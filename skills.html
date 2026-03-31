@@ -35,9 +35,29 @@
   .bundle-card {
     background: var(--cream);
     border: 1.5px solid var(--grid-line-accent);
-    padding: 36px;
     position: relative;
     transition: all 0.4s;
+    overflow: hidden;
+  }
+  .bundle-image {
+    width: 100%;
+    aspect-ratio: 16/10;
+    background: var(--cream-dark);
+    overflow: hidden;
+    border-bottom: 1px solid var(--grid-line-accent);
+  }
+  .bundle-image img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    transition: transform 0.5s;
+  }
+  .bundle-card:hover .bundle-image img {
+    transform: scale(1.03);
+  }
+  .bundle-content {
+    padding: 36px;
   }
   .bundle-card::before {
     content: '';
@@ -239,7 +259,7 @@
         <li><a href="skills.html" class="active hide-mobile">Skills</a></li>
         <li><a href="widgets.html" class="hide-mobile">Widgets</a></li>
         <li><a href="https://promptlab.tools" target="_blank" class="hide-mobile">Prompt Lab</a></li>
-        <li><a href="https://notion.so" target="_blank" class="nav-cta">Notion Store</a></li>
+        <li><a href="https://github.com/DaveHomeAssist/system-by-dave" target="_blank" class="nav-cta">GitHub</a></li>
       </ul>
     </nav>
   </header>
@@ -254,7 +274,7 @@
   </section>
 
   <!-- FEATURED AGENTS -->
-  <section class="featured-agents">
+  <section class="featured-agents" id="agents">
     <div class="container">
       <div class="section-header reveal">
         <span class="section-number">01</span>
@@ -262,7 +282,7 @@
         <span class="section-subtitle">4 agents</span>
       </div>
       <div class="agents-grid">
-        <a href="#" class="product-card reveal">
+        <a href="#ai" class="product-card reveal">
           <div class="product-image">
             <img src="img/agent-promptkeeper.png" alt="PromptKeeper" onerror="this.parentElement.innerHTML='<div class=product-image-placeholder>PK</div>'">
           </div>
@@ -276,7 +296,7 @@
             </div>
           </div>
         </a>
-        <a href="#" class="product-card reveal reveal-delay-1">
+        <a href="#productivity" class="product-card reveal reveal-delay-1">
           <div class="product-image">
             <img src="img/agent-daily-prophet.png" alt="Daily Prophet" onerror="this.parentElement.innerHTML='<div class=product-image-placeholder>DP</div>'">
           </div>
@@ -290,7 +310,7 @@
             </div>
           </div>
         </a>
-        <a href="#" class="product-card reveal reveal-delay-2">
+        <a href="#formatting" class="product-card reveal reveal-delay-2">
           <div class="product-image">
             <img src="img/agent-formatting-wizard.png" alt="Formatting Wizard" onerror="this.parentElement.innerHTML='<div class=product-image-placeholder>FW</div>'">
           </div>
@@ -304,9 +324,9 @@
             </div>
           </div>
         </a>
-        <a href="#" class="product-card reveal reveal-delay-3">
+        <a href="#productivity" class="product-card reveal reveal-delay-3">
           <div class="product-image">
-            <div class="product-image-placeholder">SI</div>
+            <img src="img/agent-sort-inbox.png" alt="Sort Inbox" class="product-image-sort-inbox" onerror="this.parentElement.innerHTML='<div class=product-image-placeholder>SI</div>'">
           </div>
           <div class="product-body">
             <div class="product-category"><span class="product-category-dot"></span> Agent</div>
@@ -323,7 +343,7 @@
   </section>
 
   <!-- BUNDLES -->
-  <section class="bundles-section">
+  <section class="bundles-section" id="bundles">
     <div class="container">
       <div class="section-header reveal">
         <span class="section-number">02</span>
@@ -332,47 +352,57 @@
       </div>
       <div class="bundles-grid">
         <div class="bundle-card reveal">
-          <div class="bundle-tag">Bundle</div>
-          <h3 class="bundle-name">Formatting Pack</h3>
-          <div class="bundle-price"><span class="currency">$</span>24</div>
-          <p class="bundle-desc">Six skills that clean up, restructure, and polish your Notion pages. From raw meeting notes to publish-ready docs.</p>
-          <ul class="bundle-skills">
-            <li>Formatting Wizard</li>
-            <li>Page Structuring Agent</li>
-            <li>Toggle & Callout Converter</li>
-            <li>Table Formatter</li>
-            <li>Heading Hierarchy Fix</li>
-            <li>Inline Code Highlighter</li>
-          </ul>
-          <a href="#" class="btn-primary" style="font-size:11px; padding:12px 24px;">
-            Get Bundle
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </a>
+          <div class="bundle-image">
+            <img src="img/card-formatting-pack.png" alt="Formatting Pack bundle artwork">
+          </div>
+          <div class="bundle-content">
+            <div class="bundle-tag">Bundle</div>
+            <h3 class="bundle-name">Formatting Pack</h3>
+            <div class="bundle-price"><span class="currency">$</span>24</div>
+            <p class="bundle-desc">Six skills that clean up, restructure, and polish your Notion pages. From raw meeting notes to publish-ready docs.</p>
+            <ul class="bundle-skills">
+              <li>Formatting Wizard</li>
+              <li>Page Structuring Agent</li>
+              <li>Toggle & Callout Converter</li>
+              <li>Table Formatter</li>
+              <li>Heading Hierarchy Fix</li>
+              <li>Inline Code Highlighter</li>
+            </ul>
+            <a href="#formatting" class="btn-primary" style="font-size:11px; padding:12px 24px;">
+              View Skills
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+          </div>
         </div>
         <div class="bundle-card reveal reveal-delay-1">
-          <div class="bundle-tag">Bundle</div>
-          <h3 class="bundle-name">Productivity Pack</h3>
-          <div class="bundle-price"><span class="currency">$</span>29</div>
-          <p class="bundle-desc">Six skills for taming information overload. Inbox sorting, daily briefings, content summarization, and automated tagging.</p>
-          <ul class="bundle-skills">
-            <li>Sort Inbox</li>
-            <li>Daily Prophet</li>
-            <li>Smart Tagger</li>
-            <li>Content Summarizer</li>
-            <li>Weekly Digest Builder</li>
-            <li>Priority Scorer</li>
-          </ul>
-          <a href="#" class="btn-primary" style="font-size:11px; padding:12px 24px;">
-            Get Bundle
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </a>
+          <div class="bundle-image">
+            <img src="img/card-productivity-pack.png" alt="Productivity Pack bundle artwork">
+          </div>
+          <div class="bundle-content">
+            <div class="bundle-tag">Bundle</div>
+            <h3 class="bundle-name">Productivity Pack</h3>
+            <div class="bundle-price"><span class="currency">$</span>29</div>
+            <p class="bundle-desc">Six skills for taming information overload. Inbox sorting, daily briefings, content summarization, and automated tagging.</p>
+            <ul class="bundle-skills">
+              <li>Sort Inbox</li>
+              <li>Daily Prophet</li>
+              <li>Smart Tagger</li>
+              <li>Content Summarizer</li>
+              <li>Weekly Digest Builder</li>
+              <li>Priority Scorer</li>
+            </ul>
+            <a href="#productivity" class="btn-primary" style="font-size:11px; padding:12px 24px;">
+              View Skills
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
   <!-- ALL SKILLS CATALOG -->
-  <section class="catalog-section">
+  <section class="catalog-section" id="catalog">
     <div class="container">
       <div class="section-header reveal">
         <span class="section-number">03</span>
@@ -393,7 +423,7 @@
       </div>
 
       <!-- Writing -->
-      <div class="skill-category reveal" data-category="writing">
+      <div class="skill-category reveal" id="writing" data-category="writing">
         <div class="skill-category-header">
           <span class="skill-category-name">Writing</span>
           <span class="skill-category-count">3 skills</span>
@@ -416,7 +446,7 @@
       </div>
 
       <!-- Formatting -->
-      <div class="skill-category reveal" data-category="formatting">
+      <div class="skill-category reveal" id="formatting" data-category="formatting">
         <div class="skill-category-header">
           <span class="skill-category-name">Formatting</span>
           <span class="skill-category-count">6 skills</span>
@@ -454,7 +484,7 @@
       </div>
 
       <!-- Productivity -->
-      <div class="skill-category reveal" data-category="productivity">
+      <div class="skill-category reveal" id="productivity" data-category="productivity">
         <div class="skill-category-header">
           <span class="skill-category-name">Productivity</span>
           <span class="skill-category-count">6 skills</span>
@@ -492,7 +522,7 @@
       </div>
 
       <!-- AI & Prompts -->
-      <div class="skill-category reveal" data-category="ai">
+      <div class="skill-category reveal" id="ai" data-category="ai">
         <div class="skill-category-header">
           <span class="skill-category-name">AI &amp; Prompts</span>
           <span class="skill-category-count">2 skills</span>
@@ -510,7 +540,7 @@
       </div>
 
       <!-- Dev -->
-      <div class="skill-category reveal" data-category="dev">
+      <div class="skill-category reveal" id="dev" data-category="dev">
         <div class="skill-category-header">
           <span class="skill-category-name">Dev</span>
           <span class="skill-category-count">3 skills</span>
@@ -533,7 +563,7 @@
       </div>
 
       <!-- AV/Production -->
-      <div class="skill-category reveal" data-category="av">
+      <div class="skill-category reveal" id="av" data-category="av">
         <div class="skill-category-header">
           <span class="skill-category-name">AV / Production</span>
           <span class="skill-category-count">3 skills</span>
@@ -580,8 +610,8 @@
         <div class="footer-col">
           <h4>Resources</h4>
           <ul>
-            <li><a href="#">Setup Guides</a></li>
-            <li><a href="#">Changelog</a></li>
+            <li><a href="https://github.com/DaveHomeAssist/system-by-dave" target="_blank">Project Repo</a></li>
+            <li><a href="https://github.com/DaveHomeAssist/system-by-dave/blob/main/CHANGELOG.md" target="_blank">Changelog</a></li>
             <li><a href="https://github.com/DaveHomeAssist" target="_blank">GitHub</a></li>
           </ul>
         </div>
@@ -590,7 +620,7 @@
           <ul>
             <li><a href="https://davehomeassist.github.io/NotionWidgets/" target="_blank">NotionWidgets</a></li>
             <li><a href="https://promptlab.tools" target="_blank">promptlab.tools</a></li>
-            <li><a href="#">Twitter / X</a></li>
+            <li><a href="privacy-policy.html">Privacy Policy</a></li>
           </ul>
         </div>
       </div>

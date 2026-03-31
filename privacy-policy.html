@@ -3,136 +3,214 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Privacy Policy — Prompt Lab</title>
+<title>Privacy Policy — System by Dave</title>
+<meta name="description" content="Privacy policy for system-by-dave: a static site for Notion tools, agents, widgets, and Prompt Lab links.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300;1,9..40,400&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
 <style>
-  :root {
-    --bg: #0f0f14;
-    --surface: #1a1a24;
-    --text: #e4e4ec;
-    --text-muted: #9998a8;
-    --accent: #8b5cf6;
-    --border: #2a2a3a;
-    --font-body: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    --font-mono: 'SF Mono', 'Cascadia Code', 'Fira Code', monospace;
-    --max-w: 680px;
+  .policy-shell {
+    padding: 80px 0 100px;
   }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--font-body);
-    font-size: 15px;
-    line-height: 1.75;
-    padding: 48px 24px 96px;
+  .policy-wrap {
+    max-width: 760px;
   }
-
-  .container { max-width: var(--max-w); margin: 0 auto; }
-
-  h1 {
-    font-size: 28px;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    margin-bottom: 8px;
-    color: #fff;
-  }
-
-  .subtitle {
-    color: var(--text-muted);
-    font-size: 14px;
-    margin-bottom: 48px;
-  }
-
-  h2 {
-    font-size: 18px;
-    font-weight: 600;
-    color: #fff;
-    margin: 40px 0 12px;
-    letter-spacing: -0.01em;
-  }
-
-  p { margin-bottom: 16px; }
-
-  .highlight {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 20px 24px;
-    margin: 24px 0;
-    font-size: 14px;
-  }
-
-  .highlight strong { color: var(--accent); }
-
-  code {
+  .policy-meta {
     font-family: var(--font-mono);
-    font-size: 13px;
-    background: var(--surface);
-    padding: 2px 6px;
-    border-radius: 4px;
-    color: var(--accent);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--rust);
+    margin-bottom: 24px;
   }
-
-  a { color: var(--accent); text-decoration: none; }
-  a:hover { text-decoration: underline; }
-
-  .footer {
-    margin-top: 64px;
-    padding-top: 24px;
-    border-top: 1px solid var(--border);
-    color: var(--text-muted);
-    font-size: 13px;
+  .policy-intro {
+    font-size: 16px;
+    font-weight: 300;
+    line-height: 1.8;
+    color: var(--charcoal-light);
+    margin-bottom: 36px;
+    max-width: 680px;
+  }
+  .policy-callout {
+    background: rgba(181,101,74,0.04);
+    border: 1px solid var(--grid-line-accent);
+    padding: 24px 28px;
+    margin-bottom: 40px;
+  }
+  .policy-callout p:last-child {
+    margin-bottom: 0;
+  }
+  .policy-section + .policy-section {
+    margin-top: 32px;
+  }
+  .policy-section h2 {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 400;
+    margin-bottom: 12px;
+    line-height: 1.2;
+  }
+  .policy-section p,
+  .policy-section li {
+    font-size: 15px;
+    font-weight: 300;
+    line-height: 1.75;
+    color: var(--charcoal-light);
+  }
+  .policy-section p + p {
+    margin-top: 14px;
+  }
+  .policy-section ul {
+    margin: 14px 0 0 18px;
+  }
+  .policy-section li + li {
+    margin-top: 10px;
+  }
+  .policy-section a {
+    color: var(--rust);
+  }
+  @media (max-width: 680px) {
+    .policy-shell {
+      padding: 56px 0 80px;
+    }
+    .policy-section h2 {
+      font-size: 24px;
+    }
   }
 </style>
 </head>
 <body>
-<div class="container">
+<div class="page-wrapper">
 
-<h1>Privacy Policy</h1>
-<p class="subtitle">Prompt Lab · Effective March 30, 2026</p>
+  <header>
+    <nav class="container">
+      <a href="index.html" class="nav-brand">
+        <div class="nav-brand-mark"><span>S</span><span class="mark-d">D</span></div>
+        <span class="nav-brand-text">System by Dave</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="skills.html" class="hide-mobile">Skills</a></li>
+        <li><a href="widgets.html" class="hide-mobile">Widgets</a></li>
+        <li><a href="https://promptlab.tools" target="_blank" class="hide-mobile">Prompt Lab</a></li>
+        <li><a href="https://github.com/DaveHomeAssist/system-by-dave" target="_blank" class="nav-cta">GitHub</a></li>
+      </ul>
+    </nav>
+  </header>
 
-<div class="highlight">
-  <strong>The short version:</strong> Prompt Lab stores everything locally on your device. Your API keys never leave your browser. We do not collect, transmit, or sell any user data.
+  <section class="page-hero">
+    <div class="container">
+      <div class="page-hero-tag reveal">Policy</div>
+      <h1 class="reveal reveal-delay-1">Privacy <em>Policy</em></h1>
+      <p class="page-hero-desc reveal reveal-delay-2">This policy covers the System by Dave website and its static pages. It does not replace the separate policy for the Prompt Lab product.</p>
+    </div>
+  </section>
+
+  <section class="policy-shell">
+    <div class="container">
+      <div class="policy-wrap">
+        <div class="policy-meta reveal">Effective March 31, 2026</div>
+
+        <p class="policy-intro reveal reveal-delay-1">System by Dave is a static website that showcases Notion skills, agents, widgets, and related tools. The site does not offer user accounts, checkout, or an authenticated application experience.</p>
+
+        <div class="policy-callout reveal reveal-delay-2">
+          <p><strong>Short version:</strong> this site does not run its own analytics, account system, or database. Most pages are static HTML served through GitHub Pages. When you leave this site for GitHub, NotionWidgets, or Prompt Lab, those destinations operate under their own policies.</p>
+        </div>
+
+        <div class="policy-section reveal">
+          <h2>What This Site Collects</h2>
+          <p>System by Dave does not directly collect personal information through sign-in forms, checkout flows, comments, or user accounts because those systems do not exist on this site.</p>
+          <p>The homepage email signup field is currently a client-side placeholder only. Submitting that form does not send your email address to a server or store it in a database.</p>
+        </div>
+
+        <div class="policy-section reveal">
+          <h2>Hosting and Basic Web Requests</h2>
+          <p>This site is hosted on GitHub Pages. Like most web hosting platforms, GitHub may process standard request information such as IP address, browser metadata, and request logs as part of delivering the site. That handling is governed by GitHub's own policies, not a custom System by Dave backend.</p>
+        </div>
+
+        <div class="policy-section reveal">
+          <h2>Third-Party Resources</h2>
+          <p>Some parts of the site load resources from third parties in order to render properly.</p>
+          <ul>
+            <li>Google Fonts is used to load the site's typefaces.</li>
+            <li>The widgets page embeds live widget demos hosted on GitHub Pages under the NotionWidgets project.</li>
+            <li>Outbound links may send you to GitHub, Prompt Lab, or other external properties.</li>
+          </ul>
+          <p>Those services may have their own logging, cookies, or privacy practices. You should review their policies if you interact with them directly.</p>
+        </div>
+
+        <div class="policy-section reveal">
+          <h2>Cookies and Analytics</h2>
+          <p>System by Dave does not currently run first-party analytics, advertising trackers, marketing pixels, or cookie consent tooling because the site does not set up its own tracking stack.</p>
+        </div>
+
+        <div class="policy-section reveal">
+          <h2>Prompt Lab</h2>
+          <p>Prompt Lab is a separate product with its own privacy policy. If you are using Prompt Lab, refer to <a href="https://promptlab.tools/privacy" target="_blank" rel="noopener noreferrer">promptlab.tools/privacy</a> for the product-specific terms that apply there.</p>
+        </div>
+
+        <div class="policy-section reveal">
+          <h2>Changes to This Policy</h2>
+          <p>If this page changes materially, the updated version will be published at this URL with a revised effective date.</p>
+        </div>
+
+        <div class="policy-section reveal">
+          <h2>Contact</h2>
+          <p>Questions about the site can be directed through the project repository at <a href="https://github.com/DaveHomeAssist/system-by-dave" target="_blank" rel="noopener noreferrer">github.com/DaveHomeAssist/system-by-dave</a>.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <a href="index.html" class="nav-brand">
+            <div class="nav-brand-mark"><span>S</span><span class="mark-d">D</span></div>
+            <span class="nav-brand-text">System by Dave</span>
+          </a>
+          <p class="footer-brand-desc">Handcrafted Notion tools for people who take their workflows seriously.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Products</h4>
+          <ul>
+            <li><a href="skills.html">Skills &amp; Agents</a></li>
+            <li><a href="widgets.html">Widgets</a></li>
+            <li><a href="https://promptlab.tools" target="_blank">Prompt Lab</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Resources</h4>
+          <ul>
+            <li><a href="https://github.com/DaveHomeAssist/system-by-dave" target="_blank">Project Repo</a></li>
+            <li><a href="https://github.com/DaveHomeAssist/system-by-dave/blob/main/CHANGELOG.md" target="_blank">Changelog</a></li>
+            <li><a href="https://github.com/DaveHomeAssist" target="_blank">GitHub</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Connect</h4>
+          <ul>
+            <li><a href="https://davehomeassist.github.io/NotionWidgets/" target="_blank">NotionWidgets</a></li>
+            <li><a href="https://promptlab.tools" target="_blank">promptlab.tools</a></li>
+            <li><a href="privacy-policy.html">Privacy Policy</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span class="footer-copy">&copy; 2026 System by Dave. All rights reserved.</span>
+      </div>
+    </div>
+  </footer>
+
 </div>
 
-<h2>What Prompt Lab Does</h2>
-<p>Prompt Lab is a browser extension for AI prompt engineering. It helps you write, enhance, compare, organize, and version prompts. It connects to AI provider APIs using your own API keys.</p>
-
-<h2>Data Storage</h2>
-<p>All user data — your prompt library, collections, notepad content, preferences, and settings — is stored in your browser's <code>localStorage</code>. This data never leaves your device. There is no Prompt Lab server, database, or cloud sync. If you uninstall the extension or clear your browser data, this data is permanently deleted.</p>
-
-<h2>API Keys</h2>
-<p>Your API key is stored in <code>chrome.storage.local</code>, which is isolated to the extension's background service worker. The key is used exclusively to authenticate requests to AI provider APIs (such as the Anthropic API) on your behalf. Your API key is never transmitted to any server operated by Prompt Lab, never included in analytics or logging, and never accessible to web pages or other extensions.</p>
-
-<h2>API Requests</h2>
-<p>When you use enhancement, A/B testing, or other AI-powered features, Prompt Lab sends your prompt text directly to the AI provider's API endpoint using your API key. These requests go from your browser to the provider (e.g., Anthropic, OpenAI, Google). Prompt Lab does not proxy, intercept, log, or store these requests. The provider's own privacy policy governs how they handle your data.</p>
-
-<h2>Data Collection</h2>
-<p>Prompt Lab collects no analytics, telemetry, usage data, crash reports, or personally identifiable information. There are no tracking pixels, no cookies set by Prompt Lab, and no third-party analytics scripts.</p>
-
-<h2>Permissions</h2>
-<p>Prompt Lab requests only the <code>storage</code> permission, used to securely store your API key in the extension's isolated storage area. No other browser permissions are requested. Prompt Lab does not access your browsing history, tabs, bookmarks, downloads, or any other browser data.</p>
-
-<h2>Shareable Links</h2>
-<p>Prompt Lab can generate shareable links for individual prompts. These links encode the prompt data in the URL fragment (the part after <code>#</code>), which is not sent to any server. Sharing a link shares only the data you explicitly choose to include.</p>
-
-<h2>Third-Party Services</h2>
-<p>Prompt Lab does not integrate with any third-party analytics, advertising, or tracking services. The only third-party communication is between your browser and the AI provider APIs you configure.</p>
-
-<h2>Children's Privacy</h2>
-<p>Prompt Lab is not directed at children under 13. We do not knowingly collect data from children.</p>
-
-<h2>Changes to This Policy</h2>
-<p>If this policy changes, the updated version will be published at this URL with a new effective date. Material changes will be noted in the extension's release notes.</p>
-
-<h2>Contact</h2>
-<p>Questions about this privacy policy can be directed to the Prompt Lab project on <a href="https://github.com/DaveHomeAssist/prompt-lab">GitHub</a>.</p>
-
-<div class="footer">
-  <p>Prompt Lab is an open-source project. This privacy policy applies to the Chrome extension, web app, and all distribution surfaces at <a href="https://promptlab.tools">promptlab.tools</a>.</p>
-</div>
-
-</div>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  });
+</script>
 </body>
 </html>
