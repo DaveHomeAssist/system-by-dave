@@ -32,33 +32,18 @@
     border: 1px solid var(--grid-line-accent);
     border-radius: 4px;
     aspect-ratio: 16/10;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     position: relative;
     overflow: hidden;
   }
   .widget-preview::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background:
-      repeating-linear-gradient(90deg, var(--grid-line) 0 0.5px, transparent 0.5px 20px),
-      repeating-linear-gradient(0deg, var(--grid-line) 0 0.5px, transparent 0.5px 20px);
-  }
-  .widget-preview-label {
-    position: relative;
-    font-family: var(--font-mono);
-    font-size: 14px;
-    color: var(--charcoal-light);
-    opacity: 0.5;
-    letter-spacing: 0.06em;
+    display: none;
   }
   .widget-preview iframe {
     width: 100%;
     height: 100%;
     border: none;
     position: relative;
+    border-radius: 4px;
   }
 
   .widget-info-tag {
@@ -159,7 +144,7 @@
       <!-- PROJECT STATUS -->
       <div class="widget-row reveal">
         <div class="widget-preview">
-          <span class="widget-preview-label">Project Status Dashboard</span>
+          <iframe src="https://davehomeassist.github.io/NotionWidgets/project-status.html" loading="lazy" title="Project Status Dashboard"></iframe>
         </div>
         <div class="widget-info">
           <div class="widget-info-tag">Widget</div>
@@ -185,7 +170,7 @@
       <!-- QUEST LOG -->
       <div class="widget-row reverse reveal">
         <div class="widget-preview">
-          <span class="widget-preview-label">Quest Log</span>
+          <iframe src="https://davehomeassist.github.io/NotionWidgets/quest-log.html" loading="lazy" title="Quest Log"></iframe>
         </div>
         <div class="widget-info">
           <div class="widget-info-tag">Widget</div>
@@ -211,7 +196,7 @@
       <!-- CLIENT APPROVAL -->
       <div class="widget-row reveal">
         <div class="widget-preview">
-          <span class="widget-preview-label">Client Approval Hub</span>
+          <iframe src="https://davehomeassist.github.io/NotionWidgets/client-approval.html" loading="lazy" title="Client Approval Hub"></iframe>
         </div>
         <div class="widget-info">
           <div class="widget-info-tag">Widget</div>
@@ -237,7 +222,7 @@
       <!-- WORKSPACE MAP -->
       <div class="widget-row reverse reveal">
         <div class="widget-preview">
-          <span class="widget-preview-label">Workspace Map</span>
+          <iframe src="https://davehomeassist.github.io/NotionWidgets/notion-workspace-map-v2.html" loading="lazy" title="Workspace Map"></iframe>
         </div>
         <div class="widget-info">
           <div class="widget-info-tag">Widget</div>
