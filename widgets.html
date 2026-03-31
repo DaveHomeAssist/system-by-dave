@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Widgets — System by Dave</title>
+<meta name="description" content="Embeddable HTML widgets for Notion. Status dashboards, quest trackers, approval hubs, workspace maps — no backend, URL-parameter configured.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300;1,9..40,400&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .widget-detail {
+    padding: 80px 0;
+  }
+  .widget-detail + .widget-detail {
+    padding-top: 0;
+  }
+  .widget-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    align-items: center;
+    padding: 48px 0;
+    border-bottom: 1px solid var(--grid-line-accent);
+  }
+  .widget-row:last-child { border-bottom: none; }
+  .widget-row.reverse { direction: rtl; }
+  .widget-row.reverse > * { direction: ltr; }
+
+  .widget-preview {
+    background: var(--cream-dark);
+    border: 1px solid var(--grid-line-accent);
+    border-radius: 4px;
+    aspect-ratio: 16/10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .widget-preview::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      repeating-linear-gradient(90deg, var(--grid-line) 0 0.5px, transparent 0.5px 20px),
+      repeating-linear-gradient(0deg, var(--grid-line) 0 0.5px, transparent 0.5px 20px);
+  }
+  .widget-preview-label {
+    position: relative;
+    font-family: var(--font-mono);
+    font-size: 14px;
+    color: var(--charcoal-light);
+    opacity: 0.5;
+    letter-spacing: 0.06em;
+  }
+  .widget-preview iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    position: relative;
+  }
+
+  .widget-info-tag {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--rust);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .widget-info h3 {
+    font-family: var(--font-display);
+    font-size: 32px;
+    font-weight: 400;
+    margin-bottom: 16px;
+    line-height: 1.15;
+  }
+  .widget-info p {
+    font-size: 15px;
+    font-weight: 300;
+    line-height: 1.7;
+    color: var(--charcoal-light);
+    margin-bottom: 24px;
+  }
+  .widget-features {
+    list-style: none;
+    margin-bottom: 28px;
+  }
+  .widget-features li {
+    font-size: 13px;
+    font-weight: 300;
+    color: var(--charcoal-light);
+    padding: 6px 0;
+    border-bottom: 1px solid var(--grid-line);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .widget-features li::before {
+    content: '';
+    width: 4px;
+    height: 4px;
+    background: var(--rust);
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .widget-actions {
+    display: flex;
+    gap: 12px;
+  }
+  .widget-actions .btn-primary { font-size: 11px; padding: 12px 24px; }
+  .widget-actions .btn-secondary { font-size: 11px; padding: 12px 20px; }
+
+  @media (max-width: 1024px) {
+    .widget-row, .widget-row.reverse {
+      grid-template-columns: 1fr;
+      direction: ltr;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="page-wrapper">
+
+  <!-- HEADER -->
+  <header>
+    <nav class="container">
+      <a href="index.html" class="nav-brand">
+        <div class="nav-brand-mark"><span>S</span><span class="mark-d">D</span></div>
+        <span class="nav-brand-text">System by Dave</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="skills.html" class="hide-mobile">Skills</a></li>
+        <li><a href="widgets.html" class="active hide-mobile">Widgets</a></li>
+        <li><a href="https://promptlab.tools" target="_blank" class="hide-mobile">Prompt Lab</a></li>
+        <li><a href="https://notion.so" target="_blank" class="nav-cta">Notion Store</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- PAGE HERO -->
+  <section class="page-hero">
+    <div class="container">
+      <div class="page-hero-tag reveal">NotionWidgets</div>
+      <h1 class="reveal reveal-delay-1">Embeddable widgets for <em>Notion</em></h1>
+      <p class="page-hero-desc reveal reveal-delay-2">Self-contained HTML files that embed directly into Notion pages via iframe. No backend, no API key, no account — configured entirely through URL parameters.</p>
+    </div>
+  </section>
+
+  <!-- WIDGETS -->
+  <section class="widget-detail">
+    <div class="container">
+
+      <!-- PROJECT STATUS -->
+      <div class="widget-row reveal">
+        <div class="widget-preview">
+          <span class="widget-preview-label">Project Status Dashboard</span>
+        </div>
+        <div class="widget-info">
+          <div class="widget-info-tag">Widget</div>
+          <h3>Project Status Dashboard</h3>
+          <p>A compact status panel with animated progress rings, phase tracking, milestone markers, and color-coded health indicators. Dark and light mode. Fits cleanly inside any Notion page.</p>
+          <ul class="widget-features">
+            <li>Animated SVG progress rings</li>
+            <li>Phase stages with active/complete states</li>
+            <li>Health status indicators (on track, at risk, blocked)</li>
+            <li>URL-parameter configured — no editing code</li>
+            <li>Respects prefers-color-scheme</li>
+          </ul>
+          <div class="widget-actions">
+            <a href="https://davehomeassist.github.io/NotionWidgets/" target="_blank" class="btn-primary">
+              View Demo
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
+            </a>
+            <a href="https://github.com/DaveHomeAssist/NotionWidgets" target="_blank" class="btn-secondary">GitHub</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- QUEST LOG -->
+      <div class="widget-row reverse reveal">
+        <div class="widget-preview">
+          <span class="widget-preview-label">Quest Log</span>
+        </div>
+        <div class="widget-info">
+          <div class="widget-info-tag">Widget</div>
+          <h3>Quest Log</h3>
+          <p>Turn your Notion tasks into an RPG. Track quests with XP bars, streak counters, gold earned, and HP — complete with level progression and critical hit bonuses.</p>
+          <ul class="widget-features">
+            <li>XP, gold, streaks, and HP tracking</li>
+            <li>Quest completion with level-up animations</li>
+            <li>Critical hit bonus for streaks</li>
+            <li>Gamification layer over real tasks</li>
+            <li>URL-parameter configured</li>
+          </ul>
+          <div class="widget-actions">
+            <a href="https://davehomeassist.github.io/NotionWidgets/" target="_blank" class="btn-primary">
+              View Demo
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
+            </a>
+            <a href="https://github.com/DaveHomeAssist/NotionWidgets" target="_blank" class="btn-secondary">GitHub</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- CLIENT APPROVAL -->
+      <div class="widget-row reveal">
+        <div class="widget-preview">
+          <span class="widget-preview-label">Client Approval Hub</span>
+        </div>
+        <div class="widget-info">
+          <div class="widget-info-tag">Widget</div>
+          <h3>Client Approval Hub</h3>
+          <p>An approval workflow panel with Approve, Revise, and Restart actions. Captures feedback inline, tracks decision status, and shows approval history — perfect for freelancers and agency workflows.</p>
+          <ul class="widget-features">
+            <li>Three-state approval flow (approve / revise / restart)</li>
+            <li>Inline feedback text capture</li>
+            <li>Status badge with decision history</li>
+            <li>Clean embed for client-facing pages</li>
+            <li>Dark and light mode</li>
+          </ul>
+          <div class="widget-actions">
+            <a href="https://davehomeassist.github.io/NotionWidgets/" target="_blank" class="btn-primary">
+              View Demo
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
+            </a>
+            <a href="https://github.com/DaveHomeAssist/NotionWidgets" target="_blank" class="btn-secondary">GitHub</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- WORKSPACE MAP -->
+      <div class="widget-row reverse reveal">
+        <div class="widget-preview">
+          <span class="widget-preview-label">Workspace Map</span>
+        </div>
+        <div class="widget-info">
+          <div class="widget-info-tag">Widget</div>
+          <h3>Workspace Map</h3>
+          <p>An interactive graph powered by D3 and dagre that visualizes your entire Notion workspace as a node map. Filter by type, search by name, zoom, pan, and click through to understand how your pages and databases connect.</p>
+          <ul class="widget-features">
+            <li>D3 + dagre force-directed graph layout</li>
+            <li>Color-coded node types (hubs, databases, projects, pages)</li>
+            <li>Search, filter, and zoom controls</li>
+            <li>Stats panel with node counts</li>
+            <li>Full-page or embedded mode</li>
+          </ul>
+          <div class="widget-actions">
+            <a href="https://davehomeassist.github.io/NotionWidgets/" target="_blank" class="btn-primary">
+              View Demo
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
+            </a>
+            <a href="https://github.com/DaveHomeAssist/NotionWidgets" target="_blank" class="btn-secondary">GitHub</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <a href="index.html" class="nav-brand">
+            <div class="nav-brand-mark"><span>S</span><span class="mark-d">D</span></div>
+            <span class="nav-brand-text">System by Dave</span>
+          </a>
+          <p class="footer-brand-desc">Handcrafted Notion tools for people who take their workflows seriously.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Products</h4>
+          <ul>
+            <li><a href="skills.html">Skills &amp; Agents</a></li>
+            <li><a href="widgets.html">Widgets</a></li>
+            <li><a href="https://promptlab.tools" target="_blank">Prompt Lab</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Resources</h4>
+          <ul>
+            <li><a href="#">Setup Guides</a></li>
+            <li><a href="https://github.com/DaveHomeAssist" target="_blank">GitHub</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Connect</h4>
+          <ul>
+            <li><a href="https://davehomeassist.github.io/NotionWidgets/" target="_blank">NotionWidgets</a></li>
+            <li><a href="https://promptlab.tools" target="_blank">promptlab.tools</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span class="footer-copy">&copy; 2026 System by Dave. All rights reserved.</span>
+      </div>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  });
+</script>
+</body>
+</html>

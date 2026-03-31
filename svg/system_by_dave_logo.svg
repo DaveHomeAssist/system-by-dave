@@ -1,0 +1,51 @@
+<svg width="100%" viewBox="0 0 680 310" xmlns="http://www.w3.org/2000/svg">
+  <rect width="680" height="300" fill="#0a0a0a" style="fill:rgb(10, 10, 10);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+
+  <!-- Mark: geometric S built from 3 horizontal bars connected by verticals -->
+  <!-- Unit = 20px. Mark occupies 100x120, centered at x=120, y=90 -->
+
+  <!-- Top bar -->
+  <rect x="60" y="90" width="100" height="20" fill="#b8f542" style="fill:rgb(184, 245, 66);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+  <!-- Mid bar -->
+  <rect x="60" y="140" width="100" height="20" fill="#b8f542" style="fill:rgb(184, 245, 66);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+  <!-- Bottom bar -->
+  <rect x="60" y="190" width="100" height="20" fill="#b8f542" style="fill:rgb(184, 245, 66);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+
+  <!-- Top-left vertical connector (top bar down to mid, left side) -->
+  <rect x="60" y="110" width="20" height="30" fill="#b8f542" style="fill:rgb(184, 245, 66);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+  <!-- Bottom-right vertical connector (mid bar down to bottom, right side) -->
+  <rect x="140" y="160" width="20" height="30" fill="#b8f542" style="fill:rgb(184, 245, 66);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+
+  <!-- Negative space cutouts to clarify the S shape -->
+  <!-- Top-right open (no vertical on right of top section) -->
+  <!-- Bottom-left open (no vertical on left of bottom section) -->
+
+  <!-- Subtle grid texture behind mark -->
+  <g stroke="#1a1a1a" stroke-width="0.5" opacity="0.6" style="fill:rgb(0, 0, 0);stroke:rgb(26, 26, 26);color:rgb(255, 255, 255);stroke-width:0.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:0.6;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">
+    <line x1="40" y1="90" x2="40" y2="210" style="fill:rgb(0, 0, 0);stroke:rgb(26, 26, 26);color:rgb(255, 255, 255);stroke-width:0.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+    <line x1="60" y1="70" x2="60" y2="230" style="fill:rgb(0, 0, 0);stroke:rgb(26, 26, 26);color:rgb(255, 255, 255);stroke-width:0.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+    <line x1="180" y1="70" x2="180" y2="230" style="fill:rgb(0, 0, 0);stroke:rgb(26, 26, 26);color:rgb(255, 255, 255);stroke-width:0.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+    <line x1="200" y1="90" x2="200" y2="210" style="fill:rgb(0, 0, 0);stroke:rgb(26, 26, 26);color:rgb(255, 255, 255);stroke-width:0.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+    <line x1="40" y1="70" x2="200" y2="70" style="fill:rgb(0, 0, 0);stroke:rgb(26, 26, 26);color:rgb(255, 255, 255);stroke-width:0.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+    <line x1="40" y1="90" x2="200" y2="90" style="fill:rgb(0, 0, 0);stroke:rgb(26, 26, 26);color:rgb(255, 255, 255);stroke-width:0.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+    <line x1="40" y1="230" x2="200" y2="230" style="fill:rgb(0, 0, 0);stroke:rgb(26, 26, 26);color:rgb(255, 255, 255);stroke-width:0.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+    <line x1="40" y1="210" x2="200" y2="210" style="fill:rgb(0, 0, 0);stroke:rgb(26, 26, 26);color:rgb(255, 255, 255);stroke-width:0.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+  </g>
+
+  <!-- Acid green left rail -->
+  <rect x="40" y="70" width="3" height="160" fill="#b8f542" opacity="0.4" style="fill:rgb(184, 245, 66);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:0.4;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+
+  <!-- Wordmark: SYSTEM BY DAVE -->
+  <!-- SYSTEM -->
+  <text x="230" y="158" font-family="'Syne','Arial Black',sans-serif" font-size="64" font-weight="800" fill="#f0ede6" letter-spacing="-1" style="fill:rgb(240, 237, 230);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:Syne, &quot;Arial Black&quot;, sans-serif;font-size:64px;font-weight:800;text-anchor:start;dominant-baseline:auto">SYSTEM</text>
+
+  <!-- BY — small green, superscript feel -->
+  <text x="232" y="196" font-family="'DM Mono','Courier New',monospace" font-size="13" font-weight="500" fill="#b8f542" letter-spacing="5" style="fill:rgb(184, 245, 66);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;DM Mono&quot;, &quot;Courier New&quot;, monospace;font-size:13px;font-weight:500;text-anchor:start;dominant-baseline:auto">BY DAVE</text>
+
+  <!-- Divider between mark and wordmark -->
+  <line x1="215" y1="80" x2="215" y2="220" stroke="#2a2a2a" stroke-width="1" style="fill:rgb(0, 0, 0);stroke:rgb(42, 42, 42);color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+
+  <!-- Bottom tagline rule -->
+  <line x1="40" y1="248" x2="640" y2="248" stroke="#1e1e1e" stroke-width="1" style="fill:rgb(0, 0, 0);stroke:rgb(30, 30, 30);color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+  <text x="40" y="268" font-family="'DM Mono','Courier New',monospace" font-size="11" font-weight="400" fill="#333333" letter-spacing="3" style="fill:rgb(51, 51, 51);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;DM Mono&quot;, &quot;Courier New&quot;, monospace;font-size:11px;font-weight:400;text-anchor:start;dominant-baseline:auto">NOTION TEMPLATES  ·  PERSONAL OS  ·  FREELANCE TOOLS</text>
+</svg>

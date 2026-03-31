@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Privacy Policy — Prompt Lab</title>
+<style>
+  :root {
+    --bg: #0f0f14;
+    --surface: #1a1a24;
+    --text: #e4e4ec;
+    --text-muted: #9998a8;
+    --accent: #8b5cf6;
+    --border: #2a2a3a;
+    --font-body: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    --font-mono: 'SF Mono', 'Cascadia Code', 'Fira Code', monospace;
+    --max-w: 680px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.75;
+    padding: 48px 24px 96px;
+  }
+
+  .container { max-width: var(--max-w); margin: 0 auto; }
+
+  h1 {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+    color: #fff;
+  }
+
+  .subtitle {
+    color: var(--text-muted);
+    font-size: 14px;
+    margin-bottom: 48px;
+  }
+
+  h2 {
+    font-size: 18px;
+    font-weight: 600;
+    color: #fff;
+    margin: 40px 0 12px;
+    letter-spacing: -0.01em;
+  }
+
+  p { margin-bottom: 16px; }
+
+  .highlight {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin: 24px 0;
+    font-size: 14px;
+  }
+
+  .highlight strong { color: var(--accent); }
+
+  code {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    background: var(--surface);
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: var(--accent);
+  }
+
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  .footer {
+    margin-top: 64px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 13px;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<h1>Privacy Policy</h1>
+<p class="subtitle">Prompt Lab · Effective March 30, 2026</p>
+
+<div class="highlight">
+  <strong>The short version:</strong> Prompt Lab stores everything locally on your device. Your API keys never leave your browser. We do not collect, transmit, or sell any user data.
+</div>
+
+<h2>What Prompt Lab Does</h2>
+<p>Prompt Lab is a browser extension for AI prompt engineering. It helps you write, enhance, compare, organize, and version prompts. It connects to AI provider APIs using your own API keys.</p>
+
+<h2>Data Storage</h2>
+<p>All user data — your prompt library, collections, notepad content, preferences, and settings — is stored in your browser's <code>localStorage</code>. This data never leaves your device. There is no Prompt Lab server, database, or cloud sync. If you uninstall the extension or clear your browser data, this data is permanently deleted.</p>
+
+<h2>API Keys</h2>
+<p>Your API key is stored in <code>chrome.storage.local</code>, which is isolated to the extension's background service worker. The key is used exclusively to authenticate requests to AI provider APIs (such as the Anthropic API) on your behalf. Your API key is never transmitted to any server operated by Prompt Lab, never included in analytics or logging, and never accessible to web pages or other extensions.</p>
+
+<h2>API Requests</h2>
+<p>When you use enhancement, A/B testing, or other AI-powered features, Prompt Lab sends your prompt text directly to the AI provider's API endpoint using your API key. These requests go from your browser to the provider (e.g., Anthropic, OpenAI, Google). Prompt Lab does not proxy, intercept, log, or store these requests. The provider's own privacy policy governs how they handle your data.</p>
+
+<h2>Data Collection</h2>
+<p>Prompt Lab collects no analytics, telemetry, usage data, crash reports, or personally identifiable information. There are no tracking pixels, no cookies set by Prompt Lab, and no third-party analytics scripts.</p>
+
+<h2>Permissions</h2>
+<p>Prompt Lab requests only the <code>storage</code> permission, used to securely store your API key in the extension's isolated storage area. No other browser permissions are requested. Prompt Lab does not access your browsing history, tabs, bookmarks, downloads, or any other browser data.</p>
+
+<h2>Shareable Links</h2>
+<p>Prompt Lab can generate shareable links for individual prompts. These links encode the prompt data in the URL fragment (the part after <code>#</code>), which is not sent to any server. Sharing a link shares only the data you explicitly choose to include.</p>
+
+<h2>Third-Party Services</h2>
+<p>Prompt Lab does not integrate with any third-party analytics, advertising, or tracking services. The only third-party communication is between your browser and the AI provider APIs you configure.</p>
+
+<h2>Children's Privacy</h2>
+<p>Prompt Lab is not directed at children under 13. We do not knowingly collect data from children.</p>
+
+<h2>Changes to This Policy</h2>
+<p>If this policy changes, the updated version will be published at this URL with a new effective date. Material changes will be noted in the extension's release notes.</p>
+
+<h2>Contact</h2>
+<p>Questions about this privacy policy can be directed to the Prompt Lab project on <a href="https://github.com/DaveHomeAssist/prompt-lab">GitHub</a>.</p>
+
+<div class="footer">
+  <p>Prompt Lab is an open-source project. This privacy policy applies to the Chrome extension, web app, and all distribution surfaces at <a href="https://promptlab.tools">promptlab.tools</a>.</p>
+</div>
+
+</div>
+</body>
+</html>

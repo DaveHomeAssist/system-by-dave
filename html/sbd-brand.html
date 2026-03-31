@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>System by Dave — Brand Reference</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #1c1917;
+    --bg2:       #222019;
+    --bg3:       #2a2623;
+    --rust:      #c0623a;
+    --rust-dim:  #8a4428;
+    --rust-pale: #e8a882;
+    --sand:      #e8dece;
+    --sand-dim:  #b8afa2;
+    --sand-pale: #f2ede6;
+    --charcoal:  #2e2b28;
+    --mid:       #4a4440;
+    --faint:     #333030;
+    --border:    #2e2b28;
+    --border2:   #3a3632;
+
+    --font-display: 'Syne', 'Arial Black', sans-serif;
+    --font-mono:    'DM Mono', 'Courier New', monospace;
+    --font-body:    'DM Sans', system-ui, sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--sand);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Layout ── */
+  .page {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 40px 120px;
+  }
+
+  /* ── Header ── */
+  header {
+    border-bottom: 1px solid var(--border);
+    padding: 48px 0 40px;
+    margin-bottom: 80px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+  }
+
+  .header-mark {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .mark-svg { flex-shrink: 0; }
+
+  .header-wordmark h1 {
+    font-family: var(--font-display);
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: var(--sand);
+    line-height: 1;
+  }
+
+  .header-wordmark span {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--rust);
+    letter-spacing: 4px;
+    display: block;
+    margin-top: 6px;
+  }
+
+  .header-meta {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--mid);
+    letter-spacing: 2px;
+    text-align: right;
+    line-height: 2;
+  }
+
+  /* ── Section ── */
+  section {
+    margin-bottom: 80px;
+  }
+
+  .section-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 4px;
+    color: var(--rust);
+    text-transform: uppercase;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── Logo lockups ── */
+  .logo-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+  }
+
+  .logo-swatch {
+    padding: 48px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .logo-swatch.dark  { background: var(--bg); border: 1px solid var(--border); }
+  .logo-swatch.light { background: var(--sand-pale); border: 1px solid #d8d2c8; }
+  .logo-swatch.rust-bg { background: var(--rust); border: 1px solid var(--rust); }
+  .logo-swatch.charcoal-bg { background: var(--charcoal); border: 1px solid var(--charcoal); }
+
+  .logo-swatch figcaption {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 2px;
+    margin-top: 16px;
+    text-align: center;
+    color: var(--mid);
+  }
+
+  .logo-swatch.light figcaption { color: #9a958e; }
+
+  .logo-swatch figure {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* ── Color palette ── */
+  .palette {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+  }
+
+  .swatch {
+    aspect-ratio: 1;
+    position: relative;
+    cursor: default;
+  }
+
+  .swatch-label {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 8px 6px 6px;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.5px;
+    line-height: 1.5;
+    background: rgba(0,0,0,0.4);
+  }
+
+  .swatch-label.light-text { color: #f2ede6; }
+  .swatch-label.dark-text  { color: #1c1917; background: rgba(255,255,255,0.3); }
+
+  /* ── Typography ── */
+  .type-specimen {
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  .type-row {
+    display: grid;
+    grid-template-columns: 160px 1fr 120px;
+    align-items: baseline;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+    gap: 24px;
+  }
+
+  .type-row:last-child { border-bottom: none; }
+
+  .type-meta {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--mid);
+    letter-spacing: 1px;
+    line-height: 1.6;
+  }
+
+  .type-usage {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--rust-dim);
+    letter-spacing: 1px;
+    text-align: right;
+  }
+
+  .specimen-display {
+    font-family: var(--font-display);
+    font-size: 52px;
+    font-weight: 800;
+    color: var(--sand);
+    letter-spacing: -1px;
+    line-height: 1;
+  }
+
+  .specimen-display-sm {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--sand);
+    letter-spacing: -0.5px;
+    line-height: 1.1;
+  }
+
+  .specimen-mono-lg {
+    font-family: var(--font-mono);
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--rust);
+    letter-spacing: 4px;
+  }
+
+  .specimen-mono-sm {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--sand-dim);
+    letter-spacing: 2px;
+  }
+
+  .specimen-body {
+    font-family: var(--font-body);
+    font-size: 15px;
+    font-weight: 300;
+    color: var(--sand-dim);
+    line-height: 1.7;
+  }
+
+  /* ── Spacing ── */
+  .spacing-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .spacing-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--faint);
+  }
+
+  .spacing-bar-wrap {
+    flex: 1;
+    height: 20px;
+    display: flex;
+    align-items: center;
+  }
+
+  .spacing-bar {
+    height: 8px;
+    background: var(--rust);
+    opacity: 0.7;
+  }
+
+  .spacing-val {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--rust);
+    width: 36px;
+    text-align: right;
+  }
+
+  .spacing-name {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--mid);
+    letter-spacing: 2px;
+    width: 80px;
+  }
+
+  /* ── Usage examples ── */
+  .usage-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+  }
+
+  .usage-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    padding: 32px;
+  }
+
+  .usage-card h3 {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--sand);
+    margin-bottom: 8px;
+  }
+
+  .usage-card p {
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 300;
+    color: var(--sand-dim);
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+
+  .tag {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 2px;
+    padding: 4px 10px;
+    border: 1px solid var(--border2);
+    color: var(--mid);
+    margin-right: 6px;
+    margin-bottom: 6px;
+  }
+
+  .tag.accent {
+    border-color: var(--rust-dim);
+    color: var(--rust-pale);
+  }
+
+  /* ── Do / Don't ── */
+  .rules-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px;
+  }
+
+  .rule-block {
+    padding: 28px;
+    border: 1px solid var(--border);
+  }
+
+  .rule-block.do   { border-top: 3px solid var(--rust); }
+  .rule-block.dont { border-top: 3px solid var(--mid); }
+
+  .rule-header {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 3px;
+    margin-bottom: 16px;
+  }
+
+  .rule-block.do   .rule-header { color: var(--rust); }
+  .rule-block.dont .rule-header { color: var(--mid); }
+
+  .rule-block ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .rule-block ul li {
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 300;
+    color: var(--sand-dim);
+    padding: 6px 0;
+    border-bottom: 1px solid var(--faint);
+    padding-left: 16px;
+    position: relative;
+    line-height: 1.5;
+  }
+
+  .rule-block ul li::before {
+    position: absolute;
+    left: 0;
+    font-family: var(--font-mono);
+    font-size: 10px;
+  }
+
+  .rule-block.do   ul li::before { content: '+'; color: var(--rust); }
+  .rule-block.dont ul li::before { content: '—'; color: var(--mid); }
+
+  /* ── Mark anatomy ── */
+  .mark-anatomy {
+    display: flex;
+    gap: 60px;
+    align-items: flex-start;
+    padding: 40px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+  }
+
+  .anatomy-notes {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding-top: 8px;
+  }
+
+  .anatomy-note {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .anatomy-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 6px;
+  }
+
+  .anatomy-note p {
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 300;
+    color: var(--sand-dim);
+    line-height: 1.5;
+  }
+
+  .anatomy-note strong {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--sand);
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  /* ── Footer ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding-top: 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  footer p {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--mid);
+    letter-spacing: 2px;
+  }
+
+  /* ── Animations ── */
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  section {
+    animation: fade-up 0.5s ease both;
+  }
+
+  section:nth-child(1) { animation-delay: 0.05s; }
+  section:nth-child(2) { animation-delay: 0.10s; }
+  section:nth-child(3) { animation-delay: 0.15s; }
+  section:nth-child(4) { animation-delay: 0.20s; }
+  section:nth-child(5) { animation-delay: 0.25s; }
+  section:nth-child(6) { animation-delay: 0.30s; }
+  section:nth-child(7) { animation-delay: 0.35s; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Header -->
+  <header>
+    <div class="header-mark">
+      <svg class="mark-svg" width="48" height="60" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
+        <rect x="0"  y="0"  width="100" height="20" fill="#c0623a"/>
+        <rect x="0"  y="50" width="100" height="20" fill="#c0623a"/>
+        <rect x="0"  y="100" width="100" height="20" fill="#c0623a"/>
+        <rect x="0"  y="20" width="20"  height="30" fill="#c0623a"/>
+        <rect x="80" y="70" width="20"  height="30" fill="#c0623a"/>
+      </svg>
+      <div class="header-wordmark">
+        <h1>SYSTEM</h1>
+        <span>BY DAVE</span>
+      </div>
+    </div>
+    <div class="header-meta">
+      BRAND REFERENCE v1.0<br>
+      MARCH 2026<br>
+      @SYSTEMBYDAVE
+    </div>
+  </header>
+
+  <!-- 01 Logo -->
+  <section>
+    <div class="section-label">01 — Logo lockup</div>
+    <div class="logo-grid">
+      <div class="logo-swatch dark">
+        <figure>
+          <svg width="260" height="120" viewBox="0 0 520 240" xmlns="http://www.w3.org/2000/svg">
+            <g stroke="#2a2623" stroke-width="0.5" opacity="0.6">
+              <line x1="30" y1="60" x2="30" y2="180"/><line x1="50" y1="40" x2="50" y2="200"/>
+              <line x1="150" y1="40" x2="150" y2="200"/><line x1="170" y1="60" x2="170" y2="180"/>
+              <line x1="30" y1="40" x2="170" y2="40"/><line x1="30" y1="60" x2="170" y2="60"/>
+              <line x1="30" y1="200" x2="170" y2="200"/><line x1="30" y1="180" x2="170" y2="180"/>
+            </g>
+            <rect x="50" y="60"  width="100" height="20" fill="#c0623a"/>
+            <rect x="50" y="110" width="100" height="20" fill="#c0623a"/>
+            <rect x="50" y="160" width="100" height="20" fill="#c0623a"/>
+            <rect x="50" y="80"  width="20"  height="30" fill="#c0623a"/>
+            <rect x="130" y="130" width="20" height="30" fill="#c0623a"/>
+            <rect x="30" y="40" width="3" height="160" fill="#c0623a" opacity="0.4"/>
+            <line x1="185" y1="50" x2="185" y2="190" stroke="#2e2b28" stroke-width="1"/>
+            <text x="200" y="130" font-family="Arial Black,sans-serif" font-size="52" font-weight="800" fill="#e8dece" letter-spacing="-1">SYSTEM</text>
+            <text x="202" y="162" font-family="Courier New,monospace" font-size="11" font-weight="500" fill="#c0623a" letter-spacing="4">BY DAVE</text>
+          </svg>
+          <figcaption>DARK — PRIMARY</figcaption>
+        </figure>
+      </div>
+      <div class="logo-swatch light">
+        <figure>
+          <svg width="260" height="120" viewBox="0 0 520 240" xmlns="http://www.w3.org/2000/svg">
+            <g stroke="#ddd8cf" stroke-width="0.5" opacity="0.8">
+              <line x1="30" y1="60" x2="30" y2="180"/><line x1="50" y1="40" x2="50" y2="200"/>
+              <line x1="150" y1="40" x2="150" y2="200"/><line x1="170" y1="60" x2="170" y2="180"/>
+              <line x1="30" y1="40" x2="170" y2="40"/><line x1="30" y1="60" x2="170" y2="60"/>
+              <line x1="30" y1="200" x2="170" y2="200"/><line x1="30" y1="180" x2="170" y2="180"/>
+            </g>
+            <rect x="50" y="60"  width="100" height="20" fill="#2e2b28"/>
+            <rect x="50" y="110" width="100" height="20" fill="#2e2b28"/>
+            <rect x="50" y="160" width="100" height="20" fill="#2e2b28"/>
+            <rect x="50" y="80"  width="20"  height="30" fill="#2e2b28"/>
+            <rect x="130" y="130" width="20" height="30" fill="#2e2b28"/>
+            <rect x="30" y="40" width="3" height="160" fill="#c0623a" opacity="0.6"/>
+            <line x1="185" y1="50" x2="185" y2="190" stroke="#ccc7be" stroke-width="1"/>
+            <text x="200" y="130" font-family="Arial Black,sans-serif" font-size="52" font-weight="800" fill="#1c1917" letter-spacing="-1">SYSTEM</text>
+            <text x="202" y="162" font-family="Courier New,monospace" font-size="11" font-weight="500" fill="#c0623a" letter-spacing="4">BY DAVE</text>
+          </svg>
+          <figcaption>LIGHT — SECONDARY</figcaption>
+        </figure>
+      </div>
+      <div class="logo-swatch charcoal-bg">
+        <figure>
+          <svg width="160" height="80" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
+            <rect x="0"  y="0"   width="100" height="20" fill="#c0623a"/>
+            <rect x="0"  y="50"  width="100" height="20" fill="#c0623a"/>
+            <rect x="0"  y="100" width="100" height="20" fill="#c0623a"/>
+            <rect x="0"  y="20"  width="20"  height="30" fill="#c0623a"/>
+            <rect x="80" y="70"  width="20"  height="30" fill="#c0623a"/>
+          </svg>
+          <figcaption style="color:#8a8480;">MARK ONLY — CHARCOAL</figcaption>
+        </figure>
+      </div>
+      <div class="logo-swatch rust-bg">
+        <figure>
+          <svg width="160" height="80" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
+            <rect x="0"  y="0"   width="100" height="20" fill="#1c1917"/>
+            <rect x="0"  y="50"  width="100" height="20" fill="#1c1917"/>
+            <rect x="0"  y="100" width="100" height="20" fill="#1c1917"/>
+            <rect x="0"  y="20"  width="20"  height="30" fill="#1c1917"/>
+            <rect x="80" y="70"  width="20"  height="30" fill="#1c1917"/>
+          </svg>
+          <figcaption style="color:#8a4428;">MARK ONLY — RUST BG</figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 Mark anatomy -->
+  <section>
+    <div class="section-label">02 — Mark anatomy</div>
+    <div class="mark-anatomy">
+      <svg width="140" height="170" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
+        <rect x="0"  y="0"   width="100" height="20" fill="#c0623a"/>
+        <rect x="0"  y="50"  width="100" height="20" fill="#c0623a"/>
+        <rect x="0"  y="100" width="100" height="20" fill="#c0623a"/>
+        <rect x="0"  y="20"  width="20"  height="30" fill="#c0623a"/>
+        <rect x="80" y="70"  width="20"  height="30" fill="#c0623a"/>
+        <!-- annotations -->
+        <line x1="105" y1="10"  x2="120" y2="10"  stroke="#4a4440" stroke-width="0.5" stroke-dasharray="2 2"/>
+        <line x1="105" y1="60"  x2="120" y2="60"  stroke="#4a4440" stroke-width="0.5" stroke-dasharray="2 2"/>
+        <line x1="105" y1="110" x2="120" y2="110" stroke="#4a4440" stroke-width="0.5" stroke-dasharray="2 2"/>
+        <line x1="-5"  y1="30"  x2="-20" y2="30"  stroke="#4a4440" stroke-width="0.5" stroke-dasharray="2 2"/>
+        <line x1="105" y1="85"  x2="120" y2="85"  stroke="#4a4440" stroke-width="0.5" stroke-dasharray="2 2"/>
+      </svg>
+      <div class="anatomy-notes">
+        <div class="anatomy-note">
+          <div class="anatomy-dot" style="background:#c0623a;"></div>
+          <div>
+            <strong>Three horizontal bars</strong>
+            <p>Equal weight, equal spacing. The rhythm of a structured system — top, mid, bottom.</p>
+          </div>
+        </div>
+        <div class="anatomy-note">
+          <div class="anatomy-dot" style="background:#8a4428;"></div>
+          <div>
+            <strong>Alternating vertical connectors</strong>
+            <p>Left side connects top to mid. Right side connects mid to bottom. Traces an S without curves — pure grid logic.</p>
+          </div>
+        </div>
+        <div class="anatomy-note">
+          <div class="anatomy-dot" style="background:#4a4440;"></div>
+          <div>
+            <strong>20px grid unit</strong>
+            <p>Every element is a multiple of 20px. Bars are 20px tall. Connectors are 20px wide. Nothing arbitrary.</p>
+          </div>
+        </div>
+        <div class="anatomy-note">
+          <div class="anatomy-dot" style="background:#2e2b28;"></div>
+          <div>
+            <strong>Open corners</strong>
+            <p>Top-right and bottom-left stay open. This is what makes it an S and not a grid block.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 Color -->
+  <section>
+    <div class="section-label">03 — Color palette</div>
+    <div class="palette">
+      <div class="swatch" style="background:#1c1917;">
+        <div class="swatch-label light-text">BG PRIMARY<br>#1c1917</div>
+      </div>
+      <div class="swatch" style="background:#222019;">
+        <div class="swatch-label light-text">BG SURFACE<br>#222019</div>
+      </div>
+      <div class="swatch" style="background:#2e2b28;">
+        <div class="swatch-label light-text">CHARCOAL<br>#2e2b28</div>
+      </div>
+      <div class="swatch" style="background:#4a4440;">
+        <div class="swatch-label light-text">MID<br>#4a4440</div>
+      </div>
+      <div class="swatch" style="background:#c0623a;">
+        <div class="swatch-label light-text">RUST<br>#c0623a</div>
+      </div>
+      <div class="swatch" style="background:#e8dece;">
+        <div class="swatch-label dark-text">SAND<br>#e8dece</div>
+      </div>
+      <div class="swatch" style="background:#f2ede6;">
+        <div class="swatch-label dark-text">PARCHMENT<br>#f2ede6</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 Typography -->
+  <section>
+    <div class="section-label">04 — Typography</div>
+    <div class="type-specimen">
+      <div class="type-row">
+        <div class="type-meta">SYNE 800<br>Display / Wordmark</div>
+        <div class="specimen-display">SYSTEM</div>
+        <div class="type-usage">HEADINGS<br>LOGOMARK</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta">SYNE 700<br>Display / Sub</div>
+        <div class="specimen-display-sm">Notion Templates</div>
+        <div class="type-usage">SUBHEADS<br>TITLES</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta">DM MONO 500<br>Accent / Label</div>
+        <div class="specimen-mono-lg">BY DAVE</div>
+        <div class="type-usage">LABELS<br>ACCENTS</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta">DM MONO 400<br>Meta / Caption</div>
+        <div class="specimen-mono-sm">NOTION TEMPLATES · PERSONAL OS · FREELANCE TOOLS</div>
+        <div class="type-usage">CAPTIONS<br>META</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta">DM SANS 300<br>Body</div>
+        <div class="specimen-body">Notion templates and productivity systems for freelancers, homeowners, and builders. Built by a working AV engineer who lives in these systems daily.</div>
+        <div class="type-usage">BODY<br>DESCRIPTIONS</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 Spacing -->
+  <section>
+    <div class="section-label">05 — Spacing scale</div>
+    <div class="spacing-stack">
+      <div class="spacing-row">
+        <div class="spacing-name">XS</div>
+        <div class="spacing-bar-wrap"><div class="spacing-bar" style="width:8px;"></div></div>
+        <div class="spacing-val">8px</div>
+      </div>
+      <div class="spacing-row">
+        <div class="spacing-name">SM</div>
+        <div class="spacing-bar-wrap"><div class="spacing-bar" style="width:16px;"></div></div>
+        <div class="spacing-val">16px</div>
+      </div>
+      <div class="spacing-row">
+        <div class="spacing-name">MD</div>
+        <div class="spacing-bar-wrap"><div class="spacing-bar" style="width:24px;"></div></div>
+        <div class="spacing-val">24px</div>
+      </div>
+      <div class="spacing-row">
+        <div class="spacing-name">LG</div>
+        <div class="spacing-bar-wrap"><div class="spacing-bar" style="width:40px;"></div></div>
+        <div class="spacing-val">40px</div>
+      </div>
+      <div class="spacing-row">
+        <div class="spacing-name">XL</div>
+        <div class="spacing-bar-wrap"><div class="spacing-bar" style="width:64px;"></div></div>
+        <div class="spacing-val">64px</div>
+      </div>
+      <div class="spacing-row">
+        <div class="spacing-name">2XL</div>
+        <div class="spacing-bar-wrap"><div class="spacing-bar" style="width:80px;"></div></div>
+        <div class="spacing-val">80px</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 06 Usage examples -->
+  <section>
+    <div class="section-label">06 — Usage examples</div>
+    <div class="usage-grid">
+      <div class="usage-card">
+        <h3>48 Hour Web Pipeline</h3>
+        <p>Deploy a client-ready website in two days. Notion-based project tracker with built-in QC checklist and Netlify deploy workflow.</p>
+        <span class="tag accent">TEMPLATE</span>
+        <span class="tag">FREELANCE</span>
+        <span class="tag">WEB</span>
+      </div>
+      <div class="usage-card">
+        <h3>Freelance Business OS</h3>
+        <p>Full operating system for solo operators. Client CRM, invoice tracker, project pipeline, and time audit — all in one Notion workspace.</p>
+        <span class="tag accent">TEMPLATE</span>
+        <span class="tag">BUSINESS</span>
+        <span class="tag">NOTION</span>
+      </div>
+      <div class="usage-card">
+        <h3>Home Assistant Hub</h3>
+        <p>Smart home automation tracker integrated with Home Assistant. Device inventory, automation log, and maintenance schedule.</p>
+        <span class="tag accent">TEMPLATE</span>
+        <span class="tag">HOME</span>
+        <span class="tag">AUTOMATION</span>
+      </div>
+      <div class="usage-card">
+        <h3>Union Gig Tracker</h3>
+        <p>IATSE-aware gig log with payment tracking, certification reminders, and call sheet archive. Built for working crew.</p>
+        <span class="tag accent">TEMPLATE</span>
+        <span class="tag">IATSE</span>
+        <span class="tag">PRODUCTION</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 07 Do / Don't -->
+  <section>
+    <div class="section-label">07 — Brand rules</div>
+    <div class="rules-grid">
+      <div class="rule-block do">
+        <div class="rule-header">DO</div>
+        <ul>
+          <li>Use "System by Dave" in full on first reference</li>
+          <li>Use the geometric S mark at 40px minimum size</li>
+          <li>Keep the rust accent as the single color accent</li>
+          <li>Use Syne 800 for all display headings</li>
+          <li>Pair DM Mono labels with DM Sans body text</li>
+          <li>Use the warm dark bg (#1c1917) not pure black</li>
+          <li>Maintain the grid aesthetic across all assets</li>
+          <li>Use parchment (#f2ede6) for light mode backgrounds</li>
+        </ul>
+      </div>
+      <div class="rule-block dont">
+        <div class="rule-header">DON'T</div>
+        <ul>
+          <li>Use lime green or any neon accent color</li>
+          <li>Stretch or distort the S mark proportions</li>
+          <li>Use more than one accent color at once</li>
+          <li>Set the wordmark in any font other than Syne</li>
+          <li>Use the mark below 24px — use text only</li>
+          <li>Place the logo on busy photographic backgrounds</li>
+          <li>Use rounded corners on the mark or grid elements</li>
+          <li>Mix the rust and lime green palettes</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>SYSTEM BY DAVE — BRAND REFERENCE v1.0</p>
+    <p>@SYSTEMBYDAVE · MARCH 2026</p>
+  </footer>
+
+</div>
+</body>
+</html>

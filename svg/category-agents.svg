@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <defs>
+    <pattern id="ag-grid" width="20" height="20" patternUnits="userSpaceOnUse">
+      <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#B5654A" stroke-width="0.3" opacity="0.12"/>
+    </pattern>
+  </defs>
+  <rect width="200" height="200" fill="#F5F0E8"/>
+  <rect width="200" height="200" fill="url(#ag-grid)"/>
+
+  <!-- Central figure / agent avatar -->
+  <g transform="translate(100, 78)">
+    <!-- Head -->
+    <circle cx="0" cy="0" r="22" fill="none" stroke="#2C2C2C" stroke-width="2" opacity="0.7"/>
+    <circle cx="0" cy="0" r="18" fill="#2C2C2C" opacity="0.06"/>
+    <!-- Eyes -->
+    <circle cx="-7" cy="-2" r="2.5" fill="#2C2C2C" opacity="0.5"/>
+    <circle cx="7" cy="-2" r="2.5" fill="#2C2C2C" opacity="0.5"/>
+    <!-- Antenna / signal -->
+    <line x1="0" y1="-22" x2="0" y2="-34" stroke="#2C2C2C" stroke-width="1.5" opacity="0.4"/>
+    <circle cx="0" cy="-36" r="3" fill="#B5654A" opacity="0.6"/>
+    <circle cx="0" cy="-36" r="6" fill="none" stroke="#B5654A" stroke-width="0.8" opacity="0.25"/>
+    <circle cx="0" cy="-36" r="10" fill="none" stroke="#B5654A" stroke-width="0.5" opacity="0.15"/>
+  </g>
+
+  <!-- Body / torso -->
+  <path d="M80 100 Q80 118 76 130 L124 130 Q120 118 120 100" fill="none" stroke="#2C2C2C" stroke-width="1.5" opacity="0.4"/>
+  <rect x="82" y="108" width="36" height="20" rx="4" fill="#2C2C2C" opacity="0.06"/>
+  <rect x="82" y="108" width="36" height="20" rx="4" fill="none" stroke="#2C2C2C" stroke-width="0.8" opacity="0.2"/>
+
+  <!-- Task cards orbiting -->
+  <!-- Card left -->
+  <g transform="translate(28, 64) rotate(-8)">
+    <rect width="36" height="28" rx="2" fill="#F5F0E8" stroke="#B5654A" stroke-width="1" opacity="0.5"/>
+    <rect x="5" y="6" width="20" height="2" rx="1" fill="#2C2C2C" opacity="0.25"/>
+    <rect x="5" y="12" width="26" height="2" rx="1" fill="#B5654A" opacity="0.2"/>
+    <rect x="5" y="18" width="16" height="2" rx="1" fill="#2C2C2C" opacity="0.15"/>
+  </g>
+  <!-- Connecting line -->
+  <path d="M64 78 Q74 78 80 78" stroke="#B5654A" stroke-width="0.8" opacity="0.3" stroke-dasharray="3 3"/>
+
+  <!-- Card right -->
+  <g transform="translate(140, 56) rotate(6)">
+    <rect width="36" height="28" rx="2" fill="#F5F0E8" stroke="#B5654A" stroke-width="1" opacity="0.5"/>
+    <rect x="5" y="6" width="18" height="2" rx="1" fill="#2C2C2C" opacity="0.25"/>
+    <rect x="5" y="12" width="26" height="2" rx="1" fill="#2C2C2C" opacity="0.15"/>
+    <rect x="5" y="18" width="12" height="6" rx="1" fill="#B5654A" opacity="0.15"/>
+  </g>
+  <!-- Connecting line -->
+  <path d="M140 72 Q130 76 120 78" stroke="#B5654A" stroke-width="0.8" opacity="0.3" stroke-dasharray="3 3"/>
+
+  <!-- Card bottom-left -->
+  <g transform="translate(32, 130) rotate(4)">
+    <rect width="32" height="24" rx="2" fill="#F5F0E8" stroke="#2C2C2C" stroke-width="0.8" opacity="0.25"/>
+    <rect x="5" y="6" width="22" height="2" rx="1" fill="#2C2C2C" opacity="0.2"/>
+    <rect x="5" y="12" width="14" height="2" rx="1" fill="#B5654A" opacity="0.2"/>
+  </g>
+  <path d="M64 140 Q72 136 78 132" stroke="#2C2C2C" stroke-width="0.5" opacity="0.2" stroke-dasharray="2 4"/>
+
+  <!-- Card bottom-right -->
+  <g transform="translate(144, 120) rotate(-5)">
+    <rect width="32" height="24" rx="2" fill="#F5F0E8" stroke="#2C2C2C" stroke-width="0.8" opacity="0.25"/>
+    <circle cx="10" cy="12" r="4" fill="#B5654A" opacity="0.15" stroke="#B5654A" stroke-width="0.5"/>
+    <rect x="18" y="8" width="10" height="2" rx="1" fill="#2C2C2C" opacity="0.2"/>
+    <rect x="18" y="14" width="8" height="2" rx="1" fill="#2C2C2C" opacity="0.15"/>
+  </g>
+  <path d="M144 132 Q132 130 122 128" stroke="#2C2C2C" stroke-width="0.5" opacity="0.2" stroke-dasharray="2 4"/>
+
+  <!-- Output tray / processed items -->
+  <g transform="translate(60, 158)">
+    <line x1="0" y1="0" x2="80" y2="0" stroke="#2C2C2C" stroke-width="1" opacity="0.2"/>
+    <!-- Sorted items -->
+    <rect x="4" y="4" width="14" height="18" rx="1.5" fill="#B5654A" opacity="0.15" stroke="#B5654A" stroke-width="0.6"/>
+    <rect x="22" y="4" width="14" height="18" rx="1.5" fill="#B5654A" opacity="0.15" stroke="#B5654A" stroke-width="0.6"/>
+    <rect x="40" y="4" width="14" height="18" rx="1.5" fill="#B5654A" opacity="0.15" stroke="#B5654A" stroke-width="0.6"/>
+    <!-- Checkmarks -->
+    <path d="M8 12 L10 15 L15 9" stroke="#B5654A" stroke-width="1" fill="none" opacity="0.5"/>
+    <path d="M26 12 L28 15 L33 9" stroke="#B5654A" stroke-width="1" fill="none" opacity="0.5"/>
+    <path d="M44 12 L46 15 L51 9" stroke="#B5654A" stroke-width="1" fill="none" opacity="0.5"/>
+  </g>
+
+  <!-- Label -->
+  <text x="16" y="24" font-family="Georgia, serif" font-size="11" fill="#2C2C2C" opacity="0.5" letter-spacing="0.08em">AGENTS</text>
+  <line x1="16" y1="30" x2="62" y2="30" stroke="#B5654A" stroke-width="0.8" opacity="0.3"/>
+</svg>

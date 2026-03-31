@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <!-- Background grid -->
+  <defs>
+    <pattern id="sk-grid" width="20" height="20" patternUnits="userSpaceOnUse">
+      <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#B5654A" stroke-width="0.3" opacity="0.12"/>
+    </pattern>
+    <clipPath id="sk-clip">
+      <rect x="4" y="4" width="192" height="192" rx="2"/>
+    </clipPath>
+  </defs>
+  <rect width="200" height="200" fill="#F5F0E8"/>
+  <rect width="200" height="200" fill="url(#sk-grid)" clip-path="url(#sk-clip)"/>
+
+  <!-- Wand / pencil tool -->
+  <line x1="42" y1="148" x2="118" y2="52" stroke="#2C2C2C" stroke-width="3" stroke-linecap="round"/>
+  <line x1="42" y1="148" x2="118" y2="52" stroke="#B5654A" stroke-width="1.5" stroke-linecap="round" opacity="0.3" stroke-dasharray="4 6"/>
+  <!-- Pencil tip -->
+  <polygon points="42,148 36,158 48,154" fill="#B5654A" opacity="0.8"/>
+  <!-- Pencil eraser end -->
+  <rect x="114" y="44" width="12" height="8" rx="2" transform="rotate(-52 120 48)" fill="#2C2C2C" opacity="0.2"/>
+
+  <!-- Sparkle elements from wand tip -->
+  <g opacity="0.7">
+    <!-- Star 1 -->
+    <path d="M60 130 L62 124 L64 130 L70 132 L64 134 L62 140 L60 134 L54 132Z" fill="#B5654A" opacity="0.6"/>
+    <!-- Star 2 -->
+    <path d="M78 108 L79.5 104 L81 108 L85 109.5 L81 111 L79.5 115 L78 111 L74 109.5Z" fill="#B5654A" opacity="0.4"/>
+    <!-- Star 3 -->
+    <path d="M52 118 L53 115 L54 118 L57 119 L54 120 L53 123 L52 120 L49 119Z" fill="#2C2C2C" opacity="0.25"/>
+    <!-- Dot scatter -->
+    <circle cx="68" cy="120" r="1.5" fill="#B5654A" opacity="0.35"/>
+    <circle cx="48" cy="136" r="1" fill="#2C2C2C" opacity="0.2"/>
+    <circle cx="72" cy="140" r="1.2" fill="#B5654A" opacity="0.25"/>
+  </g>
+
+  <!-- Enhancement lines radiating out -->
+  <g stroke="#B5654A" stroke-width="0.8" opacity="0.3" stroke-linecap="round">
+    <line x1="88" y1="80" x2="108" y2="70"/>
+    <line x1="92" y1="90" x2="116" y2="86"/>
+    <line x1="86" y1="72" x2="98" y2="58"/>
+  </g>
+
+  <!-- Before: messy text block -->
+  <g transform="translate(120, 60)">
+    <rect width="56" height="68" rx="2" fill="none" stroke="#2C2C2C" stroke-width="1" opacity="0.15"/>
+    <line x1="8" y1="14" x2="48" y2="14" stroke="#2C2C2C" stroke-width="2" opacity="0.12"/>
+    <line x1="8" y1="22" x2="38" y2="22" stroke="#2C2C2C" stroke-width="1.5" opacity="0.1"/>
+    <line x1="8" y1="30" x2="44" y2="30" stroke="#2C2C2C" stroke-width="1.5" opacity="0.1"/>
+    <line x1="8" y1="38" x2="30" y2="38" stroke="#2C2C2C" stroke-width="1.5" opacity="0.1"/>
+    <line x1="8" y1="46" x2="42" y2="46" stroke="#2C2C2C" stroke-width="1.5" opacity="0.1"/>
+    <line x1="8" y1="54" x2="36" y2="54" stroke="#2C2C2C" stroke-width="1.5" opacity="0.1"/>
+  </g>
+
+  <!-- After: clean formatted block -->
+  <g transform="translate(120, 136)">
+    <rect width="56" height="50" rx="2" fill="none" stroke="#B5654A" stroke-width="1" opacity="0.35"/>
+    <rect x="6" y="6" width="44" height="3" rx="1" fill="#2C2C2C" opacity="0.3"/>
+    <rect x="6" y="14" width="32" height="2" rx="1" fill="#B5654A" opacity="0.25"/>
+    <rect x="6" y="20" width="38" height="2" rx="1" fill="#2C2C2C" opacity="0.12"/>
+    <rect x="6" y="26" width="28" height="2" rx="1" fill="#2C2C2C" opacity="0.12"/>
+    <rect x="6" y="34" width="44" height="8" rx="1" fill="#B5654A" opacity="0.08"/>
+    <rect x="10" y="36" width="24" height="2" rx="1" fill="#B5654A" opacity="0.2"/>
+  </g>
+
+  <!-- Arrow connecting them -->
+  <path d="M148 132 L148 138" stroke="#B5654A" stroke-width="1" opacity="0.4" marker-end="none"/>
+  <polygon points="144,136 148,142 152,136" fill="#B5654A" opacity="0.3"/>
+
+  <!-- Label -->
+  <text x="16" y="24" font-family="Georgia, serif" font-size="11" fill="#2C2C2C" opacity="0.5" letter-spacing="0.08em">SKILLS</text>
+  <line x1="16" y1="30" x2="56" y2="30" stroke="#B5654A" stroke-width="0.8" opacity="0.3"/>
+</svg>

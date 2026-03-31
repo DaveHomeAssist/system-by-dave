@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>System by Dave — Notion Tools, Skills & Agents</title>
+<meta name="description" content="Handcrafted Notion skills, agents, widgets, and templates. Built by one person, tested by many.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300;1,9..40,400&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  /* ─── HOMEPAGE-SPECIFIC ─── */
+  .hero { padding: 120px 0 100px; }
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+  }
+  .hero-content { max-width: 520px; }
+  .hero-tag {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--rust);
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .hero-tag::before {
+    content: '';
+    width: 32px;
+    height: 1.5px;
+    background: var(--rust);
+  }
+  .hero h1 {
+    font-family: var(--font-display);
+    font-size: clamp(42px, 5vw, 64px);
+    font-weight: 400;
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    margin-bottom: 28px;
+  }
+  .hero h1 em { font-style: italic; color: var(--rust); }
+  .hero-desc {
+    font-size: 17px;
+    font-weight: 300;
+    line-height: 1.7;
+    color: var(--charcoal-light);
+    margin-bottom: 40px;
+    max-width: 440px;
+  }
+  .hero-actions { display: flex; gap: 16px; align-items: center; }
+
+  .hero-visual {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .blueprint-frame {
+    width: 400px; height: 400px;
+    position: relative;
+    border: 1.5px solid rgba(181,101,74,0.2);
+  }
+  .blueprint-frame::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      repeating-linear-gradient(90deg, rgba(181,101,74,0.06) 0 0.5px, transparent 0.5px 20px),
+      repeating-linear-gradient(0deg, rgba(181,101,74,0.06) 0 0.5px, transparent 0.5px 20px);
+  }
+  .blueprint-s {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: var(--font-display);
+    font-size: 240px;
+    line-height: 1;
+    color: var(--charcoal);
+    opacity: 0.06;
+    user-select: none;
+  }
+  .blueprint-modules {
+    position: absolute;
+    inset: 30px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 16px;
+  }
+  .bp-module {
+    border: 1px solid rgba(181,101,74,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    transition: all 0.4s;
+  }
+  .bp-module:hover { border-color: var(--rust); }
+  .bp-module img { width: 100%; height: 100%; object-fit: cover; }
+
+  .corner { position: absolute; width: 12px; height: 12px; }
+  .corner::before, .corner::after {
+    content: '';
+    position: absolute;
+    background: var(--rust);
+    opacity: 0.5;
+  }
+  .corner-tl { top: -1px; left: -1px; }
+  .corner-tl::before { width: 12px; height: 1.5px; }
+  .corner-tl::after { width: 1.5px; height: 12px; }
+  .corner-tr { top: -1px; right: -1px; }
+  .corner-tr::before { right: 0; width: 12px; height: 1.5px; }
+  .corner-tr::after { right: 0; width: 1.5px; height: 12px; }
+  .corner-bl { bottom: -1px; left: -1px; }
+  .corner-bl::before { bottom: 0; width: 12px; height: 1.5px; }
+  .corner-bl::after { bottom: 0; width: 1.5px; height: 12px; }
+  .corner-br { bottom: -1px; right: -1px; }
+  .corner-br::before { bottom: 0; right: 0; width: 12px; height: 1.5px; }
+  .corner-br::after { bottom: 0; right: 0; width: 1.5px; height: 12px; }
+
+  /* ─── CATEGORY SHOWCASE ─── */
+  .showcase { padding: 80px 0; }
+  .showcase + .showcase { padding-top: 0; }
+
+  .showcase-row {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 60px;
+    align-items: start;
+  }
+  .showcase-label {
+    position: sticky;
+    top: 100px;
+  }
+  .showcase-label-tag {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--rust);
+    margin-bottom: 12px;
+  }
+  .showcase-label h2 {
+    font-family: var(--font-display);
+    font-size: 36px;
+    font-weight: 400;
+    margin-bottom: 16px;
+    line-height: 1.15;
+  }
+  .showcase-label p {
+    font-size: 15px;
+    font-weight: 300;
+    line-height: 1.65;
+    color: var(--charcoal-light);
+    margin-bottom: 24px;
+  }
+  .showcase-label .btn-secondary { font-size: 11px; padding: 12px 20px; }
+
+  .showcase-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  /* ─── ETHOS ─── */
+  .ethos { padding: 100px 0; }
+  .ethos-grid {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 80px;
+  }
+  .ethos-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--rust);
+    margin-bottom: 20px;
+  }
+  .ethos-statement {
+    font-family: var(--font-display);
+    font-size: clamp(28px, 3vw, 38px);
+    line-height: 1.35;
+    font-weight: 400;
+  }
+  .ethos-statement em { font-style: italic; color: var(--rust); }
+  .ethos-points {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    padding-top: 20px;
+  }
+  .ethos-point {
+    padding-left: 20px;
+    border-left: 1.5px solid var(--grid-line-accent);
+    transition: border-color 0.3s;
+  }
+  .ethos-point:hover { border-left-color: var(--rust); }
+  .ethos-point-title {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .ethos-point-desc {
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 1.65;
+    color: var(--charcoal-light);
+  }
+
+  /* ─── CTA ─── */
+  .cta-section {
+    padding: 100px 0;
+    border-top: 1px solid var(--grid-line-accent);
+  }
+  .cta-box {
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: center;
+  }
+  .cta-box h2 {
+    font-family: var(--font-display);
+    font-size: clamp(28px, 3vw, 40px);
+    margin-bottom: 16px;
+  }
+  .cta-box p {
+    font-size: 15px;
+    font-weight: 300;
+    color: var(--charcoal-light);
+    line-height: 1.7;
+    margin-bottom: 36px;
+  }
+  .email-form { display: flex; max-width: 460px; margin: 0 auto; }
+  .email-form input {
+    flex: 1;
+    padding: 16px 20px;
+    border: 1.5px solid var(--charcoal);
+    border-right: none;
+    background: transparent;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--charcoal);
+    outline: none;
+  }
+  .email-form input::placeholder { color: var(--charcoal-light); opacity: 0.4; }
+  .email-form input:focus { border-color: var(--rust); }
+  .email-form button {
+    padding: 16px 28px;
+    background: var(--charcoal);
+    color: var(--cream);
+    border: 1.5px solid var(--charcoal);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s;
+    white-space: nowrap;
+  }
+  .email-form button:hover { background: var(--rust); border-color: var(--rust); }
+
+  @media (max-width: 1024px) {
+    .hero-grid { grid-template-columns: 1fr; gap: 60px; }
+    .hero-visual { display: none; }
+    .showcase-row { grid-template-columns: 1fr; gap: 40px; }
+    .showcase-label { position: static; }
+    .ethos-grid { grid-template-columns: 1fr; gap: 48px; }
+  }
+  @media (max-width: 680px) {
+    .hero-actions { flex-direction: column; align-items: stretch; }
+    .showcase-cards { grid-template-columns: 1fr; }
+    .ethos-points { grid-template-columns: 1fr; }
+    .email-form { flex-direction: column; }
+    .email-form input { border-right: 1.5px solid var(--charcoal); border-bottom: none; }
+  }
+</style>
+</head>
+<body>
+<div class="page-wrapper">
+
+  <!-- HEADER -->
+  <header>
+    <nav class="container">
+      <a href="index.html" class="nav-brand">
+        <div class="nav-brand-mark">
+          <span>S</span>
+          <span class="mark-d">D</span>
+        </div>
+        <span class="nav-brand-text">System by Dave</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="skills.html" class="hide-mobile">Skills</a></li>
+        <li><a href="widgets.html" class="hide-mobile">Widgets</a></li>
+        <li><a href="https://promptlab.tools" target="_blank" class="hide-mobile">Prompt Lab</a></li>
+        <li><a href="https://notion.so" target="_blank" class="nav-cta">Notion Store</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-grid">
+        <div class="hero-content">
+          <div class="hero-tag reveal">Tools for Notion People</div>
+          <h1 class="reveal reveal-delay-1">Skills, agents & widgets that make <em>Notion</em> work harder</h1>
+          <p class="hero-desc reveal reveal-delay-2">AI skills, embeddable widgets, and prompt tools — handcrafted for people who build systems inside Notion.</p>
+          <div class="hero-actions reveal reveal-delay-3">
+            <a href="#agents" class="btn-primary">
+              See what's new
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+            <a href="widgets.html" class="btn-secondary">Browse Widgets</a>
+          </div>
+        </div>
+        <div class="hero-visual reveal reveal-delay-2">
+          <div class="blueprint-frame">
+            <div class="corner corner-tl"></div>
+            <div class="corner corner-tr"></div>
+            <div class="corner corner-bl"></div>
+            <div class="corner corner-br"></div>
+            <div class="blueprint-s">S</div>
+            <div class="blueprint-modules">
+              <div class="bp-module"><img src="svg/category-skills.svg" alt="Skills"></div>
+              <div class="bp-module"><img src="svg/category-agents.svg" alt="Agents"></div>
+              <div class="bp-module"><img src="svg/category-templates.svg" alt="Templates"></div>
+              <div class="bp-module"><img src="svg/category-systems.svg" alt="Systems"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AGENTS -->
+  <section class="showcase" id="agents">
+    <div class="container">
+      <div class="showcase-row reveal">
+        <div class="showcase-label">
+          <div class="showcase-label-tag">Agents</div>
+          <h2>AI agents that run inside Notion</h2>
+          <p>Each agent handles a specific workflow — triaging your inbox, assembling your daily briefing, or keeping your prompts organized.</p>
+          <a href="skills.html" class="btn-secondary">All Skills &amp; Agents →</a>
+        </div>
+        <div class="showcase-cards">
+          <a href="#" class="product-card">
+            <div class="product-image">
+              <img src="img/agent-promptkeeper.png" alt="PromptKeeper" onerror="this.parentElement.innerHTML='<div class=product-image-placeholder>PK</div>'">
+            </div>
+            <div class="product-body">
+              <div class="product-category"><span class="product-category-dot"></span> Agent</div>
+              <h3 class="product-name">PromptKeeper</h3>
+              <p class="product-desc">Save, organize, and recall your best AI prompts inside Notion.</p>
+              <div class="product-footer">
+                <span class="product-price"><span class="currency">$</span>15</span>
+                <span class="product-link">View <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+              </div>
+            </div>
+          </a>
+          <a href="#" class="product-card">
+            <div class="product-image">
+              <img src="img/agent-daily-prophet.png" alt="Daily Prophet" onerror="this.parentElement.innerHTML='<div class=product-image-placeholder>DP</div>'">
+            </div>
+            <div class="product-body">
+              <div class="product-category"><span class="product-category-dot"></span> Agent</div>
+              <h3 class="product-name">Daily Prophet</h3>
+              <p class="product-desc">Your morning briefing — tasks, calendar, and notes assembled automatically.</p>
+              <div class="product-footer">
+                <span class="product-price"><span class="currency">$</span>12</span>
+                <span class="product-link">View <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+              </div>
+            </div>
+          </a>
+          <a href="#" class="product-card">
+            <div class="product-image">
+              <img src="img/agent-formatting-wizard.png" alt="Formatting Wizard" onerror="this.parentElement.innerHTML='<div class=product-image-placeholder>FW</div>'">
+            </div>
+            <div class="product-body">
+              <div class="product-category"><span class="product-category-dot"></span> Skill</div>
+              <h3 class="product-name">Formatting Wizard</h3>
+              <p class="product-desc">Transform messy notes into clean, structured Notion pages instantly.</p>
+              <div class="product-footer">
+                <span class="product-price"><span class="currency">$</span>12</span>
+                <span class="product-link">View <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+              </div>
+            </div>
+          </a>
+          <a href="#" class="product-card">
+            <div class="product-image">
+              <div class="product-image-placeholder">SI</div>
+            </div>
+            <div class="product-body">
+              <div class="product-category"><span class="product-category-dot"></span> Agent</div>
+              <h3 class="product-name">Sort Inbox</h3>
+              <p class="product-desc">Weekly triage that classifies, routes, and prioritizes every item in your Notion inbox.</p>
+              <div class="product-footer">
+                <span class="product-price"><span class="currency">$</span>19</span>
+                <span class="product-link">View <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WIDGETS -->
+  <section class="showcase" id="widgets">
+    <div class="container">
+      <div class="showcase-row reveal">
+        <div class="showcase-label">
+          <div class="showcase-label-tag">Widgets</div>
+          <h2>Embeddable widgets for Notion</h2>
+          <p>Self-contained HTML widgets that drop into any Notion page via embed. No backend, no API key — configured entirely through URL parameters.</p>
+          <a href="widgets.html" class="btn-secondary">All Widgets →</a>
+        </div>
+        <div class="showcase-cards">
+          <a href="https://davehomeassist.github.io/NotionWidgets/" target="_blank" class="product-card">
+            <div class="product-image">
+              <div class="product-image-placeholder">📊</div>
+            </div>
+            <div class="product-body">
+              <div class="product-category"><span class="product-category-dot"></span> Widget</div>
+              <h3 class="product-name">Project Status</h3>
+              <p class="product-desc">Progress rings, phase tracking, and health indicators in a compact dashboard panel.</p>
+              <div class="product-footer">
+                <span class="product-price"><span class="free-tag">Free</span></span>
+                <span class="product-link">View <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+              </div>
+            </div>
+          </a>
+          <a href="https://davehomeassist.github.io/NotionWidgets/" target="_blank" class="product-card">
+            <div class="product-image">
+              <div class="product-image-placeholder">⚔️</div>
+            </div>
+            <div class="product-body">
+              <div class="product-category"><span class="product-category-dot"></span> Widget</div>
+              <h3 class="product-name">Quest Log</h3>
+              <p class="product-desc">Gamified task tracker with XP, streaks, gold, and HP. Turn your tasks into an RPG.</p>
+              <div class="product-footer">
+                <span class="product-price"><span class="free-tag">Free</span></span>
+                <span class="product-link">View <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+              </div>
+            </div>
+          </a>
+          <a href="https://davehomeassist.github.io/NotionWidgets/" target="_blank" class="product-card">
+            <div class="product-image">
+              <div class="product-image-placeholder">✅</div>
+            </div>
+            <div class="product-body">
+              <div class="product-category"><span class="product-category-dot"></span> Widget</div>
+              <h3 class="product-name">Client Approval Hub</h3>
+              <p class="product-desc">Approve, revise, or restart workflow with feedback capture and status tracking.</p>
+              <div class="product-footer">
+                <span class="product-price"><span class="free-tag">Free</span></span>
+                <span class="product-link">View <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+              </div>
+            </div>
+          </a>
+          <a href="https://davehomeassist.github.io/NotionWidgets/" target="_blank" class="product-card">
+            <div class="product-image">
+              <div class="product-image-placeholder">🗺️</div>
+            </div>
+            <div class="product-body">
+              <div class="product-category"><span class="product-category-dot"></span> Widget</div>
+              <h3 class="product-name">Workspace Map</h3>
+              <p class="product-desc">Interactive D3 graph that visualizes your entire Notion workspace structure.</p>
+              <div class="product-footer">
+                <span class="product-price"><span class="free-tag">Free</span></span>
+                <span class="product-link">View <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROMPT LAB -->
+  <section class="showcase" id="promptlab">
+    <div class="container">
+      <div class="showcase-row reveal">
+        <div class="showcase-label">
+          <div class="showcase-label-tag">Chrome Extension</div>
+          <h2>Prompt Lab</h2>
+          <p>A complete prompt engineering workbench in your browser sidebar. Write, enhance, score, compare, and organize AI prompts — powered by your own API key.</p>
+          <a href="https://promptlab.tools" target="_blank" class="btn-primary" style="font-size:11px; padding:12px 24px;">
+            promptlab.tools
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
+          </a>
+        </div>
+        <div class="showcase-cards">
+          <div class="product-card" style="grid-column: span 2;">
+            <div class="product-image" style="aspect-ratio: 21/9;">
+              <div class="product-image-placeholder" style="font-size:32px;">Prompt Lab</div>
+            </div>
+            <div class="product-body">
+              <div class="product-category"><span class="product-category-dot"></span> Extension</div>
+              <h3 class="product-name">Prompt Lab — AI Prompt Workbench</h3>
+              <p class="product-desc">7 enhancement modes, live quality scoring, A/B testing, prompt library with version history, template variables, composer mode, and shareable links. Privacy-first — your API key never leaves your browser.</p>
+              <div class="product-footer">
+                <span class="product-price"><span class="free-tag">Free</span></span>
+                <span class="product-link">
+                  Chrome Web Store
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ETHOS -->
+  <section class="ethos" id="about">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-number">—</span>
+        <h2 class="section-title">How It Works</h2>
+      </div>
+      <div class="ethos-grid">
+        <div class="reveal">
+          <div class="ethos-label">The Approach</div>
+          <p class="ethos-statement">Every tool is built from <em>real workflows</em>, tested in production, and designed to disappear into the way you already work.</p>
+        </div>
+        <div class="ethos-points reveal reveal-delay-1">
+          <div class="ethos-point">
+            <h4 class="ethos-point-title">Built in Notion</h4>
+            <p class="ethos-point-desc">No external apps, no plugins to break. Skills run natively using Notion AI. Widgets embed via iframe.</p>
+          </div>
+          <div class="ethos-point">
+            <h4 class="ethos-point-title">Documented</h4>
+            <p class="ethos-point-desc">Every product includes a setup guide and architecture notes so you understand what you're using and why.</p>
+          </div>
+          <div class="ethos-point">
+            <h4 class="ethos-point-title">Modular by Design</h4>
+            <p class="ethos-point-desc">Use standalone or connect together. Shared naming conventions mean everything clicks into place.</p>
+          </div>
+          <div class="ethos-point">
+            <h4 class="ethos-point-title">No Subscriptions</h4>
+            <p class="ethos-point-desc">Buy once, get updates as Notion ships new features. Widgets are free and open source.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="container">
+      <div class="cta-box reveal">
+        <h2>New tools, shipped monthly</h2>
+        <p>Get notified when new skills, widgets, and agents drop. No spam — just the occasional system update.</p>
+        <form class="email-form" onsubmit="event.preventDefault(); this.querySelector('button').textContent='Noted ✓'; this.querySelector('input').value='';">
+          <input type="email" placeholder="your@email.com" required>
+          <button type="submit">Subscribe</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <a href="index.html" class="nav-brand">
+            <div class="nav-brand-mark"><span>S</span><span class="mark-d">D</span></div>
+            <span class="nav-brand-text">System by Dave</span>
+          </a>
+          <p class="footer-brand-desc">Handcrafted Notion tools for people who take their workflows seriously.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Products</h4>
+          <ul>
+            <li><a href="skills.html">Skills &amp; Agents</a></li>
+            <li><a href="widgets.html">Widgets</a></li>
+            <li><a href="https://promptlab.tools" target="_blank">Prompt Lab</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Resources</h4>
+          <ul>
+            <li><a href="#">Setup Guides</a></li>
+            <li><a href="#">Changelog</a></li>
+            <li><a href="https://github.com/DaveHomeAssist" target="_blank">GitHub</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Connect</h4>
+          <ul>
+            <li><a href="https://davehomeassist.github.io/NotionWidgets/" target="_blank">NotionWidgets</a></li>
+            <li><a href="https://promptlab.tools" target="_blank">promptlab.tools</a></li>
+            <li><a href="#">Twitter / X</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span class="footer-copy">&copy; 2026 System by Dave. All rights reserved.</span>
+      </div>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+  });
+</script>
+</body>
+</html>
