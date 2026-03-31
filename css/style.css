@@ -283,6 +283,9 @@ nav {
   object-fit: cover;
   transition: transform 0.5s;
 }
+.product-image img.product-image-sort-inbox {
+  object-position: center top;
+}
 .product-card:hover .product-image img { transform: scale(1.04); }
 
 .product-image-placeholder {
