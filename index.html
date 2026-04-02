@@ -5,9 +5,50 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>System by Dave — Notion Tools, Skills & Agents</title>
 <meta name="description" content="Handcrafted Notion skills, agents, widgets, and templates. Built by one person, tested by many.">
+<link rel="canonical" href="https://systembydave.com/">
+<meta name="robots" content="index,follow">
+<meta name="theme-color" content="#F5F0E8">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="System by Dave">
+<meta property="og:title" content="System by Dave — Notion Tools, Skills & Agents">
+<meta property="og:description" content="Handcrafted Notion skills, agents, widgets, and templates. Built by one person, tested by many.">
+<meta property="og:url" content="https://systembydave.com/">
+<meta property="og:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<meta property="og:image:width" content="1024">
+<meta property="og:image:height" content="412">
+<meta property="og:image:alt" content="System by Dave preview banner">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="System by Dave — Notion Tools, Skills & Agents">
+<meta name="twitter:description" content="Handcrafted Notion skills, agents, widgets, and templates. Built by one person, tested by many.">
+<meta name="twitter:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<link rel="icon" href="svg/system_by_dave_logo_rust.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300;1,9..40,400&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
+<script>
+  if (window.location.pathname.endsWith('/index.html')) {
+    const canonicalPath = window.location.pathname.replace(/index\.html$/, '');
+    window.location.replace(`${window.location.origin}${canonicalPath}${window.location.search}${window.location.hash}`);
+  }
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "System by Dave",
+  "url": "https://systembydave.com/",
+  "description": "Handcrafted Notion skills, agents, widgets, and templates. Built by one person, tested by many.",
+  "publisher": {
+    "@type": "Person",
+    "name": "Dave Robertson"
+  },
+  "sameAs": [
+    "https://github.com/DaveHomeAssist/system-by-dave",
+    "https://promptlab.tools"
+  ]
+}
+</script>
 <style>
   /* ─── HOMEPAGE-SPECIFIC ─── */
   .hero { padding: 120px 0 100px; }
@@ -283,11 +324,12 @@
 </style>
 </head>
 <body>
+<a class="skip-link" href="#main-content">Skip to content</a>
 <div class="page-wrapper">
 
   <!-- HEADER -->
   <header>
-    <nav class="container">
+    <nav class="container" aria-label="Primary">
       <a href="index.html" class="nav-brand">
         <div class="nav-brand-mark">
           <span>S</span>
@@ -299,11 +341,13 @@
         <li><a href="skills.html" class="hide-mobile">Skills</a></li>
         <li><a href="agents.html" class="hide-mobile">Agents</a></li>
         <li><a href="widgets.html" class="hide-mobile">Widgets</a></li>
-        <li><a href="https://promptlab.tools" target="_blank" class="hide-mobile">Prompt Lab</a></li>
-        <li><a href="https://github.com/DaveHomeAssist/system-by-dave" target="_blank" class="nav-cta">GitHub</a></li>
+        <li><a href="https://promptlab.tools" target="_blank" rel="noopener noreferrer" class="hide-mobile">Prompt Lab</a></li>
+        <li><a href="https://github.com/DaveHomeAssist/system-by-dave" target="_blank" rel="noopener noreferrer" class="nav-cta">GitHub</a></li>
       </ul>
     </nav>
   </header>
+
+  <main id="main-content">
 
   <!-- HERO -->
   <section class="hero">
@@ -353,7 +397,7 @@
         <div class="showcase-cards">
           <a href="agents.html" class="product-card">
             <div class="product-image">
-              <img src="img/agent-promptkeeper.png" alt="PromptKeeper" onerror="this.parentElement.innerHTML='<div class=product-image-placeholder>PK</div>'">
+              <img src="img/agent-promptkeeper.webp" alt="PromptKeeper" width="2048" height="2048" loading="lazy" decoding="async" onerror="this.parentElement.innerHTML='<div class=product-image-placeholder>PK</div>'">
             </div>
             <div class="product-body">
               <div class="product-category"><span class="product-category-dot"></span> Agent</div>
@@ -367,7 +411,7 @@
           </a>
           <a href="agents.html" class="product-card">
             <div class="product-image">
-              <img src="img/agent-daily-prophet.png" alt="Daily Prophet" onerror="this.parentElement.innerHTML='<div class=product-image-placeholder>DP</div>'">
+              <img src="img/agent-daily-prophet.webp" alt="Daily Prophet" width="960" height="960" loading="lazy" decoding="async" onerror="this.parentElement.innerHTML='<div class=product-image-placeholder>DP</div>'">
             </div>
             <div class="product-body">
               <div class="product-category"><span class="product-category-dot"></span> Agent</div>
@@ -381,7 +425,7 @@
           </a>
           <a href="agents.html" class="product-card">
             <div class="product-image">
-              <img src="img/agent-formatting-wizard.png" alt="Formatting Wizard" onerror="this.parentElement.innerHTML='<div class=product-image-placeholder>FW</div>'">
+              <img src="img/agent-formatting-wizard.webp" alt="Formatting Wizard" width="1024" height="1024" loading="lazy" decoding="async" onerror="this.parentElement.innerHTML='<div class=product-image-placeholder>FW</div>'">
             </div>
             <div class="product-body">
               <div class="product-category"><span class="product-category-dot"></span> Agent</div>
@@ -395,7 +439,7 @@
           </a>
           <a href="agents.html" class="product-card">
             <div class="product-image">
-              <img src="img/agent-sort-inbox.png" alt="Sort Inbox" class="product-image-sort-inbox" onerror="this.parentElement.innerHTML='<div class=product-image-placeholder>SI</div>'">
+              <img src="img/agent-sort-inbox.webp" alt="Sort Inbox" class="product-image-sort-inbox" width="854" height="860" loading="lazy" decoding="async" onerror="this.parentElement.innerHTML='<div class=product-image-placeholder>SI</div>'">
             </div>
             <div class="product-body">
               <div class="product-category"><span class="product-category-dot"></span> Agent</div>
@@ -423,7 +467,7 @@
           <a href="widgets.html" class="btn-secondary">All Widgets →</a>
         </div>
         <div class="showcase-cards">
-          <a href="https://davehomeassist.github.io/NotionWidgets/project-status.html" target="_blank" class="product-card widget-card">
+          <a href="https://davehomeassist.github.io/NotionWidgets/project-status.html" target="_blank" rel="noopener noreferrer" class="product-card widget-card">
             <div class="product-image widget-live-preview">
               <iframe src="https://davehomeassist.github.io/NotionWidgets/project-status.html" loading="lazy" title="Project Status Dashboard" tabindex="-1"></iframe>
             </div>
@@ -437,7 +481,7 @@
               </div>
             </div>
           </a>
-          <a href="https://davehomeassist.github.io/NotionWidgets/quest-log.html" target="_blank" class="product-card widget-card">
+          <a href="https://davehomeassist.github.io/NotionWidgets/quest-log.html" target="_blank" rel="noopener noreferrer" class="product-card widget-card">
             <div class="product-image widget-live-preview">
               <iframe src="https://davehomeassist.github.io/NotionWidgets/quest-log.html" loading="lazy" title="Quest Log" tabindex="-1"></iframe>
             </div>
@@ -451,7 +495,7 @@
               </div>
             </div>
           </a>
-          <a href="https://davehomeassist.github.io/NotionWidgets/client-approval.html" target="_blank" class="product-card widget-card">
+          <a href="https://davehomeassist.github.io/NotionWidgets/client-approval.html" target="_blank" rel="noopener noreferrer" class="product-card widget-card">
             <div class="product-image widget-live-preview">
               <iframe src="https://davehomeassist.github.io/NotionWidgets/client-approval.html" loading="lazy" title="Client Approval Hub" tabindex="-1"></iframe>
             </div>
@@ -465,7 +509,7 @@
               </div>
             </div>
           </a>
-          <a href="https://davehomeassist.github.io/NotionWidgets/graph-explorer.html" target="_blank" class="product-card widget-card">
+          <a href="https://davehomeassist.github.io/NotionWidgets/graph-explorer.html" target="_blank" rel="noopener noreferrer" class="product-card widget-card">
             <div class="product-image widget-live-preview">
               <iframe src="https://davehomeassist.github.io/NotionWidgets/graph-explorer.html" loading="lazy" title="Workspace Map" tabindex="-1"></iframe>
             </div>
@@ -492,15 +536,15 @@
           <div class="showcase-label-tag">Chrome Extension</div>
           <h2>Prompt Lab</h2>
           <p>A complete prompt engineering workbench in your browser sidebar. Write, enhance, score, compare, and organize AI prompts — powered by your own API key.</p>
-          <a href="https://promptlab.tools" target="_blank" class="btn-primary" style="font-size:11px; padding:12px 24px;">
+          <a href="https://promptlab.tools" target="_blank" rel="noopener noreferrer" class="btn-primary" style="font-size:11px; padding:12px 24px;">
             promptlab.tools
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
           </a>
         </div>
         <div class="showcase-cards">
-          <a href="https://promptlab.tools/app" target="_blank" class="product-card" style="grid-column: span 2;">
+          <a href="https://promptlab.tools/app" target="_blank" rel="noopener noreferrer" class="product-card" style="grid-column: span 2;">
             <div class="product-image" style="aspect-ratio: 21/9;">
-              <img src="img/promptlab-extension-preview.png" alt="Prompt Lab extension running in Chrome sidebar" style="object-position: top left;">
+              <img src="img/promptlab-extension-preview.webp" alt="Prompt Lab extension running in Chrome sidebar" width="2032" height="1162" loading="lazy" decoding="async" style="object-position: top left;">
             </div>
             <div class="product-body">
               <div class="product-category"><span class="product-category-dot"></span> Extension</div>
@@ -558,13 +602,16 @@
         <h2>New tools, shipped monthly</h2>
         <p>Get notified when new skills, widgets, and agents drop. No spam — just the occasional system update.</p>
         <form class="email-form" onsubmit="event.preventDefault(); this.querySelector('button').textContent='Noted ✓'; this.querySelector('input').value='';">
-          <input type="email" placeholder="your@email.com" required>
+          <label class="sr-only" for="email-address">Email address</label>
+          <input id="email-address" name="email" type="email" placeholder="your@email.com" autocomplete="email" aria-describedby="email-note" required>
           <button type="submit">Subscribe</button>
         </form>
-        <p style="font-family:var(--font-mono); font-size:11px; color:var(--charcoal-light); opacity:0.5; margin-top:12px;">Email collection coming soon — form is not yet connected.</p>
+        <p id="email-note" style="font-family:var(--font-mono); font-size:11px; color:var(--charcoal-light); opacity:0.5; margin-top:12px;">Email collection coming soon — form is not yet connected.</p>
       </div>
     </div>
   </section>
+
+  </main>
 
   <!-- FOOTER -->
   <footer>
@@ -583,22 +630,22 @@
             <li><a href="skills.html">Skills</a></li>
             <li><a href="agents.html">Agents</a></li>
             <li><a href="widgets.html">Widgets</a></li>
-            <li><a href="https://promptlab.tools" target="_blank">Prompt Lab</a></li>
+            <li><a href="https://promptlab.tools" target="_blank" rel="noopener noreferrer">Prompt Lab</a></li>
           </ul>
         </div>
         <div class="footer-col">
           <h4>Resources</h4>
           <ul>
-            <li><a href="https://github.com/DaveHomeAssist/system-by-dave" target="_blank">Project Repo</a></li>
-            <li><a href="https://github.com/DaveHomeAssist/system-by-dave/blob/main/CHANGELOG.md" target="_blank">Changelog</a></li>
-            <li><a href="https://github.com/DaveHomeAssist" target="_blank">GitHub</a></li>
+            <li><a href="https://github.com/DaveHomeAssist/system-by-dave" target="_blank" rel="noopener noreferrer">Project Repo</a></li>
+            <li><a href="https://github.com/DaveHomeAssist/system-by-dave/blob/main/CHANGELOG.md" target="_blank" rel="noopener noreferrer">Changelog</a></li>
+            <li><a href="https://github.com/DaveHomeAssist" target="_blank" rel="noopener noreferrer">GitHub</a></li>
           </ul>
         </div>
         <div class="footer-col">
           <h4>Connect</h4>
           <ul>
-            <li><a href="https://github.com/DaveHomeAssist" target="_blank">GitHub</a></li>
-            <li><a href="https://promptlab.tools" target="_blank">promptlab.tools</a></li>
+            <li><a href="https://github.com/DaveHomeAssist" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+            <li><a href="https://promptlab.tools" target="_blank" rel="noopener noreferrer">promptlab.tools</a></li>
             <li><a href="privacy-policy.html">Privacy Policy</a></li>
           </ul>
         </div>

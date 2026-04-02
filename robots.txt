@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /404.html
+Disallow: /500.html
+
+Sitemap: https://systembydave.com/sitemap.xml
+Host: systembydave.com

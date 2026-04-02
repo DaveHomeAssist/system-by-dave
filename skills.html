@@ -5,7 +5,25 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Skills — System by Dave</title>
 <meta name="description" content="24 Notion AI skills across 6 categories. Writing, formatting, productivity, dev, AV/production, and AI prompt tools — all running natively in Notion.">
+<link rel="canonical" href="https://systembydave.com/skills.html">
+<meta name="robots" content="index,follow">
+<meta name="theme-color" content="#F5F0E8">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="System by Dave">
+<meta property="og:title" content="Skills — System by Dave">
+<meta property="og:description" content="24 Notion AI skills across 6 categories. Writing, formatting, productivity, dev, AV/production, and AI prompt tools — all running natively in Notion.">
+<meta property="og:url" content="https://systembydave.com/skills.html">
+<meta property="og:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<meta property="og:image:width" content="1024">
+<meta property="og:image:height" content="412">
+<meta property="og:image:alt" content="System by Dave preview banner">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Skills — System by Dave">
+<meta name="twitter:description" content="24 Notion AI skills across 6 categories. Writing, formatting, productivity, dev, AV/production, and AI prompt tools — all running natively in Notion.">
+<meta name="twitter:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<link rel="icon" href="svg/system_by_dave_logo_rust.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300;1,9..40,400&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 <style>
@@ -50,23 +68,25 @@
 </style>
 </head>
 <body>
+<a class="skip-link" href="#main-content">Skip to content</a>
 <div class="page-wrapper">
   <header>
-    <nav class="container">
+    <nav class="container" aria-label="Primary">
       <a href="index.html" class="nav-brand">
         <div class="nav-brand-mark"><span>S</span><span class="mark-d">D</span></div>
         <span class="nav-brand-text">System by Dave</span>
       </a>
       <ul class="nav-links">
-        <li><a href="skills.html" class="active hide-mobile">Skills</a></li>
+        <li><a href="skills.html" class="active hide-mobile" aria-current="page">Skills</a></li>
         <li><a href="agents.html" class="hide-mobile">Agents</a></li>
         <li><a href="widgets.html" class="hide-mobile">Widgets</a></li>
-        <li><a href="https://promptlab.tools" target="_blank" class="hide-mobile">Prompt Lab</a></li>
-        <li><a href="https://github.com/DaveHomeAssist/system-by-dave" target="_blank" class="nav-cta">GitHub</a></li>
+        <li><a href="https://promptlab.tools" target="_blank" rel="noopener noreferrer" class="hide-mobile">Prompt Lab</a></li>
+        <li><a href="https://github.com/DaveHomeAssist/system-by-dave" target="_blank" rel="noopener noreferrer" class="nav-cta">GitHub</a></li>
       </ul>
     </nav>
   </header>
 
+  <main id="main-content">
   <section class="page-hero">
     <div class="container">
       <div class="page-hero-tag reveal">Catalog</div>
@@ -84,14 +104,14 @@
       </div>
 
       <div class="catalog-filters">
-        <div class="cat-pills">
-          <button class="cat-pill active" data-filter="all">All</button>
-          <button class="cat-pill" data-filter="writing">Writing</button>
-          <button class="cat-pill" data-filter="formatting">Formatting</button>
-          <button class="cat-pill" data-filter="productivity">Productivity</button>
-          <button class="cat-pill" data-filter="ai">AI &amp; Prompts</button>
-          <button class="cat-pill" data-filter="dev">Dev</button>
-          <button class="cat-pill" data-filter="av">AV / Production</button>
+        <div class="cat-pills" role="toolbar" aria-label="Filter skills by category">
+          <button class="cat-pill active" type="button" data-filter="all" aria-pressed="true">All</button>
+          <button class="cat-pill" type="button" data-filter="writing" aria-pressed="false">Writing</button>
+          <button class="cat-pill" type="button" data-filter="formatting" aria-pressed="false">Formatting</button>
+          <button class="cat-pill" type="button" data-filter="productivity" aria-pressed="false">Productivity</button>
+          <button class="cat-pill" type="button" data-filter="ai" aria-pressed="false">AI &amp; Prompts</button>
+          <button class="cat-pill" type="button" data-filter="dev" aria-pressed="false">Dev</button>
+          <button class="cat-pill" type="button" data-filter="av" aria-pressed="false">AV / Production</button>
         </div>
       </div>
 
@@ -265,6 +285,7 @@
 
     </div>
   </section>
+  </main>
 
   <footer>
     <div class="container">
@@ -282,21 +303,21 @@
             <li><a href="skills.html">Skills</a></li>
             <li><a href="agents.html">Agents</a></li>
             <li><a href="widgets.html">Widgets</a></li>
-            <li><a href="https://promptlab.tools" target="_blank">Prompt Lab</a></li>
+            <li><a href="https://promptlab.tools" target="_blank" rel="noopener noreferrer">Prompt Lab</a></li>
           </ul>
         </div>
         <div class="footer-col">
           <h4>Resources</h4>
           <ul>
-            <li><a href="https://github.com/DaveHomeAssist/system-by-dave" target="_blank">Project Repo</a></li>
-            <li><a href="https://github.com/DaveHomeAssist/system-by-dave/blob/main/CHANGELOG.md" target="_blank">Changelog</a></li>
+            <li><a href="https://github.com/DaveHomeAssist/system-by-dave" target="_blank" rel="noopener noreferrer">Project Repo</a></li>
+            <li><a href="https://github.com/DaveHomeAssist/system-by-dave/blob/main/CHANGELOG.md" target="_blank" rel="noopener noreferrer">Changelog</a></li>
           </ul>
         </div>
         <div class="footer-col">
           <h4>Connect</h4>
           <ul>
-            <li><a href="https://github.com/DaveHomeAssist" target="_blank">GitHub</a></li>
-            <li><a href="https://promptlab.tools" target="_blank">promptlab.tools</a></li>
+            <li><a href="https://github.com/DaveHomeAssist" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+            <li><a href="https://promptlab.tools" target="_blank" rel="noopener noreferrer">promptlab.tools</a></li>
             <li><a href="privacy-policy.html">Privacy Policy</a></li>
           </ul>
         </div>
@@ -319,8 +340,12 @@
     const categories = document.querySelectorAll('.skill-category');
     pills.forEach(pill => {
       pill.addEventListener('click', () => {
-        pills.forEach(p => p.classList.remove('active'));
+        pills.forEach(p => {
+          p.classList.remove('active');
+          p.setAttribute('aria-pressed', 'false');
+        });
         pill.classList.add('active');
+        pill.setAttribute('aria-pressed', 'true');
         const filter = pill.dataset.filter;
         categories.forEach(cat => {
           if (filter === 'all' || cat.dataset.category === filter) {
