@@ -1,0 +1,1872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wedding Ops System — System by Dave</title>
+<meta name="description" content="A complete Notion system specification for wedding planning — 8 databases, 35 views, 50+ task seeds, and a phase-aware lifecycle.">
+<link rel="canonical" href="https://systembydave.com/wedding-ops.html">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#F5F0E8">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="System by Dave">
+<meta property="og:title" content="Wedding Ops System — System by Dave">
+<meta property="og:description" content="A complete Notion system specification for wedding planning — 8 databases, 35 views, 50+ task seeds, and a phase-aware lifecycle.">
+<meta property="og:url" content="https://systembydave.com/wedding-ops.html">
+<link rel="icon" href="svg/system_by_dave_logo_rust.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300;1,9..40,400&family=JetBrains+Mono:wght@300;400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+/* ═══════════════════════════════════════════
+   WEDDING OPS — PAGE-SPECIFIC STYLES
+   ═══════════════════════════════════════════ */
+
+/* ─── LAYOUT ─── */
+.spec-layout {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 60px;
+  padding: 60px 0 120px;
+  align-items: start;
+}
+
+/* ─── SIDEBAR TOC ─── */
+.spec-toc {
+  position: sticky;
+  top: 92px;
+  max-height: calc(100vh - 112px);
+  overflow-y: auto;
+  padding-right: 16px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--grid-line-accent) transparent;
+}
+.spec-toc::-webkit-scrollbar { width: 3px; }
+.spec-toc::-webkit-scrollbar-thumb { background: var(--grid-line-accent); border-radius: 2px; }
+
+.toc-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--rust);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.toc-label::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--rust);
+  opacity: 0.4;
+}
+
+.toc-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.toc-list a {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--charcoal-light);
+  text-decoration: none;
+  padding: 6px 12px;
+  display: block;
+  border-left: 2px solid transparent;
+  transition: all 0.2s;
+  line-height: 1.4;
+}
+.toc-list a:hover {
+  color: var(--charcoal);
+  border-left-color: var(--grid-line-accent);
+}
+.toc-list a.active {
+  color: var(--rust);
+  border-left-color: var(--rust);
+  font-weight: 400;
+}
+
+/* ─── SPEC CONTENT ─── */
+.spec-content {
+  min-width: 0;
+}
+
+.spec-section {
+  margin-bottom: 80px;
+  scroll-margin-top: 100px;
+}
+
+.spec-section-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--rust);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.spec-section-label::before {
+  content: '';
+  width: 24px;
+  height: 1.5px;
+  background: var(--rust);
+}
+
+.spec-section h2 {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 3vw, 38px);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  margin-bottom: 12px;
+  line-height: 1.15;
+}
+.spec-section h2 em {
+  font-style: italic;
+  color: var(--rust);
+}
+
+.spec-section-desc {
+  font-size: 15px;
+  font-weight: 300;
+  line-height: 1.7;
+  color: var(--charcoal-light);
+  max-width: 640px;
+  margin-bottom: 36px;
+}
+
+/* ─── STAT STRIP ─── */
+.stat-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 1px;
+  background: var(--grid-line-accent);
+  border: 1px solid var(--grid-line-accent);
+  margin-bottom: 48px;
+}
+.stat-item {
+  background: var(--cream);
+  padding: 20px 24px;
+  text-align: center;
+}
+.stat-num {
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 400;
+  color: var(--charcoal);
+  line-height: 1;
+  margin-bottom: 6px;
+}
+.stat-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--charcoal-light);
+}
+
+/* ─── SYSTEM MAP ─── */
+.sys-map {
+  background: var(--cream);
+  border: 1px solid var(--grid-line-accent);
+  padding: 40px;
+  margin-bottom: 48px;
+  overflow-x: auto;
+}
+.sys-map pre {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--charcoal-light);
+  white-space: pre;
+  margin: 0;
+}
+.sys-map .map-highlight { color: var(--rust); font-weight: 400; }
+.sys-map .map-existing { color: var(--charcoal); opacity: 0.5; }
+
+/* ─── PRINCIPLES ─── */
+.principles-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--grid-line-accent);
+  border: 1px solid var(--grid-line-accent);
+  margin-bottom: 48px;
+}
+.principle {
+  background: var(--cream);
+  padding: 28px;
+}
+.principle-num {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--rust);
+  margin-bottom: 8px;
+}
+.principle h4 {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 400;
+  margin-bottom: 8px;
+}
+.principle p {
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--charcoal-light);
+  line-height: 1.6;
+}
+
+/* ─── TAXONOMY PILLS ─── */
+.tax-group {
+  margin-bottom: 32px;
+}
+.tax-group-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--charcoal);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.tax-group-label .tax-used-in {
+  font-weight: 300;
+  color: var(--charcoal-light);
+  font-size: 10px;
+}
+.tax-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.tax-pill {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  padding: 6px 14px;
+  border: 1px solid var(--grid-line-accent);
+  background: transparent;
+  color: var(--charcoal-light);
+  cursor: default;
+  transition: all 0.2s;
+}
+.tax-pill.vendor-only {
+  border-left: 3px solid var(--rust);
+}
+.tax-pill.budget-only {
+  border-left: 3px solid var(--charcoal-light);
+}
+
+/* ─── DATABASE CARDS ─── */
+.db-card {
+  border: 1px solid var(--grid-line-accent);
+  margin-bottom: 16px;
+  background: var(--cream);
+  overflow: hidden;
+  transition: border-color 0.3s;
+}
+.db-card.open {
+  border-color: rgba(181,101,74,0.3);
+}
+.db-card-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 28px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.2s;
+}
+.db-card-header:hover {
+  background: rgba(181,101,74,0.02);
+}
+.db-card-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+  width: 40px;
+  text-align: center;
+}
+.db-card-title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 400;
+  flex-grow: 1;
+}
+.db-card-badge {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border: 1px solid var(--grid-line-accent);
+}
+.db-card-badge.existing {
+  color: var(--rust);
+  border-color: rgba(181,101,74,0.3);
+}
+.db-card-badge.new-db {
+  color: var(--charcoal-light);
+}
+.db-card-chevron {
+  font-family: var(--font-mono);
+  font-size: 18px;
+  color: var(--charcoal-light);
+  transition: transform 0.3s;
+  flex-shrink: 0;
+}
+.db-card.open .db-card-chevron {
+  transform: rotate(180deg);
+}
+.db-card-body {
+  display: none;
+  padding: 0 28px 28px;
+  border-top: 1px solid var(--grid-line);
+}
+.db-card.open .db-card-body {
+  display: block;
+}
+
+/* ─── SCHEMA TABLE ─── */
+.schema-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  font-size: 13px;
+}
+.schema-table thead th {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--charcoal-light);
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 2px solid var(--grid-line-accent);
+  font-weight: 400;
+}
+.schema-table tbody td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--grid-line);
+  font-weight: 300;
+  color: var(--charcoal-light);
+  vertical-align: top;
+  line-height: 1.5;
+}
+.schema-table tbody tr:last-child td {
+  border-bottom: none;
+}
+.schema-table .prop-name {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--charcoal);
+}
+.schema-table .prop-type {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--rust);
+}
+.schema-table .prop-computed {
+  opacity: 0.6;
+  font-style: italic;
+}
+
+.schema-subsection {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--grid-line);
+}
+.schema-subsection-title {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--rust);
+  margin-bottom: 12px;
+}
+
+/* ─── FORMULA BLOCKS ─── */
+.formula-block {
+  background: var(--charcoal);
+  color: var(--cream);
+  padding: 16px 20px;
+  margin: 8px 0;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.6;
+  position: relative;
+  overflow-x: auto;
+}
+.formula-block code {
+  color: var(--cream);
+  font-family: inherit;
+}
+.formula-copy {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  background: rgba(245,240,232,0.1);
+  color: rgba(245,240,232,0.6);
+  border: 1px solid rgba(245,240,232,0.15);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.formula-copy:hover {
+  background: rgba(245,240,232,0.2);
+  color: var(--cream);
+}
+.formula-copy.copied {
+  color: var(--rust-light);
+  border-color: var(--rust-light);
+}
+
+/* ─── RELATIONS DIAGRAM ─── */
+.rel-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--grid-line-accent);
+  border: 1px solid var(--grid-line-accent);
+  margin-bottom: 32px;
+}
+.rel-row {
+  display: contents;
+}
+.rel-cell {
+  background: var(--cream);
+  padding: 14px 20px;
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--charcoal-light);
+}
+.rel-cell.rel-header {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--charcoal-light);
+  font-weight: 400;
+}
+.rel-arrow {
+  font-family: var(--font-mono);
+  color: var(--rust);
+  margin: 0 6px;
+}
+
+/* ─── VIEWS TABLE ─── */
+.views-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.views-table thead th {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--charcoal-light);
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 2px solid var(--grid-line-accent);
+  font-weight: 400;
+}
+.views-table tbody td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--grid-line);
+  font-weight: 300;
+  color: var(--charcoal-light);
+  vertical-align: top;
+}
+.views-table .view-name {
+  font-weight: 400;
+  color: var(--charcoal);
+}
+.views-table .view-type {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--rust);
+}
+
+/* ─── BUILD CHECKLIST ─── */
+.build-progress {
+  margin-bottom: 24px;
+}
+.build-bar-track {
+  height: 4px;
+  background: var(--grid-line-accent);
+  position: relative;
+  margin-bottom: 8px;
+}
+.build-bar-fill {
+  height: 100%;
+  background: var(--rust);
+  width: 0%;
+  transition: width 0.4s ease;
+}
+.build-bar-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--charcoal-light);
+  letter-spacing: 0.06em;
+}
+
+.build-list {
+  list-style: none;
+  counter-reset: build-step;
+}
+.build-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--grid-line);
+  counter-increment: build-step;
+}
+.build-step:last-child { border-bottom: none; }
+
+.build-check {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 1.5px solid var(--grid-line-accent);
+  flex-shrink: 0;
+  cursor: pointer;
+  position: relative;
+  margin-top: 1px;
+  transition: all 0.2s;
+  background: var(--cream);
+}
+.build-check:checked {
+  border-color: var(--rust);
+  background: var(--rust);
+}
+.build-check:checked::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 6px;
+  width: 5px;
+  height: 9px;
+  border: solid var(--cream);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+.build-check:hover { border-color: var(--rust-light); }
+
+.build-step-content {
+  flex-grow: 1;
+}
+.build-step-label {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--charcoal);
+  line-height: 1.5;
+}
+.build-step.checked .build-step-label {
+  color: var(--charcoal-light);
+  text-decoration: line-through;
+  text-decoration-color: var(--grid-line-accent);
+}
+.build-step-dep {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--charcoal-light);
+  letter-spacing: 0.06em;
+  margin-top: 2px;
+}
+.build-step-num {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--rust);
+  opacity: 0.5;
+  min-width: 20px;
+  text-align: center;
+  margin-top: 2px;
+}
+.build-step-num::before {
+  content: counter(build-step, decimal-leading-zero);
+}
+
+/* ─── LIFECYCLE TIMELINE ─── */
+.lifecycle {
+  position: relative;
+  padding-left: 32px;
+}
+.lifecycle::before {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: 0;
+  bottom: 0;
+  width: 1.5px;
+  background: var(--grid-line-accent);
+}
+.lifecycle-phase {
+  position: relative;
+  margin-bottom: 40px;
+  padding-bottom: 0;
+}
+.lifecycle-phase:last-child { margin-bottom: 0; }
+.lifecycle-dot {
+  position: absolute;
+  left: -32px;
+  top: 4px;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  border: 2px solid var(--rust);
+  background: var(--cream);
+  z-index: 1;
+}
+.lifecycle-phase.phase-active .lifecycle-dot {
+  background: var(--rust);
+}
+.lifecycle-phase-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--rust);
+  margin-bottom: 6px;
+}
+.lifecycle-phase h4 {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 400;
+  margin-bottom: 8px;
+}
+.lifecycle-phase p {
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--charcoal-light);
+  line-height: 1.6;
+  margin-bottom: 12px;
+  max-width: 540px;
+}
+.lifecycle-dbs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.lifecycle-db-pill {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  padding: 4px 10px;
+  border: 1px solid var(--grid-line-accent);
+  color: var(--charcoal-light);
+}
+.lifecycle-db-pill.active-db {
+  border-color: rgba(181,101,74,0.3);
+  color: var(--rust);
+}
+
+/* ─── TASK SEEDS ─── */
+.seed-filters {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+.seed-filter {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  border: 1px solid var(--grid-line-accent);
+  background: transparent;
+  color: var(--charcoal-light);
+  cursor: pointer;
+  transition: all 0.25s;
+}
+.seed-filter:hover, .seed-filter.active {
+  border-color: var(--rust);
+  color: var(--rust);
+  background: rgba(181,101,74,0.04);
+}
+
+.seed-group {
+  margin-bottom: 32px;
+}
+.seed-group[hidden] { display: none; }
+.seed-group-title {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--rust);
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--grid-line-accent);
+  margin-bottom: 12px;
+}
+.seed-task {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 16px;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--grid-line);
+  font-size: 13px;
+}
+.seed-task:last-child { border-bottom: none; }
+.seed-task-name {
+  font-weight: 300;
+  color: var(--charcoal);
+}
+.seed-task-cat {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--charcoal-light);
+}
+.seed-task-pri {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  padding: 2px 8px;
+  border: 1px solid var(--grid-line-accent);
+}
+.seed-task-pri.must { color: var(--rust); border-color: rgba(181,101,74,0.3); }
+.seed-task-pri.should { color: var(--charcoal-light); }
+.seed-task-pri.nice { color: var(--charcoal-light); opacity: 0.6; }
+
+/* ─── INLINE NOTE ─── */
+.spec-note {
+  padding: 20px 24px;
+  border-left: 3px solid var(--rust);
+  background: rgba(181,101,74,0.03);
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--charcoal-light);
+  line-height: 1.6;
+  margin: 24px 0;
+}
+.spec-note strong {
+  font-weight: 500;
+  color: var(--charcoal);
+}
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 1024px) {
+  .spec-layout { grid-template-columns: 1fr; gap: 0; }
+  .spec-toc { position: static; max-height: none; padding: 0 0 40px; border-bottom: 1px solid var(--grid-line-accent); margin-bottom: 40px; }
+  .toc-list { flex-direction: row; flex-wrap: wrap; gap: 4px; }
+  .toc-list a { border-left: none; border-bottom: 2px solid transparent; padding: 6px 10px; font-size: 12px; }
+  .toc-list a.active { border-bottom-color: var(--rust); border-left: none; }
+  .principles-grid { grid-template-columns: 1fr; }
+  .rel-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 680px) {
+  .stat-strip { grid-template-columns: repeat(2, 1fr); }
+  .seed-task { grid-template-columns: 1fr; gap: 4px; }
+  .seed-task-cat, .seed-task-pri { justify-self: start; }
+  .sys-map { padding: 24px; }
+  .sys-map pre { font-size: 10px; }
+}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to content</a>
+<div class="page-wrapper">
+
+  <header>
+    <nav class="container" aria-label="Primary">
+      <a href="index.html" class="nav-brand">
+        <div class="nav-brand-mark"><span>S</span><span class="mark-d">D</span></div>
+        <span class="nav-brand-text">System by Dave</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="skills.html" class="hide-mobile">Skills</a></li>
+        <li><a href="agents.html" class="hide-mobile">Agents</a></li>
+        <li><a href="widgets.html" class="hide-mobile">Widgets</a></li>
+        <li><a href="https://promptlab.tools" target="_blank" rel="noopener noreferrer" class="hide-mobile">Prompt Lab</a></li>
+        <li><a href="https://github.com/DaveHomeAssist/system-by-dave" target="_blank" rel="noopener noreferrer" class="nav-cta">GitHub</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main id="main-content">
+  <section class="page-hero">
+    <div class="container">
+      <div class="page-hero-tag reveal">System Spec</div>
+      <h1 class="reveal reveal-delay-1">Wedding <em>Ops</em></h1>
+      <p class="page-hero-desc reveal reveal-delay-2">A complete Notion system specification for wedding planning. Eight interconnected databases, a phase-aware lifecycle, and every formula, view, and template defined before a single database is created.</p>
+    </div>
+  </section>
+
+  <div class="container">
+    <div class="spec-layout">
+
+      <!-- ─── SIDEBAR TOC ─── -->
+      <aside class="spec-toc" aria-label="Table of contents">
+        <div class="toc-label">Contents</div>
+        <ul class="toc-list" id="tocList">
+          <li><a href="#overview">Overview</a></li>
+          <li><a href="#taxonomy">Shared Taxonomy</a></li>
+          <li><a href="#databases">Database Schemas</a></li>
+          <li><a href="#relations">Relations Map</a></li>
+          <li><a href="#views">Views Reference</a></li>
+          <li><a href="#formulas">Formulas & Rollups</a></li>
+          <li><a href="#lifecycle">Lifecycle</a></li>
+          <li><a href="#tasks">Task Seeds</a></li>
+          <li><a href="#build">Build Order</a></li>
+          <li><a href="#pages">Day-of & Shot List</a></li>
+        </ul>
+      </aside>
+
+      <!-- ─── MAIN CONTENT ─── -->
+      <div class="spec-content">
+
+        <!-- ═══ OVERVIEW ═══ -->
+        <section class="spec-section reveal" id="overview">
+          <div class="spec-section-label">Section 01</div>
+          <h2>System <em>Overview</em></h2>
+          <p class="spec-section-desc">A single Notion workspace that manages the full wedding lifecycle alongside the live site at veronicaandlucas.com. Guest List is the spine — everything connects back to it.</p>
+
+          <div class="stat-strip">
+            <div class="stat-item">
+              <div class="stat-num">8</div>
+              <div class="stat-label">Databases</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-num">35</div>
+              <div class="stat-label">Views</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-num">30+</div>
+              <div class="stat-label">Templates</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-num">50+</div>
+              <div class="stat-label">Task Seeds</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-num">7</div>
+              <div class="stat-label">Phases</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-num">12</div>
+              <div class="stat-label">Formulas</div>
+            </div>
+          </div>
+
+          <div class="sys-map">
+<pre>
+                         <span class="map-highlight">&#x250C;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2510;</span>
+                         <span class="map-highlight">&#x2502;  &#x1F465; Guest    &#x2502;</span>
+                         <span class="map-highlight">&#x2502;    List      &#x2502;</span>  &#x2190; the spine
+                         <span class="map-highlight">&#x2514;&#x2500;&#x2500;&#x252C;&#x2500;&#x2500;&#x2500;&#x252C;&#x2500;&#x2500;&#x2500;&#x252C;&#x2500;&#x2500;&#x2500;&#x2518;</span>
+                            &#x2502;   &#x2502;   &#x2502;
+               &#x250C;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2518;   &#x2502;   &#x2514;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2510;
+               &#x25BC;                &#x25BC;                 &#x25BC;
+      <span class="map-existing">&#x250C;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2510;</span>   &#x250C;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2510;   <span class="map-existing">&#x250C;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2510;</span>
+      <span class="map-existing">&#x2502; &#x1F4EC; RSVP    &#x2502;</span>   &#x2502; &#x1FA91; Seating  &#x2502;   <span class="map-existing">&#x2502; &#x1F389; Shenan- &#x2502;</span>
+      <span class="map-existing">&#x2502; Responses  &#x2502;</span>   &#x2502;    Chart     &#x2502;   <span class="map-existing">&#x2502;  igans     &#x2502;</span>
+      <span class="map-existing">&#x2514;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2518;</span>   &#x2514;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2518;   <span class="map-existing">&#x2514;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x252C;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2518;</span>
+                                                    &#x2502;
+                                                    &#x25BC; song requests
+      &#x250C;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2510;   &#x250C;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2510;   &#x250C;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2510;
+      &#x2502; &#x1F3E2; Vendors &#x2502;&#x2500;&#x25B6;&#x2502; &#x1F4B0; Budget   &#x2502;   &#x2502; &#x1F3B5; Music   &#x2502;
+      &#x2514;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2518;   &#x2514;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2518;   &#x2514;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2518;
+
+      &#x250C;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2510;   &#x250C;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2510;
+      &#x2502; &#x2705; Tasks   &#x2502;   &#x2502; &#x1F4CB; Day-of   &#x2502;  &#x2190; page, not db
+      &#x2514;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2518;   &#x2514;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2500;&#x2518;
+</pre>
+          </div>
+
+          <div class="principles-grid">
+            <div class="principle">
+              <div class="principle-num">01</div>
+              <h4>One Vocabulary</h4>
+              <p>Select options defined once, used identically across databases. No "Photo" in one place and "Photography" in another.</p>
+            </div>
+            <div class="principle">
+              <div class="principle-num">02</div>
+              <h4>Guest List is the Spine</h4>
+              <p>Every person-related database relates back to it. No orphan records.</p>
+            </div>
+            <div class="principle">
+              <div class="principle-num">03</div>
+              <h4>Budget + Vendors Joined</h4>
+              <p>Every dollar traces to a vendor or category. Nothing floats unattributed.</p>
+            </div>
+            <div class="principle">
+              <div class="principle-num">04</div>
+              <h4>Phase-Aware</h4>
+              <p>Databases activate in stages. Irrelevant ones stay collapsed, not deleted.</p>
+            </div>
+            <div class="principle">
+              <div class="principle-num">05</div>
+              <h4>Dashboard-First</h4>
+              <p>Hub page shows live rollup metrics. Never open a database just to get a headline number.</p>
+            </div>
+            <div class="principle">
+              <div class="principle-num">06</div>
+              <h4>Templateable</h4>
+              <p>Row templates for common entries. The whole system is duplicable for reuse.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ═══ TAXONOMY ═══ -->
+        <section class="spec-section reveal" id="taxonomy">
+          <div class="spec-section-label">Section 02</div>
+          <h2>Shared <em>Taxonomy</em></h2>
+          <p class="spec-section-desc">Canonical select values used identically wherever they appear. This is the single source of truth — no synonyms, no abbreviations.</p>
+
+          <div class="tax-group">
+            <div class="tax-group-label">Category <span class="tax-used-in">— Vendors, Budget, Tasks</span></div>
+            <div class="tax-pills">
+              <span class="tax-pill vendor-only">Venue</span>
+              <span class="tax-pill vendor-only">Catering</span>
+              <span class="tax-pill vendor-only">Photography</span>
+              <span class="tax-pill vendor-only">Videography</span>
+              <span class="tax-pill vendor-only">DJ & Music</span>
+              <span class="tax-pill vendor-only">Florist</span>
+              <span class="tax-pill vendor-only">Officiant</span>
+              <span class="tax-pill vendor-only">Rentals</span>
+              <span class="tax-pill vendor-only">Hair & Makeup</span>
+              <span class="tax-pill vendor-only">Cake & Dessert</span>
+              <span class="tax-pill vendor-only">Transportation</span>
+              <span class="tax-pill vendor-only">Stationery</span>
+              <span class="tax-pill budget-only">Attire</span>
+              <span class="tax-pill budget-only">Rings</span>
+              <span class="tax-pill budget-only">Legal & License</span>
+              <span class="tax-pill budget-only">Favors</span>
+              <span class="tax-pill budget-only">Tips & Gratuity</span>
+              <span class="tax-pill budget-only">Decor</span>
+              <span class="tax-pill budget-only">Honeymoon</span>
+              <span class="tax-pill budget-only">Website</span>
+              <span class="tax-pill">Other</span>
+            </div>
+            <div class="spec-note" style="margin-top: 12px;">
+              <strong>Rust border</strong> = used in Vendors, Budget, and Tasks.
+              <strong>Gray border</strong> = Budget and Tasks only (not vendor categories).
+            </div>
+          </div>
+
+          <div class="tax-group">
+            <div class="tax-group-label">Side <span class="tax-used-in">— Guest List</span></div>
+            <div class="tax-pills">
+              <span class="tax-pill">Bride</span>
+              <span class="tax-pill">Groom</span>
+              <span class="tax-pill">Mutual</span>
+            </div>
+          </div>
+
+          <div class="tax-group">
+            <div class="tax-group-label">Circle <span class="tax-used-in">— Guest List</span></div>
+            <div class="tax-pills">
+              <span class="tax-pill">Immediate Family</span>
+              <span class="tax-pill">Extended Family</span>
+              <span class="tax-pill">Bridal Party</span>
+              <span class="tax-pill">Close Friend</span>
+              <span class="tax-pill">Friend</span>
+              <span class="tax-pill">Colleague</span>
+              <span class="tax-pill">Neighbor</span>
+              <span class="tax-pill">Plus One</span>
+            </div>
+          </div>
+
+          <div class="tax-group">
+            <div class="tax-group-label">Owner <span class="tax-used-in">— Tasks</span></div>
+            <div class="tax-pills">
+              <span class="tax-pill">Veronica</span>
+              <span class="tax-pill">Lucas</span>
+              <span class="tax-pill">Both</span>
+              <span class="tax-pill">Planner</span>
+              <span class="tax-pill">Dave</span>
+              <span class="tax-pill">Other</span>
+            </div>
+          </div>
+
+          <div class="tax-group">
+            <div class="tax-group-label">Milestone <span class="tax-used-in">— Tasks</span></div>
+            <div class="tax-pills">
+              <span class="tax-pill">12+ Months</span>
+              <span class="tax-pill">9–12 Months</span>
+              <span class="tax-pill">6–9 Months</span>
+              <span class="tax-pill">3–6 Months</span>
+              <span class="tax-pill">1–3 Months</span>
+              <span class="tax-pill">2–4 Weeks</span>
+              <span class="tax-pill">Week Of</span>
+              <span class="tax-pill">Day Of</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- ═══ DATABASES ═══ -->
+        <section class="spec-section reveal" id="databases">
+          <div class="spec-section-label">Section 03</div>
+          <h2>Database <em>Schemas</em></h2>
+          <p class="spec-section-desc">Click any database to expand its full schema. Properties in italics are computed (formulas or rollups).</p>
+
+          <!-- Guest List -->
+          <div class="db-card" data-db="guests">
+            <div class="db-card-header" onclick="toggleDb(this)">
+              <span class="db-card-icon">&#x1F465;</span>
+              <span class="db-card-title">Guest List</span>
+              <span class="db-card-badge new-db">New</span>
+              <span class="db-card-chevron">&#x25BE;</span>
+            </div>
+            <div class="db-card-body">
+              <table class="schema-table">
+                <thead><tr><th>Property</th><th>Type</th><th>Notes</th></tr></thead>
+                <tbody>
+                  <tr><td class="prop-name">Name</td><td class="prop-type">title</td><td>"First Last" format</td></tr>
+                  <tr><td class="prop-name">Email</td><td class="prop-type">email</td><td></td></tr>
+                  <tr><td class="prop-name">Phone</td><td class="prop-type">phone</td><td></td></tr>
+                  <tr><td class="prop-name">Mailing Address</td><td class="prop-type">text</td><td>Full address for paper invites</td></tr>
+                  <tr><td class="prop-name">Side</td><td class="prop-type">select</td><td>Bride &middot; Groom &middot; Mutual</td></tr>
+                  <tr><td class="prop-name">Circle</td><td class="prop-type">select</td><td>See shared taxonomy</td></tr>
+                  <tr><td class="prop-name">Invite Status</td><td class="prop-type">select</td><td>Not Yet &rarr; Save the Date Sent &rarr; Invited &rarr; Reminder Sent</td></tr>
+                  <tr><td class="prop-name">RSVP Status</td><td class="prop-type">select</td><td>Awaiting &rarr; Accepted &rarr; Declined</td></tr>
+                  <tr><td class="prop-name">Plus One Granted</td><td class="prop-type">checkbox</td><td></td></tr>
+                  <tr><td class="prop-name">Plus One Name</td><td class="prop-type">text</td><td></td></tr>
+                  <tr><td class="prop-name">Dietary</td><td class="prop-type">text</td><td>Free text — allergies, preferences</td></tr>
+                  <tr><td class="prop-name">Meal Choice</td><td class="prop-type">select</td><td>TBD + options added when menu finalizes</td></tr>
+                  <tr><td class="prop-name">Table</td><td class="prop-type">relation</td><td>&rarr; Seating Chart</td></tr>
+                  <tr><td class="prop-name">Hotel Needed</td><td class="prop-type">checkbox</td><td>Flags out-of-town guests</td></tr>
+                  <tr><td class="prop-name">Gift Received</td><td class="prop-type">checkbox</td><td></td></tr>
+                  <tr><td class="prop-name">Thank You Sent</td><td class="prop-type">checkbox</td><td></td></tr>
+                  <tr><td class="prop-name">RSVP Response</td><td class="prop-type">relation</td><td>&rarr; RSVP Responses</td></tr>
+                  <tr><td class="prop-name">Notes</td><td class="prop-type">text</td><td></td></tr>
+                  <tr><td class="prop-name prop-computed"><em>Has Dietary Need</em></td><td class="prop-type">formula</td><td>true if Dietary is not empty</td></tr>
+                  <tr><td class="prop-name prop-computed"><em>RSVPd on Site</em></td><td class="prop-type">rollup</td><td>Count of RSVP Response relation</td></tr>
+                </tbody>
+              </table>
+              <div class="schema-subsection">
+                <div class="schema-subsection-title">Row Templates</div>
+                <table class="schema-table">
+                  <thead><tr><th>Template</th><th>Pre-fills</th></tr></thead>
+                  <tbody>
+                    <tr><td class="prop-name">Bride's Family</td><td>Side: Bride, Circle: Immediate Family</td></tr>
+                    <tr><td class="prop-name">Groom's Family</td><td>Side: Groom, Circle: Immediate Family</td></tr>
+                    <tr><td class="prop-name">Bride's Friend</td><td>Side: Bride, Circle: Friend</td></tr>
+                    <tr><td class="prop-name">Groom's Friend</td><td>Side: Groom, Circle: Friend</td></tr>
+                    <tr><td class="prop-name">Mutual Friend</td><td>Side: Mutual, Circle: Friend</td></tr>
+                    <tr><td class="prop-name">Bridal Party</td><td>Circle: Bridal Party</td></tr>
+                    <tr><td class="prop-name">Plus One</td><td>Circle: Plus One, Invite Status: Not Yet</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- RSVP -->
+          <div class="db-card" data-db="rsvp">
+            <div class="db-card-header" onclick="toggleDb(this)">
+              <span class="db-card-icon">&#x1F4EC;</span>
+              <span class="db-card-title">RSVP Responses</span>
+              <span class="db-card-badge existing">Existing</span>
+              <span class="db-card-chevron">&#x25BE;</span>
+            </div>
+            <div class="db-card-body">
+              <div class="spec-note">Existing schema unchanged. Add one relation property to link responses to the master Guest List.</div>
+              <table class="schema-table">
+                <thead><tr><th>Property</th><th>Type</th><th>Notes</th></tr></thead>
+                <tbody>
+                  <tr><td class="prop-name">Guest Name</td><td class="prop-type">title</td><td>Existing</td></tr>
+                  <tr><td class="prop-name">Email</td><td class="prop-type">email</td><td>Existing</td></tr>
+                  <tr><td class="prop-name">Attending</td><td class="prop-type">select</td><td>Joyfully Accepts &middot; Regretfully Declines</td></tr>
+                  <tr><td class="prop-name">Plus One</td><td class="prop-type">checkbox</td><td>Existing</td></tr>
+                  <tr><td class="prop-name">Guest Name (+1)</td><td class="prop-type">text</td><td>Existing</td></tr>
+                  <tr><td class="prop-name">Guest Dietary (+1)</td><td class="prop-type">text</td><td>Existing</td></tr>
+                  <tr><td class="prop-name">Dietary Restrictions</td><td class="prop-type">text</td><td>Existing</td></tr>
+                  <tr><td class="prop-name">Notes</td><td class="prop-type">text</td><td>Existing</td></tr>
+                  <tr><td class="prop-name" style="color: var(--rust);">Guest Record</td><td class="prop-type">relation</td><td style="color: var(--rust);">&rarr; Guest List — <strong>NEW</strong></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Shenanigans -->
+          <div class="db-card" data-db="shenanigans">
+            <div class="db-card-header" onclick="toggleDb(this)">
+              <span class="db-card-icon">&#x1F389;</span>
+              <span class="db-card-title">Shenanigans</span>
+              <span class="db-card-badge existing">Existing</span>
+              <span class="db-card-chevron">&#x25BE;</span>
+            </div>
+            <div class="db-card-body">
+              <div class="spec-note"><strong>No changes.</strong> Author stays free text (guests type their name on the site). Song requests are manually promoted to the Music database.</div>
+              <table class="schema-table">
+                <thead><tr><th>Property</th><th>Type</th><th>Notes</th></tr></thead>
+                <tbody>
+                  <tr><td class="prop-name">Author</td><td class="prop-type">title</td><td>Free text from guest</td></tr>
+                  <tr><td class="prop-name">Type</td><td class="prop-type">select</td><td>Toast Roast &middot; Photo Ops &middot; Song Requests &middot; Advice & Bets</td></tr>
+                  <tr><td class="prop-name">Content</td><td class="prop-type">text</td><td></td></tr>
+                  <tr><td class="prop-name">Extra</td><td class="prop-type">text</td><td>Song title, photo link, etc.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Vendors -->
+          <div class="db-card" data-db="vendors">
+            <div class="db-card-header" onclick="toggleDb(this)">
+              <span class="db-card-icon">&#x1F3E2;</span>
+              <span class="db-card-title">Vendors</span>
+              <span class="db-card-badge new-db">New</span>
+              <span class="db-card-chevron">&#x25BE;</span>
+            </div>
+            <div class="db-card-body">
+              <table class="schema-table">
+                <thead><tr><th>Property</th><th>Type</th><th>Notes</th></tr></thead>
+                <tbody>
+                  <tr><td class="prop-name">Vendor Name</td><td class="prop-type">title</td><td>Business name</td></tr>
+                  <tr><td class="prop-name">Category</td><td class="prop-type">select</td><td>Vendor subset of shared taxonomy</td></tr>
+                  <tr><td class="prop-name">Contact Name</td><td class="prop-type">text</td><td></td></tr>
+                  <tr><td class="prop-name">Phone</td><td class="prop-type">phone</td><td></td></tr>
+                  <tr><td class="prop-name">Email</td><td class="prop-type">email</td><td></td></tr>
+                  <tr><td class="prop-name">Website</td><td class="prop-type">url</td><td></td></tr>
+                  <tr><td class="prop-name">Status</td><td class="prop-type">select</td><td>Researching &rarr; Contacted &rarr; Meeting Set &rarr; Proposal In &rarr; Booked &rarr; Deposit Paid &rarr; Paid in Full</td></tr>
+                  <tr><td class="prop-name">Total Cost</td><td class="prop-type">number ($)</td><td>Contract total</td></tr>
+                  <tr><td class="prop-name">Deposit</td><td class="prop-type">number ($)</td><td></td></tr>
+                  <tr><td class="prop-name">Deposit Due</td><td class="prop-type">date</td><td></td></tr>
+                  <tr><td class="prop-name">Balance Due</td><td class="prop-type">date</td><td></td></tr>
+                  <tr><td class="prop-name">Contract</td><td class="prop-type">url</td><td>Link to PDF</td></tr>
+                  <tr><td class="prop-name">Budget Lines</td><td class="prop-type">relation</td><td>&rarr; Budget (reverse)</td></tr>
+                  <tr><td class="prop-name">Rating</td><td class="prop-type">select</td><td>&#9733; &middot; &#9733;&#9733; &middot; &#9733;&#9733;&#9733; — post-event</td></tr>
+                  <tr><td class="prop-name">Notes</td><td class="prop-type">text</td><td></td></tr>
+                  <tr><td class="prop-name prop-computed"><em>Balance Remaining</em></td><td class="prop-type">formula</td><td>Total Cost - Deposit</td></tr>
+                  <tr><td class="prop-name prop-computed"><em>Days Until Deposit</em></td><td class="prop-type">formula</td><td>dateBetween(Deposit Due, now)</td></tr>
+                  <tr><td class="prop-name prop-computed"><em>Overdue</em></td><td class="prop-type">formula</td><td>true if past due and not yet paid</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Budget -->
+          <div class="db-card" data-db="budget">
+            <div class="db-card-header" onclick="toggleDb(this)">
+              <span class="db-card-icon">&#x1F4B0;</span>
+              <span class="db-card-title">Budget</span>
+              <span class="db-card-badge new-db">New</span>
+              <span class="db-card-chevron">&#x25BE;</span>
+            </div>
+            <div class="db-card-body">
+              <table class="schema-table">
+                <thead><tr><th>Property</th><th>Type</th><th>Notes</th></tr></thead>
+                <tbody>
+                  <tr><td class="prop-name">Line Item</td><td class="prop-type">title</td><td>Specific: "Catering: dinner service"</td></tr>
+                  <tr><td class="prop-name">Category</td><td class="prop-type">select</td><td>Full shared taxonomy</td></tr>
+                  <tr><td class="prop-name">Estimated</td><td class="prop-type">number ($)</td><td></td></tr>
+                  <tr><td class="prop-name">Actual</td><td class="prop-type">number ($)</td><td>Fill as costs finalize</td></tr>
+                  <tr><td class="prop-name">Paid By</td><td class="prop-type">select</td><td>Couple &middot; Bride's Family &middot; Groom's Family &middot; Split</td></tr>
+                  <tr><td class="prop-name">Payment Status</td><td class="prop-type">select</td><td>Not Started &rarr; Deposit Paid &rarr; Paid in Full</td></tr>
+                  <tr><td class="prop-name">Due Date</td><td class="prop-type">date</td><td></td></tr>
+                  <tr><td class="prop-name">Vendor</td><td class="prop-type">relation</td><td>&rarr; Vendors</td></tr>
+                  <tr><td class="prop-name">Notes</td><td class="prop-type">text</td><td></td></tr>
+                  <tr><td class="prop-name prop-computed"><em>Over/Under</em></td><td class="prop-type">formula</td><td>Actual - Estimated</td></tr>
+                  <tr><td class="prop-name prop-computed"><em>% of Estimated</em></td><td class="prop-type">formula</td><td>round(Actual / Estimated * 100)</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Seating -->
+          <div class="db-card" data-db="seating">
+            <div class="db-card-header" onclick="toggleDb(this)">
+              <span class="db-card-icon">&#x1FA91;</span>
+              <span class="db-card-title">Seating Chart</span>
+              <span class="db-card-badge new-db">New</span>
+              <span class="db-card-chevron">&#x25BE;</span>
+            </div>
+            <div class="db-card-body">
+              <table class="schema-table">
+                <thead><tr><th>Property</th><th>Type</th><th>Notes</th></tr></thead>
+                <tbody>
+                  <tr><td class="prop-name">Table</td><td class="prop-type">title</td><td>"Table 1", "Head Table", "Kids Table"</td></tr>
+                  <tr><td class="prop-name">Capacity</td><td class="prop-type">number</td><td>Chairs at this table</td></tr>
+                  <tr><td class="prop-name">Location</td><td class="prop-type">text</td><td>"Near dance floor", "Garden side"</td></tr>
+                  <tr><td class="prop-name">Guests</td><td class="prop-type">relation</td><td>&rarr; Guest List (multi)</td></tr>
+                  <tr><td class="prop-name">Notes</td><td class="prop-type">text</td><td></td></tr>
+                  <tr><td class="prop-name prop-computed"><em>Seated</em></td><td class="prop-type">rollup</td><td>Count of Guests relation</td></tr>
+                  <tr><td class="prop-name prop-computed"><em>Spots Left</em></td><td class="prop-type">formula</td><td>Capacity - Seated</td></tr>
+                  <tr><td class="prop-name prop-computed"><em>Full</em></td><td class="prop-type">formula</td><td>Spots Left &le; 0</td></tr>
+                  <tr><td class="prop-name prop-computed"><em>Guest Names</em></td><td class="prop-type">rollup</td><td>Show Name, comma-separated</td></tr>
+                  <tr><td class="prop-name prop-computed"><em>Dietary Flags</em></td><td class="prop-type">rollup</td><td>Show Dietary from guests (non-empty)</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Music -->
+          <div class="db-card" data-db="music">
+            <div class="db-card-header" onclick="toggleDb(this)">
+              <span class="db-card-icon">&#x1F3B5;</span>
+              <span class="db-card-title">Music</span>
+              <span class="db-card-badge new-db">New</span>
+              <span class="db-card-chevron">&#x25BE;</span>
+            </div>
+            <div class="db-card-body">
+              <table class="schema-table">
+                <thead><tr><th>Property</th><th>Type</th><th>Notes</th></tr></thead>
+                <tbody>
+                  <tr><td class="prop-name">Song</td><td class="prop-type">title</td><td></td></tr>
+                  <tr><td class="prop-name">Artist</td><td class="prop-type">text</td><td></td></tr>
+                  <tr><td class="prop-name">Category</td><td class="prop-type">select</td><td>First Dance &middot; Parent Dance (Bride) &middot; Parent Dance (Groom) &middot; Processional &middot; Recessional &middot; Must Play &middot; Do Not Play &middot; Guest Request &middot; Ceremony &middot; Cocktail Hour &middot; Dinner</td></tr>
+                  <tr><td class="prop-name">Requested By</td><td class="prop-type">text</td><td>Guest name, "Couple", or "DJ"</td></tr>
+                  <tr><td class="prop-name">Priority</td><td class="prop-type">select</td><td>Essential &middot; Nice to Have &middot; Maybe</td></tr>
+                  <tr><td class="prop-name">Source</td><td class="prop-type">select</td><td>Couple &middot; Guest (site) &middot; DJ Suggestion</td></tr>
+                  <tr><td class="prop-name">Approved</td><td class="prop-type">checkbox</td><td>Couple reviewed and approved</td></tr>
+                  <tr><td class="prop-name">Notes</td><td class="prop-type">text</td><td></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Tasks -->
+          <div class="db-card" data-db="tasks">
+            <div class="db-card-header" onclick="toggleDb(this)">
+              <span class="db-card-icon">&#x2705;</span>
+              <span class="db-card-title">Tasks</span>
+              <span class="db-card-badge new-db">New</span>
+              <span class="db-card-chevron">&#x25BE;</span>
+            </div>
+            <div class="db-card-body">
+              <table class="schema-table">
+                <thead><tr><th>Property</th><th>Type</th><th>Notes</th></tr></thead>
+                <tbody>
+                  <tr><td class="prop-name">Task</td><td class="prop-type">title</td><td>Action-oriented: "Book photographer"</td></tr>
+                  <tr><td class="prop-name">Category</td><td class="prop-type">select</td><td>Full shared taxonomy</td></tr>
+                  <tr><td class="prop-name">Status</td><td class="prop-type">select</td><td>Not Started &rarr; In Progress &rarr; Done &rarr; Blocked</td></tr>
+                  <tr><td class="prop-name">Due</td><td class="prop-type">date</td><td></td></tr>
+                  <tr><td class="prop-name">Owner</td><td class="prop-type">select</td><td>Shared taxonomy</td></tr>
+                  <tr><td class="prop-name">Priority</td><td class="prop-type">select</td><td>Must Do &middot; Should Do &middot; Nice to Have</td></tr>
+                  <tr><td class="prop-name">Milestone</td><td class="prop-type">select</td><td>Shared taxonomy</td></tr>
+                  <tr><td class="prop-name">Depends On</td><td class="prop-type">relation</td><td>&rarr; Tasks (self-relation)</td></tr>
+                  <tr><td class="prop-name">Notes</td><td class="prop-type">text</td><td></td></tr>
+                  <tr><td class="prop-name prop-computed"><em>Overdue</em></td><td class="prop-type">formula</td><td>true if not Done and past Due</td></tr>
+                  <tr><td class="prop-name prop-computed"><em>Days Left</em></td><td class="prop-type">formula</td><td>dateBetween(Due, now, "days")</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ═══ RELATIONS ═══ -->
+        <section class="spec-section reveal" id="relations">
+          <div class="spec-section-label">Section 04</div>
+          <h2>Relations <em>Map</em></h2>
+          <p class="spec-section-desc">Every cross-database link with cardinality. Relations not listed here are intentionally absent.</p>
+
+          <table class="schema-table" style="margin-bottom: 32px;">
+            <thead><tr><th>From</th><th>Property</th><th></th><th>To</th><th>Cardinality</th></tr></thead>
+            <tbody>
+              <tr><td class="prop-name">Guest List</td><td>RSVP Response</td><td class="rel-arrow">&rarr;</td><td class="prop-name">RSVP Responses</td><td>1 &rarr; 0..1</td></tr>
+              <tr><td class="prop-name">Guest List</td><td>Table</td><td class="rel-arrow">&rarr;</td><td class="prop-name">Seating Chart</td><td>many &rarr; 1</td></tr>
+              <tr><td class="prop-name">RSVP Responses</td><td>Guest Record</td><td class="rel-arrow">&rarr;</td><td class="prop-name">Guest List</td><td>1 &rarr; 0..1</td></tr>
+              <tr><td class="prop-name">Vendors</td><td>Budget Lines</td><td class="rel-arrow">&rarr;</td><td class="prop-name">Budget</td><td>1 &rarr; many</td></tr>
+              <tr><td class="prop-name">Budget</td><td>Vendor</td><td class="rel-arrow">&rarr;</td><td class="prop-name">Vendors</td><td>many &rarr; 1</td></tr>
+              <tr><td class="prop-name">Seating Chart</td><td>Guests</td><td class="rel-arrow">&rarr;</td><td class="prop-name">Guest List</td><td>1 &rarr; many</td></tr>
+              <tr><td class="prop-name">Tasks</td><td>Depends On</td><td class="rel-arrow">&rarr;</td><td class="prop-name">Tasks</td><td>many &rarr; many</td></tr>
+            </tbody>
+          </table>
+
+          <div class="spec-note">
+            <strong>Not related by design:</strong> Shenanigans &rarr; Guest List (Author is free text; fuzzy-matching isn't worth the complexity). Shenanigans &rarr; Music (manual promotion, not a live relation).
+          </div>
+        </section>
+
+        <!-- ═══ VIEWS ═══ -->
+        <section class="spec-section reveal" id="views">
+          <div class="spec-section-label">Section 05</div>
+          <h2>Views <em>Reference</em></h2>
+          <p class="spec-section-desc">35 views across all databases. Click a database to see its views.</p>
+
+          <div class="db-card" data-db="guests-views">
+            <div class="db-card-header" onclick="toggleDb(this)">
+              <span class="db-card-icon">&#x1F465;</span>
+              <span class="db-card-title">Guest List Views</span>
+              <span class="db-card-badge new-db">7 views</span>
+              <span class="db-card-chevron">&#x25BE;</span>
+            </div>
+            <div class="db-card-body">
+              <table class="views-table">
+                <thead><tr><th>View</th><th>Type</th><th>Filter</th><th>Group</th></tr></thead>
+                <tbody>
+                  <tr><td class="view-name">All Guests</td><td class="view-type">table</td><td>None</td><td>—</td></tr>
+                  <tr><td class="view-name">By Side</td><td class="view-type">board</td><td>None</td><td>Side</td></tr>
+                  <tr><td class="view-name">Awaiting RSVP</td><td class="view-type">table</td><td>RSVP = Awaiting AND Invited</td><td>—</td></tr>
+                  <tr><td class="view-name">Dietary Needs</td><td class="view-type">table</td><td>Has Dietary Need = true</td><td>—</td></tr>
+                  <tr><td class="view-name">Needs Hotel</td><td class="view-type">table</td><td>Hotel Needed = true</td><td>—</td></tr>
+                  <tr><td class="view-name">Gift Tracking</td><td class="view-type">table</td><td>RSVP Status = Accepted</td><td>—</td></tr>
+                  <tr><td class="view-name">Headcount</td><td class="view-type">board</td><td>RSVP Status not empty</td><td>RSVP Status</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="db-card" data-db="vendor-views">
+            <div class="db-card-header" onclick="toggleDb(this)">
+              <span class="db-card-icon">&#x1F3E2;</span>
+              <span class="db-card-title">Vendor Views</span>
+              <span class="db-card-badge new-db">5 views</span>
+              <span class="db-card-chevron">&#x25BE;</span>
+            </div>
+            <div class="db-card-body">
+              <table class="views-table">
+                <thead><tr><th>View</th><th>Type</th><th>Filter</th><th>Group</th></tr></thead>
+                <tbody>
+                  <tr><td class="view-name">All Vendors</td><td class="view-type">table</td><td>None</td><td>—</td></tr>
+                  <tr><td class="view-name">By Category</td><td class="view-type">board</td><td>None</td><td>Category</td></tr>
+                  <tr><td class="view-name">Pipeline</td><td class="view-type">board</td><td>Status &ne; Paid in Full</td><td>Status</td></tr>
+                  <tr><td class="view-name">Overdue Payments</td><td class="view-type">table</td><td>Overdue = true</td><td>—</td></tr>
+                  <tr><td class="view-name">Booked</td><td class="view-type">table</td><td>Status &ge; Booked</td><td>Category</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="db-card" data-db="budget-views">
+            <div class="db-card-header" onclick="toggleDb(this)">
+              <span class="db-card-icon">&#x1F4B0;</span>
+              <span class="db-card-title">Budget Views</span>
+              <span class="db-card-badge new-db">4 views</span>
+              <span class="db-card-chevron">&#x25BE;</span>
+            </div>
+            <div class="db-card-body">
+              <table class="views-table">
+                <thead><tr><th>View</th><th>Type</th><th>Filter</th><th>Group</th></tr></thead>
+                <tbody>
+                  <tr><td class="view-name">All Items</td><td class="view-type">table</td><td>None</td><td>Category</td></tr>
+                  <tr><td class="view-name">By Who Pays</td><td class="view-type">board</td><td>None</td><td>Paid By</td></tr>
+                  <tr><td class="view-name">Unpaid</td><td class="view-type">table</td><td>Status &ne; Paid in Full</td><td>—</td></tr>
+                  <tr><td class="view-name">Over Budget</td><td class="view-type">table</td><td>Over/Under > 0</td><td>—</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="db-card" data-db="music-views">
+            <div class="db-card-header" onclick="toggleDb(this)">
+              <span class="db-card-icon">&#x1F3B5;</span>
+              <span class="db-card-title">Music Views</span>
+              <span class="db-card-badge new-db">5 views</span>
+              <span class="db-card-chevron">&#x25BE;</span>
+            </div>
+            <div class="db-card-body">
+              <table class="views-table">
+                <thead><tr><th>View</th><th>Type</th><th>Filter</th><th>Group</th></tr></thead>
+                <tbody>
+                  <tr><td class="view-name">Full List</td><td class="view-type">table</td><td>None</td><td>Category</td></tr>
+                  <tr><td class="view-name">For DJ — Play</td><td class="view-type">table</td><td>&ne; Do Not Play AND Approved</td><td>Category</td></tr>
+                  <tr><td class="view-name">Do Not Play</td><td class="view-type">table</td><td>Category = Do Not Play</td><td>—</td></tr>
+                  <tr><td class="view-name">Guest Requests</td><td class="view-type">table</td><td>Source = Guest (site)</td><td>—</td></tr>
+                  <tr><td class="view-name">Needs Review</td><td class="view-type">table</td><td>Approved = false</td><td>—</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="db-card" data-db="task-views">
+            <div class="db-card-header" onclick="toggleDb(this)">
+              <span class="db-card-icon">&#x2705;</span>
+              <span class="db-card-title">Task Views</span>
+              <span class="db-card-badge new-db">7 views</span>
+              <span class="db-card-chevron">&#x25BE;</span>
+            </div>
+            <div class="db-card-body">
+              <table class="views-table">
+                <thead><tr><th>View</th><th>Type</th><th>Filter</th><th>Group</th></tr></thead>
+                <tbody>
+                  <tr><td class="view-name">Board</td><td class="view-type">board</td><td>Status &ne; Done</td><td>Status</td></tr>
+                  <tr><td class="view-name">Calendar</td><td class="view-type">calendar</td><td>None</td><td>by Due</td></tr>
+                  <tr><td class="view-name">By Milestone</td><td class="view-type">board</td><td>Status &ne; Done</td><td>Milestone</td></tr>
+                  <tr><td class="view-name">Overdue</td><td class="view-type">table</td><td>Overdue = true</td><td>—</td></tr>
+                  <tr><td class="view-name">Veronica's</td><td class="view-type">table</td><td>Owner = Veronica, not Done</td><td>—</td></tr>
+                  <tr><td class="view-name">Lucas's</td><td class="view-type">table</td><td>Owner = Lucas, not Done</td><td>—</td></tr>
+                  <tr><td class="view-name">Done</td><td class="view-type">table</td><td>Status = Done</td><td>Milestone</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ═══ FORMULAS ═══ -->
+        <section class="spec-section reveal" id="formulas">
+          <div class="spec-section-label">Section 06</div>
+          <h2>Formulas & <em>Rollups</em></h2>
+          <p class="spec-section-desc">Every computed property with copy-pasteable Notion formulas. Click "Copy" to grab the formula.</p>
+
+          <h3 style="font-family: var(--font-display); font-size: 20px; font-weight: 400; margin: 24px 0 16px;">Guest List</h3>
+          <p style="font-size: 13px; color: var(--charcoal-light); margin-bottom: 8px;"><strong>Has Dietary Need</strong></p>
+          <div class="formula-block"><code>if(length(prop("Dietary")) > 0, true, false)</code><button class="formula-copy" onclick="copyFormula(this)">Copy</button></div>
+
+          <h3 style="font-family: var(--font-display); font-size: 20px; font-weight: 400; margin: 32px 0 16px;">Vendors</h3>
+          <p style="font-size: 13px; color: var(--charcoal-light); margin-bottom: 8px;"><strong>Balance Remaining</strong></p>
+          <div class="formula-block"><code>prop("Total Cost") - prop("Deposit")</code><button class="formula-copy" onclick="copyFormula(this)">Copy</button></div>
+          <p style="font-size: 13px; color: var(--charcoal-light); margin: 16px 0 8px;"><strong>Days Until Deposit</strong></p>
+          <div class="formula-block"><code>if(empty(prop("Deposit Due")), 0, dateBetween(prop("Deposit Due"), now(), "days"))</code><button class="formula-copy" onclick="copyFormula(this)">Copy</button></div>
+          <p style="font-size: 13px; color: var(--charcoal-light); margin: 16px 0 8px;"><strong>Overdue</strong></p>
+          <div class="formula-block"><code>if(prop("Days Until Deposit") &lt; 0 and prop("Status") != "Deposit Paid" and prop("Status") != "Paid in Full", true, false)</code><button class="formula-copy" onclick="copyFormula(this)">Copy</button></div>
+
+          <h3 style="font-family: var(--font-display); font-size: 20px; font-weight: 400; margin: 32px 0 16px;">Budget</h3>
+          <p style="font-size: 13px; color: var(--charcoal-light); margin-bottom: 8px;"><strong>Over/Under</strong></p>
+          <div class="formula-block"><code>prop("Actual") - prop("Estimated")</code><button class="formula-copy" onclick="copyFormula(this)">Copy</button></div>
+          <p style="font-size: 13px; color: var(--charcoal-light); margin: 16px 0 8px;"><strong>% of Estimated</strong></p>
+          <div class="formula-block"><code>if(prop("Estimated") > 0, round(prop("Actual") / prop("Estimated") * 100), 0)</code><button class="formula-copy" onclick="copyFormula(this)">Copy</button></div>
+
+          <h3 style="font-family: var(--font-display); font-size: 20px; font-weight: 400; margin: 32px 0 16px;">Seating Chart</h3>
+          <p style="font-size: 13px; color: var(--charcoal-light); margin-bottom: 8px;"><strong>Spots Left</strong></p>
+          <div class="formula-block"><code>prop("Capacity") - prop("Seated")</code><button class="formula-copy" onclick="copyFormula(this)">Copy</button></div>
+          <p style="font-size: 13px; color: var(--charcoal-light); margin: 16px 0 8px;"><strong>Full</strong></p>
+          <div class="formula-block"><code>prop("Spots Left") &lt;= 0</code><button class="formula-copy" onclick="copyFormula(this)">Copy</button></div>
+
+          <h3 style="font-family: var(--font-display); font-size: 20px; font-weight: 400; margin: 32px 0 16px;">Tasks</h3>
+          <p style="font-size: 13px; color: var(--charcoal-light); margin-bottom: 8px;"><strong>Overdue</strong></p>
+          <div class="formula-block"><code>if(prop("Status") != "Done" and not empty(prop("Due")) and prop("Due") &lt; now(), true, false)</code><button class="formula-copy" onclick="copyFormula(this)">Copy</button></div>
+          <p style="font-size: 13px; color: var(--charcoal-light); margin: 16px 0 8px;"><strong>Days Left</strong></p>
+          <div class="formula-block"><code>if(empty(prop("Due")), 0, dateBetween(prop("Due"), now(), "days"))</code><button class="formula-copy" onclick="copyFormula(this)">Copy</button></div>
+        </section>
+
+        <!-- ═══ LIFECYCLE ═══ -->
+        <section class="spec-section reveal" id="lifecycle">
+          <div class="spec-section-label">Section 07</div>
+          <h2>Lifecycle <em>Guide</em></h2>
+          <p class="spec-section-desc">The system activates in phases. Each phase has different active databases and priorities.</p>
+
+          <div class="lifecycle">
+            <div class="lifecycle-phase phase-active">
+              <div class="lifecycle-dot"></div>
+              <div class="lifecycle-phase-label">Phase 1 — 12+ Months</div>
+              <h4>Foundation</h4>
+              <p>Build the guest list, research and book key vendors, set the budget ceiling. Seed milestone tasks.</p>
+              <div class="lifecycle-dbs">
+                <span class="lifecycle-db-pill active-db">Guest List</span>
+                <span class="lifecycle-db-pill active-db">Vendors</span>
+                <span class="lifecycle-db-pill active-db">Budget</span>
+                <span class="lifecycle-db-pill active-db">Tasks</span>
+              </div>
+            </div>
+            <div class="lifecycle-phase">
+              <div class="lifecycle-dot"></div>
+              <div class="lifecycle-phase-label">Phase 2 — 9–12 Months</div>
+              <h4>Booking</h4>
+              <p>Lock in vendors, pay deposits, finalize budget estimates. Send save the dates.</p>
+              <div class="lifecycle-dbs">
+                <span class="lifecycle-db-pill active-db">Vendors</span>
+                <span class="lifecycle-db-pill active-db">Budget</span>
+                <span class="lifecycle-db-pill active-db">Tasks</span>
+                <span class="lifecycle-db-pill">Guest List</span>
+              </div>
+            </div>
+            <div class="lifecycle-phase">
+              <div class="lifecycle-dot"></div>
+              <div class="lifecycle-phase-label">Phase 3 — 6–9 Months</div>
+              <h4>Planning</h4>
+              <p>Finalize guest list, start music curation, order invitations, register for gifts.</p>
+              <div class="lifecycle-dbs">
+                <span class="lifecycle-db-pill active-db">Guest List</span>
+                <span class="lifecycle-db-pill active-db">Music</span>
+                <span class="lifecycle-db-pill active-db">Tasks</span>
+                <span class="lifecycle-db-pill">Vendors</span>
+                <span class="lifecycle-db-pill">Budget</span>
+              </div>
+            </div>
+            <div class="lifecycle-phase">
+              <div class="lifecycle-dot"></div>
+              <div class="lifecycle-phase-label">Phase 4 — 3–6 Months</div>
+              <h4>Invitations & RSVPs</h4>
+              <p>Mail invitations, deploy RSVP backend, match responses to guest list records, send reminders.</p>
+              <div class="lifecycle-dbs">
+                <span class="lifecycle-db-pill active-db">Guest List</span>
+                <span class="lifecycle-db-pill active-db">RSVP Responses</span>
+                <span class="lifecycle-db-pill active-db">Tasks</span>
+              </div>
+            </div>
+            <div class="lifecycle-phase">
+              <div class="lifecycle-dot"></div>
+              <div class="lifecycle-phase-label">Phase 5 — 1–3 Months</div>
+              <h4>Final Prep</h4>
+              <p>Build seating chart, review guest song requests, share DJ list, send final headcount to caterer.</p>
+              <div class="lifecycle-dbs">
+                <span class="lifecycle-db-pill active-db">Seating Chart</span>
+                <span class="lifecycle-db-pill active-db">Music</span>
+                <span class="lifecycle-db-pill active-db">Tasks</span>
+                <span class="lifecycle-db-pill">Guest List</span>
+              </div>
+            </div>
+            <div class="lifecycle-phase">
+              <div class="lifecycle-dot"></div>
+              <div class="lifecycle-phase-label">Phase 6 — Week Of & Day Of</div>
+              <h4>Execution</h4>
+              <p>Share Day-of Timeline with vendors, Shot List with photographer, Dietary by Table with caterer.</p>
+              <div class="lifecycle-dbs">
+                <span class="lifecycle-db-pill active-db">Day-of Timeline</span>
+                <span class="lifecycle-db-pill active-db">Shot List</span>
+                <span class="lifecycle-db-pill active-db">Tasks</span>
+              </div>
+            </div>
+            <div class="lifecycle-phase">
+              <div class="lifecycle-dot"></div>
+              <div class="lifecycle-phase-label">Phase 7 — Post-Wedding</div>
+              <h4>Wrap-Up</h4>
+              <p>Track gifts received, send thank-you notes, rate vendors, close out the budget.</p>
+              <div class="lifecycle-dbs">
+                <span class="lifecycle-db-pill active-db">Guest List</span>
+                <span class="lifecycle-db-pill active-db">Vendors</span>
+                <span class="lifecycle-db-pill active-db">Budget</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ═══ TASK SEEDS ═══ -->
+        <section class="spec-section reveal" id="tasks">
+          <div class="spec-section-label">Section 08</div>
+          <h2>Task <em>Seeds</em></h2>
+          <p class="spec-section-desc">Pre-populated tasks for each milestone. Filter by phase to see what gets created.</p>
+
+          <div class="seed-filters" id="seedFilters">
+            <button class="seed-filter active" data-milestone="all">All</button>
+            <button class="seed-filter" data-milestone="12+">12+ Mo</button>
+            <button class="seed-filter" data-milestone="9-12">9–12 Mo</button>
+            <button class="seed-filter" data-milestone="6-9">6–9 Mo</button>
+            <button class="seed-filter" data-milestone="3-6">3–6 Mo</button>
+            <button class="seed-filter" data-milestone="1-3">1–3 Mo</button>
+            <button class="seed-filter" data-milestone="2-4w">2–4 Wk</button>
+            <button class="seed-filter" data-milestone="week">Week Of</button>
+          </div>
+
+          <div class="seed-group" data-milestone="12+">
+            <div class="seed-group-title">12+ Months</div>
+            <div class="seed-task"><span class="seed-task-name">Set overall budget range</span><span class="seed-task-cat">Other</span><span class="seed-task-pri must">Must Do</span></div>
+            <div class="seed-task"><span class="seed-task-name">Book venue</span><span class="seed-task-cat">Venue</span><span class="seed-task-pri must">Must Do</span></div>
+            <div class="seed-task"><span class="seed-task-name">Start guest list draft</span><span class="seed-task-cat">Other</span><span class="seed-task-pri must">Must Do</span></div>
+            <div class="seed-task"><span class="seed-task-name">Research photographers</span><span class="seed-task-cat">Photography</span><span class="seed-task-pri must">Must Do</span></div>
+            <div class="seed-task"><span class="seed-task-name">Research caterers</span><span class="seed-task-cat">Catering</span><span class="seed-task-pri must">Must Do</span></div>
+            <div class="seed-task"><span class="seed-task-name">Choose bridal party</span><span class="seed-task-cat">Other</span><span class="seed-task-pri must">Must Do</span></div>
+            <div class="seed-task"><span class="seed-task-name">Research officiants</span><span class="seed-task-cat">Officiant</span><span class="seed-task-pri should">Should Do</span></div>
+            <div class="seed-task"><span class="seed-task-name">Start wedding website</span><span class="seed-task-cat">Website</span><span class="seed-task-pri should">Should Do</span></div>
+          </div>
+
+          <div class="seed-group" data-milestone="9-12">
+            <div class="seed-group-title">9–12 Months</div>
+            <div class="seed-task"><span class="seed-task-name">Book photographer</span><span class="seed-task-cat">Photography</span><span class="seed-task-pri must">Must Do</span></div>
+            <div class="seed-task"><span class="seed-task-name">Book videographer</span><span class="seed-task-cat">Videography</span><span class="seed-task-pri should">Should Do</span></div>
+            <div class="seed-task"><span class="seed-task-name">Book caterer</span><span class="seed-task-cat">Catering</span><span class="seed-task-pri must">Must Do</span></div>
+            <div class="seed-task"><span class="seed-task-name">Book florist</span><span class="seed-task-cat">Florist</span><span class="seed-task-pri must">Must Do</span></div>
+            <div class="seed-task"><span class="seed-task-name">Book DJ or band</span><span class="seed-task-cat">DJ & Music</span><span class="seed-task-pri must">Must Do</span></div>
+            <div class="seed-task"><span class="seed-task-name">Shop for wedding dress</span><span class="seed-task-cat">Attire</span><span class="seed-task-pri must">Must Do</span></div>
+            <div class="seed-task"><span class="seed-task-name">Send save the dates</span><span class="seed-task-cat">Stationery</span><span class="seed-task-pri must">Must Do</span></div>
+            <div class="seed-task"><span class="seed-task-name">Book officiant</span><span class="seed-task-cat">Officiant</span><span class="seed-task-pri must">Must Do</span></div>
+          </div>
+
+          <div class="seed-group" data-milestone="6-9">
+            <div class="seed-group-title">6–9 Months</div>
+            <div class="seed-task"><span class="seed-task-name">Book hair & makeup</span><span class="seed-task-cat">Hair & Makeup</span><span class="seed-task-pri must">Must Do</span></div>
+            <div class="seed-task"><span class="seed-task-name">Book transportation</span><span class="seed-task-cat">Transportation</span><span class="seed-task-pri should">Should Do</span></div>
+            <div class="seed-task"><span class="seed-task-name">Order invitations</span><span class="seed-task-cat">Stationery</span><span class="seed-task-pri must">Must Do</span></div>
+            <div class="seed-task"><span class="seed-task-name">Register for gifts</span><span class="seed-task-cat">Other</span><span class="seed-task-pri must">Must Do</span></div>
+            <div class="seed-task"><span class="seed-task-name">Plan honeymoon</span><span class="seed-task-cat">Honeymoon</span><span class="seed-task-pri should">Should Do</span></div>
+            <div class="seed-task"><span class="seed-task-name">Book hotel room block</span><span class="seed-task-cat">Other</span><span class="seed-task-pri must">Must Do</span></div>
+            <div class="seed-task"><span class="seed-task-name">Finalize guest list</span><span class="seed-task-cat">Other</span><span class="seed-task-pri must">Must Do</span></div>
+            <div class="seed-task"><span class="seed-task-name">First dress fitting</span><span class="seed-task-cat">Attire</span><span class="seed-task-pri must">Must Do</span></div>
+          </div>
+
+          <div class="seed-group" data-milestone="3-6">
+            <div class="seed-group-title">3–6 Months</div>
+            <div class="seed-task"><span class="seed-task-name">Send invitations</span><span class="seed-task-cat">Stationery</span><span class="seed-task-pri must">Must Do</span></div>
+            <div class="seed-task"><span class="seed-task-name">Order wedding cake</span><span class="seed-task-cat">Cake & Dessert</span><span class="seed-task-pri must">Must Do</span></div>
+            <div class="seed-task"><span class="seed-task-name">Rent suits / tuxes</span><span class="seed-task-cat">Attire</span><span class="seed-task-pri must">Must Do</span></div>
+            <div class="seed-task"><span class="seed-task-name">Book rehearsal dinner venue</span><span class="seed-task-cat">Venue</span><span class="seed-task-pri must">Must Do</span></div>
+            <div class="seed-task"><span class="seed-task-name">Plan ceremony readings</span><span class="seed-task-cat">Other</span><span class="seed-task-pri should">Should Do</span></div>
+            <div class="seed-task"><span class="seed-task-name">Apply for marriage license</span><span class="seed-task-cat">Legal & License</span><span class="seed-task-pri must">Must Do</span></div>
+            <div class="seed-task"><span class="seed-task-name">Deploy RSVP backend</span><span class="seed-task-cat">Website</span><span class="seed-task-pri must">Must Do</span></div>
+            <div class="seed-task"><span class="seed-task-name">Add registry URL to website</span><span class="seed-task-cat">Website</span><span class="seed-task-pri must">Must Do</span></div>
+          </div>
+
+          <div class="seed-group" data-milestone="1-3">
+            <div class="seed-group-title">1–3 Months</div>
+            <div class="seed-task"><span class="seed-task-name">Track RSVPs + send reminders</span><span class="seed-task-cat">Other</span><span class="seed-task-pri must">Must Do</span></div>
+            <div class="seed-task"><span class="seed-task-name">Finalize seating chart</span><span class="seed-task-cat">Other</span><span class="seed-task-pri must">Must Do</span></div>
+            <div class="seed-task"><span class="seed-task-name">Final dress fitting</span><span class="seed-task-cat">Attire</span><span class="seed-task-pri must">Must Do</span></div>
+            <div class="seed-task"><span class="seed-task-name">Write vows</span><span class="seed-task-cat">Other</span><span class="seed-task-pri must">Must Do</span></div>
+            <div class="seed-task"><span class="seed-task-name">Create day-of timeline</span><span class="seed-task-cat">Other</span><span class="seed-task-pri must">Must Do</span></div>
+            <div class="seed-task"><span class="seed-task-name">Confirm all vendors</span><span class="seed-task-cat">Other</span><span class="seed-task-pri must">Must Do</span></div>
+            <div class="seed-task"><span class="seed-task-name">Finalize music list + share with DJ</span><span class="seed-task-cat">DJ & Music</span><span class="seed-task-pri must">Must Do</span></div>
+            <div class="seed-task"><span class="seed-task-name">Order favors</span><span class="seed-task-cat">Favors</span><span class="seed-task-pri nice">Nice to Have</span></div>
+          </div>
+
+          <div class="seed-group" data-milestone="2-4w">
+            <div class="seed-group-title">2–4 Weeks</div>
+            <div class="seed-task"><span class="seed-task-name">Send final headcount to caterer</span><span class="seed-task-cat">Catering</span><span class="seed-task-pri must">Must Do</span></div>
+            <div class="seed-task"><span class="seed-task-name">Confirm vendor arrival times</span><span class="seed-task-cat">Other</span><span class="seed-task-pri must">Must Do</span></div>
+            <div class="seed-task"><span class="seed-task-name">Break in wedding shoes</span><span class="seed-task-cat">Attire</span><span class="seed-task-pri should">Should Do</span></div>
+            <div class="seed-task"><span class="seed-task-name">Finalize shot list</span><span class="seed-task-cat">Photography</span><span class="seed-task-pri must">Must Do</span></div>
+            <div class="seed-task"><span class="seed-task-name">Prepare vendor tips (envelopes)</span><span class="seed-task-cat">Tips & Gratuity</span><span class="seed-task-pri must">Must Do</span></div>
+            <div class="seed-task"><span class="seed-task-name">Assign day-of point person</span><span class="seed-task-cat">Other</span><span class="seed-task-pri must">Must Do</span></div>
+            <div class="seed-task"><span class="seed-task-name">Print programs / menus</span><span class="seed-task-cat">Stationery</span><span class="seed-task-pri should">Should Do</span></div>
+          </div>
+
+          <div class="seed-group" data-milestone="week">
+            <div class="seed-group-title">Week Of</div>
+            <div class="seed-task"><span class="seed-task-name">Final vendor confirmation calls</span><span class="seed-task-cat">Other</span><span class="seed-task-pri must">Must Do</span></div>
+            <div class="seed-task"><span class="seed-task-name">Pack for honeymoon</span><span class="seed-task-cat">Honeymoon</span><span class="seed-task-pri must">Must Do</span></div>
+            <div class="seed-task"><span class="seed-task-name">Assemble emergency kit</span><span class="seed-task-cat">Other</span><span class="seed-task-pri should">Should Do</span></div>
+            <div class="seed-task"><span class="seed-task-name">Rehearsal + rehearsal dinner</span><span class="seed-task-cat">Other</span><span class="seed-task-pri must">Must Do</span></div>
+            <div class="seed-task"><span class="seed-task-name">Delegate day-of responsibilities</span><span class="seed-task-cat">Other</span><span class="seed-task-pri must">Must Do</span></div>
+            <div class="seed-task"><span class="seed-task-name">Relax</span><span class="seed-task-cat">Other</span><span class="seed-task-pri must">Must Do</span></div>
+          </div>
+        </section>
+
+        <!-- ═══ BUILD ORDER ═══ -->
+        <section class="spec-section reveal" id="build">
+          <div class="spec-section-label">Section 09</div>
+          <h2>Build <em>Order</em></h2>
+          <p class="spec-section-desc">Create the system in this sequence to avoid broken relations. Check off each step as you go — progress is saved to your browser.</p>
+
+          <div class="build-progress">
+            <div class="build-bar-track"><div class="build-bar-fill" id="buildBarFill"></div></div>
+            <div class="build-bar-label" id="buildBarLabel">0 of 20 steps complete</div>
+          </div>
+
+          <ol class="build-list" id="buildList">
+            <li class="build-step"><input type="checkbox" class="build-check" data-step="1"><span class="build-step-num"></span><div class="build-step-content"><div class="build-step-label">Create Guest List database (no relations yet)</div></div></li>
+            <li class="build-step"><input type="checkbox" class="build-check" data-step="2"><span class="build-step-num"></span><div class="build-step-content"><div class="build-step-label">Create Vendors database (no relations yet)</div></div></li>
+            <li class="build-step"><input type="checkbox" class="build-check" data-step="3"><span class="build-step-num"></span><div class="build-step-content"><div class="build-step-label">Create Budget database + add Vendor relation</div><div class="build-step-dep">Depends on: Step 2</div></div></li>
+            <li class="build-step"><input type="checkbox" class="build-check" data-step="4"><span class="build-step-num"></span><div class="build-step-content"><div class="build-step-label">Add Budget Lines (reverse relation) to Vendors</div><div class="build-step-dep">Depends on: Step 3</div></div></li>
+            <li class="build-step"><input type="checkbox" class="build-check" data-step="5"><span class="build-step-num"></span><div class="build-step-content"><div class="build-step-label">Create Seating Chart database</div></div></li>
+            <li class="build-step"><input type="checkbox" class="build-check" data-step="6"><span class="build-step-num"></span><div class="build-step-content"><div class="build-step-label">Add Table relation to Guest List &rarr; Seating</div><div class="build-step-dep">Depends on: Steps 1, 5</div></div></li>
+            <li class="build-step"><input type="checkbox" class="build-check" data-step="7"><span class="build-step-num"></span><div class="build-step-content"><div class="build-step-label">Add Guests (reverse relation) to Seating &rarr; Guest List</div><div class="build-step-dep">Depends on: Step 6</div></div></li>
+            <li class="build-step"><input type="checkbox" class="build-check" data-step="8"><span class="build-step-num"></span><div class="build-step-content"><div class="build-step-label">Add Guest Record relation to RSVP Responses &rarr; Guest List</div><div class="build-step-dep">Depends on: Step 1</div></div></li>
+            <li class="build-step"><input type="checkbox" class="build-check" data-step="9"><span class="build-step-num"></span><div class="build-step-content"><div class="build-step-label">Add RSVP Response relation to Guest List &rarr; RSVP Responses</div><div class="build-step-dep">Depends on: Step 8</div></div></li>
+            <li class="build-step"><input type="checkbox" class="build-check" data-step="10"><span class="build-step-num"></span><div class="build-step-content"><div class="build-step-label">Create Music database</div></div></li>
+            <li class="build-step"><input type="checkbox" class="build-check" data-step="11"><span class="build-step-num"></span><div class="build-step-content"><div class="build-step-label">Create Tasks database (with self-relation Depends On)</div></div></li>
+            <li class="build-step"><input type="checkbox" class="build-check" data-step="12"><span class="build-step-num"></span><div class="build-step-content"><div class="build-step-label">Seed milestone tasks from task seeds</div><div class="build-step-dep">Depends on: Step 11</div></div></li>
+            <li class="build-step"><input type="checkbox" class="build-check" data-step="13"><span class="build-step-num"></span><div class="build-step-content"><div class="build-step-label">Add formulas to all databases</div><div class="build-step-dep">Depends on: Steps 1–11</div></div></li>
+            <li class="build-step"><input type="checkbox" class="build-check" data-step="14"><span class="build-step-num"></span><div class="build-step-content"><div class="build-step-label">Add rollups to Guest List + Seating</div><div class="build-step-dep">Depends on: Steps 6–9, 13</div></div></li>
+            <li class="build-step"><input type="checkbox" class="build-check" data-step="15"><span class="build-step-num"></span><div class="build-step-content"><div class="build-step-label">Create all views per database (35 total)</div><div class="build-step-dep">Depends on: Steps 1–14</div></div></li>
+            <li class="build-step"><input type="checkbox" class="build-check" data-step="16"><span class="build-step-num"></span><div class="build-step-content"><div class="build-step-label">Create row templates per database</div><div class="build-step-dep">Depends on: Steps 1–14</div></div></li>
+            <li class="build-step"><input type="checkbox" class="build-check" data-step="17"><span class="build-step-num"></span><div class="build-step-content"><div class="build-step-label">Create Day-of Timeline page from template</div></div></li>
+            <li class="build-step"><input type="checkbox" class="build-check" data-step="18"><span class="build-step-num"></span><div class="build-step-content"><div class="build-step-label">Create Shot List page from template</div></div></li>
+            <li class="build-step"><input type="checkbox" class="build-check" data-step="19"><span class="build-step-num"></span><div class="build-step-content"><div class="build-step-label">Restructure hub page with dashboard layout</div><div class="build-step-dep">Depends on: Steps 1–18</div></div></li>
+            <li class="build-step"><input type="checkbox" class="build-check" data-step="20"><span class="build-step-num"></span><div class="build-step-content"><div class="build-step-label">Add inline linked database views to hub page</div><div class="build-step-dep">Depends on: Step 19</div></div></li>
+          </ol>
+        </section>
+
+        <!-- ═══ PAGES ═══ -->
+        <section class="spec-section reveal" id="pages">
+          <div class="spec-section-label">Section 10</div>
+          <h2>Day-of & <em>Shot List</em></h2>
+          <p class="spec-section-desc">Two standalone Notion pages (not databases) shared directly with vendors.</p>
+
+          <div class="db-card">
+            <div class="db-card-header" onclick="toggleDb(this)">
+              <span class="db-card-icon">&#x1F4CB;</span>
+              <span class="db-card-title">Day-of Timeline</span>
+              <span class="db-card-badge new-db">Page</span>
+              <span class="db-card-chevron">&#x25BE;</span>
+            </div>
+            <div class="db-card-body">
+              <p style="font-size: 13px; font-weight: 300; color: var(--charcoal-light); line-height: 1.6; margin-bottom: 16px;">A narrative document with time blocks from 6 AM through midnight. Shared with all vendors and the wedding party. Includes emergency contacts at the top.</p>
+              <table class="schema-table">
+                <thead><tr><th>Time Block</th><th>Events</th></tr></thead>
+                <tbody>
+                  <tr><td class="prop-name">6:00 AM – 12:00 PM</td><td>Hair & makeup, florist setup, photographer detail shots</td></tr>
+                  <tr><td class="prop-name">1:00 PM – 2:30 PM</td><td>First look, wedding party photos, family combos</td></tr>
+                  <tr><td class="prop-name">3:00 PM – 4:00 PM</td><td>DJ setup, officiant walkthrough, ushers in position</td></tr>
+                  <tr><td class="prop-name">4:00 PM – 5:00 PM</td><td>Guest arrival, ceremony</td></tr>
+                  <tr><td class="prop-name">5:00 PM – 6:30 PM</td><td>Cocktail hour, couple photos, room flip</td></tr>
+                  <tr><td class="prop-name">6:30 PM – 8:30 PM</td><td>Grand entrance, first dance, dinner, toasts, parent dances, cake</td></tr>
+                  <tr><td class="prop-name">8:45 PM – 11:00 PM</td><td>Open dancing, bouquet toss, last dance, send-off</td></tr>
+                  <tr><td class="prop-name">11:00 PM – 12:00 AM</td><td>Vendor breakdown, venue cleared</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="db-card">
+            <div class="db-card-header" onclick="toggleDb(this)">
+              <span class="db-card-icon">&#x1F4F8;</span>
+              <span class="db-card-title">Shot List</span>
+              <span class="db-card-badge new-db">Page</span>
+              <span class="db-card-chevron">&#x25BE;</span>
+            </div>
+            <div class="db-card-body">
+              <p style="font-size: 13px; font-weight: 300; color: var(--charcoal-light); line-height: 1.6; margin-bottom: 16px;">A checklist page shared with the photographer. 70+ shots organized by phase — details, getting ready, first look, family combos, ceremony, and reception.</p>
+              <table class="schema-table">
+                <thead><tr><th>Section</th><th>Shot Count</th></tr></thead>
+                <tbody>
+                  <tr><td class="prop-name">Detail Shots</td><td>Rings, invitation suite, shoes, bouquet, dress, venue, table settings, cake (13)</td></tr>
+                  <tr><td class="prop-name">Getting Ready</td><td>Bride getting dressed, reactions, groom prep, parents (6)</td></tr>
+                  <tr><td class="prop-name">First Look</td><td>Approach, reveal, reaction, embrace, walking (6)</td></tr>
+                  <tr><td class="prop-name">Family Combos</td><td>Both sides — parents, siblings, grandparents, combined (13)</td></tr>
+                  <tr><td class="prop-name">Wedding Party</td><td>Group, individual, cross-gender fun shots (8)</td></tr>
+                  <tr><td class="prop-name">Ceremony</td><td>Processional, reactions, vows, kiss, recessional (12)</td></tr>
+                  <tr><td class="prop-name">Reception</td><td>First dance, toasts, cake, dancing, send-off (12)</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+      </div><!-- /spec-content -->
+    </div><!-- /spec-layout -->
+  </div><!-- /container -->
+  </main>
+
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <a href="index.html" class="nav-brand">
+            <div class="nav-brand-mark"><span>S</span><span class="mark-d">D</span></div>
+            <span class="nav-brand-text">System by Dave</span>
+          </a>
+          <p class="footer-brand-desc">Handcrafted Notion tools for people who take their workflows seriously.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Products</h4>
+          <ul>
+            <li><a href="skills.html">Skills</a></li>
+            <li><a href="agents.html">Agents</a></li>
+            <li><a href="widgets.html">Widgets</a></li>
+            <li><a href="https://promptlab.tools" target="_blank" rel="noopener noreferrer">Prompt Lab</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Resources</h4>
+          <ul>
+            <li><a href="https://github.com/DaveHomeAssist/system-by-dave" target="_blank" rel="noopener noreferrer">Project Repo</a></li>
+            <li><a href="https://github.com/DaveHomeAssist/system-by-dave/blob/main/CHANGELOG.md" target="_blank" rel="noopener noreferrer">Changelog</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Connect</h4>
+          <ul>
+            <li><a href="https://github.com/DaveHomeAssist" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+            <li><a href="https://promptlab.tools" target="_blank" rel="noopener noreferrer">promptlab.tools</a></li>
+            <li><a href="privacy-policy.html">Privacy Policy</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span class="footer-copy">&copy; 2026 System by Dave. All rights reserved.</span>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════
+   WEDDING OPS — INTERACTIVITY
+   ═══════════════════════════════════════════ */
+
+// ─── Scroll reveal ───
+document.addEventListener('DOMContentLoaded', () => {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+});
+
+// ─── Database card toggle ───
+function toggleDb(header) {
+  const card = header.closest('.db-card');
+  card.classList.toggle('open');
+}
+
+// ─── TOC active state ───
+const tocLinks = document.querySelectorAll('.toc-list a');
+const sections = document.querySelectorAll('.spec-section');
+
+function updateToc() {
+  let current = '';
+  sections.forEach(s => {
+    if (s.getBoundingClientRect().top <= 120) current = s.id;
+  });
+  tocLinks.forEach(a => {
+    a.classList.toggle('active', a.getAttribute('href') === `#${current}`);
+  });
+}
+window.addEventListener('scroll', updateToc, { passive: true });
+updateToc();
+
+// ─── Formula copy ───
+function copyFormula(btn) {
+  const code = btn.parentElement.querySelector('code').textContent;
+  navigator.clipboard.writeText(code).then(() => {
+    btn.textContent = 'Copied';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1500);
+  });
+}
+
+// ─── Build checklist with localStorage ───
+const BUILD_KEY = 'wedding_ops_build';
+
+function loadBuildState() {
+  try { return JSON.parse(localStorage.getItem(BUILD_KEY)) || {}; } catch { return {}; }
+}
+
+function saveBuildState(state) {
+  localStorage.setItem(BUILD_KEY, JSON.stringify(state));
+}
+
+function updateBuildProgress() {
+  const checks = document.querySelectorAll('.build-check');
+  const total = checks.length;
+  const done = document.querySelectorAll('.build-check:checked').length;
+  const pct = Math.round((done / total) * 100);
+  document.getElementById('buildBarFill').style.width = `${pct}%`;
+  document.getElementById('buildBarLabel').textContent = `${done} of ${total} steps complete`;
+}
+
+function initBuildChecklist() {
+  const state = loadBuildState();
+  document.querySelectorAll('.build-check').forEach(cb => {
+    const step = cb.dataset.step;
+    if (state[step]) {
+      cb.checked = true;
+      cb.closest('.build-step').classList.add('checked');
+    }
+    cb.addEventListener('change', () => {
+      const s = loadBuildState();
+      s[step] = cb.checked;
+      saveBuildState(s);
+      cb.closest('.build-step').classList.toggle('checked', cb.checked);
+      updateBuildProgress();
+    });
+  });
+  updateBuildProgress();
+}
+initBuildChecklist();
+
+// ─── Task seed filters ───
+document.querySelectorAll('.seed-filter').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.seed-filter').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const m = btn.dataset.milestone;
+    document.querySelectorAll('.seed-group').forEach(g => {
+      g.hidden = m !== 'all' && g.dataset.milestone !== m;
+    });
+  });
+});
+</script>
+</body>
+</html>
