@@ -34,6 +34,7 @@ Edit HTML/CSS directly — changes are visible on refresh.
 | `agents.html` | Agents catalog |
 | `skills.html` | Skills catalog |
 | `widgets.html` | Widget gallery |
+| `resume/index.html` | Public resume |
 | `wedding-ops.html` | Wedding ops case study |
 | `privacy-policy.html` | Privacy policy |
 | `404.html` / `500.html` | Error pages |

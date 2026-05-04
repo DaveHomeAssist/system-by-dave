@@ -20,6 +20,7 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
 - `agents.html` — agents catalog (cards are deep-linked)
 - `skills.html` — skills catalog
 - `widgets.html` — widget previews (poster cards, not live iframes)
+- `resume/index.html` — public resume page
 - `wedding-ops.html` — wedding ops case study
 - `privacy-policy.html`
 - `404.html`, `500.html` — error pages (with OG/Twitter meta)
