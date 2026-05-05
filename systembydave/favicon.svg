@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Davai">
+  <rect width="64" height="64" rx="10" fill="#171a1f"/>
+  <path d="M18 13h15c9.4 0 16 6.7 16 19s-6.6 19-16 19H18V13Zm10 9v20h5c4.1 0 7-3.8 7-10s-2.9-10-7-10h-5Z" fill="#f7f8f5"/>
+  <path d="M12 51h40v5H12z" fill="#08766d"/>
+</svg>

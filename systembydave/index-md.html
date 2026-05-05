@@ -1,0 +1,123 @@
+<!doctype html>
+        <html lang="en">
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1">
+          <title>INDEX.md Spec | Davai</title>
+          <meta name="description" content="INDEX.md registry format, generator behavior, and rationale for a flat memory index.">
+          <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: https:; script-src 'self' 'unsafe-inline'">
+          <link rel="canonical" href="https://systembydave.com/systembydave/index-md.html">
+          <meta name="robots" content="index,follow">
+          <meta name="theme-color" content="#f7f8f5">
+          <meta property="og:title" content="INDEX.md Spec | Davai">
+          <meta property="og:description" content="INDEX.md registry format, generator behavior, and rationale for a flat memory index.">
+          <meta property="og:type" content="website">
+          <meta property="og:site_name" content="System by Dave">
+          <meta property="og:url" content="https://systembydave.com/systembydave/index-md.html">
+          <meta property="og:image" content="https://systembydave.com/systembydave/assets/img/04_folder_tree.svg">
+          <meta property="og:image:alt" content="Davai memory architecture folder tree diagram">
+          <meta name="twitter:card" content="summary_large_image">
+          <meta name="twitter:title" content="INDEX.md Spec | Davai">
+          <meta name="twitter:description" content="INDEX.md registry format, generator behavior, and rationale for a flat memory index.">
+          <meta name="twitter:image" content="https://systembydave.com/systembydave/assets/img/04_folder_tree.svg">
+          <link rel="icon" type="image/svg+xml" href="favicon.svg">
+          <link rel="stylesheet" href="assets/styles.css">
+        </head>
+        <body>
+          <a class="skip-link" href="#main">Skip to content</a>
+          <header class="site-header">
+            <div class="shell header-inner">
+              <a class="brand" href="index.html" aria-label="Davai overview">
+                <span class="brand-mark" aria-hidden="true">D</span>
+                <span>
+                  <strong>systembydave.com</strong>
+                  <small>Davai memory architecture</small>
+                </span>
+              </a>
+              <nav class="primary-nav" aria-label="Primary navigation">
+                <a class="nav-link" href="index.html">Overview</a>
+<a class="nav-link" href="routing.html">Routing</a>
+<a class="nav-link" href="lifecycle.html">Lifecycle</a>
+<a class="nav-link is-active" href="index-md.html" aria-current="page">INDEX.md</a>
+<a class="nav-link" href="sync.html">Sync</a>
+<a class="nav-link" href="voice.html">Voice</a>
+<a class="nav-link" href="implementation.html">Build</a>
+              </nav>
+            </div>
+            <div class="layer-rail">
+              <nav class="shell layer-strip" aria-label="Memory layers">
+                <a class="layer-chip layer-red" href="layers/identity.html"><span>1</span>Identity</a>
+<a class="layer-chip layer-teal" href="layers/semantic.html"><span>2</span>Semantic</a>
+<a class="layer-chip layer-blue" href="layers/episodic.html"><span>3</span>Episodic</a>
+<a class="layer-chip layer-gold" href="layers/procedural.html"><span>4</span>Procedural</a>
+<a class="layer-chip layer-violet" href="layers/reference.html"><span>5</span>Reference</a>
+<a class="layer-chip layer-green" href="layers/working.html"><span>6</span>Working</a>
+<a class="layer-chip layer-orange" href="layers/decisions.html"><span>7</span>Decisions</a>
+              </nav>
+            </div>
+          </header>
+          <main id="main">
+            <section class="band hero-small">
+          <div class="shell">
+            <p class="eyebrow">INDEX.md</p>
+            <h1>Flat registry for retrieval</h1>
+            <p class="lede">INDEX.md is a generated map of memory entries. It exists so retrieval can find candidates without crawling every file path or guessing from nested folders.</p>
+          </div>
+        </section>
+
+        <section class="band band-white">
+          <div class="shell split">
+            <div>
+              <h2>Format</h2>
+              <p>Keep the registry flat, deterministic, and generated. Humans edit memory entries; the generator writes the index.</p>
+              <pre><code>| id | layer | title | path | updated | tags | verified |
+|---|---|---|---|---|---|---|
+| semantic-memory-routing | semantic | Routing by retrieval question | semantic/memory-routing.md | 2026-05-05 | routing,davai | 2026-05-05 |</code></pre>
+              <aside class="callout callout-info">
+  <strong>Why flat</strong>
+  <p>A flat registry gives retrieval one predictable surface. Nested topic indexes invite stale duplicates and hidden priority rules.</p>
+</aside>
+            </div>
+            <div class="template-panel">
+              <h3>Generator behavior</h3>
+              <ol class="protocol-list">
+                <li>Walk the seven canonical folders.</li>
+                <li>Read frontmatter with a structured parser.</li>
+                <li>Fall back gracefully on missing optional fields.</li>
+                <li>Sort by layer, title, and path for stable diffs.</li>
+                <li>Emit warnings for missing required fields once the schema is enforced.</li>
+              </ol>
+            </div>
+          </div>
+        </section>
+
+        <section class="band">
+          <div class="shell">
+            <div class="section-heading">
+              <p class="eyebrow">Schema</p>
+              <h2>Fields to enforce next</h2>
+            </div>
+            <div class="check-grid">
+              <article><strong>last_verified</strong><span>Required for reference and procedural records; useful for semantic facts.</span></article>
+              <article><strong>supersedes</strong><span>Required when a decision or fact replaces earlier material.</span></article>
+              <article><strong>source</strong><span>Required when a record depends on an external authority or dated evidence.</span></article>
+              <article><strong>owner</strong><span>Required for working notes and operational procedures.</span></article>
+            </div>
+          </div>
+        </section>
+          </main>
+          <footer class="site-footer">
+            <div class="shell footer-grid">
+              <div>
+                <strong>Davai</strong>
+                <p>A static reference for routing memory into identity, semantic, episodic, procedural, reference, working, and decision layers.</p>
+              </div>
+              <div>
+                <span>Generated 2026-05-05</span>
+                <a href="routing.html">Routing protocol</a>
+                <a href="implementation.html">Implementation guide</a>
+              </div>
+            </div>
+          </footer>
+        </body>
+        </html>

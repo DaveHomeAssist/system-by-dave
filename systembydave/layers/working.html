@@ -1,0 +1,120 @@
+<!doctype html>
+        <html lang="en">
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1">
+          <title>Layer 6 - Working | Davai</title>
+          <meta name="description" content="Layer 6 of Davai: current state, temporary notes, and intake decomposition.">
+          <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: https:; script-src 'self' 'unsafe-inline'">
+          <link rel="canonical" href="https://systembydave.com/systembydave/layers/working.html">
+          <meta name="robots" content="index,follow">
+          <meta name="theme-color" content="#f7f8f5">
+          <meta property="og:title" content="Layer 6 - Working | Davai">
+          <meta property="og:description" content="Layer 6 of Davai: current state, temporary notes, and intake decomposition.">
+          <meta property="og:type" content="website">
+          <meta property="og:site_name" content="System by Dave">
+          <meta property="og:url" content="https://systembydave.com/systembydave/layers/working.html">
+          <meta property="og:image" content="https://systembydave.com/systembydave/assets/img/04_folder_tree.svg">
+          <meta property="og:image:alt" content="Davai memory architecture folder tree diagram">
+          <meta name="twitter:card" content="summary_large_image">
+          <meta name="twitter:title" content="Layer 6 - Working | Davai">
+          <meta name="twitter:description" content="Layer 6 of Davai: current state, temporary notes, and intake decomposition.">
+          <meta name="twitter:image" content="https://systembydave.com/systembydave/assets/img/04_folder_tree.svg">
+          <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+          <link rel="stylesheet" href="../assets/styles.css">
+        </head>
+        <body>
+          <a class="skip-link" href="#main">Skip to content</a>
+          <header class="site-header">
+            <div class="shell header-inner">
+              <a class="brand" href="../index.html" aria-label="Davai overview">
+                <span class="brand-mark" aria-hidden="true">D</span>
+                <span>
+                  <strong>systembydave.com</strong>
+                  <small>Davai memory architecture</small>
+                </span>
+              </a>
+              <nav class="primary-nav" aria-label="Primary navigation">
+                <a class="nav-link" href="../index.html">Overview</a>
+<a class="nav-link" href="../routing.html">Routing</a>
+<a class="nav-link" href="../lifecycle.html">Lifecycle</a>
+<a class="nav-link" href="../index-md.html">INDEX.md</a>
+<a class="nav-link" href="../sync.html">Sync</a>
+<a class="nav-link" href="../voice.html">Voice</a>
+<a class="nav-link" href="../implementation.html">Build</a>
+              </nav>
+            </div>
+            <div class="layer-rail">
+              <nav class="shell layer-strip" aria-label="Memory layers">
+                <a class="layer-chip layer-red" href="identity.html"><span>1</span>Identity</a>
+<a class="layer-chip layer-teal" href="semantic.html"><span>2</span>Semantic</a>
+<a class="layer-chip layer-blue" href="episodic.html"><span>3</span>Episodic</a>
+<a class="layer-chip layer-gold" href="procedural.html"><span>4</span>Procedural</a>
+<a class="layer-chip layer-violet" href="reference.html"><span>5</span>Reference</a>
+<a class="layer-chip layer-green is-active" href="working.html" aria-current="page"><span>6</span>Working</a>
+<a class="layer-chip layer-orange" href="decisions.html"><span>7</span>Decisions</a>
+              </nav>
+            </div>
+          </header>
+          <main id="main">
+            <section class="band layer-hero layer-border-green">
+          <div class="shell split">
+            <div>
+              <p class="eyebrow">Layer 6</p>
+              <h1>Working: Current state</h1>
+              <p class="lede">What is active right now and likely to change soon?</p>
+            </div>
+            <div class="layer-summary">
+              <table class="spec-table"><tbody><tr><th scope="row">Canonical path</th><td><code>working/</code></td></tr>
+<tr><th scope="row">Trigger</th><td>Active tasks, hypotheses, temporary notes, scratch state, open loops.</td></tr>
+<tr><th scope="row">Stores</th><td>Current operating context with owners, blockers, next actions, and expiry.</td></tr>
+<tr><th scope="row">Avoid</th><td>Permanent facts, evidence logs, and long-term decisions.</td></tr>
+<tr><th scope="row">Lifecycle</th><td>Mutate aggressively; consolidate or delete when no longer current.</td></tr></tbody></table>
+            </div>
+          </div>
+        </section><section class="band band-white">
+          <div class="shell split">
+            <div>
+              <h2>Current operating state</h2>
+              <p>Working memory is intentionally temporary. It carries what is active now: hypotheses, blockers, task state, and intake items waiting to be decomposed.</p>
+              <table class="spec-table"><tbody><tr><th scope="row">No subdirs smell test</th><td>If working/ needs a deep folder tree, the material is probably no longer temporary. Route it to the durable layer.</td></tr>
+<tr><th scope="row">Expiry</th><td>Every working note should have an owner, next action, and review date.</td></tr>
+<tr><th scope="row">Exit paths</th><td>Resolve, delete, or consolidate into semantic, episodic, procedural, reference, identity, or decisions.</td></tr></tbody></table>
+            </div>
+            <figure class="diagram">
+  <img src="../assets/img/06_intake_decomposition.svg" alt="Before and after intake routing into Davai memory layers." loading="lazy">
+  <figcaption>Working is often the intake buffer before decomposition.</figcaption>
+</figure>
+          </div>
+        </section>
+
+        <section class="band">
+          <div class="shell">
+            <div class="section-heading">
+              <p class="eyebrow">Intake decomposition</p>
+              <h2>One messy note becomes multiple routed notes</h2>
+            </div>
+            <div class="check-grid">
+              <article><strong>Task state</strong><span>Keep the active next action in working/ until completed or abandoned.</span></article>
+              <article><strong>Dated evidence</strong><span>Move what happened into episodic/YYYY/MM/ as the evidence trail.</span></article>
+              <article><strong>Durable rule</strong><span>Extract stable facts into semantic/ only after they stand on their own.</span></article>
+              <article><strong>Process</strong><span>Convert repeatable steps into procedural/ with validation and rollback.</span></article>
+            </div>
+          </div>
+        </section>
+          </main>
+          <footer class="site-footer">
+            <div class="shell footer-grid">
+              <div>
+                <strong>Davai</strong>
+                <p>A static reference for routing memory into identity, semantic, episodic, procedural, reference, working, and decision layers.</p>
+              </div>
+              <div>
+                <span>Generated 2026-05-05</span>
+                <a href="../routing.html">Routing protocol</a>
+                <a href="../implementation.html">Implementation guide</a>
+              </div>
+            </div>
+          </footer>
+        </body>
+        </html>

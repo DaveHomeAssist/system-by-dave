@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 600" role="img" aria-labelledby="title desc">
+  <title id="title">Synthesized retrieval latency vs corpus scale</title>
+  <desc id="desc">Line chart comparing a flat corpus to Davai layered retrieval. Numbers are illustrative and must be replaced with benchmark data.</desc>
+  <rect width="980" height="600" fill="#fbfcfa"/>
+  <path d="M90 70H900V500H90Z" fill="#fff" stroke="#d9ded8"/>
+  <g stroke="#e6eae5" stroke-width="1">
+    <path d="M90 414H900"/><path d="M90 328H900"/><path d="M90 242H900"/><path d="M90 156H900"/>
+    <path d="M225 70V500"/><path d="M360 70V500"/><path d="M495 70V500"/><path d="M630 70V500"/><path d="M765 70V500"/>
+  </g>
+  <g fill="#5f6670" font-family="Inter,Arial,sans-serif" font-size="18">
+    <text x="90" y="548">100</text><text x="222" y="548">1k</text><text x="352" y="548">5k</text><text x="486" y="548">25k</text><text x="620" y="548">100k</text><text x="748" y="548">500k</text>
+    <text x="28" y="505">0ms</text><text x="20" y="419">200</text><text x="20" y="333">400</text><text x="20" y="247">600</text><text x="20" y="161">800</text><text x="10" y="75">1000</text>
+  </g>
+  <path d="M112 460 C220 432 330 365 450 284 S700 142 868 98" fill="none" stroke="#b63b2f" stroke-width="6" stroke-linecap="round"/>
+  <path d="M112 462 C250 447 372 430 492 397 S742 340 868 312" fill="none" stroke="#245b91" stroke-width="6" stroke-linecap="round"/>
+  <path d="M112 456 C250 449 372 443 492 432 S742 412 868 398" fill="none" stroke="#08766d" stroke-width="6" stroke-linecap="round"/>
+  <g font-family="Inter,Arial,sans-serif">
+    <text x="90" y="40" fill="#171a1f" font-size="30" font-weight="800">Retrieval latency vs. corpus scale</text>
+    <text x="90" y="574" fill="#5f6670" font-size="16">Corpus items, log scale</text>
+    <text transform="translate(24 350) rotate(-90)" fill="#5f6670" font-size="16">Median retrieval latency</text>
+    <rect x="620" y="88" width="250" height="112" rx="8" fill="#fff" stroke="#d9ded8"/>
+    <circle cx="642" cy="122" r="7" fill="#b63b2f"/><text x="660" y="128" fill="#171a1f" font-size="16">Flat registry only</text>
+    <circle cx="642" cy="154" r="7" fill="#245b91"/><text x="660" y="160" fill="#171a1f" font-size="16">Topic folders</text>
+    <circle cx="642" cy="186" r="7" fill="#08766d"/><text x="660" y="192" fill="#171a1f" font-size="16">Davai layered</text>
+    <text x="588" y="535" fill="#b63b2f" font-size="14" font-weight="700">Synthesized data</text>
+  </g>
+</svg>

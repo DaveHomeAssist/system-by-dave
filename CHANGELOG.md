@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-05-05
+
+- Added the Davai memory architecture static reference bundle at `/systembydave/`, including seven layer pages, routing, lifecycle, INDEX.md, sync, voice, and implementation guides.
+- Added generated Davai diagrams, storyboard scripts, a standalone upload zip, and `build_site.py` for rebuilding the bundle.
+- Added `/systembydave/` URLs to the root sitemap and advertised the section sitemap from `robots.txt`.
+
 ## 2026-05-04
 
 - Added a public resume page at `/resume/` with System by Dave styling, a signal-flow visual, responsive layout, print styles, and reduced-motion support.

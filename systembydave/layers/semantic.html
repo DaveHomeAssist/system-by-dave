@@ -1,0 +1,131 @@
+<!doctype html>
+        <html lang="en">
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1">
+          <title>Layer 2 - Semantic | Davai</title>
+          <meta name="description" content="Layer 2 of Davai: timeless facts and reusable conceptual memory.">
+          <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: https:; script-src 'self' 'unsafe-inline'">
+          <link rel="canonical" href="https://systembydave.com/systembydave/layers/semantic.html">
+          <meta name="robots" content="index,follow">
+          <meta name="theme-color" content="#f7f8f5">
+          <meta property="og:title" content="Layer 2 - Semantic | Davai">
+          <meta property="og:description" content="Layer 2 of Davai: timeless facts and reusable conceptual memory.">
+          <meta property="og:type" content="website">
+          <meta property="og:site_name" content="System by Dave">
+          <meta property="og:url" content="https://systembydave.com/systembydave/layers/semantic.html">
+          <meta property="og:image" content="https://systembydave.com/systembydave/assets/img/04_folder_tree.svg">
+          <meta property="og:image:alt" content="Davai memory architecture folder tree diagram">
+          <meta name="twitter:card" content="summary_large_image">
+          <meta name="twitter:title" content="Layer 2 - Semantic | Davai">
+          <meta name="twitter:description" content="Layer 2 of Davai: timeless facts and reusable conceptual memory.">
+          <meta name="twitter:image" content="https://systembydave.com/systembydave/assets/img/04_folder_tree.svg">
+          <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+          <link rel="stylesheet" href="../assets/styles.css">
+        </head>
+        <body>
+          <a class="skip-link" href="#main">Skip to content</a>
+          <header class="site-header">
+            <div class="shell header-inner">
+              <a class="brand" href="../index.html" aria-label="Davai overview">
+                <span class="brand-mark" aria-hidden="true">D</span>
+                <span>
+                  <strong>systembydave.com</strong>
+                  <small>Davai memory architecture</small>
+                </span>
+              </a>
+              <nav class="primary-nav" aria-label="Primary navigation">
+                <a class="nav-link" href="../index.html">Overview</a>
+<a class="nav-link" href="../routing.html">Routing</a>
+<a class="nav-link" href="../lifecycle.html">Lifecycle</a>
+<a class="nav-link" href="../index-md.html">INDEX.md</a>
+<a class="nav-link" href="../sync.html">Sync</a>
+<a class="nav-link" href="../voice.html">Voice</a>
+<a class="nav-link" href="../implementation.html">Build</a>
+              </nav>
+            </div>
+            <div class="layer-rail">
+              <nav class="shell layer-strip" aria-label="Memory layers">
+                <a class="layer-chip layer-red" href="identity.html"><span>1</span>Identity</a>
+<a class="layer-chip layer-teal is-active" href="semantic.html" aria-current="page"><span>2</span>Semantic</a>
+<a class="layer-chip layer-blue" href="episodic.html"><span>3</span>Episodic</a>
+<a class="layer-chip layer-gold" href="procedural.html"><span>4</span>Procedural</a>
+<a class="layer-chip layer-violet" href="reference.html"><span>5</span>Reference</a>
+<a class="layer-chip layer-green" href="working.html"><span>6</span>Working</a>
+<a class="layer-chip layer-orange" href="decisions.html"><span>7</span>Decisions</a>
+              </nav>
+            </div>
+          </header>
+          <main id="main">
+            <section class="band layer-hero layer-border-teal">
+          <div class="shell split">
+            <div>
+              <p class="eyebrow">Layer 2</p>
+              <h1>Semantic: Timeless facts</h1>
+              <p class="lede">What is true independent of a specific date or workflow?</p>
+            </div>
+            <div class="layer-summary">
+              <table class="spec-table"><tbody><tr><th scope="row">Canonical path</th><td><code>semantic/</code></td></tr>
+<tr><th scope="row">Trigger</th><td>Definitions, durable facts, concept summaries, stable rules, vocabulary.</td></tr>
+<tr><th scope="row">Stores</th><td>Short, reusable facts that answer future retrieval questions directly.</td></tr>
+<tr><th scope="row">Avoid</th><td>Chronology, source dumps, procedural steps, and unresolved work-in-progress.</td></tr>
+<tr><th scope="row">Lifecycle</th><td>Mutate when the fact changes; cite dated evidence when confidence matters.</td></tr></tbody></table>
+            </div>
+          </div>
+        </section><section class="band band-white">
+          <div class="shell split">
+            <div>
+              <h2>Timeless fact layer</h2>
+              <p>Semantic notes are compact answers to reusable questions. They should still be traceable, but they should not require the reader to reconstruct a meeting or source document to get the fact.</p>
+              <table class="spec-table"><tbody><tr><th scope="row">Good entry</th><td>Davai routes memory by future retrieval question, not by source format.</td></tr>
+<tr><th scope="row">Poor entry</th><td>On May 3, Dave said the router misclassified a runbook as semantic.</td></tr>
+<tr><th scope="row">Split rule</th><td>If the answer needs a date, use episodic. If it needs steps, use procedural. If it points to a long source, use reference.</td></tr></tbody></table>
+            </div>
+            <figure class="diagram">
+  <img src="../assets/img/03_router_f1_by_class.svg" alt="Synthesized router F1 by trigger class." loading="lazy">
+  <figcaption>Semantic is one trigger class in the router benchmark harness.</figcaption>
+</figure>
+          </div>
+        </section>
+
+        <section class="band">
+          <div class="shell two-col">
+            <article class="example good">
+              <h3>Good semantic note</h3>
+              <pre><code>---
+type: semantic
+topic: memory-routing
+last_verified: 2026-05-05
+---
+A retrieval question is the question future Dave or an agent
+will ask when deciding whether this memory should be loaded.</code></pre>
+            </article>
+            <article class="example poor">
+              <h3>Poor semantic note</h3>
+              <pre><code>---
+type: semantic
+---
+Meeting notes from launch planning:
+- benchmark data still synthetic
+- write link checker
+- deploy later</code></pre>
+              <p>This mixes episodic evidence, working tasks, and procedural follow-up. Decompose it at intake.</p>
+            </article>
+          </div>
+        </section>
+          </main>
+          <footer class="site-footer">
+            <div class="shell footer-grid">
+              <div>
+                <strong>Davai</strong>
+                <p>A static reference for routing memory into identity, semantic, episodic, procedural, reference, working, and decision layers.</p>
+              </div>
+              <div>
+                <span>Generated 2026-05-05</span>
+                <a href="../routing.html">Routing protocol</a>
+                <a href="../implementation.html">Implementation guide</a>
+              </div>
+            </div>
+          </footer>
+        </body>
+        </html>

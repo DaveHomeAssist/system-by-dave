@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 700" role="img" aria-labelledby="title desc">
+  <title id="title">Janitor consolidation walkthrough</title>
+  <desc id="desc">Diagram showing the Janitor workflow: detect drift, inspect episodic evidence, update current memory, and link correction.</desc>
+  <rect width="1100" height="700" fill="#fbfcfa"/>
+  <style>
+    .card{fill:#fff;stroke:#d9ded8;stroke-width:2;rx:8}.head{rx:8}.t{font:800 24px Inter,Arial,sans-serif;fill:#171a1f}.s{font:16px Inter,Arial,sans-serif;fill:#303640}.m{font:15px Inter,Arial,sans-serif;fill:#5f6670}.path{font:700 17px monospace;fill:#fff}.line{stroke:#aab3aa;stroke-width:3;fill:none;marker-end:url(#arrow)}
+  </style>
+  <defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="7" refY="3" orient="auto"><path d="M0 0 L7 3 L0 6Z" fill="#aab3aa"/></marker></defs>
+  <text x="70" y="58" class="t">Janitor drift audit</text>
+  <g>
+    <rect x="70" y="100" width="220" height="88" class="card"/><rect x="70" y="100" width="220" height="34" rx="8" fill="#b63b2f"/><text x="92" y="124" class="path">1 detect drift</text><text x="92" y="160" class="s">Semantic fact conflicts</text><text x="92" y="181" class="m">with current evidence.</text>
+    <path d="M290 144H386" class="line"/>
+    <rect x="400" y="100" width="220" height="88" class="card"/><rect x="400" y="100" width="220" height="34" rx="8" fill="#245b91"/><text x="422" y="124" class="path">2 inspect events</text><text x="422" y="160" class="s">Check episodic records</text><text x="422" y="181" class="m">and corrections.</text>
+    <path d="M620 144H716" class="line"/>
+    <rect x="730" y="100" width="270" height="88" class="card"/><rect x="730" y="100" width="270" height="34" rx="8" fill="#08766d"/><text x="752" y="124" class="path">3 update current fact</text><text x="752" y="160" class="s">Mutate semantic record</text><text x="752" y="181" class="m">with evidence link.</text>
+  </g>
+  <g>
+    <rect x="135" y="280" width="830" height="300" class="card"/>
+    <text x="170" y="330" class="t">Example</text>
+    <text x="170" y="378" class="s">Old semantic: "Charts prove layered retrieval is faster at scale."</text>
+    <text x="170" y="420" class="s">Episodic evidence: "Charts are synthesized and illustrative."</text>
+    <text x="170" y="462" class="s">Correction: "Do not publish performance claims until benchmark harness replaces SVG data."</text>
+    <text x="170" y="526" class="m">Output links: semantic/performance-claims.md -> episodic/2026/05/chart-gap.md -> procedural/benchmark-harness.md</text>
+  </g>
+  <rect x="352" y="612" width="396" height="48" rx="8" fill="#171a1f"/><text x="382" y="643" class="path">consolidate, link, verify INDEX.md</text>
+</svg>

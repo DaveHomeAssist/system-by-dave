@@ -4,4 +4,5 @@ Disallow: /404.html
 Disallow: /500.html
 
 Sitemap: https://systembydave.com/sitemap.xml
+Sitemap: https://systembydave.com/systembydave/sitemap.xml
 Host: systembydave.com

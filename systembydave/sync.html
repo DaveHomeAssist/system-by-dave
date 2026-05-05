@@ -1,0 +1,126 @@
+<!doctype html>
+        <html lang="en">
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1">
+          <title>Canonical Writer Sync | Davai</title>
+          <meta name="description" content="Canonical-writer sync model using a bare repo, post-receive hook, and generated static output.">
+          <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: https:; script-src 'self' 'unsafe-inline'">
+          <link rel="canonical" href="https://systembydave.com/systembydave/sync.html">
+          <meta name="robots" content="index,follow">
+          <meta name="theme-color" content="#f7f8f5">
+          <meta property="og:title" content="Canonical Writer Sync | Davai">
+          <meta property="og:description" content="Canonical-writer sync model using a bare repo, post-receive hook, and generated static output.">
+          <meta property="og:type" content="website">
+          <meta property="og:site_name" content="System by Dave">
+          <meta property="og:url" content="https://systembydave.com/systembydave/sync.html">
+          <meta property="og:image" content="https://systembydave.com/systembydave/assets/img/04_folder_tree.svg">
+          <meta property="og:image:alt" content="Davai memory architecture folder tree diagram">
+          <meta name="twitter:card" content="summary_large_image">
+          <meta name="twitter:title" content="Canonical Writer Sync | Davai">
+          <meta name="twitter:description" content="Canonical-writer sync model using a bare repo, post-receive hook, and generated static output.">
+          <meta name="twitter:image" content="https://systembydave.com/systembydave/assets/img/04_folder_tree.svg">
+          <link rel="icon" type="image/svg+xml" href="favicon.svg">
+          <link rel="stylesheet" href="assets/styles.css">
+        </head>
+        <body>
+          <a class="skip-link" href="#main">Skip to content</a>
+          <header class="site-header">
+            <div class="shell header-inner">
+              <a class="brand" href="index.html" aria-label="Davai overview">
+                <span class="brand-mark" aria-hidden="true">D</span>
+                <span>
+                  <strong>systembydave.com</strong>
+                  <small>Davai memory architecture</small>
+                </span>
+              </a>
+              <nav class="primary-nav" aria-label="Primary navigation">
+                <a class="nav-link" href="index.html">Overview</a>
+<a class="nav-link" href="routing.html">Routing</a>
+<a class="nav-link" href="lifecycle.html">Lifecycle</a>
+<a class="nav-link" href="index-md.html">INDEX.md</a>
+<a class="nav-link is-active" href="sync.html" aria-current="page">Sync</a>
+<a class="nav-link" href="voice.html">Voice</a>
+<a class="nav-link" href="implementation.html">Build</a>
+              </nav>
+            </div>
+            <div class="layer-rail">
+              <nav class="shell layer-strip" aria-label="Memory layers">
+                <a class="layer-chip layer-red" href="layers/identity.html"><span>1</span>Identity</a>
+<a class="layer-chip layer-teal" href="layers/semantic.html"><span>2</span>Semantic</a>
+<a class="layer-chip layer-blue" href="layers/episodic.html"><span>3</span>Episodic</a>
+<a class="layer-chip layer-gold" href="layers/procedural.html"><span>4</span>Procedural</a>
+<a class="layer-chip layer-violet" href="layers/reference.html"><span>5</span>Reference</a>
+<a class="layer-chip layer-green" href="layers/working.html"><span>6</span>Working</a>
+<a class="layer-chip layer-orange" href="layers/decisions.html"><span>7</span>Decisions</a>
+              </nav>
+            </div>
+          </header>
+          <main id="main">
+            <section class="band hero-small">
+          <div class="shell">
+            <p class="eyebrow">Canonical writer sync</p>
+            <h1>Bare repo plus post-receive hook</h1>
+            <p class="lede">Decisions 0003 and 0005 define the sync posture: one accepted writer path, one generated site, and a deployment step that does not invent a second source of truth.</p>
+          </div>
+        </section>
+
+        <section class="band band-white">
+          <div class="shell split">
+            <div>
+              <h2>Flow</h2>
+              <ol class="protocol-list">
+                <li>Operator pushes to the bare canonical repository.</li>
+                <li>The post-receive hook checks out the accepted branch into a worktree.</li>
+                <li>The hook runs validators: frontmatter lint, link check, index generation, and site build.</li>
+                <li>The static output is promoted only if validation passes.</li>
+              </ol>
+              <table class="spec-table"><tbody><tr><th scope="row">Decision 0003</th><td>Establish canonical-writer sync instead of competing writable copies.</td></tr>
+<tr><th scope="row">Decision 0005</th><td>Use post-receive generation to keep the published reference derived from accepted source.</td></tr>
+<tr><th scope="row">Failure mode</th><td>If validation fails, reject promotion and leave the previous static site intact.</td></tr></tbody></table>
+            </div>
+            <div class="template-panel">
+              <h3>Hook sketch</h3>
+              <pre><code>#!/usr/bin/env sh
+set -eu
+GIT_WORK_TREE=/srv/davai/worktree git checkout -f main
+cd /srv/davai/worktree
+python3 tools/lint_frontmatter.py
+python3 tools/check_links.py
+python3 tools/build_index.py
+python3 build_site.py
+rsync -a --delete systembydave/ /srv/www/systembydave/</code></pre>
+            </div>
+          </div>
+        </section>
+
+        <section class="band">
+          <div class="shell">
+            <div class="section-heading">
+              <p class="eyebrow">Sync guardrails</p>
+              <h2>Keep publishing boring</h2>
+            </div>
+            <div class="check-grid">
+              <article><strong>No manual edits on host.</strong><span>Published files are disposable output from the canonical source.</span></article>
+              <article><strong>Promotion is atomic.</strong><span>Build to a candidate directory, then swap only after validators pass.</span></article>
+              <article><strong>Logs are retained.</strong><span>Keep build and validation logs near the deployment for audit and recovery.</span></article>
+              <article><strong>Rollback is explicit.</strong><span>Re-promote a known commit rather than editing generated files in place.</span></article>
+            </div>
+          </div>
+        </section>
+          </main>
+          <footer class="site-footer">
+            <div class="shell footer-grid">
+              <div>
+                <strong>Davai</strong>
+                <p>A static reference for routing memory into identity, semantic, episodic, procedural, reference, working, and decision layers.</p>
+              </div>
+              <div>
+                <span>Generated 2026-05-05</span>
+                <a href="routing.html">Routing protocol</a>
+                <a href="implementation.html">Implementation guide</a>
+              </div>
+            </div>
+          </footer>
+        </body>
+        </html>

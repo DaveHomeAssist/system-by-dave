@@ -1,0 +1,131 @@
+<!doctype html>
+        <html lang="en">
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1">
+          <title>Layer 4 - Procedural | Davai</title>
+          <meta name="description" content="Layer 4 of Davai: how-to runbooks, repeatable workflows, and validation templates.">
+          <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: https:; script-src 'self' 'unsafe-inline'">
+          <link rel="canonical" href="https://systembydave.com/systembydave/layers/procedural.html">
+          <meta name="robots" content="index,follow">
+          <meta name="theme-color" content="#f7f8f5">
+          <meta property="og:title" content="Layer 4 - Procedural | Davai">
+          <meta property="og:description" content="Layer 4 of Davai: how-to runbooks, repeatable workflows, and validation templates.">
+          <meta property="og:type" content="website">
+          <meta property="og:site_name" content="System by Dave">
+          <meta property="og:url" content="https://systembydave.com/systembydave/layers/procedural.html">
+          <meta property="og:image" content="https://systembydave.com/systembydave/assets/img/04_folder_tree.svg">
+          <meta property="og:image:alt" content="Davai memory architecture folder tree diagram">
+          <meta name="twitter:card" content="summary_large_image">
+          <meta name="twitter:title" content="Layer 4 - Procedural | Davai">
+          <meta name="twitter:description" content="Layer 4 of Davai: how-to runbooks, repeatable workflows, and validation templates.">
+          <meta name="twitter:image" content="https://systembydave.com/systembydave/assets/img/04_folder_tree.svg">
+          <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+          <link rel="stylesheet" href="../assets/styles.css">
+        </head>
+        <body>
+          <a class="skip-link" href="#main">Skip to content</a>
+          <header class="site-header">
+            <div class="shell header-inner">
+              <a class="brand" href="../index.html" aria-label="Davai overview">
+                <span class="brand-mark" aria-hidden="true">D</span>
+                <span>
+                  <strong>systembydave.com</strong>
+                  <small>Davai memory architecture</small>
+                </span>
+              </a>
+              <nav class="primary-nav" aria-label="Primary navigation">
+                <a class="nav-link" href="../index.html">Overview</a>
+<a class="nav-link" href="../routing.html">Routing</a>
+<a class="nav-link" href="../lifecycle.html">Lifecycle</a>
+<a class="nav-link" href="../index-md.html">INDEX.md</a>
+<a class="nav-link" href="../sync.html">Sync</a>
+<a class="nav-link" href="../voice.html">Voice</a>
+<a class="nav-link" href="../implementation.html">Build</a>
+              </nav>
+            </div>
+            <div class="layer-rail">
+              <nav class="shell layer-strip" aria-label="Memory layers">
+                <a class="layer-chip layer-red" href="identity.html"><span>1</span>Identity</a>
+<a class="layer-chip layer-teal" href="semantic.html"><span>2</span>Semantic</a>
+<a class="layer-chip layer-blue" href="episodic.html"><span>3</span>Episodic</a>
+<a class="layer-chip layer-gold is-active" href="procedural.html" aria-current="page"><span>4</span>Procedural</a>
+<a class="layer-chip layer-violet" href="reference.html"><span>5</span>Reference</a>
+<a class="layer-chip layer-green" href="working.html"><span>6</span>Working</a>
+<a class="layer-chip layer-orange" href="decisions.html"><span>7</span>Decisions</a>
+              </nav>
+            </div>
+          </header>
+          <main id="main">
+            <section class="band layer-hero layer-border-gold">
+          <div class="shell split">
+            <div>
+              <p class="eyebrow">Layer 4</p>
+              <h1>Procedural: How to do X</h1>
+              <p class="lede">How should the system or operator perform this task?</p>
+            </div>
+            <div class="layer-summary">
+              <table class="spec-table"><tbody><tr><th scope="row">Canonical path</th><td><code>procedural/</code></td></tr>
+<tr><th scope="row">Trigger</th><td>Runbooks, checklists, repeatable workflows, command sequences, playbooks.</td></tr>
+<tr><th scope="row">Stores</th><td>Actionable steps with prerequisites, commands, validation, rollback, and owners.</td></tr>
+<tr><th scope="row">Avoid</th><td>One-time event notes and long reference documents.</td></tr>
+<tr><th scope="row">Lifecycle</th><td>Update in place when the process changes; link major changes to decisions.</td></tr></tbody></table>
+            </div>
+          </div>
+        </section><section class="band band-white">
+          <div class="shell split">
+            <div>
+              <h2>Runbooks and repeatable work</h2>
+              <p>Procedural memory should let an operator execute a task without re-deriving the sequence. It is not a transcript. It is a maintained operating method.</p>
+              <table class="spec-table"><tbody><tr><th scope="row">Good entries</th><td>Build steps, release checklists, Janitor procedures, sync repair, benchmark rerendering.</td></tr>
+<tr><th scope="row">Decision discipline</th><td>Link major process changes to <a href='decisions.html'>decisions/</a> so operators can see why the runbook changed.</td></tr>
+<tr><th scope="row">Validation</th><td>Every runbook needs a done condition and a rollback or recovery path when failure is plausible.</td></tr></tbody></table>
+            </div>
+            <div class="template-panel">
+              <h3>Worked runbook template</h3>
+              <pre><code>---
+type: procedural
+owner: memory-operator
+last_verified: YYYY-MM-DD
+related_decisions: [0003, 0005]
+---
+# Goal
+# Preconditions
+# Steps
+# Validation
+# Rollback
+# Links</code></pre>
+            </div>
+          </div>
+        </section>
+
+        <section class="band">
+          <div class="shell">
+            <div class="section-heading">
+              <p class="eyebrow">Procedure smell tests</p>
+              <h2>How to keep runbooks executable</h2>
+            </div>
+            <div class="check-grid">
+              <article><strong>Command is copyable.</strong><span>Use exact commands or exact UI paths where possible.</span></article>
+              <article><strong>Inputs are named.</strong><span>Declare required files, credentials, branches, and environment variables.</span></article>
+              <article><strong>Result is observable.</strong><span>Write the validation step as a concrete test, not a feeling.</span></article>
+              <article><strong>Change history is linked.</strong><span>When the method changes for architectural reasons, link the ADR.</span></article>
+            </div>
+          </div>
+        </section>
+          </main>
+          <footer class="site-footer">
+            <div class="shell footer-grid">
+              <div>
+                <strong>Davai</strong>
+                <p>A static reference for routing memory into identity, semantic, episodic, procedural, reference, working, and decision layers.</p>
+              </div>
+              <div>
+                <span>Generated 2026-05-05</span>
+                <a href="../routing.html">Routing protocol</a>
+                <a href="../implementation.html">Implementation guide</a>
+              </div>
+            </div>
+          </footer>
+        </body>
+        </html>

@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 760" role="img" aria-labelledby="title desc">
+  <title id="title">Davai folder tree with retrieval question callouts</title>
+  <desc id="desc">Architecture diagram showing the seven canonical Davai folders and the retrieval question for each folder.</desc>
+  <rect width="1000" height="760" fill="#fbfcfa"/>
+  <style>
+    .label{font:700 22px Inter,Arial,sans-serif;fill:#171a1f}.path{font:700 18px monospace;fill:#fff}.q{font:16px Inter,Arial,sans-serif;fill:#303640}.small{font:14px Inter,Arial,sans-serif;fill:#5f6670}.line{stroke:#aab3aa;stroke-width:3;fill:none}.box{fill:#fff;stroke:#d9ded8;stroke-width:2;rx:8}.root{fill:#171a1f;rx:8}
+  </style>
+  <rect x="54" y="48" width="240" height="64" class="root"/>
+  <text x="78" y="88" class="path">davai/</text>
+  <path d="M174 112V680" class="line"/>
+  <g>
+    <path d="M174 158H322" class="line"/><rect x="322" y="124" width="206" height="68" rx="8" fill="#b63b2f"/><text x="344" y="166" class="path">identity/</text><rect x="560" y="124" width="380" height="68" class="box"/><text x="582" y="152" class="q">Who is this person?</text><text x="582" y="176" class="small">Durable preferences, profile, voice anchor.</text>
+    <path d="M174 238H322" class="line"/><rect x="322" y="204" width="206" height="68" rx="8" fill="#08766d"/><text x="344" y="246" class="path">semantic/</text><rect x="560" y="204" width="380" height="68" class="box"/><text x="582" y="232" class="q">What is timelessly true?</text><text x="582" y="256" class="small">Definitions, facts, stable rules.</text>
+    <path d="M174 318H322" class="line"/><rect x="322" y="284" width="206" height="68" rx="8" fill="#245b91"/><text x="344" y="326" class="path">episodic/YYYY/MM/</text><rect x="560" y="284" width="380" height="68" class="box"/><text x="582" y="312" class="q">What happened when?</text><text x="582" y="336" class="small">Dated evidence and corrections.</text>
+    <path d="M174 398H322" class="line"/><rect x="322" y="364" width="206" height="68" rx="8" fill="#b47a16"/><text x="344" y="406" class="path">procedural/</text><rect x="560" y="364" width="380" height="68" class="box"/><text x="582" y="392" class="q">How do we do this?</text><text x="582" y="416" class="small">Runbooks, commands, validation.</text>
+    <path d="M174 478H322" class="line"/><rect x="322" y="444" width="206" height="68" rx="8" fill="#7053a3"/><text x="344" y="486" class="path">reference/</text><rect x="560" y="444" width="380" height="68" class="box"/><text x="582" y="472" class="q">Where should we look?</text><text x="582" y="496" class="small">Pointers, source maps, verification.</text>
+    <path d="M174 558H322" class="line"/><rect x="322" y="524" width="206" height="68" rx="8" fill="#4f7d3f"/><text x="344" y="566" class="path">working/</text><rect x="560" y="524" width="380" height="68" class="box"/><text x="582" y="552" class="q">What is active right now?</text><text x="582" y="576" class="small">Temporary state, blockers, intake.</text>
+    <path d="M174 638H322" class="line"/><rect x="322" y="604" width="206" height="68" rx="8" fill="#bd5d22"/><text x="344" y="646" class="path">decisions/</text><rect x="560" y="604" width="380" height="68" class="box"/><text x="582" y="632" class="q">What did we choose and why?</text><text x="582" y="656" class="small">ADRs, supersedence, consequences.</text>
+  </g>
+  <text x="54" y="724" class="small">Folder shape follows retrieval question, not source format.</text>
+</svg>

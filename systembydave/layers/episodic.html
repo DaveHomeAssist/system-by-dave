@@ -1,0 +1,134 @@
+<!doctype html>
+        <html lang="en">
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1">
+          <title>Layer 3 - Episodic | Davai</title>
+          <meta name="description" content="Layer 3 of Davai: dated event records, correction rules, and Janitor ground truth.">
+          <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: https:; script-src 'self' 'unsafe-inline'">
+          <link rel="canonical" href="https://systembydave.com/systembydave/layers/episodic.html">
+          <meta name="robots" content="index,follow">
+          <meta name="theme-color" content="#f7f8f5">
+          <meta property="og:title" content="Layer 3 - Episodic | Davai">
+          <meta property="og:description" content="Layer 3 of Davai: dated event records, correction rules, and Janitor ground truth.">
+          <meta property="og:type" content="website">
+          <meta property="og:site_name" content="System by Dave">
+          <meta property="og:url" content="https://systembydave.com/systembydave/layers/episodic.html">
+          <meta property="og:image" content="https://systembydave.com/systembydave/assets/img/04_folder_tree.svg">
+          <meta property="og:image:alt" content="Davai memory architecture folder tree diagram">
+          <meta name="twitter:card" content="summary_large_image">
+          <meta name="twitter:title" content="Layer 3 - Episodic | Davai">
+          <meta name="twitter:description" content="Layer 3 of Davai: dated event records, correction rules, and Janitor ground truth.">
+          <meta name="twitter:image" content="https://systembydave.com/systembydave/assets/img/04_folder_tree.svg">
+          <link rel="icon" type="image/svg+xml" href="../favicon.svg">
+          <link rel="stylesheet" href="../assets/styles.css">
+        </head>
+        <body>
+          <a class="skip-link" href="#main">Skip to content</a>
+          <header class="site-header">
+            <div class="shell header-inner">
+              <a class="brand" href="../index.html" aria-label="Davai overview">
+                <span class="brand-mark" aria-hidden="true">D</span>
+                <span>
+                  <strong>systembydave.com</strong>
+                  <small>Davai memory architecture</small>
+                </span>
+              </a>
+              <nav class="primary-nav" aria-label="Primary navigation">
+                <a class="nav-link" href="../index.html">Overview</a>
+<a class="nav-link" href="../routing.html">Routing</a>
+<a class="nav-link" href="../lifecycle.html">Lifecycle</a>
+<a class="nav-link" href="../index-md.html">INDEX.md</a>
+<a class="nav-link" href="../sync.html">Sync</a>
+<a class="nav-link" href="../voice.html">Voice</a>
+<a class="nav-link" href="../implementation.html">Build</a>
+              </nav>
+            </div>
+            <div class="layer-rail">
+              <nav class="shell layer-strip" aria-label="Memory layers">
+                <a class="layer-chip layer-red" href="identity.html"><span>1</span>Identity</a>
+<a class="layer-chip layer-teal" href="semantic.html"><span>2</span>Semantic</a>
+<a class="layer-chip layer-blue is-active" href="episodic.html" aria-current="page"><span>3</span>Episodic</a>
+<a class="layer-chip layer-gold" href="procedural.html"><span>4</span>Procedural</a>
+<a class="layer-chip layer-violet" href="reference.html"><span>5</span>Reference</a>
+<a class="layer-chip layer-green" href="working.html"><span>6</span>Working</a>
+<a class="layer-chip layer-orange" href="decisions.html"><span>7</span>Decisions</a>
+              </nav>
+            </div>
+          </header>
+          <main id="main">
+            <section class="band layer-hero layer-border-blue">
+          <div class="shell split">
+            <div>
+              <p class="eyebrow">Layer 3</p>
+              <h1>Episodic: Dated events</h1>
+              <p class="lede">What happened, when, and what evidence proves it?</p>
+            </div>
+            <div class="layer-summary">
+              <table class="spec-table"><tbody><tr><th scope="row">Canonical path</th><td><code>episodic/YYYY/MM/</code></td></tr>
+<tr><th scope="row">Trigger</th><td>Meetings, observations, incidents, corrections, dated decisions before ADRs.</td></tr>
+<tr><th scope="row">Stores</th><td>Append-only event records with dates, participants, and source context.</td></tr>
+<tr><th scope="row">Avoid</th><td>Timeless facts without dates and instructions meant to be reused.</td></tr>
+<tr><th scope="row">Lifecycle</th><td>Append corrections; do not silently rewrite the original record.</td></tr></tbody></table>
+            </div>
+          </div>
+        </section><section class="band band-white">
+          <div class="shell split">
+            <div>
+              <h2>Dated evidence layer</h2>
+              <p>Episodic is the ground truth for what happened. The Janitor uses it to detect drift, reconcile current facts, and justify updates to semantic, procedural, identity, and decision records.</p>
+              <table class="spec-table"><tbody><tr><th scope="row">Path shape</th><td><code>episodic/YYYY/MM/</code> keeps chronology easy to scan without inventing topic folders.</td></tr>
+<tr><th scope="row">Correction rule</th><td>Append a correction note with date and reason. Do not silently rewrite the old event.</td></tr>
+<tr><th scope="row">Janitor role</th><td>When facts drift, episodic records provide the evidence trail for consolidation.</td></tr></tbody></table>
+              <aside class="callout callout-warn">
+  <strong>Reference implementation</strong>
+  <p>Episodic is the audit base for <a href='../lifecycle.html'>lifecycle.html</a>. Treat it as evidence, not a polished knowledge page.</p>
+</aside>
+            </div>
+            <figure class="diagram">
+  <img src="../assets/img/07_drift_audit.svg" alt="Janitor consolidation walkthrough from stale facts to corrected records." loading="lazy">
+  <figcaption>A drift audit starts from contradiction and ends with a linked correction.</figcaption>
+</figure>
+          </div>
+        </section>
+
+        <section class="band">
+          <div class="shell two-col">
+            <article class="example good">
+              <h3>Event record</h3>
+              <pre><code>---
+type: episodic
+date: 2026-05-05
+source: implementation-review
+---
+The benchmark charts were identified as synthesized and must
+not be used for performance claims until a harness exists.</code></pre>
+            </article>
+            <article class="example good">
+              <h3>Correction record</h3>
+              <pre><code>---
+type: episodic
+date: 2026-05-06
+corrects: 2026-05-05-benchmark-note
+---
+The harness now measures all seven trigger classes. Replace
+the synthesized SVG charts with generated benchmark output.</code></pre>
+            </article>
+          </div>
+        </section>
+          </main>
+          <footer class="site-footer">
+            <div class="shell footer-grid">
+              <div>
+                <strong>Davai</strong>
+                <p>A static reference for routing memory into identity, semantic, episodic, procedural, reference, working, and decision layers.</p>
+              </div>
+              <div>
+                <span>Generated 2026-05-05</span>
+                <a href="../routing.html">Routing protocol</a>
+                <a href="../implementation.html">Implementation guide</a>
+              </div>
+            </div>
+          </footer>
+        </body>
+        </html>

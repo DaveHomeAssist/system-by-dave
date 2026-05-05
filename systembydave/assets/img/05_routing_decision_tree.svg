@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 760" role="img" aria-labelledby="title desc">
+  <title id="title">PROTOCOL.md routing decision tree</title>
+  <desc id="desc">Routing tree that maps incoming memory to identity, semantic, episodic, procedural, reference, working, or decisions.</desc>
+  <rect width="1100" height="760" fill="#fbfcfa"/>
+  <style>
+    .node{fill:#fff;stroke:#d9ded8;stroke-width:2;rx:8}.root{fill:#171a1f;rx:8}.t{font:700 20px Inter,Arial,sans-serif;fill:#171a1f}.w{font:700 20px Inter,Arial,sans-serif;fill:#fff}.s{font:15px Inter,Arial,sans-serif;fill:#5f6670}.path{font:700 16px monospace;fill:#fff}.line{stroke:#aab3aa;stroke-width:3;fill:none}.yes{font:700 14px Inter,Arial,sans-serif;fill:#08766d}.no{font:700 14px Inter,Arial,sans-serif;fill:#b63b2f}
+  </style>
+  <rect x="405" y="34" width="290" height="70" class="root"/><text x="456" y="76" class="w">New memory item</text>
+  <path d="M550 104V145" class="line"/>
+  <rect x="360" y="145" width="380" height="74" class="node"/><text x="394" y="174" class="t">One retrieval question?</text><text x="394" y="200" class="s">If mixed, split before routing.</text>
+  <path d="M360 182H170V260" class="line"/><text x="214" y="174" class="no">no</text><rect x="60" y="260" width="220" height="70" rx="8" fill="#4f7d3f"/><text x="94" y="290" class="path">working/</text><text x="94" y="314" class="path">then decompose</text>
+  <path d="M550 219V260" class="line"/><text x="564" y="244" class="yes">yes</text>
+  <rect x="350" y="260" width="400" height="68" class="node"/><text x="378" y="302" class="t">Durable user or voice rule?</text>
+  <path d="M350 294H150V374" class="line"/><text x="224" y="286" class="yes">yes</text><rect x="52" y="374" width="206" height="58" rx="8" fill="#b63b2f"/><text x="78" y="411" class="path">identity/</text>
+  <path d="M550 328V374" class="line"/><text x="565" y="354" class="no">no</text>
+  <rect x="350" y="374" width="400" height="68" class="node"/><text x="378" y="416" class="t">Timeless fact or definition?</text>
+  <path d="M750 408H940V374" class="line"/><text x="828" y="400" class="yes">yes</text><rect x="832" y="316" width="206" height="58" rx="8" fill="#08766d"/><text x="858" y="353" class="path">semantic/</text>
+  <path d="M550 442V486" class="line"/><text x="565" y="468" class="no">no</text>
+  <rect x="350" y="486" width="400" height="68" class="node"/><text x="378" y="528" class="t">Dated event or correction?</text>
+  <path d="M350 520H150V558" class="line"/><text x="224" y="512" class="yes">yes</text><rect x="52" y="558" width="246" height="58" rx="8" fill="#245b91"/><text x="78" y="595" class="path">episodic/YYYY/MM/</text>
+  <path d="M550 554V596" class="line"/><text x="565" y="580" class="no">no</text>
+  <rect x="350" y="596" width="400" height="68" class="node"/><text x="378" y="638" class="t">Procedure, source, or choice?</text>
+  <path d="M350 630H150V680" class="line"/><rect x="52" y="680" width="206" height="54" rx="8" fill="#b47a16"/><text x="78" y="714" class="path">procedural/</text>
+  <path d="M550 664V707H447" class="line"/><rect x="330" y="680" width="206" height="54" rx="8" fill="#7053a3"/><text x="356" y="714" class="path">reference/</text>
+  <path d="M750 630H940V680" class="line"/><rect x="832" y="680" width="206" height="54" rx="8" fill="#bd5d22"/><text x="858" y="714" class="path">decisions/</text>
+  <text x="80" y="52" class="s">Fallback: if active and temporary, use working/ with expiry.</text>
+</svg>

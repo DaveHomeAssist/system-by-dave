@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 680" role="img" aria-labelledby="title desc">
+  <title id="title">Before and after intake decomposition</title>
+  <desc id="desc">Diagram showing one mixed intake note split into working, episodic, semantic, and procedural records.</desc>
+  <rect width="1100" height="680" fill="#fbfcfa"/>
+  <style>
+    .box{fill:#fff;stroke:#d9ded8;stroke-width:2;rx:8}.dark{fill:#171a1f;rx:8}.t{font:800 24px Inter,Arial,sans-serif;fill:#171a1f}.w{font:800 24px Inter,Arial,sans-serif;fill:#fff}.s{font:16px Inter,Arial,sans-serif;fill:#303640}.m{font:15px Inter,Arial,sans-serif;fill:#5f6670}.path{font:700 17px monospace;fill:#fff}.line{stroke:#aab3aa;stroke-width:3;fill:none;marker-end:url(#arrow)}
+  </style>
+  <defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="7" refY="3" orient="auto"><path d="M0 0 L7 3 L0 6Z" fill="#aab3aa"/></marker></defs>
+  <text x="60" y="58" class="t">Before: mixed intake</text>
+  <rect x="60" y="90" width="410" height="470" class="box"/>
+  <text x="92" y="135" class="s">Launch review note</text>
+  <text x="92" y="178" class="m">- benchmark charts are synthetic</text>
+  <text x="92" y="212" class="m">- Janitor needs link checker</text>
+  <text x="92" y="246" class="m">- update runbook after sync change</text>
+  <text x="92" y="280" class="m">- blocker: deploy workflow missing</text>
+  <text x="92" y="314" class="m">- Dave wants direct, factual copy</text>
+  <path d="M490 325H606" class="line"/>
+  <text x="600" y="58" class="t">After: routed records</text>
+  <g>
+    <rect x="635" y="90" width="370" height="82" rx="8" fill="#4f7d3f"/><text x="660" y="124" class="path">working/deploy-workflow.md</text><text x="660" y="150" class="path">active blocker + next action</text>
+    <rect x="635" y="204" width="370" height="82" rx="8" fill="#245b91"/><text x="660" y="238" class="path">episodic/2026/05/review.md</text><text x="660" y="264" class="path">dated evidence</text>
+    <rect x="635" y="318" width="370" height="82" rx="8" fill="#08766d"/><text x="660" y="352" class="path">semantic/perf-claims.md</text><text x="660" y="378" class="path">stable rule: no synthetic claims</text>
+    <rect x="635" y="432" width="370" height="82" rx="8" fill="#b47a16"/><text x="660" y="466" class="path">procedural/janitor-link-check.md</text><text x="660" y="492" class="path">repeatable validation step</text>
+    <rect x="635" y="546" width="370" height="82" rx="8" fill="#b63b2f"/><text x="660" y="580" class="path">identity/voice.md</text><text x="660" y="606" class="path">durable communication rule</text>
+  </g>
+</svg>

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 600" role="img" aria-labelledby="title desc">
+  <title id="title">Synthesized router F1 by trigger class</title>
+  <desc id="desc">Bar chart showing illustrative router F1 values for the seven Davai trigger classes.</desc>
+  <rect width="980" height="600" fill="#fbfcfa"/>
+  <path d="M80 70H910V480H80Z" fill="#fff" stroke="#d9ded8"/>
+  <g stroke="#e6eae5" stroke-width="1">
+    <path d="M80 406H910"/><path d="M80 332H910"/><path d="M80 258H910"/><path d="M80 184H910"/><path d="M80 110H910"/>
+  </g>
+  <g fill="#5f6670" font-family="Inter,Arial,sans-serif" font-size="16">
+    <text x="36" y="485">0.00</text><text x="36" y="411">0.20</text><text x="36" y="337">0.40</text><text x="36" y="263">0.60</text><text x="36" y="189">0.80</text><text x="36" y="115">1.00</text>
+  </g>
+  <g font-family="Inter,Arial,sans-serif"><rect x="115" y="139.6" width="70" height="340.4" rx="7" fill="#b63b2f"/><text x="150" y="125.6" text-anchor="middle" fill="#171a1f" font-size="18" font-weight="800">0.92</text><text x="150" y="523" text-anchor="middle" fill="#5f6670" font-size="16">identity</text><rect x="233" y="154.4" width="70" height="325.6" rx="7" fill="#08766d"/><text x="268" y="140.4" text-anchor="middle" fill="#171a1f" font-size="18" font-weight="800">0.88</text><text x="268" y="523" text-anchor="middle" fill="#5f6670" font-size="16">semantic</text><rect x="351" y="132.2" width="70" height="347.8" rx="7" fill="#245b91"/><text x="386" y="118.2" text-anchor="middle" fill="#171a1f" font-size="18" font-weight="800">0.94</text><text x="386" y="523" text-anchor="middle" fill="#5f6670" font-size="16">episodic</text><rect x="469" y="161.8" width="70" height="318.2" rx="7" fill="#b47a16"/><text x="504" y="147.8" text-anchor="middle" fill="#171a1f" font-size="18" font-weight="800">0.86</text><text x="504" y="523" text-anchor="middle" fill="#5f6670" font-size="16">procedural</text><rect x="587" y="172.9" width="70" height="307.1" rx="7" fill="#7053a3"/><text x="622" y="158.9" text-anchor="middle" fill="#171a1f" font-size="18" font-weight="800">0.83</text><text x="622" y="523" text-anchor="middle" fill="#5f6670" font-size="16">reference</text><rect x="705" y="150.7" width="70" height="329.3" rx="7" fill="#4f7d3f"/><text x="740" y="136.7" text-anchor="middle" fill="#171a1f" font-size="18" font-weight="800">0.89</text><text x="740" y="523" text-anchor="middle" fill="#5f6670" font-size="16">working</text><rect x="823" y="143.3" width="70" height="336.7" rx="7" fill="#bd5d22"/><text x="858" y="129.3" text-anchor="middle" fill="#171a1f" font-size="18" font-weight="800">0.91</text><text x="858" y="523" text-anchor="middle" fill="#5f6670" font-size="16">decisions</text></g>
+  <g font-family="Inter,Arial,sans-serif">
+    <text x="80" y="40" fill="#171a1f" font-size="30" font-weight="800">Router F1 by layer trigger class</text>
+    <text x="80" y="566" fill="#5f6670" font-size="16">Trigger class</text>
+    <text transform="translate(22 330) rotate(-90)" fill="#5f6670" font-size="16">F1 score</text>
+    <text x="714" y="566" fill="#b63b2f" font-size="14" font-weight="700">Synthesized data</text>
+  </g>
+</svg>

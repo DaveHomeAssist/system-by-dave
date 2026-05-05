@@ -1,0 +1,224 @@
+<!doctype html>
+        <html lang="en">
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1">
+          <title>Davai Memory Architecture</title>
+          <meta name="description" content="A static guide to the Davai seven-layer memory architecture, routing protocol, lifecycle rules, sync model, and implementation plan.">
+          <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: https:; script-src 'self' 'unsafe-inline'">
+          <link rel="canonical" href="https://systembydave.com/systembydave/">
+          <meta name="robots" content="index,follow">
+          <meta name="theme-color" content="#f7f8f5">
+          <meta property="og:title" content="Davai Memory Architecture">
+          <meta property="og:description" content="A static guide to the Davai seven-layer memory architecture, routing protocol, lifecycle rules, sync model, and implementation plan.">
+          <meta property="og:type" content="website">
+          <meta property="og:site_name" content="System by Dave">
+          <meta property="og:url" content="https://systembydave.com/systembydave/">
+          <meta property="og:image" content="https://systembydave.com/systembydave/assets/img/04_folder_tree.svg">
+          <meta property="og:image:alt" content="Davai memory architecture folder tree diagram">
+          <meta name="twitter:card" content="summary_large_image">
+          <meta name="twitter:title" content="Davai Memory Architecture">
+          <meta name="twitter:description" content="A static guide to the Davai seven-layer memory architecture, routing protocol, lifecycle rules, sync model, and implementation plan.">
+          <meta name="twitter:image" content="https://systembydave.com/systembydave/assets/img/04_folder_tree.svg">
+          <link rel="icon" type="image/svg+xml" href="favicon.svg">
+          <link rel="stylesheet" href="assets/styles.css">
+        </head>
+        <body>
+          <a class="skip-link" href="#main">Skip to content</a>
+          <header class="site-header">
+            <div class="shell header-inner">
+              <a class="brand" href="index.html" aria-label="Davai overview">
+                <span class="brand-mark" aria-hidden="true">D</span>
+                <span>
+                  <strong>systembydave.com</strong>
+                  <small>Davai memory architecture</small>
+                </span>
+              </a>
+              <nav class="primary-nav" aria-label="Primary navigation">
+                <a class="nav-link is-active" href="index.html" aria-current="page">Overview</a>
+<a class="nav-link" href="routing.html">Routing</a>
+<a class="nav-link" href="lifecycle.html">Lifecycle</a>
+<a class="nav-link" href="index-md.html">INDEX.md</a>
+<a class="nav-link" href="sync.html">Sync</a>
+<a class="nav-link" href="voice.html">Voice</a>
+<a class="nav-link" href="implementation.html">Build</a>
+              </nav>
+            </div>
+            <div class="layer-rail">
+              <nav class="shell layer-strip" aria-label="Memory layers">
+                <a class="layer-chip layer-red" href="layers/identity.html"><span>1</span>Identity</a>
+<a class="layer-chip layer-teal" href="layers/semantic.html"><span>2</span>Semantic</a>
+<a class="layer-chip layer-blue" href="layers/episodic.html"><span>3</span>Episodic</a>
+<a class="layer-chip layer-gold" href="layers/procedural.html"><span>4</span>Procedural</a>
+<a class="layer-chip layer-violet" href="layers/reference.html"><span>5</span>Reference</a>
+<a class="layer-chip layer-green" href="layers/working.html"><span>6</span>Working</a>
+<a class="layer-chip layer-orange" href="layers/decisions.html"><span>7</span>Decisions</a>
+              </nav>
+            </div>
+          </header>
+          <main id="main">
+            <section class="hero band">
+          <div class="shell hero-grid">
+            <div class="hero-copy">
+              <p class="eyebrow">Canonical routing reference</p>
+              <h1>Davai memory architecture</h1>
+              <p class="lede">A seven-layer static guide for deciding where memory belongs, how it should change over time, and how operators keep current state separate from evidence and architectural commitments.</p>
+              <div class="hero-actions">
+                <a class="button button-primary" href="implementation.html">Build from zero</a>
+                <a class="button button-secondary" href="routing.html">Open PROTOCOL.md</a>
+              </div>
+            </div>
+            <div class="route-panel" aria-label="Architecture snapshot">
+              <div class="route-line">
+                <span>input</span>
+                <strong>route by retrieval question</strong>
+              </div>
+              <div class="route-stack">
+                <span>identity/</span>
+                <span>semantic/</span>
+                <span>episodic/YYYY/MM/</span>
+                <span>procedural/</span>
+                <span>reference/</span>
+                <span>working/</span>
+                <span>decisions/</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="band band-white" id="layers">
+          <div class="shell">
+            <div class="section-heading">
+              <p class="eyebrow">Seven layers</p>
+              <h2>Architecture at a glance</h2>
+              <p>Each layer exists because it answers a different retrieval question. Folder shape follows retrieval, not source format.</p>
+            </div>
+            <div class="layer-grid">
+              <article class="layer-card layer-border-red">
+  <a class="layer-card-link" href="layers/identity.html">
+    <span class="layer-index">Layer 1</span>
+    <h3>Identity</h3>
+    <p>Who is this person, and what durable preferences shape the response?</p>
+    <code>identity/</code>
+  </a>
+</article>
+<article class="layer-card layer-border-teal">
+  <a class="layer-card-link" href="layers/semantic.html">
+    <span class="layer-index">Layer 2</span>
+    <h3>Semantic</h3>
+    <p>What is true independent of a specific date or workflow?</p>
+    <code>semantic/</code>
+  </a>
+</article>
+<article class="layer-card layer-border-blue">
+  <a class="layer-card-link" href="layers/episodic.html">
+    <span class="layer-index">Layer 3</span>
+    <h3>Episodic</h3>
+    <p>What happened, when, and what evidence proves it?</p>
+    <code>episodic/YYYY/MM/</code>
+  </a>
+</article>
+<article class="layer-card layer-border-gold">
+  <a class="layer-card-link" href="layers/procedural.html">
+    <span class="layer-index">Layer 4</span>
+    <h3>Procedural</h3>
+    <p>How should the system or operator perform this task?</p>
+    <code>procedural/</code>
+  </a>
+</article>
+<article class="layer-card layer-border-violet">
+  <a class="layer-card-link" href="layers/reference.html">
+    <span class="layer-index">Layer 5</span>
+    <h3>Reference</h3>
+    <p>Where should someone look for authoritative source material?</p>
+    <code>reference/</code>
+  </a>
+</article>
+<article class="layer-card layer-border-green">
+  <a class="layer-card-link" href="layers/working.html">
+    <span class="layer-index">Layer 6</span>
+    <h3>Working</h3>
+    <p>What is active right now and likely to change soon?</p>
+    <code>working/</code>
+  </a>
+</article>
+<article class="layer-card layer-border-orange">
+  <a class="layer-card-link" href="layers/decisions.html">
+    <span class="layer-index">Layer 7</span>
+    <h3>Decisions</h3>
+    <p>What choice was made, why, and what does it supersede?</p>
+    <code>decisions/</code>
+  </a>
+</article>
+            </div>
+          </div>
+        </section>
+
+        <section class="band">
+          <div class="shell split">
+            <div>
+              <p class="eyebrow">Routing frame</p>
+              <h2>The question decides the folder</h2>
+              <p>Do not ask where the note came from first. Ask what future retrieval will need: identity, timeless fact, dated evidence, instructions, source location, current state, or architectural commitment.</p>
+              <table class="spec-table compact">
+                <thead><tr><th>Layer</th><th>Name</th><th>Retrieval question</th><th>Path</th></tr></thead>
+                <tbody>
+                  <tr><td>Layer 1</td><td><a href="layers/identity.html">Identity</a></td><td>Who is this person, and what durable preferences shape the response?</td><td><code>identity/</code></td></tr><tr><td>Layer 2</td><td><a href="layers/semantic.html">Semantic</a></td><td>What is true independent of a specific date or workflow?</td><td><code>semantic/</code></td></tr><tr><td>Layer 3</td><td><a href="layers/episodic.html">Episodic</a></td><td>What happened, when, and what evidence proves it?</td><td><code>episodic/YYYY/MM/</code></td></tr><tr><td>Layer 4</td><td><a href="layers/procedural.html">Procedural</a></td><td>How should the system or operator perform this task?</td><td><code>procedural/</code></td></tr><tr><td>Layer 5</td><td><a href="layers/reference.html">Reference</a></td><td>Where should someone look for authoritative source material?</td><td><code>reference/</code></td></tr><tr><td>Layer 6</td><td><a href="layers/working.html">Working</a></td><td>What is active right now and likely to change soon?</td><td><code>working/</code></td></tr><tr><td>Layer 7</td><td><a href="layers/decisions.html">Decisions</a></td><td>What choice was made, why, and what does it supersede?</td><td><code>decisions/</code></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <figure class="diagram">
+  <img src="assets/img/04_folder_tree.svg" alt="Davai folder tree with retrieval question callouts." loading="lazy">
+  <figcaption>Folder layout with the retrieval question attached to each branch.</figcaption>
+</figure>
+          </div>
+        </section>
+
+        <section class="band band-ink">
+          <div class="shell">
+            <div class="section-heading">
+              <p class="eyebrow">Publish blockers</p>
+              <h2>Known production gaps</h2>
+              <p>These are tracked openly so the site is useful as an implementation reference without pretending the instrumentation is complete.</p>
+            </div>
+            <div class="gap-grid">
+              <article><strong>Benchmark data is synthesized.</strong><span>Re-render latency, recall, and router F1 charts from a real harness before making performance claims.</span></article>
+              <article><strong>Storyboard scripts assume a mem CLI.</strong><span>Rename the commands or write the CLI before recording operational walkthroughs.</span></article>
+              <article><strong>Schema and links need enforcement.</strong><span>Add frontmatter linting and cross-layer link checks to the Janitor loop.</span></article>
+              <article><strong>Routing telemetry is missing.</strong><span>Log input, chosen layer, confidence, and correction events so routing can improve from evidence.</span></article>
+            </div>
+          </div>
+        </section>
+
+        <section class="band band-white">
+          <div class="shell chart-grid">
+            <figure class="diagram">
+  <img src="assets/img/01_retrieval_latency.svg" alt="Synthesized chart comparing retrieval latency as corpus scale grows." loading="lazy">
+  <figcaption>Synthesized latency chart. Replace with benchmark data before publication.</figcaption>
+</figure>
+            <figure class="diagram">
+  <img src="assets/img/02_first_try_accuracy.svg" alt="Synthesized chart comparing first try recall as corpus scale grows." loading="lazy">
+  <figcaption>Synthesized first-try recall chart. Replace with benchmark data before publication.</figcaption>
+</figure>
+            <figure class="diagram">
+  <img src="assets/img/03_router_f1_by_class.svg" alt="Synthesized bar chart of router F1 by trigger class." loading="lazy">
+  <figcaption>Synthesized router F1 chart across the seven trigger classes.</figcaption>
+</figure>
+          </div>
+        </section>
+          </main>
+          <footer class="site-footer">
+            <div class="shell footer-grid">
+              <div>
+                <strong>Davai</strong>
+                <p>A static reference for routing memory into identity, semantic, episodic, procedural, reference, working, and decision layers.</p>
+              </div>
+              <div>
+                <span>Generated 2026-05-05</span>
+                <a href="routing.html">Routing protocol</a>
+                <a href="implementation.html">Implementation guide</a>
+              </div>
+            </div>
+          </footer>
+        </body>
+        </html>

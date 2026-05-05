@@ -1,0 +1,113 @@
+<!doctype html>
+        <html lang="en">
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1">
+          <title>Lifecycle | Davai</title>
+          <meta name="description" content="Append versus mutate rules and the Janitor consolidation workflow for Davai memory.">
+          <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: https:; script-src 'self' 'unsafe-inline'">
+          <link rel="canonical" href="https://systembydave.com/systembydave/lifecycle.html">
+          <meta name="robots" content="index,follow">
+          <meta name="theme-color" content="#f7f8f5">
+          <meta property="og:title" content="Lifecycle | Davai">
+          <meta property="og:description" content="Append versus mutate rules and the Janitor consolidation workflow for Davai memory.">
+          <meta property="og:type" content="website">
+          <meta property="og:site_name" content="System by Dave">
+          <meta property="og:url" content="https://systembydave.com/systembydave/lifecycle.html">
+          <meta property="og:image" content="https://systembydave.com/systembydave/assets/img/04_folder_tree.svg">
+          <meta property="og:image:alt" content="Davai memory architecture folder tree diagram">
+          <meta name="twitter:card" content="summary_large_image">
+          <meta name="twitter:title" content="Lifecycle | Davai">
+          <meta name="twitter:description" content="Append versus mutate rules and the Janitor consolidation workflow for Davai memory.">
+          <meta name="twitter:image" content="https://systembydave.com/systembydave/assets/img/04_folder_tree.svg">
+          <link rel="icon" type="image/svg+xml" href="favicon.svg">
+          <link rel="stylesheet" href="assets/styles.css">
+        </head>
+        <body>
+          <a class="skip-link" href="#main">Skip to content</a>
+          <header class="site-header">
+            <div class="shell header-inner">
+              <a class="brand" href="index.html" aria-label="Davai overview">
+                <span class="brand-mark" aria-hidden="true">D</span>
+                <span>
+                  <strong>systembydave.com</strong>
+                  <small>Davai memory architecture</small>
+                </span>
+              </a>
+              <nav class="primary-nav" aria-label="Primary navigation">
+                <a class="nav-link" href="index.html">Overview</a>
+<a class="nav-link" href="routing.html">Routing</a>
+<a class="nav-link is-active" href="lifecycle.html" aria-current="page">Lifecycle</a>
+<a class="nav-link" href="index-md.html">INDEX.md</a>
+<a class="nav-link" href="sync.html">Sync</a>
+<a class="nav-link" href="voice.html">Voice</a>
+<a class="nav-link" href="implementation.html">Build</a>
+              </nav>
+            </div>
+            <div class="layer-rail">
+              <nav class="shell layer-strip" aria-label="Memory layers">
+                <a class="layer-chip layer-red" href="layers/identity.html"><span>1</span>Identity</a>
+<a class="layer-chip layer-teal" href="layers/semantic.html"><span>2</span>Semantic</a>
+<a class="layer-chip layer-blue" href="layers/episodic.html"><span>3</span>Episodic</a>
+<a class="layer-chip layer-gold" href="layers/procedural.html"><span>4</span>Procedural</a>
+<a class="layer-chip layer-violet" href="layers/reference.html"><span>5</span>Reference</a>
+<a class="layer-chip layer-green" href="layers/working.html"><span>6</span>Working</a>
+<a class="layer-chip layer-orange" href="layers/decisions.html"><span>7</span>Decisions</a>
+              </nav>
+            </div>
+          </header>
+          <main id="main">
+            <section class="band hero-small">
+          <div class="shell">
+            <p class="eyebrow">Lifecycle</p>
+            <h1>Append, mutate, consolidate</h1>
+            <p class="lede">The layer determines how memory is allowed to change. Some records are living documents; others are evidence that should only gain corrections.</p>
+          </div>
+        </section>
+
+        <section class="band band-white">
+          <div class="shell split">
+            <div>
+              <h2>Append vs mutate matrix</h2>
+              <table class="spec-table">
+                <thead><tr><th>Layer</th><th>Default</th><th>Rule</th></tr></thead>
+                <tbody><tr><th scope="row">Identity</th><td>Mutate with evidence</td><td>Append only when preserving correction history matters.</td></tr><tr><th scope="row">Semantic</th><td>Mutate stable fact</td><td>Append dated evidence in episodic before major changes.</td></tr><tr><th scope="row">Episodic</th><td>Append by default</td><td>Never silently rewrite event history.</td></tr><tr><th scope="row">Procedural</th><td>Mutate current runbook</td><td>Link major process shifts to decisions.</td></tr><tr><th scope="row">Reference</th><td>Mutate verification metadata</td><td>Append source change notes when provenance matters.</td></tr><tr><th scope="row">Working</th><td>Mutate or delete</td><td>Consolidate before expiry.</td></tr><tr><th scope="row">Decisions</th><td>Supersede</td><td>Do not rewrite accepted rationale.</td></tr></tbody>
+              </table>
+            </div>
+            <figure class="diagram">
+  <img src="assets/img/07_drift_audit.svg" alt="Janitor consolidation walkthrough." loading="lazy">
+  <figcaption>The Janitor turns contradiction into a linked correction path.</figcaption>
+</figure>
+          </div>
+        </section>
+
+        <section class="band">
+          <div class="shell">
+            <div class="section-heading">
+              <p class="eyebrow">Janitor</p>
+              <h2>Consolidation loop</h2>
+            </div>
+            <div class="check-grid">
+              <article><strong>Find drift.</strong><span>Compare current semantic, procedural, and identity notes against episodic evidence and decisions.</span></article>
+              <article><strong>Resolve conflict.</strong><span>Pick the winning record, create corrections, and mark superseded decisions when needed.</span></article>
+              <article><strong>Validate links.</strong><span>Check cross-layer links, reference locations, and INDEX.md entries.</span></article>
+              <article><strong>Record telemetry.</strong><span>Log routing corrections so the next router learns from actual failures.</span></article>
+            </div>
+          </div>
+        </section>
+          </main>
+          <footer class="site-footer">
+            <div class="shell footer-grid">
+              <div>
+                <strong>Davai</strong>
+                <p>A static reference for routing memory into identity, semantic, episodic, procedural, reference, working, and decision layers.</p>
+              </div>
+              <div>
+                <span>Generated 2026-05-05</span>
+                <a href="routing.html">Routing protocol</a>
+                <a href="implementation.html">Implementation guide</a>
+              </div>
+            </div>
+          </footer>
+        </body>
+        </html>

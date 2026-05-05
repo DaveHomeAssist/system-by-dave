@@ -1,0 +1,119 @@
+<!doctype html>
+        <html lang="en">
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1">
+          <title>Implementation Guide | Davai</title>
+          <meta name="description" content="Ten-step implementation guide for building the Davai memory architecture from zero.">
+          <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: https:; script-src 'self' 'unsafe-inline'">
+          <link rel="canonical" href="https://systembydave.com/systembydave/implementation.html">
+          <meta name="robots" content="index,follow">
+          <meta name="theme-color" content="#f7f8f5">
+          <meta property="og:title" content="Implementation Guide | Davai">
+          <meta property="og:description" content="Ten-step implementation guide for building the Davai memory architecture from zero.">
+          <meta property="og:type" content="website">
+          <meta property="og:site_name" content="System by Dave">
+          <meta property="og:url" content="https://systembydave.com/systembydave/implementation.html">
+          <meta property="og:image" content="https://systembydave.com/systembydave/assets/img/04_folder_tree.svg">
+          <meta property="og:image:alt" content="Davai memory architecture folder tree diagram">
+          <meta name="twitter:card" content="summary_large_image">
+          <meta name="twitter:title" content="Implementation Guide | Davai">
+          <meta name="twitter:description" content="Ten-step implementation guide for building the Davai memory architecture from zero.">
+          <meta name="twitter:image" content="https://systembydave.com/systembydave/assets/img/04_folder_tree.svg">
+          <link rel="icon" type="image/svg+xml" href="favicon.svg">
+          <link rel="stylesheet" href="assets/styles.css">
+        </head>
+        <body>
+          <a class="skip-link" href="#main">Skip to content</a>
+          <header class="site-header">
+            <div class="shell header-inner">
+              <a class="brand" href="index.html" aria-label="Davai overview">
+                <span class="brand-mark" aria-hidden="true">D</span>
+                <span>
+                  <strong>systembydave.com</strong>
+                  <small>Davai memory architecture</small>
+                </span>
+              </a>
+              <nav class="primary-nav" aria-label="Primary navigation">
+                <a class="nav-link" href="index.html">Overview</a>
+<a class="nav-link" href="routing.html">Routing</a>
+<a class="nav-link" href="lifecycle.html">Lifecycle</a>
+<a class="nav-link" href="index-md.html">INDEX.md</a>
+<a class="nav-link" href="sync.html">Sync</a>
+<a class="nav-link" href="voice.html">Voice</a>
+<a class="nav-link is-active" href="implementation.html" aria-current="page">Build</a>
+              </nav>
+            </div>
+            <div class="layer-rail">
+              <nav class="shell layer-strip" aria-label="Memory layers">
+                <a class="layer-chip layer-red" href="layers/identity.html"><span>1</span>Identity</a>
+<a class="layer-chip layer-teal" href="layers/semantic.html"><span>2</span>Semantic</a>
+<a class="layer-chip layer-blue" href="layers/episodic.html"><span>3</span>Episodic</a>
+<a class="layer-chip layer-gold" href="layers/procedural.html"><span>4</span>Procedural</a>
+<a class="layer-chip layer-violet" href="layers/reference.html"><span>5</span>Reference</a>
+<a class="layer-chip layer-green" href="layers/working.html"><span>6</span>Working</a>
+<a class="layer-chip layer-orange" href="layers/decisions.html"><span>7</span>Decisions</a>
+              </nav>
+            </div>
+          </header>
+          <main id="main">
+            <section class="band hero-small">
+          <div class="shell">
+            <p class="eyebrow">Implementation guide</p>
+            <h1>Build Davai from zero</h1>
+            <p class="lede">A practical sequence for moving from empty folders to routed memory, generated indexes, sync promotion, and Janitor consolidation.</p>
+          </div>
+        </section>
+
+        <section class="band band-white">
+          <div class="shell">
+            <div class="step-grid">
+              <article><span>1</span><strong>Create the seven folders</strong><p>identity/, semantic/, episodic/YYYY/MM/, procedural/, reference/, working/, decisions/.</p></article><article><span>2</span><strong>Define frontmatter</strong><p>Use typed metadata before content conventions drift.</p></article><article><span>3</span><strong>Write PROTOCOL.md</strong><p>Codify routing by retrieval question and decomposition rules.</p></article><article><span>4</span><strong>Seed identity and voice</strong><p>Add durable user and response-style constraints first.</p></article><article><span>5</span><strong>Add INDEX.md generation</strong><p>Walk canonical folders and emit a flat registry.</p></article><article><span>6</span><strong>Create intake flow</strong><p>Route mixed input into working first, then split durable records.</p></article><article><span>7</span><strong>Add Janitor checks</strong><p>Find stale working notes, broken links, missing verification, and drift.</p></article><article><span>8</span><strong>Wire canonical sync</strong><p>Use the bare repo and post-receive hook described in sync.html.</p></article><article><span>9</span><strong>Instrument routing</strong><p>Log input, chosen layer, confidence, and correction events.</p></article><article><span>10</span><strong>Benchmark and publish</strong><p>Replace synthesized charts with harness output before performance claims.</p></article>
+            </div>
+          </div>
+        </section>
+
+        <section class="band">
+          <div class="shell split">
+            <div>
+              <h2>Operational walkthroughs</h2>
+              <p>The storyboard asset includes scripts for two videos: routing mixed intake and running a Janitor drift audit. The scripts currently assume a <code>mem</code> CLI, which is a production gap until the real tooling name is substituted or the CLI exists.</p>
+              <a class="button button-secondary" href="assets/img/08_storyboard_scripts.md">Open storyboard scripts</a>
+            </div>
+            <figure class="diagram">
+  <img src="assets/img/06_intake_decomposition.svg" alt="Intake decomposition from one mixed note to routed memory files." loading="lazy">
+  <figcaption>The build should prove decomposition before adding automation.</figcaption>
+</figure>
+          </div>
+        </section>
+
+        <section class="band band-ink">
+          <div class="shell">
+            <div class="section-heading">
+              <p class="eyebrow">Before canonical publication</p>
+              <h2>Close the production gaps</h2>
+            </div>
+            <div class="gap-grid">
+              <article><strong>Benchmark harness.</strong><span>Generate charts from real retrieval and router measurements across all seven trigger classes.</span></article>
+              <article><strong>Frontmatter linter.</strong><span>Fail commits that omit required fields once the schema is in active use.</span></article>
+              <article><strong>Cross-layer link checker.</strong><span>Run during Janitor and during post-receive promotion.</span></article>
+              <article><strong>Routing telemetry.</strong><span>Persist decisions and correction labels to train a better router later.</span></article>
+            </div>
+          </div>
+        </section>
+          </main>
+          <footer class="site-footer">
+            <div class="shell footer-grid">
+              <div>
+                <strong>Davai</strong>
+                <p>A static reference for routing memory into identity, semantic, episodic, procedural, reference, working, and decision layers.</p>
+              </div>
+              <div>
+                <span>Generated 2026-05-05</span>
+                <a href="routing.html">Routing protocol</a>
+                <a href="implementation.html">Implementation guide</a>
+              </div>
+            </div>
+          </footer>
+        </body>
+        </html>
