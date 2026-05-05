@@ -319,7 +319,11 @@ def home_page() -> str:
           <div class="shell hero-grid">
             <div class="hero-copy">
               <p class="eyebrow">Canonical routing reference</p>
-              <h1>Davai memory architecture</h1>
+              <h1 class="hero-title">
+                <span>Davai</span>
+                <span>memory</span>
+                <span>architecture</span>
+              </h1>
               <p class="lede">A seven-layer static guide for deciding where memory belongs, how it should change over time, and how operators keep current state separate from evidence and architectural commitments.</p>
               <div class="hero-actions">
                 <a class="button button-primary" href="{rel_url(current, 'implementation.html')}">Build from zero</a>
@@ -1408,7 +1412,18 @@ def styles_css() -> str:
           font-size: clamp(3.3rem, 9vw, 7.5rem);
           line-height: 0.92;
           letter-spacing: 0;
-          overflow-wrap: break-word;
+          overflow-wrap: normal;
+          word-break: normal;
+        }
+
+        .hero-title {
+          max-width: none;
+        }
+
+        .hero-title span {
+          display: block;
+          width: fit-content;
+          max-width: 100%;
         }
 
         .hero-small h1,

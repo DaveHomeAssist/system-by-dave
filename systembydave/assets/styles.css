@@ -277,7 +277,18 @@ h1 {
   font-size: clamp(3.3rem, 9vw, 7.5rem);
   line-height: 0.92;
   letter-spacing: 0;
-  overflow-wrap: break-word;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+
+.hero-title {
+  max-width: none;
+}
+
+.hero-title span {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
 }
 
 .hero-small h1,
