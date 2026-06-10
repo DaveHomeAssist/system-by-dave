@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-06-10
+
+- Added a private, unlisted sub-page at `/flooring-contract-review.html` — a plain-English review of the Robertson family flooring contract (12 priority-ranked issues, annotated full-contract view, ready-to-send email). Self-contained page (own inline styles/JS, system fonts).
+- Marked the page `noindex, nofollow` and added a `robots.txt` Disallow; deliberately kept it out of `sitemap.xml` and the site nav, since it contains personal details and is meant to be shared by link only.
+
 ## 2026-05-05
 
 - Added the Davai memory architecture static reference bundle at `/systembydave/`, including seven layer pages, routing, lifecycle, INDEX.md, sync, voice, and implementation guides.

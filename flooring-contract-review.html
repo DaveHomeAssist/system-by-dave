@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: https:; script-src 'self' 'unsafe-inline'; base-uri 'self'; form-action 'none'">
+<title>Flooring Contract Review — 56 Harding Ave</title>
+<meta name="description" content="A practical, plain-English walkthrough of one residential flooring contract — 12 priority-ranked issues and the specific changes to request before signing. Not legal advice.">
+<link rel="canonical" href="https://systembydave.com/flooring-contract-review.html">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#f6f5f2">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="System by Dave">
+<meta property="og:title" content="Flooring Contract Review">
+<meta property="og:description" content="A plain-English walkthrough of a residential flooring contract — 12 priority-ranked issues and the changes to request before signing. Not legal advice.">
+<meta property="og:url" content="https://systembydave.com/flooring-contract-review.html">
+<meta property="og:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<meta property="og:image:width" content="1024">
+<meta property="og:image:height" content="412">
+<meta property="og:image:alt" content="System by Dave preview banner">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Flooring Contract Review">
+<meta name="twitter:description" content="A plain-English walkthrough of a residential flooring contract — 12 priority-ranked issues and the changes to request before signing. Not legal advice.">
+<meta name="twitter:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<link rel="icon" href="svg/system_by_dave_logo_rust.svg" type="image/svg+xml">
+<style>
+  :root{ color-scheme:light;
+    --bg:#f6f5f2; --card:#ffffff; --ink:#1c1b19; --muted:#6b6862; --line:#e6e3dd;
+    --crit:#c0392b; --crit-bg:#fbeae7;
+    --high:#d35400; --high-bg:#fcecdf;
+    --med:#b8860b; --med-bg:#faf3da;
+    --low:#6b7280; --low-bg:#eef0f2;
+    --good:#2e7d52; --good-bg:#e6f3ec;
+    --legal:#3b5b8c; --legal-bg:#eaf0fb;
+    --shadow:0 1px 2px rgba(0,0,0,.05),0 6px 20px rgba(0,0,0,.05);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:ui-sans-serif,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.6;font-size:16px;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:920px;margin:0 auto;padding:32px 20px 80px}
+  h1,h2,h3{font-family:ui-sans-serif,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.2;margin:0}
+  a{color:var(--legal)}
+
+  /* Header */
+  .head{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:28px;box-shadow:var(--shadow);margin-bottom:20px}
+  .eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600}
+  h1{font-size:28px;margin:6px 0 4px}
+  .sub{color:var(--muted);font-size:15px}
+  .banner{margin-top:18px;background:var(--crit-bg);border:1px solid #f0c9c2;color:var(--crit);border-radius:10px;padding:12px 14px;font-weight:600;font-size:14px}
+  .banner span{font-weight:400;color:#7a3b32}
+
+  /* Fact grid */
+  .facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-top:18px}
+  .fact{background:var(--card);padding:14px 16px}
+  .fact .k{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+  .fact .v{font-size:18px;font-weight:600;font-family:ui-sans-serif,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;margin-top:2px}
+
+  /* How to use */
+  .howto{background:var(--legal-bg);border:1px solid #cdd9f0;border-radius:14px;padding:20px 22px;margin-bottom:22px}
+  .howto h2{font-size:17px;color:var(--legal);margin-bottom:8px}
+  .howto p{margin:6px 0;font-size:14.5px}
+  .howto ul{margin:8px 0 0;padding-left:18px;font-size:14.5px}
+  .howto li{margin:4px 0}
+
+  /* Filter bar */
+  .filterbar{position:sticky;top:0;z-index:20;background:rgba(246,245,242,.92);backdrop-filter:blur(8px);padding:12px 0;margin-bottom:14px;border-bottom:1px solid var(--line)}
+  .filterbar-inner{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .flabel{font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.08em;margin-right:2px}
+  .chip{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:6px 13px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--ink);transition:.15s}
+  .chip:hover{border-color:#c9c5bd}
+  .chip.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .chip .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle}
+
+  /* Section heads */
+  .sec-title{font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700;margin:30px 4px 12px}
+
+  /* Issue cards */
+  .issue{background:var(--card);border:1px solid var(--line);border-left-width:5px;border-radius:14px;padding:20px 22px;margin-bottom:14px;box-shadow:var(--shadow)}
+  .issue[data-pri="crit"]{border-left-color:var(--crit)}
+  .issue[data-pri="high"]{border-left-color:var(--high)}
+  .issue[data-pri="med"]{border-left-color:var(--med)}
+  .issue[data-pri="low"]{border-left-color:var(--low)}
+  .issue-top{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:4px}
+  .num{font-family:ui-sans-serif,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-weight:700;color:var(--muted);font-size:14px}
+  .issue h3{font-size:19px;flex:1;min-width:200px}
+  .tags{display:flex;gap:6px;flex-wrap:wrap}
+  .badge{font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:4px 9px;border-radius:6px}
+  .b-crit{background:var(--crit-bg);color:var(--crit)}
+  .b-high{background:var(--high-bg);color:var(--high)}
+  .b-med{background:var(--med-bg);color:var(--med)}
+  .b-low{background:var(--low-bg);color:var(--low)}
+  .b-src{background:#f0eee9;color:var(--muted)}
+  .row{margin-top:12px}
+  .row .lab{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:3px}
+  .quote{border-left:3px solid var(--line);padding:6px 0 6px 14px;color:#46443f;font-style:italic;font-size:14.5px;background:linear-gradient(90deg,#faf9f7,transparent)}
+  .ask{background:#f4f8f5;border:1px solid #d6e7dd;border-radius:9px;padding:11px 14px;font-size:14.5px}
+  .ask strong{color:var(--good)}
+  .legalnote{background:var(--legal-bg);border:1px solid #cdd9f0;border-radius:9px;padding:11px 14px;font-size:14px;margin-top:12px}
+  .legalnote .lab{color:var(--legal)}
+  .disc{font-size:15px;margin-top:6px}
+
+  /* Good list */
+  .good{background:var(--good-bg);border:1px solid #c7e3d3;border-radius:14px;padding:20px 22px;margin-bottom:14px}
+  .good h3{font-size:18px;color:var(--good);margin-bottom:8px}
+  .good ul{margin:0;padding-left:18px;columns:2;column-gap:28px;font-size:14.5px}
+  .good li{margin:5px 0;break-inside:avoid}
+
+  /* Pricing */
+  .price{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin-bottom:14px;box-shadow:var(--shadow)}
+  .price h3{font-size:18px;margin-bottom:6px}
+  .pricebig{font-family:ui-sans-serif,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:30px;font-weight:700}
+  .pricebig small{font-size:14px;color:var(--muted);font-weight:500}
+
+  /* Checklist */
+  .check{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px;box-shadow:var(--shadow);margin-bottom:14px}
+  .check h3{font-size:18px;margin-bottom:12px}
+  .clist{list-style:none;margin:0;padding:0}
+  .clist li{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px dashed var(--line);font-size:14.5px}
+  .clist li:last-child{border-bottom:0}
+  .box{width:18px;height:18px;border:2px solid var(--high);border-radius:5px;flex:none;margin-top:2px}
+
+  /* Email */
+  .email{background:#1c1b19;color:#f1efe9;border-radius:14px;padding:22px;margin-bottom:14px}
+  .email h3{color:#fff;font-size:18px;margin-bottom:4px}
+  .email .meta{font-size:13px;color:#a9a59c;margin-bottom:14px}
+  .email pre{white-space:pre-wrap;font-family:ui-sans-serif,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:14px;line-height:1.7;margin:0;color:#e7e4dd}
+  .copybtn{margin-top:14px;background:#f1efe9;color:#1c1b19;border:0;border-radius:8px;padding:9px 16px;font-weight:600;font-family:inherit;font-size:14px;cursor:pointer}
+  .copybtn:active{transform:scale(.98)}
+
+  .disclaim{font-size:12.5px;color:var(--muted);margin-top:24px;text-align:center;line-height:1.5}
+  .hidden{display:none !important}
+
+  /* View toggle */
+  .viewtoggle{display:flex;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:6px;margin-bottom:18px;box-shadow:var(--shadow)}
+  .viewtoggle button{flex:1;border:0;background:transparent;font-family:ui-sans-serif,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-weight:600;font-size:14.5px;padding:11px;border-radius:8px;cursor:pointer;color:var(--muted);transition:.15s}
+  .viewtoggle button.active{background:var(--ink);color:#fff}
+
+  /* Annotated document */
+  .doc{max-width:1040px;margin:0 auto;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:36px 40px;box-shadow:var(--shadow)}
+  .doc-title{font-family:ui-sans-serif,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:22px;font-weight:700;text-align:center;margin-bottom:4px}
+  .doc-meta{text-align:center;color:var(--muted);font-size:13px;margin-bottom:8px}
+  .doc-hint{text-align:center;color:var(--muted);font-size:12.5px;font-style:italic;margin-bottom:22px}
+  .pagemark{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:700;border-top:1px dashed var(--line);padding-top:14px;margin:30px 0 12px;clear:both}
+  .doc h4{font-family:ui-sans-serif,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:15px;margin:18px 0 4px;color:var(--ink)}
+  .doc p{font-size:14px;color:#33312d;margin:9px 0}
+  .clause{overflow:visible}
+
+  /* Margin comment */
+  .cmt{float:right;clear:right;width:300px;margin:4px 0 16px 30px;border-radius:10px;padding:12px 14px;font-size:12.5px;line-height:1.5;background:var(--low-bg);border:1px solid var(--line);border-left:4px solid var(--low)}
+  .cmt[data-pri="crit"]{background:var(--crit-bg);border-left-color:var(--crit)}
+  .cmt[data-pri="high"]{background:var(--high-bg);border-left-color:var(--high)}
+  .cmt[data-pri="med"]{background:var(--med-bg);border-left-color:var(--med)}
+  .cmt[data-pri="low"]{background:var(--low-bg);border-left-color:var(--low)}
+  .cmt-h{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+  .cmt-n{font-family:ui-sans-serif,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-weight:700;font-size:12px;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;flex:none}
+  .cmt[data-pri="crit"] .cmt-n{background:var(--crit)}
+  .cmt[data-pri="high"] .cmt-n{background:var(--high)}
+  .cmt[data-pri="med"] .cmt-n{background:var(--med)}
+  .cmt[data-pri="low"] .cmt-n{background:var(--low)}
+  .cmt-t{font-weight:700;font-size:12.5px;font-family:ui-sans-serif,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.25}
+  .cmt .ask2{margin-top:7px;padding-top:7px;border-top:1px solid rgba(0,0,0,.08)}
+  .cmt .ask2 b{font-weight:700}
+  .cmt.legalc{border-left-color:var(--legal);background:var(--legal-bg)}
+  .cmt.legalc .cmt-n{background:var(--legal)}
+  .cmt .vtag{display:inline-block;font-size:9.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--legal);background:#fff;border:1px solid #cdd9f0;border-radius:4px;padding:1px 5px;margin-left:auto}
+
+  /* Inline highlight */
+  .mark{border-radius:3px;padding:0 2px;border-bottom:2px solid;cursor:default}
+  .mark[data-pri="crit"]{background:var(--crit-bg);border-color:var(--crit)}
+  .mark[data-pri="high"]{background:var(--high-bg);border-color:var(--high)}
+  .mark[data-pri="med"]{background:var(--med-bg);border-color:var(--med)}
+  .mark[data-pri="low"]{background:var(--low-bg);border-color:var(--low)}
+  .mark-n{font-size:10px;font-weight:700;vertical-align:super;margin-left:1px;color:var(--muted)}
+
+  @media (max-width:860px){
+    .cmt{float:none;width:auto;margin:10px 0 18px}
+    .doc{padding:24px 18px}
+  }
+  @media print{
+    .viewtoggle{display:none}
+    #view-doc.hidden,#view-summary.hidden{display:block !important}
+    .cmt{float:none;width:auto}
+  }
+
+  @media (max-width:560px){
+    .good ul{columns:1}
+    h1{font-size:24px}
+    .wrap{padding:20px 14px 60px}
+  }
+  @media print{
+    body{background:#fff}
+    .filterbar,.copybtn{display:none}
+    .issue,.head,.good,.price,.check,.email,.howto{box-shadow:none;break-inside:avoid}
+    .email{background:#fff;color:#000;border:1px solid #ccc}
+    .email h3,.email pre{color:#000}
+    .email .meta{color:#444}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HEADER -->
+  <div class="head">
+    <div class="eyebrow">Practical Contract Review · Not Legal Advice</div>
+    <h1>Flooring Contract Review</h1>
+    <div class="sub">Tom Robertson (Owner) &nbsp;·&nbsp; Willow Floors LLC (Contractor) &nbsp;·&nbsp; 56 Harding Ave, Oaklyn, NJ &nbsp;·&nbsp; Effective June 8, 2026 &nbsp;·&nbsp; Reviewed June 10, 2026</div>
+
+    <div class="facts">
+      <div class="fact"><div class="k">Total</div><div class="v">$6,021.43</div></div>
+      <div class="fact"><div class="k">Deposit (40%)</div><div class="v">$2,408.57</div></div>
+      <div class="fact"><div class="k">On completion (60%)</div><div class="v">$3,612.86</div></div>
+      <div class="fact"><div class="k">Scope</div><div class="v">935 sq ft LVP</div></div>
+      <div class="fact"><div class="k">Installed price</div><div class="v">$6.44/sq ft</div></div>
+    </div>
+
+    <div class="banner">Status: contract NOT yet signed by Tom. <span>Willow Floors (Marcello Santos) signed 06/10/2026; the Owner signature line is still blank. This is the moment to ask for changes, before signing and before any deposit.</span></div>
+  </div>
+
+  <!-- HOW TO USE -->
+  <div class="howto">
+    <h2>How to use this page</h2>
+    <p>This is a plain-English walkthrough of one flooring contract, written so the whole family can read it together. Every item lists what the contract actually says, why it matters, and the specific change to ask for.</p>
+    <ul>
+      <li><strong>Mom &amp; Dad:</strong> the red and orange items at the top are the ones worth a phone call before signing. The green section near the bottom is what the contract already gets right.</li>
+      <li><strong>Veronica:</strong> blue boxes marked <em>Legal note</em> flag the clauses where your read matters most (arbitration, warranty, remedies). Everything is sourced to the contract text so you can react without needing to be here.</li>
+      <li>Use the filter buttons to show only the high-priority items, or print the whole thing (it is formatted to print cleanly).</li>
+    </ul>
+    <p style="margin-bottom:0"><strong>One caveat up front:</strong> this is a practical review, not legal advice. Veronica's read carries more weight than mine on the legal clauses.</p>
+  </div>
+
+  <!-- VIEW TOGGLE -->
+  <div class="viewtoggle">
+    <button id="tab-summary" class="active">📋&nbsp; Summary Review</button>
+    <button id="tab-doc">📄&nbsp; Annotated Contract</button>
+  </div>
+
+  <div id="view-summary">
+
+  <!-- FILTER -->
+  <div class="filterbar">
+    <div class="filterbar-inner">
+      <span class="flabel">Show</span>
+      <button class="chip active" data-filter="all">All issues</button>
+      <button class="chip" data-filter="crit"><span class="dot" style="background:var(--crit)"></span>Critical</button>
+      <button class="chip" data-filter="high"><span class="dot" style="background:var(--high)"></span>High</button>
+      <button class="chip" data-filter="med"><span class="dot" style="background:var(--med)"></span>Medium</button>
+      <button class="chip" data-filter="low"><span class="dot" style="background:var(--low)"></span>Low</button>
+    </div>
+  </div>
+
+  <div class="sec-title">The Issues — 12 items, highest priority first</div>
+  <div id="issues">
+
+  <!-- 1 -->
+  <div class="issue" data-pri="crit">
+    <div class="issue-top">
+      <span class="num">01</span>
+      <h3>The contract isn't signed yet — use that</h3>
+      <div class="tags"><span class="badge b-crit">Critical</span></div>
+    </div>
+    <div class="disc">Willow Floors already signed on June 10. Tom has not. That ordering is actually good news: every change below is far easier to get <em>before</em> a signature and a deposit than after. Once Tom signs and the 40% is paid, leverage drops sharply. The single most important move is to treat the items in this document as a short list to settle first, then sign.</div>
+    <div class="row"><div class="lab">What to do</div><div class="ask"><strong>Don't sign or pay anything yet.</strong> Send the requested changes (a ready-to-send email is at the bottom of this page), get them in writing, then sign.</div></div>
+  </div>
+
+  <!-- 2 -->
+  <div class="issue" data-pri="high">
+    <div class="issue-top">
+      <span class="num">02</span>
+      <h3>The actual flooring product is never named</h3>
+      <div class="tags"><span class="badge b-high">High</span><span class="badge b-src">Both reviews</span></div>
+    </div>
+    <div class="row"><div class="lab">What the contract says</div><div class="quote">"…approximately 935 square feet of Luxury Vinyl Plank (LVP) flooring, 5.2 mm thickness with a 22 mil wear layer…"</div></div>
+    <div class="disc">That is a spec, not a product. No manufacturer, no collection, no color, no style, no SKU, and no product warranty are named. Two different floors can both be "5.2mm / 22 mil" and look and wear nothing alike. As written, the contractor could substitute a cheaper look-alike and still be technically compliant. This is the biggest gap in the whole agreement and the easiest to fix.</div>
+    <div class="row"><div class="lab">Ask for</div><div class="ask"><strong>Attach the exact brand, collection, color, and SKU</strong> to the contract, plus the manufacturer's product warranty sheet. If a sample was shown, reference it by name.</div></div>
+  </div>
+
+  <!-- 3 -->
+  <div class="issue" data-pri="high">
+    <div class="issue-top">
+      <span class="num">03</span>
+      <h3>No completion date</h3>
+      <div class="tags"><span class="badge b-high">High</span><span class="badge b-src">Both reviews</span></div>
+    </div>
+    <div class="row"><div class="lab">What the contract says</div><div class="quote">"This Contract will begin on the Effective Date and shall remain in effect until completion of the Services…"</div></div>
+    <div class="disc">There is a start date but no end date, no number of working days, and no maximum duration. "Until completion" gives the contractor unlimited time with no remedy if the job drags. For a roughly 935 sq ft single-product install, this is normally a few days of work.</div>
+    <div class="row"><div class="lab">Ask for</div><div class="ask"><strong>"Work to be substantially completed within ___ calendar days of start,"</strong> unless delayed by an approved change order or force majeure.</div></div>
+  </div>
+
+  <!-- 4 -->
+  <div class="issue" data-pri="high">
+    <div class="issue-top">
+      <span class="num">04</span>
+      <h3>Weak warranty + only a 30-day window to report defects</h3>
+      <div class="tags"><span class="badge b-high">High</span><span class="badge b-src">Both reviews</span></div>
+    </div>
+    <div class="row"><div class="lab">What the contract says</div><div class="quote">"…if the Owner identifies and notifies the Contractor any deficiencies within 30 days of completion of the Contract." &nbsp;The Warranty section otherwise only promises a generic "workmanlike manner" standard — no stated length.</div></div>
+    <div class="disc">Flooring problems frequently appear after 30 days: planks separating, edges lifting, hollow or bouncy spots, quarter-round pulling away as the room's humidity cycles. A 30-day reporting window can expire before the most common defects even show up. There is no stated labor-warranty length at all.</div>
+    <div class="row"><div class="lab">Ask for</div><div class="ask"><strong>A 1-year workmanship warranty</strong> on labor and installation, plus pass-through of the manufacturer's material warranty — and language that the <strong>warranty period (not the 30 days) governs defect correction.</strong></div></div>
+    <div class="legalnote"><div class="lab" style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;margin-bottom:3px">Legal note for Veronica</div>The "Correction of Work" clause and the Warranty clause work against each other here: a broad workmanship standard is undercut by a hard 30-day notice cap. Worth deciding whether to tie correction obligations to the warranty period instead, and whether NJ's implied warranty of workmanlike performance adds a backstop regardless of the written term.</div>
+  </div>
+
+  <!-- 5 -->
+  <div class="issue" data-pri="high">
+    <div class="issue-top">
+      <span class="num">05</span>
+      <h3>Subfloor repairs are undefined and open-ended</h3>
+      <div class="tags"><span class="badge b-high">High</span><span class="badge b-src">Both reviews</span></div>
+    </div>
+    <div class="row"><div class="lab">What the contract says</div><div class="quote">"Perform minor subfloor repairs in up to three (3) identified sections… Any additional concealed subfloor damage discovered after removal… will be considered additional work and will require customer approval before proceeding."</div></div>
+    <div class="disc">Two soft spots here. First, a "section" is never defined — square footage, dimensions, material, or repair method. Second, concealed damage is open-ended extra work at an unstated price, discovered only after the old floor is up, when stopping is least convenient. Requiring approval is good, but with no agreed rate the approval happens under pressure. This is the classic change-order trap.</div>
+    <div class="row"><div class="lab">Ask for</div><div class="ask"><strong>Define what's included</strong> (square footage or dimensions per section), <strong>and lock a capped or per-square-foot rate</strong> for any concealed repairs found on removal, so a surprise can't become a blank check.</div></div>
+  </div>
+
+  <!-- 6 -->
+  <div class="issue" data-pri="high">
+    <div class="issue-top">
+      <span class="num">06</span>
+      <h3>License and insurance not verified in the document</h3>
+      <div class="tags"><span class="badge b-high">High</span><span class="badge b-src">Both reviews</span></div>
+    </div>
+    <div class="row"><div class="lab">What the contract says</div><div class="quote">"Upon request, the Contractor will provide evidence of appropriate insurance…" &nbsp;No NJ Home Improvement Contractor registration number and no 3-day cancellation notice appear anywhere.</div></div>
+    <div class="disc">New Jersey requires most home-improvement contractors to be registered with the state (a "HIC" number) and to include certain consumer protections. Insurance is only promised "upon request" rather than proven up front. None of this means Willow Floors is doing anything wrong — but it should be verified on paper before money changes hands, not afterward.</div>
+    <div class="row"><div class="lab">Ask for</div><div class="ask"><strong>The NJ HIC registration number and certificates of insurance</strong> (general liability + workers' comp) delivered before the deposit.</div></div>
+    <div class="legalnote"><div class="lab" style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;margin-bottom:3px">Legal note for Veronica</div>NJ's Consumer Fraud Act / Home Improvement Practices regs (N.J.A.C. 13:45A-16) require HIC registration and a written 3-day right to cancel on home-improvement contracts. Neither appears in this document. Worth confirming current registration status and whether the missing cancellation notice is material.</div>
+  </div>
+
+  <!-- 7 -->
+  <div class="issue" data-pri="med">
+    <div class="issue-top">
+      <span class="num">07</span>
+      <h3>No acclimation or manufacturer-spec install language</h3>
+      <div class="tags"><span class="badge b-med">Medium</span><span class="badge b-src">Alt review</span></div>
+    </div>
+    <div class="disc">Most LVP manufacturers require the planks to acclimate to the room and, in some cases, a moisture check on the subfloor before installation. Skipping it is a common cause of the lifting and gapping problems noted above — and skipping it can also void the material warranty. The contract says nothing about following the manufacturer's instructions.</div>
+    <div class="row"><div class="lab">Ask for</div><div class="ask"><strong>"Installation performed per the manufacturer's written requirements, including acclimation and moisture testing where required."</strong></div></div>
+  </div>
+
+  <!-- 8 -->
+  <div class="issue" data-pri="med">
+    <div class="issue-top">
+      <span class="num">08</span>
+      <h3>No cleanup or disposal standard</h3>
+      <div class="tags"><span class="badge b-med">Medium</span><span class="badge b-src">Both reviews</span></div>
+    </div>
+    <div class="disc">The contract never says the crew will haul away the old flooring, remove debris, or leave the house broom-clean. Disposal of the torn-out floor is also not clearly anyone's job. Usually a contractor handles this, but "usually" isn't in writing here.</div>
+    <div class="row"><div class="lab">Ask for</div><div class="ask"><strong>Removal and disposal of old flooring and debris, with the home left broom-clean</strong> on completion.</div></div>
+  </div>
+
+  <!-- 9 -->
+  <div class="issue" data-pri="med">
+    <div class="issue-top">
+      <span class="num">09</span>
+      <h3>Furniture-moving scope is vague</h3>
+      <div class="tags"><span class="badge b-med">Medium</span><span class="badge b-src">Alt review</span></div>
+    </div>
+    <div class="row"><div class="lab">What the contract says</div><div class="quote">"Remove and reinstall furniture as reasonably necessary…" &nbsp;Specialty heavy items (pianos, safes, aquariums, pool tables, unlisted appliances) are explicitly excluded.</div></div>
+    <div class="disc">"Reasonably necessary" is subjective and a likely day-of disagreement. It's worth knowing in advance exactly what the crew moves versus what the family needs to clear themselves — beds, dressers, china cabinets, washer/dryer, refrigerator.</div>
+    <div class="row"><div class="lab">Ask for</div><div class="ask"><strong>A short written list</strong> of what the crew will move and what the homeowner must clear beforehand.</div></div>
+  </div>
+
+  <!-- 10 -->
+  <div class="issue" data-pri="med">
+    <div class="issue-top">
+      <span class="num">10</span>
+      <h3>Payment method changes the price</h3>
+      <div class="tags"><span class="badge b-med">Medium</span><span class="badge b-src">Practical</span></div>
+    </div>
+    <div class="row"><div class="lab">What the contract says</div><div class="quote">"Accepted payment methods: Cash, Credit card (2.99% per transaction), Bank transfer (1% per transaction), Personal Check (no fee)."</div></div>
+    <div class="disc">On a $6,021.43 job, paying by credit card adds about $180, and bank transfer about $60. A personal check is free. Nothing to negotiate here — just a choice that saves real money.</div>
+    <div class="row"><div class="lab">Recommendation</div><div class="ask"><strong>Pay the deposit and the balance by personal check.</strong></div></div>
+  </div>
+
+  <!-- 11 -->
+  <div class="issue" data-pri="low">
+    <div class="issue-top">
+      <span class="num">11</span>
+      <h3>Mandatory binding arbitration</h3>
+      <div class="tags"><span class="badge b-low">Low–High</span><span class="badge b-src">Reviews disagree</span></div>
+    </div>
+    <div class="row"><div class="lab">What the contract says</div><div class="quote">"Any controversies or disputes… shall be resolved by binding arbitration in accordance with the then-current Commercial Arbitration Rules of the American Arbitration Association. The arbitrator(s) shall not have the authority to… award punitive damages."</div></div>
+    <div class="disc">This clause waives the right to go to normal court or a jury, limits appeals, and bars punitive damages. It's the most owner-unfriendly section in the contract. <strong>The two reviews split on how hard to push:</strong> one treats it as the single biggest legal concern and would try to strike it; the other rates it low because AAA <em>Commercial</em> arbitration can cost more than a $6,000 dispute is worth, and contractors rarely agree to remove it — so pushing hard risks the easier wins. A practical middle path satisfies both: don't fight to delete it, just carve out small claims.</div>
+    <div class="row"><div class="lab">Ask for</div><div class="ask"><strong>Preserve small-claims court for both parties</strong> (e.g., "either party may bring a claim within the jurisdictional limit of small-claims court"), or strike arbitration entirely if they'll agree.</div></div>
+    <div class="legalnote"><div class="lab" style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;margin-bottom:3px">Legal note for Veronica</div>This is the clause where your judgment should override the priority label. Points worth weighing: AAA <em>Commercial</em> (vs. Consumer) rules and fee schedule on a ~$6k matter; the punitive-damages and modification carve-outs; interaction with the attorneys'-fees "prevailing party" clause; and whether a small-claims carve-out is the right ask versus deletion. Your call on whether this is a deal-shaper or a live-with-it.</div>
+  </div>
+
+  <!-- 12 -->
+  <div class="issue" data-pri="low">
+    <div class="issue-top">
+      <span class="num">12</span>
+      <h3>Drafting errors in the Termination clause</h3>
+      <div class="tags"><span class="badge b-low">Low</span><span class="badge b-src">Practical</span></div>
+    </div>
+    <div class="row"><div class="lab">What the contract says</div><div class="quote">"…with or without cause, upon 30 to the other party… Upon Early Termination, the Provider shall receive a pro-rated payment…"</div></div>
+    <div class="disc">Two sloppy spots. "Upon 30 to the other party" is missing a word (almost certainly "30 days' written notice"). And "Provider" appears where the contract's defined party is "Contractor." Neither is dangerous, but a contract with blanks like this should be tightened before signing, and it's a free ask to fold in with the others.</div>
+    <div class="row"><div class="lab">Ask for</div><div class="ask"><strong>Correct to "upon 30 days' written notice,"</strong> and change "Provider" to "Contractor."</div></div>
+  </div>
+
+  </div><!-- /issues -->
+
+  <!-- GOOD -->
+  <div class="sec-title">What the contract already gets right</div>
+  <div class="good">
+    <h3>Fair / standard terms — no change needed</h3>
+    <ul>
+      <li>Reasonably detailed written scope of work</li>
+      <li>Change orders require written, signed approval</li>
+      <li>Majority of payment (60%) due at completion, not up front</li>
+      <li>Contractor indemnifies the owner</li>
+      <li>Permits are included in the project price</li>
+      <li>Owner inspection rights during and after install</li>
+      <li>Concealed subfloor work needs owner approval</li>
+      <li>New Jersey governing law</li>
+    </ul>
+  </div>
+
+  <!-- PRICING -->
+  <div class="sec-title">Is the price fair?</div>
+  <div class="price">
+    <h3>Pricing sanity check</h3>
+    <div class="pricebig">$6.44<small> / sq ft installed</small></div>
+    <div class="disc">$6,021.43 ÷ 935 sq ft, covering material, labor, ~280 ft of quarter-round, the bullnose transition, furniture moving, and delivery. That lands within the normal range for mid-grade LVP installation in southern New Jersey. The price is <strong>not obviously high</strong> — the concerns above are about <em>terms</em>, not cost.</div>
+  </div>
+
+  <!-- CHECKLIST -->
+  <div class="sec-title">Before signing — verify on paper</div>
+  <div class="check">
+    <h3>Documents to collect first</h3>
+    <ul class="clist">
+      <li><span class="box"></span><div>Exact flooring brand, collection, color, SKU + manufacturer warranty sheet</div></li>
+      <li><span class="box"></span><div>NJ Home Improvement Contractor registration number</div></li>
+      <li><span class="box"></span><div>Certificate of general liability insurance</div></li>
+      <li><span class="box"></span><div>Certificate of workers' compensation insurance</div></li>
+      <li><span class="box"></span><div>Written completion timeframe (calendar days)</div></li>
+      <li><span class="box"></span><div>Written 1-year workmanship warranty</div></li>
+      <li><span class="box"></span><div>Capped / per-sq-ft rate for concealed subfloor repair</div></li>
+      <li><span class="box"></span><div>Confirmation of cleanup, debris removal, and old-floor disposal</div></li>
+    </ul>
+  </div>
+
+  <!-- EMAIL -->
+  <div class="sec-title">Ready-to-send email</div>
+  <div class="email">
+    <h3>Pre-signature note to the contractor</h3>
+    <div class="meta">From Tom → Marcello Santos, Willow Floors LLC. Friendly, leads with "ready to move forward," bundles the key asks into one message.</div>
+    <pre id="emailtext">Subject: A few clarifications before I sign — 56 Harding Ave flooring
+
+Hi Marcello,
+
+Thanks for putting the contract together. I'm ready to move forward and just want a few items clarified or adjusted before I sign and send the deposit. Most are small; a couple just protect both of us if something comes up mid-job.
+
+1. Flooring product. Please attach the exact manufacturer, collection, color, and SKU of the LVP to the contract, along with the product warranty sheet, so we're both clear on the specific floor going in.
+
+2. Completion timeframe. The contract has a start date but no end date. Please add an estimated substantial-completion date (for example, X working days from start).
+
+3. Workmanship warranty. The contract gives 30 days after completion to report defects. I'd like to add a 1-year warranty on workmanship plus pass-through of the manufacturer's material warranty, since installation issues often show up after the first month.
+
+4. Subfloor repairs. I understand concealed damage found after removal is extra work needing my approval. Before I sign, please give me a capped or per-square-foot rate for that work so there are no open-ended surprises.
+
+5. License and insurance. Please send your New Jersey Home Improvement Contractor registration number and certificates of insurance (general liability and workers' comp) before the deposit. Standard due diligence on my end.
+
+6. Cleanup. Please confirm in writing that removal and disposal of the old flooring and debris is included and the house will be left broom-clean.
+
+7. Termination wording. The termination clause reads "upon 30 to the other party" — I think it's meant to say "30 days' written notice." Worth correcting (it also says "Provider" where I believe it means "Contractor").
+
+One more small item: would you be open to preserving small-claims court for both of us as an alternative to arbitration? Happy to keep the rest of that clause as-is.
+
+Once these are squared away I'll sign and get the deposit to you by check. Glad to hop on a quick call if that's easier.
+
+Thanks,
+Tom Robertson
+56 Harding Ave, Oaklyn, NJ 08107</pre>
+    <button class="copybtn" id="copybtn">Copy email text</button>
+  </div>
+
+  </div><!-- /view-summary -->
+
+  <!-- ANNOTATED CONTRACT VIEW -->
+  <div id="view-doc" class="hidden">
+   <div class="doc">
+    <div class="doc-title">Flooring Contract — Full Text</div>
+    <div class="doc-meta">Transcribed from the four-page contract forwarded June 10, 2026. Reproduced in full for reference.</div>
+    <div class="doc-hint">Highlighted passages have a numbered comment in the margin (they stack below the text on narrow screens). Numbers match the Summary Review.</div>
+
+    <div class="pagemark">Page 1</div>
+
+    <h4>Flooring Contract</h4>
+    <p>This Flooring Contract ("Contract") is made effective as of June 8, 2026, by and between Tom Robertson of 56 Harding Ave, Oaklyn, New Jersey 08107 ("Owner"), and Willow Floors LLC of 7150 N Park Dr - suite 410, Pennsauken, New Jersey 08109 ("Contractor").</p>
+    <p><strong>Description of Services.</strong> Beginning on June 8, 2026 ("Effective Date"), the Contractor will provide to the Owner the following flooring services (collectively, "Services"):</p>
+
+    <h4>Scope of Work</h4>
+    <div class="clause">
+      <aside class="cmt" data-pri="high">
+        <div class="cmt-h"><span class="cmt-n">2</span><span class="cmt-t">Product not identified</span></div>
+        Only a thickness and wear layer are given. No brand, collection, color, or SKU, so a different look-alike floor could be substituted and still comply.
+        <div class="ask2"><b>Ask:</b> attach exact brand, collection, color, SKU + the manufacturer warranty.</div>
+      </aside>
+      <p>Contractor shall furnish labor and materials necessary to complete the following work: Supply and install <span class="mark" data-pri="high">approximately 935 square feet of Luxury Vinyl Plank (LVP) flooring, 5.2 mm thickness with a 22 mil wear layer<span class="mark-n">2</span></span>, in the designated areas of the residence. Include standard material waste necessary for proper installation. Prepare the existing floor surface as required for installation of the new flooring.</p>
+    </div>
+    <div class="clause">
+      <aside class="cmt" data-pri="med">
+        <div class="cmt-h"><span class="cmt-n">9</span><span class="cmt-t">Furniture scope vague</span></div>
+        "Reasonably necessary" is subjective and a likely day-of disagreement.
+        <div class="ask2"><b>Ask:</b> a written list of what the crew moves vs. what the family clears first.</div>
+      </aside>
+      <p><span class="mark" data-pri="med">Remove and reinstall furniture as reasonably necessary<span class="mark-n">9</span></span> to complete the flooring installation. Customer is responsible for removing all fragile, valuable, electronic, and personal items prior to the start of work.</p>
+    </div>
+    <div class="clause">
+      <aside class="cmt" data-pri="high">
+        <div class="cmt-h"><span class="cmt-n">5</span><span class="cmt-t">Subfloor repairs open-ended</span></div>
+        A "section" is never defined, and concealed damage is extra work at an unstated price, discovered after the old floor is up. Classic change-order trap.
+        <div class="ask2"><b>Ask:</b> define what's included (sq ft) and cap the rate for concealed repairs.</div>
+      </aside>
+      <p><span class="mark" data-pri="high">Perform minor subfloor repairs in up to three (3) identified sections that were visible and noted at the time of the estimate. Any additional concealed subfloor damage discovered after removal of the existing flooring will be considered additional work and will require customer approval before proceeding.<span class="mark-n">5</span></span> Supply and install approximately 280 linear feet of 3/4" quarter-round molding to provide a finished appearance where required. Supply and install one (1) color-matched vinyl overlap bullnose transition/step nosing as specified. Provide delivery, freight, and transportation of materials to the project site.</p>
+    </div>
+    <div class="clause">
+      <aside class="cmt" data-pri="med">
+        <div class="cmt-h"><span class="cmt-n">8</span><span class="cmt-t">No cleanup standard</span></div>
+        Nothing here says the crew hauls away the old floor, removes debris, or leaves the house broom-clean.
+        <div class="ask2"><b>Ask:</b> confirm disposal of old flooring/debris and broom-clean finish in writing.</div>
+      </aside>
+      <p><strong>Exclusions:</strong> Painting or caulking of moldings unless specifically listed in this agreement. Repairs to structural framing, joists, or subfloor areas beyond the three sections included above. Moving specialty items such as pianos, safes, aquariums, pool tables, appliances not specifically identified, or other excessively heavy items. Any work not specifically described in this Scope of Work.</p>
+    </div>
+
+    <h4>Scope of Work</h4>
+    <p>The Contractor shall provide all labor and materials and perform all work necessary for the completion of the flooring services specified in this Contract. Any drawings and specifications signed by both the Owner and the Contractor are hereby made a part of this Contract. The Contractor hereby agrees to provide services and materials for the installation of flooring on an ongoing basis during the term of this agreement, for the Owner in accordance with the Owner's specifications in the Description of Services clause. Said installation will take place at the following address: 56 Harding Ave, Oaklyn, New Jersey 08107.</p>
+
+    <h4>Change Orders</h4>
+    <p>The parties may at any time modify the scope of the Services by including desired changes in a written "change order" that explains the changes and the adjustment to the payment for the Services that will result from such changes. Such a change order shall become effective when signed and dated by both parties.</p>
+
+    <h4>Payment</h4>
+    <p>Payment shall be made to Willow Floors LLC, 7150 N Park Dr - suite 410, Pennsauken, New Jersey 08109. Tom Robertson agrees to pay the sum of $6,021.43 as follows:</p>
+    <p>Event/Milestone/Date: Upon sign the contract — Payment Amount: $2,408.57<br>Event/Milestone/Date: Upon finish the contract — Payment Amount: $3,612.86</p>
+
+    <div class="pagemark">Page 2</div>
+
+    <p>If any invoice is not paid when due, interest will be added to and payable on all overdue amounts at 10.00 percent per year, or the maximum percentage allowed under applicable laws, whichever is less. The Owner shall pay all costs of collection, including, without limitation, reasonable attorney fees.</p>
+    <p>In addition to any other right or remedy provided by law, if the Owner fails to pay for the Services when due, the Contractor has the option to treat such failure to pay as a material breach of this Contract, and may cancel this Contract and/or seek legal remedies.</p>
+    <div class="clause">
+      <aside class="cmt" data-pri="med">
+        <div class="cmt-h"><span class="cmt-n">10</span><span class="cmt-t">Payment method = price</span></div>
+        Card adds ~$180, bank transfer ~$60, check is free on this total.
+        <div class="ask2"><b>Do:</b> pay the deposit and balance by personal check.</div>
+      </aside>
+      <p><span class="mark" data-pri="med">Accepted payment methods: Cash, Credit card (2.99% per transaction), Bank transfer (1% per transaction), Personal Check (no fee).<span class="mark-n">10</span></span></p>
+    </div>
+
+    <h4>Term</h4>
+    <div class="clause">
+      <aside class="cmt" data-pri="high">
+        <div class="cmt-h"><span class="cmt-n">3</span><span class="cmt-t">No completion date</span></div>
+        Start date but no end date, no number of days, no maximum. "Until completion" gives unlimited time with no remedy.
+        <div class="ask2"><b>Ask:</b> substantially complete within ___ calendar days of start.</div>
+      </aside>
+      <p>This Contract will begin on the Effective Date and shall <span class="mark" data-pri="high">remain in effect until completion of the Services<span class="mark-n">3</span></span> ("Termination Date"), unless terminated earlier as outlined in the Termination section below. Either party may alter the Termination Date by mutual written consent.</p>
+    </div>
+
+    <h4>Termination</h4>
+    <div class="clause">
+      <aside class="cmt" data-pri="low">
+        <div class="cmt-h"><span class="cmt-n">12</span><span class="cmt-t">Drafting errors</span></div>
+        "Upon 30 to the other party" is missing a word, and "Provider" should be "Contractor" (the defined party).
+        <div class="ask2"><b>Ask:</b> correct to "upon 30 days' written notice"; fix "Provider" → "Contractor".</div>
+      </aside>
+      <p>Either party may end this Contract prior to the Termination Date, with or without cause, <span class="mark" data-pri="low">upon 30 to the other party<span class="mark-n">12</span></span> ("Early Termination"). Upon Early Termination, the <span class="mark" data-pri="low">Provider<span class="mark-n">12</span></span> shall receive a pro-rated payment for the Services rendered prior to the Early Termination Date. An email notice to the other party will suffice.</p>
+    </div>
+
+    <h4>Relationship of Parties</h4>
+    <p>The Contractor is an independent contractor with respect to its relationship to the Owner. Neither the Contractor nor the Contractor's employees are or shall be deemed for any purpose to be employees of the Owner. The Owner shall not be responsible to the Contractor, the Contractor's employees, or any governing body for any payroll taxes related to the performance of the Services. Upon request, the Contractor will provide evidence of appropriate insurance coverage for workers' compensation and general liability insurance.</p>
+
+    <h4>Permits</h4>
+    <p>The Contractor shall apply for and obtain such permits and regulatory approvals as may be required by the local municipal/county government, the cost thereof shall be included as part of the project price.</p>
+
+    <h4>Insurance</h4>
+    <div class="clause">
+      <aside class="cmt legalc" data-pri="high">
+        <div class="cmt-h"><span class="cmt-n">6</span><span class="cmt-t">Verify license &amp; insurance</span><span class="vtag">For V</span></div>
+        No NJ Home Improvement Contractor (HIC) registration number and no 3-day cancellation notice appear anywhere; insurance is only "upon request."
+        <div class="ask2"><b>Ask:</b> HIC number + certificates of insurance before the deposit. <b>V:</b> see N.J.A.C. 13:45A-16 — is the missing cancellation notice material?</div>
+      </aside>
+      <p><span class="mark" data-pri="high">The Contractor shall maintain general liability, workers' compensation, and builder's risk insurance.<span class="mark-n">6</span></span></p>
+    </div>
+
+    <h4>Warranty</h4>
+    <div class="clause">
+      <aside class="cmt" data-pri="med">
+        <div class="cmt-h"><span class="cmt-n">7</span><span class="cmt-t">No acclimation / spec language</span></div>
+        Only a generic "workmanlike" standard, with no stated length and no requirement to follow the manufacturer's install instructions (acclimation, moisture testing) — skipping which can void the material warranty.
+        <div class="ask2"><b>Ask:</b> "installed per manufacturer's written requirements, including acclimation and moisture testing."</div>
+      </aside>
+      <p><span class="mark" data-pri="med">The Contractor shall provide its services and meet its obligations under this Contract in a timely and workmanlike manner, using knowledge and recommendations for performing the services which meet generally acceptable standards in the Contractor's community and region, and will provide a standard of care equal to, or superior to, care used by service providers similar to the Contractor on similar projects.<span class="mark-n">7</span></span></p>
+    </div>
+
+    <h4>Inspection Rights</h4>
+    <p>The Owner has the right to inspect the flooring installation upon completion, and as installation progresses, to ensure the services provided conform to the Contract and are acceptable under industry standards. Any requests for third-party inspection should be made in writing and attached to this Contract.</p>
+
+    <h4>Indemnification</h4>
+    <p>The Contractor agrees to indemnify and hold the Owner harmless from all claims, losses, expenses, fees, including attorney fees, costs, and judgments that may be asserted against the Owner that result from the acts or omissions of the Contractor and/or the Contractor's employees, agents, or representatives.</p>
+
+    <h4>Default</h4>
+    <p>The occurrence of any of the following shall constitute a material default under this Contract: (a) The failure to make a required payment when due. (b) The insolvency or bankruptcy of either party. (c) The subjection of any of either party's property to any levy, seizure, general assignment for the benefit of creditors, application or sale for or by any creditor or government agency. (d) The failure to make available or deliver the Services in the time and manner provided for in this Contract.</p>
+
+    <h4>Remedies</h4>
+    <p>In addition to any and all other rights a party may have available according to law, if a party defaults by failing to substantially perform any provision, term or condition of this Contract (including without limitation the failure to make a monetary payment when due), the other party may terminate the Contract by providing written notice to the defaulting party. This notice shall describe with sufficient detail the nature of the default. The party</p>
+
+    <div class="pagemark">Page 3</div>
+
+    <p>receiving such notice shall have 30 days from the effective date of such notice to cure the default(s). Unless waived by a party providing notice, the failure to cure the default(s) within such time period shall result in the automatic termination of this Contract.</p>
+
+    <h4>Correction of Work</h4>
+    <div class="clause">
+      <aside class="cmt legalc" data-pri="high">
+        <div class="cmt-h"><span class="cmt-n">4</span><span class="cmt-t">30-day defect window</span><span class="vtag">For V</span></div>
+        Common flooring defects (lifting, separation, hollow spots) often appear after 30 days. The broad workmanship standard above is undercut by this hard notice cap, and no warranty length is stated.
+        <div class="ask2"><b>Ask:</b> 1-year workmanship warranty + manufacturer pass-through; the warranty period, not 30 days, governs correction. <b>V:</b> does NJ's implied warranty backstop this?</div>
+      </aside>
+      <p>The Contractor shall promptly correct any work that is found to be defective, incomplete, or not in accordance with the requirements of this Contract, <span class="mark" data-pri="high">if the Owner identifies and notifies the Contractor any deficiencies within 30 days of completion of the Contract.<span class="mark-n">4</span></span> The Contractor agrees to make the necessary corrections at their own expense within a reasonable time after receiving notice from the Owner.</p>
+    </div>
+
+    <h4>Force Majeure</h4>
+    <p>If performance of this Contract or any obligation under this Contract is prevented, restricted, or interfered with by causes beyond either party's reasonable control ("Force Majeure"), and if the party unable to carry out its obligations gives the other party prompt written notice of such event, then the obligations of the party invoking this provision shall be suspended to the extent necessary by such event. The term Force Majeure shall include, without limitation, acts of God, plague, epidemic, pandemic, outbreaks of infectious disease or any other public health crisis, including quarantine or other employee restrictions, fire, explosion, vandalism, storm or other similar occurrence, orders or acts of military or civil authority, or by national emergencies, insurrections, riots, or wars, or strikes, lock-outs, work stoppages, or other labor disputes, or supplier failures. The excused party shall use reasonable efforts under the circumstances to avoid or remove such causes of non-performance and shall proceed to perform with reasonable dispatch whenever such causes are removed or ceased. An act or omission shall be deemed within the reasonable control of a party if committed, omitted, or caused by such party, or its employees, officers, agents, or affiliates.</p>
+
+    <h4>Arbitration</h4>
+    <div class="clause">
+      <aside class="cmt legalc" data-pri="low">
+        <div class="cmt-h"><span class="cmt-n">11</span><span class="cmt-t">Binding arbitration</span><span class="vtag">For V</span></div>
+        Waives court and jury, limits appeals, bars punitive damages. The two reviews split on how hard to push; AAA <em>Commercial</em> rules can cost more than a $6k dispute is worth.
+        <div class="ask2"><b>Ask:</b> preserve small-claims court for both parties, or strike arbitration. <b>V:</b> your call whether this is a deal-shaper — Commercial vs. Consumer rules, the fee schedule, and the prevailing-party fees clause all matter.</div>
+      </aside>
+      <p>Any controversies or disputes arising out of or relating to this Contract shall be <span class="mark" data-pri="low">resolved by binding arbitration in accordance with the then-current Commercial Arbitration Rules of the American Arbitration Association.<span class="mark-n">11</span></span> The parties shall select a mutually acceptable arbitrator knowledgeable about issues relating to the subject matter of this Contract. In the event the parties are unable to agree to such a selection, each party will select an arbitrator, and the two arbitrators in turn shall select a third arbitrator, all three of whom shall preside jointly over the matter. The arbitration shall take place at a location that is reasonably centrally located between the parties, or otherwise mutually agreed upon by the parties. All documents, materials, and information in the possession of each party that are in any way relevant to the dispute shall be made available to the other party for review and copying no later than 30 days after the notice of arbitration is served. The <span class="mark" data-pri="low">arbitrator(s) shall not have the authority to modify any provision of this Contract or to award punitive damages.<span class="mark-n">11</span></span> The arbitrator(s) shall have the power to issue mandatory orders and restraint orders in connection with the arbitration. The decision rendered by the arbitrator(s) shall be final and binding on the parties, and judgment may be entered in conformity with the decision in any court having jurisdiction. The agreement to arbitration shall be specifically enforceable under the prevailing arbitration law. During the continuance of any arbitration proceeding, the parties shall continue to perform their respective obligations under this Contract.</p>
+    </div>
+
+    <h4>Attorneys' Fees</h4>
+    <p>If a legal suit, action, or proceeding, including arbitration, is brought by any party to enforce or to interpret any provision of this Contract, the prevailing party will be entitled to recover, in addition to any other damages awarded, all costs associated with conducting the suit, action, proceeding, or arbitration and reasonable attorneys' fees.</p>
+
+    <h4>Entire Agreement</h4>
+    <p>This Contract contains the entire agreement of the parties with respect to the subject matter contained herein. No other promises, warranties, representations, agreements, or understandings, whether oral or written, exist concerning this subject matter. This Contract supersedes any previous or simultaneous oral or written promises, warranties, representations, agreements, or conditions between the parties.</p>
+
+    <h4>Severability</h4>
+    <p>If any provision of this Contract shall be held to be invalid, illegal, or unenforceable for any reason, the remaining provisions shall continue to be valid and enforceable. If a court finds that any provision of this Contract is invalid, illegal, or unenforceable, but that by limiting such provision, it will become valid, legal, and enforceable, then such provision shall be deemed to be written, construed, and enforced as so limited.</p>
+
+    <h4>Amendment</h4>
+    <p>This Contract may be modified, amended, or supplemented only if the changes are made in writing and signed by all parties.</p>
+
+    <h4>Governing Law</h4>
+    <p>This Contract shall be governed by the laws of New Jersey.</p>
+
+    <h4>Notice</h4>
+    <p>Any notice or communication required or permitted under this Contract shall be sufficiently given if</p>
+
+    <div class="pagemark">Page 4</div>
+
+    <p>delivered in person or by certified mail, return receipt requested, to the address set forth in the opening paragraph or to such other address as one party may have furnished to the other in writing.</p>
+
+    <h4>Waiver</h4>
+    <p>The failure of either party to enforce any provision of this Contract shall not be construed as a waiver or limitation of that party's right to subsequently enforce and compel strict compliance with every provision of this Contract.</p>
+
+    <h4>Signatories</h4>
+    <div class="clause">
+      <aside class="cmt" data-pri="crit">
+        <div class="cmt-h"><span class="cmt-n">1</span><span class="cmt-t">Not signed yet — use that</span></div>
+        Willow Floors signed 06/10/2026; the Owner line is blank. Every change is far easier to get before a signature and deposit.
+        <div class="ask2"><b>Do:</b> settle the items above, get them in writing, then sign.</div>
+      </aside>
+      <p>This Contract shall be signed on behalf of Tom Robertson by Tom Robertson, Homeowner, and on behalf of Willow Floors LLC by Marcello Santos, Manager, and effective as of the date first above written.</p>
+      <p><strong>The Owner: Tom Robertson</strong><br><span class="mark" data-pri="crit">_______________________________ &nbsp; ____________<br>Tom Robertson, Homeowner &nbsp; Date &nbsp;(blank — unsigned)<span class="mark-n">1</span></span></p>
+      <p><strong>The Contractor: Willow Floors LLC</strong><br>marcello santos &nbsp; 06/10/2026<br>_______________________________ &nbsp; ____________<br>Marcello Santos, Manager &nbsp; Date</p>
+    </div>
+
+   </div>
+  </div><!-- /view-doc -->
+
+  <div class="disclaim">
+    This document is a practical, plain-language review of one flooring contract for the Robertson family. It is not legal advice and does not create an attorney-client relationship. For binding legal judgment on the arbitration, warranty, and remedies clauses, rely on a licensed attorney.<br>Prepared June 10, 2026 · 56 Harding Ave, Oaklyn, NJ 08107
+  </div>
+
+</div>
+
+<script>
+  // Priority filter
+  var chips = document.querySelectorAll('.chip');
+  var issues = document.querySelectorAll('#issues .issue');
+  chips.forEach(function(c){
+    c.addEventListener('click', function(){
+      chips.forEach(function(x){x.classList.remove('active')});
+      c.classList.add('active');
+      var f = c.getAttribute('data-filter');
+      issues.forEach(function(it){
+        if(f==='all' || it.getAttribute('data-pri')===f){ it.classList.remove('hidden'); }
+        else { it.classList.add('hidden'); }
+      });
+    });
+  });
+  // View toggle
+  var tabS = document.getElementById('tab-summary'), tabD = document.getElementById('tab-doc');
+  var viewS = document.getElementById('view-summary'), viewD = document.getElementById('view-doc');
+  function show(which){
+    var doc = which==='doc';
+    viewD.classList.toggle('hidden',!doc); viewS.classList.toggle('hidden',doc);
+    tabD.classList.toggle('active',doc); tabS.classList.toggle('active',!doc);
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+  tabS.addEventListener('click',function(){show('summary')});
+  tabD.addEventListener('click',function(){show('doc')});
+
+  // Copy email
+  var btn = document.getElementById('copybtn');
+  btn.addEventListener('click', function(){
+    var t = document.getElementById('emailtext').innerText;
+    navigator.clipboard.writeText(t).then(function(){
+      var o = btn.textContent; btn.textContent = 'Copied ✓';
+      setTimeout(function(){ btn.textContent = o; }, 1800);
+    }).catch(function(){ btn.textContent = 'Select the text above to copy'; });
+  });
+</script>
+</body>
+</html>
