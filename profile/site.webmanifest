@@ -1,0 +1,15 @@
+{
+  "name": "Dave Robertson — Live Event & Broadcast Technology",
+  "short_name": "Dave Robertson",
+  "description": "Live event and broadcast technology professional based in Oaklyn, NJ, working throughout the Philadelphia region.",
+  "lang": "en-US",
+  "start_url": "/profile/",
+  "scope": "/profile/",
+  "display": "standalone",
+  "background_color": "#0d0e11",
+  "theme_color": "#0d0e11",
+  "icons": [
+    { "src": "assets/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "assets/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
