@@ -110,6 +110,19 @@
   .price h3{font-size:18px;margin-bottom:6px}
   .pricebig{font-family:ui-sans-serif,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:30px;font-weight:700}
   .pricebig small{font-size:14px;color:var(--muted);font-weight:500}
+  /* Material vs labor split */
+  .split{margin-top:16px;border-top:1px dashed var(--line);padding-top:14px}
+  .splitlab{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:8px}
+  .split .bar{display:flex;height:28px;border-radius:8px;overflow:hidden;border:1px solid var(--line);margin-bottom:12px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .split .seg{display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;white-space:nowrap;padding:0 6px}
+  .split .seg-mat{background:var(--med)}
+  .split .seg-lab{background:var(--legal)}
+  .split .rows{display:grid;gap:8px}
+  .split .r{display:flex;align-items:center;gap:10px;font-size:14px}
+  .split .r .sw{width:12px;height:12px;border-radius:3px;flex:none}
+  .split .r .amt{margin-left:auto;font-weight:700;font-family:ui-sans-serif,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  .split .r .amt small{font-weight:500;color:var(--muted);font-size:12px}
+  .splitnote{font-size:12.5px;color:var(--muted);margin-top:10px}
 
   /* Checklist */
   .check{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px;box-shadow:var(--shadow);margin-bottom:14px}
@@ -212,6 +225,7 @@
       <div class="fact"><div class="k">On completion (60%)</div><div class="v">$3,612.86</div></div>
       <div class="fact"><div class="k">Scope</div><div class="v">935 sq ft LVP</div></div>
       <div class="fact"><div class="k">Installed price</div><div class="v">$6.44/sq ft</div></div>
+      <div class="fact"><div class="k">Selected floor</div><div class="v">EF Legendary, 6005 Orthodox</div></div>
     </div>
 
     <div class="banner">Status: contract NOT yet signed by Tom. <span>Willow Floors (Marcello Santos) signed 06/10/2026; the Owner signature line is still blank. This is the moment to ask for changes, before signing and before any deposit.</span></div>
@@ -267,12 +281,12 @@
   <div class="issue" data-pri="high">
     <div class="issue-top">
       <span class="num">02</span>
-      <h3>The actual flooring product is never named</h3>
+      <h3>Product is now identified, but the contract still does not match it</h3>
       <div class="tags"><span class="badge b-high">High</span><span class="badge b-src">Both reviews</span></div>
     </div>
     <div class="row"><div class="lab">What the contract says</div><div class="quote">"…approximately 935 square feet of Luxury Vinyl Plank (LVP) flooring, 5.2 mm thickness with a 22 mil wear layer…"</div></div>
-    <div class="disc">That is a spec, not a product. No manufacturer, no collection, no color, no style, no SKU, and no product warranty are named. Two different floors can both be "5.2mm / 22 mil" and look and wear nothing alike. As written, the contractor could substitute a cheaper look-alike and still be technically compliant. This is the biggest gap in the whole agreement and the easiest to fix.</div>
-    <div class="row"><div class="lab">Ask for</div><div class="ask"><strong>Attach the exact brand, collection, color, and SKU</strong> to the contract, plus the manufacturer's product warranty sheet. If a sample was shown, reference it by name.</div></div>
+    <div class="disc">The selected floor is now known: EF Legendary, color 6005 Orthodox, 7" x 48", 5.2 mm rigid SPC core with a 20 mil wear layer and attached 1.0 mm IXPE pad. Two follow-ups remain. First, the contract still does not name it, so a look-alike could still be substituted. Second, the contract states a 22 mil wear layer but the actual product is 20 mil. The Legendary line is offered in 12 mil and 20 mil wear layers and 22 mil is not a listed option, which confirms the contract figure is an error. 20 mil is a durable premium-residential / light-commercial grade, so this is not a quality downgrade, but the written spec and the chosen product disagree.</div>
+    <div class="row"><div class="lab">Ask for</div><div class="ask"><strong>Name this exact product in the contract</strong> (brand, collection, color, size, 5.2 mm / 20 mil) <strong>and correct the wear-layer figure from 22 mil to 20 mil</strong> so the spec matches what is being installed.</div></div>
   </div>
 
   <!-- 3 -->
@@ -295,7 +309,7 @@
       <div class="tags"><span class="badge b-high">High</span><span class="badge b-src">Both reviews</span></div>
     </div>
     <div class="row"><div class="lab">What the contract says</div><div class="quote">"…if the Owner identifies and notifies the Contractor any deficiencies within 30 days of completion of the Contract." &nbsp;The Warranty section otherwise only promises a generic "workmanlike manner" standard — no stated length.</div></div>
-    <div class="disc">Flooring problems frequently appear after 30 days: planks separating, edges lifting, hollow or bouncy spots, quarter-round pulling away as the room's humidity cycles. A 30-day reporting window can expire before the most common defects even show up. There is no stated labor-warranty length at all.</div>
+    <div class="disc">Flooring problems frequently appear after 30 days: planks separating, edges lifting, hollow or bouncy spots, quarter-round pulling away as the room's humidity cycles. A 30-day reporting window can expire before the most common defects even show up. There is no stated labor-warranty length at all. The selected EF product carries a strong manufacturer material warranty (lifetime residential, lifetime waterproof, lifetime pet stains). That covers the flooring itself, but it is not a labor warranty, so a contractor workmanship warranty (target 1 year) is still needed on top of it.</div>
     <div class="row"><div class="lab">Ask for</div><div class="ask"><strong>A 1-year workmanship warranty</strong> on labor and installation, plus pass-through of the manufacturer's material warranty — and language that the <strong>warranty period (not the 30 days) governs defect correction.</strong></div></div>
     <div class="legalnote"><div class="lab" style="font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;margin-bottom:3px">Legal note for Veronica</div>The "Correction of Work" clause and the Warranty clause work against each other here: a broad workmanship standard is undercut by a hard 30-day notice cap. Worth deciding whether to tie correction obligations to the warranty period instead, and whether NJ's implied warranty of workmanlike performance adds a backstop regardless of the written term.</div>
   </div>
@@ -414,12 +428,33 @@
     </ul>
   </div>
 
+  <!-- SECOND OPINION -->
+  <div class="sec-title">Second opinion / alternate bid</div>
+  <div class="price">
+    <h3>Getz estimate this Friday</h3>
+    <div class="disc">Getz, a hardwood contractor, is giving a second estimate at the house on Friday, June 12, 2026. The installer, Jeff, is attending the walkthrough himself, which lowers the risk of mid-job change orders (see Issue 5). Make sure every contractor quotes the SAME finished floor (EF Legendary, 6005 Orthodox, 5.2 mm / 20 mil) so the prices are comparable. A separate <a href="#estimator-questions" title="Estimator question sheet, to be linked once it is published">estimator question sheet</a> (link to be added) covers what to ask.</div>
+  </div>
+
   <!-- PRICING -->
   <div class="sec-title">Is the price fair?</div>
   <div class="price">
     <h3>Pricing sanity check</h3>
     <div class="pricebig">$6.44<small> / sq ft installed</small></div>
     <div class="disc">$6,021.43 ÷ 935 sq ft, covering material, labor, ~280 ft of quarter-round, the bullnose transition, furniture moving, and delivery. That lands within the normal range for mid-grade LVP installation in southern New Jersey. The price is <strong>not obviously high</strong> — the concerns above are about <em>terms</em>, not cost.</div>
+    <div class="split">
+      <div class="splitlab">Material vs labor split</div>
+      <div class="bar">
+        <div class="seg seg-mat" style="width:40.2%">Material 40%</div>
+        <div class="seg seg-lab" style="width:59.8%">Labor + extras 60%</div>
+      </div>
+      <div class="rows">
+        <div class="r"><span class="sw" style="background:var(--ink)"></span><span>Installed</span><span class="amt">$6.44<small> / sq ft</small></span></div>
+        <div class="r"><span class="sw" style="background:var(--med)"></span><span>Material (retail)</span><span class="amt">~$2.59<small> / sq ft</small></span></div>
+        <div class="r"><span class="sw" style="background:var(--legal)"></span><span>Implied labor + extras</span><span class="amt">~$3.85<small> / sq ft</small></span></div>
+      </div>
+      <div class="splitnote">Labor + extras covers the quarter-round, bullnose transition, subfloor repair, furniture moving, delivery, overhead and profit.</div>
+      <div class="disc">This split is in the normal range and is a sanity check, not exact accounting. Contractors buy material below retail, so Willow's true material cost is likely under $2.59 / sq ft, which means a bit more of the price is labor and overhead. Nothing here looks padded.</div>
+    </div>
   </div>
 
   <!-- CHECKLIST -->
@@ -491,11 +526,11 @@ Tom Robertson
     <h4>Scope of Work</h4>
     <div class="clause">
       <aside class="cmt" data-pri="high">
-        <div class="cmt-h"><span class="cmt-n">2</span><span class="cmt-t">Product not identified</span></div>
-        Only a thickness and wear layer are given. No brand, collection, color, or SKU, so a different look-alike floor could be substituted and still comply.
-        <div class="ask2"><b>Ask:</b> attach exact brand, collection, color, SKU + the manufacturer warranty.</div>
+        <div class="cmt-h"><span class="cmt-n">2</span><span class="cmt-t">Identified, but spec mismatch</span></div>
+        The floor is now identified: EF Legendary, 6005 Orthodox, 5.2 mm with a 20 mil wear layer. Two gaps remain: the contract still does not name it, and it lists a 22 mil wear layer where the product is 20 mil (22 mil is not even an option in this line).
+        <div class="ask2"><b>Ask:</b> name this exact product in the contract and correct 22 mil to 20 mil.</div>
       </aside>
-      <p>Contractor shall furnish labor and materials necessary to complete the following work: Supply and install <span class="mark" data-pri="high">approximately 935 square feet of Luxury Vinyl Plank (LVP) flooring, 5.2 mm thickness with a 22 mil wear layer<span class="mark-n">2</span></span>, in the designated areas of the residence. Include standard material waste necessary for proper installation. Prepare the existing floor surface as required for installation of the new flooring.</p>
+      <p>Contractor shall furnish labor and materials necessary to complete the following work: Supply and install <span class="mark" data-pri="high">approximately 935 square feet of Luxury Vinyl Plank (LVP) flooring, 5.2 mm thickness with a <strong>22 mil</strong> wear layer<span class="mark-n">2</span></span>, in the designated areas of the residence. Include standard material waste necessary for proper installation. Prepare the existing floor surface as required for installation of the new flooring.</p>
     </div>
     <div class="clause">
       <aside class="cmt" data-pri="med">

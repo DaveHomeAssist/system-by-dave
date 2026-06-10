@@ -4,6 +4,7 @@
 
 - Added a private, unlisted sub-page at `/flooring-contract-review.html` — a plain-English review of the Robertson family flooring contract (12 priority-ranked issues, annotated full-contract view, ready-to-send email). Self-contained page (own inline styles/JS, system fonts).
 - Marked the page `noindex, nofollow` and added a `robots.txt` Disallow; deliberately kept it out of `sitemap.xml` and the site nav, since it contains personal details and is meant to be shared by link only.
+- Content update on `/flooring-contract-review.html` after new info: the selected floor is now identified (EF Legendary / Dreamweaver, color 6005 Orthodox, 5.2 mm / 20 mil SPC). Reframed Issue 2 (and annotated comment #2) from "product missing" to "identified, but reconcile the spec" and flagged the contract's 22 mil vs the product's 20 mil. Added a "Selected floor" header tile, a manufacturer-warranty note to Issue 4, a "Second opinion / alternate bid" card (Getz estimate Fri Jun 12), and a material-vs-labor split (≈$2.59 material / ≈$3.85 labor of the $6.44/sq ft) to the pricing section. Edits made in both views; toggle/filter/copy and print/mobile styles unchanged.
 
 ## 2026-05-05
 
