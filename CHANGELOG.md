@@ -2,6 +2,10 @@
 
 ## 2026-06-11
 
+* Launched a public **Prompt Library** browser at `/prompts/` — a self-contained, zero-dependency page (vanilla JS) with 228 curated, copy-ready prompts: instant search, faceted filters (collection/area/pack/format/platform), and one-click copy. Public-safe subset (internal/operational prompts, Notion IDs, and flagged drafts excluded). Added to `sitemap.xml`.
+* Upgraded `/prompts/` with five features (smoke-tested headless, zero console errors): `{{variable}}` fill-in with live preview + remembered values, relevance-ranked search with match highlighting, per-prompt permalinks (`#p=id`) + shareable view-links, `j`/`k` result navigation plus a ⌘/Ctrl-K command palette, and full keyboard/ARIA accessibility (live regions, focus-visible rings, reduced-motion). Plus per-group counts in the facet dropdowns.
+* Linked `/prompts/` (nav + Products footer) and `/profile/` (Connect footer) from the homepage so both routes are reachable, not just listed in `sitemap.xml`.
+
 * Added a private, unlisted prototype page at `/youtube-pipeline.html` for the Notion based YouTube Pipeline. The page is marked `noindex, nofollow`, blocked in `robots.txt`, and kept out of `sitemap.xml` because it still requires the Claude artifact host APIs for live data and writes.
 * Added `youtube-pipeline-regression-2026-06-11.js` plus `youtube-pipeline-production-plan-2026-06-11.md` beside the prototype so the data loss guard and remaining production gates are visible in repo.
 * Hardened `/youtube-pipeline.html` for public static hosting: added host capability gating, explicit database ID validation, safer local draft storage, a clear local drafts action, and MCP request timeouts.
