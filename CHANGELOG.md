@@ -4,6 +4,7 @@
 
 * Added a private, unlisted prototype page at `/youtube-pipeline.html` for the Notion based YouTube Pipeline. The page is marked `noindex, nofollow`, blocked in `robots.txt`, and kept out of `sitemap.xml` because it still requires the Claude artifact host APIs for live data and writes.
 * Added `youtube-pipeline-regression-2026-06-11.js` plus `youtube-pipeline-production-plan-2026-06-11.md` beside the prototype so the data loss guard and remaining production gates are visible in repo.
+* Hardened `/youtube-pipeline.html` for public static hosting: added host capability gating, explicit database ID validation, safer local draft storage, a clear local drafts action, and MCP request timeouts.
 
 ## 2026-06-10
 

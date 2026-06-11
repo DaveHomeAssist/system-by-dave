@@ -49,6 +49,7 @@
   .meta{color:var(--muted);font-size:12px}
   .iconbtn{border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:6px 10px;font-weight:600;color:var(--ink)}
   .iconbtn:hover{border-color:#cfcdc7}
+  button[disabled]{opacity:.5;cursor:not-allowed}
   .banner{border-radius:var(--radius);padding:10px 12px;margin:8px 0;font-weight:500;display:flex;gap:10px;align-items:flex-start}
   .banner.err{background:#fdecec;border:1px solid #f4c7c7;color:#7e2020}
   .banner.warn{background:#fbf4e0;border:1px solid #eedcab;color:#6b520c}
@@ -56,6 +57,10 @@
   .banner button{margin-left:auto}
   .prototype-note{background:#fff7df;border:1px solid #ecd184;color:#5f4807;border-radius:var(--radius);padding:9px 12px;margin:0 0 10px;font-size:13px;font-weight:600}
   .prototype-note span{font-weight:500;color:#765b10}
+  .hoststate{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:0 0 10px;color:var(--muted);font-size:12px}
+  .hostpill{border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:3px 8px;font-weight:700}
+  .hostpill.ok{color:var(--ok);border-color:#bdddc9;background:#eff8f3}
+  .hostpill.warn{color:var(--warn);border-color:#ead99e;background:#fff8df}
   .filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:8px 0}
   .filters select,.filters input{border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:6px 8px;color:var(--ink)}
   /* board */
@@ -126,6 +131,8 @@
   .setup p{color:var(--muted);margin:6px 0}
   .setup input{width:100%;border:1px solid var(--line);border-radius:8px;padding:9px;margin:8px 0;font:inherit;background:#fff;color:var(--ink)}
   .setup ol{color:var(--muted);font-size:13px;padding-left:18px}
+  .setup .note{font-size:12px;color:var(--muted);margin:4px 0 10px}
+  .setup .danger{border-color:#f1b6b6;color:#9c2525}
   details.raw{margin-top:10px;font-size:12px;color:var(--muted)}
   details.raw pre{white-space:pre-wrap;background:#f4f3f0;border:1px solid var(--line);border-radius:8px;padding:8px;max-height:240px;overflow:auto}
   .hide{display:none!important}
@@ -142,10 +149,12 @@
     </div>
     <div class="spacer"></div>
     <span class="meta" id="loadedAt"></span>
+    <button class="iconbtn" id="reloadBtn">Reload</button>
     <button class="iconbtn" id="settingsBtn">⚙ Settings</button>
     <button class="iconbtn" id="newBtn">+ New video</button>
   </header>
   <div class="prototype-note">Prototype host required. <span>This page needs the Claude artifact APIs for Notion reads, writes, and AI actions. It is published for internal testing, not standalone production use.</span></div>
+  <div class="hoststate"><span class="hostpill warn" id="hostPill">Host checking</span><span id="hostDetail"></span></div>
 
   <div id="banners"></div>
 
@@ -244,8 +253,11 @@
   <h2>Connect the pipeline database</h2>
   <p>Paste the <strong>view URL</strong> of your <code>DB | YouTube Pipeline</code> Notion database (open the DB, copy the link from a table view — it contains <code>?v=</code>).</p>
   <input id="viewUrlInput" type="url" placeholder="https://www.notion.so/…?v=…" />
+  <p class="note">Database ID is stored separately so new page creation does not depend on brittle URL parsing.</p>
+  <input id="dbIdInput" type="text" placeholder="Optional database ID, 32 hex characters" />
   <div style="display:flex;gap:8px">
     <button class="btn primary" id="saveSetup">Save</button>
+    <button class="btn danger" id="clearDrafts">Clear local drafts</button>
     <button class="btn ghost" id="closeSetup">Close</button>
   </div>
   <ol>
@@ -267,6 +279,8 @@
 const NOTION = "mcp__d742cc63-6dff-444d-b292-7439d3d36afa";
 const CONFIG = {
   databaseViewUrl: "",                 // set via Settings (persisted to localStorage)
+  databaseId: "",                      // explicit ID for create-page calls
+  requestTimeoutMs: 15000,
   titleProp: "Title",
   props: {
     stage:        "Status | Stage",
@@ -307,20 +321,35 @@ const CONFIG = {
     "Post-Mortem":     [],
   },
 };
-const LS = { url:"ytpipe.viewUrl", prefs:"ytpipe.prefs", draft:id=>"ytpipe.draft."+id };
+const LS = { url:"ytpipe.viewUrl", databaseId:"ytpipe.databaseId", prefs:"ytpipe.prefs", draftPrefix:"ytpipe.draft.", draft:id=>"ytpipe.draft."+id };
 
 /* ---- load persisted config/prefs ---- */
 try{ const u=localStorage.getItem(LS.url); if(u) CONFIG.databaseViewUrl=u; }catch(e){}
+try{ const d=localStorage.getItem(LS.databaseId); if(d) CONFIG.databaseId=d; }catch(e){}
 let PREFS = (()=>{ try{return JSON.parse(localStorage.getItem(LS.prefs))||{}}catch(e){return {}} })();
 function savePrefs(){ try{localStorage.setItem(LS.prefs,JSON.stringify(PREFS))}catch(e){} }
 
 /* =========================================================================
    STATE
    ========================================================================= */
-let STATE = { rows:[], loadedAt:null, error:null, online:navigator.onLine, current:null, parseUnverified:false, lastRaw:"" };
+let STATE = { rows:[], loadedAt:null, error:null, online:navigator.onLine, current:null, parseUnverified:false, lastRaw:"", hostReady:false, aiReady:false };
 const $ = s=>document.querySelector(s);
 const $$ = s=>[...document.querySelectorAll(s)];
 const esc = s=>(s==null?"":String(s)).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const hasCowork = () => !!(window.cowork && window.cowork.callMcpTool);
+const hasAskClaude = () => !!(window.cowork && window.cowork.askClaude);
+function refreshHostState(){
+  STATE.hostReady = hasCowork();
+  STATE.aiReady = hasAskClaude();
+}
+function canUseRemote(){ return STATE.online && STATE.hostReady; }
+function timeout(promise, ms, label){
+  let t;
+  const timer = new Promise((_, reject)=>{
+    t = setTimeout(()=>reject(new Error(label+" timed out after "+Math.round(ms/1000)+" seconds")), ms);
+  });
+  return Promise.race([promise, timer]).finally(()=>clearTimeout(t));
+}
 
 /* =========================================================================
    DATA LAYER  (callMcpTool wrapper + defensive parser)
@@ -330,8 +359,9 @@ const esc = s=>(s==null?"":String(s)).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&l
    verification. If rows can't be parsed, a warning banner stays up.
    ========================================================================= */
 async function mcp(tool, args){
-  if(!window.cowork || !window.cowork.callMcpTool) throw new Error("Artifact host API unavailable");
-  const r = await window.cowork.callMcpTool(NOTION+"__"+tool, args);
+  refreshHostState();
+  if(!STATE.hostReady) throw new Error("Artifact host API unavailable. Open this page inside the Claude artifact host to use Notion reads or writes.");
+  const r = await timeout(window.cowork.callMcpTool(NOTION+"__"+tool, args), CONFIG.requestTimeoutMs, tool);
   if(r && r.isError) throw new Error(typeof r.content?.[0]?.text==="string"? r.content[0].text : "Connector error");
   let payload = r?.structuredContent;
   if(payload==null && r?.content?.[0]?.text){
@@ -368,6 +398,42 @@ function extractPageBody(payload, seen=new Set()){
   return "";
 }
 
+function normalizeNotionId(value){
+  const compact = String(value||"").replace(/-/g,"");
+  let best = "";
+  for(let i=0; i<=compact.length-32; i++){
+    const candidate = compact.slice(i, i+32);
+    if(/^[0-9a-f]{32}$/i.test(candidate)) best = candidate;
+  }
+  return best.toLowerCase();
+}
+
+function idFromNotionUrl(value){
+  try{
+    const u = new URL(value);
+    const path = decodeURIComponent(u.pathname);
+    return normalizeNotionId(path);
+  }catch(e){
+    return normalizeNotionId(value);
+  }
+}
+
+function isAllowedNotionHost(hostname){
+  return /(^|\.)notion\.(so|site)$/i.test(hostname);
+}
+
+function validateDatabaseViewUrl(value){
+  if(!value) return {ok:false, message:"Paste a Notion database view URL."};
+  try{
+    const u = new URL(value);
+    if(!isAllowedNotionHost(u.hostname)) return {ok:false, message:"Use a notion.so or notion.site URL."};
+    if(!idFromNotionUrl(value)) return {ok:false, message:"The URL does not contain a database ID."};
+    return {ok:true, message:""};
+  }catch(e){
+    return {ok:false, message:"Paste a valid URL."};
+  }
+}
+
 // Extract a {props, id, title} record from a variety of possible payload rows.
 function normalizeRow(raw){
   const p = CONFIG.props;
@@ -402,8 +468,12 @@ function parseRows(payload){
 }
 
 async function loadRows(){
+  refreshHostState();
   STATE.error=null;
-  if(!CONFIG.databaseViewUrl){ STATE.rows=[]; render(); openSetup(); return; }
+  if(!CONFIG.databaseViewUrl){ STATE.rows=[]; render(); return; }
+  const validation=validateDatabaseViewUrl(CONFIG.databaseViewUrl);
+  if(!validation.ok){ STATE.error=validation.message; STATE.rows=[]; render(); return; }
+  if(!STATE.hostReady){ STATE.rows=[]; render(); return; }
   try{
     renderBanners("loading");
     const payload = await mcp("notion-query-database-view", { view_url: CONFIG.databaseViewUrl });
@@ -438,12 +508,13 @@ async function saveVideo(v, {advance=false}={}){
       await mcp("notion-update-page", { page_id:v.id, command:"replace_content", new_str: v.script||"" , allow_deleting_content:true});
     }
   }else{
-    await mcp("notion-create-pages", { parent:{database_id: dbIdFromView()}, pages:[{ properties:props, content:v.script||"" }] });
+    const databaseId = dbIdFromView();
+    if(!databaseId) throw new Error("Database ID unavailable. Add it in Settings before creating a new page.");
+    await mcp("notion-create-pages", { parent:{database_id: databaseId}, pages:[{ properties:props, content:v.script||"" }] });
   }
 }
 function dbIdFromView(){
-  // view url: https://notion.so/<ws>/<dbid>?v=<view>; dbid is last path segment before ?v=
-  try{ const u=new URL(CONFIG.databaseViewUrl); const seg=u.pathname.split("/").pop(); return seg.replace(/-/g,"").slice(-32); }catch(e){ return ""; }
+  return normalizeNotionId(CONFIG.databaseId) || idFromNotionUrl(CONFIG.databaseViewUrl);
 }
 
 /* =========================================================================
@@ -484,8 +555,34 @@ function serializeBeats(beats, notes){
 function cssVar(name){ return getComputedStyle(document.documentElement).getPropertyValue(name); }
 function stageColor(stage){ return cssVar(CONFIG.stageColors[stage]||"--idea")||"#888"; }
 
+function renderHostState(){
+  const pill=$("#hostPill"), detail=$("#hostDetail");
+  if(!pill || !detail) return;
+  pill.classList.toggle("ok", STATE.hostReady);
+  pill.classList.toggle("warn", !STATE.hostReady);
+  pill.textContent = STATE.hostReady ? "Host ready" : "Read only";
+  detail.textContent = STATE.hostReady
+    ? "Notion connector available. AI actions "+(STATE.aiReady ? "available." : "unavailable.")
+    : "Notion reads, writes, and AI actions are disabled on this public static page.";
+}
+
+function updateActionAvailability(){
+  const remoteReady = canUseRemote();
+  const newBtn=$("#newBtn"), reloadBtn=$("#reloadBtn"), saveBtn=$("#saveBtn"), advanceBtn=$("#advanceBtn");
+  if(newBtn) newBtn.disabled = !remoteReady || !CONFIG.databaseViewUrl;
+  if(reloadBtn) reloadBtn.disabled = !remoteReady || !CONFIG.databaseViewUrl;
+  if(saveBtn && STATE.current) saveBtn.disabled = !remoteReady;
+  if(advanceBtn && STATE.current){
+    const g=canAdvance(STATE.current);
+    advanceBtn.disabled = !remoteReady || !g.ok || !nextStage(STATE.current.stage);
+  }
+}
+
 function renderBanners(mode){
   const b=$("#banners"); let html="";
+  if(!STATE.hostReady){
+    html+=`<div class="banner warn"><span>Remote features are disabled because the artifact host API is unavailable. Open this page in the Claude artifact host before connecting or writing to Notion.</span></div>`;
+  }
   if(!CONFIG.databaseViewUrl){
     html+=`<div class="banner info">No database connected yet. <button class="iconbtn" onclick="openSetup()">Connect database</button></div>`;
   }
@@ -531,6 +628,10 @@ function cardHtml(v){
 function renderBoard(){
   const board=$("#board"); const rows=applyFilters(STATE.rows);
   if(!CONFIG.databaseViewUrl){ board.innerHTML=""; return; }
+  if(!STATE.hostReady){
+    board.innerHTML=`<div class="empty" style="grid-column:1/-1">Remote host unavailable. Open this page in the Claude artifact host to load or write Notion records.</div>`;
+    return;
+  }
   if(STATE.rows.length===0 && !STATE.error){
     board.innerHTML=`<div class="empty" style="grid-column:1/-1">No videos yet. <button class="iconbtn" onclick="newVideo()">+ Create the first one</button></div>`;
     return;
@@ -581,6 +682,8 @@ function renderFilters(){
 }
 
 function render(){
+  refreshHostState();
+  renderHostState();
   renderBanners();
   renderFilters();
   renderBoard();
@@ -588,7 +691,8 @@ function render(){
   renderCalendar();
   $("#loadedAt").textContent = STATE.loadedAt? "Loaded "+STATE.loadedAt.toLocaleTimeString() : "";
   $("#mapDump").textContent = Object.entries(CONFIG.props).map(([k,v])=>`${v}  →  ${k}`).join("\n");
-  $("#dbName").textContent = CONFIG.databaseViewUrl? "· connected":"· not connected";
+  $("#dbName").textContent = CONFIG.databaseViewUrl? "· configured":"· not configured";
+  updateActionAvailability();
 }
 
 /* =========================================================================
@@ -598,9 +702,27 @@ function blankVideo(){ return {id:"new:"+Date.now(), title:"", stage:"Idea", sta
   logline:"",hook:"",keyword:"",beats:"",broll:"",cta:"",thumbConcept:"",seoTitle:"",seoDesc:"",tags:"",
   ytUrl:"",thumbUrl:"",recordDate:"",publishDate:"",runtime:"",script:"",scriptLoaded:true,scriptDirty:false }; }
 
+function draftForStorage(v){
+  const copy = {...v, scriptLoading:false};
+  if(isPersistedPage(copy) && !copy.scriptDirty){
+    copy.script = "";
+    copy.scriptLoaded = false;
+  }
+  return copy;
+}
 function loadDraft(id){ try{ const d=localStorage.getItem(LS.draft(id)); return d?JSON.parse(d):null; }catch(e){return null;} }
-function saveDraft(){ if(!STATE.current) return; try{ localStorage.setItem(LS.draft(STATE.current.id), JSON.stringify(STATE.current)); }catch(e){} setSaveState("draft saved locally"); }
+function saveDraft(){ if(!STATE.current) return; try{ localStorage.setItem(LS.draft(STATE.current.id), JSON.stringify(draftForStorage(STATE.current))); }catch(e){} setSaveState("draft saved locally"); }
 function clearDraft(id){ try{ localStorage.removeItem(LS.draft(id)); }catch(e){} }
+function clearAllDrafts(){
+  let count=0;
+  try{
+    for(let i=localStorage.length-1;i>=0;i--){
+      const key=localStorage.key(i);
+      if(key && key.startsWith(LS.draftPrefix)){ localStorage.removeItem(key); count++; }
+    }
+  }catch(e){}
+  alert(count ? "Cleared "+count+" local draft"+(count===1?"":"s")+".": "No local drafts found.");
+}
 function setSaveState(t){ $("#saveState").textContent=t||""; }
 
 function fillStageOptions(){ $("#dStage").innerHTML=CONFIG.stages.map(s=>`<option>${esc(s)}</option>`).join(""); }
@@ -620,6 +742,7 @@ function prepareForEdit(v){
 }
 
 function normalizeDraft(v){
+  v.scriptLoading = false;
   if(!isPersistedPage(v)){
     v.scriptLoaded = true;
     v.scriptDirty = !!v.script;
@@ -730,16 +853,19 @@ function updateGateUI(){
   const v=STATE.current; if(!v) return;
   const g=canAdvance(v); const ns=nextStage(v.stage);
   const adv=$("#advanceBtn");
-  if(!ns){ adv.textContent="Final stage"; adv.disabled=true; $("#gateWarn").textContent=""; return; }
+  if(!ns){ adv.textContent="Final stage"; adv.disabled=true; $("#gateWarn").textContent=""; updateActionAvailability(); return; }
   adv.textContent="Advance ▸ "+ns;
-  adv.disabled = !g.ok || !STATE.online;
-  $("#gateWarn").textContent = g.ok? "" : "Need: "+g.missing.map(fieldLabel).join(", ");
+  adv.disabled = !g.ok || !canUseRemote();
+  $("#gateWarn").textContent = !STATE.hostReady ? "Remote host unavailable" : (g.ok? "" : "Need: "+g.missing.map(fieldLabel).join(", "));
+  updateActionAvailability();
 }
 function fieldLabel(k){ return ({logline:"Logline",keyword:"Keyword",hook:"Hook",beats:"Beats",cta:"CTA",runtime:"Runtime",recordDate:"Record date",broll:"B-roll",thumbConcept:"Thumbnail concept",seoTitle:"SEO title",ytUrl:"YouTube URL",publishDate:"Publish date"}[k])||k; }
 
 /* ---- save / advance ---- */
 async function doSave(advance){
   const v=STATE.current; pull();
+  refreshHostState();
+  if(!STATE.hostReady){ alert("Remote host unavailable. Changes are kept locally only."); saveDraft(); return; }
   if(!STATE.online){ alert("You're offline — changes are kept locally."); saveDraft(); return; }
   if(advance){
     const g=canAdvance(v); if(!g.ok){ alert("Can't advance: missing "+g.missing.map(fieldLabel).join(", ")); return; }
@@ -768,7 +894,8 @@ async function doSave(advance){
    ========================================================================= */
 async function aiAction(kind, btn){
   const v=STATE.current; pull();
-  if(!window.cowork || !window.cowork.askClaude){ alert("askClaude unavailable in this host."); return; }
+  refreshHostState();
+  if(!STATE.aiReady){ alert("AI actions are unavailable in this host."); return; }
   if((kind==="tighten" || kind==="seo") && isPersistedPage(v) && !v.scriptLoaded){
     alert("Load the Notion page body before running script AI actions.");
     return;
@@ -814,15 +941,42 @@ function switchTab(t){
   $("#view-calendar").classList.toggle("hide",t!=="calendar");
   PREFS.tab=t; savePrefs();
 }
-function newVideo(){ openDrawer(null); }
+function newVideo(){
+  refreshHostState();
+  if(!canUseRemote()){ alert("Remote host unavailable. New Notion pages can only be created inside the Claude artifact host."); return; }
+  if(!dbIdFromView()){ alert("Add a Database ID in Settings before creating a page."); return; }
+  openDrawer(null);
+}
 window.newVideo=newVideo; window.openSetup=openSetup; window.loadRows=loadRows;
 
-function openSetup(){ $("#viewUrlInput").value=CONFIG.databaseViewUrl||""; $("#setupCard").classList.remove("hide"); $("#setupBg").classList.add("open"); }
+function openSetup(){
+  $("#viewUrlInput").value=CONFIG.databaseViewUrl||"";
+  $("#dbIdInput").value=CONFIG.databaseId || dbIdFromView() || "";
+  $("#setupCard").classList.remove("hide");
+  $("#setupBg").classList.add("open");
+}
 function closeSetup(){ $("#setupCard").classList.add("hide"); $("#setupBg").classList.remove("open"); }
+function saveSetupConfig(){
+  const viewUrl=$("#viewUrlInput").value.trim();
+  const explicitId=normalizeNotionId($("#dbIdInput").value.trim());
+  const validation=validateDatabaseViewUrl(viewUrl);
+  if(!validation.ok){ alert(validation.message); return; }
+  const databaseId = explicitId || idFromNotionUrl(viewUrl);
+  if(!databaseId){ alert("Database ID unavailable. Paste it into the Database ID field."); return; }
+  CONFIG.databaseViewUrl=viewUrl;
+  CONFIG.databaseId=databaseId;
+  try{
+    localStorage.setItem(LS.url,CONFIG.databaseViewUrl);
+    localStorage.setItem(LS.databaseId,CONFIG.databaseId);
+  }catch(e){}
+  closeSetup();
+  loadRows();
+}
 
 document.addEventListener("DOMContentLoaded",()=>{
   $$("#tabs button").forEach(b=>b.onclick=()=>switchTab(b.dataset.tab));
   $("#newBtn").onclick=newVideo;
+  $("#reloadBtn").onclick=loadRows;
   $("#settingsBtn").onclick=openSetup;
   $("#dClose").onclick=closeDrawer; $("#drawerBg").onclick=closeDrawer;
   $("#saveBtn").onclick=()=>doSave(false);
@@ -831,7 +985,8 @@ document.addEventListener("DOMContentLoaded",()=>{
   $("#addBeat").onclick=()=>{ const arr=currentBeats(); arr.push({label:"",tc:""}); STATE.current.beats=serializeBeats(arr,""); renderBeats(); };
   $$("#drawer [data-ai]").forEach(b=>b.onclick=()=>aiAction(b.dataset.ai,b));
   $$("#drawer input,#drawer textarea,#drawer select").forEach(el=>el.addEventListener("input",e=>markDirty({scriptDirty:e.target.id==="dScript"})));
-  $("#saveSetup").onclick=()=>{ CONFIG.databaseViewUrl=$("#viewUrlInput").value.trim(); try{localStorage.setItem(LS.url,CONFIG.databaseViewUrl)}catch(e){} closeSetup(); loadRows(); };
+  $("#saveSetup").onclick=saveSetupConfig;
+  $("#clearDrafts").onclick=clearAllDrafts;
   $("#closeSetup").onclick=closeSetup; $("#setupBg").onclick=closeSetup;
   // filters
   $("#search").oninput=e=>{PREFS.search=e.target.value;savePrefs();render();};

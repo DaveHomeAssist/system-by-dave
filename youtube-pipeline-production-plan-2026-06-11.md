@@ -1,6 +1,6 @@
 # YouTube Pipeline Production Plan
 
-Status: phase 1 complete, production gate still closed.
+Status: phase 2 static safety complete, production gate still closed.
 
 ## Completed
 
@@ -23,6 +23,22 @@ Status: phase 1 complete, production gate still closed.
 
    `tighten` and `seo` actions now require a loaded script body for persisted pages.
 
+4. Static host read only guard
+
+   The public GitHub Pages route now detects whether the Claude artifact host API is present. Without that host, Notion reads, Notion writes, new page creation, reload, and AI actions are disabled with a visible read only state.
+
+5. Database identity validation
+
+   Settings now require a valid Notion URL and store an explicit database ID for new page creation. New page writes fail before connector calls when the database ID is unavailable.
+
+6. Safer local drafts
+
+   Loaded page body content is no longer stored in `localStorage` unless the script body is edited. Settings also include a clear local drafts control.
+
+7. Connector timeout
+
+   MCP calls now have a 15 second UI timeout so connector hangs do not leave the page in an indefinite saving or loading state.
+
 ## Remaining Production Issues
 
 1. Live Notion payload verification
@@ -38,7 +54,7 @@ Status: phase 1 complete, production gate still closed.
 
 2. Runtime boundary
 
-   Risk: this still depends on `window.cowork`, a hard coded MCP connector id, and artifact host privileges.
+   Risk: the editable workflow still depends on `window.cowork`, a hard coded MCP connector id, and artifact host privileges.
 
    Acceptance criteria:
 
@@ -49,11 +65,11 @@ Status: phase 1 complete, production gate still closed.
 
 3. Database identity and schema validation
 
-   Risk: new page creation still derives database id from a copied view URL.
+   Risk: property validation still depends on matching the assumed Notion schema.
 
    Acceptance criteria:
 
-   1. Store an explicit database id.
+   1. Fetch the live database schema.
    2. Validate required properties on connect.
    3. Show a blocking setup error when a property is missing or has the wrong type.
 
@@ -79,15 +95,13 @@ Status: phase 1 complete, production gate still closed.
 
 6. Storage and privacy posture
 
-   Risk: local drafts and database URLs are stored in `localStorage`.
+   Risk: edited drafts and database URLs are still stored in `localStorage`.
 
    Acceptance criteria:
 
-   1. Add clear draft controls.
-   2. Avoid storing full script body unless the user edits it.
-   3. Document what is stored locally.
-   4. Decide whether draft storage needs encryption or should be replaced by server persisted drafts.
+   1. Document what is stored locally.
+   2. Decide whether draft storage needs encryption or should be replaced by server persisted drafts.
 
 ## Next Phase
 
-Phase 2 should be live Notion payload verification plus fixtures. Do not build a deploy target until the actual connector response shapes are pinned.
+Phase 3 should be live Notion payload verification plus fixtures. Do not build a full production deploy target until the actual connector response shapes are pinned.
