@@ -3,6 +3,7 @@ Allow: /
 Disallow: /404.html
 Disallow: /500.html
 Disallow: /flooring-contract-review.html
+Disallow: /youtube-pipeline.html
 
 Sitemap: https://systembydave.com/sitemap.xml
 Sitemap: https://systembydave.com/systembydave/sitemap.xml

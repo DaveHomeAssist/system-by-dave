@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: https:; script-src 'self' 'unsafe-inline'; base-uri 'self'; form-action 'none'">
+<title>YouTube Pipeline Prototype | System by Dave</title>
+<meta name="description" content="A private System by Dave prototype for a Notion-backed YouTube production pipeline. Requires the Claude artifact host APIs for live data.">
+<link rel="canonical" href="https://systembydave.com/youtube-pipeline.html">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#f7f7f5">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="System by Dave">
+<meta property="og:title" content="YouTube Pipeline Prototype">
+<meta property="og:description" content="A private prototype for a Notion-backed YouTube production pipeline. Requires the Claude artifact host APIs for live data.">
+<meta property="og:url" content="https://systembydave.com/youtube-pipeline.html">
+<meta property="og:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<meta property="og:image:width" content="1024">
+<meta property="og:image:height" content="412">
+<meta property="og:image:alt" content="System by Dave preview banner">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="YouTube Pipeline Prototype">
+<meta name="twitter:description" content="A private prototype for a Notion-backed YouTube production pipeline. Requires the Claude artifact host APIs for live data.">
+<meta name="twitter:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<link rel="icon" href="svg/system_by_dave_logo_rust.svg" type="image/svg+xml">
+<style>
+  :root{
+    color-scheme: light;
+    --bg:#f7f7f5; --panel:#ffffff; --ink:#1d1c1a; --muted:#6b6862; --line:#e7e5e0;
+    --accent:#2f6df6; --accent-ink:#fff; --danger:#d23f3f; --warn:#b8860b; --ok:#2e7d4f;
+    --idea:#8a8a8a; --research:#3b82f6; --script:#7c5cff; --record:#e07b1a;
+    --edit:#caa11a; --thumb:#d6489a; --publish:#2e9a5c; --post:#9a6b3f;
+    --radius:10px; --shadow:0 1px 2px rgba(0,0,0,.06),0 4px 14px rgba(0,0,0,.05);
+    font-synthesis: none;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+  button{font:inherit;cursor:pointer}
+  a{color:var(--accent)}
+  .wrap{max-width:1200px;margin:0 auto;padding:14px 16px 60px}
+  header.top{display:flex;align-items:center;gap:12px;margin-bottom:10px;flex-wrap:wrap}
+  .brand{font-weight:700;font-size:16px;letter-spacing:-.01em}
+  .brand small{font-weight:500;color:var(--muted);margin-left:6px}
+  .tabs{display:flex;gap:4px;background:var(--panel);padding:4px;border:1px solid var(--line);border-radius:var(--radius)}
+  .tabs button{border:0;background:transparent;color:var(--muted);padding:6px 12px;border-radius:7px;font-weight:600}
+  .tabs button.active{background:var(--accent);color:var(--accent-ink)}
+  .spacer{flex:1}
+  .meta{color:var(--muted);font-size:12px}
+  .iconbtn{border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:6px 10px;font-weight:600;color:var(--ink)}
+  .iconbtn:hover{border-color:#cfcdc7}
+  .banner{border-radius:var(--radius);padding:10px 12px;margin:8px 0;font-weight:500;display:flex;gap:10px;align-items:flex-start}
+  .banner.err{background:#fdecec;border:1px solid #f4c7c7;color:#7e2020}
+  .banner.warn{background:#fbf4e0;border:1px solid #eedcab;color:#6b520c}
+  .banner.info{background:#eaf1ff;border:1px solid #cdddff;color:#1f3f86}
+  .banner button{margin-left:auto}
+  .prototype-note{background:#fff7df;border:1px solid #ecd184;color:#5f4807;border-radius:var(--radius);padding:9px 12px;margin:0 0 10px;font-size:13px;font-weight:600}
+  .prototype-note span{font-weight:500;color:#765b10}
+  .filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:8px 0}
+  .filters select,.filters input{border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:6px 8px;color:var(--ink)}
+  /* board */
+  .board{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(220px,1fr);gap:10px;overflow-x:auto;padding-bottom:8px}
+  .col{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);display:flex;flex-direction:column;min-height:120px}
+  .col h3{margin:0;padding:9px 11px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:7px}
+  .dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+  .col .cnt{margin-left:auto;color:var(--muted);font-weight:600}
+  .cards{padding:8px;display:flex;flex-direction:column;gap:8px}
+  .card{border:1px solid var(--line);border-radius:9px;padding:9px 10px;background:#fff;box-shadow:var(--shadow);text-align:left;width:100%}
+  .card:hover{border-color:#c9c7c1}
+  .card .t{font-weight:600;margin-bottom:5px;line-height:1.3}
+  .chips{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+  .chip{font-size:11px;font-weight:700;padding:2px 7px;border-radius:999px;background:#f0efec;color:#55524c}
+  .chip.p0{background:#fde0e0;color:#a52121}.chip.p1{background:#fde6d4;color:#9a5a14}
+  .chip.p2{background:#fbf3cf;color:#7c6710}.chip.p3{background:#eceae5;color:#67645e}
+  .chip.blocked{background:#fde0e0;color:#a52121}
+  .flag{color:var(--danger);font-weight:700}
+  .empty{color:var(--muted);text-align:center;padding:34px 10px}
+  /* drawer */
+  .drawer-bg{position:fixed;inset:0;background:rgba(20,18,16,.32);display:none;z-index:40}
+  .drawer-bg.open{display:block}
+  .drawer{position:fixed;top:0;right:0;height:100%;width:min(760px,96vw);background:var(--panel);
+    border-left:1px solid var(--line);box-shadow:-8px 0 30px rgba(0,0,0,.12);transform:translateX(100%);
+    transition:transform .18s ease;display:flex;flex-direction:column;z-index:41}
+  .drawer.open{transform:none}
+  .drawer header{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--line)}
+  .drawer header input.title{flex:1;font-size:16px;font-weight:700;border:1px solid transparent;background:transparent;border-radius:7px;padding:5px 7px;color:var(--ink)}
+  .drawer header input.title:focus{border-color:var(--line);outline:none;background:#fff}
+  .drawer .body{overflow:auto;padding:14px;display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .drawer .body .full{grid-column:1/3}
+  label.fld{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);margin:0 0 4px}
+  .field{margin-bottom:12px}
+  .field input[type=text],.field input[type=url],.field input[type=number],.field select,.field textarea{
+    width:100%;border:1px solid var(--line);background:#fff;border-radius:8px;padding:7px 9px;color:var(--ink);font:inherit}
+  .field textarea{resize:vertical;min-height:60px}
+  textarea.script{min-height:320px;font:13px/1.55 ui-monospace,SFMono-Regular,Menlo,monospace}
+  .beats{display:flex;flex-direction:column;gap:6px}
+  .beat{display:grid;grid-template-columns:1fr 86px auto;gap:6px;align-items:center}
+  .beat input{border:1px solid var(--line);border-radius:7px;padding:6px 7px;font:inherit;background:#fff;color:var(--ink)}
+  .beat .x{border:1px solid var(--line);background:#fff;border-radius:7px;padding:5px 8px;color:var(--muted)}
+  .miniwrap{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+  .mini{border:1px solid var(--line);background:#fff;border-radius:7px;padding:5px 9px;font-weight:600;font-size:12px;color:var(--ink)}
+  .mini:hover{border-color:var(--accent);color:var(--accent)}
+  .mini[disabled]{opacity:.5;cursor:progress}
+  .scriptbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:0 0 6px}
+  .scriptstate{font-size:12px;color:var(--muted)}
+  .scriptstate.warn{color:var(--warn);font-weight:600}
+  .suggest{margin-top:8px;border:1px dashed #cdddff;background:#f3f7ff;border-radius:8px;padding:8px;font-size:13px}
+  .suggest .opt{display:flex;gap:8px;align-items:flex-start;padding:5px 0;border-top:1px solid #e3ecff}
+  .suggest .opt:first-of-type{border-top:0}
+  .suggest .opt button{border:1px solid var(--accent);color:var(--accent);background:#fff;border-radius:6px;padding:3px 8px;font-weight:700;font-size:12px;white-space:nowrap}
+  .drawer footer{margin-top:auto;border-top:1px solid var(--line);padding:11px 14px;display:flex;gap:8px;align-items:center}
+  .btn{border:1px solid var(--line);background:#fff;border-radius:8px;padding:8px 13px;font-weight:700;color:var(--ink)}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  .btn.ghost{background:transparent}
+  .btn[disabled]{opacity:.5;cursor:not-allowed}
+  .gatewarn{color:var(--danger);font-size:12px;font-weight:600}
+  .savestate{font-size:12px;color:var(--muted);margin-left:auto}
+  /* calendar */
+  .cal{display:flex;flex-direction:column;gap:6px}
+  .calrow{display:grid;grid-template-columns:120px 1fr;gap:10px;padding:8px 10px;background:var(--panel);border:1px solid var(--line);border-radius:8px}
+  .calrow .d{font-weight:700}
+  .calrow .ev{display:flex;gap:6px;flex-wrap:wrap}
+  /* setup */
+  .setup{max-width:680px;margin:30px auto;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow)}
+  .setup h2{margin:0 0 6px}
+  .setup p{color:var(--muted);margin:6px 0}
+  .setup input{width:100%;border:1px solid var(--line);border-radius:8px;padding:9px;margin:8px 0;font:inherit;background:#fff;color:var(--ink)}
+  .setup ol{color:var(--muted);font-size:13px;padding-left:18px}
+  details.raw{margin-top:10px;font-size:12px;color:var(--muted)}
+  details.raw pre{white-space:pre-wrap;background:#f4f3f0;border:1px solid var(--line);border-radius:8px;padding:8px;max-height:240px;overflow:auto}
+  .hide{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">🎬 YouTube Pipeline <small id="dbName"></small></div>
+    <div class="tabs" id="tabs">
+      <button data-tab="board" class="active">Board</button>
+      <button data-tab="workbench">Workbench</button>
+      <button data-tab="calendar">Calendar</button>
+    </div>
+    <div class="spacer"></div>
+    <span class="meta" id="loadedAt"></span>
+    <button class="iconbtn" id="settingsBtn">⚙ Settings</button>
+    <button class="iconbtn" id="newBtn">+ New video</button>
+  </header>
+  <div class="prototype-note">Prototype host required. <span>This page needs the Claude artifact APIs for Notion reads, writes, and AI actions. It is published for internal testing, not standalone production use.</span></div>
+
+  <div id="banners"></div>
+
+  <!-- BOARD -->
+  <section id="view-board">
+    <div class="filters">
+      <input id="search" type="search" placeholder="Search title / keyword…" style="min-width:200px" />
+      <select id="fOwner"><option value="">All owners</option></select>
+      <select id="fPriority"><option value="">All priorities</option><option>P0</option><option>P1</option><option>P2</option><option>P3</option></select>
+      <select id="fState"><option value="">All states</option><option>Active</option><option>Blocked</option><option>Parked</option><option>Published</option><option>Archived</option></select>
+    </div>
+    <div class="board" id="board"></div>
+  </section>
+
+  <!-- WORKBENCH (list of videos -> opens drawer) -->
+  <section id="view-workbench" class="hide">
+    <div class="empty" id="wbEmpty">Pick a video from the board, or use “+ New video”. The workbench opens per video.</div>
+    <div class="board" id="wbList" style="grid-auto-columns:minmax(260px,1fr)"></div>
+  </section>
+
+  <!-- CALENDAR -->
+  <section id="view-calendar" class="hide">
+    <div class="cal" id="cal"></div>
+  </section>
+</div>
+
+<!-- DRAWER -->
+<div class="drawer-bg" id="drawerBg"></div>
+<aside class="drawer" id="drawer" aria-hidden="true">
+  <header>
+    <span class="dot" id="dStageDot"></span>
+    <input class="title" id="dTitle" placeholder="Working title" />
+    <button class="iconbtn" id="dClose">✕</button>
+  </header>
+  <div class="body">
+    <div>
+      <div class="field"><label class="fld">Stage</label><select id="dStage"></select></div>
+      <div class="field"><label class="fld">State</label>
+        <select id="dState"><option>Active</option><option>Blocked</option><option>Parked</option><option>Published</option><option>Archived</option></select></div>
+      <div class="field"><label class="fld">Priority</label>
+        <select id="dPriority"><option>P0</option><option>P1</option><option>P2</option><option>P3</option></select></div>
+      <div class="field"><label class="fld">Logline</label><textarea id="dLogline" placeholder="One-sentence premise"></textarea></div>
+      <div class="field"><label class="fld">Target keyword</label><input type="text" id="dKeyword" /></div>
+      <div class="field"><label class="fld">Runtime target (min)</label><input type="number" id="dRuntime" min="0" step="0.5" /></div>
+      <div class="field"><label class="fld">Record date</label><input type="date" id="dRecord" /></div>
+      <div class="field"><label class="fld">Publish date</label><input type="date" id="dPublish" /></div>
+    </div>
+    <div>
+      <div class="field"><label class="fld">Hook</label><textarea id="dHook" placeholder="First 5–15s opener"></textarea>
+        <div class="miniwrap"><button class="mini" data-ai="hooks">✨ 3 hook options</button></div>
+        <div id="sugHook"></div>
+      </div>
+      <div class="field"><label class="fld">Beats</label>
+        <div class="beats" id="dBeats"></div>
+        <div class="miniwrap"><button class="mini" id="addBeat">+ beat</button><button class="mini" data-ai="beats">✨ outline beats</button></div>
+        <div id="sugBeats"></div>
+      </div>
+      <div class="field"><label class="fld">CTA</label><input type="text" id="dCta" /></div>
+      <div class="field"><label class="fld">B-roll cues</label><textarea id="dBroll"></textarea></div>
+    </div>
+
+    <div class="full">
+      <label class="fld">Script body</label>
+      <div class="scriptbar">
+        <button class="mini hide" id="loadScriptBtn">Load page body</button>
+        <span class="scriptstate" id="scriptState"></span>
+      </div>
+      <textarea class="script" id="dScript" placeholder="Full script…"></textarea>
+      <div class="miniwrap">
+        <button class="mini" data-ai="tighten">✨ tighten selection</button>
+        <button class="mini" data-ai="seo">✨ draft SEO title + desc + tags</button>
+      </div>
+      <div id="sugSeo"></div>
+    </div>
+
+    <div class="full" id="seoFields">
+      <div class="field"><label class="fld">SEO title</label><input type="text" id="dSeoTitle" /></div>
+      <div class="field"><label class="fld">SEO description</label><textarea id="dSeoDesc"></textarea></div>
+      <div class="field"><label class="fld">Tags (comma separated)</label><input type="text" id="dTags" /></div>
+      <div class="field"><label class="fld">Thumbnail concept</label><textarea id="dThumbConcept"></textarea></div>
+      <div class="field"><label class="fld">Thumbnail URL</label><input type="url" id="dThumbUrl" /></div>
+      <div class="field"><label class="fld">YouTube URL</label><input type="url" id="dYtUrl" /></div>
+    </div>
+  </div>
+  <footer>
+    <button class="btn primary" id="saveBtn">Save</button>
+    <button class="btn" id="advanceBtn">Advance ▸</button>
+    <span class="gatewarn" id="gateWarn"></span>
+    <span class="savestate" id="saveState"></span>
+  </footer>
+</aside>
+
+<!-- SETTINGS / SETUP -->
+<div class="drawer-bg" id="setupBg"></div>
+<div id="setupCard" class="setup hide" style="position:fixed;top:8%;left:50%;transform:translateX(-50%);z-index:42;max-height:84vh;overflow:auto">
+  <h2>Connect the pipeline database</h2>
+  <p>Paste the <strong>view URL</strong> of your <code>DB | YouTube Pipeline</code> Notion database (open the DB, copy the link from a table view — it contains <code>?v=</code>).</p>
+  <input id="viewUrlInput" type="url" placeholder="https://www.notion.so/…?v=…" />
+  <div style="display:flex;gap:8px">
+    <button class="btn primary" id="saveSetup">Save</button>
+    <button class="btn ghost" id="closeSetup">Close</button>
+  </div>
+  <ol>
+    <li>Reads run on open and are cached; use the header <em>Reload</em> button to refresh.</li>
+    <li>Stage gates and the parser are configured in <code>CONFIG</code> at the top of the source.</li>
+    <li>Unsaved script drafts are kept locally per video, so a reload never loses your writing.</li>
+  </ol>
+  <details class="raw"><summary>Field mapping (Notion property → app field)</summary>
+    <pre id="mapDump"></pre>
+  </details>
+</div>
+
+<script>
+/* =========================================================================
+   CONFIG — the resource is parameterized here. Clone this artifact and swap
+   `databaseViewUrl` (or set it via Settings) to drive another channel.
+   Property names MUST match the Notion "DB | YouTube Pipeline" schema.
+   ========================================================================= */
+const NOTION = "mcp__d742cc63-6dff-444d-b292-7439d3d36afa";
+const CONFIG = {
+  databaseViewUrl: "",                 // set via Settings (persisted to localStorage)
+  titleProp: "Title",
+  props: {
+    stage:        "Status | Stage",
+    state:        "Status | State",
+    priority:     "Status | Priority",
+    logline:      "Text | Logline",
+    hook:         "Text | Hook",
+    keyword:      "Text | Target Keyword",
+    beats:        "Text | Beats",
+    broll:        "Text | B-Roll Cues",
+    cta:          "Text | CTA",
+    thumbConcept: "Text | Thumbnail Concept",
+    seoTitle:     "Text | SEO Title",
+    seoDesc:      "Text | SEO Description",
+    tags:         "Tags | YouTube",
+    ytUrl:        "URL | YouTube",
+    thumbUrl:     "URL | Thumbnail",
+    recordDate:   "Date | Record",
+    publishDate:  "Date | Publish",
+    runtime:      "Number | Runtime Target",
+    views7d:      "Number | Views 7d",
+    views28d:     "Number | Views 28d",
+    retention:    "Number | Retention %",
+    postMortem:   "Text | Post-Mortem",
+    owner:        "Person | Owner",
+  },
+  stages: ["Idea","Research","Script","Record","Edit","Thumbnail & SEO","Publish","Post-Mortem"],
+  stageColors: {Idea:"--idea",Research:"--research",Script:"--script",Record:"--record",Edit:"--edit","Thumbnail & SEO":"--thumb",Publish:"--publish","Post-Mortem":"--post"},
+  // Gate: fields required to LEAVE a stage (advance to the next one).
+  gates: {
+    "Idea":            ["logline"],
+    "Research":        ["keyword"],
+    "Script":          ["hook","beats","cta","runtime"],
+    "Record":          ["recordDate"],
+    "Edit":            ["broll"],
+    "Thumbnail & SEO": ["thumbConcept","seoTitle"],
+    "Publish":         ["ytUrl","publishDate"],
+    "Post-Mortem":     [],
+  },
+};
+const LS = { url:"ytpipe.viewUrl", prefs:"ytpipe.prefs", draft:id=>"ytpipe.draft."+id };
+
+/* ---- load persisted config/prefs ---- */
+try{ const u=localStorage.getItem(LS.url); if(u) CONFIG.databaseViewUrl=u; }catch(e){}
+let PREFS = (()=>{ try{return JSON.parse(localStorage.getItem(LS.prefs))||{}}catch(e){return {}} })();
+function savePrefs(){ try{localStorage.setItem(LS.prefs,JSON.stringify(PREFS))}catch(e){} }
+
+/* =========================================================================
+   STATE
+   ========================================================================= */
+let STATE = { rows:[], loadedAt:null, error:null, online:navigator.onLine, current:null, parseUnverified:false, lastRaw:"" };
+const $ = s=>document.querySelector(s);
+const $$ = s=>[...document.querySelectorAll(s)];
+const esc = s=>(s==null?"":String(s)).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+/* =========================================================================
+   DATA LAYER  (callMcpTool wrapper + defensive parser)
+   The exact shape of notion-query-database-view output must be confirmed on a
+   live connection. parseRows() handles (a) structured JSON rows and (b) the
+   Notion-flavored markdown property dump, and exposes the raw payload for
+   verification. If rows can't be parsed, a warning banner stays up.
+   ========================================================================= */
+async function mcp(tool, args){
+  if(!window.cowork || !window.cowork.callMcpTool) throw new Error("Artifact host API unavailable");
+  const r = await window.cowork.callMcpTool(NOTION+"__"+tool, args);
+  if(r && r.isError) throw new Error(typeof r.content?.[0]?.text==="string"? r.content[0].text : "Connector error");
+  let payload = r?.structuredContent;
+  if(payload==null && r?.content?.[0]?.text){
+    try{ payload = JSON.parse(r.content[0].text); }
+    catch(_){ payload = r.content[0].text; }   // raw markdown string
+  }
+  return payload;
+}
+
+function asText(v){ if(v==null) return ""; if(typeof v==="string") return v; if(Array.isArray(v)) return v.join(", "); return String(v); }
+function isPersistedPage(v){ return !!(v && v.id && /^[0-9a-f-]{32,36}$/i.test(v.id)); }
+
+function extractPageBody(payload, seen=new Set()){
+  if(payload==null) return "";
+  if(typeof payload==="string") return payload;
+  if(Array.isArray(payload)){
+    return payload.map(item=>extractPageBody(item, seen)).filter(Boolean).join("\n");
+  }
+  if(typeof payload!=="object" || seen.has(payload)) return "";
+  seen.add(payload);
+  const directKeys = ["markdown","page_content","body","content","plain_text","text"];
+  for(const key of directKeys){
+    const value = payload[key];
+    if(typeof value==="string") return value;
+    if(Array.isArray(value)){
+      const text = value.map(item=>extractPageBody(item, seen)).filter(Boolean).join("\n");
+      if(text) return text;
+    }
+  }
+  for(const value of Object.values(payload)){
+    const text = extractPageBody(value, seen);
+    if(text) return text;
+  }
+  return "";
+}
+
+// Extract a {props, id, title} record from a variety of possible payload rows.
+function normalizeRow(raw){
+  const p = CONFIG.props;
+  const get = key => {
+    const name = key==="title" ? CONFIG.titleProp : p[key];
+    const src = raw.properties || raw.props || raw;
+    if(src && name in src) return src[name];
+    return undefined;
+  };
+  const r = {
+    id: raw.id || raw.page_id || raw.url || raw[CONFIG.titleProp] || crypto.randomUUID(),
+    url: raw.url || raw.page_url || "",
+    title: asText(get("title")) || "(untitled)",
+  };
+  for(const k of Object.keys(p)) r[k] = asText(get(k));
+  return r;
+}
+
+function parseRows(payload){
+  STATE.parseUnverified = false;
+  STATE.lastRaw = typeof payload==="string" ? payload : JSON.stringify(payload,null,2);
+  // (a) structured arrays
+  let arr = null;
+  if(Array.isArray(payload)) arr = payload;
+  else if(payload && Array.isArray(payload.results)) arr = payload.results;
+  else if(payload && Array.isArray(payload.rows)) arr = payload.rows;
+  else if(payload && Array.isArray(payload.pages)) arr = payload.pages;
+  if(arr) return arr.map(normalizeRow);
+  // (b) markdown / unknown -> can't reliably structure; flag for live verification
+  STATE.parseUnverified = true;
+  return [];
+}
+
+async function loadRows(){
+  STATE.error=null;
+  if(!CONFIG.databaseViewUrl){ STATE.rows=[]; render(); openSetup(); return; }
+  try{
+    renderBanners("loading");
+    const payload = await mcp("notion-query-database-view", { view_url: CONFIG.databaseViewUrl });
+    STATE.rows = parseRows(payload);
+    STATE.loadedAt = new Date();
+  }catch(e){
+    STATE.error = e.message||String(e);
+  }
+  render();
+}
+
+/* ---- writes ---- */
+function buildProps(v){
+  const p=CONFIG.props, out={};
+  out[CONFIG.titleProp]=v.title||"";
+  out[p.stage]=v.stage; out[p.state]=v.state; out[p.priority]=v.priority;
+  out[p.logline]=v.logline; out[p.hook]=v.hook; out[p.keyword]=v.keyword;
+  out[p.beats]=v.beats; out[p.broll]=v.broll; out[p.cta]=v.cta;
+  out[p.thumbConcept]=v.thumbConcept; out[p.seoTitle]=v.seoTitle; out[p.seoDesc]=v.seoDesc;
+  out[p.tags]=v.tags;
+  if(p.recordDate && v.recordDate){ out["date:"+p.recordDate+":start"]=v.recordDate; out["date:"+p.recordDate+":is_datetime"]=0; }
+  if(p.publishDate && v.publishDate){ out["date:"+p.publishDate+":start"]=v.publishDate; out["date:"+p.publishDate+":is_datetime"]=0; }
+  if(v.runtime!=="") out[p.runtime]=Number(v.runtime);
+  out[p.ytUrl]=v.ytUrl; out[p.thumbUrl]=v.thumbUrl;
+  return out;
+}
+async function saveVideo(v, {advance=false}={}){
+  const props = buildProps(v);
+  if(isPersistedPage(v)){
+    await mcp("notion-update-page", { page_id:v.id, command:"update_properties", properties:props });
+    if(v.scriptLoaded && v.scriptDirty){
+      await mcp("notion-update-page", { page_id:v.id, command:"replace_content", new_str: v.script||"" , allow_deleting_content:true});
+    }
+  }else{
+    await mcp("notion-create-pages", { parent:{database_id: dbIdFromView()}, pages:[{ properties:props, content:v.script||"" }] });
+  }
+}
+function dbIdFromView(){
+  // view url: https://notion.so/<ws>/<dbid>?v=<view>; dbid is last path segment before ?v=
+  try{ const u=new URL(CONFIG.databaseViewUrl); const seg=u.pathname.split("/").pop(); return seg.replace(/-/g,"").slice(-32); }catch(e){ return ""; }
+}
+
+/* =========================================================================
+   GATE LOGIC
+   ========================================================================= */
+function isEmpty(val){ return val==null || String(val).trim()===""; }
+function missingForStage(v, stage){
+  const req = CONFIG.gates[stage]||[];
+  return req.filter(k=>isEmpty(v[k]));
+}
+function canAdvance(v){
+  const miss = missingForStage(v, v.stage);
+  return { ok:miss.length===0, missing:miss };
+}
+function nextStage(stage){ const i=CONFIG.stages.indexOf(stage); return i<0||i>=CONFIG.stages.length-1?null:CONFIG.stages[i+1]; }
+
+/* =========================================================================
+   BEATS serialization  ([BEAT] label | timecode)
+   ========================================================================= */
+function parseBeats(text){
+  const beats=[]; let notes=[];
+  (text||"").split(/\r?\n/).forEach(line=>{
+    const m=line.match(/^\s*\[BEAT\]\s*(.*?)\s*(?:\|\s*(.*))?$/i);
+    if(m) beats.push({label:m[1]||"", tc:(m[2]||"").trim()});
+    else if(line.trim()) notes.push(line);
+  });
+  return {beats, notes:notes.join("\n")};
+}
+function serializeBeats(beats, notes){
+  const lines = beats.filter(b=>b.label||b.tc).map(b=>`[BEAT] ${b.label}${b.tc?" | "+b.tc:""}`);
+  if(notes&&notes.trim()) lines.push(notes.trim());
+  return lines.join("\n");
+}
+
+/* =========================================================================
+   RENDER
+   ========================================================================= */
+function cssVar(name){ return getComputedStyle(document.documentElement).getPropertyValue(name); }
+function stageColor(stage){ return cssVar(CONFIG.stageColors[stage]||"--idea")||"#888"; }
+
+function renderBanners(mode){
+  const b=$("#banners"); let html="";
+  if(!CONFIG.databaseViewUrl){
+    html+=`<div class="banner info">No database connected yet. <button class="iconbtn" onclick="openSetup()">Connect database</button></div>`;
+  }
+  if(mode==="loading") html+=`<div class="banner info">Loading videos…</div>`;
+  if(STATE.error){
+    html+=`<div class="banner err"><span>⚠ Couldn't load from Notion: ${esc(STATE.error)}</span><button class="iconbtn" onclick="loadRows()">Retry</button></div>`;
+  }
+  if(STATE.parseUnverified){
+    html+=`<div class="banner warn"><span>⚠ Connected, but the response shape wasn't recognized by the parser. This needs a one-time live verification — see raw payload in Settings.</span></div>`;
+  }
+  if(!STATE.online){
+    html+=`<div class="banner warn">You appear offline. Editing still works; Save/Advance are disabled until you're back online.</div>`;
+  }
+  b.innerHTML=html;
+}
+
+function applyFilters(rows){
+  const q=(PREFS.search||"").toLowerCase();
+  return rows.filter(v=>{
+    if(PREFS.fOwner && v.owner!==PREFS.fOwner) return false;
+    if(PREFS.fPriority && v.priority!==PREFS.fPriority) return false;
+    if(PREFS.fState && v.state!==PREFS.fState) return false;
+    if(q && !(`${v.title} ${v.keyword}`.toLowerCase().includes(q))) return false;
+    return true;
+  });
+}
+
+function cardHtml(v){
+  const gate=canAdvance(v);
+  const blocked = v.state==="Blocked" || !gate.ok;
+  const pr = (v.priority||"").toLowerCase();
+  return `<button class="card" data-id="${esc(v.id)}">
+    <div class="t">${esc(v.title)} ${blocked?'<span class="flag" title="Missing required fields or blocked">●</span>':''}</div>
+    <div class="chips">
+      ${v.priority?`<span class="chip ${pr}">${esc(v.priority)}</span>`:''}
+      ${v.owner?`<span class="chip">${esc(v.owner)}</span>`:''}
+      ${v.state&&v.state!=="Active"?`<span class="chip ${v.state==="Blocked"?'blocked':''}">${esc(v.state)}</span>`:''}
+      ${v.keyword?`<span class="chip">🔍 ${esc(v.keyword)}</span>`:''}
+    </div>
+  </button>`;
+}
+
+function renderBoard(){
+  const board=$("#board"); const rows=applyFilters(STATE.rows);
+  if(!CONFIG.databaseViewUrl){ board.innerHTML=""; return; }
+  if(STATE.rows.length===0 && !STATE.error){
+    board.innerHTML=`<div class="empty" style="grid-column:1/-1">No videos yet. <button class="iconbtn" onclick="newVideo()">+ Create the first one</button></div>`;
+    return;
+  }
+  board.innerHTML = CONFIG.stages.map(st=>{
+    const items=rows.filter(v=>(v.stage||"Idea")===st);
+    return `<div class="col">
+      <h3><span class="dot" style="background:${stageColor(st)}"></span>${esc(st)}<span class="cnt">${items.length}</span></h3>
+      <div class="cards">${items.map(cardHtml).join("")||'<div class="empty" style="padding:14px;font-size:12px">—</div>'}</div>
+    </div>`;
+  }).join("");
+  $$("#board .card").forEach(c=>c.onclick=()=>openDrawer(c.dataset.id));
+}
+
+function renderWorkbenchList(){
+  const wrap=$("#wbList"); const rows=applyFilters(STATE.rows);
+  $("#wbEmpty").classList.toggle("hide", rows.length>0);
+  wrap.innerHTML = CONFIG.stages.map(st=>{
+    const items=rows.filter(v=>(v.stage||"Idea")===st); if(!items.length) return "";
+    return `<div class="col"><h3><span class="dot" style="background:${stageColor(st)}"></span>${esc(st)}<span class="cnt">${items.length}</span></h3>
+      <div class="cards">${items.map(cardHtml).join("")}</div></div>`;
+  }).join("");
+  $$("#wbList .card").forEach(c=>c.onclick=()=>openDrawer(c.dataset.id));
+}
+
+function renderCalendar(){
+  const cal=$("#cal");
+  const events=[];
+  STATE.rows.forEach(v=>{
+    if(v.recordDate) events.push({date:v.recordDate, label:"🎥 Record: "+v.title, id:v.id});
+    if(v.publishDate) events.push({date:v.publishDate, label:"🚀 Publish: "+v.title, id:v.id});
+  });
+  events.sort((a,b)=>a.date.localeCompare(b.date));
+  if(!events.length){ cal.innerHTML=`<div class="empty">No record or publish dates set.</div>`; return; }
+  const byDate={}; events.forEach(e=>{(byDate[e.date]=byDate[e.date]||[]).push(e)});
+  cal.innerHTML=Object.keys(byDate).map(d=>`<div class="calrow"><div class="d">${esc(d)}</div>
+    <div class="ev">${byDate[d].map(e=>`<button class="chip" data-id="${esc(e.id)}">${esc(e.label)}</button>`).join("")}</div></div>`).join("");
+  $$("#cal .chip").forEach(c=>c.onclick=()=>openDrawer(c.dataset.id));
+}
+
+function renderFilters(){
+  const owners=[...new Set(STATE.rows.map(v=>v.owner).filter(Boolean))].sort();
+  const sel=$("#fOwner"); const cur=PREFS.fOwner||"";
+  sel.innerHTML=`<option value="">All owners</option>`+owners.map(o=>`<option ${o===cur?'selected':''}>${esc(o)}</option>`).join("");
+  $("#search").value=PREFS.search||"";
+  $("#fPriority").value=PREFS.fPriority||"";
+  $("#fState").value=PREFS.fState||"";
+}
+
+function render(){
+  renderBanners();
+  renderFilters();
+  renderBoard();
+  renderWorkbenchList();
+  renderCalendar();
+  $("#loadedAt").textContent = STATE.loadedAt? "Loaded "+STATE.loadedAt.toLocaleTimeString() : "";
+  $("#mapDump").textContent = Object.entries(CONFIG.props).map(([k,v])=>`${v}  →  ${k}`).join("\n");
+  $("#dbName").textContent = CONFIG.databaseViewUrl? "· connected":"· not connected";
+}
+
+/* =========================================================================
+   DRAWER (workbench editor)
+   ========================================================================= */
+function blankVideo(){ return {id:"new:"+Date.now(), title:"", stage:"Idea", state:"Active", priority:"P2",
+  logline:"",hook:"",keyword:"",beats:"",broll:"",cta:"",thumbConcept:"",seoTitle:"",seoDesc:"",tags:"",
+  ytUrl:"",thumbUrl:"",recordDate:"",publishDate:"",runtime:"",script:"",scriptLoaded:true,scriptDirty:false }; }
+
+function loadDraft(id){ try{ const d=localStorage.getItem(LS.draft(id)); return d?JSON.parse(d):null; }catch(e){return null;} }
+function saveDraft(){ if(!STATE.current) return; try{ localStorage.setItem(LS.draft(STATE.current.id), JSON.stringify(STATE.current)); }catch(e){} setSaveState("draft saved locally"); }
+function clearDraft(id){ try{ localStorage.removeItem(LS.draft(id)); }catch(e){} }
+function setSaveState(t){ $("#saveState").textContent=t||""; }
+
+function fillStageOptions(){ $("#dStage").innerHTML=CONFIG.stages.map(s=>`<option>${esc(s)}</option>`).join(""); }
+
+function prepareForEdit(v){
+  if(isPersistedPage(v)){
+    v.script = "";
+    v.scriptLoaded = false;
+    v.scriptDirty = false;
+    v.scriptLoading = false;
+  }else{
+    v.scriptLoaded = true;
+    v.scriptDirty = false;
+    v.scriptLoading = false;
+  }
+  return v;
+}
+
+function normalizeDraft(v){
+  if(!isPersistedPage(v)){
+    v.scriptLoaded = true;
+    v.scriptDirty = !!v.script;
+    return v;
+  }
+  if(v.scriptLoaded !== true){
+    v.scriptLoaded = !!v.script;
+  }
+  v.scriptDirty = !!v.scriptDirty;
+  if(!v.scriptLoaded) v.script = "";
+  return v;
+}
+
+function setScriptEditorState(message){
+  const v=STATE.current; if(!v) return;
+  const persisted=isPersistedPage(v);
+  const unloaded=persisted && !v.scriptLoaded;
+  const loading=!!v.scriptLoading;
+  const script=$("#dScript"), loadBtn=$("#loadScriptBtn"), state=$("#scriptState");
+  script.disabled=unloaded || loading;
+  script.placeholder=unloaded ? "Load the Notion page body before editing this script." : "Full script...";
+  loadBtn.classList.toggle("hide", !persisted);
+  loadBtn.disabled=!persisted || v.scriptLoaded || loading;
+  state.textContent = message || (unloaded ? "Page body not loaded. Metadata saves will leave it unchanged." : (persisted ? "Page body loaded." : "New page body will be created on save."));
+  state.classList.toggle("warn", unloaded);
+}
+
+async function loadScriptBody(){
+  const v=STATE.current; if(!isPersistedPage(v)) return;
+  v.scriptLoading=true; setScriptEditorState("Loading page body...");
+  try{
+    let payload;
+    try{ payload = await mcp("notion-fetch", { id:v.id }); }
+    catch(e){ payload = await mcp("notion-fetch", { page_id:v.id }); }
+    v.script = extractPageBody(payload);
+    v.scriptLoaded = true;
+    v.scriptDirty = false;
+    $("#dScript").value=v.script;
+    v.scriptLoading=false;
+    setScriptEditorState(v.script ? "Page body loaded." : "Page body loaded empty.");
+  }catch(e){
+    v.scriptLoading=false;
+    setScriptEditorState("Page body load failed: "+(e.message||String(e)));
+  }
+}
+
+function openDrawer(id){
+  let v = STATE.rows.find(r=>r.id===id);
+  v = v? prepareForEdit(JSON.parse(JSON.stringify(v))) : blankVideo();
+  const draft=loadDraft(v.id);
+  if(draft){
+    // restore unsaved draft
+    if(confirm("You have an unsaved local draft for this video. Restore it? (Cancel = discard draft)")) v=normalizeDraft(draft);
+    else clearDraft(v.id);
+  }
+  STATE.current=v;
+  fillStageOptions();
+  $("#dTitle").value=v.title; $("#dStage").value=v.stage||"Idea"; $("#dState").value=v.state||"Active";
+  $("#dPriority").value=v.priority||"P2"; $("#dLogline").value=v.logline||""; $("#dKeyword").value=v.keyword||"";
+  $("#dRuntime").value=v.runtime||""; $("#dRecord").value=v.recordDate||""; $("#dPublish").value=v.publishDate||"";
+  $("#dHook").value=v.hook||""; $("#dCta").value=v.cta||""; $("#dBroll").value=v.broll||"";
+  $("#dScript").value=v.script||""; $("#dSeoTitle").value=v.seoTitle||""; $("#dSeoDesc").value=v.seoDesc||"";
+  $("#dTags").value=v.tags||""; $("#dThumbConcept").value=v.thumbConcept||""; $("#dThumbUrl").value=v.thumbUrl||""; $("#dYtUrl").value=v.ytUrl||"";
+  setScriptEditorState();
+  renderBeats();
+  ["sugHook","sugBeats","sugSeo"].forEach(i=>$("#"+i).innerHTML="");
+  updateGateUI();
+  $("#dStageDot").style.background=stageColor(v.stage||"Idea");
+  $("#drawer").classList.add("open"); $("#drawer").setAttribute("aria-hidden","false");
+  $("#drawerBg").classList.add("open");
+  setSaveState(draft?"restored local draft":"");
+}
+function closeDrawer(){ $("#drawer").classList.remove("open"); $("#drawerBg").classList.remove("open"); $("#drawer").setAttribute("aria-hidden","true"); STATE.current=null; }
+
+function renderBeats(){
+  const {beats}=parseBeats(STATE.current.beats||"");
+  const host=$("#dBeats");
+  if(!beats.length) beats.push({label:"",tc:""});
+  host.innerHTML=beats.map((b,i)=>`<div class="beat">
+    <input data-i="${i}" data-f="label" placeholder="Beat" value="${esc(b.label)}"/>
+    <input data-i="${i}" data-f="tc" placeholder="~0:30" value="${esc(b.tc)}"/>
+    <button class="x" data-del="${i}">✕</button></div>`).join("");
+  host.querySelectorAll("input").forEach(inp=>inp.oninput=collectBeats);
+  host.querySelectorAll("[data-del]").forEach(btn=>btn.onclick=()=>{ const arr=currentBeats(); arr.splice(+btn.dataset.del,1); STATE.current.beats=serializeBeats(arr,""); renderBeats(); markDirty(); });
+}
+function currentBeats(){ const arr=[]; $$("#dBeats .beat").forEach(r=>{ arr.push({label:r.querySelector('[data-f=label]').value, tc:r.querySelector('[data-f=tc]').value}); }); return arr; }
+function collectBeats(){ STATE.current.beats=serializeBeats(currentBeats(),""); markDirty(); }
+
+function pull(){ const v=STATE.current; if(!v) return;
+  v.title=$("#dTitle").value; v.stage=$("#dStage").value; v.state=$("#dState").value; v.priority=$("#dPriority").value;
+  v.logline=$("#dLogline").value; v.keyword=$("#dKeyword").value; v.runtime=$("#dRuntime").value;
+  v.recordDate=$("#dRecord").value; v.publishDate=$("#dPublish").value; v.hook=$("#dHook").value; v.cta=$("#dCta").value;
+  v.broll=$("#dBroll").value; v.script=$("#dScript").value; v.seoTitle=$("#dSeoTitle").value; v.seoDesc=$("#dSeoDesc").value;
+  v.tags=$("#dTags").value; v.thumbConcept=$("#dThumbConcept").value; v.thumbUrl=$("#dThumbUrl").value; v.ytUrl=$("#dYtUrl").value;
+}
+let dirtyTimer=null;
+function markDirty(opts={}){
+  pull();
+  if(opts.scriptDirty && STATE.current.scriptLoaded) STATE.current.scriptDirty=true;
+  updateGateUI();
+  setScriptEditorState();
+  clearTimeout(dirtyTimer);
+  dirtyTimer=setTimeout(saveDraft,600);
+  $("#dStageDot").style.background=stageColor(STATE.current.stage);
+}
+
+function updateGateUI(){
+  const v=STATE.current; if(!v) return;
+  const g=canAdvance(v); const ns=nextStage(v.stage);
+  const adv=$("#advanceBtn");
+  if(!ns){ adv.textContent="Final stage"; adv.disabled=true; $("#gateWarn").textContent=""; return; }
+  adv.textContent="Advance ▸ "+ns;
+  adv.disabled = !g.ok || !STATE.online;
+  $("#gateWarn").textContent = g.ok? "" : "Need: "+g.missing.map(fieldLabel).join(", ");
+}
+function fieldLabel(k){ return ({logline:"Logline",keyword:"Keyword",hook:"Hook",beats:"Beats",cta:"CTA",runtime:"Runtime",recordDate:"Record date",broll:"B-roll",thumbConcept:"Thumbnail concept",seoTitle:"SEO title",ytUrl:"YouTube URL",publishDate:"Publish date"}[k])||k; }
+
+/* ---- save / advance ---- */
+async function doSave(advance){
+  const v=STATE.current; pull();
+  if(!STATE.online){ alert("You're offline — changes are kept locally."); saveDraft(); return; }
+  if(advance){
+    const g=canAdvance(v); if(!g.ok){ alert("Can't advance: missing "+g.missing.map(fieldLabel).join(", ")); return; }
+    v.stage=nextStage(v.stage);
+    if(v.stage==="Record" && !v.recordDate) v.recordDate=new Date().toISOString().slice(0,10);
+    if(v.stage==="Publish" && !v.publishDate) v.publishDate=new Date().toISOString().slice(0,10);
+  }
+  $("#saveBtn").disabled=true; $("#advanceBtn").disabled=true; setSaveState("saving…");
+  try{
+    await saveVideo(v,{advance});
+    clearDraft(v.id);
+    setSaveState("saved to Notion");
+    closeDrawer();
+    await loadRows();
+  }catch(e){
+    setSaveState("");
+    alert("Save failed (kept your local draft): "+(e.message||e));
+    saveDraft();
+  }finally{
+    $("#saveBtn").disabled=false; updateGateUI();
+  }
+}
+
+/* =========================================================================
+   askClaude actions
+   ========================================================================= */
+async function aiAction(kind, btn){
+  const v=STATE.current; pull();
+  if(!window.cowork || !window.cowork.askClaude){ alert("askClaude unavailable in this host."); return; }
+  if((kind==="tighten" || kind==="seo") && isPersistedPage(v) && !v.scriptLoaded){
+    alert("Load the Notion page body before running script AI actions.");
+    return;
+  }
+  btn.disabled=true;
+  try{
+    let prompt="", data=[], target="";
+    if(kind==="hooks"){ prompt=`Write 3 distinct YouTube hook options (first 10 seconds), one per line, no numbering, for a video. Logline: "${v.logline}". Target keyword: "${v.keyword}". Each under 25 words, punchy.`; target="sugHook"; }
+    if(kind==="beats"){ prompt=`Outline the section beats for a ${v.runtime||"8"}-minute YouTube video. Logline: "${v.logline}". Return 5-8 lines, each formatted exactly: [BEAT] label | ~m:ss`; target="sugBeats"; }
+    if(kind==="tighten"){ const sel=getSelection().toString()|| $("#dScript").value; prompt=`Tighten this YouTube script text. Keep meaning and voice, cut filler, return only the revised text:\n\n${sel}`; target="sugSeo"; }
+    if(kind==="seo"){ prompt=`From this script, return JSON {"title":"","description":"","tags":["",""]} optimized for YouTube SEO. Title under 70 chars, description 2-3 sentences, 6-10 tags.`; data=[v.script||""]; target="sugSeo"; }
+    const out = await window.cowork.askClaude(prompt, data);
+    showSuggestion(kind, target, out);
+  }catch(e){ alert("AI action failed: "+(e.message||e)); }
+  finally{ btn.disabled=false; }
+}
+function showSuggestion(kind,target,out){
+  const host=$("#"+target); const text=typeof out==="string"?out:JSON.stringify(out);
+  if(kind==="hooks"){
+    const opts=text.split(/\r?\n/).map(s=>s.replace(/^[-*\d.\s]+/,"").trim()).filter(Boolean);
+    host.innerHTML=`<div class="suggest"><strong>Hook options</strong>${opts.map(o=>`<div class="opt"><span>${esc(o)}</span><button>use</button></div>`).join("")}</div>`;
+    host.querySelectorAll(".opt button").forEach((b,i)=>b.onclick=()=>{ $("#dHook").value=opts[i]; markDirty(); });
+  } else if(kind==="beats"){
+    host.innerHTML=`<div class="suggest"><strong>Suggested beats</strong><div class="opt"><pre style="white-space:pre-wrap;margin:0">${esc(text)}</pre><button>use</button></div></div>`;
+    host.querySelector("button").onclick=()=>{ STATE.current.beats=text; renderBeats(); markDirty(); };
+  } else if(kind==="seo"){
+    let obj=null; try{ obj=JSON.parse(text.match(/\{[\s\S]*\}/)?.[0]||text); }catch(e){}
+    host.innerHTML=`<div class="suggest"><strong>SEO draft</strong><div class="opt"><pre style="white-space:pre-wrap;margin:0">${esc(text)}</pre><button>apply</button></div></div>`;
+    host.querySelector("button").onclick=()=>{ if(obj){ $("#dSeoTitle").value=obj.title||""; $("#dSeoDesc").value=obj.description||""; $("#dTags").value=(obj.tags||[]).join(", "); markDirty(); } };
+  } else {
+    host.innerHTML=`<div class="suggest"><strong>Tightened</strong><div class="opt"><pre style="white-space:pre-wrap;margin:0">${esc(text)}</pre><button>replace script</button></div></div>`;
+    host.querySelector("button").onclick=()=>{ $("#dScript").value=text; markDirty({scriptDirty:true}); };
+  }
+}
+
+/* =========================================================================
+   EVENTS
+   ========================================================================= */
+function switchTab(t){
+  $$("#tabs button").forEach(b=>b.classList.toggle("active",b.dataset.tab===t));
+  $("#view-board").classList.toggle("hide",t!=="board");
+  $("#view-workbench").classList.toggle("hide",t!=="workbench");
+  $("#view-calendar").classList.toggle("hide",t!=="calendar");
+  PREFS.tab=t; savePrefs();
+}
+function newVideo(){ openDrawer(null); }
+window.newVideo=newVideo; window.openSetup=openSetup; window.loadRows=loadRows;
+
+function openSetup(){ $("#viewUrlInput").value=CONFIG.databaseViewUrl||""; $("#setupCard").classList.remove("hide"); $("#setupBg").classList.add("open"); }
+function closeSetup(){ $("#setupCard").classList.add("hide"); $("#setupBg").classList.remove("open"); }
+
+document.addEventListener("DOMContentLoaded",()=>{
+  $$("#tabs button").forEach(b=>b.onclick=()=>switchTab(b.dataset.tab));
+  $("#newBtn").onclick=newVideo;
+  $("#settingsBtn").onclick=openSetup;
+  $("#dClose").onclick=closeDrawer; $("#drawerBg").onclick=closeDrawer;
+  $("#saveBtn").onclick=()=>doSave(false);
+  $("#advanceBtn").onclick=()=>doSave(true);
+  $("#loadScriptBtn").onclick=loadScriptBody;
+  $("#addBeat").onclick=()=>{ const arr=currentBeats(); arr.push({label:"",tc:""}); STATE.current.beats=serializeBeats(arr,""); renderBeats(); };
+  $$("#drawer [data-ai]").forEach(b=>b.onclick=()=>aiAction(b.dataset.ai,b));
+  $$("#drawer input,#drawer textarea,#drawer select").forEach(el=>el.addEventListener("input",e=>markDirty({scriptDirty:e.target.id==="dScript"})));
+  $("#saveSetup").onclick=()=>{ CONFIG.databaseViewUrl=$("#viewUrlInput").value.trim(); try{localStorage.setItem(LS.url,CONFIG.databaseViewUrl)}catch(e){} closeSetup(); loadRows(); };
+  $("#closeSetup").onclick=closeSetup; $("#setupBg").onclick=closeSetup;
+  // filters
+  $("#search").oninput=e=>{PREFS.search=e.target.value;savePrefs();render();};
+  $("#fOwner").onchange=e=>{PREFS.fOwner=e.target.value;savePrefs();render();};
+  $("#fPriority").onchange=e=>{PREFS.fPriority=e.target.value;savePrefs();render();};
+  $("#fState").onchange=e=>{PREFS.fState=e.target.value;savePrefs();render();};
+  window.addEventListener("online",()=>{STATE.online=true;render();updateGateUI();});
+  window.addEventListener("offline",()=>{STATE.online=false;render();updateGateUI();});
+  if(PREFS.tab) switchTab(PREFS.tab);
+  loadRows();
+});
+</script>
+</body>
+</html>
