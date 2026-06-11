@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: https:; script-src 'self' 'unsafe-inline'">
+<title>Project Registry - System by Dave</title>
+<meta name="description" content="A public registry of DaveHomeAssist GitHub projects, including purpose, stack, recent activity, and repository links.">
+<link rel="canonical" href="https://systembydave.com/project-registry.html">
+<meta name="robots" content="index,follow">
+<meta name="theme-color" content="#F5F0E8">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="System by Dave">
+<meta property="og:title" content="Project Registry - System by Dave">
+<meta property="og:description" content="A public registry of DaveHomeAssist GitHub projects, including purpose, stack, recent activity, and repository links.">
+<meta property="og:url" content="https://systembydave.com/project-registry.html">
+<meta property="og:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<meta property="og:image:width" content="1024">
+<meta property="og:image:height" content="412">
+<meta property="og:image:alt" content="System by Dave preview banner">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Project Registry - System by Dave">
+<meta name="twitter:description" content="A public registry of DaveHomeAssist GitHub projects, including purpose, stack, recent activity, and repository links.">
+<meta name="twitter:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<link rel="icon" href="svg/system_by_dave_logo_rust.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/fonts.css">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .registry-hero {
+    padding: 72px 0 44px;
+    border-bottom: 1px solid var(--grid-line-accent);
+  }
+  .registry-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0;
+    text-transform: uppercase;
+    color: var(--rust);
+    margin-bottom: 18px;
+  }
+  .registry-hero h1 {
+    font-family: var(--font-display);
+    font-size: 52px;
+    font-weight: 400;
+    line-height: 1.08;
+    margin-bottom: 22px;
+  }
+  .registry-hero p {
+    max-width: 720px;
+    color: var(--charcoal-light);
+    font-size: 17px;
+    font-weight: 300;
+    line-height: 1.7;
+  }
+  .registry-section {
+    padding: 42px 0 82px;
+  }
+  .registry-metrics {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 22px;
+  }
+  .registry-metric {
+    min-height: 112px;
+    border: 1.5px solid var(--grid-line-accent);
+    background: rgba(245, 240, 232, 0.72);
+    padding: 22px;
+  }
+  .registry-metric strong {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 42px;
+    font-weight: 400;
+    line-height: 1;
+  }
+  .registry-metric span {
+    display: block;
+    margin-top: 10px;
+    color: var(--charcoal-light);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0;
+    text-transform: uppercase;
+  }
+  .registry-toolbar {
+    display: grid;
+    grid-template-columns: minmax(220px, 1.8fr) repeat(3, minmax(150px, 1fr));
+    gap: 12px;
+    align-items: end;
+    margin-bottom: 22px;
+    padding: 18px;
+    border: 1.5px solid var(--grid-line-accent);
+    background: rgba(245, 240, 232, 0.8);
+  }
+  .registry-field {
+    display: grid;
+    gap: 7px;
+  }
+  .registry-field label {
+    color: var(--rust);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0;
+    text-transform: uppercase;
+  }
+  .registry-field input,
+  .registry-field select {
+    width: 100%;
+    min-height: 42px;
+    border: 1.5px solid var(--grid-line-accent);
+    background: var(--cream);
+    color: var(--charcoal);
+    font: inherit;
+    padding: 9px 11px;
+  }
+  .registry-field input:focus,
+  .registry-field select:focus {
+    border-color: var(--rust);
+    outline: 2px solid rgba(154, 80, 56, 0.18);
+    outline-offset: 1px;
+  }
+  .registry-results-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    align-items: baseline;
+    margin-bottom: 14px;
+    color: var(--charcoal-light);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0;
+    text-transform: uppercase;
+  }
+  .registry-table-wrap {
+    overflow-x: auto;
+    border: 1.5px solid var(--grid-line-accent);
+    background: rgba(245, 240, 232, 0.88);
+    box-shadow: var(--shadow-md);
+  }
+  .registry-table {
+    width: 100%;
+    min-width: 980px;
+    border-collapse: collapse;
+    table-layout: fixed;
+  }
+  .registry-table th,
+  .registry-table td {
+    padding: 18px 16px;
+    border-bottom: 1px solid var(--grid-line-accent);
+    text-align: left;
+    vertical-align: top;
+  }
+  .registry-table th {
+    background: var(--cream-dark);
+    color: var(--rust);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0;
+    text-transform: uppercase;
+  }
+  .registry-table tbody tr:hover {
+    background: rgba(181, 101, 74, 0.06);
+  }
+  .repo-name {
+    color: var(--charcoal);
+    font-weight: 700;
+    text-decoration: none;
+    overflow-wrap: anywhere;
+  }
+  .repo-name:hover {
+    color: var(--rust);
+  }
+  .repo-meta {
+    display: block;
+    margin-top: 6px;
+    color: var(--charcoal-light);
+    font-family: var(--font-mono);
+    font-size: 11px;
+  }
+  .repo-purpose {
+    color: var(--charcoal-light);
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 1.65;
+  }
+  .registry-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .registry-pill,
+  .registry-status {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    border: 1px solid var(--grid-line-accent);
+    padding: 3px 8px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .registry-pill {
+    background: rgba(237, 231, 219, 0.7);
+    color: var(--charcoal-light);
+  }
+  .registry-status {
+    color: var(--rust-dark);
+    background: rgba(181, 101, 74, 0.1);
+  }
+  .registry-status.archived {
+    color: var(--charcoal-light);
+    background: rgba(44, 44, 44, 0.06);
+  }
+  .registry-empty {
+    padding: 44px 20px;
+    color: var(--charcoal-light);
+    text-align: center;
+  }
+  .registry-note {
+    margin-top: 18px;
+    color: var(--charcoal-light);
+    font-size: 13px;
+    font-weight: 300;
+  }
+  @media (max-width: 900px) {
+    .registry-metrics {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .registry-toolbar {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  @media (max-width: 680px) {
+    .registry-hero {
+      padding: 48px 0 34px;
+    }
+    .registry-hero h1 {
+      font-size: 38px;
+    }
+    .registry-toolbar,
+    .registry-metrics {
+      grid-template-columns: 1fr;
+    }
+    .registry-results-header {
+      flex-direction: column;
+      gap: 6px;
+    }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to content</a>
+<div class="page-wrapper">
+  <header>
+    <nav class="container" aria-label="Primary">
+      <a href="index.html" class="nav-brand">
+        <div class="nav-brand-mark"><span>S</span><span class="mark-d">D</span></div>
+        <span class="nav-brand-text">System by Dave</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="skills.html" class="hide-mobile">Skills</a></li>
+        <li><a href="agents.html" class="hide-mobile">Agents</a></li>
+        <li><a href="widgets.html" class="hide-mobile">Widgets</a></li>
+        <li><a href="project-registry.html" class="active hide-mobile" aria-current="page">Projects</a></li>
+        <li><a href="https://promptlab.tools" target="_blank" rel="noopener noreferrer" class="hide-mobile">Prompt Lab</a></li>
+        <li><a href="https://github.com/DaveHomeAssist/system-by-dave" target="_blank" rel="noopener noreferrer" class="nav-cta">GitHub</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main id="main-content">
+    <section class="registry-hero">
+      <div class="container">
+        <div class="registry-eyebrow">DaveHomeAssist GitHub</div>
+        <h1>Public Project Registry</h1>
+        <p>A browsable snapshot of public repositories, grouped by purpose, stack, status, and recent activity. The private local audit stays offline.</p>
+      </div>
+    </section>
+
+    <section class="registry-section">
+      <div class="container">
+        <div class="registry-metrics" aria-label="Project summary">
+          <div class="registry-metric"><strong id="metric-total">0</strong><span>Public repos</span></div>
+          <div class="registry-metric"><strong id="metric-active">0</strong><span>Active</span></div>
+          <div class="registry-metric"><strong id="metric-archived">0</strong><span>Archived</span></div>
+          <div class="registry-metric"><strong id="metric-commits">0</strong><span>90 day commits</span></div>
+        </div>
+
+        <form class="registry-toolbar" role="search" aria-label="Filter public repositories">
+          <div class="registry-field">
+            <label for="registry-search">Search</label>
+            <input id="registry-search" type="search" placeholder="Repo, purpose, stack">
+          </div>
+          <div class="registry-field">
+            <label for="registry-status">Status</label>
+            <select id="registry-status">
+              <option value="all">All statuses</option>
+              <option value="active">Active</option>
+              <option value="maintenance">Maintenance</option>
+              <option value="archived">Archived</option>
+            </select>
+          </div>
+          <div class="registry-field">
+            <label for="registry-category">Category</label>
+            <select id="registry-category">
+              <option value="all">All categories</option>
+            </select>
+          </div>
+          <div class="registry-field">
+            <label for="registry-sort">Sort</label>
+            <select id="registry-sort">
+              <option value="updated">Last update</option>
+              <option value="activity">90 day activity</option>
+              <option value="name">Name</option>
+              <option value="category">Category</option>
+            </select>
+          </div>
+        </form>
+
+        <div class="registry-results-header">
+          <span id="registry-count">0 repositories</span>
+          <span id="registry-generated">Loading registry data</span>
+        </div>
+
+        <div class="registry-table-wrap">
+          <table class="registry-table">
+            <thead>
+              <tr>
+                <th style="width: 220px;">Repository</th>
+                <th style="width: 150px;">Category</th>
+                <th style="width: 310px;">Purpose</th>
+                <th style="width: 170px;">Stack</th>
+                <th style="width: 130px;">Status</th>
+                <th style="width: 150px;">Activity</th>
+              </tr>
+            </thead>
+            <tbody id="registry-rows">
+              <tr><td colspan="6"><div class="registry-empty">Loading public repository data.</div></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="registry-note">Public-safe subset only: no private repositories, local paths, uncommitted-file counts, or internal triage notes are published here.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <a href="index.html" class="nav-brand">
+            <div class="nav-brand-mark"><span>S</span><span class="mark-d">D</span></div>
+            <span class="nav-brand-text">System by Dave</span>
+          </a>
+          <p class="footer-brand-desc">Handcrafted Notion tools for people who take their workflows seriously.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Products</h4>
+          <ul>
+            <li><a href="skills.html">Skills</a></li>
+            <li><a href="agents.html">Agents</a></li>
+            <li><a href="widgets.html">Widgets</a></li>
+            <li><a href="prompts/">Prompts</a></li>
+            <li><a href="https://promptlab.tools" target="_blank" rel="noopener noreferrer">Prompt Lab</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Resources</h4>
+          <ul>
+            <li><a href="project-registry.html">Project Registry</a></li>
+            <li><a href="https://github.com/DaveHomeAssist/system-by-dave" target="_blank" rel="noopener noreferrer">Project Repo</a></li>
+            <li><a href="https://github.com/DaveHomeAssist/system-by-dave/blob/main/CHANGELOG.md" target="_blank" rel="noopener noreferrer">Changelog</a></li>
+            <li><a href="https://github.com/DaveHomeAssist" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Connect</h4>
+          <ul>
+            <li><a href="https://github.com/DaveHomeAssist" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+            <li><a href="https://promptlab.tools" target="_blank" rel="noopener noreferrer">promptlab.tools</a></li>
+            <li><a href="profile/">Profile</a></li>
+            <li><a href="prompts/">Prompts</a></li>
+            <li><a href="privacy-policy.html">Privacy Policy</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span class="footer-copy">&copy; 2026 System by Dave. All rights reserved.</span>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<script src="project-registry-public.js"></script>
+<script>
+  (function () {
+    const data = window.SBD_PROJECT_REGISTRY || { registry: { counts: {} }, projects: [] };
+    const projects = Array.isArray(data.projects) ? data.projects : [];
+    const fields = {
+      search: document.getElementById('registry-search'),
+      status: document.getElementById('registry-status'),
+      category: document.getElementById('registry-category'),
+      sort: document.getElementById('registry-sort')
+    };
+    const rows = document.getElementById('registry-rows');
+    const count = document.getElementById('registry-count');
+    const generated = document.getElementById('registry-generated');
+
+    function text(value) {
+      return String(value == null ? '' : value);
+    }
+
+    function escapeHtml(value) {
+      return text(value)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    function formatDate(value) {
+      const date = value ? new Date(value) : null;
+      if (!date || Number.isNaN(date.getTime())) return 'Unknown';
+      return date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+    }
+
+    function dateValue(value) {
+      const date = value ? new Date(value) : null;
+      return date && !Number.isNaN(date.getTime()) ? date.getTime() : 0;
+    }
+
+    function stack(project) {
+      return Array.isArray(project.stack) ? project.stack.filter(Boolean) : [];
+    }
+
+    function searchable(project) {
+      return [
+        project.name,
+        project.fullName,
+        project.category,
+        project.purpose,
+        stack(project).join(' '),
+        project.status
+      ].join(' ').toLowerCase();
+    }
+
+    function filtered() {
+      const query = fields.search.value.trim().toLowerCase();
+      const status = fields.status.value;
+      const category = fields.category.value;
+      return projects.filter((project) => {
+        if (query && !searchable(project).includes(query)) return false;
+        if (status !== 'all' && project.status !== status) return false;
+        if (category !== 'all' && project.category !== category) return false;
+        return true;
+      });
+    }
+
+    function sorted(items) {
+      const copy = items.slice();
+      const mode = fields.sort.value;
+      copy.sort((a, b) => {
+        if (mode === 'activity') {
+          return Number(b.recentCommits90d || 0) - Number(a.recentCommits90d || 0) || a.name.localeCompare(b.name);
+        }
+        if (mode === 'name') {
+          return a.name.localeCompare(b.name);
+        }
+        if (mode === 'category') {
+          return text(a.category).localeCompare(text(b.category)) || a.name.localeCompare(b.name);
+        }
+        return dateValue(b.lastRemoteUpdate) - dateValue(a.lastRemoteUpdate) || a.name.localeCompare(b.name);
+      });
+      return copy;
+    }
+
+    function renderMetrics() {
+      const counts = data.registry && data.registry.counts ? data.registry.counts : {};
+      document.getElementById('metric-total').textContent = counts.total || projects.length;
+      document.getElementById('metric-active').textContent = counts.active || projects.filter((project) => project.status === 'active').length;
+      document.getElementById('metric-archived').textContent = counts.archived || projects.filter((project) => project.status === 'archived').length;
+      document.getElementById('metric-commits').textContent = projects.reduce((total, project) => total + Number(project.recentCommits90d || 0), 0);
+      generated.textContent = data.registry && data.registry.generatedAt ? 'Snapshot ' + formatDate(data.registry.generatedAt) : 'Snapshot date unavailable';
+    }
+
+    function populateCategories() {
+      const categories = Array.from(new Set(projects.map((project) => project.category).filter(Boolean))).sort();
+      fields.category.innerHTML = '<option value="all">All categories</option>' +
+        categories.map((category) => '<option value="' + escapeHtml(category) + '">' + escapeHtml(category) + '</option>').join('');
+    }
+
+    function renderRows() {
+      const items = sorted(filtered());
+      count.textContent = items.length + ' repositor' + (items.length === 1 ? 'y' : 'ies');
+      if (!items.length) {
+        rows.innerHTML = '<tr><td colspan="6"><div class="registry-empty">No public repositories match those filters.</div></td></tr>';
+        return;
+      }
+
+      rows.innerHTML = items.map((project) => {
+        const stackItems = stack(project).slice(0, 4);
+        const extraStack = Math.max(0, stack(project).length - stackItems.length);
+        const statusClass = project.status === 'archived' ? ' archived' : '';
+        const purpose = project.purpose || 'No public description recorded.';
+        return '<tr>' +
+          '<td><a class="repo-name" href="' + escapeHtml(project.github) + '" target="_blank" rel="noopener noreferrer">' + escapeHtml(project.name) + '</a>' +
+          '<span class="repo-meta">' + escapeHtml(project.defaultBranch || 'main') + ' branch</span></td>' +
+          '<td>' + escapeHtml(project.category || 'Uncategorized') + '</td>' +
+          '<td><p class="repo-purpose">' + escapeHtml(purpose) + '</p></td>' +
+          '<td><div class="registry-pills">' + stackItems.map((item) => '<span class="registry-pill">' + escapeHtml(item) + '</span>').join('') +
+          (extraStack ? '<span class="registry-pill">+' + extraStack + '</span>' : '') + '</div></td>' +
+          '<td><span class="registry-status' + statusClass + '">' + escapeHtml(project.status || 'public') + '</span></td>' +
+          '<td>' + escapeHtml(formatDate(project.lastRemoteUpdate)) + '<span class="repo-meta">' + escapeHtml(project.recentCommits90d || 0) + ' commits / 90d</span></td>' +
+          '</tr>';
+      }).join('');
+    }
+
+    function render() {
+      renderMetrics();
+      renderRows();
+    }
+
+    Object.keys(fields).forEach((key) => {
+      fields[key].addEventListener('input', render);
+      fields[key].addEventListener('change', render);
+    });
+
+    populateCategories();
+    render();
+  }());
+</script>
+</body>
+</html>
