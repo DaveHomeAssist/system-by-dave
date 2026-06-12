@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'none'">
+<title>Teleprompter | System by Dave</title>
+<meta name="description" content="A free offline teleprompter page for typing or pasting a script and reading it with smooth auto scrolling text.">
+<link rel="canonical" href="https://systembydave.com/teleprompter.html">
+<meta name="theme-color" content="#0a0c10">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="System by Dave">
+<meta property="og:title" content="Teleprompter">
+<meta property="og:description" content="A free offline teleprompter page for typing or pasting a script and reading it with smooth auto scrolling text.">
+<meta property="og:url" content="https://systembydave.com/teleprompter.html">
+<meta property="og:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<meta property="og:image:width" content="1024">
+<meta property="og:image:height" content="412">
+<meta property="og:image:alt" content="System by Dave preview banner">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Teleprompter">
+<meta name="twitter:description" content="A free offline teleprompter page for typing or pasting a script and reading it with smooth auto scrolling text.">
+<meta name="twitter:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<link rel="icon" href="svg/system_by_dave_logo_rust.svg" type="image/svg+xml">
+<style>
+  :root{
+    --bg:#0a0c10;
+    --surface:#12161d;
+    --surface-2:#1a1f29;
+    --line:#2a313d;
+    --text:#f4f6fb;
+    --muted:#aab3c2;
+    --accent:#5bb0ff;
+    --accent-strong:#3d97f0;
+    --accent-ink:#04121f;
+    --danger:#ff6b6b;
+    --focus:#9ad0ff;
+    --radius:12px;
+    --reader-fs:48px;
+    --reader-lh:1.5;
+    --reader-width:42rem;
+    --ui-sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --read-sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--ui-sans);
+    font-size:16px;
+    line-height:1.45;
+    -webkit-font-smoothing:antialiased;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+  }
+
+  a{color:var(--accent)}
+
+  /* ---------- App shell ---------- */
+  .app{display:flex;flex-direction:column;height:100%;min-height:0}
+
+  header.bar{
+    display:flex;align-items:center;gap:12px;
+    padding:10px 16px;
+    background:linear-gradient(180deg,var(--surface),var(--surface) 60%,#0e1218);
+    border-bottom:1px solid var(--line);
+    z-index:30;
+    flex:0 0 auto;
+  }
+  .brand{display:flex;align-items:center;gap:10px;font-weight:650;letter-spacing:.2px}
+  .brand .dot{
+    width:12px;height:12px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%,#7fc3ff,var(--accent-strong));
+    box-shadow:0 0 0 4px rgba(91,176,255,.14);
+  }
+  .brand small{display:block;color:var(--muted);font-weight:500;font-size:11px;letter-spacing:.3px}
+  .bar .spacer{flex:1}
+
+  /* ---------- Controls toolbar ---------- */
+  .toolbar{
+    display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+    padding:10px 16px;
+    background:var(--surface);
+    border-bottom:1px solid var(--line);
+    z-index:20;
+    flex:0 0 auto;
+    transition:opacity .25s ease, transform .25s ease;
+  }
+  .group{
+    display:flex;align-items:center;gap:6px;
+    padding:5px 8px;
+    background:var(--surface-2);
+    border:1px solid var(--line);
+    border-radius:10px;
+  }
+  .group .label{color:var(--muted);font-size:12px;padding:0 2px;white-space:nowrap}
+  .group .readout{
+    min-width:42px;text-align:center;font-variant-numeric:tabular-nums;
+    font-size:13px;color:var(--text);
+  }
+
+  button{
+    font:inherit;color:var(--text);cursor:pointer;
+    background:var(--surface-2);
+    border:1px solid var(--line);
+    border-radius:9px;
+    padding:8px 12px;
+    line-height:1;
+    transition:background .15s ease,border-color .15s ease,transform .05s ease;
+  }
+  button:hover{background:#222936;border-color:#36404f}
+  button:active{transform:translateY(1px)}
+  button.icon{padding:8px 10px;min-width:38px;font-size:15px}
+  button.toggle[aria-pressed="true"]{
+    background:rgba(91,176,255,.16);
+    border-color:var(--accent-strong);
+    color:#cfe7ff;
+  }
+  button.primary{
+    background:linear-gradient(180deg,var(--accent),var(--accent-strong));
+    border-color:var(--accent-strong);
+    color:var(--accent-ink);
+    font-weight:700;
+    padding:9px 18px;
+    box-shadow:0 1px 0 rgba(255,255,255,.18) inset;
+  }
+  button.primary:hover{filter:brightness(1.05)}
+  button.ghost{background:transparent}
+
+  :focus-visible{outline:3px solid var(--focus);outline-offset:2px;border-radius:8px}
+
+  /* ---------- Main / reader ---------- */
+  main{position:relative;flex:1 1 auto;min-height:0;display:flex}
+
+  .reader{
+    position:relative;flex:1;min-height:0;
+    overflow:hidden;
+    background:radial-gradient(120% 80% at 50% 0%, #0d1219, #07090d 70%);
+    cursor:default;
+  }
+  .mirror-wrap{
+    position:absolute;inset:0;
+    transition:transform .2s ease;
+    will-change:transform;
+  }
+  body.mirror .mirror-wrap{transform:scaleX(-1)}
+  .reader-inner{
+    position:absolute;left:0;right:0;top:0;
+    margin:0 auto;
+    max-width:var(--reader-width);
+    padding:50vh 24px;
+    font-family:var(--read-sans);
+    font-size:var(--reader-fs);
+    line-height:var(--reader-lh);
+    font-weight:600;
+    color:#fff;
+    white-space:pre-wrap;
+    word-break:break-word;
+    text-wrap:pretty;
+    will-change:transform;
+  }
+
+  /* center reading-line indicator */
+  .centerline-rule{
+    position:absolute;left:0;right:0;top:50%;height:0;
+    border-top:2px solid rgba(91,176,255,.55);
+    box-shadow:0 0 18px rgba(91,176,255,.25);
+    pointer-events:none;display:none;z-index:5;
+  }
+  body.centerline .centerline-rule{display:block}
+  .centerline-rule::before,.centerline-rule::after{
+    content:"";position:absolute;top:-6px;
+    border-top:6px solid transparent;border-bottom:6px solid transparent;
+  }
+  .centerline-rule::before{left:0;border-left:9px solid rgba(91,176,255,.7)}
+  .centerline-rule::after{right:0;border-right:9px solid rgba(91,176,255,.7)}
+
+  /* edge fades so text enters/leaves softly */
+  .fade{position:absolute;left:0;right:0;height:90px;pointer-events:none;z-index:4}
+  .fade.top{top:0;background:linear-gradient(180deg,#07090d,rgba(7,9,13,0))}
+  .fade.bottom{bottom:0;background:linear-gradient(0deg,#07090d,rgba(7,9,13,0))}
+
+  /* ---------- Editor ---------- */
+  .editor{
+    position:absolute;inset:0;display:flex;flex-direction:column;
+    background:var(--bg);z-index:10;
+  }
+  .editor-head{
+    display:flex;align-items:center;gap:10px;
+    padding:12px 16px;border-bottom:1px solid var(--line);color:var(--muted);
+  }
+  .editor-head strong{color:var(--text)}
+  #script{
+    flex:1;width:100%;resize:none;border:0;outline:0;
+    background:var(--bg);color:var(--text);
+    font-family:var(--read-sans);
+    font-size:20px;line-height:1.6;
+    padding:20px clamp(16px,6vw,80px);
+  }
+  #script::placeholder{color:#5d6675}
+  body.reading .editor{display:none}
+
+  /* end-of-script banner */
+  .toast{
+    position:absolute;left:50%;bottom:26px;transform:translateX(-50%);
+    background:var(--surface-2);border:1px solid var(--line);
+    padding:10px 16px;border-radius:999px;color:var(--text);
+    font-size:13px;z-index:25;display:none;align-items:center;gap:10px;
+    box-shadow:0 8px 30px rgba(0,0,0,.45);
+  }
+  .toast.show{display:flex}
+  .toast button{padding:5px 10px;font-size:12px}
+
+  /* ---------- Auto-hide while playing ---------- */
+  body.playing.immersive .toolbar,
+  body.playing.immersive header.bar{opacity:0;pointer-events:none;transform:translateY(-4px)}
+  body.playing.immersive .reader{cursor:none}
+
+  /* ---------- Help dialog ---------- */
+  .help-backdrop{
+    position:fixed;inset:0;background:rgba(4,7,12,.6);
+    display:none;align-items:center;justify-content:center;z-index:50;padding:20px;
+  }
+  .help-backdrop.open{display:flex}
+  .help{
+    background:var(--surface);border:1px solid var(--line);border-radius:16px;
+    max-width:520px;width:100%;padding:22px 24px;
+    box-shadow:0 24px 70px rgba(0,0,0,.55);
+  }
+  .help h2{margin:0 0 4px;font-size:18px}
+  .help p.sub{margin:0 0 16px;color:var(--muted);font-size:13px}
+  .keys{display:grid;grid-template-columns:auto 1fr;gap:8px 14px;align-items:center}
+  kbd{
+    display:inline-block;min-width:20px;text-align:center;
+    background:var(--surface-2);border:1px solid var(--line);
+    border-bottom-width:2px;border-radius:6px;
+    padding:3px 7px;font-size:12px;font-family:var(--ui-sans);color:#dbe4f0;
+  }
+  .keys .desc{color:var(--muted);font-size:13px}
+  .help .close-row{display:flex;justify-content:flex-end;margin-top:18px}
+
+  footer{
+    flex:0 0 auto;padding:8px 16px;font-size:12px;color:var(--muted);
+    border-top:1px solid var(--line);background:var(--surface);
+    display:flex;gap:14px;align-items:center;flex-wrap:wrap;
+  }
+  footer .spacer{flex:1}
+
+  .hint{color:var(--muted);font-size:12px}
+  .storage-status{
+    display:inline-flex;align-items:center;
+    padding:5px 9px;
+    border:1px solid rgba(255,217,168,.32);
+    border-radius:999px;
+    background:#241b10;
+    color:#ffd9a8;
+    font-size:12px;
+    white-space:nowrap;
+  }
+  .storage-status[hidden]{display:none}
+  .file-input{display:none}
+
+  /* Reduced motion: soften transitions (scroll engine still works + manual steps provided) */
+  @media (prefers-reduced-motion:reduce){
+    *{transition-duration:.001ms !important}
+    .reader{scroll-behavior:auto}
+  }
+
+  /* Narrow screens / tablet */
+  @media (max-width:760px){
+    .toolbar{gap:6px;padding:8px 10px}
+    .group{padding:4px 6px}
+    .group .label{display:none}
+    header.bar .brand small{display:none}
+    #script{font-size:18px;padding:16px}
+  }
+
+  /* No-JS: show the script plainly, hide JS-only chrome */
+  .noscript-note{
+    display:none;padding:14px 18px;background:#2a1f12;color:#ffd9a8;
+    border-bottom:1px solid #4a3a22;font-size:13px;
+  }
+  html.no-js .noscript-note{display:block}
+  html.no-js .toolbar,html.no-js .help-backdrop,html.no-js .centerline-rule,
+  html.no-js .fade,html.no-js footer .js-only{display:none}
+  html.no-js #script{position:static;min-height:60vh}
+</style>
+</head>
+<body class="centerline">
+<script>document.documentElement.classList.add('no-js');</script>
+
+<div class="app">
+  <header class="bar">
+    <span class="brand">
+      <span class="dot" aria-hidden="true"></span>
+      <span>Teleprompter<small>Free · offline · no install</small></span>
+    </span>
+    <span class="spacer"></span>
+    <button id="editBtn" class="ghost" type="button" title="Switch between editing and reading">Edit script</button>
+    <button id="helpBtn" class="ghost" type="button" aria-haspopup="dialog" title="Keyboard shortcuts">⌨ Shortcuts</button>
+  </header>
+
+  <div class="noscript-note">
+    JavaScript is off, so auto-scroll and controls are unavailable — but your script is fully readable below.
+  </div>
+
+  <!-- Controls -->
+  <div class="toolbar" id="toolbar" role="toolbar" aria-label="Teleprompter controls">
+    <div class="group">
+      <button id="playBtn" class="primary" type="button" aria-pressed="false">▶ Play</button>
+      <button id="restartBtn" class="icon" type="button" title="Restart from top (R)" aria-label="Restart from top">⮌</button>
+    </div>
+
+    <div class="group" aria-label="Scroll speed">
+      <span class="label">Speed</span>
+      <button class="icon" type="button" data-act="speedDown" title="Slower (Arrow Down)" aria-label="Decrease speed">−</button>
+      <span class="readout" id="speedOut" aria-live="off">60</span>
+      <button class="icon" type="button" data-act="speedUp" title="Faster (Arrow Up)" aria-label="Increase speed">+</button>
+    </div>
+
+    <div class="group" aria-label="Manual scroll">
+      <span class="label">Step</span>
+      <button class="icon" type="button" data-act="stepBack" title="Step up" aria-label="Step up">▲</button>
+      <button class="icon" type="button" data-act="stepFwd" title="Step down" aria-label="Step down">▼</button>
+    </div>
+
+    <div class="group" aria-label="Font size">
+      <span class="label">Font</span>
+      <button class="icon" type="button" data-act="fontDown" title="Smaller text (Minus)" aria-label="Decrease font size">A−</button>
+      <span class="readout" id="fontOut">48</span>
+      <button class="icon" type="button" data-act="fontUp" title="Larger text (Plus)" aria-label="Increase font size">A+</button>
+    </div>
+
+    <div class="group" aria-label="Line height">
+      <span class="label">Line</span>
+      <button class="icon" type="button" data-act="lhDown" title="Tighter lines" aria-label="Decrease line height">−</button>
+      <span class="readout" id="lhOut">1.5</span>
+      <button class="icon" type="button" data-act="lhUp" title="Looser lines" aria-label="Increase line height">+</button>
+    </div>
+
+    <div class="group" aria-label="Reading width">
+      <span class="label">Width</span>
+      <button class="icon" type="button" data-act="widthDown" title="Narrower" aria-label="Decrease reading width">−</button>
+      <span class="readout" id="widthOut">42</span>
+      <button class="icon" type="button" data-act="widthUp" title="Wider" aria-label="Increase reading width">+</button>
+    </div>
+
+    <div class="group">
+      <button id="mirrorBtn" class="toggle" type="button" aria-pressed="false" title="Mirror text for beam-splitter glass (M)">⇋ Mirror</button>
+      <button id="lineBtn" class="toggle" type="button" aria-pressed="true" title="Toggle center reading line">― Line</button>
+      <button id="fsBtn" class="toggle" type="button" aria-pressed="false" title="Fullscreen (F)">⛶ Full</button>
+    </div>
+
+    <div class="group" aria-label="Script file">
+      <button id="saveFileBtn" type="button" title="Save script to a text file" aria-label="Save script to file">⇩ Save</button>
+      <button id="loadFileBtn" type="button" title="Load script from a text file" aria-label="Load script from file">⇧ Load</button>
+    </div>
+  </div>
+  <input id="scriptFileInput" class="file-input" type="file" accept=".txt,.md,text/plain,text/markdown">
+
+  <!-- Reader + Editor -->
+  <main>
+    <div class="reader" id="reader" tabindex="-1" aria-label="Reading surface">
+      <div class="fade top" aria-hidden="true"></div>
+      <div class="fade bottom" aria-hidden="true"></div>
+      <div class="centerline-rule" aria-hidden="true"></div>
+      <div class="mirror-wrap">
+        <div class="reader-inner" id="readerInner"></div>
+      </div>
+    </div>
+
+    <div class="editor" id="editor">
+      <div class="editor-head">
+        <strong>Your script</strong>
+        <span class="hint" id="saveHint">Paste or type. Saved automatically on this device.</span>
+        <span class="storage-status" id="storageStatus" hidden>Auto save off. Use Save or Load.</span>
+        <span class="spacer" style="flex:1"></span>
+        <button id="doneBtn" class="primary" type="button">Done — start reading</button>
+      </div>
+      <textarea id="script" spellcheck="true" autocomplete="off"
+        placeholder="Paste or type your script here…
+
+Welcome to your teleprompter. This text scrolls smoothly while you read to camera.
+
+Press “Done — start reading”, then hit Play (or the Space bar) to begin. Adjust speed live with the Up and Down arrow keys, and resize the text with Plus and Minus.
+
+Turn on Mirror mode if you read through beam-splitter glass."></textarea>
+    </div>
+
+    <div class="toast" id="toast" role="status">
+      <span>End of script.</span>
+      <button id="toastRestart" type="button">Restart</button>
+    </div>
+  </main>
+
+  <footer>
+    <span>100% on-device — nothing is uploaded. Your script stays in this browser.</span>
+    <span class="spacer"></span>
+    <span class="js-only hint">Space play/pause · ↑/↓ speed · +/− font · M mirror · F fullscreen · R restart</span>
+  </footer>
+</div>
+
+<!-- Shortcuts dialog -->
+<div class="help-backdrop" id="helpBackdrop" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+  <div class="help">
+    <h2 id="helpTitle">Keyboard shortcuts</h2>
+    <p class="sub">Work from the keyboard while you read to camera.</p>
+    <div class="keys">
+      <kbd>Space</kbd><span class="desc">Play / pause</span>
+      <kbd>↑</kbd><span class="desc">Increase scroll speed</span>
+      <kbd>↓</kbd><span class="desc">Decrease scroll speed</span>
+      <kbd>+</kbd><span class="desc">Increase font size</span>
+      <kbd>−</kbd><span class="desc">Decrease font size</span>
+      <kbd>M</kbd><span class="desc">Toggle mirror mode</span>
+      <kbd>F</kbd><span class="desc">Toggle fullscreen</span>
+      <kbd>R</kbd><span class="desc">Restart from top</span>
+      <kbd>Esc</kbd><span class="desc">Exit fullscreen / close this</span>
+    </div>
+    <div class="close-row">
+      <button id="helpClose" class="primary" type="button">Got it</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  document.documentElement.classList.remove('no-js');
+
+  var $ = function(id){ return document.getElementById(id); };
+  var body = document.body;
+
+  var reader   = $('reader');
+  var inner    = $('readerInner');
+  var script   = $('script');
+  var toast    = $('toast');
+  var fileInput = $('scriptFileInput');
+  var saveHint = $('saveHint');
+  var storageStatus = $('storageStatus');
+
+  // ---- Settings (persisted) ----
+  var SPEED = {min:10, max:400, step:10, val:60};   // px / second
+  var FONT  = {min:24, max:120, step:4, val:48};    // px
+  var LH    = {min:1.1, max:2.4, step:0.1, val:1.5};
+  var WIDTH = {min:24, max:80, step:4, val:42};     // rem
+
+  var STORE = 'teleprompter.v1';
+  var storage = (function(){
+    var local = null;
+    var ok = false;
+    try{
+      local = window.localStorage;
+      var probe = 'teleprompter.storage.probe';
+      local.setItem(probe, probe);
+      ok = local.getItem(probe) === probe;
+      local.removeItem(probe);
+    }catch(e){
+      local = null;
+      ok = false;
+    }
+    return {
+      isAvailable:function(){ return ok; },
+      get:function(key){
+        if(!ok || !local) return null;
+        try{
+          return local.getItem(key);
+        }catch(e){
+          ok = false;
+          return null;
+        }
+      },
+      set:function(key, value){
+        if(!ok || !local) return false;
+        try{
+          local.setItem(key, value);
+          return true;
+        }catch(e){
+          ok = false;
+          return false;
+        }
+      }
+    };
+  })();
+
+  function updateStorageUi(){
+    var available = storage.isAvailable();
+    if(saveHint){
+      saveHint.textContent = available
+        ? 'Paste or type. Saved automatically on this device.'
+        : 'Paste or type. Auto save is off in this browser. Use Save or Load.';
+    }
+    if(storageStatus){
+      storageStatus.hidden = available;
+    }
+  }
+
+  function loadSettings(){
+    try{
+      var raw = storage.get(STORE);
+      if(!raw) return;
+      var s = JSON.parse(raw);
+      if(typeof s.speed==='number') SPEED.val = clamp(s.speed, SPEED.min, SPEED.max);
+      if(typeof s.font==='number')  FONT.val  = clamp(s.font, FONT.min, FONT.max);
+      if(typeof s.lh==='number')    LH.val    = clamp(s.lh, LH.min, LH.max);
+      if(typeof s.width==='number') WIDTH.val = clamp(s.width, WIDTH.min, WIDTH.max);
+      if(typeof s.mirror==='boolean') mirror = s.mirror;
+      if(typeof s.centerline==='boolean') centerline = s.centerline;
+    }catch(e){/* ignore corrupt storage */}
+  }
+  function saveSettings(){
+    var saved = storage.set(STORE, JSON.stringify({
+      speed:SPEED.val, font:FONT.val, lh:LH.val, width:WIDTH.val,
+      mirror:mirror, centerline:centerline
+    }));
+    if(!saved) updateStorageUi();
+  }
+
+  var SCRIPT_STORE = 'teleprompter.script.v1';
+  var SAMPLE_SCRIPT = [
+    'Sample script',
+    '',
+    'Welcome to your teleprompter.',
+    '',
+    'This sample is loaded automatically so you can test the reading view right away.',
+    '',
+    'Press Done, then Play. Adjust speed with the Up and Down arrow keys until the pace feels natural.',
+    '',
+    'Use the Font and Width controls to set a comfortable reading size.',
+    '',
+    'Turn on Mirror if you are reading through beam splitter glass.',
+    '',
+    'When you are ready, replace this text with your own script.'
+  ].join('\n');
+  function loadScript(){
+    var t = storage.get(SCRIPT_STORE);
+    if(t!==null){
+      script.value = t;
+      return true;
+    }
+    script.value = SAMPLE_SCRIPT;
+    return false;
+  }
+  var saveTimer=null;
+  function saveScriptDebounced(){
+    if(saveTimer) clearTimeout(saveTimer);
+    saveTimer = setTimeout(function(){
+      if(!storage.set(SCRIPT_STORE, script.value)) updateStorageUi();
+    }, 300);
+  }
+
+  function scriptFileName(){
+    var d = new Date();
+    var yyyy = d.getFullYear();
+    var mm = String(d.getMonth() + 1).padStart(2, '0');
+    var dd = String(d.getDate()).padStart(2, '0');
+    return 'teleprompter-script-' + yyyy + '-' + mm + '-' + dd + '.txt';
+  }
+
+  function saveScriptToFile(){
+    var blob = new Blob([script.value || ''], {type:'text/plain;charset=utf-8'});
+    var url = URL.createObjectURL(blob);
+    var link = document.createElement('a');
+    link.download = scriptFileName();
+    link.href = url;
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    link.click();
+    setTimeout(function(){
+      URL.revokeObjectURL(url);
+      if(link.parentNode) link.parentNode.removeChild(link);
+    }, 0);
+  }
+
+  function loadScriptFromFile(file){
+    var readerForFile = new FileReader();
+    readerForFile.onload = function(){
+      script.value = typeof readerForFile.result === 'string' ? readerForFile.result : '';
+      saveScriptDebounced();
+      syncReader();
+      applyTransform();
+      showToast(false);
+      if(isReading()){
+        reader.focus({preventScroll:true});
+      }else{
+        script.focus();
+      }
+    };
+    readerForFile.onerror = function(){
+      window.alert('Could not load that file.');
+    };
+    readerForFile.readAsText(file);
+  }
+
+  function clamp(v,a,b){ return Math.max(a, Math.min(b, v)); }
+
+  // ---- State ----
+  var mirror = false;
+  var centerline = true;
+  var playing = false;
+  var pos = 0;          // scroll position in px (float, sub-pixel)
+  var maxScroll = 0;
+  var rafId = null;
+  var lastTs = 0;
+
+  // ---- Apply visual settings ----
+  function applySettings(){
+    document.documentElement.style.setProperty('--reader-fs', FONT.val + 'px');
+    document.documentElement.style.setProperty('--reader-lh', String(LH.val));
+    document.documentElement.style.setProperty('--reader-width', WIDTH.val + 'rem');
+    $('speedOut').textContent = String(SPEED.val);
+    $('fontOut').textContent  = String(FONT.val);
+    $('lhOut').textContent    = LH.val.toFixed(1);
+    $('widthOut').textContent = String(WIDTH.val);
+    body.classList.toggle('mirror', mirror);
+    body.classList.toggle('centerline', centerline);
+    $('mirrorBtn').setAttribute('aria-pressed', String(mirror));
+    $('lineBtn').setAttribute('aria-pressed', String(centerline));
+    measure();
+    applyTransform();
+  }
+
+  // ---- Layout measurement ----
+  function measure(){
+    // inner has 50vh top+bottom padding; scroll range = full height - viewport height
+    maxScroll = Math.max(0, inner.offsetHeight - reader.clientHeight);
+    pos = clamp(pos, 0, maxScroll);
+  }
+
+  function applyTransform(){
+    inner.style.transform = 'translateY(' + (-pos).toFixed(2) + 'px)';
+  }
+
+  // ---- Reader content ----
+  function syncReader(){
+    inner.textContent = script.value || '';
+    measure();
+  }
+
+  // ---- Modes ----
+  function setReading(on){
+    body.classList.toggle('reading', on);
+    if(on){
+      syncReader();
+      reader.focus({preventScroll:true});
+    }else{
+      pause();
+      script.focus();
+    }
+  }
+  function isReading(){ return body.classList.contains('reading'); }
+
+  // ---- Play / pause engine ----
+  function tick(ts){
+    if(!playing){ return; }
+    if(!lastTs) lastTs = ts;
+    var dt = (ts - lastTs)/1000;
+    lastTs = ts;
+    // guard against tab-switch jumps
+    if(dt > 0.1) dt = 0.1;
+    pos += SPEED.val * dt;
+    if(pos >= maxScroll){
+      pos = maxScroll;
+      applyTransform();
+      pause();
+      showToast(true);
+      return;
+    }
+    applyTransform();
+    rafId = requestAnimationFrame(tick);
+  }
+
+  function play(){
+    if(!isReading()) setReading(true);
+    if(maxScroll<=0) measure();
+    if(pos >= maxScroll){ pos = 0; } // restart if at end
+    playing = true;
+    lastTs = 0;
+    body.classList.add('playing');
+    $('playBtn').textContent = '⏸ Pause';
+    $('playBtn').setAttribute('aria-pressed','true');
+    showToast(false);
+    armImmersive();
+    cancelAnimationFrame(rafId);
+    rafId = requestAnimationFrame(tick);
+  }
+  function pause(){
+    playing = false;
+    body.classList.remove('playing','immersive');
+    $('playBtn').textContent = '▶ Play';
+    $('playBtn').setAttribute('aria-pressed','false');
+    cancelAnimationFrame(rafId);
+    if(hideTimer) clearTimeout(hideTimer);
+  }
+  function togglePlay(){ playing ? pause() : play(); }
+
+  function restart(){
+    pos = 0; applyTransform(); showToast(false);
+    if(!playing){ /* stay paused at top */ }
+  }
+
+  // step (manual / reduced-motion fallback)
+  function step(dir){
+    var amount = Math.max(40, FONT.val * LH.val * 1.2);
+    pos = clamp(pos + dir*amount, 0, maxScroll);
+    applyTransform();
+    showToast(false);
+  }
+
+  // ---- Immersive auto-hide of controls while playing ----
+  var hideTimer = null;
+  function armImmersive(){
+    body.classList.remove('immersive');
+    if(hideTimer) clearTimeout(hideTimer);
+    hideTimer = setTimeout(function(){
+      if(playing) body.classList.add('immersive');
+    }, 2200);
+  }
+  function wake(){
+    if(!playing) return;
+    armImmersive();
+  }
+
+  // ---- Toast ----
+  function showToast(on){ toast.classList.toggle('show', on); }
+
+  // ---- Settings mutators ----
+  function bump(obj, dir, out, fmt){
+    obj.val = clamp(+(obj.val + dir*obj.step).toFixed(4), obj.min, obj.max);
+    if(out) $(out).textContent = fmt ? fmt(obj.val) : String(obj.val);
+    saveSettings();
+  }
+  function changeFont(dir){ bump(FONT, dir, 'fontOut'); applyMetric(); }
+  function changeLH(dir){ bump(LH, dir, 'lhOut', function(v){return v.toFixed(1);}); applyMetric(); }
+  function changeWidth(dir){ bump(WIDTH, dir, 'widthOut'); applyMetric(); }
+  function changeSpeed(dir){ bump(SPEED, dir, 'speedOut'); }
+  function applyMetric(){
+    document.documentElement.style.setProperty('--reader-fs', FONT.val + 'px');
+    document.documentElement.style.setProperty('--reader-lh', String(LH.val));
+    document.documentElement.style.setProperty('--reader-width', WIDTH.val + 'rem');
+    measure(); applyTransform();
+  }
+
+  function toggleMirror(){ mirror=!mirror; body.classList.toggle('mirror',mirror);
+    $('mirrorBtn').setAttribute('aria-pressed',String(mirror)); saveSettings(); }
+  function toggleLine(){ centerline=!centerline; body.classList.toggle('centerline',centerline);
+    $('lineBtn').setAttribute('aria-pressed',String(centerline)); saveSettings(); }
+
+  // ---- Fullscreen ----
+  function toggleFullscreen(){
+    var el = document.documentElement;
+    if(!document.fullscreenElement){
+      (el.requestFullscreen ? el.requestFullscreen() : Promise.reject()).catch(function(){});
+    }else{
+      (document.exitFullscreen ? document.exitFullscreen() : null);
+    }
+  }
+  document.addEventListener('fullscreenchange', function(){
+    var fs = !!document.fullscreenElement;
+    $('fsBtn').setAttribute('aria-pressed', String(fs));
+    if(fs && !isReading()) setReading(true);
+  });
+
+  // ---- Help dialog ----
+  var help = $('helpBackdrop'), lastFocus=null;
+  function openHelp(){ lastFocus=document.activeElement; help.classList.add('open'); $('helpClose').focus(); }
+  function closeHelp(){ help.classList.remove('open'); if(lastFocus) lastFocus.focus(); }
+
+  // ---- Wiring ----
+  $('editBtn').addEventListener('click', function(){ setReading(false); });
+  $('doneBtn').addEventListener('click', function(){ setReading(true); });
+  $('playBtn').addEventListener('click', togglePlay);
+  $('restartBtn').addEventListener('click', restart);
+  $('toastRestart').addEventListener('click', function(){ restart(); play(); });
+  $('mirrorBtn').addEventListener('click', toggleMirror);
+  $('lineBtn').addEventListener('click', toggleLine);
+  $('fsBtn').addEventListener('click', toggleFullscreen);
+  $('helpBtn').addEventListener('click', openHelp);
+  $('helpClose').addEventListener('click', closeHelp);
+  help.addEventListener('click', function(e){ if(e.target===help) closeHelp(); });
+  $('saveFileBtn').addEventListener('click', saveScriptToFile);
+  $('loadFileBtn').addEventListener('click', function(){
+    fileInput.value = '';
+    fileInput.click();
+  });
+  fileInput.addEventListener('change', function(){
+    var file = fileInput.files && fileInput.files[0];
+    if(file) loadScriptFromFile(file);
+  });
+
+  // toolbar data-act buttons
+  document.querySelectorAll('[data-act]').forEach(function(b){
+    b.addEventListener('click', function(){
+      switch(b.getAttribute('data-act')){
+        case 'speedUp': changeSpeed(+1); break;
+        case 'speedDown': changeSpeed(-1); break;
+        case 'fontUp': changeFont(+1); break;
+        case 'fontDown': changeFont(-1); break;
+        case 'lhUp': changeLH(+1); break;
+        case 'lhDown': changeLH(-1); break;
+        case 'widthUp': changeWidth(+1); break;
+        case 'widthDown': changeWidth(-1); break;
+        case 'stepFwd': step(+1); break;
+        case 'stepBack': step(-1); break;
+      }
+    });
+  });
+
+  // script persistence + live sync
+  script.addEventListener('input', function(){
+    saveScriptDebounced();
+    if(isReading()) syncReader();
+  });
+
+  // wake controls on activity while playing
+  ['mousemove','pointerdown','wheel','touchstart'].forEach(function(ev){
+    reader.addEventListener(ev, wake, {passive:true});
+  });
+
+  // wheel to scrub when paused
+  reader.addEventListener('wheel', function(e){
+    if(playing) return;
+    if(!isReading()) return;
+    e.preventDefault();
+    pos = clamp(pos + e.deltaY, 0, maxScroll);
+    applyTransform();
+  }, {passive:false});
+
+  // ---- Keyboard shortcuts ----
+  document.addEventListener('keydown', function(e){
+    // Don't hijack typing in the editor
+    var typing = (document.activeElement === script);
+    var k = e.key;
+
+    if(help.classList.contains('open')){
+      if(k==='Escape'){ e.preventDefault(); closeHelp(); }
+      return;
+    }
+    if(typing){
+      // allow Esc to leave the editor into reading mode
+      if(k==='Escape'){ e.preventDefault(); setReading(true); }
+      return;
+    }
+
+    switch(k){
+      case ' ': case 'Spacebar':
+        e.preventDefault(); togglePlay(); break;
+      case 'ArrowUp':
+        e.preventDefault(); changeSpeed(+1); wake(); break;
+      case 'ArrowDown':
+        e.preventDefault(); changeSpeed(-1); wake(); break;
+      case '+': case '=': // '=' is the unshifted '+' on most layouts
+        e.preventDefault(); changeFont(+1); wake(); break;
+      case '-': case '_':
+        e.preventDefault(); changeFont(-1); wake(); break;
+      case 'm': case 'M':
+        e.preventDefault(); toggleMirror(); wake(); break;
+      case 'f': case 'F':
+        e.preventDefault(); toggleFullscreen(); break;
+      case 'r': case 'R':
+        e.preventDefault(); restart(); wake(); break;
+      case 'PageDown':
+        e.preventDefault(); step(+1); break;
+      case 'PageUp':
+        e.preventDefault(); step(-1); break;
+      case 'Escape':
+        if(document.fullscreenElement){ /* browser handles exit */ }
+        break;
+    }
+  });
+
+  // ---- Resize handling ----
+  var rT=null;
+  window.addEventListener('resize', function(){
+    if(rT) clearTimeout(rT);
+    rT = setTimeout(function(){ measure(); applyTransform(); }, 120);
+  });
+
+  // ---- Init ----
+  updateStorageUi();
+  loadSettings();
+  var hadSavedScript = loadScript();
+  applySettings();
+  syncReader();
+  // First-time loads show the sample in the editor. Saved scripts reopen in reading mode.
+  if(hadSavedScript && (script.value||'').trim().length > 0){
+    setReading(true);
+  }else{
+    setReading(false);
+  }
+})();
+</script>
+</body>
+</html>

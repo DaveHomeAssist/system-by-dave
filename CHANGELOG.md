@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-06-12
+
+* Added `/teleprompter.html`, a self contained teleprompter page with editable script text, smooth auto scrolling, keyboard controls, mirror mode, fullscreen, manual save and load file controls, and a starter sample script for first load.
+
 ## 2026-06-11
 
 * Added a public-safe **Project Registry** at `/project-registry.html` with searchable/filterable metadata for 52 public DaveHomeAssist repositories. Private repos, local filesystem paths, dirty worktree counts, and internal triage notes remain excluded from the published data set. Added the page to the homepage Resources footer and `sitemap.xml`.
