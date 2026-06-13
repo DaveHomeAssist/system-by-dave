@@ -23,6 +23,7 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
 - `teleprompter.html` — AV teleprompter
 - `show-timer.html` — AV show timer
 - `cue-sheet.html` — AV cue sheet
+- `input-list.html` — AV input list and patch sheet
 - `av-calculator.html` — AV calculator
 - `resume/index.html` — public resume page
 - `wedding-ops.html` — wedding ops case study
@@ -44,7 +45,7 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
 - `teleprompter.html` now includes expanded reader font, color,
   background, saved-script, show package, remote, and rundown controls.
 - AV tools now include `teleprompter.html`, `show-timer.html`,
-  `cue-sheet.html`, and `av-calculator.html`.
+  `cue-sheet.html`, `input-list.html`, and `av-calculator.html`.
 
 ## Conventions
 See `AGENTS.md` for coding conventions and the review checklist.

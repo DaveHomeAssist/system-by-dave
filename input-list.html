@@ -1,0 +1,1542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'none'">
+<title>Input List | System by Dave</title>
+<meta name="description" content="A browser based AV input list and patch sheet for planning channels, connections, phantom power, monitors, owners, and line check status.">
+<link rel="canonical" href="https://systembydave.com/input-list.html">
+<meta name="theme-color" content="#0b0d10">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="System by Dave">
+<meta property="og:title" content="Input List">
+<meta property="og:description" content="A browser based AV input list and patch sheet for planning channels, connections, phantom power, monitors, owners, and line check status.">
+<meta property="og:url" content="https://systembydave.com/input-list.html">
+<meta property="og:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<meta property="og:image:width" content="1024">
+<meta property="og:image:height" content="412">
+<meta property="og:image:alt" content="System by Dave preview banner">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Input List">
+<meta name="twitter:description" content="A browser based AV input list and patch sheet for planning channels, connections, phantom power, monitors, owners, and line check status.">
+<meta name="twitter:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<link rel="icon" href="svg/system_by_dave_logo_rust.svg" type="image/svg+xml">
+<style>
+  :root{
+    --bg:#0b0d10;
+    --panel:#12171d;
+    --panel-2:#171e26;
+    --panel-3:#1d252e;
+    --line:#303945;
+    --line-strong:#465363;
+    --text:#f6f8fb;
+    --muted:#a9b4c1;
+    --dim:#768391;
+    --rust:#c0623a;
+    --rust-2:#e58a5c;
+    --blue:#72b8ff;
+    --green:#6be092;
+    --amber:#ffd166;
+    --red:#ff6b6b;
+    --ink:#071016;
+    --radius:8px;
+    --shadow:0 16px 60px rgba(0,0,0,.32);
+    --mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --fast:120ms;
+    --med:180ms;
+    --ease:cubic-bezier(.2,.8,.2,1);
+    --press:cubic-bezier(.2,0,0,1);
+  }
+
+  *{box-sizing:border-box}
+  html,body{min-height:100%}
+  body{
+    margin:0;
+    background:
+      radial-gradient(circle at 16% -12%,rgba(192,98,58,.18),transparent 30rem),
+      linear-gradient(180deg,#0b0d10 0%,#11161b 52%,#080a0d 100%);
+    color:var(--text);
+    font-family:var(--sans);
+    line-height:1.45;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+  body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    background:
+      repeating-linear-gradient(90deg,rgba(255,255,255,.035) 0 1px,transparent 1px 80px),
+      repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0 1px,transparent 1px 80px);
+    mask-image:linear-gradient(180deg,rgba(0,0,0,.8),rgba(0,0,0,.12));
+  }
+  a{color:inherit}
+  button,input,select,textarea{font:inherit}
+  button{
+    min-height:40px;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    background:var(--panel-2);
+    color:var(--text);
+    padding:9px 12px;
+    cursor:pointer;
+    user-select:none;
+    -webkit-tap-highlight-color:transparent;
+    transition:
+      transform var(--fast) var(--press),
+      border-color var(--fast) var(--ease),
+      background var(--fast) var(--ease),
+      box-shadow var(--fast) var(--ease),
+      color var(--fast) var(--ease);
+    touch-action:manipulation;
+  }
+  button:hover{
+    border-color:var(--line-strong);
+    background:var(--panel-3);
+    transform:translateY(-1px);
+    box-shadow:0 8px 22px rgba(0,0,0,.18);
+  }
+  button:active,
+  button.is-pressing{
+    transform:translateY(1px) scale(.975);
+    box-shadow:inset 0 2px 5px rgba(0,0,0,.28);
+  }
+  button.primary{
+    background:linear-gradient(180deg,var(--rust-2),var(--rust));
+    border-color:var(--rust);
+    color:#140905;
+    font-weight:800;
+  }
+  button.danger{
+    border-color:rgba(255,107,107,.55);
+    color:#ffd5d5;
+    background:rgba(255,107,107,.1);
+  }
+  button:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible,
+  a:focus-visible{
+    outline:2px solid var(--blue);
+    outline-offset:3px;
+  }
+  button:disabled{
+    cursor:not-allowed;
+    opacity:.5;
+    transform:none;
+    box-shadow:none;
+  }
+  input,select,textarea{
+    width:100%;
+    min-height:40px;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    background:#0e1318;
+    color:var(--text);
+    padding:9px 10px;
+    transition:border-color var(--fast) var(--ease),background var(--fast) var(--ease),box-shadow var(--fast) var(--ease);
+  }
+  textarea{
+    min-height:42px;
+    resize:vertical;
+  }
+  input:hover,
+  input:focus,
+  select:hover,
+  select:focus,
+  textarea:hover,
+  textarea:focus{
+    border-color:var(--line-strong);
+    background:#111821;
+  }
+  input::placeholder,
+  textarea::placeholder{color:var(--dim)}
+
+  .skip-link{
+    position:absolute;
+    top:12px;
+    left:12px;
+    z-index:1000;
+    background:var(--text);
+    color:var(--ink);
+    padding:10px 14px;
+    border-radius:var(--radius);
+    transform:translateY(-150%);
+    transition:transform var(--med) var(--ease);
+  }
+  .skip-link:focus-visible{transform:translateY(0)}
+  .sr-only{
+    position:absolute;
+    width:1px;
+    height:1px;
+    padding:0;
+    margin:-1px;
+    overflow:hidden;
+    clip:rect(0,0,0,0);
+    white-space:nowrap;
+    border:0;
+  }
+
+  .app{
+    position:relative;
+    z-index:1;
+    min-height:100vh;
+  }
+  .topbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    padding:14px 18px;
+    border-bottom:1px solid rgba(255,255,255,.08);
+    background:rgba(11,13,16,.88);
+    backdrop-filter:blur(18px);
+    position:sticky;
+    top:0;
+    z-index:30;
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    text-decoration:none;
+  }
+  .brand-mark{
+    width:38px;
+    height:38px;
+    border:1px solid rgba(255,255,255,.24);
+    border-radius:50%;
+    display:grid;
+    place-items:center;
+    font-family:Georgia,serif;
+    font-size:19px;
+    color:var(--rust-2);
+    background:#11161c;
+  }
+  .brand-text{
+    display:flex;
+    flex-direction:column;
+    gap:1px;
+  }
+  .brand-text strong{
+    font-size:14px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+  }
+  .brand-text span{
+    color:var(--muted);
+    font-family:var(--mono);
+    font-size:11px;
+  }
+  .top-actions{
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+    gap:8px;
+    flex-wrap:wrap;
+  }
+
+  main{
+    width:min(1540px,100%);
+    margin:0 auto;
+    padding:26px 18px 34px;
+  }
+  .hero{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(320px,460px);
+    gap:18px;
+    align-items:stretch;
+    margin-bottom:18px;
+  }
+  .hero-main,
+  .status-panel,
+  .meta-panel,
+  .workbench,
+  .inspector,
+  .operator-panel{
+    border:1px solid rgba(255,255,255,.1);
+    border-radius:var(--radius);
+    background:rgba(18,23,29,.9);
+    box-shadow:var(--shadow);
+  }
+  .hero-main{
+    padding:24px;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    min-height:240px;
+  }
+  .eyebrow{
+    margin:0 0 10px;
+    color:var(--rust-2);
+    font-family:var(--mono);
+    font-size:12px;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+  }
+  h1{
+    margin:0;
+    font-size:clamp(38px,5vw,72px);
+    line-height:.95;
+    letter-spacing:0;
+    max-width:860px;
+  }
+  .hero-copy{
+    max-width:760px;
+    margin:16px 0 0;
+    color:var(--muted);
+    font-size:16px;
+  }
+  .hero-tools{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-top:22px;
+  }
+  .status-panel{
+    padding:16px;
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:10px;
+  }
+  .metric{
+    min-width:0;
+    padding:12px;
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:var(--radius);
+    background:#0e1318;
+  }
+  .metric span{
+    display:block;
+    color:var(--muted);
+    font-family:var(--mono);
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+  }
+  .metric strong{
+    display:block;
+    margin-top:6px;
+    font-size:30px;
+    line-height:1;
+    font-variant-numeric:tabular-nums;
+  }
+  .metric small{
+    display:block;
+    margin-top:5px;
+    color:var(--dim);
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+
+  .meta-panel{
+    display:grid;
+    grid-template-columns:repeat(6,minmax(0,1fr));
+    gap:10px;
+    padding:14px;
+    margin-bottom:18px;
+  }
+  .field{
+    min-width:0;
+  }
+  .field.wide{grid-column:span 2}
+  .field label{
+    display:block;
+    margin:0 0 5px;
+    color:var(--muted);
+    font-family:var(--mono);
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+  }
+
+  .layout{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) 360px;
+    gap:18px;
+    align-items:start;
+  }
+  .workbench{
+    min-width:0;
+    overflow:hidden;
+  }
+  .toolbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding:14px;
+    border-bottom:1px solid rgba(255,255,255,.08);
+    background:rgba(23,30,38,.78);
+  }
+  .filters{
+    display:grid;
+    grid-template-columns:minmax(160px,1fr) 150px 150px;
+    gap:8px;
+    flex:1;
+    min-width:0;
+  }
+  .toolbar-actions{
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  .table-wrap{
+    overflow:auto;
+    max-height:70vh;
+  }
+  table{
+    width:100%;
+    min-width:1120px;
+    border-collapse:separate;
+    border-spacing:0;
+  }
+  th,td{
+    border-bottom:1px solid rgba(255,255,255,.07);
+    border-right:1px solid rgba(255,255,255,.05);
+    padding:8px;
+    vertical-align:top;
+  }
+  th{
+    position:sticky;
+    top:0;
+    z-index:5;
+    background:#10161c;
+    color:var(--muted);
+    font-family:var(--mono);
+    font-size:11px;
+    text-align:left;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+  }
+  td:first-child,
+  th:first-child{
+    border-left:0;
+  }
+  tr{
+    transition:background var(--fast) var(--ease);
+  }
+  tbody tr:hover{
+    background:rgba(255,255,255,.035);
+  }
+  tbody tr.selected{
+    background:rgba(114,184,255,.1);
+    box-shadow:inset 3px 0 0 var(--blue);
+  }
+  .num-cell{
+    width:54px;
+    color:var(--text);
+    font-family:var(--mono);
+    font-weight:800;
+    text-align:center;
+    padding-top:16px;
+  }
+  .row-button{
+    min-height:34px;
+    width:34px;
+    padding:0;
+  }
+  td input,
+  td select,
+  td textarea{
+    min-height:36px;
+    padding:7px 8px;
+    border-color:rgba(255,255,255,.08);
+    background:rgba(8,12,16,.78);
+  }
+  td textarea{
+    min-height:36px;
+    max-height:88px;
+  }
+  .source-input{min-width:150px}
+  .notes-input{min-width:190px}
+  .status-pill{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    min-width:94px;
+    padding:5px 8px;
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:999px;
+    font-family:var(--mono);
+    font-size:11px;
+    color:var(--muted);
+    white-space:nowrap;
+  }
+  .status-pill::before{
+    content:"";
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    background:var(--dim);
+  }
+  .status-open::before{background:var(--dim)}
+  .status-patched::before{background:var(--amber)}
+  .status-checked::before{background:var(--green)}
+  .status-problem::before{background:var(--red)}
+
+  .empty{
+    padding:28px;
+    color:var(--muted);
+    text-align:center;
+  }
+  .empty[hidden]{display:none}
+
+  .inspector{
+    padding:16px;
+    position:sticky;
+    top:82px;
+  }
+  .inspector h2,
+  .operator-panel h2{
+    margin:0 0 10px;
+    font-size:18px;
+    line-height:1.2;
+  }
+  .inspector-note{
+    color:var(--muted);
+    font-size:13px;
+    margin:0 0 14px;
+  }
+  .selected-card{
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:var(--radius);
+    background:#0e1318;
+    padding:12px;
+    margin-bottom:14px;
+  }
+  .selected-card strong{
+    display:block;
+    font-size:20px;
+    line-height:1.1;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .selected-card span{
+    display:block;
+    margin-top:5px;
+    color:var(--muted);
+    font-size:12px;
+  }
+  .quick-actions{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+    margin-bottom:14px;
+  }
+  .stack-actions{
+    display:grid;
+    gap:8px;
+  }
+  .hint{
+    margin:12px 0 0;
+    color:var(--muted);
+    font-size:12px;
+  }
+  .hint.success{color:#bff6d2}
+  .hint.error{color:#ffd0d0}
+  .feedback-success{
+    border-color:rgba(107,224,146,.85) !important;
+    animation:confirm var(--med) var(--ease);
+  }
+  .feedback-error{
+    border-color:var(--red) !important;
+    box-shadow:0 0 0 3px rgba(255,107,107,.2) !important;
+    animation:shake 160ms cubic-bezier(.3,0,.2,1);
+  }
+  @keyframes confirm{
+    0%{transform:scale(1)}
+    45%{transform:scale(1.018);box-shadow:0 0 0 4px rgba(107,224,146,.16)}
+    100%{transform:scale(1);box-shadow:0 0 0 rgba(107,224,146,0)}
+  }
+  @keyframes shake{
+    0%,100%{transform:translateX(0)}
+    25%{transform:translateX(-4px)}
+    55%{transform:translateX(4px)}
+    80%{transform:translateX(-2px)}
+  }
+
+  .operator-panel{
+    margin-top:18px;
+    padding:16px;
+  }
+  .summary-text{
+    min-height:180px;
+    font-family:var(--mono);
+    font-size:12px;
+    line-height:1.55;
+  }
+
+  .file-input{display:none}
+
+  @media (max-width:1120px){
+    .hero,
+    .layout{
+      grid-template-columns:1fr;
+    }
+    .inspector{
+      position:static;
+    }
+    .meta-panel{
+      grid-template-columns:repeat(3,minmax(0,1fr));
+    }
+  }
+  @media (max-width:680px){
+    .topbar{
+      align-items:flex-start;
+      flex-direction:column;
+    }
+    main{padding:16px 10px 26px}
+    .hero-main{padding:18px}
+    .status-panel{
+      grid-template-columns:1fr 1fr;
+      padding:10px;
+    }
+    .metric strong{font-size:24px}
+    .meta-panel{
+      grid-template-columns:1fr;
+      padding:10px;
+    }
+    .field.wide{grid-column:auto}
+    .toolbar{
+      align-items:stretch;
+      flex-direction:column;
+    }
+    .filters{
+      grid-template-columns:1fr;
+    }
+    .toolbar-actions,
+    .top-actions,
+    .hero-tools{
+      justify-content:stretch;
+    }
+    .toolbar-actions button,
+    .top-actions button,
+    .hero-tools button,
+    .hero-tools a{
+      flex:1 1 auto;
+    }
+    .quick-actions{
+      grid-template-columns:1fr;
+    }
+  }
+
+  @media print{
+    body{
+      background:#fff;
+      color:#000;
+    }
+    body::before,
+    .topbar,
+    .hero-tools,
+    .toolbar,
+    .inspector,
+    .operator-panel,
+    .row-button,
+    .skip-link{
+      display:none !important;
+    }
+    main{
+      width:100%;
+      padding:0;
+    }
+    .hero,
+    .layout,
+    .meta-panel{
+      display:block;
+    }
+    .hero-main,
+    .status-panel,
+    .meta-panel,
+    .workbench{
+      border:0;
+      box-shadow:none;
+      background:#fff;
+    }
+    h1{font-size:28px}
+    .hero-copy{color:#222}
+    .table-wrap{
+      overflow:visible;
+      max-height:none;
+    }
+    table{
+      min-width:0;
+      font-size:10px;
+      border-collapse:collapse;
+    }
+    th,td{
+      border:1px solid #aaa;
+      color:#000;
+      padding:4px;
+    }
+    th{background:#eee;color:#000}
+    td input,
+    td select,
+    td textarea{
+      border:0;
+      padding:0;
+      min-height:0;
+      color:#000;
+      background:transparent;
+      appearance:none;
+    }
+    .status-pill{
+      border:0;
+      padding:0;
+      color:#000;
+    }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#sheetTable">Skip to input list</a>
+<div class="app">
+  <header class="topbar">
+    <a class="brand" href="index.html#av-tools" aria-label="Back to System by Dave AV tools">
+      <span class="brand-mark">S</span>
+      <span class="brand-text">
+        <strong>System by Dave</strong>
+        <span>AV Tools / Input List</span>
+      </span>
+    </a>
+    <div class="top-actions">
+      <button id="printBtn" type="button">Print</button>
+      <button id="copySummaryBtn" type="button">Copy Summary</button>
+      <button id="exportCsvBtn" type="button">CSV</button>
+      <button id="exportJsonBtn" type="button">Export</button>
+      <button id="importJsonBtn" type="button">Import</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="pageTitle">
+      <div class="hero-main">
+        <div>
+          <p class="eyebrow">Patch prep and line check</p>
+          <h1 id="pageTitle">Input List</h1>
+          <p class="hero-copy">Build a clean channel list for microphones, playback, wireless, comms, records, confidence feeds, and stage lines. Track patch status before the room gets loud.</p>
+        </div>
+        <div class="hero-tools">
+          <button id="addRowBtn" class="primary" type="button">Add Channel</button>
+          <button id="sampleBtn" type="button">Load Sample</button>
+          <button id="renumberBtn" type="button">Renumber</button>
+          <button id="resetBtn" class="danger" type="button">Reset</button>
+        </div>
+      </div>
+      <aside class="status-panel" aria-label="Patch sheet summary">
+        <div class="metric">
+          <span>Channels</span>
+          <strong id="metricTotal">0</strong>
+          <small>Total rows</small>
+        </div>
+        <div class="metric">
+          <span>Checked</span>
+          <strong id="metricChecked">0</strong>
+          <small>Line check done</small>
+        </div>
+        <div class="metric">
+          <span>Open</span>
+          <strong id="metricOpen">0</strong>
+          <small>Needs attention</small>
+        </div>
+        <div class="metric">
+          <span>Wireless</span>
+          <strong id="metricWireless">0</strong>
+          <small>RF sources</small>
+        </div>
+      </aside>
+    </section>
+
+    <section class="meta-panel" aria-label="Show metadata">
+      <div class="field wide">
+        <label for="showName">Show</label>
+        <input id="showName" type="text" placeholder="General session">
+      </div>
+      <div class="field">
+        <label for="venueName">Venue</label>
+        <input id="venueName" type="text" placeholder="Room 204">
+      </div>
+      <div class="field">
+        <label for="showDate">Date</label>
+        <input id="showDate" type="date">
+      </div>
+      <div class="field">
+        <label for="engineerName">Engineer</label>
+        <input id="engineerName" type="text" placeholder="A1 / lead">
+      </div>
+      <div class="field">
+        <label for="consoleName">Console</label>
+        <input id="consoleName" type="text" placeholder="CL5 / X32 / QL1">
+      </div>
+    </section>
+
+    <section class="layout">
+      <div class="workbench">
+        <div class="toolbar" aria-label="Input list controls">
+          <div class="filters">
+            <label class="sr-only" for="searchInput">Search inputs</label>
+            <input id="searchInput" type="search" placeholder="Search source, patch, notes">
+            <label class="sr-only" for="statusFilter">Filter status</label>
+            <select id="statusFilter">
+              <option value="all">All status</option>
+              <option value="open">Open</option>
+              <option value="patched">Patched</option>
+              <option value="checked">Checked</option>
+              <option value="problem">Problem</option>
+            </select>
+            <label class="sr-only" for="typeFilter">Filter type</label>
+            <select id="typeFilter">
+              <option value="all">All types</option>
+              <option value="mic">Mic</option>
+              <option value="di">DI</option>
+              <option value="playback">Playback</option>
+              <option value="wireless">Wireless</option>
+              <option value="comms">Comms</option>
+              <option value="record">Record</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="toolbar-actions">
+            <button id="duplicateBtn" type="button">Duplicate</button>
+            <button id="moveUpBtn" type="button">Up</button>
+            <button id="moveDownBtn" type="button">Down</button>
+            <button id="deleteBtn" class="danger" type="button">Delete</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table id="sheetTable">
+            <caption class="sr-only">Input list and patch sheet rows</caption>
+            <thead>
+              <tr>
+                <th scope="col">Sel</th>
+                <th scope="col">Ch</th>
+                <th scope="col">Source</th>
+                <th scope="col">Type</th>
+                <th scope="col">Patch</th>
+                <th scope="col">Conn</th>
+                <th scope="col">48V</th>
+                <th scope="col">Stand</th>
+                <th scope="col">Monitor</th>
+                <th scope="col">Owner</th>
+                <th scope="col">Status</th>
+                <th scope="col">Notes</th>
+              </tr>
+            </thead>
+            <tbody id="sheetBody"></tbody>
+          </table>
+          <div id="emptyState" class="empty" hidden>No channels match the current filters.</div>
+        </div>
+      </div>
+
+      <aside class="inspector" aria-label="Selected channel controls">
+        <h2>Selected Channel</h2>
+        <p class="inspector-note">Use this panel during patch and line check to keep the next action obvious.</p>
+        <div class="selected-card">
+          <strong id="selectedTitle">No channel selected</strong>
+          <span id="selectedDetail">Select a row to mark status or move it.</span>
+        </div>
+        <div class="quick-actions">
+          <button data-status="open" type="button">Open</button>
+          <button data-status="patched" type="button">Patched</button>
+          <button data-status="checked" type="button">Checked</button>
+          <button data-status="problem" type="button">Problem</button>
+        </div>
+        <div class="stack-actions">
+          <button id="takeNextBtn" class="primary" type="button">Select Next Open</button>
+          <button id="clearFiltersBtn" type="button">Clear Filters</button>
+        </div>
+        <p id="message" class="hint">Changes save in this browser when storage is available.</p>
+      </aside>
+    </section>
+
+    <section class="operator-panel" aria-label="Operator summary">
+      <h2>Operator Summary</h2>
+      <textarea id="summaryText" class="summary-text" readonly></textarea>
+    </section>
+  </main>
+</div>
+
+<input id="jsonInput" class="file-input" type="file" accept="application/json,.json">
+
+<script>
+(function(){
+  "use strict";
+
+  var STORE = "input-list.v1";
+  var EXPORT_SCHEMA = "system-by-dave.input-list.v1";
+  var MAX_ROWS = 96;
+
+  var $ = function(id){ return document.getElementById(id); };
+  var sheetBody = $("sheetBody");
+  var emptyState = $("emptyState");
+  var message = $("message");
+  var jsonInput = $("jsonInput");
+  var selectedId = "";
+  var saveTimer = null;
+  var rows = [];
+  var metaFields = ["showName","venueName","showDate","engineerName","consoleName"];
+
+  var sampleRows = [
+    {ch:1, source:"Lectern mic", type:"mic", patch:"SL box 1", conn:"XLR", phantom:"yes", stand:"Lectern", monitor:"None", owner:"A1", status:"checked", notes:"High pass on"},
+    {ch:2, source:"Panel 1 lav", type:"wireless", patch:"RX A1", conn:"XLR", phantom:"no", stand:"Lav", monitor:"Presenter", owner:"A2", status:"patched", notes:"Fresh batteries"},
+    {ch:3, source:"Panel 2 lav", type:"wireless", patch:"RX A2", conn:"XLR", phantom:"no", stand:"Lav", monitor:"Presenter", owner:"A2", status:"patched", notes:"Coordinate with RF"},
+    {ch:4, source:"Laptop playback L", type:"playback", patch:"AV DI L", conn:"DI", phantom:"no", stand:"Table", monitor:"Room", owner:"V1", status:"checked", notes:"From show machine"},
+    {ch:5, source:"Laptop playback R", type:"playback", patch:"AV DI R", conn:"DI", phantom:"no", stand:"Table", monitor:"Room", owner:"V1", status:"checked", notes:"Linked with ch 4"},
+    {ch:6, source:"Comms program", type:"comms", patch:"Matrix out 3", conn:"XLR", phantom:"no", stand:"Rack", monitor:"Backstage", owner:"A1", status:"open", notes:"Confirm mix minus"},
+    {ch:7, source:"Record feed L", type:"record", patch:"Matrix 7", conn:"XLR", phantom:"no", stand:"Rack", monitor:"Record", owner:"A1", status:"open", notes:"ISO recorder"},
+    {ch:8, source:"Record feed R", type:"record", patch:"Matrix 8", conn:"XLR", phantom:"no", stand:"Rack", monitor:"Record", owner:"A1", status:"open", notes:"ISO recorder"}
+  ];
+
+  var storage = (function(){
+    var local = null;
+    var ok = false;
+    try{
+      local = window.localStorage;
+      local.setItem("input-list.probe", "1");
+      ok = local.getItem("input-list.probe") === "1";
+      local.removeItem("input-list.probe");
+    }catch(e){
+      local = null;
+      ok = false;
+    }
+    return {
+      available:function(){ return ok; },
+      get:function(key){
+        if(!ok || !local) return null;
+        try{ return local.getItem(key); }catch(e){ ok = false; return null; }
+      },
+      set:function(key, value){
+        if(!ok || !local) return false;
+        try{ local.setItem(key, value); return true; }catch(e){ ok = false; return false; }
+      }
+    };
+  })();
+
+  function newId(){
+    return "input-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 8);
+  }
+
+  function clampText(value, max){
+    return String(value || "").trim().slice(0, max);
+  }
+
+  function normalizeStatus(value){
+    return ["open","patched","checked","problem"].indexOf(value) >= 0 ? value : "open";
+  }
+
+  function normalizeType(value){
+    return ["mic","di","playback","wireless","comms","record","other"].indexOf(value) >= 0 ? value : "other";
+  }
+
+  function normalizePhantom(value){
+    return value === "yes" ? "yes" : "no";
+  }
+
+  function normalizeRow(row, index){
+    row = row && typeof row === "object" ? row : {};
+    return {
+      id:typeof row.id === "string" && row.id ? row.id.slice(0, 80) : newId(),
+      ch:Number.isFinite(Number(row.ch)) ? Math.max(1, Math.min(999, Math.round(Number(row.ch)))) : index + 1,
+      source:clampText(row.source, 80),
+      type:normalizeType(row.type),
+      patch:clampText(row.patch, 80),
+      conn:clampText(row.conn, 40),
+      phantom:normalizePhantom(row.phantom),
+      stand:clampText(row.stand, 60),
+      monitor:clampText(row.monitor, 60),
+      owner:clampText(row.owner, 40),
+      status:normalizeStatus(row.status),
+      notes:clampText(row.notes, 180)
+    };
+  }
+
+  function getMeta(){
+    var meta = {};
+    metaFields.forEach(function(id){
+      meta[id] = $(id).value || "";
+    });
+    return meta;
+  }
+
+  function applyMeta(meta){
+    meta = meta && typeof meta === "object" ? meta : {};
+    metaFields.forEach(function(id){
+      $(id).value = typeof meta[id] === "string" ? meta[id].slice(0, 120) : "";
+    });
+  }
+
+  function defaultMeta(){
+    var d = new Date();
+    return {
+      showName:"General session",
+      venueName:"Main room",
+      showDate:d.toISOString().slice(0, 10),
+      engineerName:"",
+      consoleName:""
+    };
+  }
+
+  function loadState(){
+    var raw = storage.get(STORE);
+    var parsed;
+    if(raw){
+      try{
+        parsed = JSON.parse(raw);
+      }catch(e){
+        parsed = null;
+      }
+    }
+    if(parsed && typeof parsed === "object"){
+      applyMeta(parsed.meta);
+      rows = Array.isArray(parsed.rows) ? parsed.rows.map(normalizeRow).slice(0, MAX_ROWS) : [];
+      selectedId = typeof parsed.selectedId === "string" ? parsed.selectedId : "";
+      if(rows.length) return;
+    }
+    applyMeta(defaultMeta());
+    rows = sampleRows.map(normalizeRow);
+    selectedId = rows[0] ? rows[0].id : "";
+  }
+
+  function saveStateNow(){
+    var payload = {
+      schema:EXPORT_SCHEMA,
+      updatedAt:new Date().toISOString(),
+      meta:getMeta(),
+      rows:rows,
+      selectedId:selectedId
+    };
+    if(!storage.set(STORE, JSON.stringify(payload))){
+      showMessage("Browser storage is unavailable. Export JSON to save a copy.", "error");
+    }
+  }
+
+  function saveState(){
+    if(saveTimer) clearTimeout(saveTimer);
+    saveTimer = setTimeout(saveStateNow, 200);
+  }
+
+  function flash(el, className){
+    if(!el) return;
+    el.classList.remove(className);
+    void el.offsetWidth;
+    el.classList.add(className);
+    setTimeout(function(){ el.classList.remove(className); }, 190);
+  }
+
+  function showMessage(text, kind){
+    message.classList.remove("success","error");
+    message.textContent = text;
+    if(kind) message.classList.add(kind);
+  }
+
+  function rowById(id){
+    return rows.find(function(row){ return row.id === id; }) || null;
+  }
+
+  function selectedIndex(){
+    return rows.findIndex(function(row){ return row.id === selectedId; });
+  }
+
+  function visibleRows(){
+    var term = $("searchInput").value.trim().toLowerCase();
+    var status = $("statusFilter").value;
+    var type = $("typeFilter").value;
+    return rows.filter(function(row){
+      var haystack = [row.ch,row.source,row.type,row.patch,row.conn,row.phantom,row.stand,row.monitor,row.owner,row.status,row.notes].join(" ").toLowerCase();
+      if(term && haystack.indexOf(term) === -1) return false;
+      if(status !== "all" && row.status !== status) return false;
+      if(type !== "all" && row.type !== type) return false;
+      return true;
+    });
+  }
+
+  function statusLabel(value){
+    return value.charAt(0).toUpperCase() + value.slice(1);
+  }
+
+  function optionHtml(options, current){
+    return options.map(function(option){
+      return '<option value="' + option.value + '"' + (option.value === current ? " selected" : "") + ">" + option.label + "</option>";
+    }).join("");
+  }
+
+  function esc(value){
+    return String(value == null ? "" : value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  function renderRows(){
+    var visible = visibleRows();
+    sheetBody.innerHTML = "";
+    visible.forEach(function(row){
+      var tr = document.createElement("tr");
+      tr.dataset.id = row.id;
+      tr.className = row.id === selectedId ? "selected" : "";
+      tr.innerHTML = [
+        '<td><button class="row-button" type="button" data-select="' + esc(row.id) + '" aria-label="Select channel ' + esc(row.ch) + '">Sel</button></td>',
+        '<td class="num-cell">' + esc(row.ch) + '</td>',
+        '<td><input class="source-input" data-field="source" value="' + esc(row.source) + '" aria-label="Source for channel ' + esc(row.ch) + '"></td>',
+        '<td><select data-field="type" aria-label="Type for channel ' + esc(row.ch) + '">' + optionHtml([
+          {value:"mic",label:"Mic"},
+          {value:"di",label:"DI"},
+          {value:"playback",label:"Playback"},
+          {value:"wireless",label:"Wireless"},
+          {value:"comms",label:"Comms"},
+          {value:"record",label:"Record"},
+          {value:"other",label:"Other"}
+        ], row.type) + '</select></td>',
+        '<td><input data-field="patch" value="' + esc(row.patch) + '" aria-label="Patch for channel ' + esc(row.ch) + '"></td>',
+        '<td><input data-field="conn" value="' + esc(row.conn) + '" aria-label="Connection for channel ' + esc(row.ch) + '"></td>',
+        '<td><select data-field="phantom" aria-label="Phantom power for channel ' + esc(row.ch) + '">' + optionHtml([
+          {value:"no",label:"No"},
+          {value:"yes",label:"Yes"}
+        ], row.phantom) + '</select></td>',
+        '<td><input data-field="stand" value="' + esc(row.stand) + '" aria-label="Stand for channel ' + esc(row.ch) + '"></td>',
+        '<td><input data-field="monitor" value="' + esc(row.monitor) + '" aria-label="Monitor for channel ' + esc(row.ch) + '"></td>',
+        '<td><input data-field="owner" value="' + esc(row.owner) + '" aria-label="Owner for channel ' + esc(row.ch) + '"></td>',
+        '<td><select data-field="status" aria-label="Status for channel ' + esc(row.ch) + '">' + optionHtml([
+          {value:"open",label:"Open"},
+          {value:"patched",label:"Patched"},
+          {value:"checked",label:"Checked"},
+          {value:"problem",label:"Problem"}
+        ], row.status) + '</select><span class="status-pill status-' + esc(row.status) + '">' + esc(statusLabel(row.status)) + '</span></td>',
+        '<td><textarea class="notes-input" data-field="notes" aria-label="Notes for channel ' + esc(row.ch) + '">' + esc(row.notes) + '</textarea></td>'
+      ].join("");
+      sheetBody.appendChild(tr);
+    });
+    emptyState.hidden = visible.length > 0;
+    updateInspector();
+    updateMetrics();
+    updateSummary();
+  }
+
+  function updateMetrics(){
+    var checked = rows.filter(function(row){ return row.status === "checked"; }).length;
+    var open = rows.filter(function(row){ return row.status === "open" || row.status === "problem"; }).length;
+    var wireless = rows.filter(function(row){ return row.type === "wireless"; }).length;
+    $("metricTotal").textContent = String(rows.length);
+    $("metricChecked").textContent = String(checked);
+    $("metricOpen").textContent = String(open);
+    $("metricWireless").textContent = String(wireless);
+  }
+
+  function updateInspector(){
+    var row = rowById(selectedId);
+    var hasRow = !!row;
+    $("duplicateBtn").disabled = !hasRow;
+    $("moveUpBtn").disabled = !hasRow || selectedIndex() <= 0;
+    $("moveDownBtn").disabled = !hasRow || selectedIndex() < 0 || selectedIndex() >= rows.length - 1;
+    $("deleteBtn").disabled = !hasRow;
+    if(!row){
+      $("selectedTitle").textContent = "No channel selected";
+      $("selectedDetail").textContent = "Select a row to mark status or move it.";
+      return;
+    }
+    $("selectedTitle").textContent = "Ch " + row.ch + " / " + (row.source || "Untitled source");
+    $("selectedDetail").textContent = [statusLabel(row.status), row.patch || "No patch", row.owner || "No owner"].join(" / ");
+  }
+
+  function updateSummary(){
+    var meta = getMeta();
+    var checked = rows.filter(function(row){ return row.status === "checked"; }).length;
+    var problems = rows.filter(function(row){ return row.status === "problem"; });
+    var open = rows.filter(function(row){ return row.status === "open"; });
+    var wireless = rows.filter(function(row){ return row.type === "wireless"; });
+    var lines = [];
+    lines.push("INPUT LIST");
+    lines.push("Show: " + (meta.showName || "Untitled"));
+    lines.push("Venue: " + (meta.venueName || "Not set"));
+    lines.push("Date: " + (meta.showDate || "Not set"));
+    lines.push("Engineer: " + (meta.engineerName || "Not set"));
+    lines.push("Console: " + (meta.consoleName || "Not set"));
+    lines.push("");
+    lines.push("Channels: " + rows.length);
+    lines.push("Checked: " + checked + " / " + rows.length);
+    lines.push("Open: " + open.length);
+    lines.push("Problems: " + problems.length);
+    lines.push("Wireless: " + wireless.length);
+    if(problems.length){
+      lines.push("");
+      lines.push("Problem channels:");
+      problems.forEach(function(row){
+        lines.push("Ch " + row.ch + " " + row.source + " / " + (row.notes || "No note"));
+      });
+    }
+    if(open.length){
+      lines.push("");
+      lines.push("Next open:");
+      open.slice(0, 8).forEach(function(row){
+        lines.push("Ch " + row.ch + " " + row.source + " / " + (row.patch || "No patch"));
+      });
+    }
+    $("summaryText").value = lines.join("\n");
+  }
+
+  function selectRow(id){
+    selectedId = id;
+    renderRows();
+    saveState();
+  }
+
+  function addRow(seed){
+    if(rows.length >= MAX_ROWS){
+      showMessage("Maximum channel count reached.", "error");
+      flash($("addRowBtn"), "feedback-error");
+      return;
+    }
+    var nextChannel = rows.reduce(function(max, row){ return Math.max(max, row.ch); }, 0) + 1;
+    var row = normalizeRow(Object.assign({ch:nextChannel,status:"open",phantom:"no",type:"mic"}, seed || {}), rows.length);
+    rows.push(row);
+    selectedId = row.id;
+    renderRows();
+    saveState();
+    showMessage("Channel added.", "success");
+    flash($("addRowBtn"), "feedback-success");
+  }
+
+  function duplicateSelected(){
+    var index = selectedIndex();
+    if(index < 0) return;
+    var copy = Object.assign({}, rows[index], {id:newId(), ch:rows[index].ch + 1, status:"open"});
+    rows.splice(index + 1, 0, copy);
+    selectedId = copy.id;
+    renderRows();
+    saveState();
+    showMessage("Channel duplicated.", "success");
+    flash($("duplicateBtn"), "feedback-success");
+  }
+
+  function moveSelected(dir){
+    var index = selectedIndex();
+    var target = index + dir;
+    if(index < 0 || target < 0 || target >= rows.length) return;
+    var row = rows.splice(index, 1)[0];
+    rows.splice(target, 0, row);
+    renderRows();
+    saveState();
+    showMessage("Channel moved.", "success");
+    flash(dir < 0 ? $("moveUpBtn") : $("moveDownBtn"), "feedback-success");
+  }
+
+  function deleteSelected(){
+    var row = rowById(selectedId);
+    var index = selectedIndex();
+    if(!row) return;
+    if(!window.confirm("Delete selected channel?")) return;
+    rows.splice(index, 1);
+    selectedId = rows[Math.min(index, rows.length - 1)] ? rows[Math.min(index, rows.length - 1)].id : "";
+    renderRows();
+    saveState();
+    showMessage("Channel deleted.", "success");
+    flash($("deleteBtn"), "feedback-success");
+  }
+
+  function renumberRows(){
+    rows.forEach(function(row, index){ row.ch = index + 1; });
+    renderRows();
+    saveState();
+    showMessage("Channels renumbered.", "success");
+    flash($("renumberBtn"), "feedback-success");
+  }
+
+  function setSelectedStatus(status){
+    var row = rowById(selectedId);
+    var button = document.querySelector('[data-status="' + status + '"]');
+    if(!row){
+      showMessage("Select a channel first.", "error");
+      flash(button, "feedback-error");
+      return;
+    }
+    row.status = normalizeStatus(status);
+    renderRows();
+    saveState();
+    showMessage("Status set to " + statusLabel(row.status) + ".", "success");
+    flash(button, "feedback-success");
+  }
+
+  function selectNextOpen(){
+    var next = rows.find(function(row){ return row.status === "open" || row.status === "problem"; });
+    if(!next){
+      showMessage("No open or problem channels.", "success");
+      flash($("takeNextBtn"), "feedback-success");
+      return;
+    }
+    $("statusFilter").value = "all";
+    $("typeFilter").value = "all";
+    $("searchInput").value = "";
+    selectedId = next.id;
+    renderRows();
+    showMessage("Selected channel " + next.ch + ".", "success");
+    flash($("takeNextBtn"), "feedback-success");
+  }
+
+  function updateRowField(id, field, value, rerender){
+    var row = rowById(id);
+    if(!row) return;
+    if(field === "ch"){
+      row.ch = Math.max(1, Math.min(999, Math.round(Number(value) || row.ch)));
+    }else if(field === "type"){
+      row.type = normalizeType(value);
+    }else if(field === "status"){
+      row.status = normalizeStatus(value);
+    }else if(field === "phantom"){
+      row.phantom = normalizePhantom(value);
+    }else if(Object.prototype.hasOwnProperty.call(row, field)){
+      row[field] = clampText(value, field === "notes" ? 180 : 80);
+    }
+    selectedId = id;
+    if(rerender){
+      renderRows();
+    }else{
+      updateInspector();
+      updateMetrics();
+      updateSummary();
+    }
+    saveState();
+  }
+
+  function clearFilters(){
+    $("searchInput").value = "";
+    $("statusFilter").value = "all";
+    $("typeFilter").value = "all";
+    renderRows();
+    showMessage("Filters cleared.", "success");
+    flash($("clearFiltersBtn"), "feedback-success");
+  }
+
+  function loadSample(){
+    if(rows.length && !window.confirm("Replace the current input list with the sample?")) return;
+    applyMeta(defaultMeta());
+    rows = sampleRows.map(normalizeRow);
+    selectedId = rows[0] ? rows[0].id : "";
+    clearFilters();
+    saveStateNow();
+    showMessage("Sample input list loaded.", "success");
+    flash($("sampleBtn"), "feedback-success");
+  }
+
+  function resetSheet(){
+    if(!window.confirm("Clear the current input list?")) return;
+    applyMeta(defaultMeta());
+    rows = [];
+    selectedId = "";
+    renderRows();
+    saveStateNow();
+    showMessage("Input list cleared.", "success");
+    flash($("resetBtn"), "feedback-success");
+  }
+
+  function exportPayload(){
+    return {
+      schema:EXPORT_SCHEMA,
+      exportedAt:new Date().toISOString(),
+      meta:getMeta(),
+      rows:rows
+    };
+  }
+
+  function fileStem(){
+    var stem = (getMeta().showName || "input-list").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    return stem || "input-list";
+  }
+
+  function downloadText(filename, type, text, button){
+    var url = null;
+    var link = null;
+    try{
+      url = URL.createObjectURL(new Blob([text], {type:type}));
+      link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      link.style.display = "none";
+      document.body.appendChild(link);
+      link.click();
+      flash(button, "feedback-success");
+      setTimeout(function(){
+        URL.revokeObjectURL(url);
+        if(link.parentNode) link.parentNode.removeChild(link);
+      }, 0);
+    }catch(e){
+      if(url) URL.revokeObjectURL(url);
+      if(link && link.parentNode) link.parentNode.removeChild(link);
+      flash(button, "feedback-error");
+      showMessage("Download failed. Copy the summary instead.", "error");
+    }
+  }
+
+  function csvEscape(value){
+    value = String(value == null ? "" : value);
+    return /[",\n]/.test(value) ? '"' + value.replace(/"/g, '""') + '"' : value;
+  }
+
+  function buildCsv(){
+    var header = ["Channel","Source","Type","Patch","Connection","Phantom","Stand","Monitor","Owner","Status","Notes"];
+    var lines = [header.map(csvEscape).join(",")];
+    rows.forEach(function(row){
+      lines.push([row.ch,row.source,row.type,row.patch,row.conn,row.phantom,row.stand,row.monitor,row.owner,row.status,row.notes].map(csvEscape).join(","));
+    });
+    return lines.join("\n");
+  }
+
+  function exportJson(){
+    downloadText(fileStem() + ".input-list.json", "application/json;charset=utf-8", JSON.stringify(exportPayload(), null, 2), $("exportJsonBtn"));
+    showMessage("JSON exported.", "success");
+  }
+
+  function exportCsv(){
+    downloadText(fileStem() + ".input-list.csv", "text/csv;charset=utf-8", buildCsv(), $("exportCsvBtn"));
+    showMessage("CSV exported.", "success");
+  }
+
+  function importPayload(payload){
+    if(!payload || typeof payload !== "object" || !Array.isArray(payload.rows)){
+      throw new Error("Invalid input list");
+    }
+    rows = payload.rows.map(normalizeRow).slice(0, MAX_ROWS);
+    applyMeta(payload.meta || {});
+    selectedId = rows[0] ? rows[0].id : "";
+    renderRows();
+    saveStateNow();
+  }
+
+  function importJsonFile(file){
+    var reader = new FileReader();
+    reader.onload = function(){
+      try{
+        importPayload(JSON.parse(String(reader.result || "")));
+        showMessage("Input list imported.", "success");
+        flash($("importJsonBtn"), "feedback-success");
+      }catch(e){
+        showMessage("Could not import that JSON file.", "error");
+        flash($("importJsonBtn"), "feedback-error");
+      }
+    };
+    reader.onerror = function(){
+      showMessage("Could not read that file.", "error");
+      flash($("importJsonBtn"), "feedback-error");
+    };
+    reader.readAsText(file);
+  }
+
+  function copySummary(){
+    var text = $("summaryText").value;
+    if(!navigator.clipboard || !navigator.clipboard.writeText){
+      $("summaryText").select();
+      document.execCommand("copy");
+      showMessage("Summary copied.", "success");
+      flash($("copySummaryBtn"), "feedback-success");
+      return;
+    }
+    navigator.clipboard.writeText(text).then(function(){
+      showMessage("Summary copied.", "success");
+      flash($("copySummaryBtn"), "feedback-success");
+    }).catch(function(){
+      showMessage("Copy failed. Select the summary text instead.", "error");
+      flash($("copySummaryBtn"), "feedback-error");
+    });
+  }
+
+  function bindEvents(){
+    $("addRowBtn").addEventListener("click", function(){ addRow(); });
+    $("duplicateBtn").addEventListener("click", duplicateSelected);
+    $("moveUpBtn").addEventListener("click", function(){ moveSelected(-1); });
+    $("moveDownBtn").addEventListener("click", function(){ moveSelected(1); });
+    $("deleteBtn").addEventListener("click", deleteSelected);
+    $("renumberBtn").addEventListener("click", renumberRows);
+    $("sampleBtn").addEventListener("click", loadSample);
+    $("resetBtn").addEventListener("click", resetSheet);
+    $("clearFiltersBtn").addEventListener("click", clearFilters);
+    $("takeNextBtn").addEventListener("click", selectNextOpen);
+    $("printBtn").addEventListener("click", function(){ window.print(); });
+    $("copySummaryBtn").addEventListener("click", copySummary);
+    $("exportJsonBtn").addEventListener("click", exportJson);
+    $("exportCsvBtn").addEventListener("click", exportCsv);
+    $("importJsonBtn").addEventListener("click", function(){
+      jsonInput.value = "";
+      jsonInput.click();
+    });
+    jsonInput.addEventListener("change", function(){
+      var file = jsonInput.files && jsonInput.files[0];
+      if(file) importJsonFile(file);
+    });
+    metaFields.forEach(function(id){
+      $(id).addEventListener("input", function(){
+        updateSummary();
+        saveState();
+      });
+    });
+    ["searchInput","statusFilter","typeFilter"].forEach(function(id){
+      $(id).addEventListener("input", renderRows);
+      $(id).addEventListener("change", renderRows);
+    });
+    document.querySelectorAll("[data-status]").forEach(function(button){
+      button.addEventListener("click", function(){ setSelectedStatus(button.getAttribute("data-status")); });
+    });
+    sheetBody.addEventListener("click", function(e){
+      var button = e.target.closest("[data-select]");
+      var tr = e.target.closest("tr");
+      if(button){
+        selectRow(button.getAttribute("data-select"));
+        return;
+      }
+      if(tr && tr.dataset.id){
+        selectedId = tr.dataset.id;
+        updateInspector();
+        document.querySelectorAll("tbody tr").forEach(function(rowEl){
+          rowEl.classList.toggle("selected", rowEl.dataset.id === selectedId);
+        });
+        saveState();
+      }
+    });
+    sheetBody.addEventListener("input", function(e){
+      var field = e.target.getAttribute("data-field");
+      var tr = e.target.closest("tr");
+      if(field && tr) updateRowField(tr.dataset.id, field, e.target.value, false);
+    });
+    sheetBody.addEventListener("change", function(e){
+      var field = e.target.getAttribute("data-field");
+      var tr = e.target.closest("tr");
+      if(field && tr) updateRowField(tr.dataset.id, field, e.target.value, true);
+    });
+    document.addEventListener("keydown", function(e){
+      var tag = document.activeElement ? document.activeElement.tagName : "";
+      var typing = tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT";
+      if((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "s"){
+        e.preventDefault();
+        exportJson();
+        return;
+      }
+      if(typing) return;
+      if(e.key === "n" || e.key === "N"){
+        e.preventDefault();
+        addRow();
+      }else if(e.key === "j" || e.key === "J"){
+        e.preventDefault();
+        selectNextOpen();
+      }else if(e.key === "Delete" || e.key === "Backspace"){
+        e.preventDefault();
+        deleteSelected();
+      }
+    });
+  }
+
+  loadState();
+  bindEvents();
+  renderRows();
+  if(!storage.available()){
+    showMessage("Browser storage is unavailable. Export JSON to keep a copy.", "error");
+  }
+})();
+</script>
+</body>
+</html>
