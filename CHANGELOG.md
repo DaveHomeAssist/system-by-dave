@@ -3,6 +3,7 @@
 ## 2026-06-13
 
 * Added an unlisted, noindex **Prompt Browser** page at `/prompt-browser.html` for the full local prompt library browser. The page includes ranked search, review queue, fill-in mode, saved views, import/export state, and local-only browser state. It is blocked in `robots.txt` and kept out of `sitemap.xml` and site navigation because the embedded library includes internal working prompts.
+* Added tactile microinteractions to `/teleprompter.html`: pressed and hover button states, control confirmation pulses, inline file save/load success and error feedback, paused-reader drag resistance with snap release, and reduced-motion fallbacks.
 
 ## 2026-06-12
 

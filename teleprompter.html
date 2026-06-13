@@ -34,8 +34,14 @@
     --accent-strong:#3d97f0;
     --accent-ink:#04121f;
     --danger:#ff6b6b;
+    --success:#66d99a;
     --focus:#9ad0ff;
     --radius:12px;
+    --dur-fast:120ms;
+    --dur-med:180ms;
+    --ease-out:cubic-bezier(.2,.8,.2,1);
+    --ease-press:cubic-bezier(.2,0,0,1);
+    --press-scale:.975;
     --reader-fs:48px;
     --reader-lh:1.5;
     --reader-width:42rem;
@@ -87,7 +93,7 @@
     border-bottom:1px solid var(--line);
     z-index:20;
     flex:0 0 auto;
-    transition:opacity .25s ease, transform .25s ease;
+    transition:opacity var(--dur-med) var(--ease-out), transform var(--dur-med) var(--ease-out);
   }
   .group{
     display:flex;align-items:center;gap:6px;
@@ -95,6 +101,12 @@
     background:var(--surface-2);
     border:1px solid var(--line);
     border-radius:10px;
+    transition:background var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out);
+  }
+  .group:hover,.group:focus-within{
+    background:#202632;
+    border-color:#3f4c5d;
+    box-shadow:0 0 0 1px rgba(154,208,255,.06);
   }
   .group .label{color:var(--muted);font-size:12px;padding:0 2px;white-space:nowrap}
   .group .readout{
@@ -109,15 +121,38 @@
     border-radius:9px;
     padding:8px 12px;
     line-height:1;
-    transition:background .15s ease,border-color .15s ease,transform .05s ease;
+    user-select:none;
+    -webkit-tap-highlight-color:transparent;
+    transition:
+      background var(--dur-fast) var(--ease-out),
+      border-color var(--dur-fast) var(--ease-out),
+      box-shadow var(--dur-fast) var(--ease-out),
+      color var(--dur-fast) var(--ease-out),
+      filter var(--dur-fast) var(--ease-out),
+      transform var(--dur-fast) var(--ease-press);
+    touch-action:manipulation;
   }
-  button:hover{background:#222936;border-color:#36404f}
-  button:active{transform:translateY(1px)}
+  button:hover{
+    background:#232c3b;
+    border-color:#465467;
+    box-shadow:0 0 0 1px rgba(154,208,255,.08),0 3px 10px rgba(0,0,0,.18);
+    transform:translateY(-1px);
+  }
+  button:active,button.is-pressing{
+    background:#283242;
+    border-color:#536275;
+    box-shadow:inset 0 1px 3px rgba(0,0,0,.32);
+    transform:translateY(1px) scale(var(--press-scale));
+  }
   button.icon{padding:8px 10px;min-width:38px;font-size:15px}
   button.toggle[aria-pressed="true"]{
     background:rgba(91,176,255,.16);
     border-color:var(--accent-strong);
     color:#cfe7ff;
+  }
+  button.toggle[aria-pressed="true"]:hover{
+    background:rgba(91,176,255,.22);
+    border-color:#69b8ff;
   }
   button.primary{
     background:linear-gradient(180deg,var(--accent),var(--accent-strong));
@@ -128,7 +163,30 @@
     box-shadow:0 1px 0 rgba(255,255,255,.18) inset;
   }
   button.primary:hover{filter:brightness(1.05)}
+  button.primary:active,button.primary.is-pressing{filter:brightness(.94) saturate(1.08)}
   button.ghost{background:transparent}
+  .feedback-success{
+    border-color:rgba(102,217,154,.88) !important;
+    animation:success-confirm var(--dur-med) var(--ease-out);
+  }
+  .feedback-error{
+    border-color:var(--danger) !important;
+    box-shadow:0 0 0 3px rgba(255,107,107,.2) !important;
+    animation:error-shake 160ms cubic-bezier(.3,0,.2,1);
+  }
+  .hint.feedback-success{color:#bff6d2}
+  .hint.feedback-error{color:#ffd0d0}
+  @keyframes success-confirm{
+    0%{transform:scale(1)}
+    45%{box-shadow:0 0 0 4px rgba(102,217,154,.18);transform:scale(1.018)}
+    100%{box-shadow:0 0 0 rgba(102,217,154,0);transform:scale(1)}
+  }
+  @keyframes error-shake{
+    0%,100%{transform:translateX(0)}
+    25%{transform:translateX(-4px)}
+    55%{transform:translateX(4px)}
+    80%{transform:translateX(-2px)}
+  }
 
   :focus-visible{outline:3px solid var(--focus);outline-offset:2px;border-radius:8px}
 
@@ -140,10 +198,25 @@
     overflow:hidden;
     background:radial-gradient(120% 80% at 50% 0%, #0d1219, #07090d 70%);
     cursor:default;
+    touch-action:none;
   }
+  .reader::after{
+    content:"";
+    position:absolute;inset:0;z-index:3;pointer-events:none;
+    border:1px solid transparent;
+    box-shadow:inset 0 0 0 0 rgba(91,176,255,0);
+    transition:border-color var(--dur-med) var(--ease-out), box-shadow var(--dur-med) var(--ease-out);
+  }
+  body.reading:not(.playing) .reader{cursor:grab}
+  body.reading:not(.playing) .reader:hover::after,
+  body.reading:not(.playing) .reader.dragging::after{
+    border-color:rgba(154,208,255,.18);
+    box-shadow:inset 0 0 0 1px rgba(91,176,255,.08);
+  }
+  body.reading:not(.playing) .reader.dragging{cursor:grabbing}
   .mirror-wrap{
     position:absolute;inset:0;
-    transition:transform .2s ease;
+    transition:transform var(--dur-med) var(--ease-out);
     will-change:transform;
   }
   body.mirror .mirror-wrap{transform:scaleX(-1)}
@@ -161,6 +234,9 @@
     word-break:break-word;
     text-wrap:pretty;
     will-change:transform;
+  }
+  .reader-inner.snap-feedback{
+    transition:transform var(--dur-med) var(--ease-out);
   }
 
   /* center reading-line indicator */
@@ -265,8 +341,9 @@
 
   /* Reduced motion: soften transitions (scroll engine still works + manual steps provided) */
   @media (prefers-reduced-motion:reduce){
-    *{transition-duration:.001ms !important}
+    *{transition-duration:.001ms !important;animation-duration:.001ms !important}
     .reader{scroll-behavior:auto}
+    button:hover,button:active,button.is-pressing{transform:none}
   }
 
   /* Narrow screens / tablet */
@@ -488,6 +565,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   function updateStorageUi(){
     var available = storage.isAvailable();
     if(saveHint){
+      saveHint.classList.remove('feedback-success','feedback-error');
       saveHint.textContent = available
         ? 'Paste or type. Saved automatically on this device.'
         : 'Paste or type. Auto save is off in this browser. Use Save or Load.';
@@ -495,6 +573,26 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     if(storageStatus){
       storageStatus.hidden = available;
     }
+  }
+
+  function flashClass(el, className, duration){
+    if(!el) return;
+    el.classList.remove(className);
+    void el.offsetWidth;
+    el.classList.add(className);
+    setTimeout(function(){ el.classList.remove(className); }, duration || 190);
+  }
+  function signalSuccess(el){ flashClass(el, 'feedback-success', 190); }
+  function signalError(el){ flashClass(el, 'feedback-error', 190); }
+
+  var hintTimer = null;
+  function showHintNotice(message, kind){
+    if(!saveHint) return;
+    if(hintTimer) clearTimeout(hintTimer);
+    saveHint.classList.remove('feedback-success','feedback-error');
+    saveHint.textContent = message;
+    if(kind) saveHint.classList.add('feedback-' + kind);
+    hintTimer = setTimeout(updateStorageUi, 1600);
   }
 
   function loadSettings(){
@@ -560,18 +658,29 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   }
 
   function saveScriptToFile(){
-    var blob = new Blob([script.value || ''], {type:'text/plain;charset=utf-8'});
-    var url = URL.createObjectURL(blob);
-    var link = document.createElement('a');
-    link.download = scriptFileName();
-    link.href = url;
-    link.style.display = 'none';
-    document.body.appendChild(link);
-    link.click();
-    setTimeout(function(){
-      URL.revokeObjectURL(url);
-      if(link.parentNode) link.parentNode.removeChild(link);
-    }, 0);
+    var url = null;
+    var link = null;
+    try{
+      var blob = new Blob([script.value || ''], {type:'text/plain;charset=utf-8'});
+      url = URL.createObjectURL(blob);
+      link = document.createElement('a');
+      link.download = scriptFileName();
+      link.href = url;
+      link.style.display = 'none';
+      document.body.appendChild(link);
+      link.click();
+      signalSuccess($('saveFileBtn'));
+      showHintNotice('Script saved as a text file.', 'success');
+      setTimeout(function(){
+        URL.revokeObjectURL(url);
+        if(link.parentNode) link.parentNode.removeChild(link);
+      }, 0);
+    }catch(e){
+      if(url) URL.revokeObjectURL(url);
+      if(link && link.parentNode) link.parentNode.removeChild(link);
+      signalError($('saveFileBtn'));
+      showHintNotice('Could not save the file. Select the script and copy it instead.', 'error');
+    }
   }
 
   function loadScriptFromFile(file){
@@ -587,9 +696,12 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
       }else{
         script.focus();
       }
+      signalSuccess($('loadFileBtn'));
+      showHintNotice('Script loaded.', 'success');
     };
     readerForFile.onerror = function(){
-      window.alert('Could not load that file.');
+      signalError($('loadFileBtn'));
+      showHintNotice('Could not load that file. Try a plain text file.', 'error');
     };
     readerForFile.readAsText(file);
   }
@@ -604,6 +716,13 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   var maxScroll = 0;
   var rafId = null;
   var lastTs = 0;
+  var snapTimer = null;
+  var dragState = {
+    active:false,
+    pointerId:null,
+    startY:0,
+    startPos:0
+  };
 
   // ---- Apply visual settings ----
   function applySettings(){
@@ -631,6 +750,27 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
 
   function applyTransform(){
     inner.style.transform = 'translateY(' + (-pos).toFixed(2) + 'px)';
+  }
+
+  function applySnapTransform(){
+    if(playing){
+      applyTransform();
+      return;
+    }
+    if(snapTimer) clearTimeout(snapTimer);
+    inner.classList.remove('snap-feedback');
+    void inner.offsetWidth;
+    inner.classList.add('snap-feedback');
+    applyTransform();
+    snapTimer = setTimeout(function(){
+      inner.classList.remove('snap-feedback');
+    }, 190);
+  }
+
+  function snapReader(){
+    var amount = Math.max(24, FONT.val * LH.val * .5);
+    pos = clamp(Math.round(pos / amount) * amount, 0, maxScroll);
+    applySnapTransform();
   }
 
   // ---- Reader content ----
@@ -673,6 +813,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   }
 
   function play(){
+    cancelReaderDrag();
     if(!isReading()) setReading(true);
     if(maxScroll<=0) measure();
     if(pos >= maxScroll){ pos = 0; } // restart if at end
@@ -694,10 +835,14 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     cancelAnimationFrame(rafId);
     if(hideTimer) clearTimeout(hideTimer);
   }
-  function togglePlay(){ playing ? pause() : play(); }
+  function togglePlay(){
+    playing ? pause() : play();
+    signalSuccess($('playBtn'));
+  }
 
   function restart(){
-    pos = 0; applyTransform(); showToast(false);
+    pos = 0; applySnapTransform(); showToast(false);
+    signalSuccess($('restartBtn'));
     if(!playing){ /* stay paused at top */ }
   }
 
@@ -705,7 +850,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   function step(dir){
     var amount = Math.max(40, FONT.val * LH.val * 1.2);
     pos = clamp(pos + dir*amount, 0, maxScroll);
-    applyTransform();
+    applySnapTransform();
     showToast(false);
   }
 
@@ -744,22 +889,32 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   }
 
   function toggleMirror(){ mirror=!mirror; body.classList.toggle('mirror',mirror);
-    $('mirrorBtn').setAttribute('aria-pressed',String(mirror)); saveSettings(); }
+    $('mirrorBtn').setAttribute('aria-pressed',String(mirror)); saveSettings(); signalSuccess($('mirrorBtn')); }
   function toggleLine(){ centerline=!centerline; body.classList.toggle('centerline',centerline);
-    $('lineBtn').setAttribute('aria-pressed',String(centerline)); saveSettings(); }
+    $('lineBtn').setAttribute('aria-pressed',String(centerline)); saveSettings(); signalSuccess($('lineBtn')); }
 
   // ---- Fullscreen ----
   function toggleFullscreen(){
     var el = document.documentElement;
     if(!document.fullscreenElement){
-      (el.requestFullscreen ? el.requestFullscreen() : Promise.reject()).catch(function(){});
+      if(el.requestFullscreen){
+        el.requestFullscreen().catch(function(){ signalError($('fsBtn')); });
+      }else{
+        signalError($('fsBtn'));
+      }
     }else{
-      (document.exitFullscreen ? document.exitFullscreen() : null);
+      if(document.exitFullscreen){
+        var exit = document.exitFullscreen();
+        if(exit && exit.catch) exit.catch(function(){ signalError($('fsBtn')); });
+      }else{
+        signalError($('fsBtn'));
+      }
     }
   }
   document.addEventListener('fullscreenchange', function(){
     var fs = !!document.fullscreenElement;
     $('fsBtn').setAttribute('aria-pressed', String(fs));
+    signalSuccess($('fsBtn'));
     if(fs && !isReading()) setReading(true);
   });
 
@@ -768,17 +923,75 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   function openHelp(){ lastFocus=document.activeElement; help.classList.add('open'); $('helpClose').focus(); }
   function closeHelp(){ help.classList.remove('open'); if(lastFocus) lastFocus.focus(); }
 
+  function installPressFeedback(){
+    document.querySelectorAll('button').forEach(function(button){
+      function press(){ if(!button.disabled) button.classList.add('is-pressing'); }
+      function release(){ button.classList.remove('is-pressing'); }
+      button.addEventListener('pointerdown', press);
+      button.addEventListener('pointerup', release);
+      button.addEventListener('pointercancel', release);
+      button.addEventListener('pointerleave', release);
+      button.addEventListener('blur', release);
+      button.addEventListener('keydown', function(e){
+        if(e.key === ' ' || e.key === 'Enter') press();
+      });
+      button.addEventListener('keyup', function(e){
+        if(e.key === ' ' || e.key === 'Enter') release();
+      });
+    });
+  }
+
+  function cancelReaderDrag(){
+    dragState.active = false;
+    dragState.pointerId = null;
+    reader.classList.remove('dragging');
+  }
+
+  function startReaderDrag(e){
+    if(playing || !isReading()) return;
+    if(typeof e.button === 'number' && e.button !== 0) return;
+    dragState.active = true;
+    dragState.pointerId = e.pointerId;
+    dragState.startY = e.clientY;
+    dragState.startPos = pos;
+    reader.classList.add('dragging');
+    reader.focus({preventScroll:true});
+    if(reader.setPointerCapture && e.pointerId !== undefined){
+      try{ reader.setPointerCapture(e.pointerId); }catch(err){}
+    }
+    e.preventDefault();
+  }
+
+  function moveReaderDrag(e){
+    if(!dragState.active || e.pointerId !== dragState.pointerId) return;
+    var resistance = e.pointerType === 'touch' ? .78 : .65;
+    var deltaY = e.clientY - dragState.startY;
+    pos = clamp(dragState.startPos - deltaY * resistance, 0, maxScroll);
+    applyTransform();
+    e.preventDefault();
+  }
+
+  function endReaderDrag(e){
+    if(!dragState.active || (e && e.pointerId !== dragState.pointerId)) return;
+    if(reader.releasePointerCapture && e && e.pointerId !== undefined){
+      try{ reader.releasePointerCapture(e.pointerId); }catch(err){}
+    }
+    cancelReaderDrag();
+    snapReader();
+  }
+
   // ---- Wiring ----
-  $('editBtn').addEventListener('click', function(){ setReading(false); });
-  $('doneBtn').addEventListener('click', function(){ setReading(true); });
+  installPressFeedback();
+  $('editBtn').addEventListener('click', function(){ setReading(false); signalSuccess($('editBtn')); });
+  $('doneBtn').addEventListener('click', function(){ setReading(true); signalSuccess($('doneBtn')); });
   $('playBtn').addEventListener('click', togglePlay);
   $('restartBtn').addEventListener('click', restart);
-  $('toastRestart').addEventListener('click', function(){ restart(); play(); });
+  $('toastRestart').addEventListener('click', function(){ restart(); play(); signalSuccess($('toastRestart')); signalSuccess($('playBtn')); });
   $('mirrorBtn').addEventListener('click', toggleMirror);
   $('lineBtn').addEventListener('click', toggleLine);
   $('fsBtn').addEventListener('click', toggleFullscreen);
-  $('helpBtn').addEventListener('click', openHelp);
-  $('helpClose').addEventListener('click', closeHelp);
+  $('helpBtn').addEventListener('click', function(){ openHelp(); signalSuccess($('helpBtn')); });
+  $('helpClose').addEventListener('click', function(){ closeHelp(); signalSuccess($('helpClose')); });
   help.addEventListener('click', function(e){ if(e.target===help) closeHelp(); });
   $('saveFileBtn').addEventListener('click', saveScriptToFile);
   $('loadFileBtn').addEventListener('click', function(){
@@ -805,6 +1018,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
         case 'stepFwd': step(+1); break;
         case 'stepBack': step(-1); break;
       }
+      signalSuccess(b);
     });
   });
 
@@ -827,6 +1041,11 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     pos = clamp(pos + e.deltaY, 0, maxScroll);
     applyTransform();
   }, {passive:false});
+
+  reader.addEventListener('pointerdown', startReaderDrag);
+  reader.addEventListener('pointermove', moveReaderDrag);
+  reader.addEventListener('pointerup', endReaderDrag);
+  reader.addEventListener('pointercancel', endReaderDrag);
 
   // ---- Keyboard shortcuts ----
   document.addEventListener('keydown', function(e){
