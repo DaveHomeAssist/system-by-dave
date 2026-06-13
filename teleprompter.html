@@ -463,6 +463,117 @@
   .keys .desc{color:var(--muted);font-size:13px}
   .help .close-row{display:flex;justify-content:flex-end;margin-top:18px}
 
+  .remote-panel{
+    display:none;
+    flex:1 1 auto;
+    min-height:0;
+    padding:18px;
+    background:radial-gradient(120% 80% at 50% 0%, #111722, #07090d 72%);
+    overflow:auto;
+  }
+  body.remote-mode .toolbar,
+  body.remote-mode main,
+  body.remote-mode footer{
+    display:none;
+  }
+  body.remote-mode #remoteBtn,
+  body.remote-mode #editBtn,
+  body.remote-mode #helpBtn{
+    display:none;
+  }
+  body.remote-mode .remote-panel{
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
+  .remote-card{
+    width:min(100%,560px);
+    margin:0 auto;
+    padding:16px;
+    border:1px solid var(--line);
+    border-radius:16px;
+    background:rgba(18,22,29,.94);
+    box-shadow:0 18px 50px rgba(0,0,0,.28);
+  }
+  .remote-head{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:14px;
+  }
+  .remote-head h1{
+    margin:0;
+    font-size:18px;
+    line-height:1.2;
+  }
+  .remote-head p{
+    margin:5px 0 0;
+    color:var(--muted);
+    font-size:12px;
+  }
+  .remote-status{
+    flex:0 0 auto;
+    padding:6px 9px;
+    border:1px solid rgba(255,217,168,.32);
+    border-radius:999px;
+    background:#241b10;
+    color:#ffd9a8;
+    font-size:12px;
+    white-space:nowrap;
+  }
+  .remote-status.online{
+    border-color:rgba(102,217,154,.5);
+    background:#102419;
+    color:#bff6d2;
+  }
+  .remote-now{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:8px;
+    margin-bottom:14px;
+  }
+  .remote-metric{
+    min-width:0;
+    padding:10px;
+    border:1px solid var(--line);
+    border-radius:12px;
+    background:var(--surface-2);
+  }
+  .remote-metric span{
+    display:block;
+    color:var(--muted);
+    font-size:11px;
+    white-space:nowrap;
+  }
+  .remote-metric strong{
+    display:block;
+    margin-top:4px;
+    color:var(--text);
+    font-size:18px;
+    line-height:1.1;
+    font-variant-numeric:tabular-nums;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .remote-controls{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:8px;
+  }
+  .remote-controls button{
+    min-height:48px;
+  }
+  .remote-controls .wide{
+    grid-column:1 / -1;
+  }
+  .remote-note{
+    margin:12px 0 0;
+    color:var(--muted);
+    font-size:12px;
+  }
+
   footer{
     flex:0 0 auto;padding:8px 16px;font-size:12px;color:var(--muted);
     border-top:1px solid var(--line);background:var(--surface);
@@ -511,6 +622,10 @@
     .run-hud #remainingOut{display:none}
     .run-hud .marker-readout{max-width:96px}
     .progress-rail{width:72px}
+    .remote-panel{padding:12px}
+    .remote-card{padding:14px;border-radius:14px}
+    .remote-now{grid-template-columns:1fr}
+    .remote-controls{grid-template-columns:1fr 1fr}
     #script{font-size:18px;padding:16px}
   }
 
@@ -535,6 +650,7 @@
       <span>Teleprompter<small>Free · offline · no install</small></span>
     </span>
     <span class="spacer"></span>
+    <button id="remoteBtn" class="ghost" type="button" title="Open remote control window">Remote</button>
     <button id="editBtn" class="ghost" type="button" title="Switch between editing and reading">Edit script</button>
     <button id="helpBtn" class="ghost" type="button" aria-haspopup="dialog" title="Keyboard shortcuts">⌨ Shortcuts</button>
   </header>
@@ -628,6 +744,46 @@
       <button id="loadFileBtn" type="button" title="Load script from a text file" aria-label="Load script from file">⇧ Load</button>
     </div>
   </div>
+
+  <section class="remote-panel" id="remotePanel" aria-label="Teleprompter remote control">
+    <div class="remote-card">
+      <div class="remote-head">
+        <div>
+          <h1>Teleprompter Remote</h1>
+          <p>Control the reader window from this screen.</p>
+        </div>
+        <span class="remote-status" id="remoteStatus">Waiting</span>
+      </div>
+      <div class="remote-now">
+        <div class="remote-metric">
+          <span>Status</span>
+          <strong id="remoteStateOut">Offline</strong>
+        </div>
+        <div class="remote-metric">
+          <span>Run</span>
+          <strong id="remoteTimerOut">00:00</strong>
+        </div>
+        <div class="remote-metric">
+          <span>Marker</span>
+          <strong id="remoteMarkerOut">None</strong>
+        </div>
+      </div>
+      <div class="remote-controls" aria-label="Remote controls">
+        <button id="remoteCueBtn" class="wide primary" type="button">Cue + Play</button>
+        <button id="remotePlayBtn" type="button">Play / Pause</button>
+        <button id="remoteRestartBtn" type="button">Restart</button>
+        <button id="remoteSpeedDownBtn" type="button">Speed −</button>
+        <button id="remoteSpeedUpBtn" type="button">Speed +</button>
+        <button id="remoteMarkerPrevBtn" type="button">Prev Marker</button>
+        <button id="remoteMarkerNextBtn" type="button">Next Marker</button>
+        <button id="remoteStepBackBtn" type="button">Step Up</button>
+        <button id="remoteStepFwdBtn" type="button">Step Down</button>
+        <button id="remoteReadBtn" type="button">Read Mode</button>
+        <button id="remoteEditBtn" type="button">Edit Mode</button>
+      </div>
+      <p class="remote-note" id="remoteNote">Keep the reader tab open. Commands stay in this browser.</p>
+    </div>
+  </section>
   <input id="scriptFileInput" class="file-input" type="file" accept=".txt,.md,text/plain,text/markdown">
 
   <!-- Reader + Editor -->
@@ -719,6 +875,9 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
 
   var $ = function(id){ return document.getElementById(id); };
   var body = document.body;
+  var urlParams = new URLSearchParams(window.location.search);
+  var isRemoteMode = urlParams.get('remote') === '1';
+  if(isRemoteMode) body.classList.add('remote-mode');
 
   var reader   = $('reader');
   var inner    = $('readerInner');
@@ -743,6 +902,12 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   var markerSelect = $('markerSelect');
   var markerOut = $('markerOut');
   var markerMeasure = $('markerMeasure');
+  var remoteBtn = $('remoteBtn');
+  var remoteStatus = $('remoteStatus');
+  var remoteStateOut = $('remoteStateOut');
+  var remoteTimerOut = $('remoteTimerOut');
+  var remoteMarkerOut = $('remoteMarkerOut');
+  var remoteNote = $('remoteNote');
 
   // ---- Settings (persisted) ----
   var SPEED = {min:10, max:400, step:10, val:60};   // px / second
@@ -845,6 +1010,13 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     hintTimer = setTimeout(updateStorageUi, 1600);
   }
 
+  function setRemoteNote(message, kind){
+    if(!remoteNote) return;
+    remoteNote.classList.remove('feedback-success','feedback-error');
+    remoteNote.textContent = message;
+    if(kind) remoteNote.classList.add('feedback-' + kind);
+  }
+
   function sanitizeFontFace(value){
     return Object.prototype.hasOwnProperty.call(FONT_FACES, value) ? value : 'system';
   }
@@ -879,7 +1051,18 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   var SCRIPT_STORE = 'teleprompter.script.v1';
   var PREF_STORE = 'teleprompter.preferences.v1';
   var SAVED_SCRIPTS_STORE = 'teleprompter.savedScripts.v1';
+  var REMOTE_SESSION_STORE = 'teleprompter.remoteSession.v1';
+  var REMOTE_BUS_STORE = 'teleprompter.remoteBus.v1';
   var MAX_SAVED_SCRIPTS = 24;
+  var REMOTE_CHANNEL_PREFIX = 'teleprompter.remote.';
+  var remoteSourceId = 'source-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
+  var remoteSessionId = urlParams.get('session') || storage.get(REMOTE_SESSION_STORE) || ('session-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8));
+  if(!isRemoteMode && storage.isAvailable()) storage.set(REMOTE_SESSION_STORE, remoteSessionId);
+  var remoteChannel = null;
+  var remoteStateTimer = null;
+  var remoteLastStateAt = 0;
+  var remoteWaitingTimer = null;
+  var remoteSeenMessages = {};
   var preferences = {
     lastMode:'edit',
     lastFileStem:'',
@@ -1144,6 +1327,179 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
       var rate = scriptStats.words && total ? Math.round(scriptStats.words / Math.max(total / 60, 0.01)) : 0;
       scriptMeta.textContent = scriptStats.words + ' words · ' + formatTime(total) + ' run' + (rate ? ' · ' + rate + ' wpm' : '') + (scriptMarkers.length ? ' · ' + scriptMarkers.length + ' markers' : '');
     }
+    scheduleRemoteState(false);
+  }
+
+  function currentRemoteState(){
+    var markerText = markerOut ? markerOut.textContent : 'No markers';
+    return {
+      playing:!!playing,
+      cueing:!!cueing,
+      reading:isReading(),
+      speed:SPEED.val,
+      timer:timerOut ? timerOut.textContent : '00:00 / 00:00',
+      remaining:remainingOut ? remainingOut.textContent : 'Left 00:00',
+      progress:progressOut ? progressOut.textContent : '0%',
+      marker:markerText || 'No markers',
+      markerCount:scriptMarkers.length,
+      title:scriptTitle(),
+      updatedAt:Date.now()
+    };
+  }
+
+  function remotePost(message){
+    message.id = 'msg-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
+    message.session = remoteSessionId;
+    message.source = remoteSourceId;
+    message.sentAt = Date.now();
+    if(remoteChannel){
+      try{ remoteChannel.postMessage(message); }catch(e){}
+    }
+    if(storage.isAvailable()){
+      storage.set(REMOTE_BUS_STORE, JSON.stringify(message));
+    }
+  }
+
+  function publishRemoteState(force){
+    if(isRemoteMode) return;
+    if(force && remoteStateTimer){
+      clearTimeout(remoteStateTimer);
+      remoteStateTimer = null;
+    }
+    remoteLastStateAt = Date.now();
+    remotePost({type:'state', role:'reader', state:currentRemoteState()});
+  }
+
+  function scheduleRemoteState(force){
+    if(isRemoteMode) return;
+    if(force){
+      publishRemoteState(true);
+      return;
+    }
+    var now = Date.now();
+    if(now - remoteLastStateAt > 250){
+      publishRemoteState(false);
+      return;
+    }
+    if(remoteStateTimer) return;
+    remoteStateTimer = setTimeout(function(){
+      remoteStateTimer = null;
+      publishRemoteState(false);
+    }, 250);
+  }
+
+  function updateRemotePanel(state){
+    if(!isRemoteMode || !state) return;
+    if(remoteStatus){
+      remoteStatus.textContent = 'Linked';
+      remoteStatus.classList.add('online');
+    }
+    if(remoteStateOut){
+      remoteStateOut.textContent = state.cueing ? 'Cueing' : (state.playing ? 'Playing' : (state.reading ? 'Paused' : 'Edit'));
+    }
+    if(remoteTimerOut){
+      remoteTimerOut.textContent = state.progress + ' · ' + state.timer;
+    }
+    if(remoteMarkerOut){
+      remoteMarkerOut.textContent = state.marker || 'No markers';
+    }
+    setRemoteNote('Linked to reader. Speed ' + state.speed + '.', 'success');
+    if(remoteWaitingTimer) clearTimeout(remoteWaitingTimer);
+    remoteWaitingTimer = setTimeout(function(){
+      if(remoteStatus){
+        remoteStatus.textContent = 'Waiting';
+        remoteStatus.classList.remove('online');
+      }
+      if(remoteStateOut) remoteStateOut.textContent = 'Offline';
+      setRemoteNote('Waiting for reader updates.', 'error');
+    }, 3500);
+  }
+
+  function sendRemoteCommand(command, data){
+    remotePost({type:'command', role:'remote', command:command, data:data || {}});
+    setRemoteNote('Sent ' + command + '.', 'success');
+  }
+
+  function handleRemoteCommand(command, data){
+    if(isRemoteMode) return;
+    data = data || {};
+    switch(command){
+      case 'togglePlay': togglePlay(); break;
+      case 'cue': startCue(); break;
+      case 'restart': restart(); break;
+      case 'speedDelta': changeSpeed(data.dir > 0 ? +1 : -1); break;
+      case 'markerDelta': jumpRelativeMarker(data.dir > 0 ? +1 : -1); break;
+      case 'stepDelta': step(data.dir > 0 ? +1 : -1); break;
+      case 'readMode': setReading(true); break;
+      case 'editMode': setReading(false); break;
+    }
+    scheduleRemoteState(true);
+  }
+
+  function handleRemoteMessage(message){
+    if(!message || message.session !== remoteSessionId || message.source === remoteSourceId) return;
+    if(message.id){
+      if(remoteSeenMessages[message.id]) return;
+      remoteSeenMessages[message.id] = true;
+    }
+    if(message.type === 'command' && message.role === 'remote'){
+      handleRemoteCommand(message.command, message.data);
+    }
+    if(message.type === 'state' && message.role === 'reader'){
+      updateRemotePanel(message.state);
+    }
+  }
+
+  function setupRemoteSync(){
+    if(window.BroadcastChannel){
+      try{
+        remoteChannel = new BroadcastChannel(REMOTE_CHANNEL_PREFIX + remoteSessionId);
+        remoteChannel.onmessage = function(event){ handleRemoteMessage(event.data); };
+      }catch(e){
+        remoteChannel = null;
+      }
+    }
+    window.addEventListener('storage', function(event){
+      if(event.key !== REMOTE_BUS_STORE || !event.newValue) return;
+      try{
+        handleRemoteMessage(JSON.parse(event.newValue));
+      }catch(e){}
+    });
+    if(isRemoteMode){
+      setRemoteNote('Waiting for reader updates.', 'error');
+      sendRemoteCommand('hello');
+    }else{
+      scheduleRemoteState(true);
+    }
+  }
+
+  function openRemoteWindow(){
+    try{
+      var remoteUrl = new URL(window.location.href);
+      remoteUrl.searchParams.set('remote', '1');
+      remoteUrl.searchParams.set('session', remoteSessionId);
+      var remoteWin = window.open(remoteUrl.toString(), 'teleprompterRemote', 'popup,width=420,height=740');
+      if(remoteWin){
+        signalSuccess(remoteBtn);
+        showHintNotice('Remote control window opened.', 'success');
+        scheduleRemoteState(true);
+      }else{
+        signalError(remoteBtn);
+        showHintNotice('Popup blocked. Allow popups and try Remote again.', 'error');
+      }
+    }catch(e){
+      signalError(remoteBtn);
+      showHintNotice('Could not open remote control.', 'error');
+    }
+  }
+
+  function wireRemoteButton(id, command, data){
+    var button = $(id);
+    if(!button) return;
+    button.addEventListener('click', function(){
+      sendRemoteCommand(command, data);
+      signalSuccess(button);
+    });
   }
 
   function newSavedScriptId(){
@@ -1542,6 +1898,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     armImmersive();
     cancelAnimationFrame(rafId);
     rafId = requestAnimationFrame(tick);
+    scheduleRemoteState(true);
   }
   function pause(){
     playing = false;
@@ -1550,6 +1907,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     $('playBtn').setAttribute('aria-pressed','false');
     cancelAnimationFrame(rafId);
     if(hideTimer) clearTimeout(hideTimer);
+    scheduleRemoteState(true);
   }
   function togglePlay(){
     if(cueing){
@@ -1571,6 +1929,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     signalSuccess($('restartBtn'));
     savePreferences('restart');
     updatePrediction();
+    scheduleRemoteState(true);
     if(!playing){ /* stay paused at top */ }
   }
 
@@ -1656,6 +2015,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
       cueOverlay.setAttribute('aria-hidden', String(!active));
     }
     if(active && cueOut) cueOut.textContent = String(count);
+    scheduleRemoteState(true);
   }
 
   function cancelCue(notify){
@@ -1885,7 +2245,20 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   }
 
   // ---- Wiring ----
+  setupRemoteSync();
   installPressFeedback();
+  remoteBtn.addEventListener('click', openRemoteWindow);
+  wireRemoteButton('remoteCueBtn', 'cue');
+  wireRemoteButton('remotePlayBtn', 'togglePlay');
+  wireRemoteButton('remoteRestartBtn', 'restart');
+  wireRemoteButton('remoteSpeedDownBtn', 'speedDelta', {dir:-1});
+  wireRemoteButton('remoteSpeedUpBtn', 'speedDelta', {dir:1});
+  wireRemoteButton('remoteMarkerPrevBtn', 'markerDelta', {dir:-1});
+  wireRemoteButton('remoteMarkerNextBtn', 'markerDelta', {dir:1});
+  wireRemoteButton('remoteStepBackBtn', 'stepDelta', {dir:-1});
+  wireRemoteButton('remoteStepFwdBtn', 'stepDelta', {dir:1});
+  wireRemoteButton('remoteReadBtn', 'readMode');
+  wireRemoteButton('remoteEditBtn', 'editMode');
   $('editBtn').addEventListener('click', function(){ setReading(false); signalSuccess($('editBtn')); });
   $('doneBtn').addEventListener('click', function(){ setReading(true); signalSuccess($('doneBtn')); });
   $('playBtn').addEventListener('click', togglePlay);
@@ -1988,6 +2361,30 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     // Don't hijack typing in the editor
     var typing = (document.activeElement === script);
     var k = e.key;
+
+    if(isRemoteMode){
+      switch(k){
+        case ' ': case 'Spacebar':
+          e.preventDefault(); sendRemoteCommand('togglePlay'); break;
+        case 'c': case 'C':
+          e.preventDefault(); sendRemoteCommand('cue'); break;
+        case 'r': case 'R':
+          e.preventDefault(); sendRemoteCommand('restart'); break;
+        case 'ArrowUp':
+          e.preventDefault(); sendRemoteCommand('speedDelta', {dir:1}); break;
+        case 'ArrowDown':
+          e.preventDefault(); sendRemoteCommand('speedDelta', {dir:-1}); break;
+        case ']':
+          e.preventDefault(); sendRemoteCommand('markerDelta', {dir:1}); break;
+        case '[':
+          e.preventDefault(); sendRemoteCommand('markerDelta', {dir:-1}); break;
+        case 'PageDown':
+          e.preventDefault(); sendRemoteCommand(e.shiftKey ? 'markerDelta' : 'stepDelta', {dir:1}); break;
+        case 'PageUp':
+          e.preventDefault(); sendRemoteCommand(e.shiftKey ? 'markerDelta' : 'stepDelta', {dir:-1}); break;
+      }
+      return;
+    }
 
     if(help.classList.contains('open')){
       if(k==='Escape'){ e.preventDefault(); closeHelp(); }
