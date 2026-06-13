@@ -36,6 +36,7 @@
     --danger:#ff6b6b;
     --success:#66d99a;
     --focus:#9ad0ff;
+    --reader-color:#fff;
     --radius:12px;
     --dur-fast:120ms;
     --dur-med:180ms;
@@ -165,6 +166,7 @@
   button.primary:hover{filter:brightness(1.05)}
   button.primary:active,button.primary.is-pressing{filter:brightness(.94) saturate(1.08)}
   button.ghost{background:transparent}
+  button:disabled,select:disabled{opacity:.55;cursor:not-allowed;transform:none;box-shadow:none}
   button.predicted-action{
     border-color:var(--focus);
     box-shadow:0 0 0 2px rgba(154,208,255,.16),0 4px 14px rgba(0,0,0,.22);
@@ -193,6 +195,32 @@
     25%{transform:translateX(-4px)}
     55%{transform:translateX(4px)}
     80%{transform:translateX(-2px)}
+  }
+  select{
+    font:inherit;
+    color:var(--text);
+    background:var(--surface-2);
+    border:1px solid var(--line);
+    border-radius:9px;
+    min-height:32px;
+    max-width:172px;
+    padding:6px 28px 6px 10px;
+    line-height:1.1;
+    transition:background var(--dur-fast) var(--ease-out),border-color var(--dur-fast) var(--ease-out),box-shadow var(--dur-fast) var(--ease-out);
+  }
+  select:hover{background:#232c3b;border-color:#465467}
+  select.saved-select{max-width:190px}
+  .swatches{display:flex;align-items:center;gap:5px}
+  .swatch{
+    width:28px;height:28px;min-width:28px;padding:0;border-radius:999px;
+    background:var(--swatch,#fff);
+    border-color:rgba(255,255,255,.22);
+    position:relative;
+  }
+  .swatch:hover{transform:translateY(-1px);border-color:rgba(255,255,255,.45)}
+  .swatch[aria-pressed="true"]{
+    box-shadow:0 0 0 2px var(--surface),0 0 0 4px var(--focus);
+    border-color:#fff;
   }
 
   :focus-visible{outline:3px solid var(--focus);outline-offset:2px;border-radius:8px}
@@ -236,7 +264,7 @@
     font-size:var(--reader-fs);
     line-height:var(--reader-lh);
     font-weight:600;
-    color:#fff;
+    color:var(--reader-color);
     white-space:pre-wrap;
     word-break:break-word;
     text-wrap:pretty;
@@ -433,10 +461,35 @@
       <button class="icon" type="button" data-act="widthUp" title="Wider" aria-label="Increase reading width">+</button>
     </div>
 
+    <div class="group" aria-label="Reader style">
+      <span class="label">Style</span>
+      <select id="fontFaceSelect" title="Reader font" aria-label="Reader font">
+        <option value="system">System</option>
+        <option value="serif">Serif</option>
+        <option value="mono">Mono</option>
+        <option value="rounded">Rounded</option>
+      </select>
+      <div class="swatches" aria-label="Text color">
+        <button class="swatch" type="button" data-text-color="white" style="--swatch:#ffffff" title="White text" aria-label="White text" aria-pressed="true"></button>
+        <button class="swatch" type="button" data-text-color="warm" style="--swatch:#ffe7bf" title="Warm text" aria-label="Warm text" aria-pressed="false"></button>
+        <button class="swatch" type="button" data-text-color="cyan" style="--swatch:#bde9ff" title="Cyan text" aria-label="Cyan text" aria-pressed="false"></button>
+        <button class="swatch" type="button" data-text-color="green" style="--swatch:#c8f7d2" title="Green text" aria-label="Green text" aria-pressed="false"></button>
+        <button class="swatch" type="button" data-text-color="amber" style="--swatch:#ffd48a" title="Amber text" aria-label="Amber text" aria-pressed="false"></button>
+      </div>
+    </div>
+
     <div class="group">
       <button id="mirrorBtn" class="toggle" type="button" aria-pressed="false" title="Mirror text for beam-splitter glass (M)">⇋ Mirror</button>
       <button id="lineBtn" class="toggle" type="button" aria-pressed="true" title="Toggle center reading line">― Line</button>
       <button id="fsBtn" class="toggle" type="button" aria-pressed="false" title="Fullscreen (F)">⛶ Full</button>
+    </div>
+
+    <div class="group" aria-label="Saved scripts">
+      <span class="label">Saved</span>
+      <select id="savedScriptSelect" class="saved-select" title="Saved scripts in this browser" aria-label="Saved scripts"></select>
+      <button id="saveLocalBtn" type="button" title="Save this script in this browser">Save</button>
+      <button id="loadLocalBtn" type="button" title="Load the selected saved script">Load</button>
+      <button id="deleteLocalBtn" class="icon" type="button" title="Delete the selected saved script" aria-label="Delete saved script">×</button>
     </div>
 
     <div class="group" aria-label="Script file">
@@ -525,12 +578,32 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   var fileInput = $('scriptFileInput');
   var saveHint = $('saveHint');
   var storageStatus = $('storageStatus');
+  var fontFaceSelect = $('fontFaceSelect');
+  var savedScriptSelect = $('savedScriptSelect');
+  var saveLocalBtn = $('saveLocalBtn');
+  var loadLocalBtn = $('loadLocalBtn');
+  var deleteLocalBtn = $('deleteLocalBtn');
 
   // ---- Settings (persisted) ----
   var SPEED = {min:10, max:400, step:10, val:60};   // px / second
   var FONT  = {min:24, max:120, step:4, val:48};    // px
   var LH    = {min:1.1, max:2.4, step:0.1, val:1.5};
   var WIDTH = {min:24, max:80, step:4, val:42};     // rem
+  var FONT_FACES = {
+    system:'-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif',
+    serif:'Georgia,"Times New Roman",Times,serif',
+    mono:'"SFMono-Regular","SF Mono",Consolas,"Liberation Mono",Menlo,monospace',
+    rounded:'ui-rounded,"SF Pro Rounded","Avenir Next",Avenir,Helvetica,Arial,sans-serif'
+  };
+  var TEXT_COLORS = {
+    white:'#ffffff',
+    warm:'#ffe7bf',
+    cyan:'#bde9ff',
+    green:'#c8f7d2',
+    amber:'#ffd48a'
+  };
+  var FONT_FACE = 'system';
+  var TEXT_COLOR = 'white';
 
   var STORE = 'teleprompter.v1';
   var storage = (function(){
@@ -582,6 +655,12 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     if(storageStatus){
       storageStatus.hidden = available;
     }
+    if(!available){
+      if(savedScriptSelect) savedScriptSelect.disabled = true;
+      if(saveLocalBtn) saveLocalBtn.disabled = true;
+      if(loadLocalBtn) loadLocalBtn.disabled = true;
+      if(deleteLocalBtn) deleteLocalBtn.disabled = true;
+    }
   }
 
   function flashClass(el, className, duration){
@@ -605,6 +684,14 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     hintTimer = setTimeout(updateStorageUi, 1600);
   }
 
+  function sanitizeFontFace(value){
+    return Object.prototype.hasOwnProperty.call(FONT_FACES, value) ? value : 'system';
+  }
+
+  function sanitizeTextColor(value){
+    return Object.prototype.hasOwnProperty.call(TEXT_COLORS, value) ? value : 'white';
+  }
+
   function loadSettings(){
     try{
       var raw = storage.get(STORE);
@@ -616,18 +703,22 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
       if(typeof s.width==='number') WIDTH.val = clamp(s.width, WIDTH.min, WIDTH.max);
       if(typeof s.mirror==='boolean') mirror = s.mirror;
       if(typeof s.centerline==='boolean') centerline = s.centerline;
+      if(typeof s.fontFace==='string') FONT_FACE = sanitizeFontFace(s.fontFace);
+      if(typeof s.textColor==='string') TEXT_COLOR = sanitizeTextColor(s.textColor);
     }catch(e){/* ignore corrupt storage */}
   }
   function saveSettings(){
     var saved = storage.set(STORE, JSON.stringify({
       speed:SPEED.val, font:FONT.val, lh:LH.val, width:WIDTH.val,
-      mirror:mirror, centerline:centerline
+      mirror:mirror, centerline:centerline, fontFace:FONT_FACE, textColor:TEXT_COLOR
     }));
     if(!saved) updateStorageUi();
   }
 
   var SCRIPT_STORE = 'teleprompter.script.v1';
   var PREF_STORE = 'teleprompter.preferences.v1';
+  var SAVED_SCRIPTS_STORE = 'teleprompter.savedScripts.v1';
+  var MAX_SAVED_SCRIPTS = 24;
   var preferences = {
     lastMode:'edit',
     lastFileStem:'',
@@ -637,6 +728,8 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   };
   var currentPrediction = '';
   var predictedButton = null;
+  var savedScripts = [];
+  var activeSavedScriptId = '';
   var SAMPLE_SCRIPT = [
     'Sample script',
     '',
@@ -721,6 +814,196 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     return fileStemFromText(titleFromScript()) || preferences.lastFileStem || 'teleprompter-script';
   }
 
+  function scriptTitle(){
+    return titleFromScript() || 'Untitled script';
+  }
+
+  function newSavedScriptId(){
+    return 'script-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
+  }
+
+  function currentFormatSnapshot(){
+    return {
+      speed:SPEED.val,
+      font:FONT.val,
+      lh:LH.val,
+      width:WIDTH.val,
+      mirror:mirror,
+      centerline:centerline,
+      fontFace:FONT_FACE,
+      textColor:TEXT_COLOR
+    };
+  }
+
+  function applyFormatSnapshot(format){
+    if(!format || typeof format !== 'object') return;
+    if(typeof format.speed==='number') SPEED.val = clamp(format.speed, SPEED.min, SPEED.max);
+    if(typeof format.font==='number') FONT.val = clamp(format.font, FONT.min, FONT.max);
+    if(typeof format.lh==='number') LH.val = clamp(format.lh, LH.min, LH.max);
+    if(typeof format.width==='number') WIDTH.val = clamp(format.width, WIDTH.min, WIDTH.max);
+    if(typeof format.mirror==='boolean') mirror = format.mirror;
+    if(typeof format.centerline==='boolean') centerline = format.centerline;
+    if(typeof format.fontFace==='string') FONT_FACE = sanitizeFontFace(format.fontFace);
+    if(typeof format.textColor==='string') TEXT_COLOR = sanitizeTextColor(format.textColor);
+    saveSettings();
+    applySettings();
+  }
+
+  function sanitizeSavedScript(item){
+    if(!item || typeof item !== 'object') return null;
+    if(typeof item.text !== 'string') return null;
+    var id = typeof item.id === 'string' && item.id ? item.id : newSavedScriptId();
+    var title = typeof item.title === 'string' && item.title.trim() ? item.title.trim() : 'Untitled script';
+    return {
+      id:id.slice(0, 80),
+      title:title.slice(0, 80),
+      text:item.text,
+      format:item.format && typeof item.format === 'object' ? item.format : {},
+      updatedAt:typeof item.updatedAt === 'string' ? item.updatedAt.slice(0, 40) : new Date().toISOString()
+    };
+  }
+
+  function loadSavedScripts(){
+    savedScripts = [];
+    try{
+      var raw = storage.get(SAVED_SCRIPTS_STORE);
+      if(raw){
+        var parsed = JSON.parse(raw);
+        if(Array.isArray(parsed)){
+          savedScripts = parsed.map(sanitizeSavedScript).filter(Boolean).slice(0, MAX_SAVED_SCRIPTS);
+        }
+      }
+    }catch(e){
+      savedScripts = [];
+    }
+    renderSavedScripts();
+  }
+
+  function saveSavedScripts(){
+    if(!storage.isAvailable()){
+      updateStorageUi();
+      return false;
+    }
+    var saved = storage.set(SAVED_SCRIPTS_STORE, JSON.stringify(savedScripts));
+    if(!saved) updateStorageUi();
+    return saved;
+  }
+
+  function renderSavedScripts(){
+    if(!savedScriptSelect) return;
+    var storageAvailable = storage.isAvailable();
+    savedScriptSelect.innerHTML = '';
+    var empty = document.createElement('option');
+    empty.value = '';
+    empty.textContent = storageAvailable ? 'New saved script' : 'Saved scripts unavailable';
+    savedScriptSelect.appendChild(empty);
+    savedScripts.forEach(function(item){
+      var option = document.createElement('option');
+      option.value = item.id;
+      option.textContent = item.title;
+      savedScriptSelect.appendChild(option);
+    });
+    if(activeSavedScriptId && savedScripts.some(function(item){ return item.id === activeSavedScriptId; })){
+      savedScriptSelect.value = activeSavedScriptId;
+    }else{
+      activeSavedScriptId = '';
+      savedScriptSelect.value = '';
+    }
+    savedScriptSelect.disabled = !storageAvailable;
+    saveLocalBtn.disabled = !storageAvailable;
+    loadLocalBtn.disabled = !storageAvailable || !activeSavedScriptId;
+    deleteLocalBtn.disabled = !storageAvailable || !activeSavedScriptId;
+  }
+
+  function saveCurrentScriptLocal(){
+    if(!storage.isAvailable()){
+      signalError(saveLocalBtn);
+      showHintNotice('Saved scripts need browser storage. Use file Save instead.', 'error');
+      return;
+    }
+    var text = script.value || '';
+    if(!text.trim()){
+      signalError(saveLocalBtn);
+      showHintNotice('Add script text before saving here.', 'error');
+      return;
+    }
+    var existing = activeSavedScriptId ? savedScripts.find(function(item){ return item.id === activeSavedScriptId; }) : null;
+    var entry = existing || {
+      id:newSavedScriptId(),
+      title:'',
+      text:'',
+      format:{},
+      updatedAt:''
+    };
+    entry.title = scriptTitle().slice(0, 80);
+    entry.text = text;
+    entry.format = currentFormatSnapshot();
+    entry.updatedAt = new Date().toISOString();
+    savedScripts = savedScripts.filter(function(item){ return item.id !== entry.id; });
+    savedScripts.unshift(entry);
+    savedScripts = savedScripts.slice(0, MAX_SAVED_SCRIPTS);
+    activeSavedScriptId = entry.id;
+    if(saveSavedScripts()){
+      rememberFileStem(fileStemFromText(entry.title));
+      renderSavedScripts();
+      signalSuccess(saveLocalBtn);
+      showHintNotice('Saved in this browser.', 'success');
+      savePreferences('save-local');
+      updatePrediction();
+    }else{
+      signalError(saveLocalBtn);
+      showHintNotice('Could not save locally. Use file Save instead.', 'error');
+    }
+  }
+
+  function loadSelectedScriptLocal(){
+    var entry = savedScripts.find(function(item){ return item.id === activeSavedScriptId; });
+    if(!entry){
+      signalError(loadLocalBtn);
+      showHintNotice('Pick a saved script first.', 'error');
+      return;
+    }
+    script.value = entry.text;
+    applyFormatSnapshot(entry.format);
+    saveScriptDebounced();
+    syncReader();
+    applyTransform();
+    showToast(false);
+    rememberFileStem(fileStemFromText(entry.title));
+    renderSavedScripts();
+    signalSuccess(loadLocalBtn);
+    showHintNotice('Saved script loaded.', 'success');
+    savePreferences('load-local');
+    updatePrediction();
+    if(isReading()){
+      reader.focus({preventScroll:true});
+    }else{
+      script.focus();
+    }
+  }
+
+  function deleteSelectedScriptLocal(){
+    var entry = savedScripts.find(function(item){ return item.id === activeSavedScriptId; });
+    if(!entry){
+      signalError(deleteLocalBtn);
+      showHintNotice('Pick a saved script first.', 'error');
+      return;
+    }
+    if(!window.confirm('Delete this saved script from this browser?')) return;
+    savedScripts = savedScripts.filter(function(item){ return item.id !== entry.id; });
+    activeSavedScriptId = '';
+    if(saveSavedScripts()){
+      renderSavedScripts();
+      signalSuccess(deleteLocalBtn);
+      showHintNotice('Saved script deleted.', 'success');
+      savePreferences('delete-local');
+      updatePrediction();
+    }else{
+      signalError(deleteLocalBtn);
+      showHintNotice('Could not update saved scripts.', 'error');
+    }
+  }
+
   function scriptFileName(){
     var d = new Date();
     var yyyy = d.getFullYear();
@@ -762,6 +1045,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     var readerForFile = new FileReader();
     readerForFile.onload = function(){
       script.value = typeof readerForFile.result === 'string' ? readerForFile.result : '';
+      activeSavedScriptId = '';
       rememberFileStem(fileStemFromText(file && file.name ? file.name.replace(/\.[^.]+$/, '') : ''));
       saveScriptDebounced();
       syncReader();
@@ -772,6 +1056,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
       }else{
         script.focus();
       }
+      renderSavedScripts();
       signalSuccess($('loadFileBtn'));
       savePreferences('load');
       updatePrediction();
@@ -804,9 +1089,13 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
 
   // ---- Apply visual settings ----
   function applySettings(){
+    FONT_FACE = sanitizeFontFace(FONT_FACE);
+    TEXT_COLOR = sanitizeTextColor(TEXT_COLOR);
     document.documentElement.style.setProperty('--reader-fs', FONT.val + 'px');
     document.documentElement.style.setProperty('--reader-lh', String(LH.val));
     document.documentElement.style.setProperty('--reader-width', WIDTH.val + 'rem');
+    document.documentElement.style.setProperty('--read-sans', FONT_FACES[FONT_FACE]);
+    document.documentElement.style.setProperty('--reader-color', TEXT_COLORS[TEXT_COLOR]);
     $('speedOut').textContent = String(SPEED.val);
     $('fontOut').textContent  = String(FONT.val);
     $('lhOut').textContent    = LH.val.toFixed(1);
@@ -815,6 +1104,10 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     body.classList.toggle('centerline', centerline);
     $('mirrorBtn').setAttribute('aria-pressed', String(mirror));
     $('lineBtn').setAttribute('aria-pressed', String(centerline));
+    if(fontFaceSelect) fontFaceSelect.value = FONT_FACE;
+    document.querySelectorAll('[data-text-color]').forEach(function(button){
+      button.setAttribute('aria-pressed', String(button.getAttribute('data-text-color') === TEXT_COLOR));
+    });
     measure();
     applyTransform();
     updatePrediction();
@@ -970,7 +1263,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     if(!saveHint) return;
     var text = (script.value || '').trim();
     if(!text){
-      setPredictedAction($('loadFileBtn'), 'Next: Load a script or paste text.');
+      setPredictedAction(savedScripts.length ? loadLocalBtn : $('loadFileBtn'), savedScripts.length ? 'Next: Load a saved script or paste text.' : 'Next: Load a script or paste text.');
       return;
     }
     if(!isReading()){
@@ -998,6 +1291,22 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   function changeLH(dir){ bump(LH, dir, 'lhOut', function(v){return v.toFixed(1);}); applyMetric(); }
   function changeWidth(dir){ bump(WIDTH, dir, 'widthOut'); applyMetric(); }
   function changeSpeed(dir){ bump(SPEED, dir, 'speedOut'); savePreferences('speed'); updatePrediction(); }
+  function changeFontFace(value){
+    FONT_FACE = sanitizeFontFace(value);
+    saveSettings();
+    applySettings();
+    signalSuccess(fontFaceSelect);
+    savePreferences('font-face');
+    updatePrediction();
+  }
+  function changeTextColor(value, sourceButton){
+    TEXT_COLOR = sanitizeTextColor(value);
+    saveSettings();
+    applySettings();
+    signalSuccess(sourceButton);
+    savePreferences('text-color');
+    updatePrediction();
+  }
   function applyMetric(){
     document.documentElement.style.setProperty('--reader-fs', FONT.val + 'px');
     document.documentElement.style.setProperty('--reader-lh', String(LH.val));
@@ -1117,6 +1426,22 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   $('helpClose').addEventListener('click', function(){ closeHelp(); signalSuccess($('helpClose')); });
   help.addEventListener('click', function(e){ if(e.target===help) closeHelp(); });
   $('saveFileBtn').addEventListener('click', saveScriptToFile);
+  fontFaceSelect.addEventListener('change', function(){
+    changeFontFace(fontFaceSelect.value);
+  });
+  document.querySelectorAll('[data-text-color]').forEach(function(button){
+    button.addEventListener('click', function(){
+      changeTextColor(button.getAttribute('data-text-color'), button);
+    });
+  });
+  savedScriptSelect.addEventListener('change', function(){
+    activeSavedScriptId = savedScriptSelect.value || '';
+    renderSavedScripts();
+    updatePrediction();
+  });
+  saveLocalBtn.addEventListener('click', saveCurrentScriptLocal);
+  loadLocalBtn.addEventListener('click', loadSelectedScriptLocal);
+  deleteLocalBtn.addEventListener('click', deleteSelectedScriptLocal);
   $('loadFileBtn').addEventListener('click', function(){
     fileInput.value = '';
     fileInput.click();
@@ -1228,6 +1553,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   loadPreferences();
   updateStorageUi();
   loadSettings();
+  loadSavedScripts();
   var hadSavedScript = loadScript();
   applySettings();
   syncReader();

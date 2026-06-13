@@ -2,6 +2,7 @@
 
 ## 2026-06-13
 
+* Expanded `/teleprompter.html` formatting and script management: added reader font family choices, text color swatches, and a local saved-scripts library with Save, Load, Delete, and per-script formatting snapshots.
 * Added lightweight anticipatory UX to `/teleprompter.html`: context-aware next-action highlights, short dynamic hints, smarter title-based Save filenames, last-mode restore, and local-only preference metadata in `localStorage`.
 * Added an unlisted, noindex **Prompt Browser** page at `/prompt-browser.html` for the full local prompt library browser. The page includes ranked search, review queue, fill-in mode, saved views, import/export state, and local-only browser state. It is blocked in `robots.txt` and kept out of `sitemap.xml` and site navigation because the embedded library includes internal working prompts.
 * Added tactile microinteractions to `/teleprompter.html`: pressed and hover button states, control confirmation pulses, inline file save/load success and error feedback, paused-reader drag resistance with snap release, and reduced-motion fallbacks.
