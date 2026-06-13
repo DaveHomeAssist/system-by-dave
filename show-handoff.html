@@ -1,0 +1,1435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'none'">
+<title>Show Handoff | System by Dave</title>
+<meta name="description" content="A browser based AV show handoff builder for status notes, signal flow notes, decision matrices, summary tables, and prioritized next actions.">
+<link rel="canonical" href="https://systembydave.com/show-handoff.html">
+<meta name="theme-color" content="#0b0d10">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="System by Dave">
+<meta property="og:title" content="Show Handoff">
+<meta property="og:description" content="A browser based AV show handoff builder for status notes, signal flow notes, decision matrices, summary tables, and prioritized next actions.">
+<meta property="og:url" content="https://systembydave.com/show-handoff.html">
+<meta property="og:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<meta property="og:image:width" content="1024">
+<meta property="og:image:height" content="412">
+<meta property="og:image:alt" content="System by Dave preview banner">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Show Handoff">
+<meta name="twitter:description" content="A browser based AV show handoff builder for status notes, signal flow notes, decision matrices, summary tables, and prioritized next actions.">
+<meta name="twitter:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<link rel="icon" href="svg/system_by_dave_logo_rust.svg" type="image/svg+xml">
+<style>
+  :root{
+    --bg:#0b0d10;
+    --panel:#12171d;
+    --panel-2:#171e26;
+    --panel-3:#1d252e;
+    --line:#303945;
+    --line-strong:#465363;
+    --text:#f6f8fb;
+    --muted:#a9b4c1;
+    --dim:#768391;
+    --rust:#c0623a;
+    --rust-2:#e58a5c;
+    --blue:#72b8ff;
+    --green:#6be092;
+    --amber:#ffd166;
+    --red:#ff6b6b;
+    --ink:#071016;
+    --radius:8px;
+    --shadow:0 16px 60px rgba(0,0,0,.32);
+    --mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --fast:120ms;
+    --med:180ms;
+    --ease:cubic-bezier(.2,.8,.2,1);
+    --press:cubic-bezier(.2,0,0,1);
+  }
+
+  *{box-sizing:border-box}
+  html,body{min-height:100%;overflow-x:hidden}
+  body{
+    margin:0;
+    background:
+      radial-gradient(circle at 16% -12%,rgba(192,98,58,.18),transparent 30rem),
+      linear-gradient(180deg,#0b0d10 0%,#11161b 52%,#080a0d 100%);
+    color:var(--text);
+    font-family:var(--sans);
+    line-height:1.45;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+  body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    background:
+      repeating-linear-gradient(90deg,rgba(255,255,255,.035) 0 1px,transparent 1px 80px),
+      repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0 1px,transparent 1px 80px);
+    mask-image:linear-gradient(180deg,rgba(0,0,0,.8),rgba(0,0,0,.12));
+  }
+  a{color:inherit}
+  button,input,select,textarea{font:inherit}
+  button{
+    min-height:40px;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    background:var(--panel-2);
+    color:var(--text);
+    padding:9px 12px;
+    cursor:pointer;
+    user-select:none;
+    -webkit-tap-highlight-color:transparent;
+    transition:
+      transform var(--fast) var(--press),
+      border-color var(--fast) var(--ease),
+      background var(--fast) var(--ease),
+      box-shadow var(--fast) var(--ease),
+      color var(--fast) var(--ease);
+    touch-action:manipulation;
+  }
+  button:hover{
+    border-color:var(--line-strong);
+    background:var(--panel-3);
+    transform:translateY(-1px);
+    box-shadow:0 8px 22px rgba(0,0,0,.18);
+  }
+  button:active,
+  button.is-pressing{
+    transform:translateY(1px) scale(.975);
+    box-shadow:inset 0 2px 5px rgba(0,0,0,.28);
+  }
+  button.primary{
+    background:linear-gradient(180deg,var(--rust-2),var(--rust));
+    border-color:var(--rust);
+    color:#140905;
+    font-weight:800;
+  }
+  button.danger{
+    border-color:rgba(255,107,107,.55);
+    color:#ffd5d5;
+    background:rgba(255,107,107,.1);
+  }
+  button:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible,
+  a:focus-visible{
+    outline:2px solid var(--blue);
+    outline-offset:3px;
+  }
+  button:disabled{
+    cursor:not-allowed;
+    opacity:.5;
+    transform:none;
+    box-shadow:none;
+  }
+  input,select,textarea{
+    width:100%;
+    min-height:40px;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    background:#0e1318;
+    color:var(--text);
+    padding:9px 10px;
+    transition:border-color var(--fast) var(--ease),background var(--fast) var(--ease),box-shadow var(--fast) var(--ease);
+  }
+  textarea{
+    min-height:92px;
+    resize:vertical;
+  }
+  input:hover,
+  input:focus,
+  select:hover,
+  select:focus,
+  textarea:hover,
+  textarea:focus{
+    border-color:var(--line-strong);
+    background:#111821;
+  }
+  input::placeholder,
+  textarea::placeholder{color:var(--dim)}
+
+  .skip-link{
+    position:absolute;
+    top:12px;
+    left:12px;
+    z-index:1000;
+    background:var(--text);
+    color:var(--ink);
+    padding:10px 14px;
+    border-radius:var(--radius);
+    transform:translateY(-150%);
+    transition:transform var(--med) var(--ease);
+  }
+  .skip-link:focus-visible{transform:translateY(0)}
+  .sr-only{
+    position:absolute;
+    width:1px;
+    height:1px;
+    padding:0;
+    margin:-1px;
+    overflow:hidden;
+    clip:rect(0,0,0,0);
+    white-space:nowrap;
+    border:0;
+  }
+
+  .app{
+    position:relative;
+    z-index:1;
+    min-height:100vh;
+  }
+  .topbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    padding:14px 18px;
+    border-bottom:1px solid rgba(255,255,255,.08);
+    background:rgba(11,13,16,.88);
+    backdrop-filter:blur(18px);
+    position:sticky;
+    top:0;
+    z-index:30;
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    text-decoration:none;
+  }
+  .brand-mark{
+    width:38px;
+    height:38px;
+    border:1px solid rgba(255,255,255,.24);
+    border-radius:50%;
+    display:grid;
+    place-items:center;
+    font-family:Georgia,serif;
+    font-size:19px;
+    color:var(--rust-2);
+    background:#11161c;
+  }
+  .brand-text{
+    display:flex;
+    flex-direction:column;
+    gap:1px;
+  }
+  .brand-text strong{
+    font-size:14px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+  }
+  .brand-text span{
+    color:var(--muted);
+    font-family:var(--mono);
+    font-size:11px;
+  }
+  .top-actions{
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+    gap:8px;
+    flex-wrap:wrap;
+  }
+
+  main{
+    width:min(1540px,100%);
+    margin:0 auto;
+    padding:26px 18px 34px;
+  }
+  .hero{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(320px,460px);
+    gap:18px;
+    align-items:stretch;
+    margin-bottom:18px;
+  }
+  .hero-main,
+  .status-panel,
+  .meta-panel,
+  .workbench,
+  .preview-panel,
+  .panel{
+    border:1px solid rgba(255,255,255,.1);
+    border-radius:var(--radius);
+    background:rgba(18,23,29,.9);
+    box-shadow:var(--shadow);
+  }
+  .hero-main{
+    padding:24px;
+    min-height:240px;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+  }
+  .eyebrow{
+    margin:0 0 10px;
+    color:var(--rust-2);
+    font-family:var(--mono);
+    font-size:12px;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+  }
+  h1{
+    margin:0;
+    font-size:clamp(38px,5vw,72px);
+    line-height:.95;
+    letter-spacing:0;
+    max-width:860px;
+  }
+  .hero-copy{
+    max-width:760px;
+    margin:16px 0 0;
+    color:var(--muted);
+    font-size:16px;
+  }
+  .hero-tools{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-top:22px;
+  }
+  .status-panel{
+    padding:16px;
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:10px;
+  }
+  .metric{
+    min-width:0;
+    padding:12px;
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:var(--radius);
+    background:#0e1318;
+  }
+  .metric span{
+    display:block;
+    color:var(--muted);
+    font-family:var(--mono);
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+  }
+  .metric strong{
+    display:block;
+    margin-top:6px;
+    font-size:30px;
+    line-height:1;
+    font-variant-numeric:tabular-nums;
+  }
+  .metric small{
+    display:block;
+    margin-top:5px;
+    color:var(--dim);
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+
+  .meta-panel{
+    display:grid;
+    grid-template-columns:repeat(6,minmax(0,1fr));
+    gap:10px;
+    padding:14px;
+    margin-bottom:18px;
+  }
+  .field{min-width:0}
+  .field.wide{grid-column:span 2}
+  .field label{
+    display:block;
+    margin:0 0 5px;
+    color:var(--muted);
+    font-family:var(--mono);
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+  }
+
+  .layout{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) 420px;
+    gap:18px;
+    align-items:start;
+  }
+  .workbench{
+    min-width:0;
+    overflow:hidden;
+  }
+  .section-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding:14px 16px;
+    border-bottom:1px solid rgba(255,255,255,.08);
+    background:rgba(23,30,38,.78);
+  }
+  .section-head h2{
+    margin:0;
+    font-size:18px;
+    line-height:1.2;
+  }
+  .section-head span{
+    color:var(--muted);
+    font-family:var(--mono);
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+  }
+  .handoff-grid{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:12px;
+    padding:14px;
+  }
+  .handoff-field{
+    min-width:0;
+  }
+  .handoff-field.full{grid-column:1 / -1}
+  .handoff-field label{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+    margin-bottom:6px;
+    color:var(--muted);
+    font-family:var(--mono);
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+  }
+  .handoff-field label small{
+    color:var(--dim);
+    font-weight:400;
+    letter-spacing:0;
+    text-transform:none;
+  }
+  .handoff-field textarea{
+    min-height:108px;
+  }
+
+  .tables{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:18px;
+    margin-top:18px;
+    min-width:0;
+  }
+  .table-wrap{
+    width:100%;
+    max-width:100%;
+    min-width:0;
+    overflow:auto;
+    contain:paint;
+  }
+  table{
+    width:100%;
+    min-width:720px;
+    border-collapse:separate;
+    border-spacing:0;
+  }
+  th,td{
+    border-bottom:1px solid rgba(255,255,255,.07);
+    border-right:1px solid rgba(255,255,255,.05);
+    padding:8px;
+    vertical-align:top;
+  }
+  th{
+    background:#10161c;
+    color:var(--muted);
+    font-family:var(--mono);
+    font-size:11px;
+    text-align:left;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+  }
+  td:first-child,
+  th:first-child{border-left:0}
+  td input,
+  td select,
+  td textarea{
+    min-height:36px;
+    padding:7px 8px;
+    border-color:rgba(255,255,255,.08);
+    background:rgba(8,12,16,.78);
+  }
+  td textarea{
+    min-height:38px;
+    max-height:96px;
+  }
+  .row-button{
+    min-height:34px;
+    width:34px;
+    padding:0;
+  }
+  .panel-actions{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  .panel-foot{
+    padding:12px 14px;
+    border-top:1px solid rgba(255,255,255,.08);
+    color:var(--muted);
+    font-size:12px;
+  }
+  .panel{min-width:0}
+
+  .preview-panel{
+    position:sticky;
+    top:82px;
+    overflow:hidden;
+  }
+  .preview-toolbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+    padding:12px;
+    border-bottom:1px solid rgba(255,255,255,.08);
+    background:rgba(23,30,38,.78);
+  }
+  .preview-toolbar h2{
+    margin:0;
+    font-size:18px;
+  }
+  .summary-output{
+    width:100%;
+    min-height:620px;
+    border:0;
+    border-radius:0;
+    background:#0e1318;
+    color:#edf4fb;
+    font-family:var(--mono);
+    font-size:12px;
+    line-height:1.55;
+    padding:14px;
+    resize:vertical;
+  }
+  .hint{
+    margin:0;
+    color:var(--muted);
+    font-size:12px;
+  }
+  .hint.success{color:#bff6d2}
+  .hint.error{color:#ffd0d0}
+  .feedback-success{
+    border-color:rgba(107,224,146,.85) !important;
+    animation:confirm var(--med) var(--ease);
+  }
+  .feedback-error{
+    border-color:var(--red) !important;
+    box-shadow:0 0 0 3px rgba(255,107,107,.2) !important;
+    animation:shake 160ms cubic-bezier(.3,0,.2,1);
+  }
+  @keyframes confirm{
+    0%{transform:scale(1)}
+    45%{transform:scale(1.018);box-shadow:0 0 0 4px rgba(107,224,146,.16)}
+    100%{transform:scale(1);box-shadow:0 0 0 rgba(107,224,146,0)}
+  }
+  @keyframes shake{
+    0%,100%{transform:translateX(0)}
+    25%{transform:translateX(-4px)}
+    55%{transform:translateX(4px)}
+    80%{transform:translateX(-2px)}
+  }
+  .file-input{display:none}
+
+  @media (max-width:1120px){
+    .hero,
+    .layout{
+      grid-template-columns:1fr;
+    }
+    .preview-panel{
+      position:static;
+    }
+    .meta-panel{
+      grid-template-columns:repeat(3,minmax(0,1fr));
+    }
+  }
+  @media (max-width:680px){
+    .topbar{
+      align-items:flex-start;
+      flex-direction:column;
+    }
+    main{padding:16px 10px 26px}
+    .hero-main{padding:18px}
+    .status-panel{
+      grid-template-columns:1fr 1fr;
+      padding:10px;
+    }
+    .metric strong{font-size:24px}
+    .meta-panel,
+    .handoff-grid{
+      grid-template-columns:1fr;
+      padding:10px;
+    }
+    .field.wide,
+    .handoff-field.full{grid-column:auto}
+    .section-head,
+    .preview-toolbar{
+      align-items:flex-start;
+      flex-direction:column;
+    }
+    .top-actions,
+    .hero-tools,
+    .panel-actions{
+      width:100%;
+    }
+    .top-actions button,
+    .hero-tools button,
+    .panel-actions button,
+    .top-actions a{
+      flex:1 1 auto;
+    }
+    table{min-width:820px}
+    .summary-output{min-height:420px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{transition-duration:.001ms !important;animation-duration:.001ms !important}
+    button:hover,button:active,button.is-pressing{transform:none}
+  }
+  @media print{
+    body{
+      background:#fff;
+      color:#111;
+    }
+    body::before,
+    .topbar,
+    .hero,
+    .meta-panel,
+    .workbench,
+    .preview-toolbar,
+    .panel-foot{
+      display:none !important;
+    }
+    main{
+      padding:0;
+      max-width:none;
+    }
+    .layout{display:block}
+    .preview-panel{
+      position:static;
+      border:0;
+      box-shadow:none;
+      background:#fff;
+    }
+    .summary-output{
+      min-height:auto;
+      border:0;
+      background:#fff;
+      color:#111;
+      white-space:pre-wrap;
+    }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#handoffForm">Skip to handoff form</a>
+<div class="app">
+  <header class="topbar">
+    <a class="brand" href="index.html#av-tools" aria-label="Back to System by Dave AV tools">
+      <span class="brand-mark">S</span>
+      <span class="brand-text">
+        <strong>Show Handoff</strong>
+        <span>AV operator tool</span>
+      </span>
+    </a>
+    <div class="top-actions">
+      <button id="sampleBtn" type="button">Load Sample</button>
+      <button id="clearBtn" class="danger" type="button">Clear</button>
+      <button id="copyBtn" class="primary" type="button">Copy Handoff</button>
+      <button id="printBtn" type="button">Print</button>
+      <button id="exportBtn" type="button">Export JSON</button>
+      <button id="importBtn" type="button">Import JSON</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" aria-label="Show handoff overview">
+      <div class="hero-main">
+        <div>
+          <p class="eyebrow">Handoff Builder</p>
+          <h1>Clean room status, decisions, and next actions.</h1>
+          <p class="hero-copy">Build a professional AV handoff with useful sections, a summary table, a decision matrix, and numbered prioritized actions for the next tech or PM.</p>
+        </div>
+        <div class="hero-tools">
+          <button id="copyActionsBtn" type="button">Copy Actions</button>
+          <button id="copyMatrixBtn" type="button">Copy Decision Matrix</button>
+          <button id="addActionTopBtn" type="button">Add Action</button>
+        </div>
+      </div>
+      <aside class="status-panel" aria-label="Handoff metrics">
+        <div class="metric">
+          <span>Filled Sections</span>
+          <strong id="sectionCount">0</strong>
+          <small id="sectionNote">Waiting for notes</small>
+        </div>
+        <div class="metric">
+          <span>Open Actions</span>
+          <strong id="actionCount">0</strong>
+          <small id="actionNote">No actions yet</small>
+        </div>
+        <div class="metric">
+          <span>Risks</span>
+          <strong id="riskCount">0</strong>
+          <small>From risks and gotchas</small>
+        </div>
+        <div class="metric">
+          <span>Decisions</span>
+          <strong id="decisionCount">0</strong>
+          <small>Matrix rows</small>
+        </div>
+      </aside>
+    </section>
+
+    <section class="meta-panel" aria-label="Show metadata">
+      <div class="field wide">
+        <label for="showName">Show / Project</label>
+        <input id="showName" type="text" placeholder="General session, main ballroom">
+      </div>
+      <div class="field">
+        <label for="venueName">Venue</label>
+        <input id="venueName" type="text" placeholder="Room or site">
+      </div>
+      <div class="field">
+        <label for="showDate">Date</label>
+        <input id="showDate" type="date">
+      </div>
+      <div class="field">
+        <label for="preparedBy">Prepared By</label>
+        <input id="preparedBy" type="text" placeholder="Name">
+      </div>
+      <div class="field">
+        <label for="handoffTo">Handoff To</label>
+        <input id="handoffTo" type="text" placeholder="Next tech, PM, crew">
+      </div>
+    </section>
+
+    <div class="layout">
+      <div>
+        <section class="workbench" id="handoffForm" aria-label="Handoff sections">
+          <div class="section-head">
+            <div>
+              <span>Core Handoff</span>
+              <h2>Sections</h2>
+            </div>
+            <p class="hint" id="hint" aria-live="polite">Edits are remembered in this browser.</p>
+          </div>
+          <div class="handoff-grid">
+            <div class="handoff-field full">
+              <label for="currentStatus">CURRENT STATUS <small>one clear paragraph</small></label>
+              <textarea id="currentStatus" placeholder="Where the show stands right now."></textarea>
+            </div>
+            <div class="handoff-field">
+              <label for="working">WHAT IS WORKING</label>
+              <textarea id="working" placeholder="Confirmed systems, tested paths, clean handoffs."></textarea>
+            </div>
+            <div class="handoff-field">
+              <label for="notWorking">WHAT IS NOT WORKING</label>
+              <textarea id="notWorking" placeholder="Known problems, workarounds, dead ends."></textarea>
+            </div>
+            <div class="handoff-field">
+              <label for="gear">GEAR / SYSTEMS INVOLVED</label>
+              <textarea id="gear" placeholder="Consoles, comms, displays, cameras, playback, control machines."></textarea>
+            </div>
+            <div class="handoff-field">
+              <label for="signalFlow">SIGNAL FLOW / NETWORK / CONTROL NOTES</label>
+              <textarea id="signalFlow" placeholder="Sources, destinations, IPs, routing, control surfaces, important cable paths."></textarea>
+            </div>
+            <div class="handoff-field">
+              <label for="keyDecisions">KEY DECISIONS</label>
+              <textarea id="keyDecisions" placeholder="Confirmed calls and the reason if it matters."></textarea>
+            </div>
+            <div class="handoff-field">
+              <label for="clientCrewNotes">CLIENT / CREW NOTES</label>
+              <textarea id="clientCrewNotes" placeholder="Who asked for what, crew expectations, communication notes."></textarea>
+            </div>
+            <div class="handoff-field">
+              <label for="risks">RISKS / GOTCHAS</label>
+              <textarea id="risks" placeholder="Anything likely to bite the next operator."></textarea>
+            </div>
+            <div class="handoff-field">
+              <label for="questions">QUESTIONS STILL OPEN</label>
+              <textarea id="questions" placeholder="Decisions or details still waiting on an answer."></textarea>
+            </div>
+          </div>
+        </section>
+
+        <div class="tables">
+          <section class="panel" aria-label="Prioritized actions">
+            <div class="section-head">
+              <div>
+                <span>Numbered List</span>
+                <h2>Prioritized Actions</h2>
+              </div>
+              <div class="panel-actions">
+                <button id="addActionBtn" type="button">Add Action</button>
+                <button id="sortActionsBtn" type="button">Sort</button>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table aria-label="Prioritized actions table">
+                <thead>
+                  <tr>
+                    <th>Priority</th>
+                    <th>Action</th>
+                    <th>Owner</th>
+                    <th>Status</th>
+                    <th>Due</th>
+                    <th><span class="sr-only">Remove</span></th>
+                  </tr>
+                </thead>
+                <tbody id="actionsBody"></tbody>
+              </table>
+            </div>
+            <div class="panel-foot">Actions print as a numbered list ordered by priority.</div>
+          </section>
+
+          <section class="panel" aria-label="Decision matrix">
+            <div class="section-head">
+              <div>
+                <span>Decision Matrix</span>
+                <h2>Options And Calls</h2>
+              </div>
+              <button id="addDecisionBtn" type="button">Add Decision</button>
+            </div>
+            <div class="table-wrap">
+              <table aria-label="Decision matrix table">
+                <thead>
+                  <tr>
+                    <th>Option</th>
+                    <th>Upside</th>
+                    <th>Risk</th>
+                    <th>Decision</th>
+                    <th><span class="sr-only">Remove</span></th>
+                  </tr>
+                </thead>
+                <tbody id="decisionsBody"></tbody>
+              </table>
+            </div>
+            <div class="panel-foot">Use this when the next person needs to know why a call was made.</div>
+          </section>
+        </div>
+      </div>
+
+      <aside class="preview-panel" aria-label="Generated handoff">
+        <div class="preview-toolbar">
+          <div>
+            <h2>Generated Handoff</h2>
+            <p class="hint">Paste ready Markdown</p>
+          </div>
+          <button id="refreshBtn" type="button">Refresh</button>
+        </div>
+        <textarea id="output" class="summary-output" readonly spellcheck="false" aria-label="Generated handoff Markdown"></textarea>
+      </aside>
+    </div>
+  </main>
+</div>
+
+<input id="importFile" class="file-input" type="file" accept=".json,application/json">
+
+<script>
+(function(){
+  "use strict";
+
+  var STORE = "show-handoff.v1";
+  var SCHEMA = "system-by-dave.show-handoff.v1";
+  var fields = ["showName","venueName","showDate","preparedBy","handoffTo","currentStatus","working","notWorking","gear","signalFlow","keyDecisions","clientCrewNotes","risks","questions"];
+  var textFields = ["currentStatus","working","notWorking","gear","signalFlow","keyDecisions","clientCrewNotes","risks","questions"];
+  var state = createInitialState();
+  var saveTimer = null;
+
+  function $(id){ return document.getElementById(id); }
+
+  function today(){
+    var d = new Date();
+    return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+  }
+
+  function createInitialState(){
+    return {
+      meta:{
+        showName:"",
+        venueName:"",
+        showDate:today(),
+        preparedBy:"",
+        handoffTo:""
+      },
+      sections:{
+        currentStatus:"",
+        working:"",
+        notWorking:"",
+        gear:"",
+        signalFlow:"",
+        keyDecisions:"",
+        clientCrewNotes:"",
+        risks:"",
+        questions:""
+      },
+      actions:[],
+      decisions:[]
+    };
+  }
+
+  function sampleState(){
+    return {
+      meta:{
+        showName:"General Session Main Ballroom",
+        venueName:"Convention Center Ballroom A",
+        showDate:today(),
+        preparedBy:"Dave",
+        handoffTo:"Morning tech and PM"
+      },
+      sections:{
+        currentStatus:"Room is set for rehearsal. Playback, podium mic, timer, and main program screen are ready. Camera shade still needs a final pass after doors open.",
+        working:"Podium mic patched and checked. Playback laptop is feeding switcher and confidence monitor. Show timer is visible at downstage monitor. DSM has the current cue sheet.",
+        notWorking:"Stage right confidence feed flickers when the SDI barrel at rack input 3 is touched. Do not move that cable until a replacement barrel is available.",
+        gear:"Yamaha QL1, Barco projector, Mac playback laptop, Decimator at lectern, two PTZ cameras, downstage timer monitor, Clear Com belt packs.",
+        signalFlow:"Playback HDMI to Decimator, SDI to switcher input 2. Program out to projector and confidence monitor. PTZ control rides house network VLAN 30. Timer laptop is on local HDMI only.",
+        keyDecisions:"Client approved keeping lower third graphics off the confidence monitor. PM approved holding Camera 2 as wide safety until panel walk up.",
+        clientCrewNotes:"Client wants walk in music low under announcements. Stage manager calls all speaker walks from DSL. PM wants any camera problem called on comms before touching presets.",
+        risks:"Rack input 3 barrel is weak. Camera 1 preset 4 is too tight for the taller presenter. Stage right cable path is exposed near the sponsor table.",
+        questions:"Will awards segment use walk up music per winner? Is the remote speaker still joining by laptop audio or phone bridge?"
+      },
+      actions:[
+        {priority:"P1",action:"Replace or secure rack input 3 SDI barrel before doors.",owner:"Video",status:"open",due:"Before doors"},
+        {priority:"P1",action:"Confirm awards walk up music count with stage manager.",owner:"Audio",status:"open",due:"Rehearsal"},
+        {priority:"P2",action:"Retune Camera 1 preset 4 for taller presenter.",owner:"Camera",status:"open",due:"Before show"},
+        {priority:"P3",action:"Tape sponsor table cable path after catering clears.",owner:"Stage",status:"waiting",due:"Lunch"}
+      ],
+      decisions:[
+        {option:"Confidence monitor with graphics",upside:"Speaker sees final program look.",risk:"Lower thirds cover notes during remarks.",decision:"Skip graphics on confidence."},
+        {option:"Camera 2 tight panel shot",upside:"Better visual variety.",risk:"Misses walk up transitions.",decision:"Hold Camera 2 wide until panel is seated."}
+      ]
+    };
+  }
+
+  function sanitizeLoaded(raw){
+    var next = createInitialState();
+    if(!raw || typeof raw !== "object") return next;
+    if(raw.meta && typeof raw.meta === "object"){
+      Object.keys(next.meta).forEach(function(key){
+        if(typeof raw.meta[key] === "string") next.meta[key] = raw.meta[key].slice(0, 300);
+      });
+    }
+    if(raw.sections && typeof raw.sections === "object"){
+      Object.keys(next.sections).forEach(function(key){
+        if(typeof raw.sections[key] === "string") next.sections[key] = raw.sections[key].slice(0, 6000);
+      });
+    }
+    if(Array.isArray(raw.actions)){
+      next.actions = raw.actions.map(function(item){
+        return {
+          priority:normalizePriority(item && item.priority),
+          action:typeof item.action === "string" ? item.action.slice(0, 800) : "",
+          owner:typeof item.owner === "string" ? item.owner.slice(0, 120) : "",
+          status:normalizeActionStatus(item && item.status),
+          due:typeof item.due === "string" ? item.due.slice(0, 120) : ""
+        };
+      }).filter(function(item){ return item.action || item.owner || item.due; }).slice(0, 50);
+    }
+    if(Array.isArray(raw.decisions)){
+      next.decisions = raw.decisions.map(function(item){
+        return {
+          option:typeof item.option === "string" ? item.option.slice(0, 600) : "",
+          upside:typeof item.upside === "string" ? item.upside.slice(0, 600) : "",
+          risk:typeof item.risk === "string" ? item.risk.slice(0, 600) : "",
+          decision:typeof item.decision === "string" ? item.decision.slice(0, 600) : ""
+        };
+      }).filter(function(item){ return item.option || item.upside || item.risk || item.decision; }).slice(0, 40);
+    }
+    return next;
+  }
+
+  function normalizePriority(value){
+    value = String(value || "").toUpperCase();
+    return ["P1","P2","P3"].indexOf(value) >= 0 ? value : "P2";
+  }
+
+  function normalizeActionStatus(value){
+    value = String(value || "").toLowerCase();
+    return ["open","waiting","done","blocked"].indexOf(value) >= 0 ? value : "open";
+  }
+
+  function readForm(){
+    state.meta.showName = $("showName").value.trim();
+    state.meta.venueName = $("venueName").value.trim();
+    state.meta.showDate = $("showDate").value;
+    state.meta.preparedBy = $("preparedBy").value.trim();
+    state.meta.handoffTo = $("handoffTo").value.trim();
+    textFields.forEach(function(id){
+      state.sections[id] = $(id).value.trim();
+    });
+  }
+
+  function writeForm(){
+    $("showName").value = state.meta.showName;
+    $("venueName").value = state.meta.venueName;
+    $("showDate").value = state.meta.showDate;
+    $("preparedBy").value = state.meta.preparedBy;
+    $("handoffTo").value = state.meta.handoffTo;
+    textFields.forEach(function(id){
+      $(id).value = state.sections[id] || "";
+    });
+    renderActions();
+    renderDecisions();
+    refresh();
+  }
+
+  function saveNow(){
+    try{
+      localStorage.setItem(STORE, JSON.stringify(state));
+    }catch(err){
+      showHint("Could not save in this browser.", "error");
+    }
+  }
+
+  function queueSave(){
+    if(saveTimer) clearTimeout(saveTimer);
+    saveTimer = setTimeout(saveNow, 180);
+  }
+
+  function loadSaved(){
+    try{
+      var raw = localStorage.getItem(STORE);
+      if(raw) state = sanitizeLoaded(JSON.parse(raw));
+    }catch(err){
+      state = createInitialState();
+    }
+    writeForm();
+  }
+
+  function actionPriorityValue(priority){
+    return priority === "P1" ? 1 : priority === "P2" ? 2 : 3;
+  }
+
+  function sortActions(){
+    readForm();
+    state.actions.sort(function(a,b){
+      var pa = actionPriorityValue(a.priority);
+      var pb = actionPriorityValue(b.priority);
+      if(pa !== pb) return pa - pb;
+      return (a.status || "").localeCompare(b.status || "");
+    });
+    renderActions();
+    refresh();
+    saveNow();
+    showHint("Actions sorted.", "success");
+    signalSuccess($("sortActionsBtn"));
+  }
+
+  function addAction(){
+    readForm();
+    state.actions.push({priority:"P2",action:"",owner:"",status:"open",due:""});
+    renderActions();
+    refresh();
+    queueSave();
+    var last = $("actionsBody").querySelector("tr:last-child textarea");
+    if(last) last.focus();
+  }
+
+  function addDecision(){
+    readForm();
+    state.decisions.push({option:"",upside:"",risk:"",decision:""});
+    renderDecisions();
+    refresh();
+    queueSave();
+    var last = $("decisionsBody").querySelector("tr:last-child textarea");
+    if(last) last.focus();
+  }
+
+  function renderActions(){
+    var body = $("actionsBody");
+    body.innerHTML = "";
+    if(!state.actions.length){
+      state.actions.push({priority:"P1",action:"",owner:"",status:"open",due:""});
+    }
+    state.actions.forEach(function(item,index){
+      var tr = document.createElement("tr");
+      tr.innerHTML = [
+        "<td><select data-action-field=\"priority\" data-index=\"" + index + "\"><option>P1</option><option>P2</option><option>P3</option></select></td>",
+        "<td><textarea data-action-field=\"action\" data-index=\"" + index + "\" placeholder=\"Next action\"></textarea></td>",
+        "<td><input data-action-field=\"owner\" data-index=\"" + index + "\" type=\"text\" placeholder=\"Owner\"></td>",
+        "<td><select data-action-field=\"status\" data-index=\"" + index + "\"><option value=\"open\">open</option><option value=\"waiting\">waiting</option><option value=\"blocked\">blocked</option><option value=\"done\">done</option></select></td>",
+        "<td><input data-action-field=\"due\" data-index=\"" + index + "\" type=\"text\" placeholder=\"Due\"></td>",
+        "<td><button class=\"row-button danger\" type=\"button\" data-remove-action=\"" + index + "\" aria-label=\"Remove action\">x</button></td>"
+      ].join("");
+      body.appendChild(tr);
+      tr.querySelector("[data-action-field='priority']").value = item.priority;
+      tr.querySelector("[data-action-field='action']").value = item.action;
+      tr.querySelector("[data-action-field='owner']").value = item.owner;
+      tr.querySelector("[data-action-field='status']").value = item.status;
+      tr.querySelector("[data-action-field='due']").value = item.due;
+    });
+  }
+
+  function renderDecisions(){
+    var body = $("decisionsBody");
+    body.innerHTML = "";
+    if(!state.decisions.length){
+      state.decisions.push({option:"",upside:"",risk:"",decision:""});
+    }
+    state.decisions.forEach(function(item,index){
+      var tr = document.createElement("tr");
+      tr.innerHTML = [
+        "<td><textarea data-decision-field=\"option\" data-index=\"" + index + "\" placeholder=\"Option\"></textarea></td>",
+        "<td><textarea data-decision-field=\"upside\" data-index=\"" + index + "\" placeholder=\"Upside\"></textarea></td>",
+        "<td><textarea data-decision-field=\"risk\" data-index=\"" + index + "\" placeholder=\"Risk\"></textarea></td>",
+        "<td><textarea data-decision-field=\"decision\" data-index=\"" + index + "\" placeholder=\"Decision\"></textarea></td>",
+        "<td><button class=\"row-button danger\" type=\"button\" data-remove-decision=\"" + index + "\" aria-label=\"Remove decision\">x</button></td>"
+      ].join("");
+      body.appendChild(tr);
+      tr.querySelector("[data-decision-field='option']").value = item.option;
+      tr.querySelector("[data-decision-field='upside']").value = item.upside;
+      tr.querySelector("[data-decision-field='risk']").value = item.risk;
+      tr.querySelector("[data-decision-field='decision']").value = item.decision;
+    });
+  }
+
+  function updateActionField(target){
+    var index = Number(target.getAttribute("data-index"));
+    var field = target.getAttribute("data-action-field");
+    if(!state.actions[index] || !field) return;
+    state.actions[index][field] = field === "priority" ? normalizePriority(target.value) : field === "status" ? normalizeActionStatus(target.value) : target.value.trim();
+    refresh();
+    queueSave();
+  }
+
+  function updateDecisionField(target){
+    var index = Number(target.getAttribute("data-index"));
+    var field = target.getAttribute("data-decision-field");
+    if(!state.decisions[index] || !field) return;
+    state.decisions[index][field] = target.value.trim();
+    refresh();
+    queueSave();
+  }
+
+  function lines(text){
+    return (text || "").split(/\r?\n/).map(function(line){ return line.trim(); }).filter(Boolean);
+  }
+
+  function firstLine(text, fallback){
+    var list = lines(text);
+    return list[0] || fallback;
+  }
+
+  function pipe(text){
+    return String(text || "").replace(/\|/g, "\\|").replace(/\s+/g, " ").trim() || " ";
+  }
+
+  function sectionBlock(title, text){
+    return title + ":\n" + (text || "Not noted.") + "\n";
+  }
+
+  function summaryTable(){
+    return [
+      "| Area | Summary |",
+      "|---|---|",
+      "| CURRENT STATUS | " + pipe(state.sections.currentStatus || "Not noted.") + " |",
+      "| WHAT IS WORKING | " + pipe(firstLine(state.sections.working, "Not noted.")) + " |",
+      "| WHAT IS NOT WORKING | " + pipe(firstLine(state.sections.notWorking, "Not noted.")) + " |",
+      "| RISKS / GOTCHAS | " + pipe(firstLine(state.sections.risks, "Not noted.")) + " |",
+      "| NEXT ACTIONS | " + pipe(nextActionSummary()) + " |"
+    ].join("\n");
+  }
+
+  function actionRows(){
+    return state.actions.filter(function(item){
+      return item.action || item.owner || item.due;
+    }).sort(function(a,b){
+      var pa = actionPriorityValue(a.priority);
+      var pb = actionPriorityValue(b.priority);
+      if(pa !== pb) return pa - pb;
+      return (a.status || "").localeCompare(b.status || "");
+    });
+  }
+
+  function nextActionSummary(){
+    var rows = actionRows().filter(function(item){ return item.status !== "done"; });
+    return rows.length ? rows[0].priority + " " + rows[0].action : "No open actions.";
+  }
+
+  function actionsMarkdown(){
+    var rows = actionRows();
+    if(!rows.length) return "1. No next actions noted.";
+    return rows.map(function(item,index){
+      var tail = [];
+      if(item.owner) tail.push("Owner: " + item.owner);
+      if(item.status) tail.push("Status: " + item.status);
+      if(item.due) tail.push("Due: " + item.due);
+      return (index + 1) + ". [" + item.priority + "] " + (item.action || "Untitled action") + (tail.length ? " (" + tail.join(", ") + ")" : "");
+    }).join("\n");
+  }
+
+  function decisionRows(){
+    return state.decisions.filter(function(item){
+      return item.option || item.upside || item.risk || item.decision;
+    });
+  }
+
+  function decisionMatrix(){
+    var rows = decisionRows();
+    if(!rows.length){
+      rows = [{option:"No options noted.",upside:" ",risk:" ",decision:" "}];
+    }
+    return [
+      "| Option | Upside | Risk | Decision |",
+      "|---|---|---|---|"
+    ].concat(rows.map(function(item){
+      return "| " + pipe(item.option) + " | " + pipe(item.upside) + " | " + pipe(item.risk) + " | " + pipe(item.decision) + " |";
+    })).join("\n");
+  }
+
+  function buildMarkdown(){
+    readForm();
+    var title = state.meta.showName || "Untitled show";
+    var meta = [
+      "SHOW / PROJECT: " + title,
+      state.meta.venueName ? "VENUE: " + state.meta.venueName : "",
+      state.meta.showDate ? "DATE: " + state.meta.showDate : "",
+      state.meta.preparedBy ? "PREPARED BY: " + state.meta.preparedBy : "",
+      state.meta.handoffTo ? "HANDOFF TO: " + state.meta.handoffTo : ""
+    ].filter(Boolean).join("\n");
+    return [
+      meta,
+      "",
+      "SUMMARY TABLE:",
+      summaryTable(),
+      "",
+      sectionBlock("CURRENT STATUS", state.sections.currentStatus),
+      sectionBlock("WHAT IS WORKING", state.sections.working),
+      sectionBlock("WHAT IS NOT WORKING", state.sections.notWorking),
+      sectionBlock("GEAR / SYSTEMS INVOLVED", state.sections.gear),
+      sectionBlock("SIGNAL FLOW / NETWORK / CONTROL NOTES", state.sections.signalFlow),
+      sectionBlock("KEY DECISIONS", state.sections.keyDecisions),
+      "DECISION MATRIX:",
+      decisionMatrix(),
+      "",
+      sectionBlock("CLIENT / CREW NOTES", state.sections.clientCrewNotes),
+      sectionBlock("RISKS / GOTCHAS", state.sections.risks),
+      "NEXT ACTIONS:",
+      actionsMarkdown(),
+      "",
+      sectionBlock("QUESTIONS STILL OPEN", state.sections.questions)
+    ].join("\n");
+  }
+
+  function refresh(){
+    var filled = textFields.filter(function(id){ return (state.sections[id] || "").trim(); }).length;
+    var openActions = actionRows().filter(function(item){ return item.status !== "done"; }).length;
+    var risks = lines(state.sections.risks).length;
+    var decisions = decisionRows().length;
+    $("sectionCount").textContent = String(filled);
+    $("sectionNote").textContent = filled === textFields.length ? "All sections filled" : (textFields.length - filled) + " sections open";
+    $("actionCount").textContent = String(openActions);
+    $("actionNote").textContent = openActions ? "Next: " + firstLine(nextActionSummary(), "Ready") : "No actions yet";
+    $("riskCount").textContent = String(risks);
+    $("decisionCount").textContent = String(decisions);
+    $("output").value = buildMarkdown();
+  }
+
+  function showHint(message, kind){
+    var hint = $("hint");
+    hint.className = "hint" + (kind ? " " + kind : "");
+    hint.textContent = message;
+    setTimeout(function(){
+      hint.className = "hint";
+      hint.textContent = "Edits are remembered in this browser.";
+    }, 1600);
+  }
+
+  function flashClass(el, className, duration){
+    if(!el) return;
+    el.classList.remove(className);
+    void el.offsetWidth;
+    el.classList.add(className);
+    setTimeout(function(){ el.classList.remove(className); }, duration || 190);
+  }
+  function signalSuccess(el){ flashClass(el, "feedback-success", 190); }
+  function signalError(el){ flashClass(el, "feedback-error", 190); }
+
+  function copyText(text, source){
+    if(!text.trim()){
+      signalError(source);
+      showHint("Nothing to copy yet.", "error");
+      return;
+    }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(function(){
+        signalSuccess(source);
+        showHint("Copied.", "success");
+      }).catch(function(){
+        fallbackCopy(text, source);
+      });
+    }else{
+      fallbackCopy(text, source);
+    }
+  }
+
+  function fallbackCopy(text, source){
+    $("output").value = text;
+    $("output").focus();
+    $("output").select();
+    try{
+      document.execCommand("copy");
+      signalSuccess(source);
+      showHint("Copied.", "success");
+    }catch(err){
+      signalError(source);
+      showHint("Copy failed. Select the generated text.", "error");
+    }
+  }
+
+  function exportJson(){
+    readForm();
+    var payload = {
+      schema:SCHEMA,
+      exportedAt:new Date().toISOString(),
+      meta:state.meta,
+      sections:state.sections,
+      actions:actionRows(),
+      decisions:decisionRows()
+    };
+    var stem = (state.meta.showName || "show-handoff").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "show-handoff";
+    var blob = new Blob([JSON.stringify(payload, null, 2)], {type:"application/json;charset=utf-8"});
+    var url = URL.createObjectURL(blob);
+    var link = document.createElement("a");
+    link.href = url;
+    link.download = stem + "-" + (state.meta.showDate || today()) + ".show-handoff.json";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 0);
+    signalSuccess($("exportBtn"));
+    showHint("JSON exported.", "success");
+  }
+
+  function importJson(file){
+    var reader = new FileReader();
+    reader.onload = function(){
+      try{
+        var raw = JSON.parse(String(reader.result || "{}"));
+        if(raw.schema && raw.schema !== SCHEMA) throw new Error("Wrong schema");
+        state = sanitizeLoaded(raw);
+        writeForm();
+        saveNow();
+        signalSuccess($("importBtn"));
+        showHint("JSON imported.", "success");
+      }catch(err){
+        signalError($("importBtn"));
+        showHint("Could not import that file.", "error");
+      }
+    };
+    reader.onerror = function(){
+      signalError($("importBtn"));
+      showHint("Could not read that file.", "error");
+    };
+    reader.readAsText(file);
+  }
+
+  function clearAll(){
+    if(!window.confirm("Clear this handoff from this browser?")) return;
+    state = createInitialState();
+    writeForm();
+    saveNow();
+    signalSuccess($("clearBtn"));
+    showHint("Cleared.", "success");
+  }
+
+  function installPressFeedback(){
+    document.querySelectorAll("button").forEach(function(button){
+      function press(){ if(!button.disabled) button.classList.add("is-pressing"); }
+      function release(){ button.classList.remove("is-pressing"); }
+      button.addEventListener("pointerdown", press);
+      button.addEventListener("pointerup", release);
+      button.addEventListener("pointercancel", release);
+      button.addEventListener("pointerleave", release);
+      button.addEventListener("blur", release);
+      button.addEventListener("keydown", function(e){ if(e.key === " " || e.key === "Enter") press(); });
+      button.addEventListener("keyup", function(e){ if(e.key === " " || e.key === "Enter") release(); });
+    });
+  }
+
+  fields.forEach(function(id){
+    $(id).addEventListener("input", function(){
+      readForm();
+      refresh();
+      queueSave();
+    });
+  });
+
+  $("actionsBody").addEventListener("input", function(e){
+    if(e.target.matches("[data-action-field]")) updateActionField(e.target);
+  });
+  $("actionsBody").addEventListener("change", function(e){
+    if(e.target.matches("[data-action-field]")) updateActionField(e.target);
+  });
+  $("actionsBody").addEventListener("click", function(e){
+    var button = e.target.closest("[data-remove-action]");
+    if(!button) return;
+    state.actions.splice(Number(button.getAttribute("data-remove-action")), 1);
+    renderActions();
+    refresh();
+    saveNow();
+  });
+  $("decisionsBody").addEventListener("input", function(e){
+    if(e.target.matches("[data-decision-field]")) updateDecisionField(e.target);
+  });
+  $("decisionsBody").addEventListener("click", function(e){
+    var button = e.target.closest("[data-remove-decision]");
+    if(!button) return;
+    state.decisions.splice(Number(button.getAttribute("data-remove-decision")), 1);
+    renderDecisions();
+    refresh();
+    saveNow();
+  });
+
+  $("sampleBtn").addEventListener("click", function(){
+    state = sampleState();
+    writeForm();
+    saveNow();
+    signalSuccess($("sampleBtn"));
+    showHint("Sample loaded.", "success");
+  });
+  $("clearBtn").addEventListener("click", clearAll);
+  $("copyBtn").addEventListener("click", function(){ copyText(buildMarkdown(), $("copyBtn")); });
+  $("copyActionsBtn").addEventListener("click", function(){ copyText(actionsMarkdown(), $("copyActionsBtn")); });
+  $("copyMatrixBtn").addEventListener("click", function(){ copyText(decisionMatrix(), $("copyMatrixBtn")); });
+  $("printBtn").addEventListener("click", function(){
+    refresh();
+    window.print();
+    signalSuccess($("printBtn"));
+  });
+  $("exportBtn").addEventListener("click", exportJson);
+  $("importBtn").addEventListener("click", function(){
+    $("importFile").value = "";
+    $("importFile").click();
+  });
+  $("importFile").addEventListener("change", function(){
+    var file = $("importFile").files && $("importFile").files[0];
+    if(file) importJson(file);
+  });
+  $("addActionBtn").addEventListener("click", addAction);
+  $("addActionTopBtn").addEventListener("click", addAction);
+  $("sortActionsBtn").addEventListener("click", sortActions);
+  $("addDecisionBtn").addEventListener("click", addDecision);
+  $("refreshBtn").addEventListener("click", function(){
+    refresh();
+    signalSuccess($("refreshBtn"));
+    showHint("Preview refreshed.", "success");
+  });
+
+  installPressFeedback();
+  loadSaved();
+})();
+</script>
+</body>
+</html>

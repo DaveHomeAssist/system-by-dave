@@ -2,6 +2,7 @@
 
 ## 2026-06-13
 
+* Added `/show-handoff.html`, a browser based AV show handoff builder with show metadata, exact handoff sections, generated summary table, decision matrix, numbered prioritized actions, copy actions, copy matrix, copy full Markdown, print output, JSON import and export, sample handoff, and remembered browser state. Linked it from the homepage AV Tools section, added it to the Products footer, and added it to `sitemap.xml`.
 * Tightened `/teleprompter.html` mobile formatting controls so the toolbar scrolls inside its own rail on phone widths, keeps the editor usable, and gives color swatches larger touch targets.
 * Added `/stage-plot.html`, a browser based AV stage plot tool with draggable room layout items, sample stage plot, exact position controls, nudge controls, snap to grid, print output, JSON import and export, copyable operator summary, and remembered browser state. Linked it from the homepage AV Tools section, added it to the Products footer, and added it to `sitemap.xml`.
 * Added `/input-list.html`, a browser based AV input list and patch sheet with show metadata, sample channels, editable patch rows, line check status, filters, selected channel controls, print output, JSON import and export, CSV export, copyable operator summary, and remembered browser state. Linked it from the homepage AV Tools section, added it to the Products footer, and added it to `sitemap.xml`.
