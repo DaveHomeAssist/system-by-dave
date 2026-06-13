@@ -165,6 +165,13 @@
   button.primary:hover{filter:brightness(1.05)}
   button.primary:active,button.primary.is-pressing{filter:brightness(.94) saturate(1.08)}
   button.ghost{background:transparent}
+  button.predicted-action{
+    border-color:var(--focus);
+    box-shadow:0 0 0 2px rgba(154,208,255,.16),0 4px 14px rgba(0,0,0,.22);
+  }
+  button.primary.predicted-action{
+    box-shadow:0 1px 0 rgba(255,255,255,.18) inset,0 0 0 3px rgba(91,176,255,.2);
+  }
   .feedback-success{
     border-color:rgba(102,217,154,.88) !important;
     animation:success-confirm var(--dur-med) var(--ease-out);
@@ -326,6 +333,7 @@
   footer .spacer{flex:1}
 
   .hint{color:var(--muted);font-size:12px}
+  .hint.next-action-ready{color:#cfe7ff}
   .storage-status{
     display:inline-flex;align-items:center;
     padding:5px 9px;
@@ -452,7 +460,7 @@
     <div class="editor" id="editor">
       <div class="editor-head">
         <strong>Your script</strong>
-        <span class="hint" id="saveHint">Paste or type. Saved automatically on this device.</span>
+        <span class="hint" id="saveHint" aria-live="polite">Paste or type. Saved automatically on this device.</span>
         <span class="storage-status" id="storageStatus" hidden>Auto save off. Use Save or Load.</span>
         <span class="spacer" style="flex:1"></span>
         <button id="doneBtn" class="primary" type="button">Done — start reading</button>
@@ -566,9 +574,10 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     var available = storage.isAvailable();
     if(saveHint){
       saveHint.classList.remove('feedback-success','feedback-error');
-      saveHint.textContent = available
+      saveHint.classList.toggle('next-action-ready', !!currentPrediction);
+      saveHint.textContent = currentPrediction || (available
         ? 'Paste or type. Saved automatically on this device.'
-        : 'Paste or type. Auto save is off in this browser. Use Save or Load.';
+        : 'Paste or type. Auto save is off in this browser. Use Save or Load.');
     }
     if(storageStatus){
       storageStatus.hidden = available;
@@ -590,6 +599,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     if(!saveHint) return;
     if(hintTimer) clearTimeout(hintTimer);
     saveHint.classList.remove('feedback-success','feedback-error');
+    saveHint.classList.remove('next-action-ready');
     saveHint.textContent = message;
     if(kind) saveHint.classList.add('feedback-' + kind);
     hintTimer = setTimeout(updateStorageUi, 1600);
@@ -617,6 +627,16 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   }
 
   var SCRIPT_STORE = 'teleprompter.script.v1';
+  var PREF_STORE = 'teleprompter.preferences.v1';
+  var preferences = {
+    lastMode:'edit',
+    lastFileStem:'',
+    lastAction:'',
+    lastLength:0,
+    updatedAt:''
+  };
+  var currentPrediction = '';
+  var predictedButton = null;
   var SAMPLE_SCRIPT = [
     'Sample script',
     '',
@@ -649,12 +669,66 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     }, 300);
   }
 
+  function loadPreferences(){
+    try{
+      var raw = storage.get(PREF_STORE);
+      if(!raw) return;
+      var p = JSON.parse(raw);
+      if(p && typeof p === 'object'){
+        if(p.lastMode === 'edit' || p.lastMode === 'reading') preferences.lastMode = p.lastMode;
+        if(typeof p.lastFileStem === 'string') preferences.lastFileStem = p.lastFileStem.slice(0, 80);
+        if(typeof p.lastAction === 'string') preferences.lastAction = p.lastAction.slice(0, 40);
+        if(typeof p.lastLength === 'number') preferences.lastLength = Math.max(0, Math.min(1000000, p.lastLength));
+        if(typeof p.updatedAt === 'string') preferences.updatedAt = p.updatedAt.slice(0, 40);
+      }
+    }catch(e){/* ignore corrupt preference metadata */}
+  }
+
+  function savePreferences(action){
+    preferences.lastMode = isReading() ? 'reading' : 'edit';
+    preferences.lastAction = action || preferences.lastAction || '';
+    preferences.lastLength = (script.value || '').length;
+    preferences.updatedAt = new Date().toISOString();
+    if(!storage.set(PREF_STORE, JSON.stringify(preferences))) updateStorageUi();
+  }
+
+  function titleFromScript(){
+    var lines = (script.value || '').split(/\r?\n/);
+    for(var i = 0; i < lines.length; i++){
+      var cleaned = lines[i].replace(/^#+\s*/, '').trim();
+      if(cleaned) return cleaned;
+    }
+    return '';
+  }
+
+  function fileStemFromText(text){
+    return (text || '')
+      .toLowerCase()
+      .replace(/['"]/g, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .slice(0, 54);
+  }
+
+  function rememberFileStem(stem){
+    if(stem){
+      preferences.lastFileStem = stem;
+      savePreferences('file-name');
+    }
+  }
+
+  function likelyFileStem(){
+    return fileStemFromText(titleFromScript()) || preferences.lastFileStem || 'teleprompter-script';
+  }
+
   function scriptFileName(){
     var d = new Date();
     var yyyy = d.getFullYear();
     var mm = String(d.getMonth() + 1).padStart(2, '0');
     var dd = String(d.getDate()).padStart(2, '0');
-    return 'teleprompter-script-' + yyyy + '-' + mm + '-' + dd + '.txt';
+    var stem = likelyFileStem();
+    rememberFileStem(stem);
+    return stem + '-' + yyyy + '-' + mm + '-' + dd + '.txt';
   }
 
   function saveScriptToFile(){
@@ -670,6 +744,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
       document.body.appendChild(link);
       link.click();
       signalSuccess($('saveFileBtn'));
+      savePreferences('save');
       showHintNotice('Script saved as a text file.', 'success');
       setTimeout(function(){
         URL.revokeObjectURL(url);
@@ -687,6 +762,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     var readerForFile = new FileReader();
     readerForFile.onload = function(){
       script.value = typeof readerForFile.result === 'string' ? readerForFile.result : '';
+      rememberFileStem(fileStemFromText(file && file.name ? file.name.replace(/\.[^.]+$/, '') : ''));
       saveScriptDebounced();
       syncReader();
       applyTransform();
@@ -697,6 +773,8 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
         script.focus();
       }
       signalSuccess($('loadFileBtn'));
+      savePreferences('load');
+      updatePrediction();
       showHintNotice('Script loaded.', 'success');
     };
     readerForFile.onerror = function(){
@@ -739,6 +817,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     $('lineBtn').setAttribute('aria-pressed', String(centerline));
     measure();
     applyTransform();
+    updatePrediction();
   }
 
   // ---- Layout measurement ----
@@ -789,6 +868,8 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
       pause();
       script.focus();
     }
+    savePreferences(on ? 'reading' : 'edit');
+    updatePrediction();
   }
   function isReading(){ return body.classList.contains('reading'); }
 
@@ -838,11 +919,15 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   function togglePlay(){
     playing ? pause() : play();
     signalSuccess($('playBtn'));
+    savePreferences(playing ? 'play' : 'pause');
+    updatePrediction();
   }
 
   function restart(){
     pos = 0; applySnapTransform(); showToast(false);
     signalSuccess($('restartBtn'));
+    savePreferences('restart');
+    updatePrediction();
     if(!playing){ /* stay paused at top */ }
   }
 
@@ -852,6 +937,8 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     pos = clamp(pos + dir*amount, 0, maxScroll);
     applySnapTransform();
     showToast(false);
+    savePreferences('step');
+    updatePrediction();
   }
 
   // ---- Immersive auto-hide of controls while playing ----
@@ -871,6 +958,36 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   // ---- Toast ----
   function showToast(on){ toast.classList.toggle('show', on); }
 
+  function setPredictedAction(button, message){
+    if(predictedButton) predictedButton.classList.remove('predicted-action');
+    predictedButton = button || null;
+    currentPrediction = message || '';
+    if(predictedButton) predictedButton.classList.add('predicted-action');
+    updateStorageUi();
+  }
+
+  function updatePrediction(){
+    if(!saveHint) return;
+    var text = (script.value || '').trim();
+    if(!text){
+      setPredictedAction($('loadFileBtn'), 'Next: Load a script or paste text.');
+      return;
+    }
+    if(!isReading()){
+      setPredictedAction($('doneBtn'), 'Next: Done — start reading.');
+      return;
+    }
+    if(playing){
+      setPredictedAction($('playBtn'), 'Next: Pause when you need to adjust.');
+      return;
+    }
+    if(maxScroll > 0 && pos >= maxScroll - 2){
+      setPredictedAction($('restartBtn'), 'Next: Restart from top.');
+      return;
+    }
+    setPredictedAction($('playBtn'), 'Next: Play.');
+  }
+
   // ---- Settings mutators ----
   function bump(obj, dir, out, fmt){
     obj.val = clamp(+(obj.val + dir*obj.step).toFixed(4), obj.min, obj.max);
@@ -880,18 +997,20 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   function changeFont(dir){ bump(FONT, dir, 'fontOut'); applyMetric(); }
   function changeLH(dir){ bump(LH, dir, 'lhOut', function(v){return v.toFixed(1);}); applyMetric(); }
   function changeWidth(dir){ bump(WIDTH, dir, 'widthOut'); applyMetric(); }
-  function changeSpeed(dir){ bump(SPEED, dir, 'speedOut'); }
+  function changeSpeed(dir){ bump(SPEED, dir, 'speedOut'); savePreferences('speed'); updatePrediction(); }
   function applyMetric(){
     document.documentElement.style.setProperty('--reader-fs', FONT.val + 'px');
     document.documentElement.style.setProperty('--reader-lh', String(LH.val));
     document.documentElement.style.setProperty('--reader-width', WIDTH.val + 'rem');
     measure(); applyTransform();
+    savePreferences('reading-metric');
+    updatePrediction();
   }
 
   function toggleMirror(){ mirror=!mirror; body.classList.toggle('mirror',mirror);
-    $('mirrorBtn').setAttribute('aria-pressed',String(mirror)); saveSettings(); signalSuccess($('mirrorBtn')); }
+    $('mirrorBtn').setAttribute('aria-pressed',String(mirror)); saveSettings(); signalSuccess($('mirrorBtn')); savePreferences('mirror'); updatePrediction(); }
   function toggleLine(){ centerline=!centerline; body.classList.toggle('centerline',centerline);
-    $('lineBtn').setAttribute('aria-pressed',String(centerline)); saveSettings(); signalSuccess($('lineBtn')); }
+    $('lineBtn').setAttribute('aria-pressed',String(centerline)); saveSettings(); signalSuccess($('lineBtn')); savePreferences('line'); updatePrediction(); }
 
   // ---- Fullscreen ----
   function toggleFullscreen(){
@@ -915,6 +1034,8 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     var fs = !!document.fullscreenElement;
     $('fsBtn').setAttribute('aria-pressed', String(fs));
     signalSuccess($('fsBtn'));
+    savePreferences(fs ? 'fullscreen' : 'exit-fullscreen');
+    updatePrediction();
     if(fs && !isReading()) setReading(true);
   });
 
@@ -978,6 +1099,8 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     }
     cancelReaderDrag();
     snapReader();
+    savePreferences('drag');
+    updatePrediction();
   }
 
   // ---- Wiring ----
@@ -1025,7 +1148,9 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   // script persistence + live sync
   script.addEventListener('input', function(){
     saveScriptDebounced();
+    rememberFileStem(fileStemFromText(titleFromScript()));
     if(isReading()) syncReader();
+    updatePrediction();
   });
 
   // wake controls on activity while playing
@@ -1040,6 +1165,8 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     e.preventDefault();
     pos = clamp(pos + e.deltaY, 0, maxScroll);
     applyTransform();
+    savePreferences('wheel');
+    updatePrediction();
   }, {passive:false});
 
   reader.addEventListener('pointerdown', startReaderDrag);
@@ -1094,21 +1221,23 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   var rT=null;
   window.addEventListener('resize', function(){
     if(rT) clearTimeout(rT);
-    rT = setTimeout(function(){ measure(); applyTransform(); }, 120);
+    rT = setTimeout(function(){ measure(); applyTransform(); updatePrediction(); }, 120);
   });
 
   // ---- Init ----
+  loadPreferences();
   updateStorageUi();
   loadSettings();
   var hadSavedScript = loadScript();
   applySettings();
   syncReader();
-  // First-time loads show the sample in the editor. Saved scripts reopen in reading mode.
-  if(hadSavedScript && (script.value||'').trim().length > 0){
+  // First-time loads show the sample in the editor. Saved scripts reopen in the last used mode.
+  if(hadSavedScript && (script.value||'').trim().length > 0 && preferences.lastMode !== 'edit'){
     setReading(true);
   }else{
     setReading(false);
   }
+  updatePrediction();
 })();
 </script>
 </body>
