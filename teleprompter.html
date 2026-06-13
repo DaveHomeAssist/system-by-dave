@@ -495,6 +495,78 @@
   .keys .desc{color:var(--muted);font-size:13px}
   .help .close-row{display:flex;justify-content:flex-end;margin-top:18px}
 
+  .rundown-backdrop{
+    position:fixed;inset:0;background:rgba(4,7,12,.62);
+    display:none;align-items:center;justify-content:center;z-index:52;padding:20px;
+  }
+  .rundown-backdrop.open{display:flex}
+  .rundown{
+    width:min(720px,100%);
+    max-height:min(78vh,760px);
+    display:flex;
+    flex-direction:column;
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:16px;
+    box-shadow:0 24px 70px rgba(0,0,0,.55);
+    overflow:hidden;
+  }
+  .rundown-head{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:16px;
+    padding:18px 18px 14px;
+    border-bottom:1px solid var(--line);
+  }
+  .rundown-head h2{
+    margin:0;
+    font-size:18px;
+    line-height:1.2;
+  }
+  .rundown-summary{
+    margin:6px 0 0;
+    color:var(--muted);
+    font-size:12px;
+  }
+  .rundown-body{
+    overflow:auto;
+    padding:8px;
+  }
+  .rundown-row{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) 72px 72px 58px auto;
+    align-items:center;
+    gap:10px;
+    padding:9px 10px;
+    border-bottom:1px solid rgba(255,255,255,.06);
+  }
+  .rundown-row:last-child{border-bottom:0}
+  .rundown-title{
+    min-width:0;
+    color:var(--text);
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .rundown-title small{
+    display:block;
+    margin-top:2px;
+    color:var(--muted);
+    font-size:11px;
+  }
+  .rundown-time{
+    color:#dbe9f7;
+    font-size:12px;
+    font-variant-numeric:tabular-nums;
+    white-space:nowrap;
+  }
+  .rundown-empty{
+    padding:18px;
+    color:var(--muted);
+    font-size:13px;
+  }
+
   .remote-panel{
     display:none;
     flex:1 1 auto;
@@ -661,6 +733,9 @@
     .remote-card{padding:14px;border-radius:14px}
     .remote-now{grid-template-columns:1fr}
     .remote-controls{grid-template-columns:1fr 1fr}
+    .rundown-backdrop{padding:10px}
+    .rundown-row{grid-template-columns:minmax(0,1fr) 62px 62px auto}
+    .rundown-row .rundown-time:nth-of-type(3){display:none}
     #script{font-size:18px;padding:16px}
   }
 
@@ -744,6 +819,7 @@
       <button class="icon" type="button" data-act="markerPrev" title="Previous marker ([ or Shift Page Up)" aria-label="Previous marker">◀</button>
       <select id="markerSelect" class="marker-select" title="Jump to a script marker" aria-label="Script markers"></select>
       <button class="icon" type="button" data-act="markerNext" title="Next marker (] or Shift Page Down)" aria-label="Next marker">▶</button>
+      <button id="rundownBtn" type="button" title="Open timed marker rundown">Rundown</button>
     </div>
 
     <div class="group" aria-label="Font size">
@@ -935,6 +1011,19 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   </div>
 </div>
 
+<div class="rundown-backdrop" id="rundownBackdrop" role="dialog" aria-modal="true" aria-labelledby="rundownTitle">
+  <div class="rundown">
+    <div class="rundown-head">
+      <div>
+        <h2 id="rundownTitle">Marker rundown</h2>
+        <p class="rundown-summary" id="rundownSummary">No markers</p>
+      </div>
+      <button id="rundownClose" class="icon" type="button" aria-label="Close marker rundown">×</button>
+    </div>
+    <div class="rundown-body" id="rundownBody"></div>
+  </div>
+</div>
+
 <script>
 (function(){
   "use strict";
@@ -975,6 +1064,11 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   var markerSelect = $('markerSelect');
   var markerOut = $('markerOut');
   var markerMeasure = $('markerMeasure');
+  var rundownBtn = $('rundownBtn');
+  var rundownBackdrop = $('rundownBackdrop');
+  var rundownClose = $('rundownClose');
+  var rundownBody = $('rundownBody');
+  var rundownSummary = $('rundownSummary');
   var remoteBtn = $('remoteBtn');
   var remoteStatus = $('remoteStatus');
   var remoteStateOut = $('remoteStateOut');
@@ -1382,6 +1476,78 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     measureMarkerPositions();
     updateMarkerUi();
     updateRunHud();
+    refreshRundownIfOpen();
+  }
+
+  function markerTimingRows(){
+    if(!scriptMarkers.length) return [];
+    measureMarkerPositions();
+    return scriptMarkers.map(function(marker, index){
+      var nextMarker = scriptMarkers[index + 1];
+      var startPos = clamp(marker.pos || 0, 0, maxScroll);
+      var endPos = nextMarker ? clamp(nextMarker.pos || 0, 0, maxScroll) : maxScroll;
+      var start = SPEED.val > 0 ? startPos / SPEED.val : 0;
+      var duration = SPEED.val > 0 ? Math.max(0, endPos - startPos) / SPEED.val : 0;
+      var pct = maxScroll > 0 ? Math.round(clamp(startPos / maxScroll, 0, 1) * 100) : 0;
+      return {
+        index:index,
+        title:marker.title,
+        line:marker.line,
+        start:start,
+        duration:duration,
+        pct:pct
+      };
+    });
+  }
+
+  function renderRundown(){
+    var rows = markerTimingRows();
+    if(!rundownBody || !rundownSummary) return;
+    rundownBody.innerHTML = '';
+    if(!rows.length){
+      rundownSummary.textContent = 'No markers';
+      var empty = document.createElement('div');
+      empty.className = 'rundown-empty';
+      empty.textContent = 'Add markdown headings, [[bracket cues]], or == divider cues == to build a timed rundown.';
+      rundownBody.appendChild(empty);
+      return;
+    }
+    var total = SPEED.val > 0 ? maxScroll / SPEED.val : 0;
+    rundownSummary.textContent = rows.length + ' markers · ' + formatTime(total) + ' run' + (TARGET_RUNTIME.val ? ' · target ' + formatTime(TARGET_RUNTIME.val) : '');
+    rows.forEach(function(row){
+      var item = document.createElement('div');
+      item.className = 'rundown-row';
+      var title = document.createElement('div');
+      title.className = 'rundown-title';
+      title.textContent = (row.index + 1) + '. ' + row.title;
+      var meta = document.createElement('small');
+      meta.textContent = 'Line ' + row.line;
+      title.appendChild(meta);
+      var start = document.createElement('span');
+      start.className = 'rundown-time';
+      start.textContent = formatTime(row.start);
+      var duration = document.createElement('span');
+      duration.className = 'rundown-time';
+      duration.textContent = '+' + formatTime(row.duration);
+      var pct = document.createElement('span');
+      pct.className = 'rundown-time';
+      pct.textContent = row.pct + '%';
+      var jump = document.createElement('button');
+      jump.type = 'button';
+      jump.textContent = 'Jump';
+      jump.setAttribute('data-marker-index', String(row.index));
+      jump.setAttribute('aria-label', 'Jump to ' + row.title);
+      item.appendChild(title);
+      item.appendChild(start);
+      item.appendChild(duration);
+      item.appendChild(pct);
+      item.appendChild(jump);
+      rundownBody.appendChild(item);
+    });
+  }
+
+  function refreshRundownIfOpen(){
+    if(rundownBackdrop && rundownBackdrop.classList.contains('open')) renderRundown();
   }
 
   function formatTime(totalSeconds){
@@ -2554,8 +2720,23 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
 
   // ---- Help dialog ----
   var help = $('helpBackdrop'), lastFocus=null;
+  var rundownLastFocus=null;
   function openHelp(){ lastFocus=document.activeElement; help.classList.add('open'); $('helpClose').focus(); }
   function closeHelp(){ help.classList.remove('open'); if(lastFocus) lastFocus.focus(); }
+  function openRundown(){
+    rundownLastFocus = document.activeElement;
+    syncReader();
+    measure();
+    renderRundown();
+    rundownBackdrop.classList.add('open');
+    rundownClose.focus();
+    signalSuccess(rundownBtn);
+    savePreferences('rundown');
+  }
+  function closeRundown(){
+    rundownBackdrop.classList.remove('open');
+    if(rundownLastFocus) rundownLastFocus.focus();
+  }
 
   function installPressFeedback(){
     document.querySelectorAll('button').forEach(function(button){
@@ -2643,6 +2824,20 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   $('helpBtn').addEventListener('click', function(){ openHelp(); signalSuccess($('helpBtn')); });
   $('helpClose').addEventListener('click', function(){ closeHelp(); signalSuccess($('helpClose')); });
   help.addEventListener('click', function(e){ if(e.target===help) closeHelp(); });
+  rundownBtn.addEventListener('click', openRundown);
+  rundownClose.addEventListener('click', function(){ closeRundown(); signalSuccess(rundownClose); });
+  rundownBackdrop.addEventListener('click', function(e){ if(e.target===rundownBackdrop) closeRundown(); });
+  rundownBody.addEventListener('click', function(e){
+    var button = e.target.closest('[data-marker-index]');
+    var index;
+    if(!button) return;
+    index = parseInt(button.getAttribute('data-marker-index'), 10);
+    if(Number.isFinite(index)){
+      closeRundown();
+      jumpToMarker(index);
+      signalSuccess(button);
+    }
+  });
   $('saveFileBtn').addEventListener('click', saveScriptToFile);
   fitTimeBtn.addEventListener('click', fitSpeedToTargetRuntime);
   targetTimeInput.addEventListener('change', function(){ setTargetRuntimeFromInput(true); });
@@ -2777,6 +2972,10 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
 
     if(help.classList.contains('open')){
       if(k==='Escape'){ e.preventDefault(); closeHelp(); }
+      return;
+    }
+    if(rundownBackdrop.classList.contains('open')){
+      if(k==='Escape'){ e.preventDefault(); closeRundown(); }
       return;
     }
     if(cueing && k==='Escape'){

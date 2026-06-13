@@ -2,6 +2,7 @@
 
 ## 2026-06-13
 
+* Added a timed marker rundown to `/teleprompter.html`: operators can open a rundown dialog showing each marker's estimated start time, segment duration, line number, progress position, and jump control.
 * Added a target pace readout to `/teleprompter.html`: when a target runtime is set, the run HUD and remote now show whether the current speed is on target, fast, or slow against that duration.
 * Added target runtime fitting to `/teleprompter.html`: operators can enter a run time such as `02:00`, fit scroll speed to that target, persist the target in saved scripts and show packages, and see it in the script run metadata.
 * Added portable show packages to `/teleprompter.html`: operators can export the current script, formatting, and saved-script library to JSON and import it on another browser session with duplicate-safe saved-script merging.
