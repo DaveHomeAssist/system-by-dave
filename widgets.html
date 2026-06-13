@@ -5,14 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: https:; script-src 'self' 'unsafe-inline'">
 <title>Widgets — System by Dave</title>
-<meta name="description" content="Embeddable HTML widgets for Notion. Status dashboards, quest trackers, approval hubs, workspace maps — no backend, URL-parameter configured.">
+<meta name="description" content="Embeddable HTML widgets for Notion. Status dashboards, quest trackers, approval hubs, and workspace maps configured through URL parameters.">
 <link rel="canonical" href="https://systembydave.com/widgets.html">
 <meta name="robots" content="index,follow">
 <meta name="theme-color" content="#F5F0E8">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="System by Dave">
 <meta property="og:title" content="Widgets — System by Dave">
-<meta property="og:description" content="Embeddable HTML widgets for Notion. Status dashboards, quest trackers, approval hubs, workspace maps — no backend, URL-parameter configured.">
+<meta property="og:description" content="Embeddable HTML widgets for Notion. Status dashboards, quest trackers, approval hubs, and workspace maps configured through URL parameters.">
 <meta property="og:url" content="https://systembydave.com/widgets.html">
 <meta property="og:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
 <meta property="og:image:width" content="1024">
@@ -20,7 +20,7 @@
 <meta property="og:image:alt" content="System by Dave preview banner">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Widgets — System by Dave">
-<meta name="twitter:description" content="Embeddable HTML widgets for Notion. Status dashboards, quest trackers, approval hubs, workspace maps — no backend, URL-parameter configured.">
+<meta name="twitter:description" content="Embeddable HTML widgets for Notion. Status dashboards, quest trackers, approval hubs, and workspace maps configured through URL parameters.">
 <meta name="twitter:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
 <link rel="icon" href="svg/system_by_dave_logo_rust.svg" type="image/svg+xml">
 <link rel="stylesheet" href="css/fonts.css">
@@ -52,16 +52,40 @@
     position: relative;
     overflow: hidden;
   }
-  .widget-preview::before {
-    display: none;
-  }
-  .widget-preview iframe {
-    position: absolute;
-    inset: 0;
+  .widget-preview-poster {
     width: 100%;
     height: 100%;
-    border: none;
-    border-radius: 4px;
+    display: grid;
+    place-items: center;
+    padding: 28px;
+    text-align: center;
+    background:
+      linear-gradient(135deg, rgba(181,101,74,0.08), rgba(181,101,74,0.02)),
+      repeating-linear-gradient(90deg, rgba(181,101,74,0.07) 0 1px, transparent 1px 20px),
+      repeating-linear-gradient(0deg, rgba(181,101,74,0.06) 0 1px, transparent 1px 20px);
+  }
+  .widget-preview-poster::before {
+    content: attr(data-poster);
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    font-family: var(--font-display);
+    font-size: clamp(64px, 12vw, 122px);
+    color: var(--rust);
+    opacity: 0.16;
+    letter-spacing: -0.03em;
+  }
+  .widget-preview-poster span {
+    position: relative;
+    z-index: 1;
+    max-width: 260px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    line-height: 1.6;
+    text-transform: uppercase;
+    color: var(--charcoal);
   }
 
   .widget-info-tag {
@@ -155,7 +179,7 @@
     <div class="container">
       <div class="page-hero-tag reveal">NotionWidgets</div>
       <h1 class="reveal reveal-delay-1">Embeddable widgets for <em>Notion</em></h1>
-      <p class="page-hero-desc reveal reveal-delay-2">Self-contained HTML files that embed directly into Notion pages via iframe. No backend, no API key, no account — configured entirely through URL parameters.</p>
+      <p class="page-hero-desc reveal reveal-delay-2">Standalone HTML files that embed directly into Notion pages via iframe and configure through URL parameters.</p>
     </div>
   </section>
 
@@ -165,13 +189,15 @@
       <div class="section-header reveal">
         <span class="section-number">—</span>
         <h2 class="section-title">All Widgets</h2>
-        <span class="section-subtitle">4 live demos</span>
+        <span class="section-subtitle">4 widget previews</span>
       </div>
 
       <!-- PROJECT STATUS -->
       <div class="widget-row reveal">
         <div class="widget-preview">
-          <iframe src="https://davehomeassist.github.io/NotionWidgets/project-status.html" loading="lazy" title="Project Status Dashboard" tabindex="-1"></iframe>
+          <div class="widget-preview-poster" data-poster="PS" role="img" aria-label="Project Status Dashboard preview">
+            <span>Project Status Dashboard</span>
+          </div>
         </div>
         <div class="widget-info">
           <div class="widget-info-tag">Widget</div>
@@ -197,7 +223,9 @@
       <!-- QUEST LOG -->
       <div class="widget-row reverse reveal">
         <div class="widget-preview">
-          <iframe src="https://davehomeassist.github.io/NotionWidgets/quest-log.html" loading="lazy" title="Quest Log" tabindex="-1"></iframe>
+          <div class="widget-preview-poster" data-poster="QL" role="img" aria-label="Quest Log preview">
+            <span>Quest Log</span>
+          </div>
         </div>
         <div class="widget-info">
           <div class="widget-info-tag">Widget</div>
@@ -223,7 +251,9 @@
       <!-- CLIENT APPROVAL -->
       <div class="widget-row reveal">
         <div class="widget-preview">
-          <iframe src="https://davehomeassist.github.io/NotionWidgets/client-approval.html" loading="lazy" title="Client Approval Hub" tabindex="-1"></iframe>
+          <div class="widget-preview-poster" data-poster="CA" role="img" aria-label="Client Approval Hub preview">
+            <span>Client Approval Hub</span>
+          </div>
         </div>
         <div class="widget-info">
           <div class="widget-info-tag">Widget</div>
@@ -249,7 +279,9 @@
       <!-- WORKSPACE MAP -->
       <div class="widget-row reverse reveal">
         <div class="widget-preview">
-          <iframe src="https://davehomeassist.github.io/NotionWidgets/graph-explorer.html" loading="lazy" title="Workspace Map" tabindex="-1"></iframe>
+          <div class="widget-preview-poster" data-poster="WM" role="img" aria-label="Workspace Map preview">
+            <span>Workspace Map</span>
+          </div>
         </div>
         <div class="widget-info">
           <div class="widget-info-tag">Widget</div>

@@ -2,6 +2,8 @@
 
 ## 2026-06-13
 
+* Added `/show-timer.html`, a stage friendly AV show timer with countdown, count up, clock mode, presets, custom duration parsing, quick time adjustments, warning and overrun states, keyboard controls, stage view, and remembered browser preferences. Linked it from the homepage AV Tools section, added it to the Products footer, and added it to `sitemap.xml`.
+* Reworded `/widgets.html` public copy to describe current URL parameter configuration without permanence framing and replaced external demo iframes with static preview panels so the page has no third party runtime errors.
 * Added a live next cue readout to `/teleprompter.html`: the run HUD and remote now show the next marker, estimated time until cue, and clock time when a show start is set.
 * Added show start scheduling to `/teleprompter.html`: operators can set a show start time or use Now, see the planned end time in the run HUD and remote, and view estimated clock times for each marker in the rundown.
 * Added a timed marker rundown to `/teleprompter.html`: operators can open a rundown dialog showing each marker's estimated start time, segment duration, line number, progress position, and jump control.

@@ -1,0 +1,1304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'none'">
+<title>Show Timer | System by Dave</title>
+<meta name="description" content="A stage friendly AV show timer with countdown, count up, clock mode, presets, warning states, and fullscreen display.">
+<link rel="canonical" href="https://systembydave.com/show-timer.html">
+<meta name="theme-color" content="#0b0d10">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="System by Dave">
+<meta property="og:title" content="Show Timer">
+<meta property="og:description" content="A stage friendly AV show timer with countdown, count up, clock mode, presets, warning states, and fullscreen display.">
+<meta property="og:url" content="https://systembydave.com/show-timer.html">
+<meta property="og:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<meta property="og:image:width" content="1024">
+<meta property="og:image:height" content="412">
+<meta property="og:image:alt" content="System by Dave preview banner">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Show Timer">
+<meta name="twitter:description" content="A stage friendly AV show timer with countdown, count up, clock mode, presets, warning states, and fullscreen display.">
+<meta name="twitter:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<link rel="icon" href="svg/system_by_dave_logo_rust.svg" type="image/svg+xml">
+<style>
+  :root{
+    --bg:#0b0d10;
+    --panel:#12171d;
+    --panel-2:#171e26;
+    --panel-3:#1d252e;
+    --line:#303945;
+    --line-strong:#465363;
+    --text:#f6f8fb;
+    --muted:#a9b4c1;
+    --dim:#768391;
+    --rust:#c0623a;
+    --rust-2:#e58a5c;
+    --blue:#72b8ff;
+    --green:#6be092;
+    --amber:#ffd166;
+    --red:#ff6b6b;
+    --ink:#071016;
+    --shadow:0 16px 60px rgba(0,0,0,.32);
+    --radius:8px;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --fast:120ms;
+    --med:180ms;
+    --ease:cubic-bezier(.2,.8,.2,1);
+    --press:cubic-bezier(.2,0,0,1);
+  }
+
+  *{box-sizing:border-box}
+  html,body{min-height:100%}
+  body{
+    margin:0;
+    background:
+      radial-gradient(circle at 16% -10%,rgba(192,98,58,.18),transparent 30rem),
+      linear-gradient(180deg,#0b0d10 0%,#101419 55%,#080a0d 100%);
+    color:var(--text);
+    font-family:var(--sans);
+    line-height:1.4;
+    -webkit-font-smoothing:antialiased;
+  }
+  body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    background:
+      repeating-linear-gradient(90deg,rgba(255,255,255,.035) 0 1px,transparent 1px 80px),
+      repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0 1px,transparent 1px 80px);
+    mask-image:linear-gradient(180deg,rgba(0,0,0,.8),rgba(0,0,0,.15));
+  }
+  a{color:inherit}
+  button,input{
+    font:inherit;
+  }
+  button{
+    min-height:42px;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    background:var(--panel-2);
+    color:var(--text);
+    padding:10px 13px;
+    cursor:pointer;
+    user-select:none;
+    -webkit-tap-highlight-color:transparent;
+    transition:
+      transform var(--fast) var(--press),
+      border-color var(--fast) var(--ease),
+      background var(--fast) var(--ease),
+      box-shadow var(--fast) var(--ease),
+      color var(--fast) var(--ease);
+    touch-action:manipulation;
+  }
+  button:hover{
+    border-color:var(--line-strong);
+    background:var(--panel-3);
+    transform:translateY(-1px);
+    box-shadow:0 8px 22px rgba(0,0,0,.18);
+  }
+  button:active,
+  button.is-pressing{
+    transform:translateY(1px) scale(.975);
+    box-shadow:inset 0 2px 5px rgba(0,0,0,.28);
+  }
+  button:focus-visible,
+  input:focus-visible,
+  a:focus-visible{
+    outline:2px solid var(--blue);
+    outline-offset:3px;
+  }
+  button:disabled{
+    cursor:not-allowed;
+    opacity:.5;
+    transform:none;
+    box-shadow:none;
+  }
+  button.primary{
+    background:linear-gradient(180deg,var(--rust-2),var(--rust));
+    border-color:var(--rust);
+    color:#140905;
+    font-weight:800;
+  }
+  button.primary:hover{filter:brightness(1.06)}
+  button.mode[aria-pressed="true"],
+  button.preset[aria-pressed="true"]{
+    border-color:var(--blue);
+    background:rgba(114,184,255,.14);
+    color:#d8edff;
+    box-shadow:0 0 0 2px rgba(114,184,255,.12);
+  }
+  input{
+    width:100%;
+    min-height:42px;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    background:#0e1318;
+    color:var(--text);
+    padding:10px 12px;
+    font-family:var(--mono);
+    font-size:15px;
+    transition:border-color var(--fast) var(--ease),box-shadow var(--fast) var(--ease),background var(--fast) var(--ease);
+  }
+  input:hover,
+  input:focus{
+    border-color:var(--line-strong);
+    background:#111821;
+  }
+  input::placeholder{color:var(--dim)}
+
+  .skip-link{
+    position:absolute;
+    top:12px;
+    left:12px;
+    z-index:1000;
+    background:var(--text);
+    color:var(--ink);
+    padding:10px 14px;
+    border-radius:var(--radius);
+    transform:translateY(-150%);
+    transition:transform var(--med) var(--ease);
+  }
+  .skip-link:focus-visible{transform:translateY(0)}
+  .sr-only{
+    position:absolute;
+    width:1px;
+    height:1px;
+    padding:0;
+    margin:-1px;
+    overflow:hidden;
+    clip:rect(0,0,0,0);
+    white-space:nowrap;
+    border:0;
+  }
+
+  .app{
+    position:relative;
+    z-index:1;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+  }
+  .topbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    padding:14px 18px;
+    border-bottom:1px solid rgba(255,255,255,.08);
+    background:rgba(11,13,16,.86);
+    backdrop-filter:blur(18px);
+    position:sticky;
+    top:0;
+    z-index:20;
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    text-decoration:none;
+  }
+  .brand-mark{
+    width:38px;
+    height:38px;
+    border:1px solid rgba(255,255,255,.24);
+    border-radius:50%;
+    display:grid;
+    place-items:center;
+    font-family:Georgia,serif;
+    font-size:19px;
+    color:var(--rust-2);
+    background:#11161c;
+  }
+  .brand-text{
+    display:flex;
+    flex-direction:column;
+    gap:1px;
+  }
+  .brand-text strong{
+    font-size:14px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+  }
+  .brand-text span{
+    color:var(--muted);
+    font-family:var(--mono);
+    font-size:11px;
+  }
+  .top-actions{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+    justify-content:flex-end;
+  }
+  .top-link{
+    color:var(--muted);
+    font-family:var(--mono);
+    font-size:12px;
+    letter-spacing:.04em;
+    text-decoration:none;
+    text-transform:uppercase;
+    transition:color var(--fast) var(--ease);
+  }
+  .top-link:hover{color:var(--text)}
+
+  main{
+    width:100%;
+    max-width:1280px;
+    margin:0 auto;
+    padding:22px 18px 34px;
+    flex:1;
+    display:grid;
+    grid-template-columns:minmax(0,1.35fr) minmax(320px,.65fr);
+    gap:18px;
+    align-items:stretch;
+  }
+
+  .timer-panel,
+  .control-panel,
+  .info-panel{
+    background:linear-gradient(180deg,rgba(18,23,29,.96),rgba(12,15,19,.96));
+    border:1px solid rgba(255,255,255,.09);
+    border-radius:14px;
+    box-shadow:var(--shadow);
+  }
+  .timer-panel{
+    min-height:calc(100vh - 120px);
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    padding:30px;
+    overflow:hidden;
+    position:relative;
+  }
+  .timer-panel::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:
+      linear-gradient(90deg,transparent,rgba(255,255,255,.04),transparent),
+      repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0 1px,transparent 1px 22px);
+    opacity:.45;
+    pointer-events:none;
+  }
+  .timer-inner{
+    position:relative;
+    z-index:1;
+    display:flex;
+    flex-direction:column;
+    gap:22px;
+  }
+  .timer-meta{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px;
+    flex-wrap:wrap;
+    color:var(--muted);
+    font-family:var(--mono);
+    font-size:12px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+  }
+  .state-pill{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    min-height:30px;
+    padding:6px 10px;
+    border:1px solid var(--line);
+    border-radius:999px;
+    color:var(--text);
+    background:#0d1217;
+  }
+  .state-dot{
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    background:var(--green);
+    box-shadow:0 0 0 4px rgba(107,224,146,.12);
+  }
+  .timer-display{
+    font-family:var(--mono);
+    font-size:clamp(62px,15vw,184px);
+    line-height:.9;
+    letter-spacing:-.08em;
+    font-variant-numeric:tabular-nums;
+    text-wrap:balance;
+    overflow-wrap:anywhere;
+  }
+  .timer-label{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:18px;
+    flex-wrap:wrap;
+  }
+  .timer-label h1{
+    margin:0;
+    font-size:clamp(26px,4vw,48px);
+    line-height:1;
+    font-weight:800;
+    letter-spacing:-.03em;
+  }
+  .timer-label p{
+    margin:0;
+    max-width:520px;
+    color:var(--muted);
+    font-size:15px;
+  }
+  .progress-track{
+    width:100%;
+    height:12px;
+    border-radius:999px;
+    background:#070a0e;
+    border:1px solid rgba(255,255,255,.08);
+    overflow:hidden;
+  }
+  .progress-fill{
+    display:block;
+    width:0%;
+    height:100%;
+    background:linear-gradient(90deg,var(--blue),var(--green));
+    transition:width var(--med) linear,background var(--fast) var(--ease);
+  }
+  .stats{
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:10px;
+  }
+  .stat{
+    padding:12px;
+    background:rgba(255,255,255,.035);
+    border:1px solid rgba(255,255,255,.07);
+    border-radius:var(--radius);
+    min-width:0;
+  }
+  .stat span{
+    display:block;
+    color:var(--dim);
+    font-family:var(--mono);
+    font-size:10px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    margin-bottom:6px;
+  }
+  .stat strong{
+    display:block;
+    font-family:var(--mono);
+    font-size:16px;
+    font-variant-numeric:tabular-nums;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+
+  body[data-timer-state="warning"] .timer-panel{border-color:rgba(255,209,102,.55)}
+  body[data-timer-state="warning"] .state-dot{background:var(--amber);box-shadow:0 0 0 4px rgba(255,209,102,.14)}
+  body[data-timer-state="warning"] .progress-fill{background:linear-gradient(90deg,var(--amber),#ffb347)}
+  body[data-timer-state="danger"] .timer-panel{border-color:rgba(255,107,107,.65)}
+  body[data-timer-state="danger"] .state-dot{background:var(--red);box-shadow:0 0 0 4px rgba(255,107,107,.14)}
+  body[data-timer-state="danger"] .progress-fill{background:linear-gradient(90deg,#ff8a8a,var(--red))}
+  body[data-timer-state="overrun"] .timer-panel{
+    border-color:rgba(255,107,107,.9);
+    background:linear-gradient(180deg,rgba(40,18,18,.98),rgba(13,8,9,.98));
+  }
+  body[data-timer-state="overrun"] .timer-display{color:#ffd7d7}
+  body[data-timer-state="overrun"] .state-dot{background:var(--red);box-shadow:0 0 0 5px rgba(255,107,107,.18)}
+  body[data-timer-state="overrun"] .progress-fill{background:var(--red)}
+
+  .side{
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+    min-width:0;
+  }
+  .control-panel,
+  .info-panel{
+    padding:16px;
+  }
+  .panel-title{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:12px;
+    padding-bottom:12px;
+    border-bottom:1px solid rgba(255,255,255,.08);
+  }
+  .panel-title h2{
+    margin:0;
+    font-size:13px;
+    font-family:var(--mono);
+    letter-spacing:.1em;
+    text-transform:uppercase;
+  }
+  .panel-title span{
+    color:var(--dim);
+    font-family:var(--mono);
+    font-size:11px;
+  }
+  .control-stack{
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
+  .field-group{
+    display:grid;
+    gap:8px;
+  }
+  .field-group label,
+  .control-label{
+    color:var(--muted);
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+  }
+  .button-grid{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:8px;
+  }
+  .preset-grid{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:8px;
+  }
+  .duration-row{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    gap:8px;
+  }
+  .threshold-row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+  }
+  .transport-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+  }
+  .transport-grid .primary{grid-column:1 / -1}
+  .adjust-grid{
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:8px;
+  }
+  .stage-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+  }
+  .hint{
+    min-height:21px;
+    color:var(--muted);
+    font-size:13px;
+    line-height:1.45;
+  }
+  .hint.success{color:#bdf8ce}
+  .hint.error{color:#ffd0d0}
+  .feedback-success{
+    animation:confirm var(--med) var(--ease);
+    border-color:rgba(107,224,146,.85) !important;
+  }
+  .feedback-error{
+    animation:shake 160ms cubic-bezier(.3,0,.2,1);
+    border-color:var(--red) !important;
+    box-shadow:0 0 0 3px rgba(255,107,107,.16) !important;
+  }
+  @keyframes confirm{
+    0%{transform:scale(1)}
+    45%{transform:scale(1.02);box-shadow:0 0 0 4px rgba(107,224,146,.14)}
+    100%{transform:scale(1);box-shadow:0 0 0 rgba(107,224,146,0)}
+  }
+  @keyframes shake{
+    0%,100%{transform:translateX(0)}
+    30%{transform:translateX(-4px)}
+    60%{transform:translateX(4px)}
+    82%{transform:translateX(-2px)}
+  }
+
+  .shortcut-list{
+    display:grid;
+    grid-template-columns:auto 1fr;
+    gap:9px 12px;
+    margin:0;
+    color:var(--muted);
+    font-size:13px;
+  }
+  .shortcut-list dt{
+    font-family:var(--mono);
+    color:var(--text);
+    padding:2px 6px;
+    border:1px solid var(--line);
+    border-radius:6px;
+    background:#0e1318;
+    min-width:42px;
+    text-align:center;
+  }
+  .shortcut-list dd{margin:0}
+  .privacy-note{
+    margin:14px 0 0;
+    color:var(--dim);
+    font-size:12px;
+    line-height:1.55;
+  }
+
+  .noscript{
+    margin:20px;
+    padding:16px;
+    border:1px solid var(--red);
+    border-radius:var(--radius);
+    background:#231212;
+    color:#ffe0e0;
+  }
+
+  body.stage-view{
+    overflow:hidden;
+  }
+  body.stage-view .topbar,
+  body.stage-view .side{
+    display:none;
+  }
+  body.stage-view main{
+    max-width:none;
+    min-height:100vh;
+    padding:0;
+    display:block;
+  }
+  body.stage-view .timer-panel{
+    min-height:100vh;
+    border:0;
+    border-radius:0;
+    padding:5vw;
+  }
+  body.stage-view .timer-display{
+    font-size:clamp(80px,22vw,300px);
+  }
+  body.stage-view .stats{
+    max-width:980px;
+  }
+
+  @media (max-width:980px){
+    main{
+      grid-template-columns:1fr;
+    }
+    .timer-panel{
+      min-height:58vh;
+    }
+    .stats{
+      grid-template-columns:repeat(2,minmax(0,1fr));
+    }
+  }
+  @media (max-width:680px){
+    .topbar{
+      align-items:flex-start;
+      flex-direction:column;
+    }
+    .top-actions{
+      width:100%;
+      justify-content:space-between;
+    }
+    main{
+      padding:12px;
+      gap:12px;
+    }
+    .timer-panel{
+      min-height:50vh;
+      padding:18px;
+      border-radius:10px;
+    }
+    .timer-display{
+      font-size:clamp(54px,22vw,96px);
+      letter-spacing:-.07em;
+    }
+    .timer-label{
+      align-items:flex-start;
+      flex-direction:column;
+      gap:8px;
+    }
+    .stats,
+    .button-grid,
+    .preset-grid,
+    .adjust-grid,
+    .stage-grid{
+      grid-template-columns:1fr 1fr;
+    }
+    .duration-row,
+    .threshold-row{
+      grid-template-columns:1fr;
+    }
+  }
+  @media (prefers-reduced-motion:reduce){
+    *,
+    *::before,
+    *::after{
+      animation-duration:1ms !important;
+      transition-duration:1ms !important;
+      scroll-behavior:auto !important;
+    }
+  }
+</style>
+</head>
+<body data-timer-state="normal">
+<a class="skip-link" href="#main-content">Skip to timer</a>
+<noscript>
+  <div class="noscript">JavaScript is off, so the timer controls are unavailable.</div>
+</noscript>
+<div class="app">
+  <header class="topbar">
+    <a class="brand" href="index.html" aria-label="System by Dave home">
+      <span class="brand-mark">S</span>
+      <span class="brand-text">
+        <strong>Show Timer</strong>
+        <span>System by Dave AV tools</span>
+      </span>
+    </a>
+    <div class="top-actions" aria-label="Related tools">
+      <a class="top-link" href="teleprompter.html">Teleprompter</a>
+      <a class="top-link" href="index.html">Home</a>
+      <span class="top-link" id="clockReadout">--:--:--</span>
+    </div>
+  </header>
+
+  <main id="main-content">
+    <section class="timer-panel" aria-label="Timer display">
+      <div class="timer-inner">
+        <div class="timer-meta">
+          <span id="modeLabel">Countdown</span>
+          <span class="state-pill"><span class="state-dot" aria-hidden="true"></span><span id="stateLabel">Ready</span></span>
+        </div>
+        <div class="timer-display" id="timerDisplay" aria-live="off">05:00</div>
+        <div class="timer-label">
+          <h1 id="mainLabel">Stage timer</h1>
+          <p id="supportText">Preset a segment, start the clock, and use warning states as the cue approaches.</p>
+        </div>
+        <div class="progress-track" aria-hidden="true">
+          <span class="progress-fill" id="progressFill"></span>
+        </div>
+        <div class="stats" aria-label="Timer details">
+          <div class="stat"><span>Target</span><strong id="targetReadout">05:00</strong></div>
+          <div class="stat"><span>Elapsed</span><strong id="elapsedReadout">00:00</strong></div>
+          <div class="stat"><span>Remaining</span><strong id="remainingReadout">05:00</strong></div>
+          <div class="stat"><span>ETA</span><strong id="etaReadout">--:--</strong></div>
+        </div>
+      </div>
+    </section>
+
+    <aside class="side" aria-label="Timer controls">
+      <section class="control-panel">
+        <div class="panel-title">
+          <h2>Controls</h2>
+          <span id="storageStatus">Prefs ready</span>
+        </div>
+        <div class="control-stack">
+          <div class="field-group">
+            <div class="control-label">Mode</div>
+            <div class="button-grid" role="group" aria-label="Timer mode">
+              <button class="mode" type="button" data-mode="countdown" aria-pressed="true">Countdown</button>
+              <button class="mode" type="button" data-mode="countup" aria-pressed="false">Count Up</button>
+              <button class="mode" type="button" data-mode="clock" aria-pressed="false">Clock</button>
+            </div>
+          </div>
+
+          <div class="field-group" id="presetGroup">
+            <div class="control-label">Presets</div>
+            <div class="preset-grid" role="group" aria-label="Duration presets">
+              <button class="preset" type="button" data-duration="30000">00:30</button>
+              <button class="preset" type="button" data-duration="60000">01:00</button>
+              <button class="preset" type="button" data-duration="120000">02:00</button>
+              <button class="preset" type="button" data-duration="300000" aria-pressed="true">05:00</button>
+              <button class="preset" type="button" data-duration="600000">10:00</button>
+              <button class="preset" type="button" data-duration="900000">15:00</button>
+            </div>
+          </div>
+
+          <div class="field-group" id="customGroup">
+            <label for="durationInput">Custom duration</label>
+            <div class="duration-row">
+              <input id="durationInput" type="text" inputmode="numeric" autocomplete="off" spellcheck="false" placeholder="mm:ss or h:mm:ss" value="05:00">
+              <button type="button" id="applyDurationBtn">Apply</button>
+            </div>
+          </div>
+
+          <div class="field-group" id="thresholdGroup">
+            <div class="control-label">Warnings in seconds</div>
+            <div class="threshold-row">
+              <label>
+                <span class="sr-only">Warning threshold seconds</span>
+                <input id="warningInput" type="number" min="1" max="3600" step="1" value="60" aria-label="Warning threshold seconds">
+              </label>
+              <label>
+                <span class="sr-only">Danger threshold seconds</span>
+                <input id="dangerInput" type="number" min="1" max="3600" step="1" value="10" aria-label="Danger threshold seconds">
+              </label>
+            </div>
+          </div>
+
+          <div class="transport-grid" role="group" aria-label="Transport controls">
+            <button class="primary" type="button" id="startPauseBtn">Start</button>
+            <button type="button" id="resetBtn">Reset</button>
+            <button type="button" id="lapBtn">Mark</button>
+          </div>
+
+          <div class="field-group" id="adjustGroup">
+            <div class="control-label">Quick adjust</div>
+            <div class="adjust-grid" role="group" aria-label="Adjust timer">
+              <button type="button" data-adjust="-60000">-1m</button>
+              <button type="button" data-adjust="-30000">-30s</button>
+              <button type="button" data-adjust="30000">+30s</button>
+              <button type="button" data-adjust="60000">+1m</button>
+            </div>
+          </div>
+
+          <div class="stage-grid">
+            <button type="button" id="stageBtn">Stage View</button>
+            <button type="button" id="clearPrefsBtn">Clear Prefs</button>
+          </div>
+
+          <div class="hint" id="hint" role="status" aria-live="polite">Space starts the timer. F opens stage view.</div>
+        </div>
+      </section>
+
+      <section class="info-panel">
+        <div class="panel-title">
+          <h2>Shortcuts</h2>
+          <span id="markReadout">No marks</span>
+        </div>
+        <dl class="shortcut-list">
+          <dt>Space</dt><dd>Start or pause</dd>
+          <dt>R</dt><dd>Reset</dd>
+          <dt>F</dt><dd>Stage view</dd>
+          <dt>Up</dt><dd>Add 30 seconds</dd>
+          <dt>Down</dt><dd>Subtract 30 seconds</dd>
+          <dt>1 2 3</dt><dd>Countdown, count up, clock</dd>
+        </dl>
+        <p class="privacy-note">This page remembers the last mode, duration, and warning thresholds in this browser only.</p>
+      </section>
+    </aside>
+  </main>
+</div>
+
+<script>
+(() => {
+  'use strict';
+
+  const PREF_STORE = 'showTimer.preferences.v1';
+  const MAX_DURATION_MS = 24 * 60 * 60 * 1000;
+  const DEFAULTS = {
+    mode: 'countdown',
+    durationMs: 5 * 60 * 1000,
+    warningMs: 60 * 1000,
+    dangerMs: 10 * 1000
+  };
+
+  const els = {
+    timerDisplay: document.getElementById('timerDisplay'),
+    modeLabel: document.getElementById('modeLabel'),
+    stateLabel: document.getElementById('stateLabel'),
+    mainLabel: document.getElementById('mainLabel'),
+    supportText: document.getElementById('supportText'),
+    progressFill: document.getElementById('progressFill'),
+    targetReadout: document.getElementById('targetReadout'),
+    elapsedReadout: document.getElementById('elapsedReadout'),
+    remainingReadout: document.getElementById('remainingReadout'),
+    etaReadout: document.getElementById('etaReadout'),
+    durationInput: document.getElementById('durationInput'),
+    warningInput: document.getElementById('warningInput'),
+    dangerInput: document.getElementById('dangerInput'),
+    startPauseBtn: document.getElementById('startPauseBtn'),
+    resetBtn: document.getElementById('resetBtn'),
+    lapBtn: document.getElementById('lapBtn'),
+    stageBtn: document.getElementById('stageBtn'),
+    clearPrefsBtn: document.getElementById('clearPrefsBtn'),
+    applyDurationBtn: document.getElementById('applyDurationBtn'),
+    hint: document.getElementById('hint'),
+    storageStatus: document.getElementById('storageStatus'),
+    markReadout: document.getElementById('markReadout'),
+    clockReadout: document.getElementById('clockReadout'),
+    modeButtons: Array.from(document.querySelectorAll('[data-mode]')),
+    presetButtons: Array.from(document.querySelectorAll('[data-duration]')),
+    adjustButtons: Array.from(document.querySelectorAll('[data-adjust]')),
+    durationControls: Array.from(document.querySelectorAll('#presetGroup button, #customGroup input, #customGroup button, #adjustGroup button, #thresholdGroup input'))
+  };
+
+  const storage = (() => {
+    try {
+      const probe = 'showTimer.storage.probe';
+      window.localStorage.setItem(probe, '1');
+      window.localStorage.removeItem(probe);
+      return {
+        available: true,
+        get: key => window.localStorage.getItem(key),
+        set: (key, value) => {
+          window.localStorage.setItem(key, value);
+          return true;
+        },
+        remove: key => window.localStorage.removeItem(key)
+      };
+    } catch (error) {
+      return {
+        available: false,
+        get: () => null,
+        set: () => false,
+        remove: () => {}
+      };
+    }
+  })();
+
+  const prefs = loadPrefs();
+  const state = {
+    running: false,
+    elapsedMs: 0,
+    startedAt: 0,
+    frame: 0,
+    marks: []
+  };
+
+  function loadPrefs() {
+    const saved = storage.get(PREF_STORE);
+    if (!saved) return { ...DEFAULTS };
+    try {
+      const parsed = JSON.parse(saved);
+      const durationMs = clampNumber(parsed.durationMs, 1000, MAX_DURATION_MS, DEFAULTS.durationMs);
+      const warningMs = clampNumber(parsed.warningMs, 1000, MAX_DURATION_MS, DEFAULTS.warningMs);
+      const dangerMs = clampNumber(parsed.dangerMs, 1000, Math.max(1000, warningMs - 1000), DEFAULTS.dangerMs);
+      const mode = ['countdown', 'countup', 'clock'].includes(parsed.mode) ? parsed.mode : DEFAULTS.mode;
+      return { mode, durationMs, warningMs, dangerMs };
+    } catch (error) {
+      return { ...DEFAULTS };
+    }
+  }
+
+  function savePrefs() {
+    const saved = storage.set(PREF_STORE, JSON.stringify(prefs));
+    els.storageStatus.textContent = saved ? 'Prefs saved' : 'Prefs blocked';
+  }
+
+  function clampNumber(value, min, max, fallback) {
+    const number = Number(value);
+    if (!Number.isFinite(number)) return fallback;
+    return Math.min(max, Math.max(min, number));
+  }
+
+  function getElapsedMs() {
+    if (!state.running) return state.elapsedMs;
+    return state.elapsedMs + (performance.now() - state.startedAt);
+  }
+
+  function formatDuration(ms, options = {}) {
+    const showOverrun = options.showOverrun || false;
+    const isNegative = ms < 0;
+    const absMs = Math.abs(Math.trunc(ms));
+    const totalSeconds = Math.floor(absMs / 1000);
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    const prefix = isNegative && showOverrun ? '+' : '';
+    if (hours > 0) {
+      return `${prefix}${hours}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    }
+    return `${prefix}${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+  }
+
+  function formatClock(date = new Date()) {
+    return date.toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    });
+  }
+
+  function parseDuration(input) {
+    const raw = String(input || '').trim().toLowerCase();
+    if (!raw) return null;
+
+    const unitMatch = raw.match(/^(?:(\d+(?:\.\d+)?)h)?\s*(?:(\d+(?:\.\d+)?)m)?\s*(?:(\d+(?:\.\d+)?)s)?$/);
+    if (unitMatch && (unitMatch[1] || unitMatch[2] || unitMatch[3])) {
+      const hours = Number(unitMatch[1] || 0);
+      const minutes = Number(unitMatch[2] || 0);
+      const seconds = Number(unitMatch[3] || 0);
+      const totalMs = ((hours * 3600) + (minutes * 60) + seconds) * 1000;
+      return totalMs > 0 && totalMs <= MAX_DURATION_MS ? totalMs : null;
+    }
+
+    if (raw.includes(':')) {
+      const parts = raw.split(':').map(part => part.trim());
+      if (parts.length < 2 || parts.length > 3 || parts.some(part => !/^\d+$/.test(part))) return null;
+      const numbers = parts.map(Number);
+      const seconds = numbers[numbers.length - 1];
+      const minutes = numbers[numbers.length - 2];
+      const hours = numbers.length === 3 ? numbers[0] : 0;
+      if (seconds > 59 || minutes > 59 || hours > 23) return null;
+      const totalMs = ((hours * 3600) + (minutes * 60) + seconds) * 1000;
+      return totalMs > 0 && totalMs <= MAX_DURATION_MS ? totalMs : null;
+    }
+
+    if (/^\d+(?:\.\d+)?$/.test(raw)) {
+      const totalMs = Number(raw) * 60 * 1000;
+      return totalMs > 0 && totalMs <= MAX_DURATION_MS ? totalMs : null;
+    }
+
+    return null;
+  }
+
+  function visualState(remainingMs) {
+    if (prefs.mode !== 'countdown') return 'normal';
+    if (remainingMs < 0) return 'overrun';
+    if (remainingMs <= prefs.dangerMs) return 'danger';
+    if (remainingMs <= prefs.warningMs) return 'warning';
+    return 'normal';
+  }
+
+  function setMode(mode) {
+    if (!['countdown', 'countup', 'clock'].includes(mode)) return;
+    pause(false);
+    prefs.mode = mode;
+    state.elapsedMs = 0;
+    state.marks = [];
+    savePrefs();
+    render();
+    scheduleFrame();
+    pulse(document.querySelector(`[data-mode="${mode}"]`), 'success');
+    announce(mode === 'clock' ? 'Clock mode active.' : `${mode === 'countup' ? 'Count up' : 'Countdown'} mode ready.`, 'success');
+  }
+
+  function setDuration(ms, options = {}) {
+    prefs.durationMs = clampNumber(ms, 1000, MAX_DURATION_MS, DEFAULTS.durationMs);
+    if (options.reset !== false) {
+      state.elapsedMs = 0;
+      state.startedAt = performance.now();
+      state.marks = [];
+    }
+    savePrefs();
+    render();
+  }
+
+  function applyCustomDuration() {
+    const parsed = parseDuration(els.durationInput.value);
+    if (!parsed) {
+      pulse(els.durationInput, 'error');
+      announce('Use mm:ss, h:mm:ss, 5m, 90s, or a plain minute value.', 'error');
+      return;
+    }
+    setDuration(parsed);
+    pulse(els.applyDurationBtn, 'success');
+    announce(`Duration set to ${formatDuration(parsed)}.`, 'success');
+  }
+
+  function applyThresholds() {
+    const warningSeconds = Number(els.warningInput.value);
+    const dangerSeconds = Number(els.dangerInput.value);
+    if (!Number.isFinite(warningSeconds) || !Number.isFinite(dangerSeconds) || warningSeconds <= 0 || dangerSeconds <= 0 || dangerSeconds >= warningSeconds) {
+      pulse(els.warningInput, 'error');
+      pulse(els.dangerInput, 'error');
+      announce('Warning seconds must be greater than danger seconds.', 'error');
+      els.warningInput.value = Math.round(prefs.warningMs / 1000);
+      els.dangerInput.value = Math.round(prefs.dangerMs / 1000);
+      return;
+    }
+    prefs.warningMs = Math.round(warningSeconds * 1000);
+    prefs.dangerMs = Math.round(dangerSeconds * 1000);
+    savePrefs();
+    render();
+    announce('Warning thresholds saved.', 'success');
+  }
+
+  function toggleRun() {
+    if (prefs.mode === 'clock') {
+      announce('Clock mode updates live.', 'success');
+      pulse(els.startPauseBtn, 'success');
+      return;
+    }
+    state.running ? pause(true) : start();
+  }
+
+  function start() {
+    if (state.running) return;
+    state.running = true;
+    state.startedAt = performance.now();
+    scheduleFrame();
+    render();
+    announce('Timer running.', 'success');
+    pulse(els.startPauseBtn, 'success');
+  }
+
+  function pause(showHint) {
+    if (!state.running) return;
+    state.elapsedMs = getElapsedMs();
+    state.running = false;
+    cancelAnimationFrame(state.frame);
+    state.frame = 0;
+    render();
+    if (showHint) announce('Timer paused.', 'success');
+  }
+
+  function resetTimer() {
+    state.running = false;
+    state.elapsedMs = 0;
+    state.startedAt = performance.now();
+    state.marks = [];
+    cancelAnimationFrame(state.frame);
+    state.frame = 0;
+    render();
+    scheduleFrame();
+    announce('Timer reset.', 'success');
+    pulse(els.resetBtn, 'success');
+  }
+
+  function quickAdjust(deltaMs) {
+    if (prefs.mode === 'clock') {
+      announce('Quick adjust is disabled in clock mode.', 'error');
+      return;
+    }
+    if (prefs.mode === 'countdown') {
+      setDuration(prefs.durationMs + deltaMs, { reset: false });
+      announce(deltaMs > 0 ? 'Target increased.' : 'Target reduced.', 'success');
+      return;
+    }
+    state.elapsedMs = Math.max(0, getElapsedMs() + deltaMs);
+    if (state.running) state.startedAt = performance.now();
+    render();
+    announce(deltaMs > 0 ? 'Count up advanced.' : 'Count up backed up.', 'success');
+  }
+
+  function addMark() {
+    if (prefs.mode === 'clock') {
+      announce('Marks are for running timers.', 'error');
+      pulse(els.lapBtn, 'error');
+      return;
+    }
+    const elapsed = getElapsedMs();
+    state.marks.push(elapsed);
+    if (state.marks.length > 6) state.marks.shift();
+    els.markReadout.textContent = `Mark ${state.marks.length}: ${formatDuration(elapsed)}`;
+    announce(`Mark saved at ${formatDuration(elapsed)}.`, 'success');
+    pulse(els.lapBtn, 'success');
+  }
+
+  function scheduleFrame() {
+    cancelAnimationFrame(state.frame);
+    if (state.running || prefs.mode === 'clock') {
+      state.frame = requestAnimationFrame(tick);
+    }
+  }
+
+  function tick() {
+    render();
+    state.frame = requestAnimationFrame(tick);
+  }
+
+  function updateControlState() {
+    els.modeButtons.forEach(button => {
+      button.setAttribute('aria-pressed', String(button.dataset.mode === prefs.mode));
+    });
+    els.presetButtons.forEach(button => {
+      const active = Number(button.dataset.duration) === prefs.durationMs;
+      button.setAttribute('aria-pressed', String(active));
+    });
+    if (document.activeElement !== els.durationInput) {
+      els.durationInput.value = formatDuration(prefs.durationMs);
+    }
+    if (document.activeElement !== els.warningInput) {
+      els.warningInput.value = Math.round(prefs.warningMs / 1000);
+    }
+    if (document.activeElement !== els.dangerInput) {
+      els.dangerInput.value = Math.round(prefs.dangerMs / 1000);
+    }
+    const clockMode = prefs.mode === 'clock';
+    els.durationControls.forEach(control => {
+      control.disabled = clockMode;
+    });
+    els.resetBtn.disabled = clockMode;
+    els.lapBtn.disabled = clockMode;
+    els.startPauseBtn.textContent = clockMode ? 'Live Clock' : state.running ? 'Pause' : 'Start';
+  }
+
+  function render() {
+    const now = new Date();
+    els.clockReadout.textContent = formatClock(now);
+    const elapsed = getElapsedMs();
+    const remaining = prefs.durationMs - elapsed;
+    const displayValue = prefs.mode === 'clock'
+      ? formatClock(now)
+      : prefs.mode === 'countup'
+        ? formatDuration(elapsed)
+        : formatDuration(remaining, { showOverrun: true });
+    const stateName = visualState(remaining);
+    document.body.dataset.timerState = stateName;
+    els.timerDisplay.textContent = displayValue;
+    els.modeLabel.textContent = prefs.mode === 'countdown' ? 'Countdown' : prefs.mode === 'countup' ? 'Count up' : 'Time of day';
+
+    if (prefs.mode === 'clock') {
+      els.stateLabel.textContent = 'Live clock';
+      els.mainLabel.textContent = 'Time of day';
+      els.supportText.textContent = 'Use stage view for a clean clock display at front of house or backstage.';
+      els.targetReadout.textContent = 'Clock';
+      els.elapsedReadout.textContent = '--';
+      els.remainingReadout.textContent = '--';
+      els.etaReadout.textContent = now.toLocaleDateString();
+      els.progressFill.style.width = '100%';
+      updateControlState();
+      return;
+    }
+
+    const stateCopy = {
+      normal: state.running ? 'Running' : 'Ready',
+      warning: state.running ? 'Warning' : 'Warning zone',
+      danger: state.running ? 'Final seconds' : 'Danger zone',
+      overrun: 'Overrun'
+    };
+    els.stateLabel.textContent = stateCopy[stateName] || 'Ready';
+    els.mainLabel.textContent = prefs.mode === 'countup' ? 'Count up timer' : stateName === 'overrun' ? 'Overrun' : 'Stage timer';
+    els.supportText.textContent = prefs.mode === 'countup'
+      ? 'Count upward for rehearsals, holds, breaks, and room resets.'
+      : stateName === 'overrun'
+        ? 'The segment has passed target. The display now shows overrun time.'
+        : 'Preset a segment, start the clock, and use warning states as the cue approaches.';
+    els.targetReadout.textContent = prefs.mode === 'countup' ? formatDuration(prefs.durationMs) : formatDuration(prefs.durationMs);
+    els.elapsedReadout.textContent = formatDuration(elapsed);
+    els.remainingReadout.textContent = prefs.mode === 'countup' ? '--' : formatDuration(remaining, { showOverrun: true });
+    if (prefs.mode === 'countdown') {
+      els.etaReadout.textContent = remaining >= 0 ? formatClock(new Date(Date.now() + remaining)) : 'Past';
+    } else {
+      els.etaReadout.textContent = state.running ? 'Running' : 'Ready';
+    }
+    const progress = prefs.mode === 'countdown'
+      ? Math.min(100, Math.max(0, elapsed / prefs.durationMs * 100))
+      : Math.min(100, Math.max(0, elapsed / prefs.durationMs * 100));
+    els.progressFill.style.width = `${progress}%`;
+    updateControlState();
+  }
+
+  function announce(message, type) {
+    els.hint.textContent = message;
+    els.hint.classList.remove('success', 'error');
+    if (type) els.hint.classList.add(type);
+  }
+
+  function pulse(element, type) {
+    if (!element) return;
+    const className = type === 'error' ? 'feedback-error' : 'feedback-success';
+    element.classList.remove('feedback-error', 'feedback-success');
+    void element.offsetWidth;
+    element.classList.add(className);
+    window.setTimeout(() => element.classList.remove(className), 220);
+  }
+
+  function enterStageView() {
+    document.body.classList.add('stage-view');
+    els.stageBtn.textContent = 'Exit Stage';
+    if (document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    }
+    announce('Stage view active. Press Esc to exit.', 'success');
+  }
+
+  function exitStageView() {
+    document.body.classList.remove('stage-view');
+    els.stageBtn.textContent = 'Stage View';
+    if (document.fullscreenElement && document.exitFullscreen) {
+      document.exitFullscreen().catch(() => {});
+    }
+    announce('Stage view closed.', 'success');
+  }
+
+  function toggleStageView() {
+    document.body.classList.contains('stage-view') ? exitStageView() : enterStageView();
+  }
+
+  function clearPrefs() {
+    storage.remove(PREF_STORE);
+    Object.assign(prefs, DEFAULTS);
+    resetTimer();
+    savePrefs();
+    announce('Preferences cleared.', 'success');
+    pulse(els.clearPrefsBtn, 'success');
+  }
+
+  function attachPressFeedback(button) {
+    button.addEventListener('pointerdown', () => button.classList.add('is-pressing'));
+    ['pointerup', 'pointercancel', 'pointerleave', 'blur'].forEach(eventName => {
+      button.addEventListener(eventName, () => button.classList.remove('is-pressing'));
+    });
+  }
+
+  els.modeButtons.forEach(button => {
+    button.addEventListener('click', () => setMode(button.dataset.mode));
+  });
+  els.presetButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      setDuration(Number(button.dataset.duration));
+      announce(`Preset ${button.textContent.trim()} selected.`, 'success');
+      pulse(button, 'success');
+    });
+  });
+  els.adjustButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      quickAdjust(Number(button.dataset.adjust));
+      pulse(button, 'success');
+    });
+  });
+  Array.from(document.querySelectorAll('button')).forEach(attachPressFeedback);
+
+  els.applyDurationBtn.addEventListener('click', applyCustomDuration);
+  els.durationInput.addEventListener('keydown', event => {
+    if (event.key === 'Enter') applyCustomDuration();
+  });
+  els.warningInput.addEventListener('change', applyThresholds);
+  els.dangerInput.addEventListener('change', applyThresholds);
+  els.startPauseBtn.addEventListener('click', toggleRun);
+  els.resetBtn.addEventListener('click', resetTimer);
+  els.lapBtn.addEventListener('click', addMark);
+  els.stageBtn.addEventListener('click', toggleStageView);
+  els.clearPrefsBtn.addEventListener('click', clearPrefs);
+  document.addEventListener('fullscreenchange', () => {
+    if (!document.fullscreenElement && document.body.classList.contains('stage-view')) {
+      document.body.classList.remove('stage-view');
+      els.stageBtn.textContent = 'Stage View';
+    }
+  });
+  document.addEventListener('keydown', event => {
+    const target = event.target;
+    const typing = target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target instanceof HTMLSelectElement;
+    if (typing) return;
+    if (event.key === ' ') {
+      event.preventDefault();
+      toggleRun();
+    } else if (event.key.toLowerCase() === 'r') {
+      resetTimer();
+    } else if (event.key.toLowerCase() === 'f') {
+      toggleStageView();
+    } else if (event.key === 'Escape' && document.body.classList.contains('stage-view')) {
+      exitStageView();
+    } else if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      quickAdjust(30000);
+    } else if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      quickAdjust(-30000);
+    } else if (event.key === '1') {
+      setMode('countdown');
+    } else if (event.key === '2') {
+      setMode('countup');
+    } else if (event.key === '3') {
+      setMode('clock');
+    }
+  });
+
+  if (!storage.available) {
+    els.storageStatus.textContent = 'Prefs blocked';
+    announce('Timer works, but preference storage is unavailable in this browser.', 'error');
+  }
+  render();
+  scheduleFrame();
+})();
+</script>
+</body>
+</html>
