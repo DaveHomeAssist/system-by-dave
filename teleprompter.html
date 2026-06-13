@@ -231,6 +231,7 @@
   }
   input.time-input:hover,input.time-input:focus{background:#232c3b;border-color:#465467}
   input.time-input::placeholder{color:#768294}
+  input.start-input{width:72px}
   .swatches{display:flex;align-items:center;gap:5px}
   .swatch{
     width:28px;height:28px;min-width:28px;padding:0;border-radius:999px;
@@ -535,11 +536,14 @@
   }
   .rundown-row{
     display:grid;
-    grid-template-columns:minmax(0,1fr) 72px 72px 58px auto;
+    grid-template-columns:minmax(0,1fr) 68px 68px 78px 52px auto;
     align-items:center;
     gap:10px;
     padding:9px 10px;
     border-bottom:1px solid rgba(255,255,255,.06);
+  }
+  .rundown-row.no-clock{
+    grid-template-columns:minmax(0,1fr) 72px 72px 58px auto;
   }
   .rundown-row:last-child{border-bottom:0}
   .rundown-title{
@@ -734,8 +738,9 @@
     .remote-now{grid-template-columns:1fr}
     .remote-controls{grid-template-columns:1fr 1fr}
     .rundown-backdrop{padding:10px}
-    .rundown-row{grid-template-columns:minmax(0,1fr) 62px 62px auto}
-    .rundown-row .rundown-time:nth-of-type(3){display:none}
+    .rundown-row{grid-template-columns:minmax(0,1fr) 62px 62px 72px auto}
+    .rundown-row.no-clock{grid-template-columns:minmax(0,1fr) 62px 62px auto}
+    .rundown-percent{display:none}
     #script{font-size:18px;padding:16px}
   }
 
@@ -806,6 +811,8 @@
       <span class="label">Run</span>
       <input id="targetTimeInput" class="time-input" type="text" inputmode="numeric" placeholder="02:00" title="Target runtime, for example 02:00" aria-label="Target runtime">
       <button id="fitTimeBtn" type="button" title="Set speed to target runtime">Fit</button>
+      <input id="startTimeInput" class="time-input start-input" type="text" inputmode="numeric" placeholder="Start" title="Show start time, for example 14:30 or 2:30p" aria-label="Show start time">
+      <button id="startNowBtn" type="button" title="Set show start to the current time">Now</button>
     </div>
 
     <div class="group" aria-label="Manual scroll">
@@ -939,6 +946,7 @@
         <span id="remainingOut">Left 00:00</span>
         <span id="progressOut">0%</span>
         <span class="pace-readout" id="paceOut" hidden>On target</span>
+        <span class="pace-readout" id="scheduleOut" hidden>End 00:00</span>
         <span class="marker-readout" id="markerOut">No markers</span>
         <span class="progress-rail" aria-hidden="true"><span class="progress-fill" id="progressFill"></span></span>
       </div>
@@ -1045,6 +1053,8 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   var importShowBtn = $('importShowBtn');
   var targetTimeInput = $('targetTimeInput');
   var fitTimeBtn = $('fitTimeBtn');
+  var startTimeInput = $('startTimeInput');
+  var startNowBtn = $('startNowBtn');
   var saveHint = $('saveHint');
   var storageStatus = $('storageStatus');
   var fontFaceSelect = $('fontFaceSelect');
@@ -1059,6 +1069,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   var remainingOut = $('remainingOut');
   var progressOut = $('progressOut');
   var paceOut = $('paceOut');
+  var scheduleOut = $('scheduleOut');
   var progressFill = $('progressFill');
   var scriptMeta = $('scriptMeta');
   var markerSelect = $('markerSelect');
@@ -1097,6 +1108,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   };
   var FONT_FACE = 'system';
   var TEXT_COLOR = 'white';
+  var showStartMinutes = null;
 
   var STORE = 'teleprompter.v1';
   var CUE_SECONDS = 3;
@@ -1198,6 +1210,12 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     return seconds > 0 ? clamp(seconds, TARGET_RUNTIME.min, TARGET_RUNTIME.max) : 0;
   }
 
+  function sanitizeShowStart(value){
+    if(value === null || typeof value === 'undefined' || value === '') return null;
+    var minutes = Math.round(Number(value));
+    return Number.isFinite(minutes) && minutes >= 0 && minutes < 1440 ? minutes : null;
+  }
+
   function loadSettings(){
     try{
       var raw = storage.get(STORE);
@@ -1208,6 +1226,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
       if(typeof s.lh==='number')    LH.val    = clamp(s.lh, LH.min, LH.max);
       if(typeof s.width==='number') WIDTH.val = clamp(s.width, WIDTH.min, WIDTH.max);
       if(typeof s.targetRuntime==='number') TARGET_RUNTIME.val = sanitizeTargetRuntime(s.targetRuntime);
+      if(typeof s.showStartMinutes==='number') showStartMinutes = sanitizeShowStart(s.showStartMinutes);
       if(typeof s.mirror==='boolean') mirror = s.mirror;
       if(typeof s.centerline==='boolean') centerline = s.centerline;
       if(typeof s.fontFace==='string') FONT_FACE = sanitizeFontFace(s.fontFace);
@@ -1218,6 +1237,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     var saved = storage.set(STORE, JSON.stringify({
       speed:SPEED.val, font:FONT.val, lh:LH.val, width:WIDTH.val,
       targetRuntime:TARGET_RUNTIME.val,
+      showStartMinutes:showStartMinutes,
       mirror:mirror, centerline:centerline, fontFace:FONT_FACE, textColor:TEXT_COLOR
     }));
     if(!saved) updateStorageUi();
@@ -1494,6 +1514,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
         title:marker.title,
         line:marker.line,
         start:start,
+        clock:showStartMinutes === null ? '' : formatClockLabel(showStartMinutes, start),
         duration:duration,
         pct:pct
       };
@@ -1513,10 +1534,10 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
       return;
     }
     var total = SPEED.val > 0 ? maxScroll / SPEED.val : 0;
-    rundownSummary.textContent = rows.length + ' markers · ' + formatTime(total) + ' run' + (TARGET_RUNTIME.val ? ' · target ' + formatTime(TARGET_RUNTIME.val) : '');
+    rundownSummary.textContent = rows.length + ' markers · ' + formatTime(total) + ' run' + (TARGET_RUNTIME.val ? ' · target ' + formatTime(TARGET_RUNTIME.val) : '') + (showStartMinutes === null ? '' : ' · start ' + formatClockLabel(showStartMinutes, 0));
     rows.forEach(function(row){
       var item = document.createElement('div');
-      item.className = 'rundown-row';
+      item.className = 'rundown-row ' + (showStartMinutes === null ? 'no-clock' : 'has-clock');
       var title = document.createElement('div');
       title.className = 'rundown-title';
       title.textContent = (row.index + 1) + '. ' + row.title;
@@ -1529,8 +1550,11 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
       var duration = document.createElement('span');
       duration.className = 'rundown-time';
       duration.textContent = '+' + formatTime(row.duration);
+      var clock = document.createElement('span');
+      clock.className = 'rundown-time rundown-clock';
+      clock.textContent = row.clock;
       var pct = document.createElement('span');
-      pct.className = 'rundown-time';
+      pct.className = 'rundown-time rundown-percent';
       pct.textContent = row.pct + '%';
       var jump = document.createElement('button');
       jump.type = 'button';
@@ -1540,6 +1564,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
       item.appendChild(title);
       item.appendChild(start);
       item.appendChild(duration);
+      if(showStartMinutes !== null) item.appendChild(clock);
       item.appendChild(pct);
       item.appendChild(jump);
       rundownBody.appendChild(item);
@@ -1559,6 +1584,27 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
       return h + ':' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
     }
     return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+  }
+
+  function formatShowStartInput(minutes){
+    minutes = sanitizeShowStart(minutes);
+    if(minutes === null) return '';
+    return String(Math.floor(minutes / 60)).padStart(2, '0') + ':' + String(minutes % 60).padStart(2, '0');
+  }
+
+  function formatClockLabel(startMinutes, offsetSeconds){
+    var minutes = sanitizeShowStart(startMinutes);
+    var total;
+    var hour;
+    var minute;
+    var suffix;
+    if(minutes === null) return '';
+    total = (minutes + Math.round(Math.max(0, offsetSeconds || 0) / 60)) % 1440;
+    hour = Math.floor(total / 60);
+    minute = total % 60;
+    suffix = hour >= 12 ? 'PM' : 'AM';
+    hour = hour % 12 || 12;
+    return hour + ':' + String(minute).padStart(2, '0') + ' ' + suffix;
   }
 
   function parseRuntimeInput(value){
@@ -1582,6 +1628,41 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     return nums[0] * 3600 + nums[1] * 60 + nums[2];
   }
 
+  function parseShowStartInput(value){
+    var raw = (value || '').trim().toLowerCase();
+    var suffix = '';
+    var compact;
+    var match;
+    var hour;
+    var minute;
+    if(!raw) return null;
+    raw = raw.replace(/\s+/g, '');
+    match = raw.match(/(am|pm|a|p)$/);
+    if(match){
+      suffix = match[1].charAt(0);
+      raw = raw.slice(0, -match[1].length);
+    }
+    compact = raw.match(/^\d{3,4}$/);
+    if(compact && raw.indexOf(':') === -1){
+      hour = Number(raw.slice(0, -2));
+      minute = Number(raw.slice(-2));
+    }else{
+      match = raw.match(/^(\d{1,2})(?::([0-5]\d))?$/);
+      if(!match) return NaN;
+      hour = Number(match[1]);
+      minute = match[2] ? Number(match[2]) : 0;
+    }
+    if(!Number.isFinite(hour) || !Number.isFinite(minute) || minute < 0 || minute > 59) return NaN;
+    if(suffix){
+      if(hour < 1 || hour > 12) return NaN;
+      if(hour === 12) hour = 0;
+      if(suffix === 'p') hour += 12;
+    }else if(hour < 0 || hour > 23){
+      return NaN;
+    }
+    return hour * 60 + minute;
+  }
+
   function setTargetRuntimeFromInput(showNotice){
     var parsed = parseRuntimeInput(targetTimeInput ? targetTimeInput.value : '');
     if(parsed === 0){
@@ -1589,6 +1670,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
       if(targetTimeInput) targetTimeInput.value = '';
       saveSettings();
       updateRunHud();
+      refreshRundownIfOpen();
       updatePrediction();
       if(showNotice) showHintNotice('Target runtime cleared.', 'success');
       return true;
@@ -1602,10 +1684,55 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     if(targetTimeInput) targetTimeInput.value = formatTime(TARGET_RUNTIME.val);
     saveSettings();
     updateRunHud();
+    refreshRundownIfOpen();
     savePreferences('target-runtime');
     updatePrediction();
     if(showNotice) showHintNotice('Target runtime set to ' + formatTime(TARGET_RUNTIME.val) + '.', 'success');
     return true;
+  }
+
+  function setShowStartFromInput(showNotice){
+    var parsed = parseShowStartInput(startTimeInput ? startTimeInput.value : '');
+    if(parsed === null){
+      showStartMinutes = null;
+      if(startTimeInput) startTimeInput.value = '';
+      saveSettings();
+      updateRunHud();
+      refreshRundownIfOpen();
+      updatePrediction();
+      scheduleRemoteState(true);
+      if(showNotice) showHintNotice('Show start cleared.', 'success');
+      return true;
+    }
+    if(!Number.isFinite(parsed)){
+      signalError(startTimeInput);
+      showHintNotice('Use a start time like 14:30, 2:30p, or 930.', 'error');
+      return false;
+    }
+    showStartMinutes = sanitizeShowStart(parsed);
+    if(startTimeInput) startTimeInput.value = formatShowStartInput(showStartMinutes);
+    saveSettings();
+    updateRunHud();
+    refreshRundownIfOpen();
+    savePreferences('show-start');
+    updatePrediction();
+    scheduleRemoteState(true);
+    if(showNotice) showHintNotice('Show start set to ' + formatClockLabel(showStartMinutes, 0) + '.', 'success');
+    return true;
+  }
+
+  function setShowStartToNow(){
+    var now = new Date();
+    showStartMinutes = now.getHours() * 60 + now.getMinutes();
+    if(startTimeInput) startTimeInput.value = formatShowStartInput(showStartMinutes);
+    saveSettings();
+    updateRunHud();
+    refreshRundownIfOpen();
+    savePreferences('show-start-now');
+    updatePrediction();
+    scheduleRemoteState(true);
+    signalSuccess(startNowBtn);
+    showHintNotice('Show start set to now.', 'success');
   }
 
   function currentPaceState(total){
@@ -1633,6 +1760,17 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     if(pace && pace.status !== 'none') paceOut.classList.add('pace-' + pace.status);
   }
 
+  function updateScheduleUi(total){
+    if(!scheduleOut) return;
+    if(showStartMinutes === null){
+      scheduleOut.hidden = true;
+      scheduleOut.textContent = '';
+      return;
+    }
+    scheduleOut.hidden = false;
+    scheduleOut.textContent = 'End ' + formatClockLabel(showStartMinutes, total);
+  }
+
   function updateRunHud(){
     var total = SPEED.val > 0 ? maxScroll / SPEED.val : 0;
     var elapsed = SPEED.val > 0 ? clamp(pos / SPEED.val, 0, total) : 0;
@@ -1643,11 +1781,12 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     if(remainingOut) remainingOut.textContent = 'Left ' + formatTime(remaining);
     if(progressOut) progressOut.textContent = pct + '%';
     updatePaceUi(pace);
+    updateScheduleUi(total);
     if(progressFill) progressFill.style.width = pct + '%';
     if(markerOut && !scriptMarkers.length) markerOut.textContent = 'No markers';
     if(scriptMeta){
       var rate = scriptStats.words && total ? Math.round(scriptStats.words / Math.max(total / 60, 0.01)) : 0;
-      scriptMeta.textContent = scriptStats.words + ' words · ' + formatTime(total) + ' run' + (TARGET_RUNTIME.val ? ' · target ' + formatTime(TARGET_RUNTIME.val) : '') + (rate ? ' · ' + rate + ' wpm' : '') + (scriptMarkers.length ? ' · ' + scriptMarkers.length + ' markers' : '');
+      scriptMeta.textContent = scriptStats.words + ' words · ' + formatTime(total) + ' run' + (TARGET_RUNTIME.val ? ' · target ' + formatTime(TARGET_RUNTIME.val) : '') + (showStartMinutes === null ? '' : ' · start ' + formatClockLabel(showStartMinutes, 0) + ' · end ' + formatClockLabel(showStartMinutes, total)) + (rate ? ' · ' + rate + ' wpm' : '') + (scriptMarkers.length ? ' · ' + scriptMarkers.length + ' markers' : '');
     }
     scheduleRemoteState(false);
   }
@@ -1663,6 +1802,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
       remaining:remainingOut ? remainingOut.textContent : 'Left 00:00',
       progress:progressOut ? progressOut.textContent : '0%',
       pace:paceOut && !paceOut.hidden ? paceOut.textContent : '',
+      schedule:scheduleOut && !scheduleOut.hidden ? scheduleOut.textContent : '',
       marker:markerText || 'No markers',
       markerCount:scriptMarkers.length,
       title:scriptTitle(),
@@ -1721,7 +1861,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
       remoteStateOut.textContent = state.cueing ? 'Cueing' : (state.playing ? 'Playing' : (state.reading ? 'Paused' : 'Edit'));
     }
     if(remoteTimerOut){
-      remoteTimerOut.textContent = state.progress + ' · ' + state.timer + (state.pace ? ' · ' + state.pace : '');
+      remoteTimerOut.textContent = state.progress + ' · ' + state.timer + (state.pace ? ' · ' + state.pace : '') + (state.schedule ? ' · ' + state.schedule : '');
     }
     if(remoteMarkerOut){
       remoteMarkerOut.textContent = state.marker || 'No markers';
@@ -1836,6 +1976,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
       lh:LH.val,
       width:WIDTH.val,
       targetRuntime:TARGET_RUNTIME.val,
+      showStartMinutes:showStartMinutes,
       mirror:mirror,
       centerline:centerline,
       fontFace:FONT_FACE,
@@ -1850,6 +1991,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     if(typeof format.lh==='number') LH.val = clamp(format.lh, LH.min, LH.max);
     if(typeof format.width==='number') WIDTH.val = clamp(format.width, WIDTH.min, WIDTH.max);
     if(typeof format.targetRuntime==='number') TARGET_RUNTIME.val = sanitizeTargetRuntime(format.targetRuntime);
+    if(Object.prototype.hasOwnProperty.call(format, 'showStartMinutes')) showStartMinutes = sanitizeShowStart(format.showStartMinutes);
     if(typeof format.mirror==='boolean') mirror = format.mirror;
     if(typeof format.centerline==='boolean') centerline = format.centerline;
     if(typeof format.fontFace==='string') FONT_FACE = sanitizeFontFace(format.fontFace);
@@ -2279,6 +2421,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     $('lhOut').textContent    = LH.val.toFixed(1);
     $('widthOut').textContent = String(WIDTH.val);
     if(targetTimeInput) targetTimeInput.value = TARGET_RUNTIME.val ? formatTime(TARGET_RUNTIME.val) : '';
+    if(startTimeInput) startTimeInput.value = showStartMinutes === null ? '' : formatShowStartInput(showStartMinutes);
     body.classList.toggle('mirror', mirror);
     body.classList.toggle('centerline', centerline);
     $('mirrorBtn').setAttribute('aria-pressed', String(mirror));
@@ -2620,7 +2763,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   function changeFont(dir){ bump(FONT, dir, 'fontOut'); applyMetric(); }
   function changeLH(dir){ bump(LH, dir, 'lhOut', function(v){return v.toFixed(1);}); applyMetric(); }
   function changeWidth(dir){ bump(WIDTH, dir, 'widthOut'); applyMetric(); }
-  function changeSpeed(dir){ bump(SPEED, dir, 'speedOut'); updateRunHud(); savePreferences('speed'); updatePrediction(); }
+  function changeSpeed(dir){ bump(SPEED, dir, 'speedOut'); updateRunHud(); refreshRundownIfOpen(); savePreferences('speed'); updatePrediction(); }
   function fitSpeedToTargetRuntime(){
     var rawSpeed;
     var fittedSpeed;
@@ -2649,6 +2792,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     saveSettings();
     applySettings();
     updateRunHud();
+    refreshRundownIfOpen();
     savePreferences('fit-runtime');
     updatePrediction();
     scheduleRemoteState(true);
@@ -2847,6 +2991,14 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
       fitSpeedToTargetRuntime();
     }
   });
+  startTimeInput.addEventListener('change', function(){ setShowStartFromInput(true); });
+  startTimeInput.addEventListener('keydown', function(e){
+    if(e.key === 'Enter'){
+      e.preventDefault();
+      setShowStartFromInput(true);
+    }
+  });
+  startNowBtn.addEventListener('click', setShowStartToNow);
   exportShowBtn.addEventListener('click', exportShowPackage);
   importShowBtn.addEventListener('click', function(){
     showPackageInput.value = '';
