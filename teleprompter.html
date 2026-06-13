@@ -629,6 +629,23 @@
     #script{font-size:18px;padding:16px}
   }
 
+  @media (max-width:520px){
+    header.bar{gap:6px;padding:8px 10px}
+    header.bar .brand{min-width:0;flex:1}
+    header.bar .spacer{display:none}
+    header.bar button.ghost{
+      width:38px;
+      min-width:38px;
+      padding:8px 0;
+      overflow:hidden;
+      font-size:0;
+    }
+    header.bar button.ghost::before{font-size:15px}
+    #remoteBtn::before{content:"⇄"}
+    #editBtn::before{content:"✎"}
+    #helpBtn::before{content:"⌨"}
+  }
+
   /* No-JS: show the script plainly, hide JS-only chrome */
   .noscript-note{
     display:none;padding:14px 18px;background:#2a1f12;color:#ffd9a8;
@@ -743,6 +760,12 @@
       <button id="saveFileBtn" type="button" title="Save script to a text file" aria-label="Save script to file">⇩ Save</button>
       <button id="loadFileBtn" type="button" title="Load script from a text file" aria-label="Load script from file">⇧ Load</button>
     </div>
+
+    <div class="group" aria-label="Show package">
+      <span class="label">Show</span>
+      <button id="exportShowBtn" type="button" title="Export current script, formatting, and saved scripts">Export</button>
+      <button id="importShowBtn" type="button" title="Import a teleprompter show package">Import</button>
+    </div>
   </div>
 
   <section class="remote-panel" id="remotePanel" aria-label="Teleprompter remote control">
@@ -785,6 +808,7 @@
     </div>
   </section>
   <input id="scriptFileInput" class="file-input" type="file" accept=".txt,.md,text/plain,text/markdown">
+  <input id="showPackageInput" class="file-input" type="file" accept=".json,application/json">
 
   <!-- Reader + Editor -->
   <main>
@@ -884,6 +908,9 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   var script   = $('script');
   var toast    = $('toast');
   var fileInput = $('scriptFileInput');
+  var showPackageInput = $('showPackageInput');
+  var exportShowBtn = $('exportShowBtn');
+  var importShowBtn = $('importShowBtn');
   var saveHint = $('saveHint');
   var storageStatus = $('storageStatus');
   var fontFaceSelect = $('fontFaceSelect');
@@ -1051,6 +1078,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   var SCRIPT_STORE = 'teleprompter.script.v1';
   var PREF_STORE = 'teleprompter.preferences.v1';
   var SAVED_SCRIPTS_STORE = 'teleprompter.savedScripts.v1';
+  var SHOW_PACKAGE_SCHEMA = 'system-by-dave.teleprompter.show.v1';
   var REMOTE_SESSION_STORE = 'teleprompter.remoteSession.v1';
   var REMOTE_BUS_STORE = 'teleprompter.remoteBus.v1';
   var MAX_SAVED_SCRIPTS = 24;
@@ -1753,6 +1781,175 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     readerForFile.readAsText(file);
   }
 
+  function showPackageFileName(){
+    var d = new Date();
+    var yyyy = d.getFullYear();
+    var mm = String(d.getMonth() + 1).padStart(2, '0');
+    var dd = String(d.getDate()).padStart(2, '0');
+    var stem = likelyFileStem();
+    rememberFileStem(stem);
+    return stem + '-' + yyyy + '-' + mm + '-' + dd + '.teleprompter-show.json';
+  }
+
+  function savedScriptDedupeKey(item){
+    return (item.title || '') + '\n' + (item.text || '');
+  }
+
+  function savedScriptForPackage(item){
+    var clean = sanitizeSavedScript(item);
+    if(!clean) return null;
+    return {
+      title:clean.title,
+      text:clean.text,
+      format:clean.format,
+      updatedAt:clean.updatedAt
+    };
+  }
+
+  function buildShowPackage(){
+    return {
+      schema:SHOW_PACKAGE_SCHEMA,
+      exportedAt:new Date().toISOString(),
+      title:scriptTitle(),
+      script:script.value || '',
+      format:currentFormatSnapshot(),
+      savedScripts:savedScripts.map(savedScriptForPackage).filter(Boolean).slice(0, MAX_SAVED_SCRIPTS)
+    };
+  }
+
+  function exportShowPackage(){
+    var url = null;
+    var link = null;
+    if(!hasScriptText() && !savedScripts.length){
+      signalError(exportShowBtn);
+      showHintNotice('Add a script or saved script before exporting.', 'error');
+      return;
+    }
+    try{
+      var payload = JSON.stringify(buildShowPackage(), null, 2);
+      var blob = new Blob([payload], {type:'application/json;charset=utf-8'});
+      url = URL.createObjectURL(blob);
+      link = document.createElement('a');
+      link.download = showPackageFileName();
+      link.href = url;
+      link.style.display = 'none';
+      document.body.appendChild(link);
+      link.click();
+      signalSuccess(exportShowBtn);
+      savePreferences('export-show');
+      showHintNotice('Show package exported.', 'success');
+      setTimeout(function(){
+        URL.revokeObjectURL(url);
+        if(link.parentNode) link.parentNode.removeChild(link);
+      }, 0);
+    }catch(e){
+      if(url) URL.revokeObjectURL(url);
+      if(link && link.parentNode) link.parentNode.removeChild(link);
+      signalError(exportShowBtn);
+      showHintNotice('Could not export the show package.', 'error');
+    }
+  }
+
+  function mergeImportedSavedScripts(items){
+    if(!Array.isArray(items) || !items.length){
+      return {attempted:false, persisted:true, count:0};
+    }
+    var existingKeys = {};
+    var importedKeys = {};
+    var imported = [];
+    savedScripts.forEach(function(item){
+      existingKeys[savedScriptDedupeKey(item)] = true;
+    });
+    items.forEach(function(item){
+      var clean = sanitizeSavedScript(item);
+      var key;
+      if(!clean) return;
+      clean.id = newSavedScriptId();
+      key = savedScriptDedupeKey(clean);
+      if(existingKeys[key] || importedKeys[key]) return;
+      importedKeys[key] = true;
+      imported.push(clean);
+    });
+    if(!imported.length){
+      return {attempted:true, persisted:true, count:0};
+    }
+    if(!storage.isAvailable()){
+      updateStorageUi();
+      return {attempted:true, persisted:false, count:0};
+    }
+    var previous = savedScripts.slice();
+    savedScripts = imported.concat(savedScripts).slice(0, MAX_SAVED_SCRIPTS);
+    if(saveSavedScripts()){
+      return {attempted:true, persisted:true, count:imported.length};
+    }
+    savedScripts = previous;
+    return {attempted:true, persisted:false, count:0};
+  }
+
+  function importShowPackage(packageData, file){
+    if(!packageData || typeof packageData !== 'object' || Array.isArray(packageData)){
+      throw new Error('Invalid show package');
+    }
+    var hasKnownSchema = packageData.schema === SHOW_PACKAGE_SCHEMA;
+    var hasScript = typeof packageData.script === 'string';
+    var hasSavedScripts = Array.isArray(packageData.savedScripts);
+    if(!hasKnownSchema && !hasScript && !hasSavedScripts){
+      throw new Error('Invalid show package');
+    }
+    if(hasScript){
+      script.value = packageData.script;
+      activeSavedScriptId = '';
+    }
+    if(packageData.format && typeof packageData.format === 'object'){
+      applyFormatSnapshot(packageData.format);
+    }
+    var merge = mergeImportedSavedScripts(packageData.savedScripts);
+    var title = typeof packageData.title === 'string' ? packageData.title : '';
+    rememberFileStem(fileStemFromText(title) || fileStemFromText(file && file.name ? file.name.replace(/\.[^.]+$/, '') : ''));
+    saveScriptDebounced();
+    syncReader();
+    applyTransform();
+    showToast(false);
+    renderSavedScripts();
+    savePreferences('import-show');
+    updatePrediction();
+    scheduleRemoteState(true);
+    if(isReading()){
+      reader.focus({preventScroll:true});
+    }else{
+      script.focus();
+    }
+    if(merge.attempted && !merge.persisted){
+      signalError(importShowBtn);
+      showHintNotice('Show package loaded. Saved script library could not persist in this browser.', 'error');
+      return;
+    }
+    signalSuccess(importShowBtn);
+    if(merge.count){
+      showHintNotice('Show package loaded with ' + merge.count + ' saved script' + (merge.count === 1 ? '.' : 's.'), 'success');
+    }else{
+      showHintNotice('Show package loaded.', 'success');
+    }
+  }
+
+  function importShowPackageFile(file){
+    var readerForPackage = new FileReader();
+    readerForPackage.onload = function(){
+      try{
+        var text = typeof readerForPackage.result === 'string' ? readerForPackage.result : '';
+        importShowPackage(JSON.parse(text), file);
+      }catch(e){
+        signalError(importShowBtn);
+        showHintNotice('Could not import that show package.', 'error');
+      }
+    };
+    readerForPackage.onerror = function(){
+      signalError(importShowBtn);
+      showHintNotice('Could not read that show package.', 'error');
+    };
+    readerForPackage.readAsText(file);
+  }
+
   function clamp(v,a,b){ return Math.max(a, Math.min(b, v)); }
 
   // ---- State ----
@@ -2272,6 +2469,15 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   $('helpClose').addEventListener('click', function(){ closeHelp(); signalSuccess($('helpClose')); });
   help.addEventListener('click', function(e){ if(e.target===help) closeHelp(); });
   $('saveFileBtn').addEventListener('click', saveScriptToFile);
+  exportShowBtn.addEventListener('click', exportShowPackage);
+  importShowBtn.addEventListener('click', function(){
+    showPackageInput.value = '';
+    showPackageInput.click();
+  });
+  showPackageInput.addEventListener('change', function(){
+    var file = showPackageInput.files && showPackageInput.files[0];
+    if(file) importShowPackageFile(file);
+  });
   fontFaceSelect.addEventListener('change', function(){
     changeFontFace(fontFaceSelect.value);
   });

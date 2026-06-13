@@ -2,6 +2,7 @@
 
 ## 2026-06-13
 
+* Added portable show packages to `/teleprompter.html`: operators can export the current script, formatting, and saved-script library to JSON and import it on another browser session with duplicate-safe saved-script merging.
 * Added a companion remote control mode to `/teleprompter.html`: the reader window can open a separate remote window for play, cue, restart, speed, marker, step, read mode, and edit mode commands with live reader status sync.
 * Added operator marker navigation to `/teleprompter.html`: markdown headings, bracket cues, and divider cues now become jump markers with a marker dropdown, previous and next controls, keyboard shortcuts, and a live marker readout in the run monitor.
 * Added pro run controls to `/teleprompter.html`: a 3-second Cue + Play leader, live elapsed and remaining run time, progress percentage, progress rail, and script word-count/run-rate readout.
