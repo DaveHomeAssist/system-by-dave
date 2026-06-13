@@ -319,6 +319,23 @@
     overflow:hidden;
     text-overflow:ellipsis;
   }
+  .pace-readout{
+    padding:2px 7px;
+    border:1px solid rgba(154,208,255,.2);
+    border-radius:999px;
+    background:rgba(255,255,255,.06);
+  }
+  .pace-readout.pace-on{
+    border-color:rgba(102,217,154,.46);
+    color:#bff6d2;
+    background:rgba(102,217,154,.1);
+  }
+  .pace-readout.pace-fast,
+  .pace-readout.pace-slow{
+    border-color:rgba(255,212,138,.42);
+    color:#ffe7bf;
+    background:rgba(255,212,138,.1);
+  }
   .progress-rail{
     width:110px;
     height:4px;
@@ -621,8 +638,10 @@
   /* Narrow screens / tablet */
   @media (max-width:760px){
     .toolbar{gap:6px;padding:8px 10px}
-    .group{padding:4px 6px}
+    .group{max-width:100%;min-width:0;padding:4px 6px}
     .group .label{display:none}
+    select.saved-select{max-width:142px}
+    select.marker-select{max-width:142px}
     header.bar .brand small{display:none}
     .script-meta{display:none}
     .run-hud{
@@ -635,6 +654,7 @@
       font-size:11px;
     }
     .run-hud #remainingOut{display:none}
+    .run-hud #paceOut{max-width:92px;overflow:hidden;text-overflow:ellipsis}
     .run-hud .marker-readout{max-width:96px}
     .progress-rail{width:72px}
     .remote-panel{padding:12px}
@@ -659,6 +679,7 @@
     #remoteBtn::before{content:"⇄"}
     #editBtn::before{content:"✎"}
     #helpBtn::before{content:"⌨"}
+    select.saved-select{max-width:132px}
   }
 
   /* No-JS: show the script plainly, hide JS-only chrome */
@@ -841,6 +862,7 @@
         <span id="timerOut">00:00 / 00:00</span>
         <span id="remainingOut">Left 00:00</span>
         <span id="progressOut">0%</span>
+        <span class="pace-readout" id="paceOut" hidden>On target</span>
         <span class="marker-readout" id="markerOut">No markers</span>
         <span class="progress-rail" aria-hidden="true"><span class="progress-fill" id="progressFill"></span></span>
       </div>
@@ -947,6 +969,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   var timerOut = $('timerOut');
   var remainingOut = $('remainingOut');
   var progressOut = $('progressOut');
+  var paceOut = $('paceOut');
   var progressFill = $('progressFill');
   var scriptMeta = $('scriptMeta');
   var markerSelect = $('markerSelect');
@@ -1419,14 +1442,41 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     return true;
   }
 
+  function currentPaceState(total){
+    var delta;
+    var absDelta;
+    if(!TARGET_RUNTIME.val || !maxScroll){
+      return {label:'', status:'none', delta:0};
+    }
+    delta = Math.round(total - TARGET_RUNTIME.val);
+    absDelta = Math.abs(delta);
+    if(absDelta <= 2){
+      return {label:'On target', status:'on', delta:delta};
+    }
+    if(delta < 0){
+      return {label:'Fast by ' + formatTime(absDelta), status:'fast', delta:delta};
+    }
+    return {label:'Slow by ' + formatTime(absDelta), status:'slow', delta:delta};
+  }
+
+  function updatePaceUi(pace){
+    if(!paceOut) return;
+    paceOut.hidden = !pace || !pace.label;
+    paceOut.textContent = pace && pace.label ? pace.label : '';
+    paceOut.classList.remove('pace-on','pace-fast','pace-slow');
+    if(pace && pace.status !== 'none') paceOut.classList.add('pace-' + pace.status);
+  }
+
   function updateRunHud(){
     var total = SPEED.val > 0 ? maxScroll / SPEED.val : 0;
     var elapsed = SPEED.val > 0 ? clamp(pos / SPEED.val, 0, total) : 0;
     var remaining = Math.max(0, total - elapsed);
     var pct = maxScroll > 0 ? Math.round(clamp(pos / maxScroll, 0, 1) * 100) : 0;
+    var pace = currentPaceState(total);
     if(timerOut) timerOut.textContent = formatTime(elapsed) + ' / ' + formatTime(total);
     if(remainingOut) remainingOut.textContent = 'Left ' + formatTime(remaining);
     if(progressOut) progressOut.textContent = pct + '%';
+    updatePaceUi(pace);
     if(progressFill) progressFill.style.width = pct + '%';
     if(markerOut && !scriptMarkers.length) markerOut.textContent = 'No markers';
     if(scriptMeta){
@@ -1446,6 +1496,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
       timer:timerOut ? timerOut.textContent : '00:00 / 00:00',
       remaining:remainingOut ? remainingOut.textContent : 'Left 00:00',
       progress:progressOut ? progressOut.textContent : '0%',
+      pace:paceOut && !paceOut.hidden ? paceOut.textContent : '',
       marker:markerText || 'No markers',
       markerCount:scriptMarkers.length,
       title:scriptTitle(),
@@ -1504,7 +1555,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
       remoteStateOut.textContent = state.cueing ? 'Cueing' : (state.playing ? 'Playing' : (state.reading ? 'Paused' : 'Edit'));
     }
     if(remoteTimerOut){
-      remoteTimerOut.textContent = state.progress + ' · ' + state.timer;
+      remoteTimerOut.textContent = state.progress + ' · ' + state.timer + (state.pace ? ' · ' + state.pace : '');
     }
     if(remoteMarkerOut){
       remoteMarkerOut.textContent = state.marker || 'No markers';

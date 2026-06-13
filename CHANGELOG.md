@@ -2,6 +2,7 @@
 
 ## 2026-06-13
 
+* Added a target pace readout to `/teleprompter.html`: when a target runtime is set, the run HUD and remote now show whether the current speed is on target, fast, or slow against that duration.
 * Added target runtime fitting to `/teleprompter.html`: operators can enter a run time such as `02:00`, fit scroll speed to that target, persist the target in saved scripts and show packages, and see it in the script run metadata.
 * Added portable show packages to `/teleprompter.html`: operators can export the current script, formatting, and saved-script library to JSON and import it on another browser session with duplicate-safe saved-script merging.
 * Added a companion remote control mode to `/teleprompter.html`: the reader window can open a separate remote window for play, cue, restart, speed, marker, step, read mode, and edit mode commands with live reader status sync.
