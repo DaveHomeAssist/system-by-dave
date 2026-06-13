@@ -23,6 +23,7 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
 - `teleprompter.html` — AV teleprompter
 - `show-timer.html` — AV show timer
 - `cue-sheet.html` — AV cue sheet
+- `av-calculator.html` — AV calculator
 - `resume/index.html` — public resume page
 - `wedding-ops.html` — wedding ops case study
 - `privacy-policy.html`
@@ -40,8 +41,8 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
 - Mobile nav primary links now stay visible at the 680px breakpoint.
 - Agent cards on `agents.html` are deep-linked by id.
 - `404.html` and `500.html` now carry OG + Twitter Card meta.
-- AV tools now include `teleprompter.html`, `show-timer.html`, and
-  `cue-sheet.html`.
+- AV tools now include `teleprompter.html`, `show-timer.html`,
+  `cue-sheet.html`, and `av-calculator.html`.
 
 ## Conventions
 See `AGENTS.md` for coding conventions and the review checklist.

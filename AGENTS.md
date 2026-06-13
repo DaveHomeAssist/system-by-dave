@@ -14,8 +14,8 @@ Read `CLAUDE.md` first for project orientation. This file is the rulebook.
 ## HTML conventions
 
 - Every user-facing page (`index`, `agents`, `skills`, `widgets`,
-  `teleprompter`, `show-timer`, `cue-sheet`, `resume`, `wedding-ops`,
-  `privacy-policy`, `404`, `500`) must have:
+  `teleprompter`, `show-timer`, `cue-sheet`, `av-calculator`, `resume`,
+  `wedding-ops`, `privacy-policy`, `404`, `500`) must have:
   - A full `<head>` with `<title>`, `<meta name="description">`, canonical
     link, and theme color.
   - Open Graph meta (`og:type`, `og:title`, `og:description`, `og:url`,

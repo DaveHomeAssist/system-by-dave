@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'none'">
+<title>AV Calculator | System by Dave</title>
+<meta name="description" content="A browser based AV calculator for audio delay, projection throw, record storage, and power load checks.">
+<link rel="canonical" href="https://systembydave.com/av-calculator.html">
+<meta name="theme-color" content="#0b0d10">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="System by Dave">
+<meta property="og:title" content="AV Calculator">
+<meta property="og:description" content="A browser based AV calculator for audio delay, projection throw, record storage, and power load checks.">
+<meta property="og:url" content="https://systembydave.com/av-calculator.html">
+<meta property="og:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<meta property="og:image:width" content="1024">
+<meta property="og:image:height" content="412">
+<meta property="og:image:alt" content="System by Dave preview banner">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AV Calculator">
+<meta name="twitter:description" content="A browser based AV calculator for audio delay, projection throw, record storage, and power load checks.">
+<meta name="twitter:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<link rel="icon" href="svg/system_by_dave_logo_rust.svg" type="image/svg+xml">
+<style>
+  :root{
+    --bg:#0b0d10;
+    --panel:#12171d;
+    --panel-2:#171e26;
+    --panel-3:#1d252e;
+    --line:#303945;
+    --line-strong:#465363;
+    --text:#f6f8fb;
+    --muted:#a9b4c1;
+    --dim:#768391;
+    --rust:#c0623a;
+    --rust-2:#e58a5c;
+    --blue:#72b8ff;
+    --green:#6be092;
+    --amber:#ffd166;
+    --red:#ff6b6b;
+    --ink:#071016;
+    --radius:8px;
+    --shadow:0 16px 60px rgba(0,0,0,.32);
+    --mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --fast:120ms;
+    --med:180ms;
+    --ease:cubic-bezier(.2,.8,.2,1);
+    --press:cubic-bezier(.2,0,0,1);
+  }
+
+  *{box-sizing:border-box}
+  html,body{min-height:100%}
+  body{
+    margin:0;
+    background:
+      radial-gradient(circle at 16% -12%,rgba(192,98,58,.18),transparent 30rem),
+      linear-gradient(180deg,#0b0d10 0%,#11161b 52%,#080a0d 100%);
+    color:var(--text);
+    font-family:var(--sans);
+    line-height:1.45;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+  body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    background:
+      repeating-linear-gradient(90deg,rgba(255,255,255,.035) 0 1px,transparent 1px 80px),
+      repeating-linear-gradient(0deg,rgba(255,255,255,.025) 0 1px,transparent 1px 80px);
+    mask-image:linear-gradient(180deg,rgba(0,0,0,.8),rgba(0,0,0,.12));
+  }
+  a{color:inherit}
+  button,input,select{
+    font:inherit;
+  }
+  button{
+    min-height:40px;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    background:var(--panel-2);
+    color:var(--text);
+    padding:9px 12px;
+    cursor:pointer;
+    user-select:none;
+    -webkit-tap-highlight-color:transparent;
+    transition:
+      transform var(--fast) var(--press),
+      border-color var(--fast) var(--ease),
+      background var(--fast) var(--ease),
+      box-shadow var(--fast) var(--ease),
+      color var(--fast) var(--ease);
+    touch-action:manipulation;
+  }
+  button:hover{
+    border-color:var(--line-strong);
+    background:var(--panel-3);
+    transform:translateY(-1px);
+    box-shadow:0 8px 22px rgba(0,0,0,.18);
+  }
+  button:active,
+  button.is-pressing{
+    transform:translateY(1px) scale(.975);
+    box-shadow:inset 0 2px 5px rgba(0,0,0,.28);
+  }
+  button.primary{
+    background:linear-gradient(180deg,var(--rust-2),var(--rust));
+    border-color:var(--rust);
+    color:#140905;
+    font-weight:800;
+  }
+  button:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  a:focus-visible{
+    outline:2px solid var(--blue);
+    outline-offset:3px;
+  }
+  input,select{
+    width:100%;
+    min-height:40px;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    background:#0e1318;
+    color:var(--text);
+    padding:9px 10px;
+    transition:border-color var(--fast) var(--ease),background var(--fast) var(--ease),box-shadow var(--fast) var(--ease);
+  }
+  input:hover,
+  input:focus,
+  select:hover,
+  select:focus{
+    border-color:var(--line-strong);
+    background:#111821;
+  }
+  input::placeholder{color:var(--dim)}
+
+  .skip-link{
+    position:absolute;
+    top:12px;
+    left:12px;
+    z-index:1000;
+    background:var(--text);
+    color:var(--ink);
+    padding:10px 14px;
+    border-radius:var(--radius);
+    transform:translateY(-150%);
+    transition:transform var(--med) var(--ease);
+  }
+  .skip-link:focus-visible{transform:translateY(0)}
+  .sr-only{
+    position:absolute;
+    width:1px;
+    height:1px;
+    padding:0;
+    margin:-1px;
+    overflow:hidden;
+    clip:rect(0,0,0,0);
+    white-space:nowrap;
+    border:0;
+  }
+
+  .app{
+    position:relative;
+    z-index:1;
+    min-height:100vh;
+  }
+  .topbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    padding:14px 18px;
+    border-bottom:1px solid rgba(255,255,255,.08);
+    background:rgba(11,13,16,.88);
+    backdrop-filter:blur(18px);
+    position:sticky;
+    top:0;
+    z-index:30;
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    text-decoration:none;
+  }
+  .brand-mark{
+    width:38px;
+    height:38px;
+    border:1px solid rgba(255,255,255,.24);
+    border-radius:50%;
+    display:grid;
+    place-items:center;
+    font-family:Georgia,serif;
+    font-size:19px;
+    color:var(--rust-2);
+    background:#11161c;
+  }
+  .brand-text{
+    display:flex;
+    flex-direction:column;
+    gap:1px;
+  }
+  .brand-text strong{
+    font-size:14px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+  }
+  .brand-text span{
+    color:var(--muted);
+    font-family:var(--mono);
+    font-size:11px;
+  }
+  .top-actions{
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .top-link{
+    color:var(--muted);
+    font-family:var(--mono);
+    font-size:12px;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+    text-decoration:none;
+    transition:color var(--fast) var(--ease);
+  }
+  .top-link:hover{color:var(--text)}
+
+  main{
+    width:100%;
+    max-width:1480px;
+    margin:0 auto;
+    padding:22px 18px 34px;
+  }
+  .hero{
+    margin-bottom:18px;
+    padding:20px;
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    gap:18px;
+    align-items:end;
+    background:linear-gradient(180deg,rgba(18,23,29,.96),rgba(12,15,19,.96));
+    border:1px solid rgba(255,255,255,.09);
+    border-radius:14px;
+    box-shadow:var(--shadow);
+  }
+  .eyebrow{
+    margin:0 0 10px;
+    color:var(--rust-2);
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+  }
+  h1{
+    margin:0;
+    font-size:clamp(34px,5vw,64px);
+    line-height:1.02;
+    letter-spacing:-.05em;
+  }
+  .hero p{
+    max-width:760px;
+    margin:12px 0 0;
+    color:var(--muted);
+    font-size:15px;
+  }
+  .hero-actions{
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+    gap:8px;
+    flex-wrap:wrap;
+  }
+
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:18px;
+  }
+  .calc-card,
+  .summary-panel{
+    background:linear-gradient(180deg,rgba(18,23,29,.96),rgba(12,15,19,.96));
+    border:1px solid rgba(255,255,255,.09);
+    border-radius:14px;
+    box-shadow:var(--shadow);
+    overflow:hidden;
+  }
+  .card-head{
+    display:flex;
+    justify-content:space-between;
+    gap:12px;
+    padding:16px;
+    border-bottom:1px solid rgba(255,255,255,.08);
+  }
+  .card-head h2{
+    margin:0;
+    font-size:14px;
+    font-family:var(--mono);
+    letter-spacing:.1em;
+    text-transform:uppercase;
+  }
+  .card-head span{
+    color:var(--dim);
+    font-family:var(--mono);
+    font-size:11px;
+  }
+  .card-body{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+    padding:16px;
+  }
+  .field{
+    display:grid;
+    gap:7px;
+  }
+  .field label{
+    color:var(--muted);
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+  }
+  .full{
+    grid-column:1 / -1;
+  }
+  .result-grid{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:10px;
+    padding:0 16px 16px;
+  }
+  .result{
+    min-width:0;
+    padding:12px;
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:var(--radius);
+    background:rgba(255,255,255,.035);
+  }
+  .result span{
+    display:block;
+    margin-bottom:5px;
+    color:var(--dim);
+    font-family:var(--mono);
+    font-size:10px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+  }
+  .result strong{
+    display:block;
+    font-family:var(--mono);
+    font-size:18px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .result.good strong{color:var(--green)}
+  .result.warn strong{color:var(--amber)}
+  .result.bad strong{color:var(--red)}
+
+  .summary-panel{
+    margin-top:18px;
+  }
+  .summary-body{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    gap:16px;
+    align-items:start;
+    padding:16px;
+  }
+  .summary-output{
+    margin:0;
+    min-height:132px;
+    white-space:pre-wrap;
+    color:#dfe7f0;
+    font-family:var(--mono);
+    font-size:13px;
+    line-height:1.55;
+    overflow-wrap:anywhere;
+  }
+  .summary-actions{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+  }
+  .hint{
+    min-height:21px;
+    color:var(--muted);
+    font-size:13px;
+    line-height:1.45;
+    padding:0 16px 16px;
+  }
+  .hint.success{color:#bdf8ce}
+  .hint.error{color:#ffd0d0}
+
+  .feedback-success{
+    animation:confirm var(--med) var(--ease);
+    border-color:rgba(107,224,146,.85) !important;
+  }
+  .feedback-error{
+    animation:shake 160ms cubic-bezier(.3,0,.2,1);
+    border-color:var(--red) !important;
+    box-shadow:0 0 0 3px rgba(255,107,107,.16) !important;
+  }
+  @keyframes confirm{
+    0%{transform:scale(1)}
+    45%{transform:scale(1.02);box-shadow:0 0 0 4px rgba(107,224,146,.14)}
+    100%{transform:scale(1);box-shadow:0 0 0 rgba(107,224,146,0)}
+  }
+  @keyframes shake{
+    0%,100%{transform:translateX(0)}
+    30%{transform:translateX(-4px)}
+    60%{transform:translateX(4px)}
+    82%{transform:translateX(-2px)}
+  }
+  .noscript{
+    margin:20px;
+    padding:16px;
+    border:1px solid var(--red);
+    border-radius:var(--radius);
+    background:#231212;
+    color:#ffe0e0;
+  }
+
+  @media (max-width:1080px){
+    .grid{
+      grid-template-columns:1fr;
+    }
+  }
+  @media (max-width:680px){
+    .topbar,
+    .hero{
+      align-items:flex-start;
+      grid-template-columns:1fr;
+      flex-direction:column;
+    }
+    .top-actions,
+    .hero-actions{
+      width:100%;
+      justify-content:space-between;
+    }
+    main{
+      padding:12px;
+    }
+    .card-body,
+    .result-grid,
+    .summary-body{
+      grid-template-columns:1fr;
+    }
+    .summary-actions{
+      flex-direction:row;
+      flex-wrap:wrap;
+    }
+  }
+  @media (prefers-reduced-motion:reduce){
+    *,
+    *::before,
+    *::after{
+      animation-duration:1ms !important;
+      transition-duration:1ms !important;
+      scroll-behavior:auto !important;
+    }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to calculators</a>
+<noscript>
+  <div class="noscript">JavaScript is off, so calculations are unavailable.</div>
+</noscript>
+<div class="app">
+  <header class="topbar">
+    <a class="brand" href="index.html" aria-label="System by Dave home">
+      <span class="brand-mark">S</span>
+      <span class="brand-text">
+        <strong>AV Calculator</strong>
+        <span>System by Dave AV tools</span>
+      </span>
+    </a>
+    <div class="top-actions" aria-label="Related tools">
+      <a class="top-link" href="teleprompter.html">Teleprompter</a>
+      <a class="top-link" href="show-timer.html">Show Timer</a>
+      <a class="top-link" href="cue-sheet.html">Cue Sheet</a>
+      <a class="top-link" href="index.html">Home</a>
+    </div>
+  </header>
+
+  <main id="main-content">
+    <section class="hero" aria-label="AV calculator overview">
+      <div>
+        <p class="eyebrow">Field math</p>
+        <h1>AV calculator</h1>
+        <p>Fast operator checks for delay, projection, record storage, and power load. Values update as you type and the page remembers the last setup in this browser.</p>
+      </div>
+      <div class="hero-actions">
+        <button type="button" class="primary" id="copySummaryBtn">Copy Summary</button>
+        <button type="button" id="resetBtn">Reset</button>
+      </div>
+    </section>
+
+    <section class="grid" aria-label="Calculator groups">
+      <article class="calc-card" id="audioCard">
+        <div class="card-head">
+          <h2>Audio Delay</h2>
+          <span>Distance to delay</span>
+        </div>
+        <div class="card-body">
+          <div class="field">
+            <label for="delayDistance">Distance</label>
+            <input id="delayDistance" data-key="delayDistance" type="number" min="0" step="0.1" value="72">
+          </div>
+          <div class="field">
+            <label for="delayUnit">Unit</label>
+            <select id="delayUnit" data-key="delayUnit">
+              <option value="ft">Feet</option>
+              <option value="m">Meters</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="delayTemp">Temperature F</label>
+            <input id="delayTemp" data-key="delayTemp" type="number" step="1" value="68">
+          </div>
+          <div class="field">
+            <label for="delayFrameRate">Frame Rate</label>
+            <select id="delayFrameRate" data-key="delayFrameRate">
+              <option value="23.976">23.976</option>
+              <option value="24">24</option>
+              <option value="29.97">29.97</option>
+              <option value="30" selected>30</option>
+              <option value="59.94">59.94</option>
+              <option value="60">60</option>
+            </select>
+          </div>
+        </div>
+        <div class="result-grid">
+          <div class="result"><span>Delay</span><strong id="delayMs">0 ms</strong></div>
+          <div class="result"><span>Frames</span><strong id="delayFrames">0 fr</strong></div>
+          <div class="result"><span>48k Samples</span><strong id="delaySamples">0</strong></div>
+        </div>
+        <div class="hint" id="delayHint">Enter speaker distance to calculate delay time.</div>
+      </article>
+
+      <article class="calc-card" id="projectionCard">
+        <div class="card-head">
+          <h2>Projection</h2>
+          <span>Screen and throw</span>
+        </div>
+        <div class="card-body">
+          <div class="field">
+            <label for="screenWidth">Screen Width Ft</label>
+            <input id="screenWidth" data-key="screenWidth" type="number" min="0.1" step="0.1" value="16">
+          </div>
+          <div class="field">
+            <label for="aspectRatio">Aspect</label>
+            <select id="aspectRatio" data-key="aspectRatio">
+              <option value="1.7777777778">16:9</option>
+              <option value="1.6">16:10</option>
+              <option value="1.3333333333">4:3</option>
+              <option value="2.35">2.35:1</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="throwRatio">Throw Ratio</label>
+            <input id="throwRatio" data-key="throwRatio" type="number" min="0.1" step="0.01" value="1.5">
+          </div>
+          <div class="field">
+            <label for="throwDistance">Actual Distance Ft</label>
+            <input id="throwDistance" data-key="throwDistance" type="number" min="0" step="0.1" value="24">
+          </div>
+        </div>
+        <div class="result-grid">
+          <div class="result"><span>Height</span><strong id="screenHeight">0 ft</strong></div>
+          <div class="result"><span>Diagonal</span><strong id="screenDiagonal">0 in</strong></div>
+          <div class="result"><span>Ideal Throw</span><strong id="idealThrow">0 ft</strong></div>
+        </div>
+        <div class="hint" id="projectionHint">Use actual distance to compare against the lens throw ratio.</div>
+      </article>
+
+      <article class="calc-card" id="storageCard">
+        <div class="card-head">
+          <h2>Record Storage</h2>
+          <span>Bitrate to drive size</span>
+        </div>
+        <div class="card-body">
+          <div class="field">
+            <label for="bitrate">Bitrate Mbps</label>
+            <input id="bitrate" data-key="bitrate" type="number" min="0" step="1" value="50">
+          </div>
+          <div class="field">
+            <label for="recordHours">Duration Hours</label>
+            <input id="recordHours" data-key="recordHours" type="number" min="0" step="0.25" value="2">
+          </div>
+          <div class="field">
+            <label for="cameraCount">Record Feeds</label>
+            <input id="cameraCount" data-key="cameraCount" type="number" min="1" step="1" value="3">
+          </div>
+          <div class="field">
+            <label for="storageHeadroom">Headroom Percent</label>
+            <input id="storageHeadroom" data-key="storageHeadroom" type="number" min="0" max="200" step="1" value="20">
+          </div>
+        </div>
+        <div class="result-grid">
+          <div class="result"><span>Base Size</span><strong id="baseStorage">0 GB</strong></div>
+          <div class="result"><span>With Headroom</span><strong id="totalStorage">0 GB</strong></div>
+          <div class="result"><span>Per Hour</span><strong id="perHourStorage">0 GB</strong></div>
+        </div>
+        <div class="hint" id="storageHint">Use camera bitrate, feed count, and runtime to size recording media.</div>
+      </article>
+
+      <article class="calc-card" id="powerCard">
+        <div class="card-head">
+          <h2>Power Load</h2>
+          <span>Watts to amps</span>
+        </div>
+        <div class="card-body">
+          <div class="field">
+            <label for="deviceWatts">Watts Each</label>
+            <input id="deviceWatts" data-key="deviceWatts" type="number" min="0" step="1" value="350">
+          </div>
+          <div class="field">
+            <label for="deviceCount">Device Count</label>
+            <input id="deviceCount" data-key="deviceCount" type="number" min="1" step="1" value="4">
+          </div>
+          <div class="field">
+            <label for="voltage">Voltage</label>
+            <select id="voltage" data-key="voltage">
+              <option value="120">120 V</option>
+              <option value="208">208 V</option>
+              <option value="230">230 V</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="circuitAmps">Circuit Amps</label>
+            <select id="circuitAmps" data-key="circuitAmps">
+              <option value="15">15 A</option>
+              <option value="20" selected>20 A</option>
+              <option value="30">30 A</option>
+              <option value="60">60 A</option>
+            </select>
+          </div>
+        </div>
+        <div class="result-grid">
+          <div class="result"><span>Total Watts</span><strong id="totalWatts">0 W</strong></div>
+          <div class="result"><span>Load</span><strong id="totalAmps">0 A</strong></div>
+          <div class="result" id="circuitResult"><span>80 Percent</span><strong id="circuitPercent">0%</strong></div>
+        </div>
+        <div class="hint" id="powerHint">Compare load against the 80 percent continuous circuit target.</div>
+      </article>
+    </section>
+
+    <section class="summary-panel" aria-label="Calculation summary">
+      <div class="card-head">
+        <h2>Operator Summary</h2>
+        <span id="saveStatus">Saved</span>
+      </div>
+      <div class="summary-body">
+        <pre class="summary-output" id="summaryOutput"></pre>
+        <div class="summary-actions">
+          <button type="button" class="primary" id="copySummaryBtn2">Copy</button>
+          <button type="button" id="downloadSummaryBtn">Download TXT</button>
+        </div>
+      </div>
+      <div class="hint" id="globalHint">Calculations update as values change. Confirm final values against venue and equipment specs before show use.</div>
+    </section>
+  </main>
+</div>
+
+<script>
+(() => {
+  'use strict';
+
+  const STORE = 'avCalculator.v1';
+  const DEFAULTS = {
+    delayDistance: 72,
+    delayUnit: 'ft',
+    delayTemp: 68,
+    delayFrameRate: 30,
+    screenWidth: 16,
+    aspectRatio: 1.7777777778,
+    throwRatio: 1.5,
+    throwDistance: 24,
+    bitrate: 50,
+    recordHours: 2,
+    cameraCount: 3,
+    storageHeadroom: 20,
+    deviceWatts: 350,
+    deviceCount: 4,
+    voltage: 120,
+    circuitAmps: 20
+  };
+
+  const fields = Array.from(document.querySelectorAll('[data-key]'));
+  const els = {
+    delayMs: document.getElementById('delayMs'),
+    delayFrames: document.getElementById('delayFrames'),
+    delaySamples: document.getElementById('delaySamples'),
+    delayHint: document.getElementById('delayHint'),
+    screenHeight: document.getElementById('screenHeight'),
+    screenDiagonal: document.getElementById('screenDiagonal'),
+    idealThrow: document.getElementById('idealThrow'),
+    projectionHint: document.getElementById('projectionHint'),
+    baseStorage: document.getElementById('baseStorage'),
+    totalStorage: document.getElementById('totalStorage'),
+    perHourStorage: document.getElementById('perHourStorage'),
+    storageHint: document.getElementById('storageHint'),
+    totalWatts: document.getElementById('totalWatts'),
+    totalAmps: document.getElementById('totalAmps'),
+    circuitPercent: document.getElementById('circuitPercent'),
+    circuitResult: document.getElementById('circuitResult'),
+    powerHint: document.getElementById('powerHint'),
+    summaryOutput: document.getElementById('summaryOutput'),
+    saveStatus: document.getElementById('saveStatus'),
+    globalHint: document.getElementById('globalHint'),
+    resetBtn: document.getElementById('resetBtn'),
+    copyButtons: [document.getElementById('copySummaryBtn'), document.getElementById('copySummaryBtn2')],
+    downloadSummaryBtn: document.getElementById('downloadSummaryBtn')
+  };
+
+  const storage = (() => {
+    try {
+      const probe = 'avCalculator.storage.probe';
+      window.localStorage.setItem(probe, '1');
+      window.localStorage.removeItem(probe);
+      return {
+        available: true,
+        get: key => window.localStorage.getItem(key),
+        set: (key, value) => {
+          window.localStorage.setItem(key, value);
+          return true;
+        },
+        remove: key => window.localStorage.removeItem(key)
+      };
+    } catch (error) {
+      return {
+        available: false,
+        get: () => null,
+        set: () => false,
+        remove: () => {}
+      };
+    }
+  })();
+
+  let state = loadState();
+
+  function loadState() {
+    const saved = storage.get(STORE);
+    if (!saved) return { ...DEFAULTS };
+    try {
+      const parsed = JSON.parse(saved);
+      return { ...DEFAULTS, ...parsed };
+    } catch (error) {
+      return { ...DEFAULTS };
+    }
+  }
+
+  function saveState() {
+    const saved = storage.set(STORE, JSON.stringify(state));
+    els.saveStatus.textContent = saved ? 'Saved' : 'Storage blocked';
+  }
+
+  function numberValue(key, min, fallback) {
+    const value = Number(state[key]);
+    if (!Number.isFinite(value)) return fallback;
+    return Math.max(min, value);
+  }
+
+  function setFieldValues() {
+    fields.forEach(field => {
+      const key = field.dataset.key;
+      if (state[key] === undefined) return;
+      field.value = String(state[key]);
+    });
+  }
+
+  function readFields() {
+    fields.forEach(field => {
+      const key = field.dataset.key;
+      if (field.tagName === 'SELECT') {
+        state[key] = field.value;
+      } else {
+        state[key] = field.value;
+      }
+    });
+    saveState();
+    calculate();
+  }
+
+  function calculate() {
+    const audio = calculateDelay();
+    const projection = calculateProjection();
+    const storageCalc = calculateStorage();
+    const power = calculatePower();
+    renderSummary(audio, projection, storageCalc, power);
+  }
+
+  function calculateDelay() {
+    const distanceInput = numberValue('delayDistance', 0, DEFAULTS.delayDistance);
+    const unit = state.delayUnit === 'm' ? 'm' : 'ft';
+    const tempF = numberValue('delayTemp', -40, DEFAULTS.delayTemp);
+    const tempC = (tempF - 32) * 5 / 9;
+    const speedMps = 331.3 + (0.606 * tempC);
+    const speedFps = speedMps * 3.28084;
+    const distanceFt = unit === 'm' ? distanceInput * 3.28084 : distanceInput;
+    const delayMs = speedFps > 0 ? distanceFt / speedFps * 1000 : 0;
+    const frameRate = numberValue('delayFrameRate', 1, DEFAULTS.delayFrameRate);
+    const frames = delayMs / 1000 * frameRate;
+    const samples = delayMs / 1000 * 48000;
+    els.delayMs.textContent = `${format(delayMs, 1)} ms`;
+    els.delayFrames.textContent = `${format(frames, 2)} fr`;
+    els.delaySamples.textContent = String(Math.round(samples));
+    els.delayHint.textContent = delayMs > 35
+      ? 'This is beyond a Haas range. Treat it as a real delay zone.'
+      : 'Short delay range. Check alignment by ear in the room.';
+    return { delayMs, frames, samples, distanceInput, unit, tempF };
+  }
+
+  function calculateProjection() {
+    const widthFt = numberValue('screenWidth', 0.1, DEFAULTS.screenWidth);
+    const aspect = numberValue('aspectRatio', 0.1, DEFAULTS.aspectRatio);
+    const throwRatio = numberValue('throwRatio', 0.1, DEFAULTS.throwRatio);
+    const actualDistance = numberValue('throwDistance', 0, DEFAULTS.throwDistance);
+    const heightFt = widthFt / aspect;
+    const diagonalIn = Math.sqrt((widthFt * 12) ** 2 + (heightFt * 12) ** 2);
+    const idealThrowFt = widthFt * throwRatio;
+    const requiredRatio = actualDistance / widthFt;
+    const varianceFt = actualDistance - idealThrowFt;
+    els.screenHeight.textContent = `${format(heightFt, 2)} ft`;
+    els.screenDiagonal.textContent = `${format(diagonalIn, 0)} in`;
+    els.idealThrow.textContent = `${format(idealThrowFt, 1)} ft`;
+    els.projectionHint.textContent = `Actual distance needs a ${format(requiredRatio, 2)}:1 lens. Variance from selected ratio is ${format(varianceFt, 1)} ft.`;
+    return { widthFt, heightFt, diagonalIn, throwRatio, idealThrowFt, actualDistance, requiredRatio, varianceFt };
+  }
+
+  function calculateStorage() {
+    const bitrate = numberValue('bitrate', 0, DEFAULTS.bitrate);
+    const hours = numberValue('recordHours', 0, DEFAULTS.recordHours);
+    const feeds = Math.max(1, Math.round(numberValue('cameraCount', 1, DEFAULTS.cameraCount)));
+    const headroom = numberValue('storageHeadroom', 0, DEFAULTS.storageHeadroom);
+    const baseGb = bitrate * hours * 3600 / 8 / 1000 * feeds;
+    const totalGb = baseGb * (1 + headroom / 100);
+    const perHourGb = bitrate * 3600 / 8 / 1000 * feeds;
+    els.baseStorage.textContent = `${format(baseGb, 1)} GB`;
+    els.totalStorage.textContent = `${format(totalGb, 1)} GB`;
+    els.perHourStorage.textContent = `${format(perHourGb, 1)} GB`;
+    els.storageHint.textContent = totalGb >= 1000
+      ? `Plan about ${format(totalGb / 1000, 2)} TB with headroom.`
+      : `Plan about ${format(totalGb, 1)} GB with headroom.`;
+    return { bitrate, hours, feeds, headroom, baseGb, totalGb, perHourGb };
+  }
+
+  function calculatePower() {
+    const wattsEach = numberValue('deviceWatts', 0, DEFAULTS.deviceWatts);
+    const count = Math.max(1, Math.round(numberValue('deviceCount', 1, DEFAULTS.deviceCount)));
+    const voltage = numberValue('voltage', 1, DEFAULTS.voltage);
+    const circuitAmps = numberValue('circuitAmps', 1, DEFAULTS.circuitAmps);
+    const totalWatts = wattsEach * count;
+    const amps = totalWatts / voltage;
+    const continuousLimit = circuitAmps * 0.8;
+    const percentOfTarget = continuousLimit > 0 ? amps / continuousLimit * 100 : 0;
+    els.totalWatts.textContent = `${format(totalWatts, 0)} W`;
+    els.totalAmps.textContent = `${format(amps, 2)} A`;
+    els.circuitPercent.textContent = `${format(percentOfTarget, 0)}%`;
+    els.circuitResult.classList.remove('good', 'warn', 'bad');
+    els.circuitResult.classList.add(percentOfTarget <= 80 ? 'good' : percentOfTarget <= 100 ? 'warn' : 'bad');
+    els.powerHint.textContent = percentOfTarget <= 80
+      ? 'Load is comfortably under the continuous target.'
+      : percentOfTarget <= 100
+        ? 'Load is close to the continuous target. Split if gear may surge.'
+        : 'Load exceeds the continuous target. Split across circuits.';
+    return { wattsEach, count, voltage, circuitAmps, totalWatts, amps, continuousLimit, percentOfTarget };
+  }
+
+  function renderSummary(audio, projection, storageCalc, power) {
+    els.summaryOutput.textContent = [
+      `Audio delay: ${format(audio.delayMs, 1)} ms for ${format(audio.distanceInput, 1)} ${audio.unit} at ${format(audio.tempF, 0)} F (${format(audio.frames, 2)} frames at ${state.delayFrameRate} fps).`,
+      `Projection: ${format(projection.widthFt, 1)} ft wide screen is ${format(projection.heightFt, 2)} ft high, ${format(projection.diagonalIn, 0)} in diagonal. Ideal throw at ${format(projection.throwRatio, 2)}:1 is ${format(projection.idealThrowFt, 1)} ft. Actual distance needs ${format(projection.requiredRatio, 2)}:1.`,
+      `Record storage: ${storageCalc.feeds} feed(s) at ${format(storageCalc.bitrate, 0)} Mbps for ${format(storageCalc.hours, 2)} hr needs ${format(storageCalc.totalGb, 1)} GB with ${format(storageCalc.headroom, 0)} percent headroom.`,
+      `Power: ${power.count} device(s) at ${format(power.wattsEach, 0)} W each draw ${format(power.amps, 2)} A at ${format(power.voltage, 0)} V. This is ${format(power.percentOfTarget, 0)} percent of a ${format(power.circuitAmps, 0)} A circuit's 80 percent target.`
+    ].join('\n');
+  }
+
+  function format(value, digits) {
+    if (!Number.isFinite(value)) return '0';
+    return value.toLocaleString(undefined, {
+      minimumFractionDigits: digits,
+      maximumFractionDigits: digits
+    });
+  }
+
+  async function copySummary(button) {
+    const text = els.summaryOutput.textContent;
+    try {
+      await navigator.clipboard.writeText(text);
+      announce('Summary copied.', 'success');
+      pulse(button, 'success');
+    } catch (error) {
+      const area = document.createElement('textarea');
+      area.value = text;
+      document.body.appendChild(area);
+      area.select();
+      const copied = document.execCommand('copy');
+      area.remove();
+      announce(copied ? 'Summary copied.' : 'Copy failed.', copied ? 'success' : 'error');
+      pulse(button, copied ? 'success' : 'error');
+    }
+  }
+
+  function downloadSummary() {
+    const blob = new Blob([els.summaryOutput.textContent], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'av-calculator-summary.txt';
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 250);
+    announce('Summary downloaded.', 'success');
+  }
+
+  function resetValues() {
+    state = { ...DEFAULTS };
+    setFieldValues();
+    saveState();
+    calculate();
+    announce('Calculator reset.', 'success');
+    pulse(els.resetBtn, 'success');
+  }
+
+  function announce(message, type) {
+    els.globalHint.textContent = message;
+    els.globalHint.classList.remove('success', 'error');
+    if (type) els.globalHint.classList.add(type);
+  }
+
+  function pulse(element, type) {
+    if (!element) return;
+    const className = type === 'error' ? 'feedback-error' : 'feedback-success';
+    element.classList.remove('feedback-error', 'feedback-success');
+    void element.offsetWidth;
+    element.classList.add(className);
+    window.setTimeout(() => element.classList.remove(className), 220);
+  }
+
+  function attachPressFeedback(button) {
+    button.addEventListener('pointerdown', () => button.classList.add('is-pressing'));
+    ['pointerup', 'pointercancel', 'pointerleave', 'blur'].forEach(eventName => {
+      button.addEventListener(eventName, () => button.classList.remove('is-pressing'));
+    });
+  }
+
+  fields.forEach(field => {
+    field.addEventListener('input', readFields);
+    field.addEventListener('change', readFields);
+  });
+  els.resetBtn.addEventListener('click', resetValues);
+  els.copyButtons.forEach(button => button.addEventListener('click', () => copySummary(button)));
+  els.downloadSummaryBtn.addEventListener('click', downloadSummary);
+  Array.from(document.querySelectorAll('button')).forEach(attachPressFeedback);
+
+  if (!storage.available) {
+    els.saveStatus.textContent = 'Storage blocked';
+    announce('Calculators work, but browser storage is unavailable.', 'error');
+  }
+  setFieldValues();
+  calculate();
+})();
+</script>
+</body>
+</html>
