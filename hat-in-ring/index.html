@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Hat-in-Ring Radar · System by Dave</title>
+<meta name="description" content="2028 presidential signal tracker — a live, auto-updating dashboard grading who is moving toward a 2028 run by status tier and momentum.">
+<link rel="canonical" href="https://systembydave.com/hat-in-ring/">
+<meta property="og:title" content="Hat-in-Ring Radar — 2028 presidential signal tracker">
+<meta property="og:description" content="Live, auto-updating dashboard: status tier x momentum across 40+ potential 2028 candidates.">
+<meta property="og:url" content="https://systembydave.com/hat-in-ring/">
+<style>
+  :root{ color-scheme: light; }
+  html,body{margin:0;height:100%;background:#f6f5f1}
+  .hir-frame{position:fixed;inset:0;width:100%;height:100%;border:0;display:block}
+  .hir-fallback{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    padding:28px;max-width:640px;margin:0 auto;color:#1a1a1a;line-height:1.5}
+  .hir-fallback a{color:#2f6fd1}
+</style>
+</head>
+<body>
+  <!-- Live source of truth: the auto-updating GitHub Pages build (daily ingest -> build -> deploy).
+       Framing it here keeps systembydave.com/hat-in-ring/ always current with zero copy/sync. -->
+  <iframe class="hir-frame"
+          src="https://davehomeassist.github.io/hat-in-ring/"
+          title="Hat-in-Ring Radar — 2028 presidential signal tracker"
+          loading="eager"
+          referrerpolicy="no-referrer-when-downgrade"
+          allow="clipboard-write"></iframe>
+  <noscript>
+    <div class="hir-fallback">
+      <h1>Hat-in-Ring Radar</h1>
+      <p>This live dashboard needs JavaScript. Open it directly:
+        <a href="https://davehomeassist.github.io/hat-in-ring/">davehomeassist.github.io/hat-in-ring</a>.</p>
+    </div>
+  </noscript>
+</body>
+</html>
