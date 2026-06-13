@@ -326,6 +326,13 @@
     border-radius:999px;
     background:rgba(255,255,255,.06);
   }
+  .cue-readout{
+    max-width:180px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    border-color:rgba(255,212,138,.38);
+    color:#ffe7bf;
+  }
   .pace-readout.pace-on{
     border-color:rgba(102,217,154,.46);
     color:#bff6d2;
@@ -731,6 +738,8 @@
     }
     .run-hud #remainingOut{display:none}
     .run-hud #paceOut{max-width:92px;overflow:hidden;text-overflow:ellipsis}
+    .run-hud #scheduleOut{max-width:96px;overflow:hidden;text-overflow:ellipsis}
+    .run-hud #nextCueOut{max-width:112px;overflow:hidden;text-overflow:ellipsis}
     .run-hud .marker-readout{max-width:96px}
     .progress-rail{width:72px}
     .remote-panel{padding:12px}
@@ -947,6 +956,7 @@
         <span id="progressOut">0%</span>
         <span class="pace-readout" id="paceOut" hidden>On target</span>
         <span class="pace-readout" id="scheduleOut" hidden>End 00:00</span>
+        <span class="pace-readout cue-readout" id="nextCueOut" hidden>Next cue</span>
         <span class="marker-readout" id="markerOut">No markers</span>
         <span class="progress-rail" aria-hidden="true"><span class="progress-fill" id="progressFill"></span></span>
       </div>
@@ -1070,6 +1080,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   var progressOut = $('progressOut');
   var paceOut = $('paceOut');
   var scheduleOut = $('scheduleOut');
+  var nextCueOut = $('nextCueOut');
   var progressFill = $('progressFill');
   var scriptMeta = $('scriptMeta');
   var markerSelect = $('markerSelect');
@@ -1771,17 +1782,46 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     scheduleOut.textContent = 'End ' + formatClockLabel(showStartMinutes, total);
   }
 
+  function nextCueState(total){
+    var next = null;
+    var seconds = 0;
+    var label = '';
+    var i;
+    if(!scriptMarkers.length || !maxScroll || SPEED.val <= 0){
+      return {label:'', title:'', index:-1, seconds:0};
+    }
+    for(i = 0; i < scriptMarkers.length; i++){
+      if(scriptMarkers[i].pos > pos + 2){
+        next = scriptMarkers[i];
+        break;
+      }
+    }
+    if(!next) return {label:'End in ' + formatTime(Math.max(0, total - (pos / SPEED.val))), title:'End', index:-1, seconds:Math.max(0, total - (pos / SPEED.val))};
+    seconds = Math.max(0, (next.pos - pos) / SPEED.val);
+    label = 'Next ' + (i + 1) + '/' + scriptMarkers.length + ' ' + next.title + ' ' + formatTime(seconds);
+    if(showStartMinutes !== null) label += ' · ' + formatClockLabel(showStartMinutes, next.pos / SPEED.val);
+    return {label:label, title:next.title, index:i, seconds:seconds};
+  }
+
+  function updateNextCueUi(nextCue){
+    if(!nextCueOut) return;
+    nextCueOut.hidden = !nextCue || !nextCue.label;
+    nextCueOut.textContent = nextCue && nextCue.label ? nextCue.label : '';
+  }
+
   function updateRunHud(){
     var total = SPEED.val > 0 ? maxScroll / SPEED.val : 0;
     var elapsed = SPEED.val > 0 ? clamp(pos / SPEED.val, 0, total) : 0;
     var remaining = Math.max(0, total - elapsed);
     var pct = maxScroll > 0 ? Math.round(clamp(pos / maxScroll, 0, 1) * 100) : 0;
     var pace = currentPaceState(total);
+    var nextCue = nextCueState(total);
     if(timerOut) timerOut.textContent = formatTime(elapsed) + ' / ' + formatTime(total);
     if(remainingOut) remainingOut.textContent = 'Left ' + formatTime(remaining);
     if(progressOut) progressOut.textContent = pct + '%';
     updatePaceUi(pace);
     updateScheduleUi(total);
+    updateNextCueUi(nextCue);
     if(progressFill) progressFill.style.width = pct + '%';
     if(markerOut && !scriptMarkers.length) markerOut.textContent = 'No markers';
     if(scriptMeta){
@@ -1803,6 +1843,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
       progress:progressOut ? progressOut.textContent : '0%',
       pace:paceOut && !paceOut.hidden ? paceOut.textContent : '',
       schedule:scheduleOut && !scheduleOut.hidden ? scheduleOut.textContent : '',
+      nextCue:nextCueOut && !nextCueOut.hidden ? nextCueOut.textContent : '',
       marker:markerText || 'No markers',
       markerCount:scriptMarkers.length,
       title:scriptTitle(),
@@ -1861,7 +1902,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
       remoteStateOut.textContent = state.cueing ? 'Cueing' : (state.playing ? 'Playing' : (state.reading ? 'Paused' : 'Edit'));
     }
     if(remoteTimerOut){
-      remoteTimerOut.textContent = state.progress + ' · ' + state.timer + (state.pace ? ' · ' + state.pace : '') + (state.schedule ? ' · ' + state.schedule : '');
+      remoteTimerOut.textContent = state.progress + ' · ' + state.timer + (state.pace ? ' · ' + state.pace : '') + (state.schedule ? ' · ' + state.schedule : '') + (state.nextCue ? ' · ' + state.nextCue : '');
     }
     if(remoteMarkerOut){
       remoteMarkerOut.textContent = state.marker || 'No markers';

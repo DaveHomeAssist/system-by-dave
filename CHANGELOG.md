@@ -2,6 +2,7 @@
 
 ## 2026-06-13
 
+* Added a live next cue readout to `/teleprompter.html`: the run HUD and remote now show the next marker, estimated time until cue, and clock time when a show start is set.
 * Added show start scheduling to `/teleprompter.html`: operators can set a show start time or use Now, see the planned end time in the run HUD and remote, and view estimated clock times for each marker in the rundown.
 * Added a timed marker rundown to `/teleprompter.html`: operators can open a rundown dialog showing each marker's estimated start time, segment duration, line number, progress position, and jump control.
 * Added a target pace readout to `/teleprompter.html`: when a target runtime is set, the run HUD and remote now show whether the current speed is on target, fast, or slow against that duration.
