@@ -52,7 +52,7 @@
     --read-sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   }
   *{box-sizing:border-box}
-  html,body{height:100%}
+  html,body{height:100%;overflow:hidden}
   body{
     margin:0;
     background:var(--bg);
@@ -259,7 +259,7 @@
   }
   .swatches{display:flex;align-items:center;gap:5px}
   .swatch{
-    width:28px;height:28px;min-width:28px;padding:0;border-radius:999px;
+    width:32px;height:32px;min-width:32px;padding:0;border-radius:999px;
     background:var(--swatch,#fff);
     border-color:rgba(255,255,255,.22);
     position:relative;
@@ -746,10 +746,28 @@
 
   /* Narrow screens / tablet */
   @media (max-width:760px){
-    .toolbar{gap:6px;padding:8px 10px}
-    .group{max-width:100%;min-width:0;padding:4px 6px;flex-wrap:wrap}
+    .toolbar{
+      gap:6px;
+      padding:8px 10px;
+      width:100%;
+      max-width:100vw;
+      min-width:0;
+      flex-wrap:nowrap;
+      contain:paint;
+      overflow-x:auto;
+      overscroll-behavior-x:contain;
+      -webkit-overflow-scrolling:touch;
+      scrollbar-width:thin;
+    }
+    .group{
+      flex:0 0 auto;
+      max-width:none;
+      min-width:0;
+      padding:4px 6px;
+      flex-wrap:nowrap;
+    }
     .group .label{display:none}
-    .swatches{flex-wrap:wrap}
+    .swatches{flex-wrap:nowrap}
     select.saved-select{max-width:142px}
     select.marker-select{max-width:142px}
     header.bar .brand small{display:none}
