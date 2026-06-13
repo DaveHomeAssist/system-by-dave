@@ -2,6 +2,7 @@
 
 ## 2026-06-13
 
+* Added operator marker navigation to `/teleprompter.html`: markdown headings, bracket cues, and divider cues now become jump markers with a marker dropdown, previous and next controls, keyboard shortcuts, and a live marker readout in the run monitor.
 * Added pro run controls to `/teleprompter.html`: a 3-second Cue + Play leader, live elapsed and remaining run time, progress percentage, progress rail, and script word-count/run-rate readout.
 * Expanded `/teleprompter.html` formatting and script management: added reader font family choices, text color swatches, and a local saved-scripts library with Save, Load, Delete, and per-script formatting snapshots.
 * Added lightweight anticipatory UX to `/teleprompter.html`: context-aware next-action highlights, short dynamic hints, smarter title-based Save filenames, last-mode restore, and local-only preference metadata in `localStorage`.

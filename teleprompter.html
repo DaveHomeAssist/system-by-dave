@@ -215,6 +215,7 @@
   }
   select:hover{background:#232c3b;border-color:#465467}
   select.saved-select{max-width:190px}
+  select.marker-select{max-width:190px}
   .swatches{display:flex;align-items:center;gap:5px}
   .swatch{
     width:28px;height:28px;min-width:28px;padding:0;border-radius:999px;
@@ -298,6 +299,11 @@
     pointer-events:none;
   }
   .run-hud span{white-space:nowrap}
+  .run-hud .marker-readout{
+    max-width:150px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
   .progress-rail{
     width:110px;
     height:4px;
@@ -351,6 +357,25 @@
   }
   .cue-overlay.cue-pop .cue-card{
     animation:success-confirm var(--dur-med) var(--ease-out);
+  }
+  .marker-measure{
+    position:absolute;
+    left:0;
+    right:0;
+    top:0;
+    z-index:-1;
+    visibility:hidden;
+    pointer-events:none;
+    margin:0 auto;
+    max-width:var(--reader-width);
+    padding:0 24px;
+    font-family:var(--read-sans);
+    font-size:var(--reader-fs);
+    line-height:var(--reader-lh);
+    font-weight:600;
+    white-space:pre-wrap;
+    word-break:break-word;
+    text-wrap:pretty;
   }
 
   /* center reading-line indicator */
@@ -483,6 +508,8 @@
       border-radius:12px;
       font-size:11px;
     }
+    .run-hud #remainingOut{display:none}
+    .run-hud .marker-readout{max-width:96px}
     .progress-rail{width:72px}
     #script{font-size:18px;padding:16px}
   }
@@ -535,6 +562,13 @@
       <span class="label">Step</span>
       <button class="icon" type="button" data-act="stepBack" title="Step up" aria-label="Step up">▲</button>
       <button class="icon" type="button" data-act="stepFwd" title="Step down" aria-label="Step down">▼</button>
+    </div>
+
+    <div class="group" aria-label="Script markers">
+      <span class="label">Markers</span>
+      <button class="icon" type="button" data-act="markerPrev" title="Previous marker ([ or Shift Page Up)" aria-label="Previous marker">◀</button>
+      <select id="markerSelect" class="marker-select" title="Jump to a script marker" aria-label="Script markers"></select>
+      <button class="icon" type="button" data-act="markerNext" title="Next marker (] or Shift Page Down)" aria-label="Next marker">▶</button>
     </div>
 
     <div class="group" aria-label="Font size">
@@ -606,6 +640,7 @@
         <span id="timerOut">00:00 / 00:00</span>
         <span id="remainingOut">Left 00:00</span>
         <span id="progressOut">0%</span>
+        <span class="marker-readout" id="markerOut">No markers</span>
         <span class="progress-rail" aria-hidden="true"><span class="progress-fill" id="progressFill"></span></span>
       </div>
       <div class="cue-overlay" id="cueOverlay" hidden aria-hidden="true">
@@ -617,6 +652,7 @@
       <div class="mirror-wrap">
         <div class="reader-inner" id="readerInner"></div>
       </div>
+      <div class="marker-measure" id="markerMeasure" aria-hidden="true"></div>
     </div>
 
     <div class="editor" id="editor">
@@ -666,6 +702,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
       <kbd>F</kbd><span class="desc">Toggle fullscreen</span>
       <kbd>C</kbd><span class="desc">Cue then play</span>
       <kbd>R</kbd><span class="desc">Restart from top</span>
+      <kbd>[ / ]</kbd><span class="desc">Previous / next marker</span>
       <kbd>Page</kbd><span class="desc">Step up / down</span>
       <kbd>Esc</kbd><span class="desc">Exit fullscreen / close this</span>
     </div>
@@ -703,6 +740,9 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   var progressOut = $('progressOut');
   var progressFill = $('progressFill');
   var scriptMeta = $('scriptMeta');
+  var markerSelect = $('markerSelect');
+  var markerOut = $('markerOut');
+  var markerMeasure = $('markerMeasure');
 
   // ---- Settings (persisted) ----
   var SPEED = {min:10, max:400, step:10, val:60};   // px / second
@@ -855,18 +895,26 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     words:0,
     lines:0
   };
+  var scriptMarkers = [];
+  var activeMarkerIndex = -1;
   var SAMPLE_SCRIPT = [
-    'Sample script',
+    '# Sample script',
     '',
     'Welcome to your teleprompter.',
     '',
     'This sample is loaded automatically so you can test the reading view right away.',
     '',
+    '# Setup',
+    '',
     'Press Done, then Play. Adjust speed with the Up and Down arrow keys until the pace feels natural.',
     '',
     'Use the Font and Width controls to set a comfortable reading size.',
     '',
+    '# Camera read',
+    '',
     'Turn on Mirror if you are reading through beam splitter glass.',
+    '',
+    '# Wrap',
     '',
     'When you are ready, replace this text with your own script.'
   ].join('\n');
@@ -956,6 +1004,121 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     updateRunHud();
   }
 
+  function normalizeMarkerTitle(text){
+    return (text || '').replace(/\s+/g, ' ').trim().slice(0, 70);
+  }
+
+  function markerTitleFromLine(line){
+    var trimmed = (line || '').trim();
+    var match;
+    if(!trimmed) return '';
+    match = trimmed.match(/^#{1,6}\s+(.+)$/);
+    if(match) return normalizeMarkerTitle(match[1].replace(/#+$/, ''));
+    match = trimmed.match(/^\[\[(.+?)\]\]$/);
+    if(match) return normalizeMarkerTitle(match[1]);
+    match = trimmed.match(/^={2,}\s*(.+?)\s*={2,}$/);
+    if(match) return normalizeMarkerTitle(match[1]);
+    return '';
+  }
+
+  function parseScriptMarkers(){
+    var text = script.value || '';
+    var markers = [];
+    var pattern = /([^\r\n]*)(\r?\n|$)/g;
+    var match;
+    var offset = 0;
+    var lineNumber = 1;
+    while((match = pattern.exec(text)) !== null){
+      if(match[0] === '') break;
+      var line = match[1] || '';
+      var title = markerTitleFromLine(line);
+      if(title){
+        markers.push({
+          id:'marker-' + markers.length,
+          title:title,
+          offset:offset,
+          line:lineNumber,
+          pos:0
+        });
+      }
+      offset += match[0].length;
+      lineNumber += 1;
+    }
+    return markers.slice(0, 60);
+  }
+
+  function measureMarkerPositions(){
+    if(!markerMeasure || !scriptMarkers.length) return;
+    var text = script.value || '';
+    scriptMarkers.forEach(function(marker){
+      markerMeasure.textContent = text.slice(0, marker.offset);
+      marker.pos = clamp(markerMeasure.offsetHeight, 0, maxScroll);
+    });
+    markerMeasure.textContent = '';
+  }
+
+  function activeMarkerIndexForPosition(){
+    var index = -1;
+    for(var i = 0; i < scriptMarkers.length; i++){
+      if(pos + 2 >= scriptMarkers[i].pos){
+        index = i;
+      }else{
+        break;
+      }
+    }
+    return index;
+  }
+
+  function renderMarkerSelect(){
+    if(!markerSelect) return;
+    markerSelect.innerHTML = '';
+    if(!scriptMarkers.length){
+      var empty = document.createElement('option');
+      empty.value = '';
+      empty.textContent = 'No markers';
+      markerSelect.appendChild(empty);
+      markerSelect.disabled = true;
+      return;
+    }
+    var prompt = document.createElement('option');
+    prompt.value = '';
+    prompt.textContent = 'Jump to marker';
+    markerSelect.appendChild(prompt);
+    scriptMarkers.forEach(function(marker, index){
+      var option = document.createElement('option');
+      option.value = String(index);
+      option.textContent = marker.title;
+      markerSelect.appendChild(option);
+    });
+    markerSelect.disabled = false;
+  }
+
+  function updateMarkerUi(){
+    if(!scriptMarkers.length){
+      activeMarkerIndex = -1;
+      if(markerOut) markerOut.textContent = 'No markers';
+      if(markerSelect) markerSelect.value = '';
+      return;
+    }
+    activeMarkerIndex = activeMarkerIndexForPosition();
+    if(markerOut){
+      markerOut.textContent = activeMarkerIndex >= 0
+        ? (activeMarkerIndex + 1) + '/' + scriptMarkers.length + ' ' + scriptMarkers[activeMarkerIndex].title
+        : 'Before 1/' + scriptMarkers.length;
+    }
+    if(markerSelect){
+      markerSelect.value = activeMarkerIndex >= 0 ? String(activeMarkerIndex) : '';
+    }
+  }
+
+  function rebuildMarkers(){
+    scriptMarkers = parseScriptMarkers();
+    renderMarkerSelect();
+    measureMarkerPositions();
+    updateMarkerUi();
+    updateRunHud();
+  }
+
   function formatTime(totalSeconds){
     var seconds = Math.max(0, Math.ceil(Number.isFinite(totalSeconds) ? totalSeconds : 0));
     var h = Math.floor(seconds / 3600);
@@ -976,9 +1139,10 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     if(remainingOut) remainingOut.textContent = 'Left ' + formatTime(remaining);
     if(progressOut) progressOut.textContent = pct + '%';
     if(progressFill) progressFill.style.width = pct + '%';
+    if(markerOut && !scriptMarkers.length) markerOut.textContent = 'No markers';
     if(scriptMeta){
       var rate = scriptStats.words && total ? Math.round(scriptStats.words / Math.max(total / 60, 0.01)) : 0;
-      scriptMeta.textContent = scriptStats.words + ' words · ' + formatTime(total) + ' run' + (rate ? ' · ' + rate + ' wpm' : '');
+      scriptMeta.textContent = scriptStats.words + ' words · ' + formatTime(total) + ' run' + (rate ? ' · ' + rate + ' wpm' : '') + (scriptMarkers.length ? ' · ' + scriptMarkers.length + ' markers' : '');
     }
   }
 
@@ -1282,12 +1446,15 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     // inner has 50vh top+bottom padding; scroll range = full height - viewport height
     maxScroll = Math.max(0, inner.offsetHeight - reader.clientHeight);
     pos = clamp(pos, 0, maxScroll);
+    measureMarkerPositions();
     updateRunHud();
+    updateMarkerUi();
   }
 
   function applyTransform(){
     inner.style.transform = 'translateY(' + (-pos).toFixed(2) + 'px)';
     updateRunHud();
+    updateMarkerUi();
   }
 
   function applySnapTransform(){
@@ -1315,6 +1482,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   function syncReader(){
     inner.textContent = script.value || '';
     updateScriptStats();
+    rebuildMarkers();
     measure();
   }
 
@@ -1414,6 +1582,45 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     showToast(false);
     savePreferences('step');
     updatePrediction();
+  }
+
+  function jumpToMarker(index){
+    if(!scriptMarkers.length){
+      signalError(markerSelect);
+      showHintNotice('Add headings like # Intro to create markers.', 'error');
+      return;
+    }
+    index = Math.max(0, Math.min(scriptMarkers.length - 1, index));
+    cancelCue(false);
+    pause();
+    if(!isReading()) setReading(true);
+    measureMarkerPositions();
+    pos = clamp(scriptMarkers[index].pos, 0, maxScroll);
+    applySnapTransform();
+    showToast(false);
+    updateMarkerUi();
+    if(markerSelect) signalSuccess(markerSelect);
+    showHintNotice('Jumped to ' + scriptMarkers[index].title + '.', 'success');
+    savePreferences('marker-jump');
+    updatePrediction();
+    reader.focus({preventScroll:true});
+  }
+
+  function jumpRelativeMarker(dir){
+    if(!scriptMarkers.length){
+      signalError(markerSelect);
+      showHintNotice('No script markers found.', 'error');
+      return;
+    }
+    var current = activeMarkerIndexForPosition();
+    var target = dir > 0 ? current + 1 : current - 1;
+    if(current < 0 && dir > 0) target = 0;
+    if(target < 0 || target >= scriptMarkers.length){
+      signalError(markerSelect);
+      showHintNotice(dir > 0 ? 'No later marker.' : 'No earlier marker.', 'error');
+      return;
+    }
+    jumpToMarker(target);
   }
 
   // ---- Immersive auto-hide of controls while playing ----
@@ -1575,6 +1782,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     document.documentElement.style.setProperty('--reader-fs', FONT.val + 'px');
     document.documentElement.style.setProperty('--reader-lh', String(LH.val));
     document.documentElement.style.setProperty('--reader-width', WIDTH.val + 'rem');
+    measureMarkerPositions();
     measure(); applyTransform();
     savePreferences('reading-metric');
     updatePrediction();
@@ -1704,6 +1912,10 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     renderSavedScripts();
     updatePrediction();
   });
+  markerSelect.addEventListener('change', function(){
+    var index = parseInt(markerSelect.value, 10);
+    if(Number.isFinite(index)) jumpToMarker(index);
+  });
   saveLocalBtn.addEventListener('click', saveCurrentScriptLocal);
   loadLocalBtn.addEventListener('click', loadSelectedScriptLocal);
   deleteLocalBtn.addEventListener('click', deleteSelectedScriptLocal);
@@ -1730,6 +1942,8 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
         case 'widthDown': changeWidth(-1); break;
         case 'stepFwd': step(+1); break;
         case 'stepBack': step(-1); break;
+        case 'markerNext': jumpRelativeMarker(+1); break;
+        case 'markerPrev': jumpRelativeMarker(-1); break;
       }
       signalSuccess(b);
     });
@@ -1740,7 +1954,11 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     saveScriptDebounced();
     rememberFileStem(fileStemFromText(titleFromScript()));
     updateScriptStats();
-    if(isReading()) syncReader();
+    if(isReading()){
+      syncReader();
+    }else{
+      rebuildMarkers();
+    }
     updatePrediction();
   });
 
@@ -1806,10 +2024,14 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
         e.preventDefault(); startCue(); break;
       case 'r': case 'R':
         e.preventDefault(); restart(); wake(); break;
+      case ']':
+        e.preventDefault(); jumpRelativeMarker(+1); break;
+      case '[':
+        e.preventDefault(); jumpRelativeMarker(-1); break;
       case 'PageDown':
-        e.preventDefault(); step(+1); break;
+        e.preventDefault(); e.shiftKey ? jumpRelativeMarker(+1) : step(+1); break;
       case 'PageUp':
-        e.preventDefault(); step(-1); break;
+        e.preventDefault(); e.shiftKey ? jumpRelativeMarker(-1) : step(-1); break;
       case 'Escape':
         if(document.fullscreenElement){ /* browser handles exit */ }
         break;
