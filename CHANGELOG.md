@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-06-13
+
+* Added an unlisted, noindex **Prompt Browser** page at `/prompt-browser.html` for the full local prompt library browser. The page includes ranked search, review queue, fill-in mode, saved views, import/export state, and local-only browser state. It is blocked in `robots.txt` and kept out of `sitemap.xml` and site navigation because the embedded library includes internal working prompts.
+
 ## 2026-06-12
 
 * Added `/teleprompter.html`, a self contained teleprompter page with editable script text, smooth auto scrolling, keyboard controls, mirror mode, fullscreen, manual save and load file controls, and a starter sample script for first load.
