@@ -2,6 +2,7 @@
 
 ## 2026-06-13
 
+* Expanded `/teleprompter.html` formatting and saved-script controls: added more reader fonts, font weight, expanded text color swatches, custom text color, reader background palettes, custom reader background color, and a Save as action for keeping multiple browser saved-script versions.
 * Added `/av-calculator.html`, a browser based AV calculator with audio delay, projection throw, record storage, and power load checks, saved browser values, copyable operator summary, and text export. Linked it from the homepage AV Tools section, added it to the Products footer, and added it to `sitemap.xml`.
 * Added `/cue-sheet.html`, a browser based AV cue sheet for run of show work with starter cues, editable cue rows, selected and next cue controls, status tracking, keyboard shortcuts, print output, JSON import and export, CSV export, and remembered browser state. Linked it from the homepage AV Tools section, added it to the Products footer, and added it to `sitemap.xml`.
 * Added `/show-timer.html`, a stage friendly AV show timer with countdown, count up, clock mode, presets, custom duration parsing, quick time adjustments, warning and overrun states, keyboard controls, stage view, and remembered browser preferences. Linked it from the homepage AV Tools section, added it to the Products footer, and added it to `sitemap.xml`.
