@@ -216,6 +216,21 @@
   select:hover{background:#232c3b;border-color:#465467}
   select.saved-select{max-width:190px}
   select.marker-select{max-width:190px}
+  input.time-input{
+    width:76px;
+    min-height:32px;
+    font:inherit;
+    color:var(--text);
+    background:var(--surface-2);
+    border:1px solid var(--line);
+    border-radius:9px;
+    padding:6px 8px;
+    line-height:1.1;
+    font-variant-numeric:tabular-nums;
+    transition:background var(--dur-fast) var(--ease-out),border-color var(--dur-fast) var(--ease-out),box-shadow var(--dur-fast) var(--ease-out);
+  }
+  input.time-input:hover,input.time-input:focus{background:#232c3b;border-color:#465467}
+  input.time-input::placeholder{color:#768294}
   .swatches{display:flex;align-items:center;gap:5px}
   .swatch{
     width:28px;height:28px;min-width:28px;padding:0;border-radius:999px;
@@ -691,6 +706,12 @@
       <button class="icon" type="button" data-act="speedUp" title="Faster (Arrow Up)" aria-label="Increase speed">+</button>
     </div>
 
+    <div class="group" aria-label="Target runtime">
+      <span class="label">Run</span>
+      <input id="targetTimeInput" class="time-input" type="text" inputmode="numeric" placeholder="02:00" title="Target runtime, for example 02:00" aria-label="Target runtime">
+      <button id="fitTimeBtn" type="button" title="Set speed to target runtime">Fit</button>
+    </div>
+
     <div class="group" aria-label="Manual scroll">
       <span class="label">Step</span>
       <button class="icon" type="button" data-act="stepBack" title="Step up" aria-label="Step up">▲</button>
@@ -911,6 +932,8 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   var showPackageInput = $('showPackageInput');
   var exportShowBtn = $('exportShowBtn');
   var importShowBtn = $('importShowBtn');
+  var targetTimeInput = $('targetTimeInput');
+  var fitTimeBtn = $('fitTimeBtn');
   var saveHint = $('saveHint');
   var storageStatus = $('storageStatus');
   var fontFaceSelect = $('fontFaceSelect');
@@ -941,6 +964,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   var FONT  = {min:24, max:120, step:4, val:48};    // px
   var LH    = {min:1.1, max:2.4, step:0.1, val:1.5};
   var WIDTH = {min:24, max:80, step:4, val:42};     // rem
+  var TARGET_RUNTIME = {min:5, max:14400, val:0};   // seconds
   var FONT_FACES = {
     system:'-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif',
     serif:'Georgia,"Times New Roman",Times,serif',
@@ -1052,6 +1076,11 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     return Object.prototype.hasOwnProperty.call(TEXT_COLORS, value) ? value : 'white';
   }
 
+  function sanitizeTargetRuntime(value){
+    var seconds = Math.round(Number(value) || 0);
+    return seconds > 0 ? clamp(seconds, TARGET_RUNTIME.min, TARGET_RUNTIME.max) : 0;
+  }
+
   function loadSettings(){
     try{
       var raw = storage.get(STORE);
@@ -1061,6 +1090,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
       if(typeof s.font==='number')  FONT.val  = clamp(s.font, FONT.min, FONT.max);
       if(typeof s.lh==='number')    LH.val    = clamp(s.lh, LH.min, LH.max);
       if(typeof s.width==='number') WIDTH.val = clamp(s.width, WIDTH.min, WIDTH.max);
+      if(typeof s.targetRuntime==='number') TARGET_RUNTIME.val = sanitizeTargetRuntime(s.targetRuntime);
       if(typeof s.mirror==='boolean') mirror = s.mirror;
       if(typeof s.centerline==='boolean') centerline = s.centerline;
       if(typeof s.fontFace==='string') FONT_FACE = sanitizeFontFace(s.fontFace);
@@ -1070,6 +1100,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   function saveSettings(){
     var saved = storage.set(STORE, JSON.stringify({
       speed:SPEED.val, font:FONT.val, lh:LH.val, width:WIDTH.val,
+      targetRuntime:TARGET_RUNTIME.val,
       mirror:mirror, centerline:centerline, fontFace:FONT_FACE, textColor:TEXT_COLOR
     }));
     if(!saved) updateStorageUi();
@@ -1341,6 +1372,53 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
   }
 
+  function parseRuntimeInput(value){
+    var raw = (value || '').trim();
+    var parts;
+    var nums;
+    if(!raw) return 0;
+    parts = raw.split(':');
+    if(parts.length > 3) return NaN;
+    nums = parts.map(function(part){
+      var cleaned = part.trim();
+      return /^\d+$/.test(cleaned) ? Number(cleaned) : NaN;
+    });
+    if(nums.some(function(num){ return !Number.isFinite(num); })) return NaN;
+    if(nums.length === 1) return nums[0];
+    if(nums.length === 2){
+      if(nums[1] >= 60) return NaN;
+      return nums[0] * 60 + nums[1];
+    }
+    if(nums[1] >= 60 || nums[2] >= 60) return NaN;
+    return nums[0] * 3600 + nums[1] * 60 + nums[2];
+  }
+
+  function setTargetRuntimeFromInput(showNotice){
+    var parsed = parseRuntimeInput(targetTimeInput ? targetTimeInput.value : '');
+    if(parsed === 0){
+      TARGET_RUNTIME.val = 0;
+      if(targetTimeInput) targetTimeInput.value = '';
+      saveSettings();
+      updateRunHud();
+      updatePrediction();
+      if(showNotice) showHintNotice('Target runtime cleared.', 'success');
+      return true;
+    }
+    if(!Number.isFinite(parsed) || parsed < TARGET_RUNTIME.min || parsed > TARGET_RUNTIME.max){
+      signalError(targetTimeInput);
+      showHintNotice('Use a target like 02:00, from 00:05 to 4:00:00.', 'error');
+      return false;
+    }
+    TARGET_RUNTIME.val = Math.round(parsed);
+    if(targetTimeInput) targetTimeInput.value = formatTime(TARGET_RUNTIME.val);
+    saveSettings();
+    updateRunHud();
+    savePreferences('target-runtime');
+    updatePrediction();
+    if(showNotice) showHintNotice('Target runtime set to ' + formatTime(TARGET_RUNTIME.val) + '.', 'success');
+    return true;
+  }
+
   function updateRunHud(){
     var total = SPEED.val > 0 ? maxScroll / SPEED.val : 0;
     var elapsed = SPEED.val > 0 ? clamp(pos / SPEED.val, 0, total) : 0;
@@ -1353,7 +1431,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     if(markerOut && !scriptMarkers.length) markerOut.textContent = 'No markers';
     if(scriptMeta){
       var rate = scriptStats.words && total ? Math.round(scriptStats.words / Math.max(total / 60, 0.01)) : 0;
-      scriptMeta.textContent = scriptStats.words + ' words · ' + formatTime(total) + ' run' + (rate ? ' · ' + rate + ' wpm' : '') + (scriptMarkers.length ? ' · ' + scriptMarkers.length + ' markers' : '');
+      scriptMeta.textContent = scriptStats.words + ' words · ' + formatTime(total) + ' run' + (TARGET_RUNTIME.val ? ' · target ' + formatTime(TARGET_RUNTIME.val) : '') + (rate ? ' · ' + rate + ' wpm' : '') + (scriptMarkers.length ? ' · ' + scriptMarkers.length + ' markers' : '');
     }
     scheduleRemoteState(false);
   }
@@ -1540,6 +1618,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
       font:FONT.val,
       lh:LH.val,
       width:WIDTH.val,
+      targetRuntime:TARGET_RUNTIME.val,
       mirror:mirror,
       centerline:centerline,
       fontFace:FONT_FACE,
@@ -1553,6 +1632,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     if(typeof format.font==='number') FONT.val = clamp(format.font, FONT.min, FONT.max);
     if(typeof format.lh==='number') LH.val = clamp(format.lh, LH.min, LH.max);
     if(typeof format.width==='number') WIDTH.val = clamp(format.width, WIDTH.min, WIDTH.max);
+    if(typeof format.targetRuntime==='number') TARGET_RUNTIME.val = sanitizeTargetRuntime(format.targetRuntime);
     if(typeof format.mirror==='boolean') mirror = format.mirror;
     if(typeof format.centerline==='boolean') centerline = format.centerline;
     if(typeof format.fontFace==='string') FONT_FACE = sanitizeFontFace(format.fontFace);
@@ -1981,6 +2061,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     $('fontOut').textContent  = String(FONT.val);
     $('lhOut').textContent    = LH.val.toFixed(1);
     $('widthOut').textContent = String(WIDTH.val);
+    if(targetTimeInput) targetTimeInput.value = TARGET_RUNTIME.val ? formatTime(TARGET_RUNTIME.val) : '';
     body.classList.toggle('mirror', mirror);
     body.classList.toggle('centerline', centerline);
     $('mirrorBtn').setAttribute('aria-pressed', String(mirror));
@@ -2295,6 +2376,10 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
       return;
     }
     if(!isReading()){
+      if(TARGET_RUNTIME.val){
+        setPredictedAction(fitTimeBtn, 'Next: Fit speed to target runtime.');
+        return;
+      }
       setPredictedAction($('doneBtn'), 'Next: Done — start reading.');
       return;
     }
@@ -2319,6 +2404,45 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   function changeLH(dir){ bump(LH, dir, 'lhOut', function(v){return v.toFixed(1);}); applyMetric(); }
   function changeWidth(dir){ bump(WIDTH, dir, 'widthOut'); applyMetric(); }
   function changeSpeed(dir){ bump(SPEED, dir, 'speedOut'); updateRunHud(); savePreferences('speed'); updatePrediction(); }
+  function fitSpeedToTargetRuntime(){
+    var rawSpeed;
+    var fittedSpeed;
+    if(!setTargetRuntimeFromInput(false)) return;
+    if(!TARGET_RUNTIME.val){
+      signalError(targetTimeInput);
+      showHintNotice('Enter a target runtime first.', 'error');
+      return;
+    }
+    if(!hasScriptText()){
+      setReading(false);
+      signalError(fitTimeBtn);
+      showHintNotice('Add script text before fitting runtime.', 'error');
+      return;
+    }
+    syncReader();
+    measure();
+    if(maxScroll <= 0){
+      signalError(fitTimeBtn);
+      showHintNotice('Script is too short to fit runtime.', 'error');
+      return;
+    }
+    rawSpeed = maxScroll / TARGET_RUNTIME.val;
+    fittedSpeed = clamp(Math.round(rawSpeed), SPEED.min, SPEED.max);
+    SPEED.val = fittedSpeed;
+    saveSettings();
+    applySettings();
+    updateRunHud();
+    savePreferences('fit-runtime');
+    updatePrediction();
+    scheduleRemoteState(true);
+    if(rawSpeed < SPEED.min || rawSpeed > SPEED.max){
+      signalError(fitTimeBtn);
+      showHintNotice('Closest speed is ' + fittedSpeed + '. Target is outside speed range.', 'error');
+      return;
+    }
+    signalSuccess(fitTimeBtn);
+    showHintNotice('Speed fitted to ' + formatTime(TARGET_RUNTIME.val) + '.', 'success');
+  }
   function changeFontFace(value){
     FONT_FACE = sanitizeFontFace(value);
     saveSettings();
@@ -2469,6 +2593,14 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   $('helpClose').addEventListener('click', function(){ closeHelp(); signalSuccess($('helpClose')); });
   help.addEventListener('click', function(e){ if(e.target===help) closeHelp(); });
   $('saveFileBtn').addEventListener('click', saveScriptToFile);
+  fitTimeBtn.addEventListener('click', fitSpeedToTargetRuntime);
+  targetTimeInput.addEventListener('change', function(){ setTargetRuntimeFromInput(true); });
+  targetTimeInput.addEventListener('keydown', function(e){
+    if(e.key === 'Enter'){
+      e.preventDefault();
+      fitSpeedToTargetRuntime();
+    }
+  });
   exportShowBtn.addEventListener('click', exportShowPackage);
   importShowBtn.addEventListener('click', function(){
     showPackageInput.value = '';
