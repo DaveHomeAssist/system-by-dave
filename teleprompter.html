@@ -166,6 +166,11 @@
   button.primary:hover{filter:brightness(1.05)}
   button.primary:active,button.primary.is-pressing{filter:brightness(.94) saturate(1.08)}
   button.ghost{background:transparent}
+  button.cue-active{
+    border-color:#ffd48a;
+    color:#ffe7bf;
+    background:#2b2112;
+  }
   button:disabled,select:disabled{opacity:.55;cursor:not-allowed;transform:none;box-shadow:none}
   button.predicted-action{
     border-color:var(--focus);
@@ -273,6 +278,80 @@
   .reader-inner.snap-feedback{
     transition:transform var(--dur-med) var(--ease-out);
   }
+  .run-hud{
+    position:absolute;
+    top:14px;
+    right:14px;
+    z-index:8;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    max-width:min(92vw,540px);
+    padding:8px 10px;
+    border:1px solid rgba(154,208,255,.2);
+    border-radius:999px;
+    background:rgba(10,12,16,.78);
+    color:#dbe9f7;
+    font-size:12px;
+    font-variant-numeric:tabular-nums;
+    box-shadow:0 10px 30px rgba(0,0,0,.26);
+    pointer-events:none;
+  }
+  .run-hud span{white-space:nowrap}
+  .progress-rail{
+    width:110px;
+    height:4px;
+    overflow:hidden;
+    border-radius:999px;
+    background:rgba(255,255,255,.16);
+  }
+  .progress-fill{
+    display:block;
+    width:0%;
+    height:100%;
+    border-radius:inherit;
+    background:linear-gradient(90deg,var(--accent),#ffd48a);
+    transition:width var(--dur-fast) var(--ease-out);
+  }
+  .cue-overlay{
+    position:absolute;
+    inset:0;
+    z-index:24;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:rgba(4,7,12,.62);
+    pointer-events:none;
+  }
+  .cue-overlay[hidden]{display:none}
+  .cue-card{
+    min-width:min(72vw,420px);
+    padding:26px 34px 30px;
+    border:1px solid rgba(255,212,138,.36);
+    border-radius:18px;
+    background:rgba(18,22,29,.9);
+    text-align:center;
+    box-shadow:0 24px 80px rgba(0,0,0,.46);
+  }
+  .cue-label{
+    display:block;
+    margin-bottom:8px;
+    color:#ffe7bf;
+    font-size:13px;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+  }
+  .cue-card strong{
+    display:block;
+    color:#fff6e6;
+    font-size:clamp(72px,18vw,172px);
+    line-height:.9;
+    font-weight:800;
+    font-variant-numeric:tabular-nums;
+  }
+  .cue-overlay.cue-pop .cue-card{
+    animation:success-confirm var(--dur-med) var(--ease-out);
+  }
 
   /* center reading-line indicator */
   .centerline-rule{
@@ -304,6 +383,12 @@
     padding:12px 16px;border-bottom:1px solid var(--line);color:var(--muted);
   }
   .editor-head strong{color:var(--text)}
+  .script-meta{
+    color:#d4deec;
+    font-size:12px;
+    font-variant-numeric:tabular-nums;
+    white-space:nowrap;
+  }
   #script{
     flex:1;width:100%;resize:none;border:0;outline:0;
     background:var(--bg);color:var(--text);
@@ -388,6 +473,17 @@
     .group{padding:4px 6px}
     .group .label{display:none}
     header.bar .brand small{display:none}
+    .script-meta{display:none}
+    .run-hud{
+      top:8px;
+      left:8px;
+      right:8px;
+      justify-content:space-between;
+      gap:8px;
+      border-radius:12px;
+      font-size:11px;
+    }
+    .progress-rail{width:72px}
     #script{font-size:18px;padding:16px}
   }
 
@@ -424,6 +520,7 @@
   <div class="toolbar" id="toolbar" role="toolbar" aria-label="Teleprompter controls">
     <div class="group">
       <button id="playBtn" class="primary" type="button" aria-pressed="false">▶ Play</button>
+      <button id="cueBtn" type="button" title="3 second cue then play (C)" aria-label="Cue then play">Cue + Play</button>
       <button id="restartBtn" class="icon" type="button" title="Restart from top (R)" aria-label="Restart from top">⮌</button>
     </div>
 
@@ -505,6 +602,18 @@
       <div class="fade top" aria-hidden="true"></div>
       <div class="fade bottom" aria-hidden="true"></div>
       <div class="centerline-rule" aria-hidden="true"></div>
+      <div class="run-hud" id="runHud" aria-live="polite">
+        <span id="timerOut">00:00 / 00:00</span>
+        <span id="remainingOut">Left 00:00</span>
+        <span id="progressOut">0%</span>
+        <span class="progress-rail" aria-hidden="true"><span class="progress-fill" id="progressFill"></span></span>
+      </div>
+      <div class="cue-overlay" id="cueOverlay" hidden aria-hidden="true">
+        <div class="cue-card">
+          <span class="cue-label">Stand by</span>
+          <strong id="cueOut">3</strong>
+        </div>
+      </div>
       <div class="mirror-wrap">
         <div class="reader-inner" id="readerInner"></div>
       </div>
@@ -515,6 +624,7 @@
         <strong>Your script</strong>
         <span class="hint" id="saveHint" aria-live="polite">Paste or type. Saved automatically on this device.</span>
         <span class="storage-status" id="storageStatus" hidden>Auto save off. Use Save or Load.</span>
+        <span class="script-meta" id="scriptMeta">0 words · 00:00 run</span>
         <span class="spacer" style="flex:1"></span>
         <button id="doneBtn" class="primary" type="button">Done — start reading</button>
       </div>
@@ -554,7 +664,9 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
       <kbd>−</kbd><span class="desc">Decrease font size</span>
       <kbd>M</kbd><span class="desc">Toggle mirror mode</span>
       <kbd>F</kbd><span class="desc">Toggle fullscreen</span>
+      <kbd>C</kbd><span class="desc">Cue then play</span>
       <kbd>R</kbd><span class="desc">Restart from top</span>
+      <kbd>Page</kbd><span class="desc">Step up / down</span>
       <kbd>Esc</kbd><span class="desc">Exit fullscreen / close this</span>
     </div>
     <div class="close-row">
@@ -583,6 +695,14 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   var saveLocalBtn = $('saveLocalBtn');
   var loadLocalBtn = $('loadLocalBtn');
   var deleteLocalBtn = $('deleteLocalBtn');
+  var cueBtn = $('cueBtn');
+  var cueOverlay = $('cueOverlay');
+  var cueOut = $('cueOut');
+  var timerOut = $('timerOut');
+  var remainingOut = $('remainingOut');
+  var progressOut = $('progressOut');
+  var progressFill = $('progressFill');
+  var scriptMeta = $('scriptMeta');
 
   // ---- Settings (persisted) ----
   var SPEED = {min:10, max:400, step:10, val:60};   // px / second
@@ -606,6 +726,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   var TEXT_COLOR = 'white';
 
   var STORE = 'teleprompter.v1';
+  var CUE_SECONDS = 3;
   var storage = (function(){
     var local = null;
     var ok = false;
@@ -730,6 +851,10 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   var predictedButton = null;
   var savedScripts = [];
   var activeSavedScriptId = '';
+  var scriptStats = {
+    words:0,
+    lines:0
+  };
   var SAMPLE_SCRIPT = [
     'Sample script',
     '',
@@ -816,6 +941,45 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
 
   function scriptTitle(){
     return titleFromScript() || 'Untitled script';
+  }
+
+  function hasScriptText(){
+    return (script.value || '').trim().length > 0;
+  }
+
+  function updateScriptStats(){
+    var text = script.value || '';
+    var words = text.trim() ? text.trim().match(/\S+/g) : null;
+    var lines = text.split(/\r?\n/).filter(function(line){ return line.trim(); });
+    scriptStats.words = words ? words.length : 0;
+    scriptStats.lines = lines.length;
+    updateRunHud();
+  }
+
+  function formatTime(totalSeconds){
+    var seconds = Math.max(0, Math.ceil(Number.isFinite(totalSeconds) ? totalSeconds : 0));
+    var h = Math.floor(seconds / 3600);
+    var m = Math.floor((seconds % 3600) / 60);
+    var s = seconds % 60;
+    if(h > 0){
+      return h + ':' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+    }
+    return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+  }
+
+  function updateRunHud(){
+    var total = SPEED.val > 0 ? maxScroll / SPEED.val : 0;
+    var elapsed = SPEED.val > 0 ? clamp(pos / SPEED.val, 0, total) : 0;
+    var remaining = Math.max(0, total - elapsed);
+    var pct = maxScroll > 0 ? Math.round(clamp(pos / maxScroll, 0, 1) * 100) : 0;
+    if(timerOut) timerOut.textContent = formatTime(elapsed) + ' / ' + formatTime(total);
+    if(remainingOut) remainingOut.textContent = 'Left ' + formatTime(remaining);
+    if(progressOut) progressOut.textContent = pct + '%';
+    if(progressFill) progressFill.style.width = pct + '%';
+    if(scriptMeta){
+      var rate = scriptStats.words && total ? Math.round(scriptStats.words / Math.max(total / 60, 0.01)) : 0;
+      scriptMeta.textContent = scriptStats.words + ' words · ' + formatTime(total) + ' run' + (rate ? ' · ' + rate + ' wpm' : '');
+    }
   }
 
   function newSavedScriptId(){
@@ -1118,10 +1282,12 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     // inner has 50vh top+bottom padding; scroll range = full height - viewport height
     maxScroll = Math.max(0, inner.offsetHeight - reader.clientHeight);
     pos = clamp(pos, 0, maxScroll);
+    updateRunHud();
   }
 
   function applyTransform(){
     inner.style.transform = 'translateY(' + (-pos).toFixed(2) + 'px)';
+    updateRunHud();
   }
 
   function applySnapTransform(){
@@ -1148,11 +1314,13 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   // ---- Reader content ----
   function syncReader(){
     inner.textContent = script.value || '';
+    updateScriptStats();
     measure();
   }
 
   // ---- Modes ----
   function setReading(on){
+    if(!on) cancelCue(false);
     body.classList.toggle('reading', on);
     if(on){
       syncReader();
@@ -1187,6 +1355,12 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   }
 
   function play(){
+    if(!hasScriptText()){
+      setReading(false);
+      signalError($('playBtn'));
+      showHintNotice('Add script text before playback.', 'error');
+      return;
+    }
     cancelReaderDrag();
     if(!isReading()) setReading(true);
     if(maxScroll<=0) measure();
@@ -1210,6 +1384,13 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     if(hideTimer) clearTimeout(hideTimer);
   }
   function togglePlay(){
+    if(cueing){
+      cancelCue(true);
+      signalSuccess($('playBtn'));
+      savePreferences('cue-cancel');
+      updatePrediction();
+      return;
+    }
     playing ? pause() : play();
     signalSuccess($('playBtn'));
     savePreferences(playing ? 'play' : 'pause');
@@ -1217,6 +1398,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   }
 
   function restart(){
+    cancelCue(false);
     pos = 0; applySnapTransform(); showToast(false);
     signalSuccess($('restartBtn'));
     savePreferences('restart');
@@ -1251,6 +1433,84 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   // ---- Toast ----
   function showToast(on){ toast.classList.toggle('show', on); }
 
+  var cueing = false;
+  var cueTimer = null;
+
+  function setCueUi(active, count){
+    cueing = active;
+    body.classList.toggle('cueing', active);
+    if(cueBtn){
+      cueBtn.textContent = active ? 'Cancel Cue' : 'Cue + Play';
+      cueBtn.classList.toggle('cue-active', active);
+      cueBtn.setAttribute('aria-pressed', String(active));
+    }
+    if(cueOverlay){
+      cueOverlay.hidden = !active;
+      cueOverlay.setAttribute('aria-hidden', String(!active));
+    }
+    if(active && cueOut) cueOut.textContent = String(count);
+  }
+
+  function cancelCue(notify){
+    if(cueTimer) clearTimeout(cueTimer);
+    cueTimer = null;
+    if(!cueing) return;
+    setCueUi(false, '');
+    if(notify){
+      signalSuccess(cueBtn);
+      showHintNotice('Cue canceled.', 'success');
+    }
+    updatePrediction();
+  }
+
+  function finishCue(){
+    if(cueTimer) clearTimeout(cueTimer);
+    cueTimer = null;
+    setCueUi(false, '');
+    play();
+    signalSuccess(cueBtn);
+    savePreferences('cue-play');
+    updatePrediction();
+  }
+
+  function cueStep(count){
+    if(!cueing) return;
+    if(count <= 0){
+      finishCue();
+      return;
+    }
+    if(cueOut) cueOut.textContent = String(count);
+    if(cueOverlay){
+      cueOverlay.classList.remove('cue-pop');
+      void cueOverlay.offsetWidth;
+      cueOverlay.classList.add('cue-pop');
+    }
+    cueTimer = setTimeout(function(){
+      cueStep(count - 1);
+    }, 1000);
+  }
+
+  function startCue(){
+    if(cueing){
+      cancelCue(true);
+      savePreferences('cue-cancel');
+      return;
+    }
+    if(!hasScriptText()){
+      setReading(false);
+      signalError(cueBtn);
+      showHintNotice('Add script text before cueing playback.', 'error');
+      return;
+    }
+    pause();
+    if(!isReading()) setReading(true);
+    showToast(false);
+    setCueUi(true, CUE_SECONDS);
+    savePreferences('cue-ready');
+    updatePrediction();
+    cueStep(CUE_SECONDS);
+  }
+
   function setPredictedAction(button, message){
     if(predictedButton) predictedButton.classList.remove('predicted-action');
     predictedButton = button || null;
@@ -1262,6 +1522,10 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   function updatePrediction(){
     if(!saveHint) return;
     var text = (script.value || '').trim();
+    if(cueing){
+      setPredictedAction(cueBtn, 'Next: Cue is running.');
+      return;
+    }
     if(!text){
       setPredictedAction(savedScripts.length ? loadLocalBtn : $('loadFileBtn'), savedScripts.length ? 'Next: Load a saved script or paste text.' : 'Next: Load a script or paste text.');
       return;
@@ -1278,7 +1542,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
       setPredictedAction($('restartBtn'), 'Next: Restart from top.');
       return;
     }
-    setPredictedAction($('playBtn'), 'Next: Play.');
+    setPredictedAction(cueBtn, 'Next: Cue + Play.');
   }
 
   // ---- Settings mutators ----
@@ -1290,7 +1554,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   function changeFont(dir){ bump(FONT, dir, 'fontOut'); applyMetric(); }
   function changeLH(dir){ bump(LH, dir, 'lhOut', function(v){return v.toFixed(1);}); applyMetric(); }
   function changeWidth(dir){ bump(WIDTH, dir, 'widthOut'); applyMetric(); }
-  function changeSpeed(dir){ bump(SPEED, dir, 'speedOut'); savePreferences('speed'); updatePrediction(); }
+  function changeSpeed(dir){ bump(SPEED, dir, 'speedOut'); updateRunHud(); savePreferences('speed'); updatePrediction(); }
   function changeFontFace(value){
     FONT_FACE = sanitizeFontFace(value);
     saveSettings();
@@ -1378,7 +1642,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   }
 
   function startReaderDrag(e){
-    if(playing || !isReading()) return;
+    if(cueing || playing || !isReading()) return;
     if(typeof e.button === 'number' && e.button !== 0) return;
     dragState.active = true;
     dragState.pointerId = e.pointerId;
@@ -1417,6 +1681,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   $('editBtn').addEventListener('click', function(){ setReading(false); signalSuccess($('editBtn')); });
   $('doneBtn').addEventListener('click', function(){ setReading(true); signalSuccess($('doneBtn')); });
   $('playBtn').addEventListener('click', togglePlay);
+  cueBtn.addEventListener('click', startCue);
   $('restartBtn').addEventListener('click', restart);
   $('toastRestart').addEventListener('click', function(){ restart(); play(); signalSuccess($('toastRestart')); signalSuccess($('playBtn')); });
   $('mirrorBtn').addEventListener('click', toggleMirror);
@@ -1474,6 +1739,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   script.addEventListener('input', function(){
     saveScriptDebounced();
     rememberFileStem(fileStemFromText(titleFromScript()));
+    updateScriptStats();
     if(isReading()) syncReader();
     updatePrediction();
   });
@@ -1509,6 +1775,12 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
       if(k==='Escape'){ e.preventDefault(); closeHelp(); }
       return;
     }
+    if(cueing && k==='Escape'){
+      e.preventDefault();
+      cancelCue(true);
+      savePreferences('cue-cancel');
+      return;
+    }
     if(typing){
       // allow Esc to leave the editor into reading mode
       if(k==='Escape'){ e.preventDefault(); setReading(true); }
@@ -1530,6 +1802,8 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
         e.preventDefault(); toggleMirror(); wake(); break;
       case 'f': case 'F':
         e.preventDefault(); toggleFullscreen(); break;
+      case 'c': case 'C':
+        e.preventDefault(); startCue(); break;
       case 'r': case 'R':
         e.preventDefault(); restart(); wake(); break;
       case 'PageDown':

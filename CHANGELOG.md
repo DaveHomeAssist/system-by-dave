@@ -2,6 +2,7 @@
 
 ## 2026-06-13
 
+* Added pro run controls to `/teleprompter.html`: a 3-second Cue + Play leader, live elapsed and remaining run time, progress percentage, progress rail, and script word-count/run-rate readout.
 * Expanded `/teleprompter.html` formatting and script management: added reader font family choices, text color swatches, and a local saved-scripts library with Save, Load, Delete, and per-script formatting snapshots.
 * Added lightweight anticipatory UX to `/teleprompter.html`: context-aware next-action highlights, short dynamic hints, smarter title-based Save filenames, last-mode restore, and local-only preference metadata in `localStorage`.
 * Added an unlisted, noindex **Prompt Browser** page at `/prompt-browser.html` for the full local prompt library browser. The page includes ranked search, review queue, fill-in mode, saved views, import/export state, and local-only browser state. It is blocked in `robots.txt` and kept out of `sitemap.xml` and site navigation because the embedded library includes internal working prompts.
