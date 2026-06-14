@@ -1,0 +1,1492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'none'">
+<title>Playback Check | System by Dave</title>
+<meta name="description" content="A browser based AV playback checklist for media files, cue timing, destinations, audio routing, backup status, and playback readiness.">
+<link rel="canonical" href="https://systembydave.com/playback-check.html">
+<meta name="theme-color" content="#0b0d10">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="System by Dave">
+<meta property="og:title" content="Playback Check">
+<meta property="og:description" content="A browser based AV playback checklist for media files, cue timing, destinations, audio routing, backup status, and playback readiness.">
+<meta property="og:url" content="https://systembydave.com/playback-check.html">
+<meta property="og:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<meta property="og:image:width" content="1024">
+<meta property="og:image:height" content="412">
+<meta property="og:image:alt" content="System by Dave preview banner">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Playback Check">
+<meta name="twitter:description" content="A browser based AV playback checklist for media files, cue timing, destinations, audio routing, backup status, and playback readiness.">
+<meta name="twitter:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<link rel="icon" href="svg/system_by_dave_logo_rust.svg" type="image/svg+xml">
+<style>
+  :root{
+    --bg:#0b0d10;
+    --panel:#12171d;
+    --panel-2:#171e26;
+    --panel-3:#1d252e;
+    --line:#303945;
+    --line-strong:#465363;
+    --text:#f6f8fb;
+    --muted:#a9b4c1;
+    --dim:#768391;
+    --rust:#c0623a;
+    --rust-2:#e58a5c;
+    --blue:#72b8ff;
+    --green:#6be092;
+    --amber:#ffd166;
+    --red:#ff6b6b;
+    --purple:#b996ff;
+    --ink:#071016;
+    --radius:8px;
+    --shadow:0 16px 60px rgba(0,0,0,.32);
+    --mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --fast:120ms;
+    --med:180ms;
+    --ease:cubic-bezier(.2,.8,.2,1);
+    --press:cubic-bezier(.2,0,0,1);
+  }
+  *{box-sizing:border-box}
+  html,body{min-height:100%}
+  body{
+    margin:0;
+    background:
+      radial-gradient(circle at 15% -12%,rgba(192,98,58,.18),transparent 30rem),
+      radial-gradient(circle at 84% 10%,rgba(114,184,255,.1),transparent 28rem),
+      linear-gradient(180deg,#0b0d10 0%,#11161b 52%,#080a0d 100%);
+    color:var(--text);
+    font-family:var(--sans);
+    line-height:1.45;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+  body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    background:
+      repeating-linear-gradient(90deg,rgba(255,255,255,.034) 0 1px,transparent 1px 80px),
+      repeating-linear-gradient(0deg,rgba(255,255,255,.024) 0 1px,transparent 1px 80px);
+    mask-image:linear-gradient(180deg,rgba(0,0,0,.78),rgba(0,0,0,.12));
+  }
+  a{color:inherit}
+  button,input,select,textarea{font:inherit}
+  button{
+    min-height:44px;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    background:var(--panel-2);
+    color:var(--text);
+    padding:9px 12px;
+    cursor:pointer;
+    user-select:none;
+    -webkit-tap-highlight-color:transparent;
+    transition:
+      transform var(--fast) var(--press),
+      border-color var(--fast) var(--ease),
+      background var(--fast) var(--ease),
+      box-shadow var(--fast) var(--ease),
+      color var(--fast) var(--ease);
+    touch-action:manipulation;
+  }
+  button:hover{
+    border-color:var(--line-strong);
+    background:var(--panel-3);
+    transform:translateY(-1px);
+    box-shadow:0 8px 22px rgba(0,0,0,.18);
+  }
+  button:active,
+  button.is-pressing{
+    transform:translateY(1px) scale(.975);
+    box-shadow:inset 0 2px 5px rgba(0,0,0,.28);
+  }
+  button.primary{
+    background:linear-gradient(180deg,var(--rust-2),var(--rust));
+    border-color:var(--rust);
+    color:#140905;
+    font-weight:800;
+  }
+  button.danger{
+    border-color:rgba(255,107,107,.55);
+    color:#ffd5d5;
+    background:rgba(255,107,107,.1);
+  }
+  button:disabled{
+    cursor:not-allowed;
+    opacity:.52;
+    transform:none;
+    box-shadow:none;
+  }
+  button:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible,
+  a:focus-visible{
+    outline:2px solid var(--blue);
+    outline-offset:3px;
+  }
+  input,select,textarea{
+    width:100%;
+    min-height:40px;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    background:#0e1318;
+    color:var(--text);
+    padding:9px 10px;
+    transition:border-color var(--fast) var(--ease),background var(--fast) var(--ease),box-shadow var(--fast) var(--ease);
+  }
+  textarea{
+    min-height:42px;
+    resize:vertical;
+  }
+  input:hover,
+  input:focus,
+  select:hover,
+  select:focus,
+  textarea:hover,
+  textarea:focus{
+    border-color:var(--line-strong);
+    background:#111821;
+  }
+  input::placeholder,
+  textarea::placeholder{color:var(--dim)}
+  .skip-link{
+    position:absolute;
+    top:12px;
+    left:12px;
+    z-index:1000;
+    background:var(--text);
+    color:var(--ink);
+    padding:10px 14px;
+    border-radius:var(--radius);
+    transform:translateY(-150%);
+    transition:transform var(--med) var(--ease);
+  }
+  .skip-link:focus-visible{transform:translateY(0)}
+  .app{
+    position:relative;
+    z-index:1;
+    min-height:100vh;
+  }
+  .topbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    padding:14px 18px;
+    border-bottom:1px solid rgba(255,255,255,.08);
+    background:rgba(11,13,16,.88);
+    backdrop-filter:blur(18px);
+    position:sticky;
+    top:0;
+    z-index:30;
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    text-decoration:none;
+  }
+  .brand-mark{
+    width:38px;
+    height:38px;
+    border:1px solid rgba(255,255,255,.24);
+    border-radius:50%;
+    display:grid;
+    place-items:center;
+    font-family:Georgia,serif;
+    font-size:19px;
+    color:var(--rust-2);
+    background:#11161c;
+  }
+  .brand-text{
+    display:flex;
+    flex-direction:column;
+    gap:1px;
+  }
+  .brand-text strong{
+    font-size:14px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+  }
+  .brand-text span{
+    color:var(--muted);
+    font-family:var(--mono);
+    font-size:11px;
+  }
+  .top-actions{
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+    gap:8px;
+    flex-wrap:wrap;
+  }
+  .top-link{
+    color:var(--muted);
+    font-family:var(--mono);
+    font-size:12px;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+    text-decoration:none;
+  }
+  .top-link:hover{color:var(--text)}
+  main{
+    width:min(1540px,100%);
+    margin:0 auto;
+    padding:26px 18px 34px;
+  }
+  .hero{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(320px,440px);
+    gap:18px;
+    align-items:stretch;
+    margin-bottom:18px;
+  }
+  .hero-main,
+  .status-panel,
+  .workbench,
+  .inspector,
+  .operator-panel{
+    border:1px solid rgba(255,255,255,.1);
+    border-radius:14px;
+    background:linear-gradient(180deg,rgba(18,23,29,.96),rgba(12,15,19,.96));
+    box-shadow:var(--shadow);
+  }
+  .hero-main{padding:18px}
+  .eyebrow{
+    margin:0 0 10px;
+    color:var(--rust-2);
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+  }
+  .show-title{
+    width:100%;
+    min-height:58px;
+    margin:0 0 12px;
+    padding:8px 10px;
+    border-color:transparent;
+    background:transparent;
+    font-size:clamp(30px,5vw,58px);
+    font-weight:850;
+    line-height:1.04;
+  }
+  .show-title:hover,
+  .show-title:focus{
+    border-color:var(--line);
+    background:#10161d;
+  }
+  .meta-grid{
+    display:grid;
+    grid-template-columns:repeat(5,minmax(0,1fr));
+    gap:10px;
+  }
+  .field label{
+    display:block;
+    margin:0 0 5px;
+    color:var(--dim);
+    font-family:var(--mono);
+    font-size:10px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+  }
+  .status-panel{padding:16px}
+  .stats{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+  }
+  .stat{
+    min-width:0;
+    padding:12px;
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:var(--radius);
+    background:rgba(255,255,255,.035);
+  }
+  .stat span{
+    display:block;
+    margin-bottom:4px;
+    color:var(--dim);
+    font-family:var(--mono);
+    font-size:10px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+  }
+  .stat strong{
+    display:block;
+    font-family:var(--mono);
+    font-size:18px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .layout{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) 340px;
+    gap:18px;
+    align-items:start;
+  }
+  .workbench{overflow:hidden}
+  .toolbar{
+    display:grid;
+    grid-template-columns:minmax(220px,1fr) 150px 150px auto;
+    gap:10px;
+    padding:14px;
+    border-bottom:1px solid rgba(255,255,255,.08);
+  }
+  .button-row{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    justify-content:flex-end;
+  }
+  .table-wrap{
+    overflow-x:auto;
+    max-width:100%;
+  }
+  table{
+    width:100%;
+    min-width:1480px;
+    border-collapse:separate;
+    border-spacing:0;
+  }
+  thead th{
+    position:sticky;
+    top:68px;
+    z-index:2;
+    padding:10px 8px;
+    color:var(--muted);
+    background:#10151b;
+    border-bottom:1px solid rgba(255,255,255,.1);
+    font-family:var(--mono);
+    font-size:10px;
+    letter-spacing:.08em;
+    text-align:left;
+    text-transform:uppercase;
+  }
+  tbody tr{
+    transition:background var(--fast) var(--ease),box-shadow var(--fast) var(--ease),opacity var(--fast) var(--ease);
+  }
+  tbody tr:hover{background:rgba(255,255,255,.035)}
+  tbody tr.selected{
+    background:rgba(114,184,255,.08);
+    box-shadow:inset 3px 0 0 var(--blue);
+  }
+  tbody tr.status-ready{box-shadow:inset 3px 0 0 var(--green)}
+  tbody tr.status-pending{box-shadow:inset 3px 0 0 var(--amber)}
+  tbody tr.status-issue{box-shadow:inset 3px 0 0 var(--red)}
+  tbody tr.status-played{opacity:.72;box-shadow:inset 3px 0 0 var(--purple)}
+  tbody td{
+    padding:8px;
+    border-bottom:1px solid rgba(255,255,255,.07);
+    vertical-align:top;
+  }
+  .field-xs{min-width:76px}
+  .field-small{min-width:110px}
+  .field-medium{min-width:150px}
+  .field-large{min-width:220px}
+  .field-notes{min-width:270px}
+  .row-input,
+  .row-select,
+  .row-textarea{
+    min-height:36px;
+    padding:7px 8px;
+    border-radius:7px;
+    font-size:13px;
+  }
+  .row-input.mono{
+    font-family:var(--mono);
+    font-variant-numeric:tabular-nums;
+  }
+  .row-textarea{
+    min-height:36px;
+    max-height:130px;
+    line-height:1.35;
+  }
+  .empty-state{
+    padding:34px;
+    color:var(--muted);
+    text-align:center;
+  }
+  .empty-state strong{
+    display:block;
+    margin-bottom:6px;
+    color:var(--text);
+  }
+  .side{
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+    min-width:0;
+  }
+  .inspector,
+  .operator-panel{padding:16px}
+  .panel-title{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:12px;
+    padding-bottom:12px;
+    border-bottom:1px solid rgba(255,255,255,.08);
+  }
+  .panel-title h2{
+    margin:0;
+    font-size:13px;
+    font-family:var(--mono);
+    letter-spacing:.1em;
+    text-transform:uppercase;
+  }
+  .panel-title span{
+    color:var(--dim);
+    font-family:var(--mono);
+    font-size:11px;
+  }
+  .next-card{
+    margin-bottom:12px;
+    padding:14px;
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:var(--radius);
+    background:#0e1318;
+  }
+  .next-card span{
+    display:block;
+    margin-bottom:6px;
+    color:var(--rust-2);
+    font-family:var(--mono);
+    font-size:10px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+  }
+  .next-card strong{
+    display:block;
+    margin-bottom:6px;
+    font-size:18px;
+    line-height:1.25;
+  }
+  .next-card p{
+    margin:0;
+    color:var(--muted);
+    font-size:13px;
+  }
+  .selected-grid{
+    display:grid;
+    gap:8px;
+  }
+  .selected-grid textarea{min-height:72px}
+  .side-actions{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+  }
+  .side-actions .wide{grid-column:1 / -1}
+  .hint{
+    min-height:21px;
+    color:var(--muted);
+    font-size:13px;
+    line-height:1.45;
+  }
+  .hint.success{color:#bdf8ce}
+  .hint.error{color:#ffd0d0}
+  .shortcut-list{
+    display:grid;
+    grid-template-columns:auto 1fr;
+    gap:9px 12px;
+    margin:0;
+    color:var(--muted);
+    font-size:13px;
+  }
+  .shortcut-list dt{
+    min-width:42px;
+    padding:2px 6px;
+    border:1px solid var(--line);
+    border-radius:6px;
+    background:#0e1318;
+    color:var(--text);
+    font-family:var(--mono);
+    text-align:center;
+  }
+  .shortcut-list dd{margin:0}
+  .privacy-note{
+    margin:14px 0 0;
+    color:var(--dim);
+    font-size:12px;
+    line-height:1.55;
+  }
+  .feedback-success{
+    animation:confirm var(--med) var(--ease);
+    border-color:rgba(107,224,146,.85) !important;
+  }
+  .feedback-error{
+    animation:shake 160ms cubic-bezier(.3,0,.2,1);
+    border-color:var(--red) !important;
+    box-shadow:0 0 0 3px rgba(255,107,107,.16) !important;
+  }
+  @keyframes confirm{
+    0%{transform:scale(1)}
+    45%{transform:scale(1.02);box-shadow:0 0 0 4px rgba(107,224,146,.14)}
+    100%{transform:scale(1);box-shadow:0 0 0 rgba(107,224,146,0)}
+  }
+  @keyframes shake{
+    0%,100%{transform:translateX(0)}
+    30%{transform:translateX(-4px)}
+    60%{transform:translateX(4px)}
+    82%{transform:translateX(-2px)}
+  }
+  .noscript{
+    margin:20px;
+    padding:16px;
+    border:1px solid var(--red);
+    border-radius:var(--radius);
+    background:rgba(255,107,107,.1);
+    color:#ffd0d0;
+  }
+  .file-input{display:none}
+  @media (max-width:1080px){
+    .hero,
+    .layout{grid-template-columns:1fr}
+    .toolbar{grid-template-columns:1fr 1fr}
+    .button-row{justify-content:flex-start}
+    thead th{top:66px}
+  }
+  @media (max-width:680px){
+    .topbar{align-items:flex-start;flex-direction:column}
+    .top-actions{justify-content:flex-start}
+    main{padding:18px 10px 26px}
+    .hero-main,
+    .status-panel,
+    .workbench,
+    .inspector,
+    .operator-panel{border-radius:10px}
+    .meta-grid{grid-template-columns:1fr}
+    .stats{grid-template-columns:1fr 1fr}
+    .toolbar{grid-template-columns:1fr}
+    .button-row{display:grid;grid-template-columns:1fr 1fr}
+    .button-row button{width:100%}
+    table{min-width:1300px}
+    .side-actions{grid-template-columns:1fr}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{transition-duration:.001ms !important;animation-duration:.001ms !important}
+    button:hover,button:active,button.is-pressing{transform:none}
+  }
+  @media print{
+    body{background:#fff;color:#111}
+    body::before,
+    .topbar,
+    .toolbar,
+    .side,
+    .skip-link{display:none !important}
+    main{width:100%;padding:0}
+    .hero{display:block}
+    .hero-main,
+    .status-panel,
+    .workbench{
+      border:0;
+      box-shadow:none;
+      background:#fff;
+      color:#111;
+    }
+    input,select,textarea{
+      border:0;
+      background:transparent;
+      color:#111;
+      padding:0;
+    }
+    table{min-width:0;font-size:10px}
+    thead th{position:static;background:#eee;color:#111}
+    tbody td{border-bottom:1px solid #ccc}
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#playbackTable">Skip to playback list</a>
+<noscript>
+  <div class="noscript">Playback Check needs JavaScript for editing, import, export, filtering, and browser saved state.</div>
+</noscript>
+<div class="app">
+  <header class="topbar">
+    <a class="brand" href="index.html#av-tools" aria-label="Back to AV tools">
+      <span class="brand-mark">S</span>
+      <span class="brand-text">
+        <strong>Playback Check</strong>
+        <span>System by Dave AV tools</span>
+      </span>
+    </a>
+    <div class="top-actions">
+      <a class="top-link" href="index.html#av-tools">AV Tools</a>
+      <button id="printBtn" type="button">Print</button>
+      <button id="copySummaryBtn" type="button">Copy Summary</button>
+      <button id="exportCsvBtn" type="button">Export CSV</button>
+      <button id="exportJsonBtn" type="button">Export JSON</button>
+      <button id="importJsonBtn" type="button">Import JSON</button>
+      <input id="importInput" class="file-input" type="file" accept=".json,application/json">
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" aria-label="Show metadata">
+      <div class="hero-main">
+        <p class="eyebrow">Media playback checklist</p>
+        <input id="showName" class="show-title" type="text" aria-label="Show name">
+        <div class="meta-grid">
+          <div class="field">
+            <label for="venue">Venue</label>
+            <input id="venue" type="text">
+          </div>
+          <div class="field">
+            <label for="showDate">Date</label>
+            <input id="showDate" type="date">
+          </div>
+          <div class="field">
+            <label for="playbackOp">Playback Op</label>
+            <input id="playbackOp" type="text">
+          </div>
+          <div class="field">
+            <label for="tdName">TD</label>
+            <input id="tdName" type="text">
+          </div>
+          <div class="field">
+            <label for="audioLead">Audio</label>
+            <input id="audioLead" type="text">
+          </div>
+        </div>
+      </div>
+      <aside class="status-panel" aria-label="Playback status">
+        <div class="stats">
+          <div class="stat"><span>Total</span><strong id="totalOut">0</strong></div>
+          <div class="stat"><span>Ready</span><strong id="readyOut">0</strong></div>
+          <div class="stat"><span>Issues</span><strong id="issueOut">0</strong></div>
+          <div class="stat"><span>Played</span><strong id="playedOut">0</strong></div>
+          <div class="stat"><span>Remaining</span><strong id="remainingOut">0</strong></div>
+          <div class="stat"><span>Runtime</span><strong id="runtimeOut">00:00</strong></div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="layout">
+      <div class="workbench">
+        <div class="toolbar" role="toolbar" aria-label="Playback list controls">
+          <input id="searchInput" type="search" placeholder="Search file, cue, destination, notes" aria-label="Search playback cues">
+          <select id="destinationFilter" aria-label="Filter by destination"></select>
+          <select id="statusFilter" aria-label="Filter by status">
+            <option value="all">All status</option>
+            <option value="ready">Ready</option>
+            <option value="pending">Pending</option>
+            <option value="issue">Issue</option>
+            <option value="played">Played</option>
+          </select>
+          <div class="button-row">
+            <button id="addCueBtn" class="primary" type="button">Add Cue</button>
+            <button id="loadSampleBtn" type="button">Sample</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table id="playbackTable">
+            <thead>
+              <tr>
+                <th>Cue</th>
+                <th>File</th>
+                <th>Type</th>
+                <th>Duration</th>
+                <th>Aspect</th>
+                <th>Audio</th>
+                <th>Destination</th>
+                <th>Status</th>
+                <th>Backup</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody id="cueBody"></tbody>
+          </table>
+          <div id="emptyState" class="empty-state" hidden>
+            <strong>No playback cues match.</strong>
+            <span>Clear filters or add a new cue.</span>
+          </div>
+        </div>
+      </div>
+
+      <aside class="side" aria-label="Selected playback cue">
+        <section class="inspector">
+          <div class="panel-title">
+            <h2>Selected cue</h2>
+            <span id="selectedIdOut">None</span>
+          </div>
+          <div class="next-card">
+            <span>Next unplayed</span>
+            <strong id="nextCueTitle">None</strong>
+            <p id="nextCueMeta">Ready cues appear here.</p>
+          </div>
+          <div class="selected-grid">
+            <div class="field">
+              <label for="selectedStatus">Status</label>
+              <select id="selectedStatus">
+                <option value="ready">Ready</option>
+                <option value="pending">Pending</option>
+                <option value="issue">Issue</option>
+                <option value="played">Played</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="selectedNotes">Notes</label>
+              <textarea id="selectedNotes"></textarea>
+            </div>
+            <div class="side-actions">
+              <button id="markReadyBtn" type="button">Ready</button>
+              <button id="markIssueBtn" type="button">Issue</button>
+              <button id="playNextBtn" class="primary wide" type="button">Play Next</button>
+              <button id="moveUpBtn" type="button">Move Up</button>
+              <button id="moveDownBtn" type="button">Move Down</button>
+              <button id="duplicateBtn" type="button">Duplicate</button>
+              <button id="deleteBtn" class="danger" type="button">Delete</button>
+            </div>
+          </div>
+          <p id="hint" class="hint" role="status">Loaded sample playback plan.</p>
+        </section>
+
+        <section class="operator-panel">
+          <div class="panel-title">
+            <h2>Keyboard</h2>
+            <span>Fast actions</span>
+          </div>
+          <dl class="shortcut-list">
+            <dt>N</dt><dd>Add cue</dd>
+            <dt>R</dt><dd>Mark selected ready</dd>
+            <dt>I</dt><dd>Mark selected issue</dd>
+            <dt>P</dt><dd>Play next ready cue</dd>
+            <dt>D</dt><dd>Duplicate selected cue</dd>
+            <dt>Del</dt><dd>Delete selected cue</dd>
+          </dl>
+          <p class="privacy-note">Playback data is remembered in this browser when storage is available. Export JSON before moving to another device.</p>
+        </section>
+      </aside>
+    </section>
+  </main>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var STORAGE_KEY = 'playback-check.v1';
+  var SCHEMA = 'system-by-dave.playback-check.v1';
+  var STATUS = ['ready','pending','issue','played'];
+  var TYPES = ['video','audio','slide','image','walk in','sting','other'];
+  var ASPECTS = ['16:9','9:16','4:3','1:1','21:9','audio only','mixed'];
+  var AUDIO = ['embedded','separate','none','voiceover','house music','click'];
+  var DESTINATIONS = ['Main screen','Confidence','Record','Stream','Lobby','Audio console','All screens'];
+  var $ = function(id){ return document.getElementById(id); };
+
+  var state = {
+    meta:{
+      showName:'General Session Playback',
+      venue:'Ballroom A',
+      showDate:new Date().toISOString().slice(0, 10),
+      playbackOp:'Playback',
+      tdName:'TD',
+      audioLead:'A1'
+    },
+    cues:[],
+    selectedId:'',
+    filters:{search:'',destination:'all',status:'all'}
+  };
+
+  var sampleCues = [
+    {cue:'PB 001',file:'00_walk_in_loop_1080p.mov',type:'walk in',duration:'12:00',aspect:'16:9',audio:'embedded',destination:'Main screen',status:'ready',backup:'Backup SSD A',notes:'Loop until house to half.'},
+    {cue:'PB 002',file:'01_opening_sting_h264.mp4',type:'sting',duration:'00:18',aspect:'16:9',audio:'embedded',destination:'All screens',status:'ready',backup:'Playback laptop 2',notes:'Roll on TD call after lights out.'},
+    {cue:'PB 003',file:'02_ceo_intro_lowerthird.png',type:'image',duration:'00:08',aspect:'16:9',audio:'none',destination:'Main screen',status:'pending',backup:'Graphics folder',notes:'Confirm spelling with producer.'},
+    {cue:'PB 004',file:'03_product_video_final_v7.mp4',type:'video',duration:'02:34',aspect:'16:9',audio:'embedded',destination:'Main screen',status:'issue',backup:'Backup SSD A',notes:'Audio tail pops. Need replaced file before doors.'},
+    {cue:'PB 005',file:'04_awards_music_bed.wav',type:'audio',duration:'05:00',aspect:'audio only',audio:'house music',destination:'Audio console',status:'ready',backup:'Qlab backup',notes:'Fade under presenter walk.'},
+    {cue:'PB 006',file:'05_closing_loop_clean.mov',type:'video',duration:'08:00',aspect:'16:9',audio:'embedded',destination:'Lobby',status:'pending',backup:'Playback laptop 2',notes:'Check lobby scaler input.'}
+  ];
+
+  var inputs = {
+    showName:$('showName'),
+    venue:$('venue'),
+    showDate:$('showDate'),
+    playbackOp:$('playbackOp'),
+    tdName:$('tdName'),
+    audioLead:$('audioLead'),
+    search:$('searchInput'),
+    destination:$('destinationFilter'),
+    status:$('statusFilter'),
+    selectedStatus:$('selectedStatus'),
+    selectedNotes:$('selectedNotes')
+  };
+
+  function storageAvailable(){
+    try{
+      var key = 'playback-check-probe';
+      localStorage.setItem(key, key);
+      localStorage.removeItem(key);
+      return true;
+    }catch(e){
+      return false;
+    }
+  }
+
+  function uid(){
+    return 'cue-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
+  }
+
+  function cloneCue(cue){
+    return {
+      id:cue.id || uid(),
+      cue:String(cue.cue || ''),
+      file:String(cue.file || ''),
+      type:TYPES.indexOf(cue.type) >= 0 ? cue.type : 'video',
+      duration:normalizeDurationInput(cue.duration || ''),
+      aspect:ASPECTS.indexOf(cue.aspect) >= 0 ? cue.aspect : '16:9',
+      audio:AUDIO.indexOf(cue.audio) >= 0 ? cue.audio : 'embedded',
+      destination:String(cue.destination || 'Main screen'),
+      status:STATUS.indexOf(cue.status) >= 0 ? cue.status : 'pending',
+      backup:String(cue.backup || ''),
+      notes:String(cue.notes || '')
+    };
+  }
+
+  function normalizeState(raw){
+    var next = raw && typeof raw === 'object' ? raw : {};
+    var meta = next.meta && typeof next.meta === 'object' ? next.meta : {};
+    return {
+      meta:{
+        showName:String(meta.showName || 'General Session Playback').slice(0, 120),
+        venue:String(meta.venue || '').slice(0, 120),
+        showDate:String(meta.showDate || new Date().toISOString().slice(0, 10)).slice(0, 20),
+        playbackOp:String(meta.playbackOp || '').slice(0, 80),
+        tdName:String(meta.tdName || '').slice(0, 80),
+        audioLead:String(meta.audioLead || '').slice(0, 80)
+      },
+      cues:Array.isArray(next.cues) ? next.cues.map(cloneCue).slice(0, 200) : sampleCues.map(cloneCue),
+      selectedId:typeof next.selectedId === 'string' ? next.selectedId : '',
+      filters:{
+        search:String(next.filters && next.filters.search || ''),
+        destination:String(next.filters && next.filters.destination || 'all'),
+        status:STATUS.indexOf(next.filters && next.filters.status) >= 0 ? next.filters.status : 'all'
+      }
+    };
+  }
+
+  function loadState(){
+    if(!storageAvailable()){
+      state = normalizeState({});
+      return;
+    }
+    try{
+      var raw = localStorage.getItem(STORAGE_KEY);
+      state = raw ? normalizeState(JSON.parse(raw)) : normalizeState({});
+    }catch(e){
+      state = normalizeState({});
+    }
+    if(!state.selectedId && state.cues[0]) state.selectedId = state.cues[0].id;
+  }
+
+  function saveState(){
+    if(!storageAvailable()) return false;
+    try{
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        schema:SCHEMA,
+        savedAt:new Date().toISOString(),
+        meta:state.meta,
+        cues:state.cues,
+        selectedId:state.selectedId,
+        filters:state.filters
+      }));
+      return true;
+    }catch(e){
+      showHint('Could not save in this browser. Export JSON to keep a copy.', 'error');
+      return false;
+    }
+  }
+
+  function setInputValues(){
+    inputs.showName.value = state.meta.showName;
+    inputs.venue.value = state.meta.venue;
+    inputs.showDate.value = state.meta.showDate;
+    inputs.playbackOp.value = state.meta.playbackOp;
+    inputs.tdName.value = state.meta.tdName;
+    inputs.audioLead.value = state.meta.audioLead;
+    inputs.search.value = state.filters.search;
+    inputs.status.value = state.filters.status;
+  }
+
+  function selectOptions(values, selected, firstLabel){
+    var html = firstLabel ? '<option value="all">' + escapeHtml(firstLabel) + '</option>' : '';
+    values.forEach(function(value){
+      html += '<option value="' + escapeAttr(value) + '"' + (value === selected ? ' selected' : '') + '>' + escapeHtml(value) + '</option>';
+    });
+    return html;
+  }
+
+  function renderDestinationFilter(){
+    var map = {};
+    state.cues.forEach(function(cue){ if(cue.destination) map[cue.destination] = true; });
+    var values = Object.keys(map).sort(function(a,b){ return a.localeCompare(b); });
+    if(state.filters.destination !== 'all' && values.indexOf(state.filters.destination) < 0){
+      state.filters.destination = 'all';
+    }
+    inputs.destination.innerHTML = selectOptions(values, state.filters.destination, 'All destinations');
+  }
+
+  function visibleCues(){
+    var q = state.filters.search.trim().toLowerCase();
+    return state.cues.filter(function(cue){
+      var haystack = [
+        cue.cue,
+        cue.file,
+        cue.type,
+        cue.duration,
+        cue.aspect,
+        cue.audio,
+        cue.destination,
+        cue.status,
+        cue.backup,
+        cue.notes
+      ].join(' ').toLowerCase();
+      if(q && haystack.indexOf(q) === -1) return false;
+      if(state.filters.destination !== 'all' && cue.destination !== state.filters.destination) return false;
+      if(state.filters.status !== 'all' && cue.status !== state.filters.status) return false;
+      return true;
+    });
+  }
+
+  function renderRows(){
+    var rows = visibleCues();
+    var body = $('cueBody');
+    $('emptyState').hidden = rows.length > 0;
+    body.innerHTML = rows.map(function(cue){
+      return '<tr class="status-' + cue.status + (cue.id === state.selectedId ? ' selected' : '') + '" data-id="' + escapeAttr(cue.id) + '">' +
+        cell('<input class="row-input mono field-xs" data-field="cue" value="' + escapeAttr(cue.cue) + '" aria-label="Cue number">') +
+        cell('<input class="row-input field-large" data-field="file" value="' + escapeAttr(cue.file) + '" aria-label="File name">') +
+        cell('<select class="row-select field-small" data-field="type" aria-label="Media type">' + selectOptions(TYPES, cue.type, '') + '</select>') +
+        cell('<input class="row-input mono field-small" data-field="duration" value="' + escapeAttr(cue.duration) + '" aria-label="Duration">') +
+        cell('<select class="row-select field-small" data-field="aspect" aria-label="Aspect ratio">' + selectOptions(ASPECTS, cue.aspect, '') + '</select>') +
+        cell('<select class="row-select field-medium" data-field="audio" aria-label="Audio route">' + selectOptions(AUDIO, cue.audio, '') + '</select>') +
+        cell('<input class="row-input field-medium" data-field="destination" value="' + escapeAttr(cue.destination) + '" aria-label="Destination">') +
+        cell('<select class="row-select field-small" data-field="status" aria-label="Status">' + selectOptions(STATUS, cue.status, '') + '</select>') +
+        cell('<input class="row-input field-medium" data-field="backup" value="' + escapeAttr(cue.backup) + '" aria-label="Backup">') +
+        cell('<textarea class="row-textarea field-notes" data-field="notes" aria-label="Notes">' + escapeHtml(cue.notes) + '</textarea>') +
+        '</tr>';
+    }).join('');
+  }
+
+  function cell(content){
+    return '<td>' + content + '</td>';
+  }
+
+  function updateStats(){
+    var total = state.cues.length;
+    var ready = state.cues.filter(function(cue){ return cue.status === 'ready'; }).length;
+    var issue = state.cues.filter(function(cue){ return cue.status === 'issue'; }).length;
+    var played = state.cues.filter(function(cue){ return cue.status === 'played'; }).length;
+    $('totalOut').textContent = total;
+    $('readyOut').textContent = ready;
+    $('issueOut').textContent = issue;
+    $('playedOut').textContent = played;
+    $('remainingOut').textContent = Math.max(0, total - played);
+    $('runtimeOut').textContent = formatDuration(totalSeconds(state.cues));
+  }
+
+  function updateNextCue(){
+    var next = state.cues.find(function(cue){ return cue.status === 'ready'; }) ||
+      state.cues.find(function(cue){ return cue.status === 'pending'; }) || null;
+    $('nextCueTitle').textContent = next ? next.cue + ' | ' + next.file : 'None';
+    $('nextCueMeta').textContent = next ? next.duration + ' | ' + next.destination + ' | ' + next.status : 'Ready cues appear here.';
+  }
+
+  function selectedCue(){
+    return state.cues.find(function(cue){ return cue.id === state.selectedId; }) || null;
+  }
+
+  function updateInspector(){
+    var cue = selectedCue();
+    var disabled = !cue;
+    $('selectedIdOut').textContent = cue ? cue.cue || 'Selected' : 'None';
+    inputs.selectedStatus.disabled = disabled;
+    inputs.selectedNotes.disabled = disabled;
+    $('markReadyBtn').disabled = disabled;
+    $('markIssueBtn').disabled = disabled;
+    $('playNextBtn').disabled = !state.cues.some(function(item){ return item.status === 'ready'; });
+    $('moveUpBtn').disabled = disabled;
+    $('moveDownBtn').disabled = disabled;
+    $('duplicateBtn').disabled = disabled;
+    $('deleteBtn').disabled = disabled;
+    if(cue){
+      inputs.selectedStatus.value = cue.status;
+      inputs.selectedNotes.value = cue.notes;
+    }else{
+      inputs.selectedStatus.value = 'pending';
+      inputs.selectedNotes.value = '';
+    }
+  }
+
+  function render(){
+    setInputValues();
+    renderDestinationFilter();
+    renderRows();
+    updateStats();
+    updateNextCue();
+    updateInspector();
+  }
+
+  function updateCue(id, field, value, normalizeNow){
+    var cue = state.cues.find(function(item){ return item.id === id; });
+    if(!cue) return;
+    if(field === 'duration' && normalizeNow) value = normalizeDurationInput(value);
+    if(field === 'status' && STATUS.indexOf(value) < 0) value = 'pending';
+    cue[field] = value;
+    if(field === 'destination' && normalizeNow) renderDestinationFilter();
+    if(field === 'status' || (field === 'destination' && normalizeNow) || (field === 'duration' && normalizeNow)) renderRows();
+    saveState();
+    updateStats();
+    updateNextCue();
+    updateInspector();
+  }
+
+  function selectCue(id){
+    if(!id) return;
+    if(state.selectedId === id){
+      updateInspector();
+      return;
+    }
+    state.selectedId = id;
+    saveState();
+    renderRows();
+    updateInspector();
+  }
+
+  function addCue(afterId){
+    var index = afterId ? state.cues.findIndex(function(cue){ return cue.id === afterId; }) + 1 : state.cues.length;
+    if(index < 0) index = state.cues.length;
+    var nextNumber = state.cues.length + 1;
+    var cue = cloneCue({
+      cue:'PB ' + String(nextNumber).padStart(3, '0'),
+      file:'new_playback_file.mp4',
+      type:'video',
+      duration:'00:30',
+      aspect:'16:9',
+      audio:'embedded',
+      destination:'Main screen',
+      status:'pending',
+      backup:'',
+      notes:''
+    });
+    state.cues.splice(index, 0, cue);
+    state.selectedId = cue.id;
+    saveState();
+    render();
+    showHint('Cue added.', 'success');
+    focusSelectedRow();
+  }
+
+  function duplicateSelected(){
+    var cue = selectedCue();
+    var index;
+    var copy;
+    if(!cue) return showHint('Pick a cue first.', 'error');
+    index = state.cues.findIndex(function(item){ return item.id === cue.id; });
+    copy = cloneCue(Object.assign({}, cue, {
+      id:uid(),
+      cue:cue.cue + ' copy',
+      status:'pending',
+      notes:cue.notes ? cue.notes + ' Copy.' : 'Copy.'
+    }));
+    state.cues.splice(index + 1, 0, copy);
+    state.selectedId = copy.id;
+    saveState();
+    render();
+    showHint('Cue duplicated.', 'success');
+    focusSelectedRow();
+  }
+
+  function deleteSelected(){
+    var cue = selectedCue();
+    var index;
+    if(!cue) return showHint('Pick a cue first.', 'error');
+    if(!window.confirm('Delete selected playback cue?')) return;
+    index = state.cues.findIndex(function(item){ return item.id === cue.id; });
+    state.cues.splice(index, 1);
+    state.selectedId = state.cues[Math.min(index, state.cues.length - 1)] ? state.cues[Math.min(index, state.cues.length - 1)].id : '';
+    saveState();
+    render();
+    showHint('Cue deleted.', 'success');
+  }
+
+  function moveSelected(dir){
+    var cue = selectedCue();
+    var index;
+    var nextIndex;
+    if(!cue) return showHint('Pick a cue first.', 'error');
+    index = state.cues.findIndex(function(item){ return item.id === cue.id; });
+    nextIndex = index + dir;
+    if(nextIndex < 0 || nextIndex >= state.cues.length) return;
+    state.cues.splice(index, 1);
+    state.cues.splice(nextIndex, 0, cue);
+    saveState();
+    render();
+    showHint(dir < 0 ? 'Cue moved up.' : 'Cue moved down.', 'success');
+    focusSelectedRow();
+  }
+
+  function setSelectedStatus(status){
+    var cue = selectedCue();
+    if(!cue) return showHint('Pick a cue first.', 'error');
+    cue.status = status;
+    saveState();
+    render();
+    showHint(status === 'ready' ? 'Cue marked ready.' : status === 'issue' ? 'Cue marked issue.' : 'Cue updated.', status === 'issue' ? 'error' : 'success');
+  }
+
+  function playNextReady(){
+    var cue = state.cues.find(function(item){ return item.status === 'ready'; });
+    if(!cue) return showHint('No ready cue to play.', 'error');
+    cue.status = 'played';
+    state.selectedId = cue.id;
+    saveState();
+    render();
+    showHint('Marked ' + cue.cue + ' played.', 'success');
+    focusSelectedRow();
+  }
+
+  function loadSample(){
+    if(state.cues.length && !window.confirm('Replace current playback list with sample cues?')) return;
+    state = normalizeState({meta:state.meta,cues:sampleCues,selectedId:'',filters:{search:'',destination:'all',status:'all'}});
+    if(state.cues[0]) state.selectedId = state.cues[0].id;
+    saveState();
+    render();
+    showHint('Sample playback plan loaded.', 'success');
+  }
+
+  function buildSummary(){
+    var lines = [];
+    var issues = state.cues.filter(function(cue){ return cue.status === 'issue'; });
+    var next = state.cues.find(function(cue){ return cue.status === 'ready'; });
+    lines.push('PLAYBACK CHECK');
+    lines.push('Show: ' + state.meta.showName);
+    lines.push('Venue: ' + state.meta.venue);
+    lines.push('Date: ' + state.meta.showDate);
+    lines.push('Playback Op: ' + state.meta.playbackOp);
+    lines.push('TD: ' + state.meta.tdName);
+    lines.push('Audio: ' + state.meta.audioLead);
+    lines.push('');
+    lines.push('Summary: ' + state.cues.length + ' cues, ' + issues.length + ' issues, ' + state.cues.filter(function(cue){ return cue.status === 'played'; }).length + ' played, runtime ' + formatDuration(totalSeconds(state.cues)));
+    lines.push('Next: ' + (next ? next.cue + ' ' + next.file + ' to ' + next.destination : 'None'));
+    if(issues.length){
+      lines.push('');
+      lines.push('Issues:');
+      issues.forEach(function(cue){
+        lines.push('- ' + cue.cue + ' ' + cue.file + ': ' + (cue.notes || 'No note'));
+      });
+    }
+    lines.push('');
+    lines.push('Playback list:');
+    state.cues.forEach(function(cue){
+      lines.push('- ' + cue.cue + ' | ' + cue.file + ' | ' + cue.duration + ' | ' + cue.destination + ' | ' + cue.status + ' | backup: ' + (cue.backup || 'none'));
+    });
+    return lines.join('\n');
+  }
+
+  function copySummary(){
+    copyText(buildSummary()).then(function(){
+      showHint('Playback summary copied.', 'success');
+      signal($('copySummaryBtn'), 'success');
+    }).catch(function(){
+      showHint('Could not copy summary.', 'error');
+      signal($('copySummaryBtn'), 'error');
+    });
+  }
+
+  function exportJson(){
+    var payload = {
+      schema:SCHEMA,
+      exportedAt:new Date().toISOString(),
+      meta:state.meta,
+      cues:state.cues
+    };
+    downloadFile(fileStem() + '.playback-check.json', JSON.stringify(payload, null, 2), 'application/json;charset=utf-8');
+    showHint('JSON exported.', 'success');
+  }
+
+  function exportCsv(){
+    var fields = ['cue','file','type','duration','aspect','audio','destination','status','backup','notes'];
+    var csv = [fields.join(',')].concat(state.cues.map(function(cue){
+      return fields.map(function(field){ return csvCell(cue[field]); }).join(',');
+    })).join('\n');
+    downloadFile(fileStem() + '.playback-check.csv', csv, 'text/csv;charset=utf-8');
+    showHint('CSV exported.', 'success');
+  }
+
+  function importJsonFile(file){
+    var reader = new FileReader();
+    reader.onload = function(){
+      try{
+        var parsed = JSON.parse(String(reader.result || ''));
+        if(!parsed || typeof parsed !== 'object' || !Array.isArray(parsed.cues)) throw new Error('Invalid payload');
+        state = normalizeState({
+          meta:parsed.meta || state.meta,
+          cues:parsed.cues,
+          selectedId:'',
+          filters:{search:'',destination:'all',status:'all'}
+        });
+        if(state.cues[0]) state.selectedId = state.cues[0].id;
+        saveState();
+        render();
+        showHint('Playback JSON imported.', 'success');
+        signal($('importJsonBtn'), 'success');
+      }catch(e){
+        showHint('Could not import that JSON file.', 'error');
+        signal($('importJsonBtn'), 'error');
+      }
+    };
+    reader.onerror = function(){
+      showHint('Could not read that JSON file.', 'error');
+      signal($('importJsonBtn'), 'error');
+    };
+    reader.readAsText(file);
+  }
+
+  function syncMeta(){
+    state.meta.showName = inputs.showName.value;
+    state.meta.venue = inputs.venue.value;
+    state.meta.showDate = inputs.showDate.value;
+    state.meta.playbackOp = inputs.playbackOp.value;
+    state.meta.tdName = inputs.tdName.value;
+    state.meta.audioLead = inputs.audioLead.value;
+    saveState();
+  }
+
+  function bindEvents(){
+    Object.keys(inputs).forEach(function(key){
+      if(['showName','venue','showDate','playbackOp','tdName','audioLead'].indexOf(key) >= 0){
+        inputs[key].addEventListener('input', syncMeta);
+      }
+    });
+    inputs.search.addEventListener('input', function(){
+      state.filters.search = inputs.search.value;
+      saveState();
+      renderRows();
+    });
+    inputs.destination.addEventListener('change', function(){
+      state.filters.destination = inputs.destination.value;
+      saveState();
+      renderRows();
+    });
+    inputs.status.addEventListener('change', function(){
+      state.filters.status = inputs.status.value;
+      saveState();
+      renderRows();
+    });
+    $('cueBody').addEventListener('focusin', function(event){
+      var row = event.target.closest('tr[data-id]');
+      if(row) selectCue(row.getAttribute('data-id'));
+    });
+    $('cueBody').addEventListener('click', function(event){
+      var row = event.target.closest('tr[data-id]');
+      if(row) selectCue(row.getAttribute('data-id'));
+    });
+    $('cueBody').addEventListener('input', function(event){
+      var target = event.target;
+      var row = target.closest('tr[data-id]');
+      var field = target.getAttribute('data-field');
+      if(row && field) updateCue(row.getAttribute('data-id'), field, target.value, false);
+    });
+    $('cueBody').addEventListener('change', function(event){
+      var target = event.target;
+      var row = target.closest('tr[data-id]');
+      var field = target.getAttribute('data-field');
+      if(row && field) updateCue(row.getAttribute('data-id'), field, target.value, true);
+    });
+    inputs.selectedStatus.addEventListener('change', function(){ setSelectedStatus(inputs.selectedStatus.value); });
+    inputs.selectedNotes.addEventListener('input', function(){
+      var cue = selectedCue();
+      if(!cue) return;
+      cue.notes = inputs.selectedNotes.value;
+      saveState();
+      renderRows();
+    });
+    $('addCueBtn').addEventListener('click', function(){ addCue(state.selectedId); signal(this, 'success'); });
+    $('loadSampleBtn').addEventListener('click', function(){ loadSample(); signal(this, 'success'); });
+    $('markReadyBtn').addEventListener('click', function(){ setSelectedStatus('ready'); signal(this, 'success'); });
+    $('markIssueBtn').addEventListener('click', function(){ setSelectedStatus('issue'); signal(this, 'error'); });
+    $('playNextBtn').addEventListener('click', function(){ playNextReady(); signal(this, 'success'); });
+    $('moveUpBtn').addEventListener('click', function(){ moveSelected(-1); signal(this, 'success'); });
+    $('moveDownBtn').addEventListener('click', function(){ moveSelected(1); signal(this, 'success'); });
+    $('duplicateBtn').addEventListener('click', function(){ duplicateSelected(); signal(this, 'success'); });
+    $('deleteBtn').addEventListener('click', function(){ deleteSelected(); signal(this, 'success'); });
+    $('printBtn').addEventListener('click', function(){ window.print(); signal(this, 'success'); });
+    $('copySummaryBtn').addEventListener('click', copySummary);
+    $('exportJsonBtn').addEventListener('click', function(){ exportJson(); signal(this, 'success'); });
+    $('exportCsvBtn').addEventListener('click', function(){ exportCsv(); signal(this, 'success'); });
+    $('importJsonBtn').addEventListener('click', function(){ $('importInput').click(); });
+    $('importInput').addEventListener('change', function(){
+      var file = $('importInput').files && $('importInput').files[0];
+      if(file) importJsonFile(file);
+      $('importInput').value = '';
+    });
+    document.addEventListener('keydown', function(event){
+      if(isTyping()) return;
+      if(event.key === 'n' || event.key === 'N'){ event.preventDefault(); addCue(state.selectedId); }
+      if(event.key === 'r' || event.key === 'R'){ event.preventDefault(); setSelectedStatus('ready'); }
+      if(event.key === 'i' || event.key === 'I'){ event.preventDefault(); setSelectedStatus('issue'); }
+      if(event.key === 'p' || event.key === 'P'){ event.preventDefault(); playNextReady(); }
+      if(event.key === 'd' || event.key === 'D'){ event.preventDefault(); duplicateSelected(); }
+      if(event.key === 'Delete'){ event.preventDefault(); deleteSelected(); }
+    });
+    installPressFeedback();
+  }
+
+  function installPressFeedback(){
+    document.querySelectorAll('button').forEach(function(button){
+      function press(){ if(!button.disabled) button.classList.add('is-pressing'); }
+      function release(){ button.classList.remove('is-pressing'); }
+      button.addEventListener('pointerdown', press);
+      button.addEventListener('pointerup', release);
+      button.addEventListener('pointercancel', release);
+      button.addEventListener('pointerleave', release);
+      button.addEventListener('blur', release);
+      button.addEventListener('keydown', function(event){
+        if(event.key === ' ' || event.key === 'Enter') press();
+      });
+      button.addEventListener('keyup', function(event){
+        if(event.key === ' ' || event.key === 'Enter') release();
+      });
+    });
+  }
+
+  function showHint(message, kind){
+    var hint = $('hint');
+    hint.textContent = message;
+    hint.classList.remove('success','error');
+    if(kind) hint.classList.add(kind);
+  }
+
+  function signal(element, kind){
+    if(!element) return;
+    var className = kind === 'error' ? 'feedback-error' : 'feedback-success';
+    element.classList.remove(className);
+    void element.offsetWidth;
+    element.classList.add(className);
+    setTimeout(function(){ element.classList.remove(className); }, 190);
+  }
+
+  function focusSelectedRow(){
+    var row = document.querySelector('tr[data-id="' + cssEscape(state.selectedId) + '"]');
+    var input = row && row.querySelector('input,select,textarea');
+    if(input) input.focus({preventScroll:true});
+  }
+
+  function isTyping(){
+    var tag = document.activeElement && document.activeElement.tagName;
+    return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
+  }
+
+  function totalSeconds(cues){
+    return cues.reduce(function(sum, cue){ return sum + parseDuration(cue.duration); }, 0);
+  }
+
+  function parseDuration(value){
+    var parts = String(value || '').trim().split(':').map(function(part){ return parseInt(part, 10); });
+    if(parts.some(function(part){ return !Number.isFinite(part); })) return 0;
+    if(parts.length === 1) return Math.max(0, parts[0]);
+    if(parts.length === 2) return Math.max(0, parts[0] * 60 + parts[1]);
+    return Math.max(0, parts[0] * 3600 + parts[1] * 60 + parts[2]);
+  }
+
+  function normalizeDurationInput(value){
+    var seconds = parseDuration(value);
+    if(!seconds && String(value || '').trim() === '') return '';
+    return formatDuration(seconds);
+  }
+
+  function formatDuration(seconds){
+    seconds = Math.max(0, Math.round(seconds || 0));
+    var h = Math.floor(seconds / 3600);
+    var m = Math.floor((seconds % 3600) / 60);
+    var s = seconds % 60;
+    if(h) return String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+    return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+  }
+
+  function fileStem(){
+    return (state.meta.showName || 'playback-check')
+      .toLowerCase()
+      .replace(/['"]/g, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .slice(0, 60) || 'playback-check';
+  }
+
+  function csvCell(value){
+    value = String(value == null ? '' : value);
+    if(/[",\n]/.test(value)) return '"' + value.replace(/"/g, '""') + '"';
+    return value;
+  }
+
+  function downloadFile(filename, content, type){
+    var blob = new Blob([content], {type:type});
+    var url = URL.createObjectURL(blob);
+    var link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    link.click();
+    setTimeout(function(){
+      URL.revokeObjectURL(url);
+      if(link.parentNode) link.parentNode.removeChild(link);
+    }, 0);
+  }
+
+  function copyText(text){
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      return navigator.clipboard.writeText(text);
+    }
+    return new Promise(function(resolve, reject){
+      var area = document.createElement('textarea');
+      area.value = text;
+      area.setAttribute('readonly', '');
+      area.style.position = 'fixed';
+      area.style.left = '-9999px';
+      document.body.appendChild(area);
+      area.select();
+      try{
+        document.execCommand('copy') ? resolve() : reject(new Error('copy failed'));
+      }catch(e){
+        reject(e);
+      }finally{
+        if(area.parentNode) area.parentNode.removeChild(area);
+      }
+    });
+  }
+
+  function escapeHtml(value){
+    return String(value == null ? '' : value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function escapeAttr(value){
+    return escapeHtml(value);
+  }
+
+  function cssEscape(value){
+    if(window.CSS && CSS.escape) return CSS.escape(value);
+    return String(value).replace(/"/g, '\\"');
+  }
+
+  loadState();
+  render();
+  bindEvents();
+})();
+</script>
+</body>
+</html>

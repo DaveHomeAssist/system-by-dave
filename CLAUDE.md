@@ -23,6 +23,7 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
 - `teleprompter.html` — AV teleprompter
 - `show-timer.html` — AV show timer
 - `cue-sheet.html` — AV cue sheet
+- `playback-check.html` — AV playback checklist
 - `input-list.html` — AV input list and patch sheet
 - `stage-plot.html` — AV stage plot
 - `show-handoff.html` — AV show handoff builder
@@ -51,8 +52,11 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
   word spacing, text stroke, reusable saved looks, saved script tags, pinned
   saved scripts, saved sort, saved copy, show package, remote, and rundown
   controls.
+- `playback-check.html` tracks media playback files, destinations, audio
+  routes, backups, duration, ready status, played state, issues, copyable
+  summaries, print output, JSON import and export, and CSV export.
 - AV tools now include `teleprompter.html`, `show-timer.html`,
-  `cue-sheet.html`, `input-list.html`, `stage-plot.html`,
+  `cue-sheet.html`, `playback-check.html`, `input-list.html`, `stage-plot.html`,
   `show-handoff.html`, `camera-shot-list.html`, `comms-check.html`,
   and `av-calculator.html`.
 
