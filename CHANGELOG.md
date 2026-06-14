@@ -2,6 +2,8 @@
 
 ## 2026-06-14
 
+* Added `/teleprompter.html` reset view recovery: the `0` shortcut pauses motion, exits fullscreen, closes overlays, shows controls, returns advanced controls to compact mode, restarts at the top, and keeps script and formatting data intact.
+* Renamed the `/teleprompter.html` visible hide controls actions to Max script so the space saving mode is obvious in the header, toolbar, and editor header while keeping the `H` shortcut and Show controls restore action.
 * Hardened CueForge and PlotForge AV Suite route aliases: `/cueforge.html` and `/plotforge.html` now use context aware fallback links, load the shared AV Suite context helper, avoid context dropping meta refreshes, and refresh the AV Suite offline cache version.
 * Added `/teleprompter.html` compact toolbar mode: new loads start with core read controls only, operators can use More controls or the `A` shortcut to reveal formatting, timing, marker, file, package, and saved script tools, and the choice is remembered in browser preferences.
 * Added AV Suite dock compact mode: suite launched tool pages can shrink the context dock to an AV Suite link, current tool status summary, and Expand control, with the preference remembered across tool pages. Bumped the AV Suite offline cache version so cached tools refresh the helper.

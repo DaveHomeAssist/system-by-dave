@@ -85,11 +85,12 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
   word spacing, text stroke, text alignment, reusable custom color swatches,
   reusable saved looks, saved script tags, pinned saved scripts, saved sort,
   saved copy, text only saved script loading, script templates, show package,
-  remote, rundown controls, a visible toolbar Hide controls action, compact
-  Hide and Show labels, a remembered compact toolbar mode with More controls
-  and the `A` shortcut, an editor header Hide controls action beside Done, and
-  a remembered controls mode that clears the header, toolbar, and footer while
-  leaving a small Show controls restore button. The header Hide controls action
+  remote, rundown controls, visible Max script controls in the header,
+  toolbar, and editor header, compact Hide and Show labels, a remembered
+  compact toolbar mode with More controls and the `A` shortcut, the `0`
+  reset view recovery shortcut, and a remembered controls mode that clears the
+  header, toolbar, and footer while
+  leaving a small Show controls restore button. The header Max script action
   stays visibly labeled until phone width, and the collapsed read view offsets
   the run HUD away from the restore button.
 - `av-suite.html` is the AV suite launch hub with show profile fields,

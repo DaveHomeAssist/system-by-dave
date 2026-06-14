@@ -234,7 +234,7 @@
     display:inline-flex;
     align-items:center;
     justify-content:center;
-    min-width:128px;
+    min-width:112px;
     white-space:nowrap;
     border-color:#426489;
     background:rgba(91,176,255,.1);
@@ -1091,7 +1091,7 @@
       <span>Teleprompter<small>Browser tool · no install</small></span>
     </span>
     <span class="spacer"></span>
-    <button id="controlsToggleBtn" class="ghost" type="button" aria-controls="toolbar" aria-expanded="true" aria-pressed="false" aria-label="Hide controls and maximize script" title="Hide controls and maximize script (H)">Hide controls</button>
+    <button id="controlsToggleBtn" class="ghost controls-toggle-inline" type="button" aria-controls="toolbar" aria-expanded="true" aria-pressed="false" aria-label="Hide controls and maximize script" title="Hide controls and maximize script (H)">Max script</button>
     <button id="remoteBtn" class="ghost" type="button" title="Open remote control window">Remote</button>
     <button id="editBtn" class="ghost" type="button" title="Switch between editing and reading">Edit script</button>
     <button id="helpBtn" class="ghost" type="button" aria-haspopup="dialog" title="Keyboard shortcuts">⌨ Shortcuts</button>
@@ -1107,7 +1107,7 @@
     <div class="group">
       <button id="playBtn" class="primary" type="button" aria-pressed="false">▶ Play</button>
       <button id="cueBtn" type="button" title="3 second cue then play (C)" aria-label="Cue then play">Cue + Play</button>
-      <button id="controlsInlineToggleBtn" class="controls-toggle-inline" type="button" aria-controls="toolbar" aria-expanded="true" aria-pressed="false" aria-label="Hide controls and maximize script" title="Hide controls and maximize script (H)">Hide controls</button>
+      <button id="controlsInlineToggleBtn" class="controls-toggle-inline" type="button" aria-controls="toolbar" aria-expanded="true" aria-pressed="false" aria-label="Hide controls and maximize script" title="Hide controls and maximize script (H)">Max script</button>
       <button id="toolbarCompactBtn" class="toolbar-compact-toggle" type="button" aria-controls="toolbar" aria-expanded="false" aria-pressed="true" aria-label="Show advanced teleprompter controls" title="Show advanced teleprompter controls (A)">More controls</button>
       <button id="restartBtn" class="icon" type="button" title="Restart from top (R)" aria-label="Restart from top">⮌</button>
     </div>
@@ -1465,7 +1465,7 @@
         <span class="storage-status" id="storageStatus" hidden>Auto save off. Use Save or Load.</span>
         <span class="script-meta" id="scriptMeta">0 words · 00:00 run</span>
         <span class="spacer" style="flex:1"></span>
-        <button id="editorControlsToggleBtn" class="editor-controls-btn" type="button" aria-controls="toolbar" aria-expanded="true" aria-pressed="false" aria-label="Hide controls and maximize script" title="Hide controls and maximize script (H)">Hide controls</button>
+        <button id="editorControlsToggleBtn" class="editor-controls-btn controls-toggle-inline" type="button" aria-controls="toolbar" aria-expanded="true" aria-pressed="false" aria-label="Hide controls and maximize script" title="Hide controls and maximize script (H)">Max script</button>
         <button id="doneBtn" class="primary" type="button">Done: start reading</button>
       </div>
       <textarea id="script" spellcheck="true" autocomplete="off"
@@ -1487,7 +1487,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   <footer>
     <span>Drafts, saved looks, formatting, and saved scripts use this browser's storage when available.</span>
     <span class="spacer"></span>
-    <span class="js-only hint">Space play/pause · ↑/↓ speed · +/− font · A more controls · H controls · M mirror · F fullscreen · R restart</span>
+    <span class="js-only hint">Space play/pause · ↑/↓ speed · +/− font · A more controls · H hide/show controls · 0 reset view · M mirror · F fullscreen · R restart</span>
   </footer>
 </div>
 
@@ -1509,6 +1509,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
       <kbd>F</kbd><span class="desc">Toggle fullscreen</span>
       <kbd>C</kbd><span class="desc">Cue then play</span>
       <kbd>R</kbd><span class="desc">Restart from top</span>
+      <kbd>0</kbd><span class="desc">Reset view</span>
       <kbd>[ / ]</kbd><span class="desc">Previous / next marker</span>
       <kbd>Page</kbd><span class="desc">Step up / down</span>
       <kbd>Esc</kbd><span class="desc">Exit fullscreen / close this</span>
@@ -2443,7 +2444,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     var compact = false;
     try{ compact = window.matchMedia('(max-width:520px)').matches; }catch(e){ compact = false; }
     if(compact) return collapsed ? 'Show' : 'Hide';
-    return collapsed ? 'Show controls' : 'Hide controls';
+    return collapsed ? 'Show controls' : 'Max script';
   }
 
   function refreshToolbarCompact(){
@@ -4290,6 +4291,9 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   var rafId = null;
   var lastTs = 0;
   var snapTimer = null;
+  var resettingView = false;
+  var resetViewTimer = null;
+  var resetViewSuppressUntil = 0;
   var dragState = {
     active:false,
     pointerId:null,
@@ -4503,6 +4507,53 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     updatePrediction();
     scheduleRemoteState(true);
     if(!playing){ /* stay paused at top */ }
+  }
+
+  function finishResetViewPreference(){
+    if(resetViewTimer){
+      clearTimeout(resetViewTimer);
+      resetViewTimer = null;
+    }
+    savePreferences('reset-view');
+    resettingView = false;
+    updatePrediction();
+    scheduleRemoteState(true);
+  }
+
+  function resetViewState(){
+    var fullscreenExit = null;
+    var hadFullscreen = !!document.fullscreenElement;
+    cancelCue(false);
+    pause();
+    cancelReaderDrag();
+    showToast(false);
+    if(help && help.classList.contains('open')) closeHelp();
+    if(rundownBackdrop && rundownBackdrop.classList.contains('open')) closeRundown();
+    setControlsCollapsed(false, false);
+    setToolbarCompact(true, false);
+    resettingView = !!hadFullscreen;
+    if(hadFullscreen && document.exitFullscreen){
+      resetViewSuppressUntil = Date.now() + 1500;
+      fullscreenExit = document.exitFullscreen();
+      if(fullscreenExit && fullscreenExit.catch) fullscreenExit.catch(function(){});
+    }
+    setReading(true);
+    syncReader();
+    measure();
+    pos = 0;
+    applySnapTransform();
+    updateMarkerUi();
+    reader.focus({preventScroll:true});
+    signalSuccess($('restartBtn'));
+    showHintNotice('View reset: controls shown, advanced controls compact, script at top.', 'success');
+    if(hadFullscreen){
+      resetViewTimer = setTimeout(finishResetViewPreference, 320);
+    }
+    if(fullscreenExit && fullscreenExit.then){
+      fullscreenExit.then(finishResetViewPreference, finishResetViewPreference);
+    }else if(!hadFullscreen){
+      finishResetViewPreference();
+    }
   }
 
   // step (manual / reduced-motion fallback)
@@ -4924,7 +4975,11 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     var fs = !!document.fullscreenElement;
     $('fsBtn').setAttribute('aria-pressed', String(fs));
     signalSuccess($('fsBtn'));
-    savePreferences(fs ? 'fullscreen' : 'exit-fullscreen');
+    if(!fs && (resettingView || Date.now() < resetViewSuppressUntil)){
+      finishResetViewPreference();
+    }else if(!resettingView){
+      savePreferences(fs ? 'fullscreen' : 'exit-fullscreen');
+    }
     updatePrediction();
     if(fs && !isReading()) setReading(true);
   });
@@ -5300,10 +5355,12 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
 
     if(help.classList.contains('open')){
       if(k==='Escape'){ e.preventDefault(); closeHelp(); }
+      if(k==='0'){ e.preventDefault(); resetViewState(); }
       return;
     }
     if(rundownBackdrop.classList.contains('open')){
       if(k==='Escape'){ e.preventDefault(); closeRundown(); }
+      if(k==='0'){ e.preventDefault(); resetViewState(); }
       return;
     }
     if(cueing && k==='Escape'){
@@ -5343,6 +5400,8 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
         e.preventDefault(); toggleItalic(); wake(); break;
       case 'r': case 'R':
         e.preventDefault(); restart(); wake(); break;
+      case '0':
+        e.preventDefault(); resetViewState(); break;
       case ']':
         e.preventDefault(); jumpRelativeMarker(+1); break;
       case '[':
