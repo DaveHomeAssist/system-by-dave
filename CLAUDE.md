@@ -73,8 +73,8 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
   word spacing, text stroke, text alignment, reusable custom color swatches,
   reusable saved looks, saved script tags, pinned saved scripts, saved sort,
   saved copy, text only saved script loading, script templates, show package,
-  remote, rundown controls, a visible toolbar Hide controls action, and a
-  remembered controls mode that clears the header, toolbar, and footer while
+  remote, rundown controls, a visible toolbar Hide controls action, compact
+  Hide and Show labels, and a remembered controls mode that clears the header, toolbar, and footer while
   leaving a small Show controls restore button.
 - `cue-sheet.html` is rolled into the AV suite as CueForge, with
   `cueforge.html` as a route alias.
