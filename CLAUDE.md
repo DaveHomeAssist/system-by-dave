@@ -27,6 +27,7 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
 - `record-log.html` — AV record log
 - `power-plan.html` — AV power plan
 - `network-plan.html` — AV network plan
+- `rf-coordination.html`: AV RF coordination sheet
 - `signal-flow.html` — AV signal flow planner
 - `input-list.html` — AV input list and patch sheet
 - `stage-plot.html` — AV stage plot
@@ -69,14 +70,19 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
 - `network-plan.html` tracks show control, audio, video, comms, internet,
   IPs, VLANs, switch ports, backup paths, issue status, copyable summaries,
   print output, JSON import and export, and CSV export.
+- `rf-coordination.html` tracks wireless mics, IEMs, IFB, comms packs,
+  receivers, frequencies, bands, channels, scan status, backup paths, issue
+  status, conflict warnings, copyable summaries, print output, JSON import
+  and export, and CSV export.
 - `signal-flow.html` tracks AV sources, processors, destinations, formats,
   connectors, backups, route status, issues, copyable summaries, print output,
   JSON import and export, and CSV export.
 - AV tools now include `teleprompter.html`, `show-timer.html`,
   `cue-sheet.html`, `playback-check.html`, `record-log.html`,
-  `power-plan.html`, `network-plan.html`, `signal-flow.html`,
-  `input-list.html`, `stage-plot.html`, `show-handoff.html`,
-  `camera-shot-list.html`, `comms-check.html`, and `av-calculator.html`.
+  `power-plan.html`, `network-plan.html`, `rf-coordination.html`,
+  `signal-flow.html`, `input-list.html`, `stage-plot.html`,
+  `show-handoff.html`, `camera-shot-list.html`, `comms-check.html`, and
+  `av-calculator.html`.
 
 ## Conventions
 See `AGENTS.md` for coding conventions and the review checklist.
