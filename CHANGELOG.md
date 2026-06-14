@@ -2,6 +2,7 @@
 
 ## 2026-06-14
 
+* Added AV Suite show package backup: `/av-suite.html` can now export one JSON package containing the suite profile plus known saved AV tool data from this browser, then import that package on another browser session with an allow listed storage restore for the current AV tools.
 * Added AV Suite readiness notes: `/av-suite.html` tool cards now include saved per tool blocker or handoff notes, a Notes only view, sidebar issue and note surfacing, suite JSON import and export support, search by note text, and copied launch lists that include those notes.
 * Added contextual AV Suite return navigation: AV tool pages opened with suite context now show a compact AV Suite return link that preserves show name, venue, date, operator, and phase. `/av-suite.html` now accepts those same return parameters and updates the saved suite profile when operators come back from a tool.
 * Added AV Suite show context handoff: `/av-suite.html` now appends show name, venue, date, operator, and phase to tool links, launch list links, and copied tool links. Added `js/av-suite-context.js` so AV tool pages with matching metadata fields prefill from those links, and updated CueForge and PlotForge route aliases to preserve query strings during redirects.

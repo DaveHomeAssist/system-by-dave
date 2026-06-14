@@ -95,7 +95,8 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
   readiness tracking, readiness notes, issue and note focused views, pinned
   tools, recent tools, show context handoff links, return context hydration,
   copyable launch lists, saved browser preferences, tactile button feedback,
-  suite JSON import and export, and mobile layout containment.
+  suite JSON import and export, show package backup for known AV tool storage,
+  and mobile layout containment.
 - `js/av-suite-context.js` is the shared AV tool context helper. It reads
   `sbdShow`, `sbdVenue`, `sbdDate`, and `sbdOperator` URL parameters and
   fills matching show metadata fields on AV tool pages that include it. When

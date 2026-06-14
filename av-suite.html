@@ -5,13 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'none'">
 <title>AV Suite | System by Dave</title>
-<meta name="description" content="A browser based launch hub for System by Dave AV tools, grouped by show phase with saved operator preferences, readiness tracking, notes, pinned tools, search, suite JSON import and export, and quick handoff copy.">
+<meta name="description" content="A browser based launch hub for System by Dave AV tools, grouped by show phase with saved operator preferences, readiness tracking, notes, pinned tools, search, suite JSON import and export, show package backup, and quick handoff copy.">
 <link rel="canonical" href="https://systembydave.com/av-suite.html">
 <meta name="theme-color" content="#0a0f17">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="System by Dave">
 <meta property="og:title" content="AV Suite">
-<meta property="og:description" content="Open the System by Dave AV tool suite from one operator hub with show context, phase recommendations, readiness tracking, notes, search, pins, recent tools, and suite JSON transfer.">
+<meta property="og:description" content="Open the System by Dave AV tool suite from one operator hub with show context, phase recommendations, readiness tracking, notes, search, pins, recent tools, suite JSON transfer, and show package backup.">
 <meta property="og:url" content="https://systembydave.com/av-suite.html">
 <meta property="og:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
 <meta property="og:image:width" content="1024">
@@ -19,7 +19,7 @@
 <meta property="og:image:alt" content="System by Dave preview banner">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="AV Suite">
-<meta name="twitter:description" content="Open the System by Dave AV tool suite from one operator hub with show context, phase recommendations, readiness tracking, notes, search, pins, recent tools, and suite JSON transfer.">
+<meta name="twitter:description" content="Open the System by Dave AV tool suite from one operator hub with show context, phase recommendations, readiness tracking, notes, search, pins, recent tools, suite JSON transfer, and show package backup.">
 <meta name="twitter:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
 <link rel="icon" href="svg/system_by_dave_logo_rust.svg" type="image/svg+xml">
 <style>
@@ -224,8 +224,11 @@
         <button id="exportSuiteBtn" type="button">Export Suite JSON</button>
         <button id="importSuiteBtn" type="button">Import Suite JSON</button>
         <input id="suiteImportInput" class="file-input" type="file" accept=".json,application/json">
+        <button id="exportPackageBtn" type="button">Export Show Package</button>
+        <button id="importPackageBtn" type="button">Import Show Package</button>
+        <input id="packageImportInput" class="file-input" type="file" accept=".json,application/json">
         <button id="clearPrefsBtn" class="danger" type="button">Clear Suite Preferences</button>
-        <p class="privacy-note">Show profile, readiness, notes, pinned tools, and recent tools are remembered in this browser when storage is available. Tool links carry show context in the URL so supported tools can prefill metadata. Export JSON before moving to another machine.</p>
+        <p class="privacy-note">Show profile, readiness, notes, pinned tools, recent tools, and exported show packages use this browser's storage when available. Tool links carry show context in the URL so supported tools can prefill metadata. Export JSON before moving to another machine.</p>
       </section>
     </aside>
   </section>
@@ -289,6 +292,51 @@
     strike:['strike-plan','truck-pack','cable-plan','show-task-board','crew-time-log'],
     closeout:['show-handoff','show-report','client-signoff','change-order','record-log','crew-time-log']
   };
+  var TOOL_STORAGE_KEYS=[
+    {tool:'teleprompter',label:'Teleprompter state',key:'teleprompter.v1'},
+    {tool:'teleprompter',label:'Teleprompter script',key:'teleprompter.script.v1'},
+    {tool:'teleprompter',label:'Teleprompter preferences',key:'teleprompter.preferences.v1'},
+    {tool:'teleprompter',label:'Teleprompter saved scripts',key:'teleprompter.savedScripts.v1'},
+    {tool:'teleprompter',label:'Teleprompter saved looks',key:'teleprompter.savedFormats.v1'},
+    {tool:'teleprompter',label:'Teleprompter custom colors',key:'teleprompter.customColors.v1'},
+    {tool:'show-timer',label:'Show Timer preferences',key:'showTimer.preferences.v1'},
+    {tool:'cueforge',label:'CueForge cue sheet',key:'cueSheet.v1'},
+    {tool:'playback-check',label:'Playback Check',key:'playback-check.v1'},
+    {tool:'record-log',label:'Record Log',key:'record-log.v1'},
+    {tool:'stream-plan',label:'Stream Plan',key:'sbd.streamPlan.v1'},
+    {tool:'show-advance',label:'Show Advance',key:'show-advance.v1'},
+    {tool:'site-survey',label:'Site Survey',key:'site-survey.v1'},
+    {tool:'crew-call',label:'Crew Call',key:'crew-call.v1'},
+    {tool:'crew-time-log',label:'Crew Time Log',key:'crew-time-log.v1'},
+    {tool:'room-check',label:'Room Check',key:'room-check.v1'},
+    {tool:'breakout-room-matrix',label:'Breakout Room Matrix',key:'breakout-room-matrix.v1'},
+    {tool:'show-task-board',label:'Show Task Board',key:'show-task-board.v1'},
+    {tool:'show-handoff',label:'Show Handoff',key:'show-handoff.v1'},
+    {tool:'show-report',label:'Show Report',key:'show-report.v1'},
+    {tool:'change-order',label:'Change Order',key:'change-order.v1'},
+    {tool:'client-signoff',label:'Client Sign Off',key:'client-signoff.v1'},
+    {tool:'input-list',label:'Input List',key:'input-list.v1'},
+    {tool:'audio-patch',label:'Audio Patch',key:'audio-patch.v1'},
+    {tool:'line-check',label:'Line Check',key:'line-check.v1'},
+    {tool:'speaker-plan',label:'Speaker Plan',key:'sbd.speakerPlan.v1'},
+    {tool:'power-plan',label:'Power Plan',key:'power-plan.v1'},
+    {tool:'network-plan',label:'Network Plan',key:'network-plan.v1'},
+    {tool:'signal-flow',label:'Signal Flow',key:'signal-flow.v1'},
+    {tool:'video-patch',label:'Video Patch',key:'sbd.videoPatch.v1'},
+    {tool:'display-plan',label:'Display Plan',key:'display-plan.v1'},
+    {tool:'projection-plan',label:'Projection Plan',key:'sbd.projectionPlan.v1'},
+    {tool:'lighting-patch',label:'Lighting Patch',key:'lighting-patch.v1'},
+    {tool:'cable-plan',label:'Cable Plan',key:'cable-plan.v1'},
+    {tool:'rf-coordination',label:'RF Coordination',key:'rf-coordination.v1'},
+    {tool:'comms-check',label:'Comms Check',key:'comms-check.v1'},
+    {tool:'camera-shot-list',label:'Camera Shot List',key:'camera-shot-list.v1'},
+    {tool:'plotforge',label:'PlotForge stage plot',key:'stage-plot.v1'},
+    {tool:'gear-prep',label:'Gear Prep',key:'gear-prep.v1'},
+    {tool:'truck-pack',label:'Truck Pack Plan',key:'truck-pack.v1'},
+    {tool:'load-in-plan',label:'Load In Plan',key:'load-in-plan.v1'},
+    {tool:'strike-plan',label:'Strike Plan',key:'strike-plan.v1'},
+    {tool:'av-calculator',label:'AV Calculator',key:'avCalculator.v1'}
+  ];
   var READINESS_VALUES=['pending','ready','issue','skipped'];
   var READINESS_LABELS={pending:'Pending',ready:'Ready',issue:'Issue',skipped:'Skipped'};
   var $=function(id){return document.getElementById(id);};
@@ -346,6 +394,11 @@
   function copyLaunchList(){var tools=recommendedTools();var counts=readinessCounts();var issueTools=TOOLS.filter(function(tool){return toolReadiness(tool.id)==='issue';});var noteTools=TOOLS.filter(function(tool){return toolNote(tool.id);});var lines=['AV SUITE LAUNCH LIST','Show: '+state.showName,'Venue: '+state.venue,'Date: '+state.showDate,'Operator: '+state.operator,'Phase: '+titleCase(state.phase),'Readiness: '+counts.ready+' ready, '+counts.issue+' issue, '+counts.skipped+' skipped','','Recommended:'];tools.forEach(function(tool){lines.push(launchLine(tool));});lines.push('');lines.push('Pinned:');state.favorites.map(toolById).filter(Boolean).forEach(function(tool){lines.push(launchLine(tool));});lines.push('');lines.push('Issues:');if(issueTools.length){issueTools.forEach(function(tool){lines.push(launchLine(tool));});}else{lines.push('None');}lines.push('');lines.push('Notes:');if(noteTools.length){noteTools.forEach(function(tool){lines.push(tool.name+' | '+toolNote(tool.id));});}else{lines.push('None');}copyText(lines.join('\n')).then(function(){showHint('Launch list copied with show context and notes.','success');signal($('copyLaunchBtn'),'success');}).catch(function(){showHint('Could not copy launch list.','error');signal($('copyLaunchBtn'),'error');});}
   function exportSuite(){downloadFile(fileStem()+'.av-suite.json',JSON.stringify(suitePayload(),null,2),'application/json;charset=utf-8');showHint('Suite JSON exported.','success');signal($('exportSuiteBtn'),'success');}
   function importSuiteFile(file){var reader=new FileReader();reader.onload=function(){try{applySuitePayload(JSON.parse(String(reader.result||'')));saveState();render();showHint('Suite JSON imported.','success');signal($('importSuiteBtn'),'success');}catch(e){showHint('Could not import that suite JSON file.','error');signal($('importSuiteBtn'),'error');}};reader.onerror=function(){showHint('Could not read that suite JSON file.','error');signal($('importSuiteBtn'),'error');};reader.readAsText(file);}
+  function allowedPackageKey(key){return TOOL_STORAGE_KEYS.some(function(item){return item.key===key;});}
+  function packageToolData(){var entries=[];if(!storageAvailable()) return entries;TOOL_STORAGE_KEYS.forEach(function(item){var value=localStorage.getItem(item.key);if(value!==null){entries.push({tool:item.tool,label:item.label,key:item.key,value:String(value)});}});return entries;}
+  function packagePayload(){return {schema:'system-by-dave.av-suite-package.v1',exportedAt:new Date().toISOString(),suite:suitePayload(),toolData:packageToolData()};}
+  function exportPackage(){var payload=packagePayload();downloadFile(fileStem()+'.av-show-package.json',JSON.stringify(payload,null,2),'application/json;charset=utf-8');showHint('Show package exported with '+payload.toolData.length+' saved tool '+(payload.toolData.length===1?'entry.':'entries.'),'success');signal($('exportPackageBtn'),'success');}
+  function importPackageFile(file){var reader=new FileReader();reader.onload=function(){try{var parsed=JSON.parse(String(reader.result||''));var restored=0;if(!parsed||parsed.schema!=='system-by-dave.av-suite-package.v1'||!Array.isArray(parsed.toolData)) throw new Error('Invalid package');if(parsed.suite) applySuitePayload(parsed.suite);parsed.toolData.forEach(function(entry){if(!entry||!allowedPackageKey(entry.key)) return;localStorage.setItem(entry.key,String(entry.value||''));restored++;});saveState();render();showHint('Show package imported. Restored '+restored+' saved tool '+(restored===1?'entry.':'entries.'),'success');signal($('importPackageBtn'),'success');}catch(e){showHint('Could not import that show package JSON file.','error');signal($('importPackageBtn'),'error');}};reader.onerror=function(){showHint('Could not read that show package file.','error');signal($('importPackageBtn'),'error');};reader.readAsText(file);}
   function clearPrefs(){if(!window.confirm('Clear AV Suite saved profile, readiness, pins, and recent tools?')) return;if(storageAvailable()) localStorage.removeItem(STORAGE_KEY);state=defaultState();render();showHint('Suite preferences cleared.','success');}
   function absoluteHref(href){return new URL(href, window.location.href).href;}
   function fileStem(){return (state.showName||'av-suite').toLowerCase().replace(/['"]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,60)||'av-suite';}
@@ -382,6 +435,9 @@
   $('exportSuiteBtn').addEventListener('click',exportSuite);
   $('importSuiteBtn').addEventListener('click',function(){$('suiteImportInput').click();});
   $('suiteImportInput').addEventListener('change',function(){var file=$('suiteImportInput').files&&$('suiteImportInput').files[0];if(file) importSuiteFile(file);$('suiteImportInput').value='';});
+  $('exportPackageBtn').addEventListener('click',exportPackage);
+  $('importPackageBtn').addEventListener('click',function(){$('packageImportInput').click();});
+  $('packageImportInput').addEventListener('change',function(){var file=$('packageImportInput').files&&$('packageImportInput').files[0];if(file) importPackageFile(file);$('packageImportInput').value='';});
   $('clearPrefsBtn').addEventListener('click',clearPrefs);
   installPressFeedback();
 })();
