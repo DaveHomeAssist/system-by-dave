@@ -15,7 +15,7 @@ Read `CLAUDE.md` first for project orientation. This file is the rulebook.
 
 - Every user-facing page (`index`, `agents`, `skills`, `widgets`,
   `teleprompter`, `show-timer`, `cue-sheet`, `cueforge`, `input-list`,
-  `playback-check`, `record-log`, `power-plan`, `audio-patch`,
+  `playback-check`, `stream-plan`, `record-log`, `power-plan`, `audio-patch`,
   `speaker-plan`,
   `lighting-patch`,
   `display-plan`, `projection-plan`, `video-patch`,

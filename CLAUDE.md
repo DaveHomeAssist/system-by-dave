@@ -25,6 +25,7 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
 - `cue-sheet.html` — CueForge cue sheet and run of show control
 - `cueforge.html` — CueForge route alias
 - `playback-check.html` — AV playback checklist
+- `stream-plan.html` — AV stream plan
 - `record-log.html` — AV record log
 - `power-plan.html` — AV power plan
 - `audio-patch.html` — AV audio patch sheet
@@ -78,6 +79,10 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
 - `playback-check.html` tracks media playback files, destinations, audio
   routes, backups, duration, ready status, played state, issues, copyable
   summaries, print output, JSON import and export, and CSV export.
+- `stream-plan.html` tracks encoders, stream types, platforms,
+  destinations, servers, key labels, inputs, resolutions, bitrates, audio,
+  records, backup paths, test status, stream gap warnings, copyable summaries,
+  print output, JSON import and export, and CSV export.
 - `record-log.html` tracks program records, camera ISOs, audio captures,
   media destinations, backups, duration, record status, issues, delivery
   status, copyable summaries, print output, JSON import and export, and CSV
@@ -132,8 +137,9 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
   connectors, backups, route status, issues, copyable summaries, print output,
   JSON import and export, and CSV export.
 - AV tools now include `teleprompter.html`, `show-timer.html`,
-  `cue-sheet.html`, `cueforge.html`, `playback-check.html`, `record-log.html`,
-  `power-plan.html`, `audio-patch.html`, `speaker-plan.html`,
+  `cue-sheet.html`, `cueforge.html`, `playback-check.html`,
+  `stream-plan.html`, `record-log.html`, `power-plan.html`, `audio-patch.html`,
+  `speaker-plan.html`,
   `lighting-patch.html`,
   `display-plan.html`,
   `projection-plan.html`,
