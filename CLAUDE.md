@@ -39,6 +39,7 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
 - `network-plan.html` — AV network plan
 - `cable-plan.html` — AV cable plan
 - `rf-coordination.html`: AV RF coordination sheet
+- `site-survey.html`: AV site survey
 - `gear-prep.html`: AV gear prep checklist
 - `load-in-plan.html`: AV load in plan
 - `strike-plan.html`: AV strike plan
@@ -137,6 +138,9 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
   receivers, frequencies, bands, channels, scan status, backup paths, issue
   status, conflict warnings, copyable summaries, print output, JSON import
   and export, and CSV export.
+- `site-survey.html` tracks venue access, loading, rooms, power, rigging,
+  network, safety, contacts, findings, follow ups, open items, copyable
+  summaries, print output, JSON import and export, and CSV export.
 - `gear-prep.html` tracks pull sheets, case IDs, quantities, departments,
   locations, owners, test status, pack status, load status, issues, open
   items, copyable summaries, print output, JSON import and export, and CSV
@@ -171,7 +175,7 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
   `network-plan.html`,
   `cable-plan.html`,
   `rf-coordination.html`,
-  `gear-prep.html`, `load-in-plan.html`, `strike-plan.html`, `show-advance.html`, `crew-call.html`,
+  `site-survey.html`, `gear-prep.html`, `load-in-plan.html`, `strike-plan.html`, `show-advance.html`, `crew-call.html`,
   `signal-flow.html`,
   `input-list.html`, `stage-plot.html`, `plotforge.html`, `show-handoff.html`,
   `camera-shot-list.html`, `comms-check.html`, and `av-calculator.html`.
