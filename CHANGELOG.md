@@ -2,6 +2,7 @@
 
 ## 2026-06-13
 
+* Added `/camera-shot-list.html`, a browser based AV camera shot list with show metadata, sample camera plan, editable shot rows, camera and status filters, selected shot controls, ready and problem status, take next, print output, JSON import and export, CSV export, copyable operator summary, remembered browser state, and mobile table containment. Linked it from the homepage AV Tools section, added it to the Products footer, and added it to `sitemap.xml`.
 * Expanded `/teleprompter.html` reader formatting and saved-script management: added format presets, italic reader text, uppercase mode, more text and background swatches, saved script search, rename, duplicate, and a larger browser saved-script library.
 * Added `/show-handoff.html`, a browser based AV show handoff builder with show metadata, exact handoff sections, generated summary table, decision matrix, numbered prioritized actions, copy actions, copy matrix, copy full Markdown, print output, JSON import and export, sample handoff, and remembered browser state. Linked it from the homepage AV Tools section, added it to the Products footer, and added it to `sitemap.xml`.
 * Tightened `/teleprompter.html` mobile formatting controls so the toolbar scrolls inside its own rail on phone widths, keeps the editor usable, and gives color swatches larger touch targets.
