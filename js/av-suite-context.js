@@ -8,6 +8,11 @@
     phase: clean(params.get('sbdPhase'), 30)
   };
   if(!context.showName && !context.venue && !context.showDate && !context.operator) return;
+  var STORAGE_KEY = 'av-suite-dashboard.v1';
+  var DEFAULT_FAVORITES = ['teleprompter', 'show-timer', 'cueforge'];
+  var READINESS_LABELS = {pending:'Pending', ready:'Ready', issue:'Issue', skipped:'Skipped'};
+  var READINESS_BUTTON_LABELS = {pending:'Pending', ready:'Ready', issue:'Issue', skipped:'Skip'};
+  var READINESS_VALUES = ['pending', 'ready', 'issue', 'skipped'];
   var PHASE_LABELS={advance:'Advance',prep:'Prep',loadin:'Load In',show:'Show',strike:'Strike',closeout:'Closeout'};
   var PHASE_TOOLS={
     advance:[
@@ -88,6 +93,17 @@
     return ids.some(function(id){return setInput(id, value);});
   }
 
+  function storageAvailable(){
+    try{
+      var key = 'av-suite-context-probe';
+      localStorage.setItem(key, key);
+      localStorage.removeItem(key);
+      return true;
+    }catch(e){
+      return false;
+    }
+  }
+
   function hydrate(){
     var applied = false;
     applied = firstExisting(['showName', 'showTitle'], context.showName) || applied;
@@ -131,6 +147,26 @@
     return ROUTE_ALIASES[file] || file;
   }
 
+  function currentToolId(){
+    var route = currentRoute();
+    return route ? route.replace(/\.html$/i, '') : '';
+  }
+
+  function toolNameFromId(id){
+    var route = id + '.html';
+    var name = '';
+    Object.keys(PHASE_TOOLS).some(function(phase){
+      return PHASE_TOOLS[phase].some(function(tool){
+        if(tool.href === route){
+          name = tool.name;
+          return true;
+        }
+        return false;
+      });
+    });
+    return name || id.replace(/-/g, ' ').replace(/\b\w/g, function(letter){return letter.toUpperCase();});
+  }
+
   function phaseTools(){
     return PHASE_TOOLS[context.phase] || [];
   }
@@ -156,6 +192,146 @@
     var label = PHASE_LABELS[context.phase] || 'Current';
     var count = phaseTools().length;
     return label + (count ? ' ' + count : '');
+  }
+
+  function defaultSuiteState(){
+    return {
+      schema:'system-by-dave.av-suite.v1',
+      savedAt:new Date().toISOString(),
+      showName:context.showName || 'AV Tool Suite',
+      venue:context.venue || '',
+      showDate:context.showDate || new Date().toISOString().slice(0, 10),
+      operator:context.operator || '',
+      phase:context.phase || 'show',
+      favorites:DEFAULT_FAVORITES.slice(),
+      recent:[],
+      readiness:{},
+      toolNotes:{},
+      commandRecent:[],
+      filters:{search:'', phase:'all', dept:'all', pin:'all'}
+    };
+  }
+
+  function cleanObject(value){
+    return value && typeof value === 'object' && !Array.isArray(value) ? value : {};
+  }
+
+  function readSuiteState(){
+    var state = defaultSuiteState();
+    var parsed;
+    if(!storageAvailable()) return state;
+    try{
+      parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+    }catch(e){
+      parsed = {};
+    }
+    if(!parsed || typeof parsed !== 'object') parsed = {};
+    state.schema = 'system-by-dave.av-suite.v1';
+    state.showName = clean(parsed.showName || state.showName, 120);
+    state.venue = clean(parsed.venue || state.venue, 120);
+    state.showDate = clean(parsed.showDate || state.showDate, 20);
+    state.operator = clean(parsed.operator || state.operator, 80);
+    state.phase = clean(parsed.phase || state.phase, 30);
+    state.favorites = Array.isArray(parsed.favorites) ? parsed.favorites.map(String).slice(0, 60) : state.favorites;
+    state.recent = Array.isArray(parsed.recent) ? parsed.recent.map(String).slice(0, 12) : state.recent;
+    state.readiness = cleanObject(parsed.readiness);
+    state.toolNotes = cleanObject(parsed.toolNotes);
+    state.commandRecent = Array.isArray(parsed.commandRecent) ? parsed.commandRecent.map(String).slice(0, 10) : state.commandRecent;
+    state.filters = cleanObject(parsed.filters);
+    if(!state.filters.search) state.filters.search = '';
+    if(!state.filters.phase) state.filters.phase = 'all';
+    if(!state.filters.dept) state.filters.dept = 'all';
+    if(!state.filters.pin) state.filters.pin = 'all';
+    return state;
+  }
+
+  function applyContextToSuiteState(state){
+    if(context.showName) state.showName = context.showName;
+    if(context.venue) state.venue = context.venue;
+    if(context.showDate) state.showDate = context.showDate;
+    if(context.operator) state.operator = context.operator;
+    if(context.phase){
+      state.phase = context.phase;
+      state.filters = cleanObject(state.filters);
+      state.filters.phase = context.phase;
+    }
+  }
+
+  function saveSuiteState(state){
+    if(!storageAvailable()) return false;
+    state.savedAt = new Date().toISOString();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    return true;
+  }
+
+  function toolReadiness(id){
+    var value = String(readSuiteState().readiness[id] || 'pending');
+    return READINESS_VALUES.indexOf(value) >= 0 ? value : 'pending';
+  }
+
+  function setToolReadiness(value){
+    var id = currentToolId();
+    var state;
+    if(!id || READINESS_VALUES.indexOf(value) < 0) return false;
+    state = readSuiteState();
+    applyContextToSuiteState(state);
+    state.readiness = cleanObject(state.readiness);
+    if(value === 'pending') delete state.readiness[id];
+    else state.readiness[id] = value;
+    return saveSuiteState(state);
+  }
+
+  function updateReadinessControls(dock, saved){
+    var id = currentToolId();
+    var value = toolReadiness(id);
+    var status = dock.querySelector('[data-sbd-suite-status]');
+    var message = dock.querySelector('[data-sbd-suite-message]');
+    dock.querySelectorAll('[data-sbd-suite-readiness]').forEach(function(button){
+      var active = button.getAttribute('data-sbd-suite-readiness') === value;
+      button.setAttribute('aria-pressed', String(active));
+    });
+    if(status){
+      status.textContent = toolNameFromId(id) + ' ' + READINESS_LABELS[value];
+      status.setAttribute('data-status', value);
+    }
+    if(message){
+      message.textContent = saved === false ? 'Storage blocked' : (saved ? 'Saved' : '');
+      if(saved) setTimeout(function(){message.textContent = '';}, 1500);
+    }
+  }
+
+  function addReadinessControls(dock){
+    var id = currentToolId();
+    var group;
+    var status;
+    var message;
+    if(!id) return;
+    group = document.createElement('div');
+    group.className = 'sbd-suite-readiness';
+    group.setAttribute('aria-label', 'AV Suite readiness for this tool');
+    status = document.createElement('span');
+    status.className = 'sbd-suite-status';
+    status.setAttribute('data-sbd-suite-status', 'true');
+    group.appendChild(status);
+    READINESS_VALUES.forEach(function(value){
+      var button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'sbd-suite-button';
+      button.textContent = READINESS_BUTTON_LABELS[value] || READINESS_LABELS[value];
+      button.setAttribute('data-sbd-suite-readiness', value);
+      button.setAttribute('aria-pressed', 'false');
+      button.addEventListener('click', function(){
+        updateReadinessControls(dock, setToolReadiness(value));
+      });
+      group.appendChild(button);
+    });
+    message = document.createElement('span');
+    message.className = 'sbd-suite-message';
+    message.setAttribute('data-sbd-suite-message', 'true');
+    message.setAttribute('aria-live', 'polite');
+    group.appendChild(message);
+    dock.appendChild(group);
+    updateReadinessControls(dock, null);
   }
 
   function makeLink(className, href, text, label){
@@ -196,7 +372,21 @@
       '.sbd-suite-main{border-color:rgba(114,244,233,.72);color:#dffffc}',
       '.sbd-suite-phase{color:#aab8ca;font-family:"SFMono-Regular","Cascadia Code","Liberation Mono",Menlo,monospace;text-transform:uppercase;letter-spacing:.06em;font-size:10px}',
       '.sbd-suite-step{max-width:180px;overflow:hidden;text-overflow:ellipsis}',
-      '@media (max-width:680px){.sbd-suite-dock{left:10px;right:10px;bottom:10px;display:grid;grid-template-columns:1fr 1fr;align-items:stretch}.sbd-suite-phase{grid-column:1/-1}.sbd-suite-main{grid-column:1/-1}.sbd-suite-link,.sbd-suite-phase{min-width:0}.sbd-suite-step{max-width:none}}',
+      '.sbd-suite-readiness{display:inline-flex;align-items:center;gap:4px;border-left:1px solid rgba(73,97,120,.65);padding-left:6px}',
+      '.sbd-suite-status,.sbd-suite-message{display:inline-flex;align-items:center;min-height:28px;border-radius:999px;padding:5px 8px;color:#aab8ca;background:rgba(12,18,28,.8);white-space:nowrap;font-family:"SFMono-Regular","Cascadia Code","Liberation Mono",Menlo,monospace;font-size:10px;text-transform:uppercase;letter-spacing:.06em}',
+      '.sbd-suite-status[data-status="ready"]{color:#baf7d0;background:rgba(31,110,72,.3)}',
+      '.sbd-suite-status[data-status="issue"]{color:#ffd2da;background:rgba(133,46,66,.32)}',
+      '.sbd-suite-status[data-status="skipped"]{color:#d8d3c4;background:rgba(98,86,58,.38)}',
+      '.sbd-suite-button{appearance:none;display:inline-flex;align-items:center;justify-content:center;min-height:28px;border:1px solid rgba(73,97,120,.78);border-radius:7px;padding:5px 8px;color:#f4f8ff;background:rgba(22,34,49,.88);font:700 11px -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;cursor:pointer;transition:transform 140ms ease,background 140ms ease,border-color 140ms ease,color 140ms ease}',
+      '.sbd-suite-button:hover{border-color:#72f4e9;background:rgba(27,43,60,.98)}',
+      '.sbd-suite-button:active{transform:scale(.96)}',
+      '.sbd-suite-button:focus-visible{outline:2px solid #72f4e9;outline-offset:2px}',
+      '.sbd-suite-button[aria-pressed="true"]{border-color:#72f4e9;color:#dffffc;background:rgba(37,92,94,.72)}',
+      '.sbd-suite-button[data-sbd-suite-readiness="ready"][aria-pressed="true"]{border-color:#72d69a;color:#ebfff1;background:rgba(31,110,72,.74)}',
+      '.sbd-suite-button[data-sbd-suite-readiness="issue"][aria-pressed="true"]{border-color:#ff8fa6;color:#fff4f6;background:rgba(133,46,66,.78)}',
+      '.sbd-suite-button[data-sbd-suite-readiness="skipped"][aria-pressed="true"]{border-color:#d8c78a;color:#fff9df;background:rgba(98,86,58,.78)}',
+      '@media (max-width:900px){.sbd-suite-dock{display:grid;grid-template-columns:auto auto 1fr;align-items:stretch}.sbd-suite-readiness{grid-column:1/-1;border-left:0;border-top:1px solid rgba(73,97,120,.65);padding-left:0;padding-top:6px;flex-wrap:wrap}.sbd-suite-step{max-width:none}}',
+      '@media (max-width:680px){.sbd-suite-dock{left:10px;right:10px;bottom:10px;grid-template-columns:1fr 1fr}.sbd-suite-phase{grid-column:1/-1}.sbd-suite-main{grid-column:1/-1}.sbd-suite-readiness{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr}.sbd-suite-status,.sbd-suite-message{grid-column:1/-1;justify-content:center}.sbd-suite-link,.sbd-suite-phase,.sbd-suite-button{min-width:0}.sbd-suite-step{max-width:none}}',
       '@media print{.sbd-suite-dock{display:none!important}}'
     ].join('');
     dock = document.createElement('nav');
@@ -206,6 +396,7 @@
     var suiteLink = makeLink('sbd-suite-link sbd-suite-main', suiteHref(), 'AV Suite', 'Return to AV Suite with this show context');
     suiteLink.setAttribute('data-sbd-suite-return', 'true');
     dock.appendChild(suiteLink);
+    addReadinessControls(dock);
     if(tools.length){
       var phase = document.createElement('span');
       phase.className = 'sbd-suite-phase';

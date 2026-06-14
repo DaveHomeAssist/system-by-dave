@@ -2,6 +2,7 @@
 
 ## 2026-06-14
 
+* Added AV Suite dock readiness controls: `js/av-suite-context.js` now lets suite launched tool pages mark the current tool Pending, Ready, Issue, or Skip from the compact dock, saves that state into `/av-suite.html` dashboard storage with the current show context, and updates the dock status immediately. Bumped the AV Suite offline cache version so the updated helper refreshes cleanly.
 * Added AV Suite copyable show links: `/av-suite.html` can now copy a suite URL carrying show, venue, date, operator, and current phase, exposes the action in Operator shortcuts and Quick Switcher, and includes the suite link in launch lists and phase handoffs. Bumped the AV Suite offline cache version so the updated hub refreshes cleanly.
 * Added AV Suite tool to tool phase navigation: `js/av-suite-context.js` now turns the compact AV Suite return link into a context dock on suite launched tool pages, with previous and next links for the current phase's recommended tools. Bumped the AV Suite offline cache version so the updated helper refreshes cleanly.
 * Added AV Suite offline readiness: `/av-suite.html` now registers `av-suite-worker.js`, caches the AV Suite hub, shared AV context helper, brand assets, every AV tool route, and CueForge and PlotForge aliases, with visible cache status plus Cache AV Tools, Refresh Cache, and Clear Cache actions in the side rail and Quick Switcher.
