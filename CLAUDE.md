@@ -24,6 +24,7 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
 - `show-timer.html` — AV show timer
 - `cue-sheet.html` — AV cue sheet
 - `playback-check.html` — AV playback checklist
+- `record-log.html` — AV record log
 - `signal-flow.html` — AV signal flow planner
 - `input-list.html` — AV input list and patch sheet
 - `stage-plot.html` — AV stage plot
@@ -56,12 +57,16 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
 - `playback-check.html` tracks media playback files, destinations, audio
   routes, backups, duration, ready status, played state, issues, copyable
   summaries, print output, JSON import and export, and CSV export.
+- `record-log.html` tracks program records, camera ISOs, audio captures,
+  media destinations, backups, duration, record status, issues, delivery
+  status, copyable summaries, print output, JSON import and export, and CSV
+  export.
 - `signal-flow.html` tracks AV sources, processors, destinations, formats,
   connectors, backups, route status, issues, copyable summaries, print output,
   JSON import and export, and CSV export.
 - AV tools now include `teleprompter.html`, `show-timer.html`,
-  `cue-sheet.html`, `playback-check.html`, `signal-flow.html`,
-  `input-list.html`, `stage-plot.html`, `show-handoff.html`,
+  `cue-sheet.html`, `playback-check.html`, `record-log.html`,
+  `signal-flow.html`, `input-list.html`, `stage-plot.html`, `show-handoff.html`,
   `camera-shot-list.html`, `comms-check.html`, and `av-calculator.html`.
 
 ## Conventions
