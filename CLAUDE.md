@@ -27,6 +27,7 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
 - `stage-plot.html` — AV stage plot
 - `show-handoff.html` — AV show handoff builder
 - `camera-shot-list.html` — AV camera shot list
+- `comms-check.html` — AV comms check
 - `av-calculator.html` — AV calculator
 - `resume/index.html` — public resume page
 - `wedding-ops.html` — wedding ops case study
@@ -51,7 +52,8 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
   rundown controls.
 - AV tools now include `teleprompter.html`, `show-timer.html`,
   `cue-sheet.html`, `input-list.html`, `stage-plot.html`,
-  `show-handoff.html`, `camera-shot-list.html`, and `av-calculator.html`.
+  `show-handoff.html`, `camera-shot-list.html`, `comms-check.html`,
+  and `av-calculator.html`.
 
 ## Conventions
 See `AGENTS.md` for coding conventions and the review checklist.

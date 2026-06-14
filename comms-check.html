@@ -1,0 +1,1489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'none'">
+<title>Comms Check | System by Dave</title>
+<meta name="description" content="A browser based AV comms check tool for intercom, radios, IFB, device assignments, battery status, backups, and line check tracking.">
+<link rel="canonical" href="https://systembydave.com/comms-check.html">
+<meta name="theme-color" content="#0b0d10">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="System by Dave">
+<meta property="og:title" content="Comms Check">
+<meta property="og:description" content="A browser based AV comms check tool for intercom, radios, IFB, device assignments, battery status, backups, and line check tracking.">
+<meta property="og:url" content="https://systembydave.com/comms-check.html">
+<meta property="og:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<meta property="og:image:width" content="1024">
+<meta property="og:image:height" content="412">
+<meta property="og:image:alt" content="System by Dave preview banner">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Comms Check">
+<meta name="twitter:description" content="A browser based AV comms check tool for intercom, radios, IFB, device assignments, battery status, backups, and line check tracking.">
+<meta name="twitter:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<link rel="icon" href="svg/system_by_dave_logo_rust.svg" type="image/svg+xml">
+<style>
+  :root{
+    --bg:#0b0d10;
+    --panel:#12171d;
+    --panel-2:#171e26;
+    --panel-3:#1d252e;
+    --line:#303945;
+    --line-strong:#465363;
+    --text:#f6f8fb;
+    --muted:#a9b4c1;
+    --dim:#768391;
+    --rust:#c0623a;
+    --rust-2:#e58a5c;
+    --blue:#72b8ff;
+    --green:#6be092;
+    --amber:#ffd166;
+    --red:#ff6b6b;
+    --purple:#b996ff;
+    --ink:#071016;
+    --radius:8px;
+    --shadow:0 16px 60px rgba(0,0,0,.32);
+    --mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --fast:120ms;
+    --med:180ms;
+    --ease:cubic-bezier(.2,.8,.2,1);
+    --press:cubic-bezier(.2,0,0,1);
+  }
+  *{box-sizing:border-box}
+  html,body{min-height:100%}
+  body{
+    margin:0;
+    background:
+      radial-gradient(circle at 15% -12%,rgba(192,98,58,.18),transparent 30rem),
+      radial-gradient(circle at 82% 10%,rgba(114,184,255,.1),transparent 28rem),
+      linear-gradient(180deg,#0b0d10 0%,#11161b 52%,#080a0d 100%);
+    color:var(--text);
+    font-family:var(--sans);
+    line-height:1.45;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+  body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    background:
+      repeating-linear-gradient(90deg,rgba(255,255,255,.034) 0 1px,transparent 1px 80px),
+      repeating-linear-gradient(0deg,rgba(255,255,255,.024) 0 1px,transparent 1px 80px);
+    mask-image:linear-gradient(180deg,rgba(0,0,0,.78),rgba(0,0,0,.12));
+  }
+  a{color:inherit}
+  button,input,select,textarea{font:inherit}
+  button{
+    min-height:40px;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    background:var(--panel-2);
+    color:var(--text);
+    padding:9px 12px;
+    cursor:pointer;
+    user-select:none;
+    transition:
+      transform var(--fast) var(--press),
+      border-color var(--fast) var(--ease),
+      background var(--fast) var(--ease),
+      box-shadow var(--fast) var(--ease),
+      color var(--fast) var(--ease);
+    touch-action:manipulation;
+  }
+  button:hover{
+    border-color:var(--line-strong);
+    background:var(--panel-3);
+    transform:translateY(-1px);
+    box-shadow:0 8px 22px rgba(0,0,0,.18);
+  }
+  button:active,
+  button.is-pressing{
+    transform:translateY(1px) scale(.975);
+    box-shadow:inset 0 2px 5px rgba(0,0,0,.28);
+  }
+  button.primary{
+    background:linear-gradient(180deg,var(--rust-2),var(--rust));
+    border-color:var(--rust);
+    color:#140905;
+    font-weight:800;
+  }
+  button.danger{
+    border-color:rgba(255,107,107,.55);
+    color:#ffd5d5;
+    background:rgba(255,107,107,.1);
+  }
+  button:disabled{
+    cursor:not-allowed;
+    opacity:.52;
+    transform:none;
+    box-shadow:none;
+  }
+  button:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible,
+  a:focus-visible{
+    outline:2px solid var(--blue);
+    outline-offset:3px;
+  }
+  input,select,textarea{
+    width:100%;
+    min-height:40px;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    background:#0e1318;
+    color:var(--text);
+    padding:9px 10px;
+    transition:border-color var(--fast) var(--ease),background var(--fast) var(--ease),box-shadow var(--fast) var(--ease);
+  }
+  textarea{
+    min-height:42px;
+    resize:vertical;
+  }
+  input:hover,
+  input:focus,
+  select:hover,
+  select:focus,
+  textarea:hover,
+  textarea:focus{
+    border-color:var(--line-strong);
+    background:#111821;
+  }
+  input::placeholder,
+  textarea::placeholder{color:var(--dim)}
+  .skip-link{
+    position:absolute;
+    top:12px;
+    left:12px;
+    z-index:1000;
+    background:var(--text);
+    color:var(--ink);
+    padding:10px 14px;
+    border-radius:var(--radius);
+    transform:translateY(-150%);
+    transition:transform var(--med) var(--ease);
+  }
+  .skip-link:focus-visible{transform:translateY(0)}
+  .app{
+    position:relative;
+    z-index:1;
+    min-height:100vh;
+  }
+  .topbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    padding:14px 18px;
+    border-bottom:1px solid rgba(255,255,255,.08);
+    background:rgba(11,13,16,.88);
+    backdrop-filter:blur(18px);
+    position:sticky;
+    top:0;
+    z-index:30;
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    text-decoration:none;
+  }
+  .brand-mark{
+    width:38px;
+    height:38px;
+    border:1px solid rgba(255,255,255,.24);
+    border-radius:50%;
+    display:grid;
+    place-items:center;
+    font-family:Georgia,serif;
+    font-size:19px;
+    color:var(--rust-2);
+    background:#11161c;
+  }
+  .brand-text{
+    display:flex;
+    flex-direction:column;
+    gap:1px;
+  }
+  .brand-text strong{
+    font-size:14px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+  }
+  .brand-text span{
+    color:var(--muted);
+    font-family:var(--mono);
+    font-size:11px;
+  }
+  .top-actions{
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+    gap:8px;
+    flex-wrap:wrap;
+  }
+  .top-link{
+    color:var(--muted);
+    font-family:var(--mono);
+    font-size:12px;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+    text-decoration:none;
+  }
+  .top-link:hover{color:var(--text)}
+  main{
+    width:min(1540px,100%);
+    margin:0 auto;
+    padding:26px 18px 34px;
+  }
+  .hero{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(320px,440px);
+    gap:18px;
+    align-items:stretch;
+    margin-bottom:18px;
+  }
+  .hero-main,
+  .status-panel,
+  .workbench,
+  .inspector,
+  .operator-panel{
+    border:1px solid rgba(255,255,255,.1);
+    border-radius:14px;
+    background:linear-gradient(180deg,rgba(18,23,29,.96),rgba(12,15,19,.96));
+    box-shadow:var(--shadow);
+  }
+  .hero-main{
+    padding:18px;
+  }
+  .eyebrow{
+    margin:0 0 10px;
+    color:var(--rust-2);
+    font-family:var(--mono);
+    font-size:11px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+  }
+  .show-title{
+    width:100%;
+    min-height:58px;
+    margin:0 0 12px;
+    padding:8px 10px;
+    border-color:transparent;
+    background:transparent;
+    font-size:clamp(30px,5vw,58px);
+    font-weight:850;
+    line-height:1.04;
+  }
+  .show-title:hover,
+  .show-title:focus{
+    border-color:var(--line);
+    background:#10161d;
+  }
+  .meta-grid{
+    display:grid;
+    grid-template-columns:repeat(5,minmax(0,1fr));
+    gap:10px;
+  }
+  .field label{
+    display:block;
+    margin:0 0 5px;
+    color:var(--dim);
+    font-family:var(--mono);
+    font-size:10px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+  }
+  .status-panel{
+    padding:16px;
+  }
+  .stats{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+  }
+  .stat{
+    min-width:0;
+    padding:12px;
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:var(--radius);
+    background:rgba(255,255,255,.035);
+  }
+  .stat span{
+    display:block;
+    margin-bottom:4px;
+    color:var(--dim);
+    font-family:var(--mono);
+    font-size:10px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+  }
+  .stat strong{
+    display:block;
+    font-family:var(--mono);
+    font-size:18px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+  .layout{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) 340px;
+    gap:18px;
+    align-items:start;
+  }
+  .workbench{
+    overflow:hidden;
+  }
+  .toolbar{
+    display:grid;
+    grid-template-columns:minmax(220px,1fr) 150px 150px auto;
+    gap:10px;
+    padding:14px;
+    border-bottom:1px solid rgba(255,255,255,.08);
+  }
+  .button-row{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    justify-content:flex-end;
+  }
+  .table-wrap{
+    overflow-x:auto;
+    max-width:100%;
+  }
+  table{
+    width:100%;
+    min-width:1320px;
+    border-collapse:separate;
+    border-spacing:0;
+  }
+  thead th{
+    position:sticky;
+    top:68px;
+    z-index:2;
+    padding:10px 8px;
+    color:var(--muted);
+    background:#10151b;
+    border-bottom:1px solid rgba(255,255,255,.1);
+    font-family:var(--mono);
+    font-size:10px;
+    letter-spacing:.08em;
+    text-align:left;
+    text-transform:uppercase;
+  }
+  tbody tr{
+    transition:background var(--fast) var(--ease),box-shadow var(--fast) var(--ease),opacity var(--fast) var(--ease);
+  }
+  tbody tr:hover{
+    background:rgba(255,255,255,.035);
+  }
+  tbody tr.selected{
+    background:rgba(114,184,255,.08);
+    box-shadow:inset 3px 0 0 var(--blue);
+  }
+  tbody tr.status-checked{box-shadow:inset 3px 0 0 var(--green)}
+  tbody tr.status-pending{box-shadow:inset 3px 0 0 var(--amber)}
+  tbody tr.status-issue{box-shadow:inset 3px 0 0 var(--red)}
+  tbody tr.status-spare{opacity:.74}
+  tbody tr.battery-low,
+  tbody tr.battery-swap{background:rgba(255,209,102,.045)}
+  tbody td{
+    padding:8px;
+    border-bottom:1px solid rgba(255,255,255,.07);
+    vertical-align:top;
+  }
+  .field-xs{min-width:76px}
+  .field-small{min-width:110px}
+  .field-medium{min-width:150px}
+  .field-large{min-width:210px}
+  .field-notes{min-width:260px}
+  .row-input,
+  .row-select,
+  .row-textarea{
+    min-height:36px;
+    padding:7px 8px;
+    border-radius:7px;
+    font-size:13px;
+  }
+  .row-input.mono{
+    font-family:var(--mono);
+    font-variant-numeric:tabular-nums;
+  }
+  .row-textarea{
+    min-height:36px;
+    max-height:130px;
+    line-height:1.35;
+  }
+  .empty-state{
+    padding:34px;
+    color:var(--muted);
+    text-align:center;
+  }
+  .empty-state strong{
+    display:block;
+    margin-bottom:6px;
+    color:var(--text);
+  }
+  .side{
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+    min-width:0;
+  }
+  .inspector,
+  .operator-panel{
+    padding:16px;
+  }
+  .panel-title{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:12px;
+    padding-bottom:12px;
+    border-bottom:1px solid rgba(255,255,255,.08);
+  }
+  .panel-title h2{
+    margin:0;
+    font-size:13px;
+    font-family:var(--mono);
+    letter-spacing:.1em;
+    text-transform:uppercase;
+  }
+  .panel-title span{
+    color:var(--dim);
+    font-family:var(--mono);
+    font-size:11px;
+  }
+  .next-card{
+    margin-bottom:12px;
+    padding:14px;
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:var(--radius);
+    background:#0e1318;
+  }
+  .next-card span{
+    display:block;
+    margin-bottom:6px;
+    color:var(--rust-2);
+    font-family:var(--mono);
+    font-size:10px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+  }
+  .next-card strong{
+    display:block;
+    margin-bottom:6px;
+    font-size:18px;
+    line-height:1.25;
+  }
+  .next-card p{
+    margin:0;
+    color:var(--muted);
+    font-size:13px;
+  }
+  .selected-grid{
+    display:grid;
+    gap:8px;
+  }
+  .selected-grid textarea{
+    min-height:72px;
+  }
+  .side-actions{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+  }
+  .side-actions .wide{
+    grid-column:1 / -1;
+  }
+  .hint{
+    min-height:21px;
+    color:var(--muted);
+    font-size:13px;
+    line-height:1.45;
+  }
+  .hint.success{color:#bdf8ce}
+  .hint.error{color:#ffd0d0}
+  .shortcut-list{
+    display:grid;
+    grid-template-columns:auto 1fr;
+    gap:9px 12px;
+    margin:0;
+    color:var(--muted);
+    font-size:13px;
+  }
+  .shortcut-list dt{
+    min-width:42px;
+    padding:2px 6px;
+    border:1px solid var(--line);
+    border-radius:6px;
+    background:#0e1318;
+    color:var(--text);
+    font-family:var(--mono);
+    text-align:center;
+  }
+  .shortcut-list dd{margin:0}
+  .privacy-note{
+    margin:14px 0 0;
+    color:var(--dim);
+    font-size:12px;
+    line-height:1.55;
+  }
+  .feedback-success{
+    animation:confirm var(--med) var(--ease);
+    border-color:rgba(107,224,146,.85) !important;
+  }
+  .feedback-error{
+    animation:shake 160ms cubic-bezier(.3,0,.2,1);
+    border-color:var(--red) !important;
+    box-shadow:0 0 0 3px rgba(255,107,107,.16) !important;
+  }
+  @keyframes confirm{
+    0%{transform:scale(1)}
+    45%{transform:scale(1.02);box-shadow:0 0 0 4px rgba(107,224,146,.14)}
+    100%{transform:scale(1);box-shadow:0 0 0 rgba(107,224,146,0)}
+  }
+  @keyframes shake{
+    0%,100%{transform:translateX(0)}
+    30%{transform:translateX(-4px)}
+    60%{transform:translateX(4px)}
+    82%{transform:translateX(-2px)}
+  }
+  .noscript{
+    margin:20px;
+    padding:16px;
+    border:1px solid var(--red);
+    border-radius:var(--radius);
+    background:#231212;
+    color:#ffe0e0;
+  }
+  .file-input{display:none}
+  @media (max-width:1120px){
+    .hero,
+    .layout{
+      grid-template-columns:1fr;
+    }
+    .side{
+      grid-row:1;
+    }
+    .toolbar{
+      grid-template-columns:1fr;
+    }
+    .button-row{
+      justify-content:flex-start;
+    }
+    .meta-grid{
+      grid-template-columns:repeat(2,minmax(0,1fr));
+    }
+  }
+  @media (max-width:680px){
+    .topbar{
+      align-items:flex-start;
+      flex-direction:column;
+    }
+    .top-actions{
+      width:100%;
+      justify-content:space-between;
+    }
+    main{
+      padding:12px;
+    }
+    .meta-grid,
+    .stats{
+      grid-template-columns:1fr 1fr;
+    }
+    .button-row,
+    .side-actions{
+      grid-template-columns:1fr;
+    }
+    .side-actions button,
+    .button-row button{
+      flex:1 1 140px;
+    }
+    .show-title{
+      font-size:32px;
+    }
+  }
+  @media (max-width:460px){
+    .meta-grid,
+    .stats{
+      grid-template-columns:1fr;
+    }
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{transition-duration:.001ms !important;animation-duration:.001ms !important}
+    button:hover,
+    button:active,
+    button.is-pressing{transform:none}
+  }
+  @media print{
+    body{
+      background:#fff;
+      color:#000;
+    }
+    body::before,
+    .topbar,
+    .toolbar,
+    .side,
+    .skip-link,
+    .noscript{display:none !important}
+    main{
+      max-width:none;
+      padding:0;
+    }
+    .hero,
+    .layout{
+      display:block;
+    }
+    .hero-main,
+    .workbench{
+      border:0;
+      box-shadow:none;
+      background:#fff;
+    }
+    .table-wrap{
+      overflow:visible;
+    }
+    table{
+      min-width:0;
+      font-size:10px;
+    }
+    input,select,textarea{
+      border:0;
+      padding:0;
+      color:#000;
+      background:transparent;
+    }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#commsTable">Skip to comms table</a>
+<noscript>
+  <div class="noscript">JavaScript is off, so editing and export controls are unavailable. Open this page with scripts enabled to build the comms check.</div>
+</noscript>
+
+<div class="app">
+  <header class="topbar">
+    <a class="brand" href="index.html#av-tools" aria-label="System by Dave AV tools">
+      <span class="brand-mark" aria-hidden="true">S</span>
+      <span class="brand-text">
+        <strong>Comms Check</strong>
+        <span>System by Dave AV tool</span>
+      </span>
+    </a>
+    <div class="top-actions">
+      <a class="top-link" href="index.html#av-tools">AV tools</a>
+      <button id="sampleBtn" type="button">Load Sample</button>
+      <button id="printBtn" type="button">Print</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" aria-label="Show setup">
+      <div class="hero-main">
+        <p class="eyebrow">Intercom radio IFB</p>
+        <input id="showName" class="show-title" type="text" value="General Session Comms Check" aria-label="Show name">
+        <div class="meta-grid">
+          <div class="field">
+            <label for="venue">Venue</label>
+            <input id="venue" type="text" value="Ballroom A">
+          </div>
+          <div class="field">
+            <label for="showDate">Date</label>
+            <input id="showDate" type="date">
+          </div>
+          <div class="field">
+            <label for="commsLead">Comms lead</label>
+            <input id="commsLead" type="text" value="A2 comms">
+          </div>
+          <div class="field">
+            <label for="stageManager">Stage manager</label>
+            <input id="stageManager" type="text" value="SM desk">
+          </div>
+          <div class="field">
+            <label for="a1">A1</label>
+            <input id="a1" type="text" value="FOH A1">
+          </div>
+        </div>
+      </div>
+      <aside class="status-panel" aria-label="Comms metrics">
+        <div class="stats">
+          <div class="stat"><span>Total</span><strong id="totalOut">0</strong></div>
+          <div class="stat"><span>Checked</span><strong id="checkedOut">0</strong></div>
+          <div class="stat"><span>Issues</span><strong id="issueOut">0</strong></div>
+          <div class="stat"><span>Battery low</span><strong id="batteryOut">0</strong></div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="layout">
+      <section class="workbench" aria-label="Editable comms check">
+        <div class="toolbar">
+          <input id="searchInput" type="search" placeholder="Search position, person, device, notes" aria-label="Search assignments">
+          <select id="channelFilter" aria-label="Filter by channel">
+            <option value="all">All channels</option>
+          </select>
+          <select id="statusFilter" aria-label="Filter by status">
+            <option value="all">All status</option>
+            <option value="checked">Checked</option>
+            <option value="pending">Pending</option>
+            <option value="issue">Issue</option>
+            <option value="spare">Spare</option>
+          </select>
+          <div class="button-row">
+            <button id="addBtn" class="primary" type="button">Add Assignment</button>
+            <button id="duplicateBtn" type="button">Duplicate</button>
+            <button id="moveUpBtn" type="button">Move Up</button>
+            <button id="moveDownBtn" type="button">Move Down</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table id="commsTable">
+            <thead>
+              <tr>
+                <th>Position</th>
+                <th>Person</th>
+                <th>System</th>
+                <th>Channel</th>
+                <th>Device ID</th>
+                <th>Battery</th>
+                <th>Status</th>
+                <th>Backup</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody id="commsBody"></tbody>
+          </table>
+          <div id="emptyState" class="empty-state" hidden>
+            <strong>No assignments match the current filters.</strong>
+            Clear search or filters to see the full comms plan.
+          </div>
+        </div>
+      </section>
+
+      <aside class="side">
+        <section class="inspector" aria-label="Selected assignment">
+          <div class="panel-title">
+            <h2>Selected assignment</h2>
+            <span id="selectedIdOut">None</span>
+          </div>
+          <div class="next-card" id="nextCard">
+            <span>Next open check</span>
+            <strong id="nextTitleOut">No assignments</strong>
+            <p id="nextMetaOut">Add assignments or load the sample comms plan.</p>
+          </div>
+          <div class="selected-grid">
+            <div class="field">
+              <label for="selectedStatus">Status</label>
+              <select id="selectedStatus">
+                <option value="checked">Checked</option>
+                <option value="pending">Pending</option>
+                <option value="issue">Issue</option>
+                <option value="spare">Spare</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="selectedNotes">Notes</label>
+              <textarea id="selectedNotes" placeholder="Selected assignment notes"></textarea>
+            </div>
+          </div>
+          <div class="side-actions" style="margin-top:10px">
+            <button id="markCheckedBtn" type="button">Mark Checked</button>
+            <button id="markIssueBtn" type="button">Mark Issue</button>
+            <button id="deleteBtn" class="danger wide" type="button">Delete Assignment</button>
+          </div>
+          <p id="hint" class="hint" role="status" aria-live="polite"></p>
+        </section>
+
+        <section class="operator-panel" aria-label="Operator actions">
+          <div class="panel-title">
+            <h2>Output</h2>
+            <span>JSON CSV TXT</span>
+          </div>
+          <div class="side-actions">
+            <button id="copySummaryBtn" type="button">Copy Summary</button>
+            <button id="exportCsvBtn" type="button">Export CSV</button>
+            <button id="exportJsonBtn" type="button">Export JSON</button>
+            <button id="importJsonBtn" type="button">Import JSON</button>
+          </div>
+          <p class="privacy-note">Show data is remembered in this browser when storage is available. JSON export moves the comms plan between browsers.</p>
+        </section>
+
+        <section class="operator-panel" aria-label="Shortcuts">
+          <div class="panel-title">
+            <h2>Shortcuts</h2>
+            <span>Keyboard</span>
+          </div>
+          <dl class="shortcut-list">
+            <dt>N</dt><dd>Add assignment</dd>
+            <dt>D</dt><dd>Duplicate selected</dd>
+            <dt>C</dt><dd>Mark selected checked</dd>
+            <dt>I</dt><dd>Mark selected issue</dd>
+          </dl>
+        </section>
+      </aside>
+    </section>
+  </main>
+</div>
+
+<input id="jsonInput" class="file-input" type="file" accept=".json,application/json">
+
+<script>
+(function(){
+  "use strict";
+
+  var STORAGE_KEY = 'comms-check.v1';
+  var SCHEMA = 'system-by-dave.comms-check.v1';
+  var $ = function(id){ return document.getElementById(id); };
+  var state = defaultState();
+  var selectedId = '';
+
+  function uid(){
+    return 'comms-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
+  }
+
+  function today(){
+    var d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+
+  function defaultState(){
+    return {
+      schema:SCHEMA,
+      meta:{
+        showName:'General Session Comms Check',
+        venue:'Ballroom A',
+        date:today(),
+        commsLead:'A2 comms',
+        stageManager:'SM desk',
+        a1:'FOH A1'
+      },
+      filters:{
+        search:'',
+        channel:'all',
+        status:'all'
+      },
+      assignments:sampleAssignments()
+    };
+  }
+
+  function sampleAssignments(){
+    return [
+      makeAssignment('Show caller','Stage manager','Wired intercom','A','BP-01','full','checked','Spare BP-09','Program, deck, and A1 verified.'),
+      makeAssignment('FOH audio','A1','Wired intercom','A','BP-02','good','checked','Radio 05','Talkback to SM and monitor world checked.'),
+      makeAssignment('Video director','TD','Wired intercom','A','BP-03','good','checked','Spare headset HS-04','Program return confirmed.'),
+      makeAssignment('Camera 1','Cam op 1','Wired intercom','B','BP-04','good','pending','Spare cable 25 ft','Needs final camera tally check.'),
+      makeAssignment('Camera 2','Cam op 2','Wired intercom','B','BP-05','low','issue','Radio 07','Battery low. Swap before doors.'),
+      makeAssignment('Presenter IFB','Keynote','IFB','IFB 1','IFB-01','full','pending','IFB-02','Test with presenter at lectern.'),
+      makeAssignment('Stage left deck','A2','Radio','Ops 1','R-12','good','checked','R-14','Use for cable moves and mic handoff.'),
+      makeAssignment('Producer','Client producer','Radio','Client','R-21','full','spare','R-22','Keep at tech table until rehearsal.')
+    ];
+  }
+
+  function makeAssignment(position, person, system, channel, deviceId, battery, status, backup, notes){
+    return {
+      id:uid(),
+      position:position,
+      person:person,
+      system:system,
+      channel:channel,
+      deviceId:deviceId,
+      battery:battery,
+      status:status,
+      backup:backup,
+      notes:notes
+    };
+  }
+
+  function cleanText(value, max){
+    if(typeof value !== 'string') value = value == null ? '' : String(value);
+    return value.slice(0, max || 500);
+  }
+
+  function sanitizeStatus(value){
+    return ['checked','pending','issue','spare'].indexOf(value) >= 0 ? value : 'pending';
+  }
+
+  function sanitizeBattery(value){
+    return ['full','good','low','swap'].indexOf(value) >= 0 ? value : 'good';
+  }
+
+  function sanitizeAssignment(item){
+    item = item && typeof item === 'object' ? item : {};
+    return {
+      id:typeof item.id === 'string' && item.id ? item.id.slice(0, 80) : uid(),
+      position:cleanText(item.position || 'Position', 80),
+      person:cleanText(item.person || '', 80),
+      system:cleanText(item.system || 'Wired intercom', 60),
+      channel:cleanText(item.channel || 'A', 50),
+      deviceId:cleanText(item.deviceId || '', 60),
+      battery:sanitizeBattery(item.battery),
+      status:sanitizeStatus(item.status),
+      backup:cleanText(item.backup || '', 100),
+      notes:cleanText(item.notes || '', 500)
+    };
+  }
+
+  function sanitizeState(data){
+    var clean = defaultState();
+    data = data && typeof data === 'object' ? data : {};
+    clean.meta.showName = cleanText(data.meta && data.meta.showName || clean.meta.showName, 120);
+    clean.meta.venue = cleanText(data.meta && data.meta.venue || '', 80);
+    clean.meta.date = cleanText(data.meta && data.meta.date || today(), 20);
+    clean.meta.commsLead = cleanText(data.meta && data.meta.commsLead || '', 80);
+    clean.meta.stageManager = cleanText(data.meta && data.meta.stageManager || '', 80);
+    clean.meta.a1 = cleanText(data.meta && data.meta.a1 || '', 80);
+    clean.filters.search = cleanText(data.filters && data.filters.search || '', 100);
+    clean.filters.channel = cleanText(data.filters && data.filters.channel || 'all', 50);
+    clean.filters.status = cleanText(data.filters && data.filters.status || 'all', 20);
+    if(Array.isArray(data.assignments)){
+      clean.assignments = data.assignments.map(sanitizeAssignment).slice(0, 300);
+    }
+    if(!clean.assignments.length) clean.assignments = sampleAssignments();
+    return clean;
+  }
+
+  function loadState(){
+    try{
+      var raw = window.localStorage && window.localStorage.getItem(STORAGE_KEY);
+      if(!raw) return;
+      state = sanitizeState(JSON.parse(raw));
+    }catch(e){
+      state = defaultState();
+    }
+  }
+
+  function saveState(){
+    try{
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }catch(e){
+      setHint('Browser storage is unavailable. Use JSON export for transfer.', 'error');
+    }
+  }
+
+  function setHint(message, kind){
+    var hint = $('hint');
+    hint.className = 'hint' + (kind ? ' ' + kind : '');
+    hint.textContent = message || '';
+  }
+
+  function flash(el, className){
+    if(!el) return;
+    el.classList.remove(className);
+    void el.offsetWidth;
+    el.classList.add(className);
+    setTimeout(function(){ el.classList.remove(className); }, 190);
+  }
+
+  function installPressFeedback(){
+    document.querySelectorAll('button').forEach(function(button){
+      function press(){ if(!button.disabled) button.classList.add('is-pressing'); }
+      function release(){ button.classList.remove('is-pressing'); }
+      button.addEventListener('pointerdown', press);
+      button.addEventListener('pointerup', release);
+      button.addEventListener('pointercancel', release);
+      button.addEventListener('pointerleave', release);
+      button.addEventListener('blur', release);
+      button.addEventListener('keydown', function(e){
+        if(e.key === ' ' || e.key === 'Enter') press();
+      });
+      button.addEventListener('keyup', function(e){
+        if(e.key === ' ' || e.key === 'Enter') release();
+      });
+    });
+  }
+
+  function syncMetaToUi(){
+    $('showName').value = state.meta.showName;
+    $('venue').value = state.meta.venue;
+    $('showDate').value = state.meta.date;
+    $('commsLead').value = state.meta.commsLead;
+    $('stageManager').value = state.meta.stageManager;
+    $('a1').value = state.meta.a1;
+    $('searchInput').value = state.filters.search;
+    $('statusFilter').value = state.filters.status;
+  }
+
+  function readMetaFromUi(){
+    state.meta.showName = $('showName').value;
+    state.meta.venue = $('venue').value;
+    state.meta.date = $('showDate').value;
+    state.meta.commsLead = $('commsLead').value;
+    state.meta.stageManager = $('stageManager').value;
+    state.meta.a1 = $('a1').value;
+    state.filters.search = $('searchInput').value;
+    state.filters.channel = $('channelFilter').value;
+    state.filters.status = $('statusFilter').value;
+    saveState();
+  }
+
+  function visibleAssignments(){
+    var q = state.filters.search.trim().toLowerCase();
+    return state.assignments.filter(function(item){
+      var haystack = [
+        item.position, item.person, item.system, item.channel, item.deviceId,
+        item.battery, item.status, item.backup, item.notes
+      ].join(' ').toLowerCase();
+      if(q && haystack.indexOf(q) === -1) return false;
+      if(state.filters.channel !== 'all' && item.channel !== state.filters.channel) return false;
+      if(state.filters.status !== 'all' && item.status !== state.filters.status) return false;
+      return true;
+    });
+  }
+
+  function renderChannelFilter(){
+    var select = $('channelFilter');
+    var channels = {};
+    var previous = state.filters.channel;
+    select.innerHTML = '<option value="all">All channels</option>';
+    state.assignments.forEach(function(item){ if(item.channel) channels[item.channel] = true; });
+    Object.keys(channels).sort().forEach(function(channel){
+      var option = document.createElement('option');
+      option.value = channel;
+      option.textContent = channel;
+      select.appendChild(option);
+    });
+    select.value = channels[previous] || previous === 'all' ? previous : 'all';
+    state.filters.channel = select.value;
+  }
+
+  function renderTable(){
+    renderChannelFilter();
+    var body = $('commsBody');
+    var rows = visibleAssignments();
+    body.innerHTML = '';
+    rows.forEach(function(item){
+      body.appendChild(renderRow(item));
+    });
+    $('emptyState').hidden = rows.length > 0;
+    if(selectedId && !state.assignments.some(function(item){ return item.id === selectedId; })){
+      selectedId = state.assignments[0] ? state.assignments[0].id : '';
+    }
+    updateMetrics();
+    renderInspector();
+  }
+
+  function renderRow(item){
+    var tr = document.createElement('tr');
+    tr.dataset.id = item.id;
+    tr.className = 'status-' + item.status + ' battery-' + item.battery + (item.id === selectedId ? ' selected' : '');
+    tr.addEventListener('click', function(){
+      selectedId = item.id;
+      renderTable();
+    });
+    [
+      cellInput(item, 'position', 'field-large'),
+      cellInput(item, 'person', 'field-medium'),
+      cellInput(item, 'system', 'field-medium'),
+      cellInput(item, 'channel', 'field-small mono'),
+      cellInput(item, 'deviceId', 'field-small mono'),
+      cellBattery(item),
+      cellStatus(item),
+      cellInput(item, 'backup', 'field-medium'),
+      cellTextarea(item, 'notes', 'field-notes')
+    ].forEach(function(cell){ tr.appendChild(cell); });
+    return tr;
+  }
+
+  function cellInput(item, key, className){
+    var td = document.createElement('td');
+    var input = document.createElement('input');
+    input.className = 'row-input ' + className;
+    input.value = item[key] || '';
+    input.addEventListener('input', function(){
+      item[key] = input.value;
+      saveState();
+      if(key === 'channel') renderTable();
+      else updateMetrics();
+    });
+    td.appendChild(input);
+    return td;
+  }
+
+  function cellTextarea(item, key, className){
+    var td = document.createElement('td');
+    var textarea = document.createElement('textarea');
+    textarea.className = 'row-textarea ' + className;
+    textarea.value = item[key] || '';
+    textarea.addEventListener('input', function(){
+      item[key] = textarea.value;
+      saveState();
+      if(item.id === selectedId) renderInspector();
+    });
+    td.appendChild(textarea);
+    return td;
+  }
+
+  function cellBattery(item){
+    var td = document.createElement('td');
+    var select = document.createElement('select');
+    select.className = 'row-select field-small';
+    ['full','good','low','swap'].forEach(function(value){
+      var option = document.createElement('option');
+      option.value = value;
+      option.textContent = label(value);
+      select.appendChild(option);
+    });
+    select.value = item.battery;
+    select.addEventListener('change', function(){
+      item.battery = sanitizeBattery(select.value);
+      saveState();
+      renderTable();
+    });
+    td.appendChild(select);
+    return td;
+  }
+
+  function cellStatus(item){
+    var td = document.createElement('td');
+    var select = document.createElement('select');
+    select.className = 'row-select field-small';
+    ['checked','pending','issue','spare'].forEach(function(value){
+      var option = document.createElement('option');
+      option.value = value;
+      option.textContent = label(value);
+      select.appendChild(option);
+    });
+    select.value = item.status;
+    select.addEventListener('change', function(){
+      item.status = sanitizeStatus(select.value);
+      saveState();
+      renderTable();
+    });
+    td.appendChild(select);
+    return td;
+  }
+
+  function label(value){
+    return String(value || '').replace(/\b\w/g, function(match){ return match.toUpperCase(); });
+  }
+
+  function updateMetrics(){
+    var total = state.assignments.length;
+    var checked = state.assignments.filter(function(item){ return item.status === 'checked'; }).length;
+    var issues = state.assignments.filter(function(item){ return item.status === 'issue'; }).length;
+    var low = state.assignments.filter(function(item){ return item.battery === 'low' || item.battery === 'swap'; }).length;
+    $('totalOut').textContent = String(total);
+    $('checkedOut').textContent = String(checked);
+    $('issueOut').textContent = String(issues);
+    $('batteryOut').textContent = String(low);
+  }
+
+  function selectedAssignment(){
+    return state.assignments.find(function(item){ return item.id === selectedId; }) || null;
+  }
+
+  function nextOpenAssignment(){
+    return state.assignments.find(function(item){
+      return item.status === 'pending' || item.status === 'issue' || item.battery === 'low' || item.battery === 'swap';
+    }) || null;
+  }
+
+  function renderInspector(){
+    var selected = selectedAssignment();
+    var next = nextOpenAssignment();
+    $('selectedIdOut').textContent = selected ? selected.position : 'None';
+    if(next){
+      $('nextTitleOut').textContent = next.position;
+      $('nextMetaOut').textContent = next.person + ' / ' + next.system + ' / ' + next.channel + ' / ' + label(next.status);
+    }else{
+      $('nextTitleOut').textContent = state.assignments.length ? 'All checks closed' : 'No assignments';
+      $('nextMetaOut').textContent = state.assignments.length ? 'No pending, issue, or battery swap rows.' : 'Add assignments or load the sample comms plan.';
+    }
+    $('selectedStatus').disabled = !selected;
+    $('selectedNotes').disabled = !selected;
+    $('markCheckedBtn').disabled = !selected;
+    $('markIssueBtn').disabled = !selected;
+    $('deleteBtn').disabled = !selected;
+    $('duplicateBtn').disabled = !selected;
+    $('moveUpBtn').disabled = !selected;
+    $('moveDownBtn').disabled = !selected;
+    if(selected){
+      $('selectedStatus').value = selected.status;
+      $('selectedNotes').value = selected.notes;
+    }else{
+      $('selectedStatus').value = 'pending';
+      $('selectedNotes').value = '';
+    }
+  }
+
+  function addAssignment(){
+    readMetaFromUi();
+    var item = makeAssignment('New position','', 'Wired intercom', 'A', '', 'good', 'pending', '', '');
+    state.assignments.push(item);
+    selectedId = item.id;
+    saveState();
+    renderTable();
+    setHint('Assignment added.', 'success');
+    flash($('addBtn'), 'feedback-success');
+  }
+
+  function duplicateSelected(){
+    var selected = selectedAssignment();
+    var copy;
+    if(!selected){
+      setHint('Pick an assignment first.', 'error');
+      flash($('duplicateBtn'), 'feedback-error');
+      return;
+    }
+    copy = sanitizeAssignment(Object.assign({}, selected, {
+      id:uid(),
+      position:selected.position + ' copy',
+      status:'pending'
+    }));
+    state.assignments.splice(state.assignments.indexOf(selected) + 1, 0, copy);
+    selectedId = copy.id;
+    saveState();
+    renderTable();
+    setHint('Assignment duplicated.', 'success');
+    flash($('duplicateBtn'), 'feedback-success');
+  }
+
+  function moveSelected(dir){
+    var index = state.assignments.findIndex(function(item){ return item.id === selectedId; });
+    var next = index + dir;
+    var item;
+    if(index < 0 || next < 0 || next >= state.assignments.length){
+      setHint('Cannot move that assignment further.', 'error');
+      flash(dir < 0 ? $('moveUpBtn') : $('moveDownBtn'), 'feedback-error');
+      return;
+    }
+    item = state.assignments.splice(index, 1)[0];
+    state.assignments.splice(next, 0, item);
+    saveState();
+    renderTable();
+    flash(dir < 0 ? $('moveUpBtn') : $('moveDownBtn'), 'feedback-success');
+  }
+
+  function deleteSelected(){
+    var selected = selectedAssignment();
+    if(!selected) return;
+    state.assignments = state.assignments.filter(function(item){ return item.id !== selected.id; });
+    selectedId = state.assignments[0] ? state.assignments[0].id : '';
+    saveState();
+    renderTable();
+    setHint('Assignment deleted.', 'success');
+    flash($('deleteBtn'), 'feedback-success');
+  }
+
+  function setSelectedStatus(status){
+    var selected = selectedAssignment();
+    if(!selected){
+      setHint('Pick an assignment first.', 'error');
+      return;
+    }
+    selected.status = sanitizeStatus(status);
+    selected.notes = $('selectedNotes').value;
+    saveState();
+    renderTable();
+    setHint('Status set to ' + label(selected.status) + '.', 'success');
+  }
+
+  function applySelectedNotes(){
+    var selected = selectedAssignment();
+    if(!selected) return;
+    selected.status = sanitizeStatus($('selectedStatus').value);
+    selected.notes = $('selectedNotes').value;
+    saveState();
+    renderTable();
+  }
+
+  function loadSample(){
+    state = defaultState();
+    selectedId = state.assignments[0] ? state.assignments[0].id : '';
+    saveState();
+    syncMetaToUi();
+    renderTable();
+    setHint('Sample comms plan loaded.', 'success');
+    flash($('sampleBtn'), 'feedback-success');
+  }
+
+  function summaryText(){
+    var lines = [];
+    var checked = state.assignments.filter(function(item){ return item.status === 'checked'; }).length;
+    var issues = state.assignments.filter(function(item){ return item.status === 'issue'; });
+    var low = state.assignments.filter(function(item){ return item.battery === 'low' || item.battery === 'swap'; });
+    lines.push('# ' + state.meta.showName + ' comms check');
+    lines.push('Venue: ' + state.meta.venue);
+    lines.push('Date: ' + state.meta.date);
+    lines.push('Lead: ' + state.meta.commsLead + ' / SM: ' + state.meta.stageManager + ' / A1: ' + state.meta.a1);
+    lines.push('Status: ' + checked + '/' + state.assignments.length + ' checked, ' + issues.length + ' issues, ' + low.length + ' low or swap batteries');
+    lines.push('');
+    lines.push('Assignments');
+    state.assignments.forEach(function(item, index){
+      lines.push((index + 1) + '. ' + item.position + ' / ' + item.person + ' / ' + item.system + ' ' + item.channel + ' / ' + item.deviceId + ' / ' + label(item.battery) + ' / ' + label(item.status) + (item.backup ? ' / backup ' + item.backup : '') + (item.notes ? ' / ' + item.notes : ''));
+    });
+    return lines.join('\n');
+  }
+
+  function copyText(text){
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      return navigator.clipboard.writeText(text);
+    }
+    return new Promise(function(resolve, reject){
+      var temp = document.createElement('textarea');
+      temp.value = text;
+      temp.setAttribute('readonly', '');
+      temp.style.position = 'fixed';
+      temp.style.left = '-9999px';
+      document.body.appendChild(temp);
+      temp.select();
+      try{
+        document.execCommand('copy') ? resolve() : reject(new Error('copy failed'));
+      }catch(e){
+        reject(e);
+      }finally{
+        if(temp.parentNode) temp.parentNode.removeChild(temp);
+      }
+    });
+  }
+
+  function copySummary(){
+    copyText(summaryText()).then(function(){
+      setHint('Comms summary copied.', 'success');
+      flash($('copySummaryBtn'), 'feedback-success');
+    }).catch(function(){
+      setHint('Copy failed. Use JSON export instead.', 'error');
+      flash($('copySummaryBtn'), 'feedback-error');
+    });
+  }
+
+  function download(name, type, content){
+    var blob = new Blob([content], {type:type});
+    var url = URL.createObjectURL(blob);
+    var link = document.createElement('a');
+    link.href = url;
+    link.download = name;
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    link.click();
+    setTimeout(function(){
+      URL.revokeObjectURL(url);
+      if(link.parentNode) link.parentNode.removeChild(link);
+    }, 0);
+  }
+
+  function fileStem(){
+    return (state.meta.showName || 'comms-check').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 70) || 'comms-check';
+  }
+
+  function exportJson(){
+    readMetaFromUi();
+    download(fileStem() + '.comms-check.json', 'application/json;charset=utf-8', JSON.stringify(state, null, 2));
+    setHint('JSON exported.', 'success');
+    flash($('exportJsonBtn'), 'feedback-success');
+  }
+
+  function csvCell(value){
+    value = String(value == null ? '' : value);
+    return '"' + value.replace(/"/g, '""') + '"';
+  }
+
+  function exportCsv(){
+    var rows = [['Position','Person','System','Channel','Device ID','Battery','Status','Backup','Notes']];
+    state.assignments.forEach(function(item){
+      rows.push([item.position,item.person,item.system,item.channel,item.deviceId,label(item.battery),label(item.status),item.backup,item.notes]);
+    });
+    download(fileStem() + '.comms-check.csv', 'text/csv;charset=utf-8', rows.map(function(row){ return row.map(csvCell).join(','); }).join('\n'));
+    setHint('CSV exported.', 'success');
+    flash($('exportCsvBtn'), 'feedback-success');
+  }
+
+  function importJsonFile(file){
+    var reader = new FileReader();
+    reader.onload = function(){
+      try{
+        var parsed = JSON.parse(String(reader.result || ''));
+        if(parsed.schema !== SCHEMA && !Array.isArray(parsed.assignments)){
+          throw new Error('Invalid comms file');
+        }
+        state = sanitizeState(parsed);
+        selectedId = state.assignments[0] ? state.assignments[0].id : '';
+        saveState();
+        syncMetaToUi();
+        renderTable();
+        setHint('JSON imported.', 'success');
+        flash($('importJsonBtn'), 'feedback-success');
+      }catch(e){
+        setHint('Could not import that JSON file.', 'error');
+        flash($('importJsonBtn'), 'feedback-error');
+      }
+    };
+    reader.onerror = function(){
+      setHint('Could not read that JSON file.', 'error');
+      flash($('importJsonBtn'), 'feedback-error');
+    };
+    reader.readAsText(file);
+  }
+
+  function wireEvents(){
+    ['showName','venue','showDate','commsLead','stageManager','a1','searchInput','channelFilter','statusFilter'].forEach(function(id){
+      $(id).addEventListener('input', function(){
+        readMetaFromUi();
+        renderTable();
+      });
+      $(id).addEventListener('change', function(){
+        readMetaFromUi();
+        renderTable();
+      });
+    });
+    $('sampleBtn').addEventListener('click', loadSample);
+    $('printBtn').addEventListener('click', function(){ window.print(); });
+    $('addBtn').addEventListener('click', addAssignment);
+    $('duplicateBtn').addEventListener('click', duplicateSelected);
+    $('moveUpBtn').addEventListener('click', function(){ moveSelected(-1); });
+    $('moveDownBtn').addEventListener('click', function(){ moveSelected(1); });
+    $('deleteBtn').addEventListener('click', deleteSelected);
+    $('markCheckedBtn').addEventListener('click', function(){ setSelectedStatus('checked'); flash($('markCheckedBtn'), 'feedback-success'); });
+    $('markIssueBtn').addEventListener('click', function(){ setSelectedStatus('issue'); flash($('markIssueBtn'), 'feedback-success'); });
+    $('selectedStatus').addEventListener('change', applySelectedNotes);
+    $('selectedNotes').addEventListener('input', function(){
+      var selected = selectedAssignment();
+      if(!selected) return;
+      selected.notes = $('selectedNotes').value;
+      saveState();
+    });
+    $('copySummaryBtn').addEventListener('click', copySummary);
+    $('exportCsvBtn').addEventListener('click', exportCsv);
+    $('exportJsonBtn').addEventListener('click', exportJson);
+    $('importJsonBtn').addEventListener('click', function(){
+      $('jsonInput').value = '';
+      $('jsonInput').click();
+    });
+    $('jsonInput').addEventListener('change', function(){
+      var file = $('jsonInput').files && $('jsonInput').files[0];
+      if(file) importJsonFile(file);
+    });
+    document.addEventListener('keydown', function(e){
+      var active = document.activeElement;
+      var typing = active && ['INPUT','TEXTAREA','SELECT'].indexOf(active.tagName) >= 0;
+      if(typing) return;
+      switch(e.key){
+        case 'n': case 'N':
+          e.preventDefault(); addAssignment(); break;
+        case 'd': case 'D':
+          e.preventDefault(); duplicateSelected(); break;
+        case 'c': case 'C':
+          e.preventDefault(); setSelectedStatus('checked'); break;
+        case 'i': case 'I':
+          e.preventDefault(); setSelectedStatus('issue'); break;
+      }
+    });
+  }
+
+  loadState();
+  selectedId = state.assignments[0] ? state.assignments[0].id : '';
+  syncMetaToUi();
+  renderTable();
+  wireEvents();
+  installPressFeedback();
+})();
+</script>
+</body>
+</html>
