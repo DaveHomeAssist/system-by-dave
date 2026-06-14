@@ -1108,7 +1108,7 @@
       <button id="playBtn" class="primary" type="button" aria-pressed="false">▶ Play</button>
       <button id="cueBtn" type="button" title="3 second cue then play (C)" aria-label="Cue then play">Cue + Play</button>
       <button id="controlsInlineToggleBtn" class="controls-toggle-inline" type="button" aria-controls="toolbar" aria-expanded="true" aria-pressed="false" aria-label="Hide controls and maximize script" title="Hide controls and maximize script (H)">Hide controls</button>
-      <button id="toolbarCompactBtn" class="toolbar-compact-toggle" type="button" aria-controls="toolbar" aria-expanded="false" aria-pressed="true" aria-label="Show advanced teleprompter controls" title="Show advanced teleprompter controls">More controls</button>
+      <button id="toolbarCompactBtn" class="toolbar-compact-toggle" type="button" aria-controls="toolbar" aria-expanded="false" aria-pressed="true" aria-label="Show advanced teleprompter controls" title="Show advanced teleprompter controls (A)">More controls</button>
       <button id="restartBtn" class="icon" type="button" title="Restart from top (R)" aria-label="Restart from top">⮌</button>
     </div>
 
@@ -1487,7 +1487,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   <footer>
     <span>Drafts, saved looks, formatting, and saved scripts use this browser's storage when available.</span>
     <span class="spacer"></span>
-    <span class="js-only hint">Space play/pause · ↑/↓ speed · +/− font · H controls · M mirror · F fullscreen · R restart</span>
+    <span class="js-only hint">Space play/pause · ↑/↓ speed · +/− font · A more controls · H controls · M mirror · F fullscreen · R restart</span>
   </footer>
 </div>
 
@@ -1502,6 +1502,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
       <kbd>↓</kbd><span class="desc">Decrease scroll speed</span>
       <kbd>+</kbd><span class="desc">Increase font size</span>
       <kbd>−</kbd><span class="desc">Decrease font size</span>
+      <kbd>A</kbd><span class="desc">Show / hide advanced controls</span>
       <kbd>H</kbd><span class="desc">Show / hide controls</span>
       <kbd>I</kbd><span class="desc">Toggle italic reader text</span>
       <kbd>M</kbd><span class="desc">Toggle mirror mode</span>
@@ -2455,7 +2456,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
       toolbarCompactBtn.setAttribute('aria-expanded', String(!compact));
       toolbarCompactBtn.setAttribute('aria-pressed', String(compact));
       toolbarCompactBtn.setAttribute('aria-label', fullLabel);
-      toolbarCompactBtn.setAttribute('title', fullLabel);
+      toolbarCompactBtn.setAttribute('title', fullLabel + ' (A)');
     }
     window.requestAnimationFrame(function(){
       measure();
@@ -2473,6 +2474,16 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   function toggleToolbarCompact(sourceButton){
     setToolbarCompact(!preferences.toolbarCompact, false);
     signalSuccess(sourceButton || toolbarCompactBtn);
+  }
+
+  function toggleToolbarAdvancedShortcut(){
+    if(preferences.controlsCollapsed){
+      setControlsCollapsed(false, false);
+      setToolbarCompact(false, false);
+      signalSuccess(toolbarCompactBtn);
+      return;
+    }
+    toggleToolbarCompact(toolbarCompactBtn);
   }
 
   function refreshControlsToggle(){
@@ -5320,6 +5331,8 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
         e.preventDefault(); changeFont(-1); wake(); break;
       case 'h': case 'H':
         e.preventDefault(); toggleControls(); wake(); break;
+      case 'a': case 'A':
+        e.preventDefault(); toggleToolbarAdvancedShortcut(); wake(); break;
       case 'm': case 'M':
         e.preventDefault(); toggleMirror(); wake(); break;
       case 'f': case 'F':
