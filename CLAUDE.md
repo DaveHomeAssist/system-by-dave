@@ -46,6 +46,7 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
 - `strike-plan.html`: AV strike plan
 - `show-advance.html`: AV show advance tracker
 - `crew-call.html`: AV crew call sheet
+- `crew-time-log.html`: AV crew time log
 - `signal-flow.html` — AV signal flow planner
 - `input-list.html` — AV input list and patch sheet
 - `stage-plot.html` — PlotForge stage plot
@@ -167,6 +168,9 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
   locations, meal breaks, release times, phone numbers, crew status, problem
   flags, copyable summaries, print output, JSON import and export, and CSV
   export.
+- `crew-time-log.html` tracks departments, crew names, roles, call times,
+  actual check in, meal minutes, release times, hour totals, issue status,
+  copyable summaries, print output, JSON import and export, and CSV export.
 - `signal-flow.html` tracks AV sources, processors, destinations, formats,
   connectors, backups, route status, issues, copyable summaries, print output,
   JSON import and export, and CSV export.
@@ -183,7 +187,7 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
   `network-plan.html`,
   `cable-plan.html`,
   `rf-coordination.html`,
-  `site-survey.html`, `gear-prep.html`, `truck-pack.html`, `load-in-plan.html`, `strike-plan.html`, `show-advance.html`, `crew-call.html`,
+  `site-survey.html`, `gear-prep.html`, `truck-pack.html`, `load-in-plan.html`, `strike-plan.html`, `show-advance.html`, `crew-call.html`, `crew-time-log.html`,
   `signal-flow.html`,
   `input-list.html`, `stage-plot.html`, `plotforge.html`, `show-handoff.html`, `show-report.html`,
   `camera-shot-list.html`, `comms-check.html`, and `av-calculator.html`.
