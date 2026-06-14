@@ -37,6 +37,7 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
 - `projection-plan.html` — AV projection plan
 - `video-patch.html` — AV video patch sheet
 - `network-plan.html` — AV network plan
+- `cable-plan.html` — AV cable plan
 - `rf-coordination.html`: AV RF coordination sheet
 - `gear-prep.html`: AV gear prep checklist
 - `strike-plan.html`: AV strike plan
@@ -127,6 +128,10 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
 - `network-plan.html` tracks show control, audio, video, comms, internet,
   IPs, VLANs, switch ports, backup paths, issue status, copyable summaries,
   print output, JSON import and export, and CSV export.
+- `cable-plan.html` tracks cable types, cable names, lengths, sources,
+  destinations, paths, labels, owners, pull status, trip and slack issues,
+  cable gap warnings, copyable summaries, print output, JSON import and
+  export, and CSV export.
 - `rf-coordination.html` tracks wireless mics, IEMs, IFB, comms packs,
   receivers, frequencies, bands, channels, scan status, backup paths, issue
   status, conflict warnings, copyable summaries, print output, JSON import
@@ -160,6 +165,7 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
   `projection-plan.html`,
   `video-patch.html`,
   `network-plan.html`,
+  `cable-plan.html`,
   `rf-coordination.html`,
   `gear-prep.html`, `strike-plan.html`, `show-advance.html`, `crew-call.html`,
   `signal-flow.html`,

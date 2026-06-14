@@ -21,7 +21,7 @@ Read `CLAUDE.md` first for project orientation. This file is the rulebook.
   `speaker-plan`,
   `lighting-patch`,
   `display-plan`, `projection-plan`, `video-patch`,
-  `network-plan`, `rf-coordination`, `gear-prep`, `strike-plan`,
+  `network-plan`, `cable-plan`, `rf-coordination`, `gear-prep`, `strike-plan`,
   `show-advance`, `crew-call`, `signal-flow`, `stage-plot`, `plotforge`, `show-handoff`,
   `camera-shot-list`, `comms-check`, `av-calculator`, `resume`,
   `wedding-ops`, `privacy-policy`, `404`, `500`) must have:
