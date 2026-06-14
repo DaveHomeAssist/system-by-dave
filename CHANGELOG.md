@@ -2,6 +2,7 @@
 
 ## 2026-06-14
 
+* Added AV Suite show context handoff: `/av-suite.html` now appends show name, venue, date, operator, and phase to tool links, launch list links, and copied tool links. Added `js/av-suite-context.js` so AV tool pages with matching metadata fields prefill from those links, and updated CueForge and PlotForge route aliases to preserve query strings during redirects.
 * Added cross tool readiness tracking to `/av-suite.html` with per tool Pending Ready Issue Skipped states, readiness counts, issue focused views, sidebar readiness actions, launch list readiness summaries, and suite JSON import and export support.
 * Expanded `/av-suite.html` with suite JSON import and export so show profile fields, current phase, pinned tools, recent tools, and filters can be moved between browser sessions or machines. Added visible Export Suite JSON and Import Suite JSON controls with success and error feedback.
 * Added `/av-suite.html`, a browser based AV suite launch hub with show profile fields, phase recommendations, search, phase and department filters, pinned tools, recent tools, copyable launch lists, saved browser preferences, tactile button feedback, and mobile layout containment. Linked it from the homepage AV Tools section, made it the primary AV Tools entry button, added it to the Products footer, and added it to `sitemap.xml`.

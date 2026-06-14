@@ -13,6 +13,8 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
 - Static HTML — **no build step**, files are served directly.
 - Shared styles in `css/style.css`.
 - Each page may have an inline `<style>` block for page-specific overrides.
+- Shared browser helpers may live in `js/` when multiple static AV pages need
+  the same small behavior.
 - Vanilla JS only (no frameworks, no bundlers).
 
 ## Pages
@@ -91,8 +93,12 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
 - `av-suite.html` is the AV suite launch hub with show profile fields,
   phase recommendations, search, phase and department filters, cross tool
   readiness tracking, issue focused views, pinned tools, recent tools,
-  copyable launch lists, saved browser preferences, tactile button feedback,
-  suite JSON import and export, and mobile layout containment.
+  show context handoff links, copyable launch lists, saved browser
+  preferences, tactile button feedback, suite JSON import and export, and
+  mobile layout containment.
+- `js/av-suite-context.js` is the shared AV tool context helper. It reads
+  `sbdShow`, `sbdVenue`, `sbdDate`, and `sbdOperator` URL parameters and
+  fills matching show metadata fields on AV tool pages that include it.
 - `cue-sheet.html` is rolled into the AV suite as CueForge, with
   `cueforge.html` as a route alias.
 - `stage-plot.html` is rolled into the AV suite as PlotForge, with
