@@ -1,6 +1,6 @@
 'use strict';
 
-var CACHE_NAME='sbd-av-suite-v20260614-dockcompact';
+var CACHE_NAME='sbd-av-suite-v20260614-aliascontext';
 var CACHE_PREFIX='sbd-av-suite-';
 var OFFLINE_ASSETS=[
   './av-suite.html',

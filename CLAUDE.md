@@ -110,9 +110,9 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
   compact dock mode, an inline note editor, and previous and next links for
   the current phase's recommended tools.
 - `cue-sheet.html` is rolled into the AV suite as CueForge, with
-  `cueforge.html` as a route alias.
+  `cueforge.html` as a context preserving route alias and fallback card.
 - `stage-plot.html` is rolled into the AV suite as PlotForge, with
-  `plotforge.html` as a route alias.
+  `plotforge.html` as a context preserving route alias and fallback card.
 - `playback-check.html` tracks media playback files, destinations, audio
   routes, backups, duration, ready status, played state, issues, copyable
   summaries, print output, JSON import and export, and CSV export.

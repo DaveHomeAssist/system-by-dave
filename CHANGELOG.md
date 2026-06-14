@@ -2,6 +2,7 @@
 
 ## 2026-06-14
 
+* Hardened CueForge and PlotForge AV Suite route aliases: `/cueforge.html` and `/plotforge.html` now use context aware fallback links, load the shared AV Suite context helper, avoid context dropping meta refreshes, and refresh the AV Suite offline cache version.
 * Added `/teleprompter.html` compact toolbar mode: new loads start with core read controls only, operators can use More controls or the `A` shortcut to reveal formatting, timing, marker, file, package, and saved script tools, and the choice is remembered in browser preferences.
 * Added AV Suite dock compact mode: suite launched tool pages can shrink the context dock to an AV Suite link, current tool status summary, and Expand control, with the preference remembered across tool pages. Bumped the AV Suite offline cache version so cached tools refresh the helper.
 * Replaced the AV Suite dock note browser prompt with an inline note editor: suite launched tool pages now open a compact dock input with Save, Clear, and Cancel actions, keyboard save and cancel support, current note preview, and the same `/av-suite.html` dashboard storage. Bumped the AV Suite offline cache version so cached tools refresh the helper.
