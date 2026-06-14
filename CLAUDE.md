@@ -90,9 +90,10 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
   compact toolbar mode with More controls and the `A` shortcut, the `0`
   reset view recovery shortcut, and a remembered controls mode that clears the
   header, toolbar, and footer while
-  leaving a small Show controls restore button. The header Max script action
-  stays visibly labeled until phone width, and the collapsed read view offsets
-  the run HUD away from the restore button.
+  leaving a small Show controls restore button in read mode and at the lower
+  edge after collapsed edit reloads. The header Max script action stays
+  visibly labeled until phone width, and the collapsed read view offsets the
+  run HUD away from the restore button.
 - `av-suite.html` is the AV suite launch hub with show profile fields,
   phase recommendations, search, phase and department filters, cross tool
   readiness tracking, readiness notes, operator review queue, issue and note

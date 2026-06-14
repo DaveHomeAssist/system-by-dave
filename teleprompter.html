@@ -126,7 +126,11 @@
     font-size:14px;
   }
   body.controls-collapsed .controls-wake{display:inline-flex}
-  body.controls-collapsed:not(.reading) .controls-wake{display:none}
+  body.controls-collapsed:not(.reading) .controls-wake{
+    top:auto;
+    right:14px;
+    bottom:14px;
+  }
   .group{
     display:flex;align-items:center;gap:6px;
     padding:5px 8px;
@@ -683,6 +687,9 @@
   }
   body.controls-collapsed:not(.reading) .editor-head{
     padding-right:176px;
+  }
+  body.controls-collapsed:not(.reading) #script{
+    padding-bottom:76px;
   }
 
   /* ---------- Help dialog ---------- */

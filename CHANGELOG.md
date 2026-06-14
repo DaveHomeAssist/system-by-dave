@@ -2,6 +2,7 @@
 
 ## 2026-06-14
 
+* Fixed `/teleprompter.html` controls recovery after Max script reloads in edit mode: the floating Show controls button now stays visible at the lower edge, avoids the editor header, gives the script field bottom padding, and bumps the AV Suite offline cache version so cached teleprompter copies refresh.
 * Added an AV Suite phase gate: `/av-suite.html` now shows the current phase's recommended tools with readiness, notes, saved data counts, and open actions, adds Copy Phase Gate, exposes the action in Quick Switcher, and bumps the AV Suite offline cache version.
 * Added `/teleprompter.html` reset view recovery: the `0` shortcut pauses motion, exits fullscreen, closes overlays, shows controls, returns advanced controls to compact mode, restarts at the top, and keeps script and formatting data intact.
 * Renamed the `/teleprompter.html` visible hide controls actions to Max script so the space saving mode is obvious in the header, toolbar, and editor header while keeping the `H` shortcut and Show controls restore action.

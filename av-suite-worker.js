@@ -1,6 +1,6 @@
 'use strict';
 
-var CACHE_NAME='sbd-av-suite-v20260614-phasegate';
+var CACHE_NAME='sbd-av-suite-v20260614-telepromptrestore';
 var CACHE_PREFIX='sbd-av-suite-';
 var OFFLINE_ASSETS=[
   './av-suite.html',
