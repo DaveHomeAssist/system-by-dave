@@ -110,10 +110,18 @@
   .group{
     display:flex;align-items:center;gap:6px;
     padding:5px 8px;
+    min-width:0;
     background:var(--surface-2);
     border:1px solid var(--line);
     border-radius:10px;
     transition:background var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out);
+  }
+  .group[aria-label="Reader style"],
+  .group[aria-label="Reader background"],
+  .group[aria-label="Reading line color"],
+  .group[aria-label="Saved scripts"]{
+    flex-wrap:wrap;
+    max-width:100%;
   }
   .group:hover,.group:focus-within{
     background:#202632;
@@ -177,6 +185,11 @@
   button.primary:hover{filter:brightness(1.05)}
   button.primary:active,button.primary.is-pressing{filter:brightness(.94) saturate(1.08)}
   button.ghost{background:transparent}
+  #controlsToggleBtn[aria-pressed="true"]{
+    background:rgba(91,176,255,.16);
+    border-color:var(--accent-strong);
+    color:#cfe7ff;
+  }
   button.cue-active{
     border-color:#ffd48a;
     color:#ffe7bf;
@@ -282,6 +295,11 @@
     border:0;
   }
   .swatches{display:flex;align-items:center;gap:5px}
+  .group[aria-label="Reader style"] .swatches,
+  .group[aria-label="Reader background"] .swatches,
+  .group[aria-label="Reading line color"] .swatches{
+    flex-wrap:wrap;
+  }
   .swatch{
     width:32px;height:32px;min-width:32px;padding:0;border-radius:999px;
     background:var(--swatch,#fff);
@@ -555,6 +573,8 @@
   body.playing.immersive .toolbar,
   body.playing.immersive header.bar{opacity:0;pointer-events:none;transform:translateY(-4px)}
   body.playing.immersive .reader{cursor:none}
+  body.controls-collapsed .toolbar,
+  body.controls-collapsed footer{display:none}
 
   /* ---------- Help dialog ---------- */
   .help-backdrop{
@@ -668,6 +688,7 @@
     display:none;
   }
   body.remote-mode #remoteBtn,
+  body.remote-mode #controlsToggleBtn,
   body.remote-mode #editBtn,
   body.remote-mode #helpBtn{
     display:none;
@@ -825,6 +846,15 @@
       padding:4px 6px;
       flex-wrap:nowrap;
     }
+    .group[aria-label="Reader style"],
+    .group[aria-label="Reader background"],
+    .group[aria-label="Reading line color"],
+    .group[aria-label="Saved scripts"],
+    .group[aria-label="Reader style"] .swatches,
+    .group[aria-label="Reader background"] .swatches,
+    .group[aria-label="Reading line color"] .swatches{
+      flex-wrap:nowrap;
+    }
     .group .label{display:none}
     .swatches{flex-wrap:nowrap}
     input.saved-filter{width:104px}
@@ -871,6 +901,7 @@
       font-size:0;
     }
     header.bar button.ghost::before{font-size:15px}
+    #controlsToggleBtn::before{content:"▤"}
     #remoteBtn::before{content:"⇄"}
     #editBtn::before{content:"✎"}
     #helpBtn::before{content:"⌨"}
@@ -899,6 +930,7 @@
       <span>Teleprompter<small>Browser tool · no install</small></span>
     </span>
     <span class="spacer"></span>
+    <button id="controlsToggleBtn" class="ghost" type="button" aria-controls="toolbar" aria-expanded="true" aria-pressed="false" title="Hide controls (H)">Hide controls</button>
     <button id="remoteBtn" class="ghost" type="button" title="Open remote control window">Remote</button>
     <button id="editBtn" class="ghost" type="button" title="Switch between editing and reading">Edit script</button>
     <button id="helpBtn" class="ghost" type="button" aria-haspopup="dialog" title="Keyboard shortcuts">⌨ Shortcuts</button>
@@ -1290,7 +1322,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   <footer>
     <span>Drafts, saved looks, formatting, and saved scripts use this browser's storage when available.</span>
     <span class="spacer"></span>
-    <span class="js-only hint">Space play/pause · ↑/↓ speed · +/− font · M mirror · F fullscreen · R restart</span>
+    <span class="js-only hint">Space play/pause · ↑/↓ speed · +/− font · H controls · M mirror · F fullscreen · R restart</span>
   </footer>
 </div>
 
@@ -1305,6 +1337,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
       <kbd>↓</kbd><span class="desc">Decrease scroll speed</span>
       <kbd>+</kbd><span class="desc">Increase font size</span>
       <kbd>−</kbd><span class="desc">Decrease font size</span>
+      <kbd>H</kbd><span class="desc">Show / hide controls</span>
       <kbd>I</kbd><span class="desc">Toggle italic reader text</span>
       <kbd>M</kbd><span class="desc">Toggle mirror mode</span>
       <kbd>F</kbd><span class="desc">Toggle fullscreen</span>
@@ -1344,6 +1377,8 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   var isRemoteMode = urlParams.get('remote') === '1';
   if(isRemoteMode) body.classList.add('remote-mode');
 
+  var toolbar = $('toolbar');
+  var controlsToggleBtn = $('controlsToggleBtn');
   var reader   = $('reader');
   var inner    = $('readerInner');
   var script   = $('script');
@@ -2069,6 +2104,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     lastAction:'',
     lastLength:0,
     savedScriptSort:'recent',
+    controlsCollapsed:false,
     updatedAt:''
   };
   var currentPrediction = '';
@@ -2216,6 +2252,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
         if(typeof p.lastAction === 'string') preferences.lastAction = p.lastAction.slice(0, 40);
         if(typeof p.lastLength === 'number') preferences.lastLength = Math.max(0, Math.min(1000000, p.lastLength));
         if(typeof p.savedScriptSort === 'string') preferences.savedScriptSort = sanitizeSavedSort(p.savedScriptSort);
+        if(typeof p.controlsCollapsed === 'boolean') preferences.controlsCollapsed = p.controlsCollapsed;
         if(typeof p.updatedAt === 'string') preferences.updatedAt = p.updatedAt.slice(0, 40);
       }
     }catch(e){/* ignore corrupt preference metadata */}
@@ -2228,6 +2265,38 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     preferences.savedScriptSort = sanitizeSavedSort(preferences.savedScriptSort);
     preferences.updatedAt = new Date().toISOString();
     if(!storage.set(PREF_STORE, JSON.stringify(preferences))) updateStorageUi();
+  }
+
+  function refreshControlsToggle(){
+    var collapsed = !!preferences.controlsCollapsed;
+    body.classList.toggle('controls-collapsed', collapsed);
+    if(toolbar){
+      toolbar.hidden = collapsed;
+      toolbar.setAttribute('aria-hidden', String(collapsed));
+    }
+    if(controlsToggleBtn){
+      controlsToggleBtn.textContent = collapsed ? 'Show controls' : 'Hide controls';
+      controlsToggleBtn.setAttribute('aria-expanded', String(!collapsed));
+      controlsToggleBtn.setAttribute('aria-pressed', String(collapsed));
+      controlsToggleBtn.setAttribute('aria-label', collapsed ? 'Show controls' : 'Hide controls');
+      controlsToggleBtn.setAttribute('title', (collapsed ? 'Show controls' : 'Hide controls') + ' (H)');
+    }
+    window.requestAnimationFrame(function(){
+      measure();
+      applyTransform();
+      updatePrediction();
+    });
+  }
+
+  function setControlsCollapsed(collapsed, skipSave){
+    preferences.controlsCollapsed = !!collapsed;
+    refreshControlsToggle();
+    if(!skipSave) savePreferences(preferences.controlsCollapsed ? 'controls-hide' : 'controls-show');
+  }
+
+  function toggleControls(){
+    setControlsCollapsed(!preferences.controlsCollapsed, false);
+    signalSuccess(controlsToggleBtn);
   }
 
   function titleFromScript(){
@@ -4366,6 +4435,10 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
       setPredictedAction($('doneBtn'), 'Next: Done — start reading.');
       return;
     }
+    if(preferences.controlsCollapsed){
+      setPredictedAction(controlsToggleBtn, playing ? 'Next: Press Space to pause or show controls.' : 'Next: Press Space to play or show controls.');
+      return;
+    }
     if(playing){
       setPredictedAction($('playBtn'), 'Next: Pause when you need to adjust.');
       return;
@@ -4700,6 +4773,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   // ---- Wiring ----
   setupRemoteSync();
   installPressFeedback();
+  controlsToggleBtn.addEventListener('click', toggleControls);
   remoteBtn.addEventListener('click', openRemoteWindow);
   wireRemoteButton('remoteCueBtn', 'cue');
   wireRemoteButton('remotePlayBtn', 'togglePlay');
@@ -5009,6 +5083,8 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
         e.preventDefault(); changeFont(+1); wake(); break;
       case '-': case '_':
         e.preventDefault(); changeFont(-1); wake(); break;
+      case 'h': case 'H':
+        e.preventDefault(); toggleControls(); wake(); break;
       case 'm': case 'M':
         e.preventDefault(); toggleMirror(); wake(); break;
       case 'f': case 'F':
@@ -5042,6 +5118,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
 
   // ---- Init ----
   loadPreferences();
+  setControlsCollapsed(preferences.controlsCollapsed, true);
   updateStorageUi();
   loadSettings();
   loadCustomColors();
