@@ -2,6 +2,7 @@
 
 ## 2026-06-14
 
+* Added AV Suite tool to tool phase navigation: `js/av-suite-context.js` now turns the compact AV Suite return link into a context dock on suite launched tool pages, with previous and next links for the current phase's recommended tools. Bumped the AV Suite offline cache version so the updated helper refreshes cleanly.
 * Added AV Suite offline readiness: `/av-suite.html` now registers `av-suite-worker.js`, caches the AV Suite hub, shared AV context helper, brand assets, every AV tool route, and CueForge and PlotForge aliases, with visible cache status plus Cache AV Tools, Refresh Cache, and Clear Cache actions in the side rail and Quick Switcher.
 * Added AV Suite Quick Switcher: `/av-suite.html` now opens a keyboard driven command palette for review items, current phase tools, phases, views, copy actions, scans, exports, and tool launch, with recent commands saved in the suite JSON payload.
 * Added AV Suite phase handoff copy: `/av-suite.html` now copies a practical show handoff with the current phase, readiness counts, working and issue tools, signal network and control notes, client and crew notes, risks, summary table, decision matrix, numbered prioritized actions, and phase recommendation links.

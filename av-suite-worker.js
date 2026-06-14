@@ -1,6 +1,6 @@
 'use strict';
 
-var CACHE_NAME='sbd-av-suite-v20260614-offline';
+var CACHE_NAME='sbd-av-suite-v20260614-contextnav';
 var CACHE_PREFIX='sbd-av-suite-';
 var OFFLINE_ASSETS=[
   './av-suite.html',

@@ -103,8 +103,9 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
 - `js/av-suite-context.js` is the shared AV tool context helper. It reads
   `sbdShow`, `sbdVenue`, `sbdDate`, and `sbdOperator` URL parameters and
   fills matching show metadata fields on AV tool pages that include it. When
-  context is present it also adds a compact AV Suite return link carrying the
-  same show profile values.
+  context is present it also adds a compact AV Suite context dock carrying the
+  same show profile values, with previous and next links for the current
+  phase's recommended tools.
 - `cue-sheet.html` is rolled into the AV suite as CueForge, with
   `cueforge.html` as a route alias.
 - `stage-plot.html` is rolled into the AV suite as PlotForge, with
