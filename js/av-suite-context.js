@@ -9,6 +9,7 @@
   };
   if(!context.showName && !context.venue && !context.showDate && !context.operator) return;
   var STORAGE_KEY = 'av-suite-dashboard.v1';
+  var DOCK_COMPACT_KEY = 'av-suite-dock-compact.v1';
   var DEFAULT_FAVORITES = ['teleprompter', 'show-timer', 'cueforge'];
   var READINESS_LABELS = {pending:'Pending', ready:'Ready', issue:'Issue', skipped:'Skipped'};
   var READINESS_BUTTON_LABELS = {pending:'Pending', ready:'Ready', issue:'Issue', skipped:'Skip'};
@@ -264,6 +265,17 @@
     return true;
   }
 
+  function readDockCompact(){
+    if(!storageAvailable()) return false;
+    return localStorage.getItem(DOCK_COMPACT_KEY) === 'true';
+  }
+
+  function saveDockCompact(value){
+    if(!storageAvailable()) return false;
+    localStorage.setItem(DOCK_COMPACT_KEY, value ? 'true' : 'false');
+    return true;
+  }
+
   function toolReadiness(id){
     var value = String(readSuiteState().readiness[id] || 'pending');
     return READINESS_VALUES.indexOf(value) >= 0 ? value : 'pending';
@@ -356,6 +368,7 @@
     var value = toolReadiness(id);
     var note = toolNote(id);
     var status = dock.querySelector('[data-sbd-suite-status]');
+    var compactSummary = dock.querySelector('[data-sbd-suite-compact-summary]');
     var message = dock.querySelector('[data-sbd-suite-message]');
     var noteStatus = dock.querySelector('[data-sbd-suite-note-status]');
     var noteButton = dock.querySelector('[data-sbd-suite-note-button]');
@@ -367,6 +380,12 @@
     if(status){
       status.textContent = toolNameFromId(id) + ' ' + READINESS_LABELS[value];
       status.setAttribute('data-status', value);
+    }
+    if(compactSummary){
+      compactSummary.textContent = toolNameFromId(id) + ' ' + READINESS_LABELS[value] + (note ? ' · Note' : '');
+      compactSummary.title = note ? note : toolNameFromId(id) + ' ' + READINESS_LABELS[value];
+      compactSummary.setAttribute('data-status', value);
+      compactSummary.setAttribute('data-has-note', String(Boolean(note)));
     }
     if(noteStatus){
       noteStatus.textContent = shortNote(note);
@@ -384,6 +403,26 @@
       message.textContent = saved === false ? 'Storage blocked' : (messageText || (saved ? 'Saved' : ''));
       if(saved) setTimeout(function(){message.textContent = '';}, 1500);
     }
+  }
+
+  function setDockCompact(dock, compact, skipSave){
+    var button = dock.querySelector('[data-sbd-suite-compact-toggle]');
+    var isCompact = Boolean(compact);
+    dock.setAttribute('data-sbd-suite-compact', String(isCompact));
+    if(isCompact) setNoteEditorOpen(dock, false, false);
+    if(button){
+      button.textContent = isCompact ? 'Expand' : 'Compact';
+      button.setAttribute('aria-pressed', String(isCompact));
+      button.setAttribute('aria-expanded', String(!isCompact));
+      button.setAttribute('aria-label', isCompact ? 'Expand AV Suite dock' : 'Compact AV Suite dock');
+      button.title = isCompact ? 'Expand AV Suite dock' : 'Compact AV Suite dock';
+    }
+    if(!skipSave) saveDockCompact(isCompact);
+    updateReadinessControls(dock, null);
+  }
+
+  function toggleDockCompact(dock){
+    setDockCompact(dock, dock.getAttribute('data-sbd-suite-compact') !== 'true', false);
   }
 
   function addReadinessControls(dock){
@@ -520,6 +559,12 @@
       '.sbd-suite-phase{color:#aab8ca;font-family:"SFMono-Regular","Cascadia Code","Liberation Mono",Menlo,monospace;text-transform:uppercase;letter-spacing:.06em;font-size:10px}',
       '.sbd-suite-step{max-width:180px;overflow:hidden;text-overflow:ellipsis}',
       '.sbd-suite-dock[data-sbd-suite-note-open="true"]{flex-wrap:wrap}',
+      '.sbd-suite-compact-toggle{min-height:34px}',
+      '.sbd-suite-compact-summary{display:none;align-items:center;min-height:34px;min-width:0;max-width:230px;border:1px solid rgba(73,97,120,.78);border-radius:8px;padding:8px 10px;color:#aab8ca;background:rgba(12,18,28,.8);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font:700 10px "SFMono-Regular","Cascadia Code","Liberation Mono",Menlo,monospace;text-transform:uppercase;letter-spacing:.06em}',
+      '.sbd-suite-compact-summary[data-status="ready"]{color:#baf7d0;background:rgba(31,110,72,.3)}',
+      '.sbd-suite-compact-summary[data-status="issue"]{color:#ffd2da;background:rgba(133,46,66,.32)}',
+      '.sbd-suite-compact-summary[data-status="skipped"]{color:#d8d3c4;background:rgba(98,86,58,.38)}',
+      '.sbd-suite-compact-summary[data-has-note="true"]{border-color:rgba(114,244,233,.56)}',
       '.sbd-suite-readiness{display:inline-flex;align-items:center;gap:4px;border-left:1px solid rgba(73,97,120,.65);padding-left:6px}',
       '.sbd-suite-status,.sbd-suite-message{display:inline-flex;align-items:center;min-height:28px;border-radius:999px;padding:5px 8px;color:#aab8ca;background:rgba(12,18,28,.8);white-space:nowrap;font-family:"SFMono-Regular","Cascadia Code","Liberation Mono",Menlo,monospace;font-size:10px;text-transform:uppercase;letter-spacing:.06em}',
       '.sbd-suite-status[data-status="ready"]{color:#baf7d0;background:rgba(31,110,72,.3)}',
@@ -541,6 +586,11 @@
       '.sbd-suite-button[data-sbd-suite-readiness="skipped"][aria-pressed="true"]{border-color:#d8c78a;color:#fff9df;background:rgba(98,86,58,.78)}',
       '@media (max-width:900px){.sbd-suite-dock{display:grid;grid-template-columns:auto auto 1fr;align-items:stretch}.sbd-suite-readiness{grid-column:1/-1;border-left:0;border-top:1px solid rgba(73,97,120,.65);padding-left:0;padding-top:6px;flex-wrap:wrap}.sbd-suite-note-editor{grid-column:1/-1;min-width:0}.sbd-suite-step{max-width:none}}',
       '@media (max-width:680px){.sbd-suite-dock{left:10px;right:10px;bottom:10px;grid-template-columns:1fr 1fr}.sbd-suite-phase{grid-column:1/-1}.sbd-suite-main{grid-column:1/-1}.sbd-suite-readiness{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr}.sbd-suite-status,.sbd-suite-note,.sbd-suite-note-editor,.sbd-suite-message{grid-column:1/-1;justify-content:center;max-width:none}.sbd-suite-note-editor{grid-template-columns:1fr auto auto auto}.sbd-suite-note-input{flex-basis:100%;width:100%}.sbd-suite-link,.sbd-suite-phase,.sbd-suite-button{min-width:0}.sbd-suite-step{max-width:none}}',
+      '.sbd-suite-dock[data-sbd-suite-compact="true"]{display:flex;align-items:center;max-width:min(470px,calc(100vw - 28px));padding:5px}',
+      '.sbd-suite-dock[data-sbd-suite-compact="true"] .sbd-suite-readiness,.sbd-suite-dock[data-sbd-suite-compact="true"] .sbd-suite-phase,.sbd-suite-dock[data-sbd-suite-compact="true"] .sbd-suite-step,.sbd-suite-dock[data-sbd-suite-compact="true"] .sbd-suite-note-editor{display:none!important}',
+      '.sbd-suite-dock[data-sbd-suite-compact="true"] .sbd-suite-compact-summary{display:inline-flex;flex:1 1 auto}',
+      '.sbd-suite-dock[data-sbd-suite-compact="true"] .sbd-suite-main,.sbd-suite-dock[data-sbd-suite-compact="true"] .sbd-suite-compact-toggle{min-height:30px;padding:7px 9px}',
+      '@media (max-width:680px){.sbd-suite-dock[data-sbd-suite-compact="true"]{left:10px;right:10px;display:grid;grid-template-columns:auto 1fr auto;max-width:none}.sbd-suite-dock[data-sbd-suite-compact="true"] .sbd-suite-main{grid-column:auto}.sbd-suite-dock[data-sbd-suite-compact="true"] .sbd-suite-compact-summary{max-width:none;justify-content:center}}',
       '@media print{.sbd-suite-dock{display:none!important}}'
     ].join('');
     dock = document.createElement('nav');
@@ -550,6 +600,18 @@
     var suiteLink = makeLink('sbd-suite-link sbd-suite-main', suiteHref(), 'AV Suite', 'Return to AV Suite with this show context');
     suiteLink.setAttribute('data-sbd-suite-return', 'true');
     dock.appendChild(suiteLink);
+    var compactSummary = document.createElement('span');
+    compactSummary.className = 'sbd-suite-compact-summary';
+    compactSummary.setAttribute('data-sbd-suite-compact-summary', 'true');
+    dock.appendChild(compactSummary);
+    var compactToggle = document.createElement('button');
+    compactToggle.type = 'button';
+    compactToggle.className = 'sbd-suite-button sbd-suite-compact-toggle';
+    compactToggle.setAttribute('data-sbd-suite-compact-toggle', 'true');
+    compactToggle.setAttribute('aria-pressed', 'false');
+    compactToggle.setAttribute('aria-expanded', 'true');
+    compactToggle.addEventListener('click', function(){toggleDockCompact(dock);});
+    dock.appendChild(compactToggle);
     addReadinessControls(dock);
     if(tools.length){
       var phase = document.createElement('span');
@@ -561,6 +623,7 @@
     }
     document.head.appendChild(style);
     document.body.appendChild(dock);
+    setDockCompact(dock, readDockCompact(), true);
   }
 
   if(document.readyState === 'loading'){
