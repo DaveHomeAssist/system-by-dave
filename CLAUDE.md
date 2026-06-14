@@ -28,6 +28,7 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
 - `power-plan.html` — AV power plan
 - `network-plan.html` — AV network plan
 - `rf-coordination.html`: AV RF coordination sheet
+- `gear-prep.html`: AV gear prep checklist
 - `signal-flow.html` — AV signal flow planner
 - `input-list.html` — AV input list and patch sheet
 - `stage-plot.html` — AV stage plot
@@ -74,13 +75,17 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
   receivers, frequencies, bands, channels, scan status, backup paths, issue
   status, conflict warnings, copyable summaries, print output, JSON import
   and export, and CSV export.
+- `gear-prep.html` tracks pull sheets, case IDs, quantities, departments,
+  locations, owners, test status, pack status, load status, issues, open
+  items, copyable summaries, print output, JSON import and export, and CSV
+  export.
 - `signal-flow.html` tracks AV sources, processors, destinations, formats,
   connectors, backups, route status, issues, copyable summaries, print output,
   JSON import and export, and CSV export.
 - AV tools now include `teleprompter.html`, `show-timer.html`,
   `cue-sheet.html`, `playback-check.html`, `record-log.html`,
   `power-plan.html`, `network-plan.html`, `rf-coordination.html`,
-  `signal-flow.html`, `input-list.html`, `stage-plot.html`,
+  `gear-prep.html`, `signal-flow.html`, `input-list.html`, `stage-plot.html`,
   `show-handoff.html`, `camera-shot-list.html`, `comms-check.html`, and
   `av-calculator.html`.
 
