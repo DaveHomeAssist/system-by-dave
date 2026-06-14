@@ -31,6 +31,7 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
 - `speaker-plan.html` — AV speaker deployment plan
 - `lighting-patch.html` — AV lighting patch sheet
 - `display-plan.html` — AV display plan
+- `projection-plan.html` — AV projection plan
 - `video-patch.html` — AV video patch sheet
 - `network-plan.html` — AV network plan
 - `rf-coordination.html`: AV RF coordination sheet
@@ -100,6 +101,10 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
   resolutions, aspect ratios, refresh rates, routes, backup paths, display
   status, backup gap warnings, copyable summaries, print output, JSON import
   and export, and CSV export.
+- `projection-plan.html` tracks screens, projection surfaces, sizes, aspect
+  ratios, projectors, lenses, throw distances, projector positions, input
+  routes, blends, backup paths, alignment status, projection gap warnings,
+  copyable summaries, print output, JSON import and export, and CSV export.
 - `video-patch.html` tracks video sources, source types, formats, connectors,
   switcher or router inputs, converters, destinations, route outputs, backup
   paths, test status, route gap warnings, copyable summaries, print output,
@@ -131,6 +136,7 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
   `power-plan.html`, `audio-patch.html`, `speaker-plan.html`,
   `lighting-patch.html`,
   `display-plan.html`,
+  `projection-plan.html`,
   `video-patch.html`,
   `network-plan.html`,
   `rf-coordination.html`,
