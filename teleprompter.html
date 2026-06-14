@@ -126,6 +126,7 @@
     font-size:14px;
   }
   body.controls-collapsed .controls-wake{display:inline-flex}
+  body.controls-collapsed:not(.reading) .controls-wake{display:none}
   .group{
     display:flex;align-items:center;gap:6px;
     padding:5px 8px;
@@ -598,6 +599,25 @@
     padding:12px 16px;border-bottom:1px solid var(--line);color:var(--muted);
   }
   .editor-head strong{color:var(--text)}
+  .editor-head .editor-controls-btn{
+    flex:0 0 auto;
+    min-width:128px;
+    border-color:#426489;
+    background:rgba(91,176,255,.1);
+    color:#dceeff;
+    font-weight:700;
+    white-space:nowrap;
+  }
+  .editor-head .editor-controls-btn::before{
+    content:"▤";
+    margin-right:6px;
+    font-size:13px;
+  }
+  .editor-head .editor-controls-btn[aria-pressed="true"]{
+    background:rgba(91,176,255,.18);
+    border-color:var(--accent-strong);
+    color:#cfe7ff;
+  }
   .script-meta{
     color:#d4deec;
     font-size:12px;
@@ -925,6 +945,9 @@
       flex-wrap:nowrap;
     }
     .group .label{display:none}
+    .editor-head{gap:6px;padding:10px}
+    .editor-head #saveHint{display:none}
+    .editor-head .editor-controls-btn{min-width:76px}
     .controls-toggle-inline{min-width:76px}
     .swatches{flex-wrap:nowrap}
     input.saved-filter{width:104px}
@@ -1010,6 +1033,11 @@
       min-width:40px;
       padding:9px 10px;
       font-size:12px;
+    }
+    .editor-head .editor-controls-btn{
+      min-width:68px;
+      padding:8px 10px;
+      font-size:13px;
     }
     input.saved-filter{width:96px}
     select.saved-select{max-width:132px}
@@ -1409,6 +1437,7 @@
         <span class="storage-status" id="storageStatus" hidden>Auto save off. Use Save or Load.</span>
         <span class="script-meta" id="scriptMeta">0 words · 00:00 run</span>
         <span class="spacer" style="flex:1"></span>
+        <button id="editorControlsToggleBtn" class="editor-controls-btn" type="button" aria-controls="toolbar" aria-expanded="true" aria-pressed="false" aria-label="Hide controls and maximize script" title="Hide controls and maximize script (H)">Hide controls</button>
         <button id="doneBtn" class="primary" type="button">Done — start reading</button>
       </div>
       <textarea id="script" spellcheck="true" autocomplete="off"
@@ -1488,6 +1517,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   var toolbar = $('toolbar');
   var controlsToggleBtn = $('controlsToggleBtn');
   var controlsInlineToggleBtn = $('controlsInlineToggleBtn');
+  var editorControlsToggleBtn = $('editorControlsToggleBtn');
   var controlsWakeBtn = $('controlsWakeBtn');
   var reader   = $('reader');
   var inner    = $('readerInner');
@@ -2407,6 +2437,13 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
       controlsInlineToggleBtn.setAttribute('aria-label', fullLabel);
       controlsInlineToggleBtn.setAttribute('title', fullLabel + ' (H)');
     }
+    if(editorControlsToggleBtn){
+      editorControlsToggleBtn.textContent = label;
+      editorControlsToggleBtn.setAttribute('aria-expanded', String(!collapsed));
+      editorControlsToggleBtn.setAttribute('aria-pressed', String(collapsed));
+      editorControlsToggleBtn.setAttribute('aria-label', fullLabel);
+      editorControlsToggleBtn.setAttribute('title', fullLabel + ' (H)');
+    }
     if(controlsWakeBtn){
       controlsWakeBtn.textContent = collapsed ? controlsToggleLabel(true) : 'Show controls';
       controlsWakeBtn.hidden = !collapsed;
@@ -2429,7 +2466,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
 
   function toggleControls(sourceButton){
     setControlsCollapsed(!preferences.controlsCollapsed, false);
-    signalSuccess(sourceButton || controlsToggleBtn || controlsInlineToggleBtn);
+    signalSuccess(sourceButton || controlsToggleBtn || controlsInlineToggleBtn || editorControlsToggleBtn);
   }
 
   function titleFromScript(){
@@ -4908,6 +4945,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   installPressFeedback();
   controlsToggleBtn.addEventListener('click', function(){ toggleControls(controlsToggleBtn); });
   controlsInlineToggleBtn.addEventListener('click', function(){ toggleControls(controlsInlineToggleBtn); });
+  editorControlsToggleBtn.addEventListener('click', function(){ toggleControls(editorControlsToggleBtn); });
   controlsWakeBtn.addEventListener('click', function(){ toggleControls(controlsWakeBtn); });
   remoteBtn.addEventListener('click', openRemoteWindow);
   wireRemoteButton('remoteCueBtn', 'cue');
