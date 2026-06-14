@@ -22,7 +22,7 @@ Read `CLAUDE.md` first for project orientation. This file is the rulebook.
   `lighting-patch`,
   `display-plan`, `projection-plan`, `video-patch`,
   `network-plan`, `cable-plan`, `rf-coordination`, `site-survey`, `gear-prep`, `truck-pack`, `load-in-plan`, `strike-plan`,
-  `show-advance`, `crew-call`, `crew-time-log`, `signal-flow`, `stage-plot`, `plotforge`, `show-handoff`, `show-report`, `change-order`, `client-signoff`,
+  `show-advance`, `crew-call`, `crew-time-log`, `signal-flow`, `stage-plot`, `plotforge`, `show-handoff`, `show-report`, `show-task-board`, `change-order`, `client-signoff`,
   `camera-shot-list`, `comms-check`, `av-calculator`, `resume`,
   `wedding-ops`, `privacy-policy`, `404`, `500`) must have:
   - A full `<head>` with `<title>`, `<meta name="description">`, canonical

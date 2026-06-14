@@ -53,6 +53,7 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
 - `plotforge.html` — PlotForge route alias
 - `show-handoff.html` — AV show handoff builder
 - `show-report.html`: AV show report
+- `show-task-board.html`: AV show task board
 - `change-order.html`: AV change order log
 - `client-signoff.html`: AV client sign off tracker
 - `camera-shot-list.html` — AV camera shot list
@@ -158,6 +159,9 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
 - `show-report.html` tracks timeline entries, issues, client requests,
   decisions, crew notes, follow ups, severity, status, report gaps, copyable
   summaries, print output, JSON import and export, and CSV export.
+- `show-task-board.html` tracks show day tasks, areas, owners, priorities,
+  due times, sources, blockers, status, task gap warnings, copyable
+  summaries, print output, JSON import and export, and CSV export.
 - `change-order.html` tracks client change requests, areas, requesters,
   scope impact, cost, approval status, owners, due times, issue status,
   copyable summaries, print output, JSON import and export, and CSV export.
@@ -199,7 +203,7 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
   `rf-coordination.html`,
   `site-survey.html`, `gear-prep.html`, `truck-pack.html`, `load-in-plan.html`, `strike-plan.html`, `show-advance.html`, `crew-call.html`, `crew-time-log.html`,
   `signal-flow.html`,
-  `input-list.html`, `stage-plot.html`, `plotforge.html`, `show-handoff.html`, `show-report.html`, `change-order.html`, `client-signoff.html`,
+  `input-list.html`, `stage-plot.html`, `plotforge.html`, `show-handoff.html`, `show-report.html`, `show-task-board.html`, `change-order.html`, `client-signoff.html`,
   `camera-shot-list.html`, `comms-check.html`, and `av-calculator.html`.
 
 ## Conventions
