@@ -269,6 +269,14 @@
     return READINESS_VALUES.indexOf(value) >= 0 ? value : 'pending';
   }
 
+  function cleanNote(value){
+    return clean(value, 240);
+  }
+
+  function toolNote(id){
+    return cleanNote(readSuiteState().toolNotes[id] || '');
+  }
+
   function setToolReadiness(value){
     var id = currentToolId();
     var state;
@@ -281,11 +289,43 @@
     return saveSuiteState(state);
   }
 
-  function updateReadinessControls(dock, saved){
+  function setToolNote(value){
+    var id = currentToolId();
+    var state;
+    var note;
+    if(!id) return false;
+    state = readSuiteState();
+    applyContextToSuiteState(state);
+    state.toolNotes = cleanObject(state.toolNotes);
+    note = cleanNote(value);
+    if(note) state.toolNotes[id] = note;
+    else delete state.toolNotes[id];
+    return saveSuiteState(state);
+  }
+
+  function shortNote(note){
+    if(!note) return 'No note';
+    return note.length > 54 ? note.slice(0, 51) + '...' : note;
+  }
+
+  function editToolNote(dock){
+    var id = currentToolId();
+    var current = toolNote(id);
+    var value;
+    if(!id || !window.prompt) return;
+    value = window.prompt('Readiness note for ' + toolNameFromId(id) + '. Leave blank to clear.', current);
+    if(value === null) return;
+    updateReadinessControls(dock, setToolNote(value), cleanNote(value) ? 'Note saved' : 'Note cleared');
+  }
+
+  function updateReadinessControls(dock, saved, messageText){
     var id = currentToolId();
     var value = toolReadiness(id);
+    var note = toolNote(id);
     var status = dock.querySelector('[data-sbd-suite-status]');
     var message = dock.querySelector('[data-sbd-suite-message]');
+    var noteStatus = dock.querySelector('[data-sbd-suite-note-status]');
+    var noteButton = dock.querySelector('[data-sbd-suite-note-button]');
     dock.querySelectorAll('[data-sbd-suite-readiness]').forEach(function(button){
       var active = button.getAttribute('data-sbd-suite-readiness') === value;
       button.setAttribute('aria-pressed', String(active));
@@ -294,8 +334,17 @@
       status.textContent = toolNameFromId(id) + ' ' + READINESS_LABELS[value];
       status.setAttribute('data-status', value);
     }
+    if(noteStatus){
+      noteStatus.textContent = shortNote(note);
+      noteStatus.title = note || 'No readiness note';
+      noteStatus.setAttribute('data-has-note', String(Boolean(note)));
+    }
+    if(noteButton){
+      noteButton.setAttribute('aria-pressed', String(Boolean(note)));
+      noteButton.title = note ? 'Edit readiness note: ' + note : 'Add readiness note';
+    }
     if(message){
-      message.textContent = saved === false ? 'Storage blocked' : (saved ? 'Saved' : '');
+      message.textContent = saved === false ? 'Storage blocked' : (messageText || (saved ? 'Saved' : ''));
       if(saved) setTimeout(function(){message.textContent = '';}, 1500);
     }
   }
@@ -304,6 +353,8 @@
     var id = currentToolId();
     var group;
     var status;
+    var noteButton;
+    var noteStatus;
     var message;
     if(!id) return;
     group = document.createElement('div');
@@ -325,6 +376,18 @@
       });
       group.appendChild(button);
     });
+    noteButton = document.createElement('button');
+    noteButton.type = 'button';
+    noteButton.className = 'sbd-suite-button sbd-suite-note-button';
+    noteButton.textContent = 'Note';
+    noteButton.setAttribute('data-sbd-suite-note-button', 'true');
+    noteButton.setAttribute('aria-pressed', 'false');
+    noteButton.addEventListener('click', function(){editToolNote(dock);});
+    group.appendChild(noteButton);
+    noteStatus = document.createElement('span');
+    noteStatus.className = 'sbd-suite-note';
+    noteStatus.setAttribute('data-sbd-suite-note-status', 'true');
+    group.appendChild(noteStatus);
     message = document.createElement('span');
     message.className = 'sbd-suite-message';
     message.setAttribute('data-sbd-suite-message', 'true');
@@ -377,6 +440,8 @@
       '.sbd-suite-status[data-status="ready"]{color:#baf7d0;background:rgba(31,110,72,.3)}',
       '.sbd-suite-status[data-status="issue"]{color:#ffd2da;background:rgba(133,46,66,.32)}',
       '.sbd-suite-status[data-status="skipped"]{color:#d8d3c4;background:rgba(98,86,58,.38)}',
+      '.sbd-suite-note{display:inline-flex;align-items:center;min-height:28px;max-width:190px;border-radius:999px;padding:5px 8px;color:#aab8ca;background:rgba(12,18,28,.8);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font:700 10px "SFMono-Regular","Cascadia Code","Liberation Mono",Menlo,monospace;text-transform:uppercase;letter-spacing:.06em}',
+      '.sbd-suite-note[data-has-note="true"]{color:#dffffc;background:rgba(37,92,94,.38)}',
       '.sbd-suite-button{appearance:none;display:inline-flex;align-items:center;justify-content:center;min-height:28px;border:1px solid rgba(73,97,120,.78);border-radius:7px;padding:5px 8px;color:#f4f8ff;background:rgba(22,34,49,.88);font:700 11px -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;cursor:pointer;transition:transform 140ms ease,background 140ms ease,border-color 140ms ease,color 140ms ease}',
       '.sbd-suite-button:hover{border-color:#72f4e9;background:rgba(27,43,60,.98)}',
       '.sbd-suite-button:active{transform:scale(.96)}',
@@ -386,7 +451,7 @@
       '.sbd-suite-button[data-sbd-suite-readiness="issue"][aria-pressed="true"]{border-color:#ff8fa6;color:#fff4f6;background:rgba(133,46,66,.78)}',
       '.sbd-suite-button[data-sbd-suite-readiness="skipped"][aria-pressed="true"]{border-color:#d8c78a;color:#fff9df;background:rgba(98,86,58,.78)}',
       '@media (max-width:900px){.sbd-suite-dock{display:grid;grid-template-columns:auto auto 1fr;align-items:stretch}.sbd-suite-readiness{grid-column:1/-1;border-left:0;border-top:1px solid rgba(73,97,120,.65);padding-left:0;padding-top:6px;flex-wrap:wrap}.sbd-suite-step{max-width:none}}',
-      '@media (max-width:680px){.sbd-suite-dock{left:10px;right:10px;bottom:10px;grid-template-columns:1fr 1fr}.sbd-suite-phase{grid-column:1/-1}.sbd-suite-main{grid-column:1/-1}.sbd-suite-readiness{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr}.sbd-suite-status,.sbd-suite-message{grid-column:1/-1;justify-content:center}.sbd-suite-link,.sbd-suite-phase,.sbd-suite-button{min-width:0}.sbd-suite-step{max-width:none}}',
+      '@media (max-width:680px){.sbd-suite-dock{left:10px;right:10px;bottom:10px;grid-template-columns:1fr 1fr}.sbd-suite-phase{grid-column:1/-1}.sbd-suite-main{grid-column:1/-1}.sbd-suite-readiness{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr}.sbd-suite-status,.sbd-suite-note,.sbd-suite-message{grid-column:1/-1;justify-content:center;max-width:none}.sbd-suite-link,.sbd-suite-phase,.sbd-suite-button{min-width:0}.sbd-suite-step{max-width:none}}',
       '@media print{.sbd-suite-dock{display:none!important}}'
     ].join('');
     dock = document.createElement('nav');
