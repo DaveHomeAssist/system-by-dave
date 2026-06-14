@@ -39,6 +39,8 @@
     --reader-color:#fff;
     --reader-bg:#07090d;
     --reader-weight:600;
+    --reader-style:normal;
+    --reader-transform:none;
     --radius:12px;
     --dur-fast:120ms;
     --dur-med:180ms;
@@ -218,6 +220,20 @@
   select:hover{background:#232c3b;border-color:#465467}
   select.saved-select{max-width:190px}
   select.marker-select{max-width:190px}
+  input.saved-filter{
+    width:126px;
+    min-height:32px;
+    font:inherit;
+    color:var(--text);
+    background:var(--surface-2);
+    border:1px solid var(--line);
+    border-radius:9px;
+    padding:6px 9px;
+    line-height:1.1;
+    transition:background var(--dur-fast) var(--ease-out),border-color var(--dur-fast) var(--ease-out),box-shadow var(--dur-fast) var(--ease-out);
+  }
+  input.saved-filter:hover,input.saved-filter:focus{background:#232c3b;border-color:#465467}
+  input.saved-filter::placeholder{color:#768294}
   input.time-input{
     width:76px;
     min-height:32px;
@@ -311,7 +327,9 @@
     font-size:var(--reader-fs);
     line-height:var(--reader-lh);
     font-weight:var(--reader-weight);
+    font-style:var(--reader-style);
     color:var(--reader-color);
+    text-transform:var(--reader-transform);
     white-space:pre-wrap;
     word-break:break-word;
     text-wrap:pretty;
@@ -438,6 +456,8 @@
     font-size:var(--reader-fs);
     line-height:var(--reader-lh);
     font-weight:var(--reader-weight);
+    font-style:var(--reader-style);
+    text-transform:var(--reader-transform);
     white-space:pre-wrap;
     word-break:break-word;
     text-wrap:pretty;
@@ -484,6 +504,7 @@
     background:var(--bg);color:var(--text);
     font-family:var(--read-sans);
     font-weight:var(--reader-weight);
+    font-style:var(--reader-style);
     font-size:20px;line-height:1.6;
     padding:20px clamp(16px,6vw,80px);
   }
@@ -768,6 +789,7 @@
     }
     .group .label{display:none}
     .swatches{flex-wrap:nowrap}
+    input.saved-filter{width:104px}
     select.saved-select{max-width:142px}
     select.marker-select{max-width:142px}
     header.bar .brand small{display:none}
@@ -813,6 +835,7 @@
     #remoteBtn::before{content:"⇄"}
     #editBtn::before{content:"✎"}
     #helpBtn::before{content:"⌨"}
+    input.saved-filter{width:96px}
     select.saved-select{max-width:132px}
   }
 
@@ -906,6 +929,15 @@
 
     <div class="group" aria-label="Reader style">
       <span class="label">Style</span>
+      <select id="formatPresetSelect" title="Formatting preset" aria-label="Formatting preset">
+        <option value="custom">Custom</option>
+        <option value="default">Default read</option>
+        <option value="highContrast">High contrast</option>
+        <option value="warmStudio">Warm studio</option>
+        <option value="confidence">Confidence monitor</option>
+        <option value="techMono">Tech mono</option>
+        <option value="compactRun">Compact run</option>
+      </select>
       <select id="fontFaceSelect" title="Reader font" aria-label="Reader font">
         <option value="system">System</option>
         <option value="display">Display</option>
@@ -922,14 +954,23 @@
         <option value="700">Bold</option>
         <option value="800">Heavy</option>
       </select>
+      <select id="caseSelect" title="Reader text case" aria-label="Reader text case">
+        <option value="none">Case</option>
+        <option value="uppercase">UPPER</option>
+      </select>
+      <button id="italicBtn" class="toggle icon" type="button" aria-pressed="false" title="Italic reader text (I)" aria-label="Toggle italic reader text">I</button>
       <div class="swatches" aria-label="Text color">
         <button class="swatch" type="button" data-text-color="white" style="--swatch:#ffffff" title="White text" aria-label="White text" aria-pressed="true"></button>
+        <button class="swatch" type="button" data-text-color="black" style="--swatch:#111111" title="Black text" aria-label="Black text" aria-pressed="false"></button>
+        <button class="swatch" type="button" data-text-color="paper" style="--swatch:#fff8ee" title="Paper text" aria-label="Paper text" aria-pressed="false"></button>
         <button class="swatch" type="button" data-text-color="warm" style="--swatch:#ffe7bf" title="Warm text" aria-label="Warm text" aria-pressed="false"></button>
         <button class="swatch" type="button" data-text-color="cyan" style="--swatch:#bde9ff" title="Cyan text" aria-label="Cyan text" aria-pressed="false"></button>
         <button class="swatch" type="button" data-text-color="green" style="--swatch:#c8f7d2" title="Green text" aria-label="Green text" aria-pressed="false"></button>
         <button class="swatch" type="button" data-text-color="amber" style="--swatch:#ffd48a" title="Amber text" aria-label="Amber text" aria-pressed="false"></button>
         <button class="swatch" type="button" data-text-color="rose" style="--swatch:#ffd1dc" title="Rose text" aria-label="Rose text" aria-pressed="false"></button>
         <button class="swatch" type="button" data-text-color="violet" style="--swatch:#d8ccff" title="Violet text" aria-label="Violet text" aria-pressed="false"></button>
+        <button class="swatch" type="button" data-text-color="red" style="--swatch:#ffb3a7" title="Red text" aria-label="Red text" aria-pressed="false"></button>
+        <button class="swatch" type="button" data-text-color="blue" style="--swatch:#a8d8ff" title="Blue text" aria-label="Blue text" aria-pressed="false"></button>
       </div>
       <label title="Custom text color">
         <span class="visually-hidden">Custom text color</span>
@@ -945,6 +986,8 @@
         <button class="swatch" type="button" data-bg-color="charcoal" style="--swatch:#11161f" title="Charcoal reader background" aria-label="Charcoal reader background" aria-pressed="false"></button>
         <button class="swatch" type="button" data-bg-color="warm" style="--swatch:#16110b" title="Warm reader background" aria-label="Warm reader background" aria-pressed="false"></button>
         <button class="swatch" type="button" data-bg-color="greenroom" style="--swatch:#07140e" title="Greenroom reader background" aria-label="Greenroom reader background" aria-pressed="false"></button>
+        <button class="swatch" type="button" data-bg-color="paper" style="--swatch:#fff8ee" title="Paper reader background" aria-label="Paper reader background" aria-pressed="false"></button>
+        <button class="swatch" type="button" data-bg-color="blueprint" style="--swatch:#061a2a" title="Blueprint reader background" aria-label="Blueprint reader background" aria-pressed="false"></button>
       </div>
       <label title="Custom reader background">
         <span class="visually-hidden">Custom reader background</span>
@@ -960,10 +1003,13 @@
 
     <div class="group" aria-label="Saved scripts">
       <span class="label">Saved</span>
+      <input id="savedScriptFilter" class="saved-filter" type="search" autocomplete="off" placeholder="Search" title="Filter saved scripts" aria-label="Filter saved scripts">
       <select id="savedScriptSelect" class="saved-select" title="Saved scripts in this browser" aria-label="Saved scripts"></select>
       <button id="saveLocalBtn" type="button" title="Save this script in this browser">Save</button>
       <button id="saveAsLocalBtn" type="button" title="Save this as a new saved script">Save as</button>
       <button id="loadLocalBtn" type="button" title="Load the selected saved script">Load</button>
+      <button id="renameLocalBtn" type="button" title="Rename the selected saved script">Rename</button>
+      <button id="duplicateLocalBtn" type="button" title="Duplicate the selected saved script">Duplicate</button>
       <button id="deleteLocalBtn" class="icon" type="button" title="Delete the selected saved script" aria-label="Delete saved script">×</button>
     </div>
 
@@ -1092,6 +1138,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
       <kbd>↓</kbd><span class="desc">Decrease scroll speed</span>
       <kbd>+</kbd><span class="desc">Increase font size</span>
       <kbd>−</kbd><span class="desc">Decrease font size</span>
+      <kbd>I</kbd><span class="desc">Toggle italic reader text</span>
       <kbd>M</kbd><span class="desc">Toggle mirror mode</span>
       <kbd>F</kbd><span class="desc">Toggle fullscreen</span>
       <kbd>C</kbd><span class="desc">Cue then play</span>
@@ -1144,14 +1191,20 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   var startNowBtn = $('startNowBtn');
   var saveHint = $('saveHint');
   var storageStatus = $('storageStatus');
+  var formatPresetSelect = $('formatPresetSelect');
   var fontFaceSelect = $('fontFaceSelect');
   var fontWeightSelect = $('fontWeightSelect');
+  var caseSelect = $('caseSelect');
+  var italicBtn = $('italicBtn');
   var textColorInput = $('textColorInput');
   var readerBgInput = $('readerBgInput');
+  var savedScriptFilter = $('savedScriptFilter');
   var savedScriptSelect = $('savedScriptSelect');
   var saveLocalBtn = $('saveLocalBtn');
   var saveAsLocalBtn = $('saveAsLocalBtn');
   var loadLocalBtn = $('loadLocalBtn');
+  var renameLocalBtn = $('renameLocalBtn');
+  var duplicateLocalBtn = $('duplicateLocalBtn');
   var deleteLocalBtn = $('deleteLocalBtn');
   var cueBtn = $('cueBtn');
   var cueOverlay = $('cueOverlay');
@@ -1203,22 +1256,103 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   };
   var TEXT_COLORS = {
     white:'#ffffff',
+    black:'#111111',
+    paper:'#fff8ee',
     warm:'#ffe7bf',
     cyan:'#bde9ff',
     green:'#c8f7d2',
     amber:'#ffd48a',
     rose:'#ffd1dc',
-    violet:'#d8ccff'
+    violet:'#d8ccff',
+    red:'#ffb3a7',
+    blue:'#a8d8ff'
   };
   var READER_BACKGROUNDS = {
     black:'#07090d',
     navy:'#07111f',
     charcoal:'#11161f',
     warm:'#16110b',
-    greenroom:'#07140e'
+    greenroom:'#07140e',
+    paper:'#fff8ee',
+    blueprint:'#061a2a'
   };
+  var TEXT_TRANSFORMS = {
+    none:true,
+    uppercase:true
+  };
+  var FORMAT_PRESETS = {
+    default:{
+      font:48,
+      lh:1.5,
+      width:42,
+      fontFace:'system',
+      fontWeight:600,
+      fontStyle:'normal',
+      textTransform:'none',
+      textColor:'white',
+      readerBg:'black'
+    },
+    highContrast:{
+      font:56,
+      lh:1.45,
+      width:44,
+      fontFace:'large',
+      fontWeight:700,
+      fontStyle:'normal',
+      textTransform:'none',
+      textColor:'white',
+      readerBg:'black'
+    },
+    warmStudio:{
+      font:52,
+      lh:1.55,
+      width:46,
+      fontFace:'serif',
+      fontWeight:600,
+      fontStyle:'normal',
+      textTransform:'none',
+      textColor:'warm',
+      readerBg:'warm'
+    },
+    confidence:{
+      font:60,
+      lh:1.42,
+      width:50,
+      fontFace:'large',
+      fontWeight:800,
+      fontStyle:'normal',
+      textTransform:'uppercase',
+      textColor:'black',
+      readerBg:'paper'
+    },
+    techMono:{
+      font:44,
+      lh:1.55,
+      width:52,
+      fontFace:'mono',
+      fontWeight:600,
+      fontStyle:'normal',
+      textTransform:'none',
+      textColor:'cyan',
+      readerBg:'blueprint'
+    },
+    compactRun:{
+      font:40,
+      lh:1.35,
+      width:58,
+      fontFace:'compact',
+      fontWeight:600,
+      fontStyle:'normal',
+      textTransform:'none',
+      textColor:'paper',
+      readerBg:'charcoal'
+    }
+  };
+  var FORMAT_PRESET = 'default';
   var FONT_FACE = 'system';
   var FONT_WEIGHT = 600;
+  var FONT_STYLE = 'normal';
+  var TEXT_TRANSFORM = 'none';
   var TEXT_COLOR = 'white';
   var READER_BG = 'black';
   var showStartMinutes = null;
@@ -1276,9 +1410,12 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     }
     if(!available){
       if(savedScriptSelect) savedScriptSelect.disabled = true;
+      if(savedScriptFilter) savedScriptFilter.disabled = true;
       if(saveLocalBtn) saveLocalBtn.disabled = true;
       if(saveAsLocalBtn) saveAsLocalBtn.disabled = true;
       if(loadLocalBtn) loadLocalBtn.disabled = true;
+      if(renameLocalBtn) renameLocalBtn.disabled = true;
+      if(duplicateLocalBtn) duplicateLocalBtn.disabled = true;
       if(deleteLocalBtn) deleteLocalBtn.disabled = true;
     }
   }
@@ -1318,6 +1455,37 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   function sanitizeFontWeight(value){
     var weight = Math.round(Number(value) || 600);
     return Object.prototype.hasOwnProperty.call(FONT_WEIGHTS, weight) ? weight : 600;
+  }
+
+  function sanitizeFontStyle(value){
+    return value === 'italic' ? 'italic' : 'normal';
+  }
+
+  function sanitizeTextTransform(value){
+    return Object.prototype.hasOwnProperty.call(TEXT_TRANSFORMS, value) ? value : 'none';
+  }
+
+  function sanitizeFormatPreset(value){
+    if(value === 'custom') return 'custom';
+    return Object.prototype.hasOwnProperty.call(FORMAT_PRESETS, value) ? value : 'default';
+  }
+
+  function markCustomFormat(){
+    FORMAT_PRESET = 'custom';
+  }
+
+  function currentVisualFormatMatchesPreset(presetKey){
+    var preset = FORMAT_PRESETS[presetKey];
+    if(!preset) return false;
+    return FONT.val === preset.font &&
+      LH.val === preset.lh &&
+      WIDTH.val === preset.width &&
+      FONT_FACE === preset.fontFace &&
+      FONT_WEIGHT === preset.fontWeight &&
+      FONT_STYLE === preset.fontStyle &&
+      TEXT_TRANSFORM === preset.textTransform &&
+      TEXT_COLOR === preset.textColor &&
+      READER_BG === preset.readerBg;
   }
 
   function normalizeHexColor(value){
@@ -1372,10 +1540,16 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
       if(typeof s.showStartMinutes==='number') showStartMinutes = sanitizeShowStart(s.showStartMinutes);
       if(typeof s.mirror==='boolean') mirror = s.mirror;
       if(typeof s.centerline==='boolean') centerline = s.centerline;
+      if(typeof s.formatPreset==='string') FORMAT_PRESET = sanitizeFormatPreset(s.formatPreset);
       if(typeof s.fontFace==='string') FONT_FACE = sanitizeFontFace(s.fontFace);
       if(typeof s.fontWeight==='number' || typeof s.fontWeight==='string') FONT_WEIGHT = sanitizeFontWeight(s.fontWeight);
+      if(typeof s.fontStyle==='string') FONT_STYLE = sanitizeFontStyle(s.fontStyle);
+      if(typeof s.textTransform==='string') TEXT_TRANSFORM = sanitizeTextTransform(s.textTransform);
       if(typeof s.textColor==='string') TEXT_COLOR = sanitizeTextColor(s.textColor);
       if(typeof s.readerBg==='string') READER_BG = sanitizeReaderBg(s.readerBg);
+      if(typeof s.formatPreset !== 'string' && !currentVisualFormatMatchesPreset('default')){
+        FORMAT_PRESET = 'custom';
+      }
     }catch(e){/* ignore corrupt storage */}
   }
   function saveSettings(){
@@ -1383,8 +1557,9 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
       speed:SPEED.val, font:FONT.val, lh:LH.val, width:WIDTH.val,
       targetRuntime:TARGET_RUNTIME.val,
       showStartMinutes:showStartMinutes,
-      mirror:mirror, centerline:centerline, fontFace:FONT_FACE,
-      fontWeight:FONT_WEIGHT, textColor:TEXT_COLOR, readerBg:READER_BG
+      mirror:mirror, centerline:centerline, formatPreset:FORMAT_PRESET,
+      fontFace:FONT_FACE, fontWeight:FONT_WEIGHT, fontStyle:FONT_STYLE,
+      textTransform:TEXT_TRANSFORM, textColor:TEXT_COLOR, readerBg:READER_BG
     }));
     if(!saved) updateStorageUi();
   }
@@ -1395,7 +1570,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   var SHOW_PACKAGE_SCHEMA = 'system-by-dave.teleprompter.show.v1';
   var REMOTE_SESSION_STORE = 'teleprompter.remoteSession.v1';
   var REMOTE_BUS_STORE = 'teleprompter.remoteBus.v1';
-  var MAX_SAVED_SCRIPTS = 24;
+  var MAX_SAVED_SCRIPTS = 60;
   var REMOTE_CHANNEL_PREFIX = 'teleprompter.remote.';
   var remoteSourceId = 'source-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
   var remoteSessionId = urlParams.get('session') || storage.get(REMOTE_SESSION_STORE) || ('session-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8));
@@ -1416,6 +1591,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   var predictedButton = null;
   var savedScripts = [];
   var activeSavedScriptId = '';
+  var savedScriptFilterText = '';
   var scriptStats = {
     words:0,
     lines:0
@@ -2155,8 +2331,11 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
       showStartMinutes:showStartMinutes,
       mirror:mirror,
       centerline:centerline,
+      formatPreset:FORMAT_PRESET,
       fontFace:FONT_FACE,
       fontWeight:FONT_WEIGHT,
+      fontStyle:FONT_STYLE,
+      textTransform:TEXT_TRANSFORM,
       textColor:TEXT_COLOR,
       readerBg:READER_BG
     };
@@ -2172,8 +2351,11 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     if(Object.prototype.hasOwnProperty.call(format, 'showStartMinutes')) showStartMinutes = sanitizeShowStart(format.showStartMinutes);
     if(typeof format.mirror==='boolean') mirror = format.mirror;
     if(typeof format.centerline==='boolean') centerline = format.centerline;
+    if(typeof format.formatPreset==='string') FORMAT_PRESET = sanitizeFormatPreset(format.formatPreset);
     if(typeof format.fontFace==='string') FONT_FACE = sanitizeFontFace(format.fontFace);
     if(typeof format.fontWeight==='number' || typeof format.fontWeight==='string') FONT_WEIGHT = sanitizeFontWeight(format.fontWeight);
+    if(typeof format.fontStyle==='string') FONT_STYLE = sanitizeFontStyle(format.fontStyle);
+    if(typeof format.textTransform==='string') TEXT_TRANSFORM = sanitizeTextTransform(format.textTransform);
     if(typeof format.textColor==='string') TEXT_COLOR = sanitizeTextColor(format.textColor);
     if(typeof format.readerBg==='string') READER_BG = sanitizeReaderBg(format.readerBg);
     saveSettings();
@@ -2223,27 +2405,41 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   function renderSavedScripts(){
     if(!savedScriptSelect) return;
     var storageAvailable = storage.isAvailable();
+    var filter = savedScriptFilterText.trim().toLowerCase();
+    var visibleScripts = savedScripts.filter(function(item){
+      if(!filter) return true;
+      return (item.title || '').toLowerCase().indexOf(filter) !== -1 ||
+        (item.text || '').toLowerCase().indexOf(filter) !== -1;
+    });
+    var activeVisible = activeSavedScriptId && visibleScripts.some(function(item){
+      return item.id === activeSavedScriptId;
+    });
     savedScriptSelect.innerHTML = '';
     var empty = document.createElement('option');
     empty.value = '';
-    empty.textContent = storageAvailable ? 'New saved script' : 'Saved scripts unavailable';
+    empty.textContent = storageAvailable
+      ? (filter && !visibleScripts.length ? 'No matches' : 'Pick saved script')
+      : 'Saved scripts unavailable';
     savedScriptSelect.appendChild(empty);
-    savedScripts.forEach(function(item){
+    visibleScripts.forEach(function(item){
       var option = document.createElement('option');
       option.value = item.id;
       option.textContent = item.title;
       savedScriptSelect.appendChild(option);
     });
-    if(activeSavedScriptId && savedScripts.some(function(item){ return item.id === activeSavedScriptId; })){
+    if(activeVisible){
       savedScriptSelect.value = activeSavedScriptId;
     }else{
       activeSavedScriptId = '';
       savedScriptSelect.value = '';
     }
+    if(savedScriptFilter) savedScriptFilter.disabled = !storageAvailable;
     savedScriptSelect.disabled = !storageAvailable;
     saveLocalBtn.disabled = !storageAvailable;
     if(saveAsLocalBtn) saveAsLocalBtn.disabled = !storageAvailable;
     loadLocalBtn.disabled = !storageAvailable || !activeSavedScriptId;
+    if(renameLocalBtn) renameLocalBtn.disabled = !storageAvailable || !activeSavedScriptId;
+    if(duplicateLocalBtn) duplicateLocalBtn.disabled = !storageAvailable || !activeSavedScriptId;
     deleteLocalBtn.disabled = !storageAvailable || !activeSavedScriptId;
   }
 
@@ -2278,6 +2474,8 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     activeSavedScriptId = entry.id;
     if(saveSavedScripts()){
       rememberFileStem(fileStemFromText(entry.title));
+      savedScriptFilterText = '';
+      if(savedScriptFilter) savedScriptFilter.value = '';
       renderSavedScripts();
       signalSuccess(sourceButton);
       showHintNotice(forceNew ? 'Saved as a new script.' : 'Saved in this browser.', 'success');
@@ -2334,6 +2532,76 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     }else{
       signalError(deleteLocalBtn);
       showHintNotice('Could not update saved scripts.', 'error');
+    }
+  }
+
+  function renameSelectedScriptLocal(){
+    var entry = savedScripts.find(function(item){ return item.id === activeSavedScriptId; });
+    var nextTitle;
+    if(!entry){
+      signalError(renameLocalBtn);
+      showHintNotice('Pick a saved script first.', 'error');
+      return;
+    }
+    nextTitle = window.prompt('Rename saved script', entry.title);
+    if(nextTitle === null) return;
+    nextTitle = nextTitle.trim();
+    if(!nextTitle){
+      signalError(renameLocalBtn);
+      showHintNotice('Saved script names cannot be blank.', 'error');
+      return;
+    }
+    entry.title = nextTitle.slice(0, 80);
+    entry.updatedAt = new Date().toISOString();
+    if(saveSavedScripts()){
+      rememberFileStem(fileStemFromText(entry.title));
+      savedScriptFilterText = '';
+      if(savedScriptFilter) savedScriptFilter.value = '';
+      renderSavedScripts();
+      signalSuccess(renameLocalBtn);
+      showHintNotice('Saved script renamed.', 'success');
+      savePreferences('rename-local');
+      updatePrediction();
+    }else{
+      signalError(renameLocalBtn);
+      showHintNotice('Could not rename saved script.', 'error');
+    }
+  }
+
+  function duplicateSelectedScriptLocal(){
+    var entry = savedScripts.find(function(item){ return item.id === activeSavedScriptId; });
+    var copy;
+    if(!entry){
+      signalError(duplicateLocalBtn);
+      showHintNotice('Pick a saved script first.', 'error');
+      return;
+    }
+    copy = sanitizeSavedScript({
+      id:newSavedScriptId(),
+      title:('Copy of ' + entry.title).slice(0, 80),
+      text:entry.text,
+      format:entry.format,
+      updatedAt:new Date().toISOString()
+    });
+    if(!copy){
+      signalError(duplicateLocalBtn);
+      showHintNotice('Could not duplicate saved script.', 'error');
+      return;
+    }
+    savedScripts.unshift(copy);
+    savedScripts = savedScripts.slice(0, MAX_SAVED_SCRIPTS);
+    activeSavedScriptId = copy.id;
+    if(saveSavedScripts()){
+      savedScriptFilterText = '';
+      if(savedScriptFilter) savedScriptFilter.value = '';
+      renderSavedScripts();
+      signalSuccess(duplicateLocalBtn);
+      showHintNotice('Saved script duplicated.', 'success');
+      savePreferences('duplicate-local');
+      updatePrediction();
+    }else{
+      signalError(duplicateLocalBtn);
+      showHintNotice('Could not duplicate saved script.', 'error');
     }
   }
 
@@ -2591,8 +2859,11 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
 
   // ---- Apply visual settings ----
   function applySettings(){
+    FORMAT_PRESET = sanitizeFormatPreset(FORMAT_PRESET);
     FONT_FACE = sanitizeFontFace(FONT_FACE);
     FONT_WEIGHT = sanitizeFontWeight(FONT_WEIGHT);
+    FONT_STYLE = sanitizeFontStyle(FONT_STYLE);
+    TEXT_TRANSFORM = sanitizeTextTransform(TEXT_TRANSFORM);
     TEXT_COLOR = sanitizeTextColor(TEXT_COLOR);
     READER_BG = sanitizeReaderBg(READER_BG);
     var readerColor = colorValue(TEXT_COLOR, TEXT_COLORS, 'white');
@@ -2602,6 +2873,8 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     document.documentElement.style.setProperty('--reader-width', WIDTH.val + 'rem');
     document.documentElement.style.setProperty('--read-sans', FONT_FACES[FONT_FACE]);
     document.documentElement.style.setProperty('--reader-weight', String(FONT_WEIGHT));
+    document.documentElement.style.setProperty('--reader-style', FONT_STYLE);
+    document.documentElement.style.setProperty('--reader-transform', TEXT_TRANSFORM);
     document.documentElement.style.setProperty('--reader-color', readerColor);
     document.documentElement.style.setProperty('--reader-bg', readerBg);
     $('speedOut').textContent = String(SPEED.val);
@@ -2614,8 +2887,11 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     body.classList.toggle('centerline', centerline);
     $('mirrorBtn').setAttribute('aria-pressed', String(mirror));
     $('lineBtn').setAttribute('aria-pressed', String(centerline));
+    if(formatPresetSelect) formatPresetSelect.value = FORMAT_PRESET;
     if(fontFaceSelect) fontFaceSelect.value = FONT_FACE;
     if(fontWeightSelect) fontWeightSelect.value = String(FONT_WEIGHT);
+    if(caseSelect) caseSelect.value = TEXT_TRANSFORM;
+    if(italicBtn) italicBtn.setAttribute('aria-pressed', String(FONT_STYLE === 'italic'));
     if(textColorInput) textColorInput.value = readerColor;
     if(readerBgInput) readerBgInput.value = readerBg;
     document.querySelectorAll('[data-text-color]').forEach(function(button){
@@ -2954,9 +3230,9 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     if(out) $(out).textContent = fmt ? fmt(obj.val) : String(obj.val);
     saveSettings();
   }
-  function changeFont(dir){ bump(FONT, dir, 'fontOut'); applyMetric(); }
-  function changeLH(dir){ bump(LH, dir, 'lhOut', function(v){return v.toFixed(1);}); applyMetric(); }
-  function changeWidth(dir){ bump(WIDTH, dir, 'widthOut'); applyMetric(); }
+  function changeFont(dir){ markCustomFormat(); bump(FONT, dir, 'fontOut'); applyMetric(); }
+  function changeLH(dir){ markCustomFormat(); bump(LH, dir, 'lhOut', function(v){return v.toFixed(1);}); applyMetric(); }
+  function changeWidth(dir){ markCustomFormat(); bump(WIDTH, dir, 'widthOut'); applyMetric(); }
   function changeSpeed(dir){ bump(SPEED, dir, 'speedOut'); updateRunHud(); refreshRundownIfOpen(); savePreferences('speed'); updatePrediction(); }
   function fitSpeedToTargetRuntime(){
     var rawSpeed;
@@ -2998,7 +3274,38 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     signalSuccess(fitTimeBtn);
     showHintNotice('Speed fitted to ' + formatTime(TARGET_RUNTIME.val) + '.', 'success');
   }
+  function applyNamedFormatPreset(value){
+    var presetKey = sanitizeFormatPreset(value);
+    var preset = FORMAT_PRESETS[presetKey];
+    FORMAT_PRESET = presetKey;
+    if(presetKey === 'custom'){
+      saveSettings();
+      applySettings();
+      signalSuccess(formatPresetSelect);
+      showHintNotice('Custom format active.', 'success');
+      savePreferences('format-custom');
+      updatePrediction();
+      return;
+    }
+    if(!preset) return;
+    if(typeof preset.font === 'number') FONT.val = clamp(preset.font, FONT.min, FONT.max);
+    if(typeof preset.lh === 'number') LH.val = clamp(preset.lh, LH.min, LH.max);
+    if(typeof preset.width === 'number') WIDTH.val = clamp(preset.width, WIDTH.min, WIDTH.max);
+    if(typeof preset.fontFace === 'string') FONT_FACE = sanitizeFontFace(preset.fontFace);
+    if(typeof preset.fontWeight === 'number' || typeof preset.fontWeight === 'string') FONT_WEIGHT = sanitizeFontWeight(preset.fontWeight);
+    if(typeof preset.fontStyle === 'string') FONT_STYLE = sanitizeFontStyle(preset.fontStyle);
+    if(typeof preset.textTransform === 'string') TEXT_TRANSFORM = sanitizeTextTransform(preset.textTransform);
+    if(typeof preset.textColor === 'string') TEXT_COLOR = sanitizeTextColor(preset.textColor);
+    if(typeof preset.readerBg === 'string') READER_BG = sanitizeReaderBg(preset.readerBg);
+    saveSettings();
+    applySettings();
+    signalSuccess(formatPresetSelect);
+    showHintNotice('Format preset applied.', 'success');
+    savePreferences('format-preset');
+    updatePrediction();
+  }
   function changeFontFace(value){
+    markCustomFormat();
     FONT_FACE = sanitizeFontFace(value);
     saveSettings();
     applySettings();
@@ -3007,6 +3314,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     updatePrediction();
   }
   function changeFontWeight(value){
+    markCustomFormat();
     FONT_WEIGHT = sanitizeFontWeight(value);
     saveSettings();
     applySettings();
@@ -3014,7 +3322,26 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     savePreferences('font-weight');
     updatePrediction();
   }
+  function changeTextTransform(value){
+    markCustomFormat();
+    TEXT_TRANSFORM = sanitizeTextTransform(value);
+    saveSettings();
+    applySettings();
+    signalSuccess(caseSelect);
+    savePreferences('text-case');
+    updatePrediction();
+  }
+  function toggleItalic(){
+    markCustomFormat();
+    FONT_STYLE = FONT_STYLE === 'italic' ? 'normal' : 'italic';
+    saveSettings();
+    applySettings();
+    signalSuccess(italicBtn);
+    savePreferences('font-style');
+    updatePrediction();
+  }
   function changeTextColor(value, sourceButton){
+    markCustomFormat();
     TEXT_COLOR = sanitizeTextColor(value);
     saveSettings();
     applySettings();
@@ -3023,6 +3350,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     updatePrediction();
   }
   function changeReaderBg(value, sourceButton){
+    markCustomFormat();
     READER_BG = sanitizeReaderBg(value);
     saveSettings();
     applySettings();
@@ -3034,6 +3362,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     document.documentElement.style.setProperty('--reader-fs', FONT.val + 'px');
     document.documentElement.style.setProperty('--reader-lh', String(LH.val));
     document.documentElement.style.setProperty('--reader-width', WIDTH.val + 'rem');
+    if(formatPresetSelect) formatPresetSelect.value = FORMAT_PRESET;
     measureMarkerPositions();
     measure(); applyTransform();
     savePreferences('reading-metric');
@@ -3218,12 +3547,19 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     var file = showPackageInput.files && showPackageInput.files[0];
     if(file) importShowPackageFile(file);
   });
+  formatPresetSelect.addEventListener('change', function(){
+    applyNamedFormatPreset(formatPresetSelect.value);
+  });
   fontFaceSelect.addEventListener('change', function(){
     changeFontFace(fontFaceSelect.value);
   });
   fontWeightSelect.addEventListener('change', function(){
     changeFontWeight(fontWeightSelect.value);
   });
+  caseSelect.addEventListener('change', function(){
+    changeTextTransform(caseSelect.value);
+  });
+  italicBtn.addEventListener('click', toggleItalic);
   document.querySelectorAll('[data-text-color]').forEach(function(button){
     button.addEventListener('click', function(){
       changeTextColor(button.getAttribute('data-text-color'), button);
@@ -3249,6 +3585,11 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     renderSavedScripts();
     updatePrediction();
   });
+  savedScriptFilter.addEventListener('input', function(){
+    savedScriptFilterText = savedScriptFilter.value || '';
+    renderSavedScripts();
+    updatePrediction();
+  });
   markerSelect.addEventListener('change', function(){
     var index = parseInt(markerSelect.value, 10);
     if(Number.isFinite(index)) jumpToMarker(index);
@@ -3258,6 +3599,8 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     saveAsLocalBtn.addEventListener('click', function(){ saveCurrentScriptLocal(true); });
   }
   loadLocalBtn.addEventListener('click', loadSelectedScriptLocal);
+  renameLocalBtn.addEventListener('click', renameSelectedScriptLocal);
+  duplicateLocalBtn.addEventListener('click', duplicateSelectedScriptLocal);
   deleteLocalBtn.addEventListener('click', deleteSelectedScriptLocal);
   $('loadFileBtn').addEventListener('click', function(){
     fileInput.value = '';
@@ -3390,6 +3733,8 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
         e.preventDefault(); toggleFullscreen(); break;
       case 'c': case 'C':
         e.preventDefault(); startCue(); break;
+      case 'i': case 'I':
+        e.preventDefault(); toggleItalic(); wake(); break;
       case 'r': case 'R':
         e.preventDefault(); restart(); wake(); break;
       case ']':

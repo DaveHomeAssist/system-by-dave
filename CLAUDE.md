@@ -45,7 +45,8 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
 - Agent cards on `agents.html` are deep-linked by id.
 - `404.html` and `500.html` now carry OG + Twitter Card meta.
 - `teleprompter.html` now includes expanded reader font, color,
-  background, saved-script, show package, remote, and rundown controls.
+  background, format preset, saved-script, show package, remote, and
+  rundown controls.
 - AV tools now include `teleprompter.html`, `show-timer.html`,
   `cue-sheet.html`, `input-list.html`, `stage-plot.html`,
   `show-handoff.html`, and `av-calculator.html`.
