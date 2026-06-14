@@ -92,11 +92,12 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
   collapsed read view offsets the run HUD away from the restore button.
 - `av-suite.html` is the AV suite launch hub with show profile fields,
   phase recommendations, search, phase and department filters, cross tool
-  readiness tracking, readiness notes, issue and note focused views, pinned
-  tools, recent tools, saved tool data badges and scan, show context handoff
-  links, return context hydration, copyable launch lists, saved browser
-  preferences, tactile button feedback, suite JSON import and export, show
-  package backup for known AV tool storage, and mobile layout containment.
+  readiness tracking, readiness notes, operator review queue, issue and note
+  focused views, pinned tools, recent tools, saved tool data badges and scan,
+  show context handoff links, return context hydration, copyable launch lists,
+  saved browser preferences, tactile button feedback, suite JSON import and
+  export, show package backup for known AV tool storage, and mobile layout
+  containment.
 - `js/av-suite-context.js` is the shared AV tool context helper. It reads
   `sbdShow`, `sbdVenue`, `sbdDate`, and `sbdOperator` URL parameters and
   fills matching show metadata fields on AV tool pages that include it. When
