@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Client Sign Off | System by Dave</title>
+<meta name="description" content="A browser based AV client sign off tracker for show acceptance, deliverables, approvers, exceptions, follow ups, and closeout notes.">
+<link rel="canonical" href="https://systembydave.com/client-signoff.html">
+<meta name="theme-color" content="#0c1118">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Client Sign Off">
+<meta property="og:description" content="A browser based AV client sign off tracker for show acceptance, deliverables, approvers, exceptions, follow ups, and closeout notes.">
+<meta property="og:url" content="https://systembydave.com/client-signoff.html">
+<meta property="og:image" content="https://systembydave.com/assets/og/system-by-dave.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Client Sign Off">
+<meta name="twitter:description" content="A browser based AV client sign off tracker for show acceptance, deliverables, approvers, exceptions, follow ups, and closeout notes.">
+<meta name="twitter:image" content="https://systembydave.com/assets/og/system-by-dave.png">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; base-uri 'self'; form-action 'self'">
+<style>
+  :root{color-scheme:dark;--bg:#070a0f;--panel:#121922;--panel-2:#0d131b;--line:#293544;--line-soft:#1d2835;--text:#f4f7fb;--muted:#9aa7b7;--accent:#d36f3f;--accent-2:#62d6d2;--green:#6be092;--yellow:#ffd166;--red:#ff6b6b;--radius:8px;--shadow:0 24px 70px rgba(0,0,0,.38);--mono:"SFMono-Regular","Roboto Mono",Consolas,monospace;--sans:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;--fast:120ms;--med:180ms;--ease:cubic-bezier(.2,.8,.2,1)}
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100%;background:radial-gradient(circle at top left,rgba(98,214,210,.12),transparent 34rem),radial-gradient(circle at top right,rgba(211,111,63,.14),transparent 32rem),var(--bg);color:var(--text);font-family:var(--sans)}
+  body::before{content:"";position:fixed;inset:0;background:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:72px 72px;pointer-events:none;mask-image:linear-gradient(to bottom,#000,transparent 70%)}
+  a{color:inherit}
+  button,input,select,textarea{font:inherit}
+  button{border:1px solid #344355;background:#17212d;color:var(--text);border-radius:var(--radius);padding:10px 14px;cursor:pointer;transition:transform var(--fast) var(--ease),background var(--fast) var(--ease),border-color var(--fast) var(--ease),box-shadow var(--fast) var(--ease)}
+  button:hover{background:#202b38;border-color:#4a5c70;transform:translateY(-1px)}
+  button:active,button.is-pressing{transform:translateY(1px) scale(.985);background:#263240}
+  button.primary{background:linear-gradient(180deg,#ee8b55,var(--accent));border-color:#f09963;color:#111;font-weight:800}
+  button.danger{border-color:rgba(255,107,107,.7);color:#ffd4d4;background:#24151a}
+  button:disabled{opacity:.5;cursor:not-allowed;transform:none}
+  input,select,textarea{width:100%;border:1px solid #2f3d4d;background:#0b1118;color:var(--text);border-radius:7px;padding:10px 11px;outline:none;transition:border-color var(--fast) var(--ease),box-shadow var(--fast) var(--ease),background var(--fast) var(--ease)}
+  input:focus,select:focus,textarea:focus{border-color:var(--accent-2);box-shadow:0 0 0 3px rgba(98,214,210,.14);background:#0e151e}
+  textarea{min-height:64px;resize:vertical}
+  label{display:block;color:var(--muted);font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+  .skip-link{position:absolute;left:12px;top:12px;transform:translateY(-140%);background:var(--accent-2);color:#071014;padding:8px 10px;border-radius:7px;z-index:20}
+  .skip-link:focus{transform:none}
+  .noscript{padding:12px 16px;background:#2a1d12;color:#ffd9b4}
+  .app{position:relative;z-index:1}
+  .topbar{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 18px;background:rgba(9,13,19,.94);border-bottom:1px solid var(--line);backdrop-filter:blur(14px)}
+  .brand{display:flex;align-items:center;gap:12px;text-decoration:none;min-width:0}
+  .brand-mark{width:38px;height:38px;border:1px solid #415266;border-radius:50%;display:grid;place-items:center;color:var(--accent-2);font-family:var(--mono)}
+  .brand-text{display:grid;gap:3px;min-width:0}
+  .brand-text strong{font-size:14px;letter-spacing:.16em;text-transform:uppercase}
+  .brand-text span{color:var(--muted);font-family:var(--mono);font-size:11px}
+  .top-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+  main{display:grid;gap:18px;padding:22px;max-width:1500px;margin:0 auto}
+  .hero{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:18px}
+  .panel{background:linear-gradient(180deg,rgba(19,27,37,.96),rgba(13,18,26,.96));border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+  .show-panel{padding:18px}
+  .eyebrow{margin:0 0 14px;color:var(--accent-2);font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase}
+  .show-title{border:0;background:transparent;padding:0;margin:0 0 24px;color:var(--text);font-size:clamp(34px,5vw,58px);font-weight:900;letter-spacing:0}
+  .show-title:focus{box-shadow:none;background:transparent}
+  .meta-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+  .status-panel{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:14px}
+  .stat{background:#0b1017;border:1px solid var(--line-soft);border-radius:7px;padding:13px}
+  .stat span{display:block;color:var(--muted);font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.09em}
+  .stat strong{display:block;margin-top:7px;font-size:30px;line-height:1}
+  .workspace{display:grid;grid-template-columns:minmax(0,1fr) 350px;gap:18px;align-items:start}
+  .main-panel{overflow:hidden}
+  .toolbar{display:grid;grid-template-columns:minmax(220px,1fr) 170px 170px auto;gap:10px;padding:14px;border-bottom:1px solid var(--line)}
+  .button-row{display:flex;gap:8px}
+  .table-wrap{overflow:auto;max-height:58vh}
+  table{border-collapse:separate;border-spacing:0;width:100%;min-width:1240px}
+  th,td{border-bottom:1px solid var(--line-soft);padding:8px;text-align:left;vertical-align:top}
+  th{position:sticky;top:0;z-index:2;background:#101720;color:var(--muted);font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em}
+  tbody tr{transition:background var(--fast) var(--ease),box-shadow var(--fast) var(--ease)}
+  tbody tr:hover{background:rgba(255,255,255,.025)}
+  tbody tr.selected{background:rgba(98,214,210,.09);box-shadow:inset 0 0 0 1px rgba(98,214,210,.32)}
+  tbody tr.has-gap{box-shadow:inset 3px 0 0 var(--red)}
+  tbody tr.status-signed,tbody tr.status-waived{box-shadow:inset 3px 0 0 var(--green)}
+  tbody tr.status-ready{box-shadow:inset 3px 0 0 var(--yellow)}
+  tbody tr.status-rejected{opacity:.72}
+  .row-input,.row-select,.row-textarea{min-width:0;padding:8px 9px}
+  .field-small{width:96px}.field-mid{width:144px}.field-large{width:230px}.field-notes{width:260px}
+  .empty-state{padding:28px;color:var(--muted);text-align:center}
+  .side{display:grid;gap:18px;position:sticky;top:88px}
+  .side-section{padding:14px}
+  .selected-item{display:flex;justify-content:space-between;gap:12px;margin-bottom:12px;color:var(--muted);font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em}
+  .item-card{display:grid;gap:10px;margin-bottom:14px}
+  .item-node{background:#0b1017;border:1px solid var(--line-soft);border-radius:7px;padding:12px}
+  .item-node span{display:block;color:var(--muted);font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+  .item-node strong{font-size:15px}
+  .selected-grid{display:grid;gap:10px}
+  .side-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .hint{margin:10px 0 0;color:var(--muted);font-size:13px}
+  .hint.success{color:var(--green)}.hint.error{color:#ffd1d1}
+  .shortcut-list{display:grid;grid-template-columns:auto 1fr;gap:8px 14px;color:var(--muted)}
+  .shortcut-list dt{color:var(--accent-2);font-family:var(--mono)}
+  .shortcut-list dd{margin:0}
+  .privacy-note{color:var(--muted);font-size:12px;line-height:1.45}
+  .gap-text{color:var(--yellow)}.clean-text{color:var(--green)}
+  .file-input{display:none}
+  .feedback-success{border-color:rgba(107,224,146,.85) !important;box-shadow:0 0 0 3px rgba(107,224,146,.14) !important}
+  .feedback-error{border-color:var(--red) !important;box-shadow:0 0 0 3px rgba(255,107,107,.16) !important;animation:shake var(--med) var(--ease)}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+  @media (max-width:980px){.hero,.workspace{grid-template-columns:1fr}.side{position:static}.meta-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.toolbar{grid-template-columns:1fr 1fr}.button-row{grid-column:1 / -1}.show-title{font-size:32px}}
+  @media (max-width:680px){.topbar{position:static;align-items:flex-start;flex-direction:column}.top-actions{width:100%;justify-content:flex-start}.top-actions button{flex:1 1 96px;padding:9px 10px;font-size:13px}main{padding:10px;gap:12px}.hero,.workspace{gap:12px}.show-panel,.side-section{padding:12px}.meta-grid,.status-panel,.toolbar{grid-template-columns:1fr}.show-title{font-size:26px}.table-wrap{max-height:none}th,td{padding:6px}.side-actions{grid-template-columns:1fr}}
+  @media (prefers-reduced-motion:reduce){*{transition-duration:.001ms !important;animation-duration:.001ms !important}button:hover,button:active,button.is-pressing{transform:none}}
+  @media print{body{background:#fff;color:#111}body::before,.topbar,.toolbar,.side,.skip-link{display:none !important}main{padding:0;width:100%}.hero{display:block}.panel{box-shadow:none;border-color:#ccc;background:#fff}.show-title,input,select,textarea{color:#111;background:#fff;border-color:#ccc}.table-wrap{max-height:none;overflow:visible}table{min-width:0;font-size:9px}th,td{padding:4px}}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#signoffLog">Skip to client sign off log</a>
+<noscript><div class="noscript">Client Sign Off needs JavaScript for editing, import, export, filtering, and browser saved state.</div></noscript>
+<div class="app">
+  <header class="topbar">
+    <a class="brand" href="index.html#av-tools" aria-label="Back to AV tools">
+      <span class="brand-mark">S</span>
+      <span class="brand-text"><strong>Client Sign Off</strong><span>System by Dave AV tools</span></span>
+    </a>
+    <div class="top-actions">
+      <button id="printBtn" type="button">Print</button>
+      <button id="copySummaryBtn" type="button">Copy Summary</button>
+      <button id="exportCsvBtn" type="button">Export CSV</button>
+      <button id="exportJsonBtn" type="button">Export JSON</button>
+      <button id="importJsonBtn" type="button">Import JSON</button>
+      <input id="importInput" class="file-input" type="file" accept=".json,application/json">
+    </div>
+  </header>
+  <main>
+    <section class="hero" aria-label="Client sign off metadata">
+      <div class="panel show-panel">
+        <div>
+          <p class="eyebrow">AV client sign off</p>
+          <input id="showName" class="show-title" type="text" aria-label="Show name">
+        </div>
+        <div class="meta-grid">
+          <div class="field"><label for="client">Client</label><input id="client" type="text"></div>
+          <div class="field"><label for="venue">Venue</label><input id="venue" type="text"></div>
+          <div class="field"><label for="room">Room</label><input id="room" type="text"></div>
+          <div class="field"><label for="showDate">Show date</label><input id="showDate" type="date"></div>
+          <div class="field"><label for="showLead">Show lead</label><input id="showLead" type="text"></div>
+          <div class="field"><label for="clientLead">Client lead</label><input id="clientLead" type="text"></div>
+          <div class="field"><label for="closeoutTime">Closeout time</label><input id="closeoutTime" type="time"></div>
+          <div class="field"><label for="reportRef">Report ref</label><input id="reportRef" type="text"></div>
+        </div>
+      </div>
+      <aside class="panel status-panel" aria-label="Client sign off status">
+        <div class="stat"><span>Total</span><strong id="totalOut">0</strong></div>
+        <div class="stat"><span>Signed</span><strong id="signedOut">0</strong></div>
+        <div class="stat"><span>Pending</span><strong id="pendingOut">0</strong></div>
+        <div class="stat"><span>Exceptions</span><strong id="exceptionOut">0</strong></div>
+        <div class="stat"><span>Follow Up</span><strong id="followOut">0</strong></div>
+        <div class="stat"><span>Ready</span><strong id="readyOut">0</strong></div>
+      </aside>
+    </section>
+    <section class="workspace">
+      <div class="panel main-panel" id="signoffLog">
+        <div class="toolbar" role="toolbar" aria-label="Client sign off controls">
+          <input id="searchInput" type="search" placeholder="Search area, item, approver, status, exceptions, owner, notes" aria-label="Search client sign off log">
+          <select id="areaFilter" aria-label="Filter by area"></select>
+          <select id="statusFilter" aria-label="Filter by status">
+            <option value="all">All statuses</option>
+            <option value="pending">Pending</option>
+            <option value="ready">Ready</option>
+            <option value="signed">Signed</option>
+            <option value="exception">Exception</option>
+            <option value="follow-up">Follow Up</option>
+            <option value="waived">Waived</option>
+            <option value="rejected">Rejected</option>
+          </select>
+          <div class="button-row">
+            <button id="addItemBtn" class="primary" type="button">Add Item</button>
+            <button id="loadSampleBtn" type="button">Sample</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table id="signoffTable">
+            <thead>
+              <tr>
+                <th>Area</th>
+                <th>Item</th>
+                <th>Approver</th>
+                <th>Due</th>
+                <th>Status</th>
+                <th>Signed At</th>
+                <th>Exception</th>
+                <th>Owner</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody id="itemBody"></tbody>
+          </table>
+        </div>
+        <div id="emptyState" class="empty-state" hidden>No sign off items match the current filters.</div>
+      </div>
+      <aside class="side">
+        <section class="panel side-section" aria-label="Selected sign off item">
+          <div class="selected-item"><span>Selected</span><span id="selectedIdOut">None</span></div>
+          <div class="item-card" aria-label="Selected sign off preview">
+            <div class="item-node"><span>Item</span><strong id="itemName">None</strong></div>
+            <div class="item-node"><span>Approval</span><strong id="itemRoute">None</strong></div>
+            <div class="item-node"><span>Risk</span><strong id="itemRisk">None</strong></div>
+          </div>
+          <div class="selected-grid">
+            <div>
+              <label for="selectedStatus">Status</label>
+              <select id="selectedStatus">
+                <option value="pending">Pending</option>
+                <option value="ready">Ready</option>
+                <option value="signed">Signed</option>
+                <option value="exception">Exception</option>
+                <option value="follow-up">Follow Up</option>
+                <option value="waived">Waived</option>
+                <option value="rejected">Rejected</option>
+              </select>
+            </div>
+            <div>
+              <label for="selectedException">Exception</label>
+              <textarea id="selectedException"></textarea>
+            </div>
+            <div>
+              <label for="selectedNotes">Notes</label>
+              <textarea id="selectedNotes"></textarea>
+            </div>
+            <div class="side-actions">
+              <button id="markReadyBtn" type="button">Ready</button>
+              <button id="markSignedBtn" type="button">Signed</button>
+              <button id="markExceptionBtn" type="button">Exception</button>
+              <button id="markFollowBtn" type="button">Follow Up</button>
+              <button id="markWaivedBtn" type="button">Waived</button>
+              <button id="markRejectedBtn" type="button">Rejected</button>
+              <button id="moveUpBtn" type="button">Move Up</button>
+              <button id="moveDownBtn" type="button">Move Down</button>
+              <button id="duplicateBtn" type="button">Duplicate</button>
+              <button id="deleteBtn" class="danger" type="button">Delete</button>
+            </div>
+          </div>
+          <p id="hint" class="hint" role="status">Loaded sample client sign off log.</p>
+        </section>
+        <section class="panel side-section" aria-label="Keyboard shortcuts">
+          <h2>Fast actions</h2>
+          <dl class="shortcut-list">
+            <dt>N</dt><dd>Add item after selected</dd>
+            <dt>R</dt><dd>Mark selected ready</dd>
+            <dt>S</dt><dd>Mark selected signed</dd>
+            <dt>E</dt><dd>Mark selected exception</dd>
+            <dt>F</dt><dd>Mark selected follow up</dd>
+            <dt>W</dt><dd>Mark selected waived</dd>
+            <dt>X</dt><dd>Mark selected rejected</dd>
+            <dt>D</dt><dd>Duplicate selected item</dd>
+            <dt>Del</dt><dd>Delete selected item</dd>
+          </dl>
+          <p class="privacy-note">Client sign off data is remembered in this browser when storage is available. Export JSON before moving to another device.</p>
+        </section>
+      </aside>
+    </section>
+  </main>
+</div>
+<script>
+(function(){
+  var STORAGE_KEY='client-signoff.v1';
+  var SCHEMA='system-by-dave.client-signoff.v1';
+  var AREAS=['general','audio','video','lighting','staging','streaming','records','rooms','labor','billing','deliverables','safety','other'];
+  var STATUS=['pending','ready','signed','exception','follow-up','waived','rejected'];
+  var $=function(id){return document.getElementById(id);};
+  var state={meta:{showName:'General Session Client Sign Off',client:'Client',venue:'Venue',room:'Main Room',showDate:new Date().toISOString().slice(0,10),showLead:'Show lead',clientLead:'Client lead',closeoutTime:'17:00',reportRef:'SR-001'},items:[],selectedId:'',filters:{search:'',area:'all',status:'all'}};
+  var sampleItems=[
+    {area:'general',item:'Main room accepted',approver:'Client PM',due:'16:30',status:'signed',signedAt:'16:45',exception:'',owner:'PM',notes:'Client walked room and accepted final layout.'},
+    {area:'audio',item:'Program audio approved',approver:'Producer',due:'16:45',status:'signed',signedAt:'16:50',exception:'',owner:'A1',notes:'Walk out music and lectern level approved.'},
+    {area:'records',item:'Program record delivered',approver:'Client media',due:'17:00',status:'signed',signedAt:'17:05',exception:'',owner:'V1',notes:'Primary and backup files copied to client drive.'},
+    {area:'lighting',item:'Sponsor wall look',approver:'Sponsor lead',due:'17:15',status:'ready',signedAt:'',exception:'',owner:'LX',notes:'Ready for sponsor check before doors.'},
+    {area:'streaming',item:'Stream archive link',approver:'Digital lead',due:'17:30',status:'follow-up',signedAt:'',exception:'Client wants download link after encode.',owner:'Streaming',notes:'Send archive link after upload completes.'},
+    {area:'billing',item:'Change order packet',approver:'Client finance',due:'17:30',status:'exception',signedAt:'',exception:'CO-003 waiting signature.',owner:'PM',notes:'Attach signed CO-001 and CO-002 to report.'},
+    {area:'deliverables',item:'USB-C adapter return',approver:'Client PM',due:'18:00',status:'follow-up',signedAt:'',exception:'Adapter ships tomorrow.',owner:'Runner',notes:'Client accepted delayed return in report.'},
+    {area:'safety',item:'Egress clear at close',approver:'Venue',due:'18:00',status:'waived',signedAt:'17:40',exception:'',owner:'Stage',notes:'Venue waived written sign off after visual check.'}
+  ];
+  var inputs={showName:$('showName'),client:$('client'),venue:$('venue'),room:$('room'),showDate:$('showDate'),showLead:$('showLead'),clientLead:$('clientLead'),closeoutTime:$('closeoutTime'),reportRef:$('reportRef'),search:$('searchInput'),area:$('areaFilter'),status:$('statusFilter'),selectedStatus:$('selectedStatus'),selectedException:$('selectedException'),selectedNotes:$('selectedNotes')};
+  function uid(){return 'so-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,7);}
+  function storageAvailable(){try{var key='client-signoff-probe';localStorage.setItem(key,key);localStorage.removeItem(key);return true;}catch(e){return false;}}
+  function cloneItem(item){var next=Object.assign({id:uid(),area:'general',item:'New sign off item',approver:'Client',due:'',status:'pending',signedAt:'',exception:'',owner:'PM',notes:''},item||{});if(!next.id) next.id=uid();if(AREAS.indexOf(next.area)<0) next.area='other';if(STATUS.indexOf(next.status)<0) next.status='pending';return next;}
+  function normalizeState(raw){var next=raw&&typeof raw==='object'?raw:{};var meta=next.meta&&typeof next.meta==='object'?next.meta:{};return {meta:{showName:String(meta.showName||'General Session Client Sign Off').slice(0,120),client:String(meta.client||'').slice(0,120),venue:String(meta.venue||'').slice(0,120),room:String(meta.room||'').slice(0,120),showDate:String(meta.showDate||new Date().toISOString().slice(0,10)).slice(0,20),showLead:String(meta.showLead||'').slice(0,80),clientLead:String(meta.clientLead||'').slice(0,80),closeoutTime:String(meta.closeoutTime||'').slice(0,20),reportRef:String(meta.reportRef||'').slice(0,80)},items:Array.isArray(next.items)?next.items.map(cloneItem).slice(0,300):sampleItems.map(cloneItem),selectedId:typeof next.selectedId==='string'?next.selectedId:'',filters:{search:String(next.filters&&next.filters.search||''),area:AREAS.indexOf(next.filters&&next.filters.area)>=0?next.filters.area:'all',status:STATUS.indexOf(next.filters&&next.filters.status)>=0?next.filters.status:'all'}};}
+  function loadState(){if(!storageAvailable()){state=normalizeState({});if(state.items[0]) state.selectedId=state.items[0].id;return;}try{var raw=localStorage.getItem(STORAGE_KEY);state=raw?normalizeState(JSON.parse(raw)):normalizeState({});}catch(e){state=normalizeState({});}if(!state.selectedId&&state.items[0]) state.selectedId=state.items[0].id;}
+  function saveState(){if(!storageAvailable()) return false;try{localStorage.setItem(STORAGE_KEY,JSON.stringify({schema:SCHEMA,savedAt:new Date().toISOString(),meta:state.meta,items:state.items,selectedId:state.selectedId,filters:state.filters}));return true;}catch(e){showHint('Could not save in this browser. Export JSON to keep a copy.','error');return false;}}
+  function setInputValues(){Object.keys(state.meta).forEach(function(key){if(inputs[key]) inputs[key].value=state.meta[key];});inputs.search.value=state.filters.search;inputs.status.value=state.filters.status;}
+  function selectOptions(values,selected,firstLabel){var html=firstLabel?'<option value="all">'+escapeHtml(firstLabel)+'</option>':'';values.forEach(function(value){html+='<option value="'+escapeAttr(value)+'"'+(value===selected?' selected':'')+'>'+escapeHtml(titleCase(value))+'</option>';});return html;}
+  function renderAreaFilter(){var map={};state.items.forEach(function(item){if(item.area) map[item.area]=true;});var values=Object.keys(map).sort(function(a,b){return a.localeCompare(b);});if(state.filters.area!=='all'&&values.indexOf(state.filters.area)<0) state.filters.area='all';inputs.area.innerHTML=selectOptions(values,state.filters.area,'All areas');}
+  function isSigned(item){return item.status==='signed'||item.status==='waived';}
+  function isPending(item){return item.status==='pending'||item.status==='ready';}
+  function hasException(item){return item.status==='exception'||item.status==='rejected'||String(item.exception||'').trim().length>0;}
+  function isFollow(item){return item.status==='follow-up';}
+  function isReady(item){return isSigned(item)||item.status==='ready';}
+  function hasGap(item){var missingCore=!String(item.item||'').trim()||!String(item.approver||'').trim()||!String(item.owner||'').trim();var missingSignedTime=isSigned(item)&&!String(item.signedAt||'').trim();var missingExceptionNotes=hasException(item)&&!String(item.notes||'').trim();return missingCore||missingSignedTime||missingExceptionNotes;}
+  function visibleItems(){var q=state.filters.search.trim().toLowerCase();return state.items.filter(function(item){var haystack=[item.area,item.item,item.approver,item.due,item.status,item.signedAt,item.exception,item.owner,item.notes].join(' ').toLowerCase();if(q&&haystack.indexOf(q)===-1) return false;if(state.filters.area!=='all'&&item.area!==state.filters.area) return false;if(state.filters.status!=='all'&&item.status!==state.filters.status) return false;return true;});}
+  function renderRows(){var rows=visibleItems();var body=$('itemBody');if(rows.length&&!rows.some(function(item){return item.id===state.selectedId;})){state.selectedId=rows[0].id;saveState();}$('emptyState').hidden=rows.length>0;body.innerHTML=rows.map(function(item){var gap=hasGap(item);return '<tr class="status-'+item.status+(item.id===state.selectedId?' selected':'')+(gap?' has-gap':'')+'" data-id="'+escapeAttr(item.id)+'">'+cell('<select class="row-select field-mid" data-field="area" aria-label="Area">'+selectOptions(AREAS,item.area,'')+'</select>')+cell('<input class="row-input field-large" data-field="item" value="'+escapeAttr(item.item)+'" aria-label="Item">')+cell('<input class="row-input field-mid" data-field="approver" value="'+escapeAttr(item.approver)+'" aria-label="Approver">')+cell('<input class="row-input field-small" data-field="due" value="'+escapeAttr(item.due)+'" aria-label="Due time">')+cell('<select class="row-select field-mid" data-field="status" aria-label="Status">'+selectOptions(STATUS,item.status,'')+'</select>')+cell('<input class="row-input field-small" data-field="signedAt" value="'+escapeAttr(item.signedAt)+'" aria-label="Signed at">')+cell('<textarea class="row-textarea field-notes" data-field="exception" aria-label="Exception">'+escapeHtml(item.exception)+'</textarea>')+cell('<input class="row-input field-mid" data-field="owner" value="'+escapeAttr(item.owner)+'" aria-label="Owner">')+cell('<textarea class="row-textarea field-notes" data-field="notes" aria-label="Notes">'+escapeHtml(item.notes)+'</textarea>')+'</tr>';}).join('');}
+  function cell(content){return '<td>'+content+'</td>';}
+  function updateStats(){$('totalOut').textContent=state.items.length;$('signedOut').textContent=state.items.filter(isSigned).length;$('pendingOut').textContent=state.items.filter(isPending).length;$('exceptionOut').textContent=state.items.filter(hasException).length;$('followOut').textContent=state.items.filter(isFollow).length;$('readyOut').textContent=state.items.filter(isReady).length;}
+  function selectedItem(){return state.items.find(function(item){return item.id===state.selectedId;})||null;}
+  function updateInspector(){var item=selectedItem();var disabled=!item;var gap=item&&hasGap(item);$('selectedIdOut').textContent=item?titleCase(item.area):'None';inputs.selectedStatus.disabled=disabled;inputs.selectedException.disabled=disabled;inputs.selectedNotes.disabled=disabled;['markReadyBtn','markSignedBtn','markExceptionBtn','markFollowBtn','markWaivedBtn','markRejectedBtn','moveUpBtn','moveDownBtn','duplicateBtn','deleteBtn'].forEach(function(id){$(id).disabled=disabled;});$('itemName').textContent=item?(item.item||'No item'):'None';$('itemRoute').textContent=item?(item.approver||'No approver')+' | due '+(item.due||'none')+' | signed '+(item.signedAt||'none'):'None';$('itemRisk').textContent=item?(gap?(item.exception||'Sign off gap'):item.status):'None';$('itemRisk').className=item?(gap?'gap-text':'clean-text'):'';if(item){inputs.selectedStatus.value=item.status;inputs.selectedException.value=item.exception;inputs.selectedNotes.value=item.notes;}else{inputs.selectedStatus.value='pending';inputs.selectedException.value='';inputs.selectedNotes.value='';}}
+  function render(){setInputValues();renderAreaFilter();renderRows();updateStats();updateInspector();}
+  function updateItem(id,field,value,commitNow){var item=state.items.find(function(row){return row.id===id;});if(!item) return;if(field==='status'&&STATUS.indexOf(value)<0) value='pending';if(field==='area'&&AREAS.indexOf(value)<0) value='other';if(commitNow&&['item','approver','due','signedAt','owner'].indexOf(field)>=0) value=normalizeShort(value);item[field]=value;if(field==='exception'&&String(value).trim()&&item.status==='pending') item.status='exception';if(field==='signedAt'&&String(value).trim()&&item.status==='ready') item.status='signed';if((field==='area'||field==='status')&&commitNow) renderRows();if(field==='area'&&commitNow) renderAreaFilter();saveState();updateStats();updateInspector();}
+  function markSelectedRow(){document.querySelectorAll('#itemBody tr[data-id]').forEach(function(row){row.classList.toggle('selected',row.getAttribute('data-id')===state.selectedId);});}
+  function selectItem(id){if(!id) return;if(state.selectedId===id){updateInspector();return;}state.selectedId=id;saveState();markSelectedRow();updateInspector();}
+  function addItem(afterId){var index=afterId?state.items.findIndex(function(item){return item.id===afterId;})+1:state.items.length;if(index<0) index=state.items.length;var item=cloneItem({area:'general',item:'New sign off item',approver:state.meta.clientLead||'Client',due:state.meta.closeoutTime||'',status:'pending',signedAt:'',exception:'',owner:state.meta.showLead||'PM',notes:''});state.items.splice(index,0,item);state.selectedId=item.id;saveState();render();showHint('Sign off item added.','success');focusSelectedRow();}
+  function duplicateSelected(){var item=selectedItem();var index;var copy;if(!item) return showHint('Pick a sign off item first.','error');index=state.items.findIndex(function(row){return row.id===item.id;});copy=cloneItem(Object.assign({},item,{id:uid(),item:item.item+' copy',status:'pending',signedAt:'',exception:'',notes:item.notes?item.notes+' Copy.':'Copy.'}));state.items.splice(index+1,0,copy);state.selectedId=copy.id;saveState();render();showHint('Sign off item duplicated. Confirm approver and status.','success');focusSelectedRow();}
+  function deleteSelected(){var item=selectedItem();var index;if(!item) return showHint('Pick a sign off item first.','error');if(!window.confirm('Delete selected sign off item?')) return;index=state.items.findIndex(function(row){return row.id===item.id;});state.items.splice(index,1);state.selectedId=state.items[Math.min(index,state.items.length-1)]?state.items[Math.min(index,state.items.length-1)].id:'';saveState();render();showHint('Sign off item deleted.','success');}
+  function moveSelected(dir){var item=selectedItem();var index;var nextIndex;if(!item) return showHint('Pick a sign off item first.','error');index=state.items.findIndex(function(row){return row.id===item.id;});nextIndex=index+dir;if(nextIndex<0||nextIndex>=state.items.length) return;state.items.splice(index,1);state.items.splice(nextIndex,0,item);saveState();render();showHint(dir<0?'Sign off item moved up.':'Sign off item moved down.','success');focusSelectedRow();}
+  function setSelectedStatus(status){var item=selectedItem();if(!item) return showHint('Pick a sign off item first.','error');item.status=status;if((status==='signed'||status==='waived')&&!item.signedAt) item.signedAt=nowTime();if(status==='signed'||status==='waived') item.exception='';if((status==='exception'||status==='rejected')&&!item.exception) item.exception='Needs client review.';saveState();render();showHint(status==='exception'||status==='rejected'?'Sign off item needs attention.':'Sign off item updated.',status==='exception'||status==='rejected'?'error':'success');}
+  function loadSample(){if(state.items.length&&!window.confirm('Replace current client sign off log with sample entries?')) return;state=normalizeState({meta:state.meta,items:sampleItems,selectedId:'',filters:{search:'',area:'all',status:'all'}});if(state.items[0]) state.selectedId=state.items[0].id;saveState();render();showHint('Sample client sign off log loaded.','success');}
+  function buildSummary(){var lines=['CLIENT SIGN OFF',state.meta.showName,'Client: '+state.meta.client,'Venue: '+state.meta.venue,'Signed: '+$('signedOut').textContent,'Pending: '+$('pendingOut').textContent,'Exceptions: '+$('exceptionOut').textContent,'Follow up: '+$('followOut').textContent,''];state.items.forEach(function(item,index){lines.push((index+1)+'. '+titleCase(item.area)+' | '+item.status+' | '+item.item+' | approver '+item.approver+' | owner '+item.owner+' | signed '+(item.signedAt||'none')+(item.exception?' | exception '+item.exception:'')+(item.notes?' | notes '+item.notes:''));});return lines.join('\n');}
+  function copySummary(){copyText(buildSummary()).then(function(){showHint('Client sign off summary copied.','success');signal($('copySummaryBtn'),'success');}).catch(function(){showHint('Could not copy summary.','error');signal($('copySummaryBtn'),'error');});}
+  function exportJson(){var payload={schema:SCHEMA,exportedAt:new Date().toISOString(),meta:state.meta,items:state.items};downloadFile(fileStem()+'.client-signoff.json',JSON.stringify(payload,null,2),'application/json;charset=utf-8');showHint('JSON exported.','success');}
+  function exportCsv(){var fields=['area','item','approver','due','status','signedAt','exception','owner','notes'];var csv=[fields.join(',')].concat(state.items.map(function(item){return fields.map(function(field){return csvCell(item[field]);}).join(',');})).join('\n');downloadFile(fileStem()+'.client-signoff.csv',csv,'text/csv;charset=utf-8');showHint('CSV exported.','success');}
+  function importJsonFile(file){var reader=new FileReader();reader.onload=function(){try{var parsed=JSON.parse(String(reader.result||''));if(!parsed||typeof parsed!=='object'||!Array.isArray(parsed.items)) throw new Error('Invalid payload');state=normalizeState({meta:parsed.meta||state.meta,items:parsed.items,selectedId:'',filters:{search:'',area:'all',status:'all'}});if(state.items[0]) state.selectedId=state.items[0].id;saveState();render();showHint('Client sign off JSON imported.','success');signal($('importJsonBtn'),'success');}catch(e){showHint('Could not import that JSON file.','error');signal($('importJsonBtn'),'error');}};reader.onerror=function(){showHint('Could not read that JSON file.','error');signal($('importJsonBtn'),'error');};reader.readAsText(file);}
+  function syncMeta(){state.meta.showName=inputs.showName.value;state.meta.client=inputs.client.value;state.meta.venue=inputs.venue.value;state.meta.room=inputs.room.value;state.meta.showDate=inputs.showDate.value;state.meta.showLead=inputs.showLead.value;state.meta.clientLead=inputs.clientLead.value;state.meta.closeoutTime=inputs.closeoutTime.value;state.meta.reportRef=inputs.reportRef.value;saveState();}
+  function bindEvents(){Object.keys(inputs).forEach(function(key){if(['showName','client','venue','room','showDate','showLead','clientLead','closeoutTime','reportRef'].indexOf(key)>=0) inputs[key].addEventListener('input',syncMeta);});inputs.search.addEventListener('input',function(){state.filters.search=inputs.search.value;saveState();renderRows();updateInspector();});inputs.area.addEventListener('change',function(){state.filters.area=inputs.area.value;saveState();renderRows();updateInspector();});inputs.status.addEventListener('change',function(){state.filters.status=inputs.status.value;saveState();renderRows();updateInspector();});$('itemBody').addEventListener('focusin',function(event){var row=event.target.closest('tr[data-id]');if(row) selectItem(row.getAttribute('data-id'));});$('itemBody').addEventListener('click',function(event){var row=event.target.closest('tr[data-id]');if(row) selectItem(row.getAttribute('data-id'));});$('itemBody').addEventListener('input',function(event){var target=event.target;var row=target.closest('tr[data-id]');var field=target.getAttribute('data-field');if(row&&field) updateItem(row.getAttribute('data-id'),field,target.value,false);});$('itemBody').addEventListener('change',function(event){var target=event.target;var row=target.closest('tr[data-id]');var field=target.getAttribute('data-field');if(row&&field) updateItem(row.getAttribute('data-id'),field,target.value,true);});inputs.selectedStatus.addEventListener('change',function(){setSelectedStatus(inputs.selectedStatus.value);});inputs.selectedException.addEventListener('input',function(){var item=selectedItem();if(!item) return;item.exception=inputs.selectedException.value;if(item.exception.trim()) item.status='exception';saveState();renderRows();updateStats();updateInspector();});inputs.selectedNotes.addEventListener('input',function(){var item=selectedItem();if(!item) return;item.notes=inputs.selectedNotes.value;saveState();renderRows();});$('addItemBtn').addEventListener('click',function(){addItem(state.selectedId);signal(this,'success');});$('loadSampleBtn').addEventListener('click',function(){loadSample();signal(this,'success');});$('markReadyBtn').addEventListener('click',function(){setSelectedStatus('ready');signal(this,'success');});$('markSignedBtn').addEventListener('click',function(){setSelectedStatus('signed');signal(this,'success');});$('markExceptionBtn').addEventListener('click',function(){setSelectedStatus('exception');signal(this,'error');});$('markFollowBtn').addEventListener('click',function(){setSelectedStatus('follow-up');signal(this,'success');});$('markWaivedBtn').addEventListener('click',function(){setSelectedStatus('waived');signal(this,'success');});$('markRejectedBtn').addEventListener('click',function(){setSelectedStatus('rejected');signal(this,'error');});$('moveUpBtn').addEventListener('click',function(){moveSelected(-1);signal(this,'success');});$('moveDownBtn').addEventListener('click',function(){moveSelected(1);signal(this,'success');});$('duplicateBtn').addEventListener('click',function(){duplicateSelected();signal(this,'success');});$('deleteBtn').addEventListener('click',function(){deleteSelected();signal(this,'success');});$('printBtn').addEventListener('click',function(){window.print();signal(this,'success');});$('copySummaryBtn').addEventListener('click',copySummary);$('exportJsonBtn').addEventListener('click',function(){exportJson();signal(this,'success');});$('exportCsvBtn').addEventListener('click',function(){exportCsv();signal(this,'success');});$('importJsonBtn').addEventListener('click',function(){$('importInput').click();});$('importInput').addEventListener('change',function(){var file=$('importInput').files&&$('importInput').files[0];if(file) importJsonFile(file);$('importInput').value='';});document.addEventListener('keydown',function(event){if(isTyping()) return;if(event.key==='n'||event.key==='N'){event.preventDefault();addItem(state.selectedId);}if(event.key==='r'||event.key==='R'){event.preventDefault();setSelectedStatus('ready');}if(event.key==='s'||event.key==='S'){event.preventDefault();setSelectedStatus('signed');}if(event.key==='e'||event.key==='E'){event.preventDefault();setSelectedStatus('exception');}if(event.key==='f'||event.key==='F'){event.preventDefault();setSelectedStatus('follow-up');}if(event.key==='w'||event.key==='W'){event.preventDefault();setSelectedStatus('waived');}if(event.key==='x'||event.key==='X'){event.preventDefault();setSelectedStatus('rejected');}if(event.key==='d'||event.key==='D'){event.preventDefault();duplicateSelected();}if(event.key==='Delete'){event.preventDefault();deleteSelected();}});installPressFeedback();}
+  function installPressFeedback(){document.querySelectorAll('button').forEach(function(button){function press(){if(!button.disabled) button.classList.add('is-pressing');}function release(){button.classList.remove('is-pressing');}button.addEventListener('pointerdown',press);button.addEventListener('pointerup',release);button.addEventListener('pointercancel',release);button.addEventListener('pointerleave',release);button.addEventListener('blur',release);button.addEventListener('keydown',function(event){if(event.key===' '||event.key==='Enter') press();});button.addEventListener('keyup',function(event){if(event.key===' '||event.key==='Enter') release();});});}
+  function showHint(message,kind){var hint=$('hint');hint.textContent=message;hint.classList.remove('success','error');if(kind) hint.classList.add(kind);}
+  function signal(element,kind){if(!element) return;var className=kind==='error'?'feedback-error':'feedback-success';element.classList.remove(className);void element.offsetWidth;element.classList.add(className);setTimeout(function(){element.classList.remove(className);},190);}
+  function nowTime(){return new Date().toTimeString().slice(0,5);}
+  function focusSelectedRow(){var row=document.querySelector('tr[data-id="'+cssEscape(state.selectedId)+'"]');var input=row&&row.querySelector('input,select,textarea');if(input) input.focus({preventScroll:true});}
+  function isTyping(){var tag=document.activeElement&&document.activeElement.tagName;return tag==='INPUT'||tag==='TEXTAREA'||tag==='SELECT';}
+  function normalizeShort(value){return String(value||'').trim().replace(/\s+/g,' ').slice(0,160);}
+  function titleCase(value){return String(value||'').replace(/-/g,' ').replace(/\b\w/g,function(letter){return letter.toUpperCase();});}
+  function fileStem(){return (state.meta.showName||'client-signoff').toLowerCase().replace(/['"]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,60)||'client-signoff';}
+  function csvCell(value){value=String(value==null?'':value);if(/[",\n]/.test(value)) return '"'+value.replace(/"/g,'""')+'"';return value;}
+  function downloadFile(filename,content,type){var blob=new Blob([content],{type:type});var url=URL.createObjectURL(blob);var link=document.createElement('a');link.href=url;link.download=filename;link.style.display='none';document.body.appendChild(link);link.click();setTimeout(function(){URL.revokeObjectURL(url);if(link.parentNode) link.parentNode.removeChild(link);},0);}
+  function copyText(text){if(navigator.clipboard&&navigator.clipboard.writeText) return navigator.clipboard.writeText(text);return new Promise(function(resolve,reject){var area=document.createElement('textarea');area.value=text;area.setAttribute('readonly','');area.style.position='fixed';area.style.left='-9999px';document.body.appendChild(area);area.select();try{document.execCommand('copy')?resolve():reject(new Error('copy failed'));}catch(e){reject(e);}finally{if(area.parentNode) area.parentNode.removeChild(area);}});}
+  function escapeHtml(value){return String(value==null?'':value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+  function escapeAttr(value){return escapeHtml(value);}
+  function cssEscape(value){if(window.CSS&&CSS.escape) return CSS.escape(value);return String(value).replace(/"/g,'\\"');}
+  loadState();
+  render();
+  bindEvents();
+})();
+</script>
+</body>
+</html>
