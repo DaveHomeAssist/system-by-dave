@@ -97,6 +97,7 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
   phase recommendations, search, phase and department filters, cross tool
   readiness tracking, readiness notes, operator review queue, issue and note
   focused views, pinned tools, recent tools, saved tool data badges and scan,
+  current phase gate list with Copy Phase Gate,
   show context handoff links, phase handoff copy with a summary table decision
   matrix and numbered actions, Quick Switcher command palette, return context
   hydration, copyable launch lists, saved browser preferences, tactile button

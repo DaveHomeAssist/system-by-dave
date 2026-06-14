@@ -2,6 +2,7 @@
 
 ## 2026-06-14
 
+* Added an AV Suite phase gate: `/av-suite.html` now shows the current phase's recommended tools with readiness, notes, saved data counts, and open actions, adds Copy Phase Gate, exposes the action in Quick Switcher, and bumps the AV Suite offline cache version.
 * Added `/teleprompter.html` reset view recovery: the `0` shortcut pauses motion, exits fullscreen, closes overlays, shows controls, returns advanced controls to compact mode, restarts at the top, and keeps script and formatting data intact.
 * Renamed the `/teleprompter.html` visible hide controls actions to Max script so the space saving mode is obvious in the header, toolbar, and editor header while keeping the `H` shortcut and Show controls restore action.
 * Hardened CueForge and PlotForge AV Suite route aliases: `/cueforge.html` and `/plotforge.html` now use context aware fallback links, load the shared AV Suite context helper, avoid context dropping meta refreshes, and refresh the AV Suite offline cache version.
