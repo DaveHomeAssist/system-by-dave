@@ -40,6 +40,7 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
 - `cable-plan.html` — AV cable plan
 - `rf-coordination.html`: AV RF coordination sheet
 - `gear-prep.html`: AV gear prep checklist
+- `load-in-plan.html`: AV load in plan
 - `strike-plan.html`: AV strike plan
 - `show-advance.html`: AV show advance tracker
 - `crew-call.html`: AV crew call sheet
@@ -74,8 +75,8 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
   reusable saved looks, saved script tags, pinned saved scripts, saved sort,
   saved copy, text only saved script loading, script templates, show package,
   remote, rundown controls, a visible toolbar Hide controls action, compact
-  Hide and Show labels, and a remembered controls mode that clears the header, toolbar, and footer while
-  leaving a small Show controls restore button.
+  Hide and Show labels, and a remembered controls mode that clears the header,
+  toolbar, and footer while leaving a small Show controls restore button.
 - `cue-sheet.html` is rolled into the AV suite as CueForge, with
   `cueforge.html` as a route alias.
 - `stage-plot.html` is rolled into the AV suite as PlotForge, with
@@ -140,6 +141,9 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
   locations, owners, test status, pack status, load status, issues, open
   items, copyable summaries, print output, JSON import and export, and CSV
   export.
+- `load-in-plan.html` tracks trucks, docks, room destinations, departments,
+  load in items, owners, due times, build status, blockers, gap warnings,
+  copyable summaries, print output, JSON import and export, and CSV export.
 - `strike-plan.html` tracks departments, strike items, locations, owners,
   case IDs, destinations, load out status, missing gear, issue status,
   copyable summaries, print output, JSON import and export, and CSV export.
@@ -167,7 +171,7 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
   `network-plan.html`,
   `cable-plan.html`,
   `rf-coordination.html`,
-  `gear-prep.html`, `strike-plan.html`, `show-advance.html`, `crew-call.html`,
+  `gear-prep.html`, `load-in-plan.html`, `strike-plan.html`, `show-advance.html`, `crew-call.html`,
   `signal-flow.html`,
   `input-list.html`, `stage-plot.html`, `plotforge.html`, `show-handoff.html`,
   `camera-shot-list.html`, `comms-check.html`, and `av-calculator.html`.
