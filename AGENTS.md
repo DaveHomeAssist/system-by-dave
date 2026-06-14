@@ -15,8 +15,8 @@ Read `CLAUDE.md` first for project orientation. This file is the rulebook.
 
 - Every user-facing page (`index`, `agents`, `skills`, `widgets`,
   `teleprompter`, `show-timer`, `cue-sheet`, `input-list`,
-  `playback-check`, `stage-plot`, `show-handoff`, `camera-shot-list`,
-  `comms-check`, `av-calculator`, `resume`, `wedding-ops`,
+  `playback-check`, `signal-flow`, `stage-plot`, `show-handoff`,
+  `camera-shot-list`, `comms-check`, `av-calculator`, `resume`, `wedding-ops`,
   `privacy-policy`, `404`, `500`) must have:
   - A full `<head>` with `<title>`, `<meta name="description">`, canonical
     link, and theme color.
