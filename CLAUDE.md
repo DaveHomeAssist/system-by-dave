@@ -28,6 +28,7 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
 - `record-log.html` — AV record log
 - `power-plan.html` — AV power plan
 - `audio-patch.html` — AV audio patch sheet
+- `speaker-plan.html` — AV speaker deployment plan
 - `lighting-patch.html` — AV lighting patch sheet
 - `display-plan.html` — AV display plan
 - `network-plan.html` — AV network plan
@@ -84,6 +85,10 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
   labels, stageboxes, inputs, phantom power, gain, destinations, monitor sends,
   line check status, patch gap warnings, copyable summaries, print output, JSON
   import and export, and CSV export.
+- `speaker-plan.html` tracks speaker zones, loudspeakers, speaker types,
+  processor outputs, amps, cable paths, trim, delay, coverage status, backup
+  routes, issue status, copyable summaries, print output, JSON import and
+  export, and CSV export.
 - `lighting-patch.html` tracks fixtures, positions, modes, universes,
   addresses, channels, dimmers, colors, focus notes, patch status, duplicate
   address warnings, copyable summaries, print output, JSON import and export,
@@ -116,7 +121,8 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
   JSON import and export, and CSV export.
 - AV tools now include `teleprompter.html`, `show-timer.html`,
   `cue-sheet.html`, `cueforge.html`, `playback-check.html`, `record-log.html`,
-  `power-plan.html`, `audio-patch.html`, `lighting-patch.html`,
+  `power-plan.html`, `audio-patch.html`, `speaker-plan.html`,
+  `lighting-patch.html`,
   `display-plan.html`,
   `network-plan.html`,
   `rf-coordination.html`,
