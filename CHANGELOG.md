@@ -2,6 +2,7 @@
 
 ## 2026-06-14
 
+* Added AV Suite saved tool data scan: `/av-suite.html` now shows saved data badges from known AV tool storage, adds a Saved data only view, scans saved tool content for issue language, marks saved tools ready when clear, marks issue language for review, and keeps existing Issue or Skipped exceptions.
 * Added AV Suite show package backup: `/av-suite.html` can now export one JSON package containing the suite profile plus known saved AV tool data from this browser, then import that package on another browser session with an allow listed storage restore for the current AV tools.
 * Added AV Suite readiness notes: `/av-suite.html` tool cards now include saved per tool blocker or handoff notes, a Notes only view, sidebar issue and note surfacing, suite JSON import and export support, search by note text, and copied launch lists that include those notes.
 * Added contextual AV Suite return navigation: AV tool pages opened with suite context now show a compact AV Suite return link that preserves show name, venue, date, operator, and phase. `/av-suite.html` now accepts those same return parameters and updates the saved suite profile when operators come back from a tool.
@@ -83,7 +84,7 @@
 ## 2026-06-11
 
 * Added a public-safe **Project Registry** at `/project-registry.html` with searchable/filterable metadata for 52 public DaveHomeAssist repositories. Private repos, local filesystem paths, dirty worktree counts, and internal triage notes remain excluded from the published data set. Added the page to the homepage Resources footer and `sitemap.xml`.
-* Launched a public **Prompt Library** browser at `/prompts/` — a self-contained, zero-dependency page (vanilla JS) with 228 curated, copy-ready prompts: instant search, faceted filters (collection/area/pack/format/platform), and one-click copy. Public-safe subset (internal/operational prompts, Notion IDs, and flagged drafts excluded). Added to `sitemap.xml`.
+* Launched a public **Prompt Library** browser at `/prompts/`: a self-contained, zero-dependency page (vanilla JS) with 228 curated, copy-ready prompts: instant search, faceted filters (collection/area/pack/format/platform), and one-click copy. Public-safe subset (internal/operational prompts, Notion IDs, and flagged drafts excluded). Added to `sitemap.xml`.
 * Upgraded `/prompts/` with five features (smoke-tested headless, zero console errors): `{{variable}}` fill-in with live preview + remembered values, relevance-ranked search with match highlighting, per-prompt permalinks (`#p=id`) + shareable view-links, `j`/`k` result navigation plus a ⌘/Ctrl-K command palette, and full keyboard/ARIA accessibility (live regions, focus-visible rings, reduced-motion). Plus per-group counts in the facet dropdowns.
 * Linked `/prompts/` (nav + Products footer) and `/profile/` (Connect footer) from the homepage so both routes are reachable, not just listed in `sitemap.xml`.
 
@@ -93,7 +94,7 @@
 
 ## 2026-06-10
 
-- Added a private, unlisted sub-page at `/flooring-contract-review.html` — a plain-English review of the Robertson family flooring contract (12 priority-ranked issues, annotated full-contract view, ready-to-send email). Self-contained page (own inline styles/JS, system fonts).
+- Added a private, unlisted sub-page at `/flooring-contract-review.html`: a plain-English review of the Robertson family flooring contract (12 priority-ranked issues, annotated full-contract view, ready-to-send email). Self-contained page (own inline styles/JS, system fonts).
 - Marked the page `noindex, nofollow` and added a `robots.txt` Disallow; kept it out of `sitemap.xml` and the site nav, since it contains personal details and is meant to be shared by link only.
 - Content update on `/flooring-contract-review.html` after new info: the selected floor is now identified (EF Legendary / Dreamweaver, color 6005 Orthodox, 5.2 mm / 20 mil SPC). Reframed Issue 2 (and annotated comment #2) from "product missing" to "identified, but reconcile the spec" and flagged the contract's 22 mil vs the product's 20 mil. Added a "Selected floor" header tile, a manufacturer-warranty note to Issue 4, a "Second opinion / alternate bid" card (Getz estimate Fri Jun 12), and a material-vs-labor split (≈$2.59 material / ≈$3.85 labor of the $6.44/sq ft) to the pricing section. Edits made in both views; toggle/filter/copy and print/mobile styles unchanged.
 

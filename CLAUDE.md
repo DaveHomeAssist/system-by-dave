@@ -1,16 +1,16 @@
-# CLAUDE.md — System by Dave
+# CLAUDE.md: System by Dave
 
 Orientation for Claude Code sessions working in this repo.
 
 ## Project
-**System by Dave** — personal system and workflow documentation site showcasing
+**System by Dave**: personal system and workflow documentation site showcasing
 Notion skills, agents, widgets, and templates built by Dave Robertson.
 
 - **Domain:** [systembydave.com](https://systembydave.com)
 - **Host:** GitHub Pages with custom domain (`CNAME` = `systembydave.com`)
 
 ## Stack
-- Static HTML — **no build step**, files are served directly.
+- Static HTML: **no build step**, files are served directly.
 - Shared styles in `css/style.css`.
 - Each page may have an inline `<style>` block for page-specific overrides.
 - Shared browser helpers may live in `js/` when multiple static AV pages need
@@ -18,30 +18,30 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
 - Vanilla JS only (no frameworks, no bundlers).
 
 ## Pages
-- `index.html` — home
-- `agents.html` — agents catalog (cards are deep-linked)
-- `skills.html` — skills catalog
-- `widgets.html` — widget previews (poster cards, not live iframes)
-- `av-suite.html` — AV suite launch hub
-- `teleprompter.html` — AV teleprompter
-- `show-timer.html` — AV show timer
-- `cue-sheet.html` — CueForge cue sheet and run of show control
-- `cueforge.html` — CueForge route alias
-- `playback-check.html` — AV playback checklist
-- `stream-plan.html` — AV stream plan
-- `record-log.html` — AV record log
-- `power-plan.html` — AV power plan
-- `audio-patch.html` — AV audio patch sheet
+- `index.html`: home
+- `agents.html`: agents catalog (cards are deep-linked)
+- `skills.html`: skills catalog
+- `widgets.html`: widget previews (poster cards, not live iframes)
+- `av-suite.html`: AV suite launch hub
+- `teleprompter.html`: AV teleprompter
+- `show-timer.html`: AV show timer
+- `cue-sheet.html`: CueForge cue sheet and run of show control
+- `cueforge.html`: CueForge route alias
+- `playback-check.html`: AV playback checklist
+- `stream-plan.html`: AV stream plan
+- `record-log.html`: AV record log
+- `power-plan.html`: AV power plan
+- `audio-patch.html`: AV audio patch sheet
 - `line-check.html`: AV line check tracker
 - `room-check.html`: AV room readiness check
 - `breakout-room-matrix.html`: AV breakout room matrix
-- `speaker-plan.html` — AV speaker deployment plan
-- `lighting-patch.html` — AV lighting patch sheet
-- `display-plan.html` — AV display plan
-- `projection-plan.html` — AV projection plan
-- `video-patch.html` — AV video patch sheet
-- `network-plan.html` — AV network plan
-- `cable-plan.html` — AV cable plan
+- `speaker-plan.html`: AV speaker deployment plan
+- `lighting-patch.html`: AV lighting patch sheet
+- `display-plan.html`: AV display plan
+- `projection-plan.html`: AV projection plan
+- `video-patch.html`: AV video patch sheet
+- `network-plan.html`: AV network plan
+- `cable-plan.html`: AV cable plan
 - `rf-coordination.html`: AV RF coordination sheet
 - `site-survey.html`: AV site survey
 - `gear-prep.html`: AV gear prep checklist
@@ -51,28 +51,28 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
 - `show-advance.html`: AV show advance tracker
 - `crew-call.html`: AV crew call sheet
 - `crew-time-log.html`: AV crew time log
-- `signal-flow.html` — AV signal flow planner
-- `input-list.html` — AV input list and patch sheet
-- `stage-plot.html` — PlotForge stage plot
-- `plotforge.html` — PlotForge route alias
-- `show-handoff.html` — AV show handoff builder
+- `signal-flow.html`: AV signal flow planner
+- `input-list.html`: AV input list and patch sheet
+- `stage-plot.html`: PlotForge stage plot
+- `plotforge.html`: PlotForge route alias
+- `show-handoff.html`: AV show handoff builder
 - `show-report.html`: AV show report
 - `show-task-board.html`: AV show task board
 - `change-order.html`: AV change order log
 - `client-signoff.html`: AV client sign off tracker
-- `camera-shot-list.html` — AV camera shot list
-- `comms-check.html` — AV comms check
-- `av-calculator.html` — AV calculator
-- `resume/index.html` — public resume page
-- `wedding-ops.html` — wedding ops case study
+- `camera-shot-list.html`: AV camera shot list
+- `comms-check.html`: AV comms check
+- `av-calculator.html`: AV calculator
+- `resume/index.html`: public resume page
+- `wedding-ops.html`: wedding ops case study
 - `privacy-policy.html`
-- `404.html`, `500.html` — error pages (with OG/Twitter meta)
-- `html/sbd-brand.html` — internal brand/design reference
+- `404.html`, `500.html`: error pages (with OG/Twitter meta)
+- `html/sbd-brand.html`: internal brand/design reference
 
 ## Deploy
 - GitHub Pages from the default branch.
 - `CNAME` pins the custom domain.
-- `sitemap.xml` and `robots.txt` are hand-maintained — bump `lastmod` on content changes.
+- `sitemap.xml` and `robots.txt` are hand-maintained: bump `lastmod` on content changes.
 
 ## Recent work
 - Removed dead subscribe CTA from homepage.
@@ -93,10 +93,10 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
 - `av-suite.html` is the AV suite launch hub with show profile fields,
   phase recommendations, search, phase and department filters, cross tool
   readiness tracking, readiness notes, issue and note focused views, pinned
-  tools, recent tools, show context handoff links, return context hydration,
-  copyable launch lists, saved browser preferences, tactile button feedback,
-  suite JSON import and export, show package backup for known AV tool storage,
-  and mobile layout containment.
+  tools, recent tools, saved tool data badges and scan, show context handoff
+  links, return context hydration, copyable launch lists, saved browser
+  preferences, tactile button feedback, suite JSON import and export, show
+  package backup for known AV tool storage, and mobile layout containment.
 - `js/av-suite-context.js` is the shared AV tool context helper. It reads
   `sbdShow`, `sbdVenue`, `sbdDate`, and `sbdOperator` URL parameters and
   fills matching show metadata fields on AV tool pages that include it. When
