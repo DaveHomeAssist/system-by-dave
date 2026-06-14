@@ -293,6 +293,7 @@
   function defaultState(){return {showName:'AV Tool Suite',venue:'',showDate:new Date().toISOString().slice(0,10),operator:'',phase:'show',favorites:['teleprompter','show-timer','cueforge'],recent:[],readiness:{},filters:{search:'',phase:'all',dept:'all',pin:'all'}};}
   function storageAvailable(){try{var key='av-suite-probe';localStorage.setItem(key,key);localStorage.removeItem(key);return true;}catch(e){return false;}}
   function loadState(){if(!storageAvailable()) return;try{var raw=localStorage.getItem(STORAGE_KEY);if(!raw) return;var parsed=JSON.parse(raw);applySuitePayload(parsed);}catch(e){}}
+  function applyUrlContext(){var params=new URLSearchParams(window.location.search);var changed=false;function cleanParam(name,limit){return String(params.get(name)||'').replace(/\s+/g,' ').trim().slice(0,limit);}function assign(key,name,limit){var value=cleanParam(name,limit);if(value&&state[key]!==value){state[key]=value;changed=true;}}assign('showName','sbdShow',120);assign('venue','sbdVenue',120);assign('showDate','sbdDate',20);assign('operator','sbdOperator',80);var phase=cleanParam('sbdPhase',30);if(phase&&phaseExists(phase)&&phase!=='all'&&state.phase!==phase){state.phase=phase;state.filters.phase=phase;changed=true;}if(changed) saveState();}
   function suitePayload(){return {schema:'system-by-dave.av-suite.v1',savedAt:new Date().toISOString(),showName:state.showName,venue:state.venue,showDate:state.showDate,operator:state.operator,phase:state.phase,favorites:state.favorites,recent:state.recent,readiness:state.readiness,filters:state.filters};}
   function saveState(){if(!storageAvailable()) return false;try{localStorage.setItem(STORAGE_KEY,JSON.stringify(suitePayload()));return true;}catch(e){showHint('Suite preferences could not be saved in this browser.','error');return false;}}
   function applySuitePayload(parsed){if(!parsed||typeof parsed!=='object') throw new Error('Invalid payload');state.showName=String(parsed.showName||state.showName).slice(0,120);state.venue=String(parsed.venue||'').slice(0,120);state.showDate=String(parsed.showDate||state.showDate).slice(0,20);state.operator=String(parsed.operator||'').slice(0,80);state.phase=phaseExists(parsed.phase)?parsed.phase:state.phase;state.favorites=cleanIds(parsed.favorites).slice(0,60);state.recent=cleanIds(parsed.recent).slice(0,12);state.readiness=cleanReadiness(parsed.readiness);state.filters=cleanFilters(parsed.filters);}
@@ -345,6 +346,7 @@
   function escapeHtml(value){return String(value==null?'':value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
   function escapeAttr(value){return escapeHtml(value);}
   loadState();
+  applyUrlContext();
   render();
   inputs.showName.addEventListener('input',syncProfile);
   inputs.venue.addEventListener('input',syncProfile);

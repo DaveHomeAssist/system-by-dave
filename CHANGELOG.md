@@ -2,6 +2,7 @@
 
 ## 2026-06-14
 
+* Added contextual AV Suite return navigation: AV tool pages opened with suite context now show a compact AV Suite return link that preserves show name, venue, date, operator, and phase. `/av-suite.html` now accepts those same return parameters and updates the saved suite profile when operators come back from a tool.
 * Added AV Suite show context handoff: `/av-suite.html` now appends show name, venue, date, operator, and phase to tool links, launch list links, and copied tool links. Added `js/av-suite-context.js` so AV tool pages with matching metadata fields prefill from those links, and updated CueForge and PlotForge route aliases to preserve query strings during redirects.
 * Added cross tool readiness tracking to `/av-suite.html` with per tool Pending Ready Issue Skipped states, readiness counts, issue focused views, sidebar readiness actions, launch list readiness summaries, and suite JSON import and export support.
 * Expanded `/av-suite.html` with suite JSON import and export so show profile fields, current phase, pinned tools, recent tools, and filters can be moved between browser sessions or machines. Added visible Export Suite JSON and Import Suite JSON controls with success and error feedback.

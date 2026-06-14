@@ -93,12 +93,14 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
 - `av-suite.html` is the AV suite launch hub with show profile fields,
   phase recommendations, search, phase and department filters, cross tool
   readiness tracking, issue focused views, pinned tools, recent tools,
-  show context handoff links, copyable launch lists, saved browser
-  preferences, tactile button feedback, suite JSON import and export, and
-  mobile layout containment.
+  show context handoff links, return context hydration, copyable launch
+  lists, saved browser preferences, tactile button feedback, suite JSON
+  import and export, and mobile layout containment.
 - `js/av-suite-context.js` is the shared AV tool context helper. It reads
   `sbdShow`, `sbdVenue`, `sbdDate`, and `sbdOperator` URL parameters and
-  fills matching show metadata fields on AV tool pages that include it.
+  fills matching show metadata fields on AV tool pages that include it. When
+  context is present it also adds a compact AV Suite return link carrying the
+  same show profile values.
 - `cue-sheet.html` is rolled into the AV suite as CueForge, with
   `cueforge.html` as a route alias.
 - `stage-plot.html` is rolled into the AV suite as PlotForge, with
