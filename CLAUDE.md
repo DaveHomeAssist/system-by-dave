@@ -30,6 +30,7 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
 - `power-plan.html` — AV power plan
 - `audio-patch.html` — AV audio patch sheet
 - `line-check.html`: AV line check tracker
+- `room-check.html`: AV room readiness check
 - `speaker-plan.html` — AV speaker deployment plan
 - `lighting-patch.html` — AV lighting patch sheet
 - `display-plan.html` — AV display plan
@@ -99,6 +100,9 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
   assignments, console labels, patch inputs, destinations, talkback checks,
   status, problems, check gap warnings, copyable summaries, print output, JSON
   import and export, and CSV export.
+- `room-check.html` tracks show rooms, room checks, owners, due times,
+  priorities, room readiness status, blockers, readiness gap warnings,
+  copyable summaries, print output, JSON import and export, and CSV export.
 - `speaker-plan.html` tracks speaker zones, loudspeakers, speaker types,
   processor outputs, amps, cable paths, trim, delay, coverage status, backup
   routes, issue status, copyable summaries, print output, JSON import and
@@ -145,6 +149,7 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
   `cue-sheet.html`, `cueforge.html`, `playback-check.html`,
   `stream-plan.html`, `record-log.html`, `power-plan.html`, `audio-patch.html`,
   `line-check.html`,
+  `room-check.html`,
   `speaker-plan.html`,
   `lighting-patch.html`,
   `display-plan.html`,

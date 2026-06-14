@@ -17,6 +17,7 @@ Read `CLAUDE.md` first for project orientation. This file is the rulebook.
   `teleprompter`, `show-timer`, `cue-sheet`, `cueforge`, `input-list`,
   `playback-check`, `stream-plan`, `record-log`, `power-plan`, `audio-patch`,
   `line-check`,
+  `room-check`,
   `speaker-plan`,
   `lighting-patch`,
   `display-plan`, `projection-plan`, `video-patch`,
