@@ -1098,7 +1098,7 @@
       <span>Teleprompter<small>Browser tool · no install</small></span>
     </span>
     <span class="spacer"></span>
-    <button id="controlsToggleBtn" class="ghost controls-toggle-inline" type="button" aria-controls="toolbar" aria-expanded="true" aria-pressed="false" aria-label="Hide controls and maximize script" title="Hide controls and maximize script (H)">Max script</button>
+    <button id="controlsToggleBtn" class="ghost controls-toggle-inline" type="button" aria-controls="toolbar" aria-expanded="true" aria-pressed="false" aria-label="Hide controls and maximize script" title="Hide controls and maximize script (H)">Hide controls</button>
     <button id="remoteBtn" class="ghost" type="button" title="Open remote control window">Remote</button>
     <button id="editBtn" class="ghost" type="button" title="Switch between editing and reading">Edit script</button>
     <button id="helpBtn" class="ghost" type="button" aria-haspopup="dialog" title="Keyboard shortcuts">⌨ Shortcuts</button>
@@ -1114,7 +1114,7 @@
     <div class="group">
       <button id="playBtn" class="primary" type="button" aria-pressed="false">▶ Play</button>
       <button id="cueBtn" type="button" title="3 second cue then play (C)" aria-label="Cue then play">Cue + Play</button>
-      <button id="controlsInlineToggleBtn" class="controls-toggle-inline" type="button" aria-controls="toolbar" aria-expanded="true" aria-pressed="false" aria-label="Hide controls and maximize script" title="Hide controls and maximize script (H)">Max script</button>
+      <button id="controlsInlineToggleBtn" class="controls-toggle-inline" type="button" aria-controls="toolbar" aria-expanded="true" aria-pressed="false" aria-label="Hide controls and maximize script" title="Hide controls and maximize script (H)">Hide controls</button>
       <button id="toolbarCompactBtn" class="toolbar-compact-toggle" type="button" aria-controls="toolbar" aria-expanded="false" aria-pressed="true" aria-label="Show advanced teleprompter controls" title="Show advanced teleprompter controls (A)">More controls</button>
       <button id="restartBtn" class="icon" type="button" title="Restart from top (R)" aria-label="Restart from top">⮌</button>
     </div>
@@ -1472,7 +1472,7 @@
         <span class="storage-status" id="storageStatus" hidden>Auto save off. Use Save or Load.</span>
         <span class="script-meta" id="scriptMeta">0 words · 00:00 run</span>
         <span class="spacer" style="flex:1"></span>
-        <button id="editorControlsToggleBtn" class="editor-controls-btn controls-toggle-inline" type="button" aria-controls="toolbar" aria-expanded="true" aria-pressed="false" aria-label="Hide controls and maximize script" title="Hide controls and maximize script (H)">Max script</button>
+        <button id="editorControlsToggleBtn" class="editor-controls-btn controls-toggle-inline" type="button" aria-controls="toolbar" aria-expanded="true" aria-pressed="false" aria-label="Hide controls and maximize script" title="Hide controls and maximize script (H)">Hide controls</button>
         <button id="doneBtn" class="primary" type="button">Done: start reading</button>
       </div>
       <textarea id="script" spellcheck="true" autocomplete="off"
@@ -2451,7 +2451,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     var compact = false;
     try{ compact = window.matchMedia('(max-width:520px)').matches; }catch(e){ compact = false; }
     if(compact) return collapsed ? 'Show' : 'Hide';
-    return collapsed ? 'Show controls' : 'Max script';
+    return collapsed ? 'Show controls' : 'Hide controls';
   }
 
   function refreshToolbarCompact(){
