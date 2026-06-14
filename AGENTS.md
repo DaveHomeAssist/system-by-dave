@@ -18,7 +18,7 @@ Read `CLAUDE.md` first for project orientation. This file is the rulebook.
   `playback-check`, `record-log`, `power-plan`, `audio-patch`,
   `speaker-plan`,
   `lighting-patch`,
-  `display-plan`,
+  `display-plan`, `video-patch`,
   `network-plan`, `rf-coordination`, `gear-prep`, `show-advance`,
   `crew-call`, `signal-flow`, `stage-plot`, `plotforge`, `show-handoff`,
   `camera-shot-list`, `comms-check`, `av-calculator`, `resume`,
