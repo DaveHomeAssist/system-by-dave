@@ -2,6 +2,7 @@
 
 ## 2026-06-14
 
+* Added `/teleprompter.html` compact toolbar mode: new loads start with core read controls only, operators can use More controls to reveal formatting, timing, marker, file, package, and saved script tools, and the choice is remembered in browser preferences.
 * Added AV Suite dock compact mode: suite launched tool pages can shrink the context dock to an AV Suite link, current tool status summary, and Expand control, with the preference remembered across tool pages. Bumped the AV Suite offline cache version so cached tools refresh the helper.
 * Replaced the AV Suite dock note browser prompt with an inline note editor: suite launched tool pages now open a compact dock input with Save, Clear, and Cancel actions, keyboard save and cancel support, current note preview, and the same `/av-suite.html` dashboard storage. Bumped the AV Suite offline cache version so cached tools refresh the helper.
 * Added AV Suite dock readiness notes: `js/av-suite-context.js` now lets suite launched tool pages add, edit, preview, or clear a current tool readiness note from the compact dock, saves the note into `/av-suite.html` dashboard storage with current show context, and bumps the AV Suite offline cache version so the updated helper refreshes cleanly.

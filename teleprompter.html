@@ -251,6 +251,27 @@
     border-color:var(--accent-strong);
     color:#cfe7ff;
   }
+  .toolbar-compact-toggle{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-width:118px;
+    white-space:nowrap;
+    border-color:#514b61;
+    background:rgba(255,212,138,.1);
+    color:#ffe7bf;
+    font-weight:700;
+  }
+  .toolbar-compact-toggle:hover{
+    border-color:#ffd48a;
+    background:rgba(255,212,138,.16);
+  }
+  .toolbar-compact-toggle[aria-pressed="true"]{
+    border-color:#ffd48a;
+    background:rgba(255,212,138,.18);
+    color:#fff3d1;
+  }
+  body.toolbar-compact .toolbar-advanced{display:none}
   button.cue-active{
     border-color:#ffd48a;
     color:#ffe7bf;
@@ -949,6 +970,7 @@
     .editor-head #saveHint{display:none}
     .editor-head .editor-controls-btn{min-width:76px}
     .controls-toggle-inline{min-width:76px}
+    .toolbar-compact-toggle{min-width:106px}
     .swatches{flex-wrap:nowrap}
     input.saved-filter{width:104px}
     select.saved-select{max-width:142px}
@@ -1039,6 +1061,11 @@
       padding:8px 10px;
       font-size:13px;
     }
+    .toolbar-compact-toggle{
+      min-width:92px;
+      padding:8px 10px;
+      font-size:13px;
+    }
     input.saved-filter{width:96px}
     select.saved-select{max-width:132px}
   }
@@ -1072,7 +1099,7 @@
   <button id="controlsWakeBtn" class="controls-wake" type="button" aria-controls="toolbar" aria-expanded="false" hidden title="Show controls (H)">Show controls</button>
 
   <div class="noscript-note">
-    JavaScript is off, so auto-scroll and controls are unavailable — but your script is fully readable below.
+    JavaScript is off, so auto-scroll and controls are unavailable, but your script is fully readable below.
   </div>
 
   <!-- Controls -->
@@ -1081,6 +1108,7 @@
       <button id="playBtn" class="primary" type="button" aria-pressed="false">▶ Play</button>
       <button id="cueBtn" type="button" title="3 second cue then play (C)" aria-label="Cue then play">Cue + Play</button>
       <button id="controlsInlineToggleBtn" class="controls-toggle-inline" type="button" aria-controls="toolbar" aria-expanded="true" aria-pressed="false" aria-label="Hide controls and maximize script" title="Hide controls and maximize script (H)">Hide controls</button>
+      <button id="toolbarCompactBtn" class="toolbar-compact-toggle" type="button" aria-controls="toolbar" aria-expanded="false" aria-pressed="true" aria-label="Show advanced teleprompter controls" title="Show advanced teleprompter controls">More controls</button>
       <button id="restartBtn" class="icon" type="button" title="Restart from top (R)" aria-label="Restart from top">⮌</button>
     </div>
 
@@ -1091,7 +1119,7 @@
       <button class="icon" type="button" data-act="speedUp" title="Faster (Arrow Up)" aria-label="Increase speed">+</button>
     </div>
 
-    <div class="group" aria-label="Target runtime">
+    <div class="group toolbar-advanced" aria-label="Target runtime">
       <span class="label">Run</span>
       <input id="targetTimeInput" class="time-input" type="text" inputmode="numeric" placeholder="02:00" title="Target runtime, for example 02:00" aria-label="Target runtime">
       <button id="fitTimeBtn" type="button" title="Set speed to target runtime">Fit</button>
@@ -1099,13 +1127,13 @@
       <button id="startNowBtn" type="button" title="Set show start to the current time">Now</button>
     </div>
 
-    <div class="group" aria-label="Manual scroll">
+    <div class="group toolbar-advanced" aria-label="Manual scroll">
       <span class="label">Step</span>
       <button class="icon" type="button" data-act="stepBack" title="Step up" aria-label="Step up">▲</button>
       <button class="icon" type="button" data-act="stepFwd" title="Step down" aria-label="Step down">▼</button>
     </div>
 
-    <div class="group" aria-label="Script markers">
+    <div class="group toolbar-advanced" aria-label="Script markers">
       <span class="label">Markers</span>
       <button class="icon" type="button" data-act="markerPrev" title="Previous marker ([ or Shift Page Up)" aria-label="Previous marker">◀</button>
       <select id="markerSelect" class="marker-select" title="Jump to a script marker" aria-label="Script markers"></select>
@@ -1120,21 +1148,21 @@
       <button class="icon" type="button" data-act="fontUp" title="Larger text (Plus)" aria-label="Increase font size">A+</button>
     </div>
 
-    <div class="group" aria-label="Line height">
+    <div class="group toolbar-advanced" aria-label="Line height">
       <span class="label">Line</span>
       <button class="icon" type="button" data-act="lhDown" title="Tighter lines" aria-label="Decrease line height">−</button>
       <span class="readout" id="lhOut">1.5</span>
       <button class="icon" type="button" data-act="lhUp" title="Looser lines" aria-label="Increase line height">+</button>
     </div>
 
-    <div class="group" aria-label="Reading width">
+    <div class="group toolbar-advanced" aria-label="Reading width">
       <span class="label">Width</span>
       <button class="icon" type="button" data-act="widthDown" title="Narrower" aria-label="Decrease reading width">−</button>
       <span class="readout" id="widthOut">42</span>
       <button class="icon" type="button" data-act="widthUp" title="Wider" aria-label="Increase reading width">+</button>
     </div>
 
-    <div class="group" aria-label="Reader style">
+    <div class="group toolbar-advanced" aria-label="Reader style">
       <span class="label">Style</span>
       <select id="formatPresetSelect" title="Formatting preset" aria-label="Formatting preset">
         <option value="custom">Custom</option>
@@ -1256,7 +1284,7 @@
       <div id="textCustomSwatches" class="swatches custom-swatches" aria-label="Saved custom text colors"></div>
     </div>
 
-    <div class="group" aria-label="Reader background">
+    <div class="group toolbar-advanced" aria-label="Reader background">
       <span class="label">Bg</span>
       <div class="swatches" aria-label="Reader background color">
         <button class="swatch" type="button" data-bg-color="black" style="--swatch:#07090d" title="Black reader background" aria-label="Black reader background" aria-pressed="true"></button>
@@ -1282,7 +1310,7 @@
       <div id="bgCustomSwatches" class="swatches custom-swatches" aria-label="Saved custom background colors"></div>
     </div>
 
-    <div class="group" aria-label="Reading line color">
+    <div class="group toolbar-advanced" aria-label="Reading line color">
       <span class="label">Line color</span>
       <div class="swatches" aria-label="Reading line color swatches">
         <button class="swatch" type="button" data-line-color="blue" style="--swatch:#5bb0ff" title="Blue reading line" aria-label="Blue reading line" aria-pressed="true"></button>
@@ -1301,7 +1329,7 @@
       <div id="lineCustomSwatches" class="swatches custom-swatches" aria-label="Saved custom reading line colors"></div>
     </div>
 
-    <div class="group" aria-label="Saved format presets">
+    <div class="group toolbar-advanced" aria-label="Saved format presets">
       <span class="label">Looks</span>
       <select id="savedFormatSelect" class="saved-select" title="Saved formatting looks in this browser" aria-label="Saved formatting looks"></select>
       <button id="saveFormatBtn" type="button" title="Save the current reader formatting as a reusable look">Save look</button>
@@ -1310,13 +1338,13 @@
       <span class="style-library-info" id="savedFormatInfo">0 looks</span>
     </div>
 
-    <div class="group">
+    <div class="group toolbar-advanced">
       <button id="mirrorBtn" class="toggle" type="button" aria-pressed="false" title="Mirror text for beam-splitter glass (M)">⇋ Mirror</button>
       <button id="lineBtn" class="toggle" type="button" aria-pressed="true" title="Toggle center reading line">― Line</button>
       <button id="fsBtn" class="toggle" type="button" aria-pressed="false" title="Fullscreen (F)">⛶ Full</button>
     </div>
 
-    <div class="group" aria-label="Saved scripts">
+    <div class="group toolbar-advanced" aria-label="Saved scripts">
       <span class="label">Saved</span>
       <input id="savedScriptFilter" class="saved-filter" type="search" autocomplete="off" placeholder="Search" title="Filter saved scripts" aria-label="Filter saved scripts">
       <select id="savedSortSelect" class="saved-select" title="Sort saved scripts" aria-label="Sort saved scripts">
@@ -1348,12 +1376,12 @@
       <span class="saved-library-info" id="savedLibraryInfo">0 saved</span>
     </div>
 
-    <div class="group" aria-label="Script file">
+    <div class="group toolbar-advanced" aria-label="Script file">
       <button id="saveFileBtn" type="button" title="Save script to a text file" aria-label="Save script to file">⇩ Save</button>
       <button id="loadFileBtn" type="button" title="Load script from a text file" aria-label="Load script from file">⇧ Load</button>
     </div>
 
-    <div class="group" aria-label="Show package">
+    <div class="group toolbar-advanced" aria-label="Show package">
       <span class="label">Show</span>
       <button id="exportShowBtn" type="button" title="Export current script, formatting, and saved scripts">Export</button>
       <button id="importShowBtn" type="button" title="Import a teleprompter show package">Import</button>
@@ -1438,14 +1466,14 @@
         <span class="script-meta" id="scriptMeta">0 words · 00:00 run</span>
         <span class="spacer" style="flex:1"></span>
         <button id="editorControlsToggleBtn" class="editor-controls-btn" type="button" aria-controls="toolbar" aria-expanded="true" aria-pressed="false" aria-label="Hide controls and maximize script" title="Hide controls and maximize script (H)">Hide controls</button>
-        <button id="doneBtn" class="primary" type="button">Done — start reading</button>
+        <button id="doneBtn" class="primary" type="button">Done: start reading</button>
       </div>
       <textarea id="script" spellcheck="true" autocomplete="off"
         placeholder="Paste or type your script here…
 
 Welcome to your teleprompter. This text scrolls smoothly while you read to camera.
 
-Press “Done — start reading”, then hit Play (or the Space bar) to begin. Adjust speed live with the Up and Down arrow keys, and resize the text with Plus and Minus.
+Press “Done: start reading”, then hit Play (or the Space bar) to begin. Adjust speed live with the Up and Down arrow keys, and resize the text with Plus and Minus.
 
 Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     </div>
@@ -1517,6 +1545,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   var toolbar = $('toolbar');
   var controlsToggleBtn = $('controlsToggleBtn');
   var controlsInlineToggleBtn = $('controlsInlineToggleBtn');
+  var toolbarCompactBtn = $('toolbarCompactBtn');
   var editorControlsToggleBtn = $('editorControlsToggleBtn');
   var controlsWakeBtn = $('controlsWakeBtn');
   var reader   = $('reader');
@@ -2245,6 +2274,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     lastLength:0,
     savedScriptSort:'recent',
     controlsCollapsed:false,
+    toolbarCompact:true,
     updatedAt:''
   };
   var currentPrediction = '';
@@ -2393,6 +2423,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
         if(typeof p.lastLength === 'number') preferences.lastLength = Math.max(0, Math.min(1000000, p.lastLength));
         if(typeof p.savedScriptSort === 'string') preferences.savedScriptSort = sanitizeSavedSort(p.savedScriptSort);
         if(typeof p.controlsCollapsed === 'boolean') preferences.controlsCollapsed = p.controlsCollapsed;
+        if(typeof p.toolbarCompact === 'boolean') preferences.toolbarCompact = p.toolbarCompact;
         if(typeof p.updatedAt === 'string') preferences.updatedAt = p.updatedAt.slice(0, 40);
       }
     }catch(e){/* ignore corrupt preference metadata */}
@@ -2412,6 +2443,36 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     try{ compact = window.matchMedia('(max-width:520px)').matches; }catch(e){ compact = false; }
     if(compact) return collapsed ? 'Show' : 'Hide';
     return collapsed ? 'Show controls' : 'Hide controls';
+  }
+
+  function refreshToolbarCompact(){
+    var compact = !!preferences.toolbarCompact;
+    var label = compact ? 'More controls' : 'Fewer controls';
+    var fullLabel = compact ? 'Show advanced teleprompter controls' : 'Hide advanced teleprompter controls';
+    body.classList.toggle('toolbar-compact', compact);
+    if(toolbarCompactBtn){
+      toolbarCompactBtn.textContent = label;
+      toolbarCompactBtn.setAttribute('aria-expanded', String(!compact));
+      toolbarCompactBtn.setAttribute('aria-pressed', String(compact));
+      toolbarCompactBtn.setAttribute('aria-label', fullLabel);
+      toolbarCompactBtn.setAttribute('title', fullLabel);
+    }
+    window.requestAnimationFrame(function(){
+      measure();
+      applyTransform();
+      updatePrediction();
+    });
+  }
+
+  function setToolbarCompact(compact, skipSave){
+    preferences.toolbarCompact = !!compact;
+    refreshToolbarCompact();
+    if(!skipSave) savePreferences(preferences.toolbarCompact ? 'toolbar-compact' : 'toolbar-expanded');
+  }
+
+  function toggleToolbarCompact(sourceButton){
+    setToolbarCompact(!preferences.toolbarCompact, false);
+    signalSuccess(sourceButton || toolbarCompactBtn);
   }
 
   function refreshControlsToggle(){
@@ -4602,7 +4663,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
         setPredictedAction(fitTimeBtn, 'Next: Fit speed to target runtime.');
         return;
       }
-      setPredictedAction($('doneBtn'), 'Next: Done — start reading.');
+      setPredictedAction($('doneBtn'), 'Next: Done: start reading.');
       return;
     }
     if(preferences.controlsCollapsed){
@@ -4945,6 +5006,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   installPressFeedback();
   controlsToggleBtn.addEventListener('click', function(){ toggleControls(controlsToggleBtn); });
   controlsInlineToggleBtn.addEventListener('click', function(){ toggleControls(controlsInlineToggleBtn); });
+  toolbarCompactBtn.addEventListener('click', function(){ toggleToolbarCompact(toolbarCompactBtn); });
   editorControlsToggleBtn.addEventListener('click', function(){ toggleControls(editorControlsToggleBtn); });
   controlsWakeBtn.addEventListener('click', function(){ toggleControls(controlsWakeBtn); });
   remoteBtn.addEventListener('click', openRemoteWindow);
@@ -5296,6 +5358,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
 
   // ---- Init ----
   loadPreferences();
+  setToolbarCompact(preferences.toolbarCompact, true);
   setControlsCollapsed(preferences.controlsCollapsed, true);
   updateStorageUi();
   loadSettings();
