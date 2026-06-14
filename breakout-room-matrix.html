@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Breakout Room Matrix | System by Dave</title>
+<meta name="description" content="A browser based AV breakout room matrix for room assignments, schedules, owners, signal routes, readiness, blockers, and handoff notes.">
+<link rel="canonical" href="https://systembydave.com/breakout-room-matrix.html">
+<meta name="theme-color" content="#0b1017">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Breakout Room Matrix">
+<meta property="og:description" content="A browser based AV breakout room matrix for room assignments, schedules, owners, signal routes, readiness, blockers, and handoff notes.">
+<meta property="og:url" content="https://systembydave.com/breakout-room-matrix.html">
+<meta property="og:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Breakout Room Matrix">
+<meta name="twitter:description" content="A browser based AV breakout room matrix for room assignments, schedules, owners, signal routes, readiness, blockers, and handoff notes.">
+<meta name="twitter:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<link rel="icon" href="svg/system_by_dave_logo_rust.svg" type="image/svg+xml">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; base-uri 'self'; form-action 'self'">
+<style>
+  :root{color-scheme:dark;--bg:#070a0f;--panel:#121a24;--panel-2:#0c131b;--line:#293745;--line-soft:#1b2734;--text:#f5f7fb;--muted:#9daabc;--accent:#c96b3f;--cyan:#62d6d2;--green:#6be092;--yellow:#ffd166;--red:#ff6b6b;--violet:#b59cff;--radius:8px;--shadow:0 24px 70px rgba(0,0,0,.36);--mono:"SFMono-Regular","Roboto Mono",Consolas,monospace;--sans:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;--fast:120ms;--med:180ms;--ease:cubic-bezier(.2,.8,.2,1)}
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100%;background:radial-gradient(circle at top left,rgba(98,214,210,.14),transparent 34rem),radial-gradient(circle at top right,rgba(201,107,63,.14),transparent 34rem),var(--bg);color:var(--text);font-family:var(--sans)}
+  body::before{content:"";position:fixed;inset:0;background:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:72px 72px;pointer-events:none;mask-image:linear-gradient(to bottom,#000,transparent 70%)}
+  a{color:inherit}
+  button,input,select,textarea{font:inherit}
+  button{border:1px solid #344456;background:#17212d;color:var(--text);border-radius:var(--radius);padding:10px 14px;cursor:pointer;transition:transform var(--fast) var(--ease),background var(--fast) var(--ease),border-color var(--fast) var(--ease),box-shadow var(--fast) var(--ease)}
+  button:hover{background:#202b38;border-color:#4c6074;transform:translateY(-1px)}
+  button:active,button.is-pressing{transform:translateY(1px) scale(.985);background:#263240}
+  button.primary{background:linear-gradient(180deg,#ef8c57,var(--accent));border-color:#f29b6b;color:#111;font-weight:800}
+  button.danger{border-color:rgba(255,107,107,.7);color:#ffd4d4;background:#24151a}
+  button:disabled{opacity:.52;cursor:not-allowed;transform:none}
+  input,select,textarea{width:100%;border:1px solid #2f3e4f;background:#0b1118;color:var(--text);border-radius:7px;padding:10px 11px;outline:none;transition:border-color var(--fast) var(--ease),box-shadow var(--fast) var(--ease),background var(--fast) var(--ease)}
+  input:focus,select:focus,textarea:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(98,214,210,.14);background:#0e151e}
+  textarea{min-height:64px;resize:vertical}
+  label{display:block;color:var(--muted);font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+  .skip-link{position:absolute;left:12px;top:12px;transform:translateY(-140%);background:var(--cyan);color:#071014;padding:8px 10px;border-radius:7px;z-index:20}
+  .skip-link:focus{transform:none}
+  .noscript{padding:12px 16px;background:#2a1d12;color:#ffd9b4}
+  .app{position:relative;z-index:1}
+  .topbar{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 18px;background:rgba(9,13,19,.94);border-bottom:1px solid var(--line);backdrop-filter:blur(14px)}
+  .brand{display:flex;align-items:center;gap:12px;text-decoration:none;min-width:0}
+  .brand-mark{width:38px;height:38px;border:1px solid #415266;border-radius:50%;display:grid;place-items:center;color:var(--cyan);font-family:var(--mono);font-weight:800}
+  .brand-text{display:grid;gap:3px;min-width:0}
+  .brand-text strong{font-size:14px;letter-spacing:.15em;text-transform:uppercase}
+  .brand-text span{color:var(--muted);font-family:var(--mono);font-size:11px}
+  .top-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+  main{display:grid;gap:18px;padding:22px;max-width:1540px;margin:0 auto}
+  .hero{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:18px}
+  .panel{background:linear-gradient(180deg,rgba(19,27,37,.96),rgba(13,18,26,.96));border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+  .show-panel{padding:18px}
+  .eyebrow{margin:0 0 14px;color:var(--cyan);font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase}
+  .show-title{border:0;background:transparent;padding:0;margin:0 0 24px;color:var(--text);font-size:clamp(34px,5vw,58px);font-weight:900;letter-spacing:0}
+  .show-title:focus{box-shadow:none;background:transparent}
+  .meta-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+  .status-panel{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:14px}
+  .stat{background:#0b1017;border:1px solid var(--line-soft);border-radius:7px;padding:13px}
+  .stat span{display:block;color:var(--muted);font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.09em}
+  .stat strong{display:block;margin-top:7px;font-size:30px;line-height:1}
+  .workspace{display:grid;grid-template-columns:minmax(0,1fr) 350px;gap:18px;align-items:start}
+  .main-panel{overflow:hidden}
+  .toolbar{display:grid;grid-template-columns:minmax(220px,1fr) 170px 170px 170px auto;gap:10px;padding:14px;border-bottom:1px solid var(--line)}
+  .button-row{display:flex;gap:8px}
+  .table-wrap{overflow:auto;max-height:58vh}
+  table{border-collapse:separate;border-spacing:0;width:100%;min-width:1560px}
+  th,td{border-bottom:1px solid var(--line-soft);padding:8px;text-align:left;vertical-align:top}
+  th{position:sticky;top:0;z-index:2;background:#101720;color:var(--muted);font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em}
+  tbody tr{transition:background var(--fast) var(--ease),box-shadow var(--fast) var(--ease)}
+  tbody tr:hover{background:rgba(255,255,255,.025)}
+  tbody tr.selected{background:rgba(98,214,210,.09);box-shadow:inset 0 0 0 1px rgba(98,214,210,.32)}
+  tbody tr.has-gap{box-shadow:inset 3px 0 0 var(--red)}
+  tbody tr.status-ready{box-shadow:inset 3px 0 0 var(--green)}
+  tbody tr.status-active{box-shadow:inset 3px 0 0 var(--cyan)}
+  tbody tr.status-blocked{box-shadow:inset 3px 0 0 var(--red)}
+  tbody tr.status-building{box-shadow:inset 3px 0 0 var(--yellow)}
+  tbody tr.status-done{opacity:.74}
+  .row-input,.row-select,.row-textarea{min-width:0;padding:8px 9px}
+  .field-small{width:96px}.field-mid{width:142px}.field-large{width:230px}.field-wide{width:260px}.field-notes{width:280px}
+  .empty-state{padding:28px;color:var(--muted);text-align:center}
+  .side{display:grid;gap:18px;position:sticky;top:88px}
+  .side-section{padding:14px}
+  .selected-item{display:flex;justify-content:space-between;gap:12px;margin-bottom:12px;color:var(--muted);font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em}
+  .item-card{display:grid;gap:10px;margin-bottom:14px}
+  .item-node{background:#0b1017;border:1px solid var(--line-soft);border-radius:7px;padding:12px}
+  .item-node span{display:block;color:var(--muted);font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+  .item-node strong{font-size:15px}
+  .selected-grid{display:grid;gap:10px}
+  .side-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .hint{margin:10px 0 0;color:var(--muted);font-size:13px}
+  .hint.success{color:var(--green)}.hint.error{color:#ffd1d1}
+  .shortcut-list{display:grid;grid-template-columns:auto 1fr;gap:8px 14px;color:var(--muted)}
+  .shortcut-list dt{color:var(--cyan);font-family:var(--mono)}
+  .shortcut-list dd{margin:0}
+  .privacy-note{color:var(--muted);font-size:12px;line-height:1.45}
+  .gap-text{color:var(--yellow)}.clean-text{color:var(--green)}
+  .file-input{display:none}
+  .feedback-success{border-color:rgba(107,224,146,.85) !important;box-shadow:0 0 0 3px rgba(107,224,146,.14) !important}
+  .feedback-error{border-color:var(--red) !important;box-shadow:0 0 0 3px rgba(255,107,107,.16) !important;animation:shake var(--med) var(--ease)}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+  @media (max-width:980px){.hero,.workspace{grid-template-columns:1fr}.side{position:static}.meta-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.toolbar{grid-template-columns:1fr 1fr}.button-row{grid-column:1 / -1}.show-title{font-size:32px}}
+  @media (max-width:680px){.topbar{position:static;align-items:flex-start;flex-direction:column}.top-actions{width:100%;justify-content:flex-start}.top-actions button{flex:1 1 96px;padding:9px 10px;font-size:13px}main{padding:10px;gap:12px}.hero,.workspace{gap:12px}.show-panel,.side-section{padding:12px}.meta-grid,.status-panel,.toolbar{grid-template-columns:1fr}.show-title{font-size:26px}.table-wrap{max-height:none}th,td{padding:6px}.side-actions{grid-template-columns:1fr}}
+  @media (prefers-reduced-motion:reduce){*{transition-duration:.001ms !important;animation-duration:.001ms !important}button:hover,button:active,button.is-pressing{transform:none}}
+  @media print{body{background:#fff;color:#111}body::before,.topbar,.toolbar,.side,.skip-link{display:none !important}main{padding:0;width:100%}.hero{display:block}.panel{box-shadow:none;border-color:#ccc;background:#fff}.show-title,input,select,textarea{color:#111;background:#fff;border-color:#ccc}.table-wrap{max-height:none;overflow:visible}table{min-width:0;font-size:8px}th,td{padding:4px}}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#roomMatrix">Skip to breakout room matrix</a>
+<noscript><div class="noscript">Breakout Room Matrix needs JavaScript for editing, import, export, filtering, and browser saved state.</div></noscript>
+<div class="app">
+  <header class="topbar">
+    <a class="brand" href="index.html#av-tools" aria-label="Back to AV tools">
+      <span class="brand-mark">BR</span>
+      <span class="brand-text"><strong>Breakout Room Matrix</strong><span>System by Dave AV tools</span></span>
+    </a>
+    <div class="top-actions">
+      <button id="printBtn" type="button">Print</button>
+      <button id="copySummaryBtn" type="button">Copy Summary</button>
+      <button id="exportCsvBtn" type="button">Export CSV</button>
+      <button id="exportJsonBtn" type="button">Export JSON</button>
+      <button id="importJsonBtn" type="button">Import JSON</button>
+      <input id="importInput" class="file-input" type="file" accept=".json,application/json">
+    </div>
+  </header>
+  <main>
+    <section class="hero" aria-label="Breakout matrix metadata">
+      <div class="panel show-panel">
+        <div>
+          <p class="eyebrow">AV breakout room matrix</p>
+          <input id="showName" class="show-title" type="text" aria-label="Show name">
+        </div>
+        <div class="meta-grid">
+          <div><label for="client">Client</label><input id="client" type="text"></div>
+          <div><label for="venue">Venue</label><input id="venue" type="text"></div>
+          <div><label for="showDate">Show date</label><input id="showDate" type="date"></div>
+          <div><label for="matrixLead">Matrix lead</label><input id="matrixLead" type="text"></div>
+          <div><label for="roomsLead">Rooms lead</label><input id="roomsLead" type="text"></div>
+          <div><label for="crewDesk">Crew desk</label><input id="crewDesk" type="text"></div>
+          <div><label for="updateTime">Last update</label><input id="updateTime" type="time"></div>
+          <div><label for="handoffTarget">Handoff target</label><input id="handoffTarget" type="text"></div>
+        </div>
+      </div>
+      <aside class="panel status-panel" aria-label="Breakout room status">
+        <div class="stat"><span>Total</span><strong id="totalOut">0</strong></div>
+        <div class="stat"><span>Ready</span><strong id="readyOut">0</strong></div>
+        <div class="stat"><span>Active</span><strong id="activeOut">0</strong></div>
+        <div class="stat"><span>Open</span><strong id="openOut">0</strong></div>
+        <div class="stat"><span>Blocked</span><strong id="blockedOut">0</strong></div>
+        <div class="stat"><span>Critical</span><strong id="criticalOut">0</strong></div>
+      </aside>
+    </section>
+    <section class="workspace">
+      <div class="panel main-panel" id="roomMatrix">
+        <div class="toolbar" role="toolbar" aria-label="Breakout room controls">
+          <input id="searchInput" type="search" placeholder="Search room, track, session, owners, routes, blockers, notes" aria-label="Search breakout room matrix">
+          <select id="trackFilter" aria-label="Filter by track"></select>
+          <select id="statusFilter" aria-label="Filter by status">
+            <option value="all">All statuses</option>
+            <option value="planned">Planned</option>
+            <option value="building">Building</option>
+            <option value="checked">Checked</option>
+            <option value="ready">Ready</option>
+            <option value="active">Active</option>
+            <option value="blocked">Blocked</option>
+            <option value="strike">Strike</option>
+            <option value="done">Done</option>
+          </select>
+          <select id="riskFilter" aria-label="Filter by risk">
+            <option value="all">All risks</option>
+            <option value="low">Low</option>
+            <option value="normal">Normal</option>
+            <option value="high">High</option>
+            <option value="critical">Critical</option>
+          </select>
+          <div class="button-row">
+            <button id="addRoomBtn" class="primary" type="button">Add Room</button>
+            <button id="loadSampleBtn" type="button">Sample</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table id="roomTable">
+            <thead>
+              <tr>
+                <th>Room</th>
+                <th>Track</th>
+                <th>Session</th>
+                <th>Start</th>
+                <th>End</th>
+                <th>Tech</th>
+                <th>Producer</th>
+                <th>Audio</th>
+                <th>Video</th>
+                <th>Network</th>
+                <th>Power</th>
+                <th>Status</th>
+                <th>Risk</th>
+                <th>Blocker</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody id="roomBody"></tbody>
+          </table>
+        </div>
+        <div id="emptyState" class="empty-state" hidden>No breakout rooms match the current filters.</div>
+      </div>
+      <aside class="side">
+        <section class="panel side-section" aria-label="Selected room">
+          <div class="selected-item"><span>Selected</span><span id="selectedIdOut">None</span></div>
+          <div class="item-card" aria-label="Selected room preview">
+            <div class="item-node"><span>Room</span><strong id="itemRoom">None</strong></div>
+            <div class="item-node"><span>Route</span><strong id="itemRoute">None</strong></div>
+            <div class="item-node"><span>Risk</span><strong id="itemRisk">None</strong></div>
+          </div>
+          <div class="selected-grid">
+            <div>
+              <label for="selectedStatus">Status</label>
+              <select id="selectedStatus">
+                <option value="planned">Planned</option>
+                <option value="building">Building</option>
+                <option value="checked">Checked</option>
+                <option value="ready">Ready</option>
+                <option value="active">Active</option>
+                <option value="blocked">Blocked</option>
+                <option value="strike">Strike</option>
+                <option value="done">Done</option>
+              </select>
+            </div>
+            <div>
+              <label for="selectedRisk">Risk</label>
+              <select id="selectedRisk">
+                <option value="low">Low</option>
+                <option value="normal">Normal</option>
+                <option value="high">High</option>
+                <option value="critical">Critical</option>
+              </select>
+            </div>
+            <div>
+              <label for="selectedBlocker">Blocker</label>
+              <textarea id="selectedBlocker"></textarea>
+            </div>
+            <div>
+              <label for="selectedNotes">Notes</label>
+              <textarea id="selectedNotes"></textarea>
+            </div>
+            <div class="side-actions">
+              <button id="markBuildingBtn" type="button">Building</button>
+              <button id="markCheckedBtn" type="button">Checked</button>
+              <button id="markReadyBtn" type="button">Ready</button>
+              <button id="markActiveBtn" type="button">Active</button>
+              <button id="markBlockedBtn" type="button">Blocked</button>
+              <button id="markStrikeBtn" type="button">Strike</button>
+              <button id="moveUpBtn" type="button">Move Up</button>
+              <button id="moveDownBtn" type="button">Move Down</button>
+              <button id="duplicateBtn" type="button">Duplicate</button>
+              <button id="deleteBtn" class="danger" type="button">Delete</button>
+            </div>
+          </div>
+          <p id="hint" class="hint" role="status">Loaded sample breakout room matrix.</p>
+        </section>
+        <section class="panel side-section" aria-label="Keyboard shortcuts">
+          <h2>Fast actions</h2>
+          <dl class="shortcut-list">
+            <dt>N</dt><dd>Add room after selected</dd>
+            <dt>B</dt><dd>Mark selected building</dd>
+            <dt>C</dt><dd>Mark selected checked</dd>
+            <dt>R</dt><dd>Mark selected ready</dd>
+            <dt>A</dt><dd>Mark selected active</dd>
+            <dt>S</dt><dd>Mark selected strike</dd>
+            <dt>O</dt><dd>Mark selected done</dd>
+            <dt>D</dt><dd>Duplicate selected room</dd>
+            <dt>Del</dt><dd>Delete selected room</dd>
+          </dl>
+          <p class="privacy-note">Breakout room data is remembered in this browser when storage is available. Export JSON before moving to another machine.</p>
+        </section>
+      </aside>
+    </section>
+  </main>
+</div>
+<script>
+(function(){
+  var STORAGE_KEY='breakout-room-matrix.v1';
+  var SCHEMA='system-by-dave.breakout-room-matrix.v1';
+  var STATUS=['planned','building','checked','ready','active','blocked','strike','done'];
+  var RISK=['low','normal','high','critical'];
+  var $=function(id){return document.getElementById(id);};
+  var state={meta:{showName:'Conference Breakout Matrix',client:'Client',venue:'Venue',showDate:new Date().toISOString().slice(0,10),matrixLead:'Matrix lead',roomsLead:'Rooms lead',crewDesk:'Crew desk',updateTime:'08:30',handoffTarget:'Evening crew'},rooms:[],selectedId:'',filters:{search:'',track:'all',status:'all',risk:'all'}};
+  var sampleRooms=[
+    {room:'Room 201',track:'Leadership',session:'Opening breakout',start:'09:00',end:'10:15',tech:'Tech A',producer:'Producer A',audio:'2 lav, 2 HH, podium',video:'Laptop to projector and confidence',network:'Presenter hardline, VLAN 210',power:'Two 20A walls checked',status:'ready',risk:'normal',blocker:'',notes:'Speaker timer set to 15 minutes.'},
+    {room:'Room 202',track:'Finance',session:'Panel and Q A',start:'09:15',end:'10:30',tech:'Tech B',producer:'Producer B',audio:'4 lav, 2 audience mics',video:'Deck laptop to 16 by 9 screen',network:'House WiFi with hardline backup',power:'FOH quad and screen power good',status:'checked',risk:'high',blocker:'',notes:'Panel table moved two feet downstage.'},
+    {room:'Room 203',track:'Training',session:'Hands on lab',start:'09:30',end:'11:00',tech:'Tech C',producer:'Training lead',audio:'2 HH, laptop audio',video:'Dual displays mirrored',network:'Lab switch pending venue port',power:'Extra quad needed at rear tables',status:'blocked',risk:'critical',blocker:'Waiting on venue IT for lab switch uplink.',notes:'Keep hotspot as fallback.'},
+    {room:'Room 204',track:'Sales',session:'Regional updates',start:'10:00',end:'11:15',tech:'Tech D',producer:'Sales producer',audio:'Podium and 1 lav',video:'Presenter laptop with HDMI spare',network:'Presenter hardline',power:'Podium and projector checked',status:'active',risk:'normal',blocker:'',notes:'Live now. Watch podium mic cable.'},
+    {room:'Room 205',track:'Operations',session:'Workflow review',start:'10:30',end:'11:45',tech:'Tech E',producer:'Ops producer',audio:'2 lav, 1 HH',video:'Laptop through scaler',network:'No network required',power:'FOH and projector checked',status:'building',risk:'high',blocker:'',notes:'Need final laptop from presenter.'},
+    {room:'Room 206',track:'Executive',session:'Board prep',start:'11:00',end:'12:00',tech:'Tech F',producer:'Exec producer',audio:'4 lav and record feed',video:'Deck laptop, confidence, record',network:'Hardline to record laptop',power:'Dedicated wall circuit confirmed',status:'planned',risk:'critical',blocker:'',notes:'Client requested isolated record check.'},
+    {room:'Room 207',track:'Partner',session:'Sponsor workshop',start:'11:15',end:'12:15',tech:'Tech G',producer:'Sponsor lead',audio:'2 HH and laptop audio',video:'Sponsor laptop to display',network:'Guest WiFi',power:'Table power verified',status:'done',risk:'low',blocker:'',notes:'Morning session complete.'},
+    {room:'Room 208',track:'Training',session:'Afternoon reset',start:'12:30',end:'13:15',tech:'Tech H',producer:'Training lead',audio:'Reset from lab layout',video:'Displays to extended desktop',network:'Lab network retest',power:'Rear table quads',status:'strike',risk:'normal',blocker:'',notes:'Reset after lunch.'}
+  ];
+  var inputs={showName:$('showName'),client:$('client'),venue:$('venue'),showDate:$('showDate'),matrixLead:$('matrixLead'),roomsLead:$('roomsLead'),crewDesk:$('crewDesk'),updateTime:$('updateTime'),handoffTarget:$('handoffTarget'),search:$('searchInput'),track:$('trackFilter'),status:$('statusFilter'),risk:$('riskFilter'),selectedStatus:$('selectedStatus'),selectedRisk:$('selectedRisk'),selectedBlocker:$('selectedBlocker'),selectedNotes:$('selectedNotes')};
+  function storageAvailable(){try{var key='breakout-room-matrix-probe';localStorage.setItem(key,key);localStorage.removeItem(key);return true;}catch(e){return false;}}
+  function uid(){return 'room-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,8);}
+  function cloneRoom(room){return {id:room.id||uid(),room:String(room.room||''),track:String(room.track||''),session:String(room.session||''),start:String(room.start||''),end:String(room.end||''),tech:String(room.tech||''),producer:String(room.producer||''),audio:String(room.audio||''),video:String(room.video||''),network:String(room.network||''),power:String(room.power||''),status:STATUS.indexOf(room.status)>=0?room.status:'planned',risk:RISK.indexOf(room.risk)>=0?room.risk:'normal',blocker:String(room.blocker||''),notes:String(room.notes||'')};}
+  function normalizeState(raw){var next=raw&&typeof raw==='object'?raw:{};var meta=next.meta&&typeof next.meta==='object'?next.meta:{};return {meta:{showName:String(meta.showName||'Conference Breakout Matrix').slice(0,120),client:String(meta.client||'').slice(0,120),venue:String(meta.venue||'').slice(0,120),showDate:String(meta.showDate||new Date().toISOString().slice(0,10)).slice(0,20),matrixLead:String(meta.matrixLead||'').slice(0,80),roomsLead:String(meta.roomsLead||'').slice(0,80),crewDesk:String(meta.crewDesk||'').slice(0,80),updateTime:String(meta.updateTime||'').slice(0,20),handoffTarget:String(meta.handoffTarget||'').slice(0,120)},rooms:Array.isArray(next.rooms)?next.rooms.map(cloneRoom).slice(0,300):sampleRooms.map(cloneRoom),selectedId:typeof next.selectedId==='string'?next.selectedId:'',filters:{search:String(next.filters&&next.filters.search||''),track:String(next.filters&&next.filters.track||'all'),status:STATUS.indexOf(next.filters&&next.filters.status)>=0?next.filters.status:'all',risk:RISK.indexOf(next.filters&&next.filters.risk)>=0?next.filters.risk:'all'}};}
+  function loadState(){if(!storageAvailable()){state=normalizeState({});if(state.rooms[0]) state.selectedId=state.rooms[0].id;return;}try{var raw=localStorage.getItem(STORAGE_KEY);state=raw?normalizeState(JSON.parse(raw)):normalizeState({});}catch(e){state=normalizeState({});}if(!state.selectedId&&state.rooms[0]) state.selectedId=state.rooms[0].id;}
+  function saveState(){if(!storageAvailable()) return false;try{localStorage.setItem(STORAGE_KEY,JSON.stringify({schema:SCHEMA,savedAt:new Date().toISOString(),meta:state.meta,rooms:state.rooms,selectedId:state.selectedId,filters:state.filters}));return true;}catch(e){showHint('Could not save in this browser. Export JSON to keep a copy.','error');return false;}}
+  function setInputValues(){inputs.showName.value=state.meta.showName;inputs.client.value=state.meta.client;inputs.venue.value=state.meta.venue;inputs.showDate.value=state.meta.showDate;inputs.matrixLead.value=state.meta.matrixLead;inputs.roomsLead.value=state.meta.roomsLead;inputs.crewDesk.value=state.meta.crewDesk;inputs.updateTime.value=state.meta.updateTime;inputs.handoffTarget.value=state.meta.handoffTarget;inputs.search.value=state.filters.search;inputs.status.value=state.filters.status;inputs.risk.value=state.filters.risk;}
+  function optionHtml(values,selected,firstLabel){var html=firstLabel?'<option value="all">'+escapeHtml(firstLabel)+'</option>':'';values.forEach(function(value){html+='<option value="'+escapeAttr(value)+'"'+(value===selected?' selected':'')+'>'+escapeHtml(titleCase(value))+'</option>';});return html;}
+  function renderTrackFilter(){var map={};state.rooms.forEach(function(room){if(room.track) map[room.track]=true;});var values=Object.keys(map).sort(function(a,b){return a.localeCompare(b);});if(state.filters.track!=='all'&&values.indexOf(state.filters.track)<0) state.filters.track='all';inputs.track.innerHTML=optionHtml(values,state.filters.track,'All tracks');}
+  function isDone(room){return room.status==='done';}
+  function isOpen(room){return !isDone(room)&&room.status!=='ready'&&room.status!=='active'&&room.status!=='strike';}
+  function hasGap(room){if(room.status==='done'||room.status==='strike') return false;return room.status==='blocked'||room.risk==='critical'||!String(room.room||'').trim()||!String(room.tech||'').trim()||!String(room.start||'').trim()||!String(room.audio||'').trim()||!String(room.video||'').trim()||(room.status==='blocked'&&!String(room.blocker||'').trim());}
+  function visibleRooms(){var q=state.filters.search.trim().toLowerCase();return state.rooms.filter(function(room){var haystack=[room.room,room.track,room.session,room.start,room.end,room.tech,room.producer,room.audio,room.video,room.network,room.power,room.status,room.risk,room.blocker,room.notes].join(' ').toLowerCase();if(q&&haystack.indexOf(q)===-1) return false;if(state.filters.track!=='all'&&room.track!==state.filters.track) return false;if(state.filters.status!=='all'&&room.status!==state.filters.status) return false;if(state.filters.risk!=='all'&&room.risk!==state.filters.risk) return false;return true;});}
+  function renderRows(){var rows=visibleRooms();var body=$('roomBody');if(rows.length&&!rows.some(function(room){return room.id===state.selectedId;})){state.selectedId=rows[0].id;saveState();}$('emptyState').hidden=rows.length>0;body.innerHTML=rows.map(function(room){return '<tr class="status-'+room.status+(room.id===state.selectedId?' selected':'')+(hasGap(room)?' has-gap':'')+'" data-id="'+escapeAttr(room.id)+'">'+cell(input('room',room.room,'field-mid'))+cell(input('track',room.track,'field-mid'))+cell(input('session',room.session,'field-large'))+cell(input('start',room.start,'field-small'))+cell(input('end',room.end,'field-small'))+cell(input('tech',room.tech,'field-mid'))+cell(input('producer',room.producer,'field-mid'))+cell(textarea('audio',room.audio,'field-wide'))+cell(textarea('video',room.video,'field-wide'))+cell(textarea('network',room.network,'field-wide'))+cell(input('power',room.power,'field-large'))+cell('<select class="row-select field-mid" data-field="status" aria-label="Status">'+optionHtml(STATUS,room.status,'')+'</select>')+cell('<select class="row-select field-mid" data-field="risk" aria-label="Risk">'+optionHtml(RISK,room.risk,'')+'</select>')+cell(textarea('blocker',room.blocker,'field-notes'))+cell(textarea('notes',room.notes,'field-notes'))+'</tr>';}).join('');}
+  function input(field,value,cls){return '<input class="row-input '+cls+'" data-field="'+field+'" value="'+escapeAttr(value)+'" aria-label="'+titleCase(field)+'">';}
+  function textarea(field,value,cls){return '<textarea class="row-textarea '+cls+'" data-field="'+field+'" aria-label="'+titleCase(field)+'">'+escapeHtml(value)+'</textarea>';}
+  function cell(content){return '<td>'+content+'</td>';}
+  function updateStats(){var ready=state.rooms.filter(function(room){return room.status==='ready';}).length;$('totalOut').textContent=state.rooms.length;$('readyOut').textContent=ready;$('activeOut').textContent=state.rooms.filter(function(room){return room.status==='active';}).length;$('openOut').textContent=state.rooms.filter(isOpen).length;$('blockedOut').textContent=state.rooms.filter(function(room){return room.status==='blocked';}).length;$('criticalOut').textContent=state.rooms.filter(function(room){return room.risk==='critical';}).length;}
+  function selectedRoom(){return state.rooms.find(function(room){return room.id===state.selectedId;})||null;}
+  function updateInspector(){var room=selectedRoom();var disabled=!room;var gap=room&&hasGap(room);$('selectedIdOut').textContent=room?room.room:'None';inputs.selectedStatus.disabled=disabled;inputs.selectedRisk.disabled=disabled;inputs.selectedBlocker.disabled=disabled;inputs.selectedNotes.disabled=disabled;['markBuildingBtn','markCheckedBtn','markReadyBtn','markActiveBtn','markBlockedBtn','markStrikeBtn','moveUpBtn','moveDownBtn','duplicateBtn','deleteBtn'].forEach(function(id){$(id).disabled=disabled;});$('itemRoom').textContent=room?(room.room+' | '+room.session):'None';$('itemRoute').textContent=room?(room.audio+' | '+room.video):'None';$('itemRisk').textContent=room?(gap?(room.status==='blocked'?'Blocked':titleCase(room.risk)+' risk'):titleCase(room.status)):'None';$('itemRisk').className=room?(gap?'gap-text':'clean-text'):'';if(room){inputs.selectedStatus.value=room.status;inputs.selectedRisk.value=room.risk;inputs.selectedBlocker.value=room.blocker;inputs.selectedNotes.value=room.notes;}else{inputs.selectedStatus.value='planned';inputs.selectedRisk.value='normal';inputs.selectedBlocker.value='';inputs.selectedNotes.value='';}}
+  function render(){setInputValues();renderTrackFilter();renderRows();updateStats();updateInspector();}
+  function updateRoom(id,field,value,commitNow){var room=state.rooms.find(function(row){return row.id===id;});if(!room) return;if(field==='status'&&STATUS.indexOf(value)<0) value='planned';if(field==='risk'&&RISK.indexOf(value)<0) value='normal';if(commitNow&&['room','track','session','start','end','tech','producer','power'].indexOf(field)>=0) value=normalizeShort(value);room[field]=value;if(field==='risk'&&value==='critical'&&room.status==='planned') room.status='building';if(field==='status'&&(value==='ready'||value==='done')) room.blocker='';if((field==='status'||field==='risk')&&commitNow) renderRows();if(field==='track'&&commitNow) renderTrackFilter();saveState();updateStats();updateInspector();}
+  function markSelectedRow(){document.querySelectorAll('#roomBody tr[data-id]').forEach(function(row){row.classList.toggle('selected',row.getAttribute('data-id')===state.selectedId);});}
+  function selectRoom(id){if(!id) return;if(state.selectedId===id){updateInspector();return;}state.selectedId=id;saveState();markSelectedRow();updateInspector();}
+  function addRoom(afterId){var index=afterId?state.rooms.findIndex(function(room){return room.id===afterId;})+1:state.rooms.length;if(index<0) index=state.rooms.length;var room=cloneRoom({room:'New Room',track:'General',session:'New session',start:nowTime(),end:'',tech:state.meta.roomsLead||'',producer:'',audio:'',video:'',network:'',power:'',status:'planned',risk:'normal',blocker:'',notes:''});state.rooms.splice(index,0,room);state.selectedId=room.id;saveState();render();showHint('Room added.','success');focusSelectedRow();}
+  function duplicateSelected(){var room=selectedRoom();var index;var copy;if(!room) return showHint('Pick a room first.','error');index=state.rooms.findIndex(function(row){return row.id===room.id;});copy=cloneRoom(Object.assign({},room,{id:uid(),room:room.room+' copy',status:'planned',blocker:''}));state.rooms.splice(index+1,0,copy);state.selectedId=copy.id;saveState();render();showHint('Room duplicated. Confirm schedule and route.','success');focusSelectedRow();}
+  function deleteSelected(){var room=selectedRoom();var index;if(!room) return showHint('Pick a room first.','error');if(!window.confirm('Delete selected breakout room?')) return;index=state.rooms.findIndex(function(row){return row.id===room.id;});state.rooms.splice(index,1);state.selectedId=state.rooms[Math.min(index,state.rooms.length-1)]?state.rooms[Math.min(index,state.rooms.length-1)].id:'';saveState();render();showHint('Room deleted.','success');}
+  function moveSelected(dir){var room=selectedRoom();var index;var nextIndex;if(!room) return showHint('Pick a room first.','error');index=state.rooms.findIndex(function(row){return row.id===room.id;});nextIndex=index+dir;if(nextIndex<0||nextIndex>=state.rooms.length) return;state.rooms.splice(index,1);state.rooms.splice(nextIndex,0,room);saveState();render();showHint(dir<0?'Room moved up.':'Room moved down.','success');focusSelectedRow();}
+  function setSelectedStatus(status){var room=selectedRoom();if(!room) return showHint('Pick a room first.','error');room.status=status;if(status==='ready'||status==='done') room.blocker='';if(status==='blocked'&&!room.blocker) room.blocker='Add blocker details.';saveState();render();showHint(status==='blocked'?'Room blocked. Add blocker and owner.':'Room updated.',status==='blocked'?'error':'success');}
+  function loadSample(){if(state.rooms.length&&!window.confirm('Replace current breakout room matrix with sample rooms?')) return;state=normalizeState({meta:state.meta,rooms:sampleRooms,selectedId:'',filters:{search:'',track:'all',status:'all',risk:'all'}});if(state.rooms[0]) state.selectedId=state.rooms[0].id;saveState();render();showHint('Sample breakout room matrix loaded.','success');}
+  function buildSummary(){var lines=[];var blocked=state.rooms.filter(function(room){return room.status==='blocked';});var critical=state.rooms.filter(function(room){return room.risk==='critical';});var open=state.rooms.filter(isOpen);lines.push('BREAKOUT ROOM MATRIX');lines.push('Show: '+state.meta.showName);lines.push('Client: '+state.meta.client);lines.push('Venue: '+state.meta.venue);lines.push('Show Date: '+state.meta.showDate);lines.push('Matrix Lead: '+state.meta.matrixLead);lines.push('Rooms Lead: '+state.meta.roomsLead);lines.push('Crew Desk: '+state.meta.crewDesk);lines.push('Last Update: '+state.meta.updateTime);lines.push('Handoff Target: '+state.meta.handoffTarget);lines.push('');lines.push('Summary: '+state.rooms.length+' rooms, '+state.rooms.filter(function(room){return room.status==='ready';}).length+' ready, '+state.rooms.filter(function(room){return room.status==='active';}).length+' active, '+open.length+' open, '+blocked.length+' blocked, '+critical.length+' critical.');if(blocked.length){lines.push('');lines.push('Blocked Rooms:');blocked.forEach(function(room){lines.push('- '+room.room+' | '+room.session+' | '+room.tech+' | '+room.blocker);});}if(critical.length){lines.push('');lines.push('Critical Risk:');critical.forEach(function(room){lines.push('- '+room.room+' | '+room.session+' | '+room.status+' | '+room.start);});}lines.push('');lines.push('Open Rooms:');open.forEach(function(room){lines.push('- '+room.room+' | '+room.track+' | '+room.session+' | '+room.tech+' | '+room.status+' | '+room.start);});return lines.join('\n');}
+  function copySummary(){copyText(buildSummary()).then(function(){showHint('Breakout room summary copied.','success');signal($('copySummaryBtn'),'success');}).catch(function(){showHint('Could not copy summary.','error');signal($('copySummaryBtn'),'error');});}
+  function exportJson(){var payload={schema:SCHEMA,exportedAt:new Date().toISOString(),meta:state.meta,rooms:state.rooms};downloadFile(fileStem()+'.breakout-room-matrix.json',JSON.stringify(payload,null,2),'application/json;charset=utf-8');showHint('JSON exported.','success');}
+  function exportCsv(){var fields=['room','track','session','start','end','tech','producer','audio','video','network','power','status','risk','blocker','notes'];var csv=[fields.join(',')].concat(state.rooms.map(function(room){return fields.map(function(field){return csvCell(room[field]);}).join(',');})).join('\n');downloadFile(fileStem()+'.breakout-room-matrix.csv',csv,'text/csv;charset=utf-8');showHint('CSV exported.','success');}
+  function importJsonFile(file){var reader=new FileReader();reader.onload=function(){try{var parsed=JSON.parse(String(reader.result||''));if(!parsed||typeof parsed!=='object'||!Array.isArray(parsed.rooms)) throw new Error('Invalid payload');state=normalizeState({meta:parsed.meta||state.meta,rooms:parsed.rooms,selectedId:'',filters:{search:'',track:'all',status:'all',risk:'all'}});if(state.rooms[0]) state.selectedId=state.rooms[0].id;saveState();render();showHint('Breakout room matrix JSON imported.','success');signal($('importJsonBtn'),'success');}catch(e){showHint('Could not import that JSON file.','error');signal($('importJsonBtn'),'error');}};reader.onerror=function(){showHint('Could not read that JSON file.','error');signal($('importJsonBtn'),'error');};reader.readAsText(file);}
+  function syncMeta(){state.meta.showName=inputs.showName.value;state.meta.client=inputs.client.value;state.meta.venue=inputs.venue.value;state.meta.showDate=inputs.showDate.value;state.meta.matrixLead=inputs.matrixLead.value;state.meta.roomsLead=inputs.roomsLead.value;state.meta.crewDesk=inputs.crewDesk.value;state.meta.updateTime=inputs.updateTime.value;state.meta.handoffTarget=inputs.handoffTarget.value;saveState();}
+  function bindEvents(){Object.keys(inputs).forEach(function(key){if(['showName','client','venue','showDate','matrixLead','roomsLead','crewDesk','updateTime','handoffTarget'].indexOf(key)>=0) inputs[key].addEventListener('input',syncMeta);});inputs.search.addEventListener('input',function(){state.filters.search=inputs.search.value;saveState();renderRows();updateInspector();});inputs.track.addEventListener('change',function(){state.filters.track=inputs.track.value;saveState();renderRows();updateInspector();});inputs.status.addEventListener('change',function(){state.filters.status=inputs.status.value;saveState();renderRows();updateInspector();});inputs.risk.addEventListener('change',function(){state.filters.risk=inputs.risk.value;saveState();renderRows();updateInspector();});$('roomBody').addEventListener('focusin',function(event){var row=event.target.closest('tr[data-id]');if(row) selectRoom(row.getAttribute('data-id'));});$('roomBody').addEventListener('click',function(event){var row=event.target.closest('tr[data-id]');if(row) selectRoom(row.getAttribute('data-id'));});$('roomBody').addEventListener('input',function(event){var target=event.target;var row=target.closest('tr[data-id]');var field=target.getAttribute('data-field');if(row&&field) updateRoom(row.getAttribute('data-id'),field,target.value,false);});$('roomBody').addEventListener('change',function(event){var target=event.target;var row=target.closest('tr[data-id]');var field=target.getAttribute('data-field');if(row&&field) updateRoom(row.getAttribute('data-id'),field,target.value,true);});inputs.selectedStatus.addEventListener('change',function(){setSelectedStatus(inputs.selectedStatus.value);});inputs.selectedRisk.addEventListener('change',function(){var room=selectedRoom();if(!room) return;room.risk=inputs.selectedRisk.value;if(room.risk==='critical'&&room.status==='planned') room.status='building';saveState();renderRows();updateStats();updateInspector();});inputs.selectedBlocker.addEventListener('input',function(){var room=selectedRoom();if(!room) return;room.blocker=inputs.selectedBlocker.value;if(room.blocker&&room.status==='planned') room.status='blocked';saveState();renderRows();updateStats();updateInspector();});inputs.selectedNotes.addEventListener('input',function(){var room=selectedRoom();if(!room) return;room.notes=inputs.selectedNotes.value;saveState();updateStats();updateInspector();});$('addRoomBtn').addEventListener('click',function(){addRoom(state.selectedId);signal(this,'success');});$('loadSampleBtn').addEventListener('click',function(){loadSample();signal(this,'success');});$('markBuildingBtn').addEventListener('click',function(){setSelectedStatus('building');signal(this,'success');});$('markCheckedBtn').addEventListener('click',function(){setSelectedStatus('checked');signal(this,'success');});$('markReadyBtn').addEventListener('click',function(){setSelectedStatus('ready');signal(this,'success');});$('markActiveBtn').addEventListener('click',function(){setSelectedStatus('active');signal(this,'success');});$('markBlockedBtn').addEventListener('click',function(){setSelectedStatus('blocked');signal(this,'error');});$('markStrikeBtn').addEventListener('click',function(){setSelectedStatus('strike');signal(this,'success');});$('moveUpBtn').addEventListener('click',function(){moveSelected(-1);signal(this,'success');});$('moveDownBtn').addEventListener('click',function(){moveSelected(1);signal(this,'success');});$('duplicateBtn').addEventListener('click',function(){duplicateSelected();signal(this,'success');});$('deleteBtn').addEventListener('click',function(){deleteSelected();signal(this,'success');});$('printBtn').addEventListener('click',function(){window.print();signal(this,'success');});$('copySummaryBtn').addEventListener('click',copySummary);$('exportJsonBtn').addEventListener('click',function(){exportJson();signal(this,'success');});$('exportCsvBtn').addEventListener('click',function(){exportCsv();signal(this,'success');});$('importJsonBtn').addEventListener('click',function(){$('importInput').click();});$('importInput').addEventListener('change',function(){var file=$('importInput').files&&$('importInput').files[0];if(file) importJsonFile(file);$('importInput').value='';});document.addEventListener('keydown',function(event){if(isTyping()) return;if(event.key==='n'||event.key==='N'){event.preventDefault();addRoom(state.selectedId);}if(event.key==='b'||event.key==='B'){event.preventDefault();setSelectedStatus('building');}if(event.key==='c'||event.key==='C'){event.preventDefault();setSelectedStatus('checked');}if(event.key==='r'||event.key==='R'){event.preventDefault();setSelectedStatus('ready');}if(event.key==='a'||event.key==='A'){event.preventDefault();setSelectedStatus('active');}if(event.key==='s'||event.key==='S'){event.preventDefault();setSelectedStatus('strike');}if(event.key==='o'||event.key==='O'){event.preventDefault();setSelectedStatus('done');}if(event.key==='d'||event.key==='D'){event.preventDefault();duplicateSelected();}if(event.key==='Delete'){event.preventDefault();deleteSelected();}});installPressFeedback();}
+  function installPressFeedback(){document.querySelectorAll('button').forEach(function(button){function press(){if(!button.disabled) button.classList.add('is-pressing');}function release(){button.classList.remove('is-pressing');}button.addEventListener('pointerdown',press);button.addEventListener('pointerup',release);button.addEventListener('pointercancel',release);button.addEventListener('pointerleave',release);button.addEventListener('blur',release);button.addEventListener('keydown',function(event){if(event.key===' '||event.key==='Enter') press();});button.addEventListener('keyup',function(event){if(event.key===' '||event.key==='Enter') release();});});}
+  function showHint(message,kind){var hint=$('hint');hint.textContent=message;hint.classList.remove('success','error');if(kind) hint.classList.add(kind);}
+  function signal(element,kind){if(!element) return;var className=kind==='error'?'feedback-error':'feedback-success';element.classList.remove(className);void element.offsetWidth;element.classList.add(className);setTimeout(function(){element.classList.remove(className);},190);}
+  function focusSelectedRow(){var row=document.querySelector('tr[data-id="'+cssEscape(state.selectedId)+'"]');var input=row&&row.querySelector('input,select,textarea');if(input) input.focus({preventScroll:true});}
+  function isTyping(){var tag=document.activeElement&&document.activeElement.tagName;return tag==='INPUT'||tag==='TEXTAREA'||tag==='SELECT';}
+  function normalizeShort(value){return String(value||'').trim().replace(/\s+/g,' ').slice(0,140);}
+  function titleCase(value){return String(value||'').replace(/-/g,' ').replace(/\b\w/g,function(letter){return letter.toUpperCase();});}
+  function nowTime(){return new Date().toTimeString().slice(0,5);}
+  function fileStem(){return (state.meta.showName||'breakout-room-matrix').toLowerCase().replace(/['"]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,60)||'breakout-room-matrix';}
+  function csvCell(value){value=String(value==null?'':value);if(/[",\n]/.test(value)) return '"'+value.replace(/"/g,'""')+'"';return value;}
+  function downloadFile(filename,content,type){var blob=new Blob([content],{type:type});var url=URL.createObjectURL(blob);var link=document.createElement('a');link.href=url;link.download=filename;link.style.display='none';document.body.appendChild(link);link.click();setTimeout(function(){URL.revokeObjectURL(url);if(link.parentNode) link.parentNode.removeChild(link);},0);}
+  function copyText(text){if(navigator.clipboard&&navigator.clipboard.writeText) return navigator.clipboard.writeText(text);return new Promise(function(resolve,reject){var area=document.createElement('textarea');area.value=text;area.setAttribute('readonly','');area.style.position='fixed';area.style.left='-9999px';document.body.appendChild(area);area.select();try{document.execCommand('copy')?resolve():reject(new Error('copy failed'));}catch(e){reject(e);}finally{if(area.parentNode) area.parentNode.removeChild(area);}});}
+  function escapeHtml(value){return String(value==null?'':value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+  function escapeAttr(value){return escapeHtml(value);}
+  function cssEscape(value){if(window.CSS&&CSS.escape) return CSS.escape(value);return String(value).replace(/"/g,'\\"');}
+  loadState();
+  render();
+  bindEvents();
+})();
+</script>
+</body>
+</html>
