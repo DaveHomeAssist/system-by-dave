@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'none'">
+<title>AV Suite | System by Dave</title>
+<meta name="description" content="A browser based launch hub for System by Dave AV tools, grouped by show phase with saved operator preferences, pinned tools, search, and quick handoff copy.">
+<link rel="canonical" href="https://systembydave.com/av-suite.html">
+<meta name="theme-color" content="#0a0f17">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="System by Dave">
+<meta property="og:title" content="AV Suite">
+<meta property="og:description" content="Open the System by Dave AV tool suite from one operator hub with show context, phase recommendations, search, pins, and recent tools.">
+<meta property="og:url" content="https://systembydave.com/av-suite.html">
+<meta property="og:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<meta property="og:image:width" content="1024">
+<meta property="og:image:height" content="412">
+<meta property="og:image:alt" content="System by Dave preview banner">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AV Suite">
+<meta name="twitter:description" content="Open the System by Dave AV tool suite from one operator hub with show context, phase recommendations, search, pins, and recent tools.">
+<meta name="twitter:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<link rel="icon" href="svg/system_by_dave_logo_rust.svg" type="image/svg+xml">
+<style>
+  :root{
+    --bg:#080d14;
+    --panel:#111923;
+    --panel-2:#162231;
+    --panel-3:#0c141d;
+    --line:#304154;
+    --line-strong:#496178;
+    --text:#f4f8ff;
+    --muted:#aab8ca;
+    --cyan:#72f4e9;
+    --blue:#58a6ff;
+    --green:#65d991;
+    --yellow:#f6c76a;
+    --red:#ff6b6b;
+    --ink:#031016;
+    --radius:8px;
+    --shadow:0 18px 55px rgba(0,0,0,.34);
+    --mono:"SFMono-Regular","Cascadia Code","Liberation Mono",Menlo,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{min-height:100%;background:var(--bg)}
+  body{margin:0;min-height:100%;background:
+    linear-gradient(120deg,rgba(114,244,233,.08),transparent 32%),
+    linear-gradient(260deg,rgba(88,166,255,.07),transparent 36%),
+    var(--bg);color:var(--text);font-family:var(--sans);line-height:1.45}
+  a{color:inherit}
+  button,input,select{font:inherit}
+  button,.button-link{border:1px solid var(--line);border-radius:var(--radius);background:var(--panel-2);color:var(--text);padding:10px 13px;cursor:pointer;transition:transform 140ms ease,background 140ms ease,border-color 140ms ease,box-shadow 140ms ease;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
+  button:hover,.button-link:hover{background:#1b2b3c;border-color:var(--line-strong);transform:translateY(-1px)}
+  button:active,button.is-pressing{transform:translateY(1px) scale(.98);background:#203349}
+  button.primary{background:linear-gradient(180deg,var(--cyan),#45b9ff);border-color:#7bdfff;color:var(--ink);font-weight:800}
+  button.ghost,.button-link.ghost{background:transparent}
+  button.pin[aria-pressed="true"]{background:rgba(246,199,106,.18);border-color:var(--yellow);color:#ffe7ae}
+  button.danger{border-color:#7b313a;color:#ffd3d8;background:#30161d}
+  input,select{width:100%;border:1px solid var(--line);border-radius:var(--radius);background:#0b131c;color:var(--text);padding:10px 11px;outline:none}
+  input:focus,select:focus,button:focus-visible,a:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+  label{display:block;margin:0 0 6px;color:var(--muted);font-family:var(--mono);font-size:12px;text-transform:uppercase;letter-spacing:.08em}
+  .topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:15px 20px;background:rgba(8,13,20,.94);border-bottom:1px solid var(--line);backdrop-filter:blur(14px)}
+  .brand{display:flex;align-items:center;gap:13px;min-width:0}
+  .mark{display:grid;place-items:center;width:52px;height:52px;border:2px solid #456176;border-radius:50%;color:var(--cyan);font-weight:900;font-size:22px;font-family:var(--mono);letter-spacing:-.05em}
+  .brand h1{margin:0;font-size:23px;letter-spacing:.24em;text-transform:uppercase}
+  .brand span{display:block;color:var(--muted);font-family:var(--mono);font-size:14px;letter-spacing:.05em}
+  .top-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px}
+  main{width:min(1440px,100%);margin:0 auto;padding:20px;display:grid;gap:18px}
+  .hero{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(320px,.95fr);gap:18px;align-items:stretch}
+  .panel{background:rgba(17,25,35,.95);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow)}
+  .profile{padding:18px;display:grid;gap:15px}
+  .profile-kicker,.section-kicker{margin:0;color:var(--cyan);font-family:var(--mono);font-size:13px;text-transform:uppercase;letter-spacing:.22em}
+  .show-title{margin:0;font-size:clamp(32px,5vw,58px);line-height:.95;letter-spacing:-.02em}
+  .profile-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+  .phase-strip{display:flex;flex-wrap:wrap;gap:8px}
+  .phase-strip button{font-family:var(--mono);font-size:12px;text-transform:uppercase;letter-spacing:.08em}
+  .phase-strip button[aria-pressed="true"]{background:rgba(114,244,233,.16);border-color:var(--cyan);color:#dffffc}
+  .status{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:14px}
+  .stat{padding:14px;border:1px solid rgba(73,97,120,.72);border-radius:12px;background:rgba(12,20,29,.84)}
+  .stat span{display:block;color:var(--muted);font-family:var(--mono);font-size:12px;text-transform:uppercase;letter-spacing:.08em}
+  .stat strong{display:block;margin-top:4px;font-size:30px}
+  .workspace{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:18px;align-items:start}
+  .tool-panel{padding:16px;display:grid;gap:14px}
+  .toolbar{display:grid;grid-template-columns:minmax(220px,1fr) 160px 170px 150px;gap:10px;align-items:end}
+  .recommendations{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+  .recommend-card,.tool-card,.recent-item{border:1px solid var(--line);border-radius:12px;background:rgba(12,20,29,.8);padding:12px}
+  .recommend-card{display:grid;gap:8px;border-color:rgba(114,244,233,.45)}
+  .recommend-card strong,.tool-card h3{font-size:17px;margin:0}
+  .recommend-card span,.tool-meta,.recent-item span{color:var(--muted);font-size:12px}
+  .tool-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+  .tool-card{display:grid;gap:11px;min-height:198px;position:relative}
+  .tool-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+  .badge-row{display:flex;flex-wrap:wrap;gap:6px}
+  .badge{display:inline-flex;align-items:center;border:1px solid rgba(73,97,120,.78);border-radius:999px;padding:4px 8px;color:#d8e6f8;background:#0a121b;font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em}
+  .badge.hot{border-color:rgba(114,244,233,.7);color:var(--cyan)}
+  .tool-card p{margin:0;color:#d8e3ef;font-size:14px}
+  .tool-actions{display:flex;gap:8px;margin-top:auto}
+  .tool-actions button{flex:1}
+  .side{display:grid;gap:14px}
+  .side-section{padding:14px;display:grid;gap:12px}
+  .side-section h2{margin:0;font-size:18px}
+  .recent-list{display:grid;gap:8px}
+  .recent-item{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center}
+  .empty{padding:18px;border:1px dashed var(--line);border-radius:12px;color:var(--muted);text-align:center}
+  .hint{min-height:22px;margin:0;color:var(--muted);font-size:13px}
+  .hint.success{color:var(--green)}
+  .hint.error{color:var(--red)}
+  .privacy-note{margin:0;color:var(--muted);font-size:12px}
+  .feedback-success{animation:successPulse 180ms ease}
+  .feedback-error{animation:errorShake 180ms ease}
+  @keyframes successPulse{50%{box-shadow:0 0 0 4px rgba(101,217,145,.22)}}
+  @keyframes errorShake{25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+  @media (prefers-reduced-motion:reduce){*{transition-duration:.001ms!important;animation-duration:.001ms!important}button:hover,button:active,button.is-pressing{transform:none}}
+  @media (max-width:1050px){.hero,.workspace{grid-template-columns:1fr}.tool-grid,.recommendations{grid-template-columns:repeat(2,minmax(0,1fr))}.profile-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  @media (max-width:680px){.topbar{position:static;align-items:flex-start;flex-direction:column}.top-actions{width:100%;display:grid;grid-template-columns:1fr 1fr}.brand h1{font-size:20px}.brand span{font-size:12px}main{padding:10px}.profile,.tool-panel,.side-section{padding:12px}.toolbar,.profile-grid,.status,.tool-grid,.recommendations{grid-template-columns:1fr}.tool-actions{grid-template-columns:1fr}.show-title{font-size:36px}}
+</style>
+</head>
+<body>
+<noscript><div class="empty">AV Suite needs JavaScript for pins, search, saved preferences, and quick launch state. The individual tool links in the page source still work.</div></noscript>
+<div class="topbar">
+  <div class="brand">
+    <div class="mark" aria-hidden="true">AV</div>
+    <div>
+      <h1>AV Suite</h1>
+      <span>System by Dave show tools</span>
+    </div>
+  </div>
+  <div class="top-actions">
+    <button id="copyLaunchBtn" type="button">Copy Launch List</button>
+    <button id="openRecommendedBtn" class="primary" type="button">Open Recommended</button>
+    <a href="index.html#av-tools" class="button-link ghost">All Products</a>
+  </div>
+</div>
+<main>
+  <section class="hero">
+    <div class="panel profile">
+      <p class="profile-kicker">Show profile</p>
+      <h2 class="show-title" id="showTitleOut">AV Tool Suite</h2>
+      <div class="profile-grid">
+        <div><label for="showName">Show</label><input id="showName" type="text" autocomplete="off"></div>
+        <div><label for="venue">Venue</label><input id="venue" type="text" autocomplete="off"></div>
+        <div><label for="showDate">Date</label><input id="showDate" type="date"></div>
+        <div><label for="operator">Operator</label><input id="operator" type="text" autocomplete="off"></div>
+      </div>
+      <div>
+        <label>Current phase</label>
+        <div class="phase-strip" id="phaseButtons" aria-label="Show phase"></div>
+      </div>
+      <p class="hint" id="hint" role="status">Pick a phase to surface the tools an operator usually needs next.</p>
+    </div>
+    <aside class="panel status" aria-label="Suite status">
+      <div class="stat"><span>Tools</span><strong id="toolCountOut">0</strong></div>
+      <div class="stat"><span>Pinned</span><strong id="pinnedCountOut">0</strong></div>
+      <div class="stat"><span>Visible</span><strong id="visibleCountOut">0</strong></div>
+      <div class="stat"><span>Recent</span><strong id="recentCountOut">0</strong></div>
+    </aside>
+  </section>
+
+  <section class="workspace">
+    <section class="panel tool-panel" aria-label="AV suite launch tools">
+      <p class="section-kicker">Recommended next</p>
+      <div class="recommendations" id="recommendations"></div>
+      <div class="toolbar">
+        <div><label for="searchInput">Search tools</label><input id="searchInput" type="search" placeholder="Search teleprompter, patch, crew, rooms"></div>
+        <div><label for="phaseFilter">Phase</label><select id="phaseFilter"></select></div>
+        <div><label for="deptFilter">Department</label><select id="deptFilter"></select></div>
+        <div><label for="pinFilter">View</label><select id="pinFilter"><option value="all">All tools</option><option value="pinned">Pinned only</option><option value="recent">Recent only</option></select></div>
+      </div>
+      <div id="toolGrid" class="tool-grid"></div>
+      <div id="emptyState" class="empty" hidden>No tools match the current filters.</div>
+    </section>
+    <aside class="side">
+      <section class="panel side-section">
+        <h2>Recent tools</h2>
+        <div id="recentList" class="recent-list"></div>
+      </section>
+      <section class="panel side-section">
+        <h2>Operator shortcuts</h2>
+        <button id="pinRecommendedBtn" type="button">Pin Recommended Set</button>
+        <button id="clearPrefsBtn" class="danger" type="button">Clear Suite Preferences</button>
+        <p class="privacy-note">Show profile, pinned tools, and recent tools are remembered in this browser when storage is available.</p>
+      </section>
+    </aside>
+  </section>
+</main>
+<script>
+(function(){
+  var STORAGE_KEY='av-suite-dashboard.v1';
+  var PHASES=[
+    {id:'advance',label:'Advance'},
+    {id:'prep',label:'Prep'},
+    {id:'loadin',label:'Load In'},
+    {id:'show',label:'Show'},
+    {id:'strike',label:'Strike'},
+    {id:'closeout',label:'Closeout'}
+  ];
+  var TOOLS=[
+    {id:'teleprompter',name:'Teleprompter',href:'teleprompter.html',dept:'Show Flow',phases:['prep','show'],tag:'Script',desc:'Script reader with formatting, saved scripts, cues, remote mode, rundown, and a compact read view.'},
+    {id:'show-timer',name:'Show Timer',href:'show-timer.html',dept:'Show Flow',phases:['prep','show'],tag:'Clock',desc:'Countdown, count up, clock mode, stage view, warning states, and keyboard control.'},
+    {id:'cueforge',name:'CueForge',href:'cueforge.html',dept:'Show Flow',phases:['advance','prep','show'],tag:'Cues',desc:'Run of show cue control with next actions, status tracking, print, JSON, and CSV.'},
+    {id:'playback-check',name:'Playback Check',href:'playback-check.html',dept:'Playback',phases:['prep','show'],tag:'Media',desc:'Playback file checklist with routes, backups, duration, ready state, and export.'},
+    {id:'record-log',name:'Record Log',href:'record-log.html',dept:'Playback',phases:['show','closeout'],tag:'Record',desc:'Program records, camera ISOs, audio captures, media destinations, backup status, and handoff notes.'},
+    {id:'stream-plan',name:'Stream Plan',href:'stream-plan.html',dept:'Streaming',phases:['advance','prep','show'],tag:'Stream',desc:'Encoder, platform, destination, bitrate, audio, record, backup, and test tracking.'},
+    {id:'show-advance',name:'Show Advance',href:'show-advance.html',dept:'Planning',phases:['advance'],tag:'Advance',desc:'Contacts, access, schedule, power, network, labor, deliverables, risks, and open questions.'},
+    {id:'site-survey',name:'Site Survey',href:'site-survey.html',dept:'Planning',phases:['advance'],tag:'Venue',desc:'Venue access, loading, rooms, power, rigging, network, safety, contacts, and findings.'},
+    {id:'crew-call',name:'Crew Call',href:'crew-call.html',dept:'Labor',phases:['advance','prep','show'],tag:'Crew',desc:'Departments, names, roles, call times, locations, meal breaks, release times, and phone numbers.'},
+    {id:'crew-time-log',name:'Crew Time Log',href:'crew-time-log.html',dept:'Labor',phases:['show','closeout'],tag:'Time',desc:'Actual check in, meals, release times, hour totals, issues, and export.'},
+    {id:'room-check',name:'Room Check',href:'room-check.html',dept:'Rooms',phases:['loadin','show'],tag:'Rooms',desc:'Room readiness by area, owner, priority, deadline, status, blocker, and notes.'},
+    {id:'breakout-room-matrix',name:'Breakout Room Matrix',href:'breakout-room-matrix.html',dept:'Rooms',phases:['advance','prep','show'],tag:'Matrix',desc:'Breakout schedules, tracks, techs, producers, audio, video, network, power, readiness, and blockers.'},
+    {id:'show-task-board',name:'Show Task Board',href:'show-task-board.html',dept:'Rooms',phases:['loadin','show','strike'],tag:'Tasks',desc:'Show day tasks, area, owner, priority, due time, source, blocker, status counts, and handoff summaries.'},
+    {id:'show-handoff',name:'Show Handoff',href:'show-handoff.html',dept:'Closeout',phases:['show','closeout'],tag:'Handoff',desc:'A concise show transfer builder for status, signal flow, crew notes, risks, and next actions.'},
+    {id:'show-report',name:'Show Report',href:'show-report.html',dept:'Closeout',phases:['closeout'],tag:'Report',desc:'Timeline, issues, client requests, decisions, crew notes, follow ups, severity, and status.'},
+    {id:'change-order',name:'Change Order',href:'change-order.html',dept:'Client',phases:['show','closeout'],tag:'Change',desc:'Client scope requests, approval, cost impact, owners, due times, issue state, and notes.'},
+    {id:'client-signoff',name:'Client Sign Off',href:'client-signoff.html',dept:'Client',phases:['closeout'],tag:'Signoff',desc:'Acceptance items, approvers, signed times, exceptions, follow ups, owners, and notes.'},
+    {id:'input-list',name:'Input List',href:'input-list.html',dept:'Audio',phases:['advance','prep','show'],tag:'Inputs',desc:'Input list and patch prep with channels, line checks, filters, print, JSON, and CSV.'},
+    {id:'audio-patch',name:'Audio Patch',href:'audio-patch.html',dept:'Audio',phases:['prep','loadin','show'],tag:'Audio',desc:'Console channels, sources, stageboxes, inputs, phantom, gain, destinations, monitor sends, and gaps.'},
+    {id:'line-check',name:'Line Check',href:'line-check.html',dept:'Audio',phases:['loadin','show'],tag:'Check',desc:'Channels, sources, locations, techs, console labels, destinations, talkback, problems, and status.'},
+    {id:'speaker-plan',name:'Speaker Plan',href:'speaker-plan.html',dept:'Audio',phases:['advance','prep','loadin'],tag:'PA',desc:'Zones, loudspeakers, processor outputs, amps, cable paths, trim, delay, coverage, and backup routes.'},
+    {id:'power-plan',name:'Power Plan',href:'power-plan.html',dept:'Power',phases:['advance','prep','loadin'],tag:'Power',desc:'Circuits, sources, room locations, load estimates, capacity, draw, headroom, backups, and issues.'},
+    {id:'network-plan',name:'Network Plan',href:'network-plan.html',dept:'Network',phases:['advance','prep','loadin','show'],tag:'Network',desc:'Show control, audio, video, comms, internet, IPs, VLANs, switch ports, backups, and issues.'},
+    {id:'signal-flow',name:'Signal Flow',href:'signal-flow.html',dept:'Video',phases:['advance','prep','loadin'],tag:'Routes',desc:'Sources, processors, destinations, formats, connectors, backups, route status, and issues.'},
+    {id:'video-patch',name:'Video Patch',href:'video-patch.html',dept:'Video',phases:['prep','loadin','show'],tag:'Video',desc:'Sources, formats, connectors, switcher inputs, converters, destinations, routes, backups, and tests.'},
+    {id:'display-plan',name:'Display Plan',href:'display-plan.html',dept:'Video',phases:['advance','prep','loadin'],tag:'Displays',desc:'Displays, inputs, processors, resolutions, aspect ratios, refresh rates, routes, backups, and status.'},
+    {id:'projection-plan',name:'Projection Plan',href:'projection-plan.html',dept:'Video',phases:['advance','prep','loadin'],tag:'Projection',desc:'Screens, surfaces, projectors, lenses, throw, positions, routes, blends, backup paths, and alignment.'},
+    {id:'lighting-patch',name:'Lighting Patch',href:'lighting-patch.html',dept:'Lighting',phases:['advance','prep','loadin','show'],tag:'LX',desc:'Fixtures, positions, modes, universes, addresses, channels, dimmers, colors, focus notes, and status.'},
+    {id:'cable-plan',name:'Cable Plan',href:'cable-plan.html',dept:'Build',phases:['prep','loadin','strike'],tag:'Cable',desc:'Cable types, lengths, source, destination, path, labels, owners, pull status, trip, and slack issues.'},
+    {id:'rf-coordination',name:'RF Coordination',href:'rf-coordination.html',dept:'Comms',phases:['advance','prep','show'],tag:'RF',desc:'Wireless mics, IEM, IFB, comms packs, receivers, frequencies, bands, conflicts, and backups.'},
+    {id:'comms-check',name:'Comms Check',href:'comms-check.html',dept:'Comms',phases:['prep','show'],tag:'Comms',desc:'Intercom, radio, and IFB assignments with channels, devices, battery, backups, and issue flags.'},
+    {id:'camera-shot-list',name:'Camera Shot List',href:'camera-shot-list.html',dept:'Camera',phases:['advance','prep','show'],tag:'Camera',desc:'Camera plan with shot rows, framing, movement, presets, ready and problem status, and take next.'},
+    {id:'plotforge',name:'PlotForge',href:'plotforge.html',dept:'Planning',phases:['advance','prep','loadin'],tag:'Plot',desc:'Room layout planner with draggable stages, screens, cameras, speakers, mics, tables, power, and cable paths.'},
+    {id:'gear-prep',name:'Gear Prep',href:'gear-prep.html',dept:'Logistics',phases:['prep'],tag:'Gear',desc:'Pull sheets, case IDs, quantities, departments, owners, test, pack, load, issues, and open items.'},
+    {id:'truck-pack',name:'Truck Pack Plan',href:'truck-pack.html',dept:'Logistics',phases:['prep','loadin','strike'],tag:'Truck',desc:'Cases, truck zones, load order, unload order, weights, owners, pack status, and issues.'},
+    {id:'load-in-plan',name:'Load In Plan',href:'load-in-plan.html',dept:'Logistics',phases:['loadin'],tag:'Load In',desc:'Trucks, docks, destinations, departments, items, owners, due times, build status, blockers, and gaps.'},
+    {id:'strike-plan',name:'Strike Plan',href:'strike-plan.html',dept:'Logistics',phases:['strike'],tag:'Strike',desc:'Departments, strike items, locations, owners, case IDs, destinations, load out status, missing gear, and issues.'},
+    {id:'av-calculator',name:'AV Calculator',href:'av-calculator.html',dept:'Utility',phases:['advance','prep','loadin','show'],tag:'Math',desc:'Audio delay, projection throw, record storage, and power load checks with copyable summaries.'}
+  ];
+  var RECOMMENDED={
+    advance:['show-advance','site-survey','breakout-room-matrix','crew-call','plotforge','input-list'],
+    prep:['gear-prep','truck-pack','cueforge','teleprompter','playback-check','audio-patch','video-patch','network-plan'],
+    loadin:['load-in-plan','room-check','power-plan','line-check','display-plan','projection-plan','speaker-plan','show-task-board'],
+    show:['teleprompter','show-timer','cueforge','show-task-board','breakout-room-matrix','record-log','comms-check','camera-shot-list'],
+    strike:['strike-plan','truck-pack','cable-plan','show-task-board','crew-time-log'],
+    closeout:['show-handoff','show-report','client-signoff','change-order','record-log','crew-time-log']
+  };
+  var $=function(id){return document.getElementById(id);};
+  var inputs={showName:$('showName'),venue:$('venue'),showDate:$('showDate'),operator:$('operator'),search:$('searchInput'),phase:$('phaseFilter'),dept:$('deptFilter'),pin:$('pinFilter')};
+  var state={showName:'AV Tool Suite',venue:'',showDate:new Date().toISOString().slice(0,10),operator:'',phase:'show',favorites:['teleprompter','show-timer','cueforge'],recent:[],filters:{search:'',phase:'all',dept:'all',pin:'all'}};
+
+  function storageAvailable(){try{var key='av-suite-probe';localStorage.setItem(key,key);localStorage.removeItem(key);return true;}catch(e){return false;}}
+  function loadState(){if(!storageAvailable()) return;try{var raw=localStorage.getItem(STORAGE_KEY);if(!raw) return;var parsed=JSON.parse(raw);state.showName=String(parsed.showName||state.showName).slice(0,120);state.venue=String(parsed.venue||'').slice(0,120);state.showDate=String(parsed.showDate||state.showDate).slice(0,20);state.operator=String(parsed.operator||'').slice(0,80);state.phase=phaseExists(parsed.phase)?parsed.phase:state.phase;state.favorites=cleanIds(parsed.favorites).slice(0,60);state.recent=cleanIds(parsed.recent).slice(0,12);state.filters={search:String(parsed.filters&&parsed.filters.search||''),phase:phaseExists(parsed.filters&&parsed.filters.phase)?parsed.filters.phase:'all',dept:deptExists(parsed.filters&&parsed.filters.dept)?parsed.filters.dept:'all',pin:['all','pinned','recent'].indexOf(parsed.filters&&parsed.filters.pin)>=0?parsed.filters.pin:'all'};}catch(e){}}
+  function saveState(){if(!storageAvailable()) return false;try{localStorage.setItem(STORAGE_KEY,JSON.stringify({schema:'system-by-dave.av-suite.v1',savedAt:new Date().toISOString(),showName:state.showName,venue:state.venue,showDate:state.showDate,operator:state.operator,phase:state.phase,favorites:state.favorites,recent:state.recent,filters:state.filters}));return true;}catch(e){showHint('Suite preferences could not be saved in this browser.','error');return false;}}
+  function cleanIds(ids){return Array.isArray(ids)?ids.filter(function(id){return toolById(id);}):[];}
+  function toolById(id){return TOOLS.find(function(tool){return tool.id===id;})||null;}
+  function phaseExists(id){return id==='all'||PHASES.some(function(phase){return phase.id===id;});}
+  function departments(){var map={};TOOLS.forEach(function(tool){map[tool.dept]=true;});return Object.keys(map).sort();}
+  function deptExists(name){return name==='all'||departments().indexOf(name)>=0;}
+  function titleCase(value){return String(value||'').replace(/-/g,' ').replace(/\b\w/g,function(letter){return letter.toUpperCase();});}
+  function setInputValues(){inputs.showName.value=state.showName;inputs.venue.value=state.venue;inputs.showDate.value=state.showDate;inputs.operator.value=state.operator;inputs.search.value=state.filters.search;inputs.phase.value=state.filters.phase;inputs.dept.value=state.filters.dept;inputs.pin.value=state.filters.pin;$('showTitleOut').textContent=state.showName||'AV Tool Suite';}
+  function renderPhaseButtons(){var wrap=$('phaseButtons');wrap.innerHTML=PHASES.map(function(phase){return '<button type="button" data-phase="'+phase.id+'" aria-pressed="'+String(state.phase===phase.id)+'">'+phase.label+'</button>';}).join('');}
+  function renderFilters(){inputs.phase.innerHTML='<option value="all">All phases</option>'+PHASES.map(function(phase){return '<option value="'+phase.id+'">'+phase.label+'</option>';}).join('');inputs.dept.innerHTML='<option value="all">All departments</option>'+departments().map(function(dept){return '<option value="'+escapeAttr(dept)+'">'+escapeHtml(dept)+'</option>';}).join('');}
+  function recommendedTools(){return (RECOMMENDED[state.phase]||[]).map(toolById).filter(Boolean);}
+  function visibleTools(){var query=state.filters.search.trim().toLowerCase();return TOOLS.filter(function(tool){var haystack=[tool.name,tool.dept,tool.tag,tool.desc,tool.phases.join(' ')].join(' ').toLowerCase();if(query&&haystack.indexOf(query)===-1) return false;if(state.filters.phase!=='all'&&tool.phases.indexOf(state.filters.phase)<0) return false;if(state.filters.dept!=='all'&&tool.dept!==state.filters.dept) return false;if(state.filters.pin==='pinned'&&state.favorites.indexOf(tool.id)<0) return false;if(state.filters.pin==='recent'&&state.recent.indexOf(tool.id)<0) return false;return true;});}
+  function renderRecommendations(){var tools=recommendedTools().slice(0,3);$('recommendations').innerHTML=tools.map(function(tool){return '<article class="recommend-card"><span>'+escapeHtml(tool.dept)+' | '+tool.tag+'</span><strong>'+escapeHtml(tool.name)+'</strong><button type="button" class="primary" data-open="'+tool.id+'">Open '+escapeHtml(tool.name)+'</button></article>';}).join('');}
+  function renderTools(){var tools=visibleTools();$('emptyState').hidden=tools.length>0;$('toolGrid').innerHTML=tools.map(function(tool){var pinned=state.favorites.indexOf(tool.id)>=0;var hot=recommendedTools().some(function(item){return item.id===tool.id;});return '<article class="tool-card" data-id="'+tool.id+'"><div class="tool-head"><div><div class="badge-row"><span class="badge '+(hot?'hot':'')+'">'+escapeHtml(tool.tag)+'</span><span class="badge">'+escapeHtml(tool.dept)+'</span></div><h3>'+escapeHtml(tool.name)+'</h3></div><button type="button" class="pin" data-pin="'+tool.id+'" aria-pressed="'+String(pinned)+'" aria-label="'+(pinned?'Unpin ':'Pin ')+escapeAttr(tool.name)+'">'+(pinned?'Pinned':'Pin')+'</button></div><p>'+escapeHtml(tool.desc)+'</p><div class="tool-meta">'+tool.phases.map(titleCase).join(' | ')+'</div><div class="tool-actions"><button type="button" class="primary" data-open="'+tool.id+'">Open</button><button type="button" data-preview="'+tool.id+'">Copy Name</button></div></article>';}).join('');updateStats(tools.length);}
+  function renderRecent(){var list=state.recent.map(toolById).filter(Boolean);$('recentList').innerHTML=list.length?list.map(function(tool){return '<div class="recent-item"><div><strong>'+escapeHtml(tool.name)+'</strong><span>'+escapeHtml(tool.dept)+' | '+tool.tag+'</span></div><button type="button" data-open="'+tool.id+'">Open</button></div>';}).join(''):'<div class="empty">No recent tools yet.</div>';}
+  function updateStats(visibleCount){$('toolCountOut').textContent=TOOLS.length;$('pinnedCountOut').textContent=state.favorites.length;$('visibleCountOut').textContent=visibleCount;$('recentCountOut').textContent=state.recent.length;}
+  function render(){renderPhaseButtons();renderFilters();setInputValues();renderRecommendations();renderTools();renderRecent();}
+  function syncProfile(){state.showName=inputs.showName.value;state.venue=inputs.venue.value;state.showDate=inputs.showDate.value;state.operator=inputs.operator.value;$('showTitleOut').textContent=state.showName||'AV Tool Suite';saveState();}
+  function setPhase(id){if(!phaseExists(id)||id==='all') return;state.phase=id;state.filters.phase=id;saveState();render();showHint('Recommended tools updated for '+titleCase(id)+'.','success');}
+  function togglePin(id){var index=state.favorites.indexOf(id);var tool=toolById(id);if(!tool) return;if(index>=0){state.favorites.splice(index,1);showHint(tool.name+' unpinned.','success');}else{state.favorites.unshift(id);showHint(tool.name+' pinned.','success');}saveState();renderTools();renderRecent();}
+  function rememberTool(id){state.recent=state.recent.filter(function(item){return item!==id;});state.recent.unshift(id);state.recent=state.recent.slice(0,12);saveState();}
+  function openTool(id){var tool=toolById(id);if(!tool) return;rememberTool(id);window.location.href=tool.href;}
+  function copyToolName(id){var tool=toolById(id);if(!tool) return;copyText(tool.name+' | '+tool.href).then(function(){showHint(tool.name+' copied.','success');}).catch(function(){showHint('Could not copy tool name.','error');});}
+  function pinRecommended(){var ids=recommendedTools().map(function(tool){return tool.id;});ids.reverse().forEach(function(id){if(state.favorites.indexOf(id)<0) state.favorites.unshift(id);});saveState();render();showHint('Recommended set pinned.','success');}
+  function copyLaunchList(){var tools=recommendedTools();var lines=['AV SUITE LAUNCH LIST','Show: '+state.showName,'Venue: '+state.venue,'Date: '+state.showDate,'Operator: '+state.operator,'Phase: '+titleCase(state.phase),'','Recommended:'];tools.forEach(function(tool){lines.push(tool.name+' | '+absoluteHref(tool.href));});lines.push('');lines.push('Pinned:');state.favorites.map(toolById).filter(Boolean).forEach(function(tool){lines.push(tool.name+' | '+absoluteHref(tool.href));});copyText(lines.join('\n')).then(function(){showHint('Launch list copied.','success');signal($('copyLaunchBtn'),'success');}).catch(function(){showHint('Could not copy launch list.','error');signal($('copyLaunchBtn'),'error');});}
+  function clearPrefs(){if(!window.confirm('Clear AV Suite saved profile, pins, and recent tools?')) return;if(storageAvailable()) localStorage.removeItem(STORAGE_KEY);state={showName:'AV Tool Suite',venue:'',showDate:new Date().toISOString().slice(0,10),operator:'',phase:'show',favorites:['teleprompter','show-timer','cueforge'],recent:[],filters:{search:'',phase:'all',dept:'all',pin:'all'}};render();showHint('Suite preferences cleared.','success');}
+  function absoluteHref(href){return new URL(href, window.location.href).href;}
+  function copyText(text){if(navigator.clipboard&&navigator.clipboard.writeText) return navigator.clipboard.writeText(text);return new Promise(function(resolve,reject){var area=document.createElement('textarea');area.value=text;area.setAttribute('readonly','');area.style.position='fixed';area.style.left='-9999px';document.body.appendChild(area);area.select();try{document.execCommand('copy')?resolve():reject(new Error('copy failed'));}catch(e){reject(e);}finally{if(area.parentNode) area.parentNode.removeChild(area);}});}
+  function showHint(message,kind){var hint=$('hint');hint.textContent=message;hint.classList.remove('success','error');if(kind) hint.classList.add(kind);}
+  function signal(element,kind){var className=kind==='error'?'feedback-error':'feedback-success';if(!element) return;element.classList.remove(className);void element.offsetWidth;element.classList.add(className);setTimeout(function(){element.classList.remove(className);},190);}
+  function installPressFeedback(){document.querySelectorAll('button').forEach(function(button){function press(){if(!button.disabled) button.classList.add('is-pressing');}function release(){button.classList.remove('is-pressing');}button.addEventListener('pointerdown',press);button.addEventListener('pointerup',release);button.addEventListener('pointercancel',release);button.addEventListener('pointerleave',release);button.addEventListener('blur',release);button.addEventListener('keydown',function(event){if(event.key===' '||event.key==='Enter') press();});button.addEventListener('keyup',function(event){if(event.key===' '||event.key==='Enter') release();});});}
+  function escapeHtml(value){return String(value==null?'':value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+  function escapeAttr(value){return escapeHtml(value);}
+  loadState();
+  render();
+  inputs.showName.addEventListener('input',syncProfile);
+  inputs.venue.addEventListener('input',syncProfile);
+  inputs.showDate.addEventListener('input',syncProfile);
+  inputs.operator.addEventListener('input',syncProfile);
+  inputs.search.addEventListener('input',function(){state.filters.search=inputs.search.value;saveState();renderTools();});
+  inputs.phase.addEventListener('change',function(){state.filters.phase=inputs.phase.value;saveState();renderTools();});
+  inputs.dept.addEventListener('change',function(){state.filters.dept=inputs.dept.value;saveState();renderTools();});
+  inputs.pin.addEventListener('change',function(){state.filters.pin=inputs.pin.value;saveState();renderTools();});
+  $('phaseButtons').addEventListener('click',function(event){var button=event.target.closest('button[data-phase]');if(button) setPhase(button.getAttribute('data-phase'));});
+  document.addEventListener('click',function(event){var open=event.target.closest('[data-open]');var pin=event.target.closest('[data-pin]');var preview=event.target.closest('[data-preview]');if(open){openTool(open.getAttribute('data-open'));return;}if(pin){togglePin(pin.getAttribute('data-pin'));signal(pin,'success');return;}if(preview){copyToolName(preview.getAttribute('data-preview'));signal(preview,'success');}});
+  $('openRecommendedBtn').addEventListener('click',function(){var tool=recommendedTools()[0];if(tool) openTool(tool.id);});
+  $('copyLaunchBtn').addEventListener('click',copyLaunchList);
+  $('pinRecommendedBtn').addEventListener('click',function(){pinRecommended();signal(this,'success');});
+  $('clearPrefsBtn').addEventListener('click',clearPrefs);
+  installPressFeedback();
+})();
+</script>
+</body>
+</html>

@@ -14,7 +14,7 @@ Read `CLAUDE.md` first for project orientation. This file is the rulebook.
 ## HTML conventions
 
 - Every user-facing page (`index`, `agents`, `skills`, `widgets`,
-  `teleprompter`, `show-timer`, `cue-sheet`, `cueforge`, `input-list`,
+  `av-suite`, `teleprompter`, `show-timer`, `cue-sheet`, `cueforge`, `input-list`,
   `playback-check`, `stream-plan`, `record-log`, `power-plan`, `audio-patch`,
   `line-check`,
   `room-check`,

@@ -20,6 +20,7 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
 - `agents.html` — agents catalog (cards are deep-linked)
 - `skills.html` — skills catalog
 - `widgets.html` — widget previews (poster cards, not live iframes)
+- `av-suite.html` — AV suite launch hub
 - `teleprompter.html` — AV teleprompter
 - `show-timer.html` — AV show timer
 - `cue-sheet.html` — CueForge cue sheet and run of show control
@@ -87,6 +88,10 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
   toolbar, and footer while leaving a small Show controls restore button. The
   header Hide controls action stays visibly labeled until phone width, and the
   collapsed read view offsets the run HUD away from the restore button.
+- `av-suite.html` is the AV suite launch hub with show profile fields,
+  phase recommendations, search, phase and department filters, pinned tools,
+  recent tools, copyable launch lists, saved browser preferences, tactile
+  button feedback, and mobile layout containment.
 - `cue-sheet.html` is rolled into the AV suite as CueForge, with
   `cueforge.html` as a route alias.
 - `stage-plot.html` is rolled into the AV suite as PlotForge, with
@@ -193,7 +198,7 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
 - `signal-flow.html` tracks AV sources, processors, destinations, formats,
   connectors, backups, route status, issues, copyable summaries, print output,
   JSON import and export, and CSV export.
-- AV tools now include `teleprompter.html`, `show-timer.html`,
+- AV tools now include `av-suite.html`, `teleprompter.html`, `show-timer.html`,
   `cue-sheet.html`, `cueforge.html`, `playback-check.html`,
   `stream-plan.html`, `record-log.html`, `power-plan.html`, `audio-patch.html`,
   `line-check.html`,
