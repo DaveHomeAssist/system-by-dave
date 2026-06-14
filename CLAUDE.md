@@ -48,8 +48,9 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
 - `404.html` and `500.html` now carry OG + Twitter Card meta.
 - `teleprompter.html` now includes expanded reader font, color,
   background, letter spacing, text shadow, reading line color, format preset,
-  pinned saved-script, saved sort, saved copy, show package, remote, and
-  rundown controls.
+  word spacing, text stroke, reusable saved looks, saved script tags, pinned
+  saved scripts, saved sort, saved copy, show package, remote, and rundown
+  controls.
 - AV tools now include `teleprompter.html`, `show-timer.html`,
   `cue-sheet.html`, `input-list.html`, `stage-plot.html`,
   `show-handoff.html`, `camera-shot-list.html`, `comms-check.html`,
