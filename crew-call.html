@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'none'">
+<title>Crew Call | System by Dave</title>
+<meta name="description" content="A browser based AV crew call sheet for departments, names, roles, call times, locations, meal breaks, release times, contact status, and handoff notes.">
+<link rel="canonical" href="https://systembydave.com/crew-call.html">
+<meta name="theme-color" content="#0b0d10">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="System by Dave">
+<meta property="og:title" content="Crew Call">
+<meta property="og:description" content="A browser based AV crew call sheet for departments, names, roles, call times, locations, meal breaks, release times, contact status, and handoff notes.">
+<meta property="og:url" content="https://systembydave.com/crew-call.html">
+<meta property="og:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<meta property="og:image:width" content="1024">
+<meta property="og:image:height" content="412">
+<meta property="og:image:alt" content="System by Dave preview banner">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Crew Call">
+<meta name="twitter:description" content="A browser based AV crew call sheet for departments, names, roles, call times, locations, meal breaks, release times, contact status, and handoff notes.">
+<meta name="twitter:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<link rel="icon" href="svg/system_by_dave_logo_rust.svg" type="image/svg+xml">
+<style>
+  :root{
+    --bg:#0b0d10;
+    --panel:#12171d;
+    --panel-2:#171e26;
+    --panel-3:#1d252e;
+    --line:#303945;
+    --line-strong:#465363;
+    --text:#f6f8fb;
+    --muted:#a9b4c1;
+    --dim:#768391;
+    --rust:#c0623a;
+    --rust-2:#e58a5c;
+    --blue:#72b8ff;
+    --green:#6be092;
+    --amber:#ffd166;
+    --red:#ff6b6b;
+    --purple:#b996ff;
+    --ink:#071016;
+    --radius:8px;
+    --shadow:0 16px 60px rgba(0,0,0,.32);
+    --mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --fast:120ms;
+    --med:180ms;
+    --ease:cubic-bezier(.2,.8,.2,1);
+    --press:cubic-bezier(.2,0,0,1);
+  }
+  *{box-sizing:border-box}
+  html,body{min-height:100%}
+  body{
+    margin:0;
+    background:
+      radial-gradient(circle at 12% -14%,rgba(192,98,58,.18),transparent 30rem),
+      radial-gradient(circle at 86% 8%,rgba(114,184,255,.14),transparent 28rem),
+      linear-gradient(180deg,#0b0d10 0%,#11161b 52%,#080a0d 100%);
+    color:var(--text);
+    font-family:var(--sans);
+    line-height:1.45;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+  body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    background:
+      repeating-linear-gradient(90deg,rgba(255,255,255,.034) 0 1px,transparent 1px 80px),
+      repeating-linear-gradient(0deg,rgba(255,255,255,.024) 0 1px,transparent 1px 80px);
+    mask-image:linear-gradient(180deg,rgba(0,0,0,.78),rgba(0,0,0,.12));
+  }
+  a{color:inherit}
+  button,input,select,textarea{font:inherit}
+  button{
+    min-height:44px;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    background:var(--panel-2);
+    color:var(--text);
+    padding:9px 12px;
+    cursor:pointer;
+    user-select:none;
+    -webkit-tap-highlight-color:transparent;
+    touch-action:manipulation;
+    transition:transform var(--fast) var(--press),border-color var(--fast) var(--ease),background var(--fast) var(--ease),box-shadow var(--fast) var(--ease),color var(--fast) var(--ease);
+  }
+  button:hover{
+    border-color:var(--line-strong);
+    background:var(--panel-3);
+    transform:translateY(-1px);
+    box-shadow:0 8px 22px rgba(0,0,0,.18);
+  }
+  button:active,
+  button.is-pressing{
+    transform:translateY(1px) scale(.975);
+    box-shadow:inset 0 2px 5px rgba(0,0,0,.28);
+  }
+  button.primary{
+    background:linear-gradient(180deg,var(--rust-2),var(--rust));
+    border-color:var(--rust);
+    color:#140905;
+    font-weight:800;
+  }
+  button.danger{
+    border-color:rgba(255,107,107,.55);
+    color:#ffd5d5;
+    background:rgba(255,107,107,.1);
+  }
+  button:disabled{
+    cursor:not-allowed;
+    opacity:.52;
+    transform:none;
+    box-shadow:none;
+  }
+  button:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible,
+  a:focus-visible{
+    outline:2px solid var(--blue);
+    outline-offset:3px;
+  }
+  input,select,textarea{
+    width:100%;
+    min-height:40px;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    background:#0e1318;
+    color:var(--text);
+    padding:9px 10px;
+    transition:border-color var(--fast) var(--ease),background var(--fast) var(--ease),box-shadow var(--fast) var(--ease);
+  }
+  textarea{min-height:42px;resize:vertical}
+  input:hover,
+  input:focus,
+  select:hover,
+  select:focus,
+  textarea:hover,
+  textarea:focus{
+    border-color:var(--line-strong);
+    background:#111821;
+  }
+  input::placeholder,
+  textarea::placeholder{color:var(--dim)}
+  .skip-link{
+    position:absolute;
+    top:12px;
+    left:12px;
+    z-index:1000;
+    background:var(--text);
+    color:var(--ink);
+    padding:10px 14px;
+    border-radius:var(--radius);
+    transform:translateY(-150%);
+    transition:transform var(--med) var(--ease);
+  }
+  .skip-link:focus-visible{transform:translateY(0)}
+  .app{position:relative;z-index:1;min-height:100vh}
+  .topbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    padding:14px 18px;
+    border-bottom:1px solid rgba(255,255,255,.08);
+    background:rgba(11,13,16,.88);
+    backdrop-filter:blur(18px);
+    position:sticky;
+    top:0;
+    z-index:30;
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    text-decoration:none;
+  }
+  .brand-mark{
+    width:38px;
+    height:38px;
+    border:1px solid rgba(255,255,255,.24);
+    border-radius:50%;
+    display:grid;
+    place-items:center;
+    font-family:Georgia,serif;
+    font-size:19px;
+    color:var(--rust-2);
+    background:#11161c;
+  }
+  .brand-text{display:flex;flex-direction:column;gap:1px}
+  .brand-text strong{font-size:14px;letter-spacing:.08em;text-transform:uppercase}
+  .brand-text span{color:var(--muted);font-family:var(--mono);font-size:11px}
+  .top-actions{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+  main{width:min(1540px,100%);margin:0 auto;padding:22px}
+  .hero{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) 360px;
+    gap:18px;
+    align-items:stretch;
+    margin-bottom:18px;
+  }
+  .panel{
+    border:1px solid rgba(255,255,255,.09);
+    background:linear-gradient(180deg,rgba(23,30,38,.92),rgba(14,18,23,.94));
+    box-shadow:var(--shadow);
+    border-radius:var(--radius);
+  }
+  .show-panel{padding:18px;display:grid;gap:16px}
+  .eyebrow{margin:0 0 3px;color:var(--rust-2);font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.12em}
+  .show-title{
+    min-height:58px;
+    border:0;
+    background:transparent;
+    padding:0;
+    color:var(--text);
+    font-size:clamp(31px,4.2vw,62px);
+    line-height:1.04;
+    font-weight:900;
+  }
+  .show-title:hover,
+  .show-title:focus{background:transparent}
+  .meta-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+  .field label,
+  .selected-grid label{
+    display:block;
+    margin:0 0 5px;
+    color:var(--muted);
+    font-family:var(--mono);
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.09em;
+  }
+  .status-panel{padding:14px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .stat{
+    min-height:76px;
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:var(--radius);
+    background:rgba(9,12,16,.58);
+    padding:12px;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+  }
+  .stat span{color:var(--muted);font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.1em}
+  .stat strong{font-size:28px;line-height:1}
+  .workspace{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:18px;align-items:start}
+  .main-panel{min-width:0}
+  .toolbar{
+    display:grid;
+    grid-template-columns:minmax(180px,1fr) 180px 170px auto;
+    gap:10px;
+    align-items:center;
+    padding:14px;
+    border-bottom:1px solid rgba(255,255,255,.08);
+  }
+  .button-row{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+  .table-wrap{overflow:auto;max-height:calc(100vh - 360px);min-height:400px}
+  table{width:100%;min-width:1400px;border-collapse:separate;border-spacing:0}
+  thead th{
+    position:sticky;
+    top:0;
+    z-index:4;
+    background:#10161d;
+    color:var(--muted);
+    font-family:var(--mono);
+    font-size:11px;
+    text-align:left;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    border-bottom:1px solid var(--line);
+    padding:10px 8px;
+  }
+  tbody td{border-bottom:1px solid rgba(255,255,255,.07);padding:7px;vertical-align:top}
+  tbody tr{transition:background var(--fast) var(--ease),box-shadow var(--fast) var(--ease)}
+  tbody tr:hover{background:rgba(255,255,255,.035)}
+  tbody tr.selected{background:rgba(114,184,255,.075);box-shadow:inset 3px 0 0 var(--blue)}
+  tbody tr.status-scheduled{box-shadow:inset 3px 0 0 rgba(255,209,102,.72)}
+  tbody tr.status-confirmed{box-shadow:inset 3px 0 0 rgba(114,184,255,.72)}
+  tbody tr.status-checked-in{box-shadow:inset 3px 0 0 rgba(185,150,255,.72)}
+  tbody tr.status-on-site{box-shadow:inset 3px 0 0 rgba(107,224,146,.72)}
+  tbody tr.status-wrapped{box-shadow:inset 3px 0 0 rgba(118,131,145,.72)}
+  tbody tr.status-problem{box-shadow:inset 3px 0 0 rgba(255,107,107,.72)}
+  .row-input,.row-select,.row-textarea{min-height:36px;padding:7px 8px;font-size:13px}
+  .row-input.mono{font-family:var(--mono);font-size:12px}
+  .row-textarea{min-height:36px;max-height:130px;line-height:1.35}
+  .field-xs{width:92px}
+  .field-small{width:126px}
+  .field-medium{width:168px}
+  .field-large{width:220px}
+  .field-notes{width:300px}
+  .empty-state{padding:34px;color:var(--muted);text-align:center;border-top:1px solid rgba(255,255,255,.08)}
+  .side{position:sticky;top:82px;display:grid;gap:14px}
+  .side-section{padding:14px}
+  .side h2{margin:0 0 12px;font-size:17px}
+  .selected-item{display:flex;align-items:center;justify-content:space-between;gap:10px;color:var(--muted);font-family:var(--mono);font-size:12px}
+  .selected-item span:last-child{color:var(--text);text-align:right}
+  .item-card{display:grid;gap:9px;margin-top:12px}
+  .item-node{border:1px solid rgba(255,255,255,.08);border-radius:var(--radius);background:rgba(8,12,16,.62);padding:10px}
+  .item-node span{display:block;color:var(--muted);font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.09em}
+  .item-node strong{display:block;margin-top:2px;font-size:14px;overflow-wrap:anywhere}
+  .role-lead{color:var(--amber)}
+  .role-crew{color:var(--green)}
+  .selected-grid{display:grid;gap:10px}
+  .selected-grid textarea{min-height:72px}
+  .side-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .hint{min-height:21px;margin:12px 0 0;color:var(--muted);line-height:1.45}
+  .hint.success{color:var(--green)}
+  .hint.error{color:#ffd5d5}
+  .shortcut-list{display:grid;grid-template-columns:auto 1fr;gap:6px 10px;margin:12px 0 0;color:var(--muted);font-size:13px}
+  .shortcut-list dt{min-width:30px;border:1px solid rgba(255,255,255,.14);border-radius:6px;padding:2px 6px;color:var(--text);font-family:var(--mono);text-align:center}
+  .shortcut-list dd{margin:0}
+  .privacy-note{margin:12px 0 0;color:var(--dim);font-size:12px;line-height:1.55}
+  .feedback-success{border-color:rgba(107,224,146,.85) !important;box-shadow:0 0 0 3px rgba(107,224,146,.14) !important}
+  .feedback-error{border-color:var(--red) !important;box-shadow:0 0 0 3px rgba(255,107,107,.16) !important;animation:shake var(--med) var(--ease)}
+  @keyframes shake{0%,100%{transform:translateX(0)}35%{transform:translateX(-4px)}70%{transform:translateX(4px)}}
+  .file-input{display:none}
+  .noscript{margin:16px;padding:14px;border:1px solid var(--red);background:rgba(255,107,107,.12);border-radius:var(--radius)}
+  @media (max-width:1100px){
+    .hero,.workspace{grid-template-columns:1fr}
+    .side{position:static}
+    .toolbar{grid-template-columns:1fr 1fr}
+    .button-row{justify-content:flex-start}
+  }
+  @media (max-width:680px){
+    main{padding:14px}
+    .topbar{align-items:flex-start;flex-direction:column}
+    .top-actions{justify-content:flex-start}
+    .meta-grid{grid-template-columns:1fr}
+    .status-panel{grid-template-columns:1fr 1fr}
+    .toolbar{grid-template-columns:1fr}
+    .button-row{display:grid;grid-template-columns:1fr 1fr}
+    .button-row button{width:100%}
+    .table-wrap{max-height:none;min-height:320px}
+    .side-actions{grid-template-columns:1fr}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{transition-duration:.001ms !important;animation-duration:.001ms !important}
+    button:hover,button:active,button.is-pressing{transform:none}
+  }
+  @media print{
+    body{background:#fff;color:#111}
+    body::before,.topbar,.toolbar,.side,.skip-link{display:none !important}
+    main{padding:0;width:100%}
+    .hero{display:block}
+    .panel{box-shadow:none;border-color:#ccc;background:#fff}
+    .show-title,input,select,textarea{color:#111;background:#fff;border-color:#ccc}
+    .table-wrap{max-height:none;overflow:visible}
+    table{min-width:0;font-size:10px}
+    th,td{padding:5px}
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#items">Skip to crew calls</a>
+<noscript><div class="noscript">Crew Call needs JavaScript for editing, import, export, filtering, and browser saved state.</div></noscript>
+<div class="app">
+  <header class="topbar">
+    <a class="brand" href="index.html#av-tools" aria-label="Back to AV tools">
+      <span class="brand-mark">S</span>
+      <span class="brand-text">
+        <strong>Crew Call</strong>
+        <span>System by Dave AV tools</span>
+      </span>
+    </a>
+    <div class="top-actions">
+      <button id="printBtn" type="button">Print</button>
+      <button id="copySummaryBtn" type="button">Copy Summary</button>
+      <button id="exportCsvBtn" type="button">Export CSV</button>
+      <button id="exportJsonBtn" type="button">Export JSON</button>
+      <button id="importJsonBtn" type="button">Import JSON</button>
+      <input id="importInput" class="file-input" type="file" accept=".json,application/json">
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" aria-label="Show metadata">
+      <div class="panel show-panel">
+        <div>
+          <p class="eyebrow">AV crew call</p>
+          <input id="showName" class="show-title" type="text" aria-label="Show name">
+        </div>
+        <div class="meta-grid">
+          <div class="field"><label for="client">Client</label><input id="client" type="text"></div>
+          <div class="field"><label for="venue">Venue</label><input id="venue" type="text"></div>
+          <div class="field"><label for="showDate">Date</label><input id="showDate" type="date"></div>
+          <div class="field"><label for="advanceLead">Crew lead</label><input id="advanceLead" type="text"></div>
+          <div class="field"><label for="loadIn">Load in</label><input id="loadIn" type="text"></div>
+          <div class="field"><label for="handoffTo">Handoff to</label><input id="handoffTo" type="text"></div>
+        </div>
+      </div>
+      <aside class="panel status-panel" aria-label="Crew status">
+        <div class="stat"><span>Total</span><strong id="totalOut">0</strong></div>
+        <div class="stat"><span>Checked In</span><strong id="confirmedOut">0</strong></div>
+        <div class="stat"><span>Open</span><strong id="openOut">0</strong></div>
+        <div class="stat"><span>Problems</span><strong id="issueOut">0</strong></div>
+        <div class="stat"><span>Leads</span><strong id="highOut">0</strong></div>
+        <div class="stat"><span>Departments</span><strong id="sectionOut">0</strong></div>
+      </aside>
+    </section>
+
+    <section class="workspace">
+      <div class="panel main-panel" id="items">
+        <div class="toolbar" role="toolbar" aria-label="Crew list controls">
+          <input id="searchInput" type="search" placeholder="Search department, name, role, call, location, phone, notes" aria-label="Search crew calls">
+          <select id="sectionFilter" aria-label="Filter by department"></select>
+          <select id="statusFilter" aria-label="Filter by status">
+            <option value="all">All statuses</option>
+            <option value="scheduled">Scheduled</option>
+            <option value="confirmed">Confirmed</option>
+            <option value="checked-in">Checked In</option>
+            <option value="on-site">On Site</option>
+            <option value="wrapped">Wrapped</option>
+            <option value="problem">Problem</option>
+          </select>
+          <div class="button-row">
+            <button id="addItemBtn" class="primary" type="button">Add Crew</button>
+            <button id="loadSampleBtn" type="button">Sample</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table id="advanceTable">
+            <thead>
+              <tr>
+                <th>Department</th>
+                <th>Name</th>
+                <th>Role</th>
+                <th>Call</th>
+                <th>Location</th>
+                <th>Meal</th>
+                <th>Release</th>
+                <th>Phone</th>
+                <th>Status</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody id="itemBody"></tbody>
+          </table>
+        </div>
+        <div id="emptyState" class="empty-state" hidden>No crew calls match the current filters.</div>
+      </div>
+
+      <aside class="side">
+        <section class="panel side-section" aria-label="Selected crew member">
+          <div class="selected-item"><span>Selected</span><span id="selectedIdOut">None</span></div>
+          <div class="item-card" aria-label="Selected crew preview">
+            <div class="item-node"><span>Name</span><strong id="itemName">None</strong></div>
+            <div class="item-node"><span>Call and location</span><strong id="itemRoute">None</strong></div>
+            <div class="item-node"><span>Role</span><strong id="itemPriority">None</strong></div>
+          </div>
+          <div class="selected-grid">
+            <div>
+              <label for="selectedStatus">Status</label>
+              <select id="selectedStatus">
+                <option value="scheduled">Scheduled</option>
+                <option value="confirmed">Confirmed</option>
+                <option value="checked-in">Checked In</option>
+                <option value="on-site">On Site</option>
+                <option value="wrapped">Wrapped</option>
+                <option value="problem">Problem</option>
+              </select>
+            </div>
+            <div>
+              <label for="selectedNotes">Notes</label>
+              <textarea id="selectedNotes"></textarea>
+            </div>
+            <div class="side-actions">
+              <button id="markNeededBtn" type="button">Scheduled</button>
+              <button id="markRequestedBtn" type="button">Confirmed</button>
+              <button id="markReceivedBtn" type="button">Checked In</button>
+              <button id="markConfirmedBtn" type="button">On Site</button>
+              <button id="markIssueBtn" type="button">Problem</button>
+              <button id="markDeferredBtn" type="button">Wrapped</button>
+              <button id="moveUpBtn" type="button">Move Up</button>
+              <button id="moveDownBtn" type="button">Move Down</button>
+              <button id="duplicateBtn" type="button">Duplicate</button>
+              <button id="deleteBtn" class="danger" type="button">Delete</button>
+            </div>
+          </div>
+          <p id="hint" class="hint" role="status">Loaded sample crew call.</p>
+        </section>
+        <section class="panel side-section" aria-label="Keyboard shortcuts">
+          <h2>Fast actions</h2>
+          <dl class="shortcut-list">
+            <dt>N</dt><dd>Add crew after selected</dd>
+            <dt>C</dt><dd>Mark selected confirmed</dd>
+            <dt>V</dt><dd>Mark selected checked in</dd>
+            <dt>O</dt><dd>Mark selected on site</dd>
+            <dt>I</dt><dd>Mark selected problem</dd>
+            <dt>D</dt><dd>Duplicate selected crew</dd>
+            <dt>Del</dt><dd>Delete selected crew</dd>
+          </dl>
+          <p class="privacy-note">Crew call data is remembered in this browser when storage is available. Export JSON before moving to another device.</p>
+        </section>
+      </aside>
+    </section>
+  </main>
+</div>
+
+<script>
+(function(){
+  var STORAGE_KEY = 'crew-call.v1';
+  var SCHEMA = 'system-by-dave.crew-call.v1';
+  var STATUS = ['scheduled','confirmed','checked-in','on-site','wrapped','problem'];
+  var DEPARTMENTS = ['audio','video','lighting','projection','camera','streaming','comms','stage','labor','producer','venue','other'];
+  var $ = function(id){ return document.getElementById(id); };
+  var state = {
+    meta:{showName:'General Session Crew Call',client:'Client',venue:'Ballroom A',showDate:new Date().toISOString().slice(0,10),advanceLead:'Production manager',loadIn:'08:00',handoffTo:'Show caller'},
+    items:[],
+    selectedId:'',
+    filters:{search:'',section:'all',status:'all'}
+  };
+  var sampleItems = [
+    {section:'producer',name:'Production Manager',role:'PM Lead',call:'07:00',location:'Ballroom A dock',meal:'12:30',release:'18:00',phone:'555-0100',status:'checked-in',notes:'Runs daily safety and client updates.'},
+    {section:'audio',name:'A1',role:'Audio Lead',call:'07:30',location:'FOH',meal:'12:30',release:'18:00',phone:'555-0101',status:'confirmed',notes:'Owns console, record feed, and comm with stage.'},
+    {section:'audio',name:'A2',role:'Stage Audio',call:'08:00',location:'Stage left',meal:'12:30',release:'18:00',phone:'555-0102',status:'scheduled',notes:'Patch podium, lavs, playback DIs.'},
+    {section:'video',name:'V1',role:'Video Lead',call:'07:30',location:'Video world',meal:'13:00',release:'18:30',phone:'555-0103',status:'checked-in',notes:'Owns screen routing and records.'},
+    {section:'camera',name:'Camera Op 1',role:'Camera Operator',call:'09:00',location:'Camera 1',meal:'13:00',release:'17:30',phone:'555-0104',status:'scheduled',notes:'Tripod at center aisle.'},
+    {section:'projection',name:'Projection Tech',role:'Projection Lead',call:'07:45',location:'Stage right',meal:'13:00',release:'18:30',phone:'555-0105',status:'confirmed',notes:'Lens check before rehearsal.'},
+    {section:'streaming',name:'Stream Engineer',role:'Stream Lead',call:'08:00',location:'Control table',meal:'12:30',release:'18:30',phone:'555-0106',status:'problem',notes:'Awaiting venue uplink contact.'},
+    {section:'comms',name:'Comms Tech',role:'Intercom',call:'08:00',location:'FOH rack',meal:'12:30',release:'18:00',phone:'555-0107',status:'scheduled',notes:'Program packs and spare batteries.'},
+    {section:'stage',name:'Stagehand 1',role:'Stage Labor',call:'07:00',location:'Dock',meal:'12:00',release:'16:00',phone:'555-0108',status:'on-site',notes:'Helps scenic, screen dress, strike prep.'},
+    {section:'venue',name:'Electrician',role:'Venue Power',call:'07:15',location:'Ballroom service hall',meal:'12:00',release:'10:30',phone:'555-0109',status:'confirmed',notes:'Turn on dedicated circuits and stay for test.'}
+  ];
+  var inputs = {showName:$('showName'),client:$('client'),venue:$('venue'),showDate:$('showDate'),advanceLead:$('advanceLead'),loadIn:$('loadIn'),handoffTo:$('handoffTo'),search:$('searchInput'),section:$('sectionFilter'),status:$('statusFilter'),selectedStatus:$('selectedStatus'),selectedNotes:$('selectedNotes')};
+  function storageAvailable(){try{var key='crew-call-probe';localStorage.setItem(key,key);localStorage.removeItem(key);return true;}catch(e){return false;}}
+  function uid(){return 'crew-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2,8);}
+  function cloneItem(item){return {id:item.id || uid(),section:DEPARTMENTS.indexOf(item.section) >= 0 ? item.section : 'other',name:String(item.name || ''),role:String(item.role || ''),call:String(item.call || ''),location:String(item.location || ''),meal:String(item.meal || ''),release:String(item.release || ''),phone:String(item.phone || ''),status:STATUS.indexOf(item.status) >= 0 ? item.status : 'scheduled',notes:String(item.notes || '')};}
+  function normalizeState(raw){
+    var next = raw && typeof raw === 'object' ? raw : {};
+    var meta = next.meta && typeof next.meta === 'object' ? next.meta : {};
+    return {
+      meta:{showName:String(meta.showName || 'General Session Crew Call').slice(0,120),client:String(meta.client || '').slice(0,120),venue:String(meta.venue || '').slice(0,120),showDate:String(meta.showDate || new Date().toISOString().slice(0,10)).slice(0,20),advanceLead:String(meta.advanceLead || '').slice(0,80),loadIn:String(meta.loadIn || '').slice(0,80),handoffTo:String(meta.handoffTo || '').slice(0,80)},
+      items:Array.isArray(next.items) ? next.items.map(cloneItem).slice(0,300) : sampleItems.map(cloneItem),
+      selectedId:typeof next.selectedId === 'string' ? next.selectedId : '',
+      filters:{search:String(next.filters && next.filters.search || ''),section:DEPARTMENTS.indexOf(next.filters && next.filters.section) >= 0 ? next.filters.section : 'all',status:STATUS.indexOf(next.filters && next.filters.status) >= 0 ? next.filters.status : 'all'}
+    };
+  }
+  function loadState(){if(!storageAvailable()){state=normalizeState({});return;}try{var raw=localStorage.getItem(STORAGE_KEY);state=raw ? normalizeState(JSON.parse(raw)) : normalizeState({});}catch(e){state=normalizeState({});}if(!state.selectedId && state.items[0]) state.selectedId=state.items[0].id;}
+  function saveState(){if(!storageAvailable()) return false;try{localStorage.setItem(STORAGE_KEY,JSON.stringify({schema:SCHEMA,savedAt:new Date().toISOString(),meta:state.meta,items:state.items,selectedId:state.selectedId,filters:state.filters}));return true;}catch(e){showHint('Could not save in this browser. Export JSON to keep a copy.','error');return false;}}
+  function setInputValues(){inputs.showName.value=state.meta.showName;inputs.client.value=state.meta.client;inputs.venue.value=state.meta.venue;inputs.showDate.value=state.meta.showDate;inputs.advanceLead.value=state.meta.advanceLead;inputs.loadIn.value=state.meta.loadIn;inputs.handoffTo.value=state.meta.handoffTo;inputs.search.value=state.filters.search;inputs.status.value=state.filters.status;}
+  function selectOptions(values,selected,firstLabel){var html=firstLabel ? '<option value="all">' + escapeHtml(firstLabel) + '</option>' : '';values.forEach(function(value){html += '<option value="' + escapeAttr(value) + '"' + (value === selected ? ' selected' : '') + '>' + escapeHtml(titleCase(value)) + '</option>';});return html;}
+  function renderSectionFilter(){var map={};state.items.forEach(function(item){if(item.section) map[item.section]=true;});var values=Object.keys(map).sort(function(a,b){return a.localeCompare(b);});if(state.filters.section !== 'all' && values.indexOf(state.filters.section) < 0) state.filters.section='all';inputs.section.innerHTML=selectOptions(values,state.filters.section,'All departments');}
+  function visibleItems(){var q=state.filters.search.trim().toLowerCase();return state.items.filter(function(item){var haystack=[item.section,item.name,item.role,item.call,item.location,item.meal,item.release,item.phone,item.status,item.notes].join(' ').toLowerCase();if(q && haystack.indexOf(q) === -1) return false;if(state.filters.section !== 'all' && item.section !== state.filters.section) return false;if(state.filters.status !== 'all' && item.status !== state.filters.status) return false;return true;});}
+  function renderRows(){var rows=visibleItems();var body=$('itemBody');$('emptyState').hidden=rows.length > 0;body.innerHTML=rows.map(function(item){return '<tr class="status-' + item.status + (item.id === state.selectedId ? ' selected' : '') + '" data-id="' + escapeAttr(item.id) + '">' + cell('<select class="row-select field-small" data-field="section" aria-label="Department">' + selectOptions(DEPARTMENTS,item.section,'') + '</select>') + cell('<input class="row-input field-large" data-field="name" value="' + escapeAttr(item.name) + '" aria-label="Name">') + cell('<input class="row-input field-small" data-field="role" value="' + escapeAttr(item.role) + '" aria-label="Role">') + cell('<input class="row-input field-small" data-field="call" value="' + escapeAttr(item.call) + '" aria-label="Call time">') + cell('<input class="row-input field-small" data-field="location" value="' + escapeAttr(item.location) + '" aria-label="Location">') + cell('<input class="row-input field-small" data-field="meal" value="' + escapeAttr(item.meal) + '" aria-label="Meal">') + cell('<input class="row-input field-small" data-field="release" value="' + escapeAttr(item.release) + '" aria-label="Release">') + cell('<input class="row-input field-small" data-field="phone" value="' + escapeAttr(item.phone) + '" aria-label="Phone">') + cell('<select class="row-select field-small" data-field="status" aria-label="Status">' + selectOptions(STATUS,item.status,'') + '</select>') + cell('<textarea class="row-textarea field-notes" data-field="notes" aria-label="Notes">' + escapeHtml(item.notes) + '</textarea>') + '</tr>';}).join('');}
+  function cell(content){return '<td>' + content + '</td>';}
+  function updateStats(){var open=state.items.filter(function(item){return item.status !== 'checked-in' && item.status !== 'on-site' && item.status !== 'wrapped';});$('totalOut').textContent=state.items.length;$('confirmedOut').textContent=state.items.filter(function(item){return item.status === 'checked-in' || item.status === 'on-site';}).length;$('openOut').textContent=open.length;$('issueOut').textContent=state.items.filter(function(item){return item.status === 'problem';}).length;$('highOut').textContent=state.items.filter(function(item){return isLead(item);}).length;$('sectionOut').textContent=uniqueCount(state.items.map(function(item){return item.section;}));}
+  function uniqueCount(values){var map={};values.forEach(function(value){value=String(value || '').trim();if(value) map[value]=true;});return Object.keys(map).length;}
+  function selectedItem(){return state.items.find(function(item){return item.id === state.selectedId;}) || null;}
+  function updateInspector(){var item=selectedItem();var disabled=!item;$('selectedIdOut').textContent=item ? item.name || 'Selected' : 'None';inputs.selectedStatus.disabled=disabled;inputs.selectedNotes.disabled=disabled;['markNeededBtn','markRequestedBtn','markReceivedBtn','markConfirmedBtn','markIssueBtn','markDeferredBtn','moveUpBtn','moveDownBtn','duplicateBtn','deleteBtn'].forEach(function(id){$(id).disabled=disabled;});$('itemName').textContent=item ? item.name || 'Unassigned' : 'None';$('itemRoute').textContent=item ? (item.call || 'No call') + ' / ' + (item.location || 'No location') : 'None';$('itemPriority').textContent=item ? item.role || 'No role' : 'None';$('itemPriority').className=item ? (isLead(item) ? 'role-lead' : 'role-crew') : '';if(item){inputs.selectedStatus.value=item.status;inputs.selectedNotes.value=item.notes;}else{inputs.selectedStatus.value='scheduled';inputs.selectedNotes.value='';}}
+  function render(){setInputValues();renderSectionFilter();renderRows();updateStats();updateInspector();}
+  function updateItem(id,field,value,commitNow){var item=state.items.find(function(row){return row.id === id;});if(!item) return;if(field === 'status' && STATUS.indexOf(value) < 0) value='scheduled';if(field === 'section' && DEPARTMENTS.indexOf(value) < 0) value='other';if(commitNow && ['name','role','call','location','meal','release','phone'].indexOf(field) >= 0) value=normalizeShort(value);item[field]=value;if((field === 'section' || field === 'status') && commitNow) renderRows();if(field === 'section' && commitNow) renderSectionFilter();saveState();updateStats();updateInspector();}
+  function selectItem(id){if(!id) return;if(state.selectedId === id){updateInspector();return;}state.selectedId=id;saveState();renderRows();updateInspector();}
+  function addItem(afterId){var index=afterId ? state.items.findIndex(function(item){return item.id === afterId;}) + 1 : state.items.length;if(index < 0) index=state.items.length;var item=cloneItem({section:'other',name:'New crew member',role:'Crew',call:'08:00',location:'FOH',meal:'12:30',release:'18:00',phone:'',status:'scheduled',notes:''});state.items.splice(index,0,item);state.selectedId=item.id;saveState();render();showHint('Crew member added.','success');focusSelectedRow();}
+  function duplicateSelected(){var item=selectedItem();var index;var copy;if(!item) return showHint('Pick a crew member first.','error');index=state.items.findIndex(function(row){return row.id === item.id;});copy=cloneItem(Object.assign({},item,{id:uid(),name:item.name + ' copy',status:'scheduled',notes:item.notes ? item.notes + ' Copy.' : 'Copy.'}));state.items.splice(index + 1,0,copy);state.selectedId=copy.id;saveState();render();showHint('Crew member duplicated.','success');focusSelectedRow();}
+  function deleteSelected(){var item=selectedItem();var index;if(!item) return showHint('Pick a crew member first.','error');if(!window.confirm('Delete selected crew member?')) return;index=state.items.findIndex(function(row){return row.id === item.id;});state.items.splice(index,1);state.selectedId=state.items[Math.min(index,state.items.length - 1)] ? state.items[Math.min(index,state.items.length - 1)].id : '';saveState();render();showHint('Crew member deleted.','success');}
+  function moveSelected(dir){var item=selectedItem();var index;var nextIndex;if(!item) return showHint('Pick a crew member first.','error');index=state.items.findIndex(function(row){return row.id === item.id;});nextIndex=index + dir;if(nextIndex < 0 || nextIndex >= state.items.length) return;state.items.splice(index,1);state.items.splice(nextIndex,0,item);saveState();render();showHint(dir < 0 ? 'Crew member moved up.' : 'Crew member moved down.','success');focusSelectedRow();}
+  function setSelectedStatus(status){var item=selectedItem();if(!item) return showHint('Pick a crew member first.','error');item.status=status;saveState();render();showHint(status === 'problem' ? 'Crew member marked problem.' : 'Crew member updated.',status === 'problem' ? 'error' : 'success');}
+  function loadSample(){if(state.items.length && !window.confirm('Replace current crew call with sample items?')) return;state=normalizeState({meta:state.meta,items:sampleItems,selectedId:'',filters:{search:'',section:'all',status:'all'}});if(state.items[0]) state.selectedId=state.items[0].id;saveState();render();showHint('Sample crew call loaded.','success');}
+  function buildSummary(){var lines=[];var problems=state.items.filter(function(item){return item.status === 'problem';});var open=state.items.filter(function(item){return item.status !== 'checked-in' && item.status !== 'on-site' && item.status !== 'wrapped';});lines.push('CREW CALL');lines.push('Show: ' + state.meta.showName);lines.push('Client: ' + state.meta.client);lines.push('Venue: ' + state.meta.venue);lines.push('Date: ' + state.meta.showDate);lines.push('Crew Lead: ' + state.meta.advanceLead);lines.push('Load In: ' + state.meta.loadIn);lines.push('Handoff: ' + state.meta.handoffTo);lines.push('');lines.push('Summary: ' + state.items.length + ' crew, ' + state.items.filter(function(item){return item.status === 'checked-in' || item.status === 'on-site';}).length + ' checked in, ' + open.length + ' open, ' + problems.length + ' problems.');if(problems.length){lines.push('');lines.push('Problems:');problems.forEach(function(item){lines.push('- ' + item.name + ' | ' + item.role + ' | ' + item.phone + ': ' + (item.notes || 'No note'));});}lines.push('');lines.push('Open Crew:');open.forEach(function(item){lines.push('- ' + item.section + ' | ' + item.name + ' | ' + item.role + ' | ' + item.call + ' | ' + item.location + ' | ' + item.status);});return lines.join('\n');}
+  function copySummary(){copyText(buildSummary()).then(function(){showHint('Crew call summary copied.','success');signal($('copySummaryBtn'),'success');}).catch(function(){showHint('Could not copy summary.','error');signal($('copySummaryBtn'),'error');});}
+  function exportJson(){var payload={schema:SCHEMA,exportedAt:new Date().toISOString(),meta:state.meta,items:state.items};downloadFile(fileStem() + '.crew-call.json',JSON.stringify(payload,null,2),'application/json;charset=utf-8');showHint('JSON exported.','success');}
+  function exportCsv(){var fields=['section','name','role','call','location','meal','release','phone','status','notes'];var csv=[fields.join(',')].concat(state.items.map(function(item){return fields.map(function(field){return csvCell(item[field]);}).join(',');})).join('\n');downloadFile(fileStem() + '.crew-call.csv',csv,'text/csv;charset=utf-8');showHint('CSV exported.','success');}
+  function importJsonFile(file){var reader=new FileReader();reader.onload=function(){try{var parsed=JSON.parse(String(reader.result || ''));if(!parsed || typeof parsed !== 'object' || !Array.isArray(parsed.items)) throw new Error('Invalid payload');state=normalizeState({meta:parsed.meta || state.meta,items:parsed.items,selectedId:'',filters:{search:'',section:'all',status:'all'}});if(state.items[0]) state.selectedId=state.items[0].id;saveState();render();showHint('Crew call JSON imported.','success');signal($('importJsonBtn'),'success');}catch(e){showHint('Could not import that JSON file.','error');signal($('importJsonBtn'),'error');}};reader.onerror=function(){showHint('Could not read that JSON file.','error');signal($('importJsonBtn'),'error');};reader.readAsText(file);}
+  function syncMeta(){state.meta.showName=inputs.showName.value;state.meta.client=inputs.client.value;state.meta.venue=inputs.venue.value;state.meta.showDate=inputs.showDate.value;state.meta.advanceLead=inputs.advanceLead.value;state.meta.loadIn=inputs.loadIn.value;state.meta.handoffTo=inputs.handoffTo.value;saveState();}
+  function bindEvents(){Object.keys(inputs).forEach(function(key){if(['showName','client','venue','showDate','advanceLead','loadIn','handoffTo'].indexOf(key) >= 0) inputs[key].addEventListener('input',syncMeta);});inputs.search.addEventListener('input',function(){state.filters.search=inputs.search.value;saveState();renderRows();});inputs.section.addEventListener('change',function(){state.filters.section=inputs.section.value;saveState();renderRows();});inputs.status.addEventListener('change',function(){state.filters.status=inputs.status.value;saveState();renderRows();});$('itemBody').addEventListener('focusin',function(event){var row=event.target.closest('tr[data-id]');if(row) selectItem(row.getAttribute('data-id'));});$('itemBody').addEventListener('click',function(event){var row=event.target.closest('tr[data-id]');if(row) selectItem(row.getAttribute('data-id'));});$('itemBody').addEventListener('input',function(event){var target=event.target;var row=target.closest('tr[data-id]');var field=target.getAttribute('data-field');if(row && field) updateItem(row.getAttribute('data-id'),field,target.value,false);});$('itemBody').addEventListener('change',function(event){var target=event.target;var row=target.closest('tr[data-id]');var field=target.getAttribute('data-field');if(['name','role','call','location','meal','release','phone'].indexOf(field) >= 0) target.value=normalizeShort(target.value);if(row && field) updateItem(row.getAttribute('data-id'),field,target.value,true);});inputs.selectedStatus.addEventListener('change',function(){setSelectedStatus(inputs.selectedStatus.value);});inputs.selectedNotes.addEventListener('input',function(){var item=selectedItem();if(!item) return;item.notes=inputs.selectedNotes.value;saveState();renderRows();});$('addItemBtn').addEventListener('click',function(){addItem(state.selectedId);signal(this,'success');});$('loadSampleBtn').addEventListener('click',function(){loadSample();signal(this,'success');});$('markNeededBtn').addEventListener('click',function(){setSelectedStatus('scheduled');signal(this,'success');});$('markRequestedBtn').addEventListener('click',function(){setSelectedStatus('confirmed');signal(this,'success');});$('markReceivedBtn').addEventListener('click',function(){setSelectedStatus('checked-in');signal(this,'success');});$('markConfirmedBtn').addEventListener('click',function(){setSelectedStatus('on-site');signal(this,'success');});$('markIssueBtn').addEventListener('click',function(){setSelectedStatus('problem');signal(this,'error');});$('markDeferredBtn').addEventListener('click',function(){setSelectedStatus('wrapped');signal(this,'success');});$('moveUpBtn').addEventListener('click',function(){moveSelected(-1);signal(this,'success');});$('moveDownBtn').addEventListener('click',function(){moveSelected(1);signal(this,'success');});$('duplicateBtn').addEventListener('click',function(){duplicateSelected();signal(this,'success');});$('deleteBtn').addEventListener('click',function(){deleteSelected();signal(this,'success');});$('printBtn').addEventListener('click',function(){window.print();signal(this,'success');});$('copySummaryBtn').addEventListener('click',copySummary);$('exportJsonBtn').addEventListener('click',function(){exportJson();signal(this,'success');});$('exportCsvBtn').addEventListener('click',function(){exportCsv();signal(this,'success');});$('importJsonBtn').addEventListener('click',function(){$('importInput').click();});$('importInput').addEventListener('change',function(){var file=$('importInput').files && $('importInput').files[0];if(file) importJsonFile(file);$('importInput').value='';});document.addEventListener('keydown',function(event){if(isTyping()) return;if(event.key === 'n' || event.key === 'N'){event.preventDefault();addItem(state.selectedId);}if(event.key === 'c' || event.key === 'C'){event.preventDefault();setSelectedStatus('confirmed');}if(event.key === 'v' || event.key === 'V'){event.preventDefault();setSelectedStatus('checked-in');}if(event.key === 'o' || event.key === 'O'){event.preventDefault();setSelectedStatus('on-site');}if(event.key === 'i' || event.key === 'I'){event.preventDefault();setSelectedStatus('problem');}if(event.key === 'd' || event.key === 'D'){event.preventDefault();duplicateSelected();}if(event.key === 'Delete'){event.preventDefault();deleteSelected();}});installPressFeedback();}
+  function installPressFeedback(){document.querySelectorAll('button').forEach(function(button){function press(){if(!button.disabled) button.classList.add('is-pressing');}function release(){button.classList.remove('is-pressing');}button.addEventListener('pointerdown',press);button.addEventListener('pointerup',release);button.addEventListener('pointercancel',release);button.addEventListener('pointerleave',release);button.addEventListener('blur',release);button.addEventListener('keydown',function(event){if(event.key === ' ' || event.key === 'Enter') press();});button.addEventListener('keyup',function(event){if(event.key === ' ' || event.key === 'Enter') release();});});}
+  function showHint(message,kind){var hint=$('hint');hint.textContent=message;hint.classList.remove('success','error');if(kind) hint.classList.add(kind);}
+  function signal(element,kind){if(!element) return;var className=kind === 'error' ? 'feedback-error' : 'feedback-success';element.classList.remove(className);void element.offsetWidth;element.classList.add(className);setTimeout(function(){element.classList.remove(className);},190);}
+  function focusSelectedRow(){var row=document.querySelector('tr[data-id="' + cssEscape(state.selectedId) + '"]');var input=row && row.querySelector('input,select,textarea');if(input) input.focus({preventScroll:true});}
+  function isTyping(){var tag=document.activeElement && document.activeElement.tagName;return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';}
+  function normalizeShort(value){return String(value || '').trim().replace(/\s+/g,' ').slice(0,100);}
+  function titleCase(value){return String(value || '').replace(/-/g,' ').replace(/\b\w/g,function(letter){return letter.toUpperCase();});}
+  function isLead(item){return /\b(lead|pm|a1|v1|engineer)\b/i.test(item.role || '') || item.section === 'producer';}
+  function fileStem(){return (state.meta.showName || 'crew-call').toLowerCase().replace(/['"]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,60) || 'crew-call';}
+  function csvCell(value){value=String(value == null ? '' : value);if(/[",\n]/.test(value)) return '"' + value.replace(/"/g,'""') + '"';return value;}
+  function downloadFile(filename,content,type){var blob=new Blob([content],{type:type});var url=URL.createObjectURL(blob);var link=document.createElement('a');link.href=url;link.download=filename;link.style.display='none';document.body.appendChild(link);link.click();setTimeout(function(){URL.revokeObjectURL(url);if(link.parentNode) link.parentNode.removeChild(link);},0);}
+  function copyText(text){if(navigator.clipboard && navigator.clipboard.writeText) return navigator.clipboard.writeText(text);return new Promise(function(resolve,reject){var area=document.createElement('textarea');area.value=text;area.setAttribute('readonly','');area.style.position='fixed';area.style.left='-9999px';document.body.appendChild(area);area.select();try{document.execCommand('copy') ? resolve() : reject(new Error('copy failed'));}catch(e){reject(e);}finally{if(area.parentNode) area.parentNode.removeChild(area);}});}
+  function escapeHtml(value){return String(value == null ? '' : value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+  function escapeAttr(value){return escapeHtml(value);}
+  function cssEscape(value){if(window.CSS && CSS.escape) return CSS.escape(value);return String(value).replace(/"/g,'\\"');}
+  loadState();
+  render();
+  bindEvents();
+})();
+</script>
+</body>
+</html>
