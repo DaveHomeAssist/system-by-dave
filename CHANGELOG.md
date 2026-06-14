@@ -2,6 +2,7 @@
 
 ## 2026-06-14
 
+* Added AV Suite Quick Switcher: `/av-suite.html` now opens a keyboard driven command palette for review items, current phase tools, phases, views, copy actions, scans, exports, and tool launch, with recent commands saved in the suite JSON payload.
 * Added AV Suite phase handoff copy: `/av-suite.html` now copies a practical show handoff with the current phase, readiness counts, working and issue tools, signal network and control notes, client and crew notes, risks, summary table, decision matrix, numbered prioritized actions, and phase recommendation links.
 * Added AV Suite operator review queue: `/av-suite.html` now ranks issue tools, readiness notes, saved tool data scan needs, pending current phase tools, and show package export as practical next actions with one click open, scan, export, and copy queue actions.
 * Added AV Suite saved tool data scan: `/av-suite.html` now shows saved data badges from known AV tool storage, adds a Saved data only view, scans saved tool content for issue language, marks saved tools ready when clear, marks issue language for review, and keeps existing Issue or Skipped exceptions.
