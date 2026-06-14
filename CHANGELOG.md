@@ -2,6 +2,7 @@
 
 ## 2026-06-13
 
+* Expanded `/teleprompter.html` formatting and saved-script library controls again: added more reader font stacks, letter spacing, text shadow styles, extra text and background swatches, reading line color controls, pinned saved scripts, saved script sorting, saved script copy, saved library counts, and portable show-package support for the new format fields.
 * Added `/camera-shot-list.html`, a browser based AV camera shot list with show metadata, sample camera plan, editable shot rows, camera and status filters, selected shot controls, ready and problem status, take next, print output, JSON import and export, CSV export, copyable operator summary, remembered browser state, and mobile table containment. Linked it from the homepage AV Tools section, added it to the Products footer, and added it to `sitemap.xml`.
 * Expanded `/teleprompter.html` reader formatting and saved-script management: added format presets, italic reader text, uppercase mode, more text and background swatches, saved script search, rename, duplicate, and a larger browser saved-script library.
 * Added `/show-handoff.html`, a browser based AV show handoff builder with show metadata, exact handoff sections, generated summary table, decision matrix, numbered prioritized actions, copy actions, copy matrix, copy full Markdown, print output, JSON import and export, sample handoff, and remembered browser state. Linked it from the homepage AV Tools section, added it to the Products footer, and added it to `sitemap.xml`.
@@ -23,8 +24,8 @@
 * Added operator marker navigation to `/teleprompter.html`: markdown headings, bracket cues, and divider cues now become jump markers with a marker dropdown, previous and next controls, keyboard shortcuts, and a live marker readout in the run monitor.
 * Added pro run controls to `/teleprompter.html`: a 3-second Cue + Play leader, live elapsed and remaining run time, progress percentage, progress rail, and script word-count/run-rate readout.
 * Expanded `/teleprompter.html` formatting and script management: added reader font family choices, text color swatches, and a local saved-scripts library with Save, Load, Delete, and per-script formatting snapshots.
-* Added lightweight anticipatory UX to `/teleprompter.html`: context-aware next-action highlights, short dynamic hints, smarter title-based Save filenames, last-mode restore, and local-only preference metadata in `localStorage`.
-* Added an unlisted, noindex **Prompt Browser** page at `/prompt-browser.html` for the full local prompt library browser. The page includes ranked search, review queue, fill-in mode, saved views, import/export state, and local-only browser state. It is blocked in `robots.txt` and kept out of `sitemap.xml` and site navigation because the embedded library includes internal working prompts.
+* Added lightweight anticipatory UX to `/teleprompter.html`: context-aware next-action highlights, short dynamic hints, smarter title-based Save filenames, last-mode restore, and browser preference metadata in `localStorage`.
+* Added an unlisted, noindex **Prompt Browser** page at `/prompt-browser.html` for the full prompt library browser. The page includes ranked search, review queue, fill-in mode, saved views, import/export state, and browser state. It is blocked in `robots.txt` and kept out of `sitemap.xml` and site navigation because the embedded library includes internal working prompts.
 * Added tactile microinteractions to `/teleprompter.html`: pressed and hover button states, control confirmation pulses, inline file save/load success and error feedback, paused-reader drag resistance with snap release, and reduced-motion fallbacks.
 
 ## 2026-06-12
