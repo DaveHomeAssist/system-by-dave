@@ -1,0 +1,1398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'none'">
+<title>Network Plan | System by Dave</title>
+<meta name="description" content="A browser based AV network planner for show control, streaming, audio, comms, IPs, VLANs, switch ports, issues, and handoff notes.">
+<link rel="canonical" href="https://systembydave.com/network-plan.html">
+<meta name="theme-color" content="#0b0d10">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="System by Dave">
+<meta property="og:title" content="Network Plan">
+<meta property="og:description" content="A browser based AV network planner for show control, streaming, audio, comms, IPs, VLANs, switch ports, issues, and handoff notes.">
+<meta property="og:url" content="https://systembydave.com/network-plan.html">
+<meta property="og:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<meta property="og:image:width" content="1024">
+<meta property="og:image:height" content="412">
+<meta property="og:image:alt" content="System by Dave preview banner">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Network Plan">
+<meta name="twitter:description" content="A browser based AV network planner for show control, streaming, audio, comms, IPs, VLANs, switch ports, issues, and handoff notes.">
+<meta name="twitter:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<link rel="icon" href="svg/system_by_dave_logo_rust.svg" type="image/svg+xml">
+<style>
+  :root{
+    --bg:#0b0d10;
+    --panel:#12171d;
+    --panel-2:#171e26;
+    --panel-3:#1d252e;
+    --line:#303945;
+    --line-strong:#465363;
+    --text:#f6f8fb;
+    --muted:#a9b4c1;
+    --dim:#768391;
+    --rust:#c0623a;
+    --rust-2:#e58a5c;
+    --blue:#72b8ff;
+    --green:#6be092;
+    --amber:#ffd166;
+    --red:#ff6b6b;
+    --purple:#b996ff;
+    --ink:#071016;
+    --radius:8px;
+    --shadow:0 16px 60px rgba(0,0,0,.32);
+    --mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --fast:120ms;
+    --med:180ms;
+    --ease:cubic-bezier(.2,.8,.2,1);
+    --press:cubic-bezier(.2,0,0,1);
+  }
+  *{box-sizing:border-box}
+  html,body{min-height:100%}
+  body{
+    margin:0;
+    background:
+      radial-gradient(circle at 12% -14%,rgba(192,98,58,.18),transparent 30rem),
+      radial-gradient(circle at 86% 8%,rgba(114,184,255,.14),transparent 28rem),
+      linear-gradient(180deg,#0b0d10 0%,#11161b 52%,#080a0d 100%);
+    color:var(--text);
+    font-family:var(--sans);
+    line-height:1.45;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+  body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    background:
+      repeating-linear-gradient(90deg,rgba(255,255,255,.034) 0 1px,transparent 1px 80px),
+      repeating-linear-gradient(0deg,rgba(255,255,255,.024) 0 1px,transparent 1px 80px);
+    mask-image:linear-gradient(180deg,rgba(0,0,0,.78),rgba(0,0,0,.12));
+  }
+  a{color:inherit}
+  button,input,select,textarea{font:inherit}
+  button{
+    min-height:44px;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    background:var(--panel-2);
+    color:var(--text);
+    padding:9px 12px;
+    cursor:pointer;
+    user-select:none;
+    -webkit-tap-highlight-color:transparent;
+    touch-action:manipulation;
+    transition:transform var(--fast) var(--press),border-color var(--fast) var(--ease),background var(--fast) var(--ease),box-shadow var(--fast) var(--ease),color var(--fast) var(--ease);
+  }
+  button:hover{
+    border-color:var(--line-strong);
+    background:var(--panel-3);
+    transform:translateY(-1px);
+    box-shadow:0 8px 22px rgba(0,0,0,.18);
+  }
+  button:active,
+  button.is-pressing{
+    transform:translateY(1px) scale(.975);
+    box-shadow:inset 0 2px 5px rgba(0,0,0,.28);
+  }
+  button.primary{
+    background:linear-gradient(180deg,var(--rust-2),var(--rust));
+    border-color:var(--rust);
+    color:#140905;
+    font-weight:800;
+  }
+  button.danger{
+    border-color:rgba(255,107,107,.55);
+    color:#ffd5d5;
+    background:rgba(255,107,107,.1);
+  }
+  button:disabled{
+    cursor:not-allowed;
+    opacity:.52;
+    transform:none;
+    box-shadow:none;
+  }
+  button:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible,
+  a:focus-visible{
+    outline:2px solid var(--blue);
+    outline-offset:3px;
+  }
+  input,select,textarea{
+    width:100%;
+    min-height:40px;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    background:#0e1318;
+    color:var(--text);
+    padding:9px 10px;
+    transition:border-color var(--fast) var(--ease),background var(--fast) var(--ease),box-shadow var(--fast) var(--ease);
+  }
+  textarea{min-height:42px;resize:vertical}
+  input:hover,
+  input:focus,
+  select:hover,
+  select:focus,
+  textarea:hover,
+  textarea:focus{
+    border-color:var(--line-strong);
+    background:#111821;
+  }
+  input::placeholder,
+  textarea::placeholder{color:var(--dim)}
+  .skip-link{
+    position:absolute;
+    top:12px;
+    left:12px;
+    z-index:1000;
+    background:var(--text);
+    color:var(--ink);
+    padding:10px 14px;
+    border-radius:var(--radius);
+    transform:translateY(-150%);
+    transition:transform var(--med) var(--ease);
+  }
+  .skip-link:focus-visible{transform:translateY(0)}
+  .app{position:relative;z-index:1;min-height:100vh}
+  .topbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    padding:14px 18px;
+    border-bottom:1px solid rgba(255,255,255,.08);
+    background:rgba(11,13,16,.88);
+    backdrop-filter:blur(18px);
+    position:sticky;
+    top:0;
+    z-index:30;
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    text-decoration:none;
+  }
+  .brand-mark{
+    width:38px;
+    height:38px;
+    border:1px solid rgba(255,255,255,.24);
+    border-radius:50%;
+    display:grid;
+    place-items:center;
+    font-family:Georgia,serif;
+    font-size:19px;
+    color:var(--rust-2);
+    background:#11161c;
+  }
+  .brand-text{display:flex;flex-direction:column;gap:1px}
+  .brand-text strong{
+    font-size:14px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+  }
+  .brand-text span{
+    color:var(--muted);
+    font-family:var(--mono);
+    font-size:11px;
+  }
+  .top-actions{
+    display:flex;
+    justify-content:flex-end;
+    gap:8px;
+    flex-wrap:wrap;
+  }
+  main{
+    width:min(1540px,100%);
+    margin:0 auto;
+    padding:22px;
+  }
+  .hero{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) 360px;
+    gap:18px;
+    align-items:stretch;
+    margin-bottom:18px;
+  }
+  .panel{
+    border:1px solid rgba(255,255,255,.09);
+    background:linear-gradient(180deg,rgba(23,30,38,.92),rgba(14,18,23,.94));
+    box-shadow:var(--shadow);
+    border-radius:var(--radius);
+  }
+  .show-panel{padding:18px;display:grid;gap:16px}
+  .eyebrow{
+    margin:0 0 3px;
+    color:var(--rust-2);
+    font-family:var(--mono);
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.12em;
+  }
+  .show-title{
+    min-height:58px;
+    border:0;
+    background:transparent;
+    padding:0;
+    color:var(--text);
+    font-size:clamp(31px,4.2vw,62px);
+    line-height:1.04;
+    font-weight:900;
+  }
+  .show-title:hover,
+  .show-title:focus{background:transparent}
+  .meta-grid{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:10px;
+  }
+  .field label,
+  .selected-grid label{
+    display:block;
+    margin:0 0 5px;
+    color:var(--muted);
+    font-family:var(--mono);
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.09em;
+  }
+  .status-panel{
+    padding:14px;
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:10px;
+  }
+  .stat{
+    min-height:76px;
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:var(--radius);
+    background:rgba(9,12,16,.58);
+    padding:12px;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+  }
+  .stat span{
+    color:var(--muted);
+    font-family:var(--mono);
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.1em;
+  }
+  .stat strong{font-size:28px;line-height:1}
+  .workspace{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) 330px;
+    gap:18px;
+    align-items:start;
+  }
+  .main-panel{min-width:0}
+  .toolbar{
+    display:grid;
+    grid-template-columns:minmax(180px,1fr) 180px 170px auto;
+    gap:10px;
+    align-items:center;
+    padding:14px;
+    border-bottom:1px solid rgba(255,255,255,.08);
+  }
+  .button-row{
+    display:flex;
+    gap:8px;
+    justify-content:flex-end;
+    flex-wrap:wrap;
+  }
+  .table-wrap{
+    overflow:auto;
+    max-height:calc(100vh - 360px);
+    min-height:400px;
+  }
+  table{
+    width:100%;
+    min-width:1360px;
+    border-collapse:separate;
+    border-spacing:0;
+  }
+  thead th{
+    position:sticky;
+    top:0;
+    z-index:4;
+    background:#10161d;
+    color:var(--muted);
+    font-family:var(--mono);
+    font-size:11px;
+    text-align:left;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    border-bottom:1px solid var(--line);
+    padding:10px 8px;
+  }
+  tbody td{
+    border-bottom:1px solid rgba(255,255,255,.07);
+    padding:7px;
+    vertical-align:top;
+  }
+  tbody tr{transition:background var(--fast) var(--ease),box-shadow var(--fast) var(--ease)}
+  tbody tr:hover{background:rgba(255,255,255,.035)}
+  tbody tr.selected{
+    background:rgba(114,184,255,.075);
+    box-shadow:inset 3px 0 0 var(--blue);
+  }
+  tbody tr.status-planned{box-shadow:inset 3px 0 0 rgba(255,209,102,.72)}
+  tbody tr.status-patched{box-shadow:inset 3px 0 0 rgba(114,184,255,.72)}
+  tbody tr.status-online{box-shadow:inset 3px 0 0 rgba(107,224,146,.72)}
+  tbody tr.status-issue{box-shadow:inset 3px 0 0 rgba(255,107,107,.72)}
+  tbody tr.status-spare{box-shadow:inset 3px 0 0 rgba(185,150,255,.72)}
+  .row-input,
+  .row-select,
+  .row-textarea{
+    min-height:36px;
+    padding:7px 8px;
+    font-size:13px;
+  }
+  .row-input.mono{font-family:var(--mono);font-size:12px}
+  .row-textarea{
+    min-height:36px;
+    max-height:130px;
+    line-height:1.35;
+  }
+  .field-xs{width:88px}
+  .field-small{width:124px}
+  .field-medium{width:168px}
+  .field-large{width:210px}
+  .field-notes{width:280px}
+  .empty-state{
+    padding:34px;
+    color:var(--muted);
+    text-align:center;
+    border-top:1px solid rgba(255,255,255,.08);
+  }
+  .side{
+    position:sticky;
+    top:82px;
+    display:grid;
+    gap:14px;
+  }
+  .side-section{padding:14px}
+  .side h2{margin:0 0 12px;font-size:17px}
+  .selected-device{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    color:var(--muted);
+    font-family:var(--mono);
+    font-size:12px;
+  }
+  .selected-device span:last-child{color:var(--text);text-align:right}
+  .device-card{
+    display:grid;
+    gap:9px;
+    margin-top:12px;
+  }
+  .device-node{
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:var(--radius);
+    background:rgba(8,12,16,.62);
+    padding:10px;
+  }
+  .device-node span{
+    display:block;
+    color:var(--muted);
+    font-family:var(--mono);
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:.09em;
+  }
+  .device-node strong{
+    display:block;
+    margin-top:2px;
+    font-size:14px;
+    overflow-wrap:anywhere;
+  }
+  .selected-grid{display:grid;gap:10px}
+  .selected-grid textarea{min-height:72px}
+  .side-actions{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+  }
+  .hint{
+    min-height:21px;
+    margin:12px 0 0;
+    color:var(--muted);
+    line-height:1.45;
+  }
+  .hint.success{color:var(--green)}
+  .hint.error{color:#ffd5d5}
+  .shortcut-list{
+    display:grid;
+    grid-template-columns:auto 1fr;
+    gap:6px 10px;
+    margin:12px 0 0;
+    color:var(--muted);
+    font-size:13px;
+  }
+  .shortcut-list dt{
+    min-width:30px;
+    border:1px solid rgba(255,255,255,.14);
+    border-radius:6px;
+    padding:2px 6px;
+    color:var(--text);
+    font-family:var(--mono);
+    text-align:center;
+  }
+  .shortcut-list dd{margin:0}
+  .privacy-note{
+    margin:12px 0 0;
+    color:var(--dim);
+    font-size:12px;
+    line-height:1.55;
+  }
+  .feedback-success{
+    border-color:rgba(107,224,146,.85) !important;
+    box-shadow:0 0 0 3px rgba(107,224,146,.14) !important;
+  }
+  .feedback-error{
+    border-color:var(--red) !important;
+    box-shadow:0 0 0 3px rgba(255,107,107,.16) !important;
+    animation:shake var(--med) var(--ease);
+  }
+  @keyframes shake{
+    0%,100%{transform:translateX(0)}
+    35%{transform:translateX(-4px)}
+    70%{transform:translateX(4px)}
+  }
+  .file-input{display:none}
+  .noscript{
+    margin:16px;
+    padding:14px;
+    border:1px solid var(--red);
+    background:rgba(255,107,107,.12);
+    border-radius:var(--radius);
+  }
+  @media (max-width:1100px){
+    .hero,
+    .workspace{grid-template-columns:1fr}
+    .side{position:static}
+    .toolbar{grid-template-columns:1fr 1fr}
+    .button-row{justify-content:flex-start}
+  }
+  @media (max-width:680px){
+    main{padding:14px}
+    .topbar{align-items:flex-start;flex-direction:column}
+    .top-actions{justify-content:flex-start}
+    .meta-grid{grid-template-columns:1fr}
+    .status-panel{grid-template-columns:1fr 1fr}
+    .toolbar{grid-template-columns:1fr}
+    .button-row{display:grid;grid-template-columns:1fr 1fr}
+    .button-row button{width:100%}
+    .table-wrap{max-height:none;min-height:320px}
+    .side-actions{grid-template-columns:1fr}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{transition-duration:.001ms !important;animation-duration:.001ms !important}
+    button:hover,button:active,button.is-pressing{transform:none}
+  }
+  @media print{
+    body{background:#fff;color:#111}
+    body::before,
+    .topbar,
+    .toolbar,
+    .side,
+    .skip-link{display:none !important}
+    main{padding:0;width:100%}
+    .hero{display:block}
+    .panel{box-shadow:none;border-color:#ccc;background:#fff}
+    .show-title,
+    input,select,textarea{
+      color:#111;
+      background:#fff;
+      border-color:#ccc;
+    }
+    .table-wrap{max-height:none;overflow:visible}
+    table{min-width:0;font-size:10px}
+    th,td{padding:5px}
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#devices">Skip to network devices</a>
+<noscript><div class="noscript">Network Plan needs JavaScript for editing, import, export, filtering, and browser saved state.</div></noscript>
+<div class="app">
+  <header class="topbar">
+    <a class="brand" href="index.html#av-tools" aria-label="Back to AV tools">
+      <span class="brand-mark">S</span>
+      <span class="brand-text">
+        <strong>Network Plan</strong>
+        <span>System by Dave AV tools</span>
+      </span>
+    </a>
+    <div class="top-actions">
+      <button id="printBtn" type="button">Print</button>
+      <button id="copySummaryBtn" type="button">Copy Summary</button>
+      <button id="exportCsvBtn" type="button">Export CSV</button>
+      <button id="exportJsonBtn" type="button">Export JSON</button>
+      <button id="importJsonBtn" type="button">Import JSON</button>
+      <input id="importInput" class="file-input" type="file" accept=".json,application/json">
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" aria-label="Show metadata">
+      <div class="panel show-panel">
+        <div>
+          <p class="eyebrow">AV network planner</p>
+          <input id="showName" class="show-title" type="text" aria-label="Show name">
+        </div>
+        <div class="meta-grid">
+          <div class="field">
+            <label for="venue">Venue</label>
+            <input id="venue" type="text">
+          </div>
+          <div class="field">
+            <label for="showDate">Date</label>
+            <input id="showDate" type="date">
+          </div>
+          <div class="field">
+            <label for="networkLead">Network lead</label>
+            <input id="networkLead" type="text">
+          </div>
+          <div class="field">
+            <label for="room">Room</label>
+            <input id="room" type="text">
+          </div>
+          <div class="field">
+            <label for="internetProvider">Internet provider</label>
+            <input id="internetProvider" type="text">
+          </div>
+          <div class="field">
+            <label for="handoffTo">Handoff to</label>
+            <input id="handoffTo" type="text">
+          </div>
+        </div>
+      </div>
+      <aside class="panel status-panel" aria-label="Network status">
+        <div class="stat"><span>Total</span><strong id="totalOut">0</strong></div>
+        <div class="stat"><span>Online</span><strong id="onlineOut">0</strong></div>
+        <div class="stat"><span>Static</span><strong id="staticOut">0</strong></div>
+        <div class="stat"><span>Issues</span><strong id="issueOut">0</strong></div>
+        <div class="stat"><span>Networks</span><strong id="networkOut">0</strong></div>
+        <div class="stat"><span>VLANs</span><strong id="vlanOut">0</strong></div>
+      </aside>
+    </section>
+
+    <section class="workspace">
+      <div class="panel main-panel" id="devices">
+        <div class="toolbar" role="toolbar" aria-label="Network list controls">
+          <input id="searchInput" type="search" placeholder="Search device, role, IP, VLAN, port, notes" aria-label="Search devices">
+          <select id="networkFilter" aria-label="Filter by network"></select>
+          <select id="statusFilter" aria-label="Filter by status">
+            <option value="all">All statuses</option>
+            <option value="planned">Planned</option>
+            <option value="patched">Patched</option>
+            <option value="online">Online</option>
+            <option value="issue">Issue</option>
+            <option value="spare">Spare</option>
+          </select>
+          <div class="button-row">
+            <button id="addDeviceBtn" class="primary" type="button">Add Device</button>
+            <button id="loadSampleBtn" type="button">Sample</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table id="deviceTable">
+            <thead>
+              <tr>
+                <th>Device</th>
+                <th>Role</th>
+                <th>Zone</th>
+                <th>Network</th>
+                <th>IP</th>
+                <th>Method</th>
+                <th>VLAN</th>
+                <th>Port</th>
+                <th>Status</th>
+                <th>Backup</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody id="deviceBody"></tbody>
+          </table>
+        </div>
+        <div id="emptyState" class="empty-state" hidden>
+          No devices match the current filters.
+        </div>
+      </div>
+
+      <aside class="side">
+        <section class="panel side-section" aria-label="Selected device">
+          <div class="selected-device">
+            <span>Selected</span>
+            <span id="selectedIdOut">None</span>
+          </div>
+          <div class="device-card" aria-label="Selected device preview">
+            <div class="device-node"><span>Device</span><strong id="deviceName">None</strong></div>
+            <div class="device-node"><span>Network route</span><strong id="deviceRoute">None</strong></div>
+            <div class="device-node"><span>Backup</span><strong id="deviceBackup">None</strong></div>
+          </div>
+          <div class="selected-grid">
+            <div>
+              <label for="selectedStatus">Status</label>
+              <select id="selectedStatus">
+                <option value="planned">Planned</option>
+                <option value="patched">Patched</option>
+                <option value="online">Online</option>
+                <option value="issue">Issue</option>
+                <option value="spare">Spare</option>
+              </select>
+            </div>
+            <div>
+              <label for="selectedNotes">Notes</label>
+              <textarea id="selectedNotes"></textarea>
+            </div>
+            <div class="side-actions">
+              <button id="markPlannedBtn" type="button">Planned</button>
+              <button id="markPatchedBtn" type="button">Patched</button>
+              <button id="markOnlineBtn" type="button">Online</button>
+              <button id="markIssueBtn" type="button">Issue</button>
+              <button id="markSpareBtn" type="button">Spare</button>
+              <button id="moveUpBtn" type="button">Move Up</button>
+              <button id="moveDownBtn" type="button">Move Down</button>
+              <button id="duplicateBtn" type="button">Duplicate</button>
+              <button id="deleteBtn" class="danger" type="button">Delete</button>
+            </div>
+          </div>
+          <p id="hint" class="hint" role="status">Loaded sample network plan.</p>
+        </section>
+        <section class="panel side-section" aria-label="Keyboard shortcuts">
+          <h2>Fast actions</h2>
+          <dl class="shortcut-list">
+            <dt>N</dt><dd>Add device after selected</dd>
+            <dt>O</dt><dd>Mark selected online</dd>
+            <dt>P</dt><dd>Mark selected patched</dd>
+            <dt>I</dt><dd>Mark selected issue</dd>
+            <dt>S</dt><dd>Mark selected spare</dd>
+            <dt>D</dt><dd>Duplicate selected device</dd>
+            <dt>Del</dt><dd>Delete selected device</dd>
+          </dl>
+          <p class="privacy-note">Network data is remembered in this browser when storage is available. Export JSON before moving to another device.</p>
+        </section>
+      </aside>
+    </section>
+  </main>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var STORAGE_KEY = 'network-plan.v1';
+  var SCHEMA = 'system-by-dave.network-plan.v1';
+  var STATUS = ['planned','patched','online','issue','spare'];
+  var NETWORKS = ['control','audio','video','comms','internet','show','other'];
+  var METHODS = ['static','dhcp','reserved','link-local','unknown'];
+  var $ = function(id){ return document.getElementById(id); };
+
+  var state = {
+    meta:{
+      showName:'General Session Network Plan',
+      venue:'Ballroom A',
+      showDate:new Date().toISOString().slice(0, 10),
+      networkLead:'Network',
+      room:'Ballroom A',
+      internetProvider:'Venue IT',
+      handoffTo:'Show crew'
+    },
+    devices:[],
+    selectedId:'',
+    filters:{search:'',network:'all',status:'all'}
+  };
+
+  var sampleDevices = [
+    {device:'Core switch',role:'Managed switch',zone:'FOH',network:'control',ip:'10.40.10.2',method:'static',vlan:'10',port:'Switch port 1',status:'online',backup:'Spare 8 port switch',notes:'Label uplinks and save config.'},
+    {device:'Stream encoder',role:'Primary stream',zone:'FOH',network:'internet',ip:'10.40.20.12',method:'static',vlan:'20',port:'Switch port 4',status:'online',backup:'Laptop hotspot',notes:'Run speed test before doors.'},
+    {device:'Dante console',role:'Audio control',zone:'FOH',network:'audio',ip:'10.40.30.10',method:'static',vlan:'30',port:'Switch port 8',status:'online',backup:'Analog left right feed',notes:'Clock leader on console.'},
+    {device:'Stage box',role:'Audio stage I/O',zone:'Stage left',network:'audio',ip:'10.40.30.20',method:'static',vlan:'30',port:'Stage trunk 1',status:'patched',backup:'Copper snake',notes:'Confirm link lights after stage power.'},
+    {device:'Graphics laptop',role:'Lower thirds',zone:'FOH',network:'control',ip:'DHCP',method:'dhcp',vlan:'10',port:'Switch port 5',status:'patched',backup:'Backup graphics laptop',notes:'Reserve address if show file needs fixed target.'},
+    {device:'Intercom bridge',role:'Comms gateway',zone:'Backstage',network:'comms',ip:'10.40.40.14',method:'static',vlan:'40',port:'Switch port 9',status:'issue',backup:'Radio channel 2',notes:'Bridge sees switch but panel does not register.'},
+    {device:'Presenter laptop',role:'Slides internet',zone:'Lectern',network:'internet',ip:'DHCP',method:'dhcp',vlan:'20',port:'Floor pocket A',status:'planned',backup:'Phone tether',notes:'Keep presenter traffic off audio VLAN.'},
+    {device:'Spare router',role:'Emergency NAT',zone:'FOH case',network:'other',ip:'192.168.88.1',method:'static',vlan:'99',port:'Case spare',status:'spare',backup:'Venue DHCP',notes:'Use only if venue handoff fails.'}
+  ];
+
+  var inputs = {
+    showName:$('showName'),
+    venue:$('venue'),
+    showDate:$('showDate'),
+    networkLead:$('networkLead'),
+    room:$('room'),
+    internetProvider:$('internetProvider'),
+    handoffTo:$('handoffTo'),
+    search:$('searchInput'),
+    network:$('networkFilter'),
+    status:$('statusFilter'),
+    selectedStatus:$('selectedStatus'),
+    selectedNotes:$('selectedNotes')
+  };
+
+  function storageAvailable(){
+    try{
+      var key = 'network-plan-probe';
+      localStorage.setItem(key, key);
+      localStorage.removeItem(key);
+      return true;
+    }catch(e){
+      return false;
+    }
+  }
+
+  function uid(){
+    return 'device-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
+  }
+
+  function cloneDevice(device){
+    return {
+      id:device.id || uid(),
+      device:String(device.device || ''),
+      role:String(device.role || ''),
+      zone:String(device.zone || ''),
+      network:NETWORKS.indexOf(device.network) >= 0 ? device.network : 'control',
+      ip:String(device.ip || ''),
+      method:METHODS.indexOf(device.method) >= 0 ? device.method : 'static',
+      vlan:String(device.vlan || ''),
+      port:String(device.port || ''),
+      status:STATUS.indexOf(device.status) >= 0 ? device.status : 'planned',
+      backup:String(device.backup || ''),
+      notes:String(device.notes || '')
+    };
+  }
+
+  function normalizeState(raw){
+    var next = raw && typeof raw === 'object' ? raw : {};
+    var meta = next.meta && typeof next.meta === 'object' ? next.meta : {};
+    return {
+      meta:{
+        showName:String(meta.showName || 'General Session Network Plan').slice(0, 120),
+        venue:String(meta.venue || '').slice(0, 120),
+        showDate:String(meta.showDate || new Date().toISOString().slice(0, 10)).slice(0, 20),
+        networkLead:String(meta.networkLead || '').slice(0, 80),
+        room:String(meta.room || '').slice(0, 120),
+        internetProvider:String(meta.internetProvider || '').slice(0, 100),
+        handoffTo:String(meta.handoffTo || '').slice(0, 80)
+      },
+      devices:Array.isArray(next.devices) ? next.devices.map(cloneDevice).slice(0, 300) : sampleDevices.map(cloneDevice),
+      selectedId:typeof next.selectedId === 'string' ? next.selectedId : '',
+      filters:{
+        search:String(next.filters && next.filters.search || ''),
+        network:NETWORKS.indexOf(next.filters && next.filters.network) >= 0 ? next.filters.network : 'all',
+        status:STATUS.indexOf(next.filters && next.filters.status) >= 0 ? next.filters.status : 'all'
+      }
+    };
+  }
+
+  function loadState(){
+    if(!storageAvailable()){
+      state = normalizeState({});
+      return;
+    }
+    try{
+      var raw = localStorage.getItem(STORAGE_KEY);
+      state = raw ? normalizeState(JSON.parse(raw)) : normalizeState({});
+    }catch(e){
+      state = normalizeState({});
+    }
+    if(!state.selectedId && state.devices[0]) state.selectedId = state.devices[0].id;
+  }
+
+  function saveState(){
+    if(!storageAvailable()) return false;
+    try{
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        schema:SCHEMA,
+        savedAt:new Date().toISOString(),
+        meta:state.meta,
+        devices:state.devices,
+        selectedId:state.selectedId,
+        filters:state.filters
+      }));
+      return true;
+    }catch(e){
+      showHint('Could not save in this browser. Export JSON to keep a copy.', 'error');
+      return false;
+    }
+  }
+
+  function setInputValues(){
+    inputs.showName.value = state.meta.showName;
+    inputs.venue.value = state.meta.venue;
+    inputs.showDate.value = state.meta.showDate;
+    inputs.networkLead.value = state.meta.networkLead;
+    inputs.room.value = state.meta.room;
+    inputs.internetProvider.value = state.meta.internetProvider;
+    inputs.handoffTo.value = state.meta.handoffTo;
+    inputs.search.value = state.filters.search;
+    inputs.status.value = state.filters.status;
+  }
+
+  function selectOptions(values, selected, firstLabel){
+    var html = firstLabel ? '<option value="all">' + escapeHtml(firstLabel) + '</option>' : '';
+    values.forEach(function(value){
+      html += '<option value="' + escapeAttr(value) + '"' + (value === selected ? ' selected' : '') + '>' + escapeHtml(titleCase(value)) + '</option>';
+    });
+    return html;
+  }
+
+  function renderNetworkFilter(){
+    var map = {};
+    state.devices.forEach(function(device){ if(device.network) map[device.network] = true; });
+    var values = Object.keys(map).sort(function(a,b){ return a.localeCompare(b); });
+    if(state.filters.network !== 'all' && values.indexOf(state.filters.network) < 0){
+      state.filters.network = 'all';
+    }
+    inputs.network.innerHTML = selectOptions(values, state.filters.network, 'All networks');
+  }
+
+  function visibleDevices(){
+    var q = state.filters.search.trim().toLowerCase();
+    return state.devices.filter(function(device){
+      var haystack = [
+        device.device,
+        device.role,
+        device.zone,
+        device.network,
+        device.ip,
+        device.method,
+        device.vlan,
+        device.port,
+        device.status,
+        device.backup,
+        device.notes
+      ].join(' ').toLowerCase();
+      if(q && haystack.indexOf(q) === -1) return false;
+      if(state.filters.network !== 'all' && device.network !== state.filters.network) return false;
+      if(state.filters.status !== 'all' && device.status !== state.filters.status) return false;
+      return true;
+    });
+  }
+
+  function renderRows(){
+    var rows = visibleDevices();
+    var body = $('deviceBody');
+    $('emptyState').hidden = rows.length > 0;
+    body.innerHTML = rows.map(function(device){
+      return '<tr class="status-' + device.status + (device.id === state.selectedId ? ' selected' : '') + '" data-id="' + escapeAttr(device.id) + '">' +
+        cell('<input class="row-input field-medium" data-field="device" value="' + escapeAttr(device.device) + '" aria-label="Device">') +
+        cell('<input class="row-input field-medium" data-field="role" value="' + escapeAttr(device.role) + '" aria-label="Role">') +
+        cell('<input class="row-input field-small" data-field="zone" value="' + escapeAttr(device.zone) + '" aria-label="Zone">') +
+        cell('<select class="row-select field-small" data-field="network" aria-label="Network">' + selectOptions(NETWORKS, device.network, '') + '</select>') +
+        cell('<input class="row-input mono field-medium" data-field="ip" value="' + escapeAttr(device.ip) + '" aria-label="IP address">') +
+        cell('<select class="row-select field-small" data-field="method" aria-label="Address method">' + selectOptions(METHODS, device.method, '') + '</select>') +
+        cell('<input class="row-input mono field-xs" data-field="vlan" value="' + escapeAttr(device.vlan) + '" aria-label="VLAN">') +
+        cell('<input class="row-input field-medium" data-field="port" value="' + escapeAttr(device.port) + '" aria-label="Port">') +
+        cell('<select class="row-select field-small" data-field="status" aria-label="Status">' + selectOptions(STATUS, device.status, '') + '</select>') +
+        cell('<input class="row-input field-medium" data-field="backup" value="' + escapeAttr(device.backup) + '" aria-label="Backup">') +
+        cell('<textarea class="row-textarea field-notes" data-field="notes" aria-label="Notes">' + escapeHtml(device.notes) + '</textarea>') +
+        '</tr>';
+    }).join('');
+  }
+
+  function cell(content){
+    return '<td>' + content + '</td>';
+  }
+
+  function updateStats(){
+    $('totalOut').textContent = state.devices.length;
+    $('onlineOut').textContent = state.devices.filter(function(device){ return device.status === 'online'; }).length;
+    $('staticOut').textContent = state.devices.filter(function(device){ return device.method === 'static'; }).length;
+    $('issueOut').textContent = state.devices.filter(function(device){ return device.status === 'issue'; }).length;
+    $('networkOut').textContent = uniqueCount(state.devices.map(function(device){ return device.network; }));
+    $('vlanOut').textContent = uniqueCount(state.devices.map(function(device){ return device.vlan; }));
+  }
+
+  function uniqueCount(values){
+    var map = {};
+    values.forEach(function(value){
+      value = String(value || '').trim();
+      if(value) map[value] = true;
+    });
+    return Object.keys(map).length;
+  }
+
+  function selectedDevice(){
+    return state.devices.find(function(device){ return device.id === state.selectedId; }) || null;
+  }
+
+  function updateInspector(){
+    var device = selectedDevice();
+    var disabled = !device;
+    $('selectedIdOut').textContent = device ? device.device || 'Selected' : 'None';
+    inputs.selectedStatus.disabled = disabled;
+    inputs.selectedNotes.disabled = disabled;
+    $('markPlannedBtn').disabled = disabled;
+    $('markPatchedBtn').disabled = disabled;
+    $('markOnlineBtn').disabled = disabled;
+    $('markIssueBtn').disabled = disabled;
+    $('markSpareBtn').disabled = disabled;
+    $('moveUpBtn').disabled = disabled;
+    $('moveDownBtn').disabled = disabled;
+    $('duplicateBtn').disabled = disabled;
+    $('deleteBtn').disabled = disabled;
+    $('deviceName').textContent = device ? device.device || 'Unassigned' : 'None';
+    $('deviceRoute').textContent = device ? titleCase(device.network) + ' / ' + (device.ip || 'No IP') + ' / VLAN ' + (device.vlan || 'none') : 'None';
+    $('deviceBackup').textContent = device ? device.backup || 'None' : 'None';
+    if(device){
+      inputs.selectedStatus.value = device.status;
+      inputs.selectedNotes.value = device.notes;
+    }else{
+      inputs.selectedStatus.value = 'planned';
+      inputs.selectedNotes.value = '';
+    }
+  }
+
+  function render(){
+    setInputValues();
+    renderNetworkFilter();
+    renderRows();
+    updateStats();
+    updateInspector();
+  }
+
+  function updateDevice(id, field, value, commitNow){
+    var device = state.devices.find(function(item){ return item.id === id; });
+    if(!device) return;
+    if(field === 'status' && STATUS.indexOf(value) < 0) value = 'planned';
+    if(field === 'network' && NETWORKS.indexOf(value) < 0) value = 'other';
+    if(field === 'method' && METHODS.indexOf(value) < 0) value = 'unknown';
+    if(field === 'ip' && commitNow) value = normalizeIp(value);
+    if(field === 'vlan' && commitNow) value = String(value || '').replace(/[^0-9A-Za-z_-]/g, '').slice(0, 16);
+    device[field] = value;
+    if(field === 'network' && commitNow) renderNetworkFilter();
+    if(field === 'status' || (field === 'network' && commitNow)) renderRows();
+    saveState();
+    updateStats();
+    updateInspector();
+  }
+
+  function selectDevice(id){
+    if(!id) return;
+    if(state.selectedId === id){
+      updateInspector();
+      return;
+    }
+    state.selectedId = id;
+    saveState();
+    renderRows();
+    updateInspector();
+  }
+
+  function addDevice(afterId){
+    var index = afterId ? state.devices.findIndex(function(device){ return device.id === afterId; }) + 1 : state.devices.length;
+    if(index < 0) index = state.devices.length;
+    var nextNumber = state.devices.length + 1;
+    var device = cloneDevice({
+      device:'Device ' + String(nextNumber).padStart(2, '0'),
+      role:'New network device',
+      zone:'FOH',
+      network:'control',
+      ip:'10.40.10.' + String(20 + nextNumber),
+      method:'static',
+      vlan:'10',
+      port:'Switch port',
+      status:'planned',
+      backup:'',
+      notes:''
+    });
+    state.devices.splice(index, 0, device);
+    state.selectedId = device.id;
+    saveState();
+    render();
+    showHint('Device added.', 'success');
+    focusSelectedRow();
+  }
+
+  function duplicateSelected(){
+    var device = selectedDevice();
+    var index;
+    var copy;
+    if(!device) return showHint('Pick a device first.', 'error');
+    index = state.devices.findIndex(function(item){ return item.id === device.id; });
+    copy = cloneDevice(Object.assign({}, device, {
+      id:uid(),
+      device:device.device + ' copy',
+      status:'planned',
+      notes:device.notes ? device.notes + ' Copy.' : 'Copy.'
+    }));
+    state.devices.splice(index + 1, 0, copy);
+    state.selectedId = copy.id;
+    saveState();
+    render();
+    showHint('Device duplicated.', 'success');
+    focusSelectedRow();
+  }
+
+  function deleteSelected(){
+    var device = selectedDevice();
+    var index;
+    if(!device) return showHint('Pick a device first.', 'error');
+    if(!window.confirm('Delete selected device?')) return;
+    index = state.devices.findIndex(function(item){ return item.id === device.id; });
+    state.devices.splice(index, 1);
+    state.selectedId = state.devices[Math.min(index, state.devices.length - 1)] ? state.devices[Math.min(index, state.devices.length - 1)].id : '';
+    saveState();
+    render();
+    showHint('Device deleted.', 'success');
+  }
+
+  function moveSelected(dir){
+    var device = selectedDevice();
+    var index;
+    var nextIndex;
+    if(!device) return showHint('Pick a device first.', 'error');
+    index = state.devices.findIndex(function(item){ return item.id === device.id; });
+    nextIndex = index + dir;
+    if(nextIndex < 0 || nextIndex >= state.devices.length) return;
+    state.devices.splice(index, 1);
+    state.devices.splice(nextIndex, 0, device);
+    saveState();
+    render();
+    showHint(dir < 0 ? 'Device moved up.' : 'Device moved down.', 'success');
+    focusSelectedRow();
+  }
+
+  function setSelectedStatus(status){
+    var device = selectedDevice();
+    if(!device) return showHint('Pick a device first.', 'error');
+    device.status = status;
+    saveState();
+    render();
+    showHint(status === 'issue' ? 'Device marked issue.' : 'Device updated.', status === 'issue' ? 'error' : 'success');
+  }
+
+  function loadSample(){
+    if(state.devices.length && !window.confirm('Replace current network plan with sample devices?')) return;
+    state = normalizeState({meta:state.meta,devices:sampleDevices,selectedId:'',filters:{search:'',network:'all',status:'all'}});
+    if(state.devices[0]) state.selectedId = state.devices[0].id;
+    saveState();
+    render();
+    showHint('Sample network plan loaded.', 'success');
+  }
+
+  function buildSummary(){
+    var lines = [];
+    var issues = state.devices.filter(function(device){ return device.status === 'issue'; });
+    lines.push('NETWORK PLAN');
+    lines.push('Show: ' + state.meta.showName);
+    lines.push('Venue: ' + state.meta.venue);
+    lines.push('Date: ' + state.meta.showDate);
+    lines.push('Network Lead: ' + state.meta.networkLead);
+    lines.push('Room: ' + state.meta.room);
+    lines.push('Internet Provider: ' + state.meta.internetProvider);
+    lines.push('Handoff: ' + state.meta.handoffTo);
+    lines.push('');
+    lines.push('Summary: ' + state.devices.length + ' devices, ' + state.devices.filter(function(device){ return device.status === 'online'; }).length + ' online, ' + state.devices.filter(function(device){ return device.method === 'static'; }).length + ' static, ' + issues.length + ' issues, ' + uniqueCount(state.devices.map(function(device){ return device.network; })) + ' networks, ' + uniqueCount(state.devices.map(function(device){ return device.vlan; })) + ' VLANs.');
+    if(issues.length){
+      lines.push('');
+      lines.push('Issues:');
+      issues.forEach(function(device){
+        lines.push('- ' + device.device + ' ' + device.ip + ': ' + (device.notes || 'No note'));
+      });
+    }
+    lines.push('');
+    lines.push('Devices:');
+    state.devices.forEach(function(device){
+      lines.push('- ' + device.device + ' | ' + device.role + ' | ' + device.zone + ' | ' + device.network + ' | ' + device.ip + ' | ' + device.method + ' | VLAN ' + (device.vlan || 'none') + ' | ' + device.port + ' | ' + device.status + ' | backup: ' + (device.backup || 'none'));
+    });
+    return lines.join('\n');
+  }
+
+  function copySummary(){
+    copyText(buildSummary()).then(function(){
+      showHint('Network summary copied.', 'success');
+      signal($('copySummaryBtn'), 'success');
+    }).catch(function(){
+      showHint('Could not copy summary.', 'error');
+      signal($('copySummaryBtn'), 'error');
+    });
+  }
+
+  function exportJson(){
+    var payload = {
+      schema:SCHEMA,
+      exportedAt:new Date().toISOString(),
+      meta:state.meta,
+      devices:state.devices
+    };
+    downloadFile(fileStem() + '.network-plan.json', JSON.stringify(payload, null, 2), 'application/json;charset=utf-8');
+    showHint('JSON exported.', 'success');
+  }
+
+  function exportCsv(){
+    var fields = ['device','role','zone','network','ip','method','vlan','port','status','backup','notes'];
+    var csv = [fields.join(',')].concat(state.devices.map(function(device){
+      return fields.map(function(field){ return csvCell(device[field]); }).join(',');
+    })).join('\n');
+    downloadFile(fileStem() + '.network-plan.csv', csv, 'text/csv;charset=utf-8');
+    showHint('CSV exported.', 'success');
+  }
+
+  function importJsonFile(file){
+    var reader = new FileReader();
+    reader.onload = function(){
+      try{
+        var parsed = JSON.parse(String(reader.result || ''));
+        if(!parsed || typeof parsed !== 'object' || !Array.isArray(parsed.devices)) throw new Error('Invalid payload');
+        state = normalizeState({
+          meta:parsed.meta || state.meta,
+          devices:parsed.devices,
+          selectedId:'',
+          filters:{search:'',network:'all',status:'all'}
+        });
+        if(state.devices[0]) state.selectedId = state.devices[0].id;
+        saveState();
+        render();
+        showHint('Network JSON imported.', 'success');
+        signal($('importJsonBtn'), 'success');
+      }catch(e){
+        showHint('Could not import that JSON file.', 'error');
+        signal($('importJsonBtn'), 'error');
+      }
+    };
+    reader.onerror = function(){
+      showHint('Could not read that JSON file.', 'error');
+      signal($('importJsonBtn'), 'error');
+    };
+    reader.readAsText(file);
+  }
+
+  function syncMeta(){
+    state.meta.showName = inputs.showName.value;
+    state.meta.venue = inputs.venue.value;
+    state.meta.showDate = inputs.showDate.value;
+    state.meta.networkLead = inputs.networkLead.value;
+    state.meta.room = inputs.room.value;
+    state.meta.internetProvider = inputs.internetProvider.value;
+    state.meta.handoffTo = inputs.handoffTo.value;
+    saveState();
+  }
+
+  function bindEvents(){
+    Object.keys(inputs).forEach(function(key){
+      if(['showName','venue','showDate','networkLead','room','internetProvider','handoffTo'].indexOf(key) >= 0){
+        inputs[key].addEventListener('input', syncMeta);
+      }
+    });
+    inputs.search.addEventListener('input', function(){
+      state.filters.search = inputs.search.value;
+      saveState();
+      renderRows();
+    });
+    inputs.network.addEventListener('change', function(){
+      state.filters.network = inputs.network.value;
+      saveState();
+      renderRows();
+    });
+    inputs.status.addEventListener('change', function(){
+      state.filters.status = inputs.status.value;
+      saveState();
+      renderRows();
+    });
+    $('deviceBody').addEventListener('focusin', function(event){
+      var row = event.target.closest('tr[data-id]');
+      if(row) selectDevice(row.getAttribute('data-id'));
+    });
+    $('deviceBody').addEventListener('click', function(event){
+      var row = event.target.closest('tr[data-id]');
+      if(row) selectDevice(row.getAttribute('data-id'));
+    });
+    $('deviceBody').addEventListener('input', function(event){
+      var target = event.target;
+      var row = target.closest('tr[data-id]');
+      var field = target.getAttribute('data-field');
+      if(row && field) updateDevice(row.getAttribute('data-id'), field, target.value, false);
+    });
+    $('deviceBody').addEventListener('change', function(event){
+      var target = event.target;
+      var row = target.closest('tr[data-id]');
+      var field = target.getAttribute('data-field');
+      if(field === 'ip') target.value = normalizeIp(target.value);
+      if(field === 'vlan') target.value = String(target.value || '').replace(/[^0-9A-Za-z_-]/g, '').slice(0, 16);
+      if(row && field) updateDevice(row.getAttribute('data-id'), field, target.value, true);
+    });
+    inputs.selectedStatus.addEventListener('change', function(){ setSelectedStatus(inputs.selectedStatus.value); });
+    inputs.selectedNotes.addEventListener('input', function(){
+      var device = selectedDevice();
+      if(!device) return;
+      device.notes = inputs.selectedNotes.value;
+      saveState();
+      renderRows();
+    });
+    $('addDeviceBtn').addEventListener('click', function(){ addDevice(state.selectedId); signal(this, 'success'); });
+    $('loadSampleBtn').addEventListener('click', function(){ loadSample(); signal(this, 'success'); });
+    $('markPlannedBtn').addEventListener('click', function(){ setSelectedStatus('planned'); signal(this, 'success'); });
+    $('markPatchedBtn').addEventListener('click', function(){ setSelectedStatus('patched'); signal(this, 'success'); });
+    $('markOnlineBtn').addEventListener('click', function(){ setSelectedStatus('online'); signal(this, 'success'); });
+    $('markIssueBtn').addEventListener('click', function(){ setSelectedStatus('issue'); signal(this, 'error'); });
+    $('markSpareBtn').addEventListener('click', function(){ setSelectedStatus('spare'); signal(this, 'success'); });
+    $('moveUpBtn').addEventListener('click', function(){ moveSelected(-1); signal(this, 'success'); });
+    $('moveDownBtn').addEventListener('click', function(){ moveSelected(1); signal(this, 'success'); });
+    $('duplicateBtn').addEventListener('click', function(){ duplicateSelected(); signal(this, 'success'); });
+    $('deleteBtn').addEventListener('click', function(){ deleteSelected(); signal(this, 'success'); });
+    $('printBtn').addEventListener('click', function(){ window.print(); signal(this, 'success'); });
+    $('copySummaryBtn').addEventListener('click', copySummary);
+    $('exportJsonBtn').addEventListener('click', function(){ exportJson(); signal(this, 'success'); });
+    $('exportCsvBtn').addEventListener('click', function(){ exportCsv(); signal(this, 'success'); });
+    $('importJsonBtn').addEventListener('click', function(){ $('importInput').click(); });
+    $('importInput').addEventListener('change', function(){
+      var file = $('importInput').files && $('importInput').files[0];
+      if(file) importJsonFile(file);
+      $('importInput').value = '';
+    });
+    document.addEventListener('keydown', function(event){
+      if(isTyping()) return;
+      if(event.key === 'n' || event.key === 'N'){ event.preventDefault(); addDevice(state.selectedId); }
+      if(event.key === 'o' || event.key === 'O'){ event.preventDefault(); setSelectedStatus('online'); }
+      if(event.key === 'p' || event.key === 'P'){ event.preventDefault(); setSelectedStatus('patched'); }
+      if(event.key === 'i' || event.key === 'I'){ event.preventDefault(); setSelectedStatus('issue'); }
+      if(event.key === 's' || event.key === 'S'){ event.preventDefault(); setSelectedStatus('spare'); }
+      if(event.key === 'd' || event.key === 'D'){ event.preventDefault(); duplicateSelected(); }
+      if(event.key === 'Delete'){ event.preventDefault(); deleteSelected(); }
+    });
+    installPressFeedback();
+  }
+
+  function installPressFeedback(){
+    document.querySelectorAll('button').forEach(function(button){
+      function press(){ if(!button.disabled) button.classList.add('is-pressing'); }
+      function release(){ button.classList.remove('is-pressing'); }
+      button.addEventListener('pointerdown', press);
+      button.addEventListener('pointerup', release);
+      button.addEventListener('pointercancel', release);
+      button.addEventListener('pointerleave', release);
+      button.addEventListener('blur', release);
+      button.addEventListener('keydown', function(event){
+        if(event.key === ' ' || event.key === 'Enter') press();
+      });
+      button.addEventListener('keyup', function(event){
+        if(event.key === ' ' || event.key === 'Enter') release();
+      });
+    });
+  }
+
+  function showHint(message, kind){
+    var hint = $('hint');
+    hint.textContent = message;
+    hint.classList.remove('success','error');
+    if(kind) hint.classList.add(kind);
+  }
+
+  function signal(element, kind){
+    if(!element) return;
+    var className = kind === 'error' ? 'feedback-error' : 'feedback-success';
+    element.classList.remove(className);
+    void element.offsetWidth;
+    element.classList.add(className);
+    setTimeout(function(){ element.classList.remove(className); }, 190);
+  }
+
+  function focusSelectedRow(){
+    var row = document.querySelector('tr[data-id="' + cssEscape(state.selectedId) + '"]');
+    var input = row && row.querySelector('input,select,textarea');
+    if(input) input.focus({preventScroll:true});
+  }
+
+  function isTyping(){
+    var tag = document.activeElement && document.activeElement.tagName;
+    return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
+  }
+
+  function normalizeIp(value){
+    return String(value || '').trim().replace(/\s+/g, ' ').slice(0, 80);
+  }
+
+  function titleCase(value){
+    return String(value || '').replace(/\b\w/g, function(letter){ return letter.toUpperCase(); });
+  }
+
+  function fileStem(){
+    return (state.meta.showName || 'network-plan')
+      .toLowerCase()
+      .replace(/['"]/g, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .slice(0, 60) || 'network-plan';
+  }
+
+  function csvCell(value){
+    value = String(value == null ? '' : value);
+    if(/[",\n]/.test(value)) return '"' + value.replace(/"/g, '""') + '"';
+    return value;
+  }
+
+  function downloadFile(filename, content, type){
+    var blob = new Blob([content], {type:type});
+    var url = URL.createObjectURL(blob);
+    var link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    link.click();
+    setTimeout(function(){
+      URL.revokeObjectURL(url);
+      if(link.parentNode) link.parentNode.removeChild(link);
+    }, 0);
+  }
+
+  function copyText(text){
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      return navigator.clipboard.writeText(text);
+    }
+    return new Promise(function(resolve, reject){
+      var area = document.createElement('textarea');
+      area.value = text;
+      area.setAttribute('readonly', '');
+      area.style.position = 'fixed';
+      area.style.left = '-9999px';
+      document.body.appendChild(area);
+      area.select();
+      try{
+        document.execCommand('copy') ? resolve() : reject(new Error('copy failed'));
+      }catch(e){
+        reject(e);
+      }finally{
+        if(area.parentNode) area.parentNode.removeChild(area);
+      }
+    });
+  }
+
+  function escapeHtml(value){
+    return String(value == null ? '' : value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function escapeAttr(value){
+    return escapeHtml(value);
+  }
+
+  function cssEscape(value){
+    if(window.CSS && CSS.escape) return CSS.escape(value);
+    return String(value).replace(/"/g, '\\"');
+  }
+
+  loadState();
+  render();
+  bindEvents();
+})();
+</script>
+</body>
+</html>
