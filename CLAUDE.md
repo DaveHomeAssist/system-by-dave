@@ -89,10 +89,10 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
   header Hide controls action stays visibly labeled until phone width, and the
   collapsed read view offsets the run HUD away from the restore button.
 - `av-suite.html` is the AV suite launch hub with show profile fields,
-  phase recommendations, search, phase and department filters, pinned tools,
-  recent tools, copyable launch lists, saved browser preferences, tactile
-  button feedback, suite JSON import and export, and mobile layout
-  containment.
+  phase recommendations, search, phase and department filters, cross tool
+  readiness tracking, issue focused views, pinned tools, recent tools,
+  copyable launch lists, saved browser preferences, tactile button feedback,
+  suite JSON import and export, and mobile layout containment.
 - `cue-sheet.html` is rolled into the AV suite as CueForge, with
   `cueforge.html` as a route alias.
 - `stage-plot.html` is rolled into the AV suite as PlotForge, with

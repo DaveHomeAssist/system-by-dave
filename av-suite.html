@@ -5,13 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'none'">
 <title>AV Suite | System by Dave</title>
-<meta name="description" content="A browser based launch hub for System by Dave AV tools, grouped by show phase with saved operator preferences, pinned tools, search, suite JSON import and export, and quick handoff copy.">
+<meta name="description" content="A browser based launch hub for System by Dave AV tools, grouped by show phase with saved operator preferences, readiness tracking, pinned tools, search, suite JSON import and export, and quick handoff copy.">
 <link rel="canonical" href="https://systembydave.com/av-suite.html">
 <meta name="theme-color" content="#0a0f17">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="System by Dave">
 <meta property="og:title" content="AV Suite">
-<meta property="og:description" content="Open the System by Dave AV tool suite from one operator hub with show context, phase recommendations, search, pins, recent tools, and suite JSON transfer.">
+<meta property="og:description" content="Open the System by Dave AV tool suite from one operator hub with show context, phase recommendations, readiness tracking, search, pins, recent tools, and suite JSON transfer.">
 <meta property="og:url" content="https://systembydave.com/av-suite.html">
 <meta property="og:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
 <meta property="og:image:width" content="1024">
@@ -19,7 +19,7 @@
 <meta property="og:image:alt" content="System by Dave preview banner">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="AV Suite">
-<meta name="twitter:description" content="Open the System by Dave AV tool suite from one operator hub with show context, phase recommendations, search, pins, recent tools, and suite JSON transfer.">
+<meta name="twitter:description" content="Open the System by Dave AV tool suite from one operator hub with show context, phase recommendations, readiness tracking, search, pins, recent tools, and suite JSON transfer.">
 <meta name="twitter:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
 <link rel="icon" href="svg/system_by_dave_logo_rust.svg" type="image/svg+xml">
 <style>
@@ -78,10 +78,13 @@
   .phase-strip{display:flex;flex-wrap:wrap;gap:8px}
   .phase-strip button{font-family:var(--mono);font-size:12px;text-transform:uppercase;letter-spacing:.08em}
   .phase-strip button[aria-pressed="true"]{background:rgba(114,244,233,.16);border-color:var(--cyan);color:#dffffc}
-  .status{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:14px}
+  .status{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;padding:14px}
   .stat{padding:14px;border:1px solid rgba(73,97,120,.72);border-radius:12px;background:rgba(12,20,29,.84)}
   .stat span{display:block;color:var(--muted);font-family:var(--mono);font-size:12px;text-transform:uppercase;letter-spacing:.08em}
   .stat strong{display:block;margin-top:4px;font-size:30px}
+  .stat.ready strong{color:var(--green)}
+  .stat.issue strong{color:var(--red)}
+  .stat.skipped strong{color:var(--yellow)}
   .workspace{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:18px;align-items:start}
   .tool-panel{padding:16px;display:grid;gap:14px}
   .toolbar{display:grid;grid-template-columns:minmax(220px,1fr) 160px 170px 150px;gap:10px;align-items:end}
@@ -91,17 +94,38 @@
   .recommend-card strong,.tool-card h3{font-size:17px;margin:0}
   .recommend-card span,.tool-meta,.recent-item span{color:var(--muted);font-size:12px}
   .tool-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-  .tool-card{display:grid;gap:11px;min-height:198px;position:relative}
+  .tool-card{display:grid;gap:11px;min-height:232px;position:relative}
+  .tool-card.ready-ready{border-color:rgba(101,217,145,.72)}
+  .tool-card.ready-issue{border-color:rgba(255,107,107,.76);box-shadow:0 0 0 1px rgba(255,107,107,.14)}
+  .tool-card.ready-skipped{opacity:.84}
   .tool-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
   .badge-row{display:flex;flex-wrap:wrap;gap:6px}
   .badge{display:inline-flex;align-items:center;border:1px solid rgba(73,97,120,.78);border-radius:999px;padding:4px 8px;color:#d8e6f8;background:#0a121b;font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.06em}
   .badge.hot{border-color:rgba(114,244,233,.7);color:var(--cyan)}
+  .badge.ready-badge{border-color:rgba(73,97,120,.78)}
+  .badge.ready-ready{border-color:rgba(101,217,145,.76);color:#bbf7ce}
+  .badge.ready-issue{border-color:rgba(255,107,107,.82);color:#ffd4d4}
+  .badge.ready-skipped{border-color:rgba(246,199,106,.76);color:#ffe3a6}
   .tool-card p{margin:0;color:#d8e3ef;font-size:14px}
+  .readiness-row{display:grid;grid-template-columns:minmax(0,1fr) 132px;gap:8px;align-items:end}
+  .readiness-row label{margin:0}
+  .readiness-select{padding:8px 9px}
+  .readiness-select.ready-ready{border-color:rgba(101,217,145,.76);color:#d7ffe4}
+  .readiness-select.ready-issue{border-color:rgba(255,107,107,.82);color:#ffd9d9}
+  .readiness-select.ready-skipped{border-color:rgba(246,199,106,.76);color:#ffe6ae}
   .tool-actions{display:flex;gap:8px;margin-top:auto}
   .tool-actions button{flex:1}
   .side{display:grid;gap:14px}
   .side-section{padding:14px;display:grid;gap:12px}
   .side-section h2{margin:0;font-size:18px}
+  .readiness-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+  .readiness-pill{border:1px solid var(--line);border-radius:10px;padding:9px;background:#0b131c}
+  .readiness-pill span{display:block;color:var(--muted);font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.08em}
+  .readiness-pill strong{display:block;margin-top:2px;font-size:22px}
+  .readiness-actions{display:grid;gap:8px}
+  .readiness-list{display:grid;gap:8px}
+  .readiness-item{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:9px;background:#0b131c}
+  .readiness-item span{display:block;color:var(--muted);font-size:12px}
   .recent-list{display:grid;gap:8px}
   .recent-item{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center}
   .empty{padding:18px;border:1px dashed var(--line);border-radius:12px;color:var(--muted);text-align:center}
@@ -115,7 +139,7 @@
   @keyframes errorShake{25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
   @media (prefers-reduced-motion:reduce){*{transition-duration:.001ms!important;animation-duration:.001ms!important}button:hover,button:active,button.is-pressing{transform:none}}
   @media (max-width:1050px){.hero,.workspace{grid-template-columns:1fr}.tool-grid,.recommendations{grid-template-columns:repeat(2,minmax(0,1fr))}.profile-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-  @media (max-width:680px){.topbar{position:static;align-items:flex-start;flex-direction:column}.top-actions{width:100%;display:grid;grid-template-columns:1fr 1fr}.brand h1{font-size:20px}.brand span{font-size:12px}main{padding:10px}.profile,.tool-panel,.side-section{padding:12px}.toolbar,.profile-grid,.status,.tool-grid,.recommendations{grid-template-columns:1fr}.tool-actions{grid-template-columns:1fr}.show-title{font-size:36px}}
+  @media (max-width:680px){.topbar{position:static;align-items:flex-start;flex-direction:column}.top-actions{width:100%;display:grid;grid-template-columns:1fr 1fr}.brand h1{font-size:20px}.brand span{font-size:12px}main{padding:10px}.profile,.tool-panel,.side-section{padding:12px}.toolbar,.profile-grid,.status,.tool-grid,.recommendations,.readiness-row{grid-template-columns:1fr}.readiness-summary{grid-template-columns:repeat(3,minmax(0,1fr))}.tool-actions{grid-template-columns:1fr}.show-title{font-size:36px}}
 </style>
 </head>
 <body>
@@ -153,9 +177,11 @@
     </div>
     <aside class="panel status" aria-label="Suite status">
       <div class="stat"><span>Tools</span><strong id="toolCountOut">0</strong></div>
+      <div class="stat ready"><span>Ready</span><strong id="readyCountOut">0</strong></div>
+      <div class="stat issue"><span>Issues</span><strong id="issueCountOut">0</strong></div>
+      <div class="stat skipped"><span>Skipped</span><strong id="skipCountOut">0</strong></div>
       <div class="stat"><span>Pinned</span><strong id="pinnedCountOut">0</strong></div>
       <div class="stat"><span>Visible</span><strong id="visibleCountOut">0</strong></div>
-      <div class="stat"><span>Recent</span><strong id="recentCountOut">0</strong></div>
     </aside>
   </section>
 
@@ -167,12 +193,22 @@
         <div><label for="searchInput">Search tools</label><input id="searchInput" type="search" placeholder="Search teleprompter, patch, crew, rooms"></div>
         <div><label for="phaseFilter">Phase</label><select id="phaseFilter"></select></div>
         <div><label for="deptFilter">Department</label><select id="deptFilter"></select></div>
-        <div><label for="pinFilter">View</label><select id="pinFilter"><option value="all">All tools</option><option value="pinned">Pinned only</option><option value="recent">Recent only</option></select></div>
+        <div><label for="pinFilter">View</label><select id="pinFilter"><option value="all">All tools</option><option value="pinned">Pinned only</option><option value="recent">Recent only</option><option value="ready">Ready only</option><option value="issues">Issues only</option><option value="skipped">Skipped only</option></select></div>
       </div>
       <div id="toolGrid" class="tool-grid"></div>
       <div id="emptyState" class="empty" hidden>No tools match the current filters.</div>
     </section>
     <aside class="side">
+      <section class="panel side-section">
+        <h2>Suite readiness</h2>
+        <div id="readinessSummary" class="readiness-summary"></div>
+        <div class="readiness-actions">
+          <button id="markRecommendedReadyBtn" type="button">Mark Recommended Ready</button>
+          <button id="showIssuesBtn" type="button">Show Issues</button>
+          <button id="resetReadinessBtn" class="ghost" type="button">Reset Readiness</button>
+        </div>
+        <div id="readinessIssueList" class="readiness-list"></div>
+      </section>
       <section class="panel side-section">
         <h2>Recent tools</h2>
         <div id="recentList" class="recent-list"></div>
@@ -184,7 +220,7 @@
         <button id="importSuiteBtn" type="button">Import Suite JSON</button>
         <input id="suiteImportInput" class="file-input" type="file" accept=".json,application/json">
         <button id="clearPrefsBtn" class="danger" type="button">Clear Suite Preferences</button>
-        <p class="privacy-note">Show profile, pinned tools, and recent tools are remembered in this browser when storage is available. Export JSON before moving to another machine.</p>
+        <p class="privacy-note">Show profile, readiness, pinned tools, and recent tools are remembered in this browser when storage is available. Export JSON before moving to another machine.</p>
       </section>
     </aside>
   </section>
@@ -248,48 +284,63 @@
     strike:['strike-plan','truck-pack','cable-plan','show-task-board','crew-time-log'],
     closeout:['show-handoff','show-report','client-signoff','change-order','record-log','crew-time-log']
   };
+  var READINESS_VALUES=['pending','ready','issue','skipped'];
+  var READINESS_LABELS={pending:'Pending',ready:'Ready',issue:'Issue',skipped:'Skipped'};
   var $=function(id){return document.getElementById(id);};
   var inputs={showName:$('showName'),venue:$('venue'),showDate:$('showDate'),operator:$('operator'),search:$('searchInput'),phase:$('phaseFilter'),dept:$('deptFilter'),pin:$('pinFilter')};
-  var state={showName:'AV Tool Suite',venue:'',showDate:new Date().toISOString().slice(0,10),operator:'',phase:'show',favorites:['teleprompter','show-timer','cueforge'],recent:[],filters:{search:'',phase:'all',dept:'all',pin:'all'}};
+  var state=defaultState();
 
+  function defaultState(){return {showName:'AV Tool Suite',venue:'',showDate:new Date().toISOString().slice(0,10),operator:'',phase:'show',favorites:['teleprompter','show-timer','cueforge'],recent:[],readiness:{},filters:{search:'',phase:'all',dept:'all',pin:'all'}};}
   function storageAvailable(){try{var key='av-suite-probe';localStorage.setItem(key,key);localStorage.removeItem(key);return true;}catch(e){return false;}}
-  function loadState(){if(!storageAvailable()) return;try{var raw=localStorage.getItem(STORAGE_KEY);if(!raw) return;var parsed=JSON.parse(raw);state.showName=String(parsed.showName||state.showName).slice(0,120);state.venue=String(parsed.venue||'').slice(0,120);state.showDate=String(parsed.showDate||state.showDate).slice(0,20);state.operator=String(parsed.operator||'').slice(0,80);state.phase=phaseExists(parsed.phase)?parsed.phase:state.phase;state.favorites=cleanIds(parsed.favorites).slice(0,60);state.recent=cleanIds(parsed.recent).slice(0,12);state.filters={search:String(parsed.filters&&parsed.filters.search||''),phase:phaseExists(parsed.filters&&parsed.filters.phase)?parsed.filters.phase:'all',dept:deptExists(parsed.filters&&parsed.filters.dept)?parsed.filters.dept:'all',pin:['all','pinned','recent'].indexOf(parsed.filters&&parsed.filters.pin)>=0?parsed.filters.pin:'all'};}catch(e){}}
-  function suitePayload(){return {schema:'system-by-dave.av-suite.v1',savedAt:new Date().toISOString(),showName:state.showName,venue:state.venue,showDate:state.showDate,operator:state.operator,phase:state.phase,favorites:state.favorites,recent:state.recent,filters:state.filters};}
+  function loadState(){if(!storageAvailable()) return;try{var raw=localStorage.getItem(STORAGE_KEY);if(!raw) return;var parsed=JSON.parse(raw);applySuitePayload(parsed);}catch(e){}}
+  function suitePayload(){return {schema:'system-by-dave.av-suite.v1',savedAt:new Date().toISOString(),showName:state.showName,venue:state.venue,showDate:state.showDate,operator:state.operator,phase:state.phase,favorites:state.favorites,recent:state.recent,readiness:state.readiness,filters:state.filters};}
   function saveState(){if(!storageAvailable()) return false;try{localStorage.setItem(STORAGE_KEY,JSON.stringify(suitePayload()));return true;}catch(e){showHint('Suite preferences could not be saved in this browser.','error');return false;}}
+  function applySuitePayload(parsed){if(!parsed||typeof parsed!=='object') throw new Error('Invalid payload');state.showName=String(parsed.showName||state.showName).slice(0,120);state.venue=String(parsed.venue||'').slice(0,120);state.showDate=String(parsed.showDate||state.showDate).slice(0,20);state.operator=String(parsed.operator||'').slice(0,80);state.phase=phaseExists(parsed.phase)?parsed.phase:state.phase;state.favorites=cleanIds(parsed.favorites).slice(0,60);state.recent=cleanIds(parsed.recent).slice(0,12);state.readiness=cleanReadiness(parsed.readiness);state.filters=cleanFilters(parsed.filters);}
+  function cleanFilters(filters){filters=filters&&typeof filters==='object'?filters:{};return {search:String(filters.search||''),phase:phaseExists(filters.phase)?filters.phase:'all',dept:deptExists(filters.dept)?filters.dept:'all',pin:['all','pinned','recent','ready','issues','skipped'].indexOf(filters.pin)>=0?filters.pin:'all'};}
   function cleanIds(ids){return Array.isArray(ids)?ids.filter(function(id){return toolById(id);}):[];}
+  function cleanReadiness(map){var next={};if(!map||typeof map!=='object') return next;Object.keys(map).forEach(function(id){var value=String(map[id]||'pending');if(toolById(id)&&READINESS_VALUES.indexOf(value)>=0&&value!=='pending') next[id]=value;});return next;}
   function toolById(id){return TOOLS.find(function(tool){return tool.id===id;})||null;}
   function phaseExists(id){return id==='all'||PHASES.some(function(phase){return phase.id===id;});}
   function departments(){var map={};TOOLS.forEach(function(tool){map[tool.dept]=true;});return Object.keys(map).sort();}
   function deptExists(name){return name==='all'||departments().indexOf(name)>=0;}
   function titleCase(value){return String(value||'').replace(/-/g,' ').replace(/\b\w/g,function(letter){return letter.toUpperCase();});}
+  function toolReadiness(id){return state.readiness[id]||'pending';}
+  function readinessLabel(value){return READINESS_LABELS[value]||READINESS_LABELS.pending;}
+  function readinessOptions(selected){return READINESS_VALUES.map(function(value){return '<option value="'+value+'"'+(value===selected?' selected':'')+'>'+READINESS_LABELS[value]+'</option>';}).join('');}
+  function readinessCounts(){var counts={pending:0,ready:0,issue:0,skipped:0};TOOLS.forEach(function(tool){counts[toolReadiness(tool.id)]++;});return counts;}
   function setInputValues(){inputs.showName.value=state.showName;inputs.venue.value=state.venue;inputs.showDate.value=state.showDate;inputs.operator.value=state.operator;inputs.search.value=state.filters.search;inputs.phase.value=state.filters.phase;inputs.dept.value=state.filters.dept;inputs.pin.value=state.filters.pin;$('showTitleOut').textContent=state.showName||'AV Tool Suite';}
   function renderPhaseButtons(){var wrap=$('phaseButtons');wrap.innerHTML=PHASES.map(function(phase){return '<button type="button" data-phase="'+phase.id+'" aria-pressed="'+String(state.phase===phase.id)+'">'+phase.label+'</button>';}).join('');}
   function renderFilters(){inputs.phase.innerHTML='<option value="all">All phases</option>'+PHASES.map(function(phase){return '<option value="'+phase.id+'">'+phase.label+'</option>';}).join('');inputs.dept.innerHTML='<option value="all">All departments</option>'+departments().map(function(dept){return '<option value="'+escapeAttr(dept)+'">'+escapeHtml(dept)+'</option>';}).join('');}
   function recommendedTools(){return (RECOMMENDED[state.phase]||[]).map(toolById).filter(Boolean);}
-  function visibleTools(){var query=state.filters.search.trim().toLowerCase();return TOOLS.filter(function(tool){var haystack=[tool.name,tool.dept,tool.tag,tool.desc,tool.phases.join(' ')].join(' ').toLowerCase();if(query&&haystack.indexOf(query)===-1) return false;if(state.filters.phase!=='all'&&tool.phases.indexOf(state.filters.phase)<0) return false;if(state.filters.dept!=='all'&&tool.dept!==state.filters.dept) return false;if(state.filters.pin==='pinned'&&state.favorites.indexOf(tool.id)<0) return false;if(state.filters.pin==='recent'&&state.recent.indexOf(tool.id)<0) return false;return true;});}
+  function visibleTools(){var query=state.filters.search.trim().toLowerCase();return TOOLS.filter(function(tool){var haystack=[tool.name,tool.dept,tool.tag,tool.desc,tool.phases.join(' ')].join(' ').toLowerCase();var ready=toolReadiness(tool.id);if(query&&haystack.indexOf(query)===-1) return false;if(state.filters.phase!=='all'&&tool.phases.indexOf(state.filters.phase)<0) return false;if(state.filters.dept!=='all'&&tool.dept!==state.filters.dept) return false;if(state.filters.pin==='pinned'&&state.favorites.indexOf(tool.id)<0) return false;if(state.filters.pin==='recent'&&state.recent.indexOf(tool.id)<0) return false;if(state.filters.pin==='ready'&&ready!=='ready') return false;if(state.filters.pin==='issues'&&ready!=='issue') return false;if(state.filters.pin==='skipped'&&ready!=='skipped') return false;return true;});}
   function renderRecommendations(){var tools=recommendedTools().slice(0,3);$('recommendations').innerHTML=tools.map(function(tool){return '<article class="recommend-card"><span>'+escapeHtml(tool.dept)+' | '+tool.tag+'</span><strong>'+escapeHtml(tool.name)+'</strong><button type="button" class="primary" data-open="'+tool.id+'">Open '+escapeHtml(tool.name)+'</button></article>';}).join('');}
-  function renderTools(){var tools=visibleTools();$('emptyState').hidden=tools.length>0;$('toolGrid').innerHTML=tools.map(function(tool){var pinned=state.favorites.indexOf(tool.id)>=0;var hot=recommendedTools().some(function(item){return item.id===tool.id;});return '<article class="tool-card" data-id="'+tool.id+'"><div class="tool-head"><div><div class="badge-row"><span class="badge '+(hot?'hot':'')+'">'+escapeHtml(tool.tag)+'</span><span class="badge">'+escapeHtml(tool.dept)+'</span></div><h3>'+escapeHtml(tool.name)+'</h3></div><button type="button" class="pin" data-pin="'+tool.id+'" aria-pressed="'+String(pinned)+'" aria-label="'+(pinned?'Unpin ':'Pin ')+escapeAttr(tool.name)+'">'+(pinned?'Pinned':'Pin')+'</button></div><p>'+escapeHtml(tool.desc)+'</p><div class="tool-meta">'+tool.phases.map(titleCase).join(' | ')+'</div><div class="tool-actions"><button type="button" class="primary" data-open="'+tool.id+'">Open</button><button type="button" data-preview="'+tool.id+'">Copy Name</button></div></article>';}).join('');updateStats(tools.length);}
+  function renderTools(){var tools=visibleTools();$('emptyState').hidden=tools.length>0;$('toolGrid').innerHTML=tools.map(function(tool){var pinned=state.favorites.indexOf(tool.id)>=0;var hot=recommendedTools().some(function(item){return item.id===tool.id;});var ready=toolReadiness(tool.id);return '<article class="tool-card ready-'+ready+'" data-id="'+tool.id+'"><div class="tool-head"><div><div class="badge-row"><span class="badge '+(hot?'hot':'')+'">'+escapeHtml(tool.tag)+'</span><span class="badge">'+escapeHtml(tool.dept)+'</span><span class="badge ready-badge ready-'+ready+'">'+readinessLabel(ready)+'</span></div><h3>'+escapeHtml(tool.name)+'</h3></div><button type="button" class="pin" data-pin="'+tool.id+'" aria-pressed="'+String(pinned)+'" aria-label="'+(pinned?'Unpin ':'Pin ')+escapeAttr(tool.name)+'">'+(pinned?'Pinned':'Pin')+'</button></div><p>'+escapeHtml(tool.desc)+'</p><div class="tool-meta">'+tool.phases.map(titleCase).join(' | ')+'</div><div class="readiness-row"><label for="ready-'+tool.id+'">Readiness</label><select id="ready-'+tool.id+'" class="readiness-select ready-'+ready+'" data-readiness="'+tool.id+'" aria-label="Set '+escapeAttr(tool.name)+' readiness">'+readinessOptions(ready)+'</select></div><div class="tool-actions"><button type="button" class="primary" data-open="'+tool.id+'">Open</button><button type="button" data-preview="'+tool.id+'">Copy Name</button></div></article>';}).join('');updateStats(tools.length);}
   function renderRecent(){var list=state.recent.map(toolById).filter(Boolean);$('recentList').innerHTML=list.length?list.map(function(tool){return '<div class="recent-item"><div><strong>'+escapeHtml(tool.name)+'</strong><span>'+escapeHtml(tool.dept)+' | '+tool.tag+'</span></div><button type="button" data-open="'+tool.id+'">Open</button></div>';}).join(''):'<div class="empty">No recent tools yet.</div>';}
-  function updateStats(visibleCount){$('toolCountOut').textContent=TOOLS.length;$('pinnedCountOut').textContent=state.favorites.length;$('visibleCountOut').textContent=visibleCount;$('recentCountOut').textContent=state.recent.length;}
-  function render(){renderPhaseButtons();renderFilters();setInputValues();renderRecommendations();renderTools();renderRecent();}
+  function renderReadiness(){var counts=readinessCounts();var issueTools=TOOLS.filter(function(tool){return toolReadiness(tool.id)==='issue';});$('readinessSummary').innerHTML='<div class="readiness-pill"><span>Ready</span><strong>'+counts.ready+'</strong></div><div class="readiness-pill"><span>Issues</span><strong>'+counts.issue+'</strong></div><div class="readiness-pill"><span>Skipped</span><strong>'+counts.skipped+'</strong></div>';$('readinessIssueList').innerHTML=issueTools.length?issueTools.map(function(tool){return '<div class="readiness-item"><div><strong>'+escapeHtml(tool.name)+'</strong><span>'+escapeHtml(tool.dept)+'</span></div><button type="button" data-open="'+tool.id+'">Open</button></div>';}).join(''):'<div class="empty">No tools marked with issues.</div>';}
+  function updateStats(visibleCount){var counts=readinessCounts();$('toolCountOut').textContent=TOOLS.length;$('readyCountOut').textContent=counts.ready;$('issueCountOut').textContent=counts.issue;$('skipCountOut').textContent=counts.skipped;$('pinnedCountOut').textContent=state.favorites.length;$('visibleCountOut').textContent=visibleCount;}
+  function render(){renderPhaseButtons();renderFilters();setInputValues();renderRecommendations();renderTools();renderRecent();renderReadiness();}
   function syncProfile(){state.showName=inputs.showName.value;state.venue=inputs.venue.value;state.showDate=inputs.showDate.value;state.operator=inputs.operator.value;$('showTitleOut').textContent=state.showName||'AV Tool Suite';saveState();}
   function setPhase(id){if(!phaseExists(id)||id==='all') return;state.phase=id;state.filters.phase=id;saveState();render();showHint('Recommended tools updated for '+titleCase(id)+'.','success');}
   function togglePin(id){var index=state.favorites.indexOf(id);var tool=toolById(id);if(!tool) return;if(index>=0){state.favorites.splice(index,1);showHint(tool.name+' unpinned.','success');}else{state.favorites.unshift(id);showHint(tool.name+' pinned.','success');}saveState();renderTools();renderRecent();}
+  function setToolReadiness(id,value){var tool=toolById(id);if(!tool||READINESS_VALUES.indexOf(value)<0) return;if(value==='pending') delete state.readiness[id];else state.readiness[id]=value;saveState();renderTools();renderReadiness();showHint(tool.name+' marked '+readinessLabel(value).toLowerCase()+'.','success');}
   function rememberTool(id){state.recent=state.recent.filter(function(item){return item!==id;});state.recent.unshift(id);state.recent=state.recent.slice(0,12);saveState();}
   function openTool(id){var tool=toolById(id);if(!tool) return;rememberTool(id);window.location.href=tool.href;}
   function copyToolName(id){var tool=toolById(id);if(!tool) return;copyText(tool.name+' | '+tool.href).then(function(){showHint(tool.name+' copied.','success');}).catch(function(){showHint('Could not copy tool name.','error');});}
   function pinRecommended(){var ids=recommendedTools().map(function(tool){return tool.id;});ids.reverse().forEach(function(id){if(state.favorites.indexOf(id)<0) state.favorites.unshift(id);});saveState();render();showHint('Recommended set pinned.','success');}
-  function copyLaunchList(){var tools=recommendedTools();var lines=['AV SUITE LAUNCH LIST','Show: '+state.showName,'Venue: '+state.venue,'Date: '+state.showDate,'Operator: '+state.operator,'Phase: '+titleCase(state.phase),'','Recommended:'];tools.forEach(function(tool){lines.push(tool.name+' | '+absoluteHref(tool.href));});lines.push('');lines.push('Pinned:');state.favorites.map(toolById).filter(Boolean).forEach(function(tool){lines.push(tool.name+' | '+absoluteHref(tool.href));});copyText(lines.join('\n')).then(function(){showHint('Launch list copied.','success');signal($('copyLaunchBtn'),'success');}).catch(function(){showHint('Could not copy launch list.','error');signal($('copyLaunchBtn'),'error');});}
+  function markRecommendedReady(){var changed=0;recommendedTools().forEach(function(tool){if(toolReadiness(tool.id)!=='issue'&&toolReadiness(tool.id)!=='ready'){state.readiness[tool.id]='ready';changed++;}});saveState();render();showHint(changed?changed+' recommended tools marked ready. Existing issues kept.':'Recommended tools already ready or marked with issues.','success');}
+  function showIssues(){state.filters.pin='issues';state.filters.phase='all';saveState();render();showHint('Showing tools marked with issues.','success');}
+  function resetReadiness(){if(!window.confirm('Reset readiness for all AV suite tools?')) return;state.readiness={};saveState();render();showHint('Suite readiness reset.','success');}
+  function copyLaunchList(){var tools=recommendedTools();var counts=readinessCounts();var issueTools=TOOLS.filter(function(tool){return toolReadiness(tool.id)==='issue';});var lines=['AV SUITE LAUNCH LIST','Show: '+state.showName,'Venue: '+state.venue,'Date: '+state.showDate,'Operator: '+state.operator,'Phase: '+titleCase(state.phase),'Readiness: '+counts.ready+' ready, '+counts.issue+' issue, '+counts.skipped+' skipped','','Recommended:'];tools.forEach(function(tool){lines.push(tool.name+' ['+readinessLabel(toolReadiness(tool.id))+'] | '+absoluteHref(tool.href));});lines.push('');lines.push('Pinned:');state.favorites.map(toolById).filter(Boolean).forEach(function(tool){lines.push(tool.name+' ['+readinessLabel(toolReadiness(tool.id))+'] | '+absoluteHref(tool.href));});lines.push('');lines.push('Issues:');if(issueTools.length){issueTools.forEach(function(tool){lines.push(tool.name+' | '+absoluteHref(tool.href));});}else{lines.push('None');}copyText(lines.join('\n')).then(function(){showHint('Launch list copied.','success');signal($('copyLaunchBtn'),'success');}).catch(function(){showHint('Could not copy launch list.','error');signal($('copyLaunchBtn'),'error');});}
   function exportSuite(){downloadFile(fileStem()+'.av-suite.json',JSON.stringify(suitePayload(),null,2),'application/json;charset=utf-8');showHint('Suite JSON exported.','success');signal($('exportSuiteBtn'),'success');}
-  function importSuiteFile(file){var reader=new FileReader();reader.onload=function(){try{var parsed=JSON.parse(String(reader.result||''));if(!parsed||typeof parsed!=='object') throw new Error('Invalid payload');state.showName=String(parsed.showName||state.showName).slice(0,120);state.venue=String(parsed.venue||'').slice(0,120);state.showDate=String(parsed.showDate||state.showDate).slice(0,20);state.operator=String(parsed.operator||'').slice(0,80);state.phase=phaseExists(parsed.phase)?parsed.phase:state.phase;state.favorites=cleanIds(parsed.favorites).slice(0,60);state.recent=cleanIds(parsed.recent).slice(0,12);state.filters={search:String(parsed.filters&&parsed.filters.search||''),phase:phaseExists(parsed.filters&&parsed.filters.phase)?parsed.filters.phase:'all',dept:deptExists(parsed.filters&&parsed.filters.dept)?parsed.filters.dept:'all',pin:['all','pinned','recent'].indexOf(parsed.filters&&parsed.filters.pin)>=0?parsed.filters.pin:'all'};saveState();render();showHint('Suite JSON imported.','success');signal($('importSuiteBtn'),'success');}catch(e){showHint('Could not import that suite JSON file.','error');signal($('importSuiteBtn'),'error');}};reader.onerror=function(){showHint('Could not read that suite JSON file.','error');signal($('importSuiteBtn'),'error');};reader.readAsText(file);}
-  function clearPrefs(){if(!window.confirm('Clear AV Suite saved profile, pins, and recent tools?')) return;if(storageAvailable()) localStorage.removeItem(STORAGE_KEY);state={showName:'AV Tool Suite',venue:'',showDate:new Date().toISOString().slice(0,10),operator:'',phase:'show',favorites:['teleprompter','show-timer','cueforge'],recent:[],filters:{search:'',phase:'all',dept:'all',pin:'all'}};render();showHint('Suite preferences cleared.','success');}
+  function importSuiteFile(file){var reader=new FileReader();reader.onload=function(){try{applySuitePayload(JSON.parse(String(reader.result||'')));saveState();render();showHint('Suite JSON imported.','success');signal($('importSuiteBtn'),'success');}catch(e){showHint('Could not import that suite JSON file.','error');signal($('importSuiteBtn'),'error');}};reader.onerror=function(){showHint('Could not read that suite JSON file.','error');signal($('importSuiteBtn'),'error');};reader.readAsText(file);}
+  function clearPrefs(){if(!window.confirm('Clear AV Suite saved profile, readiness, pins, and recent tools?')) return;if(storageAvailable()) localStorage.removeItem(STORAGE_KEY);state=defaultState();render();showHint('Suite preferences cleared.','success');}
   function absoluteHref(href){return new URL(href, window.location.href).href;}
   function fileStem(){return (state.showName||'av-suite').toLowerCase().replace(/['"]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,60)||'av-suite';}
   function downloadFile(filename,content,type){var blob=new Blob([content],{type:type});var url=URL.createObjectURL(blob);var link=document.createElement('a');link.href=url;link.download=filename;link.style.display='none';document.body.appendChild(link);link.click();setTimeout(function(){URL.revokeObjectURL(url);if(link.parentNode) link.parentNode.removeChild(link);},0);}
   function copyText(text){if(navigator.clipboard&&navigator.clipboard.writeText) return navigator.clipboard.writeText(text);return new Promise(function(resolve,reject){var area=document.createElement('textarea');area.value=text;area.setAttribute('readonly','');area.style.position='fixed';area.style.left='-9999px';document.body.appendChild(area);area.select();try{document.execCommand('copy')?resolve():reject(new Error('copy failed'));}catch(e){reject(e);}finally{if(area.parentNode) area.parentNode.removeChild(area);}});}
   function showHint(message,kind){var hint=$('hint');hint.textContent=message;hint.classList.remove('success','error');if(kind) hint.classList.add(kind);}
   function signal(element,kind){var className=kind==='error'?'feedback-error':'feedback-success';if(!element) return;element.classList.remove(className);void element.offsetWidth;element.classList.add(className);setTimeout(function(){element.classList.remove(className);},190);}
-  function installPressFeedback(){document.querySelectorAll('button').forEach(function(button){function press(){if(!button.disabled) button.classList.add('is-pressing');}function release(){button.classList.remove('is-pressing');}button.addEventListener('pointerdown',press);button.addEventListener('pointerup',release);button.addEventListener('pointercancel',release);button.addEventListener('pointerleave',release);button.addEventListener('blur',release);button.addEventListener('keydown',function(event){if(event.key===' '||event.key==='Enter') press();});button.addEventListener('keyup',function(event){if(event.key===' '||event.key==='Enter') release();});});}
+  function installPressFeedback(){function buttonFrom(event){return event.target&&event.target.closest?event.target.closest('button'):null;}function releaseAll(){document.querySelectorAll('button.is-pressing').forEach(function(button){button.classList.remove('is-pressing');});}document.addEventListener('pointerdown',function(event){var button=buttonFrom(event);if(button&&!button.disabled) button.classList.add('is-pressing');});document.addEventListener('pointerup',releaseAll);document.addEventListener('pointercancel',releaseAll);document.addEventListener('pointerout',function(event){var button=buttonFrom(event);if(button&&!button.contains(event.relatedTarget)) button.classList.remove('is-pressing');});document.addEventListener('blur',releaseAll,true);document.addEventListener('keydown',function(event){var button=buttonFrom(event);if(button&&!button.disabled&&(event.key===' '||event.key==='Enter')) button.classList.add('is-pressing');});document.addEventListener('keyup',function(event){if(event.key===' '||event.key==='Enter') releaseAll();});}
   function escapeHtml(value){return String(value==null?'':value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
   function escapeAttr(value){return escapeHtml(value);}
   loadState();
@@ -304,9 +355,13 @@
   inputs.pin.addEventListener('change',function(){state.filters.pin=inputs.pin.value;saveState();renderTools();});
   $('phaseButtons').addEventListener('click',function(event){var button=event.target.closest('button[data-phase]');if(button) setPhase(button.getAttribute('data-phase'));});
   document.addEventListener('click',function(event){var open=event.target.closest('[data-open]');var pin=event.target.closest('[data-pin]');var preview=event.target.closest('[data-preview]');if(open){openTool(open.getAttribute('data-open'));return;}if(pin){togglePin(pin.getAttribute('data-pin'));signal(pin,'success');return;}if(preview){copyToolName(preview.getAttribute('data-preview'));signal(preview,'success');}});
+  document.addEventListener('change',function(event){var select=event.target.closest('[data-readiness]');if(select){setToolReadiness(select.getAttribute('data-readiness'),select.value);signal(select,'success');}});
   $('openRecommendedBtn').addEventListener('click',function(){var tool=recommendedTools()[0];if(tool) openTool(tool.id);});
   $('copyLaunchBtn').addEventListener('click',copyLaunchList);
   $('pinRecommendedBtn').addEventListener('click',function(){pinRecommended();signal(this,'success');});
+  $('markRecommendedReadyBtn').addEventListener('click',function(){markRecommendedReady();signal(this,'success');});
+  $('showIssuesBtn').addEventListener('click',function(){showIssues();signal(this,'success');});
+  $('resetReadinessBtn').addEventListener('click',function(){resetReadiness();signal(this,'success');});
   $('exportSuiteBtn').addEventListener('click',exportSuite);
   $('importSuiteBtn').addEventListener('click',function(){$('suiteImportInput').click();});
   $('suiteImportInput').addEventListener('change',function(){var file=$('suiteImportInput').files&&$('suiteImportInput').files[0];if(file) importSuiteFile(file);$('suiteImportInput').value='';});
