@@ -2,6 +2,7 @@
 
 ## 2026-06-14
 
+* Added AV Suite phase handoff copy: `/av-suite.html` now copies a practical show handoff with the current phase, readiness counts, working and issue tools, signal network and control notes, client and crew notes, risks, summary table, decision matrix, numbered prioritized actions, and phase recommendation links.
 * Added AV Suite operator review queue: `/av-suite.html` now ranks issue tools, readiness notes, saved tool data scan needs, pending current phase tools, and show package export as practical next actions with one click open, scan, export, and copy queue actions.
 * Added AV Suite saved tool data scan: `/av-suite.html` now shows saved data badges from known AV tool storage, adds a Saved data only view, scans saved tool content for issue language, marks saved tools ready when clear, marks issue language for review, and keeps existing Issue or Skipped exceptions.
 * Added AV Suite show package backup: `/av-suite.html` can now export one JSON package containing the suite profile plus known saved AV tool data from this browser, then import that package on another browser session with an allow listed storage restore for the current AV tools.
