@@ -41,6 +41,7 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
 - `rf-coordination.html`: AV RF coordination sheet
 - `site-survey.html`: AV site survey
 - `gear-prep.html`: AV gear prep checklist
+- `truck-pack.html`: AV truck pack plan
 - `load-in-plan.html`: AV load in plan
 - `strike-plan.html`: AV strike plan
 - `show-advance.html`: AV show advance tracker
@@ -145,6 +146,9 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
   locations, owners, test status, pack status, load status, issues, open
   items, copyable summaries, print output, JSON import and export, and CSV
   export.
+- `truck-pack.html` tracks cases, truck zones, load order, unload order,
+  weights, owners, pack status, issues, open items, copyable summaries, print
+  output, JSON import and export, and CSV export.
 - `load-in-plan.html` tracks trucks, docks, room destinations, departments,
   load in items, owners, due times, build status, blockers, gap warnings,
   copyable summaries, print output, JSON import and export, and CSV export.
@@ -175,7 +179,7 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
   `network-plan.html`,
   `cable-plan.html`,
   `rf-coordination.html`,
-  `site-survey.html`, `gear-prep.html`, `load-in-plan.html`, `strike-plan.html`, `show-advance.html`, `crew-call.html`,
+  `site-survey.html`, `gear-prep.html`, `truck-pack.html`, `load-in-plan.html`, `strike-plan.html`, `show-advance.html`, `crew-call.html`,
   `signal-flow.html`,
   `input-list.html`, `stage-plot.html`, `plotforge.html`, `show-handoff.html`,
   `camera-shot-list.html`, `comms-check.html`, and `av-calculator.html`.

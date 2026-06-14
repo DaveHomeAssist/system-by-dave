@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'none'">
+<title>Truck Pack Plan | System by Dave</title>
+<meta name="description" content="A browser based AV truck pack plan for cases, truck zones, load order, unload order, weight, owners, pack status, issues, and handoff notes.">
+<link rel="canonical" href="https://systembydave.com/truck-pack.html">
+<meta name="theme-color" content="#0b0d10">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="System by Dave">
+<meta property="og:title" content="Truck Pack Plan">
+<meta property="og:description" content="A browser based AV truck pack plan for cases, truck zones, load order, unload order, weight, owners, pack status, issues, and handoff notes.">
+<meta property="og:url" content="https://systembydave.com/truck-pack.html">
+<meta property="og:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<meta property="og:image:width" content="1024">
+<meta property="og:image:height" content="412">
+<meta property="og:image:alt" content="System by Dave preview banner">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Truck Pack Plan">
+<meta name="twitter:description" content="A browser based AV truck pack plan for cases, truck zones, load order, unload order, weight, owners, pack status, issues, and handoff notes.">
+<meta name="twitter:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<link rel="icon" href="svg/system_by_dave_logo_rust.svg" type="image/svg+xml">
+<style>
+  :root{--bg:#0b0d10;--panel:#12171d;--panel-2:#171e26;--panel-3:#1d252e;--line:#303945;--line-strong:#465363;--text:#f6f8fb;--muted:#a9b4c1;--dim:#768391;--rust:#c0623a;--rust-2:#e58a5c;--blue:#72b8ff;--green:#6be092;--amber:#ffd166;--red:#ff6b6b;--purple:#b996ff;--cyan:#62d6d2;--ink:#071016;--radius:8px;--shadow:0 16px 60px rgba(0,0,0,.32);--mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;--sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;--fast:120ms;--med:180ms;--ease:cubic-bezier(.2,.8,.2,1);--press:cubic-bezier(.2,0,0,1)}
+  *{box-sizing:border-box}
+  html,body{min-height:100%}
+  body{margin:0;background:radial-gradient(circle at 12% -12%,rgba(98,214,210,.18),transparent 30rem),radial-gradient(circle at 86% 8%,rgba(192,98,58,.14),transparent 28rem),linear-gradient(180deg,#0b0d10 0%,#11161b 52%,#080a0d 100%);color:var(--text);font-family:var(--sans);line-height:1.45;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+  body::before{content:"";position:fixed;inset:0;pointer-events:none;background:repeating-linear-gradient(90deg,rgba(255,255,255,.034) 0 1px,transparent 1px 80px),repeating-linear-gradient(0deg,rgba(255,255,255,.024) 0 1px,transparent 1px 80px);mask-image:linear-gradient(180deg,rgba(0,0,0,.78),rgba(0,0,0,.12))}
+  a{color:inherit}
+  button,input,select,textarea{font:inherit}
+  button{min-height:44px;border:1px solid var(--line);border-radius:var(--radius);background:var(--panel-2);color:var(--text);padding:9px 12px;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;touch-action:manipulation;transition:transform var(--fast) var(--press),border-color var(--fast) var(--ease),background var(--fast) var(--ease),box-shadow var(--fast) var(--ease),color var(--fast) var(--ease)}
+  button:hover{border-color:var(--line-strong);background:var(--panel-3);transform:translateY(-1px);box-shadow:0 8px 22px rgba(0,0,0,.18)}
+  button:active,button.is-pressing{transform:translateY(1px) scale(.975);box-shadow:inset 0 2px 5px rgba(0,0,0,.28)}
+  button.primary{background:linear-gradient(180deg,var(--rust-2),var(--rust));border-color:var(--rust);color:#140905;font-weight:800}
+  button.danger{border-color:rgba(255,107,107,.55);color:#ffd5d5;background:rgba(255,107,107,.1)}
+  button:disabled{cursor:not-allowed;opacity:.52;transform:none;box-shadow:none}
+  button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,a:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
+  input,select,textarea{width:100%;min-height:40px;border:1px solid var(--line);border-radius:var(--radius);background:#0e1318;color:var(--text);padding:9px 10px;transition:border-color var(--fast) var(--ease),background var(--fast) var(--ease),box-shadow var(--fast) var(--ease)}
+  textarea{min-height:42px;resize:vertical}
+  input:hover,input:focus,select:hover,select:focus,textarea:hover,textarea:focus{border-color:var(--line-strong);background:#111821}
+  input::placeholder,textarea::placeholder{color:var(--dim)}
+  .skip-link{position:absolute;top:12px;left:12px;z-index:1000;background:var(--text);color:var(--ink);padding:10px 14px;border-radius:var(--radius);transform:translateY(-150%);transition:transform var(--med) var(--ease)}
+  .skip-link:focus-visible{transform:translateY(0)}
+  .app{position:relative;z-index:1;min-height:100vh}
+  .topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.08);background:rgba(11,13,16,.88);backdrop-filter:blur(18px);position:sticky;top:0;z-index:30}
+  .brand{display:flex;align-items:center;gap:12px;text-decoration:none}
+  .brand-mark{width:38px;height:38px;border:1px solid rgba(255,255,255,.24);border-radius:50%;display:grid;place-items:center;font-family:Georgia,serif;font-size:19px;color:var(--cyan);background:#11161c}
+  .brand-text{display:flex;flex-direction:column;gap:1px}
+  .brand-text strong{font-size:14px;letter-spacing:.08em;text-transform:uppercase}
+  .brand-text span{color:var(--muted);font-family:var(--mono);font-size:11px}
+  .top-actions{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+  main{width:min(1580px,100%);margin:0 auto;padding:22px}
+  .hero{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:18px;align-items:stretch;margin-bottom:18px}
+  .panel{border:1px solid rgba(255,255,255,.09);background:linear-gradient(180deg,rgba(23,30,38,.92),rgba(14,18,23,.94));box-shadow:var(--shadow);border-radius:var(--radius)}
+  .show-panel{padding:18px;display:grid;gap:16px}
+  .eyebrow{margin:0 0 3px;color:var(--cyan);font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.12em}
+  .show-title{min-height:58px;border:0;background:transparent;padding:0;color:var(--text);font-size:clamp(30px,4vw,60px);font-weight:900;letter-spacing:0}
+  .show-title:focus{background:transparent;box-shadow:none}
+  .meta-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+  .field{display:grid;gap:5px}
+  label{color:var(--muted);font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em}
+  .status-panel{padding:14px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .stat{padding:12px;border:1px solid rgba(255,255,255,.08);border-radius:var(--radius);background:rgba(8,11,14,.55)}
+  .stat span{display:block;color:var(--muted);font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em}
+  .stat strong{display:block;margin-top:4px;font-size:28px;line-height:1}
+  .workspace{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:18px;align-items:start}
+  .main-panel{padding:14px;min-width:0}
+  .toolbar{display:grid;grid-template-columns:minmax(220px,1fr) 180px 180px auto;gap:10px;margin-bottom:12px}
+  .button-row{display:flex;gap:8px;flex-wrap:wrap}
+  .table-wrap{overflow:auto;max-height:calc(100vh - 360px);min-height:400px}
+  table{width:100%;min-width:1860px;border-collapse:separate;border-spacing:0}
+  th,td{padding:7px;border-bottom:1px solid rgba(255,255,255,.075);vertical-align:top}
+  th{position:sticky;top:0;z-index:2;background:#121820;color:var(--muted);text-align:left;font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.07em}
+  tbody tr{transition:background var(--fast) var(--ease),box-shadow var(--fast) var(--ease)}
+  tbody tr:hover{background:rgba(255,255,255,.035)}
+  tbody tr.selected{background:rgba(98,214,210,.09);box-shadow:inset 0 0 0 1px rgba(98,214,210,.32)}
+  tbody tr.status-planned{box-shadow:inset 3px 0 0 rgba(118,131,145,.72)}
+  tbody tr.status-pulled{box-shadow:inset 3px 0 0 rgba(114,184,255,.72)}
+  tbody tr.status-staged{box-shadow:inset 3px 0 0 rgba(255,209,102,.78)}
+  tbody tr.status-packed{box-shadow:inset 3px 0 0 rgba(98,214,210,.8)}
+  tbody tr.status-strapped{box-shadow:inset 3px 0 0 rgba(107,224,146,.78)}
+  tbody tr.status-loaded{box-shadow:inset 3px 0 0 rgba(107,224,146,.95)}
+  tbody tr.status-issue{box-shadow:inset 3px 0 0 rgba(255,107,107,.82)}
+  tbody tr.status-hold{box-shadow:inset 3px 0 0 rgba(185,150,255,.72)}
+  tbody tr.has-gap{background:rgba(255,209,102,.07)}
+  .field-small{min-width:92px}
+  .field-mid{min-width:132px}
+  .field-large{min-width:190px}
+  .field-notes{min-width:230px}
+  .empty-state{padding:28px;text-align:center;color:var(--muted);font-family:var(--mono)}
+  .side{display:grid;gap:18px}
+  .side-section{padding:14px}
+  .side-section h2{margin:0 0 12px;font-size:15px}
+  .selected-item{display:flex;justify-content:space-between;gap:12px;margin-bottom:12px;color:var(--muted);font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em}
+  .item-card{display:grid;gap:8px;margin-bottom:12px}
+  .item-node{padding:12px;border:1px solid rgba(255,255,255,.08);border-radius:var(--radius);background:#0e1318}
+  .item-node span{display:block;color:var(--muted);font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em}
+  .item-node strong{display:block;margin-top:4px;word-break:break-word}
+  .gap-text{color:var(--amber)}
+  .clean-text{color:var(--green)}
+  .selected-grid{display:grid;gap:10px}
+  .side-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .hint{min-height:21px;margin:12px 0 0;color:var(--muted);line-height:1.45}
+  .hint.success{color:var(--green)}
+  .hint.error{color:#ffd5d5}
+  .shortcut-list{display:grid;grid-template-columns:auto 1fr;gap:8px 10px;margin:0;color:var(--muted)}
+  .shortcut-list dt{font-family:var(--mono);color:var(--cyan)}
+  .shortcut-list dd{margin:0}
+  .privacy-note{margin:12px 0 0;color:var(--dim);font-size:12px}
+  .feedback-success{border-color:rgba(107,224,146,.85) !important;box-shadow:0 0 0 3px rgba(107,224,146,.14) !important}
+  .feedback-error{border-color:var(--red) !important;box-shadow:0 0 0 3px rgba(255,107,107,.16) !important;animation:shake var(--med) var(--ease)}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+  .file-input{display:none}
+  .noscript{position:fixed;inset:auto 16px 16px;z-index:1000;padding:12px 14px;border-radius:var(--radius);background:#ffd5d5;color:#220707}
+  @media (max-width:1080px){.hero,.workspace{grid-template-columns:1fr}.status-panel{grid-template-columns:repeat(3,minmax(0,1fr))}}
+  @media (max-width:680px){main{padding:14px}.topbar{align-items:flex-start;flex-direction:column}.top-actions{justify-content:flex-start}.show-title{min-height:44px;font-size:22px}.meta-grid{grid-template-columns:1fr}.status-panel{grid-template-columns:1fr 1fr}.toolbar{grid-template-columns:1fr}.button-row{display:grid;grid-template-columns:1fr 1fr}.button-row button{width:100%}.table-wrap{max-height:none;min-height:320px}.side-actions{grid-template-columns:1fr}}
+  @media (prefers-reduced-motion:reduce){*{transition-duration:.001ms !important;animation-duration:.001ms !important}button:hover,button:active,button.is-pressing{transform:none}}
+  @media print{body{background:#fff;color:#111}body::before,.topbar,.toolbar,.side,.skip-link{display:none !important}main{padding:0;width:100%}.hero{display:block}.panel{box-shadow:none;border-color:#ccc;background:#fff}.show-title,input,select,textarea{color:#111;background:#fff;border-color:#ccc}.table-wrap{max-height:none;overflow:visible}table{min-width:0;font-size:9px}th,td{padding:4px}}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#pack">Skip to truck pack plan</a>
+<noscript><div class="noscript">Truck Pack Plan needs JavaScript for editing, import, export, filtering, and browser saved state.</div></noscript>
+<div class="app">
+  <header class="topbar">
+    <a class="brand" href="index.html#av-tools" aria-label="Back to AV tools">
+      <span class="brand-mark">S</span>
+      <span class="brand-text"><strong>Truck Pack Plan</strong><span>System by Dave AV tools</span></span>
+    </a>
+    <div class="top-actions">
+      <button id="printBtn" type="button">Print</button>
+      <button id="copySummaryBtn" type="button">Copy Summary</button>
+      <button id="exportCsvBtn" type="button">Export CSV</button>
+      <button id="exportJsonBtn" type="button">Export JSON</button>
+      <button id="importJsonBtn" type="button">Import JSON</button>
+      <input id="importInput" class="file-input" type="file" accept=".json,application/json">
+    </div>
+  </header>
+  <main>
+    <section class="hero" aria-label="Pack metadata">
+      <div class="panel show-panel">
+        <div>
+          <p class="eyebrow">AV truck pack plan</p>
+          <input id="showName" class="show-title" type="text" aria-label="Show name">
+        </div>
+        <div class="meta-grid">
+          <div class="field"><label for="client">Client</label><input id="client" type="text"></div>
+          <div class="field"><label for="warehouse">Warehouse</label><input id="warehouse" type="text"></div>
+          <div class="field"><label for="truck">Truck</label><input id="truck" type="text"></div>
+          <div class="field"><label for="packDate">Pack date</label><input id="packDate" type="date"></div>
+          <div class="field"><label for="packLead">Pack lead</label><input id="packLead" type="text"></div>
+          <div class="field"><label for="driver">Driver</label><input id="driver" type="text"></div>
+          <div class="field"><label for="dock">Dock</label><input id="dock" type="text"></div>
+          <div class="field"><label for="departure">Departure</label><input id="departure" type="time"></div>
+        </div>
+      </div>
+      <aside class="panel status-panel" aria-label="Pack status">
+        <div class="stat"><span>Total</span><strong id="totalOut">0</strong></div>
+        <div class="stat"><span>Ready</span><strong id="readyOut">0</strong></div>
+        <div class="stat"><span>Open</span><strong id="openOut">0</strong></div>
+        <div class="stat"><span>Issues</span><strong id="issueOut">0</strong></div>
+        <div class="stat"><span>Weight</span><strong id="weightOut">0</strong></div>
+        <div class="stat"><span>Zones</span><strong id="zoneOut">0</strong></div>
+      </aside>
+    </section>
+    <section class="workspace">
+      <div class="panel main-panel" id="pack">
+        <div class="toolbar" role="toolbar" aria-label="Truck pack controls">
+          <input id="searchInput" type="search" placeholder="Search department, case, contents, zone, order, owner, status, issue, notes" aria-label="Search truck pack plan">
+          <select id="departmentFilter" aria-label="Filter by department"></select>
+          <select id="statusFilter" aria-label="Filter by status">
+            <option value="all">All statuses</option>
+            <option value="planned">Planned</option>
+            <option value="pulled">Pulled</option>
+            <option value="staged">Staged</option>
+            <option value="packed">Packed</option>
+            <option value="strapped">Strapped</option>
+            <option value="loaded">Loaded</option>
+            <option value="issue">Issue</option>
+            <option value="hold">Hold</option>
+          </select>
+          <div class="button-row">
+            <button id="addItemBtn" class="primary" type="button">Add Case</button>
+            <button id="loadSampleBtn" type="button">Sample</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table id="packTable">
+            <thead>
+              <tr>
+                <th>Dept</th>
+                <th>Case</th>
+                <th>Contents</th>
+                <th>Zone</th>
+                <th>Load</th>
+                <th>Unload</th>
+                <th>Weight</th>
+                <th>Owner</th>
+                <th>Status</th>
+                <th>Issue</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody id="itemBody"></tbody>
+          </table>
+        </div>
+        <div id="emptyState" class="empty-state" hidden>No truck pack items match the current filters.</div>
+      </div>
+      <aside class="side">
+        <section class="panel side-section" aria-label="Selected truck pack item">
+          <div class="selected-item"><span>Selected</span><span id="selectedIdOut">None</span></div>
+          <div class="item-card" aria-label="Selected pack preview">
+            <div class="item-node"><span>Case</span><strong id="itemName">None</strong></div>
+            <div class="item-node"><span>Pack</span><strong id="itemRoute">None</strong></div>
+            <div class="item-node"><span>Risk</span><strong id="itemRisk">None</strong></div>
+          </div>
+          <div class="selected-grid">
+            <div>
+              <label for="selectedStatus">Status</label>
+              <select id="selectedStatus">
+                <option value="planned">Planned</option>
+                <option value="pulled">Pulled</option>
+                <option value="staged">Staged</option>
+                <option value="packed">Packed</option>
+                <option value="strapped">Strapped</option>
+                <option value="loaded">Loaded</option>
+                <option value="issue">Issue</option>
+                <option value="hold">Hold</option>
+              </select>
+            </div>
+            <div>
+              <label for="selectedIssue">Issue</label>
+              <textarea id="selectedIssue"></textarea>
+            </div>
+            <div>
+              <label for="selectedNotes">Notes</label>
+              <textarea id="selectedNotes"></textarea>
+            </div>
+            <div class="side-actions">
+              <button id="markPlannedBtn" type="button">Planned</button>
+              <button id="markPulledBtn" type="button">Pulled</button>
+              <button id="markStagedBtn" type="button">Staged</button>
+              <button id="markPackedBtn" type="button">Packed</button>
+              <button id="markStrappedBtn" type="button">Strapped</button>
+              <button id="markLoadedBtn" type="button">Loaded</button>
+              <button id="markIssueBtn" type="button">Issue</button>
+              <button id="markHoldBtn" type="button">Hold</button>
+              <button id="moveUpBtn" type="button">Move Up</button>
+              <button id="moveDownBtn" type="button">Move Down</button>
+              <button id="duplicateBtn" type="button">Duplicate</button>
+              <button id="deleteBtn" class="danger" type="button">Delete</button>
+            </div>
+          </div>
+          <p id="hint" class="hint" role="status">Loaded sample truck pack plan.</p>
+        </section>
+        <section class="panel side-section" aria-label="Keyboard shortcuts">
+          <h2>Fast actions</h2>
+          <dl class="shortcut-list">
+            <dt>N</dt><dd>Add case after selected</dd>
+            <dt>P</dt><dd>Mark selected planned</dd>
+            <dt>U</dt><dd>Mark selected pulled</dd>
+            <dt>S</dt><dd>Mark selected staged</dd>
+            <dt>K</dt><dd>Mark selected packed</dd>
+            <dt>T</dt><dd>Mark selected strapped</dd>
+            <dt>L</dt><dd>Mark selected loaded</dd>
+            <dt>I</dt><dd>Mark selected issue</dd>
+            <dt>H</dt><dd>Mark selected hold</dd>
+            <dt>D</dt><dd>Duplicate selected case</dd>
+            <dt>Del</dt><dd>Delete selected case</dd>
+          </dl>
+          <p class="privacy-note">Truck pack data is remembered in this browser when storage is available. Export JSON before moving to another device.</p>
+        </section>
+      </aside>
+    </section>
+  </main>
+</div>
+<script>
+(function(){
+  var STORAGE_KEY='truck-pack.v1';
+  var SCHEMA='system-by-dave.truck-pack.v1';
+  var STATUS=['planned','pulled','staged','packed','strapped','loaded','issue','hold'];
+  var DEPARTMENTS=['audio','video','lighting','projection','power','network','rigging','scenic','stage','comms','general','other'];
+  var ZONES=['nose','mid','tail','curb','street','ramp','cab','loose'];
+  var $=function(id){return document.getElementById(id);};
+  var state={meta:{showName:'General Session Truck Pack Plan',client:'Client',warehouse:'Warehouse',truck:'Truck 1',packDate:new Date().toISOString().slice(0,10),packLead:'Pack lead',driver:'Driver',dock:'Dock A',departure:'06:30'},items:[],selectedId:'',filters:{search:'',department:'all',status:'all'}};
+  var sampleItems=[
+    {department:'audio',caseId:'A-FOH',contents:'FOH console case and desk kit',truckZone:'tail',loadOrder:'7',unloadOrder:'2',weight:'180',owner:'A1',status:'staged',issue:'',notes:'Tail loaded for early FOH build.'},
+    {department:'audio',caseId:'A-STG',contents:'Stagebox, mic stands, and cable trunk',truckZone:'tail',loadOrder:'8',unloadOrder:'1',weight:'220',owner:'A2',status:'packed',issue:'',notes:'Unload first to stage left.'},
+    {department:'video',caseId:'V-RACK',contents:'Switcher, records, and playback rack',truckZone:'mid',loadOrder:'5',unloadOrder:'3',weight:'210',owner:'V1',status:'strapped',issue:'',notes:'Keep upright and strapped to E track.'},
+    {department:'projection',caseId:'P-PROJ',contents:'Projector, lens, cradle, and spares',truckZone:'nose',loadOrder:'2',unloadOrder:'6',weight:'260',owner:'Projection',status:'hold',issue:'Waiting on final lens case',notes:'Do not bury until lens case arrives.'},
+    {department:'lighting',caseId:'LX-WASH',contents:'Stage wash fixtures and uplight cases',truckZone:'mid',loadOrder:'4',unloadOrder:'5',weight:'340',owner:'LX',status:'pulled',issue:'',notes:'Split cases by room side.'},
+    {department:'power',caseId:'PWR-DISTRO',contents:'Distro, feeder, tails, and cable ramps',truckZone:'tail',loadOrder:'9',unloadOrder:'0',weight:'520',owner:'Power',status:'loaded',issue:'',notes:'Power comes off truck first.'},
+    {department:'network',caseId:'NET-KIT',contents:'Show switch, access point, WAN kit, and LTE backup',truckZone:'cab',loadOrder:'1',unloadOrder:'4',weight:'45',owner:'Network',status:'loaded',issue:'',notes:'Cab carry with laptops.'},
+    {department:'scenic',caseId:'SCN-SIGN',contents:'Lectern sign and client graphics',truckZone:'loose',loadOrder:'3',unloadOrder:'7',weight:'20',owner:'Scenic',status:'issue',issue:'Client logo panel missing',notes:'Hold loose until replacement arrives.'}
+  ];
+  var inputs={showName:$('showName'),client:$('client'),warehouse:$('warehouse'),truck:$('truck'),packDate:$('packDate'),packLead:$('packLead'),driver:$('driver'),dock:$('dock'),departure:$('departure'),search:$('searchInput'),department:$('departmentFilter'),status:$('statusFilter'),selectedStatus:$('selectedStatus'),selectedIssue:$('selectedIssue'),selectedNotes:$('selectedNotes')};
+  function storageAvailable(){try{var key='truck-pack-probe';localStorage.setItem(key,key);localStorage.removeItem(key);return true;}catch(e){return false;}}
+  function uid(){return 'pack-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,8);}
+  function cloneItem(item){return {id:item.id||uid(),department:DEPARTMENTS.indexOf(item.department)>=0?item.department:'other',caseId:String(item.caseId||''),contents:String(item.contents||''),truckZone:ZONES.indexOf(item.truckZone)>=0?item.truckZone:'loose',loadOrder:String(item.loadOrder||''),unloadOrder:String(item.unloadOrder||''),weight:String(item.weight||''),owner:String(item.owner||''),status:STATUS.indexOf(item.status)>=0?item.status:'planned',issue:String(item.issue||''),notes:String(item.notes||'')};}
+  function normalizeState(raw){var next=raw&&typeof raw==='object'?raw:{};var meta=next.meta&&typeof next.meta==='object'?next.meta:{};return {meta:{showName:String(meta.showName||'General Session Truck Pack Plan').slice(0,120),client:String(meta.client||'').slice(0,120),warehouse:String(meta.warehouse||'').slice(0,120),truck:String(meta.truck||'').slice(0,80),packDate:String(meta.packDate||new Date().toISOString().slice(0,10)).slice(0,20),packLead:String(meta.packLead||'').slice(0,80),driver:String(meta.driver||'').slice(0,80),dock:String(meta.dock||'').slice(0,80),departure:String(meta.departure||'').slice(0,20)},items:Array.isArray(next.items)?next.items.map(cloneItem).slice(0,300):sampleItems.map(cloneItem),selectedId:typeof next.selectedId==='string'?next.selectedId:'',filters:{search:String(next.filters&&next.filters.search||''),department:DEPARTMENTS.indexOf(next.filters&&next.filters.department)>=0?next.filters.department:'all',status:STATUS.indexOf(next.filters&&next.filters.status)>=0?next.filters.status:'all'}};}
+  function loadState(){if(!storageAvailable()){state=normalizeState({});if(state.items[0]) state.selectedId=state.items[0].id;return;}try{var raw=localStorage.getItem(STORAGE_KEY);state=raw?normalizeState(JSON.parse(raw)):normalizeState({});}catch(e){state=normalizeState({});}if(!state.selectedId&&state.items[0]) state.selectedId=state.items[0].id;}
+  function saveState(){if(!storageAvailable()) return false;try{localStorage.setItem(STORAGE_KEY,JSON.stringify({schema:SCHEMA,savedAt:new Date().toISOString(),meta:state.meta,items:state.items,selectedId:state.selectedId,filters:state.filters}));return true;}catch(e){showHint('Could not save in this browser. Export JSON to keep a copy.','error');return false;}}
+  function setInputValues(){inputs.showName.value=state.meta.showName;inputs.client.value=state.meta.client;inputs.warehouse.value=state.meta.warehouse;inputs.truck.value=state.meta.truck;inputs.packDate.value=state.meta.packDate;inputs.packLead.value=state.meta.packLead;inputs.driver.value=state.meta.driver;inputs.dock.value=state.meta.dock;inputs.departure.value=state.meta.departure;inputs.search.value=state.filters.search;inputs.status.value=state.filters.status;}
+  function selectOptions(values,selected,firstLabel){var html=firstLabel?'<option value="all">'+escapeHtml(firstLabel)+'</option>':'';values.forEach(function(value){html+='<option value="'+escapeAttr(value)+'"'+(value===selected?' selected':'')+'>'+escapeHtml(titleCase(value))+'</option>';});return html;}
+  function renderDepartmentFilter(){var map={};state.items.forEach(function(item){if(item.department) map[item.department]=true;});var values=Object.keys(map).sort(function(a,b){return a.localeCompare(b);});if(state.filters.department!=='all'&&values.indexOf(state.filters.department)<0) state.filters.department='all';inputs.department.innerHTML=selectOptions(values,state.filters.department,'All departments');}
+  function isReady(item){return item.status==='strapped'||item.status==='loaded';}
+  function hasGap(item){if(item.status==='hold') return false;return item.status==='issue'||String(item.issue||'').trim().length>0||!String(item.caseId||'').trim()||!String(item.contents||'').trim()||!String(item.loadOrder||'').trim()||!String(item.unloadOrder||'').trim()||!String(item.owner||'').trim();}
+  function visibleItems(){var q=state.filters.search.trim().toLowerCase();return state.items.filter(function(item){var haystack=[item.department,item.caseId,item.contents,item.truckZone,item.loadOrder,item.unloadOrder,item.weight,item.owner,item.status,item.issue,item.notes].join(' ').toLowerCase();if(q&&haystack.indexOf(q)===-1) return false;if(state.filters.department!=='all'&&item.department!==state.filters.department) return false;if(state.filters.status!=='all'&&item.status!==state.filters.status) return false;return true;});}
+  function renderRows(){var rows=visibleItems();var body=$('itemBody');if(rows.length&&!rows.some(function(item){return item.id===state.selectedId;})){state.selectedId=rows[0].id;saveState();}$('emptyState').hidden=rows.length>0;body.innerHTML=rows.map(function(item){var gap=hasGap(item);return '<tr class="status-'+item.status+(item.id===state.selectedId?' selected':'')+(gap?' has-gap':'')+'" data-id="'+escapeAttr(item.id)+'">'+cell('<select class="row-select field-mid" data-field="department" aria-label="Department">'+selectOptions(DEPARTMENTS,item.department,'')+'</select>')+cell('<input class="row-input field-mid" data-field="caseId" value="'+escapeAttr(item.caseId)+'" aria-label="Case">')+cell('<input class="row-input field-large" data-field="contents" value="'+escapeAttr(item.contents)+'" aria-label="Contents">')+cell('<select class="row-select field-mid" data-field="truckZone" aria-label="Truck zone">'+selectOptions(ZONES,item.truckZone,'')+'</select>')+cell('<input class="row-input field-small" data-field="loadOrder" value="'+escapeAttr(item.loadOrder)+'" aria-label="Load order">')+cell('<input class="row-input field-small" data-field="unloadOrder" value="'+escapeAttr(item.unloadOrder)+'" aria-label="Unload order">')+cell('<input class="row-input field-small" data-field="weight" value="'+escapeAttr(item.weight)+'" aria-label="Weight">')+cell('<input class="row-input field-mid" data-field="owner" value="'+escapeAttr(item.owner)+'" aria-label="Owner">')+cell('<select class="row-select field-mid" data-field="status" aria-label="Status">'+selectOptions(STATUS,item.status,'')+'</select>')+cell('<textarea class="row-textarea field-notes" data-field="issue" aria-label="Issue">'+escapeHtml(item.issue)+'</textarea>')+cell('<textarea class="row-textarea field-notes" data-field="notes" aria-label="Notes">'+escapeHtml(item.notes)+'</textarea>')+'</tr>';}).join('');}
+  function cell(content){return '<td>'+content+'</td>';}
+  function updateStats(){var ready=state.items.filter(isReady).length;var open=state.items.filter(function(item){return !isReady(item)&&item.status!=='hold';}).length;$('totalOut').textContent=state.items.length;$('readyOut').textContent=ready;$('openOut').textContent=open;$('issueOut').textContent=state.items.filter(function(item){return item.status==='issue'||String(item.issue||'').trim();}).length;$('weightOut').textContent=totalWeight();$('zoneOut').textContent=uniqueCount(state.items.map(function(item){return item.truckZone;}));}
+  function totalWeight(){return state.items.reduce(function(total,item){var value=Number(String(item.weight||'').replace(/[^0-9.]/g,''));return total+(isFinite(value)?value:0);},0);}
+  function uniqueCount(values){var map={};values.forEach(function(value){value=String(value||'').trim();if(value) map[value]=true;});return Object.keys(map).length;}
+  function selectedItem(){return state.items.find(function(item){return item.id===state.selectedId;})||null;}
+  function updateInspector(){var item=selectedItem();var disabled=!item;var gap=item&&hasGap(item);$('selectedIdOut').textContent=item?titleCase(item.department):'None';inputs.selectedStatus.disabled=disabled;inputs.selectedIssue.disabled=disabled;inputs.selectedNotes.disabled=disabled;['markPlannedBtn','markPulledBtn','markStagedBtn','markPackedBtn','markStrappedBtn','markLoadedBtn','markIssueBtn','markHoldBtn','moveUpBtn','moveDownBtn','duplicateBtn','deleteBtn'].forEach(function(id){$(id).disabled=disabled;});$('itemName').textContent=item?(item.caseId||'No case')+' | '+(item.contents||'No contents'):'None';$('itemRoute').textContent=item?titleCase(item.truckZone)+' | load '+(item.loadOrder||'No load')+' | unload '+(item.unloadOrder||'No unload'):'None';$('itemRisk').textContent=item?(gap?(item.issue||'Pack gap'):item.status):'None';$('itemRisk').className=item?(gap?'gap-text':'clean-text'):'';if(item){inputs.selectedStatus.value=item.status;inputs.selectedIssue.value=item.issue;inputs.selectedNotes.value=item.notes;}else{inputs.selectedStatus.value='planned';inputs.selectedIssue.value='';inputs.selectedNotes.value='';}}
+  function render(){setInputValues();renderDepartmentFilter();renderRows();updateStats();updateInspector();}
+  function updateItem(id,field,value,commitNow){var item=state.items.find(function(row){return row.id===id;});if(!item) return;if(field==='status'&&STATUS.indexOf(value)<0) value='planned';if(field==='department'&&DEPARTMENTS.indexOf(value)<0) value='other';if(field==='truckZone'&&ZONES.indexOf(value)<0) value='loose';if(commitNow&&['caseId','contents','loadOrder','unloadOrder','weight','owner'].indexOf(field)>=0) value=normalizeShort(value);item[field]=value;if(field==='issue'&&String(value).trim()&&item.status!=='hold') item.status='issue';if((field==='department'||field==='status'||field==='truckZone')&&commitNow) renderRows();if(field==='department'&&commitNow) renderDepartmentFilter();saveState();updateStats();updateInspector();}
+  function markSelectedRow(){document.querySelectorAll('#itemBody tr[data-id]').forEach(function(row){row.classList.toggle('selected',row.getAttribute('data-id')===state.selectedId);});}
+  function selectItem(id){if(!id) return;if(state.selectedId===id){updateInspector();return;}state.selectedId=id;saveState();markSelectedRow();updateInspector();}
+  function addItem(afterId){var index=afterId?state.items.findIndex(function(item){return item.id===afterId;})+1:state.items.length;if(index<0) index=state.items.length;var item=cloneItem({department:'general',caseId:'NEW-CASE',contents:'New truck pack item',truckZone:'loose',loadOrder:'',unloadOrder:'',weight:'',owner:state.meta.packLead||'',status:'planned',issue:'',notes:''});state.items.splice(index,0,item);state.selectedId=item.id;saveState();render();showHint('Truck pack item added.','success');focusSelectedRow();}
+  function duplicateSelected(){var item=selectedItem();var index;var copy;if(!item) return showHint('Pick a case first.','error');index=state.items.findIndex(function(row){return row.id===item.id;});copy=cloneItem(Object.assign({},item,{id:uid(),caseId:item.caseId+' copy',status:'planned',issue:'',notes:item.notes?item.notes+' Copy.':'Copy.'}));state.items.splice(index+1,0,copy);state.selectedId=copy.id;saveState();render();showHint('Truck pack item duplicated. Confirm zone and order.','success');focusSelectedRow();}
+  function deleteSelected(){var item=selectedItem();var index;if(!item) return showHint('Pick a case first.','error');if(!window.confirm('Delete selected truck pack item?')) return;index=state.items.findIndex(function(row){return row.id===item.id;});state.items.splice(index,1);state.selectedId=state.items[Math.min(index,state.items.length-1)]?state.items[Math.min(index,state.items.length-1)].id:'';saveState();render();showHint('Truck pack item deleted.','success');}
+  function moveSelected(dir){var item=selectedItem();var index;var nextIndex;if(!item) return showHint('Pick a case first.','error');index=state.items.findIndex(function(row){return row.id===item.id;});nextIndex=index+dir;if(nextIndex<0||nextIndex>=state.items.length) return;state.items.splice(index,1);state.items.splice(nextIndex,0,item);saveState();render();showHint(dir<0?'Truck pack item moved up.':'Truck pack item moved down.','success');focusSelectedRow();}
+  function setSelectedStatus(status){var item=selectedItem();if(!item) return showHint('Pick a case first.','error');item.status=status;if(status==='packed'||status==='strapped'||status==='loaded'||status==='hold') item.issue='';saveState();render();showHint(status==='issue'?'Truck pack item needs attention.':'Truck pack item updated.',status==='issue'?'error':'success');}
+  function loadSample(){if(state.items.length&&!window.confirm('Replace current truck pack plan with sample items?')) return;state=normalizeState({meta:state.meta,items:sampleItems,selectedId:'',filters:{search:'',department:'all',status:'all'}});if(state.items[0]) state.selectedId=state.items[0].id;saveState();render();showHint('Sample truck pack plan loaded.','success');}
+  function buildSummary(){var lines=[];var gaps=state.items.filter(hasGap);var open=state.items.filter(function(item){return !isReady(item)&&item.status!=='hold';});lines.push('TRUCK PACK PLAN');lines.push('Show: '+state.meta.showName);lines.push('Client: '+state.meta.client);lines.push('Warehouse: '+state.meta.warehouse);lines.push('Truck: '+state.meta.truck);lines.push('Pack Date: '+state.meta.packDate);lines.push('Pack Lead: '+state.meta.packLead);lines.push('Driver: '+state.meta.driver);lines.push('Dock: '+state.meta.dock);lines.push('Departure: '+state.meta.departure);lines.push('');lines.push('Summary: '+state.items.length+' cases, '+state.items.filter(isReady).length+' ready, '+open.length+' open, '+gaps.length+' pack gaps, '+totalWeight()+' lb.');if(gaps.length){lines.push('');lines.push('Pack Gaps:');gaps.forEach(function(item){lines.push('- '+titleCase(item.department)+' | '+item.caseId+' | '+titleCase(item.truckZone)+' | '+(item.issue||item.status));});}lines.push('');lines.push('Load Order:');state.items.slice().sort(function(a,b){return Number(a.loadOrder||999)-Number(b.loadOrder||999);}).forEach(function(item){lines.push('- '+(item.loadOrder||'?')+' | '+item.caseId+' | '+titleCase(item.truckZone)+' | '+item.status);});return lines.join('\n');}
+  function copySummary(){copyText(buildSummary()).then(function(){showHint('Truck pack summary copied.','success');signal($('copySummaryBtn'),'success');}).catch(function(){showHint('Could not copy summary.','error');signal($('copySummaryBtn'),'error');});}
+  function exportJson(){var payload={schema:SCHEMA,exportedAt:new Date().toISOString(),meta:state.meta,items:state.items};downloadFile(fileStem()+'.truck-pack.json',JSON.stringify(payload,null,2),'application/json;charset=utf-8');showHint('JSON exported.','success');}
+  function exportCsv(){var fields=['department','caseId','contents','truckZone','loadOrder','unloadOrder','weight','owner','status','issue','notes'];var csv=[fields.join(',')].concat(state.items.map(function(item){return fields.map(function(field){return csvCell(item[field]);}).join(',');})).join('\n');downloadFile(fileStem()+'.truck-pack.csv',csv,'text/csv;charset=utf-8');showHint('CSV exported.','success');}
+  function importJsonFile(file){var reader=new FileReader();reader.onload=function(){try{var parsed=JSON.parse(String(reader.result||''));if(!parsed||typeof parsed!=='object'||!Array.isArray(parsed.items)) throw new Error('Invalid payload');state=normalizeState({meta:parsed.meta||state.meta,items:parsed.items,selectedId:'',filters:{search:'',department:'all',status:'all'}});if(state.items[0]) state.selectedId=state.items[0].id;saveState();render();showHint('Truck pack JSON imported.','success');signal($('importJsonBtn'),'success');}catch(e){showHint('Could not import that JSON file.','error');signal($('importJsonBtn'),'error');}};reader.onerror=function(){showHint('Could not read that JSON file.','error');signal($('importJsonBtn'),'error');};reader.readAsText(file);}
+  function syncMeta(){state.meta.showName=inputs.showName.value;state.meta.client=inputs.client.value;state.meta.warehouse=inputs.warehouse.value;state.meta.truck=inputs.truck.value;state.meta.packDate=inputs.packDate.value;state.meta.packLead=inputs.packLead.value;state.meta.driver=inputs.driver.value;state.meta.dock=inputs.dock.value;state.meta.departure=inputs.departure.value;saveState();}
+  function bindEvents(){Object.keys(inputs).forEach(function(key){if(['showName','client','warehouse','truck','packDate','packLead','driver','dock','departure'].indexOf(key)>=0) inputs[key].addEventListener('input',syncMeta);});inputs.search.addEventListener('input',function(){state.filters.search=inputs.search.value;saveState();renderRows();updateInspector();});inputs.department.addEventListener('change',function(){state.filters.department=inputs.department.value;saveState();renderRows();updateInspector();});inputs.status.addEventListener('change',function(){state.filters.status=inputs.status.value;saveState();renderRows();updateInspector();});$('itemBody').addEventListener('focusin',function(event){var row=event.target.closest('tr[data-id]');if(row) selectItem(row.getAttribute('data-id'));});$('itemBody').addEventListener('click',function(event){var row=event.target.closest('tr[data-id]');if(row) selectItem(row.getAttribute('data-id'));});$('itemBody').addEventListener('input',function(event){var target=event.target;var row=target.closest('tr[data-id]');var field=target.getAttribute('data-field');if(row&&field) updateItem(row.getAttribute('data-id'),field,target.value,false);});$('itemBody').addEventListener('change',function(event){var target=event.target;var row=target.closest('tr[data-id]');var field=target.getAttribute('data-field');if(['caseId','contents','loadOrder','unloadOrder','weight','owner'].indexOf(field)>=0) target.value=normalizeShort(target.value);if(row&&field) updateItem(row.getAttribute('data-id'),field,target.value,true);});inputs.selectedStatus.addEventListener('change',function(){setSelectedStatus(inputs.selectedStatus.value);});inputs.selectedIssue.addEventListener('input',function(){var item=selectedItem();if(!item) return;item.issue=inputs.selectedIssue.value;if(item.issue.trim()&&item.status!=='hold') item.status='issue';saveState();renderRows();updateStats();updateInspector();});inputs.selectedNotes.addEventListener('input',function(){var item=selectedItem();if(!item) return;item.notes=inputs.selectedNotes.value;saveState();renderRows();});$('addItemBtn').addEventListener('click',function(){addItem(state.selectedId);signal(this,'success');});$('loadSampleBtn').addEventListener('click',function(){loadSample();signal(this,'success');});$('markPlannedBtn').addEventListener('click',function(){setSelectedStatus('planned');signal(this,'success');});$('markPulledBtn').addEventListener('click',function(){setSelectedStatus('pulled');signal(this,'success');});$('markStagedBtn').addEventListener('click',function(){setSelectedStatus('staged');signal(this,'success');});$('markPackedBtn').addEventListener('click',function(){setSelectedStatus('packed');signal(this,'success');});$('markStrappedBtn').addEventListener('click',function(){setSelectedStatus('strapped');signal(this,'success');});$('markLoadedBtn').addEventListener('click',function(){setSelectedStatus('loaded');signal(this,'success');});$('markIssueBtn').addEventListener('click',function(){setSelectedStatus('issue');signal(this,'error');});$('markHoldBtn').addEventListener('click',function(){setSelectedStatus('hold');signal(this,'success');});$('moveUpBtn').addEventListener('click',function(){moveSelected(-1);signal(this,'success');});$('moveDownBtn').addEventListener('click',function(){moveSelected(1);signal(this,'success');});$('duplicateBtn').addEventListener('click',function(){duplicateSelected();signal(this,'success');});$('deleteBtn').addEventListener('click',function(){deleteSelected();signal(this,'success');});$('printBtn').addEventListener('click',function(){window.print();signal(this,'success');});$('copySummaryBtn').addEventListener('click',copySummary);$('exportJsonBtn').addEventListener('click',function(){exportJson();signal(this,'success');});$('exportCsvBtn').addEventListener('click',function(){exportCsv();signal(this,'success');});$('importJsonBtn').addEventListener('click',function(){$('importInput').click();});$('importInput').addEventListener('change',function(){var file=$('importInput').files&&$('importInput').files[0];if(file) importJsonFile(file);$('importInput').value='';});document.addEventListener('keydown',function(event){if(isTyping()) return;if(event.key==='n'||event.key==='N'){event.preventDefault();addItem(state.selectedId);}if(event.key==='p'||event.key==='P'){event.preventDefault();setSelectedStatus('planned');}if(event.key==='u'||event.key==='U'){event.preventDefault();setSelectedStatus('pulled');}if(event.key==='s'||event.key==='S'){event.preventDefault();setSelectedStatus('staged');}if(event.key==='k'||event.key==='K'){event.preventDefault();setSelectedStatus('packed');}if(event.key==='t'||event.key==='T'){event.preventDefault();setSelectedStatus('strapped');}if(event.key==='l'||event.key==='L'){event.preventDefault();setSelectedStatus('loaded');}if(event.key==='i'||event.key==='I'){event.preventDefault();setSelectedStatus('issue');}if(event.key==='h'||event.key==='H'){event.preventDefault();setSelectedStatus('hold');}if(event.key==='d'||event.key==='D'){event.preventDefault();duplicateSelected();}if(event.key==='Delete'){event.preventDefault();deleteSelected();}});installPressFeedback();}
+  function installPressFeedback(){document.querySelectorAll('button').forEach(function(button){function press(){if(!button.disabled) button.classList.add('is-pressing');}function release(){button.classList.remove('is-pressing');}button.addEventListener('pointerdown',press);button.addEventListener('pointerup',release);button.addEventListener('pointercancel',release);button.addEventListener('pointerleave',release);button.addEventListener('blur',release);button.addEventListener('keydown',function(event){if(event.key===' '||event.key==='Enter') press();});button.addEventListener('keyup',function(event){if(event.key===' '||event.key==='Enter') release();});});}
+  function showHint(message,kind){var hint=$('hint');hint.textContent=message;hint.classList.remove('success','error');if(kind) hint.classList.add(kind);}
+  function signal(element,kind){if(!element) return;var className=kind==='error'?'feedback-error':'feedback-success';element.classList.remove(className);void element.offsetWidth;element.classList.add(className);setTimeout(function(){element.classList.remove(className);},190);}
+  function focusSelectedRow(){var row=document.querySelector('tr[data-id="'+cssEscape(state.selectedId)+'"]');var input=row&&row.querySelector('input,select,textarea');if(input) input.focus({preventScroll:true});}
+  function isTyping(){var tag=document.activeElement&&document.activeElement.tagName;return tag==='INPUT'||tag==='TEXTAREA'||tag==='SELECT';}
+  function normalizeShort(value){return String(value||'').trim().replace(/\s+/g,' ').slice(0,140);}
+  function titleCase(value){return String(value||'').replace(/-/g,' ').replace(/\b\w/g,function(letter){return letter.toUpperCase();});}
+  function fileStem(){return (state.meta.showName||'truck-pack').toLowerCase().replace(/['"]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,60)||'truck-pack';}
+  function csvCell(value){value=String(value==null?'':value);if(/[",\n]/.test(value)) return '"'+value.replace(/"/g,'""')+'"';return value;}
+  function downloadFile(filename,content,type){var blob=new Blob([content],{type:type});var url=URL.createObjectURL(blob);var link=document.createElement('a');link.href=url;link.download=filename;link.style.display='none';document.body.appendChild(link);link.click();setTimeout(function(){URL.revokeObjectURL(url);if(link.parentNode) link.parentNode.removeChild(link);},0);}
+  function copyText(text){if(navigator.clipboard&&navigator.clipboard.writeText) return navigator.clipboard.writeText(text);return new Promise(function(resolve,reject){var area=document.createElement('textarea');area.value=text;area.setAttribute('readonly','');area.style.position='fixed';area.style.left='-9999px';document.body.appendChild(area);area.select();try{document.execCommand('copy')?resolve():reject(new Error('copy failed'));}catch(e){reject(e);}finally{if(area.parentNode) area.parentNode.removeChild(area);}});}
+  function escapeHtml(value){return String(value==null?'':value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+  function escapeAttr(value){return escapeHtml(value);}
+  function cssEscape(value){if(window.CSS&&CSS.escape) return CSS.escape(value);return String(value).replace(/"/g,'\\"');}
+  loadState();
+  render();
+  bindEvents();
+})();
+</script>
+</body>
+</html>
