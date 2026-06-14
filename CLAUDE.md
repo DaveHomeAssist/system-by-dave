@@ -98,7 +98,8 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
   matrix and numbered actions, Quick Switcher command palette, return context
   hydration, copyable launch lists, saved browser preferences, tactile button
   feedback, suite JSON import and export, show package backup for known AV tool
-  storage, and mobile layout containment.
+  storage, offline cache readiness controls backed by `av-suite-worker.js`,
+  and mobile layout containment.
 - `js/av-suite-context.js` is the shared AV tool context helper. It reads
   `sbdShow`, `sbdVenue`, `sbdDate`, and `sbdOperator` URL parameters and
   fills matching show metadata fields on AV tool pages that include it. When
