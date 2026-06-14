@@ -2,6 +2,7 @@
 
 ## 2026-06-14
 
+* Replaced the AV Suite dock note browser prompt with an inline note editor: suite launched tool pages now open a compact dock input with Save, Clear, and Cancel actions, keyboard save and cancel support, current note preview, and the same `/av-suite.html` dashboard storage. Bumped the AV Suite offline cache version so cached tools refresh the helper.
 * Added AV Suite dock readiness notes: `js/av-suite-context.js` now lets suite launched tool pages add, edit, preview, or clear a current tool readiness note from the compact dock, saves the note into `/av-suite.html` dashboard storage with current show context, and bumps the AV Suite offline cache version so the updated helper refreshes cleanly.
 * Made `/teleprompter.html` controls hiding visible from the script editor header by adding a Hide controls button beside Done, syncing it with the header button, toolbar button, `H` shortcut, floating Show controls restore button, and saved controls preference.
 * Added AV Suite dock readiness controls: `js/av-suite-context.js` now lets suite launched tool pages mark the current tool Pending, Ready, Issue, or Skip from the compact dock, saves that state into `/av-suite.html` dashboard storage with the current show context, and updates the dock status immediately. Bumped the AV Suite offline cache version so the updated helper refreshes cleanly.

@@ -308,14 +308,47 @@
     return note.length > 54 ? note.slice(0, 51) + '...' : note;
   }
 
-  function editToolNote(dock){
+  function setNoteEditorOpen(dock, open, focusEditor){
     var id = currentToolId();
-    var current = toolNote(id);
-    var value;
-    if(!id || !window.prompt) return;
-    value = window.prompt('Readiness note for ' + toolNameFromId(id) + '. Leave blank to clear.', current);
-    if(value === null) return;
-    updateReadinessControls(dock, setToolNote(value), cleanNote(value) ? 'Note saved' : 'Note cleared');
+    var editor = dock.querySelector('[data-sbd-suite-note-editor]');
+    var input = dock.querySelector('[data-sbd-suite-note-input]');
+    var noteButton = dock.querySelector('[data-sbd-suite-note-button]');
+    if(!editor || !input) return;
+    dock.setAttribute('data-sbd-suite-note-open', String(open));
+    editor.hidden = !open;
+    editor.setAttribute('data-open', String(open));
+    noteButton && noteButton.setAttribute('aria-expanded', String(open));
+    if(open){
+      input.value = toolNote(id);
+      input.setAttribute('aria-label', 'Readiness note for ' + toolNameFromId(id));
+      if(focusEditor){
+        setTimeout(function(){
+          input.focus();
+          input.select();
+        }, 0);
+      }
+    }else if(focusEditor && noteButton){
+      noteButton.focus();
+    }
+  }
+
+  function saveNoteEditor(dock){
+    var input = dock.querySelector('[data-sbd-suite-note-input]');
+    var note = input ? cleanNote(input.value) : '';
+    var saved = setToolNote(note);
+    if(saved) setNoteEditorOpen(dock, false, false);
+    updateReadinessControls(dock, saved, note ? 'Note saved' : 'Note cleared');
+  }
+
+  function toggleToolNoteEditor(dock){
+    var open = dock.getAttribute('data-sbd-suite-note-open') === 'true';
+    setNoteEditorOpen(dock, !open, true);
+  }
+
+  function clearNoteEditor(dock){
+    var input = dock.querySelector('[data-sbd-suite-note-input]');
+    if(input) input.value = '';
+    saveNoteEditor(dock);
   }
 
   function updateReadinessControls(dock, saved, messageText){
@@ -326,6 +359,7 @@
     var message = dock.querySelector('[data-sbd-suite-message]');
     var noteStatus = dock.querySelector('[data-sbd-suite-note-status]');
     var noteButton = dock.querySelector('[data-sbd-suite-note-button]');
+    var noteInput = dock.querySelector('[data-sbd-suite-note-input]');
     dock.querySelectorAll('[data-sbd-suite-readiness]').forEach(function(button){
       var active = button.getAttribute('data-sbd-suite-readiness') === value;
       button.setAttribute('aria-pressed', String(active));
@@ -343,6 +377,9 @@
       noteButton.setAttribute('aria-pressed', String(Boolean(note)));
       noteButton.title = note ? 'Edit readiness note: ' + note : 'Add readiness note';
     }
+    if(noteInput && dock.getAttribute('data-sbd-suite-note-open') !== 'true'){
+      noteInput.value = note;
+    }
     if(message){
       message.textContent = saved === false ? 'Storage blocked' : (messageText || (saved ? 'Saved' : ''));
       if(saved) setTimeout(function(){message.textContent = '';}, 1500);
@@ -355,6 +392,11 @@
     var status;
     var noteButton;
     var noteStatus;
+    var noteEditor;
+    var noteInput;
+    var saveButton;
+    var clearButton;
+    var cancelButton;
     var message;
     if(!id) return;
     group = document.createElement('div');
@@ -382,12 +424,54 @@
     noteButton.textContent = 'Note';
     noteButton.setAttribute('data-sbd-suite-note-button', 'true');
     noteButton.setAttribute('aria-pressed', 'false');
-    noteButton.addEventListener('click', function(){editToolNote(dock);});
+    noteButton.setAttribute('aria-expanded', 'false');
+    noteButton.addEventListener('click', function(){toggleToolNoteEditor(dock);});
     group.appendChild(noteButton);
     noteStatus = document.createElement('span');
     noteStatus.className = 'sbd-suite-note';
     noteStatus.setAttribute('data-sbd-suite-note-status', 'true');
     group.appendChild(noteStatus);
+    noteEditor = document.createElement('div');
+    noteEditor.className = 'sbd-suite-note-editor';
+    noteEditor.setAttribute('data-sbd-suite-note-editor', 'true');
+    noteEditor.setAttribute('data-open', 'false');
+    noteEditor.hidden = true;
+    noteInput = document.createElement('input');
+    noteInput.className = 'sbd-suite-note-input';
+    noteInput.type = 'text';
+    noteInput.maxLength = 240;
+    noteInput.placeholder = 'Note for readiness, owner, or blocker';
+    noteInput.setAttribute('data-sbd-suite-note-input', 'true');
+    noteInput.addEventListener('keydown', function(event){
+      if(event.key === 'Enter'){
+        event.preventDefault();
+        saveNoteEditor(dock);
+      }
+      if(event.key === 'Escape'){
+        event.preventDefault();
+        setNoteEditorOpen(dock, false, true);
+      }
+    });
+    noteEditor.appendChild(noteInput);
+    saveButton = document.createElement('button');
+    saveButton.type = 'button';
+    saveButton.className = 'sbd-suite-button';
+    saveButton.textContent = 'Save';
+    saveButton.addEventListener('click', function(){saveNoteEditor(dock);});
+    noteEditor.appendChild(saveButton);
+    clearButton = document.createElement('button');
+    clearButton.type = 'button';
+    clearButton.className = 'sbd-suite-button';
+    clearButton.textContent = 'Clear';
+    clearButton.addEventListener('click', function(){clearNoteEditor(dock);});
+    noteEditor.appendChild(clearButton);
+    cancelButton = document.createElement('button');
+    cancelButton.type = 'button';
+    cancelButton.className = 'sbd-suite-button';
+    cancelButton.textContent = 'Cancel';
+    cancelButton.addEventListener('click', function(){setNoteEditorOpen(dock, false, true);});
+    noteEditor.appendChild(cancelButton);
+    group.appendChild(noteEditor);
     message = document.createElement('span');
     message.className = 'sbd-suite-message';
     message.setAttribute('data-sbd-suite-message', 'true');
@@ -435,6 +519,7 @@
       '.sbd-suite-main{border-color:rgba(114,244,233,.72);color:#dffffc}',
       '.sbd-suite-phase{color:#aab8ca;font-family:"SFMono-Regular","Cascadia Code","Liberation Mono",Menlo,monospace;text-transform:uppercase;letter-spacing:.06em;font-size:10px}',
       '.sbd-suite-step{max-width:180px;overflow:hidden;text-overflow:ellipsis}',
+      '.sbd-suite-dock[data-sbd-suite-note-open="true"]{flex-wrap:wrap}',
       '.sbd-suite-readiness{display:inline-flex;align-items:center;gap:4px;border-left:1px solid rgba(73,97,120,.65);padding-left:6px}',
       '.sbd-suite-status,.sbd-suite-message{display:inline-flex;align-items:center;min-height:28px;border-radius:999px;padding:5px 8px;color:#aab8ca;background:rgba(12,18,28,.8);white-space:nowrap;font-family:"SFMono-Regular","Cascadia Code","Liberation Mono",Menlo,monospace;font-size:10px;text-transform:uppercase;letter-spacing:.06em}',
       '.sbd-suite-status[data-status="ready"]{color:#baf7d0;background:rgba(31,110,72,.3)}',
@@ -442,6 +527,10 @@
       '.sbd-suite-status[data-status="skipped"]{color:#d8d3c4;background:rgba(98,86,58,.38)}',
       '.sbd-suite-note{display:inline-flex;align-items:center;min-height:28px;max-width:190px;border-radius:999px;padding:5px 8px;color:#aab8ca;background:rgba(12,18,28,.8);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font:700 10px "SFMono-Regular","Cascadia Code","Liberation Mono",Menlo,monospace;text-transform:uppercase;letter-spacing:.06em}',
       '.sbd-suite-note[data-has-note="true"]{color:#dffffc;background:rgba(37,92,94,.38)}',
+      '.sbd-suite-note-editor{display:none;align-items:center;gap:5px;flex:1 1 100%;min-width:min(420px,calc(100vw - 44px));padding-top:6px;border-top:1px solid rgba(73,97,120,.65)}',
+      '.sbd-suite-note-editor[data-open="true"]{display:flex}',
+      '.sbd-suite-note-input{appearance:none;flex:1 1 220px;min-width:0;min-height:30px;border:1px solid rgba(73,97,120,.78);border-radius:7px;padding:6px 8px;color:#f4f8ff;background:rgba(12,18,28,.92);font:700 11px -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;outline:none}',
+      '.sbd-suite-note-input:focus{border-color:#72f4e9;box-shadow:0 0 0 2px rgba(114,244,233,.18)}',
       '.sbd-suite-button{appearance:none;display:inline-flex;align-items:center;justify-content:center;min-height:28px;border:1px solid rgba(73,97,120,.78);border-radius:7px;padding:5px 8px;color:#f4f8ff;background:rgba(22,34,49,.88);font:700 11px -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;cursor:pointer;transition:transform 140ms ease,background 140ms ease,border-color 140ms ease,color 140ms ease}',
       '.sbd-suite-button:hover{border-color:#72f4e9;background:rgba(27,43,60,.98)}',
       '.sbd-suite-button:active{transform:scale(.96)}',
@@ -450,8 +539,8 @@
       '.sbd-suite-button[data-sbd-suite-readiness="ready"][aria-pressed="true"]{border-color:#72d69a;color:#ebfff1;background:rgba(31,110,72,.74)}',
       '.sbd-suite-button[data-sbd-suite-readiness="issue"][aria-pressed="true"]{border-color:#ff8fa6;color:#fff4f6;background:rgba(133,46,66,.78)}',
       '.sbd-suite-button[data-sbd-suite-readiness="skipped"][aria-pressed="true"]{border-color:#d8c78a;color:#fff9df;background:rgba(98,86,58,.78)}',
-      '@media (max-width:900px){.sbd-suite-dock{display:grid;grid-template-columns:auto auto 1fr;align-items:stretch}.sbd-suite-readiness{grid-column:1/-1;border-left:0;border-top:1px solid rgba(73,97,120,.65);padding-left:0;padding-top:6px;flex-wrap:wrap}.sbd-suite-step{max-width:none}}',
-      '@media (max-width:680px){.sbd-suite-dock{left:10px;right:10px;bottom:10px;grid-template-columns:1fr 1fr}.sbd-suite-phase{grid-column:1/-1}.sbd-suite-main{grid-column:1/-1}.sbd-suite-readiness{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr}.sbd-suite-status,.sbd-suite-note,.sbd-suite-message{grid-column:1/-1;justify-content:center;max-width:none}.sbd-suite-link,.sbd-suite-phase,.sbd-suite-button{min-width:0}.sbd-suite-step{max-width:none}}',
+      '@media (max-width:900px){.sbd-suite-dock{display:grid;grid-template-columns:auto auto 1fr;align-items:stretch}.sbd-suite-readiness{grid-column:1/-1;border-left:0;border-top:1px solid rgba(73,97,120,.65);padding-left:0;padding-top:6px;flex-wrap:wrap}.sbd-suite-note-editor{grid-column:1/-1;min-width:0}.sbd-suite-step{max-width:none}}',
+      '@media (max-width:680px){.sbd-suite-dock{left:10px;right:10px;bottom:10px;grid-template-columns:1fr 1fr}.sbd-suite-phase{grid-column:1/-1}.sbd-suite-main{grid-column:1/-1}.sbd-suite-readiness{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr}.sbd-suite-status,.sbd-suite-note,.sbd-suite-note-editor,.sbd-suite-message{grid-column:1/-1;justify-content:center;max-width:none}.sbd-suite-note-editor{grid-template-columns:1fr auto auto auto}.sbd-suite-note-input{flex-basis:100%;width:100%}.sbd-suite-link,.sbd-suite-phase,.sbd-suite-button{min-width:0}.sbd-suite-step{max-width:none}}',
       '@media print{.sbd-suite-dock{display:none!important}}'
     ].join('');
     dock = document.createElement('nav');
