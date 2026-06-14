@@ -107,6 +107,25 @@
     flex:0 0 auto;
     transition:opacity var(--dur-med) var(--ease-out), transform var(--dur-med) var(--ease-out);
   }
+  .controls-wake{
+    position:fixed;
+    top:12px;
+    right:14px;
+    z-index:46;
+    display:none;
+    align-items:center;
+    gap:6px;
+    padding:9px 12px;
+    background:rgba(17,22,31,.88);
+    border-color:#465467;
+    box-shadow:0 10px 28px rgba(0,0,0,.34),0 0 0 1px rgba(154,208,255,.08);
+    backdrop-filter:blur(12px);
+  }
+  .controls-wake::before{
+    content:"▤";
+    font-size:14px;
+  }
+  body.controls-collapsed .controls-wake{display:inline-flex}
   .group{
     display:flex;align-items:center;gap:6px;
     padding:5px 8px;
@@ -573,6 +592,7 @@
   body.playing.immersive .toolbar,
   body.playing.immersive header.bar{opacity:0;pointer-events:none;transform:translateY(-4px)}
   body.playing.immersive .reader{cursor:none}
+  body.controls-collapsed header.bar,
   body.controls-collapsed .toolbar,
   body.controls-collapsed footer{display:none}
 
@@ -689,6 +709,7 @@
   }
   body.remote-mode #remoteBtn,
   body.remote-mode #controlsToggleBtn,
+  body.remote-mode #controlsWakeBtn,
   body.remote-mode #editBtn,
   body.remote-mode #helpBtn{
     display:none;
@@ -905,6 +926,13 @@
     #remoteBtn::before{content:"⇄"}
     #editBtn::before{content:"✎"}
     #helpBtn::before{content:"⌨"}
+    .controls-wake{
+      top:8px;
+      right:8px;
+      min-width:40px;
+      padding:9px 10px;
+      font-size:12px;
+    }
     input.saved-filter{width:96px}
     select.saved-select{max-width:132px}
   }
@@ -935,6 +963,7 @@
     <button id="editBtn" class="ghost" type="button" title="Switch between editing and reading">Edit script</button>
     <button id="helpBtn" class="ghost" type="button" aria-haspopup="dialog" title="Keyboard shortcuts">⌨ Shortcuts</button>
   </header>
+  <button id="controlsWakeBtn" class="controls-wake" type="button" aria-controls="toolbar" aria-expanded="false" hidden title="Show controls (H)">Show controls</button>
 
   <div class="noscript-note">
     JavaScript is off, so auto-scroll and controls are unavailable — but your script is fully readable below.
@@ -1379,6 +1408,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
 
   var toolbar = $('toolbar');
   var controlsToggleBtn = $('controlsToggleBtn');
+  var controlsWakeBtn = $('controlsWakeBtn');
   var reader   = $('reader');
   var inner    = $('readerInner');
   var script   = $('script');
@@ -2280,6 +2310,11 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
       controlsToggleBtn.setAttribute('aria-pressed', String(collapsed));
       controlsToggleBtn.setAttribute('aria-label', collapsed ? 'Show controls' : 'Hide controls');
       controlsToggleBtn.setAttribute('title', (collapsed ? 'Show controls' : 'Hide controls') + ' (H)');
+    }
+    if(controlsWakeBtn){
+      controlsWakeBtn.hidden = !collapsed;
+      controlsWakeBtn.setAttribute('aria-expanded', String(!collapsed));
+      controlsWakeBtn.setAttribute('aria-label', collapsed ? 'Show controls' : 'Controls shown');
     }
     window.requestAnimationFrame(function(){
       measure();
@@ -4774,6 +4809,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   setupRemoteSync();
   installPressFeedback();
   controlsToggleBtn.addEventListener('click', toggleControls);
+  controlsWakeBtn.addEventListener('click', toggleControls);
   remoteBtn.addEventListener('click', openRemoteWindow);
   wireRemoteButton('remoteCueBtn', 'cue');
   wireRemoteButton('remotePlayBtn', 'togglePlay');
