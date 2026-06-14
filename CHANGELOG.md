@@ -2,6 +2,7 @@
 
 ## 2026-06-14
 
+* Added `/show-advance.html`, a browser based AV show advance tracker with show metadata, sample show advance, editable advance rows, section ask owner due priority status details and notes fields, section and status filters, selected item preview, selected item controls, needed requested received confirmed issue deferred status, total confirmed open issue high priority and section counts, print output, JSON import and export, CSV export, copyable operator summary, remembered browser state, keyboard shortcuts, tactile button feedback, and mobile table containment. Linked it from the homepage AV Tools section, added it to the Products footer, and added it to `sitemap.xml`.
 * Rolled CueForge and PlotForge into the AV tools suite: renamed the homepage cards and footer links, updated `cue-sheet.html` and `stage-plot.html` metadata and on page labels, added `cueforge.html` and `plotforge.html` route aliases, updated export schemas and filenames to use CueForge and PlotForge naming, updated `CLAUDE.md`, `AGENTS.md`, and bumped sitemap entries.
 * Expanded `/teleprompter.html` formatting and saved script controls: added text alignment, more system reader font stacks, anchor desk producer notes and bold card presets, wider spacing options, reusable custom text background and reading line color swatches, script templates, text only saved script loading, and show package support for custom swatches.
 

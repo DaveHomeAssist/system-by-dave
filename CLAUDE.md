@@ -30,6 +30,7 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
 - `network-plan.html` — AV network plan
 - `rf-coordination.html`: AV RF coordination sheet
 - `gear-prep.html`: AV gear prep checklist
+- `show-advance.html`: AV show advance tracker
 - `signal-flow.html` — AV signal flow planner
 - `input-list.html` — AV input list and patch sheet
 - `stage-plot.html` — PlotForge stage plot
@@ -86,15 +87,19 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
   locations, owners, test status, pack status, load status, issues, open
   items, copyable summaries, print output, JSON import and export, and CSV
   export.
+- `show-advance.html` tracks contacts, venue access, schedule, power,
+  network, audio, video, labor, deliverables, risks, open questions, owners,
+  due dates, priority, status, copyable summaries, print output, JSON import
+  and export, and CSV export.
 - `signal-flow.html` tracks AV sources, processors, destinations, formats,
   connectors, backups, route status, issues, copyable summaries, print output,
   JSON import and export, and CSV export.
 - AV tools now include `teleprompter.html`, `show-timer.html`,
   `cue-sheet.html`, `cueforge.html`, `playback-check.html`, `record-log.html`,
   `power-plan.html`, `network-plan.html`, `rf-coordination.html`,
-  `gear-prep.html`, `signal-flow.html`, `input-list.html`, `stage-plot.html`,
-  `plotforge.html`, `show-handoff.html`, `camera-shot-list.html`,
-  `comms-check.html`, and `av-calculator.html`.
+  `gear-prep.html`, `show-advance.html`, `signal-flow.html`,
+  `input-list.html`, `stage-plot.html`, `plotforge.html`, `show-handoff.html`,
+  `camera-shot-list.html`, `comms-check.html`, and `av-calculator.html`.
 
 ## Conventions
 See `AGENTS.md` for coding conventions and the review checklist.
