@@ -51,6 +51,7 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
 - `stage-plot.html` — PlotForge stage plot
 - `plotforge.html` — PlotForge route alias
 - `show-handoff.html` — AV show handoff builder
+- `show-report.html`: AV show report
 - `camera-shot-list.html` — AV camera shot list
 - `comms-check.html` — AV comms check
 - `av-calculator.html` — AV calculator
@@ -149,6 +150,9 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
 - `truck-pack.html` tracks cases, truck zones, load order, unload order,
   weights, owners, pack status, issues, open items, copyable summaries, print
   output, JSON import and export, and CSV export.
+- `show-report.html` tracks timeline entries, issues, client requests,
+  decisions, crew notes, follow ups, severity, status, report gaps, copyable
+  summaries, print output, JSON import and export, and CSV export.
 - `load-in-plan.html` tracks trucks, docks, room destinations, departments,
   load in items, owners, due times, build status, blockers, gap warnings,
   copyable summaries, print output, JSON import and export, and CSV export.
@@ -181,7 +185,7 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
   `rf-coordination.html`,
   `site-survey.html`, `gear-prep.html`, `truck-pack.html`, `load-in-plan.html`, `strike-plan.html`, `show-advance.html`, `crew-call.html`,
   `signal-flow.html`,
-  `input-list.html`, `stage-plot.html`, `plotforge.html`, `show-handoff.html`,
+  `input-list.html`, `stage-plot.html`, `plotforge.html`, `show-handoff.html`, `show-report.html`,
   `camera-shot-list.html`, `comms-check.html`, and `av-calculator.html`.
 
 ## Conventions
