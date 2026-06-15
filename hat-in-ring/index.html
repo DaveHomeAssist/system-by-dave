@@ -269,7 +269,7 @@ a:focus-visible,button:focus-visible,select:focus-visible,input:focus-visible,
     <div class="asof">
       As of <b id="asof">June 15, 2026</b><br>
       <span id="counter"></span><br>
-      <span class="buildstamp" title="Last automated rebuild (UTC in CI)">auto-built Jun 15 2026 08:02</span>
+      <span class="buildstamp" title="Last automated rebuild (UTC in CI)">auto-built Jun 15 2026 08:37</span>
     </div>
   </header>
 
@@ -975,7 +975,7 @@ function init(){
   $('#scrim').addEventListener('click',closeDrawer);
   document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDrawer();});
 
-  $('#foot').innerHTML=`Manually-maintained tracker — data seeded from public reporting (AP, Reuters, Time, WaPo, ABC, C-SPAN, FEC) as of June 15, 2026 (auto-generated Jun 15 2026 08:02). Edits/additions save to this browser only; use <b>Export</b> to back up or port to Notion. <b>Status tier</b> = furthest verifiable step taken; <b>momentum</b> = weighted activity + recency, capped 0–100. Not a live FEC/news feed — see chat notes for wiring options. · <span class="resetlink" id="resetPrefs">Reset view</span>`;
+  $('#foot').innerHTML=`Manually-maintained tracker — data seeded from public reporting (AP, Reuters, Time, WaPo, ABC, C-SPAN, FEC) as of June 15, 2026 (auto-generated Jun 15 2026 08:37). Edits/additions save to this browser only; use <b>Export</b> to back up or port to Notion. <b>Status tier</b> = furthest verifiable step taken; <b>momentum</b> = weighted activity + recency, capped 0–100. Not a live FEC/news feed — see chat notes for wiring options. · <span class="resetlink" id="resetPrefs">Reset view</span>`;
   // drawer swipe-to-dismiss (touch): light resistance + snap on release
   (function(){var d=$('#drawer'),x0=null;
     d.addEventListener('touchstart',function(ev){x0=ev.touches[0].clientX;d.style.transition='none';},{passive:true});
