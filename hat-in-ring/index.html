@@ -19,6 +19,9 @@
 <meta name="twitter:description" content="Live 2028 presidential signal tracker: status tier × momentum across 40+ potential candidates, updated daily from FEC filings and news. Trajectory, early-state activity, head-to-head compare, and money movement — defensible signals, not a rumor board.">
 <meta name="twitter:image" content="https://systembydave.com/hat-in-ring/assets/share/latest.svg">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"2028 Hat-in-Ring Radar","url":"https://systembydave.com/hat-in-ring/","description":"Live 2028 presidential signal tracker: status tier × momentum across 40+ potential candidates, updated daily from FEC filings and news. Trajectory, early-state activity, head-to-head compare, and money movement — defensible signals, not a rumor board.","publisher":{"@type":"Organization","name":"System by Dave","url":"https://systembydave.com/"}}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pinyon+Script&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
   color-scheme: light;
@@ -257,6 +260,39 @@ a:focus-visible,button:focus-visible,select:focus-visible,input:focus-visible,
   outline:2px solid var(--dem);outline-offset:2px;border-radius:6px}
 .seg button[aria-selected=true]{background:var(--ink);color:#fff}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+/* ===== Hat-in-Ring Radar scope (design graft — self-contained navy command-center; reuses the page's --dem/--rep/--lib/--ind/--t* tokens) ===== */
+.hir-radar{--navy:#0c1730;--navy-2:#0a1226;--sky:#bacaef;margin:14px 0 2px;padding:16px 18px 14px;background:radial-gradient(120% 140% at 50% -10%,#16264a 0%,var(--navy) 55%,var(--navy-2) 100%);border:1px solid #1e2f54;border-radius:16px;color:#e8eefc;box-shadow:0 10px 34px rgba(6,12,28,.45),inset 0 1px 0 rgba(255,255,255,.04)}
+.hir-radar-head{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap;margin-bottom:6px}
+.hir-script{font-family:'Pinyon Script',cursive;font-size:30px;line-height:.9;color:#fff;text-shadow:0 1px 10px rgba(120,160,255,.35)}
+.hir-sub{font-family:'Space Grotesk',system-ui,sans-serif;font-size:11.5px;letter-spacing:.04em;color:var(--sky);opacity:.82}
+.hir-legend{display:flex;gap:12px;margin-left:auto;font-family:'Space Grotesk',system-ui,sans-serif;font-size:11px;color:var(--sky)}
+.hir-legend .lm{display:inline-flex;align-items:center;gap:5px}
+.hir-legend .lm i{width:8px;height:8px;border-radius:50%;box-shadow:0 0 6px currentColor}
+.hir-ctrls{display:flex;gap:6px;align-items:center}
+.hir-radar button{font:inherit;font-size:13px;cursor:pointer;background:rgba(255,255,255,.06);color:#cfe0ff;border:1px solid #2a3c64;border-radius:8px;padding:5px 9px;line-height:1}
+.hir-radar button.on,.hir-radar button:hover{background:rgba(120,160,255,.18);border-color:#3a5286}
+.hir-scope{position:relative;width:100%;max-width:560px;margin:6px auto 0;aspect-ratio:1/1}
+.hir-radar[data-dir="briefing"] .hir-scope{max-width:340px}
+.hir-scope canvas{position:absolute;inset:0;width:100%;height:100%}
+.hir-blips{position:absolute;inset:0}
+.hir-blip{position:absolute;width:var(--bs,13px);height:var(--bs,13px);margin:calc(var(--bs,13px)/-2) 0 0 calc(var(--bs,13px)/-2);border-radius:50%;background:var(--bc,#8aa);box-shadow:0 0 8px var(--bc,#8aa),inset 0 0 0 1px rgba(255,255,255,.28);cursor:pointer;transition:transform .12s ease}
+.hir-blip:hover,.hir-blip:focus-visible{transform:scale(1.28);z-index:5;outline:none}
+.hir-blip .star{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#ffe07a;font-size:calc(var(--bs,13px)*.72);text-shadow:0 0 4px rgba(0,0,0,.6)}
+.hir-blip.ping{animation:hirping .9s ease-out}
+@keyframes hirping{0%{box-shadow:0 0 0 0 var(--bc),0 0 8px var(--bc)}100%{box-shadow:0 0 0 15px transparent,0 0 8px var(--bc)}}
+.hir-blip .hir-tip{position:absolute;left:50%;bottom:150%;transform:translateX(-50%);white-space:nowrap;background:#0a1226;border:1px solid #2a3c64;border-radius:8px;padding:6px 9px;font-family:'Space Grotesk',system-ui,sans-serif;font-size:11px;color:#e8eefc;opacity:0;pointer-events:none;transition:opacity .12s;box-shadow:0 8px 22px rgba(0,0,0,.5);z-index:6}
+.hir-blip:hover .hir-tip,.hir-blip:focus-visible .hir-tip{opacity:1}
+.hir-tip .bn{font-weight:600}.hir-tip .br{color:var(--sky);font-size:10px}
+.hir-foot{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;margin-top:10px;font-family:'Space Grotesk',system-ui,sans-serif;font-size:10.5px;color:var(--sky);opacity:.78}
+.hir-foot b{color:#fff}
+.hir-tweaks{position:fixed;right:16px;bottom:16px;z-index:60;width:236px;background:#0a1226;border:1px solid #2a3c64;border-radius:12px;padding:14px 14px 8px;color:#e8eefc;font-family:'Space Grotesk',system-ui,sans-serif;font-size:12px;box-shadow:0 16px 40px rgba(0,0,0,.5)}
+.hir-tweaks[hidden]{display:none}
+.hir-tweaks h4{margin:0 0 8px;font-family:'Pinyon Script',cursive;font-size:21px;font-weight:400;color:#fff}
+.hir-tweaks .row{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:9px 0}
+.hir-tweaks input[type=range]{width:112px}
+@media (prefers-reduced-motion: reduce){.hir-blip,.hir-blip.ping{animation:none;transition:none}}
+@media (max-width:640px){.hir-script{font-size:24px}.hir-legend{width:100%;margin:4px 0 0}.hir-tweaks{left:12px;right:12px;width:auto}}
 </style>
 </head>
 <body>
@@ -269,7 +305,7 @@ a:focus-visible,button:focus-visible,select:focus-visible,input:focus-visible,
     <div class="asof">
       As of <b id="asof">June 15, 2026</b><br>
       <span id="counter"></span><br>
-      <span class="buildstamp" title="Last automated rebuild (UTC in CI)">auto-built Jun 15 2026 08:37</span>
+      <span class="buildstamp" title="Last automated rebuild (UTC in CI)">auto-built Jun 15 2026 09:47</span>
     </div>
   </header>
 
@@ -283,6 +319,37 @@ a:focus-visible,button:focus-visible,select:focus-visible,input:focus-visible,
 
   <div class="stats" id="stats"></div>
   <div class="nudge hide" id="nudge"></div>
+
+  <!-- ===== Hat-in-Ring Radar scope (design graft) ===== -->
+  <section class="hir-radar" id="scopeHost" data-dir="command" aria-label="Candidate radar scope">
+    <div class="hir-radar-head">
+      <div>
+        <div class="hir-script">Live Scope</div>
+        <div class="hir-sub">who's stepping into the ring — and how hot</div>
+      </div>
+      <div class="hir-legend" id="hirScopeLegend"></div>
+      <div class="hir-ctrls">
+        <button type="button" class="hir-dirbtn on" data-hirdir="command" title="Command view" aria-label="Command view">◎</button>
+        <button type="button" class="hir-dirbtn" data-hirdir="briefing" title="Briefing (compact)" aria-label="Briefing view">▭</button>
+        <button type="button" id="hirTweakBtn" title="Radar tweaks" aria-label="Radar tweaks">⚙</button>
+      </div>
+    </div>
+    <div class="hir-scope" id="hirScope">
+      <canvas id="hirScopeCanvas"></canvas>
+      <div class="hir-blips" id="hirBlips"></div>
+    </div>
+    <div class="hir-foot">
+      <span><b>Centre</b> = high momentum</span>
+      <span><b>Angle</b> = party lane</span>
+      <span><b>Dot size</b> = confidence · <b>★</b> = poll leader</span>
+    </div>
+  </section>
+  <div class="hir-tweaks" id="hirTweaks" hidden>
+    <h4>Radar Tweaks</h4>
+    <div class="row"><label for="hirRadarOn">Radar sweep</label><button type="button" id="hirRadarOn" class="on">On</button></div>
+    <div class="row"><label for="hirSpeed">Sweep speed</label><input type="range" id="hirSpeed" min="2" max="12" step="1" value="6"></div>
+    <div class="row"><label for="hirDirSel">Layout</label><button type="button" id="hirDirSel">Command</button></div>
+  </div>
 
   <div class="toolbar">
     <div class="grow"><input type="search" id="q" list="qhints" placeholder="Search name or role…" autocomplete="off"><datalist id="qhints"></datalist></div>
@@ -778,7 +845,7 @@ function renderCmpTray(){
   el.innerHTML=`<span>Compare:</span>${names.map(n=>`<span class="cchip">${esc(n.name)}<span class="x" data-cmpx="${n.id}" role="button" tabindex="0" title="Remove">×</span></span>`).join('')}<button class="btn" id="openCompare" style="background:#fff">Compare ${names.length}</button><button class="btn" id="clearCompare" style="background:transparent;color:#fff;border-color:rgba(255,255,255,.4)">Clear</button>`;
   el.classList.remove('hide');
 }
-function renderAll(){renderStats();renderQuick();renderBoard();renderCards();renderReview();renderFeed();renderLegend();renderBriefing();renderTrajectory();renderEarlyStates();renderCompare();renderCmpTray();renderStateFilter();syncControls();}
+function renderAll(){renderStats();renderQuick();renderBoard();renderCards();renderReview();renderFeed();renderLegend();renderBriefing();renderTrajectory();renderEarlyStates();renderCompare();renderCmpTray();renderStateFilter();syncControls();if(window.__hirRadar)window.__hirRadar.plot();}
 
 /* ---------- drawer ---------- */
 function openDrawer(id){
@@ -975,7 +1042,7 @@ function init(){
   $('#scrim').addEventListener('click',closeDrawer);
   document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDrawer();});
 
-  $('#foot').innerHTML=`Manually-maintained tracker — data seeded from public reporting (AP, Reuters, Time, WaPo, ABC, C-SPAN, FEC) as of June 15, 2026 (auto-generated Jun 15 2026 08:37). Edits/additions save to this browser only; use <b>Export</b> to back up or port to Notion. <b>Status tier</b> = furthest verifiable step taken; <b>momentum</b> = weighted activity + recency, capped 0–100. Not a live FEC/news feed — see chat notes for wiring options. · <span class="resetlink" id="resetPrefs">Reset view</span>`;
+  $('#foot').innerHTML=`Manually-maintained tracker — data seeded from public reporting (AP, Reuters, Time, WaPo, ABC, C-SPAN, FEC) as of June 15, 2026 (auto-generated Jun 15 2026 09:47). Edits/additions save to this browser only; use <b>Export</b> to back up or port to Notion. <b>Status tier</b> = furthest verifiable step taken; <b>momentum</b> = weighted activity + recency, capped 0–100. Not a live FEC/news feed — see chat notes for wiring options. · <span class="resetlink" id="resetPrefs">Reset view</span>`;
   // drawer swipe-to-dismiss (touch): light resistance + snap on release
   (function(){var d=$('#drawer'),x0=null;
     d.addEventListener('touchstart',function(ev){x0=ev.touches[0].clientX;d.style.transition='none';},{passive:true});
@@ -984,8 +1051,125 @@ function init(){
   })();
   if(COMPARE.length) PREFS.view='compare';         // arrived via a #compare= deep link
   renderAll(); renderNudge(); renderHints();
+  if(window.__hirRadar)window.__hirRadar.boot();   // mount + start the radar scope (no-op headless)
   UX.lastSeenVer=GENERATED_AT; saveUX();          // mark this build as seen
 }
+
+/* ===== Hat-in-Ring Radar scope (design graft) — self-contained & headless-safe.
+   Reads the live filtered()/records() + PARTYC/TIERS/CONF/esc globals; blips carry
+   data-id so the existing delegated click handler opens the candidate drawer. ===== */
+(function(){
+  var PARTY_ANGLE={Democrat:205,Republican:-25,Libertarian:70,Independent:140};   // degrees
+  var RADAR={on:true,beam:0,period:6000,last:0,raf:0};
+  var EL,CV,CTX,BLIPS,PLOT=[],SW=0,SH=0,built=false;
+  function q(s){return document.querySelector(s);}
+  function build(){
+    if(built)return;
+    EL=q('#scopeHost'); CV=q('#hirScopeCanvas'); BLIPS=q('#hirBlips');
+    if(!CV||typeof CV.getContext!=='function'||!BLIPS)return;   // headless / no-canvas: stay un-built
+    CTX=CV.getContext('2d'); built=true;
+    var leg=q('#hirScopeLegend');
+    if(leg)leg.innerHTML=['Democrat','Republican','Libertarian','Independent'].map(function(p){
+      return '<span class="lm" style="color:'+(PARTYC[p]||'var(--other)')+'"><i style="background:'+(PARTYC[p]||'var(--other)')+'"></i>'+p.slice(0,3)+'</span>';}).join('');
+    fit();
+  }
+  function fit(){
+    if(!CV||!CTX)return;
+    var box=CV.parentElement; if(!box)return;
+    var w=box.clientWidth,h=box.clientHeight; if(!w||!h)return;
+    var dpr=Math.min(window.devicePixelRatio||1,2);
+    CV.width=Math.round(w*dpr); CV.height=Math.round(h*dpr);
+    CTX.setTransform(dpr,0,0,dpr,0,0); SW=w; SH=h;
+  }
+  function geom(){return {cx:SW/2,cy:SH/2,maxR:Math.min(SW,SH)/2*0.9};}
+  function plot(){
+    if(!built||!BLIPS)return;
+    fit();
+    var data=(typeof filtered==='function'?filtered():[]).filter(function(x){return x.tier>0;});
+    var byParty={}; data.forEach(function(x){(byParty[x.party]=byParty[x.party]||[]).push(x);});
+    var g=geom(); PLOT=[];
+    Object.keys(byParty).forEach(function(party){
+      var list=byParty[party].sort(function(a,b){return b.score-a.score;});
+      var base=(PARTY_ANGLE[party]!=null?PARTY_ANGLE[party]:90)*Math.PI/180, span=70*Math.PI/180;
+      list.forEach(function(x,i){
+        var t=list.length>1?(i/(list.length-1)-0.5):0, ang=base+t*span;
+        var rr=g.maxR*(0.13+0.87*(1-x.score/100));
+        PLOT.push({x:x,ang:((ang%(2*Math.PI))+2*Math.PI)%(2*Math.PI),px:g.cx+Math.cos(ang)*rr,py:g.cy+Math.sin(ang)*rr});
+      });
+    });
+    BLIPS.innerHTML=PLOT.map(function(p){
+      var x=p.x, sz=12+((CONF[x.conf]||0)*2.2);
+      var lbl=x.statusLabel||(TIERS[x.tier]&&TIERS[x.tier].label)||'', col=(TIERS[x.tier]&&TIERS[x.tier].c)||'#fff';
+      return '<div class="hir-blip'+(x.pollLead?' lead':'')+'" data-id="'+x.id+'" data-blip="'+x.id+'" tabindex="0" role="button" aria-label="'+esc(x.name)+'"'
+        +' style="left:'+(p.px/SW*100).toFixed(2)+'%;top:'+(p.py/SH*100).toFixed(2)+'%;--bc:'+(PARTYC[x.party]||'var(--other)')+';--bs:'+sz.toFixed(0)+'px">'
+        +(x.pollLead?'<span class="star">★</span>':'')
+        +'<div class="hir-tip"><div class="bn">'+esc(x.name)+'</div><div class="br">'+esc(lbl)+' · '+esc(x.party)+'</div><div>Momentum <b style="color:'+col+'">'+x.score+'</b></div></div>'
+        +'</div>';
+    }).join('');
+    draw();
+  }
+  function draw(){
+    if(!CTX||!SW)return;
+    var g=geom(), ctx=CTX, sky='rgba(186,202,239,';
+    ctx.clearRect(0,0,SW,SH); ctx.lineWidth=1;
+    for(var i=1;i<=4;i++){ctx.beginPath();ctx.arc(g.cx,g.cy,g.maxR*i/4,0,2*Math.PI);ctx.strokeStyle=sky+(i===4?0.22:0.13)+')';ctx.stroke();}
+    for(var a=0;a<360;a+=30){var r=a*Math.PI/180;ctx.beginPath();ctx.moveTo(g.cx,g.cy);ctx.lineTo(g.cx+Math.cos(r)*g.maxR,g.cy+Math.sin(r)*g.maxR);ctx.strokeStyle=sky+'0.07)';ctx.stroke();}
+    ctx.beginPath();ctx.arc(g.cx,g.cy,3,0,2*Math.PI);ctx.fillStyle='rgba(206,32,41,.9)';ctx.fill();
+    if(RADAR.on){
+      var b=RADAR.beam, grad=ctx.createConicGradient?ctx.createConicGradient(b,g.cx,g.cy):null;
+      ctx.save();ctx.beginPath();ctx.moveTo(g.cx,g.cy);ctx.arc(g.cx,g.cy,g.maxR,b-0.5,b);ctx.closePath();
+      if(grad){grad.addColorStop(0,'rgba(206,32,41,0)');grad.addColorStop(0.92,'rgba(206,32,41,0)');grad.addColorStop(1,'rgba(206,32,41,.30)');ctx.fillStyle=grad;}
+      else ctx.fillStyle='rgba(206,32,41,.18)';
+      ctx.fill();
+      ctx.beginPath();ctx.moveTo(g.cx,g.cy);ctx.lineTo(g.cx+Math.cos(b)*g.maxR,g.cy+Math.sin(b)*g.maxR);ctx.strokeStyle='rgba(255,70,66,.85)';ctx.lineWidth=1.5;ctx.stroke();
+      ctx.restore();
+    }
+  }
+  function frame(ts){
+    if(!RADAR.on)return;
+    if(!RADAR.last)RADAR.last=ts;
+    var dt=ts-RADAR.last; RADAR.last=ts;
+    RADAR.beam=(RADAR.beam+(2*Math.PI)*(dt/RADAR.period))%(2*Math.PI);
+    draw();
+    var beam=RADAR.beam;
+    PLOT.forEach(function(p){
+      var d=Math.abs(((p.ang-beam+Math.PI)%(2*Math.PI))-Math.PI);
+      var el=BLIPS&&BLIPS.querySelector('[data-blip="'+p.x.id+'"]'); if(!el)return;
+      if(d<0.10){if(!el._pinged){el.classList.add('ping');el._pinged=1;}}
+      else if(el._pinged&&d>0.18){el.classList.remove('ping');el._pinged=0;}
+    });
+    RADAR.raf=requestAnimationFrame(frame);
+  }
+  function start(){
+    if(typeof requestAnimationFrame!=='function'){try{draw();}catch(e){}return;}
+    if(typeof cancelAnimationFrame==='function')cancelAnimationFrame(RADAR.raf);
+    RADAR.last=0;
+    var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if(RADAR.on&&!reduce)RADAR.raf=requestAnimationFrame(frame); else draw();
+  }
+  function setRadar(on){RADAR.on=on;if(EL)EL.classList.toggle('radar-off',!on);start();}
+  function setDir(dir){
+    if(EL)EL.setAttribute('data-dir',dir);
+    var dd=document.querySelectorAll('.hir-dirbtn');
+    for(var i=0;i<dd.length;i++)dd[i].classList.toggle('on',dd[i].getAttribute('data-hirdir')===dir);
+    var ds=q('#hirDirSel'); if(ds)ds.textContent=dir.charAt(0).toUpperCase()+dir.slice(1);
+    fit(); plot();
+  }
+  function boot(){
+    build();
+    if(!built)return;
+    var dd=document.querySelectorAll('.hir-dirbtn');
+    for(var i=0;i<dd.length;i++)(function(btn){btn.addEventListener('click',function(){setDir(btn.getAttribute('data-hirdir'));});})(dd[i]);
+    var tb=q('#hirTweakBtn'),tw=q('#hirTweaks');
+    if(tb&&tw)tb.addEventListener('click',function(){tw.hidden=!tw.hidden;});
+    var ro=q('#hirRadarOn'); if(ro)ro.addEventListener('click',function(){var on=!RADAR.on;setRadar(on);ro.textContent=on?'On':'Off';ro.classList.toggle('on',on);});
+    var sp=q('#hirSpeed'); if(sp)sp.addEventListener('input',function(e){RADAR.period=(13-(+e.target.value))*1000;if(RADAR.on)start();});
+    var ds=q('#hirDirSel'); if(ds)ds.addEventListener('click',function(){setDir(EL.getAttribute('data-dir')==='command'?'briefing':'command');});
+    var rt=null; window.addEventListener('resize',function(){clearTimeout(rt);rt=setTimeout(function(){fit();plot();},120);});
+    plot(); start();
+  }
+  window.__hirRadar={boot:boot,plot:plot,build:build,start:start,setRadar:setRadar};
+})();
 init();
 </script>
 </body>
