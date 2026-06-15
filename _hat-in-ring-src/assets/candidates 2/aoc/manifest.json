@@ -1,0 +1,52 @@
+[
+  {
+    "file": "assets/candidates/aoc/01_alexandria_ocasio_cortez_official_portrait_jpg.jpg",
+    "source": "Alexandria_Ocasio-Cortez_Official_Portrait.jpg",
+    "license": "(Wikipedia lead)",
+    "artist": "",
+    "width": 800,
+    "height": 1000,
+    "descriptionurl": "https://en.wikipedia.org/wiki/Alexandria%20Ocasio-Cortez",
+    "bytes": 145183
+  },
+  {
+    "file": "assets/candidates/aoc/02_alexandria_ocasio_cortez_official_portrait_1_jpg.jpg",
+    "source": "Alexandria Ocasio-Cortez Official Portrait (1).jpg",
+    "license": "Public domain",
+    "artist": "Franmarie Metzler; U.S. House Office of Photography",
+    "width": 800,
+    "height": 1067,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:Alexandria_Ocasio-Cortez_Official_Portrait_(1).jpg",
+    "bytes": 170473
+  },
+  {
+    "file": "assets/candidates/aoc/03_alexandria_ocasio_cortez_official_portrait_cropped.jpg",
+    "source": "Alexandria Ocasio-Cortez Official Portrait (cropped 2).jpg",
+    "license": "Public domain",
+    "artist": "Franmarie Metzler; U.S. House Office of Photography",
+    "width": 800,
+    "height": 1067,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:Alexandria_Ocasio-Cortez_Official_Portrait_(cropped_2).jpg",
+    "bytes": 179351
+  },
+  {
+    "file": "assets/candidates/aoc/04_alexandria_ocasio_cortez_official_portrait_jpg.jpg",
+    "source": "Alexandria Ocasio-Cortez Official Portrait.jpg",
+    "license": "Public domain",
+    "artist": "Franmarie Metzler; U.S. House Office of Photography",
+    "width": 800,
+    "height": 1000,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:Alexandria_Ocasio-Cortez_Official_Portrait.jpg",
+    "bytes": 145183
+  },
+  {
+    "file": "assets/candidates/aoc/05_alexandria_ocasio_cortez_official_portrait_cropped.jpg",
+    "source": "Alexandria Ocasio-Cortez Official Portrait (cropped)2.jpg",
+    "license": "Public domain",
+    "artist": "Franmarie Metzler; U.S. House Office of Photography",
+    "width": 800,
+    "height": 1000,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:Alexandria_Ocasio-Cortez_Official_Portrait_(cropped)2.jpg",
+    "bytes": 154248
+  }
+]

@@ -1,0 +1,5 @@
+requests>=2.31
+feedparser>=6.0
+PyYAML>=6.0
+Jinja2>=3.0
+pytest>=7.0          # tests only

@@ -1,0 +1,52 @@
+[
+  {
+    "file": "assets/candidates/harris/01_kamala_harris_vice_presidential_portrait_jpg.jpg",
+    "source": "Kamala_Harris_Vice_Presidential_Portrait.jpg",
+    "license": "(Wikipedia lead)",
+    "artist": "",
+    "width": 800,
+    "height": 1000,
+    "descriptionurl": "https://en.wikipedia.org/wiki/Kamala%20Harris",
+    "bytes": 155014
+  },
+  {
+    "file": "assets/candidates/harris/02_kamala_harris_official_photo_jpg.jpg",
+    "source": "Kamala Harris official photo.jpg",
+    "license": "Public domain",
+    "artist": "Office of Senator Kamala Harris",
+    "width": 800,
+    "height": 1200,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:Kamala_Harris_official_photo.jpg",
+    "bytes": 153919
+  },
+  {
+    "file": "assets/candidates/harris/03_kamala_harris_vice_presidential_portrait_jpg.jpg",
+    "source": "Kamala Harris Vice Presidential Portrait.jpg",
+    "license": "Public domain",
+    "artist": "Lawrence Jackson",
+    "width": 800,
+    "height": 1000,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:Kamala_Harris_Vice_Presidential_Portrait.jpg",
+    "bytes": 155014
+  },
+  {
+    "file": "assets/candidates/harris/04_kamala_harris_and_the_oxford_kamalas_jpg.jpg",
+    "source": "Kamala Harris and the Oxford Kamalas.jpg",
+    "license": "Public domain",
+    "artist": "Kamala Harris",
+    "width": 800,
+    "height": 450,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:Kamala_Harris_and_the_Oxford_Kamalas.jpg",
+    "bytes": 172315
+  },
+  {
+    "file": "assets/candidates/harris/05_kamala_harris_swearing_in_antony_blinken_jpg.jpg",
+    "source": "Kamala Harris swearing in Antony Blinken.jpg",
+    "license": "Public domain",
+    "artist": "The White House",
+    "width": 800,
+    "height": 450,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:Kamala_Harris_swearing_in_Antony_Blinken.jpg",
+    "bytes": 172504
+  }
+]

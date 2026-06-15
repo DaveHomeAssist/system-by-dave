@@ -1,0 +1,52 @@
+[
+  {
+    "file": "assets/candidates/gallego/01_senator_ruben_gallego_official_portrait_jpg.jpg",
+    "source": "Senator_Ruben_Gallego_Official_Portrait.jpg",
+    "license": "Wikipedia lead",
+    "artist": "",
+    "width": 800,
+    "height": 1000,
+    "descriptionurl": "https://en.wikipedia.org/wiki/Ruben%20Gallego",
+    "bytes": 207948
+  },
+  {
+    "file": "assets/candidates/gallego/02_ruben_gallego_jpg.jpg",
+    "source": "Ruben Gallego.jpg",
+    "license": "Public domain",
+    "artist": "US Congress",
+    "width": 800,
+    "height": 1200,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:Ruben_Gallego.jpg",
+    "bytes": 186388
+  },
+  {
+    "file": "assets/candidates/gallego/03_ruben_gallego_2013_jpg.jpg",
+    "source": "Ruben Gallego 2013.jpg",
+    "license": "CC BY-SA 2.0",
+    "artist": "Gage Skidmore",
+    "width": 800,
+    "height": 1200,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:Ruben_Gallego_2013.jpg",
+    "bytes": 232106
+  },
+  {
+    "file": "assets/candidates/gallego/04_ruben_gallego_official_portrait_jpg.jpg",
+    "source": "Ruben Gallego official portrait.jpg",
+    "license": "Public domain",
+    "artist": "House Creative Committee",
+    "width": 800,
+    "height": 1000,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:Ruben_Gallego_official_portrait.jpg",
+    "bytes": 190664
+  },
+  {
+    "file": "assets/candidates/gallego/05_ruben_gallego_official_photo_jpg.jpg",
+    "source": "Ruben Gallego official photo.jpg",
+    "license": "Public domain",
+    "artist": "US House Office of Photography",
+    "width": 800,
+    "height": 800,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:Ruben_Gallego_official_photo.jpg",
+    "bytes": 160400
+  }
+]

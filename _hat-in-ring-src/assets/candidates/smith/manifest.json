@@ -1,0 +1,52 @@
+[
+  {
+    "file": "assets/candidates/smith/01_stephen_a_smith_in_january_2023_3x4_cropped_c_jpg.jpg",
+    "source": "Stephen_A._Smith_in_January_2023_(3x4_cropped_c).jpg",
+    "license": "Wikipedia lead",
+    "artist": "",
+    "width": 800,
+    "height": 1067,
+    "descriptionurl": "https://en.wikipedia.org/wiki/Stephen%20A.%20Smith",
+    "bytes": 279585
+  },
+  {
+    "file": "assets/candidates/smith/02_first_take_salute_the_troops_broadcast_cropped2_jp.jpg",
+    "source": "First Take Salute the Troops broadcast (cropped2).jpg",
+    "license": "Public domain",
+    "artist": "US Air Force from USA Tech. Sgt. Carl Clegg/108th Wing",
+    "width": 800,
+    "height": 1185,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:First_Take_Salute_the_Troops_broadcast_(cropped2).jpg",
+    "bytes": 232240
+  },
+  {
+    "file": "assets/candidates/smith/03_diversity1_jpg.jpg",
+    "source": "Diversity1.jpg",
+    "license": "Public domain",
+    "artist": "Iusportscenter",
+    "width": 800,
+    "height": 879,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:Diversity1.jpg",
+    "bytes": 245681
+  },
+  {
+    "file": "assets/candidates/smith/04_diversity2_jpg.jpg",
+    "source": "Diversity2.jpg",
+    "license": "Public domain",
+    "artist": "Iusportscenter",
+    "width": 695,
+    "height": 764,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:Diversity2.jpg",
+    "bytes": 221826
+  },
+  {
+    "file": "assets/candidates/smith/05_cari_champion_on_first_take_at_joint_base_mcguire_.jpg",
+    "source": "Cari Champion on 'First Take' at Joint Base McGuire-Dix-Lakehurst.jpg",
+    "license": "Public domain",
+    "artist": "Tech. Sgt. Carl Clegg",
+    "width": 449,
+    "height": 603,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:Cari_Champion_on_%27First_Take%27_at_Joint_Base_McGuire-Dix-Lakehurst.jpg",
+    "bytes": 201774
+  }
+]

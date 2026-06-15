@@ -1,0 +1,52 @@
+[
+  {
+    "file": "assets/candidates/flynn/01_michael_t_flynn_jpg.jpg",
+    "source": "Michael_T_Flynn.jpg",
+    "license": "Wikipedia lead",
+    "artist": "",
+    "width": 800,
+    "height": 1000,
+    "descriptionurl": "https://en.wikipedia.org/wiki/Michael%20Flynn",
+    "bytes": 200888
+  },
+  {
+    "file": "assets/candidates/flynn/02_michael_flynn_029_jpg.jpg",
+    "source": "Michael Flynn 029.jpg",
+    "license": "CC BY-SA 4.0",
+    "artist": "WS “Bob” and Gladys Flynn",
+    "width": 800,
+    "height": 1173,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:Michael_Flynn_029.jpg",
+    "bytes": 205133
+  },
+  {
+    "file": "assets/candidates/flynn/03_michael_flynn_024_jpg.jpg",
+    "source": "Michael Flynn 024.jpg",
+    "license": "CC BY-SA 4.0",
+    "artist": "WS “Bob” and Gladys Flynn",
+    "width": 800,
+    "height": 1106,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:Michael_Flynn_024.jpg",
+    "bytes": 177649
+  },
+  {
+    "file": "assets/candidates/flynn/04_michael_flynn_in_1977_jpg.jpg",
+    "source": "Michael Flynn in 1977.jpg",
+    "license": "Public domain",
+    "artist": "The Providence Journal",
+    "width": 800,
+    "height": 1068,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:Michael_Flynn_in_1977.jpg",
+    "bytes": 171750
+  },
+  {
+    "file": "assets/candidates/flynn/05_michael_flynn_027_jpg.jpg",
+    "source": "Michael Flynn 027.jpg",
+    "license": "CC BY-SA 4.0",
+    "artist": "WS “Bob” and Gladys Flynn",
+    "width": 800,
+    "height": 1025,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:Michael_Flynn_027.jpg",
+    "bytes": 159718
+  }
+]

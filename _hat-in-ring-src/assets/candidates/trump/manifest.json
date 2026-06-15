@@ -1,0 +1,52 @@
+[
+  {
+    "file": "assets/candidates/trump/01_official_presidential_portrait_of_president_donald.jpg",
+    "source": "Official_Presidential_Portrait_of_President_Donald_J._Trump_(2025)_(cropped)(2).jpg",
+    "license": "Wikipedia lead",
+    "artist": "",
+    "width": 800,
+    "height": 1028,
+    "descriptionurl": "https://en.wikipedia.org/wiki/Donald%20Trump",
+    "bytes": 167846
+  },
+  {
+    "file": "assets/candidates/trump/02_buck_sexton_with_president_donald_j_trump_in_the_o.jpg",
+    "source": "Buck Sexton with President Donald J. Trump in the Oval Office of the White House by Shealah Craighead Washington DC May 2020.jpg",
+    "license": "Public domain",
+    "artist": "Official White House Photo by Shealah Craighead",
+    "width": 800,
+    "height": 1234,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:Buck_Sexton_with_President_Donald_J._Trump_in_the_Oval_Office_of_the_White_House_by_Shealah_Craighead_Washington_DC_May_2020.jpg",
+    "bytes": 306483
+  },
+  {
+    "file": "assets/candidates/trump/03_official_portrait_of_president_donald_trump_2nd_cr.jpg",
+    "source": "Official Portrait of President Donald Trump (2nd cropped).jpg",
+    "license": "Public domain",
+    "artist": "Shealeah Craighead",
+    "width": 800,
+    "height": 1111,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:Official_Portrait_of_President_Donald_Trump_(2nd_cropped).jpg",
+    "bytes": 314513
+  },
+  {
+    "file": "assets/candidates/trump/04_donald_trump_official_portrait_cropped_jpg.jpg",
+    "source": "Donald Trump official portrait (cropped).jpg",
+    "license": "Public domain",
+    "artist": "Shealeah Craighead",
+    "width": 800,
+    "height": 1103,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:Donald_Trump_official_portrait_(cropped).jpg",
+    "bytes": 373654
+  },
+  {
+    "file": "assets/candidates/trump/05_january_2025_official_presidential_portrait_of_don.jpg",
+    "source": "January 2025 Official Presidential Portrait of Donald J. Trump.jpg",
+    "license": "Public domain",
+    "artist": "Daniel Torok",
+    "width": 800,
+    "height": 1035,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:January_2025_Official_Presidential_Portrait_of_Donald_J._Trump.jpg",
+    "bytes": 287415
+  }
+]

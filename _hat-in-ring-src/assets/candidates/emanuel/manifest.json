@@ -1,0 +1,52 @@
+[
+  {
+    "file": "assets/candidates/emanuel/01_ambassador_emanuel_portrait_jpg.jpg",
+    "source": "Ambassador-emanuel-portrait.jpg",
+    "license": "Wikipedia lead",
+    "artist": "",
+    "width": 800,
+    "height": 1012,
+    "descriptionurl": "https://en.wikipedia.org/wiki/Rahm%20Emanuel",
+    "bytes": 406646
+  },
+  {
+    "file": "assets/candidates/emanuel/02_rahm_emanuel_at_higashi_ginza_station_2024_02_14_3.jpg",
+    "source": "Rahm Emanuel at Higashi-Ginza Station 2024-02-14 3.jpg",
+    "license": "Public domain",
+    "artist": "Embassy of the United States in Tokyo",
+    "width": 800,
+    "height": 1200,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:Rahm_Emanuel_at_Higashi-Ginza_Station_2024-02-14_3.jpg",
+    "bytes": 242805
+  },
+  {
+    "file": "assets/candidates/emanuel/03_rahm_emanuel_2016_jpg.jpg",
+    "source": "Rahm Emanuel 2016.jpg",
+    "license": "Public domain",
+    "artist": "Official White House Photo by Pete Souza",
+    "width": 596,
+    "height": 682,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:Rahm_Emanuel_2016.jpg",
+    "bytes": 39643
+  },
+  {
+    "file": "assets/candidates/emanuel/04_rahm_emanuel_2003_jpg.jpg",
+    "source": "Rahm Emanuel 2003.jpg",
+    "license": "Public domain",
+    "artist": "U.S. House of Representatives",
+    "width": 512,
+    "height": 768,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:Rahm_Emanuel_2003.jpg",
+    "bytes": 405639
+  },
+  {
+    "file": "assets/candidates/emanuel/05_rahm_emanuel_hankyu_very_much_tweet_may_2022_png.png",
+    "source": "Rahm Emanuel Hankyu Very Much tweet May 2022.png",
+    "license": "Public domain",
+    "artist": "United States Embassy in Japan",
+    "width": 800,
+    "height": 785,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:Rahm_Emanuel_Hankyu_Very_Much_tweet_May_2022.png",
+    "bytes": 966549
+  }
+]

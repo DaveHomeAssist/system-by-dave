@@ -1,0 +1,52 @@
+[
+  {
+    "file": "assets/candidates/desantis/01_ron_desantis_official_photo_jpg.jpg",
+    "source": "Ron_DeSantis_official_photo.jpg",
+    "license": "Wikipedia lead",
+    "artist": "",
+    "width": 800,
+    "height": 999,
+    "descriptionurl": "https://en.wikipedia.org/wiki/Ron%20DeSantis",
+    "bytes": 264876
+  },
+  {
+    "file": "assets/candidates/desantis/02_ron_desantis_2020_cropped_jpg.jpg",
+    "source": "Ron DeSantis 2020 (cropped).jpg",
+    "license": "CC BY 2.0",
+    "artist": "U.S. Secretary of Defense",
+    "width": 948,
+    "height": 1377,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:Ron_DeSantis_2020_(cropped).jpg",
+    "bytes": 947107
+  },
+  {
+    "file": "assets/candidates/desantis/03_ron_desantis_crop_jpg.jpg",
+    "source": "Ron DeSantis-crop.jpg",
+    "license": "CC BY-SA 2.0",
+    "artist": "Gage Skidmore from Surprise, AZ, United States of America",
+    "width": 919,
+    "height": 1284,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:Ron_DeSantis-crop.jpg",
+    "bytes": 455301
+  },
+  {
+    "file": "assets/candidates/desantis/04_ron_desantis_official_portrait_113th_congress_jpg.jpg",
+    "source": "Ron DeSantis, Official Portrait, 113th Congress.jpg",
+    "license": "Public domain",
+    "artist": "Federal Government of the United States",
+    "width": 800,
+    "height": 1202,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:Ron_DeSantis,_Official_Portrait,_113th_Congress.jpg",
+    "bytes": 205805
+  },
+  {
+    "file": "assets/candidates/desantis/05_gov_ron_desantis_official_2_x2_jpg.jpg",
+    "source": "Gov-Ron-DeSantis-Official-2-X2.jpg",
+    "license": "Public domain",
+    "artist": "Government of Florida",
+    "width": 800,
+    "height": 1200,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:Gov-Ron-DeSantis-Official-2-X2.jpg",
+    "bytes": 302372
+  }
+]

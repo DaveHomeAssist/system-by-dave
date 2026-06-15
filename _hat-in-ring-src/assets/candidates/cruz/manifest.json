@@ -1,0 +1,52 @@
+[
+  {
+    "file": "assets/candidates/cruz/01_ted_cruz_official_116th_portrait_3x4_cropped_jpg.jpg",
+    "source": "Ted_Cruz_official_116th_portrait_(3x4_cropped).jpg",
+    "license": "Wikipedia lead",
+    "artist": "",
+    "width": 800,
+    "height": 1069,
+    "descriptionurl": "https://en.wikipedia.org/wiki/Ted%20Cruz",
+    "bytes": 227025
+  },
+  {
+    "file": "assets/candidates/cruz/02_ted_cruz_february_2015_jpg.jpg",
+    "source": "Ted Cruz February 2015.jpg",
+    "license": "CC BY-SA 4.0",
+    "artist": "Michael Vadon",
+    "width": 800,
+    "height": 1067,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:Ted_Cruz_February_2015.jpg",
+    "bytes": 264115
+  },
+  {
+    "file": "assets/candidates/cruz/03_ted_cruz_official_116th_portrait_cropped_jpg.jpg",
+    "source": "Ted Cruz official 116th portrait (cropped).jpg",
+    "license": "Public domain",
+    "artist": "U.S. Senate Photographic Studio",
+    "width": 800,
+    "height": 1067,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:Ted_Cruz_official_116th_portrait_(cropped).jpg",
+    "bytes": 291773
+  },
+  {
+    "file": "assets/candidates/cruz/04_senator_ted_cruz_alternate_portrait_116th_congress.jpg",
+    "source": "Senator Ted Cruz, alternate portrait, 116th Congress.jpg",
+    "license": "Public domain",
+    "artist": "United States Senate Photographic Studio",
+    "width": 800,
+    "height": 1013,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:Senator_Ted_Cruz,_alternate_portrait,_116th_Congress.jpg",
+    "bytes": 186473
+  },
+  {
+    "file": "assets/candidates/cruz/05_ted_cruz_official_116th_portrait_jpg.jpg",
+    "source": "Ted Cruz official 116th portrait.jpg",
+    "license": "Public domain",
+    "artist": "U.S. Senate Photographic Studio",
+    "width": 800,
+    "height": 1013,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:Ted_Cruz_official_116th_portrait.jpg",
+    "bytes": 145452
+  }
+]

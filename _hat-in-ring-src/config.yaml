@@ -1,0 +1,39 @@
+# Hat-in-Ring Radar — ingest configuration
+cycle: 2028
+news_throttle: 1.0          # seconds between RSS queries (be polite to Google News)
+
+# Broad discovery queries — catch names not yet on the watchlist.
+# Anything matched here with no known person lands in data/review_queue.json.
+broad_queries:
+  - '2028 presidential "considering" OR "exploratory committee"'
+  - '2028 president "not ruling out" OR "thinking about it"'
+  - '2028 presidential candidate "files statement of candidacy"'
+  - 'Democrat 2028 president "would consider" OR "weighing a run"'
+  - 'Republican 2028 president "considering" OR "exploring"'
+
+# Watchlist drives per-person news queries and FEC matching.
+#   id       : must match the dataset record id (data/seed.json)
+#   aliases  : strings to look for in headlines (first is the query term)
+#   fec_ids  : FEC candidate ids, once a person files (enables exact matching)
+# Records in the dataset but absent here are auto-watched by full name.
+watchlist:
+  - {id: newsom,    name: Gavin Newsom,            aliases: ["Gavin Newsom", "Newsom"]}
+  - {id: harris,    name: Kamala Harris,           aliases: ["Kamala Harris", "Harris"]}
+  - {id: booker,    name: Cory Booker,             aliases: ["Cory Booker", "Booker"]}
+  - {id: buttigieg, name: Pete Buttigieg,          aliases: ["Pete Buttigieg", "Buttigieg"]}
+  - {id: beshear,   name: Andy Beshear,            aliases: ["Andy Beshear", "Beshear"]}
+  - {id: pritzker,  name: J.B. Pritzker,           aliases: ["JB Pritzker", "Pritzker"]}
+  - {id: shapiro,   name: Josh Shapiro,            aliases: ["Josh Shapiro", "Shapiro"]}
+  - {id: whitmer,   name: Gretchen Whitmer,        aliases: ["Gretchen Whitmer", "Whitmer"]}
+  - {id: aoc,       name: Alexandria Ocasio-Cortez, aliases: ["Ocasio-Cortez", "AOC"]}
+  - {id: khanna,    name: Ro Khanna,               aliases: ["Ro Khanna", "Khanna"]}
+  - {id: gallego,   name: Ruben Gallego,           aliases: ["Ruben Gallego", "Gallego"]}
+  - {id: kelly,     name: Mark Kelly,              aliases: ["Mark Kelly"]}
+  - {id: slotkin,   name: Elissa Slotkin,          aliases: ["Elissa Slotkin", "Slotkin"]}
+  - {id: vance,     name: J.D. Vance,              aliases: ["JD Vance", "Vance"]}
+  - {id: rubio,     name: Marco Rubio,             aliases: ["Marco Rubio", "Rubio"]}
+  - {id: desantis,  name: Ron DeSantis,            aliases: ["Ron DeSantis", "DeSantis"]}
+  - {id: cruz,      name: Ted Cruz,                aliases: ["Ted Cruz"]}
+  - {id: paul,      name: Rand Paul,               aliases: ["Rand Paul"]}
+  - {id: gabbard,   name: Tulsi Gabbard,           aliases: ["Tulsi Gabbard", "Gabbard"]}
+  - {id: moore,     name: Wes Moore,               aliases: ["Wes Moore"]}

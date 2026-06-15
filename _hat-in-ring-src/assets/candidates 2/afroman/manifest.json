@@ -1,0 +1,52 @@
+[
+  {
+    "file": "assets/candidates/afroman/01_afroman_2026_cropped_jpg.jpg",
+    "source": "Afroman_2026_(cropped).jpg",
+    "license": "(Wikipedia lead)",
+    "artist": "",
+    "width": 573,
+    "height": 764,
+    "descriptionurl": "https://en.wikipedia.org/wiki/Afroman",
+    "bytes": 128253
+  },
+  {
+    "file": "assets/candidates/afroman/02_afroman_smoking_jpg.jpg",
+    "source": "Afroman smoking.jpg",
+    "license": "CC BY-SA 2.0",
+    "artist": "Chris Gilmore",
+    "width": 800,
+    "height": 1170,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:Afroman_smoking.jpg",
+    "bytes": 348558
+  },
+  {
+    "file": "assets/candidates/afroman/03_afroman_gainesville_2011_1_cropped_jpg.jpg",
+    "source": "Afroman @ Gainesville 2011 (1) (cropped).jpg",
+    "license": "CC BY-SA 2.0",
+    "artist": "Chris Gilmore",
+    "width": 783,
+    "height": 1044,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:Afroman_@_Gainesville_2011_(1)_(cropped).jpg",
+    "bytes": 370335
+  },
+  {
+    "file": "assets/candidates/afroman/04_afroman_gainesville_2011_3_cropped_cropped_jpg.jpg",
+    "source": "Afroman @ Gainesville 2011 (3) (cropped) (cropped).jpg",
+    "license": "CC BY-SA 2.0",
+    "artist": "Chris Gilmore",
+    "width": 800,
+    "height": 955,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:Afroman_@_Gainesville_2011_(3)_(cropped)_(cropped).jpg",
+    "bytes": 245142
+  },
+  {
+    "file": "assets/candidates/afroman/05_tk_crazy_png.png",
+    "source": "TK Crazy.png",
+    "license": "CC BY-SA 4.0",
+    "artist": "TK Crazy",
+    "width": 720,
+    "height": 900,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:TK_Crazy.png",
+    "bytes": 1057321
+  }
+]

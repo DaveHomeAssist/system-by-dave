@@ -1,0 +1,52 @@
+[
+  {
+    "file": "assets/candidates/rubio/01_official_portrait_of_secretary_marco_rubio_cropped.jpg",
+    "source": "Official_portrait_of_Secretary_Marco_Rubio_(cropped)(2).jpg",
+    "license": "Wikipedia lead",
+    "artist": "",
+    "width": 800,
+    "height": 1005,
+    "descriptionurl": "https://en.wikipedia.org/wiki/Marco%20Rubio",
+    "bytes": 134655
+  },
+  {
+    "file": "assets/candidates/rubio/02_marco_rubio_by_gage_skidmore_11_jpg.jpg",
+    "source": "Marco Rubio by Gage Skidmore 11.jpg",
+    "license": "CC BY-SA 3.0",
+    "artist": "Gage Skidmore",
+    "width": 800,
+    "height": 1200,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:Marco_Rubio_by_Gage_Skidmore_11.jpg",
+    "bytes": 146859
+  },
+  {
+    "file": "assets/candidates/rubio/03_official_portrait_of_secretary_marco_rubio_january.jpg",
+    "source": "Official portrait of Secretary Marco Rubio, January 2025.jpg",
+    "license": "Public domain",
+    "artist": "U.S. Department of State",
+    "width": 800,
+    "height": 1100,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:Official_portrait_of_Secretary_Marco_Rubio,_January_2025.jpg",
+    "bytes": 152326
+  },
+  {
+    "file": "assets/candidates/rubio/04_official_portrait_of_secretary_marco_rubio_jpg.jpg",
+    "source": "Official portrait of Secretary Marco Rubio.jpg",
+    "license": "Public domain",
+    "artist": "U.S. Department of State",
+    "width": 800,
+    "height": 1100,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:Official_portrait_of_Secretary_Marco_Rubio.jpg",
+    "bytes": 138137
+  },
+  {
+    "file": "assets/candidates/rubio/05_marco_rubio_and_carlos_lopez_cantera_jpg.jpg",
+    "source": "Marco Rubio and Carlos Lopez-Cantera.jpg",
+    "license": "Public domain",
+    "artist": "House photo by Mark Foley",
+    "width": 800,
+    "height": 1067,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:Marco_Rubio_and_Carlos_Lopez-Cantera.jpg",
+    "bytes": 234510
+  }
+]

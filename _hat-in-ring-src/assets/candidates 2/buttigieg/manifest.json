@@ -1,0 +1,52 @@
+[
+  {
+    "file": "assets/candidates/buttigieg/01_pete_buttigieg_secretary_of_transportation_jpg.jpg",
+    "source": "Pete_Buttigieg,_Secretary_of_Transportation.jpg",
+    "license": "(Wikipedia lead)",
+    "artist": "",
+    "width": 800,
+    "height": 1000,
+    "descriptionurl": "https://en.wikipedia.org/wiki/Pete%20Buttigieg",
+    "bytes": 185277
+  },
+  {
+    "file": "assets/candidates/buttigieg/02_pete_buttigieg_speaking_at_the_2019_california_dem.jpg",
+    "source": "Pete Buttigieg speaking at the 2019 California Democratic Party State Convention at Moscone Center in San Francisco on June 1, 2019 (48012501841) (cropped).jpg",
+    "license": "CC BY-SA 2.0",
+    "artist": "Gage Skidmore from Peoria, AZ, United States of America",
+    "width": 800,
+    "height": 1145,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:Pete_Buttigieg_speaking_at_the_2019_California_Democratic_Party_State_Convention_at_Moscone_Center_in_San_Francisco_on_June_1,_2019_(48012501841)_(cropped).jpg",
+    "bytes": 203254
+  },
+  {
+    "file": "assets/candidates/buttigieg/03_pete_buttigieg_by_gage_skidmore_jpg.jpg",
+    "source": "Pete Buttigieg by Gage Skidmore.jpg",
+    "license": "CC BY-SA 3.0",
+    "artist": "Gage Skidmore",
+    "width": 800,
+    "height": 1096,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:Pete_Buttigieg_by_Gage_Skidmore.jpg",
+    "bytes": 238981
+  },
+  {
+    "file": "assets/candidates/buttigieg/04_pete_buttigieg_secretary_of_transportation_jpg.jpg",
+    "source": "Pete Buttigieg, Secretary of Transportation.jpg",
+    "license": "Public domain",
+    "artist": "United States Department of Transportation",
+    "width": 800,
+    "height": 1000,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:Pete_Buttigieg,_Secretary_of_Transportation.jpg",
+    "bytes": 185277
+  },
+  {
+    "file": "assets/candidates/buttigieg/05_pete_buttigieg_official_photo_jpg.jpg",
+    "source": "Pete Buttigieg official photo.jpg",
+    "license": "Public domain",
+    "artist": "US Department of Transportation",
+    "width": 800,
+    "height": 1000,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:Pete_Buttigieg_official_photo.jpg",
+    "bytes": 218829
+  }
+]

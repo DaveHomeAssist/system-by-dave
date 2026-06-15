@@ -1,0 +1,478 @@
+[
+  {
+    "id": "greaney",
+    "name": "Dan Greaney",
+    "count": 2,
+    "files": [
+      "assets/candidates/greaney/01_dan_greaney_campaign_jpg.jpg",
+      "assets/candidates/greaney/02_dan_greaney_2028_presidential_campaign_logo_png.png"
+    ]
+  },
+  {
+    "id": "bovino",
+    "name": "Gregory \"Greg\" Bovino",
+    "count": 5,
+    "files": [
+      "assets/candidates/bovino/01_2026_border_patrol_chief_greg_bovino_in_minneapoli.jpg",
+      "assets/candidates/bovino/02_2026_border_patrol_chief_greg_bovino_in_minneapoli.jpg",
+      "assets/candidates/bovino/03_greg_bovino_at_the_broadview_uscis_processing_cent.jpg",
+      "assets/candidates/bovino/04_2026_border_patrol_chief_greg_bovino_in_minneapoli.jpg",
+      "assets/candidates/bovino/05_2026_gregory_bovino_at_bishop_henry_whipple_buildi.jpg"
+    ]
+  },
+  {
+    "id": "jorgensen",
+    "name": "Jo Jorgensen",
+    "count": 5,
+    "files": [
+      "assets/candidates/jorgensen/01_jo_jorgensen_portrait_3_jpg.jpg",
+      "assets/candidates/jorgensen/02_jo_jorgensen_in_pittsburgh_jpg.jpg",
+      "assets/candidates/jorgensen/03_jo_jorgensen_cropped_jpg.jpg",
+      "assets/candidates/jorgensen/04_jo_jorgensen_portrait_3_cropped_jpg.jpg",
+      "assets/candidates/jorgensen/05_jo_jorgensen_portrait_3_cropped_2_jpg.jpg"
+    ]
+  },
+  {
+    "id": "newsom",
+    "name": "Gavin Newsom",
+    "count": 4,
+    "files": [
+      "assets/candidates/newsom/01_governor_of_california_gavin_newsom_cropped_3x4_jp.jpg",
+      "assets/candidates/newsom/02_gavin_newsom_official_photo_jpg.jpg",
+      "assets/candidates/newsom/03_gavin_newsom_2020_04_23_jpg.jpg",
+      "assets/candidates/newsom/04_gavin_newsom_with_salvadoran_immigrant_surfers_jpg.jpg"
+    ]
+  },
+  {
+    "id": "harris",
+    "name": "Kamala Harris",
+    "count": 5,
+    "files": [
+      "assets/candidates/harris/01_kamala_harris_vice_presidential_portrait_jpg.jpg",
+      "assets/candidates/harris/02_kamala_harris_official_photo_jpg.jpg",
+      "assets/candidates/harris/03_kamala_harris_vice_presidential_portrait_jpg.jpg",
+      "assets/candidates/harris/04_kamala_harris_and_the_oxford_kamalas_jpg.jpg",
+      "assets/candidates/harris/05_kamala_harris_swearing_in_antony_blinken_jpg.jpg"
+    ]
+  },
+  {
+    "id": "booker",
+    "name": "Cory Booker",
+    "count": 5,
+    "files": [
+      "assets/candidates/booker/01_cory_booker_official_portrait_119th_congress_jpg.jpg",
+      "assets/candidates/booker/02_cory_booker_2011_shankbone_jpg.jpg",
+      "assets/candidates/booker/03_cory_booker_official_portrait_114th_congress_jpg.jpg",
+      "assets/candidates/booker/04_cory_booker_and_marie_yovanovitch_png.png",
+      "assets/candidates/booker/05_terri_sewell_and_cory_booker_2019_jpg.jpg"
+    ]
+  },
+  {
+    "id": "beshear",
+    "name": "Andy Beshear",
+    "count": 5,
+    "files": [
+      "assets/candidates/beshear/01_andy_beshear_in_april_2026_cropped_jpg.jpg",
+      "assets/candidates/beshear/02_andy_beshear_2025_jpg.jpg",
+      "assets/candidates/beshear/03_andy_beshear_2024_cropped_jpg.jpg",
+      "assets/candidates/beshear/04_andy_beshear_2024_jpg.jpg",
+      "assets/candidates/beshear/05_2021_andy_beshear_jpg.jpg"
+    ]
+  },
+  {
+    "id": "kelly",
+    "name": "Mark Kelly",
+    "count": 5,
+    "files": [
+      "assets/candidates/kelly/01_sen_mark_kelly_d_az_official_portrait_119th_congre.jpg",
+      "assets/candidates/kelly/02_mark_kelly_official_portrait_117th_jpg.jpg",
+      "assets/candidates/kelly/03_mark_kelly_official_portrait_119th_jpg.jpg",
+      "assets/candidates/kelly/04_mark_e_kelly_2001_jpg.jpg",
+      "assets/candidates/kelly/05_senator_mark_kelly_codel_at_mkab_9180399_jpg.jpg"
+    ]
+  },
+  {
+    "id": "khanna",
+    "name": "Ro Khanna",
+    "count": 5,
+    "files": [
+      "assets/candidates/khanna/01_ro_khanna_official_portrait_115th_congress_3x4_jpg.jpg",
+      "assets/candidates/khanna/02_ro_khanna_official_portrait_115th_congress_jpg.jpg",
+      "assets/candidates/khanna/03_ro_khanna_2026_02_20_002_jpg.jpg",
+      "assets/candidates/khanna/04_ro_khanna_completing_2020_us_census_01_jpg.jpg",
+      "assets/candidates/khanna/05_legislation_for_free_face_masks_ro_khanna_png.png"
+    ]
+  },
+  {
+    "id": "gallego",
+    "name": "Ruben Gallego",
+    "count": 5,
+    "files": [
+      "assets/candidates/gallego/01_senator_ruben_gallego_official_portrait_jpg.jpg",
+      "assets/candidates/gallego/02_ruben_gallego_jpg.jpg",
+      "assets/candidates/gallego/03_ruben_gallego_2013_jpg.jpg",
+      "assets/candidates/gallego/04_ruben_gallego_official_portrait_jpg.jpg",
+      "assets/candidates/gallego/05_ruben_gallego_official_photo_jpg.jpg"
+    ]
+  },
+  {
+    "id": "pritzker",
+    "name": "J.B. Pritzker",
+    "count": 5,
+    "files": [
+      "assets/candidates/pritzker/01_governor_jb_pritzker_official_portrait_2019_crop_j.jpg",
+      "assets/candidates/pritzker/02_governor_jb_pritzker_official_portrait_2019_jpg.jpg",
+      "assets/candidates/pritzker/03_j_b_pritzker_april_2023_jpg.jpg",
+      "assets/candidates/pritzker/04_j_b_pritzker_40052212680_cropped_jpg.jpg",
+      "assets/candidates/pritzker/05_j_b_pritzker_april_2023_3x4_jpg.jpg"
+    ]
+  },
+  {
+    "id": "emanuel",
+    "name": "Rahm Emanuel",
+    "count": 5,
+    "files": [
+      "assets/candidates/emanuel/01_ambassador_emanuel_portrait_jpg.jpg",
+      "assets/candidates/emanuel/02_rahm_emanuel_at_higashi_ginza_station_2024_02_14_3.jpg",
+      "assets/candidates/emanuel/03_rahm_emanuel_2016_jpg.jpg",
+      "assets/candidates/emanuel/04_rahm_emanuel_2003_jpg.jpg",
+      "assets/candidates/emanuel/05_rahm_emanuel_hankyu_very_much_tweet_may_2022_png.png"
+    ]
+  },
+  {
+    "id": "green",
+    "name": "Josh Green",
+    "count": 5,
+    "files": [
+      "assets/candidates/green/01_lieutenant_governor_of_hawaii_josh_green_jpg.jpg",
+      "assets/candidates/green/02_lieutenant_governor_of_hawaii_josh_green_cropped1_.jpg",
+      "assets/candidates/green/03_lieutenant_governor_of_hawaii_josh_green_cropped_j.jpg",
+      "assets/candidates/green/04_josh_green_official_photo_2022_cropped_jpg.jpg",
+      "assets/candidates/green/05_lieutenant_governor_of_hawaii_josh_green_cropped_2.jpg"
+    ]
+  },
+  {
+    "id": "landrieu",
+    "name": "Mitch Landrieu",
+    "count": 5,
+    "files": [
+      "assets/candidates/landrieu/01_mitch_landrieu_52801339981_cropped_jpg.jpg",
+      "assets/candidates/landrieu/02_mitch_landrieu_at_dookys_jpg.jpg",
+      "assets/candidates/landrieu/03_mitch_landrieu_jpg.jpg",
+      "assets/candidates/landrieu/04_mitch_landrieu_52801339981_cropped_jpg.jpg",
+      "assets/candidates/landrieu/05_mitch_landrieu_january_2022_jpg.jpg"
+    ]
+  },
+  {
+    "id": "slotkin",
+    "name": "Elissa Slotkin",
+    "count": 5,
+    "files": [
+      "assets/candidates/slotkin/01_elissa_slotkin_2026_official_portrait_cropped_jpg.jpg",
+      "assets/candidates/slotkin/02_elissa_slotkin_20190202_153059_jpg.jpg",
+      "assets/candidates/slotkin/03_elissa_slotkin_20190202_153100_jpg.jpg",
+      "assets/candidates/slotkin/04_elissa_slotkin_20190202_153102_jpg.jpg",
+      "assets/candidates/slotkin/05_elissa_slotkin_20190202_153103_jpg.jpg"
+    ]
+  },
+  {
+    "id": "cruz",
+    "name": "Ted Cruz",
+    "count": 5,
+    "files": [
+      "assets/candidates/cruz/01_ted_cruz_official_116th_portrait_3x4_cropped_jpg.jpg",
+      "assets/candidates/cruz/02_ted_cruz_february_2015_jpg.jpg",
+      "assets/candidates/cruz/03_ted_cruz_official_116th_portrait_cropped_jpg.jpg",
+      "assets/candidates/cruz/04_senator_ted_cruz_alternate_portrait_116th_congress.jpg",
+      "assets/candidates/cruz/05_ted_cruz_official_116th_portrait_jpg.jpg"
+    ]
+  },
+  {
+    "id": "desantis",
+    "name": "Ron DeSantis",
+    "count": 5,
+    "files": [
+      "assets/candidates/desantis/01_ron_desantis_official_photo_jpg.jpg",
+      "assets/candidates/desantis/02_ron_desantis_2020_cropped_jpg.jpg",
+      "assets/candidates/desantis/03_ron_desantis_crop_jpg.jpg",
+      "assets/candidates/desantis/04_ron_desantis_official_portrait_113th_congress_jpg.jpg",
+      "assets/candidates/desantis/05_gov_ron_desantis_official_2_x2_jpg.jpg"
+    ]
+  },
+  {
+    "id": "paul",
+    "name": "Rand Paul",
+    "count": 5,
+    "files": [
+      "assets/candidates/paul/01_rand_paul_portrait_jpg.jpg",
+      "assets/candidates/paul/02_rand_paul_6050270819_jpg.jpg",
+      "assets/candidates/paul/03_rand_paul_6053969582_jpg.jpg",
+      "assets/candidates/paul/04_rand_paul_official_portrait_112th_congress_alterna.jpg",
+      "assets/candidates/paul/05_rand_paul_2011_jpg.jpg"
+    ]
+  },
+  {
+    "id": "gabbard",
+    "name": "Tulsi Gabbard",
+    "count": 5,
+    "files": [
+      "assets/candidates/gabbard/01_director_tulsi_gabbard_official_portrait_jpg.jpg",
+      "assets/candidates/gabbard/02_tulsi_gabbard_official_portrait_113th_congress_cro.jpg",
+      "assets/candidates/gabbard/03_tulsi_gabbard_official_portrait_113th_congress_cro.jpg",
+      "assets/candidates/gabbard/04_tulsi_gabbard_official_portrait_113th_congress_jpg.jpg",
+      "assets/candidates/gabbard/05_tulsi_gabbard_by_gage_skidmore_jpg.jpg"
+    ]
+  },
+  {
+    "id": "bacon",
+    "name": "Don Bacon",
+    "count": 5,
+    "files": [
+      "assets/candidates/bacon/01_bacon_don_119th_congress_3x4_cropped_b_jpg.jpg",
+      "assets/candidates/bacon/02_donald_j_bacon_cropped_jpg.jpg",
+      "assets/candidates/bacon/03_bacon_don_119th_congress_jpg.jpg",
+      "assets/candidates/bacon/04_don_bacon_117th_congress_jpg.jpg",
+      "assets/candidates/bacon/05_donald_j_bacon_jpg.jpg"
+    ]
+  },
+  {
+    "id": "lemon",
+    "name": "Don Lemon",
+    "count": 5,
+    "files": [
+      "assets/candidates/lemon/01_don_lemon_at_the_2018_pulitzer_prizes_jpg.jpg",
+      "assets/candidates/lemon/02_cnn_don_lemon_just_before_a_show_crop_jpg.jpg",
+      "assets/candidates/lemon/03_don_lemon_cropped_to_collar_jpg.jpg",
+      "assets/candidates/lemon/04_don_lemon_at_the_2018_pulitzer_prizes_jpg.jpg",
+      "assets/candidates/lemon/05_don_lemon_portrait_2018_jpg.jpg"
+    ]
+  },
+  {
+    "id": "buttigieg",
+    "name": "Pete Buttigieg",
+    "count": 5,
+    "files": [
+      "assets/candidates/buttigieg/01_pete_buttigieg_secretary_of_transportation_jpg.jpg",
+      "assets/candidates/buttigieg/02_pete_buttigieg_speaking_at_the_2019_california_dem.jpg",
+      "assets/candidates/buttigieg/03_pete_buttigieg_by_gage_skidmore_jpg.jpg",
+      "assets/candidates/buttigieg/04_pete_buttigieg_secretary_of_transportation_jpg.jpg",
+      "assets/candidates/buttigieg/05_pete_buttigieg_official_photo_jpg.jpg"
+    ]
+  },
+  {
+    "id": "aoc",
+    "name": "Alexandria Ocasio-Cortez",
+    "count": 5,
+    "files": [
+      "assets/candidates/aoc/01_alexandria_ocasio_cortez_official_portrait_jpg.jpg",
+      "assets/candidates/aoc/02_alexandria_ocasio_cortez_official_portrait_1_jpg.jpg",
+      "assets/candidates/aoc/03_alexandria_ocasio_cortez_official_portrait_cropped.jpg",
+      "assets/candidates/aoc/04_alexandria_ocasio_cortez_official_portrait_jpg.jpg",
+      "assets/candidates/aoc/05_alexandria_ocasio_cortez_official_portrait_cropped.jpg"
+    ]
+  },
+  {
+    "id": "shapiro",
+    "name": "Josh Shapiro",
+    "count": 5,
+    "files": [
+      "assets/candidates/shapiro/01_josh_shapiro_december_2025_jpg.jpg",
+      "assets/candidates/shapiro/02_josh_shapiro_in_2019_cropped_jpg.jpg",
+      "assets/candidates/shapiro/03_josh_shapiro_2021_cropped_jpg.jpg",
+      "assets/candidates/shapiro/04_governor_shapiro_cropped_jpg.jpg",
+      "assets/candidates/shapiro/05_josh_shapiro_december_2025_cropped_jpg.jpg"
+    ]
+  },
+  {
+    "id": "murphy",
+    "name": "Phil Murphy",
+    "count": 5,
+    "files": [
+      "assets/candidates/murphy/01_gov_phil_murphy_jpg.jpg",
+      "assets/candidates/murphy/02_philip_d_murphy_jpg.jpg",
+      "assets/candidates/murphy/03_phil_murphy_2025_jpg.jpg",
+      "assets/candidates/murphy/04_phil_murphy_for_governor_cropped_2_jpg.jpg",
+      "assets/candidates/murphy/05_phil_murphy_7643341426_jpg.jpg"
+    ]
+  },
+  {
+    "id": "yang",
+    "name": "Andrew Yang",
+    "count": 5,
+    "files": [
+      "assets/candidates/yang/01_andrew_yang_november_2023_jpg.jpg",
+      "assets/candidates/yang/02_andrew_yang_talking_about_urban_entrepreneurship_a.jpg",
+      "assets/candidates/yang/03_andrew_yang_by_gage_skidmore_jpg.jpg",
+      "assets/candidates/yang/04_andrew_yang_small_seal_script_jpg.jpg",
+      "assets/candidates/yang/05_andrew_yang_iowa_tour_january_and_february_2020_pn.png"
+    ]
+  },
+  {
+    "id": "afroman",
+    "name": "Afroman (Joseph Foreman)",
+    "count": 5,
+    "files": [
+      "assets/candidates/afroman/01_afroman_2026_cropped_jpg.jpg",
+      "assets/candidates/afroman/02_afroman_smoking_jpg.jpg",
+      "assets/candidates/afroman/03_afroman_gainesville_2011_1_cropped_jpg.jpg",
+      "assets/candidates/afroman/04_afroman_gainesville_2011_3_cropped_cropped_jpg.jpg",
+      "assets/candidates/afroman/05_tk_crazy_png.png"
+    ]
+  },
+  {
+    "id": "vance",
+    "name": "J.D. Vance",
+    "count": 5,
+    "files": [
+      "assets/candidates/vance/01_march_2026_official_vice_presidential_portrait_of_.jpg",
+      "assets/candidates/vance/02_jd_vance_official_portrait_cropped_headshot_jpg.jpg",
+      "assets/candidates/vance/03_jd_vance_birth_certificate_jpg.jpg",
+      "assets/candidates/vance/04_january_2025_official_vice_presidential_portrait_o.jpg",
+      "assets/candidates/vance/05_senator_vance_official_portrait_118th_congress_jpg.jpg"
+    ]
+  },
+  {
+    "id": "whitmer",
+    "name": "Gretchen Whitmer",
+    "count": 5,
+    "files": [
+      "assets/candidates/whitmer/01_2025_gretchen_whitmer_cropped_jpg.jpg",
+      "assets/candidates/whitmer/02_governor_whitmer_mayor_duggan_crime_reduction_pres.jpg",
+      "assets/candidates/whitmer/03_gretchen_whitmer_cropped_jpg.jpg",
+      "assets/candidates/whitmer/04_gov_gretchen_whitmer_cropped_jpg.jpg",
+      "assets/candidates/whitmer/05_gretchen_whitmer_20190202_019_jpg.jpg"
+    ]
+  },
+  {
+    "id": "bannon",
+    "name": "Steve Bannon",
+    "count": 5,
+    "files": [
+      "assets/candidates/bannon/01_steve_bannon_in_2025_3x4_cropped_jpg.jpg",
+      "assets/candidates/bannon/02_americafest_2025_steve_bannon_02_jpg.jpg",
+      "assets/candidates/bannon/03_americafest_2025_steve_bannon_03_jpg.jpg",
+      "assets/candidates/bannon/04_americafest_2025_steve_bannon_04_jpg.jpg",
+      "assets/candidates/bannon/05_americafest_2025_steve_bannon_06_jpg.jpg"
+    ]
+  },
+  {
+    "id": "flynn",
+    "name": "Michael Flynn",
+    "count": 5,
+    "files": [
+      "assets/candidates/flynn/01_michael_t_flynn_jpg.jpg",
+      "assets/candidates/flynn/02_michael_flynn_029_jpg.jpg",
+      "assets/candidates/flynn/03_michael_flynn_024_jpg.jpg",
+      "assets/candidates/flynn/04_michael_flynn_in_1977_jpg.jpg",
+      "assets/candidates/flynn/05_michael_flynn_027_jpg.jpg"
+    ]
+  },
+  {
+    "id": "carlson",
+    "name": "Tucker Carlson",
+    "count": 5,
+    "files": [
+      "assets/candidates/carlson/01_tucker_carlson_54670577849_cropped_2_jpg.jpg",
+      "assets/candidates/carlson/02_americafest_2025_tucker_carlson_03_jpg.jpg",
+      "assets/candidates/carlson/03_americafest_2025_tucker_carlson_04_jpg.jpg",
+      "assets/candidates/carlson/04_americafest_2025_tucker_carlson_05_jpg.jpg",
+      "assets/candidates/carlson/05_americafest_2025_tucker_carlson_11_jpg.jpg"
+    ]
+  },
+  {
+    "id": "hunter",
+    "name": "Hunter Biden",
+    "count": 5,
+    "files": [
+      "assets/candidates/hunter/01_hunter_biden_september_30_2014_jpg.jpg",
+      "assets/candidates/hunter/02_r_hunter_biden_at_center_for_strategic_internation.jpg",
+      "assets/candidates/hunter/03_hunter_biden_3219469044_jpg.jpg",
+      "assets/candidates/hunter/04_melissa_cohen_and_hunter_biden_50875523797_jpg.jpg",
+      "assets/candidates/hunter/05_young_hunter_biden_jpg.jpg"
+    ]
+  },
+  {
+    "id": "trump",
+    "name": "Donald Trump",
+    "count": 5,
+    "files": [
+      "assets/candidates/trump/01_official_presidential_portrait_of_president_donald.jpg",
+      "assets/candidates/trump/02_buck_sexton_with_president_donald_j_trump_in_the_o.jpg",
+      "assets/candidates/trump/03_official_portrait_of_president_donald_trump_2nd_cr.jpg",
+      "assets/candidates/trump/04_donald_trump_official_portrait_cropped_jpg.jpg",
+      "assets/candidates/trump/05_january_2025_official_presidential_portrait_of_don.jpg"
+    ]
+  },
+  {
+    "id": "rubio",
+    "name": "Marco Rubio",
+    "count": 5,
+    "files": [
+      "assets/candidates/rubio/01_official_portrait_of_secretary_marco_rubio_cropped.jpg",
+      "assets/candidates/rubio/02_marco_rubio_by_gage_skidmore_11_jpg.jpg",
+      "assets/candidates/rubio/03_official_portrait_of_secretary_marco_rubio_january.jpg",
+      "assets/candidates/rubio/04_official_portrait_of_secretary_marco_rubio_jpg.jpg",
+      "assets/candidates/rubio/05_marco_rubio_and_carlos_lopez_cantera_jpg.jpg"
+    ]
+  },
+  {
+    "id": "moore",
+    "name": "Wes Moore",
+    "count": 5,
+    "files": [
+      "assets/candidates/moore/01_wes_moore_official_governor_portrait_jpg.jpg",
+      "assets/candidates/moore/02_governor_wes_moore_at_essencefest_2025_jpg.jpg",
+      "assets/candidates/moore/03_wes_moore_official_governor_portrait_jpg.jpg",
+      "assets/candidates/moore/04_wes_moore_credit_amunankhra_house_ltd_jpg.jpg",
+      "assets/candidates/moore/05_wes_moore_swearing_in_cabinet_member_carolyn_scrug.jpg"
+    ]
+  },
+  {
+    "id": "raimondo",
+    "name": "Gina Raimondo",
+    "count": 5,
+    "files": [
+      "assets/candidates/raimondo/01_gina_raimondo_jpg.jpg",
+      "assets/candidates/raimondo/02_gina_raimondo_cropped_2_jpg.jpg",
+      "assets/candidates/raimondo/03_ri_governor_gina_raimondo_bristol_parade_jpg.jpg",
+      "assets/candidates/raimondo/04_ri_governor_gina_raimondo_bristol_parade_cropped_2.jpg",
+      "assets/candidates/raimondo/05_governor_gina_raimondo_of_rhode_island_jpg.jpg"
+    ]
+  },
+  {
+    "id": "walz",
+    "name": "Tim Walz",
+    "count": 5,
+    "files": [
+      "assets/candidates/walz/01_governor_tim_walz_2026_jpg.jpg",
+      "assets/candidates/walz/02_tim_walz_official_photo_jpg.jpg",
+      "assets/candidates/walz/03_governor_tim_walz_at_bemidji_steel_jpg.jpg",
+      "assets/candidates/walz/04_governor_tim_walz_at_vikings_training_camp_on_30_j.jpg",
+      "assets/candidates/walz/05_governor_tim_walz_at_vikings_training_camp_on_30_j.jpg"
+    ]
+  },
+  {
+    "id": "mtg",
+    "name": "Marjorie Taylor Greene",
+    "count": 5,
+    "files": [
+      "assets/candidates/mtg/01_marjorie_taylor_greene_cropped_jpg.jpg",
+      "assets/candidates/mtg/02_marjorie_taylor_greene_51771333799_cropped_jpg.jpg",
+      "assets/candidates/mtg/03_marjorie_taylor_greene_117th_congress_portrait_jpe.jpg",
+      "assets/candidates/mtg/04_marjorie_taylor_greene_cropped_jpg.jpg",
+      "assets/candidates/mtg/05_marjorie_taylor_greene_51769864787_cropped_jpg.jpg"
+    ]
+  },
+  {
+    "id": "smith",
+    "name": "Stephen A. Smith",
+    "count": 5,
+    "files": [
+      "assets/candidates/smith/01_stephen_a_smith_in_january_2023_3x4_cropped_c_jpg.jpg",
+      "assets/candidates/smith/02_first_take_salute_the_troops_broadcast_cropped2_jp.jpg",
+      "assets/candidates/smith/03_diversity1_jpg.jpg",
+      "assets/candidates/smith/04_diversity2_jpg.jpg",
+      "assets/candidates/smith/05_cari_champion_on_first_take_at_joint_base_mcguire_.jpg"
+    ]
+  }
+]

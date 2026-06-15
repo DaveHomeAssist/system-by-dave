@@ -1,0 +1,42 @@
+[
+  {
+    "file": "assets/candidates/newsom/01_governor_of_california_gavin_newsom_cropped_3x4_jp.jpg",
+    "source": "Governor_of_California_Gavin_Newsom_(cropped_3x4).jpg",
+    "license": "Wikipedia lead",
+    "artist": "",
+    "width": 800,
+    "height": 1068,
+    "descriptionurl": "https://en.wikipedia.org/wiki/Gavin%20Newsom",
+    "bytes": 138234
+  },
+  {
+    "file": "assets/candidates/newsom/02_gavin_newsom_official_photo_jpg.jpg",
+    "source": "Gavin Newsom official photo.jpg",
+    "license": "Public domain",
+    "artist": "Office of the Lieutenant Governor of California",
+    "width": 800,
+    "height": 1200,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:Gavin_Newsom_official_photo.jpg",
+    "bytes": 315959
+  },
+  {
+    "file": "assets/candidates/newsom/03_gavin_newsom_2020_04_23_jpg.jpg",
+    "source": "Gavin Newsom - 2020-04-23.jpg",
+    "license": "Public domain",
+    "artist": "Government of California",
+    "width": 800,
+    "height": 1067,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:Gavin_Newsom_-_2020-04-23.jpg",
+    "bytes": 386801
+  },
+  {
+    "file": "assets/candidates/newsom/04_gavin_newsom_with_salvadoran_immigrant_surfers_jpg.jpg",
+    "source": "Gavin Newsom with Salvadoran immigrant surfers.jpg",
+    "license": "Public domain",
+    "artist": "Office of the California Governor",
+    "width": 800,
+    "height": 534,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:Gavin_Newsom_with_Salvadoran_immigrant_surfers.jpg",
+    "bytes": 156837
+  }
+]

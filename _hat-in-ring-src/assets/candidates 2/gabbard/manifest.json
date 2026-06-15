@@ -1,0 +1,52 @@
+[
+  {
+    "file": "assets/candidates/gabbard/01_director_tulsi_gabbard_official_portrait_jpg.jpg",
+    "source": "Director_Tulsi_Gabbard_Official_Portrait.jpg",
+    "license": "Wikipedia lead",
+    "artist": "",
+    "width": 800,
+    "height": 1000,
+    "descriptionurl": "https://en.wikipedia.org/wiki/Tulsi%20Gabbard",
+    "bytes": 191730
+  },
+  {
+    "file": "assets/candidates/gabbard/02_tulsi_gabbard_official_portrait_113th_congress_cro.jpg",
+    "source": "Tulsi Gabbard, official portrait, 113th Congress (cropped 3).jpg",
+    "license": "Public domain",
+    "artist": "U.S. House Office of Photography",
+    "width": 922,
+    "height": 1204,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:Tulsi_Gabbard,_official_portrait,_113th_Congress_(cropped_3).jpg",
+    "bytes": 1082255
+  },
+  {
+    "file": "assets/candidates/gabbard/03_tulsi_gabbard_official_portrait_113th_congress_cro.jpg",
+    "source": "Tulsi Gabbard, official portrait, 113th Congress (cropped).jpg",
+    "license": "Public domain",
+    "artist": "U.S. House Office of Photography",
+    "width": 800,
+    "height": 1216,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:Tulsi_Gabbard,_official_portrait,_113th_Congress_(cropped).jpg",
+    "bytes": 361243
+  },
+  {
+    "file": "assets/candidates/gabbard/04_tulsi_gabbard_official_portrait_113th_congress_jpg.jpg",
+    "source": "Tulsi Gabbard, official portrait, 113th Congress.jpg",
+    "license": "Public domain",
+    "artist": "Congresswoman Tulsi Gabbard",
+    "width": 800,
+    "height": 1202,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:Tulsi_Gabbard,_official_portrait,_113th_Congress.jpg",
+    "bytes": 395609
+  },
+  {
+    "file": "assets/candidates/gabbard/05_tulsi_gabbard_by_gage_skidmore_jpg.jpg",
+    "source": "Tulsi Gabbard by Gage Skidmore.jpg",
+    "license": "CC BY-SA 3.0",
+    "artist": "Gage Skidmore",
+    "width": 800,
+    "height": 1165,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:Tulsi_Gabbard_by_Gage_Skidmore.jpg",
+    "bytes": 202824
+  }
+]

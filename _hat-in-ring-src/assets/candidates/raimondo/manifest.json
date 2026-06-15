@@ -1,0 +1,52 @@
+[
+  {
+    "file": "assets/candidates/raimondo/01_gina_raimondo_jpg.jpg",
+    "source": "Gina_Raimondo.jpg",
+    "license": "Wikipedia lead",
+    "artist": "",
+    "width": 800,
+    "height": 1034,
+    "descriptionurl": "https://en.wikipedia.org/wiki/Gina%20Raimondo",
+    "bytes": 280330
+  },
+  {
+    "file": "assets/candidates/raimondo/02_gina_raimondo_cropped_2_jpg.jpg",
+    "source": "Gina Raimondo (cropped 2).jpg",
+    "license": "Public domain",
+    "artist": "United States Department of Commerce",
+    "width": 897,
+    "height": 1215,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:Gina_Raimondo_(cropped_2).jpg",
+    "bytes": 801143
+  },
+  {
+    "file": "assets/candidates/raimondo/03_ri_governor_gina_raimondo_bristol_parade_jpg.jpg",
+    "source": "RI Governor Gina Raimondo Bristol parade.jpg",
+    "license": "CC BY-SA 4.0",
+    "artist": "Kenneth C. Zirkel",
+    "width": 800,
+    "height": 1200,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:RI_Governor_Gina_Raimondo_Bristol_parade.jpg",
+    "bytes": 227847
+  },
+  {
+    "file": "assets/candidates/raimondo/04_ri_governor_gina_raimondo_bristol_parade_cropped_2.jpg",
+    "source": "RI Governor Gina Raimondo Bristol parade (cropped 2).jpg",
+    "license": "CC BY-SA 4.0",
+    "artist": "Kenneth C. Zirkel",
+    "width": 851,
+    "height": 1064,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:RI_Governor_Gina_Raimondo_Bristol_parade_(cropped_2).jpg",
+    "bytes": 276390
+  },
+  {
+    "file": "assets/candidates/raimondo/05_governor_gina_raimondo_of_rhode_island_jpg.jpg",
+    "source": "Governor Gina Raimondo of Rhode Island.jpg",
+    "license": "CC BY-SA 3.0",
+    "artist": "Kenneth C. Zirkel",
+    "width": 800,
+    "height": 1117,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:Governor_Gina_Raimondo_of_Rhode_Island.jpg",
+    "bytes": 228000
+  }
+]

@@ -1,0 +1,825 @@
+[
+  {
+    "id": "greaney",
+    "name": "Dan Greaney",
+    "party": "Republican",
+    "role": "Perennial candidate",
+    "bucket": "formal",
+    "keys": [
+      "declared"
+    ],
+    "conf": "Very high",
+    "delta": 0,
+    "lastSignal": "2026-02-15",
+    "headline": "Filed FEC Form 2 — declared 2028 campaign",
+    "why": "Only formally declared major-party filer so far; low-profile.",
+    "quote": "",
+    "tags": [
+      "FEC",
+      "declared"
+    ]
+  },
+  {
+    "id": "bovino",
+    "name": "Gregory \"Greg\" Bovino",
+    "party": "Republican",
+    "role": "Border-enforcement figure",
+    "bucket": "formal",
+    "keys": [
+      "exploratory",
+      "mediaBlitz"
+    ],
+    "conf": "Medium",
+    "delta": 6,
+    "lastSignal": "2026-04-10",
+    "headline": "\"All options\" exploratory posture for 2028",
+    "why": "Early exploratory lane on the MAGA-enforcement flank.",
+    "quote": "",
+    "tags": [
+      "exploratory"
+    ]
+  },
+  {
+    "id": "jorgensen",
+    "name": "Jo Jorgensen",
+    "party": "Libertarian",
+    "role": "2020 LP nominee",
+    "bucket": "formal",
+    "keys": [
+      "exploratory"
+    ],
+    "conf": "High",
+    "delta": 8,
+    "lastSignal": "2026-05-12",
+    "headline": "Formed exploratory committee for 2028 LP nomination",
+    "why": "Most concrete step on the Libertarian side.",
+    "quote": "",
+    "tags": [
+      "exploratory",
+      "Libertarian"
+    ]
+  },
+  {
+    "id": "newsom",
+    "name": "Gavin Newsom",
+    "party": "Democrat",
+    "role": "Governor of California",
+    "bucket": "considering",
+    "keys": [
+      "consideringQuote",
+      "earlyState",
+      "donors",
+      "staffing",
+      "mediaBlitz"
+    ],
+    "conf": "High",
+    "delta": 0,
+    "lastSignal": "2026-05-28",
+    "pollLead": "Dem poll leader",
+    "headline": "\"Lying if I said I wasn't seriously thinking about it\"",
+    "why": "Catapulted to front-runner in Emerson national polling.",
+    "quote": "I'd be lying if I said I wasn't seriously thinking about it.",
+    "tags": [
+      "governor lane",
+      "frontrunner"
+    ]
+  },
+  {
+    "id": "harris",
+    "name": "Kamala Harris",
+    "party": "Democrat",
+    "role": "Former VP / 2024 nominee",
+    "bucket": "considering",
+    "keys": [
+      "consideringQuote",
+      "donors",
+      "staffing",
+      "mediaBlitz"
+    ],
+    "conf": "High",
+    "delta": -3,
+    "lastSignal": "2026-02-20",
+    "headline": "Has not decided; \"may or may not\" run again",
+    "why": "Retains 2024 donor & staff network; leads some rematch polls.",
+    "quote": "I have not made a decision… I may or may not.",
+    "tags": [
+      "rematch",
+      "establishment"
+    ]
+  },
+  {
+    "id": "booker",
+    "name": "Cory Booker",
+    "party": "Democrat",
+    "role": "U.S. Senator (NJ)",
+    "bucket": "considering",
+    "keys": [
+      "consideringQuote",
+      "mediaBlitz"
+    ],
+    "conf": "High",
+    "delta": 14,
+    "lastSignal": "2026-05-30",
+    "headline": "\"Of course I'm thinking about it\" — not ruled out",
+    "why": "Most explicit yes among Senate Democrats; record-floor-speech visibility.",
+    "quote": "Of course I'm thinking about it.",
+    "tags": [
+      "senate"
+    ]
+  },
+  {
+    "id": "beshear",
+    "name": "Andy Beshear",
+    "party": "Democrat",
+    "role": "Governor of Kentucky",
+    "bucket": "considering",
+    "keys": [
+      "consideringQuote",
+      "mediaBlitz"
+    ],
+    "conf": "High",
+    "delta": 4,
+    "lastSignal": "2026-05-08",
+    "headline": "Open \"under the right circumstances\"; decision after DGA term",
+    "why": "Red-state Dem appeal; timeline tied to Governors Assoc. chairmanship.",
+    "quote": "I'd consider it under the right circumstances.",
+    "tags": [
+      "governor lane",
+      "post-DGA"
+    ]
+  },
+  {
+    "id": "kelly",
+    "name": "Mark Kelly",
+    "party": "Democrat",
+    "role": "U.S. Senator (AZ)",
+    "bucket": "considering",
+    "keys": [
+      "consideringQuote",
+      "staffing"
+    ],
+    "conf": "Medium",
+    "delta": 5,
+    "lastSignal": "2026-02-17",
+    "headline": "Reported to be \"seriously considering\" a 2028 run",
+    "why": "Swing-state, astronaut/veteran profile draws operative interest.",
+    "quote": "",
+    "tags": [
+      "senate",
+      "swing-state"
+    ]
+  },
+  {
+    "id": "khanna",
+    "name": "Ro Khanna",
+    "party": "Democrat",
+    "role": "U.S. Rep (CA)",
+    "bucket": "considering",
+    "keys": [
+      "consideringQuote"
+    ],
+    "conf": "High",
+    "delta": 12,
+    "lastSignal": "2026-03-20",
+    "headline": "\"We'll look at that after the midterms\"",
+    "why": "First clear public timeline from the progressive-pragmatist lane.",
+    "quote": "We'll look at that after the midterms.",
+    "tags": [
+      "post-midterms",
+      "progressive"
+    ]
+  },
+  {
+    "id": "gallego",
+    "name": "Ruben Gallego",
+    "party": "Democrat",
+    "role": "U.S. Senator (AZ)",
+    "bucket": "considering",
+    "keys": [
+      "consideringQuote"
+    ],
+    "conf": "Medium",
+    "delta": 8,
+    "lastSignal": "2026-04-06",
+    "headline": "Shifted from \"no\" to \"we have to look at it\"",
+    "why": "Notable upgrade — went from denial to open in weeks.",
+    "quote": "We have to look at it.",
+    "tags": [
+      "senate",
+      "upgrade"
+    ]
+  },
+  {
+    "id": "pritzker",
+    "name": "J.B. Pritzker",
+    "party": "Democrat",
+    "role": "Governor of Illinois",
+    "bucket": "considering",
+    "keys": [
+      "consideringQuote",
+      "donors",
+      "mediaBlitz"
+    ],
+    "conf": "High",
+    "delta": 6,
+    "lastSignal": "2026-05-01",
+    "headline": "\"Can't rule anything out\" for 2028",
+    "why": "Self-funding capacity removes the money constraint entirely.",
+    "quote": "I can't rule anything out.",
+    "tags": [
+      "governor lane",
+      "self-fund"
+    ]
+  },
+  {
+    "id": "emanuel",
+    "name": "Rahm Emanuel",
+    "party": "Democrat",
+    "role": "Former Amb. / Chicago mayor",
+    "bucket": "considering",
+    "keys": [
+      "softConsidering",
+      "mediaBlitz",
+      "donors"
+    ],
+    "conf": "Medium",
+    "delta": 4,
+    "lastSignal": "2026-05-15",
+    "headline": "Publicly positioning / testing a centrist lane",
+    "why": "Aggressive media tour to project vitality and viability.",
+    "quote": "",
+    "tags": [
+      "centrist",
+      "testing"
+    ]
+  },
+  {
+    "id": "green",
+    "name": "Josh Green",
+    "party": "Democrat",
+    "role": "Governor of Hawaii",
+    "bucket": "considering",
+    "keys": [
+      "softConsidering"
+    ],
+    "conf": "Low",
+    "delta": 2,
+    "lastSignal": "2026-05-20",
+    "headline": "Among Dems considering; \"open if needed\"",
+    "why": "Outside-lane physician-governor; low national profile.",
+    "quote": "",
+    "tags": [
+      "governor lane"
+    ]
+  },
+  {
+    "id": "landrieu",
+    "name": "Mitch Landrieu",
+    "party": "Democrat",
+    "role": "Former New Orleans mayor",
+    "bucket": "considering",
+    "keys": [
+      "earlyState",
+      "donors"
+    ],
+    "conf": "Medium",
+    "delta": 7,
+    "lastSignal": "2026-04-19",
+    "headline": "Quietly exploring / soft-launching a possible bid",
+    "why": "Behavioral signals (travel, donor outreach) ahead of any quote.",
+    "quote": "",
+    "tags": [
+      "soft-launch"
+    ]
+  },
+  {
+    "id": "slotkin",
+    "name": "Elissa Slotkin",
+    "party": "Democrat",
+    "role": "U.S. Senator (MI)",
+    "bucket": "considering",
+    "keys": [
+      "softConsidering"
+    ],
+    "conf": "Medium",
+    "delta": 6,
+    "lastSignal": "2026-06-09",
+    "headline": "Not set on running, but \"keeping her name in the mix\"",
+    "why": "Most recent signal on the board; swing-state freshman senator.",
+    "quote": "",
+    "tags": [
+      "senate",
+      "swing-state",
+      "fresh"
+    ]
+  },
+  {
+    "id": "cruz",
+    "name": "Ted Cruz",
+    "party": "Republican",
+    "role": "U.S. Senator (TX)",
+    "bucket": "considering",
+    "keys": [
+      "consideringQuote",
+      "donors",
+      "staffing"
+    ],
+    "conf": "High",
+    "delta": 5,
+    "lastSignal": "2025-12-22",
+    "headline": "Weighing another run — setting up a clash with Vance",
+    "why": "2016 infrastructure & donor base; explicit intra-MAGA lane.",
+    "quote": "",
+    "tags": [
+      "senate",
+      "anti-Vance lane"
+    ]
+  },
+  {
+    "id": "desantis",
+    "name": "Ron DeSantis",
+    "party": "Republican",
+    "role": "Governor of Florida",
+    "bucket": "considering",
+    "keys": [
+      "consideringQuote",
+      "donors",
+      "staffing"
+    ],
+    "conf": "Medium",
+    "delta": 3,
+    "lastSignal": "2026-03-24",
+    "headline": "Didn't rule it out: \"We'll see… you never know\"",
+    "why": "2024 national org still partly intact; term-limited in 2026.",
+    "quote": "We'll see. You never know.",
+    "tags": [
+      "governor lane",
+      "retread"
+    ]
+  },
+  {
+    "id": "paul",
+    "name": "Rand Paul",
+    "party": "Republican",
+    "role": "U.S. Senator (KY)",
+    "bucket": "considering",
+    "keys": [
+      "consideringQuote"
+    ],
+    "conf": "Medium",
+    "delta": 4,
+    "lastSignal": "2026-04-02",
+    "headline": "\"Thinking about it\" — puts odds around 50-50",
+    "why": "Libertarian-Republican lane; rare explicit probability.",
+    "quote": "I'd put it around 50-50.",
+    "tags": [
+      "senate",
+      "liberty lane"
+    ]
+  },
+  {
+    "id": "gabbard",
+    "name": "Tulsi Gabbard",
+    "party": "Republican",
+    "role": "Trump admin official",
+    "bucket": "considering",
+    "keys": [
+      "softConsidering",
+      "mediaBlitz"
+    ],
+    "conf": "Low",
+    "delta": 2,
+    "lastSignal": "2026-03-30",
+    "headline": "Would \"never rule out\" an opportunity to serve",
+    "why": "Admin platform raises visibility; non-committal framing.",
+    "quote": "I'd never rule out an opportunity to serve.",
+    "tags": [
+      "admin",
+      "MAGA"
+    ]
+  },
+  {
+    "id": "bacon",
+    "name": "Don Bacon",
+    "party": "Republican",
+    "role": "U.S. Rep (NE), retiring",
+    "bucket": "considering",
+    "keys": [
+      "softConsidering"
+    ],
+    "conf": "Low",
+    "delta": 1,
+    "lastSignal": "2026-03-10",
+    "headline": "Won't rule out governor — or president — in 2028",
+    "why": "Centrist Republican lane; also weighing NE governor.",
+    "quote": "I wouldn't rule it out.",
+    "tags": [
+      "centrist"
+    ]
+  },
+  {
+    "id": "lemon",
+    "name": "Don Lemon",
+    "party": "Democrat",
+    "role": "Media figure",
+    "bucket": "considering",
+    "keys": [
+      "softConsidering",
+      "mediaBlitz"
+    ],
+    "conf": "Low",
+    "delta": 3,
+    "lastSignal": "2026-05-22",
+    "headline": "Says he is \"seriously considering\" a run",
+    "why": "No party structure or office base — celebrity lane.",
+    "quote": "I'm seriously considering it.",
+    "tags": [
+      "celebrity",
+      "no structure"
+    ]
+  },
+  {
+    "id": "buttigieg",
+    "name": "Pete Buttigieg",
+    "party": "Democrat",
+    "role": "Former Transp. Secretary",
+    "bucket": "soft",
+    "keys": [
+      "donors",
+      "staffing",
+      "mediaBlitz"
+    ],
+    "conf": "Medium",
+    "delta": 2,
+    "lastSignal": "2026-05-10",
+    "headline": "Hinted at 2028 but stays noncommittal",
+    "why": "Top-3 in Dem polls on name ID; no explicit \"considering\" yet.",
+    "quote": "",
+    "tags": [
+      "establishment",
+      "polls-high"
+    ]
+  },
+  {
+    "id": "aoc",
+    "name": "Alexandria Ocasio-Cortez",
+    "party": "Democrat",
+    "role": "U.S. Rep (NY)",
+    "bucket": "soft",
+    "keys": [
+      "donors",
+      "mediaBlitz"
+    ],
+    "conf": "Medium",
+    "delta": 3,
+    "lastSignal": "2026-04-28",
+    "headline": "Hasn't ruled out higher office; frames ambition as policy",
+    "why": "Massive small-dollar base; leads some progressive polls.",
+    "quote": "",
+    "tags": [
+      "progressive",
+      "grassroots"
+    ]
+  },
+  {
+    "id": "shapiro",
+    "name": "Josh Shapiro",
+    "party": "Democrat",
+    "role": "Governor of Pennsylvania",
+    "bucket": "soft",
+    "keys": [
+      "mediaBlitz"
+    ],
+    "conf": "Medium",
+    "delta": 2,
+    "lastSignal": "2026-05-05",
+    "headline": "Cautious, but wants to be \"part of the national debate\"",
+    "why": "Marquee swing-state governor; deliberately low-key.",
+    "quote": "",
+    "tags": [
+      "governor lane",
+      "swing-state"
+    ]
+  },
+  {
+    "id": "murphy",
+    "name": "Phil Murphy",
+    "party": "Democrat",
+    "role": "Former NJ governor",
+    "bucket": "soft",
+    "keys": [
+      "softConsidering"
+    ],
+    "conf": "Low",
+    "delta": 1,
+    "lastSignal": "2026-04-15",
+    "headline": "\"Nothing off the table,\" while downplaying the odds",
+    "why": "Term-ended governor; low probability self-assessment.",
+    "quote": "",
+    "tags": [
+      "long-shot"
+    ]
+  },
+  {
+    "id": "yang",
+    "name": "Andrew Yang",
+    "party": "Independent",
+    "role": "Forward Party founder",
+    "bucket": "soft",
+    "keys": [
+      "softConsidering",
+      "mediaBlitz"
+    ],
+    "conf": "Low",
+    "delta": 2,
+    "lastSignal": "2026-03-18",
+    "headline": "Reported mulling 2028; says odds of running are high",
+    "why": "Third-party/independent lane outside the two primaries.",
+    "quote": "",
+    "tags": [
+      "independent",
+      "Forward"
+    ]
+  },
+  {
+    "id": "afroman",
+    "name": "Afroman (Joseph Foreman)",
+    "party": "Libertarian",
+    "role": "Musician",
+    "bucket": "soft",
+    "keys": [
+      "softConsidering"
+    ],
+    "conf": "Low",
+    "delta": 1,
+    "lastSignal": "2026-04-20",
+    "headline": "Hinted at a 2028 Libertarian run",
+    "why": "Celebrity LP lane; no committee yet.",
+    "quote": "",
+    "tags": [
+      "celebrity",
+      "Libertarian"
+    ]
+  },
+  {
+    "id": "vance",
+    "name": "J.D. Vance",
+    "party": "Republican",
+    "role": "Vice President",
+    "bucket": "soft",
+    "keys": [
+      "donors",
+      "staffing",
+      "mediaBlitz"
+    ],
+    "conf": "Medium",
+    "delta": 0,
+    "lastSignal": "2026-06-03",
+    "pollLead": "GOP poll leader (~35%)",
+    "headline": "Downplays it — \"I'm a VP and I like my job\"",
+    "why": "Leads GOP primary polls despite no \"considering\" language; Trump floats a Vance-Rubio ticket.",
+    "quote": "I'm not a potential future candidate. I'm a Vice President.",
+    "tags": [
+      "heir-apparent",
+      "downplaying"
+    ]
+  },
+  {
+    "id": "whitmer",
+    "name": "Gretchen Whitmer",
+    "party": "Democrat",
+    "role": "Governor of Michigan",
+    "bucket": "soft",
+    "keys": [
+      "softConsidering",
+      "mediaBlitz"
+    ],
+    "conf": "Low",
+    "delta": -2,
+    "lastSignal": "2026-04-12",
+    "headline": "Ruled it out, then walked it back (\"never say never\")",
+    "why": "Contradictory signals — flagged for source conflict.",
+    "quote": "Never say never.",
+    "tags": [
+      "swing-state",
+      "contradictory"
+    ]
+  },
+  {
+    "id": "bannon",
+    "name": "Steve Bannon",
+    "party": "Republican",
+    "role": "Strategist / media",
+    "bucket": "edge",
+    "keys": [
+      "softConsidering"
+    ],
+    "conf": "Low",
+    "delta": 0,
+    "lastSignal": "2026-03-12",
+    "headline": "Refuses to rule out a run; posture muddy",
+    "why": "Tied up with Trump-third-term advocacy; no structure.",
+    "quote": "",
+    "tags": [
+      "media",
+      "conditional"
+    ]
+  },
+  {
+    "id": "flynn",
+    "name": "Michael Flynn",
+    "party": "Republican",
+    "role": "Former NSA / general",
+    "bucket": "edge",
+    "keys": [
+      "softConsidering"
+    ],
+    "conf": "Low",
+    "delta": 0,
+    "lastSignal": "2026-02-01",
+    "headline": "Conditional: would run only if Mike Pence runs",
+    "why": "Pure contingency — not an independent signal.",
+    "quote": "",
+    "tags": [
+      "conditional"
+    ]
+  },
+  {
+    "id": "carlson",
+    "name": "Tucker Carlson",
+    "party": "Republican",
+    "role": "Media figure",
+    "bucket": "edge",
+    "keys": [
+      "softConsidering"
+    ],
+    "conf": "Noise",
+    "delta": 0,
+    "lastSignal": "2026-01-20",
+    "headline": "Mused about 2028, didn't fully rule out — no structure",
+    "why": "Speculative; included for completeness, low signal value.",
+    "quote": "",
+    "tags": [
+      "media",
+      "noise"
+    ]
+  },
+  {
+    "id": "hunter",
+    "name": "Hunter Biden",
+    "party": "Democrat",
+    "role": "—",
+    "bucket": "edge",
+    "keys": [
+      "softConsidering"
+    ],
+    "conf": "Noise",
+    "delta": 0,
+    "lastSignal": "2026-06-05",
+    "headline": "Flirts publicly: \"Let's take another crack with a Biden\"",
+    "why": "Joke/troll posting, incl. VP talk with Newsom — not a real candidacy.",
+    "quote": "Let's take another crack with a Biden.",
+    "tags": [
+      "noise",
+      "troll"
+    ]
+  },
+  {
+    "id": "trump",
+    "name": "Donald Trump",
+    "party": "Republican",
+    "role": "President",
+    "bucket": "out",
+    "keys": [
+      "barred"
+    ],
+    "conf": "High",
+    "delta": 0,
+    "lastSignal": "2026-05-01",
+    "headline": "Barred by 22nd Amendment; teases third-term scenarios",
+    "why": "Legally ineligible; tracked only because of the chatter he generates.",
+    "quote": "",
+    "tags": [
+      "ineligible",
+      "22nd Amdt"
+    ]
+  },
+  {
+    "id": "rubio",
+    "name": "Marco Rubio",
+    "party": "Republican",
+    "role": "Secretary of State",
+    "bucket": "out",
+    "keys": [
+      "endorsedOther",
+      "staffing"
+    ],
+    "conf": "Medium",
+    "delta": 0,
+    "lastSignal": "2026-06-03",
+    "headline": "Not planning a run; signals support for Vance",
+    "why": "Trump floats him as Vance's running mate, not a rival.",
+    "quote": "",
+    "tags": [
+      "VP talk",
+      "deferring"
+    ]
+  },
+  {
+    "id": "moore",
+    "name": "Wes Moore",
+    "party": "Democrat",
+    "role": "Governor of Maryland",
+    "bucket": "out",
+    "keys": [
+      "ruledOut"
+    ],
+    "conf": "High",
+    "delta": 0,
+    "lastSignal": "2026-03-15",
+    "headline": "Explicitly says he is not running in 2028",
+    "why": "Clear denial; often cited as a future-cycle prospect instead.",
+    "quote": "I am not running.",
+    "tags": [
+      "denied"
+    ]
+  },
+  {
+    "id": "raimondo",
+    "name": "Gina Raimondo",
+    "party": "Democrat",
+    "role": "Former Commerce Secretary",
+    "bucket": "out",
+    "keys": [
+      "ruledOut"
+    ],
+    "conf": "Medium",
+    "delta": -8,
+    "lastSignal": "2026-03-01",
+    "headline": "Said yes, then later reporting: no longer considering",
+    "why": "Cooled off after initial openness.",
+    "quote": "",
+    "tags": [
+      "cooled"
+    ]
+  },
+  {
+    "id": "walz",
+    "name": "Tim Walz",
+    "party": "Democrat",
+    "role": "Governor of Minnesota",
+    "bucket": "out",
+    "keys": [
+      "ruledOut"
+    ],
+    "conf": "Medium",
+    "delta": -6,
+    "lastSignal": "2026-02-10",
+    "headline": "Earlier \"may run,\" later \"not thinking about 2028\"",
+    "why": "2024 VP nominee who walked back earlier interest.",
+    "quote": "",
+    "tags": [
+      "cooled"
+    ]
+  },
+  {
+    "id": "mtg",
+    "name": "Marjorie Taylor Greene",
+    "party": "Republican",
+    "role": "U.S. Rep (GA)",
+    "bucket": "out",
+    "keys": [
+      "ruledOut"
+    ],
+    "conf": "Low",
+    "delta": 0,
+    "lastSignal": "2026-02-25",
+    "headline": "TIME reported private interest; she publicly denied it",
+    "why": "Source conflict resolved toward denial.",
+    "quote": "",
+    "tags": [
+      "denied",
+      "conflict"
+    ]
+  },
+  {
+    "id": "smith",
+    "name": "Stephen A. Smith",
+    "party": "Independent",
+    "role": "Sports media",
+    "bucket": "out",
+    "keys": [
+      "ruledOut"
+    ],
+    "conf": "Low",
+    "delta": 0,
+    "lastSignal": "2026-01-15",
+    "headline": "Entertained a run, later said no plans",
+    "why": "Backed away from earlier flirtation.",
+    "quote": "",
+    "tags": [
+      "celebrity",
+      "backed away"
+    ]
+  }
+]

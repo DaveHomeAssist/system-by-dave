@@ -1,0 +1,52 @@
+[
+  {
+    "file": "assets/candidates/jorgensen/01_jo_jorgensen_portrait_3_jpg.jpg",
+    "source": "Jo_Jorgensen_portrait_3.jpg",
+    "license": "(Wikipedia lead)",
+    "artist": "",
+    "width": 800,
+    "height": 1000,
+    "descriptionurl": "https://en.wikipedia.org/wiki/Jo%20Jorgensen",
+    "bytes": 213543
+  },
+  {
+    "file": "assets/candidates/jorgensen/02_jo_jorgensen_in_pittsburgh_jpg.jpg",
+    "source": "Jo Jorgensen in Pittsburgh.jpg",
+    "license": "CC BY-SA 4.0",
+    "artist": "Tartan357",
+    "width": 800,
+    "height": 1157,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:Jo_Jorgensen_in_Pittsburgh.jpg",
+    "bytes": 301178
+  },
+  {
+    "file": "assets/candidates/jorgensen/03_jo_jorgensen_cropped_jpg.jpg",
+    "source": "Jo Jorgensen (cropped).jpg",
+    "license": "CC BY-SA 4.0",
+    "artist": "Eliyak, on behalf of Jo Jorgensen for President",
+    "width": 800,
+    "height": 1067,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:Jo_Jorgensen_(cropped).jpg",
+    "bytes": 161185
+  },
+  {
+    "file": "assets/candidates/jorgensen/04_jo_jorgensen_portrait_3_cropped_jpg.jpg",
+    "source": "Jo Jorgensen portrait 3 (cropped).jpg",
+    "license": "CC BY 4.0",
+    "artist": "Jo Jorgensen for President",
+    "width": 800,
+    "height": 1067,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:Jo_Jorgensen_portrait_3_(cropped).jpg",
+    "bytes": 239000
+  },
+  {
+    "file": "assets/candidates/jorgensen/05_jo_jorgensen_portrait_3_cropped_2_jpg.jpg",
+    "source": "Jo Jorgensen portrait 3 (cropped 2).jpg",
+    "license": "CC BY 4.0",
+    "artist": "Jo Jorgensen for President",
+    "width": 800,
+    "height": 1067,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:Jo_Jorgensen_portrait_3_(cropped_2).jpg",
+    "bytes": 245292
+  }
+]

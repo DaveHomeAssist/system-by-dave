@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+.env
+public/
+data/dashboard.html
+.DS_Store

@@ -1,0 +1,52 @@
+[
+  {
+    "file": "assets/candidates/paul/01_rand_paul_portrait_jpg.jpg",
+    "source": "Rand_Paul_Portrait.jpg",
+    "license": "Wikipedia lead",
+    "artist": "",
+    "width": 800,
+    "height": 1134,
+    "descriptionurl": "https://en.wikipedia.org/wiki/Rand%20Paul",
+    "bytes": 285046
+  },
+  {
+    "file": "assets/candidates/paul/02_rand_paul_6050270819_jpg.jpg",
+    "source": "Rand Paul (6050270819).jpg",
+    "license": "CC BY-SA 2.0",
+    "artist": "Gage Skidmore from Peoria, AZ, United States of America",
+    "width": 800,
+    "height": 1200,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:Rand_Paul_(6050270819).jpg",
+    "bytes": 272870
+  },
+  {
+    "file": "assets/candidates/paul/03_rand_paul_6053969582_jpg.jpg",
+    "source": "Rand Paul (6053969582).jpg",
+    "license": "CC BY-SA 2.0",
+    "artist": "Gage Skidmore from Peoria, AZ, United States of America",
+    "width": 800,
+    "height": 1200,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:Rand_Paul_(6053969582).jpg",
+    "bytes": 284715
+  },
+  {
+    "file": "assets/candidates/paul/04_rand_paul_official_portrait_112th_congress_alterna.jpg",
+    "source": "Rand Paul, official portrait, 112th Congress alternate.jpg",
+    "license": "Public domain",
+    "artist": "United States Senate",
+    "width": 800,
+    "height": 1013,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:Rand_Paul,_official_portrait,_112th_Congress_alternate.jpg",
+    "bytes": 217219
+  },
+  {
+    "file": "assets/candidates/paul/05_rand_paul_2011_jpg.jpg",
+    "source": "Rand Paul 2011.jpg",
+    "license": "CC BY-SA 2.0",
+    "artist": "Gage Skidmore at https://www.flickr.com/photos/gageskidmore",
+    "width": 800,
+    "height": 800,
+    "descriptionurl": "https://commons.wikimedia.org/wiki/File:Rand_Paul_2011.jpg",
+    "bytes": 102120
+  }
+]
