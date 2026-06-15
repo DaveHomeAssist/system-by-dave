@@ -58,8 +58,9 @@ def test_seed_has_no_script_breakout(tmp_path):
     seed = html[html.index("const SEED ="):html.index("/* ---------- persistence")]
     assert "</script" not in seed.lower(), "raw </script> survived into the SEED literal"
     assert "\\u003c" in seed, "expected '<' to be escaped as \\u003c in the SEED"
-    # The whole document should contain only the single structural </script> closer.
-    assert html.lower().count("</script>") == 1
+    # Two structural </script> closers: the head JSON-LD block + the dashboard
+    # script. The escaped SEED adds none (its "<" became <), which is the point.
+    assert html.lower().count("</script>") == 2
 
 
 RENDER_CHECK = Path(__file__).resolve().parent / "xss_render_check.js"

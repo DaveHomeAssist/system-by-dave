@@ -48,9 +48,12 @@ try {
     renderQuick(); renderStats();
     OUT={T:T,R0:R0,RM:RM,MC:MC,RD:RD,D5:D5,seedAdds:seedAdds,withAdd:withAdd,RC:RC,
       chips:(document.querySelector('#quickbar').innerHTML.match(/data-quick=/g)||[]).length,
-      // strip the legitimate avatar <img> first, then assert no OTHER tag leaked
-      // (an injected <img onerror=...> from an unescaped field lacks class="avatarSm")
-      escaped:!/<(img|script|svg)/i.test(document.querySelector('#boardBody').innerHTML.replace(/<img class="avatarSm"[^>]*>/g,''))};
+      // strip the legitimate avatar <img> and momentum sparkline <svg> first, then
+      // assert no OTHER tag leaked (an injected <img onerror=...>/<svg> from an
+      // unescaped field lacks class="avatarSm"/class="spark").
+      escaped:!/<(img|script|svg)/i.test(document.querySelector('#boardBody').innerHTML
+        .replace(/<img class="avatarSm"[^>]*>/g,'')
+        .replace(/<svg class="spark"[^]*?<\\/svg>/g,''))};
   `);
 } catch (e) {
   console.log('FAIL: dashboard threw -> ' + (e && e.message));

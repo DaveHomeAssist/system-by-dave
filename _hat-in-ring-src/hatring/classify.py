@@ -15,6 +15,8 @@ import re
 import logging
 from dataclasses import dataclass, field
 
+from . import geo
+
 log = logging.getLogger("hatring.classify")
 
 # Ordered rules: (signal_key, compiled regex). First strong match sets status.
@@ -72,6 +74,7 @@ class Classified:
     matched_alias: str | None = None
     discovery: bool = False           # True -> name not on watchlist
     tags: list[str] = field(default_factory=list)
+    states: list[str] = field(default_factory=list)   # early-state codes (IA/NH/SC/NV)
 
 
 _TITLES = {"Senator", "Sen", "Sen.", "Gov", "Gov.", "Governor", "Rep", "Rep.",
@@ -143,6 +146,10 @@ def classify_item(item, watchlist: list[dict]) -> Classified | None:
     satire = bool(_SATIRE_RX.search(text)) or item.source in _SATIRE_SOURCES
     if satire:
         confidence = "Noise"
+    # Early-state geo tagging: when the earlyState signal fired, capture WHICH
+    # of IA/NH/SC/NV the headline names so the Early-State Big Board can attribute
+    # activity. Empty when earlyState didn't fire (or no state named).
+    states = geo.tag_states(text) if "earlyState" in keys else []
     return Classified(
         person_id=pid,
         name_guess=alias or _guess_name(item.title),
@@ -154,6 +161,7 @@ def classify_item(item, watchlist: list[dict]) -> Classified | None:
         url=item.url, source=item.source, date=item.published,
         matched_alias=alias, discovery=(pid is None) or satire,
         tags=[item.source] if item.source else [],
+        states=states,
     )
 
 

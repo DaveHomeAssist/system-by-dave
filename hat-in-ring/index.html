@@ -4,6 +4,21 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>2028 Hat-in-Ring Radar</title>
+<meta name="description" content="Live 2028 presidential signal tracker: status tier × momentum across 40+ potential candidates, updated daily from FEC filings and news. Trajectory, early-state activity, head-to-head compare, and money movement — defensible signals, not a rumor board.">
+<link rel="canonical" href="https://systembydave.com/hat-in-ring/">
+<meta name="theme-color" content="#1a1a1a">
+<meta name="robots" content="index,follow">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="System by Dave">
+<meta property="og:title" content="2028 Hat-in-Ring Radar — presidential signal tracker">
+<meta property="og:description" content="Live 2028 presidential signal tracker: status tier × momentum across 40+ potential candidates, updated daily from FEC filings and news. Trajectory, early-state activity, head-to-head compare, and money movement — defensible signals, not a rumor board.">
+<meta property="og:url" content="https://systembydave.com/hat-in-ring/">
+<meta property="og:image" content="https://systembydave.com/hat-in-ring/assets/share/latest.svg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="2028 Hat-in-Ring Radar">
+<meta name="twitter:description" content="Live 2028 presidential signal tracker: status tier × momentum across 40+ potential candidates, updated daily from FEC filings and news. Trajectory, early-state activity, head-to-head compare, and money movement — defensible signals, not a rumor board.">
+<meta name="twitter:image" content="https://systembydave.com/hat-in-ring/assets/share/latest.svg">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"2028 Hat-in-Ring Radar","url":"https://systembydave.com/hat-in-ring/","description":"Live 2028 presidential signal tracker: status tier × momentum across 40+ potential candidates, updated daily from FEC filings and news. Trajectory, early-state activity, head-to-head compare, and money movement — defensible signals, not a rumor board.","publisher":{"@type":"Organization","name":"System by Dave","url":"https://systembydave.com/"}}</script>
 <style>
 :root{
   color-scheme: light;
@@ -178,6 +193,70 @@ footer{margin-top:26px;padding-top:14px;border-top:1px solid var(--line);font-si
   border-radius:10px;padding:9px 13px;margin-bottom:14px;font-size:12.5px}
 .nudge .x{cursor:pointer;color:#274b78;opacity:.6;font-size:16px;line-height:1}
 .resetlink{cursor:pointer;color:var(--muted);text-decoration:underline}
+/* ---- v2: trajectory, early-state board, compare, money, share, a11y ---- */
+.spark{vertical-align:middle;display:inline-block}
+.trendCell{width:90px;white-space:nowrap}
+.slopen{font-variant-numeric:tabular-nums;font-size:11px;margin-left:5px}
+.slopen.up{color:var(--good)} .slopen.dn{color:var(--bad)} .slopen.fl{color:var(--muted)}
+.flags{display:flex;flex-wrap:wrap;gap:4px;margin:7px 0 0 6px}
+.flag{font-size:9.5px;font-weight:700;letter-spacing:.03em;border-radius:5px;padding:1px 6px;text-transform:uppercase;border:1px solid transparent}
+.flag.new{background:#e6f6ec;color:#1f7a44;border-color:#bfe6cd}
+.flag.hot{background:#fdecea;color:#c0392b;border-color:#f3c4bd}
+.flag.cool{background:#eef2f7;color:#5b6b7d;border-color:#d3dbe5}
+.flag.stale{background:#f3f1ec;color:#8a8475;border-color:#e0dccf}
+.flag.verified{background:#eef7f1;color:#2c7a52;border-color:#cfe7d8}
+/* crawl summary (SEO / no-JS) */
+.crawl-summary{font-size:12.5px;color:var(--muted);margin:0 0 14px}
+.crawl-summary noscript table{width:100%;margin-top:8px}
+/* briefing */
+.briefing .b-item{display:flex;justify-content:space-between;gap:8px;padding:7px 15px;border-bottom:1px solid var(--line);font-size:12.5px;cursor:pointer}
+.briefing .b-item:last-child{border-bottom:0}
+.briefing .b-empty{padding:12px 15px;color:var(--muted);font-size:12.5px}
+.briefing .b-sec{font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);padding:9px 15px 3px;font-weight:700}
+.b-d{font-variant-numeric:tabular-nums;font-weight:600}
+.b-d.up{color:var(--good)} .b-d.dn{color:var(--bad)} .b-d.fl{color:var(--muted)}
+.b-share{padding:10px 15px;border-top:1px solid var(--line);font-size:12px}
+/* trajectory view */
+.trajCtl{display:flex;gap:8px;align-items:center;padding:10px 15px;border-bottom:1px solid var(--line);font-size:12.5px;color:var(--muted)}
+/* early-state big board */
+.bigboard{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:14px}
+@media(max-width:560px){.bigboard{grid-template-columns:1fr}}
+.statecard{border:1px solid var(--line);border-radius:11px;padding:13px;background:#fff;cursor:pointer;transition:.12s}
+.statecard:hover,.statecard:focus-visible{border-color:#c9c6bd;transform:translateY(-1px);outline:none}
+.statecard h3{font-size:16px;display:flex;justify-content:space-between;align-items:baseline}
+.statecard .sc-n{font-family:Georgia,serif;font-size:22px;color:var(--dem)}
+.heatbar{height:8px;border-radius:4px;background:#eee;overflow:hidden;margin:9px 0}
+.heatbar > i{display:block;height:100%;background:linear-gradient(90deg,var(--t2),var(--t4))}
+.sc-list{font-size:12.5px;color:#333;margin-top:6px}
+.sc-list .sc-row{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px dashed var(--line)}
+.sc-row:last-child{border-bottom:0}
+.statefilter{display:flex;align-items:center;gap:8px;background:#eef5ff;border:1px solid #d4e3fb;color:#274b78;border-radius:8px;padding:7px 12px;margin:0 0 12px;font-size:12.5px}
+.statefilter .x{cursor:pointer;margin-left:auto;font-size:16px;line-height:1}
+/* compare */
+.cmp-pick{position:absolute;top:9px;right:9px;width:18px;height:18px;cursor:pointer;z-index:2}
+.cmptray{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--ink);color:#fff;border-radius:12px;
+  padding:9px 14px;display:flex;gap:10px;align-items:center;box-shadow:0 6px 22px rgba(0,0,0,.2);z-index:55;font-size:12.5px;max-width:94vw}
+.cmptray .cchip{background:rgba(255,255,255,.16);border-radius:7px;padding:3px 8px;display:inline-flex;gap:6px;align-items:center}
+.cmptray .cchip .x{cursor:pointer;opacity:.7}
+.cmpgrid{display:grid;gap:12px;padding:14px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.cmpcol{border:1px solid var(--line);border-radius:11px;padding:13px;background:#fff}
+.cmpcol h3{font-size:15px}
+.cmpcol .crow{display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px dashed var(--line);font-size:12.5px}
+.cmpcol .crow:last-child{border-bottom:0}
+.cmpcol .crow .ck{color:var(--muted)}
+.cmpEmpty{padding:26px 16px;color:var(--muted);text-align:center;font-size:13px}
+/* money */
+.money-tbl{width:100%;font-size:12.5px;margin-top:4px}
+.money-tbl td{padding:4px 0;border-bottom:1px dashed var(--line)}
+.money-tbl td:last-child{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+.money-na{color:var(--muted);font-size:12.5px}
+.moneyCell{font-variant-numeric:tabular-nums;font-size:12px;white-space:nowrap}
+/* a11y: visible focus everywhere */
+a:focus-visible,button:focus-visible,select:focus-visible,input:focus-visible,
+.chip:focus-visible,.qchip:focus-visible,.statecard:focus-visible,tr.row:focus-visible,.card:focus-visible{
+  outline:2px solid var(--dem);outline-offset:2px;border-radius:6px}
+.seg button[aria-selected=true]{background:var(--ink);color:#fff}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 </style>
 </head>
 <body>
@@ -190,9 +269,17 @@ footer{margin-top:26px;padding-top:14px;border-top:1px solid var(--line);font-si
     <div class="asof">
       As of <b id="asof">June 15, 2026</b><br>
       <span id="counter"></span><br>
-      <span class="buildstamp" title="Last automated rebuild (UTC in CI)">auto-built Jun 15 2026 03:39</span>
+      <span class="buildstamp" title="Last automated rebuild (UTC in CI)">auto-built Jun 15 2026 03:59</span>
     </div>
   </header>
+
+  <section class="crawl-summary" id="crawl-summary">
+    <p>The <b>2028 Hat-in-Ring Radar</b> tracks 40 potential 2028 U.S. presidential candidates on two axes — <b>status tier</b> (the furthest verifiable step taken) and <b>momentum</b> (weighted activity + recency, 0–100) — rebuilt daily from FEC filings and news. Status is not the same as support. Live board: <a href="https://systembydave.com/hat-in-ring/">systembydave.com/hat-in-ring</a>.</p>
+    <noscript>
+      <table><thead><tr><th>#</th><th>Candidate</th><th>Lane</th><th>Status</th><th>Momentum</th></tr></thead>
+      <tbody><tr><td>1</td><td>Gavin Newsom</td><td>Democrat</td><td>Actively considering</td><td>60</td></tr><tr><td>2</td><td>J.D. Vance</td><td>Republican</td><td>Actively considering</td><td>60</td></tr><tr><td>3</td><td>Kamala Harris</td><td>Democrat</td><td>Actively considering</td><td>55</td></tr><tr><td>4</td><td>Rahm Emanuel</td><td>Democrat</td><td>Actively considering</td><td>50</td></tr><tr><td>5</td><td>Ted Cruz</td><td>Republican</td><td>Actively considering</td><td>50</td></tr><tr><td>6</td><td>Ron DeSantis</td><td>Republican</td><td>Actively considering</td><td>50</td></tr><tr><td>7</td><td>Dan Greaney</td><td>Republican</td><td>Declared</td><td>45</td></tr><tr><td>8</td><td>Jo Jorgensen</td><td>Libertarian</td><td>Exploratory</td><td>45</td></tr><tr><td>9</td><td>Ruben Gallego</td><td>Democrat</td><td>Actively considering</td><td>45</td></tr><tr><td>10</td><td>Pete Buttigieg</td><td>Democrat</td><td>Positioning</td><td>40</td></tr><tr><td>11</td><td>Gregory &quot;Greg&quot; Bovino</td><td>Republican</td><td>Exploratory</td><td>35</td></tr><tr><td>12</td><td>J.B. Pritzker</td><td>Democrat</td><td>Actively considering</td><td>35</td></tr><tr><td>13</td><td>Cory Booker</td><td>Democrat</td><td>Actively considering</td><td>30</td></tr><tr><td>14</td><td>Mark Kelly</td><td>Democrat</td><td>Actively considering</td><td>30</td></tr><tr><td>15</td><td>Elissa Slotkin</td><td>Democrat</td><td>Positioning</td><td>27</td></tr></tbody></table>
+    </noscript>
+  </section>
 
   <div class="stats" id="stats"></div>
   <div class="nudge hide" id="nudge"></div>
@@ -214,10 +301,13 @@ footer{margin-top:26px;padding-top:14px;border-top:1px solid var(--line);font-si
       <option value="2">Medium+</option>
       <option value="1">Hide noise</option>
     </select>
-    <div class="seg" id="viewSeg">
-      <button data-view="board" class="on">Leaderboard <span class="segbadge alt" id="moversCount" title="movers"></span></button>
-      <button data-view="cards">Cards</button>
-      <button data-view="review">Review <span class="segbadge" id="reviewCount"></span></button>
+    <div class="seg" id="viewSeg" role="tablist" aria-label="Dashboard views">
+      <button data-view="board" role="tab" aria-selected="true" class="on">Leaderboard <span class="segbadge alt" id="moversCount" title="movers"></span></button>
+      <button data-view="cards" role="tab" aria-selected="false">Cards</button>
+      <button data-view="traj" role="tab" aria-selected="false">Trajectory</button>
+      <button data-view="early" role="tab" aria-selected="false">Early&nbsp;States</button>
+      <button data-view="compare" role="tab" aria-selected="false">Compare <span class="segbadge alt" id="compareCount"></span></button>
+      <button data-view="review" role="tab" aria-selected="false">Review <span class="segbadge" id="reviewCount"></span></button>
     </div>
     <button class="btn" id="addBtn">+ Add</button>
     <button class="btn" id="exportBtn" title="Download data as JSON">Export</button>
@@ -227,6 +317,7 @@ footer{margin-top:26px;padding-top:14px;border-top:1px solid var(--line);font-si
 
   <div class="layout">
     <div>
+      <div id="stateFilter"></div>
       <div class="panel" id="boardPanel">
         <h2>Seriousness leaderboard <span class="meta" id="boardMeta"></span></h2>
         <table id="board"><thead><tr>
@@ -235,6 +326,7 @@ footer{margin-top:26px;padding-top:14px;border-top:1px solid var(--line);font-si
           <th data-sort="party">Lane</th>
           <th data-sort="tierRank">Status</th>
           <th data-sort="score" class="sorted">Momentum</th>
+          <th data-sort="slope30" class="trendCell">Trend</th>
           <th data-sort="delta">7‑day</th>
           <th data-sort="confRank">Conf.</th>
         </tr></thead><tbody id="boardBody"></tbody></table>
@@ -252,9 +344,32 @@ footer{margin-top:26px;padding-top:14px;border-top:1px solid var(--line);font-si
           <span class="meta" id="decisionsMeta"></span>
         </div>
       </div>
+
+      <div class="panel hide" id="trajPanel">
+        <h2>Momentum trajectory <span class="meta" id="trajMeta"></span></h2>
+        <div class="trajCtl">Sort by
+          <div class="seg" id="trajSeg" role="group" aria-label="Trajectory window">
+            <button data-win="7" class="on">7‑day</button><button data-win="30">30‑day</button>
+          </div> momentum change · sparkline shows recent momentum.</div>
+        <table id="trajTbl"><thead><tr><th class="rank">#</th><th>Candidate</th><th>Trend</th><th>Momentum</th><th>Δ7d</th><th>Δ30d</th></tr></thead><tbody id="trajBody"></tbody></table>
+      </div>
+
+      <div class="panel hide" id="earlyPanel">
+        <h2>Early‑state activity <span class="meta">Iowa · New Hampshire · South Carolina · Nevada</span></h2>
+        <div class="bigboard" id="bigboard"></div>
+      </div>
+
+      <div class="panel hide" id="comparePanel">
+        <h2>Head‑to‑head compare <span class="meta" id="cmpMeta"></span></h2>
+        <div id="cmpBody"></div>
+      </div>
     </div>
 
     <aside>
+      <div class="panel" style="margin-bottom:16px">
+        <h2>Today's briefing <span class="meta" id="briefMeta">what moved</span></h2>
+        <div class="briefing" id="briefing"></div>
+      </div>
       <div class="panel" style="margin-bottom:16px">
         <h2>Today's movement <span class="meta">latest signals</span></h2>
         <div class="feed" id="feed"></div>
@@ -273,6 +388,7 @@ footer{margin-top:26px;padding-top:14px;border-top:1px solid var(--line);font-si
 <div class="scrim" id="scrim"></div>
 <div class="drawer" id="drawer"><div id="drawerInner"></div></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="cmptray hide" id="cmptray" aria-live="polite"></div>
 
 <script>
 const GENERATED_AT = "2026-06-15T12:00:00Z";   // build timestamp (drives recency maths)
@@ -350,10 +466,14 @@ function score(c){
    Sources: AP, Reuters, Time, WaPo, ABC, C-SPAN, FEC, Wikipedia.
    keys[] drive both status and score; edit/add persists locally.
    ============================================================ */
-const SEED = [{"bucket": "formal", "conf": "Very high", "delta": 0, "headline": "‘Simpsons’ writer Dan Greaney announces 2028 presidential campaign - News.com.au", "id": "greaney", "img": "assets/candidates/greaney/01_dan_greaney_campaign_jpg.jpg", "keys": ["declared"], "lastSignal": "2026-05-26", "name": "Dan Greaney", "party": "Republican", "quote": "", "role": "Perennial candidate", "tags": ["FEC", "declared"], "why": "Only formally declared major-party filer so far; low-profile."}, {"bucket": "formal", "conf": "Medium", "delta": 0, "headline": "\"All options\" exploratory posture for 2028", "id": "bovino", "img": "assets/candidates/bovino/01_2026_border_patrol_chief_greg_bovino_in_minneapoli.jpg", "keys": ["exploratory", "mediaBlitz"], "lastSignal": "2026-04-10", "name": "Gregory \"Greg\" Bovino", "party": "Republican", "quote": "", "role": "Border-enforcement figure", "tags": ["exploratory"], "why": "Early exploratory lane on the MAGA-enforcement flank."}, {"bucket": "formal", "conf": "High", "delta": 0, "headline": "Jo Jorgensen: South Carolina Libertarian Eyes 2028 Presidential Bid - FITSNews", "id": "jorgensen", "img": "assets/candidates/jorgensen/01_jo_jorgensen_portrait_3_jpg.jpg", "keys": ["exploratory", "earlyState"], "lastSignal": "2026-05-28", "name": "Jo Jorgensen", "party": "Libertarian", "quote": "", "role": "2020 LP nominee", "tags": ["exploratory", "Libertarian"], "why": "Most concrete step on the Libertarian side."}, {"bucket": "considering", "conf": "High", "delta": 0, "headline": "Sky News Australia. . Sky News Digital Presenter Gabriella Power reacts to Hunter Biden speaking about his political future on Gavin Newsom's podcast. The son of former US President Joe Biden teased a potential vice-presidential run in 2028. - facebook.com", "id": "newsom", "img": "assets/candidates/newsom/01_governor_of_california_gavin_newsom_cropped_3x4_jp.jpg", "keys": ["consideringQuote", "earlyState", "donors", "staffing", "mediaBlitz"], "lastSignal": "2026-06-12", "name": "Gavin Newsom", "party": "Democrat", "pollLead": "Dem poll leader", "quote": "I'd be lying if I said I wasn't seriously thinking about it.", "role": "Governor of California", "tags": ["governor lane", "frontrunner"], "why": "Catapulted to front-runner in Emerson national polling."}, {"bucket": "considering", "conf": "High", "delta": 0, "headline": "Big donors backed Harris in 2024. For 2028, they’re not so sure - Los Angeles Times", "id": "harris", "img": "assets/candidates/harris/01_kamala_harris_vice_presidential_portrait_jpg.jpg", "keys": ["consideringQuote", "donors", "staffing", "mediaBlitz", "earlyState"], "lastSignal": "2026-05-10", "name": "Kamala Harris", "party": "Democrat", "quote": "I have not made a decision… I may or may not.", "role": "Former VP / 2024 nominee", "tags": ["rematch", "establishment"], "why": "Retains 2024 donor & staff network; leads some rematch polls."}, {"bucket": "considering", "conf": "High", "delta": 0, "headline": "\"Of course I'm thinking about it\" — not ruled out", "id": "booker", "img": "assets/candidates/booker/01_cory_booker_official_portrait_119th_congress_jpg.jpg", "keys": ["consideringQuote", "mediaBlitz", "softConsidering"], "lastSignal": "2026-05-30", "name": "Cory Booker", "party": "Democrat", "quote": "Of course I'm thinking about it.", "role": "U.S. Senator (NJ)", "tags": ["senate"], "why": "Most explicit yes among Senate Democrats; record-floor-speech visibility."}, {"bucket": "considering", "conf": "High", "delta": 0, "headline": "Open \"under the right circumstances\"; decision after DGA term", "id": "beshear", "img": "assets/candidates/beshear/01_andy_beshear_in_april_2026_cropped_jpg.jpg", "keys": ["consideringQuote", "mediaBlitz"], "lastSignal": "2026-05-08", "name": "Andy Beshear", "party": "Democrat", "quote": "I'd consider it under the right circumstances.", "role": "Governor of Kentucky", "tags": ["governor lane", "post-DGA"], "why": "Red-state Dem appeal; timeline tied to Governors Assoc. chairmanship."}, {"bucket": "considering", "conf": "Medium", "delta": 0, "headline": "Trump clash, fundraising boom elevate Mark Kelly’s 2028 presidential prospects - Cronkite News", "id": "kelly", "img": "assets/candidates/kelly/01_sen_mark_kelly_d_az_official_portrait_119th_congre.jpg", "keys": ["consideringQuote", "staffing", "donors"], "lastSignal": "2026-02-17", "name": "Mark Kelly", "party": "Democrat", "quote": "", "role": "U.S. Senator (AZ)", "tags": ["senate", "swing-state"], "why": "Swing-state, astronaut/veteran profile draws operative interest."}, {"bucket": "considering", "conf": "High", "delta": 0, "headline": "\"We'll look at that after the midterms\"", "id": "khanna", "img": "assets/candidates/khanna/01_ro_khanna_official_portrait_115th_congress_3x4_jpg.jpg", "keys": ["consideringQuote"], "lastSignal": "2026-03-20", "name": "Ro Khanna", "party": "Democrat", "quote": "We'll look at that after the midterms.", "role": "U.S. Rep (CA)", "tags": ["post-midterms", "progressive"], "why": "First clear public timeline from the progressive-pragmatist lane."}, {"bucket": "considering", "conf": "Medium", "delta": 0, "headline": "Sen. Ruben Gallego Attends Iowa State Fair Amid 2028 Presidential Bid Speculation Gracie Abrams (9SsQDihp8W) - Mshale", "id": "gallego", "img": "assets/candidates/gallego/01_senator_ruben_gallego_official_portrait_jpg.jpg", "keys": ["consideringQuote", "earlyState", "staffing"], "lastSignal": "2026-06-12", "name": "Ruben Gallego", "party": "Democrat", "quote": "We have to look at it.", "role": "U.S. Senator (AZ)", "tags": ["senate", "upgrade"], "why": "Notable upgrade — went from denial to open in weeks."}, {"bucket": "considering", "conf": "High", "delta": 0, "headline": "\"Can't rule anything out\" for 2028", "id": "pritzker", "img": "assets/candidates/pritzker/01_governor_jb_pritzker_official_portrait_2019_crop_j.jpg", "keys": ["consideringQuote", "donors", "mediaBlitz"], "lastSignal": "2026-05-01", "name": "J.B. Pritzker", "party": "Democrat", "quote": "I can't rule anything out.", "role": "Governor of Illinois", "tags": ["governor lane", "self-fund"], "why": "Self-funding capacity removes the money constraint entirely."}, {"bucket": "considering", "conf": "Medium", "delta": 0, "headline": "Rahm Emanuel's uphill climb in New Hampshire tests a 2028 presidential bid - Caledonian Record", "id": "emanuel", "img": "assets/candidates/emanuel/01_ambassador_emanuel_portrait_jpg.jpg", "keys": ["softConsidering", "mediaBlitz", "donors", "earlyState", "consideringQuote"], "lastSignal": "2026-06-09", "name": "Rahm Emanuel", "party": "Democrat", "quote": "", "role": "Former Amb. / Chicago mayor", "tags": ["centrist", "testing"], "why": "Aggressive media tour to project vitality and viability."}, {"bucket": "considering", "conf": "Low", "delta": 0, "headline": "Among Dems considering; \"open if needed\"", "id": "green", "img": "assets/candidates/green/01_lieutenant_governor_of_hawaii_josh_green_jpg.jpg", "keys": ["softConsidering"], "lastSignal": "2026-05-20", "name": "Josh Green", "party": "Democrat", "quote": "", "role": "Governor of Hawaii", "tags": ["governor lane"], "why": "Outside-lane physician-governor; low national profile."}, {"bucket": "considering", "conf": "Medium", "delta": 0, "headline": "Mitch Landrieu launches surprise 2028 presidential bid in New Orleans - mezha.net", "id": "landrieu", "img": "assets/candidates/landrieu/01_mitch_landrieu_52801339981_cropped_jpg.jpg", "keys": ["earlyState", "donors"], "lastSignal": "2026-04-19", "name": "Mitch Landrieu", "party": "Democrat", "quote": "", "role": "Former New Orleans mayor", "tags": ["soft-launch"], "why": "Behavioral signals (travel, donor outreach) ahead of any quote."}, {"bucket": "considering", "conf": "Medium", "delta": 0, "headline": "Not set on running, but \"keeping her name in the mix\"", "id": "slotkin", "img": "assets/candidates/slotkin/01_elissa_slotkin_2026_official_portrait_cropped_jpg.jpg", "keys": ["softConsidering", "earlyState"], "lastSignal": "2026-06-09", "name": "Elissa Slotkin", "party": "Democrat", "quote": "", "role": "U.S. Senator (MI)", "tags": ["senate", "swing-state", "fresh"], "why": "Most recent signal on the board; swing-state freshman senator."}, {"bucket": "considering", "conf": "High", "delta": 0, "headline": "Sen. Ted Cruz addresses 2028 presidential bid while in Iowa - KWTX", "id": "cruz", "img": "assets/candidates/cruz/01_ted_cruz_official_116th_portrait_3x4_cropped_jpg.jpg", "keys": ["consideringQuote", "donors", "staffing", "earlyState"], "lastSignal": "2026-05-04", "name": "Ted Cruz", "party": "Republican", "quote": "", "role": "U.S. Senator (TX)", "tags": ["senate", "anti-Vance lane"], "why": "2016 infrastructure & donor base; explicit intra-MAGA lane."}, {"bucket": "considering", "conf": "Medium", "delta": 0, "headline": "Didn't rule it out: \"We'll see… you never know\"", "id": "desantis", "img": "assets/candidates/desantis/01_ron_desantis_official_photo_jpg.jpg", "keys": ["consideringQuote", "donors", "staffing", "earlyState"], "lastSignal": "2026-03-24", "name": "Ron DeSantis", "party": "Republican", "quote": "We'll see. You never know.", "role": "Governor of Florida", "tags": ["governor lane", "retread"], "why": "2024 national org still partly intact; term-limited in 2026."}, {"bucket": "considering", "conf": "Medium", "delta": 0, "headline": "\"Thinking about it\" — puts odds around 50-50", "id": "paul", "img": "assets/candidates/paul/01_rand_paul_portrait_jpg.jpg", "keys": ["consideringQuote"], "lastSignal": "2026-04-02", "name": "Rand Paul", "party": "Republican", "quote": "I'd put it around 50-50.", "role": "U.S. Senator (KY)", "tags": ["senate", "liberty lane"], "why": "Libertarian-Republican lane; rare explicit probability."}, {"bucket": "considering", "conf": "Low", "delta": 0, "headline": "Would \"never rule out\" an opportunity to serve", "id": "gabbard", "img": "assets/candidates/gabbard/01_director_tulsi_gabbard_official_portrait_jpg.jpg", "keys": ["softConsidering", "mediaBlitz"], "lastSignal": "2026-03-30", "name": "Tulsi Gabbard", "party": "Republican", "quote": "I'd never rule out an opportunity to serve.", "role": "Trump admin official", "tags": ["admin", "MAGA"], "why": "Admin platform raises visibility; non-committal framing."}, {"bucket": "considering", "conf": "Low", "delta": 0, "headline": "Won't rule out governor — or president — in 2028", "id": "bacon", "img": "assets/candidates/bacon/01_bacon_don_119th_congress_3x4_cropped_b_jpg.jpg", "keys": ["softConsidering"], "lastSignal": "2026-03-10", "name": "Don Bacon", "party": "Republican", "quote": "I wouldn't rule it out.", "role": "U.S. Rep (NE), retiring", "tags": ["centrist"], "why": "Centrist Republican lane; also weighing NE governor."}, {"bucket": "considering", "conf": "Low", "delta": 0, "headline": "Says he is \"seriously considering\" a run", "id": "lemon", "img": "assets/candidates/lemon/01_don_lemon_at_the_2018_pulitzer_prizes_jpg.jpg", "keys": ["softConsidering", "mediaBlitz"], "lastSignal": "2026-05-22", "name": "Don Lemon", "party": "Democrat", "quote": "I'm seriously considering it.", "role": "Media figure", "tags": ["celebrity", "no structure"], "why": "No party structure or office base — celebrity lane."}, {"bucket": "soft", "conf": "Medium", "delta": 0, "headline": "Pete Buttigieg to give keynote speech at Iowa Democratic event, fueling presidential speculation - LGBTQ Nation", "id": "buttigieg", "img": "assets/candidates/buttigieg/01_pete_buttigieg_secretary_of_transportation_jpg.jpg", "keys": ["donors", "staffing", "mediaBlitz", "earlyState"], "lastSignal": "2026-06-11", "name": "Pete Buttigieg", "party": "Democrat", "quote": "", "role": "Former Transp. Secretary", "tags": ["establishment", "polls-high"], "why": "Top-3 in Dem polls on name ID; no explicit \"considering\" yet."}, {"bucket": "soft", "conf": "Medium", "delta": 0, "headline": "Hasn't ruled out higher office; frames ambition as policy", "id": "aoc", "img": "assets/candidates/aoc/01_alexandria_ocasio_cortez_official_portrait_jpg.jpg", "keys": ["donors", "mediaBlitz"], "lastSignal": "2026-04-28", "name": "Alexandria Ocasio-Cortez", "party": "Democrat", "quote": "", "role": "U.S. Rep (NY)", "tags": ["progressive", "grassroots"], "why": "Massive small-dollar base; leads some progressive polls."}, {"bucket": "soft", "conf": "Medium", "delta": 0, "headline": "Cautious, but wants to be \"part of the national debate\"", "id": "shapiro", "img": "assets/candidates/shapiro/01_josh_shapiro_december_2025_jpg.jpg", "keys": ["mediaBlitz"], "lastSignal": "2026-05-05", "name": "Josh Shapiro", "party": "Democrat", "quote": "", "role": "Governor of Pennsylvania", "tags": ["governor lane", "swing-state"], "why": "Marquee swing-state governor; deliberately low-key."}, {"bucket": "soft", "conf": "Low", "delta": 0, "headline": "\"Nothing off the table,\" while downplaying the odds", "id": "murphy", "img": "assets/candidates/murphy/01_gov_phil_murphy_jpg.jpg", "keys": ["softConsidering"], "lastSignal": "2026-04-15", "name": "Phil Murphy", "party": "Democrat", "quote": "", "role": "Former NJ governor", "tags": ["long-shot"], "why": "Term-ended governor; low probability self-assessment."}, {"bucket": "soft", "conf": "Low", "delta": 0, "headline": "Reported mulling 2028; says odds of running are high", "id": "yang", "img": "assets/candidates/yang/01_andrew_yang_november_2023_jpg.jpg", "keys": ["softConsidering", "mediaBlitz"], "lastSignal": "2026-03-18", "name": "Andrew Yang", "party": "Independent", "quote": "", "role": "Forward Party founder", "tags": ["independent", "Forward"], "why": "Third-party/independent lane outside the two primaries."}, {"bucket": "soft", "conf": "Low", "delta": 0, "headline": "Hinted at a 2028 Libertarian run", "id": "afroman", "img": "assets/candidates/afroman/01_afroman_2026_cropped_jpg.jpg", "keys": ["softConsidering"], "lastSignal": "2026-04-20", "name": "Afroman (Joseph Foreman)", "party": "Libertarian", "quote": "", "role": "Musician", "tags": ["celebrity", "Libertarian"], "why": "Celebrity LP lane; no committee yet."}, {"bucket": "soft", "conf": "Medium", "delta": 0, "headline": "Downplays it — \"I'm a VP and I like my job\"", "id": "vance", "img": "assets/candidates/vance/01_march_2026_official_vice_presidential_portrait_of_.jpg", "keys": ["donors", "staffing", "mediaBlitz", "earlyState", "consideringQuote"], "lastSignal": "2026-06-03", "name": "J.D. Vance", "party": "Republican", "pollLead": "GOP poll leader (~35%)", "quote": "I'm not a potential future candidate. I'm a Vice President.", "role": "Vice President", "tags": ["heir-apparent", "downplaying"], "why": "Leads GOP primary polls despite no \"considering\" language; Trump floats a Vance-Rubio ticket."}, {"bucket": "soft", "conf": "Low", "delta": 0, "headline": "Michigan Gov. Whitmer says she won't run for president in 2028 then backtracks hours later - WSLS", "id": "whitmer", "img": "assets/candidates/whitmer/01_2025_gretchen_whitmer_cropped_jpg.jpg", "keys": ["softConsidering", "mediaBlitz"], "lastSignal": "2026-05-28", "name": "Gretchen Whitmer", "party": "Democrat", "quote": "Never say never.", "role": "Governor of Michigan", "tags": ["swing-state", "contradictory"], "why": "Contradictory signals — flagged for source conflict."}, {"bucket": "edge", "conf": "Low", "delta": 0, "headline": "Refuses to rule out a run; posture muddy", "id": "bannon", "img": "assets/candidates/bannon/01_steve_bannon_in_2025_3x4_cropped_jpg.jpg", "keys": ["softConsidering"], "lastSignal": "2026-03-12", "name": "Steve Bannon", "party": "Republican", "quote": "", "role": "Strategist / media", "tags": ["media", "conditional"], "why": "Tied up with Trump-third-term advocacy; no structure."}, {"bucket": "edge", "conf": "Low", "delta": 0, "headline": "Conditional: would run only if Mike Pence runs", "id": "flynn", "img": "assets/candidates/flynn/01_michael_t_flynn_jpg.jpg", "keys": ["softConsidering"], "lastSignal": "2026-02-01", "name": "Michael Flynn", "party": "Republican", "quote": "", "role": "Former NSA / general", "tags": ["conditional"], "why": "Pure contingency — not an independent signal."}, {"bucket": "edge", "conf": "Noise", "delta": 0, "headline": "Is Tucker Carlson eyeing a 2028 presidential run? | Arwa Mahdawi - The Guardian", "id": "carlson", "img": "assets/candidates/carlson/01_tucker_carlson_54670577849_cropped_2_jpg.jpg", "keys": ["softConsidering", "consideringQuote"], "lastSignal": "2026-04-28", "name": "Tucker Carlson", "party": "Republican", "quote": "", "role": "Media figure", "tags": ["media", "noise"], "why": "Speculative; included for completeness, low signal value."}, {"bucket": "edge", "conf": "Noise", "delta": 0, "headline": "Flirts publicly: \"Let's take another crack with a Biden\"", "id": "hunter", "img": "assets/candidates/hunter/01_hunter_biden_september_30_2014_jpg.jpg", "keys": ["softConsidering"], "lastSignal": "2026-06-05", "name": "Hunter Biden", "party": "Democrat", "quote": "Let's take another crack with a Biden.", "role": "—", "tags": ["noise", "troll"], "why": "Joke/troll posting, incl. VP talk with Newsom — not a real candidacy."}, {"bucket": "out", "conf": "High", "delta": 0, "headline": "Barred by 22nd Amendment; teases third-term scenarios", "id": "trump", "img": "assets/candidates/trump/01_official_presidential_portrait_of_president_donald.jpg", "keys": ["barred"], "lastSignal": "2026-05-01", "name": "Donald Trump", "party": "Republican", "quote": "", "role": "President", "tags": ["ineligible", "22nd Amdt"], "why": "Legally ineligible; tracked only because of the chatter he generates."}, {"bucket": "out", "conf": "Medium", "delta": 0, "headline": "Not planning a run; signals support for Vance", "id": "rubio", "img": "assets/candidates/rubio/01_official_portrait_of_secretary_marco_rubio_cropped.jpg", "keys": ["endorsedOther", "staffing", "earlyState"], "lastSignal": "2026-06-03", "name": "Marco Rubio", "party": "Republican", "quote": "", "role": "Secretary of State", "tags": ["VP talk", "deferring"], "why": "Trump floats him as Vance's running mate, not a rival."}, {"bucket": "out", "conf": "High", "delta": 0, "headline": "Gov. Wes Moore answers 'whether he's considering a run' for President in 2028 - Modern Ghana", "id": "moore", "img": "assets/candidates/moore/01_wes_moore_official_governor_portrait_jpg.jpg", "keys": ["ruledOut", "consideringQuote"], "lastSignal": "2026-06-10", "name": "Wes Moore", "party": "Democrat", "quote": "I am not running.", "role": "Governor of Maryland", "tags": ["denied"], "why": "Clear denial; often cited as a future-cycle prospect instead."}, {"bucket": "out", "conf": "Medium", "delta": 0, "headline": "Said yes, then later reporting: no longer considering", "id": "raimondo", "img": "assets/candidates/raimondo/01_gina_raimondo_jpg.jpg", "keys": ["ruledOut"], "lastSignal": "2026-03-01", "name": "Gina Raimondo", "party": "Democrat", "quote": "", "role": "Former Commerce Secretary", "tags": ["cooled"], "why": "Cooled off after initial openness."}, {"bucket": "out", "conf": "Medium", "delta": 0, "headline": "Earlier \"may run,\" later \"not thinking about 2028\"", "id": "walz", "img": "assets/candidates/walz/01_governor_tim_walz_2026_jpg.jpg", "keys": ["ruledOut"], "lastSignal": "2026-02-10", "name": "Tim Walz", "party": "Democrat", "quote": "", "role": "Governor of Minnesota", "tags": ["cooled"], "why": "2024 VP nominee who walked back earlier interest."}, {"bucket": "out", "conf": "Low", "delta": 0, "headline": "TIME reported private interest; she publicly denied it", "id": "mtg", "img": "assets/candidates/mtg/01_marjorie_taylor_greene_cropped_jpg.jpg", "keys": ["ruledOut"], "lastSignal": "2026-02-25", "name": "Marjorie Taylor Greene", "party": "Republican", "quote": "", "role": "U.S. Rep (GA)", "tags": ["denied", "conflict"], "why": "Source conflict resolved toward denial."}, {"bucket": "out", "conf": "Low", "delta": 0, "headline": "Stephen A. Smith Tells CBS News He Is Not Ruling Out 2028 Presidential Run: “I’d Love To Be On The Debate Stages Against Some Of These Individuals” - Deadline", "id": "smith", "img": "assets/candidates/smith/01_stephen_a_smith_in_january_2023_3x4_cropped_c_jpg.jpg", "keys": ["ruledOut", "softConsidering"], "lastSignal": "2026-02-13", "name": "Stephen A. Smith", "party": "Independent", "quote": "", "role": "Sports media", "tags": ["celebrity", "backed away"], "why": "Backed away from earlier flirtation."}];
+const SEED = [{"bucket": "formal", "conf": "Very high", "delta": 0, "headline": "‘Simpsons’ writer Dan Greaney announces 2028 presidential campaign - News.com.au", "id": "greaney", "img": "assets/candidates/greaney/01_dan_greaney_campaign_jpg.jpg", "keys": ["declared"], "lastSignal": "2026-05-26", "name": "Dan Greaney", "party": "Republican", "quote": "", "role": "Perennial candidate", "series": [{"d": "2026-06-15", "s": 45, "t": 5}], "slope30": 0, "slope7": 0, "tags": ["FEC", "declared"], "why": "Only formally declared major-party filer so far; low-profile."}, {"bucket": "formal", "conf": "Medium", "delta": 0, "headline": "\"All options\" exploratory posture for 2028", "id": "bovino", "img": "assets/candidates/bovino/01_2026_border_patrol_chief_greg_bovino_in_minneapoli.jpg", "keys": ["exploratory", "mediaBlitz"], "lastSignal": "2026-04-10", "name": "Gregory \"Greg\" Bovino", "party": "Republican", "quote": "", "role": "Border-enforcement figure", "series": [{"d": "2026-06-15", "s": 35, "t": 4}], "slope30": 0, "slope7": 0, "tags": ["exploratory"], "why": "Early exploratory lane on the MAGA-enforcement flank."}, {"bucket": "formal", "conf": "High", "delta": 0, "early_states": {"SC": 1}, "early_states_last": {"SC": "2026-05-28"}, "headline": "Jo Jorgensen: South Carolina Libertarian Eyes 2028 Presidential Bid - FITSNews", "id": "jorgensen", "img": "assets/candidates/jorgensen/01_jo_jorgensen_portrait_3_jpg.jpg", "keys": ["exploratory", "earlyState"], "lastSignal": "2026-05-28", "name": "Jo Jorgensen", "party": "Libertarian", "quote": "", "role": "2020 LP nominee", "series": [{"d": "2026-06-15", "s": 45, "t": 4}], "slope30": 0, "slope7": 0, "tags": ["exploratory", "Libertarian"], "why": "Most concrete step on the Libertarian side."}, {"bucket": "considering", "conf": "High", "delta": 0, "headline": "Sky News Australia. . Sky News Digital Presenter Gabriella Power reacts to Hunter Biden speaking about his political future on Gavin Newsom's podcast. The son of former US President Joe Biden teased a potential vice-presidential run in 2028. - facebook.com", "id": "newsom", "img": "assets/candidates/newsom/01_governor_of_california_gavin_newsom_cropped_3x4_jp.jpg", "keys": ["consideringQuote", "earlyState", "donors", "staffing", "mediaBlitz"], "lastSignal": "2026-06-12", "name": "Gavin Newsom", "party": "Democrat", "pollLead": "Dem poll leader", "quote": "I'd be lying if I said I wasn't seriously thinking about it.", "role": "Governor of California", "series": [{"d": "2026-06-15", "s": 60, "t": 3}], "slope30": 0, "slope7": 0, "tags": ["governor lane", "frontrunner"], "why": "Catapulted to front-runner in Emerson national polling."}, {"bucket": "considering", "conf": "High", "delta": 0, "headline": "Big donors backed Harris in 2024. For 2028, they’re not so sure - Los Angeles Times", "id": "harris", "img": "assets/candidates/harris/01_kamala_harris_vice_presidential_portrait_jpg.jpg", "keys": ["consideringQuote", "donors", "staffing", "mediaBlitz", "earlyState"], "lastSignal": "2026-05-10", "name": "Kamala Harris", "party": "Democrat", "quote": "I have not made a decision… I may or may not.", "role": "Former VP / 2024 nominee", "series": [{"d": "2026-06-15", "s": 55, "t": 3}], "slope30": 0, "slope7": 0, "tags": ["rematch", "establishment"], "why": "Retains 2024 donor & staff network; leads some rematch polls."}, {"bucket": "considering", "conf": "High", "delta": 0, "headline": "\"Of course I'm thinking about it\" — not ruled out", "id": "booker", "img": "assets/candidates/booker/01_cory_booker_official_portrait_119th_congress_jpg.jpg", "keys": ["consideringQuote", "mediaBlitz", "softConsidering"], "lastSignal": "2026-05-30", "name": "Cory Booker", "party": "Democrat", "quote": "Of course I'm thinking about it.", "role": "U.S. Senator (NJ)", "series": [{"d": "2026-06-15", "s": 30, "t": 3}], "slope30": 0, "slope7": 0, "tags": ["senate"], "why": "Most explicit yes among Senate Democrats; record-floor-speech visibility."}, {"bucket": "considering", "conf": "High", "delta": 0, "headline": "Open \"under the right circumstances\"; decision after DGA term", "id": "beshear", "img": "assets/candidates/beshear/01_andy_beshear_in_april_2026_cropped_jpg.jpg", "keys": ["consideringQuote", "mediaBlitz"], "lastSignal": "2026-05-08", "name": "Andy Beshear", "party": "Democrat", "quote": "I'd consider it under the right circumstances.", "role": "Governor of Kentucky", "series": [{"d": "2026-06-15", "s": 25, "t": 3}], "slope30": 0, "slope7": 0, "tags": ["governor lane", "post-DGA"], "why": "Red-state Dem appeal; timeline tied to Governors Assoc. chairmanship."}, {"bucket": "considering", "conf": "Medium", "delta": 0, "headline": "Trump clash, fundraising boom elevate Mark Kelly’s 2028 presidential prospects - Cronkite News", "id": "kelly", "img": "assets/candidates/kelly/01_sen_mark_kelly_d_az_official_portrait_119th_congre.jpg", "keys": ["consideringQuote", "staffing", "donors"], "lastSignal": "2026-02-17", "name": "Mark Kelly", "party": "Democrat", "quote": "", "role": "U.S. Senator (AZ)", "series": [{"d": "2026-06-15", "s": 30, "t": 3}], "slope30": 0, "slope7": 0, "tags": ["senate", "swing-state"], "why": "Swing-state, astronaut/veteran profile draws operative interest."}, {"bucket": "considering", "conf": "High", "delta": 0, "headline": "\"We'll look at that after the midterms\"", "id": "khanna", "img": "assets/candidates/khanna/01_ro_khanna_official_portrait_115th_congress_3x4_jpg.jpg", "keys": ["consideringQuote"], "lastSignal": "2026-03-20", "name": "Ro Khanna", "party": "Democrat", "quote": "We'll look at that after the midterms.", "role": "U.S. Rep (CA)", "series": [{"d": "2026-06-15", "s": 20, "t": 3}], "slope30": 0, "slope7": 0, "tags": ["post-midterms", "progressive"], "why": "First clear public timeline from the progressive-pragmatist lane."}, {"bucket": "considering", "conf": "Medium", "delta": 0, "early_states": {"IA": 1}, "early_states_last": {"IA": "2026-06-12"}, "headline": "Sen. Ruben Gallego Attends Iowa State Fair Amid 2028 Presidential Bid Speculation Gracie Abrams (9SsQDihp8W) - Mshale", "id": "gallego", "img": "assets/candidates/gallego/01_senator_ruben_gallego_official_portrait_jpg.jpg", "keys": ["consideringQuote", "earlyState", "staffing"], "lastSignal": "2026-06-12", "name": "Ruben Gallego", "party": "Democrat", "quote": "We have to look at it.", "role": "U.S. Senator (AZ)", "series": [{"d": "2026-06-15", "s": 45, "t": 3}], "slope30": 0, "slope7": 0, "tags": ["senate", "upgrade"], "why": "Notable upgrade — went from denial to open in weeks."}, {"bucket": "considering", "conf": "High", "delta": 0, "headline": "\"Can't rule anything out\" for 2028", "id": "pritzker", "img": "assets/candidates/pritzker/01_governor_jb_pritzker_official_portrait_2019_crop_j.jpg", "keys": ["consideringQuote", "donors", "mediaBlitz"], "lastSignal": "2026-05-01", "name": "J.B. Pritzker", "party": "Democrat", "quote": "I can't rule anything out.", "role": "Governor of Illinois", "series": [{"d": "2026-06-15", "s": 35, "t": 3}], "slope30": 0, "slope7": 0, "tags": ["governor lane", "self-fund"], "why": "Self-funding capacity removes the money constraint entirely."}, {"bucket": "considering", "conf": "Medium", "delta": 0, "early_states": {"NH": 1}, "early_states_last": {"NH": "2026-06-09"}, "headline": "Rahm Emanuel's uphill climb in New Hampshire tests a 2028 presidential bid - Caledonian Record", "id": "emanuel", "img": "assets/candidates/emanuel/01_ambassador_emanuel_portrait_jpg.jpg", "keys": ["softConsidering", "mediaBlitz", "donors", "earlyState", "consideringQuote"], "lastSignal": "2026-06-09", "name": "Rahm Emanuel", "party": "Democrat", "quote": "", "role": "Former Amb. / Chicago mayor", "series": [{"d": "2026-05-29", "s": null, "t": 3}, {"d": "2026-06-15", "s": 50, "t": 3}], "slope30": 0, "slope7": 0, "tags": ["centrist", "testing"], "why": "Aggressive media tour to project vitality and viability."}, {"bucket": "considering", "conf": "Low", "delta": 0, "headline": "Among Dems considering; \"open if needed\"", "id": "green", "img": "assets/candidates/green/01_lieutenant_governor_of_hawaii_josh_green_jpg.jpg", "keys": ["softConsidering"], "lastSignal": "2026-05-20", "name": "Josh Green", "party": "Democrat", "quote": "", "role": "Governor of Hawaii", "series": [{"d": "2026-06-15", "s": 17, "t": 1}], "slope30": 0, "slope7": 0, "tags": ["governor lane"], "why": "Outside-lane physician-governor; low national profile."}, {"bucket": "considering", "conf": "Medium", "delta": 0, "headline": "Mitch Landrieu launches surprise 2028 presidential bid in New Orleans - mezha.net", "id": "landrieu", "img": "assets/candidates/landrieu/01_mitch_landrieu_52801339981_cropped_jpg.jpg", "keys": ["earlyState", "donors"], "lastSignal": "2026-04-19", "name": "Mitch Landrieu", "party": "Democrat", "quote": "", "role": "Former New Orleans mayor", "series": [{"d": "2026-04-19", "s": null, "t": 5}, {"d": "2026-06-15", "s": 20, "t": 2}], "slope30": 0, "slope7": 0, "tags": ["soft-launch"], "why": "Behavioral signals (travel, donor outreach) ahead of any quote."}, {"bucket": "considering", "conf": "Medium", "delta": 0, "headline": "Not set on running, but \"keeping her name in the mix\"", "id": "slotkin", "img": "assets/candidates/slotkin/01_elissa_slotkin_2026_official_portrait_cropped_jpg.jpg", "keys": ["softConsidering", "earlyState"], "lastSignal": "2026-06-09", "name": "Elissa Slotkin", "party": "Democrat", "quote": "", "role": "U.S. Senator (MI)", "series": [{"d": "2026-04-08", "s": null, "t": 2}, {"d": "2026-06-15", "s": 27, "t": 2}], "slope30": 0, "slope7": 0, "tags": ["senate", "swing-state", "fresh"], "why": "Most recent signal on the board; swing-state freshman senator."}, {"bucket": "considering", "conf": "High", "delta": 0, "early_states": {"IA": 1}, "early_states_last": {"IA": "2026-05-04"}, "headline": "Sen. Ted Cruz addresses 2028 presidential bid while in Iowa - KWTX", "id": "cruz", "img": "assets/candidates/cruz/01_ted_cruz_official_116th_portrait_3x4_cropped_jpg.jpg", "keys": ["consideringQuote", "donors", "staffing", "earlyState"], "lastSignal": "2026-05-04", "name": "Ted Cruz", "party": "Republican", "quote": "", "role": "U.S. Senator (TX)", "series": [{"d": "2026-06-15", "s": 50, "t": 3}], "slope30": 0, "slope7": 0, "tags": ["senate", "anti-Vance lane"], "why": "2016 infrastructure & donor base; explicit intra-MAGA lane."}, {"bucket": "considering", "conf": "Medium", "delta": 0, "headline": "Didn't rule it out: \"We'll see… you never know\"", "id": "desantis", "img": "assets/candidates/desantis/01_ron_desantis_official_photo_jpg.jpg", "keys": ["consideringQuote", "donors", "staffing", "earlyState"], "lastSignal": "2026-03-24", "name": "Ron DeSantis", "party": "Republican", "quote": "We'll see. You never know.", "role": "Governor of Florida", "series": [{"d": "2026-06-15", "s": 50, "t": 3}], "slope30": 0, "slope7": 0, "tags": ["governor lane", "retread"], "why": "2024 national org still partly intact; term-limited in 2026."}, {"bucket": "considering", "conf": "Medium", "delta": 0, "headline": "\"Thinking about it\" — puts odds around 50-50", "id": "paul", "img": "assets/candidates/paul/01_rand_paul_portrait_jpg.jpg", "keys": ["consideringQuote"], "lastSignal": "2026-04-02", "name": "Rand Paul", "party": "Republican", "quote": "I'd put it around 50-50.", "role": "U.S. Senator (KY)", "series": [{"d": "2026-06-15", "s": 20, "t": 3}], "slope30": 0, "slope7": 0, "tags": ["senate", "liberty lane"], "why": "Libertarian-Republican lane; rare explicit probability."}, {"bucket": "considering", "conf": "Low", "delta": 0, "headline": "Would \"never rule out\" an opportunity to serve", "id": "gabbard", "img": "assets/candidates/gabbard/01_director_tulsi_gabbard_official_portrait_jpg.jpg", "keys": ["softConsidering", "mediaBlitz"], "lastSignal": "2026-03-30", "name": "Tulsi Gabbard", "party": "Republican", "quote": "I'd never rule out an opportunity to serve.", "role": "Trump admin official", "series": [{"d": "2026-06-15", "s": 17, "t": 2}], "slope30": 0, "slope7": 0, "tags": ["admin", "MAGA"], "why": "Admin platform raises visibility; non-committal framing."}, {"bucket": "considering", "conf": "Low", "delta": 0, "headline": "Won't rule out governor — or president — in 2028", "id": "bacon", "img": "assets/candidates/bacon/01_bacon_don_119th_congress_3x4_cropped_b_jpg.jpg", "keys": ["softConsidering"], "lastSignal": "2026-03-10", "name": "Don Bacon", "party": "Republican", "quote": "I wouldn't rule it out.", "role": "U.S. Rep (NE), retiring", "series": [{"d": "2026-06-15", "s": 2, "t": 1}], "slope30": 0, "slope7": 0, "tags": ["centrist"], "why": "Centrist Republican lane; also weighing NE governor."}, {"bucket": "considering", "conf": "Low", "delta": 0, "headline": "Says he is \"seriously considering\" a run", "id": "lemon", "img": "assets/candidates/lemon/01_don_lemon_at_the_2018_pulitzer_prizes_jpg.jpg", "keys": ["softConsidering", "mediaBlitz"], "lastSignal": "2026-05-22", "name": "Don Lemon", "party": "Democrat", "quote": "I'm seriously considering it.", "role": "Media figure", "series": [{"d": "2026-06-15", "s": 22, "t": 2}], "slope30": 0, "slope7": 0, "tags": ["celebrity", "no structure"], "why": "No party structure or office base — celebrity lane."}, {"bucket": "soft", "conf": "Medium", "delta": 0, "early_states": {"IA": 1}, "early_states_last": {"IA": "2026-06-11"}, "headline": "Pete Buttigieg to give keynote speech at Iowa Democratic event, fueling presidential speculation - LGBTQ Nation", "id": "buttigieg", "img": "assets/candidates/buttigieg/01_pete_buttigieg_secretary_of_transportation_jpg.jpg", "keys": ["donors", "staffing", "mediaBlitz", "earlyState"], "lastSignal": "2026-06-11", "name": "Pete Buttigieg", "party": "Democrat", "quote": "", "role": "Former Transp. Secretary", "series": [{"d": "2026-06-15", "s": 40, "t": 2}], "slope30": 0, "slope7": 0, "tags": ["establishment", "polls-high"], "why": "Top-3 in Dem polls on name ID; no explicit \"considering\" yet."}, {"bucket": "soft", "conf": "Medium", "delta": 0, "headline": "Hasn't ruled out higher office; frames ambition as policy", "id": "aoc", "img": "assets/candidates/aoc/01_alexandria_ocasio_cortez_official_portrait_jpg.jpg", "keys": ["donors", "mediaBlitz"], "lastSignal": "2026-04-28", "name": "Alexandria Ocasio-Cortez", "party": "Democrat", "quote": "", "role": "U.S. Rep (NY)", "series": [{"d": "2026-06-15", "s": 15, "t": 2}], "slope30": 0, "slope7": 0, "tags": ["progressive", "grassroots"], "why": "Massive small-dollar base; leads some progressive polls."}, {"bucket": "soft", "conf": "Medium", "delta": 0, "headline": "Cautious, but wants to be \"part of the national debate\"", "id": "shapiro", "img": "assets/candidates/shapiro/01_josh_shapiro_december_2025_jpg.jpg", "keys": ["mediaBlitz"], "lastSignal": "2026-05-05", "name": "Josh Shapiro", "party": "Democrat", "quote": "", "role": "Governor of Pennsylvania", "series": [{"d": "2026-06-15", "s": 5, "t": 2}], "slope30": 0, "slope7": 0, "tags": ["governor lane", "swing-state"], "why": "Marquee swing-state governor; deliberately low-key."}, {"bucket": "soft", "conf": "Low", "delta": 0, "headline": "\"Nothing off the table,\" while downplaying the odds", "id": "murphy", "img": "assets/candidates/murphy/01_gov_phil_murphy_jpg.jpg", "keys": ["softConsidering"], "lastSignal": "2026-04-15", "name": "Phil Murphy", "party": "Democrat", "quote": "", "role": "Former NJ governor", "series": [{"d": "2026-06-15", "s": 12, "t": 1}], "slope30": 0, "slope7": 0, "tags": ["long-shot"], "why": "Term-ended governor; low probability self-assessment."}, {"bucket": "soft", "conf": "Low", "delta": 0, "headline": "Reported mulling 2028; says odds of running are high", "id": "yang", "img": "assets/candidates/yang/01_andrew_yang_november_2023_jpg.jpg", "keys": ["softConsidering", "mediaBlitz"], "lastSignal": "2026-03-18", "name": "Andrew Yang", "party": "Independent", "quote": "", "role": "Forward Party founder", "series": [{"d": "2025-10-01", "s": null, "t": 5}, {"d": "2026-06-15", "s": 17, "t": 2}], "slope30": 0, "slope7": 0, "tags": ["independent", "Forward"], "why": "Third-party/independent lane outside the two primaries."}, {"bucket": "soft", "conf": "Low", "delta": 0, "headline": "Hinted at a 2028 Libertarian run", "id": "afroman", "img": "assets/candidates/afroman/01_afroman_2026_cropped_jpg.jpg", "keys": ["softConsidering"], "lastSignal": "2026-04-20", "name": "Afroman (Joseph Foreman)", "party": "Libertarian", "quote": "", "role": "Musician", "series": [{"d": "2026-06-15", "s": 12, "t": 1}], "slope30": 0, "slope7": 0, "tags": ["celebrity", "Libertarian"], "why": "Celebrity LP lane; no committee yet."}, {"bucket": "soft", "conf": "Medium", "delta": 0, "headline": "Downplays it — \"I'm a VP and I like my job\"", "id": "vance", "img": "assets/candidates/vance/01_march_2026_official_vice_presidential_portrait_of_.jpg", "keys": ["donors", "staffing", "mediaBlitz", "earlyState", "consideringQuote"], "lastSignal": "2026-06-03", "name": "J.D. Vance", "party": "Republican", "pollLead": "GOP poll leader (~35%)", "quote": "I'm not a potential future candidate. I'm a Vice President.", "role": "Vice President", "series": [{"d": "2026-01-14", "s": null, "t": 3}, {"d": "2026-06-15", "s": 60, "t": 3}], "slope30": 0, "slope7": 0, "tags": ["heir-apparent", "downplaying"], "why": "Leads GOP primary polls despite no \"considering\" language; Trump floats a Vance-Rubio ticket."}, {"bucket": "soft", "conf": "Low", "delta": 0, "headline": "Michigan Gov. Whitmer says she won't run for president in 2028 then backtracks hours later - WSLS", "id": "whitmer", "img": "assets/candidates/whitmer/01_2025_gretchen_whitmer_cropped_jpg.jpg", "keys": ["softConsidering", "mediaBlitz"], "lastSignal": "2026-05-28", "name": "Gretchen Whitmer", "party": "Democrat", "quote": "Never say never.", "role": "Governor of Michigan", "series": [{"d": "2026-06-15", "s": 22, "t": 2}], "slope30": 0, "slope7": 0, "tags": ["swing-state", "contradictory"], "why": "Contradictory signals — flagged for source conflict."}, {"bucket": "edge", "conf": "Low", "delta": 0, "headline": "Refuses to rule out a run; posture muddy", "id": "bannon", "img": "assets/candidates/bannon/01_steve_bannon_in_2025_3x4_cropped_jpg.jpg", "keys": ["softConsidering"], "lastSignal": "2026-03-12", "name": "Steve Bannon", "party": "Republican", "quote": "", "role": "Strategist / media", "series": [{"d": "2026-06-15", "s": 2, "t": 1}], "slope30": 0, "slope7": 0, "tags": ["media", "conditional"], "why": "Tied up with Trump-third-term advocacy; no structure."}, {"bucket": "edge", "conf": "Low", "delta": 0, "headline": "Conditional: would run only if Mike Pence runs", "id": "flynn", "img": "assets/candidates/flynn/01_michael_t_flynn_jpg.jpg", "keys": ["softConsidering"], "lastSignal": "2026-02-01", "name": "Michael Flynn", "party": "Republican", "quote": "", "role": "Former NSA / general", "series": [{"d": "2026-06-15", "s": 2, "t": 1}], "slope30": 0, "slope7": 0, "tags": ["conditional"], "why": "Pure contingency — not an independent signal."}, {"bucket": "edge", "conf": "Noise", "delta": 0, "headline": "Is Tucker Carlson eyeing a 2028 presidential run? | Arwa Mahdawi - The Guardian", "id": "carlson", "img": "assets/candidates/carlson/01_tucker_carlson_54670577849_cropped_2_jpg.jpg", "keys": ["softConsidering", "consideringQuote"], "lastSignal": "2026-04-28", "name": "Tucker Carlson", "party": "Republican", "quote": "", "role": "Media figure", "series": [{"d": "2026-04-28", "s": null, "t": 3}, {"d": "2026-06-15", "s": 20, "t": 3}], "slope30": 0, "slope7": 0, "tags": ["media", "noise"], "why": "Speculative; included for completeness, low signal value."}, {"bucket": "edge", "conf": "Noise", "delta": 0, "headline": "Flirts publicly: \"Let's take another crack with a Biden\"", "id": "hunter", "img": "assets/candidates/hunter/01_hunter_biden_september_30_2014_jpg.jpg", "keys": ["softConsidering"], "lastSignal": "2026-06-05", "name": "Hunter Biden", "party": "Democrat", "quote": "Let's take another crack with a Biden.", "role": "—", "series": [{"d": "2026-06-15", "s": 17, "t": 1}], "slope30": 0, "slope7": 0, "tags": ["noise", "troll"], "why": "Joke/troll posting, incl. VP talk with Newsom — not a real candidacy."}, {"bucket": "out", "conf": "High", "delta": 0, "headline": "Barred by 22nd Amendment; teases third-term scenarios", "id": "trump", "img": "assets/candidates/trump/01_official_presidential_portrait_of_president_donald.jpg", "keys": ["barred"], "lastSignal": "2026-05-01", "name": "Donald Trump", "party": "Republican", "quote": "", "role": "President", "series": [{"d": "2026-06-15", "s": 0, "t": 0}], "slope30": 0, "slope7": 0, "tags": ["ineligible", "22nd Amdt"], "why": "Legally ineligible; tracked only because of the chatter he generates."}, {"bucket": "out", "conf": "Medium", "delta": 0, "headline": "Not planning a run; signals support for Vance", "id": "rubio", "img": "assets/candidates/rubio/01_official_portrait_of_secretary_marco_rubio_cropped.jpg", "keys": ["endorsedOther", "staffing", "earlyState"], "lastSignal": "2026-06-03", "name": "Marco Rubio", "party": "Republican", "quote": "", "role": "Secretary of State", "series": [{"d": "2026-06-15", "s": 5, "t": 2}], "slope30": 0, "slope7": 0, "tags": ["VP talk", "deferring"], "why": "Trump floats him as Vance's running mate, not a rival."}, {"bucket": "out", "conf": "High", "delta": 0, "headline": "Gov. Wes Moore answers 'whether he's considering a run' for President in 2028 - Modern Ghana", "id": "moore", "img": "assets/candidates/moore/01_wes_moore_official_governor_portrait_jpg.jpg", "keys": ["ruledOut", "consideringQuote"], "lastSignal": "2026-06-10", "name": "Wes Moore", "party": "Democrat", "quote": "I am not running.", "role": "Governor of Maryland", "series": [{"d": "2026-06-15", "s": 0, "t": 0}], "slope30": 0, "slope7": 0, "tags": ["denied"], "why": "Clear denial; often cited as a future-cycle prospect instead."}, {"bucket": "out", "conf": "Medium", "delta": 0, "headline": "Said yes, then later reporting: no longer considering", "id": "raimondo", "img": "assets/candidates/raimondo/01_gina_raimondo_jpg.jpg", "keys": ["ruledOut"], "lastSignal": "2026-03-01", "name": "Gina Raimondo", "party": "Democrat", "quote": "", "role": "Former Commerce Secretary", "series": [{"d": "2026-06-15", "s": 0, "t": 0}], "slope30": 0, "slope7": 0, "tags": ["cooled"], "why": "Cooled off after initial openness."}, {"bucket": "out", "conf": "Medium", "delta": 0, "headline": "Earlier \"may run,\" later \"not thinking about 2028\"", "id": "walz", "img": "assets/candidates/walz/01_governor_tim_walz_2026_jpg.jpg", "keys": ["ruledOut"], "lastSignal": "2026-02-10", "name": "Tim Walz", "party": "Democrat", "quote": "", "role": "Governor of Minnesota", "series": [{"d": "2026-06-15", "s": 0, "t": 0}], "slope30": 0, "slope7": 0, "tags": ["cooled"], "why": "2024 VP nominee who walked back earlier interest."}, {"bucket": "out", "conf": "Low", "delta": 0, "headline": "TIME reported private interest; she publicly denied it", "id": "mtg", "img": "assets/candidates/mtg/01_marjorie_taylor_greene_cropped_jpg.jpg", "keys": ["ruledOut"], "lastSignal": "2026-02-25", "name": "Marjorie Taylor Greene", "party": "Republican", "quote": "", "role": "U.S. Rep (GA)", "series": [{"d": "2026-06-15", "s": 0, "t": 0}], "slope30": 0, "slope7": 0, "tags": ["denied", "conflict"], "why": "Source conflict resolved toward denial."}, {"bucket": "out", "conf": "Low", "delta": 0, "headline": "Stephen A. Smith Tells CBS News He Is Not Ruling Out 2028 Presidential Run: “I’d Love To Be On The Debate Stages Against Some Of These Individuals” - Deadline", "id": "smith", "img": "assets/candidates/smith/01_stephen_a_smith_in_january_2023_3x4_cropped_c_jpg.jpg", "keys": ["ruledOut", "softConsidering"], "lastSignal": "2026-02-13", "name": "Stephen A. Smith", "party": "Independent", "quote": "", "role": "Sports media", "series": [{"d": "2026-06-15", "s": 0, "t": 0}], "slope30": 0, "slope7": 0, "tags": ["celebrity", "backed away"], "why": "Backed away from earlier flirtation."}];
 /* REVIEW QUEUE — discoveries + ambiguous denials the pipeline routed to a human
    instead of auto-applying. Triage here; Export decisions to apply in the rebuild. */
 const REVIEW = [{"date": "2026-05-28", "headline": "Michigan Gov. Gretchen Whitmer says she’s not running for president in 2028 - Yahoo", "keys": ["ruledOut"], "kind": "denial", "name": "Gretchen Whitmer", "note": "denial/downgrade — confirm before applying", "rid": "5d0e43385abd", "source": "Yahoo", "url": "https://news.google.com/rss/articles/CBMimgFBVV95cUxQVmtZYlRYODkyX1ZCdUNOZzhRVUVKekVpM0wyMnpYaVM4QTdWcUE5dmZEN0NmMF9TOElENDBwS3MzU3JvTE5HYW0xdzV5OXEyQVpiSzlVa2R5S3pNSHBpX1RtOWRUNWNZU1p0RTFfbjJuTjZ4Q1oyTWNlQkNiRXhJbnVKUU90QXRDOVRYTEdnS0p0Z3NsQl9rOU5n?oc=5"}, {"date": "2026-05-26", "headline": "Thomas Massie files statement of candidacy for 2028 House race - AOL.com", "keys": ["declared"], "kind": "discovery", "name": "Thomas Massie", "rid": "9ba03055ad43", "source": "AOL.com", "url": "https://news.google.com/rss/articles/CBMiiwFBVV95cUxNeVR4cXVmZW1TMjNXbUlkRWlVY052RW5VZ0hmTmxpSjloTE84REZyQjR3ZFh4cDNZd0c2NjR0SEZaeC1abGxISFBJZFg5NkZTOXRFNENUbW81VE9kalE3OHhFX3dOMUtqU2RBT1NERm14V0VMWm90Q0c2TlJMLUZjYmJtNlh6bFRBc21r?oc=5"}, {"date": "2026-05-28", "headline": "Michigan Gov. Gretchen Whitmer says she won't run for president in 2028 - PBS", "keys": ["ruledOut"], "kind": "denial", "name": "Gretchen Whitmer", "note": "denial/downgrade — confirm before applying", "rid": "da2a5081e2c6", "source": "PBS", "url": "https://news.google.com/rss/articles/CBMiqwFBVV95cUxQaEszSlZoVi1nRUwzMFFvaDJZcVdQSk03YjBDZTJucE80YmJaLUVZODRKa21ndF9icF9jSk1RVWJmT25VRnBVNU51ZVZFZ2k0NTBUX1Uwdkl4eHQ0c1RZWWlQd0NzWmFxT2Fqc1hBMkIyblJualA4UXVpM2JRcFQ5bHJEa1U4NUhVRmNXX3R5Xy1feEJKbEJYbFlOZm1DaURMQlpSemhkSlRMNkHSAbABQVVfeXFMUHBycXhLYlg5R2YycmhnNWlvU1lMSHNDWEJZbmpqakFWTmltMWxzNXpMU0ozWjVvTWkxNlZhMXNra2ZSTDlDRVNPamNOTzFabGEtNXlOUTJFNVFCTmp0ZGxianJLTEVwSk13WXpUUkZzWVRpQk9iclBCckVvV3ltNFJZbEZJRDhULXJuWWxQVVNTaGhmR1k1eC1PNHJSdmxfZ2hERkVRWVd2ODFpLTdIZEk?oc=5"}, {"date": "2026-04-07", "headline": "Arizona Democrat Gallego reportedly considering a presidential run in 2028 - Baltimore Sun", "keys": ["softConsidering"], "kind": "discovery", "name": "Arizona Democrat Gallego", "rid": "3e8c27646d33", "source": "Baltimore Sun", "url": "https://news.google.com/rss/articles/CBMitgFBVV95cUxQc3JwMW9paTIybmY3alVpdWxra21RdUlWZVkzblJVNlYzMXpka3pfRVd4ZEtVVjZFaWx1VG9FNEp3LWR1bW1QMGdqb1BfWlBSeTN0R1pjejhmRXZCdTl0YXdMNEhrbHRGSm5mMk1saG9YX3Z5bkNSN3VmQm5DTG1WVmRZQldCVWdhZmYydG0yWHBjV0xNekl6dzBRVkkxTjZoUGg4bHNBeURzRzZnV3h1d1MtVm5nZw?oc=5"}, {"date": "2026-04-10", "headline": "WATCH: Is Harris running in 2028? 'I'm thinking about it' - PBS", "keys": ["consideringQuote"], "kind": "discovery", "name": "Is Harris", "rid": "4146852c8827", "source": "PBS", "url": "https://news.google.com/rss/articles/CBMilAFBVV95cUxNem1tVFpWdlpMTFBCaVhnem84eGpjUFhscUhBdUNlZmFoSlFmVWxkcFRMOUY3MVduLTlQbl9vay1tWFZ0Y2piT01YY0JENkpTcFZLeExZaEdoSWhYb0ljV0ppb3RFWERIZGpsLWQ5ZVlDdDJfQng1MVZiMDI2YS1Ral9hRVJBQ2FjdDk0RThQT0JSODBL0gGaAUFVX3lxTE9LYlZRYkhQX1dLZUJBY1lJamFKQ0xHdmZRTGVRcXd1QmszWWdmV0VyZ1J4ZmEwem5rZjFjMS1nVjJtWjUzeFgycUhRem9hSHBxTEZMVFA0dll3ZmZibjRMcGl1cElKdS16WVRoNnRTR3U2TFZoVHAxZk1nYl9nTWFXaEpTV0pnZkd6SzRFTktIN2xCc09EbGpRemc?oc=5"}, {"date": "2026-05-25", "headline": "Thomas Massie files statement of candidacy for 2028 election - MSN", "keys": ["declared"], "kind": "discovery", "name": "Thomas Massie", "rid": "f58d6d5b1564", "source": "MSN", "url": "https://news.google.com/rss/articles/CBMisgFBVV95cUxQZVhxVFh5RE5kS2llUEZCZmIzV21IV2YzVHJCSnFTcllXeUZSdkFDZ2RudGRtVXI2cktfZEZfY0JvQ0dhZGZZa3htcTU0XzFVeGVlNzIzNklkc1QyMTV2NkxycFhWZ0gtdHJucEtuRkFmemZlR0d3eXRwczdvYmpiSXZHNlNtUzhkZUhmaHJLSkItUlRTbmJZWEdodGRFWUhlcEdYbXdlTlpfVFU0dGtsR0Zn?oc=5"}, {"date": "2026-06-09", "headline": "Inside Iowa Politics: Potential 2028 presidential candidate’s advice to Democrats - KTTC", "keys": ["earlyState"], "kind": "discovery", "name": "Inside Iowa Politics", "rid": "35ce1e1adbaf", "source": "KTTC", "url": "https://news.google.com/rss/articles/CBMirgFBVV95cUxPajhMWVJlTUZUV3gzV3N4SWxKUjRIWVVDMWVYVDVheDNERTNMTXYxY2dFQnFPdUVNcDVBMl9LMzFQQVp6NE52Rnl1VWwydU5jNkltQ0VUSFFTLWtsT3F3QXBHa093eXpTRTR4STlPVkZfaldyak9TVlNTMHl3eVotZGZlaHdUS09IS3lsdllxMnZ6Y1FHaEZuQjVDb3NfaWtFZkVXbHYwT0VOUXRtZHfSAcIBQVVfeXFMTmlOa1FYTDlud05WcFNsX0VUb1Jlejh3N1RNVEl4M2NaMjdDQ2M3Vms1U3h3czY5cnR2TFNUZ3NWQTRmZHJEZWNRM29fVW1mLWRERExjX0FnTDlPXzl1SDB1ZHN0Um4wOFEwR09wcDNlcWlvcFBWS18tVmFQbk8zTG1pTHpmamVJWGZ4eDdieEJCTmU0U1ZNX3FRaHZzeVNaNE5OSTU5Zll0ZEU0Mm5mbDdJT1NaN0pYM1h0SUV2VG85MkE?oc=5"}, {"date": "2026-05-26", "headline": "‘Prophet’ Behind Infamous Trump Prediction Launches 2028 Bid - The Daily Beast", "keys": ["declared"], "kind": "discovery", "name": "Behind Infamous Trump", "rid": "39c640efba03", "source": "The Daily Beast", "url": "https://news.google.com/rss/articles/CBMirwFBVV95cUxORFdzc0Z5djVVa2pwc1luNllNa0RuMndxVjMwaVlJLUs0XzBUdWZZR3lwMlZfQ0d6bUJkWEhyTkg0NldKYXN5dWRTMl9JZkN5T2NodndMYzJqbUEzbTFCRlBPdzIyWE96YlRveC1nS1JRV202a1Y3UkYzd1ZCYVdXWnN0NWNZX25aSW5ZMjdfM2pCSm04TUVsYnU3Z1pkdWFJZG0xTlVnSENoa0FSc0Nr?oc=5"}, {"date": "2026-05-25", "headline": "Massie files statement of candidacy for 2028 House race - The Courier-Journal", "keys": ["declared"], "kind": "discovery", "name": "Massie files statement of candidacy for ", "rid": "8f72dacf8379", "source": "The Courier-Journal", "url": "https://news.google.com/rss/articles/CBMiywFBVV95cUxQdURqZjA2RHFLMUs0N3lQYjBXSzlpelF3VlpKM1NnVGxLbXhYbEVoMEFQNWU5SHU0aGRyc2dmdml4T1hjdDR0cHpvRDh4QW8tNUh2dnlkdkg1YjlQZWx6d1FMT0RlbHh5MW9saUtQTmdHMFBKUEx2WEl4MHZVaEF6eTBnWjIxOFBtVUxoSm9KVTVyTVRuLXBaY1ZOOUUxVFdNaFVxNzVnVHpaSktQVmQxY3gxVE81UnRJZkIzQ3VfZ0ZsVzlzbEpzRS0tYw?oc=5"}, {"date": "2026-05-26", "headline": "Massie files statement of candidacy for 2028 House race - AOL.com", "keys": ["declared"], "kind": "discovery", "name": "Massie files statement of candidacy for ", "rid": "30ff84ec27d9", "source": "AOL.com", "url": "https://news.google.com/rss/articles/CBMiiAFBVV95cUxNakJmZ0NKZ1hLRkhCQ0Z1OE9ZQ2M1Q3JRRVJPM0ktUV9SNXNLLTJ5QWx2NTBXdEEwYWlkMmQ5b1dXbmVHZ05vOUhOOVdZU29iSTJHUFNNY2NfQnFSU0FJOFh0YjFVVjNna0dRUmE4RDl3VDgzSXYyODdkUlpLOXB6MUdSdWJSNlR2?oc=5"}, {"date": "2026-05-28", "headline": "Michigan Gov. Whitmer says she won't run for president in 2028 then backtracks hours later - WSLS", "keys": ["ruledOut"], "kind": "denial", "name": "Gretchen Whitmer", "note": "denial/downgrade — confirm before applying", "rid": "e931587826cc", "source": "WSLS", "url": "https://news.google.com/rss/articles/CBMiygFBVV95cUxPU1JqWGxWbXl3aVNGZExyZDRNVDRtLXp1eldGQ05TNlJIeDRjUVA0S3k4XzhEQ2M0dE1seks4THVjVWVpOGFDVzFDMHNlQTZmYl9UeUJraldwaXg3NGo2ZWh0Yk02MWdKVHg0MjAza0FQR3RWdjM2WHpCWWZHZGRDLWxtdGpEbWtab2VCSzNEXzViMGVCZWJDR3ZQdzctUDZLYVQ2eHV4b2hDZXNtRk9HVElVOGo4WHJ3cXRJXzl2cWkwaGFZaFBMMlJ3?oc=5"}];
+/* BRIEFING — the pipeline-baked daily "what moved" summary (top movers, new
+   filers, status changes, review backlog). Drives the Today's Briefing panel. */
+const BRIEFING = {"date": "2026-06-15", "movers": [], "new_filers": [], "review_count": 11, "totals": {"considering": 14, "formal": 3, "tracked": 40}, "transitions": []};
+const EARLY_NAMES={IA:'Iowa',NH:'New Hampshire',SC:'South Carolina',NV:'Nevada'};
 
 /* ---------- persistence ---------- */
 const LS='hatInRing_v1';
@@ -372,7 +492,7 @@ let DB=load();
 // so `DB.prefs || {defaults}` would skip the defaults on first visit and leave
 // PREFS.party undefined → filtered() crashes the whole board. Object.assign guarantees
 // every key (party array, sort, dir…) always exists.
-let PREFS=Object.assign({view:'board',party:[],bucket:'',conf:'',q:'',sort:'score',dir:'desc',quick:''},DB.prefs||{});
+let PREFS=Object.assign({view:'board',party:[],bucket:'',conf:'',q:'',sort:'score',dir:'desc',quick:'',earlyState:'',trajWin:7},DB.prefs||{});
 
 /* ---------- review-queue decisions (local until exported) ---------- */
 const RLS='hatInRing_reviewDecisions_v1';
@@ -380,6 +500,14 @@ function loadDecisions(){ try{return JSON.parse(localStorage.getItem(RLS))||{};}
 let DECISIONS=loadDecisions();                 // { rid: 'confirm' | 'dismiss' }
 function saveDecisions(){ try{localStorage.setItem(RLS,JSON.stringify(DECISIONS));}catch(e){} }
 function decide(rid,action){ DECISIONS[rid]=action; saveDecisions(); renderReview(); toast(action==='confirm'?'Confirmed — export to apply':'Dismissed'); }
+
+/* ---------- head-to-head compare (deep-linkable via #compare=id1,id2) ---------- */
+const CMP_MAX=3;
+function parseCompareHash(){try{const h=(typeof location!=='undefined'&&location.hash)?location.hash:'';const m=/[#&]compare=([^&]+)/.exec(h);return m?decodeURIComponent(m[1]).split(',').map(s=>s.trim()).filter(Boolean).slice(0,CMP_MAX):[];}catch(e){return [];}}
+let COMPARE=parseCompareHash();
+function writeCompareHash(){const h=COMPARE.length?('#compare='+COMPARE.join(',')):'';try{history.replaceState(null,'',location.pathname+location.search+h);}catch(e){}}
+function toggleCompare(id){const i=COMPARE.indexOf(id);if(i>=0)COMPARE.splice(i,1);else{if(COMPARE.length>=CMP_MAX){toast('Compare up to '+CMP_MAX+' at once');return;}COMPARE.push(id);}writeCompareHash();renderCmpTray();renderCards();if(PREFS.view==='compare')renderCompare();}
+function clearCompare(){COMPARE=[];writeCompareHash();renderCmpTray();renderCards();if(PREFS.view==='compare')renderCompare();}
 
 /* ---------- anticipatory UX state + microinteraction helpers (device-local, privacy-aware) ---------- */
 const UXLS='hatInRing_ux_v1';
@@ -420,6 +548,7 @@ function filtered(){
   if(PREFS.conf) r=r.filter(x=>x.confRank>=+PREFS.conf);
   if(PREFS.q){const q=PREFS.q.toLowerCase(); r=r.filter(x=>(x.name+' '+x.role).toLowerCase().includes(q));}
   if(PREFS.quick&&QUICK[PREFS.quick]) r=r.filter(QUICK[PREFS.quick].f);
+  if(PREFS.earlyState) r=r.filter(x=>x.early_states&&x.early_states[PREFS.earlyState]);
   const dir=PREFS.dir==='asc'?1:-1;
   r.sort((a,b)=>{
     let va=a[PREFS.sort],vb=b[PREFS.sort];
@@ -469,6 +598,7 @@ function renderBoard(){
       <td>${esc(x.party)}</td>
       <td>${tierBadge(x)}</td>
       <td class="scoreCell">${x.score}<span class="track"><i style="width:${x.score}%;background:${TIERS[x.tier].c}"></i></span></td>
+      <td class="trendCell">${sparkline(x.series)}${slopeHTML(x.slope30)}</td>
       <td>${deltaHTML(x.delta)}</td>
       <td>${confHTML(x.conf)}</td>
     </tr>`).join('');
@@ -483,10 +613,12 @@ function renderCards(){
   $('#cards').innerHTML=r.map(x=>`
     <div class="card" data-id="${x.id}">
       <span class="accent" style="background:${partyColor(x.party)}"></span>
-      <div class="ch">${x.img?`<img class="avatar" src="${esc(x.img)}" alt="" loading="lazy">`:''}<div style="flex:1;min-width:0"><div class="nm2">${esc(x.name)}${isFresh(x)?`<span class="newdot" title="New signal this week"></span>`:''}</div><div class="role2">${esc(x.role)}</div></div>${tierBadge(x)}</div>
+      <div class="ch">${x.img?`<img class="avatar" src="${esc(x.img)}" alt="" loading="lazy">`:''}<div style="flex:1;min-width:0"><div class="nm2">${esc(x.name)}${isFresh(x)?`<span class="newdot" title="New signal this week"></span>`:''}${x.pollLead?`<span class="pollLead">★</span>`:''}</div><div class="role2">${esc(x.role)}</div></div>${tierBadge(x)}</div>
+      ${stateFlags(x)}
       <div class="sig">${esc(x.headline)}</div>
       <div class="foot"><div class="scoreBig" style="color:${TIERS[x.tier].c}">${x.score}</div>
-        <div style="text-align:right">${deltaHTML(x.delta)}<br>${confHTML(x.conf)}</div></div>
+        <div style="display:flex;align-items:center;gap:8px">${sparkline(x.series)}<div style="text-align:right">${deltaHTML(x.delta)}<br>${confHTML(x.conf)}</div></div></div>
+      <label style="display:inline-flex;gap:5px;align-items:center;font-size:11px;color:var(--muted);margin:9px 0 0 6px;cursor:pointer"><input type="checkbox" class="cmp-pick" data-cmp="${x.id}" ${COMPARE.includes(x.id)?'checked':''} aria-label="Add ${esc(x.name)} to head-to-head compare"> compare</label>
     </div>`).join('');
 }
 function renderFeed(){
@@ -540,13 +672,120 @@ function renderNudge(){
     n.classList.remove('hide');
   } else { n.classList.add('hide'); }
 }
-function renderAll(){renderStats();renderQuick();renderBoard();renderCards();renderReview();renderFeed();renderLegend();syncControls();}
+/* ---------- v2 helpers: sparkline, slope, flags, money ---------- */
+function sparkline(series){
+  const pts=(series||[]).filter(p=>typeof p.s==='number');
+  const W=64,H=18,pad=2;
+  if(pts.length<2) return `<svg class="spark" width="${W}" height="${H}" aria-hidden="true"><line x1="2" y1="${H/2}" x2="${W-2}" y2="${H/2}" stroke="#d6d3ca" stroke-width="1.5"/></svg>`;
+  const X=i=>pad+(i/(pts.length-1))*(W-2*pad), Y=v=>H-pad-(Math.max(0,Math.min(100,v))/100)*(H-2*pad);
+  const d=pts.map((p,i)=>`${i?'L':'M'}${X(i).toFixed(1)} ${Y(p.s).toFixed(1)}`).join(' ');
+  const first=pts[0].s,last=pts[pts.length-1].s;
+  const col=last>first?'var(--good)':last<first?'var(--bad)':'var(--muted)';
+  return `<svg class="spark" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Momentum trend over ${pts.length} readings, now ${last}"><path d="${d}" fill="none" stroke="${col}" stroke-width="1.5"/><circle cx="${X(pts.length-1).toFixed(1)}" cy="${Y(last).toFixed(1)}" r="1.9" fill="${col}"/></svg>`;
+}
+function slopeHTML(n){n=n||0;const cls=n>0?'up':n<0?'dn':'fl';return `<span class="slopen ${cls}">${n>0?'+'+n:''+n}</span>`;}
+function stateFlags(x){
+  const f=[];
+  if((x.slope7||0)>0)f.push('<span class="flag hot" title="Momentum rising vs last week">▲ Heating</span>');
+  else if((x.slope7||0)<0)f.push('<span class="flag cool" title="Momentum falling vs last week">▼ Cooling</span>');
+  if(daysSince(x.lastSignal)>90)f.push('<span class="flag stale" title="No signal in 90+ days">Stale</span>');
+  if((x.confRank||0)>=3)f.push('<span class="flag verified" title="High-confidence sourcing">Verified</span>');
+  return f.length?`<div class="flags">${f.join('')}</div>`:'';
+}
+function fmtMoney(v){if(v==null||isNaN(v))return '—';const a=Math.abs(v);if(a>=1e9)return '$'+(v/1e9).toFixed(1)+'B';if(a>=1e6)return '$'+(v/1e6).toFixed(1)+'M';if(a>=1e3)return '$'+Math.round(v/1e3)+'K';return '$'+v;}
+function tierTimeline(series){
+  const pts=(series||[]).filter(p=>p.t!=null);
+  const ch=[];let prev=null;
+  pts.forEach(p=>{if(p.t!==prev){ch.push(p);prev=p.t;}});
+  if(ch.length<2)return '';
+  return '<div style="margin-top:8px">'+ch.map(p=>`<div class="cmp"><span>${new Date(p.d).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</span><span class="v">${(TIERS[p.t]||{}).label||p.t}</span></div>`).join('')+'</div>';
+}
+
+/* ---------- v2 renderers ---------- */
+function renderBriefing(){
+  const el=$('#briefing'); if(!el) return;
+  const b=BRIEFING||{}; const sec=[];
+  const mv=(b.movers||[]).slice(0,5);
+  if(mv.length) sec.push('<div class="b-sec">Top movers</div>'+mv.map(m=>`<div class="b-item" data-id="${m.id}"><span>${esc(m.name)}</span><span class="b-d ${m.delta>0?'up':m.delta<0?'dn':'fl'}">${m.delta>0?'▲ +'+m.delta:m.delta<0?'▼ '+m.delta:'– 0'} · ${m.score}</span></div>`).join(''));
+  const nf=(b.new_filers||[]);
+  if(nf.length) sec.push('<div class="b-sec">Formal / new filers</div>'+nf.slice(0,5).map(m=>`<div class="b-item" data-id="${m.id}"><span>${esc(m.name)}</span><span class="conf">${esc(m.statusLabel)}</span></div>`).join(''));
+  const tr=(b.transitions||[]);
+  if(tr.length) sec.push('<div class="b-sec">Status changes (7d)</div>'+tr.slice(0,5).map(t=>`<div class="b-item"><span>${esc(t.name)}</span><span class="conf">${(TIERS[t.from]||{}).label||t.from} → ${(TIERS[t.to]||{}).label||t.to}</span></div>`).join(''));
+  el.innerHTML=(sec.join('')||'<div class="b-empty">No notable movement today.</div>')+`<div class="b-share">${b.review_count?b.review_count+' item'+(b.review_count>1?'s':'')+' awaiting review · ':''}<a href="share.html" target="_blank" rel="noopener">Open share card ↗</a></div>`;
+  $('#briefMeta').textContent=b.date||'what moved';
+}
+function renderTrajectory(){
+  const win=PREFS.trajWin===30?30:7, key=win===30?'slope30':'slope7';
+  const r=records().slice().sort((a,b)=>(b[key]-a[key])||(b.score-a.score));
+  $('#trajMeta').textContent=r.length+' tracked';
+  document.querySelectorAll('#trajSeg button').forEach(b=>b.classList.toggle('on',+b.dataset.win===win));
+  $('#trajBody').innerHTML=r.map((x,i)=>`<tr class="row" data-id="${x.id}">
+    <td class="rank">${i+1}</td>
+    <td><span class="pbar" style="background:${partyColor(x.party)}"></span>${x.img?`<img class="avatarSm" src="${esc(x.img)}" alt="" loading="lazy">`:''}<span class="nm">${esc(x.name)}</span></td>
+    <td class="trendCell">${sparkline(x.series)}</td>
+    <td class="scoreCell">${x.score}</td>
+    <td>${slopeHTML(x.slope7)}</td>
+    <td>${slopeHTML(x.slope30)}</td></tr>`).join('');
+}
+function earlyTotals(){
+  const t={IA:[],NH:[],SC:[],NV:[]};
+  records().forEach(x=>{const es=x.early_states||{};Object.keys(t).forEach(s=>{if(es[s])t[s].push({name:x.name,id:x.id,n:es[s]});});});
+  Object.keys(t).forEach(s=>t[s].sort((a,b)=>b.n-a.n));
+  return t;
+}
+function renderEarlyStates(){
+  const el=$('#bigboard'); if(!el) return;
+  const t=earlyTotals();
+  const max=Math.max(1,...Object.keys(EARLY_NAMES).map(s=>t[s].reduce((a,x)=>a+x.n,0)));
+  el.innerHTML=Object.keys(EARLY_NAMES).map(s=>{
+    const rows=t[s], tot=rows.reduce((a,x)=>a+x.n,0);
+    const list=rows.slice(0,5).map(x=>`<div class="sc-row" data-id="${x.id}"><span>${esc(x.name)}</span><span>${x.n}</span></div>`).join('')||'<div class="sc-row" style="color:var(--muted)">No tracked activity yet</div>';
+    return `<div class="statecard" data-state="${s}" role="button" tabindex="0" aria-label="${EARLY_NAMES[s]}: ${tot} activity signals; filter the board to candidates active here">
+      <h3>${EARLY_NAMES[s]} <span class="sc-n">${tot}</span></h3>
+      <div class="heatbar"><i style="width:${Math.round(tot/max*100)}%"></i></div>
+      <div class="sc-list">${list}</div></div>`;
+  }).join('');
+}
+function renderStateFilter(){
+  const el=$('#stateFilter'); if(!el) return;
+  el.innerHTML=(PREFS.earlyState&&PREFS.view==='board')
+    ? `<div class="statefilter">Showing candidates active in <b>${EARLY_NAMES[PREFS.earlyState]||PREFS.earlyState}</b><span class="x" id="clearState" title="Clear early-state filter" role="button" tabindex="0">×</span></div>` : '';
+}
+function renderCompare(){
+  $('#compareCount').textContent=COMPARE.length||'';
+  $('#cmpMeta').textContent=COMPARE.length?COMPARE.length+' selected':'';
+  const recs=COMPARE.map(id=>DB.records.find(r=>r.id===id)).filter(Boolean).map(enrich);
+  const body=$('#cmpBody'); if(!body) return;
+  if(recs.length<2){ body.innerHTML=`<div class="cmpEmpty">Pick 2–3 candidates to compare — tick <b>compare</b> on any card, or open a candidate and click <b>＋ Compare</b>.${recs.length?'<br><br>Selected: '+recs.map(r=>esc(r.name)).join(', '):''}</div>`; return; }
+  const rows=[
+    ['Status',r=>`<span class="tier" style="background:${TIERS[r.tier].c}">${esc(r.statusLabel)}</span>`],
+    ['Momentum',r=>`<b>${r.score}</b>`],
+    ['Trend',r=>sparkline(r.series)],
+    ['Δ 7‑day',r=>slopeHTML(r.slope7)],
+    ['Δ 30‑day',r=>slopeHTML(r.slope30)],
+    ['Lane',r=>esc(r.party)],
+    ['Confidence',r=>esc(r.conf)],
+    ['Early states',r=>{const es=r.early_states||{};const k=Object.keys(es);return k.length?k.map(s=>esc(s)+' '+es[s]).join(' · '):'—';}],
+    ['Money (receipts)',r=>r.money?fmtMoney(r.money.receipts):'<span class="money-na">not filed</span>'],
+    ['Latest signal',r=>esc(r.headline)],
+  ];
+  body.innerHTML=`<div class="cmpgrid">${recs.map(r=>`<div class="cmpcol"><h3>${esc(r.name)} <span class="x" data-cmpx="${r.id}" role="button" tabindex="0" style="float:right;cursor:pointer;color:var(--muted)" title="Remove">×</span></h3>${rows.map(kv=>`<div class="crow"><span class="ck">${kv[0]}</span><span>${kv[1](r)}</span></div>`).join('')}</div>`).join('')}</div>`;
+}
+function renderCmpTray(){
+  const el=$('#cmptray'); if(!el) return;
+  if(!COMPARE.length){el.classList.add('hide');el.innerHTML='';return;}
+  const names=COMPARE.map(id=>{const r=DB.records.find(x=>x.id===id);return r?{id,name:r.name}:null;}).filter(Boolean);
+  el.innerHTML=`<span>Compare:</span>${names.map(n=>`<span class="cchip">${esc(n.name)}<span class="x" data-cmpx="${n.id}" role="button" tabindex="0" title="Remove">×</span></span>`).join('')}<button class="btn" id="openCompare" style="background:#fff">Compare ${names.length}</button><button class="btn" id="clearCompare" style="background:transparent;color:#fff;border-color:rgba(255,255,255,.4)">Clear</button>`;
+  el.classList.remove('hide');
+}
+function renderAll(){renderStats();renderQuick();renderBoard();renderCards();renderReview();renderFeed();renderLegend();renderBriefing();renderTrajectory();renderEarlyStates();renderCompare();renderCmpTray();renderStateFilter();syncControls();}
 
 /* ---------- drawer ---------- */
 function openDrawer(id){
   const c=DB.records.find(x=>x.id===id); if(!c)return;
   const x=enrich(c); const bd=breakdown(c);
   const total=x.score;
+  const es=x.early_states||{}, esk=Object.keys(es); const m=x.money;
   $('#drawerInner').innerHTML=`
     <div class="dh">
       <span class="x" data-close>×</span>
@@ -568,8 +807,19 @@ function openDrawer(id){
         ${bd.map(b=>`<div class="cmp"><span>${b.label}</span><span class="v ${b.w>=0?'pos':'neg'}">${b.w>=0?'+':''}${b.w}</span></div>`).join('')||'<div class="cmp"><span>No active signals</span><span class="v">0</span></div>'}
         <div class="cmp total"><span>Momentum (capped 0–100)</span><span class="v">${total}</span></div>
       </div>
+      <div class="break">
+        <h4>Momentum trajectory</h4>
+        <div style="display:flex;align-items:center;gap:10px">${sparkline(x.series)}<span class="conf">Δ7d ${slopeHTML(x.slope7)} · Δ30d ${slopeHTML(x.slope30)}</span></div>
+        ${tierTimeline(x.series)}
+      </div>
+      ${esk.length?`<div class="break"><h4>Early-state activity</h4>${esk.map(s=>`<div class="cmp"><span>${EARLY_NAMES[s]||s}</span><span class="v">${es[s]} signal${es[s]>1?'s':''}</span></div>`).join('')}</div>`:''}
+      <div class="break">
+        <h4>Money movement <span style="font-weight:400;text-transform:none;color:var(--muted)">(FEC · separate axis)</span></h4>
+        ${m?`<table class="money-tbl"><tr><td>Receipts</td><td>${fmtMoney(m.receipts)}</td></tr><tr><td>Disbursements</td><td>${fmtMoney(m.disbursements)}</td></tr><tr><td>Cash on hand</td><td>${fmtMoney(m.cash_on_hand)}</td></tr><tr><td>Debts</td><td>${fmtMoney(m.debts)}</td></tr></table><div class="conf" style="margin-top:6px">${esc(m.committee||'')}${m.coverage_end?' · thru '+esc(m.coverage_end):''}${safeUrl(m.source)?` · <a href="${esc(m.source)}" target="_blank" rel="noopener">FEC ↗</a>`:''}</div>`:`<div class="money-na">No FEC financial report on file (not a registered filer, or no totals yet). Money is never folded into momentum.</div>`}
+      </div>
       ${x.tags&&x.tags.length?`<div class="tagrow">${x.tags.map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div>`:''}
-      <div style="margin-top:18px;display:flex;gap:8px">
+      <div style="margin-top:18px;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn" data-cmpadd="${x.id}">${COMPARE.includes(x.id)?'✓ In compare':'＋ Compare'}</button>
         <button class="btn" data-edit="${x.id}">Edit</button>
         <button class="btn" data-del="${x.id}">Delete</button>
       </div>
@@ -647,12 +897,17 @@ function syncControls(){
   $('#q').value=PREFS.q||'';
   $('#bucketSel').value=PREFS.bucket||'';
   $('#confSel').value=PREFS.conf||'';
-  document.querySelectorAll('#viewSeg button').forEach(b=>b.classList.toggle('on',b.dataset.view===PREFS.view));
-  $('#boardPanel').classList.toggle('hide',PREFS.view!=='board');
-  $('#cardsPanel').classList.toggle('hide',PREFS.view!=='cards');
-  $('#reviewPanel').classList.toggle('hide',PREFS.view!=='review');
-  $('#quickbar').classList.toggle('hide',PREFS.view==='review');
+  document.querySelectorAll('#viewSeg button').forEach(b=>{const on=b.dataset.view===PREFS.view;b.classList.toggle('on',on);b.setAttribute('aria-selected',on?'true':'false');});
+  const V=PREFS.view;
+  $('#boardPanel').classList.toggle('hide',V!=='board');
+  $('#cardsPanel').classList.toggle('hide',V!=='cards');
+  $('#trajPanel').classList.toggle('hide',V!=='traj');
+  $('#earlyPanel').classList.toggle('hide',V!=='early');
+  $('#comparePanel').classList.toggle('hide',V!=='compare');
+  $('#reviewPanel').classList.toggle('hide',V!=='review');
+  $('#quickbar').classList.toggle('hide',!(V==='board'||V==='cards'));
   document.querySelectorAll('.chip.party').forEach(c=>c.classList.toggle('on',PREFS.party.includes(c.dataset.v)));
+  renderStateFilter();
 }
 function persistPrefs(){DB.prefs=PREFS;save();}
 
@@ -668,7 +923,14 @@ function init(){
   $('#q').addEventListener('change',e=>{const v=e.target.value.trim(); if(v.length>=2){UX.recentSearches=[v].concat((UX.recentSearches||[]).filter(s=>s!==v)).slice(0,5);saveUX();renderHints();}});
   $('#bucketSel').addEventListener('change',e=>{PREFS.bucket=e.target.value;persistPrefs();renderBoard();renderCards();});
   $('#confSel').addEventListener('change',e=>{PREFS.conf=e.target.value;persistPrefs();renderBoard();renderCards();});
-  document.querySelectorAll('#viewSeg button').forEach(b=>b.addEventListener('click',()=>{PREFS.view=b.dataset.view;persistPrefs();syncControls();fadePanel();}));
+  document.querySelectorAll('#viewSeg button').forEach(b=>b.addEventListener('click',()=>{PREFS.view=b.dataset.view;persistPrefs();if(b.dataset.view==='compare')renderCompare();if(b.dataset.view==='traj')renderTrajectory();if(b.dataset.view==='early')renderEarlyStates();syncControls();fadePanel();}));
+  document.querySelectorAll('#trajSeg button').forEach(b=>b.addEventListener('click',()=>{PREFS.trajWin=+b.dataset.win;persistPrefs();renderTrajectory();}));
+  // keyboard activation for role=button elements (state cards, quick chips, remove ×)
+  document.body.addEventListener('keydown',e=>{
+    if((e.key==='Enter'||e.key===' ')&&e.target&&e.target.getAttribute&&e.target.getAttribute('role')==='button'){e.preventDefault();e.target.click();}
+  });
+  // compare deep-link: react to #compare= changes (back/forward, shared links)
+  window.addEventListener('hashchange',()=>{COMPARE=parseCompareHash();renderCmpTray();renderCards();if(PREFS.view==='compare')renderCompare();});
   document.querySelectorAll('#board th[data-sort]').forEach(th=>th.addEventListener('click',()=>{
     const s=th.dataset.sort;
     if(PREFS.sort===s)PREFS.dir=PREFS.dir==='asc'?'desc':'asc';
@@ -691,6 +953,14 @@ function init(){
   document.body.addEventListener('click',e=>{
     const row=e.target.closest('[data-id]');
     if(e.target.closest('[data-close]')){closeDrawer();return;}
+    if(e.target.closest('.cmp-pick')){toggleCompare(e.target.closest('.cmp-pick').dataset.cmp);return;}
+    if(e.target.closest('[data-cmpadd]')){const id=e.target.closest('[data-cmpadd]').dataset.cmpadd;toggleCompare(id);openDrawer(id);return;}
+    if(e.target.closest('[data-cmpx]')){toggleCompare(e.target.closest('[data-cmpx]').dataset.cmpx);return;}
+    if(e.target.closest('#openCompare')){PREFS.view='compare';persistPrefs();renderCompare();syncControls();fadePanel();return;}
+    if(e.target.closest('#clearCompare')){clearCompare();return;}
+    if(e.target.closest('#clearState')){PREFS.earlyState='';persistPrefs();renderAll();return;}
+    if(e.target.closest('.sc-row[data-id]')){openDrawer(e.target.closest('.sc-row').dataset.id);return;}
+    if(e.target.closest('[data-state]')){PREFS.earlyState=e.target.closest('[data-state]').dataset.state;PREFS.view='board';persistPrefs();renderAll();fadePanel();toast('Filtered to '+(EARLY_NAMES[PREFS.earlyState]||PREFS.earlyState));return;}
     if(e.target.closest('[data-quick]')){const k=e.target.closest('[data-quick]').dataset.quick;PREFS.quick=(PREFS.quick===k?'':k);persistPrefs();renderAll();return;}
     if(e.target.closest('#showMovers')){PREFS.quick='movers';PREFS.view='board';persistPrefs();$('#nudge').classList.add('hide');renderAll();fadePanel();return;}
     if(e.target.closest('#nudgeX')){UX.dismissedNudges[GENERATED_AT]=true;saveUX();$('#nudge').classList.add('hide');return;}
@@ -705,13 +975,14 @@ function init(){
   $('#scrim').addEventListener('click',closeDrawer);
   document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDrawer();});
 
-  $('#foot').innerHTML=`Manually-maintained tracker — data seeded from public reporting (AP, Reuters, Time, WaPo, ABC, C-SPAN, FEC) as of June 15, 2026 (auto-generated Jun 15 2026 03:39). Edits/additions save to this browser only; use <b>Export</b> to back up or port to Notion. <b>Status tier</b> = furthest verifiable step taken; <b>momentum</b> = weighted activity + recency, capped 0–100. Not a live FEC/news feed — see chat notes for wiring options. · <span class="resetlink" id="resetPrefs">Reset view</span>`;
+  $('#foot').innerHTML=`Manually-maintained tracker — data seeded from public reporting (AP, Reuters, Time, WaPo, ABC, C-SPAN, FEC) as of June 15, 2026 (auto-generated Jun 15 2026 03:59). Edits/additions save to this browser only; use <b>Export</b> to back up or port to Notion. <b>Status tier</b> = furthest verifiable step taken; <b>momentum</b> = weighted activity + recency, capped 0–100. Not a live FEC/news feed — see chat notes for wiring options. · <span class="resetlink" id="resetPrefs">Reset view</span>`;
   // drawer swipe-to-dismiss (touch): light resistance + snap on release
   (function(){var d=$('#drawer'),x0=null;
     d.addEventListener('touchstart',function(ev){x0=ev.touches[0].clientX;d.style.transition='none';},{passive:true});
     d.addEventListener('touchmove',function(ev){if(x0==null)return;var dx=Math.max(0,ev.touches[0].clientX-x0);d.style.transform='translateX('+(dx*0.7)+'px)';},{passive:true});
     d.addEventListener('touchend',function(ev){if(x0==null)return;var dx=ev.changedTouches[0].clientX-x0;d.style.transition='';d.style.transform='';if(dx>90)closeDrawer();x0=null;});
   })();
+  if(COMPARE.length) PREFS.view='compare';         // arrived via a #compare= deep link
   renderAll(); renderNudge(); renderHints();
   UX.lastSeenVer=GENERATED_AT; saveUX();          // mark this build as seen
 }

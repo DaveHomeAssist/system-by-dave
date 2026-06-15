@@ -25,6 +25,9 @@ import yaml
 from . import fec as fecmod
 from . import news as newsmod
 from . import classify as clf
+from . import series as seriesmod
+from . import money as moneymod
+from . import brief as briefmod
 from .merge import Dataset, review_rid, _review_kind
 from .build import render
 
@@ -204,6 +207,28 @@ def run(args):
             log.info("dataset: %d records written", len(ds.records))
         else:
             log.info("dataset unchanged")
+
+        # Momentum trajectory: one snapshot per day so the series accumulates
+        # (momentum has no historical record in signals.jsonl). Idempotent per date.
+        seriesmod.record_snapshot(ds.records, today, DATA / "momentum_snapshots.jsonl")
+
+        # Money movement (a SEPARATE axis — never folded into momentum). FEC-only,
+        # skipped offline, and wrapped so a rate-limited DEMO_KEY never kills the run.
+        if (args.fec or args.all) and not args.offline:
+            try:
+                moneymod.refresh(ds.records, DATA / "financials.json",
+                                 cycle=cfg.get("cycle", 2028), today=today)
+            except Exception as e:                       # noqa: BLE001
+                log.error("money refresh failed: %s", e)
+
+        # Daily briefing artifact (committed; build.py recomputes for the live page).
+        try:
+            pending = [x for x in _safe_load(DATA / "review_queue.json", [], list)
+                       if isinstance(x, dict)]
+            briefmod.write_briefing(
+                briefmod.build_briefing(ds.records, len(pending), today), DATA)
+        except Exception as e:                           # noqa: BLE001
+            log.error("briefing failed: %s", e)
 
     if args.build or args.all:
         out = Path(args.out) if args.out else DATA / "dashboard.html"

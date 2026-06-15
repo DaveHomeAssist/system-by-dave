@@ -148,8 +148,10 @@ def test_html_is_well_formed(tmp_path):
     p.close()
     assert not p.stack, f"unclosed tags: {p.stack}"
     assert not p.errors, f"tag errors: {p.errors}"
-    # exactly one real closing </script> (no breakout) and one opening
-    assert html.count("</script>") == 1, "unexpected extra </script> (script-context breakout?)"
+    # Two closing </script>: the head JSON-LD block + the one dashboard script.
+    # The dashboard's inline <script> (no attrs) must still be exactly one (no
+    # breakout from injected SEED data); the JSON-LD uses <script type=...>.
+    assert html.count("</script>") == 2, "unexpected </script> count (script-context breakout?)"
     assert html.count("<script>") == 1
 
 
@@ -259,5 +261,27 @@ def test_script_breakout_is_neutralised(tmp_path):
     recs = _dataset(with_drop_fields=False)
     recs[0]["headline"] = "</script><img src=x onerror=alert(1)>"
     html = _render(tmp_path, recs=recs)
-    # if the build escaped properly, there'd still be exactly one </script>
-    assert html.count("</script>") == 1
+    # Escaped properly -> the malicious "</script>" in the headline does NOT add a
+    # closing tag, so the count stays at the legitimate two (JSON-LD + dashboard).
+    assert html.count("</script>") == 2
+
+
+# ----------------------------------------------------------------------------
+# 8. v2: momentum trajectory `series` is attached + bounded; SEO meta present
+# ----------------------------------------------------------------------------
+def test_trajectory_series_attached_and_bounded(tmp_path):
+    from hatring import series as seriesmod
+    seed = json.loads(_extract_seed(_render(tmp_path)))
+    for r in seed:
+        assert "series" in r and isinstance(r["series"], list)
+        assert len(r["series"]) <= seriesmod.MAX_POINTS
+        assert "slope7" in r and "slope30" in r
+
+
+def test_seo_and_share_metadata_present(tmp_path):
+    html = _render(tmp_path)
+    for needle in ('rel="canonical"', 'property="og:image"', 'name="twitter:card"',
+                   'application/ld+json', 'systembydave.com/hat-in-ring'):
+        assert needle in html, f"missing SEO/share tag: {needle}"
+    # static crawl summary present so SEO isn't JS-dependent
+    assert 'id="crawl-summary"' in html and "<noscript>" in html

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="Hat-in-Ring Radar daily briefing">
+<rect width="1200" height="630" fill="#0f1115"/>
+<rect width="1200" height="8" fill="#d23b3b"/>
+<text x="80" y="120" font-size="58" fill="#f4efe7" font-family="Georgia,serif">🧭 Hat-in-Ring Radar</text>
+<text x="80" y="170" font-size="28" fill="#8b929c" font-family="-apple-system,Arial,sans-serif">2028 presidential signal tracker · 2026-06-15</text>
+<text x="80" y="245" font-size="30" fill="#d23b3b" font-family="-apple-system,Arial,sans-serif" letter-spacing="2">TOP MOVERS THIS WEEK</text>
+<text x="80" y="320" font-size="38" fill="#9a9a9a" font-family="Georgia,serif">No movement today.</text>
+<text x="80" y="585" font-size="26" fill="#8b929c" font-family="-apple-system,Arial,sans-serif">40 tracked · 3 formal · 14 considering · systembydave.com/hat-in-ring</text>
+</svg>

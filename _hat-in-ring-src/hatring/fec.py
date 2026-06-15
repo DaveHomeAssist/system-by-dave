@@ -64,6 +64,34 @@ class FecClient:
             return r.json()
         raise RuntimeError("FEC API: exhausted retries (rate limited)")
 
+    def candidate_totals(self, fec_id: str, cycle: int = 2028) -> dict | None:
+        """Compact financial totals for a candidate, or None if unavailable.
+
+        Money is a SEPARATE seriousness axis — this never feeds scoring. Any
+        error (rate limit, missing data, network) returns None so the caller
+        keeps the prior artifact rather than zeroing a candidate out.
+        """
+        try:
+            data = self._get(f"/candidate/{fec_id}/totals/",
+                             cycle=cycle, per_page=1, sort="-cycle")
+        except Exception as e:                       # noqa: BLE001 - never kill the run
+            log.warning("FEC totals %s failed: %s", fec_id, e)
+            return None
+        results = data.get("results") or []
+        if not results:
+            return None
+        t = results[0]
+        return {
+            "receipts": t.get("receipts"),
+            "disbursements": t.get("disbursements"),
+            "cash_on_hand": t.get("last_cash_on_hand_end_period"),
+            "debts": t.get("last_debts_owed_by_committee"),
+            "committee": t.get("committee_name"),
+            "coverage_end": t.get("coverage_end_date"),
+            "cycle": t.get("cycle"),
+            "source": f"https://www.fec.gov/data/candidate/{fec_id}/",
+        }
+
     def presidential_candidates(self, year: int = 2028) -> Iterator[dict]:
         """Paginate every presidential candidate whose cycles include `year`."""
         page = 1

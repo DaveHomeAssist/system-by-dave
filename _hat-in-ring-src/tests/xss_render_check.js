@@ -58,7 +58,14 @@ const rendered = board + '\n' + feed;
 // escaped to "&lt;" no tag can form, so leftover inert text like "onerror=" inside
 // an escaped "&lt;img ...&gt;" is harmless — only a live "<tag" is the vulnerability.
 const bad = ['<img', '<svg', '<script', '<iframe', '<body', 'javascript:'];
-const leaked = bad.filter((b) => rendered.toLowerCase().includes(b));
+// Strip the LEGITIMATE build-controlled tags (avatar <img>, momentum <svg> sparkline)
+// before scanning — these carry fixed classes and a build-trusted src, never data.
+// An injected raw <img onerror=...>/<svg> from an unescaped field lacks these classes
+// and so still trips the check.
+const cleaned = rendered
+  .replace(/<img class="avatarSm"[^>]*>/g, '')
+  .replace(/<svg class="spark"[\s\S]*?<\/svg>/g, '');
+const leaked = bad.filter((b) => cleaned.toLowerCase().includes(b));
 if (leaked.length) {
   console.log('FAIL: unescaped payload in rendered innerHTML -> ' + leaked.join(', '));
   console.log('  board snippet: ' + board.slice(0, 200));

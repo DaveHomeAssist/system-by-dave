@@ -108,6 +108,16 @@ class Dataset:
             if k not in rec["keys"]:
                 rec["keys"].append(k)
                 changed = True
+        # Early-state activity tally (Big Board). Automation-ADDED activity data,
+        # not a curated field, so it's safe to accumulate. Idempotent: update()
+        # only calls apply_news for signals not already in the dedup log.
+        if "earlyState" in c.keys and getattr(c, "states", None):
+            es = rec.setdefault("early_states", {})
+            last = rec.setdefault("early_states_last", {})
+            for stt in c.states:
+                es[stt] = es.get(stt, 0) + 1
+                last[stt] = c.date
+                changed = True
         # refresh "latest signal" if this item is newer
         if c.date >= rec.get("lastSignal", "0000-00-00"):
             rec["lastSignal"] = c.date
