@@ -659,16 +659,23 @@
   }
   #script{
     flex:1;width:100%;resize:none;border:0;outline:0;
-    background:var(--bg);color:var(--text);
+    /* the editor is a WYSIWYG preview of the reading surface: every formatting
+       control (size, case, align, colour, shadow, stroke …) shows here while
+       composing, so "what you set is what you'll read". */
+    background:var(--reader-bg);color:var(--reader-color);
     font-family:var(--read-sans);
     font-weight:var(--reader-weight);
     font-style:var(--reader-style);
+    text-transform:var(--reader-transform);
+    text-align:var(--reader-align);
     letter-spacing:var(--reader-letter-spacing);
     word-spacing:var(--reader-word-spacing);
-    font-size:20px;line-height:1.6;
+    text-shadow:var(--reader-shadow);
+    -webkit-text-stroke:var(--reader-stroke-width) var(--reader-stroke-color);
+    font-size:var(--reader-fs);line-height:var(--reader-lh);
     padding:20px clamp(16px,6vw,80px);
   }
-  #script::placeholder{color:#5d6675}
+  #script::placeholder{color:var(--muted);-webkit-text-stroke:0;text-shadow:none}
   body.reading .editor{display:none}
 
   /* end-of-script banner */
