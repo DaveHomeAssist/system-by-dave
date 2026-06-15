@@ -47,12 +47,21 @@ jobs:
         run: python -m hatring.pipeline --build --out ../hat-in-ring/index.html
 
       # Commit refreshed dataset + rebuilt dashboard; the push triggers Pages.
+      # Race-safe: this repo is also pushed to by a human, so rebase onto any
+      # concurrent change and retry. Generated artifacts (data/, hat-in-ring/) are
+      # fully rebuilt each run, so prefer THIS run's fresh copy on the rare conflict.
       - name: Commit & push
         working-directory: ${{ github.workspace }}
         run: |
           git config user.name  "hat-in-ring-bot"
           git config user.email "actions@users.noreply.github.com"
           git add _hat-in-ring-src/data hat-in-ring
-          git diff --cached --quiet && echo "no changes" || \
-            git commit -m "chore: hat-in-ring daily ingest $(date -u +%F)"
-          git push
+          if git diff --cached --quiet; then echo "no changes"; exit 0; fi
+          git commit -m "chore: hat-in-ring daily ingest $(date -u +%F)"
+          for i in 1 2 3 4 5; do
+            git fetch -q origin main || true
+            git rebase -X theirs origin/main && git push && { echo "pushed on try $i"; exit 0; }
+            git rebase --abort 2>/dev/null || true
+            echo "push race; retry $i"; sleep $((i * 4))
+          done
+          echo "commit/push failed after 5 retries"; exit 1
