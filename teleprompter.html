@@ -27,15 +27,23 @@
     --bg:#0a0c10;
     --surface:#12161d;
     --surface-2:#1a1f29;
+    --surface-3:#1f2530;
     --line:#2a313d;
+    --line-2:#343c49;
     --text:#f4f6fb;
     --muted:#aab3c2;
-    --accent:#5bb0ff;
-    --accent-strong:#3d97f0;
-    --accent-ink:#04121f;
-    --danger:#ff6b6b;
-    --success:#66d99a;
-    --focus:#9ad0ff;
+    --faint:#717b8a;
+    /* rust — the authentic System by Dave brand accent (matches the logo mark) */
+    --accent:#e08a4f;
+    --accent-strong:#cf7637;
+    --accent-ink:#1c0f05;
+    --accent-soft:rgba(224,138,79,.16);
+    --accent-line:rgba(224,138,79,.42);
+    --danger:#ff7a72;
+    --success:#5fd39a;
+    --focus:#f2bd8f;
+    --ui-mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+    --radius-sm:9px;
     --reader-color:#fff;
     --reader-bg:#07090d;
     --reader-weight:600;
@@ -47,7 +55,7 @@
     --reader-shadow:none;
     --reader-stroke-width:0;
     --reader-stroke-color:transparent;
-    --line-color:#5bb0ff;
+    --line-color:#e08a4f;
     --radius:12px;
     --dur-fast:120ms;
     --dur-med:180ms;
@@ -91,10 +99,10 @@
   .brand{display:flex;align-items:center;gap:10px;font-weight:650;letter-spacing:.2px}
   .brand .dot{
     width:12px;height:12px;border-radius:50%;
-    background:radial-gradient(circle at 35% 30%,#7fc3ff,var(--accent-strong));
-    box-shadow:0 0 0 4px rgba(91,176,255,.14);
+    background:radial-gradient(circle at 35% 30%,#f4b485,var(--accent-strong));
+    box-shadow:0 0 0 4px rgba(224,138,79,.14);
   }
-  .brand small{display:block;color:var(--muted);font-weight:500;font-size:11px;letter-spacing:.3px}
+  .brand small{display:block;color:var(--muted);font-family:var(--ui-mono);font-weight:500;font-size:10px;letter-spacing:.14em;text-transform:uppercase}
   .bar .spacer{flex:1}
 
   /* ---------- Controls toolbar ---------- */
@@ -118,7 +126,7 @@
     padding:10px 13px;
     background:rgba(17,22,31,.88);
     border-color:#465467;
-    box-shadow:0 10px 28px rgba(0,0,0,.34),0 0 0 1px rgba(154,208,255,.08);
+    box-shadow:0 10px 28px rgba(0,0,0,.34),0 0 0 1px rgba(224,138,79,.08);
     backdrop-filter:blur(12px);
   }
   .controls-wake::before{
@@ -150,11 +158,11 @@
   .group:hover,.group:focus-within{
     background:#202632;
     border-color:#3f4c5d;
-    box-shadow:0 0 0 1px rgba(154,208,255,.06);
+    box-shadow:0 0 0 1px rgba(224,138,79,.06);
   }
-  .group .label{color:var(--muted);font-size:12px;padding:0 2px;white-space:nowrap}
+  .group .label{color:var(--faint);font-family:var(--ui-mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;padding:0 2px;white-space:nowrap}
   .group .readout{
-    min-width:42px;text-align:center;font-variant-numeric:tabular-nums;
+    min-width:46px;text-align:center;font-family:var(--ui-mono);font-variant-numeric:tabular-nums;
     font-size:13px;color:var(--text);
   }
 
@@ -179,7 +187,7 @@
   button:hover{
     background:#232c3b;
     border-color:#465467;
-    box-shadow:0 0 0 1px rgba(154,208,255,.08),0 3px 10px rgba(0,0,0,.18);
+    box-shadow:0 0 0 1px rgba(224,138,79,.08),0 3px 10px rgba(0,0,0,.18);
     transform:translateY(-1px);
   }
   button:active,button.is-pressing{
@@ -190,13 +198,13 @@
   }
   button.icon{padding:8px 10px;min-width:38px;font-size:15px}
   button.toggle[aria-pressed="true"]{
-    background:rgba(91,176,255,.16);
+    background:rgba(224,138,79,.16);
     border-color:var(--accent-strong);
-    color:#cfe7ff;
+    color:#fbe6d4;
   }
   button.toggle[aria-pressed="true"]:hover{
-    background:rgba(91,176,255,.22);
-    border-color:#69b8ff;
+    background:rgba(224,138,79,.22);
+    border-color:#e89a5d;
   }
   button.primary{
     background:linear-gradient(180deg,var(--accent),var(--accent-strong));
@@ -214,25 +222,25 @@
     align-items:center;
     justify-content:center;
     gap:6px;
-    border-color:#65b9ff;
-    background:linear-gradient(180deg,rgba(91,176,255,.28),rgba(61,151,240,.16));
-    color:#f2f9ff;
+    border-color:#e89a5d;
+    background:linear-gradient(180deg,rgba(224,138,79,.28),rgba(207,118,55,.16));
+    color:#fff6ed;
     font-weight:700;
     white-space:nowrap;
-    box-shadow:0 0 0 1px rgba(154,208,255,.1),0 6px 18px rgba(0,0,0,.16);
+    box-shadow:0 0 0 1px rgba(224,138,79,.1),0 6px 18px rgba(0,0,0,.16);
   }
   #controlsToggleBtn::before{
     content:"▤";
     font-size:13px;
   }
   #controlsToggleBtn:hover{
-    background:linear-gradient(180deg,rgba(91,176,255,.36),rgba(61,151,240,.22));
-    border-color:#8acaff;
+    background:linear-gradient(180deg,rgba(224,138,79,.36),rgba(207,118,55,.22));
+    border-color:#f4c49e;
   }
   #controlsToggleBtn[aria-pressed="true"]{
-    background:rgba(91,176,255,.18);
+    background:rgba(224,138,79,.18);
     border-color:var(--accent-strong);
-    color:#cfe7ff;
+    color:#fbe6d4;
   }
   .controls-toggle-inline{
     display:inline-flex;
@@ -240,9 +248,9 @@
     justify-content:center;
     min-width:112px;
     white-space:nowrap;
-    border-color:#426489;
-    background:rgba(91,176,255,.1);
-    color:#dceeff;
+    border-color:#7c5a3e;
+    background:rgba(224,138,79,.1);
+    color:#fbe6d4;
     font-weight:700;
   }
   .controls-toggle-inline::before{
@@ -251,9 +259,9 @@
     font-size:13px;
   }
   .controls-toggle-inline[aria-pressed="true"]{
-    background:rgba(91,176,255,.18);
+    background:rgba(224,138,79,.18);
     border-color:var(--accent-strong);
-    color:#cfe7ff;
+    color:#fbe6d4;
   }
   .toolbar-compact-toggle{
     display:inline-flex;
@@ -284,10 +292,10 @@
   button:disabled,select:disabled{opacity:.55;cursor:not-allowed;transform:none;box-shadow:none}
   button.predicted-action{
     border-color:var(--focus);
-    box-shadow:0 0 0 2px rgba(154,208,255,.16),0 4px 14px rgba(0,0,0,.22);
+    box-shadow:0 0 0 2px rgba(224,138,79,.16),0 4px 14px rgba(0,0,0,.22);
   }
   button.primary.predicted-action{
-    box-shadow:0 1px 0 rgba(255,255,255,.18) inset,0 0 0 3px rgba(91,176,255,.2);
+    box-shadow:0 1px 0 rgba(255,255,255,.18) inset,0 0 0 3px rgba(224,138,79,.2);
   }
   .feedback-success{
     border-color:rgba(102,217,154,.88) !important;
@@ -423,14 +431,14 @@
     content:"";
     position:absolute;inset:0;z-index:3;pointer-events:none;
     border:1px solid transparent;
-    box-shadow:inset 0 0 0 0 rgba(91,176,255,0);
+    box-shadow:inset 0 0 0 0 rgba(224,138,79,0);
     transition:border-color var(--dur-med) var(--ease-out), box-shadow var(--dur-med) var(--ease-out);
   }
   body.reading:not(.playing) .reader{cursor:grab}
   body.reading:not(.playing) .reader:hover::after,
   body.reading:not(.playing) .reader.dragging::after{
-    border-color:rgba(154,208,255,.18);
-    box-shadow:inset 0 0 0 1px rgba(91,176,255,.08);
+    border-color:rgba(224,138,79,.18);
+    box-shadow:inset 0 0 0 1px rgba(224,138,79,.08);
   }
   body.reading:not(.playing) .reader.dragging{cursor:grabbing}
   .mirror-wrap{
@@ -474,7 +482,7 @@
     gap:10px;
     max-width:min(92vw,540px);
     padding:8px 10px;
-    border:1px solid rgba(154,208,255,.2);
+    border:1px solid rgba(224,138,79,.2);
     border-radius:999px;
     background:rgba(10,12,16,.78);
     color:#dbe9f7;
@@ -491,7 +499,7 @@
   }
   .pace-readout{
     padding:2px 7px;
-    border:1px solid rgba(154,208,255,.2);
+    border:1px solid rgba(224,138,79,.2);
     border-radius:999px;
     background:rgba(255,255,255,.06);
   }
@@ -627,9 +635,9 @@
   .editor-head .editor-controls-btn{
     flex:0 0 auto;
     min-width:128px;
-    border-color:#426489;
-    background:rgba(91,176,255,.1);
-    color:#dceeff;
+    border-color:#7c5a3e;
+    background:rgba(224,138,79,.1);
+    color:#fbe6d4;
     font-weight:700;
     white-space:nowrap;
   }
@@ -639,9 +647,9 @@
     font-size:13px;
   }
   .editor-head .editor-controls-btn[aria-pressed="true"]{
-    background:rgba(91,176,255,.18);
+    background:rgba(224,138,79,.18);
     border-color:var(--accent-strong);
-    color:#cfe7ff;
+    color:#fbe6d4;
   }
   .script-meta{
     color:#d4deec;
@@ -911,7 +919,7 @@
   footer .spacer{flex:1}
 
   .hint{color:var(--muted);font-size:12px}
-  .hint.next-action-ready{color:#cfe7ff}
+  .hint.next-action-ready{color:#fbe6d4}
   .storage-status{
     display:inline-flex;align-items:center;
     padding:5px 9px;
@@ -1320,7 +1328,8 @@
     <div class="group toolbar-advanced" aria-label="Reading line color">
       <span class="label">Line color</span>
       <div class="swatches" aria-label="Reading line color swatches">
-        <button class="swatch" type="button" data-line-color="blue" style="--swatch:#5bb0ff" title="Blue reading line" aria-label="Blue reading line" aria-pressed="true"></button>
+        <button class="swatch" type="button" data-line-color="rust" style="--swatch:#e08a4f" title="Rust reading line" aria-label="Rust reading line" aria-pressed="true"></button>
+        <button class="swatch" type="button" data-line-color="blue" style="--swatch:#5bb0ff" title="Blue reading line" aria-label="Blue reading line" aria-pressed="false"></button>
         <button class="swatch" type="button" data-line-color="amber" style="--swatch:#ffd48a" title="Amber reading line" aria-label="Amber reading line" aria-pressed="false"></button>
         <button class="swatch" type="button" data-line-color="green" style="--swatch:#66d99a" title="Green reading line" aria-label="Green reading line" aria-pressed="false"></button>
         <button class="swatch" type="button" data-line-color="rose" style="--swatch:#ff8eab" title="Rose reading line" aria-label="Rose reading line" aria-pressed="false"></button>
@@ -1330,7 +1339,7 @@
       </div>
       <label title="Custom reading line color">
         <span class="visually-hidden">Custom reading line color</span>
-        <input id="lineColorInput" class="color-input" type="color" value="#5bb0ff" aria-label="Custom reading line color">
+        <input id="lineColorInput" class="color-input" type="color" value="#e08a4f" aria-label="Custom reading line color">
       </label>
       <button id="saveLineColorBtn" class="icon swatch-save-btn" type="button" title="Save custom reading line color" aria-label="Save custom reading line color">+</button>
       <div id="lineCustomSwatches" class="swatches custom-swatches" aria-label="Saved custom reading line colors"></div>
@@ -1745,7 +1754,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     off:'none',
     soft:'0 2px 12px rgba(0,0,0,.45)',
     crisp:'0 1px 2px rgba(0,0,0,.72)',
-    glow:'0 0 12px rgba(91,176,255,.42)',
+    glow:'0 0 12px rgba(224,138,79,.42)',
     outline:'0 1px 0 #000,1px 0 0 #000,0 -1px 0 #000,-1px 0 0 #000'
   };
   var TEXT_STROKES = {
@@ -1756,6 +1765,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     thinLight:{width:'.8px', color:'rgba(255,255,255,.78)'}
   };
   var LINE_COLORS = {
+    rust:'#e08a4f',
     blue:'#5bb0ff',
     amber:'#ffd48a',
     green:'#66d99a',
@@ -1780,7 +1790,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
       textStroke:'off',
       textColor:'white',
       readerBg:'black',
-      lineColor:'blue'
+      lineColor:'rust'
     },
     highContrast:{
       font:56,
@@ -1982,7 +1992,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   var TEXT_STROKE = 'off';
   var TEXT_COLOR = 'white';
   var READER_BG = 'black';
-  var LINE_COLOR = 'blue';
+  var LINE_COLOR = 'rust';
   var showStartMinutes = null;
 
   var STORE = 'teleprompter.v1';
