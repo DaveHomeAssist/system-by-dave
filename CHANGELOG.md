@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-06-16
+
+* Added inline rich text formatting to `/teleprompter.html`: the reader now renders `**bold**`, `*italic*`, `==highlight==`, `~~strikethrough~~`, `[[camera cues]]`, and dimmed `((director notes))` inline, and styles `# Heading` and `== Section ==` lines as section markers, while the script body is HTML escaped first so no script markup can inject markup. Lone asterisks and equals signs (math, bullets) are left untouched. Added a `✦` toggle in the Style toolbar (remembered per browser, on by default) to turn formatting on or off, documented the syntax in the Shortcuts dialog and editor placeholder, and kept marker scroll positions accurate by formatting the hidden marker measure element with the same parser.
+
 ## 2026-06-14
 
 * Renamed the `/teleprompter.html` visible controls collapse action to Hide controls in the header, toolbar, and editor header, kept the `H` shortcut and Show controls restore action, and bumped the AV Suite offline cache version so cached teleprompter copies refresh.

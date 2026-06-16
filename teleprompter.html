@@ -472,6 +472,53 @@
   .reader-inner.snap-feedback{
     transition:transform var(--dur-med) var(--ease-out);
   }
+  /* Inline script formatting — kept identical on .reader-inner and .marker-measure
+     so marker scroll positions (measured from .marker-measure) stay accurate. */
+  .reader-inner strong,.marker-measure strong{font-weight:800}
+  .reader-inner em,.marker-measure em{font-style:italic}
+  .reader-inner s,.marker-measure s{text-decoration-thickness:.08em}
+  .reader-inner mark.tp-hl,.marker-measure mark.tp-hl{
+    background:var(--accent-soft);
+    color:inherit;
+    padding:0 .14em;
+    border-radius:.14em;
+  }
+  .reader-inner .tp-cue,.marker-measure .tp-cue{
+    color:var(--accent);
+    font-weight:700;
+    font-size:.82em;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+  }
+  .reader-inner .tp-cue-line,.marker-measure .tp-cue-line{
+    display:inline-block;
+    padding:.05em .6em;
+    border:1px solid var(--accent-line);
+    border-radius:999px;
+    background:var(--accent-soft);
+  }
+  .reader-inner .tp-note,.marker-measure .tp-note{
+    color:var(--faint);
+    font-style:italic;
+    font-size:.82em;
+  }
+  .reader-inner .tp-h,.marker-measure .tp-h{
+    font-weight:800;
+    letter-spacing:.005em;
+  }
+  .reader-inner .tp-h1,.marker-measure .tp-h1{font-size:1.5em}
+  .reader-inner .tp-h2,.marker-measure .tp-h2{font-size:1.3em}
+  .reader-inner .tp-h3,.marker-measure .tp-h3{font-size:1.15em}
+  .reader-inner .tp-h4,.marker-measure .tp-h4,
+  .reader-inner .tp-h5,.marker-measure .tp-h5,
+  .reader-inner .tp-h6,.marker-measure .tp-h6{font-size:1.05em}
+  .reader-inner .tp-divider,.marker-measure .tp-divider{
+    color:var(--accent);
+    font-weight:700;
+    font-size:.8em;
+    letter-spacing:.22em;
+    text-transform:uppercase;
+  }
   .run-hud{
     position:absolute;
     top:14px;
@@ -1277,6 +1324,7 @@
         <option value="thinLight">Thin light</option>
       </select>
       <button id="italicBtn" class="toggle icon" type="button" aria-pressed="false" title="Italic reader text (I)" aria-label="Toggle italic reader text">I</button>
+      <button id="richTextBtn" class="toggle icon" type="button" aria-pressed="true" title="Rich text formatting: **bold** *italic* ==highlight== ~~strike~~ [[cue]] ((note))" aria-label="Toggle rich text formatting">✦</button>
       <div class="swatches" aria-label="Text color">
         <button class="swatch" type="button" data-text-color="white" style="--swatch:#ffffff" title="White text" aria-label="White text" aria-pressed="true"></button>
         <button class="swatch" type="button" data-text-color="black" style="--swatch:#111111" title="Black text" aria-label="Black text" aria-pressed="false"></button>
@@ -1498,7 +1546,9 @@ Welcome to your teleprompter. This text scrolls smoothly while you read to camer
 
 Press “Done: start reading”, then hit Play (or the Space bar) to begin. Adjust speed live with the Up and Down arrow keys, and resize the text with Plus and Minus.
 
-Turn on Mirror mode if you read through beam-splitter glass."></textarea>
+Turn on Mirror mode if you read through beam-splitter glass.
+
+Format as you type: **bold**, *italic*, ==highlight==, ~~strike~~, [[camera cue]], ((director note)). Lines like # Act one or == Break == become styled section markers. Toggle the ✦ button to turn formatting off."></textarea>
     </div>
 
     <div class="toast" id="toast" role="status">
@@ -1536,6 +1586,18 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
       <kbd>[ / ]</kbd><span class="desc">Previous / next marker</span>
       <kbd>Page</kbd><span class="desc">Step up / down</span>
       <kbd>Esc</kbd><span class="desc">Exit fullscreen / close this</span>
+    </div>
+    <h2 id="helpFormatTitle" style="margin-top:18px">Script formatting</h2>
+    <p class="sub">Type these in your script. The <strong>✦</strong> button turns formatting on or off.</p>
+    <div class="keys">
+      <kbd>**bold**</kbd><span class="desc">Bold</span>
+      <kbd>*italic*</kbd><span class="desc">Italic</span>
+      <kbd>==text==</kbd><span class="desc">Highlight</span>
+      <kbd>~~text~~</kbd><span class="desc">Strikethrough</span>
+      <kbd>[[cue]]</kbd><span class="desc">Camera / action cue</span>
+      <kbd>((note))</kbd><span class="desc">Director note (dimmed, don't read)</span>
+      <kbd># Heading</kbd><span class="desc">Section heading + marker</span>
+      <kbd>== Break ==</kbd><span class="desc">Section divider + marker</span>
     </div>
     <div class="close-row">
       <button id="helpClose" class="primary" type="button">Got it</button>
@@ -1597,6 +1659,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   var textShadowSelect = $('textShadowSelect');
   var textStrokeSelect = $('textStrokeSelect');
   var italicBtn = $('italicBtn');
+  var richTextBtn = $('richTextBtn');
   var textColorInput = $('textColorInput');
   var readerBgInput = $('readerBgInput');
   var lineColorInput = $('lineColorInput');
@@ -2241,6 +2304,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
       if(typeof s.showStartMinutes==='number') showStartMinutes = sanitizeShowStart(s.showStartMinutes);
       if(typeof s.mirror==='boolean') mirror = s.mirror;
       if(typeof s.centerline==='boolean') centerline = s.centerline;
+      if(typeof s.richText==='boolean') RICH_TEXT = s.richText;
       if(typeof s.formatPreset==='string') FORMAT_PRESET = sanitizeFormatPreset(s.formatPreset);
       if(typeof s.fontFace==='string') FONT_FACE = sanitizeFontFace(s.fontFace);
       if(typeof s.fontWeight==='number' || typeof s.fontWeight==='string') FONT_WEIGHT = sanitizeFontWeight(s.fontWeight);
@@ -2264,7 +2328,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
       speed:SPEED.val, font:FONT.val, lh:LH.val, width:WIDTH.val,
       targetRuntime:TARGET_RUNTIME.val,
       showStartMinutes:showStartMinutes,
-      mirror:mirror, centerline:centerline, formatPreset:FORMAT_PRESET,
+      mirror:mirror, centerline:centerline, richText:RICH_TEXT, formatPreset:FORMAT_PRESET,
       fontFace:FONT_FACE, fontWeight:FONT_WEIGHT, fontStyle:FONT_STYLE,
       textTransform:TEXT_TRANSFORM, textAlign:TEXT_ALIGN, letterSpacing:LETTER_SPACING_MODE,
       wordSpacing:WORD_SPACING_MODE, textShadow:TEXT_SHADOW,
@@ -2659,10 +2723,10 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     if(!markerMeasure || !scriptMarkers.length) return;
     var text = script.value || '';
     scriptMarkers.forEach(function(marker){
-      markerMeasure.textContent = text.slice(0, marker.offset);
+      markerMeasure.innerHTML = formatScript(text.slice(0, marker.offset));
       marker.pos = clamp(markerMeasure.offsetHeight, 0, maxScroll);
     });
-    markerMeasure.textContent = '';
+    markerMeasure.innerHTML = '';
   }
 
   function activeMarkerIndexForPosition(){
@@ -4309,6 +4373,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   // ---- State ----
   var mirror = false;
   var centerline = true;
+  var RICH_TEXT = true;
   var playing = false;
   var pos = 0;          // scroll position in px (float, sub-pixel)
   var maxScroll = 0;
@@ -4380,6 +4445,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     if(textShadowSelect) textShadowSelect.value = TEXT_SHADOW;
     if(textStrokeSelect) textStrokeSelect.value = TEXT_STROKE;
     if(italicBtn) italicBtn.setAttribute('aria-pressed', String(FONT_STYLE === 'italic'));
+    if(richTextBtn) richTextBtn.setAttribute('aria-pressed', String(RICH_TEXT));
     if(textColorInput) textColorInput.value = readerColor;
     if(readerBgInput) readerBgInput.value = readerBg;
     if(lineColorInput) lineColorInput.value = lineColor;
@@ -4435,8 +4501,51 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
   }
 
   // ---- Reader content ----
+  // Inline formatting: a small, deliberately conservative markdown-ish parser.
+  // The script body is escaped first, then a controlled set of spans/tags is
+  // injected — no arbitrary HTML from the script ever reaches the DOM.
+  function escapeHtml(text){
+    return String(text == null ? '' : text)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
+  function formatInline(text){
+    var out = text;
+    // bold before italic so the ** pairs are consumed first
+    out = out.replace(/\*\*([^\n]+?)\*\*/g, '<strong>$1</strong>');
+    out = out.replace(/==([^=\n]+?)==/g, '<mark class="tp-hl">$1</mark>');
+    out = out.replace(/~~([^\n]+?)~~/g, '<s>$1</s>');
+    // italic: single * with no whitespace just inside the markers, so lone
+    // asterisks ("5 * 3", "* bullet") are left untouched.
+    out = out.replace(/\*([^\s*][^*\n]*?[^\s*]|[^\s*])\*/g, '<em>$1</em>');
+    out = out.replace(/\[\[([^\]\n]+?)\]\]/g, '<span class="tp-cue">$1</span>');
+    out = out.replace(/\(\(([^)\n]+?)\)\)/g, '<span class="tp-note">$1</span>');
+    return out;
+  }
+  function formatLine(line){
+    var trimmed = line.trim();
+    var m;
+    if((m = trimmed.match(/^(#{1,6})\s+(.+?)\s*#*$/))){
+      return '<span class="tp-h tp-h' + m[1].length + '">' + formatInline(m[2]) + '</span>';
+    }
+    if((m = trimmed.match(/^={2,}\s*(.+?)\s*={2,}$/))){
+      return '<span class="tp-divider">' + formatInline(m[1]) + '</span>';
+    }
+    if((m = trimmed.match(/^\[\[(.+?)\]\]$/))){
+      return '<span class="tp-cue tp-cue-line">' + formatInline(m[1]) + '</span>';
+    }
+    return formatInline(line);
+  }
+  function formatScript(text){
+    var escaped = escapeHtml(text || '');
+    if(!RICH_TEXT) return escaped;
+    // split on the (escaped) newlines and rejoin so white-space:pre-wrap still
+    // controls the line breaks exactly as it did with textContent.
+    return escaped.split('\n').map(formatLine).join('\n');
+  }
   function syncReader(){
-    inner.textContent = script.value || '';
+    inner.innerHTML = formatScript(script.value);
     updateScriptStats();
     rebuildMarkers();
     measure();
@@ -4976,6 +5085,15 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     $('mirrorBtn').setAttribute('aria-pressed',String(mirror)); saveSettings(); signalSuccess($('mirrorBtn')); savePreferences('mirror'); updatePrediction(); }
   function toggleLine(){ centerline=!centerline; body.classList.toggle('centerline',centerline);
     $('lineBtn').setAttribute('aria-pressed',String(centerline)); saveSettings(); signalSuccess($('lineBtn')); savePreferences('line'); updatePrediction(); }
+  function toggleRichText(){
+    RICH_TEXT = !RICH_TEXT;
+    if(richTextBtn) richTextBtn.setAttribute('aria-pressed', String(RICH_TEXT));
+    if(isReading()) syncReader();
+    saveSettings();
+    signalSuccess(richTextBtn);
+    savePreferences('rich-text');
+    updatePrediction();
+  }
 
   // ---- Fullscreen ----
   function toggleFullscreen(){
@@ -5191,6 +5309,7 @@ Turn on Mirror mode if you read through beam-splitter glass."></textarea>
     changeTextStroke(textStrokeSelect.value);
   });
   italicBtn.addEventListener('click', toggleItalic);
+  if(richTextBtn) richTextBtn.addEventListener('click', toggleRichText);
   document.querySelectorAll('[data-text-color]').forEach(function(button){
     button.addEventListener('click', function(){
       changeTextColor(button.getAttribute('data-text-color'), button);
