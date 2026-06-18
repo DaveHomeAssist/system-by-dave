@@ -1,0 +1,1461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Residential Wiring Reference</title>
+<style>
+  :root{
+    --bg:#0f1115; --panel:#161922; --panel-2:#1d212c; --line:#2a2f3c;
+    --ink:#e8eaf0; --ink-dim:#a4adbd; --ink-faint:#6f7889;
+    --accent:#f4b740; --accent-2:#5aa9ff; --green:#4ed08a; --red:#ff6b6b;
+    --yellow:#f4d35e; --orange:#ff9f45; --purple:#b794f6; --blue:#5aa9ff;
+    --radius:14px; --maxw:1100px;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  [data-theme="light"]{
+    --bg:#f6f7f9; --panel:#ffffff; --panel-2:#f0f2f6; --line:#e2e6ee;
+    --ink:#1a1d24; --ink-dim:#4a5365; --ink-faint:#8a93a4;
+    --accent:#c8881a; --accent-2:#2563eb;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; background:var(--bg); color:var(--ink); font-family:var(--sans);
+    line-height:1.55; font-size:16px; -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--accent-2); text-decoration:none}
+  a:hover{text-decoration:underline}
+
+  /* Header */
+  header.top{
+    position:sticky; top:0; z-index:50; backdrop-filter:blur(10px);
+    background:color-mix(in srgb, var(--bg) 85%, transparent);
+    border-bottom:1px solid var(--line);
+  }
+  .top-inner{max-width:var(--maxw); margin:0 auto; padding:14px 20px; display:flex; align-items:center; gap:16px; flex-wrap:wrap}
+  .brand{display:flex; align-items:center; gap:10px; font-weight:700; font-size:1.05rem; letter-spacing:.2px}
+  .brand .bolt{font-size:1.4rem}
+  .top-tools{margin-left:auto; display:flex; align-items:center; gap:10px; flex-wrap:wrap}
+  .search{
+    background:var(--panel); border:1px solid var(--line); color:var(--ink);
+    border-radius:999px; padding:8px 14px; font-size:.9rem; width:220px; outline:none;
+  }
+  .search:focus{border-color:var(--accent-2)}
+  .btn{
+    background:var(--panel); border:1px solid var(--line); color:var(--ink-dim);
+    border-radius:999px; padding:8px 12px; font-size:.85rem; cursor:pointer; font-family:inherit;
+  }
+  .btn:hover{color:var(--ink); border-color:var(--accent-2)}
+
+  /* Nav chips */
+  nav.chips{max-width:var(--maxw); margin:0 auto; padding:0 20px 12px; display:flex; gap:8px; flex-wrap:wrap}
+  nav.chips a{
+    background:var(--panel); border:1px solid var(--line); color:var(--ink-dim);
+    padding:6px 12px; border-radius:999px; font-size:.85rem; white-space:nowrap;
+  }
+  nav.chips a:hover{color:var(--ink); border-color:var(--accent); text-decoration:none}
+  nav.chips a.active{color:var(--bg); background:var(--accent); border-color:var(--accent); font-weight:600}
+
+  main{max-width:var(--maxw); margin:0 auto; padding:24px 20px 80px}
+
+  .hero{
+    background:linear-gradient(135deg, var(--panel) 0%, var(--panel-2) 100%);
+    border:1px solid var(--line); border-radius:var(--radius); padding:26px 28px; margin-bottom:22px;
+  }
+  .hero h1{margin:0 0 6px; font-size:1.9rem; letter-spacing:-.3px}
+  .hero p{margin:0; color:var(--ink-dim); max-width:70ch}
+  .meta-row{display:flex; gap:18px; flex-wrap:wrap; margin-top:16px; font-size:.82rem; color:var(--ink-faint)}
+  .meta-row b{color:var(--ink-dim)}
+
+  /* Callouts */
+  .callout{
+    border:1px solid var(--line); border-left-width:4px; border-radius:10px;
+    padding:12px 16px; margin:14px 0; background:var(--panel);
+    display:flex; gap:12px; align-items:flex-start;
+  }
+  .callout .ic{font-size:1.2rem; line-height:1.4; flex-shrink:0}
+  .callout .body{flex:1}
+  .callout strong{color:var(--ink)}
+  .c-blue{border-left-color:var(--blue)}
+  .c-green{border-left-color:var(--green)}
+  .c-yellow{border-left-color:var(--yellow)}
+  .c-orange{border-left-color:var(--orange)}
+  .c-red{border-left-color:var(--red); background:color-mix(in srgb,var(--red) 8%, var(--panel))}
+  .c-purple{border-left-color:var(--purple)}
+  .c-gray{border-left-color:var(--ink-faint)}
+  .c-verify{border-left-color:var(--green); background:color-mix(in srgb,var(--green) 9%, var(--panel))}
+  .c-correct{border-left-color:var(--accent); background:color-mix(in srgb,var(--accent) 10%, var(--panel))}
+
+  /* Section toggles */
+  .section{border:1px solid var(--line); border-radius:var(--radius); margin:16px 0; overflow:hidden; background:var(--panel)}
+  .section > summary{
+    list-style:none; cursor:pointer; padding:18px 22px; font-size:1.25rem; font-weight:700;
+    display:flex; align-items:center; gap:12px; background:var(--panel-2); user-select:none;
+  }
+  .section > summary::-webkit-details-marker{display:none}
+  .section > summary .arrow{margin-left:auto; transition:transform .2s; color:var(--ink-faint)}
+  .section[open] > summary .arrow{transform:rotate(90deg)}
+  .section > summary:hover{color:var(--accent)}
+  .section-body{padding:6px 22px 22px}
+
+  h3{margin:24px 0 8px; font-size:1.12rem; color:var(--ink); border-bottom:1px solid var(--line); padding-bottom:6px}
+  h4{margin:18px 0 6px; font-size:.98rem; color:var(--accent)}
+
+  /* Tables */
+  .tbl-wrap{overflow-x:auto; margin:12px 0}
+  table{border-collapse:collapse; width:100%; font-size:.92rem}
+  th,td{text-align:left; padding:9px 12px; border-bottom:1px solid var(--line); vertical-align:top}
+  th{background:var(--panel-2); color:var(--ink-dim); font-weight:600; font-size:.8rem; text-transform:uppercase; letter-spacing:.5px}
+  tr:hover td{background:color-mix(in srgb,var(--accent-2) 5%, transparent)}
+
+  ul,ol{margin:8px 0; padding-left:22px}
+  li{margin:4px 0}
+  code{font-family:var(--mono); background:var(--panel-2); padding:1px 6px; border-radius:5px; font-size:.86em; color:var(--accent)}
+  pre{background:var(--panel-2); border:1px solid var(--line); border-radius:10px; padding:14px 16px; overflow-x:auto; font-family:var(--mono); font-size:.85rem; color:var(--ink-dim); line-height:1.45}
+
+  /* badges */
+  .badge{display:inline-block; font-size:.7rem; font-weight:700; padding:2px 8px; border-radius:999px; text-transform:uppercase; letter-spacing:.5px; vertical-align:middle}
+  .b-verified{background:color-mix(in srgb,var(--green) 22%,transparent); color:var(--green)}
+  .b-corrected{background:color-mix(in srgb,var(--accent) 22%,transparent); color:var(--accent)}
+  .b-ready{background:color-mix(in srgb,var(--green) 22%,transparent); color:var(--green)}
+  .b-draft{background:color-mix(in srgb,var(--ink-faint) 25%,transparent); color:var(--ink-faint)}
+  .b-field{background:color-mix(in srgb,var(--orange) 22%,transparent); color:var(--orange)}
+  .b-sourced{background:color-mix(in srgb,var(--blue) 22%,transparent); color:var(--blue)}
+
+  .src{font-size:.8rem; color:var(--ink-faint); margin-top:10px; border-top:1px dashed var(--line); padding-top:8px}
+  .src strong{color:var(--ink-dim)}
+
+  /* Draft / placeholder sections */
+  .section.draft > summary{color:var(--ink-faint)}
+  .section.draft > summary:hover{color:var(--accent)}
+  .empty-state{
+    border:1px dashed var(--line); border-radius:10px; padding:22px;
+    text-align:center; color:var(--ink-faint); background:color-mix(in srgb,var(--ink-faint) 5%,transparent); margin:12px 0;
+  }
+  .empty-state .es-ic{font-size:1.6rem; display:block; margin-bottom:6px}
+  .scope{color:var(--ink-dim); font-size:.95rem; margin:6px 0 0}
+
+  /* Contents map */
+  .toc{display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:10px; margin:14px 0}
+  .toc a{
+    display:flex; align-items:flex-start; gap:10px; padding:12px 14px; border:1px solid var(--line);
+    border-radius:10px; background:var(--panel); color:var(--ink); text-decoration:none;
+  }
+  .toc a:hover{border-color:var(--accent); text-decoration:none}
+  .toc .t-ic{font-size:1.15rem; line-height:1.3}
+  .toc .t-body{flex:1; min-width:0}
+  .toc .t-title{font-weight:600; font-size:.92rem}
+  .toc .t-scope{font-size:.78rem; color:var(--ink-faint); margin-top:2px}
+  .toc .t-status{flex-shrink:0; margin-top:2px}
+
+  /* Phase grouping + color coding */
+  .phase-rough{--ph:var(--blue)}
+  .phase-circuits{--ph:var(--orange)}
+  .phase-protect{--ph:var(--green)}
+  .phase-systems{--ph:var(--purple)}
+  .phase-tools{--ph:var(--accent)}
+
+  .phase-head{display:flex; align-items:center; gap:14px; margin:40px 2px 4px}
+  .phase-head:first-of-type{margin-top:18px}
+  .phase-head .pn{
+    font-family:var(--mono); font-size:.72rem; font-weight:700; color:var(--bg);
+    background:var(--ph); border-radius:6px; padding:3px 8px; letter-spacing:.5px;
+  }
+  .phase-head h2{margin:0; font-size:.86rem; letter-spacing:2.5px; text-transform:uppercase; color:var(--ph); font-weight:800}
+  .phase-head .pl{flex:1; height:2px; border-radius:2px; background:linear-gradient(90deg,var(--ph),transparent); opacity:.55}
+  .phase-head .pc{font-size:.74rem; color:var(--ink-faint); white-space:nowrap}
+
+  details.section[class*="phase-"] > summary{border-left:4px solid var(--ph); padding-left:18px}
+  details.section[class*="phase-"] > summary .arrow{color:var(--ph); opacity:.7}
+  details.section[class*="phase-"][open] > summary{background:color-mix(in srgb,var(--ph) 8%, var(--panel-2))}
+
+  .toc-group{margin:14px 0 4px}
+  .toc-group .tg-label{font-size:.72rem; letter-spacing:2px; text-transform:uppercase; font-weight:800; color:var(--ph); margin:14px 0 8px; display:flex; align-items:center; gap:8px}
+  .toc-group .tg-label::after{content:""; flex:1; height:1px; background:var(--line)}
+  .toc-group.phase-rough{--ph:var(--blue)} .toc-group.phase-circuits{--ph:var(--orange)}
+  .toc-group.phase-protect{--ph:var(--green)} .toc-group.phase-systems{--ph:var(--purple)}
+  .toc-group.phase-tools{--ph:var(--accent)}
+  .nec{font-family:var(--mono); font-size:.78rem; color:var(--ink-faint); white-space:nowrap}
+
+  /* Calculator */
+  .calc{background:var(--panel-2); border:1px solid var(--line); border-radius:12px; padding:18px 20px; margin:16px 0}
+  .calc h4{margin-top:0}
+  .calc-grid{display:grid; grid-template-columns:1fr auto; gap:10px 16px; align-items:center; max-width:420px}
+  .calc-grid label{font-size:.9rem; color:var(--ink-dim)}
+  .calc-grid input,.calc-grid select{
+    background:var(--panel); border:1px solid var(--line); color:var(--ink);
+    border-radius:8px; padding:7px 10px; font-size:.9rem; width:110px; font-family:inherit; text-align:right;
+  }
+  .calc-grid select{text-align:left; width:130px}
+  .calc-out{margin-top:16px; padding:14px 16px; border-radius:10px; border:1px solid var(--line); background:var(--panel)}
+  .calc-out .big{font-size:1.5rem; font-weight:700; font-family:var(--mono)}
+  .calc-result-ok{color:var(--green)} .calc-result-bad{color:var(--red)}
+  .calc-line{display:flex; justify-content:space-between; font-size:.85rem; color:var(--ink-dim); padding:3px 0; border-bottom:1px dashed var(--line)}
+  .calc-line span:last-child{font-family:var(--mono); color:var(--ink)}
+
+  .hidden{display:none !important}
+  .nores{padding:30px; text-align:center; color:var(--ink-faint)}
+
+  footer{max-width:var(--maxw); margin:0 auto; padding:30px 20px; border-top:1px solid var(--line); color:var(--ink-faint); font-size:.82rem}
+  footer a{color:var(--ink-dim)}
+
+  mark{background:var(--accent); color:#000; padding:0 2px; border-radius:3px}
+
+  /* Anticipatory-UX additions */
+  .presets{display:flex; gap:8px; flex-wrap:wrap; margin:0 0 16px}
+  .presets button{
+    background:var(--panel); border:1px solid var(--line); color:var(--ink-dim);
+    border-radius:999px; padding:7px 13px; font-size:.84rem; cursor:pointer; font-family:inherit;
+  }
+  .presets button:hover{color:var(--ink); border-color:var(--accent-2)}
+  .presets button.active{background:var(--accent); border-color:var(--accent); color:var(--bg); font-weight:600}
+
+  .calc-apply{
+    margin-top:10px; background:color-mix(in srgb,var(--green) 18%,var(--panel)); border:1px solid var(--green);
+    color:var(--green); border-radius:8px; padding:7px 13px; font-size:.86rem; cursor:pointer; font-family:inherit; font-weight:600;
+  }
+  .calc-apply:hover{background:color-mix(in srgb,var(--green) 28%,var(--panel))}
+
+  .resume-pill{
+    display:flex; align-items:center; gap:10px; margin:0 0 18px; padding:11px 16px;
+    background:color-mix(in srgb,var(--accent) 12%,var(--panel)); border:1px solid var(--accent);
+    border-radius:10px; font-size:.92rem; color:var(--ink);
+  }
+  .resume-pill a{font-weight:600; cursor:pointer}
+  .resume-pill .x{margin-left:auto; cursor:pointer; color:var(--ink-faint); border:0; background:none; font-size:1.1rem; line-height:1}
+
+  .cl-count{font-size:.78rem; font-weight:600; color:var(--accent); font-family:var(--mono)}
+  .checklist label{display:inline-flex; align-items:center; gap:8px; min-height:32px}
+
+  .toc a.visited .t-title::after{content:" ✓"; color:var(--green); font-weight:700}
+
+  .jur-set button, .jur-set input{
+    font-family:inherit; font-size:.82rem; border:1px solid var(--line); background:var(--panel);
+    color:var(--ink); border-radius:6px; padding:3px 8px; cursor:pointer;
+  }
+  .jur-set input{width:74px; cursor:text}
+  .jur-tag{color:var(--accent); font-weight:600}
+
+  .toast{
+    position:fixed; left:50%; bottom:22px; transform:translateX(-50%);
+    background:var(--panel); border:1px solid var(--accent); color:var(--ink);
+    padding:12px 18px; border-radius:10px; font-size:.88rem; max-width:90vw; z-index:100;
+    box-shadow:0 8px 30px rgba(0,0,0,.3); display:flex; align-items:center; gap:12px;
+  }
+  .toast button{background:var(--accent); color:var(--bg); border:0; border-radius:6px; padding:4px 10px; cursor:pointer; font-family:inherit; font-weight:600}
+
+  @media (max-width:640px){
+    .hero h1{font-size:1.5rem}
+    .search{width:140px}
+    .calc-grid{grid-template-columns:1fr; max-width:none}
+    .calc-grid input,.calc-grid select{width:100%}
+    .calc-grid input,.calc-grid select{font-size:16px}   /* prevents iOS focus-zoom */
+    nav.chips{flex-wrap:nowrap; overflow-x:auto; scroll-snap-type:x proximity; -webkit-overflow-scrolling:touch; padding-bottom:14px}
+    nav.chips a{scroll-snap-align:start; min-height:40px; display:flex; align-items:center}
+    .toc a{min-height:44px}
+    .checklist label{min-height:44px}
+    .presets button{min-height:40px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto}
+    .section > summary .arrow{transition:none}
+  }
+  @media print{
+    header.top,nav.chips,.top-tools,.btn,.search{display:none}
+    .section[open] .section-body, .section .section-body{display:block !important}
+    .section{break-inside:avoid}
+    body{background:#fff; color:#000}
+  }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="top-inner">
+    <div class="brand"><span class="bolt">⚡</span> Residential Wiring Reference</div>
+    <div class="top-tools">
+      <input class="search" id="search" type="search" placeholder="Search the guide…" aria-label="Search">
+      <button class="btn" id="expandAll">Expand all</button>
+      <button class="btn" id="theme">☀︎ / ☾</button>
+    </div>
+  </div>
+  <nav class="chips">
+    <a href="#contents">🗂️ Contents</a>
+    <a href="#part1">🛏️ P1 Bedroom</a>
+    <a href="#part2">💡 P2 Switch tap</a>
+    <a href="#part3">🔁 P3 3/4-way</a>
+    <a href="#part4">🚪 P4 Dedicated</a>
+    <a href="#part5">⚡ P5 Panel</a>
+    <a href="#part6">🧮 P6 Sizing</a>
+    <a href="#part7">🧱 P7 Protection</a>
+    <a href="#part8">🛡️ P8 AFCI/GFCI</a>
+    <a href="#part9">🧠 P9 Smart</a>
+    <a href="#part10">🔌 P10 Receptacles</a>
+    <a href="#part11">🧰 P11 Box fill</a>
+    <a href="#part12">💨 P12 Venting</a>
+    <a href="#part13">⚙️ P13 Garage</a>
+    <a href="#part14">🧯 P14 Alarms</a>
+    <a href="#calc">🧮 Calculator</a>
+    <a href="#appendix">📚 Appendices</a>
+  </nav>
+</header>
+
+<main>
+  <section class="hero">
+    <h1>⚡ Residential Wiring Reference</h1>
+    <p>Rough-in patterns and checklists distilled from a “build your own house” walkthrough, restructured as an interactive 14-part reference and fact-checked against the National Electrical Code (NEC).</p>
+    <div class="meta-row">
+      <div><b>Scope:</b> Bedroom rough-in · switch taps · multi-way switching · dedicated circuits · panel safety · devices · alarms</div>
+      <div><b>Code basis:</b> NEC (verify the edition adopted locally)</div>
+      <div><b>Reviewed:</b> June 2026</div>
+    </div>
+  </section>
+
+  <div id="resumeMount"></div>
+
+  <div class="callout c-yellow">
+    <span class="ic">⚠️</span>
+    <div class="body"><strong>Jurisdiction note.</strong> Specifics reflect one builder's local code. Verify against the NEC edition adopted in your area. New Jersey follows the NEC with state amendments via the Uniform Construction Code, and permits/inspection apply to most homeowner electrical work. This document is a reference, not a substitute for a licensed inspection. <span class="jur-set" id="jurSet"></span></div>
+  </div>
+
+  <div class="callout c-correct">
+    <span class="ic">🔎</span>
+    <div class="body"><strong>Fact-check summary.</strong> Most technical claims verified correct against the NEC. <span class="badge b-corrected">1 correction</span> The original called “within 6–8 in of a box” a <em>hard code distance</em> — NEC 334.30 actually requires securing <strong>within 12 in</strong> of the box and at intervals <strong>≤ 4.5 ft</strong>. The 6–8 in / ~3–4 ft figures are good practice, not the code minimum. Corrected throughout and flagged with <span class="badge b-corrected">corrected</span>. Verified items carry <span class="badge b-verified">verified</span>.</div>
+  </div>
+
+  <!-- Key measurements -->
+  <div class="callout c-orange">
+    <span class="ic">🔎</span>
+    <div class="body">
+      <strong>Key measurements</strong>
+      <div class="tbl-wrap"><table>
+        <tr><th>Item</th><th>Spec</th><th>Note</th></tr>
+        <tr><td>Switch box height (to top)</td><td>48 in</td><td>Convention, not code-fixed</td></tr>
+        <tr><td>Outlet box height (to top)</td><td>18 in</td><td>Convention, not code-fixed</td></tr>
+        <tr><td>Stud bore height</td><td>24 in off rough floor</td><td>Centered in stud</td></tr>
+        <tr><td>Secure cable from box</td><td>within 12 in <span class="badge b-corrected">corrected</span></td><td>NEC 334.30 (was stated 6–8 in)</td></tr>
+        <tr><td>Cable support spacing</td><td>every 4.5 ft max <span class="badge b-corrected">corrected</span></td><td>NEC 334.30 (was stated 4 ft)</td></tr>
+      </table></div>
+    </div>
+  </div>
+
+  <div class="callout c-green">
+    <span class="ic">✅</span>
+    <div class="body"><strong>Modern-code reminder.</strong> The source walkthrough does not address <strong>AFCI breakers</strong> or <strong>tamper-resistant receptacles</strong> — both are standard NEC requirements for dwelling bedrooms today. <span class="badge b-verified">verified</span> Confirm both with your inspector before final.</div>
+  </div>
+
+  <!-- ============ CONTENTS MAP ============ -->
+  <div class="callout c-purple" id="contents">
+    <span class="ic">🗂️</span>
+    <div class="body">
+      <strong>Contents</strong> — 14 parts plus appendices. <span class="badge b-ready">verified</span> = checked against the NEC. <span class="badge b-sourced">sourced</span> = backed by a named authority (OSHA, CPSC, manufacturer). <span class="badge b-field">field practice</span> = NEC-style guidance you must verify against the code edition your AHJ enforces.
+      <div class="toc-group phase-rough">
+        <div class="tg-label">01 · Rough-in basics</div>
+        <div class="toc">
+          <a href="#part1"><span class="t-ic">🛏️</span><span class="t-body"><span class="t-title">Part 1 · Bedroom rough-in</span><span class="t-scope">Spacing, boxes, routing, grounding, fan, smoke</span></span><span class="t-status"><span class="badge b-ready">verified</span></span></a>
+          <a href="#part2"><span class="t-ic">💡</span><span class="t-body"><span class="t-title">Part 2 · Switch off an outlet</span><span class="t-scope">Tap a general circuit within box-fill rules</span></span><span class="t-status"><span class="badge b-ready">verified</span></span></a>
+          <a href="#part3"><span class="t-ic">🔁</span><span class="t-body"><span class="t-title">Part 3 · 3-way &amp; 4-way</span><span class="t-scope">Multi-location switching, terminals, neutrals</span></span><span class="t-status"><span class="badge b-ready">verified</span></span></a>
+        </div>
+      </div>
+      <div class="toc-group phase-circuits">
+        <div class="tg-label">02 · Circuits &amp; loads</div>
+        <div class="toc">
+          <a href="#part4"><span class="t-ic">🚪</span><span class="t-body"><span class="t-title">Part 4 · Dedicated circuits</span><span class="t-scope">“Do not tap” zones: kitchen, bath, garage, laundry</span></span><span class="t-status"><span class="badge b-field">field</span></span></a>
+          <a href="#part5"><span class="t-ic">⚡</span><span class="t-body"><span class="t-title">Part 5 · Panel work basics</span><span class="t-scope">Breaker sizing, labeling, torque, shutoff workflow</span></span><span class="t-status"><span class="badge b-sourced">sourced</span></span></a>
+          <a href="#part6"><span class="t-ic">🧮</span><span class="t-body"><span class="t-title">Part 6 · Load &amp; conductor sizing</span><span class="t-scope">Ampacity, bundling, temperature derating</span></span><span class="t-status"><span class="badge b-field">field</span></span></a>
+        </div>
+      </div>
+      <div class="toc-group phase-protect">
+        <div class="tg-label">03 · Protection &amp; devices</div>
+        <div class="toc">
+          <a href="#part7"><span class="t-ic">🧱</span><span class="t-body"><span class="t-title">Part 7 · Physical protection</span><span class="t-scope">Nail plates, boring vs notching, box practice</span></span><span class="t-status"><span class="badge b-field">field</span></span></a>
+          <a href="#part8"><span class="t-ic">🛡️</span><span class="t-body"><span class="t-title">Part 8 · AFCI / GFCI strategy</span><span class="t-scope">What goes where, dual-function, troubleshooting</span></span><span class="t-status"><span class="badge b-sourced">sourced</span></span></a>
+          <a href="#part9"><span class="t-ic">🧠</span><span class="t-body"><span class="t-title">Part 9 · Smart switches</span><span class="t-scope">“Neutral in box” patterns, future-proof rough-in</span></span><span class="t-status"><span class="badge b-sourced">sourced</span></span></a>
+          <a href="#part10"><span class="t-ic">🔌</span><span class="t-body"><span class="t-title">Part 10 · Receptacle patterns</span><span class="t-scope">Split receptacles, half-hot, switched outlets</span></span><span class="t-status"><span class="badge b-sourced">sourced</span></span></a>
+          <a href="#part11"><span class="t-ic">🧰</span><span class="t-body"><span class="t-title">Part 11 · Box fill &amp; devices</span><span class="t-scope">Device types, pigtailing standards, lookup tables</span></span><span class="t-status"><span class="badge b-field">field</span></span></a>
+        </div>
+      </div>
+      <div class="toc-group phase-systems">
+        <div class="tg-label">04 · Systems</div>
+        <div class="toc">
+          <a href="#part12"><span class="t-ic">💨</span><span class="t-body"><span class="t-title">Part 12 · Venting electrical</span><span class="t-scope">Bath fan, HRV, timer &amp; humidity switches</span></span><span class="t-status"><span class="badge b-sourced">sourced</span></span></a>
+          <a href="#part13"><span class="t-ic">⚙️</span><span class="t-body"><span class="t-title">Part 13 · Garage &amp; workshop</span><span class="t-scope">20A branches, 240V tools, subpanel option</span></span><span class="t-status"><span class="badge b-field">field</span></span></a>
+          <a href="#part14"><span class="t-ic">🧯</span><span class="t-body"><span class="t-title">Part 14 · Smoke &amp; CO alarms</span><span class="t-scope">Interconnect, locations, power sourcing</span></span><span class="t-status"><span class="badge b-sourced">sourced</span></span></a>
+        </div>
+      </div>
+      <div class="toc-group phase-tools">
+        <div class="tg-label">05 · Tools &amp; reference</div>
+        <div class="toc">
+          <a href="#calc"><span class="t-ic">🧮</span><span class="t-body"><span class="t-title">Box-fill calculator</span><span class="t-scope">Live NEC 314.16 tool</span></span><span class="t-status"><span class="badge b-ready">tool</span></span></a>
+          <a href="#appendix"><span class="t-ic">📚</span><span class="t-body"><span class="t-title">Appendices</span><span class="t-scope">Tooling checklist + NEC cross-references</span></span><span class="t-status"><span class="badge b-ready">ready</span></span></a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ PHASE 1 ============ -->
+  <div class="phase-head phase-rough"><span class="pn">01</span><h2>Rough-in basics</h2><span class="pl"></span><span class="pc">Parts 1–3</span></div>
+
+  <!-- ============ PART 1 ============ -->
+  <details class="section phase-rough" id="part1" open>
+    <summary>🛏️ Part 1 — Wiring a Bedroom (Rough-In) <span class="arrow">›</span></summary>
+    <div class="section-body">
+      <div class="callout c-green"><span class="ic">🏠</span><div class="body"><strong>Goal:</strong> Rough-in a code-compliant bedroom circuit with correct outlet spacing, box placement, cable routing, and device prep.</div></div>
+
+      <h3>Code prerequisites for “bedroom” classification</h3>
+      <div class="callout c-gray"><span class="ic">ℹ️</span><div class="body">Closet, egress window, and smoke-detector requirements come from the <strong>building code (IRC)</strong>, not the NEC — but they govern whether a room legally counts as a bedroom. <span class="badge b-verified">verified</span></div></div>
+      <div class="tbl-wrap"><table>
+        <tr><th>Requirement</th><th>Spec</th></tr>
+        <tr><td>Closet</td><td>Commonly expected (varies by jurisdiction)</td></tr>
+        <tr><td>Egress window</td><td>Required (size per local code, IRC R310)</td></tr>
+        <tr><td>Switch at entry</td><td>Required, doorknob side</td></tr>
+        <tr><td>Smoke detector in room</td><td>Required</td></tr>
+        <tr><td>Smoke detector in adjacent hallway</td><td>Required</td></tr>
+        <tr><td>Outlet spacing</td><td>6/12 rule (see below)</td></tr>
+        <tr><td>Circuit</td><td>15A on 14/2 OR 20A on 12/2 <span class="badge b-verified">verified</span></td></tr>
+      </table></div>
+
+      <h3>The 6/12 rule <span class="nec">NEC 210.52(A)</span> <span class="badge b-verified">verified</span></h3>
+      <ul>
+        <li>First outlet within <strong>6 ft</strong> of a door corner on each side</li>
+        <li>No two outlets more than <strong>12 ft</strong> apart along any wall (no point on the wall &gt; 6 ft from a receptacle)</li>
+        <li>Any wall space <strong>2 ft or wider</strong> counts and needs its own receptacle</li>
+      </ul>
+
+      <h3>Worked example — 12 ft × 12 ft bedroom (placement check)</h3>
+      <ul>
+        <li><strong>West wall</strong> (12 ft solid): one outlet centered at 6 ft satisfies both rules (≤ 6 ft from each corner).</li>
+        <li><strong>North wall</strong> (12 ft, 4 ft window): outlet on each side of window, each within 6 ft of a corner.</li>
+        <li><strong>East wall</strong> (12 ft, 5 ft closet): one outlet north of closet, within 6 ft of north corner. Closet opening is excluded.</li>
+        <li><strong>South wall</strong> (12 ft, 3 ft door): one outlet west of door, within 6 ft of the west corner and the door edge.</li>
+      </ul>
+
+      <h3>Circuit configurations</h3>
+      <div class="callout c-gray"><span class="ic">🔌</span><div class="body"><strong>Quick decision:</strong> One breaker per bedroom is simpler. Splitting lights vs outlets reduces nuisance trips and scales better across multiple rooms.</div></div>
+      <h4>Pattern A — Single bedroom on one circuit</h4>
+      <ul>
+        <li>Panel ── home run ──▶ Switch box ──▶ Outlets (daisy chain)</li>
+        <li>Power lands at the switch, breaks out to lights, continues to receptacles</li>
+        <li>One breaker kills the room</li>
+      </ul>
+      <h4>Pattern B — Multiple bedrooms split by load type</h4>
+      <ul>
+        <li>Panel ── home run #1 ──▶ Lights (Bedrooms 2 + 3)</li>
+        <li>Panel ── home run #2 ──▶ Outlets (Bedrooms 2 + 3)</li>
+        <li>Lights share one breaker, outlets share another — better for 20A circuits with high outlet count</li>
+      </ul>
+
+      <h3>Box heights</h3>
+      <div class="tbl-wrap"><table>
+        <tr><th>Box</th><th>Height to top</th><th>Notes</th></tr>
+        <tr><td>Switch</td><td>48 in</td><td>Doorknob side of door swing</td></tr>
+        <tr><td>Outlet</td><td>18 in</td><td>Common rough-in height (not code-fixed)</td></tr>
+        <tr><td>Outlet above window</td><td>floor mark + 12 in</td><td>Clearance above the window opening</td></tr>
+      </table></div>
+
+      <h3>Box mounting procedure</h3>
+      <ol>
+        <li>Mark stud at target height</li>
+        <li>Mark an X on the stud face where the box mounts</li>
+        <li>Flanges against the stud face (the 1/2 in flange sets the drywall offset)</li>
+        <li>Drive nails top and bottom until flush</li>
+        <li>Lay out the full room before nailing any boxes</li>
+      </ol>
+
+      <h3>Wire pathing</h3>
+      <ul>
+        <li>Drill 3/8 in holes at 24 in off rough floor, dead center of stud</li>
+        <li>Use a right-angle drill for tight bays (closet returns, around HVAC ducts)</li>
+        <li>“Bunny hop” over obstructions through the top plate when needed</li>
+        <li>Window obstruction: drill 12 in above the rough opening</li>
+      </ul>
+
+      <h3>Wire selection</h3>
+      <div class="tbl-wrap"><table>
+        <tr><th>Run</th><th>Wire</th><th>Reason</th></tr>
+        <tr><td>15A general circuit</td><td>14/2</td><td>Code minimum</td></tr>
+        <tr><td>20A general circuit</td><td>12/2</td><td>Required for kitchen, bath, garage. Builder uses 12/2 throughout.</td></tr>
+        <tr><td>Switched ceiling fan + light</td><td>12/3</td><td>Separate switch legs for fan and light</td></tr>
+        <tr><td>Smoke detector interconnect</td><td>14/3 or 12/3</td><td>Hardwired alarm chain</td></tr>
+      </table></div>
+      <div class="callout c-yellow"><span class="ic">⚠️</span><div class="body">Never put 14 AWG on a 20A breaker. Match wire gauge to the breaker: 14 AWG → 15A, 12 AWG → 20A. <span class="badge b-verified">verified</span></div></div>
+
+      <h3>Securing &amp; stapling <span class="nec">NEC 334.30</span> <span class="badge b-corrected">corrected</span></h3>
+      <div class="callout c-correct"><span class="ic">📏</span><div class="body"><strong>Code minimum:</strong> secure NM cable <strong>within 12 in</strong> of every box and at intervals <strong>not exceeding 4.5 ft</strong>. (The original doc stated 6–8 in / 4 ft as “hard code” — those are tighter best-practice numbers, fine to use, but not the code threshold.) The 2020 NEC also limits cable to <strong>≤ 18 in</strong> between the box entry and the closest support.</div></div>
+      <ul>
+        <li>Leave 6 to 8 in of free conductor past every box (for terminations)</li>
+        <li>Staple within 12 in of every box (code) — tighter, e.g. 6–8 in, is fine</li>
+        <li>Staple every 4.5 ft max along stud runs (builder runs ~3 ft for a cleaner look)</li>
+        <li>Center the staple on the stud face; don't crush the cable</li>
+        <li>Use 1/2 in staples for 12/2, 3/4 in staples for 12/3 (12/3 is wider)</li>
+        <li>Two cables per staple OK with the 1/2 in size if listed for it</li>
+      </ul>
+
+      <h3>Grounding (two accepted methods) <span class="badge b-verified">verified</span></h3>
+      <h4>Method 1 — Green grounding wire nut</h4>
+      <ol>
+        <li>Strip jacket, expose all bare grounds</li>
+        <li>Pre-twist grounds together with pliers</li>
+        <li>Trim one ground shorter than the others</li>
+        <li>Slide the green nut over the long ground (nut has a center hole)</li>
+        <li>Twist the nut down where the wires meet — the long tail becomes the device pigtail</li>
+      </ol>
+      <h4>Method 2 — Copper crimp sleeve</h4>
+      <ol>
+        <li>Slide the sleeve over the bundle of grounds</li>
+        <li>Position 5 to 6 in from box rear</li>
+        <li>Crimp with the proper crimp tool</li>
+        <li>Twist the sleeve to bond</li>
+        <li>Trim one tail shorter, fold over the bundle</li>
+        <li>Single tail extends for the device</li>
+      </ol>
+
+      <h3>Ceiling fan box</h3>
+      <ul>
+        <li>Use a listed <strong>fan-rated saddle box</strong> (U-cradle that spans joists) <span class="badge b-verified">verified — NEC 314.27(C)</span></li>
+        <li>Center on the room, not on the framing</li>
+        <li>If center misses a joist/truss, add a wood block between joists</li>
+        <li>Saddle includes lag bolts for the fan bracket (lag bolts carry the load)</li>
+        <li>Hold box at ceiling, single screw locks to the block until drywall hangs</li>
+        <li>Run 12/3 from switch box to saddle (separate switch legs for fan vs light)</li>
+        <li>Pull 6 to 8 in past the saddle, staple with 3/4 in within 12 in</li>
+      </ul>
+
+      <h3>Smoke detector wiring</h3>
+      <ul>
+        <li>One detector per bedroom, one in the adjacent hallway, plus one on each level</li>
+        <li>Single-gang box in ceiling, typically above the door</li>
+        <li>Daisy-chain all detectors with 3-conductor cable (the third wire is the interconnect)</li>
+        <li>All units alarm when one trips</li>
+      </ul>
+
+      <h3>Wire labeling at panel</h3>
+      <p>Mark every home run before drywall:</p>
+      <ul>
+        <li><code>POWER</code> — incoming home run, energizes circuit</li>
+        <li><code>POWER CONT</code> — continues to outlets in this room</li>
+        <li><code>FAN/LIGHT</code> — 12/3 to ceiling fan saddle</li>
+        <li><code>BEDROOM 4</code> — circuit identifier for the panel ledger</li>
+      </ul>
+    </div>
+  </details>
+
+  <!-- ============ PART 2 ============ -->
+  <details class="section phase-rough" id="part2">
+    <summary>💡 Part 2 — Adding a Switch Off an Existing Outlet <span class="arrow">›</span></summary>
+    <div class="section-body">
+      <div class="callout c-orange"><span class="ic">💡</span><div class="body"><strong>Goal:</strong> Add a switched light by tapping an existing general-purpose outlet circuit, without overfilling boxes or violating dedicated-circuit rules.</div></div>
+
+      <h3>Use case</h3>
+      <p>Add a switched fixture (closet light, ceiling light) where no switch leg exists. Source the new switch by tapping an existing general-purpose outlet circuit.</p>
+
+      <h3>Source outlet selection</h3>
+      <div class="tbl-wrap"><table>
+        <tr><th>Source type</th><th>Wires entering</th><th>Box upgrade needed</th></tr>
+        <tr><td>End-of-run outlet</td><td>One 12/2</td><td>No</td></tr>
+        <tr><td>Mid-run outlet</td><td>Two 12/2</td><td>Yes — upgrade to 22.5 cu in</td></tr>
+      </table></div>
+
+      <div class="callout c-red"><span class="ic">⛔</span><div class="body"><strong>Never source from:</strong> kitchen small-appliance, bathroom, garage, laundry, or any dedicated/required circuit. These must stand alone per NEC. <span class="badge b-verified">verified — NEC 210.52(B), 210.11(C)</span></div></div>
+
+      <h3>Box-fill math <span class="nec">NEC 314.16</span> <span class="badge b-verified">verified</span></h3>
+      <p>Adding the switch run creates a third cable at the source outlet. A standard 18 cu in box overfills at three 12/2 cables plus a device. Upgrade the source box to 22.5 cu in.</p>
+      <h4>Conductor count rules</h4>
+      <ul>
+        <li>Each insulated conductor entering the box = <strong>1</strong></li>
+        <li>All equipment grounds combined = <strong>1</strong> (based on the largest)</li>
+        <li>Each device on a yoke = <strong>2</strong></li>
+        <li>Internal cable clamps (all together) = <strong>1</strong></li>
+      </ul>
+      <h4>Example</h4>
+      <p>3 cables (12/2) + 1 device = 6 insulated + 1 ground + 2 device = <strong>9 conductors</strong> → 9 × 2.25 cu in (12 AWG) = <strong>20.25 cu in</strong> → must use a 22.5 cu in box.</p>
+      <p>👉 <a href="#calc">Try the live box-fill calculator below.</a></p>
+
+      <h3>Upgrade procedure for a mid-run source</h3>
+      <ol>
+        <li>Identify the circuit, kill the breaker, verify dead at the outlet</li>
+        <li>Remove the device</li>
+        <li>Untwist the ground crimp or nut, free the tails</li>
+        <li>Drive a nail puller behind the old box, pry from the stud</li>
+        <li>Pull the box forward, free wires from the back knockouts</li>
+        <li>Drive original nails back flush</li>
+        <li>Position the new 22.5 cu in box at the same 18 in mark</li>
+        <li>Feed the existing cables through the new box knockouts</li>
+        <li>Drive the new box flush to the stud flange</li>
+        <li>Reattach to the original staple if reachable, otherwise re-secure within 12 in</li>
+      </ol>
+
+      <h3>New switch run</h3>
+      <ul>
+        <li>Switch box: 18 cu in single-gang at 48 in, doorknob side of the new opening</li>
+        <li>Drill stud at ~11 in above floor for the source-to-switch path</li>
+        <li>Run new 12/2 from source outlet up to the switch box</li>
+        <li>Pull 6 to 8 in past each box</li>
+        <li>Secure within 12 in of each box, every 4.5 ft along the stud <span class="badge b-corrected">corrected</span></li>
+        <li>Continue 12/2 from switch box up to the light fixture box</li>
+      </ul>
+
+      <h3>Pigtailing the three-cable source outlet</h3>
+      <p>Three cables in means six insulated conductors plus three grounds. The outlet has two terminals per side — pigtail to the device.</p>
+      <ol>
+        <li>Strip jacket on all three cables, remove paper</li>
+        <li>Strip 5/8 in off each conductor end</li>
+        <li><strong>Grounds:</strong> crimp all three with a copper sleeve, trim one short, fold over, leave a single pigtail</li>
+        <li><strong>Whites:</strong> bundle all three with one scrap white pigtail, pre-twist, cap with a red wire nut</li>
+        <li><strong>Blacks:</strong> bundle all three with one scrap black pigtail, pre-twist, cap with a red wire nut</li>
+        <li>Hook the three pigtails (one black, one white, one ground) onto the device</li>
+        <li>Fold conductors accordion-style into the box</li>
+      </ol>
+
+      <h3>Switch wiring at the switch box</h3>
+      <p>Two cables enter: one from the source outlet (power in), one to the fixture (switched leg out).</p>
+      <div class="tbl-wrap"><table>
+        <tr><th>Conductor</th><th>Action</th></tr>
+        <tr><td>Both blacks</td><td>One to each switch terminal (the switch breaks the hot)</td></tr>
+        <tr><td>Both whites</td><td>Wire-nut together; no connection to the switch (white is not switched)</td></tr>
+        <tr><td>Both grounds</td><td>Crimp together, pigtail to the switch ground screw</td></tr>
+      </table></div>
+      <div class="callout c-yellow"><span class="ic">⚠️</span><div class="body"><strong>Neutral-in-switch-box note:</strong> this two-cable arrangement keeps a neutral (the spliced whites) present in the switch box, which satisfies <span class="nec">NEC 404.2(C)</span>. A “switch-loop” fed from the fixture would <em>not</em> — avoid that for new work. <span class="badge b-verified">verified</span></div></div>
+
+      <h3>How the circuit behaves</h3>
+      <pre>Panel breaker
+  │
+  ▼
+Outlet circuit (existing) ───┬─── outlet ─── outlet ─── outlet
+                             │
+                             ▼ (new tap)
+                          Switch box ──▶ Light fixture</pre>
+      <p>Flipping the new switch breaks the hot leg feeding the fixture only. The outlet daisy chain stays energized.</p>
+    </div>
+  </details>
+
+  <!-- ============ PART 3 ============ -->
+  <details class="section phase-rough" id="part3">
+    <summary>🔁 Part 3 — Three-Way and Four-Way Switches <span class="arrow">›</span></summary>
+    <div class="section-body">
+      <div class="callout c-blue"><span class="ic">🔁</span><div class="body"><strong>Goal:</strong> Understand the standard cable patterns and terminal roles for multi-location switching, including neutral pass-through rules.</div></div>
+      <p>The source walkthrough only covers single-pole switches. Most real builds need at least one three-way (hallway, stairs, bedroom with two doors). A four-way lets you control one fixture from three or more locations.</p>
+
+      <h3>Three-way switch <span class="badge b-verified">verified</span></h3>
+      <p>Two switches control one fixture. Terminals:</p>
+      <ul>
+        <li><strong>Common</strong> (dark screw, usually black)</li>
+        <li><strong>Two travelers</strong> (brass screws, interchangeable)</li>
+      </ul>
+      <p>There is no fixed “off” position — flipping either switch toggles the fixture.</p>
+      <h4>Cable run summary</h4>
+      <div class="tbl-wrap"><table>
+        <tr><th>Segment</th><th>Cable</th><th>Conductors used</th></tr>
+        <tr><td>Source → S1</td><td>12/2 + gnd</td><td>Black hot, white neutral pass-through, ground</td></tr>
+        <tr><td>S1 → S2</td><td>12/3 + gnd</td><td>Black + red travelers, white neutral pass-through, ground</td></tr>
+        <tr><td>S2 → light</td><td>12/2 + gnd</td><td>Black switched hot, white neutral, ground</td></tr>
+      </table></div>
+      <h4>Wiring rules</h4>
+      <ul>
+        <li>Common at S1 takes the incoming hot</li>
+        <li>Common at S2 sends switched hot to the light</li>
+        <li>Travelers interconnect S1 and S2 (order does not matter)</li>
+        <li>Neutral never lands on a three-way switch — it splices through both boxes to the fixture</li>
+        <li><span class="nec">NEC 404.2(C)</span> (2011+): a neutral must be present in every switch box (even if unused) for future smart-switch installs <span class="badge b-verified">verified</span></li>
+      </ul>
+
+      <h3>Four-way switch <span class="badge b-verified">verified</span></h3>
+      <p>Add a four-way <strong>between</strong> two three-ways to control from a third location. A four-way has four traveler terminals (no common) and acts as a crossover — it swaps the traveler pair when toggled.</p>
+      <h4>Four-way terminal pairing</h4>
+      <ul>
+        <li>The four screws are paired top-to-bottom on each side</li>
+        <li>One side is the “input” pair (travelers from S1), the other the “output” pair (travelers to S2)</li>
+        <li>Manufacturers vary — read the back of the switch or check continuity with a meter before wiring</li>
+      </ul>
+      <h4>Adding more locations</h4>
+      <p>Each additional control location adds another four-way between the two three-ways. Three-ways sit at the ends; four-ways sit in the middle.</p>
+    </div>
+  </details>
+
+  <!-- ============ PHASE 2 ============ -->
+  <div class="phase-head phase-circuits"><span class="pn">02</span><h2>Circuits &amp; loads</h2><span class="pl"></span><span class="pc">Parts 4–6</span></div>
+
+  <details class="section phase-circuits" id="part4">
+    <summary>🚪 Part 4 — Dedicated Circuits &amp; “Do Not Tap” Zones <span class="badge b-field">field</span> <span class="arrow">›</span></summary>
+    <div class="section-body">
+      <p class="scope"><strong>Scope:</strong> Which circuits should stand alone — kitchen small-appliance, bathroom, garage, laundry, fixed appliances — and why you don't source a new load from them.</p>
+      <div class="callout c-orange"><span class="ic">🧭</span><div class="body">Plan these as intentional branch-circuit <strong>zones</strong>, not “tap whatever still has room.” A circuit-first layout reduces nuisance trips, leaves headroom for future load growth, and keeps device-protection requirements clean. The exact “do not tap” boundaries depend on the code edition your AHJ enforces — confirm before rough-in is frozen.</div></div>
+      <div class="tbl-wrap"><table>
+        <tr><th>Area</th><th>Best planning pattern</th><th>Why it helps</th></tr>
+        <tr><td>Kitchen countertop / small appliances</td><td>Keep as dedicated countertop-use circuits, not overflow for adjacent rooms or lighting</td><td>Reduces nuisance trips; keeps appliance demand where you expect it</td></tr>
+        <tr><td>Bathroom receptacles</td><td>Bathroom-intent circuit, separate from general living-area loads</td><td>Hair tools and heat appliances spike fast</td></tr>
+        <tr><td>Laundry</td><td>Treat laundry receptacles as their own zone</td><td>Washers, gas-dryer support loads, irons, utility use stack up</td></tr>
+        <tr><td>Garage / workshop</td><td>Separate general-use receptacles from lighting where possible</td><td>Losing lights when a tool trips a breaker is avoidable</td></tr>
+        <tr><td>Fixed appliances</td><td>Give fridge, microwave, disposal, dishwasher, sump pump, freezer, compressors, heaters intentional circuit decisions up front</td><td>Makes troubleshooting and future service sane</td></tr>
+        <tr><td>Future heavy loads</td><td>Rough a path now for 240V tools, EVSE, or a subpanel if the space may become a real shop</td><td>Cheap in framing stage, annoying later</td></tr>
+      </table></div>
+      <div class="callout c-red"><span class="ic">⛔</span><div class="body"><strong>Hard rule (verified in Part 2):</strong> never source a new switch/light from kitchen small-appliance, bathroom, garage, or laundry circuits — these are required to stand alone. <span class="badge b-verified">verified — NEC 210.11(C), 210.52(B)</span></div></div>
+      <div class="src"><strong>Source basis:</strong> NEC-style residential planning practice; verify dedicated-circuit minimums against the adopted NEC edition and AHJ. Adoption timelines vary by state (NEMA).</div>
+    </div>
+  </details>
+
+  <details class="section phase-circuits" id="part5">
+    <summary>⚡ Part 5 — Panel Work Basics <span class="badge b-sourced">sourced</span> <span class="arrow">›</span></summary>
+    <div class="section-body">
+      <p class="scope"><strong>Scope:</strong> Safe shutoff workflow, breaker sizing/compatibility, terminal torque, and labeling.</p>
+      <div class="callout c-red"><span class="ic">⚠️</span><div class="body"><strong>Panel interiors can stay live with the main breaker off.</strong> CPSC warns that the line side of the main and the lugs remain energized after the main is switched off — “main off = safe enough” is not a serious panel standard. In most jurisdictions, work inside the service panel is licensed-electrician territory.</div></div>
+
+      <h3>Cold-work / lockout sequence</h3>
+      <p>OSHA's sample lockout procedure runs in this order:</p>
+      <ol>
+        <li>Notify affected people that the equipment will be shut down</li>
+        <li>Identify the type and magnitude of the energy present</li>
+        <li>Shut down normally</li>
+        <li>Isolate the energy source</li>
+        <li>Lock out the isolating device</li>
+        <li>Dissipate stored energy</li>
+        <li><strong>Verify</strong> the equipment is actually disconnected before any work begins</li>
+      </ol>
+      <p>Restoration is the reverse sequence — with checks and notifications on the way back up.</p>
+
+      <h3>Breaker, torque &amp; labeling standard</h3>
+      <ul>
+        <li>Use <strong>only breaker types listed</strong> for the installed panel — not whatever fits the bus</li>
+        <li>Torque every termination to the value on the panel / breaker / lug labeling and instructions for that exact gear — torque is equipment-specific, not tribal memory</li>
+        <li>Copy the circuit directory carefully; an accurate panel schedule is part of a safe install</li>
+        <li>The NEC framework leans heavily on listed and labeled equipment being used the way its listing contemplates</li>
+      </ul>
+      <div class="src"><strong>Source basis:</strong> OSHA sample minimal lockout procedure; CPSC panel-safety guidance; NEC listed-equipment framework. Breaker sizing/conductor pairing must still be verified against the adopted code (see Part 6).</div>
+    </div>
+  </details>
+
+  <details class="section phase-circuits" id="part6">
+    <summary>🧮 Part 6 — Load, Derating &amp; Conductor Sizing <span class="badge b-field">field</span> <span class="arrow">›</span></summary>
+    <div class="section-body">
+      <p class="scope"><strong>Scope:</strong> Ampacity, conductor-bundling adjustment, and ambient-temperature correction.</p>
+      <div class="callout c-blue"><span class="ic">🧮</span><div class="body"><strong>Order of operations:</strong> choose the conductor and termination system → account for the conditions of use → <em>then</em> choose the overcurrent device. Don't decide “I want a 20A circuit” and backfill whatever routing is convenient.</div></div>
+      <h3>What pushes adjusted ampacity down</h3>
+      <ul>
+        <li><strong>Bundling:</strong> many current-carrying conductors run together (long bundles, crowded drilled holes)</li>
+        <li><strong>Ambient heat:</strong> warm spaces (attics, near appliances) reduce allowable ampacity</li>
+        <li><strong>Future plug loads:</strong> heavy continuous loads argue for sizing up early</li>
+      </ul>
+      <p>Check adjusted ampacity <strong>early</strong> — not after drywall closes the bays.</p>
+      <div class="callout c-orange"><span class="ic">⚠️</span><div class="body"><strong>Verify locally.</strong> This pass did not retrieve an official ampacity/derating table. Use the adopted NEC tables (e.g., Table 310.16) plus the actual cable and termination listings before committing any final conductor/breaker combination.</div></div>
+      <div class="src"><strong>Source basis:</strong> NEC-style field practice; conductor sizing/derating numbers are local-verification items against the adopted NEC and product listings.</div>
+    </div>
+  </details>
+
+  <!-- ============ PHASE 3 ============ -->
+  <div class="phase-head phase-protect"><span class="pn">03</span><h2>Protection &amp; devices</h2><span class="pl"></span><span class="pc">Parts 7–11</span></div>
+
+  <details class="section phase-protect" id="part7">
+    <summary>🧱 Part 7 — Physical Protection &amp; Box Practice <span class="badge b-field">field</span> <span class="arrow">›</span></summary>
+    <div class="section-body">
+      <p class="scope"><strong>Scope:</strong> Nail/steel plates, boring vs notching framing, and cable edge-distance protection.</p>
+      <div class="callout c-orange"><span class="ic">🧱</span><div class="body"><strong>Core rule:</strong> prefer <strong>boring over notching</strong>, keep runs as centered in framing as practical, and add steel protection wherever the set-back from the nailing surface can't be maintained. This preserves structure and keeps future fasteners from finding your cable.</div></div>
+      <div class="tbl-wrap"><table>
+        <tr><th>Item</th><th>Preferred practice</th></tr>
+        <tr><td>Studs / joists</td><td>Bore when you can; notch only when necessary and structurally permitted</td></tr>
+        <tr><td>Cable path</td><td>Keep runs centered in framing when possible</td></tr>
+        <tr><td>Fastener exposure</td><td>If cable is too close to the face, use a nail/screw protection plate</td></tr>
+        <tr><td>Staples / supports</td><td>Support snugly without crushing the cable jacket</td></tr>
+        <tr><td>Box entries</td><td>Avoid sharp bends and crowding right at the box</td></tr>
+        <tr><td>Device feed-throughs</td><td>Pigtail when serviceability matters more than shaving a splice</td></tr>
+      </table></div>
+      <div class="callout c-orange"><span class="ic">⚠️</span><div class="body"><strong>Verify locally.</strong> Exact notching percentages, boring set-back dimensions, and staple-support distances were not retrieved as official text in this pass — confirm against IRC/NEC as adopted. (Note: securing distances are addressed in Part 1 — NEC 334.30: within 12 in of a box, ≤ 4.5 ft intervals.)</div></div>
+      <div class="src"><strong>Source basis:</strong> NEC-/IRC-style field practice; drilling, notching, and setback numbers are local-verification items.</div>
+    </div>
+  </details>
+
+  <details class="section phase-protect" id="part8">
+    <summary>🛡️ Part 8 — AFCI, GFCI &amp; Dual-Function Strategy <span class="badge b-sourced">sourced</span> <span class="arrow">›</span></summary>
+    <div class="section-body">
+      <p class="scope"><strong>Scope:</strong> What protection goes where, when to use dual-function devices, and how to troubleshoot trips.</p>
+      <span class="hidden search-alias">bathroom bathrooms wet location wet locations</span>
+      <h3>The clean distinction</h3>
+      <div class="tbl-wrap"><table>
+        <tr><th>Device</th><th>Protects against</th></tr>
+        <tr><td>AFCI</td><td>Fire hazards from dangerous arcing</td></tr>
+        <tr><td>GFCI</td><td>Shock hazards (ground faults)</td></tr>
+        <tr><td>Dual-function</td><td>Both, in one unit</td></tr>
+      </table></div>
+      <p>Because they detect <strong>fundamentally different hazards</strong>, swapping one type for the other is not a fix — it's usually just the wrong device (CPSC).</p>
+      <h3>Breaker-type vs receptacle-type (the install consequence)</h3>
+      <ul>
+        <li><strong>Breaker-type AFCI</strong> protects the <em>whole branch circuit</em>, including the home run</li>
+        <li><strong>Receptacle-type AFCI</strong> protects downstream wiring and cord-connected loads, but <em>not</em> the upstream home run unless additional code-compliant protected wiring methods are used (Schneider Electric)</li>
+      </ul>
+      <div class="callout c-blue"><span class="ic">🛡️</span><div class="body"><strong>Default strategy:</strong> where a circuit needs both arc-fault and ground-fault protection, a <strong>dual-function breaker</strong> is usually cleanest — it covers the home run, simplifies downstream device choice, and gives one reset at the panel. Receptacle-level protection still has a place (local test/reset, selective downstream protection) — choose it intentionally.</div></div>
+      <h3>Troubleshooting trips — topology before blame</h3>
+      <ol>
+        <li>Confirm whether your device protects the whole branch or only the downstream side</li>
+        <li>Isolate downstream loads</li>
+        <li>Verify line/load routing <em>and</em> neutral routing (an outlet-type device leaves the home run outside its envelope)</li>
+        <li>Don't substitute AFCI↔GFCI hoping to stop a trip — match the device to the hazard</li>
+      </ol>
+      <div class="src"><strong>Source basis:</strong> CPSC AFCI fact sheet (AFCI=arc/fire, GFCI=shock, combo units exist); Schneider Electric technical guidance (breaker-type vs receptacle-type protection envelope). Required locations (NEC 210.8 / 210.12) vary by adopted edition — verify with the AHJ.</div>
+    </div>
+  </details>
+
+  <details class="section phase-protect" id="part9">
+    <summary>🧠 Part 9 — Smart Switches &amp; “Neutral in Box” Patterns <span class="badge b-sourced">sourced</span> <span class="arrow">›</span></summary>
+    <div class="section-body">
+      <p class="scope"><strong>Scope:</strong> Future-proof rough-in so every switch box carries a neutral for smart-switch installs.</p>
+      <div class="callout c-blue"><span class="ic">🧠</span><div class="body"><strong>Best rough-in standard:</strong> bring a neutral to <em>every</em> likely smart-switch / timer / humidity-control / occupancy-sensor box, and give the box enough depth for tomorrow's electronics — not just today's toggle.</div></div>
+      <ul>
+        <li>Modern code expectations increasingly favor a neutral at switch locations controlling lighting loads, with only limited exceptions in some multiway-visible situations</li>
+        <li>Many smart switches still expect a neutral, even though some “no-neutral” ecosystems exist — roughing the neutral keeps every option open</li>
+        <li>Pair the neutral with extra box depth (see Part 11) so the device, wire nuts, and a radio module all fit</li>
+      </ul>
+      <div class="callout c-green"><span class="ic">✅</span><div class="body">This aligns with <span class="nec">NEC 404.2(C)</span> (neutral required at switch boxes since the 2011 edition) — cross-referenced and verified in Part 3 and the Appendix.</div></div>
+      <div class="src"><strong>Source basis:</strong> secondary NEC summary on switch-box neutral expectations; current smart-switch market summaries on neutral requirements. Confirm the specific exception list against the adopted NEC edition.</div>
+    </div>
+  </details>
+
+  <details class="section phase-protect" id="part10">
+    <summary>🔌 Part 10 — Receptacle Patterns <span class="badge b-sourced">sourced</span> <span class="arrow">›</span></summary>
+    <div class="section-body">
+      <p class="scope"><strong>Scope:</strong> Split receptacles, half-hot outlets, and switched-outlet wiring patterns.</p>
+      <div class="callout c-orange"><span class="ic">🔌</span><div class="body">Common North American duplex receptacles use <strong>break-away tabs</strong> — that's what makes half-hot, split, and top/bottom two-function layouts possible. Field rule: only break tabs <em>on purpose</em>, only where the diagram and panel schedule agree, and label any switched-half or split outlet so the next person doesn't assume it's factory-common.</div></div>
+      <div class="tbl-wrap"><table>
+        <tr><th>Pattern</th><th>Typical use</th><th>Field note</th></tr>
+        <tr><td>Standard duplex</td><td>Both halves always hot</td><td>Leave tabs intact</td></tr>
+        <tr><td>Half-hot / switched-half</td><td>One half switched for lamp control, one always hot</td><td>Usually break the <em>hot-side</em> tab only; label it</td></tr>
+        <tr><td>Full split / separated halves</td><td>Intentional load separation</td><td>Only for planned circuit topology; document it</td></tr>
+        <tr><td>First-device protection</td><td>Upstream GFCI/AFCI protecting downstream outlets</td><td>Best only when the protection strategy is intentional (see Part 8)</td></tr>
+      </table></div>
+      <div class="src"><strong>Source basis:</strong> common North American wiring-device practice (break-away tab behavior); upstream-protection routing per Schneider/CPSC guidance in Part 8. Verify final details against the adopted code and device instructions.</div>
+    </div>
+  </details>
+
+  <details class="section phase-protect" id="part11">
+    <summary>🧰 Part 11 — Box Fill, Device Types &amp; Pigtailing <span class="badge b-field">field</span> <span class="arrow">›</span></summary>
+    <div class="section-body">
+      <p class="scope"><strong>Scope:</strong> A serviceability-first standard for box sizing, device types, and pigtailing.</p>
+      <div class="callout c-blue"><span class="ic">🧰</span><div class="body"><strong>Standard:</strong> size for “what stays serviceable,” not “what barely fits.” Use deeper boxes at smart-switch candidates, GFCI/AFCI-receptacle candidates, multi-cable junctions, fan/light combos, and any box carrying more than one function. Pigtailing keeps continuity independent of the device — a failed device swap won't become a downstream outage mystery.</div></div>
+      <div class="tbl-wrap"><table>
+        <tr><th>Situation</th><th>Better choice</th></tr>
+        <tr><td>Single switch today, smart/timer later</td><td>Deeper single-gang box, neutral present, spare volume</td></tr>
+        <tr><td>GFCI / AFCI receptacle location</td><td>Extra-depth box, disciplined line/load routing</td></tr>
+        <tr><td>Multi-cable switch box</td><td>Pigtails rather than back-feeding through the device</td></tr>
+        <tr><td>Fan/light/heater combo control</td><td>Multi-gang box with volume headroom and labeling</td></tr>
+        <tr><td>Workshop / garage utility box</td><td>Oversize now; tools and adapters proliferate later</td></tr>
+      </table></div>
+      <div class="callout c-correct"><span class="ic">🧮</span><div class="body"><strong>Do the arithmetic, don't eyeball it.</strong> The code has formal box-sizing rules (NEC 314.16). The live <a href="#calc">box-fill calculator</a> implements that math <span class="badge b-verified">verified</span> — treat the exact fill calculation as a verification step against the box's stamped cubic-inch rating.</div></div>
+      <div class="src"><strong>Source basis:</strong> NEC-style serviceability practice; box-fill arithmetic per NEC 314.16 (implemented in the calculator). Verify against the actual box cubic-inch listing and adopted code.</div>
+    </div>
+  </details>
+
+  <!-- ============ PHASE 4 ============ -->
+  <div class="phase-head phase-systems"><span class="pn">04</span><h2>Systems</h2><span class="pl"></span><span class="pc">Parts 12–14</span></div>
+
+  <details class="section phase-systems" id="part12">
+    <summary>💨 Part 12 — Bath Fan, HRV &amp; Venting Electrical <span class="badge b-sourced">sourced</span> <span class="arrow">›</span></summary>
+    <div class="section-body">
+      <p class="scope"><strong>Scope:</strong> Timer switches, humidity sensors, and control patterns for bath fans and HRV/ERV systems.</p>
+      <div class="callout c-blue"><span class="ic">💨</span><div class="body"><strong>Choose the fan first, then match the control to the space.</strong> Control families include countdown timers, humidity-sensing (dehumidistat) controls, occupancy sensors, delay-off controls, and dedicated ERV/HRV wall controls.</div></div>
+      <div class="callout c-red"><span class="ic">⚠️</span><div class="body"><strong>GFCI over tub/shower:</strong> fans listed for use over a bathtub or shower must be connected to a <strong>GFCI-protected circuit</strong> when installed there (Broan). Cross-check with Part 8.</div></div>
+      <div class="tbl-wrap"><table>
+        <tr><th>Control type</th><th>Use case</th><th>Example / note</th></tr>
+        <tr><td>Countdown timer</td><td>Guest bath / powder / simple “run after use”</td><td>e.g. Broan CD60W — 20/40/60-min timing, can also run non-stop where continuous ventilation is required</td></tr>
+        <tr><td>Humidity-sensing wall control</td><td>Full bath / shower room / mold-prone room</td><td>e.g. Broan DD500W — turns an ordinary fan into a humidity-sensing fan, adjustable threshold, optional always-on</td></tr>
+        <tr><td>ERV / HRV wall control</td><td>Whole-house fresh-air system</td><td>e.g. Broan VT6W — OFF / MIN / MAX supply speed + max-humidity knob</td></tr>
+        <tr><td>Auxiliary boost control</td><td>Bath / laundry / workshop on an AI-series fresh-air system</td><td>e.g. Broan VBATHW — 20/40/60-min MAX-speed exchange ventilation</td></tr>
+      </table></div>
+      <div class="src"><strong>Source basis:</strong> Broan-NuTone control lineup and product pages (CD60W, DD500W, VT6W, VBATHW) and Broan fan listing requiring GFCI over tub/shower. Confirm the exact model, listing, and any continuous-ventilation requirement for your market.</div>
+    </div>
+  </details>
+
+  <details class="section phase-systems" id="part13">
+    <summary>⚙️ Part 13 — Garage &amp; Workshop Circuits <span class="badge b-field">field</span> <span class="arrow">›</span></summary>
+    <div class="section-body">
+      <p class="scope"><strong>Scope:</strong> 20A branch circuits, 240V tool circuits, and the subpanel option.</p>
+      <div class="callout c-orange"><span class="ic">⚙️</span><div class="body"><strong>Design it like a future shop</strong> even if it starts as “just a garage.” Separate lighting from receptacles, expect real tool inrush, leave room for 240V tools, and seriously consider roughing a feeder location for a small subpanel if compressors, EV charging, heaters, welders, or woodworking tools are plausible.</div></div>
+      <ul>
+        <li>Separate general-use receptacles from lighting so a tool trip doesn't kill the lights</li>
+        <li>Plan for tool inrush — motors draw far more than nameplate at startup</li>
+        <li>Rough a path for 240V circuits now; retrofitting after drywall is the expensive version</li>
+        <li>A small subpanel near the work area pays off if the load list is growing</li>
+      </ul>
+      <div class="callout c-orange"><span class="ic">⚠️</span><div class="body"><strong>Verify locally.</strong> Minimum garage branch-circuit requirements and required GFCI/AFCI protection were not retrieved as official text in this pass — treat them as local-verification items against the adopted code.</div></div>
+      <div class="src"><strong>Source basis:</strong> NEC-style field practice; garage minimum branch-circuit and protection requirements are local-verification items.</div>
+    </div>
+  </details>
+
+  <details class="section phase-systems" id="part14">
+    <summary>🧯 Part 14 — Smoke &amp; CO Alarms <span class="badge b-sourced">sourced</span> <span class="arrow">›</span></summary>
+    <div class="section-body">
+      <p class="scope"><strong>Scope:</strong> Interconnect wiring, required locations, and power sourcing.</p>
+      <div class="callout c-green"><span class="ic">🧯</span><div class="body"><strong>Defensible default:</strong> hardwired, interconnected alarms with battery backup. When one compatible hardwired alarm sounds, all connected alarms sound. (This matches the 3-conductor interconnect chain in Part 1.)</div></div>
+      <div class="tbl-wrap"><table>
+        <tr><th>Topic</th><th>Strong default</th><th>Note</th></tr>
+        <tr><td>Power source</td><td>Hardwired with battery backup</td><td>First Alert hardwired smoke specs list hardwire + battery backup</td></tr>
+        <tr><td>Interconnect</td><td>Yes — whole-home audible</td><td>One model interconnects up to 12 compatible First Alert/BRK detectors + 6 compatible devices</td></tr>
+        <tr><td>Placement baseline</td><td>Every level, every bedroom</td><td>First Alert smoke and combo guidance state this directly</td></tr>
+        <tr><td>Device family</td><td>One ecosystem, compatible models</td><td>Interconnect is a system question, not a faceplate question</td></tr>
+        <tr><td>Replacement cycle</td><td>Replace combo alarms at least every 10 years</td><td>Per First Alert combo FAQ</td></tr>
+      </table></div>
+      <div class="callout c-yellow"><span class="ic">⚠️</span><div class="body"><strong>Interconnect compatibility is a system question.</strong> Before assuming a mixed alarm family behaves as one system, match manufacturer ecosystem, model compatibility, power source, and listing. Smoke/CO combo and smart (app-notifying) units exist, but verify the combo strategy is allowed for the specific location by local fire/building code and the product listing.</div></div>
+      <div class="src"><strong>Source basis:</strong> First Alert hardwired/interconnect smoke &amp; combo product specs and placement guidance (every level, every bedroom; ≤10-yr replacement; ecosystem compatibility). Confirm required locations and combo allowances with local fire/building code.</div>
+    </div>
+  </details>
+
+  <!-- ============ PHASE 5 ============ -->
+  <div class="phase-head phase-tools"><span class="pn">05</span><h2>Tools &amp; reference</h2><span class="pl"></span><span class="pc">Calculator · Appendices</span></div>
+
+  <!-- ============ CALCULATOR ============ -->
+  <details class="section phase-tools" id="calc" open>
+    <summary>🧮 Box-Fill Calculator <span class="arrow">›</span></summary>
+    <div class="section-body">
+      <div class="callout c-gray"><span class="ic">📦</span><div class="body">Live implementation of <span class="nec">NEC 314.16(B)</span>. Enter the conductors and devices in the box; the tool returns the minimum box volume and checks it against a target box size. Volume allowances: 14 AWG = 2.00, 12 AWG = 2.25, 10 AWG = 2.50 cu in. <span class="badge b-verified">verified</span></div></div>
+      <div class="callout c-orange hidden" id="mixedGaugeCaveat"><span class="ic">⚠️</span><div class="body"><strong>Mixed-gauge boxes:</strong> this tool counts each insulated conductor at its own 14/12/10 AWG allowance. Device yokes count by the largest conductor on the yoke; grounds and internal clamps count by the largest conductor present. For unusual mixed-device boxes, verify the yoke grouping by hand. <span class="badge b-corrected">caveat</span></div></div>
+      <div class="calc">
+        <h4>Common scenarios</h4>
+        <div class="presets" id="presets">
+          <button type="button" data-preset="end-run">End-of-run outlet</button>
+          <button type="button" data-preset="mid-tap">Mid-run + switch tap</button>
+          <button type="button" data-preset="3way">3-way switch box</button>
+          <button type="button" data-preset="fan">Fan/light combo</button>
+        </div>
+        <h4>Inputs</h4>
+        <div class="calc-grid">
+          <label for="cond14">14 AWG insulated conductors</label>
+          <input id="cond14" type="number" min="0" value="0">
+
+          <label for="cond12">12 AWG insulated conductors</label>
+          <input id="cond12" type="number" min="0" value="6">
+
+          <label for="cond10">10 AWG insulated conductors</label>
+          <input id="cond10" type="number" min="0" value="0">
+
+          <label for="devices">Devices (switches/receptacles on a yoke)</label>
+          <input id="devices" type="number" min="0" value="1">
+
+          <label for="grounds">Equipment grounds present?</label>
+          <select id="grounds"><option value="1" selected>Yes (counts as 1)</option><option value="0">No</option></select>
+
+          <label for="clamps">Internal cable clamps present?</label>
+          <select id="clamps"><option value="1" selected>Yes (counts as 1)</option><option value="0">No</option></select>
+
+          <label for="boxsize">Target box volume (cu in)</label>
+          <select id="boxsize">
+            <option value="18">18.0 — std single-gang</option>
+            <option value="20.3">20.3</option>
+            <option value="22.5" selected>22.5 — deep single-gang</option>
+            <option value="30.3">30.3 — double-gang</option>
+            <option value="42">42.0</option>
+          </select>
+        </div>
+        <div class="calc-out" id="calcOut"></div>
+      </div>
+    </div>
+  </details>
+
+  <!-- ============ APPENDICES ============ -->
+  <details class="section phase-tools" id="appendix">
+    <summary>📚 Appendices <span class="arrow">›</span></summary>
+    <div class="section-body">
+      <div class="callout c-gray"><span class="ic">📚</span><div class="body"><strong>Supporting resources.</strong> Use these as verification anchors — not a substitute for local inspection requirements.</div></div>
+
+      <h3>Tooling checklist <span class="cl-count" id="checklistCount"></span></h3>
+      <ul class="checklist" style="list-style:none; padding-left:0">
+        <li><label><input type="checkbox" data-id="drill-bit"> 3/8 in drill bit (general bays)</label></li>
+        <li><label><input type="checkbox" data-id="right-angle-drill"> Right-angle drill attachment (tight bays)</label></li>
+        <li><label><input type="checkbox" data-id="staples-12-2"> 1/2 in cable staples (12/2)</label></li>
+        <li><label><input type="checkbox" data-id="staples-12-3"> 3/4 in cable staples (12/3)</label></li>
+        <li><label><input type="checkbox" data-id="romex-stripper"> Romex stripper or utility knife (score-and-snap)</label></li>
+        <li><label><input type="checkbox" data-id="wire-strippers"> Wire strippers (5/8 in mark for 12 AWG)</label></li>
+        <li><label><input type="checkbox" data-id="linemans-pliers"> Lineman's pliers</label></li>
+        <li><label><input type="checkbox" data-id="needle-nose"> Needle-nose pliers</label></li>
+        <li><label><input type="checkbox" data-id="ground-nuts"> Green grounding wire nuts (center-hole) OR copper ground crimp sleeves</label></li>
+        <li><label><input type="checkbox" data-id="red-nuts"> Red wire nuts (for three-way pigtails)</label></li>
+        <li><label><input type="checkbox" data-id="nail-puller"> Nail puller (for box swaps)</label></li>
+        <li><label><input type="checkbox" data-id="voltage-tester"> Non-contact voltage tester / multimeter (verify dead)</label></li>
+      </ul>
+
+      <h3>NEC cross-references</h3>
+      <div class="tbl-wrap"><table>
+        <tr><th>Topic</th><th>Section</th><th>Status</th></tr>
+        <tr><td>Box-fill calculation</td><td class="nec">NEC 314.16</td><td><span class="badge b-verified">verified</span></td></tr>
+        <tr><td>Outlet spacing (6/12 rule)</td><td class="nec">NEC 210.52(A)</td><td><span class="badge b-verified">verified</span></td></tr>
+        <tr><td>Cable securing &amp; support</td><td class="nec">NEC 334.30</td><td><span class="badge b-corrected">corrected — 12 in / 4.5 ft</span></td></tr>
+        <tr><td>Bedroom AFCI requirement</td><td class="nec">NEC 210.12</td><td><span class="badge b-verified">verified</span></td></tr>
+        <tr><td>Tamper-resistant receptacles</td><td class="nec">NEC 406.12</td><td><span class="badge b-verified">verified</span></td></tr>
+        <tr><td>Neutral required at switch box</td><td class="nec">NEC 404.2(C)</td><td><span class="badge b-verified">verified — 2011+</span></td></tr>
+        <tr><td>Three-way / four-way switches</td><td class="nec">NEC 404.2</td><td><span class="badge b-verified">verified</span></td></tr>
+        <tr><td>Ceiling-fan box rating</td><td class="nec">NEC 314.27(C)</td><td><span class="badge b-verified">verified</span></td></tr>
+        <tr><td>Egress window (bedroom)</td><td class="nec">IRC R310</td><td><span class="badge b-verified">verified — building code, not NEC</span></td></tr>
+      </table></div>
+
+      <h3>Fact-check notes</h3>
+      <div class="callout c-correct"><span class="ic">📌</span><div class="body"><strong>Correction (NEC 334.30):</strong> the source called “within 6–8 in of a box” a hard code distance. The code requires securing within <strong>12 in</strong> of a box and at intervals <strong>≤ 4.5 ft</strong>; the 2020 edition also caps the box-to-first-support length at 18 in. Tighter spacing is acceptable, just not mandated.</div></div>
+      <div class="callout c-verify"><span class="ic">✅</span><div class="body"><strong>Verified:</strong> box-fill math and the 9-conductor → 20.25 cu in → 22.5 cu in example; the 6/12 spacing rule and 2 ft wall threshold; AFCI, tamper-resistant, and switch-box neutral requirements; three-way/four-way terminal roles; 15A/14-2 &amp; 20A/12-2 pairing.</div></div>
+
+      <h3>Parts 4–14 — sources &amp; limitations</h3>
+      <div class="callout c-blue"><span class="ic">📎</span><div class="body"><strong>Named-authority sources</strong> behind the <span class="badge b-sourced">sourced</span> sections: OSHA (sample lockout/cold-work sequence), CPSC (panel still-live warning; AFCI vs GFCI hazard distinction), Schneider Electric (breaker-type vs receptacle-type AFCI protection envelope), Broan-NuTone (bath/ERV/HRV control families; GFCI over tub/shower), and First Alert (hardwired/interconnect smoke &amp; CO specs, placement, replacement cycle).</div></div>
+      <div class="callout c-orange"><span class="ic">⚠️</span><div class="body"><strong>Weakest-source areas — verify locally (<span class="badge b-field">field</span>):</strong> dedicated-circuit minimums (Part 4), conductor ampacity/bundling/temperature derating (Part 6), framing boring/notching percentages and setbacks (Part 7), formal box-fill arithmetic beyond NEC 314.16 (Part 11), and garage minimum branch-circuit requirements (Part 13). These are presented as NEC-style field practice, not quoted enforceable code. Code adoption varies by state and jurisdiction (NEMA) — always verify against the edition your AHJ enforces, plus the listing/instructions on the actual panel, breakers, devices, fans, and alarms installed.</div></div>
+    </div>
+  </details>
+</main>
+
+<div class="nores hidden" id="noResults">No matches for “<span id="q"></span>”. <a href="#" onclick="clearSearch();return false;">Clear search</a></div>
+
+<footer>
+  Built from a “build your own house” walkthrough and fact-checked against the NEC, June 2026. This is a reference aid only — <strong>always confirm with the NEC edition adopted locally and a licensed inspector before energizing.</strong>
+  <div style="margin-top:10px"><a href="#" id="resetPrefs">Reset saved preferences</a> — clears everything this page remembers on this device.</div>
+</footer>
+
+<script src="wiring-shared.js"></script>
+<script>
+(function(){
+  // ===== Storage core (M0) =====
+  var STORE_KEY='rwr.v1';
+  function defaults(){
+    return { v:1, updatedAt:0, theme:null,
+      ui:{openSections:null, expandAll:false, lastSection:null, firstRunSeen:false},
+      calc:{}, checklist:{}, visited:[], recentSearches:[], jurisdiction:{edition:null} };
+  }
+  function load(){
+    try{
+      var raw=localStorage.getItem(STORE_KEY);
+      var d=raw?JSON.parse(raw):null;
+      if(!d||d.v!==1) return defaults();
+      var base=defaults();
+      base.ui=Object.assign(base.ui,d.ui||{});
+      base.calc=d.calc||{}; base.checklist=d.checklist||{};
+      base.visited=Array.isArray(d.visited)?d.visited:[];
+      base.recentSearches=Array.isArray(d.recentSearches)?d.recentSearches:[];
+      base.jurisdiction=Object.assign(base.jurisdiction,d.jurisdiction||{});
+      base.theme=d.theme||null;
+      return base;
+    }catch(e){ return defaults(); }
+  }
+  var state=load();
+  var saveTimer;
+  function save(){
+    state.updatedAt=Date.now();
+    clearTimeout(saveTimer);
+    saveTimer=setTimeout(function(){
+      try{ localStorage.setItem(STORE_KEY, JSON.stringify(state)); }catch(e){}
+    },250);
+  }
+  function inArr(a,v){ return a.indexOf(v)>-1; }
+  var mutedSectionIds={};
+  function setOpenMuted(section,open){
+    if(section.open===open) return;
+    mutedSectionIds[section.id]=true;
+    section.open=open;
+  }
+
+  // ---- Theme (apply stored, then persist) ----
+  var root=document.documentElement;
+  if(state.theme==='light') root.setAttribute('data-theme','light');
+  document.getElementById('theme').addEventListener('click',function(){
+    var next=root.getAttribute('data-theme')==='light'?'':'light';
+    root.setAttribute('data-theme', next);
+    state.theme = next==='light'?'light':'dark'; save();
+  });
+
+  // ---- Expand / collapse all (persisted) ----
+  var btn=document.getElementById('expandAll');
+  btn.addEventListener('click',function(){
+    var secs=document.querySelectorAll('details.section');
+    var anyClosed=Array.prototype.some.call(secs,function(s){return !s.open;});
+    secs.forEach(function(s){setOpenMuted(s,anyClosed);});
+    btn.textContent=anyClosed?'Collapse all':'Expand all';
+    state.ui.expandAll=anyClosed; syncOpenSections(); save();
+  });
+
+  // ---- Box-fill calculator (M2) ----
+  var ids=['cond14','cond12','cond10','devices','grounds','clamps','boxsize'];
+  var BOX_SIZES=[18,20.3,22.5,30.3,42];
+  var AWG_UNITS={cond14:2.00,cond12:2.25,cond10:2.50};
+  function el(id){return document.getElementById(id);}
+  function num(id){var v=parseFloat(el(id).value);return isNaN(v)?0:v;}
+  function smallestFit(req){ for(var i=0;i<BOX_SIZES.length;i++){ if(BOX_SIZES[i]>=req) return BOX_SIZES[i]; } return null; }
+  function migrateCalc(){
+    if(!state.calc) state.calc={};
+    if(state.calc.cond14!=null || state.calc.cond12!=null || state.calc.cond10!=null) return;
+    var oldUnit=parseFloat(state.calc.awg||'2.25');
+    var oldCount=(parseFloat(state.calc.cables)||0)*2 + (parseFloat(state.calc.cables3)||0)*3 + (parseFloat(state.calc.loose)||0);
+    if(oldUnit===2.00) state.calc.cond14=oldCount;
+    else if(oldUnit===2.50) state.calc.cond10=oldCount;
+    else state.calc.cond12=oldCount;
+  }
+
+  // restore last-used inputs
+  migrateCalc();
+  if(state.calc){ ids.forEach(function(id){ if(state.calc[id]!=null && el(id)) el(id).value=state.calc[id]; }); }
+
+  function snapshotCalc(){ ids.forEach(function(id){ state.calc[id]=el(id).value; }); }
+
+  function calc(){
+    var cond14=num('cond14'), cond12=num('cond12'), cond10=num('cond10');
+    var devices=num('devices'), grounds=num('grounds'), clamps=num('clamps');
+    var target=num('boxsize');
+    var counts={cond14:cond14,cond12:cond12,cond10:cond10};
+    var insulatedVolume=cond14*AWG_UNITS.cond14 + cond12*AWG_UNITS.cond12 + cond10*AWG_UNITS.cond10;
+    var present=Object.keys(counts).filter(function(k){return counts[k]>0;});
+    var largestKey=present.length ? present[present.length-1] : 'cond12';
+    var largestUnit=AWG_UNITS[largestKey];
+    var groundUnit = grounds>0 ? 1 : 0;
+    var clampUnit = clamps>0 ? 1 : 0;
+    var deviceUnits = devices*2;
+    var groundVolume = groundUnit * largestUnit;
+    var clampVolume = clampUnit * largestUnit;
+    var deviceVolume = deviceUnits * largestUnit;
+    var totalUnits = cond14 + cond12 + cond10 + groundUnit + clampUnit + deviceUnits;
+    var required = insulatedVolume + groundVolume + clampVolume + deviceVolume;
+    var ok = target >= required;
+    var fit = smallestFit(required);
+    var out=el('calcOut');
+    var caveat=el('mixedGaugeCaveat');
+    if(caveat) caveat.classList.toggle('hidden',present.length<2);
+    var verdict;
+    if(ok){
+      verdict='<div style="margin-top:6px" class="calc-result-ok">&#10004; A '+target+' cu in box is sufficient. '+
+              '<span style="color:var(--ink-faint)">(Headroom: '+(target-required).toFixed(2)+' cu in)</span></div>';
+    } else {
+      verdict='<div style="margin-top:6px" class="calc-result-bad">&#10008; '+target+' cu in is too small &mdash; needs at least '+required.toFixed(2)+' cu in.</div>'+
+              (fit ? '<button type="button" class="calc-apply" id="calcApply" data-fit="'+fit+'">&rarr; Use '+fit+' cu in</button>'
+                   : '<div class="calc-result-bad" style="margin-top:8px">No listed box size in this tool fits — use a larger enclosure or reduce conductors.</div>');
+    }
+    out.innerHTML =
+      '<div class="calc-line"><span>14 AWG insulated conductors</span><span>'+cond14+' × '+AWG_UNITS.cond14.toFixed(2)+' = '+(cond14*AWG_UNITS.cond14).toFixed(2)+'</span></div>'+
+      '<div class="calc-line"><span>12 AWG insulated conductors</span><span>'+cond12+' × '+AWG_UNITS.cond12.toFixed(2)+' = '+(cond12*AWG_UNITS.cond12).toFixed(2)+'</span></div>'+
+      '<div class="calc-line"><span>10 AWG insulated conductors</span><span>'+cond10+' × '+AWG_UNITS.cond10.toFixed(2)+' = '+(cond10*AWG_UNITS.cond10).toFixed(2)+'</span></div>'+
+      '<div class="calc-line"><span>Equipment grounds (all = 1, largest ground)</span><span>'+groundUnit+' × '+largestUnit.toFixed(2)+' = '+groundVolume.toFixed(2)+'</span></div>'+
+      '<div class="calc-line"><span>Internal clamps (all = 1, largest conductor)</span><span>'+clampUnit+' × '+largestUnit.toFixed(2)+' = '+clampVolume.toFixed(2)+'</span></div>'+
+      '<div class="calc-line"><span>Devices (×2 each, largest yoke conductor)</span><span>'+deviceUnits+' × '+largestUnit.toFixed(2)+' = '+deviceVolume.toFixed(2)+'</span></div>'+
+      '<div class="calc-line"><span><strong>Total volume units</strong></span><span><strong>'+totalUnits+' @ per-gauge allowances</strong></span></div>'+
+      '<div style="margin-top:12px">Minimum box volume required: '+
+      '<span class="big '+(ok?'calc-result-ok':'calc-result-bad')+'">'+required.toFixed(2)+' cu in</span></div>'+
+      verdict;
+    var applyBtn=el('calcApply');
+    if(applyBtn){ applyBtn.addEventListener('click',function(){
+      el('boxsize').value=this.dataset.fit; snapshotCalc(); save(); calc();
+    }); }
+  }
+  ids.forEach(function(id){
+    ['input','change'].forEach(function(evt){
+      el(id).addEventListener(evt,function(){ snapshotCalc(); save(); calc(); });
+    });
+  });
+  calc();
+
+  // ---- Calculator presets ----
+  var PRESETS={
+    'end-run':{cond14:0,cond12:2,cond10:0,devices:1,grounds:1,clamps:1,boxsize:'18'},
+    'mid-tap':{cond14:0,cond12:6,cond10:0,devices:1,grounds:1,clamps:1,boxsize:'22.5'},
+    '3way'   :{cond14:0,cond12:5,cond10:0,devices:1,grounds:1,clamps:1,boxsize:'22.5'},
+    'fan'    :{cond14:0,cond12:3,cond10:0,devices:2,grounds:1,clamps:1,boxsize:'30.3'}
+  };
+  var presetBtns=Array.prototype.slice.call(document.querySelectorAll('#presets button'));
+  function markPreset(key){ presetBtns.forEach(function(b){ b.classList.toggle('active', b.dataset.preset===key); }); }
+  presetBtns.forEach(function(b){
+    b.addEventListener('click',function(){
+      var p=PRESETS[b.dataset.preset]; if(!p) return;
+      ids.forEach(function(id){ if(p[id]!=null) el(id).value=p[id]; });
+      markPreset(b.dataset.preset);
+      state.calc.lastPreset=b.dataset.preset; snapshotCalc(); save(); calc();
+    });
+  });
+  if(state.calc.lastPreset) markPreset(state.calc.lastPreset);
+
+  // ---- Search / filter ----
+  var search=document.getElementById('search');
+  var sections=document.querySelectorAll('details.section');
+  var noRes=document.getElementById('noResults');
+  var savedOpen=null;
+  function normalizeSearchText(str){
+    return String(str||'').toLowerCase()
+      .replace(/[\u2010-\u2015]/g,'-')
+      .replace(/[^a-z0-9]+/g,' ')
+      .replace(/\s+/g,' ')
+      .trim();
+  }
+  function searchTokens(term){
+    var seen={};
+    return normalizeSearchText(term).split(' ').filter(function(t){
+      if(!t || seen[t]) return false;
+      seen[t]=true; return true;
+    });
+  }
+
+  function clearHighlights(el){
+    el.querySelectorAll('mark').forEach(function(m){
+      var t=document.createTextNode(m.textContent); m.parentNode.replaceChild(t,m);
+    });
+  }
+  function highlight(el,tokens){
+    if(!tokens.length) return;
+    var walker=document.createTreeWalker(el,NodeFilter.SHOW_TEXT,null,false);
+    var nodes=[],n;
+    while(n=walker.nextNode()){ if(n.parentNode.nodeName!=='SCRIPT'&&n.parentNode.nodeName!=='STYLE') nodes.push(n); }
+    var re=new RegExp('('+tokens.map(function(term){return term.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}).join('|')+')','ig');
+    nodes.forEach(function(node){
+      if(re.test(node.nodeValue)){
+        var span=document.createElement('span');
+        span.innerHTML=node.nodeValue.replace(re,'<mark>$1</mark>');
+        node.parentNode.replaceChild(span,node);
+      }
+    });
+  }
+
+  window.clearSearch=function(){ search.value=''; doSearch(); };
+
+  function doSearch(){
+    var term=search.value.trim();
+    var tokens=searchTokens(term);
+    sections.forEach(clearHighlights);
+    if(!tokens.length){
+      noRes.classList.add('hidden');
+      sections.forEach(function(s){s.classList.remove('hidden');});
+      if(savedOpen){ sections.forEach(function(s,i){setOpenMuted(s,savedOpen[i]);}); savedOpen=null; }
+      return;
+    }
+    if(!savedOpen){ savedOpen=Array.prototype.map.call(sections,function(s){return s.open;}); }
+    var anyHit=false;
+    sections.forEach(function(s){
+      var text=normalizeSearchText(s.textContent);
+      var hit=tokens.every(function(tok){return text.indexOf(tok)>-1;});
+      s.classList.toggle('hidden',!hit);
+      if(hit){ setOpenMuted(s,true); highlight(s,tokens); anyHit=true; }
+    });
+    noRes.classList.toggle('hidden',anyHit);
+    document.getElementById('q').textContent=term;
+  }
+  var t;
+  search.addEventListener('input',function(){clearTimeout(t);t=setTimeout(doSearch,180);});
+
+  // ---- Scroll-spy: highlight the nav chip for the section in view ----
+  var chipLinks=Array.prototype.slice.call(document.querySelectorAll('nav.chips a'));
+  var chipMap={};
+  chipLinks.forEach(function(a){ var id=a.getAttribute('href').slice(1); if(id) chipMap[id]=a; });
+  var spyTargets=Object.keys(chipMap).map(function(id){return document.getElementById(id);}).filter(Boolean);
+  function setActive(id){
+    chipLinks.forEach(function(a){a.classList.remove('active');});
+    if(chipMap[id]) chipMap[id].classList.add('active');
+    if(id && id!=='contents'){ state.ui.lastSection=id; if(!search.value.trim()) save(); }
+  }
+  if('IntersectionObserver' in window){
+    var visible={};
+    var obs=new IntersectionObserver(function(entries){
+      entries.forEach(function(e){ visible[e.target.id]=e.isIntersecting?e.boundingClientRect.top:null; });
+      // pick the topmost currently-intersecting target
+      var best=null, bestTop=Infinity;
+      spyTargets.forEach(function(el){
+        var r=el.getBoundingClientRect();
+        if(r.bottom>90 && r.top<window.innerHeight*0.5 && r.top<bestTop){ bestTop=r.top; best=el.id; }
+      });
+      if(best) setActive(best);
+    },{rootMargin:'-80px 0px -55% 0px', threshold:[0,1]});
+    spyTargets.forEach(function(el){obs.observe(el);});
+  }
+
+  // ===== M3: sections, visited progress, resume =====
+  var allSections=Array.prototype.slice.call(document.querySelectorAll('details.section'));
+  var wasReturning=!!state.ui.firstRunSeen;
+  var isMobile=window.matchMedia('(max-width:640px)').matches;
+
+  function syncOpenSections(){
+    state.ui.openSections=allSections.filter(function(s){return s.open;}).map(function(s){return s.id;});
+  }
+
+  // Restore open/closed state
+  if(wasReturning && Array.isArray(state.ui.openSections)){
+    allSections.forEach(function(s){ setOpenMuted(s,inArr(state.ui.openSections,s.id)); });
+  } else if(isMobile){
+    // first mobile load: collapse everything for a short tappable index
+    allSections.forEach(function(s){ setOpenMuted(s,false); });
+    syncOpenSections();
+  } else {
+    allSections.forEach(function(s){ if(s.open) mutedSectionIds[s.id]=true; });
+    syncOpenSections(); // capture HTML defaults on first desktop visit
+  }
+
+  // TOC progress
+  var tocGroups=Array.prototype.slice.call(document.querySelectorAll('.toc-group'));
+  tocGroups.forEach(function(g){
+    var lab=g.querySelector('.tg-label');
+    if(lab && !lab.querySelector('.tg-count')){ var c=document.createElement('span'); c.className='tg-count'; lab.appendChild(c); }
+  });
+  function refreshTOC(){
+    document.querySelectorAll('.toc a').forEach(function(a){
+      var id=a.getAttribute('href').slice(1);
+      a.classList.toggle('visited', inArr(state.visited,id));
+    });
+    tocGroups.forEach(function(g){
+      var links=g.querySelectorAll('.toc a'); if(!links.length) return;
+      var v=0; links.forEach(function(a){ if(inArr(state.visited,a.getAttribute('href').slice(1))) v++; });
+      var c=g.querySelector('.tg-count'); if(c) c.textContent='  ·  '+v+'/'+links.length;
+    });
+  }
+  function markVisited(id){ if(id && !inArr(state.visited,id)){ state.visited.push(id); save(); refreshTOC(); } }
+  refreshTOC();
+
+  // Section toggle listeners
+  allSections.forEach(function(s){
+    s.addEventListener('toggle',function(){
+      if(mutedSectionIds[s.id]){ delete mutedSectionIds[s.id]; return; }
+      if(search.value.trim()) return;
+      if(s.open) markVisited(s.id);
+      syncOpenSections(); save();
+    });
+  });
+
+  // Resume pill (returning visitors only)
+  (function(){
+    if(!wasReturning) return;
+    var id=state.ui.lastSection; if(!id) return;
+    var target=document.getElementById(id); if(!target) return;
+    var sum=target.querySelector('summary');
+    var title=id;
+    if(sum){ var c=sum.cloneNode(true);
+      c.querySelectorAll('.badge,.arrow').forEach(function(n){n.remove();});
+      title=c.textContent.replace(/›/g,'').replace(/\s+/g,' ').trim();
+    }
+    var mount=document.getElementById('resumeMount');
+    mount.innerHTML='<div class="resume-pill">↩ <a id="resumeGo">Resume where you left off — '+title+'</a><button class="x" id="resumeX" aria-label="Dismiss">×</button></div>';
+    document.getElementById('resumeGo').addEventListener('click',function(){
+      target.open=true; target.scrollIntoView({behavior:'smooth',block:'start'});
+    });
+    document.getElementById('resumeX').addEventListener('click',function(){ mount.innerHTML=''; });
+  })();
+
+  // ===== M1: checklist persistence =====
+  var boxes=Array.prototype.slice.call(document.querySelectorAll('#appendix input[type=checkbox][data-id]'));
+  function updateChecklistCount(){
+    var n=boxes.filter(function(b){return b.checked;}).length;
+    var c=document.getElementById('checklistCount');
+    if(c) c.textContent=n+' / '+boxes.length+' ready';
+  }
+  boxes.forEach(function(b){
+    if(state.checklist[b.dataset.id]) b.checked=true;
+    b.addEventListener('change',function(){ state.checklist[b.dataset.id]=b.checked; save(); updateChecklistCount(); });
+  });
+  updateChecklistCount();
+
+  // ===== M5: recent searches (native datalist) =====
+  var dl=document.createElement('datalist'); dl.id='recentList'; document.body.appendChild(dl);
+  search.setAttribute('list','recentList');
+  function refreshRecent(){
+    dl.innerHTML=state.recentSearches.map(function(t){return '<option value="'+t.replace(/"/g,'&quot;')+'">';}).join('');
+  }
+  refreshRecent();
+  search.addEventListener('change',function(){
+    var term=search.value.trim(); if(term.length<2) return;
+    state.recentSearches=[term].concat(state.recentSearches.filter(function(t){return t!==term;})).slice(0,5);
+    refreshRecent();
+  });
+
+  // ===== M5: jurisdiction memory =====
+  var jur=document.getElementById('jurSet');
+  function renderJur(){
+    if(!jur) return;
+    if(state.jurisdiction.edition){
+      jur.innerHTML='Your edition: <span class="jur-tag">NEC '+state.jurisdiction.edition+'</span> <button id="jurEdit">change</button>';
+      document.getElementById('jurEdit').addEventListener('click',function(){ state.jurisdiction.edition=null; save(); renderJur(); });
+    } else {
+      jur.innerHTML='<button id="jurStart">Set my NEC edition</button>';
+      document.getElementById('jurStart').addEventListener('click',function(){
+        jur.innerHTML='<input id="jurInput" placeholder="e.g. 2023" maxlength="8"> <button id="jurSave">Save</button>';
+        document.getElementById('jurInput').focus();
+        document.getElementById('jurSave').addEventListener('click',function(){
+          var v=document.getElementById('jurInput').value.trim().slice(0,8);
+          if(v){ state.jurisdiction.edition=v; save(); }
+          renderJur();
+        });
+      });
+    }
+  }
+  renderJur();
+
+  // ===== M5: first-run hint + reset =====
+  if(!wasReturning){
+    var toast=document.createElement('div');
+    toast.className='toast';
+    toast.innerHTML='<span>This guide remembers your place, calculator &amp; checklist — on this device only.</span><button id="toastOk">Got it</button>';
+    document.body.appendChild(toast);
+    document.getElementById('toastOk').addEventListener('click',function(){ toast.remove(); });
+    setTimeout(function(){ if(toast.parentNode) toast.remove(); },9000);
+  }
+  state.ui.firstRunSeen=true; save();
+
+  var reset=document.getElementById('resetPrefs');
+  if(reset) reset.addEventListener('click',function(e){
+    e.preventDefault();
+    try{ localStorage.removeItem(STORE_KEY); }catch(err){}
+    location.reload();
+  });
+
+  // ===== R3 deep links: #partN | #calc | #appendix | #contents =====
+  function mgFlash(elx){
+    try{
+      elx.style.transition='box-shadow .25s ease';
+      elx.style.boxShadow='0 0 0 3px var(--accent, #f59e0b)';
+      clearTimeout(elx._mgFlashT);                         // don't capture a mid-flash value as "previous"
+      elx._mgFlashT=setTimeout(function(){ elx.style.boxShadow=''; },1500);
+    }catch(e){}
+  }
+  function mgHandleHash(){
+    var parsed=(window.WiringShared&&WiringShared.parseHash)?WiringShared.parseHash(location.hash):null;
+    var id=parsed&&parsed.kind==='anchor'?parsed.id:(location.hash||'').replace(/^#/,'');
+    if(!id) return;
+    var elx=document.getElementById(id);
+    if(!elx) return;
+    var det=elx.closest?elx.closest('details'):null;
+    // open via setOpenMuted so the 'toggle' handler does NOT markVisited/persist
+    // openSections — a deep link must not corrupt the user's saved reading progress.
+    if(det) setOpenMuted(det,true);
+    if(elx.tagName&&elx.tagName.toLowerCase()==='details') setOpenMuted(elx,true);
+    try{ elx.scrollIntoView({behavior:'smooth',block:'start'}); }catch(e){ try{elx.scrollIntoView();}catch(_){} }
+    mgFlash(elx);
+  }
+  // ===== R4 bridge: read-only project snapshot (Reference READS only) =====
+  // Reads metagrid.project.v1 and shows BOM (item counts) + connected/demand
+  // load via the shared module. Spacing/feet are intentionally NOT surfaced:
+  // planner coords are schematic / NOT TO SCALE, so derived feet must not be
+  // presented as measured. boxFill stays in the calculator above (active UI).
+  function mgEsc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+  function mgRenderProjectSnapshot(){
+    if(!window.WiringShared) return;
+    var host=document.getElementById('mg-project-snapshot');
+    if(!host){
+      var anchor=document.getElementById('contents');
+      if(!anchor||!anchor.parentNode) return;
+      host=document.createElement('div');
+      host.id='mg-project-snapshot';
+      host.className='callout';
+      host.style.marginTop='14px';
+      anchor.parentNode.insertBefore(host, anchor.nextSibling);
+    }
+    var proj,est,billOfMaterials;
+    try{
+      proj=WiringShared.project.load();
+      est=WiringShared.loadEstimate(proj.loads||[]);
+      billOfMaterials=WiringShared.bom(proj.items||[]);
+    }catch(e){ host.innerHTML=''; return; }
+    var _sig; try{ _sig=JSON.stringify(proj); }catch(_e){ _sig=null; }
+    if(host.innerHTML && _sig!=null && _sig===mgRenderProjectSnapshot._sig) return;  // skip redundant re-render (focus+visibilitychange double-fire)
+    mgRenderProjectSnapshot._sig=_sig;
+    var nC=(proj.circuits||[]).length, nL=(proj.loads||[]).length, nI=(proj.items||[]).length;
+    if(!nC && !nI){
+      host.innerHTML='<strong>Project data</strong><div style="margin-top:6px;color:var(--ink-faint,#888)">No shared project yet. Open the <a href="panel-schedule-56HA.html">panel schedule</a> and <a href="basement-planner.html">planner</a> to populate circuits, loads, and placed items.</div>';
+      return;
+    }
+    var bomRows=billOfMaterials.byType.map(function(b){ return '<div class="calc-line"><span>'+mgEsc(b.label||b.type)+(b.layer?' <span style="color:var(--ink-faint,#888)">('+mgEsc(b.layer)+')</span>':'')+'</span><span>'+b.count+'</span></div>'; }).join('');
+    host.innerHTML=
+      '<strong>Project data <span style="color:var(--ink-faint,#888);font-weight:400">— live from this device</span></strong>'+
+      '<div class="calc-line" style="margin-top:8px"><span>Circuits / loads / placed items</span><span>'+nC+' / '+nL+' / '+nI+'</span></div>'+
+      '<div class="calc-line"><span>Connected load (est.)</span><span>'+(est.totalVA/1000).toFixed(1)+' kVA &middot; ~'+est.connectedA+' A</span></div>'+
+      '<div class="calc-line"><span>NEC 220.83 demand (est.)</span><span>'+(nL?est.demandA+' A':'&mdash;')+'</span></div>'+
+      (bomRows ? '<div style="margin-top:8px;font-weight:600">Bill of materials</div>'+bomRows : '')+
+      '<div style="margin-top:8px;font-size:11px;color:var(--ink-faint,#888)">Estimates only — schematic, [ASSUMED], not an inspection.</div>';
+  }
+  mgRenderProjectSnapshot();
+  if(window.WiringShared&&WiringShared.project&&WiringShared.project.watch) WiringShared.project.watch(function(){ mgRenderProjectSnapshot(); });
+
+  mgHandleHash();
+  window.addEventListener('hashchange',mgHandleHash);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,2020 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Dave Basement — Systems Planner</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  :root {
+    --bg: #f5f5f4;
+    --panel: #ffffff;
+    --ink: #1f2937;
+    --muted: #6b7280;
+    --line: #d4d4d8;
+    --accent: #1f2937;
+    --hover: #e5e7eb;
+    --active: #111827;
+    --c-electrical: #d62728;
+    --c-network:    #1f77b4;
+    --c-lighting:   #f59e0b;
+    --c-av:         #8b5cf6;
+    --c-furniture:  #6b7280;
+    --c-zone:       #2ca02c;
+    --c-annotation: #0ea5e9;
+    --c-user:       #111827;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; height: 100%; }
+  body {
+    font: 13px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    color: var(--ink);
+    background: var(--bg);
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    height: 100vh;
+    overflow: hidden;
+  }
+  header {
+    background: var(--panel);
+    border-bottom: 1px solid var(--line);
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  header h1 { margin: 0; font-size: 14px; font-weight: 700; letter-spacing: 0.02em; }
+  header .meta { color: var(--muted); font-size: 11px; }
+  header .actions { display: flex; gap: 6px; }
+  main {
+    display: grid;
+    grid-template-columns: 260px 1fr 280px;
+    overflow: hidden;
+    min-height: 0;
+  }
+  aside {
+    background: var(--panel);
+    border-right: 1px solid var(--line);
+    overflow-y: auto;
+    padding: 12px;
+  }
+  aside.right { border-right: none; border-left: 1px solid var(--line); }
+  aside h2 {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    margin: 16px 0 6px;
+  }
+  aside h2:first-child { margin-top: 0; }
+  .layer-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px 8px; border-radius: 6px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .layer-row:hover { background: var(--hover); }
+  .layer-row .swatch {
+    width: 12px; height: 12px; border-radius: 3px;
+    border: 1px solid rgba(0,0,0,0.15);
+  }
+  .layer-row .name { flex: 1; font-weight: 500; }
+  .layer-row .count { color: var(--muted); font-size: 11px; }
+  .layer-row input[type="checkbox"] { margin: 0; }
+  .layer-row.active-layer { background: #f0f9ff; outline: 1px solid #bae6fd; }
+  .tool-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+  }
+  .tool {
+    padding: 8px;
+    border: 1px solid var(--line);
+    background: #fff;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 11px;
+    text-align: center;
+    transition: background 0.1s;
+    user-select: none;
+  }
+  .tool:hover { background: var(--hover); }
+  .tool.active {
+    background: var(--active);
+    color: white;
+    border-color: var(--active);
+  }
+  .tool .glyph { font-size: 16px; line-height: 1; margin-bottom: 4px; display: block; }
+  .tool .label { font-size: 10px; }
+  button {
+    background: #fff;
+    border: 1px solid var(--line);
+    color: var(--ink);
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font: inherit;
+  }
+  button:hover { background: var(--hover); }
+  button.primary { background: var(--active); color: #fff; border-color: var(--active); }
+  button.danger { color: #b91c1c; border-color: #fecaca; }
+  button.danger:hover { background: #fef2f2; }
+  button.small { padding: 4px 8px; font-size: 11px; }
+  button:disabled { opacity: 0.4; cursor: default; }
+  button:disabled:hover { background: #fff; }
+  button.floor-btn.active { background: var(--active); color: #fff; border-color: var(--active); }
+  .canvas-wrap {
+    position: relative;
+    overflow: auto;
+    background:
+      linear-gradient(45deg, #efefef 25%, transparent 25%),
+      linear-gradient(-45deg, #efefef 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, #efefef 75%),
+      linear-gradient(-45deg, transparent 75%, #efefef 75%);
+    background-size: 16px 16px;
+    background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+    background-color: #f8f8f8;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 24px;
+  }
+  #plan {
+    background: white;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    cursor: crosshair;
+    display: block;
+    touch-action: none;   /* pointer handlers own pan/zoom on touch (R11) */
+  }
+  #plan.tool-select { cursor: default; }
+  #plan.tool-pan { cursor: grab; }
+  .plan-shell { background: white; padding: 0; }
+  .placed { cursor: move; }
+  .placed.selected > * { stroke: #0ea5e9 !important; }
+  .placed.selected .selection-ring { display: block; }
+  .selection-ring { display: none; }
+  .footer-bar {
+    background: var(--panel);
+    border-top: 1px solid var(--line);
+    padding: 6px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .footer-bar .left, .footer-bar .right { display: flex; gap: 12px; align-items: center; }
+  kbd {
+    background: #f3f4f6;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    padding: 1px 5px;
+    font-family: ui-monospace, monospace;
+    font-size: 10px;
+  }
+  .field { display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px; }
+  .field label { font-size: 11px; color: var(--muted); }
+  .field input, .field select, .field textarea {
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 6px 8px;
+    font: inherit;
+    background: #fff;
+  }
+  .field textarea { resize: vertical; min-height: 60px; }
+  .empty-hint {
+    color: var(--muted);
+    font-style: italic;
+    font-size: 12px;
+    padding: 8px;
+    text-align: center;
+  }
+  .toggle-mini {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 11px; color: var(--muted);
+    cursor: pointer;
+    user-select: none;
+  }
+  details { margin-bottom: 8px; }
+  details summary {
+    cursor: pointer;
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 700;
+    padding: 4px 0;
+  }
+  details summary::marker { color: var(--muted); }
+  .item-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 6px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    margin-bottom: 4px;
+    cursor: pointer;
+    background: #fff;
+  }
+  .item-row:hover { background: var(--hover); }
+  .item-row.selected { background: #f0f9ff; border-color: #38bdf8; }
+  .item-row .label { flex: 1; font-size: 12px; }
+  .item-row .meta { font-size: 10px; color: var(--muted); }
+  .print-only-svg { display: none; }
+  /* ---- R11 mobile chrome (injected by setupMobileChrome) ---- */
+  #mg-actionbar {
+    display: none; position: fixed; left: 0; right: 0; bottom: 0; z-index: 60;
+    gap: 6px; padding: 8px; background: var(--panel); border-top: 1px solid var(--line);
+  }
+  #mg-actionbar button { flex: 1; min-height: 48px; font-size: 13px; }
+  #mg-scrim { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.32); z-index: 40; }
+  @media (max-width: 768px) {
+    main { grid-template-columns: 1fr; }
+    /* the two desktop sidebars become bottom-sheet drawers */
+    aside, aside.right {
+      position: fixed; left: 0; right: 0; bottom: 0; width: auto;
+      max-height: 72vh;
+      border: none; border-top: 1px solid var(--line);
+      border-radius: 14px 14px 0 0;
+      box-shadow: 0 -8px 28px rgba(0,0,0,0.22);
+      transform: translateY(105%);
+      transition: transform 0.25s ease;
+      z-index: 50;
+      padding-bottom: 84px;          /* clear the fixed action bar */
+    }
+    aside.mg-open { transform: translateY(0); }
+    /* tool + fixture pickers: horizontal scroll strips */
+    #tool-bar.tool-grid, #fixture-bar.tool-grid {
+      display: flex; grid-template-columns: none;
+      gap: 8px; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 6px;
+    }
+    #tool-bar .tool, #fixture-bar .tool { flex: 0 0 auto; min-width: 68px; }
+    /* 44px minimum touch targets */
+    .tool { min-height: 44px; }
+    button, .floor-btn, .layer-row, .toggle-mini { min-height: 44px; }
+    button.small { min-height: 44px; padding: 8px 12px; font-size: 13px; }
+    body { padding-bottom: 64px; }   /* room for the fixed action bar */
+    #mg-actionbar { display: flex; }
+    #mg-scrim.show { display: block; }
+  }
+  /* ---- end R11 mobile chrome ---- */
+  @media print {
+    @page { margin: 0.35in; }
+    html, body {
+      height: auto;
+      overflow: visible;
+      background: #fff;
+      display: block;
+    }
+    header, aside, .footer-bar { display: none !important; }
+    main {
+      display: block;
+      overflow: visible;
+      min-height: 0;
+    }
+    .canvas-wrap {
+      display: block;
+      overflow: visible;
+      padding: 0;
+      background: #fff;
+    }
+    .plan-shell { background: #fff; }
+    #plan {
+      width: 100%;
+      height: auto;
+      box-shadow: none;
+      cursor: default;
+    }
+    .print-only-svg { display: inline; }
+    .selection-ring { display: none !important; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>DAVE BASEMENT — SYSTEMS PLANNER</h1>
+    <div class="meta">25′-0″ × 40′-0″ · Basement + First Floor · Scale 1/4″ = 1′-0″ · click-to-place · drag to move · Del to remove</div>
+  </div>
+  <div class="actions">
+    <button id="btn-undo" class="small" disabled title="Undo (Cmd/Ctrl+Z)">↶ Undo</button>
+    <button id="btn-redo" class="small" disabled title="Redo (Cmd/Ctrl+Shift+Z)">↷ Redo</button>
+    <button id="btn-import" class="small">Import JSON</button>
+    <button id="btn-export" class="small">Export JSON</button>
+    <button id="btn-svg" class="small">Export SVG</button>
+    <button id="btn-bom" class="small">Export BOM</button>
+    <button id="btn-bom-md" class="small">Copy BOM</button>
+    <button id="btn-pdf" class="small">Export PDF</button>
+    <button id="btn-clear" class="small danger">Clear all</button>
+  </div>
+</header>
+<main>
+  <!-- LEFT PANEL -->
+  <aside>
+    <h2>Floor</h2>
+    <div style="display:flex;gap:6px;margin-bottom:4px">
+      <button id="btn-floor-basement" class="small floor-btn active">Basement</button>
+      <button id="btn-floor-first" class="small floor-btn">First Floor</button>
+    </div>
+    <div style="font-size:11px;color:#6b7280;margin-bottom:6px">Fixtures and the panel live per floor. First-floor walls are an editable approximation.</div>
+    <h2>Active Layer</h2>
+    <div id="layers"></div>
+    <h2>Tools</h2>
+    <div id="tool-bar" class="tool-grid">
+      <div class="tool" data-tool="select"><span class="glyph">↖</span><span class="label">Select</span></div>
+      <div class="tool" data-tool="delete"><span class="glyph">⌫</span><span class="label">Delete</span></div>
+    </div>
+    <h2>Place Fixture</h2>
+    <div id="fixture-bar" class="tool-grid"></div>
+    <h2>Fixed Elements</h2>
+    <div style="font-size:11px;color:#6b7280;margin-bottom:6px">
+      Panel, ISP, HVAC are draggable. Place them where they actually are, then lock.
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap">
+      <button id="btn-select-panel" class="small">Panel</button>
+      <button id="btn-select-isp" class="small">ISP</button>
+      <button id="btn-select-hvac" class="small">HVAC</button>
+    </div>
+    <label class="toggle-mini" style="margin-top:8px"><input type="checkbox" id="opt-lock"> Lock fixed elements</label><br>
+    <button id="btn-reset-existing" class="small" style="margin-top:6px">Reset all to defaults</button>
+    <h2>Options</h2>
+    <label class="toggle-mini"><input type="checkbox" id="opt-snap" checked> Snap to 6″ grid</label><br>
+    <label class="toggle-mini"><input type="checkbox" id="opt-grid" checked> Show grid</label><br>
+    <label class="toggle-mini"><input type="checkbox" id="opt-codes"> Show NEC clearances</label>
+    <button id="btn-reset-prefs" class="small" style="margin-top:8px">Reset preferences</button>
+  </aside>
+  <!-- CANVAS -->
+  <div class="canvas-wrap" id="canvas-wrap">
+    <div class="plan-shell">
+      <svg id="plan" viewBox="0 0 720 1040" width="720" height="1040" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <pattern id="grid6" width="12" height="12" patternUnits="userSpaceOnUse">
+            <path d="M 12 0 L 0 0 0 12" fill="none" stroke="#e5e7eb" stroke-width="0.5"/>
+          </pattern>
+          <pattern id="grid12" width="24" height="24" patternUnits="userSpaceOnUse">
+            <path d="M 24 0 L 0 0 0 24" fill="none" stroke="#d1d5db" stroke-width="0.6"/>
+          </pattern>
+          <pattern id="hatch-red" patternUnits="userSpaceOnUse" width="6" height="6" patternTransform="rotate(45)">
+            <line x1="0" y1="0" x2="0" y2="6" stroke="#d62728" stroke-width="1" opacity="0.5"/>
+          </pattern>
+          <marker id="arr-blue" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0,0 L10,5 L0,10 Z" fill="#1f77b4"/>
+          </marker>
+        </defs>
+        <!-- BACKGROUND PLAN (immutable existing conditions) -->
+        <g id="plan-bg" data-floor="basement">
+          <!-- Grid -->
+          <g id="grid-layer" class="floor-grid">
+            <rect x="60" y="60" width="600" height="960" fill="url(#grid6)"/>
+            <rect x="60" y="60" width="600" height="960" fill="url(#grid12)"/>
+          </g>
+          <!-- Outer wall -->
+          <rect x="60" y="60" width="600" height="960" fill="none" stroke="#222" stroke-width="3"/>
+          <!-- Room fills (light, beneath everything) -->
+          <g opacity="0.55">
+            <rect x="63" y="63" width="294" height="384" fill="#ddebf7"/>
+            <rect x="357" y="63" width="300" height="384" fill="#fce9d5"/>
+            <rect x="63" y="447" width="294" height="120" fill="#ddebf7"/>
+            <rect x="63" y="567" width="294" height="240" fill="#ddebf7"/>
+            <rect x="357" y="447" width="300" height="290" fill="#e2efda"/>
+            <rect x="357" y="737" width="300" height="80"  fill="#e4d7e9"/>
+            <rect x="357" y="817" width="300" height="200" fill="#f2d9e8"/>
+            <rect x="63"  y="807" width="180" height="210" fill="#ddebf7"/>
+            <rect x="243" y="807" width="114" height="210" fill="#f4f4f4"/>
+          </g>
+          <!-- Internal partitions -->
+          <g stroke="#222" stroke-width="2" fill="none">
+            <line x1="357" y1="63"  x2="357" y2="1017"/>
+            <line x1="63"  y1="447" x2="357" y2="447"/>
+            <line x1="63"  y1="567" x2="357" y2="567"/>
+            <line x1="63"  y1="807" x2="357" y2="807"/>
+            <line x1="243" y1="807" x2="243" y2="1017"/>
+            <line x1="357" y1="737" x2="657" y2="737"/>
+            <line x1="357" y1="817" x2="657" y2="817"/>
+          </g>
+          <!-- Door gaps -->
+          <g fill="white">
+            <rect x="230" y="445" width="36" height="4"/>
+            <rect x="230" y="565" width="36" height="4"/>
+            <rect x="355" y="260" width="4" height="36"/>
+            <rect x="355" y="510" width="4" height="36"/>
+            <rect x="355" y="760" width="4" height="36"/>
+            <rect x="355" y="860" width="4" height="36"/>
+          </g>
+          <!-- Support columns -->
+          <g fill="#222">
+            <circle cx="357" cy="180" r="8"/>
+            <circle cx="357" cy="430" r="8"/>
+            <circle cx="357" cy="660" r="8"/>
+            <circle cx="357" cy="880" r="8"/>
+          </g>
+          <line x1="357" y1="80" x2="357" y2="1000" stroke="#555" stroke-dasharray="6 4" stroke-width="1" opacity="0.4"/>
+          <!-- HVAC, Panel, ISP are now draggable existing elements (see #existing-layer) -->
+          <!-- Furniture (existing conditions) -->
+          <rect x="455" y="110" width="120" height="140" fill="none" stroke="#666" stroke-dasharray="3 2"/>
+          <text x="515" y="185" text-anchor="middle" font-size="10" fill="#666">Queen Bed</text>
+          <rect x="480" y="560" width="80" height="50" fill="none" stroke="#666"/>
+          <text x="520" y="588" text-anchor="middle" font-size="9" fill="#666">Desk</text>
+          <!-- Laundry -->
+          <circle cx="615" cy="880" r="14" fill="#ccc" stroke="#222"/>
+          <circle cx="615" cy="930" r="14" fill="#ccc" stroke="#222"/>
+          <rect x="600" y="835" width="30" height="20" fill="#fff" stroke="#222"/>
+          <circle cx="100" cy="990" r="6" fill="#222"/>
+          <circle cx="510" cy="1000" r="5" fill="#222"/>
+          <!-- Stairs -->
+          <g stroke="#222" stroke-width="0.8" fill="none">
+            <line x1="255" y1="830" x2="345" y2="830"/>
+            <line x1="255" y1="850" x2="345" y2="850"/>
+            <line x1="255" y1="870" x2="345" y2="870"/>
+            <line x1="255" y1="890" x2="345" y2="890"/>
+            <line x1="255" y1="910" x2="345" y2="910"/>
+          </g>
+          <text x="300" y="960" text-anchor="middle" font-size="10">UP ↑</text>
+          <!-- Room labels -->
+          <g font-size="11" fill="#333" font-weight="600" pointer-events="none">
+            <text x="210" y="240" text-anchor="middle">ELECTRICAL PASS</text>
+            <text x="507" y="340" text-anchor="middle">BED AREA</text>
+            <text x="210" y="510" text-anchor="middle">WARDROBE</text>
+            <text x="210" y="670" text-anchor="middle">PANTRY</text>
+            <text x="507" y="600" text-anchor="middle">OFFICE / STUDIO</text>
+            <text x="507" y="775" text-anchor="middle">STORAGE</text>
+            <text x="507" y="860" text-anchor="middle">LAUNDRY</text>
+            <text x="152" y="910" text-anchor="middle">UTILITY/SPORTS</text>
+          </g>
+        </g>
+        <!-- FIRST FLOOR BACKGROUND PLAN — 56 Harding Ave, traced from A1 Floor Plan (schematic, [ASSUMED] partitions) -->
+        <g id="plan-bg-first" data-floor="first" style="display:none">
+          <g id="grid-layer-first" class="floor-grid">
+            <rect x="60" y="60" width="600" height="960" fill="url(#grid6)"/>
+            <rect x="60" y="60" width="600" height="960" fill="url(#grid12)"/>
+          </g>
+          <!-- House envelope (conditioned) -->
+          <rect x="66" y="70" width="588" height="353" fill="none" stroke="#222" stroke-width="3"/>
+          <!-- Rooms (dashed = [ASSUMED] per source drawing) -->
+          <g stroke="#9a9a9a" stroke-width="0.8" stroke-dasharray="4,3">
+            <rect x="66"  y="70"  width="59"  height="353" fill="#d8eeee" opacity="0.6"/>
+            <rect x="128" y="78"  width="104" height="176" fill="#d8efd8" opacity="0.6"/>
+            <rect x="239" y="78"  width="115" height="176" fill="#fde0d8" opacity="0.6"/>
+            <rect x="361" y="78"  width="67"  height="126" fill="#f0f0f0" opacity="0.6"/>
+            <rect x="435" y="78"  width="168" height="176" fill="#ecdcf2" opacity="0.6"/>
+            <rect x="128" y="255" width="89"  height="160" fill="#dde0f5" opacity="0.6"/>
+            <rect x="223" y="255" width="216" height="160" fill="#d6f0e8" opacity="0.6"/>
+            <rect x="446" y="255" width="89"  height="160" fill="#fce9d5" opacity="0.6"/>
+            <rect x="541" y="255" width="62"  height="160" fill="#efe4d2" opacity="0.6"/>
+          </g>
+          <!-- Central hall (defined) -->
+          <rect x="361" y="204" width="67" height="50" fill="#f1ead0" stroke="#1a1a1a" stroke-width="1.4"/>
+          <!-- Detached garage (rear) -->
+          <rect x="404" y="470" width="170" height="130" fill="white" stroke="#222" stroke-width="2.5"/>
+          <!-- Room labels -->
+          <g font-size="10" fill="#333" font-weight="700" pointer-events="none" text-anchor="middle">
+            <text x="95"  y="250" transform="rotate(-90 95 250)">COVERED PORCH</text>
+            <text x="180" y="170">FRONT ROOM</text>
+            <text x="297" y="170">OFFICE</text>
+            <text x="394" y="145">BATH</text>
+            <text x="519" y="170">BEDROOM</text>
+            <text x="172" y="339">DINING</text>
+            <text x="331" y="339">LIVING ROOM</text>
+            <text x="490" y="335">KITCHEN</text>
+            <text x="572" y="333" font-size="8">BATH /</text>
+            <text x="572" y="345" font-size="8">LAUNDRY</text>
+            <text x="394" y="233" font-size="9">HALL</text>
+            <text x="489" y="540" font-size="11">GARAGE</text>
+            <text x="489" y="556" font-size="8" fill="#666" font-weight="normal">detached</text>
+          </g>
+          <text x="66" y="58" font-size="11" fill="#666">First floor — 56 Harding Ave (traced from A1 Floor Plan). Partitions schematic / [ASSUMED]; field-verify.</text>
+        </g>
+        <!-- CODES OVERLAY (toggleable separately) -->
+        <g id="codes-layer" style="display:none">
+          <rect x="553" y="115" width="72" height="60" fill="url(#hatch-red)" stroke="#d62728" stroke-dasharray="4 2" opacity="0.85"/>
+          <text x="589" y="195" text-anchor="middle" font-size="9" fill="#d62728" font-weight="700">NEC 110.26</text>
+          <text x="589" y="206" text-anchor="middle" font-size="8" fill="#d62728">36″D × 30″W clearance</text>
+        </g>
+        <!-- DRAGGABLE EXISTING ELEMENTS (panel, ISP, HVAC) -->
+        <g id="existing-layer"></g>
+        <!-- USER LAYER GROUPS (placement targets) -->
+        <g id="layer-electrical" data-layer="electrical"></g>
+        <g id="layer-network"    data-layer="network"></g>
+        <g id="layer-lighting"   data-layer="lighting"></g>
+        <g id="layer-av"         data-layer="av"></g>
+        <g id="layer-furniture"  data-layer="furniture"></g>
+        <g id="layer-zone"       data-layer="zone"></g>
+        <g id="layer-annotation" data-layer="annotation"></g>
+        <!-- Title strip -->
+        <text x="60" y="50" font-size="11" fill="#666">Existing-conditions plan reference. Overlays editable.</text>
+        <g id="print-legend" class="print-only-svg"></g>
+        <g id="print-scale-bar" class="print-only-svg">
+          <line x1="80" y1="1000" x2="200" y2="1000" stroke="#111827" stroke-width="2"/>
+          <line x1="80" y1="994" x2="80" y2="1006" stroke="#111827" stroke-width="2"/>
+          <line x1="200" y1="994" x2="200" y2="1006" stroke="#111827" stroke-width="2"/>
+          <text x="80" y="992" font-size="9" fill="#111827">Schematic / NTS</text>
+        </g>
+        <g id="print-title-block" class="print-only-svg">
+          <rect x="430" y="930" width="230" height="88" fill="#fff" stroke="#111827" stroke-width="1.2"/>
+          <line x1="430" y1="955" x2="660" y2="955" stroke="#111827" stroke-width="0.8"/>
+          <line x1="430" y1="980" x2="660" y2="980" stroke="#111827" stroke-width="0.8"/>
+          <line x1="545" y1="955" x2="545" y2="1018" stroke="#111827" stroke-width="0.8"/>
+          <text id="print-project" x="438" y="947" font-size="13" fill="#111827" font-weight="700">56 Harding Ave</text>
+          <text id="print-floor" x="438" y="972" font-size="10" fill="#111827">Floor: Basement</text>
+          <text id="print-date" x="553" y="972" font-size="10" fill="#111827">Date:</text>
+          <text id="print-revision" x="438" y="1003" font-size="10" fill="#111827">Rev:</text>
+          <text id="print-sheet" x="553" y="1003" font-size="10" fill="#111827">Sheet:</text>
+        </g>
+      </svg>
+    </div>
+  </div>
+  <!-- RIGHT PANEL: ITEMS / INSPECTOR -->
+  <aside class="right">
+    <h2>Items on active layer</h2>
+    <div id="items-list"></div>
+    <h2>Project metadata</h2>
+    <div id="project-meta"></div>
+    <h2>Selection</h2>
+    <div id="inspector"><div class="empty-hint">Nothing selected.</div></div>
+  </aside>
+</main>
+<div class="footer-bar">
+  <div class="left">
+    <span id="status-tool">Tool: Select</span>
+    <span id="status-layer">Layer: —</span>
+    <span id="status-coords">— , —</span>
+    <span id="status-resume"></span>
+  </div>
+  <div class="right">
+    <span><kbd>Esc</kbd> deselect</span>
+    <span><kbd>Del</kbd> remove</span>
+    <span><kbd>S</kbd> select tool</span>
+    <span>Auto-saved locally</span>
+  </div>
+</div>
+<input type="file" id="file-input" accept="application/json" style="display:none">
+<script src="wiring-shared.js"></script>
+<script>
+"use strict";
+// ============================================================================
+// CONFIG
+// ============================================================================
+const PX_PER_FT = 24;       // 1 ft = 24 px (matches 1/4" = 1'-0" if printed at 96dpi)
+const PX_PER_IN = PX_PER_FT / 12;
+const SNAP_PX   = PX_PER_IN * 6;  // 6-inch grid
+const PLAN_ORIGIN = { x: 60, y: 60 };
+const PLAN_SIZE   = { w: 600, h: 960 };  // 25' x 40'
+const STORAGE_KEY = "basement_planner_v1";
+const LAYERS = {
+  electrical: { name: "Electrical",  color: "#d62728", visible: true,  active: true  },
+  network:    { name: "Network",     color: "#1f77b4", visible: true,  active: false },
+  lighting:   { name: "Lighting",    color: "#f59e0b", visible: false, active: false },
+  av:         { name: "AV",          color: "#8b5cf6", visible: false, active: false },
+  furniture:  { name: "Furniture",   color: "#6b7280", visible: false, active: false },
+  zone:       { name: "Zones",       color: "#2ca02c", visible: false, active: false },
+  annotation: { name: "Annotations", color: "#0ea5e9", visible: true,  active: false },
+};
+// Fixture catalog: layer → fixture types
+const FIXTURES = {
+  electrical: [
+    { type: "receptacle",  glyph: "⊙", label: "Receptacle" },
+    { type: "gfci",        glyph: "G", label: "GFCI" },
+    { type: "switch",      glyph: "S", label: "Switch" },
+    { type: "switch3way",  glyph: "S₃", label: "3-way" },
+    { type: "junction",    glyph: "J", label: "Junction" },
+    { type: "240v",        glyph: "240", label: "240V" },
+  ],
+  network: [
+    { type: "drop",        glyph: "D", label: "Cat6 drop" },
+    { type: "ap",          glyph: "▲", label: "Wi-Fi AP" },
+    { type: "patch",       glyph: "P", label: "Patch panel" },
+    { type: "camera",      glyph: "◉", label: "Camera" },
+  ],
+  lighting: [
+    { type: "can",         glyph: "○", label: "Recessed can" },
+    { type: "pendant",     glyph: "◇", label: "Pendant" },
+    { type: "sconce",      glyph: "▯", label: "Sconce" },
+    { type: "strip",       glyph: "▬", label: "LED strip" },
+  ],
+  av: [
+    { type: "speaker",     glyph: "◀", label: "Speaker" },
+    { type: "sub",         glyph: "■", label: "Subwoofer" },
+    { type: "listen",      glyph: "★", label: "Listen pos." },
+    { type: "display",     glyph: "▭", label: "Display/TV" },
+  ],
+  furniture: [
+    { type: "rect",        glyph: "▭", label: "Rect (drag-size)" },
+    { type: "circle",      glyph: "○", label: "Circle" },
+  ],
+  zone: [
+    { type: "zone",        glyph: "▦", label: "Zone (rect)" },
+  ],
+  annotation: [
+    { type: "note",        glyph: "T", label: "Text note" },
+    { type: "arrow",       glyph: "→", label: "Arrow" },
+  ],
+};
+// ============================================================================
+// STATE
+// ============================================================================
+const DEFAULT_EXISTING = {
+  panel: { kind: "panel", x: 625, y: 115, w: 20, h: 40,  label: "PANEL", color: "#ff7f0e" },
+  isp:   { kind: "isp",   x: 625, y: 260, w: 20, h: 30,  label: "ISP",   color: "#ff7f0e" },
+  hvac:  { kind: "hvac",  x: 240, y: 615, w: 100, h: 120, label: "HVAC", color: "#2ca02c" },
+};
+const DEFAULT_META = {
+  project: "56 Harding Ave",
+  revision: "A",
+  sheet: "E-001",
+};
+const DEFAULT_PREFS = {
+  lastFloor: "basement",
+  lastLayer: "electrical",
+  lastTool: "select",
+  lastFixtureByLayer: {},
+  fixtureDefaults: {
+    ap: { r2Ft: 25 },
+    rect: { wFt: 4, hFt: 3 },
+    zone: { wFt: 4, hFt: 3 },
+  },
+  labelCounters: {},
+  placeCounts: {},
+};
+const state = {
+  layers: structuredClone(LAYERS),
+  items: [],            // { id, layer, type, x, y, w?, h?, r2?, text?, rotation? }
+  existing: structuredClone(DEFAULT_EXISTING),  // draggable existing-conditions elements
+  tool: "select",       // 'select' | 'delete' | 'place:<layer>:<type>'
+  selectedId: null,
+  selectedExisting: null,  // 'panel' | 'isp' | 'hvac' | null
+  showGrid: true,
+  showCodes: false,
+  snap: true,
+  lockExisting: false,  // prevents accidental dragging once positions are right
+  floor: "basement",    // active floor: 'basement' | 'first'
+  nextId: 1,
+  meta: structuredClone(DEFAULT_META),
+  prefs: structuredClone(DEFAULT_PREFS),
+};
+// Two-stage placement (e.g. zone rectangle): track rubber-band start
+let dragStart = null;
+// Undo / redo: snapshot-based history of the editable layers (items + existing + nextId)
+let undoStack = [], redoStack = [], committedSnapshot = null;
+const MAX_HISTORY = 50;
+let storageTimer = null;
+// ============================================================================
+// DOM REFS
+// ============================================================================
+const $ = (sel) => document.querySelector(sel);
+const $$ = (sel) => document.querySelectorAll(sel);
+const svg = $("#plan");
+const layersBox = $("#layers");
+const fixtureBar = $("#fixture-bar");
+const toolBar = $("#tool-bar");
+const itemsList = $("#items-list");
+const inspector = $("#inspector");
+const projectMeta = $("#project-meta");
+// ============================================================================
+// INIT
+// ============================================================================
+// ============================================================================
+// R4 shared-project bridge. Planner READS circuits[] (for the "assign to
+// circuit" dropdown) and WRITES items[] (with circuitId + floor + x/y). The
+// Panel owns circuits/loads — we never write those (read-modify-write keeps
+// our items[] slice from clobbering them and vice-versa).
+// ============================================================================
+let projectCircuits = [];
+function refreshProjectCircuits() {
+  try { projectCircuits = (window.WiringShared ? (WiringShared.project.load().circuits || []) : []); }
+  catch (e) { projectCircuits = []; }
+}
+function mgCircuitField(item) {
+  if (!window.WiringShared) return "";
+  var cur = item.circuitId != null ? String(item.circuitId) : "";
+  var opts = '<option value="">— unassigned —</option>';
+  for (var i = 0; i < projectCircuits.length; i++) {
+    var c = projectCircuits[i];
+    var cid = String(c.id);
+    var lbl = cid + (c.name ? " · " + c.name : "") + (c.amps ? " (" + c.amps + "A)" : "");
+    opts += '<option value="' + escapeHtml(cid) + '"' + (cid === cur ? " selected" : "") + ">" + escapeHtml(lbl) + "</option>";
+  }
+  // keep an assignment visible even if the panel no longer publishes that circuit
+  if (cur && !projectCircuits.some(function (c) { return String(c.id) === cur; })) {
+    opts += '<option value="' + escapeHtml(cur) + '" selected>' + escapeHtml(cur) + " (not in panel)</option>";
+  }
+  var hint = projectCircuits.length ? "" : '<div class="empty-hint" style="margin-top:4px">Open the panel schedule once to populate circuits.</div>';
+  return '<div class="field"><label>Assigned circuit</label><select id="insp-circuit">' + opts + "</select>" + hint + "</div>";
+}
+function syncProjectFromPlanner() {
+  if (!window.WiringShared) return;
+  try {
+    var items = state.items.map(function (it) {
+      return { id: it.id, type: it.type, layer: it.layer, floor: it.floor || "basement", x: it.x, y: it.y, circuitId: it.circuitId != null ? it.circuitId : null, label: it.label || "" };
+    });
+    WiringShared.project.update({ items: items }, true); // inside persistRaw's debounce already
+  } catch (e) {}
+}
+// R3 deep link: #circuit=<id> — select & center the item assigned to that
+// circuit. No-op until items carry circuitId (wired in the R4 data bridge).
+function mgPlannerHash() {
+  var parsed = (window.WiringShared && WiringShared.parseHash) ? WiringShared.parseHash(location.hash) : null;
+  var id = parsed && parsed.kind === "circuit" ? parsed.id : null;
+  if (!id) return;
+  var match = state.items.find(function (it) { return it.circuitId != null && String(it.circuitId) === String(id); });
+  if (!match) return;
+  if (match.floor && match.floor !== state.floor) setFloor(match.floor);
+  state.selectedId = match.id;
+  state.selectedExisting = null;
+  renderExisting(); renderAllItems(); renderItemsList(); renderInspector();
+  var node = document.querySelector('.placed[data-id="' + match.id + '"]');
+  if (node && node.scrollIntoView) { try { node.scrollIntoView({ behavior: "smooth", block: "center" }); } catch (e) {} }
+}
+// ============================================================================
+// R11 mobile chrome: turn the two desktop sidebars into bottom-sheet drawers
+// and add a fixed bottom action bar (Undo · Floor · Layers/Tools · Items).
+// All CSS-gated to <=768px; desktop place/drag/select/delete are untouched.
+// ============================================================================
+function setupMobileChrome() {
+  if (document.getElementById("mg-actionbar")) return;
+  const leftAside = document.querySelector("main > aside:not(.right)");
+  const rightAside = document.querySelector("main > aside.right");
+  const scrim = document.createElement("div");
+  scrim.id = "mg-scrim";
+  document.body.appendChild(scrim);
+  function closeDrawers() {
+    if (leftAside) leftAside.classList.remove("mg-open");
+    if (rightAside) rightAside.classList.remove("mg-open");
+    scrim.classList.remove("show");
+  }
+  function openDrawer(a) {
+    closeDrawers();
+    if (a) { a.classList.add("mg-open"); scrim.classList.add("show"); }
+  }
+  scrim.addEventListener("click", closeDrawers);
+  const bar = document.createElement("div");
+  bar.id = "mg-actionbar";
+  const mk = (label, fn, id) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "small";
+    b.textContent = label;
+    if (id) b.id = id;
+    b.addEventListener("click", fn);
+    return b;
+  };
+  bar.appendChild(mk("↶ Undo", () => undo()));
+  bar.appendChild(mk(state.floor === "basement" ? "▣ Basement" : "▣ First", () => {
+    setFloor(state.floor === "basement" ? "first" : "basement");
+  }, "mg-floor-btn"));
+  bar.appendChild(mk("⚙ Layers / Tools", () => openDrawer(leftAside)));
+  bar.appendChild(mk("☰ Items", () => openDrawer(rightAside)));
+  document.body.appendChild(bar);
+}
+function init() {
+  loadFromStorage();
+  refreshProjectCircuits();           // R4: pull panel-owned circuits for the inspector dropdown
+  renderLayersPanel();
+  renderFixtures();
+  renderToolHighlight();
+  renderExisting();
+  renderAllItems();
+  renderItemsList();
+  renderProjectMeta();
+  renderInspector();
+  bindEvents();
+  updateStatus();
+  applyOptions();
+  syncFloorChrome();                // show the active floor's background + buttons
+  updatePrintArtifacts();
+  showResumeStatus();
+  committedSnapshot = snapshot();   // baseline for change detection
+  updateHistoryButtons();
+  syncProjectFromPlanner();                     // R4: migrate legacy items[] into the shared project
+  if (window.WiringShared) {
+    WiringShared.project.watch(function () {     // re-read circuits on panel change / tab refocus
+      const beforeIds = projectCircuits.map(c => c.id).join("|");
+      refreshProjectCircuits();
+      if (projectCircuits.map(c => c.id).join("|") === beforeIds) return;   // circuits unchanged → skip re-render
+      const insp = document.getElementById("inspector");
+      if (insp && insp.contains(document.activeElement)) return;            // don't clobber an in-progress inspector edit
+      renderInspector();
+    });
+  }
+  setupMobileChrome();                          // R11: mobile drawers + fixed action bar
+  mgPlannerHash();                              // R3 deep link: #circuit=<id>
+  window.addEventListener("hashchange", mgPlannerHash);
+}
+// ============================================================================
+// PERSISTENCE
+// ============================================================================
+// Serialize only the editable layers that undo/redo restores.
+function snapshot() {
+  return JSON.stringify({ items: state.items, existing: state.existing, nextId: state.nextId });
+}
+function mergePrefs(raw) {
+  const prefs = structuredClone(DEFAULT_PREFS);
+  if (!raw || typeof raw !== "object") return prefs;
+  Object.assign(prefs, raw);
+  prefs.lastFixtureByLayer = { ...DEFAULT_PREFS.lastFixtureByLayer, ...(raw.lastFixtureByLayer || {}) };
+  prefs.labelCounters = { ...DEFAULT_PREFS.labelCounters, ...(raw.labelCounters || {}) };
+  prefs.placeCounts = { ...DEFAULT_PREFS.placeCounts, ...(raw.placeCounts || {}) };
+  prefs.fixtureDefaults = {
+    ap: { ...DEFAULT_PREFS.fixtureDefaults.ap, ...((raw.fixtureDefaults && raw.fixtureDefaults.ap) || {}) },
+    rect: { ...DEFAULT_PREFS.fixtureDefaults.rect, ...((raw.fixtureDefaults && raw.fixtureDefaults.rect) || {}) },
+    zone: { ...DEFAULT_PREFS.fixtureDefaults.zone, ...((raw.fixtureDefaults && raw.fixtureDefaults.zone) || {}) },
+  };
+  return prefs;
+}
+function mergeMeta(raw) {
+  return { ...DEFAULT_META, ...(raw || {}) };
+}
+function validLayer(key) {
+  return !!state.layers[key];
+}
+function validTool(toolId) {
+  if (toolId === "select" || toolId === "delete") return true;
+  if (!toolId || !toolId.startsWith("place:")) return false;
+  const [, layer, type] = toolId.split(":");
+  return !!((FIXTURES[layer] || []).find(f => f.type === type));
+}
+function activeLayerFrom(layers) {
+  for (const [k, v] of Object.entries(layers)) if (v.active) return k;
+  return "electrical";
+}
+function applyPrefsToState() {
+  if (state.prefs.lastFloor === "basement" || state.prefs.lastFloor === "first") state.floor = state.prefs.lastFloor;
+  let layer = validLayer(state.prefs.lastLayer) ? state.prefs.lastLayer : activeLayerFrom(state.layers);
+  if (validTool(state.prefs.lastTool) && state.prefs.lastTool.startsWith("place:")) layer = state.prefs.lastTool.split(":")[1];
+  for (const k of Object.keys(state.layers)) state.layers[k].active = (k === layer);
+  if (validTool(state.prefs.lastTool)) state.tool = state.prefs.lastTool;
+}
+function syncPrefsFromState() {
+  state.prefs.lastFloor = state.floor;
+  state.prefs.lastLayer = activeLayer();
+  state.prefs.lastTool = state.tool;
+  if (state.tool && state.tool.startsWith("place:")) {
+    const [, layer, type] = state.tool.split(":");
+    state.prefs.lastFixtureByLayer[layer] = type;
+  }
+}
+// Record a history entry iff the editable state actually changed since the last commit.
+// Driven from saveToStorage, so options (grid/snap/lock) — which don't change items/existing —
+// produce no undo noise automatically.
+function recordIfChanged() {
+  const cur = snapshot();
+  if (committedSnapshot === null) { committedSnapshot = cur; return; }
+  if (cur === committedSnapshot) return;
+  undoStack.push(committedSnapshot);
+  if (undoStack.length > MAX_HISTORY) undoStack.shift();
+  redoStack = [];
+  committedSnapshot = cur;
+  updateHistoryButtons();
+}
+function persistRaw(options = {}) {
+  try {
+    if (!options.keepPrefs) syncPrefsFromState();
+    clearTimeout(storageTimer);
+    storageTimer = setTimeout(() => {
+      try {
+        const data = {
+          layers: state.layers,
+          items: state.items,
+          existing: state.existing,
+          lockExisting: state.lockExisting,
+          nextId: state.nextId,
+          showGrid: state.showGrid,
+          showCodes: state.showCodes,
+          snap: state.snap,
+          floor: state.floor,
+          meta: state.meta,
+          prefs: state.prefs,
+          undoStack, redoStack,
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        syncProjectFromPlanner();   // R4: publish items[] (circuitId/floor/x/y) to shared project
+      } catch (e) { console.warn("save failed", e); }
+    }, 250);
+  } catch (e) { console.warn("save failed", e); }
+}
+function saveToStorage() { recordIfChanged(); persistRaw(); }
+function loadFromStorage() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    const data = JSON.parse(raw);
+    if (data.layers) state.layers = data.layers;
+    if (Array.isArray(data.items)) state.items = data.items;
+    if (data.existing) state.existing = { ...DEFAULT_EXISTING, ...data.existing };
+    if (typeof data.lockExisting === "boolean") state.lockExisting = data.lockExisting;
+    if (data.nextId) state.nextId = data.nextId;
+    if (typeof data.showGrid === "boolean") state.showGrid = data.showGrid;
+    if (typeof data.showCodes === "boolean") state.showCodes = data.showCodes;
+    if (typeof data.snap === "boolean") state.snap = data.snap;
+    if (data.floor === "basement" || data.floor === "first") state.floor = data.floor;
+    state.meta = mergeMeta(data.meta);
+    state.prefs = mergePrefs(data.prefs);
+    if (!data.prefs) {
+      state.prefs.lastFloor = state.floor;
+      state.prefs.lastLayer = activeLayerFrom(state.layers);
+    }
+    applyPrefsToState();
+    state.items.forEach(it => { if (!it.floor) it.floor = "basement"; });   // migrate pre-floor items
+    if (Array.isArray(data.undoStack)) undoStack = data.undoStack.slice(-MAX_HISTORY);
+    if (Array.isArray(data.redoStack)) redoStack = data.redoStack.slice(-MAX_HISTORY);
+  } catch (e) { console.warn("load failed", e); }
+}
+// Restore an editable-layer snapshot without recording a new history entry.
+function applySnapshot(s) {
+  const d = JSON.parse(s);
+  state.items = Array.isArray(d.items) ? d.items : [];
+  state.existing = { ...structuredClone(DEFAULT_EXISTING), ...(d.existing || {}) };
+  state.nextId = d.nextId || 1;
+  if (state.selectedId != null && !state.items.find(i => i.id === state.selectedId)) state.selectedId = null;
+  state.selectedExisting = null;
+  renderExisting(); renderAllItems(); renderItemsList(); renderLayersPanel(); renderInspector(); updateStatus();
+}
+function undo() {
+  if (!undoStack.length) return;
+  redoStack.push(committedSnapshot);
+  const prev = undoStack.pop();
+  committedSnapshot = prev;
+  applySnapshot(prev);
+  persistRaw();
+  updateHistoryButtons();
+}
+function redo() {
+  if (!redoStack.length) return;
+  undoStack.push(committedSnapshot);
+  const next = redoStack.pop();
+  committedSnapshot = next;
+  applySnapshot(next);
+  persistRaw();
+  updateHistoryButtons();
+}
+function updateHistoryButtons() {
+  const u = document.getElementById("btn-undo"), r = document.getElementById("btn-redo");
+  if (u) u.disabled = undoStack.length === 0;
+  if (r) r.disabled = redoStack.length === 0;
+}
+// ============================================================================
+// LAYERS PANEL
+// ============================================================================
+function renderLayersPanel() {
+  layersBox.innerHTML = "";
+  for (const [key, layer] of Object.entries(state.layers)) {
+    const row = document.createElement("div");
+    row.className = "layer-row" + (layer.active ? " active-layer" : "");
+    row.innerHTML = `
+      <input type="checkbox" ${layer.visible ? "checked" : ""} data-vis="${key}">
+      <span class="swatch" style="background:${layer.color}"></span>
+      <span class="name">${layer.name}</span>
+      <span class="count">${countItems(key)}</span>
+    `;
+    row.addEventListener("click", (e) => {
+      if (e.target.dataset.vis) return;  // checkbox handles itself
+      setActiveLayer(key);
+    });
+    row.querySelector("input").addEventListener("change", (e) => {
+      state.layers[key].visible = e.target.checked;
+      applyLayerVisibility();
+      saveToStorage();
+    });
+    layersBox.appendChild(row);
+  }
+}
+function countItems(layerKey) {
+  return state.items.filter(it => it.layer === layerKey && (it.floor || "basement") === state.floor).length;
+}
+// ---- Floor switching ----
+function syncFloorChrome() {
+  document.getElementById("plan-bg").style.display       = state.floor === "basement" ? "" : "none";
+  document.getElementById("plan-bg-first").style.display = state.floor === "first"    ? "" : "none";
+  document.getElementById("existing-layer").style.display = state.floor === "basement" ? "" : "none";
+  updateFloorButtons();
+}
+function updateFloorButtons() {
+  const b = document.getElementById("btn-floor-basement"), f = document.getElementById("btn-floor-first");
+  if (b) b.classList.toggle("active", state.floor === "basement");
+  if (f) f.classList.toggle("active", state.floor === "first");
+}
+function setFloor(f) {
+  if (state.floor === f) return;
+  state.floor = f;
+  state.selectedId = null;
+  state.selectedExisting = null;
+  syncFloorChrome();
+  renderExisting();
+  renderAllItems();
+  renderItemsList();
+  renderLayersPanel();
+  renderInspector();
+  applyOptions();
+  updateStatus();
+  updatePrintArtifacts();
+  const _mb = document.getElementById("mg-floor-btn");
+  if (_mb) _mb.textContent = state.floor === "basement" ? "▣ Basement" : "▣ First"; // keep mobile bar label in sync
+  persistRaw();   // floor is a view setting, not an undoable edit
+}
+function setActiveLayer(key) {
+  for (const k of Object.keys(state.layers)) state.layers[k].active = (k === key);
+  state.tool = "select";
+  state.selectedId = null;
+  renderLayersPanel();
+  renderFixtures();
+  renderToolHighlight();
+  renderItemsList();
+  renderInspector();
+  updateStatus();
+  persistRaw();
+}
+function activeLayer() {
+  for (const [k, v] of Object.entries(state.layers)) if (v.active) return k;
+  return "electrical";
+}
+function applyLayerVisibility() {
+  for (const [k, v] of Object.entries(state.layers)) {
+    const g = document.getElementById(`layer-${k}`);
+    if (g) g.style.display = v.visible ? "" : "none";
+  }
+  // Update counts
+  for (const row of $$(".layer-row")) {
+    const key = row.querySelector("input").dataset.vis;
+    row.querySelector(".count").textContent = countItems(key);
+  }
+  updatePrintArtifacts();
+}
+function renderProjectMeta() {
+  projectMeta.innerHTML = `
+    <div class="field"><label>Project</label><input id="meta-project" value="${escapeHtml(state.meta.project)}"></div>
+    <div class="field"><label>Revision</label><input id="meta-revision" value="${escapeHtml(state.meta.revision)}"></div>
+    <div class="field"><label>Sheet</label><input id="meta-sheet" value="${escapeHtml(state.meta.sheet)}"></div>
+  `;
+  projectMeta.querySelector("#meta-project").addEventListener("change", e => {
+    state.meta.project = e.target.value || DEFAULT_META.project;
+    updatePrintArtifacts(); persistRaw();
+  });
+  projectMeta.querySelector("#meta-revision").addEventListener("change", e => {
+    state.meta.revision = e.target.value;
+    updatePrintArtifacts(); persistRaw();
+  });
+  projectMeta.querySelector("#meta-sheet").addEventListener("change", e => {
+    state.meta.sheet = e.target.value || DEFAULT_META.sheet;
+    updatePrintArtifacts(); persistRaw();
+  });
+}
+function fixtureLabel(layer, type) {
+  const fx = (FIXTURES[layer] || []).find(f => f.type === type);
+  return fx ? fx.label : type;
+}
+function floorLabel(floor) {
+  return floor === "first" ? "First Floor" : "Basement";
+}
+function updatePrintArtifacts() {
+  const project = document.getElementById("print-project");
+  const floor = document.getElementById("print-floor");
+  const date = document.getElementById("print-date");
+  const rev = document.getElementById("print-revision");
+  const sheet = document.getElementById("print-sheet");
+  if (project) project.textContent = state.meta.project || DEFAULT_META.project;
+  if (floor) floor.textContent = "Floor: " + floorLabel(state.floor);
+  if (date) date.textContent = "Date: " + new Date().toLocaleDateString();
+  if (rev) rev.textContent = "Rev: " + (state.meta.revision || "");
+  if (sheet) sheet.textContent = "Sheet: " + (state.meta.sheet || "");
+
+  const legend = document.getElementById("print-legend");
+  if (!legend) return;
+  const groups = {};
+  for (const item of state.items) {
+    if ((item.floor || "basement") !== state.floor) continue;
+    if (!state.layers[item.layer] || !state.layers[item.layer].visible) continue;
+    const key = item.layer + ":" + item.type;
+    groups[key] = (groups[key] || 0) + 1;
+  }
+  const rows = Object.keys(groups).sort();
+  legend.innerHTML = "";
+  const x = 430, y = 800, w = 230, rowH = 16;
+  const h = Math.max(38, 24 + rows.length * rowH);
+  legend.appendChild(makeRect(x, y, w, h, "#fff", "#111827", 1));
+  legend.appendChild(makeText(x + 8, y + 15, "Legend", "#111827", 11, "start", 700));
+  if (!rows.length) {
+    legend.appendChild(makeText(x + 8, y + 31, "No visible fixtures", "#6b7280", 9, "start", 400));
+    return;
+  }
+  rows.forEach((key, i) => {
+    const [layer, type] = key.split(":");
+    const yy = y + 31 + i * rowH;
+    legend.appendChild(makeRect(x + 8, yy - 8, 9, 9, state.layers[layer].color, "#111827", 0.5));
+    legend.appendChild(makeText(x + 23, yy, `${state.layers[layer].name}: ${fixtureLabel(layer, type)} (${groups[key]})`, "#111827", 9, "start", 400));
+  });
+}
+function showResumeStatus() {
+  const el = document.getElementById("status-resume");
+  if (el) el.textContent = "Resumed: " + floorLabel(state.floor) + " · " + (state.layers[activeLayer()]?.name || activeLayer());
+}
+// ============================================================================
+// FIXTURE BAR
+// ============================================================================
+function renderFixtures() {
+  fixtureBar.innerHTML = "";
+  const layer = activeLayer();
+  const fixtures = FIXTURES[layer] || [];
+  if (fixtures.length === 0) {
+    fixtureBar.innerHTML = `<div class="empty-hint">No fixtures for this layer.</div>`;
+    return;
+  }
+  for (const f of fixtures) {
+    const el = document.createElement("div");
+    el.className = "tool";
+    el.dataset.tool = `place:${layer}:${f.type}`;
+    el.innerHTML = `<span class="glyph" style="color:${state.layers[layer].color}">${f.glyph}</span><span class="label">${f.label}</span>`;
+    el.addEventListener("click", () => setTool(`place:${layer}:${f.type}`));
+    fixtureBar.appendChild(el);
+  }
+}
+// ============================================================================
+// TOOL HANDLING
+// ============================================================================
+function setTool(toolId) {
+  state.tool = toolId;
+  state.selectedId = null;
+  if (toolId && toolId.startsWith("place:")) {
+    const [, layer, type] = toolId.split(":");
+    state.prefs.lastFixtureByLayer[layer] = type;
+  }
+  renderToolHighlight();
+  renderInspector();
+  updateStatus();
+  // Update svg cursor class
+  svg.classList.remove("tool-select", "tool-pan");
+  if (toolId === "select") svg.classList.add("tool-select");
+  persistRaw();
+}
+function renderToolHighlight() {
+  for (const t of $$("#tool-bar .tool, #fixture-bar .tool")) {
+    t.classList.toggle("active", t.dataset.tool === state.tool);
+  }
+}
+// ============================================================================
+// COORDINATE HELPERS
+// ============================================================================
+function clientToSvg(evt) {
+  const pt = svg.createSVGPoint();
+  pt.x = evt.clientX; pt.y = evt.clientY;
+  const ctm = svg.getScreenCTM().inverse();
+  const out = pt.matrixTransform(ctm);
+  return { x: out.x, y: out.y };
+}
+function snapPoint(p) {
+  if (!state.snap) return { x: Math.round(p.x), y: Math.round(p.y) };
+  return {
+    x: Math.round(p.x / SNAP_PX) * SNAP_PX,
+    y: Math.round(p.y / SNAP_PX) * SNAP_PX,
+  };
+}
+function inPlan(p) {
+  return p.x >= PLAN_ORIGIN.x && p.x <= PLAN_ORIGIN.x + PLAN_SIZE.w
+      && p.y >= PLAN_ORIGIN.y && p.y <= PLAN_ORIGIN.y + PLAN_SIZE.h;
+}
+function pxToFtIn(px) {
+  const totalIn = px / PX_PER_IN;
+  const ft = Math.floor(totalIn / 12);
+  const inn = Math.round(totalIn - ft * 12);
+  return `${ft}′-${inn}″`;
+}
+function prefKey(layer, type) {
+  return `${state.floor}:${layer}:${type}`;
+}
+function labelPrefix(type) {
+  return ({
+    receptacle: "R", gfci: "G", switch: "S", switch3way: "S3", junction: "J", "240v": "P",
+    drop: "D", ap: "AP", patch: "PP", camera: "C",
+    can: "L", pendant: "P", sconce: "SC", strip: "LS",
+    speaker: "SP", sub: "SUB", listen: "LP", display: "TV",
+    rect: "F", circle: "C", zone: "Z", note: "N", arrow: "A",
+  })[type] || type.slice(0, 1).toUpperCase();
+}
+function nextLabel(layer, type) {
+  const key = prefKey(layer, type);
+  const n = (state.prefs.labelCounters[key] || 0) + 1;
+  state.prefs.labelCounters[key] = n;
+  return labelPrefix(type) + n;
+}
+function countPlacement(layer, type) {
+  const key = prefKey(layer, type);
+  state.prefs.placeCounts[key] = (state.prefs.placeCounts[key] || 0) + 1;
+}
+// ============================================================================
+// PLACEMENT
+// ============================================================================
+function placeItem(layer, type, p, extras = {}) {
+  const item = {
+    id: state.nextId++,
+    layer, type,
+    floor: state.floor,
+    x: p.x, y: p.y,
+    label: extras.label || nextLabel(layer, type),
+    ...extras,
+  };
+  // Defaults by type
+  if (type === "zone" || type === "rect" || (layer === "furniture" && type === "rect")) {
+    const d = state.prefs.fixtureDefaults[type] || state.prefs.fixtureDefaults.rect;
+    item.w = item.w || PX_PER_FT * (d.wFt || 4);
+    item.h = item.h || PX_PER_FT * (d.hFt || 3);
+    item.x -= item.w / 2;
+    item.y -= item.h / 2;
+  }
+  if (type === "ap") item.r2 = item.r2 || PX_PER_FT * (state.prefs.fixtureDefaults.ap.r2Ft || 25);
+  if (type === "speaker") item.rotation = 0;
+  if (type === "circle") item.r2 = PX_PER_FT * 1;
+  if (type === "note") item.text = "Note";
+  if (type === "arrow") { item.x2 = item.x + 60; item.y2 = item.y; }
+  countPlacement(layer, type);
+  state.items.push(item);
+  state.selectedId = item.id;
+  renderAllItems();
+  renderItemsList();
+  renderLayersPanel();   // for counts
+  renderInspector();
+  saveToStorage();
+}
+// ============================================================================
+// RENDER EXISTING (draggable panel/ISP/HVAC)
+// ============================================================================
+function renderExisting() {
+  const g = document.getElementById("existing-layer");
+  g.innerHTML = "";
+  for (const [key, el] of Object.entries(state.existing)) {
+    const node = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    node.classList.add("existing");
+    node.dataset.key = key;
+    if (state.selectedExisting === key) node.classList.add("selected");
+    node.style.cursor = state.lockExisting ? "default" : "move";
+    if (el.kind === "hvac") {
+      const r = makeRect(el.x, el.y, el.w, el.h, "none", el.color, 2);
+      r.setAttribute("stroke-dasharray", "5 3");
+      node.appendChild(r);
+      node.appendChild(makeText(el.x + el.w/2, el.y + el.h/2 + 3, "HVAC", el.color, 11, "middle", 700));
+      // selection outline
+      if (state.selectedExisting === key) {
+        const sel = makeRect(el.x - 4, el.y - 4, el.w + 8, el.h + 8, "none", "#0ea5e9", 1);
+        sel.setAttribute("stroke-dasharray", "3 2");
+        node.appendChild(sel);
+      }
+    } else {
+      const r = makeRect(el.x, el.y, el.w, el.h, el.color, "#222", 1);
+      node.appendChild(r);
+      // label outside the rectangle (to the left if on east wall, otherwise right)
+      const onEastWall = el.x > PLAN_ORIGIN.x + PLAN_SIZE.w * 0.7;
+      const tx = onEastWall ? el.x - 5 : el.x + el.w + 5;
+      const ty = el.y + el.h / 2 + 3;
+      node.appendChild(makeText(tx, ty, el.label, "#222", 9, onEastWall ? "end" : "start", 600));
+      if (state.selectedExisting === key) {
+        const sel = makeRect(el.x - 3, el.y - 3, el.w + 6, el.h + 6, "none", "#0ea5e9", 1);
+        sel.setAttribute("stroke-dasharray", "3 2");
+        node.appendChild(sel);
+      }
+    }
+    g.appendChild(node);
+  }
+}
+// ============================================================================
+// RENDER ITEMS
+// ============================================================================
+function renderAllItems() {
+  for (const k of Object.keys(state.layers)) {
+    const g = document.getElementById(`layer-${k}`);
+    if (g) g.innerHTML = "";
+  }
+  for (const item of state.items) {
+    if ((item.floor || "basement") !== state.floor) continue;   // only the active floor
+    const g = document.getElementById(`layer-${item.layer}`);
+    if (!g) continue;
+    g.appendChild(renderItem(item));
+  }
+  applyLayerVisibility();
+}
+function renderItem(item) {
+  const color = state.layers[item.layer].color;
+  const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+  g.classList.add("placed");
+  g.dataset.id = item.id;
+  if (item.id === state.selectedId) g.classList.add("selected");
+  const x = item.x, y = item.y;
+  // Selection ring (rendered for all items, hidden unless selected)
+  const ring = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+  ring.setAttribute("cx", x); ring.setAttribute("cy", y);
+  ring.setAttribute("r", 14);
+  ring.setAttribute("fill", "none");
+  ring.setAttribute("stroke", "#0ea5e9");
+  ring.setAttribute("stroke-dasharray", "3 2");
+  ring.classList.add("selection-ring");
+  switch (item.type) {
+    case "receptacle":
+    case "gfci":
+    case "switch":
+    case "switch3way":
+    case "junction":
+    case "240v": {
+      const isSwitch = item.type === "switch" || item.type === "switch3way";
+      const shape = isSwitch
+        ? makeRect(x - 7, y - 7, 14, 14, color)
+        : makeCircle(x, y, 7, color);
+      const label = ({
+        receptacle: "R", gfci: "G", switch: "S", switch3way: "S₃", junction: "J", "240v": "240"
+      })[item.type];
+      g.appendChild(shape);
+      g.appendChild(makeText(x, y + 3, label, "#fff", 8, "middle", 700));
+      break;
+    }
+    case "drop": {
+      g.appendChild(makeRect(x - 7, y - 7, 14, 14, color));
+      g.appendChild(makeText(x, y + 3, "D", "#fff", 8, "middle", 700));
+      break;
+    }
+    case "ap": {
+      const radius = item.r2 || PX_PER_FT * 25;
+      const halo = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+      halo.setAttribute("cx", x); halo.setAttribute("cy", y);
+      halo.setAttribute("r", radius);
+      halo.setAttribute("fill", color);
+      halo.setAttribute("fill-opacity", "0.07");
+      halo.setAttribute("stroke", color);
+      halo.setAttribute("stroke-dasharray", "4 3");
+      halo.setAttribute("stroke-width", "1");
+      g.appendChild(halo);
+      const tri = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+      tri.setAttribute("points", `${x},${y-8} ${x+8},${y+8} ${x-8},${y+8}`);
+      tri.setAttribute("fill", color);
+      g.appendChild(tri);
+      g.appendChild(makeText(x, y + 22, "AP", color, 9, "middle", 700));
+      break;
+    }
+    case "patch": {
+      g.appendChild(makeRect(x - 12, y - 8, 24, 16, color));
+      g.appendChild(makeText(x, y + 3, "PATCH", "#fff", 7, "middle", 700));
+      break;
+    }
+    case "camera": {
+      g.appendChild(makeCircle(x, y, 8, color));
+      g.appendChild(makeText(x, y + 3, "C", "#fff", 8, "middle", 700));
+      break;
+    }
+    case "can": case "pendant": case "sconce": {
+      const shape = item.type === "pendant"
+        ? makeDiamond(x, y, 8, color)
+        : item.type === "sconce"
+          ? makeRect(x - 4, y - 7, 8, 14, color)
+          : makeCircle(x, y, 7, color, "#fff");
+      g.appendChild(shape);
+      break;
+    }
+    case "strip": {
+      const w = item.w || 60;
+      g.appendChild(makeRect(x - w/2, y - 3, w, 6, color));
+      break;
+    }
+    case "speaker": {
+      const tri = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+      tri.setAttribute("points", `${x-9},${y-9} ${x+9},${y} ${x-9},${y+9}`);
+      tri.setAttribute("fill", color);
+      g.appendChild(tri);
+      break;
+    }
+    case "sub": {
+      g.appendChild(makeRect(x - 10, y - 10, 20, 20, color));
+      g.appendChild(makeText(x, y + 3, "SUB", "#fff", 7, "middle", 700));
+      break;
+    }
+    case "listen": {
+      const star = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+      const pts = [];
+      for (let i = 0; i < 10; i++) {
+        const r = i % 2 === 0 ? 10 : 5;
+        const a = (Math.PI / 5) * i - Math.PI/2;
+        pts.push(`${x + Math.cos(a)*r},${y + Math.sin(a)*r}`);
+      }
+      star.setAttribute("points", pts.join(" "));
+      star.setAttribute("fill", color);
+      g.appendChild(star);
+      break;
+    }
+    case "display": {
+      const w = item.w || 80, h = item.h || 12;
+      g.appendChild(makeRect(x - w/2, y - h/2, w, h, color));
+      g.appendChild(makeText(x, y + 22, "TV", color, 9, "middle", 700));
+      break;
+    }
+    case "rect": {
+      const w = item.w || 60, h = item.h || 40;
+      const r = makeRect(item.x, item.y, w, h, "none", color, 1.5);
+      g.appendChild(r);
+      if (item.label) g.appendChild(makeText(item.x + w/2, item.y + h/2 + 3, item.label, color, 10, "middle", 600));
+      break;
+    }
+    case "circle": {
+      const r2 = item.r2 || 24;
+      const c = makeCircle(item.x, item.y, r2, "none", color, 1.5);
+      g.appendChild(c);
+      break;
+    }
+    case "zone": {
+      const w = item.w || 96, h = item.h || 72;
+      const r = makeRect(item.x, item.y, w, h, color, color, 1.5);
+      r.setAttribute("fill-opacity", "0.15");
+      g.appendChild(r);
+      if (item.label) g.appendChild(makeText(item.x + w/2, item.y + h/2 + 3, item.label, color, 11, "middle", 700));
+      break;
+    }
+    case "note": {
+      const t = makeText(x, y, item.text || "Note", color, 11, "start", 600);
+      // Background pad for legibility
+      g.appendChild(t);
+      break;
+    }
+    case "arrow": {
+      const x2 = item.x2 || item.x + 60, y2 = item.y2 || item.y;
+      const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      line.setAttribute("x1", item.x); line.setAttribute("y1", item.y);
+      line.setAttribute("x2", x2); line.setAttribute("y2", y2);
+      line.setAttribute("stroke", color);
+      line.setAttribute("stroke-width", "1.5");
+      line.setAttribute("marker-end", "url(#arr-blue)");
+      g.appendChild(line);
+      break;
+    }
+  }
+  g.appendChild(ring);
+  return g;
+}
+function makeCircle(cx, cy, r, fill, stroke, sw) {
+  const c = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+  c.setAttribute("cx", cx); c.setAttribute("cy", cy); c.setAttribute("r", r);
+  c.setAttribute("fill", fill);
+  if (stroke) { c.setAttribute("stroke", stroke); c.setAttribute("stroke-width", sw || 1); }
+  return c;
+}
+function makeRect(x, y, w, h, fill, stroke, sw) {
+  const r = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+  r.setAttribute("x", x); r.setAttribute("y", y);
+  r.setAttribute("width", w); r.setAttribute("height", h);
+  r.setAttribute("fill", fill);
+  if (stroke) { r.setAttribute("stroke", stroke); r.setAttribute("stroke-width", sw || 1); }
+  return r;
+}
+function makeDiamond(cx, cy, r, fill) {
+  const d = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+  d.setAttribute("points", `${cx},${cy-r} ${cx+r},${cy} ${cx},${cy+r} ${cx-r},${cy}`);
+  d.setAttribute("fill", fill);
+  return d;
+}
+function makeText(x, y, str, fill, size, anchor, weight) {
+  const t = document.createElementNS("http://www.w3.org/2000/svg", "text");
+  t.setAttribute("x", x); t.setAttribute("y", y);
+  t.setAttribute("fill", fill);
+  t.setAttribute("font-size", size || 10);
+  if (anchor) t.setAttribute("text-anchor", anchor);
+  if (weight) t.setAttribute("font-weight", weight);
+  t.textContent = str;
+  t.style.pointerEvents = "none";
+  return t;
+}
+// ============================================================================
+// ITEMS LIST
+// ============================================================================
+function renderItemsList() {
+  const layer = activeLayer();
+  const items = state.items.filter(it => it.layer === layer && (it.floor || "basement") === state.floor);
+  itemsList.innerHTML = "";
+  if (items.length === 0) {
+    itemsList.innerHTML = `<div class="empty-hint">No items on this layer yet. Pick a fixture and click on the plan.</div>`;
+    return;
+  }
+  for (const it of items) {
+    const row = document.createElement("div");
+    row.className = "item-row" + (it.id === state.selectedId ? " selected" : "");
+    const fx = (FIXTURES[it.layer] || []).find(f => f.type === it.type);
+    const name = fx ? fx.label : it.type;
+    row.innerHTML = `
+      <span class="label">${name}${it.label ? " · " + escapeHtml(it.label) : ""}</span>
+      <span class="meta">${pxToFtIn(it.x - PLAN_ORIGIN.x)}, ${pxToFtIn(it.y - PLAN_ORIGIN.y)}</span>
+    `;
+    row.addEventListener("click", () => {
+      state.selectedId = it.id;
+      renderAllItems();
+      renderItemsList();
+      renderInspector();
+    });
+    itemsList.appendChild(row);
+  }
+}
+// ============================================================================
+// INSPECTOR
+// ============================================================================
+function renderInspector() {
+  // Existing-element selection takes priority
+  if (state.selectedExisting) {
+    const key = state.selectedExisting;
+    const el = state.existing[key];
+    const showHW = (key === "hvac");
+    inspector.innerHTML = `
+      <div class="field"><label>Existing fixture</label><input value="${el.label}" disabled></div>
+      <div class="field"><label>X (ft from NW corner)</label>
+        <input type="number" id="ex-x" value="${((el.x - PLAN_ORIGIN.x) / PX_PER_FT).toFixed(2)}" step="0.25"></div>
+      <div class="field"><label>Y (ft from NW corner)</label>
+        <input type="number" id="ex-y" value="${((el.y - PLAN_ORIGIN.y) / PX_PER_FT).toFixed(2)}" step="0.25"></div>
+      ${showHW ? `
+      <div class="field"><label>Width (ft)</label>
+        <input type="number" id="ex-w" value="${(el.w / PX_PER_FT).toFixed(2)}" step="0.25"></div>
+      <div class="field"><label>Depth (ft)</label>
+        <input type="number" id="ex-h" value="${(el.h / PX_PER_FT).toFixed(2)}" step="0.25"></div>` : ``}
+      <button id="ex-reset" class="small">Reset to default</button>
+    `;
+    inspector.querySelector("#ex-x").addEventListener("change", e => {
+      el.x = PLAN_ORIGIN.x + (+e.target.value) * PX_PER_FT;
+      renderExisting(); saveToStorage();
+    });
+    inspector.querySelector("#ex-y").addEventListener("change", e => {
+      el.y = PLAN_ORIGIN.y + (+e.target.value) * PX_PER_FT;
+      renderExisting(); saveToStorage();
+    });
+    if (showHW) {
+      inspector.querySelector("#ex-w").addEventListener("change", e => {
+        el.w = (+e.target.value) * PX_PER_FT; renderExisting(); saveToStorage();
+      });
+      inspector.querySelector("#ex-h").addEventListener("change", e => {
+        el.h = (+e.target.value) * PX_PER_FT; renderExisting(); saveToStorage();
+      });
+    }
+    inspector.querySelector("#ex-reset").addEventListener("click", () => {
+      state.existing[key] = structuredClone(DEFAULT_EXISTING[key]);
+      renderExisting(); renderInspector(); saveToStorage();
+    });
+    return;
+  }
+  const item = state.items.find(i => i.id === state.selectedId);
+  if (!item) {
+    inspector.innerHTML = `<div class="empty-hint">Nothing selected.</div>`;
+    return;
+  }
+  const fx = (FIXTURES[item.layer] || []).find(f => f.type === item.type);
+  const name = fx ? fx.label : item.type;
+  let extra = "";
+  if (item.type === "ap") {
+    const ftR = Math.round((item.r2 || 0) / PX_PER_FT);
+    extra += `
+      <div class="field">
+        <label>Coverage radius (ft)</label>
+        <input type="number" id="insp-r" value="${ftR}" min="5" max="60" step="1">
+      </div>`;
+  }
+  if (item.type === "rect" || item.type === "zone") {
+    extra += `
+      <div class="field"><label>Width (ft)</label>
+        <input type="number" id="insp-w" value="${(item.w / PX_PER_FT).toFixed(1)}" step="0.5"></div>
+      <div class="field"><label>Height (ft)</label>
+        <input type="number" id="insp-h" value="${(item.h / PX_PER_FT).toFixed(1)}" step="0.5"></div>`;
+  }
+  if (item.type === "note") {
+    extra += `
+      <div class="field"><label>Text</label>
+        <textarea id="insp-text">${escapeHtml(item.text || "")}</textarea></div>`;
+  }
+  inspector.innerHTML = `
+    <div class="field"><label>Type</label><input value="${name}" disabled></div>
+    <div class="field"><label>Label</label><input id="insp-label" value="${escapeHtml(item.label || "")}"></div>
+    ${mgCircuitField(item)}
+    <div class="field"><label>X (ft from NW)</label>
+      <input type="number" id="insp-x" value="${((item.x - PLAN_ORIGIN.x) / PX_PER_FT).toFixed(1)}" step="0.5"></div>
+    <div class="field"><label>Y (ft from NW)</label>
+      <input type="number" id="insp-y" value="${((item.y - PLAN_ORIGIN.y) / PX_PER_FT).toFixed(1)}" step="0.5"></div>
+    ${extra}
+    <button id="insp-delete" class="danger small">Delete item</button>
+  `;
+  inspector.querySelector("#insp-label").addEventListener("change", e => { item.label = e.target.value; commit(); });
+  const mgCsel = inspector.querySelector("#insp-circuit");
+  if (mgCsel) mgCsel.addEventListener("change", e => { item.circuitId = e.target.value || null; commit(); });
+  inspector.querySelector("#insp-x").addEventListener("change", e => { item.x = PLAN_ORIGIN.x + (+e.target.value) * PX_PER_FT; commit(); });
+  inspector.querySelector("#insp-y").addEventListener("change", e => { item.y = PLAN_ORIGIN.y + (+e.target.value) * PX_PER_FT; commit(); });
+  if (inspector.querySelector("#insp-r")) {
+    inspector.querySelector("#insp-r").addEventListener("change", e => {
+      item.r2 = (+e.target.value) * PX_PER_FT;
+      state.prefs.fixtureDefaults.ap.r2Ft = +e.target.value;
+      commit();
+    });
+  }
+  if (inspector.querySelector("#insp-w")) {
+    inspector.querySelector("#insp-w").addEventListener("change", e => {
+      item.w = (+e.target.value) * PX_PER_FT;
+      if (state.prefs.fixtureDefaults[item.type]) state.prefs.fixtureDefaults[item.type].wFt = +e.target.value;
+      commit();
+    });
+  }
+  if (inspector.querySelector("#insp-h")) {
+    inspector.querySelector("#insp-h").addEventListener("change", e => {
+      item.h = (+e.target.value) * PX_PER_FT;
+      if (state.prefs.fixtureDefaults[item.type]) state.prefs.fixtureDefaults[item.type].hFt = +e.target.value;
+      commit();
+    });
+  }
+  if (inspector.querySelector("#insp-text")) {
+    inspector.querySelector("#insp-text").addEventListener("change", e => { item.text = e.target.value; commit(); });
+  }
+  inspector.querySelector("#insp-delete").addEventListener("click", () => {
+    deleteItem(item.id);
+  });
+}
+function commit() {
+  renderAllItems();
+  renderItemsList();
+  saveToStorage();
+}
+function deleteItem(id) {
+  state.items = state.items.filter(i => i.id !== id);
+  if (state.selectedId === id) state.selectedId = null;
+  renderAllItems();
+  renderItemsList();
+  renderLayersPanel();
+  renderInspector();
+  saveToStorage();
+}
+function duplicateSelected() {
+  const item = state.items.find(i => i.id === state.selectedId);
+  if (!item) return;
+  const copy = structuredClone(item);
+  copy.id = state.nextId++;
+  copy.x += SNAP_PX;
+  copy.y += SNAP_PX;
+  if (copy.x2 != null) copy.x2 += SNAP_PX;
+  if (copy.y2 != null) copy.y2 += SNAP_PX;
+  copy.label = nextLabel(copy.layer, copy.type);
+  countPlacement(copy.layer, copy.type);
+  state.items.push(copy);
+  state.selectedId = copy.id;
+  renderAllItems();
+  renderItemsList();
+  renderLayersPanel();
+  renderInspector();
+  saveToStorage();
+}
+function resetPrefs() {
+  state.prefs = structuredClone(DEFAULT_PREFS);
+  showResumeStatus();
+  persistRaw({ keepPrefs: true });
+}
+window.resetPrefs = resetPrefs;
+// ============================================================================
+// EVENTS
+// ============================================================================
+function bindEvents() {
+  // Tool bar
+  for (const t of $$("#tool-bar .tool")) {
+    t.addEventListener("click", () => setTool(t.dataset.tool));
+  }
+  // SVG click — placement or selection
+  let dragging = null;
+  let mouseDownItem = null;
+  let downAt = null;
+  // Unified pointer input — one handler covers mouse + touch + pen (R11).
+  svg.addEventListener("pointerdown", (e) => {
+    if (e.isPrimary === false) return;   // ignore secondary touches (no multi-touch tangle)
+    const p = clientToSvg(e);
+    downAt = p;
+    const capture = () => { try { svg.setPointerCapture(e.pointerId); } catch (_) {} };
+    // Did we click an existing (panel/ISP/HVAC)?
+    const existing = e.target.closest(".existing");
+    if (existing && !state.lockExisting) {
+      const key = existing.dataset.key;
+      const el = state.existing[key];
+      state.selectedExisting = key;
+      state.selectedId = null;
+      renderExisting();
+      renderInspector();
+      updateStatus();
+      dragging = {
+        kind: "existing", key,
+        startX: el.x, startY: el.y,
+        mouseX: p.x, mouseY: p.y,
+        pointerId: e.pointerId,
+      };
+      capture();
+      return;
+    }
+    // Did we click a placed item?
+    const placed = e.target.closest(".placed");
+    if (placed) {
+      const id = +placed.dataset.id;
+      const item = state.items.find(i => i.id === id);
+      if (state.tool === "delete") {
+        deleteItem(id);
+        return;
+      }
+      mouseDownItem = item;
+      state.selectedId = id;
+      state.selectedExisting = null;
+      renderExisting();
+      renderAllItems();
+      renderItemsList();
+      renderInspector();
+      dragging = { kind: "item", item, startX: item.x, startY: item.y, mouseX: p.x, mouseY: p.y, pointerId: e.pointerId };
+      capture();
+    } else {
+      // Empty space
+      if (state.tool === "select") {
+        state.selectedId = null;
+        state.selectedExisting = null;
+        renderExisting();
+        renderAllItems();
+        renderItemsList();
+        renderInspector();
+      } else if (state.tool && state.tool.startsWith("place:")) {
+        if (!inPlan(p)) return;
+        const [, layer, type] = state.tool.split(":");
+        const sp = snapPoint(p);
+        placeItem(layer, type, sp);
+      }
+    }
+  });
+  svg.addEventListener("pointermove", (e) => {
+    if (e.isPrimary === false) return;            // ignore secondary touch pointers
+    const p = clientToSvg(e);
+    $("#status-coords").textContent = inPlan(p)
+      ? `${pxToFtIn(p.x - PLAN_ORIGIN.x)} , ${pxToFtIn(p.y - PLAN_ORIGIN.y)}`
+      : "outside plan";
+    if (dragging) {
+      const dx = p.x - dragging.mouseX;
+      const dy = p.y - dragging.mouseY;
+      let nx = dragging.startX + dx;
+      let ny = dragging.startY + dy;
+      const sp = snapPoint({ x: nx, y: ny });
+      if (dragging.kind === "existing") {
+        const el = state.existing[dragging.key];
+        el.x = sp.x;
+        el.y = sp.y;
+        renderExisting();
+      } else {
+        dragging.item.x = sp.x;
+        dragging.item.y = sp.y;
+        renderAllItems();
+      }
+    }
+  });
+  const endPointer = (e) => {
+    // ignore up/cancel from a pointer that isn't the one driving the drag (multi-touch)
+    if (dragging && dragging.pointerId != null && e && e.pointerId != null && e.pointerId !== dragging.pointerId) return;
+    if (dragging) {
+      if (dragging.pointerId != null) { try { svg.releasePointerCapture(dragging.pointerId); } catch (_) {} }
+      saveToStorage();
+      if (dragging.kind === "existing") renderInspector();
+      else { renderItemsList(); renderInspector(); }
+    }
+    dragging = null;
+    mouseDownItem = null;
+  };
+  window.addEventListener("pointerup", endPointer);
+  window.addEventListener("pointercancel", endPointer);
+  // Keyboard
+  window.addEventListener("keydown", (e) => {
+    if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+    const mod = e.metaKey || e.ctrlKey;
+    if (mod && (e.key === "d" || e.key === "D")) { e.preventDefault(); duplicateSelected(); return; }
+    if (mod && (e.key === "z" || e.key === "Z")) { e.preventDefault(); e.shiftKey ? redo() : undo(); return; }
+    if (mod && (e.key === "y" || e.key === "Y")) { e.preventDefault(); redo(); return; }
+    if (e.key === "Delete" || e.key === "Backspace") {
+      if (state.selectedId) { deleteItem(state.selectedId); e.preventDefault(); }
+    } else if (e.key === "Escape") {
+      state.selectedId = null;
+      state.selectedExisting = null;
+      setTool("select");
+      renderExisting();
+      renderAllItems();
+      renderInspector();
+    } else if (e.key === "s" || e.key === "S") {
+      setTool("select");
+    }
+  });
+  // Options
+  $("#opt-snap").addEventListener("change", e => { state.snap = e.target.checked; saveToStorage(); });
+  $("#opt-grid").addEventListener("change", e => { state.showGrid = e.target.checked; applyOptions(); saveToStorage(); });
+  $("#opt-codes").addEventListener("change", e => { state.showCodes = e.target.checked; applyOptions(); saveToStorage(); });
+  $("#opt-lock").addEventListener("change", e => {
+    state.lockExisting = e.target.checked;
+    renderExisting();
+    saveToStorage();
+  });
+  $("#btn-reset-prefs").addEventListener("click", resetPrefs);
+  // Fixed-element selection shortcuts
+  for (const k of ["panel", "isp", "hvac"]) {
+    $(`#btn-select-${k}`).addEventListener("click", () => {
+      if (state.floor !== "basement") setFloor("basement");   // panel/ISP/HVAC live in the basement
+      state.selectedExisting = k;
+      state.selectedId = null;
+      setTool("select");
+      renderExisting();
+      renderInspector();
+      // Scroll plan to it
+      const el = state.existing[k];
+      const wrap = $("#canvas-wrap");
+      const r = svg.getBoundingClientRect();
+      const ratio = r.width / svg.viewBox.baseVal.width;
+      wrap.scrollTo({
+        left: (el.x * ratio) - wrap.clientWidth / 2 + r.left - wrap.getBoundingClientRect().left,
+        top:  (el.y * ratio) - wrap.clientHeight / 2 + r.top - wrap.getBoundingClientRect().top,
+        behavior: "smooth"
+      });
+    });
+  }
+  $("#btn-reset-existing").addEventListener("click", () => {
+    if (!confirm("Reset Panel, ISP, and HVAC to default positions?")) return;
+    state.existing = structuredClone(DEFAULT_EXISTING);
+    renderExisting();
+    renderInspector();
+    saveToStorage();
+  });
+  // Floor switching
+  $("#btn-floor-basement").addEventListener("click", () => setFloor("basement"));
+  $("#btn-floor-first").addEventListener("click", () => setFloor("first"));
+  // Undo / redo
+  $("#btn-undo").addEventListener("click", undo);
+  $("#btn-redo").addEventListener("click", redo);
+  // Header buttons
+  $("#btn-export").addEventListener("click", exportJSON);
+  $("#btn-import").addEventListener("click", () => $("#file-input").click());
+  $("#file-input").addEventListener("change", importJSON);
+  $("#btn-svg").addEventListener("click", exportSVG);
+  $("#btn-bom").addEventListener("click", exportBOM);
+  $("#btn-bom-md").addEventListener("click", copyBOMMarkdown);
+  $("#btn-pdf").addEventListener("click", exportPDF);
+  window.addEventListener("beforeprint", updatePrintArtifacts);
+  $("#btn-clear").addEventListener("click", () => {
+    if (!confirm("Clear all placed items and reset layers? This cannot be undone.")) return;
+    state.items = [];
+    state.selectedId = null;
+    state.nextId = 1;
+    renderAllItems();
+    renderItemsList();
+    renderLayersPanel();
+    renderInspector();
+    saveToStorage();
+  });
+}
+function applyOptions() {
+  document.querySelectorAll(".floor-grid").forEach(g => g.style.display = state.showGrid ? "" : "none");
+  $("#codes-layer").style.display = (state.showCodes && state.floor === "basement") ? "" : "none";
+  $("#opt-snap").checked = state.snap;
+  $("#opt-grid").checked = state.showGrid;
+  $("#opt-codes").checked = state.showCodes;
+  $("#opt-lock").checked = state.lockExisting;
+}
+function updateStatus() {
+  const layer = activeLayer();
+  let toolLabel = "Select";
+  if (state.tool === "delete") toolLabel = "Delete";
+  else if (state.tool && state.tool.startsWith("place:")) {
+    const [, , type] = state.tool.split(":");
+    const fx = (FIXTURES[layer] || []).find(f => f.type === type);
+    toolLabel = "Place " + (fx ? fx.label : type);
+  }
+  $("#status-tool").textContent = "Tool: " + toolLabel;
+  $("#status-layer").textContent = "Floor: " + (state.floor === "basement" ? "Basement" : "First") + " · " + (state.layers[layer]?.name || "—");
+  showResumeStatus();
+}
+// ============================================================================
+// IMPORT / EXPORT
+// ============================================================================
+function bomRows() {
+  const groups = {};
+  for (const item of state.items) {
+    const floor = floorLabel(item.floor || "basement");
+    const layer = state.layers[item.layer]?.name || item.layer;
+    const type = fixtureLabel(item.layer, item.type);
+    const key = `${floor}\u0001${layer}\u0001${type}`;
+    if (!groups[key]) groups[key] = { floor, layer, type, quantity: 0, notes: [] };
+    groups[key].quantity += 1;
+    if (item.label) groups[key].notes.push(item.label);
+  }
+  return Object.values(groups).sort((a, b) =>
+    (a.floor + a.layer + a.type).localeCompare(b.floor + b.layer + b.type)
+  );
+}
+function csvCell(value) {
+  const s = String(value == null ? "" : value);
+  return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+}
+function bomCSV() {
+  const rows = bomRows();
+  const total = rows.reduce((sum, row) => sum + row.quantity, 0);
+  const out = [["Floor", "Layer", "Fixture Type", "Quantity", "Notes"]];
+  rows.forEach(row => out.push([row.floor, row.layer, row.type, row.quantity, row.notes.join("; ")]));
+  out.push(["TOTAL", "", "", total, ""]);
+  return out.map(row => row.map(csvCell).join(",")).join("\n");
+}
+function bomMarkdown() {
+  const rows = bomRows();
+  const total = rows.reduce((sum, row) => sum + row.quantity, 0);
+  const lines = [
+    "| Floor | Layer | Fixture Type | Quantity | Notes |",
+    "|---|---|---|---:|---|",
+  ];
+  rows.forEach(row => {
+    lines.push(`| ${row.floor} | ${row.layer} | ${row.type} | ${row.quantity} | ${row.notes.join("; ")} |`);
+  });
+  lines.push(`| TOTAL |  |  | ${total} |  |`);
+  return lines.join("\n");
+}
+function exportBOM() {
+  const blob = new Blob([bomCSV()], { type: "text/csv" });
+  triggerDownload(blob, "basement_bom.csv");
+}
+function copyText(text) {
+  if (navigator.clipboard && navigator.clipboard.writeText) return navigator.clipboard.writeText(text);
+  const ta = document.createElement("textarea");
+  ta.value = text;
+  document.body.appendChild(ta);
+  ta.select();
+  document.execCommand("copy");
+  document.body.removeChild(ta);
+  return Promise.resolve();
+}
+function copyBOMMarkdown() {
+  copyText(bomMarkdown()).then(() => {
+    $("#status-coords").textContent = "BOM copied";
+  }).catch(() => {
+    $("#status-coords").textContent = "Copy failed";
+  });
+}
+function exportPDF() {
+  updatePrintArtifacts();
+  window.print();
+}
+function exportJSON() {
+  const blob = new Blob([JSON.stringify({
+    layers: state.layers,
+    items: state.items,
+    existing: state.existing,
+    lockExisting: state.lockExisting,
+    nextId: state.nextId,
+    meta: state.meta,
+    prefs: state.prefs,
+    exportedAt: new Date().toISOString(),
+    schema: "basement_planner_v2"
+  }, null, 2)], { type: "application/json" });
+  triggerDownload(blob, "basement_plan.json");
+}
+function importJSON(e) {
+  const f = e.target.files[0];
+  if (!f) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if (data.layers) state.layers = data.layers;
+      if (Array.isArray(data.items)) { state.items = data.items; state.items.forEach(it => { if (!it.floor) it.floor = "basement"; }); }
+      if (data.existing) state.existing = { ...DEFAULT_EXISTING, ...data.existing };
+      if (typeof data.lockExisting === "boolean") state.lockExisting = data.lockExisting;
+      if (data.nextId) state.nextId = data.nextId;
+      if (data.meta) state.meta = mergeMeta(data.meta);
+      if (data.prefs) { state.prefs = mergePrefs(data.prefs); applyPrefsToState(); }
+      renderLayersPanel();
+      renderFixtures();
+      renderExisting();
+      renderAllItems();
+      renderItemsList();
+      renderProjectMeta();
+      renderInspector();
+      syncFloorChrome();
+      applyOptions();
+      updatePrintArtifacts();
+      saveToStorage();
+    } catch (err) {
+      alert("Import failed: " + err.message);
+    }
+  };
+  reader.readAsText(f);
+  e.target.value = "";
+}
+function exportSVG() {
+  // Clone the SVG, strip selection styling, embed
+  const clone = svg.cloneNode(true);
+  for (const sel of clone.querySelectorAll(".selected")) sel.classList.remove("selected");
+  const xml = new XMLSerializer().serializeToString(clone);
+  const full = `<?xml version="1.0" encoding="UTF-8"?>\n` + xml;
+  const blob = new Blob([full], { type: "image/svg+xml" });
+  triggerDownload(blob, "basement_plan.svg");
+}
+function triggerDownload(blob, name) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = name;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+// ============================================================================
+// UTIL
+// ============================================================================
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  }[c]));
+}
+// ============================================================================
+init();
+</script>
+</body>
+</html>

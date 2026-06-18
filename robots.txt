@@ -3,6 +3,7 @@ Allow: /
 Disallow: /404.html
 Disallow: /500.html
 Disallow: /flooring-contract-review.html
+Disallow: /house/56-harding/
 Disallow: /prompt-browser.html
 Disallow: /youtube-pipeline.html
 

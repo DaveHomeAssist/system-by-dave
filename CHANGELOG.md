@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-06-18
+
+* Published the private 56 Harding household renovation hub under `/house/56-harding/`, including the command center, walkthrough packet, electrical tool snapshot, project backup, and noindex/robots protection.
+
+## 2026-06-17
+
+* Added a browser saved ask tracker to `/flooring-contract-review.html` with requested, received, accepted, and blocked states, notes per issue, tracker summary counts, reset, and a generated follow up email from unresolved asks.
+
 ## 2026-06-16
 
 * Added inline rich text formatting to `/teleprompter.html`: the reader now renders `**bold**`, `*italic*`, `==highlight==`, `~~strikethrough~~`, `[[camera cues]]`, and dimmed `((director notes))` inline, and styles `# Heading` and `== Section ==` lines as section markers, while the script body is HTML escaped first so no script markup can inject markup. Lone asterisks and equals signs (math, bullets) are left untouched. Added a `✦` toggle in the Style toolbar (remembered per browser, on by default) to turn formatting on or off, documented the syntax in the Shortcuts dialog and editor placeholder, and kept marker scroll positions accurate by formatting the hidden marker measure element with the same parser.

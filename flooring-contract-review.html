@@ -132,6 +132,21 @@
   .clist li:last-child{border-bottom:0}
   .box{width:18px;height:18px;border:2px solid var(--high);border-radius:5px;flex:none;margin-top:2px}
 
+  /* Ask tracker */
+  .tracker{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 22px;box-shadow:var(--shadow);margin-bottom:18px}
+  .tracker h3{font-size:18px;margin-bottom:6px}
+  .tracker p{font-size:14px;color:var(--muted);margin:0 0 14px}
+  .tracker-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:14px}
+  .tracker-stat{background:var(--card);padding:12px 14px}
+  .tracker-stat span{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700}
+  .tracker-stat strong{display:block;font-size:24px;line-height:1;margin-top:5px}
+  .tracker-actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+  .tracker-status{min-height:20px;color:var(--good);font-size:13px;font-weight:700}
+  .issue-tracker{display:grid;grid-template-columns:170px minmax(0,1fr);gap:10px;margin-top:14px;border-top:1px dashed var(--line);padding-top:14px}
+  .issue-tracker label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700}
+  .issue-tracker select,.issue-tracker input{width:100%;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);font:inherit;font-size:14px;padding:8px 10px}
+  .issue-tracker select:focus-visible,.issue-tracker input:focus-visible{outline:2px solid var(--legal);outline-offset:2px}
+
   /* Email */
   .email{background:#1c1b19;color:#f1efe9;border-radius:14px;padding:22px;margin-bottom:14px}
   .email h3{color:#fff;font-size:18px;margin-bottom:4px}
@@ -199,10 +214,11 @@
     .good ul{columns:1}
     h1{font-size:24px}
     .wrap{padding:20px 14px 60px}
+    .tracker-grid,.issue-tracker{grid-template-columns:1fr}
   }
   @media print{
     body{background:#fff}
-    .filterbar,.copybtn{display:none}
+    .filterbar,.copybtn,.tracker-actions{display:none}
     .issue,.head,.good,.price,.check,.email,.howto{box-shadow:none;break-inside:avoid}
     .email{background:#fff;color:#000;border:1px solid #ccc}
     .email h3,.email pre{color:#000}
@@ -260,6 +276,22 @@
       <button class="chip" data-filter="high"><span class="dot" style="background:var(--high)"></span>High</button>
       <button class="chip" data-filter="med"><span class="dot" style="background:var(--med)"></span>Medium</button>
       <button class="chip" data-filter="low"><span class="dot" style="background:var(--low)"></span>Low</button>
+    </div>
+  </div>
+
+  <div class="tracker" id="ask-tracker">
+    <h3>Flooring Ask Tracker</h3>
+    <p>Track what has been requested, received, accepted, or blocked. This saves in this browser under <code>flooringReview56HA</code>.</p>
+    <div class="tracker-grid" aria-label="Flooring ask status summary">
+      <div class="tracker-stat"><span>Requested</span><strong id="ask-requested">0</strong></div>
+      <div class="tracker-stat"><span>Received</span><strong id="ask-received">0</strong></div>
+      <div class="tracker-stat"><span>Accepted</span><strong id="ask-accepted">0</strong></div>
+      <div class="tracker-stat"><span>Blocked</span><strong id="ask-blocked">0</strong></div>
+    </div>
+    <div class="tracker-actions">
+      <button class="copybtn" id="copy-followup" type="button">Copy follow up email</button>
+      <button class="copybtn" id="reset-tracker" type="button">Reset tracker</button>
+      <span class="tracker-status" id="ask-tracker-status" role="status" aria-live="polite"></span>
     </div>
   </div>
 
@@ -712,9 +744,187 @@ Tom Robertson
 </div>
 
 <script>
-  // Priority filter
+(function(){
+  var STORE_KEY = 'flooringReview56HA';
+  var STORE_VERSION = 1;
+  var STATUS_OPTIONS = [
+    ['requested','Requested'],
+    ['received','Received'],
+    ['accepted','Accepted'],
+    ['blocked','Blocked']
+  ];
   var chips = document.querySelectorAll('.chip');
-  var issues = document.querySelectorAll('#issues .issue');
+  var issues = Array.prototype.slice.call(document.querySelectorAll('#issues .issue'));
+  var saveTimer = null;
+  var trackerState = defaultState();
+
+  function copyText(text){
+    if(navigator.clipboard && navigator.clipboard.writeText) return navigator.clipboard.writeText(text);
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    return Promise.resolve();
+  }
+  function setTrackerStatus(text){
+    var el = document.getElementById('ask-tracker-status');
+    if(el) el.textContent = text || '';
+  }
+  function readStoredState(){
+    try{
+      var raw = localStorage.getItem(STORE_KEY);
+      if(!raw) return null;
+      var data = JSON.parse(raw);
+      if(!data || data.v !== STORE_VERSION || !data.asks || typeof data.asks !== 'object') return null;
+      return data;
+    }catch(e){ return null; }
+  }
+  function saveStateSoon(){
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(function(){
+      try{
+        trackerState.updatedAt = new Date().toISOString();
+        localStorage.setItem(STORE_KEY, JSON.stringify(trackerState));
+        setTrackerStatus('Saved');
+      }catch(e){
+        setTrackerStatus('Save failed');
+      }
+    }, 250);
+  }
+  function issueRecord(issue){
+    var id = (issue.querySelector('.num') || {}).textContent || '';
+    id = id.trim().replace(/^0+/, '') || String(issues.indexOf(issue) + 1);
+    var title = (issue.querySelector('h3') || {}).textContent || ('Ask ' + id);
+    var ask = (issue.querySelector('.ask') || {}).textContent || '';
+    return {
+      id: id,
+      priority: issue.getAttribute('data-pri') || 'med',
+      title: title.trim(),
+      ask: ask.trim(),
+      status: 'requested',
+      note: ''
+    };
+  }
+  function defaultState(){
+    var asks = {};
+    issues.forEach(function(issue){
+      var rec = issueRecord(issue);
+      asks[rec.id] = rec;
+    });
+    return { v: STORE_VERSION, updatedAt: '', asks: asks };
+  }
+  function mergeState(){
+    var stored = readStoredState();
+    if(!stored) return trackerState;
+    Object.keys(trackerState.asks).forEach(function(id){
+      if(stored.asks[id]){
+        trackerState.asks[id].status = stored.asks[id].status || trackerState.asks[id].status;
+        trackerState.asks[id].note = stored.asks[id].note || '';
+      }
+    });
+    trackerState.updatedAt = stored.updatedAt || '';
+    return trackerState;
+  }
+  function statusLabel(value){
+    var match = STATUS_OPTIONS.filter(function(pair){ return pair[0] === value; })[0];
+    return match ? match[1] : value;
+  }
+  function updateSummary(){
+    var counts = { requested:0, received:0, accepted:0, blocked:0 };
+    Object.keys(trackerState.asks).forEach(function(id){
+      var status = trackerState.asks[id].status;
+      if(counts[status] == null) counts[status] = 0;
+      counts[status] += 1;
+    });
+    document.getElementById('ask-requested').textContent = counts.requested || 0;
+    document.getElementById('ask-received').textContent = counts.received || 0;
+    document.getElementById('ask-accepted').textContent = counts.accepted || 0;
+    document.getElementById('ask-blocked').textContent = counts.blocked || 0;
+  }
+  function renderIssueControls(){
+    issues.forEach(function(issue){
+      var rec = issueRecord(issue);
+      var ask = trackerState.asks[rec.id];
+      var existing = issue.querySelector('.issue-tracker');
+      if(existing) existing.remove();
+      var shell = document.createElement('div');
+      shell.className = 'issue-tracker';
+      shell.setAttribute('data-ask-id', rec.id);
+      var statusWrap = document.createElement('div');
+      var statusLabelEl = document.createElement('label');
+      statusLabelEl.textContent = 'Tracker status';
+      var select = document.createElement('select');
+      STATUS_OPTIONS.forEach(function(pair){
+        var option = document.createElement('option');
+        option.value = pair[0];
+        option.textContent = pair[1];
+        if(ask.status === pair[0]) option.selected = true;
+        select.appendChild(option);
+      });
+      statusWrap.appendChild(statusLabelEl);
+      statusWrap.appendChild(select);
+      var noteWrap = document.createElement('div');
+      var noteLabel = document.createElement('label');
+      noteLabel.textContent = 'Note or evidence';
+      var note = document.createElement('input');
+      note.type = 'text';
+      note.value = ask.note || '';
+      note.placeholder = 'Date, reply, document, or blocker';
+      noteWrap.appendChild(noteLabel);
+      noteWrap.appendChild(note);
+      shell.appendChild(statusWrap);
+      shell.appendChild(noteWrap);
+      issue.appendChild(shell);
+      issue.setAttribute('data-status', ask.status);
+      select.addEventListener('change', function(){
+        ask.status = select.value;
+        issue.setAttribute('data-status', ask.status);
+        updateSummary();
+        saveStateSoon();
+      });
+      note.addEventListener('input', function(){
+        ask.note = note.value;
+        saveStateSoon();
+      });
+    });
+  }
+  function unresolvedAsks(){
+    return Object.keys(trackerState.asks).map(function(id){ return trackerState.asks[id]; })
+      .filter(function(ask){ return ask.status !== 'accepted'; });
+  }
+  function followupEmail(){
+    var asks = unresolvedAsks();
+    var lines = [
+      'Subject: Follow up on flooring contract clarifications',
+      '',
+      'Hi Marcello,',
+      '',
+      'Thanks again. I am tracking the remaining contract clarifications for 56 Harding Ave and want to keep the next pass simple. The items still open on my side are:'
+    ];
+    asks.forEach(function(ask, index){
+      lines.push('');
+      lines.push((index + 1) + '. ' + ask.title + ' [' + statusLabel(ask.status) + ']');
+      if(ask.ask) lines.push('   Request: ' + ask.ask);
+      if(ask.note) lines.push('   Note: ' + ask.note);
+    });
+    lines.push('');
+    lines.push('Once those are squared away in writing, I can review the updated contract and move forward.');
+    lines.push('');
+    lines.push('Thanks,');
+    lines.push('Tom Robertson');
+    return lines.join('\n');
+  }
+  function resetTracker(){
+    if(!confirm('Reset flooring ask tracker status and notes?')) return;
+    try{ localStorage.removeItem(STORE_KEY); }catch(e){}
+    trackerState = defaultState();
+    renderIssueControls();
+    updateSummary();
+    setTrackerStatus('Tracker reset');
+  }
+
   chips.forEach(function(c){
     c.addEventListener('click', function(){
       chips.forEach(function(x){x.classList.remove('active')});
@@ -726,7 +936,7 @@ Tom Robertson
       });
     });
   });
-  // View toggle
+
   var tabS = document.getElementById('tab-summary'), tabD = document.getElementById('tab-doc');
   var viewS = document.getElementById('view-summary'), viewD = document.getElementById('view-doc');
   function show(which){
@@ -738,15 +948,29 @@ Tom Robertson
   tabS.addEventListener('click',function(){show('summary')});
   tabD.addEventListener('click',function(){show('doc')});
 
-  // Copy email
   var btn = document.getElementById('copybtn');
   btn.addEventListener('click', function(){
     var t = document.getElementById('emailtext').innerText;
-    navigator.clipboard.writeText(t).then(function(){
-      var o = btn.textContent; btn.textContent = 'Copied ✓';
+    copyText(t).then(function(){
+      var o = btn.textContent; btn.textContent = 'Copied';
       setTimeout(function(){ btn.textContent = o; }, 1800);
     }).catch(function(){ btn.textContent = 'Select the text above to copy'; });
   });
+  document.getElementById('copy-followup').addEventListener('click', function(){
+    copyText(followupEmail()).then(function(){ setTrackerStatus('Follow up email copied'); })
+      .catch(function(){ setTrackerStatus('Copy failed'); });
+  });
+  document.getElementById('reset-tracker').addEventListener('click', resetTracker);
+
+  mergeState();
+  renderIssueControls();
+  updateSummary();
+  window.FlooringAskTracker = {
+    state: function(){ return trackerState; },
+    unresolvedAsks: unresolvedAsks,
+    followupEmail: followupEmail
+  };
+}());
 </script>
 </body>
 </html>
