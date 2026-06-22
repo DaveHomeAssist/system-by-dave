@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-06-22
+
+* Added static Hat-in-Ring handoff aliases under `/hat-in-ring/` for current candidate pages, feed files, and the nested sitemap so old System by Dave paths return a working handoff to `hatinring.com` instead of the site 404.
+
 ## 2026-06-18
 
 * Published the private 56 Harding household renovation hub under `/house/56-harding/`, including the command center, walkthrough packet, electrical tool snapshot, project backup, and noindex/robots protection.
