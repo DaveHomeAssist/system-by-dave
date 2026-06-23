@@ -4,7 +4,7 @@
 
 * Added an unlisted, noindex **Agent Finder** build notebook at `/agent-finder/` — a self-contained, zero-dependency (vanilla JS) page implementing the Literary Agent Finder design: six horizontally-snapping panels (pitch, competitive landscape, data-model blueprint, feature specs, roadmap) and an editable kanban task board with `localStorage` persistence, count-up stats, and keyboard/arrow/swipe navigation. Smoke-tested headless with zero console errors.
 * Added a companion **Data Sourcing & Compliance Brief** at `/agent-finder/compliancebrief.html` — a decision-support memo on which agent-data sources are usable, the risk behind each, field-level freshness TTLs, and pre-build guardrails (a `localStorage` checklist). Framed as recommendations to pressure-test rather than final rulings; findings are research notes pending counsel review, not legal advice.
-* Both pages are blocked in `robots.txt` and kept out of `sitemap.xml` and site navigation (internal build/planning content). Google Fonts are the only external dependency; the CSP allows `fonts.googleapis.com` / `fonts.gstatic.com` and otherwise restricts to `'self'`.
+* Both pages stay noindex, blocked in `robots.txt`, and out of `sitemap.xml` (internal build/planning content), but are now reachable from the homepage **Resources** footer and cross-linked: a "← System by Dave" back-link on each page, and a notebook ↔ brief link. Google Fonts are the only external dependency; the CSP allows `fonts.googleapis.com` / `fonts.gstatic.com` and otherwise restricts to `'self'`.
 
 ## 2026-06-22
 
