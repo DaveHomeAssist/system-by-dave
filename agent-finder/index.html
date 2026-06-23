@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data:; script-src 'self' 'unsafe-inline'; base-uri 'self'">
+<title>Agent Finder — build notebook · System by Dave</title>
+<meta name="description" content="A build notebook for the Literary Agent Finder: the pitch, competitive landscape, data-model blueprint, feature specs, roadmap, and an editable kanban task board.">
+<link rel="canonical" href="https://systembydave.com/agent-finder/">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#f6f1e4">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="System by Dave">
+<meta property="og:title" content="Agent Finder — build notebook">
+<meta property="og:description" content="Pitch, landscape, blueprint, features, roadmap, and an editable task board for the Literary Agent Finder.">
+<meta property="og:url" content="https://systembydave.com/agent-finder/">
+<link rel="icon" href="../svg/system_by_dave_logo_rust.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Special+Elite&family=Spectral:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div style="position:fixed;inset:0;display:flex;align-items:safe center;justify-content:safe center;padding:18px;background:repeating-linear-gradient(45deg,#ded6c2 0,#ded6c2 22px,#d7cfba 22px,#d7cfba 44px);">
+  <div class="laf-paper" style="position:relative;width:100%;height:100%;max-width:1180px;border:2px solid #283648;border-radius:8px;box-shadow:0 18px 50px rgba(40,54,72,0.28);display:flex;flex-direction:column;overflow:hidden;">
+
+    <!-- HEADER -->
+    <header style="flex:none;display:flex;align-items:center;justify-content:space-between;padding:11px 20px;border-bottom:1.5px solid rgba(40,54,72,0.32);background:#fffdf8;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:34px;height:34px;flex:none;border:2px solid #283648;border-radius:3px;background:#f6f1e4;display:flex;align-items:safe center;justify-content:safe center;font-size:16px;transform:rotate(-4deg);">🖋️</div>
+        <div style="line-height:1;">
+          <div style="font-family:'Caveat',cursive;font-weight:700;font-size:1.3rem;color:#283648;">Agent Finder</div>
+          <div style="font-family:'Special Elite',monospace;font-size:0.52rem;letter-spacing:0.13em;text-transform:uppercase;color:#b23a30;margin-top:1px;">build notebook · you &amp; connor</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:14px;">
+        <div style="text-align:right;line-height:1;">
+          <div id="hdrPct" style="font-family:'Caveat',cursive;font-weight:700;font-size:1.25rem;color:#b23a30;">0%</div>
+          <div style="font-family:'Special Elite',monospace;font-size:0.5rem;letter-spacing:0.10em;text-transform:uppercase;color:#5a7052;">shipped</div>
+        </div>
+        <div style="width:108px;height:9px;background:#f6f1e4;border:1.5px solid #283648;border-radius:2px;overflow:hidden;padding:1px;">
+          <div id="hdrBar" style="height:100%;width:0%;background:repeating-linear-gradient(45deg,#b23a30 0,#b23a30 5px,#c2554a 5px,#c2554a 10px);transition:width 0.5s cubic-bezier(0.16,1,0.3,1);"></div>
+        </div>
+        <a href="compliancebrief.html" target="_blank" rel="noopener" title="Data sourcing &amp; compliance brief" style="text-decoration:none;display:inline-flex;align-items:center;gap:5px;border:1.5px solid #283648;background:#f6f1e4;color:#283648;font-family:'Special Elite',monospace;font-size:0.56rem;letter-spacing:0.06em;text-transform:uppercase;padding:6px 9px;border-radius:2px;cursor:pointer;">📋 compliance</a>
+        <button type="button" id="btnReset" title="Reset board" style="border:1.5px dashed #b9aa8c;background:transparent;color:#6a6048;font-family:'Special Elite',monospace;font-size:0.56rem;letter-spacing:0.06em;text-transform:uppercase;padding:6px 9px;border-radius:2px;cursor:pointer;">↺ reset</button>
+      </div>
+    </header>
+
+    <!-- VIEWPORT -->
+    <div style="position:relative;flex:1;min-height:0;overflow:hidden;">
+      <button type="button" id="btnPrev" aria-label="Previous" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);z-index:6;width:38px;height:38px;border-radius:50%;border:1.5px solid #283648;background:rgba(255,253,248,0.92);color:#283648;cursor:pointer;font-size:1rem;display:flex;align-items:safe center;justify-content:safe center;box-shadow:2px 2px 0 rgba(40,54,72,0.14);">◀</button>
+      <button type="button" id="btnNext" aria-label="Next" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);z-index:6;width:38px;height:38px;border-radius:50%;border:1.5px solid #283648;background:rgba(255,253,248,0.92);color:#283648;cursor:pointer;font-size:1rem;display:flex;align-items:safe center;justify-content:safe center;box-shadow:2px 2px 0 rgba(40,54,72,0.14);">▶</button>
+
+      <div id="scroller" class="laf-scroller" style="height:100%;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;display:flex;">
+
+        <!-- PANEL 1 · OVERVIEW -->
+        <section data-screen-label="Overview" style="flex:0 0 100%;height:100%;scroll-snap-align:start;overflow-y:auto;display:flex;align-items:safe center;justify-content:safe center;padding:30px 64px;">
+          <div style="width:100%;max-width:760px;">
+            <div data-anim style="font-family:'Special Elite',monospace;font-size:0.66rem;letter-spacing:0.16em;text-transform:uppercase;color:#5a7052;">01 — The pitch</div>
+            <h1 data-anim style="font-family:'Caveat',cursive;font-weight:700;font-size:clamp(2.6rem,5vw,3.9rem);line-height:0.92;color:#283648;margin:4px 0 0;">The Literary <span style="color:#b23a30;">Agent</span> Finder</h1>
+            <div data-anim style="margin:6px 0 14px;"><svg width="300" height="12" viewBox="0 0 300 12" preserveAspectRatio="none" style="max-width:100%;"><path class="laf-ink-underline" d="M3 8 C 60 2, 120 11, 180 6 S 270 3, 297 8"></path></svg></div>
+            <p data-anim style="font-size:1.08rem;line-height:1.55;color:#3a4658;margin:0;max-width:560px;">Find, vet &amp; query the right literary agents — and never lose a submission in the spreadsheet again.</p>
+
+            <div data-anim style="display:flex;gap:26px;align-items:center;flex-wrap:wrap;margin-top:24px;background:#fffdf8;border:1.5px solid #283648;border-radius:3px;padding:20px 26px;box-shadow:4px 5px 0 rgba(40,54,72,0.10);">
+              <div style="position:relative;width:118px;height:118px;flex:none;">
+                <svg width="118" height="118" viewBox="0 0 126 126" style="transform:rotate(-90deg);">
+                  <circle cx="63" cy="63" r="52" fill="none" stroke="#e7ddc6" stroke-width="9"></circle>
+                  <circle id="ringCircle" cx="63" cy="63" r="52" fill="none" stroke="#b23a30" stroke-width="9" stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="326.7" style="transition:stroke-dashoffset 0.7s cubic-bezier(0.16,1,0.3,1);"></circle>
+                </svg>
+                <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:safe center;justify-content:safe center;">
+                  <span id="ringPct" style="font-family:'Caveat',cursive;font-weight:700;font-size:2.1rem;color:#283648;line-height:1;" data-count="0" data-suffix="%">0</span>
+                  <span style="font-family:'Special Elite',monospace;font-size:0.5rem;letter-spacing:0.10em;text-transform:uppercase;color:#5a7052;">shipped</span>
+                </div>
+              </div>
+              <div style="display:grid;grid-template-columns:repeat(3,auto);gap:14px 34px;">
+                <div><div style="font-family:'Caveat',cursive;font-weight:700;font-size:2.2rem;color:#283648;line-height:0.85;" data-count="6">6</div><div style="font-family:'Special Elite',monospace;font-size:0.56rem;letter-spacing:0.07em;text-transform:uppercase;color:#7a6f52;margin-top:3px;">Features</div></div>
+                <div><div style="font-family:'Caveat',cursive;font-weight:700;font-size:2.2rem;color:#283648;line-height:0.85;" data-count="6">6</div><div style="font-family:'Special Elite',monospace;font-size:0.56rem;letter-spacing:0.07em;text-transform:uppercase;color:#7a6f52;margin-top:3px;">Phases</div></div>
+                <div><div id="statTasks" style="font-family:'Caveat',cursive;font-weight:700;font-size:2.2rem;color:#283648;line-height:0.85;" data-count="0">0</div><div style="font-family:'Special Elite',monospace;font-size:0.56rem;letter-spacing:0.07em;text-transform:uppercase;color:#7a6f52;margin-top:3px;">Tasks</div></div>
+                <div><div id="statShipped" style="font-family:'Caveat',cursive;font-weight:700;font-size:2.2rem;color:#b23a30;line-height:0.85;" data-count="0">0</div><div style="font-family:'Special Elite',monospace;font-size:0.56rem;letter-spacing:0.07em;text-transform:uppercase;color:#7a6f52;margin-top:3px;">Shipped</div></div>
+                <div><div id="statInflight" style="font-family:'Caveat',cursive;font-weight:700;font-size:2.2rem;color:#5a7052;line-height:0.85;" data-count="0">0</div><div style="font-family:'Special Elite',monospace;font-size:0.56rem;letter-spacing:0.07em;text-transform:uppercase;color:#7a6f52;margin-top:3px;">In flight</div></div>
+                <div><div style="font-family:'Caveat',cursive;font-weight:700;font-size:2.2rem;color:#a98a3a;line-height:0.85;" data-count="5">5</div><div style="font-family:'Special Elite',monospace;font-size:0.56rem;letter-spacing:0.07em;text-transform:uppercase;color:#7a6f52;margin-top:3px;">Rivals</div></div>
+              </div>
+            </div>
+
+            <div data-anim style="display:flex;gap:12px;margin-top:16px;flex-wrap:wrap;">
+              <div style="flex:1;min-width:150px;background:#fffdf8;border:1.5px solid #283648;border-left:4px solid #b23a30;border-radius:3px;padding:12px 14px;"><div style="font-family:'Special Elite',monospace;font-size:0.56rem;letter-spacing:0.07em;text-transform:uppercase;color:#b23a30;">Problem</div><p style="margin:5px 0 0;font-size:0.84rem;line-height:1.45;color:#3a4658;">Querying is a spreadsheet nightmare — stale directories, scattered wishlists, threads you lose track of.</p></div>
+              <div style="flex:1;min-width:150px;background:#fffdf8;border:1.5px solid #283648;border-left:4px solid #5a7052;border-radius:3px;padding:12px 14px;"><div style="font-family:'Special Elite',monospace;font-size:0.56rem;letter-spacing:0.07em;text-transform:uppercase;color:#5a7052;">For</div><p style="margin:5px 0 0;font-size:0.84rem;line-height:1.45;color:#3a4658;">Unagented authors of book-length fiction &amp; memoir, querying their next manuscript.</p></div>
+              <div style="flex:1;min-width:150px;background:#fffdf8;border:1.5px solid #283648;border-left:4px solid #a98a3a;border-radius:3px;padding:12px 14px;"><div style="font-family:'Special Elite',monospace;font-size:0.56rem;letter-spacing:0.07em;text-transform:uppercase;color:#a98a3a;">North star</div><p style="margin:5px 0 0;font-size:0.84rem;line-height:1.45;color:#3a4658;">Shorten the time from finished manuscript to signed agent.</p></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- PANEL 2 · LANDSCAPE -->
+        <section data-screen-label="Landscape" class="laf-col" style="flex:0 0 100%;height:100%;scroll-snap-align:start;overflow-y:auto;display:flex;align-items:safe center;justify-content:safe center;padding:30px 64px;">
+          <div style="width:100%;max-width:880px;">
+            <div data-anim style="font-family:'Special Elite',monospace;font-size:0.66rem;letter-spacing:0.14em;text-transform:uppercase;color:#5a7052;">02 — Competitive landscape</div>
+            <h2 data-anim style="display:inline-block;font-family:'Spectral',serif;font-style:italic;font-weight:600;font-size:1.9rem;color:#283648;margin:5px 0 2px;">Nobody covers all three pillars</h2>
+            <p data-anim style="font-size:0.92rem;color:#5a6473;margin:0 0 16px;max-width:600px;line-height:1.5;">Every rival owns a slice — the <strong style="color:#283648;">Database</strong>, the <strong style="color:#283648;">Match</strong>, or the <strong style="color:#283648;">Tracker</strong>. The dots show who covers what. The empty column is ours.</p>
+            <div id="rivalGrid" data-anim style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;"></div>
+          </div>
+        </section>
+
+        <!-- PANEL 3 · BLUEPRINT -->
+        <section data-screen-label="Blueprint" class="laf-col" style="flex:0 0 100%;height:100%;scroll-snap-align:start;overflow-y:auto;display:flex;align-items:safe center;justify-content:safe center;padding:30px 64px;">
+          <div style="width:100%;max-width:840px;">
+            <div data-anim style="font-family:'Special Elite',monospace;font-size:0.66rem;letter-spacing:0.14em;text-transform:uppercase;color:#5a7052;">03 — Blueprint</div>
+            <h2 data-anim style="display:inline-block;font-family:'Spectral',serif;font-style:italic;font-weight:600;font-size:1.9rem;color:#283648;margin:5px 0 14px;">Data model &amp; screen flow</h2>
+            <div data-anim style="display:grid;grid-template-columns:repeat(4,1fr);gap:11px;">
+              <div style="background:#fffdf8;border:1.5px solid #283648;border-radius:3px;padding:14px;box-shadow:3px 4px 0 rgba(40,54,72,0.10);"><div style="font-family:'Caveat',cursive;font-weight:700;font-size:1.22rem;color:#b23a30;">✍️ Author</div><p style="margin:5px 0 0;font-size:0.72rem;line-height:1.45;color:#6a6f78;font-family:'Special Elite',monospace;">manuscript · genre · word count · comps · bio</p></div>
+              <div style="background:#fffdf8;border:1.5px solid #283648;border-radius:3px;padding:14px;box-shadow:3px 4px 0 rgba(40,54,72,0.10);"><div style="font-family:'Caveat',cursive;font-weight:700;font-size:1.22rem;color:#5a7052;">📇 Agent</div><p style="margin:5px 0 0;font-size:0.72rem;line-height:1.45;color:#6a6f78;font-family:'Special Elite',monospace;">agency · MSWL · genres · deals · response time</p></div>
+              <div style="background:#fffdf8;border:1.5px solid #283648;border-radius:3px;padding:14px;box-shadow:3px 4px 0 rgba(40,54,72,0.10);"><div style="font-family:'Caveat',cursive;font-weight:700;font-size:1.22rem;color:#c2554a;">📬 Query</div><p style="margin:5px 0 0;font-size:0.72rem;line-height:1.45;color:#6a6f78;font-family:'Special Elite',monospace;">status · sent / replied · materials · notes</p></div>
+              <div style="background:#fffdf8;border:1.5px solid #283648;border-radius:3px;padding:14px;box-shadow:3px 4px 0 rgba(40,54,72,0.10);"><div style="font-family:'Caveat',cursive;font-weight:700;font-size:1.22rem;color:#a98a3a;">🎯 Match</div><p style="margin:5px 0 0;font-size:0.72rem;line-height:1.45;color:#6a6f78;font-family:'Special Elite',monospace;">score · ranked reasons · confidence</p></div>
+            </div>
+            <div data-anim style="margin-top:14px;background:#fffdf8;border:1.5px solid #283648;border-radius:3px;padding:16px;box-shadow:3px 4px 0 rgba(40,54,72,0.10);">
+              <div style="font-family:'Special Elite',monospace;font-size:0.58rem;letter-spacing:0.09em;text-transform:uppercase;color:#5a7052;margin-bottom:11px;">Screen flow</div>
+              <div id="flowSteps" style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- PANEL 4 · FEATURES -->
+        <section data-screen-label="Features" class="laf-col" style="flex:0 0 100%;height:100%;scroll-snap-align:start;overflow-y:auto;display:flex;align-items:safe center;justify-content:safe center;padding:30px 64px;">
+          <div style="width:100%;max-width:880px;">
+            <div data-anim style="font-family:'Special Elite',monospace;font-size:0.66rem;letter-spacing:0.14em;text-transform:uppercase;color:#5a7052;">04 — Feature specs</div>
+            <h2 data-anim style="display:inline-block;font-family:'Spectral',serif;font-style:italic;font-weight:600;font-size:1.9rem;color:#283648;margin:5px 0 14px;">Six things it has to do well</h2>
+            <div id="featureGrid" data-anim style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;"></div>
+          </div>
+        </section>
+
+        <!-- PANEL 5 · ROADMAP -->
+        <section data-screen-label="Roadmap" class="laf-col" style="flex:0 0 100%;height:100%;scroll-snap-align:start;overflow-y:auto;display:flex;align-items:safe center;justify-content:safe center;padding:30px 64px;">
+          <div style="width:100%;max-width:860px;">
+            <div data-anim style="font-family:'Special Elite',monospace;font-size:0.66rem;letter-spacing:0.14em;text-transform:uppercase;color:#5a7052;">05 — Roadmap</div>
+            <h2 data-anim style="display:inline-block;font-family:'Spectral',serif;font-style:italic;font-weight:600;font-size:1.9rem;color:#283648;margin:5px 0 12px;">Completion by phase</h2>
+
+            <div id="roadmapBars" data-anim style="display:flex;align-items:flex-end;gap:14px;height:130px;background:#fffdf8;border:1.5px solid #283648;border-radius:3px;padding:14px 18px 12px;box-shadow:3px 4px 0 rgba(40,54,72,0.10);margin-bottom:14px;"></div>
+
+            <div id="roadmapCards" data-anim style="display:grid;grid-template-columns:repeat(2,1fr);gap:9px;"></div>
+          </div>
+        </section>
+
+        <!-- PANEL 6 · BOARD -->
+        <section data-screen-label="Task Board" style="flex:0 0 100%;height:100%;scroll-snap-align:start;display:flex;flex-direction:column;padding:24px 56px 18px;">
+          <div data-anim style="display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex:none;margin-bottom:12px;">
+            <div>
+              <div style="font-family:'Special Elite',monospace;font-size:0.66rem;letter-spacing:0.14em;text-transform:uppercase;color:#5a7052;">06 — Task board</div>
+              <h2 style="display:inline-block;font-family:'Spectral',serif;font-style:italic;font-weight:600;font-size:1.9rem;color:#283648;margin:4px 0 0;">Where the work happens</h2>
+            </div>
+            <div style="font-family:'Caveat',cursive;font-size:1.02rem;color:#5a6473;line-height:1.2;max-width:280px;text-align:right;">Tap ◀ ▶ to move a card · tap the owner to reassign · ＋ adds one. Saved in this browser.</div>
+          </div>
+
+          <div id="boardGrid" data-anim style="flex:1;min-height:0;display:grid;grid-template-columns:repeat(4,1fr);gap:12px;"></div>
+        </section>
+
+      </div>
+    </div>
+
+    <!-- BOTTOM NAV -->
+    <nav style="position:relative;flex:none;display:flex;border-top:1.5px solid rgba(40,54,72,0.32);background:#fffdf8;">
+      <div id="navInd" style="position:absolute;top:0;left:0;height:100%;width:16.6666%;background:rgba(40,54,72,0.10);border-top:3px solid #283648;pointer-events:none;z-index:0;transition:transform 0.35s cubic-bezier(0.16,1,0.3,1);"></div>
+      <div id="navItems" style="display:contents;"></div>
+    </nav>
+
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

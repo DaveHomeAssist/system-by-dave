@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data:; script-src 'self' 'unsafe-inline'; base-uri 'self'">
+<title>Data Sourcing &amp; Compliance Brief — System by Dave</title>
+<meta name="description" content="Internal decision-support memo for the Literary Agent Finder: which agent-data sources are usable, the risk behind each, freshness TTLs, and pre-build guardrails to decide on.">
+<link rel="canonical" href="https://systembydave.com/agent-finder/compliancebrief.html">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#f6f1e4">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="System by Dave">
+<meta property="og:title" content="Data Sourcing & Compliance Brief">
+<meta property="og:description" content="Decision-support memo on agent-data sourcing options, risks, and guardrails for the Literary Agent Finder.">
+<meta property="og:url" content="https://systembydave.com/agent-finder/compliancebrief.html">
+<link rel="icon" href="../svg/system_by_dave_logo_rust.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Special+Elite&family=Spectral:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f6f1e4; --card:#fffdf8; --ink:#283648; --muted:#54606f; --faint:#867b62;
+    --red:#b23a30; --red-soft:#c2554a; --sage:#5a7052; --sage-soft:#6b8260; --gold:#a98a3a; --gold-bright:#e7c45c;
+    --line:rgba(40,54,72,0.32); --rule:#283648;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  /* Larger root so the whole rem-based scale reads comfortably as an ops doc */
+  html{font-size:18px;}
+  body{
+    color:var(--ink);
+    font-family:'Spectral',Georgia,serif;
+    font-size:1.05rem;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    background-color:var(--paper);
+    background-image:
+      repeating-linear-gradient(rgba(56,90,140,0.00) 0px, rgba(56,90,140,0.00) 35px, rgba(56,90,140,0.10) 36px),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  }
+  ::-webkit-scrollbar{width:10px;height:10px;}
+  ::-webkit-scrollbar-thumb{background:#c9bda0;border-radius:99px;}
+  @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;}}
+
+  .wrap{max-width:1080px;margin:0 auto;padding:0 28px 96px;}
+  .mono{font-family:'Special Elite',monospace;}
+  .hand{font-family:'Caveat',cursive;}
+  .kicker{font-family:'Special Elite',monospace;font-size:0.74rem;letter-spacing:0.13em;text-transform:uppercase;color:var(--sage);}
+  .card{background:var(--card);border:1.5px solid var(--ink);border-radius:3px;box-shadow:3px 4px 0 rgba(40,54,72,0.10);}
+  section{padding:50px 0;border-top:1.5px dashed var(--line);}
+  section:first-of-type{border-top:none;}
+  h2{display:inline-block;font-family:'Spectral',serif;font-style:italic;font-weight:600;font-size:2.05rem;color:var(--ink);margin:8px 0 0;}
+  p.lead{font-size:1.12rem;line-height:1.6;color:var(--muted);max-width:720px;margin:12px 0 0;}
+
+  /* HERO */
+  .hero{padding:54px 0 8px;}
+  .hero h1{font-family:'Caveat',cursive;font-weight:700;font-size:clamp(2.9rem,5.6vw,4.3rem);line-height:0.92;color:var(--ink);margin:6px 0 0;}
+  .hero h1 span{color:var(--red);}
+  .uline{margin:8px 0 16px;}
+  .uline path{stroke:var(--red);stroke-width:2.4;fill:none;stroke-linecap:round;}
+  .meta-row{display:flex;flex-wrap:wrap;gap:7px 24px;margin-top:16px;font-family:'Special Elite',monospace;font-size:0.7rem;letter-spacing:0.04em;text-transform:uppercase;color:var(--muted);}
+  .meta-row b{color:var(--ink);}
+
+  .verdict{display:flex;flex-wrap:wrap;gap:16px;margin-top:28px;}
+  .v{flex:1;min-width:270px;border-radius:3px;padding:20px 22px;}
+  .v.nogo{background:var(--ink);box-shadow:4px 5px 0 rgba(40,54,72,0.18);}
+  .v.go{background:var(--card);border:1.5px solid var(--ink);border-left:5px solid var(--sage);box-shadow:3px 4px 0 rgba(40,54,72,0.10);}
+  .v .tag{font-family:'Special Elite',monospace;font-size:0.64rem;letter-spacing:0.08em;text-transform:uppercase;}
+  .v.nogo .tag{color:var(--gold-bright);} .v.go .tag{color:var(--sage);}
+  .v .big{font-family:'Caveat',cursive;font-weight:700;font-size:1.95rem;margin:3px 0 0;line-height:1;}
+  .v.nogo .big{color:#fffdf8;} .v.go .big{color:var(--ink);}
+  .v p{margin:10px 0 0;font-size:1.02rem;line-height:1.5;}
+  .v.nogo p{color:#e6ebf1;} .v.go p{color:var(--muted);}
+
+  /* OPEN QUESTIONS — reinforces that nothing here is final */
+  .open{margin-top:18px;border:1.5px dashed var(--line);border-radius:3px;padding:18px 22px;background:rgba(255,253,248,0.55);}
+  .open-k{font-family:'Special Elite',monospace;font-size:0.68rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--gold);}
+  .open ul{margin:11px 0 0;padding:0;list-style:none;}
+  .open li{position:relative;padding:7px 0 7px 26px;font-size:1.02rem;line-height:1.45;color:var(--ink);}
+  .open li::before{content:'?';position:absolute;left:2px;top:6px;font-family:'Special Elite',monospace;color:var(--gold);font-weight:700;}
+
+  /* STATS */
+  .statband{display:flex;gap:30px;align-items:center;flex-wrap:wrap;margin-top:28px;padding:24px 28px;}
+  .ring-wrap{position:relative;width:128px;height:128px;flex:none;}
+  .ring-wrap svg{width:128px;height:128px;}
+  .ring-wrap .lab{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+  .ring-wrap .num{font-family:'Caveat',cursive;font-weight:700;font-size:2.3rem;color:var(--ink);line-height:1;}
+  .ring-wrap .cap{font-family:'Special Elite',monospace;font-size:0.56rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--sage);}
+  .tiles{display:grid;grid-template-columns:repeat(4,auto);gap:18px 34px;}
+  .tiles .n{font-family:'Caveat',cursive;font-weight:700;font-size:2.3rem;line-height:0.85;}
+  .tiles .c{font-family:'Special Elite',monospace;font-size:0.62rem;letter-spacing:0.05em;text-transform:uppercase;color:#7a6f52;margin-top:5px;}
+
+  /* CHIPS */
+  .chips{display:flex;flex-wrap:wrap;gap:9px;margin-top:24px;}
+  .chip{cursor:pointer;border:1.5px solid var(--ink);background:var(--card);color:var(--muted);
+    font-family:'Special Elite',monospace;font-size:0.68rem;letter-spacing:0.05em;text-transform:uppercase;
+    padding:8px 14px;border-radius:2px;transition:all .15s;box-shadow:2px 2px 0 rgba(40,54,72,0.10);}
+  .chip[aria-pressed="true"]{background:var(--ink);color:#fffdf8;box-shadow:none;transform:translate(2px,2px);}
+  .chip .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:7px;vertical-align:middle;}
+
+  /* SOURCE GRID */
+  .src-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:16px;margin-top:22px;}
+  .src{position:relative;padding:18px 20px 18px 24px;border-radius:3px;background:var(--card);border:1.5px solid var(--ink);
+    box-shadow:3px 4px 0 rgba(40,54,72,0.10);transition:opacity .25s;}
+  .src.hide{display:none;}
+  .src .edge{position:absolute;left:0;top:14px;bottom:14px;width:5px;}
+  .src.v-nogo .edge{background:var(--red);} .src.v-cond .edge{background:var(--gold);} .src.v-go .edge{background:var(--sage);}
+  .src .head{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+  .src .name{font-family:'Spectral',serif;font-weight:600;font-size:1.2rem;color:var(--ink);line-height:1.1;}
+  .pill{font-family:'Special Elite',monospace;font-size:0.56rem;letter-spacing:0.05em;text-transform:uppercase;padding:4px 9px;border-radius:2px;color:#fffdf8;white-space:nowrap;flex:none;}
+  .pill.nogo{background:var(--red);} .pill.cond{background:var(--gold);} .pill.go{background:var(--sage);}
+  .src .restr{margin:12px 0 0;font-size:1rem;line-height:1.48;color:var(--ink);}
+  .src .why-k{margin-top:13px;font-family:'Special Elite',monospace;font-size:0.58rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--red);}
+  .src .why{margin:4px 0 0;font-size:0.96rem;line-height:1.48;color:var(--muted);}
+
+  /* CLAIMS */
+  .claims{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:16px;margin-top:24px;}
+  .claim{padding:18px 20px;}
+  .claim .top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;}
+  .claim .id{font-family:'Special Elite',monospace;font-size:0.6rem;letter-spacing:0.05em;text-transform:uppercase;color:var(--sage);}
+  .finding{font-family:'Special Elite',monospace;font-size:0.56rem;letter-spacing:0.04em;text-transform:uppercase;padding:4px 9px;border-radius:2px;color:#fffdf8;flex:none;}
+  .finding.conf{background:var(--red);} .finding.likely{background:var(--gold);} .finding.supp{background:var(--sage);}
+  .claim h3{font-family:'Spectral',serif;font-weight:600;font-size:1.18rem;color:var(--ink);margin:11px 0 0;}
+  .claim p{margin:7px 0 0;font-size:0.98rem;line-height:1.48;color:var(--muted);}
+
+  /* TTL TABLE */
+  .ttl{margin-top:24px;overflow-x:auto;}
+  table{width:100%;border-collapse:collapse;font-size:0.98rem;min-width:560px;}
+  thead th{text-align:left;font-family:'Special Elite',monospace;font-size:0.6rem;letter-spacing:0.07em;text-transform:uppercase;color:var(--sage);padding:15px 18px;background:rgba(231,221,198,0.5);}
+  tbody td{padding:14px 18px;border-top:1.5px dashed var(--line);color:var(--ink);vertical-align:middle;}
+  .ttl-bar{height:9px;border-radius:2px;background:#f6f1e4;border:1.5px solid var(--ink);overflow:hidden;min-width:100px;padding:1px;}
+  .ttl-bar i{display:block;height:100%;background:repeating-linear-gradient(45deg,var(--sage) 0,var(--sage) 5px,var(--sage-soft) 5px,var(--sage-soft) 10px);}
+  .ttl-days{font-family:'Caveat',cursive;font-weight:700;font-size:1.35rem;color:var(--ink);white-space:nowrap;}
+  .lic{color:var(--red);font-family:'Special Elite',monospace;font-size:0.64rem;text-transform:uppercase;}
+
+  /* BUILD SPLIT */
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:24px;}
+  @media(max-width:700px){.split{grid-template-columns:1fr;}}
+  .col{padding:20px 22px;}
+  .col h3{font-family:'Caveat',cursive;font-weight:700;font-size:1.6rem;margin:0;line-height:1;}
+  .col.dont{border-left:5px solid var(--red);} .col.dont h3{color:var(--red);}
+  .col.do{border-left:5px solid var(--sage);} .col.do h3{color:var(--sage);}
+  .col ul{list-style:none;margin:14px 0 0;padding:0;}
+  .col li{position:relative;padding:9px 0 9px 26px;font-size:1.02rem;line-height:1.45;color:var(--ink);border-top:1.5px dashed var(--line);}
+  .col li:first-child{border-top:none;}
+  .col li::before{position:absolute;left:0;top:9px;font-family:'Special Elite',monospace;}
+  .col.dont li::before{content:'\2715';color:var(--red);} .col.do li::before{content:'\2713';color:var(--sage);}
+
+  /* CONTROLS */
+  .ctrl-progress{display:flex;justify-content:space-between;align-items:baseline;margin-top:8px;}
+  .ctrl-progress .pct{font-family:'Caveat',cursive;font-weight:700;font-size:1.5rem;color:var(--sage);}
+  .ctrl-track{height:10px;background:#f6f1e4;border:1.5px solid var(--ink);border-radius:2px;overflow:hidden;margin-top:7px;padding:1px;}
+  .ctrl-track i{display:block;height:100%;background:repeating-linear-gradient(45deg,var(--sage) 0,var(--sage) 5px,var(--sage-soft) 5px,var(--sage-soft) 10px);transition:width .4s cubic-bezier(.16,1,.3,1);}
+  .ctrls{margin-top:20px;display:flex;flex-direction:column;}
+  .ctrl{display:flex;align-items:center;gap:15px;padding:15px 18px;cursor:pointer;-webkit-user-select:none;user-select:none;border-top:1.5px dashed var(--line);transition:background .15s;}
+  .ctrl:first-child{border-top:none;}
+  .ctrl:hover{background:rgba(231,221,198,0.35);}
+  .box{width:26px;height:26px;flex:none;border:1.5px solid var(--ink);border-radius:2px;background:var(--card);
+    display:flex;align-items:center;justify-content:center;color:#fffdf8;font-size:0.95rem;transition:all .15s;}
+  .ctrl.done .box{background:var(--sage);}
+  .ctrl.done .ctrl-name{color:var(--faint);text-decoration:line-through;}
+  .ctrl-name{flex:1;font-size:1.05rem;color:var(--ink);}
+  .ctrl-owner{font-family:'Special Elite',monospace;font-size:0.62rem;text-transform:uppercase;color:var(--muted);flex:none;}
+  .prio{font-family:'Special Elite',monospace;font-size:0.56rem;letter-spacing:0.05em;padding:4px 9px;border-radius:2px;flex:none;color:#fffdf8;}
+  .prio.p0{background:var(--red);} .prio.p1{background:var(--gold);}
+
+  .foot{text-align:center;padding:38px 0 0;border-top:1.5px dashed var(--line);margin-top:8px;}
+  .foot .s{font-family:'Caveat',cursive;font-weight:600;font-size:1.45rem;color:var(--red);}
+  .foot .d{font-family:'Special Elite',monospace;font-size:0.62rem;letter-spacing:0.06em;text-transform:uppercase;color:var(--faint);display:block;margin-top:6px;}
+  .src-note{font-family:'Special Elite',monospace;font-size:0.64rem;line-height:1.65;color:var(--faint);margin-top:18px;}
+
+  [data-rev]{opacity:0;transform:translateY(18px);transition:opacity .5s ease,transform .5s cubic-bezier(.16,1,.3,1);}
+  [data-rev].in{opacity:1;transform:none;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="kicker" style="color:var(--sage);">Internal memo · decision support</div>
+    <h1>Data Sourcing &amp; <span>Compliance</span></h1>
+    <div class="uline"><svg width="320" height="12" viewBox="0 0 320 12" preserveAspectRatio="none" style="max-width:100%;"><path d="M3 8 C 70 2, 150 11, 220 6 S 300 3, 317 8"></path></svg></div>
+    <p class="lead">Before the match engine reads a single agent, one question shapes the build: <em>which sources can we actually use?</em> This brief lays out the options, the risk behind each, and what we'd still need to verify — so the sourcing call gets made with eyes open, not by default.</p>
+    <div class="meta-row">
+      <span><b>For</b> Connor Altizer · Senior Partner</span>
+      <span><b>From</b> Legal &amp; Technical Research</span>
+      <span><b>Date</b> June 23, 2026</span>
+      <span><b>Re</b> Sourcing options for the agent database</span>
+    </div>
+
+    <div class="verdict">
+      <div class="v nogo">
+        <div class="tag">Where we're leaning</div>
+        <div class="big">Toward a permissioned V1</div>
+        <p>A curated, source-linked build looks like the most defensible path today. Read it as the starting direction to pressure-test — a strong recommendation, not a locked ruling.</p>
+      </div>
+      <div class="v go">
+        <div class="tag">What's still open</div>
+        <div class="big">The reads can move</div>
+        <p>Everything below is current legal-research reading, not a final call. A license, updated terms, or counsel sign-off could shift any source from red toward green — flag anything that looks off.</p>
+      </div>
+    </div>
+
+    <div class="open">
+      <div class="open-k">What would change the call</div>
+      <ul>
+        <li>Which directories would <b>license</b> data to us, rather than sit at a flat No-Go.</li>
+        <li><b>Counsel sign-off</b> on the terms-of-service reads below before any of them gate production.</li>
+        <li>Whether the curated V1 set is <b>50 or 150</b> agents — and who owns keeping it fresh.</li>
+      </ul>
+    </div>
+  </header>
+
+  <!-- AT A GLANCE -->
+  <section data-rev>
+    <div class="kicker">01 — Where things stand</div>
+    <h2>What the review surfaced</h2>
+    <div class="statband card">
+      <div class="ring-wrap">
+        <svg viewBox="0 0 126 126" style="transform:rotate(-90deg);">
+          <circle cx="63" cy="63" r="52" fill="none" stroke="#e7ddc6" stroke-width="9"></circle>
+          <circle id="riskRing" cx="63" cy="63" r="52" fill="none" stroke="#b23a30" stroke-width="9" stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="326.7" style="transition:stroke-dashoffset .9s cubic-bezier(.16,1,.3,1);"></circle>
+        </svg>
+        <div class="lab"><span class="num" data-count="63" data-suffix="%">0%</span><span class="cap">restrictive terms</span></div>
+      </div>
+      <div class="tiles">
+        <div><div class="n" style="color:var(--ink)" data-count="8">0</div><div class="c">Sources reviewed</div></div>
+        <div><div class="n" style="color:var(--red)" data-count="5">0</div><div class="c">Lean No-Go</div></div>
+        <div><div class="n" style="color:var(--gold)" data-count="3">0</div><div class="c">Workable w/ care</div></div>
+        <div><div class="n" style="color:var(--sage)" data-count="4">0</div><div class="c">Risk reads</div></div>
+        <div><div class="n" style="color:var(--ink)" data-count="10">0</div><div class="c">Proposed controls</div></div>
+        <div><div class="n" style="color:var(--red)" data-count="7">0</div><div class="c">Suggested P0s</div></div>
+        <div><div class="n" style="color:var(--sage)" data-count="0">0</div><div class="c">Bulk-scrape OK</div></div>
+        <div><div class="n" style="color:var(--gold)" data-count="150">0</div><div class="c">Curated V1 target</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SOURCE MATRIX -->
+  <section data-rev>
+    <div class="kicker">02 — Sourcing risk matrix</div>
+    <h2>Source by source</h2>
+    <p class="lead">The strongest signal comes from the platforms' own terms. Verdicts are a working read to steer sourcing — filter by posture, and treat each as a decision input to verify, not a rule already in force.</p>
+    <div class="chips" id="filterChips">
+      <button type="button" class="chip" data-filter="all" aria-pressed="true">All</button>
+      <button type="button" class="chip" data-filter="nogo" aria-pressed="false"><span class="dot" style="background:var(--red)"></span>Lean No-Go</button>
+      <button type="button" class="chip" data-filter="cond" aria-pressed="false"><span class="dot" style="background:var(--gold)"></span>Conditional</button>
+      <button type="button" class="chip" data-filter="go" aria-pressed="false"><span class="dot" style="background:var(--sage)"></span>Conditional Go</button>
+    </div>
+    <div class="src-grid" id="srcGrid"></div>
+    <p class="src-note">Citations [S1]–[S8] are review notes, not yet independently re-verified. Treat these verdicts as guidance to inform the sourcing decision — they should pass a citation audit and counsel review before any of them gate production.</p>
+  </section>
+
+  <!-- CLAIMS -->
+  <section data-rev>
+    <div class="kicker">03 — Risk reads</div>
+    <h2>The four questions to settle</h2>
+    <p class="lead">Each is a judgment call with a confidence level attached — not a settled fact. They're here to focus the discussion and show where the exposure actually sits, so we can weigh it rather than guess.</p>
+    <div class="claims">
+      <div class="claim card">
+        <div class="top"><span class="id">Question 1 · TOS / contract</span><span class="finding conf">High concern</span></div>
+        <h3>Legal &amp; TOS risk looks high</h3>
+        <p>MSWL, Reedsy, Duotrope and Publishers Marketplace each carry terms that read as hostile to automated extraction or commercial reuse. That points away from a broad scrape as the default — worth a closer legal look before ruling it in or out.</p>
+      </div>
+      <div class="claim card">
+        <div class="top"><span class="id">Question 2 · Freshness</span><span class="finding likely">Likely</span></div>
+        <h3>Freshness is hard to hold at scale</h3>
+        <p>"Unsustainable" is too absolute for a narrow tool — but a broad DB claiming reliable status, URLs and emails decays fast. The mitigation: give every volatile field a source, a date, and a TTL.</p>
+      </div>
+      <div class="claim card">
+        <div class="top"><span class="id">Question 3 · CFAA / defamation</span><span class="finding likely">Material</span></div>
+        <h3>CFAA probably isn't the main risk</h3>
+        <p><em>Van Buren</em> and <em>hiQ v. LinkedIn</em> suggest public scraping isn't automatically illegal. The exposure that looks more real: contract breach, paywall/login circumvention, database claims, and defamation from shared negative notes.</p>
+      </div>
+      <div class="claim card">
+        <div class="top"><span class="id">Question 4 · Strategy</span><span class="finding supp">Supported</span></div>
+        <h3>Favor curation over broad scraping</h3>
+        <p>The direction the evidence supports: a permission-aware research assistant — permitted/licensed sources, manual curation, field-level freshness, a source-rights register, and no copied expressive text.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FRESHNESS -->
+  <section data-rev>
+    <div class="kicker">04 — Freshness (proposed)</div>
+    <h2>Field-level TTLs</h2>
+    <p class="lead">A static scraped database goes stale within weeks. The proposed rule: every volatile field carries a time-to-live and a required control before the match engine trusts it. Tune the numbers — these are starting points to argue with, not gospel.</p>
+    <div class="ttl card">
+      <table>
+        <thead><tr><th>Field</th><th style="width:150px;">Suggested TTL</th><th style="width:130px;">Freshness</th><th>Suggested control</th></tr></thead>
+        <tbody id="ttlBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- BUILD / DON'T -->
+  <section data-rev>
+    <div class="kicker">05 — Product direction</div>
+    <h2>What we'd lean into, what we'd skip</h2>
+    <div class="split">
+      <div class="col dont card">
+        <h3>Steer away from</h3>
+        <ul>
+          <li>Bulk scrapers over agent directories</li>
+          <li>Copied or paraphrased profile prose at scale</li>
+          <li>Stored paywalled deal data (Publishers Marketplace)</li>
+          <li>Extracted user comments, reports, private query stats</li>
+          <li>Republished negative notes about agents or agencies</li>
+          <li>An "always current" comprehensive-database claim</li>
+        </ul>
+      </div>
+      <div class="col do card">
+        <h3>Lean into</h3>
+        <ul>
+          <li>A curated start set of 50–150 agents</li>
+          <li>Official agency pages as the primary source</li>
+          <li>Only factual fields, each with a source link</li>
+          <li>"Last verified" + "verify before submitting" warnings</li>
+          <li>User-private notes that are never published</li>
+          <li>A permission queue + agent correction / opt-out</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTROLS -->
+  <section data-rev>
+    <div class="kicker">06 — Pre-build controls</div>
+    <h2>Guardrails to decide on</h2>
+    <p class="lead">Proposed guardrails for V1. Treat the P0s as ship-blockers unless we consciously decide otherwise — and use this as a live checklist to track what's actually been settled, not a wall of mandates.</p>
+    <div class="ctrl-progress"><span class="kicker" style="color:var(--sage);">Controls settled</span><span class="pct" id="ctrlPct">0%</span></div>
+    <div class="ctrl-track"><i id="ctrlBar" style="width:0%"></i></div>
+    <div class="ctrls card" id="ctrlList"></div>
+  </section>
+
+  <div class="foot">
+    <span class="s">decide with eyes open</span>
+    <span class="d">Literary Agent Finder · data sourcing &amp; compliance brief · June 23, 2026</span>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var REDUCED = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  var SOURCES = [
+    { name:'MSWL', verdict:'nogo', label:'Lean No-Go', restr:'Personal / non-commercial use only; no robots or spiders to monitor or copy material. [S1]', why:'Express no-bot and non-commercial restrictions.' },
+    { name:'Reedsy', verdict:'nogo', label:'Lean No-Go', restr:'Content downloadable for personal use only; no scraping of Reedsy Content without permission. [S2]', why:'Express anti-scrape language for Reedsy Content.' },
+    { name:'Duotrope', verdict:'nogo', label:'Lean No-Go', restr:'No bots to retrieve content; no data may build another database or compilation. [S3]', why:'No-bot, no commercial reuse, no competing database.' },
+    { name:'Publishers Marketplace', verdict:'nogo', label:'Lean No-Go', restr:'Prohibits spiders/robots/agents; bans aggregation, copying, reposting, redistribution; caps DB reuse. [S4]', why:'Licensed business database with strong redistribution bans.' },
+    { name:'QueryTracker', verdict:'nogo', label:'No-Go w/o permission', restr:'Curated, constantly-updated database; export/print gated to premium members. [S5]', why:'Proprietary curated DB; member-driven stats; frequent updates.' },
+    { name:'AALA', verdict:'cond', label:'Conditional · manual', restr:'No explicit no-bot terms verified, but member login and consent/licensing posture. [S6]', why:'Professional association directory — caution; manual only.' },
+    { name:'AgentQuery', verdict:'cond', label:'Conditional · manual', restr:'Free public DB but all-rights-reserved posture; no-bot terms unverified.', why:'No broad automated commercial reuse without review.' },
+    { name:'Individual agency sites', verdict:'go', label:'Conditional Go', restr:'Use only official, public, non-restricted pages; obey robots/TOS; store minimal facts.', why:'Source-by-source; minimal factual fields + source link only.' }
+  ];
+  var TTLS = [
+    { field:'Open / closed to queries', ttl:'7–14 days', days:11, ctrl:'Show "verify before submitting"' },
+    { field:'Submission URL', ttl:'14–30 days', days:22, ctrl:'Official source link required' },
+    { field:'Contact email / form', ttl:'30 days', days:30, ctrl:'Prefer form URL over copied email' },
+    { field:'Agency affiliation', ttl:'30–60 days', days:45, ctrl:'Recheck before recommendation' },
+    { field:'Genre / wishlist', ttl:'60–90 days', days:75, ctrl:'Summarize only; do not copy prose' },
+    { field:'Sales / deal data', ttl:'License required', days:0, lic:true, ctrl:'Do not scrape Publishers Marketplace' }
+  ];
+  var MAXDAY = 90;
+  var CONTROLS = [
+    { id:'c1', name:'Source-rights register', prio:'p0', owner:'Legal / Ops' },
+    { id:'c2', name:'No-go source blocklist', prio:'p0', owner:'Engineering' },
+    { id:'c3', name:'Field-level TTLs', prio:'p0', owner:'Product / Data' },
+    { id:'c4', name:'Official-source-only ingestion rule', prio:'p0', owner:'Data Ops' },
+    { id:'c5', name:'No copied expressive text policy', prio:'p0', owner:'Legal / Product' },
+    { id:'c6', name:'No paywalled / member-only scraping', prio:'p0', owner:'Engineering' },
+    { id:'c7', name:'No negative shared reputation notes', prio:'p0', owner:'Product / Legal' },
+    { id:'c8', name:'Correction / opt-out workflow', prio:'p1', owner:'Product' },
+    { id:'c9', name:'Permission request template', prio:'p1', owner:'Biz Dev' },
+    { id:'c10', name:'Licensed-source outreach', prio:'p1', owner:'Partnerships' }
+  ];
+
+  var KEY = 'laf-compliance-controls-v1';
+  function loadDone(){ try{ var r=localStorage.getItem(KEY); if(r){var p=JSON.parse(r); if(p&&typeof p==='object') return p;} }catch(e){} return {}; }
+  function saveDone(d){ try{ localStorage.setItem(KEY, JSON.stringify(d)); }catch(e){} }
+  var done = loadDone();
+  function esc(s){ return String(s).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];}); }
+
+  // source matrix
+  var grid = document.getElementById('srcGrid');
+  grid.innerHTML = SOURCES.map(function(s){
+    var pc = s.verdict==='nogo'?'nogo':(s.verdict==='cond'?'cond':'go');
+    return '<div class="src v-'+s.verdict+'" data-verdict="'+s.verdict+'"><span class="edge"></span>'
+      + '<div class="head"><span class="name">'+esc(s.name)+'</span><span class="pill '+pc+'">'+esc(s.label)+'</span></div>'
+      + '<p class="restr">'+esc(s.restr)+'</p>'
+      + '<div class="why-k">Why this read</div><p class="why">'+esc(s.why)+'</p></div>';
+  }).join('');
+
+  var chips = document.querySelectorAll('#filterChips .chip');
+  chips.forEach(function(c){
+    c.addEventListener('click', function(){
+      chips.forEach(function(x){ x.setAttribute('aria-pressed','false'); });
+      c.setAttribute('aria-pressed','true');
+      var f = c.getAttribute('data-filter');
+      document.querySelectorAll('.src').forEach(function(el){
+        el.classList.toggle('hide', !(f==='all' || el.getAttribute('data-verdict')===f));
+      });
+    });
+  });
+
+  // TTL table
+  document.getElementById('ttlBody').innerHTML = TTLS.map(function(t){
+    var bar = t.lic ? '<span class="lic">Licensed</span>' : '<div class="ttl-bar"><i style="width:'+Math.round(t.days/MAXDAY*100)+'%"></i></div>';
+    var days = t.lic ? '<span class="lic">—</span>' : '<span class="ttl-days">'+esc(t.ttl)+'</span>';
+    return '<tr><td>'+esc(t.field)+'</td><td>'+days+'</td><td>'+bar+'</td><td style="color:var(--muted)">'+esc(t.ctrl)+'</td></tr>';
+  }).join('');
+
+  // controls
+  var list = document.getElementById('ctrlList');
+  function renderCtrls(){
+    list.innerHTML = CONTROLS.map(function(c){
+      var d = !!done[c.id];
+      return '<div class="ctrl'+(d?' done':'')+'" data-id="'+c.id+'" role="checkbox" aria-checked="'+d+'" tabindex="0">'
+        + '<span class="box">'+(d?'✓':'')+'</span><span class="ctrl-name">'+esc(c.name)+'</span>'
+        + '<span class="ctrl-owner">'+esc(c.owner)+'</span><span class="prio '+c.prio+'">'+c.prio.toUpperCase()+'</span></div>';
+    }).join('');
+    list.querySelectorAll('.ctrl').forEach(function(el){
+      var toggle=function(){ var id=el.getAttribute('data-id'); done[id]=!done[id]; saveDone(done); renderCtrls(); updateProgress(); };
+      el.addEventListener('click', toggle);
+      el.addEventListener('keydown', function(e){ if(e.key===' '||e.key==='Enter'){ e.preventDefault(); toggle(); } });
+    });
+  }
+  function updateProgress(){
+    var n = CONTROLS.filter(function(c){ return done[c.id]; }).length;
+    var pct = Math.round(n/CONTROLS.length*100);
+    document.getElementById('ctrlPct').textContent = pct+'%';
+    document.getElementById('ctrlBar').style.width = pct+'%';
+  }
+  renderCtrls(); updateProgress();
+
+  // reveals
+  function revealAll(){ document.querySelectorAll('[data-rev]').forEach(function(el){ el.classList.add('in'); }); }
+  if (REDUCED || !('IntersectionObserver' in window)) { revealAll(); }
+  else {
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+    }, { threshold:0.12 });
+    document.querySelectorAll('[data-rev]').forEach(function(el){ io.observe(el); });
+  }
+
+  // count-ups + risk ring (run when glance is in view)
+  function runCounts(){
+    document.querySelectorAll('[data-count]').forEach(function(el){
+      var end = parseFloat(el.getAttribute('data-count'))||0, suf = el.getAttribute('data-suffix')||'';
+      if (REDUCED) { el.textContent = Math.round(end)+suf; return; }
+      var dur=950, t0=performance.now(), fin=false;
+      function finish(){ if(fin)return; fin=true; el.textContent=Math.round(end)+suf; }
+      function step(){ if(fin)return; var p=Math.min(1,(performance.now()-t0)/dur); el.textContent=Math.round(end*(1-Math.pow(1-p,3)))+suf; if(p<1) setTimeout(step,32); else finish(); }
+      setTimeout(step,200); setTimeout(finish,dur+400);
+    });
+    var ring=document.getElementById('riskRing'); if(ring) ring.setAttribute('stroke-dashoffset', 326.7*(1-0.63));
+  }
+  var glance = document.querySelector('section');
+  if (REDUCED || !('IntersectionObserver' in window)) { runCounts(); }
+  else {
+    var io2 = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){ if(e.isIntersecting){ runCounts(); io2.disconnect(); } });
+    }, { threshold:0.3 });
+    io2.observe(glance);
+  }
+})();
+</script>
+</body>
+</html>

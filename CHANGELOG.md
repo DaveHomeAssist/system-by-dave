@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-06-23
+
+* Added an unlisted, noindex **Agent Finder** build notebook at `/agent-finder/` — a self-contained, zero-dependency (vanilla JS) page implementing the Literary Agent Finder design: six horizontally-snapping panels (pitch, competitive landscape, data-model blueprint, feature specs, roadmap) and an editable kanban task board with `localStorage` persistence, count-up stats, and keyboard/arrow/swipe navigation. Smoke-tested headless with zero console errors.
+* Added a companion **Data Sourcing & Compliance Brief** at `/agent-finder/compliancebrief.html` — a decision-support memo on which agent-data sources are usable, the risk behind each, field-level freshness TTLs, and pre-build guardrails (a `localStorage` checklist). Framed as recommendations to pressure-test rather than final rulings; findings are research notes pending counsel review, not legal advice.
+* Both pages are blocked in `robots.txt` and kept out of `sitemap.xml` and site navigation (internal build/planning content). Google Fonts are the only external dependency; the CSP allows `fonts.googleapis.com` / `fonts.gstatic.com` and otherwise restricts to `'self'`.
+
 ## 2026-06-22
 
 * Added static Hat-in-Ring handoff aliases under `/hat-in-ring/` for current candidate pages, feed files, and the nested sitemap so old System by Dave paths return a working handoff to `hatinring.com` instead of the site 404.
