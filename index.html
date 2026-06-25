@@ -267,6 +267,16 @@
     .showcase-cards { grid-template-columns: 1fr; }
     .ethos-points { grid-template-columns: 1fr; }
   }
+  /* AV tools — department menu */
+  .av-dept-menu{margin:0 0 48px;}
+  .av-dept-intro{font-family:var(--font-mono);font-size:13px;color:var(--charcoal-light);margin:0 0 22px;}
+  .av-dept-intro a{color:var(--rust);text-decoration:none;border-bottom:1px solid currentColor;}
+  .av-dept-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:26px 28px;}
+  .av-dept-group h3{font-family:var(--font-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--rust);margin:0 0 10px;padding-bottom:8px;border-bottom:1px solid var(--grid-line-accent);}
+  .av-dept-group ul{list-style:none;margin:0;padding:0;}
+  .av-dept-group li a{display:block;padding:5px 0;color:var(--charcoal);text-decoration:none;font-size:15px;line-height:1.3;transition:color .15s ease,padding-left .15s ease;}
+  .av-dept-group li a:hover{color:var(--rust);padding-left:6px;}
+  @media (max-width:680px){.av-dept-grid{grid-template-columns:1fr 1fr;gap:22px 18px;}}
 </style>
 </head>
 <body>
@@ -473,6 +483,99 @@
   <!-- AV TOOLS -->
   <section class="showcase" id="av-tools">
     <div class="container">
+      <div class="av-dept-menu reveal">
+        <p class="av-dept-intro">Browse every AV tool by department — or open the <a href="av-suite.html">AV Suite</a> operator hub.</p>
+        <div class="av-dept-grid">
+        <div class="av-dept-group">
+          <h3>Run of show</h3>
+          <ul>
+            <li><a href="teleprompter.html">Teleprompter</a></li>
+            <li><a href="show-timer.html">Show Timer</a></li>
+            <li><a href="cueforge.html">CueForge</a></li>
+            <li><a href="playback-check.html">Playback Check</a></li>
+            <li><a href="comms-check.html">Comms Check</a></li>
+          </ul>
+        </div>
+        <div class="av-dept-group">
+          <h3>Audio</h3>
+          <ul>
+            <li><a href="audio-patch.html">Audio Patch</a></li>
+            <li><a href="line-check.html">Line Check</a></li>
+            <li><a href="input-list.html">Input List</a></li>
+            <li><a href="signal-flow.html">Signal Flow</a></li>
+            <li><a href="speaker-plan.html">Speaker Plan</a></li>
+            <li><a href="rf-coordination.html">RF Coordination</a></li>
+          </ul>
+        </div>
+        <div class="av-dept-group">
+          <h3>Video</h3>
+          <ul>
+            <li><a href="video-patch.html">Video Patch</a></li>
+            <li><a href="display-plan.html">Display Plan</a></li>
+            <li><a href="projection-plan.html">Projection Plan</a></li>
+            <li><a href="stream-plan.html">Stream Plan</a></li>
+            <li><a href="record-log.html">Record Log</a></li>
+            <li><a href="camera-shot-list.html">Camera Shot List</a></li>
+          </ul>
+        </div>
+        <div class="av-dept-group">
+          <h3>Lighting</h3>
+          <ul>
+            <li><a href="lighting-patch.html">Lighting Patch</a></li>
+          </ul>
+        </div>
+        <div class="av-dept-group">
+          <h3>Power &amp; data</h3>
+          <ul>
+            <li><a href="power-plan.html">Power Plan</a></li>
+            <li><a href="network-plan.html">Network Plan</a></li>
+            <li><a href="cable-plan.html">Cable Plan</a></li>
+          </ul>
+        </div>
+        <div class="av-dept-group">
+          <h3>Spaces &amp; staging</h3>
+          <ul>
+            <li><a href="plotforge.html">PlotForge</a></li>
+            <li><a href="room-check.html">Room Check</a></li>
+            <li><a href="breakout-room-matrix.html">Breakout Room Matrix</a></li>
+            <li><a href="site-survey.html">Site Survey</a></li>
+          </ul>
+        </div>
+        <div class="av-dept-group">
+          <h3>Logistics</h3>
+          <ul>
+            <li><a href="gear-prep.html">Gear Prep</a></li>
+            <li><a href="truck-pack.html">Truck Pack Plan</a></li>
+            <li><a href="load-in-plan.html">Load-In Plan</a></li>
+            <li><a href="strike-plan.html">Strike Plan</a></li>
+            <li><a href="show-advance.html">Show Advance</a></li>
+          </ul>
+        </div>
+        <div class="av-dept-group">
+          <h3>Crew</h3>
+          <ul>
+            <li><a href="crew-call.html">Crew Call</a></li>
+            <li><a href="crew-time-log.html">Crew Time Log</a></li>
+          </ul>
+        </div>
+        <div class="av-dept-group">
+          <h3>Show docs &amp; client</h3>
+          <ul>
+            <li><a href="show-handoff.html">Show Handoff</a></li>
+            <li><a href="show-report.html">Show Report</a></li>
+            <li><a href="show-task-board.html">Show Task Board</a></li>
+            <li><a href="change-order.html">Change Order</a></li>
+            <li><a href="client-signoff.html">Client Sign-Off</a></li>
+          </ul>
+        </div>
+        <div class="av-dept-group">
+          <h3>Calculators</h3>
+          <ul>
+            <li><a href="av-calculator.html">AV Calculator</a></li>
+          </ul>
+        </div>
+        </div>
+      </div>
       <div class="showcase-row reveal">
         <div class="showcase-label">
           <div class="showcase-label-tag">AV Tools</div>
