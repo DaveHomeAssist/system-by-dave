@@ -723,6 +723,23 @@
     padding:20px clamp(16px,6vw,80px);
   }
   #script::placeholder{color:var(--muted);-webkit-text-stroke:0;text-shadow:none}
+  /* Rich WYSIWYG editor: reuses every .reader-inner visual style (so inline
+     bold/highlight/cue and per-span color/size/weight render exactly as they
+     read) and overrides only the box so it scrolls and edits like a field. */
+  .reader-inner.script-rich{
+    position:static;flex:1 1 auto;min-height:0;height:auto;
+    overflow:auto;outline:0;cursor:text;
+    padding:24px clamp(16px,6vw,80px) 40vh;
+    transform:none !important;will-change:auto;
+  }
+  .reader-inner.script-rich:empty::before{
+    content:attr(data-placeholder);color:var(--muted);
+    -webkit-text-stroke:0;text-shadow:none;pointer-events:none;
+  }
+  /* JS active: the contenteditable is the editor; the textarea is the no-JS fallback. */
+  #scriptRich{display:none}
+  html:not(.no-js) #script{display:none}
+  html:not(.no-js) #scriptRich{display:block}
   body.reading .editor{display:none}
 
   /* end-of-script banner */
@@ -1549,6 +1566,7 @@ Press “Done: start reading”, then hit Play (or the Space bar) to begin. Adju
 Turn on Mirror mode if you read through beam-splitter glass.
 
 Format as you type: **bold**, *italic*, ==highlight==, ~~strike~~, [[camera cue]], ((director note)). Lines like # Act one or == Break == become styled section markers. Toggle the ✦ button to turn formatting off."></textarea>
+      <div id="scriptRich" class="reader-inner script-rich" contenteditable="true" spellcheck="true" role="textbox" aria-multiline="true" aria-label="Your script" data-placeholder="Paste or type your script here… Formatting you apply (color, size, weight, highlight) shows exactly as it will read."></div>
     </div>
 
     <div class="toast" id="toast" role="status">
@@ -1638,6 +1656,7 @@ Format as you type: **bold**, *italic*, ==highlight==, ~~strike~~, [[camera cue]
   var reader   = $('reader');
   var inner    = $('readerInner');
   var script   = $('script');
+  var scriptRich = $('scriptRich');
   var toast    = $('toast');
   var fileInput = $('scriptFileInput');
   var showPackageInput = $('showPackageInput');
@@ -2492,8 +2511,10 @@ Format as you type: **bold**, *italic*, ==highlight==, ~~strike~~, [[camera cue]
   // derived mirror so Phase 1 can adopt it as the authored document. Writing both
   // keeps them from drifting between phases.
   function persistScript(){
+    var rich = richEditorHtml();
+    if(scriptRich) script.value = htmlToPlain(rich); // keep the plain-text mirror exact
     var okPlain = storage.set(SCRIPT_STORE, script.value);
-    storage.set(SCRIPT_RICH_STORE, plainToRichHtml(script.value));
+    storage.set(SCRIPT_RICH_STORE, rich);
     if(!okPlain) updateStorageUi();
   }
   function saveScriptDebounced(){
@@ -3823,6 +3844,7 @@ Format as you type: **bold**, *italic*, ==highlight==, ~~strike~~, [[camera cue]
       return;
     }
     script.value = entry.text;
+    if(scriptRich) setRichEditor(entry.html ? entry.html : plainToRichHtml(entry.text));
     if(includeFormat){
       applyFormatSnapshot(entry.format);
     }
@@ -4077,6 +4099,7 @@ Format as you type: **bold**, *italic*, ==highlight==, ~~strike~~, [[camera cue]
     var readerForFile = new FileReader();
     readerForFile.onload = function(){
       script.value = typeof readerForFile.result === 'string' ? readerForFile.result : '';
+      if(scriptRich) setRichEditor(plainToRichHtml(script.value));
       activeSavedScriptId = '';
       rememberFileStem(fileStemFromText(file && file.name ? file.name.replace(/\.[^.]+$/, '') : ''));
       saveScriptNow();
@@ -4117,26 +4140,25 @@ Format as you type: **bold**, *italic*, ==highlight==, ~~strike~~, [[camera cue]
       return;
     }
     if(isReading()) setReading(false);
-    current = script.value || '';
-    start = Number.isFinite(script.selectionStart) ? script.selectionStart : current.length;
-    end = Number.isFinite(script.selectionEnd) ? script.selectionEnd : start;
-    before = current.slice(0, start);
-    after = current.slice(end);
-    if(current.trim()){
-      insert = (before && !/\n\n$/.test(before) ? '\n\n' : '') + template + (after && !/^\n\n/.test(after) ? '\n\n' : '');
-    }else{
-      insert = template;
-    }
-    script.value = before + insert + after;
-    nextCursor = (before + insert).length;
     activeSavedScriptId = '';
-    saveScriptNow();
-    syncReader();
-    applyTransform();
+    if(scriptRich){
+      scriptRich.focus();
+      var sel = window.getSelection();
+      if(!sel || !sel.rangeCount) placeCaretEnd(scriptRich);
+      var hasText = (scriptRich.innerText || '').trim().length > 0;
+      insertPlainAtCaret((hasText ? '\n\n' : '') + template + '\n\n');
+      scriptRich.dispatchEvent(new Event('input'));
+    }else{
+      // no-JS / fallback: append to the textarea
+      current = script.value || '';
+      script.value = current + (current.trim() ? '\n\n' : '') + template + '\n\n';
+      saveScriptNow();
+      syncReader();
+      applyTransform();
+      script.focus();
+    }
     showToast(false);
     renderSavedScripts();
-    script.focus();
-    script.setSelectionRange(nextCursor, nextCursor);
     if(scriptTemplateSelect) scriptTemplateSelect.value = '';
     signalSuccess(insertTemplateBtn);
     showHintNotice('Template inserted.', 'success');
@@ -4191,6 +4213,7 @@ Format as you type: **bold**, *italic*, ==highlight==, ~~strike~~, [[camera cue]
       exportedAt:new Date().toISOString(),
       title:scriptTitle(),
       script:script.value || '',
+      scriptHtml:richEditorHtml(),
       format:currentFormatSnapshot(),
       customColors:{
         text:sanitizeCustomColorList(customColors.text),
@@ -4320,6 +4343,7 @@ Format as you type: **bold**, *italic*, ==highlight==, ~~strike~~, [[camera cue]
     }
     if(hasScript){
       script.value = packageData.script;
+      if(scriptRich) setRichEditor(packageData.scriptHtml ? packageData.scriptHtml : plainToRichHtml(packageData.script));
       activeSavedScriptId = '';
     }
     if(packageData.format && typeof packageData.format === 'object'){
@@ -4574,6 +4598,25 @@ Format as you type: **bold**, *italic*, ==highlight==, ~~strike~~, [[camera cue]
   function plainToRichHtml(text){
     return sanitizeRichHtml(formatScript(text == null ? '' : text));
   }
+  // Collapse block/line-break markup to the canonical inline + "\n" form the reader
+  // uses (white-space:pre-wrap). Browsers and pasted HTML emit <div>/<p>/<br>; the
+  // whitelist drops those tags, so turn their boundaries into newlines first.
+  function canonicalizeRichHtml(html){
+    var d = document.createElement('div');
+    d.innerHTML = String(html == null ? '' : html);
+    Array.prototype.forEach.call(d.querySelectorAll('br'), function(br){
+      if(br.parentNode) br.parentNode.replaceChild(document.createTextNode('\n'), br);
+    });
+    Array.prototype.forEach.call(d.querySelectorAll('div,p,li,h1,h2,h3,h4,h5,h6'), function(b){
+      b.appendChild(document.createTextNode('\n'));
+    });
+    return sanitizeRichHtml(d.innerHTML).replace(/\n{3,}/g, '\n\n');
+  }
+  function htmlToPlain(html){
+    var d = document.createElement('div');
+    d.innerHTML = String(html == null ? '' : html);
+    return d.textContent || '';
+  }
 
   function escapeHtml(text){
     return String(text == null ? '' : text)
@@ -4615,8 +4658,49 @@ Format as you type: **bold**, *italic*, ==highlight==, ~~strike~~, [[camera cue]
     // controls the line breaks exactly as it did with textContent.
     return escaped.split('\n').map(formatLine).join('\n');
   }
+  // ---- Rich editor (contenteditable) bridge ----
+  // scriptRich is the authored rich document in edit mode; script.value is its
+  // plain-text mirror (and the no-JS fallback). v2 stores the rich HTML, v1 the text.
+  function richEditorHtml(){
+    return scriptRich ? canonicalizeRichHtml(scriptRich.innerHTML) : plainToRichHtml(script.value);
+  }
+  function richEditorText(){
+    return scriptRich ? htmlToPlain(richEditorHtml()) : (script.value || '');
+  }
+  function setRichEditor(html){
+    if(!scriptRich) return;
+    scriptRich.innerHTML = canonicalizeRichHtml(html);
+  }
+  function placeCaretEnd(el){
+    if(!el) return;
+    var range = document.createRange();
+    range.selectNodeContents(el);
+    range.collapse(false);
+    var sel = window.getSelection();
+    if(sel){ sel.removeAllRanges(); sel.addRange(range); }
+  }
+  function insertPlainAtCaret(text){
+    var sel = window.getSelection();
+    if(!sel || !sel.rangeCount){ if(scriptRich) scriptRich.appendChild(document.createTextNode(text)); return; }
+    var range = sel.getRangeAt(0);
+    range.deleteContents();
+    var node = document.createTextNode(text);
+    range.insertNode(node);
+    range.setStartAfter(node); range.setEndAfter(node);
+    sel.removeAllRanges(); sel.addRange(range);
+  }
+  function insertHtmlAtCaret(html){
+    var sel = window.getSelection();
+    if(!sel || !sel.rangeCount) return;
+    var range = sel.getRangeAt(0);
+    range.deleteContents();
+    var frag = range.createContextualFragment(sanitizeRichHtml(html));
+    var last = frag.lastChild;
+    range.insertNode(frag);
+    if(last){ range.setStartAfter(last); range.setEndAfter(last); sel.removeAllRanges(); sel.addRange(range); }
+  }
   function syncReader(){
-    inner.innerHTML = sanitizeRichHtml(formatScript(script.value));
+    inner.innerHTML = richEditorHtml(); // already sanitized + canonicalized
     updateScriptStats();
     rebuildMarkers();
     measure();
@@ -4627,11 +4711,13 @@ Format as you type: **bold**, *italic*, ==highlight==, ~~strike~~, [[camera cue]
     if(!on) cancelCue(false);
     body.classList.toggle('reading', on);
     if(on){
+      if(scriptRich){ script.value = richEditorText(); saveScriptNow(); } // commit edits
       syncReader();
       reader.focus({preventScroll:true});
     }else{
       pause();
-      script.focus();
+      if(scriptRich){ scriptRich.focus(); placeCaretEnd(scriptRich); }
+      else script.focus();
     }
     savePreferences(on ? 'reading' : 'edit');
     updatePrediction();
@@ -5503,7 +5589,7 @@ Format as you type: **bold**, *italic*, ==highlight==, ~~strike~~, [[camera cue]
     });
   });
 
-  // script persistence + live sync
+  // script persistence + live sync (textarea: no-JS fallback path)
   script.addEventListener('input', function(){
     saveScriptDebounced();
     rememberFileStem(fileStemFromText(titleFromScript()));
@@ -5515,6 +5601,36 @@ Format as you type: **bold**, *italic*, ==highlight==, ~~strike~~, [[camera cue]
     }
     updatePrediction();
   });
+
+  // Rich contenteditable editor — the JS-mode editing surface.
+  if(scriptRich){
+    scriptRich.addEventListener('input', function(){
+      script.value = scriptRich.innerText; // fast plain-text mirror; persistScript reconciles on save
+      saveScriptDebounced();
+      rememberFileStem(fileStemFromText(titleFromScript()));
+      updateScriptStats();
+      rebuildMarkers();
+      updatePrediction();
+    });
+    // Keep line breaks as "\n" text nodes (pre-wrap) instead of browser <div>/<p> blocks.
+    scriptRich.addEventListener('beforeinput', function(e){
+      if(e.inputType === 'insertParagraph' || e.inputType === 'insertLineBreak'){
+        e.preventDefault();
+        insertPlainAtCaret('\n');
+        scriptRich.dispatchEvent(new Event('input'));
+      }
+    });
+    // Sanitize pasted content to the whitelist before it enters the document.
+    scriptRich.addEventListener('paste', function(e){
+      var dt = e.clipboardData;
+      if(!dt) return;
+      e.preventDefault();
+      var html = dt.getData('text/html');
+      if(html){ insertHtmlAtCaret(html); }
+      else { insertPlainAtCaret(dt.getData('text/plain') || ''); }
+      scriptRich.dispatchEvent(new Event('input'));
+    });
+  }
 
   // wake controls on activity while playing
   ['mousemove','pointerdown','wheel','touchstart'].forEach(function(ev){
@@ -5653,6 +5769,8 @@ Format as you type: **bold**, *italic*, ==highlight==, ~~strike~~, [[camera cue]
   loadSavedFormats();
   var hadSavedScript = loadScript();
   migrateRichScript();
+  var storedRich = storage.get(SCRIPT_RICH_STORE);
+  setRichEditor(storedRich !== null ? storedRich : plainToRichHtml(script.value));
   applySettings();
   syncReader();
   // First-time loads show the sample in the editor. Saved scripts reopen in the last used mode.
