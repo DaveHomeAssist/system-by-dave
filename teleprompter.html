@@ -740,6 +740,33 @@
   #scriptRich{display:none}
   html:not(.no-js) #script{display:none}
   html:not(.no-js) #scriptRich{display:block}
+  /* Selection formatting bar (rich editor only) */
+  .format-bar{display:none}
+  html:not(.no-js) .format-bar{
+    display:flex;align-items:center;flex-wrap:wrap;gap:6px;
+    padding:8px 16px;border-bottom:1px solid var(--line);
+    background:rgba(10,12,16,.6);
+  }
+  .format-bar .fb-label{
+    color:var(--faint);font-family:var(--ui-mono);font-size:9.5px;
+    letter-spacing:.16em;text-transform:uppercase;margin-right:2px;
+  }
+  .format-bar .fb-btn{
+    min-width:34px;height:30px;padding:0 8px;
+    border:1px solid var(--line);border-radius:8px;
+    background:rgba(255,255,255,.04);color:var(--text);
+    font-size:13px;cursor:pointer;line-height:1;
+    transition:background var(--dur-fast) var(--ease-out),border-color var(--dur-fast) var(--ease-out);
+  }
+  .format-bar .fb-btn:hover{background:rgba(224,138,79,.14);border-color:var(--accent-line)}
+  .format-bar .fb-swatch{
+    display:inline-flex;align-items:center;gap:4px;height:30px;padding:0 6px;
+    border:1px solid var(--line);border-radius:8px;background:rgba(255,255,255,.04);
+    color:var(--text);font-size:13px;cursor:pointer;
+  }
+  .format-bar .fb-swatch input[type=color]{
+    width:22px;height:22px;border:0;padding:0;background:none;cursor:pointer;
+  }
   body.reading .editor{display:none}
 
   /* end-of-script banner */
@@ -1556,6 +1583,18 @@
         <button id="editorControlsToggleBtn" class="editor-controls-btn controls-toggle-inline" type="button" aria-controls="toolbar" aria-expanded="true" aria-pressed="false" aria-label="Hide controls and maximize script" title="Hide controls and maximize script (H)">Hide controls</button>
         <button id="doneBtn" class="primary" type="button">Done: start reading</button>
       </div>
+      <div class="format-bar" id="formatBar" role="toolbar" aria-label="Format selected text">
+        <span class="fb-label">Selection</span>
+        <button id="fbBold" class="fb-btn" type="button" title="Bold selection (Ctrl/Cmd+B)" aria-label="Bold selection"><b>B</b></button>
+        <label class="fb-swatch" title="Text color of selection"><span aria-hidden="true">A</span><input id="fbColor" type="color" value="#ffffff" aria-label="Text color of selection"></label>
+        <button id="fbColorClear" class="fb-btn" type="button" title="Clear text color" aria-label="Clear text color">A⌫</button>
+        <label class="fb-swatch fb-hi" title="Highlight color of selection"><span aria-hidden="true">▦</span><input id="fbHi" type="color" value="#ffd400" aria-label="Highlight color of selection"></label>
+        <button id="fbHiClear" class="fb-btn" type="button" title="Clear highlight" aria-label="Clear highlight">▦⌫</button>
+        <button id="fbSizeDown" class="fb-btn" type="button" title="Smaller selection" aria-label="Smaller selection">A−</button>
+        <button id="fbSizeUp" class="fb-btn" type="button" title="Bigger selection" aria-label="Bigger selection">A+</button>
+        <button id="fbSizeReset" class="fb-btn" type="button" title="Reset selection size" aria-label="Reset selection size">A↺</button>
+        <button id="fbClear" class="fb-btn" type="button" title="Clear all formatting on selection" aria-label="Clear all formatting on selection">Clear</button>
+      </div>
       <textarea id="script" spellcheck="true" autocomplete="off"
         placeholder="Paste or type your script here…
 
@@ -1657,6 +1696,10 @@ Format as you type: **bold**, *italic*, ==highlight==, ~~strike~~, [[camera cue]
   var inner    = $('readerInner');
   var script   = $('script');
   var scriptRich = $('scriptRich');
+  var formatBar = $('formatBar');
+  var fbBold = $('fbBold'), fbColor = $('fbColor'), fbColorClear = $('fbColorClear');
+  var fbHi = $('fbHi'), fbHiClear = $('fbHiClear');
+  var fbSizeUp = $('fbSizeUp'), fbSizeDown = $('fbSizeDown'), fbSizeReset = $('fbSizeReset'), fbClear = $('fbClear');
   var toast    = $('toast');
   var fileInput = $('scriptFileInput');
   var showPackageInput = $('showPackageInput');
@@ -4699,6 +4742,103 @@ Format as you type: **bold**, *italic*, ==highlight==, ~~strike~~, [[camera cue]
     range.insertNode(frag);
     if(last){ range.setStartAfter(last); range.setEndAfter(last); sel.removeAllRanges(); sel.addRange(range); }
   }
+  // ---- Per-span selection formatting ----
+  // Remember the last non-empty selection inside the editor so toolbar actions
+  // (which can blur the editor / open a colour picker) still know what to style.
+  var savedRange = null;
+  function rememberSelection(){
+    if(!scriptRich) return;
+    var sel = window.getSelection();
+    if(!sel || !sel.rangeCount) return;
+    var r = sel.getRangeAt(0);
+    if(!r.collapsed && scriptRich.contains(r.commonAncestorContainer)) savedRange = r.cloneRange();
+  }
+  function activeEditRange(){
+    if(!scriptRich) return null;
+    var sel = window.getSelection();
+    if(sel && sel.rangeCount){
+      var r = sel.getRangeAt(0);
+      if(!r.collapsed && scriptRich.contains(r.commonAncestorContainer)) return r;
+    }
+    if(savedRange && scriptRich.contains(savedRange.commonAncestorContainer)) return savedRange.cloneRange();
+    return null;
+  }
+  function setOrRemoveStyle(el, prop, value){
+    if(!el.style) return;
+    if(value === null || value === '') el.style.removeProperty(prop);
+    else el.style.setProperty(prop, value);
+  }
+  // Restyle the nodes of an extracted range: wrap bare text in styled spans and
+  // set the property on element nodes (clearing the same prop on descendants so
+  // the new value wins). value === null removes the property instead.
+  function applyPropToFragment(frag, prop, value){
+    var nodes = Array.prototype.slice.call(frag.childNodes);
+    nodes.forEach(function(node){
+      if(node.nodeType === 3){
+        if(node.nodeValue === '' || value === null || value === '') return;
+        var span = document.createElement('span');
+        node.parentNode.replaceChild(span, node);
+        span.appendChild(node);
+        setOrRemoveStyle(span, prop, value);
+      }else if(node.nodeType === 1){
+        setOrRemoveStyle(node, prop, value);
+        Array.prototype.forEach.call(node.querySelectorAll('*'), function(el){
+          if(el.style) el.style.removeProperty(prop);
+        });
+      }
+    });
+  }
+  function styleSelection(prop, value){
+    if(!scriptRich) return;
+    var range = activeEditRange();
+    if(!range) return;
+    var sel = window.getSelection();
+    sel.removeAllRanges(); sel.addRange(range);
+    range = sel.getRangeAt(0);
+    if(range.collapsed) return;
+    var frag = range.extractContents();
+    applyPropToFragment(frag, prop, value);
+    var first = frag.firstChild, last = frag.lastChild;
+    range.insertNode(frag);
+    if(first && last){
+      var nr = document.createRange();
+      nr.setStartBefore(first); nr.setEndAfter(last);
+      sel.removeAllRanges(); sel.addRange(nr);
+      savedRange = nr.cloneRange();
+    }
+    scriptRich.focus();
+    scriptRich.dispatchEvent(new Event('input'));
+  }
+  function clearSelectionFormatting(){
+    styleSelection('color', null);
+    styleSelection('background-color', null);
+    styleSelection('font-weight', null);
+    styleSelection('font-size', null);
+  }
+  function nearestInlineStyle(node, prop){
+    while(node && node !== scriptRich){
+      if(node.nodeType === 1 && node.style){
+        var v = node.style.getPropertyValue(prop);
+        if(v) return v;
+      }
+      node = node.parentNode;
+    }
+    return '';
+  }
+  function selectionAnchorNode(){
+    var range = activeEditRange();
+    return range ? range.startContainer : null;
+  }
+  function toggleBoldSelection(){
+    var on = !!nearestInlineStyle(selectionAnchorNode(), 'font-weight');
+    styleSelection('font-weight', on ? null : '700');
+  }
+  function stepSizeSelection(dir){
+    var cur = parseFloat(nearestInlineStyle(selectionAnchorNode(), 'font-size')) || 1;
+    var next = Math.min(2.6, Math.max(0.6, Math.round((cur + dir * 0.2) * 100) / 100));
+    styleSelection('font-size', next === 1 ? null : next + 'em');
+  }
+
   function syncReader(){
     inner.innerHTML = richEditorHtml(); // already sanitized + canonicalized
     updateScriptStats();
@@ -5632,6 +5772,24 @@ Format as you type: **bold**, *italic*, ==highlight==, ~~strike~~, [[camera cue]
     });
   }
 
+  // Selection formatting toolbar
+  document.addEventListener('selectionchange', rememberSelection);
+  if(formatBar){
+    // keep the editor's selection when clicking toolbar buttons
+    formatBar.addEventListener('mousedown', function(e){ if(e.target.closest('button')) e.preventDefault(); });
+    fbBold.addEventListener('click', toggleBoldSelection);
+    fbColorClear.addEventListener('click', function(){ styleSelection('color', null); });
+    fbHiClear.addEventListener('click', function(){ styleSelection('background-color', null); });
+    fbSizeUp.addEventListener('click', function(){ stepSizeSelection(+1); });
+    fbSizeDown.addEventListener('click', function(){ stepSizeSelection(-1); });
+    fbSizeReset.addEventListener('click', function(){ styleSelection('font-size', null); });
+    fbClear.addEventListener('click', clearSelectionFormatting);
+    // colour pickers commit on change (after the native picker closes) so they
+    // don't refocus the editor mid-drag
+    fbColor.addEventListener('change', function(){ styleSelection('color', fbColor.value); });
+    fbHi.addEventListener('change', function(){ styleSelection('background-color', fbHi.value); });
+  }
+
   // wake controls on activity while playing
   ['mousemove','pointerdown','wheel','touchstart'].forEach(function(ev){
     reader.addEventListener(ev, wake, {passive:true});
@@ -5655,8 +5813,8 @@ Format as you type: **bold**, *italic*, ==highlight==, ~~strike~~, [[camera cue]
 
   // ---- Keyboard shortcuts ----
   document.addEventListener('keydown', function(e){
-    // Don't hijack typing in the editor
-    var typing = (document.activeElement === script);
+    // Don't hijack typing in the editor (textarea fallback or rich contenteditable)
+    var typing = (document.activeElement === script || document.activeElement === scriptRich);
     var k = e.key;
 
     if(isRemoteMode){
@@ -5700,6 +5858,10 @@ Format as you type: **bold**, *italic*, ==highlight==, ~~strike~~, [[camera cue]
       return;
     }
     if(typing){
+      // bold the current selection in the rich editor
+      if((e.metaKey || e.ctrlKey) && (k === 'b' || k === 'B') && document.activeElement === scriptRich){
+        e.preventDefault(); toggleBoldSelection(); return;
+      }
       // allow Esc to leave the editor into reading mode
       if(k==='Escape'){ e.preventDefault(); setReading(true); }
       return;
