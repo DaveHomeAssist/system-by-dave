@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-06-25
+
+* Updated `/plotforge.html` so `systembydave.com/plotforge` opens the live PlotForge beta at `https://plotforge-beta.vercel.app/`, preserving query strings and hash fragments with a static fallback link.
+
 ## 2026-06-23
 
 * Added an unlisted, noindex **Agent Finder** build notebook at `/agent-finder/` — a self-contained, zero-dependency (vanilla JS) page implementing the Literary Agent Finder design: six horizontally-snapping panels (pitch, competitive landscape, data-model blueprint, feature specs, roadmap) and an editable kanban task board with `localStorage` persistence, count-up stats, and keyboard/arrow/swipe navigation. Smoke-tested headless with zero console errors.
