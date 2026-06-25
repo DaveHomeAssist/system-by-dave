@@ -165,6 +165,18 @@
     min-width:46px;text-align:center;font-family:var(--ui-mono);font-variant-numeric:tabular-nums;
     font-size:13px;color:var(--text);
   }
+  /* Pace (wpm) control */
+  .wpm-input{
+    width:46px;text-align:center;font-family:var(--ui-mono);font-variant-numeric:tabular-nums;
+    font-size:15px;font-weight:700;color:var(--text);
+    background:var(--surface-2);border:1px solid var(--line);border-radius:8px;
+    padding:6px 4px;outline:0;
+  }
+  .wpm-input:focus{border-color:var(--accent-line);box-shadow:0 0 0 1px rgba(224,138,79,.18)}
+  .group .wpm-unit{color:var(--faint);font-family:var(--ui-mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase}
+  .group .px-readout{min-width:0;font-size:10.5px;color:var(--muted)}
+  .group .px-readout::after{content:" px/s";color:var(--faint)}
+  select.pace-select{max-width:170px}
 
   button{
     font:inherit;color:var(--text);cursor:pointer;
@@ -581,6 +593,23 @@
     height:100%;
     border-radius:inherit;
     background:linear-gradient(90deg,var(--accent),#ffd48a);
+    transition:width var(--dur-fast) var(--ease-out);
+  }
+  /* Completion % — emphasized in the HUD */
+  #progressOut{
+    font-size:15px;font-weight:800;color:#ffe7bf;
+    font-variant-numeric:tabular-nums;letter-spacing:.01em;
+  }
+  /* Always-visible completion bar across the bottom of the reader */
+  .reader-progress{
+    position:absolute;left:0;right:0;bottom:0;z-index:7;
+    height:8px;background:rgba(255,255,255,.08);
+    pointer-events:none;
+  }
+  .reader-progress-fill{
+    display:block;width:0%;height:100%;
+    background:linear-gradient(90deg,var(--accent),#ffd48a);
+    box-shadow:0 0 12px rgba(224,138,79,.5);
     transition:width var(--dur-fast) var(--ease-out);
   }
   .cue-overlay{
@@ -1225,11 +1254,21 @@
       <button id="restartBtn" class="icon" type="button" title="Restart from top (R)" aria-label="Restart from top">⮌</button>
     </div>
 
-    <div class="group" aria-label="Scroll speed">
-      <span class="label">Speed</span>
+    <div class="group" aria-label="Reading pace">
+      <span class="label">Pace</span>
       <button class="icon" type="button" data-act="speedDown" title="Slower (Arrow Down)" aria-label="Decrease speed">−</button>
-      <span class="readout" id="speedOut" aria-live="off">60</span>
+      <input id="wpmInput" class="wpm-input" type="text" inputmode="numeric" maxlength="3" value="140" title="Reading pace in words per minute — type a number or use −/+. The same number reproduces the pace on any script." aria-label="Reading pace in words per minute">
+      <span class="wpm-unit">wpm</span>
       <button class="icon" type="button" data-act="speedUp" title="Faster (Arrow Up)" aria-label="Increase speed">+</button>
+      <span class="readout px-readout" id="speedOut" aria-live="off" title="Scroll speed in pixels per second">60</span>
+    </div>
+
+    <div class="group toolbar-advanced" aria-label="Saved reading paces">
+      <span class="label">Saved pace</span>
+      <select id="paceSelect" class="pace-select" title="Recall a saved reading pace" aria-label="Saved reading paces"></select>
+      <button id="savePaceBtn" type="button" title="Save the current pace as a named favorite">Save</button>
+      <button id="pinPaceBtn" type="button" title="Pin the selected pace as the default for new scripts">Pin</button>
+      <button id="deletePaceBtn" type="button" title="Delete the selected saved pace">Del</button>
     </div>
 
     <div class="group toolbar-advanced" aria-label="Target runtime">
@@ -1571,6 +1610,7 @@
         <div class="reader-inner" id="readerInner"></div>
       </div>
       <div class="marker-measure" id="markerMeasure" aria-hidden="true"></div>
+      <div class="reader-progress" aria-hidden="true"><span class="reader-progress-fill" id="readerProgressFill"></span></div>
     </div>
 
     <div class="editor" id="editor">
@@ -1700,6 +1740,9 @@ Format as you type: **bold**, *italic*, ==highlight==, ~~strike~~, [[camera cue]
   var fbBold = $('fbBold'), fbColor = $('fbColor'), fbColorClear = $('fbColorClear');
   var fbHi = $('fbHi'), fbHiClear = $('fbHiClear');
   var fbSizeUp = $('fbSizeUp'), fbSizeDown = $('fbSizeDown'), fbSizeReset = $('fbSizeReset'), fbClear = $('fbClear');
+  var wpmInput = $('wpmInput'), speedOut = $('speedOut');
+  var paceSelect = $('paceSelect'), savePaceBtn = $('savePaceBtn'), pinPaceBtn = $('pinPaceBtn'), deletePaceBtn = $('deletePaceBtn');
+  var readerProgressFill = $('readerProgressFill');
   var toast    = $('toast');
   var fileInput = $('scriptFileInput');
   var showPackageInput = $('showPackageInput');
@@ -2405,6 +2448,7 @@ Format as you type: **bold**, *italic*, ==highlight==, ~~strike~~, [[camera cue]
   var PREF_STORE = 'teleprompter.preferences.v1';
   var SAVED_SCRIPTS_STORE = 'teleprompter.savedScripts.v1';
   var SAVED_FORMATS_STORE = 'teleprompter.savedFormats.v1';
+  var PACE_PRESETS_STORE = 'teleprompter.pacePresets.v1';
   var CUSTOM_COLORS_STORE = 'teleprompter.customColors.v1';
   var SHOW_PACKAGE_SCHEMA = 'system-by-dave.teleprompter.show.v1';
   var REMOTE_SESSION_STORE = 'teleprompter.remoteSession.v1';
@@ -2436,6 +2480,8 @@ Format as you type: **bold**, *italic*, ==highlight==, ~~strike~~, [[camera cue]
   var activeSavedFormatId = '';
   var customColors = {text:[], bg:[], line:[]};
   var savedScripts = [];
+  var pacePresets = [];
+  var MAX_PACE_PRESETS = 24;
   var activeSavedScriptId = '';
   var savedScriptFilterText = '';
   var scriptStats = {
@@ -3182,6 +3228,8 @@ Format as you type: **bold**, *italic*, ==highlight==, ~~strike~~, [[camera cue]
     updateScheduleUi(total);
     updateNextCueUi(nextCue);
     if(progressFill) progressFill.style.width = pct + '%';
+    if(readerProgressFill) readerProgressFill.style.width = pct + '%';
+    renderSpeedReadouts();
     if(markerOut && !scriptMarkers.length) markerOut.textContent = 'No markers';
     if(scriptMeta){
       var rate = scriptStats.words && total ? Math.round(scriptStats.words / Math.max(total / 60, 0.01)) : 0;
@@ -3711,6 +3759,98 @@ Format as you type: **bold**, *italic*, ==highlight==, ~~strike~~, [[camera cue]
     }
   }
 
+  // ---- Saved reading paces (global wpm presets) ----
+  function newPaceId(){ return 'pace-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 7); }
+  function sanitizePacePreset(item){
+    if(!item || typeof item !== 'object') return null;
+    var wpm = typeof item.wpm === 'number' && item.wpm > 0 ? Math.round(clamp(item.wpm, 20, 1000)) : 0;
+    if(!wpm) return null;
+    var id = typeof item.id === 'string' && item.id ? item.id.slice(0, 60) : newPaceId();
+    var name = typeof item.name === 'string' && item.name.trim() ? item.name.trim().slice(0, 40) : (wpm + ' wpm');
+    return { id:id, name:name, wpm:wpm, pinned:item.pinned === true };
+  }
+  function loadPacePresets(){
+    pacePresets = [];
+    try{
+      var raw = storage.get(PACE_PRESETS_STORE);
+      if(!raw) return;
+      var data = JSON.parse(raw);
+      var list = Array.isArray(data) ? data : (data && Array.isArray(data.presets) ? data.presets : []);
+      pacePresets = list.map(sanitizePacePreset).filter(Boolean).slice(0, MAX_PACE_PRESETS);
+    }catch(e){ pacePresets = []; }
+  }
+  function savePacePresets(){
+    return storage.set(PACE_PRESETS_STORE, JSON.stringify({ presets:pacePresets }));
+  }
+  function pinnedPaceWpm(){
+    var p = pacePresets.find(function(x){ return x.pinned; });
+    return p ? p.wpm : 0;
+  }
+  function renderPacePresets(){
+    if(!paceSelect) return;
+    var selected = paceSelect.value;
+    paceSelect.innerHTML = '';
+    var ph = document.createElement('option');
+    ph.value = '';
+    ph.textContent = pacePresets.length ? 'Saved paces…' : 'No saved paces';
+    paceSelect.appendChild(ph);
+    pacePresets.forEach(function(p){
+      var opt = document.createElement('option');
+      opt.value = p.id;
+      opt.textContent = (p.pinned ? '★ ' : '') + p.name + ' · ' + p.wpm + ' wpm';
+      paceSelect.appendChild(opt);
+    });
+    if(pacePresets.some(function(p){ return p.id === selected; })) paceSelect.value = selected;
+    else { var pin = pacePresets.find(function(p){ return p.pinned; }); paceSelect.value = pin ? pin.id : ''; }
+  }
+  function saveCurrentPaceLocal(){
+    if(!storage.isAvailable()){ signalError(savePaceBtn); showHintNotice('Saved paces need browser storage.', 'error'); return; }
+    var wpm = currentWpm();
+    if(!wpm){ signalError(savePaceBtn); showHintNotice('Set a pace on a script first, then Save.', 'error'); return; }
+    var name = window.prompt('Name this pace', 'Pace ' + wpm);
+    if(name === null) return;
+    var preset = sanitizePacePreset({ name:(name || '').trim() || (wpm + ' wpm'), wpm:wpm });
+    pacePresets = pacePresets.filter(function(p){ return p.name.toLowerCase() !== preset.name.toLowerCase(); });
+    pacePresets.unshift(preset);
+    pacePresets = pacePresets.slice(0, MAX_PACE_PRESETS);
+    if(savePacePresets()){
+      renderPacePresets();
+      if(paceSelect) paceSelect.value = preset.id;
+      signalSuccess(savePaceBtn);
+      showHintNotice('Saved pace "' + preset.name + '" (' + wpm + ' wpm).', 'success');
+    }else{ signalError(savePaceBtn); showHintNotice('Could not save the pace.', 'error'); }
+  }
+  function pinSelectedPace(){
+    var id = paceSelect ? paceSelect.value : '';
+    var target = pacePresets.find(function(p){ return p.id === id; });
+    if(!target){ signalError(pinPaceBtn); showHintNotice('Pick a saved pace to pin.', 'error'); return; }
+    var turningOn = !target.pinned;
+    pacePresets.forEach(function(p){ p.pinned = false; });
+    target.pinned = turningOn;
+    if(savePacePresets()){
+      renderPacePresets();
+      signalSuccess(pinPaceBtn);
+      showHintNotice(turningOn ? '"' + target.name + '" pinned as the default pace.' : 'Default pace cleared.', 'success');
+    }else{ signalError(pinPaceBtn); showHintNotice('Could not pin the pace.', 'error'); }
+  }
+  function deleteSelectedPace(){
+    var id = paceSelect ? paceSelect.value : '';
+    var target = pacePresets.find(function(p){ return p.id === id; });
+    if(!target){ signalError(deletePaceBtn); showHintNotice('Pick a saved pace to delete.', 'error'); return; }
+    pacePresets = pacePresets.filter(function(p){ return p.id !== id; });
+    if(savePacePresets()){
+      renderPacePresets();
+      signalSuccess(deletePaceBtn);
+      showHintNotice('Deleted pace "' + target.name + '".', 'success');
+    }else{ signalError(deletePaceBtn); showHintNotice('Could not delete the pace.', 'error'); }
+  }
+  function applySelectedPace(){
+    var id = paceSelect ? paceSelect.value : '';
+    var target = pacePresets.find(function(p){ return p.id === id; });
+    if(!target) return;
+    applyPaceWpm(target.wpm, true);
+  }
+
   function sanitizeSavedScript(item){
     if(!item || typeof item !== 'object') return null;
     if(typeof item.text !== 'string') return null;
@@ -3720,6 +3860,8 @@ Format as you type: **bold**, *italic*, ==highlight==, ~~strike~~, [[camera cue]
       id:id.slice(0, 80),
       title:title.slice(0, 80),
       text:item.text,
+      html:typeof item.html === 'string' ? item.html : '',
+      paceWpm:typeof item.paceWpm === 'number' && item.paceWpm > 0 ? Math.round(clamp(item.paceWpm, 20, 1000)) : 0,
       format:item.format && typeof item.format === 'object' ? item.format : {},
       tags:sanitizeTags(item.tags),
       favorite:item.favorite === true,
@@ -3850,6 +3992,8 @@ Format as you type: **bold**, *italic*, ==highlight==, ~~strike~~, [[camera cue]
       id:newSavedScriptId(),
       title:'',
       text:'',
+      html:'',
+      paceWpm:0,
       format:{},
       tags:[],
       favorite:false,
@@ -3857,6 +4001,8 @@ Format as you type: **bold**, *italic*, ==highlight==, ~~strike~~, [[camera cue]
     };
     entry.title = scriptTitle().slice(0, 80);
     entry.text = text;
+    entry.html = richEditorHtml();
+    entry.paceWpm = currentWpm();
     entry.format = currentFormatSnapshot();
     entry.tags = sanitizeTags(entry.tags);
     entry.updatedAt = new Date().toISOString();
@@ -3893,6 +4039,11 @@ Format as you type: **bold**, *italic*, ==highlight==, ~~strike~~, [[camera cue]
     }
     saveScriptNow();
     syncReader();
+    // restore the script's own remembered pace, else the pinned default
+    if(includeFormat){
+      var loadPace = entry.paceWpm > 0 ? entry.paceWpm : pinnedPaceWpm();
+      if(loadPace > 0) applyPaceWpm(loadPace, false);
+    }
     applyTransform();
     showToast(false);
     rememberFileStem(fileStemFromText(entry.title));
@@ -4229,6 +4380,8 @@ Format as you type: **bold**, *italic*, ==highlight==, ~~strike~~, [[camera cue]
     return {
       title:clean.title,
       text:clean.text,
+      html:clean.html,
+      paceWpm:clean.paceWpm,
       format:clean.format,
       tags:clean.tags,
       favorite:clean.favorite,
@@ -4505,7 +4658,7 @@ Format as you type: **bold**, *italic*, ==highlight==, ~~strike~~, [[camera cue]
     document.documentElement.style.setProperty('--reader-color', readerColor);
     document.documentElement.style.setProperty('--reader-bg', readerBg);
     document.documentElement.style.setProperty('--line-color', lineColor);
-    $('speedOut').textContent = String(SPEED.val);
+    renderSpeedReadouts();
     $('fontOut').textContent  = String(FONT.val);
     $('lhOut').textContent    = LH.val.toFixed(1);
     $('widthOut').textContent = String(WIDTH.val);
@@ -4844,6 +4997,7 @@ Format as you type: **bold**, *italic*, ==highlight==, ~~strike~~, [[camera cue]
     updateScriptStats();
     rebuildMarkers();
     measure();
+    renderSpeedReadouts();
   }
 
   // ---- Modes ----
@@ -5182,7 +5336,46 @@ Format as you type: **bold**, *italic*, ==highlight==, ~~strike~~, [[camera cue]
   function changeFont(dir){ markCustomFormat(); bump(FONT, dir, 'fontOut'); applyMetric(); }
   function changeLH(dir){ markCustomFormat(); bump(LH, dir, 'lhOut', function(v){return v.toFixed(1);}); applyMetric(); }
   function changeWidth(dir){ markCustomFormat(); bump(WIDTH, dir, 'widthOut'); applyMetric(); }
-  function changeSpeed(dir){ bump(SPEED, dir, 'speedOut'); updateRunHud(); refreshRundownIfOpen(); savePreferences('speed'); updatePrediction(); }
+  // ---- Reading pace (words per minute) ----
+  // px/s is the scroll unit; wpm is the speaker-facing value because it stays
+  // stable across scripts and font sizes (px/s does not).
+  function currentWpm(){
+    var w = scriptStats.words || 0;
+    if(!w || maxScroll <= 0 || SPEED.val <= 0) return 0;
+    return Math.round(w * 60 * SPEED.val / maxScroll);
+  }
+  function speedForWpm(wpm){
+    var w = scriptStats.words || 0;
+    if(!w || maxScroll <= 0 || !(wpm > 0)) return SPEED.val;
+    return clamp(Math.round(wpm * maxScroll / (w * 60)), SPEED.min, SPEED.max);
+  }
+  function renderSpeedReadouts(){
+    if(speedOut) speedOut.textContent = String(SPEED.val);
+    if(wpmInput && document.activeElement !== wpmInput){
+      var wpm = currentWpm();
+      wpmInput.value = wpm ? String(wpm) : '';
+      wpmInput.placeholder = wpm ? '' : '—';
+    }
+  }
+  function applyPaceWpm(wpm, notify){
+    if(!(wpm > 0)){ if(notify) showHintNotice('Enter a words-per-minute number, e.g. 140.', 'error'); return false; }
+    if((scriptStats.words || 0) <= 0 || maxScroll <= 0){ syncReader(); measure(); }
+    if((scriptStats.words || 0) <= 0 || maxScroll <= 0){
+      if(notify) showHintNotice('Add script text before setting a words-per-minute pace.', 'error');
+      return false;
+    }
+    SPEED.val = speedForWpm(wpm);
+    saveSettings();
+    renderSpeedReadouts();
+    updateRunHud();
+    refreshRundownIfOpen();
+    savePreferences('pace-wpm');
+    updatePrediction();
+    scheduleRemoteState(true);
+    if(notify) showHintNotice('Pace set to ~' + currentWpm() + ' wpm (' + SPEED.val + ' px/s).', 'success');
+    return true;
+  }
+  function changeSpeed(dir){ bump(SPEED, dir, 'speedOut'); renderSpeedReadouts(); updateRunHud(); refreshRundownIfOpen(); savePreferences('speed'); updatePrediction(); }
   function fitSpeedToTargetRuntime(){
     var rawSpeed;
     var fittedSpeed;
@@ -5569,6 +5762,18 @@ Format as you type: **bold**, *italic*, ==highlight==, ~~strike~~, [[camera cue]
     }
   });
   startNowBtn.addEventListener('click', setShowStartToNow);
+  // Pace (wpm) control + saved paces
+  if(wpmInput){
+    wpmInput.addEventListener('change', function(){ applyPaceWpm(parseInt(wpmInput.value, 10), true); });
+    wpmInput.addEventListener('keydown', function(e){
+      if(e.key === 'Enter'){ e.preventDefault(); applyPaceWpm(parseInt(wpmInput.value, 10), true); wpmInput.blur(); }
+    });
+    wpmInput.addEventListener('blur', renderSpeedReadouts);
+  }
+  if(paceSelect) paceSelect.addEventListener('change', applySelectedPace);
+  if(savePaceBtn) savePaceBtn.addEventListener('click', saveCurrentPaceLocal);
+  if(pinPaceBtn) pinPaceBtn.addEventListener('click', pinSelectedPace);
+  if(deletePaceBtn) deletePaceBtn.addEventListener('click', deleteSelectedPace);
   exportShowBtn.addEventListener('click', exportShowPackage);
   importShowBtn.addEventListener('click', function(){
     showPackageInput.value = '';
@@ -5795,15 +6000,23 @@ Format as you type: **bold**, *italic*, ==highlight==, ~~strike~~, [[camera cue]
     reader.addEventListener(ev, wake, {passive:true});
   });
 
-  // wheel to scrub when paused
+  // wheel adjusts live speed while playing; scrubs position when paused
+  var wheelSpeedTs = 0;
   reader.addEventListener('wheel', function(e){
-    if(playing) return;
     if(!isReading()) return;
     e.preventDefault();
-    pos = clamp(pos + e.deltaY, 0, maxScroll);
-    applyTransform();
-    savePreferences('wheel');
-    updatePrediction();
+    if(playing){
+      // throttle so trackpad momentum doesn't spam speed steps / storage writes
+      var now = Date.now();
+      if(now - wheelSpeedTs < 55) return;
+      wheelSpeedTs = now;
+      changeSpeed(e.deltaY < 0 ? +1 : -1); // scroll up = faster, down = slower
+    }else{
+      pos = clamp(pos + e.deltaY, 0, maxScroll);
+      applyTransform();
+      savePreferences('wheel');
+      updatePrediction();
+    }
   }, {passive:false});
 
   reader.addEventListener('pointerdown', startReaderDrag);
@@ -5813,8 +6026,10 @@ Format as you type: **bold**, *italic*, ==highlight==, ~~strike~~, [[camera cue]
 
   // ---- Keyboard shortcuts ----
   document.addEventListener('keydown', function(e){
-    // Don't hijack typing in the editor (textarea fallback or rich contenteditable)
-    var typing = (document.activeElement === script || document.activeElement === scriptRich);
+    // Don't hijack typing in any field (editor, inputs, selects, contenteditable)
+    var ae = document.activeElement;
+    var typing = !!ae && (ae === script || ae === scriptRich || ae.isContentEditable ||
+      ae.tagName === 'INPUT' || ae.tagName === 'SELECT' || ae.tagName === 'TEXTAREA');
     var k = e.key;
 
     if(isRemoteMode){
@@ -5929,6 +6144,8 @@ Format as you type: **bold**, *italic*, ==highlight==, ~~strike~~, [[camera cue]
   loadCustomColors();
   loadSavedScripts();
   loadSavedFormats();
+  loadPacePresets();
+  renderPacePresets();
   var hadSavedScript = loadScript();
   migrateRichScript();
   var storedRich = storage.get(SCRIPT_RICH_STORE);
