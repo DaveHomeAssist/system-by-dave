@@ -2339,6 +2339,7 @@ Format as you type: **bold**, *italic*, ==highlight==, ~~strike~~, [[camera cue]
   }
 
   var SCRIPT_STORE = 'teleprompter.script.v1';
+  var SCRIPT_RICH_STORE = 'teleprompter.script.v2'; // rich (per-span styled) HTML; v1 stays the plain-text mirror
   var PREF_STORE = 'teleprompter.preferences.v1';
   var SAVED_SCRIPTS_STORE = 'teleprompter.savedScripts.v1';
   var SAVED_FORMATS_STORE = 'teleprompter.savedFormats.v1';
@@ -2487,18 +2488,30 @@ Format as you type: **bold**, *italic*, ==highlight==, ~~strike~~, [[camera cue]
     return false;
   }
   var saveTimer=null;
+  // Phase 0: v1 (plain text) is the source of truth; v2 (rich HTML) is kept as a
+  // derived mirror so Phase 1 can adopt it as the authored document. Writing both
+  // keeps them from drifting between phases.
+  function persistScript(){
+    var okPlain = storage.set(SCRIPT_STORE, script.value);
+    storage.set(SCRIPT_RICH_STORE, plainToRichHtml(script.value));
+    if(!okPlain) updateStorageUi();
+  }
   function saveScriptDebounced(){
     if(saveTimer) clearTimeout(saveTimer);
-    saveTimer = setTimeout(function(){
-      if(!storage.set(SCRIPT_STORE, script.value)) updateStorageUi();
-    }, 300);
+    saveTimer = setTimeout(persistScript, 300);
   }
   function saveScriptNow(){
     if(saveTimer){
       clearTimeout(saveTimer);
       saveTimer = null;
     }
-    if(!storage.set(SCRIPT_STORE, script.value)) updateStorageUi();
+    persistScript();
+  }
+  // Ensure a v2 rich snapshot exists for the loaded script (one-time migration).
+  function migrateRichScript(){
+    if(!storage.isAvailable()) return;
+    if(storage.get(SCRIPT_RICH_STORE) !== null) return;
+    storage.set(SCRIPT_RICH_STORE, plainToRichHtml(script.value));
   }
 
   function loadPreferences(){
@@ -4504,6 +4517,64 @@ Format as you type: **bold**, *italic*, ==highlight==, ~~strike~~, [[camera cue]
   // Inline formatting: a small, deliberately conservative markdown-ish parser.
   // The script body is escaped first, then a controlled set of spans/tags is
   // injected — no arbitrary HTML from the script ever reaches the DOM.
+  // ---- Rich-text whitelist sanitizer ----
+  // Every string that becomes reader innerHTML passes through this. Only the
+  // inline tags the formatter emits plus a few editor primitives survive, and
+  // <span>s may carry only color / background / weight / size. A pasted or
+  // migrated document can never smuggle script, layout CSS, urls, or remote
+  // resources. Built on detached DOM nodes so nothing fetches or executes.
+  var RICH_ALLOWED_TAGS = {STRONG:1, EM:1, S:1, MARK:1, BR:1, SPAN:1, B:1, I:1, U:1};
+  // Tags whose entire subtree is discarded (text included) rather than unwrapped.
+  var RICH_DROP_SUBTREE = {SCRIPT:1, STYLE:1, TITLE:1, NOSCRIPT:1, IFRAME:1, OBJECT:1, EMBED:1, TEMPLATE:1, HEAD:1, LINK:1, META:1};
+  var RICH_ALLOWED_CLASSES = {
+    'tp-hl':1, 'tp-cue':1, 'tp-cue-line':1, 'tp-note':1, 'tp-divider':1,
+    'tp-h':1, 'tp-h1':1, 'tp-h2':1, 'tp-h3':1, 'tp-h4':1, 'tp-h5':1, 'tp-h6':1
+  };
+  var RICH_ALLOWED_STYLE = {'color':1, 'background-color':1, 'font-weight':1, 'font-size':1};
+  function sanitizeRichStyle(value){
+    var out = [];
+    String(value == null ? '' : value).split(';').forEach(function(decl){
+      var idx = decl.indexOf(':');
+      if(idx < 0) return;
+      var prop = decl.slice(0, idx).trim().toLowerCase();
+      var val = decl.slice(idx + 1).trim();
+      if(!RICH_ALLOWED_STYLE[prop] || !val) return;
+      // reject anything that could break out of the value or pull a resource
+      if(/[<>{}\\"']|url\(|expression|javascript:|@import|\/\*/i.test(val)) return;
+      out.push(prop + ':' + val);
+    });
+    return out.join(';');
+  }
+  function sanitizeRichInto(node, out){
+    var i, child, tag, clean, cls, style;
+    for(i = 0; i < node.childNodes.length; i++){
+      child = node.childNodes[i];
+      if(child.nodeType === 3){ out.appendChild(document.createTextNode(child.nodeValue)); continue; }
+      if(child.nodeType !== 1) continue; // drop comments and the rest
+      tag = child.tagName;
+      if(RICH_DROP_SUBTREE[tag]) continue; // discard tag and its contents
+      if(!RICH_ALLOWED_TAGS[tag]){ sanitizeRichInto(child, out); continue; } // unwrap, keep clean contents
+      clean = document.createElement(tag);
+      cls = (child.getAttribute('class') || '').split(/\s+/).filter(function(c){ return RICH_ALLOWED_CLASSES[c]; });
+      if(cls.length) clean.setAttribute('class', cls.join(' '));
+      style = sanitizeRichStyle(child.getAttribute('style'));
+      if(style) clean.setAttribute('style', style);
+      out.appendChild(clean);
+      sanitizeRichInto(child, clean);
+    }
+  }
+  function sanitizeRichHtml(html){
+    var src = document.createElement('div');
+    src.innerHTML = String(html == null ? '' : html);
+    var dest = document.createElement('div');
+    sanitizeRichInto(src, dest);
+    return dest.innerHTML;
+  }
+  // Plain script text -> sanitized rich HTML, reusing the existing markup formatter.
+  function plainToRichHtml(text){
+    return sanitizeRichHtml(formatScript(text == null ? '' : text));
+  }
+
   function escapeHtml(text){
     return String(text == null ? '' : text)
       .replace(/&/g, '&amp;')
@@ -4545,7 +4616,7 @@ Format as you type: **bold**, *italic*, ==highlight==, ~~strike~~, [[camera cue]
     return escaped.split('\n').map(formatLine).join('\n');
   }
   function syncReader(){
-    inner.innerHTML = formatScript(script.value);
+    inner.innerHTML = sanitizeRichHtml(formatScript(script.value));
     updateScriptStats();
     rebuildMarkers();
     measure();
@@ -5581,6 +5652,7 @@ Format as you type: **bold**, *italic*, ==highlight==, ~~strike~~, [[camera cue]
   loadSavedScripts();
   loadSavedFormats();
   var hadSavedScript = loadScript();
+  migrateRichScript();
   applySettings();
   syncReader();
   // First-time loads show the sample in the editor. Saved scripts reopen in the last used mode.
