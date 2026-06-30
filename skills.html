@@ -4,362 +4,174 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: https:; script-src 'self' 'unsafe-inline'">
-<title>Skills — System by Dave</title>
-<meta name="description" content="24 Notion AI skills across 6 categories. Writing, formatting, productivity, dev, AV/production, and AI prompt tools — all running natively in Notion.">
+<title>Notion AI Skills — System by Dave</title>
+<meta name="description" content="24 custom skills that run natively inside Notion AI. Right-click any page, pick a skill, and let it work. No plugins, no external apps.">
 <link rel="canonical" href="https://systembydave.com/skills.html">
-<meta name="robots" content="index,follow">
-<meta name="theme-color" content="#F5F0E8">
+<meta name="theme-color" content="#0A0D14">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="System by Dave">
-<meta property="og:title" content="Skills — System by Dave">
-<meta property="og:description" content="24 Notion AI skills across 6 categories. Writing, formatting, productivity, dev, AV/production, and AI prompt tools — all running natively in Notion.">
-<meta property="og:url" content="https://systembydave.com/skills.html">
-<meta property="og:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
-<meta property="og:image:width" content="1024">
-<meta property="og:image:height" content="412">
-<meta property="og:image:alt" content="System by Dave preview banner">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Skills — System by Dave">
-<meta name="twitter:description" content="24 Notion AI skills across 6 categories. Writing, formatting, productivity, dev, AV/production, and AI prompt tools — all running natively in Notion.">
-<meta name="twitter:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<meta property="og:title" content="Notion AI Skills — System by Dave">
+<meta property="og:description" content="24 custom skills that run natively inside Notion AI. No plugins, no external apps.">
 <link rel="icon" href="svg/system_by_dave_logo_rust.svg" type="image/svg+xml">
 <link rel="stylesheet" href="css/fonts.css">
-<link rel="stylesheet" href="css/style.css">
-<script>(function(){try{var t=localStorage.getItem("sbd-theme")||"dark";document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
 <style>
-  .catalog-section { padding: 60px 0 80px; }
-  .catalog-filters { margin-top: 32px; margin-bottom: 48px; }
-  .skill-category { margin-bottom: 48px; }
-  .skill-category-header {
-    display: flex; align-items: center; gap: 12px;
-    padding-bottom: 12px; margin-bottom: 4px;
-    border-bottom: 1px solid var(--grid-line-accent);
-  }
-  .skill-category-name {
-    font-family: var(--font-mono); font-size: 13px; font-weight: 400;
-    letter-spacing: 0.06em; text-transform: uppercase;
-  }
-  .skill-category-count {
-    font-family: var(--font-mono); font-size: 11px;
-    color: var(--charcoal-light); opacity: 0.4;
-  }
-  .skill-row {
-    display: grid; grid-template-columns: 1fr 2fr auto;
-    gap: 20px; align-items: center; padding: 14px 0;
-    border-bottom: 1px solid var(--grid-line); transition: background 0.2s;
-  }
-  .skill-row:hover { background: rgba(181,101,74,0.02); }
-  .skill-name { font-size: 15px; font-weight: 400; }
-  .skill-trigger {
-    font-family: var(--font-mono); font-size: 11px;
-    color: var(--charcoal-light); opacity: 0.6;
-  }
-  .skill-desc { font-size: 13px; font-weight: 300; color: var(--charcoal-light); line-height: 1.5; }
-  .skill-badge {
-    font-family: var(--font-mono); font-size: 10px;
-    letter-spacing: 0.08em; text-transform: uppercase;
-    padding: 4px 12px; white-space: nowrap; border-radius: 2px;
-    color: #3a7d4f; background: rgba(58,125,79,0.06); border: 1px solid rgba(58,125,79,0.12);
-  }
-  @media (max-width: 680px) {
-    .skill-row { grid-template-columns: 1fr auto; gap: 8px; }
-    .skill-desc { display: none; }
+  :root{--bg:#0A0D14;--ink:#F3F4F7;--rust:oklch(0.65 0.19 33);--green:oklch(0.68 0.13 158);
+    --ff-display:'Space Grotesk','DM Sans',-apple-system,sans-serif;--ff-body:'DM Sans',-apple-system,sans-serif;--ff-mono:'JetBrains Mono','IBM Plex Mono',ui-monospace,monospace;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{background:#0A0D14;}
+  ::selection{background:oklch(0.65 0.19 33 / 0.32);color:#fff;}
+  a{color:inherit;}
+  .nav-link{color:rgba(243,244,247,0.6);transition:color .2s ease;}
+  .nav-link:hover{color:#F3F4F7;}
+  .nav-link.active{color:oklch(0.72 0.19 33);}
+  .gh-btn{transition:background .2s ease,color .2s ease;}
+  .gh-btn:hover{background:oklch(0.65 0.19 33)!important;color:#fff!important;}
+  .cat-pill{font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:rgba(243,244,247,0.6);background:transparent;border:1px solid rgba(255,255,255,0.14);padding:9px 16px;cursor:pointer;transition:all .2s ease;}
+  .cat-pill:hover{color:#F3F4F7;border-color:rgba(255,255,255,0.3);}
+  .cat-pill.active{color:#fff;background:oklch(0.65 0.19 33);border-color:oklch(0.65 0.19 33);}
+  .skill-row{display:grid;grid-template-columns:1fr 1.6fr auto;gap:24px;align-items:center;padding:18px 20px;border:1px solid rgba(255,255,255,0.08);border-top:none;background:rgba(255,255,255,0.02);}
+  .skill-category .skill-row:first-of-type{border-top:1px solid rgba(255,255,255,0.08);}
+  .skill-name{font-family:var(--ff-display);font-weight:600;font-size:16px;}
+  .skill-trigger{font-family:var(--ff-mono);font-size:11px;color:rgba(243,244,247,0.5);}
+  .skill-desc{font-size:13.5px;font-weight:300;line-height:1.6;color:rgba(243,244,247,0.6);}
+  .skill-badge{font-family:var(--ff-mono);font-size:10px;letter-spacing:0.08em;text-transform:uppercase;color:oklch(0.72 0.13 158);border:1px solid oklch(0.68 0.13 158 / 0.4);padding:4px 10px;white-space:nowrap;}
+  .skill-category{margin-bottom:36px;}
+  .skill-category-header{display:flex;align-items:baseline;gap:14px;margin-bottom:14px;}
+  .skill-category-name{font-family:var(--ff-display);font-weight:600;font-size:20px;}
+  .skill-category-count{font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:oklch(0.72 0.19 33);}
+  a:focus-visible,button:focus-visible{outline:2px solid var(--rust);outline-offset:3px;}
+  @media (max-width:760px){
+    .skill-row{grid-template-columns:1fr;gap:8px;}
+    nav.bar{flex-wrap:wrap;height:auto!important;padding:14px 20px!important;gap:14px!important;}
+    .nav-links{gap:18px!important;}
   }
 </style>
 </head>
-<body>
-<a class="skip-link" href="#main-content">Skip to content</a>
-<div class="page-wrapper">
-  <header>
-    <nav class="container" aria-label="Primary">
-      <a href="index.html" class="nav-brand">
-        <div class="nav-brand-mark"><span>S</span><span class="mark-d">D</span></div>
-        <span class="nav-brand-text">System by Dave</span>
-      </a>
-      <ul class="nav-links">
-        <li><a href="skills.html" class="active hide-mobile" aria-current="page">Skills</a></li>
-        <li><a href="agents.html" class="hide-mobile">Agents</a></li>
-        <li><a href="widgets.html" class="hide-mobile">Widgets</a></li>
-        <li><a href="/world-cup/" class="hide-mobile">World Cup</a></li>
-        <li><a href="https://promptlab.tools" target="_blank" rel="noopener noreferrer" class="hide-mobile">Prompt Lab</a></li>
-        <li><a href="https://github.com/DaveHomeAssist/system-by-dave" target="_blank" rel="noopener noreferrer" class="nav-cta">GitHub</a></li>
-      </ul>
-    </nav>
-  </header>
+<body style="font-family:var(--ff-body);background:var(--bg);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased;">
+<div style="position:relative;min-height:100vh;overflow-x:hidden;">
+  <div style="position:absolute;inset:0;pointer-events:none;z-index:0;background:repeating-linear-gradient(90deg, rgba(255,255,255,0.022) 0 1px, transparent 1px 88px), repeating-linear-gradient(0deg, rgba(255,255,255,0.022) 0 1px, transparent 1px 88px);"></div>
+  <div style="position:absolute;top:-180px;left:50%;transform:translateX(-50%);width:900px;height:520px;pointer-events:none;z-index:0;background:radial-gradient(ellipse at center, oklch(0.65 0.19 33 / 0.16), transparent 70%);filter:blur(20px);"></div>
+  <div style="position:relative;z-index:1;">
 
-  <main id="main-content">
-  <section class="page-hero">
-    <div class="container">
-      <div class="page-hero-tag reveal">Catalog</div>
-      <h1 class="reveal reveal-delay-1">Notion AI <em>Skills</em></h1>
-      <p class="page-hero-desc reveal reveal-delay-2">24 custom skills that run natively inside Notion AI. Right-click any page, pick a skill, and let it work. No plugins, no external apps.</p>
-    </div>
-  </section>
+    <header style="position:sticky;top:0;z-index:100;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);background:rgba(10,13,20,0.72);border-bottom:1px solid rgba(255,255,255,0.07);">
+      <nav class="bar" style="max-width:1200px;margin:0 auto;padding:0 40px;height:70px;display:flex;align-items:center;justify-content:space-between;gap:24px;">
+        <a href="index.html" style="display:flex;align-items:center;gap:12px;text-decoration:none;color:#F3F4F7;">
+          <span style="width:34px;height:34px;border:1px solid rgba(255,255,255,0.22);display:flex;align-items:center;justify-content:center;font-family:var(--ff-display);font-weight:600;font-size:16px;background:rgba(255,255,255,0.03);">S</span>
+          <span style="font-family:var(--ff-mono);font-size:12px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(243,244,247,0.85);">System<span style="color:rgba(243,244,247,0.4);">_by_</span>Dave</span>
+        </a>
+        <div class="nav-links" style="display:flex;align-items:center;gap:30px;">
+          <a href="notion.html" class="nav-link active" style="font-family:var(--ff-mono);font-size:12px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;">Notion</a>
+          <a href="av-suite.html" class="nav-link" style="font-family:var(--ff-mono);font-size:12px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;">AV&nbsp;Suite</a>
+          <a href="prompt-lab.html" class="nav-link" style="font-family:var(--ff-mono);font-size:12px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;">Prompt&nbsp;Lab</a>
+          <a href="https://github.com/DaveHomeAssist/system-by-dave" target="_blank" rel="noopener" class="gh-btn" style="font-family:var(--ff-mono);font-size:12px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;color:#0A0D14;background:#F3F4F7;padding:9px 18px;">GitHub&nbsp;↗</a>
+        </div>
+      </nav>
+    </header>
 
-  <section class="catalog-section" id="catalog">
-    <div class="container">
-      <div class="section-header reveal">
-        <span class="section-number">—</span>
-        <h2 class="section-title">All Skills</h2>
-        <span class="section-subtitle">24 skills &middot; 6 categories</span>
+    <section style="max-width:1200px;margin:0 auto;padding:88px 40px 40px;">
+      <div style="font-family:var(--ff-mono);font-size:12px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(243,244,247,0.4);margin-bottom:28px;"><a href="index.html" class="nav-link" style="text-decoration:none;">Home</a> / <a href="notion.html" class="nav-link" style="text-decoration:none;">Notion</a> / <span style="color:oklch(0.72 0.19 33);">Skills</span></div>
+      <div style="display:inline-flex;align-items:center;gap:9px;font-family:var(--ff-mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:oklch(0.72 0.19 33);margin-bottom:22px;"><span style="width:7px;height:7px;border-radius:50%;background:oklch(0.65 0.19 33);"></span>Catalog · native to Notion AI</div>
+      <h1 style="font-family:var(--ff-display);font-weight:600;font-size:clamp(40px,5.4vw,68px);line-height:1.0;letter-spacing:-0.03em;margin-bottom:22px;">Notion AI Skills</h1>
+      <p style="font-size:17px;font-weight:300;line-height:1.7;color:rgba(243,244,247,0.62);max-width:620px;">24 custom skills that run natively inside Notion AI. Right-click any page, pick a skill, and let it work. No plugins, no external apps.</p>
+    </section>
+
+    <section style="max-width:1200px;margin:0 auto;padding:24px 40px 80px;">
+      <div style="display:flex;align-items:baseline;gap:18px;margin-bottom:28px;padding-bottom:20px;border-bottom:1px solid rgba(255,255,255,0.09);">
+        <span style="font-family:var(--ff-mono);font-size:12px;color:oklch(0.72 0.19 33);">—</span>
+        <h2 style="font-family:var(--ff-display);font-weight:500;font-size:clamp(22px,2.6vw,30px);letter-spacing:-0.02em;">All Skills</h2>
+        <span style="margin-left:auto;font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:rgba(243,244,247,0.4);">24 skills · 6 categories</span>
       </div>
 
-      <div class="catalog-filters">
-        <div class="cat-pills" role="toolbar" aria-label="Filter skills by category">
-          <button class="cat-pill active" type="button" data-filter="all" aria-pressed="true">All</button>
-          <button class="cat-pill" type="button" data-filter="writing" aria-pressed="false">Writing</button>
-          <button class="cat-pill" type="button" data-filter="formatting" aria-pressed="false">Formatting</button>
-          <button class="cat-pill" type="button" data-filter="productivity" aria-pressed="false">Productivity</button>
-          <button class="cat-pill" type="button" data-filter="ai" aria-pressed="false">AI &amp; Prompts</button>
-          <button class="cat-pill" type="button" data-filter="dev" aria-pressed="false">Dev</button>
-          <button class="cat-pill" type="button" data-filter="av" aria-pressed="false">AV / Production</button>
-        </div>
+      <div role="toolbar" aria-label="Filter skills by category" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:32px;">
+        <button class="cat-pill active" type="button" data-filter="all" aria-pressed="true">All</button>
+        <button class="cat-pill" type="button" data-filter="writing" aria-pressed="false">Writing</button>
+        <button class="cat-pill" type="button" data-filter="formatting" aria-pressed="false">Formatting</button>
+        <button class="cat-pill" type="button" data-filter="productivity" aria-pressed="false">Productivity</button>
+        <button class="cat-pill" type="button" data-filter="ai" aria-pressed="false">AI &amp; Prompts</button>
+        <button class="cat-pill" type="button" data-filter="dev" aria-pressed="false">Dev</button>
+        <button class="cat-pill" type="button" data-filter="av" aria-pressed="false">AV / Production</button>
       </div>
 
-      <!-- Writing -->
-      <div class="skill-category reveal" id="writing" data-category="writing">
-        <div class="skill-category-header">
-          <span class="skill-category-name">Writing</span>
-          <span class="skill-category-count">3 skills</span>
-        </div>
-        <div class="skill-row">
-          <div><span class="skill-name">Improve Writing</span><br><span class="skill-trigger">✏️ Improve Writing</span></div>
-          <span class="skill-desc">Revise content for clarity, conciseness, and flow without changing meaning. Fixes grammar, reduces repetition, and improves readability.</span>
-          <span class="skill-badge">Live</span>
-        </div>
-        <div class="skill-row">
-          <div><span class="skill-name">Proofread</span><br><span class="skill-trigger">✅ Proofread</span></div>
-          <span class="skill-desc">Fix spelling, grammar, and punctuation. Minimal rewording — only what's needed for correctness.</span>
-          <span class="skill-badge">Live</span>
-        </div>
-        <div class="skill-row">
-          <div><span class="skill-name">Expand Selection</span><br><span class="skill-trigger">📖 Expand Selection</span></div>
-          <span class="skill-desc">Elaborate on selected text with relevant detail, examples, and context. Expands by 50–100% without adding filler.</span>
-          <span class="skill-badge">Live</span>
-        </div>
+      <div class="skill-category" id="writing" data-category="writing">
+        <div class="skill-category-header"><span class="skill-category-name">Writing</span><span class="skill-category-count">3 skills</span></div>
+        <div class="skill-row"><div><span class="skill-name">Improve Writing</span><br><span class="skill-trigger">✏️ Improve Writing</span></div><span class="skill-desc">Revise content for clarity, conciseness, and flow without changing meaning. Fixes grammar, reduces repetition, and improves readability.</span><span class="skill-badge">Live</span></div>
+        <div class="skill-row"><div><span class="skill-name">Proofread</span><br><span class="skill-trigger">✅ Proofread</span></div><span class="skill-desc">Fix spelling, grammar, and punctuation. Minimal rewording — only what's needed for correctness.</span><span class="skill-badge">Live</span></div>
+        <div class="skill-row"><div><span class="skill-name">Expand Selection</span><br><span class="skill-trigger">📖 Expand Selection</span></div><span class="skill-desc">Elaborate on selected text with relevant detail, examples, and context. Expands by 50–100% without adding filler.</span><span class="skill-badge">Live</span></div>
       </div>
 
-      <!-- Formatting -->
-      <div class="skill-category reveal" id="formatting" data-category="formatting">
-        <div class="skill-category-header">
-          <span class="skill-category-name">Formatting</span>
-          <span class="skill-category-count">8 skills</span>
-        </div>
-        <div class="skill-row">
-          <div><span class="skill-name">Reformat</span><br><span class="skill-trigger">⚙️ Reformat</span></div>
-          <span class="skill-desc">Fix line breaks, convert dashes to bullets, add paragraph breaks and headings for scannability. Structure only — no content changes.</span>
-          <span class="skill-badge">Live</span>
-        </div>
-        <div class="skill-row">
-          <div><span class="skill-name">Add Formatting</span><br><span class="skill-trigger">🎨 Add Formatting</span></div>
-          <span class="skill-desc">Apply highlight colors, callout blocks, columns, dividers, and section headings to create visual hierarchy.</span>
-          <span class="skill-badge">Live</span>
-        </div>
-        <div class="skill-row">
-          <div><span class="skill-name">Convert to Table</span><br><span class="skill-trigger">📊 Convert to Table</span></div>
-          <span class="skill-desc">Convert lists, prose, or structured data into clean Notion tables with proper headers.</span>
-          <span class="skill-badge">Live</span>
-        </div>
-        <div class="skill-row">
-          <div><span class="skill-name">Make Toggle Lists (Expanded)</span><br><span class="skill-trigger">🔽 Make Toggle Lists</span></div>
-          <span class="skill-desc">Convert content into toggle blocks with expanded detail, definitions, and sub-points nested inside each toggle.</span>
-          <span class="skill-badge">Live</span>
-        </div>
-        <div class="skill-row">
-          <div><span class="skill-name">Fix &amp; Add Emojis for Categories</span><br><span class="skill-trigger">😊 Fix &amp; Add Emojis</span></div>
-          <span class="skill-desc">Apply appropriate emojis to headings, labels, and list items. Fix mismatched or inconsistent emoji usage.</span>
-          <span class="skill-badge">Live</span>
-        </div>
-        <div class="skill-row">
-          <div><span class="skill-name">Page Structuring &amp; Visual Formatting</span><br><span class="skill-trigger">🖼️ Organize, Add Colors &amp; Callouts</span></div>
-          <span class="skill-desc">Full-page transformation using Notion components — callouts, toggles, columns, color-coded highlights, and section hierarchy.</span>
-          <span class="skill-badge">Live</span>
-        </div>
-        <div class="skill-row">
-          <div><span class="skill-name">Apply Detailed Formatting</span><br><span class="skill-trigger">📐 Apply Detailed Formatting</span></div>
-          <span class="skill-desc">Comprehensive formatting pass: structural organization, visual enhancement, style consistency, and accessibility.</span>
-          <span class="skill-badge">Live</span>
-        </div>
-        <div class="skill-row">
-          <div><span class="skill-name">Organize &amp; Enhance Page</span><br><span class="skill-trigger">🗂️ Organize &amp; Enhance Page</span></div>
-          <span class="skill-desc">Reorder content logically, group related items, add visual components, and consolidate redundancy.</span>
-          <span class="skill-badge">Live</span>
-        </div>
+      <div class="skill-category" id="formatting" data-category="formatting">
+        <div class="skill-category-header"><span class="skill-category-name">Formatting</span><span class="skill-category-count">8 skills</span></div>
+        <div class="skill-row"><div><span class="skill-name">Reformat</span><br><span class="skill-trigger">⚙️ Reformat</span></div><span class="skill-desc">Fix line breaks, convert dashes to bullets, add paragraph breaks and headings for scannability. Structure only — no content changes.</span><span class="skill-badge">Live</span></div>
+        <div class="skill-row"><div><span class="skill-name">Add Formatting</span><br><span class="skill-trigger">🎨 Add Formatting</span></div><span class="skill-desc">Apply highlight colors, callout blocks, columns, dividers, and section headings to create visual hierarchy.</span><span class="skill-badge">Live</span></div>
+        <div class="skill-row"><div><span class="skill-name">Convert to Table</span><br><span class="skill-trigger">📊 Convert to Table</span></div><span class="skill-desc">Convert lists, prose, or structured data into clean Notion tables with proper headers.</span><span class="skill-badge">Live</span></div>
+        <div class="skill-row"><div><span class="skill-name">Make Toggle Lists (Expanded)</span><br><span class="skill-trigger">🔽 Make Toggle Lists</span></div><span class="skill-desc">Convert content into toggle blocks with expanded detail, definitions, and sub-points nested inside each toggle.</span><span class="skill-badge">Live</span></div>
+        <div class="skill-row"><div><span class="skill-name">Fix &amp; Add Emojis for Categories</span><br><span class="skill-trigger">😊 Fix &amp; Add Emojis</span></div><span class="skill-desc">Apply appropriate emojis to headings, labels, and list items. Fix mismatched or inconsistent emoji usage.</span><span class="skill-badge">Live</span></div>
+        <div class="skill-row"><div><span class="skill-name">Page Structuring &amp; Visual Formatting</span><br><span class="skill-trigger">🖼️ Organize, Add Colors &amp; Callouts</span></div><span class="skill-desc">Full-page transformation using Notion components — callouts, toggles, columns, color-coded highlights, and section hierarchy.</span><span class="skill-badge">Live</span></div>
+        <div class="skill-row"><div><span class="skill-name">Apply Detailed Formatting</span><br><span class="skill-trigger">📐 Apply Detailed Formatting</span></div><span class="skill-desc">Comprehensive formatting pass: structural organization, visual enhancement, style consistency, and accessibility.</span><span class="skill-badge">Live</span></div>
+        <div class="skill-row"><div><span class="skill-name">Organize &amp; Enhance Page</span><br><span class="skill-trigger">🗂️ Organize &amp; Enhance Page</span></div><span class="skill-desc">Reorder content logically, group related items, add visual components, and consolidate redundancy.</span><span class="skill-badge">Live</span></div>
       </div>
 
-      <!-- Dev -->
-      <div class="skill-category reveal" id="dev" data-category="dev">
-        <div class="skill-category-header">
-          <span class="skill-category-name">Dev</span>
-          <span class="skill-category-count">3 skills</span>
-        </div>
-        <div class="skill-row">
-          <div><span class="skill-name">Review &amp; Suggest Fixes</span><br><span class="skill-trigger">🔍 Review &amp; Suggest Fixes</span></div>
-          <span class="skill-desc">Code review organized by severity: bugs, warnings, style issues. Every finding includes a concrete fix.</span>
-          <span class="skill-badge">Live</span>
-        </div>
-        <div class="skill-row">
-          <div><span class="skill-name">Debug to Fix</span><br><span class="skill-trigger">🐛 Debug to Fix</span></div>
-          <span class="skill-desc">Root cause analysis with targeted fix. Identifies the problem, explains why, provides corrected code, and suggests verification.</span>
-          <span class="skill-badge">Live</span>
-        </div>
-        <div class="skill-row">
-          <div><span class="skill-name">Generate README</span><br><span class="skill-trigger">📝 Generate README</span></div>
-          <span class="skill-desc">Generates a structured README with description, features, tech stack, getting started, project structure, and environment variables.</span>
-          <span class="skill-badge">Live</span>
-        </div>
+      <div class="skill-category" id="dev" data-category="dev">
+        <div class="skill-category-header"><span class="skill-category-name">Dev</span><span class="skill-category-count">3 skills</span></div>
+        <div class="skill-row"><div><span class="skill-name">Review &amp; Suggest Fixes</span><br><span class="skill-trigger">🔍 Review &amp; Suggest Fixes</span></div><span class="skill-desc">Code review organized by severity: bugs, warnings, style issues. Every finding includes a concrete fix.</span><span class="skill-badge">Live</span></div>
+        <div class="skill-row"><div><span class="skill-name">Debug to Fix</span><br><span class="skill-trigger">🐛 Debug to Fix</span></div><span class="skill-desc">Root cause analysis with targeted fix. Identifies the problem, explains why, provides corrected code, and suggests verification.</span><span class="skill-badge">Live</span></div>
+        <div class="skill-row"><div><span class="skill-name">Generate README</span><br><span class="skill-trigger">📝 Generate README</span></div><span class="skill-desc">Generates a structured README with description, features, tech stack, getting started, project structure, and environment variables.</span><span class="skill-badge">Live</span></div>
       </div>
 
-      <!-- AV / Production -->
-      <div class="skill-category reveal" id="av" data-category="av">
-        <div class="skill-category-header">
-          <span class="skill-category-name">AV / Production</span>
-          <span class="skill-category-count">3 skills</span>
-        </div>
-        <div class="skill-row">
-          <div><span class="skill-name">Generate Shot Plan</span><br><span class="skill-trigger">🎬 Generate Shot Plan</span></div>
-          <span class="skill-desc">Creates structured shot lists with scene, angle, lens, subject, action, equipment, and schedule from a brief or script.</span>
-          <span class="skill-badge">Live</span>
-        </div>
-        <div class="skill-row">
-          <div><span class="skill-name">Parse Tech Rider</span><br><span class="skill-trigger">🎛️ Parse Tech Rider</span></div>
-          <span class="skill-desc">Extracts structured production requirements from a technical rider: audio, lighting, video, power, backline, and contacts.</span>
-          <span class="skill-badge">Live</span>
-        </div>
-        <div class="skill-row">
-          <div><span class="skill-name">Draft Run of Show</span><br><span class="skill-trigger">🎬 Draft Run of Show</span></div>
-          <span class="skill-desc">Generates a day-of production timeline with cue sheets, staffing assignments, and contingency plans.</span>
-          <span class="skill-badge">Live</span>
-        </div>
+      <div class="skill-category" id="av" data-category="av">
+        <div class="skill-category-header"><span class="skill-category-name">AV / Production</span><span class="skill-category-count">3 skills</span></div>
+        <div class="skill-row"><div><span class="skill-name">Generate Shot Plan</span><br><span class="skill-trigger">🎬 Generate Shot Plan</span></div><span class="skill-desc">Creates structured shot lists with scene, angle, lens, subject, action, equipment, and schedule from a brief or script.</span><span class="skill-badge">Live</span></div>
+        <div class="skill-row"><div><span class="skill-name">Parse Tech Rider</span><br><span class="skill-trigger">🎛️ Parse Tech Rider</span></div><span class="skill-desc">Extracts structured production requirements from a technical rider: audio, lighting, video, power, backline, and contacts.</span><span class="skill-badge">Live</span></div>
+        <div class="skill-row"><div><span class="skill-name">Draft Run of Show</span><br><span class="skill-trigger">🎬 Draft Run of Show</span></div><span class="skill-desc">Generates a day-of production timeline with cue sheets, staffing assignments, and contingency plans.</span><span class="skill-badge">Live</span></div>
       </div>
 
-      <!-- Productivity -->
-      <div class="skill-category reveal" id="productivity" data-category="productivity">
-        <div class="skill-category-header">
-          <span class="skill-category-name">Productivity</span>
-          <span class="skill-category-count">5 skills</span>
-        </div>
-        <div class="skill-row">
-          <div><span class="skill-name">Explain</span><br><span class="skill-trigger">💬 Explain</span></div>
-          <span class="skill-desc">ELI5-style explanation of any selected word, phrase, or concept. Clear, concise, jargon-free.</span>
-          <span class="skill-badge">Live</span>
-        </div>
-        <div class="skill-row">
-          <div><span class="skill-name">Fill Data from Records into Template</span><br><span class="skill-trigger">📋 Fill Data from Records</span></div>
-          <span class="skill-desc">Populate a template with real data from database records. Preserves template structure, flags missing fields as TBD.</span>
-          <span class="skill-badge">Live</span>
-        </div>
-        <div class="skill-row">
-          <div><span class="skill-name">Create Table with Model Entries</span><br><span class="skill-trigger">📊 Create Table with Model Entries</span></div>
-          <span class="skill-desc">Generates a well-structured table with realistic example rows demonstrating how the table should be used.</span>
-          <span class="skill-badge">Live</span>
-        </div>
-        <div class="skill-row">
-          <div><span class="skill-name">Sort Inbox</span><br><span class="skill-trigger">🗂️ Sort Inbox</span></div>
-          <span class="skill-desc">Weekly inbox triage — classifies every item into 4 gates (filed, route to DB, route to project, archive) with a full markdown table.</span>
-          <span class="skill-badge">Live</span>
-        </div>
-        <div class="skill-row">
-          <div><span class="skill-name">Summarize Page to Bullet Points</span><br><span class="skill-trigger">📊 Summarize Page</span></div>
-          <span class="skill-desc">Extracts key points, decisions, and action items into a scannable 5–15 bullet summary. Flags deadlines and action items.</span>
-          <span class="skill-badge">Live</span>
-        </div>
+      <div class="skill-category" id="productivity" data-category="productivity">
+        <div class="skill-category-header"><span class="skill-category-name">Productivity</span><span class="skill-category-count">5 skills</span></div>
+        <div class="skill-row"><div><span class="skill-name">Explain</span><br><span class="skill-trigger">💬 Explain</span></div><span class="skill-desc">ELI5-style explanation of any selected word, phrase, or concept. Clear, concise, jargon-free.</span><span class="skill-badge">Live</span></div>
+        <div class="skill-row"><div><span class="skill-name">Fill Data from Records into Template</span><br><span class="skill-trigger">📋 Fill Data from Records</span></div><span class="skill-desc">Populate a template with real data from database records. Preserves template structure, flags missing fields as TBD.</span><span class="skill-badge">Live</span></div>
+        <div class="skill-row"><div><span class="skill-name">Create Table with Model Entries</span><br><span class="skill-trigger">📊 Create Table with Model Entries</span></div><span class="skill-desc">Generates a well-structured table with realistic example rows demonstrating how the table should be used.</span><span class="skill-badge">Live</span></div>
+        <div class="skill-row"><div><span class="skill-name">Sort Inbox</span><br><span class="skill-trigger">🗂️ Sort Inbox</span></div><span class="skill-desc">Weekly inbox triage — classifies every item into 4 gates (filed, route to DB, route to project, archive) with a full markdown table.</span><span class="skill-badge">Live</span></div>
+        <div class="skill-row"><div><span class="skill-name">Summarize Page to Bullet Points</span><br><span class="skill-trigger">📊 Summarize Page</span></div><span class="skill-desc">Extracts key points, decisions, and action items into a scannable 5–15 bullet summary. Flags deadlines and action items.</span><span class="skill-badge">Live</span></div>
       </div>
 
-      <!-- AI & Prompts -->
-      <div class="skill-category reveal" id="ai" data-category="ai">
-        <div class="skill-category-header">
-          <span class="skill-category-name">AI &amp; Prompts</span>
-          <span class="skill-category-count">2 skills</span>
-        </div>
-        <div class="skill-row">
-          <div><span class="skill-name">Develop, Group &amp; Create Prompts</span><br><span class="skill-trigger">🧩 Develop, Group &amp; Create Prompts</span></div>
-          <span class="skill-desc">Takes raw material and develops it further, groups items into categories, and generates clean reusable prompts.</span>
-          <span class="skill-badge">Live</span>
-        </div>
-        <div class="skill-row">
-          <div><span class="skill-name">Generate Page Banner Prompt</span><br><span class="skill-trigger">🖼️ Generate Page Banner Prompt</span></div>
-          <span class="skill-desc">Analyzes page content and generates an image-gen prompt for a Notion cover banner — theme, composition, palette, and constraints.</span>
-          <span class="skill-badge">Live</span>
-        </div>
+      <div class="skill-category" id="ai" data-category="ai">
+        <div class="skill-category-header"><span class="skill-category-name">AI &amp; Prompts</span><span class="skill-category-count">2 skills</span></div>
+        <div class="skill-row"><div><span class="skill-name">Develop, Group &amp; Create Prompts</span><br><span class="skill-trigger">🧩 Develop, Group &amp; Create Prompts</span></div><span class="skill-desc">Takes raw material and develops it further, groups items into categories, and generates clean reusable prompts.</span><span class="skill-badge">Live</span></div>
+        <div class="skill-row"><div><span class="skill-name">Generate Page Banner Prompt</span><br><span class="skill-trigger">🖼️ Generate Page Banner Prompt</span></div><span class="skill-desc">Analyzes page content and generates an image-gen prompt for a Notion cover banner — theme, composition, palette, and constraints.</span><span class="skill-badge">Live</span></div>
       </div>
 
-    </div>
-  </section>
-  </main>
+    </section>
 
-  <footer>
-    <div class="container">
-      <div class="footer-grid">
-        <div>
-          <a href="index.html" class="nav-brand">
-            <div class="nav-brand-mark"><span>S</span><span class="mark-d">D</span></div>
-            <span class="nav-brand-text">System by Dave</span>
-          </a>
-          <p class="footer-brand-desc">Handcrafted Notion tools for people who take their workflows seriously.</p>
+    <footer style="border-top:1px solid rgba(255,255,255,0.07);">
+      <div style="max-width:1200px;margin:0 auto;padding:48px 40px 36px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:12px;"><span style="width:34px;height:34px;border:1px solid rgba(255,255,255,0.22);display:flex;align-items:center;justify-content:center;font-family:var(--ff-display);font-weight:600;font-size:16px;">S</span><span style="font-family:var(--ff-mono);font-size:12px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(243,244,247,0.6);">System by Dave</span></div>
+        <div style="display:flex;gap:26px;flex-wrap:wrap;">
+          <a href="index.html" class="nav-link" style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;">Home</a>
+          <a href="agents.html" class="nav-link" style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;">Agents</a>
+          <a href="widgets.html" class="nav-link" style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;">Widgets</a>
+          <a href="privacy-policy.html" class="nav-link" style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;">Privacy</a>
         </div>
-        <div class="footer-col">
-          <h4>Products</h4>
-          <ul>
-            <li><a href="skills.html">Skills</a></li>
-            <li><a href="agents.html">Agents</a></li>
-            <li><a href="widgets.html">Widgets</a></li>
-            <li><a href="https://promptlab.tools" target="_blank" rel="noopener noreferrer">Prompt Lab</a></li>
-          </ul>
-        </div>
-        <div class="footer-col">
-          <h4>Resources</h4>
-          <ul>
-            <li><a href="https://github.com/DaveHomeAssist/system-by-dave" target="_blank" rel="noopener noreferrer">Project Repo</a></li>
-            <li><a href="https://github.com/DaveHomeAssist/system-by-dave/blob/main/CHANGELOG.md" target="_blank" rel="noopener noreferrer">Changelog</a></li>
-          </ul>
-        </div>
-        <div class="footer-col">
-          <h4>Connect</h4>
-          <ul>
-            <li><a href="https://github.com/DaveHomeAssist" target="_blank" rel="noopener noreferrer">GitHub</a></li>
-            <li><a href="https://promptlab.tools" target="_blank" rel="noopener noreferrer">promptlab.tools</a></li>
-            <li><a href="privacy-policy.html">Privacy Policy</a></li>
-          </ul>
-        </div>
+        <span style="font-family:var(--ff-mono);font-size:11px;color:rgba(243,244,247,0.35);">© 2026</span>
       </div>
-      <div class="footer-bottom">
-        <span class="footer-copy">&copy; 2026 System by Dave. All rights reserved.</span>
-      </div>
-    </div>
-  </footer>
+    </footer>
+
+  </div>
 </div>
-
 <script>
   document.addEventListener('DOMContentLoaded', () => {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
-    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
-    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-
     const pills = document.querySelectorAll('.cat-pill');
     const categories = document.querySelectorAll('.skill-category');
     pills.forEach(pill => {
       pill.addEventListener('click', () => {
-        pills.forEach(p => {
-          p.classList.remove('active');
-          p.setAttribute('aria-pressed', 'false');
-        });
+        pills.forEach(p => { p.classList.remove('active'); p.setAttribute('aria-pressed', 'false'); });
         pill.classList.add('active');
         pill.setAttribute('aria-pressed', 'true');
         const filter = pill.dataset.filter;
         categories.forEach(cat => {
-          if (filter === 'all' || cat.dataset.category === filter) {
-            cat.style.display = '';
-            cat.classList.add('visible');
-          } else {
-            cat.style.display = 'none';
-          }
+          cat.style.display = (filter === 'all' || cat.dataset.category === filter) ? '' : 'none';
         });
       });
     });
   });
 </script>
-<script src="js/theme.js" defer></script>
 </body>
 </html>
