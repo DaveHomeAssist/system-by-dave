@@ -672,6 +672,11 @@
           </div>
           <p id="hint" class="hint" role="status">Loaded sample power plan.</p>
         </section>
+        <section class="panel side-section" aria-label="Load by power source">
+          <h2>Load by source</h2>
+          <div id="sourceRollup" class="source-rollup"></div>
+          <p class="privacy-note">Live draw vs capacity per source (struck circuits excluded). Over 80 percent is flagged; over capacity means split the source.</p>
+        </section>
         <section class="panel side-section" aria-label="Keyboard shortcuts">
           <h2>Fast actions</h2>
           <dl class="shortcut-list">
@@ -914,6 +919,39 @@
     $('issueOut').textContent = state.circuits.filter(function(circuit){ return circuit.status === 'issue'; }).length;
     $('loadOut').textContent = load + '%';
     $('headroomOut').textContent = (headroom < 0 ? '-' + formatAmps(Math.abs(headroom)) + ' OVER' : formatAmps(headroom));
+    renderSourceRollup();
+  }
+
+  function renderSourceRollup(){
+    var el = $('sourceRollup');
+    if(!el) return;
+    var groups = {};
+    state.circuits.forEach(function(c){
+      if(c.status === 'struck') return;
+      var src = SOURCES.indexOf(c.source) >= 0 ? c.source : 'other';
+      if(!groups[src]) groups[src] = { draw:0, cap:0, n:0 };
+      groups[src].draw += parseAmps(c.draw);
+      groups[src].cap += parseAmps(c.capacity);
+      groups[src].n += 1;
+    });
+    var order = SOURCES.filter(function(s){ return groups[s]; });
+    if(!order.length){ el.innerHTML = '<p class="hint">No live circuits yet.</p>'; return; }
+    el.innerHTML = order.map(function(s){
+      var g = groups[s];
+      var pct = g.cap > 0 ? Math.round(g.draw / g.cap * 100) : 0;
+      var over = g.cap > 0 && g.draw > g.cap;
+      var near = !over && pct >= 80;
+      var color = over ? '#ff6b6b' : (near ? '#ffd166' : '#6be092');
+      var width = Math.max(0, Math.min(100, pct));
+      return '<div style="margin-bottom:10px;">'
+        + '<div style="display:flex;justify-content:space-between;gap:8px;font-family:var(--font-mono,ui-monospace),monospace;font-size:11px;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;">'
+        + '<span>' + escapeHtml(s) + ' <span style="opacity:.55">(' + g.n + ')</span></span>'
+        + '<span style="color:' + color + ';white-space:nowrap;">' + formatAmps(g.draw) + ' / ' + formatAmps(g.cap) + ' A &middot; ' + pct + '%' + (over ? ' OVER' : '') + '</span>'
+        + '</div>'
+        + '<div style="height:6px;border-radius:3px;background:rgba(255,255,255,0.08);overflow:hidden;">'
+        + '<div style="height:100%;width:' + width + '%;background:' + color + ';transition:width .2s ease;"></div>'
+        + '</div></div>';
+    }).join('');
   }
 
   function selectedCircuit(){

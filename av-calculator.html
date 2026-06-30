@@ -652,6 +652,76 @@
         </div>
         <div class="hint" id="powerHint">Compare load against the 80 percent continuous circuit target.</div>
       </article>
+
+      <article class="calc-card" id="voltageDropCard">
+        <div class="card-head">
+          <h2>Voltage Drop</h2>
+          <span>Cable run loss</span>
+        </div>
+        <div class="card-body">
+          <div class="field">
+            <label for="dropAmps">Load Amps</label>
+            <input id="dropAmps" data-key="dropAmps" type="number" min="0" step="0.1" value="12">
+          </div>
+          <div class="field">
+            <label for="dropLength">Run Ft (one way)</label>
+            <input id="dropLength" data-key="dropLength" type="number" min="0" step="1" value="100">
+          </div>
+          <div class="field">
+            <label for="dropGauge">Wire Gauge</label>
+            <select id="dropGauge" data-key="dropGauge">
+              <option value="14">14 AWG</option>
+              <option value="12">12 AWG</option>
+              <option value="10" selected>10 AWG</option>
+              <option value="8">8 AWG</option>
+              <option value="6">6 AWG</option>
+              <option value="4">4 AWG</option>
+              <option value="2">2 AWG</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="dropVoltage">Voltage</label>
+            <select id="dropVoltage" data-key="dropVoltage">
+              <option value="120">120 V</option>
+              <option value="208">208 V</option>
+              <option value="230">230 V</option>
+            </select>
+          </div>
+        </div>
+        <div class="result-grid">
+          <div class="result"><span>Drop</span><strong id="voltageDrop">0 V</strong></div>
+          <div class="result" id="dropResult"><span>Percent</span><strong id="dropPercent">0%</strong></div>
+          <div class="result"><span>End Volts</span><strong id="dropEndV">0 V</strong></div>
+        </div>
+        <div class="hint" id="dropHint">Keep drop under 3 percent for sensitive gear; under 5 percent overall.</div>
+      </article>
+
+      <article class="calc-card" id="splCard">
+        <div class="card-head">
+          <h2>SPL Distance</h2>
+          <span>Inverse square loss</span>
+        </div>
+        <div class="card-body">
+          <div class="field">
+            <label for="splRef">Reference SPL dB</label>
+            <input id="splRef" data-key="splRef" type="number" min="0" step="1" value="100">
+          </div>
+          <div class="field">
+            <label for="splRefDist">Reference Ft</label>
+            <input id="splRefDist" data-key="splRefDist" type="number" min="0.1" step="0.1" value="3">
+          </div>
+          <div class="field">
+            <label for="splTargetDist">Target Ft</label>
+            <input id="splTargetDist" data-key="splTargetDist" type="number" min="0.1" step="1" value="50">
+          </div>
+        </div>
+        <div class="result-grid">
+          <div class="result"><span>SPL At Target</span><strong id="splOut">0 dB</strong></div>
+          <div class="result"><span>Loss</span><strong id="splLoss">0 dB</strong></div>
+          <div class="result"><span>Doublings</span><strong id="splDoublings">0</strong></div>
+        </div>
+        <div class="hint" id="splHint">Free-field estimate. Real rooms add reflections and gain.</div>
+      </article>
     </section>
 
     <section class="summary-panel" aria-label="Calculation summary">
@@ -692,7 +762,14 @@
     deviceWatts: 350,
     deviceCount: 4,
     voltage: 120,
-    circuitAmps: 20
+    circuitAmps: 20,
+    dropAmps: 12,
+    dropLength: 100,
+    dropGauge: '10',
+    dropVoltage: 120,
+    splRef: 100,
+    splRefDist: 3,
+    splTargetDist: 50
   };
 
   const fields = Array.from(document.querySelectorAll('[data-key]'));
@@ -714,6 +791,15 @@
     circuitPercent: document.getElementById('circuitPercent'),
     circuitResult: document.getElementById('circuitResult'),
     powerHint: document.getElementById('powerHint'),
+    voltageDrop: document.getElementById('voltageDrop'),
+    dropPercent: document.getElementById('dropPercent'),
+    dropResult: document.getElementById('dropResult'),
+    dropEndV: document.getElementById('dropEndV'),
+    dropHint: document.getElementById('dropHint'),
+    splOut: document.getElementById('splOut'),
+    splLoss: document.getElementById('splLoss'),
+    splDoublings: document.getElementById('splDoublings'),
+    splHint: document.getElementById('splHint'),
     summaryOutput: document.getElementById('summaryOutput'),
     saveStatus: document.getElementById('saveStatus'),
     globalHint: document.getElementById('globalHint'),
@@ -796,7 +882,9 @@
     const projection = calculateProjection();
     const storageCalc = calculateStorage();
     const power = calculatePower();
-    renderSummary(audio, projection, storageCalc, power);
+    const drop = calculateVoltageDrop();
+    const spl = calculateSpl();
+    renderSummary(audio, projection, storageCalc, power, drop, spl);
   }
 
   function calculateDelay() {
@@ -876,12 +964,54 @@
     return { wattsEach, count, voltage, circuitAmps, totalWatts, amps, continuousLimit, percentOfTarget };
   }
 
-  function renderSummary(audio, projection, storageCalc, power) {
+  function calculateVoltageDrop() {
+    const OHMS_PER_KFT = { '14': 2.525, '12': 1.588, '10': 0.999, '8': 0.628, '6': 0.395, '4': 0.249, '2': 0.156 };
+    const amps = numberValue('dropAmps', 0, DEFAULTS.dropAmps);
+    const lengthFt = numberValue('dropLength', 0, DEFAULTS.dropLength);
+    const gauge = String(state.dropGauge || DEFAULTS.dropGauge);
+    const voltage = numberValue('dropVoltage', 1, DEFAULTS.dropVoltage);
+    const ohmsPerFt = (OHMS_PER_KFT[gauge] || OHMS_PER_KFT['10']) / 1000;
+    const dropV = 2 * lengthFt * amps * ohmsPerFt;
+    const percent = voltage > 0 ? dropV / voltage * 100 : 0;
+    const endV = voltage - dropV;
+    els.voltageDrop.textContent = `${format(dropV, 2)} V`;
+    els.dropPercent.textContent = `${format(percent, 1)}%`;
+    els.dropEndV.textContent = `${format(endV, 1)} V`;
+    els.dropResult.classList.remove('good', 'warn', 'bad');
+    els.dropResult.classList.add(percent <= 3 ? 'good' : percent <= 5 ? 'warn' : 'bad');
+    els.dropHint.textContent = percent <= 3
+      ? 'Drop is within the 3 percent target for sensitive gear.'
+      : percent <= 5
+        ? 'Acceptable for general loads but high for sensitive gear. Consider a heavier gauge.'
+        : 'Drop is too high. Use a heavier gauge, a shorter run, or higher voltage.';
+    return { amps, lengthFt, gauge, voltage, dropV, percent, endV };
+  }
+
+  function calculateSpl() {
+    const refSpl = numberValue('splRef', 0, DEFAULTS.splRef);
+    const refDist = numberValue('splRefDist', 0.1, DEFAULTS.splRefDist);
+    const targetDist = numberValue('splTargetDist', 0.1, DEFAULTS.splTargetDist);
+    const ratio = refDist > 0 ? targetDist / refDist : 1;
+    const loss = 20 * Math.log10(ratio);
+    const splAt = refSpl - loss;
+    const doublings = Math.log2(ratio);
+    els.splOut.textContent = `${format(splAt, 1)} dB`;
+    els.splLoss.textContent = `${loss >= 0 ? '-' : '+'}${format(Math.abs(loss), 1)} dB`;
+    els.splDoublings.textContent = format(doublings, 2);
+    els.splHint.textContent = targetDist >= refDist
+      ? `Free field: about 6 dB lost per distance doubling (${format(doublings, 1)} doublings here).`
+      : 'Target is closer than the reference, so the level rises above the reference SPL.';
+    return { refSpl, refDist, targetDist, loss, splAt, doublings };
+  }
+
+  function renderSummary(audio, projection, storageCalc, power, drop, spl) {
     els.summaryOutput.textContent = [
       `Audio delay: ${format(audio.delayMs, 1)} ms for ${format(audio.distanceInput, 1)} ${audio.unit} at ${format(audio.tempF, 0)} F (${format(audio.frames, 2)} frames at ${state.delayFrameRate} fps).`,
       `Projection: ${format(projection.widthFt, 1)} ft wide screen is ${format(projection.heightFt, 2)} ft high, ${format(projection.diagonalIn, 0)} in diagonal. Ideal throw at ${format(projection.throwRatio, 2)}:1 is ${format(projection.idealThrowFt, 1)} ft. Actual distance needs ${format(projection.requiredRatio, 2)}:1.`,
       `Record storage: ${storageCalc.feeds} feed(s) at ${format(storageCalc.bitrate, 0)} Mbps for ${format(storageCalc.hours, 2)} hr needs ${format(storageCalc.totalGb, 1)} GB with ${format(storageCalc.headroom, 0)} percent headroom.`,
-      `Power: ${power.count} device(s) at ${format(power.wattsEach, 0)} W each draw ${format(power.amps, 2)} A at ${format(power.voltage, 0)} V. This is ${format(power.percentOfTarget, 0)} percent of a ${format(power.circuitAmps, 0)} A circuit's 80 percent target.`
+      `Power: ${power.count} device(s) at ${format(power.wattsEach, 0)} W each draw ${format(power.amps, 2)} A at ${format(power.voltage, 0)} V. This is ${format(power.percentOfTarget, 0)} percent of a ${format(power.circuitAmps, 0)} A circuit's 80 percent target.`,
+      `Voltage drop: ${format(drop.amps, 1)} A over ${format(drop.lengthFt, 0)} ft of ${drop.gauge} AWG at ${format(drop.voltage, 0)} V drops ${format(drop.dropV, 2)} V (${format(drop.percent, 1)} percent), ending at ${format(drop.endV, 1)} V.`,
+      `SPL distance: ${format(spl.refSpl, 0)} dB at ${format(spl.refDist, 1)} ft is about ${format(spl.splAt, 1)} dB at ${format(spl.targetDist, 0)} ft (${format(spl.loss, 1)} dB loss).`
     ].join('\n');
   }
 
