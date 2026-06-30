@@ -1184,7 +1184,8 @@
 
   function selectItem(id){
     selectedId = id || "";
-    updateItemElement(item);
+    var item = items.filter(function(i){ return i.id === selectedId; })[0];
+    if(item) updateItemElement(item);
     updateInspector();
     updateMetrics();
     updateSummary();

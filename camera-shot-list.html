@@ -1382,13 +1382,19 @@
     }else{
       lines.push('- None');
     }
-    navigator.clipboard.writeText(lines.join('\n')).then(function(){
-      setHint('Summary copied.', 'success');
-      flash($('copySummaryBtn'), 'feedback-success');
-    }).catch(function(){
+    var __summary = lines.join('\n');
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(__summary).then(function(){
+        setHint('Summary copied.', 'success');
+        flash($('copySummaryBtn'), 'feedback-success');
+      }).catch(function(){
+        setHint('Copy failed. Use JSON or CSV export.', 'error');
+        flash($('copySummaryBtn'), 'feedback-error');
+      });
+    } else {
       setHint('Copy failed. Use JSON or CSV export.', 'error');
       flash($('copySummaryBtn'), 'feedback-error');
-    });
+    }
   }
 
   function download(content, filename, type){

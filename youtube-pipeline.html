@@ -445,7 +445,7 @@ function normalizeRow(raw){
     return undefined;
   };
   const r = {
-    id: raw.id || raw.page_id || raw.url || raw[CONFIG.titleProp] || crypto.randomUUID(),
+    id: raw.id || raw.page_id || raw.url || raw[CONFIG.titleProp] || (self.crypto&&crypto.randomUUID?crypto.randomUUID():('yt-'+Date.now().toString(36)+Math.random().toString(36).slice(2,8))),
     url: raw.url || raw.page_url || "",
     title: asText(get("title")) || "(untitled)",
   };

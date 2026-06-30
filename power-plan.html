@@ -912,7 +912,7 @@
     $('hotOut').textContent = state.circuits.filter(function(circuit){ return circuit.status === 'hot'; }).length;
     $('issueOut').textContent = state.circuits.filter(function(circuit){ return circuit.status === 'issue'; }).length;
     $('loadOut').textContent = load + '%';
-    $('headroomOut').textContent = formatAmps(headroom);
+    $('headroomOut').textContent = (headroom < 0 ? '-' + formatAmps(Math.abs(headroom)) + ' OVER' : formatAmps(headroom));
   }
 
   function selectedCircuit(){
@@ -1086,7 +1086,7 @@
     lines.push('Utility Contact: ' + state.meta.utilityContact);
     lines.push('Handoff: ' + state.meta.handoffTo);
     lines.push('');
-    lines.push('Summary: ' + state.circuits.length + ' circuits, ' + state.circuits.filter(function(circuit){ return circuit.status === 'patched'; }).length + ' patched, ' + state.circuits.filter(function(circuit){ return circuit.status === 'hot'; }).length + ' hot, ' + issues.length + ' issues, total draw ' + formatAmps(draw) + ', capacity ' + formatAmps(capacity) + ', headroom ' + formatAmps(capacity - draw));
+    lines.push('Summary: ' + state.circuits.length + ' circuits, ' + state.circuits.filter(function(circuit){ return circuit.status === 'patched'; }).length + ' patched, ' + state.circuits.filter(function(circuit){ return circuit.status === 'hot'; }).length + ' hot, ' + issues.length + ' issues, total draw ' + formatAmps(draw) + ', capacity ' + formatAmps(capacity) + ', headroom ' + ((capacity - draw) < 0 ? '-' + formatAmps(Math.abs(capacity - draw)) + ' OVER' : formatAmps(capacity - draw)));
     if(issues.length){
       lines.push('');
       lines.push('Issues:');
