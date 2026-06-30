@@ -4,1228 +4,231 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: https:; script-src 'self' 'unsafe-inline'">
-<title>System by Dave — Notion Skills, Agents & Browser AV Tools</title>
-<meta name="description" content="Handcrafted Notion skills, agents & widgets, plus browser-based AV show tools. Built by one person, tested in production.">
+<title>System by Dave — Software tools that do the unglamorous work</title>
+<meta name="description" content="Notion agents and widgets, a prompt-engineering workbench, and a full kit of browser-based AV show tools. Three product lines, one operator's standard — handcrafted, documented, no subscriptions.">
 <link rel="canonical" href="https://systembydave.com/">
-<meta name="robots" content="index,follow">
-<meta name="theme-color" content="#F5F0E8">
+<meta name="theme-color" content="#0A0D14">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="System by Dave">
-<meta property="og:title" content="System by Dave — Notion Skills, Agents & Browser AV Tools">
-<meta property="og:description" content="Handcrafted Notion skills, agents & widgets, plus browser-based AV show tools. Built by one person, tested in production.">
+<meta property="og:title" content="System by Dave — Software tools that do the unglamorous work">
+<meta property="og:description" content="Notion agents and widgets, a prompt-engineering workbench, and a full kit of browser-based AV show tools.">
 <meta property="og:url" content="https://systembydave.com/">
 <meta property="og:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
-<meta property="og:image:width" content="1024">
-<meta property="og:image:height" content="412">
-<meta property="og:image:alt" content="System by Dave preview banner">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="System by Dave — Notion Skills, Agents & Browser AV Tools">
-<meta name="twitter:description" content="Handcrafted Notion skills, agents & widgets, plus browser-based AV show tools. Built by one person, tested in production.">
-<meta name="twitter:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
 <link rel="icon" href="svg/system_by_dave_logo_rust.svg" type="image/svg+xml">
 <link rel="stylesheet" href="css/fonts.css">
-<link rel="stylesheet" href="css/style.css">
-<script>(function(){try{var t=localStorage.getItem("sbd-theme")||"dark";document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
 <script>
   if (window.location.pathname.endsWith('/index.html')) {
-    const canonicalPath = window.location.pathname.replace(/index\.html$/, '');
-    window.location.replace(`${window.location.origin}${canonicalPath}${window.location.search}${window.location.hash}`);
+    const p = window.location.pathname.replace(/index\.html$/, '');
+    window.location.replace(`${window.location.origin}${p}${window.location.search}${window.location.hash}`);
   }
-</script>
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  "name": "System by Dave",
-  "url": "https://systembydave.com/",
-  "description": "Handcrafted Notion skills, agents & widgets, plus browser-based AV show tools. Built by one person, tested in production.",
-  "publisher": {
-    "@type": "Person",
-    "name": "Dave Robertson"
-  },
-  "sameAs": [
-    "https://github.com/DaveHomeAssist/system-by-dave",
-    "https://promptlab.tools"
-  ]
-}
 </script>
 <style>
-  /* ─── HOMEPAGE-SPECIFIC ─── */
-  .hero { padding: 120px 0 100px; }
-  .hero-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 80px;
-    align-items: center;
+  :root{
+    --bg:#0A0D14; --ink:#F3F4F7;
+    --blue:oklch(0.66 0.17 256); --red:oklch(0.65 0.19 33); --green:oklch(0.68 0.13 158);
+    --ff-display:'Space Grotesk','DM Sans',-apple-system,sans-serif;
+    --ff-body:'DM Sans',-apple-system,sans-serif;
+    --ff-mono:'JetBrains Mono','IBM Plex Mono',ui-monospace,monospace;
   }
-  .hero-content { max-width: 520px; }
-  .hero-tag {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--rust);
-    margin-bottom: 24px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{background:#0A0D14;}
+  ::selection{background:oklch(0.66 0.17 256 / 0.3);color:#fff;}
+  a{color:inherit;}
+  .nav-link{color:rgba(243,244,247,0.6);transition:color .2s ease;}
+  .nav-link:hover{color:#F3F4F7;}
+  .gh-btn{transition:background .2s ease,color .2s ease;}
+  .gh-btn:hover{background:oklch(0.66 0.17 256)!important;color:#fff!important;}
+  .line-card{transition:transform .35s ease, background .35s ease, border-color .35s ease;}
+  .line-card:hover{transform:translateY(-5px);background:rgba(255,255,255,0.05);}
+  .line-card.l-red:hover{border-color:var(--red);}
+  .line-card.l-green:hover{border-color:var(--green);}
+  .line-card.l-blue:hover{border-color:var(--blue);}
+  .feat:hover{border-color:rgba(255,255,255,0.22);}
+  .cta-1{transition:background .2s ease,color .2s ease;}
+  .cta-1:hover{background:oklch(0.66 0.17 256)!important;color:#fff!important;}
+  .cta-2{transition:border-color .2s ease;}
+  .cta-2:hover{border-color:#F3F4F7!important;}
+  a:focus-visible,button:focus-visible{outline:2px solid var(--blue);outline-offset:3px;}
+  @media (max-width:880px){
+    .specs{grid-template-columns:repeat(2,1fr)!important;}
+    .lines,.feat-grid,.feat-side,.ethos-pts{grid-template-columns:1fr!important;}
+    .ethos-wrap{grid-template-columns:1fr!important;}
+    nav.bar{flex-wrap:wrap;height:auto!important;padding-top:14px!important;padding-bottom:14px!important;gap:14px!important;}
+    .nav-links{gap:18px!important;}
+    .hero{padding:64px 0 56px!important;}
   }
-  .hero-tag::before {
-    content: '';
-    width: 32px;
-    height: 1.5px;
-    background: var(--rust);
-  }
-  .hero h1 {
-    font-family: var(--font-display);
-    font-size: clamp(42px, 5vw, 64px);
-    font-weight: 400;
-    line-height: 1.08;
-    letter-spacing: -0.02em;
-    margin-bottom: 28px;
-  }
-  .hero h1 em { font-style: italic; color: var(--rust); }
-  .hero-desc {
-    font-size: 17px;
-    font-weight: 300;
-    line-height: 1.7;
-    color: var(--charcoal-light);
-    margin-bottom: 40px;
-    max-width: 440px;
-  }
-  .hero-actions { display: flex; gap: 16px; align-items: center; }
-
-  .hero-visual {
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  .blueprint-frame {
-    width: 400px; height: 400px;
-    position: relative;
-    border: 1.5px solid rgba(181,101,74,0.2);
-  }
-  .blueprint-frame::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background:
-      repeating-linear-gradient(90deg, rgba(181,101,74,0.06) 0 0.5px, transparent 0.5px 20px),
-      repeating-linear-gradient(0deg, rgba(181,101,74,0.06) 0 0.5px, transparent 0.5px 20px);
-  }
-  .blueprint-s {
-    position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    font-family: var(--font-display);
-    font-size: 240px;
-    line-height: 1;
-    color: var(--charcoal);
-    opacity: 0.06;
-    user-select: none;
-  }
-  .blueprint-modules {
-    position: absolute;
-    inset: 30px;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr;
-    gap: 16px;
-  }
-  .bp-module {
-    border: 1px solid rgba(181,101,74,0.15);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    transition: all 0.4s;
-  }
-  .bp-module:hover { border-color: var(--rust); }
-  .bp-module img { width: 100%; height: 100%; object-fit: cover; }
-
-  .corner { position: absolute; width: 12px; height: 12px; }
-  .corner::before, .corner::after {
-    content: '';
-    position: absolute;
-    background: var(--rust);
-    opacity: 0.5;
-  }
-  .corner-tl { top: -1px; left: -1px; }
-  .corner-tl::before { width: 12px; height: 1.5px; }
-  .corner-tl::after { width: 1.5px; height: 12px; }
-  .corner-tr { top: -1px; right: -1px; }
-  .corner-tr::before { right: 0; width: 12px; height: 1.5px; }
-  .corner-tr::after { right: 0; width: 1.5px; height: 12px; }
-  .corner-bl { bottom: -1px; left: -1px; }
-  .corner-bl::before { bottom: 0; width: 12px; height: 1.5px; }
-  .corner-bl::after { bottom: 0; width: 1.5px; height: 12px; }
-  .corner-br { bottom: -1px; right: -1px; }
-  .corner-br::before { bottom: 0; right: 0; width: 12px; height: 1.5px; }
-  .corner-br::after { bottom: 0; right: 0; width: 1.5px; height: 12px; }
-
-  /* ─── CATEGORY SHOWCASE ─── */
-  .showcase { padding: 80px 0; }
-  .showcase + .showcase { padding-top: 0; }
-
-  .showcase-row {
-    display: grid;
-    grid-template-columns: 1fr 2fr;
-    gap: 60px;
-    align-items: start;
-  }
-  .showcase-label {
-    position: sticky;
-    top: 100px;
-  }
-  .showcase-label-tag {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--rust);
-    margin-bottom: 12px;
-  }
-  .showcase-label h2 {
-    font-family: var(--font-display);
-    font-size: 36px;
-    font-weight: 400;
-    margin-bottom: 16px;
-    line-height: 1.15;
-  }
-  .showcase-label p {
-    font-size: 15px;
-    font-weight: 300;
-    line-height: 1.65;
-    color: var(--charcoal-light);
-    margin-bottom: 24px;
-  }
-  .showcase-label .btn-secondary { font-size: 11px; padding: 12px 20px; }
-
-  .showcase-cards {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-  }
-
-  /* ─── ETHOS ─── */
-  .ethos { padding: 100px 0; }
-  .ethos-grid {
-    display: grid;
-    grid-template-columns: 1fr 2fr;
-    gap: 80px;
-  }
-  .ethos-label {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--rust);
-    margin-bottom: 20px;
-  }
-  .ethos-statement {
-    font-family: var(--font-display);
-    font-size: clamp(28px, 3vw, 38px);
-    line-height: 1.35;
-    font-weight: 400;
-  }
-  .ethos-statement em { font-style: italic; color: var(--rust); }
-  .ethos-points {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 40px;
-    padding-top: 20px;
-  }
-  .ethos-point {
-    padding-left: 20px;
-    border-left: 1.5px solid var(--grid-line-accent);
-    transition: border-color 0.3s;
-  }
-  .ethos-point:hover { border-left-color: var(--rust); }
-  .ethos-point-title {
-    font-family: var(--font-mono);
-    font-size: 12px;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    margin-bottom: 10px;
-  }
-  .ethos-point-desc {
-    font-size: 14px;
-    font-weight: 300;
-    line-height: 1.65;
-    color: var(--charcoal-light);
-  }
-
-  @media (max-width: 1024px) {
-    .hero-grid { grid-template-columns: 1fr; gap: 60px; }
-    .hero-visual { display: none; }
-    .showcase-row { grid-template-columns: 1fr; gap: 40px; }
-    .showcase-label { position: static; }
-    .ethos-grid { grid-template-columns: 1fr; gap: 48px; }
-  }
-  @media (max-width: 680px) {
-    .hero-actions { flex-direction: column; align-items: stretch; }
-    .showcase-cards { grid-template-columns: 1fr; }
-    .ethos-points { grid-template-columns: 1fr; }
-  }
-  /* AV tools — department menu */
-  .av-dept-menu{margin:0 0 48px;}
-  .av-dept-intro{font-family:var(--font-mono);font-size:13px;color:var(--charcoal-light);margin:0 0 22px;}
-  .av-dept-intro a{color:var(--rust);text-decoration:none;border-bottom:1px solid currentColor;}
-  .av-dept-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:26px 28px;}
-  .av-dept-group h3{font-family:var(--font-mono);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--rust);margin:0 0 10px;padding-bottom:8px;border-bottom:1px solid var(--grid-line-accent);}
-  .av-dept-group ul{list-style:none;margin:0;padding:0;}
-  .av-dept-group li a{display:block;padding:5px 0;color:var(--charcoal);text-decoration:none;font-size:15px;line-height:1.3;transition:color .15s ease,padding-left .15s ease;}
-  .av-dept-group li a:hover{color:var(--rust);padding-left:6px;}
-  @media (max-width:680px){.av-dept-grid{grid-template-columns:1fr 1fr;gap:22px 18px;}}
 </style>
 </head>
-<body>
-<a class="skip-link" href="#main-content">Skip to content</a>
-<div class="page-wrapper">
+<body style="font-family:var(--ff-body);background:var(--bg);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased;">
+<div style="position:relative;min-height:100vh;overflow-x:hidden;">
 
-  <!-- HEADER -->
-  <header>
-    <nav class="container" aria-label="Primary">
-      <a href="index.html" class="nav-brand">
-        <div class="nav-brand-mark">
-          <span>S</span>
-          <span class="mark-d">D</span>
+  <div style="position:absolute;inset:0;pointer-events:none;z-index:0;background:repeating-linear-gradient(90deg, rgba(255,255,255,0.022) 0 1px, transparent 1px 88px), repeating-linear-gradient(0deg, rgba(255,255,255,0.022) 0 1px, transparent 1px 88px);"></div>
+  <div style="position:absolute;top:-180px;left:50%;transform:translateX(-50%);width:900px;height:560px;pointer-events:none;z-index:0;background:radial-gradient(ellipse at center, oklch(0.66 0.17 256 / 0.18), transparent 70%);filter:blur(20px);"></div>
+
+  <div style="position:relative;z-index:1;">
+
+    <!-- NAV -->
+    <header style="position:sticky;top:0;z-index:100;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);background:rgba(10,13,20,0.72);border-bottom:1px solid rgba(255,255,255,0.07);">
+      <nav class="bar" style="max-width:1200px;margin:0 auto;padding:0 40px;height:70px;display:flex;align-items:center;justify-content:space-between;gap:24px;">
+        <a href="index.html" style="display:flex;align-items:center;gap:12px;text-decoration:none;color:#F3F4F7;">
+          <span style="width:34px;height:34px;border:1px solid rgba(255,255,255,0.22);display:flex;align-items:center;justify-content:center;font-family:var(--ff-display);font-weight:600;font-size:16px;background:rgba(255,255,255,0.03);">S</span>
+          <span style="font-family:var(--ff-mono);font-size:12px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(243,244,247,0.85);">System<span style="color:rgba(243,244,247,0.4);">_by_</span>Dave</span>
+        </a>
+        <div class="nav-links" style="display:flex;align-items:center;gap:30px;">
+          <a href="agents.html" class="nav-link" style="font-family:var(--ff-mono);font-size:12px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;">Notion</a>
+          <a href="av-suite.html" class="nav-link" style="font-family:var(--ff-mono);font-size:12px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;">AV&nbsp;Suite</a>
+          <a href="https://promptlab.tools" target="_blank" rel="noopener" class="nav-link" style="font-family:var(--ff-mono);font-size:12px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;">Prompt&nbsp;Lab</a>
+          <a href="https://github.com/DaveHomeAssist/system-by-dave" target="_blank" rel="noopener" class="gh-btn" style="font-family:var(--ff-mono);font-size:12px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;color:#0A0D14;background:#F3F4F7;padding:9px 18px;">GitHub&nbsp;↗</a>
         </div>
-        <span class="nav-brand-text">System by Dave</span>
-      </a>
-      <ul class="nav-links">
-        <li><a href="av-suite.html">AV&nbsp;Tools</a></li>
-        <li><a href="tools.html#notion">Notion</a></li>
-        <li><a href="tools.html#apps">Apps&nbsp;&amp;&nbsp;Games</a></li>
-        <li><a href="tools.html#trackers">Trackers</a></li>
-        <li><a href="tools.html">Tools</a></li>
-        <li><a href="#about">Ethos</a></li>
-        <li><a href="https://promptlab.tools" target="_blank" rel="noopener noreferrer">Prompt&nbsp;Lab&nbsp;↗</a></li>
-        <li><a href="https://davehomeassist.github.io" target="_blank" rel="noopener noreferrer">Portfolio&nbsp;↗</a></li>
-        <li><a href="https://github.com/DaveHomeAssist/system-by-dave" target="_blank" rel="noopener noreferrer" class="nav-cta">GitHub&nbsp;↗</a></li>
-      </ul>
-    </nav>
-  </header>
+      </nav>
+    </header>
 
-  <main id="main-content">
+    <!-- HERO -->
+    <section class="hero" style="max-width:1200px;margin:0 auto;padding:104px 40px 80px;text-align:center;">
+      <div style="display:inline-flex;align-items:center;gap:10px;font-family:var(--ff-mono);font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(243,244,247,0.55);border:1px solid rgba(255,255,255,0.1);padding:8px 16px;border-radius:100px;margin-bottom:36px;">
+        <span style="width:7px;height:7px;border-radius:50%;background:oklch(0.68 0.13 158);box-shadow:0 0 10px oklch(0.68 0.13 158);"></span>Built by one person · tested in production
+      </div>
+      <h1 style="font-family:var(--ff-display);font-weight:600;font-size:clamp(46px,7vw,92px);line-height:0.98;letter-spacing:-0.03em;margin-bottom:30px;">Software tools that<br><span style="color:rgba(243,244,247,0.45);">do the unglamorous work.</span></h1>
+      <p style="font-size:18px;font-weight:300;line-height:1.7;color:rgba(243,244,247,0.62);max-width:580px;margin:0 auto 44px;">Notion agents and widgets, a prompt-engineering workbench, and a full kit of browser-based AV show tools. Three product lines, one operator's standard — handcrafted, documented, no subscriptions.</p>
+      <div style="display:flex;gap:14px;align-items:center;justify-content:center;flex-wrap:wrap;">
+        <a href="#lines" class="cta-1" style="display:inline-flex;align-items:center;gap:10px;padding:16px 30px;background:#F3F4F7;color:#0A0D14;font-family:var(--ff-mono);font-size:12px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;">Explore the system <span>→</span></a>
+        <a href="av-suite.html" class="cta-2" style="display:inline-flex;align-items:center;gap:8px;padding:16px 28px;color:#F3F4F7;font-family:var(--ff-mono);font-size:12px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;border:1px solid rgba(255,255,255,0.18);">Open AV Suite</a>
+      </div>
 
-  <!-- HERO -->
-  <section class="hero">
-    <div class="container">
-      <div class="hero-grid">
-        <div class="hero-content">
-          <div class="hero-tag reveal">Tools for Notion People</div>
-          <h1 class="reveal reveal-delay-1">Skills, agents & widgets that make <em>Notion</em> work harder</h1>
-          <p class="hero-desc reveal reveal-delay-2">AI skills, embeddable widgets, and prompt tools — handcrafted for people who build systems inside Notion.</p>
-          <div class="hero-actions reveal reveal-delay-3">
-            <a href="#av-tools" class="btn-primary">
-              See what's new
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-            </a>
-            <a href="widgets.html" class="btn-secondary">Browse Widgets</a>
+      <!-- spec strip -->
+      <div class="specs" style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;margin-top:84px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.06);text-align:left;">
+        <div style="background:#0A0D14;padding:26px 24px;"><div style="font-family:var(--ff-display);font-weight:600;font-size:38px;line-height:1;margin-bottom:8px;color:oklch(0.66 0.17 256);">01</div><div style="font-family:var(--ff-mono);font-size:10.5px;letter-spacing:0.06em;text-transform:uppercase;color:rgba(243,244,247,0.5);">Prompt-engineering workbench</div></div>
+        <div style="background:#0A0D14;padding:26px 24px;"><div style="font-family:var(--ff-display);font-weight:600;font-size:38px;line-height:1;margin-bottom:8px;color:oklch(0.68 0.13 158);">40+</div><div style="font-family:var(--ff-mono);font-size:10.5px;letter-spacing:0.06em;text-transform:uppercase;color:rgba(243,244,247,0.5);">Browser AV tools, offline-first</div></div>
+        <div style="background:#0A0D14;padding:26px 24px;"><div style="font-family:var(--ff-display);font-weight:600;font-size:38px;line-height:1;margin-bottom:8px;color:oklch(0.65 0.19 33);">04</div><div style="font-family:var(--ff-mono);font-size:10.5px;letter-spacing:0.06em;text-transform:uppercase;color:rgba(243,244,247,0.5);">Notion agents, in production</div></div>
+        <div style="background:#0A0D14;padding:26px 24px;"><div style="font-family:var(--ff-display);font-weight:600;font-size:38px;line-height:1;margin-bottom:8px;color:#F3F4F7;">$0</div><div style="font-family:var(--ff-mono);font-size:10.5px;letter-spacing:0.06em;text-transform:uppercase;color:rgba(243,244,247,0.5);">Widgets, free &amp; open source</div></div>
+      </div>
+    </section>
+
+    <!-- PRODUCT LINES -->
+    <section id="lines" style="max-width:1200px;margin:0 auto;padding:48px 40px 40px;">
+      <div style="display:flex;align-items:baseline;gap:18px;margin-bottom:40px;">
+        <span style="font-family:var(--ff-mono);font-size:12px;color:rgba(243,244,247,0.4);">01</span>
+        <h2 style="font-family:var(--ff-display);font-weight:500;font-size:clamp(26px,3vw,38px);letter-spacing:-0.02em;">Three product lines</h2>
+        <span style="margin-left:auto;font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:rgba(243,244,247,0.4);">Pick a workspace →</span>
+      </div>
+      <div class="lines" style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;">
+        <a href="agents.html" class="line-card l-red" style="position:relative;display:flex;flex-direction:column;min-height:340px;padding:30px;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.09);text-decoration:none;color:inherit;overflow:hidden;">
+          <div style="position:absolute;top:0;left:0;right:0;height:3px;background:oklch(0.65 0.19 33);opacity:0.85;"></div>
+          <div style="display:flex;align-items:center;gap:9px;font-family:var(--ff-mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:oklch(0.65 0.19 33);margin-bottom:auto;"><span style="width:7px;height:7px;border-radius:50%;background:oklch(0.65 0.19 33);"></span>Workspace</div>
+          <div style="font-family:var(--ff-mono);font-size:64px;font-weight:500;line-height:1;color:oklch(0.65 0.19 33);opacity:0.16;margin:32px 0 18px;">N</div>
+          <h3 style="font-family:var(--ff-display);font-weight:600;font-size:27px;letter-spacing:-0.01em;margin-bottom:12px;">Notion</h3>
+          <p style="font-size:14px;font-weight:300;line-height:1.6;color:rgba(243,244,247,0.6);margin-bottom:22px;">AI agents and embeddable widgets that run natively inside Notion — triage, briefings, formatting, and live dashboards.</p>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding-top:18px;border-top:1px solid rgba(255,255,255,0.08);">
+            <span style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:rgba(243,244,247,0.5);">4 agents · free widgets</span>
+            <span style="font-family:var(--ff-mono);font-size:12px;color:oklch(0.65 0.19 33);">Enter →</span>
           </div>
-        </div>
-        <div class="hero-visual reveal reveal-delay-2">
-          <div class="blueprint-frame">
-            <div class="corner corner-tl"></div>
-            <div class="corner corner-tr"></div>
-            <div class="corner corner-bl"></div>
-            <div class="corner corner-br"></div>
-            <div class="blueprint-s">S</div>
-            <div class="blueprint-modules">
-              <div class="bp-module"><img src="svg/category-skills.svg" alt="Skills"></div>
-              <div class="bp-module"><img src="svg/category-agents.svg" alt="Agents"></div>
-              <div class="bp-module"><img src="svg/category-templates.svg" alt="Templates"></div>
-              <div class="bp-module"><img src="svg/category-systems.svg" alt="Systems"></div>
-            </div>
+        </a>
+        <a href="av-suite.html" class="line-card l-green" style="position:relative;display:flex;flex-direction:column;min-height:340px;padding:30px;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.09);text-decoration:none;color:inherit;overflow:hidden;">
+          <div style="position:absolute;top:0;left:0;right:0;height:3px;background:oklch(0.68 0.13 158);opacity:0.85;"></div>
+          <div style="display:flex;align-items:center;gap:9px;font-family:var(--ff-mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:oklch(0.68 0.13 158);margin-bottom:auto;"><span style="width:7px;height:7px;border-radius:50%;background:oklch(0.68 0.13 158);"></span>Live shows</div>
+          <div style="font-family:var(--ff-mono);font-size:64px;font-weight:500;line-height:1;color:oklch(0.68 0.13 158);opacity:0.16;margin:32px 0 18px;">AV</div>
+          <h3 style="font-family:var(--ff-display);font-weight:600;font-size:27px;letter-spacing:-0.01em;margin-bottom:12px;">AV Suite</h3>
+          <p style="font-size:14px;font-weight:300;line-height:1.6;color:rgba(243,244,247,0.6);margin-bottom:22px;">A full kit of browser-based tools for live-show operators — planning, patching, timing, cueing, and run-of-show.</p>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding-top:18px;border-top:1px solid rgba(255,255,255,0.08);">
+            <span style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:rgba(243,244,247,0.5);">40+ tools · offline</span>
+            <span style="font-family:var(--ff-mono);font-size:12px;color:oklch(0.68 0.13 158);">Enter →</span>
           </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- AGENTS -->
-  <section class="showcase" id="agents">
-    <div class="container">
-      <div class="showcase-row reveal">
-        <div class="showcase-label">
-          <div class="showcase-label-tag">Agents</div>
-          <h2>AI agents that run inside Notion</h2>
-          <p>Each agent handles a specific workflow — triaging your inbox, assembling your daily briefing, or keeping your prompts organized.</p>
-          <a href="agents.html" class="btn-secondary">All Agents →</a>
-        </div>
-        <div class="showcase-cards">
-          <a href="agents.html#promptkeeper" class="product-card">
-            <div class="product-image">
-              <img src="img/agent-promptkeeper.webp" alt="PromptKeeper" width="2048" height="2048" loading="lazy" decoding="async" onerror="this.parentElement.innerHTML='<div class=product-image-placeholder>PK</div>'">
-            </div>
-            <div class="product-body">
-              <div class="product-category"><span class="product-category-dot"></span> Agent</div>
-              <h3 class="product-name">PromptKeeper</h3>
-              <p class="product-desc">Save, organize, and recall your best AI prompts inside Notion.</p>
-              <div class="product-footer">
-                <span class="product-price"><span class="currency">$</span>15</span>
-                <span class="product-link">View <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-              </div>
-            </div>
-          </a>
-          <a href="agents.html#daily-prophet" class="product-card">
-            <div class="product-image">
-              <img src="img/agent-daily-prophet.webp" alt="Daily Prophet" width="960" height="960" loading="lazy" decoding="async" onerror="this.parentElement.innerHTML='<div class=product-image-placeholder>DP</div>'">
-            </div>
-            <div class="product-body">
-              <div class="product-category"><span class="product-category-dot"></span> Agent</div>
-              <h3 class="product-name">Daily Prophet</h3>
-              <p class="product-desc">Your morning briefing — tasks, calendar, and notes assembled automatically.</p>
-              <div class="product-footer">
-                <span class="product-price"><span class="currency">$</span>12</span>
-                <span class="product-link">View <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-              </div>
-            </div>
-          </a>
-          <a href="agents.html#formatting-wizard" class="product-card">
-            <div class="product-image">
-              <img src="img/agent-formatting-wizard.webp" alt="Formatting Wizard" width="1024" height="1024" loading="lazy" decoding="async" onerror="this.parentElement.innerHTML='<div class=product-image-placeholder>FW</div>'">
-            </div>
-            <div class="product-body">
-              <div class="product-category"><span class="product-category-dot"></span> Agent</div>
-              <h3 class="product-name">Formatting Wizard</h3>
-              <p class="product-desc">Transform messy notes into clean, structured Notion pages instantly.</p>
-              <div class="product-footer">
-                <span class="product-price"><span class="currency">$</span>12</span>
-                <span class="product-link">View <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-              </div>
-            </div>
-          </a>
-          <a href="agents.html#sort-inbox" class="product-card">
-            <div class="product-image">
-              <img src="img/agent-sort-inbox.webp" alt="Sort Inbox" class="product-image-sort-inbox" width="854" height="860" loading="lazy" decoding="async" onerror="this.parentElement.innerHTML='<div class=product-image-placeholder>SI</div>'">
-            </div>
-            <div class="product-body">
-              <div class="product-category"><span class="product-category-dot"></span> Agent</div>
-              <h3 class="product-name">Sort Inbox</h3>
-              <p class="product-desc">Weekly triage that classifies, routes, and prioritizes every item in your Notion inbox.</p>
-              <div class="product-footer">
-                <span class="product-price"><span class="currency">$</span>19</span>
-                <span class="product-link">View <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-              </div>
-            </div>
-          </a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- WIDGETS -->
-  <section class="showcase" id="widgets">
-    <div class="container">
-      <div class="showcase-row reveal">
-        <div class="showcase-label">
-          <div class="showcase-label-tag">Widgets</div>
-          <h2>Embeddable widgets for Notion</h2>
-          <p>Standalone HTML widgets that drop into any Notion page via embed. They configure through URL parameters and need no API key.</p>
-          <a href="widgets.html" class="btn-secondary">All Widgets →</a>
-        </div>
-        <div class="showcase-cards">
-          <a href="https://davehomeassist.github.io/NotionWidgets/project-status.html" target="_blank" rel="noopener noreferrer" class="product-card widget-card">
-            <div class="product-image widget-poster" data-poster="PS" aria-hidden="true"></div>
-            <div class="product-body">
-              <div class="product-category"><span class="product-category-dot"></span> Widget</div>
-              <h3 class="product-name">Project Status</h3>
-              <p class="product-desc">Progress rings, phase tracking, and health indicators in a compact dashboard panel.</p>
-              <div class="product-footer">
-                <span class="product-price"><span class="free-tag">Free</span></span>
-                <span class="product-link">View <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-              </div>
-            </div>
-          </a>
-          <a href="https://davehomeassist.github.io/NotionWidgets/quest-log.html" target="_blank" rel="noopener noreferrer" class="product-card widget-card">
-            <div class="product-image widget-poster" data-poster="QL" aria-hidden="true"></div>
-            <div class="product-body">
-              <div class="product-category"><span class="product-category-dot"></span> Widget</div>
-              <h3 class="product-name">Quest Log</h3>
-              <p class="product-desc">Gamified task tracker with XP, streaks, gold, and HP. Turn your tasks into an RPG.</p>
-              <div class="product-footer">
-                <span class="product-price"><span class="free-tag">Free</span></span>
-                <span class="product-link">View <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-              </div>
-            </div>
-          </a>
-          <a href="https://davehomeassist.github.io/NotionWidgets/client-approval.html" target="_blank" rel="noopener noreferrer" class="product-card widget-card">
-            <div class="product-image widget-poster" data-poster="CA" aria-hidden="true"></div>
-            <div class="product-body">
-              <div class="product-category"><span class="product-category-dot"></span> Widget</div>
-              <h3 class="product-name">Client Approval Hub</h3>
-              <p class="product-desc">Approve, revise, or restart workflow with feedback capture and status tracking.</p>
-              <div class="product-footer">
-                <span class="product-price"><span class="free-tag">Free</span></span>
-                <span class="product-link">View <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-              </div>
-            </div>
-          </a>
-          <a href="https://davehomeassist.github.io/NotionWidgets/graph-explorer.html" target="_blank" rel="noopener noreferrer" class="product-card widget-card">
-            <div class="product-image widget-poster" data-poster="WM" aria-hidden="true"></div>
-            <div class="product-body">
-              <div class="product-category"><span class="product-category-dot"></span> Widget</div>
-              <h3 class="product-name">Workspace Map</h3>
-              <p class="product-desc">Interactive D3 graph that visualizes your entire Notion workspace structure.</p>
-              <div class="product-footer">
-                <span class="product-price"><span class="free-tag">Free</span></span>
-                <span class="product-link">View <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-              </div>
-            </div>
-          </a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- AV TOOLS -->
-  <section class="showcase" id="av-tools">
-    <div class="container">
-      <div class="av-dept-menu reveal">
-        <p class="av-dept-intro">Browse every AV tool by department — or open the <a href="av-suite.html">AV Suite</a> operator hub.</p>
-        <div class="av-dept-grid">
-        <div class="av-dept-group">
-          <h3>Run of show</h3>
-          <ul>
-            <li><a href="teleprompter.html">Teleprompter</a></li>
-            <li><a href="show-timer.html">Show Timer</a></li>
-            <li><a href="cueforge.html">CueForge</a></li>
-            <li><a href="playback-check.html">Playback Check</a></li>
-            <li><a href="comms-check.html">Comms Check</a></li>
-          </ul>
-        </div>
-        <div class="av-dept-group">
-          <h3>Audio</h3>
-          <ul>
-            <li><a href="audio-patch.html">Audio Patch</a></li>
-            <li><a href="line-check.html">Line Check</a></li>
-            <li><a href="input-list.html">Input List</a></li>
-            <li><a href="signal-flow.html">Signal Flow</a></li>
-            <li><a href="speaker-plan.html">Speaker Plan</a></li>
-            <li><a href="rf-coordination.html">RF Coordination</a></li>
-          </ul>
-        </div>
-        <div class="av-dept-group">
-          <h3>Video</h3>
-          <ul>
-            <li><a href="video-patch.html">Video Patch</a></li>
-            <li><a href="display-plan.html">Display Plan</a></li>
-            <li><a href="projection-plan.html">Projection Plan</a></li>
-            <li><a href="stream-plan.html">Stream Plan</a></li>
-            <li><a href="record-log.html">Record Log</a></li>
-            <li><a href="camera-shot-list.html">Camera Shot List</a></li>
-          </ul>
-        </div>
-        <div class="av-dept-group">
-          <h3>Lighting</h3>
-          <ul>
-            <li><a href="lighting-patch.html">Lighting Patch</a></li>
-          </ul>
-        </div>
-        <div class="av-dept-group">
-          <h3>Power &amp; data</h3>
-          <ul>
-            <li><a href="power-plan.html">Power Plan</a></li>
-            <li><a href="network-plan.html">Network Plan</a></li>
-            <li><a href="cable-plan.html">Cable Plan</a></li>
-          </ul>
-        </div>
-        <div class="av-dept-group">
-          <h3>Spaces &amp; staging</h3>
-          <ul>
-            <li><a href="plotforge.html">PlotForge</a></li>
-            <li><a href="room-check.html">Room Check</a></li>
-            <li><a href="breakout-room-matrix.html">Breakout Room Matrix</a></li>
-            <li><a href="site-survey.html">Site Survey</a></li>
-          </ul>
-        </div>
-        <div class="av-dept-group">
-          <h3>Logistics</h3>
-          <ul>
-            <li><a href="gear-prep.html">Gear Prep</a></li>
-            <li><a href="truck-pack.html">Truck Pack Plan</a></li>
-            <li><a href="load-in-plan.html">Load-In Plan</a></li>
-            <li><a href="strike-plan.html">Strike Plan</a></li>
-            <li><a href="show-advance.html">Show Advance</a></li>
-          </ul>
-        </div>
-        <div class="av-dept-group">
-          <h3>Crew</h3>
-          <ul>
-            <li><a href="crew-call.html">Crew Call</a></li>
-            <li><a href="crew-time-log.html">Crew Time Log</a></li>
-          </ul>
-        </div>
-        <div class="av-dept-group">
-          <h3>Show docs &amp; client</h3>
-          <ul>
-            <li><a href="show-handoff.html">Show Handoff</a></li>
-            <li><a href="show-report.html">Show Report</a></li>
-            <li><a href="show-task-board.html">Show Task Board</a></li>
-            <li><a href="change-order.html">Change Order</a></li>
-            <li><a href="client-signoff.html">Client Sign-Off</a></li>
-          </ul>
-        </div>
-        <div class="av-dept-group">
-          <h3>Calculators</h3>
-          <ul>
-            <li><a href="av-calculator.html">AV Calculator</a></li>
-          </ul>
-        </div>
-        </div>
-      </div>
-      <div class="showcase-row reveal">
-        <div class="showcase-label">
-          <div class="showcase-label-tag">AV Tools</div>
-          <h2>Show utilities for the room</h2>
-          <p>A full set of browser-based tools for live-show operators — planning, patching, timing, cueing, and run-of-show — anchored by the AV Suite launch hub. Everything runs in the browser, works offline, and keeps your show data on your device.</p>
-          <a href="av-suite.html" class="btn-secondary">Open AV Suite →</a>
-        </div>
-        <div class="showcase-cards">
-          <a href="av-suite.html" class="product-card widget-card">
-            <div class="product-image widget-poster" data-poster="AV" aria-hidden="true"></div>
-            <div class="product-body">
-              <div class="product-category"><span class="product-category-dot"></span> AV Tool</div>
-              <h3 class="product-name">AV Suite</h3>
-              <p class="product-desc">Operator launch hub with show profile, phase recommendations, search, department filters, pinned tools, recent tools, and copyable launch lists.</p>
-              <div class="product-footer">
-                <span class="product-price"><span class="free-tag">Free</span></span>
-                <span class="product-link">Open <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-              </div>
-            </div>
-          </a>
-          <a href="teleprompter.html" class="product-card widget-card">
-            <div class="product-image widget-poster" data-poster="TP" aria-hidden="true"></div>
-            <div class="product-body">
-              <div class="product-category"><span class="product-category-dot"></span> AV Tool</div>
-              <h3 class="product-name">Teleprompter</h3>
-              <p class="product-desc">Script reader with font stacks, color palettes, line color, text effects, pinned saved scripts, saved script sorting, cue markers, show packages, remote mode, and timed rundown views.</p>
-              <div class="product-footer">
-                <span class="product-price"><span class="free-tag">Free</span></span>
-                <span class="product-link">Open <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-              </div>
-            </div>
-          </a>
-          <a href="show-timer.html" class="product-card widget-card">
-            <div class="product-image widget-poster" data-poster="ST" aria-hidden="true"></div>
-            <div class="product-body">
-              <div class="product-category"><span class="product-category-dot"></span> AV Tool</div>
-              <h3 class="product-name">Show Timer</h3>
-              <p class="product-desc">Stage timer with countdown, count up, clock mode, fast presets, warning states, keyboard control, and stage view.</p>
-              <div class="product-footer">
-                <span class="product-price"><span class="free-tag">Free</span></span>
-                <span class="product-link">Open <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-              </div>
-            </div>
-          </a>
-          <a href="cueforge.html" class="product-card widget-card">
-            <div class="product-image widget-poster" data-poster="CF" aria-hidden="true"></div>
-            <div class="product-body">
-              <div class="product-category"><span class="product-category-dot"></span> AV Tool</div>
-              <h3 class="product-name">CueForge</h3>
-              <p class="product-desc">CueForge run of show control with sample cues, status tracking, next cue actions, keyboard control, print, JSON export, and CSV export.</p>
-              <div class="product-footer">
-                <span class="product-price"><span class="free-tag">Free</span></span>
-                <span class="product-link">Open <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-              </div>
-            </div>
-          </a>
-          <a href="playback-check.html" class="product-card widget-card">
-            <div class="product-image widget-poster" data-poster="PB" aria-hidden="true"></div>
-            <div class="product-body">
-              <div class="product-category"><span class="product-category-dot"></span> AV Tool</div>
-              <h3 class="product-name">Playback Check</h3>
-              <p class="product-desc">Media playback checklist with file names, durations, aspect ratios, audio routing, destinations, backups, ready status, issue tracking, print, JSON export, and CSV export.</p>
-              <div class="product-footer">
-                <span class="product-price"><span class="free-tag">Free</span></span>
-                <span class="product-link">Open <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-              </div>
-            </div>
-          </a>
-          <a href="stream-plan.html" class="product-card widget-card">
-            <div class="product-image widget-poster" data-poster="ON" aria-hidden="true"></div>
-            <div class="product-body">
-              <div class="product-category"><span class="product-category-dot"></span> AV Tool</div>
-              <h3 class="product-name">Stream Plan</h3>
-              <p class="product-desc">Streaming planner for encoders, platforms, destinations, servers, key labels, inputs, bitrates, audio, records, backups, test status, handoff notes, JSON export, and CSV export.</p>
-              <div class="product-footer">
-                <span class="product-price"><span class="free-tag">Free</span></span>
-                <span class="product-link">Open <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-              </div>
-            </div>
-          </a>
-          <a href="record-log.html" class="product-card widget-card">
-            <div class="product-image widget-poster" data-poster="RL" aria-hidden="true"></div>
-            <div class="product-body">
-              <div class="product-category"><span class="product-category-dot"></span> AV Tool</div>
-              <h3 class="product-name">Record Log</h3>
-              <p class="product-desc">Recording tracker for program records, camera ISOs, slides, audio, streams, media destinations, backups, issue status, handoff notes, JSON export, and CSV export.</p>
-              <div class="product-footer">
-                <span class="product-price"><span class="free-tag">Free</span></span>
-                <span class="product-link">Open <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-              </div>
-            </div>
-          </a>
-          <a href="power-plan.html" class="product-card widget-card">
-            <div class="product-image widget-poster" data-poster="PW" aria-hidden="true"></div>
-            <div class="product-body">
-              <div class="product-category"><span class="product-category-dot"></span> AV Tool</div>
-              <h3 class="product-name">Power Plan</h3>
-              <p class="product-desc">Circuit planner for power sources, room locations, load names, voltage, capacity, draw, headroom, backups, issue status, handoff notes, JSON export, and CSV export.</p>
-              <div class="product-footer">
-                <span class="product-price"><span class="free-tag">Free</span></span>
-                <span class="product-link">Open <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-              </div>
-            </div>
-          </a>
-          <a href="audio-patch.html" class="product-card widget-card">
-            <div class="product-image widget-poster" data-poster="AP" aria-hidden="true"></div>
-            <div class="product-body">
-              <div class="product-category"><span class="product-category-dot"></span> AV Tool</div>
-              <h3 class="product-name">Audio Patch</h3>
-              <p class="product-desc">Audio patch sheet for console channels, sources, stageboxes, inputs, phantom power, gain, destinations, monitors, line check status, patch gap warnings, handoff notes, JSON export, and CSV export.</p>
-              <div class="product-footer">
-                <span class="product-price"><span class="free-tag">Free</span></span>
-                <span class="product-link">Open <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-              </div>
-            </div>
-          </a>
-          <a href="line-check.html" class="product-card widget-card">
-            <div class="product-image widget-poster" data-poster="LC" aria-hidden="true"></div>
-            <div class="product-body">
-              <div class="product-category"><span class="product-category-dot"></span> AV Tool</div>
-              <h3 class="product-name">Line Check</h3>
-              <p class="product-desc">Line check tracker for channels, sources, locations, tech assignments, patch points, destinations, talkback, problems, status, handoff notes, JSON export, and CSV export.</p>
-              <div class="product-footer">
-                <span class="product-price"><span class="free-tag">Free</span></span>
-                <span class="product-link">Open <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-              </div>
-            </div>
-          </a>
-          <a href="room-check.html" class="product-card widget-card">
-            <div class="product-image widget-poster" data-poster="RC" aria-hidden="true"></div>
-            <div class="product-body">
-              <div class="product-category"><span class="product-category-dot"></span> AV Tool</div>
-              <h3 class="product-name">Room Check</h3>
-              <p class="product-desc">Room readiness tracker for stage, audio, video, lighting, network, safety, house, talent, owners, deadlines, blockers, status, handoff notes, JSON export, and CSV export.</p>
-              <div class="product-footer">
-                <span class="product-price"><span class="free-tag">Free</span></span>
-                <span class="product-link">Open <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-              </div>
-            </div>
-          </a>
-          <a href="breakout-room-matrix.html" class="product-card widget-card">
-            <div class="product-image widget-poster" data-poster="BR" aria-hidden="true"></div>
-            <div class="product-body">
-              <div class="product-category"><span class="product-category-dot"></span> AV Tool</div>
-              <h3 class="product-name">Breakout Room Matrix</h3>
-              <p class="product-desc">Multi room matrix for breakout schedules, tracks, techs, producers, audio, video, network, power, readiness, blockers, handoff notes, JSON export, and CSV export.</p>
-              <div class="product-footer">
-                <span class="product-price"><span class="free-tag">Free</span></span>
-                <span class="product-link">Open <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-              </div>
-            </div>
-          </a>
-          <a href="speaker-plan.html" class="product-card widget-card">
-            <div class="product-image widget-poster" data-poster="SPK" aria-hidden="true"></div>
-            <div class="product-body">
-              <div class="product-category"><span class="product-category-dot"></span> AV Tool</div>
-              <h3 class="product-name">Speaker Plan</h3>
-              <p class="product-desc">Speaker deployment planner for zones, loudspeakers, processor outputs, amps, cable paths, trim, delay, coverage status, backup routes, handoff notes, JSON export, and CSV export.</p>
-              <div class="product-footer">
-                <span class="product-price"><span class="free-tag">Free</span></span>
-                <span class="product-link">Open <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-              </div>
-            </div>
-          </a>
-          <a href="lighting-patch.html" class="product-card widget-card">
-            <div class="product-image widget-poster" data-poster="LX" aria-hidden="true"></div>
-            <div class="product-body">
-              <div class="product-category"><span class="product-category-dot"></span> AV Tool</div>
-              <h3 class="product-name">Lighting Patch</h3>
-              <p class="product-desc">Fixture patch sheet for positions, units, modes, universes, addresses, channels, dimmers, colors, focus notes, status, duplicate address warnings, handoff notes, JSON export, and CSV export.</p>
-              <div class="product-footer">
-                <span class="product-price"><span class="free-tag">Free</span></span>
-                <span class="product-link">Open <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-              </div>
-            </div>
-          </a>
-          <a href="display-plan.html" class="product-card widget-card">
-            <div class="product-image widget-poster" data-poster="DP" aria-hidden="true"></div>
-            <div class="product-body">
-              <div class="product-category"><span class="product-category-dot"></span> AV Tool</div>
-              <h3 class="product-name">Display Plan</h3>
-              <p class="product-desc">Display plan for screens, processors, inputs, resolutions, aspect ratios, refresh rates, routes, backup paths, status, backup gap warnings, handoff notes, JSON export, and CSV export.</p>
-              <div class="product-footer">
-                <span class="product-price"><span class="free-tag">Free</span></span>
-                <span class="product-link">Open <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-              </div>
-            </div>
-          </a>
-          <a href="projection-plan.html" class="product-card widget-card">
-            <div class="product-image widget-poster" data-poster="PJ" aria-hidden="true"></div>
-            <div class="product-body">
-              <div class="product-category"><span class="product-category-dot"></span> AV Tool</div>
-              <h3 class="product-name">Projection Plan</h3>
-              <p class="product-desc">Projection planner for screens, projectors, lenses, throw, positions, input routes, blends, backup paths, alignment status, handoff notes, JSON export, and CSV export.</p>
-              <div class="product-footer">
-                <span class="product-price"><span class="free-tag">Free</span></span>
-                <span class="product-link">Open <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-              </div>
-            </div>
-          </a>
-          <a href="video-patch.html" class="product-card widget-card">
-            <div class="product-image widget-poster" data-poster="VP" aria-hidden="true"></div>
-            <div class="product-body">
-              <div class="product-category"><span class="product-category-dot"></span> AV Tool</div>
-              <h3 class="product-name">Video Patch</h3>
-              <p class="product-desc">Video patch sheet for sources, formats, connectors, switcher inputs, converters, destinations, route outputs, backup paths, test status, handoff notes, JSON export, and CSV export.</p>
-              <div class="product-footer">
-                <span class="product-price"><span class="free-tag">Free</span></span>
-                <span class="product-link">Open <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-              </div>
-            </div>
-          </a>
-          <a href="network-plan.html" class="product-card widget-card">
-            <div class="product-image widget-poster" data-poster="NW" aria-hidden="true"></div>
-            <div class="product-body">
-              <div class="product-category"><span class="product-category-dot"></span> AV Tool</div>
-              <h3 class="product-name">Network Plan</h3>
-              <p class="product-desc">Network planner for show control, audio, video, comms, internet, IPs, VLANs, switch ports, backup paths, issue status, handoff notes, JSON export, and CSV export.</p>
-              <div class="product-footer">
-                <span class="product-price"><span class="free-tag">Free</span></span>
-                <span class="product-link">Open <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-              </div>
-            </div>
-          </a>
-          <a href="signal-flow.html" class="product-card widget-card">
-            <div class="product-image widget-poster" data-poster="SF" aria-hidden="true"></div>
-            <div class="product-body">
-              <div class="product-category"><span class="product-category-dot"></span> AV Tool</div>
-              <h3 class="product-name">Signal Flow</h3>
-              <p class="product-desc">Route planner for sources, processors, destinations, formats, connectors, backups, route status, issue tracking, print, JSON export, and CSV export.</p>
-              <div class="product-footer">
-                <span class="product-price"><span class="free-tag">Free</span></span>
-                <span class="product-link">Open <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-              </div>
-            </div>
-          </a>
-          <a href="cable-plan.html" class="product-card widget-card">
-            <div class="product-image widget-poster" data-poster="CP" aria-hidden="true"></div>
-            <div class="product-body">
-              <div class="product-category"><span class="product-category-dot"></span> AV Tool</div>
-              <h3 class="product-name">Cable Plan</h3>
-              <p class="product-desc">Cable run tracker for types, lengths, sources, destinations, paths, labels, owners, pull status, trip and slack issues, print, JSON export, and CSV export.</p>
-              <div class="product-footer">
-                <span class="product-price"><span class="free-tag">Free</span></span>
-                <span class="product-link">Open <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-              </div>
-            </div>
-          </a>
-          <a href="input-list.html" class="product-card widget-card">
-            <div class="product-image widget-poster" data-poster="IL" aria-hidden="true"></div>
-            <div class="product-body">
-              <div class="product-category"><span class="product-category-dot"></span> AV Tool</div>
-              <h3 class="product-name">Input List</h3>
-              <p class="product-desc">Patch sheet for channels, sources, connections, phantom power, monitors, owners, line check status, print, JSON export, and CSV export.</p>
-              <div class="product-footer">
-                <span class="product-price"><span class="free-tag">Free</span></span>
-                <span class="product-link">Open <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-              </div>
-            </div>
-          </a>
-          <a href="plotforge.html" class="product-card widget-card">
-            <div class="product-image widget-poster" data-poster="SP" aria-hidden="true"></div>
-            <div class="product-body">
-              <div class="product-category"><span class="product-category-dot"></span> AV Tool</div>
-              <h3 class="product-name">PlotForge</h3>
-              <p class="product-desc">PlotForge room layout planner with draggable stage, screens, cameras, speakers, mics, tables, power, cable paths, notes, print, and JSON export.</p>
-              <div class="product-footer">
-                <span class="product-price"><span class="free-tag">Free</span></span>
-                <span class="product-link">Open <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-              </div>
-            </div>
-          </a>
-          <a href="show-handoff.html" class="product-card widget-card">
-            <div class="product-image widget-poster" data-poster="SH" aria-hidden="true"></div>
-            <div class="product-body">
-              <div class="product-category"><span class="product-category-dot"></span> AV Tool</div>
-              <h3 class="product-name">Show Handoff</h3>
-              <p class="product-desc">Shift handoff builder with status sections, signal flow notes, risks, numbered next actions, summary table, decision matrix, print, and JSON export.</p>
-              <div class="product-footer">
-                <span class="product-price"><span class="free-tag">Free</span></span>
-                <span class="product-link">Open <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-              </div>
-            </div>
-          </a>
-          <a href="show-report.html" class="product-card widget-card">
-            <div class="product-image widget-poster" data-poster="SR" aria-hidden="true"></div>
-            <div class="product-body">
-              <div class="product-category"><span class="product-category-dot"></span> AV Tool</div>
-              <h3 class="product-name">Show Report</h3>
-              <p class="product-desc">Show day report for timeline entries, issues, client requests, decisions, crew notes, follow ups, severity, status, handoff notes, JSON export, and CSV export.</p>
-              <div class="product-footer">
-                <span class="product-price"><span class="free-tag">Free</span></span>
-                <span class="product-link">Open <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-              </div>
-            </div>
-          </a>
-          <a href="show-task-board.html" class="product-card widget-card">
-            <div class="product-image widget-poster" data-poster="TB" aria-hidden="true"></div>
-            <div class="product-body">
-              <div class="product-category"><span class="product-category-dot"></span> AV Tool</div>
-              <h3 class="product-name">Show Task Board</h3>
-              <p class="product-desc">Live task board for show day fixes, owners, priority, due times, blockers, sources, notes, status counts, handoff summaries, JSON export, and CSV export.</p>
-              <div class="product-footer">
-                <span class="product-price"><span class="free-tag">Free</span></span>
-                <span class="product-link">Open <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-              </div>
-            </div>
-          </a>
-          <a href="change-order.html" class="product-card widget-card">
-            <div class="product-image widget-poster" data-poster="CO" aria-hidden="true"></div>
-            <div class="product-body">
-              <div class="product-category"><span class="product-category-dot"></span> AV Tool</div>
-              <h3 class="product-name">Change Order</h3>
-              <p class="product-desc">Client change tracker for scope requests, area, requester, impact, cost, approvals, owners, due times, status, handoff notes, JSON export, and CSV export.</p>
-              <div class="product-footer">
-                <span class="product-price"><span class="free-tag">Free</span></span>
-                <span class="product-link">Open <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-              </div>
-            </div>
-          </a>
-          <a href="client-signoff.html" class="product-card widget-card">
-            <div class="product-image widget-poster" data-poster="CS" aria-hidden="true"></div>
-            <div class="product-body">
-              <div class="product-category"><span class="product-category-dot"></span> AV Tool</div>
-              <h3 class="product-name">Client Sign Off</h3>
-              <p class="product-desc">Closeout tracker for client acceptance, deliverables, room checks, approvers, signed times, exceptions, follow ups, handoff notes, JSON export, and CSV export.</p>
-              <div class="product-footer">
-                <span class="product-price"><span class="free-tag">Free</span></span>
-                <span class="product-link">Open <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-              </div>
-            </div>
-          </a>
-          <a href="camera-shot-list.html" class="product-card widget-card">
-            <div class="product-image widget-poster" data-poster="CM" aria-hidden="true"></div>
-            <div class="product-body">
-              <div class="product-category"><span class="product-category-dot"></span> AV Tool</div>
-              <h3 class="product-name">Camera Shot List</h3>
-              <p class="product-desc">Camera plan with editable shots, camera filters, framing, movement, presets, ready and problem status, take next, print, JSON export, and CSV export.</p>
-              <div class="product-footer">
-                <span class="product-price"><span class="free-tag">Free</span></span>
-                <span class="product-link">Open <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-              </div>
-            </div>
-          </a>
-          <a href="comms-check.html" class="product-card widget-card">
-            <div class="product-image widget-poster" data-poster="IC" aria-hidden="true"></div>
-            <div class="product-body">
-              <div class="product-category"><span class="product-category-dot"></span> AV Tool</div>
-              <h3 class="product-name">Comms Check</h3>
-              <p class="product-desc">Intercom, radio, and IFB assignment tracker with channels, device IDs, battery status, backups, issue flags, print, JSON export, and CSV export.</p>
-              <div class="product-footer">
-                <span class="product-price"><span class="free-tag">Free</span></span>
-                <span class="product-link">Open <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-              </div>
-            </div>
-          </a>
-          <a href="rf-coordination.html" class="product-card widget-card">
-            <div class="product-image widget-poster" data-poster="RF" aria-hidden="true"></div>
-            <div class="product-body">
-              <div class="product-category"><span class="product-category-dot"></span> AV Tool</div>
-              <h3 class="product-name">RF Coordination</h3>
-              <p class="product-desc">Wireless coordination sheet for mics, IEMs, IFB, comms packs, receivers, frequencies, bands, channels, scan status, conflict warnings, backups, handoff notes, JSON export, and CSV export.</p>
-              <div class="product-footer">
-                <span class="product-price"><span class="free-tag">Free</span></span>
-                <span class="product-link">Open <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-              </div>
-            </div>
-          </a>
-          <a href="site-survey.html" class="product-card widget-card">
-            <div class="product-image widget-poster" data-poster="SS" aria-hidden="true"></div>
-            <div class="product-body">
-              <div class="product-category"><span class="product-category-dot"></span> AV Tool</div>
-              <h3 class="product-name">Site Survey</h3>
-              <p class="product-desc">Venue survey tracker for access, loading, rooms, power, rigging, network, safety, contacts, findings, follow ups, handoff notes, JSON export, and CSV export.</p>
-              <div class="product-footer">
-                <span class="product-price"><span class="free-tag">Free</span></span>
-                <span class="product-link">Open <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-              </div>
-            </div>
-          </a>
-          <a href="gear-prep.html" class="product-card widget-card">
-            <div class="product-image widget-poster" data-poster="GP" aria-hidden="true"></div>
-            <div class="product-body">
-              <div class="product-category"><span class="product-category-dot"></span> AV Tool</div>
-              <h3 class="product-name">Gear Prep</h3>
-              <p class="product-desc">Pack checklist for pull sheets, case IDs, quantities, departments, test status, pack status, load status, issues, open items, handoff notes, JSON export, and CSV export.</p>
-              <div class="product-footer">
-                <span class="product-price"><span class="free-tag">Free</span></span>
-                <span class="product-link">Open <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-              </div>
-            </div>
-          </a>
-          <a href="truck-pack.html" class="product-card widget-card">
-            <div class="product-image widget-poster" data-poster="TK" aria-hidden="true"></div>
-            <div class="product-body">
-              <div class="product-category"><span class="product-category-dot"></span> AV Tool</div>
-              <h3 class="product-name">Truck Pack Plan</h3>
-              <p class="product-desc">Truck pack tracker for cases, truck zones, load order, unload order, weights, owners, packed and loaded status, issues, handoff notes, JSON export, and CSV export.</p>
-              <div class="product-footer">
-                <span class="product-price"><span class="free-tag">Free</span></span>
-                <span class="product-link">Open <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-              </div>
-            </div>
-          </a>
-          <a href="load-in-plan.html" class="product-card widget-card">
-            <div class="product-image widget-poster" data-poster="LI" aria-hidden="true"></div>
-            <div class="product-body">
-              <div class="product-category"><span class="product-category-dot"></span> AV Tool</div>
-              <h3 class="product-name">Load In Plan</h3>
-              <p class="product-desc">Load in tracker for trucks, docks, rooms, gear, departments, owners, due times, build status, blockers, handoff notes, JSON export, and CSV export.</p>
-              <div class="product-footer">
-                <span class="product-price"><span class="free-tag">Free</span></span>
-                <span class="product-link">Open <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-              </div>
-            </div>
-          </a>
-          <a href="strike-plan.html" class="product-card widget-card">
-            <div class="product-image widget-poster" data-poster="SK" aria-hidden="true"></div>
-            <div class="product-body">
-              <div class="product-category"><span class="product-category-dot"></span> AV Tool</div>
-              <h3 class="product-name">Strike Plan</h3>
-              <p class="product-desc">Strike and load out tracker for departments, items, locations, owners, cases, destinations, packed and loaded status, missing gear, issues, handoff notes, JSON export, and CSV export.</p>
-              <div class="product-footer">
-                <span class="product-price"><span class="free-tag">Free</span></span>
-                <span class="product-link">Open <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-              </div>
-            </div>
-          </a>
-          <a href="show-advance.html" class="product-card widget-card">
-            <div class="product-image widget-poster" data-poster="SA" aria-hidden="true"></div>
-            <div class="product-body">
-              <div class="product-category"><span class="product-category-dot"></span> AV Tool</div>
-              <h3 class="product-name">Show Advance</h3>
-              <p class="product-desc">Advance tracker for contacts, venue access, schedule, power, network, labor, deliverables, open questions, risk items, owners, due dates, status, handoff notes, JSON export, and CSV export.</p>
-              <div class="product-footer">
-                <span class="product-price"><span class="free-tag">Free</span></span>
-                <span class="product-link">Open <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-              </div>
-            </div>
-          </a>
-          <a href="crew-call.html" class="product-card widget-card">
-            <div class="product-image widget-poster" data-poster="CC" aria-hidden="true"></div>
-            <div class="product-body">
-              <div class="product-category"><span class="product-category-dot"></span> AV Tool</div>
-              <h3 class="product-name">Crew Call</h3>
-              <p class="product-desc">Crew call sheet for departments, names, roles, call times, locations, meal breaks, release times, phone numbers, contact status, problem flags, handoff notes, JSON export, and CSV export.</p>
-              <div class="product-footer">
-                <span class="product-price"><span class="free-tag">Free</span></span>
-                <span class="product-link">Open <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-              </div>
-            </div>
-          </a>
-          <a href="crew-time-log.html" class="product-card widget-card">
-            <div class="product-image widget-poster" data-poster="CT" aria-hidden="true"></div>
-            <div class="product-body">
-              <div class="product-category"><span class="product-category-dot"></span> AV Tool</div>
-              <h3 class="product-name">Crew Time Log</h3>
-              <p class="product-desc">Crew time tracker for departments, names, roles, call times, actual check in, meal minutes, release times, hour totals, issues, handoff notes, JSON export, and CSV export.</p>
-              <div class="product-footer">
-                <span class="product-price"><span class="free-tag">Free</span></span>
-                <span class="product-link">Open <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-              </div>
-            </div>
-          </a>
-          <a href="av-calculator.html" class="product-card widget-card">
-            <div class="product-image widget-poster" data-poster="AC" aria-hidden="true"></div>
-            <div class="product-body">
-              <div class="product-category"><span class="product-category-dot"></span> AV Tool</div>
-              <h3 class="product-name">AV Calculator</h3>
-              <p class="product-desc">Operator math for audio delay, projection throw, record storage, and power load checks with copyable summaries.</p>
-              <div class="product-footer">
-                <span class="product-price"><span class="free-tag">Free</span></span>
-                <span class="product-link">Open <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
-              </div>
-            </div>
-          </a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- PROMPT LAB -->
-  <section class="showcase" id="promptlab">
-    <div class="container">
-      <div class="showcase-row reveal">
-        <div class="showcase-label">
-          <div class="showcase-label-tag">Chrome Extension</div>
-          <h2>Prompt Lab</h2>
-          <p>A complete prompt engineering workbench in your browser sidebar. Write, enhance, score, compare, and organize AI prompts — powered by your own API key.</p>
-          <a href="https://promptlab.tools" target="_blank" rel="noopener noreferrer" class="btn-primary" style="font-size:11px; padding:12px 24px;">
-            promptlab.tools
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
-          </a>
-        </div>
-        <div class="showcase-cards">
-          <a href="https://promptlab.tools/app" target="_blank" rel="noopener noreferrer" class="product-card" style="grid-column: span 2;">
-            <div class="product-image" style="aspect-ratio: 21/9;">
-              <img src="img/promptlab-extension-preview.webp" alt="Prompt Lab extension running in Chrome sidebar" width="2032" height="1162" loading="lazy" decoding="async" style="object-position: top left;">
-            </div>
-            <div class="product-body">
-              <div class="product-category"><span class="product-category-dot"></span> Extension</div>
-              <h3 class="product-name">Prompt Lab — AI Prompt Workbench</h3>
-              <p class="product-desc">7 enhancement modes, live quality scoring, A/B testing, prompt library with version history, template variables, composer mode, and shareable links. Privacy-first — your API key never leaves your browser.</p>
-              <div class="product-footer">
-                <span class="product-price"><span class="free-tag">Free</span></span>
-                <span class="product-link">Open App <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg></span>
-              </div>
-            </div>
-          </a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ETHOS -->
-  <section class="ethos" id="about">
-    <div class="container">
-      <div class="section-header reveal">
-        <span class="section-number">—</span>
-        <h2 class="section-title">How It Works</h2>
-      </div>
-      <div class="ethos-grid">
-        <div class="reveal">
-          <div class="ethos-label">The Approach</div>
-          <p class="ethos-statement">Every tool is built from <em>real workflows</em>, tested in production, and designed to disappear into the way you already work.</p>
-        </div>
-        <div class="ethos-points reveal reveal-delay-1">
-          <div class="ethos-point">
-            <h3 class="ethos-point-title">Built in Notion</h3>
-            <p class="ethos-point-desc">No external apps, no plugins to break. Skills run natively using Notion AI. Widgets embed via iframe.</p>
+        </a>
+        <a href="https://promptlab.tools" target="_blank" rel="noopener" class="line-card l-blue" style="position:relative;display:flex;flex-direction:column;min-height:340px;padding:30px;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.09);text-decoration:none;color:inherit;overflow:hidden;">
+          <div style="position:absolute;top:0;left:0;right:0;height:3px;background:oklch(0.66 0.17 256);opacity:0.85;"></div>
+          <div style="display:flex;align-items:center;gap:9px;font-family:var(--ff-mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:oklch(0.66 0.17 256);margin-bottom:auto;"><span style="width:7px;height:7px;border-radius:50%;background:oklch(0.66 0.17 256);"></span>Extension</div>
+          <div style="font-family:var(--ff-mono);font-size:64px;font-weight:500;line-height:1;color:oklch(0.66 0.17 256);opacity:0.16;margin:32px 0 18px;">PL</div>
+          <h3 style="font-family:var(--ff-display);font-weight:600;font-size:27px;letter-spacing:-0.01em;margin-bottom:12px;">Prompt Lab</h3>
+          <p style="font-size:14px;font-weight:300;line-height:1.6;color:rgba(243,244,247,0.6);margin-bottom:22px;">A prompt-engineering workbench in your browser sidebar — write, enhance, score, compare, and organize prompts.</p>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding-top:18px;border-top:1px solid rgba(255,255,255,0.08);">
+            <span style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:rgba(243,244,247,0.5);">Chrome · free</span>
+            <span style="font-family:var(--ff-mono);font-size:12px;color:oklch(0.66 0.17 256);">Enter →</span>
           </div>
-          <div class="ethos-point">
-            <h3 class="ethos-point-title">Documented</h3>
-            <p class="ethos-point-desc">Every product includes a setup guide and architecture notes so you understand what you're using and why.</p>
+        </a>
+      </div>
+    </section>
+
+    <!-- FEATURED -->
+    <section style="max-width:1200px;margin:0 auto;padding:56px 40px;">
+      <div style="display:flex;align-items:baseline;gap:18px;margin-bottom:40px;">
+        <span style="font-family:var(--ff-mono);font-size:12px;color:rgba(243,244,247,0.4);">02</span>
+        <h2 style="font-family:var(--ff-display);font-weight:500;font-size:clamp(26px,3vw,38px);letter-spacing:-0.02em;">Featured this month</h2>
+      </div>
+      <div class="feat-grid" style="display:grid;grid-template-columns:1.4fr 1fr;gap:20px;">
+        <a href="https://promptlab.tools" target="_blank" rel="noopener" class="feat" style="position:relative;display:flex;flex-direction:column;justify-content:flex-end;min-height:360px;padding:32px;border:1px solid rgba(255,255,255,0.09);text-decoration:none;color:inherit;overflow:hidden;background:#0E1220;transition:border-color .3s ease;">
+          <img src="img/promptlab-extension-preview.webp" alt="Prompt Lab" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top right;opacity:0.5;-webkit-mask-image:linear-gradient(to top, transparent 8%, #000 75%);mask-image:linear-gradient(to top, transparent 8%, #000 75%);">
+          <div style="position:relative;">
+            <div style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:oklch(0.7 0.16 256);margin-bottom:14px;">Prompt Lab · v1.7</div>
+            <h3 style="font-family:var(--ff-display);font-weight:600;font-size:30px;letter-spacing:-0.01em;margin-bottom:12px;max-width:420px;">A prompt-engineering workbench in your browser sidebar</h3>
+            <p style="font-size:14px;font-weight:300;color:rgba(243,244,247,0.6);max-width:420px;">7 enhancement modes, live quality scoring, A/B testing, and a versioned library — your API key never leaves the browser.</p>
           </div>
-          <div class="ethos-point">
-            <h3 class="ethos-point-title">Modular by Design</h3>
-            <p class="ethos-point-desc">Use standalone or connect together. Shared naming conventions mean everything clicks into place.</p>
-          </div>
-          <div class="ethos-point">
-            <h3 class="ethos-point-title">No Subscriptions</h3>
-            <p class="ethos-point-desc">Buy once, get updates as Notion ships new features. Widgets are free and open source.</p>
-          </div>
+        </a>
+        <div class="feat-side" style="display:grid;grid-template-rows:1fr 1fr;gap:20px;">
+          <a href="av-suite.html" class="feat" style="display:flex;flex-direction:column;justify-content:space-between;padding:26px;border:1px solid rgba(255,255,255,0.09);text-decoration:none;color:inherit;background:rgba(255,255,255,0.02);transition:border-color .3s ease;">
+            <div style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:oklch(0.72 0.13 158);">AV Suite · new tools</div>
+            <div>
+              <h3 style="font-family:var(--ff-display);font-weight:600;font-size:23px;margin-bottom:6px;">CueForge + Show Advance</h3>
+              <p style="font-size:13.5px;font-weight:300;color:rgba(243,244,247,0.58);">Run-of-show control and pre-show advance, now in the suite.</p>
+            </div>
+          </a>
+          <a href="agents.html" class="feat" style="display:flex;flex-direction:column;justify-content:space-between;padding:26px;border:1px solid rgba(255,255,255,0.09);text-decoration:none;color:inherit;background:rgba(255,255,255,0.02);transition:border-color .3s ease;">
+            <div style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:oklch(0.7 0.19 33);">Notion · agents</div>
+            <div>
+              <h3 style="font-family:var(--ff-display);font-weight:600;font-size:23px;margin-bottom:6px;">Sort Inbox</h3>
+              <p style="font-size:13.5px;font-weight:300;color:rgba(243,244,247,0.58);">Weekly triage that classifies and routes every inbox item.</p>
+            </div>
+          </a>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  </main>
-
-  <!-- FOOTER -->
-  <footer>
-    <div class="container">
-      <div class="footer-grid">
+    <!-- ETHOS -->
+    <section style="max-width:1200px;margin:0 auto;padding:56px 40px 80px;">
+      <div class="ethos-wrap" style="border:1px solid rgba(255,255,255,0.09);padding:56px 48px;background:linear-gradient(180deg, rgba(255,255,255,0.025), transparent);display:grid;grid-template-columns:1fr 1.5fr;gap:56px;align-items:start;">
         <div>
-          <a href="index.html" class="nav-brand">
-            <div class="nav-brand-mark"><span>S</span><span class="mark-d">D</span></div>
-            <span class="nav-brand-text">System by Dave</span>
-          </a>
-          <p class="footer-brand-desc">Handcrafted Notion tools for people who take their workflows seriously.</p>
+          <div style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:rgba(243,244,247,0.45);margin-bottom:20px;">The approach</div>
+          <p style="font-family:var(--ff-display);font-weight:500;font-size:clamp(24px,2.6vw,32px);line-height:1.28;letter-spacing:-0.01em;">Every tool is built from real workflows, tested in production, and made to <span style="color:oklch(0.66 0.17 256);">disappear</span> into how you already work.</p>
         </div>
-        <div class="footer-col">
-          <h4>Products</h4>
-          <ul>
-            <li><a href="skills.html">Skills</a></li>
-            <li><a href="agents.html">Agents</a></li>
-            <li><a href="widgets.html">Widgets</a></li>
-            <li><a href="prompts/">Prompts</a></li>
-            <li><a href="av-suite.html">AV Suite</a></li>
-            <li><a href="teleprompter.html">Teleprompter</a></li>
-            <li><a href="show-timer.html">Show Timer</a></li>
-            <li><a href="cueforge.html">CueForge</a></li>
-            <li><a href="playback-check.html">Playback Check</a></li>
-            <li><a href="stream-plan.html">Stream Plan</a></li>
-            <li><a href="record-log.html">Record Log</a></li>
-            <li><a href="power-plan.html">Power Plan</a></li>
-            <li><a href="audio-patch.html">Audio Patch</a></li>
-            <li><a href="line-check.html">Line Check</a></li>
-            <li><a href="room-check.html">Room Check</a></li>
-            <li><a href="breakout-room-matrix.html">Breakout Room Matrix</a></li>
-            <li><a href="speaker-plan.html">Speaker Plan</a></li>
-            <li><a href="lighting-patch.html">Lighting Patch</a></li>
-            <li><a href="display-plan.html">Display Plan</a></li>
-            <li><a href="projection-plan.html">Projection Plan</a></li>
-            <li><a href="video-patch.html">Video Patch</a></li>
-            <li><a href="network-plan.html">Network Plan</a></li>
-            <li><a href="signal-flow.html">Signal Flow</a></li>
-            <li><a href="cable-plan.html">Cable Plan</a></li>
-            <li><a href="input-list.html">Input List</a></li>
-            <li><a href="plotforge.html">PlotForge</a></li>
-            <li><a href="show-handoff.html">Show Handoff</a></li>
-            <li><a href="show-report.html">Show Report</a></li>
-            <li><a href="show-task-board.html">Show Task Board</a></li>
-            <li><a href="change-order.html">Change Order</a></li>
-            <li><a href="client-signoff.html">Client Sign Off</a></li>
-            <li><a href="camera-shot-list.html">Camera Shot List</a></li>
-            <li><a href="comms-check.html">Comms Check</a></li>
-            <li><a href="rf-coordination.html">RF Coordination</a></li>
-            <li><a href="site-survey.html">Site Survey</a></li>
-            <li><a href="gear-prep.html">Gear Prep</a></li>
-            <li><a href="truck-pack.html">Truck Pack Plan</a></li>
-            <li><a href="load-in-plan.html">Load In Plan</a></li>
-            <li><a href="strike-plan.html">Strike Plan</a></li>
-            <li><a href="show-advance.html">Show Advance</a></li>
-            <li><a href="crew-call.html">Crew Call</a></li>
-            <li><a href="crew-time-log.html">Crew Time Log</a></li>
-            <li><a href="av-calculator.html">AV Calculator</a></li>
-            <li><a href="/world-cup/">World Cup Predictor</a></li>
-            <li><a href="hat-in-ring/">Hat-in-Ring Radar</a></li>
-            <li><a href="https://promptlab.tools" target="_blank" rel="noopener noreferrer">Prompt Lab</a></li>
-          </ul>
-        </div>
-        <div class="footer-col">
-          <h4>Resources</h4>
-          <ul>
-            <li><a href="project-registry.html">Project Registry</a></li>
-            <li><a href="agent-finder/">Agent Finder</a></li>
-            <li><a href="https://github.com/DaveHomeAssist/system-by-dave" target="_blank" rel="noopener noreferrer">Project Repo</a></li>
-            <li><a href="https://github.com/DaveHomeAssist/system-by-dave/blob/main/CHANGELOG.md" target="_blank" rel="noopener noreferrer">Changelog</a></li>
-            <li><a href="https://github.com/DaveHomeAssist" target="_blank" rel="noopener noreferrer">GitHub</a></li>
-          </ul>
-        </div>
-        <div class="footer-col">
-          <h4>Connect</h4>
-          <ul>
-            <li><a href="https://github.com/DaveHomeAssist" target="_blank" rel="noopener noreferrer">GitHub</a></li>
-            <li><a href="https://promptlab.tools" target="_blank" rel="noopener noreferrer">promptlab.tools</a></li>
-            <li><a href="profile/">Profile</a></li>
-            <li><a href="prompts/">Prompts</a></li>
-            <li><a href="privacy-policy.html">Privacy Policy</a></li>
-          </ul>
+        <div class="ethos-pts" style="display:grid;grid-template-columns:1fr 1fr;gap:32px 40px;">
+          <div style="padding-left:18px;border-left:1px solid rgba(255,255,255,0.14);">
+            <h4 style="font-family:var(--ff-mono);font-size:12px;letter-spacing:0.04em;text-transform:uppercase;margin-bottom:10px;color:#F3F4F7;">Built native</h4>
+            <p style="font-size:13.5px;font-weight:300;line-height:1.6;color:rgba(243,244,247,0.55);">No external apps to break. Skills run on Notion AI; AV tools run offline in your browser.</p>
+          </div>
+          <div style="padding-left:18px;border-left:1px solid rgba(255,255,255,0.14);">
+            <h4 style="font-family:var(--ff-mono);font-size:12px;letter-spacing:0.04em;text-transform:uppercase;margin-bottom:10px;color:#F3F4F7;">Documented</h4>
+            <p style="font-size:13.5px;font-weight:300;line-height:1.6;color:rgba(243,244,247,0.55);">Every product ships with a setup guide and architecture notes — know what you use and why.</p>
+          </div>
+          <div style="padding-left:18px;border-left:1px solid rgba(255,255,255,0.14);">
+            <h4 style="font-family:var(--ff-mono);font-size:12px;letter-spacing:0.04em;text-transform:uppercase;margin-bottom:10px;color:#F3F4F7;">Modular</h4>
+            <p style="font-size:13.5px;font-weight:300;line-height:1.6;color:rgba(243,244,247,0.55);">Use standalone or connect together. Shared naming means everything clicks into place.</p>
+          </div>
+          <div style="padding-left:18px;border-left:1px solid rgba(255,255,255,0.14);">
+            <h4 style="font-family:var(--ff-mono);font-size:12px;letter-spacing:0.04em;text-transform:uppercase;margin-bottom:10px;color:#F3F4F7;">No subscriptions</h4>
+            <p style="font-size:13.5px;font-weight:300;line-height:1.6;color:rgba(243,244,247,0.55);">Buy once, get updates as platforms ship features. Widgets and AV tools are free.</p>
+          </div>
         </div>
       </div>
-      <div class="footer-bottom">
-        <span class="footer-copy">&copy; 2026 System by Dave. All rights reserved.</span>
-      </div>
-    </div>
-  </footer>
+    </section>
 
+    <!-- FOOTER -->
+    <footer style="border-top:1px solid rgba(255,255,255,0.07);">
+      <div style="max-width:1200px;margin:0 auto;padding:48px 40px 36px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span style="width:34px;height:34px;border:1px solid rgba(255,255,255,0.22);display:flex;align-items:center;justify-content:center;font-family:var(--ff-display);font-weight:600;font-size:16px;">S</span>
+          <span style="font-family:var(--ff-mono);font-size:12px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(243,244,247,0.6);">System by Dave</span>
+        </div>
+        <div style="display:flex;gap:26px;flex-wrap:wrap;">
+          <a href="agents.html" class="nav-link" style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;">Notion</a>
+          <a href="av-suite.html" class="nav-link" style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;">AV Suite</a>
+          <a href="https://promptlab.tools" target="_blank" rel="noopener" class="nav-link" style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;">Prompt Lab</a>
+          <a href="https://github.com/DaveHomeAssist" target="_blank" rel="noopener" class="nav-link" style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;">GitHub ↗</a>
+        </div>
+        <span style="font-family:var(--ff-mono);font-size:11px;color:rgba(243,244,247,0.35);">© 2026</span>
+      </div>
+    </footer>
+
+  </div>
 </div>
-
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('visible'); });
-    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
-    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-  });
-</script>
-<script src="js/theme.js" defer></script>
 </body>
 </html>
