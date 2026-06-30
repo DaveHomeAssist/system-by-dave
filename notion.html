@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: https:; script-src 'self' 'unsafe-inline'">
+<title>Notion agents &amp; widgets — System by Dave</title>
+<meta name="description" content="AI agents that run natively on Notion AI, plus embeddable widgets that drop into any page via iframe. No plugins, no API keys.">
+<link rel="canonical" href="https://systembydave.com/notion.html">
+<meta name="theme-color" content="#0A0D14">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Notion agents & widgets — System by Dave">
+<meta property="og:description" content="AI agents that run natively on Notion AI, plus embeddable widgets that drop into any page via iframe.">
+<link rel="icon" href="svg/system_by_dave_logo_rust.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/fonts.css">
+<style>
+  :root{
+    --bg:#0A0D14; --ink:#F3F4F7;
+    --rust:oklch(0.65 0.19 33); --rust-bright:oklch(0.72 0.19 33);
+    --ff-display:'Space Grotesk','DM Sans',-apple-system,sans-serif;
+    --ff-body:'DM Sans',-apple-system,sans-serif;
+    --ff-mono:'JetBrains Mono','IBM Plex Mono',ui-monospace,monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{background:#0A0D14;}
+  ::selection{background:oklch(0.65 0.19 33 / 0.32);color:#fff;}
+  a{color:inherit;}
+  .nav-link{color:rgba(243,244,247,0.6);transition:color .2s ease;}
+  .nav-link:hover{color:#F3F4F7;}
+  .nav-link.active{color:oklch(0.72 0.19 33);}
+  .gh-btn{transition:background .2s ease,color .2s ease;}
+  .gh-btn:hover{background:oklch(0.65 0.19 33)!important;color:#fff!important;}
+  .card{transition:transform .35s ease, border-color .35s ease;}
+  .card:hover{transform:translateY(-4px);border-color:oklch(0.65 0.19 33);}
+  a:focus-visible,button:focus-visible{outline:2px solid var(--rust);outline-offset:3px;}
+  @media (max-width:880px){
+    .agrid,.wgrid,.steps{grid-template-columns:1fr!important;}
+    .hero-grid,.statgrid{grid-template-columns:1fr!important;}
+    nav.bar{flex-wrap:wrap;height:auto!important;padding:14px 20px!important;gap:14px!important;}
+    .nav-links{gap:18px!important;}
+  }
+</style>
+</head>
+<body style="font-family:var(--ff-body);background:var(--bg);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased;">
+<div style="position:relative;min-height:100vh;overflow-x:hidden;">
+  <div style="position:absolute;inset:0;pointer-events:none;z-index:0;background:repeating-linear-gradient(90deg, rgba(255,255,255,0.022) 0 1px, transparent 1px 88px), repeating-linear-gradient(0deg, rgba(255,255,255,0.022) 0 1px, transparent 1px 88px);"></div>
+  <div style="position:absolute;top:-180px;left:50%;transform:translateX(-50%);width:900px;height:520px;pointer-events:none;z-index:0;background:radial-gradient(ellipse at center, oklch(0.65 0.19 33 / 0.16), transparent 70%);filter:blur(20px);"></div>
+  <div style="position:relative;z-index:1;">
+
+    <header style="position:sticky;top:0;z-index:100;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);background:rgba(10,13,20,0.72);border-bottom:1px solid rgba(255,255,255,0.07);">
+      <nav class="bar" style="max-width:1200px;margin:0 auto;padding:0 40px;height:70px;display:flex;align-items:center;justify-content:space-between;gap:24px;">
+        <a href="index.html" style="display:flex;align-items:center;gap:12px;text-decoration:none;color:#F3F4F7;">
+          <span style="width:34px;height:34px;border:1px solid rgba(255,255,255,0.22);display:flex;align-items:center;justify-content:center;font-family:var(--ff-display);font-weight:600;font-size:16px;background:rgba(255,255,255,0.03);">S</span>
+          <span style="font-family:var(--ff-mono);font-size:12px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(243,244,247,0.85);">System<span style="color:rgba(243,244,247,0.4);">_by_</span>Dave</span>
+        </a>
+        <div class="nav-links" style="display:flex;align-items:center;gap:30px;">
+          <a href="notion.html" class="nav-link active" style="font-family:var(--ff-mono);font-size:12px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;">Notion</a>
+          <a href="av-suite.html" class="nav-link" style="font-family:var(--ff-mono);font-size:12px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;">AV&nbsp;Suite</a>
+          <a href="prompt-lab.html" class="nav-link" style="font-family:var(--ff-mono);font-size:12px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;">Prompt&nbsp;Lab</a>
+          <a href="https://github.com/DaveHomeAssist/system-by-dave" target="_blank" rel="noopener" class="gh-btn" style="font-family:var(--ff-mono);font-size:12px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;color:#0A0D14;background:#F3F4F7;padding:9px 18px;">GitHub&nbsp;↗</a>
+        </div>
+      </nav>
+    </header>
+
+    <section style="max-width:1200px;margin:0 auto;padding:88px 40px 56px;">
+      <div style="font-family:var(--ff-mono);font-size:12px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(243,244,247,0.4);margin-bottom:28px;"><a href="index.html" class="nav-link" style="text-decoration:none;">Home</a> / <span style="color:oklch(0.72 0.19 33);">Notion</span></div>
+      <div class="hero-grid" style="display:grid;grid-template-columns:1.3fr 1fr;gap:56px;align-items:end;">
+        <div>
+          <div style="display:inline-flex;align-items:center;gap:9px;font-family:var(--ff-mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:oklch(0.72 0.19 33);margin-bottom:24px;"><span style="width:7px;height:7px;border-radius:50%;background:oklch(0.65 0.19 33);"></span>Workspace tools</div>
+          <h1 style="font-family:var(--ff-display);font-weight:600;font-size:clamp(40px,5.4vw,68px);line-height:1.0;letter-spacing:-0.03em;margin-bottom:24px;">Tools for Notion people.</h1>
+          <p style="font-size:17px;font-weight:300;line-height:1.7;color:rgba(243,244,247,0.62);max-width:520px;">AI agents that run natively on Notion AI, and embeddable widgets that drop into any page via iframe — no plugins, no API keys, nothing to break.</p>
+        </div>
+        <div class="statgrid" style="display:grid;grid-template-columns:1fr 1fr;gap:1px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.06);">
+          <div style="background:#0A0D14;padding:22px 20px;"><div style="font-family:var(--ff-display);font-weight:600;font-size:30px;color:oklch(0.72 0.19 33);">04</div><div style="font-family:var(--ff-mono);font-size:10px;letter-spacing:0.06em;text-transform:uppercase;color:rgba(243,244,247,0.5);margin-top:6px;">Paid agents</div></div>
+          <div style="background:#0A0D14;padding:22px 20px;"><div style="font-family:var(--ff-display);font-weight:600;font-size:30px;">04</div><div style="font-family:var(--ff-mono);font-size:10px;letter-spacing:0.06em;text-transform:uppercase;color:rgba(243,244,247,0.5);margin-top:6px;">Free widgets</div></div>
+          <div style="background:#0A0D14;padding:22px 20px;"><div style="font-family:var(--ff-display);font-weight:600;font-size:30px;">$0</div><div style="font-family:var(--ff-mono);font-size:10px;letter-spacing:0.06em;text-transform:uppercase;color:rgba(243,244,247,0.5);margin-top:6px;">Open source</div></div>
+          <div style="background:#0A0D14;padding:22px 20px;"><div style="font-family:var(--ff-display);font-weight:600;font-size:30px;">∞</div><div style="font-family:var(--ff-mono);font-size:10px;letter-spacing:0.06em;text-transform:uppercase;color:rgba(243,244,247,0.5);margin-top:6px;">No subscription</div></div>
+        </div>
+      </div>
+    </section>
+
+    <section style="max-width:1200px;margin:0 auto;padding:48px 40px;">
+      <div style="display:flex;align-items:baseline;gap:18px;margin-bottom:36px;padding-bottom:20px;border-bottom:1px solid rgba(255,255,255,0.09);">
+        <span style="font-family:var(--ff-mono);font-size:12px;color:oklch(0.72 0.19 33);">01</span>
+        <h2 style="font-family:var(--ff-display);font-weight:500;font-size:clamp(24px,2.8vw,34px);letter-spacing:-0.02em;">Agents</h2>
+        <span style="margin-left:auto;font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:rgba(243,244,247,0.4);">Paid · native to Notion AI</span>
+      </div>
+      <div class="agrid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:18px;">
+        <a href="agents.html" class="card" style="display:flex;flex-direction:column;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.09);text-decoration:none;color:inherit;overflow:hidden;">
+          <div style="aspect-ratio:4/3;overflow:hidden;background:#EDE9DD;border-bottom:1px solid rgba(255,255,255,0.08);"><img src="img/agent-promptkeeper.webp" alt="PromptKeeper" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+          <div style="padding:22px;display:flex;flex-direction:column;flex-grow:1;">
+            <div style="display:flex;align-items:center;gap:8px;font-family:var(--ff-mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:oklch(0.72 0.19 33);margin-bottom:12px;"><span style="width:6px;height:6px;border-radius:50%;background:oklch(0.65 0.19 33);"></span>Agent</div>
+            <h3 style="font-family:var(--ff-display);font-weight:600;font-size:21px;margin-bottom:9px;">PromptKeeper</h3>
+            <p style="font-size:13px;font-weight:300;line-height:1.6;color:rgba(243,244,247,0.58);flex-grow:1;margin-bottom:20px;">Save, organize, and recall your best AI prompts inside Notion.</p>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding-top:15px;border-top:1px solid rgba(255,255,255,0.08);"><span style="font-family:var(--ff-mono);font-size:15px;"><span style="font-size:10px;color:rgba(243,244,247,0.5);">$</span>15</span><span style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:oklch(0.72 0.19 33);">View →</span></div>
+          </div>
+        </a>
+        <a href="agents.html" class="card" style="display:flex;flex-direction:column;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.09);text-decoration:none;color:inherit;overflow:hidden;">
+          <div style="aspect-ratio:4/3;overflow:hidden;background:#EDE9DD;border-bottom:1px solid rgba(255,255,255,0.08);"><img src="img/agent-daily-prophet.webp" alt="Daily Prophet" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+          <div style="padding:22px;display:flex;flex-direction:column;flex-grow:1;">
+            <div style="display:flex;align-items:center;gap:8px;font-family:var(--ff-mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:oklch(0.72 0.19 33);margin-bottom:12px;"><span style="width:6px;height:6px;border-radius:50%;background:oklch(0.65 0.19 33);"></span>Agent</div>
+            <h3 style="font-family:var(--ff-display);font-weight:600;font-size:21px;margin-bottom:9px;">Daily Prophet</h3>
+            <p style="font-size:13px;font-weight:300;line-height:1.6;color:rgba(243,244,247,0.58);flex-grow:1;margin-bottom:20px;">Your morning briefing — tasks, calendar, and notes assembled automatically.</p>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding-top:15px;border-top:1px solid rgba(255,255,255,0.08);"><span style="font-family:var(--ff-mono);font-size:15px;"><span style="font-size:10px;color:rgba(243,244,247,0.5);">$</span>12</span><span style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:oklch(0.72 0.19 33);">View →</span></div>
+          </div>
+        </a>
+        <a href="agents.html" class="card" style="display:flex;flex-direction:column;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.09);text-decoration:none;color:inherit;overflow:hidden;">
+          <div style="aspect-ratio:4/3;overflow:hidden;background:#EDE9DD;border-bottom:1px solid rgba(255,255,255,0.08);"><img src="img/agent-formatting-wizard.webp" alt="Formatting Wizard" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+          <div style="padding:22px;display:flex;flex-direction:column;flex-grow:1;">
+            <div style="display:flex;align-items:center;gap:8px;font-family:var(--ff-mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:oklch(0.72 0.19 33);margin-bottom:12px;"><span style="width:6px;height:6px;border-radius:50%;background:oklch(0.65 0.19 33);"></span>Agent</div>
+            <h3 style="font-family:var(--ff-display);font-weight:600;font-size:21px;margin-bottom:9px;">Formatting Wizard</h3>
+            <p style="font-size:13px;font-weight:300;line-height:1.6;color:rgba(243,244,247,0.58);flex-grow:1;margin-bottom:20px;">Transform messy notes into clean, structured Notion pages instantly.</p>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding-top:15px;border-top:1px solid rgba(255,255,255,0.08);"><span style="font-family:var(--ff-mono);font-size:15px;"><span style="font-size:10px;color:rgba(243,244,247,0.5);">$</span>12</span><span style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:oklch(0.72 0.19 33);">View →</span></div>
+          </div>
+        </a>
+        <a href="agents.html" class="card" style="display:flex;flex-direction:column;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.09);text-decoration:none;color:inherit;overflow:hidden;">
+          <div style="aspect-ratio:4/3;overflow:hidden;background:#EDE9DD;border-bottom:1px solid rgba(255,255,255,0.08);"><img src="img/agent-sort-inbox.webp" alt="Sort Inbox" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
+          <div style="padding:22px;display:flex;flex-direction:column;flex-grow:1;">
+            <div style="display:flex;align-items:center;gap:8px;font-family:var(--ff-mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:oklch(0.72 0.19 33);margin-bottom:12px;"><span style="width:6px;height:6px;border-radius:50%;background:oklch(0.65 0.19 33);"></span>Agent</div>
+            <h3 style="font-family:var(--ff-display);font-weight:600;font-size:21px;margin-bottom:9px;">Sort Inbox</h3>
+            <p style="font-size:13px;font-weight:300;line-height:1.6;color:rgba(243,244,247,0.58);flex-grow:1;margin-bottom:20px;">Weekly triage that classifies, routes, and prioritizes every inbox item.</p>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding-top:15px;border-top:1px solid rgba(255,255,255,0.08);"><span style="font-family:var(--ff-mono);font-size:15px;"><span style="font-size:10px;color:rgba(243,244,247,0.5);">$</span>19</span><span style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:oklch(0.72 0.19 33);">View →</span></div>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <section style="max-width:1200px;margin:0 auto;padding:48px 40px;">
+      <div style="display:flex;align-items:baseline;gap:18px;margin-bottom:36px;padding-bottom:20px;border-bottom:1px solid rgba(255,255,255,0.09);">
+        <span style="font-family:var(--ff-mono);font-size:12px;color:oklch(0.72 0.19 33);">02</span>
+        <h2 style="font-family:var(--ff-display);font-weight:500;font-size:clamp(24px,2.8vw,34px);letter-spacing:-0.02em;">Widgets</h2>
+        <span style="margin-left:auto;font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:rgba(243,244,247,0.4);">Free · embed via iframe</span>
+      </div>
+      <div class="wgrid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:18px;">
+        <a href="https://davehomeassist.github.io/NotionWidgets/project-status.html" target="_blank" rel="noopener" class="card" style="display:flex;flex-direction:column;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.09);text-decoration:none;color:inherit;overflow:hidden;">
+          <div style="aspect-ratio:4/3;position:relative;overflow:hidden;background:linear-gradient(135deg, oklch(0.65 0.19 33 / 0.14), transparent 70%), repeating-linear-gradient(90deg, rgba(255,255,255,0.04) 0 0.5px, transparent 0.5px 18px), repeating-linear-gradient(0deg, rgba(255,255,255,0.04) 0 0.5px, transparent 0.5px 18px);border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;"><span style="font-family:var(--ff-display);font-weight:700;font-size:64px;color:oklch(0.65 0.19 33);opacity:0.3;">PS</span></div>
+          <div style="padding:22px;display:flex;flex-direction:column;flex-grow:1;">
+            <div style="display:flex;align-items:center;gap:8px;font-family:var(--ff-mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:oklch(0.72 0.19 33);margin-bottom:12px;"><span style="width:6px;height:6px;border-radius:50%;background:oklch(0.65 0.19 33);"></span>Widget</div>
+            <h3 style="font-family:var(--ff-display);font-weight:600;font-size:21px;margin-bottom:9px;">Project Status</h3>
+            <p style="font-size:13px;font-weight:300;line-height:1.6;color:rgba(243,244,247,0.58);flex-grow:1;margin-bottom:20px;">Progress rings, phase tracking, and health indicators in a compact panel.</p>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding-top:15px;border-top:1px solid rgba(255,255,255,0.08);"><span style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:rgba(243,244,247,0.55);">Free</span><span style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:oklch(0.72 0.19 33);">View ↗</span></div>
+          </div>
+        </a>
+        <a href="https://davehomeassist.github.io/NotionWidgets/quest-log.html" target="_blank" rel="noopener" class="card" style="display:flex;flex-direction:column;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.09);text-decoration:none;color:inherit;overflow:hidden;">
+          <div style="aspect-ratio:4/3;position:relative;overflow:hidden;background:linear-gradient(135deg, oklch(0.65 0.19 33 / 0.14), transparent 70%), repeating-linear-gradient(90deg, rgba(255,255,255,0.04) 0 0.5px, transparent 0.5px 18px), repeating-linear-gradient(0deg, rgba(255,255,255,0.04) 0 0.5px, transparent 0.5px 18px);border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;"><span style="font-family:var(--ff-display);font-weight:700;font-size:64px;color:oklch(0.65 0.19 33);opacity:0.3;">QL</span></div>
+          <div style="padding:22px;display:flex;flex-direction:column;flex-grow:1;">
+            <div style="display:flex;align-items:center;gap:8px;font-family:var(--ff-mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:oklch(0.72 0.19 33);margin-bottom:12px;"><span style="width:6px;height:6px;border-radius:50%;background:oklch(0.65 0.19 33);"></span>Widget</div>
+            <h3 style="font-family:var(--ff-display);font-weight:600;font-size:21px;margin-bottom:9px;">Quest Log</h3>
+            <p style="font-size:13px;font-weight:300;line-height:1.6;color:rgba(243,244,247,0.58);flex-grow:1;margin-bottom:20px;">Gamified task tracker with XP, streaks, gold, and HP. Tasks as an RPG.</p>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding-top:15px;border-top:1px solid rgba(255,255,255,0.08);"><span style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:rgba(243,244,247,0.55);">Free</span><span style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:oklch(0.72 0.19 33);">View ↗</span></div>
+          </div>
+        </a>
+        <a href="https://davehomeassist.github.io/NotionWidgets/client-approval.html" target="_blank" rel="noopener" class="card" style="display:flex;flex-direction:column;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.09);text-decoration:none;color:inherit;overflow:hidden;">
+          <div style="aspect-ratio:4/3;position:relative;overflow:hidden;background:linear-gradient(135deg, oklch(0.65 0.19 33 / 0.14), transparent 70%), repeating-linear-gradient(90deg, rgba(255,255,255,0.04) 0 0.5px, transparent 0.5px 18px), repeating-linear-gradient(0deg, rgba(255,255,255,0.04) 0 0.5px, transparent 0.5px 18px);border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;"><span style="font-family:var(--ff-display);font-weight:700;font-size:64px;color:oklch(0.65 0.19 33);opacity:0.3;">CA</span></div>
+          <div style="padding:22px;display:flex;flex-direction:column;flex-grow:1;">
+            <div style="display:flex;align-items:center;gap:8px;font-family:var(--ff-mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:oklch(0.72 0.19 33);margin-bottom:12px;"><span style="width:6px;height:6px;border-radius:50%;background:oklch(0.65 0.19 33);"></span>Widget</div>
+            <h3 style="font-family:var(--ff-display);font-weight:600;font-size:21px;margin-bottom:9px;">Client Approval</h3>
+            <p style="font-size:13px;font-weight:300;line-height:1.6;color:rgba(243,244,247,0.58);flex-grow:1;margin-bottom:20px;">Approve, revise, or restart workflow with feedback capture and status.</p>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding-top:15px;border-top:1px solid rgba(255,255,255,0.08);"><span style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:rgba(243,244,247,0.55);">Free</span><span style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:oklch(0.72 0.19 33);">View ↗</span></div>
+          </div>
+        </a>
+        <a href="https://davehomeassist.github.io/NotionWidgets/graph-explorer.html" target="_blank" rel="noopener" class="card" style="display:flex;flex-direction:column;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.09);text-decoration:none;color:inherit;overflow:hidden;">
+          <div style="aspect-ratio:4/3;position:relative;overflow:hidden;background:linear-gradient(135deg, oklch(0.65 0.19 33 / 0.14), transparent 70%), repeating-linear-gradient(90deg, rgba(255,255,255,0.04) 0 0.5px, transparent 0.5px 18px), repeating-linear-gradient(0deg, rgba(255,255,255,0.04) 0 0.5px, transparent 0.5px 18px);border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;"><span style="font-family:var(--ff-display);font-weight:700;font-size:64px;color:oklch(0.65 0.19 33);opacity:0.3;">WM</span></div>
+          <div style="padding:22px;display:flex;flex-direction:column;flex-grow:1;">
+            <div style="display:flex;align-items:center;gap:8px;font-family:var(--ff-mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:oklch(0.72 0.19 33);margin-bottom:12px;"><span style="width:6px;height:6px;border-radius:50%;background:oklch(0.65 0.19 33);"></span>Widget</div>
+            <h3 style="font-family:var(--ff-display);font-weight:600;font-size:21px;margin-bottom:9px;">Workspace Map</h3>
+            <p style="font-size:13px;font-weight:300;line-height:1.6;color:rgba(243,244,247,0.58);flex-grow:1;margin-bottom:20px;">Interactive D3 graph that visualizes your entire Notion workspace.</p>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding-top:15px;border-top:1px solid rgba(255,255,255,0.08);"><span style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:rgba(243,244,247,0.55);">Free</span><span style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:oklch(0.72 0.19 33);">View ↗</span></div>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <section style="max-width:1200px;margin:0 auto;padding:48px 40px 80px;">
+      <div class="steps" style="border:1px solid rgba(255,255,255,0.09);padding:44px;background:linear-gradient(180deg, oklch(0.65 0.19 33 / 0.05), transparent);display:grid;grid-template-columns:repeat(3,1fr);gap:36px;">
+        <div><div style="font-family:var(--ff-mono);font-size:12px;color:oklch(0.72 0.19 33);margin-bottom:14px;">01</div><h4 style="font-family:var(--ff-display);font-weight:600;font-size:18px;margin-bottom:8px;">Duplicate into Notion</h4><p style="font-size:13.5px;font-weight:300;line-height:1.6;color:rgba(243,244,247,0.58);">Each agent and widget comes as a template you duplicate into your own workspace in one click.</p></div>
+        <div><div style="font-family:var(--ff-mono);font-size:12px;color:oklch(0.72 0.19 33);margin-bottom:14px;">02</div><h4 style="font-family:var(--ff-display);font-weight:600;font-size:18px;margin-bottom:8px;">Configure once</h4><p style="font-size:13.5px;font-weight:300;line-height:1.6;color:rgba(243,244,247,0.58);">Set your databases and preferences. Widgets configure through URL parameters — no API key.</p></div>
+        <div><div style="font-family:var(--ff-mono);font-size:12px;color:oklch(0.72 0.19 33);margin-bottom:14px;">03</div><h4 style="font-family:var(--ff-display);font-weight:600;font-size:18px;margin-bottom:8px;">Let it run</h4><p style="font-size:13.5px;font-weight:300;line-height:1.6;color:rgba(243,244,247,0.58);">Agents work natively on Notion AI; widgets embed live. Updates ship as platforms add features.</p></div>
+      </div>
+    </section>
+
+    <footer style="border-top:1px solid rgba(255,255,255,0.07);">
+      <div style="max-width:1200px;margin:0 auto;padding:48px 40px 36px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:12px;"><span style="width:34px;height:34px;border:1px solid rgba(255,255,255,0.22);display:flex;align-items:center;justify-content:center;font-family:var(--ff-display);font-weight:600;font-size:16px;">S</span><span style="font-family:var(--ff-mono);font-size:12px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(243,244,247,0.6);">System by Dave</span></div>
+        <div style="display:flex;gap:26px;flex-wrap:wrap;">
+          <a href="index.html" class="nav-link" style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;">Home</a>
+          <a href="av-suite.html" class="nav-link" style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;">AV Suite</a>
+          <a href="prompt-lab.html" class="nav-link" style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;">Prompt Lab</a>
+          <a href="https://github.com/DaveHomeAssist" target="_blank" rel="noopener" class="nav-link" style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;">GitHub ↗</a>
+        </div>
+        <span style="font-family:var(--ff-mono);font-size:11px;color:rgba(243,244,247,0.35);">© 2026</span>
+      </div>
+    </footer>
+
+  </div>
+</div>
+</body>
+</html>
