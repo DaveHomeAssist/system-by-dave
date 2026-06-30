@@ -8,7 +8,7 @@
 <meta name="description" content="Every tool, app, tracker and widget built by Dave Robertson — AV show utilities, Notion tools, apps & games, live trackers, and dev labs. Filter by category.">
 <link rel="canonical" href="https://systembydave.com/tools.html">
 <meta name="robots" content="index,follow">
-<meta name="theme-color" content="#F5F0E8">
+<meta name="theme-color" content="#0A0D14">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="System by Dave">
 <meta property="og:title" content="Tools — System by Dave">
@@ -16,65 +16,67 @@
 <meta property="og:url" content="https://systembydave.com/tools.html">
 <meta property="og:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Tools — System by Dave">
-<meta name="twitter:description" content="Every tool, app, tracker and widget built by Dave Robertson. Filter by category.">
-<meta name="twitter:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
 <link rel="icon" href="svg/system_by_dave_logo_rust.svg" type="image/svg+xml">
 <link rel="stylesheet" href="css/fonts.css">
-<link rel="stylesheet" href="css/style.css">
-<script>(function(){try{var t=localStorage.getItem("sbd-theme")||"dark";document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
 <style>
-  /* ─── /tools index — generated from the curated registry overlay ─── */
-  .tools-hero { padding: 64px 0 28px; }
-  .tools-hero .eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--rust); }
-  .tools-hero h1 { font-family: var(--font-display); font-size: clamp(34px, 5vw, 56px); line-height: 1.04; margin: 10px 0 12px; color: var(--charcoal); }
-  .tools-hero p { max-width: 60ch; color: var(--charcoal-light); font-size: 16px; line-height: 1.6; }
-  .tools-controls { position: sticky; top: 72px; z-index: 40; background: rgba(245,240,232,0.9); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--grid-line-accent); padding: 14px 0; margin-bottom: 28px; }
-  .chips { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-  .chip-filter { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.04em; text-transform: uppercase; padding: 8px 14px; min-height: 36px; display: inline-flex; align-items: center; border: 1.5px solid var(--grid-line-accent); border-radius: 999px; background: transparent; color: var(--charcoal-light); cursor: pointer; transition: all 0.18s; }
-  .chip-filter:hover { border-color: var(--rust-light); color: var(--rust); }
-  .chip-filter[aria-pressed="true"] { background: var(--charcoal); border-color: var(--charcoal); color: var(--cream); }
-  .chips .count { margin-left: auto; font-family: var(--font-mono); font-size: 11px; color: var(--charcoal-light); white-space: nowrap; }
-  .tools-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 20px; padding-bottom: 80px; }
-  .tool-card { display: flex; flex-direction: column; gap: 10px; padding: 22px; background: #fff; border: 1px solid var(--grid-line-accent); border-radius: 14px; box-shadow: var(--shadow-sm); text-decoration: none; color: var(--charcoal); transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s; position: relative; overflow: hidden; }
-  .tool-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--rust); transform: scaleX(0); transform-origin: left; transition: transform 0.25s; }
-  .tool-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); border-color: var(--rust-light); }
-  .tool-card:hover::before { transform: scaleX(1); }
-  .tool-card:focus-visible { outline: 2px solid var(--rust); outline-offset: 3px; }
-  .tool-card .tc-head { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
-  .tool-card h3 { font-family: var(--font-display); font-size: 21px; line-height: 1.1; color: var(--charcoal); }
-  .tool-card .tc-ext { font-family: var(--font-mono); font-size: 11px; color: var(--rust); white-space: nowrap; }
-  .tool-card p { font-size: 14px; line-height: 1.55; color: var(--charcoal-light); flex: 1; }
-  .tool-card .tc-host { font-family: var(--font-mono); font-size: 11px; color: var(--charcoal-light); opacity: 0.8; word-break: break-all; }
-  .tool-card .tc-chips { display: flex; flex-wrap: wrap; gap: 6px; }
-  .tc-chip { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; padding: 3px 8px; border-radius: 6px; background: var(--cream-dark); color: var(--charcoal-light); }
-  .tools-empty { grid-column: 1/-1; text-align: center; color: var(--charcoal-light); padding: 60px 0; font-family: var(--font-mono); font-size: 13px; }
-  .tools-note { color: var(--charcoal-light); font-size: 13px; margin: -8px 0 24px; font-family: var(--font-mono); }
-  @media (max-width: 680px) {
-    .tools-controls { top: 0; }
-    .tools-grid { grid-template-columns: 1fr; }
-    .chips .count { width: 100%; margin: 4px 0 0; }
-  }
+  :root{--bg:#0A0D14;--ink:#F3F4F7;--rust:oklch(0.65 0.19 33);
+    --ff-display:'Space Grotesk','DM Sans',-apple-system,sans-serif;--ff-body:'DM Sans',-apple-system,sans-serif;--ff-mono:'JetBrains Mono','IBM Plex Mono',ui-monospace,monospace;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{background:#0A0D14;}
+  body{font-family:var(--ff-body);background:var(--bg);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased;}
+  ::selection{background:oklch(0.65 0.19 33 / 0.32);color:#fff;}
+  a{color:inherit;}
+  .container{max-width:1200px;margin:0 auto;padding:0 40px;}
+  .nav-link{color:rgba(243,244,247,0.6);transition:color .2s ease;text-decoration:none;font-family:var(--ff-mono);font-size:12px;letter-spacing:0.06em;text-transform:uppercase;}
+  .nav-link:hover{color:#F3F4F7;}
+  .nav-link.active{color:oklch(0.72 0.19 33);}
+  .gh-btn{font-family:var(--ff-mono);font-size:12px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;color:#0A0D14;background:#F3F4F7;padding:9px 18px;transition:background .2s ease,color .2s ease;}
+  .gh-btn:hover{background:oklch(0.65 0.19 33);color:#fff;}
+  .tools-hero{padding:88px 0 28px;}
+  .tools-hero .eyebrow{font-family:var(--ff-mono);font-size:12px;letter-spacing:0.14em;text-transform:uppercase;color:oklch(0.72 0.19 33);}
+  .tools-hero h1{font-family:var(--ff-display);font-weight:600;font-size:clamp(40px,5.4vw,68px);line-height:1.0;letter-spacing:-0.03em;margin:14px 0 16px;}
+  .tools-hero p{max-width:62ch;color:rgba(243,244,247,0.62);font-size:17px;font-weight:300;line-height:1.7;}
+  .tools-controls{position:sticky;top:70px;z-index:40;background:rgba(10,13,20,0.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,0.09);padding:14px 0;margin:28px 0;}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;align-items:center;}
+  .chip-filter{font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;padding:8px 14px;min-height:36px;display:inline-flex;align-items:center;border:1px solid rgba(255,255,255,0.14);background:transparent;color:rgba(243,244,247,0.6);cursor:pointer;transition:all .18s;}
+  .chip-filter:hover{border-color:rgba(255,255,255,0.3);color:#F3F4F7;}
+  .chip-filter[aria-pressed="true"]{background:oklch(0.65 0.19 33);border-color:oklch(0.65 0.19 33);color:#fff;}
+  .chips .count{margin-left:auto;font-family:var(--ff-mono);font-size:11px;color:rgba(243,244,247,0.45);white-space:nowrap;}
+  .tools-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:18px;padding-bottom:80px;}
+  .tool-card{display:flex;flex-direction:column;gap:10px;padding:24px;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.09);text-decoration:none;color:inherit;transition:transform .25s,border-color .25s;position:relative;overflow:hidden;}
+  .tool-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:oklch(0.65 0.19 33);transform:scaleX(0);transform-origin:left;transition:transform .25s;}
+  .tool-card:hover{transform:translateY(-4px);border-color:oklch(0.65 0.19 33);}
+  .tool-card:hover::before{transform:scaleX(1);}
+  .tool-card:focus-visible{outline:2px solid oklch(0.65 0.19 33);outline-offset:3px;}
+  .tool-card .tc-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;}
+  .tool-card h3{font-family:var(--ff-display);font-weight:600;font-size:21px;line-height:1.1;}
+  .tool-card .tc-ext{font-family:var(--ff-mono);font-size:11px;color:oklch(0.72 0.19 33);white-space:nowrap;}
+  .tool-card p{font-size:14px;font-weight:300;line-height:1.55;color:rgba(243,244,247,0.6);flex:1;}
+  .tool-card .tc-host{font-family:var(--ff-mono);font-size:11px;color:rgba(243,244,247,0.4);word-break:break-all;}
+  .tool-card .tc-chips{display:flex;flex-wrap:wrap;gap:6px;}
+  .tc-chip{font-family:var(--ff-mono);font-size:10px;letter-spacing:0.06em;text-transform:uppercase;padding:3px 8px;background:rgba(255,255,255,0.06);color:rgba(243,244,247,0.6);}
+  .tools-empty{grid-column:1/-1;text-align:center;color:rgba(243,244,247,0.45);padding:60px 0;font-family:var(--ff-mono);font-size:13px;}
+  .tools-note{color:rgba(243,244,247,0.5);font-size:13px;margin:0 0 24px;font-family:var(--ff-mono);}
+  footer{border-top:1px solid rgba(255,255,255,0.07);margin-top:40px;}
+  .foot{display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;padding:48px 0 36px;}
+  @media (max-width:680px){.container{padding:0 20px;}.tools-controls{top:0;}.tools-grid{grid-template-columns:1fr;}.chips .count{width:100%;margin:4px 0 0;}}
 </style>
 </head>
 <body>
-  <header>
-    <nav class="container" aria-label="Primary">
-      <a href="index.html" class="nav-brand">
-        <div class="nav-brand-mark"><span>S</span><span class="mark-d">D</span></div>
-        <span class="nav-brand-text">System by Dave</span>
+  <div style="position:fixed;inset:0;pointer-events:none;z-index:0;background:repeating-linear-gradient(90deg, rgba(255,255,255,0.022) 0 1px, transparent 1px 88px), repeating-linear-gradient(0deg, rgba(255,255,255,0.022) 0 1px, transparent 1px 88px);"></div>
+  <div style="position:relative;z-index:1;">
+  <header style="position:sticky;top:0;z-index:100;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);background:rgba(10,13,20,0.72);border-bottom:1px solid rgba(255,255,255,0.07);">
+    <nav class="container" aria-label="Primary" style="height:70px;display:flex;align-items:center;justify-content:space-between;gap:24px;">
+      <a href="index.html" style="display:flex;align-items:center;gap:12px;text-decoration:none;color:#F3F4F7;">
+        <span style="width:34px;height:34px;border:1px solid rgba(255,255,255,0.22);display:flex;align-items:center;justify-content:center;font-family:var(--ff-display);font-weight:600;font-size:16px;background:rgba(255,255,255,0.03);">S</span>
+        <span style="font-family:var(--ff-mono);font-size:12px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(243,244,247,0.85);">System<span style="color:rgba(243,244,247,0.4);">_by_</span>Dave</span>
       </a>
-      <ul class="nav-links">
-        <li><a href="av-suite.html">AV&nbsp;Tools</a></li>
-        <li><a href="tools.html#notion">Notion</a></li>
-        <li><a href="tools.html#apps">Apps&nbsp;&amp;&nbsp;Games</a></li>
-        <li><a href="tools.html#trackers">Trackers</a></li>
-        <li><a href="tools.html" aria-current="page">Tools</a></li>
-        <li><a href="index.html#about">Ethos</a></li>
-        <li><a href="https://promptlab.tools" target="_blank" rel="noopener noreferrer">Prompt&nbsp;Lab&nbsp;↗</a></li>
-        <li><a href="https://davehomeassist.github.io" target="_blank" rel="noopener noreferrer">Portfolio&nbsp;↗</a></li>
-        <li><a href="https://github.com/DaveHomeAssist/system-by-dave" target="_blank" rel="noopener noreferrer" class="nav-cta">GitHub&nbsp;↗</a></li>
-      </ul>
+      <div style="display:flex;align-items:center;gap:30px;">
+        <a href="notion.html" class="nav-link">Notion</a>
+        <a href="av-suite.html" class="nav-link">AV&nbsp;Suite</a>
+        <a href="prompt-lab.html" class="nav-link">Prompt&nbsp;Lab</a>
+        <a href="https://github.com/DaveHomeAssist/system-by-dave" target="_blank" rel="noopener" class="gh-btn">GitHub&nbsp;↗</a>
+      </div>
     </nav>
   </header>
 
@@ -101,40 +103,21 @@
 
   <footer>
     <div class="container">
-      <div class="footer-grid">
-        <div>
-          <a href="index.html" class="nav-brand">
-            <div class="nav-brand-mark"><span>S</span><span class="mark-d">D</span></div>
-            <span class="nav-brand-text">System by Dave</span>
-          </a>
-          <p class="footer-brand-desc">Handcrafted tools for people who take their workflows seriously.</p>
+      <div class="foot">
+        <div style="display:flex;align-items:center;gap:12px;"><span style="width:34px;height:34px;border:1px solid rgba(255,255,255,0.22);display:flex;align-items:center;justify-content:center;font-family:var(--ff-display);font-weight:600;font-size:16px;">S</span><span style="font-family:var(--ff-mono);font-size:12px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(243,244,247,0.6);">System by Dave</span></div>
+        <div style="display:flex;gap:26px;flex-wrap:wrap;">
+          <a href="notion.html" class="nav-link" style="font-size:11px;">Notion</a>
+          <a href="av-suite.html" class="nav-link" style="font-size:11px;">AV Suite</a>
+          <a href="prompt-lab.html" class="nav-link" style="font-size:11px;">Prompt Lab</a>
+          <a href="https://github.com/DaveHomeAssist" target="_blank" rel="noopener" class="nav-link" style="font-size:11px;">GitHub ↗</a>
         </div>
-        <div class="footer-col">
-          <h4>Explore</h4>
-          <ul>
-            <li><a href="av-suite.html">AV Tools</a></li>
-            <li><a href="tools.html#notion">Notion Tools</a></li>
-            <li><a href="tools.html#apps">Apps &amp; Games</a></li>
-            <li><a href="tools.html#trackers">Trackers</a></li>
-            <li><a href="index.html#about">Ethos</a></li>
-          </ul>
-        </div>
-        <div class="footer-col">
-          <h4>Hubs</h4>
-          <ul>
-            <li><a href="https://promptlab.tools" target="_blank" rel="noopener noreferrer">Prompt Lab ↗</a></li>
-            <li><a href="https://davehomeassist.github.io" target="_blank" rel="noopener noreferrer">Portfolio ↗</a></li>
-            <li><a href="https://github.com/DaveHomeAssist/system-by-dave" target="_blank" rel="noopener noreferrer">GitHub ↗</a></li>
-          </ul>
-        </div>
-      </div>
-      <div class="footer-bottom">
-        <span class="footer-copy">&copy; 2026 System by Dave. All rights reserved.</span>
+        <span style="font-family:var(--ff-mono);font-size:11px;color:rgba(243,244,247,0.35);">© 2026</span>
       </div>
     </div>
   </footer>
+  </div>
 
-  <!-- the full project inventory (52 repos) is available for enrichment / future-proofing -->
+  <!-- the full project inventory is available for enrichment / future-proofing -->
   <script src="project-registry-public.js"></script>
   <script>
   /* Curated overlay: the public-facing set, each with a verified live URL + filter chips.
@@ -226,6 +209,5 @@
   setActive(chipFromHash());
   window.addEventListener('hashchange', function(){ setActive(chipFromHash()); });
   </script>
-<script src="js/theme.js" defer></script>
 </body>
 </html>
