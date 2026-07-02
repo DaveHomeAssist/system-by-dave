@@ -16,6 +16,16 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
 - Shared browser helpers may live in `js/` when multiple static AV pages need
   the same small behavior.
 - Vanilla JS only (no frameworks, no bundlers).
+- **`js/sbd-registry.js` is the single source of truth for the AV tools**
+  (names, routes, departments, phases, storage keys, recommendations, offline
+  assets). The AV Suite console, `js/sbd-nav.js`, `js/av-suite-context.js`,
+  and `av-suite-worker.js` consume it; `scripts/gen_sitemap.py` regenerates
+  `sitemap.xml` from it. Adding a tool = one registry entry + version bump.
+- `js/sbd-handoff.js`: staged cross-tool show-data handoff (`sbd.handoff.v1`);
+  first pair is Crew Call → Crew Time Log.
+- `manifest.json` + per-page manifest/apple-touch-icon links make the AV Suite
+  installable; `av-suite-worker.js` (registered by `av-suite.html`) caches the
+  suite + all tools for offline field use.
 
 ## Pages
 - `index.html`: home
@@ -72,7 +82,8 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
 ## Deploy
 - GitHub Pages from the default branch.
 - `CNAME` pins the custom domain.
-- `sitemap.xml` and `robots.txt` are hand-maintained: bump `lastmod` on content changes.
+- `sitemap.xml` is generated — run `python scripts/gen_sitemap.py` after content
+  changes. `robots.txt` is hand-maintained.
 
 ## Recent work
 - Removed dead subscribe CTA from homepage.

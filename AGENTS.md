@@ -50,10 +50,28 @@ Read `CLAUDE.md` first for project orientation. This file is the rulebook.
 - Inline `<script>` only where needed. No module bundling.
 - Prefer progressive enhancement — pages must render correctly with JS off.
 
+## AV tool registry (single source of truth)
+
+- **`js/sbd-registry.js` owns the AV tool list**: names, routes, departments,
+  phases, per-tool `localStorage` keys, per-phase recommendations, aliases, and
+  the offline asset manifest. The AV Suite console, `js/sbd-nav.js`,
+  `js/av-suite-context.js`, and `av-suite-worker.js` all consume it.
+- **Adding a tool:** add one entry to `tools` (plus its id in `navDepartments`
+  if it belongs in the universal nav), bump `SBD_REGISTRY.version` so the
+  service-worker cache rolls, then run `python scripts/gen_sitemap.py`.
+- **Include order on tool pages:** `js/sbd-registry.js` →
+  (`js/sbd-handoff.js` when the page sends/receives handoffs, loaded before the
+  tool's inline script) → `js/av-suite-context.js` → `js/sbd-nav.js` (defer).
+- **Cross-tool handoffs** use `js/sbd-handoff.js` (`sbd.handoff.v1`): stage the
+  target tool's own import-JSON shape, navigate with
+  `SBD_HANDOFF.carryContext()`, and let the target's `normalizeState()` import
+  it behind a confirm prompt.
+
 ## SEO / housekeeping
 
-- `sitemap.xml` and `robots.txt` are hand-maintained. Update `<lastmod>` in
-  `sitemap.xml` for any page whose content you change.
+- `sitemap.xml` is generated: run `python scripts/gen_sitemap.py` after content
+  changes (tool URLs come from the registry; lastmod from git). `robots.txt`
+  stays hand-maintained.
 - Keep `CHANGELOG.md` meaningful — note material content or layout changes.
 
 ## Review checklist (before commit)

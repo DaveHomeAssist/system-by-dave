@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-07-02
+
+* **Restored the AV Suite operator console** at `/av-suite.html` in the dark SYSTEM_BY_DAVE design. The June static hub is replaced by the full console — show profile, six-phase recommendations, readiness tracking with notes, pinned/recent tools, review queue, phase gate, Quick Switcher command palette, operator settings drawer, suite JSON + show-package export/import, and offline cache controls — re-tokenized from the warm-rust skin to the site's cool-dark green accent, wrapped in the shared site header/footer, and reading the same `av-suite-dashboard.v1` browser state as before (existing show data rehydrates).
+* **Re-enabled offline + install.** The console registers `av-suite-worker.js` again (it was dead code on the static hub — nothing on the site registered it), the worker builds its cache manifest from the registry via `importScripts`, and a root `manifest.json` plus per-page manifest/apple-touch-icon links make the suite installable to a phone home screen. Cache version rolls to `sbd-av-suite-v20260702-console-restore`.
+* **Added `js/sbd-registry.js`** — single source of truth for the 38 AV tools: names, routes, console departments, phases, per-tool `localStorage` keys, per-phase recommendations, route aliases, and the offline asset list. Consumed by the console, `js/sbd-nav.js`, `js/av-suite-context.js` (which keeps a built-in fallback), and the service worker. `scripts/gen_sitemap.py` regenerates `sitemap.xml` from it (lastmod from git history).
+* **Fixed dead tool back-links.** Every tool page's brand link (plus three `top-link`s) pointed at `index.html#av-tools`, an anchor the homepage redesign removed; they now land on `/av-suite.html`. Also added the missing favicon to `/change-order.html` and `/client-signoff.html`.
+* **First cross-tool data handoff.** `js/sbd-handoff.js` defines the staged show-data envelope (`sbd.handoff.v1` — the staged payload is simply the target tool's own import JSON, so the target's existing `normalizeState()` does the import). `/crew-call.html` gains a **Send to Time Log** action that maps the roster into `/crew-time-log.html` (sections → departments, call times, show meta) behind a confirm-before-replace prompt, carrying AV Suite show-context URL params across the jump.
+
 ## 2026-06-25
 
 * Updated `/plotforge.html` so `systembydave.com/plotforge` opens the live PlotForge beta at `https://plotforge-beta.vercel.app/`, preserving query strings and hash fragments with a static fallback link.
