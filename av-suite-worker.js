@@ -1,54 +1,13 @@
 'use strict';
 
-var CACHE_NAME='sbd-av-suite-v20260614-hidecontrols';
+/* Offline cache worker for the AV Suite. The asset manifest and cache version
+   come from js/sbd-registry.js — the single source of truth for tools. Bump
+   SBD_REGISTRY.version whenever a tool or shared asset changes. */
+importScripts('./js/sbd-registry.js');
+
 var CACHE_PREFIX='sbd-av-suite-';
-var OFFLINE_ASSETS=[
-  './av-suite.html',
-  './av-suite-worker.js',
-  './js/av-suite-context.js',
-  './svg/system_by_dave_logo_rust.svg',
-  './img/card-cover-banner-wide.png',
-  './teleprompter.html',
-  './show-timer.html',
-  './cueforge.html',
-  './cue-sheet.html',
-  './playback-check.html',
-  './record-log.html',
-  './stream-plan.html',
-  './show-advance.html',
-  './site-survey.html',
-  './crew-call.html',
-  './crew-time-log.html',
-  './room-check.html',
-  './breakout-room-matrix.html',
-  './show-task-board.html',
-  './show-handoff.html',
-  './show-report.html',
-  './change-order.html',
-  './client-signoff.html',
-  './input-list.html',
-  './audio-patch.html',
-  './line-check.html',
-  './speaker-plan.html',
-  './power-plan.html',
-  './network-plan.html',
-  './signal-flow.html',
-  './video-patch.html',
-  './display-plan.html',
-  './projection-plan.html',
-  './lighting-patch.html',
-  './cable-plan.html',
-  './rf-coordination.html',
-  './comms-check.html',
-  './camera-shot-list.html',
-  './plotforge.html',
-  './stage-plot.html',
-  './gear-prep.html',
-  './truck-pack.html',
-  './load-in-plan.html',
-  './strike-plan.html',
-  './av-calculator.html'
-];
+var CACHE_NAME=CACHE_PREFIX+self.SBD_REGISTRY.version;
+var OFFLINE_ASSETS=self.SBD_REGISTRY.offlineAssets();
 var OFFLINE_URLS=OFFLINE_ASSETS.map(function(asset){return new URL(asset,self.registration.scope).href;});
 
 function canonicalUrl(requestUrl){

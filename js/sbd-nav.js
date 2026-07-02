@@ -7,68 +7,20 @@
 (function(){
   if(document.documentElement.getAttribute('data-sbd-nav') === 'off') return;
 
-  // Tools grouped by department (matches the homepage + All Tools directory).
-  var DEPARTMENTS = [
-    {label:'Run of show', tools:[
-      {name:'Teleprompter', href:'teleprompter.html'},
-      {name:'Show Timer', href:'show-timer.html'},
-      {name:'CueForge', href:'cueforge.html'},
-      {name:'Playback Check', href:'playback-check.html'},
-      {name:'Comms Check', href:'comms-check.html'}
-    ]},
-    {label:'Audio', tools:[
-      {name:'Audio Patch', href:'audio-patch.html'},
-      {name:'Line Check', href:'line-check.html'},
-      {name:'Input List', href:'input-list.html'},
-      {name:'Signal Flow', href:'signal-flow.html'},
-      {name:'Speaker Plan', href:'speaker-plan.html'},
-      {name:'RF Coordination', href:'rf-coordination.html'}
-    ]},
-    {label:'Video', tools:[
-      {name:'Video Patch', href:'video-patch.html'},
-      {name:'Display Plan', href:'display-plan.html'},
-      {name:'Projection Plan', href:'projection-plan.html'},
-      {name:'Stream Plan', href:'stream-plan.html'},
-      {name:'Record Log', href:'record-log.html'},
-      {name:'Camera Shot List', href:'camera-shot-list.html'}
-    ]},
-    {label:'Lighting', tools:[
-      {name:'Lighting Patch', href:'lighting-patch.html'}
-    ]},
-    {label:'Power & data', tools:[
-      {name:'Power Plan', href:'power-plan.html'},
-      {name:'Network Plan', href:'network-plan.html'},
-      {name:'Cable Plan', href:'cable-plan.html'}
-    ]},
-    {label:'Spaces & staging', tools:[
-      {name:'PlotForge', href:'plotforge.html'},
-      {name:'Room Check', href:'room-check.html'},
-      {name:'Breakout Room Matrix', href:'breakout-room-matrix.html'},
-      {name:'Site Survey', href:'site-survey.html'}
-    ]},
-    {label:'Logistics', tools:[
-      {name:'Gear Prep', href:'gear-prep.html'},
-      {name:'Truck Pack Plan', href:'truck-pack.html'},
-      {name:'Load-In Plan', href:'load-in-plan.html'},
-      {name:'Strike Plan', href:'strike-plan.html'},
-      {name:'Show Advance', href:'show-advance.html'}
-    ]},
-    {label:'Crew', tools:[
-      {name:'Crew Call', href:'crew-call.html'},
-      {name:'Crew Time Log', href:'crew-time-log.html'}
-    ]},
-    {label:'Show docs & client', tools:[
-      {name:'Show Handoff', href:'show-handoff.html'},
-      {name:'Show Report', href:'show-report.html'},
-      {name:'Show Task Board', href:'show-task-board.html'},
-      {name:'Change Order', href:'change-order.html'},
-      {name:'Client Sign-Off', href:'client-signoff.html'}
-    ]},
-    {label:'Calculators', tools:[
-      {name:'AV Calculator', href:'av-calculator.html'}
-    ]}
-  ];
-  var ALIASES = {'cue-sheet.html':'cueforge.html', 'stage-plot.html':'plotforge.html'};
+  // Tool data comes from js/sbd-registry.js (single source of truth).
+  // Pages must include the registry before this script.
+  var REG = window.SBD_REGISTRY;
+  if(!REG || !REG.navDepartments || !REG.toolById){
+    if(window.console && console.warn) console.warn('sbd-nav: SBD_REGISTRY missing — include js/sbd-registry.js before js/sbd-nav.js.');
+    return;
+  }
+  var DEPARTMENTS = REG.navDepartments.map(function(group){
+    return {label: group.label, tools: group.toolIds.map(function(id){
+      var tool = REG.toolById(id);
+      return tool ? {name: tool.name, href: tool.href} : null;
+    }).filter(Boolean)};
+  });
+  var ALIASES = REG.aliases || {};
   // Destinations, not tools — never render the nav on these.
   var SKIP = {'index.html':1, '':1, 'av-suite.html':1, 'tools.html':1, '404.html':1, '500.html':1};
 

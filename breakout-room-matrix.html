@@ -17,6 +17,8 @@
 <meta name="twitter:description" content="A browser based AV breakout room matrix for room assignments, schedules, owners, signal routes, readiness, blockers, and handoff notes.">
 <meta name="twitter:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
 <link rel="icon" href="svg/system_by_dave_logo_rust.svg" type="image/svg+xml">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="profile/assets/apple-touch-icon.png">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; base-uri 'self'; form-action 'self'">
 <style>
   :root{color-scheme:dark;--bg:#070a0f;--panel:#121a24;--panel-2:#0c131b;--line:#293745;--line-soft:#1b2734;--text:#f5f7fb;--muted:#9daabc;--accent:#c96b3f;--cyan:#62d6d2;--green:#6be092;--yellow:#ffd166;--red:#ff6b6b;--violet:#b59cff;--radius:8px;--shadow:0 24px 70px rgba(0,0,0,.36);--mono:"SFMono-Regular","Roboto Mono",Consolas,monospace;--sans:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;--fast:120ms;--med:180ms;--ease:cubic-bezier(.2,.8,.2,1)}
@@ -111,7 +113,7 @@
 <noscript><div class="noscript">Breakout Room Matrix needs JavaScript for editing, import, export, filtering, and browser saved state.</div></noscript>
 <div class="app">
   <header class="topbar">
-    <a class="brand" href="index.html#av-tools" aria-label="Back to AV tools">
+    <a class="brand" href="av-suite.html" aria-label="Back to the AV Suite">
       <span class="brand-mark">BR</span>
       <span class="brand-text"><strong>Breakout Room Matrix</strong><span>System by Dave AV tools</span></span>
     </a>
@@ -354,6 +356,7 @@
   bindEvents();
 })();
 </script>
+<script src="js/sbd-registry.js"></script>
 <script src="js/av-suite-context.js"></script>
 <script src="js/sbd-nav.js" defer></script>
 <script src="js/responsive-tables.js" defer></script>

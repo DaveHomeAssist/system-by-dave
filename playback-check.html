@@ -22,6 +22,8 @@
 <meta name="twitter:description" content="A browser based AV playback checklist for media files, cue timing, destinations, audio routing, backup status, and playback readiness.">
 <meta name="twitter:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
 <link rel="icon" href="svg/system_by_dave_logo_rust.svg" type="image/svg+xml">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="profile/assets/apple-touch-icon.png">
 <style>
   :root{
     --bg:#0b0d10;
@@ -614,7 +616,7 @@
 </noscript>
 <div class="app">
   <header class="topbar">
-    <a class="brand" href="index.html#av-tools" aria-label="Back to AV tools">
+    <a class="brand" href="av-suite.html" aria-label="Back to the AV Suite">
       <span class="brand-mark">S</span>
       <span class="brand-text">
         <strong>Playback Check</strong>
@@ -622,7 +624,7 @@
       </span>
     </a>
     <div class="top-actions">
-      <a class="top-link" href="index.html#av-tools">AV Tools</a>
+      <a class="top-link" href="av-suite.html">AV Suite</a>
       <button id="printBtn" type="button">Print</button>
       <button id="copySummaryBtn" type="button">Copy Summary</button>
       <button id="exportCsvBtn" type="button">Export CSV</button>
@@ -1490,6 +1492,7 @@
   bindEvents();
 })();
 </script>
+<script src="js/sbd-registry.js"></script>
 <script src="js/av-suite-context.js"></script>
 <script src="js/sbd-nav.js" defer></script>
 <script src="js/responsive-tables.js" defer></script>

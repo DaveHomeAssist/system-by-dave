@@ -72,6 +72,23 @@
   };
   var ROUTE_ALIASES={'cue-sheet.html':'cueforge.html','stage-plot.html':'plotforge.html'};
 
+  /* Prefer js/sbd-registry.js (single source of truth) when a page loads it
+     before this script; the literals above remain as a fallback so the dock
+     still works on pages that never include the registry. */
+  (function(){
+    var REG = window.SBD_REGISTRY;
+    if(!REG || !REG.recommended || !REG.toolById) return;
+    var next = {};
+    Object.keys(REG.recommended).forEach(function(phase){
+      next[phase] = REG.recommended[phase].map(function(id){
+        var tool = REG.toolById(id);
+        return tool ? {name: tool.name, href: tool.href} : null;
+      }).filter(Boolean);
+    });
+    PHASE_TOOLS = next;
+    if(REG.aliases) ROUTE_ALIASES = REG.aliases;
+  })();
+
   function clean(value, limit){
     return String(value || '').replace(/\s+/g, ' ').trim().slice(0, limit);
   }

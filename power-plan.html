@@ -22,6 +22,8 @@
 <meta name="twitter:description" content="A browser based AV power plan for circuits, power sources, load estimates, headroom, backups, issues, and handoff notes.">
 <meta name="twitter:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
 <link rel="icon" href="svg/system_by_dave_logo_rust.svg" type="image/svg+xml">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="profile/assets/apple-touch-icon.png">
 <style>
   :root{
     --bg:#0b0d10;
@@ -530,7 +532,7 @@
 <noscript><div class="noscript">Power Plan needs JavaScript for editing, import, export, filtering, and browser saved state.</div></noscript>
 <div class="app">
   <header class="topbar">
-    <a class="brand" href="index.html#av-tools" aria-label="Back to AV tools">
+    <a class="brand" href="av-suite.html" aria-label="Back to the AV Suite">
       <span class="brand-mark">S</span>
       <span class="brand-text">
         <strong>Power Plan</strong>
@@ -1445,6 +1447,7 @@
   bindEvents();
 })();
 </script>
+<script src="js/sbd-registry.js"></script>
 <script src="js/av-suite-context.js"></script>
 <script src="js/sbd-nav.js" defer></script>
 <script src="js/responsive-tables.js" defer></script>

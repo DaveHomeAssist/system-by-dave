@@ -22,6 +22,8 @@
 <meta name="twitter:description" content="A browser based AV show handoff builder for status notes, signal flow notes, decision matrices, summary tables, and prioritized next actions.">
 <meta name="twitter:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
 <link rel="icon" href="svg/system_by_dave_logo_rust.svg" type="image/svg+xml">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="profile/assets/apple-touch-icon.png">
 <style>
   :root{
     --bg:#0b0d10;
@@ -636,7 +638,7 @@
 <a class="skip-link" href="#handoffForm">Skip to handoff form</a>
 <div class="app">
   <header class="topbar">
-    <a class="brand" href="index.html#av-tools" aria-label="Back to System by Dave AV tools">
+    <a class="brand" href="av-suite.html" aria-label="Back to System by Dave AV tools">
       <span class="brand-mark">S</span>
       <span class="brand-text">
         <strong>Show Handoff</strong>
@@ -1432,6 +1434,7 @@
   loadSaved();
 })();
 </script>
+<script src="js/sbd-registry.js"></script>
 <script src="js/av-suite-context.js"></script>
 <script src="js/sbd-nav.js" defer></script>
 <script src="js/responsive-tables.js" defer></script>
