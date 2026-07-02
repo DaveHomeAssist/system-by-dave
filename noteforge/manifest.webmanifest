@@ -1,0 +1,14 @@
+{
+  "name": "My Notes",
+  "short_name": "My Notes",
+  "description": "A local-first markdown notes app with wikilinks, backlinks, tags, and a graph.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#16181d",
+  "theme_color": "#3b6ef6",
+  "icons": [
+    { "src": "./icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "./icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}

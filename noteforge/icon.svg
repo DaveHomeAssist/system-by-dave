@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="My Notes">
+  <!-- Full-bleed background so the icon also works as a maskable icon. -->
+  <rect width="512" height="512" fill="#3b6ef6"/>
+  <g transform="translate(0,0)">
+    <rect x="128" y="96" width="256" height="320" rx="24" fill="#ffffff"/>
+    <rect x="168" y="160" width="176" height="20" rx="10" fill="#3b6ef6"/>
+    <rect x="168" y="212" width="176" height="20" rx="10" fill="#8b5cf6"/>
+    <rect x="168" y="264" width="120" height="20" rx="10" fill="#94a3b8"/>
+    <rect x="168" y="316" width="150" height="20" rx="10" fill="#94a3b8"/>
+  </g>
+</svg>

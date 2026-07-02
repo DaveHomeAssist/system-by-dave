@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta http-equiv="Content-Security-Policy" content="default-src &#39;self&#39;; script-src &#39;self&#39;; style-src &#39;self&#39; &#39;unsafe-inline&#39;; img-src &#39;self&#39; data: https:; font-src &#39;self&#39; data:; connect-src &#39;self&#39;; object-src &#39;none&#39;; base-uri &#39;self&#39;; form-action &#39;none&#39;">
+
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#3b6ef6" />
+  <title>My Notes</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='14' font-size='14'>📝</text></svg>" />
+  <link rel="manifest" href="/noteforge/manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="/noteforge/icon.svg" />
+  <script type="module" crossorigin src="/noteforge/assets/index-Bitxdys7.js"></script>
+  <link rel="stylesheet" crossorigin href="/noteforge/assets/index-BofZKhXB.css">
+</head>
+<body>
+  <!-- Mobile-only top bar with the sidebar toggle -->
+  <div class="mobile-bar">
+    <button id="sidebar-toggle" class="btn btn--ghost" aria-label="Open notes sidebar" aria-expanded="false" aria-controls="app">☰</button>
+    <span class="mobile-bar__title">📝 My Notes</span>
+  </div>
+  <div class="sidebar-backdrop" id="sidebar-backdrop" hidden></div>
+
+  <div class="app" id="app">
+    <!-- Sidebar: search, actions, note list, tags -->
+    <aside class="sidebar">
+      <header class="sidebar__header">
+        <h1 class="brand">📝 My Notes</h1>
+        <div class="sidebar__actions">
+          <button id="new-note-btn" class="btn btn--primary" title="New note (Ctrl+N)">＋ New</button>
+          <button id="theme-btn" class="btn btn--ghost" title="Toggle theme" aria-label="Toggle theme">🌙</button>
+          <button id="graph-btn" class="btn btn--ghost" title="Toggle graph view" aria-label="Toggle graph view">🕸️</button>
+          <div class="menu">
+            <button id="menu-btn" class="btn btn--ghost" title="More" aria-label="More actions" aria-controls="menu-dropdown" aria-expanded="false">⋯</button>
+            <div class="menu__dropdown" id="menu-dropdown" hidden>
+              <button id="palette-btn" class="menu__item">⌘ Command palette <span class="menu__hint">Ctrl/⌘ P</span></button>
+              <button id="template-btn" class="menu__item">🧩 New from template…</button>
+              <button id="trash-btn" class="menu__item">🗑 Trash <span id="trash-badge" class="menu__badge" hidden></span></button>
+              <button id="settings-btn" class="menu__item">⚙ Settings</button>
+              <button id="export-btn" class="menu__item">⬇ Export JSON</button>
+              <button id="import-btn" class="menu__item">⬆ Import JSON</button>
+              <button id="seed-btn" class="menu__item">✨ Load sample notes</button>
+            </div>
+          </div>
+          <input type="file" id="import-file" accept="application/json" hidden />
+        </div>
+      </header>
+
+      <div class="search">
+        <input type="search" id="search-input" class="search__input"
+               placeholder="Search…  (Ctrl+K)  ·  tag: in:title has:banner" autocomplete="off" />
+      </div>
+
+      <div class="list-controls">
+        <label class="sort-field">Sort
+          <select id="sort-select" class="sort-select" title="Sort notes">
+            <option value="updated">Updated</option>
+            <option value="created">Created</option>
+            <option value="title">Title A–Z</option>
+          </select>
+        </label>
+      </div>
+
+      <div id="tag-filter" class="tag-filter"></div>
+
+      <div id="note-list" class="note-list"></div>
+
+      <footer class="sidebar__footer">
+        <span id="note-count" class="muted"></span>
+      </footer>
+    </aside>
+
+    <!-- Main content: editor or graph -->
+    <main class="main">
+      <section id="editor" class="editor"></section>
+      <section id="graph" class="graph" hidden></section>
+    </main>
+  </div>
+
+  <!-- Command palette (Ctrl/⌘+P) -->
+  <div class="modal palette" id="palette-overlay" hidden>
+    <div class="modal__backdrop" data-close></div>
+    <div class="modal__panel palette__panel" role="dialog" aria-modal="true" aria-label="Command palette" tabindex="-1">
+      <input id="palette-input" class="palette__input" type="text" autocomplete="off" spellcheck="false"
+             placeholder="Search notes…   ·   &gt; commands   ·   # headings"
+             role="combobox" aria-expanded="true" aria-controls="palette-list" aria-autocomplete="list" />
+      <div id="palette-list" class="palette__list" role="listbox" aria-label="Results"></div>
+    </div>
+  </div>
+
+  <!-- Trash (soft-deleted notes) -->
+  <div class="modal" id="trash-overlay" hidden>
+    <div class="modal__backdrop" data-close></div>
+    <div class="modal__panel" role="dialog" aria-modal="true" aria-label="Trash" tabindex="-1">
+      <header class="modal__header">
+        <h2 class="modal__title">🗑 Trash</h2>
+        <div class="modal__actions">
+          <button id="trash-empty" class="btn btn--danger-ghost">Empty trash</button>
+          <button class="btn btn--ghost" data-close title="Close">✕</button>
+        </div>
+      </header>
+      <div id="trash-list" class="trash-list"></div>
+    </div>
+  </div>
+
+  <!-- Settings -->
+  <div class="modal" id="settings-overlay" hidden>
+    <div class="modal__backdrop" data-close></div>
+    <div class="modal__panel" role="dialog" aria-modal="true" aria-label="Settings" tabindex="-1">
+      <header class="modal__header">
+        <h2 class="modal__title">⚙ Settings</h2>
+        <div class="modal__actions">
+          <button class="btn btn--ghost" data-close title="Close" aria-label="Close settings">✕</button>
+        </div>
+      </header>
+      <div id="settings-form" class="settings"></div>
+    </div>
+  </div>
+
+</body>
+</html>
