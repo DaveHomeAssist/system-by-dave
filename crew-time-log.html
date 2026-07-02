@@ -22,6 +22,8 @@
 <meta name="twitter:description" content="A browser based AV crew time log for call times, actual check in, meal breaks, releases, departments, roles, hour totals, issues, and handoff notes.">
 <meta name="twitter:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
 <link rel="icon" href="svg/system_by_dave_logo_rust.svg" type="image/svg+xml">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="profile/assets/apple-touch-icon.png">
 <style>
   :root{--bg:#0b0d10;--panel:#12171d;--panel-2:#171e26;--panel-3:#1d252e;--line:#303945;--line-strong:#465363;--text:#f6f8fb;--muted:#a9b4c1;--dim:#768391;--rust:#c0623a;--rust-2:#e58a5c;--blue:#72b8ff;--green:#6be092;--amber:#ffd166;--red:#ff6b6b;--purple:#b996ff;--cyan:#62d6d2;--ink:#071016;--radius:8px;--shadow:0 16px 60px rgba(0,0,0,.32);--mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;--sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;--fast:120ms;--med:180ms;--ease:cubic-bezier(.2,.8,.2,1);--press:cubic-bezier(.2,0,0,1)}
   *{box-sizing:border-box}
@@ -127,7 +129,7 @@
 <noscript><div class="noscript">Crew Time Log needs JavaScript for editing, import, export, filtering, and browser saved state.</div></noscript>
 <div class="app">
   <header class="topbar">
-    <a class="brand" href="index.html#av-tools" aria-label="Back to AV tools">
+    <a class="brand" href="av-suite.html" aria-label="Back to the AV Suite">
       <span class="brand-mark">S</span>
       <span class="brand-text"><strong>Crew Time Log</strong><span>System by Dave AV tools</span></span>
     </a>
@@ -278,6 +280,7 @@
     </section>
   </main>
 </div>
+<script src="js/sbd-handoff.js"></script>
 <script>
 (function(){
   var STORAGE_KEY='crew-time-log.v1';
@@ -354,10 +357,26 @@
   function escapeAttr(value){return escapeHtml(value);}
   function cssEscape(value){if(window.CSS&&CSS.escape) return CSS.escape(value);return String(value).replace(/"/g,'\\"');}
   loadState();
+  (function(){
+    if(!window.SBD_HANDOFF) return;
+    var staged=SBD_HANDOFF.peek('crew-time-log');
+    if(!staged) return;
+    var payload=staged.payload||{};
+    var count=Array.isArray(payload.items)?payload.items.length:0;
+    var fromLabel=staged.from&&staged.from.label?String(staged.from.label):'another tool';
+    if(count&&window.confirm('Import '+count+' crew from '+fromLabel+'? OK replaces the current roster and show details. Cancel keeps what you have.')){
+      state=normalizeState(payload);
+      if(state.items[0]) state.selectedId=state.items[0].id;
+      saveState();
+      showHint('Imported '+count+' crew from '+fromLabel+'.','success');
+    }
+    SBD_HANDOFF.take('crew-time-log');
+  })();
   render();
   bindEvents();
 })();
 </script>
+<script src="js/sbd-registry.js"></script>
 <script src="js/av-suite-context.js"></script>
 <script src="js/sbd-nav.js" defer></script>
 <script src="js/responsive-tables.js" defer></script>
