@@ -31,6 +31,7 @@ STATIC_PAGES = [
     ("widgets.html", "weekly", "0.7"),
     ("world-cup/", "weekly", "0.7"),
     ("hat-in-ring/", "weekly", "0.7"),
+    ("marsscape/", "monthly", "0.7"),
     ("resume/", "monthly", "0.6"),
     ("profile/", "monthly", "0.6"),
     ("prompts/", "monthly", "0.6"),
