@@ -318,6 +318,129 @@
     gap:8px;
     flex-wrap:wrap;
   }
+  .caller-deck-panel{
+    position:relative;
+    overflow:hidden;
+    margin-bottom:18px;
+    padding:16px;
+    background:
+      linear-gradient(135deg,rgba(229,138,92,.12),transparent 34%),
+      linear-gradient(180deg,rgba(18,23,29,.96),rgba(10,13,17,.96));
+    border:1px solid rgba(255,255,255,.1);
+    border-radius:14px;
+    box-shadow:var(--shadow);
+  }
+  .caller-deck-panel::before{
+    content:"";
+    position:absolute;
+    left:18px;
+    right:18px;
+    top:88px;
+    height:1px;
+    background:linear-gradient(90deg,var(--rust-2),rgba(114,184,255,.36),transparent);
+    opacity:.6;
+  }
+  .caller-head{
+    position:relative;
+    z-index:1;
+    display:flex;
+    align-items:end;
+    justify-content:space-between;
+    gap:16px;
+    margin-bottom:14px;
+  }
+  .caller-head h2{
+    margin:0;
+    font-size:22px;
+    letter-spacing:.01em;
+  }
+  .caller-count{
+    flex:0 0 auto;
+    color:var(--muted);
+    font-family:var(--mono);
+    font-size:12px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+  }
+  .caller-deck{
+    position:relative;
+    z-index:1;
+    display:grid;
+    grid-template-columns:repeat(5,minmax(0,1fr));
+    gap:10px;
+  }
+  .cue-card{
+    position:relative;
+    min-height:142px;
+    padding:14px;
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:10px;
+    text-align:left;
+    border-color:rgba(255,255,255,.1);
+    background:
+      linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.018)),
+      #0e1318;
+  }
+  .cue-card::before{
+    content:"";
+    position:absolute;
+    inset:0 auto 0 0;
+    width:4px;
+    border-radius:14px 0 0 14px;
+    background:var(--blue);
+  }
+  .cue-card:hover{
+    border-color:rgba(114,184,255,.55);
+  }
+  .cue-card.is-selected{
+    border-color:var(--blue);
+    box-shadow:0 0 0 2px rgba(114,184,255,.15),0 14px 30px rgba(0,0,0,.24);
+  }
+  .cue-card.status-standby::before{background:var(--purple)}
+  .cue-card.status-go::before{background:var(--green)}
+  .cue-card.status-hold::before{background:var(--amber)}
+  .cue-card.status-issue::before{background:var(--red)}
+  .cue-card-kicker,
+  .cue-card-meta,
+  .cue-card-notes{
+    display:block;
+  }
+  .cue-card-kicker{
+    color:var(--rust-2);
+    font-family:var(--mono);
+    font-size:10px;
+    font-weight:800;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+  }
+  .cue-card-title{
+    display:block;
+    color:var(--text);
+    font-size:16px;
+    line-height:1.25;
+  }
+  .cue-card-meta{
+    color:var(--muted);
+    font-family:var(--mono);
+    font-size:11px;
+    line-height:1.35;
+  }
+  .cue-card-notes{
+    color:var(--dim);
+    font-size:12px;
+    line-height:1.35;
+  }
+  .deck-empty{
+    grid-column:1 / -1;
+    padding:18px;
+    border:1px dashed rgba(255,255,255,.18);
+    border-radius:var(--radius);
+    color:var(--muted);
+    background:rgba(255,255,255,.025);
+  }
 
   .toolbar{
     display:grid;
@@ -590,6 +713,9 @@
     .shell{
       grid-template-columns:1fr;
     }
+    .caller-deck{
+      grid-template-columns:repeat(3,minmax(0,1fr));
+    }
     .side{
       grid-row:1;
     }
@@ -611,6 +737,16 @@
     .hero-actions{
       width:100%;
       justify-content:space-between;
+    }
+    .caller-head{
+      align-items:flex-start;
+      flex-direction:column;
+    }
+    .caller-deck-panel::before{
+      top:104px;
+    }
+    .caller-deck{
+      grid-template-columns:1fr;
     }
     main{
       padding:12px;
@@ -635,6 +771,7 @@
     .toolbar,
     .side,
     .hero-actions,
+    .caller-deck-panel,
     .drag-cell,
     .row-grip{
       display:none !important;
@@ -734,6 +871,17 @@
         <button type="button" id="importBtn">Import JSON</button>
         <input class="sr-only" type="file" id="importFile" accept="application/json,.json">
       </div>
+    </section>
+
+    <section class="caller-deck-panel" aria-label="Cue caller deck">
+      <div class="caller-head">
+        <div>
+          <p class="eyebrow">Caller deck</p>
+          <h2>On deck</h2>
+        </div>
+        <strong class="caller-count" id="callerDeckCount">0 open</strong>
+      </div>
+      <div class="caller-deck" id="callerDeck"></div>
     </section>
 
     <div class="shell">
@@ -865,6 +1013,8 @@
     showTitle: document.getElementById('showTitle'),
     searchInput: document.getElementById('searchInput'),
     statusFilter: document.getElementById('statusFilter'),
+    callerDeck: document.getElementById('callerDeck'),
+    callerDeckCount: document.getElementById('callerDeckCount'),
     cueBody: document.getElementById('cueBody'),
     emptyState: document.getElementById('emptyState'),
     storageStatus: document.getElementById('storageStatus'),
@@ -1011,6 +1161,7 @@
     const rows = visibleRows();
     els.emptyState.hidden = rows.length > 0;
     els.cueBody.innerHTML = rows.map(rowTemplate).join('');
+    renderCallerDeck();
     renderStats();
     renderNextCue();
     updateButtons();
@@ -1035,6 +1186,30 @@
         </td>
         <td><textarea class="row-textarea field-notes" data-field="notes" aria-label="Cue notes">${escapeHtml(row.notes)}</textarea></td>
       </tr>`;
+  }
+
+  function renderCallerDeck() {
+    const openRows = state.rows.filter(row => row.status !== 'Done');
+    els.callerDeckCount.textContent = `${openRows.length} open`;
+    if (!openRows.length) {
+      els.callerDeck.innerHTML = '<div class="deck-empty">Run complete</div>';
+      return;
+    }
+    els.callerDeck.innerHTML = openRows.slice(0, 5).map(callerCardTemplate).join('');
+  }
+
+  function callerCardTemplate(row, index) {
+    const selected = row.id === state.selectedId;
+    const statusClass = `status-${row.status.toLowerCase()}`;
+    const position = index === 0 ? 'Next' : `+${index}`;
+    const meta = [row.number || 'Cue', row.time || 'No time', row.type || 'Cue', row.owner].filter(Boolean).join(' / ');
+    return `
+      <button class="cue-card ${selected ? 'is-selected ' : ''}${statusClass}" type="button" data-caller="${escapeHtml(row.id)}" aria-label="Select ${escapeHtml(row.number || 'cue')} ${escapeHtml(row.action || 'Untitled cue')}">
+        <span class="cue-card-kicker">${escapeHtml(position)} / ${escapeHtml(row.status)}</span>
+        <strong class="cue-card-title">${escapeHtml(row.action || 'Untitled cue')}</strong>
+        <span class="cue-card-meta">${escapeHtml(meta)}</span>
+        <span class="cue-card-notes">${escapeHtml(row.notes || row.source || 'No notes')}</span>
+      </button>`;
   }
 
   function renderStats() {
@@ -1101,6 +1276,7 @@
     els.cueBody.querySelectorAll('tr[data-id]').forEach(row => {
       row.classList.toggle('selected', row.dataset.id === id);
     });
+    renderCallerDeck();
     renderNextCue();
     updateButtons();
   }
@@ -1114,6 +1290,7 @@
     renderStats();
     renderNextCue();
     updateRowShell(rowId);
+    renderCallerDeck();
   }
 
   function updateRowShell(rowId) {
@@ -1368,6 +1545,10 @@
   els.cueBody.addEventListener('click', event => {
     const row = event.target.closest('tr[data-id]');
     if (row) selectRowSoft(row.dataset.id);
+  });
+  els.callerDeck.addEventListener('click', event => {
+    const card = event.target.closest('[data-caller]');
+    if (card) selectRow(card.dataset.caller, { scroll: true });
   });
   els.cueBody.addEventListener('input', event => {
     const target = event.target;

@@ -135,7 +135,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool change — rolls the service-worker cache. */
-    version:'v20260703-accessibility-mobile',
+    version:'v20260703-cueforge-deck',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,

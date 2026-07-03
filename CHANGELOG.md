@@ -2,6 +2,8 @@
 
 ## 2026-07-03
 
+* Added `av-suite-unique-app-opportunities-2026-07-03.md` to document the table-heavy AV Suite pattern and prioritize domain-shaped app surfaces, starting with CueForge, Signal Flow, audio patch/input workflows, power, network, RF, truck/load workflows, room operations, and camera shots.
+* Added a CueForge Caller Deck above the editable cue table so the next open cues read as show-calling cards instead of only spreadsheet rows, with card selection synced to the table and Take Next Cue flow. Added `scripts/probe_cueforge.js` to smoke-test CueForge routing, context hydration, editing, filtering, cue advancement, Caller Deck updates, import/export, persistence, and mobile containment.
 * Added `av-suite-upgrade-plan-2026-07-03.md` as the implementation plan for the July AV Suite hardening pass, scoped to trust/accessibility/mobile polish and verification while leaving Teleprompter and PlotForge feature work out of this round.
 * Hardened `/av-suite.html` by making the closed Operator Settings drawer inert, preserving focus return, and tightening the phone-width command bar so primary actions wrap without clipping.
 * Improved shared mobile AV tool usability: the fixed tool nav now reserves bottom page space on phones and the responsive table-card controls use larger touch/editor targets.
