@@ -78,7 +78,8 @@
         <a href="notion.html" class="nav-link">Notion</a>
         <a href="av-suite.html" class="nav-link">AV&nbsp;Suite</a>
         <a href="prompt-lab.html" class="nav-link">Prompt&nbsp;Lab</a>
-        <a href="https://github.com/DaveHomeAssist/system-by-dave" target="_blank" rel="noopener" class="gh-btn">GitHub&nbsp;↗</a>
+        <a href="command53/" class="nav-link">Command53</a>
+        <a href="https://github.com/DaveHomeAssist/system-by-dave" target="_blank" rel="noopener noreferrer" class="gh-btn">GitHub&nbsp;↗</a>
       </div>
     </nav>
   </header>
@@ -112,7 +113,8 @@
           <a href="notion.html" class="nav-link" style="font-size:11px;">Notion</a>
           <a href="av-suite.html" class="nav-link" style="font-size:11px;">AV Suite</a>
           <a href="prompt-lab.html" class="nav-link" style="font-size:11px;">Prompt Lab</a>
-          <a href="https://github.com/DaveHomeAssist" target="_blank" rel="noopener" class="nav-link" style="font-size:11px;">GitHub ↗</a>
+          <a href="command53/" class="nav-link" style="font-size:11px;">Command53</a>
+          <a href="https://github.com/DaveHomeAssist" target="_blank" rel="noopener noreferrer" class="nav-link" style="font-size:11px;">GitHub ↗</a>
         </div>
         <span style="font-family:var(--ff-mono);font-size:11px;color:rgba(243,244,247,0.35);">© 2026</span>
       </div>
@@ -131,6 +133,7 @@
     { name: 'AV Suite',            url: 'av-suite.html',                                   chips: ['AV'],                    blurb: 'Operator launch hub — groups 38 browser-based AV show tools by show phase and tracks readiness at a glance.' },
     { name: 'Teleprompter',        url: 'teleprompter.html',                               chips: ['AV'],                    blurb: 'On-device teleprompter with instrument-grade controls, mirror/fullscreen, rundown timing and show packages.' },
     { name: 'DeckForge',           url: 'https://davehomeassist.github.io/deckforge/',     chips: ['AV'],                    blurb: 'Design Elgato Stream Deck & Logitech MX Creative Console layouts for your OBS / vMix show workflow.' },
+    { name: 'Command53',           url: 'command53/',                                      chips: ['Labs','Trackers'],       blurb: 'The live workspace command center for project status, daily pass context, and quick launch prompts.' },
     // ── Notion ──
     { name: 'Notion Skills',       url: 'skills.html',                                     chips: ['Notion'],                blurb: 'AI skills that run natively inside Notion AI — no external apps or plugins to break.' },
     { name: 'Notion Agents',       url: 'agents.html',                                     chips: ['Notion'],                blurb: 'Agents that triage your inbox, assemble briefings and keep your prompts organized — inside Notion.' },
@@ -151,7 +154,9 @@
     // ── Labs ──
     { name: 'Graph Explorer',      url: 'https://davehomeassist.github.io/graph-explorer/',chips: ['Labs'],                  blurb: 'Dataset-agnostic node-graph topology visualizer — one D3 / Dagre engine, many pluggable map packs.' },
     { name: 'SDLC Tool Stack Map', url: 'https://davehomeassist.github.io/sdlc-tool-stack-map/', chips: ['Labs'],            blurb: 'An interactive visual map of an SDLC tool stack, grouped by lifecycle stage.' },
-    { name: 'Prompt Lab',          url: 'https://promptlab.tools/',                        chips: ['Labs'],                  blurb: 'A multi-surface prompt-engineering workstation — hosted web app, Chrome extension and desktop build.' }
+    { name: 'Prompt Lab',          url: 'https://promptlab.tools/',                        chips: ['Labs'],                  blurb: 'A multi-surface prompt-engineering workstation — hosted web app, Chrome extension and desktop build.' },
+    { name: 'Project Registry',    url: 'project-registry.html',                           chips: ['Labs'],                  blurb: 'Public-safe repository inventory with stack, purpose, status, and recent activity.' },
+    { name: 'Dave Robertson Profile', url: 'profile/',                                     chips: ['Labs'],                  blurb: 'Live event, broadcast, systems, and business operating context for clients and collaborators.' }
   ];
 
   var CHIP_ORDER = ['AV','Notion','Apps','Games','Trackers','Sports','Labs'];
@@ -171,7 +176,7 @@
     grid.innerHTML = shown.length ? shown.map(function(t){
       var ext = isExternal(t.url);
       var attrs = ext ? ' target="_blank" rel="noopener noreferrer"' : '';
-      return '<a class="tool-card" href="' + esc(t.url) + '"' + attrs + '>'
+      return '<a class="tool-card" data-track-cta="tools:' + esc(t.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')) + '" href="' + esc(t.url) + '"' + attrs + '>'
         + '<div class="tc-head"><h3>' + esc(t.name) + '</h3>' + (ext ? '<span class="tc-ext">↗</span>' : '') + '</div>'
         + '<p>' + esc(t.blurb) + '</p>'
         + '<div class="tc-host">' + esc(hostLabel(t.url)) + '</div>'
@@ -212,5 +217,6 @@
   setActive(chipFromHash());
   window.addEventListener('hashchange', function(){ setActive(chipFromHash()); });
   </script>
+  <script src="js/sbd-cta-metrics.js" defer></script>
 </body>
 </html>

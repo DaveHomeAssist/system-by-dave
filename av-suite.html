@@ -499,6 +499,13 @@
   .empty{padding:16px;border:1px dashed var(--line-2);border-radius:var(--r-md);color:var(--muted);text-align:center;font-size:var(--fs-meta)}
   .privacy-note{margin:0;color:var(--muted);font-size:11.5px;line-height:1.5}
 
+  .operator-docs{display:grid;grid-template-columns:1.15fr 1fr;gap:var(--gap);padding:0 28px 28px}
+  .docs-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  .doc-card{border:1px solid var(--line-2);background:var(--surface-2);padding:16px}
+  .doc-card strong{display:block;margin-bottom:8px;color:var(--text);font-family:var(--font-display);font-size:18px;font-weight:500;line-height:1.15}
+  .doc-card span{display:block;color:var(--muted);font-size:13px;line-height:1.45}
+  .doc-card code{font-family:var(--font-mono);font-size:11px;color:var(--accent-pale)}
+
   /* — Offline pills — */
   .offline-summary{display:grid;grid-template-columns:repeat(2,1fr);gap:7px}
   .offline-pill{border:1px solid var(--line-2);border-radius:var(--r-md);padding:9px 11px;background:var(--surface-2);display:grid;gap:2px}
@@ -605,6 +612,7 @@
   @media (max-width:1180px){
     .hero{grid-template-columns:1fr}
     .workspace{grid-template-columns:1fr}
+    .operator-docs{grid-template-columns:1fr}
     .cb-title{max-width:46vw}
   }
   @media (max-width:900px){
@@ -620,6 +628,8 @@
     .cb-actions .cta{grid-column:1/-1}
     .cb-phase{order:-1}
     main{padding-left:12px;padding-right:12px}
+    .operator-docs{padding-left:12px;padding-right:12px}
+    .docs-grid{grid-template-columns:1fr}
     .profile-fields{grid-template-columns:1fr}
     .phase-strip{grid-auto-flow:row;grid-template-columns:repeat(3,1fr);grid-auto-columns:auto}
     .phase-strip button{min-width:0;white-space:normal}
@@ -647,6 +657,7 @@
       <a href="notion.html" class="nav-link">Notion</a>
       <a href="av-suite.html" class="nav-link active" aria-current="page">AV&nbsp;Suite</a>
       <a href="prompt-lab.html" class="nav-link">Prompt&nbsp;Lab</a>
+      <a href="command53/" class="nav-link">Command53</a>
       <a href="tools.html" class="nav-link">All&nbsp;Tools</a>
       <a href="https://github.com/DaveHomeAssist/system-by-dave" target="_blank" rel="noopener noreferrer" class="gh-btn">GitHub&nbsp;↗</a>
     </div>
@@ -769,6 +780,27 @@
       </section>
     </aside>
   </section>
+
+  <section class="operator-docs" aria-label="AV Suite operator documentation">
+    <section class="panel side-section">
+      <h2>Operator Start Pattern</h2>
+      <div class="docs-grid">
+        <div class="doc-card"><strong>1. Name the show</strong><span>Set show, venue, date, operator, and phase before launching tools. Context carries through supported URLs.</span></div>
+        <div class="doc-card"><strong>2. Open recommended</strong><span>Use the current phase to surface the tools most likely to matter next.</span></div>
+        <div class="doc-card"><strong>3. Mark readiness</strong><span>Use Ready, Issue, Skipped, notes, and saved-data scans to keep handoffs explicit.</span></div>
+        <div class="doc-card"><strong>4. Export package</strong><span>Use <code>Export Show Package</code> before changing machines, browsers, or operators.</span></div>
+      </div>
+    </section>
+    <aside class="panel side-section">
+      <h2>Recovery & Handoff</h2>
+      <div class="docs-grid">
+        <div class="doc-card"><strong>Copy phase gate</strong><span>Generates a compact phase-specific status handoff for the next operator.</span></div>
+        <div class="doc-card"><strong>Cache AV tools</strong><span>Preload the suite before a venue network gets unreliable.</span></div>
+        <div class="doc-card"><strong>Import package</strong><span>Restore a previously exported show package on another browser session.</span></div>
+        <div class="doc-card"><strong>Review queue</strong><span>Collect blockers, pending phase tools, saved data risks, and notes in one place.</span></div>
+      </div>
+    </aside>
+</section>
 </main>
 
 <footer class="site-foot">
@@ -778,6 +810,7 @@
       <a href="index.html" class="nav-link">Home</a>
       <a href="notion.html" class="nav-link">Notion</a>
       <a href="prompt-lab.html" class="nav-link">Prompt Lab</a>
+      <a href="command53/" class="nav-link">Command53</a>
       <a href="tools.html" class="nav-link">All Tools</a>
       <a href="https://github.com/DaveHomeAssist" target="_blank" rel="noopener noreferrer" class="nav-link">GitHub ↗</a>
     </div>

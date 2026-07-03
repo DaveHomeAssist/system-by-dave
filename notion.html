@@ -40,6 +40,10 @@
   .gh-btn:hover{background:oklch(0.65 0.19 33)!important;color:#fff!important;}
   .card{transition:transform .35s ease, border-color .35s ease;}
   .card:hover{transform:translateY(-4px);border-color:oklch(0.65 0.19 33);}
+  .hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px;}
+  .hero-action{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:11px 16px;border:1px solid rgba(255,255,255,0.14);font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;color:#F3F4F7;transition:border-color .2s ease,background .2s ease,color .2s ease;}
+  .hero-action.primary{background:oklch(0.65 0.19 33);border-color:oklch(0.65 0.19 33);color:#fff;}
+  .hero-action:hover{border-color:oklch(0.72 0.19 33);background:rgba(255,255,255,0.045);}
   a:focus-visible,button:focus-visible{outline:2px solid var(--rust);outline-offset:3px;}
   @media (max-width:880px){
     .agrid,.wgrid,.steps{grid-template-columns:1fr!important;}
@@ -65,7 +69,7 @@
           <a href="notion.html" class="nav-link active" style="font-family:var(--ff-mono);font-size:12px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;">Notion</a>
           <a href="av-suite.html" class="nav-link" style="font-family:var(--ff-mono);font-size:12px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;">AV&nbsp;Suite</a>
           <a href="prompt-lab.html" class="nav-link" style="font-family:var(--ff-mono);font-size:12px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;">Prompt&nbsp;Lab</a>
-          <a href="https://github.com/DaveHomeAssist/system-by-dave" target="_blank" rel="noopener" class="gh-btn" style="font-family:var(--ff-mono);font-size:12px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;color:#0A0D14;background:#F3F4F7;padding:9px 18px;">GitHub&nbsp;↗</a>
+          <a href="https://github.com/DaveHomeAssist/system-by-dave" target="_blank" rel="noopener noreferrer" class="gh-btn" style="font-family:var(--ff-mono);font-size:12px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;color:#0A0D14;background:#F3F4F7;padding:9px 18px;">GitHub&nbsp;↗</a>
         </div>
       </nav>
     </header>
@@ -77,6 +81,11 @@
           <div style="display:inline-flex;align-items:center;gap:9px;font-family:var(--ff-mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:oklch(0.72 0.19 33);margin-bottom:24px;"><span style="width:7px;height:7px;border-radius:50%;background:oklch(0.65 0.19 33);"></span>Workspace tools</div>
           <h1 style="font-family:var(--ff-display);font-weight:600;font-size:clamp(40px,5.4vw,68px);line-height:1.0;letter-spacing:-0.03em;margin-bottom:24px;">Tools for Notion people.</h1>
           <p style="font-size:17px;font-weight:300;line-height:1.7;color:rgba(243,244,247,0.62);max-width:520px;">AI agents that run natively on Notion AI, and embeddable widgets that drop into any page via iframe — no plugins, no API keys, nothing to break.</p>
+          <div class="hero-actions" aria-label="Notion product actions">
+            <a href="agents.html" class="hero-action primary" data-track-cta="notion:view-agents">View agents</a>
+            <a href="widgets.html" class="hero-action" data-track-cta="notion:view-widgets">Open widgets</a>
+            <a href="skills.html" class="hero-action" data-track-cta="notion:view-skills">Browse skills</a>
+          </div>
         </div>
         <div class="statgrid" style="display:grid;grid-template-columns:1fr 1fr;gap:1px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.06);">
           <div style="background:#0A0D14;padding:22px 20px;"><div style="font-family:var(--ff-display);font-weight:600;font-size:30px;color:oklch(0.72 0.19 33);">04</div><div style="font-family:var(--ff-mono);font-size:10px;letter-spacing:0.06em;text-transform:uppercase;color:rgba(243,244,247,0.5);margin-top:6px;">Paid agents</div></div>
@@ -94,7 +103,7 @@
         <span style="margin-left:auto;font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:rgba(243,244,247,0.4);">Paid · native to Notion AI</span>
       </div>
       <div class="agrid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:18px;">
-        <a href="agents.html" class="card" style="display:flex;flex-direction:column;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.09);text-decoration:none;color:inherit;overflow:hidden;">
+        <a href="agents.html#promptkeeper" class="card" data-track-cta="notion:agent-promptkeeper" style="display:flex;flex-direction:column;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.09);text-decoration:none;color:inherit;overflow:hidden;">
           <div style="aspect-ratio:4/3;overflow:hidden;background:#EDE9DD;border-bottom:1px solid rgba(255,255,255,0.08);"><img src="img/agent-promptkeeper.webp" alt="PromptKeeper" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
           <div style="padding:22px;display:flex;flex-direction:column;flex-grow:1;">
             <div style="display:flex;align-items:center;gap:8px;font-family:var(--ff-mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:oklch(0.72 0.19 33);margin-bottom:12px;"><span style="width:6px;height:6px;border-radius:50%;background:oklch(0.65 0.19 33);"></span>Agent</div>
@@ -103,7 +112,7 @@
             <div style="display:flex;align-items:center;justify-content:space-between;padding-top:15px;border-top:1px solid rgba(255,255,255,0.08);"><span style="font-family:var(--ff-mono);font-size:15px;"><span style="font-size:10px;color:rgba(243,244,247,0.5);">$</span>15</span><span style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:oklch(0.72 0.19 33);">View →</span></div>
           </div>
         </a>
-        <a href="agents.html" class="card" style="display:flex;flex-direction:column;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.09);text-decoration:none;color:inherit;overflow:hidden;">
+        <a href="agents.html#daily-prophet" class="card" data-track-cta="notion:agent-daily-prophet" style="display:flex;flex-direction:column;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.09);text-decoration:none;color:inherit;overflow:hidden;">
           <div style="aspect-ratio:4/3;overflow:hidden;background:#EDE9DD;border-bottom:1px solid rgba(255,255,255,0.08);"><img src="img/agent-daily-prophet.webp" alt="Daily Prophet" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
           <div style="padding:22px;display:flex;flex-direction:column;flex-grow:1;">
             <div style="display:flex;align-items:center;gap:8px;font-family:var(--ff-mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:oklch(0.72 0.19 33);margin-bottom:12px;"><span style="width:6px;height:6px;border-radius:50%;background:oklch(0.65 0.19 33);"></span>Agent</div>
@@ -112,7 +121,7 @@
             <div style="display:flex;align-items:center;justify-content:space-between;padding-top:15px;border-top:1px solid rgba(255,255,255,0.08);"><span style="font-family:var(--ff-mono);font-size:15px;"><span style="font-size:10px;color:rgba(243,244,247,0.5);">$</span>12</span><span style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:oklch(0.72 0.19 33);">View →</span></div>
           </div>
         </a>
-        <a href="agents.html" class="card" style="display:flex;flex-direction:column;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.09);text-decoration:none;color:inherit;overflow:hidden;">
+        <a href="agents.html#formatting-wizard" class="card" data-track-cta="notion:agent-formatting-wizard" style="display:flex;flex-direction:column;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.09);text-decoration:none;color:inherit;overflow:hidden;">
           <div style="aspect-ratio:4/3;overflow:hidden;background:#EDE9DD;border-bottom:1px solid rgba(255,255,255,0.08);"><img src="img/agent-formatting-wizard.webp" alt="Formatting Wizard" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
           <div style="padding:22px;display:flex;flex-direction:column;flex-grow:1;">
             <div style="display:flex;align-items:center;gap:8px;font-family:var(--ff-mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:oklch(0.72 0.19 33);margin-bottom:12px;"><span style="width:6px;height:6px;border-radius:50%;background:oklch(0.65 0.19 33);"></span>Agent</div>
@@ -121,7 +130,7 @@
             <div style="display:flex;align-items:center;justify-content:space-between;padding-top:15px;border-top:1px solid rgba(255,255,255,0.08);"><span style="font-family:var(--ff-mono);font-size:15px;"><span style="font-size:10px;color:rgba(243,244,247,0.5);">$</span>12</span><span style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:oklch(0.72 0.19 33);">View →</span></div>
           </div>
         </a>
-        <a href="agents.html" class="card" style="display:flex;flex-direction:column;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.09);text-decoration:none;color:inherit;overflow:hidden;">
+        <a href="agents.html#sort-inbox" class="card" data-track-cta="notion:agent-sort-inbox" style="display:flex;flex-direction:column;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.09);text-decoration:none;color:inherit;overflow:hidden;">
           <div style="aspect-ratio:4/3;overflow:hidden;background:#EDE9DD;border-bottom:1px solid rgba(255,255,255,0.08);"><img src="img/agent-sort-inbox.webp" alt="Sort Inbox" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
           <div style="padding:22px;display:flex;flex-direction:column;flex-grow:1;">
             <div style="display:flex;align-items:center;gap:8px;font-family:var(--ff-mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:oklch(0.72 0.19 33);margin-bottom:12px;"><span style="width:6px;height:6px;border-radius:50%;background:oklch(0.65 0.19 33);"></span>Agent</div>
@@ -140,7 +149,7 @@
         <span style="margin-left:auto;font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:rgba(243,244,247,0.4);">Free · embed via iframe</span>
       </div>
       <div class="wgrid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:18px;">
-        <a href="https://davehomeassist.github.io/NotionWidgets/project-status.html" target="_blank" rel="noopener" class="card" style="display:flex;flex-direction:column;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.09);text-decoration:none;color:inherit;overflow:hidden;">
+        <a href="https://davehomeassist.github.io/NotionWidgets/project-status.html" target="_blank" rel="noopener noreferrer" class="card" style="display:flex;flex-direction:column;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.09);text-decoration:none;color:inherit;overflow:hidden;">
           <div style="aspect-ratio:4/3;position:relative;overflow:hidden;background:linear-gradient(135deg, oklch(0.65 0.19 33 / 0.14), transparent 70%), repeating-linear-gradient(90deg, rgba(255,255,255,0.04) 0 0.5px, transparent 0.5px 18px), repeating-linear-gradient(0deg, rgba(255,255,255,0.04) 0 0.5px, transparent 0.5px 18px);border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;"><span style="font-family:var(--ff-display);font-weight:700;font-size:64px;color:oklch(0.65 0.19 33);opacity:0.3;">PS</span></div>
           <div style="padding:22px;display:flex;flex-direction:column;flex-grow:1;">
             <div style="display:flex;align-items:center;gap:8px;font-family:var(--ff-mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:oklch(0.72 0.19 33);margin-bottom:12px;"><span style="width:6px;height:6px;border-radius:50%;background:oklch(0.65 0.19 33);"></span>Widget</div>
@@ -149,7 +158,7 @@
             <div style="display:flex;align-items:center;justify-content:space-between;padding-top:15px;border-top:1px solid rgba(255,255,255,0.08);"><span style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:rgba(243,244,247,0.55);">Free</span><span style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:oklch(0.72 0.19 33);">View ↗</span></div>
           </div>
         </a>
-        <a href="https://davehomeassist.github.io/NotionWidgets/quest-log.html" target="_blank" rel="noopener" class="card" style="display:flex;flex-direction:column;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.09);text-decoration:none;color:inherit;overflow:hidden;">
+        <a href="https://davehomeassist.github.io/NotionWidgets/quest-log.html" target="_blank" rel="noopener noreferrer" class="card" style="display:flex;flex-direction:column;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.09);text-decoration:none;color:inherit;overflow:hidden;">
           <div style="aspect-ratio:4/3;position:relative;overflow:hidden;background:linear-gradient(135deg, oklch(0.65 0.19 33 / 0.14), transparent 70%), repeating-linear-gradient(90deg, rgba(255,255,255,0.04) 0 0.5px, transparent 0.5px 18px), repeating-linear-gradient(0deg, rgba(255,255,255,0.04) 0 0.5px, transparent 0.5px 18px);border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;"><span style="font-family:var(--ff-display);font-weight:700;font-size:64px;color:oklch(0.65 0.19 33);opacity:0.3;">QL</span></div>
           <div style="padding:22px;display:flex;flex-direction:column;flex-grow:1;">
             <div style="display:flex;align-items:center;gap:8px;font-family:var(--ff-mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:oklch(0.72 0.19 33);margin-bottom:12px;"><span style="width:6px;height:6px;border-radius:50%;background:oklch(0.65 0.19 33);"></span>Widget</div>
@@ -158,7 +167,7 @@
             <div style="display:flex;align-items:center;justify-content:space-between;padding-top:15px;border-top:1px solid rgba(255,255,255,0.08);"><span style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:rgba(243,244,247,0.55);">Free</span><span style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:oklch(0.72 0.19 33);">View ↗</span></div>
           </div>
         </a>
-        <a href="https://davehomeassist.github.io/NotionWidgets/client-approval.html" target="_blank" rel="noopener" class="card" style="display:flex;flex-direction:column;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.09);text-decoration:none;color:inherit;overflow:hidden;">
+        <a href="https://davehomeassist.github.io/NotionWidgets/client-approval.html" target="_blank" rel="noopener noreferrer" class="card" style="display:flex;flex-direction:column;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.09);text-decoration:none;color:inherit;overflow:hidden;">
           <div style="aspect-ratio:4/3;position:relative;overflow:hidden;background:linear-gradient(135deg, oklch(0.65 0.19 33 / 0.14), transparent 70%), repeating-linear-gradient(90deg, rgba(255,255,255,0.04) 0 0.5px, transparent 0.5px 18px), repeating-linear-gradient(0deg, rgba(255,255,255,0.04) 0 0.5px, transparent 0.5px 18px);border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;"><span style="font-family:var(--ff-display);font-weight:700;font-size:64px;color:oklch(0.65 0.19 33);opacity:0.3;">CA</span></div>
           <div style="padding:22px;display:flex;flex-direction:column;flex-grow:1;">
             <div style="display:flex;align-items:center;gap:8px;font-family:var(--ff-mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:oklch(0.72 0.19 33);margin-bottom:12px;"><span style="width:6px;height:6px;border-radius:50%;background:oklch(0.65 0.19 33);"></span>Widget</div>
@@ -167,7 +176,7 @@
             <div style="display:flex;align-items:center;justify-content:space-between;padding-top:15px;border-top:1px solid rgba(255,255,255,0.08);"><span style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:rgba(243,244,247,0.55);">Free</span><span style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:oklch(0.72 0.19 33);">View ↗</span></div>
           </div>
         </a>
-        <a href="https://davehomeassist.github.io/NotionWidgets/graph-explorer.html" target="_blank" rel="noopener" class="card" style="display:flex;flex-direction:column;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.09);text-decoration:none;color:inherit;overflow:hidden;">
+        <a href="https://davehomeassist.github.io/NotionWidgets/graph-explorer.html" target="_blank" rel="noopener noreferrer" class="card" style="display:flex;flex-direction:column;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.09);text-decoration:none;color:inherit;overflow:hidden;">
           <div style="aspect-ratio:4/3;position:relative;overflow:hidden;background:linear-gradient(135deg, oklch(0.65 0.19 33 / 0.14), transparent 70%), repeating-linear-gradient(90deg, rgba(255,255,255,0.04) 0 0.5px, transparent 0.5px 18px), repeating-linear-gradient(0deg, rgba(255,255,255,0.04) 0 0.5px, transparent 0.5px 18px);border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;"><span style="font-family:var(--ff-display);font-weight:700;font-size:64px;color:oklch(0.65 0.19 33);opacity:0.3;">WM</span></div>
           <div style="padding:22px;display:flex;flex-direction:column;flex-grow:1;">
             <div style="display:flex;align-items:center;gap:8px;font-family:var(--ff-mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:oklch(0.72 0.19 33);margin-bottom:12px;"><span style="width:6px;height:6px;border-radius:50%;background:oklch(0.65 0.19 33);"></span>Widget</div>
@@ -194,7 +203,7 @@
           <a href="index.html" class="nav-link" style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;">Home</a>
           <a href="av-suite.html" class="nav-link" style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;">AV Suite</a>
           <a href="prompt-lab.html" class="nav-link" style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;">Prompt Lab</a>
-          <a href="https://github.com/DaveHomeAssist" target="_blank" rel="noopener" class="nav-link" style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;">GitHub ↗</a>
+          <a href="https://github.com/DaveHomeAssist" target="_blank" rel="noopener noreferrer" class="nav-link" style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;">GitHub ↗</a>
         </div>
         <span style="font-family:var(--ff-mono);font-size:11px;color:rgba(243,244,247,0.35);">© 2026</span>
       </div>
@@ -202,5 +211,6 @@
 
   </div>
 </div>
+<script src="js/sbd-cta-metrics.js" defer></script>
 </body>
 </html>

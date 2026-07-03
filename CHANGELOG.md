@@ -6,6 +6,13 @@
 * Hardened `/av-suite.html` by making the closed Operator Settings drawer inert, preserving focus return, and tightening the phone-width command bar so primary actions wrap without clipping.
 * Improved shared mobile AV tool usability: the fixed tool nav now reserves bottom page space on phones and the responsive table-card controls use larger touch/editor targets.
 * Reconciled AV Suite public copy to the registry-backed 38 tool count, bumped the offline cache version, and added dependency-free AV Suite registry/offline plus responsive browser verification scripts.
+* Added `systembydave-upgrade-implementation-plan-2026-07-03.md` to map the live site review into shipped public-site patches and verification gates.
+* Upgraded the homepage with audience-first routing for live operators, Prompt Lab users, Notion builders, and clients or partners; promoted Command53, Project Registry, Profile, and Privacy as proof surfaces; added clearer product CTAs and mobile containment for the dark hero/action layout.
+* Strengthened Prompt Lab with mobile hero containment, install/web-app CTA tracking, and visible trust proof for BYO key, privacy policy, registry/source trail, and free browser access.
+* Clarified Notion and Agents flows with overview CTAs, stable per-agent anchors, request-context URLs, and a visible agent setup flow.
+* Added an AV Suite operator documentation panel covering show start, recommended launch, readiness, package export, handoff, cache, import, and review-queue recovery patterns.
+* Promoted Command53, Project Registry, and Profile into the Tools catalog and added local-only CTA counters via `js/sbd-cta-metrics.js` without network analytics.
+* Improved Project Registry table contrast so repository names, purposes, stack pills, and status rows remain readable under the active theme.
 
 ## 2026-07-02
 
