@@ -69,7 +69,7 @@
       '.sbd-nav .sbd-nav-dept{color:#93a1b3;font:700 10px "SFMono-Regular",Menlo,monospace;text-transform:uppercase;letter-spacing:.08em;padding:0 4px;white-space:nowrap}',
       '.sbd-nav .sbd-nav-sep{width:1px;align-self:stretch;margin:2px 1px;background:rgba(120,132,148,.32)}',
       '.sbd-nav .sbd-nav-step{max-width:150px;overflow:hidden;text-overflow:ellipsis}',
-      '@media (max-width:680px){.sbd-nav{left:10px;right:10px;bottom:10px;flex-wrap:wrap;justify-content:center}.sbd-nav .sbd-nav-step{max-width:none}}',
+      '@media (max-width:680px){body.has-sbd-nav{padding-bottom:calc(118px + env(safe-area-inset-bottom))}.sbd-nav{left:10px;right:10px;bottom:max(10px,env(safe-area-inset-bottom));flex-wrap:wrap;justify-content:center;align-items:stretch;max-height:28vh;overflow:auto}.sbd-nav a{min-height:38px;padding:7px 9px;justify-content:center}.sbd-nav .sbd-nav-sep{display:none}.sbd-nav .sbd-nav-dept{flex:1 0 100%;text-align:center;padding-top:2px}.sbd-nav .sbd-nav-step{flex:1 1 40%;max-width:46vw;min-width:0}}',
       '@media print{.sbd-nav{display:none!important}}'
     ].join('');
 
@@ -94,6 +94,7 @@
 
     document.head.appendChild(style);
     document.body.appendChild(nav);
+    document.body.classList.add('has-sbd-nav');
   }
 
   if(document.readyState === 'loading'){

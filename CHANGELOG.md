@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-07-03
+
+* Added `av-suite-upgrade-plan-2026-07-03.md` as the implementation plan for the July AV Suite hardening pass, scoped to trust/accessibility/mobile polish and verification while leaving Teleprompter and PlotForge feature work out of this round.
+* Hardened `/av-suite.html` by making the closed Operator Settings drawer inert, preserving focus return, and tightening the phone-width command bar so primary actions wrap without clipping.
+* Improved shared mobile AV tool usability: the fixed tool nav now reserves bottom page space on phones and the responsive table-card controls use larger touch/editor targets.
+* Reconciled AV Suite public copy to the registry-backed 38 tool count, bumped the offline cache version, and added dependency-free AV Suite registry/offline plus responsive browser verification scripts.
+
 ## 2026-07-02
 
 * **Restored the AV Suite operator console** at `/av-suite.html` in the dark SYSTEM_BY_DAVE design. The June static hub is replaced by the full console — show profile, six-phase recommendations, readiness tracking with notes, pinned/recent tools, review queue, phase gate, Quick Switcher command palette, operator settings drawer, suite JSON + show-package export/import, and offline cache controls — re-tokenized from the warm-rust skin to the site's cool-dark green accent, wrapped in the shared site header/footer, and reading the same `av-suite-dashboard.v1` browser state as before (existing show data rehydrates).

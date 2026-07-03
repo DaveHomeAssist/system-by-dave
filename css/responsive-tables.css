@@ -15,6 +15,7 @@
     border: 1px solid rgba(255, 255, 255, 0.14) !important;
     border-radius: 8px !important;
     background: rgba(255, 255, 255, 0.03) !important;
+    scroll-margin-bottom: 132px !important;
   }
   .table-wrap tbody td,
   .table-wrap tbody th {
@@ -54,5 +55,13 @@
   .table-wrap tbody td > select,
   .table-wrap tbody th > input,
   .table-wrap tbody th > textarea,
-  .table-wrap tbody th > select { width: 100% !important; min-width: 0 !important; max-width: 100% !important; box-sizing: border-box; }
+  .table-wrap tbody th > select {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    min-height: 44px !important;
+    box-sizing: border-box;
+  }
+  .table-wrap tbody td > textarea,
+  .table-wrap tbody th > textarea { min-height: 64px !important; }
 }

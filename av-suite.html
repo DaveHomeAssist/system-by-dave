@@ -520,6 +520,7 @@
     background:var(--surface);border-left:1px solid var(--line-2);box-shadow:var(--shadow-drawer);
     display:grid;grid-template-rows:auto 1fr;transform:translateX(102%);transition:transform var(--dur-panel) var(--ease-out);
   }
+  .drawer[aria-hidden="true"]{pointer-events:none}
   .drawer.open{transform:translateX(0)}
   .drawer-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:18px 18px 16px;border-bottom:1px solid var(--line)}
   .drawer-head h2{font-family:var(--font-display);font-size:24px;color:var(--text);margin-top:3px}
@@ -614,12 +615,14 @@
   @media (max-width:680px){
     .command-bar{flex-direction:column;align-items:stretch;gap:12px;position:static}
     .cb-title{max-width:none;white-space:normal}
-    .cb-actions{justify-content:flex-start}
-    .cb-actions .button-link,.cb-actions button{flex:1 1 auto}
+    .cb-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));justify-content:stretch;align-items:stretch}
+    .cb-actions .button-link,.cb-actions button,.cb-actions .cb-phase{width:100%;min-width:0;white-space:normal;padding-left:8px;padding-right:8px}
+    .cb-actions .cta{grid-column:1/-1}
     .cb-phase{order:-1}
     main{padding-left:12px;padding-right:12px}
     .profile-fields{grid-template-columns:1fr}
     .phase-strip{grid-auto-flow:row;grid-template-columns:repeat(3,1fr);grid-auto-columns:auto}
+    .phase-strip button{min-width:0;white-space:normal}
     .toolbar{grid-template-columns:1fr}
     .readiness-actions{grid-template-columns:1fr}
     .command-backdrop{padding:10px}
@@ -784,7 +787,7 @@
 
 <!-- ============ OPERATOR SETTINGS DRAWER ============ -->
 <div class="drawer-scrim" id="drawerScrim" hidden></div>
-<aside class="drawer" id="settingsDrawer" role="dialog" aria-modal="true" aria-labelledby="drawerTitle" aria-hidden="true">
+<aside class="drawer" id="settingsDrawer" role="dialog" aria-modal="true" aria-labelledby="drawerTitle" aria-hidden="true" inert>
   <header class="drawer-head">
     <div>
       <p class="kicker">Operator</p>
@@ -1142,8 +1145,14 @@
 
   /* ---- Operator Settings drawer ---- */
   var drawer=$('settingsDrawer'),scrim=$('drawerScrim'),openBtn=$('openSettingsBtn'),closeBtn=$('closeSettingsBtn'),lastFocus=null;
+  function setDrawerInteractive(active){
+    if(!drawer) return;
+    if(active) drawer.removeAttribute('inert');
+    else drawer.setAttribute('inert','');
+  }
   function openDrawer(){
     lastFocus=document.activeElement;
+    setDrawerInteractive(true);
     scrim.hidden=false;void drawer.offsetWidth;scrim.classList.add('open');drawer.classList.add('open');
     drawer.setAttribute('aria-hidden','false');openBtn.setAttribute('aria-expanded','true');
     var f=drawer.querySelector('button, [href], input, select, textarea');if(f) f.focus();
@@ -1153,6 +1162,7 @@
     drawer.setAttribute('aria-hidden','true');openBtn.setAttribute('aria-expanded','false');
     window.setTimeout(function(){scrim.hidden=true;},220);
     if(lastFocus&&lastFocus.focus) lastFocus.focus();
+    setDrawerInteractive(false);
   }
   if(openBtn) openBtn.addEventListener('click',openDrawer);
   if(closeBtn) closeBtn.addEventListener('click',closeDrawer);
