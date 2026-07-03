@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://systembydave.com/noteforge/sitemap.xml
