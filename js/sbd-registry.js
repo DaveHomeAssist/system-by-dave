@@ -137,7 +137,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool change — rolls the service-worker cache. */
-    version:'v20260703-audio-operator',
+    version:'v20260703-power-network-rf',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,

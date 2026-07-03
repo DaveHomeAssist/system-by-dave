@@ -53,6 +53,42 @@
       fields: ['channel', 'source', 'type', 'location', 'tech', 'console', 'input', 'destination', 'talkback', 'status', 'problem', 'notes'],
       empty: 'No visible line-check items. Clear filters or add a line.',
       card: lineCheckCard
+    },
+    'power-plan.html': {
+      id: 'powerPlanView',
+      bodySelector: '#circuitBody',
+      insertBefore: '.workspace',
+      eyebrow: 'Power map',
+      title: 'Power Load View',
+      summary: 'Circuits, sources, locations, draw, headroom, backups, and issue state as load cards.',
+      countLabel: 'visible circuits',
+      fields: ['circuit', 'location', 'load', 'source', 'voltage', 'capacity', 'draw', 'status', 'backup', 'notes'],
+      empty: 'No visible circuits. Clear filters or add a power circuit.',
+      card: powerPlanCard
+    },
+    'network-plan.html': {
+      id: 'networkPlanView',
+      bodySelector: '#deviceBody',
+      insertBefore: '.workspace',
+      eyebrow: 'Network map',
+      title: 'Network Address View',
+      summary: 'Device, VLAN, IP method, switch port, backup path, and online state in one scan.',
+      countLabel: 'visible devices',
+      fields: ['device', 'role', 'zone', 'network', 'ip', 'method', 'vlan', 'port', 'status', 'backup', 'notes'],
+      empty: 'No visible network devices. Clear filters or add a device.',
+      card: networkPlanCard
+    },
+    'rf-coordination.html': {
+      id: 'rfCoordinationView',
+      bodySelector: '#unitBody',
+      insertBefore: '.workspace',
+      eyebrow: 'RF map',
+      title: 'RF Frequency View',
+      summary: 'Wireless units, owners, frequencies, bands, channels, conflicts, and backups as scan cards.',
+      countLabel: 'visible units',
+      fields: ['unit', 'type', 'owner', 'zone', 'frequency', 'band', 'channel', 'status', 'backup', 'notes'],
+      empty: 'No visible RF units. Clear filters or add a wireless unit.',
+      card: rfCoordinationCard
     }
   };
 
@@ -259,6 +295,71 @@
     });
   }
 
+  function powerPlanCard(item) {
+    var status = normalizeToken(item.status || 'planned');
+    var feed = [item.location, titleCase(item.source || '')].filter(Boolean).join(' / ') || 'Feed open';
+    var load = [item.draw ? item.draw + 'A draw' : '', item.capacity ? item.capacity + 'A capacity' : ''].filter(Boolean).join(' / ') || 'Load open';
+    return channelCard({
+      id: item.id,
+      selected: item.selected,
+      status: status,
+      aria: 'Open power circuit ' + (item.circuit || item.load || 'row'),
+      kicker: item.circuit || 'Circuit',
+      badge: titleCase(item.source || 'power'),
+      startLabel: 'Load',
+      source: item.load || 'Unassigned load',
+      middleLabel: 'Feed',
+      middle: feed,
+      endLabel: 'Draw',
+      end: load,
+      meta: [item.voltage || '', item.backup ? 'Backup: ' + item.backup : 'No backup feed'].filter(Boolean).join(' | '),
+      note: item.notes || ''
+    });
+  }
+
+  function networkPlanCard(item) {
+    var status = normalizeToken(item.status || 'planned');
+    var address = [item.ip || 'IP open', item.vlan ? 'VLAN ' + item.vlan : 'VLAN open'].join(' / ');
+    return channelCard({
+      id: item.id,
+      selected: item.selected,
+      status: status,
+      aria: 'Open network device ' + (item.device || item.role || 'row'),
+      kicker: item.device || 'Device',
+      badge: titleCase(item.network || 'network'),
+      startLabel: 'Role',
+      source: item.role || 'Role open',
+      middleLabel: 'Address',
+      middle: address,
+      endLabel: 'Port',
+      end: item.port || 'Port open',
+      meta: [item.zone ? 'Zone: ' + item.zone : '', item.method ? 'Method: ' + item.method : '', item.backup ? 'Backup: ' + item.backup : 'No backup path'].filter(Boolean).join(' | '),
+      note: item.notes || ''
+    });
+  }
+
+  function rfCoordinationCard(item) {
+    var status = normalizeToken(item.status || 'planned');
+    var frequency = [item.frequency ? item.frequency + ' MHz' : 'Frequency open', titleCase(item.band || '')].filter(Boolean).join(' / ');
+    var zone = [item.zone || 'Zone open', item.channel || 'Channel open'].join(' / ');
+    return channelCard({
+      id: item.id,
+      selected: item.selected,
+      status: status,
+      aria: 'Open RF unit ' + (item.unit || item.owner || 'row'),
+      kicker: item.unit || 'Unit',
+      badge: titleCase(item.type || 'rf'),
+      startLabel: 'Owner',
+      source: item.owner || 'Owner open',
+      middleLabel: 'Frequency',
+      middle: frequency,
+      endLabel: 'Zone',
+      end: zone,
+      meta: item.backup ? 'Backup: ' + item.backup : 'No backup unit',
+      note: item.notes || ''
+    });
+  }
+
   function channelCard(options) {
     return [
       '<button class="av-domain-card is-' + escapeAttr(options.status) + (options.selected ? ' is-selected' : '') + '" type="button" data-row-id="' + escapeAttr(options.id) + '" aria-label="' + escapeAttr(options.aria) + '">',
@@ -268,7 +369,7 @@
           '<span class="av-domain-status is-' + escapeAttr(options.status) + '">' + escapeHtml(titleCase(options.status)) + '</span>',
         '</span>',
         '<span class="av-domain-chain">',
-          chainNode('Source', options.source),
+          chainNode(options.startLabel || 'Source', options.source),
           '<span class="av-domain-chain-hop" aria-hidden="true">to</span>',
           chainNode(options.middleLabel, options.middle),
           '<span class="av-domain-chain-hop" aria-hidden="true">to</span>',

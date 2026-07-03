@@ -71,6 +71,45 @@ const targets = [
     expects: ['Lead vocal', 'QL5 Ch 1'],
     editValue: 'Probe line source',
     requireClasses: ['is-passed', 'is-issue']
+  },
+  {
+    name: 'power-plan',
+    page: 'power-plan.html',
+    title: 'Power Plan',
+    panel: '#powerPlanView',
+    body: '#circuitBody',
+    countLabel: 'visible circuits',
+    minRows: 7,
+    expects: ['FOH audio rack', 'FOH wall A1'],
+    editField: 'load',
+    editValue: 'Probe power load',
+    requireClasses: ['is-hot', 'is-issue']
+  },
+  {
+    name: 'network-plan',
+    page: 'network-plan.html',
+    title: 'Network Plan',
+    panel: '#networkPlanView',
+    body: '#deviceBody',
+    countLabel: 'visible devices',
+    minRows: 8,
+    expects: ['Core switch', '10.40.10.2'],
+    editField: 'device',
+    editValue: 'Probe network device',
+    requireClasses: ['is-online', 'is-issue']
+  },
+  {
+    name: 'rf-coordination',
+    page: 'rf-coordination.html',
+    title: 'RF Coordination',
+    panel: '#rfCoordinationView',
+    body: '#unitBody',
+    countLabel: 'visible units',
+    minRows: 8,
+    expects: ['Vocal handheld A', '542.125'],
+    editField: 'unit',
+    editValue: 'Probe RF unit',
+    requireClasses: ['is-clean', 'is-issue']
   }
 ];
 
@@ -214,9 +253,10 @@ async function main() {
       });
 
       await evaluate(`(() => {
-        const firstSource = document.querySelector(${JSON.stringify(`${target.body} tr[data-id] [data-field="source"]`)});
-        firstSource.value = ${JSON.stringify(target.editValue)};
-        firstSource.dispatchEvent(new Event('input', { bubbles: true }));
+        const field = ${JSON.stringify(target.editField || 'source')};
+        const control = document.querySelector(${JSON.stringify(`${target.body} tr[data-id]`)} + ' [data-field="' + field + '"]');
+        control.value = ${JSON.stringify(target.editValue)};
+        control.dispatchEvent(new Event('input', { bubbles: true }));
       })()`);
       await delay(350);
       state = await snapshot(target);

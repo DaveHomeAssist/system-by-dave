@@ -2,6 +2,7 @@
 
 ## 2026-07-03
 
+* Extended the AV domain-view layer across Power Plan, Network Plan, and RF Coordination with load-map, address-map, and frequency-map cards that surface circuits, draw, VLAN/IP, ports, wireless frequencies, owner zones, backup paths, selected-row sync, and mobile scan layouts above the editable tables.
 * Extended the AV domain-view layer across Audio Patch, Input List, and Line Check with console-strip/input-rail/run-rail operator cards that keep channel rows, patch points, phantom/monitor/owner details, problem notes, selected-row sync, and mobile one-column scanning visible above the editable tables.
 * Added a shared AV domain-view layer and wired Signal Flow to a route-chain view that turns visible route rows into source to processor to destination cards with status, format, connector, backup path, notes, selected-row sync, keyboard-focusable cards, responsive mobile stacking, and offline cache coverage.
 * Added `av-suite-unique-app-opportunities-2026-07-03.md` to document the table-heavy AV Suite pattern and prioritize domain-shaped app surfaces, starting with CueForge, Signal Flow, audio patch/input workflows, power, network, RF, truck/load workflows, room operations, and camera shots.

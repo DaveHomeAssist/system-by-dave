@@ -94,13 +94,17 @@
 
 .av-domain-card.is-ready,
 .av-domain-card.is-checked,
-.av-domain-card.is-passed {
+.av-domain-card.is-passed,
+.av-domain-card.is-hot,
+.av-domain-card.is-online,
+.av-domain-card.is-clean {
   border-color: rgba(107, 224, 146, .38);
 }
 
 .av-domain-card.is-patched,
 .av-domain-card.is-linecheck,
-.av-domain-card.is-gained {
+.av-domain-card.is-gained,
+.av-domain-card.is-scanned {
   border-color: rgba(114, 184, 255, .4);
 }
 
@@ -113,6 +117,11 @@
 .av-domain-card.is-problem,
 .av-domain-card.is-muted {
   border-color: rgba(255, 107, 107, .42);
+}
+
+.av-domain-card.is-spare,
+.av-domain-card.is-struck {
+  border-color: rgba(118, 131, 145, .42);
 }
 
 .av-domain-card-top,
@@ -169,14 +178,18 @@
 
 .av-domain-status.is-ready,
 .av-domain-status.is-checked,
-.av-domain-status.is-passed {
+.av-domain-status.is-passed,
+.av-domain-status.is-hot,
+.av-domain-status.is-online,
+.av-domain-status.is-clean {
   border-color: rgba(107, 224, 146, .48);
   color: #c9ffd8;
 }
 
 .av-domain-status.is-patched,
 .av-domain-status.is-linecheck,
-.av-domain-status.is-gained {
+.av-domain-status.is-gained,
+.av-domain-status.is-scanned {
   border-color: rgba(114, 184, 255, .48);
   color: #d4ebff;
 }
@@ -192,6 +205,12 @@
 .av-domain-status.is-muted {
   border-color: rgba(255, 107, 107, .48);
   color: #ffd5d5;
+}
+
+.av-domain-status.is-spare,
+.av-domain-status.is-struck {
+  border-color: rgba(118, 131, 145, .5);
+  color: #d7dee7;
 }
 
 .av-domain-chain {
