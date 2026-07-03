@@ -104,7 +104,9 @@
     './js/sbd-nav.js',
     './js/sbd-handoff.js',
     './js/responsive-tables.js',
+    './js/av-domain-views.js',
     './css/responsive-tables.css',
+    './css/av-domain-views.css',
     './css/fonts.css',
     './svg/system_by_dave_logo_rust.svg',
     './img/card-cover-banner-wide.png',
@@ -135,7 +137,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool change — rolls the service-worker cache. */
-    version:'v20260703-cueforge-deck',
+    version:'v20260703-signal-chain',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,
