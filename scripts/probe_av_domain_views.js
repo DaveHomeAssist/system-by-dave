@@ -23,6 +23,56 @@ const chromeBin = chromeArg ? chromeArg.slice('--chrome='.length) : (
 const failures = [];
 const runtimeExceptions = [];
 const notes = [];
+const targets = [
+  {
+    name: 'signal-flow',
+    page: 'signal-flow.html',
+    title: 'Signal Flow',
+    panel: '#routeChainView',
+    body: '#routeBody',
+    countLabel: 'visible routes',
+    minRows: 7,
+    expects: ['Playback laptop 1', 'Spyder input 4'],
+    editValue: 'Probe camera source',
+    requireClasses: ['is-issue', 'is-backup']
+  },
+  {
+    name: 'audio-patch',
+    page: 'audio-patch.html',
+    title: 'Audio Patch',
+    panel: '#audioPatchView',
+    body: '#itemBody',
+    countLabel: 'visible channels',
+    minRows: 7,
+    expects: ['Lead vocal', 'Stagebox A'],
+    editValue: 'Probe audio source',
+    requireClasses: ['is-ready', 'is-issue']
+  },
+  {
+    name: 'input-list',
+    page: 'input-list.html',
+    title: 'Input List',
+    panel: '#inputListView',
+    body: '#sheetBody',
+    countLabel: 'visible inputs',
+    minRows: 8,
+    expects: ['Lectern mic', 'SL box 1'],
+    editValue: 'Probe input source',
+    requireClasses: ['is-checked', 'is-open']
+  },
+  {
+    name: 'line-check',
+    page: 'line-check.html',
+    title: 'Line Check',
+    panel: '#lineCheckView',
+    body: '#itemBody',
+    countLabel: 'visible lines',
+    minRows: 7,
+    expects: ['Lead vocal', 'QL5 Ch 1'],
+    editValue: 'Probe line source',
+    requireClasses: ['is-passed', 'is-issue']
+  }
+];
 
 function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -114,101 +164,122 @@ async function main() {
       return result.result.value;
     }
 
-    async function snapshot() {
+    async function snapshot(target) {
       return evaluate(`(() => {
-        const panel = document.querySelector('#routeChainView');
-        const cards = Array.from(document.querySelectorAll('#routeChainView .av-domain-card'));
-        const rows = Array.from(document.querySelectorAll('#routeBody tr[data-id]'));
+        const panel = document.querySelector(${JSON.stringify(target.panel)});
+        const cards = Array.from(document.querySelectorAll(${JSON.stringify(`${target.panel} .av-domain-card`)}));
+        const rows = Array.from(document.querySelectorAll(${JSON.stringify(`${target.body} tr[data-id]`)}));
         return {
           title: document.title,
           hasPanel: Boolean(panel),
-          count: document.querySelector('#routeChainView [data-domain-count]')?.textContent.trim() || '',
+          count: document.querySelector(${JSON.stringify(`${target.panel} [data-domain-count]`)})?.textContent.trim() || '',
           cardCount: cards.length,
           rowCount: rows.length,
           firstText: cards[0]?.textContent.replace(/\\s+/g, ' ').trim() || '',
           selectedCards: cards.filter((card) => card.classList.contains('is-selected')).length,
           selectedRow: rows.find((row) => row.classList.contains('selected'))?.dataset.id || '',
           selectedCard: cards.find((card) => card.classList.contains('is-selected'))?.dataset.rowId || '',
-          issueCards: cards.filter((card) => card.classList.contains('is-issue')).length,
-          backupCards: cards.filter((card) => card.classList.contains('is-backup')).length,
+          classes: cards.reduce((acc, card) => {
+            Array.from(card.classList).forEach((name) => {
+              if (name.indexOf('is-') === 0) acc[name] = (acc[name] || 0) + 1;
+            });
+            return acc;
+          }, {}),
           text: panel?.textContent.replace(/\\s+/g, ' ').trim() || ''
         };
       })()`);
     }
 
+    async function runDesktopTarget(target) {
+      await cdp('Emulation.setDeviceMetricsOverride', {
+        width: 1280,
+        height: 900,
+        deviceScaleFactor: 1,
+        mobile: false
+      });
+      await cdp('Page.navigate', { url: new URL(target.page, baseUrl).href });
+      await delay(2200);
+
+      let state = await snapshot(target);
+      assert(state.title.includes(target.title), `${target.name} page title did not load.`);
+      assert(state.hasPanel, `${target.name} domain panel did not render.`);
+      assert(state.cardCount === state.rowCount, `${target.name} card count ${state.cardCount} did not match visible rows ${state.rowCount}.`);
+      assert(state.cardCount >= target.minRows, `${target.name} expected at least ${target.minRows} sample cards, saw ${state.cardCount}.`);
+      assert(state.count === `${state.cardCount} ${target.countLabel}`, `${target.name} count was "${state.count}".`);
+      target.expects.forEach((expected) => {
+        assert(state.text.includes(expected), `${target.name} domain view did not include expected text "${expected}".`);
+      });
+      target.requireClasses.forEach((className) => {
+        assert((state.classes[className] || 0) >= 1, `${target.name} did not expose ${className} status cards.`);
+      });
+
+      await evaluate(`(() => {
+        const firstSource = document.querySelector(${JSON.stringify(`${target.body} tr[data-id] [data-field="source"]`)});
+        firstSource.value = ${JSON.stringify(target.editValue)};
+        firstSource.dispatchEvent(new Event('input', { bubbles: true }));
+      })()`);
+      await delay(350);
+      state = await snapshot(target);
+      assert(state.text.includes(target.editValue), `${target.name} domain view did not update after editing a table source.`);
+
+      const clickedId = await evaluate(`(() => {
+        const cards = Array.from(document.querySelectorAll(${JSON.stringify(`${target.panel} .av-domain-card`)}));
+        const targetCard = cards.find((card) => !card.classList.contains('is-selected')) || cards[0];
+        targetCard.click();
+        return targetCard.dataset.rowId || '';
+      })()`);
+      await delay(500);
+      state = await snapshot(target);
+      assert(Boolean(clickedId), `${target.name} could not click a domain card.`);
+      assert(state.selectedRow === clickedId, `${target.name} card click did not select the matching table row.`);
+      assert(state.selectedCard === clickedId, `${target.name} selected card did not sync after card click.`);
+    }
+
+    async function runMobileTarget(target) {
+      await cdp('Emulation.setDeviceMetricsOverride', {
+        width: 390,
+        height: 844,
+        deviceScaleFactor: 1,
+        mobile: true
+      });
+      await cdp('Page.navigate', { url: new URL(target.page, baseUrl).href });
+      await delay(2200);
+      const mobile = await evaluate(`(() => {
+        const panel = document.querySelector(${JSON.stringify(target.panel)});
+        const vw = window.innerWidth;
+        const selector = 'a[href],button,input,select,textarea,[tabindex]';
+        function isVisible(el) {
+          const rect = el.getBoundingClientRect();
+          const style = getComputedStyle(el);
+          return rect.width > 0 && rect.height > 0 && style.visibility !== 'hidden' && style.display !== 'none';
+        }
+        const focusables = Array.from(document.querySelectorAll(selector)).filter((el) => !el.disabled && isVisible(el));
+        const clipped = focusables.map((el) => {
+          const rect = el.getBoundingClientRect();
+          return { tag: el.tagName.toLowerCase(), id: el.id || '', cls: el.className || '', left: Math.round(rect.left), right: Math.round(rect.right) };
+        }).filter((item) => item.left < -1 || item.right > vw + 1);
+        return {
+          hasPanel: Boolean(panel),
+          overflowX: Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) - vw,
+          clipped,
+          cardColumns: panel ? getComputedStyle(panel.querySelector('.av-domain-deck')).gridTemplateColumns : ''
+        };
+      })()`);
+      assert(mobile.hasPanel, `${target.name} mobile domain panel did not render.`);
+      assert(mobile.overflowX <= 1, `${target.name} mobile viewport has overflowX=${mobile.overflowX}.`);
+      assert(mobile.clipped.length === 0, `${target.name} mobile viewport has clipped focusable controls: ${JSON.stringify(mobile.clipped.slice(0, 4))}`);
+      assert(mobile.cardColumns && !mobile.cardColumns.includes(' '), `${target.name} mobile deck is not one column: ${mobile.cardColumns}`);
+    }
+
     await cdp('Page.enable');
     await cdp('Runtime.enable');
     await cdp('DOM.enable');
-    await cdp('Emulation.setDeviceMetricsOverride', {
-      width: 1280,
-      height: 900,
-      deviceScaleFactor: 1,
-      mobile: false
-    });
-    await cdp('Page.navigate', { url: new URL('signal-flow.html', baseUrl).href });
-    await delay(2200);
 
-    let state = await snapshot();
-    assert(state.title.includes('Signal Flow'), 'Signal Flow page title did not load.');
-    assert(state.hasPanel, 'Route chain panel did not render.');
-    assert(state.cardCount === state.rowCount, `Route chain card count ${state.cardCount} did not match visible rows ${state.rowCount}.`);
-    assert(state.cardCount >= 7, `Expected sample route cards, saw ${state.cardCount}.`);
-    assert(state.count === `${state.cardCount} visible routes`, `Route chain count was "${state.count}".`);
-    assert(state.firstText.includes('Playback laptop 1') && state.firstText.includes('Spyder input 4'), 'First route card did not show the source to destination chain.');
-    assert(state.issueCards >= 1, 'Route chain did not expose issue status cards.');
-    assert(state.backupCards >= 1, 'Route chain did not expose backup status cards.');
-
-    await evaluate(`(() => {
-      const firstSource = document.querySelector('#routeBody tr[data-id] [data-field="source"]');
-      firstSource.value = 'Probe camera source';
-      firstSource.dispatchEvent(new Event('input', { bubbles: true }));
-    })()`);
-    await delay(350);
-    state = await snapshot();
-    assert(state.text.includes('Probe camera source'), 'Route chain did not update after editing a table source.');
-
-    const clickedId = await evaluate(`(() => {
-      const cards = Array.from(document.querySelectorAll('#routeChainView .av-domain-card'));
-      const target = cards.find((card) => !card.classList.contains('is-selected')) || cards[0];
-      target.click();
-      return target.dataset.rowId || '';
-    })()`);
-    await delay(500);
-    state = await snapshot();
-    assert(Boolean(clickedId), 'Could not click a route chain card.');
-    assert(state.selectedRow === clickedId, 'Clicking a route chain card did not select the matching table row.');
-    assert(state.selectedCard === clickedId, 'Selected route chain card did not sync after card click.');
-
-    await cdp('Emulation.setDeviceMetricsOverride', {
-      width: 390,
-      height: 844,
-      deviceScaleFactor: 1,
-      mobile: true
-    });
-    await cdp('Page.navigate', { url: new URL('signal-flow.html', baseUrl).href });
-    await delay(2200);
-    const mobile = await evaluate(`(() => {
-      const vw = window.innerWidth;
-      const selector = 'a[href],button,input,select,textarea,[tabindex]';
-      function isVisible(el) {
-        const rect = el.getBoundingClientRect();
-        const style = getComputedStyle(el);
-        return rect.width > 0 && rect.height > 0 && style.visibility !== 'hidden' && style.display !== 'none';
-      }
-      const focusables = Array.from(document.querySelectorAll(selector)).filter((el) => !el.disabled && isVisible(el));
-      const clipped = focusables.map((el) => {
-        const rect = el.getBoundingClientRect();
-        return { tag: el.tagName.toLowerCase(), id: el.id || '', cls: el.className || '', left: Math.round(rect.left), right: Math.round(rect.right) };
-      }).filter((item) => item.left < -1 || item.right > vw + 1);
-      return {
-        overflowX: Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) - vw,
-        clipped,
-        cardColumns: getComputedStyle(document.querySelector('#routeChainView .av-domain-deck')).gridTemplateColumns
-      };
-    })()`);
-    assert(mobile.overflowX <= 1, `Signal Flow mobile viewport has overflowX=${mobile.overflowX}.`);
-    assert(mobile.clipped.length === 0, `Signal Flow mobile viewport has clipped focusable controls: ${JSON.stringify(mobile.clipped.slice(0, 4))}`);
-    assert(mobile.cardColumns && !mobile.cardColumns.includes(' '), `Route chain mobile deck is not one column: ${mobile.cardColumns}`);
+    for (const target of targets) {
+      await runDesktopTarget(target);
+      await runMobileTarget(target);
+      notes.push(`${target.name}=passed`);
+    }
 
     ws.close();
   } finally {
@@ -228,7 +299,6 @@ async function main() {
   }
 
   notes.push(`base=${baseUrl}`);
-  notes.push('signal-flow route-chain=passed');
   console.log(`AV domain-view probe passed (${notes.join(', ')}).`);
 }
 

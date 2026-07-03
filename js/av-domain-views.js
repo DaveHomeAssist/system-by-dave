@@ -16,6 +16,43 @@
       fields: ['route', 'system', 'source', 'format', 'connector', 'processor', 'destination', 'status', 'backup', 'notes'],
       empty: 'No visible routes to map. Clear filters or add a signal route.',
       card: signalFlowCard
+    },
+    'audio-patch.html': {
+      id: 'audioPatchView',
+      bodySelector: '#itemBody',
+      insertBefore: '.workspace',
+      eyebrow: 'Console strip',
+      title: 'Audio Patch Operator View',
+      summary: 'Channel, source, stagebox, console, destination, and monitor sends in scan order.',
+      countLabel: 'visible channels',
+      fields: ['channel', 'source', 'type', 'console', 'stagebox', 'input', 'phantom', 'gain', 'destination', 'monitor', 'status', 'notes'],
+      empty: 'No visible audio channels. Clear filters or add a channel.',
+      card: audioPatchCard
+    },
+    'input-list.html': {
+      id: 'inputListView',
+      bodySelector: '#sheetBody',
+      insertBefore: '.workspace',
+      eyebrow: 'Input rail',
+      title: 'Input List Patch View',
+      summary: 'Channel sources, patch points, phantom power, owners, and line-check state as operator cards.',
+      countLabel: 'visible inputs',
+      fields: ['ch', 'source', 'type', 'patch', 'conn', 'phantom', 'stand', 'monitor', 'owner', 'status', 'notes'],
+      readers: { ch: readNumCell },
+      empty: 'No visible inputs. Clear filters or load the sample input list.',
+      card: inputListCard
+    },
+    'line-check.html': {
+      id: 'lineCheckView',
+      bodySelector: '#itemBody',
+      insertBefore: '.workspace',
+      eyebrow: 'Line check',
+      title: 'Line Check Run Rail',
+      summary: 'Patch, tech, destination, talkback, problem, and pass state for fast room calls.',
+      countLabel: 'visible lines',
+      fields: ['channel', 'source', 'type', 'location', 'tech', 'console', 'input', 'destination', 'talkback', 'status', 'problem', 'notes'],
+      empty: 'No visible line-check items. Clear filters or add a line.',
+      card: lineCheckCard
     }
   };
 
@@ -123,7 +160,13 @@
       selected: row.classList.contains('selected')
     };
     config.fields.forEach(function (field) {
-      var control = row.querySelector('[data-field="' + field + '"]');
+      var reader = config.readers && config.readers[field];
+      var control;
+      if (reader) {
+        data[field] = String(reader(row) || '').trim();
+        return;
+      }
+      control = row.querySelector('[data-field="' + field + '"]');
       data[field] = control ? String(control.value || control.textContent || '').trim() : '';
     });
     return data;
@@ -155,6 +198,88 @@
     ].join('');
   }
 
+  function audioPatchCard(item) {
+    var status = normalizeToken(item.status || 'planned');
+    var patch = [item.console, item.stagebox, item.input].filter(Boolean).join(' / ') || 'Patch open';
+    var power = [item.phantom ? 'Phantom ' + item.phantom : '', item.gain ? 'Gain ' + item.gain : ''].filter(Boolean).join(' | ');
+    return channelCard({
+      id: item.id,
+      selected: item.selected,
+      status: status,
+      aria: 'Open audio channel ' + (item.channel || item.source || 'row'),
+      kicker: 'Ch ' + (item.channel || '?'),
+      badge: titleCase(item.type || 'source'),
+      source: item.source || 'Unassigned source',
+      middleLabel: 'Patch',
+      middle: patch,
+      endLabel: 'Output',
+      end: item.destination || item.monitor || 'Destination open',
+      meta: [power, item.monitor ? 'Monitor: ' + item.monitor : 'No monitor send'].filter(Boolean).join(' | '),
+      note: item.notes || ''
+    });
+  }
+
+  function inputListCard(item) {
+    var status = normalizeToken(item.status || 'open');
+    var patch = [item.patch, item.conn].filter(Boolean).join(' / ') || 'Patch open';
+    return channelCard({
+      id: item.id,
+      selected: item.selected,
+      status: status,
+      aria: 'Open input ' + (item.ch || item.source || 'row'),
+      kicker: 'Ch ' + (item.ch || '?'),
+      badge: titleCase(item.type || 'input'),
+      source: item.source || 'Unassigned source',
+      middleLabel: 'Patch',
+      middle: patch,
+      endLabel: 'Owner',
+      end: item.owner || 'Owner open',
+      meta: [item.phantom ? 'Phantom ' + item.phantom : '', item.monitor ? 'Monitor: ' + item.monitor : '', item.stand ? 'Stand: ' + item.stand : ''].filter(Boolean).join(' | '),
+      note: item.notes || ''
+    });
+  }
+
+  function lineCheckCard(item) {
+    var status = normalizeToken(item.status || 'pending');
+    var patch = [item.console, item.input].filter(Boolean).join(' / ') || 'Patch open';
+    return channelCard({
+      id: item.id,
+      selected: item.selected,
+      status: status,
+      aria: 'Open line check ' + (item.channel || item.source || 'row'),
+      kicker: 'Ch ' + (item.channel || '?'),
+      badge: titleCase(item.type || 'line'),
+      source: item.source || 'Unassigned source',
+      middleLabel: 'Patch',
+      middle: patch,
+      endLabel: 'Tech',
+      end: item.tech || item.location || 'Tech open',
+      meta: [item.destination ? 'Destination: ' + item.destination : '', item.talkback ? 'Talkback: ' + item.talkback : ''].filter(Boolean).join(' | '),
+      note: item.problem || item.notes || ''
+    });
+  }
+
+  function channelCard(options) {
+    return [
+      '<button class="av-domain-card is-' + escapeAttr(options.status) + (options.selected ? ' is-selected' : '') + '" type="button" data-row-id="' + escapeAttr(options.id) + '" aria-label="' + escapeAttr(options.aria) + '">',
+        '<span class="av-domain-card-top">',
+          '<span class="av-domain-kicker">' + escapeHtml(options.kicker) + '</span>',
+          '<span class="av-domain-badge">' + escapeHtml(options.badge) + '</span>',
+          '<span class="av-domain-status is-' + escapeAttr(options.status) + '">' + escapeHtml(titleCase(options.status)) + '</span>',
+        '</span>',
+        '<span class="av-domain-chain">',
+          chainNode('Source', options.source),
+          '<span class="av-domain-chain-hop" aria-hidden="true">to</span>',
+          chainNode(options.middleLabel, options.middle),
+          '<span class="av-domain-chain-hop" aria-hidden="true">to</span>',
+          chainNode(options.endLabel, options.end),
+        '</span>',
+        options.meta ? '<span class="av-domain-meta">' + escapeHtml(options.meta) + '</span>' : '',
+        options.note ? '<span class="av-domain-note">' + escapeHtml(options.note) + '</span>' : '',
+      '</button>'
+    ].join('');
+  }
+
   function chainNode(label, value) {
     return [
       '<span class="av-domain-chain-node">',
@@ -162,6 +287,11 @@
         '<strong>' + escapeHtml(value) + '</strong>',
       '</span>'
     ].join('');
+  }
+
+  function readNumCell(row) {
+    var cell = row.querySelector('.num-cell');
+    return cell ? cell.textContent : '';
   }
 
   function titleCase(value) {
