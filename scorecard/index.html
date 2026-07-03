@@ -1,0 +1,3195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Ballpark Scorecard — a classic pencil-and-paper baseball scorecard in your browser. Score any game, track every at-bat, export your card. Local-first and free.">
+<title>Ballpark Scorecard — score like it's 1975</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2314181f'/%3E%3Ctext x='16' y='22' font-size='18' text-anchor='middle' fill='%23c8a864' font-family='Georgia,serif'%3E9%3C/text%3E%3C/svg%3E">
+<meta name="theme-color" content="#14181f">
+<style>
+/* ═══════════════════════════════════════════
+   SCOREKEEPER · CENTERPIECE LAYOUT
+   The grid is the hero. Everything serves it.
+═══════════════════════════════════════════ */
+
+@font-face {
+  font-family: 'Playfair Display';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('fonts/playfair-display-700.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Playfair Display';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('fonts/playfair-display-italic-400.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'DM Mono';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('fonts/dm-mono-400.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'DM Mono';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('fonts/dm-mono-500.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'DM Sans';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url('fonts/dm-sans-300.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'DM Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('fonts/dm-sans-400.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'DM Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('fonts/dm-sans-500.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Special Elite';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('fonts/special-elite-400.woff2') format('woff2');
+}
+
+:root {
+  /* Page */
+  --bg:            #F5EDD8;
+  --bg-mid:        #FBF6E9;
+
+  /* Scorecard */
+  --sc-cream:      #FBF6E9;
+  --sc-pebble:     #F0E8D4;
+  --sc-line:       #C9BA9B;
+  --sc-ink:        #1C1108;
+  --sc-ink-faded:  #6B5D44;
+  --sc-pencil:     #2A4A8A;
+  --sc-red:        #B03030;
+  --sc-gold:       #C8920A;
+
+  /* Team accent — overridden by theme switcher */
+  --team-primary:  #E81828;
+  --team-secondary:#002D72;
+
+  /* Cell */
+  --cell-size:     92px;
+  --lineup-w:      172px;
+  --totals-w:      58px;
+
+  /* Fonts */
+  --f-score:  'Special Elite', cursive;
+  --f-display:'Playfair Display', serif;
+  --f-mono:   'DM Mono', monospace;
+  --f-body:   'DM Sans', sans-serif;
+}
+
+/* ─── Theme accent overrides ──────────── */
+:root[data-theme="classic"] { --team-primary:#E81828; --team-secondary:#002D72; --sc-gold:#C8920A; }
+:root[data-theme="navy"]     { --team-primary:#132448; --team-secondary:#C9A24B; --sc-gold:#C9A24B; --sc-pencil:#132448; }
+:root[data-theme="royal"]    { --team-primary:#005A9C; --team-secondary:#EF3E42; --sc-gold:#D9A64A; --sc-pencil:#005A9C; }
+:root[data-theme="ivy"]      { --team-primary:#0E3386; --team-secondary:#CC3433; --sc-gold:#D4AD55; --sc-pencil:#0E3386; }
+:root[data-theme="dusk"]     { --team-primary:#002D72; --team-secondary:#FF5910; --sc-gold:#D8AB4F; --sc-pencil:#002D72; }
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { height: 100%; }
+
+body {
+  font-family: var(--f-body);
+  background: var(--bg);
+  color: var(--sc-ink);
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─── Layout shell ──────────────────────── */
+/* desktop: [card | notes-panel]
+             [input-bar            ]
+   ipad:   [card full-width]
+             [input-drawer]
+             notes = slide-in
+   mobile: single column scroll
+*/
+
+.sk-nav {
+  background: rgba(15,31,56,0.98);
+  border-bottom: 1px solid rgba(200,168,100,0.24);
+  padding: 0 16px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+  z-index: 50;
+}
+
+.sk-nav-back {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(245,237,216,0.45);
+  text-decoration: none;
+  transition: color 140ms;
+}
+.sk-nav-back:hover { color: rgba(245,237,216,0.8); }
+
+.sk-nav-sep { color: rgba(245,237,216,0.2); font-size: 12px; }
+
+.sk-nav-title {
+  font-family: var(--f-display);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--sc-cream);
+  letter-spacing: -0.01em;
+  flex: 1;
+}
+
+.sk-nav-venue {
+  font-family: var(--f-mono);
+  font-size: 10px;
+  color: var(--sc-gold);
+  letter-spacing: 0.06em;
+}
+
+.sk-nav-actions {
+  display: flex;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.sk-btn {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  border: 1px solid rgba(200,168,100,0.2);
+  background: transparent;
+  color: rgba(245,237,216,0.55);
+  transition: all 140ms;
+}
+.sk-btn:hover { color: var(--sc-cream); border-color: rgba(200,168,100,0.4); background: rgba(255,255,255,0.04); }
+.sk-btn-amber {
+  border-color: rgba(200,146,10,0.32);
+  color: rgba(240,184,67,0.88);
+  background: rgba(200,146,10,0.08);
+}
+.sk-btn-amber:hover {
+  border-color: rgba(240,184,67,0.5);
+  background: rgba(200,146,10,0.14);
+}
+.sk-btn-green {
+  border-color: rgba(46,125,82,0.38);
+  color: #8ACA8A;
+  background: rgba(46,125,82,0.1);
+}
+.sk-btn-green:hover {
+  border-color: rgba(138,202,138,0.55);
+  background: rgba(46,125,82,0.16);
+}
+.sk-btn-red {
+  border-color: rgba(184,48,48,0.36);
+  color: #E08080;
+  background: rgba(176,48,48,0.09);
+}
+.sk-btn-red:hover { color: #F1A4A4; border-color: #B03030; background: rgba(176,48,48,0.16); }
+
+/* ─── Main area ─────────────────────────── */
+.sk-main {
+  flex: 1;
+  display: flex;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* ─── Scorecard column ──────────────────── */
+.sk-card-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.sk-story-shell {
+  padding: 18px 18px 0;
+}
+
+.sk-story-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) 240px;
+  gap: 18px;
+  padding: 16px;
+  border: 1px solid rgba(200,168,100,0.16);
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(255,252,243,0.88), rgba(240,232,212,0.74));
+}
+
+.sk-story-card[hidden] {
+  display: none;
+}
+
+.sk-story-media {
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+  min-height: 240px;
+  aspect-ratio: 16 / 9;
+  background:
+    linear-gradient(180deg, rgba(15,31,56,0.18), rgba(15,31,56,0.5)),
+    radial-gradient(circle at 15% 18%, rgba(240,184,67,0.22), transparent 28%),
+    linear-gradient(135deg, rgba(15,31,56,0.88), rgba(28,26,20,0.96));
+}
+
+.sk-story-video,
+.sk-story-poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.sk-story-video {
+  z-index: 0;
+  opacity: 0;
+  transition: opacity 180ms ease;
+}
+
+.sk-story-poster {
+  z-index: 0;
+}
+
+.sk-story-media.has-video .sk-story-video {
+  opacity: 1;
+}
+
+.sk-story-media.has-video .sk-story-poster {
+  opacity: 0;
+}
+
+.sk-story-overlay {
+  position: absolute;
+  inset: auto 0 0 0;
+  z-index: 1;
+  padding: 18px;
+  background: linear-gradient(180deg, transparent, rgba(15,31,56,0.88));
+}
+
+.sk-story-kicker {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(240,184,67,0.78);
+  margin-bottom: 8px;
+}
+
+.sk-story-title {
+  font-family: var(--f-display);
+  font-size: clamp(22px, 2.6vw, 32px);
+  font-weight: 700;
+  color: var(--sc-cream);
+  line-height: 1.08;
+}
+
+.sk-story-caption {
+  margin-top: 10px;
+  font-size: 14px;
+  color: rgba(245,237,216,0.78);
+  max-width: 42ch;
+}
+
+.sk-story-side {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 16px;
+  min-width: 0;
+}
+
+.sk-story-meta {
+  display: grid;
+  gap: 10px;
+}
+
+.sk-story-meta-row {
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(200,168,100,0.12);
+}
+
+.sk-story-meta-label {
+  font-family: var(--f-mono);
+  font-size: 8px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(200,168,100,0.58);
+  margin-bottom: 4px;
+}
+
+.sk-story-meta-value {
+  font-size: 14px;
+  line-height: 1.35;
+  color: var(--sc-ink);
+}
+
+.sk-story-fallback {
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: rgba(255,252,243,0.78);
+  border: 1px solid rgba(200,168,100,0.22);
+}
+
+.sk-story-fallback-title {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(240,184,67,0.76);
+  margin-bottom: 6px;
+}
+
+.sk-story-fallback-text {
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--sc-ink-faded);
+}
+
+.sk-story-quick-note {
+  padding: 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(200,168,100,0.2);
+  background: rgba(255,252,243,0.9);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sk-story-note-title {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(240,184,67,0.82);
+}
+
+.sk-story-note-copy {
+  margin-top: 4px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--sc-ink-faded);
+}
+
+.sk-story-note-input {
+  width: 100%;
+  min-height: 88px;
+  resize: vertical;
+  border-radius: 8px;
+  border: 1px solid rgba(200,168,100,0.24);
+  background: rgba(255,252,243,0.98);
+  color: var(--sc-ink);
+  font-family: var(--f-body);
+  font-size: 14px;
+  line-height: 1.45;
+  padding: 10px 12px;
+  outline: none;
+}
+
+.sk-story-note-input:focus {
+  border-color: rgba(200,168,100,0.44);
+  box-shadow: inset 0 0 0 1px rgba(200,168,100,0.16);
+}
+
+.sk-story-note-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.sk-story-note-hint {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  color: rgba(107,93,68,0.68);
+}
+
+/* ─── Notes panel ───────────────────────── */
+.sk-notes-panel {
+  width: clamp(280px, 24vw, 340px);
+  min-width: 280px;
+  flex-shrink: 0;
+  background: #F2E8D2;
+  border-left: 1px solid rgba(200,168,100,0.24);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.sk-notes-header {
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid rgba(200,168,100,0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sk-notes-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.sk-notes-title {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(28,17,8,0.58);
+}
+
+.sk-notes-count {
+  min-width: 24px;
+  padding: 3px 7px;
+  border-radius: 999px;
+  background: rgba(15,31,56,0.08);
+  color: var(--sc-ink);
+  font-family: var(--f-mono);
+  font-size: 10px;
+  text-align: center;
+}
+
+.sk-notes-sub {
+  font-size: 13px;
+  line-height: 1.4;
+  color: rgba(107,93,68,0.76);
+}
+
+.sk-notes-feed {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px 16px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sk-note-entry {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sk-note-inning {
+  font-family: var(--f-mono);
+  font-size: 8px;
+  letter-spacing: 0.12em;
+  color: rgba(28,17,8,0.56);
+}
+
+.sk-note-text {
+  font-family: var(--f-display);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--sc-ink);
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+
+.sk-note-text.red { color: #E05050; }
+.sk-note-text.gold { color: var(--sc-gold); }
+
+.sk-notes-input-area {
+  padding: 12px 16px 16px;
+  border-top: 1px solid rgba(200,168,100,0.18);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: linear-gradient(180deg, rgba(242,232,210,0.88), rgba(242,232,210,1));
+  box-shadow: 0 -12px 24px rgba(15,31,56,0.08);
+}
+
+.sk-notes-compose-label {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(107,93,68,0.66);
+}
+
+.sk-notes-input {
+  width: 100%;
+  min-height: 92px;
+  resize: vertical;
+  background: rgba(255,252,243,0.9);
+  border: 1px solid rgba(200,168,100,0.22);
+  border-radius: 8px;
+  color: var(--sc-ink);
+  font-family: var(--f-body);
+  font-size: 14px;
+  line-height: 1.45;
+  padding: 10px 12px;
+  outline: none;
+}
+
+.sk-notes-input:focus { border-color: rgba(200,168,100,0.35); }
+.sk-notes-input::placeholder { color: rgba(107,93,68,0.55); }
+
+.sk-notes-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.sk-notes-hint {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  color: rgba(107,93,68,0.68);
+}
+
+/* ─── Linescore strip ───────────────────── */
+.sk-linescore-wrap {
+  background: var(--bg-mid);
+  border-bottom: 2px solid rgba(200,168,100,0.22);
+  padding: 0 8px;
+  flex-shrink: 0;
+  overflow-x: auto;
+}
+
+.sk-linescore {
+  border-collapse: collapse;
+  min-width: 100%;
+}
+
+.sk-linescore th, .sk-linescore td {
+  font-family: var(--f-mono);
+  font-size: 11px;
+  text-align: center;
+  padding: 6px 8px;
+  border-right: 1px solid rgba(200,168,100,0.1);
+  min-width: 28px;
+  white-space: nowrap;
+}
+
+.sk-linescore th:last-child, .sk-linescore td:last-child { border-right: none; }
+
+.sk-linescore thead th {
+  color: rgba(107,93,68,0.82);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  border-bottom: 1px solid rgba(200,168,100,0.1);
+}
+
+.sk-linescore .ls-team {
+  text-align: left;
+  padding-left: 8px;
+  font-family: var(--f-display);
+  font-size: 12px;
+  font-weight: 700;
+  min-width: 90px;
+  border-right: 1px solid rgba(200,168,100,0.2) !important;
+}
+.ls-team-logo {
+  width: 18px; height: 18px;
+  vertical-align: middle;
+  margin-right: 4px;
+  border-radius: 2px;
+}
+
+.sk-linescore .ls-rhe {
+  border-left: 1px solid rgba(200,168,100,0.2) !important;
+  font-weight: 500;
+}
+
+.ls-away-row td { color: #2A4A8A; }
+.ls-home-row td { color: var(--sc-ink); }
+.ls-away-row .ls-team,
+.ls-home-row .ls-team { color: var(--sc-ink); }
+
+/* ─── Outs + status bar ─────────────────── */
+.sk-status-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 12px;
+  background: rgba(255,252,243,0.82);
+  border-bottom: 1px solid rgba(200,168,100,0.16);
+  flex-shrink: 0;
+}
+
+.sk-outs-label {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(107,93,68,0.72);
+}
+
+.sk-out-pip {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(200,168,100,0.35);
+  background: transparent;
+  transition: background 140ms, border-color 140ms;
+}
+
+.sk-out-pip.filled {
+  background: var(--team-primary);
+  border-color: var(--team-primary);
+}
+
+.sk-batter-info {
+  margin-left: 8px;
+  font-family: var(--f-mono);
+  font-size: 10px;
+  color: #7EB4E0;
+  letter-spacing: 0.06em;
+}
+
+.sk-inning-info {
+  margin-left: auto;
+  font-family: var(--f-display);
+  font-size: 12px;
+  font-style: italic;
+  color: rgba(200,168,100,0.6);
+}
+
+.sk-side-tabs {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 10px;
+  padding: 3px;
+  border: 1px solid rgba(200,168,100,0.22);
+  border-radius: 999px;
+  background: rgba(15,31,56,0.05);
+}
+
+.sk-side-tab {
+  border: none;
+  background: transparent;
+  color: rgba(28,17,8,0.72);
+  font-family: var(--f-mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border-radius: 999px;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: background 120ms, color 120ms, box-shadow 120ms;
+}
+
+.sk-side-tab:hover {
+  color: var(--sc-ink);
+}
+
+.sk-side-tab.is-viewing {
+  background: rgba(15,31,56,0.1);
+  color: var(--sc-ink);
+}
+
+.sk-side-tab.is-batting {
+  background: rgba(42,74,138,0.34);
+  box-shadow: inset 0 0 0 1px rgba(126,180,224,0.68);
+  color: #D8E8F8;
+}
+
+.sk-view-info {
+  font-family: var(--f-mono);
+  font-size: 8px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(107,93,68,0.7);
+  margin-left: 4px;
+}
+
+/* ─── Diamond grid ──────────────────────── */
+.sk-grid-scroll {
+  flex: 1;
+  overflow: auto;
+  position: relative;
+}
+
+.sk-grid-wrap {
+  display: flex;
+  min-width: max-content;
+}
+
+/* Lineup spine */
+.sk-lineup-col {
+  flex-shrink: 0;
+  width: var(--lineup-w);
+  border-right: 2px solid rgba(200,168,100,0.25);
+  position: sticky;
+  left: 0;
+  z-index: 10;
+  background: #F4E9D0;
+}
+
+.sk-lineup-head {
+  height: 30px;
+  background: #EFE3C7;
+  border-bottom: 2px solid rgba(200,168,100,0.25);
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  gap: 8px;
+  font-family: var(--f-mono);
+  font-size: 8px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(107,93,68,0.76);
+}
+
+.sk-lineup-cell {
+  height: var(--cell-size);
+  border-bottom: 1px solid rgba(200,168,100,0.1);
+  display: flex;
+  align-items: center;
+  padding: 0 8px 0 10px;
+  gap: 8px;
+  transition: background 140ms;
+}
+
+.sk-lineup-cell.active-batter {
+  background: rgba(42,74,138,0.1);
+}
+
+.sk-bat-num {
+  font-family: var(--f-score);
+  font-size: 16px;
+  color: rgba(200,168,100,0.25);
+  width: 16px;
+  flex-shrink: 0;
+  text-align: center;
+}
+
+.sk-bat-pos {
+  font-family: var(--f-mono);
+  font-size: 8px;
+  color: rgba(200,168,100,0.4);
+  border: 1px solid rgba(200,168,100,0.2);
+  border-radius: 2px;
+  padding: 1px 4px;
+  width: 28px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.sk-bat-name {
+  font-family: var(--f-display);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--sc-ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: -0.01em;
+}
+
+/* Inning columns */
+.sk-innings-area {
+  display: flex;
+}
+
+.sk-inning-col {
+  flex-shrink: 0;
+  border-right: 1px solid rgba(200,168,100,0.08);
+}
+
+.sk-inning-col.break-3, .sk-inning-col.break-6 {
+  border-right: 1px solid rgba(200,168,100,0.2);
+}
+
+.sk-inning-head {
+  height: 30px;
+  background: #EFE3C7;
+  border-bottom: 2px solid rgba(200,168,100,0.25);
+  width: var(--cell-size);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--f-score);
+  font-size: 14px;
+  color: rgba(107,93,68,0.88);
+}
+
+/* ─── THE DIAMOND CELL ──────────────────── */
+.sk-diamond-cell {
+  width: var(--cell-size);
+  height: var(--cell-size);
+  border-bottom: 1px solid rgba(200,168,100,0.08);
+  position: relative;
+  cursor: pointer;
+  transition: background 100ms;
+}
+
+.sk-diamond-cell:hover { background: rgba(42,74,138,0.05); }
+.sk-diamond-cell.active-cell { background: rgba(42,74,138,0.1); }
+
+.sk-diamond-cell svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Corner annotations */
+.cell-out-circle {
+  position: absolute;
+  top: 4px; right: 5px;
+  font-family: var(--f-mono);
+  font-size: 8px;
+  width: 13px; height: 13px;
+  border: 1px solid rgba(200,168,100,0.3);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: rgba(200,168,100,0.5);
+  line-height: 1;
+}
+
+.cell-out-circle.filled {
+  background: rgba(200,168,100,0.6);
+  color: #1C1A14;
+  border-color: transparent;
+}
+
+.cell-code-label {
+  position: absolute;
+  top: 4px; left: 4px;
+  font-family: var(--f-mono);
+  font-size: 9px;
+  font-weight: 500;
+  line-height: 1.2;
+  pointer-events: none;
+}
+
+.cell-count-dots {
+  position: absolute;
+  bottom: 3px; left: 4px;
+  display: flex; flex-direction: column; gap: 2px;
+}
+
+.count-dot-row { display: flex; gap: 2px; }
+
+.count-dot {
+  width: 3px; height: 3px;
+  border-radius: 50%;
+}
+
+.count-dot.ball   { background: #7EB4E0; opacity: 0.7; }
+.count-dot.strike { background: #E05050; opacity: 0.7; }
+
+/* Totals column */
+.sk-totals-col {
+  flex-shrink: 0;
+  width: var(--totals-w);
+  border-left: 2px solid rgba(200,168,100,0.25);
+  position: sticky;
+  right: 0;
+  background: #F4E9D0;
+  z-index: 10;
+}
+
+.sk-totals-head {
+  height: 30px;
+  background: #EFE3C7;
+  border-bottom: 2px solid rgba(200,168,100,0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--f-mono);
+  font-size: 8px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(107,93,68,0.76);
+}
+
+.sk-totals-cell {
+  height: var(--cell-size);
+  border-bottom: 1px solid rgba(200,168,100,0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+
+.totals-ab {
+  font-family: var(--f-mono);
+  font-size: 10px;
+  color: rgba(200,168,100,0.4);
+}
+
+.totals-h {
+  font-family: var(--f-score);
+  font-size: 18px;
+  color: var(--sc-ink);
+}
+
+/* ─── Input bar (desktop bottom) ────────── */
+.sk-input-bar {
+  background: #F2E8D2;
+  border-top: 2px solid rgba(200,168,100,0.22);
+  padding: 10px 14px;
+  flex-shrink: 0;
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.sk-input-section { display: flex; flex-direction: column; gap: 5px; }
+
+.sk-input-label {
+  font-family: var(--f-mono);
+  font-size: 8px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(107,93,68,0.76);
+}
+
+.sk-chip-row {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.sk-chip {
+  font-family: var(--f-score);
+  font-size: 11px;
+  padding: 4px 9px;
+  border-radius: 3px;
+  border: 1px solid rgba(200,168,100,0.15);
+  background: rgba(15,31,56,0.04);
+  color: rgba(28,17,8,0.86);
+  cursor: pointer;
+  transition: all 120ms;
+}
+
+.sk-chip:hover { border-color: rgba(200,168,100,0.4); color: var(--sc-ink); background: rgba(15,31,56,0.08); }
+.sk-chip.is-selected { background: rgba(42,74,138,0.48); border-color: #7EB4E0; color: #D8E8F8; }
+.sk-chip.hit-chip:hover, .sk-chip.hit-chip.is-selected { border-color: #4B8750; background: rgba(40,90,40,0.28); color: #A6E0AA; }
+.sk-chip.err-chip:hover, .sk-chip.err-chip.is-selected { border-color: var(--sc-red); background: rgba(176,48,48,0.22); color: #F1A4A4; }
+
+.sk-code-input {
+  background: rgba(255,252,243,0.9);
+  border: 1px solid rgba(200,168,100,0.18);
+  border-radius: 4px;
+  color: var(--sc-ink);
+  font-family: var(--f-mono);
+  font-size: 13px;
+  padding: 7px 10px;
+  width: 90px;
+  outline: none;
+  letter-spacing: 0.06em;
+}
+
+.sk-code-input:focus { border-color: rgba(200,168,100,0.45); }
+.sk-code-input::placeholder { color: rgba(107,93,68,0.52); }
+
+.sk-count-input {
+  width: 58px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(200,168,100,0.18);
+  border-radius: 4px;
+  color: var(--sc-ink);
+  font-family: var(--f-mono);
+  font-size: 12px;
+  padding: 7px 8px;
+  outline: none;
+}
+.sk-count-input:focus { border-color: rgba(200,168,100,0.45); }
+.sk-count-input::placeholder { color: rgba(107,93,68,0.52); }
+
+.sk-log-btn {
+  background: rgba(200,48,42,0.82);
+  border: 1px solid rgba(241,164,164,0.28);
+  border-radius: 4px;
+  color: #FCEAE8;
+  font-family: var(--f-score);
+  font-size: 13px;
+  padding: 8px 18px;
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  transition: all 120ms;
+  white-space: nowrap;
+  align-self: flex-end;
+}
+.sk-log-btn:hover { background: rgba(212,59,49,0.92); border-color: rgba(241,164,164,0.44); }
+
+.sk-chip.is-disabled,
+.sk-chip[disabled] {
+  opacity: 0.38;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.sk-guided-section {
+  min-width: min(100%, 420px);
+}
+
+.sk-resolver-panel {
+  min-width: min(100%, 360px);
+  flex: 1 1 360px;
+  padding: 10px 12px;
+  border: 1px solid rgba(126,180,224,0.24);
+  border-radius: 8px;
+  background: rgba(255,252,243,0.78);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.45);
+}
+
+.sk-resolver-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.sk-resolver-title {
+  font-family: var(--f-score);
+  font-size: 14px;
+  color: var(--sc-ink);
+}
+
+.sk-resolver-sub {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(107,93,68,0.72);
+}
+
+.sk-resolver-sub.is-warning {
+  color: #C85050;
+}
+
+.sk-resolver-bases-wrap {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.sk-resolver-block {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.sk-resolver-label {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(107,93,68,0.72);
+}
+
+.sk-resolver-arrow {
+  font-family: var(--f-score);
+  font-size: 16px;
+  color: rgba(107,93,68,0.7);
+}
+
+.sk-base-strip {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.sk-base-pill {
+  min-width: 42px;
+  padding: 4px 7px;
+  border-radius: 999px;
+  border: 1px solid rgba(200,168,100,0.18);
+  background: rgba(15,31,56,0.05);
+  color: rgba(107,93,68,0.72);
+  font-family: var(--f-mono);
+  font-size: 10px;
+  text-align: center;
+}
+
+.sk-base-pill.is-occupied {
+  background: rgba(42,74,138,0.16);
+  border-color: rgba(126,180,224,0.35);
+  color: var(--sc-ink);
+}
+
+.sk-resolver-meta {
+  font-family: var(--f-mono);
+  font-size: 10px;
+  line-height: 1.45;
+  color: rgba(28,17,8,0.78);
+  margin-bottom: 8px;
+}
+
+.sk-resolver-moves {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.sk-move-chip {
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: rgba(15,31,56,0.06);
+  border: 1px solid rgba(200,168,100,0.15);
+  font-family: var(--f-mono);
+  font-size: 10px;
+  color: rgba(28,17,8,0.82);
+}
+
+.sk-move-chip.is-run {
+  background: rgba(75,135,80,0.15);
+  border-color: rgba(75,135,80,0.26);
+}
+
+.sk-move-chip.is-out {
+  background: rgba(200,80,80,0.14);
+  border-color: rgba(200,80,80,0.26);
+}
+
+/* ─── iPad layout overrides ─────────────── */
+[data-layout="ipad"] .sk-notes-panel {
+  position: fixed;
+  right: calc(-1 * min(360px, 92vw));
+  top: 48px;
+  bottom: 0;
+  width: min(360px, 92vw);
+  z-index: 40;
+  transition: right 300ms cubic-bezier(0.25,0.46,0.45,0.94);
+  box-shadow: -4px 0 24px rgba(0,0,0,0.4);
+}
+
+[data-layout="ipad"] .sk-notes-panel.is-open { right: 0; }
+
+[data-layout="ipad"] .sk-card-col { flex: 1; }
+
+/* Pencil mode indicator */
+[data-input="pen"] .sk-nav-title::after {
+  content: ' · ✏';
+  font-family: var(--f-mono);
+  font-size: 10px;
+  color: var(--sc-gold);
+  opacity: 0.7;
+}
+
+/* ─── Mobile (JS-driven layout attr) ──── */
+[data-layout="mobile"] body { overflow: auto; }
+[data-layout="mobile"] .sk-main { flex-direction: column; overflow: visible; }
+[data-layout="mobile"] .sk-notes-panel { width: 100%; border-left: none; border-top: 1px solid rgba(200,168,100,0.12); }
+[data-layout="mobile"] .sk-input-bar { flex-direction: column; }
+[data-layout="mobile"] .sk-chip-row { flex-wrap: wrap; }
+[data-layout="mobile"] .sk-notes-input-area { box-shadow: none; }
+
+/* ─── Responsive fallbacks (CSS-only) ─── */
+@media (max-width: 1200px) {
+  :root { --cell-size: 84px; --lineup-w: 160px; --totals-w: 54px; }
+  .sk-notes-panel { width: 280px; min-width: 280px; }
+  .sk-story-card { grid-template-columns: 1fr 220px; }
+}
+
+@media (max-width: 900px) and (min-width: 641px) {
+  :root { --cell-size: 72px; --lineup-w: 140px; --totals-w: 48px; }
+  .sk-notes-panel { width: 240px; }
+}
+
+@media (max-width: 640px) {
+  :root { --cell-size: 56px; --lineup-w: 110px; --totals-w: 42px; }
+  body { overflow: auto; }
+  .sk-main { flex-direction: column; overflow: visible; }
+  .sk-notes-panel { width: 100%; border-left: none; border-top: 1px solid rgba(200,168,100,0.12); }
+  .sk-input-bar { flex-direction: column; gap: 6px; padding: 8px; }
+  .sk-chip-row { flex-wrap: wrap; }
+  .sk-nav { padding: 0 8px; gap: 6px; }
+  .sk-nav-actions { gap: 4px; flex-wrap: wrap; justify-content: flex-end; }
+  .sk-btn { font-size: 8px; padding: 4px 7px; }
+  .sk-story-shell { padding: 14px 14px 0; }
+  .sk-story-card { grid-template-columns: 1fr; gap: 14px; padding: 12px; }
+  .sk-story-media { min-height: 190px; }
+  .sk-story-note-actions,
+  .sk-notes-actions { flex-direction: column; align-items: stretch; }
+}
+
+/* ─── Pencil canvas overlay ─────────────── */
+.pencil-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+}
+
+[data-input="pen"] .pencil-overlay {
+  pointer-events: auto;
+}
+
+/* ─── Theme switcher overrides for dark scorekeeper ── */
+.theme-switcher__trigger {
+  background: rgba(255,252,243,0.92);
+  color: var(--sc-ink);
+  border-color: rgba(200,168,100,0.28);
+  box-shadow: 0 10px 28px rgba(15,31,56,0.16);
+}
+.theme-switcher__panel {
+  background: #FBF6E9;
+  border-color: rgba(200,168,100,0.24);
+  box-shadow: 0 16px 40px rgba(15,31,56,0.14);
+}
+.theme-switcher__header { color: rgba(107,93,68,0.72); }
+.theme-switcher__option {
+  background: rgba(15,31,56,0.04);
+  border-color: rgba(200,168,100,0.18);
+  color: var(--sc-ink);
+}
+.theme-switcher__option[aria-pressed="true"] {
+  border-color: var(--sc-gold);
+  box-shadow: inset 0 0 0 1px rgba(200,146,10,0.25);
+}
+.theme-switcher__swatch { border-color: rgba(245,237,216,0.2); }
+
+/* ─── Toast notifications ──────────────── */
+.bpq-toast {
+  position: fixed;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%) translateY(12px);
+  z-index: 9000;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  border-left: 4px solid var(--sc-line);
+  background: rgba(15,31,56,0.94);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: #F5EDD8;
+  font-family: var(--f-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  max-width: min(480px, calc(100vw - 32px));
+  box-shadow: 0 8px 28px rgba(0,0,0,0.28);
+  opacity: 0;
+  transition: opacity 180ms ease, transform 180ms ease;
+  pointer-events: none;
+}
+.bpq-toast.is-visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+  pointer-events: auto;
+}
+.bpq-toast[data-tone="info"]    { border-left-color: #7EB4E0; }
+.bpq-toast[data-tone="success"] { border-left-color: #4B8750; }
+.bpq-toast[data-tone="error"]   { border-left-color: #C85050; }
+.bpq-toast[data-tone="undo"]    { border-left-color: #C8920A; }
+.bpq-toast-msg { flex: 1; line-height: 1.35; }
+.bpq-toast-action {
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 4px;
+  color: #F5EDD8;
+  font-family: var(--f-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 120ms;
+}
+.bpq-toast-action:hover { background: rgba(255,255,255,0.2); }
+.bpq-toast-close {
+  background: none;
+  border: none;
+  color: rgba(245,237,216,0.45);
+  font-size: 14px;
+  cursor: pointer;
+  padding: 2px 4px;
+  line-height: 1;
+}
+.bpq-toast-close:hover { color: #F5EDD8; }
+
+/* ─── Save status chip ─────────────────── */
+.sk-save-chip {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  padding: 3px 8px;
+  border-radius: 3px;
+  transition: opacity 180ms ease, background 180ms ease, color 180ms ease;
+  opacity: 0;
+  pointer-events: none;
+}
+.sk-save-chip.saved {
+  opacity: 1;
+  background: rgba(75,135,80,0.18);
+  color: #8ACA8A;
+}
+.sk-save-chip.failed {
+  opacity: 1;
+  background: rgba(200,80,80,0.18);
+  color: #E08080;
+}
+
+</style>
+</head>
+<body>
+
+<!-- ═══ NAV ══════════════════════════════ -->
+<nav class="sk-nav">
+  <a href="/" class="sk-nav-back">Ballpark Scorecard</a>
+  <span class="sk-nav-sep">/</span>
+  <span class="sk-nav-title" id="sk-game-title">New Game</span>
+  <span class="sk-nav-venue" id="sk-venue-label"></span>
+  <div class="sk-nav-actions">
+    <span class="sk-save-chip" id="saveStatusChip"></span>
+    <button class="sk-btn" id="btn-setup">Setup</button>
+    <button class="sk-btn" id="btn-notes-toggle">Notes</button>
+    <button class="sk-btn sk-btn-amber" id="btn-undo">⌘Z Undo</button>
+    <button class="sk-btn sk-btn-green" id="btn-export">Export</button>
+    <button class="sk-btn sk-btn-green" id="btn-import">Import</button>
+    <button class="sk-btn sk-btn-red" id="btn-reset">Reset</button>
+    <button class="sk-btn sk-btn-red" id="btn-finish">Finish game</button>
+  </div>
+</nav>
+
+<!-- ═══ MAIN ══════════════════════════════ -->
+<div class="sk-main">
+
+  <!-- Scorecard column -->
+  <div class="sk-card-col">
+
+    <section class="sk-story-shell">
+      <div class="sk-story-card" id="sk-story-card">
+        <div class="sk-story-media" id="sk-story-media">
+          <div class="sk-story-poster" aria-hidden="true" style="width:100%;height:100%;background:linear-gradient(135deg,#1b2230,#12161d);"></div>
+          <div class="sk-story-overlay">
+            <div class="sk-story-kicker">At the park</div>
+            <div class="sk-story-title">Keep the score where the trip pays off.</div>
+            <div class="sk-story-caption">When the game starts, this turns into the working card.</div>
+          </div>
+        </div>
+        <div class="sk-story-side">
+          <div class="sk-story-meta">
+            <div class="sk-story-meta-row">
+              <div class="sk-story-meta-label">Park</div>
+              <div class="sk-story-meta-value" id="sk-story-park">Waiting on the park</div>
+            </div>
+            <div class="sk-story-meta-row">
+              <div class="sk-story-meta-label">Matchup</div>
+              <div class="sk-story-meta-value" id="sk-story-matchup">Away at Home</div>
+            </div>
+            <div class="sk-story-meta-row">
+              <div class="sk-story-meta-label">Mode</div>
+              <div class="sk-story-meta-value">Starts as a cover. Clears once you log the game.</div>
+            </div>
+          </div>
+          <div class="sk-story-quick-note">
+            <div>
+              <div class="sk-story-note-title">Quick note</div>
+              <div class="sk-story-note-copy">Capture the crowd, weather, or first impression before first pitch.</div>
+            </div>
+            <textarea class="sk-story-note-input" id="story-note-input" placeholder="Big crowd. Wind blowing out. Park feels electric."></textarea>
+            <div class="sk-story-note-actions">
+              <span class="sk-story-note-hint">Adds to game notes right away</span>
+              <button class="sk-btn sk-btn-amber" id="story-note-add-btn" type="button">Add note</button>
+            </div>
+          </div>
+          <div class="sk-story-fallback" id="sk-story-fallback">
+            <div class="sk-story-fallback-title">Video slot</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Linescore -->
+    <div class="sk-linescore-wrap">
+      <table class="sk-linescore" id="linescore">
+        <thead>
+          <tr>
+            <th class="ls-team"></th>
+            <th>1</th><th>2</th><th>3</th><th>4</th><th>5</th>
+            <th>6</th><th>7</th><th>8</th><th>9</th>
+            <th class="ls-rhe">R</th><th>H</th><th>E</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="ls-away-row">
+            <td class="ls-team" id="ls-away-name">Away</td>
+            <td id="ls-a1">·</td><td id="ls-a2">·</td><td id="ls-a3">·</td>
+            <td id="ls-a4">·</td><td id="ls-a5">·</td><td id="ls-a6">·</td>
+            <td id="ls-a7">·</td><td id="ls-a8">·</td><td id="ls-a9">·</td>
+            <td class="ls-rhe" id="ls-aR">0</td>
+            <td id="ls-aH">0</td><td id="ls-aE">0</td>
+          </tr>
+          <tr class="ls-home-row">
+            <td class="ls-team" id="ls-home-name">Home</td>
+            <td id="ls-h1">·</td><td id="ls-h2">·</td><td id="ls-h3">·</td>
+            <td id="ls-h4">·</td><td id="ls-h5">·</td><td id="ls-h6">·</td>
+            <td id="ls-h7">·</td><td id="ls-h8">·</td><td id="ls-h9">·</td>
+            <td class="ls-rhe" id="ls-hR">0</td>
+            <td id="ls-hH">0</td><td id="ls-hE">0</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Status bar -->
+    <div class="sk-status-bar">
+      <span class="sk-outs-label">Outs</span>
+      <div class="sk-out-pip" id="op1"></div>
+      <div class="sk-out-pip" id="op2"></div>
+      <div class="sk-out-pip" id="op3"></div>
+      <span class="sk-batter-info" id="batter-info">↑ Away · Batter 1</span>
+      <div class="sk-side-tabs" aria-label="Visible scorebook">
+        <button class="sk-side-tab is-viewing is-batting" id="view-away-btn" type="button">Away</button>
+        <button class="sk-side-tab" id="view-home-btn" type="button">Home</button>
+      </div>
+      <span class="sk-view-info" id="view-info">Viewing away book</span>
+      <span class="sk-inning-info" id="inning-info">Top 1st</span>
+    </div>
+
+    <!-- Diamond grid -->
+    <div class="sk-grid-scroll">
+      <div class="sk-grid-wrap">
+
+        <!-- Lineup spine -->
+        <div class="sk-lineup-col">
+          <div class="sk-lineup-head">
+            <span>#</span><span>Pos</span><span>Batter</span>
+          </div>
+          <div id="lineup-cells"></div>
+        </div>
+
+        <!-- Innings -->
+        <div class="sk-innings-area" id="innings-area"></div>
+
+        <!-- Totals -->
+        <div class="sk-totals-col">
+          <div class="sk-totals-head">AB·H</div>
+          <div id="totals-cells"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Input bar -->
+    <div class="sk-input-bar">
+
+      <div class="sk-input-section sk-guided-section">
+        <span class="sk-input-label">Guided plays</span>
+        <div class="sk-chip-row">
+          <button class="sk-chip sk-guided-chip hit-chip" type="button" data-guided-code="1B">1B</button>
+          <button class="sk-chip sk-guided-chip hit-chip" type="button" data-guided-code="2B">2B</button>
+          <button class="sk-chip sk-guided-chip hit-chip" type="button" data-guided-code="3B">3B</button>
+          <button class="sk-chip sk-guided-chip hit-chip" type="button" data-guided-code="HR">HR</button>
+          <button class="sk-chip sk-guided-chip hit-chip" type="button" data-guided-code="BB">BB</button>
+          <button class="sk-chip sk-guided-chip hit-chip" type="button" data-guided-code="HBP">HBP</button>
+          <button class="sk-chip sk-guided-chip" type="button" data-guided-code="K">K</button>
+          <button class="sk-chip sk-guided-chip" type="button" data-guided-code="FO">FO</button>
+          <button class="sk-chip sk-guided-chip" type="button" data-guided-code="SF">SF</button>
+          <button class="sk-chip sk-guided-chip" type="button" data-guided-code="GO">GO</button>
+          <button class="sk-chip sk-guided-chip" type="button" data-guided-code="DP">DP</button>
+          <button class="sk-chip sk-guided-chip err-chip" type="button" data-guided-code="E">E</button>
+        </div>
+      </div>
+
+      <div class="sk-resolver-panel" id="resolver-panel">
+        <div class="sk-resolver-head">
+          <span class="sk-resolver-title">Projected result</span>
+          <span class="sk-resolver-sub" id="resolver-status">Choose a guided play</span>
+        </div>
+        <div class="sk-resolver-bases-wrap">
+          <div class="sk-resolver-block">
+            <span class="sk-resolver-label">Now</span>
+            <div class="sk-base-strip" id="resolver-bases-now"></div>
+          </div>
+          <div class="sk-resolver-arrow">→</div>
+          <div class="sk-resolver-block">
+            <span class="sk-resolver-label">After</span>
+            <div class="sk-base-strip" id="resolver-bases-next"></div>
+          </div>
+        </div>
+        <div class="sk-resolver-meta" id="resolver-meta">The app can resolve common runner movement from your current base state.</div>
+        <div class="sk-resolver-moves" id="resolver-moves"></div>
+      </div>
+
+      <div class="sk-input-section">
+        <span class="sk-input-label">Quick outs</span>
+        <div class="sk-chip-row">
+          <div class="sk-chip" data-code="K">K</div>
+          <div class="sk-chip" data-code="Ʞ">Ʞ</div>
+          <div class="sk-chip" data-code="6-3">6-3</div>
+          <div class="sk-chip" data-code="5-3">5-3</div>
+          <div class="sk-chip" data-code="4-3">4-3</div>
+          <div class="sk-chip" data-code="F7">F7</div>
+          <div class="sk-chip" data-code="F8">F8</div>
+          <div class="sk-chip" data-code="F9">F9</div>
+          <div class="sk-chip" data-code="DP4-6-3">4-6-3</div>
+        </div>
+      </div>
+
+      <div class="sk-input-section">
+        <span class="sk-input-label">Reaches</span>
+        <div class="sk-chip-row">
+          <div class="sk-chip hit-chip" data-code="1B">1B</div>
+          <div class="sk-chip hit-chip" data-code="2B">2B</div>
+          <div class="sk-chip hit-chip" data-code="3B">3B</div>
+          <div class="sk-chip hit-chip" data-code="HR">HR</div>
+          <div class="sk-chip hit-chip" data-code="BB">BB</div>
+          <div class="sk-chip hit-chip" data-code="HBP">HBP</div>
+          <div class="sk-chip err-chip" data-code="E6">E6</div>
+          <div class="sk-chip err-chip" data-code="E5">E5</div>
+          <div class="sk-chip err-chip" data-code="E4">E4</div>
+        </div>
+      </div>
+
+      <div class="sk-input-section">
+        <span class="sk-input-label">Code</span>
+        <input class="sk-code-input" id="play-code" placeholder="6-3, HR…">
+      </div>
+
+      <div class="sk-input-section">
+        <span class="sk-input-label">Count</span>
+        <input class="sk-count-input" id="play-count" placeholder="3-2" maxlength="3">
+      </div>
+
+      <button class="sk-log-btn" id="log-btn">Log Play ↵</button>
+
+    </div>
+  </div>
+
+  <!-- Notes panel -->
+  <div class="sk-notes-panel" id="notes-panel">
+    <div class="sk-notes-header">
+      <div class="sk-notes-header-top">
+        <div class="sk-notes-title">Game notes</div>
+        <div class="sk-notes-count" id="notes-count">0</div>
+      </div>
+      <div class="sk-notes-sub">Keep one running stream of what the game felt like, not just what the score did.</div>
+    </div>
+    <div class="sk-notes-feed" id="notes-feed">
+      <!-- Sample entries -->
+      <div class="sk-note-entry">
+        <span class="sk-note-inning">INN 1</span>
+        <span class="sk-note-text">Top of the first. Big crowd.</span>
+      </div>
+    </div>
+    <div class="sk-notes-input-area">
+      <div class="sk-notes-compose-label">Quick note</div>
+      <textarea class="sk-notes-input" id="note-input" placeholder="What changed in the game, crowd, weather, or feel?"></textarea>
+      <div class="sk-notes-actions">
+        <span class="sk-notes-hint">Use Cmd+Enter or Ctrl+Enter to save fast</span>
+        <button class="sk-btn sk-btn-amber" id="note-add-btn" type="button">Add note</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /sk-main -->
+
+<!-- Ballpark Scorecard is fully self-contained: the pure baseball scoring
+     engine (resolver) is bundled below, and the former quest shared stack
+     (theme switcher, storage bus, team logos, trip/visit tracking) is replaced
+     by small local stubs. No team logos, no league data, no external requests. -->
+<script>
+/* resolver.js — pure baseball scoring rules, bundled verbatim (no team IP). */
+(function (global) {
+  'use strict';
+
+  var BPQ = global.BPQ = global.BPQ || {};
+
+  function cloneRunner(runner) {
+    if (!runner) return null;
+    return {
+      id: runner.id,
+      batterId: runner.batterId,
+      reachedOn: runner.reachedOn,
+      reachedInning: runner.reachedInning,
+      cellRef: runner.cellRef ? { batter: runner.cellRef.batter, inning: runner.cellRef.inning } : null
+    };
+  }
+
+  function cloneBases(bases) {
+    return {
+      first: cloneRunner(bases && bases.first),
+      second: cloneRunner(bases && bases.second),
+      third: cloneRunner(bases && bases.third)
+    };
+  }
+
+  function emptyBases() {
+    return { first: null, second: null, third: null };
+  }
+
+  function makeResult(nextBases, runs, outsAdded, moves, warnings) {
+    return {
+      bases: nextBases,
+      nextBases: nextBases,
+      runsScored: runs || 0,
+      outsAdded: outsAdded || 0,
+      moves: moves || [],
+      runnerMoves: moves || [],
+      warnings: warnings || []
+    };
+  }
+
+  function forceWalk(bases, batterRunner) {
+    var next = cloneBases(bases);
+    var runs = 0;
+    var moves = [];
+
+    if (next.first && next.second && next.third) {
+      runs += 1;
+      moves.push({ from: 'third', to: 'home', safe: true, runnerId: next.third.id });
+    }
+
+    if (next.second && next.first) {
+      moves.push({ from: 'second', to: 'third', safe: true, runnerId: next.second.id });
+      next.third = next.second;
+    }
+    if (next.first) {
+      moves.push({ from: 'first', to: 'second', safe: true, runnerId: next.first.id });
+      next.second = next.first;
+    }
+
+    next.first = cloneRunner(batterRunner);
+    moves.push({ from: 'batter', to: 'first', safe: true, runnerId: batterRunner && batterRunner.id ? batterRunner.id : null });
+
+    return makeResult(next, runs, 0, moves, []);
+  }
+
+  function resolveSingle(bases, batterRunner) {
+    var next = emptyBases();
+    var runs = 0;
+    var moves = [];
+
+    if (bases.third) {
+      runs += 1;
+      moves.push({ from: 'third', to: 'home', safe: true, runnerId: bases.third.id });
+    }
+    if (bases.second) {
+      next.third = cloneRunner(bases.second);
+      moves.push({ from: 'second', to: 'third', safe: true, runnerId: bases.second.id });
+    }
+    if (bases.first) {
+      next.second = cloneRunner(bases.first);
+      moves.push({ from: 'first', to: 'second', safe: true, runnerId: bases.first.id });
+    }
+
+    next.first = cloneRunner(batterRunner);
+    moves.push({ from: 'batter', to: 'first', safe: true, runnerId: batterRunner && batterRunner.id ? batterRunner.id : null });
+
+    return makeResult(next, runs, 0, moves, []);
+  }
+
+  function resolveDouble(bases, batterRunner) {
+    var next = emptyBases();
+    var runs = 0;
+    var moves = [];
+
+    if (bases.third) {
+      runs += 1;
+      moves.push({ from: 'third', to: 'home', safe: true, runnerId: bases.third.id });
+    }
+    if (bases.second) {
+      runs += 1;
+      moves.push({ from: 'second', to: 'home', safe: true, runnerId: bases.second.id });
+    }
+    if (bases.first) {
+      next.third = cloneRunner(bases.first);
+      moves.push({ from: 'first', to: 'third', safe: true, runnerId: bases.first.id });
+    }
+
+    next.second = cloneRunner(batterRunner);
+    moves.push({ from: 'batter', to: 'second', safe: true, runnerId: batterRunner && batterRunner.id ? batterRunner.id : null });
+
+    return makeResult(next, runs, 0, moves, []);
+  }
+
+  function resolveTriple(bases, batterRunner) {
+    var next = emptyBases();
+    var runs = 0;
+    var moves = [];
+
+    if (bases.third) {
+      runs += 1;
+      moves.push({ from: 'third', to: 'home', safe: true, runnerId: bases.third.id });
+    }
+    if (bases.second) {
+      runs += 1;
+      moves.push({ from: 'second', to: 'home', safe: true, runnerId: bases.second.id });
+    }
+    if (bases.first) {
+      runs += 1;
+      moves.push({ from: 'first', to: 'home', safe: true, runnerId: bases.first.id });
+    }
+
+    next.third = cloneRunner(batterRunner);
+    moves.push({ from: 'batter', to: 'third', safe: true, runnerId: batterRunner && batterRunner.id ? batterRunner.id : null });
+
+    return makeResult(next, runs, 0, moves, []);
+  }
+
+  function resolveHomeRun(bases, batterRunner) {
+    var next = emptyBases();
+    var runs = 0;
+    var moves = [];
+
+    if (bases.third) {
+      runs += 1;
+      moves.push({ from: 'third', to: 'home', safe: true, runnerId: bases.third.id });
+    }
+    if (bases.second) {
+      runs += 1;
+      moves.push({ from: 'second', to: 'home', safe: true, runnerId: bases.second.id });
+    }
+    if (bases.first) {
+      runs += 1;
+      moves.push({ from: 'first', to: 'home', safe: true, runnerId: bases.first.id });
+    }
+
+    runs += 1;
+    moves.push({ from: 'batter', to: 'home', safe: true, runnerId: batterRunner && batterRunner.id ? batterRunner.id : null });
+
+    return makeResult(next, runs, 0, moves, []);
+  }
+
+  function resolveStrikeout(bases) {
+    return makeResult(cloneBases(bases), 0, 1, [], []);
+  }
+
+  function resolveFlyOut(bases) {
+    return makeResult(cloneBases(bases), 0, 1, [], []);
+  }
+
+  function resolveSacFly(bases) {
+    if (!bases.third) {
+      var fallback = resolveFlyOut(bases);
+      fallback.warnings = ['Sac fly selected with no runner on third'];
+      return fallback;
+    }
+    var next = cloneBases(bases);
+    var moves = [{ from: 'third', to: 'home', safe: true, runnerId: bases.third.id }];
+    next.third = null;
+    return makeResult(next, 1, 1, moves, []);
+  }
+
+  function resolveGroundOut(bases) {
+    return makeResult(cloneBases(bases), 0, 1, [], ['Default ground out keeps runners in place']);
+  }
+
+  function resolveDoublePlay(bases) {
+    if (!bases.first) {
+      var fallback = resolveGroundOut(bases);
+      fallback.warnings = ['Double play selected with no runner on first'];
+      return fallback;
+    }
+    var next = cloneBases(bases);
+    var moves = [{ from: 'first', to: 'out', safe: false, runnerId: bases.first.id }];
+    next.first = null;
+    return makeResult(next, 0, 2, moves, []);
+  }
+
+  function resolveFieldersChoice(bases, batterRunner) {
+    var next = cloneBases(bases);
+    var warnings = [];
+    var moves = [];
+    if (next.first) {
+      moves.push({ from: 'first', to: 'out', safe: false, runnerId: next.first.id });
+      next.first = cloneRunner(batterRunner);
+      moves.push({ from: 'batter', to: 'first', safe: true, runnerId: batterRunner && batterRunner.id ? batterRunner.id : null });
+      return makeResult(next, 0, 1, moves, warnings);
+    }
+    if (next.second) {
+      moves.push({ from: 'second', to: 'out', safe: false, runnerId: next.second.id });
+      next.second = null;
+      next.first = cloneRunner(batterRunner);
+      moves.push({ from: 'batter', to: 'first', safe: true, runnerId: batterRunner && batterRunner.id ? batterRunner.id : null });
+      warnings.push('Fielder choice defaulted to runner from second out');
+      return makeResult(next, 0, 1, moves, warnings);
+    }
+    warnings.push('Fielder choice selected with no force situation');
+    return makeResult(cloneBases(bases), 0, 0, [], warnings);
+  }
+
+  function resolveError(bases, batterRunner) {
+    var result = forceWalk(bases, batterRunner);
+    result.warnings = ['Error defaults to batter safe at first with forced advancement only'];
+    return result;
+  }
+
+  function highestOccupiedBase(bases) {
+    if (bases.third) return 'third';
+    if (bases.second) return 'second';
+    if (bases.first) return 'first';
+    return null;
+  }
+
+  function nextBaseName(base) {
+    if (base === 'first') return 'second';
+    if (base === 'second') return 'third';
+    if (base === 'third') return 'home';
+    return null;
+  }
+
+  function resolveStolenBase(bases, options) {
+    var from = options && options.from ? options.from : highestOccupiedBase(bases);
+    if (!from || !bases[from]) return makeResult(cloneBases(bases), 0, 0, [], ['No runner available for stolen base']);
+    var to = nextBaseName(from);
+    var next = cloneBases(bases);
+    var runner = next[from];
+    next[from] = null;
+    var runs = 0;
+    if (to === 'home') {
+      runs = 1;
+    } else {
+      next[to] = runner;
+    }
+    return makeResult(next, runs, 0, [{ from: from, to: to, safe: true, runnerId: runner.id }], []);
+  }
+
+  function resolveCaughtStealing(bases, options) {
+    var from = options && options.from ? options.from : highestOccupiedBase(bases);
+    if (!from || !bases[from]) return makeResult(cloneBases(bases), 0, 0, [], ['No runner available for caught stealing']);
+    var next = cloneBases(bases);
+    var runner = next[from];
+    next[from] = null;
+    return makeResult(next, 0, 1, [{ from: from, to: 'out', safe: false, runnerId: runner.id }], []);
+  }
+
+  function resolveWildPitch(bases, options) {
+    var next = cloneBases(bases);
+    var moves = [];
+    var runs = 0;
+    var targets = options && Array.isArray(options.advance) && options.advance.length
+      ? options.advance.slice()
+      : ['third', 'second', 'first'];
+
+    targets.forEach(function (from) {
+      if (!next[from]) return;
+      var runner = next[from];
+      var to = nextBaseName(from);
+      next[from] = null;
+      if (to === 'home') {
+        runs += 1;
+      } else {
+        next[to] = runner;
+      }
+      moves.push({ from: from, to: to, safe: true, runnerId: runner.id });
+    });
+
+    return makeResult(next, runs, 0, moves, []);
+  }
+
+  function resolvePlay(playType, state, batterRunner, options) {
+    var bases = cloneBases(state && state.bases ? state.bases : emptyBases());
+    switch (playType) {
+      case '1B': return resolveSingle(bases, batterRunner);
+      case '2B': return resolveDouble(bases, batterRunner);
+      case '3B': return resolveTriple(bases, batterRunner);
+      case 'HR': return resolveHomeRun(bases, batterRunner);
+      case 'BB':
+      case 'HBP': return forceWalk(bases, batterRunner);
+      case 'K': return resolveStrikeout(bases);
+      case 'FO': return resolveFlyOut(bases);
+      case 'SF': return resolveSacFly(bases);
+      case 'GO': return resolveGroundOut(bases);
+      case 'DP': return resolveDoublePlay(bases);
+      case 'FC': return resolveFieldersChoice(bases, batterRunner);
+      case 'E': return resolveError(bases, batterRunner);
+      case 'SB': return resolveStolenBase(bases, options || {});
+      case 'CS': return resolveCaughtStealing(bases, options || {});
+      case 'WP': return resolveWildPitch(bases, options || {});
+      default:
+        throw new Error('Unknown play type: ' + playType);
+    }
+  }
+
+  function normalizeScorekeeperCode(code) {
+    var normalized = String(code || '').trim().toUpperCase();
+    if (!normalized) return null;
+    if (normalized === 'Ʞ') return 'K';
+    if (normalized === 'FO' || normalized === 'F7' || normalized === 'F8' || normalized === 'F9') return 'FO';
+    if (normalized === 'GO' || normalized === '6-3' || normalized === '5-3' || normalized === '4-3' || normalized === '1-3' || normalized === '3-1') return 'GO';
+    if (normalized === 'DP' || normalized.indexOf('DP') === 0) return 'DP';
+    if (normalized === 'E' || /^E\d$/.test(normalized)) return 'E';
+    if (normalized === '1B' || normalized === '2B' || normalized === '3B' || normalized === 'HR' ||
+        normalized === 'BB' || normalized === 'HBP' || normalized === 'K' || normalized === 'SF' ||
+        normalized === 'FC' || normalized === 'SB' || normalized === 'CS' || normalized === 'WP') {
+      return normalized;
+    }
+    return null;
+  }
+
+  BPQ.resolver = {
+    cloneBases: cloneBases,
+    emptyBases: emptyBases,
+    forceWalk: forceWalk,
+    resolveSingle: resolveSingle,
+    resolveDouble: resolveDouble,
+    resolveTriple: resolveTriple,
+    resolveHomeRun: resolveHomeRun,
+    resolveStrikeout: resolveStrikeout,
+    resolveFlyOut: resolveFlyOut,
+    resolveSacFly: resolveSacFly,
+    resolveGroundOut: resolveGroundOut,
+    resolveDoublePlay: resolveDoublePlay,
+    resolveFieldersChoice: resolveFieldersChoice,
+    resolveError: resolveError,
+    resolveStolenBase: resolveStolenBase,
+    resolveCaughtStealing: resolveCaughtStealing,
+    resolveWildPitch: resolveWildPitch,
+    resolvePlay: resolvePlay,
+    normalizeScorekeeperCode: normalizeScorekeeperCode
+  };
+})(window);
+</script>
+<script>
+(function (window) {
+  'use strict';
+  var BPQ = window.BPQ = window.BPQ || {};
+  BPQ.utils = BPQ.utils || {};
+  BPQ.utils.escapeHtml = function (value) {
+    return String(value == null ? '' : value)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  };
+  BPQ.logos = { getTeamLogo: function () { return ''; } };
+  BPQ.storage = { flush: function () {} };
+  BPQ.app = {
+    getScorekeeperContext: function () { return null; },
+    clearScorekeeperContext: function () {},
+    markVisited: function () {},
+    updateActiveTrip: function () {}
+  };
+})(window);
+</script>
+<script>
+/* ═══════════════════════════════════════════
+   SCOREKEEPER ENGINE
+═══════════════════════════════════════════ */
+'use strict';
+
+const app = window.BPQ && window.BPQ.app;
+const utils = window.BPQ && window.BPQ.utils;
+const logos = window.BPQ && window.BPQ.logos;
+const resolver = window.BPQ && window.BPQ.resolver;
+const SESSION_KEY = 'sbd.scorecard.v1';
+const INNINGS = 9;
+const BATTERS = 9;
+function teamLogoUrl(name) {
+  return logos && logos.getTeamLogo ? logos.getTeamLogo(name) : '';
+}
+const DEFAULT_POSITIONS = ['CF','SS','1B','LF','DH','3B','RF','C','2B'];
+const DEFAULT_NAMES = ['Batter 1','Batter 2','Batter 3','Batter 4','Batter 5','Batter 6','Batter 7','Batter 8','Batter 9'];
+
+const HIT_CODES   = new Set(['1B','2B','3B','HR']);
+const REACH_CODES = new Set(['BB','HBP','FC']);
+const OUT_RE      = /^(K|Ʞ|[FLUNG]\d|[1-9]-[1-9](-[1-9])*|DP.*)$/;
+const ERR_RE      = /^E(\d)?$/;
+const EXTRA_OUT_CODES = new Set(['FO','GO','SF','DP','CS']);
+const GUIDED_CODE_MAP = {
+  '1B': '1B',
+  '2B': '2B',
+  '3B': '3B',
+  'HR': 'HR',
+  'BB': 'BB',
+  'HBP': 'HBP',
+  'K': 'K',
+  'Ʞ': 'K',
+  'FO': 'FO',
+  'F7': 'FO',
+  'F8': 'FO',
+  'F9': 'FO',
+  'SF': 'SF',
+  'GO': 'GO',
+  '6-3': 'GO',
+  '5-3': 'GO',
+  '4-3': 'GO',
+  '1-3': 'GO',
+  '3-1': 'GO',
+  'DP': 'DP',
+  'DP4-6-3': 'DP',
+  'DP6-4-3': 'DP',
+  'DP5-4-3': 'DP',
+  'DP3-6-3': 'DP',
+  'E': 'E',
+  'E1': 'E',
+  'E2': 'E',
+  'E3': 'E',
+  'E4': 'E',
+  'E5': 'E',
+  'E6': 'E',
+  'E7': 'E',
+  'E8': 'E',
+  'E9': 'E'
+};
+const GUIDED_PLATE_APPEARANCE_TYPES = new Set(['1B','2B','3B','HR','BB','HBP','K','FO','SF','GO','DP','E']);
+const GUIDED_AB_TYPES = new Set(['1B','2B','3B','HR','K','FO','GO','DP','E']);
+const GUIDED_HIT_TYPES = new Set(['1B','2B','3B','HR']);
+
+function isOut(c)  { return EXTRA_OUT_CODES.has(c) || OUT_RE.test(c) || /^\d+-\d+/.test(c) || /^F\d/.test(c); }
+function isHit(c)  { return HIT_CODES.has(c); }
+function isErr(c)  { return ERR_RE.test(c); }
+function clone(value) { return JSON.parse(JSON.stringify(value)); }
+function escapeHtml(value) {
+  if (utils && utils.escapeHtml) return utils.escapeHtml(value);
+  var div = document.createElement('div');
+  div.textContent = value == null ? '' : value;
+  return div.innerHTML;
+}
+
+function emptyBasesState() {
+  return resolver && resolver.emptyBases ? resolver.emptyBases() : { first: null, second: null, third: null };
+}
+
+function emptyGameState() {
+  return {
+    inning: 1,
+    half: 'top',
+    outs: 0,
+    battingTeam: 'away',
+    activeBatterId: 'away-b1-pa1',
+    lineupIndex: { away: 0, home: 0 },
+    bases: emptyBasesState(),
+    score: { away: 0, home: 0 },
+    contextDirty: false
+  };
+}
+
+function emptyPlayIntent() {
+  return {
+    playType: null,
+    code: '',
+    batterId: null,
+    options: {},
+    corrections: []
+  };
+}
+
+function emptyPlays() {
+  return {
+    away: Array.from({ length: BATTERS }, () => Array(INNINGS).fill(null)),
+    home: Array.from({ length: BATTERS }, () => Array(INNINGS).fill(null))
+  };
+}
+
+function emptyTotals() {
+  return {
+    away: Array.from({ length: BATTERS }, () => ({ ab: 0, h: 0 })),
+    home: Array.from({ length: BATTERS }, () => ({ ab: 0, h: 0 }))
+  };
+}
+
+function emptyLinescore() {
+  return {
+    away: { r: 0, h: 0, e: 0, inn: Array(INNINGS).fill(null) },
+    home: { r: 0, h: 0, e: 0, inn: Array(INNINGS).fill(null) }
+  };
+}
+
+function getInitialMeta() {
+  const context = app && app.getScorekeeperContext ? app.getScorekeeperContext() : null;
+  return {
+    title: context ? `${context.awayTeam ? context.awayTeam + ' at ' : ''}${context.homeTeam} scorebook` : 'New Game',
+    venue: context ? context.venue : '',
+    parkId: context ? context.parkId : '',
+    gameId: context ? context.gameId : '',
+    startDateTimeLocal: context ? context.startDateTimeLocal : '',
+    awayName: context && context.awayTeam ? context.awayTeam : 'Away',
+    homeName: context ? context.homeTeam : 'Home'
+  };
+}
+
+let meta = getInitialMeta();
+let plays = emptyPlays();
+let totals = emptyTotals();
+let ls = emptyLinescore();
+let notes = [];
+let currentSide = 'away';
+let viewSide = 'away';
+let curInning = 0;
+let outsThisHalf = 0;
+let batterIndex = { away: 0, home: 0 };
+let undoStack = [];
+let lineupNames = DEFAULT_NAMES.slice();
+let lineupPositions = DEFAULT_POSITIONS.slice();
+let gameState = emptyGameState();
+let playIntent = emptyPlayIntent();
+let resolvedPlay = null;
+let plateAppearanceSeq = 0;
+
+const ordinals = ['1st','2nd','3rd','4th','5th','6th','7th','8th','9th'];
+
+function totalLoggedPlays() {
+  return ['away', 'home'].reduce((sum, side) => sum + plays[side].flat().filter(Boolean).length, 0);
+}
+
+function getCurrentBatter() {
+  return batterIndex[currentSide];
+}
+
+function normalizeGuidedPlayType(code) {
+  const normalized = String(code || '').trim().toUpperCase();
+  if (!normalized) return null;
+  return GUIDED_CODE_MAP[normalized] || (resolver && resolver.normalizeScorekeeperCode ? resolver.normalizeScorekeeperCode(normalized) : null);
+}
+
+function buildBatterAppearanceId(side, batter, preview) {
+  const seq = preview ? plateAppearanceSeq + 1 : ++plateAppearanceSeq;
+  return `${side}-b${batter + 1}-pa${seq}`;
+}
+
+function buildBatterRunner(playType, preview) {
+  const batter = getCurrentBatter();
+  const side = currentSide;
+  const appearanceId = buildBatterAppearanceId(side, batter, preview);
+  return {
+    id: `r-${appearanceId}`,
+    batterId: appearanceId,
+    reachedOn: playType,
+    reachedInning: curInning + 1,
+    cellRef: { batter: batter, inning: curInning }
+  };
+}
+
+function syncGameStateFromLegacy() {
+  gameState.inning = curInning + 1;
+  gameState.half = currentSide === 'away' ? 'top' : 'bottom';
+  gameState.outs = outsThisHalf;
+  gameState.battingTeam = currentSide;
+  gameState.activeBatterId = `${currentSide}-b${getCurrentBatter() + 1}-next`;
+  gameState.lineupIndex = clone(batterIndex);
+  gameState.score = { away: ls.away.r, home: ls.home.r };
+  if (!gameState.bases) gameState.bases = emptyBasesState();
+}
+
+function getBaseOccupancyList(bases) {
+  return [
+    { key: 'first', label: '1B', runner: bases && bases.first ? bases.first : null },
+    { key: 'second', label: '2B', runner: bases && bases.second ? bases.second : null },
+    { key: 'third', label: '3B', runner: bases && bases.third ? bases.third : null }
+  ];
+}
+
+function renderBaseStrip(bases) {
+  return getBaseOccupancyList(bases).map((base) => {
+    return `<span class="sk-base-pill${base.runner ? ' is-occupied' : ''}">${base.label}</span>`;
+  }).join('');
+}
+
+function moveText(move) {
+  if (!move) return '';
+  if (move.to === 'home') return `${move.from} scored`;
+  if (move.to === 'out' || move.safe === false) return `${move.from} out`;
+  return `${move.from} to ${move.to}`;
+}
+
+function updateGuidedAvailability() {
+  document.querySelectorAll('.sk-guided-chip').forEach((chip) => {
+    const code = chip.dataset.guidedCode;
+    const disable = code === 'SF' && !(gameState.bases && gameState.bases.third);
+    chip.disabled = disable;
+    chip.classList.toggle('is-disabled', disable);
+  });
+}
+
+function updateResolverPanel() {
+  const nowEl = document.getElementById('resolver-bases-now');
+  const nextEl = document.getElementById('resolver-bases-next');
+  const metaEl = document.getElementById('resolver-meta');
+  const movesEl = document.getElementById('resolver-moves');
+  const statusEl = document.getElementById('resolver-status');
+  if (!nowEl || !nextEl || !metaEl || !movesEl || !statusEl) return;
+
+  nowEl.innerHTML = renderBaseStrip(gameState.bases || emptyBasesState());
+  nextEl.innerHTML = renderBaseStrip(resolvedPlay && resolvedPlay.bases ? resolvedPlay.bases : (gameState.bases || emptyBasesState()));
+  movesEl.innerHTML = '';
+  statusEl.classList.remove('is-warning');
+
+  if (gameState.contextDirty) {
+    statusEl.textContent = 'Manual state drift';
+    statusEl.classList.add('is-warning');
+    metaEl.textContent = 'Base state is no longer trusted after a manual unsupported code. Use guided plays or reset the inning state.';
+    return;
+  }
+
+  if (!playIntent.playType || !resolvedPlay) {
+    statusEl.textContent = 'Choose a guided play';
+    metaEl.textContent = 'The app will project runner movement, runs, and outs from the current base state.';
+    return;
+  }
+
+  statusEl.textContent = playIntent.playType;
+  if (resolvedPlay.warnings && resolvedPlay.warnings.length) {
+    statusEl.classList.add('is-warning');
+  }
+  metaEl.textContent = `Runs +${resolvedPlay.runsScored} · Outs +${resolvedPlay.outsAdded}${resolvedPlay.warnings && resolvedPlay.warnings.length ? ' · ' + resolvedPlay.warnings.join(' · ') : ''}`;
+  movesEl.innerHTML = (resolvedPlay.moves || []).length
+    ? (resolvedPlay.moves || []).map((move) => {
+        const extra = move.to === 'home' ? ' is-run' : (move.safe === false || move.to === 'out' ? ' is-out' : '');
+        return `<span class="sk-move-chip${extra}">${escapeHtml(moveText(move))}</span>`;
+      }).join('')
+    : `<span class="sk-move-chip">No runner movement</span>`;
+}
+
+function refreshGuidedPreview(code) {
+  playIntent.code = String(code || '').trim().toUpperCase();
+  playIntent.playType = normalizeGuidedPlayType(playIntent.code);
+  playIntent.batterId = playIntent.playType ? buildBatterAppearanceId(currentSide, getCurrentBatter(), true) : null;
+  resolvedPlay = null;
+
+  if (playIntent.playType && resolver && !gameState.contextDirty) {
+    try {
+      resolvedPlay = resolver.resolvePlay(
+        playIntent.playType,
+        { bases: gameState.bases || emptyBasesState() },
+        buildBatterRunner(playIntent.playType, true),
+        playIntent.options || {}
+      );
+    } catch (error) {
+      resolvedPlay = null;
+    }
+  }
+
+  updateGuidedAvailability();
+  updateResolverPanel();
+}
+
+function captureSession() {
+  return {
+    version: 1,
+    meta: clone(meta),
+    plays: clone(plays),
+    totals: clone(totals),
+    ls: clone(ls),
+    notes: clone(notes),
+    lineupNames: clone(lineupNames),
+    lineupPositions: clone(lineupPositions),
+    currentSide,
+    viewSide,
+    curInning,
+    outsThisHalf,
+    batterIndex: clone(batterIndex),
+    gameState: clone(gameState),
+    playIntent: clone(playIntent),
+    resolvedPlay: clone(resolvedPlay),
+    plateAppearanceSeq
+  };
+}
+
+function teamLogoImg(name) {
+  const url = teamLogoUrl(name);
+  return url ? `<img class="ls-team-logo" src="${url}" alt="" loading="lazy">` : '';
+}
+
+function updateMetaLabels() {
+  document.getElementById('sk-game-title').textContent = meta.title || 'New Game';
+  const venueBits = [meta.venue || ''];
+  if (meta.startDateTimeLocal) {
+    const start = new Date(meta.startDateTimeLocal);
+    if (Number.isFinite(start.getTime())) {
+      venueBits.push(start.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }));
+      venueBits.push(start.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }));
+    }
+  }
+  document.getElementById('sk-venue-label').textContent = venueBits.filter(Boolean).join(' · ');
+  const awayEl = document.getElementById('ls-away-name');
+  const homeEl = document.getElementById('ls-home-name');
+  const awayName = meta.awayName || 'Away';
+  const homeName = meta.homeName || 'Home';
+  awayEl.innerHTML = teamLogoImg(awayName) + escapeHtml(awayName);
+  homeEl.innerHTML = teamLogoImg(homeName) + escapeHtml(homeName);
+  const storyPark = document.getElementById('sk-story-park');
+  const storyMatchup = document.getElementById('sk-story-matchup');
+  if (storyPark) storyPark.textContent = meta.venue || 'Waiting on the park';
+  if (storyMatchup) storyMatchup.innerHTML = `${teamLogoImg(awayName)}${escapeHtml(awayName)} at ${teamLogoImg(homeName)}${escapeHtml(homeName)}`;
+}
+
+/* ── Toast system ─────────────────────── */
+let activeToast = null;
+let activeToastTimer = null;
+
+function showToast(message, tone, duration, actionLabel, onAction) {
+  if (tone === undefined) tone = 'info';
+  if (duration === undefined) duration = 3200;
+  if (actionLabel === undefined) actionLabel = '';
+  clearToast();
+  const el = document.createElement('div');
+  el.className = 'bpq-toast';
+  el.dataset.tone = tone;
+  el.setAttribute(tone === 'error' ? 'role' : 'role', tone === 'error' ? 'alert' : 'status');
+  if (tone !== 'error') el.setAttribute('aria-live', 'polite');
+  let html = '<span class="bpq-toast-msg">' + escapeHtml(message) + '</span>';
+  if (actionLabel && onAction) {
+    html += '<button class="bpq-toast-action" type="button">' + escapeHtml(actionLabel) + '</button>';
+  }
+  html += '<button class="bpq-toast-close" type="button" aria-label="Dismiss">×</button>';
+  el.innerHTML = html;
+  document.body.appendChild(el);
+  requestAnimationFrame(function () { requestAnimationFrame(function () { el.classList.add('is-visible'); }); });
+  el.querySelector('.bpq-toast-close').addEventListener('click', clearToast);
+  if (actionLabel && onAction) {
+    el.querySelector('.bpq-toast-action').addEventListener('click', function () { onAction(); clearToast(); });
+  }
+  activeToast = el;
+  if (duration > 0) {
+    activeToastTimer = setTimeout(clearToast, duration);
+  }
+}
+
+function clearToast() {
+  if (activeToastTimer) { clearTimeout(activeToastTimer); activeToastTimer = null; }
+  if (activeToast) { activeToast.remove(); activeToast = null; }
+}
+
+/* ── Save chip ────────────────────────── */
+let _saveChipTimer = null;
+
+function flashSaveChip(success) {
+  const chip = document.getElementById('saveStatusChip');
+  if (!chip) return;
+  if (_saveChipTimer) { clearTimeout(_saveChipTimer); _saveChipTimer = null; }
+  chip.className = 'sk-save-chip ' + (success ? 'saved' : 'failed');
+  chip.textContent = success ? 'Saved ✓' : 'Save failed';
+  if (success) {
+    _saveChipTimer = setTimeout(function () {
+      chip.className = 'sk-save-chip';
+      chip.textContent = '';
+    }, 2000);
+  }
+}
+
+function saveSession() {
+  try {
+    localStorage.setItem(SESSION_KEY, JSON.stringify(captureSession()));
+    flashSaveChip(true);
+  } catch (err) {
+    flashSaveChip(false);
+    showToast('Save failed — storage may be full. Export your data.', 'error', 0);
+  }
+}
+
+function pushUndo() {
+  undoStack.push(captureSession());
+  if (undoStack.length > 30) undoStack.shift();
+}
+
+function restoreSession(snapshot) {
+  if (!snapshot) return;
+  meta = snapshot.meta || getInitialMeta();
+  plays = snapshot.plays || emptyPlays();
+  totals = snapshot.totals || emptyTotals();
+  ls = snapshot.ls || emptyLinescore();
+  notes = Array.isArray(snapshot.notes) ? snapshot.notes : [];
+  lineupNames = Array.isArray(snapshot.lineupNames) && snapshot.lineupNames.length === BATTERS
+    ? snapshot.lineupNames.slice()
+    : DEFAULT_NAMES.slice();
+  lineupPositions = Array.isArray(snapshot.lineupPositions) && snapshot.lineupPositions.length === BATTERS
+    ? snapshot.lineupPositions.slice()
+    : DEFAULT_POSITIONS.slice();
+  currentSide = snapshot.currentSide || 'away';
+  viewSide = snapshot.viewSide || snapshot.currentSide || 'away';
+  curInning = Number.isFinite(snapshot.curInning) ? snapshot.curInning : 0;
+  outsThisHalf = Number.isFinite(snapshot.outsThisHalf) ? snapshot.outsThisHalf : 0;
+  batterIndex = snapshot.batterIndex || { away: 0, home: 0 };
+  gameState = snapshot.gameState || emptyGameState();
+  playIntent = snapshot.playIntent || emptyPlayIntent();
+  resolvedPlay = snapshot.resolvedPlay || null;
+  plateAppearanceSeq = Number.isFinite(snapshot.plateAppearanceSeq) ? snapshot.plateAppearanceSeq : 0;
+  syncGameStateFromLegacy();
+  renderAll();
+}
+
+function applyContextToSession(force) {
+  const context = app && app.getScorekeeperContext ? app.getScorekeeperContext() : null;
+  if (!context) return;
+  const sessionIsEmpty = totalLoggedPlays() === 0 && notes.length === 0;
+  if (force || sessionIsEmpty) {
+    meta.venue = context.venue || meta.venue;
+    meta.parkId = context.parkId || meta.parkId;
+    meta.gameId = context.gameId || meta.gameId;
+    meta.startDateTimeLocal = context.startDateTimeLocal || meta.startDateTimeLocal;
+    meta.awayName = context.awayTeam || meta.awayName;
+    meta.homeName = context.homeTeam || meta.homeName;
+    if (!meta.title || meta.title === 'New Game') meta.title = `${meta.awayName} at ${meta.homeName} scorebook`;
+    updateMetaLabels();
+    saveSession();
+  }
+  if (!viewSide) viewSide = currentSide;
+  if (app && app.clearScorekeeperContext) app.clearScorekeeperContext();
+}
+
+function loadSession() {
+  try {
+    const raw = localStorage.getItem(SESSION_KEY);
+    if (raw) restoreSession(JSON.parse(raw));
+    applyContextToSession(!raw);
+  } catch (error) {
+    applyContextToSession(true);
+  }
+}
+
+function buildGrid() {
+  const lineupEl = document.getElementById('lineup-cells');
+  lineupEl.innerHTML = '';
+  for (let b = 0; b < BATTERS; b++) {
+    const c = document.createElement('div');
+    c.className = 'sk-lineup-cell';
+    c.id = `lc-${b}`;
+    c.innerHTML = `
+      <span class="sk-bat-num">${b + 1}</span>
+      <span class="sk-bat-pos">${lineupPositions[b]}</span>
+      <span class="sk-bat-name"></span>`;
+    lineupEl.appendChild(c);
+  }
+
+  const innEl = document.getElementById('innings-area');
+  innEl.innerHTML = '';
+  for (let i = 0; i < INNINGS; i++) {
+    const col = document.createElement('div');
+    col.className = 'sk-inning-col' + ([2, 5].includes(i) ? ' break-' + ([2, 5].indexOf(i) === 0 ? 3 : 6) : '');
+    col.innerHTML = `<div class="sk-inning-head">${i + 1}</div>`;
+    for (let b = 0; b < BATTERS; b++) {
+      const cell = document.createElement('div');
+      cell.className = 'sk-diamond-cell';
+      cell.id = `cell-${b}-${i}`;
+      cell.innerHTML = renderDiamond(null);
+      cell.addEventListener('click', () => {
+        if (viewSide !== currentSide) return;
+        batterIndex[currentSide] = b;
+        curInning = i;
+        refreshActive();
+      });
+      col.appendChild(cell);
+    }
+    innEl.appendChild(col);
+  }
+
+  const totEl = document.getElementById('totals-cells');
+  totEl.innerHTML = '';
+  for (let b = 0; b < BATTERS; b++) {
+    const c = document.createElement('div');
+    c.className = 'sk-totals-cell';
+    c.id = `tot-${b}`;
+    c.innerHTML = `<span class="totals-ab">0</span><span class="totals-h">0</span>`;
+    totEl.appendChild(c);
+  }
+}
+
+const DP = { t:[44,12], r:[76,44], b:[44,76], l:[12,44] };
+const pt = (p) => `${p[0]},${p[1]}`;
+
+const BASE_PATHS = {
+  '1B' : `M${pt(DP.b)} L${pt(DP.r)}`,
+  '2B' : `M${pt(DP.b)} L${pt(DP.r)} L${pt(DP.t)}`,
+  '3B' : `M${pt(DP.b)} L${pt(DP.r)} L${pt(DP.t)} L${pt(DP.l)}`,
+  'HR' : `M${pt(DP.b)} L${pt(DP.r)} L${pt(DP.t)} L${pt(DP.l)} Z`,
+  'BB' : `M${pt(DP.b)} L${pt(DP.r)}`,
+  'HBP': `M${pt(DP.b)} L${pt(DP.r)}`,
+  'FC' : `M${pt(DP.b)} L${pt(DP.r)}`
+};
+
+function renderDiamond(play, isActive) {
+  const outline = `<path d="M${pt(DP.t)} L${pt(DP.r)} L${pt(DP.b)} L${pt(DP.l)} Z" fill="none" stroke="#C9BA9B" stroke-width="0.8" stroke-dasharray="2,2" opacity="0.35"/>`;
+  const activeRing = isActive && !play
+    ? `<path d="M${pt(DP.t)} L${pt(DP.r)} L${pt(DP.b)} L${pt(DP.l)} Z" fill="none" stroke="#7EB4E0" stroke-width="1.5" opacity="0.4"/>`
+    : '';
+  if (!play) return `<svg viewBox="0 0 88 88" xmlns="http://www.w3.org/2000/svg">${outline}${activeRing}</svg>`;
+
+  const { code, count, outNum, isLastOut } = play;
+  const err = isErr(code);
+  const hit = isHit(code);
+  const hr = code === 'HR';
+  const out = isOut(code);
+  const color = err ? '#C85050' : hit ? '#7EB4E0' : out ? '#A89878' : '#7EB4E0';
+
+  let pathEl = '';
+  if (BASE_PATHS[code]) {
+    const filled = hr ? `fill="${color}" fill-opacity="0.18"` : 'fill="none"';
+    pathEl = `<path d="${BASE_PATHS[code]}" stroke="${color}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" ${filled}/>`;
+  }
+
+  const codeColor = err ? '#C85050' : hit ? '#8AC4E8' : '#A89878';
+  const codeEl = `<text x="5" y="12" font-family="'DM Mono',monospace" font-size="9" fill="${codeColor}" font-weight="500">${escapeHtml(code)}</text>`;
+
+  let outEl = '';
+  if (outNum) {
+    outEl = `<circle cx="75" cy="11" r="7" fill="#A89878" opacity="0.65"/><text x="75" y="15" text-anchor="middle" font-family="'DM Mono',monospace" font-size="9" fill="#1C1A14">${outNum}</text>`;
+  }
+
+  let countEl = '';
+  if (count && count.includes('-')) {
+    const [balls, strikes] = count.split('-').map(Number);
+    const bd = Array.from({ length: Math.min(balls, 4) }, (_, i) => `<circle cx="${4 + i * 5}" cy="79" r="1.8" fill="#7EB4E0" opacity="0.6"/>`).join('');
+    const sd = Array.from({ length: Math.min(strikes, 3) }, (_, i) => `<circle cx="${4 + i * 5}" cy="84" r="1.8" fill="#C85050" opacity="0.6"/>`).join('');
+    countEl = bd + sd;
+  }
+
+  const slash = isLastOut ? `<line x1="60" y1="62" x2="88" y2="88" stroke="#A89878" stroke-width="1.5" stroke-linecap="round" opacity="0.45"/>` : '';
+
+  return `<svg viewBox="0 0 88 88" xmlns="http://www.w3.org/2000/svg">${outline}${pathEl}${codeEl}${outEl}${countEl}${slash}</svg>`;
+}
+
+function updateTotalsCell(batter) {
+  const el = document.getElementById(`tot-${batter}`);
+  if (el) el.innerHTML = `<span class="totals-ab">${totals[viewSide][batter].ab}</span><span class="totals-h">${totals[viewSide][batter].h}</span>`;
+}
+
+function renderVisibleScorecard() {
+  for (let batter = 0; batter < BATTERS; batter++) {
+    const row = document.getElementById(`lc-${batter}`);
+    if (row) {
+      const name = row.querySelector('.sk-bat-name');
+      if (name) name.textContent = lineupNames[batter];
+      const pos = row.querySelector('.sk-bat-pos');
+      if (pos) pos.textContent = lineupPositions[batter];
+    }
+    for (let inning = 0; inning < INNINGS; inning++) {
+      const cell = document.getElementById(`cell-${batter}-${inning}`);
+      if (cell) cell.innerHTML = renderDiamond(plays[viewSide][batter][inning], false);
+    }
+    updateTotalsCell(batter);
+  }
+}
+
+function updateViewSideUI() {
+  const awayBtn = document.getElementById('view-away-btn');
+  const homeBtn = document.getElementById('view-home-btn');
+  const viewInfo = document.getElementById('view-info');
+  if (awayBtn) {
+    awayBtn.textContent = meta.awayName || 'Away';
+    awayBtn.classList.toggle('is-viewing', viewSide === 'away');
+    awayBtn.classList.toggle('is-batting', currentSide === 'away');
+    awayBtn.setAttribute('aria-pressed', viewSide === 'away' ? 'true' : 'false');
+  }
+  if (homeBtn) {
+    homeBtn.textContent = meta.homeName || 'Home';
+    homeBtn.classList.toggle('is-viewing', viewSide === 'home');
+    homeBtn.classList.toggle('is-batting', currentSide === 'home');
+    homeBtn.setAttribute('aria-pressed', viewSide === 'home' ? 'true' : 'false');
+  }
+  if (viewInfo) {
+    const viewedName = viewSide === 'away' ? (meta.awayName || 'Away') : (meta.homeName || 'Home');
+    const activeName = currentSide === 'away' ? (meta.awayName || 'Away') : (meta.homeName || 'Home');
+    viewInfo.textContent = viewSide === currentSide
+      ? `Viewing live ${viewedName} book`
+      : `Viewing ${viewedName} book · ${activeName} batting`;
+  }
+}
+
+function setViewSide(side) {
+  if (side !== 'away' && side !== 'home') return;
+  viewSide = side;
+  saveSession();
+  renderAll();
+}
+
+function updateLinescore() {
+  updateMetaLabels();
+  for (let inning = 0; inning < INNINGS; inning++) {
+    const awayVal = ls.away.inn[inning];
+    const homeVal = ls.home.inn[inning];
+    document.getElementById(`ls-a${inning + 1}`).textContent = awayVal === null ? '·' : awayVal;
+    document.getElementById(`ls-h${inning + 1}`).textContent = homeVal === null ? '·' : homeVal;
+  }
+  document.getElementById('ls-aR').textContent = ls.away.r;
+  document.getElementById('ls-aH').textContent = ls.away.h;
+  document.getElementById('ls-aE').textContent = ls.away.e;
+  document.getElementById('ls-hR').textContent = ls.home.r;
+  document.getElementById('ls-hH').textContent = ls.home.h;
+  document.getElementById('ls-hE').textContent = ls.home.e;
+}
+
+function refreshActive() {
+  renderVisibleScorecard();
+  updateViewSideUI();
+  document.querySelectorAll('.sk-diamond-cell').forEach((cell) => cell.classList.remove('active-cell'));
+  document.querySelectorAll('.sk-lineup-cell').forEach((cell) => cell.classList.remove('active-batter'));
+  const activeBatter = getCurrentBatter();
+  if (viewSide === currentSide) {
+    const activeCell = document.getElementById(`cell-${activeBatter}-${curInning}`);
+    if (activeCell) {
+      activeCell.classList.add('active-cell');
+      if (!plays[currentSide][activeBatter][curInning]) activeCell.innerHTML = renderDiamond(null, true);
+      activeCell.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+    }
+    const lineupCell = document.getElementById(`lc-${activeBatter}`);
+    if (lineupCell) lineupCell.classList.add('active-batter');
+  }
+  [1,2,3].forEach((index) => {
+    document.getElementById(`op${index}`).classList.toggle('filled', index <= outsThisHalf);
+  });
+  document.getElementById('batter-info').textContent = `${currentSide === 'away' ? '↑' : '↓'} ${currentSide === 'away' ? meta.awayName : meta.homeName} · ${lineupNames[activeBatter]}`;
+  document.getElementById('inning-info').textContent = `${currentSide === 'away' ? 'Top' : 'Bottom'} ${ordinals[curInning]}`;
+}
+
+function renderNotes() {
+  const feed = document.getElementById('notes-feed');
+  const countEl = document.getElementById('notes-count');
+  const toggleBtn = document.getElementById('btn-notes-toggle');
+  if (countEl) countEl.textContent = String(notes.length);
+  if (toggleBtn) toggleBtn.textContent = notes.length ? `Notes (${notes.length})` : 'Notes';
+  feed.innerHTML = notes.length
+    ? notes.map((entry) => `
+      <div class="sk-note-entry">
+        <span class="sk-note-inning">${escapeHtml(entry.label)}</span>
+        <span class="sk-note-text ${entry.tone || ''}">${escapeHtml(entry.text)}</span>
+      </div>
+    `).join('')
+    : `
+      <div class="sk-note-entry">
+        <span class="sk-note-inning">NOTES</span>
+        <span class="sk-note-text">No notes yet. Log the feel of the game as it happens.</span>
+      </div>
+    `;
+  feed.scrollTop = feed.scrollHeight;
+}
+
+function renderAll() {
+  syncGameStateFromLegacy();
+  updateLinescore();
+  renderNotes();
+  updateStoryState();
+  refreshActive();
+  updateGuidedAvailability();
+  updateResolverPanel();
+}
+
+function updateStoryState() {
+  const storyCard = document.getElementById('sk-story-card');
+  if (!storyCard) return;
+  storyCard.hidden = totalLoggedPlays() > 0;
+}
+
+function commitResolvedPlay(code, count, playType, result) {
+  const side = currentSide;
+  const fieldingSide = side === 'away' ? 'home' : 'away';
+  const batter = getCurrentBatter();
+  const outsAfter = outsThisHalf + result.outsAdded;
+  const isLastOut = outsAfter >= 3;
+  const inningIndex = curInning;
+
+  if (ls[side].inn[inningIndex] === null) ls[side].inn[inningIndex] = 0;
+
+  plays[side][batter][inningIndex] = {
+    code: code,
+    count: count,
+    outNum: result.outsAdded ? Math.min(outsAfter, 3) : null,
+    isLastOut: isLastOut,
+    resolvedPlay: {
+      playType: playType,
+      runsScored: result.runsScored,
+      outsAdded: result.outsAdded,
+      runnerMoves: clone(result.moves || []),
+      warnings: clone(result.warnings || [])
+    }
+  };
+
+  if (GUIDED_AB_TYPES.has(playType)) totals[side][batter].ab++;
+  if (GUIDED_HIT_TYPES.has(playType)) {
+    totals[side][batter].h++;
+    ls[side].h++;
+  }
+  if (playType === 'E') ls[fieldingSide].e++;
+
+  if (result.runsScored) {
+    ls[side].r += result.runsScored;
+    ls[side].inn[inningIndex] += result.runsScored;
+  }
+
+  gameState.bases = clone(result.bases || emptyBasesState());
+  gameState.score = { away: ls.away.r, home: ls.home.r };
+  gameState.contextDirty = false;
+  outsThisHalf = outsAfter;
+
+  if (GUIDED_PLATE_APPEARANCE_TYPES.has(playType)) {
+    batterIndex[side] = (batter + 1) % BATTERS;
+  }
+
+  if (isLastOut) {
+    plays[side][batter][inningIndex].strandedBases = Object.keys(gameState.bases).filter((base) => gameState.bases[base]);
+    gameState.bases = emptyBasesState();
+    outsThisHalf = 0;
+    currentSide = side === 'away' ? 'home' : 'away';
+    if (currentSide === 'away') curInning = Math.min(curInning + 1, INNINGS - 1);
+  }
+
+  playIntent = emptyPlayIntent();
+  resolvedPlay = null;
+}
+
+function setupStoryMedia() {
+  const media = document.getElementById('sk-story-media');
+  const video = document.getElementById('sk-story-video');
+  const fallback = document.getElementById('sk-story-fallback');
+  if (!media || !video || !fallback) return;
+
+  function showFallback() {
+    media.classList.remove('has-video');
+    fallback.hidden = false;
+  }
+
+  function showVideo() {
+    media.classList.add('has-video');
+    fallback.hidden = true;
+  }
+
+  video.addEventListener('loadeddata', showVideo, { once: true });
+  video.addEventListener('error', showFallback, { once: true });
+
+  const playAttempt = video.play();
+  if (playAttempt && typeof playAttempt.catch === 'function') {
+    playAttempt.then(showVideo).catch(showFallback);
+  }
+}
+
+function logPlay(code, count) {
+  if (!code.trim()) return;
+  pushUndo();
+  const normalizedPlayType = normalizeGuidedPlayType(code);
+
+  if (normalizedPlayType && resolver && !gameState.contextDirty) {
+    const result = resolver.resolvePlay(
+      normalizedPlayType,
+      { bases: gameState.bases || emptyBasesState() },
+      buildBatterRunner(normalizedPlayType, false),
+      playIntent.options || {}
+    );
+    commitResolvedPlay(code, count, normalizedPlayType, result);
+  } else {
+    const side = currentSide;
+    const batter = getCurrentBatter();
+    const out = isOut(code);
+    const hit = isHit(code);
+    const err = isErr(code);
+    const reach = REACH_CODES.has(code);
+    if (out) outsThisHalf++;
+    const isLastOut = outsThisHalf >= 3;
+
+    plays[side][batter][curInning] = { code, count, outNum: out ? outsThisHalf : null, isLastOut };
+
+    if (!(code === 'BB' || code === 'HBP')) totals[side][batter].ab++;
+    if (hit) {
+      totals[side][batter].h++;
+      ls[side].h++;
+    }
+    if (err) ls[side === 'away' ? 'home' : 'away'].e++;
+    if (code === 'HR') {
+      ls[side].r++;
+      ls[side].inn[curInning] = (ls[side].inn[curInning] || 0) + 1;
+    } else if (reach && ls[side].inn[curInning] === null) {
+      ls[side].inn[curInning] = 0;
+    }
+
+    batterIndex[side] = (batter + 1) % BATTERS;
+    if (isLastOut) {
+      outsThisHalf = 0;
+      currentSide = side === 'away' ? 'home' : 'away';
+      if (currentSide === 'away') curInning = Math.min(curInning + 1, INNINGS - 1);
+    }
+
+    gameState.contextDirty = true;
+    playIntent = emptyPlayIntent();
+    resolvedPlay = null;
+  }
+
+  renderAll();
+  saveSession();
+  document.getElementById('play-code').value = '';
+  document.getElementById('play-count').value = '';
+  document.querySelectorAll('.sk-chip').forEach((chip) => chip.classList.remove('is-selected'));
+}
+
+function addNote(text) {
+  const cleanText = text.trim();
+  if (!cleanText) return;
+  pushUndo();
+  const isKey = cleanText.toUpperCase() === cleanText && cleanText.length < 40;
+  notes.push({
+    label: `${currentSide === 'away' ? 'TOP' : 'BOT'} ${curInning + 1}`,
+    text: cleanText,
+    tone: isKey ? 'gold' : ''
+  });
+  renderAll();
+  saveSession();
+}
+
+function clearNoteDrafts() {
+  ['note-input', 'story-note-input'].forEach((id) => {
+    const field = document.getElementById(id);
+    if (field) field.value = '';
+  });
+}
+
+function submitNoteFromField(fieldId) {
+  const field = document.getElementById(fieldId);
+  if (!field) return;
+  const value = field.value.trim();
+  if (!value) return;
+  document.getElementById('notes-panel').classList.add('is-open');
+  addNote(value);
+  clearNoteDrafts();
+  field.focus();
+}
+
+function normalizeLineupInput(value, fallback) {
+  const parsed = String(value || '')
+    .split(',')
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .slice(0, BATTERS);
+  if (parsed.length !== BATTERS) return fallback.slice();
+  return parsed;
+}
+
+function runSetup() {
+  const nextTitle = window.prompt('Game title', meta.title || 'New Game');
+  if (nextTitle === null) return;
+  const nextAway = window.prompt('Away team name', meta.awayName || 'Away');
+  if (nextAway === null) return;
+  const nextHome = window.prompt('Home team name', meta.homeName || 'Home');
+  if (nextHome === null) return;
+  const nextVenue = window.prompt('Venue', meta.venue || '');
+  if (nextVenue === null) return;
+  const nextLineupNames = window.prompt('Lineup names, comma separated', lineupNames.join(', '));
+  if (nextLineupNames === null) return;
+  const nextLineupPositions = window.prompt('Lineup positions, comma separated', lineupPositions.join(', '));
+  if (nextLineupPositions === null) return;
+  meta.title = nextTitle.trim() || 'New Game';
+  meta.awayName = nextAway.trim() || 'Away';
+  meta.homeName = nextHome.trim() || 'Home';
+  meta.venue = nextVenue.trim();
+  lineupNames = normalizeLineupInput(nextLineupNames, lineupNames);
+  lineupPositions = normalizeLineupInput(nextLineupPositions, lineupPositions);
+  renderAll();
+  saveSession();
+}
+
+function exportSession() {
+  const payload = captureSession();
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `${(meta.title || 'ballpark-scorecard').toLowerCase().replace(/[^a-z0-9]+/g, '-')}.json`;
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
+function buildFinalScoreLine() {
+  return `Final: ${meta.awayName || 'Away'} ${ls.away.r}, ${meta.homeName || 'Home'} ${ls.home.r}`;
+}
+
+function buildVisitNotes() {
+  const lines = [buildFinalScoreLine()];
+  if (meta.venue) lines.push(`Venue: ${meta.venue}`);
+  notes.forEach((entry) => {
+    const label = entry && entry.label ? `[${entry.label}] ` : '';
+    const text = entry && entry.text ? entry.text.trim() : '';
+    if (text) lines.push(`${label}${text}`);
+  });
+  return lines.join('\n');
+}
+
+function deriveBestFeature() {
+  const standout = notes.find((entry) => entry && entry.tone === 'gold' && entry.text && entry.text.trim());
+  if (standout) return standout.text.trim();
+  const firstNote = notes.find((entry) => entry && entry.text && entry.text.trim());
+  if (firstNote) return firstNote.text.trim();
+  return buildFinalScoreLine();
+}
+
+function finalizeGame() {
+  const confirmation = window.confirm(
+    `Finish this game?\n\n${buildFinalScoreLine()}\n${meta.venue ? `${meta.venue}\n` : ''}Your scorecard stays saved in this browser. Use Export to keep a copy.`
+  );
+  if (!confirmation) return;
+  pushUndo();
+  meta.final = true;
+  saveSession();
+  renderAll();
+  showToast('Game finished. Use Export to keep a copy of your card.', 'success', 6000, 'Export', exportSession);
+}
+
+function undoLastAction() {
+  const snapshot = undoStack.pop();
+  if (!snapshot) return;
+  restoreSession(snapshot);
+  saveSession();
+}
+
+/* ── Reset with undo ─────────────────── */
+function resetGame() {
+  const priorSnapshot = captureSession();
+  meta = getInitialMeta();
+  plays = emptyPlays();
+  totals = emptyTotals();
+  ls = emptyLinescore();
+  notes = [];
+  currentSide = 'away';
+  viewSide = 'away';
+  curInning = 0;
+  outsThisHalf = 0;
+  batterIndex = { away: 0, home: 0 };
+  lineupNames = DEFAULT_NAMES.slice();
+  lineupPositions = DEFAULT_POSITIONS.slice();
+  undoStack = [];
+  renderAll();
+  saveSession();
+  showToast('Game reset.', 'undo', 5000, 'Undo', function () {
+    restoreSession(priorSnapshot);
+    saveSession();
+    showToast('Reset undone.', 'success', 2200);
+  });
+}
+
+/* ── Clear session (delete) with undo ── */
+function clearSession() {
+  const priorSnapshot = captureSession();
+  try { localStorage.removeItem(SESSION_KEY); } catch (e) { /* ignore */ }
+  meta = getInitialMeta();
+  plays = emptyPlays();
+  totals = emptyTotals();
+  ls = emptyLinescore();
+  notes = [];
+  currentSide = 'away';
+  viewSide = 'away';
+  curInning = 0;
+  outsThisHalf = 0;
+  batterIndex = { away: 0, home: 0 };
+  lineupNames = DEFAULT_NAMES.slice();
+  lineupPositions = DEFAULT_POSITIONS.slice();
+  undoStack = [];
+  renderAll();
+  showToast('Session cleared.', 'undo', 5000, 'Undo', function () {
+    restoreSession(priorSnapshot);
+    saveSession();
+    showToast('Session restored.', 'success', 2200);
+  });
+}
+
+/* ── Import validation + flow ────────── */
+const VALID_PLAY_CODES = new Set([
+  'K', 'Ʞ', '6-3', '5-3', '4-3', '1-3', '3-1', 'F7', 'F8', 'F9', 'F3', 'F4', 'F5', 'F6',
+  'L7', 'L8', 'L9', 'L3', 'L4', 'L5', 'L6',
+  'DP4-6-3', 'DP6-4-3', 'DP5-4-3', 'DP3-6-3',
+  '1B', '2B', '3B', 'HR', 'BB', 'HBP', 'FC',
+  'E', 'E1', 'E2', 'E3', 'E4', 'E5', 'E6', 'E7', 'E8', 'E9',
+  'SAC', 'SF', 'FO', 'GO', 'DP', 'SB', 'CS', 'WP'
+]);
+
+function validateGameImport(obj) {
+  if (!obj || typeof obj !== 'object') return 'Import data is not a valid object.';
+  if (typeof obj.version !== 'number') return 'Missing version field.';
+  if (!obj.meta || typeof obj.meta !== 'object') return 'Missing meta object.';
+  if (!obj.meta.awayName || typeof obj.meta.awayName !== 'string') return 'Missing or invalid meta.awayName.';
+  if (!obj.meta.homeName || typeof obj.meta.homeName !== 'string') return 'Missing or invalid meta.homeName.';
+  if (!obj.plays || typeof obj.plays !== 'object') return 'Missing plays object.';
+  for (const side of ['away', 'home']) {
+    if (!Array.isArray(obj.plays[side])) return 'plays.' + side + ' must be an array.';
+    for (let b = 0; b < obj.plays[side].length; b++) {
+      if (!Array.isArray(obj.plays[side][b])) return 'plays.' + side + '[' + b + '] must be an array.';
+      for (let i = 0; i < obj.plays[side][b].length; i++) {
+        const play = obj.plays[side][b][i];
+        if (play === null) continue;
+        if (!play || typeof play !== 'object' || !play.code) return 'Invalid play at ' + side + '[' + b + '][' + i + '].';
+        if (!VALID_PLAY_CODES.has(play.code) && !isOut(play.code) && !isHit(play.code) && !isErr(play.code)) {
+          return 'Unknown play code "' + play.code + '" at ' + side + '[' + b + '][' + i + '].';
+        }
+      }
+    }
+  }
+  if (!obj.ls || typeof obj.ls !== 'object') return 'Missing linescore (ls) object.';
+  return null;
+}
+
+function importSession() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json,application/json';
+  input.addEventListener('change', function () {
+    const file = input.files && input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function () {
+      let parsed;
+      try { parsed = JSON.parse(reader.result); } catch (e) {
+        showToast('Invalid JSON file.', 'error', 5000);
+        return;
+      }
+      const error = validateGameImport(parsed);
+      if (error) {
+        showToast(error, 'error', 5000);
+        return;
+      }
+      pushUndo();
+      restoreSession(parsed);
+      saveSession();
+      showToast('Game imported: ' + escapeHtml(parsed.meta.title || 'Untitled'), 'success', 3200);
+    };
+    reader.onerror = function () {
+      showToast('Failed to read file.', 'error', 5000);
+    };
+    reader.readAsText(file);
+  });
+  input.click();
+}
+
+document.querySelectorAll('.sk-chip').forEach((chip) => {
+  chip.addEventListener('click', () => {
+    const code = chip.dataset.guidedCode || chip.dataset.code;
+    if (!code) return;
+    document.getElementById('play-code').value = code;
+    document.querySelectorAll('.sk-chip').forEach((item) => item.classList.remove('is-selected'));
+    chip.classList.add('is-selected');
+    refreshGuidedPreview(code);
+  });
+});
+
+document.getElementById('log-btn').addEventListener('click', () => {
+  logPlay(
+    document.getElementById('play-code').value.trim(),
+    document.getElementById('play-count').value.trim()
+  );
+});
+
+document.getElementById('play-code').addEventListener('keydown', (event) => {
+  if (event.key === 'Enter') document.getElementById('log-btn').click();
+});
+
+document.getElementById('play-code').addEventListener('input', (event) => {
+  document.querySelectorAll('.sk-chip').forEach((item) => item.classList.remove('is-selected'));
+  const normalized = String(event.target.value || '').trim().toUpperCase();
+  if (!normalized) {
+    playIntent = emptyPlayIntent();
+    resolvedPlay = null;
+    updateResolverPanel();
+    return;
+  }
+  refreshGuidedPreview(normalized);
+});
+
+document.addEventListener('keydown', (event) => {
+  if ((event.metaKey || event.ctrlKey) && event.key === 'z') {
+    event.preventDefault();
+    undoLastAction();
+  }
+});
+
+document.getElementById('btn-notes-toggle').addEventListener('click', () => {
+  const panel = document.getElementById('notes-panel');
+  panel.classList.toggle('is-open');
+  if (panel.classList.contains('is-open')) {
+    const input = document.getElementById('note-input');
+    if (input) input.focus();
+  }
+});
+
+document.getElementById('note-add-btn').addEventListener('click', () => submitNoteFromField('note-input'));
+document.getElementById('story-note-add-btn').addEventListener('click', () => submitNoteFromField('story-note-input'));
+
+document.getElementById('note-input').addEventListener('keydown', (event) => {
+  if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') {
+    event.preventDefault();
+    submitNoteFromField('note-input');
+  }
+});
+
+document.getElementById('story-note-input').addEventListener('keydown', (event) => {
+  if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') {
+    event.preventDefault();
+    submitNoteFromField('story-note-input');
+  }
+});
+
+document.getElementById('btn-undo').addEventListener('click', undoLastAction);
+document.getElementById('btn-export').addEventListener('click', exportSession);
+document.getElementById('btn-import').addEventListener('click', importSession);
+document.getElementById('btn-reset').addEventListener('click', resetGame);
+document.getElementById('btn-finish').addEventListener('click', finalizeGame);
+document.getElementById('btn-setup').addEventListener('click', runSetup);
+document.getElementById('view-away-btn').addEventListener('click', () => setViewSide('away'));
+document.getElementById('view-home-btn').addEventListener('click', () => setViewSide('home'));
+
+document.addEventListener('penDetected', () => {
+  console.log('[BPQ] Pen detected — ink overlay ready for Phase 2');
+});
+
+window.render_game_to_text = function renderGameToText() {
+  return JSON.stringify({
+    title: meta.title,
+    venue: meta.venue,
+    gameId: meta.gameId,
+    startDateTimeLocal: meta.startDateTimeLocal,
+    currentSide,
+    viewSide,
+    inning: curInning + 1,
+    outs: outsThisHalf,
+    batter: getCurrentBatter() + 1,
+    bases: {
+      first: !!(gameState.bases && gameState.bases.first),
+      second: !!(gameState.bases && gameState.bases.second),
+      third: !!(gameState.bases && gameState.bases.third)
+    },
+    guidedPlay: playIntent.playType,
+    preview: resolvedPlay ? {
+      runsScored: resolvedPlay.runsScored,
+      outsAdded: resolvedPlay.outsAdded,
+      moveCount: (resolvedPlay.moves || []).length,
+      warnings: resolvedPlay.warnings || []
+    } : null,
+    contextDirty: !!gameState.contextDirty,
+    away: { name: meta.awayName, r: ls.away.r, h: ls.away.h, e: ls.away.e },
+    home: { name: meta.homeName, r: ls.home.r, h: ls.home.h, e: ls.home.e },
+    notes: notes.length
+  });
+};
+
+window.advanceTime = function advanceTime() {
+  return null;
+};
+
+buildGrid();
+setupStoryMedia();
+loadSession();
+updateViewSideUI();
+renderAll();
+</script>
+</body>
+</html>

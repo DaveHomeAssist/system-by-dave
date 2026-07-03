@@ -30,6 +30,7 @@ STATIC_PAGES = [
     ("agents.html", "weekly", "0.7"),
     ("widgets.html", "weekly", "0.7"),
     ("world-cup/", "weekly", "0.7"),
+    ("scorecard/", "monthly", "0.6"),
     ("hat-in-ring/", "weekly", "0.7"),
     ("marsscape/", "monthly", "0.7"),
     ("resume/", "monthly", "0.6"),
