@@ -1,6 +1,6 @@
 {
-  "name": "My Notes",
-  "short_name": "My Notes",
+  "name": "NoteForge",
+  "short_name": "NoteForge",
   "description": "A local-first markdown notes app with wikilinks, backlinks, tags, and a graph.",
   "start_url": "./",
   "scope": "./",

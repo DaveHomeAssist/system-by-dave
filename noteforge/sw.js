@@ -4,12 +4,12 @@
 // (e.g. external banner images) are never touched, matching the app's CSP/privacy
 // posture. Registered only in production (see src/app/pwa.js).
 
-// f233a6e27f12 is replaced at build time (vite.config.js) with a per-build id so
+// 81e1d83273b2 is replaced at build time (vite.config.js) with a per-build id so
 // the SW bytes change every deploy — that's what makes the browser install the new
 // worker, re-run install/activate, and delete the previous cache. In dev the SW is
 // never registered (see src/app/pwa.js), so the literal placeholder is harmless.
-const CACHE = 'my-notes-f233a6e27f12';
-// Base path this SW is scoped to (e.g. "/my-notes-app/" on GitHub Pages, "/" at
+const CACHE = 'noteforge-81e1d83273b2';
+// Base path this SW is scoped to (e.g. "/noteforge/" on GitHub Pages, "/" at
 // root). Derived from the SW's own URL so the same file works under any deploy path.
 const BASE = new URL('./', self.location).pathname;
 const SHELL = BASE; // app-shell / start URL
