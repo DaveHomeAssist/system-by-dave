@@ -1,0 +1,50 @@
+name: Deploy site to Pages
+
+# Publishes the repo's static content to GitHub Pages via Actions, replacing the
+# legacy branch build (which was erratically slow — 10-15 min hangs). Serves the
+# SAME files the legacy build did: the whole repo root, minus VCS + CI tooling
+# (.git / .github), so the git history is never exposed. .nojekyll + CNAME are
+# carried through, so no Jekyll processing and the custom domain is preserved.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Don't cancel an in-flight publish of the live site.
+concurrency:
+  group: systembydave-pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      # Actions pinned by SHA per GitHub's security-hardening guide.
+      - name: Checkout
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+
+      - name: Stage site (everything except VCS + CI tooling)
+        run: |
+          mkdir -p _site
+          rsync -a --exclude='.git' --exclude='.github' --exclude='_site' ./ _site/
+          echo "Staged $(find _site -type f | wc -l) files."
+
+      - name: Configure Pages
+        uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5.0.0
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3.0.1
+        with:
+          path: _site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4.0.5
