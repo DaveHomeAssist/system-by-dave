@@ -97,30 +97,51 @@
 .av-domain-card.is-passed,
 .av-domain-card.is-hot,
 .av-domain-card.is-online,
-.av-domain-card.is-clean {
+.av-domain-card.is-clean,
+.av-domain-card.is-tested,
+.av-domain-card.is-loaded,
+.av-domain-card.is-arrived,
+.av-domain-card.is-delivered,
+.av-domain-card.is-built,
+.av-domain-card.is-returned,
+.av-domain-card.is-done,
+.av-domain-card.is-taken {
   border-color: rgba(107, 224, 146, .38);
 }
 
 .av-domain-card.is-patched,
 .av-domain-card.is-linecheck,
 .av-domain-card.is-gained,
-.av-domain-card.is-scanned {
+.av-domain-card.is-scanned,
+.av-domain-card.is-pulled,
+.av-domain-card.is-staged,
+.av-domain-card.is-strapped,
+.av-domain-card.is-struck,
+.av-domain-card.is-active {
   border-color: rgba(114, 184, 255, .4);
 }
 
 .av-domain-card.is-open,
 .av-domain-card.is-pending,
-.av-domain-card.is-planned {
+.av-domain-card.is-planned,
+.av-domain-card.is-needed,
+.av-domain-card.is-hold,
+.av-domain-card.is-watch,
+.av-domain-card.is-deferred,
+.av-domain-card.is-building,
+.av-domain-card.is-strike {
   border-color: rgba(255, 209, 102, .34);
 }
 
 .av-domain-card.is-problem,
-.av-domain-card.is-muted {
+.av-domain-card.is-muted,
+.av-domain-card.is-missing,
+.av-domain-card.is-blocked {
   border-color: rgba(255, 107, 107, .42);
 }
 
 .av-domain-card.is-spare,
-.av-domain-card.is-struck {
+.av-domain-card.is-na {
   border-color: rgba(118, 131, 145, .42);
 }
 
@@ -181,7 +202,15 @@
 .av-domain-status.is-passed,
 .av-domain-status.is-hot,
 .av-domain-status.is-online,
-.av-domain-status.is-clean {
+.av-domain-status.is-clean,
+.av-domain-status.is-tested,
+.av-domain-status.is-loaded,
+.av-domain-status.is-arrived,
+.av-domain-status.is-delivered,
+.av-domain-status.is-built,
+.av-domain-status.is-returned,
+.av-domain-status.is-done,
+.av-domain-status.is-taken {
   border-color: rgba(107, 224, 146, .48);
   color: #c9ffd8;
 }
@@ -189,26 +218,39 @@
 .av-domain-status.is-patched,
 .av-domain-status.is-linecheck,
 .av-domain-status.is-gained,
-.av-domain-status.is-scanned {
+.av-domain-status.is-scanned,
+.av-domain-status.is-pulled,
+.av-domain-status.is-staged,
+.av-domain-status.is-strapped,
+.av-domain-status.is-struck,
+.av-domain-status.is-active {
   border-color: rgba(114, 184, 255, .48);
   color: #d4ebff;
 }
 
 .av-domain-status.is-open,
 .av-domain-status.is-pending,
-.av-domain-status.is-planned {
+.av-domain-status.is-planned,
+.av-domain-status.is-needed,
+.av-domain-status.is-hold,
+.av-domain-status.is-watch,
+.av-domain-status.is-deferred,
+.av-domain-status.is-building,
+.av-domain-status.is-strike {
   border-color: rgba(255, 209, 102, .48);
   color: #ffe3a3;
 }
 
 .av-domain-status.is-problem,
-.av-domain-status.is-muted {
+.av-domain-status.is-muted,
+.av-domain-status.is-missing,
+.av-domain-status.is-blocked {
   border-color: rgba(255, 107, 107, .48);
   color: #ffd5d5;
 }
 
 .av-domain-status.is-spare,
-.av-domain-status.is-struck {
+.av-domain-status.is-na {
   border-color: rgba(118, 131, 145, .5);
   color: #d7dee7;
 }

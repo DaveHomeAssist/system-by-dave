@@ -684,6 +684,7 @@
   }
 </style>
 <link rel="stylesheet" href="css/responsive-tables.css">
+<link rel="stylesheet" href="css/av-domain-views.css">
 </head>
 <body>
 <h1 style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;">Camera Shot List</h1>
@@ -1113,6 +1114,7 @@
     var input = document.createElement('input');
     input.className = 'row-input ' + className;
     input.value = shot[key] || '';
+    input.setAttribute('data-field', key);
     input.setAttribute('aria-label', key + ' for shot ' + shot.number);
     input.addEventListener('focus', function(){ selectedId = shot.id; renderInspector(); });
     input.addEventListener('input', function(){
@@ -1130,6 +1132,7 @@
     var textarea = document.createElement('textarea');
     textarea.className = 'row-textarea ' + className;
     textarea.value = shot[key] || '';
+    textarea.setAttribute('data-field', key);
     textarea.setAttribute('aria-label', key + ' for shot ' + shot.number);
     textarea.addEventListener('focus', function(){ selectedId = shot.id; renderInspector(); });
     textarea.addEventListener('input', function(){
@@ -1145,6 +1148,7 @@
     var td = document.createElement('td');
     var select = document.createElement('select');
     select.className = 'row-select field-small';
+    select.setAttribute('data-field', 'status');
     select.setAttribute('aria-label', 'status for shot ' + shot.number);
     [
       ['ready','Ready'],
@@ -1512,5 +1516,6 @@
 <script src="js/av-suite-context.js"></script>
 <script src="js/sbd-nav.js" defer></script>
 <script src="js/responsive-tables.js" defer></script>
+<script src="js/av-domain-views.js" defer></script>
 </body>
 </html>

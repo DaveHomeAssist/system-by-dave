@@ -89,6 +89,90 @@
       fields: ['unit', 'type', 'owner', 'zone', 'frequency', 'band', 'channel', 'status', 'backup', 'notes'],
       empty: 'No visible RF units. Clear filters or add a wireless unit.',
       card: rfCoordinationCard
+    },
+    'gear-prep.html': {
+      id: 'gearPrepView',
+      bodySelector: '#itemBody',
+      insertBefore: '.workspace',
+      eyebrow: 'Gear pull',
+      title: 'Gear Prep Pull View',
+      summary: 'Items, quantities, cases, locations, owners, pack state, and issue notes as pull cards.',
+      countLabel: 'visible items',
+      fields: ['item', 'category', 'qty', 'caseId', 'location', 'owner', 'status', 'notes'],
+      empty: 'No visible gear items. Clear filters or add a pull item.',
+      card: gearPrepCard
+    },
+    'truck-pack.html': {
+      id: 'truckPackView',
+      bodySelector: '#itemBody',
+      insertBefore: '.workspace',
+      eyebrow: 'Truck map',
+      title: 'Truck Pack Load View',
+      summary: 'Cases, zones, load order, unload order, owner, weight, and issues as load cards.',
+      countLabel: 'visible cases',
+      fields: ['department', 'caseId', 'contents', 'truckZone', 'loadOrder', 'unloadOrder', 'weight', 'owner', 'status', 'issue', 'notes'],
+      empty: 'No visible truck cases. Clear filters or add a case.',
+      card: truckPackCard
+    },
+    'load-in-plan.html': {
+      id: 'loadInView',
+      bodySelector: '#itemBody',
+      insertBefore: '.workspace',
+      eyebrow: 'Load in',
+      title: 'Load In Delivery View',
+      summary: 'Truck, dock, destination, owner, due time, blocker, and build state as delivery cards.',
+      countLabel: 'visible items',
+      fields: ['department', 'item', 'truck', 'dock', 'destination', 'owner', 'due', 'status', 'blocker', 'notes'],
+      empty: 'No visible load-in items. Clear filters or add a delivery item.',
+      card: loadInCard
+    },
+    'strike-plan.html': {
+      id: 'strikePlanView',
+      bodySelector: '#itemBody',
+      insertBefore: '.workspace',
+      eyebrow: 'Strike map',
+      title: 'Strike Packout View',
+      summary: 'Departments, gear, locations, cases, destinations, owners, and missing items as packout cards.',
+      countLabel: 'visible items',
+      fields: ['department', 'item', 'location', 'owner', 'caseId', 'destination', 'status', 'issue', 'notes'],
+      empty: 'No visible strike items. Clear filters or add a packout item.',
+      card: strikePlanCard
+    },
+    'room-check.html': {
+      id: 'roomCheckView',
+      bodySelector: '#itemBody',
+      insertBefore: '.workspace',
+      eyebrow: 'Room checks',
+      title: 'Room Readiness View',
+      summary: 'Area checks, owners, due times, priorities, blockers, and readiness state as room cards.',
+      countLabel: 'visible checks',
+      fields: ['area', 'check', 'owner', 'due', 'priority', 'status', 'blocker', 'notes'],
+      empty: 'No visible room checks. Clear filters or add a check.',
+      card: roomCheckCard
+    },
+    'breakout-room-matrix.html': {
+      id: 'breakoutRoomView',
+      bodySelector: '#roomBody',
+      insertBefore: '.workspace',
+      eyebrow: 'Breakout map',
+      title: 'Breakout Room Run View',
+      summary: 'Rooms, tracks, sessions, techs, producers, AV needs, risk, blockers, and status as room cards.',
+      countLabel: 'visible rooms',
+      fields: ['room', 'track', 'session', 'start', 'end', 'tech', 'producer', 'audio', 'video', 'network', 'power', 'status', 'risk', 'blocker', 'notes'],
+      empty: 'No visible breakout rooms. Clear filters or add a room.',
+      card: breakoutRoomCard
+    },
+    'camera-shot-list.html': {
+      id: 'cameraShotView',
+      bodySelector: '#shotBody',
+      insertBefore: '.workspace',
+      eyebrow: 'Camera rail',
+      title: 'Camera Shot Run View',
+      summary: 'Shot number, cue, camera, subject, framing, movement, preset, and take state as show-calling cards.',
+      countLabel: 'visible shots',
+      fields: ['number', 'cue', 'camera', 'type', 'subject', 'framing', 'movement', 'preset', 'status', 'notes'],
+      empty: 'No visible camera shots. Clear filters or load the sample plan.',
+      card: cameraShotCard
     }
   };
 
@@ -357,6 +441,147 @@
       end: zone,
       meta: item.backup ? 'Backup: ' + item.backup : 'No backup unit',
       note: item.notes || ''
+    });
+  }
+
+  function gearPrepCard(item) {
+    var status = normalizeToken(item.status || 'needed');
+    return channelCard({
+      id: item.id,
+      selected: item.selected,
+      status: status,
+      aria: 'Open gear item ' + (item.item || item.caseId || 'row'),
+      kicker: item.caseId || 'Gear',
+      badge: titleCase(item.category || 'gear'),
+      startLabel: 'Item',
+      source: [item.qty ? item.qty + 'x' : '', item.item || 'Item open'].filter(Boolean).join(' '),
+      middleLabel: 'Location',
+      middle: item.location || 'Location open',
+      endLabel: 'Owner',
+      end: item.owner || 'Owner open',
+      meta: item.caseId ? 'Case: ' + item.caseId : 'No case ID',
+      note: item.notes || ''
+    });
+  }
+
+  function truckPackCard(item) {
+    var status = normalizeToken(item.status || 'planned');
+    var order = ['Load ' + (item.loadOrder || '?'), 'Unload ' + (item.unloadOrder || '?')].join(' / ');
+    return channelCard({
+      id: item.id,
+      selected: item.selected,
+      status: status,
+      aria: 'Open truck case ' + (item.caseId || item.contents || 'row'),
+      kicker: item.caseId || 'Case',
+      badge: titleCase(item.department || 'truck'),
+      startLabel: 'Contents',
+      source: item.contents || 'Contents open',
+      middleLabel: 'Zone',
+      middle: [titleCase(item.truckZone || ''), order].filter(Boolean).join(' / '),
+      endLabel: 'Owner',
+      end: item.owner || 'Owner open',
+      meta: item.weight ? 'Weight: ' + item.weight + ' lb' : 'No weight',
+      note: item.issue || item.notes || ''
+    });
+  }
+
+  function loadInCard(item) {
+    var status = normalizeToken(item.status || 'planned');
+    return channelCard({
+      id: item.id,
+      selected: item.selected,
+      status: status,
+      aria: 'Open load-in item ' + (item.item || item.destination || 'row'),
+      kicker: item.due || 'Load in',
+      badge: titleCase(item.department || 'load'),
+      startLabel: 'Item',
+      source: item.item || 'Item open',
+      middleLabel: 'Route',
+      middle: [item.truck || 'Truck open', item.dock || 'Dock open'].join(' / '),
+      endLabel: 'Destination',
+      end: item.destination || 'Destination open',
+      meta: item.owner ? 'Owner: ' + item.owner : 'Owner open',
+      note: item.blocker || item.notes || ''
+    });
+  }
+
+  function strikePlanCard(item) {
+    var status = normalizeToken(item.status || 'pending');
+    return channelCard({
+      id: item.id,
+      selected: item.selected,
+      status: status,
+      aria: 'Open strike item ' + (item.item || item.caseId || 'row'),
+      kicker: item.caseId || 'Strike',
+      badge: titleCase(item.department || 'strike'),
+      startLabel: 'Item',
+      source: item.item || 'Item open',
+      middleLabel: 'From',
+      middle: item.location || 'Location open',
+      endLabel: 'To',
+      end: item.destination || 'Destination open',
+      meta: item.owner ? 'Owner: ' + item.owner : 'Owner open',
+      note: item.issue || item.notes || ''
+    });
+  }
+
+  function roomCheckCard(item) {
+    var status = normalizeToken(item.status || 'pending');
+    return channelCard({
+      id: item.id,
+      selected: item.selected,
+      status: status,
+      aria: 'Open room check ' + (item.check || item.area || 'row'),
+      kicker: item.due || 'Room',
+      badge: titleCase(item.area || 'room'),
+      startLabel: 'Check',
+      source: item.check || 'Check open',
+      middleLabel: 'Owner',
+      middle: item.owner || 'Owner open',
+      endLabel: 'Priority',
+      end: titleCase(item.priority || 'normal'),
+      meta: item.blocker ? 'Blocker: ' + item.blocker : 'No blocker',
+      note: item.notes || ''
+    });
+  }
+
+  function breakoutRoomCard(room) {
+    var status = normalizeToken(room.status || 'planned');
+    return channelCard({
+      id: room.id,
+      selected: room.selected,
+      status: status,
+      aria: 'Open breakout room ' + (room.room || room.session || 'row'),
+      kicker: room.room || 'Room',
+      badge: titleCase(room.risk || 'normal') + ' risk',
+      startLabel: 'Session',
+      source: room.session || 'Session open',
+      middleLabel: 'Crew',
+      middle: [room.tech || 'Tech open', room.producer || 'Producer open'].join(' / '),
+      endLabel: 'Schedule',
+      end: [room.start || '?', room.end || '?'].join(' - '),
+      meta: [room.audio ? 'Audio: ' + room.audio : '', room.video ? 'Video: ' + room.video : '', room.network ? 'Network: ' + room.network : ''].filter(Boolean).join(' | '),
+      note: room.blocker || room.notes || ''
+    });
+  }
+
+  function cameraShotCard(shot) {
+    var status = normalizeToken(shot.status || 'hold');
+    return channelCard({
+      id: shot.id,
+      selected: shot.selected,
+      status: status,
+      aria: 'Open camera shot ' + (shot.number || shot.subject || 'row'),
+      kicker: shot.number || 'Shot',
+      badge: shot.camera || 'Camera',
+      startLabel: 'Subject',
+      source: shot.subject || 'Subject open',
+      middleLabel: 'Frame',
+      middle: shot.framing || 'Framing open',
+      endLabel: 'Move',
+      end: [shot.movement || 'Move open', shot.preset ? 'Preset ' + shot.preset : 'No preset'].join(' / '),
+      meta: [shot.cue ? 'Cue: ' + shot.cue : '', shot.type ? 'Type: ' + shot.type : ''].filter(Boolean).join(' | '),
+      note: shot.notes || ''
     });
   }
 

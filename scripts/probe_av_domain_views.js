@@ -110,6 +110,97 @@ const targets = [
     editField: 'unit',
     editValue: 'Probe RF unit',
     requireClasses: ['is-clean', 'is-issue']
+  },
+  {
+    name: 'gear-prep',
+    page: 'gear-prep.html',
+    title: 'Gear Prep',
+    panel: '#gearPrepView',
+    body: '#itemBody',
+    countLabel: 'visible items',
+    minRows: 8,
+    expects: ['Main video switcher', 'VID-01'],
+    editField: 'item',
+    editValue: 'Probe gear item',
+    requireClasses: ['is-tested', 'is-issue']
+  },
+  {
+    name: 'truck-pack',
+    page: 'truck-pack.html',
+    title: 'Truck Pack',
+    panel: '#truckPackView',
+    body: '#itemBody',
+    countLabel: 'visible cases',
+    minRows: 8,
+    expects: ['FOH console case', 'A-FOH'],
+    editField: 'contents',
+    editValue: 'Probe truck case',
+    requireClasses: ['is-loaded', 'is-issue']
+  },
+  {
+    name: 'load-in-plan',
+    page: 'load-in-plan.html',
+    title: 'Load In Plan',
+    panel: '#loadInView',
+    body: '#itemBody',
+    countLabel: 'visible items',
+    minRows: 8,
+    expects: ['Truck arrival and unload lane', 'Dock A'],
+    editField: 'item',
+    editValue: 'Probe load-in item',
+    requireClasses: ['is-built', 'is-issue']
+  },
+  {
+    name: 'strike-plan',
+    page: 'strike-plan.html',
+    title: 'Strike Plan',
+    panel: '#strikePlanView',
+    body: '#itemBody',
+    countLabel: 'visible items',
+    minRows: 10,
+    expects: ['FOH console and stagebox', 'Audio 01'],
+    editField: 'item',
+    editValue: 'Probe strike item',
+    requireClasses: ['is-returned', 'is-missing']
+  },
+  {
+    name: 'room-check',
+    page: 'room-check.html',
+    title: 'Room Check',
+    panel: '#roomCheckView',
+    body: '#itemBody',
+    countLabel: 'visible checks',
+    minRows: 10,
+    expects: ['Room walk and sightlines', 'Lead tech'],
+    editField: 'check',
+    editValue: 'Probe room check',
+    requireClasses: ['is-ready', 'is-issue']
+  },
+  {
+    name: 'breakout-room-matrix',
+    page: 'breakout-room-matrix.html',
+    title: 'Breakout Room Matrix',
+    panel: '#breakoutRoomView',
+    body: '#roomBody',
+    countLabel: 'visible rooms',
+    minRows: 8,
+    expects: ['Room 201', 'Opening breakout'],
+    editField: 'session',
+    editValue: 'Probe breakout session',
+    requireClasses: ['is-ready', 'is-blocked']
+  },
+  {
+    name: 'camera-shot-list',
+    page: 'camera-shot-list.html',
+    title: 'Camera Shot List',
+    panel: '#cameraShotView',
+    body: '#shotBody',
+    countLabel: 'visible shots',
+    minRows: 6,
+    expects: ['Room and lectern', 'Opening wide'],
+    editField: 'subject',
+    editValue: 'Probe camera subject',
+    requireClasses: ['is-ready', 'is-hold']
   }
 ];
 

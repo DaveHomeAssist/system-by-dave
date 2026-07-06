@@ -137,7 +137,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool change — rolls the service-worker cache. */
-    version:'v20260703-power-network-rf',
+    version:'v20260706-logistics-rooms-camera',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,
