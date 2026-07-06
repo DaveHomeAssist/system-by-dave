@@ -1,0 +1,2284 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Career Market Command Center</title>
+  <meta name="description" content="Private career-market command center for job listings, resume variants, proof links, and application packets.">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <meta name="theme-color" content="#141820">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none';">
+  <link rel="canonical" href="https://systembydave.com/career-market.html">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="System by Dave">
+  <meta property="og:title" content="Career Market Command Center">
+  <meta property="og:description" content="Private local-first application command center for job listings, resume variants, proof links, and packets.">
+  <meta property="og:url" content="https://systembydave.com/career-market.html">
+  <meta property="og:image" content="https://systembydave.com/img/og-card.jpg">
+  <meta property="og:image:alt" content="System by Dave career market command center">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Career Market Command Center">
+  <meta name="twitter:description" content="Private local-first application command center for job listings, resume variants, proof links, and packets.">
+  <meta name="twitter:image" content="https://systembydave.com/img/og-card.jpg">
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #101318;
+      --panel: #171b22;
+      --panel-2: #1e242d;
+      --panel-3: #252c37;
+      --text: #f4f6f8;
+      --muted: #aab2bd;
+      --line: #353d4a;
+      --hot: #ffb84d;
+      --good: #5dd39e;
+      --warn: #ff7a70;
+      --info: #6da8ff;
+      --shadow: 0 18px 48px rgba(0, 0, 0, 0.34);
+      --radius: 8px;
+      --font: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    }
+
+    [data-theme="light"] {
+      color-scheme: light;
+      --bg: #f5f6f8;
+      --panel: #ffffff;
+      --panel-2: #f0f2f5;
+      --panel-3: #e5e9ef;
+      --text: #171b22;
+      --muted: #536071;
+      --line: #cfd6df;
+      --shadow: 0 12px 32px rgba(38, 49, 63, 0.14);
+    }
+
+    [data-theme="medium"] {
+      color-scheme: dark;
+      --bg: #141820;
+      --panel: #1d232d;
+      --panel-2: #252d39;
+      --panel-3: #2f3947;
+      --text: #f7f8fa;
+      --muted: #b5beca;
+      --line: #3d4858;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      letter-spacing: 0;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    button,
+    a {
+      touch-action: manipulation;
+    }
+
+    a {
+      color: var(--info);
+    }
+
+    .app-shell {
+      display: grid;
+      grid-template-columns: 250px minmax(0, 1fr);
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+      padding: 24px 18px;
+      border-right: 1px solid var(--line);
+      background: color-mix(in srgb, var(--panel) 92%, var(--bg));
+      overflow-y: auto;
+    }
+
+    .brand {
+      display: grid;
+      gap: 6px;
+    }
+
+    .eyebrow {
+      margin: 0;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 11px;
+      text-transform: uppercase;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 22px;
+      line-height: 1.05;
+    }
+
+    .brand p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .nav {
+      display: grid;
+      gap: 8px;
+    }
+
+    .nav button,
+    .ghost-btn,
+    .primary-btn,
+    .icon-btn,
+    .chip-btn {
+      min-height: 40px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      color: var(--text);
+      background: var(--panel-2);
+      cursor: pointer;
+      transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+    }
+
+    .nav button {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      text-align: left;
+    }
+
+    .nav button:hover,
+    .ghost-btn:hover,
+    .primary-btn:hover,
+    .icon-btn:hover,
+    .chip-btn:hover {
+      border-color: color-mix(in srgb, var(--info) 60%, var(--line));
+      transform: translateY(-1px);
+    }
+
+    .nav button[aria-current="page"] {
+      border-color: color-mix(in srgb, var(--hot) 70%, var(--line));
+      background: color-mix(in srgb, var(--hot) 18%, var(--panel-2));
+    }
+
+    .nav-key,
+    .tag,
+    .status-pill,
+    .mini {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .sidebar-actions {
+      display: grid;
+      gap: 8px;
+      margin-top: auto;
+    }
+
+    .main {
+      min-width: 0;
+      padding: 28px;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      display: grid;
+      grid-template-columns: minmax(220px, 1fr) auto;
+      gap: 12px;
+      align-items: center;
+      margin: -28px -28px 22px;
+      padding: 18px 28px;
+      border-bottom: 1px solid var(--line);
+      background: color-mix(in srgb, var(--bg) 88%, transparent);
+      backdrop-filter: blur(12px);
+    }
+
+    .search-wrap {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .field,
+    .select,
+    .textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      color: var(--text);
+      background: var(--panel);
+      outline: none;
+    }
+
+    .field,
+    .select {
+      min-height: 42px;
+      padding: 0 12px;
+    }
+
+    .textarea {
+      min-height: 104px;
+      padding: 12px;
+      resize: vertical;
+      line-height: 1.5;
+    }
+
+    .field:focus,
+    .select:focus,
+    .textarea:focus {
+      border-color: var(--info);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--info) 22%, transparent);
+    }
+
+    .top-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    .primary-btn {
+      padding: 0 14px;
+      background: color-mix(in srgb, var(--good) 24%, var(--panel-2));
+      border-color: color-mix(in srgb, var(--good) 55%, var(--line));
+      font-weight: 700;
+    }
+
+    .ghost-btn,
+    .icon-btn,
+    .chip-btn {
+      padding: 0 12px;
+    }
+
+    .icon-btn {
+      width: 42px;
+      padding: 0;
+    }
+
+    .view {
+      display: none;
+    }
+
+    .view.active {
+      display: block;
+    }
+
+    .view-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 20px;
+      align-items: start;
+      margin-bottom: 20px;
+    }
+
+    .view-title {
+      margin: 0;
+      font-size: clamp(28px, 4vw, 48px);
+      line-height: 1;
+    }
+
+    .view-copy {
+      max-width: 780px;
+      margin: 10px 0 0;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .kpi-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      margin-bottom: 18px;
+    }
+
+    .two-col {
+      grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+      align-items: start;
+    }
+
+    .three-col {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .panel,
+    .kpi,
+    .record-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .panel {
+      padding: 16px;
+    }
+
+    .panel-head {
+      display: flex;
+      gap: 12px;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .panel h2,
+    .panel h3,
+    .record-card h3 {
+      margin: 0;
+      font-size: 17px;
+    }
+
+    .panel p,
+    .record-card p {
+      color: var(--muted);
+    }
+
+    .kpi {
+      display: grid;
+      gap: 6px;
+      padding: 16px;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .kpi strong {
+      font-size: 34px;
+      line-height: 1;
+    }
+
+    .kpi span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .queue {
+      display: grid;
+      gap: 10px;
+    }
+
+    .queue-item {
+      display: grid;
+      grid-template-columns: 42px minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: center;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel-2);
+    }
+
+    .rank-badge {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius);
+      background: color-mix(in srgb, var(--info) 22%, var(--panel-3));
+      font-family: var(--mono);
+      font-weight: 700;
+    }
+
+    .queue-title {
+      display: block;
+      font-weight: 800;
+      overflow-wrap: anywhere;
+    }
+
+    .queue-sub {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .filters {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(150px, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 980px;
+    }
+
+    th,
+    td {
+      padding: 12px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      position: sticky;
+      top: 79px;
+      z-index: 5;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+    }
+
+    tbody tr {
+      cursor: pointer;
+    }
+
+    tbody tr:hover {
+      background: color-mix(in srgb, var(--info) 10%, transparent);
+    }
+
+    .priority-apply {
+      color: #15130d;
+      background: var(--hot);
+      border-color: var(--hot);
+    }
+
+    .priority-stretch {
+      color: #160f0e;
+      background: #ff9b8f;
+      border-color: #ff9b8f;
+    }
+
+    .priority-bridge,
+    .priority-backup,
+    .priority-screen {
+      color: #09130e;
+      background: var(--good);
+      border-color: var(--good);
+    }
+
+    .priority-skip,
+    .priority-stale {
+      color: #210f0f;
+      background: var(--warn);
+      border-color: var(--warn);
+    }
+
+    .status-pill,
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+      padding: 3px 8px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      white-space: nowrap;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(320px, 0.42fr);
+      gap: 14px;
+      align-items: start;
+    }
+
+    .detail-title {
+      margin: 0;
+      font-size: clamp(24px, 4vw, 42px);
+      line-height: 1.05;
+    }
+
+    .detail-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .action-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .form-grid .full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .record-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .record-card {
+      padding: 16px;
+      display: grid;
+      gap: 10px;
+      align-content: start;
+    }
+
+    .record-card p {
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    .empty {
+      padding: 24px;
+      border: 1px dashed var(--line);
+      border-radius: var(--radius);
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .drawer {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: none;
+      background: rgba(0, 0, 0, 0.55);
+    }
+
+    .drawer.open {
+      display: grid;
+      place-items: stretch end;
+    }
+
+    .drawer-panel {
+      width: min(760px, 100vw);
+      height: 100vh;
+      overflow-y: auto;
+      padding: 24px;
+      background: var(--panel);
+      border-left: 1px solid var(--line);
+      box-shadow: var(--shadow);
+    }
+
+    .drawer-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: start;
+      margin-bottom: 18px;
+    }
+
+    .toast {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 140;
+      max-width: min(420px, calc(100vw - 36px));
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      color: var(--text);
+      box-shadow: var(--shadow);
+      opacity: 0;
+      transform: translateY(12px);
+      pointer-events: none;
+      transition: opacity 160ms ease, transform 160ms ease;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .print-zone {
+      display: none;
+    }
+
+    @media (max-width: 1100px) {
+      .app-shell {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: static;
+        height: auto;
+        border-right: 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .nav {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .sidebar-actions {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .two-col,
+      .detail-grid {
+        grid-template-columns: 1fr;
+      }
+
+      th {
+        top: 0;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .main {
+        padding: 18px;
+      }
+
+      .topbar {
+        grid-template-columns: 1fr;
+        margin: -18px -18px 18px;
+        padding: 14px 18px;
+      }
+
+      .top-actions {
+        justify-content: stretch;
+      }
+
+      .top-actions > *,
+      .sidebar-actions > *,
+      .nav button {
+        flex: 1;
+      }
+
+      .nav,
+      .sidebar-actions,
+      .kpi-grid,
+      .three-col,
+      .record-grid,
+      .filters,
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .view-head {
+        grid-template-columns: 1fr;
+      }
+
+      .queue-item {
+        grid-template-columns: 40px minmax(0, 1fr);
+      }
+
+      .queue-item .action-row {
+        grid-column: 1 / -1;
+      }
+
+      .drawer-panel {
+        padding: 18px;
+      }
+    }
+
+    @media print {
+      body {
+        background: #fff;
+        color: #111;
+      }
+
+      .sidebar,
+      .topbar,
+      .view,
+      .drawer,
+      .toast {
+        display: none !important;
+      }
+
+      .app-shell {
+        display: block;
+      }
+
+      .main {
+        padding: 0;
+      }
+
+      .print-zone {
+        display: block;
+        padding: 24px;
+      }
+
+      .print-zone h1 {
+        margin-top: 0;
+      }
+
+      .print-zone a {
+        color: #111;
+      }
+    }
+  </style>
+</head>
+<body data-theme="medium">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <p class="eyebrow">Private career command center</p>
+        <h1>Career Market</h1>
+        <p>Public app shell only. Import a private JSON backup or add records locally; no listing data ships with this page.</p>
+      </div>
+
+      <nav class="nav" aria-label="Primary screens">
+        <button type="button" data-nav="dashboard"><span>Dashboard</span><span class="nav-key">1</span></button>
+        <button type="button" data-nav="listings"><span>Listings</span><span class="nav-key">2</span></button>
+        <button type="button" data-nav="resume-kit"><span>Resume Kit</span><span class="nav-key">3</span></button>
+        <button type="button" data-nav="proof-library"><span>Proof Library</span><span class="nav-key">4</span></button>
+        <button type="button" data-nav="packets"><span>Packets</span><span class="nav-key">5</span></button>
+        <button type="button" data-nav="canon"><span>Canon</span><span class="nav-key">6</span></button>
+      </nav>
+
+      <div class="sidebar-actions">
+        <button class="primary-btn" type="button" id="addListingBtn">Add Listing</button>
+        <button class="ghost-btn" type="button" id="exportBtn">Export JSON</button>
+        <button class="ghost-btn" type="button" id="importBtn">Import JSON</button>
+        <input class="hidden" type="file" id="importFile" accept="application/json,.json">
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="search-wrap">
+          <input class="field" id="globalSearch" type="search" placeholder="Search listings, notes, proofs..." aria-label="Search active records">
+        </div>
+        <div class="top-actions">
+          <button class="ghost-btn" type="button" id="printBtn">Print</button>
+          <button class="ghost-btn" type="button" id="helpBtn">Help</button>
+          <select class="select" id="themeSelect" aria-label="Theme">
+            <option value="medium">Medium</option>
+            <option value="dark">Dark</option>
+            <option value="light">Light</option>
+          </select>
+        </div>
+      </header>
+
+      <section class="view" id="view-dashboard" data-view="dashboard">
+        <div class="view-head">
+          <div>
+            <p class="eyebrow">Today queue</p>
+            <h2 class="view-title">Dashboard</h2>
+            <p class="view-copy">The working screen for listings that need action, follow-up, resume export, or source verification.</p>
+          </div>
+          <button class="primary-btn" type="button" data-action="quick-add">Add Listing</button>
+        </div>
+        <div class="grid kpi-grid" id="kpiGrid"></div>
+        <div class="grid two-col">
+          <section class="panel">
+            <div class="panel-head">
+              <div>
+                <h2>Priority Queue</h2>
+                <p class="mini">Top open roles by score and action priority.</p>
+              </div>
+              <button class="ghost-btn" type="button" data-nav-target="listings">All Listings</button>
+            </div>
+            <div class="queue" id="priorityQueue"></div>
+          </section>
+          <section class="panel">
+            <div class="panel-head">
+              <div>
+                <h2>Readiness Flags</h2>
+                <p class="mini">Items to clean up before serious applications.</p>
+              </div>
+              <button class="ghost-btn" type="button" data-nav-target="canon">Canon</button>
+            </div>
+            <div class="queue" id="readinessFlags"></div>
+          </section>
+        </div>
+      </section>
+
+      <section class="view" id="view-listings" data-view="listings">
+        <div class="view-head">
+          <div>
+            <p class="eyebrow">Evaluate and decide</p>
+            <h2 class="view-title">Listings</h2>
+            <p class="view-copy">Filter opportunities by track, priority, status, source, and region. Select a row to open the detail workflow.</p>
+          </div>
+          <button class="primary-btn" type="button" data-action="quick-add">Add Listing</button>
+        </div>
+        <div class="filters">
+          <select class="select" id="trackFilter" aria-label="Track filter"></select>
+          <select class="select" id="priorityFilter" aria-label="Priority filter"></select>
+          <select class="select" id="statusFilter" aria-label="Status filter"></select>
+          <select class="select" id="regionFilter" aria-label="Region filter"></select>
+          <select class="select" id="sourceFilter" aria-label="Source filter"></select>
+          <select class="select" id="sortFilter" aria-label="Sort listings"></select>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Company / Role</th>
+                <th>Track</th>
+                <th>Status</th>
+                <th>Score</th>
+                <th>Region</th>
+                <th>Resume</th>
+                <th>Next Action</th>
+                <th>Source</th>
+              </tr>
+            </thead>
+            <tbody id="listingRows"></tbody>
+          </table>
+        </div>
+        <div class="empty hidden" id="listingEmpty">No listings match the current filters.</div>
+      </section>
+
+      <section class="view" id="view-detail" data-view="detail">
+        <div id="detailMount"></div>
+      </section>
+
+      <section class="view" id="view-resume-kit" data-view="resume-kit">
+        <div class="view-head">
+          <div>
+            <p class="eyebrow">Prepare</p>
+            <h2 class="view-title">Resume Kit</h2>
+            <p class="view-copy">Manage the resume variants that map to each career lane. Mark exports after saving a PDF so packets stay traceable.</p>
+          </div>
+          <button class="ghost-btn" type="button" data-nav-target="canon">Open Canon</button>
+        </div>
+        <div class="record-grid" id="variantGrid"></div>
+      </section>
+
+      <section class="view" id="view-proof-library" data-view="proof-library">
+        <div class="view-head">
+          <div>
+            <p class="eyebrow">Support</p>
+            <h2 class="view-title">Proof Library</h2>
+            <p class="view-copy">Use one to three proof links per application. Keep public links checked before sending them to a recruiter or hiring manager.</p>
+          </div>
+          <select class="select" id="proofTrackFilter" aria-label="Proof track filter"></select>
+        </div>
+        <div class="record-grid" id="proofGrid"></div>
+      </section>
+
+      <section class="view" id="view-packets" data-view="packets">
+        <div class="view-head">
+          <div>
+            <p class="eyebrow">Send</p>
+            <h2 class="view-title">Application Packets</h2>
+            <p class="view-copy">Saved packet snapshots collect the role, selected resume, public proof links, and follow-up notes.</p>
+          </div>
+          <button class="ghost-btn" type="button" id="copySelectedPacketBtn">Copy Selected</button>
+        </div>
+        <div class="grid two-col">
+          <section class="panel">
+            <div class="panel-head">
+              <h2>Saved Packets</h2>
+            </div>
+            <div class="queue" id="packetList"></div>
+          </section>
+          <section class="panel">
+            <div class="panel-head">
+              <h2>Packet Preview</h2>
+            </div>
+            <div id="packetPreview"></div>
+          </section>
+        </div>
+      </section>
+
+      <section class="view" id="view-canon" data-view="canon">
+        <div class="view-head">
+          <div>
+            <p class="eyebrow">Maintain</p>
+            <h2 class="view-title">Canon / Settings</h2>
+            <p class="view-copy">Private verified facts, public links, and backup controls. This is where drift gets caught before a resume goes out.</p>
+          </div>
+          <button class="ghost-btn" type="button" id="saveCanonBtn">Save Canon</button>
+        </div>
+        <div class="grid two-col">
+          <section class="panel">
+            <div class="panel-head">
+              <h2>Contact Block</h2>
+              <span class="status-pill">Private source</span>
+            </div>
+            <div class="form-grid" id="canonForm"></div>
+          </section>
+          <section class="panel">
+            <div class="panel-head">
+              <h2>Data Safety</h2>
+            </div>
+            <div class="queue" id="dataSafety"></div>
+            <div class="action-row" style="margin-top: 12px;">
+              <button class="ghost-btn" type="button" id="resetSeedBtn">Reset Shell Data</button>
+              <button class="ghost-btn" type="button" id="clearPacketsBtn">Clear Packets</button>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section class="print-zone" id="printZone" aria-hidden="true"></section>
+    </main>
+  </div>
+
+  <div class="drawer" id="listingDrawer" role="dialog" aria-modal="true" aria-labelledby="drawerTitle">
+    <div class="drawer-panel">
+      <div class="drawer-head">
+        <div>
+          <p class="eyebrow" id="drawerMode">Capture</p>
+          <h2 id="drawerTitle">Add Listing</h2>
+        </div>
+        <button class="icon-btn" type="button" id="closeDrawerBtn" aria-label="Close">X</button>
+      </div>
+      <form id="listingForm" class="form-grid">
+        <input type="hidden" id="listingId">
+        <label>Company<input class="field" id="companyInput" required></label>
+        <label>Role title<input class="field" id="roleInput" required></label>
+        <label>Source URL<input class="field" id="urlInput" type="url" placeholder="https://"></label>
+        <label>Source<input class="field" id="sourceInput" placeholder="Company page, LinkedIn, email"></label>
+        <label>Location<input class="field" id="locationInput" placeholder="Philadelphia, PA"></label>
+        <label>Type<input class="field" id="typeInput" placeholder="Full-time, contract, remote"></label>
+        <label>Track<select class="select" id="trackInput"></select></label>
+        <label>Priority<select class="select" id="priorityInput"></select></label>
+        <label>Status<select class="select" id="statusInput"></select></label>
+        <label>Score<input class="field" id="scoreInput" type="number" min="0" max="100" step="1" value="70"></label>
+        <label class="full">Tags<input class="field" id="tagsInput" placeholder="Comma-separated tags"></label>
+        <label class="full">Fit<textarea class="textarea" id="fitInput"></textarea></label>
+        <label class="full">Tradeoff<textarea class="textarea" id="tradeoffInput"></textarea></label>
+        <label class="full">Next action<textarea class="textarea" id="nextInput"></textarea></label>
+        <label class="full">Private notes<textarea class="textarea" id="notesInput"></textarea></label>
+        <label>Follow-up date<input class="field" id="followUpInput" type="date"></label>
+        <label>Checked date<input class="field" id="checkedInput" type="date"></label>
+        <div class="full action-row">
+          <button class="primary-btn" type="submit">Save Listing</button>
+          <button class="ghost-btn" type="button" id="cancelDrawerBtn">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="drawer" id="helpDrawer" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+    <div class="drawer-panel">
+      <div class="drawer-head">
+        <div>
+          <p class="eyebrow">Controls</p>
+          <h2 id="helpTitle">Keyboard and Safety Notes</h2>
+        </div>
+        <button class="icon-btn" type="button" id="closeHelpBtn" aria-label="Close">X</button>
+      </div>
+      <div class="record-grid">
+        <article class="record-card">
+          <h3>Shortcuts</h3>
+          <p><b>/</b> focuses search.</p>
+          <p><b>n</b> opens Add Listing.</p>
+          <p><b>1-6</b> switches screens.</p>
+          <p><b>p</b> prints the current packet or view.</p>
+          <p><b>Esc</b> closes panels.</p>
+        </article>
+        <article class="record-card">
+          <h3>Public Copy Rule</h3>
+          <p>Packets separate recruiter-safe copy from private notes. Review proof links and contact details before sending.</p>
+        </article>
+        <article class="record-card">
+          <h3>Storage</h3>
+          <p>Data saves in this browser through localStorage. Use Export JSON before major edits or browser cleanup.</p>
+        </article>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    (function () {
+      "use strict";
+
+      const STORAGE_KEY = "careerMarket.v1";
+      const today = new Date().toISOString().slice(0, 10);
+
+      const tracks = [
+        "Broadcast Engineer",
+        "Live Event Production Ops",
+        "Broadcast Systems / IP / Streaming",
+        "Systems / AI / Automation",
+        "Web / Product / Freelance"
+      ];
+
+      const priorities = ["Apply now", "Screen first", "Bridge", "Stretch", "Backup", "Skip"];
+      const statuses = ["New", "Screened", "Tailored", "Applied", "Follow-up", "Interview", "Closed", "Skipped", "Stale"];
+
+      const defaultVariants = [
+        {
+          id: "broadcast-engineer",
+          name: "Broadcast Engineer",
+          track: "Broadcast Engineer",
+          filePattern: "dave-robertson-broadcast-engineer-YYYY-MM.pdf",
+          publicUrl: "https://davehomeassist.github.io/av-resume/",
+          summary: "Lead with live broadcast reliability, signal flow, camera/switching comfort, IP systems, and calm troubleshooting under show pressure.",
+          lastExported: "",
+          stale: true
+        },
+        {
+          id: "live-production-ops",
+          name: "Live Event Production Ops",
+          track: "Live Event Production Ops",
+          filePattern: "dave-robertson-live-production-ops-YYYY-MM.pdf",
+          publicUrl: "https://davehomeassist.github.io/av-resume/",
+          summary: "Lead with show advance, crew coordination, vendor communication, LED/projection, schedules, budgets, and field execution.",
+          lastExported: "",
+          stale: true
+        },
+        {
+          id: "broadcast-systems-ip",
+          name: "Broadcast Systems / IP",
+          track: "Broadcast Systems / IP / Streaming",
+          filePattern: "dave-robertson-broadcast-systems-ip-YYYY-MM.pdf",
+          publicUrl: "https://systembydave.com/resume/",
+          summary: "Lead with routing, streaming, IP video, network-aware troubleshooting, media systems, and escalation ownership.",
+          lastExported: "",
+          stale: true
+        },
+        {
+          id: "systems-ai",
+          name: "Systems / AI",
+          track: "Systems / AI / Automation",
+          filePattern: "dave-robertson-systems-ai-YYYY-MM.pdf",
+          publicUrl: "https://systembydave.com/resume/",
+          summary: "Lead with System by Dave, local-first tools, AI workflows, dashboards, and practical reliability-minded software.",
+          lastExported: "",
+          stale: true
+        },
+        {
+          id: "web-product",
+          name: "Web / Product",
+          track: "Web / Product / Freelance",
+          filePattern: "dave-robertson-web-product-YYYY-MM.pdf",
+          publicUrl: "https://systembydave.com/project-registry.html",
+          summary: "Lead with polished static apps, lead-gen demos, product clarity, practical UX, and client-safe delivery.",
+          lastExported: "",
+          stale: true
+        }
+      ];
+
+      const defaultProofs = [
+        {
+          id: "profile",
+          label: "System by Dave Profile",
+          url: "https://systembydave.com/profile/",
+          tracks: tracks.slice(),
+          note: "Best default public profile link.",
+          lastChecked: today,
+          hidden: false
+        },
+        {
+          id: "systems-resume",
+          label: "System by Dave Resume",
+          url: "https://systembydave.com/resume/",
+          tracks: ["Broadcast Systems / IP / Streaming", "Systems / AI / Automation", "Web / Product / Freelance"],
+          note: "Systems, AI, automation, and infrastructure-facing resume.",
+          lastChecked: today,
+          hidden: false
+        },
+        {
+          id: "av-resume",
+          label: "AV Resume",
+          url: "https://davehomeassist.github.io/av-resume/",
+          tracks: ["Broadcast Engineer", "Live Event Production Ops", "Broadcast Systems / IP / Streaming"],
+          note: "Best AV, broadcast, live production resume proof.",
+          lastChecked: today,
+          hidden: false
+        },
+        {
+          id: "project-registry",
+          label: "Project Registry",
+          url: "https://systembydave.com/project-registry.html",
+          tracks: ["Systems / AI / Automation", "Web / Product / Freelance", "Broadcast Systems / IP / Streaming"],
+          note: "Public software/project proof index.",
+          lastChecked: today,
+          hidden: false
+        },
+        {
+          id: "av-tools",
+          label: "AV Tools Suite",
+          url: "https://systembydave.com/tools.html",
+          tracks: ["Broadcast Engineer", "Live Event Production Ops", "Broadcast Systems / IP / Streaming"],
+          note: "Proof of production workflow tooling and field-oriented systems thinking.",
+          lastChecked: today,
+          hidden: false
+        },
+        {
+          id: "freelance-landing",
+          label: "Systems Architecture Landing",
+          url: "https://davehomeassist.github.io/freelance-landing/",
+          tracks: ["Systems / AI / Automation", "Web / Product / Freelance"],
+          note: "Consulting and AI systems architecture proof.",
+          lastChecked: today,
+          hidden: false
+        },
+        {
+          id: "rapid-sites",
+          label: "Rapid Sites Demo",
+          url: "https://davehomeassist.github.io/freelance/",
+          tracks: ["Web / Product / Freelance"],
+          note: "Fast local-business lead-gen site proof.",
+          lastChecked: today,
+          hidden: false
+        },
+        {
+          id: "contractor-demo",
+          label: "Contractor Demo",
+          url: "https://davehomeassist.github.io/contractor/",
+          tracks: ["Web / Product / Freelance"],
+          note: "Static React business-site proof.",
+          lastChecked: today,
+          hidden: false
+        }
+      ];
+
+      const defaultListings = [];
+
+      const defaultState = {
+        schemaVersion: 1,
+        activeView: "dashboard",
+        selectedListingId: "",
+        selectedPacketId: "",
+        filters: {
+          search: "",
+          track: "all",
+          priority: "all",
+          status: "all",
+          region: "all",
+          source: "all",
+          sort: "score"
+        },
+        theme: "medium",
+        canon: {
+          name: "David Robertson",
+          region: "Oaklyn, NJ / Philadelphia region",
+          email: "",
+          phone: "",
+          publicProfile: "https://systembydave.com/profile/",
+          publicResume: "https://systembydave.com/resume/",
+          avResume: "https://davehomeassist.github.io/av-resume/",
+          warning: "Verify final email, phone, and DigitalFootprints.Live before sending applications."
+        },
+        variants: defaultVariants,
+        proofs: defaultProofs,
+        listings: defaultListings,
+        packets: []
+      };
+
+      let state = loadState();
+
+      const els = {};
+
+      document.addEventListener("DOMContentLoaded", init);
+
+      function init() {
+        cacheElements();
+        hydrateControls();
+        bindEvents();
+        setTheme(state.theme || "medium");
+        navigate(state.activeView || "dashboard", { silent: true });
+        renderAll();
+      }
+
+      function cacheElements() {
+        els.body = document.body;
+        els.navButtons = Array.from(document.querySelectorAll("[data-nav]"));
+        els.views = Array.from(document.querySelectorAll(".view"));
+        els.globalSearch = document.getElementById("globalSearch");
+        els.trackFilter = document.getElementById("trackFilter");
+        els.priorityFilter = document.getElementById("priorityFilter");
+        els.statusFilter = document.getElementById("statusFilter");
+        els.regionFilter = document.getElementById("regionFilter");
+        els.sourceFilter = document.getElementById("sourceFilter");
+        els.sortFilter = document.getElementById("sortFilter");
+        els.proofTrackFilter = document.getElementById("proofTrackFilter");
+        els.kpiGrid = document.getElementById("kpiGrid");
+        els.priorityQueue = document.getElementById("priorityQueue");
+        els.readinessFlags = document.getElementById("readinessFlags");
+        els.listingRows = document.getElementById("listingRows");
+        els.listingEmpty = document.getElementById("listingEmpty");
+        els.detailMount = document.getElementById("detailMount");
+        els.variantGrid = document.getElementById("variantGrid");
+        els.proofGrid = document.getElementById("proofGrid");
+        els.packetList = document.getElementById("packetList");
+        els.packetPreview = document.getElementById("packetPreview");
+        els.canonForm = document.getElementById("canonForm");
+        els.dataSafety = document.getElementById("dataSafety");
+        els.printZone = document.getElementById("printZone");
+        els.toast = document.getElementById("toast");
+        els.listingDrawer = document.getElementById("listingDrawer");
+        els.helpDrawer = document.getElementById("helpDrawer");
+        els.listingForm = document.getElementById("listingForm");
+        els.importFile = document.getElementById("importFile");
+        els.themeSelect = document.getElementById("themeSelect");
+      }
+
+      function hydrateControls() {
+        fillSelect(els.trackFilter, [["all", "All tracks"]].concat(tracks.map(item => [item, item])));
+        fillSelect(els.priorityFilter, [["all", "All priorities"]].concat(priorities.map(item => [item, item])));
+        fillSelect(els.statusFilter, [["all", "All statuses"]].concat(statuses.map(item => [item, item])));
+        fillSelect(els.regionFilter, [
+          ["all", "All regions"],
+          ["Philadelphia", "Philadelphia"],
+          ["PA", "Pennsylvania"],
+          ["NJ", "New Jersey"],
+          ["NY", "New York"],
+          ["Remote", "Remote"],
+          ["Travel", "Travel"]
+        ]);
+        fillSelect(els.sourceFilter, getSourceOptions());
+        fillSelect(els.sortFilter, [
+          ["score", "Score"],
+          ["priority", "Priority"],
+          ["followUpDate", "Follow-up date"],
+          ["foundDate", "Newest"],
+          ["company", "Company"]
+        ]);
+        fillSelect(els.proofTrackFilter, [["all", "All tracks"]].concat(tracks.map(item => [item, item])));
+
+        fillSelect(document.getElementById("trackInput"), tracks.map(item => [item, item]));
+        fillSelect(document.getElementById("priorityInput"), priorities.map(item => [item, item]));
+        fillSelect(document.getElementById("statusInput"), statuses.map(item => [item, item]));
+
+        els.globalSearch.value = state.filters.search || "";
+        els.trackFilter.value = state.filters.track || "all";
+        els.priorityFilter.value = state.filters.priority || "all";
+        els.statusFilter.value = state.filters.status || "all";
+        els.regionFilter.value = state.filters.region || "all";
+        els.sourceFilter.value = state.filters.source || "all";
+        els.sortFilter.value = state.filters.sort || "score";
+        els.themeSelect.value = state.theme || "medium";
+      }
+
+      function bindEvents() {
+        els.navButtons.forEach(button => {
+          button.addEventListener("click", () => navigate(button.dataset.nav));
+        });
+
+        document.querySelectorAll("[data-nav-target]").forEach(button => {
+          button.addEventListener("click", () => navigate(button.dataset.navTarget));
+        });
+
+        document.querySelectorAll("[data-action='quick-add']").forEach(button => {
+          button.addEventListener("click", () => openListingDrawer());
+        });
+
+        document.getElementById("addListingBtn").addEventListener("click", () => openListingDrawer());
+        document.getElementById("closeDrawerBtn").addEventListener("click", closeListingDrawer);
+        document.getElementById("cancelDrawerBtn").addEventListener("click", closeListingDrawer);
+        document.getElementById("helpBtn").addEventListener("click", () => els.helpDrawer.classList.add("open"));
+        document.getElementById("closeHelpBtn").addEventListener("click", () => els.helpDrawer.classList.remove("open"));
+        document.getElementById("exportBtn").addEventListener("click", exportState);
+        document.getElementById("importBtn").addEventListener("click", () => els.importFile.click());
+        document.getElementById("printBtn").addEventListener("click", printCurrent);
+        document.getElementById("saveCanonBtn").addEventListener("click", saveCanon);
+        document.getElementById("resetSeedBtn").addEventListener("click", resetSeedData);
+        document.getElementById("clearPacketsBtn").addEventListener("click", clearPackets);
+        document.getElementById("copySelectedPacketBtn").addEventListener("click", copySelectedPacket);
+
+        els.listingForm.addEventListener("submit", saveListingFromForm);
+        els.importFile.addEventListener("change", importState);
+        els.themeSelect.addEventListener("change", event => setTheme(event.target.value));
+
+        [els.globalSearch, els.trackFilter, els.priorityFilter, els.statusFilter, els.regionFilter, els.sourceFilter, els.sortFilter].forEach(control => {
+          control.addEventListener("input", updateFilters);
+          control.addEventListener("change", updateFilters);
+        });
+
+        els.proofTrackFilter.addEventListener("change", renderProofLibrary);
+
+        document.addEventListener("keydown", handleKeys);
+        els.listingDrawer.addEventListener("click", event => {
+          if (event.target === els.listingDrawer) closeListingDrawer();
+        });
+        els.helpDrawer.addEventListener("click", event => {
+          if (event.target === els.helpDrawer) els.helpDrawer.classList.remove("open");
+        });
+      }
+
+      function handleKeys(event) {
+        if (event.target && ["INPUT", "TEXTAREA", "SELECT"].includes(event.target.tagName)) {
+          if (event.key === "Escape") {
+            event.target.blur();
+          }
+          return;
+        }
+
+        if (event.key === "/") {
+          event.preventDefault();
+          els.globalSearch.focus();
+          return;
+        }
+        if (event.key.toLowerCase() === "n") {
+          openListingDrawer();
+          return;
+        }
+        if (event.key.toLowerCase() === "p") {
+          printCurrent();
+          return;
+        }
+        if (event.key === "Escape") {
+          closeListingDrawer();
+          els.helpDrawer.classList.remove("open");
+          return;
+        }
+        const navMap = {
+          "1": "dashboard",
+          "2": "listings",
+          "3": "resume-kit",
+          "4": "proof-library",
+          "5": "packets",
+          "6": "canon"
+        };
+        if (navMap[event.key]) navigate(navMap[event.key]);
+      }
+
+      function loadState() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) return clone(defaultState);
+          const parsed = JSON.parse(raw);
+          return normalizeState(parsed);
+        } catch (error) {
+          console.warn("Could not load saved career market state", error);
+          return clone(defaultState);
+        }
+      }
+
+      function normalizeState(value) {
+        const base = clone(defaultState);
+        const merged = Object.assign(base, value || {});
+        merged.filters = Object.assign(base.filters, value && value.filters ? value.filters : {});
+        merged.canon = Object.assign(base.canon, value && value.canon ? value.canon : {});
+        merged.variants = Array.isArray(merged.variants) && merged.variants.length ? merged.variants : clone(defaultVariants);
+        merged.proofs = Array.isArray(merged.proofs) && merged.proofs.length ? merged.proofs : clone(defaultProofs);
+        merged.listings = Array.isArray(merged.listings) && merged.listings.length ? merged.listings : clone(defaultListings);
+        merged.packets = Array.isArray(merged.packets) ? merged.packets : [];
+        return merged;
+      }
+
+      function saveState() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      }
+
+      function renderAll() {
+        saveState();
+        renderNav();
+        renderDashboard();
+        renderListings();
+        renderDetail();
+        renderResumeKit();
+        renderProofLibrary();
+        renderPackets();
+        renderCanon();
+      }
+
+      function renderNav() {
+        els.navButtons.forEach(button => {
+          button.setAttribute("aria-current", button.dataset.nav === state.activeView ? "page" : "false");
+        });
+      }
+
+      function navigate(view, options) {
+        const normalized = view === "detail" ? "detail" : view;
+        state.activeView = normalized;
+        els.views.forEach(section => section.classList.toggle("active", section.dataset.view === normalized));
+        renderNav();
+        if (!options || !options.silent) {
+          saveState();
+        }
+        if (normalized === "detail" && !getSelectedListing()) {
+          state.selectedListingId = state.listings[0] ? state.listings[0].id : "";
+        }
+        renderAll();
+      }
+
+      function setTheme(theme) {
+        state.theme = theme || "medium";
+        document.body.dataset.theme = state.theme;
+        if (els.themeSelect) els.themeSelect.value = state.theme;
+        saveState();
+      }
+
+      function updateFilters() {
+        state.filters.search = els.globalSearch.value.trim();
+        state.filters.track = els.trackFilter.value;
+        state.filters.priority = els.priorityFilter.value;
+        state.filters.status = els.statusFilter.value;
+        state.filters.region = els.regionFilter.value;
+        state.filters.source = els.sourceFilter.value;
+        state.filters.sort = els.sortFilter.value;
+        renderAll();
+      }
+
+      function renderDashboard() {
+        const openListings = state.listings.filter(item => !["Closed", "Skipped"].includes(item.status));
+        const due = state.listings.filter(item => item.followUpDate && item.followUpDate <= today && !["Closed", "Skipped"].includes(item.status));
+        const stale = state.listings.filter(item => isStale(item));
+        const applyNow = state.listings.filter(item => item.priority === "Apply now" && !["Applied", "Closed", "Skipped"].includes(item.status));
+
+        const kpis = [
+          { label: "Open Listings", value: openListings.length, filter: null },
+          { label: "Apply Now", value: applyNow.length, filter: { priority: "Apply now" } },
+          { label: "Follow-ups Due", value: due.length, filter: { status: "Follow-up" } },
+          { label: "Stale / Recheck", value: stale.length, filter: { status: "Stale" } }
+        ];
+
+        els.kpiGrid.innerHTML = kpis.map(item => `
+          <button class="kpi" type="button" data-kpi='${h(JSON.stringify(item.filter || {}))}'>
+            <strong>${item.value}</strong>
+            <span>${h(item.label)}</span>
+          </button>
+        `).join("");
+
+        els.kpiGrid.querySelectorAll("[data-kpi]").forEach(button => {
+          button.addEventListener("click", () => {
+            const filter = JSON.parse(button.dataset.kpi || "{}");
+            Object.assign(state.filters, { track: "all", priority: "all", status: "all", region: "all", source: "all" }, filter);
+            hydrateControls();
+            navigate("listings");
+          });
+        });
+
+        const queue = openListings.slice().sort(prioritySort).slice(0, 6);
+        els.priorityQueue.innerHTML = queue.length ? queue.map(queueItemTemplate).join("") : `<div class="empty">No open listings. Add a listing to start the queue.</div>`;
+        bindQueueActions(els.priorityQueue);
+
+        const flags = getReadinessFlags();
+        els.readinessFlags.innerHTML = flags.length ? flags.map(flag => `
+          <div class="queue-item">
+            <span class="rank-badge">${h(flag.level)}</span>
+            <span><b class="queue-title">${h(flag.title)}</b><span class="queue-sub">${h(flag.copy)}</span></span>
+            <button class="ghost-btn" type="button" data-nav-target="${h(flag.target)}">Open</button>
+          </div>
+        `).join("") : `<div class="empty">No readiness flags.</div>`;
+        els.readinessFlags.querySelectorAll("[data-nav-target]").forEach(button => {
+          button.addEventListener("click", () => navigate(button.dataset.navTarget));
+        });
+      }
+
+      function queueItemTemplate(item) {
+        return `
+          <div class="queue-item">
+            <span class="rank-badge">${h(String(item.rank || "-"))}</span>
+            <span>
+              <b class="queue-title">${h(item.company)} - ${h(item.role)}</b>
+              <span class="queue-sub">${h(item.priority)} / ${h(item.track)} / ${h(item.next || "No next action recorded.")}</span>
+            </span>
+            <span class="action-row">
+              <button class="ghost-btn" type="button" data-open="${h(item.id)}">Open</button>
+              <button class="ghost-btn" type="button" data-status="${h(item.id)}" data-next-status="Applied">Applied</button>
+            </span>
+          </div>
+        `;
+      }
+
+      function bindQueueActions(root) {
+        root.querySelectorAll("[data-open]").forEach(button => {
+          button.addEventListener("click", () => openListing(button.dataset.open));
+        });
+        root.querySelectorAll("[data-status]").forEach(button => {
+          button.addEventListener("click", () => updateListingStatus(button.dataset.status, button.dataset.nextStatus));
+        });
+      }
+
+      function getReadinessFlags() {
+        const flags = [];
+        if (!state.canon.email || !state.canon.phone) {
+          flags.push({
+            level: "High",
+            title: "Contact block needs verification",
+            copy: "Email and phone are intentionally blank until verified for resume exports.",
+            target: "canon"
+          });
+        }
+        if (state.canon.warning && state.canon.warning.toLowerCase().includes("digitalfootprints")) {
+          flags.push({
+            level: "High",
+            title: "DigitalFootprints.Live unresolved",
+            copy: "Do not send that domain until DNS is fixed or the link is removed.",
+            target: "canon"
+          });
+        }
+        const staleVariants = state.variants.filter(item => item.stale || !item.lastExported);
+        if (staleVariants.length) {
+          flags.push({
+            level: "Med",
+            title: "Resume exports are not marked current",
+            copy: `${staleVariants.length} variant(s) need a fresh PDF export or confirmation.`,
+            target: "resume-kit"
+          });
+        }
+        const staleListings = state.listings.filter(isStale);
+        if (staleListings.length) {
+          flags.push({
+            level: "Med",
+            title: "Listings need source recheck",
+            copy: `${staleListings.length} listing(s) are stale or missing checked dates.`,
+            target: "listings"
+          });
+        }
+        return flags;
+      }
+
+      function renderListings() {
+        const listings = getFilteredListings();
+        els.listingRows.innerHTML = listings.map(item => {
+          const variant = getVariant(item.resumeVariant);
+          return `
+            <tr data-open-row="${h(item.id)}">
+              <td><b>#${h(String(item.rank || "-"))}</b></td>
+              <td><b>${h(item.company)}</b><br><span class="mini">${h(item.role)}</span><div class="tags">${(item.tags || []).slice(0, 3).map(tag).join("")}</div></td>
+              <td>${h(item.track)}</td>
+              <td>${statusPill(item.status)}<br><span class="mini">${h(item.priority)}</span></td>
+              <td><b>${h(String(item.score || 0))}</b>/100</td>
+              <td>${h(item.location || "")}<br><span class="mini">${h(item.type || "")}</span></td>
+              <td>${h(variant ? variant.name : "TBD")}</td>
+              <td>${h(item.next || "")}</td>
+              <td>${item.url ? `<a href="${h(item.url)}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Open</a>` : "No URL"}</td>
+            </tr>
+          `;
+        }).join("");
+        els.listingEmpty.classList.toggle("hidden", listings.length > 0);
+        els.listingRows.querySelectorAll("[data-open-row]").forEach(row => {
+          row.addEventListener("click", () => openListing(row.dataset.openRow));
+        });
+      }
+
+      function getFilteredListings() {
+        const query = (state.filters.search || "").toLowerCase();
+        let results = state.listings.filter(item => {
+          if (state.filters.track !== "all" && item.track !== state.filters.track) return false;
+          if (state.filters.priority !== "all" && item.priority !== state.filters.priority) return false;
+          if (state.filters.status !== "all") {
+            if (state.filters.status === "Stale") {
+              if (!isStale(item)) return false;
+            } else if (item.status !== state.filters.status) {
+              return false;
+            }
+          }
+          if (state.filters.region !== "all" && !String(item.location || "").includes(state.filters.region)) return false;
+          if (state.filters.source !== "all" && item.source !== state.filters.source) return false;
+          if (query && !searchBlob(item).includes(query)) return false;
+          return true;
+        });
+
+        results = results.sort((a, b) => {
+          switch (state.filters.sort) {
+            case "priority":
+              return priorityWeight(a.priority) - priorityWeight(b.priority) || Number(b.score || 0) - Number(a.score || 0);
+            case "followUpDate":
+              return String(a.followUpDate || "9999-99-99").localeCompare(String(b.followUpDate || "9999-99-99"));
+            case "foundDate":
+              return String(b.foundDate || "").localeCompare(String(a.foundDate || ""));
+            case "company":
+              return String(a.company || "").localeCompare(String(b.company || ""));
+            default:
+              return Number(b.score || 0) - Number(a.score || 0);
+          }
+        });
+        return results;
+      }
+
+      function renderDetail() {
+        const item = getSelectedListing();
+        if (!item) {
+          els.detailMount.innerHTML = `<div class="empty">No listing selected.</div>`;
+          return;
+        }
+
+        const variant = getVariant(item.resumeVariant);
+        const proofs = getProofsForListing(item);
+
+        els.detailMount.innerHTML = `
+          <div class="view-head">
+            <div>
+              <p class="eyebrow">Listing Detail</p>
+              <h2 class="detail-title">${h(item.company)} - ${h(item.role)}</h2>
+              <div class="detail-meta">
+                ${statusPill(item.status)}
+                ${priorityPill(item.priority)}
+                <span class="status-pill">${h(item.track)}</span>
+                <span class="status-pill">${h(String(item.score || 0))}/100</span>
+              </div>
+            </div>
+            <div class="action-row">
+              <button class="ghost-btn" type="button" data-edit-current>Edit</button>
+              <button class="primary-btn" type="button" data-create-packet="${h(item.id)}">Create Packet</button>
+            </div>
+          </div>
+          <div class="detail-grid">
+            <section class="panel">
+              <div class="panel-head">
+                <h2>Decision</h2>
+                ${item.url ? `<a href="${h(item.url)}" target="_blank" rel="noopener noreferrer">Open source</a>` : ""}
+              </div>
+              <div class="action-row" style="margin-bottom: 14px;">
+                ${["Screened", "Tailored", "Applied", "Follow-up", "Skipped"].map(status => `<button class="chip-btn" type="button" data-current-status="${h(status)}">${h(status)}</button>`).join("")}
+              </div>
+              <p><b>Fit:</b> ${h(item.fit || "")}</p>
+              <p><b>Tradeoff:</b> ${h(item.tradeoff || "")}</p>
+              <p><b>Next:</b> ${h(item.next || "")}</p>
+              <p><b>Private positioning:</b> ${h(item.notes || "")}</p>
+              <div class="tags">${(item.tags || []).map(tag).join("")}</div>
+            </section>
+            <aside class="grid">
+              <section class="panel">
+                <div class="panel-head">
+                  <h2>Resume Variant</h2>
+                  <button class="ghost-btn" type="button" data-nav-target="resume-kit">Kit</button>
+                </div>
+                <label>Selected variant
+                  <select class="select" id="detailVariantSelect">
+                    ${state.variants.map(option => `<option value="${h(option.id)}" ${option.id === item.resumeVariant ? "selected" : ""}>${h(option.name)}</option>`).join("")}
+                  </select>
+                </label>
+                <p>${h(variant ? variant.summary : "No variant selected.")}</p>
+                ${variant && variant.publicUrl ? `<p><a href="${h(variant.publicUrl)}" target="_blank" rel="noopener noreferrer">Open resume source</a></p>` : ""}
+              </section>
+              <section class="panel">
+                <div class="panel-head">
+                  <h2>Proof Links</h2>
+                  <button class="ghost-btn" type="button" data-copy-proofs="${h(item.id)}">Copy</button>
+                </div>
+                <div class="queue" id="detailProofPicker">
+                  ${state.proofs.map(proof => `
+                    <label style="display:flex;gap:8px;align-items:start;text-transform:none;font-size:13px;font-weight:600;color:var(--text);">
+                      <input type="checkbox" data-proof-check="${h(proof.id)}" ${(item.proofIds || []).includes(proof.id) ? "checked" : ""}>
+                      <span><b>${h(proof.label)}</b><br><span class="mini">${h(proof.note || "")}</span></span>
+                    </label>
+                  `).join("")}
+                </div>
+                <div class="queue" style="margin-top:12px;">
+                  ${proofs.map(proof => `<div><b>${h(proof.label)}</b><br><a href="${h(proof.url)}" target="_blank" rel="noopener noreferrer">${h(proof.url)}</a></div>`).join("") || `<div class="empty">No proof links selected.</div>`}
+                </div>
+              </section>
+              <section class="panel">
+                <div class="panel-head">
+                  <h2>Timeline</h2>
+                </div>
+                <p>Found: ${h(item.foundDate || "TBD")}</p>
+                <p>Checked: ${h(item.checkedDate || "TBD")}</p>
+                <p>Follow-up: ${h(item.followUpDate || "Not scheduled")}</p>
+              </section>
+            </aside>
+          </div>
+        `;
+
+        els.detailMount.querySelector("[data-edit-current]").addEventListener("click", () => openListingDrawer(item.id));
+        els.detailMount.querySelector("[data-create-packet]").addEventListener("click", () => createPacket(item.id));
+        const variantSelect = els.detailMount.querySelector("#detailVariantSelect");
+        if (variantSelect) {
+          variantSelect.addEventListener("change", () => {
+            item.resumeVariant = variantSelect.value;
+            saveState();
+            renderAll();
+            toast("Resume variant updated.");
+          });
+        }
+        els.detailMount.querySelectorAll("[data-proof-check]").forEach(input => {
+          input.addEventListener("change", () => {
+            item.proofIds = Array.from(els.detailMount.querySelectorAll("[data-proof-check]:checked")).map(box => box.dataset.proofCheck);
+            saveState();
+            renderAll();
+            toast("Proof links updated.");
+          });
+        });
+        els.detailMount.querySelectorAll("[data-current-status]").forEach(button => {
+          button.addEventListener("click", () => updateListingStatus(item.id, button.dataset.currentStatus));
+        });
+        els.detailMount.querySelectorAll("[data-nav-target]").forEach(button => {
+          button.addEventListener("click", () => navigate(button.dataset.navTarget));
+        });
+        const copyProofBtn = els.detailMount.querySelector("[data-copy-proofs]");
+        if (copyProofBtn) copyProofBtn.addEventListener("click", () => copyProofLinks(item.id));
+      }
+
+      function renderResumeKit() {
+        els.variantGrid.innerHTML = state.variants.map(variant => `
+          <article class="record-card">
+            <div class="panel-head">
+              <h3>${h(variant.name)}</h3>
+              <span class="status-pill">${variant.lastExported ? "Exported" : "Needs PDF"}</span>
+            </div>
+            <p>${h(variant.summary)}</p>
+            <p><b>File:</b> ${h(variant.filePattern)}</p>
+            <p><b>Last exported:</b> ${h(variant.lastExported || "Not recorded")}</p>
+            <div class="action-row">
+              ${variant.publicUrl ? `<a class="ghost-btn" href="${h(variant.publicUrl)}" target="_blank" rel="noopener noreferrer">Open Source</a>` : ""}
+              <button class="ghost-btn" type="button" data-exported="${h(variant.id)}">Mark Exported</button>
+              <button class="ghost-btn" type="button" data-copy-summary="${h(variant.id)}">Copy Summary</button>
+            </div>
+          </article>
+        `).join("");
+        els.variantGrid.querySelectorAll("[data-exported]").forEach(button => {
+          button.addEventListener("click", () => markVariantExported(button.dataset.exported));
+        });
+        els.variantGrid.querySelectorAll("[data-copy-summary]").forEach(button => {
+          button.addEventListener("click", () => {
+            const variant = getVariant(button.dataset.copySummary);
+            copyText(variant ? variant.summary : "");
+          });
+        });
+      }
+
+      function renderProofLibrary() {
+        const track = els.proofTrackFilter.value || "all";
+        const proofs = state.proofs.filter(proof => track === "all" || (proof.tracks || []).includes(track));
+        els.proofGrid.innerHTML = proofs.map(proof => `
+          <article class="record-card">
+            <div class="panel-head">
+              <h3>${h(proof.label)}</h3>
+              <span class="status-pill">${proof.hidden ? "Hidden" : "Active"}</span>
+            </div>
+            <p><a href="${h(proof.url)}" target="_blank" rel="noopener noreferrer">${h(proof.url)}</a></p>
+            <p>${h(proof.note || "")}</p>
+            <div class="tags">${(proof.tracks || []).map(tag).join("")}</div>
+            <p class="mini">Last checked: ${h(proof.lastChecked || "Not recorded")}</p>
+            <div class="action-row">
+              <button class="ghost-btn" type="button" data-copy-proof="${h(proof.id)}">Copy</button>
+              <button class="ghost-btn" type="button" data-check-proof="${h(proof.id)}">Mark Checked</button>
+              <button class="ghost-btn" type="button" data-toggle-proof="${h(proof.id)}">${proof.hidden ? "Unhide" : "Hide"}</button>
+            </div>
+          </article>
+        `).join("");
+        els.proofGrid.querySelectorAll("[data-copy-proof]").forEach(button => {
+          button.addEventListener("click", () => {
+            const proof = state.proofs.find(item => item.id === button.dataset.copyProof);
+            copyText(proof ? proof.url : "");
+          });
+        });
+        els.proofGrid.querySelectorAll("[data-check-proof]").forEach(button => {
+          button.addEventListener("click", () => markProofChecked(button.dataset.checkProof));
+        });
+        els.proofGrid.querySelectorAll("[data-toggle-proof]").forEach(button => {
+          button.addEventListener("click", () => toggleProofHidden(button.dataset.toggleProof));
+        });
+      }
+
+      function renderPackets() {
+        els.packetList.innerHTML = state.packets.length ? state.packets.map(packet => `
+          <button class="queue-item" type="button" data-select-packet="${h(packet.id)}">
+            <span class="rank-badge">${h(String(packet.createdDate || "").slice(5) || "P")}</span>
+            <span><b class="queue-title">${h(packet.company)} - ${h(packet.role)}</b><span class="queue-sub">${h(packet.resumeName)} / ${h(packet.createdDate)}</span></span>
+            <span class="status-pill">${packet.id === state.selectedPacketId ? "Selected" : "Open"}</span>
+          </button>
+        `).join("") : `<div class="empty">No saved packets yet. Open a listing and create one.</div>`;
+
+        els.packetList.querySelectorAll("[data-select-packet]").forEach(button => {
+          button.addEventListener("click", () => {
+            state.selectedPacketId = button.dataset.selectPacket;
+            renderAll();
+          });
+        });
+
+        const packet = getSelectedPacket();
+        els.packetPreview.innerHTML = packet ? packetPreviewTemplate(packet) : `<div class="empty">Select or create a packet to preview it.</div>`;
+      }
+
+      function packetPreviewTemplate(packet) {
+        return `
+          <div class="queue">
+            <div>
+              <h3>${h(packet.company)} - ${h(packet.role)}</h3>
+              <p><b>Resume:</b> ${h(packet.resumeName)}</p>
+              <p><b>Source:</b> ${packet.sourceUrl ? `<a href="${h(packet.sourceUrl)}" target="_blank" rel="noopener noreferrer">${h(packet.sourceUrl)}</a>` : "No URL"}</p>
+            </div>
+            <div>
+              <h3>Public packet copy</h3>
+              <p>${h(packet.publicCopy)}</p>
+            </div>
+            <div>
+              <h3>Proof links</h3>
+              ${(packet.proofs || []).map(proof => `<p><a href="${h(proof.url)}" target="_blank" rel="noopener noreferrer">${h(proof.label)}</a></p>`).join("")}
+            </div>
+            <div>
+              <h3>Private notes</h3>
+              <p>${h(packet.privateNotes || "No private notes recorded.")}</p>
+            </div>
+          </div>
+        `;
+      }
+
+      function renderCanon() {
+        const fields = [
+          ["name", "Name"],
+          ["region", "Region"],
+          ["email", "Email"],
+          ["phone", "Phone"],
+          ["publicProfile", "Public profile"],
+          ["publicResume", "Public resume"],
+          ["avResume", "AV resume"],
+          ["warning", "Warning / cleanup note"]
+        ];
+        els.canonForm.innerHTML = fields.map(([key, labelText]) => `
+          <label class="${key === "warning" ? "full" : ""}">${h(labelText)}
+            ${key === "warning" ? `<textarea class="textarea" data-canon="${h(key)}">${h(state.canon[key] || "")}</textarea>` : `<input class="field" data-canon="${h(key)}" value="${h(state.canon[key] || "")}">`}
+          </label>
+        `).join("");
+
+        els.dataSafety.innerHTML = getReadinessFlags().map(flag => `
+          <div class="queue-item">
+            <span class="rank-badge">${h(flag.level)}</span>
+            <span><b class="queue-title">${h(flag.title)}</b><span class="queue-sub">${h(flag.copy)}</span></span>
+          </div>
+        `).join("") || `<div class="empty">No current safety flags.</div>`;
+      }
+
+      function saveCanon() {
+        els.canonForm.querySelectorAll("[data-canon]").forEach(input => {
+          state.canon[input.dataset.canon] = input.value.trim();
+        });
+        saveState();
+        renderAll();
+        toast("Canon saved.");
+      }
+
+      function openListing(id) {
+        state.selectedListingId = id;
+        navigate("detail");
+      }
+
+      function getSelectedListing() {
+        return state.listings.find(item => item.id === state.selectedListingId) || state.listings[0] || null;
+      }
+
+      function getSelectedPacket() {
+        return state.packets.find(item => item.id === state.selectedPacketId) || state.packets[0] || null;
+      }
+
+      function openListingDrawer(id) {
+        const item = id ? state.listings.find(listing => listing.id === id) : null;
+        document.getElementById("drawerMode").textContent = item ? "Edit" : "Capture";
+        document.getElementById("drawerTitle").textContent = item ? "Edit Listing" : "Add Listing";
+        document.getElementById("listingId").value = item ? item.id : "";
+        document.getElementById("companyInput").value = item ? item.company : "";
+        document.getElementById("roleInput").value = item ? item.role : "";
+        document.getElementById("urlInput").value = item ? item.url : "";
+        document.getElementById("sourceInput").value = item ? item.source : "";
+        document.getElementById("locationInput").value = item ? item.location : "";
+        document.getElementById("typeInput").value = item ? item.type : "";
+        document.getElementById("trackInput").value = item ? item.track : tracks[0];
+        document.getElementById("priorityInput").value = item ? item.priority : "Screen first";
+        document.getElementById("statusInput").value = item ? item.status : "New";
+        document.getElementById("scoreInput").value = item ? item.score : 70;
+        document.getElementById("tagsInput").value = item ? (item.tags || []).join(", ") : "";
+        document.getElementById("fitInput").value = item ? item.fit : "";
+        document.getElementById("tradeoffInput").value = item ? item.tradeoff : "";
+        document.getElementById("nextInput").value = item ? item.next : "";
+        document.getElementById("notesInput").value = item ? item.notes : "";
+        document.getElementById("followUpInput").value = item ? item.followUpDate || "" : "";
+        document.getElementById("checkedInput").value = item ? item.checkedDate || "" : today;
+        els.listingDrawer.classList.add("open");
+        setTimeout(() => document.getElementById("companyInput").focus(), 0);
+      }
+
+      function closeListingDrawer() {
+        els.listingDrawer.classList.remove("open");
+      }
+
+      function saveListingFromForm(event) {
+        event.preventDefault();
+        const id = document.getElementById("listingId").value || makeId("listing");
+        const track = document.getElementById("trackInput").value;
+        const existing = state.listings.find(item => item.id === id);
+        const item = {
+          id,
+          rank: existing ? existing.rank : state.listings.length + 1,
+          company: document.getElementById("companyInput").value.trim(),
+          role: document.getElementById("roleInput").value.trim(),
+          url: document.getElementById("urlInput").value.trim(),
+          source: document.getElementById("sourceInput").value.trim() || "Manual",
+          location: document.getElementById("locationInput").value.trim(),
+          type: document.getElementById("typeInput").value.trim(),
+          track,
+          priority: document.getElementById("priorityInput").value,
+          status: document.getElementById("statusInput").value,
+          score: Number(document.getElementById("scoreInput").value || 0),
+          resumeVariant: existing ? existing.resumeVariant : defaultVariantForTrack(track),
+          proofIds: existing ? existing.proofIds : defaultProofIdsForTrack(track),
+          tags: splitTags(document.getElementById("tagsInput").value),
+          fit: document.getElementById("fitInput").value.trim(),
+          tradeoff: document.getElementById("tradeoffInput").value.trim(),
+          next: document.getElementById("nextInput").value.trim(),
+          notes: document.getElementById("notesInput").value.trim(),
+          foundDate: existing ? existing.foundDate : today,
+          checkedDate: document.getElementById("checkedInput").value || today,
+          followUpDate: document.getElementById("followUpInput").value
+        };
+
+        if (existing) {
+          Object.assign(existing, item);
+        } else {
+          state.listings.push(item);
+        }
+        state.selectedListingId = id;
+        hydrateControls();
+        closeListingDrawer();
+        navigate("detail");
+        toast(existing ? "Listing updated." : "Listing added.");
+      }
+
+      function updateListingStatus(id, status) {
+        const item = state.listings.find(listing => listing.id === id);
+        if (!item) return;
+        item.status = status;
+        if (status === "Applied" && !item.followUpDate) {
+          item.followUpDate = addDays(today, 7);
+        }
+        if (status === "Screened" || status === "Tailored" || status === "Applied") {
+          item.checkedDate = today;
+        }
+        saveState();
+        renderAll();
+        toast(`Marked ${item.company} as ${status}.`);
+      }
+
+      function markVariantExported(id) {
+        const variant = getVariant(id);
+        if (!variant) return;
+        variant.lastExported = today;
+        variant.stale = false;
+        saveState();
+        renderAll();
+        toast(`${variant.name} marked exported.`);
+      }
+
+      function markProofChecked(id) {
+        const proof = state.proofs.find(item => item.id === id);
+        if (!proof) return;
+        proof.lastChecked = today;
+        saveState();
+        renderAll();
+        toast(`${proof.label} marked checked.`);
+      }
+
+      function toggleProofHidden(id) {
+        const proof = state.proofs.find(item => item.id === id);
+        if (!proof) return;
+        proof.hidden = !proof.hidden;
+        saveState();
+        renderAll();
+      }
+
+      function createPacket(id) {
+        const listing = state.listings.find(item => item.id === id);
+        if (!listing) return;
+        const variant = getVariant(listing.resumeVariant);
+        const proofs = getProofsForListing(listing).slice(0, 3);
+        const packet = {
+          id: makeId("packet"),
+          listingId: listing.id,
+          createdDate: today,
+          company: listing.company,
+          role: listing.role,
+          sourceUrl: listing.url,
+          resumeId: variant ? variant.id : "",
+          resumeName: variant ? variant.name : "TBD",
+          proofs: proofs.map(proof => ({ label: proof.label, url: proof.url })),
+          publicCopy: buildPublicPacketCopy(listing, variant, proofs),
+          privateNotes: [listing.tradeoff, listing.next, listing.notes].filter(Boolean).join("\n\n")
+        };
+        state.packets.unshift(packet);
+        state.selectedPacketId = packet.id;
+        listing.status = listing.status === "New" ? "Tailored" : listing.status;
+        saveState();
+        navigate("packets");
+        toast("Application packet created.");
+      }
+
+      function buildPublicPacketCopy(listing, variant, proofs) {
+        const proofText = proofs.map(proof => `${proof.label}: ${proof.url}`).join("\n");
+        return [
+          `${listing.company} - ${listing.role}`,
+          `Resume variant: ${variant ? variant.name : "TBD"}`,
+          `Positioning: ${listing.fit || "TBD"}`,
+          proofText ? `Proof links:\n${proofText}` : "Proof links: TBD"
+        ].join("\n\n");
+      }
+
+      function copyProofLinks(id) {
+        const listing = state.listings.find(item => item.id === id);
+        if (!listing) return;
+        const text = getProofsForListing(listing).slice(0, 3).map(proof => `${proof.label}: ${proof.url}`).join("\n");
+        copyText(text);
+      }
+
+      function copySelectedPacket() {
+        const packet = getSelectedPacket();
+        if (!packet) {
+          toast("No packet selected.");
+          return;
+        }
+        copyText(packet.publicCopy);
+      }
+
+      function printCurrent() {
+        let html = "";
+        if (state.activeView === "packets") {
+          const packet = getSelectedPacket();
+          html = packet ? `
+            <h1>${h(packet.company)} - ${h(packet.role)}</h1>
+            <p><b>Created:</b> ${h(packet.createdDate)}</p>
+            <p><b>Resume:</b> ${h(packet.resumeName)}</p>
+            <pre>${h(packet.publicCopy)}</pre>
+            <h2>Private Notes</h2>
+            <pre>${h(packet.privateNotes || "")}</pre>
+          ` : "<h1>No packet selected</h1>";
+        } else {
+          const listing = getSelectedListing();
+          html = listing ? `
+            <h1>${h(listing.company)} - ${h(listing.role)}</h1>
+            <p><b>Status:</b> ${h(listing.status)} / <b>Priority:</b> ${h(listing.priority)}</p>
+            <p><b>Track:</b> ${h(listing.track)}</p>
+            <p><b>Resume:</b> ${h(getVariant(listing.resumeVariant)?.name || "TBD")}</p>
+            <p><b>Fit:</b> ${h(listing.fit || "")}</p>
+            <p><b>Next:</b> ${h(listing.next || "")}</p>
+          ` : "<h1>Career Market</h1>";
+        }
+        els.printZone.innerHTML = html;
+        window.print();
+      }
+
+      function exportState() {
+        const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `career-market-backup-${today}.json`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(url);
+        toast("Backup exported.");
+      }
+
+      function importState(event) {
+        const file = event.target.files && event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            const parsed = JSON.parse(String(reader.result || "{}"));
+            state = normalizeState(parsed);
+            saveState();
+            hydrateControls();
+            renderAll();
+            toast("Backup imported.");
+          } catch (error) {
+            toast("Import failed. JSON could not be parsed.");
+          } finally {
+            event.target.value = "";
+          }
+        };
+        reader.readAsText(file);
+      }
+
+      function resetSeedData() {
+        const confirmed = window.confirm("Reset listings, variants, proofs, and canon back to the blank System by Dave shell data?");
+        if (!confirmed) return;
+        state = clone(defaultState);
+        saveState();
+        hydrateControls();
+        navigate("dashboard");
+        toast("Seed data restored.");
+      }
+
+      function clearPackets() {
+        const confirmed = window.confirm("Clear saved application packets?");
+        if (!confirmed) return;
+        state.packets = [];
+        state.selectedPacketId = "";
+        saveState();
+        renderAll();
+        toast("Packets cleared.");
+      }
+
+      function getVariant(id) {
+        return state.variants.find(item => item.id === id) || null;
+      }
+
+      function getProofsForListing(listing) {
+        const chosen = (listing.proofIds || []).map(id => state.proofs.find(proof => proof.id === id)).filter(Boolean);
+        const fallback = state.proofs.filter(proof => !proof.hidden && (proof.tracks || []).includes(listing.track));
+        return uniqueById(chosen.concat(fallback)).filter(proof => !proof.hidden).slice(0, 4);
+      }
+
+      function defaultVariantForTrack(track) {
+        const variant = state.variants.find(item => item.track === track);
+        return variant ? variant.id : state.variants[0].id;
+      }
+
+      function defaultProofIdsForTrack(track) {
+        return state.proofs.filter(proof => !proof.hidden && (proof.tracks || []).includes(track)).slice(0, 3).map(proof => proof.id);
+      }
+
+      function isStale(item) {
+        if (!item.checkedDate) return true;
+        const checked = new Date(item.checkedDate + "T00:00:00");
+        const now = new Date(today + "T00:00:00");
+        const diff = Math.floor((now - checked) / 86400000);
+        return diff > 14;
+      }
+
+      function prioritySort(a, b) {
+        return priorityWeight(a.priority) - priorityWeight(b.priority) || Number(b.score || 0) - Number(a.score || 0);
+      }
+
+      function priorityWeight(value) {
+        const order = {
+          "Apply now": 1,
+          "Screen first": 2,
+          "Stretch": 3,
+          "Bridge": 4,
+          "Backup": 5,
+          "Skip": 9
+        };
+        return order[value] || 7;
+      }
+
+      function searchBlob(item) {
+        return Object.values(item).flat().join(" ").toLowerCase();
+      }
+
+      function splitTags(value) {
+        return String(value || "").split(",").map(item => item.trim()).filter(Boolean);
+      }
+
+      function fillSelect(select, options) {
+        if (!select) return;
+        select.innerHTML = options.map(([value, label]) => `<option value="${h(value)}">${h(label)}</option>`).join("");
+      }
+
+      function getSourceOptions() {
+        const values = Array.from(new Set(state.listings.map(item => item.source).filter(Boolean))).sort();
+        return [["all", "All sources"]].concat(values.map(value => [value, value]));
+      }
+
+      function statusPill(value) {
+        return `<span class="status-pill">${h(value || "New")}</span>`;
+      }
+
+      function priorityPill(value) {
+        const className = String(value || "").toLowerCase().replace(/\s+/g, "-");
+        return `<span class="status-pill priority-${h(className)}">${h(value || "Priority")}</span>`;
+      }
+
+      function tag(value) {
+        return `<span class="tag">${h(value)}</span>`;
+      }
+
+      function makeId(prefix) {
+        return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
+      }
+
+      function addDays(dateString, days) {
+        const date = new Date(dateString + "T00:00:00");
+        date.setDate(date.getDate() + days);
+        return date.toISOString().slice(0, 10);
+      }
+
+      function uniqueById(items) {
+        const seen = new Set();
+        return items.filter(item => {
+          if (!item || seen.has(item.id)) return false;
+          seen.add(item.id);
+          return true;
+        });
+      }
+
+      function copyText(text) {
+        const value = String(text || "");
+        if (!value) {
+          toast("Nothing to copy.");
+          return;
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(value).then(() => toast("Copied.")).catch(() => fallbackCopy(value));
+        } else {
+          fallbackCopy(value);
+        }
+      }
+
+      function fallbackCopy(value) {
+        const area = document.createElement("textarea");
+        area.value = value;
+        area.setAttribute("readonly", "readonly");
+        area.style.position = "fixed";
+        area.style.left = "-999px";
+        document.body.appendChild(area);
+        area.select();
+        try {
+          document.execCommand("copy");
+          toast("Copied.");
+        } catch (error) {
+          toast("Copy failed; select text manually.");
+        }
+        area.remove();
+      }
+
+      function toast(message) {
+        els.toast.textContent = message;
+        els.toast.classList.add("show");
+        window.clearTimeout(toast.timer);
+        toast.timer = window.setTimeout(() => els.toast.classList.remove("show"), 2400);
+      }
+
+      function h(value) {
+        return String(value == null ? "" : value)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#39;");
+      }
+
+      function clone(value) {
+        return JSON.parse(JSON.stringify(value));
+      }
+    })();
+  </script>
+</body>
+</html>

@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-07-06
+
+* Added an unlisted, noindex `career-market.html` command-center shell for private career browsing workflows. The page ships without listing data, uses browser localStorage plus JSON import/export, and keeps the public System by Dave repo separate from private job notes and application packets.
+* Added career-market planning docs covering the site plan, navigation/control flow, and a private resource backend concept for a local SQLite/file-backed DaveVault service.
+
 ## 2026-07-03
 
 * Extended the AV domain-view layer across Power Plan, Network Plan, and RF Coordination with load-map, address-map, and frequency-map cards that surface circuits, draw, VLAN/IP, ports, wireless frequencies, owner zones, backup paths, selected-row sync, and mobile scan layouts above the editable tables.
