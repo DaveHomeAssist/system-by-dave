@@ -765,7 +765,7 @@
       <div class="brand">
         <p class="eyebrow">Private career command center</p>
         <h1>Career Market</h1>
-        <p>Public app shell only. Import a private JSON backup or add records locally; no listing data ships with this page.</p>
+        <p>Online seeded command center. Listings are baked into this noindex page; import/export still works for browser-local edits.</p>
       </div>
 
       <nav class="nav" aria-label="Primary screens">
@@ -949,7 +949,7 @@
             </div>
             <div class="queue" id="dataSafety"></div>
             <div class="action-row" style="margin-top: 12px;">
-              <button class="ghost-btn" type="button" id="resetSeedBtn">Reset Shell Data</button>
+              <button class="ghost-btn" type="button" id="resetSeedBtn">Reset Seed Data</button>
               <button class="ghost-btn" type="button" id="clearPacketsBtn">Clear Packets</button>
             </div>
           </section>
@@ -1028,12 +1028,15 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+  <script src="js/vendor/gsap.min.js"></script>
   <script>
     (function () {
       "use strict";
 
       const STORAGE_KEY = "careerMarket.v1";
+      const SEED_VERSION = "career-market-seed-2026-07-06-v2";
       const today = new Date().toISOString().slice(0, 10);
+      const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 
       const tracks = [
         "Broadcast Engineer",
@@ -1174,12 +1177,230 @@
         }
       ];
 
-      const defaultListings = [];
+      const defaultListings = [
+        {
+          id: "listing-spectacor-broadcast-engineer",
+          rank: 1,
+          score: 96,
+          company: "Spectacor",
+          role: "Broadcast Engineer",
+          source: "Comcast Careers",
+          url: "https://jobs.comcast.com/job/philadelphia/broadcast-engineer-spectacor/45483/96603329296",
+          location: "Philadelphia, PA",
+          type: "Full-time",
+          priority: "Apply now",
+          status: "New",
+          track: "Broadcast Engineer",
+          resumeVariant: "broadcast-engineer",
+          proofIds: ["profile", "av-resume", "av-tools"],
+          tags: ["Arena broadcast", "Live sports", "Signal flow", "IP systems"],
+          fit: "Cleanest match: local arena broadcast, live sports, control-room-adjacent engineering, video/audio signal flow, and IP broadcast systems.",
+          tradeoff: "Nights/weekends; full-time arena ops cadence.",
+          next: "Apply first. Tailor resume around ISPOR Pixera, SDI/IP, arena show reliability, and calm troubleshooting under show pressure.",
+          notes: "Lead with arena/live-event experience plus engineering judgment. This is the best match for stepping up without abandoning hands-on video systems work.",
+          foundDate: today,
+          checkedDate: today,
+          followUpDate: ""
+        },
+        {
+          id: "listing-cbs-technician-broadcast-engineer",
+          rank: 2,
+          score: 92,
+          company: "CBS News and Stations",
+          role: "Technician Broadcast Engineer",
+          source: "Paramount Careers",
+          url: "https://careers.paramount.com/job/Philadelphia-Technician-Broadcast-Engineer-PA-19130/1390335000/",
+          location: "Philadelphia, PA",
+          type: "Full-time - On-site",
+          priority: "Apply now",
+          status: "New",
+          track: "Broadcast Engineer",
+          resumeVariant: "broadcast-engineer",
+          proofIds: ["profile", "av-resume", "systems-resume"],
+          tags: ["Broadcast systems", "Live TV", "Streaming", "VR/AR studio"],
+          fit: "Direct local broadcast engineering role covering live TV and streaming equipment, advanced broadcast systems, cameras, audio, video editing tools, and VR/AR studio elements.",
+          tradeoff: "News/station cadence can mean shifts, urgent downtime pressure, and production support across technical and non-technical teams.",
+          next: "Apply early. Lead with broadcast troubleshooting, fast show-condition diagnosis, signal flow, streaming reliability, and comfort training operators on technical systems.",
+          notes: "Strongest email-discovered addition. It is not arena sports, but it is a real broadcast technology role with the right mix of systems, live production, and reliability.",
+          foundDate: today,
+          checkedDate: today,
+          followUpDate: ""
+        },
+        {
+          id: "listing-spectacor-control-room",
+          rank: 3,
+          score: 88,
+          company: "Spectacor",
+          role: "Director, Control Room Operations",
+          source: "Comcast Careers",
+          url: "https://jobs.comcast.com/job/philadelphia/director-control-room-operations-spectacor/45483/96002723920",
+          location: "Philadelphia, PA",
+          type: "Full-time",
+          priority: "Stretch",
+          status: "New",
+          track: "Live Event Production Ops",
+          resumeVariant: "live-production-ops",
+          proofIds: ["profile", "av-resume", "av-tools"],
+          tags: ["Control room", "Leadership", "Sports venue", "Crewing"],
+          fit: "Major responsibility jump into control room ownership, live event production leadership, staffing, and arena show execution.",
+          tradeoff: "Likely management-heavy and less hands-on engineering.",
+          next: "Apply only if positioning as a technical operations lead who can run the room, not just as a hands-on engineer.",
+          notes: "Best stretch angle: technical operator who can translate between engineering, production, crew, and show execution. Do not undersell leadership from Local 8/freelance work.",
+          foundDate: today,
+          checkedDate: today,
+          followUpDate: ""
+        },
+        {
+          id: "listing-av-services-broadcast-systems",
+          rank: 4,
+          score: 84,
+          company: "A-V Services Inc.",
+          role: "Broadcast System Engineer",
+          source: "Indeed",
+          url: "https://to.indeed.com/aaylxk7xv6lq",
+          location: "New York, NY",
+          type: "Full-time - From $120k/year",
+          priority: "Apply now",
+          status: "New",
+          track: "Broadcast Systems / IP / Streaming",
+          resumeVariant: "broadcast-systems-ip",
+          proofIds: ["profile", "systems-resume", "av-resume"],
+          tags: ["Broadcast systems", "IP video", "Senior scope", "NYC"],
+          fit: "Strong systems bridge from live-event video engineering into senior broadcast systems and IP-based equipment support.",
+          tradeoff: "NYC commute; likely corporate AV/broadcast hybrid rather than sports-only.",
+          next: "Apply with emphasis on signal integrity, video routing, IP systems, fast escalation, and real-world live-event problem solving.",
+          notes: "Best non-Spectacor systems role found. Good if you want higher responsibility and salary while expanding into IP broadcast systems.",
+          foundDate: today,
+          checkedDate: today,
+          followUpDate: ""
+        },
+        {
+          id: "listing-precon-production-ops",
+          rank: 5,
+          score: 80,
+          company: "Precon Events",
+          role: "Director, Production Operations & Estimating - Live Event Production",
+          source: "ZipRecruiter",
+          url: "https://www.ziprecruiter.com/c/Professional-Virtual-Event-Planning-%7C-In-Person-Events-%26-Hybrid-Conference-%7C-Precon-Virtual/Job/Director%2C-Production-Operations-%26-Estimating-Live-Event-Production/-in-Rockville%2CMD?jid=69a834ad268bff49",
+          location: "Rockville, MD",
+          type: "Full-time - On-site / travel",
+          priority: "Stretch",
+          status: "New",
+          track: "Live Event Production Ops",
+          resumeVariant: "live-production-ops",
+          proofIds: ["profile", "av-resume", "av-tools"],
+          tags: ["Live events", "LED/projection", "AV systems", "Estimating"],
+          fit: "Strong senior live-event production role translating creative concepts into executable production plans across AV, LED, projection, staging, labor, logistics, vendors, and budgets.",
+          tradeoff: "Estimating and warehouse/onsite presence are core; travel and event schedule flexibility are explicit. This is more production leadership than hands-on video engineering.",
+          next: "Screen before applying. Ask how much of the role owns technical production strategy versus estimating templates, budget margin, and warehouse coordination.",
+          notes: "Relevant as a serious responsibility jump if Dave wants production-operations leadership. It should not replace the broadcast-engineering path unless the technical authority is real.",
+          foundDate: today,
+          checkedDate: today,
+          followUpDate: ""
+        },
+        {
+          id: "listing-upwork-cloud-playout",
+          rank: 6,
+          score: 78,
+          company: "Not listed",
+          role: "Broadcast Engineer & Cloud Playout Specialist",
+          source: "Upwork",
+          url: "https://www.upwork.com/jobs/~022065520431221395137",
+          location: "Brooklyn, NY / Remote-style contract",
+          type: "Contract / project",
+          priority: "Bridge",
+          status: "New",
+          track: "Broadcast Systems / IP / Streaming",
+          resumeVariant: "broadcast-systems-ip",
+          proofIds: ["profile", "systems-resume", "project-registry"],
+          tags: ["FAST channel", "Cloud playout", "Broadcast ops", "Remote systems"],
+          fit: "Good bridge into FAST channel operations, cloud playout, content delivery reliability, and broadcast operations.",
+          tradeoff: "Less physical live-event work; may be project-scoped and less stable.",
+          next: "Pitch playback/media-server reliability, operational discipline, and willingness to grow into cloud playout workflows.",
+          notes: "Useful if you want to add cloud/FAST vocabulary to your resume. Not the primary target, but it could widen the lane.",
+          foundDate: today,
+          checkedDate: today,
+          followUpDate: ""
+        },
+        {
+          id: "listing-tipping-point-xr",
+          rank: 7,
+          score: 76,
+          company: "Tipping Point Media",
+          role: "XR Producer",
+          source: "LinkedIn",
+          url: "https://www.linkedin.com/jobs/view/xr-producer-at-tipping-point-media-tipmedia-com-4423363788",
+          location: "Malvern, PA",
+          type: "Contract - On-site / hybrid",
+          priority: "Bridge",
+          status: "New",
+          track: "Systems / AI / Automation",
+          resumeVariant: "systems-ai",
+          proofIds: ["profile", "systems-resume", "freelance-landing"],
+          tags: ["XR", "VR/AR", "Producer", "Technical teams"],
+          fit: "Local contract bridge into XR, immersive learning, AI/serious-gaming workflows, cross-functional technical teams, project planning, scheduling, client communication, and quality delivery.",
+          tradeoff: "Producer/project-management heavy and less video-ops focused; contract status means scope, duration, and rate need verification.",
+          next: "Contact only if the project has real technical production ownership. Ask about on-site cadence, rate, deliverables, and whether the role touches XR systems or only schedules teams.",
+          notes: "Good strategic bridge into immersive/XR production, especially if it adds credible technical-production vocabulary without pulling too far from live-event systems.",
+          foundDate: today,
+          checkedDate: today,
+          followUpDate: ""
+        },
+        {
+          id: "listing-cenero-av-engineer",
+          rank: 8,
+          score: 68,
+          company: "Cenero",
+          role: "On-Site Audio-Visual Engineer",
+          source: "Indeed",
+          url: "https://to.indeed.com/aatpmlxknwy8",
+          location: "Malvern, PA",
+          type: "Full-time - $50,448-$73,625/year",
+          priority: "Backup",
+          status: "New",
+          track: "Broadcast Systems / IP / Streaming",
+          resumeVariant: "broadcast-systems-ip",
+          proofIds: ["profile", "av-resume", "av-tools"],
+          tags: ["AV systems", "Local PA", "Client-facing", "Support"],
+          fit: "Local AV engineering bridge if the scope includes systems ownership, troubleshooting, and escalation work.",
+          tradeoff: "More installed AV/support than broadcast/control-room engineering.",
+          next: "Keep as backup. Pursue only if the role owns systems rather than sitting at basic helpdesk/support level.",
+          notes: "Could be practical, but only makes sense if scope and salary beat current opportunities. Ask directly about escalation ownership and video-system complexity.",
+          foundDate: today,
+          checkedDate: today,
+          followUpDate: ""
+        },
+        {
+          id: "listing-showtell-install-tech",
+          rank: 9,
+          score: 58,
+          company: "show+tell",
+          role: "AV Installation Technician",
+          source: "Indeed",
+          url: "https://to.indeed.com/aal76vjpsv7r",
+          location: "New York, NY",
+          type: "Contract - possible full-time path",
+          priority: "Bridge",
+          status: "New",
+          track: "Live Event Production Ops",
+          resumeVariant: "live-production-ops",
+          proofIds: ["profile", "av-resume"],
+          tags: ["Contract", "Install", "Computer skills", "NYC"],
+          fit: "Freelance bridge with AV install and high computer-skill requirements; possible relationship-builder.",
+          tradeoff: "More install technician than higher-responsibility operator/engineer; likely not enough by itself.",
+          next: "Pursue only if day rate, scope, or client relationship is strategically useful.",
+          notes: "Treat as optional fill-in work, not a career-direction role. It should pay well or open a relationship; otherwise, skip.",
+          foundDate: today,
+          checkedDate: today,
+          followUpDate: ""
+        }
+      ];
 
       const defaultState = {
         schemaVersion: 1,
+        seedVersion: SEED_VERSION,
         activeView: "dashboard",
-        selectedListingId: "",
+        selectedListingId: "listing-spectacor-broadcast-engineer",
         selectedPacketId: "",
         filters: {
           search: "",
@@ -1219,7 +1440,7 @@
         bindEvents();
         setTheme(state.theme || "medium");
         navigate(state.activeView || "dashboard", { silent: true });
-        renderAll();
+        animateAppIntro();
       }
 
       function cacheElements() {
@@ -1308,8 +1529,8 @@
         document.getElementById("addListingBtn").addEventListener("click", () => openListingDrawer());
         document.getElementById("closeDrawerBtn").addEventListener("click", closeListingDrawer);
         document.getElementById("cancelDrawerBtn").addEventListener("click", closeListingDrawer);
-        document.getElementById("helpBtn").addEventListener("click", () => els.helpDrawer.classList.add("open"));
-        document.getElementById("closeHelpBtn").addEventListener("click", () => els.helpDrawer.classList.remove("open"));
+        document.getElementById("helpBtn").addEventListener("click", openHelpDrawer);
+        document.getElementById("closeHelpBtn").addEventListener("click", closeHelpDrawer);
         document.getElementById("exportBtn").addEventListener("click", exportState);
         document.getElementById("importBtn").addEventListener("click", () => els.importFile.click());
         document.getElementById("printBtn").addEventListener("click", printCurrent);
@@ -1334,7 +1555,7 @@
           if (event.target === els.listingDrawer) closeListingDrawer();
         });
         els.helpDrawer.addEventListener("click", event => {
-          if (event.target === els.helpDrawer) els.helpDrawer.classList.remove("open");
+          if (event.target === els.helpDrawer) closeHelpDrawer();
         });
       }
 
@@ -1361,7 +1582,7 @@
         }
         if (event.key === "Escape") {
           closeListingDrawer();
-          els.helpDrawer.classList.remove("open");
+          closeHelpDrawer();
           return;
         }
         const navMap = {
@@ -1380,7 +1601,13 @@
           const raw = localStorage.getItem(STORAGE_KEY);
           if (!raw) return clone(defaultState);
           const parsed = JSON.parse(raw);
-          return normalizeState(parsed);
+          const loaded = normalizeState(parsed);
+          if (shouldApplySeedUpgrade(parsed, loaded)) {
+            loaded.seedVersion = SEED_VERSION;
+            loaded.listings = clone(defaultListings);
+            loaded.selectedListingId = loaded.listings[0] ? loaded.listings[0].id : "";
+          }
+          return loaded;
         } catch (error) {
           console.warn("Could not load saved career market state", error);
           return clone(defaultState);
@@ -1389,14 +1616,154 @@
 
       function normalizeState(value) {
         const base = clone(defaultState);
-        const merged = Object.assign(base, value || {});
-        merged.filters = Object.assign(base.filters, value && value.filters ? value.filters : {});
-        merged.canon = Object.assign(base.canon, value && value.canon ? value.canon : {});
+        const imported = coerceImportPayload(value);
+        const merged = Object.assign(base, imported || {});
+        merged.filters = Object.assign(base.filters, imported && imported.filters ? imported.filters : {});
+        merged.canon = Object.assign(base.canon, imported && imported.canon ? imported.canon : {});
         merged.variants = Array.isArray(merged.variants) && merged.variants.length ? merged.variants : clone(defaultVariants);
         merged.proofs = Array.isArray(merged.proofs) && merged.proofs.length ? merged.proofs : clone(defaultProofs);
-        merged.listings = Array.isArray(merged.listings) && merged.listings.length ? merged.listings : clone(defaultListings);
+        merged.listings = Array.isArray(merged.listings) ? merged.listings : clone(defaultListings);
+        merged.listings = merged.listings.map((item, index) => normalizeListing(item, index, merged)).filter(Boolean);
         merged.packets = Array.isArray(merged.packets) ? merged.packets : [];
+        merged.seedVersion = cleanText(merged.seedVersion || SEED_VERSION);
+        if (!merged.listings.some(item => item.id === merged.selectedListingId)) {
+          merged.selectedListingId = merged.listings[0] ? merged.listings[0].id : "";
+        }
+        if (merged.selectedPacketId && !merged.packets.some(item => item.id === merged.selectedPacketId)) {
+          merged.selectedPacketId = merged.packets[0] ? merged.packets[0].id : "";
+        }
         return merged;
+      }
+
+      function shouldApplySeedUpgrade(parsed, loaded) {
+        return Boolean(
+          parsed &&
+          parsed.seedVersion !== SEED_VERSION &&
+          Array.isArray(parsed.listings) &&
+          parsed.listings.length === 0 &&
+          loaded &&
+          loaded.listings.length === 0 &&
+          defaultListings.length > 0
+        );
+      }
+
+      function coerceImportPayload(value) {
+        if (Array.isArray(value)) {
+          return { listings: value };
+        }
+        if (!value || typeof value !== "object") {
+          return {};
+        }
+
+        const wrappers = [value.state, value.data, value.payload, value.careerMarket, value.careerMarketState];
+        const wrapped = wrappers.find(candidate => candidate && typeof candidate === "object" && hasImportRecords(candidate));
+        if (wrapped) {
+          return coerceImportPayload(wrapped);
+        }
+
+        const listings = value.listings || value.roles || value.jobs || value.opportunities || value.items;
+        if (Array.isArray(listings) && !Array.isArray(value.listings)) {
+          return Object.assign({}, value, { listings });
+        }
+        return value;
+      }
+
+      function hasImportRecords(value) {
+        return Boolean(value && typeof value === "object" && (
+          Array.isArray(value.listings) ||
+          Array.isArray(value.roles) ||
+          Array.isArray(value.jobs) ||
+          Array.isArray(value.opportunities) ||
+          Array.isArray(value.items) ||
+          Array.isArray(value.packets) ||
+          Array.isArray(value.variants) ||
+          Array.isArray(value.proofs)
+        ));
+      }
+
+      function hasCompatibleImportPayload(value) {
+        if (Array.isArray(value)) return true;
+        if (!value || typeof value !== "object") return false;
+        if (hasImportRecords(value) || value.schemaVersion || value.filters || value.canon) return true;
+        return [value.state, value.data, value.payload, value.careerMarket, value.careerMarketState].some(hasCompatibleImportPayload);
+      }
+
+      function normalizeListing(item, index, context) {
+        if (!item || typeof item !== "object") return null;
+        const track = normalizeChoice(item.track || inferTrack(item), tracks, tracks[0]);
+        const priority = normalizeChoice(item.priority, priorities, "Screen first");
+        const status = normalizeChoice(item.status, statuses, "New");
+        const company = cleanText(item.company || item.organization || item.employer || item.client || "Unknown company");
+        const role = cleanText(item.role || item.title || item.position || item.name || "Untitled role");
+        const rank = Number(item.rank || index + 1);
+        const scoreValue = Number(item.score ?? item.fitScore ?? 70);
+        const score = Math.max(0, Math.min(100, scoreValue));
+        const proofIds = Array.isArray(item.proofIds) ? item.proofIds : defaultProofIdsForTrackFrom(track, context.proofs);
+
+        return {
+          id: cleanText(item.id) || makeId("listing"),
+          rank: Number.isFinite(rank) ? rank : index + 1,
+          score: Number.isFinite(score) ? score : 70,
+          company,
+          role,
+          source: cleanText(item.source || item.sourceName || item.board || "Imported"),
+          url: cleanText(item.url || item.link || item.sourceUrl || item.applyUrl || ""),
+          location: cleanText(item.location || item.region || ""),
+          type: cleanText(item.type || item.employmentType || item.schedule || ""),
+          priority,
+          status,
+          track,
+          resumeVariant: validVariantId(item.resumeVariant, context.variants) || defaultVariantIdForTrack(track, context.variants),
+          proofIds,
+          tags: Array.isArray(item.tags) ? item.tags.map(cleanText).filter(Boolean) : splitTags(item.tags || item.keywords || item.category),
+          fit: cleanText(item.fit || item.fitSummary || item.summary || ""),
+          tradeoff: cleanText(item.tradeoff || item.tradeoffs || item.risk || ""),
+          next: cleanText(item.next || item.nextAction || item.action || ""),
+          notes: cleanText(item.notes || item.privateNotes || item.description || ""),
+          foundDate: cleanText(item.foundDate || item.dateFound || item.createdDate || today),
+          checkedDate: cleanText(item.checkedDate || item.dateChecked || item.lastChecked || ""),
+          followUpDate: cleanText(item.followUpDate || item.followUp || "")
+        };
+      }
+
+      function inferTrack(item) {
+        const blob = searchBlob(item);
+        if (/broadcast|control room|studio|playout|stream|camera|signal|ip video/.test(blob)) {
+          return blob.includes("cloud") || blob.includes("ip") || blob.includes("stream") ? "Broadcast Systems / IP / Streaming" : "Broadcast Engineer";
+        }
+        if (/live event|production|show|arena|stage|crew|estimating|install/.test(blob)) {
+          return "Live Event Production Ops";
+        }
+        if (/automation|ai|systems|notion|dashboard|xr|vr|ar/.test(blob)) {
+          return "Systems / AI / Automation";
+        }
+        if (/web|product|site|frontend|client/.test(blob)) {
+          return "Web / Product / Freelance";
+        }
+        return tracks[0];
+      }
+
+      function normalizeChoice(value, options, fallback) {
+        const text = cleanText(value);
+        return options.includes(text) ? text : fallback;
+      }
+
+      function cleanText(value) {
+        return String(value == null ? "" : value).trim();
+      }
+
+      function validVariantId(id, variants) {
+        const value = cleanText(id);
+        return (variants || []).some(variant => variant.id === value) ? value : "";
+      }
+
+      function defaultVariantIdForTrack(track, variants) {
+        const variant = (variants || []).find(item => item.track === track);
+        return variant ? variant.id : ((variants || [])[0] ? variants[0].id : "");
+      }
+
+      function defaultProofIdsForTrackFrom(track, proofs) {
+        return (proofs || []).filter(proof => !proof.hidden && (proof.tracks || []).includes(track)).slice(0, 3).map(proof => proof.id);
       }
 
       function saveState() {
@@ -1433,6 +1800,9 @@
           state.selectedListingId = state.listings[0] ? state.listings[0].id : "";
         }
         renderAll();
+        if (!options || !options.silent) {
+          animateView(normalized);
+        }
       }
 
       function setTheme(theme) {
@@ -1451,6 +1821,7 @@
         state.filters.source = els.sourceFilter.value;
         state.filters.sort = els.sortFilter.value;
         renderAll();
+        animateActiveRecords();
       }
 
       function renderDashboard() {
@@ -1911,12 +2282,20 @@
         document.getElementById("notesInput").value = item ? item.notes : "";
         document.getElementById("followUpInput").value = item ? item.followUpDate || "" : "";
         document.getElementById("checkedInput").value = item ? item.checkedDate || "" : today;
-        els.listingDrawer.classList.add("open");
-        setTimeout(() => document.getElementById("companyInput").focus(), 0);
+        openDrawer(els.listingDrawer);
+        setTimeout(() => document.getElementById("companyInput").focus(), canAnimate() ? 180 : 0);
       }
 
       function closeListingDrawer() {
-        els.listingDrawer.classList.remove("open");
+        closeDrawer(els.listingDrawer);
+      }
+
+      function openHelpDrawer() {
+        openDrawer(els.helpDrawer);
+      }
+
+      function closeHelpDrawer() {
+        closeDrawer(els.helpDrawer);
       }
 
       function saveListingFromForm(event) {
@@ -2026,6 +2405,7 @@
         listing.status = listing.status === "New" ? "Tailored" : listing.status;
         saveState();
         navigate("packets");
+        animateSelectedPacket();
         toast("Application packet created.");
       }
 
@@ -2102,13 +2482,16 @@
         reader.onload = () => {
           try {
             const parsed = JSON.parse(String(reader.result || "{}"));
+            if (!hasCompatibleImportPayload(parsed)) {
+              throw new Error("Unsupported import shape");
+            }
             state = normalizeState(parsed);
             saveState();
             hydrateControls();
             renderAll();
-            toast("Backup imported.");
+            toast(`Imported ${state.listings.length} listing${state.listings.length === 1 ? "" : "s"}.`);
           } catch (error) {
-            toast("Import failed. JSON could not be parsed.");
+            toast("Import failed. Use a career-market backup, listing array, or job-search roles JSON.");
           } finally {
             event.target.value = "";
           }
@@ -2117,7 +2500,7 @@
       }
 
       function resetSeedData() {
-        const confirmed = window.confirm("Reset listings, variants, proofs, and canon back to the blank System by Dave shell data?");
+        const confirmed = window.confirm("Reset listings, variants, proofs, and canon back to the seeded System by Dave career-market data?");
         if (!confirmed) return;
         state = clone(defaultState);
         saveState();
@@ -2262,8 +2645,100 @@
       function toast(message) {
         els.toast.textContent = message;
         els.toast.classList.add("show");
+        if (canAnimate()) {
+          gsap.fromTo(els.toast, { autoAlpha: 0, y: 8, scale: 0.98 }, { autoAlpha: 1, y: 0, scale: 1, duration: 0.22, ease: "power2.out", overwrite: true });
+        }
         window.clearTimeout(toast.timer);
         toast.timer = window.setTimeout(() => els.toast.classList.remove("show"), 2400);
+      }
+
+      function canAnimate() {
+        return Boolean(window.gsap) && !motionQuery.matches;
+      }
+
+      function getActiveView() {
+        return els.views.find(section => section.dataset.view === state.activeView) || null;
+      }
+
+      function animateAppIntro() {
+        if (!canAnimate()) return;
+        gsap.from(".sidebar .brand, .nav button, .sidebar-actions > *", {
+          autoAlpha: 0,
+          x: -12,
+          duration: 0.34,
+          stagger: 0.035,
+          ease: "power2.out"
+        });
+        gsap.from(".topbar", {
+          autoAlpha: 0,
+          y: -8,
+          duration: 0.32,
+          ease: "power2.out",
+          delay: 0.04
+        });
+        animateView(state.activeView || "dashboard");
+      }
+
+      function animateView(view) {
+        if (!canAnimate()) return;
+        const active = els.views.find(section => section.dataset.view === view) || getActiveView();
+        if (!active) return;
+        const head = active.querySelector(".view-head");
+        const items = active.querySelectorAll(".kpi, .panel, .record-card, .queue-item, tbody tr, .detail-grid > *");
+        const animated = [head].filter(Boolean).concat(Array.from(items));
+        gsap.killTweensOf(animated);
+        if (head) {
+          gsap.fromTo(head, { autoAlpha: 0, y: -8 }, { autoAlpha: 1, y: 0, duration: 0.26, ease: "power2.out", overwrite: true });
+        }
+        if (items.length) {
+          gsap.fromTo(items, { autoAlpha: 0, y: 10 }, { autoAlpha: 1, y: 0, duration: 0.3, stagger: 0.025, ease: "power2.out", overwrite: true });
+        }
+      }
+
+      function animateActiveRecords() {
+        if (!canAnimate()) return;
+        const active = getActiveView();
+        if (!active) return;
+        const items = active.querySelectorAll("tbody tr, .queue-item, .record-card, .kpi, .panel");
+        if (!items.length) return;
+        gsap.fromTo(items, { autoAlpha: 0.72, y: 4 }, { autoAlpha: 1, y: 0, duration: 0.2, stagger: 0.012, ease: "power1.out", overwrite: true });
+      }
+
+      function animateSelectedPacket() {
+        if (!canAnimate() || !state.selectedPacketId) return;
+        const packet = Array.from(els.packetList.querySelectorAll("[data-select-packet]")).find(item => item.dataset.selectPacket === state.selectedPacketId);
+        if (!packet) return;
+        gsap.fromTo(packet, { autoAlpha: 0.7, x: -8 }, { autoAlpha: 1, x: 0, duration: 0.28, ease: "power2.out", overwrite: true });
+      }
+
+      function openDrawer(drawer) {
+        drawer.classList.add("open");
+        if (!canAnimate()) return;
+        const panel = drawer.querySelector(".drawer-panel");
+        gsap.killTweensOf([drawer, panel].filter(Boolean));
+        gsap.fromTo(drawer, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.16, ease: "power1.out", overwrite: true });
+        gsap.fromTo(panel, { autoAlpha: 0, x: 24 }, { autoAlpha: 1, x: 0, duration: 0.28, ease: "power2.out", overwrite: true });
+      }
+
+      function closeDrawer(drawer) {
+        if (!drawer.classList.contains("open")) return;
+        if (!canAnimate()) {
+          drawer.classList.remove("open");
+          return;
+        }
+        const panel = drawer.querySelector(".drawer-panel");
+        gsap.killTweensOf([drawer, panel].filter(Boolean));
+        gsap.to(panel, { autoAlpha: 0, x: 24, duration: 0.18, ease: "power2.in", overwrite: true });
+        gsap.to(drawer, {
+          autoAlpha: 0,
+          duration: 0.2,
+          ease: "power1.out",
+          overwrite: true,
+          onComplete() {
+            drawer.classList.remove("open");
+            gsap.set([drawer, panel], { clearProps: "all" });
+          }
+        });
       }
 
       function h(value) {

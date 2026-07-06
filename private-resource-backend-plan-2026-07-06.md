@@ -107,15 +107,16 @@ Keep endpoints small and boring.
 
 ## Integration Model
 
-The current `career-market.html` can stay single-file and localStorage-first.
+The current `career-market.html` should stay localStorage-first as the fallback path, but it does not need to stay dependency-free or permanently single-file. Public deployment should self-host approved frontend assets; private workflow upgrades can use a local backend when that improves durability, search, packet generation, or resume reuse.
 
 Next upgrade path:
 
 1. Keep localStorage as fallback.
-2. Add optional backend URL setting, default blank.
-3. If backend is available, sync listings, packets, proofs, variants, and canon.
-4. If backend is unavailable, continue local-only.
+2. Add optional backend URL setting, default blank, pointed at `127.0.0.1` for local DaveVault use.
+3. If the local backend is available, sync listings, packets, proofs, variants, canon, and stored file metadata.
+4. If the backend is unavailable, continue local-only and make the offline state obvious.
 5. Export JSON stays available either way.
+6. Keep any remote/private web hosting as a later phase after local workflow, authentication, backups, and access logging are proven.
 
 ## Security Boundary
 

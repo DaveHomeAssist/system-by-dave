@@ -2,6 +2,10 @@
 
 ## 2026-07-06
 
+* Hardcoded the initial nine career-market listings into the noindex online page so the command center persists at the System by Dave URL without requiring a first-run JSON import.
+* Hardened career-market JSON import to accept full app backups, wrapped payloads, raw listing arrays, and older `job-search.html` role bundles, with clearer imported-listing feedback.
+* Added a self-hosted GSAP runtime for the noindex `career-market.html` shell and wired progressive interaction polish for app intro, screen transitions, filters, drawers, packet creation, and toast feedback.
+* Corrected the career-market planning docs to remove stale zero-dependency assumptions and clarify that approved dependencies, self-hosted public assets, and a local-first DaveVault backend are the intended path.
 * Added an unlisted, noindex `career-market.html` command-center shell for private career browsing workflows. The page ships without listing data, uses browser localStorage plus JSON import/export, and keeps the public System by Dave repo separate from private job notes and application packets.
 * Added career-market planning docs covering the site plan, navigation/control flow, and a private resource backend concept for a local SQLite/file-backed DaveVault service.
 

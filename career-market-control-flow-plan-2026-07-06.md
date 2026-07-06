@@ -335,6 +335,7 @@ Mobile should favor cards over dense tables.
 | 4 | Application Packet print/copy view |
 | 5 | Canon / Settings and JSON backup |
 | 6 | Link validation and resume export tracking |
+| 7 | Self-hosted interaction layer for screen, drawer, filter, and packet feedback |
 
 ## Acceptance Checklist
 
@@ -347,4 +348,5 @@ Mobile should favor cards over dense tables.
 - [ ] Dashboard shows stale listings and follow-ups due.
 - [ ] JSON export/import preserves listings, packets, variants, and settings.
 - [ ] Mobile view works without horizontal scrolling.
-- [ ] App remains single-file and zero-build unless intentionally moved into `system-by-dave`.
+- [ ] Public `system-by-dave` page self-hosts approved dependencies and keeps third-party runtime code out of the live CSP surface.
+- [ ] Private app can use dependencies or a local backend when they materially improve the application workflow.

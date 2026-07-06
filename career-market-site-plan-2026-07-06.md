@@ -132,7 +132,7 @@ The public layer should stay simple and client-safe:
 | Resume route clarity | Keep `/resume/` focused on systems/AI; link AV resume where appropriate |
 | Proof links by lane | Add restrained links to AV tools, project registry, freelance landing, and demos |
 | No private notes | Do not expose application decisions, pay notes, email listings, or phone/email variants until verified |
-| No new dependencies | Follow this repo's static HTML / vanilla JS pattern |
+| Dependency policy | Dependencies are allowed when they improve the workflow. Public pages should self-host approved assets, keep CSP tight, and avoid loading third-party runtime code from CDNs. |
 | Mobile-first scanning | Recruiters should be able to scan profile, proof, and resume links quickly |
 
 ## Content Cleanup Before Launch
@@ -159,6 +159,7 @@ The public layer should stay simple and client-safe:
 - Extend `job-search.html` or create a local `career-market.html`.
 - Add role tracks, resume variant recommendation, proof-link picker, and application status.
 - Store listings in a structured JS/JSON block so records can be copied or generated.
+- Use GSAP or another justified UI dependency for meaningful interaction polish: screen transitions, drawer motion, filter refresh cues, and packet creation feedback. Keep reduced-motion support.
 
 ### Phase 3: Resume Variants
 
