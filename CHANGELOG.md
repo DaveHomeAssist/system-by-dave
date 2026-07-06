@@ -2,6 +2,7 @@
 
 ## 2026-07-06
 
+* Added FIFA World Cup 26 Philadelphia field-operations credit to the public profile and systems resume IATSE experience language.
 * Hardcoded the initial nine career-market listings into the noindex online page so the command center persists at the System by Dave URL without requiring a first-run JSON import.
 * Hardened career-market JSON import to accept full app backups, wrapped payloads, raw listing arrays, and older `job-search.html` role bundles, with clearer imported-listing feedback.
 * Added a self-hosted GSAP runtime for the noindex `career-market.html` shell and wired progressive interaction polish for app intro, screen transitions, filters, drawers, packet creation, and toast feedback.
