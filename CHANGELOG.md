@@ -2,6 +2,8 @@
 
 ## 2026-07-06
 
+* Seeded the Comcast Spectacor Broadcast Engineer packet into the career-market command center, including Req `R439197`, Xfinity Mobile Arena positioning, gap handling, proof links, and submission checklist notes.
+* Added a career-market seed migration so updated baked listings and packets can hydrate existing browser sessions without clearing application progress statuses.
 * Added FIFA World Cup 26 Philadelphia field-operations credit to the public profile and systems resume IATSE experience language.
 * Hardcoded the initial nine career-market listings into the noindex online page so the command center persists at the System by Dave URL without requiring a first-run JSON import.
 * Hardened career-market JSON import to accept full app backups, wrapped payloads, raw listing arrays, and older `job-search.html` role bundles, with clearer imported-listing feedback.

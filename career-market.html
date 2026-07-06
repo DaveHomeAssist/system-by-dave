@@ -574,6 +574,14 @@
       line-height: 1.5;
     }
 
+    .packet-pre {
+      margin: 0;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      font: 13px/1.55 ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+      color: var(--text);
+    }
+
     .empty {
       padding: 24px;
       border: 1px dashed var(--line);
@@ -1034,7 +1042,7 @@
       "use strict";
 
       const STORAGE_KEY = "careerMarket.v1";
-      const SEED_VERSION = "career-market-seed-2026-07-06-v2";
+      const SEED_VERSION = "career-market-seed-2026-07-06-v3";
       const today = new Date().toISOString().slice(0, 10);
       const motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 
@@ -1189,15 +1197,15 @@
           location: "Philadelphia, PA",
           type: "Full-time",
           priority: "Apply now",
-          status: "New",
+          status: "Tailored",
           track: "Broadcast Engineer",
           resumeVariant: "broadcast-engineer",
           proofIds: ["profile", "av-resume", "av-tools"],
-          tags: ["Arena broadcast", "Live sports", "Signal flow", "IP systems"],
-          fit: "Cleanest match: local arena broadcast, live sports, control-room-adjacent engineering, video/audio signal flow, and IP broadcast systems.",
-          tradeoff: "Nights/weekends; full-time arena ops cadence.",
-          next: "Apply first. Tailor resume around ISPOR Pixera, SDI/IP, arena show reliability, and calm troubleshooting under show pressure.",
-          notes: "Lead with arena/live-event experience plus engineering judgment. This is the best match for stepping up without abandoning hands-on video systems work.",
+          tags: ["Req R439197", "Arena broadcast", "Live sports", "Signal routing", "RF/IPTV bridge"],
+          fit: "Strong match: 8+ years of live event and broadcast video engineering, direct work history in the building now branded Xfinity Mobile Arena, and coverage of nearly every core responsibility.",
+          tradeoff: "RF/IPTV and formal secondary EIC title are partial gaps; degree is preferred, but the posting allows coursework plus extensive related experience. Nights/weekends are expected.",
+          next: "Review tailored resume and cover letter, export PDFs, submit Workday Req R439197, then ask Local 8 arena contacts about engineering staff and referral paths.",
+          notes: "Notion packet exists. Lead with RF distribution and NDI/IP networking without claiming IPTV headend ownership. Use Digital Footprints leadership as EIC-equivalent proof: technical authority, crew coordination, client decisions, technician training, and maintenance mindset.",
           foundDate: today,
           checkedDate: today,
           followUpDate: ""
@@ -1396,12 +1404,44 @@
         }
       ];
 
+      const defaultPackets = [
+        {
+          id: "packet-spectacor-broadcast-engineer-2026-07-06",
+          listingId: "listing-spectacor-broadcast-engineer",
+          createdDate: "2026-07-06",
+          company: "Spectacor",
+          role: "Broadcast Engineer",
+          sourceUrl: "https://jobs.comcast.com/job/philadelphia/broadcast-engineer-spectacor/45483/96603329296",
+          resumeId: "broadcast-engineer",
+          resumeName: "Broadcast Engineer",
+          proofs: [
+            { label: "System by Dave Profile", url: "https://systembydave.com/profile/" },
+            { label: "AV Resume", url: "https://davehomeassist.github.io/av-resume/" },
+            { label: "AV Tools Suite", url: "https://systembydave.com/tools.html" }
+          ],
+          publicCopy: [
+            "Spectacor - Broadcast Engineer",
+            "Req R439197 / Xfinity Mobile Arena / Philadelphia, PA",
+            "Resume variant: Broadcast Engineer",
+            "Positioning: live event video engineer with 8+ years across arena, studio, and experiential production; in-venue signal routing, camera chains, RF distribution, real-time troubleshooting, and system maintenance.",
+            "Proof links:\nSystem by Dave Profile: https://systembydave.com/profile/\nAV Resume: https://davehomeassist.github.io/av-resume/\nAV Tools Suite: https://systembydave.com/tools.html"
+          ].join("\n\n"),
+          privateNotes: [
+            "Fit verdict: Strong match. Apply.",
+            "Gap plan: lead with confirmed RF distribution, then bridge to NDI/IP networking. Do not claim IPTV headend experience unless verified.",
+            "EIC plan: frame Digital Footprints leadership as equivalent scope: system design authority, crew coordination, client-facing engineering decisions, and technician training.",
+            "Degree plan: one-line cover-letter handling only; Loyola Computer Science coursework plus extensive related experience maps to the posting language.",
+            "Checklist: review resume draft, export 2026-07-06_WRK-RES_DavidRobertson_Resume_ComcastSpectacor.pdf, finalize cover letter PDF, submit via Workday, log application, ask Local 8 arena contacts for referral/context."
+          ].join("\n\n")
+        }
+      ];
+
       const defaultState = {
         schemaVersion: 1,
         seedVersion: SEED_VERSION,
         activeView: "dashboard",
         selectedListingId: "listing-spectacor-broadcast-engineer",
-        selectedPacketId: "",
+        selectedPacketId: "packet-spectacor-broadcast-engineer-2026-07-06",
         filters: {
           search: "",
           track: "all",
@@ -1425,7 +1465,7 @@
         variants: defaultVariants,
         proofs: defaultProofs,
         listings: defaultListings,
-        packets: []
+        packets: defaultPackets
       };
 
       let state = loadState();
@@ -1606,6 +1646,10 @@
             loaded.seedVersion = SEED_VERSION;
             loaded.listings = clone(defaultListings);
             loaded.selectedListingId = loaded.listings[0] ? loaded.listings[0].id : "";
+            loaded.packets = clone(defaultPackets);
+            loaded.selectedPacketId = loaded.packets[0] ? loaded.packets[0].id : "";
+          } else if (parsed.seedVersion !== SEED_VERSION) {
+            applySeedUpgrade(loaded);
           }
           return loaded;
         } catch (error) {
@@ -1633,6 +1677,43 @@
           merged.selectedPacketId = merged.packets[0] ? merged.packets[0].id : "";
         }
         return merged;
+      }
+
+      function applySeedUpgrade(loaded) {
+        const previousListings = new Map((loaded.listings || []).map(item => [item.id, item]));
+        loaded.seedVersion = SEED_VERSION;
+        loaded.variants = mergeSeedRecords(loaded.variants, defaultVariants, ["lastExported", "stale"]);
+        loaded.proofs = mergeSeedRecords(loaded.proofs, defaultProofs, ["lastChecked", "hidden"]);
+        loaded.listings = mergeSeedRecords(loaded.listings, defaultListings, ["foundDate", "checkedDate", "followUpDate"]);
+        loaded.listings.forEach(item => {
+          const previous = previousListings.get(item.id);
+          if (previous && ["Applied", "Follow-up", "Interview", "Closed", "Skipped"].includes(previous.status)) {
+            item.status = previous.status;
+          }
+        });
+        loaded.packets = mergeSeedRecords(loaded.packets, defaultPackets, []);
+        if (!loaded.selectedListingId && loaded.listings.length) {
+          loaded.selectedListingId = loaded.listings[0].id;
+        }
+        if (!loaded.selectedPacketId && loaded.packets.length) {
+          loaded.selectedPacketId = loaded.packets[0].id;
+        }
+      }
+
+      function mergeSeedRecords(records, seeds, preserveFields) {
+        const current = Array.isArray(records) ? records : [];
+        const existingById = new Map(current.map(item => [item && item.id, item]).filter(([id]) => id));
+        const seedIds = new Set(seeds.map(item => item.id));
+        const refreshed = seeds.map(seed => {
+          const existing = existingById.get(seed.id);
+          if (!existing) return clone(seed);
+          const merged = clone(seed);
+          preserveFields.forEach(field => {
+            if (existing[field] !== undefined) merged[field] = existing[field];
+          });
+          return merged;
+        });
+        return refreshed.concat(current.filter(item => item && !seedIds.has(item.id)));
       }
 
       function shouldApplySeedUpgrade(parsed, loaded) {
@@ -2199,7 +2280,7 @@
             </div>
             <div>
               <h3>Public packet copy</h3>
-              <p>${h(packet.publicCopy)}</p>
+              <pre class="packet-pre">${h(packet.publicCopy)}</pre>
             </div>
             <div>
               <h3>Proof links</h3>
@@ -2207,7 +2288,7 @@
             </div>
             <div>
               <h3>Private notes</h3>
-              <p>${h(packet.privateNotes || "No private notes recorded.")}</p>
+              <pre class="packet-pre">${h(packet.privateNotes || "No private notes recorded.")}</pre>
             </div>
           </div>
         `;
