@@ -6,9 +6,9 @@ This plan comes from the live audit of `systembydave.com` AV Suite tools on
 July 3, 2026. Teleprompter and PlotForge are intentionally out of scope for
 feature work in this pass.
 
-The current suite is a static GitHub Pages app with no build step, a shared AV
-tool registry in `js/sbd-registry.js`, a service worker for offline caching, a
-shared mobile table reflow helper, and per-tool vanilla HTML/CSS/JS pages.
+Current implementation snapshot: static GitHub Pages app, shared AV tool registry
+in `js/sbd-registry.js`, service worker offline caching, shared mobile table
+reflow helper, and per-tool browser HTML/CSS/JS pages.
 
 ## Patch Scope For This Pass
 

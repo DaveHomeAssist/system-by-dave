@@ -45,7 +45,7 @@
 
 ## 2026-06-23
 
-* Added an unlisted, noindex **Agent Finder** build notebook at `/agent-finder/` — a self-contained, zero-dependency (vanilla JS) page implementing the Literary Agent Finder design: six horizontally-snapping panels (pitch, competitive landscape, data-model blueprint, feature specs, roadmap) and an editable kanban task board with `localStorage` persistence, count-up stats, and keyboard/arrow/swipe navigation. Smoke-tested headless with zero console errors.
+* Added an unlisted, noindex **Agent Finder** build notebook at `/agent-finder/` — a self-contained, browser JS page implementing the Literary Agent Finder design: six horizontally-snapping panels (pitch, competitive landscape, data-model blueprint, feature specs, roadmap) and an editable kanban task board with `localStorage` persistence, count-up stats, and keyboard/arrow/swipe navigation. Smoke-tested headless with zero console errors.
 * Added a companion **Data Sourcing & Compliance Brief** at `/agent-finder/compliancebrief.html` — a decision-support memo on which agent-data sources are usable, the risk behind each, field-level freshness TTLs, and pre-build guardrails (a `localStorage` checklist). Framed as recommendations to pressure-test rather than final rulings; findings are research notes pending counsel review, not legal advice.
 * Both pages stay noindex, blocked in `robots.txt`, and out of `sitemap.xml` (internal build/planning content), but are now reachable from the homepage **Resources** footer and cross-linked: a "← System by Dave" back-link on each page, and a notebook ↔ brief link. Google Fonts are the only external dependency; the CSP allows `fonts.googleapis.com` / `fonts.gstatic.com` and otherwise restricts to `'self'`.
 
@@ -168,7 +168,7 @@
 ## 2026-06-11
 
 * Added a public-safe **Project Registry** at `/project-registry.html` with searchable/filterable metadata for 52 public DaveHomeAssist repositories. Private repos, local filesystem paths, dirty worktree counts, and internal triage notes remain excluded from the published data set. Added the page to the homepage Resources footer and `sitemap.xml`.
-* Launched a public **Prompt Library** browser at `/prompts/`: a self-contained, zero-dependency page (vanilla JS) with 228 curated, copy-ready prompts: instant search, faceted filters (collection/area/pack/format/platform), and one-click copy. Public-safe subset (internal/operational prompts, Notion IDs, and flagged drafts excluded). Added to `sitemap.xml`.
+* Launched a public **Prompt Library** browser at `/prompts/`: a self-contained, browser JS page with 228 curated, copy-ready prompts: instant search, faceted filters (collection/area/pack/format/platform), and one-click copy. Public-safe subset (internal/operational prompts, Notion IDs, and flagged drafts excluded). Added to `sitemap.xml`.
 * Upgraded `/prompts/` with five features (smoke-tested headless, zero console errors): `{{variable}}` fill-in with live preview + remembered values, relevance-ranked search with match highlighting, per-prompt permalinks (`#p=id`) + shareable view-links, `j`/`k` result navigation plus a ⌘/Ctrl-K command palette, and full keyboard/ARIA accessibility (live regions, focus-visible rings, reduced-motion). Plus per-group counts in the facet dropdowns.
 * Linked `/prompts/` (nav + Products footer) and `/profile/` (Connect footer) from the homepage so both routes are reachable, not just listed in `sitemap.xml`.
 
