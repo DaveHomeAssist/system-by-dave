@@ -51,6 +51,18 @@ function hasReturnPath(source) {
     || /href=["']https:\/\/systembydave\.com\/(?:["'#?]|index\.html)/i.test(source);
 }
 
+function isNoIndex(source) {
+  return /<meta\s+name=["']robots["'][^>]*content=["'][^"']*noindex/i.test(source);
+}
+
+function hasPublicCommand53Exposure(source) {
+  return /href=["']command53\//i.test(source)
+    || /url:\s*["']command53\//i.test(source)
+    || /open-command53/i.test(source)
+    || /proof:command53/i.test(source)
+    || />\s*Command53\s*</i.test(source);
+}
+
 function prefixFor(file) {
   const dir = path.dirname(file);
   if (dir === '.') return '';
@@ -68,6 +80,7 @@ function verifyPublicHtml() {
     if (!isDocument(source)) return;
     pages += 1;
     if (!isHomeFile(file) && !hasReturnPath(source)) fail(`${file} has no verified return path.`);
+    if (!isNoIndex(source) && hasPublicCommand53Exposure(source)) fail(`${file} exposes private Command53 routing on a public page.`);
     if (/sbd-public-nav\.js/i.test(source)) {
       const prefix = prefixFor(file);
       if (!source.includes(`href="${prefix}css/sbd-public-nav.css"`)) fail(`${file} loads public nav JS without matching CSS path.`);
