@@ -1,8 +1,15 @@
 import os, subprocess, json, io, sys, datetime, collections
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
-ROOT = r'c:/Users/digit/Desktop/github-davehomeassist'
-SKIP = {'.claude', '__pycache__', '_codex_tmp', 'node_modules', '.git', 'system-by-dave'}
+SITE_ROOT = os.path.dirname(os.path.abspath(__file__))
+DEFAULT_ROOTS = [
+    os.path.expanduser('~/Code'),
+    os.path.expanduser('~/Code/active'),
+    os.path.expanduser('~/Desktop/Code/10-projects/active'),
+    os.path.expanduser('~/Desktop/Code/10-projects/secondary'),
+]
+ROOTS = [p for p in os.environ.get('SBD_PROJECT_ROOTS', os.pathsep.join(DEFAULT_ROOTS)).split(os.pathsep) if p and os.path.isdir(p)]
+SKIP = {'.claude', '__pycache__', '_codex_tmp', 'node_modules', '.git', 'system-by-dave', '_unmerged-work', 'active'}
 PRUNE = {'node_modules', '.git', 'dist', 'build', '.next', '.vite', 'vendor'}
 now = datetime.datetime.now(datetime.timezone.utc)
 
@@ -42,10 +49,28 @@ def count_files_nongit(path):
         if n > 20000: return n
     return n
 
+def iter_project_dirs():
+    seen = set()
+    for root in ROOTS:
+        try:
+            names = sorted(os.listdir(root))
+        except Exception:
+            continue
+        for name in names:
+            full = os.path.join(root, name)
+            if not os.path.isdir(full) or name in SKIP or name.startswith('.') or name.startswith('_'):
+                continue
+            try:
+                real = os.path.realpath(full)
+            except Exception:
+                real = full
+            if real in seen:
+                continue
+            seen.add(real)
+            yield root, name, full
+
 projects = []
-for name in sorted(os.listdir(ROOT)):
-    full = os.path.join(ROOT, name)
-    if not os.path.isdir(full) or name in SKIP: continue
+for root, name, full in iter_project_dirs():
     is_git = os.path.exists(os.path.join(full, '.git'))
     p = {'name': name, 'git': is_git, 'branch': '', 'last_iso': '', 'last_msg': '', 'dirty': 0,
          'ahead': 0, 'behind': 0, 'c7': 0, 'c30': 0, 'total': 0, 'remote': '', 'files': 0, 'lang': '—',
@@ -102,7 +127,7 @@ stats = {'total': len(projects), 'git': gitn, 'dirty': dirty, 'active': active, 
          'generated': now.astimezone().strftime('%Y-%m-%d %H:%M')}
 
 # --- rolling snapshot history -> trend deltas + sparklines (one point per day, last 30) ---
-HIST_PATH = os.path.join(ROOT, 'cross-project-dashboard.history.json')
+HIST_PATH = os.path.join(SITE_ROOT, 'cross-project-dashboard.history.json')
 today = now.astimezone().strftime('%Y-%m-%d')
 try:
     hist = json.load(open(HIST_PATH, encoding='utf-8')) if os.path.exists(HIST_PATH) else {}
@@ -135,8 +160,24 @@ except Exception:
 data = json.dumps(projects, ensure_ascii=False).replace('<', '\\u003c').replace('>', '\\u003e').replace('&', '\\u0026')
 
 HTML = r'''<!DOCTYPE html><html lang="en"><head>
+<meta name="robots" content="noindex">
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Cross-Project Tracker — github-davehomeassist</title>
+<meta name="description" content="Private cross-project tracker for local repo health, Pages surfaces, work queues, and System by Dave operator follow-up.">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; base-uri 'self'; form-action 'self'; upgrade-insecure-requests">
+<meta name="theme-color" content="#0a0b10">
+<link rel="icon" href="png/sbd_logo_rust_dark.png">
+<link rel="canonical" href="https://systembydave.com/cross-project-dashboard.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="System by Dave">
+<meta property="og:title" content="Cross-Project Tracker — github-davehomeassist | System by Dave">
+<meta property="og:description" content="Private cross-project tracker for local repo health, Pages surfaces, work queues, and System by Dave operator follow-up.">
+<meta property="og:url" content="https://systembydave.com/cross-project-dashboard.html">
+<meta property="og:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Cross-Project Tracker — github-davehomeassist | System by Dave">
+<meta name="twitter:description" content="Private cross-project tracker for local repo health, Pages surfaces, work queues, and System by Dave operator follow-up.">
+<meta name="twitter:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
 <style>
 :root{--bg:#0a0b10;--surface:#13151d;--raised:#1a1d28;--border:#262a37;--text:#e8eaf2;--dim:#8b90a6;--mut:#5b6072;
 --violet:#a78bfa;--teal:#2dd4bf;--green:#34d399;--amber:#fbbf24;--red:#f87171;--blue:#60a5fa;}
@@ -156,8 +197,8 @@ h1 .gen{margin-left:auto;font-size:11.5px;font-weight:400;color:var(--mut);font-
 #q:focus{border-color:var(--violet)}
 select{background:var(--raised);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:8px 10px;font-size:12.5px;outline:none}
 .cnt{font-size:12px;color:var(--dim);margin-left:auto}
-.wrap{max-width:1240px;margin:16px auto 0;padding:0 24px}
-table{width:100%;border-collapse:collapse;font-size:12.8px}
+.wrap{max-width:1240px;margin:16px auto 0;padding:0 24px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;min-width:1120px;border-collapse:collapse;font-size:12.8px}
 th{text-align:left;color:var(--dim);font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;padding:8px 10px;border-bottom:1px solid var(--border);position:sticky;top:60px;background:var(--bg);cursor:pointer;white-space:nowrap}
 th:hover{color:var(--text)}
 td{padding:10px;border-bottom:1px solid rgba(38,42,55,.6);vertical-align:middle}
@@ -240,7 +281,10 @@ a{color:var(--teal);text-decoration:none}a:hover{text-decoration:underline}
 .tool.on{color:var(--violet);border-color:var(--violet)}
 .ackbtn{font-size:10.5px}
 #autoacts{margin-top:8px}#autoacts:empty{display:none}
-</style></head><body>
+@media(max-width:760px){.bar{padding:14px}.bar h1{flex-wrap:wrap}.stats{grid-template-columns:repeat(2,1fr);padding:0 14px}.controls,.wrap,.note,.actions,.insights{padding-left:14px;padding-right:14px}.cnt{width:100%;margin-left:0}.act-stamp{display:none}}
+@media(max-width:480px){.stats{grid-template-columns:1fr}.stat{padding:13px 15px}.stat .v{font-size:26px}.tool{flex:1;text-align:center}}
+</style><link rel="stylesheet" href="css/sbd-public-nav.css">
+</head><body>
 <div class="bar"><h1><span class="logo">▦</span> Cross-Project Tracker <span class="gen" id="gen"></span><span class="agepill" id="agepill"></span></h1></div>
 <div class="stats" id="stats"></div>
 <section class="insights" id="insights">
@@ -341,7 +385,7 @@ function render(){
     const sync=(p.ahead?'<span class="b ahead">↑'+p.ahead+'</span> ':'')+(p.behind?'<span class="b behind">↓'+p.behind+'</span>':'')||(p.git?'<span class="num">—</span>':'');
     const dd=p.d_dirty?'<span class="dlt '+(p.d_dirty>0?'up':'dn')+'" title="change since previous snapshot">'+(p.d_dirty>0?'+':'')+p.d_dirty+'</span>':'';
     const dirty=p.git?(p.dirty>0?'<span class="b dirty">'+p.dirty+'</span>'+dd:'<span class="b clean">✓</span>'):'';
-    const rl=p.remote?('<a href="https://github.com/'+esc(p.remote)+'" target="_blank" rel="noopener">'+esc(p.remote)+'</a>'+'<a class="glink" href="https://github.com/'+esc(p.remote)+'/commits/'+enc(p.branch)+'" target="_blank" rel="noopener">commits</a>'+(p.ahead>0?'<a class="glink" href="https://github.com/'+esc(p.remote)+'/compare/'+enc(p.branch)+'" target="_blank" rel="noopener">compare</a>':'')):'<span class="num">local</span>';
+    const rl=p.remote?('<a href="https://github.com/'+esc(p.remote)+'" target="_blank" rel="noopener noreferrer">'+esc(p.remote)+'</a> '+'<a class="glink" href="https://github.com/'+esc(p.remote)+'/commits/'+enc(p.branch)+'" target="_blank" rel="noopener noreferrer">commits</a>'+(p.ahead>0?' <a class="glink" href="https://github.com/'+esc(p.remote)+'/compare/'+enc(p.branch)+'" target="_blank" rel="noopener noreferrer">compare</a>':'')):'<span class="num">local</span>';
     const open=p.path?'<a class="glink open" href="vscode://file/'+esc(p.uri||p.path.replace(/\\/g,"/"))+'" title="Open this folder in VSCode">open</a>':'';
     const rsn=reasons(p);
     const riskBadge=p._score>0?'<span class="b risk'+(isAck(p)?' ackd':'')+'" title="'+esc(rsn.join(' • '))+'">'+p._score+'</span>':'<span class="num">0</span>';
@@ -423,12 +467,13 @@ $('ackToggle').addEventListener('click',e=>{showAck=!showAck;const b=e.target.cl
 $('filt').value=filt;$('q').value=q;
 if(LS.get('cpt.ins',false)){$('insights').classList.add('collapsed');const b=$('insToggle');b.textContent='show';b.setAttribute('aria-expanded','false');}
 buildInsights();buildAuto();render();
-</script></body></html>'''
+</script><script src="js/sbd-public-nav.js" defer></script>
+</body></html>'''
 acts = ''
-_ap = os.path.join(ROOT, 'cross-project-actions.html')
+_ap = os.path.join(SITE_ROOT, 'cross-project-actions.html')
 if os.path.exists(_ap): acts = open(_ap, encoding='utf-8').read()
 HTML = HTML.replace('__DATA__', data).replace('__STATS__', json.dumps(stats)).replace('__ACTIONS__', acts)
-out = os.path.join(ROOT, 'cross-project-dashboard.html')
+out = os.path.join(SITE_ROOT, 'cross-project-dashboard.html')
 open(out, 'w', encoding='utf-8').write(HTML)
 print('scanned projects:', len(projects), '| git:', gitn, '| dirty:', dirty, '| active≤7d:', active, '| commits30d:', c30, '| unpushed:', unpushed)
 print('wrote', out, '|', len(HTML.encode('utf-8')), 'bytes')
