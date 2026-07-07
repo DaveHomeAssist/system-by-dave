@@ -8,6 +8,7 @@
 * Added computed AV Workbook engine validation for audio, power, RF, video, and logistics, plus an Engines dashboard with issue totals, route cards, load meters, RF lanes, truck zone weights, and deterministic unit tests.
 * Added eight newly sourced Career Market listings from live web search and Gmail job alerts: Villanova broadcast operations, Audacy technical engineering, FIFA ceremonies production integration, TAIT event production technical direction, Netflix House attractions supervision, Jobot AV engineering, Epic video engineering, and Crossing Hurdles remote audio.
 * Bumped the Career Market seed to `career-market-seed-2026-07-07-v4` so existing browser sessions hydrate the new listings while preserving application progress.
+* Added AV Workbook legacy audio import for existing `Input List`, `Audio Patch`, and `Line Check` browser data, mapping those localStorage records into workbook signal sources, patch records, and line checks with repeatable unit-tested adapters.
 
 ## 2026-07-06
 

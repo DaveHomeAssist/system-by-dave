@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { DataGrid } from "./DataGrid";
 import { EngineDashboard } from "./EngineDashboard";
 import { downloadText, exportWorkbook, importWorkbook, loadActiveWorkbook, saveWorkbook } from "./store";
+import { mergeLegacyAudioIntoWorkbook, readLegacyAudioBundle } from "./legacyAudioImport";
 import { readRegistry } from "./registry";
 import type { AvWorkbook, RegistryTool } from "./types";
 import { validateWorkbookIssues } from "./validators";
@@ -24,6 +25,7 @@ function workbookCounts(workbook: AvWorkbook) {
     gear: workbook.gearManifest.length,
     sources: workbook.signalSources.length,
     patch: workbook.patchRecords.length,
+    "line checks": workbook.lineChecks.length,
     tasks: workbook.tasks.length
   };
 }
@@ -82,6 +84,31 @@ export default function App() {
     setMessage("Workbook JSON imported.");
   }
 
+  async function handleLegacyAudioImport() {
+    if (!workbook) return;
+    let storage: Storage;
+    try {
+      storage = window.localStorage;
+    } catch {
+      setMessage("Legacy audio import needs browser storage access.");
+      return;
+    }
+    try {
+      const bundle = readLegacyAudioBundle(storage);
+      const result = mergeLegacyAudioIntoWorkbook(workbook, bundle);
+      if (!result.summary.importedKeys.length) {
+        setMessage("No Input List, Audio Patch, or Line Check data found in this browser.");
+        return;
+      }
+      const saved = await saveWorkbook(result.workbook);
+      setWorkbook(saved);
+      setActiveTab("engines");
+      setMessage(`Legacy audio imported: ${result.summary.signalSources} sources, ${result.summary.patchRecords} patches, ${result.summary.lineChecks} line checks.`);
+    } catch (error: unknown) {
+      setMessage(error instanceof Error ? error.message : "Legacy audio import failed.");
+    }
+  }
+
   if (!workbook) {
     return (
       <main className="shell">
@@ -100,6 +127,7 @@ export default function App() {
         <nav aria-label="Workbook actions">
           <a href="../av-suite.html">Suite Console</a>
           <button type="button" onClick={handleExport}>Export JSON</button>
+          <button type="button" onClick={() => void handleLegacyAudioImport()}>Import Legacy Audio</button>
           <label className="file-button">
             Import JSON
             <input type="file" accept="application/json" onChange={(event) => void handleImport(event.target.files?.[0] ?? null)} />
@@ -196,6 +224,20 @@ export default function App() {
                 </a>
               ))}
             </div>
+          </article>
+
+          <article className="panel legacy-import-panel">
+            <div className="panel-head">
+              <div>
+                <p className="kicker">Legacy audio</p>
+                <h2>Input List → Audio Patch → Line Check</h2>
+              </div>
+              <button type="button" onClick={() => void handleLegacyAudioImport()}>Import</button>
+            </div>
+            <ul className="data-list">
+              <li><strong>Reads</strong><span>input-list.v1 · audio-patch.v1 · line-check.v1</span></li>
+              <li><strong>Writes</strong><span>Signal sources · patch records · line checks</span></li>
+            </ul>
           </article>
         </section>
       ) : null}

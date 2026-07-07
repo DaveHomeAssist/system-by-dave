@@ -141,7 +141,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool change — rolls the service-worker cache. */
-    version:'v20260707-av-workbook-p3',
+    version:'v20260707-av-workbook-audio-import',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,

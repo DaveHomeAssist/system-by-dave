@@ -47,7 +47,7 @@ h2{font-size:20px}
 .profile-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;padding:16px;margin-bottom:16px}
 label{color:var(--muted);font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:.11em}
 label input,label select{margin-top:7px;font-family:var(--font-sans);letter-spacing:0;text-transform:none}
-.metric-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin-bottom:16px}
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:16px}
 .metric-card{padding:15px}
 .metric-card span{display:block;color:var(--muted);font-family:var(--font-mono);font-size:11px;text-transform:uppercase}
 .metric-card strong{display:block;margin-top:8px;font-family:var(--font-mono);font-size:30px}
