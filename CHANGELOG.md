@@ -6,6 +6,8 @@
 * Added `/av-workbook/` to the AV Suite offline asset manifest and sitemap flow while keeping the existing AV Suite console and standalone tool URLs intact.
 * Added the first shared workbook grid mechanics, including editable cells, keyboard movement, search, sort, add-row, and spreadsheet paste support for workbook-backed Crew Call and Room Check tabs.
 * Added computed AV Workbook engine validation for audio, power, RF, video, and logistics, plus an Engines dashboard with issue totals, route cards, load meters, RF lanes, truck zone weights, and deterministic unit tests.
+* Added eight newly sourced Career Market listings from live web search and Gmail job alerts: Villanova broadcast operations, Audacy technical engineering, FIFA ceremonies production integration, TAIT event production technical direction, Netflix House attractions supervision, Jobot AV engineering, Epic video engineering, and Crossing Hurdles remote audio.
+* Bumped the Career Market seed to `career-market-seed-2026-07-07-v4` so existing browser sessions hydrate the new listings while preserving application progress.
 
 ## 2026-07-06
 
