@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { DataGrid } from "./DataGrid";
+import { EngineDashboard } from "./EngineDashboard";
 import { downloadText, exportWorkbook, importWorkbook, loadActiveWorkbook, saveWorkbook } from "./store";
 import { readRegistry } from "./registry";
 import type { AvWorkbook, RegistryTool } from "./types";
+import { validateWorkbookIssues } from "./validators";
 import { createCrewRow, createRoomRow, crewColumns, roomColumns } from "./worksheetSchemas";
 import "./styles.css";
 
@@ -29,10 +31,11 @@ function workbookCounts(workbook: AvWorkbook) {
 export default function App() {
   const [workbook, setWorkbook] = useState<AvWorkbook | null>(null);
   const [message, setMessage] = useState("Loading workbook...");
-  const [activeTab, setActiveTab] = useState<"overview" | "crew" | "rooms">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "crew" | "rooms" | "engines">("overview");
   const registry = useMemo(readRegistry, []);
   const counts = workbook ? workbookCounts(workbook) : null;
   const engineTools = registry.tools.filter((tool) => ["Audio", "Power", "Network", "Video", "Comms", "Logistics", "Rooms", "Labor", "Closeout"].includes(tool.dept));
+  const issues = useMemo(() => (workbook ? validateWorkbookIssues(workbook) : []), [workbook]);
 
   useEffect(() => {
     let cancelled = false;
@@ -112,6 +115,7 @@ export default function App() {
         </div>
         <div className="hero-status">
           <span>{statusLabel(workbook.show.globalStatus)}</span>
+          <strong>{issues.filter((issue) => issue.severity === "red").length} red · {issues.filter((issue) => issue.severity === "yellow").length} yellow</strong>
           <strong>{registry.version}</strong>
           <small>{message}</small>
         </div>
@@ -155,7 +159,8 @@ export default function App() {
         {[
           ["overview", "Overview"],
           ["crew", "Crew Call"],
-          ["rooms", "Room Check"]
+          ["rooms", "Room Check"],
+          ["engines", "Engines"]
         ].map(([id, label]) => (
           <button key={id} type="button" role="tab" aria-selected={activeTab === id} onClick={() => setActiveTab(id as typeof activeTab)}>
             {label}
@@ -215,6 +220,10 @@ export default function App() {
           createRow={createRoomRow}
           onRowsChange={(rooms) => void updateWorkbook({ ...workbook, rooms }, "Room grid saved.")}
         />
+      ) : null}
+
+      {activeTab === "engines" ? (
+        <EngineDashboard workbook={workbook} issues={issues} />
       ) : null}
     </main>
   );
