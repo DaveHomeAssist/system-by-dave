@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-07-07
+
+* Added the first build-backed AV Workbook app surface at `/av-workbook/`, with a React/TypeScript local-first workbook shell, Dexie-backed persistence, JSON import/export, and a compatibility gateway at `av-workbook.html`.
+* Added `/av-workbook/` to the AV Suite offline asset manifest and sitemap flow while keeping the existing AV Suite console and standalone tool URLs intact.
+
 ## 2026-07-06
 
 * Seeded the Comcast Spectacor Broadcast Engineer packet into the career-market command center, including Req `R439197`, Xfinity Mobile Arena positioning, gap handling, proof links, and submission checklist notes.

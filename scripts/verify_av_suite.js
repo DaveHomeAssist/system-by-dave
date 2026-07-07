@@ -76,7 +76,7 @@ function assertSourceChecks(registry) {
 }
 
 function assertPageContracts(registry) {
-  const publicPages = ['index.html', 'tools.html', 'av-suite.html'];
+  const publicPages = ['index.html', 'tools.html', 'av-suite.html', 'av-workbook.html', 'av-workbook/index.html'];
   const toolPages = registry.tools.map((tool) => tool.href);
   const aliasPages = Object.values(registry.aliases || {});
   const pages = Array.from(new Set(publicPages.concat(toolPages, aliasPages)));

@@ -1,5 +1,7 @@
 .DS_Store
 *.DS_Store
 Thumbs.db
+node_modules/
+dist/
 Agent Images/
 Prompt Lab Extension Pictures (v1.7)/

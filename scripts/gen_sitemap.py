@@ -24,6 +24,8 @@ STATIC_PAGES = [
     ("", "weekly", "1.0"),
     ("tools.html", "weekly", "0.9"),
     ("av-suite.html", "weekly", "0.9"),
+    ("av-workbook.html", "weekly", "0.8"),
+    ("av-workbook/", "weekly", "0.8"),
     ("notion.html", "weekly", "0.8"),
     ("prompt-lab.html", "weekly", "0.8"),
     ("skills.html", "weekly", "0.7"),

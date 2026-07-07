@@ -108,6 +108,10 @@
     './css/responsive-tables.css',
     './css/av-domain-views.css',
     './css/fonts.css',
+    './av-workbook.html',
+    './av-workbook/index.html',
+    './av-workbook/assets/av-workbook.js',
+    './av-workbook/assets/av-workbook.css',
     './svg/system_by_dave_logo_rust.svg',
     './img/card-cover-banner-wide.png',
     './manifest.json',
@@ -137,7 +141,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool change — rolls the service-worker cache. */
-    version:'v20260706-logistics-rooms-camera',
+    version:'v20260707-av-workbook-p1',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,

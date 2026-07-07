@@ -1,0 +1,25 @@
+{
+  "name": "system-by-dave",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build:av-workbook": "vite build --config apps/av-workbook/vite.config.ts",
+    "dev:av-workbook": "vite --config apps/av-workbook/vite.config.ts",
+    "test:av-workbook": "vitest run --config apps/av-workbook/vitest.config.ts",
+    "typecheck:av-workbook": "tsc -p apps/av-workbook/tsconfig.json --noEmit",
+    "verify:av": "node scripts/verify_av_suite.js"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^4.3.4",
+    "dexie": "^4.0.11",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.7",
+    "vitest": "^2.1.8",
+    "zod": "^3.24.1"
+  }
+}
