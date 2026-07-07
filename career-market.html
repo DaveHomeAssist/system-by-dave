@@ -1664,6 +1664,7 @@
       let state = loadState();
 
       const els = {};
+      const routeViews = new Set(["dashboard", "listings", "resume-kit", "proof-library", "packets", "canon"]);
 
       document.addEventListener("DOMContentLoaded", init);
 
@@ -1672,8 +1673,17 @@
         hydrateControls();
         bindEvents();
         setTheme(state.theme || "medium");
-        navigate(state.activeView || "dashboard", { silent: true });
+        navigate(viewFromHash() || state.activeView || "dashboard", { silent: true });
+        window.addEventListener("hashchange", () => {
+          const routedView = viewFromHash();
+          if (routedView) navigate(routedView);
+        });
         animateAppIntro();
+      }
+
+      function viewFromHash() {
+        const view = decodeURIComponent((window.location.hash || "").replace(/^#/, "")).trim();
+        return routeViews.has(view) ? view : null;
       }
 
       function cacheElements() {
