@@ -45,12 +45,13 @@
   a:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
   noscript{display:block;margin-top:16px;color:var(--dim);font-size:13px}
 </style>
+<link rel="stylesheet" href="css/sbd-public-nav.css">
 </head>
 <body>
 <main>
   <p class="kicker">AV Suite route</p>
   <h1>CueForge</h1>
-  <p>Opening the CueForge cue sheet tool for run of show cues, status, print, JSON, and CSV.</p>
+  <p>Opening the CueForge cue sheet tool for run of show cues, status, print, JSON, and CSV. <br><a href="/" rel="noopener noreferrer">System by Dave home</a></p>
   <p class="status" id="routeStatus" aria-live="polite">Preparing CueForge link.</p>
   <ul class="route-list" aria-label="CueForge route details">
     <li><strong>Tool</strong><span>cue-sheet.html</span></li>
@@ -86,5 +87,6 @@
   window.location.replace(destinationHref);
 })();
 </script>
+<script src="js/sbd-public-nav.js" defer></script>
 </body>
 </html>

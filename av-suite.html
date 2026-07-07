@@ -642,6 +642,7 @@
     .command-ready{justify-self:start}
   }
 </style>
+<link rel="stylesheet" href="css/sbd-public-nav.css">
 </head>
 <body>
 <a class="skip-link" href="#workspace">Skip to tools</a>
@@ -684,7 +685,7 @@
   <div class="cb-actions">
     <div class="cb-phase" id="cbPhase">Show</div>
     <button id="openCommandBtn" type="button">Quick Switcher <kbd>⌘K</kbd></button>
-    <a href="av-workbook/" class="button-link primary cta">Open Workbook</a>
+    <button class="primary cta" type="button" data-open="av-workbook">Open Workbook</button>
     <button id="openRecommendedBtn" class="primary cta" type="button">Open Recommended</button>
     <button id="openSettingsBtn" type="button" aria-haspopup="dialog" aria-controls="settingsDrawer" aria-expanded="false">Operator Settings</button>
     <a href="tools.html" class="button-link ghost">All Tools</a>
@@ -978,8 +979,9 @@
   function setToolReadiness(id,value){var tool=toolById(id);if(!tool||READINESS_VALUES.indexOf(value)<0) return;if(value==='pending') delete state.readiness[id];else state.readiness[id]=value;saveState();renderTools();renderPhaseGate();renderReadiness();showHint(tool.name+' marked '+readinessLabel(value).toLowerCase()+'.','success');}
   function setToolNote(id,value,announce){var tool=toolById(id);var note;if(!tool) return;note=cleanNote(value);if(note) state.toolNotes[id]=note;else delete state.toolNotes[id];saveState();renderPhaseGate();renderReadiness();if(state.filters.pin==='notes'&&!note) renderTools();if(announce) showHint(note?tool.name+' note saved.':tool.name+' note cleared.','success');}
   function rememberTool(id){state.recent=state.recent.filter(function(item){return item!==id;});state.recent.unshift(id);state.recent=state.recent.slice(0,12);saveState();}
-  function toolHref(tool){var url=new URL(tool.href, window.location.href);if(state.showName) url.searchParams.set('sbdShow',state.showName);if(state.venue) url.searchParams.set('sbdVenue',state.venue);if(state.showDate) url.searchParams.set('sbdDate',state.showDate);if(state.operator) url.searchParams.set('sbdOperator',state.operator);if(state.phase) url.searchParams.set('sbdPhase',state.phase);return url.pathname.split('/').pop()+url.search+url.hash;}
-  function suiteLinkHref(){var url=new URL('av-suite.html',window.location.href);if(state.showName) url.searchParams.set('sbdShow',state.showName);if(state.venue) url.searchParams.set('sbdVenue',state.venue);if(state.showDate) url.searchParams.set('sbdDate',state.showDate);if(state.operator) url.searchParams.set('sbdOperator',state.operator);if(state.phase) url.searchParams.set('sbdPhase',state.phase);return url.pathname.split('/').pop()+url.search+url.hash;}
+  function relativeHref(url){var path=url.pathname.replace(/^\/+/,'');return path+url.search+url.hash;}
+  function toolHref(tool){var url=new URL(tool.href, window.location.href);if(state.showName) url.searchParams.set('sbdShow',state.showName);if(state.venue) url.searchParams.set('sbdVenue',state.venue);if(state.showDate) url.searchParams.set('sbdDate',state.showDate);if(state.operator) url.searchParams.set('sbdOperator',state.operator);if(state.phase) url.searchParams.set('sbdPhase',state.phase);return relativeHref(url);}
+  function suiteLinkHref(){var url=new URL('av-suite.html',window.location.href);if(state.showName) url.searchParams.set('sbdShow',state.showName);if(state.venue) url.searchParams.set('sbdVenue',state.venue);if(state.showDate) url.searchParams.set('sbdDate',state.showDate);if(state.operator) url.searchParams.set('sbdOperator',state.operator);if(state.phase) url.searchParams.set('sbdPhase',state.phase);return relativeHref(url);}
   function openTool(id){var tool=toolById(id);if(!tool) return;rememberTool(id);window.location.href=toolHref(tool);}
   function copyToolName(id){var tool=toolById(id);if(!tool) return;copyText(tool.name+' | '+absoluteHref(toolHref(tool))).then(function(){showHint(tool.name+' copied with show context.','success');}).catch(function(){showHint('Could not copy tool name.','error');});}
   function launchLine(tool){var note=toolNote(tool.id);var line=tool.name+' ['+readinessLabel(toolReadiness(tool.id))+'] | '+absoluteHref(toolHref(tool));if(note) line+=' | Note: '+note;return line;}
@@ -1131,11 +1133,12 @@
     camera:'<rect x="3" y="7" width="18" height="12" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="13" r="3.1"/><rect x="6.5" y="4" width="5" height="3" opacity=".5"/>',
     logistics:'<rect x="3" y="5" width="18" height="14" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3 9 H21 M12 5 V19" fill="none" stroke="currentColor" stroke-width="2" opacity=".5"/>',
     utility:'<rect x="4" y="3" width="16" height="18" fill="none" stroke="currentColor" stroke-width="2"/><rect x="7" y="6" width="10" height="3" opacity=".5"/><circle cx="8.5" cy="13" r="1.3"/><circle cx="12" cy="13" r="1.3"/><circle cx="15.5" cy="13" r="1.3"/><circle cx="8.5" cy="17" r="1.3"/><circle cx="12" cy="17" r="1.3"/><circle cx="15.5" cy="17" r="1.3"/>',
-    all:'<rect x="3" y="3" width="5" height="5"/><rect x="10" y="3" width="5" height="5" opacity=".5"/><rect x="17" y="3" width="4" height="5"/><rect x="3" y="10" width="5" height="5" opacity=".5"/><rect x="10" y="10" width="5" height="5"/><rect x="17" y="10" width="4" height="5" opacity=".5"/><rect x="3" y="17" width="5" height="4"/><rect x="10" y="17" width="5" height="4" opacity=".5"/><rect x="17" y="17" width="4" height="4"/>'
+    all:'<rect x="3" y="3" width="5" height="5"/><rect x="10" y="3" width="5" height="5" opacity=".5"/><rect x="17" y="3" width="4" height="5"/><rect x="3" y="10" width="5" height="5" opacity=".5"/><rect x="10" y="10" width="5" height="5"/><rect x="17" y="10" width="4" height="5" opacity=".5"/><rect x="3" y="17" width="5" height="4"/><rect x="10" y="17" width="5" height="4" opacity=".5"/><rect x="17" y="17" width="4" height="4"/>',
+    workbook:'<rect x="4" y="3" width="16" height="18" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 8 H16 M8 12 H16 M8 16 H13" fill="none" stroke="currentColor" stroke-width="2"/><path d="M15 3 V21" fill="none" stroke="currentColor" stroke-width="1.4" opacity=".45"/>'
   };
   function gsvg(key){return '<svg class="dept-glyph" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">'+(GLYPH[key]||GLYPH.all)+'</svg>';}
-  var DEPT_KEY={'Show Flow':'show-flow','Playback':'playback','Streaming':'streaming','Planning':'planning','Labor':'labor','Rooms':'rooms','Closeout':'closeout','Client':'client','Audio':'audio','Power':'power','Network':'network','Video':'video','Lighting':'lighting','Build':'build','Comms':'comms','Camera':'camera','Logistics':'logistics','Utility':'utility'};
-  var DEPT_ORDER=['Show Flow','Playback','Streaming','Camera','Audio','Video','Lighting','Comms','Network','Power','Rooms','Planning','Logistics','Build','Labor','Client','Closeout','Utility'];
+  var DEPT_KEY={'Workbook':'workbook','Show Flow':'show-flow','Playback':'playback','Streaming':'streaming','Planning':'planning','Labor':'labor','Rooms':'rooms','Closeout':'closeout','Client':'client','Audio':'audio','Power':'power','Network':'network','Video':'video','Lighting':'lighting','Build':'build','Comms':'comms','Camera':'camera','Logistics':'logistics','Utility':'utility'};
+  var DEPT_ORDER=['Workbook','Show Flow','Playback','Streaming','Camera','Audio','Video','Lighting','Comms','Network','Power','Rooms','Planning','Logistics','Build','Labor','Client','Closeout','Utility'];
   var REG_TOOLS=(window.SBD_REGISTRY&&window.SBD_REGISTRY.tools)||[];
   var DEPT_COUNT={};REG_TOOLS.forEach(function(t){DEPT_COUNT[t.dept]=(DEPT_COUNT[t.dept]||0)+1;});
   function cardDept(card){var b=card.querySelectorAll('.badge-row .badge');return b[1]?b[1].textContent.trim():'';}
@@ -1250,5 +1253,6 @@
   window.setTimeout(function(){updateMeta();updatePhaseMirror();reflectNet();reflectIssues();},0);
 })();
 </script>
+<script src="js/sbd-public-nav.js" defer></script>
 </body>
 </html>

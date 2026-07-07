@@ -117,7 +117,8 @@ a{color:var(--teal);text-decoration:none}a:hover{text-decoration:underline}
 .tool.on{color:var(--violet);border-color:var(--violet)}
 .ackbtn{font-size:10.5px}
 #autoacts{margin-top:8px}#autoacts:empty{display:none}
-</style></head><body>
+</style><link rel="stylesheet" href="css/sbd-public-nav.css">
+</head><body>
 <div class="bar"><h1><span class="logo">▦</span> Cross-Project Tracker <span class="gen" id="gen"></span><span class="agepill" id="agepill"></span></h1></div>
 <div class="stats" id="stats"></div>
 <section class="insights" id="insights">
@@ -335,4 +336,5 @@ $('ackToggle').addEventListener('click',e=>{showAck=!showAck;const b=e.target.cl
 $('filt').value=filt;$('q').value=q;
 if(LS.get('cpt.ins',false)){$('insights').classList.add('collapsed');const b=$('insToggle');b.textContent='show';b.setAttribute('aria-expanded','false');}
 buildInsights();buildAuto();render();
-</script></body></html>
+</script><script src="js/sbd-public-nav.js" defer></script>
+</body></html>

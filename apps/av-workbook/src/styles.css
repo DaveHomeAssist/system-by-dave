@@ -61,9 +61,11 @@ label input,label select{margin-top:7px;font-family:var(--font-sans);letter-spac
 .data-list li{display:grid;grid-template-columns:130px minmax(0,1fr);gap:12px;padding:11px;background:var(--surface-2);border:1px solid var(--line)}
 .data-list strong{font-family:var(--font-mono);font-size:12px;color:var(--accent)}
 .data-list span{color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.tool-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.tool-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.tool-group{display:grid;gap:8px;align-content:start}
 .tool-list a{align-items:flex-start;flex-direction:column;min-height:74px}
 .tool-list span{font-family:var(--font-mono);font-size:10px;color:var(--accent);text-transform:uppercase}
+.tool-list .tool-group>span{color:var(--muted);letter-spacing:.08em}
 .tool-list strong{font-weight:500}
 .loading-panel{margin:20vh auto 0;width:min(520px,100%);border:1px solid var(--line);background:var(--surface);padding:28px;color:var(--muted)}
 .engine-shell{border:1px solid var(--line);background:var(--surface);padding:18px}

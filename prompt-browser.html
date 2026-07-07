@@ -89,7 +89,8 @@ pre.body{background:#f9fbfd;border:1px solid var(--border);border-radius:9px;pad
 .imgtog:hover{color:var(--text)}
 .empty{text-align:center;color:var(--mut);padding:60px 20px;font-size:15px}
 kbd{background:var(--raised);border:1px solid var(--border);border-radius:4px;padding:1px 6px;font-size:11px;font-family:monospace}
-</style></head>
+</style><link rel="stylesheet" href="css/sbd-public-nav.css">
+</head>
 <body>
 <div class="bar">
   <h1><span class="logo">⌘</span> Prompt Library Browser <span class="count" id="cnt"></span></h1>
@@ -450,4 +451,5 @@ document.addEventListener('keydown',e=>{ if(e.key==='/'&&document.activeElement!
   if(e.key==='Escape'&&document.activeElement===$('q')){$('q').value='';state.q='';render();$('q').blur();}});
 renderSavedViews(); renderRecentCopies(); applyState(readStore(STORE.state,DEFAULT_STATE));
 </script>
+<script src="js/sbd-public-nav.js" defer></script>
 </body></html>

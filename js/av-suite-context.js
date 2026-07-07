@@ -146,6 +146,32 @@
     addSuiteDock();
   }
 
+  function routeFromUrl(url){
+    var raw = url.pathname.replace(/^\/+/, '').toLowerCase();
+    var parts;
+    if(!raw) return '';
+    if(raw.slice(-1) === '/') return ROUTE_ALIASES[raw] || raw;
+    parts = raw.split('/');
+    if(parts[parts.length - 1] === 'index.html' && parts.length > 1){
+      raw = parts.slice(0, -1).join('/') + '/';
+    }else if(parts.length > 1){
+      raw = parts[parts.length - 1];
+    }
+    return ROUTE_ALIASES[raw] || raw;
+  }
+
+  function routeFromHref(href){
+    return routeFromUrl(new URL(href, window.location.href));
+  }
+
+  function relativeHref(url){
+    var path = url.pathname.replace(/^\/+/, '');
+    var currentParts = window.location.pathname.replace(/^\/+/, '').split('/').filter(Boolean);
+    var depth = currentParts.length && currentParts[currentParts.length - 1].indexOf('.') >= 0 ? currentParts.length - 1 : currentParts.length;
+    var prefix = depth ? new Array(depth + 1).join('../') : '';
+    return prefix + path + url.search + url.hash;
+  }
+
   function contextHref(href){
     var url = new URL(href, window.location.href);
     if(context.showName) url.searchParams.set('sbdShow', context.showName);
@@ -153,7 +179,7 @@
     if(context.showDate) url.searchParams.set('sbdDate', context.showDate);
     if(context.operator) url.searchParams.set('sbdOperator', context.operator);
     if(context.phase) url.searchParams.set('sbdPhase', context.phase);
-    return url.pathname.split('/').pop() + url.search + url.hash;
+    return relativeHref(url);
   }
 
   function suiteHref(){
@@ -161,13 +187,12 @@
   }
 
   function currentRoute(){
-    var file = window.location.pathname.split('/').pop() || '';
-    return ROUTE_ALIASES[file] || file;
+    return routeFromUrl(window.location);
   }
 
   function currentToolId(){
     var route = currentRoute();
-    return route ? route.replace(/\.html$/i, '') : '';
+    return route ? route.replace(/\/$/i, '').replace(/\.html$/i, '').split('/').pop() : '';
   }
 
   function toolNameFromId(id){
@@ -175,7 +200,7 @@
     var name = '';
     Object.keys(PHASE_TOOLS).some(function(phase){
       return PHASE_TOOLS[phase].some(function(tool){
-        if(tool.href === route){
+        if(routeFromHref(tool.href) === route){
           name = tool.name;
           return true;
         }
@@ -195,7 +220,7 @@
     var index = -1;
     if(!tools.length) return null;
     tools.some(function(tool, toolIndex){
-      if(tool.href === route){
+      if(routeFromHref(tool.href) === route){
         index = toolIndex;
         return true;
       }

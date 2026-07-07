@@ -24,16 +24,33 @@
   // Destinations, not tools — never render the nav on these.
   var SKIP = {'index.html':1, '':1, 'av-suite.html':1, 'tools.html':1, '404.html':1, '500.html':1};
 
+  function normalizeRoute(value){
+    var raw = String(value || '').split('#')[0].split('?')[0].replace(/^\.?\//, '').toLowerCase();
+    var parts;
+    if(!raw) return '';
+    if(raw.charAt(0) === '/'){
+      raw = raw.replace(/^\/+/, '');
+    }
+    if(raw.slice(-1) === '/') return ALIASES[raw] || raw;
+    parts = raw.split('/');
+    if(parts[parts.length - 1] === 'index.html' && parts.length > 1){
+      raw = parts.slice(0, -1).join('/') + '/';
+    }else if(parts.length > 1){
+      raw = parts[parts.length - 1];
+    }
+    return ALIASES[raw] || raw;
+  }
+
   function currentRoute(){
-    var file = (window.location.pathname.split('/').pop() || '').toLowerCase();
-    return ALIASES[file] || file;
+    return normalizeRoute(window.location.pathname);
   }
 
   function locate(route){
+    route = normalizeRoute(route);
     for(var d = 0; d < DEPARTMENTS.length; d++){
       var tools = DEPARTMENTS[d].tools;
       for(var i = 0; i < tools.length; i++){
-        if(tools[i].href === route) return {dept:DEPARTMENTS[d], index:i};
+        if(normalizeRoute(tools[i].href) === route) return {dept:DEPARTMENTS[d], index:i};
       }
     }
     return null;

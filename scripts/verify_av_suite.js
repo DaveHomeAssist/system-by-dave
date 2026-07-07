@@ -9,7 +9,7 @@ const ROOT = path.resolve(__dirname, '..');
 const args = process.argv.slice(2);
 const baseArg = args.find((arg) => arg.startsWith('--base='));
 const baseUrl = baseArg ? baseArg.slice('--base='.length).replace(/\/?$/, '/') : '';
-const expectedToolCount = 38;
+const expectedToolCount = 39;
 
 const failures = [];
 const notes = [];
@@ -20,6 +20,10 @@ function fail(message) {
 
 function read(rel) {
   return fs.readFileSync(path.join(ROOT, rel), 'utf8');
+}
+
+function pageFile(rel) {
+  return rel.endsWith('/') ? `${rel}index.html` : rel;
 }
 
 function exists(rel) {
@@ -82,7 +86,7 @@ function assertPageContracts(registry) {
   const pages = Array.from(new Set(publicPages.concat(toolPages, aliasPages)));
 
   pages.forEach((rel) => {
-    const html = read(rel);
+    const html = read(pageFile(rel));
     if (!/<title>[^<]+<\/title>/i.test(html)) fail(`${rel} missing <title>.`);
     if (!/Content-Security-Policy/i.test(html)) fail(`${rel} missing CSP meta.`);
     if (!/property="og:title"/i.test(html)) fail(`${rel} missing Open Graph title.`);

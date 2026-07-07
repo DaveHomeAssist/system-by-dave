@@ -18,6 +18,51 @@ function toolHref(tool: RegistryTool): string {
   return `../${tool.href}`;
 }
 
+const workflowToolGroups = [
+  { label: "Audio Path", ids: ["input-list", "audio-patch", "line-check", "speaker-plan", "rf-coordination"] },
+  { label: "Rooms + Labor", ids: ["room-check", "breakout-room-matrix", "crew-call", "crew-time-log"] },
+  { label: "Infrastructure", ids: ["power-plan", "network-plan", "cable-plan", "video-patch"] },
+  { label: "Handoff", ids: ["show-task-board", "show-handoff", "show-report", "client-signoff"] }
+];
+
+function groupedWorkflowTools(tools: RegistryTool[]) {
+  const byId = new Map(tools.map((tool) => [tool.id, tool]));
+  return workflowToolGroups
+    .map((group) => ({
+      label: group.label,
+      tools: group.ids.map((id) => byId.get(id)).filter((tool): tool is RegistryTool => Boolean(tool))
+    }))
+    .filter((group) => group.tools.length);
+}
+
+function cleanParam(params: URLSearchParams, key: string, limit: number): string {
+  return String(params.get(key) || "").replace(/\s+/g, " ").trim().slice(0, limit);
+}
+
+function applyUrlContext(workbook: AvWorkbook): AvWorkbook {
+  if (typeof window === "undefined") return workbook;
+  const params = new URLSearchParams(window.location.search);
+  const showName = cleanParam(params, "sbdShow", 120);
+  const venue = cleanParam(params, "sbdVenue", 120);
+  const targetDate = cleanParam(params, "sbdDate", 20);
+  if (!showName && !venue && !targetDate) return workbook;
+  const show = { ...workbook.show };
+  let changed = false;
+  if (showName && show.showName !== showName) {
+    show.showName = showName;
+    changed = true;
+  }
+  if (venue && show.venue !== venue) {
+    show.venue = venue;
+    changed = true;
+  }
+  if (targetDate && show.targetDate !== targetDate) {
+    show.targetDate = targetDate;
+    changed = true;
+  }
+  return changed ? { ...workbook, show } : workbook;
+}
+
 function workbookCounts(workbook: AvWorkbook) {
   return {
     rooms: workbook.rooms.length,
@@ -36,16 +81,19 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<"overview" | "crew" | "rooms" | "engines">("overview");
   const registry = useMemo(readRegistry, []);
   const counts = workbook ? workbookCounts(workbook) : null;
-  const engineTools = registry.tools.filter((tool) => ["Audio", "Power", "Network", "Video", "Comms", "Logistics", "Rooms", "Labor", "Closeout"].includes(tool.dept));
+  const workflowGroups = useMemo(() => groupedWorkflowTools(registry.tools), [registry.tools]);
   const issues = useMemo(() => (workbook ? validateWorkbookIssues(workbook) : []), [workbook]);
 
   useEffect(() => {
     let cancelled = false;
     loadActiveWorkbook()
-      .then((loaded) => {
+      .then(async (loaded) => {
         if (cancelled) return;
-        setWorkbook(loaded);
-        setMessage("Workbook loaded from local storage.");
+        const withContext = applyUrlContext(loaded);
+        const saved = withContext === loaded ? loaded : await saveWorkbook(withContext);
+        if (cancelled) return;
+        setWorkbook(saved);
+        setMessage(withContext === loaded ? "Workbook loaded from local storage." : "Workbook loaded with suite context.");
       })
       .catch((error: unknown) => {
         if (cancelled) return;
@@ -217,11 +265,16 @@ export default function App() {
               <h2>Current tools stay linked</h2>
             </div>
             <div className="tool-list">
-              {engineTools.slice(0, 12).map((tool) => (
-                <a href={toolHref(tool)} key={tool.id}>
-                  <span>{tool.dept}</span>
-                  <strong>{tool.name}</strong>
-                </a>
+              {workflowGroups.map((group) => (
+                <div className="tool-group" key={group.label}>
+                  <span>{group.label}</span>
+                  {group.tools.map((tool) => (
+                    <a href={toolHref(tool)} key={tool.id}>
+                      <span>{tool.dept}</span>
+                      <strong>{tool.name}</strong>
+                    </a>
+                  ))}
+                </div>
               ))}
             </div>
           </article>

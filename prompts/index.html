@@ -87,7 +87,8 @@ footer{max-width:1040px;margin:0 auto;padding:0 20px 60px;color:var(--mut);font-
 kbd{background:var(--raised);border:1px solid var(--border);border-radius:4px;padding:1px 6px;font-size:11px;font-family:monospace}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
 @media (max-width:680px){.vrow span{min-width:80px}.bar h1 .count{margin-left:0}}
-</style></head>
+</style><link rel="stylesheet" href="../css/sbd-public-nav.css">
+</head>
 <body>
 <div class="bar">
   <h1><span class="logo">⌘</span> Prompt Library <span class="home">· <a href="https://systembydave.com/">System by Dave</a></span> <span class="count" id="cnt" role="status" aria-live="polite"></span></h1>
@@ -275,4 +276,5 @@ $('foot').innerHTML='Curated subset of the System by Dave prompt library · '+DA
 ACTIONS=buildActions();
 parseHash();
 </script>
+<script src="../js/sbd-public-nav.js" defer></script>
 </body></html>

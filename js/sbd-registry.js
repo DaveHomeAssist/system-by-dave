@@ -23,6 +23,7 @@
   /* dept = console grouping (fine-grained). storageKeys = localStorage keys the
      tool writes (used by saved-data scan + show-package export/import). */
   var TOOLS=[
+    {id:'av-workbook',name:'AV Workbook',href:'av-workbook/',dept:'Workbook',phases:['advance','prep','loadin','show','strike','closeout'],tag:'Show File',desc:'Local-first shared show workbook for rooms, crew, gear, signal sources, patching, validation, and handoff state.',storageKeys:[{key:'system-by-dave.av-workbook.active.v1',label:'AV Workbook active workbook'},{key:'system-by-dave.av-workbook.fallback.v1',label:'AV Workbook fallback'}]},
     {id:'teleprompter',name:'Teleprompter',href:'teleprompter.html',dept:'Show Flow',phases:['prep','show'],tag:'Script',desc:'Script reader with formatting, saved scripts, cues, remote mode, rundown, and a compact read view.',storageKeys:[{key:'teleprompter.v1',label:'Teleprompter state'},{key:'teleprompter.script.v1',label:'Teleprompter script'},{key:'teleprompter.preferences.v1',label:'Teleprompter preferences'},{key:'teleprompter.savedScripts.v1',label:'Teleprompter saved scripts'},{key:'teleprompter.savedFormats.v1',label:'Teleprompter saved looks'},{key:'teleprompter.customColors.v1',label:'Teleprompter custom colors'}]},
     {id:'show-timer',name:'Show Timer',href:'show-timer.html',dept:'Show Flow',phases:['prep','show'],tag:'Clock',desc:'Countdown, count up, clock mode, stage view, warning states, and keyboard control.',storageKeys:[{key:'showTimer.preferences.v1',label:'Show Timer preferences'}]},
     {id:'cueforge',name:'CueForge',href:'cueforge.html',dept:'Show Flow',phases:['advance','prep','show'],tag:'Cues',desc:'Run of show cue control with next actions, status tracking, print, JSON, and CSV.',storageKeys:[{key:'cueSheet.v1',label:'CueForge cue sheet'}]},
@@ -65,17 +66,18 @@
 
   /* Per-phase recommendations shown by the console and the context dock. */
   var RECOMMENDED={
-    advance:['show-advance','site-survey','breakout-room-matrix','crew-call','plotforge','input-list'],
-    prep:['gear-prep','truck-pack','cueforge','teleprompter','playback-check','audio-patch','video-patch','network-plan'],
-    loadin:['load-in-plan','room-check','power-plan','line-check','display-plan','projection-plan','speaker-plan','show-task-board'],
-    show:['teleprompter','show-timer','cueforge','show-task-board','breakout-room-matrix','record-log','comms-check','camera-shot-list'],
-    strike:['strike-plan','truck-pack','cable-plan','show-task-board','crew-time-log'],
-    closeout:['show-handoff','show-report','client-signoff','change-order','record-log','crew-time-log']
+    advance:['av-workbook','show-advance','site-survey','breakout-room-matrix','crew-call','plotforge','input-list'],
+    prep:['av-workbook','gear-prep','truck-pack','cueforge','teleprompter','playback-check','audio-patch','video-patch','network-plan'],
+    loadin:['av-workbook','load-in-plan','room-check','power-plan','line-check','display-plan','projection-plan','speaker-plan','show-task-board'],
+    show:['av-workbook','teleprompter','show-timer','cueforge','show-task-board','breakout-room-matrix','record-log','comms-check','camera-shot-list'],
+    strike:['av-workbook','strike-plan','truck-pack','cable-plan','show-task-board','crew-time-log'],
+    closeout:['av-workbook','show-handoff','show-report','client-signoff','change-order','record-log','crew-time-log']
   };
 
   /* Universal-nav grouping (matches the homepage + All Tools directory).
      Coarser than tool.dept on purpose — ten browseable groups. */
   var NAV_DEPARTMENTS=[
+    {label:'Workbook',toolIds:['av-workbook','show-advance','show-task-board','show-handoff','show-report']},
     {label:'Run of show',toolIds:['teleprompter','show-timer','cueforge','playback-check','comms-check']},
     {label:'Audio',toolIds:['audio-patch','line-check','input-list','signal-flow','speaker-plan','rf-coordination']},
     {label:'Video',toolIds:['video-patch','display-plan','projection-plan','stream-plan','record-log','camera-shot-list']},
@@ -92,7 +94,7 @@
      cue-sheet app; `plotforge.html` forwards to the external PlotForge beta
      (stage-plot.html remains the local legacy layout tool). Nav treats the
      legacy file as the branded route for prev/next purposes. */
-  var ALIASES={'cue-sheet.html':'cueforge.html','stage-plot.html':'plotforge.html'};
+  var ALIASES={'cue-sheet.html':'cueforge.html','stage-plot.html':'plotforge.html','av-workbook.html':'av-workbook/','av-workbook/index.html':'av-workbook/'};
   var ALIAS_FILES=['./cue-sheet.html','./stage-plot.html'];
 
   /* Shared shell assets every offline session needs. */
@@ -102,9 +104,11 @@
     './js/sbd-registry.js',
     './js/av-suite-context.js',
     './js/sbd-nav.js',
+    './js/sbd-public-nav.js',
     './js/sbd-handoff.js',
     './js/responsive-tables.js',
     './js/av-domain-views.js',
+    './css/sbd-public-nav.css',
     './css/responsive-tables.css',
     './css/av-domain-views.css',
     './css/fonts.css',
@@ -141,7 +145,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool change — rolls the service-worker cache. */
-    version:'v20260707-av-workbook-audio-import',
+    version:'v20260707-public-nav-av-workbook',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,
