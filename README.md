@@ -5,9 +5,11 @@ documenting the Notion skills, agents, widgets, and templates I build and use.
 
 ## Stack
 
-- Static HTML, no build step
+- Current public pages are mostly static HTML
 - Shared stylesheet: `css/style.css`
-- Vanilla JS where needed
+- JavaScript where needed
+- App-grade surfaces may use framework code, package tooling, or generated
+  assets when that is the right product architecture
 - Hosted on GitHub Pages with a custom domain (`CNAME`)
 
 ## Local development
@@ -24,7 +26,8 @@ npx serve .
 
 Then open <http://localhost:8000>.
 
-Edit HTML/CSS directly — changes are visible on refresh.
+For static pages, edit HTML/CSS directly and refresh. For app-grade surfaces,
+use the tooling selected for that surface.
 
 ## Pages
 

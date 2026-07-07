@@ -4,12 +4,16 @@ Read `CLAUDE.md` first for project orientation. This file is the rulebook.
 
 ## Golden rules
 
-1. **No build step.** Files under the repo root are served as-is by GitHub
-   Pages. Do not introduce bundlers, transpilers, or package managers.
+1. **Product-first architecture.** The current public site is served by GitHub
+   Pages, but that is an implementation detail, not a product constraint.
+   Build tooling, frameworks, and package managers are allowed when they are
+   the right way to build an app-quality surface.
 2. **Shared styles live in `css/style.css`.** Any style that could be reused
    belongs there. Page-specific overrides go in a single inline `<style>`
    block in that page's `<head>`.
-3. **Vanilla only.** No frameworks, no runtime dependencies.
+3. **Use the right tool for the surface.** Static pages can stay simple.
+   App-grade workflows may use framework code, shared packages, or generated
+   assets when the added complexity is justified by the product behavior.
 
 ## HTML conventions
 
@@ -81,4 +85,5 @@ Read `CLAUDE.md` first for project orientation. This file is the rulebook.
 - [ ] CSP meta present on user-facing pages.
 - [ ] External links have `rel="noopener noreferrer"`.
 - [ ] `sitemap.xml` `lastmod` bumped if content changed.
-- [ ] No new runtime dependencies introduced.
+- [ ] New runtime dependencies, if any, are intentional and justified by the
+      app surface.

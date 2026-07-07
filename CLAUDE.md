@@ -10,12 +10,15 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
 - **Host:** GitHub Pages with custom domain (`CNAME` = `systembydave.com`)
 
 ## Stack
-- Static HTML: **no build step**, files are served directly.
+- Current public pages are mostly static HTML, and many files are served
+  directly.
 - Shared styles in `css/style.css`.
 - Each page may have an inline `<style>` block for page-specific overrides.
 - Shared browser helpers may live in `js/` when multiple static AV pages need
   the same small behavior.
-- Vanilla JS only (no frameworks, no bundlers).
+- Frameworks, bundlers, package managers, and generated assets are allowed when
+  they are the right architecture for an app-grade surface. Do not preserve a
+  static-only pattern when it is the reason the product stays weak.
 - **`js/sbd-registry.js` is the single source of truth for the AV tools**
   (names, routes, departments, phases, storage keys, recommendations, offline
   assets). The AV Suite console, `js/sbd-nav.js`, `js/av-suite-context.js`,
