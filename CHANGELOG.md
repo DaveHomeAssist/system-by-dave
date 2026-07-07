@@ -4,6 +4,7 @@
 
 * Added the first build-backed AV Workbook app surface at `/av-workbook/`, with a React/TypeScript local-first workbook shell, Dexie-backed persistence, JSON import/export, and a compatibility gateway at `av-workbook.html`.
 * Added `/av-workbook/` to the AV Suite offline asset manifest and sitemap flow while keeping the existing AV Suite console and standalone tool URLs intact.
+* Added the first shared workbook grid mechanics, including editable cells, keyboard movement, search, sort, add-row, and spreadsheet paste support for workbook-backed Crew Call and Room Check tabs.
 
 ## 2026-07-06
 

@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
+import { DataGrid } from "./DataGrid";
 import { downloadText, exportWorkbook, importWorkbook, loadActiveWorkbook, saveWorkbook } from "./store";
 import { readRegistry } from "./registry";
 import type { AvWorkbook, RegistryTool } from "./types";
+import { createCrewRow, createRoomRow, crewColumns, roomColumns } from "./worksheetSchemas";
 import "./styles.css";
 
 function statusLabel(value: string): string {
@@ -27,6 +29,7 @@ function workbookCounts(workbook: AvWorkbook) {
 export default function App() {
   const [workbook, setWorkbook] = useState<AvWorkbook | null>(null);
   const [message, setMessage] = useState("Loading workbook...");
+  const [activeTab, setActiveTab] = useState<"overview" | "crew" | "rooms">("overview");
   const registry = useMemo(readRegistry, []);
   const counts = workbook ? workbookCounts(workbook) : null;
   const engineTools = registry.tools.filter((tool) => ["Audio", "Power", "Network", "Video", "Comms", "Logistics", "Rooms", "Labor", "Closeout"].includes(tool.dept));
@@ -53,6 +56,12 @@ export default function App() {
     const next = await saveWorkbook({ ...workbook, show: { ...workbook.show, [key]: value } });
     setWorkbook(next);
     setMessage("Show profile saved.");
+  }
+
+  async function updateWorkbook(nextWorkbook: AvWorkbook, savedMessage: string) {
+    const saved = await saveWorkbook(nextWorkbook);
+    setWorkbook(saved);
+    setMessage(savedMessage);
   }
 
   function handleExport() {
@@ -142,35 +151,71 @@ export default function App() {
         ))}
       </section>
 
-      <section className="surface-grid">
-        <article className="panel">
-          <div className="panel-head">
-            <p className="kicker">Shared data</p>
-            <h2>Enter once model</h2>
-          </div>
-          <ul className="data-list">
-            <li><strong>Rooms</strong><span>{workbook.rooms.map((room) => room.name).join(" · ")}</span></li>
-            <li><strong>Crew</strong><span>{workbook.operators.map((operator) => `${operator.role}: ${operator.name}`).join(" · ")}</span></li>
-            <li><strong>Gear</strong><span>{workbook.gearManifest.map((item) => item.caseId).join(" · ")}</span></li>
-            <li><strong>Signals</strong><span>{workbook.signalSources.map((source) => source.label).join(" · ")}</span></li>
-          </ul>
-        </article>
+      <div className="tabs" role="tablist" aria-label="Workbook views">
+        {[
+          ["overview", "Overview"],
+          ["crew", "Crew Call"],
+          ["rooms", "Room Check"]
+        ].map(([id, label]) => (
+          <button key={id} type="button" role="tab" aria-selected={activeTab === id} onClick={() => setActiveTab(id as typeof activeTab)}>
+            {label}
+          </button>
+        ))}
+      </div>
 
-        <article className="panel">
-          <div className="panel-head">
-            <p className="kicker">Migration map</p>
-            <h2>Current tools stay linked</h2>
-          </div>
-          <div className="tool-list">
-            {engineTools.slice(0, 12).map((tool) => (
-              <a href={toolHref(tool)} key={tool.id}>
-                <span>{tool.dept}</span>
-                <strong>{tool.name}</strong>
-              </a>
-            ))}
-          </div>
-        </article>
-      </section>
+      {activeTab === "overview" ? (
+        <section className="surface-grid">
+          <article className="panel">
+            <div className="panel-head">
+              <p className="kicker">Shared data</p>
+              <h2>Enter once model</h2>
+            </div>
+            <ul className="data-list">
+              <li><strong>Rooms</strong><span>{workbook.rooms.map((room) => room.name).join(" · ")}</span></li>
+              <li><strong>Crew</strong><span>{workbook.operators.map((operator) => `${operator.role}: ${operator.name}`).join(" · ")}</span></li>
+              <li><strong>Gear</strong><span>{workbook.gearManifest.map((item) => item.caseId).join(" · ")}</span></li>
+              <li><strong>Signals</strong><span>{workbook.signalSources.map((source) => source.label).join(" · ")}</span></li>
+            </ul>
+          </article>
+
+          <article className="panel">
+            <div className="panel-head">
+              <p className="kicker">Migration map</p>
+              <h2>Current tools stay linked</h2>
+            </div>
+            <div className="tool-list">
+              {engineTools.slice(0, 12).map((tool) => (
+                <a href={toolHref(tool)} key={tool.id}>
+                  <span>{tool.dept}</span>
+                  <strong>{tool.name}</strong>
+                </a>
+              ))}
+            </div>
+          </article>
+        </section>
+      ) : null}
+
+      {activeTab === "crew" ? (
+        <DataGrid
+          title="Crew Call"
+          description="Workbook-backed crew directory. Edits save immediately and can feed time log, handoff, and closeout."
+          rows={workbook.operators}
+          columns={crewColumns}
+          createRow={createCrewRow}
+          onRowsChange={(operators) => void updateWorkbook({ ...workbook, operators }, "Crew grid saved.")}
+        />
+      ) : null}
+
+      {activeTab === "rooms" ? (
+        <DataGrid
+          title="Room Check"
+          description="Workbook-backed room readiness list. Room names are shared by power, network, logistics, and show report records."
+          rows={workbook.rooms}
+          columns={roomColumns}
+          createRow={createRoomRow}
+          onRowsChange={(rooms) => void updateWorkbook({ ...workbook, rooms }, "Room grid saved.")}
+        />
+      ) : null}
     </main>
   );
 }

@@ -5,6 +5,6 @@ export default defineConfig({
   plugins: [react()],
   test: {
     environment: "node",
-    include: ["src/**/*.test.ts", "src/**/*.test.tsx"]
+    include: ["apps/av-workbook/src/**/*.test.ts", "apps/av-workbook/src/**/*.test.tsx"]
   }
 });
