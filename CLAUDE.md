@@ -16,9 +16,8 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
 - Each page may have an inline `<style>` block for page-specific overrides.
 - Shared browser helpers may live in `js/` when multiple static AV pages need
   the same small behavior.
-- Frameworks, bundlers, package managers, and generated assets are allowed when
-  they are the right architecture for an app-grade surface. Do not preserve a
-  static-only pattern when it is the reason the product stays weak.
+- App-grade surfaces may use frameworks, bundlers, package managers, generated
+  assets, or other stronger architecture when the product calls for it.
 - **`js/sbd-registry.js` is the single source of truth for the AV tools**
   (names, routes, departments, phases, storage keys, recommendations, offline
   assets). The AV Suite console, `js/sbd-nav.js`, `js/av-suite-context.js`,
