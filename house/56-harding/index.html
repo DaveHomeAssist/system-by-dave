@@ -333,7 +333,7 @@
 
   .tool-grid {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
     gap: 14px;
   }
 
@@ -361,6 +361,7 @@
   .tool-card[data-kind="plan"] { border-top-color: var(--blueprint); }
   .tool-card[data-kind="panel"] { border-top-color: var(--green); }
   .tool-card[data-kind="floor"] { border-top-color: #72543a; }
+  .tool-card[data-kind="appliance"] { border-top-color: #8f4d2f; }
 
   .tool-kicker {
     color: var(--muted);
@@ -745,7 +746,7 @@
   <section class="wrap section" id="command" aria-labelledby="command-title">
     <div class="section-head">
       <h2 id="command-title">Reno Command Center</h2>
-      <p>Live browser state from the electrical tools, panel notes, planner items, and flooring ask tracker, with conservative fallback data when a tool has not published yet.</p>
+      <p>Live browser state from the electrical tools, panel notes, planner items, appliance planning, and flooring ask tracker, with conservative fallback data when a tool has not published yet.</p>
     </div>
     <div class="command-grid" aria-label="Renovation dashboard metrics">
       <article class="command-card">
@@ -823,8 +824,16 @@
         </div>
         <div class="tool-meta"><span>Open review</span><span aria-hidden="true">-&gt;</span></div>
       </a>
+      <a class="tool-card" data-kind="appliance" href="kitchen-appliance-update.html">
+        <div>
+          <span class="tool-kicker">Kitchen appliance plan</span>
+          <h3>Appliance Update</h3>
+          <p>Compare induction paths, service upgrade impact, budget ranges, and quote readiness.</p>
+        </div>
+        <div class="tool-meta"><span>Open planner</span><span aria-hidden="true">-&gt;</span></div>
+      </a>
     </div>
-    <p class="note"><strong>Source note:</strong> electrical tools are published here from the committed Metagrid electrical suite snapshot. The flooring review is hosted in the same System by Dave bundle because that page already has its own live review history.</p>
+    <p class="note"><strong>Source note:</strong> electrical tools are published here from the committed Metagrid electrical suite snapshot. The flooring review and kitchen appliance update are hosted in the same System by Dave bundle because those pages now belong to the active 56 Harding handoff cluster.</p>
     <section class="backup-panel" aria-labelledby="backup-title">
       <div class="backup-copy">
         <span class="tool-kicker">Local project data</span>
