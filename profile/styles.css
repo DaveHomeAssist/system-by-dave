@@ -80,13 +80,13 @@ html, body { max-width: 100%; }
 .subsection-title { font-family: var(--display); font-weight: 700; margin: 42px 0 6px; font-size: 20px; }
 
 /* ---------- Nav ---------- */
-nav {
+body > nav:not(.sbd-public-nav) {
   position: sticky; top: 0; z-index: 50;
   backdrop-filter: blur(10px);
   background: rgba(13,14,17,0.72);
   border-bottom: 1px solid var(--line);
 }
-nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 60px; }
+body > nav:not(.sbd-public-nav) .wrap { display: flex; align-items: center; justify-content: space-between; height: 60px; }
 .brand { font-family: var(--mono); font-weight: 700; letter-spacing: 0.04em; font-size: 14px; flex-shrink: 0; }
 .brand b { color: var(--amber); }
 .navlinks { display: flex; gap: 22px; font-family: var(--mono); font-size: 12px; text-transform: uppercase; letter-spacing: 0.12em; }

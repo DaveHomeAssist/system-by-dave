@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-07-09
+
+* Published the AV resume at `/resume/av/`, added the one-page PDF at `/resume/av/david-robertson-av-resume.pdf`, and made the public profile contact section lead with the AV resume.
+* Moved the PixelForge production bundle under `/pixelforge/`, rewrote generated metadata to `systembydave.com`, and added PixelForge to the AV Suite registry, recommendations, universal nav, offline cache manifest, tools catalog, and sitemap flow.
+
 ## 2026-07-07
 
 * Upgraded `/teleprompter.html` with an explicit Back control, enumerated WPM speed presets, same-position read to edit return, and per-script bookmarks with jump/delete controls and AV Suite storage visibility.

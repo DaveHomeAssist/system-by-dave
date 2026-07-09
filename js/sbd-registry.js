@@ -23,11 +23,12 @@
   /* dept = console grouping (fine-grained). storageKeys = localStorage keys the
      tool writes (used by saved-data scan + show-package export/import). */
   var TOOLS=[
-    {id:'av-workbook',name:'AV Workbook',href:'av-workbook/',dept:'Workbook',phases:['advance','prep','loadin','show','strike','closeout'],tag:'Show File',desc:'Local-first shared show workbook for rooms, crew, gear, signal sources, patching, validation, and handoff state.',storageKeys:[{key:'system-by-dave.av-workbook.active.v1',label:'AV Workbook active workbook'},{key:'system-by-dave.av-workbook.fallback.v1',label:'AV Workbook fallback'}]},
+    {id:'av-workbook',name:'AV Workbook',href:'av-workbook/',dept:'Workbook',phases:['advance','prep','loadin','show','strike','closeout'],tag:'Show File',desc:'Shared show workbook for rooms, crew, gear, signal sources, patching, validation, and handoff state.',storageKeys:[{key:'system-by-dave.av-workbook.active.v1',label:'AV Workbook active workbook'},{key:'system-by-dave.av-workbook.fallback.v1',label:'AV Workbook fallback'}]},
     {id:'teleprompter',name:'Teleprompter',href:'teleprompter.html',dept:'Show Flow',phases:['prep','show'],tag:'Script',desc:'Script reader with formatting, saved scripts, cues, remote mode, rundown, and a compact read view.',storageKeys:[{key:'teleprompter.v1',label:'Teleprompter state'},{key:'teleprompter.script.v1',label:'Teleprompter script'},{key:'teleprompter.preferences.v1',label:'Teleprompter preferences'},{key:'teleprompter.savedScripts.v1',label:'Teleprompter saved scripts'},{key:'teleprompter.savedFormats.v1',label:'Teleprompter saved looks'},{key:'teleprompter.pacePresets.v1',label:'Teleprompter saved paces'},{key:'teleprompter.bookmarks.v1',label:'Teleprompter bookmarks'},{key:'teleprompter.customColors.v1',label:'Teleprompter custom colors'}]},
     {id:'show-timer',name:'Show Timer',href:'show-timer.html',dept:'Show Flow',phases:['prep','show'],tag:'Clock',desc:'Countdown, count up, clock mode, stage view, warning states, and keyboard control.',storageKeys:[{key:'showTimer.preferences.v1',label:'Show Timer preferences'}]},
     {id:'cueforge',name:'CueForge',href:'cueforge.html',dept:'Show Flow',phases:['advance','prep','show'],tag:'Cues',desc:'Run of show cue control with next actions, status tracking, print, JSON, and CSV.',storageKeys:[{key:'cueSheet.v1',label:'CueForge cue sheet'}]},
     {id:'playback-check',name:'Playback Check',href:'playback-check.html',dept:'Playback',phases:['prep','show'],tag:'Media',desc:'Playback file checklist with routes, backups, duration, ready state, and export.',storageKeys:[{key:'playback-check.v1',label:'Playback Check'}]},
+    {id:'pixelforge',name:'PixelForge',href:'pixelforge/',dept:'Graphics',phases:['advance','prep','show','closeout'],tag:'Graphics',desc:'Raster, vector, text, and image-editing workspace for show graphics, signage fixes, simple overlays, and PNG export.',storageKeys:[{key:'PixelForge.prefs.v1',label:'PixelForge preferences'},{key:'pf:palettes:v1',label:'PixelForge palettes'},{key:'PixelForge.ai.v1',label:'PixelForge AI settings'}]},
     {id:'record-log',name:'Record Log',href:'record-log.html',dept:'Playback',phases:['show','closeout'],tag:'Record',desc:'Program records, camera ISOs, audio captures, media destinations, backup status, and handoff notes.',storageKeys:[{key:'record-log.v1',label:'Record Log'}]},
     {id:'stream-plan',name:'Stream Plan',href:'stream-plan.html',dept:'Streaming',phases:['advance','prep','show'],tag:'Stream',desc:'Encoder, platform, destination, bitrate, audio, record, backup, and test tracking.',storageKeys:[{key:'sbd.streamPlan.v1',label:'Stream Plan'}]},
     {id:'show-advance',name:'Show Advance',href:'show-advance.html',dept:'Planning',phases:['advance'],tag:'Advance',desc:'Contacts, access, schedule, power, network, labor, deliverables, risks, and open questions.',storageKeys:[{key:'show-advance.v1',label:'Show Advance'}]},
@@ -66,10 +67,10 @@
 
   /* Per-phase recommendations shown by the console and the context dock. */
   var RECOMMENDED={
-    advance:['av-workbook','show-advance','site-survey','breakout-room-matrix','crew-call','plotforge','input-list'],
-    prep:['av-workbook','gear-prep','truck-pack','cueforge','teleprompter','playback-check','audio-patch','video-patch','network-plan'],
+    advance:['av-workbook','show-advance','site-survey','breakout-room-matrix','crew-call','plotforge','pixelforge','input-list'],
+    prep:['av-workbook','gear-prep','truck-pack','cueforge','teleprompter','playback-check','pixelforge','audio-patch','video-patch','network-plan'],
     loadin:['av-workbook','load-in-plan','room-check','power-plan','line-check','display-plan','projection-plan','speaker-plan','show-task-board'],
-    show:['av-workbook','teleprompter','show-timer','cueforge','show-task-board','breakout-room-matrix','record-log','comms-check','camera-shot-list'],
+    show:['av-workbook','teleprompter','show-timer','cueforge','show-task-board','breakout-room-matrix','pixelforge','record-log','comms-check','camera-shot-list'],
     strike:['av-workbook','strike-plan','truck-pack','cable-plan','show-task-board','crew-time-log'],
     closeout:['av-workbook','show-handoff','show-report','client-signoff','change-order','record-log','crew-time-log']
   };
@@ -79,6 +80,7 @@
   var NAV_DEPARTMENTS=[
     {label:'Workbook',toolIds:['av-workbook','show-advance','show-task-board','show-handoff','show-report']},
     {label:'Run of show',toolIds:['teleprompter','show-timer','cueforge','playback-check','comms-check']},
+    {label:'Graphics',toolIds:['pixelforge','playback-check','display-plan','projection-plan']},
     {label:'Audio',toolIds:['audio-patch','line-check','input-list','signal-flow','speaker-plan','rf-coordination']},
     {label:'Video',toolIds:['video-patch','display-plan','projection-plan','stream-plan','record-log','camera-shot-list']},
     {label:'Lighting',toolIds:['lighting-patch']},
@@ -116,6 +118,21 @@
     './av-workbook/index.html',
     './av-workbook/assets/av-workbook.js',
     './av-workbook/assets/av-workbook.css',
+    './pixelforge/',
+    './pixelforge/index.html',
+    './pixelforge/editor.html',
+    './pixelforge/home.html',
+    './pixelforge/templates.html',
+    './pixelforge/guide.html',
+    './pixelforge/onboarding.html',
+    './pixelforge/brand.html',
+    './pixelforge/og-image.svg',
+    './pixelforge/assets/favicon-DcoFR1vW.svg',
+    './pixelforge/assets/imageEffectsWorker-DYpHDSGw.js',
+    './pixelforge/assets/index-CrzKMytk.css',
+    './pixelforge/assets/index-DmbrXj61.js',
+    './pixelforge/assets/ai-CBLG0OHf.js',
+    './pixelforge/assets/sdk-B-fUwnrA.js',
     './svg/system_by_dave_logo_rust.svg',
     './img/card-cover-banner-wide.png',
     './manifest.json',
@@ -145,7 +162,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool change — rolls the service-worker cache. */
-    version:'v20260707-teleprompter-bookmarks',
+    version:'v20260709-pixelforge-sbd',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,

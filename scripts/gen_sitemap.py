@@ -26,6 +26,7 @@ STATIC_PAGES = [
     ("av-suite.html", "weekly", "0.9"),
     ("av-workbook.html", "weekly", "0.8"),
     ("av-workbook/", "weekly", "0.8"),
+    ("pixelforge/", "weekly", "0.8"),
     ("notion.html", "weekly", "0.8"),
     ("prompt-lab.html", "weekly", "0.8"),
     ("skills.html", "weekly", "0.7"),
@@ -37,6 +38,7 @@ STATIC_PAGES = [
     # marsscape/ moved to mixmash.games/mars/ (2026-07-03); the page there is a
     # save-migration redirect and should not be indexed.
     ("resume/", "monthly", "0.6"),
+    ("resume/av/", "monthly", "0.6"),
     ("profile/", "monthly", "0.6"),
     ("prompts/", "monthly", "0.6"),
     ("project-registry.html", "monthly", "0.6"),

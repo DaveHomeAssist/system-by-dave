@@ -9,7 +9,7 @@ const ROOT = path.resolve(__dirname, '..');
 const args = process.argv.slice(2);
 const baseArg = args.find((arg) => arg.startsWith('--base='));
 const baseUrl = baseArg ? baseArg.slice('--base='.length).replace(/\/?$/, '/') : '';
-const expectedToolCount = 39;
+const expectedToolCount = 40;
 
 const failures = [];
 const notes = [];

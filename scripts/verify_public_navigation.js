@@ -11,7 +11,7 @@ const SKIP_FILES = new Set([
   'cross-project-actions.html',
   'html/sbd-brand.html'
 ]);
-const EXPECTED_AV_TOOL_COUNT = 39;
+const EXPECTED_AV_TOOL_COUNT = 40;
 
 const failures = [];
 const notes = [];

@@ -37,7 +37,9 @@ use the tooling selected for that surface.
 | `agents.html` | Agents catalog |
 | `skills.html` | Skills catalog |
 | `widgets.html` | Widget gallery |
+| `pixelforge/` | PixelForge editor |
 | `resume/index.html` | Public resume |
+| `resume/av/index.html` | Public AV resume |
 | `wedding-ops.html` | Wedding ops case study |
 | `privacy-policy.html` | Privacy policy |
 | `404.html` / `500.html` | Error pages |

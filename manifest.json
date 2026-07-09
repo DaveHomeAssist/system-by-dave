@@ -1,7 +1,7 @@
 {
   "name": "AV Suite — System by Dave",
   "short_name": "AV Suite",
-  "description": "Operator console for live-show AV tools — planning, patching, timing, cueing, and run-of-show. Offline-first, local-first, free.",
+  "description": "Operator console for live-show AV tools - planning, patching, timing, cueing, graphics, and run-of-show. Offline-capable and free.",
   "lang": "en-US",
   "start_url": "./av-suite.html",
   "scope": "./",
