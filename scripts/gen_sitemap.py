@@ -42,6 +42,7 @@ STATIC_PAGES = [
     ("profile/", "monthly", "0.6"),
     ("prompts/", "monthly", "0.6"),
     ("project-registry.html", "monthly", "0.6"),
+    ("remote-desktop.html", "monthly", "0.6"),
     ("privacy-policy.html", "yearly", "0.3"),
     ("systembydave/", "monthly", "0.6"),
     ("systembydave/layers/identity.html", "monthly", "0.5"),
