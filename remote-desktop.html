@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: blob:; script-src 'self' 'unsafe-inline'; media-src 'self' blob: mediastream:; connect-src 'self' https: wss: stun: turn: turns:; child-src blob:">
+<title>Remote Desktop — System by Dave</title>
+<meta name="description" content="A self-hosted, serverless WebRTC screen-share, file-transfer and remote-view tool. Locator-not-authenticator session codes, verbal peer authentication, and capability-scoped consent — the working reference build of the Remote Desktop spec.">
+<link rel="canonical" href="https://systembydave.com/remote-desktop.html">
+<meta name="robots" content="index,follow">
+<meta name="theme-color" content="#0A0D14">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="System by Dave">
+<meta property="og:title" content="Remote Desktop — System by Dave">
+<meta property="og:description" content="Serverless WebRTC screen share, file transfer and remote view with verbal peer authentication and capability-scoped consent.">
+<meta property="og:url" content="https://systembydave.com/remote-desktop.html">
+<meta property="og:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Remote Desktop — System by Dave">
+<meta name="twitter:description" content="Serverless WebRTC screen share, file transfer and remote view with verbal peer authentication and capability-scoped consent.">
+<meta name="twitter:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<link rel="icon" href="svg/system_by_dave_logo_rust.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/fonts.css">
+<style>
+  :root{--bg:#0A0D14;--ink:#F3F4F7;--rust:oklch(0.65 0.19 33);--rust-bright:oklch(0.72 0.19 33);
+    --ok:oklch(0.72 0.15 155);--warn:oklch(0.78 0.15 75);--bad:oklch(0.63 0.2 25);
+    --panel:rgba(255,255,255,0.025);--line:rgba(255,255,255,0.09);--line-2:rgba(255,255,255,0.14);
+    --ff-display:'Space Grotesk','DM Sans',-apple-system,sans-serif;--ff-body:'DM Sans',-apple-system,sans-serif;--ff-mono:'JetBrains Mono','IBM Plex Mono',ui-monospace,monospace;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{background:#0A0D14;scroll-behavior:smooth;}
+  body{font-family:var(--ff-body);background:var(--bg);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased;}
+  ::selection{background:oklch(0.65 0.19 33 / 0.32);color:#fff;}
+  a{color:inherit;}
+  .container{max-width:1160px;margin:0 auto;padding:0 40px;}
+  .nav-link{color:rgba(243,244,247,0.6);transition:color .2s ease;text-decoration:none;font-family:var(--ff-mono);font-size:12px;letter-spacing:0.06em;text-transform:uppercase;}
+  .nav-link:hover{color:#F3F4F7;}
+  .gh-btn{font-family:var(--ff-mono);font-size:12px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;color:#0A0D14;background:#F3F4F7;padding:9px 18px;transition:background .2s ease,color .2s ease;}
+  .gh-btn:hover{background:oklch(0.65 0.19 33);color:#fff;}
+
+  .hero{padding:80px 0 20px;}
+  .eyebrow{font-family:var(--ff-mono);font-size:12px;letter-spacing:0.14em;text-transform:uppercase;color:var(--rust-bright);}
+  .hero h1{font-family:var(--ff-display);font-weight:600;font-size:clamp(38px,5.2vw,64px);line-height:1.02;letter-spacing:-0.03em;margin:14px 0 16px;}
+  .hero p{max-width:66ch;color:rgba(243,244,247,0.62);font-size:17px;font-weight:300;line-height:1.7;}
+  .hero .spec-link{display:inline-block;margin-top:16px;font-family:var(--ff-mono);font-size:12px;letter-spacing:0.06em;text-transform:uppercase;color:var(--rust-bright);text-decoration:none;border-bottom:1px solid rgba(255,255,255,0.15);padding-bottom:3px;}
+
+  .banner{display:none;position:sticky;top:0;z-index:200;padding:12px 0;background:var(--bad);color:#fff;font-family:var(--ff-mono);font-size:13px;letter-spacing:0.04em;}
+  .banner.on{display:block;}
+  .banner .container{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+  .banner .dot{width:10px;height:10px;border-radius:50%;background:#fff;display:inline-block;margin-right:10px;animation:pulse 1.2s infinite;vertical-align:middle;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.35;}}
+  .kill{font-family:var(--ff-mono);font-size:12px;letter-spacing:0.08em;text-transform:uppercase;background:#fff;color:var(--bad);border:none;padding:8px 16px;cursor:pointer;font-weight:600;}
+
+  .roles{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:34px 0;}
+  .role-card{text-align:left;padding:28px;background:var(--panel);border:1px solid var(--line);cursor:pointer;transition:transform .2s,border-color .2s;color:inherit;font:inherit;}
+  .role-card:hover{transform:translateY(-3px);border-color:var(--rust);}
+  .role-card[aria-pressed="true"]{border-color:var(--rust);background:rgba(154,80,56,0.1);}
+  .role-card h2{font-family:var(--ff-display);font-size:24px;font-weight:600;margin-bottom:6px;}
+  .role-card .tag{font-family:var(--ff-mono);font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:var(--rust-bright);}
+  .role-card p{color:rgba(243,244,247,0.6);font-size:14px;font-weight:300;margin-top:8px;}
+
+  .stage{display:none;}
+  .stage.on{display:block;}
+
+  .panel{background:var(--panel);border:1px solid var(--line);padding:24px;margin-bottom:18px;}
+  .panel h3{font-family:var(--ff-display);font-size:19px;font-weight:600;margin-bottom:4px;}
+  .panel h3 .n{font-family:var(--ff-mono);font-size:12px;color:var(--rust-bright);margin-right:10px;}
+  .panel .sub{color:rgba(243,244,247,0.55);font-size:13.5px;font-weight:300;margin-bottom:16px;}
+  .panel.done{border-color:rgba(52,168,110,0.35);}
+  .panel.locked{opacity:0.45;pointer-events:none;}
+
+  label.cap{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border:1px solid var(--line);margin-bottom:8px;cursor:pointer;transition:border-color .15s;}
+  label.cap:hover{border-color:var(--line-2);}
+  label.cap input{margin-top:4px;accent-color:var(--rust);width:16px;height:16px;flex-shrink:0;}
+  label.cap .ct{font-size:14px;}
+  label.cap .cd{font-size:12px;color:rgba(243,244,247,0.5);font-weight:300;}
+  label.cap.req .cd::after{content:' · required';color:var(--rust-bright);}
+
+  .btn{font-family:var(--ff-mono);font-size:12px;letter-spacing:0.07em;text-transform:uppercase;padding:12px 20px;border:1px solid var(--rust);background:var(--rust);color:#fff;cursor:pointer;transition:background .18s,transform .1s;}
+  .btn:hover{background:var(--rust-bright);}
+  .btn:active{transform:translateY(1px);}
+  .btn:disabled{opacity:0.4;cursor:not-allowed;}
+  .btn.ghost{background:transparent;color:var(--ink);border-color:var(--line-2);}
+  .btn.ghost:hover{border-color:var(--rust);background:rgba(154,80,56,0.12);}
+  .btn.danger{background:var(--bad);border-color:var(--bad);}
+  .btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;}
+
+  textarea.code{width:100%;min-height:96px;background:#05070c;border:1px solid var(--line);color:rgba(243,244,247,0.85);font-family:var(--ff-mono);font-size:11px;line-height:1.5;padding:12px;resize:vertical;word-break:break-all;}
+  textarea.code:focus{outline:none;border-color:var(--rust);}
+
+  .sas{display:flex;align-items:center;gap:18px;flex-wrap:wrap;padding:18px;background:#05070c;border:1px solid var(--warn);margin:6px 0 14px;}
+  .sas .code{font-family:var(--ff-mono);font-size:30px;letter-spacing:0.16em;color:var(--warn);font-weight:600;}
+  .sas .words{font-family:var(--ff-mono);font-size:14px;color:rgba(243,244,247,0.75);letter-spacing:0.04em;}
+  .sas .note{font-size:12.5px;color:rgba(243,244,247,0.6);font-weight:300;max-width:44ch;}
+
+  .stat-row{display:flex;gap:22px;flex-wrap:wrap;font-family:var(--ff-mono);font-size:12px;color:rgba(243,244,247,0.6);margin-top:12px;}
+  .stat-row b{color:var(--ink);font-weight:600;}
+  .pill{display:inline-flex;align-items:center;gap:7px;font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;padding:5px 11px;border:1px solid var(--line-2);color:rgba(243,244,247,0.7);}
+  .pill .d{width:8px;height:8px;border-radius:50%;background:rgba(243,244,247,0.4);}
+  .pill.ok{border-color:rgba(52,168,110,0.5);color:var(--ok);} .pill.ok .d{background:var(--ok);}
+  .pill.warn{border-color:rgba(210,160,60,0.5);color:var(--warn);} .pill.warn .d{background:var(--warn);}
+  .pill.bad{border-color:rgba(200,70,60,0.5);color:var(--bad);} .pill.bad .d{background:var(--bad);}
+
+  .screen-wrap{position:relative;background:#000;border:1px solid var(--line);aspect-ratio:16/9;overflow:hidden;}
+  .screen-wrap video{width:100%;height:100%;object-fit:contain;display:block;background:#000;}
+  .screen-wrap .ghost{position:absolute;width:22px;height:22px;pointer-events:none;transform:translate(-50%,-50%);display:none;z-index:5;}
+  .screen-wrap .ghost svg{filter:drop-shadow(0 1px 2px rgba(0,0,0,0.8));}
+  .screen-wrap .empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:rgba(243,244,247,0.3);font-family:var(--ff-mono);font-size:13px;text-align:center;padding:20px;}
+  .screen-wrap.capturing{cursor:none;}
+
+  .log{background:#05070c;border:1px solid var(--line);height:150px;overflow-y:auto;padding:10px 12px;font-family:var(--ff-mono);font-size:11.5px;line-height:1.65;color:rgba(243,244,247,0.7);}
+  .log .t{color:rgba(243,244,247,0.35);}
+  .log .me{color:var(--rust-bright);}
+  .log .sys{color:var(--warn);}
+  .chat-in{display:flex;gap:8px;margin-top:10px;}
+  .chat-in input{flex:1;background:#05070c;border:1px solid var(--line);color:var(--ink);font-family:var(--ff-body);font-size:14px;padding:10px 12px;}
+  .chat-in input:focus{outline:none;border-color:var(--rust);}
+
+  .files{margin-top:8px;}
+  .file-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid var(--line);margin-bottom:8px;font-size:13px;}
+  .file-item .nm{flex:1;font-family:var(--ff-mono);font-size:12px;word-break:break-all;}
+  .file-item .bar{width:120px;height:6px;background:rgba(255,255,255,0.08);overflow:hidden;flex-shrink:0;}
+  .file-item .bar i{display:block;height:100%;background:var(--rust);width:0;transition:width .2s;}
+  .file-item .st{font-family:var(--ff-mono);font-size:11px;color:rgba(243,244,247,0.6);white-space:nowrap;}
+  .file-item a.dl{color:var(--rust-bright);text-decoration:none;font-family:var(--ff-mono);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;}
+  .drop{border:1px dashed var(--line-2);padding:18px;text-align:center;color:rgba(243,244,247,0.5);font-size:13px;cursor:pointer;transition:border-color .15s,background .15s;}
+  .drop:hover,.drop.over{border-color:var(--rust);background:rgba(154,80,56,0.08);}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+  .callout{border-left:3px solid var(--rust);padding:10px 16px;margin:14px 0;background:rgba(154,80,56,0.07);font-size:13px;color:rgba(243,244,247,0.72);font-weight:300;}
+  .callout b{color:var(--ink);font-weight:600;}
+
+  .locator{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:6px;}
+  .locator .tag{font-family:var(--ff-mono);font-size:26px;letter-spacing:0.14em;color:var(--ink);font-weight:600;}
+  .locator .lbl{font-family:var(--ff-mono);font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:rgba(243,244,247,0.5);}
+
+  footer{border-top:1px solid rgba(255,255,255,0.07);margin-top:60px;}
+  .foot{display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;padding:44px 0 34px;}
+
+  @media (max-width:760px){.container{padding:0 20px;}.roles{grid-template-columns:1fr;}.grid2{grid-template-columns:1fr;}.hero{padding:54px 0 12px;}}
+</style>
+</head>
+<body>
+  <div style="position:fixed;inset:0;pointer-events:none;z-index:0;background:repeating-linear-gradient(90deg, rgba(255,255,255,0.022) 0 1px, transparent 1px 88px), repeating-linear-gradient(0deg, rgba(255,255,255,0.022) 0 1px, transparent 1px 88px);"></div>
+
+  <div id="shareBanner" class="banner" role="alert">
+    <div class="container">
+      <span><span class="dot"></span><b id="bannerText">You are sharing your screen.</b></span>
+      <button class="kill" id="killBtn">■ End session now</button>
+    </div>
+  </div>
+
+  <div style="position:relative;z-index:1;">
+  <header style="position:sticky;top:0;z-index:100;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);background:rgba(10,13,20,0.72);border-bottom:1px solid rgba(255,255,255,0.07);">
+    <nav class="container" aria-label="Primary" style="height:70px;display:flex;align-items:center;justify-content:space-between;gap:24px;">
+      <a href="index.html" style="display:flex;align-items:center;gap:12px;text-decoration:none;color:#F3F4F7;">
+        <span style="width:34px;height:34px;border:1px solid rgba(255,255,255,0.22);display:flex;align-items:center;justify-content:center;font-family:var(--ff-display);font-weight:600;font-size:16px;background:rgba(255,255,255,0.03);">S</span>
+        <span style="font-family:var(--ff-mono);font-size:12px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(243,244,247,0.85);">System<span style="color:rgba(243,244,247,0.4);">_by_</span>Dave</span>
+      </a>
+      <div style="display:flex;align-items:center;gap:30px;">
+        <a href="tools.html" class="nav-link">Tools</a>
+        <a href="av-suite.html" class="nav-link">AV&nbsp;Suite</a>
+        <a href="https://github.com/DaveHomeAssist/system-by-dave" target="_blank" rel="noopener noreferrer" class="gh-btn">GitHub&nbsp;↗</a>
+      </div>
+    </nav>
+  </header>
+
+  <main id="main-content">
+    <section class="hero">
+      <div class="container">
+        <div class="eyebrow">Reference build · Remote Desktop spec v2</div>
+        <h1>Remote Desktop</h1>
+        <p>A serverless WebRTC screen-share, file-transfer and remote-view tool that runs entirely in two browsers — no accounts, no relay server, no session data leaving the two machines. It's the working embodiment of the spec's security model: the session code <b>locates</b>, a verbal code <b>authenticates</b>, and the host <b>approves each capability</b> before anything is shared.</p>
+        <a class="spec-link" href="remote-desktop-spec-v2-2026-07-11.md">Read the full spec (v2) ↗</a>
+      </div>
+    </section>
+
+    <div class="container">
+
+      <!-- ROLE PICKER -->
+      <section id="rolePicker">
+        <div class="roles">
+          <button class="role-card" id="pickHost" aria-pressed="false">
+            <span class="tag">Host / Target</span>
+            <h2>Share my screen</h2>
+            <p>This machine is the one being helped. It captures its screen and serves it to a controller. It approves every capability first, and can end the session in one click.</p>
+          </button>
+          <button class="role-card" id="pickController" aria-pressed="false">
+            <span class="tag">Controller / Viewer</span>
+            <h2>View a screen</h2>
+            <p>This machine renders the host's screen and, where a native host agent is present, sends input. In the browser build it views, chats, and transfers files.</p>
+          </button>
+        </div>
+        <div class="callout">
+          <b>How the connection works.</b> This build has no rendezvous server, so you exchange one <em>connection code</em> by hand (message / email / phone). Real products replace this hand-off with a short-ID server — see the spec's §4 and Track B. Everything after the hand-off is peer-to-peer and encrypted by WebRTC's DTLS-SRTP.
+        </div>
+      </section>
+
+      <!-- ================= HOST ================= -->
+      <section class="stage" id="hostStage">
+        <div class="panel" id="hStep1">
+          <h3><span class="n">01</span>Approve capabilities</h3>
+          <p class="sub">Consent is capability-scoped, not one switch. You grant exactly what the controller may do. Nothing is shared until you press <b>Start hosting</b>.</p>
+          <label class="cap req"><input type="checkbox" id="capView" checked disabled><span><span class="ct">Share screen (view)</span><br><span class="cd">The controller can see one screen or window you pick</span></span></label>
+          <label class="cap"><input type="checkbox" id="capFiles"><span><span class="ct">File transfer</span><br><span class="cd">Send and receive files over the encrypted data channel. Received files are saved, never run.</span></span></label>
+          <label class="cap"><input type="checkbox" id="capChat" checked><span><span class="ct">Text chat</span><br><span class="cd">A side channel for talking through the fix</span></span></label>
+          <label class="cap"><input type="checkbox" id="capCursor"><span><span class="ct">Show controller's pointer</span><br><span class="cd">Draw the controller's cursor as a ghost overlay and log its normalized input events. Browsers cannot inject OS input — real control needs the native host agent (spec §5.7 / B7).</span></span></label>
+          <div class="btn-row">
+            <button class="btn" id="hStart">Start hosting →</button>
+            <button class="btn ghost" id="hBack1">← Back</button>
+          </div>
+        </div>
+
+        <div class="panel locked" id="hStep2">
+          <h3><span class="n">02</span>Send your connection code</h3>
+          <p class="sub">Send this code to your controller by any channel you trust. It <b>locates</b> your machine and carries your encryption fingerprint — it is not a password.</p>
+          <div class="locator"><span class="tag" id="hLocator">— — —</span><span class="lbl">Session locator · shareable, not secret</span></div>
+          <textarea class="code" id="hOffer" readonly placeholder="Generating…"></textarea>
+          <div class="btn-row"><button class="btn ghost" id="hCopyOffer">Copy code</button></div>
+        </div>
+
+        <div class="panel locked" id="hStep3">
+          <h3><span class="n">03</span>Paste the controller's reply</h3>
+          <p class="sub">Your controller pastes their reply code back to you. Paste it here to finish the connection.</p>
+          <textarea class="code" id="hAnswer" placeholder="Paste the controller's reply code…"></textarea>
+          <div class="btn-row"><button class="btn" id="hConnect">Connect →</button></div>
+        </div>
+
+        <div class="panel locked" id="hStep4">
+          <h3><span class="n">04</span>Confirm you're talking to the right person</h3>
+          <p class="sub">WebRTC encrypts the link but does not prove <em>who</em> is on the other end. Read this code aloud. If it doesn't match on both screens, someone is in the middle — hang up.</p>
+          <div class="sas">
+            <span class="code" id="hSas">······</span>
+            <span class="words" id="hSasWords"></span>
+            <span class="note">Compare verbally with the controller. This is a Short Authentication String derived from both encryption keys (spec §5.1).</span>
+          </div>
+          <div class="btn-row"><button class="btn" id="hConfirm">Codes match — go live</button><button class="btn danger" id="hReject">They don't match</button></div>
+        </div>
+
+        <!-- live host surface -->
+        <div class="stage" id="hLive">
+          <div class="panel done">
+            <h3><span class="n">05</span>Live session</h3>
+            <div class="stat-row">
+              <span class="pill ok" id="hConnPill"><span class="d"></span><span>Connected</span></span>
+              <span class="pill" id="hPathPill"><span class="d"></span><span>Path: …</span></span>
+              <span>Controller sees: <b id="hSees">your screen</b></span>
+            </div>
+            <div class="screen-wrap" id="hPreview" style="margin-top:16px;">
+              <div class="ghost" id="hGhost"><svg width="22" height="22" viewBox="0 0 22 22"><path d="M2 2 L2 16 L6 12 L9 18 L12 17 L9 11 L15 11 Z" fill="#fff" stroke="oklch(0.65 0.19 33)" stroke-width="1.2"/></svg></div>
+              <video id="hVideo" muted autoplay playsinline></video>
+              <div class="empty" id="hPreviewEmpty">Your shared screen preview</div>
+            </div>
+          </div>
+
+          <div class="grid2">
+            <div class="panel" id="hChatPanel">
+              <h3>Chat</h3>
+              <div class="log" id="hLog"></div>
+              <div class="chat-in"><input id="hChatInput" placeholder="Message…" autocomplete="off"><button class="btn" id="hChatSend">Send</button></div>
+            </div>
+            <div class="panel" id="hFilePanel">
+              <h3>Files</h3>
+              <p class="sub">Chunked, hashed, verified end-to-end. Received files download to disk and are never executed (spec §5.7 / B8).</p>
+              <div class="drop" id="hDrop">Drop a file or click to send</div>
+              <input type="file" id="hFileInput" hidden>
+              <div class="files" id="hFiles"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= CONTROLLER ================= -->
+      <section class="stage" id="ctrlStage">
+        <div class="panel" id="cStep1">
+          <h3><span class="n">01</span>Paste the host's connection code</h3>
+          <p class="sub">Your host (the person you're helping) sends you their code. Paste it here to locate their machine.</p>
+          <textarea class="code" id="cOffer" placeholder="Paste the host's connection code…"></textarea>
+          <div class="btn-row"><button class="btn" id="cGen">Generate my reply →</button><button class="btn ghost" id="cBack1">← Back</button></div>
+        </div>
+
+        <div class="panel locked" id="cStep2">
+          <h3><span class="n">02</span>Send your reply code back</h3>
+          <p class="sub">Send this reply to your host by the same channel. Once they paste it, you'll connect.</p>
+          <textarea class="code" id="cAnswer" readonly placeholder="Generating…"></textarea>
+          <div class="btn-row"><button class="btn ghost" id="cCopyAnswer">Copy reply</button></div>
+        </div>
+
+        <div class="panel locked" id="cStep3">
+          <h3><span class="n">03</span>Confirm the security code</h3>
+          <p class="sub">Read this aloud with your host. Matching codes prove the encrypted link is direct, with no one in the middle.</p>
+          <div class="sas">
+            <span class="code" id="cSas">······</span>
+            <span class="words" id="cSasWords"></span>
+            <span class="note">Short Authentication String — must match the host's screen exactly (spec §5.1).</span>
+          </div>
+          <div class="btn-row"><button class="btn" id="cConfirm">Codes match — continue</button><button class="btn danger" id="cReject">They don't match</button></div>
+        </div>
+
+        <div class="stage" id="cLive">
+          <div class="panel done">
+            <h3><span class="n">04</span>Host screen</h3>
+            <div class="stat-row" style="margin-bottom:14px;">
+              <span class="pill ok" id="cConnPill"><span class="d"></span><span>Connected</span></span>
+              <span class="pill" id="cPathPill"><span class="d"></span><span>Path: …</span></span>
+              <span id="cCtrlHint" style="display:none;">Move your pointer over the screen to send input events.</span>
+            </div>
+            <div class="screen-wrap" id="cScreen">
+              <video id="cVideo" autoplay playsinline></video>
+              <div class="empty" id="cEmpty">Waiting for the host's screen…</div>
+            </div>
+            <div class="btn-row"><button class="btn danger" id="cLeave">Leave session</button></div>
+          </div>
+
+          <div class="grid2">
+            <div class="panel" id="cChatPanel">
+              <h3>Chat</h3>
+              <div class="log" id="cLog"></div>
+              <div class="chat-in"><input id="cChatInput" placeholder="Message…" autocomplete="off"><button class="btn" id="cChatSend">Send</button></div>
+            </div>
+            <div class="panel" id="cFilePanel">
+              <h3>Files</h3>
+              <p class="sub">Received files download to disk and are never executed.</p>
+              <div class="drop" id="cDrop">Drop a file or click to send</div>
+              <input type="file" id="cFileInput" hidden>
+              <div class="files" id="cFiles"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <div class="foot">
+        <div style="display:flex;align-items:center;gap:12px;"><span style="width:34px;height:34px;border:1px solid rgba(255,255,255,0.22);display:flex;align-items:center;justify-content:center;font-family:var(--ff-display);font-weight:600;font-size:16px;">S</span><span style="font-family:var(--ff-mono);font-size:12px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(243,244,247,0.6);">System by Dave</span></div>
+        <div style="display:flex;gap:26px;flex-wrap:wrap;">
+          <a href="tools.html" class="nav-link" style="font-size:11px;">Tools</a>
+          <a href="remote-desktop-spec-v2-2026-07-11.md" class="nav-link" style="font-size:11px;">Spec v2</a>
+          <a href="https://github.com/DaveHomeAssist/system-by-dave" target="_blank" rel="noopener noreferrer" class="nav-link" style="font-size:11px;">GitHub ↗</a>
+        </div>
+        <span style="font-family:var(--ff-mono);font-size:11px;color:rgba(243,244,247,0.35);">© 2026</span>
+      </div>
+    </div>
+  </footer>
+  </div>
+
+<script>
+"use strict";
+(function(){
+  // ── shared connection config ───────────────────────────────────────────────
+  // Public STUN lets peers discover their reflexive candidates for hole-punching.
+  // No TURN here: the serverless build cannot relay. Symmetric-NAT pairs that
+  // fail to hole-punch are the case the spec's coturn relay (§5.2, B3) exists for.
+  var ICE = { iceServers: [{ urls: "stun:stun.l.google.com:19302" }] };
+  var SAS_WORDS = ["amber","basin","cobalt","delta","ember","fjord","gecko","harbor",
+    "indigo","jasper","kelp","lumen","maple","nimbus","onyx","pewter",
+    "quartz","raven","slate","tundra","umber","violet","willow","xenon",
+    "yarrow","zephyr","anchor","birch","cedar","dune","echo","flint"];
+
+  var pc = null, dc = null, role = null, sessionLive = false;
+  var localStream = null;
+  var caps = {};
+  var incoming = {}; // transferId -> assembling file
+
+  // ── tiny DOM helpers ────────────────────────────────────────────────────────
+  function $(id){ return document.getElementById(id); }
+  function show(el){ el.classList.add("on"); }
+  function hide(el){ el.classList.remove("on"); }
+  function unlock(p){ p.classList.remove("locked"); }
+  function markDone(p){ p.classList.add("done"); }
+
+  // Trim a full SDP into a compact transportable code and rebuild it. Keeping the
+  // real SDP (rather than a lossy short code) is what makes this actually connect.
+  function encode(desc){ return btoa(JSON.stringify({ t: desc.type, s: desc.sdp })); }
+  function decode(str){
+    var o = JSON.parse(atob(str.trim()));
+    return { type: o.t, sdp: o.s };
+  }
+
+  // Wait for ICE gathering so the emitted code is a single self-contained blob
+  // (no trickle needed over a copy-paste channel).
+  function iceComplete(pc){
+    return new Promise(function(res){
+      if (pc.iceGatheringState === "complete") return res();
+      function chk(){ if (pc.iceGatheringState === "complete"){ pc.removeEventListener("icegatheringstatechange", chk); res(); } }
+      pc.addEventListener("icegatheringstatechange", chk);
+      setTimeout(res, 2500); // don't hang forever on a slow/blocked STUN
+    });
+  }
+
+  // Derive a short human locator from the offer — display only, never trusted.
+  function locatorFrom(str){
+    var h = 5381; for (var i=0;i<str.length;i++){ h = ((h<<5)+h+str.charCodeAt(i)) & 0xffffffff; }
+    var a = "ABCDEFGHJKMNPQRSTUVWXYZ23456789", out="";
+    var v = Math.abs(h);
+    for (var k=0;k<6;k++){ out += a[v % a.length]; v = Math.floor(v/a.length)+7; if(k===2) out+="-"; }
+    return out;
+  }
+
+  // Short Authentication String bound to BOTH DTLS fingerprints, so a MITM that
+  // swapped a fingerprint (spec §5.1) produces a different code on each side.
+  function fingerprints(pc){
+    var out = [];
+    [pc.localDescription, pc.remoteDescription].forEach(function(d){
+      if (!d) return;
+      (d.sdp.match(/a=fingerprint:\S+\s+([0-9A-Fa-f:]+)/g)||[]).forEach(function(m){ out.push(m.split(/\s+/).pop()); });
+    });
+    return out.sort().join("|");
+  }
+  async function computeSas(pc){
+    var buf = new TextEncoder().encode(fingerprints(pc));
+    var digest = new Uint8Array(await crypto.subtle.digest("SHA-256", buf));
+    var num = (digest[0]<<16 | digest[1]<<8 | digest[2]) % 1000000;
+    var code = String(num).padStart(6,"0");
+    var words = [SAS_WORDS[digest[3]&31], SAS_WORDS[digest[4]&31], SAS_WORDS[digest[5]&31]].join(" · ");
+    return { code: code, words: words };
+  }
+
+  async function connStats(pc){
+    try {
+      var stats = await pc.getStats();
+      var path = "direct";
+      stats.forEach(function(r){
+        if (r.type === "candidate-pair" && r.selected || (r.type==="candidate-pair" && r.state==="succeeded" && r.nominated)){
+          var local = stats.get(r.localCandidateId);
+          if (local && local.candidateType === "relay") path = "relayed (TURN)";
+          else if (local && local.candidateType === "srflx") path = "direct (hole-punched)";
+          else if (local && local.candidateType === "host") path = "direct (LAN)";
+        }
+      });
+      return path;
+    } catch(e){ return "unknown"; }
+  }
+
+  // ── data channel wiring (chat + files + input) ─────────────────────────────
+  function wireChannel(channel, logEl){
+    dc = channel;
+    dc.binaryType = "arraybuffer";
+    dc.onopen = function(){ logSys(logEl, "secure data channel open"); };
+    dc.onmessage = function(ev){ onData(ev.data, logEl); };
+  }
+  function sendCtl(obj){ if (dc && dc.readyState==="open") dc.send(JSON.stringify(obj)); }
+
+  function onData(data, logEl){
+    if (typeof data === "string"){
+      var msg; try { msg = JSON.parse(data); } catch(e){ return; }
+      if (msg.k === "chat"){ logMsg(logEl, "them", msg.text); }
+      else if (msg.k === "file-meta"){ beginReceive(msg, logEl); }
+      else if (msg.k === "file-done"){ finishReceive(msg, logEl); }
+      else if (msg.k === "file-cancel"){ cancelReceive(msg, logEl); }
+      else if (msg.k === "input"){ applyInput(msg); }
+      return;
+    }
+    // binary → file chunk: [4-byte transferId len][id][payload]
+    var view = new DataView(data);
+    var idLen = view.getUint8(0);
+    var id = new TextDecoder().decode(new Uint8Array(data, 1, idLen));
+    var payload = new Uint8Array(data, 1+idLen);
+    var rec = incoming[id];
+    if (!rec) return;
+    rec.chunks.push(payload.slice());
+    rec.received += payload.byteLength;
+    if (rec.el){ rec.el.querySelector(".bar i").style.width = Math.min(100,(rec.received/rec.size*100)).toFixed(0)+"%";
+      rec.el.querySelector(".st").textContent = Math.min(100,(rec.received/rec.size*100)).toFixed(0)+"%"; }
+  }
+
+  // ── chat ────────────────────────────────────────────────────────────────────
+  function nowT(){ var d=new Date(); return d.toTimeString().slice(0,8); }
+  function logRaw(logEl, cls, who, text){
+    var line = document.createElement("div");
+    line.innerHTML = '<span class="t">'+nowT()+'</span> ';
+    var w = document.createElement("span"); w.className = cls; w.textContent = who+": ";
+    line.appendChild(w); line.appendChild(document.createTextNode(text));
+    logEl.appendChild(line); logEl.scrollTop = logEl.scrollHeight;
+  }
+  function logMsg(logEl, from, text){ logRaw(logEl, from==="me"?"me":"", from==="me"?"you":"them", text); }
+  function logSys(logEl, text){ logRaw(logEl, "sys", "system", text); }
+
+  function wireChat(inputEl, sendBtn, logEl){
+    function send(){
+      var t = inputEl.value.trim(); if (!t) return;
+      sendCtl({ k:"chat", text:t }); logMsg(logEl,"me",t); inputEl.value="";
+    }
+    sendBtn.onclick = send;
+    inputEl.addEventListener("keydown", function(e){ if (e.key==="Enter") send(); });
+  }
+
+  // ── file transfer (chunked, hashed, no auto-run) ────────────────────────────
+  var CHUNK = 16 * 1024;
+  var seq = 0;
+  function tid(){ return (Date.now().toString(36)+ (seq++).toString(36)).slice(-10).padStart(10,"0"); }
+
+  async function sendFile(file, listEl, logEl){
+    if (!dc || dc.readyState!=="open"){ logSys(logEl,"no open channel"); return; }
+    var id = tid();
+    var row = fileRow(listEl, file.name, file.size, "sending");
+    var buf = await file.arrayBuffer();
+    var hashBuf = await crypto.subtle.digest("SHA-256", buf);
+    var hash = [].map.call(new Uint8Array(hashBuf), function(b){ return b.toString(16).padStart(2,"0"); }).join("");
+    sendCtl({ k:"file-meta", id:id, name:file.name.replace(/[\/\\]/g,"_"), size:file.size, hash:hash });
+    var offset = 0, idBytes = new TextEncoder().encode(id);
+    function pump(){
+      while (offset < buf.byteLength){
+        if (dc.bufferedAmount > 4*1024*1024){ setTimeout(pump, 40); return; } // backpressure
+        var end = Math.min(offset+CHUNK, buf.byteLength);
+        var slice = new Uint8Array(buf.slice(offset, end));
+        var frame = new Uint8Array(1 + idBytes.length + slice.length);
+        frame[0] = idBytes.length; frame.set(idBytes,1); frame.set(slice, 1+idBytes.length);
+        dc.send(frame.buffer);
+        offset = end;
+        var pct = (offset/buf.byteLength*100).toFixed(0);
+        row.querySelector(".bar i").style.width = pct+"%"; row.querySelector(".st").textContent = pct+"%";
+      }
+      sendCtl({ k:"file-done", id:id });
+      row.querySelector(".st").textContent = "sent ✓";
+      logSys(logEl, "sent "+file.name);
+    }
+    pump();
+  }
+
+  function beginReceive(meta, logEl){
+    incoming[meta.id] = { name:meta.name, size:meta.size, hash:meta.hash, chunks:[], received:0 };
+    var listEl = (logEl && logEl.id==="hLog") ? $("hFiles") : $("cFiles");
+    incoming[meta.id].el = fileRow(listEl, meta.name, meta.size, "receiving");
+    logSys(logEl, "incoming "+meta.name);
+  }
+  async function finishReceive(msg, logEl){
+    var rec = incoming[msg.id]; if (!rec) return;
+    var blob = new Blob(rec.chunks);
+    var buf = await blob.arrayBuffer();
+    var hashBuf = await crypto.subtle.digest("SHA-256", buf);
+    var hash = [].map.call(new Uint8Array(hashBuf), function(b){ return b.toString(16).padStart(2,"0"); }).join("");
+    var ok = hash === rec.hash;
+    var st = rec.el.querySelector(".st"); st.textContent = ok ? "verified ✓" : "hash mismatch ✗";
+    st.style.color = ok ? "var(--ok)" : "var(--bad)";
+    if (ok){
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement("a"); a.className="dl"; a.href=url; a.download=rec.name; a.textContent="Save";
+      rec.el.appendChild(a);
+    }
+    logSys(logEl, (ok?"verified ":"CORRUPT ")+rec.name);
+    delete incoming[msg.id];
+  }
+  function cancelReceive(msg, logEl){ var r=incoming[msg.id]; if(r&&r.el){ r.el.querySelector(".st").textContent="cancelled"; } delete incoming[msg.id]; }
+
+  function fileRow(listEl, name, size, state){
+    var row = document.createElement("div"); row.className="file-item";
+    row.innerHTML = '<span class="nm"></span><div class="bar"><i></i></div><span class="st"></span>';
+    row.querySelector(".nm").textContent = name + " · " + fmtSize(size);
+    row.querySelector(".st").textContent = state;
+    listEl.prepend(row); return row;
+  }
+  function fmtSize(n){ if(n<1024) return n+" B"; if(n<1048576) return (n/1024).toFixed(1)+" KB"; return (n/1048576).toFixed(1)+" MB"; }
+
+  function wireFiles(dropEl, inputEl, listEl, logEl){
+    dropEl.onclick = function(){ inputEl.click(); };
+    inputEl.onchange = function(){ if (inputEl.files[0]){ sendFile(inputEl.files[0], listEl, logEl); inputEl.value=""; } };
+    dropEl.addEventListener("dragover", function(e){ e.preventDefault(); dropEl.classList.add("over"); });
+    dropEl.addEventListener("dragleave", function(){ dropEl.classList.remove("over"); });
+    dropEl.addEventListener("drop", function(e){ e.preventDefault(); dropEl.classList.remove("over");
+      if (e.dataTransfer.files[0]) sendFile(e.dataTransfer.files[0], listEl, logEl); });
+  }
+
+  // ── input protocol (normalized events, spec §5.7) ───────────────────────────
+  function wireControllerInput(){
+    var wrap = $("cScreen"), video = $("cVideo");
+    wrap.addEventListener("pointermove", function(e){
+      var r = video.getBoundingClientRect();
+      // account for object-fit:contain letterboxing
+      var vidAR = (video.videoWidth||16)/(video.videoHeight||9), boxAR = r.width/r.height;
+      var dw = r.width, dh = r.height, ox = 0, oy = 0;
+      if (vidAR > boxAR){ dh = r.width/vidAR; oy = (r.height-dh)/2; } else { dw = r.height*vidAR; ox = (r.width-dw)/2; }
+      var xn = (e.clientX - r.left - ox)/dw, yn = (e.clientY - r.top - oy)/dh;
+      if (xn<0||xn>1||yn<0||yn>1) return;
+      sendCtl({ k:"input", event_type:"move", monitor_id:0,
+        source_width:video.videoWidth, source_height:video.videoHeight,
+        x_normalized:+xn.toFixed(4), y_normalized:+yn.toFixed(4),
+        button:null, modifier_state:0, sequence_number:seq++, timestamp:e.timeStamp|0 });
+    });
+    wrap.addEventListener("pointerdown", function(e){
+      sendCtl({ k:"input", event_type:"down", button:e.button, sequence_number:seq++, timestamp:e.timeStamp|0 });
+    });
+  }
+  function applyInput(msg){
+    // Host side: browsers cannot inject OS input, so we visualize the controller's
+    // pointer and log the event. The native host agent (B7) is what would inject it.
+    if (!caps.cursor) return;
+    var ghost = $("hGhost"), wrap = $("hPreview");
+    if (msg.event_type === "move" && typeof msg.x_normalized === "number"){
+      var r = wrap.getBoundingClientRect();
+      ghost.style.display = "block";
+      ghost.style.left = (msg.x_normalized*100)+"%";
+      ghost.style.top = (msg.y_normalized*100)+"%";
+    } else if (msg.event_type === "down"){
+      logSys($("hLog"), "controller click @ "+(msg.button===0?"left":"btn"+msg.button)+" (not injected — needs native agent)");
+    }
+  }
+
+  // ── session lifecycle ───────────────────────────────────────────────────────
+  function endSession(reason){
+    sessionLive = false;
+    try { if (localStream) localStream.getTracks().forEach(function(t){ t.stop(); }); } catch(e){}
+    try { if (dc) dc.close(); } catch(e){}
+    try { if (pc) pc.close(); } catch(e){}
+    pc = null; dc = null; localStream = null; incoming = {};
+    $("shareBanner").classList.remove("on");
+    alert("Session ended" + (reason?": "+reason:"") + ". Reload to start a new one.");
+  }
+  $("killBtn").onclick = function(){ endSession("ended by host"); };
+
+  function raiseBanner(text){ $("bannerText").textContent = text; $("shareBanner").classList.add("on"); }
+
+  function newPeer(logEl){
+    pc = new RTCPeerConnection(ICE);
+    pc.ontrack = function(ev){
+      var v = $("cVideo"); v.srcObject = ev.streams[0]; $("cEmpty").style.display="none";
+    };
+    pc.onconnectionstatechange = function(){
+      if (pc.connectionState === "failed" || pc.connectionState === "disconnected"){
+        if (sessionLive) logSys(logEl, "connection "+pc.connectionState);
+      }
+    };
+    return pc;
+  }
+
+  // ══════════════════════════ ROLE: HOST ══════════════════════════
+  function initHost(){
+    role = "host";
+    hide($("ctrlStage")); $("rolePicker").style.display="none"; show($("hostStage"));
+
+    $("hBack1").onclick = function(){ location.reload(); };
+
+    $("hStart").onclick = async function(){
+      caps = { view:true, files:$("capFiles").checked, chat:$("capChat").checked, cursor:$("capCursor").checked };
+      try {
+        localStream = await navigator.mediaDevices.getDisplayMedia({ video:{ frameRate:30 }, audio:false });
+      } catch(e){ alert("Screen share was cancelled or blocked."); return; }
+      $("hStep1").classList.add("locked");
+      unlock($("hStep2"));
+      $("hVideo").srcObject = localStream; $("hPreviewEmpty").style.display="none";
+      // if the user stops sharing via the browser UI, tear down
+      localStream.getVideoTracks()[0].addEventListener("ended", function(){ endSession("screen share stopped"); });
+
+      pc = newPeer($("hLog"));
+      localStream.getTracks().forEach(function(t){ pc.addTrack(t, localStream); });
+      var channel = pc.createDataChannel("sbd", { ordered:true });
+      wireChannel(channel, $("hLog"));
+
+      var offer = await pc.createOffer();
+      await pc.setLocalDescription(offer);
+      await iceComplete(pc);
+      var code = encode(pc.localDescription);
+      $("hOffer").value = code;
+      $("hLocator").textContent = locatorFrom(code);
+      unlock($("hStep3"));
+    };
+
+    $("hCopyOffer").onclick = function(){ copy($("hOffer").value, $("hCopyOffer")); };
+
+    $("hConnect").onclick = async function(){
+      var raw = $("hAnswer").value.trim(); if (!raw){ return; }
+      var ans; try { ans = decode(raw); } catch(e){ alert("That reply code doesn't look valid."); return; }
+      try { await pc.setRemoteDescription(ans); } catch(e){ alert("Could not apply the reply code."); return; }
+      $("hStep3").classList.add("locked");
+      var sas = await computeSas(pc);
+      $("hSas").textContent = sas.code; $("hSasWords").textContent = sas.words;
+      unlock($("hStep4"));
+    };
+
+    $("hReject").onclick = function(){ endSession("authentication failed"); };
+    $("hConfirm").onclick = async function(){
+      sessionLive = true;
+      $("hStep4").classList.add("locked");
+      show($("hLive"));
+      if (!caps.chat){ $("hChatPanel").style.display="none"; }
+      if (!caps.files){ $("hFilePanel").style.display="none"; }
+      $("hSees").textContent = "your screen";
+      raiseBanner("You are sharing your screen with a controller. Session authenticated.");
+      var path = await connStats(pc);
+      var pill = $("hPathPill"); pill.querySelector("span:last-child").textContent = "Path: "+path;
+      pill.classList.add(path.indexOf("relay")>=0 ? "warn" : "ok");
+      wireChat($("hChatInput"), $("hChatSend"), $("hLog"));
+      if (caps.files) wireFiles($("hDrop"), $("hFileInput"), $("hFiles"), $("hLog"));
+      logSys($("hLog"), "session live · capabilities: " + Object.keys(caps).filter(function(k){return caps[k];}).join(", "));
+    };
+  }
+
+  // ══════════════════════════ ROLE: CONTROLLER ══════════════════════════
+  function initController(){
+    role = "controller";
+    hide($("hostStage")); $("rolePicker").style.display="none"; show($("ctrlStage"));
+
+    $("cBack1").onclick = function(){ location.reload(); };
+
+    $("cGen").onclick = async function(){
+      var raw = $("cOffer").value.trim(); if (!raw){ alert("Paste the host's code first."); return; }
+      var offer; try { offer = decode(raw); } catch(e){ alert("That host code doesn't look valid."); return; }
+      pc = newPeer($("cLog"));
+      pc.ondatachannel = function(ev){ wireChannel(ev.channel, $("cLog")); };
+      try { await pc.setRemoteDescription(offer); } catch(e){ alert("Could not read the host code."); return; }
+      var answer = await pc.createAnswer();
+      await pc.setLocalDescription(answer);
+      await iceComplete(pc);
+      $("cAnswer").value = encode(pc.localDescription);
+      $("cStep1").classList.add("locked");
+      unlock($("cStep2"));
+      var sas = await computeSas(pc);
+      $("cSas").textContent = sas.code; $("cSasWords").textContent = sas.words;
+      unlock($("cStep3"));
+    };
+
+    $("cCopyAnswer").onclick = function(){ copy($("cAnswer").value, $("cCopyAnswer")); };
+
+    $("cReject").onclick = function(){ endSession("authentication failed"); };
+    $("cConfirm").onclick = async function(){
+      sessionLive = true;
+      $("cStep2").classList.add("locked"); $("cStep3").classList.add("locked");
+      show($("cLive"));
+      raiseBanner("You are viewing a remote screen. Be considerate — you can see their desktop.");
+      wireChat($("cChatInput"), $("cChatSend"), $("cLog"));
+      wireFiles($("cDrop"), $("cFileInput"), $("cFiles"), $("cLog"));
+      wireControllerInput();
+      $("cCtrlHint").style.display = "";
+      var path = await connStats(pc);
+      var pill = $("cPathPill"); pill.querySelector("span:last-child").textContent = "Path: "+path;
+      pill.classList.add(path.indexOf("relay")>=0 ? "warn" : "ok");
+      logSys($("cLog"), "connected to host");
+    };
+    $("cLeave").onclick = function(){ endSession("controller left"); };
+  }
+
+  function copy(text, btn){
+    navigator.clipboard.writeText(text).then(function(){
+      var o = btn.textContent; btn.textContent="Copied ✓"; setTimeout(function(){ btn.textContent=o; }, 1400);
+    }).catch(function(){ /* clipboard blocked — user can select manually */ });
+  }
+
+  // ── boot ────────────────────────────────────────────────────────────────────
+  if (!navigator.mediaDevices || !window.RTCPeerConnection){
+    document.getElementById("rolePicker").innerHTML =
+      '<div class="callout">This browser does not support the WebRTC / screen-capture APIs this tool needs. Use a recent Chrome, Edge, or Firefox on a desktop over HTTPS.</div>';
+  } else {
+    $("pickHost").onclick = function(){ initHost(); };
+    $("pickController").onclick = function(){ initController(); };
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-07-11
+
+* Added `remote-desktop-spec-v2-2026-07-11.md` — the Remote Desktop product spec & implementation plan (v2), covering the rendezvous → direct → relay pattern, peer authentication vs. transport encryption, capability-scoped consent, NAT traversal, unattended device-key pairing, and a Track A (self-host RustDesk) / Track B (build-your-own, auth-first B0–B11) roadmap.
+* Added `/remote-desktop.html` — a self-contained, serverless WebRTC reference build of the spec: host/controller role picker, manual copy-paste signaling (no rendezvous server), `getDisplayMedia` screen view, capability-scoped consent, a verbal Short Authentication String bound to both DTLS fingerprints (peer authentication, spec §5.1), a sticky sharing banner with one-click kill switch, a chunked + SHA-256-verified + no-auto-run file-transfer channel, and a normalized input-event protocol (§5.7) visualized host-side. All peer-to-peer; no session data leaves the two browsers.
+* Listed Remote Desktop on `tools.html` under Labs and registered it in `sitemap.xml`.
+
 ## 2026-07-10
 
 * Added `/ontrack.html` — OnTrack, a DJ set intelligence tool: rekordbox collection XML import, planned/played set imports (.txt/.m3u8), track tags, per-track and per-set debrief notes, planned-vs-played diffing, and JSON backup/restore. All data local.

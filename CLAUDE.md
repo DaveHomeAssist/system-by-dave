@@ -80,6 +80,9 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
 - `resume/index.html`: public resume page
 - `resume/av/index.html`: public AV resume page
 - `wedding-ops.html`: wedding ops case study
+- `remote-desktop.html`: serverless WebRTC remote desktop (screen share, file
+  transfer, remote view) — the working reference build of
+  `remote-desktop-spec-v2-2026-07-11.md`
 - `privacy-policy.html`
 - `404.html`, `500.html`: error pages (with OG/Twitter meta)
 - `html/sbd-brand.html`: internal brand/design reference
@@ -91,6 +94,15 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
   changes. `robots.txt` is hand-maintained.
 
 ## Recent work
+- Added `remote-desktop-spec-v2-2026-07-11.md` (Remote Desktop product spec &
+  implementation plan, v2) and `remote-desktop.html`, a self-contained,
+  serverless WebRTC reference build: role picker (host/controller), manual
+  copy-paste signaling, `getDisplayMedia` screen view, capability-scoped
+  consent, a verbal Short Authentication String bound to both DTLS fingerprints
+  for peer authentication, a sticky "sharing" banner + one-click kill switch, a
+  chunked/hashed/no-auto-run file-transfer channel, and a normalized
+  input-event protocol (visualized host-side, since browsers can't inject OS
+  input). Listed on `tools.html` under Labs and in `sitemap.xml`.
 - Removed dead subscribe CTA from homepage.
 - Replaced live widget iframes on `widgets.html` with poster cards.
 - Mobile nav primary links now stay visible at the 680px breakpoint.
