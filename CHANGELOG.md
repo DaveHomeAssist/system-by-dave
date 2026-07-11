@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-07-10
+
+* Added `/ontrack.html` — OnTrack, a DJ set intelligence tool: rekordbox collection XML import, planned/played set imports (.txt/.m3u8), track tags, per-track and per-set debrief notes, planned-vs-played diffing, and JSON backup/restore. All data local.
+* Registered OnTrack in the AV Suite registry (new Music department), universal nav, offline cache manifest, tools catalog, and sitemap; bumped the service-worker cache version and the public tool count to 41.
+* Self-hosted the Syne, Space Grotesk, and Space Mono fonts under `/fonts/` so OnTrack passes the site CSP and works offline.
+
 ## 2026-07-09
 
 * Published the AV resume at `/resume/av/`, added the one-page PDF at `/resume/av/david-robertson-av-resume.pdf`, and made the public profile contact section lead with the AV resume.

@@ -62,7 +62,8 @@
     {id:'truck-pack',name:'Truck Pack Plan',href:'truck-pack.html',dept:'Logistics',phases:['prep','loadin','strike'],tag:'Truck',desc:'Cases, truck zones, load order, unload order, weights, owners, pack status, and issues.',storageKeys:[{key:'truck-pack.v1',label:'Truck Pack Plan'}]},
     {id:'load-in-plan',name:'Load In Plan',href:'load-in-plan.html',dept:'Logistics',phases:['loadin'],tag:'Load In',desc:'Trucks, docks, destinations, departments, items, owners, due times, build status, blockers, and gaps.',storageKeys:[{key:'load-in-plan.v1',label:'Load In Plan'}]},
     {id:'strike-plan',name:'Strike Plan',href:'strike-plan.html',dept:'Logistics',phases:['strike'],tag:'Strike',desc:'Departments, strike items, locations, owners, case IDs, destinations, load out status, missing gear, and issues.',storageKeys:[{key:'strike-plan.v1',label:'Strike Plan'}]},
-    {id:'av-calculator',name:'AV Calculator',href:'av-calculator.html',dept:'Utility',phases:['advance','prep','loadin','show'],tag:'Math',desc:'Audio delay, projection throw, record storage, and power load checks with copyable summaries.',storageKeys:[{key:'avCalculator.v1',label:'AV Calculator'}]}
+    {id:'av-calculator',name:'AV Calculator',href:'av-calculator.html',dept:'Utility',phases:['advance','prep','loadin','show'],tag:'Math',desc:'Audio delay, projection throw, record storage, and power load checks with copyable summaries.',storageKeys:[{key:'avCalculator.v1',label:'AV Calculator'}]},
+    {id:'ontrack',name:'OnTrack',href:'ontrack.html',dept:'Music',phases:['prep','show','closeout'],tag:'DJ',desc:'DJ set intelligence — rekordbox library import, planned vs played sets, tags, and per-track debrief notes.',storageKeys:[{key:'ontrack_v1',label:'OnTrack library, sets, and notes'}]}
   ];
 
   /* Per-phase recommendations shown by the console and the context dock. */
@@ -89,7 +90,8 @@
     {label:'Logistics',toolIds:['gear-prep','truck-pack','load-in-plan','strike-plan','show-advance']},
     {label:'Crew',toolIds:['crew-call','crew-time-log']},
     {label:'Show docs & client',toolIds:['show-handoff','show-report','show-task-board','change-order','client-signoff']},
-    {label:'Calculators',toolIds:['av-calculator']}
+    {label:'Calculators',toolIds:['av-calculator']},
+    {label:'Music',toolIds:['ontrack']}
   ];
 
   /* Route aliases. `cueforge.html` is the branded route that forwards to the
@@ -139,7 +141,11 @@
     './fonts/dm-sans.woff2',
     './fonts/dm-serif-display.woff2',
     './fonts/dm-serif-display-italic.woff2',
-    './fonts/jetbrains-mono.woff2'
+    './fonts/jetbrains-mono.woff2',
+    './fonts/syne-800.woff2',
+    './fonts/space-grotesk.woff2',
+    './fonts/space-mono.woff2',
+    './fonts/space-mono-bold.woff2'
   ];
 
   function offlineAssets(){
@@ -162,7 +168,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool change — rolls the service-worker cache. */
-    version:'v20260709-pixelforge-sbd',
+    version:'v20260710-ontrack',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,

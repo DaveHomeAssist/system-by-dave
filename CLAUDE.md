@@ -75,6 +75,7 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
 - `camera-shot-list.html`: AV camera shot list
 - `comms-check.html`: AV comms check
 - `av-calculator.html`: AV calculator
+- `ontrack.html`: OnTrack DJ set intelligence (library, sets, debrief notes)
 - `pixelforge/`: PixelForge editor for AV graphics and show image fixes
 - `resume/index.html`: public resume page
 - `resume/av/index.html`: public AV resume page
@@ -250,8 +251,8 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
   `site-survey.html`, `gear-prep.html`, `truck-pack.html`, `load-in-plan.html`, `strike-plan.html`, `show-advance.html`, `crew-call.html`, `crew-time-log.html`,
   `signal-flow.html`,
   `input-list.html`, `stage-plot.html`, `plotforge.html`, `show-handoff.html`, `show-report.html`, `show-task-board.html`, `change-order.html`, `client-signoff.html`,
-  `camera-shot-list.html`, `comms-check.html`, `av-calculator.html`, and
-  `pixelforge/`.
+  `camera-shot-list.html`, `comms-check.html`, `av-calculator.html`,
+  `ontrack.html`, and `pixelforge/`.
 
 ## Conventions
 See `AGENTS.md` for coding conventions and the review checklist.
