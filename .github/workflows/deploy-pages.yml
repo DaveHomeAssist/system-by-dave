@@ -30,6 +30,8 @@ jobs:
       # Actions pinned by SHA per GitHub's security-hardening guide.
       - name: Checkout
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+        with:
+          fetch-depth: 0
 
       - name: Install verification dependencies
         run: npm ci
