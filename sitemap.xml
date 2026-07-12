@@ -19,12 +19,6 @@
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://systembydave.com/av-workbook.html</loc>
-    <lastmod>2026-07-07</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
     <loc>https://systembydave.com/av-workbook/</loc>
     <lastmod>2026-07-07</lastmod>
     <changefreq>weekly</changefreq>
@@ -398,12 +392,6 @@
   </url>
   <url>
     <loc>https://systembydave.com/camera-shot-list.html</loc>
-    <lastmod>2026-07-07</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://systembydave.com/plotforge.html</loc>
     <lastmod>2026-07-07</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
