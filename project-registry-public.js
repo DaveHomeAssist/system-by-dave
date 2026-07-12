@@ -182,7 +182,7 @@ window.SBD_PROJECT_REGISTRY = {
       "files": 16,
       "archived": false,
       "status": "active",
-      "github": "https://github.com/DaveHomeAssist/shieldbox-security-event-quote-request-v4-gold-master.html"
+      "github": "https://github.com/DaveHomeAssist/shieldbox-event-quote"
     },
     {
       "name": "PixelForge",
