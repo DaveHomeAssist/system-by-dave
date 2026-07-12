@@ -14,20 +14,26 @@ if (typeof WebSocket === 'undefined') {
 const args = process.argv.slice(2);
 const baseArg = args.find((arg) => arg.startsWith('--base='));
 const chromeArg = args.find((arg) => arg.startsWith('--chrome='));
+const targetArg = args.find((arg) => arg.startsWith('--target='));
 const baseUrl = (baseArg ? baseArg.slice('--base='.length) : 'http://127.0.0.1:8000/').replace(/\/?$/, '/');
 const chromeBin = chromeArg ? chromeArg.slice('--chrome='.length) : (
   process.env.CHROME_BIN ||
   '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
 );
 
-const targets = [
+const allTargets = [
   ['hub', 'av-suite.html'],
+  ['av-workbook', 'av-workbook/'],
+  ['ontrack', 'ontrack.html'],
   ['show-timer', 'show-timer.html'],
+  ['playback-check', 'playback-check.html'],
   ['cueforge', 'cueforge.html'],
   ['audio-patch', 'audio-patch.html'],
   ['av-calculator', 'av-calculator.html'],
   ['show-handoff', 'show-handoff.html']
 ];
+const targetName = targetArg ? targetArg.slice('--target='.length) : '';
+const targets = targetName ? allTargets.filter(([name]) => name === targetName) : allTargets;
 const widths = [390, 1280];
 const failures = [];
 const results = [];
@@ -131,12 +137,17 @@ async function main() {
         const rect = el.getBoundingClientRect();
         return { tag: el.tagName.toLowerCase(), id: el.id || '', cls: el.className || '', text: label(el).slice(0, 80), left: Math.round(rect.left), right: Math.round(rect.right) };
       }).filter((item) => item.left < -1 || item.right > vw + 1);
+      const overflowElements = Array.from(document.querySelectorAll('body *')).map((el) => {
+        const rect = el.getBoundingClientRect();
+        return { tag: el.tagName.toLowerCase(), id: el.id || '', cls: typeof el.className === 'string' ? el.className : '', left: Math.round(rect.left), right: Math.round(rect.right), width: Math.round(rect.width) };
+      }).filter((item) => item.width > 0 && (item.left < -1 || item.right > vw + 1)).slice(0, 8);
       const drawer = document.getElementById('settingsDrawer');
       return {
         title: document.title,
         viewport: { width: vw, doc: document.documentElement.scrollWidth, body: document.body.scrollWidth },
         overflowX: Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) - vw,
         clipped,
+        overflowElements,
         drawerInert: drawer ? drawer.hasAttribute('inert') : null
       };
     })()`;
@@ -153,8 +164,8 @@ async function main() {
         await delay(rel === 'cueforge.html' ? 2600 : 1800);
         const evaluated = await cdp('Runtime.evaluate', { expression, returnByValue: true });
         const value = evaluated.result.value;
-        results.push({ name, width, overflowX: value.overflowX, clipped: value.clipped.length, drawerInert: value.drawerInert });
-        if (value.overflowX > 1) failures.push(`${name} ${width}px has page overflowX=${value.overflowX}.`);
+        results.push({ name, width, overflowX: value.overflowX, clipped: value.clipped.length, overflowElements: value.overflowElements, drawerInert: value.drawerInert });
+        if (value.overflowX > 1) failures.push(`${name} ${width}px has page overflowX=${value.overflowX}: ${JSON.stringify(value.overflowElements)}.`);
         if (width === 390 && value.clipped.length) {
           failures.push(`${name} ${width}px has clipped focusable controls: ${JSON.stringify(value.clipped.slice(0, 4))}`);
         }

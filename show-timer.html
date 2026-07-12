@@ -864,6 +864,7 @@
     frame: 0,
     marks: []
   };
+  let lastAnnouncedTimerState = 'normal';
 
   function loadPrefs() {
     const saved = storage.get(PREF_STORE);
@@ -1136,6 +1137,15 @@
         : formatDuration(remaining, { showOverrun: true });
     const stateName = visualState(remaining);
     document.body.dataset.timerState = stateName;
+    if (state.running && stateName !== lastAnnouncedTimerState) {
+      const announcements = {
+        warning: `Warning. ${formatDuration(remaining)} remaining.`,
+        danger: `Final seconds. ${formatDuration(remaining)} remaining.`,
+        overrun: `Timer overrun. ${formatDuration(remaining, { showOverrun: true })}.`
+      };
+      if (announcements[stateName]) announce(announcements[stateName], stateName === 'overrun' ? 'error' : 'success');
+    }
+    lastAnnouncedTimerState = stateName;
     els.timerDisplay.textContent = displayValue;
     els.modeLabel.textContent = prefs.mode === 'countdown' ? 'Countdown' : prefs.mode === 'countup' ? 'Count up' : 'Time of day';
 

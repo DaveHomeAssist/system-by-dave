@@ -44,7 +44,7 @@
     --line2:#33414b;
     --txt:#eceae4;
     --mut:#8d9aa2;
-    --dim:#5c6a72;
+    --dim:#82919a;
     --acc:#ffa028;        /* CDJ orange */
     --ok:#3fd07a;         /* LED green */
     --warn:#ff5d5d;
@@ -138,9 +138,9 @@
   /* ---------- DRAWER ---------- */
   .drawer{position:absolute;top:0;right:0;height:100%;width:min(420px,92%);z-index:20;
     background:#11181d;border-left:1px solid var(--line2);
-    transform:translateX(102%);transition:transform .25s ease;display:flex;flex-direction:column;
+    display:none;flex-direction:column;
     box-shadow:-20px 0 50px -20px rgba(0,0,0,.7)}
-  .drawer.open{transform:none}
+  .drawer.open{display:flex}
   .dhead{padding:16px 18px 12px;border-bottom:1px solid var(--line)}
   .dhead .x{float:right;background:none;border:none;color:var(--dim);font-size:20px;cursor:pointer}
   .dhead .x:hover{color:var(--txt)}
@@ -245,11 +245,14 @@
 
   @media(max-width:880px){
     html,body{overflow:auto}
-    .unit{height:auto;min-height:100dvh}
-    .body{grid-template-columns:1fr}
-    .rail{flex-direction:row;flex-wrap:wrap;order:-1}
+    .unit{width:100%;max-width:100vw;height:auto;min-height:100dvh}
+    .plate{flex-wrap:wrap}
+    .plate .status{width:100%;margin-left:0;justify-content:space-between;gap:8px;flex-wrap:wrap}
+    .body,.screen{min-width:0}
+    .body{width:calc(100vw - 32px);max-width:100%;grid-template-columns:minmax(0,1fr)}
+    .rail{width:100%;min-width:0;flex-direction:row;flex-wrap:nowrap;order:-1}
     .rail .sp,.rail .foot{display:none}
-    .vbtn{width:auto;flex:1;justify-content:center}
+    .vbtn{width:auto;min-width:0;flex:1 1 0;justify-content:center;padding-inline:4px}
     .vbtn .k{display:none}
     .screen{min-height:78vh}
     .setcols{grid-template-columns:1fr}
@@ -263,7 +266,7 @@
 <noscript><div style="position:fixed;inset:auto 16px 16px;z-index:1000;padding:12px 14px;border-radius:9px;background:#ffd5d5;color:#220707;font:600 13px system-ui,sans-serif">OnTrack needs JavaScript for imports, notes, filtering, and browser saved state.</div></noscript>
 <div class="unit">
   <div class="plate">
-    <div class="logo">ON<b>TRACK</b></div>
+    <h1 class="logo">ON<b>TRACK</b></h1>
     <div class="status">
       <span id="savestat"><span class="savedot"></span>LOCAL</span>
       <span><b id="statTracks">0</b> TRACKS</span>
@@ -274,10 +277,10 @@
 
   <div class="body">
     <nav class="rail">
-      <button class="vbtn active" data-view="library"><span class="k">1</span><span class="n">Library</span></button>
-      <button class="vbtn" data-view="sets"><span class="k">2</span><span class="n">Sets</span></button>
-      <button class="vbtn" data-view="debrief"><span class="k">3</span><span class="n">Debrief</span></button>
-      <button class="vbtn" data-view="data"><span class="k">4</span><span class="n">Data</span></button>
+      <button class="vbtn active" data-view="library" aria-pressed="true"><span class="k">1</span><span class="n">Library</span></button>
+      <button class="vbtn" data-view="sets" aria-pressed="false"><span class="k">2</span><span class="n">Sets</span></button>
+      <button class="vbtn" data-view="debrief" aria-pressed="false"><span class="k">3</span><span class="n">Debrief</span></button>
+      <button class="vbtn" data-view="data" aria-pressed="false"><span class="k">4</span><span class="n">Data</span></button>
       <div class="sp"></div>
       <div class="foot">ONTRACK V1<br>ALL DATA LOCAL<br>NOTHING SUGGESTED</div>
     </nav>
@@ -293,11 +296,11 @@
           </div>
         </div>
         <div class="filters">
-          <input id="q" placeholder="Search artist / title / genre / tags / notes">
-          <div class="bpmbox">BPM <input id="bpmMin" placeholder="min" inputmode="numeric"> – <input id="bpmMax" placeholder="max" inputmode="numeric"></div>
-          <select id="selKey"><option value="">Key: all</option></select>
-          <select id="selGenre"><option value="">Genre: all</option></select>
-          <select id="selTag"><option value="">Tag: all</option></select>
+          <input id="q" placeholder="Search artist / title / genre / tags / notes" aria-label="Search tracks">
+          <div class="bpmbox">BPM <input id="bpmMin" placeholder="min" inputmode="numeric" aria-label="Minimum BPM"> – <input id="bpmMax" placeholder="max" inputmode="numeric" aria-label="Maximum BPM"></div>
+          <select id="selKey" aria-label="Filter by musical key"><option value="">Key: all</option></select>
+          <select id="selGenre" aria-label="Filter by genre"><option value="">Genre: all</option></select>
+          <select id="selTag" aria-label="Filter by tag"><option value="">Tag: all</option></select>
           <button class="btn ghost" id="clearF">Clear</button>
         </div>
         <div class="tblwrap" id="tblwrap"></div>
@@ -323,7 +326,7 @@
         <div class="vtitle">
           <h2>DEBRIEF</h2>
           <div class="dbtop" style="flex:1">
-            <select id="dbSel"></select>
+            <select id="dbSel" aria-label="Played set to debrief"></select>
             <span class="dbprog" id="dbProg"></span>
           </div>
         </div>
@@ -362,9 +365,9 @@
       </section>
 
       <!-- TRACK DRAWER -->
-      <aside class="drawer" id="drawer">
+      <aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="dTitle" aria-hidden="true" inert>
         <div class="dhead">
-          <button class="x" id="drawerX">×</button>
+          <button class="x" id="drawerX" type="button" aria-label="Close track details">×</button>
           <h3 id="dTitle"></h3>
           <div class="sub" id="dSub"></div>
         </div>
@@ -375,7 +378,7 @@
           </div>
           <div class="dsec addnote">
             <div class="lbl">New note</div>
-            <textarea id="dNoteText" placeholder=""></textarea>
+            <textarea id="dNoteText" aria-label="New note for selected track"></textarea>
             <div class="row"><button class="btn pri" id="dNoteSave">Save note</button></div>
           </div>
           <div class="dsec">
@@ -685,22 +688,42 @@ function renderLibrary(){
 }
 
 /* =============== DRAWER =============== */
-let drawerId=null;
+let drawerId=null,drawerReturnFocus=null;
+function closeDrawer(restoreFocus=true){
+  const drawer=document.getElementById("drawer");
+  drawer.classList.remove("open");
+  drawer.setAttribute("aria-hidden","true");
+  drawer.setAttribute("inert","");
+  if(restoreFocus&&drawerReturnFocus&&typeof drawerReturnFocus.focus==="function")drawerReturnFocus.focus();
+}
 function openDrawer(id){
   drawerId=id;
   const t=S.tracks[id];if(!t)return;
+  drawerReturnFocus=document.activeElement;
   document.getElementById("dTitle").textContent=t.title||"(untitled)";
   document.getElementById("dSub").textContent=[t.artist,t.bpm&&t.bpm+" BPM",t.key,t.genre].filter(Boolean).join(" · ");
   renderDrawerTags();renderDrawerNotes();
   document.getElementById("dNoteText").value="";
   document.getElementById("drawer").classList.add("open");
+  document.getElementById("drawer").setAttribute("aria-hidden","false");
+  document.getElementById("drawer").removeAttribute("inert");
+  document.getElementById("drawerX").focus();
 }
-document.getElementById("drawerX").addEventListener("click",()=>document.getElementById("drawer").classList.remove("open"));
+document.getElementById("drawerX").addEventListener("click",()=>closeDrawer());
+document.getElementById("drawer").addEventListener("keydown",e=>{
+  if(e.key==="Escape"){e.preventDefault();closeDrawer();return;}
+  if(e.key!=="Tab")return;
+  const focusable=[...e.currentTarget.querySelectorAll('button,input,select,textarea,[href],[tabindex]:not([tabindex="-1"])')].filter(el=>!el.disabled&&el.getClientRects().length);
+  if(!focusable.length)return;
+  const first=focusable[0],last=focusable[focusable.length-1];
+  if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
+  else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
+});
 function renderDrawerTags(){
   const t=S.tracks[drawerId];
   const box=document.getElementById("dTags");
-  box.innerHTML=t.tags.map((g,i)=>`<span class="tag">${esc(g)}<button data-i="${i}">×</button></span>`).join("")+
-    `<input id="tagIn" placeholder="+ tag">`;
+  box.innerHTML=t.tags.map((g,i)=>`<span class="tag">${esc(g)}<button data-i="${i}" aria-label="Remove tag ${esc(g)}">×</button></span>`).join("")+
+    `<input id="tagIn" placeholder="+ tag" aria-label="Add tag">`;
   box.querySelectorAll(".tag button").forEach(b=>b.addEventListener("click",()=>{
     t.tags.splice(parseInt(b.dataset.i,10),1);persist();renderDrawerTags();renderLibrary();
   }));
@@ -718,7 +741,7 @@ function renderDrawerNotes(){
   document.getElementById("dNotesLbl").textContent=`Notes (${list.length})`;
   document.getElementById("dNotes").innerHTML=list.length?list.map(n=>`
     <div class="note"><div class="nmeta"><span>${new Date(n.ts).toISOString().slice(0,10)}${n.context?" · "+esc(n.context):""}</span>
-    <button data-id="${n.id}">delete</button></div><p>${esc(n.text)}</p></div>`).join("")
+    <button data-id="${n.id}" aria-label="Delete note from ${new Date(n.ts).toISOString().slice(0,10)}">delete</button></div><p>${esc(n.text)}</p></div>`).join("")
     :'<div class="note"><p style="color:var(--dim)">No notes yet.</p></div>';
   document.querySelectorAll("#dNotes .nmeta button").forEach(b=>b.addEventListener("click",()=>{
     S.notes=S.notes.filter(n=>n.id!==b.dataset.id);persist();renderDrawerNotes();renderLibrary();
@@ -789,7 +812,7 @@ function selectSet(id){
     <div class="srow">
       <span>${st.trackIds.length} TRACKS · ${st.date}</span>
       ${st.kind==="played"?`<span>· PLAN:</span>
-        <select id="linkSel"><option value="">none</option>
+        <select id="linkSel" aria-label="Linked planned set"><option value="">none</option>
         ${plans.map(p=>`<option value="${p.id}" ${st.linkedPlanId===p.id?"selected":""}>${esc(p.name)}</option>`).join("")}</select>`:""}
     </div>
     ${stats}
@@ -866,7 +889,7 @@ function renderDebrief(){
       <div><h3>${esc(t.title)}</h3><div class="art">${esc(t.artist)}</div></div>
       <div class="specs">${t.bpm?`<span>${esc(t.bpm)} BPM</span>`:""}${t.key?`<span>${esc(t.key)}</span>`:""}${t.genre?`<span>${esc(t.genre)}</span>`:""}</div>
       ${prevNotes.length?`<div class="prev">Earlier notes: ${prevNotes.slice(0,2).map(n=>`"${esc(n.text)}"`).join(" · ")}</div>`:""}
-      <textarea id="dbText" placeholder="Note"></textarea>
+      <textarea id="dbText" placeholder="Note" aria-label="Debrief note for ${esc(t.title)}"></textarea>
       <div class="dbbtns">
         <button class="btn pri" id="dbSave">Save → next</button>
         <button class="btn" id="dbSkip">Skip</button>
@@ -876,7 +899,7 @@ function renderDebrief(){
     card=`<div class="dbcard">
       <div class="pos">SET NOTE · ${esc(st.name)}</div>
       <div><h3>Whole set</h3><div class="art">${setNotesCount(st.id)} notes written this debrief</div></div>
-      <textarea id="dbText" placeholder="Note"></textarea>
+      <textarea id="dbText" placeholder="Note" aria-label="Whole set debrief note"></textarea>
       <div class="dbbtns">
         <button class="btn pri" id="dbSave">Save & finish</button>
         <button class="btn" id="dbSkip">Finish without note</button>
@@ -946,9 +969,9 @@ document.getElementById("btnSample").addEventListener("click",()=>{
 /* =============== NAV =============== */
 const views=["library","sets","debrief","data"];
 document.querySelectorAll(".vbtn").forEach(b=>b.addEventListener("click",()=>{
-  document.querySelectorAll(".vbtn").forEach(x=>x.classList.toggle("active",x===b));
+  document.querySelectorAll(".vbtn").forEach(x=>{x.classList.toggle("active",x===b);x.setAttribute("aria-pressed",String(x===b));});
   views.forEach(v=>document.getElementById("view-"+v).classList.toggle("on",v===b.dataset.view));
-  document.getElementById("drawer").classList.remove("open");
+  closeDrawer(false);
   if(b.dataset.view==="debrief")renderDebriefSel();
 }));
 document.addEventListener("keydown",e=>{
@@ -965,6 +988,7 @@ renderAll();
 <script src="js/sbd-registry.js"></script>
 <script src="js/av-suite-context.js"></script>
 <script src="js/sbd-nav.js" defer></script>
+<script src="js/responsive-tables.js" defer></script>
 <script src="js/sbd-public-nav.js" defer></script>
 </body>
 </html>

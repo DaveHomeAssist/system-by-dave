@@ -2,6 +2,10 @@
 
 ## 2026-07-11
 
+* Hardened the AV Suite show-package boundary so PixelForge provider credentials are excluded from registry scans, exports, and imports; added verifier coverage for the denylist.
+* Replaced automatic demo-data seeding across the AV Workbook and 23 legacy AV tools with honest blank first-run states while retaining explicit New Blank and Load Sample actions.
+* Repaired high-confidence accessibility and recovery defects in AV Suite, OnTrack, Show Timer, shared responsive tables, and mobile navigation controls, including dialog focus behavior, control names, table semantics, timer-state announcements, and filter recovery.
+* Removed compatibility aliases and noindex routes from the generated sitemap, corrected CueForge canonical metadata, upgraded Vitest to a non-vulnerable release, and made the Pages deployment fail closed on AV verification, workbook tests/build, dependency audit, and generated-file drift.
 * Added `remote-desktop-spec-v2-2026-07-11.md` — the Remote Desktop product spec & implementation plan (v2), covering the rendezvous → direct → relay pattern, peer authentication vs. transport encryption, capability-scoped consent, NAT traversal, unattended device-key pairing, and a Track A (self-host RustDesk) / Track B (build-your-own, auth-first B0–B11) roadmap.
 * Added `/remote-desktop.html` — a self-contained, serverless WebRTC reference build of the spec: host/controller role picker, manual copy-paste signaling (no rendezvous server), `getDisplayMedia` screen view, capability-scoped consent, a verbal Short Authentication String bound to both DTLS fingerprints (peer authentication, spec §5.1), a sticky sharing banner with one-click kill switch, a chunked + SHA-256-verified + no-auto-run file-transfer channel, and a normalized input-event protocol (§5.7) visualized host-side. All peer-to-peer; no session data leaves the two browsers.
 * Listed Remote Desktop on `tools.html` under Labs and registered it in `sitemap.xml`.

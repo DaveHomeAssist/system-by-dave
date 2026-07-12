@@ -1,6 +1,6 @@
 import Dexie, { type Table } from "dexie";
 import { avWorkbookSchema } from "./workbookSchema";
-import { createSampleWorkbook } from "./sampleWorkbook";
+import { createBlankWorkbook } from "./sampleWorkbook";
 import type { AvWorkbook } from "./types";
 
 const ACTIVE_KEY = "system-by-dave.av-workbook.active.v1";
@@ -48,9 +48,9 @@ export async function loadActiveWorkbook(): Promise<AvWorkbook> {
     }
   }
 
-  const seeded = createSampleWorkbook();
-  await saveWorkbook(seeded);
-  return seeded;
+  const blank = createBlankWorkbook();
+  await saveWorkbook(blank);
+  return blank;
 }
 
 export async function saveWorkbook(workbook: AvWorkbook): Promise<AvWorkbook> {

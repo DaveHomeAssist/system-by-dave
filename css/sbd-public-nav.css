@@ -23,7 +23,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 34px;
+  min-height: 44px;
   padding: 7px 11px;
   border: 1px solid rgba(120, 132, 148, 0.42);
   border-radius: 8px;
@@ -62,7 +62,7 @@
 
   .sbd-public-nav a,
   .sbd-public-nav button {
-    min-height: 36px;
+    min-height: 44px;
     padding: 7px 10px;
   }
 

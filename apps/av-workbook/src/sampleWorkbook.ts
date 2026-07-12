@@ -2,6 +2,35 @@ import type { AvWorkbook } from "./types";
 
 const today = new Date().toISOString().slice(0, 10);
 
+export function createBlankWorkbook(): AvWorkbook {
+  const createdAt = Date.now();
+  return {
+    schema: "system-by-dave.av-workbook.v1",
+    workbookId: `wb-${createdAt}`,
+    savedAt: new Date().toISOString(),
+    show: {
+      showId: `show-${createdAt}`,
+      showName: "Untitled AV Workbook",
+      targetDate: today,
+      venue: "",
+      globalStatus: "draft",
+      masterTimecodeFormat: "29.97_NDF"
+    },
+    operators: [],
+    rooms: [],
+    hardware: [],
+    signalSources: [],
+    patchRecords: [],
+    lineChecks: [],
+    videoRoutes: [],
+    powerCircuits: [],
+    rfChannels: [],
+    gearManifest: [],
+    tasks: [],
+    auditEvents: []
+  };
+}
+
 export function createSampleWorkbook(): AvWorkbook {
   return {
     schema: "system-by-dave.av-workbook.v1",

@@ -7,6 +7,7 @@ import { readRegistry } from "./registry";
 import type { AvWorkbook, RegistryTool } from "./types";
 import { validateWorkbookIssues } from "./validators";
 import { createCrewRow, createRoomRow, crewColumns, roomColumns } from "./worksheetSchemas";
+import { createBlankWorkbook, createSampleWorkbook } from "./sampleWorkbook";
 import "./styles.css";
 
 function statusLabel(value: string): string {
@@ -157,6 +158,14 @@ export default function App() {
     }
   }
 
+  async function replaceWorkbook(next: AvWorkbook, label: string) {
+    if (!window.confirm(`Replace the current workbook with ${label}? Export first if you need a backup.`)) return;
+    const saved = await saveWorkbook(next);
+    setWorkbook(saved);
+    setActiveTab("overview");
+    setMessage(`${label[0].toUpperCase()}${label.slice(1)} loaded.`);
+  }
+
   if (!workbook) {
     return (
       <main className="shell">
@@ -174,6 +183,8 @@ export default function App() {
         </a>
         <nav aria-label="Workbook actions">
           <a href="../av-suite.html">Suite Console</a>
+          <button type="button" onClick={() => void replaceWorkbook(createBlankWorkbook(), "a blank workbook")}>New Blank</button>
+          <button type="button" onClick={() => void replaceWorkbook(createSampleWorkbook(), "the sample workbook")}>Load Sample</button>
           <button type="button" onClick={handleExport}>Export JSON</button>
           <button type="button" onClick={() => void handleLegacyAudioImport()}>Import Legacy Audio</button>
           <label className="file-button">

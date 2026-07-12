@@ -568,6 +568,7 @@
     .inspector,
     .operator-panel{border-radius:10px}
     .meta-grid{grid-template-columns:1fr}
+    .show-title{font-size:26px;text-overflow:ellipsis}
     .stats{grid-template-columns:1fr 1fr}
     .toolbar{grid-template-columns:1fr}
     .button-row{display:grid;grid-template-columns:1fr 1fr}
@@ -791,8 +792,8 @@
 
   var state = {
     meta:{
-      showName:'General Session Playback',
-      venue:'Ballroom A',
+      showName:'Untitled Playback',
+      venue:'',
       showDate:new Date().toISOString().slice(0, 10),
       playbackOp:'Playback',
       tdName:'TD',
@@ -862,14 +863,14 @@
     var meta = next.meta && typeof next.meta === 'object' ? next.meta : {};
     return {
       meta:{
-        showName:String(meta.showName || 'General Session Playback').slice(0, 120),
+        showName:String(meta.showName || 'Untitled Playback').slice(0, 120),
         venue:String(meta.venue || '').slice(0, 120),
         showDate:String(meta.showDate || new Date().toISOString().slice(0, 10)).slice(0, 20),
         playbackOp:String(meta.playbackOp || '').slice(0, 80),
         tdName:String(meta.tdName || '').slice(0, 80),
         audioLead:String(meta.audioLead || '').slice(0, 80)
       },
-      cues:Array.isArray(next.cues) ? next.cues.map(cloneCue).slice(0, 200) : sampleCues.map(cloneCue),
+      cues:Array.isArray(next.cues) ? next.cues.map(cloneCue).slice(0, 200) : [],
       selectedId:typeof next.selectedId === 'string' ? next.selectedId : '',
       filters:{
         search:String(next.filters && next.filters.search || ''),

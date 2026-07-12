@@ -476,7 +476,7 @@
   var POSITIONS = ['front-truss','upstage-truss','stage-left','stage-right','floor','foh','room','scenic','spare','other'];
   var $ = function(id){return document.getElementById(id);};
   var state = {
-    meta:{showName:'General Session Lighting Patch',client:'Client',venue:'Ballroom A',showDate:new Date().toISOString().slice(0,10),lead:'Lighting lead',console:'GrandMA / ETC',handoffTo:'Show crew'},
+    meta:{showName:'Untitled Lighting Patch',client:'',venue:'',showDate:new Date().toISOString().slice(0,10),lead:'Lighting lead',console:'GrandMA / ETC',handoffTo:'Show crew'},
     items:[],
     selectedId:'',
     filters:{search:'',position:'all',status:'all'}
@@ -501,8 +501,8 @@
     var next = raw && typeof raw === 'object' ? raw : {};
     var meta = next.meta && typeof next.meta === 'object' ? next.meta : {};
     return {
-      meta:{showName:String(meta.showName || 'General Session Lighting Patch').slice(0,120),client:String(meta.client || '').slice(0,120),venue:String(meta.venue || '').slice(0,120),showDate:String(meta.showDate || new Date().toISOString().slice(0,10)).slice(0,20),lead:String(meta.lead || '').slice(0,80),console:String(meta.console || '').slice(0,80),handoffTo:String(meta.handoffTo || '').slice(0,80)},
-      items:Array.isArray(next.items) ? next.items.map(cloneItem).slice(0,300) : sampleItems.map(cloneItem),
+      meta:{showName:String(meta.showName || 'Untitled Lighting Patch').slice(0,120),client:String(meta.client || '').slice(0,120),venue:String(meta.venue || '').slice(0,120),showDate:String(meta.showDate || new Date().toISOString().slice(0,10)).slice(0,20),lead:String(meta.lead || '').slice(0,80),console:String(meta.console || '').slice(0,80),handoffTo:String(meta.handoffTo || '').slice(0,80)},
+      items:Array.isArray(next.items) ? next.items.map(cloneItem).slice(0,300) :[],
       selectedId:typeof next.selectedId === 'string' ? next.selectedId : '',
       filters:{search:String(next.filters && next.filters.search || ''),position:POSITIONS.indexOf(next.filters && next.filters.position) >= 0 ? next.filters.position : 'all',status:STATUS.indexOf(next.filters && next.filters.status) >= 0 ? next.filters.status : 'all'}
     };

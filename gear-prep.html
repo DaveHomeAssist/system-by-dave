@@ -716,7 +716,7 @@
 
   var state = {
     meta:{
-      showName:'General Session Gear Prep',
+      showName:'Untitled Gear Prep',
       venue:'Ballroom A',
       showDate:new Date().toISOString().slice(0, 10),
       prepLead:'Lead tech',
@@ -789,7 +789,7 @@
     var meta = next.meta && typeof next.meta === 'object' ? next.meta : {};
     return {
       meta:{
-        showName:String(meta.showName || 'General Session Gear Prep').slice(0, 120),
+        showName:String(meta.showName || 'Untitled Gear Prep').slice(0, 120),
         venue:String(meta.venue || '').slice(0, 120),
         showDate:String(meta.showDate || new Date().toISOString().slice(0, 10)).slice(0, 20),
         prepLead:String(meta.prepLead || '').slice(0, 80),
@@ -797,7 +797,7 @@
         truck:String(meta.truck || '').slice(0, 100),
         handoffTo:String(meta.handoffTo || '').slice(0, 80)
       },
-      items:Array.isArray(next.items) ? next.items.map(cloneItem).slice(0, 300) : sampleItems.map(cloneItem),
+      items:Array.isArray(next.items) ? next.items.map(cloneItem).slice(0, 300) :[],
       selectedId:typeof next.selectedId === 'string' ? next.selectedId : '',
       filters:{
         search:String(next.filters && next.filters.search || ''),

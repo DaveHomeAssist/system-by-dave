@@ -31,6 +31,26 @@ jobs:
       - name: Checkout
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
 
+      - name: Install verification dependencies
+        run: npm ci
+
+      - name: Verify AV Suite contracts
+        run: |
+          npm run verify:av
+          npm run verify:public-navigation
+
+      - name: Verify AV Workbook
+        run: |
+          npm run typecheck:av-workbook
+          npm run test:av-workbook
+          npm run build:av-workbook
+
+      - name: Verify dependency security and generated files
+        run: |
+          npm audit --audit-level=high
+          python3 scripts/gen_sitemap.py
+          git diff --exit-code -- av-workbook sitemap.xml
+
       - name: Stage site (everything except VCS + CI tooling)
         run: |
           mkdir -p _site

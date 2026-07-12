@@ -24,7 +24,6 @@ STATIC_PAGES = [
     ("", "weekly", "1.0"),
     ("tools.html", "weekly", "0.9"),
     ("av-suite.html", "weekly", "0.9"),
-    ("av-workbook.html", "weekly", "0.8"),
     ("av-workbook/", "weekly", "0.8"),
     ("pixelforge/", "weekly", "0.8"),
     ("notion.html", "weekly", "0.8"),
@@ -76,6 +75,14 @@ def registry_tool_pages():
     return pages
 
 
+def is_indexable(path):
+    probe = os.path.join(ROOT, path, "index.html") if path.endswith("/") else os.path.join(ROOT, path)
+    if not os.path.exists(probe):
+        return False
+    source = io.open(probe, encoding="utf-8").read()
+    return not re.search(r'<meta\s+name=["\']robots["\'][^>]*content=["\'][^"\']*noindex', source, re.I)
+
+
 def dirty_paths():
     out = subprocess.run(["git", "status", "--porcelain"], cwd=ROOT,
                          capture_output=True, text=True).stdout
@@ -97,12 +104,14 @@ def main():
     dirty = dirty_paths()
     entries = []
     for path, freq, prio in STATIC_PAGES:
-        entries.append((path, lastmod_for(path, dirty), freq, prio))
+        if not path or is_indexable(path):
+            entries.append((path, lastmod_for(path, dirty), freq, prio))
     for href in registry_tool_pages():
         if not os.path.exists(os.path.join(ROOT, href)):
             print("skip (missing file):", href, file=sys.stderr)
             continue
-        entries.append((href, lastmod_for(href, dirty), TOOL_CHANGEFREQ, TOOL_PRIORITY))
+        if is_indexable(href):
+            entries.append((href, lastmod_for(href, dirty), TOOL_CHANGEFREQ, TOOL_PRIORITY))
 
     lines = ['<?xml version="1.0" encoding="UTF-8"?>',
              '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']

@@ -517,7 +517,7 @@
   var DEPARTMENTS = ['audio','video','lighting','projection','camera','streaming','comms','stage','labor','producer','venue','other'];
   var $ = function(id){ return document.getElementById(id); };
   var state = {
-    meta:{showName:'General Session Crew Call',client:'Client',venue:'Ballroom A',showDate:new Date().toISOString().slice(0,10),advanceLead:'Production manager',loadIn:'08:00',handoffTo:'Show caller'},
+    meta:{showName:'Untitled Crew Call',client:'',venue:'',showDate:new Date().toISOString().slice(0,10),advanceLead:'Production manager',loadIn:'08:00',handoffTo:'Show caller'},
     items:[],
     selectedId:'',
     filters:{search:'',section:'all',status:'all'}
@@ -542,8 +542,8 @@
     var next = raw && typeof raw === 'object' ? raw : {};
     var meta = next.meta && typeof next.meta === 'object' ? next.meta : {};
     return {
-      meta:{showName:String(meta.showName || 'General Session Crew Call').slice(0,120),client:String(meta.client || '').slice(0,120),venue:String(meta.venue || '').slice(0,120),showDate:String(meta.showDate || new Date().toISOString().slice(0,10)).slice(0,20),advanceLead:String(meta.advanceLead || '').slice(0,80),loadIn:String(meta.loadIn || '').slice(0,80),handoffTo:String(meta.handoffTo || '').slice(0,80)},
-      items:Array.isArray(next.items) ? next.items.map(cloneItem).slice(0,300) : sampleItems.map(cloneItem),
+      meta:{showName:String(meta.showName || 'Untitled Crew Call').slice(0,120),client:String(meta.client || '').slice(0,120),venue:String(meta.venue || '').slice(0,120),showDate:String(meta.showDate || new Date().toISOString().slice(0,10)).slice(0,20),advanceLead:String(meta.advanceLead || '').slice(0,80),loadIn:String(meta.loadIn || '').slice(0,80),handoffTo:String(meta.handoffTo || '').slice(0,80)},
+      items:Array.isArray(next.items) ? next.items.map(cloneItem).slice(0,300) :[],
       selectedId:typeof next.selectedId === 'string' ? next.selectedId : '',
       filters:{search:String(next.filters && next.filters.search || ''),section:DEPARTMENTS.indexOf(next.filters && next.filters.section) >= 0 ? next.filters.section : 'all',status:STATUS.indexOf(next.filters && next.filters.status) >= 0 ? next.filters.status : 'all'}
     };

@@ -1,8 +1,17 @@
 import { describe, expect, it } from "vitest";
-import { createSampleWorkbook } from "./sampleWorkbook";
+import { createBlankWorkbook, createSampleWorkbook } from "./sampleWorkbook";
+import { validateWorkbook } from "./store";
 import { validateAudio, validatePower, validateRf, validateWorkbookIssues } from "./validators";
 
 describe("workbook validators", () => {
+  it("creates a valid blank workbook without demo operations", () => {
+    const workbook = validateWorkbook(createBlankWorkbook());
+    expect(workbook.show.showName).toBe("Untitled AV Workbook");
+    expect(workbook.operators).toEqual([]);
+    expect(workbook.rooms).toEqual([]);
+    expect(workbook.auditEvents).toEqual([]);
+  });
+
   it("flags duplicate hard audio targets", () => {
     const workbook = createSampleWorkbook();
     const audio = validateAudio(workbook);

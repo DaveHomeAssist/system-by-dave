@@ -330,6 +330,16 @@ async function main() {
       await cdp('Page.navigate', { url: new URL(target.page, baseUrl).href });
       await delay(2200);
 
+      await evaluate(`(() => {
+        const hasRows = Boolean(document.querySelector(${JSON.stringify(`${target.body} tr[data-id]`)}));
+        if (!hasRows) {
+          const sampleButton = document.getElementById('loadSampleBtn') || document.getElementById('sampleBtn');
+          if (sampleButton) sampleButton.click();
+          else if (typeof loadSample === 'function') loadSample();
+        }
+      })()`);
+      await delay(350);
+
       let state = await snapshot(target);
       assert(state.title.includes(target.title), `${target.name} page title did not load.`);
       assert(state.hasPanel, `${target.name} domain panel did not render.`);
@@ -342,6 +352,10 @@ async function main() {
       target.requireClasses.forEach((className) => {
         assert((state.classes[className] || 0) >= 1, `${target.name} did not expose ${className} status cards.`);
       });
+      if (!state.rowCount) {
+        failures.push(`${target.name} has no editable rows after explicit sample load.`);
+        return;
+      }
 
       await evaluate(`(() => {
         const field = ${JSON.stringify(target.editField || 'source')};

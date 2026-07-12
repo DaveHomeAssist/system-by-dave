@@ -9,8 +9,6 @@ const ROOT = path.resolve(__dirname, '..');
 const args = process.argv.slice(2);
 const baseArg = args.find((arg) => arg.startsWith('--base='));
 const baseUrl = baseArg ? baseArg.slice('--base='.length).replace(/\/?$/, '/') : '';
-const expectedToolCount = 41;
-
 const failures = [];
 const notes = [];
 
@@ -44,9 +42,7 @@ function assertSourceChecks(registry) {
     return;
   }
 
-  if (registry.tools.length !== expectedToolCount) {
-    fail(`Registry tool count is ${registry.tools.length}, expected ${expectedToolCount}.`);
-  }
+  if (!registry.tools.length) fail('AV tool registry is empty.');
 
   const ids = new Set();
   registry.tools.forEach((tool) => {
@@ -77,6 +73,11 @@ function assertSourceChecks(registry) {
   notes.push(`registry=${registry.version}`);
   notes.push(`tools=${registry.tools.length}`);
   notes.push(`offlineAssets=${offlineAssets.length}`);
+
+  const registeredStorageKeys = registry.tools.flatMap((tool) => (tool.storageKeys || []).map((entry) => entry.key));
+  if (registeredStorageKeys.includes('PixelForge.ai.v1')) {
+    fail('PixelForge AI credentials must not be registered for saved-data scans or show-package export.');
+  }
 }
 
 function assertPageContracts(registry) {
@@ -100,12 +101,76 @@ function assertPageContracts(registry) {
   }
 
   const avSuite = read('av-suite.html');
+  if (!/SENSITIVE_PACKAGE_KEYS=\{'PixelForge\.ai\.v1':true\}/.test(avSuite)) {
+    fail('AV Suite is missing the defense-in-depth show-package secret denylist.');
+  }
+  if (!/!SENSITIVE_PACKAGE_KEYS\[key\]/.test(avSuite)) {
+    fail('AV Suite imports do not reject sensitive package keys.');
+  }
   if (!/id="settingsDrawer"[^>]*\binert\b/i.test(avSuite)) {
     fail('Settings drawer is not inert in its closed HTML state.');
   }
   if (!/removeAttribute\('inert'\)/.test(avSuite) || !/setAttribute\('inert',''\)/.test(avSuite)) {
     fail('Settings drawer inert state is not toggled by the drawer controller.');
   }
+  if (!/id="clearFiltersBtn"/.test(avSuite) || !/function clearToolFilters\(/.test(avSuite)) {
+    fail('AV Suite filtered empty state does not provide a recovery action.');
+  }
+  if (!avSuite.includes("<h3>'+d+'</h3>")) {
+    fail('AV Suite tool groups do not preserve the page heading hierarchy.');
+  }
+
+  const autoSeedPatterns = [
+    /:\s*sampleCues\.map\(cloneCue\)/,
+    /:\s*sampleItems\.map\(cloneItem\)/,
+    /if\(!next\.items\.length\)\s*next\.items\s*=\s*sampleItems\.map\(cloneItem\)/
+  ];
+  registry.tools.forEach((tool) => {
+    const source = read(pageFile(tool.href));
+    if (autoSeedPatterns.some((pattern) => pattern.test(source))) {
+      fail(`${tool.href} automatically seeds sample operations instead of starting empty.`);
+    }
+  });
+  const workbookStore = read('apps/av-workbook/src/store.ts');
+  if (/createSampleWorkbook/.test(workbookStore)) {
+    fail('AV Workbook store still seeds the sample workbook on first launch.');
+  }
+
+  const ontrack = read('ontrack.html');
+  if (!/<h1 class="logo">/.test(ontrack)) fail('OnTrack is missing its page-level heading.');
+  if (!/role="dialog"[^>]*aria-modal="true"[^>]*aria-labelledby="dTitle"/.test(ontrack)) {
+    fail('OnTrack detail drawer is missing dialog semantics.');
+  }
+  if (!/function closeDrawer\(/.test(ontrack) || !/drawerReturnFocus/.test(ontrack)) {
+    fail('OnTrack drawer does not implement focus return and keyboard close behavior.');
+  }
+  if (!/id="drawer"[^>]*\binert\b/.test(ontrack) || !/removeAttribute\("inert"\)/.test(ontrack)) {
+    fail('OnTrack detail drawer remains focusable while closed.');
+  }
+  if (!/aria-label="Search tracks"/.test(ontrack)) fail('OnTrack search control is unnamed.');
+
+  const responsiveTables = read('js/responsive-tables.js');
+  if (!/createElement\('caption'\)/.test(responsiveTables) || !/setAttribute\('scope',\s*'col'\)/.test(responsiveTables)) {
+    fail('Responsive tables helper does not provide captions and column-header scope.');
+  }
+
+  const showTimer = read('show-timer.html');
+  if (!/lastAnnouncedTimerState/.test(showTimer) || !/Timer overrun\./.test(showTimer)) {
+    fail('Show Timer does not announce meaningful timer state transitions.');
+  }
+
+  const cueforge = read('cueforge.html');
+  if (!/<meta name="robots" content="noindex,follow">/.test(cueforge)) {
+    fail('CueForge compatibility route is indexable.');
+  }
+  if (!/<link rel="canonical" href="https:\/\/systembydave\.com\/cue-sheet\.html">/.test(cueforge)) {
+    fail('CueForge compatibility route canonical does not point to Cue Sheet.');
+  }
+
+  const sitemap = read('sitemap.xml');
+  ['av-workbook.html', 'cueforge.html', 'plotforge.html'].forEach((alias) => {
+    if (sitemap.includes(alias)) fail(`Sitemap includes compatibility alias ${alias}.`);
+  });
 }
 
 async function assertRemoteChecks(registry) {

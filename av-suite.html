@@ -61,7 +61,7 @@
     --text:#F3F4F7;
     --text-2:#C9CEDA;
     --muted:#96A0B3;
-    --faint:#68738A;
+    --faint:#7B879D;
     --ink:#0A0D14;
 
     /* — Green: the single brand accent + primary action — */
@@ -420,7 +420,7 @@
   .tool-group-head:first-child{margin-top:0}
   .tgh-glyph{flex:0 0 auto;width:30px;height:30px;display:grid;place-items:center;background:var(--surface-3);border:1px solid var(--line-2);border-radius:var(--r-xs);color:var(--accent-pale)}
   .tgh-glyph .dept-glyph{width:18px;height:18px}
-  .tool-group-head h4{margin:0;font-family:var(--font-mono);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.16em;color:var(--text-2)}
+  .tool-group-head h3{margin:0;font-family:var(--font-mono);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.16em;color:var(--text-2)}
   .tgh-count{font-family:var(--font-mono);font-size:10px;color:var(--muted);border:1px solid var(--line-2);border-radius:var(--r-pill,999px);padding:1px 7px}
   .tool-group-head::after{content:'';flex:1;height:1px;background:var(--line)}
 
@@ -497,6 +497,7 @@
   .recent-item button,.readiness-item button,.phase-gate-item button{padding:6px 12px}
 
   .empty{padding:16px;border:1px dashed var(--line-2);border-radius:var(--r-md);color:var(--muted);text-align:center;font-size:var(--fs-meta)}
+  .empty button{margin-top:12px;min-height:44px}
   .privacy-note{margin:0;color:var(--muted);font-size:11.5px;line-height:1.5}
 
   .operator-docs{display:grid;grid-template-columns:1.15fr 1fr;gap:var(--gap);padding:0 28px 28px}
@@ -588,7 +589,7 @@
   .site-foot-inner{max-width:1480px;margin:0 auto;padding:26px clamp(14px,2.4vw,28px);display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap}
   .site-foot-brand{display:inline-flex;align-items:center;gap:10px;font-family:var(--font-mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
   .site-foot-copy{font-family:var(--font-mono);font-size:11px;color:var(--faint)}
-  @media (max-width:680px){.site-bar-inner{height:auto;padding:12px 14px;flex-wrap:wrap;gap:10px}.site-links{gap:14px}}
+  @media (max-width:680px){.site-bar-inner{height:auto;padding:12px 14px;flex-wrap:wrap;gap:10px}.site-links{gap:8px}.site-links a{display:inline-flex;align-items:center;min-height:44px}}
 
   /* ---- Skip link ---- */
   .skip-link{position:absolute;top:10px;left:12px;z-index:90;padding:10px 16px;background:var(--accent);color:#06130D;font-family:var(--font-mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;border-radius:var(--r-sm);transform:translateY(-160%);transition:transform var(--dur) var(--ease)}
@@ -624,7 +625,7 @@
     .command-bar{flex-direction:column;align-items:stretch;gap:12px;position:static}
     .cb-title{max-width:none;white-space:normal}
     .cb-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));justify-content:stretch;align-items:stretch}
-    .cb-actions .button-link,.cb-actions button,.cb-actions .cb-phase{width:100%;min-width:0;white-space:normal;padding-left:8px;padding-right:8px}
+    .cb-actions .button-link,.cb-actions button,.cb-actions .cb-phase{width:100%;min-width:0;min-height:44px;white-space:normal;padding-left:8px;padding-right:8px}
     .cb-actions .cta{grid-column:1/-1}
     .cb-phase{order:-1}
     main{padding-left:12px;padding-right:12px}
@@ -632,7 +633,7 @@
     .docs-grid{grid-template-columns:1fr}
     .profile-fields{grid-template-columns:1fr}
     .phase-strip{grid-auto-flow:row;grid-template-columns:repeat(3,1fr);grid-auto-columns:auto}
-    .phase-strip button{min-width:0;white-space:normal}
+    .phase-strip button{min-width:0;min-height:44px;white-space:normal}
     .toolbar{grid-template-columns:1fr}
     .readiness-actions{grid-template-columns:1fr}
     .command-backdrop{padding:10px}
@@ -746,7 +747,7 @@
         <div><label for="pinFilter">View</label><select id="pinFilter"><option value="all">All tools</option><option value="pinned">Pinned only</option><option value="recent">Recent only</option><option value="ready">Ready only</option><option value="issues">Issues only</option><option value="skipped">Skipped only</option><option value="notes">Notes only</option><option value="saved">Saved data only</option></select></div>
       </div>
       <div id="toolGrid" class="tool-grid"></div>
-      <div id="emptyState" class="empty" hidden>No tools match the current filters.</div>
+      <div id="emptyState" class="empty" hidden>No tools match the current filters.<br><button id="clearFiltersBtn" type="button">Clear filters</button></div>
     </section>
 
     <aside class="side">
@@ -904,6 +905,7 @@
   var TOOLS=REG.tools||[];
   var RECOMMENDED=REG.recommended||{};
   var TOOL_STORAGE_KEYS=TOOLS.reduce(function(list,tool){(tool.storageKeys||[]).forEach(function(entry){list.push({tool:tool.id,label:entry.label,key:entry.key});});return list;},[]);
+  var SENSITIVE_PACKAGE_KEYS={'PixelForge.ai.v1':true};
   var OFFLINE_ASSETS=REG.offlineAssets?REG.offlineAssets():[];
   var READINESS_VALUES=['pending','ready','issue','skipped'];
   var READINESS_LABELS={pending:'Pending',ready:'Ready',issue:'Issue',skipped:'Skipped'};
@@ -995,6 +997,7 @@
   function recordCommand(id){if(!commandIdAllowed(id)) return;state.commandRecent=state.commandRecent.filter(function(item){return item!==id;});state.commandRecent.unshift(id);state.commandRecent=state.commandRecent.slice(0,10);saveState();}
   function commandEntry(id,title,detail,kind,run,search,priority,badge){return {id:id,title:title,detail:detail,kind:kind,run:run,search:[title,detail,kind,search||''].join(' '),priority:priority||100,badge:badge||''};}
   function setSuiteView(value,label){state.filters.pin=value;if(['issues','notes','saved'].indexOf(value)>=0) state.filters.phase='all';saveState();render();showHint(label+' view active.','success');}
+  function clearToolFilters(){state.filters={search:'',phase:'all',dept:'all',pin:'all'};saveState();render();showHint('Tool filters cleared.','success');}
   function commandPool(){var items=[];var counts=readinessCounts();var recommended=recommendedTools();var recommendedIds=recommended.map(function(tool){return tool.id;});var first=recommended[0];reviewQueueItems().forEach(function(item,index){items.push(commandEntry('review:'+index,item.label,item.detail,'Review',function(){handleReviewAction(item.action);if(item.tool) openTool(item.tool.id);},item.tool?item.tool.name:'',10+index));});if(first){items.push(commandEntry('action:openRecommended','Open recommended tool',first.name+' for '+titleCase(state.phase),'Action',function(){openTool(first.id);},first.dept+' '+first.tag,22));}items.push(commandEntry('action:copyPhaseGate','Copy phase gate',titleCase(state.phase)+' recommended tool readiness','Action',copyPhaseGate,'phase gate checklist current recommendations',23));items.push(commandEntry('action:copyPhaseHandoff','Copy phase handoff',titleCase(state.phase)+' status packet with actions and links','Action',copyPhaseHandoff,'handoff status copy',24));items.push(commandEntry('action:copySuiteLink','Copy suite link','Show profile and current phase URL','Action',copySuiteLink,'suite link show profile phase URL',26));items.push(commandEntry('action:copyReviewQueue','Copy review queue',reviewQueueItems().length+' prioritized actions','Action',copyReviewQueue,'review queue next actions',28));items.push(commandEntry('action:copyLaunchList','Copy launch list',recommended.length+' current phase recommendations','Action',copyLaunchList,'launch links recommended',30));items.push(commandEntry('action:scanSavedData','Scan saved tool data',savedToolCount()+' tools have saved data now','Action',scanSavedToolData,'saved browser data issue scan',32));items.push(commandEntry('action:markRecommendedReady','Mark recommended ready',recommended.length+' current phase tools','Action',markRecommendedReady,'ready phase recommendations',34));items.push(commandEntry('action:showIssues','Show issues',counts.issue+' tools marked Issue','View',showIssues,'issue tools',36,'Issue'));items.push(commandEntry('action:showNotes','Show notes',TOOLS.filter(function(tool){return toolNote(tool.id);}).length+' tools have notes','View',showNotes,'notes handoff',38,'Notes'));items.push(commandEntry('action:pinRecommended','Pin recommended set',recommended.length+' tools for '+titleCase(state.phase),'Action',pinRecommended,'pin current phase',42));items.push(commandEntry('action:exportPackage','Export show package',packageToolData().length+' saved tool entries','Action',exportPackage,'backup transfer package',44));items.push(commandEntry('action:exportSuite','Export suite JSON','Profile, filters, readiness, notes, and recent commands','Action',exportSuite,'backup preferences json',46));items.push(commandEntry('action:cacheAvTools','Cache AV tools',offlineState.cached+'/'+offlineState.total+' files ready','Action',function(){cacheAvTools(false);},'offline cache tools network',48,offlineState.cache));items.push(commandEntry('action:refreshOfflineCache','Refresh offline cache','Reload AV Suite cache from the current site','Action',function(){cacheAvTools(true);},'offline cache refresh network',50));items.push(commandEntry('action:clearOfflineCache','Clear offline cache','Remove cached AV Suite files from this browser','Action',function(){clearOfflineCache();},'offline cache clear browser',52));PHASES.forEach(function(phase,index){items.push(commandEntry('phase:'+phase.id,'Switch phase: '+phase.label,(RECOMMENDED[phase.id]||[]).length+' recommended tools','Phase',function(){setPhase(phase.id);},phase.id+' '+phase.label,58+index));});[['all','All tools'],['pinned','Pinned only'],['recent','Recent only'],['ready','Ready only'],['issues','Issues only'],['skipped','Skipped only'],['notes','Notes only'],['saved','Saved data only']].forEach(function(view,index){items.push(commandEntry('view:'+view[0],'View: '+view[1],'Apply tool grid filter','View',function(){setSuiteView(view[0],view[1]);},view.join(' '),70+index));});TOOLS.forEach(function(tool){var ready=toolReadiness(tool.id);var note=toolNote(tool.id);var saved=savedEntriesForTool(tool.id).length;var priority=105;var flags=[];if(recommendedIds.indexOf(tool.id)>=0){priority-=38;flags.push('recommended');}if(ready==='issue'){priority-=34;flags.push('issue');}if(note){priority-=20;flags.push('note');}if(state.favorites.indexOf(tool.id)>=0){priority-=14;flags.push('pinned');}if(state.recent.indexOf(tool.id)>=0){priority-=10;flags.push('recent');}if(saved){priority-=8;flags.push(saved+' saved');}items.push(commandEntry('tool:'+tool.id,'Open '+tool.name,tool.dept+' | '+tool.tag+' | '+readinessLabel(ready)+(flags.length?' | '+flags.join(', '):''),'Tool',function(){openTool(tool.id);},[tool.name,tool.dept,tool.tag,tool.desc,tool.phases.join(' '),note,ready].join(' '),priority,readinessLabel(ready)));});return items;}
   function commandScore(command,query){var terms=String(query||'').toLowerCase().split(/\s+/).filter(Boolean);var text=command.search.toLowerCase();var title=command.title.toLowerCase();var recentIndex=state.commandRecent.indexOf(command.id);var score=command.priority+(recentIndex>=0?recentIndex-60:0);if(!terms.length) return score;terms.forEach(function(term){var index=text.indexOf(term);if(index<0){score=99999;return;}score+=index;if(title.indexOf(term)===0) score-=25;});return score;}
   function filteredCommands(){var query=commandState.query;return commandPool().map(function(command,index){return {command:command,score:commandScore(command,query),index:index};}).filter(function(entry){return entry.score<99999;}).sort(function(a,b){return a.score-b.score||a.index-b.index;}).slice(0,14).map(function(entry){return entry.command;});}
@@ -1013,12 +1016,13 @@
   function handleReviewAction(action){if(action==='scan'){scanSavedToolData();return;}if(action==='package'){exportPackage();return;}}
   function copyLaunchList(){var tools=recommendedTools();var counts=readinessCounts();var issueTools=TOOLS.filter(function(tool){return toolReadiness(tool.id)==='issue';});var noteTools=TOOLS.filter(function(tool){return toolNote(tool.id);});var lines=['AV SUITE LAUNCH LIST','Show: '+state.showName,'Venue: '+state.venue,'Date: '+state.showDate,'Operator: '+state.operator,'Phase: '+titleCase(state.phase),'Suite link: '+absoluteHref(suiteLinkHref()),'Readiness: '+counts.ready+' ready, '+counts.issue+' issue, '+counts.skipped+' skipped','Saved tool data: '+savedToolCount()+' tools','','Recommended:'];tools.forEach(function(tool){lines.push(launchLine(tool));});lines.push('');lines.push('Pinned:');state.favorites.map(toolById).filter(Boolean).forEach(function(tool){lines.push(launchLine(tool));});lines.push('');lines.push('Issues:');if(issueTools.length){issueTools.forEach(function(tool){lines.push(launchLine(tool));});}else{lines.push('None');}lines.push('');lines.push('Notes:');if(noteTools.length){noteTools.forEach(function(tool){lines.push(tool.name+' | '+toolNote(tool.id));});}else{lines.push('None');}copyText(lines.join('\n')).then(function(){showHint('Launch list copied with show context and notes.','success');signal($('copyLaunchBtn'),'success');}).catch(function(){showHint('Could not copy launch list.','error');signal($('copyLaunchBtn'),'error');});}
   function exportSuite(){downloadFile(fileStem()+'.av-suite.json',JSON.stringify(suitePayload(),null,2),'application/json;charset=utf-8');showHint('Suite JSON exported.','success');signal($('exportSuiteBtn'),'success');}
-  function importSuiteFile(file){var reader=new FileReader();reader.onload=function(){try{applySuitePayload(JSON.parse(String(reader.result||'')));saveState();render();showHint('Suite JSON imported.','success');signal($('importSuiteBtn'),'success');}catch(e){showHint('Could not import that suite JSON file.','error');signal($('importSuiteBtn'),'error');}};reader.onerror=function(){showHint('Could not read that suite JSON file.','error');signal($('importSuiteBtn'),'error');};reader.readAsText(file);}
-  function allowedPackageKey(key){return TOOL_STORAGE_KEYS.some(function(item){return item.key===key;});}
-  function packageToolData(){var entries=[];if(!storageAvailable()) return entries;TOOL_STORAGE_KEYS.forEach(function(item){var value=localStorage.getItem(item.key);if(value!==null){entries.push({tool:item.tool,label:item.label,key:item.key,value:String(value)});}});return entries;}
+  function importErrorMessage(error,label){if(error instanceof SyntaxError) return label+' is not valid JSON.';if(error&&error.message==='Invalid package') return label+' has the wrong schema or is missing tool data.';if(error&&error.message==='Invalid payload') return label+' is missing valid AV Suite state.';return 'Could not import '+label.toLowerCase()+'.';}
+  function importSuiteFile(file){var reader=new FileReader();reader.onload=function(){try{applySuitePayload(JSON.parse(String(reader.result||'')));saveState();render();showHint('Suite JSON imported.','success');signal($('importSuiteBtn'),'success');}catch(e){showHint(importErrorMessage(e,'Suite JSON file'),'error');signal($('importSuiteBtn'),'error');}};reader.onerror=function(){showHint('Could not read that suite JSON file.','error');signal($('importSuiteBtn'),'error');};reader.readAsText(file);}
+  function allowedPackageKey(key){return !SENSITIVE_PACKAGE_KEYS[key]&&TOOL_STORAGE_KEYS.some(function(item){return item.key===key;});}
+  function packageToolData(){var entries=[];if(!storageAvailable()) return entries;TOOL_STORAGE_KEYS.forEach(function(item){var value;if(SENSITIVE_PACKAGE_KEYS[item.key]) return;value=localStorage.getItem(item.key);if(value!==null){entries.push({tool:item.tool,label:item.label,key:item.key,value:String(value)});}});return entries;}
   function packagePayload(){return {schema:'system-by-dave.av-suite-package.v1',exportedAt:new Date().toISOString(),suite:suitePayload(),toolData:packageToolData()};}
   function exportPackage(){var payload=packagePayload();downloadFile(fileStem()+'.av-show-package.json',JSON.stringify(payload,null,2),'application/json;charset=utf-8');showHint('Show package exported with '+payload.toolData.length+' saved tool '+(payload.toolData.length===1?'entry.':'entries.'),'success');signal($('exportPackageBtn'),'success');}
-  function importPackageFile(file){var reader=new FileReader();reader.onload=function(){try{var parsed=JSON.parse(String(reader.result||''));var restored=0;if(!parsed||parsed.schema!=='system-by-dave.av-suite-package.v1'||!Array.isArray(parsed.toolData)) throw new Error('Invalid package');if(parsed.suite) applySuitePayload(parsed.suite);parsed.toolData.forEach(function(entry){if(!entry||!allowedPackageKey(entry.key)) return;localStorage.setItem(entry.key,String(entry.value||''));restored++;});saveState();render();showHint('Show package imported. Restored '+restored+' saved tool '+(restored===1?'entry.':'entries.'),'success');signal($('importPackageBtn'),'success');}catch(e){showHint('Could not import that show package JSON file.','error');signal($('importPackageBtn'),'error');}};reader.onerror=function(){showHint('Could not read that show package file.','error');signal($('importPackageBtn'),'error');};reader.readAsText(file);}
+  function importPackageFile(file){var reader=new FileReader();reader.onload=function(){try{var parsed=JSON.parse(String(reader.result||''));var restored=0;if(!parsed||parsed.schema!=='system-by-dave.av-suite-package.v1'||!Array.isArray(parsed.toolData)) throw new Error('Invalid package');if(parsed.suite) applySuitePayload(parsed.suite);parsed.toolData.forEach(function(entry){if(!entry||!allowedPackageKey(entry.key)) return;localStorage.setItem(entry.key,String(entry.value||''));restored++;});saveState();render();showHint('Show package imported. Restored '+restored+' saved tool '+(restored===1?'entry.':'entries.'),'success');signal($('importPackageBtn'),'success');}catch(e){showHint(importErrorMessage(e,'Show package JSON file'),'error');signal($('importPackageBtn'),'error');}};reader.onerror=function(){showHint('Could not read that show package file.','error');signal($('importPackageBtn'),'error');};reader.readAsText(file);}
   function clearPrefs(){if(!window.confirm('Clear AV Suite saved profile, readiness, pins, and recent tools?')) return;if(storageAvailable()) localStorage.removeItem(STORAGE_KEY);state=defaultState();render();showHint('Suite preferences cleared.','success');}
   function absoluteHref(href){return new URL(href, window.location.href).href;}
   function fileStem(){return (state.showName||'av-suite').toLowerCase().replace(/['"]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,60)||'av-suite';}
@@ -1067,6 +1071,7 @@
   $('showIssuesBtn').addEventListener('click',function(){showIssues();signal(this,'success');});
   $('showNotesBtn').addEventListener('click',function(){showNotes();signal(this,'success');});
   $('resetReadinessBtn').addEventListener('click',function(){resetReadiness();signal(this,'success');});
+  $('clearFiltersBtn').addEventListener('click',function(){clearToolFilters();signal(this,'success');});
   $('exportSuiteBtn').addEventListener('click',exportSuite);
   $('importSuiteBtn').addEventListener('click',function(){$('suiteImportInput').click();});
   $('suiteImportInput').addEventListener('change',function(){var file=$('suiteImportInput').files&&$('suiteImportInput').files[0];if(file) importSuiteFile(file);$('suiteImportInput').value='';});
@@ -1166,7 +1171,7 @@
     Object.keys(groups).forEach(function(d){if(present.indexOf(d)<0) present.push(d);});
     var single=present.length<=1;
     present.forEach(function(d){
-      if(!single){var h=document.createElement('div');h.className='tool-group-head';h.innerHTML='<span class="tgh-glyph">'+gsvg(DEPT_KEY[d]||'all')+'</span><h4>'+d+'</h4><span class="tgh-count">'+groups[d].length+'</span>';grid.appendChild(h);}
+      if(!single){var h=document.createElement('div');h.className='tool-group-head';h.innerHTML='<span class="tgh-glyph">'+gsvg(DEPT_KEY[d]||'all')+'</span><h3>'+d+'</h3><span class="tgh-count">'+groups[d].length+'</span>';grid.appendChild(h);}
       groups[d].forEach(function(c){grid.appendChild(c);});
     });
     if(gObs) gObs.observe(grid,{childList:true});
