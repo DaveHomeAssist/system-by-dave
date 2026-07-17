@@ -32,6 +32,7 @@ STATIC_PAGES = [
     ("agents.html", "weekly", "0.7"),
     ("widgets.html", "weekly", "0.7"),
     ("world-cup/", "weekly", "0.7"),
+    ("fifa-pitch-crew/", "weekly", "0.6"),
     ("scorecard/", "monthly", "0.6"),
     ("hat-in-ring/", "weekly", "0.7"),
     # marsscape/ moved to mixmash.games/mars/ (2026-07-03); the page there is a
