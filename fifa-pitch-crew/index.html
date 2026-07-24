@@ -70,16 +70,16 @@ canvas#game{position:fixed;inset:0;display:block;touch-action:none}
 #hud-score .s{display:block;transform:skewX(8deg);font-family:var(--mono);font-weight:800;
   font-size:clamp(16px,3.2vw,24px);color:var(--cyan)}
 #hud-score .cap{display:block;transform:skewX(8deg);font-size:10px;color:var(--ink-dim);letter-spacing:.2em}
-#hud-hint{position:absolute;bottom:64px;left:50%;transform:translateX(-50%);padding:7px 14px;
+#hud-hint{position:absolute;bottom:max(64px,calc(50px + env(safe-area-inset-bottom)));left:50%;transform:translateX(-50%);padding:7px 14px;
   font-size:clamp(11px,2.2vw,13px);color:var(--ink-dim);letter-spacing:.14em;white-space:nowrap;
   transition:opacity .5s}
 #hud-hint.gone{opacity:0}
-#btn-mute{position:absolute;bottom:14px;right:14px;pointer-events:auto;cursor:pointer;
+#btn-mute{position:absolute;bottom:max(14px,env(safe-area-inset-bottom));right:max(14px,env(safe-area-inset-right));pointer-events:auto;cursor:pointer;
   width:44px;height:44px;border-radius:10px;border:1px solid rgba(255,255,255,.14);
   background:var(--plate);color:var(--ink);font-size:19px;line-height:1;display:flex;
   align-items:center;justify-content:center}
 #btn-mute:active{transform:scale(.94)}
-#ticker{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);max-width:min(92vw,560px);
+#ticker{position:absolute;bottom:max(14px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);max-width:min(92vw,560px);
   padding:8px 18px;font-size:clamp(11px,2.4vw,14px);color:var(--gold);letter-spacing:.16em;
   text-transform:uppercase;text-align:center;opacity:0;transition:opacity .35s;white-space:nowrap;
   overflow:hidden;text-overflow:ellipsis}
@@ -90,13 +90,16 @@ canvas#game{position:fixed;inset:0;display:block;touch-action:none}
   #hud-score{top:8px;right:8px;padding:6px 10px}
   #hud-timer{top:8px}
   #hud-lanes i{width:10px}
-  #ticker{bottom:66px}
-  #btn-mute{bottom:12px;right:10px;width:40px;height:40px}
+  #ticker{bottom:max(66px,calc(52px + env(safe-area-inset-bottom)))}
+  #btn-mute{bottom:max(12px,env(safe-area-inset-bottom));right:max(10px,env(safe-area-inset-right));width:40px;height:40px}
 }
 
 /* ---------------- Screens ---------------- */
 .screen{position:fixed;inset:0;z-index:10;display:flex;flex-direction:column;align-items:center;
-  justify-content:center;text-align:center;padding:24px;
+  justify-content:safe center;text-align:center;padding:24px;
+  padding-top:max(24px,env(safe-area-inset-top));
+  padding-bottom:max(24px,env(safe-area-inset-bottom));
+  overflow-y:auto;-webkit-overflow-scrolling:touch;
   background:radial-gradient(120% 100% at 50% 20%,rgba(8,13,28,.62) 0%,rgba(4,7,15,.9) 78%);
   transition:opacity .4s,visibility .4s}
 .screen.hidden{opacity:0;visibility:hidden;pointer-events:none}
@@ -170,6 +173,18 @@ h2.big.bad{color:var(--danger);text-shadow:.05em .05em 0 rgba(0,0,0,.8)}
 .callline{font-family:var(--display);letter-spacing:.3em;font-size:clamp(10px,2.2vw,12px);
   color:var(--ink-dim);text-transform:uppercase;margin-bottom:6px}
 #scr-results .bestline{margin:2px 0 14px}
+/* short viewports (landscape phones): compact the overlay screens so their
+   actions stay reachable; the screens scroll if content still exceeds height */
+@media (max-height:560px){
+  h1.title{font-size:clamp(40px,10vh,72px)}
+  .rules{gap:9px;margin-top:4px}
+  .rule{padding:9px 12px}
+  .rule .ic{font-size:20px}
+  .btn-row{margin-top:18px}
+  .badge{margin-top:12px}
+  .kicker{margin-bottom:8px}
+  .foot{display:none}
+}
 @media (prefers-reduced-motion:reduce){
   *{animation-duration:.01ms!important;transition-duration:.01ms!important}
 }
@@ -365,10 +380,14 @@ function layout(){
   const ASPECT = 0.62;                       // pitch height over length
   const availW = Math.min(W*0.94, 980);
   const availH = Math.max(210, H - topPad - botPad);
-  const pw = Math.max(300, Math.min(availW, availH/ASPECT));
+  // never wider than the screen — guards very narrow / zoomed viewports (<319px)
+  const pw = Math.min(availW, Math.max(300, Math.min(availW, availH/ASPECT)));
   const ph = Math.min(availH, pw*ASPECT);
-  const px = (W-pw)/2, py = topPad + (H-topPad-botPad-ph)/2;
+  const px = (W-pw)/2;
   const apron = Math.max(24, ph*0.09);
+  // keep the far parking line clear of the top HUD plates even when the pitch is
+  // vertically compressed (short landscape phones), where centering would push it up
+  const py = Math.max(topPad + (H-topPad-botPad-ph)/2, 68 + apron);
   P = { x:px, y:py, w:pw, h:ph, apron,
         startY: py+ph+apron,        // staging line (near sideline)
         endY:   py-apron,           // far sideline parking
@@ -630,13 +649,18 @@ function addScore(n,x,y,label,col){
 // ---------- input ----------
 function grabAt(x,y){
   if(S.phase!=='deploy' && S.phase!=='strike') return;
+  const xTol = Math.min(P.laneW*.55+16, P.laneW*.5+12);
+  // grab zones of adjacent lanes overlap on narrow layouts, so pick the lane
+  // whose centre is horizontally closest rather than the first index that matches
+  let best=-1, bestDx=Infinity;
   for(const l of lanes){
     if(l.done) continue;
-    if(Math.abs(x-laneCX(l.i)) < Math.min(P.laneW*.55+16, P.laneW*.5+12) && Math.abs(y-l.y) < 74){
-      S.grabbed=l.i; S.sel=l.i; S.pointer.x=x; S.pointer.y=y;
-      if(!S.firstGrab){ S.firstGrab=true; hud.hint.classList.add('gone'); }
-      return;
-    }
+    const dx = Math.abs(x-laneCX(l.i));
+    if(dx < xTol && Math.abs(y-l.y) < 74 && dx < bestDx){ best=l.i; bestDx=dx; }
+  }
+  if(best>=0){
+    S.grabbed=best; S.sel=best; S.pointer.x=x; S.pointer.y=y;
+    if(!S.firstGrab){ S.firstGrab=true; hud.hint.classList.add('gone'); }
   }
 }
 cvs.addEventListener('pointerdown',e=>{
