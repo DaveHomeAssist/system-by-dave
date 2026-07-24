@@ -649,13 +649,18 @@ function addScore(n,x,y,label,col){
 // ---------- input ----------
 function grabAt(x,y){
   if(S.phase!=='deploy' && S.phase!=='strike') return;
+  const xTol = Math.min(P.laneW*.55+16, P.laneW*.5+12);
+  // grab zones of adjacent lanes overlap on narrow layouts, so pick the lane
+  // whose centre is horizontally closest rather than the first index that matches
+  let best=-1, bestDx=Infinity;
   for(const l of lanes){
     if(l.done) continue;
-    if(Math.abs(x-laneCX(l.i)) < Math.min(P.laneW*.55+16, P.laneW*.5+12) && Math.abs(y-l.y) < 74){
-      S.grabbed=l.i; S.sel=l.i; S.pointer.x=x; S.pointer.y=y;
-      if(!S.firstGrab){ S.firstGrab=true; hud.hint.classList.add('gone'); }
-      return;
-    }
+    const dx = Math.abs(x-laneCX(l.i));
+    if(dx < xTol && Math.abs(y-l.y) < 74 && dx < bestDx){ best=l.i; bestDx=dx; }
+  }
+  if(best>=0){
+    S.grabbed=best; S.sel=best; S.pointer.x=x; S.pointer.y=y;
+    if(!S.firstGrab){ S.firstGrab=true; hud.hint.classList.add('gone'); }
   }
 }
 cvs.addEventListener('pointerdown',e=>{
