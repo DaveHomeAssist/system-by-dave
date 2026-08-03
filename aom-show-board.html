@@ -368,7 +368,7 @@ body.edit #addroom{display:inline-block}
     <span><i class="swp"></i>Pinch</span>
     <span>&#10003; = pre-checked &nbsp;·&nbsp; struck = done</span>
   </div>
-  <div class="foot-actions"><button class="btn" id="scanbtn">&#128247; Scan sign</button><button class="btn" id="copybtn">Copy text</button><button class="btn" id="addroom">+ Room</button></div>
+  <div class="foot-actions"><button class="btn" id="scanbtn">&#128247; Scan sign</button><button class="btn" id="pastebtn">&#128203; Paste sign</button><button class="btn" id="copybtn">Copy text</button><button class="btn" id="addroom">+ Room</button></div>
 <input type="file" id="scanfile" accept="image/*" style="display:none">
 </div>
 
@@ -965,6 +965,73 @@ function previewScan(data){
   });
 }
 
+
+/* ---------- paste a sign as text ----------
+   Uses the phone's own text recognition (iOS Live Text, Android Lens): select
+   the text on the photo, copy, paste here. No network, and the recognizer is
+   better than anything we could ship. Feeds the same preview as Scan sign. */
+const MERID=/[AaPp]/;
+function pickStart(cand,end){
+  /* choose the reading that lands before the end time, nearest to it, so
+     "11:30 - 1:00PM" reads as 11:30a and not 11:30p */
+  const fits=cand.filter(v=>v<end);
+  return fits.length?Math.max(...fits):cand[0];
+}
+function parseSignText(raw){
+  const lines=String(raw).split(/\r?\n/);
+  const T=String.raw`(\d{1,2})[:.](\d{2})\s*([AaPp])?\.?[Mm]?\.?`;
+  const re=new RegExp(T+String.raw`\s*(?:-|–|—|to|until|thru)\s*`+T,"i");
+  const hm=(h,mm,pm)=>((+h%12)+(pm?12:0))*60+ +mm;
+  const pad=v=>String(Math.floor(v/60)).padStart(2,"0")+":"+String(v%60).padStart(2,"0");
+  const sessions=[];
+  lines.forEach(line=>{
+    const g=re.exec(line);
+    if(!g)return;
+    const[,h1,m1,a1,h2,m2,a2]=g;
+    let end;
+    if(a2)end=hm(h2,m2,/p/i.test(a2));
+    else if(a1){
+      end=hm(h2,m2,/p/i.test(a1));
+      /* "11:30AM - 1:00" — end inherited AM, so push it past the start */
+      if(end<=hm(h1,m1,/p/i.test(a1)))end+=720;
+    }else end=hm(h2,m2,+h2>=1&&+h2<=7);
+    const start=a1?hm(h1,m1,/p/i.test(a1))
+                  :pickStart([hm(h1,m1,false),hm(h1,m1,true)],end);
+    if(!(end>start))return;
+    const after=line.slice(g.index+g[0].length);
+    const id=((after.match(/\b(\d{5})\b/)||line.match(/\b(\d{5})\b/)||[])[1])||"";
+    sessions.push({s:pad(start),e:pad(end),id:id+(/cancel/i.test(line)?"!":"")});
+  });
+  const roomHit=raw.match(/room\s*[:\-]\s*([^\n]+)/i);
+  const dateHit=raw.match(/\b((?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.?\s+\d{1,2}|\d{1,2}\s+(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*)\b/i);
+  return{
+    room:roomHit?roomHit[1].trim():null,
+    date:dateHit?dateHit[0].trim():null,
+    sessions
+  };
+}
+function openPasteSheet(prefill,msg){
+  openSheet('<h2>Paste sign text</h2>'
+    +'<p style="font-size:13px;color:var(--muted);margin-bottom:10px">'
+    +'On the photo in your camera roll, long-press the text, Select All, Copy &mdash; then paste it here. '
+    +'Times and the 5-digit codes are read out of whatever you paste; everything else is ignored.</p>'
+    +(msg?'<div id="err" class="show">'+esc(msg)+'</div>':'<div id="err"></div>')
+    +'<div class="field"><textarea id="f_paste" rows="9" placeholder="8:00AM - 9:30AM   22986   Opening remarks&#10;9:45AM - 11:15AM  13179   ..."></textarea></div>'
+    +'<div class="sheet-actions"><button class="btn primary" id="f_read">Read it</button>'
+    +'<button class="btn" id="f_cancel">Cancel</button></div>');
+  if(prefill)$("f_paste").value=prefill;
+  $("f_cancel").addEventListener("click",closeSheet);
+  $("f_read").addEventListener("click",()=>{
+    const raw=$("f_paste").value;
+    if(!raw.trim())return showErr("Nothing pasted yet");
+    const data=parseSignText(raw);
+    if(!data.sessions.length)
+      return openPasteSheet(raw,"No time ranges found in that. Times need to look like 8:00AM - 9:30AM.");
+    previewScan(data);
+  });
+  setTimeout(()=>{const t=$("f_paste");if(t)t.focus()},50);
+}
+$("pastebtn").addEventListener("click",()=>openPasteSheet());
 
 /* ---------- gear + checks + issues ---------- */
 const DEFAULT_GEAR=["Projector on / lamp warm","Screen down & framed","HDMI to presenter laptop","Dongle (USB-C + Mini DP)","Slide advancer paired, batteries ok","Podium mic / audio check","Confidence monitor","Room lights & house set"];
