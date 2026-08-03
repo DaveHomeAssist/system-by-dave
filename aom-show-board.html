@@ -403,10 +403,16 @@ const day=()=>board.days[board.active];
 const floorName=f=>f==="R"?"Rooftop":"Floor "+f;
 
 /* ================= storage ================= */
+/* Uses Claude artifact storage when present, otherwise this browser's localStorage. */
 async function loadBoard(){
   try{
-    const r=await window.storage.get(KEY);
-    if(r&&r.value){board=JSON.parse(r.value);return}
+    if(window.storage){
+      const r=await window.storage.get(KEY);
+      if(r&&r.value){board=JSON.parse(r.value);return}
+    }else{
+      const v=localStorage.getItem(KEY);
+      if(v){board=JSON.parse(v);return}
+    }
   }catch(e){}
   board=clone(DEFAULT_BOARD);
 }
@@ -422,9 +428,15 @@ function saveBoard(){
   saveTimer=setTimeout(async()=>{
     const el=$("savestate");
     try{
-      const r=await window.storage.set(KEY,JSON.stringify(board));
-      el.textContent=r?"saved":"save failed";
-      el.className="show "+(r?"ok":"bad");
+      let ok;
+      if(window.storage){
+        ok=await window.storage.set(KEY,JSON.stringify(board));
+      }else{
+        localStorage.setItem(KEY,JSON.stringify(board));
+        ok=true;
+      }
+      el.textContent=ok?"saved":"save failed";
+      el.className="show "+(ok?"ok":"bad");
     }catch(e){
       el.textContent="not saved · session only";
       el.className="show bad";
