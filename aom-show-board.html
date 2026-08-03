@@ -984,7 +984,19 @@ function parseSignText(raw){
   const hm=(h,mm,pm)=>((+h%12)+(pm?12:0))*60+ +mm;
   const pad=v=>String(Math.floor(v/60)).padStart(2,"0")+":"+String(v%60).padStart(2,"0");
   const sessions=[];
-  lines.forEach(line=>{
+  /* On a real sign the title wraps, so "(Cancelled)" usually lands a line or
+     two below the time. Read the whole heading: the time line down to the
+     paper list or the next session. Papers marked WITHDRAWN are a
+     paper-level note and deliberately do not cancel the session. */
+  const headingOf=i=>{
+    const buf=[lines[i]];
+    for(let j=i+1;j<lines.length;j++){
+      if(/\d+\s*paper\(s\)/i.test(lines[j])||re.test(lines[j]))break;
+      buf.push(lines[j]);
+    }
+    return buf.join(" ");
+  };
+  lines.forEach((line,i)=>{
     const g=re.exec(line);
     if(!g)return;
     const[,h1,m1,a1,h2,m2,a2]=g;
@@ -1000,7 +1012,7 @@ function parseSignText(raw){
     if(!(end>start))return;
     const after=line.slice(g.index+g[0].length);
     const id=((after.match(/\b(\d{5})\b/)||line.match(/\b(\d{5})\b/)||[])[1])||"";
-    sessions.push({s:pad(start),e:pad(end),id:id+(/cancel/i.test(line)?"!":"")});
+    sessions.push({s:pad(start),e:pad(end),id:id+(/cancel/i.test(headingOf(i))?"!":"")});
   });
   const roomHit=raw.match(/room\s*[:\-]\s*([^\n]+)/i);
   const dateHit=raw.match(/\b((?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.?\s+\d{1,2}|\d{1,2}\s+(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*)\b/i);
