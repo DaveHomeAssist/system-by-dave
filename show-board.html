@@ -1,0 +1,1321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Show Board</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;800&family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#F1EADA;
+  --panel:#FAF6EC;
+  --panel-2:#E9DFCB;
+  --line:#D5C8B0;
+  --parchment:#1C1712;
+  --muted:#7A6E5E;
+  --sand:#A8792B;
+  --rust:#B03A1F;
+  --olive:#5F7F42;
+  --txdead:#8F2E17;
+  /* zone blocks derive from a hue; lightness flips with the theme */
+  --zone-l:28%;
+  --zone-sat:55%;
+  --row-h:46px;
+  --label-w:118px;
+}
+body.dark{
+  --ink:#14110F;
+  --panel:#201B17;
+  --panel-2:#2A241F;
+  --line:#3A322B;
+  --parchment:#EDE3D1;
+  --muted:#9C9084;
+  --sand:#C99A4E;
+  --rust:#C0472A;
+  --olive:#7FA05E;
+  --txdead:#E08A72;
+  --zone-l:74%;
+  --zone-sat:45%;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:var(--ink);color:var(--parchment);
+  font-family:"DM Sans",sans-serif;font-size:15px;line-height:1.5;
+  padding:20px 16px 120px;max-width:1400px;margin:0 auto;
+  -webkit-font-smoothing:antialiased;
+  transition:background .2s ease,color .2s ease;
+}
+
+/* ---------- header ---------- */
+.masthead{
+  border-bottom:2px solid var(--line);
+  padding-bottom:14px;margin-bottom:12px;
+  display:flex;justify-content:space-between;align-items:flex-end;
+  gap:12px;flex-wrap:wrap;
+}
+.masthead h1{
+  font-family:"Syne",sans-serif;font-weight:800;
+  font-size:clamp(22px,5vw,34px);
+  letter-spacing:-0.02em;line-height:1.02;text-transform:uppercase;
+}
+.masthead h1 em{font-style:normal;color:var(--sand)}
+.masthead .sub{
+  font-family:"DM Mono",monospace;font-size:11.5px;
+  letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-top:6px;
+}
+.hdr-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.btn{
+  font-family:"DM Mono",monospace;font-size:11px;
+  letter-spacing:0.1em;text-transform:uppercase;
+  background:var(--panel-2);color:var(--parchment);
+  border:1px solid var(--line);padding:8px 14px;border-radius:2px;cursor:pointer;
+}
+a.btn{text-decoration:none;display:inline-block}
+.btn:active{transform:scale(0.98)}
+.btn.primary{background:var(--sand);color:var(--ink);border-color:var(--sand);font-weight:500}
+.btn.danger{border-color:var(--rust);color:var(--txdead)}
+.btn.editing{background:var(--rust);color:#fff;border-color:var(--rust)}
+.btn.xs{padding:5px 9px;font-size:9.5px}
+#savestate{
+  font-family:"DM Mono",monospace;font-size:10px;
+  letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);
+  opacity:0;transition:opacity .3s;
+}
+#savestate.show{opacity:1}
+#savestate.ok{color:var(--olive)}
+#savestate.bad{color:var(--txdead)}
+
+/* ---------- setup ---------- */
+#setup{display:none;max-width:640px;margin:0 auto}
+body.setup #setup{display:block}
+body.setup #app{display:none}
+#setup h2{font-family:"Syne",sans-serif;font-weight:800;font-size:clamp(22px,5vw,32px);
+  text-transform:uppercase;letter-spacing:-0.02em;margin-bottom:6px}
+#setup .lede{color:var(--muted);font-size:14px;margin-bottom:22px}
+.card{border:1px solid var(--line);background:var(--panel);padding:16px;margin-bottom:16px}
+.card h3{
+  font-family:"DM Mono",monospace;font-size:10.5px;letter-spacing:0.18em;
+  text-transform:uppercase;color:var(--muted);font-weight:400;margin-bottom:12px;
+}
+.preview{border:1px solid var(--line);max-height:210px;overflow-y:auto;margin-top:10px}
+.preview table{width:100%;border-collapse:collapse;font-size:13.5px}
+.preview td{padding:6px 9px;border-bottom:1px solid var(--line)}
+.preview tr:last-child td{border-bottom:none}
+.preview .z{font-family:"DM Mono",monospace;font-size:10.5px;letter-spacing:0.08em;
+  text-transform:uppercase;color:var(--muted);text-align:right;white-space:nowrap}
+.swatch{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.preview .none{padding:12px;font-family:"DM Mono",monospace;font-size:11px;color:var(--muted)}
+
+/* ---------- day tabs ---------- */
+.daytabs{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap}
+.daytab{
+  font-family:"DM Mono",monospace;font-size:11px;
+  letter-spacing:0.08em;text-transform:uppercase;
+  background:transparent;color:var(--muted);
+  border:1px solid var(--line);padding:7px 14px;border-radius:2px;cursor:pointer;
+}
+.daytab.active{background:var(--sand);color:var(--ink);border-color:var(--sand);font-weight:500}
+.daytab.today::after{content:" •";color:var(--olive)}
+
+/* ---------- now strip ---------- */
+.now{
+  background:var(--panel);border-left:3px solid var(--sand);
+  padding:14px 16px;margin-bottom:24px;
+  display:flex;flex-wrap:wrap;gap:20px 40px;
+}
+.now .clock{font-family:"DM Mono",monospace;font-size:30px;font-weight:500;letter-spacing:-0.02em;line-height:1}
+.now .clock span{font-size:14px;color:var(--muted)}
+.now-col{min-width:150px}
+.now-col h3{
+  font-family:"DM Mono",monospace;font-size:10.5px;letter-spacing:0.16em;
+  text-transform:uppercase;color:var(--muted);font-weight:400;margin-bottom:6px;
+}
+.now-col .lines{font-size:14px;line-height:1.45}
+
+/* ---------- board ---------- */
+.section-label{
+  font-family:"DM Mono",monospace;font-size:10.5px;letter-spacing:0.18em;
+  text-transform:uppercase;color:var(--muted);margin-bottom:10px;
+  display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;
+}
+.section-label .hint{text-transform:none;letter-spacing:0.02em;font-size:11px}
+.zoom{display:flex;gap:6px;align-items:center}
+.scroller{
+  overflow-x:auto;overflow-y:hidden;
+  border:1px solid var(--line);background:var(--panel);
+  margin-bottom:12px;-webkit-overflow-scrolling:touch;
+}
+/* the track is sized from px-per-hour, so a short day is not stretched and a
+   long day is not crushed — this is what makes fine grids legible */
+.track{min-width:calc(var(--label-w) + var(--track-w));position:relative}
+.axis{display:flex;height:26px;border-bottom:1px solid var(--line);position:relative}
+.axis .corner{
+  width:var(--label-w);flex:0 0 var(--label-w);
+  position:sticky;left:0;z-index:6;
+  background:var(--panel-2);border-right:1px solid var(--line);
+}
+.axis .ticks{flex:1;position:relative}
+.tick{
+  position:absolute;top:0;bottom:0;border-left:1px solid var(--line);opacity:.45;
+}
+.tick.major{opacity:1;padding-left:5px;font-family:"DM Mono",monospace;font-size:10.5px;
+  color:var(--muted);display:flex;align-items:center}
+.gridline{position:absolute;top:26px;bottom:0;border-left:1px solid var(--line);
+  opacity:.28;pointer-events:none;z-index:1}
+.row{display:flex;height:var(--row-h);border-bottom:1px solid var(--line);position:relative;z-index:2}
+.row:last-child{border-bottom:none}
+.rlabel{
+  width:var(--label-w);flex:0 0 var(--label-w);
+  position:sticky;left:0;z-index:5;
+  background:var(--panel-2);border-right:1px solid var(--line);
+  display:flex;flex-direction:column;justify-content:center;
+  padding:0 8px 0 10px;cursor:pointer;
+}
+.rlabel .nm{font-family:"Syne",sans-serif;font-weight:600;font-size:13px;letter-spacing:-0.01em;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rlabel .zn{font-family:"DM Mono",monospace;font-size:9.5px;letter-spacing:0.1em;
+  color:var(--muted);text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+/* the badge and issue dot are absolutely positioned, so the text has to be
+   told to get out from under them — otherwise a long room name runs
+   underneath the count instead of ellipsing before it */
+.rlabel.has-badge .nm{padding-right:32px}
+.rlabel.has-iss .zn{padding-right:15px}
+.rlabel::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;
+  background:hsl(var(--zone-h) var(--zone-sat) 50%)}
+.rlabel .gearbadge{
+  position:absolute;right:5px;top:5px;
+  font-family:"DM Mono",monospace;font-size:8.5px;letter-spacing:0.04em;
+  padding:1px 4px;border-radius:2px;line-height:1.4;
+  background:var(--panel);border:1px solid var(--line);color:var(--muted);
+}
+.rlabel .gearbadge.full{background:var(--olive);border-color:var(--olive);color:var(--ink)}
+.rlabel .gearbadge.part{border-color:var(--sand);color:var(--sand)}
+.rlabel .issdot{position:absolute;right:5px;bottom:5px;width:7px;height:7px;
+  border-radius:50%;background:var(--rust)}
+body.edit .rlabel::after{
+  content:"+";position:absolute;right:6px;top:50%;transform:translateY(-50%);
+  font-family:"DM Mono",monospace;font-size:15px;color:var(--sand);
+}
+.lane{flex:1;position:relative}
+.blk{
+  position:absolute;top:7px;bottom:7px;border-radius:2px;
+  display:flex;align-items:center;padding:0 7px;cursor:pointer;
+  font-family:"DM Mono",monospace;font-size:10.5px;letter-spacing:0.02em;
+  overflow:hidden;white-space:nowrap;
+  background:hsl(var(--zone-h) var(--zone-sat) 50% / .20);
+  border:1px solid hsl(var(--zone-h) var(--zone-sat) 50% / .62);
+  color:hsl(var(--zone-h) var(--zone-sat) var(--zone-l));
+}
+.blk.dead{
+  background:repeating-linear-gradient(135deg,transparent,transparent 4px,rgba(192,71,42,0.20) 4px,rgba(192,71,42,0.20) 8px);
+  border:1px dashed rgba(192,71,42,0.75);color:var(--txdead);text-decoration:line-through;
+}
+.blk.live{box-shadow:0 0 0 1px var(--parchment) inset,0 0 14px rgba(237,227,209,0.14)}
+.blk.chk{border-width:2px;font-weight:600}
+.blk.chk::before{content:"\2713";margin-right:5px;font-weight:700}
+.blk.gone{opacity:.45;text-decoration:line-through}
+.emptyrow{position:absolute;left:10px;top:50%;transform:translateY(-50%);
+  font-family:"DM Mono",monospace;font-size:10.5px;color:var(--muted)}
+.band{
+  position:absolute;top:26px;bottom:0;
+  background:rgba(192,71,42,0.13);
+  border-left:1px solid rgba(192,71,42,0.55);
+  border-right:1px solid rgba(192,71,42,0.55);
+  pointer-events:none;z-index:3;
+}
+.band .tag{
+  position:absolute;top:2px;left:50%;transform:translateX(-50%);
+  background:var(--rust);color:#fff;
+  font-family:"DM Mono",monospace;font-size:9px;letter-spacing:0.12em;
+  padding:2px 5px;white-space:nowrap;
+}
+.head{position:absolute;top:26px;bottom:0;width:2px;background:var(--parchment);
+  z-index:4;pointer-events:none}
+.head::after{content:"";position:absolute;top:-4px;left:-3px;width:8px;height:8px;
+  background:var(--parchment);transform:rotate(45deg)}
+.board-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;
+  margin-bottom:28px;flex-wrap:wrap}
+.legend{
+  display:flex;flex-wrap:wrap;gap:8px 20px;
+  font-family:"DM Mono",monospace;font-size:10.5px;
+  letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);
+}
+.legend i{display:inline-block;width:11px;height:11px;margin-right:6px;
+  vertical-align:-1px;border-radius:2px}
+.swx{border:1px dashed var(--rust);background:rgba(192,71,42,0.18)}
+.swp{background:rgba(192,71,42,0.35);border:1px solid var(--rust)}
+.foot-actions{display:flex;gap:8px;flex-wrap:wrap}
+#addroom{display:none}
+body.edit #addroom{display:inline-block}
+
+/* ---------- turn stack ---------- */
+.turns{border:1px solid var(--line);background:var(--panel);margin-bottom:28px}
+.turn{display:flex;gap:14px;padding:11px 14px;border-bottom:1px solid var(--line);align-items:flex-start}
+.turn:last-child{border-bottom:none}
+.turn.pinch{background:rgba(192,71,42,0.10);border-left:3px solid var(--rust);padding-left:11px}
+.turn.past{opacity:0.4}
+.turn .t{font-family:"DM Mono",monospace;font-size:13px;font-weight:500;flex:0 0 62px;padding-top:1px}
+.turn .d{flex:1;font-size:14px}
+.turn .d b{font-weight:700}
+.turn .d .meta{display:block;font-family:"DM Mono",monospace;font-size:10.5px;
+  color:var(--muted);letter-spacing:0.06em;text-transform:uppercase;margin-top:2px}
+.turn.pinch .d .meta{color:var(--txdead)}
+.turns .none{padding:14px;font-family:"DM Mono",monospace;font-size:11px;color:var(--muted)}
+.footnote{border-top:2px solid var(--line);padding-top:14px;
+  font-family:"DM Mono",monospace;font-size:10.5px;letter-spacing:0.04em;color:var(--muted)}
+
+/* ---------- sheet ---------- */
+#overlay{position:fixed;inset:0;background:rgba(10,8,6,0.6);z-index:20;display:none}
+#sheet{
+  position:fixed;left:0;right:0;bottom:0;z-index:21;
+  background:var(--panel-2);border-top:2px solid var(--sand);
+  padding:18px 16px calc(18px + env(safe-area-inset-bottom));
+  display:none;max-width:560px;margin:0 auto;border-radius:6px 6px 0 0;
+  max-height:82vh;overflow-y:auto;
+}
+#sheet.open,#overlay.open{display:block}
+#sheet h2{font-family:"Syne",sans-serif;font-weight:700;font-size:17px;
+  margin-bottom:14px;letter-spacing:-0.01em}
+.field{margin-bottom:12px}
+.field label{display:block;font-family:"DM Mono",monospace;font-size:10px;
+  letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.field input[type=text],.field input[type=time],.field input[type=date],
+.field input[type=number],.field select,.field textarea{
+  width:100%;background:var(--ink);color:var(--parchment);
+  border:1px solid var(--line);border-radius:2px;padding:10px;
+  font-family:"DM Mono",monospace;font-size:15px;
+}
+.field textarea{resize:vertical;line-height:1.55}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--sand)}
+.field.half{display:inline-block;width:calc(50% - 6px)}
+.field.half + .field.half{margin-left:12px}
+.field .note{font-family:"DM Sans",sans-serif;font-size:12.5px;color:var(--muted);
+  margin-top:5px;text-transform:none;letter-spacing:0}
+.chk{display:flex;align-items:center;gap:10px;margin-bottom:14px;font-size:14px}
+.chk input{width:18px;height:18px;accent-color:var(--rust)}
+.sheet-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.sheet-actions .btn{flex:1;text-align:center;padding:11px 8px}
+#err,.err{color:var(--txdead);font-family:"DM Mono",monospace;font-size:11px;
+  margin-bottom:8px;display:none}
+#err.show,.err.show{display:block}
+.gearrow{display:flex;align-items:center;gap:11px;padding:9px 4px;
+  border-bottom:1px solid var(--line);font-size:14.5px;cursor:pointer}
+.gearrow input{width:19px;height:19px;accent-color:var(--olive);flex:0 0 auto}
+.gearrow.on span{opacity:.5;text-decoration:line-through}
+.issrow{display:flex;justify-content:space-between;align-items:center;gap:10px;
+  padding:8px 4px;border-bottom:1px solid var(--line);font-size:14px}
+.issrow em{display:block;font-family:"DM Mono",monospace;font-size:10px;font-style:normal;
+  color:var(--muted);letter-spacing:0.06em;text-transform:uppercase}
+.showrow{display:flex;justify-content:space-between;align-items:center;gap:10px;
+  padding:10px 4px;border-bottom:1px solid var(--line);font-size:14px;cursor:pointer}
+.showrow.on{color:var(--sand);font-weight:700}
+.showrow em{display:block;font-family:"DM Mono",monospace;font-size:10px;font-style:normal;
+  color:var(--muted);letter-spacing:0.06em;text-transform:uppercase}
+
+@media (max-width:640px){
+  :root{--label-w:100px;--row-h:44px}
+  body{padding:16px 12px 120px}
+  .now{gap:14px 26px}
+  .now .clock{font-size:26px}
+}
+@media (prefers-reduced-motion:no-preference){
+  .row{animation:fade .4s ease both}
+  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+}
+@media print{
+  body,body.dark{background:#fff;color:#111;padding:0;
+    --ink:#fff;--panel:#fff;--panel-2:#f2efe9;--line:#ccc;--parchment:#111;--muted:#555;
+    --zone-l:30%;--zone-sat:60%;--txdead:#8F2E17}
+  .now,.turns,.scroller{background:#fff;border-color:#bbb}
+  .rlabel,.axis .corner{background:#f2efe9}
+  .scroller{overflow:visible}
+  .track{min-width:0;width:100%}
+  .head,.hdr-actions,#addroom,.daytabs,.foot-actions,.zoom{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ============ SETUP ============ -->
+<section id="setup">
+  <h2>New show</h2>
+  <p class="lede">Set the rooms and the shape of the day once. Everything after that is
+    scanning signs and ticking boxes.</p>
+
+  <div class="card">
+    <h3>The show</h3>
+    <div class="field"><label>Show name</label>
+      <input type="text" id="s_name" placeholder="e.g. AOM 2026"></div>
+    <div class="field"><label>Venue</label>
+      <input type="text" id="s_venue" placeholder="e.g. Sheraton Philadelphia Downtown"></div>
+    <div class="field half"><label>First day</label><input type="date" id="s_start"></div>
+    <div class="field half"><label>How many days</label>
+      <input type="number" id="s_days" value="1" min="1" max="21"></div>
+  </div>
+
+  <div class="card">
+    <h3>Rooms</h3>
+    <div class="field">
+      <label>One room per line</label>
+      <textarea id="s_rooms" rows="9" placeholder="Parlor A | Floor 2&#10;Parlor B | Floor 2&#10;Seminar A | Floor 1&#10;Horizons | Rooftop"></textarea>
+      <div class="note">Add <b>| Zone</b> after a room to group it. Zones colour the
+        board and can be anything &mdash; Floor 1, Ballroom Level, Tent. Rooms with no
+        zone go in the first one.</div>
+    </div>
+    <div class="preview" id="s_preview"><div class="none">Nothing yet</div></div>
+  </div>
+
+  <div class="card">
+    <h3>Time</h3>
+    <div class="field half"><label>Grid</label><select id="s_tick"></select></div>
+    <div class="field half"><label>Snap edits to</label><select id="s_snap"></select></div>
+    <div class="field half"><label>Turn is tight under</label>
+      <input type="number" id="s_turn" value="30" min="1" max="240"></div>
+    <div class="field half"><label>Dark over</label>
+      <input type="number" id="s_dark" value="60" min="1" max="480"></div>
+    <div class="note">A tight turn is flagged on the stack. When two rooms turn at once
+      the board draws a pinch band.</div>
+  </div>
+
+  <div id="s_err" class="err"></div>
+  <div class="sheet-actions">
+    <button class="btn primary" id="s_create">Create show</button>
+    <button class="btn" id="s_import">Import a saved show</button>
+    <button class="btn" id="s_cancel" style="display:none">Cancel</button>
+  </div>
+  <input type="file" id="s_file" accept="application/json,.json" style="display:none">
+</section>
+
+<!-- ============ APP ============ -->
+<div id="app">
+<header class="masthead">
+  <div>
+    <h1 id="showname">Show Board <em id="daylabel"></em></h1>
+    <div class="sub"><span id="venuelabel"></span> &nbsp;·&nbsp; <span id="windowlabel"></span>
+      &nbsp;·&nbsp; <span id="savestate">saved</span></div>
+  </div>
+  <div class="hdr-actions">
+    <a class="btn" href="index.html" aria-label="System by Dave home">Home</a>
+    <button class="btn" id="showsbtn">Shows</button>
+    <button class="btn" id="themebtn">Dark</button>
+    <button class="btn" id="settingsbtn">Setup</button>
+    <button class="btn" id="editbtn">Edit</button>
+  </div>
+</header>
+
+<div class="daytabs" id="daytabs"></div>
+
+<section class="now">
+  <div><div class="clock" id="clock">--:--<span id="ampm"></span></div></div>
+  <div class="now-col"><h3>Live now</h3><div class="lines" id="live">&mdash;</div></div>
+  <div class="now-col"><h3>Next action</h3><div class="lines" id="next">&mdash;</div></div>
+</section>
+
+<div class="section-label">
+  <span>Room timeline</span>
+  <span class="zoom">
+    <button class="btn xs" id="zoomout">&minus;</button>
+    <span id="zoomlabel"></span>
+    <button class="btn xs" id="zoomin">+</button>
+  </span>
+  <span class="hint" id="scrollhint">tap a room for pre-check · tap a session to check it off</span>
+</div>
+
+<div class="scroller">
+  <div class="track" id="track">
+    <div class="axis"><div class="corner"></div><div class="ticks" id="ticks"></div></div>
+    <div id="rows"></div>
+  </div>
+</div>
+
+<div class="board-foot">
+  <div class="legend" id="legend"></div>
+  <div class="foot-actions">
+    <button class="btn" id="pastebtn">&#128203; Paste sign</button>
+    <button class="btn" id="copybtn">Copy text</button>
+    <button class="btn" id="addroom">+ Room</button>
+  </div>
+</div>
+
+<div class="section-label"><span>Turn stack</span></div>
+<div class="turns" id="turns"></div>
+
+<div class="footnote">
+  Pinch bands and the time axis are computed from whatever is on the board.
+  Edits save automatically, per show. The clock only runs on the day dated today.
+</div>
+</div>
+
+<div id="overlay"></div>
+<div id="sheet"></div>
+
+<script>
+/* =================================================================
+   Show Board — a reusable version of the one-off AOM board.
+   Single file, no dependencies, works offline. State lives in this
+   browser: an index of shows plus one record per show.
+   ================================================================= */
+
+const IDX_KEY="sbd.showboard.index";
+const SHOW_KEY=id=>"sbd.showboard.show."+id;
+const ZOOMS=[40,60,80,100,120,160,200,260,340,440];
+const TICKS=[1,5,10,15,30,60];
+const SNAPS=[1,5,10,15,30];
+const ZONE_HUES=[38,197,95,282,12,168,320,52];
+const DEFAULT_GEAR=["Projector on / lamp warm","Screen down & framed",
+  "HDMI to presenter laptop","Dongle (USB-C + Mini DP)",
+  "Slide advancer paired, batteries ok","Podium mic / audio check",
+  "Confidence monitor","Room lights & house set"];
+
+let index=null;     /* {shows:[{id,name,venue}], active} */
+let show=null;      /* the loaded show */
+let START=480,END=1080,SPAN=600;
+let editMode=false;
+
+/* ---------- utils ---------- */
+const $=id=>document.getElementById(id);
+const m=t=>{const[a,b]=String(t).split(":").map(Number);return a*60+b};
+const clone=o=>JSON.parse(JSON.stringify(o));
+const pad2=v=>String(v).padStart(2,"0");
+const hhmm=v=>pad2(Math.floor(v/60))+":"+pad2(v%60);
+const fmt=v=>{let h=Math.floor(v/60),mm=v%60;const ap=h>=12?"p":"a";h=h%12||12;
+  return h+(mm?":"+pad2(mm):"")+ap};
+const pct=x=>((x-START)/SPAN*100);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const uid=()=>"s"+Math.random().toString(36).slice(2,9);
+const LW=()=>parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--label-w"));
+const day=()=>show.days[show.active];
+const MONTHS=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const DOW=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+const isoOf=d=>d.getFullYear()+"-"+pad2(d.getMonth()+1)+"-"+pad2(d.getDate());
+const todayISO=()=>isoOf(new Date());
+const labelOf=d=>DOW[d.getDay()]+" "+MONTHS[d.getMonth()]+" "+d.getDate();
+
+/* zone lookup; unknown zones fall back to a neutral hue */
+function zoneOf(name){
+  const z=(show.zones||[]).find(z=>z.name===name);
+  return z||{name:name||"—",h:0,flat:true};
+}
+function zoneHue(name){const z=zoneOf(name);return z.flat?38:z.h}
+
+/* ---------- storage ---------- */
+async function sget(k){
+  if(window.storage){const r=await window.storage.get(k);return r&&r.value?r.value:null}
+  return localStorage.getItem(k);
+}
+async function sset(k,v){
+  if(window.storage)return await window.storage.set(k,v);
+  localStorage.setItem(k,v);return true;
+}
+async function loadIndex(){
+  try{const raw=await sget(IDX_KEY);if(raw)return JSON.parse(raw)}catch(e){}
+  return {shows:[],active:null};
+}
+let saveTimer=null;
+function save(){
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(async()=>{
+    const el=$("savestate");
+    try{
+      await sset(SHOW_KEY(show.id),JSON.stringify(show));
+      const row=index.shows.find(s=>s.id===show.id);
+      if(row){row.name=show.name;row.venue=show.venue}
+      await sset(IDX_KEY,JSON.stringify(index));
+      el.textContent="saved";el.className="show ok";
+    }catch(e){el.textContent="not saved · session only";el.className="show bad"}
+    setTimeout(()=>el.classList.remove("show"),1800);
+  },250);
+}
+
+/* ---------- derived ---------- */
+function computeWindow(){
+  let lo=Infinity,hi=-Infinity;
+  day().rooms.forEach(r=>r.sessions.forEach(x=>{
+    lo=Math.min(lo,m(x.s));hi=Math.max(hi,m(x.e));
+  }));
+  if(!isFinite(lo)){lo=480;hi=1080}
+  START=Math.floor(lo/60)*60;
+  END=Math.ceil(hi/60)*60;
+  if(END-START<120)END=START+120;
+  SPAN=END-START;
+}
+const activeSorted=r=>r.sessions.filter(x=>!x.dead).slice().sort((a,b)=>m(a.s)-m(b.s));
+function computeTurns(){
+  const out=[];
+  day().rooms.forEach(r=>{
+    const act=activeSorted(r);
+    act.forEach((x,i)=>{
+      const nxt=act[i+1];
+      if(nxt){
+        const gap=m(nxt.s)-m(x.e);
+        if(gap>=0)out.push({room:r.name,zone:r.zone,a:m(x.e),b:m(nxt.s),gap,kind:"turn"});
+      }else out.push({room:r.name,zone:r.zone,a:m(x.e),b:null,gap:null,kind:"done"});
+    });
+  });
+  return out.sort((p,q)=>p.a-q.a);
+}
+function computePinches(ev){
+  const tight=ev.filter(t=>t.kind==="turn"&&t.gap<=show.turnMax);
+  const cl=[];
+  tight.forEach(t=>{
+    const c=cl[cl.length-1];
+    if(c&&t.a<=c.b){c.b=Math.max(c.b,t.b);c.items.push(t)}
+    else cl.push({a:t.a,b:t.b,items:[t]});
+  });
+  return cl.filter(c=>new Set(c.items.map(i=>i.room)).size>=2);
+}
+const isToday=()=>day().date===todayISO();
+
+/* ---------- gear / checks / issues ---------- */
+function ensure(r){
+  if(!Array.isArray(r.gear)||!r.gear.length)r.gear=(show.gearTemplate||DEFAULT_GEAR).slice();
+  if(!r.checks||typeof r.checks!=="object")r.checks={};
+  if(!Array.isArray(r.issues))r.issues=[];
+  if(!Array.isArray(r.sessions))r.sessions=[];
+  return r;
+}
+function checkState(r){
+  ensure(r);
+  const k=day().date||("d"+show.active);
+  if(!r.checks[k])r.checks[k]={};
+  /* keep only this day's ticks so yesterday never looks done */
+  Object.keys(r.checks).forEach(d=>{if(d!==k)delete r.checks[d]});
+  return r.checks[k];
+}
+const checkCount=r=>{const st=checkState(r);
+  return{done:r.gear.filter(g=>st[g]).length,total:r.gear.length}};
+
+/* ---------- render ---------- */
+function renderTabs(){
+  const t=$("daytabs");t.innerHTML="";
+  show.days.forEach((d,i)=>{
+    const b=document.createElement("button");
+    b.className="daytab"+(i===show.active?" active":"")+(d.date===todayISO()?" today":"");
+    b.textContent=d.label;
+    b.addEventListener("click",()=>{show.active=i;save();render()});
+    t.appendChild(b);
+  });
+}
+function renderLegend(){
+  const l=$("legend");l.innerHTML="";
+  (show.zones||[]).forEach(z=>{
+    const s=document.createElement("span");
+    s.innerHTML='<i style="background:hsl('+z.h+' 55% 50% / .25);border:1px solid hsl('+z.h+' 55% 50%)"></i>'+esc(z.name);
+    l.appendChild(s);
+  });
+  const x=document.createElement("span");
+  x.innerHTML='<i class="swx"></i>Cancelled';l.appendChild(x);
+  const p=document.createElement("span");
+  p.innerHTML='<i class="swp"></i>Pinch';l.appendChild(p);
+  const c=document.createElement("span");
+  c.innerHTML="&#10003; = pre-checked &nbsp;·&nbsp; struck = done";l.appendChild(c);
+}
+function renderAxis(){
+  const ticks=$("ticks");ticks.innerHTML="";
+  const track=$("track");
+  const pxh=show.grid.pxPerHour;
+  track.style.setProperty("--track-w",Math.round(SPAN/60*pxh)+"px");
+  $("zoomlabel").textContent=pxh+" px/hr";
+
+  const step=show.grid.tick;
+  const pxPerTick=pxh*(step/60),pxPerMin=pxh/60;
+  /* Labels must clear ~46px or they collide, but they also have to land on
+     round times — thinning by a raw multiple gives 8:00, 8:25, 8:50, which
+     is unreadable. Pick the smallest sensible interval that both divides by
+     the tick and is wide enough. */
+  const NICE=[1,5,10,15,30,60,120,180,360];
+  const every=NICE.find(n=>n%step===0&&n*pxPerMin>=46)||step*Math.ceil(46/pxPerTick);
+  /* below ~3px apart the minor ticks are a grey smear, so don't draw them */
+  const drawMinor=pxPerTick>=3;
+  for(let t=START;t<=END;t+=step){
+    const major=((t-START)%every===0);
+    if(!major&&!drawMinor)continue;
+    const d=document.createElement("div");
+    d.className="tick"+(major?" major":"");
+    d.style.left=pct(t)+"%";
+    if(major)d.textContent=fmt(t);
+    ticks.appendChild(d);
+    if(major&&t>START){
+      const g=document.createElement("div");
+      g.className="gridline";
+      g.style.left="calc("+LW()+"px + (100% - "+LW()+"px) * "+(pct(t)/100)+")";
+      track.appendChild(g);
+    }
+  }
+}
+/* Room names are arbitrary now, so the label column sizes to the longest one
+   rather than to a fixed width picked for one venue. Measured in a canvas so
+   it matches the real font, clamped so one silly name cannot eat the board. */
+let measureCtx=null;
+function fitLabelWidth(){
+  const names=day().rooms.map(r=>r.name||"");
+  if(!names.length)return;
+  if(!measureCtx)measureCtx=document.createElement("canvas").getContext("2d");
+  measureCtx.font='600 13px Syne, sans-serif';
+  const widest=Math.max(...names.map(n=>measureCtx.measureText(n).width));
+  const badge=day().rooms.some(r=>r.sessions.length)?32:0;
+  const narrow=window.innerWidth<=640;
+  const px=Math.round(Math.min(narrow?150:210,
+                      Math.max(narrow?100:118,widest+badge+22)));
+  document.documentElement.style.setProperty("--label-w",px+"px");
+}
+function render(){
+  if(!show)return;
+  document.body.classList.remove("setup");
+  renderTabs();renderLegend();computeWindow();fitLabelWidth();
+  $("showname").innerHTML=esc(show.name||"Show Board")+' <em id="daylabel">· '+esc(day().label)+"</em>";
+  $("venuelabel").textContent=show.venue||"";
+  $("windowlabel").textContent=fmt(START)+" to "+fmt(END);
+
+  const track=$("track");
+  track.querySelectorAll(".band,.head,.gridline").forEach(el=>el.remove());
+  renderAxis();
+
+  const rows=$("rows");rows.innerHTML="";
+  day().rooms.forEach((r,ri)=>{
+    ensure(r);
+    const row=document.createElement("div");
+    row.className="row";
+    row.style.setProperty("--zone-h",zoneHue(r.zone));
+    row.style.animationDelay=(ri*28)+"ms";
+
+    const lab=document.createElement("div");
+    const cc=checkCount(r);
+    const badge=r.sessions.length
+      ?'<span class="gearbadge'+(cc.done===cc.total?" full":(cc.done?" part":""))+'">'+cc.done+"/"+cc.total+"</span>":"";
+    const dot=r.issues.length?'<span class="issdot"></span>':"";
+    lab.className="rlabel"+(badge?" has-badge":"")+(dot?" has-iss":"");
+    lab.innerHTML='<span class="nm">'+esc(r.name)+'</span><span class="zn">'+esc(r.zone||"—")+"</span>"+badge+dot;
+    lab.addEventListener("click",()=>{editMode?openRoomEditor(ri):openRoomOps(ri)});
+    row.appendChild(lab);
+
+    const lane=document.createElement("div");
+    lane.className="lane";
+    if(!r.sessions.length&&r.note)
+      lane.innerHTML='<span class="emptyrow">'+esc(r.note)+"</span>";
+    r.sessions.slice().sort((a,b)=>m(a.s)-m(b.s)).forEach(x=>{
+      const si=r.sessions.indexOf(x);
+      const a=m(x.s),b=m(x.e);
+      const el=document.createElement("div");
+      el.className="blk"+(x.dead?" dead":"")+(x.chk?" chk":"");
+      el.style.left=pct(a)+"%";
+      el.style.width=Math.max((b-a)/SPAN*100,0.4)+"%";
+      el.textContent=fmt(a)+" to "+fmt(b)+(x.dead?"  CANCELLED":(x.id?"  #"+x.id:""));
+      el.title=r.name+" · "+fmt(a)+" to "+fmt(b)+(x.id?" · #"+x.id:"");
+      el.dataset.a=a;el.dataset.b=b;el.dataset.dead=x.dead?1:0;
+      el.addEventListener("click",ev=>{
+        if(editMode){ev.stopPropagation();openSessionEditor(ri,si);return}
+        if(x.dead)return;
+        x.chk=!x.chk;el.classList.toggle("chk",x.chk);save();
+      });
+      lane.appendChild(el);
+    });
+    row.appendChild(lane);
+    rows.appendChild(row);
+  });
+
+  const ev=computeTurns(),pin=computePinches(ev),w=LW();
+  pin.forEach(p=>{
+    const band=document.createElement("div");
+    band.className="band";
+    band.style.left="calc("+w+"px + (100% - "+w+"px) * "+(pct(p.a)/100)+")";
+    band.style.width="calc((100% - "+w+"px) * "+((p.b-p.a)/SPAN)+")";
+    band.innerHTML='<span class="tag">PINCH '+fmt(p.a).toUpperCase()+" TO "+fmt(p.b).toUpperCase()+"</span>";
+    track.appendChild(band);
+  });
+  const head=document.createElement("div");
+  head.className="head";head.id="playhead";head.style.display="none";
+  track.appendChild(head);
+
+  renderTurnStack(ev,pin);
+  tick();
+}
+function renderTurnStack(ev,pin){
+  const box=$("turns");box.innerHTML="";
+  const by={};ev.forEach(t=>{(by[t.a]=by[t.a]||[]).push(t)});
+  const times=Object.keys(by).map(Number).sort((a,b)=>a-b);
+  if(!times.length){box.innerHTML='<div class="none">No sessions on this day yet</div>';return}
+  times.forEach(t=>{
+    const g=by[t],tight=g.filter(e=>e.kind==="turn"&&e.gap<=show.turnMax);
+    const inPinch=pin.some(p=>t>=p.a&&t<p.b)&&tight.length>0,multi=tight.length>1;
+    const el=document.createElement("div");
+    el.className="turn"+((multi||inPinch)?" pinch":"");
+    el.dataset.t=t;
+    const desc=g.map(e=>{
+      if(e.kind==="done")return "<b>"+esc(e.room)+"</b> done for the day";
+      if(e.gap<=show.darkMax)return "<b>"+esc(e.room)+"</b> turn, back at "+fmt(e.b);
+      return "<b>"+esc(e.room)+"</b> strike, dark until "+fmt(e.b);
+    }).join("<br>");
+    let meta="";
+    if(multi){
+      const zs=new Set(tight.map(e=>e.zone));
+      meta=tight.length+" rooms turning"+(zs.size>1?" across zones":"")
+        +" · "+Math.min(...tight.map(e=>e.gap))+" min";
+    }else if(tight.length===1)meta=tight[0].gap+" min turn";
+    el.innerHTML='<span class="t">'+fmt(t)+'</span><span class="d">'+desc+
+      (meta?'<span class="meta">'+meta+"</span>":"")+"</span>";
+    box.appendChild(el);
+  });
+}
+
+/* ---------- live tick ---------- */
+function tick(){
+  if(!show)return;
+  const now=new Date(),cur=now.getHours()*60+now.getMinutes();
+  let h=now.getHours();const mm=pad2(now.getMinutes()),ap=h>=12?"PM":"AM";h=h%12||12;
+  $("clock").firstChild.nodeValue=h+":"+mm;
+  $("ampm").textContent=" "+ap;
+
+  const today=isToday(),head=$("playhead");
+  if(head){
+    if(today&&cur>=START&&cur<=END){
+      const w=LW();head.style.display="block";
+      head.style.left="calc("+w+"px + (100% - "+w+"px) * "+(pct(cur)/100)+")";
+    }else head.style.display="none";
+  }
+  if(!today){
+    $("live").innerHTML="Viewing "+esc(day().label);
+    $("next").innerHTML="&mdash;";
+    document.querySelectorAll(".blk").forEach(el=>el.classList.remove("live","gone"));
+    document.querySelectorAll(".turn").forEach(el=>el.classList.remove("past"));
+    return;
+  }
+  const live=[],up=[];
+  day().rooms.forEach(r=>r.sessions.forEach(x=>{
+    if(x.dead)return;
+    const a=m(x.s),b=m(x.e);
+    if(cur>=a&&cur<b)live.push(esc(r.name)+"  "+fmt(a)+" to "+fmt(b));
+    if(a>cur)up.push({t:a,txt:esc(r.name)+" up"});
+    if(b>cur)up.push({t:b,txt:esc(r.name)+" out"});
+  }));
+  document.querySelectorAll(".blk").forEach(el=>{
+    const a=+el.dataset.a,b=+el.dataset.b,ok=el.dataset.dead==="0";
+    el.classList.toggle("live",ok&&cur>=a&&cur<b);
+    el.classList.toggle("gone",ok&&cur>=b);
+  });
+  $("live").innerHTML=live.length?live.join("<br>"):"Nothing running";
+  up.sort((p,q)=>p.t-q.t);
+  const t0=up.length?up[0].t:null;
+  if(t0===null)$("next").innerHTML="Day complete";
+  else $("next").innerHTML="<b>"+fmt(t0)+"</b> &nbsp;"+
+    up.filter(u=>u.t===t0).map(u=>u.txt).join("<br><b>"+fmt(t0)+"</b> &nbsp;");
+  document.querySelectorAll(".turn").forEach(el=>
+    el.classList.toggle("past",+el.dataset.t<cur));
+}
+
+/* ---------- sheet plumbing ---------- */
+function openSheet(html){$("sheet").innerHTML=html;
+  $("sheet").classList.add("open");$("overlay").classList.add("open")}
+function closeSheet(){$("sheet").classList.remove("open");$("overlay").classList.remove("open")}
+function showErr(msg){const e=$("err");if(e){e.textContent=msg;e.classList.add("show")}}
+$("overlay").addEventListener("click",closeSheet);
+
+/* ---------- session editor ---------- */
+function openSessionEditor(ri,si){
+  const r=day().rooms[ri],isNew=si===null;
+  const x=isNew?{s:"",e:"",id:"",dead:false}:r.sessions[si];
+  const step=show.grid.snap*60;
+  openSheet(
+    "<h2>"+esc(r.name)+" · "+(isNew?"New session":"Edit session")+"</h2>"
+    +'<div id="err"></div>'
+    +'<div class="field half"><label>Start</label><input type="time" id="f_s" value="'+x.s+'" step="'+step+'"></div>'
+    +'<div class="field half"><label>End</label><input type="time" id="f_e" value="'+x.e+'" step="'+step+'"></div>'
+    +'<div class="field"><label>Code (optional)</label><input type="text" id="f_id" value="'+esc(x.id||"")+'" inputmode="numeric"></div>'
+    +'<div class="chk"><input type="checkbox" id="f_dead" '+(x.dead?"checked":"")+'>'
+    +'<label for="f_dead" style="margin:0;font-family:\'DM Sans\';font-size:14px;text-transform:none;letter-spacing:0;color:var(--parchment)">Cancelled (stays visible, hatched out)</label></div>'
+    +'<div class="sheet-actions"><button class="btn primary" id="f_save">Save</button>'
+    +(isNew?"":'<button class="btn danger" id="f_del">Delete</button>')
+    +'<button class="btn" id="f_cancel">Cancel</button></div>');
+  $("f_cancel").addEventListener("click",closeSheet);
+  $("f_save").addEventListener("click",()=>{
+    const s=$("f_s").value,e=$("f_e").value;
+    if(!s||!e)return showErr("Both times are required");
+    if(m(e)<=m(s))return showErr("End must be after start");
+    const val={s,e,id:$("f_id").value.trim(),dead:$("f_dead").checked};
+    if(isNew)r.sessions.push(val);else r.sessions[si]=val;
+    r.sessions.sort((a,b)=>m(a.s)-m(b.s));
+    closeSheet();save();render();
+  });
+  if(!isNew)$("f_del").addEventListener("click",()=>{
+    r.sessions.splice(si,1);closeSheet();save();render();});
+}
+
+/* ---------- room editor ---------- */
+function openRoomEditor(ri){
+  const r=day().rooms[ri];
+  const opts=(show.zones||[]).map(z=>
+    '<option value="'+esc(z.name)+'"'+(r.zone===z.name?" selected":"")+">"+esc(z.name)+"</option>").join("");
+  openSheet(
+    "<h2>"+esc(r.name)+"</h2><div id=\"err\"></div>"
+    +'<div class="field"><label>Room name</label><input type="text" id="f_nm" value="'+esc(r.name)+'"></div>'
+    +'<div class="field half"><label>Zone</label><select id="f_z">'+opts+"</select></div>"
+    +'<div class="field half"><label>&nbsp;</label><button class="btn primary" id="f_add" style="width:100%;padding:11px 8px">+ Session</button></div>'
+    +'<div class="field"><label>Note (shows when the room is empty)</label><input type="text" id="f_note" value="'+esc(r.note||"")+'"></div>'
+    +'<div class="sheet-actions"><button class="btn primary" id="f_save">Save</button>'
+    +'<button class="btn" id="f_gear">Gear list</button>'
+    +'<button class="btn danger" id="f_del">Delete room</button>'
+    +'<button class="btn" id="f_cancel">Cancel</button></div>');
+  $("f_cancel").addEventListener("click",closeSheet);
+  $("f_add").addEventListener("click",()=>{
+    r.name=$("f_nm").value.trim()||r.name;r.zone=$("f_z").value;
+    r.note=$("f_note").value.trim();openSessionEditor(ri,null);});
+  $("f_save").addEventListener("click",()=>{
+    const nm=$("f_nm").value.trim();
+    if(!nm)return showErr("Room needs a name");
+    r.name=nm;r.zone=$("f_z").value;r.note=$("f_note").value.trim();
+    closeSheet();save();render();});
+  $("f_gear").addEventListener("click",()=>openGearEditor(ri));
+  $("f_del").addEventListener("click",()=>{
+    openSheet("<h2>Delete "+esc(r.name)+"?</h2>"
+      +'<p style="margin-bottom:14px;font-size:14px;color:var(--muted)">Removes the room and its '
+      +r.sessions.length+" session"+(r.sessions.length===1?"":"s")+" from this day only.</p>"
+      +'<div class="sheet-actions"><button class="btn danger" id="f_yes">Delete</button>'
+      +'<button class="btn" id="f_no">Keep it</button></div>');
+    $("f_yes").addEventListener("click",()=>{
+      day().rooms.splice(ri,1);closeSheet();save();render();});
+    $("f_no").addEventListener("click",closeSheet);
+  });
+}
+$("addroom").addEventListener("click",()=>{
+  const z=(show.zones[0]||{}).name||"";
+  day().rooms.push({name:"New Room",zone:z,note:"",sessions:[]});
+  save();render();openRoomEditor(day().rooms.length-1);
+});
+
+/* ---------- room ops: pre-check + issues ---------- */
+function openRoomOps(ri){
+  const r=ensure(day().rooms[ri]),st=checkState(r);
+  const rows=r.gear.map((g,i)=>
+    '<label class="gearrow'+(st[g]?" on":"")+'"><input type="checkbox" '+(st[g]?"checked":"")
+    +' data-g="'+i+'"><span>'+esc(g)+"</span></label>").join("");
+  const iss=r.issues.length
+    ? r.issues.map((x,i)=>'<div class="issrow"><span>'+esc(x.t)+"<em>"+esc(x.when)
+      +'</em></span><button class="btn danger xs" data-x="'+i+'">Clear</button></div>').join("")
+    : '<p style="font-size:13px;color:var(--muted)">Nothing logged.</p>';
+  openSheet("<h2>"+esc(r.name)+" · pre-check</h2>"
+    +'<p style="font-family:\'DM Mono\',monospace;font-size:10.5px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Resets each day · '+esc(day().label)+"</p>"
+    +'<div id="gearlist">'+rows+"</div>"
+    +'<div class="sheet-actions" style="margin-bottom:16px"><button class="btn" id="f_all">Check all</button>'
+    +'<button class="btn" id="f_none">Clear all</button><button class="btn" id="f_edit">Edit gear</button></div>'
+    +'<h2 style="font-size:15px">Issues</h2><div id="isslist">'+iss+"</div>"
+    +'<div class="field" style="margin-top:8px"><input type="text" id="f_iss" placeholder="e.g. podium mic battery low"></div>'
+    +'<div class="sheet-actions"><button class="btn primary" id="f_add">Log issue</button>'
+    +'<button class="btn" id="f_cancel">Done</button></div>');
+  $("f_cancel").addEventListener("click",()=>{closeSheet();render()});
+  $("gearlist").addEventListener("change",e=>{
+    const i=e.target.dataset.g;if(i===undefined)return;
+    st[r.gear[+i]]=e.target.checked;
+    e.target.closest(".gearrow").classList.toggle("on",e.target.checked);save();});
+  $("f_all").addEventListener("click",()=>{r.gear.forEach(g=>st[g]=true);save();openRoomOps(ri)});
+  $("f_none").addEventListener("click",()=>{r.gear.forEach(g=>delete st[g]);save();openRoomOps(ri)});
+  $("f_edit").addEventListener("click",()=>openGearEditor(ri));
+  $("f_add").addEventListener("click",()=>{
+    const v=$("f_iss").value.trim();if(!v)return;
+    const n=new Date();let h=n.getHours();const ap=h>=12?"p":"a";h=h%12||12;
+    r.issues.unshift({t:v,when:" "+h+":"+pad2(n.getMinutes())+ap+" "+day().label});
+    save();openRoomOps(ri);});
+  $("f_iss").addEventListener("keydown",e=>{if(e.key==="Enter")$("f_add").click()});
+  $("isslist").addEventListener("click",e=>{
+    const i=e.target.dataset.x;if(i===undefined)return;
+    r.issues.splice(+i,1);save();openRoomOps(ri);});
+}
+function openGearEditor(ri){
+  const r=ensure(day().rooms[ri]);
+  openSheet("<h2>"+esc(r.name)+" · gear list</h2>"
+    +'<p style="font-size:13px;color:var(--muted);margin-bottom:10px">One item per line.</p>'
+    +'<div class="field"><textarea id="f_gear" rows="9">'+esc(r.gear.join("\n"))+"</textarea></div>"
+    +'<div class="sheet-actions"><button class="btn primary" id="f_save">Save</button>'
+    +'<button class="btn" id="f_copy">Copy to all rooms</button>'
+    +'<button class="btn" id="f_back">Back</button></div>');
+  $("f_back").addEventListener("click",()=>openRoomOps(ri));
+  const read=()=>$("f_gear").value.split("\n").map(s=>s.trim()).filter(Boolean);
+  $("f_save").addEventListener("click",()=>{
+    const g=read();if(g.length)r.gear=g;save();openRoomOps(ri);});
+  $("f_copy").addEventListener("click",()=>{
+    const g=read();if(!g.length)return;
+    r.gear=g;show.gearTemplate=g.slice();
+    day().rooms.forEach(o=>{ensure(o);o.gear=g.slice()});
+    save();openRoomOps(ri);});
+}
+
+/* ---------- settings ---------- */
+function optList(vals,cur,fmtFn){
+  return vals.map(v=>'<option value="'+v+'"'+(v===cur?" selected":"")+">"+fmtFn(v)+"</option>").join("");
+}
+const tickLabel=v=>v===60?"1 hour":v+" min";
+$("settingsbtn").addEventListener("click",()=>{
+  openSheet("<h2>Setup</h2><div id=\"err\"></div>"
+    +'<div class="field"><label>Show name</label><input type="text" id="f_nm" value="'+esc(show.name)+'"></div>'
+    +'<div class="field"><label>Venue</label><input type="text" id="f_vn" value="'+esc(show.venue||"")+'"></div>'
+    +'<div class="field half"><label>Grid</label><select id="f_tick">'+optList(TICKS,show.grid.tick,tickLabel)+"</select></div>"
+    +'<div class="field half"><label>Snap edits to</label><select id="f_snap">'+optList(SNAPS,show.grid.snap,tickLabel)+"</select></div>"
+    +'<div class="field half"><label>Tight turn under</label><input type="number" id="f_turn" value="'+show.turnMax+'" min="1" max="240"></div>'
+    +'<div class="field half"><label>Dark over</label><input type="number" id="f_dark" value="'+show.darkMax+'" min="1" max="480"></div>'
+    +'<div class="field"><label>Rename this day</label><input type="text" id="f_day" value="'+esc(day().label)+'"></div>'
+    +'<div class="sheet-actions"><button class="btn primary" id="f_save">Save</button>'
+    +'<button class="btn" id="f_zones">Zones</button>'
+    +'<button class="btn" id="f_newday">+ Day</button></div>'
+    +'<div class="sheet-actions" style="margin-top:10px">'
+    +'<button class="btn" id="f_export">Export show</button>'
+    +'<button class="btn danger" id="f_delday">Delete this day</button>'
+    +'<button class="btn" id="f_cancel">Close</button></div>');
+  $("f_cancel").addEventListener("click",closeSheet);
+  $("f_save").addEventListener("click",()=>{
+    show.name=$("f_nm").value.trim()||show.name;
+    show.venue=$("f_vn").value.trim();
+    show.grid.tick=+$("f_tick").value;
+    show.grid.snap=+$("f_snap").value;
+    show.turnMax=Math.max(1,+$("f_turn").value||30);
+    show.darkMax=Math.max(1,+$("f_dark").value||60);
+    day().label=$("f_day").value.trim()||day().label;
+    closeSheet();save();render();});
+  $("f_zones").addEventListener("click",openZones);
+  $("f_export").addEventListener("click",exportShow);
+  $("f_newday").addEventListener("click",()=>{
+    const base=day();
+    const d=base.date?new Date(base.date+"T12:00:00"):new Date();
+    d.setDate(d.getDate()+1);
+    show.days.push({date:isoOf(d),label:labelOf(d),
+      rooms:base.rooms.map(r=>({name:r.name,zone:r.zone,note:"",sessions:[],
+        gear:(r.gear||show.gearTemplate||DEFAULT_GEAR).slice(),checks:{},issues:[]}))});
+    show.active=show.days.length-1;closeSheet();save();render();});
+  $("f_delday").addEventListener("click",()=>{
+    if(show.days.length<2)return showErr("A show needs at least one day");
+    show.days.splice(show.active,1);
+    show.active=Math.max(0,show.active-1);
+    closeSheet();save();render();});
+});
+function openZones(){
+  const rows=(show.zones||[]).map((z,i)=>
+    '<div class="issrow"><span><span class="swatch" style="background:hsl('+z.h+' 55% 50%)"></span>'
+    +esc(z.name)+'</span><button class="btn xs" data-h="'+i+'">Colour</button></div>').join("")
+    || '<p style="font-size:13px;color:var(--muted)">No zones.</p>';
+  openSheet("<h2>Zones</h2>"
+    +'<p style="font-size:13px;color:var(--muted);margin-bottom:10px">Tap Colour to shift a zone\'s hue. Rooms keep their zone by name.</p>'
+    +'<div id="zlist">'+rows+"</div>"
+    +'<div class="field" style="margin-top:10px"><label>Add a zone</label><input type="text" id="f_zn" placeholder="e.g. Ballroom Level"></div>'
+    +'<div class="sheet-actions"><button class="btn primary" id="f_addz">Add</button>'
+    +'<button class="btn" id="f_back">Back</button></div>');
+  $("f_back").addEventListener("click",()=>$("settingsbtn").click());
+  $("f_addz").addEventListener("click",()=>{
+    const v=$("f_zn").value.trim();if(!v)return;
+    if(!show.zones.some(z=>z.name===v))
+      show.zones.push({name:v,h:ZONE_HUES[show.zones.length%ZONE_HUES.length]});
+    save();openZones();});
+  $("zlist").addEventListener("click",e=>{
+    const i=e.target.dataset.h;if(i===undefined)return;
+    const z=show.zones[+i];
+    z.h=(z.h+37)%360;save();render();openZones();});
+}
+
+/* ---------- zoom ---------- */
+function zoom(dir){
+  const i=ZOOMS.indexOf(show.grid.pxPerHour);
+  const n=Math.min(ZOOMS.length-1,Math.max(0,(i<0?4:i)+dir));
+  show.grid.pxPerHour=ZOOMS[n];save();render();
+}
+$("zoomin").addEventListener("click",()=>zoom(1));
+$("zoomout").addEventListener("click",()=>zoom(-1));
+
+/* ---------- theme ---------- */
+function applyTheme(){
+  document.body.classList.toggle("dark",show&&show.theme==="dark");
+  $("themebtn").textContent=(show&&show.theme==="dark")?"Light":"Dark";
+}
+$("themebtn").addEventListener("click",()=>{
+  show.theme=show.theme==="dark"?"light":"dark";applyTheme();save();});
+
+/* ---------- edit mode ---------- */
+$("editbtn").addEventListener("click",()=>{
+  editMode=!editMode;
+  document.body.classList.toggle("edit",editMode);
+  $("editbtn").textContent=editMode?"Done":"Edit";
+  $("editbtn").classList.toggle("editing",editMode);
+  $("scrollhint").textContent=editMode
+    ?"tap a block to edit it · tap a room name for room options"
+    :"tap a room for pre-check · tap a session to check it off";
+});
+
+/* ---------- copy as text ---------- */
+function boardText(){
+  const d=day();
+  let out=(show.name||"Show").toUpperCase()+" — "+d.label.toUpperCase()+"\n";
+  d.rooms.forEach(r=>{
+    out+="\n"+r.name.toUpperCase()+"\n";
+    const ss=r.sessions.slice().sort((a,b)=>m(a.s)-m(b.s));
+    if(!ss.length){out+=(r.note||"No sessions")+"\n";return}
+    ss.forEach(x=>{out+=fmt(m(x.s))+" to "+fmt(m(x.e))+(x.dead?" CANCELLED":"")+"\n"});
+  });
+  const pin=computePinches(computeTurns());
+  if(pin.length){
+    const big=pin.reduce((a,b)=>b.items.length>a.items.length?b:a);
+    out+="\nWorst window: "+fmt(big.a)+" to "+fmt(big.b)+", "
+      +new Set(big.items.map(i=>i.room)).size+" rooms turn";
+  }
+  let last=0,lr="";
+  d.rooms.forEach(r=>r.sessions.forEach(x=>{
+    if(!x.dead&&m(x.e)>last){last=m(x.e);lr=r.name}}));
+  if(last)out+="\nLast out: "+lr+" "+fmt(last);
+  return out;
+}
+$("copybtn").addEventListener("click",async()=>{
+  const t=boardText();
+  try{await navigator.clipboard.writeText(t)}
+  catch(e){const ta=document.createElement("textarea");ta.value=t;
+    document.body.appendChild(ta);ta.select();
+    try{document.execCommand("copy")}catch(_){}ta.remove();}
+  const b=$("copybtn"),o=b.textContent;
+  b.textContent="Copied";setTimeout(()=>b.textContent=o,1500);
+});
+
+/* ---------- paste a sign ----------
+   Uses the phone's own text recognition (iOS Live Text, Android Lens):
+   select the text on the photo, copy, paste here. */
+function parseSignText(raw){
+  const lines=String(raw).split(/\r?\n/);
+  const T=String.raw`(\d{1,2})[:.](\d{2})\s*([AaPp])?\.?[Mm]?\.?`;
+  const re=new RegExp(T+String.raw`\s*(?:-|–|—|to|until|thru)\s*`+T,"i");
+  const hm=(h,mm,pm)=>((+h%12)+(pm?12:0))*60+ +mm;
+  const pick=(cand,end)=>{const f=cand.filter(v=>v<end);
+    return f.length?Math.max(...f):cand[0]};
+  /* a wrapped title puts "(Cancelled)" below the time, so read the whole
+     heading — down to the paper list or the next session */
+  const headingOf=i=>{
+    const buf=[lines[i]];
+    for(let j=i+1;j<lines.length;j++){
+      if(/\d+\s*paper\(s\)/i.test(lines[j])||re.test(lines[j]))break;
+      buf.push(lines[j]);
+    }
+    return buf.join(" ");
+  };
+  const sessions=[];
+  lines.forEach((line,i)=>{
+    const g=re.exec(line);
+    if(!g)return;
+    const[,h1,m1,a1,h2,m2,a2]=g;
+    let end;
+    if(a2)end=hm(h2,m2,/p/i.test(a2));
+    else if(a1){end=hm(h2,m2,/p/i.test(a1));
+      if(end<=hm(h1,m1,/p/i.test(a1)))end+=720;}
+    else end=hm(h2,m2,+h2>=1&&+h2<=7);
+    const start=a1?hm(h1,m1,/p/i.test(a1)):pick([hm(h1,m1,false),hm(h1,m1,true)],end);
+    if(!(end>start))return;
+    const after=line.slice(g.index+g[0].length);
+    const id=((after.match(/\b(\d{3,6})\b/)||line.match(/\b(\d{3,6})\b/)||[])[1])||"";
+    sessions.push({s:hhmm(start),e:hhmm(end),
+      id:id+(/cancel/i.test(headingOf(i))?"!":"")});
+  });
+  const rm=raw.match(/room\s*[:\-]\s*([^\n]+)/i);
+  return{room:rm?rm[1].trim():null,sessions};
+}
+function openPasteSheet(prefill,msg){
+  openSheet("<h2>Paste sign text</h2>"
+    +'<p style="font-size:13px;color:var(--muted);margin-bottom:10px">On the photo in your camera roll, long-press the text, Select All, Copy &mdash; then paste it here.</p>'
+    +(msg?'<div id="err" class="show">'+esc(msg)+"</div>":'<div id="err"></div>')
+    +'<div class="field"><textarea id="f_paste" rows="9" placeholder="8:00AM - 9:30AM   1234   Opening"></textarea></div>'
+    +'<div class="sheet-actions"><button class="btn primary" id="f_read">Read it</button>'
+    +'<button class="btn" id="f_cancel">Cancel</button></div>');
+  if(prefill)$("f_paste").value=prefill;
+  $("f_cancel").addEventListener("click",closeSheet);
+  $("f_read").addEventListener("click",()=>{
+    const raw=$("f_paste").value;
+    if(!raw.trim())return showErr("Nothing pasted yet");
+    const d=parseSignText(raw);
+    if(!d.sessions.length)
+      return openPasteSheet(raw,"No time ranges found. Times need to look like 8:00AM - 9:30AM.");
+    previewSign(d);
+  });
+  setTimeout(()=>{const t=$("f_paste");if(t)t.focus()},50);
+}
+function previewSign(data){
+  const rooms=day().rooms;
+  let sel=0;
+  if(data.room){
+    const norm=v=>String(v).toLowerCase().replace(/[^a-z0-9]/g,"");
+    const n=norm(data.room);
+    const hit=rooms.findIndex(r=>norm(r.name)===n||n.includes(norm(r.name))||norm(r.name).includes(n));
+    if(hit>=0)sel=hit;
+  }
+  const clean=data.sessions.map(x=>({s:x.s,e:x.e,
+    id:String(x.id||"").replace(/!+$/,""),dead:/!$/.test(String(x.id||""))}))
+    .filter(x=>/^\d{2}:\d{2}$/.test(x.s)&&/^\d{2}:\d{2}$/.test(x.e)&&m(x.e)>m(x.s));
+  if(!clean.length)return openPasteSheet("","Sessions came back malformed");
+  const list=clean.map(x=>fmt(m(x.s))+" to "+fmt(m(x.e))
+    +(x.dead?" CANCELLED":(x.id?" · #"+esc(x.id):""))).join("<br>");
+  openSheet("<h2>Sign read"+(data.room?" · "+esc(data.room):"")+"</h2>"
+    +'<div class="field"><label>Apply to room ('+esc(day().label)+')</label><select id="f_room">'
+    +rooms.map((r,i)=>'<option value="'+i+'"'+(i===sel?" selected":"")+">"+esc(r.name)+"</option>").join("")
+    +"</select></div>"
+    +'<p style="font-family:\'DM Mono\',monospace;font-size:12px;line-height:1.8;margin-bottom:14px">'+list+"</p>"
+    +'<div class="sheet-actions"><button class="btn primary" id="f_apply">Replace room sessions</button>'
+    +'<button class="btn" id="f_cancel">Cancel</button></div>');
+  $("f_cancel").addEventListener("click",closeSheet);
+  $("f_apply").addEventListener("click",()=>{
+    const r=day().rooms[+$("f_room").value];
+    r.sessions=clean.map(x=>({s:x.s,e:x.e,id:x.id,dead:x.dead}));
+    r.note="";closeSheet();save();render();});
+}
+$("pastebtn").addEventListener("click",()=>openPasteSheet());
+
+/* ---------- shows: switch, export, import ---------- */
+$("showsbtn").addEventListener("click",()=>{
+  const rows=index.shows.map(s=>
+    '<div class="showrow'+(s.id===show.id?" on":"")+'" data-s="'+s.id+'"><span>'+esc(s.name)
+    +"<em>"+esc(s.venue||"no venue")+"</em></span>"
+    +'<button class="btn danger xs" data-del="'+s.id+'">Delete</button></div>').join("");
+  openSheet("<h2>Shows</h2><div id=\"slist\">"+rows+"</div>"
+    +'<div class="sheet-actions" style="margin-top:12px">'
+    +'<button class="btn primary" id="f_new">+ New show</button>'
+    +'<button class="btn" id="f_imp">Import</button>'
+    +'<button class="btn" id="f_cancel">Close</button></div>');
+  $("f_cancel").addEventListener("click",closeSheet);
+  $("f_new").addEventListener("click",()=>{closeSheet();openSetup(true)});
+  $("f_imp").addEventListener("click",()=>$("s_file").click());
+  $("slist").addEventListener("click",async e=>{
+    const del=e.target.dataset.del;
+    if(del){
+      index.shows=index.shows.filter(s=>s.id!==del);
+      if(index.active===del)index.active=(index.shows[0]||{}).id||null;
+      await sset(IDX_KEY,JSON.stringify(index));
+      closeSheet();
+      if(index.active)await openShow(index.active);else openSetup(false);
+      return;
+    }
+    const row=e.target.closest(".showrow");
+    if(row&&row.dataset.s){closeSheet();openShow(row.dataset.s)}
+  });
+});
+function exportShow(){
+  const blob=new Blob([JSON.stringify(show,null,2)],{type:"application/json"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download=(show.name||"show").replace(/[^a-z0-9]+/gi,"-").toLowerCase()+".json";
+  document.body.appendChild(a);a.click();
+  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500);
+}
+$("s_import").addEventListener("click",()=>$("s_file").click());
+$("s_file").addEventListener("change",e=>{
+  const f=e.target.files[0];e.target.value="";
+  if(!f)return;
+  const fr=new FileReader();
+  fr.onload=async()=>{
+    let s;
+    try{s=JSON.parse(fr.result)}catch(_){return setupErr("That file is not valid JSON")}
+    if(!s||!Array.isArray(s.days))return setupErr("That does not look like a show export");
+    s.id=uid();
+    index.shows.push({id:s.id,name:s.name||"Imported show",venue:s.venue||""});
+    index.active=s.id;
+    await sset(SHOW_KEY(s.id),JSON.stringify(s));
+    await sset(IDX_KEY,JSON.stringify(index));
+    closeSheet();openShow(s.id);
+  };
+  fr.readAsText(f);
+});
+
+/* ---------- setup screen ---------- */
+function setupErr(msg){const e=$("s_err");e.textContent=msg;e.classList.add("show")}
+function parseRooms(raw){
+  const zones=[],rooms=[];
+  String(raw).split(/\r?\n/).forEach(line=>{
+    const t=line.trim();if(!t)return;
+    const bits=t.split("|");
+    const name=bits[0].trim();
+    if(!name)return;
+    const zn=(bits[1]||"").trim();
+    if(zn&&!zones.some(z=>z.name===zn))
+      zones.push({name:zn,h:ZONE_HUES[zones.length%ZONE_HUES.length]});
+    rooms.push({name,zone:zn});
+  });
+  if(!zones.length)zones.push({name:"Rooms",h:ZONE_HUES[0]});
+  rooms.forEach(r=>{if(!r.zone)r.zone=zones[0].name});
+  return{zones,rooms};
+}
+function renderRoomPreview(){
+  const {zones,rooms}=parseRooms($("s_rooms").value);
+  const box=$("s_preview");
+  if(!rooms.length){box.innerHTML='<div class="none">Nothing yet</div>';return}
+  box.innerHTML="<table>"+rooms.map(r=>{
+    const z=zones.find(z=>z.name===r.zone)||zones[0];
+    return "<tr><td>"+esc(r.name)+'</td><td class="z"><span class="swatch" style="background:hsl('
+      +z.h+' 55% 50%)"></span>'+esc(r.zone)+"</td></tr>";
+  }).join("")+"</table>";
+}
+function openSetup(cancelable){
+  document.body.classList.add("setup");
+  $("s_cancel").style.display=cancelable?"":"none";
+  $("s_err").classList.remove("show");
+  if(!$("s_start").value)$("s_start").value=todayISO();
+  $("s_tick").innerHTML=optList(TICKS,15,tickLabel);
+  $("s_snap").innerHTML=optList(SNAPS,5,tickLabel);
+  renderRoomPreview();
+}
+$("s_rooms").addEventListener("input",renderRoomPreview);
+$("s_cancel").addEventListener("click",()=>{
+  document.body.classList.remove("setup");
+  if(show)render();
+});
+$("s_create").addEventListener("click",async()=>{
+  $("s_err").classList.remove("show");
+  const name=$("s_name").value.trim();
+  if(!name)return setupErr("Give the show a name");
+  const {zones,rooms}=parseRooms($("s_rooms").value);
+  if(!rooms.length)return setupErr("Add at least one room");
+  const startISO=$("s_start").value||todayISO();
+  const n=Math.max(1,Math.min(21,+$("s_days").value||1));
+  const [Y,M,D]=startISO.split("-").map(Number);
+  const gear=DEFAULT_GEAR.slice();
+  const days=[];
+  for(let i=0;i<n;i++){
+    const d=new Date(Y,M-1,D+i);
+    days.push({date:isoOf(d),label:labelOf(d),
+      rooms:rooms.map(r=>({name:r.name,zone:r.zone,note:"",sessions:[],
+        gear:gear.slice(),checks:{},issues:[]}))});
+  }
+  const s={
+    id:uid(),name,venue:$("s_venue").value.trim(),
+    zones,gearTemplate:gear,
+    grid:{tick:+$("s_tick").value,snap:+$("s_snap").value,pxPerHour:120},
+    turnMax:Math.max(1,+$("s_turn").value||30),
+    darkMax:Math.max(1,+$("s_dark").value||60),
+    theme:"light",active:0,days
+  };
+  const t=todayISO();
+  const hit=s.days.findIndex(d=>d.date===t);
+  if(hit>=0)s.active=hit;
+  index.shows.push({id:s.id,name:s.name,venue:s.venue});
+  index.active=s.id;
+  await sset(SHOW_KEY(s.id),JSON.stringify(s));
+  await sset(IDX_KEY,JSON.stringify(index));
+  show=s;
+  document.body.classList.remove("setup");
+  applyTheme();render();
+});
+
+/* ---------- boot ---------- */
+async function openShow(id){
+  const raw=await sget(SHOW_KEY(id));
+  if(!raw){openSetup(false);return}
+  show=JSON.parse(raw);
+  show.grid=show.grid||{tick:15,snap:5,pxPerHour:120};
+  show.zones=show.zones||[{name:"Rooms",h:ZONE_HUES[0]}];
+  show.turnMax=show.turnMax||30;show.darkMax=show.darkMax||60;
+  index.active=id;
+  await sset(IDX_KEY,JSON.stringify(index));
+  const t=todayISO();
+  const hit=show.days.findIndex(d=>d.date===t);
+  if(hit>=0)show.active=hit;
+  applyTheme();render();
+}
+(async function(){
+  index=await loadIndex();
+  if(index.active&&index.shows.some(s=>s.id===index.active))await openShow(index.active);
+  else if(index.shows.length)await openShow(index.shows[0].id);
+  else openSetup(false);
+  setInterval(tick,30000);
+  window.addEventListener("resize",()=>{if(show)render()});
+})();
+</script>
+</body>
+</html>
