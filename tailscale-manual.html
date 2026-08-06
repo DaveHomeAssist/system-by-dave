@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: https:; script-src 'self' 'unsafe-inline'">
+<title>Tailscale Express Working Manual — System by Dave</title>
+<meta name="description" content="A practical Tailscale working manual for solo operators and homelabs: setup, CLI, MagicDNS, subnet routers, exit nodes, SSH, access control, and troubleshooting.">
+<link rel="canonical" href="https://systembydave.com/tailscale-manual.html">
+<meta name="robots" content="index,follow">
+<meta name="theme-color" content="#F5F0E8">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="System by Dave">
+<meta property="og:title" content="Tailscale Express Working Manual">
+<meta property="og:description" content="The practical field guide for running a personal tailnet and homelab.">
+<meta property="og:url" content="https://systembydave.com/tailscale-manual.html">
+<meta property="og:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Tailscale Express Working Manual">
+<meta name="twitter:description" content="The practical field guide for running a personal tailnet and homelab.">
+<meta name="twitter:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<link rel="icon" href="svg/system_by_dave_logo_rust.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/fonts.css">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  :root {
+    --manual-paper: #fbf8f2;
+    --manual-ink: #232321;
+    --manual-muted: #65635f;
+    --manual-border: rgba(44, 44, 44, 0.16);
+    --manual-code: #20211f;
+    --manual-signal: #9a5038;
+    --manual-green: #1f7059;
+  }
+  body { background: var(--cream); }
+  ::selection { background: rgba(154, 80, 56, 0.22); color: var(--manual-ink); }
+  .reading-progress { position: fixed; inset: 0 0 auto; height: 3px; z-index: 200; background: transparent; }
+  .reading-progress span { display: block; width: 0; height: 100%; background: var(--rust); transition: width 80ms linear; }
+  .manual-shell { position: relative; z-index: 1; }
+  .manual-header { position: relative; z-index: 110; }
+  .manual-header .nav-links { gap: 24px; }
+  .manual-header .nav-links a:focus-visible,
+  .manual-toc a:focus-visible,
+  .manual-content a:focus-visible,
+  .manual-action:focus-visible,
+  .copy-code:focus-visible { outline: 2px solid var(--rust); outline-offset: 4px; }
+  .manual-hero { padding: clamp(58px, 9vw, 112px) 0 52px; border-bottom: 1px solid var(--grid-line-accent); }
+  .manual-hero-grid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(300px, 0.8fr); gap: clamp(40px, 7vw, 96px); align-items: end; }
+  .manual-eyebrow { display: flex; align-items: center; gap: 10px; color: var(--rust); font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.13em; text-transform: uppercase; }
+  .manual-eyebrow::before { content: ""; width: 38px; height: 1px; background: currentColor; }
+  .manual-hero h1 { max-width: 760px; margin: 20px 0 22px; font-family: var(--font-display); font-size: clamp(54px, 8.5vw, 112px); font-weight: 400; letter-spacing: -0.045em; line-height: 0.82; }
+  .manual-hero h1 span { display: block; margin-top: 18px; color: var(--rust); font-family: var(--font-mono); font-size: clamp(13px, 1.7vw, 20px); font-weight: 400; letter-spacing: 0.12em; line-height: 1.25; text-transform: uppercase; }
+  .manual-deck { max-width: 650px; color: var(--charcoal-light); font-size: clamp(17px, 2vw, 21px); line-height: 1.55; }
+  .route-card { position: relative; padding: 28px; border: 1px solid var(--manual-border); background: rgba(251, 248, 242, 0.78); box-shadow: var(--shadow-md); }
+  .route-card::before { content: ""; position: absolute; inset: 8px; border: 1px solid rgba(154, 80, 56, 0.12); pointer-events: none; }
+  .route-label { color: var(--manual-muted); font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.13em; text-transform: uppercase; }
+  .route-flow { display: grid; grid-template-columns: 1fr auto 1fr; gap: 11px; align-items: center; margin: 22px 0; }
+  .route-node { min-height: 82px; display: grid; place-items: center; border: 1px solid var(--manual-border); background: var(--cream); font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; }
+  .route-line { width: 54px; height: 1px; background: var(--rust); position: relative; }
+  .route-line::after { content: ""; position: absolute; right: -1px; top: -3px; width: 7px; height: 7px; border-top: 1px solid var(--rust); border-right: 1px solid var(--rust); transform: rotate(45deg); }
+  .route-priority { display: flex; flex-wrap: wrap; gap: 8px; }
+  .route-priority span { padding: 6px 9px; border: 1px solid var(--manual-border); border-radius: 999px; color: var(--manual-muted); font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; }
+  .manual-facts { display: grid; grid-template-columns: repeat(3, 1fr); margin-top: 48px; border: 1px solid var(--manual-border); background: rgba(251, 248, 242, 0.7); }
+  .manual-fact { padding: 18px 20px; border-right: 1px solid var(--manual-border); }
+  .manual-fact:last-child { border-right: 0; }
+  .manual-fact dt { color: var(--rust); font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.11em; text-transform: uppercase; }
+  .manual-fact dd { margin-top: 5px; color: var(--charcoal-light); font-size: 14px; line-height: 1.5; }
+  .manual-layout { display: grid; grid-template-columns: 252px minmax(0, 780px); gap: clamp(52px, 7vw, 92px); justify-content: center; padding-top: 64px; padding-bottom: 100px; }
+  .manual-aside { min-width: 0; }
+  .manual-toc { display: block; position: sticky; top: 100px; height: auto; }
+  .manual-toc-label { margin-bottom: 14px; color: var(--rust); font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.13em; text-transform: uppercase; }
+  .manual-toc ol { list-style: none; border-top: 1px solid var(--manual-border); }
+  .manual-toc li { border-bottom: 1px solid var(--manual-border); }
+  .manual-toc a { display: grid; grid-template-columns: 28px 1fr; gap: 8px; padding: 9px 4px; color: var(--manual-muted); font-size: 12px; line-height: 1.3; text-decoration: none; transition: color 160ms ease, padding-left 160ms ease; }
+  .manual-toc a span { color: var(--rust); font-family: var(--font-mono); font-size: 9px; padding-top: 2px; }
+  .manual-toc a:hover,
+  .manual-toc a[aria-current="true"] { padding-left: 9px; color: var(--manual-ink); }
+  .manual-tools { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 20px; }
+  .manual-action { min-height: 40px; border: 1px solid var(--manual-border); background: transparent; color: var(--charcoal); font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; transition: background 160ms ease, color 160ms ease; }
+  .manual-action:hover { background: var(--charcoal); color: var(--cream); }
+  .manual-content { min-width: 0; }
+  .manual-section { position: relative; scroll-margin-top: 100px; padding: 0 0 84px; }
+  .manual-section + .manual-section { padding-top: 76px; border-top: 1px solid var(--manual-border); }
+  .manual-section::before { content: attr(data-section); position: absolute; right: 0; top: -18px; color: rgba(154, 80, 56, 0.08); font-family: var(--font-display); font-size: 96px; line-height: 1; pointer-events: none; }
+  .section-kicker { position: relative; display: flex; gap: 12px; margin-bottom: 18px; color: var(--rust); font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; }
+  .section-kicker span:first-child { min-width: 28px; }
+  .manual-content h2 { position: relative; max-width: 650px; margin-bottom: 34px; font-family: var(--font-display); font-size: clamp(36px, 5vw, 58px); font-weight: 400; letter-spacing: -0.025em; line-height: 1.02; }
+  .manual-content h3 { scroll-margin-top: 100px; margin: 42px 0 16px; color: var(--manual-ink); font-family: var(--font-display); font-size: clamp(23px, 3vw, 31px); font-weight: 400; line-height: 1.18; }
+  .manual-content p { margin: 0 0 20px; color: #3f3e3a; font-size: 16px; line-height: 1.82; }
+  .manual-content strong { color: var(--manual-ink); }
+  .manual-content a { color: var(--rust-dark); text-underline-offset: 3px; text-decoration-thickness: 1px; }
+  .external-mark { display: inline-block; margin-left: 3px; font-family: var(--font-mono); font-size: 0.76em; text-decoration: none; }
+  .manual-content ul,
+  .manual-content ol:not(.manual-checklist) { margin: 0 0 24px 22px; color: #3f3e3a; }
+  .manual-content li { margin-bottom: 9px; padding-left: 5px; line-height: 1.7; }
+  .manual-content li::marker { color: var(--rust); }
+  .manual-content code { padding: 0.14em 0.38em; border-radius: 3px; background: rgba(44, 44, 44, 0.08); color: #713b2a; font-family: var(--font-mono); font-size: 0.86em; overflow-wrap: anywhere; }
+  .code-block { margin: 24px 0 28px; overflow: hidden; border: 1px solid rgba(255,255,255,0.08); background: var(--manual-code); box-shadow: var(--shadow-md); }
+  .code-head { display: flex; align-items: center; justify-content: space-between; min-height: 40px; padding: 0 14px 0 18px; border-bottom: 1px solid rgba(255,255,255,0.09); color: #b9b7af; font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; }
+  .copy-code { min-width: 62px; min-height: 28px; border: 1px solid rgba(255,255,255,0.18); background: transparent; color: #e7e4dd; font: inherit; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; }
+  .copy-code:hover { border-color: #e7e4dd; }
+  .code-block pre { max-width: 100%; padding: 20px; overflow-x: auto; color: #ece9e1; font-family: var(--font-mono); font-size: 13px; line-height: 1.7; tab-size: 2; }
+  .code-block code { padding: 0; background: none; color: inherit; font-size: inherit; overflow-wrap: normal; }
+  .table-scroll { width: 100%; margin: 24px 0 30px; overflow-x: auto; border: 1px solid var(--manual-border); background: rgba(251, 248, 242, 0.78); }
+  .table-scroll:focus-visible { outline: 2px solid var(--rust); outline-offset: 3px; }
+  .manual-content table { width: 100%; min-width: 620px; border-collapse: collapse; font-size: 13px; line-height: 1.55; }
+  .manual-content th { padding: 13px 15px; background: var(--charcoal); color: var(--cream); font-family: var(--font-mono); font-size: 10px; font-weight: 400; letter-spacing: 0.08em; text-align: left; text-transform: uppercase; }
+  .manual-content td { padding: 13px 15px; border-bottom: 1px solid var(--manual-border); vertical-align: top; }
+  .manual-content tr:last-child td { border-bottom: 0; }
+  .manual-content tbody tr:nth-child(even) { background: rgba(44, 44, 44, 0.025); }
+  .warning-callout { padding: 18px 20px; border-left: 3px solid var(--rust); background: rgba(154, 80, 56, 0.08); }
+  .manual-checklist { list-style: none; margin: 0; counter-reset: checklist; }
+  .manual-checklist li { display: grid; grid-template-columns: 38px minmax(0, 1fr); gap: 14px; margin: 0; padding: 18px 0; border-top: 1px solid var(--manual-border); counter-increment: checklist; }
+  .manual-checklist li::before { content: counter(checklist, decimal-leading-zero); display: grid; place-items: center; width: 38px; height: 38px; border: 1px solid var(--rust); border-radius: 50%; color: var(--rust); font-family: var(--font-mono); font-size: 10px; }
+  .manual-checklist li span { padding-top: 5px; line-height: 1.7; }
+  .source-note { margin-top: 38px; padding: 24px; border: 1px solid var(--manual-border); background: rgba(251, 248, 242, 0.75); }
+  .manual-footer-note { max-width: 760px; color: var(--charcoal-light); font-size: 13px; line-height: 1.7; }
+  @media (max-width: 960px) {
+    .manual-layout { grid-template-columns: 210px minmax(0, 1fr); gap: 42px; }
+    .manual-hero-grid { grid-template-columns: 1fr; }
+    .route-card { max-width: 520px; }
+  }
+  @media (max-width: 680px) {
+    .manual-header nav { min-height: 72px; height: auto; padding-top: 10px; padding-bottom: 10px; align-items: flex-start; gap: 16px; }
+    .manual-header .nav-links { gap: 12px; flex-wrap: wrap; justify-content: flex-end; }
+    .manual-header .nav-links li:nth-child(n+3) { display: none; }
+    .manual-header .nav-links a { font-size: 10px; }
+    .manual-hero { padding-top: 52px; }
+    .manual-hero h1 { font-size: clamp(48px, 17vw, 76px); }
+    .manual-facts { grid-template-columns: 1fr; }
+    .manual-fact { border-right: 0; border-bottom: 1px solid var(--manual-border); }
+    .manual-fact:last-child { border-bottom: 0; }
+    .manual-layout { display: block; padding-top: 36px; padding-bottom: 72px; }
+    .manual-toc { position: static; margin-bottom: 62px; }
+    .manual-toc ol { display: grid; grid-template-columns: 1fr 1fr; }
+    .manual-toc li:nth-child(odd) { border-right: 1px solid var(--manual-border); }
+    .manual-toc a { height: 100%; padding: 10px 7px; }
+    .manual-tools { max-width: 340px; }
+    .manual-section { padding-bottom: 62px; }
+    .manual-section + .manual-section { padding-top: 58px; }
+    .manual-section::before { font-size: 72px; }
+    .manual-content p { font-size: 15.5px; line-height: 1.75; }
+    .code-block { margin-left: -20px; margin-right: -20px; }
+    .code-block pre { font-size: 12px; }
+  }
+  @media (max-width: 430px) {
+    .manual-toc ol { grid-template-columns: 1fr; }
+    .manual-toc li:nth-child(odd) { border-right: 0; }
+    .route-card { padding: 22px; }
+    .route-flow { grid-template-columns: 1fr; }
+    .route-line { width: 1px; height: 30px; justify-self: center; }
+    .route-line::after { right: -3px; top: auto; bottom: -1px; transform: rotate(135deg); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+  }
+  @media print {
+    body::before, body::after, .manual-header, .reading-progress, .manual-aside, footer { display: none !important; }
+    body { background: #fff; color: #000; }
+    .manual-hero { padding: 0 0 28px; }
+    .manual-hero-grid { display: block; }
+    .route-card { display: none; }
+    .manual-layout { display: block; padding: 30px 0 0; }
+    .manual-content { max-width: none; }
+    .manual-section { break-before: page; padding: 0; }
+    .manual-section:first-child { break-before: auto; }
+    .manual-section + .manual-section { border-top: 0; padding-top: 0; }
+    .manual-section::before { display: none; }
+    .code-block { break-inside: avoid; box-shadow: none; }
+    .table-scroll { overflow: visible; break-inside: avoid; }
+    .manual-content table { min-width: 0; }
+    a { color: #000 !important; }
+  }
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to manual</a>
+<div class="reading-progress" aria-hidden="true"><span id="readingProgress"></span></div>
+<div class="manual-shell">
+  <header class="manual-header">
+    <nav class="container" aria-label="Primary">
+      <a href="index.html" class="nav-brand">
+        <div class="nav-brand-mark"><span>S</span><span class="mark-d">D</span></div>
+        <span class="nav-brand-text">System by Dave</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="tools.html">Tools</a></li>
+        <li><a href="#manual-index">Manual index</a></li>
+        <li><a href="https://tailscale.com/docs" target="_blank" rel="noopener noreferrer">Tailscale docs ↗</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main id="main-content">
+    <section class="manual-hero" aria-labelledby="manual-title">
+      <div class="container">
+        <div class="manual-hero-grid">
+          <div>
+            <p class="manual-eyebrow">Solo operator field reference</p>
+            <h1 id="manual-title">Tailscale<span>Express working manual</span></h1>
+            <p class="manual-deck">A practical guide to running a personal tailnet across your own devices and servers—built for setup day, the first outage, and every small decision in between.</p>
+          </div>
+          <aside class="route-card" aria-label="Tailscale connection path">
+            <p class="route-label">Preferred path</p>
+            <div class="route-flow">
+              <div class="route-node">Device A</div>
+              <span class="route-line" aria-hidden="true"></span>
+              <div class="route-node">Device B</div>
+            </div>
+            <div class="route-priority" aria-label="Connection preference order">
+              <span>01 Direct</span><span>02 Peer relay</span><span>03 DERP</span>
+            </div>
+          </aside>
+        </div>
+        <dl class="manual-facts">
+          <div class="manual-fact"><dt>Scope</dt><dd>Solo operator / homelab. Personal tailnet, your own devices, servers you control.</dd></div>
+          <div class="manual-fact"><dt>Source basis</dt><dd>Tailscale documentation, fetched and checked in August 2026.</dd></div>
+          <div class="manual-fact"><dt>Outside scope</dt><dd>Organization management, PAM, AI governance, Kubernetes, and enterprise logging.</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <div class="container manual-layout">
+      <aside class="manual-aside" id="manual-index">
+        <nav class="manual-toc" aria-label="Manual sections">
+          <p class="manual-toc-label">Manual index · 12 sections</p>
+          <ol><li><a href="#the-mental-model"><span>01</span>The mental model</a></li><li><a href="#addresses"><span>02</span>Addresses</a></li><li><a href="#day-one"><span>03</span>Day one</a></li><li><a href="#the-cli-you-ll-actually-use"><span>04</span>The CLI you'll actually use</a></li><li><a href="#names-magicdns-tailnet-name-https"><span>05</span>Names: MagicDNS, tailnet name, HTTPS</a></li><li><a href="#reaching-things-subnet-routers-and-exit-nodes"><span>06</span>Reaching things: subnet routers and exit nodes</a></li><li><a href="#moving-files-and-sharing-services"><span>07</span>Moving files and sharing services</a></li><li><a href="#tailscale-ssh"><span>08</span>Tailscale SSH</a></li><li><a href="#servers-that-stay-up"><span>09</span>Servers that stay up</a></li><li><a href="#access-control"><span>10</span>Access control</a></li><li><a href="#troubleshooting"><span>11</span>Troubleshooting</a></li><li><a href="#homelab-setup-checklist"><span>12</span>Homelab setup checklist</a></li></ol>
+          <div class="manual-tools">
+            <button type="button" class="manual-action" id="printManual">Print</button>
+            <button type="button" class="manual-action" id="copyLink">Copy link</button>
+          </div>
+        </nav>
+      </aside>
+
+      <article class="manual-content" aria-label="Tailscale Express Working Manual">
+        <section class="manual-section" id="the-mental-model" data-section="01"><div class="section-kicker"><span>01</span><span>Working manual</span></div><h2>The mental model</h2><p>Tailscale is a <strong>private mesh network</strong> laid over the internet. Every device you sign in gets a stable private IP, and any two of your devices can talk directly regardless of NAT, firewalls, or which continent they're on. No port forwarding.</p><p>Four pieces, and the split between them is the thing worth understanding:</p><p><strong>Tailnet</strong> — your network. &quot;An interconnected collection of users, devices, and resources.&quot; Created the moment you first sign in. A personal tailnet is a shared-domain tailnet (a <code>gmail.com</code> login); an organization tailnet uses a custom domain.</p><p><strong>Control plane</strong> — the coordination server at <code>controlplane.tailscale.com</code>. It distributes public keys, assigns IPs, holds your access policy, tells devices about each other, and helps them find each other through NAT. <strong>It never carries your traffic.</strong></p><p><strong>Data plane</strong> — WireGuard tunnels running on each device. Encrypt, decrypt, forward. Private keys are generated locally and never leave the device.</p><p><strong>DERP</strong> — &quot;Designated Encrypted Relay for Packets.&quot; Globally distributed relays that do two jobs: help devices negotiate a connection, and relay encrypted packets when a direct path is impossible. Relayed traffic is still end-to-end encrypted; the relay forwards ciphertext it cannot read.</p><p>Connection preference order: <strong>direct → peer relay → DERP.</strong></p><h3 id="what-tailscale-can-and-cannot-see">What Tailscale can and cannot see</h3><p>Cannot: your traffic. &quot;Devices running Tailscale only exchange their public keys. Private keys never leave the device. All traffic is end-to-end encrypted, always.&quot;</p><p>Can (control plane metadata): device names, Tailscale IPs, client versions, OS, approximate geographic location, public keys, your DNS and policy config. From your identity provider it requests your email and name.</p><p>Linux clients also send connectivity logs by default. Kill them with <code>TS_NO_LOGS_NO_SUPPORT=true</code> in <code>/etc/default/tailscaled</code> — but the docs warn this &quot;may prevent Tailscale from providing technical support.&quot;</p><h3 id="if-the-coordination-server-goes-down">If the coordination server goes down</h3><p>Existing connections keep working — keys are cached locally, firewall rules are enforced on-device. What breaks: adding devices, key refresh, policy updates, revocation. Over time devices lose access to each other as keys expire.</p></section><section class="manual-section" id="addresses" data-section="02"><div class="section-kicker"><span>02</span><span>Working manual</span></div><h2>Addresses</h2><p><strong>IPv4:</strong> <code>100.64.0.0/10</code> (RFC 6598 CGNAT range) — <code>100.64.0.0</code> through <code>100.127.255.255</code>. <strong>IPv6:</strong> <code>fd7a:115c:a1e0::/48</code>.</p><p>Addresses are auto-assigned and <strong>stable for the life of the registration</strong>: &quot;A node's IP address will not change for as long as the node remains registered unless an Admin changes it.&quot; Re-registration — removing the device from the Machines page, reinstalling, or losing the node key — gets you a new one.</p><p>Reserved — never assign these:</p><div class="table-scroll" role="region" aria-label="Scrollable reference table" tabindex="0"><table><thead><tr><th scope="col">Address</th><th scope="col">Purpose</th></tr></thead><tbody><tr><td><code>100.100.100.100</code></td><td><strong>Quad100</strong> — device-local. DNS resolver on port 53, device management UI on port 80</td></tr><tr><td><code>fd7a:115c:a1e0::53</code></td><td>IPv6 Quad100</td></tr><tr><td><code>100.100.0.0/24</code>, <code>100.100.100.0/24</code>, <code>100.115.92.0/23</code></td><td>Tailscale internal</td></tr><tr><td><code>100.101.102.103</code></td><td>The <code>tshello</code> example service</td></tr></tbody></table></div><p>Find yours: <code>tailscale ip</code> (all), <code>tailscale ip -4</code> (IPv4 only).</p><p><strong>The CGNAT collision you will eventually hit:</strong> some ISPs also use <code>100.64.0.0/10</code>, and so do some other VPNs. iOS and Android enforce one VPN at a time. If you must run two VPNs on desktop, either use Tailscale's userspace networking mode or add <code>100.64.0.0/10</code> and <code>fd7a:115c:a1e0::/48</code> to the other VPN's split-tunnel config. That workaround does not work with exit nodes — exit nodes support one VPN at a time, full stop.</p></section><section class="manual-section" id="day-one" data-section="03"><div class="section-kicker"><span>03</span><span>Working manual</span></div><h2>Day one</h2><h3 id="install">Install</h3><p><strong>Linux</strong></p><div class="code-block"><div class="code-head"><span>bash</span><button type="button" class="copy-code" data-copy-target="code-1" aria-label="Copy bash code">Copy</button></div><pre id="code-1"><code>curl -fsSL https://tailscale.com/install.sh | sh
+sudo tailscale up</code></pre></div><p>Prints a URL. Open it, authenticate, done. Needs the <code>tun</code> kernel module (<code>sudo modprobe tun</code>; persist in <code>/etc/modules-load.d/tun.conf</code>).</p><p><strong>macOS</strong> — Monterey 12.0+. Standalone build from <code>pkgs.tailscale.com/stable/#macos</code> is the recommended variant. Install the VPN configuration when prompted, sign in with your IdP. Note that <strong>neither</strong> the App Store nor the Standalone build can act as a Tailscale SSH <em>server</em> — only the open-source <code>tailscaled</code> variant can. The App Store build also lacks the <code>tailscale ssh</code> subcommand (use plain <code>ssh</code>).</p><p><strong>Windows</strong> — Windows 10+ / Server 2016+. One <code>.exe</code> from <code>tailscale.com/download/windows</code> handles both 32- and 64-bit. Tray icon → Log in.</p><p><strong>iOS</strong> — 15.0+. App Store. Allow the VPN config <em>and</em> push notifications; notifications are how you learn a key is about to expire.</p><p><strong>Android</strong> — 8.0+. Play Store. For Android TV without a keyboard: admin console → Machines → Add device → Client device → Android → Input code tab.</p><p><strong>Static binaries</strong> (odd architectures, no package manager):</p><div class="code-block"><div class="code-head"><span>shell</span><button type="button" class="copy-code" data-copy-target="code-2" aria-label="Copy shell code">Copy</button></div><pre id="code-2"><code>tar xvf tailscale_&lt;version&gt;_&lt;architecture&gt;.tgz
+sudo tailscaled --state=tailscaled.state
+sudo tailscale up</code></pre></div><h3 id="sign-in">Sign-in</h3><p>There are no Tailscale passwords. You authenticate through an identity provider: <strong>Apple, Google, GitHub, Microsoft, Okta, OneLogin</strong>, a custom OIDC provider, or a passkey for a tailnet you're already authorized to join.</p><p>Pick carefully. <strong>You cannot migrate a tailnet to or from GitHub or Apple as the IdP.</strong></p><h3 id="free-plan">Free plan</h3><p>Signing up with a public-domain email (<code>@gmail.com</code>) puts you on <strong>Personal</strong>: 6 free users, 50 tagged resources, 3 ACL groups. A custom domain starts a 14-day trial of the paid tier instead. The docs don't state a device-count cap anywhere; the pricing page says user devices are unlimited. Treat that as lower confidence than a docs claim.</p><h3 id="firewall">Firewall</h3><p>Usually nothing to do. If you want to improve your odds of direct connections, allow outbound: TCP to <code>*:443</code>, UDP from source port <code>41641</code> to anywhere, UDP to <code>*:3478</code> (STUN). To accept inbound peer connections: <code>sudo ufw allow 41641/udp</code>.</p></section><section class="manual-section" id="the-cli-you-ll-actually-use" data-section="04"><div class="section-kicker"><span>04</span><span>Working manual</span></div><h2>The CLI you'll actually use</h2><h3 id="the-flag-persistence-trap">The flag-persistence trap</h3><p><strong><code>tailscale up</code> does not remember flags.</strong> &quot;Flags are not persisted between runs; you must specify all flags each time.&quot; Run <code>tailscale up --ssh</code> today and plain <code>tailscale up</code> tomorrow, and SSH is off.</p><p><code>tailscale set</code> is the modern, incremental alternative — it changes only what you name and leaves everything else alone. <strong>Use <code>set</code> for configuration; use <code>up</code> for connecting and authenticating.</strong> Current docs have migrated most feature examples from <code>up</code> to <code>set</code>.</p><p>To clear a flag, pass it empty: <code>tailscale set --exit-node=</code>.</p><h3 id="reference">Reference</h3><div class="table-scroll" role="region" aria-label="Scrollable reference table" tabindex="0"><table><thead><tr><th scope="col">Command</th><th scope="col">Does</th><th scope="col">Flags worth knowing</th></tr></thead><tbody><tr><td><code>tailscale up</code></td><td>Connect + authenticate</td><td><code>--auth-key=</code>, <code>--force-reauth</code>, <code>--accept-routes</code>, <code>--ssh</code>, <code>--shields-up</code>, <code>--advertise-routes=</code>, <code>--advertise-exit-node</code>, <code>--timeout=</code>, <code>--accept-risk=lose-ssh|all</code></td></tr><tr><td><code>tailscale down</code></td><td>Disconnect (stays logged in)</td><td><code>--reason=&quot;...&quot;</code>, <code>--accept-risk=</code></td></tr><tr><td><code>tailscale set</code></td><td>Change one setting, persistently</td><td><code>--ssh</code>, <code>--exit-node=</code>, <code>--advertise-routes=</code>, <code>--advertise-exit-node</code>, <code>--accept-routes</code>, <code>--accept-dns</code>, <code>--hostname=</code>, <code>--operator=</code>, <code>--shields-up</code>, <code>--auto-update</code>, <code>--webclient</code> (port 5252)</td></tr><tr><td><code>tailscale status</code></td><td>Who's up, direct vs relayed</td><td><code>--json</code>, <code>--active</code>, <code>--peers</code>, <code>--web</code></td></tr><tr><td><code>tailscale ip</code></td><td>This device's addresses</td><td><code>-4</code>, <code>-6</code>, <code>--1</code></td></tr><tr><td><code>tailscale ping &lt;host&gt;</code></td><td>Tailscale-aware ping w/ path detail</td><td><code>--until-direct</code>, <code>--tsmp</code>, <code>--icmp</code>, <code>--peerapi</code>, <code>--c</code>, <code>--timeout=</code></td></tr><tr><td><code>tailscale netcheck</code></td><td>Physical network diagnosis</td><td><code>--every=</code>, <code>--format=json</code>, <code>--verbose</code></td></tr><tr><td><code>tailscale file cp/get</code></td><td>Taildrop</td><td>see §7</td></tr><tr><td><code>tailscale serve</code></td><td>Expose a local service to the tailnet</td><td>see §7</td></tr><tr><td><code>tailscale funnel</code></td><td>Expose a local service to the internet</td><td>see §7</td></tr><tr><td><code>tailscale cert &lt;fqdn&gt;</code></td><td>Get a Let's Encrypt cert</td><td><code>--cert-file=</code>, <code>--key-file=</code>, <code>--min-validity=</code>, <code>--serve-demo</code></td></tr><tr><td><code>tailscale ssh &lt;user@host&gt;</code></td><td>SSH over the tailnet</td><td>—</td></tr><tr><td><code>tailscale exit-node list</code></td><td>Available exit nodes</td><td><code>--filter=&lt;country&gt;</code></td></tr><tr><td><code>tailscale logout</code></td><td>Disconnect + expire the login</td><td>Removes an ephemeral node immediately</td></tr><tr><td><code>tailscale switch</code></td><td>Multiple accounts</td><td><code>--list</code></td></tr><tr><td><code>tailscale bugreport</code></td><td>Support identifier</td><td><code>--diagnose</code>, <code>--record</code></td></tr><tr><td><code>tailscale whois &lt;ip[:port]&gt;</code></td><td>Identity, tags, capabilities of a peer</td><td><code>--json</code> (must precede the IP)</td></tr><tr><td><code>tailscale lock</code></td><td>Tailnet Lock</td><td><code>init</code>, <code>status</code>, <code>add</code>, <code>remove</code>, <code>sign</code></td></tr></tbody></table></div><p><strong>CLI location by platform.</strong> Linux: in <code>$PATH</code>. macOS standalone: Settings → CLI integration → Show me how → Install Now (needs Ventura 13.0+; installs to <code>/usr/local/bin/tailscale</code>). macOS App Store build: <code>/Applications/Tailscale.app/Contents/MacOS/Tailscale &lt;command&gt;</code>. Windows: run the <code>.exe</code> from Command Prompt. iOS and Android: no CLI at all.</p></section><section class="manual-section" id="names-magicdns-tailnet-name-https" data-section="05"><div class="section-kicker"><span>05</span><span>Working manual</span></div><h2>Names: MagicDNS, tailnet name, HTTPS</h2><h3 id="magicdns">MagicDNS</h3><p>Automatic DNS for every device. <code>ssh me@monitoring</code> instead of <code>ssh me@100.87.12.4</code>. Enabled by default on tailnets created on or after 20 October 2022; otherwise there's an <strong>Enable MagicDNS</strong> button at <code>login.tailscale.com/admin/dns</code>. No nameserver required on v1.20+.</p><p>FQDN is <code>&lt;machine-name&gt;.&lt;tailnet-dns-name&gt;</code> — e.g. <code>monitoring.yak-bebop.ts.net</code>. Tailscale adds search domains, so <code>ping monitoring</code> and <code>ping monitoring.yak-bebop.ts.net</code> are equivalent.</p><p>Two exceptions:</p><ul><li><strong>Devices shared to you from another tailnet must use the full FQDN.</strong> Bare hostname won't resolve.</li><li><strong>On macOS, <code>host</code> and <code>nslookup</code> bypass system DNS and will not see MagicDNS.</strong> Use <code>dscacheutil -q host -a name my-server</code> — <code>name</code> there is a literal keyword, not a placeholder. On Windows use <code>Resolve-DnsName</code>, not <code>nslookup</code> (it ignores NRPT rules). On Linux <code>nslookup</code> is fine.</li></ul><p>You cannot add arbitrary records to MagicDNS. Open issue, no workaround.</p><p>Turn it off per-device: <code>tailscale set --accept-dns=false</code> (Linux); macOS menu bar → Preferences → uncheck <strong>Use Tailscale DNS settings</strong>; Windows SHIFT + right-click the tray icon → deselect <strong>Use Tailscale DNS</strong>.</p><h3 id="tailnet-name">Tailnet name</h3><p>New tailnets get <code>tail&lt;hex&gt;.ts.net</code>. You can rename — but only to another Tailscale-generated random name like <code>cat-crocodile.ts.net</code>, never an arbitrary string. Admin console → DNS → Rename tailnet.</p><p class="warning-callout"><strong>Warning:</strong> once you use a randomized name for HTTPS certificates you cannot re-roll it. You can only toggle between that name and the default. Renaming breaks existing MagicDNS links, HTTPS URLs, and shares.</p><h3 id="https-certificates">HTTPS certificates</h3><ol class="manual-checklist"><li><span>Admin console → DNS → enable MagicDNS → <strong>HTTPS Certificates</strong> → Enable HTTPS.</span></li><li><span>On each machine: <code>tailscale cert &lt;machine&gt;.&lt;tailnet&gt;.ts.net</code></span></li></ol><p>Certs come from Let's Encrypt via DNS-01; Tailscale creates the TXT record. Your cert key and ACME account key are generated and stored locally — Tailscale never sees them.</p><p class="warning-callout">Three things that bite:</p><ul><li><strong>Machine names get published to public Certificate Transparency logs.</strong> Don't enable this if any hostname is sensitive. Only machines where you actually run <code>tailscale cert</code> get published.</li><li><strong>You renew it yourself.</strong> 90-day expiry. <code>tailscaled</code> doesn't know where you installed the file, so nothing auto-renews unless the consumer is integrated (Caddy, Serve).</li><li><strong>No bare-hostname HTTPS.</strong> <code>https://monitoring</code> will never work. <code>https://monitoring.yak-bebop.ts.net</code> and <code>http://monitoring</code> do.</li></ul><p>Re-requesting too often hits Let's Encrypt rate limits: &quot;you may find yourself waiting 34 hours until you can try again.&quot;</p></section><section class="manual-section" id="reaching-things-subnet-routers-and-exit-nodes" data-section="06"><div class="section-kicker"><span>06</span><span>Working manual</span></div><h2>Reaching things: subnet routers and exit nodes</h2><p>Two different jobs, constantly confused.</p><p><strong>Subnet router</strong> = reach <em>specific</em> networks that can't run Tailscale (printers, IoT, a NAS, a whole VPC). <strong>Exit node</strong> = route <em>all</em> internet traffic through a device. The traditional-VPN behavior.</p><h3 id="subnet-router">Subnet router</h3><p>On the router device:</p><div class="code-block"><div class="code-head"><span>shell</span><button type="button" class="copy-code" data-copy-target="code-3" aria-label="Copy shell code">Copy</button></div><pre id="code-3"><code>sudo tailscale set --advertise-routes=192.0.2.0/24,198.51.100.0/24</code></pre></div><p>Windows PowerShell drops the <code>sudo</code>. macOS without the CLI on <code>$PATH</code>: <code>/Applications/Tailscale.app/Contents/MacOS/Tailscale set --advertise-routes=...</code>.</p><p>Comma-separated list. All platforms except Apple TV support IPv6 subnets. Don't advertise <code>0.0.0.0/0</code> here — that's what exit nodes are for.</p><p><strong>Enable IP forwarding (Linux) — required, and easy to forget:</strong></p><div class="code-block"><div class="code-head"><span>shell</span><button type="button" class="copy-code" data-copy-target="code-4" aria-label="Copy shell code">Copy</button></div><pre id="code-4"><code>echo 'net.ipv4.ip_forward = 1' | sudo tee -a /etc/sysctl.d/99-tailscale.conf
+echo 'net.ipv6.conf.all.forwarding = 1' | sudo tee -a /etc/sysctl.d/99-tailscale.conf
+sudo sysctl -p /etc/sysctl.d/99-tailscale.conf</code></pre></div><p>If <code>/etc/sysctl.d</code> doesn't exist, write to <code>/etc/sysctl.conf</code> and <code>sysctl -p</code> that instead. On <code>firewalld</code> systems also run <code>firewall-cmd --permanent --add-masquerade</code>.</p><p><strong>Approve the routes.</strong> Admin console → Machines → filter <code>property:subnet</code> → select the device → Subnets → Edit → check the routes → Save. Nothing works until you do this. Automate it with <code>autoApprovers</code> (§9).</p><p><strong>Client side.</strong> Android, iOS, macOS, tvOS and Windows pick up approved routes automatically. <strong>Linux does not</strong> — Linux clients only learn Tailscale IPs by default:</p><div class="code-block"><div class="code-head"><span>shell</span><button type="button" class="copy-code" data-copy-target="code-5" aria-label="Copy shell code">Copy</button></div><pre id="code-5"><code>sudo tailscale set --accept-routes</code></pre></div><p><strong>SNAT.</strong> On by default: traffic from behind the router appears to come <em>from</em> the router. Disable with <code>tailscale up --snat-subnet-routes=false</code> (Linux only) to preserve source IPs — but then you need a return route to <code>100.64.0.0/10</code> pointing at the router's LAN IP, configured on each destination device or in DHCP/VPC settings. Known bug: <code>--snat-subnet-routes=false</code> on a node that is both subnet router <em>and</em> exit node causes upstream drops. Split the roles.</p><p><strong>Overlapping routes use longest-prefix match, with no failover.</strong> If router A advertises <code>10.0.0.0/16</code> and router B advertises <code>10.0.0.0/24</code>, traffic to <code>10.0.0.1</code> goes via B — and if B goes offline, Tailscale <strong>drops</strong> that traffic rather than falling back to A. For redundancy, have A advertise both prefixes.</p><p><strong>Route approval and access control are separate mechanisms.</strong> Approval injects the route into routing tables; grants decide whether the packets are permitted. You need both.</p><p>Devices behind a subnet router don't count toward your plan's device limit.</p><h3 id="exit-node">Exit node</h3><p>On the node:</p><div class="code-block"><div class="code-head"><span>shell</span><button type="button" class="copy-code" data-copy-target="code-6" aria-label="Copy shell code">Copy</button></div><pre id="code-6"><code>sudo tailscale set --advertise-exit-node
+sudo tailscale up</code></pre></div><p>The second command is required after <code>set</code> for this flag specifically. Linux exit nodes need the same IP forwarding sysctls as above.</p><p>Approve it: Machines → filter <code>property:exit-node</code> → Edit route settings → <strong>Use as exit node</strong>.</p><p>On the client:</p><div class="code-block"><div class="code-head"><span>shell</span><button type="button" class="copy-code" data-copy-target="code-7" aria-label="Copy shell code">Copy</button></div><pre id="code-7"><code>sudo tailscale set --exit-node=&lt;exit-node-ip&gt;
+sudo tailscale set --exit-node=&lt;exit-node-ip&gt; --exit-node-allow-lan-access=true
+sudo tailscale set --exit-node=                # stop</code></pre></div><p>The CLI reference documents the flag as <code>--exit-node=&lt;ip|name&gt;</code> and also accepts <code>--exit-node=auto:any</code>, though the exit-node feature page only ever demonstrates the IP form. Get the IP from <code>tailscale status</code> or <code>tailscale exit-node list</code>. GUI clients have an Exit Node menu (macOS menu bar, Windows tray, in-app on mobile) with an &quot;Allow local network access&quot; toggle; the menu only appears when an exit node exists in the tailnet.</p><p><strong>By default, using an exit node cuts off your own LAN</strong> — no local printer, no NAS by LAN IP. That's what <code>--exit-node-allow-lan-access</code> restores.</p><p><strong>Exit nodes hijack DNS.</strong> &quot;By default, when you configure a device to use an exit node, the device also uses the exit node as a DNS resolver for all domains, regardless of configuration of global and restricted (split DNS) nameservers.&quot; Override per-nameserver: DNS page → ⋯ next to the nameserver → Edit nameserver → <strong>Use with exit node</strong>.</p><p class="warning-callout"><strong>The ACL mistake everyone makes:</strong> on a default policy, exit nodes just work. Once you write your own policy, the destination must be <code>autogroup:internet</code>. Naming the exit node device as <code>dst</code> only permits connections <em>to</em> that device (SSH etc.) — it does not permit using it as a gateway.</p><p><strong>Platform caveats:</strong> requires v1.20+ on both ends. Android, macOS and Windows exit nodes use userspace routing — Android is slow and eats battery, macOS and Windows must be prevented from sleeping. Windows exit nodes spend a system thread per in-flight DNS query, which degrades under load.</p></section><section class="manual-section" id="moving-files-and-sharing-services" data-section="07"><div class="section-kicker"><span>07</span><span>Working manual</span></div><h2>Moving files and sharing services</h2><h3 id="taildrop">Taildrop</h3><p><strong>Send:</strong> macOS right-click → Share → Tailscale. Windows right-click → &quot;Send with Tailscale...&quot;. iOS/Android Share sheet → Tailscale. Linux:</p><div class="code-block"><div class="code-head"><span>shell</span><button type="button" class="copy-code" data-copy-target="code-8" aria-label="Copy shell code">Copy</button></div><pre id="code-8"><code>tailscale file cp ./my-file.txt my-phone:</code></pre></div><p>Note the <strong>trailing colon</strong> on the target.</p><p><strong>Receive:</strong> macOS <code>~/Downloads</code>, Windows <code>C:\Users\&lt;username&gt;\Downloads</code>, mobile via notification. Linux has no automatic drop directory — files sit in an inbox until you pull them:</p><div class="code-block"><div class="code-head"><span>shell</span><button type="button" class="copy-code" data-copy-target="code-9" aria-label="Copy shell code">Copy</button></div><pre id="code-9"><code>sudo tailscale file get .</code></pre></div><p><code>sudo</code> because <code>tailscaled</code> runs as root and root receives the files. Useful flags: <code>--wait</code>, <code>--loop</code>, <code>--conflict=skip|overwrite|rename</code>.</p><p><strong>Limits:</strong> your own devices only — you cannot Taildrop to another user's device. Same tailnet. <strong>Tagged nodes cannot send or receive Taildrop at all</strong> (this catches people who tag their homelab server). ACLs do not block Taildrop between your own devices.</p><h3 id="sharing-a-device-with-someone-else">Sharing a device with someone else</h3><p>Machines → device menu → Share → by email or invite link. Reusable links work up to 1,000 times; unused links expire in 30 days.</p><p>The recipient reaches <strong>only that device</strong>, by full FQDN, and only if they're an Owner/Admin/IT admin of their own tailnet. Shared machines are <strong>quarantined</strong>: they can answer incoming connections but cannot initiate any. They don't advertise subnets, and all tag information is stripped.</p><p>Bonus: each unique user who accepts a share raises the device limit on both accounts by two.</p><h3 id="serve-expose-a-local-service-to-your-tailnet">Serve — expose a local service to your tailnet</h3><div class="code-block"><div class="code-head"><span>shell</span><button type="button" class="copy-code" data-copy-target="code-10" aria-label="Copy shell code">Copy</button></div><pre id="code-10"><code>tailscale serve --bg 3000                    # proxy localhost:3000, persist in background
+tailscale serve --bg --set-path=/blog 3000   # mount at a path
+tailscale serve /home/alice/blog/index.html  # serve a file
+sudo tailscale serve /tmp/public             # serve a directory
+tailscale serve text:&quot;Hello, world!&quot;
+tailscale serve https+insecure://localhost:8443   # backend has a self-signed cert
+tailscale serve --tcp=2222 tcp://localhost:22     # raw TCP forward
+tailscale serve status
+tailscale serve reset</code></pre></div><p>Published at <code>https://&lt;device&gt;.&lt;tailnet&gt;.ts.net</code> with a real cert. Requires MagicDNS + HTTPS enabled (the CLI offers to enable it). Tailnet-only, and normal grants apply.</p><h3 id="funnel-expose-it-to-the-public-internet">Funnel — expose it to the public internet</h3><div class="code-block"><div class="code-head"><span>shell</span><button type="button" class="copy-code" data-copy-target="code-11" aria-label="Copy shell code">Copy</button></div><pre id="code-11"><code>tailscale funnel --bg 3000
+tailscale funnel status
+tailscale funnel reset</code></pre></div><p class="warning-callout"><strong>This is public. Anyone on the internet can reach it.</strong></p><p>Requirements and limits:</p><ul><li>Only ports <strong>443, 8443, 10000</strong>.</li><li>Requires HTTPS certs enabled for the tailnet.</li><li>TLS only. Funnel relays don't decrypt your traffic.</li><li>Non-configurable bandwidth limits.</li><li>Public DNS can take up to 10 minutes to propagate.</li><li>A port can't be Serve and Funnel simultaneously — last command wins.</li><li><code>--bg</code> makes it survive a reboot. Without it you re-run manually after every restart.</li></ul><p>Needs this in the policy file (the CLI adds it for you when you enable Funnel interactively):</p><div class="code-block"><div class="code-head"><span>json</span><button type="button" class="copy-code" data-copy-target="code-12" aria-label="Copy json code">Copy</button></div><pre id="code-12"><code>&quot;nodeAttrs&quot;: [
+  {
+    &quot;target&quot;: [&quot;autogroup:member&quot;],
+    &quot;attr&quot;:   [&quot;funnel&quot;],
+  },
+],</code></pre></div></section><section class="manual-section" id="tailscale-ssh" data-section="08"><div class="section-kicker"><span>08</span><span>Working manual</span></div><h2>Tailscale SSH</h2><p>Replaces SSH key management. Authentication uses the WireGuard keys that already exist, governed by your policy file. No <code>authorized_keys</code>, no key distribution.</p><p>Server side (Linux and macOS open-source build only, v1.24+):</p><div class="code-block"><div class="code-head"><span>shell</span><button type="button" class="copy-code" data-copy-target="code-13" aria-label="Copy shell code">Copy</button></div><pre id="code-13"><code>tailscale set --ssh
+tailscale set --ssh=false</code></pre></div><p>Client side: <code>ssh device</code>, <code>ssh ubuntu@device</code>, or <code>tailscale ssh user@host</code>, from any platform with a shell. (The macOS App Store build has no <code>tailscale ssh</code> subcommand — use plain <code>ssh</code> there.)</p><p>You need <strong>two things</strong> in the policy file: an access rule permitting port 22, and an <code>ssh</code> rule. Minimal working policy:</p><div class="code-block"><div class="code-head"><span>json</span><button type="button" class="copy-code" data-copy-target="code-14" aria-label="Copy json code">Copy</button></div><pre id="code-14"><code>{
+  &quot;grants&quot;: [
+    {
+      &quot;src&quot;: [&quot;group:sre&quot;],
+      &quot;dst&quot;: [&quot;tag:prod&quot;],
+      &quot;ip&quot;:  [&quot;*&quot;]
+    }
+  ],
+  &quot;groups&quot;: {
+    &quot;group:sre&quot;: [&quot;alice@example.com&quot;, &quot;bob@example.com&quot;]
+  },
+  &quot;ssh&quot;: [
+    {
+      &quot;action&quot;: &quot;accept&quot;,
+      &quot;dst&quot;:    [&quot;tag:prod&quot;],
+      &quot;src&quot;:    [&quot;group:sre&quot;],
+      &quot;users&quot;:  [&quot;ubuntu&quot;, &quot;root&quot;]
+    }
+  ],
+  &quot;tagOwners&quot;: {
+    &quot;tag:prod&quot;: [&quot;group:sre&quot;]
+  }
+}</code></pre></div><p><code>action</code> is <code>accept</code> (allow) or <code>check</code> (require browser re-auth first). <code>checkPeriod</code> sets the re-auth window: minimum 1 minute, maximum 168 hours, <strong>default 12 hours</strong>, or <code>&quot;always&quot;</code>. Check rules are evaluated before accept rules and the more restrictive wins.</p><p><code>users</code> accepts literal usernames plus <code>autogroup:nonroot</code> (anything but root).</p><p><strong>Caveats:</strong></p><ul><li>Port 22 only. Custom SSH ports are not supported.</li><li>Restarting <code>tailscaled</code> — including an upgrade — kills every live session.</li><li>Not available on Synology or QNAP.</li><li>A <strong>tagged device cannot SSH into a user-owned device.</strong> By design.</li><li>Removing it tailnet-wide means disabling <code>--ssh</code> on every host <em>and</em> deleting the <code>ssh</code> rules.</li></ul><p><strong>Security footgun from the default policy:</strong> the shipped <code>ssh</code> rule uses <code>&quot;dst&quot;: [&quot;autogroup:self&quot;]</code> with <code>&quot;users&quot;: [&quot;autogroup:nonroot&quot;, &quot;root&quot;]</code>. If you widen that <code>dst</code> to a tag without also narrowing <code>users</code>, everyone matching <code>src</code> can log in as any non-root user on those machines.</p></section><section class="manual-section" id="servers-that-stay-up" data-section="09"><div class="section-kicker"><span>09</span><span>Working manual</span></div><h2>Servers that stay up</h2><p>Four mechanisms, and they interlock.</p><h3 id="key-expiry-the-1-cause-of-quot-my-homelab-vanished-quot">Key expiry — the #1 cause of &quot;my homelab vanished&quot;</h3><p>Node keys expire after <strong>180 days by default</strong> (the docs also phrase this as &quot;6 months&quot;). When a key expires, all connections to and from that device stop. Configurable to 1–180 days at Device management → Key Expiry — but a change only applies to devices logged in <em>after</em> the change.</p><p>Fix an expired device you can reach:</p><div class="code-block"><div class="code-head"><span>shell</span><button type="button" class="copy-code" data-copy-target="code-15" aria-label="Copy shell code">Copy</button></div><pre id="code-15"><code>sudo tailscale up --force-reauth</code></pre></div><p class="warning-callout"><strong>Do not run that over SSH or RDP without another way in</strong> — it can drop the connection you're using.</p><p>Fix one you can't reach: Machines → device ⋯ menu → <strong>Temporarily extend key</strong>. Buys you 30 minutes.</p><p>Prevent it entirely: Machines → device ⋯ menu → <strong>Disable Key Expiry</strong>. Available on all plans, and the documented recommendation for &quot;trusted servers, subnet routers, or remote IoT devices that are hard to reach.&quot; Do this on every headless box the day you set it up. The tradeoff is real: a compromised key stays valid until you delete the device.</p><h3 id="tags">Tags</h3><p>Tagging a device changes its identity from <em>you</em> to <em>the tag</em>. Tags and user ownership are mutually exclusive: &quot;Applying a tag to a device previously authenticated with a user account removes the user account. Similarly, authenticating a device with a user account removes all tags.&quot;</p><p>The homelab payoff: <strong>a device tagged for the first time and authenticated has key expiry disabled by default.</strong></p><p>Define the tag first — there is no <code>tags</code> section, only <code>tagOwners</code>:</p><div class="code-block"><div class="code-head"><span>json</span><button type="button" class="copy-code" data-copy-target="code-16" aria-label="Copy json code">Copy</button></div><pre id="code-16"><code>{
+  &quot;tagOwners&quot;: {
+    &quot;tag:server&quot;: [&quot;dave@example.com&quot;],
+    &quot;tag:infrastructure&quot;: [],
+  }
+}</code></pre></div><p>An empty list means only Owners, Admins and Network admins can assign it.</p><p>Then apply it:</p><div class="code-block"><div class="code-head"><span>shell</span><button type="button" class="copy-code" data-copy-target="code-17" aria-label="Copy shell code">Copy</button></div><pre id="code-17"><code>sudo tailscale login --advertise-tags=tag:server
+sudo tailscale login --advertise-tags=tag:server,tag:development
+sudo tailscale up --advertise-tags=tag:server --force-reauth</code></pre></div><p>A device's identity is the <strong>union</strong> of its tags, not the intersection — you can't write a rule requiring both <code>tag:prod</code> and <code>tag:database</code>. Use a composite <code>tag:prod-database</code>. You cannot remove the last tag from a tagged device, and you can't remove tags via <code>--advertise-tags</code> on a device that joined with an auth key (generate a new key instead). CLI tagging works on Linux, macOS and Windows only. All plans include 50 tagged devices.</p><p><strong>Two tag side effects to plan around:</strong> tagged devices can't use Taildrop, and tagged devices can't SSH into user-owned devices.</p><h3 id="auth-keys">Auth keys</h3><p>Register a device without a browser:</p><div class="code-block"><div class="code-head"><span>shell</span><button type="button" class="copy-code" data-copy-target="code-18" aria-label="Copy shell code">Copy</button></div><pre id="code-18"><code>sudo tailscale up --auth-key=tskey-abcdef1432341818</code></pre></div><p>Note the hyphen: the documented spelling is <code>--auth-key</code>. Keys are case-sensitive. Generate at <code>login.tailscale.com/admin/settings/keys</code>.</p><p>Options: <strong>one-off</strong> (single use) or <strong>reusable</strong>; plus <strong>ephemeral</strong> (device auto-removes when it goes offline), <strong>pre-approved</strong> (skips device approval), and <strong>tags</strong>. Expiry is 1–90 days, defaulting to the 90-day maximum. No renewal — generate a new one.</p><p>Reusable keys are dangerous if stolen; the docs push you toward a key vault. And note: <strong>revoking a key does not deauthorize devices that already used it.</strong> Delete the device from the Machines page for that.</p><p>Auth key expiry and node key expiry are independent. A device registered by a now-expired auth key keeps working until its own node key expires.</p><h3 id="running-unattended">Running unattended</h3><p><strong>Linux:</strong> nothing to do. &quot;Tailscale runs as the system, and is available even when no users are logged in.&quot;</p><p><strong>Windows:</strong> by default Tailscale runs as the logged-in user, so it disconnects at logout and on reboot. Fix it — tray icon → Preferences → <strong>Run unattended</strong>, or:</p><div class="code-block"><div class="code-head"><span>powershell</span><button type="button" class="copy-code" data-copy-target="code-19" aria-label="Copy powershell code">Copy</button></div><pre id="code-19"><code>tailscale up --unattended=true</code></pre></div><p><strong>macOS:</strong> not supported. There is no run-as-system mode. Tracked at github.com/tailscale/tailscale/issues/987. If you need an always-on macOS node, expect to keep a user logged in.</p></section><section class="manual-section" id="access-control" data-section="10"><div class="section-kicker"><span>10</span><span>Working manual</span></div><h2>Access control</h2><p>New tailnets ship <strong>allow-all</strong>. Everything reaches everything. For a single-person homelab that's often the correct answer — the risk is a device compromise, not a colleague.</p><p>The default, verbatim:</p><div class="code-block"><div class="code-head"><span>json</span><button type="button" class="copy-code" data-copy-target="code-20" aria-label="Copy json code">Copy</button></div><pre id="code-20"><code>{
+  &quot;acls&quot;: [
+    {
+      &quot;action&quot;: &quot;accept&quot;,
+      &quot;src&quot;: [&quot;*&quot;],
+      &quot;dst&quot;: [&quot;*:*&quot;]
+    }
+  ],
+  &quot;ssh&quot;: [
+    {
+      &quot;action&quot;: &quot;check&quot;,
+      &quot;src&quot;: [&quot;autogroup:member&quot;],
+      &quot;dst&quot;: [&quot;autogroup:self&quot;],
+      &quot;users&quot;: [&quot;autogroup:nonroot&quot;, &quot;root&quot;]
+    }
+  ],
+}</code></pre></div><p class="warning-callout"><strong>The trap:</strong> omitting the <code>acls</code> field is <em>not</em> deny-all. An empty or missing <code>acls</code> silently reapplies the default allow-all. Deny-all is an explicit empty array: <code>{&quot;acls&quot;: []}</code>.</p><p>The file is HuJSON — trailing commas and <code>//</code> comments are legal.</p><p><strong><code>grants</code> is now the recommended form over <code>acls</code>.</strong> &quot;Grants are the recommended method and offer more functionality. However, ACLs will always be supported.&quot; Grants have no <code>action</code> field; Tailscale is deny-by-default so a grant implies accept.</p><div class="code-block"><div class="code-head"><span>json</span><button type="button" class="copy-code" data-copy-target="code-21" aria-label="Copy json code">Copy</button></div><pre id="code-21"><code>{
+  &quot;grants&quot;: [
+    {
+      &quot;src&quot;: [&quot;group:home&quot;],
+      &quot;dst&quot;: [&quot;tag:server&quot;],
+      &quot;ip&quot;:  [&quot;tcp:22&quot;, &quot;tcp:443&quot;, &quot;1000-2000&quot;]
+    }
+  ]
+}</code></pre></div><p>Sections you'll actually touch:</p><div class="table-scroll" role="region" aria-label="Scrollable reference table" tabindex="0"><table><thead><tr><th scope="col">Key</th><th scope="col">For</th></tr></thead><tbody><tr><td><code>grants</code></td><td>Access rules (preferred)</td></tr><tr><td><code>acls</code></td><td>Access rules (legacy, still supported)</td></tr><tr><td><code>ssh</code></td><td>Who can Tailscale-SSH where, as which user</td></tr><tr><td><code>tagOwners</code></td><td>Define tags and who may assign them</td></tr><tr><td><code>groups</code></td><td>Named user groups (must be <code>group:</code>-prefixed; groups can't nest)</td></tr><tr><td><code>hosts</code></td><td>Named aliases for IPs and CIDRs</td></tr><tr><td><code>nodeAttrs</code></td><td>Per-device attributes — <code>funnel</code>, <code>nextdns:&lt;id&gt;</code>, <code>randomize-client-port</code></td></tr><tr><td><code>autoApprovers</code></td><td>Skip manual route/exit-node approval</td></tr><tr><td><code>tests</code></td><td>Assertions that run on every save and block a bad policy</td></tr></tbody></table></div><p>Auto-approval, worth setting up once so you stop clicking Approve:</p><div class="code-block"><div class="code-head"><span>json</span><button type="button" class="copy-code" data-copy-target="code-22" aria-label="Copy json code">Copy</button></div><pre id="code-22"><code>&quot;autoApprovers&quot;: {
+  &quot;routes&quot;: {
+    &quot;192.0.2.0/24&quot;: [&quot;group:engineering&quot;, &quot;alice@example.com&quot;, &quot;tag:foo&quot;],
+  },
+  &quot;exitNode&quot;: [&quot;tag:bar&quot;],
+}</code></pre></div><p><strong>Auto-approvers are not retroactive.</strong> &quot;Updating the tailnet policy file to add or modify auto-approvers does not retroactively approve existing unapproved routes.&quot; You must remove the route from the subnet router and advertise it again. Prefer a tag as the approver — a user-based approver stops working if that user is suspended or deleted.</p><p>Write <code>tests</code> if you edit policy more than once. They run on save and reject a file that breaks an assertion, which is a cheaper way to find out than losing remote access.</p></section><section class="manual-section" id="troubleshooting" data-section="11"><div class="section-kicker"><span>11</span><span>Working manual</span></div><h2>Troubleshooting</h2><h3 id="the-order-to-work-in">The order to work in</h3><p><strong>1. <code>tailscale status</code></strong></p><div class="code-block"><div class="code-head"><span>text</span><button type="button" class="copy-code" data-copy-target="code-23" aria-label="Copy text code">Copy</button></div><pre id="code-23"><code>100.1.2.3   device-a  you@       linux     active; direct &lt;ip-port&gt;, tx 1116 rx 1124
+100.4.5.6   device-b  you@       macOS     active; relay &lt;relay-server&gt;, tx 1351 rx 4262
+100.7.8.9   device-c  you@       windows   idle; tx 1214 rx 50
+100.0.1.2   device-d  you@       iOS       -</code></pre></div><p>Columns: Tailscale IP, machine name, owner, OS, connection state. <code>active</code> means traffic is flowing now and names the path — <code>direct</code>, <code>relay</code> (with a DERP city code like <code>nyc</code>, <code>fra</code>, <code>tok</code>, <code>syd</code>), or <code>peer-relay</code>. <code>idle</code> means connected but quiet. <code>-</code> means never any traffic.</p><p><code>relay</code> is not broken, just slower. <code>-</code> on a device you expect to reach usually means policy or an expired key.</p><p><strong>2. <code>tailscale ping &lt;host&gt;</code></strong> — more detail than regular <code>ping</code>, and it's the <em>only</em> ping that works in userspace networking mode. <code>--until-direct</code> stops as soon as a direct path forms, which tells you whether NAT traversal is succeeding at all.</p><p><strong>3. <code>tailscale netcheck</code></strong></p><div class="code-block"><div class="code-head"><span>text</span><button type="button" class="copy-code" data-copy-target="code-24" aria-label="Copy text code">Copy</button></div><pre id="code-24"><code>Report:
+	* UDP: true
+	* IPv4: yes, &lt;ipv4-address&gt;
+	* IPv6: yes, &lt;ipv6-address&gt;
+	* MappingVariesByDestIP: false
+	* PortMapping:
+	* Nearest DERP: Seattle</code></pre></div><div class="table-scroll" role="region" aria-label="Scrollable reference table" tabindex="0"><table><thead><tr><th scope="col">Field</th><th scope="col">Read it as</th></tr></thead><tbody><tr><td><code>UDP: false</code></td><td>No direct connections possible. Everything falls back to DERP. Usually a restrictive firewall.</td></tr><tr><td><code>MappingVariesByDestIP: true</code></td><td>Hard NAT. Direct connections are unreliable.</td></tr><tr><td><code>PortMapping</code> blank</td><td>No UPnP / NAT-PMP / PCP on your router. Direct connections still possible, just less likely.</td></tr><tr><td><code>HairPinning: false</code></td><td>Your router can't route LAN → its own public IP → LAN. Affects same-LAN peers.</td></tr><tr><td>Anything blank</td><td>Tailscale couldn't measure it.</td></tr></tbody></table></div><p><strong>4. <code>tailscale whois &lt;ip&gt;</code></strong> — confirms which identity, tags and capabilities a peer actually has. A tagged device prints <code>Tags:</code> and no <code>User:</code> block. Fastest way to confirm a tag silently replaced a user identity.</p><p><strong>5. <code>tailscale bugreport</code></strong> — run it <em>while</em> the problem is happening. Prints an identifier for support. Shares no PII and does nothing unless you hand the ID over. <code>--record</code> brackets a reproduction and gives two IDs; share both.</p><h3 id="symptom-cause">Symptom → cause</h3><div class="table-scroll" role="region" aria-label="Scrollable reference table" tabindex="0"><table><thead><tr><th scope="col">Symptom</th><th scope="col">Likely cause</th></tr></thead><tbody><tr><td>Device vanished from the tailnet</td><td>Node key expired (180-day default). <code>sudo tailscale up --force-reauth</code>, or Temporarily extend key from the console.</td></tr><tr><td>A flag you set yesterday is gone</td><td>You ran bare <code>tailscale up</code>. Flags don't persist across <code>up</code>. Use <code>tailscale set</code>.</td></tr><tr><td>Subnet router advertises, nothing routes</td><td>Routes not approved in the console, IP forwarding sysctls not set, or a Linux client missing <code>--accept-routes</code>.</td></tr><tr><td>Exit node visible but unusable</td><td>Custom policy without <code>autogroup:internet</code> as <code>dst</code>. Naming the device isn't enough.</td></tr><tr><td>Exit node on, LAN gone</td><td>Expected. Add <code>--exit-node-allow-lan-access=true</code>.</td></tr><tr><td>DNS wrong while on an exit node</td><td>Exit node is the resolver for all domains by default. Enable &quot;Use with exit node&quot; on the nameserver.</td></tr><tr><td>Everything relayed, never direct</td><td><code>UDP: false</code> or <code>MappingVariesByDestIP: true</code> in netcheck. Open UDP 41641 outbound.</td></tr><tr><td>You &quot;tightened&quot; the policy and nothing changed</td><td>You removed <code>acls</code> instead of setting it to <code>[]</code>. That's allow-all.</td></tr><tr><td>New route ignored after adding autoApprovers</td><td>Not retroactive. Re-advertise the route.</td></tr><tr><td>Taildrop won't reach the server</td><td>It's tagged. Tagged nodes can't do Taildrop.</td></tr><tr><td>Can't SSH from server to laptop</td><td>Tagged device → user-owned device is blocked by design.</td></tr><tr><td><code>https://hostname</code> fails, <code>http://hostname</code> works</td><td>Bare-hostname HTTPS is impossible. Use the full <code>.ts.net</code> FQDN.</td></tr><tr><td>macOS <code>nslookup</code> can't see MagicDNS names</td><td>Expected. Use <code>dscacheutil -q host -a name my-server</code>.</td></tr><tr><td>Second VPN breaks everything</td><td>IP range conflict on <code>100.64.0.0/10</code>, or a one-VPN-at-a-time OS limit.</td></tr><tr><td>Locked yourself out over SSH</td><td><code>--force-reauth</code> and <code>tailscale down</code> can sever your session. <code>--accept-risk=lose-ssh</code> acknowledges it; it doesn't prevent it.</td></tr></tbody></table></div></section><section class="manual-section" id="homelab-setup-checklist" data-section="12"><div class="section-kicker"><span>12</span><span>Working manual</span></div><h2>Homelab setup checklist</h2><ol class="manual-checklist"><li><span>Sign in on your daily driver first. Choose the IdP deliberately — <strong>GitHub and Apple can't be migrated away from later.</strong></span></li><li><span>Confirm MagicDNS is on at <code>admin/dns</code>.</span></li><li><span>Install on the server. <code>curl -fsSL https://tailscale.com/install.sh | sh</code> then <code>sudo tailscale up</code>.</span></li><li><span><strong>Define <code>tag:server</code> in <code>tagOwners</code>, then re-auth the server with <code>--advertise-tags=tag:server</code>.</strong> Key expiry is now disabled on it. Accept that Taildrop-to-server and server-initiated SSH stop working.</span></li><li><span>On any always-on Windows box: <code>tailscale up --unattended=true</code>.</span></li><li><span>Subnet router for the gear that can't run Tailscale: set the sysctls, <code>tailscale set --advertise-routes=...</code>, approve in console, <code>tailscale set --accept-routes</code> on Linux clients.</span></li><li><span>Exit node if you want the traditional-VPN behavior: <code>tailscale set --advertise-exit-node</code> + <code>tailscale up</code>, approve, then select it per-client with LAN access on.</span></li><li><span>Add <code>autoApprovers</code> so step 6 and 7 stop requiring console clicks — remembering it only applies to routes advertised <em>after</em> the policy change.</span></li><li><span>Enable HTTPS certs only if no hostname is sensitive. Then <code>tailscale serve --bg &lt;port&gt;</code> for internal dashboards.</span></li><li><span>Funnel only when you genuinely mean &quot;the public internet.&quot; Ports 443/8443/10000, and use <code>--bg</code> so it survives a reboot.</span></li><li><span>Generate a reusable, tagged, pre-approved auth key and store it somewhere real — that's your rebuild path.</span></li><li><span>Leave the default allow-all policy until you have a reason. When you change it, add <code>tests</code> first.</span></li></ol><p><em>Every command, flag, default and JSON snippet above was checked against the source pages in a second pass. Where the docs are ambiguous or silent, the text says so rather than guessing.</em></p><p><strong>Sources:</strong> <a href="https://tailscale.com/docs" target="_blank" rel="noopener noreferrer">Tailscale docs<span class="external-mark" aria-hidden="true">↗</span></a> · <a href="https://tailscale.com/docs/concepts/what-is-tailscale" target="_blank" rel="noopener noreferrer">What is Tailscale<span class="external-mark" aria-hidden="true">↗</span></a> · <a href="https://tailscale.com/docs/reference/glossary" target="_blank" rel="noopener noreferrer">Glossary<span class="external-mark" aria-hidden="true">↗</span></a> · <a href="https://tailscale.com/docs/concepts/tailscale-ip-addresses" target="_blank" rel="noopener noreferrer">IP addresses<span class="external-mark" aria-hidden="true">↗</span></a> · <a href="https://tailscale.com/docs/reference/reserved-ip-addresses" target="_blank" rel="noopener noreferrer">Reserved IPs<span class="external-mark" aria-hidden="true">↗</span></a> · <a href="https://tailscale.com/docs/install/linux" target="_blank" rel="noopener noreferrer">Install Linux<span class="external-mark" aria-hidden="true">↗</span></a> · <a href="https://tailscale.com/docs/integrations/identity" target="_blank" rel="noopener noreferrer">Identity providers<span class="external-mark" aria-hidden="true">↗</span></a> · <a href="https://tailscale.com/docs/reference/tailscale-cli" target="_blank" rel="noopener noreferrer">CLI reference<span class="external-mark" aria-hidden="true">↗</span></a> · <a href="https://tailscale.com/docs/features/magicdns" target="_blank" rel="noopener noreferrer">MagicDNS<span class="external-mark" aria-hidden="true">↗</span></a> · <a href="https://tailscale.com/docs/reference/dns-in-tailscale" target="_blank" rel="noopener noreferrer">DNS in Tailscale<span class="external-mark" aria-hidden="true">↗</span></a> · <a href="https://tailscale.com/docs/concepts/tailnet-name" target="_blank" rel="noopener noreferrer">Tailnet name<span class="external-mark" aria-hidden="true">↗</span></a> · <a href="https://tailscale.com/docs/how-to/set-up-https-certificates" target="_blank" rel="noopener noreferrer">HTTPS certificates<span class="external-mark" aria-hidden="true">↗</span></a> · <a href="https://tailscale.com/docs/features/subnet-routers" target="_blank" rel="noopener noreferrer">Subnet routers<span class="external-mark" aria-hidden="true">↗</span></a> · <a href="https://tailscale.com/docs/features/exit-nodes" target="_blank" rel="noopener noreferrer">Exit nodes<span class="external-mark" aria-hidden="true">↗</span></a> · <a href="https://tailscale.com/docs/features/taildrop" target="_blank" rel="noopener noreferrer">Taildrop<span class="external-mark" aria-hidden="true">↗</span></a> · <a href="https://tailscale.com/docs/features/sharing" target="_blank" rel="noopener noreferrer">Sharing<span class="external-mark" aria-hidden="true">↗</span></a> · <a href="https://tailscale.com/docs/features/tailscale-serve" target="_blank" rel="noopener noreferrer">Serve<span class="external-mark" aria-hidden="true">↗</span></a> · <a href="https://tailscale.com/docs/features/tailscale-funnel" target="_blank" rel="noopener noreferrer">Funnel<span class="external-mark" aria-hidden="true">↗</span></a> · <a href="https://tailscale.com/docs/features/tailscale-ssh" target="_blank" rel="noopener noreferrer">Tailscale SSH<span class="external-mark" aria-hidden="true">↗</span></a> · <a href="https://tailscale.com/docs/features/access-control" target="_blank" rel="noopener noreferrer">Access control<span class="external-mark" aria-hidden="true">↗</span></a> · <a href="https://tailscale.com/docs/reference/syntax/policy-file" target="_blank" rel="noopener noreferrer">Policy file syntax<span class="external-mark" aria-hidden="true">↗</span></a> · <a href="https://tailscale.com/docs/reference/examples/acls" target="_blank" rel="noopener noreferrer">ACL examples<span class="external-mark" aria-hidden="true">↗</span></a> · <a href="https://tailscale.com/docs/features/access-control/auth-keys" target="_blank" rel="noopener noreferrer">Auth keys<span class="external-mark" aria-hidden="true">↗</span></a> · <a href="https://tailscale.com/docs/features/access-control/key-expiry" target="_blank" rel="noopener noreferrer">Key expiry<span class="external-mark" aria-hidden="true">↗</span></a> · <a href="https://tailscale.com/docs/features/tags" target="_blank" rel="noopener noreferrer">Tags<span class="external-mark" aria-hidden="true">↗</span></a> · <a href="https://tailscale.com/docs/how-to/run-unattended" target="_blank" rel="noopener noreferrer">Run unattended<span class="external-mark" aria-hidden="true">↗</span></a> · <a href="https://tailscale.com/docs/reference/faq/firewall-ports" target="_blank" rel="noopener noreferrer">Firewall ports FAQ<span class="external-mark" aria-hidden="true">↗</span></a> · <a href="https://tailscale.com/docs/reference/faq/other-vpns" target="_blank" rel="noopener noreferrer">Other VPNs FAQ<span class="external-mark" aria-hidden="true">↗</span></a></p></section>
+      </article>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container">
+      <div class="footer-bottom">
+        <p class="manual-footer-note">This independent working manual is based on the cited Tailscale documentation. Tailscale is a trademark of Tailscale Inc. Commands and product behavior can change; check the linked source documentation before a high-risk remote change.</p>
+        <span class="footer-copy">&copy; 2026 System by Dave.</span>
+      </div>
+    </div>
+  </footer>
+</div>
+<script>
+(function () {
+  var progress = document.getElementById('readingProgress');
+  var tocLinks = Array.prototype.slice.call(document.querySelectorAll('.manual-toc a[href^="#"]'));
+  var sections = Array.prototype.slice.call(document.querySelectorAll('.manual-section'));
+
+  function updateProgress() {
+    var doc = document.documentElement;
+    var distance = doc.scrollHeight - doc.clientHeight;
+    var percent = distance > 0 ? (doc.scrollTop / distance) * 100 : 0;
+    progress.style.width = Math.min(100, Math.max(0, percent)) + '%';
+  }
+
+  window.addEventListener('scroll', updateProgress, { passive: true });
+  window.addEventListener('resize', updateProgress);
+  updateProgress();
+
+  if ('IntersectionObserver' in window) {
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        tocLinks.forEach(function (link) {
+          var active = link.getAttribute('href') === '#' + entry.target.id;
+          if (active) link.setAttribute('aria-current', 'true');
+          else link.removeAttribute('aria-current');
+        });
+      });
+    }, { rootMargin: '-18% 0px -70% 0px', threshold: 0 });
+    sections.forEach(function (section) { observer.observe(section); });
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('.copy-code'), function (button) {
+    button.addEventListener('click', function () {
+      var target = document.getElementById(button.getAttribute('data-copy-target'));
+      var value = target ? target.innerText : '';
+      navigator.clipboard.writeText(value).then(function () {
+        button.textContent = 'Copied';
+        window.setTimeout(function () { button.textContent = 'Copy'; }, 1400);
+      }).catch(function () {
+        button.textContent = 'Select';
+        if (target) {
+          var range = document.createRange();
+          range.selectNodeContents(target);
+          var selection = window.getSelection();
+          selection.removeAllRanges();
+          selection.addRange(range);
+        }
+      });
+    });
+  });
+
+  document.getElementById('printManual').addEventListener('click', function () { window.print(); });
+  document.getElementById('copyLink').addEventListener('click', function () {
+    var button = this;
+    navigator.clipboard.writeText(window.location.href).then(function () {
+      button.textContent = 'Copied';
+      window.setTimeout(function () { button.textContent = 'Copy link'; }, 1400);
+    }).catch(function () {
+      button.textContent = 'Use address bar';
+      window.setTimeout(function () { button.textContent = 'Copy link'; }, 1800);
+    });
+  });
+}());
+</script>
+</body>
+</html>

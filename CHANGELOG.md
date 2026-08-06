@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-08-06
+
+* Added `/tailscale-manual.html`, a responsive, printable Tailscale field manual for solo operators and homelabs. The page preserves the supplied 12-section reference, command and policy snippets, troubleshooting tables, and source links, with a sticky manual index, reading progress, and copyable code blocks.
+
 ## 2026-06-25
 
 * **Homepage identity reposition (Phase 1 of the AV split).** Reframed the landing page off the dated "Tools for Notion People" framing to a platform-agnostic maker positioning. New hero (`Sharp tools for people who run their own systems`); reconciled four competing taxonomies (hero blueprint / nav / homepage sections / `tools.html` chips) down to one coherent nav (`AV Tools · Agents · Widgets · Tools · Ethos`), dropping the redundant `Notion` / `Apps & Games` / `Trackers` nav items that only re-filtered `tools.html`; de-Notion-ized the ethos ("Built in Notion" → "Runs where you work", "No Subscriptions" copy) and the footer brand line; refreshed `<title>`, meta description, OpenGraph/Twitter cards, and JSON-LD. The AV suite section is unchanged on the page — the physical split to an AV by Dave surface is Phase 2.
