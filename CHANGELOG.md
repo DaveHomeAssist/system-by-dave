@@ -2,6 +2,8 @@
 
 ## 2026-06-25
 
+* **Homepage identity reposition (Phase 1 of the AV split).** Reframed the landing page off the dated "Tools for Notion People" framing to a platform-agnostic maker positioning. New hero (`Sharp tools for people who run their own systems`); reconciled four competing taxonomies (hero blueprint / nav / homepage sections / `tools.html` chips) down to one coherent nav (`AV Tools · Agents · Widgets · Tools · Ethos`), dropping the redundant `Notion` / `Apps & Games` / `Trackers` nav items that only re-filtered `tools.html`; de-Notion-ized the ethos ("Built in Notion" → "Runs where you work", "No Subscriptions" copy) and the footer brand line; refreshed `<title>`, meta description, OpenGraph/Twitter cards, and JSON-LD. The AV suite section is unchanged on the page — the physical split to an AV by Dave surface is Phase 2.
+* **Harvested final hero copy + surface nav from the Jun-25 design comp (Option B).** Hero now reads `Software tools that do the unglamorous work` with the `Three product lines, one operator's standard` subhead; nav reorganized around the three product lines (`Notion · AV Suite · Prompt Lab ↗ · Tools · Ethos`); hero CTAs are now `Explore the system` / `Open AV Suite`. Copy + IA only — the full dark-mode visual rebuild from the comp (templated `.dc.html` → static HTML, `style-hover` → real `:hover`, inline styles → `css/style.css`, font reconciliation) is the next track (Option A).
 * Updated `/plotforge.html` so `systembydave.com/plotforge` opens the live PlotForge beta at `https://plotforge-beta.vercel.app/`, preserving query strings and hash fragments with a static fallback link.
 
 ## 2026-06-23

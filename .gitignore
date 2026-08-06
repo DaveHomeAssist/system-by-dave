@@ -3,3 +3,8 @@
 Thumbs.db
 Agent Images/
 Prompt Lab Extension Pictures (v1.7)/
+
+# Secrets — never commit credential files
+Notion-Integration-Token
+*-Integration-Token
+*.token
