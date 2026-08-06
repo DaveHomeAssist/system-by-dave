@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-08-06
+
+* Added `/tailscale-manual.html`, a responsive, printable Tailscale field manual for solo operators and homelabs. The page preserves the supplied 12-section reference, command and policy snippets, troubleshooting tables, and source links, with a sticky manual index, reading progress, and copyable code blocks.
+
 ## 2026-08-05
 
 * Promoted `/show-board.html` as the reusable room-turn operations board while keeping `/aom-show-board.html` frozen as the event-specific reference. Added a live exceptions strip, rolling browser snapshots with JSON download and restore, explicit last-save status, cross-tab overwrite detection, offline AV Suite registration, self-hosted fonts, metadata, and keyboard-accessible room and session controls.
