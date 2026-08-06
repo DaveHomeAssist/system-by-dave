@@ -37,6 +37,7 @@
     {id:'crew-time-log',name:'Crew Time Log',href:'crew-time-log.html',dept:'Labor',phases:['show','closeout'],tag:'Time',desc:'Actual check in, meals, release times, hour totals, issues, and export.',storageKeys:[{key:'crew-time-log.v1',label:'Crew Time Log'}]},
     {id:'room-check',name:'Room Check',href:'room-check.html',dept:'Rooms',phases:['loadin','show'],tag:'Rooms',desc:'Room readiness by area, owner, priority, deadline, status, blocker, and notes.',storageKeys:[{key:'room-check.v1',label:'Room Check'}]},
     {id:'breakout-room-matrix',name:'Breakout Room Matrix',href:'breakout-room-matrix.html',dept:'Rooms',phases:['advance','prep','show'],tag:'Matrix',desc:'Breakout schedules, tracks, techs, producers, audio, video, network, power, readiness, and blockers.',storageKeys:[{key:'breakout-room-matrix.v1',label:'Breakout Room Matrix'}]},
+    {id:'show-board',name:'Show Board',href:'show-board.html',dept:'Rooms',phases:['prep','loadin','show'],tag:'Live Rooms',desc:'Timeline-first room-turn board with readiness checks, active issues, pinch windows, sign-text import, and rolling local backups.',storageKeys:[]},
     {id:'show-task-board',name:'Show Task Board',href:'show-task-board.html',dept:'Rooms',phases:['loadin','show','strike'],tag:'Tasks',desc:'Show day tasks, area, owner, priority, due time, source, blocker, status counts, and handoff summaries.',storageKeys:[{key:'show-task-board.v1',label:'Show Task Board'}]},
     {id:'show-handoff',name:'Show Handoff',href:'show-handoff.html',dept:'Closeout',phases:['show','closeout'],tag:'Handoff',desc:'A concise show transfer builder for status, signal flow, crew notes, risks, and next actions.',storageKeys:[{key:'show-handoff.v1',label:'Show Handoff'}]},
     {id:'show-report',name:'Show Report',href:'show-report.html',dept:'Closeout',phases:['closeout'],tag:'Report',desc:'Timeline, issues, client requests, decisions, crew notes, follow ups, severity, and status.',storageKeys:[{key:'show-report.v1',label:'Show Report'}]},
@@ -70,8 +71,8 @@
   var RECOMMENDED={
     advance:['av-workbook','show-advance','site-survey','breakout-room-matrix','crew-call','plotforge','pixelforge','input-list'],
     prep:['av-workbook','gear-prep','truck-pack','cueforge','teleprompter','playback-check','pixelforge','audio-patch','video-patch','network-plan'],
-    loadin:['av-workbook','load-in-plan','room-check','power-plan','line-check','display-plan','projection-plan','speaker-plan','show-task-board'],
-    show:['av-workbook','teleprompter','show-timer','cueforge','show-task-board','breakout-room-matrix','pixelforge','record-log','comms-check','camera-shot-list'],
+    loadin:['av-workbook','load-in-plan','room-check','show-board','power-plan','line-check','display-plan','projection-plan','speaker-plan','show-task-board'],
+    show:['av-workbook','teleprompter','show-timer','cueforge','show-board','show-task-board','breakout-room-matrix','pixelforge','record-log','comms-check','camera-shot-list'],
     strike:['av-workbook','strike-plan','truck-pack','cable-plan','show-task-board','crew-time-log'],
     closeout:['av-workbook','show-handoff','show-report','client-signoff','change-order','record-log','crew-time-log']
   };
@@ -86,7 +87,7 @@
     {label:'Video',toolIds:['video-patch','display-plan','projection-plan','stream-plan','record-log','camera-shot-list']},
     {label:'Lighting',toolIds:['lighting-patch']},
     {label:'Power & data',toolIds:['power-plan','network-plan','cable-plan']},
-    {label:'Spaces & staging',toolIds:['plotforge','room-check','breakout-room-matrix','site-survey']},
+    {label:'Spaces & staging',toolIds:['show-board','plotforge','room-check','breakout-room-matrix','site-survey']},
     {label:'Logistics',toolIds:['gear-prep','truck-pack','load-in-plan','strike-plan','show-advance']},
     {label:'Crew',toolIds:['crew-call','crew-time-log']},
     {label:'Show docs & client',toolIds:['show-handoff','show-report','show-task-board','change-order','client-signoff']},
@@ -168,7 +169,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool change — rolls the service-worker cache. */
-    version:'v20260710-ontrack',
+    version:'v20260805-show-board',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,

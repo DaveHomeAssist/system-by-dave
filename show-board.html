@@ -1,13 +1,37 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-sbd-nav="off">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Show Board</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;800&family=DM+Mono:wght@400;500&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'none'">
+<title>Show Board | System by Dave</title>
+<meta name="robots" content="index,follow">
+<meta name="description" content="A live room-turn and technician-readiness board for breakout-room AV operations, with local backups, issue tracking, sign-text import, and offline support.">
+<link rel="canonical" href="https://systembydave.com/show-board.html">
+<meta name="theme-color" content="#1c1712">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="System by Dave">
+<meta property="og:title" content="Show Board">
+<meta property="og:description" content="A live room-turn and technician-readiness board for breakout-room AV operations.">
+<meta property="og:url" content="https://systembydave.com/show-board.html">
+<meta property="og:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<meta property="og:image:width" content="1024">
+<meta property="og:image:height" content="412">
+<meta property="og:image:alt" content="System by Dave preview banner">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Show Board">
+<meta name="twitter:description" content="A live room-turn and technician-readiness board for breakout-room AV operations.">
+<meta name="twitter:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<link rel="icon" href="svg/system_by_dave_logo_rust.svg" type="image/svg+xml">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="profile/assets/apple-touch-icon.png">
 <style>
+@font-face{font-family:"Syne";font-style:normal;font-weight:600 800;font-display:swap;
+  src:url(fonts/syne-800.woff2) format("woff2")}
+@font-face{font-family:"DM Sans";font-style:normal;font-weight:400 700;font-display:swap;
+  src:url(fonts/dm-sans.woff2) format("woff2")}
+@font-face{font-family:"DM Mono";font-style:normal;font-weight:400 500;font-display:swap;
+  src:url(fonts/space-mono.woff2) format("woff2")}
 :root{
   --ink:#F1EADA;
   --panel:#FAF6EC;
@@ -73,7 +97,12 @@ body{
   border:1px solid var(--line);padding:8px 14px;border-radius:2px;cursor:pointer;
 }
 a.btn{text-decoration:none;display:inline-block}
+.btn:hover{border-color:var(--sand)}
 .btn:active{transform:scale(0.98)}
+.btn:focus-visible,.daytab:focus-visible,.rlabel:focus-visible,.blk:focus-visible,
+input:focus-visible,select:focus-visible,textarea:focus-visible,a:focus-visible{
+  outline:3px solid var(--sand);outline-offset:3px;
+}
 .btn.primary{background:var(--sand);color:var(--ink);border-color:var(--sand);font-weight:500}
 .btn.danger{border-color:var(--rust);color:var(--txdead)}
 .btn.editing{background:var(--rust);color:#fff;border-color:var(--rust)}
@@ -81,11 +110,24 @@ a.btn{text-decoration:none;display:inline-block}
 #savestate{
   font-family:"DM Mono",monospace;font-size:10px;
   letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);
-  opacity:0;transition:opacity .3s;
+  opacity:1;transition:color .2s;
 }
-#savestate.show{opacity:1}
 #savestate.ok{color:var(--olive)}
 #savestate.bad{color:var(--txdead)}
+
+/* ---------- data confidence ---------- */
+.data-health{
+  border:1px solid var(--line);background:var(--panel);margin-bottom:16px;
+  padding:9px 11px;display:flex;align-items:center;gap:8px 14px;flex-wrap:wrap;
+  font-family:"DM Mono",monospace;font-size:10px;letter-spacing:.07em;text-transform:uppercase;
+}
+.data-health .local{color:var(--sand);font-weight:700}
+.data-health .saved{color:var(--muted)}
+.data-health .snapshot{color:var(--olive)}
+.data-health .grow{flex:1}
+.data-health.stale{border-color:var(--rust);background:rgba(192,71,42,.1)}
+.data-health.stale .saved{color:var(--txdead);font-weight:700}
+#reloadbtn[hidden]{display:none}
 
 /* ---------- setup ---------- */
 #setup{display:none;max-width:640px;margin:0 auto}
@@ -134,6 +176,28 @@ body.setup #app{display:none}
 }
 .now-col .lines{font-size:14px;line-height:1.45}
 
+/* ---------- attention strip ---------- */
+.attention{border:1px solid var(--line);background:var(--panel);margin-bottom:24px}
+.attention-head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;
+  padding:9px 12px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.attention-head h2{font-family:"DM Mono",monospace;font-size:10.5px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--muted);font-weight:400}
+.attention-head p{font-family:"DM Mono",monospace;font-size:10px;color:var(--muted)}
+.attention-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}
+.attention-card{appearance:none;text-align:left;min-width:0;border:0;border-right:1px solid var(--line);
+  background:transparent;color:var(--parchment);padding:12px;min-height:78px}
+.attention-card:last-child{border-right:0}
+button.attention-card{cursor:pointer}
+button.attention-card:hover{background:var(--panel-2)}
+.attention-card .k{display:block;font-family:"DM Mono",monospace;font-size:9.5px;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.attention-card strong{display:block;font-family:"Syne",sans-serif;font-size:17px;line-height:1.1}
+.attention-card .detail{display:block;color:var(--muted);font-size:11.5px;margin-top:4px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.attention-card.warn strong{color:var(--sand)}
+.attention-card.bad strong{color:var(--txdead)}
+.attention-card.ok strong{color:var(--olive)}
+
 /* ---------- board ---------- */
 .section-label{
   font-family:"DM Mono",monospace;font-size:10.5px;letter-spacing:0.18em;
@@ -169,9 +233,10 @@ body.setup #app{display:none}
 .rlabel{
   width:var(--label-w);flex:0 0 var(--label-w);
   position:sticky;left:0;z-index:5;
-  background:var(--panel-2);border-right:1px solid var(--line);
+  background:var(--panel-2);border:0;border-right:1px solid var(--line);
   display:flex;flex-direction:column;justify-content:center;
   padding:0 8px 0 10px;cursor:pointer;
+  appearance:none;color:var(--parchment);text-align:left;font-family:inherit;
 }
 .rlabel .nm{font-family:"Syne",sans-serif;font-weight:600;font-size:13px;letter-spacing:-0.01em;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -207,6 +272,7 @@ body.edit .rlabel::after{
   background:hsl(var(--zone-h) var(--zone-sat) 50% / .20);
   border:1px solid hsl(var(--zone-h) var(--zone-sat) 50% / .62);
   color:hsl(var(--zone-h) var(--zone-sat) var(--zone-l));
+  appearance:none;text-align:left;
 }
 .blk.dead{
   background:repeating-linear-gradient(135deg,transparent,transparent 4px,rgba(192,71,42,0.20) 4px,rgba(192,71,42,0.20) 8px);
@@ -314,11 +380,14 @@ body.edit #addroom{display:inline-block}
 .showrow em{display:block;font-family:"DM Mono",monospace;font-size:10px;font-style:normal;
   color:var(--muted);letter-spacing:0.06em;text-transform:uppercase}
 
-@media (max-width:640px){
+@media (max-width:680px){
   :root{--label-w:100px;--row-h:44px}
   body{padding:16px 12px 120px}
   .now{gap:14px 26px}
   .now .clock{font-size:26px}
+  .attention-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .attention-card:nth-child(2){border-right:0}
+  .attention-card:nth-child(-n+2){border-bottom:1px solid var(--line)}
 }
 @media (prefers-reduced-motion:no-preference){
   .row{animation:fade .4s ease both}
@@ -332,7 +401,7 @@ body.edit #addroom{display:inline-block}
   .rlabel,.axis .corner{background:#f2efe9}
   .scroller{overflow:visible}
   .track{min-width:0;width:100%}
-  .head,.hdr-actions,#addroom,.daytabs,.foot-actions,.zoom{display:none}
+  .head,.hdr-actions,#addroom,.daytabs,.foot-actions,.zoom,.data-health{display:none}
 }
 </style>
 </head>
@@ -399,11 +468,21 @@ body.edit #addroom{display:inline-block}
   <div class="hdr-actions">
     <a class="btn" href="index.html" aria-label="System by Dave home">Home</a>
     <button class="btn" id="showsbtn">Shows</button>
+    <button class="btn" id="backupsbtn">Backups</button>
     <button class="btn" id="themebtn">Dark</button>
     <button class="btn" id="settingsbtn">Setup</button>
     <button class="btn" id="editbtn">Edit</button>
   </div>
 </header>
+
+<div class="data-health" id="datahealth" aria-live="polite">
+  <span class="local">This browser only</span>
+  <span class="saved" id="lastsaved">Not saved yet</span>
+  <span class="snapshot" id="snapshotstate">Automatic snapshots on</span>
+  <span class="grow"></span>
+  <button class="btn xs" id="backupbtn">Download JSON</button>
+  <button class="btn danger xs" id="reloadbtn" hidden>Load newer copy</button>
+</div>
 
 <div class="daytabs" id="daytabs"></div>
 
@@ -413,12 +492,20 @@ body.edit #addroom{display:inline-block}
   <div class="now-col"><h3>Next action</h3><div class="lines" id="next">&mdash;</div></div>
 </section>
 
+<section class="attention" aria-labelledby="attention-title">
+  <div class="attention-head">
+    <h2 id="attention-title">Attention now</h2>
+    <p id="attentionsummary">No exceptions</p>
+  </div>
+  <div class="attention-grid" id="attentiongrid"></div>
+</section>
+
 <div class="section-label">
   <span>Room timeline</span>
   <span class="zoom">
-    <button class="btn xs" id="zoomout">&minus;</button>
+    <button class="btn xs" id="zoomout" aria-label="Zoom timeline out">&minus;</button>
     <span id="zoomlabel"></span>
-    <button class="btn xs" id="zoomin">+</button>
+    <button class="btn xs" id="zoomin" aria-label="Zoom timeline in">+</button>
   </span>
   <span class="hint" id="scrollhint">tap a room for pre-check · tap a session to check it off</span>
 </div>
@@ -433,7 +520,7 @@ body.edit #addroom{display:inline-block}
 <div class="board-foot">
   <div class="legend" id="legend"></div>
   <div class="foot-actions">
-    <button class="btn" id="pastebtn">&#128203; Paste sign</button>
+    <button class="btn" id="pastebtn">Paste sign text</button>
     <button class="btn" id="copybtn">Copy text</button>
     <button class="btn" id="addroom">+ Room</button>
   </div>
@@ -449,7 +536,7 @@ body.edit #addroom{display:inline-block}
 </div>
 
 <div id="overlay"></div>
-<div id="sheet"></div>
+<div id="sheet" role="dialog" aria-modal="true" aria-label="Show Board controls" tabindex="-1"></div>
 
 <script>
 /* =================================================================
@@ -460,6 +547,9 @@ body.edit #addroom{display:inline-block}
 
 const IDX_KEY="sbd.showboard.index";
 const SHOW_KEY=id=>"sbd.showboard.show."+id;
+const SNAP_KEY=id=>"sbd.showboard.snapshots."+id;
+const SNAP_LIMIT=8;
+const TAB_ID="t"+Math.random().toString(36).slice(2,9);
 const ZOOMS=[40,60,80,100,120,160,200,260,340,440];
 const TICKS=[1,5,10,15,30,60];
 const SNAPS=[1,5,10,15,30];
@@ -473,6 +563,8 @@ let index=null;     /* {shows:[{id,name,venue}], active} */
 let show=null;      /* the loaded show */
 let START=480,END=1080,SPAN=600;
 let editMode=false;
+let loadedRevision=0,loadedWriteToken=null,staleCopy=null;
+let sheetReturnFocus=null;
 
 /* ---------- utils ---------- */
 const $=id=>document.getElementById(id);
@@ -492,6 +584,12 @@ const DOW=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
 const isoOf=d=>d.getFullYear()+"-"+pad2(d.getMonth()+1)+"-"+pad2(d.getDate());
 const todayISO=()=>isoOf(new Date());
 const labelOf=d=>DOW[d.getDay()]+" "+MONTHS[d.getMonth()]+" "+d.getDate();
+const savedLabel=iso=>{
+  if(!iso)return "Not saved yet";
+  const d=new Date(iso);
+  return isNaN(d.getTime())?"Saved locally":"Saved locally "+d.toLocaleTimeString([],{
+    hour:"numeric",minute:"2-digit"});
+};
 
 /* zone lookup; unknown zones fall back to a neutral hue */
 function zoneOf(name){
@@ -513,19 +611,61 @@ async function loadIndex(){
   try{const raw=await sget(IDX_KEY);if(raw)return JSON.parse(raw)}catch(e){}
   return {shows:[],active:null};
 }
+async function loadSnapshots(id){
+  try{const raw=await sget(SNAP_KEY(id));const rows=raw?JSON.parse(raw):[];
+    return Array.isArray(rows)?rows:[];
+  }catch(e){return []}
+}
+function snapshotSignature(data){
+  const copy=clone(data);delete copy.savedAt;delete copy.revision;delete copy.writeToken;
+  return JSON.stringify(copy);
+}
+async function addSnapshot(data){
+  const rows=await loadSnapshots(data.id),copy=clone(data),sig=snapshotSignature(copy);
+  if(rows[0]&&snapshotSignature(rows[0].data)===sig){updateSnapshotState(rows.length);return}
+  rows.unshift({createdAt:new Date().toISOString(),data:copy});
+  await sset(SNAP_KEY(data.id),JSON.stringify(rows.slice(0,SNAP_LIMIT)));
+  updateSnapshotState(Math.min(rows.length,SNAP_LIMIT));
+}
+function updateSnapshotState(count){
+  const el=$("snapshotstate");if(!el)return;
+  el.textContent=count===undefined?"Automatic snapshots on":count+" automatic snapshot"+(count===1?"":"s");
+}
+function setStale(remote){
+  staleCopy=remote||staleCopy;
+  $("datahealth").classList.add("stale");
+  $("savestate").textContent="newer copy found";$("savestate").className="bad";
+  $("lastsaved").textContent="Newer changes exist in another tab";
+  $("reloadbtn").hidden=false;
+}
+function updateSaveHealth(){
+  if(staleCopy)return setStale(staleCopy);
+  $("datahealth").classList.remove("stale");
+  $("reloadbtn").hidden=true;
+  $("lastsaved").textContent=savedLabel(show&&show.savedAt);
+}
 let saveTimer=null;
 function save(){
   clearTimeout(saveTimer);
+  $("savestate").textContent="saving";$("savestate").className="";
   saveTimer=setTimeout(async()=>{
     const el=$("savestate");
     try{
+      const remoteRaw=await sget(SHOW_KEY(show.id));
+      const remote=remoteRaw?JSON.parse(remoteRaw):null;
+      if(remote&&((Number(remote.revision)||0)>loadedRevision||
+        (loadedWriteToken&&remote.writeToken!==loadedWriteToken))){setStale(remote);return}
+      const nextRevision=Math.max(loadedRevision,Number(remote&&remote.revision)||0)+1;
+      show.savedAt=new Date().toISOString();show.revision=nextRevision;show.writeToken=uid()+TAB_ID;
       await sset(SHOW_KEY(show.id),JSON.stringify(show));
+      loadedRevision=nextRevision;loadedWriteToken=show.writeToken;staleCopy=null;
       const row=index.shows.find(s=>s.id===show.id);
       if(row){row.name=show.name;row.venue=show.venue}
       await sset(IDX_KEY,JSON.stringify(index));
-      el.textContent="saved";el.className="show ok";
-    }catch(e){el.textContent="not saved · session only";el.className="show bad"}
-    setTimeout(()=>el.classList.remove("show"),1800);
+      el.textContent="saved locally";el.className="ok";updateSaveHealth();
+      try{await addSnapshot(show)}catch(_){updateSnapshotState()}
+    }catch(e){el.textContent="not saved · session only";el.className="bad";
+      $("lastsaved").textContent="Save failed — download JSON now"}
   },250);
 }
 
@@ -592,8 +732,10 @@ function renderTabs(){
   const t=$("daytabs");t.innerHTML="";
   show.days.forEach((d,i)=>{
     const b=document.createElement("button");
+    b.type="button";
     b.className="daytab"+(i===show.active?" active":"")+(d.date===todayISO()?" today":"");
     b.textContent=d.label;
+    b.setAttribute("aria-pressed",String(i===show.active));
     b.addEventListener("click",()=>{show.active=i;save();render()});
     t.appendChild(b);
   });
@@ -656,7 +798,7 @@ function fitLabelWidth(){
   measureCtx.font='600 13px Syne, sans-serif';
   const widest=Math.max(...names.map(n=>measureCtx.measureText(n).width));
   const badge=day().rooms.some(r=>r.sessions.length)?32:0;
-  const narrow=window.innerWidth<=640;
+  const narrow=window.innerWidth<=680;
   const px=Math.round(Math.min(narrow?150:210,
                       Math.max(narrow?100:118,widest+badge+22)));
   document.documentElement.style.setProperty("--label-w",px+"px");
@@ -681,13 +823,17 @@ function render(){
     row.style.setProperty("--zone-h",zoneHue(r.zone));
     row.style.animationDelay=(ri*28)+"ms";
 
-    const lab=document.createElement("div");
+    const lab=document.createElement("button");
+    lab.type="button";
     const cc=checkCount(r);
     const badge=r.sessions.length
       ?'<span class="gearbadge'+(cc.done===cc.total?" full":(cc.done?" part":""))+'">'+cc.done+"/"+cc.total+"</span>":"";
     const dot=r.issues.length?'<span class="issdot"></span>':"";
     lab.className="rlabel"+(badge?" has-badge":"")+(dot?" has-iss":"");
     lab.innerHTML='<span class="nm">'+esc(r.name)+'</span><span class="zn">'+esc(r.zone||"—")+"</span>"+badge+dot;
+    lab.setAttribute("aria-label",r.name+". "+cc.done+" of "+cc.total+" pre-checks complete. "+
+      r.issues.length+" active issue"+(r.issues.length===1?"":"s")+". "+
+      (editMode?"Open room editor.":"Open room readiness."));
     lab.addEventListener("click",()=>{editMode?openRoomEditor(ri):openRoomOps(ri)});
     row.appendChild(lab);
 
@@ -698,17 +844,23 @@ function render(){
     r.sessions.slice().sort((a,b)=>m(a.s)-m(b.s)).forEach(x=>{
       const si=r.sessions.indexOf(x);
       const a=m(x.s),b=m(x.e);
-      const el=document.createElement("div");
+      const el=document.createElement("button");
+      el.type="button";
       el.className="blk"+(x.dead?" dead":"")+(x.chk?" chk":"");
       el.style.left=pct(a)+"%";
       el.style.width=Math.max((b-a)/SPAN*100,0.4)+"%";
       el.textContent=fmt(a)+" to "+fmt(b)+(x.dead?"  CANCELLED":(x.id?"  #"+x.id:""));
       el.title=r.name+" · "+fmt(a)+" to "+fmt(b)+(x.id?" · #"+x.id:"");
+      el.setAttribute("aria-label",r.name+", "+fmt(a)+" to "+fmt(b)+
+        (x.dead?", cancelled":(x.chk?", complete":", incomplete"))+
+        (editMode?". Open session editor.":". Toggle complete."));
+      if(!x.dead)el.setAttribute("aria-pressed",String(Boolean(x.chk)));
       el.dataset.a=a;el.dataset.b=b;el.dataset.dead=x.dead?1:0;
       el.addEventListener("click",ev=>{
         if(editMode){ev.stopPropagation();openSessionEditor(ri,si);return}
         if(x.dead)return;
-        x.chk=!x.chk;el.classList.toggle("chk",x.chk);save();
+        x.chk=!x.chk;el.classList.toggle("chk",x.chk);
+        el.setAttribute("aria-pressed",String(Boolean(x.chk)));save();
       });
       lane.appendChild(el);
     });
@@ -730,7 +882,46 @@ function render(){
   track.appendChild(head);
 
   renderTurnStack(ev,pin);
+  renderAttention(ev,pin);
+  updateSaveHealth();
+  loadSnapshots(show.id).then(rows=>updateSnapshotState(rows.length));
   tick();
+}
+
+function attentionCard(label,value,detail,tone,roomIndex){
+  const el=document.createElement(roomIndex===undefined?"div":"button");
+  if(roomIndex!==undefined){el.type="button";el.addEventListener("click",()=>openRoomOps(roomIndex))}
+  el.className="attention-card "+tone;
+  el.innerHTML='<span class="k">'+esc(label)+'</span><strong>'+esc(value)+'</strong><span class="detail">'+esc(detail)+'</span>';
+  return el;
+}
+function renderAttention(ev,pin){
+  const box=$("attentiongrid");if(!box)return;
+  const rooms=day().rooms.map((r,i)=>({r:ensure(r),i}));
+  const unchecked=rooms.filter(x=>x.r.sessions.length&&checkCount(x.r).done<checkCount(x.r).total);
+  const issueRooms=rooms.filter(x=>x.r.issues.length);
+  const issueCount=issueRooms.reduce((sum,x)=>sum+x.r.issues.length,0);
+  const now=new Date(),cur=now.getHours()*60+now.getMinutes(),ref=isToday()?cur:START;
+  const nextPinch=pin.find(p=>p.b>=ref);
+  const turns=ev.filter(x=>x.kind==="turn"&&x.b!==null&&x.a>=ref);
+  const pressure=turns[0];
+  box.innerHTML="";
+  box.appendChild(attentionCard("Rooms unchecked",String(unchecked.length),
+    unchecked.length?unchecked.map(x=>x.r.name).slice(0,3).join(", "):"All scheduled rooms ready",
+    unchecked.length?"warn":"ok",unchecked.length?unchecked[0].i:undefined));
+  box.appendChild(attentionCard("Active issues",String(issueCount),
+    issueCount?issueRooms.map(x=>x.r.name).slice(0,3).join(", "):"No room issues logged",
+    issueCount?"bad":"ok",issueCount?issueRooms[0].i:undefined));
+  box.appendChild(attentionCard("Next pinch",nextPinch?fmt(nextPinch.a):"Clear",
+    nextPinch?new Set(nextPinch.items.map(x=>x.room)).size+" rooms · to "+fmt(nextPinch.b):"No overlapping tight turns",
+    nextPinch?"bad":"ok"));
+  const pressureRoom=pressure?rooms.find(x=>x.r.name===pressure.room):null;
+  box.appendChild(attentionCard("Next turn",pressure?fmt(pressure.a):"Clear",
+    pressure?pressure.room+" · "+pressure.gap+" min":"No upcoming turns",
+    pressure&&pressure.gap<=show.turnMax?"warn":"ok",pressureRoom?pressureRoom.i:undefined));
+  $("attentionsummary").textContent=unchecked.length+" room"+(unchecked.length===1?"":"s")+
+    " unchecked · "+issueCount+" active issue"+(issueCount===1?"":"s")+
+    (nextPinch?" · next pinch "+fmt(nextPinch.a):" · no upcoming pinch");
 }
 function renderTurnStack(ev,pin){
   const box=$("turns");box.innerHTML="";
@@ -767,6 +958,8 @@ function tick(){
   let h=now.getHours();const mm=pad2(now.getMinutes()),ap=h>=12?"PM":"AM";h=h%12||12;
   $("clock").firstChild.nodeValue=h+":"+mm;
   $("ampm").textContent=" "+ap;
+  const attentionEvents=computeTurns();
+  renderAttention(attentionEvents,computePinches(attentionEvents));
 
   const today=isToday(),head=$("playhead");
   if(head){
@@ -806,11 +999,21 @@ function tick(){
 }
 
 /* ---------- sheet plumbing ---------- */
-function openSheet(html){$("sheet").innerHTML=html;
-  $("sheet").classList.add("open");$("overlay").classList.add("open")}
-function closeSheet(){$("sheet").classList.remove("open");$("overlay").classList.remove("open")}
+function openSheet(html){
+  if(!$("sheet").classList.contains("open"))sheetReturnFocus=document.activeElement;
+  $("sheet").innerHTML=html;
+  $("sheet").classList.add("open");$("overlay").classList.add("open");
+  requestAnimationFrame(()=>{const target=$("sheet").querySelector("input,select,textarea,button");
+    (target||$("sheet")).focus()});
+}
+function closeSheet(){
+  $("sheet").classList.remove("open");$("overlay").classList.remove("open");
+  if(sheetReturnFocus&&sheetReturnFocus.isConnected)sheetReturnFocus.focus();
+  sheetReturnFocus=null;
+}
 function showErr(msg){const e=$("err");if(e){e.textContent=msg;e.classList.add("show")}}
 $("overlay").addEventListener("click",closeSheet);
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&$("sheet").classList.contains("open"))closeSheet()});
 
 /* ---------- session editor ---------- */
 function openSessionEditor(ri,si){
@@ -839,6 +1042,7 @@ function openSessionEditor(ri,si){
     closeSheet();save();render();
   });
   if(!isNew)$("f_del").addEventListener("click",()=>{
+    if(!window.confirm("Delete this session from "+r.name+"?"))return;
     r.sessions.splice(si,1);closeSheet();save();render();});
 }
 
@@ -983,6 +1187,7 @@ $("settingsbtn").addEventListener("click",()=>{
     show.active=show.days.length-1;closeSheet();save();render();});
   $("f_delday").addEventListener("click",()=>{
     if(show.days.length<2)return showErr("A show needs at least one day");
+    if(!window.confirm("Delete "+day().label+" and all of its room data?"))return;
     show.days.splice(show.active,1);
     show.active=Math.max(0,show.active-1);
     closeSheet();save();render();});
@@ -1036,6 +1241,7 @@ $("editbtn").addEventListener("click",()=>{
   $("scrollhint").textContent=editMode
     ?"tap a block to edit it · tap a room name for room options"
     :"tap a room for pre-check · tap a session to check it off";
+  render();
 });
 
 /* ---------- copy as text ---------- */
@@ -1154,6 +1360,7 @@ function previewSign(data){
   $("f_cancel").addEventListener("click",closeSheet);
   $("f_apply").addEventListener("click",()=>{
     const r=day().rooms[+$("f_room").value];
+    if(r.sessions.length&&!window.confirm("Replace all existing sessions in "+r.name+"?"))return;
     r.sessions=clean.map(x=>({s:x.s,e:x.e,id:x.id,dead:x.dead}));
     r.note="";closeSheet();save();render();});
 }
@@ -1176,6 +1383,8 @@ $("showsbtn").addEventListener("click",()=>{
   $("slist").addEventListener("click",async e=>{
     const del=e.target.dataset.del;
     if(del){
+      const target=index.shows.find(s=>s.id===del);
+      if(!window.confirm("Delete "+(target?target.name:"this show")+" from this browser?"))return;
       index.shows=index.shows.filter(s=>s.id!==del);
       if(index.active===del)index.active=(index.shows[0]||{}).id||null;
       await sset(IDX_KEY,JSON.stringify(index));
@@ -1187,14 +1396,53 @@ $("showsbtn").addEventListener("click",()=>{
     if(row&&row.dataset.s){closeSheet();openShow(row.dataset.s)}
   });
 });
-function exportShow(){
-  const blob=new Blob([JSON.stringify(show,null,2)],{type:"application/json"});
+function downloadJson(data,name){
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
   const a=document.createElement("a");
   a.href=URL.createObjectURL(blob);
-  a.download=(show.name||"show").replace(/[^a-z0-9]+/gi,"-").toLowerCase()+".json";
+  a.download=name;
   document.body.appendChild(a);a.click();
   setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500);
 }
+function exportShow(){
+  const stem=(show.name||"show").replace(/[^a-z0-9]+/gi,"-").replace(/^-|-$/g,"").toLowerCase();
+  downloadJson(show,stem+"-show-board-"+todayISO()+".json");
+}
+async function openBackups(){
+  const snapshots=await loadSnapshots(show.id);
+  const rows=snapshots.length?snapshots.map((snap,i)=>
+    '<div class="issrow"><span>'+new Date(snap.createdAt).toLocaleString()+
+    '<em>Automatic snapshot '+(i+1)+'</em></span><span><button class="btn xs" data-down="'+i+'">JSON</button> '
+    +'<button class="btn xs" data-restore="'+i+'">Restore</button></span></div>').join(""):
+    '<p style="font-size:13px;color:var(--muted)">A snapshot will be created after the next saved change.</p>';
+  openSheet('<h2>Backups · '+esc(show.name)+'</h2>'+
+    '<p style="font-size:13px;color:var(--muted);margin-bottom:12px">Snapshots protect against accidental edits in this browser. Download JSON for protection from cleared browser data or device loss.</p>'+
+    '<div id="snapshotlist">'+rows+'</div><div class="sheet-actions" style="margin-top:14px">'+
+    '<button class="btn primary" id="f_download">Download current JSON</button><button class="btn" id="f_import">Import JSON</button>'+
+    '<button class="btn" id="f_cancel">Close</button></div>');
+  $("f_download").addEventListener("click",exportShow);
+  $("f_import").addEventListener("click",()=>$("s_file").click());
+  $("f_cancel").addEventListener("click",closeSheet);
+  const list=$("snapshotlist");
+  list.addEventListener("click",async e=>{
+    const down=e.target.dataset.down,restore=e.target.dataset.restore;
+    if(down!==undefined){
+      const snap=snapshots[+down];
+      downloadJson(snap.data,(show.name||"show").replace(/[^a-z0-9]+/gi,"-").toLowerCase()+"-snapshot.json");
+      return;
+    }
+    if(restore===undefined)return;
+    const snap=snapshots[+restore];
+    if(!window.confirm("Restore the snapshot from "+new Date(snap.createdAt).toLocaleString()+"?"))return;
+    await addSnapshot(show);
+    const restored=clone(snap.data);
+    restored.id=show.id;restored.revision=loadedRevision;restored.writeToken=loadedWriteToken;
+    restored.savedAt=show.savedAt;show=restored;staleCopy=null;
+    closeSheet();save();applyTheme();render();
+  });
+}
+$("backupbtn").addEventListener("click",exportShow);
+$("backupsbtn").addEventListener("click",openBackups);
 $("s_import").addEventListener("click",()=>$("s_file").click());
 $("s_file").addEventListener("change",e=>{
   const f=e.target.files[0];e.target.value="";
@@ -1205,10 +1453,12 @@ $("s_file").addEventListener("change",e=>{
     try{s=JSON.parse(fr.result)}catch(_){return setupErr("That file is not valid JSON")}
     if(!s||!Array.isArray(s.days))return setupErr("That does not look like a show export");
     s.id=uid();
+    s.savedAt=new Date().toISOString();s.revision=1;s.writeToken=uid()+TAB_ID;
     index.shows.push({id:s.id,name:s.name||"Imported show",venue:s.venue||""});
     index.active=s.id;
     await sset(SHOW_KEY(s.id),JSON.stringify(s));
     await sset(IDX_KEY,JSON.stringify(index));
+    await addSnapshot(s);
     closeSheet();openShow(s.id);
   };
   fr.readAsText(f);
@@ -1279,7 +1529,8 @@ $("s_create").addEventListener("click",async()=>{
     grid:{tick:+$("s_tick").value,snap:+$("s_snap").value,pxPerHour:120},
     turnMax:Math.max(1,+$("s_turn").value||30),
     darkMax:Math.max(1,+$("s_dark").value||60),
-    theme:"light",active:0,days
+    theme:"light",active:0,days,savedAt:new Date().toISOString(),revision:1,
+    writeToken:uid()+TAB_ID
   };
   const t=todayISO();
   const hit=s.days.findIndex(d=>d.date===t);
@@ -1288,7 +1539,9 @@ $("s_create").addEventListener("click",async()=>{
   index.active=s.id;
   await sset(SHOW_KEY(s.id),JSON.stringify(s));
   await sset(IDX_KEY,JSON.stringify(index));
+  await addSnapshot(s);
   show=s;
+  loadedRevision=s.revision;loadedWriteToken=s.writeToken;staleCopy=null;
   document.body.classList.remove("setup");
   applyTheme();render();
 });
@@ -1301,6 +1554,7 @@ async function openShow(id){
   show.grid=show.grid||{tick:15,snap:5,pxPerHour:120};
   show.zones=show.zones||[{name:"Rooms",h:ZONE_HUES[0]}];
   show.turnMax=show.turnMax||30;show.darkMax=show.darkMax||60;
+  loadedRevision=Number(show.revision)||0;loadedWriteToken=show.writeToken||null;staleCopy=null;
   index.active=id;
   await sset(IDX_KEY,JSON.stringify(index));
   const t=todayISO();
@@ -1308,6 +1562,10 @@ async function openShow(id){
   if(hit>=0)show.active=hit;
   applyTheme();render();
 }
+$("reloadbtn").addEventListener("click",()=>{
+  if(!show||!window.confirm("Load the newer browser copy? Download JSON first if you need these unsaved edits."))return;
+  openShow(show.id);
+});
 (async function(){
   index=await loadIndex();
   if(index.active&&index.shows.some(s=>s.id===index.active))await openShow(index.active);
@@ -1315,7 +1573,19 @@ async function openShow(id){
   else openSetup(false);
   setInterval(tick,30000);
   window.addEventListener("resize",()=>{if(show)render()});
+  window.addEventListener("storage",e=>{
+    if(!show||e.key!==SHOW_KEY(show.id)||!e.newValue)return;
+    try{const remote=JSON.parse(e.newValue);
+      if(remote.writeToken&&remote.writeToken!==loadedWriteToken)setStale(remote);
+    }catch(_){}
+  });
+  if("serviceWorker" in navigator){
+    navigator.serviceWorker.register("av-suite-worker.js",{scope:"./"}).catch(()=>{});
+  }
 })();
 </script>
+<script src="js/sbd-registry.js"></script>
+<script src="js/av-suite-context.js"></script>
+<script src="js/sbd-nav.js" defer></script>
 </body>
 </html>

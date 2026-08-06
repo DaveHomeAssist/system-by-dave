@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-08-05
+
+* Promoted `/show-board.html` as the reusable room-turn operations board while keeping `/aom-show-board.html` frozen as the event-specific reference. Added a live exceptions strip, rolling browser snapshots with JSON download and restore, explicit last-save status, cross-tab overwrite detection, offline AV Suite registration, self-hosted fonts, metadata, and keyboard-accessible room and session controls.
+
 ## 2026-07-11
 
 * Hardened the AV Suite show-package boundary so PixelForge provider credentials are excluded from registry scans, exports, and imports; added verifier coverage for the denylist.
