@@ -1,0 +1,348 @@
+1. PROJECT SUMMARY
+
+Objective
+
+- Replace the fragmented System by Dave navigation with a consistent, responsive information architecture across the 75 sitemap-listed public URLs while preserving the specialized behavior of AV tools, documentation subsites, standalone apps, and private/noindex surfaces.
+- Execute from a fresh branch based on the current remote main branch, not the existing divergent feature/site-nav branch.
+
+Key Outcomes
+
+- A five-destination global header: Tools, AV Suite, Notion, Prompt Lab, and Dave; the System by Dave brand always returns Home.
+- A mobile layout that keeps primary links visible at and below 680 px without horizontal overflow or a hamburger-only menu.
+- One AV operator navigation surface per tool page, with no overlapping generic Back/Home control.
+- Static, usable navigation when JavaScript is disabled on core public pages.
+- Consistent local navigation for Notion and Davai sections and a compact site-return breadcrumb for standalone apps.
+- A truthful Tools directory that acts as the canonical directory of top-level products and systems rather than listing every AV leaf tool.
+- Explicit route policy for aliases, moved products, sitemap entries, index/noindex metadata, and private pages.
+- Verified GitHub Pages deployment, live URL behavior, mobile rendering, canonical metadata, and remote commit state.
+
+Assumptions
+
+- The implementation starts from the latest origin/main. The current workspace branch feature/site-nav is divergent and must not be merged wholesale.
+- Existing untracked files and user work remain untouched. A clean worktree or a separate clean worktree based on origin/main will be used for implementation.
+- The site remains static GitHub Pages with vanilla HTML, CSS, and JavaScript. No framework, package manager migration, bundler, or new runtime dependency will be introduced.
+- Reusable navigation styles remain in css/style.css using sbd-site-* prefixes. Page-specific overrides stay in one inline style block per page.
+- Core marketing and directory pages receive the full global header. Standalone apps receive a compact static site-return breadcrumb. AV tools receive only the AV operator bar.
+- GitHub moves from the primary header to the footer. The Dave destination is /profile/.
+- Tools remains a curated top-level product directory. Its copy changes from an exhaustive claim to a category-based directory, while AV Suite remains the detailed directory for AV leaf tools.
+- /cue-sheet.html remains the canonical local CueForge route; /cueforge.html remains a noindex compatibility alias.
+- /stage-plot.html remains the canonical offline-capable local stage plot tool; /plotforge.html remains a noindex external handoff until a separate product decision replaces it.
+- /hat-in-ring/ remains a noindex handoff, and the Tools card links directly to https://hatinring.com.
+- /noteforge/ is an active public product and will be added to Tools and sitemap.xml. Moved, private, error, and compatibility routes remain outside global navigation.
+- Private house, command-center, career-market, dashboard, contract, and prototype pages remain noindex/nofollow where appropriate and are not added to public navigation.
+
+2. PHASED IMPLEMENTATION PLAN
+
+Phase 0 — Establish a Safe, Current Baseline
+
+Goal
+
+- Create an isolated implementation branch from current origin/main and record the live navigation baseline before editing.
+
+Key Milestones
+
+- Fetch origin and verify the current main SHA, Pages source, and live sitemap count.
+- Confirm the existing feature/site-nav branch and its untracked files are not modified or merged.
+- Create a clean branch named feat/site-navigation-system from origin/main, preferably in a separate worktree if the current worktree cannot switch safely.
+- Run npm run verify:public-navigation, npm run verify:av, and git diff --check to establish the pre-change baseline.
+- Capture desktop and mobile screenshots plus DOM measurements for Home, Tools, Teleprompter, Davai, Notion, AV Suite, Profile, and one standalone app.
+- Record baseline failures: Tools width at 390 px, duplicate AV fixed navigation, orphaned public routes, and alias behavior.
+
+Dependencies
+
+- Network access to GitHub and systembydave.com.
+- A readable origin/main and enough local disk space for a clean worktree.
+
+Required Resources
+
+- Git, GitHub CLI, curl, Node.js, Chrome headless/CDP, repository verification scripts.
+- Owner: Implementing developer.
+
+Estimated Timeline
+
+- 1–2 hours.
+
+Owner / Responsible Party
+
+- Implementing developer; repository owner reviews only if remote main or Pages configuration is unexpected.
+
+Risks / Failure Points
+
+- Editing the stale feature branch could omit newer Show Board, AV Workbook, routing, or sitemap work.
+- Existing untracked files could be accidentally staged; stage only explicit paths.
+- Browser tooling may be unavailable; fall back to Chrome headless/CDP and live curl checks.
+
+Phase 1 — Define the Navigation Contract and Shared Primitives
+
+Goal
+
+- Establish one documented navigation contract and shared, collision-resistant styles before changing individual pages.
+
+Key Milestones
+
+- Define three surfaces: global site header, section-local navigation, and AV operator navigation.
+- Add sbd-site-header, sbd-site-links, sbd-site-return, sbd-section-nav, and active-state styles to css/style.css with no unscoped global selectors.
+- Define the desktop header and the <=680 px two-row layout with 44 px minimum targets and no horizontal overflow.
+- Create a canonical static HTML snippet for the global header: brand/Home, Tools, AV Suite, Notion, Prompt Lab, and Dave.
+- Create a canonical static breadcrumb snippet for standalone apps: System by Dave / Tools / Product.
+- Restrict JavaScript to progressive enhancements such as active-state detection; do not rely on JavaScript to create the only escape path.
+
+Dependencies
+
+- Phase 0 baseline and confirmed current main source.
+- Inspection of existing css/style.css selectors and page-specific navigation rules.
+
+Required Resources
+
+- HTML/CSS editor, accessibility inspection, Chrome responsive testing.
+
+Estimated Timeline
+
+- 0.5–1 day.
+
+Owner / Responsible Party
+
+- Implementing developer.
+
+Risks / Failure Points
+
+- Loading shared CSS on dark-design or app pages could cause selector collisions; all new selectors must be sbd-site-* scoped.
+- A six-item header including the brand may still overflow if labels or gaps are not bounded.
+- Replacing inline styles too broadly could create unrelated visual churn.
+
+Phase 2 — Implement the Global Header on Core Public Pages
+
+Goal
+
+- Make the primary navigation consistent and responsive across marketing, directory, profile, resume, and policy pages.
+
+Key Milestones
+
+- Replace or normalize headers on index.html, tools.html, notion.html, prompt-lab.html, skills.html, agents.html, widgets.html, project-registry.html, privacy-policy.html, profile/index.html, resume/index.html, and resume/av/index.html.
+- Apply aria-current="page" to the correct primary destination and preserve meaningful page-level local links.
+- Remove GitHub from primary headers and add or retain it in the footer with rel="noopener noreferrer".
+- Verify the full header at 1440 px, 680 px, 390 px, 320 px, 200% zoom, keyboard-only navigation, and JavaScript-disabled rendering.
+- Confirm no page exceeds viewport width and no header covers page content.
+- Update page-specific inline styles only where the shared component needs a deliberate theme adaptation.
+
+Dependencies
+
+- Phase 1 shared styles and canonical markup.
+
+Required Resources
+
+- Browser responsive mode, keyboard testing, HTML validator or parser, contrast inspection.
+
+Estimated Timeline
+
+- 1–2 days.
+
+Owner / Responsible Party
+
+- Implementing developer.
+
+Risks / Failure Points
+
+- Core pages currently use multiple visual systems; identical structure must not erase intentional page branding.
+- The Profile and resume relative paths differ from root-level pages and can produce broken links if copied verbatim.
+- Existing skip links, sticky controls, and CSP must remain functional.
+
+Phase 3 — Consolidate AV Operator Navigation
+
+Goal
+
+- Replace the overlapping Back/Home and AV navigation controls with one reliable operator bar across all registered AV tools.
+
+Key Milestones
+
+- Change js/sbd-public-nav.js so it does not render on pages managed by js/sbd-nav.js or on pages explicitly marked data-sbd-public-nav="off".
+- Refactor js/sbd-nav.js to render only AV Suite, All Tools, department label, Previous, and Next; remove duplicate Home from the operator bar.
+- Prefer a compact sticky top placement. If a bottom placement is retained for a specific tool, reserve body space and prove it does not cover controls, tables, footers, safe areas, or the AV Suite context dock.
+- Keep tool order and department data sourced from js/sbd-registry.js; do not duplicate the registry in navigation code.
+- Point CueForge navigation to cue-sheet.html and the local stage plot navigation to stage-plot.html while retaining noindex compatibility aliases.
+- Bump the SBD registry/service-worker version and update offline assets if navigation or registry files change.
+
+Dependencies
+
+- Phase 1 component contract.
+- Current js/sbd-registry.js, js/sbd-nav.js, js/sbd-public-nav.js, av-suite-worker.js, and AV context-dock behavior.
+
+Required Resources
+
+- Repository AV verification scripts, Chrome mobile testing, localStorage-safe smoke tests, service-worker inspection.
+
+Estimated Timeline
+
+- 1–2 days.
+
+Owner / Responsible Party
+
+- Implementing developer.
+
+Risks / Failure Points
+
+- Script execution order may cause both controls to render before the skip condition is evaluated.
+- Sticky positioning can conflict with Teleprompter, Show Timer, full-screen modes, print views, and existing tool headers.
+- Registry changes can invalidate offline caches or break previous/next ordering.
+- URL show-context parameters must survive navigation between AV tools.
+
+Phase 4 — Add Section Navigation and Standalone-App Escape Paths
+
+Goal
+
+- Give each public section a predictable local hierarchy without forcing full marketing navigation into operational apps.
+
+Key Milestones
+
+- Add Notion local navigation: Overview, Skills, Agents, Widgets, and Prompts.
+- Retain the Davai primary and layer navigation, but add a static System by Dave / Tools / Davai breadcrumb on all 14 Davai pages.
+- Add the compact static site-return breadcrumb to AV Workbook, PixelForge, World Cup, FIFA Pitch Crew, Scorecard, Prompts, Remote Desktop, Tailscale Manual, NoteForge, and other active standalone public products.
+- Keep product-native navigation visually dominant below the site-return breadcrumb.
+- Remove generic history-based Back buttons where a deterministic parent link exists.
+- Verify relative paths from nested directories and confirm every sitemap-listed page has a deterministic route to Home or Tools with JavaScript disabled.
+
+Dependencies
+
+- Phase 1 breadcrumb and section-nav patterns.
+- Phase 2 global destinations finalized.
+
+Required Resources
+
+- Static HTML editing, link crawler, JavaScript-disabled browser checks.
+
+Estimated Timeline
+
+- 1–2 days.
+
+Owner / Responsible Party
+
+- Implementing developer.
+
+Risks / Failure Points
+
+- Nested products use different asset and link bases; root-relative links should be used for site navigation.
+- App service workers may cache old shells and hide navigation changes during testing.
+- A site-return strip must not interfere with app fullscreen or installable-PWA layouts.
+
+Phase 5 — Reconcile the Tools Directory, Routes, and Indexing Policy
+
+Goal
+
+- Align the visible product directory, canonical routes, aliases, robots directives, and sitemap with the intended public information architecture.
+
+Key Milestones
+
+- Rewrite Tools hero copy to describe a curated directory of products and systems rather than every individual page.
+- Add or verify cards for NoteForge, Davai, Tailscale Manual, Scorecard, and other active public top-level products; retain one AV Suite card rather than duplicating all AV leaf tools.
+- Change Hat-in-Ring’s card to https://hatinring.com and keep the local handoff noindex,follow.
+- Add /noteforge/ to sitemap.xml with an accurate lastmod, and verify active public pages are intentionally included or excluded.
+- Keep /cueforge.html, /plotforge.html, and /av-workbook.html as noindex compatibility routes; ensure visible navigation points to the selected canonical destination.
+- Add explicit noindex metadata to moved or unmanaged stubs such as /marsscape/ and classify /aom-show-board.html as either an active AV tool or a private/retired page before leaving it deployed.
+- Verify private house, Command53, Career Market, dashboards, contract reviews, prototypes, 404, and 500 pages remain outside the sitemap and public navigation.
+
+Dependencies
+
+- Phases 2–4 establish final visible destinations and canonical parent routes.
+- Current sitemap generator behavior and robots.txt policy are understood.
+
+Required Resources
+
+- scripts/gen_sitemap.py, sitemap.xml, robots.txt, metadata parser, curl, repository route registry.
+
+Estimated Timeline
+
+- 0.5–1 day.
+
+Owner / Responsible Party
+
+- Implementing developer; repository owner reviews only the active-versus-retired classification if source evidence conflicts with the assumptions above.
+
+Risks / Failure Points
+
+- Adding every internal app route would bloat the sitemap and expose implementation pages.
+- Inconsistent canonical and noindex directives can send conflicting search signals.
+- GitHub Pages cannot provide normal server-side redirects; compatibility routes require clear canonical/noindex handling.
+- The sitemap generator can overwrite manual edits if its source registry is not updated first.
+
+Phase 6 — Full Verification, Deployment, and Live Closeout
+
+Goal
+
+- Prove the navigation works from source through GitHub Pages deployment and leave a reviewable audit trail.
+
+Key Milestones
+
+- Run npm run verify:public-navigation, npm run verify:av, python3 scripts/gen_sitemap.py --check if supported, and git diff --check.
+- Parse all public HTML for required metadata, CSP, external-link rel attributes, aria-current usage, and duplicate primary-navigation landmarks.
+- Crawl every sitemap URL and assert HTTP 200, one deterministic site escape path, correct canonical behavior, and no private-page exposure.
+- Run browser checks at 1440 x 900, 680 x 900, 390 x 844, and 320 x 700 for representative pages from every navigation class.
+- Test keyboard navigation, visible focus, 200% zoom, JavaScript disabled, print views for AV documents, AV full-screen modes, and service-worker refresh behavior.
+- Review the final diff for unrelated changes, stage only intended files, commit by coherent phase, and push each commit to the implementation branch.
+- After review, merge to main through the repository’s normal process; verify the remote main SHA, GitHub Pages status, live sitemap count, live HTML, and the key navigation routes.
+
+Dependencies
+
+- Phases 1–5 complete with no unresolved route classification.
+- GitHub authentication and Pages access.
+
+Required Resources
+
+- Git, GitHub CLI, curl, Node.js, Chrome headless/CDP, repo verifiers, HTML parser.
+
+Estimated Timeline
+
+- 1 day plus GitHub Pages propagation.
+
+Owner / Responsible Party
+
+- Implementing developer for code and verification; repository owner for final review/merge if branch protection requires it.
+
+Risks / Failure Points
+
+- Passing repository tests does not prove the deployed site updated; live URL verification is mandatory.
+- Service-worker or CDN caching may show stale navigation after deployment.
+- A clean feature branch can still conflict with new main changes if implementation runs for several days; re-check origin/main before final merge.
+- Existing pre-change verifier failures must remain documented and must not be misreported as navigation regressions.
+
+3. EXECUTION NOTES
+
+Critical Sequencing Constraints
+
+- Do not edit or merge the current feature/site-nav branch. Establish a clean origin/main-based branch before any implementation change.
+- Define the shared navigation contract before editing individual pages; otherwise page-specific fixes will diverge again.
+- Complete global destinations before building section-local navigation and Tools directory cards.
+- Consolidate AV navigation before performing mobile acceptance testing; the current duplicate fixed controls invalidate layout results.
+- Update js/sbd-registry.js before regenerating sitemap.xml or offline assets so generated outputs reflect the canonical route decisions.
+- Preserve static HTML escape paths before adding JavaScript enhancements.
+- Keep private/noindex routes excluded throughout; do not expose them temporarily during directory work.
+- Re-run live main reconciliation immediately before merge and deployment verification.
+
+Parallelizable Work
+
+- After Phase 1, core-header conversion and AV navigation consolidation can proceed in parallel if each owner edits separate files and both use the same navigation contract.
+- Davai breadcrumb updates and Notion local navigation can run in parallel after global destinations are fixed.
+- Route/metadata inventory can run alongside standalone-app breadcrumb work, but sitemap regeneration waits for both to finish.
+- Automated link crawling, metadata parsing, and screenshot collection can run concurrently during final verification.
+
+Quick Wins
+
+- Prevent sbd-public-nav from rendering when sbd-nav is present.
+- Move GitHub from the primary header to the footer and add Dave to the header.
+- Add <=680 px wrapping/grid rules to the Tools header.
+- Point the Hat-in-Ring card directly to hatinring.com.
+- Add NoteForge to Tools and sitemap.xml.
+
+Long-Lead Tasks
+
+- Converting all public page classes to the correct static navigation pattern.
+- Testing AV tools against sticky navigation, full-screen modes, print output, context parameters, and offline cache behavior.
+- Reconciling active, moved, alias, private, and orphan route policy across the 196 deployed HTML documents.
+- Completing live Pages verification after merge and cache propagation.
+
+4. NEXT ACTIONS
+
+1. Run git fetch origin and record the current origin/main SHA plus git status without modifying the existing feature/site-nav worktree.
+2. Create a clean worktree and branch named feat/site-navigation-system from origin/main.
+3. Run npm run verify:public-navigation, npm run verify:av, and git diff --check in the clean worktree and save the baseline results.
+4. Capture 390 px DOM width and navigation rectangles for Tools and Teleprompter, plus screenshots for the eight representative baseline pages.
+5. Inspect css/style.css, js/sbd-public-nav.js, js/sbd-nav.js, js/sbd-registry.js, and the core-page header markup, then finalize the exact sbd-site-* selectors before the first code edit.
