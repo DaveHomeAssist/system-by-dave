@@ -624,6 +624,29 @@
     document.head.appendChild(style);
     document.body.appendChild(dock);
     setDockCompact(dock, readDockCompact(), true);
+    publishDockHeight(dock);
+  }
+
+  /* Both this dock and js/sbd-nav.js pin themselves to the bottom edge, and
+     below 680px both go full width — so the dock would sit on top of the tool
+     nav (it wins on z-index: 9999 vs 9998). Publish our measured height so the
+     nav can lift itself clear. The dock's height is not fixed: it re-flows at
+     900px and 680px, has a compact mode, and grows when the note editor opens,
+     so this has to be measured rather than hard-coded. */
+  function publishDockHeight(dock){
+    var root = document.documentElement;
+    function apply(){
+      var h = dock.offsetHeight || 0;
+      root.style.setProperty('--sbd-dock-height', h + 'px');
+      root.setAttribute('data-sbd-dock', h > 0 ? 'on' : 'off');
+    }
+    apply();
+    if(typeof ResizeObserver === 'function'){
+      new ResizeObserver(apply).observe(dock);
+    }else{
+      window.addEventListener('resize', apply);
+      window.addEventListener('orientationchange', apply);
+    }
   }
 
   if(document.readyState === 'loading'){

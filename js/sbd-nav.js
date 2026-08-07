@@ -118,6 +118,13 @@
       '.sbd-nav .sbd-nav-sep{width:1px;align-self:stretch;margin:2px 1px;background:rgba(120,132,148,.32)}',
       '.sbd-nav .sbd-nav-step{max-width:150px;overflow:hidden;text-overflow:ellipsis}',
       '@media (max-width:680px){.sbd-nav{left:10px;right:10px;bottom:10px;flex-wrap:wrap;justify-content:center}.sbd-nav .sbd-nav-step{max-width:none}}',
+      /* js/av-suite-context.js pins its show-context dock to the same bottom
+         edge and also goes full width below 680px, so without this the dock
+         (z-index 9999) would completely cover this nav (9998). It publishes
+         its measured height as --sbd-dock-height and stamps data-sbd-dock;
+         when the dock is absent the selector never matches and the rule above
+         stands unchanged. */
+      '@media (max-width:680px){html[data-sbd-dock="on"] .sbd-nav{bottom:calc(20px + var(--sbd-dock-height,0px))}}',
       '@media print{.sbd-nav{display:none!important}}'
     ].join('');
 
