@@ -65,6 +65,12 @@
      client-signoff.html         9 tokens
      teleprompter.html           5 tokens
 
-   av-suite.html is deliberately NOT linked to this file: it references
-   --bg, --line, --rust, --shadow and --text without defining them, so
-   linking it would change its rendering. Fix those first. */
+   av-suite.html is deliberately NOT linked to this file, and should stay
+   that way. It carries its own complete design system — a warm dark ground
+   (--bg:#15120f against this file's cool #0b0d10), four elevation steps,
+   text tiers, a rust accent with tint/line variants, a semantic status set
+   (ready / issue / skip / pin / info), a type scale, an 8px spacing rhythm,
+   a radius scale and a motion scale: 72 tokens, none of them missing. It is
+   the suite's hub, not one of its tools, and it is meant to look different.
+   Linking this file would add ~13 tokens it never uses and imply a shared
+   palette that isn't there. */

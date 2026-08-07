@@ -49,11 +49,15 @@ Read `CLAUDE.md` first for project orientation. This file is the rulebook.
 - An AV tool page links `css/av-tool.css` and then redeclares only the tokens
   it genuinely needs to differ on. A page-local `:root` full of values
   identical to the shared file is duplication — delete it.
-- Two pages are intentionally not linked to `css/av-tool.css`:
-  `av-suite.html` (references `--bg`, `--line`, `--rust`, `--shadow`,
-  `--text` without defining them, so linking would change its rendering —
-  fix that first) and `teleprompter.html` (deviates on every core token it
-  defines).
+- Two pages are intentionally not linked to `css/av-tool.css`, and should
+  stay that way:
+  - `av-suite.html` is the suite **hub**, not a tool. It has its own
+    complete warm design system (72 tokens — warm dark ground, elevation
+    steps, text tiers, rust accent, a semantic status set, type scale,
+    spacing rhythm, radius and motion scales) and is meant to look
+    different from the tools it launches.
+  - `teleprompter.html` deviates on every core token it defines, so the
+    shared file would remove nothing.
 - Mobile breakpoint is **680px**. The mobile nav must keep the primary links
   visible at that breakpoint — do not collapse them into a hamburger-only menu.
 
