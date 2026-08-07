@@ -1,4 +1,0 @@
-User-agent: *
-Allow: /
-
-Sitemap: https://systembydave.com/systembydave/sitemap.xml

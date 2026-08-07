@@ -1,6 +1,8 @@
 .DS_Store
 *.DS_Store
 Thumbs.db
+__pycache__/
+*.pyc
 Agent Images/
 Prompt Lab Extension Pictures (v1.7)/
 
