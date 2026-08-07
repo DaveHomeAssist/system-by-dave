@@ -72,27 +72,29 @@
 <link rel="stylesheet" href="css/sbd-public-nav.css">
 </head>
 <body style="font-family:var(--ff-body);background:var(--bg);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased;">
+<a class="sbd-skip-link" href="#main-content">Skip to content</a>
 <div style="position:relative;min-height:100vh;overflow-x:hidden;">
   <div style="position:absolute;inset:0;pointer-events:none;z-index:0;background:repeating-linear-gradient(90deg, rgba(255,255,255,0.022) 0 1px, transparent 1px 88px), repeating-linear-gradient(0deg, rgba(255,255,255,0.022) 0 1px, transparent 1px 88px);"></div>
   <div style="position:absolute;top:-180px;left:50%;transform:translateX(-50%);width:980px;height:560px;pointer-events:none;z-index:0;background:radial-gradient(ellipse at center, oklch(0.66 0.17 256 / 0.2), transparent 70%);filter:blur(20px);"></div>
   <div style="position:relative;z-index:1;">
 
-    <header style="position:sticky;top:0;z-index:100;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);background:rgba(10,13,20,0.72);border-bottom:1px solid rgba(255,255,255,0.07);">
-      <nav class="bar" style="max-width:1200px;margin:0 auto;padding:0 40px;height:70px;display:flex;align-items:center;justify-content:space-between;gap:24px;">
-        <a href="index.html" style="display:flex;align-items:center;gap:12px;text-decoration:none;color:#F3F4F7;">
-          <span style="width:34px;height:34px;border:1px solid rgba(255,255,255,0.22);display:flex;align-items:center;justify-content:center;font-family:var(--ff-display);font-weight:600;font-size:16px;background:rgba(255,255,255,0.03);">S</span>
-          <span style="font-family:var(--ff-mono);font-size:12px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(243,244,247,0.85);">System<span style="color:rgba(243,244,247,0.4);">_by_</span>Dave</span>
-        </a>
-        <div class="nav-links" style="display:flex;align-items:center;gap:30px;">
-          <a href="notion.html" class="nav-link" style="font-family:var(--ff-mono);font-size:12px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;">Notion</a>
-          <a href="av-suite.html" class="nav-link" style="font-family:var(--ff-mono);font-size:12px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;">AV&nbsp;Suite</a>
-          <a href="prompt-lab.html" class="nav-link active" style="font-family:var(--ff-mono);font-size:12px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;">Prompt&nbsp;Lab</a>
-          <a href="https://promptlab.tools" target="_blank" rel="noopener noreferrer" class="gh-btn" data-track-cta="promptlab:nav-get-it" style="font-family:var(--ff-mono);font-size:12px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;color:#0A0D14;background:#F3F4F7;padding:9px 18px;">Get&nbsp;it ↗</a>
-        </div>
-      </nav>
-    </header>
+    <header class="sbd-site-header">
+  <nav class="sbd-site-header__inner" aria-label="Primary">
+    <a class="sbd-site-brand" href="/">
+      <span class="sbd-site-brand__mark" aria-hidden="true">SD</span>
+      <span class="sbd-site-brand__word">System by Dave</span>
+    </a>
+    <div class="sbd-site-links">
+      <a href="/tools.html">Tools</a>
+      <a href="/av-suite.html">AV Suite</a>
+      <a href="/notion.html">Notion</a>
+      <a href="/prompt-lab.html" aria-current="page">Prompt Lab</a>
+      <a href="/profile/">Dave</a>
+    </div>
+  </nav>
+</header>
 
-    <section style="max-width:1200px;margin:0 auto;padding:80px 40px 40px;">
+    <section id="main-content" style="max-width:1200px;margin:0 auto;padding:80px 40px 40px;">
       <div style="font-family:var(--ff-mono);font-size:12px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(243,244,247,0.4);margin-bottom:28px;"><a href="index.html" class="nav-link" style="text-decoration:none;">Home</a> / <span style="color:oklch(0.7 0.17 256);">Prompt Lab</span></div>
       <div style="text-align:center;max-width:760px;margin:0 auto 56px;">
         <div style="display:inline-flex;align-items:center;gap:9px;font-family:var(--ff-mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:oklch(0.7 0.17 256);margin-bottom:26px;"><span style="width:7px;height:7px;border-radius:50%;background:oklch(0.66 0.17 256);box-shadow:0 0 10px oklch(0.66 0.17 256);"></span>Chrome extension · v1.7 · free</div>

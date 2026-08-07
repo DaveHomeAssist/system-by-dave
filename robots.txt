@@ -8,6 +8,7 @@ Disallow: /prompt-browser.html
 Disallow: /youtube-pipeline.html
 Disallow: /agent-finder/
 Disallow: /career-market.html
+Disallow: /aom-show-board.html
 
 Disallow: /cross-project-dashboard.html
 Disallow: /wedding-ops.html

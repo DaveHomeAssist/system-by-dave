@@ -67,29 +67,31 @@
 <link rel="stylesheet" href="css/sbd-public-nav.css">
 </head>
 <body>
+<a class="sbd-skip-link" href="#main-content">Skip to content</a>
   <div style="position:fixed;inset:0;pointer-events:none;z-index:0;background:repeating-linear-gradient(90deg, rgba(255,255,255,0.022) 0 1px, transparent 1px 88px), repeating-linear-gradient(0deg, rgba(255,255,255,0.022) 0 1px, transparent 1px 88px);"></div>
   <div style="position:relative;z-index:1;">
-  <header style="position:sticky;top:0;z-index:100;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);background:rgba(10,13,20,0.72);border-bottom:1px solid rgba(255,255,255,0.07);">
-    <nav class="container" aria-label="Primary" style="height:70px;display:flex;align-items:center;justify-content:space-between;gap:24px;">
-      <a href="index.html" style="display:flex;align-items:center;gap:12px;text-decoration:none;color:#F3F4F7;">
-        <span style="width:34px;height:34px;border:1px solid rgba(255,255,255,0.22);display:flex;align-items:center;justify-content:center;font-family:var(--ff-display);font-weight:600;font-size:16px;background:rgba(255,255,255,0.03);">S</span>
-        <span style="font-family:var(--ff-mono);font-size:12px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(243,244,247,0.85);">System<span style="color:rgba(243,244,247,0.4);">_by_</span>Dave</span>
-      </a>
-      <div style="display:flex;align-items:center;gap:30px;">
-        <a href="notion.html" class="nav-link">Notion</a>
-        <a href="av-suite.html" class="nav-link">AV&nbsp;Suite</a>
-        <a href="prompt-lab.html" class="nav-link">Prompt&nbsp;Lab</a>
-        <a href="https://github.com/DaveHomeAssist/system-by-dave" target="_blank" rel="noopener noreferrer" class="gh-btn">GitHub&nbsp;↗</a>
-      </div>
-    </nav>
-  </header>
+  <header class="sbd-site-header">
+  <nav class="sbd-site-header__inner" aria-label="Primary">
+    <a class="sbd-site-brand" href="/">
+      <span class="sbd-site-brand__mark" aria-hidden="true">SD</span>
+      <span class="sbd-site-brand__word">System by Dave</span>
+    </a>
+    <div class="sbd-site-links">
+      <a href="/tools.html" aria-current="page">Tools</a>
+      <a href="/av-suite.html">AV Suite</a>
+      <a href="/notion.html">Notion</a>
+      <a href="/prompt-lab.html">Prompt Lab</a>
+      <a href="/profile/">Dave</a>
+    </div>
+  </nav>
+</header>
 
   <main id="main-content">
     <section class="tools-hero">
       <div class="container">
-        <div class="eyebrow">Everything in one place</div>
+        <div class="eyebrow">Curated product directory</div>
         <h1>Tools, apps &amp; trackers</h1>
-        <p>Everything I've built and shipped — AV show utilities, Notion tools, apps &amp; games, live trackers, and dev experiments. Each card opens the live tool. Filter by category below.</p>
+        <p>Start with the major products and systems: AV operations, Notion resources, apps, trackers, and field references. AV Suite contains the full operator-tool catalog.</p>
       </div>
     </section>
 
@@ -143,12 +145,14 @@
     // ── Apps & Games ──
     { name: 'Garden OS',           url: 'https://davehomeassist.github.io/garden-os/',     chips: ['Apps','Games'],          blurb: 'Plan a raised-bed garden with an explainable, deterministic crop-scoring engine. Spec-first showcase.' },
     { name: 'MLB Ballparks Quest', url: 'https://davehomeassist.github.io/mlb-ballparks-quest/', chips: ['Apps','Games','Sports'], blurb: 'Track ballpark visits, plan stadium road trips, and scorekeep live games. Phillies-themed PWA.' },
+    { name: 'Ballpark Scorecard',  url: 'scorecard/',                                      chips: ['Apps','Sports'],         blurb: 'A focused, installable baseball scorecard for tracking an entire game from the stands.' },
     { name: 'FIFA Pitch Crew',     url: '/fifa-pitch-crew/',                               chips: ['Games','Sports'],        blurb: 'Arcade halftime-cover game — deploy the stage cloth across six lanes, dodge the sprinklers, run the show, then strike it before kickoff.' },
     { name: 'PixelForge',          url: 'pixelforge/',                                     chips: ['AV','Apps'],             blurb: 'Browser raster, vector, text, and image editing for show graphics, signage fixes, simple overlays, and PNG export.' },
+    { name: 'NoteForge',           url: 'noteforge/',                                      chips: ['Apps'],                  blurb: 'A local-first writing workspace for structured notes, reusable documents, and focused drafting.' },
     { name: 'Trailkeeper',         url: 'https://davehomeassist.github.io/trailkeeper/',   chips: ['Apps','Trackers'],       blurb: 'Plan, shortlist and log hiking trails with live weather and nearby-trail discovery.' },
     { name: 'Festival Atlas',      url: 'https://davehomeassist.github.io/festival-atlas/',chips: ['Apps','Trackers'],       blurb: 'Browse, route and journal music festivals — 43 USA festivals seeded with 2026 dates. (Prototype.)' },
     // ── Trackers ──
-    { name: 'Hat-in-Ring Radar',   url: 'hat-in-ring/',                                    chips: ['Trackers'],              blurb: 'A 2028 presidential signal tracker — who is stepping into the ring, scored by how serious the move is.' },
+    { name: 'Hat-in-Ring Radar',   url: 'https://hatinring.com/',                          chips: ['Trackers'],              blurb: 'A 2028 presidential signal tracker — who is stepping into the ring, scored by how serious the move is.' },
     { name: 'World Cup Predictor', url: '/world-cup/',                                     chips: ['Trackers','Sports'],     blurb: 'Predict and track the World Cup as results come in.' },
     { name: 'Phillies Wire',       url: 'https://davehomeassist.github.io/phillies-wire/', chips: ['Trackers','Sports'],     blurb: 'A daily auto-generated Philadelphia Phillies newsletter, dashboard and live-innings view.' },
     { name: 'Frontier Signals',    url: 'https://davehomeassist.github.io/frontier-signals-pipeline/', chips: ['Trackers'],  blurb: 'A dark editorial "magazine" tracking frontier-compute signals, refreshed from a scraper pipeline.' },
@@ -157,6 +161,8 @@
     { name: 'SDLC Tool Stack Map', url: 'https://davehomeassist.github.io/sdlc-tool-stack-map/', chips: ['Labs'],            blurb: 'An interactive visual map of an SDLC tool stack, grouped by lifecycle stage.' },
     { name: 'Prompt Lab',          url: 'https://promptlab.tools/',                        chips: ['Labs'],                  blurb: 'A multi-surface prompt-engineering workstation — hosted web app, Chrome extension and desktop build.' },
     { name: 'Project Registry',    url: 'project-registry.html',                           chips: ['Labs'],                  blurb: 'Public-safe repository inventory with stack, purpose, status, and recent activity.' },
+    { name: 'Davai Memory Architecture', url: 'systembydave/',                             chips: ['Notion','Labs'],         blurb: 'The layered memory, routing, lifecycle, and synchronization architecture behind Dave’s working system.' },
+    { name: 'Tailscale Manual',    url: 'tailscale-manual.html',                           chips: ['Labs'],                  blurb: 'A responsive, printable field manual for secure Tailscale access, identity, routing, and recovery.' },
     { name: 'Dave Robertson Profile', url: 'profile/',                                     chips: ['Labs'],                  blurb: 'Live event, broadcast, systems, and business operating context for clients and collaborators.' },
     { name: 'Remote Desktop',      url: 'remote-desktop.html',                             chips: ['Labs'],                  blurb: 'Serverless WebRTC screen share, file transfer, and remote view — locator-not-password session codes, verbal peer authentication, and capability-scoped consent.' }
   ];

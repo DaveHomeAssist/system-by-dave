@@ -2,6 +2,8 @@
 
 ## 2026-08-06
 
+* Reworked public navigation around a shared five-destination header, Notion section navigation, Davai and standalone-product breadcrumbs, and one consolidated AV operator bar with deterministic routes, visible keyboard focus, 44 px targets, and phone-width containment.
+* Reconciled the Tools directory and public route policy: added NoteForge, Ballpark Scorecard, Davai, and the Tailscale Manual; pointed Hat-in-Ring to its production domain; selected canonical local CueForge and Stage Plot routes; and classified moved or frozen pages with noindex directives.
 * Added `/tailscale-manual.html`, a responsive, printable Tailscale field manual for solo operators and homelabs. The page preserves the supplied 12-section reference, command and policy snippets, troubleshooting tables, and source links, with a sticky manual index, reading progress, and copyable code blocks.
 
 ## 2026-08-05

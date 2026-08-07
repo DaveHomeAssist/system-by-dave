@@ -51,22 +51,24 @@
 <link rel="stylesheet" href="css/sbd-public-nav.css">
 </head>
 <body>
+<a class="sbd-skip-link" href="#main-content">Skip to content</a>
 <div style="position:fixed;inset:0;pointer-events:none;z-index:0;background:repeating-linear-gradient(90deg, rgba(255,255,255,0.022) 0 1px, transparent 1px 88px), repeating-linear-gradient(0deg, rgba(255,255,255,0.022) 0 1px, transparent 1px 88px);"></div>
 <div style="position:relative;z-index:1;">
-  <header style="position:sticky;top:0;z-index:100;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);background:rgba(10,13,20,0.72);border-bottom:1px solid rgba(255,255,255,0.07);">
-    <nav class="container" aria-label="Primary" style="height:70px;display:flex;align-items:center;justify-content:space-between;gap:24px;">
-      <a href="index.html" style="display:flex;align-items:center;gap:12px;text-decoration:none;color:#F3F4F7;">
-        <span style="width:34px;height:34px;border:1px solid rgba(255,255,255,0.22);display:flex;align-items:center;justify-content:center;font-family:var(--ff-display);font-weight:600;font-size:16px;background:rgba(255,255,255,0.03);">S</span>
-        <span style="font-family:var(--ff-mono);font-size:12px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(243,244,247,0.85);">System<span style="color:rgba(243,244,247,0.4);">_by_</span>Dave</span>
-      </a>
-      <div style="display:flex;align-items:center;gap:30px;">
-        <a href="notion.html" class="nav-link">Notion</a>
-        <a href="av-suite.html" class="nav-link">AV&nbsp;Suite</a>
-        <a href="prompt-lab.html" class="nav-link">Prompt&nbsp;Lab</a>
-        <a href="https://github.com/DaveHomeAssist/system-by-dave" target="_blank" rel="noopener" class="gh-btn">GitHub&nbsp;↗</a>
-      </div>
-    </nav>
-  </header>
+  <header class="sbd-site-header">
+  <nav class="sbd-site-header__inner" aria-label="Primary">
+    <a class="sbd-site-brand" href="/">
+      <span class="sbd-site-brand__mark" aria-hidden="true">SD</span>
+      <span class="sbd-site-brand__word">System by Dave</span>
+    </a>
+    <div class="sbd-site-links">
+      <a href="/tools.html">Tools</a>
+      <a href="/av-suite.html">AV Suite</a>
+      <a href="/notion.html">Notion</a>
+      <a href="/prompt-lab.html">Prompt Lab</a>
+      <a href="/profile/">Dave</a>
+    </div>
+  </nav>
+</header>
 
   <main id="main-content">
     <section class="container" style="padding:88px 40px 24px;">
@@ -99,7 +101,7 @@
         <a href="index.html" class="nav-link" style="font-size:11px;">Home</a>
         <a href="notion.html" class="nav-link" style="font-size:11px;">Notion</a>
         <a href="av-suite.html" class="nav-link" style="font-size:11px;">AV Suite</a>
-        <a href="https://github.com/DaveHomeAssist" target="_blank" rel="noopener" class="nav-link" style="font-size:11px;">GitHub ↗</a>
+        <a href="https://github.com/DaveHomeAssist" target="_blank" rel="noopener noreferrer" class="nav-link" style="font-size:11px;">GitHub ↗</a>
       </div>
       <span style="font-family:var(--ff-mono);font-size:11px;color:rgba(243,244,247,0.35);">© 2026</span>
     </div>
