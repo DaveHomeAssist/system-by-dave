@@ -173,24 +173,27 @@
     a { color: #000 !important; }
   }
 </style>
+<link rel="stylesheet" href="css/sbd-public-nav.css">
 </head>
 <body>
 <a class="skip-link" href="#main-content">Skip to manual</a>
 <div class="reading-progress" aria-hidden="true"><span id="readingProgress"></span></div>
 <div class="manual-shell">
-  <header class="manual-header">
-    <nav class="container" aria-label="Primary">
-      <a href="index.html" class="nav-brand">
-        <div class="nav-brand-mark"><span>S</span><span class="mark-d">D</span></div>
-        <span class="nav-brand-text">System by Dave</span>
-      </a>
-      <ul class="nav-links">
-        <li><a href="tools.html">Tools</a></li>
-        <li><a href="#manual-index">Manual index</a></li>
-        <li><a href="https://tailscale.com/docs" target="_blank" rel="noopener noreferrer">Tailscale docs ↗</a></li>
-      </ul>
-    </nav>
-  </header>
+  <header class="sbd-site-header">
+  <nav class="sbd-site-header__inner" aria-label="Primary">
+    <a class="sbd-site-brand" href="/">
+      <span class="sbd-site-brand__mark" aria-hidden="true">SD</span>
+      <span class="sbd-site-brand__word">System by Dave</span>
+    </a>
+    <div class="sbd-site-links">
+      <a href="/tools.html" aria-current="page">Tools</a>
+      <a href="/av-suite.html">AV Suite</a>
+      <a href="/notion.html">Notion</a>
+      <a href="/prompt-lab.html">Prompt Lab</a>
+      <a href="/profile/">Dave</a>
+    </div>
+  </nav>
+</header>
 
   <main id="main-content">
     <section class="manual-hero" aria-labelledby="manual-title">

@@ -41,27 +41,36 @@
 <link rel="stylesheet" href="css/sbd-public-nav.css">
 </head>
 <body style="font-family:var(--ff-body);background:var(--bg);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased;">
+<a class="sbd-skip-link" href="#main-content">Skip to content</a>
 <div style="position:relative;min-height:100vh;overflow-x:hidden;">
   <div style="position:absolute;inset:0;pointer-events:none;z-index:0;background:repeating-linear-gradient(90deg, rgba(255,255,255,0.022) 0 1px, transparent 1px 88px), repeating-linear-gradient(0deg, rgba(255,255,255,0.022) 0 1px, transparent 1px 88px);"></div>
   <div style="position:absolute;top:-180px;left:50%;transform:translateX(-50%);width:900px;height:520px;pointer-events:none;z-index:0;background:radial-gradient(ellipse at center, oklch(0.65 0.19 33 / 0.16), transparent 70%);filter:blur(20px);"></div>
   <div style="position:relative;z-index:1;">
 
-    <header style="position:sticky;top:0;z-index:100;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);background:rgba(10,13,20,0.72);border-bottom:1px solid rgba(255,255,255,0.07);">
-      <nav class="bar" style="max-width:1200px;margin:0 auto;padding:0 40px;height:70px;display:flex;align-items:center;justify-content:space-between;gap:24px;">
-        <a href="index.html" style="display:flex;align-items:center;gap:12px;text-decoration:none;color:#F3F4F7;">
-          <span style="width:34px;height:34px;border:1px solid rgba(255,255,255,0.22);display:flex;align-items:center;justify-content:center;font-family:var(--ff-display);font-weight:600;font-size:16px;background:rgba(255,255,255,0.03);">S</span>
-          <span style="font-family:var(--ff-mono);font-size:12px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(243,244,247,0.85);">System<span style="color:rgba(243,244,247,0.4);">_by_</span>Dave</span>
-        </a>
-        <div class="nav-links" style="display:flex;align-items:center;gap:30px;">
-          <a href="notion.html" class="nav-link active" style="font-family:var(--ff-mono);font-size:12px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;">Notion</a>
-          <a href="av-suite.html" class="nav-link" style="font-family:var(--ff-mono);font-size:12px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;">AV&nbsp;Suite</a>
-          <a href="prompt-lab.html" class="nav-link" style="font-family:var(--ff-mono);font-size:12px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;">Prompt&nbsp;Lab</a>
-          <a href="https://github.com/DaveHomeAssist/system-by-dave" target="_blank" rel="noopener" class="gh-btn" style="font-family:var(--ff-mono);font-size:12px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;color:#0A0D14;background:#F3F4F7;padding:9px 18px;">GitHub&nbsp;↗</a>
-        </div>
-      </nav>
-    </header>
+    <header class="sbd-site-header">
+  <nav class="sbd-site-header__inner" aria-label="Primary">
+    <a class="sbd-site-brand" href="/">
+      <span class="sbd-site-brand__mark" aria-hidden="true">SD</span>
+      <span class="sbd-site-brand__word">System by Dave</span>
+    </a>
+    <div class="sbd-site-links">
+      <a href="/tools.html">Tools</a>
+      <a href="/av-suite.html">AV Suite</a>
+      <a href="/notion.html" aria-current="page">Notion</a>
+      <a href="/prompt-lab.html">Prompt Lab</a>
+      <a href="/profile/">Dave</a>
+    </div>
+  </nav>
+</header>
+<nav class="sbd-section-nav" aria-label="Notion section">
+  <a href="/notion.html">Overview</a>
+  <a href="/skills.html">Skills</a>
+  <a href="/agents.html">Agents</a>
+  <a href="/widgets.html" aria-current="page">Widgets</a>
+  <a href="/prompts/">Prompts</a>
+</nav>
 
-    <section style="max-width:1200px;margin:0 auto;padding:88px 40px 40px;">
+    <section id="main-content" style="max-width:1200px;margin:0 auto;padding:88px 40px 40px;">
       <div style="font-family:var(--ff-mono);font-size:12px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(243,244,247,0.4);margin-bottom:28px;"><a href="index.html" class="nav-link" style="text-decoration:none;">Home</a> / <a href="notion.html" class="nav-link" style="text-decoration:none;">Notion</a> / <span style="color:oklch(0.72 0.19 33);">Widgets</span></div>
       <div style="display:inline-flex;align-items:center;gap:9px;font-family:var(--ff-mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:oklch(0.72 0.19 33);margin-bottom:22px;"><span style="width:7px;height:7px;border-radius:50%;background:oklch(0.65 0.19 33);"></span>Free · embed via iframe</div>
       <h1 style="font-family:var(--ff-display);font-weight:600;font-size:clamp(40px,5.4vw,68px);line-height:1.0;letter-spacing:-0.03em;margin-bottom:22px;">All Widgets</h1>
@@ -70,7 +79,7 @@
 
     <section style="max-width:1200px;margin:0 auto;padding:24px 40px 80px;">
       <div class="wgrid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:18px;">
-        <a href="https://davehomeassist.github.io/NotionWidgets/project-status.html" target="_blank" rel="noopener" class="card" style="display:flex;flex-direction:column;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.09);text-decoration:none;color:inherit;overflow:hidden;">
+        <a href="https://davehomeassist.github.io/NotionWidgets/project-status.html" target="_blank" rel="noopener noreferrer" class="card" style="display:flex;flex-direction:column;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.09);text-decoration:none;color:inherit;overflow:hidden;">
           <div style="aspect-ratio:4/3;position:relative;overflow:hidden;background:linear-gradient(135deg, oklch(0.65 0.19 33 / 0.14), transparent 70%), repeating-linear-gradient(90deg, rgba(255,255,255,0.04) 0 0.5px, transparent 0.5px 18px), repeating-linear-gradient(0deg, rgba(255,255,255,0.04) 0 0.5px, transparent 0.5px 18px);border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;"><span style="font-family:var(--ff-display);font-weight:700;font-size:64px;color:oklch(0.65 0.19 33);opacity:0.3;">PS</span></div>
           <div style="padding:22px;display:flex;flex-direction:column;flex-grow:1;">
             <div style="display:flex;align-items:center;gap:8px;font-family:var(--ff-mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:oklch(0.72 0.19 33);margin-bottom:12px;"><span style="width:6px;height:6px;border-radius:50%;background:oklch(0.65 0.19 33);"></span>Widget</div>
@@ -79,7 +88,7 @@
             <div style="display:flex;align-items:center;justify-content:space-between;padding-top:15px;border-top:1px solid rgba(255,255,255,0.08);"><span style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:rgba(243,244,247,0.55);">Free</span><span style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:oklch(0.72 0.19 33);">View ↗</span></div>
           </div>
         </a>
-        <a href="https://davehomeassist.github.io/NotionWidgets/quest-log.html" target="_blank" rel="noopener" class="card" style="display:flex;flex-direction:column;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.09);text-decoration:none;color:inherit;overflow:hidden;">
+        <a href="https://davehomeassist.github.io/NotionWidgets/quest-log.html" target="_blank" rel="noopener noreferrer" class="card" style="display:flex;flex-direction:column;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.09);text-decoration:none;color:inherit;overflow:hidden;">
           <div style="aspect-ratio:4/3;position:relative;overflow:hidden;background:linear-gradient(135deg, oklch(0.65 0.19 33 / 0.14), transparent 70%), repeating-linear-gradient(90deg, rgba(255,255,255,0.04) 0 0.5px, transparent 0.5px 18px), repeating-linear-gradient(0deg, rgba(255,255,255,0.04) 0 0.5px, transparent 0.5px 18px);border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;"><span style="font-family:var(--ff-display);font-weight:700;font-size:64px;color:oklch(0.65 0.19 33);opacity:0.3;">QL</span></div>
           <div style="padding:22px;display:flex;flex-direction:column;flex-grow:1;">
             <div style="display:flex;align-items:center;gap:8px;font-family:var(--ff-mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:oklch(0.72 0.19 33);margin-bottom:12px;"><span style="width:6px;height:6px;border-radius:50%;background:oklch(0.65 0.19 33);"></span>Widget</div>
@@ -88,7 +97,7 @@
             <div style="display:flex;align-items:center;justify-content:space-between;padding-top:15px;border-top:1px solid rgba(255,255,255,0.08);"><span style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:rgba(243,244,247,0.55);">Free</span><span style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:oklch(0.72 0.19 33);">View ↗</span></div>
           </div>
         </a>
-        <a href="https://davehomeassist.github.io/NotionWidgets/client-approval.html" target="_blank" rel="noopener" class="card" style="display:flex;flex-direction:column;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.09);text-decoration:none;color:inherit;overflow:hidden;">
+        <a href="https://davehomeassist.github.io/NotionWidgets/client-approval.html" target="_blank" rel="noopener noreferrer" class="card" style="display:flex;flex-direction:column;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.09);text-decoration:none;color:inherit;overflow:hidden;">
           <div style="aspect-ratio:4/3;position:relative;overflow:hidden;background:linear-gradient(135deg, oklch(0.65 0.19 33 / 0.14), transparent 70%), repeating-linear-gradient(90deg, rgba(255,255,255,0.04) 0 0.5px, transparent 0.5px 18px), repeating-linear-gradient(0deg, rgba(255,255,255,0.04) 0 0.5px, transparent 0.5px 18px);border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;"><span style="font-family:var(--ff-display);font-weight:700;font-size:64px;color:oklch(0.65 0.19 33);opacity:0.3;">CA</span></div>
           <div style="padding:22px;display:flex;flex-direction:column;flex-grow:1;">
             <div style="display:flex;align-items:center;gap:8px;font-family:var(--ff-mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:oklch(0.72 0.19 33);margin-bottom:12px;"><span style="width:6px;height:6px;border-radius:50%;background:oklch(0.65 0.19 33);"></span>Widget</div>
@@ -97,7 +106,7 @@
             <div style="display:flex;align-items:center;justify-content:space-between;padding-top:15px;border-top:1px solid rgba(255,255,255,0.08);"><span style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.08em;text-transform:uppercase;color:rgba(243,244,247,0.55);">Free</span><span style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:oklch(0.72 0.19 33);">View ↗</span></div>
           </div>
         </a>
-        <a href="https://davehomeassist.github.io/NotionWidgets/graph-explorer.html" target="_blank" rel="noopener" class="card" style="display:flex;flex-direction:column;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.09);text-decoration:none;color:inherit;overflow:hidden;">
+        <a href="https://davehomeassist.github.io/NotionWidgets/graph-explorer.html" target="_blank" rel="noopener noreferrer" class="card" style="display:flex;flex-direction:column;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.09);text-decoration:none;color:inherit;overflow:hidden;">
           <div style="aspect-ratio:4/3;position:relative;overflow:hidden;background:linear-gradient(135deg, oklch(0.65 0.19 33 / 0.14), transparent 70%), repeating-linear-gradient(90deg, rgba(255,255,255,0.04) 0 0.5px, transparent 0.5px 18px), repeating-linear-gradient(0deg, rgba(255,255,255,0.04) 0 0.5px, transparent 0.5px 18px);border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;"><span style="font-family:var(--ff-display);font-weight:700;font-size:64px;color:oklch(0.65 0.19 33);opacity:0.3;">WM</span></div>
           <div style="padding:22px;display:flex;flex-direction:column;flex-grow:1;">
             <div style="display:flex;align-items:center;gap:8px;font-family:var(--ff-mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:oklch(0.72 0.19 33);margin-bottom:12px;"><span style="width:6px;height:6px;border-radius:50%;background:oklch(0.65 0.19 33);"></span>Widget</div>
@@ -116,7 +125,7 @@
           <a href="index.html" class="nav-link" style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;">Home</a>
           <a href="agents.html" class="nav-link" style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;">Agents</a>
           <a href="av-suite.html" class="nav-link" style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;">AV Suite</a>
-          <a href="https://github.com/DaveHomeAssist" target="_blank" rel="noopener" class="nav-link" style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;">GitHub ↗</a>
+          <a href="https://github.com/DaveHomeAssist" target="_blank" rel="noopener noreferrer" class="nav-link" style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;">GitHub ↗</a>
         </div>
         <span style="font-family:var(--ff-mono);font-size:11px;color:rgba(243,244,247,0.35);">© 2026</span>
       </div>

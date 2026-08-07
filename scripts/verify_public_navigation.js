@@ -13,6 +13,32 @@ const SKIP_FILES = new Set([
 ]);
 const failures = [];
 const notes = [];
+const CORE_HEADERS = new Map([
+  ['index.html', 'Home'],
+  ['tools.html', 'Tools'],
+  ['notion.html', 'Notion'],
+  ['skills.html', 'Notion'],
+  ['agents.html', 'Notion'],
+  ['widgets.html', 'Notion'],
+  ['prompt-lab.html', 'Prompt Lab'],
+  ['privacy-policy.html', null],
+  ['remote-desktop.html', 'Tools'],
+  ['av-suite.html', 'AV Suite'],
+  ['project-registry.html', 'Tools'],
+  ['tailscale-manual.html', 'Tools'],
+  ['resume/index.html', 'Dave'],
+  ['profile/index.html', 'Dave']
+]);
+const STANDALONE_RETURNS = [
+  'resume/av/index.html',
+  'av-workbook/index.html',
+  'pixelforge/index.html',
+  'world-cup/index.html',
+  'fifa-pitch-crew/index.html',
+  'scorecard/index.html',
+  'prompts/index.html',
+  'noteforge/index.html'
+];
 
 function fail(message) {
   failures.push(message);
@@ -88,6 +114,41 @@ function verifyPublicHtml() {
   notes.push(`publicPages=${pages}`);
 }
 
+function verifyNavigationContract() {
+  CORE_HEADERS.forEach((active, file) => {
+    const source = read(file);
+    if (!/class="sbd-site-header"/.test(source)) fail(`${file} is missing the shared global header.`);
+    ['/tools.html', '/av-suite.html', '/notion.html', '/prompt-lab.html', '/profile/'].forEach((href) => {
+      if (!source.includes(`href="${href}"`)) fail(`${file} is missing global destination ${href}.`);
+    });
+    if (active === 'Home') {
+      if (!source.includes('<a class="sbd-site-brand" href="/" aria-current="page">')) fail(`${file} does not mark Home current.`);
+    } else if (active) {
+      if (!source.includes(`aria-current="page">${active}</a>`)) {
+        fail(`${file} does not mark ${active} current.`);
+      }
+    }
+  });
+
+  ['notion.html', 'skills.html', 'agents.html', 'widgets.html', 'prompts/index.html'].forEach((file) => {
+    const source = read(file);
+    if (!/class="sbd-section-nav"/.test(source)) fail(`${file} is missing Notion section navigation.`);
+  });
+  STANDALONE_RETURNS.forEach((file) => {
+    if (!/class="sbd-site-return"/.test(read(file))) fail(`${file} is missing a static site-return breadcrumb.`);
+  });
+
+  const publicNav = read('js/sbd-public-nav.js');
+  if (/history\.back/.test(publicNav)) fail('Public navigation still uses history-based Back behavior.');
+  if (!/\.sbd-nav/.test(publicNav)) fail('Public navigation does not defer to the AV operator bar.');
+  const tools = read('tools.html');
+  if (!/https:\/\/hatinring\.com\//.test(tools)) fail('Tools does not link Hat-in-Ring to its production domain.');
+  ['NoteForge', 'Ballpark Scorecard', 'Davai Memory Architecture', 'Tailscale Manual'].forEach((name) => {
+    if (!tools.includes(name)) fail(`Tools is missing ${name}.`);
+  });
+  if (!read('sitemap.xml').includes('https://systembydave.com/noteforge/')) fail('Sitemap is missing NoteForge.');
+}
+
 function loadRegistry() {
   const code = read('js/sbd-registry.js');
   const context = { self: {} };
@@ -111,11 +172,16 @@ function verifyAvWorkbookRegistry() {
   });
   const navHasWorkbook = (registry.navDepartments || []).some((group) => (group.toolIds || []).includes('av-workbook'));
   if (!navHasWorkbook) fail('AV Workbook is not present in universal nav departments.');
+  const cueforge = registry.toolById && registry.toolById('cueforge');
+  if (!cueforge || cueforge.href !== 'cue-sheet.html') fail('CueForge does not point to canonical cue-sheet.html.');
+  const plot = registry.toolById && registry.toolById('plotforge');
+  if (!plot || plot.href !== 'stage-plot.html') fail('Stage Plot does not point to canonical stage-plot.html.');
   notes.push(`registry=${registry.version}`);
   notes.push(`avTools=${registry.tools.length}`);
 }
 
 verifyPublicHtml();
+verifyNavigationContract();
 verifyAvWorkbookRegistry();
 
 if (failures.length) {

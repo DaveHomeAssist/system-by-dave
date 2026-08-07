@@ -26,7 +26,7 @@
     {id:'av-workbook',name:'AV Workbook',href:'av-workbook/',dept:'Workbook',phases:['advance','prep','loadin','show','strike','closeout'],tag:'Show File',desc:'Shared show workbook for rooms, crew, gear, signal sources, patching, validation, and handoff state.',storageKeys:[{key:'system-by-dave.av-workbook.active.v1',label:'AV Workbook active workbook'},{key:'system-by-dave.av-workbook.fallback.v1',label:'AV Workbook fallback'}]},
     {id:'teleprompter',name:'Teleprompter',href:'teleprompter.html',dept:'Show Flow',phases:['prep','show'],tag:'Script',desc:'Script reader with formatting, saved scripts, cues, remote mode, rundown, and a compact read view.',storageKeys:[{key:'teleprompter.v1',label:'Teleprompter state'},{key:'teleprompter.script.v1',label:'Teleprompter script'},{key:'teleprompter.preferences.v1',label:'Teleprompter preferences'},{key:'teleprompter.savedScripts.v1',label:'Teleprompter saved scripts'},{key:'teleprompter.savedFormats.v1',label:'Teleprompter saved looks'},{key:'teleprompter.pacePresets.v1',label:'Teleprompter saved paces'},{key:'teleprompter.bookmarks.v1',label:'Teleprompter bookmarks'},{key:'teleprompter.customColors.v1',label:'Teleprompter custom colors'}]},
     {id:'show-timer',name:'Show Timer',href:'show-timer.html',dept:'Show Flow',phases:['prep','show'],tag:'Clock',desc:'Countdown, count up, clock mode, stage view, warning states, and keyboard control.',storageKeys:[{key:'showTimer.preferences.v1',label:'Show Timer preferences'}]},
-    {id:'cueforge',name:'CueForge',href:'cueforge.html',dept:'Show Flow',phases:['advance','prep','show'],tag:'Cues',desc:'Run of show cue control with next actions, status tracking, print, JSON, and CSV.',storageKeys:[{key:'cueSheet.v1',label:'CueForge cue sheet'}]},
+    {id:'cueforge',name:'CueForge',href:'cue-sheet.html',dept:'Show Flow',phases:['advance','prep','show'],tag:'Cues',desc:'Run of show cue control with next actions, status tracking, print, JSON, and CSV.',storageKeys:[{key:'cueSheet.v1',label:'CueForge cue sheet'}]},
     {id:'playback-check',name:'Playback Check',href:'playback-check.html',dept:'Playback',phases:['prep','show'],tag:'Media',desc:'Playback file checklist with routes, backups, duration, ready state, and export.',storageKeys:[{key:'playback-check.v1',label:'Playback Check'}]},
     {id:'pixelforge',name:'PixelForge',href:'pixelforge/',dept:'Graphics',phases:['advance','prep','show','closeout'],tag:'Graphics',desc:'Raster, vector, text, and image-editing workspace for show graphics, signage fixes, simple overlays, and PNG export.',storageKeys:[{key:'PixelForge.prefs.v1',label:'PixelForge preferences'},{key:'pf:palettes:v1',label:'PixelForge palettes'}]},
     {id:'record-log',name:'Record Log',href:'record-log.html',dept:'Playback',phases:['show','closeout'],tag:'Record',desc:'Program records, camera ISOs, audio captures, media destinations, backup status, and handoff notes.',storageKeys:[{key:'record-log.v1',label:'Record Log'}]},
@@ -58,7 +58,7 @@
     {id:'rf-coordination',name:'RF Coordination',href:'rf-coordination.html',dept:'Comms',phases:['advance','prep','show'],tag:'RF',desc:'Wireless mics, IEM, IFB, comms packs, receivers, frequencies, bands, conflicts, and backups.',storageKeys:[{key:'rf-coordination.v1',label:'RF Coordination'}]},
     {id:'comms-check',name:'Comms Check',href:'comms-check.html',dept:'Comms',phases:['prep','show'],tag:'Comms',desc:'Intercom, radio, and IFB assignments with channels, devices, battery, backups, and issue flags.',storageKeys:[{key:'comms-check.v1',label:'Comms Check'}]},
     {id:'camera-shot-list',name:'Camera Shot List',href:'camera-shot-list.html',dept:'Camera',phases:['advance','prep','show'],tag:'Camera',desc:'Camera plan with shot rows, framing, movement, presets, ready and problem status, and take next.',storageKeys:[{key:'camera-shot-list.v1',label:'Camera Shot List'}]},
-    {id:'plotforge',name:'PlotForge',href:'plotforge.html',dept:'Planning',phases:['advance','prep','loadin'],tag:'Plot',desc:'Room layout planner with draggable stages, screens, cameras, speakers, mics, tables, power, and cable paths.',storageKeys:[{key:'stage-plot.v1',label:'PlotForge stage plot'}]},
+    {id:'plotforge',name:'Stage Plot',href:'stage-plot.html',dept:'Planning',phases:['advance','prep','loadin'],tag:'Plot',desc:'Offline-capable room layout planner with draggable stages, screens, cameras, speakers, mics, tables, power, and cable paths.',storageKeys:[{key:'stage-plot.v1',label:'Stage Plot'}]},
     {id:'gear-prep',name:'Gear Prep',href:'gear-prep.html',dept:'Logistics',phases:['prep'],tag:'Gear',desc:'Pull sheets, case IDs, quantities, departments, owners, test, pack, load, issues, and open items.',storageKeys:[{key:'gear-prep.v1',label:'Gear Prep'}]},
     {id:'truck-pack',name:'Truck Pack Plan',href:'truck-pack.html',dept:'Logistics',phases:['prep','loadin','strike'],tag:'Truck',desc:'Cases, truck zones, load order, unload order, weights, owners, pack status, and issues.',storageKeys:[{key:'truck-pack.v1',label:'Truck Pack Plan'}]},
     {id:'load-in-plan',name:'Load In Plan',href:'load-in-plan.html',dept:'Logistics',phases:['loadin'],tag:'Load In',desc:'Trucks, docks, destinations, departments, items, owners, due times, build status, blockers, and gaps.',storageKeys:[{key:'load-in-plan.v1',label:'Load In Plan'}]},
@@ -95,12 +95,9 @@
     {label:'Music',toolIds:['ontrack']}
   ];
 
-  /* Route aliases. `cueforge.html` is the branded route that forwards to the
-     cue-sheet app; `plotforge.html` forwards to the external PlotForge beta
-     (stage-plot.html remains the local legacy layout tool). Nav treats the
-     legacy file as the branded route for prev/next purposes. */
-  var ALIASES={'cue-sheet.html':'cueforge.html','stage-plot.html':'plotforge.html','av-workbook.html':'av-workbook/','av-workbook/index.html':'av-workbook/'};
-  var ALIAS_FILES=['./cue-sheet.html','./stage-plot.html'];
+  /* Compatibility routes normalize to their canonical local applications. */
+  var ALIASES={'cueforge.html':'cue-sheet.html','plotforge.html':'stage-plot.html','av-workbook.html':'av-workbook/','av-workbook/index.html':'av-workbook/'};
+  var ALIAS_FILES=['./cueforge.html','./plotforge.html'];
 
   /* Shared shell assets every offline session needs. */
   var BASE_ASSETS=[
@@ -169,7 +166,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool change — rolls the service-worker cache. */
-    version:'v20260805-show-board',
+    version:'v20260806-site-navigation',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,
