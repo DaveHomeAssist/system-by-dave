@@ -1,0 +1,70 @@
+/* System by Dave — AV tool design tokens.
+   Shared baseline for the AV suite's dark tool pages. Linked BEFORE each
+   page's inline <style> block, so a page can still override any token by
+   redeclaring it in its own :root — that is the only supported way to
+   deviate, and every current deviation is listed at the bottom of this file.
+
+   Per AGENTS.md: use these custom properties rather than hard-coded values.
+   Component CSS still lives inline per page; only tokens are shared so far.
+
+   These are the AV tool palette. The marketing pages (index, agents, skills,
+   widgets, …) use the light cream/rust system in css/style.css — the two are
+   deliberately separate and should not be merged. */
+
+:root {
+  /* Ground and surfaces — darkest to lightest */
+  --bg: #0b0d10;
+  --panel: #12171d;
+  --panel-2: #171e26;
+  --panel-3: #1d252e;
+
+  /* Rules */
+  --line: #303945;
+  --line-strong: #465363;
+
+  /* Text — brightest to faintest */
+  --text: #f6f8fb;
+  --muted: #a9b4c1;
+  --dim: #768391;
+
+  /* Brand accent */
+  --rust: #c0623a;
+  --rust-2: #e58a5c;
+  --ink: #071016;
+
+  /* Status and data colors */
+  --blue: #72b8ff;
+  --green: #6be092;
+  --amber: #ffd166;
+  --red: #ff6b6b;
+  --purple: #b996ff;
+
+  /* Shape */
+  --radius: 8px;
+  --shadow: 0 16px 60px rgba(0, 0, 0, .32);
+
+  /* Type */
+  --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+  /* Motion */
+  --fast: 120ms;
+  --med: 180ms;
+  --ease: cubic-bezier(.2, .8, .2, 1);
+  --press: cubic-bezier(.2, 0, 0, 1);
+}
+
+/* Known deviations, kept as inline :root overrides on those pages.
+   Each is an unreconciled second-generation style, not an intentional
+   variant — converge them onto the tokens above when each page is next
+   touched, then delete its inline override.
+
+     change-order.html          10 tokens
+     show-task-board.html       10 tokens
+     breakout-room-matrix.html   9 tokens
+     client-signoff.html         9 tokens
+     teleprompter.html           5 tokens
+
+   av-suite.html is deliberately NOT linked to this file: it references
+   --bg, --line, --rust, --shadow and --text without defining them, so
+   linking it would change its rendering. Fix those first. */

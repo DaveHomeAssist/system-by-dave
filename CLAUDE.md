@@ -11,7 +11,8 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
 
 ## Stack
 - Static HTML: **no build step**, files are served directly.
-- Shared styles in `css/style.css`.
+- Shared styles in `css/style.css` (marketing pages) and `css/av-tool.css`
+  (AV tool design tokens, linked by 38 tool pages).
 - Each page may have an inline `<style>` block for page-specific overrides.
 - Shared browser helpers may live in `js/` when multiple static AV pages need
   the same small behavior.

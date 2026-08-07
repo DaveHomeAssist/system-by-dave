@@ -7,6 +7,8 @@ Disallow: /house/56-harding/
 Disallow: /prompt-browser.html
 Disallow: /youtube-pipeline.html
 Disallow: /agent-finder/
+Disallow: /cross-project-dashboard.html
+Disallow: /cross-project-actions.html
 
 Sitemap: https://systembydave.com/sitemap.xml
 Sitemap: https://systembydave.com/systembydave/sitemap.xml

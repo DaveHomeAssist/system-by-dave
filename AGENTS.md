@@ -6,9 +6,12 @@ Read `CLAUDE.md` first for project orientation. This file is the rulebook.
 
 1. **No build step.** Files under the repo root are served as-is by GitHub
    Pages. Do not introduce bundlers, transpilers, or package managers.
-2. **Shared styles live in `css/style.css`.** Any style that could be reused
-   belongs there. Page-specific overrides go in a single inline `<style>`
-   block in that page's `<head>`.
+2. **Shared styles live in `css/`.** Marketing and doc pages use
+   `css/style.css` (the light cream/rust system). AV tool pages use
+   `css/av-tool.css` (the dark tool tokens). The two are deliberately
+   separate — do not merge them. Any style that could be reused belongs in
+   one of them; page-specific overrides go in a single inline `<style>`
+   block in that page's `<head>`, after the stylesheet link.
 3. **Vanilla only.** No frameworks, no runtime dependencies.
 
 ## HTML conventions
@@ -40,8 +43,17 @@ Read `CLAUDE.md` first for project orientation. This file is the rulebook.
 
 ## CSS conventions
 
-- Design tokens live in the `:root` block of `css/style.css` (colors, fonts,
-  shadows). Use the CSS custom properties rather than hard-coded values.
+- Design tokens live in the `:root` block of `css/style.css` (marketing
+  pages) or `css/av-tool.css` (AV tool pages). Use the CSS custom properties
+  rather than hard-coded values.
+- An AV tool page links `css/av-tool.css` and then redeclares only the tokens
+  it genuinely needs to differ on. A page-local `:root` full of values
+  identical to the shared file is duplication — delete it.
+- Two pages are intentionally not linked to `css/av-tool.css`:
+  `av-suite.html` (references `--bg`, `--line`, `--rust`, `--shadow`,
+  `--text` without defining them, so linking would change its rendering —
+  fix that first) and `teleprompter.html` (deviates on every core token it
+  defines).
 - Mobile breakpoint is **680px**. The mobile nav must keep the primary links
   visible at that breakpoint — do not collapse them into a hamburger-only menu.
 

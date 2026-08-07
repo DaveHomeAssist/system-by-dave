@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-08-06 (later)
+
+* **`cross-project-dashboard.html` / `cross-project-actions.html` are no longer indexable.** Both were publicly served with no `robots` meta, no CSP, and no `Disallow` entry, exposing a 76-project inventory including per-repo dirty working-tree state. Added `noindex,nofollow,noarchive` and the standard CSP meta to the page *and* to the `cross-project-dashboard.gen.py` template so a regenerate can't undo it, plus `Disallow` entries in `robots.txt`.
+* **Extracted `css/av-tool.css`.** 38 AV tool pages each carried their own inline `:root` token block; 858 of 905 core-token declarations were byte-identical duplicates. They now link a shared token file and keep only the declarations where they genuinely deviate. Verified zero visual change: every page's effective token map is identical to before, no non-`:root` CSS moved, and no `var()` newly resolves. `av-suite.html` and `teleprompter.html` are deliberately excluded (see `AGENTS.md`).
+
 ## 2026-08-06
 
 * Added `/tailscale-manual.html`, a responsive, printable Tailscale field manual for solo operators and homelabs. The page preserves the supplied 12-section reference, command and policy snippets, troubleshooting tables, and source links, with a sticky manual index, reading progress, and copyable code blocks.
