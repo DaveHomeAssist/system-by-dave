@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-08-08
+
+* Fixed a Show Board defect that threw away a day's room pre-checks. Switching day tabs pruned the check record down to the day being viewed, so the ticks for the day actually being worked were lost on every glance at another date. Checks are now kept per day, and stale groups are collected only when a day is deleted.
+* Gave cross-tab overwrite detection a way out. Once another tab saved, the board refused every subsequent write while reporting only "newer copy found", so edits quietly stopped persisting and loading the newer copy discarded them. The status now reads NOT SAVING, and a Save mine anyway control resolves the conflict in favour of what is on screen.
+* Deleting a show now removes its saved record and its snapshots instead of orphaning them in browser storage.
+* Smaller Show Board repairs: room label widths re-measure once the display font finishes loading, import failures surface on whichever screen is showing rather than a hidden one, and a room pointing at a missing zone renders grey instead of silently borrowing the first zone's colour.
+
 ## 2026-08-06
 
 * Reworked public navigation around a shared five-destination header, Notion section navigation, Davai and standalone-product breadcrumbs, and one consolidated AV operator bar with deterministic routes, visible keyboard focus, 44 px targets, and phone-width containment.

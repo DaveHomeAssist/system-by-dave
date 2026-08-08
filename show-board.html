@@ -1637,7 +1637,12 @@ $("keepminebtn").addEventListener("click",()=>{
      not ready, so the first measurement silently uses the fallback metrics
      and mis-sizes the column — the exact overlap it exists to prevent. */
   if(document.fonts&&document.fonts.ready)
-    document.fonts.ready.then(()=>{if(show)render()}).catch(()=>{});
+    document.fonts.ready.then(()=>{
+      /* render() clears the setup class, so re-rendering while the New Show
+         screen is open would throw the user back to the board mid-typing.
+         Setup exits through render() anyway, so skipping here loses nothing. */
+      if(show&&!document.body.classList.contains("setup"))render();
+    }).catch(()=>{});
   window.addEventListener("resize",()=>{if(show)render()});
   window.addEventListener("storage",e=>{
     if(!show||e.key!==SHOW_KEY(show.id)||!e.newValue)return;
