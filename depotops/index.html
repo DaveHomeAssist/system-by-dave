@@ -28,7 +28,7 @@
 <meta name="apple-mobile-web-app-title" content="DepotOps">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" href="./icon.svg" type="image/svg+xml">
-<title>DepotOps v0.4.0 — Projects • Shopping • Warehouse</title>
+<title>DepotOps v0.4.1 — Projects • Shopping • Warehouse</title>
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <style>
 :root{
@@ -76,20 +76,23 @@ h1{margin:3px 0 8px;font-size:clamp(30px,5vw,54px);line-height:.96;text-transfor
 .statussel{min-height:44px;border:2px solid #222;background:white;padding:7px;font-weight:800}.pqty{width:72px;min-height:44px;border:2px solid #222;padding:7px}
 .sidebar{display:grid;gap:14px}.note-card{padding:13px}.note-card h3{margin:0 0 7px;text-transform:uppercase;font-size:15px}.warn{border-left:8px solid var(--yellow)}.goal{border-left:8px solid var(--green)}.holdbox{border-left:8px solid var(--blue)}ul.compact{margin:7px 0 0;padding-left:18px;color:var(--muted)}
 .empty{padding:26px;text-align:center;color:var(--muted)}
-.project-board{padding:10px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.project-card{border:2px solid #222;background:#fff;padding:13px;position:relative}.project-card h3{margin:2px 0 5px;text-transform:uppercase;padding-right:84px}.project-card .status{position:absolute;right:9px;top:9px}.project-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin:10px 0}.mini{background:#f2efe9;border:1px solid #ccc;padding:6px}.mini b{display:block;font-size:18px}.mini span{font-size:9px;text-transform:uppercase;color:var(--muted);font-weight:900}.card-actions{display:flex;gap:6px;flex-wrap:wrap}.project-next{border-top:1px solid var(--line);margin-top:9px;padding-top:8px;font-size:11px}.project-next b{display:block;text-transform:uppercase;letter-spacing:.06em;font-size:9px;color:var(--muted)}.project-context{border:2px solid #222;background:#f7f3eb;padding:12px;margin-bottom:10px}.project-context h3{margin:0 0 5px;text-transform:uppercase}.project-context .context-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}.context-cell{background:#fff;border:1px solid var(--line);padding:8px}.context-cell b{display:block;font-size:9px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
-.project-detail{padding:10px}.reqtable{width:100%;border-collapse:collapse}.reqtable th,.reqtable td{padding:9px 7px;border-bottom:1px solid #d7d1c7;text-align:left;vertical-align:middle}.reqtable th{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}.req-actions{display:flex;gap:5px;flex-wrap:wrap}
+.projects-workspace{display:grid;grid-template-columns:minmax(0,1fr) minmax(390px,.48fr);grid-template-areas:"board inspector";gap:14px;align-items:start}.project-board-panel{grid-area:board}.project-board{padding:10px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.project-card{border:2px solid #222;background:#fff;padding:13px;position:relative;transition:border-color .16s ease,box-shadow .16s ease,transform .16s ease}.project-card:hover{transform:translateY(-2px);box-shadow:0 6px 0 rgba(0,0,0,.12)}.project-card.is-selected{border-color:var(--orange);box-shadow:0 0 0 3px var(--orange),0 8px 0 rgba(249,99,2,.14)}.project-card.is-selected::before{content:"INSPECTING";position:absolute;left:12px;top:-10px;background:var(--orange);color:#fff;border:2px solid #222;padding:2px 6px;font-size:9px;font-weight:900;letter-spacing:.08em}.project-card h3{margin:2px 0 5px;text-transform:uppercase;padding-right:84px}.project-card .status{position:absolute;right:9px;top:9px}.project-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin:10px 0}.mini{background:#f2efe9;border:1px solid #ccc;padding:6px}.mini b{display:block;font-size:18px}.mini span{font-size:9px;text-transform:uppercase;color:var(--muted);font-weight:900}.card-actions{display:flex;gap:6px;flex-wrap:wrap}.project-next{border-top:1px solid var(--line);margin-top:9px;padding-top:8px;font-size:11px}.project-next b{display:block;text-transform:uppercase;letter-spacing:.06em;font-size:9px;color:var(--muted)}
+.project-inspector{grid-area:inspector;position:sticky;top:calc(var(--topbar-height) + 12px);scroll-margin-top:calc(var(--topbar-height) + 12px);display:flex;flex-direction:column;max-height:calc(100vh - var(--topbar-height) - 24px);border-top:8px solid var(--orange);box-shadow:0 14px 34px rgba(0,0,0,.18)}.project-inspector:focus{outline:3px solid var(--orange);outline-offset:3px}.project-inspector.is-updated{animation:inspector-pulse .42s ease-out}.inspector-head{align-items:flex-start;flex-direction:column}.inspector-heading{width:100%}.inspector-eyebrow{display:block;margin-bottom:3px;color:var(--orange2);font-size:10px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}.inspector-head h2{font-size:18px;line-height:1.05}.inspector-head .actions{width:100%}.inspector-head .actions .btn{flex:1}.project-detail{padding:10px;overflow:auto}.project-context{border:2px solid #222;background:#f7f3eb;padding:12px;margin-bottom:12px}.project-context h3{margin:0 0 5px;text-transform:uppercase}.project-context .context-grid{display:grid;grid-template-columns:1fr;gap:8px;margin-top:8px}.context-cell{background:#fff;border:1px solid var(--line);padding:8px}.context-cell b{display:block;font-size:9px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
+.inspector-section{border-top:2px solid #222;padding-top:12px;margin-top:12px}.inspector-section h3{margin:0 0 8px;font-size:12px;letter-spacing:.08em;text-transform:uppercase}.inspector-list,.requirement-list{display:grid;gap:7px}.linked-row,.requirement-card{border:1px solid var(--line);background:#fff;padding:9px}.linked-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center}.linked-row b{display:block;overflow-wrap:anywhere}.requirement-head{display:flex;gap:8px;justify-content:space-between;align-items:flex-start}.shortage-pill{flex:none;background:#222;color:#fff;border:2px solid #222;padding:4px 6px;font-size:10px;font-weight:900;text-transform:uppercase}.shortage-pill.is-covered{background:#edf7ef;color:var(--green);border-color:var(--green)}.requirement-metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin:8px 0}.requirement-metric{background:#f2efe9;border:1px solid #d7d1c7;padding:5px}.requirement-metric b{display:block;font-size:14px}.requirement-metric span{display:block;color:var(--muted);font-size:8px;font-weight:900;letter-spacing:.04em;text-transform:uppercase}.req-actions{display:flex;gap:5px;flex-wrap:wrap}
+@keyframes inspector-pulse{0%{box-shadow:0 0 0 0 rgba(249,99,2,.55),0 14px 34px rgba(0,0,0,.18)}100%{box-shadow:0 0 0 10px rgba(249,99,2,0),0 14px 34px rgba(0,0,0,.18)}}
 .warehouse-layout{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}.inventory-list{padding:9px;display:grid;gap:8px}.inventory-item{border:2px solid #c7c1b7;background:#fff;padding:10px}.inventory-item.low{border-color:var(--red);background:#fff5f3}.inventory-head{display:flex;justify-content:space-between;gap:10px}.stock{font-size:24px;font-weight:900}.stockline{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-top:7px}.stockctrl{display:flex;gap:4px}.stockctrl button{min-width:44px;min-height:44px;border:2px solid #222;background:#eee;font-weight:900}.type{color:var(--orange);font-size:10px;text-transform:uppercase;font-weight:900}.toolrow{padding:10px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:10px}.toolrow:last-child{border-bottom:0}.toolname{font-weight:900}
 .utility{display:flex;gap:7px;flex-wrap:wrap;padding:10px;background:#222;margin-bottom:12px}
 .footer{margin-top:14px;background:#222;color:#ddd;padding:11px 13px;border-top:4px solid var(--orange);display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap}.footer a{color:#fff;font-weight:900}
 dialog{width:min(680px,calc(100vw - 24px));max-height:90vh;overflow:auto;border:3px solid #222;padding:0;background:var(--paper);box-shadow:0 24px 70px rgba(0,0,0,.35)}dialog::backdrop{background:rgba(0,0,0,.58)}.modal-head{background:var(--orange);color:#fff;padding:12px 14px;border-bottom:3px solid #222;display:flex;justify-content:space-between;align-items:center}.modal-head h2{margin:0;text-transform:uppercase;font-size:18px}.modal-body{padding:14px}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.field{display:grid;gap:4px}.field.full{grid-column:1/-1}.field label{font-size:11px;text-transform:uppercase;font-weight:900;color:var(--muted)}.field input,.field select,.field textarea{min-height:44px;border:2px solid #333;padding:8px;background:#fff}.modal-actions{display:flex;justify-content:flex-end;gap:7px;margin-top:14px;flex-wrap:wrap}.reconcile-row{border:2px solid #ccc;padding:9px;margin-bottom:8px;display:grid;grid-template-columns:1fr 100px;gap:10px;align-items:center}.reconcile-row input{min-height:44px;border:2px solid #222;padding:7px;width:100%}
 .toast{position:fixed;right:16px;bottom:16px;z-index:100;background:#222;color:#fff;border:3px solid var(--orange);padding:10px 12px;opacity:0;pointer-events:none}.selftest{display:none;white-space:pre-wrap}
+@media(max-width:1180px){.projects-workspace{grid-template-columns:1fr;grid-template-areas:"inspector" "board"}.project-inspector{position:static;max-height:none}.project-detail{overflow:visible}.inspector-head{flex-direction:row;align-items:center}.inspector-heading{width:auto}.inspector-head .actions{width:auto}}
 @media(max-width:980px){.hero,.grid,.warehouse-layout{grid-template-columns:1fr}.project-board{grid-template-columns:1fr 1fr}.toolbar{grid-template-columns:1fr 1fr auto}.runitem{grid-template-columns:156px minmax(0,1fr) 132px}.runitem .statussel{grid-column:3}.runitem .pqty{grid-column:3}.stats{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:680px){
   :root{--topbar-height:64px}
   .topinner{padding:8px 10px;align-items:center}.brand>div:last-child{display:none}.logo{width:40px;height:40px}nav{flex-wrap:nowrap}.navbtn{padding:6px 8px;font-size:11px;white-space:nowrap}
   .shell{padding:9px}.hero{padding:12px;grid-template-columns:1fr}.storebox{display:none}.toolbar{grid-template-columns:1fr 1fr;padding:7px}.toolbar input{grid-column:1/-1}.toolbar .wide{grid-column:1/-1}
-  .stats{grid-template-columns:repeat(2,1fr)}.runitem{grid-template-columns:1fr 1fr;gap:8px}.runitem>div:nth-child(2){grid-column:1/-1}.qtyctrl{width:156px;grid-column:1/-1}.statussel{grid-column:1!important;width:100%}.pqty{grid-column:2!important;width:100%}.project-board{grid-template-columns:1fr}.project-detail{overflow:auto}.reqtable{min-width:760px}
-  .warehouse-layout{grid-template-columns:1fr}.formgrid,.project-context .context-grid{grid-template-columns:1fr}.field.full{grid-column:auto}.reconcile-row{grid-template-columns:1fr}.panel-head{align-items:flex-start}.panel-head .actions{justify-content:flex-end}.btn.small,.product-link,a.project-link{min-height:44px}.tag.project-link,a.project-link{display:inline-flex;align-items:center}
+  .stats{grid-template-columns:repeat(2,1fr)}.runitem{grid-template-columns:1fr 1fr;gap:8px}.runitem>div:nth-child(2){grid-column:1/-1}.qtyctrl{width:156px;grid-column:1/-1}.statussel{grid-column:1!important;width:100%}.pqty{grid-column:2!important;width:100%}.project-board{grid-template-columns:1fr}.inspector-head{flex-direction:column;align-items:flex-start}.inspector-head .actions{width:100%}.inspector-head .actions .btn{flex:1}.linked-row{grid-template-columns:1fr}.requirement-metrics{grid-template-columns:1fr 1fr}
+  .warehouse-layout{grid-template-columns:1fr}.formgrid,.project-context .context-grid{grid-template-columns:1fr}.field.full{grid-column:auto}.reconcile-row{grid-template-columns:1fr}.panel-head{align-items:flex-start}.panel-head .actions{justify-content:flex-end}.btn.small,.product-link,a.project-link{min-width:44px;min-height:44px}.tag.project-link,a.project-link{display:inline-flex;align-items:center}
 }
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}}
 </style>
@@ -103,7 +106,7 @@ dialog{width:min(680px,calc(100vw - 24px));max-height:90vh;overflow:auto;border:
 </noscript>
 <header class="topbar">
   <div class="topinner">
-    <div class="brand"><div class="logo">DO</div><div>DEPOTOPS <small>v0.4.0 • Projects • Shopping • Warehouse</small></div></div>
+    <div class="brand"><div class="logo">DO</div><div>DEPOTOPS <small>v0.4.1 • Projects • Shopping • Warehouse</small></div></div>
     <nav aria-label="Primary">
       <button class="navbtn active" data-page="shopping" aria-pressed="true">Shopping Run</button>
       <button class="navbtn" data-page="projects" aria-pressed="false">Projects</button>
@@ -150,14 +153,16 @@ dialog{width:min(680px,calc(100vw - 24px));max-height:90vh;overflow:auto;border:
 
   <section id="projects" class="page">
     <div class="utility"><button class="btn orange" id="addProjectBtn">+ Project</button><button class="btn" id="addCatalogBtn">+ Catalog Item</button></div>
-    <section class="panel">
-      <div class="panel-head"><h2>Project Board</h2><span class="meta">Requirements → Warehouse coverage → Shopping shortage</span></div>
-      <div id="projectBoard" class="project-board"></div>
-    </section>
-    <section id="projectDetailPanel" class="panel" style="margin-top:14px">
-      <div class="panel-head"><h2 id="projectDetailTitle">Project Requirements</h2><div class="actions"><button class="btn small orange" id="addRequirementBtn">+ Requirement</button><button class="btn small soft" id="addShortagesBtn">Add Shortages to Run</button></div></div>
-      <div class="project-detail" id="projectDetail"></div>
-    </section>
+    <div class="projects-workspace">
+      <section class="panel project-board-panel">
+        <div class="panel-head"><h2>Project Board</h2><span class="meta">Choose Inspect to load detail in the persistent inspector</span></div>
+        <div id="projectBoard" class="project-board"></div>
+      </section>
+      <aside id="projectDetailPanel" class="panel project-inspector" aria-labelledby="projectDetailTitle" tabindex="-1">
+        <div class="panel-head inspector-head"><div class="inspector-heading"><span class="inspector-eyebrow">Project Inspector</span><h2 id="projectDetailTitle">Project Detail</h2></div><div class="actions"><button class="btn small orange" id="addRequirementBtn">+ Requirement</button><button class="btn small soft" id="addShortagesBtn">Add Shortages to Run</button></div></div>
+        <div class="project-detail" id="projectDetail"></div>
+      </aside>
+    </div>
   </section>
 
   <section id="warehouse" class="page">
@@ -169,7 +174,7 @@ dialog{width:min(680px,calc(100vw - 24px));max-height:90vh;overflow:auto;border:
     </div>
   </section>
 
-  <div class="footer"><span><b>DepotOps v0.4.0:</b> 48 canonical rows • recent Notion project links • gated and parked work preserved • local-first state.</span><a href="../index.html">System by Dave home</a></div>
+  <div class="footer"><span><b>DepotOps v0.4.1:</b> persistent project inspector • 48 canonical rows • recent Notion project links • local-first state.</span><a href="../index.html">System by Dave home</a></div>
 </div>
 
 <dialog id="editorDialog"><form method="dialog" id="editorForm"><div class="modal-head"><h2 id="editorTitle">Edit</h2><button class="btn small dark" value="cancel">Close</button></div><div class="modal-body"><div class="formgrid" id="editorFields"></div><div class="modal-actions"><button class="btn" value="cancel">Cancel</button><button class="btn orange" id="editorSave" value="default">Save</button></div></div></form></dialog>
@@ -612,31 +617,44 @@ function projectStats(pid){
  const rows=state.shoppingRunItems.filter(x=>runItemProjects(x).some(p=>p.id===pid));
  return {rows:rows.length,purchased:rows.filter(x=>x.status==="purchased").length,outstanding:rows.filter(x=>!["purchased","skipped"].includes(x.status)).length}
 }
+function syncProjectSelection(){
+ document.querySelectorAll(".project-card").forEach(c=>{
+  const selected=c.dataset.id===state.settings.selectedProjectId,button=c.querySelector('[data-act="inspect"]');
+  c.classList.toggle("is-selected",selected);c.toggleAttribute("data-selected",selected);
+  if(button){button.textContent=selected?"Inspecting":"Inspect";button.setAttribute("aria-pressed",String(selected));button.classList.toggle("dark",selected);button.classList.toggle("orange",!selected)}
+ })
+}
+function revealProjectInspector(){
+ const panel=$("projectDetailPanel");panel.classList.remove("is-updated");void panel.offsetWidth;panel.classList.add("is-updated");
+ panel.focus({preventScroll:true});
+ if(window.matchMedia("(max-width:1180px)").matches){const top=panel.getBoundingClientRect().top+window.scrollY-document.querySelector(".topbar").getBoundingClientRect().height-24;window.scrollTo({top,behavior:reduced?"auto":"smooth"})}
+ setTimeout(()=>panel.classList.remove("is-updated"),500)
+}
 function renderProjects(){
  const selected=project(state.settings.selectedProjectId)||state.projects[0];if(selected)state.settings.selectedProjectId=selected.id;
- $("projectBoard").innerHTML=state.projects.map(p=>{const k=projectStats(p.id),workflow=p.workflowState||"active";return `<article class="project-card" data-id="${p.id}"><span class="tag state-${escapeHtml(workflow)} status">${escapeHtml(p.status)}</span><div class="kicker">${escapeHtml([p.priority,p.phase,p.location].filter(Boolean).join(" · "))}</div><h3>${escapeHtml(p.name)}</h3><div class="meta">${escapeHtml(p.description||"")}</div><div class="project-kpis"><div class="mini"><b>${k.rows}</b><span>List rows</span></div><div class="mini"><b>${k.purchased}</b><span>Purchased</span></div><div class="mini"><b>${k.outstanding}</b><span>Outstanding</span></div></div>${p.nextAction?`<div class="project-next"><b>Next action</b>${escapeHtml(p.nextAction)}</div>`:""}<div class="card-actions"><button class="btn small orange" data-act="open">Open</button><button class="btn small" data-act="shop">Filter list</button>${p.notionUrl?`<a class="btn small" href="${escapeHtml(p.notionUrl)}" target="_blank" rel="noopener noreferrer">Notion</a>`:""}<button class="btn small" data-act="edit">Edit</button></div></article>`}).join("");
+ $("projectBoard").innerHTML=state.projects.map(p=>{const k=projectStats(p.id),workflow=p.workflowState||"active",isSelected=p.id===state.settings.selectedProjectId;return `<article class="project-card ${isSelected?"is-selected":""}" data-id="${p.id}" ${isSelected?'data-selected=""':""}><span class="tag state-${escapeHtml(workflow)} status">${escapeHtml(p.status)}</span><div class="kicker">${escapeHtml([p.priority,p.phase,p.location].filter(Boolean).join(" · "))}</div><h3>${escapeHtml(p.name)}</h3><div class="meta">${escapeHtml(p.description||"")}</div><div class="project-kpis"><div class="mini"><b>${k.rows}</b><span>List rows</span></div><div class="mini"><b>${k.purchased}</b><span>Purchased</span></div><div class="mini"><b>${k.outstanding}</b><span>Outstanding</span></div></div>${p.nextAction?`<div class="project-next"><b>Next action</b>${escapeHtml(p.nextAction)}</div>`:""}<div class="card-actions"><button class="btn small ${isSelected?"dark":"orange"}" data-act="inspect" aria-controls="projectDetailPanel" aria-pressed="${isSelected}">${isSelected?"Inspecting":"Inspect"}</button><button class="btn small" data-act="shop">Filter list</button>${p.notionUrl?`<a class="btn small" href="${escapeHtml(p.notionUrl)}" target="_blank" rel="noopener noreferrer">Notion</a>`:""}<button class="btn small" data-act="edit">Edit</button></div></article>`}).join("");
  document.querySelectorAll(".project-card").forEach(c=>{
-  c.querySelector('[data-act="open"]').onclick=()=>{state.settings.selectedProjectId=c.dataset.id;saveState();renderProjectDetail()};
+  c.querySelector('[data-act="inspect"]').onclick=()=>{state.settings.selectedProjectId=c.dataset.id;saveState();renderProjectDetail();syncProjectSelection();revealProjectInspector()};
   c.querySelector('[data-act="shop"]').onclick=()=>{switchPage("shopping");fillProjectFilters();$("runProjectFilter").value=c.dataset.id;renderShopping()};
   c.querySelector('[data-act="edit"]').onclick=()=>openProjectEditor(c.dataset.id)
  });
- renderProjectDetail();motion.from(".project-card",{opacity:0,y:8,duration:.22,stagger:.03})
+ renderProjectDetail();syncProjectSelection();motion.from(".project-card",{opacity:0,y:8,duration:.22,stagger:.03})
 }
 function renderProjectDetail(){
  const p=project(state.settings.selectedProjectId);if(!p){$("projectDetail").innerHTML='<div class="empty">Create a project.</div>';return}
  $("projectDetailTitle").textContent=`${p.name} — Project Detail`;
  const reqs=state.requirements.filter(r=>r.projectId===p.id),linkedRows=state.shoppingRunItems.filter(x=>runItemProjects(x).some(linked=>linked.id===p.id));
  const context=`<section class="project-context"><h3>${escapeHtml(p.name)}</h3><div class="meta">${escapeHtml([p.status,p.priority,p.phase,p.procurement].filter(Boolean).join(" · "))}</div><div class="context-grid"><div class="context-cell"><b>Blocker</b>${escapeHtml(p.blocker||"No blocker recorded")}</div><div class="context-cell"><b>Next action</b>${escapeHtml(p.nextAction||"No next action recorded")}</div></div>${p.notionUrl?`<a class="product-link" href="${escapeHtml(p.notionUrl)}" target="_blank" rel="noopener noreferrer">Open canonical project</a>`:""}</section>`;
- const linked=linkedRows.length?`<table class="reqtable"><thead><tr><th>Linked shopping row</th><th>Run status</th><th>Workflow</th><th>Priority</th></tr></thead><tbody>${linkedRows.map(x=>`<tr><td><b>${escapeHtml(item(x.itemId)?.name||"Missing item")}</b></td><td>${escapeHtml(x.status.replace("_"," "))}</td><td><span class="tag state-${escapeHtml(x.workflowState||"active")}">${escapeHtml(WORKFLOW_LABELS[x.workflowState]||x.workflowState||"Active")}</span></td><td>${escapeHtml(x.priority)}</td></tr>`).join("")}</tbody></table>`:'<div class="empty">No canonical shopping rows are linked yet.</div>';
- const requirements=reqs.length?`<h3>Modeled Requirements</h3><table class="reqtable"><thead><tr><th>Requirement</th><th>Need</th><th>On hand</th><th>Reserved</th><th>Available</th><th>Shortage</th><th>Actions</th></tr></thead><tbody>${reqs.map(r=>{
+ const linked=`<section class="inspector-section"><h3>Linked Shopping Rows · ${linkedRows.length}</h3>${linkedRows.length?`<div class="inspector-list">${linkedRows.map(x=>`<article class="linked-row"><div><b>${escapeHtml(item(x.itemId)?.name||"Missing item")}</b><div class="meta">${escapeHtml(x.status.replace("_"," "))} · ${escapeHtml(x.priority)}</div></div><span class="tag state-${escapeHtml(x.workflowState||"active")}">${escapeHtml(WORKFLOW_LABELS[x.workflowState]||x.workflowState||"Active")}</span></article>`).join("")}</div>`:'<div class="empty">No canonical shopping rows are linked yet.</div>'}</section>`;
+ const requirements=reqs.length?`<section class="inspector-section"><h3>Modeled Requirements · ${reqs.length}</h3><div class="requirement-list">${reqs.map(r=>{
   const cat=item(r.itemId),av=availableForReq(r),sh=shortage(r);
-  return `<tr data-id="${r.id}"><td><b>${escapeHtml(cat?.name||"Missing item")}</b><div class="meta">${escapeHtml(r.phase)} · ${escapeHtml(r.priority)} ${r.status==="verify"?'· VERIFY':r.status==="hold"?'· HOLD':""}</div></td><td>${r.requiredQty}</td><td>${onHand(r.itemId)}</td><td>${r.allocatedQty||0}</td><td>${av}</td><td><b>${sh}</b></td><td><div class="req-actions"><button class="btn small" data-act="reserve">Reserve</button><button class="btn small orange" data-act="add" ${!sh?"disabled":""}>Add shortage</button><button class="btn small" data-act="edit">Edit</button></div></td></tr>`
- }).join("")}</tbody></table>`:"";
+  return `<article class="requirement-card" data-id="${r.id}"><div class="requirement-head"><div><b>${escapeHtml(cat?.name||"Missing item")}</b><div class="meta">${escapeHtml(r.phase)} · ${escapeHtml(r.priority)} ${r.status==="verify"?'· VERIFY':r.status==="hold"?'· HOLD':""}</div></div><span class="shortage-pill ${sh?"":"is-covered"}">${sh?`Short ${sh}`:"Covered"}</span></div><div class="requirement-metrics"><div class="requirement-metric"><b>${r.requiredQty}</b><span>Need</span></div><div class="requirement-metric"><b>${onHand(r.itemId)}</b><span>On hand</span></div><div class="requirement-metric"><b>${r.allocatedQty||0}</b><span>Reserved</span></div><div class="requirement-metric"><b>${av}</b><span>Available</span></div></div><div class="req-actions"><button class="btn small" data-act="reserve">Reserve</button><button class="btn small orange" data-act="add" ${!sh?"disabled":""}>Add shortage</button><button class="btn small" data-act="edit">Edit</button></div></article>`
+ }).join("")}</div></section>`:"";
  $("projectDetail").innerHTML=context+linked+requirements;
- document.querySelectorAll(".reqtable tbody tr[data-id]").forEach(tr=>{
-  tr.querySelector('[data-act="reserve"]').onclick=()=>reserveRequirement(tr.dataset.id);
-  tr.querySelector('[data-act="add"]').onclick=()=>{if(addRequirementShortageToRun(tr.dataset.id)){renderAll();toast("Shortage added to run")}else toast("Nothing added — covered or already listed")};
-  tr.querySelector('[data-act="edit"]').onclick=()=>openRequirementEditor(tr.dataset.id)
+ document.querySelectorAll(".requirement-card[data-id]").forEach(card=>{
+  card.querySelector('[data-act="reserve"]').onclick=()=>reserveRequirement(card.dataset.id);
+  card.querySelector('[data-act="add"]').onclick=()=>{if(addRequirementShortageToRun(card.dataset.id)){renderAll();toast("Shortage added to run")}else toast("Nothing added — covered or already listed")};
+  card.querySelector('[data-act="edit"]').onclick=()=>openRequirementEditor(card.dataset.id)
  })
 }
 function renderWarehouse(){
@@ -717,6 +735,10 @@ function runSelfTests(){
   assert("every canonical row has project links",canonicalRows.every(x=>x.projectIds?.length&&x.projectIds.every(id=>!!project(id))),`linked=${canonicalRows.filter(x=>x.projectIds?.length).length}/48`);
   assert("three obsolete kitchen concepts are explicit",canonicalRows.filter(x=>x.workflowState==="superseded").length===3,`superseded=${canonicalRows.filter(x=>x.workflowState==="superseded").length}`);
   assert("project board includes the 19 open registry projects plus live legacy work",state.projects.length>=24,`projects=${state.projects.length}`);
+  renderProjects();const selectedProjectCard=document.querySelector(`.project-card[data-id="${state.settings.selectedProjectId}"]`),projectAreas=getComputedStyle(document.querySelector(".projects-workspace")).gridTemplateAreas;
+  assert("selected project is visibly tied to inspector",selectedProjectCard?.classList.contains("is-selected")&&selectedProjectCard.querySelector('[data-act="inspect"]')?.getAttribute("aria-pressed")==="true");
+  assert("project inspector uses compact detail cards",document.querySelector("#projectDetailPanel .linked-row")&&document.querySelector("#projectDetailPanel .requirement-card"));
+  assert("project inspector has responsive master-detail placement",window.innerWidth>1180?projectAreas.includes("board inspector"):projectAreas.indexOf("inspector")<projectAreas.indexOf("board"),`areas=${projectAreas}`);
   const legacy=clone(seedState);legacy.schemaVersion=3;legacy.projects=legacy.projects.filter(x=>!NOTION_PROJECTS.some(p=>p.id===x.id));legacy.projects.push({id:LEGACY_NOTION_PROJECT_ID,name:"Home Depot Shopping List",status:"Active",location:"56 Harding",description:"Legacy generic link"});legacy.shoppingRunItems.forEach(x=>{x.projectId=LEGACY_NOTION_PROJECT_ID;delete x.projectIds;delete x.workflowState;delete x.workflowNote});legacy.settings={activeRunId:NOTION_RUN.id,selectedProjectId:LEGACY_NOTION_PROJECT_ID,neededOnly:false};const migrated=migrateState(legacy);
   assert("v3 migration replaces generic links",migrated.schemaVersion===4&&!migrated.projects.some(x=>x.id===LEGACY_NOTION_PROJECT_ID)&&migrated.shoppingRunItems.filter(x=>x.runId===NOTION_RUN.id).every(x=>x.projectIds?.length)&&migrated.settings.focusOnly===true);
   assert("canonical item reused by requirement + inventory",byId(state.requirements,"req-cement").itemId===byId(state.inventory,"inv-cement").itemId);

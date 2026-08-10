@@ -2,6 +2,7 @@
 
 ## 2026-08-10
 
+* Upgraded `/depotops/` to v0.4.1 with a persistent Project Inspector: the selected project stays visible beside the board on wide screens, moves above the board on narrower screens, uses compact detail cards instead of wide tables, and clearly marks the project currently being inspected.
 * Synced `/depotops/` to the canonical Notion Home Depot list: all 48 rows are present, with 25 outstanding and 23 purchased; every row links back to its Notion source, existing browser data migrates additively, and Verify/Hold rows remain visible instead of being suppressed.
 * Added `/depotops/`, a local-first home project operations tool for project requirements, multi-project shopping runs, warehouse inventory, tool records, purchase reconciliation, and JSON backup and restore.
 

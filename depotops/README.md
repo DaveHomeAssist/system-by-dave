@@ -1,4 +1,4 @@
-# DepotOps v0.4.0 — Static Deploy Package
+# DepotOps v0.4.1 — Static Deploy Package
 
 This folder is ready for a static deployment. No build step, backend, database, or environment variables are required.
 
@@ -38,6 +38,8 @@ Data does **not** automatically sync between browsers or devices. Use the applic
 The seeded shopping run is a 2026-08-10 snapshot of the canonical Notion database `🛒 Home Depot Shopping List`: 48 total rows, including 25 outstanding and 23 purchased. Each row is linked to the relevant current, waiting, parked, completed-review, or superseded Notion project context. The default view shows the 22 outstanding rows tied to current or previously stopped work; `Show All 48` restores the complete canonical list.
 
 Existing browser state migrates to schema v4. The migration replaces the old generic shopping-list project association with evidence-backed project links while preserving shopping status, quantities, older runs, and custom data.
+
+The Projects screen uses a persistent master-detail workspace. On wide screens, the selected Project Inspector stays beside the board while you scroll. On narrower screens, the inspector moves above the board and the selected project card remains visibly marked.
 
 ## GSAP
 
