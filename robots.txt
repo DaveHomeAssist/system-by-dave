@@ -9,6 +9,9 @@ Disallow: /youtube-pipeline.html
 Disallow: /agent-finder/
 Disallow: /career-market.html
 Disallow: /aom-show-board.html
+Disallow: /apps/av-workbook/
+Disallow: /cross-project-actions.html
+Disallow: /html/sbd-brand.html
 
 Disallow: /cross-project-dashboard.html
 Disallow: /wedding-ops.html
