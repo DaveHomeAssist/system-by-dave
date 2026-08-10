@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none'">
+<meta name="theme-color" content="#f96302">
+<meta name="color-scheme" content="light">
+<meta name="robots" content="index,follow">
+<meta name="description" content="DepotOps — local-first home project shopping, warehouse inventory, and tool tracking.">
+<link rel="canonical" href="https://systembydave.com/depotops/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="System by Dave">
+<meta property="og:title" content="DepotOps — Projects, Shopping, and Warehouse">
+<meta property="og:description" content="A local-first field tool for home project requirements, shopping runs, warehouse inventory, and tool tracking.">
+<meta property="og:url" content="https://systembydave.com/depotops/">
+<meta property="og:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<meta property="og:image:width" content="1024">
+<meta property="og:image:height" content="412">
+<meta property="og:image:alt" content="System by Dave preview banner">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="DepotOps — Projects, Shopping, and Warehouse">
+<meta name="twitter:description" content="A local-first field tool for home project requirements, shopping runs, warehouse inventory, and tool tracking.">
+<meta name="twitter:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="DepotOps">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./icon.svg" type="image/svg+xml">
+<title>DepotOps v0.2.3 — Projects • Shopping • Warehouse</title>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<style>
+:root{
+  --orange:#f96302;--orange2:#dd5100;--ink:#151515;--ink2:#242424;--cream:#f3efe6;--paper:#fffdf8;
+  --line:#cec8bd;--muted:#69645d;--green:#24783b;--yellow:#b97d00;--red:#b8332a;--blue:#1f6299;
+  --shadow:0 10px 28px rgba(0,0,0,.10);--r:2px;--topbar-height:68px;
+}
+*{box-sizing:border-box} html{scroll-behavior:smooth}
+body{
+  margin:0;color:var(--ink);font:15px/1.4 Arial,Helvetica,sans-serif;
+  background:linear-gradient(rgba(249,99,2,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(249,99,2,.035) 1px,transparent 1px),var(--cream);
+  background-size:22px 22px
+}
+button,input,select,textarea{font:inherit} button{cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[tabindex]:focus-visible{outline:3px solid #111;outline-offset:2px}
+.topbar{position:sticky;top:0;z-index:50;background:var(--orange);color:#fff;border-bottom:4px solid #202020;box-shadow:0 4px 14px rgba(0,0,0,.2)}
+.topinner{max-width:1440px;margin:auto;padding:10px 18px;display:flex;align-items:center;gap:16px;justify-content:space-between}
+.brand{display:flex;gap:11px;align-items:center;font-weight:900;letter-spacing:-.03em}
+.logo{width:44px;height:44px;background:#fff;color:var(--orange);border:3px solid #222;display:grid;place-items:center;font-weight:900;font-size:22px;transform:rotate(-2deg)}
+.brand small{display:block;font-size:10px;letter-spacing:.12em;text-transform:uppercase}
+nav{display:flex;gap:7px;flex-wrap:wrap}.navbtn{min-height:44px;border:2px solid rgba(255,255,255,.65);background:rgba(255,255,255,.08);color:#fff;padding:7px 12px;font-weight:900}
+.navbtn.active,.navbtn[aria-pressed="true"],.navbtn:hover{background:#fff;color:#222}
+.shell{max-width:1440px;margin:auto;padding:16px}
+.hero{display:grid;grid-template-columns:1.35fr .65fr;gap:16px;background:var(--paper);border:2px solid #222;border-top:8px solid var(--orange);box-shadow:var(--shadow);padding:18px;margin-bottom:16px}
+.kicker{color:var(--orange);font-size:11px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}
+h1{margin:3px 0 8px;font-size:clamp(30px,5vw,54px);line-height:.96;text-transform:uppercase;letter-spacing:-.05em}.lead{color:var(--muted);max-width:850px}
+.storebox{border:2px dashed #222;background:#fff6ed;padding:13px}.storebox h3{margin:0 0 6px;text-transform:uppercase}.storeline{display:flex;gap:12px;justify-content:space-between;padding:3px 0}
+.page{display:none}.page.active{display:block}
+.toolbar{position:sticky;top:var(--topbar-height);z-index:35;background:#222;border:2px solid #222;padding:9px;display:grid;grid-template-columns:1.2fr .9fr auto auto auto;gap:8px;margin-bottom:12px}
+.toolbar input,.toolbar select{min-height:44px;min-width:0;width:100%;border:2px solid #555;padding:9px;background:#fff;color:#111}.toolbar .btn{min-width:0;width:100%}
+.btn{min-height:44px;border:2px solid #222;background:#fff;color:#222;padding:8px 11px;font-weight:900}.btn.orange{background:var(--orange);color:#fff}.btn.dark{background:#222;color:#fff;border-color:#fff}.btn.soft{background:#f1eee7}.btn.danger{background:#fff0ee;color:var(--red);border-color:var(--red)}.btn.small{min-height:36px;padding:5px 8px;font-size:12px}
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin-bottom:12px}.stat{background:var(--paper);border:2px solid #222;padding:11px;box-shadow:var(--shadow)}.stat .num{font-size:27px;font-weight:900}.stat .lab{font-size:10px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);font-weight:900}.progress{grid-column:1/-1;height:12px;border:2px solid #222;background:#ddd;overflow:hidden}.progress>div{height:100%;width:0;background:var(--orange)}
+.grid{display:grid;grid-template-columns:1.72fr .78fr;gap:14px}.panel{background:var(--paper);border:2px solid #222;box-shadow:var(--shadow)}.panel-head{padding:11px 13px;border-bottom:2px solid #222;background:#f0ece4;display:flex;gap:10px;align-items:center;justify-content:space-between}.panel-head h2{margin:0;font-size:17px;text-transform:uppercase}.panel-head .actions{display:flex;gap:7px;flex-wrap:wrap}
+.items{padding:9px;display:grid;gap:8px}.runitem{border:2px solid #c9c3b8;background:#fff;padding:10px;display:grid;grid-template-columns:156px minmax(260px,1fr) minmax(132px,auto) 74px;gap:12px;align-items:center}.runitem[data-status="purchased"]{opacity:.65;background:#edf7ef}.runitem[data-status="hold"]{background:#eef7ff;border-color:#6a9fc8}.runitem[data-status="not_found"]{background:#fff3f1;border-color:#da8982}.runitem[data-status="skipped"]{opacity:.58}.qtyctrl{display:grid;grid-template-columns:44px 1fr 44px;align-items:center;border:2px solid #222}.qtyctrl button{width:44px;height:44px;border:0;background:#eee;font-weight:900}.qtyctrl output{text-align:center;font-weight:900}.itemname{font-weight:900;min-width:0;overflow-wrap:anywhere}.meta{font-size:12px;color:var(--muted);overflow-wrap:anywhere}.runitem>div{min-width:0}.tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:4px}.tag{font-size:10px;text-transform:uppercase;font-weight:900;padding:4px 6px;border:1px solid currentColor}.tag.project{color:#555;background:#f4f4f4}.tag.must{color:var(--red);background:#fff1ef}.tag.buy{color:var(--yellow);background:#fff8e5}.tag.verify{color:var(--blue);background:#eef7ff}
+.product-link{
+  display:inline-flex;align-items:center;gap:5px;margin-top:7px;
+  color:#fff;background:var(--orange);border:2px solid #222;
+  padding:5px 8px;font-size:10px;font-weight:900;text-transform:uppercase;
+  text-decoration:none;min-height:32px
+}
+.product-link:hover{background:var(--orange2)}
+.product-link.search{background:#fff;color:#222}
+.product-meta{font-size:10px;color:var(--muted);margin-left:6px}
+
+.statussel{min-height:44px;border:2px solid #222;background:white;padding:7px;font-weight:800}.pqty{width:72px;min-height:44px;border:2px solid #222;padding:7px}
+.sidebar{display:grid;gap:14px}.note-card{padding:13px}.note-card h3{margin:0 0 7px;text-transform:uppercase;font-size:15px}.warn{border-left:8px solid var(--yellow)}.goal{border-left:8px solid var(--green)}.holdbox{border-left:8px solid var(--blue)}ul.compact{margin:7px 0 0;padding-left:18px;color:var(--muted)}
+.empty{padding:26px;text-align:center;color:var(--muted)}
+.project-board{padding:10px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.project-card{border:2px solid #222;background:#fff;padding:13px;position:relative}.project-card h3{margin:2px 0 5px;text-transform:uppercase}.project-card .status{position:absolute;right:9px;top:9px}.project-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin:10px 0}.mini{background:#f2efe9;border:1px solid #ccc;padding:6px}.mini b{display:block;font-size:18px}.mini span{font-size:9px;text-transform:uppercase;color:var(--muted);font-weight:900}.card-actions{display:flex;gap:6px;flex-wrap:wrap}
+.project-detail{padding:10px}.reqtable{width:100%;border-collapse:collapse}.reqtable th,.reqtable td{padding:9px 7px;border-bottom:1px solid #d7d1c7;text-align:left;vertical-align:middle}.reqtable th{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}.req-actions{display:flex;gap:5px;flex-wrap:wrap}
+.warehouse-layout{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}.inventory-list{padding:9px;display:grid;gap:8px}.inventory-item{border:2px solid #c7c1b7;background:#fff;padding:10px}.inventory-item.low{border-color:var(--red);background:#fff5f3}.inventory-head{display:flex;justify-content:space-between;gap:10px}.stock{font-size:24px;font-weight:900}.stockline{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-top:7px}.stockctrl{display:flex;gap:4px}.stockctrl button{min-width:44px;min-height:44px;border:2px solid #222;background:#eee;font-weight:900}.type{color:var(--orange);font-size:10px;text-transform:uppercase;font-weight:900}.toolrow{padding:10px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:10px}.toolrow:last-child{border-bottom:0}.toolname{font-weight:900}
+.utility{display:flex;gap:7px;flex-wrap:wrap;padding:10px;background:#222;margin-bottom:12px}
+.footer{margin-top:14px;background:#222;color:#ddd;padding:11px 13px;border-top:4px solid var(--orange);display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap}.footer a{color:#fff;font-weight:900}
+dialog{width:min(680px,calc(100vw - 24px));max-height:90vh;overflow:auto;border:3px solid #222;padding:0;background:var(--paper);box-shadow:0 24px 70px rgba(0,0,0,.35)}dialog::backdrop{background:rgba(0,0,0,.58)}.modal-head{background:var(--orange);color:#fff;padding:12px 14px;border-bottom:3px solid #222;display:flex;justify-content:space-between;align-items:center}.modal-head h2{margin:0;text-transform:uppercase;font-size:18px}.modal-body{padding:14px}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.field{display:grid;gap:4px}.field.full{grid-column:1/-1}.field label{font-size:11px;text-transform:uppercase;font-weight:900;color:var(--muted)}.field input,.field select,.field textarea{min-height:44px;border:2px solid #333;padding:8px;background:#fff}.modal-actions{display:flex;justify-content:flex-end;gap:7px;margin-top:14px;flex-wrap:wrap}.reconcile-row{border:2px solid #ccc;padding:9px;margin-bottom:8px;display:grid;grid-template-columns:1fr 100px;gap:10px;align-items:center}.reconcile-row input{min-height:44px;border:2px solid #222;padding:7px;width:100%}
+.toast{position:fixed;right:16px;bottom:16px;z-index:100;background:#222;color:#fff;border:3px solid var(--orange);padding:10px 12px;opacity:0;pointer-events:none}.selftest{display:none;white-space:pre-wrap}
+@media(max-width:980px){.hero,.grid,.warehouse-layout{grid-template-columns:1fr}.project-board{grid-template-columns:1fr 1fr}.toolbar{grid-template-columns:1fr 1fr auto}.runitem{grid-template-columns:156px minmax(0,1fr) 132px}.runitem .statussel{grid-column:3}.runitem .pqty{grid-column:3}.stats{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:680px){
+  :root{--topbar-height:64px}
+  .topinner{padding:8px 10px;align-items:center}.brand>div:last-child{display:none}.logo{width:40px;height:40px}nav{flex-wrap:nowrap}.navbtn{padding:6px 8px;font-size:11px;white-space:nowrap}
+  .shell{padding:9px}.hero{padding:12px;grid-template-columns:1fr}.storebox{display:none}.toolbar{grid-template-columns:1fr 1fr;padding:7px}.toolbar input{grid-column:1/-1}.toolbar .wide{grid-column:1/-1}
+  .stats{grid-template-columns:repeat(2,1fr)}.runitem{grid-template-columns:1fr 1fr;gap:8px}.runitem>div:nth-child(2){grid-column:1/-1}.qtyctrl{width:156px;grid-column:1/-1}.statussel{grid-column:1!important;width:100%}.pqty{grid-column:2!important;width:100%}.project-board{grid-template-columns:1fr}.project-detail{overflow:auto}.reqtable{min-width:760px}
+  .warehouse-layout{grid-template-columns:1fr}.formgrid{grid-template-columns:1fr}.field.full{grid-column:auto}.reconcile-row{grid-template-columns:1fr}.panel-head{align-items:flex-start}.panel-head .actions{justify-content:flex-end}.btn.small,.product-link{min-height:44px}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}}
+</style>
+</head>
+<body>
+<noscript>
+  <div style="max-width:760px;margin:40px auto;padding:20px;border:3px solid #222;background:#fffdf8;font:16px/1.45 Arial,Helvetica,sans-serif">
+    <strong style="display:block;font-size:22px;margin-bottom:8px">DepotOps requires JavaScript.</strong>
+    Enable JavaScript and reload this page. Your project data is stored locally in this browser.
+  </div>
+</noscript>
+<header class="topbar">
+  <div class="topinner">
+    <div class="brand"><div class="logo">DO</div><div>DEPOTOPS <small>v0.2.3 • Projects • Shopping • Warehouse</small></div></div>
+    <nav aria-label="Primary">
+      <button class="navbtn active" data-page="shopping" aria-pressed="true">Shopping Run</button>
+      <button class="navbtn" data-page="projects" aria-pressed="false">Projects</button>
+      <button class="navbtn" data-page="warehouse" aria-pressed="false">Warehouse</button>
+    </nav>
+  </div>
+</header>
+
+<div class="shell">
+  <section class="hero">
+    <div><div class="kicker">Home Projects Command Center</div><h1>Build the cart.<br>Know what you own.</h1><div class="lead">Project requirements, warehouse coverage, multi-project shopping runs, and purchase reconciliation in one local-first field tool.</div></div>
+    <div class="storebox"><h3>Today’s Store</h3><div class="storeline"><b>Lawnside #0917</b><span>Primary</span></div><div class="storeline"><span>310 Whitehorse Pike</span><span>Lawnside, NJ</span></div><hr><div class="storeline"><b>Cherry Hill #0989</b><span>Backup</span></div><div class="storeline"><span>2160 Route 70 West</span><span>Cherry Hill, NJ</span></div></div>
+  </section>
+
+  <section id="shopping" class="page active">
+    <div class="toolbar">
+      <input id="runSearch" placeholder="Search active run…" aria-label="Search active shopping run">
+      <select id="runSelect" aria-label="Shopping run"></select>
+      <select id="runProjectFilter" aria-label="Filter run by project"><option value="all">All Projects</option></select>
+      <button class="btn orange" id="newRunBtn">New Run</button>
+      <button class="btn dark" id="neededOnlyBtn">Needed Only</button>
+    </div>
+    <section class="stats">
+      <div class="stat"><div class="num" id="runVisible">0</div><div class="lab">Visible Items</div></div>
+      <div class="stat"><div class="num" id="runPurchased">0</div><div class="lab">Purchased</div></div>
+      <div class="stat"><div class="num" id="runMust">0</div><div class="lab">Must / Need</div></div>
+      <div class="stat"><div class="num" id="runProjects">0</div><div class="lab">Projects</div></div>
+      <div class="stat"><div class="num" id="runRemaining">0</div><div class="lab">Remaining</div></div>
+      <div class="progress"><div id="runProgress"></div></div>
+    </section>
+    <div class="grid">
+      <section class="panel">
+        <div class="panel-head"><h2 id="runTitle">Active Run</h2><div class="actions"><button class="btn small soft" id="completeRunBtn">Complete & Reconcile</button></div></div>
+        <div id="runItems" class="items"></div>
+      </section>
+      <aside class="sidebar">
+        <section class="panel note-card warn"><h3>⚠ Wrong Aisle Trap</h3><b>Gray electrical PVC / RNC only.</b><ul class="compact"><li>No white plumbing PVC</li><li>No pressure/DWV fittings</li><li>No tight plumbing 90s</li><li>No ENT / “Smurf tube”</li></ul></section>
+        <section class="panel note-card goal"><h3>🎯 Today’s Objective</h3><b>Finish underground raceway materials.</b><div class="meta" style="margin-top:6px">Raceway → pull string → document → verify burial → backfill.</div></section>
+        <section class="panel note-card holdbox"><h3>Hold For Verified Run</h3><ul class="compact"><li>Feeder conductors</li><li>Breaker</li><li>Garage subpanel</li><li>Ground rods</li></ul></section>
+      </aside>
+    </div>
+  </section>
+
+  <section id="projects" class="page">
+    <div class="utility"><button class="btn orange" id="addProjectBtn">+ Project</button><button class="btn" id="addCatalogBtn">+ Catalog Item</button></div>
+    <section class="panel">
+      <div class="panel-head"><h2>Project Board</h2><span class="meta">Requirements → Warehouse coverage → Shopping shortage</span></div>
+      <div id="projectBoard" class="project-board"></div>
+    </section>
+    <section id="projectDetailPanel" class="panel" style="margin-top:14px">
+      <div class="panel-head"><h2 id="projectDetailTitle">Project Requirements</h2><div class="actions"><button class="btn small orange" id="addRequirementBtn">+ Requirement</button><button class="btn small soft" id="addShortagesBtn">Add Shortages to Run</button></div></div>
+      <div class="project-detail" id="projectDetail"></div>
+    </section>
+  </section>
+
+  <section id="warehouse" class="page">
+    <div class="utility"><button class="btn orange" id="addInventoryBtn">+ Inventory Item</button><button class="btn" id="addToolBtn">+ Tool</button><button class="btn" id="exportBtn">Export JSON</button><button class="btn" id="importBtn">Import JSON</button><input type="file" id="importFile" accept="application/json" hidden><button class="btn danger" id="resetBtn">Reset v0.2 Data</button></div>
+    <div class="warehouse-layout">
+      <section class="panel"><div class="panel-head"><h2>Fasteners</h2><span>Bin Stock</span></div><div id="fasteners" class="inventory-list"></div></section>
+      <section class="panel"><div class="panel-head"><h2>Consumables & Materials</h2><span>Reorder Watch</span></div><div id="consumables" class="inventory-list"></div></section>
+      <section class="panel"><div class="panel-head"><h2>Tool Records</h2><span>Owned Gear</span></div><div id="tools"></div></section>
+    </div>
+  </section>
+
+  <div class="footer"><span><b>DepotOps v0.2.3:</b> local-first canonical data model • stable IDs • project allocation • multi-project runs • reconciliation • JSON backup.</span><a href="../index.html">System by Dave home</a></div>
+</div>
+
+<dialog id="editorDialog"><form method="dialog" id="editorForm"><div class="modal-head"><h2 id="editorTitle">Edit</h2><button class="btn small dark" value="cancel">Close</button></div><div class="modal-body"><div class="formgrid" id="editorFields"></div><div class="modal-actions"><button class="btn" value="cancel">Cancel</button><button class="btn orange" id="editorSave" value="default">Save</button></div></div></form></dialog>
+<dialog id="reconcileDialog"><form method="dialog" id="reconcileForm"><div class="modal-head"><h2>Complete & Reconcile Run</h2><button class="btn small dark" value="cancel">Close</button></div><div class="modal-body"><p>Enter any purchased quantity that should become general Warehouse stock or unused leftovers. Project-only material can remain at 0.</p><div id="reconcileRows"></div><div class="modal-actions"><button class="btn" value="cancel">Cancel</button><button class="btn orange" id="reconcileSave" value="default">Complete Run</button></div></div></form></dialog>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<pre id="selftest" class="selftest"></pre>
+
+<script>
+"use strict";
+const SCHEMA_VERSION=2, STORAGE_KEY="depotops-v0.2-state";
+const STATUS_ORDER=["needed","in_cart","purchased","not_found","skipped","hold"];
+const PRODUCT_LINKS={
+ "itm-pvc40":{url:"https://www.homedepot.com/p/202352537",exact:true,label:"Home Depot product",model:"A52BA12H",internet:"202352537"},
+ "itm-pvc80":{url:"https://www.homedepot.com/p/202352541",exact:true,label:"Home Depot product",model:"A53BA12H",internet:"202352541"},
+ "itm-sweep":{url:"https://www.homedepot.com/p/202043344",exact:true,label:"Home Depot product",model:"R5233825",internet:"202043344"},
+ "itm-coupling":{url:"https://www.homedepot.com/p/202043236",exact:true,label:"Home Depot product",model:"R6141625",internet:"202043236"},
+ "itm-adapter":{url:"https://www.homedepot.com/p/202043379",exact:true,label:"Home Depot product",model:"R5140105",internet:"202043379"},
+ "itm-lb":{url:"https://www.homedepot.com/p/202043405",exact:true,label:"Home Depot product",model:"R5133665",internet:"202043405"},
+ "itm-cement":{url:"https://www.homedepot.com/p/206751887",exact:true,label:"Home Depot product",model:"31040",internet:"206751887"},
+ "itm-primer":{url:"https://www.homedepot.com/p/100347769",exact:true,label:"Home Depot product",model:"3075633",internet:"100347769"},
+ "itm-string":{url:"https://www.homedepot.com/p/100660158",exact:true,label:"Home Depot product",model:"56108",internet:"100660158"},
+ "itm-warning":{url:"https://www.homedepot.com/p/202276217",exact:true,label:"Home Depot product",model:"42-101",internet:"202276217"},
+ "itm-ductseal":{url:"https://www.homedepot.com/p/100212441",exact:true,label:"Home Depot product",model:"DS-110",internet:"100212441"},
+ "itm-straps":{url:"https://www.homedepot.com/p/202043223",exact:true,label:"Home Depot product",model:"R5133738",internet:"202043223"}
+}
+function productLinkFor(cat){
+ if(!cat)return null;
+ if(PRODUCT_LINKS[cat.id])return PRODUCT_LINKS[cat.id];
+ return {url:`https://www.homedepot.com/s/${encodeURIComponent(cat.name)}`,exact:false,label:"Find at Home Depot"};
+}
+const $=id=>document.getElementById(id);
+const uid=(prefix="id")=>`${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2,8)}`;
+const clone=o=>JSON.parse(JSON.stringify(o));
+
+const seedState={
+ schemaVersion:2,
+ projects:[
+  {id:"prj-garage",name:"Detached Garage Feeder",status:"Active",location:"Backyard / Garage",description:"60A feeder raceway phase",createdAt:"2026-08-09",updatedAt:"2026-08-09"},
+  {id:"prj-kitchen",name:"Kitchen Electrical Upgrade",status:"Planning",location:"Main House",description:"Service, induction, wall oven",createdAt:"2026-08-09",updatedAt:"2026-08-09"},
+  {id:"prj-lighting",name:"Lighting Retrofit",status:"Active",location:"Main Level",description:"Fixture and box retrofit",createdAt:"2026-08-09",updatedAt:"2026-08-09"}
+ ],
+ catalogItems:[
+  {id:"itm-pvc40",name:'1" × 10′ Schedule 40 electrical PVC conduit',category:"material",subtype:"electrical",unit:"stick",manufacturer:"Cantex",model:"A52BA12H",verificationStatus:"verified",notes:"Gray electrical PVC/RNC."},
+  {id:"itm-pvc80",name:'1" × 10′ Schedule 80 electrical PVC conduit',category:"material",subtype:"electrical",unit:"stick",manufacturer:"",model:"A53BA12H",verificationStatus:"verified",notes:"Exposed risers where subject to physical damage."},
+  {id:"itm-sweep",name:'1" PVC long-radius 90° sweep',category:"material",subtype:"electrical",unit:"each",manufacturer:"",model:"R5233825",verificationStatus:"verified",notes:"Electrical sweep, not plumbing elbow."},
+  {id:"itm-coupling",name:'1" PVC coupling',category:"material",subtype:"electrical",unit:"each",manufacturer:"",model:"R6141625",verificationStatus:"verified",notes:"Bell ends may reduce count."},
+  {id:"itm-adapter",name:'1" threaded terminal adapter',category:"material",subtype:"electrical",unit:"each",manufacturer:"",model:"R5140105",verificationStatus:"verified",notes:"LB/enclosure transition."},
+  {id:"itm-lb",name:'1" PVC LB body + cover/gasket',category:"material",subtype:"electrical",unit:"each",manufacturer:"",model:"R5133665",verificationStatus:"verified",notes:"House + garage penetrations."},
+  {id:"itm-cement",name:"PVC electrical conduit cement",category:"consumable",subtype:"electrical",unit:"can",manufacturer:"",model:"31040",verificationStatus:"verified",notes:"Verify PVC/RNC application."},
+  {id:"itm-primer",name:"PVC primer",category:"consumable",subtype:"electrical",unit:"can",manufacturer:"",model:"3075633",verificationStatus:"verify",notes:"Use if applicable to cement/system."},
+  {id:"itm-string",name:"Pull string / mule tape",category:"consumable",subtype:"electrical",unit:"roll",manufacturer:"",model:"56108",verificationStatus:"verified",notes:"Install during raceway assembly."},
+  {id:"itm-warning",name:"Electrical warning tape",category:"consumable",subtype:"electrical",unit:"roll",manufacturer:"",model:"42-101",verificationStatus:"verified",notes:"Above buried raceway."},
+  {id:"itm-ductseal",name:"Duct seal",category:"consumable",subtype:"electrical",unit:"pack",manufacturer:"",model:"DS-110",verificationStatus:"verify",notes:"For appropriate penetrations/ends."},
+  {id:"itm-straps",name:'1" PVC conduit straps',category:"material",subtype:"electrical",unit:"pack",manufacturer:"",model:"R5133738",verificationStatus:"verified",notes:"Secure exposed risers."},
+  {id:"itm-wago",name:"WAGO 221 connectors",category:"consumable",subtype:"electrical",unit:"pack",manufacturer:"WAGO",model:"221",verificationStatus:"verified",notes:"Fixture pigtail stock."},
+  {id:"itm-labels",name:"Panel directory labels",category:"consumable",subtype:"electrical",unit:"pack",manufacturer:"",model:"",verificationStatus:"verified",notes:"Circuit identification."},
+  {id:"itm-screw8",name:"#8 × 1¼ in construction screws",category:"fastener",subtype:"screw",unit:"each",manufacturer:"",model:"",verificationStatus:"verified",notes:""},
+  {id:"itm-screw10",name:"#10 × 2½ in construction screws",category:"fastener",subtype:"screw",unit:"each",manufacturer:"",model:"",verificationStatus:"verified",notes:""},
+  {id:"itm-bolt",name:"¼-20 × 1 in bolts",category:"fastener",subtype:"bolt",unit:"each",manufacturer:"",model:"",verificationStatus:"verified",notes:""},
+  {id:"itm-washer",name:"¼ in flat washers",category:"fastener",subtype:"washer",unit:"each",manufacturer:"",model:"",verificationStatus:"verified",notes:""},
+  {id:"itm-masonry",name:"Blue masonry screws",category:"fastener",subtype:"anchor",unit:"each",manufacturer:"",model:"",verificationStatus:"verified",notes:""},
+  {id:"itm-tape",name:"Electrical tape — black",category:"consumable",subtype:"electrical",unit:"roll",manufacturer:"",model:"",verificationStatus:"verified",notes:""},
+  {id:"itm-gloves",name:"Nitrile gloves",category:"consumable",subtype:"PPE",unit:"each",manufacturer:"",model:"",verificationStatus:"verified",notes:""},
+  {id:"itm-towels",name:"Shop towels",category:"consumable",subtype:"cleaning",unit:"roll",manufacturer:"",model:"",verificationStatus:"verified",notes:""}
+ ],
+ requirements:[
+  {id:"req-pvc40",projectId:"prj-garage",itemId:"itm-pvc40",requiredQty:6,allocatedQty:0,phase:"Raceway",priority:"Must",status:"ready",notes:"~60 ft with cut/waste margin."},
+  {id:"req-pvc80",projectId:"prj-garage",itemId:"itm-pvc80",requiredQty:1,allocatedQty:0,phase:"Raceway",priority:"Must",status:"ready",notes:"House + garage exposed risers."},
+  {id:"req-sweep",projectId:"prj-garage",itemId:"itm-sweep",requiredQty:2,allocatedQty:0,phase:"Raceway",priority:"Must",status:"ready",notes:"One each end."},
+  {id:"req-coupling",projectId:"prj-garage",itemId:"itm-coupling",requiredQty:3,allocatedQty:0,phase:"Raceway",priority:"Buy",status:"ready",notes:"Spare allowance."},
+  {id:"req-adapter",projectId:"prj-garage",itemId:"itm-adapter",requiredQty:2,allocatedQty:0,phase:"Raceway",priority:"Must",status:"ready",notes:""},
+  {id:"req-lb",projectId:"prj-garage",itemId:"itm-lb",requiredQty:2,allocatedQty:0,phase:"Raceway",priority:"Must",status:"ready",notes:""},
+  {id:"req-cement",projectId:"prj-garage",itemId:"itm-cement",requiredQty:1,allocatedQty:0,phase:"Raceway",priority:"Must",status:"ready",notes:""},
+  {id:"req-primer",projectId:"prj-garage",itemId:"itm-primer",requiredQty:1,allocatedQty:0,phase:"Raceway",priority:"Buy",status:"verify",notes:"Verify cement/application."},
+  {id:"req-string",projectId:"prj-garage",itemId:"itm-string",requiredQty:1,allocatedQty:0,phase:"Raceway",priority:"Must",status:"ready",notes:""},
+  {id:"req-warning",projectId:"prj-garage",itemId:"itm-warning",requiredQty:1,allocatedQty:0,phase:"Raceway",priority:"Buy",status:"ready",notes:""},
+  {id:"req-ductseal",projectId:"prj-garage",itemId:"itm-ductseal",requiredQty:1,allocatedQty:0,phase:"Raceway",priority:"Buy",status:"verify",notes:""},
+  {id:"req-straps",projectId:"prj-garage",itemId:"itm-straps",requiredQty:1,allocatedQty:0,phase:"Raceway",priority:"Buy",status:"ready",notes:""},
+  {id:"req-wago",projectId:"prj-lighting",itemId:"itm-wago",requiredQty:1,allocatedQty:0,phase:"Fixtures",priority:"Buy",status:"ready",notes:""},
+  {id:"req-labels",projectId:"prj-kitchen",itemId:"itm-labels",requiredQty:1,allocatedQty:0,phase:"Planning",priority:"Buy",status:"ready",notes:""}
+ ],
+ inventory:[
+  {id:"inv-screw8",itemId:"itm-screw8",quantity:142,stockMode:"exact",minimumQty:60,locationId:"loc-a1",status:"available",updatedAt:"2026-08-09"},
+  {id:"inv-screw10",itemId:"itm-screw10",quantity:38,stockMode:"exact",minimumQty:40,locationId:"loc-a2",status:"available",updatedAt:"2026-08-09"},
+  {id:"inv-bolt",itemId:"itm-bolt",quantity:64,stockMode:"exact",minimumQty:24,locationId:"loc-b1",status:"available",updatedAt:"2026-08-09"},
+  {id:"inv-washer",itemId:"itm-washer",quantity:110,stockMode:"exact",minimumQty:40,locationId:"loc-b2",status:"available",updatedAt:"2026-08-09"},
+  {id:"inv-masonry",itemId:"itm-masonry",quantity:18,stockMode:"exact",minimumQty:20,locationId:"loc-c1",status:"available",updatedAt:"2026-08-09"},
+  {id:"inv-tape",itemId:"itm-tape",quantity:5,stockMode:"exact",minimumQty:3,locationId:"loc-electrical",status:"available",updatedAt:"2026-08-09"},
+  {id:"inv-cement",itemId:"itm-cement",quantity:1,stockMode:"exact",minimumQty:1,locationId:"loc-electrical",status:"available",updatedAt:"2026-08-09"},
+  {id:"inv-primer",itemId:"itm-primer",quantity:0,stockMode:"exact",minimumQty:1,locationId:"loc-electrical",status:"available",updatedAt:"2026-08-09"},
+  {id:"inv-gloves",itemId:"itm-gloves",quantity:32,stockMode:"exact",minimumQty:20,locationId:"loc-ppe",status:"available",updatedAt:"2026-08-09"},
+  {id:"inv-towels",itemId:"itm-towels",quantity:2,stockMode:"exact",minimumQty:2,locationId:"loc-cleaning",status:"available",updatedAt:"2026-08-09"},
+  {id:"inv-string",itemId:"itm-string",quantity:0,stockMode:"exact",minimumQty:1,locationId:"loc-electrical",status:"available",updatedAt:"2026-08-09"}
+ ],
+ shoppingRuns:[{id:"run-hd-0809",name:"Home Depot Run — 08/09",status:"active",storeId:"store-lawnside",createdAt:"2026-08-09",completedAt:null}],
+ shoppingRunItems:[
+  {id:"sri-pvc40",runId:"run-hd-0809",itemId:"itm-pvc40",projectRequirementId:"req-pvc40",requestedQty:6,purchasedQty:0,status:"needed",priority:"Must",source:"project",notes:""},
+  {id:"sri-pvc80",runId:"run-hd-0809",itemId:"itm-pvc80",projectRequirementId:"req-pvc80",requestedQty:1,purchasedQty:0,status:"needed",priority:"Must",source:"project",notes:""},
+  {id:"sri-sweep",runId:"run-hd-0809",itemId:"itm-sweep",projectRequirementId:"req-sweep",requestedQty:2,purchasedQty:0,status:"needed",priority:"Must",source:"project",notes:""},
+  {id:"sri-coupling",runId:"run-hd-0809",itemId:"itm-coupling",projectRequirementId:"req-coupling",requestedQty:3,purchasedQty:0,status:"needed",priority:"Buy",source:"project",notes:""},
+  {id:"sri-adapter",runId:"run-hd-0809",itemId:"itm-adapter",projectRequirementId:"req-adapter",requestedQty:2,purchasedQty:0,status:"needed",priority:"Must",source:"project",notes:""},
+  {id:"sri-lb",runId:"run-hd-0809",itemId:"itm-lb",projectRequirementId:"req-lb",requestedQty:2,purchasedQty:0,status:"needed",priority:"Must",source:"project",notes:""},
+  {id:"sri-cement",runId:"run-hd-0809",itemId:"itm-cement",projectRequirementId:"req-cement",requestedQty:0,purchasedQty:0,status:"skipped",priority:"Must",source:"project",notes:"Covered by Warehouse stock."},
+  {id:"sri-string",runId:"run-hd-0809",itemId:"itm-string",projectRequirementId:"req-string",requestedQty:1,purchasedQty:0,status:"needed",priority:"Must",source:"project",notes:""},
+  {id:"sri-warning",runId:"run-hd-0809",itemId:"itm-warning",projectRequirementId:"req-warning",requestedQty:1,purchasedQty:0,status:"needed",priority:"Buy",source:"project",notes:""},
+  {id:"sri-straps",runId:"run-hd-0809",itemId:"itm-straps",projectRequirementId:"req-straps",requestedQty:1,purchasedQty:0,status:"needed",priority:"Buy",source:"project",notes:""}
+ ],
+ tools:[
+  {id:"tool-bosch",name:"Bosch Laser Distance Meter",manufacturer:"Bosch",model:"",serial:"",status:"Owned",locationId:"loc-tools",capabilities:["measure distance"],accessories:[],purchaseDate:"",warrantyUntil:"",notes:"Primary measuring tool"},
+  {id:"tool-clamp",name:"Clamp Meter",manufacturer:"",model:"",serial:"",status:"Owned",locationId:"loc-electrical",capabilities:["measure current","electrical diagnostics"],accessories:[],purchaseDate:"",warrantyUntil:"",notes:"Electrical diagnostics"},
+  {id:"tool-pvc",name:"PVC Saw / Cutter",manufacturer:"",model:"",serial:"",status:"Verify",locationId:"loc-garage",capabilities:["cut PVC"],accessories:[],purchaseDate:"",warrantyUntil:"",notes:"Confirm before run"},
+  {id:"tool-torque",name:"Torque Wrench",manufacturer:"",model:"",serial:"",status:"Owned",locationId:"loc-tools",capabilities:["torque fasteners"],accessories:[],purchaseDate:"",warrantyUntil:"",notes:"General service"}
+ ],
+ locations:[
+  {id:"loc-garage",name:"Garage",parentId:null,type:"area"},{id:"loc-electrical",name:"Electrical Cabinet",parentId:"loc-garage",type:"cabinet"},
+  {id:"loc-tools",name:"Tool Cabinet",parentId:"loc-garage",type:"cabinet"},{id:"loc-a1",name:"Bin A1",parentId:"loc-garage",type:"bin"},
+  {id:"loc-a2",name:"Bin A2",parentId:"loc-garage",type:"bin"},{id:"loc-b1",name:"Bin B1",parentId:"loc-garage",type:"bin"},
+  {id:"loc-b2",name:"Bin B2",parentId:"loc-garage",type:"bin"},{id:"loc-c1",name:"Bin C1",parentId:"loc-garage",type:"bin"},
+  {id:"loc-ppe",name:"PPE",parentId:"loc-garage",type:"shelf"},{id:"loc-cleaning",name:"Cleaning",parentId:"loc-garage",type:"shelf"}
+ ],
+ stores:[
+  {id:"store-lawnside",retailer:"Home Depot",name:"Lawnside",storeNumber:"0917",address:"310 Whitehorse Pike, Lawnside, NJ 08045",preferred:true},
+  {id:"store-cherryhill",retailer:"Home Depot",name:"Cherry Hill",storeNumber:"0989",address:"2160 Route 70 West, Cherry Hill, NJ",preferred:false}
+ ],
+ settings:{activeRunId:"run-hd-0809",selectedProjectId:"prj-garage",neededOnly:false}
+};
+
+let state=loadState();
+
+function validateState(s){
+ const arrays=["projects","catalogItems","requirements","inventory","shoppingRuns","shoppingRunItems","tools","locations","stores"];
+ if(!s||typeof s!=="object"||!Number.isInteger(s.schemaVersion)) return {ok:false,error:"Missing schemaVersion."};
+ for(const k of arrays) if(!Array.isArray(s[k])) return {ok:false,error:`Missing array: ${k}`};
+ const all=[...s.projects,...s.catalogItems,...s.requirements,...s.inventory,...s.shoppingRuns,...s.shoppingRunItems,...s.tools,...s.locations,...s.stores];
+ const ids=all.map(x=>x.id);
+ if(ids.some(x=>!x)||new Set(ids).size!==ids.length) return {ok:false,error:"IDs must be present and globally unique."};
+ const itemIds=new Set(s.catalogItems.map(x=>x.id)), projectIds=new Set(s.projects.map(x=>x.id)), runIds=new Set(s.shoppingRuns.map(x=>x.id));
+ if(!s.settings||typeof s.settings!=="object") return {ok:false,error:"Missing settings."};
+ if(s.settings.activeRunId&&!runIds.has(s.settings.activeRunId)) return {ok:false,error:"Invalid active shopping run."};
+ if(s.settings.selectedProjectId&&!projectIds.has(s.settings.selectedProjectId)) return {ok:false,error:"Invalid selected project."};
+ if(typeof s.settings.neededOnly!=="boolean") return {ok:false,error:"Invalid needed-only setting."};
+ if(s.requirements.some(x=>!itemIds.has(x.itemId)||!projectIds.has(x.projectId))) return {ok:false,error:"Invalid requirement relationship."};
+ if(s.inventory.some(x=>!itemIds.has(x.itemId))) return {ok:false,error:"Invalid inventory relationship."};
+ if(s.shoppingRunItems.some(x=>!itemIds.has(x.itemId)||!runIds.has(x.runId))) return {ok:false,error:"Invalid shopping-run relationship."};
+ return {ok:true};
+}
+function migrateState(s){
+ if(!s||typeof s!=="object") return clone(seedState);
+ if(s.schemaVersion===2) return s;
+ if(s.schemaVersion===1){const n=clone(seedState);n.settings={...n.settings,...s.settings};return n}
+ return clone(seedState);
+}
+function loadState(){
+ try{
+  const raw=localStorage.getItem(STORAGE_KEY);
+  if(!raw) return clone(seedState);
+  const migrated=migrateState(JSON.parse(raw)), v=validateState(migrated);
+  return v.ok?migrated:clone(seedState);
+ }catch(e){return clone(seedState)}
+}
+function saveState(){state.schemaVersion=SCHEMA_VERSION;localStorage.setItem(STORAGE_KEY,JSON.stringify(state))}
+function resetState(){state=clone(seedState);saveState();renderAll()}
+function exportState(){
+ const v=validateState(state); if(!v.ok){toast(`Export blocked: ${v.error}`);return}
+ const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"}),a=document.createElement("a");
+ a.href=URL.createObjectURL(blob);a.download=`depotops-v0.2-${new Date().toISOString().slice(0,10)}.json`;a.click();URL.revokeObjectURL(a.href)
+}
+function importStateObject(obj){
+ const migrated=migrateState(obj),v=validateState(migrated); if(!v.ok) throw new Error(v.error);
+ state=clone(migrated);saveState();renderAll();return true
+}
+async function importFile(file){
+ try{const obj=JSON.parse(await file.text());importStateObject(obj);toast("Import complete")}
+ catch(e){toast(`Import blocked: ${e.message}`)}
+}
+
+const byId=(arr,id)=>arr.find(x=>x.id===id);
+const item=id=>byId(state.catalogItems,id);
+const project=id=>byId(state.projects,id);
+const locationName=id=>byId(state.locations,id)?.name||"Unassigned";
+const activeRun=()=>byId(state.shoppingRuns,state.settings.activeRunId)||state.shoppingRuns.find(r=>r.status==="active")||state.shoppingRuns[0];
+const reqRunQty=reqId=>state.shoppingRunItems.filter(x=>x.projectRequirementId===reqId&&byId(state.shoppingRuns,x.runId)?.status!=="completed"&&!["skipped","not_found"].includes(x.status)).reduce((a,x)=>a+Number(x.requestedQty||0),0);
+function onHand(itemId){return state.inventory.filter(x=>x.itemId===itemId).reduce((a,x)=>a+Number(x.quantity||0),0)}
+function reservedByOthers(itemId,excludeReqId=null){return state.requirements.filter(r=>r.itemId===itemId&&r.id!==excludeReqId).reduce((a,r)=>a+Number(r.allocatedQty||0),0)}
+function availableForReq(r){return Math.max(0,onHand(r.itemId)-reservedByOthers(r.itemId,r.id)-Number(r.allocatedQty||0))}
+function effectiveCovered(r){return Number(r.allocatedQty||0)+Math.min(availableForReq(r),Math.max(0,Number(r.requiredQty||0)-Number(r.allocatedQty||0)))}
+function shortage(r){return Math.max(0,Number(r.requiredQty||0)-effectiveCovered(r)-reqRunQty(r.id))}
+function reserveRequirement(reqId){
+ const r=byId(state.requirements,reqId);if(!r)return;
+ const add=Math.min(availableForReq(r),Math.max(0,Number(r.requiredQty)-Number(r.allocatedQty||0)));
+ r.allocatedQty=Number(r.allocatedQty||0)+add;saveState();renderAll();toast(add?`Reserved ${add}`:"No available stock to reserve")
+}
+function getOrCreateInventory(itemId){
+ let inv=state.inventory.find(x=>x.itemId===itemId);if(inv)return inv;
+ inv={id:uid("inv"),itemId,quantity:0,stockMode:"exact",minimumQty:0,locationId:"loc-garage",status:"available",updatedAt:new Date().toISOString()};state.inventory.push(inv);return inv
+}
+function addRequirementShortageToRun(reqId,runId=activeRun()?.id){
+ const r=byId(state.requirements,reqId),run=byId(state.shoppingRuns,runId);if(!r||!run||run.status==="completed")return false;
+ const cat=item(r.itemId); if(r.status==="hold"||cat?.verificationStatus==="hold") return false;
+ const qty=shortage(r); if(qty<=0)return false;
+ const existing=state.shoppingRunItems.find(x=>x.runId===runId&&x.projectRequirementId===reqId&&x.status!=="skipped");
+ if(existing){existing.requestedQty=Number(existing.requestedQty)+qty;existing.status=r.status==="verify"?"hold":"needed"}
+ else state.shoppingRunItems.push({id:uid("sri"),runId,itemId:r.itemId,projectRequirementId:reqId,requestedQty:qty,purchasedQty:0,status:r.status==="verify"?"hold":"needed",priority:r.priority||"Buy",source:"project",notes:r.notes||""});
+ saveState();return true
+}
+function addLowStockToRun(invId,runId=activeRun()?.id){
+ const inv=byId(state.inventory,invId),run=byId(state.shoppingRuns,runId);if(!inv||!run||run.status==="completed")return false;
+ const cat=item(inv.itemId);if(cat?.verificationStatus==="hold")return false;
+ const qty=Math.max(0,Number(inv.minimumQty||0)-Number(inv.quantity||0));if(!qty)return false;
+ let ex=state.shoppingRunItems.find(x=>x.runId===runId&&x.itemId===inv.itemId&&x.source==="warehouse"&&x.status!=="skipped");
+ if(ex)ex.requestedQty=Math.max(ex.requestedQty,qty);
+ else state.shoppingRunItems.push({id:uid("sri"),runId,itemId:inv.itemId,projectRequirementId:null,requestedQty:qty,purchasedQty:0,status:cat?.verificationStatus==="verify"?"hold":"needed",priority:"Reorder",source:"warehouse",notes:"Low-stock replenishment"});
+ saveState();return true
+}
+function reconcileRun(runId,warehouseAdds={}){
+ const run=byId(state.shoppingRuns,runId);if(!run||run.status==="completed")return false;
+ const rows=state.shoppingRunItems.filter(x=>x.runId===runId);
+ rows.forEach(x=>{if(x.status==="purchased"&&Number(x.purchasedQty||0)<=0)x.purchasedQty=Number(x.requestedQty||0)});
+ Object.entries(warehouseAdds).forEach(([sriId,q])=>{
+  const sri=byId(rows,sriId),qty=Math.max(0,Number(q||0));if(!sri||!qty)return;
+  const inv=getOrCreateInventory(sri.itemId);inv.quantity=Number(inv.quantity||0)+qty;inv.updatedAt=new Date().toISOString()
+ });
+ run.status="completed";run.completedAt=new Date().toISOString();const next=state.shoppingRuns.find(r=>r.status==="active");state.settings.activeRunId=next?.id||run.id;saveState();return true
+}
+
+const reduced=window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+const motion={
+ from(sel,vars){if(reduced||!window.gsap||(typeof sel==="string"&&!document.querySelector(sel)))return;gsap.killTweensOf(sel);gsap.from(sel,{...vars,overwrite:"auto"})},
+ to(sel,vars){const el=typeof sel==="string"?document.querySelector(sel):sel;if(!el)return;if(reduced||!window.gsap){if(vars?.width&&el instanceof Element)el.style.width=vars.width;return}gsap.killTweensOf(sel);gsap.to(sel,{...vars,overwrite:"auto"})},
+ page(el){if(reduced||!window.gsap)return;gsap.killTweensOf(el);gsap.fromTo(el,{opacity:0,y:10},{opacity:1,y:0,duration:.24,ease:"power2.out",overwrite:true})}
+};
+function toast(msg){const t=$("toast");t.textContent=msg;if(reduced||!window.gsap){t.style.opacity=1;setTimeout(()=>t.style.opacity=0,1300);return}gsap.killTweensOf(t);gsap.fromTo(t,{opacity:0,y:14},{opacity:1,y:0,duration:.18,overwrite:true});gsap.to(t,{opacity:0,y:8,duration:.18,delay:1.2,overwrite:"auto"})}
+function switchPage(id){const current=document.querySelector(".page.active"),next=$(id);if(!next||next===current)return;current.classList.remove("active");next.classList.add("active");document.querySelectorAll(".navbtn").forEach(b=>{const active=b.dataset.page===id;b.classList.toggle("active",active);b.setAttribute("aria-pressed",String(active))});motion.page(next)}
+function fillProjectFilters(){
+ const select=$("runProjectFilter"),selected=select.value||"all";
+ const options=state.projects.map(p=>`<option value="${p.id}">${escapeHtml(p.name)}</option>`).join("");
+ select.innerHTML=`<option value="all">All Projects</option>${options}`;
+ select.value=[...select.options].some(option=>option.value===selected)?selected:"all";
+}
+function fillRunSelect(){
+ $("runSelect").innerHTML=state.shoppingRuns.map(r=>`<option value="${r.id}" ${r.id===state.settings.activeRunId?"selected":""}>${escapeHtml(r.name)}${r.status==="completed"?" ✓":""}</option>`).join("")
+}
+function escapeHtml(s=""){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
+
+function renderShopping(){
+ fillProjectFilters();fillRunSelect();
+ const run=activeRun(); if(!run){$("runItems").innerHTML='<div class="empty">Create a shopping run.</div>';return}
+ $("runTitle").textContent=`${run.name} · ${run.status.toUpperCase()}`;
+ $("completeRunBtn").disabled=run.status==="completed";
+ const q=$("runSearch").value.toLowerCase().trim(),pf=$("runProjectFilter").value,neededOnly=!!state.settings.neededOnly;
+ let rows=state.shoppingRunItems.filter(x=>x.runId===run.id).filter(x=>{
+  const r=x.projectRequirementId?byId(state.requirements,x.projectRequirementId):null,p=r?project(r.projectId):null,n=item(x.itemId)?.name||"";
+  if(pf!=="all"&&p?.id!==pf)return false;
+  if(neededOnly&&["purchased","skipped"].includes(x.status))return false;
+  return !q||`${n} ${p?.name||""} ${x.status} ${x.priority}`.toLowerCase().includes(q)
+ });
+ $("runItems").innerHTML=rows.length?rows.map(x=>{
+  const r=x.projectRequirementId?byId(state.requirements,x.projectRequirementId):null,p=r?project(r.projectId):null,cat=item(x.itemId),locked=run.status==="completed";
+  return `<article class="runitem" data-id="${x.id}" data-status="${x.status}">
+   <div class="qtyctrl" aria-label="Requested quantity"><button type="button" data-act="qty-" aria-label="Decrease requested quantity for ${escapeHtml(cat?.name||"item")}" ${locked?"disabled":""}>−</button><output aria-label="Requested quantity">${Number(x.requestedQty)}</output><button type="button" data-act="qty+" aria-label="Increase requested quantity for ${escapeHtml(cat?.name||"item")}" ${locked?"disabled":""}>+</button></div>
+   <div><div class="itemname">${escapeHtml(cat?.name||"Missing item")}</div><div class="meta">${escapeHtml(cat?.notes||x.notes||"")}</div><div class="tags">${p?`<span class="tag project">${escapeHtml(p.name)}</span>`:`<span class="tag project">Warehouse</span>`}<span class="tag ${String(x.priority).toLowerCase()==="must"?"must":"buy"}">${escapeHtml(x.priority)}</span>${cat?.verificationStatus==="verify"?'<span class="tag verify">Verify</span>':""}</div>${(()=>{const link=productLinkFor(cat);return link?`<a class="product-link ${link.exact?"":"search"}" href="${escapeHtml(link.url)}" target="_blank" rel="noopener noreferrer">↗ ${escapeHtml(link.label)}</a>${link.exact?`<span class="product-meta">Model ${escapeHtml(link.model||cat?.model||"")} · Internet # ${escapeHtml(link.internet||"")}</span>`:""}`:""})()}</div>
+   <select class="statussel" data-act="status" aria-label="Shopping status" ${locked?"disabled":""}>${STATUS_ORDER.map(s=>`<option value="${s}" ${s===x.status?"selected":""}>${s.replace("_"," ")}</option>`).join("")}</select>
+   <input class="pqty" data-act="purchased" type="number" min="0" step="1" value="${Number(x.purchasedQty||0)}" aria-label="Purchased quantity" ${locked?"disabled":""}>
+  </article>`
+ }).join(""):'<div class="empty">No matching run items.</div>';
+ $("runVisible").textContent=rows.length;
+ const all=state.shoppingRunItems.filter(x=>x.runId===run.id),purchased=all.filter(x=>x.status==="purchased").length,remaining=all.filter(x=>!["purchased","skipped"].includes(x.status)).length;
+ $("runPurchased").textContent=purchased;$("runRemaining").textContent=remaining;$("runMust").textContent=all.filter(x=>x.priority==="Must"&&x.status==="needed").length;
+ $("runProjects").textContent=new Set(all.map(x=>{const r=x.projectRequirementId?byId(state.requirements,x.projectRequirementId):null;return r?.projectId}).filter(Boolean)).size;
+ motion.to("#runProgress",{width:`${all.length?purchased/all.length*100:0}%`,duration:.3});
+ document.querySelectorAll(".runitem").forEach(el=>{
+  const sri=byId(state.shoppingRunItems,el.dataset.id);
+  el.querySelector('[data-act="qty-"]')?.addEventListener("click",()=>{sri.requestedQty=Math.max(0,Number(sri.requestedQty)-1);saveState();renderShopping()});
+  el.querySelector('[data-act="qty+"]')?.addEventListener("click",()=>{sri.requestedQty=Number(sri.requestedQty)+1;saveState();renderShopping()});
+  el.querySelector('[data-act="status"]')?.addEventListener("change",e=>{sri.status=e.target.value;if(sri.status==="purchased"&&!sri.purchasedQty)sri.purchasedQty=sri.requestedQty;saveState();renderShopping();toast(`Status: ${sri.status.replace("_"," ")}`)});
+  el.querySelector('[data-act="purchased"]')?.addEventListener("change",e=>{sri.purchasedQty=Math.max(0,Number(e.target.value||0));saveState()});
+ });
+ motion.from(".runitem",{opacity:0,x:-8,duration:.22,stagger:.018});
+}
+function projectStats(pid){
+ const reqs=state.requirements.filter(r=>r.projectId===pid);
+ return {reqs:reqs.length,covered:reqs.filter(r=>shortage(r)===0).length,buy:reqs.reduce((a,r)=>a+shortage(r),0)}
+}
+function renderProjects(){
+ const selected=project(state.settings.selectedProjectId)||state.projects[0];if(selected)state.settings.selectedProjectId=selected.id;
+ $("projectBoard").innerHTML=state.projects.map(p=>{const k=projectStats(p.id);return `<article class="project-card" data-id="${p.id}"><span class="tag project status">${escapeHtml(p.status)}</span><div class="kicker">${escapeHtml(p.location)}</div><h3>${escapeHtml(p.name)}</h3><div class="meta">${escapeHtml(p.description)}</div><div class="project-kpis"><div class="mini"><b>${k.reqs}</b><span>Requirements</span></div><div class="mini"><b>${k.covered}</b><span>Covered</span></div><div class="mini"><b>${k.buy}</b><span>To Buy</span></div></div><div class="card-actions"><button class="btn small orange" data-act="open">Open</button><button class="btn small" data-act="edit">Edit</button></div></article>`}).join("");
+ document.querySelectorAll(".project-card").forEach(c=>{
+  c.querySelector('[data-act="open"]').onclick=()=>{state.settings.selectedProjectId=c.dataset.id;saveState();renderProjectDetail()};
+  c.querySelector('[data-act="edit"]').onclick=()=>openProjectEditor(c.dataset.id)
+ });
+ renderProjectDetail();motion.from(".project-card",{opacity:0,y:8,duration:.22,stagger:.03})
+}
+function renderProjectDetail(){
+ const p=project(state.settings.selectedProjectId);if(!p){$("projectDetail").innerHTML='<div class="empty">Create a project.</div>';return}
+ $("projectDetailTitle").textContent=`${p.name} — Requirements`;
+ const reqs=state.requirements.filter(r=>r.projectId===p.id);
+ $("projectDetail").innerHTML=reqs.length?`<table class="reqtable"><thead><tr><th>Requirement</th><th>Need</th><th>On hand</th><th>Reserved</th><th>Available</th><th>Shortage</th><th>Actions</th></tr></thead><tbody>${reqs.map(r=>{
+  const cat=item(r.itemId),av=availableForReq(r),sh=shortage(r),hold=r.status==="hold"||cat?.verificationStatus==="hold";
+  return `<tr data-id="${r.id}"><td><b>${escapeHtml(cat?.name||"Missing item")}</b><div class="meta">${escapeHtml(r.phase)} · ${escapeHtml(r.priority)} ${r.status==="verify"?'· VERIFY':""}</div></td><td>${r.requiredQty}</td><td>${onHand(r.itemId)}</td><td>${r.allocatedQty||0}</td><td>${av}</td><td><b>${sh}</b></td><td><div class="req-actions"><button class="btn small" data-act="reserve">Reserve</button><button class="btn small orange" data-act="add" ${hold||!sh?"disabled":""}>Add shortage</button><button class="btn small" data-act="edit">Edit</button></div></td></tr>`
+ }).join("")}</tbody></table>`:'<div class="empty">No requirements yet.</div>';
+ document.querySelectorAll(".reqtable tbody tr").forEach(tr=>{
+  tr.querySelector('[data-act="reserve"]').onclick=()=>reserveRequirement(tr.dataset.id);
+  tr.querySelector('[data-act="add"]').onclick=()=>{if(addRequirementShortageToRun(tr.dataset.id)){renderAll();toast("Shortage added to run")}else toast("Nothing added — covered or held")};
+  tr.querySelector('[data-act="edit"]').onclick=()=>openRequirementEditor(tr.dataset.id)
+ })
+}
+function renderWarehouse(){
+ const fast=state.inventory.filter(inv=>item(inv.itemId)?.category==="fastener"),other=state.inventory.filter(inv=>item(inv.itemId)?.category!=="fastener");
+ const card=inv=>{const cat=item(inv.itemId),low=Number(inv.quantity)<Number(inv.minimumQty||0);return `<article class="inventory-item ${low?"low":""}" data-id="${inv.id}"><div class="inventory-head"><div><div class="type">${escapeHtml(locationName(inv.locationId))}</div><div class="itemname">${escapeHtml(cat?.name||"Missing item")}</div><div class="meta">Min ${inv.minimumQty} · ${escapeHtml(inv.stockMode)}</div>${(()=>{const link=productLinkFor(cat);return link?`<a class="product-link ${link.exact?"":"search"}" href="${escapeHtml(link.url)}" target="_blank" rel="noopener noreferrer">↗ ${escapeHtml(link.label)}</a>`:""})()}</div><div class="stock">${inv.quantity}</div></div><div class="stockline"><div class="stockctrl"><button data-act="minus">−</button><button data-act="plus">+</button></div><div><button class="btn small" data-act="edit">Edit</button> <button class="btn small orange" data-act="reorder" ${!low||cat?.verificationStatus==="hold"?"disabled":""}>Add Reorder</button></div></div></article>`};
+ $("fasteners").innerHTML=fast.map(card).join("")||'<div class="empty">No fasteners.</div>';
+ $("consumables").innerHTML=other.map(card).join("")||'<div class="empty">No materials.</div>';
+ document.querySelectorAll(".inventory-item").forEach(el=>{
+  const inv=byId(state.inventory,el.dataset.id);
+  el.querySelector('[data-act="minus"]').onclick=()=>{inv.quantity=Math.max(0,Number(inv.quantity)-1);inv.updatedAt=new Date().toISOString();saveState();renderAll()};
+  el.querySelector('[data-act="plus"]').onclick=()=>{inv.quantity=Number(inv.quantity)+1;inv.updatedAt=new Date().toISOString();saveState();renderAll()};
+  el.querySelector('[data-act="edit"]').onclick=()=>openInventoryEditor(inv.id);
+  el.querySelector('[data-act="reorder"]').onclick=()=>{if(addLowStockToRun(inv.id)){renderAll();toast("Reorder added to run")}else toast("No reorder added")}
+ });
+ $("tools").innerHTML=state.tools.map(t=>`<div class="toolrow" data-id="${t.id}"><div><div class="toolname">${escapeHtml(t.name)}</div><div class="meta">${escapeHtml(locationName(t.locationId))} · ${escapeHtml((t.capabilities||[]).join(", "))}<br>${escapeHtml(t.notes||"")}</div></div><div><span class="tag ${t.status==="Verify"?"verify":"project"}">${escapeHtml(t.status)}</span> <button class="btn small" data-act="edit">Edit</button></div></div>`).join("");
+ document.querySelectorAll(".toolrow [data-act='edit']").forEach(b=>b.onclick=()=>openToolEditor(b.closest(".toolrow").dataset.id));
+ motion.from(".inventory-item,.toolrow",{opacity:0,y:7,duration:.2,stagger:.015})
+}
+function renderAll(){renderShopping();renderProjects();renderWarehouse()}
+
+let editorMode=null,editorId=null;
+function openEditor(title,fields,onSave){
+ editorMode=onSave;$("editorTitle").textContent=title;$("editorFields").innerHTML=fields;$("editorDialog").showModal()
+}
+function field(name,label,value="",type="text",full=false,extra=""){return `<div class="field ${full?"full":""}"><label for="f-${name}">${label}</label><input id="f-${name}" name="${name}" type="${type}" value="${escapeHtml(value)}" ${extra}></div>`}
+function selectField(name,label,options,value="",full=false){return `<div class="field ${full?"full":""}"><label for="f-${name}">${label}</label><select id="f-${name}" name="${name}">${options.map(([v,l])=>`<option value="${escapeHtml(v)}" ${String(v)===String(value)?"selected":""}>${escapeHtml(l)}</option>`).join("")}</select></div>`}
+function openProjectEditor(id=null){const p=id?project(id):null;openEditor(p?"Edit Project":"New Project",field("name","Name",p?.name||"","text",true)+field("location","Location",p?.location||"")+selectField("status","Status",[["Planning","Planning"],["Active","Active"],["Hold","Hold"],["Complete","Complete"]],p?.status||"Planning")+field("description","Description",p?.description||"","text",true),form=>{if(p){Object.assign(p,form,{updatedAt:new Date().toISOString()})}else{const n={id:uid("prj"),...form,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()};state.projects.push(n);state.settings.selectedProjectId=n.id}saveState();renderAll()})}
+function openCatalogEditor(){openEditor("New Catalog Item",field("name","Item name","","text",true)+selectField("category","Category",[["material","Material"],["consumable","Consumable"],["fastener","Fastener"]],"material")+field("unit","Unit","each")+selectField("verificationStatus","Verification",[["verified","Verified"],["verify","Verify"],["hold","Hold"]],"verified")+field("notes","Notes","","text",true),form=>{state.catalogItems.push({id:uid("itm"),subtype:"",manufacturer:"",model:"",...form});saveState();renderAll()})}
+function openRequirementEditor(id=null){const p=project(state.settings.selectedProjectId),r=id?byId(state.requirements,id):null;if(!p)return;const opts=state.catalogItems.map(i=>[i.id,i.name]);openEditor(r?"Edit Requirement":`Add Requirement — ${p.name}`,selectField("itemId","Catalog item",opts,r?.itemId||opts[0]?.[0],true)+field("requiredQty","Required quantity",r?.requiredQty||1,"number",false,'min="0" step="1"')+field("phase","Phase",r?.phase||"")+selectField("priority","Priority",[["Must","Must"],["Buy","Buy"],["Optional","Optional"]],r?.priority||"Buy")+selectField("status","Status",[["ready","Ready"],["verify","Verify"],["hold","Hold"]],r?.status||"ready")+field("notes","Notes",r?.notes||"","text",true),form=>{form.requiredQty=Number(form.requiredQty||0);if(r)Object.assign(r,form);else state.requirements.push({id:uid("req"),projectId:p.id,allocatedQty:0,...form});saveState();renderAll()})}
+function openInventoryEditor(id=null){const inv=id?byId(state.inventory,id):null,opts=state.catalogItems.map(i=>[i.id,i.name]);openEditor(inv?"Edit Inventory":"Add Inventory Item",selectField("itemId","Catalog item",opts,inv?.itemId||opts[0]?.[0],true)+field("quantity","On hand",inv?.quantity||0,"number",false,'min="0" step="1"')+field("minimumQty","Minimum stock",inv?.minimumQty||0,"number",false,'min="0" step="1"')+selectField("stockMode","Stock mode",[["exact","Exact"],["approximate","Approximate"],["presence","Presence"]],inv?.stockMode||"exact")+selectField("locationId","Location",state.locations.map(l=>[l.id,l.name]),inv?.locationId||"loc-garage"),form=>{form.quantity=Number(form.quantity||0);form.minimumQty=Number(form.minimumQty||0);if(inv)Object.assign(inv,form,{updatedAt:new Date().toISOString()});else state.inventory.push({id:uid("inv"),status:"available",updatedAt:new Date().toISOString(),...form});saveState();renderAll()})}
+function openToolEditor(id=null){const t=id?byId(state.tools,id):null;openEditor(t?"Edit Tool":"Add Tool",field("name","Tool name",t?.name||"","text",true)+field("manufacturer","Manufacturer",t?.manufacturer||"")+field("model","Model",t?.model||"")+field("serial","Serial",t?.serial||"")+selectField("status","Status",[["Owned","Owned"],["Verify","Verify"],["Borrowed","Borrowed"],["Rented","Rented"]],t?.status||"Owned")+selectField("locationId","Location",state.locations.map(l=>[l.id,l.name]),t?.locationId||"loc-tools")+field("capabilities","Capabilities (comma separated)",(t?.capabilities||[]).join(", "),"text",true)+field("notes","Notes",t?.notes||"","text",true),form=>{form.capabilities=String(form.capabilities||"").split(",").map(x=>x.trim()).filter(Boolean);if(t)Object.assign(t,form);else state.tools.push({id:uid("tool"),accessories:[],purchaseDate:"",warrantyUntil:"",...form});saveState();renderAll()})}
+function openNewRun(){openEditor("New Shopping Run",field("name","Run name",`Shopping Run — ${new Date().toLocaleDateString()}`,"text",true)+selectField("storeId","Store",state.stores.map(s=>[s.id,`${s.retailer} ${s.name} #${s.storeNumber}`]),state.stores.find(s=>s.preferred)?.id||state.stores[0]?.id),form=>{const r={id:uid("run"),name:form.name,status:"active",storeId:form.storeId,createdAt:new Date().toISOString(),completedAt:null};state.shoppingRuns.push(r);state.settings.activeRunId=r.id;saveState();renderAll()})}
+$("editorForm").addEventListener("submit",e=>{if(e.submitter?.value==="cancel")return;e.preventDefault();const fd=Object.fromEntries(new FormData(e.currentTarget).entries());try{editorMode?.(fd);$("editorDialog").close();toast("Saved")}catch(err){toast(err.message)}});
+
+function openReconcile(){
+ const run=activeRun();if(!run||run.status==="completed"){toast("Active run is already completed");return}
+ const rows=state.shoppingRunItems.filter(x=>x.runId===run.id&&x.status==="purchased");
+ $("reconcileRows").innerHTML=rows.length?rows.map(x=>`<div class="reconcile-row" data-id="${x.id}"><div><b>${escapeHtml(item(x.itemId)?.name||"")}</b><div class="meta">Purchased ${x.purchasedQty||x.requestedQty} · Source ${escapeHtml(x.source)}</div></div><div class="field"><label>To Warehouse</label><input name="${x.id}" type="number" min="0" max="${x.purchasedQty||x.requestedQty}" value="0"></div></div>`).join(""):'<div class="empty">No purchased items. You may still complete the run.</div>';
+ $("reconcileDialog").showModal()
+}
+$("reconcileForm").addEventListener("submit",e=>{if(e.submitter?.value==="cancel")return;e.preventDefault();const adds=Object.fromEntries(new FormData(e.currentTarget).entries());reconcileRun(activeRun().id,adds);$("reconcileDialog").close();renderAll();toast("Run completed and reconciled")});
+
+document.querySelectorAll(".navbtn").forEach(b=>b.addEventListener("click",()=>switchPage(b.dataset.page)));
+$("runSearch").addEventListener("input",renderShopping);
+$("runSelect").addEventListener("change",e=>{state.settings.activeRunId=e.target.value;saveState();renderShopping()});
+$("runProjectFilter").addEventListener("change",renderShopping);
+$("neededOnlyBtn").addEventListener("click",()=>{state.settings.neededOnly=!state.settings.neededOnly;$("neededOnlyBtn").textContent=state.settings.neededOnly?"Show All":"Needed Only";saveState();renderShopping()});
+$("newRunBtn").onclick=openNewRun;$("completeRunBtn").onclick=openReconcile;
+$("addProjectBtn").onclick=()=>openProjectEditor();$("addCatalogBtn").onclick=openCatalogEditor;$("addRequirementBtn").onclick=()=>openRequirementEditor();
+$("addShortagesBtn").onclick=()=>{const pid=state.settings.selectedProjectId;let n=0;state.requirements.filter(r=>r.projectId===pid).forEach(r=>{if(addRequirementShortageToRun(r.id))n++});renderAll();toast(`${n} shortage${n===1?"":"s"} added`)};
+$("addInventoryBtn").onclick=()=>openInventoryEditor();$("addToolBtn").onclick=()=>openToolEditor();
+$("exportBtn").onclick=exportState;$("importBtn").onclick=()=>$("importFile").click();$("importFile").addEventListener("change",e=>e.target.files[0]&&importFile(e.target.files[0]));
+$("resetBtn").onclick=()=>{if(confirm("Reset all DepotOps v0.2 local data to the seeded demo state?")){resetState();toast("v0.2 data reset")}};
+
+function bootstrapLegacyCheckMigration(){
+ if(localStorage.getItem(STORAGE_KEY))return;
+ try{
+  const legacy=JSON.parse(localStorage.getItem("depotops-shopping-v2")||"{}");const keys=Object.keys(legacy).filter(k=>legacy[k]);
+  if(keys.length){keys.forEach(k=>{const x=state.shoppingRunItems[Number(k)];if(x)x.status="in_cart"});saveState();toast(`Migrated ${keys.length} v0.1 check-off(s) as In Cart`)}
+ }catch(e){}
+}
+
+function runSelfTests(){
+ const out=[],assert=(name,cond,detail="")=>out.push(`${cond?"PASS":"FAIL"} | ${name}${detail?` | ${detail}`:""}`);
+ const backup=clone(state),filterBackup=$("runProjectFilter").value;
+ try{
+  state=clone(seedState);
+  assert("schema validates",validateState(state).ok);
+  const invalidBackup=clone(state);delete invalidBackup.settings;assert("backup without settings is rejected",!validateState(invalidBackup).ok);
+  const ids=[...state.projects,...state.catalogItems,...state.requirements,...state.inventory,...state.shoppingRuns,...state.shoppingRunItems,...state.tools,...state.locations,...state.stores].map(x=>x.id);
+  assert("stable IDs globally unique",ids.length===new Set(ids).size);
+  assert("canonical item reused by requirement + inventory",byId(state.requirements,"req-cement").itemId===byId(state.inventory,"inv-cement").itemId);
+  assert("warehouse stock covers cement requirement",shortage(byId(state.requirements,"req-cement"))===0,`shortage=${shortage(byId(state.requirements,"req-cement"))}`);
+  assert("PVC40 shortage reflects no warehouse stock",shortage(byId(state.requirements,"req-pvc40"))===0,"existing run already covers shortage");
+  const before=state.shoppingRunItems.length;const added=addRequirementShortageToRun("req-primer");
+  assert("verify requirement becomes hold item",added&&state.shoppingRunItems.at(-1).status==="hold");
+  const inv=byId(state.inventory,"inv-string");const lowAdded=addLowStockToRun(inv.id);
+  assert("low stock replenishment connects warehouse to run",lowAdded&&state.shoppingRunItems.some(x=>x.source==="warehouse"&&x.itemId==="itm-string"));
+  const snap=JSON.parse(JSON.stringify(state));assert("JSON round-trip validates",validateState(snap).ok);
+  const testRun={id:"run-test",name:"Test",status:"active",storeId:"store-lawnside",createdAt:"",completedAt:null};state.shoppingRuns.push(testRun);
+  state.shoppingRunItems.push({id:"sri-test",runId:"run-test",itemId:"itm-tape",projectRequirementId:null,requestedQty:2,purchasedQty:2,status:"purchased",priority:"Reorder",source:"warehouse",notes:""});
+  const tapeBefore=onHand("itm-tape");reconcileRun("run-test",{"sri-test":1});
+  assert("reconciliation adds leftover stock",onHand("itm-tape")===tapeBefore+1);
+  assert("run preserves completed history",byId(state.shoppingRuns,"run-test").status==="completed"&&!!byId(state.shoppingRuns,"run-test").completedAt);
+  saveState();const parsed=JSON.parse(localStorage.getItem(STORAGE_KEY));assert("complete state persists",parsed.schemaVersion===2&&parsed.projects.length===state.projects.length);
+  renderAll();
+  $("runProjectFilter").value="prj-lighting";renderShopping();assert("project filter survives rerender",$("runProjectFilter").value==="prj-lighting"&&$("runVisible").textContent==="0",`selected=${$("runProjectFilter").value}, visible=${$("runVisible").textContent}`);$("runProjectFilter").value="all";renderShopping();
+  const target=document.querySelector(".navbtn");const rect=target.getBoundingClientRect();assert("primary touch target >=44px",rect.height>=44,`height=${rect.height.toFixed(1)}`);
+  const stickyTop=parseFloat(getComputedStyle($("runSearch").closest(".toolbar")).top),topbarHeight=document.querySelector(".topbar").getBoundingClientRect().height;assert("sticky toolbar clears top navigation",Math.abs(stickyTop-topbarHeight)<=1,`toolbar=${stickyTop.toFixed(1)}, topbar=${topbarHeight.toFixed(1)}`);
+  if(window.innerWidth<=680){const visibleTargets=[...document.querySelectorAll(".topbar button,.page.active button,.page.active a,.page.active input,.page.active select")].filter(el=>{const r=el.getBoundingClientRect();return r.width&&r.height}),smallTargets=visibleTargets.filter(el=>{const r=el.getBoundingClientRect();return r.width<44||r.height<44});assert("visible mobile controls meet 44px targets",smallTargets.length===0,smallTargets.map(el=>`${el.tagName.toLowerCase()}:${el.textContent.trim()||el.getAttribute("aria-label")} ${el.getBoundingClientRect().width.toFixed(0)}x${el.getBoundingClientRect().height.toFixed(0)}`).join(", "))}
+  assert("shopping rows expose store links",document.querySelectorAll(".runitem .product-link").length>0,`links=${document.querySelectorAll(".runitem .product-link").length}`);
+  const activeSeedItems=state.shoppingRunItems.filter(x=>x.runId==="run-hd-0809");const exactCount=activeSeedItems.filter(x=>PRODUCT_LINKS[x.itemId]?.exact).length;assert("active seeded run has exact retailer links",exactCount===activeSeedItems.length,`exact=${exactCount}/${activeSeedItems.length}`);
+  const firstRunItem=document.querySelector(".runitem"),firstQty=firstRunItem?.querySelector(".qtyctrl"),firstInfo=firstRunItem?.children?.[1];
+  if(firstRunItem&&firstQty&&firstInfo){const qr=firstQty.getBoundingClientRect(),ir=firstInfo.getBoundingClientRect();const intersects=!(qr.right<=ir.left||qr.left>=ir.right||qr.bottom<=ir.top||qr.top>=ir.bottom);assert("line item quantity does not overlap product info",!intersects,`qty=(${qr.left.toFixed(1)},${qr.top.toFixed(1)},${qr.right.toFixed(1)},${qr.bottom.toFixed(1)}), info=(${ir.left.toFixed(1)},${ir.top.toFixed(1)},${ir.right.toFixed(1)},${ir.bottom.toFixed(1)})`)}
+  assert("no horizontal overflow",document.documentElement.scrollWidth<=window.innerWidth,`scroll=${document.documentElement.scrollWidth}, viewport=${window.innerWidth}`);
+ }catch(e){assert("self-test exception",false,e.message)}
+ finally{state=backup;saveState();$("runProjectFilter").value=filterBackup||"all";renderAll()}
+ $("selftest").textContent=out.join("\n");$("selftest").style.display="block";document.body.dataset.selftest=out.some(x=>x.startsWith("FAIL"))?"fail":"pass"
+}
+
+bootstrapLegacyCheckMigration();renderAll();
+$("neededOnlyBtn").textContent=state.settings.neededOnly?"Show All":"Needed Only";
+if(!reduced&&window.gsap){gsap.timeline().from(".topbar",{y:-50,opacity:0,duration:.32}).from(".hero",{y:12,opacity:0,duration:.3},"-=.12").from(".stat",{y:7,opacity:0,duration:.22,stagger:.025},"-=.1")}
+if(new URLSearchParams(location.search).get("selftest")==="1")setTimeout(runSelfTests,100);
+</script>
+</body>
+</html>

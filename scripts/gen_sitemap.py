@@ -23,6 +23,7 @@ BASE = "https://systembydave.com/"
 STATIC_PAGES = [
     ("", "weekly", "1.0"),
     ("tools.html", "weekly", "0.9"),
+    ("depotops/", "weekly", "0.7"),
     ("tailscale-manual.html", "monthly", "0.7"),
     ("av-suite.html", "weekly", "0.9"),
     ("av-workbook/", "weekly", "0.8"),

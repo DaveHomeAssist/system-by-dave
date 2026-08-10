@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-08-10
+
+* Added `/depotops/`, a local-first home project operations tool for project requirements, multi-project shopping runs, warehouse inventory, tool records, purchase reconciliation, and JSON backup and restore.
+
 ## 2026-08-06
 
 * Reworked public navigation around a shared five-destination header, Notion section navigation, Davai and standalone-product breadcrumbs, and one consolidated AV operator bar with deterministic routes, visible keyboard focus, 44 px targets, and phone-width containment.

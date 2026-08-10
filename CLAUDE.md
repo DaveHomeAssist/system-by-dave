@@ -34,6 +34,7 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
 - `agents.html`: agents catalog (cards are deep-linked)
 - `skills.html`: skills catalog
 - `widgets.html`: widget previews (poster cards, not live iframes)
+- `depotops/index.html`: local-first home project shopping, inventory, and tool tracking
 - `av-suite.html`: AV suite launch hub
 - `teleprompter.html`: AV teleprompter
 - `show-timer.html`: AV show timer
