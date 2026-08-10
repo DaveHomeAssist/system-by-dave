@@ -28,7 +28,7 @@
 <meta name="apple-mobile-web-app-title" content="DepotOps">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" href="./icon.svg" type="image/svg+xml">
-<title>DepotOps v0.2.3 — Projects • Shopping • Warehouse</title>
+<title>DepotOps v0.3.0 — Projects • Shopping • Warehouse</title>
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <style>
 :root{
@@ -103,7 +103,7 @@ dialog{width:min(680px,calc(100vw - 24px));max-height:90vh;overflow:auto;border:
 </noscript>
 <header class="topbar">
   <div class="topinner">
-    <div class="brand"><div class="logo">DO</div><div>DEPOTOPS <small>v0.2.3 • Projects • Shopping • Warehouse</small></div></div>
+    <div class="brand"><div class="logo">DO</div><div>DEPOTOPS <small>v0.3.0 • Projects • Shopping • Warehouse</small></div></div>
     <nav aria-label="Primary">
       <button class="navbtn active" data-page="shopping" aria-pressed="true">Shopping Run</button>
       <button class="navbtn" data-page="projects" aria-pressed="false">Projects</button>
@@ -141,8 +141,8 @@ dialog{width:min(680px,calc(100vw - 24px));max-height:90vh;overflow:auto;border:
       </section>
       <aside class="sidebar">
         <section class="panel note-card warn"><h3>⚠ Wrong Aisle Trap</h3><b>Gray electrical PVC / RNC only.</b><ul class="compact"><li>No white plumbing PVC</li><li>No pressure/DWV fittings</li><li>No tight plumbing 90s</li><li>No ENT / “Smurf tube”</li></ul></section>
-        <section class="panel note-card goal"><h3>🎯 Today’s Objective</h3><b>Finish underground raceway materials.</b><div class="meta" style="margin-top:6px">Raceway → pull string → document → verify burial → backfill.</div></section>
-        <section class="panel note-card holdbox"><h3>Hold For Verified Run</h3><ul class="compact"><li>Feeder conductors</li><li>Breaker</li><li>Garage subpanel</li><li>Ground rods</li></ul></section>
+        <section class="panel note-card goal"><h3>🎯 Current Source</h3><b>Canonical Notion shopping list.</b><div class="meta" style="margin-top:6px">48 total rows · 25 outstanding · 23 purchased.</div></section>
+        <section class="panel note-card holdbox"><h3>Nothing Withheld</h3><b>Every canonical row is loaded.</b><ul class="compact"><li>Use Needed Only for the 25 outstanding rows</li><li>Turn it off to see all 48</li><li>Hold remains a status you control</li></ul></section>
       </aside>
     </div>
   </section>
@@ -160,7 +160,7 @@ dialog{width:min(680px,calc(100vw - 24px));max-height:90vh;overflow:auto;border:
   </section>
 
   <section id="warehouse" class="page">
-    <div class="utility"><button class="btn orange" id="addInventoryBtn">+ Inventory Item</button><button class="btn" id="addToolBtn">+ Tool</button><button class="btn" id="exportBtn">Export JSON</button><button class="btn" id="importBtn">Import JSON</button><input type="file" id="importFile" accept="application/json" hidden><button class="btn danger" id="resetBtn">Reset v0.2 Data</button></div>
+    <div class="utility"><button class="btn orange" id="addInventoryBtn">+ Inventory Item</button><button class="btn" id="addToolBtn">+ Tool</button><button class="btn" id="exportBtn">Export JSON</button><button class="btn" id="importBtn">Import JSON</button><input type="file" id="importFile" accept="application/json" hidden><button class="btn danger" id="resetBtn">Reset App Data</button></div>
     <div class="warehouse-layout">
       <section class="panel"><div class="panel-head"><h2>Fasteners</h2><span>Bin Stock</span></div><div id="fasteners" class="inventory-list"></div></section>
       <section class="panel"><div class="panel-head"><h2>Consumables & Materials</h2><span>Reorder Watch</span></div><div id="consumables" class="inventory-list"></div></section>
@@ -168,7 +168,7 @@ dialog{width:min(680px,calc(100vw - 24px));max-height:90vh;overflow:auto;border:
     </div>
   </section>
 
-  <div class="footer"><span><b>DepotOps v0.2.3:</b> local-first canonical data model • stable IDs • project allocation • multi-project runs • reconciliation • JSON backup.</span><a href="../index.html">System by Dave home</a></div>
+  <div class="footer"><span><b>DepotOps v0.3.0:</b> canonical Notion list snapshot • local-first state • stable IDs • shopping history • JSON backup.</span><a href="../index.html">System by Dave home</a></div>
 </div>
 
 <dialog id="editorDialog"><form method="dialog" id="editorForm"><div class="modal-head"><h2 id="editorTitle">Edit</h2><button class="btn small dark" value="cancel">Close</button></div><div class="modal-body"><div class="formgrid" id="editorFields"></div><div class="modal-actions"><button class="btn" value="cancel">Cancel</button><button class="btn orange" id="editorSave" value="default">Save</button></div></div></form></dialog>
@@ -178,7 +178,7 @@ dialog{width:min(680px,calc(100vw - 24px));max-height:90vh;overflow:auto;border:
 
 <script>
 "use strict";
-const SCHEMA_VERSION=2, STORAGE_KEY="depotops-v0.2-state";
+const SCHEMA_VERSION=3, STORAGE_KEY="depotops-v0.2-state";
 const STATUS_ORDER=["needed","in_cart","purchased","not_found","skipped","hold"];
 const PRODUCT_LINKS={
  "itm-pvc40":{url:"https://www.homedepot.com/p/202352537",exact:true,label:"Home Depot product",model:"A52BA12H",internet:"202352537"},
@@ -196,6 +196,7 @@ const PRODUCT_LINKS={
 }
 function productLinkFor(cat){
  if(!cat)return null;
+ if(cat.productUrl)return {url:cat.productUrl,exact:true,label:"Open product"};
  if(PRODUCT_LINKS[cat.id])return PRODUCT_LINKS[cat.id];
  return {url:`https://www.homedepot.com/s/${encodeURIComponent(cat.name)}`,exact:false,label:"Find at Home Depot"};
 }
@@ -203,14 +204,71 @@ const $=id=>document.getElementById(id);
 const uid=(prefix="id")=>`${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2,8)}`;
 const clone=o=>JSON.parse(JSON.stringify(o));
 
+const NOTION_LIST_ITEMS=[
+ {id:"notion-5ad4cc4473ab4fd98126dc8dea9e4d0f",name:"Gate closer / spring",category:"Garden & Outdoor",department:"Outdoor",priority:"Urgent",purchased:false,notes:"Auto pull closed",productUrl:null,notionUrl:"https://app.notion.com/5ad4cc4473ab4fd98126dc8dea9e4d0f"},
+ {id:"notion-cfd5cc1f6fad4332894e98f7c5a86a47",name:"Gate hinge set",category:"Garden & Outdoor",department:"Outdoor",priority:"Urgent",purchased:false,notes:"Heavy duty",productUrl:null,notionUrl:"https://app.notion.com/cfd5cc1f6fad4332894e98f7c5a86a47"},
+ {id:"notion-d62928bec2d64e80a2ef25067c74e8c5",name:"Gate latch",category:"Garden & Outdoor",department:"Outdoor",priority:"Urgent",purchased:false,notes:"Dog proof",productUrl:null,notionUrl:"https://app.notion.com/d62928bec2d64e80a2ef25067c74e8c5"},
+ {id:"notion-8d3bc088e4fa457a974a968b7a6ddab8",name:"Shop vacuum bags",category:"Tools & Hardware",department:"Cleaning",priority:"High",purchased:false,notes:"For sanding debris",productUrl:null,notionUrl:"https://app.notion.com/8d3bc088e4fa457a974a968b7a6ddab8"},
+ {id:"notion-3b5df596fcd14547ada2ce977d2584c3",name:"Shop-Vac Small Cartridge Filter Retainer",category:"Tools & Hardware",department:"Cleaning",priority:"High",purchased:false,notes:"Shop-Vac item #3183000. Replacement retainer for small cartridge filters approx. 5.75 in diameter x 5 in high. $7.69 listed.",productUrl:"https://www.shopvac.com/products/3183000-replacement-small-cartridge-filter-retainer?variant=40067955458225",notionUrl:"https://app.notion.com/3b5df596fcd14547ada2ce977d2584c3"},
+ {id:"notion-9bbfb78eb1b44768aa11f464eb8918a7",name:"Shop-Vac Type AA Small Cartridge Filter",category:"Tools & Hardware",department:"Cleaning",priority:"High",purchased:false,notes:"Shop-Vac Type AA small cartridge filter. Product page shows item #9039833. Approx. 5.75 in diameter x 5 in high. Fits many 1-4 gallon Shop-Vac wet/dry vacuums. $18.80 listed.",productUrl:"https://www.shopvac.com/products/type-aa-9039800-shop-vac%C2%AE-small-cartridge-filter?variant=40072521121969",notionUrl:"https://app.notion.com/9bbfb78eb1b44768aa11f464eb8918a7"},
+ {id:"notion-37b0671bfbd04e0abdd73f8bb3421c82",name:"Conduit straps",category:"Electrical",department:"Electrical",priority:"High",purchased:false,notes:"Wall mounting",productUrl:null,notionUrl:"https://app.notion.com/37b0671bfbd04e0abdd73f8bb3421c82"},
+ {id:"notion-9d4783d608de46a4be6cbb7ef727b84e",name:"THHN wire (12/2 or 10/2)",category:"Electrical",department:"Electrical",priority:"High",purchased:false,notes:"For garage run",productUrl:null,notionUrl:"https://app.notion.com/9d4783d608de46a4be6cbb7ef727b84e"},
+ {id:"notion-cff4b5452d154d72950aed2be1771cfe",name:"2x4 lumber",category:"Materials",department:"Materials",priority:"High",purchased:false,notes:"Attic hatch reinforcement",productUrl:null,notionUrl:"https://app.notion.com/cff4b5452d154d72950aed2be1771cfe"},
+ {id:"notion-d444faaaf5b14ee9b003a64542c9f3fc",name:"Concrete patch mix",category:"Materials",department:"Materials",priority:"High",purchased:false,notes:"Exterior hole + basement",productUrl:null,notionUrl:"https://app.notion.com/d444faaaf5b14ee9b003a64542c9f3fc"},
+ {id:"notion-1ff53742066340dd9399a416802a2166",name:"Plywood sheets",category:"Materials",department:"Materials",priority:"High",purchased:false,notes:"Attic hatch panel",productUrl:null,notionUrl:"https://app.notion.com/1ff53742066340dd9399a416802a2166"},
+ {id:"notion-70c4e8d76a1e4ec48e6b9291557a787b",name:"PVC conduit",category:"Electrical",department:"Plumbing",priority:"High",purchased:false,notes:"For garage electrical",productUrl:null,notionUrl:"https://app.notion.com/70c4e8d76a1e4ec48e6b9291557a787b"},
+ {id:"notion-75553fa2c8fe46d8a08172f7af9a860b",name:"PVC fittings",category:"Plumbing",department:"Plumbing",priority:"High",purchased:false,notes:"Elbows for penetration",productUrl:null,notionUrl:"https://app.notion.com/75553fa2c8fe46d8a08172f7af9a860b"},
+ {id:"notion-2aa255fc8f44807da861e3374ab9f8e9",name:"Cat6a / Fiber LC to LC",category:"Electrical",department:"Unassigned",priority:"Medium",purchased:false,notes:"",productUrl:null,notionUrl:"https://app.notion.com/2aa255fc8f44807da861e3374ab9f8e9"},
+ {id:"notion-376255fc8f44818fbda2c3ec301f40e2",name:"Convection microwave (kitchen update)",category:"Appliances",department:"Materials",priority:"Medium",purchased:false,notes:"Mom request. Built-in or countertop; 120V 20A dedicated. With no range, no OTR mount, plan placement + separate cooktop hood.",productUrl:null,notionUrl:"https://app.notion.com/376255fc8f44818fbda2c3ec301f40e2"},
+ {id:"notion-376255fc8f4481ca956df4cdc1902c45",name:"Convection wall oven, single (kitchen update)",category:"Appliances",department:"Materials",priority:"Medium",purchased:false,notes:"Needs 240V dedicated circuit, 30A typical. Confirm cabinet opening and amperage on rating plate.",productUrl:null,notionUrl:"https://app.notion.com/376255fc8f4481ca956df4cdc1902c45"},
+ {id:"notion-d95cf140cc3543a39d0d1fcdaba93f21",name:"Drywall",category:"Materials",department:"Materials",priority:"Medium",purchased:false,notes:"For any interior patching",productUrl:null,notionUrl:"https://app.notion.com/d95cf140cc3543a39d0d1fcdaba93f21"},
+ {id:"notion-376255fc8f4481cfb946edf8ce9108f4",name:"Induction cooktop (kitchen update)",category:"Appliances",department:"Materials",priority:"Medium",purchased:false,notes:"Needs 240V dedicated circuit, 40A (30 in) or 50A (36 in). Confirm cutout dimensions vs counter. Verify amperage on rating plate.",productUrl:null,notionUrl:"https://app.notion.com/376255fc8f4481cfb946edf8ce9108f4"},
+ {id:"notion-45da8295d5c648fa9eedcad6aaf3c6ca",name:"Insulation",category:"Materials",department:"Materials",priority:"Medium",purchased:false,notes:"Attic + basement",productUrl:null,notionUrl:"https://app.notion.com/45da8295d5c648fa9eedcad6aaf3c6ca"},
+ {id:"notion-bf22ba1de6ae45c2ad0e46ea73ffcdd2",name:"Gutter scoop",category:"Garden & Outdoor",department:"Outdoor",priority:"Medium",purchased:false,notes:"For porch gutter clearing",productUrl:null,notionUrl:"https://app.notion.com/bf22ba1de6ae45c2ad0e46ea73ffcdd2"},
+ {id:"notion-92a94184458b4aba8f117fdd6e3704b3",name:"Pegboard",category:"Organization",department:"Tools & Hardware",priority:"Medium",purchased:false,notes:"Garage organization",productUrl:null,notionUrl:"https://app.notion.com/92a94184458b4aba8f117fdd6e3704b3"},
+ {id:"notion-47f00e659145450ebed184c629452498",name:"Trowel",category:"Tools & Hardware",department:"Tools & Hardware",priority:"Medium",purchased:false,notes:"For patching concrete",productUrl:null,notionUrl:"https://app.notion.com/47f00e659145450ebed184c629452498"},
+ {id:"notion-93ac379951c44884a85addc9b7a7cfad",name:"Flexzilla 1/4 in x 50 ft Hybrid Polymer Air Hose",category:"Tools & Hardware",department:"Workshop",priority:"Medium",purchased:false,notes:"Lowe's link. For Porter Cable pancake compressor setup. 1/4 in x 50 ft kink-free hybrid polymer air hose.",productUrl:"https://www.lowes.com/pd/Flexzilla-1-4-in-Kink-Free-50-ft-Hybrid-Polymer-Air-Hose/1001042344?user=shopping&feed=yes&utm_source=chatgpt.com&oppcref=63378c83-79ae-489a-9d67-3594747f6776",notionUrl:"https://app.notion.com/93ac379951c44884a85addc9b7a7cfad"},
+ {id:"notion-b4925cba7af240a6b7218d3c7fe3174d",name:"Interior paint",category:"Paint",department:"Paint",priority:"Low",purchased:false,notes:"For mom's refinished drawers area",productUrl:null,notionUrl:"https://app.notion.com/b4925cba7af240a6b7218d3c7fe3174d"},
+ {id:"notion-2fbf7fc9850c4dec9a0d6c81b31b65a8",name:"Painter's tape",category:"Paint",department:"Paint",priority:"Low",purchased:false,notes:"For edges",productUrl:null,notionUrl:"https://app.notion.com/2fbf7fc9850c4dec9a0d6c81b31b65a8"},
+ {id:"notion-827ed2c0f2de4e9a9265acc1f164e03a",name:"Wire nuts",category:"Electrical",department:"Electrical",priority:"High",purchased:true,notes:"For junction",productUrl:null,notionUrl:"https://app.notion.com/827ed2c0f2de4e9a9265acc1f164e03a"},
+ {id:"notion-116ac6b2770f42aca22ed4246f0e7705",name:"Exterior caulk",category:"Plumbing",department:"Plumbing",priority:"High",purchased:true,notes:"Gutter, window trim",productUrl:null,notionUrl:"https://app.notion.com/116ac6b2770f42aca22ed4246f0e7705"},
+ {id:"notion-28b722cba09247ceaca2bda954280483",name:"Silicone caulk",category:"Plumbing",department:"Plumbing",priority:"High",purchased:true,notes:"Window sealing",productUrl:null,notionUrl:"https://app.notion.com/28b722cba09247ceaca2bda954280483"},
+ {id:"notion-2aa91a53f1cd415f95a4c14b02f5c6e3",name:"Hinges / Gas Struts",category:"Tools & Hardware",department:"Tools & Hardware",priority:"High",purchased:true,notes:"For attic door",productUrl:null,notionUrl:"https://app.notion.com/2aa91a53f1cd415f95a4c14b02f5c6e3"},
+ {id:"notion-4b137420fc114f0aa334066161228e0a",name:"Power drill",category:"Power tools",department:"Tools & Hardware",priority:"High",purchased:true,notes:"For wood + masonry",productUrl:null,notionUrl:"https://app.notion.com/4b137420fc114f0aa334066161228e0a"},
+ {id:"notion-265811eb1e7d4a27a91bc30581b0c7b7",name:"Bolts and nuts",category:"Fasteners",department:"Fasteners",priority:"Medium",purchased:true,notes:"Gate hardware reinforcing",productUrl:null,notionUrl:"https://app.notion.com/265811eb1e7d4a27a91bc30581b0c7b7"},
+ {id:"notion-b9da34a73e9f48d8a656663ddd9367ba",name:"Exterior nails",category:"Fasteners",department:"Fasteners",priority:"Medium",purchased:true,notes:"For patch zones",productUrl:null,notionUrl:"https://app.notion.com/b9da34a73e9f48d8a656663ddd9367ba"},
+ {id:"notion-0be0957cae894708962cd67965c722f8",name:"Wall anchors",category:"Fasteners",department:"Fasteners",priority:"Medium",purchased:true,notes:"For attic hatch",productUrl:null,notionUrl:"https://app.notion.com/0be0957cae894708962cd67965c722f8"},
+ {id:"notion-3c347043feb54f2c8de05abd5736653d",name:"Interior caulk",category:"Plumbing",department:"Plumbing",priority:"Medium",purchased:true,notes:"House window sealing",productUrl:null,notionUrl:"https://app.notion.com/3c347043feb54f2c8de05abd5736653d"},
+ {id:"notion-1ae081aea19e47c8ada6f0c6af033698",name:"Utility knife",category:"Blades",department:"Tools & Hardware",priority:"Medium",purchased:true,notes:"New blades",productUrl:null,notionUrl:"https://app.notion.com/1ae081aea19e47c8ada6f0c6af033698"},
+ {id:"notion-294000c3276140fe83821c4466465dd3",name:"3D printer PLA/PETG",category:"Materials",department:"Workshop",priority:"Medium",purchased:true,notes:"For flange, dog collar",productUrl:null,notionUrl:"https://app.notion.com/294000c3276140fe83821c4466465dd3"},
+ {id:"notion-b5bb9f4d26774374ab769ba7db847173",name:"Work gloves",category:"Tools & Hardware",department:"Cleaning",priority:"Low",purchased:true,notes:"Spare pairs",productUrl:null,notionUrl:"https://app.notion.com/b5bb9f4d26774374ab769ba7db847173"},
+ {id:"notion-7d80713c4ae642298c967225e9965bf4",name:"LB Outdoor Conduit Box (2)",category:"Electrical",department:"Electrical",priority:"Low",purchased:true,notes:"Clean look in garage",productUrl:null,notionUrl:"https://app.notion.com/7d80713c4ae642298c967225e9965bf4"},
+ {id:"notion-006f803ad5ec4045aae66b04fe23ed11",name:"Assorted screws",category:"Fasteners",department:"Fasteners",priority:"Low",purchased:true,notes:"For gate hardware, attic door",productUrl:null,notionUrl:"https://app.notion.com/006f803ad5ec4045aae66b04fe23ed11"},
+ {id:"notion-3352e998172a4b68901fb13c8acb6695",name:"Drop cloths",category:"Paint",department:"Paint",priority:"Low",purchased:true,notes:"For sanding and leveling",productUrl:null,notionUrl:"https://app.notion.com/3352e998172a4b68901fb13c8acb6695"},
+ {id:"notion-4eed0d09de81488788542c33427f1fcc",name:"Paint brushes",category:"Paint",department:"Paint",priority:"Low",purchased:true,notes:"Always useful",productUrl:null,notionUrl:"https://app.notion.com/4eed0d09de81488788542c33427f1fcc"},
+ {id:"notion-b9d4bebabda64483918b5c95726402f6",name:"Paint supplies (trays, liners)",category:"Paint",department:"Paint",priority:"Low",purchased:true,notes:"For mom's room",productUrl:null,notionUrl:"https://app.notion.com/b9d4bebabda64483918b5c95726402f6"},
+ {id:"notion-e576e9f6e89343d2b3d6676d8cae5fc3",name:"Hammer",category:"Tools & Hardware",department:"Tools & Hardware",priority:"Low",purchased:true,notes:"Backup or upgrade if needed",productUrl:null,notionUrl:"https://app.notion.com/e576e9f6e89343d2b3d6676d8cae5fc3"},
+ {id:"notion-d9cf524b0410427cbf12a129b410abe0",name:"Level",category:"Tools & Hardware",department:"Tools & Hardware",priority:"Low",purchased:true,notes:"Needed for gate alignment",productUrl:null,notionUrl:"https://app.notion.com/d9cf524b0410427cbf12a129b410abe0"},
+ {id:"notion-bc72a062770042dabe9986885f4753da",name:"Measuring tape",category:"Tools & Hardware",department:"Tools & Hardware",priority:"Low",purchased:true,notes:"Confirm if current is in car/garage",productUrl:null,notionUrl:"https://app.notion.com/bc72a062770042dabe9986885f4753da"},
+ {id:"notion-d4448ac6c0074c62a7e4ad4071d6c380",name:"Sandpaper belts/sheets",category:"Tools & Hardware",department:"Tools & Hardware",priority:"Low",purchased:true,notes:"For miter and orbital sanders",productUrl:null,notionUrl:"https://app.notion.com/d4448ac6c0074c62a7e4ad4071d6c380"},
+ {id:"notion-8bf5d6c1d3774583b2efbe22b0eed2d6",name:"Screwdriver set",category:"Tools & Hardware",department:"Tools & Hardware",priority:"Low",purchased:true,notes:"Replace missing Philips bits",productUrl:null,notionUrl:"https://app.notion.com/8bf5d6c1d3774583b2efbe22b0eed2d6"},
+ {id:"notion-d9f2254b017447d6b8c1ce89841e8296",name:"Utility knife blades",category:"Blades",department:"Tools & Hardware",priority:"Low",purchased:true,notes:"Refill",productUrl:null,notionUrl:"https://app.notion.com/d9f2254b017447d6b8c1ce89841e8296"}
+];
+const NOTION_PROJECT={id:"prj-home-depot",name:"Home Depot Shopping List",status:"Active",location:"56 Harding",description:"Canonical Notion shopping list snapshot synced 2026-08-10.",createdAt:"2026-08-10",updatedAt:"2026-08-10"};
+const NOTION_CATALOG_ITEMS=NOTION_LIST_ITEMS.map(x=>({id:x.id,name:x.name,category:"material",subtype:x.category,unit:"each",manufacturer:"",model:"",verificationStatus:"verified",notes:x.notes,department:x.department,productUrl:x.productUrl,notionUrl:x.notionUrl}));
+const NOTION_RUN={id:"run-notion-canonical",name:"Notion Home Depot List — 08/10",status:"active",storeId:"store-lawnside",createdAt:"2026-08-10",completedAt:null};
+const NOTION_RUN_ITEMS=NOTION_LIST_ITEMS.map(x=>({id:`sri-${x.id}`,runId:NOTION_RUN.id,itemId:x.id,projectRequirementId:null,projectId:NOTION_PROJECT.id,requestedQty:1,purchasedQty:x.purchased?1:0,status:x.purchased?"purchased":"needed",priority:x.priority,source:"notion",notes:x.notes}));
+
 const seedState={
- schemaVersion:2,
+ schemaVersion:3,
  projects:[
+  NOTION_PROJECT,
   {id:"prj-garage",name:"Detached Garage Feeder",status:"Active",location:"Backyard / Garage",description:"60A feeder raceway phase",createdAt:"2026-08-09",updatedAt:"2026-08-09"},
   {id:"prj-kitchen",name:"Kitchen Electrical Upgrade",status:"Planning",location:"Main House",description:"Service, induction, wall oven",createdAt:"2026-08-09",updatedAt:"2026-08-09"},
   {id:"prj-lighting",name:"Lighting Retrofit",status:"Active",location:"Main Level",description:"Fixture and box retrofit",createdAt:"2026-08-09",updatedAt:"2026-08-09"}
  ],
  catalogItems:[
+  ...NOTION_CATALOG_ITEMS,
   {id:"itm-pvc40",name:'1" × 10′ Schedule 40 electrical PVC conduit',category:"material",subtype:"electrical",unit:"stick",manufacturer:"Cantex",model:"A52BA12H",verificationStatus:"verified",notes:"Gray electrical PVC/RNC."},
   {id:"itm-pvc80",name:'1" × 10′ Schedule 80 electrical PVC conduit',category:"material",subtype:"electrical",unit:"stick",manufacturer:"",model:"A53BA12H",verificationStatus:"verified",notes:"Exposed risers where subject to physical damage."},
   {id:"itm-sweep",name:'1" PVC long-radius 90° sweep',category:"material",subtype:"electrical",unit:"each",manufacturer:"",model:"R5233825",verificationStatus:"verified",notes:"Electrical sweep, not plumbing elbow."},
@@ -263,19 +321,8 @@ const seedState={
   {id:"inv-towels",itemId:"itm-towels",quantity:2,stockMode:"exact",minimumQty:2,locationId:"loc-cleaning",status:"available",updatedAt:"2026-08-09"},
   {id:"inv-string",itemId:"itm-string",quantity:0,stockMode:"exact",minimumQty:1,locationId:"loc-electrical",status:"available",updatedAt:"2026-08-09"}
  ],
- shoppingRuns:[{id:"run-hd-0809",name:"Home Depot Run — 08/09",status:"active",storeId:"store-lawnside",createdAt:"2026-08-09",completedAt:null}],
- shoppingRunItems:[
-  {id:"sri-pvc40",runId:"run-hd-0809",itemId:"itm-pvc40",projectRequirementId:"req-pvc40",requestedQty:6,purchasedQty:0,status:"needed",priority:"Must",source:"project",notes:""},
-  {id:"sri-pvc80",runId:"run-hd-0809",itemId:"itm-pvc80",projectRequirementId:"req-pvc80",requestedQty:1,purchasedQty:0,status:"needed",priority:"Must",source:"project",notes:""},
-  {id:"sri-sweep",runId:"run-hd-0809",itemId:"itm-sweep",projectRequirementId:"req-sweep",requestedQty:2,purchasedQty:0,status:"needed",priority:"Must",source:"project",notes:""},
-  {id:"sri-coupling",runId:"run-hd-0809",itemId:"itm-coupling",projectRequirementId:"req-coupling",requestedQty:3,purchasedQty:0,status:"needed",priority:"Buy",source:"project",notes:""},
-  {id:"sri-adapter",runId:"run-hd-0809",itemId:"itm-adapter",projectRequirementId:"req-adapter",requestedQty:2,purchasedQty:0,status:"needed",priority:"Must",source:"project",notes:""},
-  {id:"sri-lb",runId:"run-hd-0809",itemId:"itm-lb",projectRequirementId:"req-lb",requestedQty:2,purchasedQty:0,status:"needed",priority:"Must",source:"project",notes:""},
-  {id:"sri-cement",runId:"run-hd-0809",itemId:"itm-cement",projectRequirementId:"req-cement",requestedQty:0,purchasedQty:0,status:"skipped",priority:"Must",source:"project",notes:"Covered by Warehouse stock."},
-  {id:"sri-string",runId:"run-hd-0809",itemId:"itm-string",projectRequirementId:"req-string",requestedQty:1,purchasedQty:0,status:"needed",priority:"Must",source:"project",notes:""},
-  {id:"sri-warning",runId:"run-hd-0809",itemId:"itm-warning",projectRequirementId:"req-warning",requestedQty:1,purchasedQty:0,status:"needed",priority:"Buy",source:"project",notes:""},
-  {id:"sri-straps",runId:"run-hd-0809",itemId:"itm-straps",projectRequirementId:"req-straps",requestedQty:1,purchasedQty:0,status:"needed",priority:"Buy",source:"project",notes:""}
- ],
+ shoppingRuns:[NOTION_RUN],
+ shoppingRunItems:[...NOTION_RUN_ITEMS],
  tools:[
   {id:"tool-bosch",name:"Bosch Laser Distance Meter",manufacturer:"Bosch",model:"",serial:"",status:"Owned",locationId:"loc-tools",capabilities:["measure distance"],accessories:[],purchaseDate:"",warrantyUntil:"",notes:"Primary measuring tool"},
   {id:"tool-clamp",name:"Clamp Meter",manufacturer:"",model:"",serial:"",status:"Owned",locationId:"loc-electrical",capabilities:["measure current","electrical diagnostics"],accessories:[],purchaseDate:"",warrantyUntil:"",notes:"Electrical diagnostics"},
@@ -293,7 +340,7 @@ const seedState={
   {id:"store-lawnside",retailer:"Home Depot",name:"Lawnside",storeNumber:"0917",address:"310 Whitehorse Pike, Lawnside, NJ 08045",preferred:true},
   {id:"store-cherryhill",retailer:"Home Depot",name:"Cherry Hill",storeNumber:"0989",address:"2160 Route 70 West, Cherry Hill, NJ",preferred:false}
  ],
- settings:{activeRunId:"run-hd-0809",selectedProjectId:"prj-garage",neededOnly:false}
+ settings:{activeRunId:NOTION_RUN.id,selectedProjectId:NOTION_PROJECT.id,neededOnly:false}
 };
 
 let state=loadState();
@@ -312,13 +359,26 @@ function validateState(s){
  if(typeof s.settings.neededOnly!=="boolean") return {ok:false,error:"Invalid needed-only setting."};
  if(s.requirements.some(x=>!itemIds.has(x.itemId)||!projectIds.has(x.projectId))) return {ok:false,error:"Invalid requirement relationship."};
  if(s.inventory.some(x=>!itemIds.has(x.itemId))) return {ok:false,error:"Invalid inventory relationship."};
- if(s.shoppingRunItems.some(x=>!itemIds.has(x.itemId)||!runIds.has(x.runId))) return {ok:false,error:"Invalid shopping-run relationship."};
+ if(s.shoppingRunItems.some(x=>!itemIds.has(x.itemId)||!runIds.has(x.runId)||(x.projectId&&!projectIds.has(x.projectId)))) return {ok:false,error:"Invalid shopping-run relationship."};
  return {ok:true};
+}
+function mergeMissing(current=[],additions=[]){
+ const ids=new Set(current.map(x=>x.id));return [...current,...additions.filter(x=>!ids.has(x.id)).map(clone)]
+}
+function addCanonicalNotionList(s){
+ const n=clone(s);
+ n.projects=mergeMissing(n.projects,[NOTION_PROJECT]);
+ n.catalogItems=mergeMissing(n.catalogItems,NOTION_CATALOG_ITEMS);
+ n.shoppingRuns=mergeMissing(n.shoppingRuns,[NOTION_RUN]);
+ n.shoppingRunItems=mergeMissing(n.shoppingRunItems,NOTION_RUN_ITEMS);
+ n.settings={...n.settings,activeRunId:NOTION_RUN.id,selectedProjectId:NOTION_PROJECT.id,neededOnly:false};
+ n.schemaVersion=SCHEMA_VERSION;return n
 }
 function migrateState(s){
  if(!s||typeof s!=="object") return clone(seedState);
- if(s.schemaVersion===2) return s;
- if(s.schemaVersion===1){const n=clone(seedState);n.settings={...n.settings,...s.settings};return n}
+ if(s.schemaVersion===3) return s;
+ if(s.schemaVersion===2) return addCanonicalNotionList(s);
+ if(s.schemaVersion===1){const n=clone(seedState);n.settings={...n.settings,...s.settings,activeRunId:NOTION_RUN.id,selectedProjectId:NOTION_PROJECT.id,neededOnly:false};return n}
  return clone(seedState);
 }
 function loadState(){
@@ -350,6 +410,7 @@ const item=id=>byId(state.catalogItems,id);
 const project=id=>byId(state.projects,id);
 const locationName=id=>byId(state.locations,id)?.name||"Unassigned";
 const activeRun=()=>byId(state.shoppingRuns,state.settings.activeRunId)||state.shoppingRuns.find(r=>r.status==="active")||state.shoppingRuns[0];
+const runItemProject=x=>x.projectRequirementId?project(byId(state.requirements,x.projectRequirementId)?.projectId):project(x.projectId);
 const reqRunQty=reqId=>state.shoppingRunItems.filter(x=>x.projectRequirementId===reqId&&byId(state.shoppingRuns,x.runId)?.status!=="completed"&&!["skipped","not_found"].includes(x.status)).reduce((a,x)=>a+Number(x.requestedQty||0),0);
 function onHand(itemId){return state.inventory.filter(x=>x.itemId===itemId).reduce((a,x)=>a+Number(x.quantity||0),0)}
 function reservedByOthers(itemId,excludeReqId=null){return state.requirements.filter(r=>r.itemId===itemId&&r.id!==excludeReqId).reduce((a,r)=>a+Number(r.allocatedQty||0),0)}
@@ -367,20 +428,21 @@ function getOrCreateInventory(itemId){
 }
 function addRequirementShortageToRun(reqId,runId=activeRun()?.id){
  const r=byId(state.requirements,reqId),run=byId(state.shoppingRuns,runId);if(!r||!run||run.status==="completed")return false;
- const cat=item(r.itemId); if(r.status==="hold"||cat?.verificationStatus==="hold") return false;
+ const cat=item(r.itemId);
  const qty=shortage(r); if(qty<=0)return false;
  const existing=state.shoppingRunItems.find(x=>x.runId===runId&&x.projectRequirementId===reqId&&x.status!=="skipped");
- if(existing){existing.requestedQty=Number(existing.requestedQty)+qty;existing.status=r.status==="verify"?"hold":"needed"}
- else state.shoppingRunItems.push({id:uid("sri"),runId,itemId:r.itemId,projectRequirementId:reqId,requestedQty:qty,purchasedQty:0,status:r.status==="verify"?"hold":"needed",priority:r.priority||"Buy",source:"project",notes:r.notes||""});
+ const status=["verify","hold"].includes(r.status)||["verify","hold"].includes(cat?.verificationStatus)?"hold":"needed";
+ if(existing){existing.requestedQty=Number(existing.requestedQty)+qty;existing.status=status}
+ else state.shoppingRunItems.push({id:uid("sri"),runId,itemId:r.itemId,projectRequirementId:reqId,requestedQty:qty,purchasedQty:0,status,priority:r.priority||"Buy",source:"project",notes:r.notes||""});
  saveState();return true
 }
 function addLowStockToRun(invId,runId=activeRun()?.id){
  const inv=byId(state.inventory,invId),run=byId(state.shoppingRuns,runId);if(!inv||!run||run.status==="completed")return false;
- const cat=item(inv.itemId);if(cat?.verificationStatus==="hold")return false;
+ const cat=item(inv.itemId);
  const qty=Math.max(0,Number(inv.minimumQty||0)-Number(inv.quantity||0));if(!qty)return false;
  let ex=state.shoppingRunItems.find(x=>x.runId===runId&&x.itemId===inv.itemId&&x.source==="warehouse"&&x.status!=="skipped");
  if(ex)ex.requestedQty=Math.max(ex.requestedQty,qty);
- else state.shoppingRunItems.push({id:uid("sri"),runId,itemId:inv.itemId,projectRequirementId:null,requestedQty:qty,purchasedQty:0,status:cat?.verificationStatus==="verify"?"hold":"needed",priority:"Reorder",source:"warehouse",notes:"Low-stock replenishment"});
+ else state.shoppingRunItems.push({id:uid("sri"),runId,itemId:inv.itemId,projectRequirementId:null,requestedQty:qty,purchasedQty:0,status:["verify","hold"].includes(cat?.verificationStatus)?"hold":"needed",priority:"Reorder",source:"warehouse",notes:"Low-stock replenishment"});
  saveState();return true
 }
 function reconcileRun(runId,warehouseAdds={}){
@@ -420,24 +482,24 @@ function renderShopping(){
  $("completeRunBtn").disabled=run.status==="completed";
  const q=$("runSearch").value.toLowerCase().trim(),pf=$("runProjectFilter").value,neededOnly=!!state.settings.neededOnly;
  let rows=state.shoppingRunItems.filter(x=>x.runId===run.id).filter(x=>{
-  const r=x.projectRequirementId?byId(state.requirements,x.projectRequirementId):null,p=r?project(r.projectId):null,n=item(x.itemId)?.name||"";
+  const p=runItemProject(x),cat=item(x.itemId),n=cat?.name||"";
   if(pf!=="all"&&p?.id!==pf)return false;
   if(neededOnly&&["purchased","skipped"].includes(x.status))return false;
-  return !q||`${n} ${p?.name||""} ${x.status} ${x.priority}`.toLowerCase().includes(q)
+  return !q||`${n} ${p?.name||""} ${cat?.category||""} ${cat?.department||""} ${cat?.notes||""} ${x.status} ${x.priority}`.toLowerCase().includes(q)
  });
  $("runItems").innerHTML=rows.length?rows.map(x=>{
-  const r=x.projectRequirementId?byId(state.requirements,x.projectRequirementId):null,p=r?project(r.projectId):null,cat=item(x.itemId),locked=run.status==="completed";
+  const p=runItemProject(x),cat=item(x.itemId),locked=run.status==="completed",urgent=["must","urgent","high"].includes(String(x.priority).toLowerCase());
   return `<article class="runitem" data-id="${x.id}" data-status="${x.status}">
    <div class="qtyctrl" aria-label="Requested quantity"><button type="button" data-act="qty-" aria-label="Decrease requested quantity for ${escapeHtml(cat?.name||"item")}" ${locked?"disabled":""}>−</button><output aria-label="Requested quantity">${Number(x.requestedQty)}</output><button type="button" data-act="qty+" aria-label="Increase requested quantity for ${escapeHtml(cat?.name||"item")}" ${locked?"disabled":""}>+</button></div>
-   <div><div class="itemname">${escapeHtml(cat?.name||"Missing item")}</div><div class="meta">${escapeHtml(cat?.notes||x.notes||"")}</div><div class="tags">${p?`<span class="tag project">${escapeHtml(p.name)}</span>`:`<span class="tag project">Warehouse</span>`}<span class="tag ${String(x.priority).toLowerCase()==="must"?"must":"buy"}">${escapeHtml(x.priority)}</span>${cat?.verificationStatus==="verify"?'<span class="tag verify">Verify</span>':""}</div>${(()=>{const link=productLinkFor(cat);return link?`<a class="product-link ${link.exact?"":"search"}" href="${escapeHtml(link.url)}" target="_blank" rel="noopener noreferrer">↗ ${escapeHtml(link.label)}</a>${link.exact?`<span class="product-meta">Model ${escapeHtml(link.model||cat?.model||"")} · Internet # ${escapeHtml(link.internet||"")}</span>`:""}`:""})()}</div>
+   <div><div class="itemname">${escapeHtml(cat?.name||"Missing item")}</div><div class="meta">${escapeHtml([cat?.department,cat?.notes||x.notes].filter(Boolean).join(" · "))}</div><div class="tags">${p?`<span class="tag project">${escapeHtml(p.name)}</span>`:`<span class="tag project">Warehouse</span>`}<span class="tag ${urgent?"must":"buy"}">${escapeHtml(x.priority)}</span>${x.source==="notion"?'<span class="tag verify">Notion</span>':cat?.verificationStatus==="verify"?'<span class="tag verify">Verify</span>':""}</div>${(()=>{const link=productLinkFor(cat);return link?`<a class="product-link ${link.exact?"":"search"}" href="${escapeHtml(link.url)}" target="_blank" rel="noopener noreferrer">↗ ${escapeHtml(link.label)}</a>${link.exact&&(link.model||link.internet)?`<span class="product-meta">${link.model?`Model ${escapeHtml(link.model)}`:""}${link.model&&link.internet?" · ":""}${link.internet?`Internet # ${escapeHtml(link.internet)}`:""}</span>`:""}`:""})()}${cat?.notionUrl?`<a class="product-link search" href="${escapeHtml(cat.notionUrl)}" target="_blank" rel="noopener noreferrer">↗ Notion source</a>`:""}</div>
    <select class="statussel" data-act="status" aria-label="Shopping status" ${locked?"disabled":""}>${STATUS_ORDER.map(s=>`<option value="${s}" ${s===x.status?"selected":""}>${s.replace("_"," ")}</option>`).join("")}</select>
    <input class="pqty" data-act="purchased" type="number" min="0" step="1" value="${Number(x.purchasedQty||0)}" aria-label="Purchased quantity" ${locked?"disabled":""}>
   </article>`
  }).join(""):'<div class="empty">No matching run items.</div>';
  $("runVisible").textContent=rows.length;
  const all=state.shoppingRunItems.filter(x=>x.runId===run.id),purchased=all.filter(x=>x.status==="purchased").length,remaining=all.filter(x=>!["purchased","skipped"].includes(x.status)).length;
- $("runPurchased").textContent=purchased;$("runRemaining").textContent=remaining;$("runMust").textContent=all.filter(x=>x.priority==="Must"&&x.status==="needed").length;
- $("runProjects").textContent=new Set(all.map(x=>{const r=x.projectRequirementId?byId(state.requirements,x.projectRequirementId):null;return r?.projectId}).filter(Boolean)).size;
+ $("runPurchased").textContent=purchased;$("runRemaining").textContent=remaining;$("runMust").textContent=all.filter(x=>["Must","Urgent","High"].includes(x.priority)&&x.status==="needed").length;
+ $("runProjects").textContent=new Set(all.map(x=>runItemProject(x)?.id).filter(Boolean)).size;
  motion.to("#runProgress",{width:`${all.length?purchased/all.length*100:0}%`,duration:.3});
  document.querySelectorAll(".runitem").forEach(el=>{
   const sri=byId(state.shoppingRunItems,el.dataset.id);
@@ -466,18 +528,18 @@ function renderProjectDetail(){
  $("projectDetailTitle").textContent=`${p.name} — Requirements`;
  const reqs=state.requirements.filter(r=>r.projectId===p.id);
  $("projectDetail").innerHTML=reqs.length?`<table class="reqtable"><thead><tr><th>Requirement</th><th>Need</th><th>On hand</th><th>Reserved</th><th>Available</th><th>Shortage</th><th>Actions</th></tr></thead><tbody>${reqs.map(r=>{
-  const cat=item(r.itemId),av=availableForReq(r),sh=shortage(r),hold=r.status==="hold"||cat?.verificationStatus==="hold";
-  return `<tr data-id="${r.id}"><td><b>${escapeHtml(cat?.name||"Missing item")}</b><div class="meta">${escapeHtml(r.phase)} · ${escapeHtml(r.priority)} ${r.status==="verify"?'· VERIFY':""}</div></td><td>${r.requiredQty}</td><td>${onHand(r.itemId)}</td><td>${r.allocatedQty||0}</td><td>${av}</td><td><b>${sh}</b></td><td><div class="req-actions"><button class="btn small" data-act="reserve">Reserve</button><button class="btn small orange" data-act="add" ${hold||!sh?"disabled":""}>Add shortage</button><button class="btn small" data-act="edit">Edit</button></div></td></tr>`
+  const cat=item(r.itemId),av=availableForReq(r),sh=shortage(r);
+  return `<tr data-id="${r.id}"><td><b>${escapeHtml(cat?.name||"Missing item")}</b><div class="meta">${escapeHtml(r.phase)} · ${escapeHtml(r.priority)} ${r.status==="verify"?'· VERIFY':r.status==="hold"?'· HOLD':""}</div></td><td>${r.requiredQty}</td><td>${onHand(r.itemId)}</td><td>${r.allocatedQty||0}</td><td>${av}</td><td><b>${sh}</b></td><td><div class="req-actions"><button class="btn small" data-act="reserve">Reserve</button><button class="btn small orange" data-act="add" ${!sh?"disabled":""}>Add shortage</button><button class="btn small" data-act="edit">Edit</button></div></td></tr>`
  }).join("")}</tbody></table>`:'<div class="empty">No requirements yet.</div>';
  document.querySelectorAll(".reqtable tbody tr").forEach(tr=>{
   tr.querySelector('[data-act="reserve"]').onclick=()=>reserveRequirement(tr.dataset.id);
-  tr.querySelector('[data-act="add"]').onclick=()=>{if(addRequirementShortageToRun(tr.dataset.id)){renderAll();toast("Shortage added to run")}else toast("Nothing added — covered or held")};
+  tr.querySelector('[data-act="add"]').onclick=()=>{if(addRequirementShortageToRun(tr.dataset.id)){renderAll();toast("Shortage added to run")}else toast("Nothing added — covered or already listed")};
   tr.querySelector('[data-act="edit"]').onclick=()=>openRequirementEditor(tr.dataset.id)
  })
 }
 function renderWarehouse(){
  const fast=state.inventory.filter(inv=>item(inv.itemId)?.category==="fastener"),other=state.inventory.filter(inv=>item(inv.itemId)?.category!=="fastener");
- const card=inv=>{const cat=item(inv.itemId),low=Number(inv.quantity)<Number(inv.minimumQty||0);return `<article class="inventory-item ${low?"low":""}" data-id="${inv.id}"><div class="inventory-head"><div><div class="type">${escapeHtml(locationName(inv.locationId))}</div><div class="itemname">${escapeHtml(cat?.name||"Missing item")}</div><div class="meta">Min ${inv.minimumQty} · ${escapeHtml(inv.stockMode)}</div>${(()=>{const link=productLinkFor(cat);return link?`<a class="product-link ${link.exact?"":"search"}" href="${escapeHtml(link.url)}" target="_blank" rel="noopener noreferrer">↗ ${escapeHtml(link.label)}</a>`:""})()}</div><div class="stock">${inv.quantity}</div></div><div class="stockline"><div class="stockctrl"><button data-act="minus">−</button><button data-act="plus">+</button></div><div><button class="btn small" data-act="edit">Edit</button> <button class="btn small orange" data-act="reorder" ${!low||cat?.verificationStatus==="hold"?"disabled":""}>Add Reorder</button></div></div></article>`};
+ const card=inv=>{const cat=item(inv.itemId),low=Number(inv.quantity)<Number(inv.minimumQty||0);return `<article class="inventory-item ${low?"low":""}" data-id="${inv.id}"><div class="inventory-head"><div><div class="type">${escapeHtml(locationName(inv.locationId))}</div><div class="itemname">${escapeHtml(cat?.name||"Missing item")}</div><div class="meta">Min ${inv.minimumQty} · ${escapeHtml(inv.stockMode)}</div>${(()=>{const link=productLinkFor(cat);return link?`<a class="product-link ${link.exact?"":"search"}" href="${escapeHtml(link.url)}" target="_blank" rel="noopener noreferrer">↗ ${escapeHtml(link.label)}</a>`:""})()}</div><div class="stock">${inv.quantity}</div></div><div class="stockline"><div class="stockctrl"><button data-act="minus">−</button><button data-act="plus">+</button></div><div><button class="btn small" data-act="edit">Edit</button> <button class="btn small orange" data-act="reorder" ${!low?"disabled":""}>Add Reorder</button></div></div></article>`};
  $("fasteners").innerHTML=fast.map(card).join("")||'<div class="empty">No fasteners.</div>';
  $("consumables").innerHTML=other.map(card).join("")||'<div class="empty">No materials.</div>';
  document.querySelectorAll(".inventory-item").forEach(el=>{
@@ -525,7 +587,7 @@ $("addProjectBtn").onclick=()=>openProjectEditor();$("addCatalogBtn").onclick=op
 $("addShortagesBtn").onclick=()=>{const pid=state.settings.selectedProjectId;let n=0;state.requirements.filter(r=>r.projectId===pid).forEach(r=>{if(addRequirementShortageToRun(r.id))n++});renderAll();toast(`${n} shortage${n===1?"":"s"} added`)};
 $("addInventoryBtn").onclick=()=>openInventoryEditor();$("addToolBtn").onclick=()=>openToolEditor();
 $("exportBtn").onclick=exportState;$("importBtn").onclick=()=>$("importFile").click();$("importFile").addEventListener("change",e=>e.target.files[0]&&importFile(e.target.files[0]));
-$("resetBtn").onclick=()=>{if(confirm("Reset all DepotOps v0.2 local data to the seeded demo state?")){resetState();toast("v0.2 data reset")}};
+$("resetBtn").onclick=()=>{if(confirm("Reset all DepotOps local data to the canonical seeded state?")){resetState();toast("App data reset")}};
 
 function bootstrapLegacyCheckMigration(){
  if(localStorage.getItem(STORAGE_KEY))return;
@@ -544,11 +606,17 @@ function runSelfTests(){
   const invalidBackup=clone(state);delete invalidBackup.settings;assert("backup without settings is rejected",!validateState(invalidBackup).ok);
   const ids=[...state.projects,...state.catalogItems,...state.requirements,...state.inventory,...state.shoppingRuns,...state.shoppingRunItems,...state.tools,...state.locations,...state.stores].map(x=>x.id);
   assert("stable IDs globally unique",ids.length===new Set(ids).size);
+  const canonicalRows=state.shoppingRunItems.filter(x=>x.runId===NOTION_RUN.id);
+  assert("canonical Notion list includes all 48 rows",canonicalRows.length===48,`rows=${canonicalRows.length}`);
+  assert("canonical Notion list preserves 25 outstanding rows",canonicalRows.filter(x=>x.status==="needed").length===25,`needed=${canonicalRows.filter(x=>x.status==="needed").length}`);
+  assert("canonical Notion list preserves 23 purchased rows",canonicalRows.filter(x=>x.status==="purchased").length===23,`purchased=${canonicalRows.filter(x=>x.status==="purchased").length}`);
+  const legacy=clone(seedState);legacy.schemaVersion=2;legacy.projects=legacy.projects.filter(x=>x.id!==NOTION_PROJECT.id);legacy.catalogItems=legacy.catalogItems.filter(x=>!x.id.startsWith("notion-"));legacy.shoppingRuns=[];legacy.shoppingRunItems=[];legacy.settings={activeRunId:null,selectedProjectId:"prj-garage",neededOnly:true};const migrated=migrateState(legacy);
+  assert("v2 migration adds canonical Notion run",migrated.schemaVersion===3&&migrated.shoppingRunItems.filter(x=>x.runId===NOTION_RUN.id).length===48&&migrated.settings.activeRunId===NOTION_RUN.id);
   assert("canonical item reused by requirement + inventory",byId(state.requirements,"req-cement").itemId===byId(state.inventory,"inv-cement").itemId);
   assert("warehouse stock covers cement requirement",shortage(byId(state.requirements,"req-cement"))===0,`shortage=${shortage(byId(state.requirements,"req-cement"))}`);
-  assert("PVC40 shortage reflects no warehouse stock",shortage(byId(state.requirements,"req-pvc40"))===0,"existing run already covers shortage");
+  assert("PVC40 shortage reflects no warehouse stock",shortage(byId(state.requirements,"req-pvc40"))===6,`shortage=${shortage(byId(state.requirements,"req-pvc40"))}`);
   const before=state.shoppingRunItems.length;const added=addRequirementShortageToRun("req-primer");
-  assert("verify requirement becomes hold item",added&&state.shoppingRunItems.at(-1).status==="hold");
+  assert("verify requirement stays visible as hold item",added&&state.shoppingRunItems.at(-1).status==="hold");
   const inv=byId(state.inventory,"inv-string");const lowAdded=addLowStockToRun(inv.id);
   assert("low stock replenishment connects warehouse to run",lowAdded&&state.shoppingRunItems.some(x=>x.source==="warehouse"&&x.itemId==="itm-string"));
   const snap=JSON.parse(JSON.stringify(state));assert("JSON round-trip validates",validateState(snap).ok);
@@ -557,14 +625,15 @@ function runSelfTests(){
   const tapeBefore=onHand("itm-tape");reconcileRun("run-test",{"sri-test":1});
   assert("reconciliation adds leftover stock",onHand("itm-tape")===tapeBefore+1);
   assert("run preserves completed history",byId(state.shoppingRuns,"run-test").status==="completed"&&!!byId(state.shoppingRuns,"run-test").completedAt);
-  saveState();const parsed=JSON.parse(localStorage.getItem(STORAGE_KEY));assert("complete state persists",parsed.schemaVersion===2&&parsed.projects.length===state.projects.length);
+  saveState();const parsed=JSON.parse(localStorage.getItem(STORAGE_KEY));assert("complete state persists",parsed.schemaVersion===3&&parsed.projects.length===state.projects.length);
   renderAll();
   $("runProjectFilter").value="prj-lighting";renderShopping();assert("project filter survives rerender",$("runProjectFilter").value==="prj-lighting"&&$("runVisible").textContent==="0",`selected=${$("runProjectFilter").value}, visible=${$("runVisible").textContent}`);$("runProjectFilter").value="all";renderShopping();
   const target=document.querySelector(".navbtn");const rect=target.getBoundingClientRect();assert("primary touch target >=44px",rect.height>=44,`height=${rect.height.toFixed(1)}`);
   const stickyTop=parseFloat(getComputedStyle($("runSearch").closest(".toolbar")).top),topbarHeight=document.querySelector(".topbar").getBoundingClientRect().height;assert("sticky toolbar clears top navigation",Math.abs(stickyTop-topbarHeight)<=1,`toolbar=${stickyTop.toFixed(1)}, topbar=${topbarHeight.toFixed(1)}`);
   if(window.innerWidth<=680){const visibleTargets=[...document.querySelectorAll(".topbar button,.page.active button,.page.active a,.page.active input,.page.active select")].filter(el=>{const r=el.getBoundingClientRect();return r.width&&r.height}),smallTargets=visibleTargets.filter(el=>{const r=el.getBoundingClientRect();return r.width<44||r.height<44});assert("visible mobile controls meet 44px targets",smallTargets.length===0,smallTargets.map(el=>`${el.tagName.toLowerCase()}:${el.textContent.trim()||el.getAttribute("aria-label")} ${el.getBoundingClientRect().width.toFixed(0)}x${el.getBoundingClientRect().height.toFixed(0)}`).join(", "))}
   assert("shopping rows expose store links",document.querySelectorAll(".runitem .product-link").length>0,`links=${document.querySelectorAll(".runitem .product-link").length}`);
-  const activeSeedItems=state.shoppingRunItems.filter(x=>x.runId==="run-hd-0809");const exactCount=activeSeedItems.filter(x=>PRODUCT_LINKS[x.itemId]?.exact).length;assert("active seeded run has exact retailer links",exactCount===activeSeedItems.length,`exact=${exactCount}/${activeSeedItems.length}`);
+  const activeSeedItems=state.shoppingRunItems.filter(x=>x.runId===NOTION_RUN.id&&x.source==="notion");assert("every canonical row has a shopping link",activeSeedItems.length===48&&activeSeedItems.every(x=>!!productLinkFor(item(x.itemId))),`linked=${activeSeedItems.filter(x=>!!productLinkFor(item(x.itemId))).length}/${activeSeedItems.length}`);
+  const notionSourceLinks=document.querySelectorAll('.runitem a[href*="app.notion.com/"]').length;assert("every canonical row links to its Notion source",notionSourceLinks===48,`links=${notionSourceLinks}`);
   const firstRunItem=document.querySelector(".runitem"),firstQty=firstRunItem?.querySelector(".qtyctrl"),firstInfo=firstRunItem?.children?.[1];
   if(firstRunItem&&firstQty&&firstInfo){const qr=firstQty.getBoundingClientRect(),ir=firstInfo.getBoundingClientRect();const intersects=!(qr.right<=ir.left||qr.left>=ir.right||qr.bottom<=ir.top||qr.top>=ir.bottom);assert("line item quantity does not overlap product info",!intersects,`qty=(${qr.left.toFixed(1)},${qr.top.toFixed(1)},${qr.right.toFixed(1)},${qr.bottom.toFixed(1)}), info=(${ir.left.toFixed(1)},${ir.top.toFixed(1)},${ir.right.toFixed(1)},${ir.bottom.toFixed(1)})`)}
   assert("no horizontal overflow",document.documentElement.scrollWidth<=window.innerWidth,`scroll=${document.documentElement.scrollWidth}, viewport=${window.innerWidth}`);

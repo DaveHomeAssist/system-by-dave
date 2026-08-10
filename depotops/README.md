@@ -1,4 +1,4 @@
-# DepotOps v0.2.3 — Static Deploy Package
+# DepotOps v0.3.0 — Static Deploy Package
 
 This folder is ready for a static deployment. No build step, backend, database, or environment variables are required.
 
@@ -34,6 +34,8 @@ DepotOps is local-first. Application state is stored in the browser under the `l
 `depotops-v0.2-state`
 
 Data does **not** automatically sync between browsers or devices. Use the application's JSON Export/Import controls when moving data between devices.
+
+The seeded shopping run is a 2026-08-10 snapshot of the canonical Notion database `🛒 Home Depot Shopping List`: 48 total rows, including 25 outstanding and 23 purchased. Existing v0.2 browser state migrates additively to schema v3 and opens the canonical run without deleting older runs or custom data.
 
 ## GSAP
 

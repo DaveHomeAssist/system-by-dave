@@ -2,6 +2,7 @@
 
 ## 2026-08-10
 
+* Synced `/depotops/` to the canonical Notion Home Depot list: all 48 rows are present, with 25 outstanding and 23 purchased; every row links back to its Notion source, existing browser data migrates additively, and Verify/Hold rows remain visible instead of being suppressed.
 * Added `/depotops/`, a local-first home project operations tool for project requirements, multi-project shopping runs, warehouse inventory, tool records, purchase reconciliation, and JSON backup and restore.
 
 ## 2026-08-06
