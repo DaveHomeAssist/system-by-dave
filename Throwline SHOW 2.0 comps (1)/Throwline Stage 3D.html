@@ -1,0 +1,503 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Throwline · Stage 3D</title>
+<link rel="icon" href="../svg/system_by_dave_logo_rust.svg" type="image/svg+xml">
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.184.0/build/three.module.js",
+    "three/addons/controls/OrbitControls.js": "https://unpkg.com/three@0.184.0/examples/jsm/controls/OrbitControls.js",
+    "three/addons/exporters/OBJExporter.js": "https://unpkg.com/three@0.184.0/examples/jsm/exporters/OBJExporter.js",
+    "three/addons/exporters/GLTFExporter.js": "https://unpkg.com/three@0.184.0/examples/jsm/exporters/GLTFExporter.js"
+  },
+  "integrity": {
+    "https://unpkg.com/three@0.184.0/build/three.module.js": "sha384-8FCZ1eVO6it4+pbec2aDtnTrwjWXZLJRC+MAGCIPDgsYnUrl/E0A2YlF8ioMKI/J",
+    "https://unpkg.com/three@0.184.0/build/three.core.js": "sha384-dw2ooPewaEIrAgl6oFDBmmBWCE9oW9LxRGcfwZ0hLvEprzo202wXl7vCYHRlSnOT",
+    "https://unpkg.com/three@0.184.0/examples/jsm/controls/OrbitControls.js": "sha384-4rziNxOBZKQ69i+w+f89KJ55TCYquwchVbByQwmaOeIOXdOU2PLDn3kOfXHwIJC9",
+    "https://unpkg.com/three@0.184.0/examples/jsm/exporters/OBJExporter.js": "sha384-nbwtoZENJD3Vq+ACK0CuGQdPMuDWHkamC2KJD70EV5nfg6jQjfppKOea07YJN+N3",
+    "https://unpkg.com/three@0.184.0/examples/jsm/exporters/GLTFExporter.js": "sha384-VofkvpG6HERhFCYbsUOHeNXBCqID2nfqkQqnVzE1jc/oPcz+qJ13ADdXH08hE+cQ"
+  }
+}
+</script>
+<style>
+:root{
+  --deck:#f4f1ea;--case:#fbfaf7;--case-hi:#ece7dd;--line:#b9b1a5;--line-lo:#d9d2c7;
+  --chalk:#1c2026;--dim:#4c535d;--dimmer:#666e79;
+  --hazard:#8a6400;--hazard-lo:rgba(138,100,0,.11);--hazard-mid:rgba(138,100,0,.32);
+  --safety:#b53f35;--safety-lo:rgba(181,63,53,.10);
+  --go:#25724b;--go-lo:rgba(37,114,75,.10);--go-mid:rgba(37,114,75,.55);
+  --info:#276b9e;--primary-ink:#fffaf0;
+  --mono:ui-monospace,"SFMono-Regular","SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+  --sans:"Arial Narrow","Roboto Condensed","Segoe UI",Arial,sans-serif;
+  --r:4px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--deck);color:var(--chalk);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+a{color:var(--hazard)}
+three-d-stage:not(:defined){visibility:hidden}
+.app{display:grid;grid-template-columns:300px 1fr;grid-template-rows:auto 1fr;grid-template-areas:"header header" "controls stage";height:100%;min-height:0}
+header{grid-area:header;display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:11px 18px;background:var(--case);border-bottom:1px solid var(--line)}
+.brand{font-family:var(--mono);font-weight:700;font-size:15px;letter-spacing:.2em;text-transform:uppercase}
+.tag{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--dimmer);border:1px solid var(--line);border-radius:var(--r);padding:3px 7px}
+.suite-link{margin-left:auto;font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+aside{grid-area:controls;background:var(--case);border-right:1px solid var(--line);overflow:auto;padding:16px;display:flex;flex-direction:column;gap:16px;min-height:0}
+main{grid-area:stage;position:relative;min-width:0;min-height:0}
+three-d-stage{position:absolute;inset:0;width:100%;height:100%}
+.lab{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--dimmer);margin-bottom:6px}
+.grp{display:flex;flex-direction:column;gap:12px}
+.grp>h3{margin:0;font-family:var(--mono);font-size:10px;letter-spacing:.11em;text-transform:uppercase;color:var(--dimmer);font-weight:400;display:flex;align-items:center;gap:9px}
+.grp>h3::after{content:"";flex:1;height:1px;background:var(--line-lo)}
+select,input[type=text]{width:100%;background:var(--deck);color:var(--chalk);border:1px solid var(--line);border-radius:var(--r);padding:9px 10px;font-family:var(--mono);font-size:13px;min-height:38px}
+input[type=range]{width:100%;accent-color:var(--hazard);height:30px}
+.val{font-family:var(--mono);font-size:12px;font-variant-numeric:tabular-nums;color:var(--chalk);float:right;text-transform:none;letter-spacing:0}
+:focus-visible{outline:2px solid var(--hazard);outline-offset:2px}
+button{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;border-radius:var(--r);cursor:pointer;min-height:34px;padding:8px 10px;border:1px solid var(--line);background:var(--case-hi);color:var(--dim)}
+button.pri{background:var(--hazard);border-color:var(--hazard);color:var(--primary-ink);font-weight:700}
+button[aria-pressed=true]{background:var(--line-lo);color:var(--chalk);border-color:var(--line)}
+.row{display:flex;gap:7px;flex-wrap:wrap}
+.hud{position:absolute;left:16px;top:16px;background:rgba(251,250,247,.93);backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:var(--r);padding:13px 15px;min-width:250px;pointer-events:none;background-image:repeating-linear-gradient(135deg,transparent 0 9px,rgba(138,100,0,.04) 9px 18px)}
+.hud .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--dimmer)}
+.hud .big{font-family:var(--mono);font-weight:700;font-size:40px;line-height:1;letter-spacing:-.035em;color:var(--hazard);margin:6px 0 5px;font-variant-numeric:tabular-nums}
+.hud .sub{font-family:var(--mono);font-size:11.5px;font-variant-numeric:tabular-nums;color:var(--dim)}
+.hud .note{font-size:12px;margin-top:7px}
+.band{position:relative;height:12px;background:var(--deck);border:1px solid var(--line);border-radius:2px;overflow:hidden;margin-top:9px}
+.band .nom,.band .safe,.band .pin{position:absolute;top:0;bottom:0}
+.band .nom{background:var(--hazard-lo)}
+.band .safe{background:var(--go-lo);border-left:1px solid var(--go-mid);border-right:1px solid var(--go-mid)}
+.band .pin{width:2px;background:var(--hazard)}
+.facts{position:absolute;right:16px;top:16px;background:rgba(251,250,247,.93);backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:var(--r);pointer-events:none;font-family:var(--mono);font-size:11px;overflow:hidden}
+.facts div{display:flex;gap:14px;justify-content:space-between;padding:7px 13px;border-bottom:1px solid var(--line-lo)}
+.facts div:last-child{border-bottom:0}
+.facts b{font-weight:400;color:var(--dimmer);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase}
+.facts span{font-variant-numeric:tabular-nums}
+.hint{position:absolute;left:16px;bottom:60px;font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--dimmer);pointer-events:none}
+@media (max-width:820px){.app{grid-template-columns:1fr;grid-template-rows:auto 320px minmax(0,auto);grid-template-areas:"header" "stage" "controls"}aside{border-right:0;border-top:1px solid var(--line)}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <span class="brand">THROW<span style="color:var(--hazard)">LINE</span></span>
+    <span class="tag">Stage 3D · SHOW 2.0</span>
+    <span style="font-size:12px;color:var(--dimmer)">Toolbar downloads the whole stage as OBJ + MTL or GLB</span>
+    <a class="suite-link" href="../index.html">System by Dave home</a>
+  </header>
+
+  <aside>
+    <div class="grp">
+      <h3>Screen</h3>
+      <div><label class="lab" for="sw">Width <span class="val" id="swv">20' 0"</span></label><input id="sw" type="range" min="8" max="40" step="0.5" value="20"></div>
+      <div><label class="lab" for="st">Bottom off deck <span class="val" id="stv">4' 0"</span></label><input id="st" type="range" min="0" max="10" step="0.25" value="4"></div>
+      <div><label class="lab" for="ar">Aspect</label><select id="ar"><option value="1.7778">16:9 · HD / UHD</option><option value="1.6">16:10 · WUXGA</option><option value="2.39">2.39:1 · scope</option><option value="1.3333">4:3 · legacy</option></select></div>
+    </div>
+
+    <div class="grp">
+      <h3>Lens</h3>
+      <div><label class="lab" for="lens">Pairing</label><select id="lens">
+        <option value="0.978,1.320" selected>ET-DLE105 · 0.978–1.320:1</option>
+        <option value="1.300,1.740">ET-DLE205 · 1.300–1.740:1</option>
+        <option value="1.700,2.400">ET-DLE305 · 1.700–2.400:1</option>
+        <option value="2.400,4.700">ET-DLE450 · 2.400–4.700:1</option>
+        <option value="0.650,0.650">TLD+ 0.65 UST · fixed</option>
+      </select></div>
+      <div><label class="lab" for="lh">Lens optical height <span class="val" id="lhv">6' 0"</span></label><input id="lh" type="range" min="1" max="16" step="0.25" value="6"></div>
+    </div>
+
+    <div class="grp">
+      <h3>Placement</h3>
+      <div><label class="lab" for="d">Set distance <span class="val" id="dv">22' 0"</span></label><input id="d" type="range" min="6" max="60" step="0.25" value="22"></div>
+      <div class="row">
+        <button id="bw">snap wide</button>
+        <button id="bm" class="pri">safe mid</button>
+        <button id="bt">snap tele</button>
+      </div>
+    </div>
+
+    <div class="grp">
+      <h3>View</h3>
+      <div class="row">
+        <button data-cam="three" aria-pressed="true">3/4</button>
+        <button data-cam="side">side</button>
+        <button data-cam="top">top</button>
+        <button data-cam="op">operator</button>
+      </div>
+      <div class="row">
+        <button id="tcone" aria-pressed="true">throw cone</button>
+        <button id="troom" aria-pressed="true">room</button>
+        <button id="tgrid" aria-pressed="true">deck grid</button>
+      </div>
+    </div>
+
+    <p style="font-size:11.5px;color:var(--dimmer);margin:0;border-top:1px solid var(--line-lo);padding-top:12px">Every part is a named mesh, so the OBJ and GLB open in Blender with <em>screen</em>, <em>projector_body</em>, <em>lens_barrel</em> and <em>cart</em> as separate objects.</p>
+  </aside>
+
+  <main>
+    <three-d-stage name="throwline-stage" background="#f4f1ea"></three-d-stage>
+    <div class="hud">
+      <div class="k">Set mark · screen to optical origin</div>
+      <div class="big" id="hDist">22' 0"</div>
+      <div class="sub"><span style="color:var(--dimmer)">wide </span><span id="hWide">19' 6¾"</span> <span style="color:var(--dimmer)">· tele </span><span id="hTele">26' 4¾"</span></div>
+      <div class="band"><div class="nom" id="bNom"></div><div class="safe" id="bSafe"></div><div class="pin" id="bPin"></div></div>
+      <div class="note" id="hNote">Inside the ±5% conservative planning zone.</div>
+    </div>
+    <div class="facts">
+      <div><b>Image</b><span id="fImg">20' 0" × 11' 3"</span></div>
+      <div><b>Screen</b><span id="fScr">20' 0" × 11' 3"</span></div>
+      <div><b>Spill</b><span id="fSpill">none</span></div>
+      <div><b>Required ratio</b><span id="fRatio">1.100:1</span></div>
+      <div><b>Shift</b><span id="fShift">+29.0%</span></div>
+    </div>
+  </main>
+</div>
+
+<script src="./three-d-stage.js"></script>
+<script type="module">
+import * as THREE from 'three';
+
+const FT = 0.3048;
+const stage = document.querySelector('three-d-stage');
+await stage.ready;
+
+/* ---------- materials ---------- */
+const M = {
+  chassis:  new THREE.MeshStandardMaterial({ name:'chassis',  color:0x2f3339, roughness:0.62, metalness:0.28 }),
+  chassisT: new THREE.MeshStandardMaterial({ name:'chassis_top', color:0x3a3f46, roughness:0.55, metalness:0.3 }),
+  bezel:    new THREE.MeshStandardMaterial({ name:'bezel',    color:0x14171a, roughness:0.44, metalness:0.32 }),
+  glass:    new THREE.MeshStandardMaterial({ name:'lens_glass', color:0x9fc3d8, roughness:0.08, metalness:0.35, transparent:true, opacity:0.72 }),
+  ring:     new THREE.MeshStandardMaterial({ name:'lens_ring', color:0xb9b2a3, roughness:0.35, metalness:0.4 }),
+  alu:      new THREE.MeshStandardMaterial({ name:'aluminium', color:0xa9a49c, roughness:0.42, metalness:0.35 }),
+  rubber:   new THREE.MeshStandardMaterial({ name:'rubber',   color:0x1b1d20, roughness:0.9,  metalness:0.02 }),
+  screen:   new THREE.MeshStandardMaterial({ name:'screen_surface', color:0xfaf9f6, roughness:0.94, metalness:0.0, emissive:0xffffff, emissiveIntensity:0.22, side:THREE.DoubleSide }),
+  frame:    new THREE.MeshStandardMaterial({ name:'screen_frame', color:0x22242a, roughness:0.7, metalness:0.15 }),
+  drape:    new THREE.MeshStandardMaterial({ name:'drape',    color:0x2b2c30, roughness:0.98, metalness:0.0, side:THREE.DoubleSide }),
+  deck:     new THREE.MeshStandardMaterial({ name:'deck',     color:0xcfc8bb, roughness:0.96, metalness:0.0 }),
+  cone:     new THREE.MeshBasicMaterial({ name:'throw_cone', color:0xd9a520, transparent:true, opacity:0.13, side:THREE.DoubleSide, depthWrite:false })
+};
+
+function rbox(w,h,d,r,mat,name){
+  r = Math.min(r, w/2-0.001, h/2-0.001);
+  const s = new THREE.Shape();
+  const x = -w/2, y = -h/2;
+  s.moveTo(x+r, y);
+  s.lineTo(x+w-r, y); s.quadraticCurveTo(x+w, y, x+w, y+r);
+  s.lineTo(x+w, y+h-r); s.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
+  s.lineTo(x+r, y+h); s.quadraticCurveTo(x, y+h, x, y+h-r);
+  s.lineTo(x, y+r); s.quadraticCurveTo(x, y, x+r, y);
+  const g = new THREE.ExtrudeGeometry(s, { depth:d, bevelEnabled:true, bevelThickness:0.006, bevelSize:0.006, bevelSegments:2, curveSegments:8 });
+  g.translate(0,0,-d/2);
+  const m = new THREE.Mesh(g, mat); m.name = name; m.castShadow = true; m.receiveShadow = true;
+  return m;
+}
+function box(w,h,d,mat,name){
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w,h,d), mat); m.name = name;
+  m.castShadow = true; m.receiveShadow = true; return m;
+}
+function cyl(rt,rb,h,seg,mat,name){
+  const m = new THREE.Mesh(new THREE.CylinderGeometry(rt,rb,h,seg), mat); m.name = name;
+  m.castShadow = true; m.receiveShadow = true; return m;
+}
+
+/* ---------- projector on a cart ---------- */
+// Body local space: +Z points toward the screen (the throw direction).
+function buildProjector(){
+  const g = new THREE.Group(); g.name = 'projector';
+
+  const BW = 0.62, BH = 0.24, BD = 0.60;
+  const body = rbox(BW, BH, BD, 0.028, M.chassis, 'projector_body');
+  body.position.y = BH/2;
+  g.add(body);
+
+  const top = box(BW*0.86, 0.012, BD*0.80, M.chassisT, 'body_top_panel');
+  top.position.set(0, BH+0.004, -0.02); g.add(top);
+
+  const front = box(BW*0.98, BH*0.86, 0.016, M.bezel, 'front_bezel');
+  front.position.set(0, BH/2, BD/2 + 0.006); g.add(front);
+
+  // intake louvres on the operator side
+  for (let i=0;i<7;i++){
+    const l = box(0.008, BH*0.52, 0.30, M.bezel, 'louvre_'+(i+1));
+    l.position.set(-BW/2 - 0.004, BH/2, -0.18 + i*0.052);
+    g.add(l);
+  }
+  // exhaust grille at the rear
+  for (let i=0;i<5;i++){
+    const e = box(BW*0.52, 0.010, 0.008, M.bezel, 'exhaust_'+(i+1));
+    e.position.set(0.02, 0.07 + i*0.030, -BD/2 - 0.005);
+    g.add(e);
+  }
+  // recessed carry handle
+  const handle = box(0.30, 0.020, 0.026, M.bezel, 'handle');
+  handle.position.set(0, BH*0.74, -BD/2 - 0.014); g.add(handle);
+
+  // lens assembly, protruding — the silhouette cue that says "projector"
+  const mount = cyl(0.105, 0.105, 0.030, 40, M.bezel, 'lens_mount');
+  mount.rotation.x = Math.PI/2; mount.position.set(0, BH*0.56, BD/2 + 0.020); g.add(mount);
+
+  const barrel = cyl(0.086, 0.098, 0.20, 40, M.bezel, 'lens_barrel');
+  barrel.rotation.x = Math.PI/2; barrel.position.set(0, BH*0.56, BD/2 + 0.128); g.add(barrel);
+
+  const zoomRing = cyl(0.094, 0.094, 0.042, 40, M.ring, 'zoom_ring');
+  zoomRing.rotation.x = Math.PI/2; zoomRing.position.set(0, BH*0.56, BD/2 + 0.150); g.add(zoomRing);
+
+  const hood = cyl(0.090, 0.086, 0.028, 40, M.bezel, 'lens_hood');
+  hood.rotation.x = Math.PI/2; hood.position.set(0, BH*0.56, BD/2 + 0.238); g.add(hood);
+
+  const glass = cyl(0.078, 0.078, 0.010, 40, M.glass, 'front_element');
+  glass.rotation.x = Math.PI/2; glass.position.set(0, BH*0.56, BD/2 + 0.246); g.add(glass);
+
+  // adjustable feet
+  [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(([sx,sz],i)=>{
+    const f = cyl(0.026, 0.030, 0.036, 20, M.rubber, 'foot_'+(i+1));
+    f.position.set(sx*(BW/2-0.07), -0.018, sz*(BD/2-0.08)); g.add(f);
+  });
+
+  g.userData.lensY = BH*0.56;
+  g.userData.lensZ = BD/2 + 0.246;
+  return g;
+}
+
+// Rolling cart sized to carry the body at `height` metres off the deck.
+function buildCart(height){
+  const g = new THREE.Group(); g.name = 'cart';
+  const CW = 0.78, CD = 0.72, CT = 0.028;
+  const casterR = 0.052;
+  const legLen = Math.max(height - CT - casterR*2, 0.12);
+
+  const topDeck = box(CW, CT, CD, M.alu, 'cart_top');
+  topDeck.position.y = -CT/2; g.add(topDeck);
+
+  const shelf = box(CW*0.86, 0.020, CD*0.82, M.alu, 'cart_shelf');
+  shelf.position.y = -CT - legLen*0.62; g.add(shelf);
+
+  [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(([sx,sz],i)=>{
+    const leg = box(0.038, legLen, 0.038, M.alu, 'cart_leg_'+(i+1));
+    leg.position.set(sx*(CW/2-0.05), -CT - legLen/2, sz*(CD/2-0.05)); g.add(leg);
+    const caster = cyl(casterR, casterR, 0.032, 24, M.rubber, 'caster_'+(i+1));
+    caster.rotation.z = Math.PI/2;
+    caster.position.set(sx*(CW/2-0.05), -CT - legLen - casterR, sz*(CD/2-0.05)); g.add(caster);
+  });
+  return g;
+}
+
+/* ---------- screen ---------- */
+function buildScreen(w,h,bottom){
+  const g = new THREE.Group(); g.name = 'screen_assembly';
+  const surf = new THREE.Mesh(new THREE.PlaneGeometry(w,h), M.screen);
+  surf.name = 'screen_surface'; surf.receiveShadow = true;
+  surf.position.set(0, bottom + h/2, 0); g.add(surf);
+
+  const t = 0.055, dpt = 0.09;
+  const hbar = (y)=>{ const m = box(w + t*2, t, dpt, M.frame, 'frame_rail'); m.position.set(0, y, -dpt/2); return m; };
+  const vbar = (x)=>{ const m = box(t, h + t*2, dpt, M.frame, 'frame_stile'); m.position.set(x, bottom + h/2, -dpt/2); return m; };
+  g.add(hbar(bottom - t/2), hbar(bottom + h + t/2), vbar(-w/2 - t/2), vbar(w/2 + t/2));
+
+  if (bottom > 0.05){
+    const skirt = new THREE.Mesh(new THREE.PlaneGeometry(w + t*2, bottom), M.drape);
+    skirt.name = 'screen_skirt'; skirt.position.set(0, bottom/2, -0.01); g.add(skirt);
+    [-1,1].forEach((s,i)=>{
+      const leg = box(0.06, bottom + h, 0.06, M.frame, 'screen_leg_'+(i+1));
+      leg.position.set(s*(w/2 + t + 0.03), (bottom+h)/2, -dpt - 0.03); g.add(leg);
+    });
+  }
+  return g;
+}
+
+/* ---------- throw cone ---------- */
+function buildCone(apex, rect){
+  const p = rect; // [bl, br, tr, tl] as Vector3
+  const v = [];
+  const tri = (a,b)=>{ v.push(apex.x,apex.y,apex.z, a.x,a.y,a.z, b.x,b.y,b.z); };
+  tri(p[0],p[1]); tri(p[1],p[2]); tri(p[2],p[3]); tri(p[3],p[0]);
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(v,3));
+  g.computeVertexNormals();
+  const m = new THREE.Mesh(g, M.cone); m.name = 'throw_cone';
+  return m;
+}
+
+/* ---------- room ---------- */
+function buildRoom(depth, width){
+  const g = new THREE.Group(); g.name = 'room';
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(width, depth), M.deck);
+  floor.name = 'deck'; floor.rotation.x = -Math.PI/2;
+  floor.position.set(0, -0.002, depth/2 - 1.0); floor.receiveShadow = true;
+  g.add(floor);
+  const span = Math.max(width, depth);
+  const grid = new THREE.GridHelper(span, Math.max(2, Math.round(span/(4*FT))), 0x9c9488, 0xcdc5b8);
+  grid.name = 'deck_grid';
+  grid.position.set(0, 0.004, depth/2 - 1.0);
+  g.add(grid);
+  return g;
+}
+
+/* ---------- assembly ---------- */
+const root = new THREE.Group(); root.name = 'throwline_stage';
+const proj = buildProjector();
+let screenGrp = null, coneMesh = null, roomGrp = null, cartGrp = null;
+root.add(proj);
+
+const els = id => document.getElementById(id);
+const state = { w:20, bottom:4, ar:1.7778, wide:0.978, tele:1.320, lh:6, dist:22,
+                cone:true, room:true, grid:true };
+
+function fmt(ft){
+  const neg = ft<0; let v = Math.abs(ft);
+  let f = Math.floor(v), q = Math.round((v-f)*48);
+  if (q>=48){ f++; q-=48; }
+  const inch = Math.floor(q/4), fr = q%4, marks=['','¼','½','¾'];
+  return (neg?'-':'') + f + "' " + inch + marks[fr] + '"';
+}
+
+function rebuild(){
+  const w = state.w * FT, h = (state.w/state.ar) * FT, bottom = state.bottom * FT;
+  const dist = state.dist * FT, lensY = state.lh * FT;
+
+  if (screenGrp) root.remove(screenGrp);
+  screenGrp = buildScreen(w,h,bottom); root.add(screenGrp);
+
+  const depth = Math.max(dist + 4*FT, 12);
+  if (roomGrp) root.remove(roomGrp);
+  roomGrp = buildRoom(depth, Math.max(w + 6, 12)); root.add(roomGrp);
+  roomGrp.visible = state.room;
+  roomGrp.getObjectByName('deck_grid').visible = state.grid;
+
+  // projector: lens front element sits exactly at the set distance
+  proj.rotation.y = Math.PI;                       // face the screen (-Z)
+  proj.position.set(0, lensY - proj.userData.lensY, dist + proj.userData.lensZ);
+
+  if (cartGrp) root.remove(cartGrp);
+  const bodyBase = proj.position.y;
+  if (bodyBase > 0.14){
+    cartGrp = buildCart(bodyBase);
+    cartGrp.position.set(0, bodyBase, dist + proj.userData.lensZ - 0.30);
+    root.add(cartGrp);
+  } else cartGrp = null;
+
+  // image rectangle at the screen plane
+  const imgW = dist / currentRatio();
+  const imgH = imgW / state.ar;
+  const cy = bottom + h/2;                          // image centred on the screen
+  const apex = new THREE.Vector3(0, lensY, dist);
+  const rect = [
+    new THREE.Vector3(-imgW/2, cy - imgH/2, 0.004),
+    new THREE.Vector3( imgW/2, cy - imgH/2, 0.004),
+    new THREE.Vector3( imgW/2, cy + imgH/2, 0.004),
+    new THREE.Vector3(-imgW/2, cy + imgH/2, 0.004)
+  ];
+  if (coneMesh) root.remove(coneMesh);
+  coneMesh = buildCone(apex, rect);
+  coneMesh.visible = state.cone;
+  coneMesh.castShadow = false; coneMesh.receiveShadow = false;
+  root.add(coneMesh);
+
+  readout(imgW, imgH, w, h, cy, lensY);
+}
+
+// Ratio the lens is actually set to: the operator zooms to fit when the
+// distance is in range, and is pinned at a stop when it is not.
+function currentRatio(){
+  const need = state.dist / state.w;
+  return Math.min(state.tele, Math.max(state.wide, need));
+}
+
+function readout(imgW, imgH, w, h, cy, lensY){
+  const wideD = state.wide * state.w, teleD = state.tele * state.w;
+  const safeLo = wideD*1.05, safeHi = teleD*0.95;
+  const d = state.dist;
+  const inRange = d >= wideD - 0.01 && d <= teleD + 0.01;
+  const safe = d >= safeLo && d <= safeHi;
+  const col = !inRange ? 'var(--safety)' : safe ? 'var(--go)' : 'var(--hazard)';
+
+  els('hDist').textContent = fmt(d);
+  els('hDist').style.color = inRange ? 'var(--hazard)' : 'var(--safety)';
+  els('hWide').textContent = fmt(wideD);
+  els('hTele').textContent = fmt(teleD);
+  const note = els('hNote');
+  note.style.color = col;
+  note.textContent = !inRange
+    ? (d > teleD ? 'Past the tele stop. The image overshoots the screen.'
+                 : 'Inside the wide stop. The image falls short of the screen.')
+    : safe ? 'Inside the ±5% conservative planning zone.'
+           : 'In range but outside the safe band. Little margin at the stop.';
+
+  const lo = wideD - 3, hi = teleD + 3;
+  const pc = v => Math.min(100, Math.max(0, (v-lo)/(hi-lo)*100));
+  els('bNom').style.left = pc(wideD)+'%';
+  els('bNom').style.width = (pc(teleD)-pc(wideD))+'%';
+  els('bSafe').style.left = pc(safeLo)+'%';
+  els('bSafe').style.width = (pc(safeHi)-pc(safeLo))+'%';
+  els('bPin').style.left = pc(d)+'%';
+  els('bPin').style.background = col;
+
+  const iw = imgW/FT, ih = imgH/FT, sw = w/FT, sh = h/FT;
+  els('fImg').textContent = fmt(iw) + ' × ' + fmt(ih);
+  els('fScr').textContent = fmt(sw) + ' × ' + fmt(sh);
+  const spill = (iw - sw)/2;
+  els('fSpill').textContent = Math.abs(spill) < 0.02 ? 'none'
+    : (spill > 0 ? '+' : '−') + fmt(Math.abs(spill)) + ' each side';
+  els('fSpill').style.color = Math.abs(spill) > 0.02 ? 'var(--safety)' : 'var(--dim)';
+  els('fRatio').textContent = (state.dist/state.w).toFixed(3) + ':1';
+  const shiftPct = ((cy - lensY) / (imgH || 1)) * 100;
+  els('fShift').textContent = (shiftPct>=0?'+':'') + shiftPct.toFixed(1) + '%';
+  els('fShift').style.color = Math.abs(shiftPct) > 60 ? 'var(--safety)' : 'var(--info)';
+}
+
+/* ---------- controls ---------- */
+function bind(id, key, fmtFn, after){
+  const el = els(id);
+  el.addEventListener('input', ()=>{
+    state[key] = parseFloat(el.value);
+    if (fmtFn) els(id+'v').textContent = fmtFn(state[key]);
+    rebuild(); if (after) after();
+  });
+}
+bind('sw','w',fmt); bind('st','bottom',fmt); bind('lh','lh',fmt); bind('d','dist',fmt);
+els('ar').addEventListener('change', e=>{ state.ar = parseFloat(e.target.value); rebuild(); });
+els('lens').addEventListener('change', e=>{
+  const [a,b] = e.target.value.split(',').map(Number);
+  state.wide = a; state.tele = b; rebuild();
+});
+const setDist = v => { state.dist = Math.round(v*4)/4; els('d').value = state.dist; els('dv').textContent = fmt(state.dist); rebuild(); };
+els('bw').onclick = ()=> setDist(state.wide * state.w);
+els('bt').onclick = ()=> setDist(state.tele * state.w);
+els('bm').onclick = ()=> setDist((state.wide*1.05 + state.tele*0.95)/2 * state.w);
+
+function toggle(id, key, apply){
+  const b = els(id);
+  b.onclick = ()=>{
+    state[key] = !state[key];
+    b.setAttribute('aria-pressed', String(state[key]));
+    apply();
+  };
+}
+toggle('tcone','cone', ()=> coneMesh && (coneMesh.visible = state.cone));
+toggle('troom','room', ()=> roomGrp && (roomGrp.visible = state.room));
+toggle('tgrid','grid', ()=>{ const g = roomGrp && roomGrp.getObjectByName('deck_grid'); if (g) g.visible = state.grid; });
+
+document.querySelectorAll('[data-cam]').forEach(b=>{
+  b.onclick = ()=>{
+    document.querySelectorAll('[data-cam]').forEach(o=>o.setAttribute('aria-pressed', String(o===b)));
+    const d = state.dist*FT, h = (state.w/state.ar)*FT, cy = state.bottom*FT + h/2;
+    const views = {
+      three: [d*0.95, cy + d*0.55, d*1.5],
+      side:  [d*1.7, cy*1.1, d*0.55],
+      top:   [0.01, d*1.5, d*0.55],
+      op:    [0, state.lh*FT, d*1.32]
+    };
+    const [x,y,z] = views[b.dataset.cam];
+    stage._camera.position.set(x,y,z);
+    stage._controls.target.set(0, cy, d*0.35);
+    stage._controls.update();
+  };
+});
+
+rebuild();
+stage.setObject(root);
+coneMesh.castShadow = false; coneMesh.receiveShadow = false;
+document.querySelector('[data-cam="three"]').click();
+</script>
+</body>
+</html>

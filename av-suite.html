@@ -570,6 +570,14 @@
   .command-row span{display:block;color:var(--muted);font-size:12px;overflow:hidden;text-overflow:ellipsis}
   .command-ready{justify-self:end;font-family:var(--font-mono);font-size:10px;color:var(--muted)}
 
+  .confirm-dialog{width:min(460px,calc(100vw - 32px));margin:auto;padding:0;border:1px solid var(--line-strong);border-radius:var(--r-lg);background:var(--raised);color:var(--text);box-shadow:var(--shadow-pop)}
+  .confirm-dialog::backdrop{background:rgba(5,7,12,.72);backdrop-filter:blur(7px)}
+  .confirm-dialog[open]{animation:paletteIn 180ms var(--ease-out)}
+  .confirm-dialog form{display:grid;gap:18px;padding:22px}
+  .confirm-dialog h2{font-family:var(--font-display);font-size:23px;color:var(--text)}
+  .confirm-dialog p{margin:7px 0 0;color:var(--muted);font-size:var(--fs-meta);line-height:1.55}
+  .confirm-actions{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+
   /* ============================================================
      SITE CHROME (header/footer shared with the marketing pages)
      ============================================================ */
@@ -895,6 +903,19 @@
   </section>
 </div>
 
+<dialog id="confirmDialog" class="confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="confirmDialogTitle" aria-describedby="confirmDialogMessage">
+  <form id="confirmDialogForm">
+    <div>
+      <h2 id="confirmDialogTitle">Confirm action</h2>
+      <p id="confirmDialogMessage"></p>
+    </div>
+    <div class="confirm-actions">
+      <button id="confirmDialogCancel" type="button">Cancel</button>
+      <button id="confirmDialogConfirm" class="danger" type="submit">Continue</button>
+    </div>
+  </form>
+</dialog>
+
 <script src="js/sbd-registry.js"></script>
 <script>
 (function(){
@@ -914,6 +935,7 @@
   var inputs={showName:$('showName'),venue:$('venue'),showDate:$('showDate'),operator:$('operator'),search:$('searchInput'),phase:$('phaseFilter'),dept:$('deptFilter'),pin:$('pinFilter')};
   var state=defaultState();
   var commandState={open:false,query:'',activeIndex:0,items:[],lastFocus:null};
+  var confirmState={onConfirm:null,lastFocus:null};
   var offlineState={supported:false,online:navigator.onLine!==false,worker:'Checking',cache:'Checking',cached:0,total:OFFLINE_ASSETS.length,message:'Checking offline cache.',busy:false};
 
   function uniqueAssets(list){var seen={};return list.map(function(asset){return String(asset||'').trim();}).filter(function(asset){if(!asset||seen[asset]) return false;seen[asset]=true;return true;});}
@@ -1011,7 +1033,7 @@
   function scanSavedToolData(){var scanned=0;var ready=0;var issue=0;var kept=0;if(!storageAvailable()){showHint('Browser storage is unavailable, so saved tool data could not be scanned.','error');signal($('scanSavedDataBtn'),'error');return;}TOOLS.forEach(function(tool){var entries=savedEntriesForTool(tool.id);var current=toolReadiness(tool.id);var snippet;if(!entries.length) return;scanned++;snippet=savedToolIssue(entries);if(snippet){if(current!=='skipped') state.readiness[tool.id]='issue';else kept++;state.toolNotes[tool.id]=cleanNote('Saved data mentions: '+snippet);issue++;return;}if(current==='issue'||current==='skipped'){kept++;return;}state.readiness[tool.id]='ready';ready++;});state.filters.pin='saved';state.filters.phase='all';saveState();render();showHint(scanned?('Scanned '+scanned+' saved tools. '+ready+' ready, '+issue+' with issue language, '+kept+' existing exceptions kept.'):'No saved AV tool data found to scan.','success');signal($('scanSavedDataBtn'),scanned?'success':'error');}
   function showIssues(){state.filters.pin='issues';state.filters.phase='all';saveState();render();showHint('Showing tools marked with issues.','success');}
   function showNotes(){state.filters.pin='notes';state.filters.phase='all';saveState();render();showHint('Showing tools with readiness notes.','success');}
-  function resetReadiness(){if(!window.confirm('Reset readiness for all AV suite tools?')) return;state.readiness={};saveState();render();showHint('Suite readiness reset.','success');}
+  function resetReadiness(){requestConfirmation({title:'Reset all readiness?',message:'Every AV tool will return to Pending. Show profile, notes, pins, and recent tools will stay in place.',confirmText:'Reset readiness'},function(){state.readiness={};saveState();render();showHint('Suite readiness reset.','success');signal($('resetReadinessBtn'),'success');});}
   function copyReviewQueue(){var counts=readinessCounts();var lines=['AV SUITE REVIEW QUEUE','Show: '+state.showName,'Venue: '+state.venue,'Date: '+state.showDate,'Operator: '+state.operator,'Phase: '+titleCase(state.phase),'Readiness: '+counts.ready+' ready, '+counts.issue+' issue, '+counts.skipped+' skipped','Saved tool data: '+savedToolCount()+' tools','','Prioritized actions:'];reviewQueueItems().forEach(function(item,index){lines.push((index+1)+'. '+item.label+' | '+item.detail+(item.tool?' | '+absoluteHref(toolHref(item.tool)):''));});copyText(lines.join('\n')).then(function(){showHint('Review queue copied.','success');signal($('copyReviewQueueBtn'),'success');}).catch(function(){showHint('Could not copy review queue.','error');signal($('copyReviewQueueBtn'),'error');});}
   function handleReviewAction(action){if(action==='scan'){scanSavedToolData();return;}if(action==='package'){exportPackage();return;}}
   function copyLaunchList(){var tools=recommendedTools();var counts=readinessCounts();var issueTools=TOOLS.filter(function(tool){return toolReadiness(tool.id)==='issue';});var noteTools=TOOLS.filter(function(tool){return toolNote(tool.id);});var lines=['AV SUITE LAUNCH LIST','Show: '+state.showName,'Venue: '+state.venue,'Date: '+state.showDate,'Operator: '+state.operator,'Phase: '+titleCase(state.phase),'Suite link: '+absoluteHref(suiteLinkHref()),'Readiness: '+counts.ready+' ready, '+counts.issue+' issue, '+counts.skipped+' skipped','Saved tool data: '+savedToolCount()+' tools','','Recommended:'];tools.forEach(function(tool){lines.push(launchLine(tool));});lines.push('');lines.push('Pinned:');state.favorites.map(toolById).filter(Boolean).forEach(function(tool){lines.push(launchLine(tool));});lines.push('');lines.push('Issues:');if(issueTools.length){issueTools.forEach(function(tool){lines.push(launchLine(tool));});}else{lines.push('None');}lines.push('');lines.push('Notes:');if(noteTools.length){noteTools.forEach(function(tool){lines.push(tool.name+' | '+toolNote(tool.id));});}else{lines.push('None');}copyText(lines.join('\n')).then(function(){showHint('Launch list copied with show context and notes.','success');signal($('copyLaunchBtn'),'success');}).catch(function(){showHint('Could not copy launch list.','error');signal($('copyLaunchBtn'),'error');});}
@@ -1023,12 +1045,14 @@
   function packagePayload(){return {schema:'system-by-dave.av-suite-package.v1',exportedAt:new Date().toISOString(),suite:suitePayload(),toolData:packageToolData()};}
   function exportPackage(){var payload=packagePayload();downloadFile(fileStem()+'.av-show-package.json',JSON.stringify(payload,null,2),'application/json;charset=utf-8');showHint('Show package exported with '+payload.toolData.length+' saved tool '+(payload.toolData.length===1?'entry.':'entries.'),'success');signal($('exportPackageBtn'),'success');}
   function importPackageFile(file){var reader=new FileReader();reader.onload=function(){try{var parsed=JSON.parse(String(reader.result||''));var restored=0;if(!parsed||parsed.schema!=='system-by-dave.av-suite-package.v1'||!Array.isArray(parsed.toolData)) throw new Error('Invalid package');if(parsed.suite) applySuitePayload(parsed.suite);parsed.toolData.forEach(function(entry){if(!entry||!allowedPackageKey(entry.key)) return;localStorage.setItem(entry.key,String(entry.value||''));restored++;});saveState();render();showHint('Show package imported. Restored '+restored+' saved tool '+(restored===1?'entry.':'entries.'),'success');signal($('importPackageBtn'),'success');}catch(e){showHint(importErrorMessage(e,'Show package JSON file'),'error');signal($('importPackageBtn'),'error');}};reader.onerror=function(){showHint('Could not read that show package file.','error');signal($('importPackageBtn'),'error');};reader.readAsText(file);}
-  function clearPrefs(){if(!window.confirm('Clear AV Suite saved profile, readiness, pins, and recent tools?')) return;if(storageAvailable()) localStorage.removeItem(STORAGE_KEY);state=defaultState();render();showHint('Suite preferences cleared.','success');}
+  function clearPrefs(){requestConfirmation({title:'Clear suite preferences?',message:'This removes the saved show profile, readiness, notes, pins, recent tools, and filters from this browser.',confirmText:'Clear preferences'},function(){if(storageAvailable()) localStorage.removeItem(STORAGE_KEY);state=defaultState();render();showHint('Suite preferences cleared.','success');signal($('clearPrefsBtn'),'success');});}
   function absoluteHref(href){return new URL(href, window.location.href).href;}
   function fileStem(){return (state.showName||'av-suite').toLowerCase().replace(/['"]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,60)||'av-suite';}
   function downloadFile(filename,content,type){var blob=new Blob([content],{type:type});var url=URL.createObjectURL(blob);var link=document.createElement('a');link.href=url;link.download=filename;link.style.display='none';document.body.appendChild(link);link.click();setTimeout(function(){URL.revokeObjectURL(url);if(link.parentNode) link.parentNode.removeChild(link);},0);}
   function copyText(text){if(navigator.clipboard&&navigator.clipboard.writeText) return navigator.clipboard.writeText(text);return new Promise(function(resolve,reject){var area=document.createElement('textarea');area.value=text;area.setAttribute('readonly','');area.style.position='fixed';area.style.left='-9999px';document.body.appendChild(area);area.select();try{document.execCommand('copy')?resolve():reject(new Error('copy failed'));}catch(e){reject(e);}finally{if(area.parentNode) area.parentNode.removeChild(area);}});}
   function showHint(message,kind){var hint=$('hint');hint.textContent=message;hint.classList.remove('success','error');if(kind) hint.classList.add(kind);}
+  function requestConfirmation(options,onConfirm){var dialog=$('confirmDialog');if(!dialog||typeof dialog.showModal!=='function'){showHint('This action requires a browser with dialog support.','error');return;}if(dialog.open) return;confirmState.onConfirm=onConfirm;confirmState.lastFocus=document.activeElement;$('confirmDialogTitle').textContent=options.title||'Confirm action';$('confirmDialogMessage').textContent=options.message||'';$('confirmDialogConfirm').textContent=options.confirmText||'Continue';dialog.returnValue='';dialog.showModal();setTimeout(function(){$('confirmDialogCancel').focus();},0);}
+  function closeConfirmation(result){var dialog=$('confirmDialog');if(dialog&&dialog.open) dialog.close(result||'cancel');}
   function signal(element,kind){var className=kind==='error'?'feedback-error':'feedback-success';if(!element) return;element.classList.remove(className);void element.offsetWidth;element.classList.add(className);setTimeout(function(){element.classList.remove(className);},190);}
   function installPressFeedback(){function buttonFrom(event){return event.target&&event.target.closest?event.target.closest('button'):null;}function releaseAll(){document.querySelectorAll('button.is-pressing').forEach(function(button){button.classList.remove('is-pressing');});}document.addEventListener('pointerdown',function(event){var button=buttonFrom(event);if(button&&!button.disabled) button.classList.add('is-pressing');});document.addEventListener('pointerup',releaseAll);document.addEventListener('pointercancel',releaseAll);document.addEventListener('pointerout',function(event){var button=buttonFrom(event);if(button&&!button.contains(event.relatedTarget)) button.classList.remove('is-pressing');});document.addEventListener('blur',releaseAll,true);document.addEventListener('keydown',function(event){var button=buttonFrom(event);if(button&&!button.disabled&&(event.key===' '||event.key==='Enter')) button.classList.add('is-pressing');});document.addEventListener('keyup',function(event){if(event.key===' '||event.key==='Enter') releaseAll();});}
   function escapeHtml(value){return String(value==null?'':value).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
@@ -1070,7 +1094,7 @@
   $('markRecommendedReadyBtn').addEventListener('click',function(){markRecommendedReady();signal(this,'success');});
   $('showIssuesBtn').addEventListener('click',function(){showIssues();signal(this,'success');});
   $('showNotesBtn').addEventListener('click',function(){showNotes();signal(this,'success');});
-  $('resetReadinessBtn').addEventListener('click',function(){resetReadiness();signal(this,'success');});
+  $('resetReadinessBtn').addEventListener('click',resetReadiness);
   $('clearFiltersBtn').addEventListener('click',function(){clearToolFilters();signal(this,'success');});
   $('exportSuiteBtn').addEventListener('click',exportSuite);
   $('importSuiteBtn').addEventListener('click',function(){$('suiteImportInput').click();});
@@ -1079,6 +1103,10 @@
   $('importPackageBtn').addEventListener('click',function(){$('packageImportInput').click();});
   $('packageImportInput').addEventListener('change',function(){var file=$('packageImportInput').files&&$('packageImportInput').files[0];if(file) importPackageFile(file);$('packageImportInput').value='';});
   $('clearPrefsBtn').addEventListener('click',clearPrefs);
+  $('confirmDialogForm').addEventListener('submit',function(event){event.preventDefault();closeConfirmation('confirm');});
+  $('confirmDialogCancel').addEventListener('click',function(){closeConfirmation('cancel');});
+  $('confirmDialog').addEventListener('cancel',function(event){event.preventDefault();closeConfirmation('cancel');});
+  $('confirmDialog').addEventListener('close',function(){var onConfirm=confirmState.onConfirm;var confirmed=this.returnValue==='confirm';confirmState.onConfirm=null;if(confirmState.lastFocus&&confirmState.lastFocus.focus){try{confirmState.lastFocus.focus({preventScroll:true});}catch(e){confirmState.lastFocus.focus();}}confirmState.lastFocus=null;if(confirmed&&onConfirm) onConfirm();});
   $('cacheToolsBtn').addEventListener('click',function(){cacheAvTools(false,this);});
   $('refreshCacheBtn').addEventListener('click',function(){cacheAvTools(true,this);});
   $('clearCacheBtn').addEventListener('click',function(){clearOfflineCache(this);});
@@ -1207,7 +1235,7 @@
   if(openBtn) openBtn.addEventListener('click',openDrawer);
   if(closeBtn) closeBtn.addEventListener('click',closeDrawer);
   if(scrim) scrim.addEventListener('click',closeDrawer);
-  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&drawer.classList.contains('open')){e.preventDefault();closeDrawer();}});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&drawer.classList.contains('open')&&!$('confirmDialog').open){e.preventDefault();closeDrawer();}});
   /* focus trap within drawer */
   drawer.addEventListener('keydown',function(e){
     if(e.key!=='Tab'||!drawer.classList.contains('open')) return;

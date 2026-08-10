@@ -35,7 +35,7 @@
     --line-2:#343c49;
     --text:#f4f6fb;
     --muted:#aab3c2;
-    --faint:#717b8a;
+    --faint:#8994a4;
     /* rust — the authentic System by Dave brand accent (matches the logo mark) */
     --accent:#e08a4f;
     --accent-strong:#cf7637;
@@ -855,6 +855,32 @@
   .keys .desc{color:var(--muted);font-size:13px}
   .help .close-row{display:flex;justify-content:flex-end;margin-top:18px}
 
+  .action-dialog{
+    width:min(440px,calc(100vw - 32px));
+    margin:auto;
+    padding:0;
+    border:1px solid var(--line-2);
+    border-radius:16px;
+    background:var(--surface);
+    color:var(--text);
+    box-shadow:0 24px 70px rgba(0,0,0,.62);
+  }
+  .action-dialog::backdrop{background:rgba(4,7,12,.72);backdrop-filter:blur(5px)}
+  .action-dialog[open]{animation:actionDialogIn var(--dur-med) var(--ease-out)}
+  @keyframes actionDialogIn{from{opacity:0;transform:translateY(8px) scale(.985)}to{opacity:1;transform:none}}
+  .action-dialog-form{display:grid;gap:16px;padding:22px 24px}
+  .action-dialog-copy{display:grid;gap:6px}
+  .action-dialog h2{margin:0;font-size:19px;line-height:1.25}
+  .action-dialog p{margin:0;color:var(--muted);font-size:13px;line-height:1.55}
+  .action-dialog-field{display:grid;gap:7px}
+  .action-dialog-field[hidden]{display:none}
+  .action-dialog-field label{color:var(--muted);font-family:var(--ui-mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase}
+  .action-dialog-field input{width:100%;min-height:44px;border:1px solid var(--line-2);border-radius:9px;background:var(--surface-2);color:var(--text);padding:10px 12px;font:inherit;outline:0}
+  .action-dialog-field input:focus{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+  .action-dialog-actions{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+  .action-dialog-confirm.is-danger{background:#a83f39;border-color:#d35f57;color:#fff}
+  .action-dialog-confirm.is-danger:hover{background:#bd4942;border-color:#ef746a}
+
   .rundown-backdrop{
     position:fixed;inset:0;background:rgba(4,7,12,.62);
     display:none;align-items:center;justify-content:center;z-index:52;padding:20px;
@@ -1078,6 +1104,7 @@
   @media (prefers-reduced-motion:reduce){
     *{transition-duration:.001ms !important;animation-duration:.001ms !important}
     .reader{scroll-behavior:auto}
+    .toolbar{scroll-behavior:auto}
     button:hover,button:active,button.is-pressing{transform:none}
   }
 
@@ -1093,6 +1120,8 @@
       contain:paint;
       overflow-x:auto;
       overscroll-behavior-x:contain;
+      touch-action:pan-x;
+      scroll-behavior:smooth;
       -webkit-overflow-scrolling:touch;
       scrollbar-width:thin;
     }
@@ -1106,7 +1135,12 @@
     .group[aria-label="Reader style"],
     .group[aria-label="Reader background"],
     .group[aria-label="Reading line color"],
-    .group[aria-label="Saved scripts"],
+    .group[aria-label="Bookmarks"],
+    .group[aria-label="Saved scripts"]{
+      flex-wrap:nowrap;
+      max-width:none;
+      width:max-content;
+    }
     .group[aria-label="Reader style"] .swatches,
     .group[aria-label="Reader background"] .swatches,
     .group[aria-label="Reading line color"] .swatches{
@@ -1687,6 +1721,23 @@ Format as you type: **bold**, *italic*, ==highlight==, ~~strike~~, [[camera cue]
   </footer>
 </div>
 
+<dialog class="action-dialog" id="actionDialog" role="dialog" aria-modal="true" aria-labelledby="actionDialogTitle" aria-describedby="actionDialogMessage">
+  <form class="action-dialog-form" id="actionDialogForm" novalidate>
+    <div class="action-dialog-copy">
+      <h2 id="actionDialogTitle">Confirm action</h2>
+      <p id="actionDialogMessage"></p>
+    </div>
+    <div class="action-dialog-field" id="actionDialogField">
+      <label id="actionDialogLabel" for="actionDialogInput">Name</label>
+      <input id="actionDialogInput" type="text" autocomplete="off">
+    </div>
+    <div class="action-dialog-actions">
+      <button id="actionDialogCancel" type="button">Cancel</button>
+      <button id="actionDialogConfirm" class="primary action-dialog-confirm" type="submit">Continue</button>
+    </div>
+  </form>
+</dialog>
+
 <!-- Shortcuts dialog -->
 <div class="help-backdrop" id="helpBackdrop" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
   <div class="help">
@@ -1852,6 +1903,11 @@ Format as you type: **bold**, *italic*, ==highlight==, ~~strike~~, [[camera cue]
   var remoteTimerOut = $('remoteTimerOut');
   var remoteMarkerOut = $('remoteMarkerOut');
   var remoteNote = $('remoteNote');
+  var actionDialog = $('actionDialog'), actionDialogForm = $('actionDialogForm');
+  var actionDialogTitle = $('actionDialogTitle'), actionDialogMessage = $('actionDialogMessage');
+  var actionDialogField = $('actionDialogField'), actionDialogLabel = $('actionDialogLabel'), actionDialogInput = $('actionDialogInput');
+  var actionDialogCancel = $('actionDialogCancel'), actionDialogConfirm = $('actionDialogConfirm');
+  var actionDialogResolve = null, actionDialogLastFocus = null;
 
   // ---- Settings (persisted) ----
   var SPEED = {min:10, max:400, step:10, val:60};   // px / second
@@ -2299,6 +2355,67 @@ Format as you type: **bold**, *italic*, ==highlight==, ~~strike~~, [[camera cue]
     saveHint.textContent = message;
     if(kind) saveHint.classList.add('feedback-' + kind);
     hintTimer = setTimeout(updateStorageUi, 1600);
+  }
+
+  function requestActionDialog(options){
+    options = options || {};
+    return new Promise(function(resolve){
+      if(!actionDialog || typeof actionDialog.showModal !== 'function'){
+        showHintNotice('This action requires a browser with dialog support.', 'error');
+        resolve(null);
+        return;
+      }
+      if(actionDialog.open){
+        resolve(null);
+        return;
+      }
+      actionDialogTitle.textContent = options.title || 'Confirm action';
+      actionDialogMessage.textContent = options.message || '';
+      actionDialogLabel.textContent = options.label || 'Value';
+      actionDialogField.hidden = options.mode !== 'prompt';
+      actionDialogInput.value = options.value || '';
+      actionDialogInput.maxLength = options.maxLength || 120;
+      actionDialogConfirm.textContent = options.confirmText || 'Continue';
+      actionDialogConfirm.classList.toggle('is-danger', options.danger === true);
+      actionDialogResolve = resolve;
+      actionDialogLastFocus = document.activeElement;
+      actionDialog.returnValue = '';
+      actionDialog.showModal();
+      requestAnimationFrame(function(){
+        if(options.mode === 'prompt'){
+          actionDialogInput.focus();
+          actionDialogInput.select();
+        }else{
+          actionDialogCancel.focus();
+        }
+      });
+    });
+  }
+
+  function closeActionDialog(result){
+    if(actionDialog && actionDialog.open) actionDialog.close(result || 'cancel');
+  }
+
+  if(actionDialogForm){
+    actionDialogForm.addEventListener('submit', function(event){
+      event.preventDefault();
+      closeActionDialog('confirm');
+    });
+    actionDialogCancel.addEventListener('click', function(){ closeActionDialog('cancel'); });
+    actionDialog.addEventListener('cancel', function(event){
+      event.preventDefault();
+      closeActionDialog('cancel');
+    });
+    actionDialog.addEventListener('close', function(){
+      var resolve = actionDialogResolve;
+      var value = actionDialog.returnValue === 'confirm' ? (actionDialogField.hidden ? true : actionDialogInput.value) : null;
+      actionDialogResolve = null;
+      if(actionDialogLastFocus && actionDialogLastFocus.focus){
+        try{ actionDialogLastFocus.focus({preventScroll:true}); }catch(e){ actionDialogLastFocus.focus(); }
+      }
+      actionDialogLastFocus = null;
+      if(resolve) resolve(value);
+    });
   }
 
   function setRemoteNote(message, kind){
@@ -3971,7 +4088,7 @@ Format as you type: **bold**, *italic*, ==highlight==, ~~strike~~, [[camera cue]
     if(savedFormatInfo) savedFormatInfo.textContent = savedFormats.length + ' look' + (savedFormats.length === 1 ? '' : 's');
   }
 
-  function saveCurrentFormatLocal(){
+  async function saveCurrentFormatLocal(){
     var entry;
     var title;
     if(!storage.isAvailable()){
@@ -3979,7 +4096,15 @@ Format as you type: **bold**, *italic*, ==highlight==, ~~strike~~, [[camera cue]
       showHintNotice('Saved looks need browser storage.', 'error');
       return;
     }
-    title = window.prompt('Save this formatting look as', formatLabelFromCurrentState());
+    title = await requestActionDialog({
+      mode:'prompt',
+      title:'Save formatting look',
+      message:'Store the current reader styling in this browser.',
+      label:'Look name',
+      value:formatLabelFromCurrentState(),
+      maxLength:80,
+      confirmText:'Save look'
+    });
     if(title === null) return;
     title = title.trim();
     if(!title){
@@ -4028,14 +4153,20 @@ Format as you type: **bold**, *italic*, ==highlight==, ~~strike~~, [[camera cue]
     updatePrediction();
   }
 
-  function deleteSelectedSavedFormat(){
+  async function deleteSelectedSavedFormat(){
     var entry = savedFormats.find(function(item){ return item.id === activeSavedFormatId; });
     if(!entry){
       signalError(deleteFormatBtn);
       showHintNotice('Pick a saved look first.', 'error');
       return;
     }
-    if(!window.confirm('Delete this saved formatting look?')) return;
+    if(!await requestActionDialog({
+      mode:'confirm',
+      title:'Delete saved look?',
+      message:'This removes the selected formatting look from this browser.',
+      confirmText:'Delete look',
+      danger:true
+    })) return;
     savedFormats = savedFormats.filter(function(item){ return item.id !== entry.id; });
     activeSavedFormatId = '';
     if(saveSavedFormats()){
@@ -4094,11 +4225,19 @@ Format as you type: **bold**, *italic*, ==highlight==, ~~strike~~, [[camera cue]
     if(pacePresets.some(function(p){ return p.id === selected; })) paceSelect.value = selected;
     else { var pin = pacePresets.find(function(p){ return p.pinned; }); paceSelect.value = pin ? pin.id : ''; }
   }
-  function saveCurrentPaceLocal(){
+  async function saveCurrentPaceLocal(){
     if(!storage.isAvailable()){ signalError(savePaceBtn); showHintNotice('Saved paces need browser storage.', 'error'); return; }
     var wpm = currentWpm();
     if(!wpm){ signalError(savePaceBtn); showHintNotice('Set a pace on a script first, then Save.', 'error'); return; }
-    var name = window.prompt('Name this pace', 'Pace ' + wpm);
+    var name = await requestActionDialog({
+      mode:'prompt',
+      title:'Save reading pace',
+      message:'Name this reusable ' + wpm + ' wpm pace.',
+      label:'Pace name',
+      value:'Pace ' + wpm,
+      maxLength:40,
+      confirmText:'Save pace'
+    });
     if(name === null) return;
     var preset = sanitizePacePreset({ name:(name || '').trim() || (wpm + ' wpm'), wpm:wpm });
     pacePresets = pacePresets.filter(function(p){ return p.name.toLowerCase() !== preset.name.toLowerCase(); });
@@ -4360,14 +4499,20 @@ Format as you type: **bold**, *italic*, ==highlight==, ~~strike~~, [[camera cue]
     loadSavedScriptEntry(entry, false, loadTextOnlyBtn);
   }
 
-  function deleteSelectedScriptLocal(){
+  async function deleteSelectedScriptLocal(){
     var entry = savedScripts.find(function(item){ return item.id === activeSavedScriptId; });
     if(!entry){
       signalError(deleteLocalBtn);
       showHintNotice('Pick a saved script first.', 'error');
       return;
     }
-    if(!window.confirm('Delete this saved script from this browser?')) return;
+    if(!await requestActionDialog({
+      mode:'confirm',
+      title:'Delete saved script?',
+      message:'This removes “' + entry.title + '” from this browser.',
+      confirmText:'Delete script',
+      danger:true
+    })) return;
     savedScripts = savedScripts.filter(function(item){ return item.id !== entry.id; });
     activeSavedScriptId = '';
     if(saveSavedScripts()){
@@ -4382,7 +4527,7 @@ Format as you type: **bold**, *italic*, ==highlight==, ~~strike~~, [[camera cue]
     }
   }
 
-  function renameSelectedScriptLocal(){
+  async function renameSelectedScriptLocal(){
     var entry = savedScripts.find(function(item){ return item.id === activeSavedScriptId; });
     var nextTitle;
     if(!entry){
@@ -4390,7 +4535,15 @@ Format as you type: **bold**, *italic*, ==highlight==, ~~strike~~, [[camera cue]
       showHintNotice('Pick a saved script first.', 'error');
       return;
     }
-    nextTitle = window.prompt('Rename saved script', entry.title);
+    nextTitle = await requestActionDialog({
+      mode:'prompt',
+      title:'Rename saved script',
+      message:'Choose the name shown in the saved script library.',
+      label:'Script name',
+      value:entry.title,
+      maxLength:80,
+      confirmText:'Rename script'
+    });
     if(nextTitle === null) return;
     nextTitle = nextTitle.trim();
     if(!nextTitle){
@@ -4474,7 +4627,7 @@ Format as you type: **bold**, *italic*, ==highlight==, ~~strike~~, [[camera cue]
     }
   }
 
-  function editSelectedScriptTags(){
+  async function editSelectedScriptTags(){
     var entry = savedScripts.find(function(item){ return item.id === activeSavedScriptId; });
     var nextTags;
     if(!entry){
@@ -4482,7 +4635,15 @@ Format as you type: **bold**, *italic*, ==highlight==, ~~strike~~, [[camera cue]
       showHintNotice('Pick a saved script first.', 'error');
       return;
     }
-    nextTags = window.prompt('Tags, comma separated', (entry.tags || []).join(', '));
+    nextTags = await requestActionDialog({
+      mode:'prompt',
+      title:'Edit script tags',
+      message:'Separate reusable tags with commas. Leave the field blank to clear them.',
+      label:'Tags',
+      value:(entry.tags || []).join(', '),
+      maxLength:160,
+      confirmText:'Save tags'
+    });
     if(nextTags === null) return;
     entry.tags = sanitizeTags(nextTags);
     entry.updatedAt = new Date().toISOString();
@@ -6429,6 +6590,8 @@ Format as you type: **bold**, *italic*, ==highlight==, ~~strike~~, [[camera cue]
     var typing = !!ae && (ae === script || ae === scriptRich || ae.isContentEditable ||
       ae.tagName === 'INPUT' || ae.tagName === 'SELECT' || ae.tagName === 'TEXTAREA');
     var k = e.key;
+
+    if(actionDialog && actionDialog.open) return;
 
     if(isRemoteMode){
       switch(k){
