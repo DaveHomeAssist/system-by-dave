@@ -1,7 +1,7 @@
 {
   "name": "DepotOps",
   "short_name": "DepotOps",
-  "description": "Local-first home project shopping, warehouse inventory, and tool tracking.",
+  "description": "Notion-linked home project shopping, workflow gates, warehouse inventory, and tool tracking.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
