@@ -1,0 +1,441 @@
+1. PROJECT SUMMARY
+
+Objective
+
+- Implement the Throwline product roadmap as a field-ready projector calculator release: publish the canonical product surface, harden the copied/printed throw card, improve mobile field use, preserve the offline-first core, and keep the 3D stage as a companion planning surface.
+
+Key Outcomes
+
+- Throwline has one official public route with correct navigation, canonical metadata, sitemap coverage, and launch copy.
+- STOP warnings travel with the throw card wherever it goes: clipboard, print, show pack, and exported show snapshots.
+- Phone operators can see the tape mark, status, safe band, and stop count at 390 px without hunting through the page.
+- The core calculator remains one static, dependency-free, offline-capable HTML artifact.
+- The Three.js stage ships only as a companion shop-floor model after its sidecar, mobile canvas, camera, and export paths are verified.
+- Release verification covers calculation fixtures, mobile layout, imports, exports, print output, accessibility basics, and SEO metadata.
+
+Assumptions
+
+- The primary product is Throwline SHOW 2.0, currently represented by `Throwline SHOW 2.0 comps (1)/uploads/throwline-show-ready.html`.
+- The planned public route is `/ProjectorThrow` unless the owner chooses a simpler route such as `/throwline.html` before implementation begins.
+- The repo remains static GitHub Pages with vanilla HTML, CSS, and JavaScript. No framework, package manager, bundler, database, or server auth is added in this roadmap.
+- `av-calculator.html` and `projection-plan.html` remain existing AV tools, but they are not the canonical Throwline surface.
+- Browser-local storage is acceptable for custom lenses, saved jobs, shift profiles, inventory, theme, and current show data.
+- Exact lens, shift, rigging, and optical-origin decisions still require manufacturer/manual confirmation; Throwline remains a planning and verification aid.
+
+2. PHASED IMPLEMENTATION PLAN
+
+Phase Name
+
+- Phase 1 — Canonical Product Door
+
+Goal
+
+- Put Throwline behind one stable public URL and wire the site around that route before making launch, SEO, or product-completion claims.
+
+Key Milestones
+
+- Choose and document the canonical route: `/ProjectorThrow` or `/throwline.html`.
+- Copy the SHOW 2.0 artifact into the canonical route without introducing dependencies or a build step.
+- Add or update links from the homepage AV tools area, `av-suite.html`, footer navigation, and any relevant product directories.
+- Add sitemap entry with current `lastmod` and correct canonical URL.
+- Add changelog entry describing the Throwline product surface and route.
+- Verify the live or local route opens directly and is reachable from site navigation.
+
+Dependencies
+
+- Access to the current repo checkout.
+- Final route decision.
+- Current SHOW 2.0 artifact available locally.
+
+Required Resources
+
+- Implementing developer.
+- Git, local static server, browser, sitemap/changelog files.
+
+Estimated Timeline
+
+- 0.5-1 day.
+
+Owner / Responsible Party
+
+- Frontend/product engineer.
+
+Risks / Failure Points
+
+- Publishing the wrong route creates duplicate canonical surfaces.
+- Linking old AV calculator pages as Throwline dilutes the product and confuses crawlers.
+- Existing untracked prototype files could be staged accidentally.
+
+Phase Name
+
+- Phase 2 — Search, Metadata, and Crawlability
+
+Goal
+
+- Make the Throwline route understandable to crawlers and share previews while keeping the tool fast and static.
+
+Key Milestones
+
+- Add title, meta description, canonical link, theme color, Open Graph tags, Twitter Card tags, and CSP meta.
+- Add `SoftwareApplication` structured data for a projector throw calculator.
+- Confirm `robots.txt` does not block the canonical route.
+- Add content hooks around projector throw distance, lens ratio, field verification, screen luminance, and live event projection planning.
+- Run Lighthouse or equivalent checks for SEO, accessibility, best practices, and performance.
+- Validate crawl path from sitemap to route to canonical URL.
+
+Dependencies
+
+- Phase 1 canonical route must exist.
+
+Required Resources
+
+- Frontend engineer.
+- Browser dev tools, Lighthouse, static file inspection.
+
+Estimated Timeline
+
+- 0.5-1 day.
+
+Owner / Responsible Party
+
+- Frontend engineer.
+
+Risks / Failure Points
+
+- Missing canonical metadata can split ranking signals across route aliases.
+- Overstuffed SEO copy can make the tool feel less like a field instrument.
+- CSP can break inline scripts if changed without testing.
+
+Phase Name
+
+- Phase 3 — Field-Critical Throw Card Hardening
+
+Goal
+
+- Ensure every STOP condition is stamped onto the copied and printed handoff artifact before it leaves the screen.
+
+Key Milestones
+
+- Audit `collectWarnings`, `renderWarnings`, and `summaryText` behavior for all stop-tier warning types.
+- Update throw card generation so every stop-tier warning appears in copied text, current print, show pack print, and exported show snapshots.
+- Preserve the plain-text card format while improving hierarchy around mark, lens, stop warnings, field verification, and operator stamp.
+- Add fixture cases for raster mismatch, out-of-range placement, room-depth failure, unknown/exceeded shift, insufficient light, and field-correction move.
+- Verify clipboard fallback still works when `navigator.clipboard` is unavailable.
+- Confirm print output hides controls and keeps the card readable on paper.
+
+Dependencies
+
+- Phase 1 route or source file path finalized.
+- Existing warning model understood.
+
+Required Resources
+
+- Product engineer.
+- AV domain reviewer for warning severity.
+- Browser print preview and clipboard tests.
+
+Estimated Timeline
+
+- 1-2 days.
+
+Owner / Responsible Party
+
+- Product engineer.
+
+Risks / Failure Points
+
+- Warning duplication can make the card noisy.
+- Missing one stop class creates a false sense of safety.
+- Changing summary text can break saved snapshots or operator muscle memory.
+
+Phase Name
+
+- Phase 4 — Mobile Operator Surface
+
+Goal
+
+- Keep the tape mark and safety state visible in the operator's thumb zone on a phone during load-in.
+
+Key Milestones
+
+- Add the zoom envelope and stop count to the sticky mobile bar.
+- Verify the bar shows mark, status, safe band, and stop count at 390 px and 320 px.
+- Reduce vertical travel from screen/lens inputs to the first valid answer.
+- Preserve keyboard navigation and screen reader announcements.
+- Test 200% zoom, portrait orientation, and touch interaction with plan/stage SVG controls.
+- Confirm no horizontal overflow and no overlap with print or full-screen states.
+
+Dependencies
+
+- Phase 3 warning status available to mobile bar.
+
+Required Resources
+
+- UX engineer.
+- Accessibility reviewer.
+- Chrome responsive mode or physical mobile device.
+
+Estimated Timeline
+
+- 1-2 days.
+
+Owner / Responsible Party
+
+- UX engineer.
+
+Risks / Failure Points
+
+- Sticky UI can cover action buttons, cards, or drawing controls.
+- Compressing too much data into the bar can make the mark harder to read.
+- Mobile fixes can accidentally degrade desktop layout.
+
+Phase Name
+
+- Phase 5 — Accessibility and Visual System Lock
+
+Goal
+
+- Keep Throwline readable, operable, and visually consistent as a road-case instrument, not a generic SaaS page.
+
+Key Milestones
+
+- Run a WCAG 2.2 AA-oriented pass across labels, focus order, focus visibility, touch targets, color contrast, live regions, and SVG descriptions.
+- Test keyboard-only operation from blank state to copied throw card.
+- Verify VoiceOver or screen-reader flow through inputs, warnings, drawing controls, and send actions.
+- Confirm semantic colors stay load-bearing: hazard for answer/cone, green for safe, red for stop, blue for optical facts.
+- Audit generated SVG output for hardcoded color drift and add a check if practical.
+- Preserve the condensed label typography, tabular monospace measurements, 4 px radius, and dark-room visual language.
+
+Dependencies
+
+- Phase 4 mobile layout stable.
+
+Required Resources
+
+- Accessibility reviewer.
+- UX/design reviewer.
+- Browser accessibility tooling and manual keyboard/screen reader testing.
+
+Estimated Timeline
+
+- 1-2 days.
+
+Owner / Responsible Party
+
+- Accessibility reviewer with implementing developer support.
+
+Risks / Failure Points
+
+- Automated accessibility checks will miss workflow clarity and live-region overload.
+- Palette changes can desynchronize drawings from controls.
+- Overcorrecting visuals can erase the field-tool identity.
+
+Phase Name
+
+- Phase 6 — Release Verification Harness
+
+Goal
+
+- Create a repeatable bench test so future edits cannot quietly break math, state, print, mobile layout, or handoff behavior.
+
+Key Milestones
+
+- Add a verification command or documented script for syntax checks, duplicate IDs, route metadata, and CSP presence.
+- Add calculation fixtures for throw distance, safe zone, brightness, N+1, shift guard, field verification, and gear solver ranking.
+- Add state hash roundtrip tests for current schema and legacy link handling.
+- Add JSON import/export tests for lenses, jobs, and show packs.
+- Add mobile viewport checks for 390 px overflow and sticky bar visibility.
+- Add print smoke checks for current card and show pack.
+
+Dependencies
+
+- Phases 1-5 source behavior stabilized.
+
+Required Resources
+
+- QA engineer.
+- Node or browser automation if already acceptable in repo.
+- Local static server.
+
+Estimated Timeline
+
+- 2-4 days.
+
+Owner / Responsible Party
+
+- QA engineer or implementing developer.
+
+Risks / Failure Points
+
+- Adding a package manager or build dependency violates repo constraints.
+- Overly brittle visual tests can slow future releases.
+- Fixture values must be reviewed against real projector math and not invented.
+
+Phase Name
+
+- Phase 7 — Companion 3D Stage
+
+Goal
+
+- Ship the Three.js stage as a shop-floor visualization/export companion while preserving the offline calculator as the field source of truth.
+
+Key Milestones
+
+- Keep 3D out of the core Throwline single-file artifact.
+- Resolve sidecar loading for `three-d-stage.js` and any path mismatch between root and packaged copies.
+- Fix mobile grid/canvas sizing so 390 px does not collapse the stage to a 1 px canvas.
+- Import Throwline state from hash or exported job JSON.
+- Verify all cameras, toggles, orbit controls, OBJ export, MTL export, and GLB export.
+- Add clear copy: companion model for planning/export, not the offline field calculator.
+
+Dependencies
+
+- Canonical Throwline route published.
+- Stage sidecar source available and intentionally included.
+- Network/CDN policy decided for Three.js companion page.
+
+Required Resources
+
+- Product engineer.
+- Browser visual testing.
+- AV reviewer for stage defaults and rig/cart assumptions.
+
+Estimated Timeline
+
+- 3-5 days.
+
+Owner / Responsible Party
+
+- Product engineer.
+
+Risks / Failure Points
+
+- CDN dependency fails in the same ballroom conditions Throwline is designed for.
+- 3D export paths can appear to work while producing empty or malformed files.
+- Users may mistake the companion for the verified calculator unless copy and navigation are explicit.
+
+Phase Name
+
+- Phase 8 — Data Expansion and Governance
+
+Goal
+
+- Grow lens and shift coverage without turning sourced data into unreviewed folklore.
+
+Key Milestones
+
+- Prioritize projector families common in rental and live-event workflows.
+- Add exact shift profiles with model, limits, source note, source URL, confidence state, and review date.
+- Preserve estimated rows as opt-in and visibly labeled.
+- Create a review cadence for stale manufacturer data.
+- Add before/after regression fixtures for changed lens or shift data.
+- Document the difference between manufacturer-sourced, estimated, operator-supplied, and unknown values.
+
+Dependencies
+
+- Phase 6 verification harness available.
+- AV domain reviewer available.
+
+Required Resources
+
+- AV data owner.
+- Manufacturer manuals and calculators.
+- Regression fixture process.
+
+Estimated Timeline
+
+- 2-6 weeks, ongoing.
+
+Owner / Responsible Party
+
+- AV data owner with product engineer review.
+
+Risks / Failure Points
+
+- Incorrect lens data can move a physical projector mark.
+- Manufacturer pages can change or disappear.
+- Expanding data without source notes reduces operator trust.
+
+Phase Name
+
+- Phase 9 — Optional Cloud Sync Decision
+
+Goal
+
+- Defer authentication, database, and cloud sync until shared-team workflow demand justifies the security and compliance cost.
+
+Key Milestones
+
+- Collect evidence that crews need shared shows or cross-device libraries beyond JSON handoff.
+- Define threat model before implementation.
+- If approved, design auth using standard OAuth/passkey/session primitives, not custom auth.
+- Add server-side authorization per show/library resource.
+- Add GDPR export/delete flows, audit logs, encrypted transport, encrypted backups, dependency scanning, and OWASP Top 10 review.
+- Keep local-only mode available.
+
+Dependencies
+
+- Product evidence of shared-team demand.
+- Security and privacy design approval.
+
+Required Resources
+
+- Product owner.
+- Security engineer.
+- Backend/infrastructure engineer.
+- Privacy/compliance reviewer.
+
+Estimated Timeline
+
+- 4-8 weeks after approval.
+
+Owner / Responsible Party
+
+- Product owner and security owner.
+
+Risks / Failure Points
+
+- Cloud sync can turn a low-risk static tool into a user-data system.
+- Weak authorization can expose show data.
+- Premature auth can slow field workflows and reduce adoption.
+
+3. EXECUTION NOTES
+
+Critical Sequencing Constraints
+
+- Choose the canonical Throwline route before SEO, sitemap, structured data, launch copy, or external links.
+- Fix copied/printed STOP warnings before positioning Throwline for field use.
+- Stabilize mobile warning state before adding the sticky safe-band display.
+- Keep Three.js out of the core artifact unless the offline-first constraint is explicitly revoked.
+- Build verification before large lens/profile expansion so data changes are testable.
+- Do not add auth, databases, or cloud sync before product demand and security scope are approved.
+
+Parallelizable Work
+
+- SEO metadata can proceed in parallel with changelog copy after the route is chosen.
+- Accessibility audit can begin while mobile layout work is in progress, but final pass must wait until the UI stabilizes.
+- Lens/profile source gathering can start before implementation, but data merges should wait for verification fixtures.
+- 3D companion visual testing can proceed separately from the core Throwline card and mobile work.
+
+Quick Wins
+
+- Add canonical route and sitemap entry.
+- Add full metadata and structured data.
+- Add STOP warnings to copied card output.
+- Add stop count to mobile bar.
+- Add privacy note explaining browser-local storage.
+
+Long-Lead Tasks
+
+- Curated lens and shift profile expansion.
+- Release verification harness with calculation fixtures.
+- 3D companion import/export verification.
+- Any future cloud sync, auth, and compliance work.
+
+4. NEXT ACTIONS
+
+- Choose the canonical public route for Throwline: `/ProjectorThrow` or `/throwline.html`.
+- Copy `Throwline SHOW 2.0 comps (1)/uploads/throwline-show-ready.html` into the chosen route path.
+- Add the chosen route to `sitemap.xml` with the current `lastmod`.
+- Add or update homepage and `av-suite.html` links so they point to the canonical Throwline route.
+- Audit `summaryText` against all stop-tier warning outputs and list the missing warning classes before editing.
