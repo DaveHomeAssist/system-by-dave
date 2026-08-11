@@ -53,6 +53,7 @@
     {id:'video-patch',name:'Video Patch',href:'video-patch.html',dept:'Video',phases:['prep','loadin','show'],tag:'Video',desc:'Sources, formats, connectors, switcher inputs, converters, destinations, routes, backups, and tests.',storageKeys:[{key:'sbd.videoPatch.v1',label:'Video Patch'}]},
     {id:'display-plan',name:'Display Plan',href:'display-plan.html',dept:'Video',phases:['advance','prep','loadin'],tag:'Displays',desc:'Displays, inputs, processors, resolutions, aspect ratios, refresh rates, routes, backups, and status.',storageKeys:[{key:'display-plan.v1',label:'Display Plan'}]},
     {id:'projection-plan',name:'Projection Plan',href:'projection-plan.html',dept:'Video',phases:['advance','prep','loadin'],tag:'Projection',desc:'Screens, surfaces, projectors, lenses, throw, positions, routes, blends, backup paths, and alignment.',storageKeys:[{key:'sbd.projectionPlan.v1',label:'Projection Plan'}]},
+    {id:'throwline',name:'Throwline',href:'ProjectorThrow/',dept:'Video',phases:['advance','prep','loadin','show'],tag:'Projection',desc:'Offline projector throw, fit, brightness, field verification, equipment selection, drawings, and multi-screen handoff.',storageKeys:[{key:'throwline:lenses:v2',label:'Throwline custom lenses'},{key:'throwline:jobs:v2',label:'Throwline saved jobs'},{key:'throwline:shift-profiles:v1',label:'Throwline shift profiles'},{key:'throwline:inventory:v1',label:'Throwline crew inventory'},{key:'throwline:show:v1',label:'Throwline current show'},{key:'throwline:theme:v1',label:'Throwline theme'}]},
     {id:'lighting-patch',name:'Lighting Patch',href:'lighting-patch.html',dept:'Lighting',phases:['advance','prep','loadin','show'],tag:'LX',desc:'Fixtures, positions, modes, universes, addresses, channels, dimmers, colors, focus notes, and status.',storageKeys:[{key:'lighting-patch.v1',label:'Lighting Patch'}]},
     {id:'cable-plan',name:'Cable Plan',href:'cable-plan.html',dept:'Build',phases:['prep','loadin','strike'],tag:'Cable',desc:'Cable types, lengths, source, destination, path, labels, owners, pull status, trip, and slack issues.',storageKeys:[{key:'cable-plan.v1',label:'Cable Plan'}]},
     {id:'rf-coordination',name:'RF Coordination',href:'rf-coordination.html',dept:'Comms',phases:['advance','prep','show'],tag:'RF',desc:'Wireless mics, IEM, IFB, comms packs, receivers, frequencies, bands, conflicts, and backups.',storageKeys:[{key:'rf-coordination.v1',label:'RF Coordination'}]},
@@ -69,9 +70,9 @@
 
   /* Per-phase recommendations shown by the console and the context dock. */
   var RECOMMENDED={
-    advance:['av-workbook','show-advance','site-survey','breakout-room-matrix','crew-call','plotforge','pixelforge','input-list'],
+    advance:['av-workbook','show-advance','site-survey','breakout-room-matrix','crew-call','throwline','plotforge','pixelforge','input-list'],
     prep:['av-workbook','gear-prep','truck-pack','cueforge','teleprompter','playback-check','pixelforge','audio-patch','video-patch','network-plan'],
-    loadin:['av-workbook','load-in-plan','room-check','show-board','power-plan','line-check','display-plan','projection-plan','speaker-plan','show-task-board'],
+    loadin:['av-workbook','load-in-plan','room-check','show-board','power-plan','line-check','display-plan','projection-plan','throwline','speaker-plan','show-task-board'],
     show:['av-workbook','teleprompter','show-timer','cueforge','show-board','show-task-board','breakout-room-matrix','pixelforge','record-log','comms-check','camera-shot-list'],
     strike:['av-workbook','strike-plan','truck-pack','cable-plan','show-task-board','crew-time-log'],
     closeout:['av-workbook','show-handoff','show-report','client-signoff','change-order','record-log','crew-time-log']
@@ -84,7 +85,7 @@
     {label:'Run of show',toolIds:['teleprompter','show-timer','cueforge','playback-check','comms-check']},
     {label:'Graphics',toolIds:['pixelforge','playback-check','display-plan','projection-plan']},
     {label:'Audio',toolIds:['audio-patch','line-check','input-list','signal-flow','speaker-plan','rf-coordination']},
-    {label:'Video',toolIds:['video-patch','display-plan','projection-plan','stream-plan','record-log','camera-shot-list']},
+    {label:'Video',toolIds:['video-patch','display-plan','projection-plan','throwline','stream-plan','record-log','camera-shot-list']},
     {label:'Lighting',toolIds:['lighting-patch']},
     {label:'Power & data',toolIds:['power-plan','network-plan','cable-plan']},
     {label:'Spaces & staging',toolIds:['show-board','plotforge','room-check','breakout-room-matrix','site-survey']},
@@ -166,7 +167,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool change — rolls the service-worker cache. */
-    version:'v20260806-site-navigation',
+    version:'v20260810-throwline-first-release',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,
