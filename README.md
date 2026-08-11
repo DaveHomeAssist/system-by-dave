@@ -52,6 +52,10 @@ Pushes to the default branch deploy automatically via GitHub Pages. The custom
 domain is set in `CNAME`. Update `sitemap.xml` (`lastmod`) whenever page
 content changes.
 
+## Portfolio governance
+
+- [Portfolio product roadmap — August 2026](docs/portfolio-product-roadmap-2026-08-10.md)
+
 ## Contributing
 
 This is a personal site, but see `AGENTS.md` for the conventions any
