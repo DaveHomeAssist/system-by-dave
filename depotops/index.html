@@ -28,7 +28,7 @@
 <meta name="apple-mobile-web-app-title" content="DepotOps">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" href="./icon.svg" type="image/svg+xml">
-<title>DepotOps v0.4.1 — Projects • Shopping • Warehouse</title>
+<title>DepotOps v0.5.0 — Projects • Shopping • Warehouse</title>
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <style>
 :root{
@@ -60,9 +60,9 @@ h1{margin:3px 0 8px;font-size:clamp(30px,5vw,54px);line-height:.96;text-transfor
 .toolbar{position:sticky;top:var(--topbar-height);z-index:35;background:#222;border:2px solid #222;padding:9px;display:grid;grid-template-columns:1.2fr .9fr 1fr auto auto auto;gap:8px;margin-bottom:12px}
 .toolbar input,.toolbar select{min-height:44px;min-width:0;width:100%;border:2px solid #555;padding:9px;background:#fff;color:#111}.toolbar .btn{min-width:0;width:100%}
 .btn{min-height:44px;border:2px solid #222;background:#fff;color:#222;padding:8px 11px;font-weight:900}.btn.orange{background:var(--orange);color:#fff}.btn.dark{background:#222;color:#fff;border-color:#fff}.btn.soft{background:#f1eee7}.btn.danger{background:#fff0ee;color:var(--red);border-color:var(--red)}.btn.small{min-height:36px;padding:5px 8px;font-size:12px}
-.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin-bottom:12px}.stat{background:var(--paper);border:2px solid #222;padding:11px;box-shadow:var(--shadow)}.stat .num{font-size:27px;font-weight:900}.stat .lab{font-size:10px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);font-weight:900}.progress{grid-column:1/-1;height:12px;border:2px solid #222;background:#ddd;overflow:hidden}.progress>div{height:100%;width:0;background:var(--orange)}
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin-bottom:12px}.stat{background:var(--paper);border:2px solid #222;padding:11px;box-shadow:var(--shadow)}.stat .num{font-size:27px;font-weight:900}.stat .lab{font-size:10px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);font-weight:900}.stats-note{grid-column:1/-1;color:var(--muted);font-size:11px;font-weight:800}.progress{grid-column:1/-1;height:12px;border:2px solid #222;background:#ddd;overflow:hidden}.progress>div{height:100%;width:0;background:var(--orange)}
 .grid{display:grid;grid-template-columns:1.72fr .78fr;gap:14px}.panel{background:var(--paper);border:2px solid #222;box-shadow:var(--shadow)}.panel-head{padding:11px 13px;border-bottom:2px solid #222;background:#f0ece4;display:flex;gap:10px;align-items:center;justify-content:space-between}.panel-head h2{margin:0;font-size:17px;text-transform:uppercase}.panel-head .actions{display:flex;gap:7px;flex-wrap:wrap}
-.items{padding:9px;display:grid;gap:8px}.runitem{border:2px solid #c9c3b8;background:#fff;padding:10px;display:grid;grid-template-columns:156px minmax(260px,1fr) minmax(132px,auto) 74px;gap:12px;align-items:center}.runitem[data-status="purchased"]{opacity:.65;background:#edf7ef}.runitem[data-status="hold"]{background:#eef7ff;border-color:#6a9fc8}.runitem[data-status="not_found"]{background:#fff3f1;border-color:#da8982}.runitem[data-status="skipped"]{opacity:.58}.runitem[data-workflow="active"]{border-left:8px solid var(--green)}.runitem[data-workflow="gated"]{border-left:8px solid var(--blue)}.runitem[data-workflow="parked"]{border-left:8px solid #777}.runitem[data-workflow="review"]{border-left:8px solid var(--yellow)}.runitem[data-workflow="superseded"]{border-left:8px solid var(--red);background:#fff6f4}.qtyctrl{display:grid;grid-template-columns:44px 1fr 44px;align-items:center;border:2px solid #222}.qtyctrl button{width:44px;height:44px;border:0;background:#eee;font-weight:900}.qtyctrl output{text-align:center;font-weight:900}.itemname{font-weight:900;min-width:0;overflow-wrap:anywhere}.meta{font-size:12px;color:var(--muted);overflow-wrap:anywhere}.workflow-note{font-size:11px;font-weight:800;margin-top:5px;color:var(--ink)}.runitem>div{min-width:0}.tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:4px}.tag{font-size:10px;text-transform:uppercase;font-weight:900;padding:4px 6px;border:1px solid currentColor}.tag.project{color:#555;background:#f4f4f4}.tag.must{color:var(--red);background:#fff1ef}.tag.buy{color:#805600;background:#fff8e5}.tag.verify{color:var(--blue);background:#eef7ff}.tag.state-active{color:var(--green);background:#edf7ef}.tag.state-gated{color:var(--blue);background:#eef7ff}.tag.state-parked{color:#555;background:#f0efec}.tag.state-review{color:#805600;background:#fff8e5}.tag.state-completed{color:var(--green);background:#edf7ef}.tag.state-superseded{color:var(--red);background:#fff1ef}.project-link{color:inherit;text-decoration-thickness:2px;text-underline-offset:2px}.project-link:hover{color:var(--orange2)}
+.items{padding:9px;display:grid;gap:8px}.runitem{border:2px solid #c9c3b8;background:#fff;padding:10px;display:grid;grid-template-columns:156px minmax(260px,1fr) minmax(148px,auto) 88px;gap:12px;align-items:start}.runitem[data-status="purchased"]{opacity:.65;background:#edf7ef}.runitem[data-status="partially_purchased"]{background:#fff8e5;border-color:#c89219}.runitem[data-status="hold"]{background:#eef7ff;border-color:#6a9fc8}.runitem[data-status="not_found"]{background:#fff3f1;border-color:#da8982}.runitem[data-status="skipped"]{opacity:.58}.runitem[data-workflow="active"]{border-left:8px solid var(--green)}.runitem[data-workflow="gated"]{border-left:8px solid var(--blue)}.runitem[data-workflow="parked"]{border-left:8px solid #777}.runitem[data-workflow="review"]{border-left:8px solid var(--yellow)}.runitem[data-workflow="superseded"]{border-left:8px solid var(--red);background:#fff6f4}.run-control{display:grid;gap:4px;min-width:0}.control-label{color:var(--muted);font-size:10px;font-weight:900;letter-spacing:.07em;text-transform:uppercase}.qtyctrl{display:grid;grid-template-columns:44px 1fr 44px;align-items:center;border:2px solid #222}.qtyctrl button{width:44px;height:44px;border:0;background:#eee;font-weight:900}.qtyctrl output{text-align:center;font-weight:900}.quantity-state{min-height:16px;font-size:10px;font-weight:900;text-transform:uppercase}.quantity-state.partial{color:#805600}.quantity-state.overage{color:var(--red)}.itemname{font-weight:900;min-width:0;overflow-wrap:anywhere}.meta{font-size:12px;color:var(--muted);overflow-wrap:anywhere}.workflow-note{font-size:11px;font-weight:800;margin-top:5px;color:var(--ink)}.runitem>div{min-width:0}.tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:4px}.tag{font-size:10px;text-transform:uppercase;font-weight:900;padding:4px 6px;border:1px solid currentColor}.tag.project{color:#555;background:#f4f4f4}.tag.must{color:var(--red);background:#fff1ef}.tag.buy{color:#805600;background:#fff8e5}.tag.verify{color:var(--blue);background:#eef7ff}.tag.state-active{color:var(--green);background:#edf7ef}.tag.state-gated{color:var(--blue);background:#eef7ff}.tag.state-parked{color:#555;background:#f0efec}.tag.state-review{color:#805600;background:#fff8e5}.tag.state-completed{color:var(--green);background:#edf7ef}.tag.state-superseded{color:var(--red);background:#fff1ef}.project-link{color:inherit;text-decoration-thickness:2px;text-underline-offset:2px}.project-link:hover{color:var(--orange2)}
 .product-link{
   display:inline-flex;align-items:center;gap:5px;margin-top:7px;
   color:#fff;background:var(--orange);border:2px solid #222;
@@ -73,7 +73,7 @@ h1{margin:3px 0 8px;font-size:clamp(30px,5vw,54px);line-height:.96;text-transfor
 .product-link.search{background:#fff;color:#222}
 .product-meta{font-size:10px;color:var(--muted);margin-left:6px}
 
-.statussel{min-height:44px;border:2px solid #222;background:white;padding:7px;font-weight:800}.pqty{width:72px;min-height:44px;border:2px solid #222;padding:7px}
+.statussel{width:100%;min-height:44px;border:2px solid #222;background:white;padding:7px;font-weight:800}.pqty{width:100%;min-height:44px;border:2px solid #222;padding:7px}
 .sidebar{display:grid;gap:14px}.note-card{padding:13px}.note-card h3{margin:0 0 7px;text-transform:uppercase;font-size:15px}.warn{border-left:8px solid var(--yellow)}.goal{border-left:8px solid var(--green)}.holdbox{border-left:8px solid var(--blue)}ul.compact{margin:7px 0 0;padding-left:18px;color:var(--muted)}
 .empty{padding:26px;text-align:center;color:var(--muted)}
 .projects-workspace{display:grid;grid-template-columns:minmax(0,1fr) minmax(390px,.48fr);grid-template-areas:"board inspector";gap:14px;align-items:start}.project-board-panel{grid-area:board}.project-board{padding:10px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.project-card{border:2px solid #222;background:#fff;padding:13px;position:relative;transition:border-color .16s ease,box-shadow .16s ease,transform .16s ease}.project-card:hover{transform:translateY(-2px);box-shadow:0 6px 0 rgba(0,0,0,.12)}.project-card.is-selected{border-color:var(--orange);box-shadow:0 0 0 3px var(--orange),0 8px 0 rgba(249,99,2,.14)}.project-card.is-selected::before{content:"INSPECTING";position:absolute;left:12px;top:-10px;background:var(--orange);color:#fff;border:2px solid #222;padding:2px 6px;font-size:9px;font-weight:900;letter-spacing:.08em}.project-card h3{margin:2px 0 5px;text-transform:uppercase;padding-right:84px}.project-card .status{position:absolute;right:9px;top:9px}.project-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin:10px 0}.mini{background:#f2efe9;border:1px solid #ccc;padding:6px}.mini b{display:block;font-size:18px}.mini span{font-size:9px;text-transform:uppercase;color:var(--muted);font-weight:900}.card-actions{display:flex;gap:6px;flex-wrap:wrap}.project-next{border-top:1px solid var(--line);margin-top:9px;padding-top:8px;font-size:11px}.project-next b{display:block;text-transform:uppercase;letter-spacing:.06em;font-size:9px;color:var(--muted)}
@@ -83,16 +83,16 @@ h1{margin:3px 0 8px;font-size:clamp(30px,5vw,54px);line-height:.96;text-transfor
 .warehouse-layout{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}.inventory-list{padding:9px;display:grid;gap:8px}.inventory-item{border:2px solid #c7c1b7;background:#fff;padding:10px}.inventory-item.low{border-color:var(--red);background:#fff5f3}.inventory-head{display:flex;justify-content:space-between;gap:10px}.stock{font-size:24px;font-weight:900}.stockline{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-top:7px}.stockctrl{display:flex;gap:4px}.stockctrl button{min-width:44px;min-height:44px;border:2px solid #222;background:#eee;font-weight:900}.type{color:var(--orange);font-size:10px;text-transform:uppercase;font-weight:900}.toolrow{padding:10px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:10px}.toolrow:last-child{border-bottom:0}.toolname{font-weight:900}
 .utility{display:flex;gap:7px;flex-wrap:wrap;padding:10px;background:#222;margin-bottom:12px}
 .footer{margin-top:14px;background:#222;color:#ddd;padding:11px 13px;border-top:4px solid var(--orange);display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap}.footer a{color:#fff;font-weight:900}
-dialog{width:min(680px,calc(100vw - 24px));max-height:90vh;overflow:auto;border:3px solid #222;padding:0;background:var(--paper);box-shadow:0 24px 70px rgba(0,0,0,.35)}dialog::backdrop{background:rgba(0,0,0,.58)}.modal-head{background:var(--orange);color:#fff;padding:12px 14px;border-bottom:3px solid #222;display:flex;justify-content:space-between;align-items:center}.modal-head h2{margin:0;text-transform:uppercase;font-size:18px}.modal-body{padding:14px}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.field{display:grid;gap:4px}.field.full{grid-column:1/-1}.field label{font-size:11px;text-transform:uppercase;font-weight:900;color:var(--muted)}.field input,.field select,.field textarea{min-height:44px;border:2px solid #333;padding:8px;background:#fff}.modal-actions{display:flex;justify-content:flex-end;gap:7px;margin-top:14px;flex-wrap:wrap}.reconcile-row{border:2px solid #ccc;padding:9px;margin-bottom:8px;display:grid;grid-template-columns:1fr 100px;gap:10px;align-items:center}.reconcile-row input{min-height:44px;border:2px solid #222;padding:7px;width:100%}
+dialog{width:min(680px,calc(100vw - 24px));max-height:90vh;overflow:auto;border:3px solid #222;padding:0;background:var(--paper);box-shadow:0 24px 70px rgba(0,0,0,.35)}#reconcileDialog{width:min(820px,calc(100vw - 24px))}dialog::backdrop{background:rgba(0,0,0,.58)}.modal-head{position:sticky;top:0;z-index:3;background:var(--orange);color:#fff;padding:12px 14px;border-bottom:3px solid #222;display:flex;justify-content:space-between;align-items:center}.modal-head h2{margin:0;text-transform:uppercase;font-size:18px}.modal-body{padding:14px}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.field{display:grid;gap:4px}.field.full{grid-column:1/-1}.field label{font-size:11px;text-transform:uppercase;font-weight:900;color:var(--muted)}.field input,.field select,.field textarea{min-height:44px;border:2px solid #333;padding:8px;background:#fff}.modal-actions{display:flex;justify-content:flex-end;gap:7px;margin-top:14px;flex-wrap:wrap}.closeout-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:12px 0}.closeout-summary .stat{box-shadow:none;padding:8px}.closeout-section{border-top:3px solid #222;margin-top:16px;padding-top:12px}.closeout-section h3{margin:0 0 4px;text-transform:uppercase;font-size:14px}.closeout-tools{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin:10px 0}.closeout-decision,.reconcile-row{border:2px solid #ccc;padding:10px;margin-bottom:8px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center}.decision-options{display:flex;gap:7px;flex-wrap:wrap}.decision-options label{display:flex;align-items:center;gap:6px;min-height:44px;border:2px solid #222;background:#fff;padding:7px 9px;font-weight:800}.decision-options input{width:20px;height:20px}.reconcile-row{grid-template-columns:minmax(0,1fr) 124px}.reconcile-row input{min-height:44px;border:2px solid #222;padding:7px;width:100%}.closeout-submitbar{position:sticky;bottom:0;z-index:3;margin:12px -14px -14px;padding:10px 14px;background:var(--paper);border-top:3px solid #222;box-shadow:0 -10px 24px rgba(0,0,0,.14)}.closeout-submitbar .modal-actions{margin-top:8px}.decision-status{min-height:22px;padding:9px;border:2px solid #222;background:#fff8e5;font-weight:900}.decision-status.ready{background:#edf7ef;color:var(--green);border-color:var(--green)}
 .toast{position:fixed;right:16px;bottom:16px;z-index:100;background:#222;color:#fff;border:3px solid var(--orange);padding:10px 12px;opacity:0;pointer-events:none}.selftest{display:none;white-space:pre-wrap}
 @media(max-width:1180px){.projects-workspace{grid-template-columns:1fr;grid-template-areas:"inspector" "board"}.project-inspector{position:static;max-height:none}.project-detail{overflow:visible}.inspector-head{flex-direction:row;align-items:center}.inspector-heading{width:auto}.inspector-head .actions{width:auto}}
-@media(max-width:980px){.hero,.grid,.warehouse-layout{grid-template-columns:1fr}.project-board{grid-template-columns:1fr 1fr}.toolbar{grid-template-columns:1fr 1fr auto}.runitem{grid-template-columns:156px minmax(0,1fr) 132px}.runitem .statussel{grid-column:3}.runitem .pqty{grid-column:3}.stats{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:980px){.hero,.grid,.warehouse-layout{grid-template-columns:1fr}.project-board{grid-template-columns:1fr 1fr}.toolbar{grid-template-columns:1fr 1fr auto}.runitem{grid-template-columns:156px minmax(0,1fr) 148px}.runitem .run-control.purchased{grid-column:3}.stats{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:680px){
   :root{--topbar-height:64px}
   .topinner{padding:8px 10px;align-items:center}.brand>div:last-child{display:none}.logo{width:40px;height:40px}nav{flex-wrap:nowrap}.navbtn{padding:6px 8px;font-size:11px;white-space:nowrap}
   .shell{padding:9px}.hero{padding:12px;grid-template-columns:1fr}.storebox{display:none}.toolbar{grid-template-columns:1fr 1fr;padding:7px}.toolbar input{grid-column:1/-1}.toolbar .wide{grid-column:1/-1}
-  .stats{grid-template-columns:repeat(2,1fr)}.runitem{grid-template-columns:1fr 1fr;gap:8px}.runitem>div:nth-child(2){grid-column:1/-1}.qtyctrl{width:156px;grid-column:1/-1}.statussel{grid-column:1!important;width:100%}.pqty{grid-column:2!important;width:100%}.project-board{grid-template-columns:1fr}.inspector-head{flex-direction:column;align-items:flex-start}.inspector-head .actions{width:100%}.inspector-head .actions .btn{flex:1}.linked-row{grid-template-columns:1fr}.requirement-metrics{grid-template-columns:1fr 1fr}
-  .warehouse-layout{grid-template-columns:1fr}.formgrid,.project-context .context-grid{grid-template-columns:1fr}.field.full{grid-column:auto}.reconcile-row{grid-template-columns:1fr}.panel-head{align-items:flex-start}.panel-head .actions{justify-content:flex-end}.btn.small,.product-link,a.project-link{min-width:44px;min-height:44px}.tag.project-link,a.project-link{display:inline-flex;align-items:center}
+  .stats{grid-template-columns:repeat(2,1fr)}.runitem{grid-template-columns:1fr 1fr;gap:8px}.runitem>div:nth-child(2){grid-column:1/-1}.run-control.requested{grid-column:1/-1}.run-control.status{grid-column:1!important}.run-control.purchased{grid-column:2!important}.qtyctrl{width:156px}.project-board{grid-template-columns:1fr}.inspector-head{flex-direction:column;align-items:flex-start}.inspector-head .actions{width:100%}.inspector-head .actions .btn{flex:1}.linked-row{grid-template-columns:1fr}.requirement-metrics{grid-template-columns:1fr 1fr}
+  .warehouse-layout{grid-template-columns:1fr}.formgrid,.project-context .context-grid{grid-template-columns:1fr}.closeout-summary{grid-template-columns:1fr 1fr}.field.full{grid-column:auto}.closeout-decision,.reconcile-row{grid-template-columns:1fr}.decision-options{display:grid;grid-template-columns:1fr 1fr}.decision-options label:only-child{grid-column:1/-1}.panel-head{align-items:flex-start}.panel-head .actions{justify-content:flex-end}.btn.small,.product-link,a.project-link{min-width:44px;min-height:44px}.tag.project-link,a.project-link{display:inline-flex;align-items:center}
 }
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}}
 </style>
@@ -106,7 +106,7 @@ dialog{width:min(680px,calc(100vw - 24px));max-height:90vh;overflow:auto;border:
 </noscript>
 <header class="topbar">
   <div class="topinner">
-    <div class="brand"><div class="logo">DO</div><div>DEPOTOPS <small>v0.4.1 • Projects • Shopping • Warehouse</small></div></div>
+    <div class="brand"><div class="logo">DO</div><div>DEPOTOPS <small>v0.5.0 • Projects • Shopping • Warehouse</small></div></div>
     <nav aria-label="Primary">
       <button class="navbtn active" data-page="shopping" aria-pressed="true">Shopping Run</button>
       <button class="navbtn" data-page="projects" aria-pressed="false">Projects</button>
@@ -131,16 +131,17 @@ dialog{width:min(680px,calc(100vw - 24px));max-height:90vh;overflow:auto;border:
       <button class="btn dark" id="neededOnlyBtn">Show Purchased</button>
     </div>
     <section class="stats">
-      <div class="stat"><div class="num" id="runVisible">0</div><div class="lab">Visible Items</div></div>
-      <div class="stat"><div class="num" id="runPurchased">0</div><div class="lab">Purchased</div></div>
-      <div class="stat"><div class="num" id="runMust">0</div><div class="lab">Actionable</div></div>
-      <div class="stat"><div class="num" id="runProjects">0</div><div class="lab">Linked Projects</div></div>
-      <div class="stat"><div class="num" id="runRemaining">0</div><div class="lab">Remaining</div></div>
+      <div class="stat"><div class="num" id="runVisible">0</div><div class="lab">Shown</div></div>
+      <div class="stat"><div class="num" id="runPurchased">0</div><div class="lab">Run Purchased</div></div>
+      <div class="stat"><div class="num" id="runMust">0</div><div class="lab">Ready to Buy</div></div>
+      <div class="stat"><div class="num" id="runProjects">0</div><div class="lab">Run Projects</div></div>
+      <div class="stat"><div class="num" id="runRemaining">0</div><div class="lab">Run Unresolved</div></div>
+      <div class="stats-note">Shown respects filters. Other totals describe the full run.</div>
       <div class="progress"><div id="runProgress"></div></div>
     </section>
     <div class="grid">
       <section class="panel">
-        <div class="panel-head"><h2 id="runTitle">Active Run</h2><div class="actions"><button class="btn small soft" id="completeRunBtn">Complete & Reconcile</button></div></div>
+        <div class="panel-head"><h2 id="runTitle">Active Run</h2><div class="actions"><button class="btn small soft" id="completeRunBtn">Review & Close Run</button></div></div>
         <div id="runItems" class="items"></div>
       </section>
       <aside class="sidebar">
@@ -174,18 +175,20 @@ dialog{width:min(680px,calc(100vw - 24px));max-height:90vh;overflow:auto;border:
     </div>
   </section>
 
-  <div class="footer"><span><b>DepotOps v0.4.1:</b> persistent project inspector • 48 canonical rows • recent Notion project links • local-first state.</span><a href="../index.html">System by Dave home</a></div>
+  <div class="footer"><span><b>DepotOps v0.5.0:</b> enforced run state • explicit closeout decisions • safe follow-up runs • local-first state.</span><a href="../index.html">System by Dave home</a></div>
 </div>
 
 <dialog id="editorDialog"><form method="dialog" id="editorForm"><div class="modal-head"><h2 id="editorTitle">Edit</h2><button class="btn small dark" value="cancel">Close</button></div><div class="modal-body"><div class="formgrid" id="editorFields"></div><div class="modal-actions"><button class="btn" value="cancel">Cancel</button><button class="btn orange" id="editorSave" value="default">Save</button></div></div></form></dialog>
-<dialog id="reconcileDialog"><form method="dialog" id="reconcileForm"><div class="modal-head"><h2>Complete & Reconcile Run</h2><button class="btn small dark" value="cancel">Close</button></div><div class="modal-body"><p>Enter any purchased quantity that should become general Warehouse stock or unused leftovers. Project-only material can remain at 0.</p><div id="reconcileRows"></div><div class="modal-actions"><button class="btn" value="cancel">Cancel</button><button class="btn orange" id="reconcileSave" value="default">Complete Run</button></div></div></form></dialog>
+<dialog id="reconcileDialog"><form method="dialog" id="reconcileForm"><div class="modal-head"><h2>Review & Close Run</h2><button class="btn small dark" value="cancel">Close</button></div><div class="modal-body"><p>Resolve every remainder and accept every overage before closing. DepotOps validates the full closeout before changing run or Warehouse state.</p><div id="closeoutSummary" class="closeout-summary"></div><section id="unresolvedSection" class="closeout-section"><div class="closeout-tools"><div><h3>Unresolved rows</h3><div class="meta">Carry remaining quantity into a follow-up run or skip it from this run.</div></div><button class="btn small soft" id="carryAllBtn" type="button">Carry all eligible</button></div><div class="field full"><label for="followupName">Follow-up run name</label><input id="followupName" name="followupName" type="text"></div><div id="closeoutDecisions"></div></section><section id="overageSection" class="closeout-section"><h3>Quantity overages</h3><div class="meta">Each quantity above the request needs explicit acceptance.</div><div id="overageDecisions"></div></section><section class="closeout-section"><h3>Warehouse allocation</h3><p class="meta">Enter how much of each acquired quantity becomes general stock or unused leftovers. Project-only material can remain at 0.</p><div id="reconcileRows"></div></section><div class="closeout-submitbar"><div id="closeoutRemaining" class="decision-status" role="status" aria-live="polite"></div><div class="modal-actions"><button class="btn" value="cancel">Cancel</button><button class="btn orange" id="reconcileSave" value="default" disabled>Close Run</button></div></div></div></form></dialog>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <pre id="selftest" class="selftest"></pre>
 
 <script>
 "use strict";
-const SCHEMA_VERSION=4, STORAGE_KEY="depotops-v0.2-state";
-const STATUS_ORDER=["needed","in_cart","purchased","not_found","skipped","hold"];
+const SCHEMA_VERSION=5, STORAGE_KEY="depotops-v0.2-state";
+const STATUS_ORDER=["needed","in_cart","partially_purchased","purchased","not_found","skipped","hold"];
+const EDITABLE_STATUS_ORDER=STATUS_ORDER.filter(x=>x!=="partially_purchased");
+const CLOSEOUT_DISPOSITIONS=new Set(["fulfilled","fulfilled_overage","carried_forward","skipped","skipped_remainder"]);
 const FOCUS_WORKFLOW_STATES=new Set(["active","gated","parked","review"]);
 const PRODUCT_LINKS={
  "itm-pvc40":{url:"https://www.homedepot.com/p/202352537",exact:true,label:"Home Depot product",model:"A52BA12H",internet:"202352537"},
@@ -343,7 +346,7 @@ const NOTION_RUN={id:"run-notion-canonical",name:"Notion Home Depot List — 08/
 const NOTION_RUN_ITEMS=NOTION_LIST_ITEMS.map(x=>{const link=ITEM_PROJECT_LINKS[x.id];return {id:`sri-${x.id}`,runId:NOTION_RUN.id,itemId:x.id,projectRequirementId:null,projectId:link.projectIds[0],projectIds:[...link.projectIds],workflowState:link.workflowState,workflowNote:link.workflowNote,requestedQty:1,purchasedQty:x.purchased?1:0,status:x.purchased?"purchased":"needed",priority:x.priority,source:"notion",notes:x.notes}});
 
 const seedState={
- schemaVersion:4,
+ schemaVersion:5,
  projects:[
   ...NOTION_PROJECTS
  ],
@@ -425,14 +428,21 @@ const seedState={
 
 let state=loadState();
 
+function toCount(value){const n=Number(value);return Number.isFinite(n)?Math.max(0,Math.floor(n)):0}
+function normalizeRunItemState(row){
+ row.requestedQty=toCount(row.requestedQty);row.purchasedQty=toCount(row.purchasedQty);
+ if(row.purchasedQty>0)row.status=row.purchasedQty<row.requestedQty?"partially_purchased":"purchased";
+ else if(!EDITABLE_STATUS_ORDER.includes(row.status))row.status="needed";
+ return row
+}
 function validateState(s){
  const arrays=["projects","catalogItems","requirements","inventory","shoppingRuns","shoppingRunItems","tools","locations","stores"];
- if(!s||typeof s!=="object"||!Number.isInteger(s.schemaVersion)) return {ok:false,error:"Missing schemaVersion."};
+ if(!s||typeof s!=="object"||s.schemaVersion!==SCHEMA_VERSION) return {ok:false,error:`Expected schemaVersion ${SCHEMA_VERSION}.`};
  for(const k of arrays) if(!Array.isArray(s[k])) return {ok:false,error:`Missing array: ${k}`};
  const all=[...s.projects,...s.catalogItems,...s.requirements,...s.inventory,...s.shoppingRuns,...s.shoppingRunItems,...s.tools,...s.locations,...s.stores];
  const ids=all.map(x=>x.id);
  if(ids.some(x=>!x)||new Set(ids).size!==ids.length) return {ok:false,error:"IDs must be present and globally unique."};
- const itemIds=new Set(s.catalogItems.map(x=>x.id)), projectIds=new Set(s.projects.map(x=>x.id)), runIds=new Set(s.shoppingRuns.map(x=>x.id));
+ const itemIds=new Set(s.catalogItems.map(x=>x.id)), projectIds=new Set(s.projects.map(x=>x.id)), runIds=new Set(s.shoppingRuns.map(x=>x.id)),runItemIds=new Set(s.shoppingRunItems.map(x=>x.id));
  if(!s.settings||typeof s.settings!=="object") return {ok:false,error:"Missing settings."};
  if(s.settings.activeRunId&&!runIds.has(s.settings.activeRunId)) return {ok:false,error:"Invalid active shopping run."};
  if(s.settings.selectedProjectId&&!projectIds.has(s.settings.selectedProjectId)) return {ok:false,error:"Invalid selected project."};
@@ -441,6 +451,19 @@ function validateState(s){
  if(s.requirements.some(x=>!itemIds.has(x.itemId)||!projectIds.has(x.projectId))) return {ok:false,error:"Invalid requirement relationship."};
  if(s.inventory.some(x=>!itemIds.has(x.itemId))) return {ok:false,error:"Invalid inventory relationship."};
  if(s.shoppingRunItems.some(x=>!itemIds.has(x.itemId)||!runIds.has(x.runId)||(x.projectId&&!projectIds.has(x.projectId))||(x.projectIds&&(!Array.isArray(x.projectIds)||x.projectIds.some(id=>!projectIds.has(id)))))) return {ok:false,error:"Invalid shopping-run relationship."};
+ if(s.shoppingRuns.some(x=>!["active","completed"].includes(x.status))) return {ok:false,error:"Invalid shopping-run status."};
+ if(s.shoppingRuns.some(x=>(x.sourceRunId&&!runIds.has(x.sourceRunId))||(x.closedWithFollowupRunId&&!runIds.has(x.closedWithFollowupRunId)))) return {ok:false,error:"Invalid shopping-run closeout relationship."};
+ for(const row of s.shoppingRunItems){
+  if(!Number.isInteger(row.requestedQty)||row.requestedQty<0||!Number.isInteger(row.purchasedQty)||row.purchasedQty<0) return {ok:false,error:`Invalid quantity on ${row.id}.`};
+  if(!STATUS_ORDER.includes(row.status)) return {ok:false,error:`Invalid shopping status on ${row.id}.`};
+  const expected=row.purchasedQty>0?(row.purchasedQty<row.requestedQty?"partially_purchased":"purchased"):row.status;
+  if(row.purchasedQty>0&&row.status!==expected) return {ok:false,error:`Purchased quantity and status disagree on ${row.id}.`};
+  if(row.purchasedQty===0&&["partially_purchased","purchased"].includes(row.status)) return {ok:false,error:`Purchase status has no quantity on ${row.id}.`};
+  if(row.closeoutDisposition&&!CLOSEOUT_DISPOSITIONS.has(row.closeoutDisposition)) return {ok:false,error:`Invalid closeout disposition on ${row.id}.`};
+  if(row.sourceRunItemId&&!runItemIds.has(row.sourceRunItemId)) return {ok:false,error:`Invalid carried-row source on ${row.id}.`};
+  if(row.carriedToRunId&&!runIds.has(row.carriedToRunId)) return {ok:false,error:`Invalid follow-up run on ${row.id}.`};
+  if(row.closeoutDisposition==="carried_forward"&&!row.carriedToRunId) return {ok:false,error:`Missing follow-up run on ${row.id}.`};
+ }
  return {ok:true};
 }
 function mergeMissing(current=[],additions=[]){
@@ -466,13 +489,17 @@ function upgradeToV4(s){
  n.shoppingRunItems=mergeMissing(n.shoppingRunItems,NOTION_RUN_ITEMS);
  n.requirements=(n.requirements||[]).map(x=>{const canonical=seedRequirements.get(x.id);return canonical?{...x,projectId:canonical.projectId,status:canonical.status,notes:canonical.notes}:x});
  n.settings={...n.settings,activeRunId:NOTION_RUN.id,selectedProjectId:n.settings?.selectedProjectId===LEGACY_NOTION_PROJECT_ID?"prj-panel":n.settings?.selectedProjectId||"prj-panel",neededOnly:true,focusOnly:true};
- n.schemaVersion=SCHEMA_VERSION;return n
+ n.schemaVersion=4;return n
+}
+function upgradeToV5(s){
+ const n=clone(s);n.shoppingRunItems=(n.shoppingRunItems||[]).map(normalizeRunItemState);n.schemaVersion=SCHEMA_VERSION;return n
 }
 function migrateState(s){
  if(!s||typeof s!=="object") return clone(seedState);
- if(s.schemaVersion===4) return s;
- if(s.schemaVersion===3) return upgradeToV4(s);
- if(s.schemaVersion===2) return upgradeToV4(addCanonicalNotionList(s));
+ if(s.schemaVersion===5) return s;
+ if(s.schemaVersion===4) return upgradeToV5(s);
+ if(s.schemaVersion===3) return upgradeToV5(upgradeToV4(s));
+ if(s.schemaVersion===2) return upgradeToV5(upgradeToV4(addCanonicalNotionList(s)));
  if(s.schemaVersion===1){const n=clone(seedState);n.settings={...n.settings,...s.settings,activeRunId:NOTION_RUN.id,selectedProjectId:"prj-panel",neededOnly:true,focusOnly:true};return n}
  return clone(seedState);
 }
@@ -528,7 +555,7 @@ function addRequirementShortageToRun(reqId,runId=activeRun()?.id){
  const qty=shortage(r); if(qty<=0)return false;
  const existing=state.shoppingRunItems.find(x=>x.runId===runId&&x.projectRequirementId===reqId&&x.status!=="skipped");
  const status=["verify","hold"].includes(r.status)||["verify","hold"].includes(cat?.verificationStatus)?"hold":"needed";
- if(existing){existing.requestedQty=Number(existing.requestedQty)+qty;existing.status=status}
+ if(existing){existing.requestedQty=toCount(existing.requestedQty)+qty;if(existing.purchasedQty===0)existing.status=status;normalizeRunItemState(existing)}
  else state.shoppingRunItems.push({id:uid("sri"),runId,itemId:r.itemId,projectRequirementId:reqId,projectId:r.projectId,projectIds:[r.projectId],workflowState:project(r.projectId)?.workflowState||"active",workflowNote:r.notes||"",requestedQty:qty,purchasedQty:0,status,priority:r.priority||"Buy",source:"project",notes:r.notes||""});
  saveState();return true
 }
@@ -537,19 +564,63 @@ function addLowStockToRun(invId,runId=activeRun()?.id){
  const cat=item(inv.itemId);
  const qty=Math.max(0,Number(inv.minimumQty||0)-Number(inv.quantity||0));if(!qty)return false;
  let ex=state.shoppingRunItems.find(x=>x.runId===runId&&x.itemId===inv.itemId&&x.source==="warehouse"&&x.status!=="skipped");
- if(ex)ex.requestedQty=Math.max(ex.requestedQty,qty);
+ if(ex){ex.requestedQty=Math.max(ex.requestedQty,qty);normalizeRunItemState(ex)}
  else state.shoppingRunItems.push({id:uid("sri"),runId,itemId:inv.itemId,projectRequirementId:null,projectId:null,projectIds:[],workflowState:"active",workflowNote:"Warehouse replenishment",requestedQty:qty,purchasedQty:0,status:["verify","hold"].includes(cat?.verificationStatus)?"hold":"needed",priority:"Reorder",source:"warehouse",notes:"Low-stock replenishment"});
  saveState();return true
 }
-function reconcileRun(runId,warehouseAdds={}){
- const run=byId(state.shoppingRuns,runId);if(!run||run.status==="completed")return false;
- const rows=state.shoppingRunItems.filter(x=>x.runId===runId);
- rows.forEach(x=>{if(x.status==="purchased"&&Number(x.purchasedQty||0)<=0)x.purchasedQty=Number(x.requestedQty||0)});
- Object.entries(warehouseAdds).forEach(([sriId,q])=>{
-  const sri=byId(rows,sriId),qty=Math.max(0,Number(q||0));if(!sri||!qty)return;
-  const inv=getOrCreateInventory(sri.itemId);inv.quantity=Number(inv.quantity||0)+qty;inv.updatedAt=new Date().toISOString()
- });
- run.status="completed";run.completedAt=new Date().toISOString();const next=state.shoppingRuns.find(r=>r.status==="active");state.settings.activeRunId=next?.id||run.id;saveState();return true
+function isRunItemResolved(row,run=byId(state.shoppingRuns,row.runId)){
+ if(run?.status==="completed"&&CLOSEOUT_DISPOSITIONS.has(row.closeoutDisposition))return true;
+ return ["purchased","skipped"].includes(row.status)
+}
+function runCloseoutIssues(runId){
+ const run=byId(state.shoppingRuns,runId),rows=state.shoppingRunItems.filter(x=>x.runId===runId);
+ return {run,rows,unresolved:rows.filter(x=>!isRunItemResolved(x,run)),overages:rows.filter(x=>x.purchasedQty>x.requestedQty),acquired:rows.filter(x=>x.purchasedQty>0)}
+}
+function carryStatusFor(row){return row.status==="hold"||row.workflowState!=="active"?"hold":"needed"}
+function reconcileRun(runId,options={}){
+ const {warehouseAdds={},resolutions={},overages={},followupName=""}=options||{},issues=runCloseoutIssues(runId),run=issues.run;
+ if(!run)return {ok:false,error:"Run not found."};
+ if(run.status==="completed")return {ok:false,error:"Run is already completed."};
+ for(const row of issues.unresolved)if(!["carry","skip"].includes(resolutions[row.id]))return {ok:false,error:`Choose carry forward or skip for ${item(row.itemId)?.name||row.id}.`};
+ for(const row of issues.overages)if(overages[row.id]!==true)return {ok:false,error:`Accept the quantity overage for ${item(row.itemId)?.name||row.id}.`};
+ const carryRows=issues.unresolved.filter(x=>resolutions[x.id]==="carry");
+ if(carryRows.some(x=>Math.max(0,x.requestedQty-x.purchasedQty)===0))return {ok:false,error:"A zero-quantity remainder cannot be carried forward."};
+ const cleanFollowupName=String(followupName||"").trim();
+ if(carryRows.length&&!cleanFollowupName)return {ok:false,error:"Name the follow-up run before closing."};
+ const acquiredIds=new Set(issues.acquired.map(x=>x.id));
+ for(const [id,value] of Object.entries(warehouseAdds)){
+  const row=byId(issues.acquired,id),qty=Number(value||0);
+  if(!acquiredIds.has(id))return {ok:false,error:"Warehouse allocation references a row with no acquired quantity."};
+  if(!Number.isInteger(qty)||qty<0||qty>row.purchasedQty)return {ok:false,error:`Warehouse quantity for ${item(row.itemId)?.name||id} must be a whole number from 0 to ${row.purchasedQty}.`}
+ }
+ const next=clone(state),nextRun=byId(next.shoppingRuns,runId),nextRows=next.shoppingRunItems.filter(x=>x.runId===runId),completedAt=new Date().toISOString();
+ let followup=null;
+ if(carryRows.length){
+  followup={id:uid("run"),name:cleanFollowupName,status:"active",storeId:run.storeId,createdAt:completedAt,completedAt:null,sourceRunId:runId};next.shoppingRuns.push(followup)
+ }
+ for(const current of issues.rows){
+  const row=byId(nextRows,current.id);
+  if(!isRunItemResolved(current,run)){
+   if(resolutions[current.id]==="carry"){
+    row.closeoutDisposition="carried_forward";row.carriedToRunId=followup.id;
+    const carried={...clone(row),id:uid("sri"),runId:followup.id,requestedQty:Math.max(0,row.requestedQty-row.purchasedQty),purchasedQty:0,status:carryStatusFor(row),sourceRunItemId:row.id};
+    delete carried.closeoutDisposition;delete carried.carriedToRunId;next.shoppingRunItems.push(carried)
+   }else{
+    row.closeoutDisposition="skipped_remainder";if(row.purchasedQty===0)row.status="skipped"
+   }
+  }else if(row.status==="skipped")row.closeoutDisposition="skipped";
+  else row.closeoutDisposition=row.purchasedQty>row.requestedQty?"fulfilled_overage":"fulfilled"
+ }
+ for(const current of issues.acquired){
+  const qty=Number(warehouseAdds[current.id]||0);if(!qty)continue;
+  let inv=next.inventory.find(x=>x.itemId===current.itemId);
+  if(!inv){inv={id:uid("inv"),itemId:current.itemId,quantity:0,stockMode:"exact",minimumQty:0,locationId:"loc-garage",status:"available",updatedAt:completedAt};next.inventory.push(inv)}
+  inv.quantity=toCount(inv.quantity)+qty;inv.updatedAt=completedAt
+ }
+ nextRun.status="completed";nextRun.completedAt=completedAt;nextRun.closedWithFollowupRunId=followup?.id||null;
+ next.settings.activeRunId=followup?.id||next.shoppingRuns.find(x=>x.id!==runId&&x.status==="active")?.id||runId;
+ const validation=validateState(next);if(!validation.ok)return {ok:false,error:`Closeout blocked: ${validation.error}`};
+ state=next;saveState();return {ok:true,followup,carriedCount:carryRows.length,completedRunId:runId}
 }
 
 const reduced=window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
@@ -588,34 +659,34 @@ function renderShopping(){
   if(neededOnly&&["purchased","skipped"].includes(x.status))return false;
   return !q||`${n} ${projects.map(p=>p.name).join(" ")} ${cat?.category||""} ${cat?.department||""} ${cat?.notes||""} ${x.workflowNote||""} ${x.status} ${x.priority}`.toLowerCase().includes(q)
  });
- rows=rows.map((x,index)=>({x,index})).sort((a,b)=>(WORKFLOW_RANK[a.x.workflowState]??9)-(WORKFLOW_RANK[b.x.workflowState]??9)||a.index-b.index).map(({x})=>x);
- $("runItems").innerHTML=rows.length?rows.map(x=>{
-  const projects=runItemProjects(x),cat=item(x.itemId),locked=run.status==="completed",urgent=["must","urgent","high"].includes(String(x.priority).toLowerCase()),workflow=x.workflowState||"active";
-  const projectTags=projects.length?projects.map(p=>p.notionUrl?`<a class="tag project project-link" href="${escapeHtml(p.notionUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(p.name)}</a>`:`<span class="tag project">${escapeHtml(p.name)}</span>`).join(""):'<span class="tag project">Warehouse</span>';
-  return `<article class="runitem" data-id="${x.id}" data-status="${x.status}" data-workflow="${escapeHtml(workflow)}">
-   <div class="qtyctrl" aria-label="Requested quantity"><button type="button" data-act="qty-" aria-label="Decrease requested quantity for ${escapeHtml(cat?.name||"item")}" ${locked?"disabled":""}>−</button><output aria-label="Requested quantity">${Number(x.requestedQty)}</output><button type="button" data-act="qty+" aria-label="Increase requested quantity for ${escapeHtml(cat?.name||"item")}" ${locked?"disabled":""}>+</button></div>
-   <div><div class="itemname">${escapeHtml(cat?.name||"Missing item")}</div><div class="meta">${escapeHtml([cat?.department,cat?.notes||x.notes].filter(Boolean).join(" · "))}</div><div class="workflow-note">${escapeHtml(x.workflowNote||"")}</div><div class="tags">${projectTags}<span class="tag state-${escapeHtml(workflow)}">${escapeHtml(WORKFLOW_LABELS[workflow]||workflow)}</span><span class="tag ${urgent?"must":"buy"}">${escapeHtml(x.priority)}</span>${x.source==="notion"?'<span class="tag verify">Notion</span>':cat?.verificationStatus==="verify"?'<span class="tag verify">Verify</span>':""}</div>${(()=>{const link=productLinkFor(cat);return link?`<a class="product-link ${link.exact?"":"search"}" href="${escapeHtml(link.url)}" target="_blank" rel="noopener noreferrer">↗ ${escapeHtml(link.label)}</a>${link.exact&&(link.model||link.internet)?`<span class="product-meta">${link.model?`Model ${escapeHtml(link.model)}`:""}${link.model&&link.internet?" · ":""}${link.internet?`Internet # ${escapeHtml(link.internet)}`:""}</span>`:""}`:""})()}${cat?.notionUrl?`<a class="product-link search" href="${escapeHtml(cat.notionUrl)}" target="_blank" rel="noopener noreferrer">↗ List row</a>`:""}</div>
-   <select class="statussel" data-act="status" aria-label="Shopping status" ${locked?"disabled":""}>${STATUS_ORDER.map(s=>`<option value="${s}" ${s===x.status?"selected":""}>${s.replace("_"," ")}</option>`).join("")}</select>
-   <input class="pqty" data-act="purchased" type="number" min="0" step="1" value="${Number(x.purchasedQty||0)}" aria-label="Purchased quantity" ${locked?"disabled":""}>
-  </article>`
- }).join(""):'<div class="empty">No matching run items.</div>';
- $("runVisible").textContent=rows.length;
- const all=state.shoppingRunItems.filter(x=>x.runId===run.id),purchased=all.filter(x=>x.status==="purchased").length,remaining=all.filter(x=>!["purchased","skipped"].includes(x.status)).length;
- $("runPurchased").textContent=purchased;$("runRemaining").textContent=remaining;$("runMust").textContent=all.filter(x=>x.workflowState==="active"&&x.status==="needed").length;
+	 rows=rows.map((x,index)=>({x,index})).sort((a,b)=>(WORKFLOW_RANK[a.x.workflowState]??9)-(WORKFLOW_RANK[b.x.workflowState]??9)||a.index-b.index).map(({x})=>x);
+	 $("runItems").innerHTML=rows.length?rows.map(x=>{
+	  const projects=runItemProjects(x),cat=item(x.itemId),locked=run.status==="completed",urgent=["must","urgent","high"].includes(String(x.priority).toLowerCase()),workflow=x.workflowState||"active",remainingQty=Math.max(0,x.requestedQty-x.purchasedQty),overage=Math.max(0,x.purchasedQty-x.requestedQty);
+	  const projectTags=projects.length?projects.map(p=>p.notionUrl?`<a class="tag project project-link" href="${escapeHtml(p.notionUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(p.name)}</a>`:`<span class="tag project">${escapeHtml(p.name)}</span>`).join(""):'<span class="tag project">Warehouse</span>';
+	  return `<article class="runitem" data-id="${x.id}" data-status="${x.status}" data-workflow="${escapeHtml(workflow)}">
+	   <div class="run-control requested"><span class="control-label" id="requested-${x.id}">Requested</span><div class="qtyctrl" aria-labelledby="requested-${x.id}"><button type="button" data-act="qty-" aria-label="Decrease requested quantity for ${escapeHtml(cat?.name||"item")}" ${locked?"disabled":""}>−</button><output>${x.requestedQty}</output><button type="button" data-act="qty+" aria-label="Increase requested quantity for ${escapeHtml(cat?.name||"item")}" ${locked?"disabled":""}>+</button></div></div>
+	   <div><div class="itemname">${escapeHtml(cat?.name||"Missing item")}</div><div class="meta">${escapeHtml([cat?.department,cat?.notes||x.notes].filter(Boolean).join(" · "))}</div><div class="workflow-note">${escapeHtml(x.workflowNote||"")}</div><div class="tags">${projectTags}<span class="tag state-${escapeHtml(workflow)}">${escapeHtml(WORKFLOW_LABELS[workflow]||workflow)}</span><span class="tag ${urgent?"must":"buy"}">${escapeHtml(x.priority)}</span>${x.source==="notion"?'<span class="tag verify">Notion</span>':cat?.verificationStatus==="verify"?'<span class="tag verify">Verify</span>':""}${x.closeoutDisposition?`<span class="tag project">${escapeHtml(x.closeoutDisposition.replaceAll("_"," "))}</span>`:""}</div>${(()=>{const link=productLinkFor(cat);return link?`<a class="product-link ${link.exact?"":"search"}" href="${escapeHtml(link.url)}" target="_blank" rel="noopener noreferrer">↗ ${escapeHtml(link.label)}</a>${link.exact&&(link.model||link.internet)?`<span class="product-meta">${link.model?`Model ${escapeHtml(link.model)}`:""}${link.model&&link.internet?" · ":""}${link.internet?`Internet # ${escapeHtml(link.internet)}`:""}</span>`:""}`:""})()}${cat?.notionUrl?`<a class="product-link search" href="${escapeHtml(cat.notionUrl)}" target="_blank" rel="noopener noreferrer">↗ List row</a>`:""}</div>
+	   <label class="run-control status"><span class="control-label">Shopping status</span><select class="statussel" data-act="status" ${locked?"disabled":""}>${STATUS_ORDER.map(s=>`<option value="${s}" ${s===x.status?"selected":""} ${s==="partially_purchased"?"disabled":""}>${s.replaceAll("_"," ")}${s==="partially_purchased"?" (derived)":""}</option>`).join("")}</select></label>
+	   <label class="run-control purchased"><span class="control-label">Purchased</span><input class="pqty" data-act="purchased" type="number" min="0" step="1" value="${x.purchasedQty}" ${locked?"disabled":""}><span class="quantity-state ${overage?"overage":remainingQty&&x.purchasedQty?"partial":""}">${overage?`Over by ${overage}`:remainingQty&&x.purchasedQty?`${remainingQty} left`:""}</span></label>
+	  </article>`
+	 }).join(""):'<div class="empty">No matching run items.</div>';
+	 $("runVisible").textContent=rows.length;
+	 const all=state.shoppingRunItems.filter(x=>x.runId===run.id),purchased=all.filter(x=>x.status==="purchased").length,remaining=all.filter(x=>!isRunItemResolved(x,run)).length;
+	 $("runPurchased").textContent=purchased;$("runRemaining").textContent=remaining;$("runMust").textContent=all.filter(x=>x.workflowState==="active"&&["needed","in_cart","partially_purchased"].includes(x.status)).length;
  $("runProjects").textContent=new Set(all.flatMap(x=>runItemProjects(x).map(p=>p.id))).size;
  motion.to("#runProgress",{width:`${all.length?purchased/all.length*100:0}%`,duration:.3});
- document.querySelectorAll(".runitem").forEach(el=>{
-  const sri=byId(state.shoppingRunItems,el.dataset.id);
-  el.querySelector('[data-act="qty-"]')?.addEventListener("click",()=>{sri.requestedQty=Math.max(0,Number(sri.requestedQty)-1);saveState();renderShopping()});
-  el.querySelector('[data-act="qty+"]')?.addEventListener("click",()=>{sri.requestedQty=Number(sri.requestedQty)+1;saveState();renderShopping()});
-  el.querySelector('[data-act="status"]')?.addEventListener("change",e=>{sri.status=e.target.value;if(sri.status==="purchased"&&!sri.purchasedQty)sri.purchasedQty=sri.requestedQty;saveState();renderShopping();toast(`Status: ${sri.status.replace("_"," ")}`)});
-  el.querySelector('[data-act="purchased"]')?.addEventListener("change",e=>{sri.purchasedQty=Math.max(0,Number(e.target.value||0));saveState()});
- });
+	 document.querySelectorAll(".runitem").forEach(el=>{
+	  const sri=byId(state.shoppingRunItems,el.dataset.id);
+	  el.querySelector('[data-act="qty-"]')?.addEventListener("click",()=>{sri.requestedQty=Math.max(0,sri.requestedQty-1);normalizeRunItemState(sri);saveState();renderShopping()});
+	  el.querySelector('[data-act="qty+"]')?.addEventListener("click",()=>{sri.requestedQty+=1;normalizeRunItemState(sri);saveState();renderShopping()});
+	  el.querySelector('[data-act="status"]')?.addEventListener("change",e=>{const selected=e.target.value;if(selected!=="purchased"&&sri.purchasedQty>0){toast("Clear Purchased before choosing a nonpurchase status");renderShopping();return}if(selected==="purchased"){if(sri.requestedQty===0)sri.requestedQty=1;sri.purchasedQty=sri.requestedQty}else sri.status=selected;normalizeRunItemState(sri);saveState();renderShopping();toast(`Status: ${sri.status.replaceAll("_"," ")}`)});
+	  el.querySelector('[data-act="purchased"]')?.addEventListener("change",e=>{sri.purchasedQty=toCount(e.target.value);normalizeRunItemState(sri);saveState();renderShopping()});
+	 });
  motion.from(".runitem",{opacity:0,x:-8,duration:.22,stagger:.018});
 }
 function projectStats(pid){
- const rows=state.shoppingRunItems.filter(x=>runItemProjects(x).some(p=>p.id===pid));
- return {rows:rows.length,purchased:rows.filter(x=>x.status==="purchased").length,outstanding:rows.filter(x=>!["purchased","skipped"].includes(x.status)).length}
+	 const rows=state.shoppingRunItems.filter(x=>runItemProjects(x).some(p=>p.id===pid));
+	 return {rows:rows.length,purchased:rows.filter(x=>x.status==="purchased").length,outstanding:rows.filter(x=>!isRunItemResolved(x)).length}
 }
 function syncProjectSelection(){
  document.querySelectorAll(".project-card").forEach(c=>{
@@ -691,11 +762,35 @@ $("editorForm").addEventListener("submit",e=>{if(e.submitter?.value==="cancel")r
 
 function openReconcile(){
  const run=activeRun();if(!run||run.status==="completed"){toast("Active run is already completed");return}
- const rows=state.shoppingRunItems.filter(x=>x.runId===run.id&&x.status==="purchased");
- $("reconcileRows").innerHTML=rows.length?rows.map(x=>`<div class="reconcile-row" data-id="${x.id}"><div><b>${escapeHtml(item(x.itemId)?.name||"")}</b><div class="meta">Purchased ${x.purchasedQty||x.requestedQty} · Source ${escapeHtml(x.source)}</div></div><div class="field"><label>To Warehouse</label><input name="${x.id}" type="number" min="0" max="${x.purchasedQty||x.requestedQty}" value="0"></div></div>`).join(""):'<div class="empty">No purchased items. You may still complete the run.</div>';
- $("reconcileDialog").showModal()
+ const issues=runCloseoutIssues(run.id),fulfilled=issues.rows.filter(x=>isRunItemResolved(x,run)).length;
+ $("closeoutSummary").innerHTML=`<div class="stat"><div class="num">${issues.rows.length}</div><div class="lab">Run rows</div></div><div class="stat"><div class="num">${fulfilled}</div><div class="lab">Resolved</div></div><div class="stat"><div class="num">${issues.unresolved.length}</div><div class="lab">Need decision</div></div><div class="stat"><div class="num">${issues.overages.length}</div><div class="lab">Overages</div></div>`;
+ $("unresolvedSection").hidden=issues.unresolved.length===0;
+ $("closeoutDecisions").innerHTML=issues.unresolved.map(x=>{const remaining=Math.max(0,x.requestedQty-x.purchasedQty),name=item(x.itemId)?.name||"Missing item";return `<div class="closeout-decision" data-id="${x.id}"><div><b>${escapeHtml(name)}</b><div class="meta">${escapeHtml(x.status.replaceAll("_"," "))} · Requested ${x.requestedQty} · Purchased ${x.purchasedQty} · ${remaining} remaining</div></div><div class="decision-options" role="radiogroup" aria-label="Closeout decision for ${escapeHtml(name)}"><label><input type="radio" name="resolution-${x.id}" value="carry" ${remaining===0?"disabled":""}> Carry forward</label><label><input type="radio" name="resolution-${x.id}" value="skip"> Skip remainder</label></div></div>`}).join("");
+ $("followupName").value=`Follow-up — ${run.name}`;
+ $("overageSection").hidden=issues.overages.length===0;
+ $("overageDecisions").innerHTML=issues.overages.map(x=>{const over=x.purchasedQty-x.requestedQty,name=item(x.itemId)?.name||"Missing item";return `<div class="closeout-decision" data-id="${x.id}"><div><b>${escapeHtml(name)}</b><div class="meta">Requested ${x.requestedQty} · Purchased ${x.purchasedQty} · Over by ${over}</div></div><div class="decision-options"><label><input type="checkbox" name="overage-${x.id}" value="accept"> Accept overage</label></div></div>`}).join("");
+ $("reconcileRows").innerHTML=issues.acquired.length?issues.acquired.map(x=>`<div class="reconcile-row" data-id="${x.id}"><div><b>${escapeHtml(item(x.itemId)?.name||"")}</b><div class="meta">Acquired ${x.purchasedQty} · Source ${escapeHtml(x.source)}</div></div><div class="field"><label for="warehouse-${x.id}">To Warehouse</label><input id="warehouse-${x.id}" name="warehouse-${x.id}" type="number" min="0" max="${x.purchasedQty}" step="1" value="0"></div></div>`).join(""):'<div class="empty">No acquired quantities to allocate.</div>';
+ $("reconcileDialog").showModal();updateCloseoutReadiness()
 }
-$("reconcileForm").addEventListener("submit",e=>{if(e.submitter?.value==="cancel")return;e.preventDefault();const adds=Object.fromEntries(new FormData(e.currentTarget).entries());reconcileRun(activeRun().id,adds);$("reconcileDialog").close();renderAll();toast("Run completed and reconciled")});
+function updateCloseoutReadiness(){
+ const run=activeRun(),issues=run?runCloseoutIssues(run.id):{unresolved:[],overages:[]},form=$("reconcileForm");
+ let remaining=issues.unresolved.filter(x=>!form.querySelector(`input[name="resolution-${x.id}"]:checked`)).length+issues.overages.filter(x=>!form.querySelector(`input[name="overage-${x.id}"]:checked`)).length;
+ const carryCount=issues.unresolved.filter(x=>form.querySelector(`input[name="resolution-${x.id}"]:checked`)?.value==="carry").length,followup=$("followupName");
+ followup.disabled=carryCount===0;if(carryCount&& !followup.value.trim())remaining++;
+ $("carryAllBtn").disabled=!issues.unresolved.some(x=>x.requestedQty>x.purchasedQty);
+ $("reconcileSave").disabled=remaining>0;$("closeoutRemaining").classList.toggle("ready",remaining===0);
+ $("closeoutRemaining").textContent=remaining?`${remaining} closeout decision${remaining===1?"":"s"} remaining`:`Ready to close ${run?.name||"run"}`
+}
+$("carryAllBtn").addEventListener("click",()=>{document.querySelectorAll('#closeoutDecisions input[value="carry"]:not(:disabled)').forEach(x=>x.checked=true);updateCloseoutReadiness()});
+$("reconcileForm").addEventListener("input",updateCloseoutReadiness);
+$("reconcileForm").addEventListener("submit",e=>{
+ if(e.submitter?.value==="cancel")return;e.preventDefault();
+ const run=activeRun(),issues=runCloseoutIssues(run.id),fd=new FormData(e.currentTarget),resolutions={},overages={},warehouseAdds={};
+ issues.unresolved.forEach(x=>resolutions[x.id]=fd.get(`resolution-${x.id}`));issues.overages.forEach(x=>overages[x.id]=fd.get(`overage-${x.id}`)==="accept");issues.acquired.forEach(x=>warehouseAdds[x.id]=fd.get(`warehouse-${x.id}`)||0);
+ const result=reconcileRun(run.id,{resolutions,overages,warehouseAdds,followupName:$("followupName").value});
+ if(!result.ok){$("closeoutRemaining").classList.remove("ready");$("closeoutRemaining").textContent=result.error;toast(result.error);return}
+ $("reconcileDialog").close();renderAll();toast(result.followup?`Run closed · ${result.carriedCount} carried forward`:"Run closed and reconciled")
+});
 
 document.querySelectorAll(".navbtn").forEach(b=>b.addEventListener("click",()=>switchPage(b.dataset.page)));
 $("runSearch").addEventListener("input",renderShopping);
@@ -714,7 +809,7 @@ function bootstrapLegacyCheckMigration(){
  if(localStorage.getItem(STORAGE_KEY))return;
  try{
   const legacy=JSON.parse(localStorage.getItem("depotops-shopping-v2")||"{}");const keys=Object.keys(legacy).filter(k=>legacy[k]);
-  if(keys.length){keys.forEach(k=>{const x=state.shoppingRunItems[Number(k)];if(x)x.status="in_cart"});saveState();toast(`Migrated ${keys.length} v0.1 check-off(s) as In Cart`)}
+  if(keys.length){keys.forEach(k=>{const x=state.shoppingRunItems[Number(k)];if(x&&x.purchasedQty===0)x.status="in_cart";if(x)normalizeRunItemState(x)});saveState();toast(`Migrated ${keys.length} v0.1 check-off(s) as In Cart`)}
  }catch(e){}
 }
 
@@ -739,8 +834,11 @@ function runSelfTests(){
   assert("selected project is visibly tied to inspector",selectedProjectCard?.classList.contains("is-selected")&&selectedProjectCard.querySelector('[data-act="inspect"]')?.getAttribute("aria-pressed")==="true");
   assert("project inspector uses compact detail cards",document.querySelector("#projectDetailPanel .linked-row")&&document.querySelector("#projectDetailPanel .requirement-card"));
   assert("project inspector has responsive master-detail placement",window.innerWidth>1180?projectAreas.includes("board inspector"):projectAreas.indexOf("inspector")<projectAreas.indexOf("board"),`areas=${projectAreas}`);
-  const legacy=clone(seedState);legacy.schemaVersion=3;legacy.projects=legacy.projects.filter(x=>!NOTION_PROJECTS.some(p=>p.id===x.id));legacy.projects.push({id:LEGACY_NOTION_PROJECT_ID,name:"Home Depot Shopping List",status:"Active",location:"56 Harding",description:"Legacy generic link"});legacy.shoppingRunItems.forEach(x=>{x.projectId=LEGACY_NOTION_PROJECT_ID;delete x.projectIds;delete x.workflowState;delete x.workflowNote});legacy.settings={activeRunId:NOTION_RUN.id,selectedProjectId:LEGACY_NOTION_PROJECT_ID,neededOnly:false};const migrated=migrateState(legacy);
-  assert("v3 migration replaces generic links",migrated.schemaVersion===4&&!migrated.projects.some(x=>x.id===LEGACY_NOTION_PROJECT_ID)&&migrated.shoppingRunItems.filter(x=>x.runId===NOTION_RUN.id).every(x=>x.projectIds?.length)&&migrated.settings.focusOnly===true);
+	  const legacy=clone(seedState);legacy.schemaVersion=3;legacy.projects=legacy.projects.filter(x=>!NOTION_PROJECTS.some(p=>p.id===x.id));legacy.projects.push({id:LEGACY_NOTION_PROJECT_ID,name:"Home Depot Shopping List",status:"Active",location:"56 Harding",description:"Legacy generic link"});legacy.shoppingRunItems.forEach(x=>{x.projectId=LEGACY_NOTION_PROJECT_ID;delete x.projectIds;delete x.workflowState;delete x.workflowNote});legacy.settings={activeRunId:NOTION_RUN.id,selectedProjectId:LEGACY_NOTION_PROJECT_ID,neededOnly:false};const migrated=migrateState(legacy);
+	  assert("v3 migration replaces generic links",migrated.schemaVersion===5&&!migrated.projects.some(x=>x.id===LEGACY_NOTION_PROJECT_ID)&&migrated.shoppingRunItems.filter(x=>x.runId===NOTION_RUN.id).every(x=>x.projectIds?.length)&&migrated.settings.focusOnly===true);
+	  const legacyV4=clone(seedState),legacyPartial=legacyV4.shoppingRunItems.find(x=>x.status==="needed");legacyV4.schemaVersion=4;legacyPartial.requestedQty=3;legacyPartial.purchasedQty=1;legacyPartial.status="needed";const migratedV5=migrateState(legacyV4);
+	  assert("v4 migration derives partial purchase state",migratedV5.schemaVersion===5&&byId(migratedV5.shoppingRunItems,legacyPartial.id).status==="partially_purchased");
+	  const inconsistent=clone(state),inconsistentRow=inconsistent.shoppingRunItems.find(x=>x.status==="needed");inconsistentRow.purchasedQty=1;assert("schema rejects contradictory purchase state",!validateState(inconsistent).ok);
   assert("canonical item reused by requirement + inventory",byId(state.requirements,"req-cement").itemId===byId(state.inventory,"inv-cement").itemId);
   assert("warehouse stock covers cement requirement",shortage(byId(state.requirements,"req-cement"))===0,`shortage=${shortage(byId(state.requirements,"req-cement"))}`);
   assert("PVC40 shortage reflects no warehouse stock",shortage(byId(state.requirements,"req-pvc40"))===6,`shortage=${shortage(byId(state.requirements,"req-pvc40"))}`);
@@ -749,13 +847,30 @@ function runSelfTests(){
   const inv=byId(state.inventory,"inv-string");const lowAdded=addLowStockToRun(inv.id);
   assert("low stock replenishment connects warehouse to run",lowAdded&&state.shoppingRunItems.some(x=>x.source==="warehouse"&&x.itemId==="itm-string"));
   const snap=JSON.parse(JSON.stringify(state));assert("JSON round-trip validates",validateState(snap).ok);
-  const testRun={id:"run-test",name:"Test",status:"active",storeId:"store-lawnside",createdAt:"",completedAt:null};state.shoppingRuns.push(testRun);
-  state.shoppingRunItems.push({id:"sri-test",runId:"run-test",itemId:"itm-tape",projectRequirementId:null,requestedQty:2,purchasedQty:2,status:"purchased",priority:"Reorder",source:"warehouse",notes:""});
-  const tapeBefore=onHand("itm-tape");reconcileRun("run-test",{"sri-test":1});
-  assert("reconciliation adds leftover stock",onHand("itm-tape")===tapeBefore+1);
-  assert("run preserves completed history",byId(state.shoppingRuns,"run-test").status==="completed"&&!!byId(state.shoppingRuns,"run-test").completedAt);
-  saveState();const parsed=JSON.parse(localStorage.getItem(STORAGE_KEY));assert("complete state persists",parsed.schemaVersion===4&&parsed.projects.length===state.projects.length);
-  renderAll();
+	  const testRun={id:"run-test",name:"Test",status:"active",storeId:"store-lawnside",createdAt:"",completedAt:null};state.shoppingRuns.push(testRun);
+	  state.shoppingRunItems.push(
+	   {id:"sri-test-full",runId:"run-test",itemId:"itm-tape",projectRequirementId:null,requestedQty:2,purchasedQty:2,status:"purchased",workflowState:"active",priority:"Reorder",source:"warehouse",notes:""},
+	   {id:"sri-test-partial",runId:"run-test",itemId:"itm-string",projectRequirementId:null,requestedQty:3,purchasedQty:1,status:"partially_purchased",workflowState:"active",priority:"Reorder",source:"warehouse",notes:""},
+	   {id:"sri-test-over",runId:"run-test",itemId:"itm-primer",projectRequirementId:null,requestedQty:1,purchasedQty:2,status:"purchased",workflowState:"active",priority:"Reorder",source:"warehouse",notes:""},
+	   {id:"sri-test-hold",runId:"run-test",itemId:"itm-labels",projectRequirementId:null,requestedQty:1,purchasedQty:0,status:"hold",workflowState:"gated",priority:"Buy",source:"project",notes:""}
+	  );
+	  const tapeBefore=onHand("itm-tape"),stringBefore=onHand("itm-string"),blockedClose=reconcileRun("run-test");
+	  assert("closeout blocks unresolved rows and overages",!blockedClose.ok&&byId(state.shoppingRuns,"run-test").status==="active");
+	  assert("blocked closeout is atomic",onHand("itm-tape")===tapeBefore&&!state.shoppingRuns.some(x=>x.sourceRunId==="run-test"));
+	  const closeDecisions={resolutions:{"sri-test-partial":"carry","sri-test-hold":"skip"},overages:{"sri-test-over":true}};
+	  const namelessClose=reconcileRun("run-test",{...closeDecisions,followupName:""});assert("closeout requires a named follow-up",!namelessClose.ok&&byId(state.shoppingRuns,"run-test").status==="active");
+	  const invalidAllocation=reconcileRun("run-test",{...closeDecisions,warehouseAdds:{"sri-test-full":3},followupName:"Follow-up — Test"});assert("closeout rejects Warehouse quantity above acquired",!invalidAllocation.ok&&onHand("itm-tape")===tapeBefore);
+	  const closeResult=reconcileRun("run-test",{resolutions:{"sri-test-partial":"carry","sri-test-hold":"skip"},overages:{"sri-test-over":true},warehouseAdds:{"sri-test-full":1,"sri-test-partial":1,"sri-test-over":0},followupName:"Follow-up — Test"});
+	  assert("explicit closeout succeeds",closeResult.ok&&closeResult.carriedCount===1);
+	  assert("reconciliation bounds and adds Warehouse stock",onHand("itm-tape")===tapeBefore+1&&onHand("itm-string")===stringBefore+1);
+	  const followup=byId(state.shoppingRuns,closeResult.followup?.id),carried=state.shoppingRunItems.find(x=>x.runId===followup?.id&&x.sourceRunItemId==="sri-test-partial");
+	  assert("follow-up carries only remaining quantity",followup?.status==="active"&&carried?.requestedQty===2&&carried?.purchasedQty===0&&carried?.status==="needed");
+	  assert("closeout records row dispositions",byId(state.shoppingRunItems,"sri-test-partial").closeoutDisposition==="carried_forward"&&byId(state.shoppingRunItems,"sri-test-hold").closeoutDisposition==="skipped_remainder"&&byId(state.shoppingRunItems,"sri-test-over").closeoutDisposition==="fulfilled_overage");
+	  assert("run preserves resolved completed history",byId(state.shoppingRuns,"run-test").status==="completed"&&state.shoppingRunItems.filter(x=>x.runId==="run-test").every(x=>isRunItemResolved(x)));
+	  state.settings.activeRunId=NOTION_RUN.id;saveState();const parsed=JSON.parse(localStorage.getItem(STORAGE_KEY));assert("complete state persists",parsed.schemaVersion===5&&parsed.projects.length===state.projects.length);
+	  renderAll();
+	  assert("shopping quantity controls have visible labels",[...document.querySelectorAll(".runitem:first-child .control-label")].map(x=>x.textContent).join("|")==="Requested|Shopping status|Purchased");
+	  openReconcile();assert("closeout preflight blocks undecided rows",$("reconcileSave").disabled&&$("closeoutRemaining").textContent.includes("remaining"));$("carryAllBtn").click();assert("closeout preflight enables after explicit decisions",!$("reconcileSave").disabled);$("reconcileDialog").close();
   $("runProjectFilter").value="prj-lighting";renderShopping();assert("project filter survives rerender",$("runProjectFilter").value==="prj-lighting"&&$("runVisible").textContent==="0",`selected=${$("runProjectFilter").value}, visible=${$("runVisible").textContent}`);$("runProjectFilter").value="all";renderShopping();
   const target=document.querySelector(".navbtn");const rect=target.getBoundingClientRect();assert("primary touch target >=44px",rect.height>=44,`height=${rect.height.toFixed(1)}`);
   const stickyTop=parseFloat(getComputedStyle($("runSearch").closest(".toolbar")).top),topbarHeight=document.querySelector(".topbar").getBoundingClientRect().height;assert("sticky toolbar clears top navigation",Math.abs(stickyTop-topbarHeight)<=1,`toolbar=${stickyTop.toFixed(1)}, topbar=${topbarHeight.toFixed(1)}`);

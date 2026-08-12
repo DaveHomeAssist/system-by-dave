@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-08-12
+
+### DepotOps v0.5.0
+
+* Enforced consistent `/depotops/` shopping-run quantities and statuses, added visible Requested, Shopping status, and Purchased labels, and surfaced partial quantities and overages directly on each row.
+* Replaced unconditional run completion with an atomic closeout preflight that keeps readiness and close actions visible, requires carry-or-skip decisions for every unresolved row, requires explicit overage acceptance, bounds Warehouse allocations, and names a follow-up run when remaining quantities are carried forward.
+* Added schema v5 migration and regression coverage for contradictory legacy state, blocked closeouts, Warehouse reconciliation, row dispositions, follow-up quantities, responsive controls, and decision gating.
+
 ## 2026-08-10
 
 * Added the 12-month portfolio product roadmap for Frontier Signals, Hat in Ring, CurlPlan, and Phillies Wire, covering feature sequencing, UX and accessibility, visual systems, screen flows, security and compliance, SEO, performance, technical debt, owners, measurable release gates, structured logs, blockers, and risk controls.

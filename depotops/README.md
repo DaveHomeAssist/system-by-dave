@@ -1,4 +1,4 @@
-# DepotOps v0.4.1
+# DepotOps v0.5.0
 
 DepotOps is a local-first home project operations tool. Projects define why
 material is needed, Shopping Runs organize what to acquire, and Warehouse
@@ -19,8 +19,9 @@ The canonical application is published at:
 5. Set the requested quantity, update the shopping status while at the store,
    and record the quantity actually purchased.
 6. Open **Warehouse** to manage inventory and tools or to export a JSON backup.
-7. Use **Complete & Reconcile** only after reviewing every unresolved row and
-   deciding which purchased quantities should become general Warehouse stock.
+7. Use **Review & Close Run** to classify every unresolved remainder, accept
+   any quantity overage, and decide which acquired quantities should become
+   general Warehouse stock.
 
 DepotOps links records to their Notion sources, but it does not synchronize
 changes to or from Notion automatically.
@@ -34,10 +35,19 @@ Each Shopping Run row contains two different quantities:
 - **Purchased quantity** is the number field to the right of the shopping
   status. It records how many units were actually acquired.
 
-Choosing `purchased` automatically copies the requested quantity into the
-purchased quantity only when the purchased quantity is still zero. Editing the
-purchased quantity by itself does not change the shopping status. Review both
-fields because the current app permits them to disagree.
+The controls now enforce one run-state model:
+
+- Choosing `purchased` sets the purchased quantity to the requested quantity.
+  If both quantities were zero, both become one.
+- Entering a positive purchased quantity derives `partially purchased` when it
+  is below the request and `purchased` when it meets or exceeds the request.
+- A partial row shows the quantity left. A row above the request shows the
+  overage.
+- Setting purchased quantity back to zero returns a derived purchase state to
+  `needed`.
+- A row with acquired quantity cannot be changed to a nonpurchase status until
+  the purchased quantity is cleared. This prevents status changes from hiding
+  recorded purchase evidence.
 
 ## Shopping statuses
 
@@ -48,6 +58,7 @@ independent of the project's workflow state.
 | --- | --- |
 | `needed` | Still intended for this run and not recorded as acquired. |
 | `in cart` | Selected during the shopping trip but not yet recorded as purchased. |
+| `partially purchased` | Some units were acquired, but fewer than requested. This state is derived from the two quantities and cannot be selected directly. |
 | `purchased` | Acquired. Confirm the purchased quantity before closing the run. |
 | `not found` | Not available during this attempt. The row remains unresolved. |
 | `skipped` | Intentionally excluded from the run's remaining count. |
@@ -83,14 +94,16 @@ or review work:
   **Needed Only**.
 - The project selector and search field further filter the visible rows.
 
-Summary cards do not all use the same scope:
+The summary cards state their scope directly:
 
-- **Visible Items** is the number left after the current search and filters.
-- **Purchased**, **Actionable**, **Linked Projects**, and **Remaining** describe
-  the entire selected run.
-- **Actionable** counts rows whose workflow is Active and whose shopping status
-  is `needed`.
-- **Remaining** excludes only `purchased` and `skipped` rows.
+- **Shown** is the number left after the current search and filters.
+- **Run Purchased**, **Ready to Buy**, **Run Projects**, and **Run Unresolved**
+  describe the entire selected run.
+- **Ready to Buy** counts Active workflow rows that are `needed`, `in cart`, or
+  `partially purchased`.
+- **Run Unresolved** counts every row that still needs a closeout decision. A
+  newly closed run treats its recorded carry, skip, and fulfillment
+  dispositions as resolved history.
 
 ## Project Inspector and shortages
 
@@ -104,25 +117,33 @@ available Warehouse stock, and quantities already on an unfinished run. It adds
 only the uncovered quantity to the active run. Requirements or catalog items
 marked for verification or hold enter the run as `hold` rather than `needed`.
 
-## Completing and reconciling a run
+## Reviewing and closing a run
 
-**Complete & Reconcile** lists rows currently marked `purchased`. For each row,
-enter the portion of the purchased quantity that should become general
-Warehouse inventory or unused leftover stock. Project-only material can remain
-at zero.
+**Review & Close Run** performs a preflight across the entire selected run.
+The Close Run button remains disabled until all required decisions are present:
 
-Completing the dialog:
+- Every unresolved row must be set to **Carry forward** or **Skip remainder**.
+- Every purchased quantity above its request must be explicitly accepted.
+- If any row is carried, the prefilled follow-up run name must remain nonempty.
+- Each Warehouse allocation must be a whole number from zero through the
+  acquired quantity. Project-only material can remain at zero.
 
-- fills a zero purchased quantity from the requested quantity for rows already
-  marked `purchased`;
-- adds the entered Warehouse quantities to inventory;
-- marks the run completed and records its completion time; and
-- locks that run's row controls as completed history.
+DepotOps validates the full closeout before mutating state. A failed validation
+does not complete the run, create a follow-up, or change Warehouse quantities.
+On a successful closeout it:
 
-The current implementation does not block closure when rows remain unresolved,
-create a follow-up run, allocate purchases automatically to project
-requirements, or resolve project-source conflicts. Review and classify those
-items before completing the run.
+- adds the approved Warehouse quantities to inventory;
+- records fulfilled, accepted-overage, carried-forward, skipped, or
+  skipped-remainder disposition on every original row;
+- creates one active follow-up run when needed, containing only each carried
+  row's unpurchased remainder with purchased quantity reset to zero;
+- preserves gated, parked, review, or held work as `hold` in that follow-up and
+  returns active purchase-ready work to `needed`; and
+- completes and locks the original run, records its completion time, and makes
+  the follow-up the selected run.
+
+Closeout does not allocate purchases automatically to project requirements or
+resolve Notion project-source conflicts. Those remain explicit project actions.
 
 ## Local data and recovery
 
@@ -131,7 +152,7 @@ Application state is stored in browser `localStorage` under:
 `depotops-v0.2-state`
 
 The `v0.2` text is a stable legacy storage name retained for compatibility; the
-current data schema is v4. Export filenames also retain the legacy
+current data schema is v5. Export filenames also retain the legacy
 `depotops-v0.2-YYYY-MM-DD.json` prefix, but the JSON records its actual schema
 version.
 
@@ -150,10 +171,11 @@ current browser state. It does not merge records and does not create an
 automatic pre-import backup. Reset replaces the current state with the seeded
 canonical state after a confirmation prompt.
 
-Existing schema v1 through v3 browser data migrates to schema v4. The migration
-replaces the old generic shopping-list project association with evidence-backed
-project links while preserving saved shopping statuses, quantities, older runs,
-and custom data.
+Existing schema v1 through v4 browser data migrates to schema v5. Earlier
+migrations still replace the old generic shopping-list project association with
+evidence-backed project links. The v5 migration normalizes contradictory saved
+shopping states from the quantities while preserving older runs and custom
+data.
 
 ## Files and architecture
 
@@ -181,8 +203,8 @@ Open:
 - <http://127.0.0.1:4173/depotops/?selftest=1>
 
 The self-test route temporarily exercises seeded state and restores the saved
-browser state when the test completes. The current expected result is 31 passes
-and zero failures on desktop, and 32 passes and zero failures at the 680px
+browser state when the test completes. The current expected result is 43 passes
+and zero failures on desktop, and 44 passes and zero failures at the 680px
 mobile breakpoint or below.
 
 ## Verification
