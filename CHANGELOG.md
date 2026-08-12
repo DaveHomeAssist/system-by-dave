@@ -5,8 +5,21 @@
 * Added the 12-month portfolio product roadmap for Frontier Signals, Hat in Ring, CurlPlan, and Phillies Wire, covering feature sequencing, UX and accessibility, visual systems, screen flows, security and compliance, SEO, performance, technical debt, owners, measurable release gates, structured logs, blockers, and risk controls.
 * Added `/ProjectorThrow/` for Throwline SHOW 2.0: a self-contained offline projector planning and show-handoff app plus an optional online Stage 3D companion with responsive overlays, keyboard camera control, persistent light and dark themes, dependency fallback messaging, and OBJ, MTL, and GLB export.
 * Reconciled the unlisted-route search policy: handoff gateways now point canonical signals at their destinations, PixelForge compatibility routes consolidate under `/pixelforge/`, and internal/source-only routes are explicitly excluded from crawling.
+
+### DepotOps v0.4.1
+
 * Upgraded `/depotops/` to v0.4.1 with a persistent Project Inspector: the selected project stays visible beside the board on wide screens, moves above the board on narrower screens, uses compact detail cards instead of wide tables, and clearly marks the project currently being inspected.
+
+### DepotOps v0.4.0
+
+* Linked all 48 canonical `/depotops/` shopping rows to evidence-backed project context, classified active, gated, parked, review, and superseded work, focused the default view on 22 outstanding rows tied to current or previously stopped projects, and migrated existing browser state to schema v4 without replacing saved quantities, statuses, older runs, or custom data.
+
+### DepotOps v0.3.0
+
 * Synced `/depotops/` to the canonical Notion Home Depot list: all 48 rows are present, with 25 outstanding and 23 purchased; every row links back to its Notion source, existing browser data migrates additively, and Verify/Hold rows remain visible instead of being suppressed.
+
+### DepotOps v0.2.3
+
 * Added `/depotops/`, a local-first home project operations tool for project requirements, multi-project shopping runs, warehouse inventory, tool records, purchase reconciliation, and JSON backup and restore.
 
 ## 2026-08-06
