@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0.0",
+  "timestamp": "2026-08-12T08:00:00Z",
+  "severity": "info",
+  "product": "phillies-wire",
+  "environment": "ci",
+  "event_type": "verification_completed",
+  "status": "succeeded",
+  "run_id": "github:phillies-wire:123456789",
+  "correlation_id": "release:phillies-wire:2026-08-12",
+  "workflow": "publish",
+  "commit_sha": "1111111111111111111111111111111111111111",
+  "message": "Render and verification gates passed",
+  "duration_ms": 48231,
+  "counts": { "tests_passed": 21, "tests_failed": 0 },
+  "evidence_urls": ["https://github.com/DaveHomeAssist/phillies-wire/actions/runs/123456789"]
+}

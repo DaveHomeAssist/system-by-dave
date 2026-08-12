@@ -1,0 +1,680 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2026-08-12T08:26:14.293Z",
+  "method": "Chrome DevTools Protocol, mobile 4G and 4x CPU throttle, reduced motion, keyboard traversal, 640px reflow check",
+  "limitations": [
+    "Lab metrics are synthetic local-run evidence, not field Core Web Vitals.",
+    "VoiceOver speech output and meaning require a human assistive-technology pass.",
+    "Automated control-name and target checks do not certify WCAG conformance."
+  ],
+  "results": [
+    {
+      "name": "curlplan",
+      "audited_at": "2026-08-12T08:25:50.087Z",
+      "mobile": {
+        "title": "CurlPlan",
+        "url": "http://127.0.0.1:9410/",
+        "metrics": {
+          "cls": 0,
+          "lcp": 1068
+        },
+        "headings": [
+          {
+            "level": 1,
+            "text": "Your season, your circle"
+          },
+          {
+            "level": 2,
+            "text": "Appearance"
+          }
+        ],
+        "landmarks": {
+          "main": 1,
+          "nav": 0,
+          "header": 0,
+          "footer": 0
+        },
+        "controls": 8,
+        "unnamedControls": [],
+        "smallControls": [],
+        "horizontalOverflow": false,
+        "documentWidth": 390,
+        "viewportWidth": 390,
+        "activeAnimations": 0,
+        "resources": [
+          {
+            "name": "http://127.0.0.1:9410/fonts/hanken-grotesk-latin.woff2",
+            "type": "link",
+            "transferSize": 34964,
+            "duration": 638
+          },
+          {
+            "name": "http://127.0.0.1:9410/fonts/instrument-serif-400-latin.woff2",
+            "type": "link",
+            "transferSize": 15340,
+            "duration": 405
+          },
+          {
+            "name": "http://127.0.0.1:9410/fonts/dm-mono-400-latin.woff2",
+            "type": "css",
+            "transferSize": 8988,
+            "duration": 299
+          },
+          {
+            "name": "http://127.0.0.1:9410/fonts/dm-mono-500-latin.woff2",
+            "type": "css",
+            "transferSize": 9024,
+            "duration": 202
+          }
+        ]
+      },
+      "transfer_bytes": 171985,
+      "focus_order_first_20": [
+        "button:Explore the demo",
+        "button:Ice",
+        "button:Arena",
+        "button:House red",
+        "button:House blue",
+        "button:Granite",
+        "button:Toggle pebble texture",
+        "button:Sign out",
+        "BODY",
+        "button:Explore the demo",
+        "button:Ice",
+        "button:Arena",
+        "button:House red",
+        "button:House blue",
+        "button:Granite",
+        "button:Toggle pebble texture",
+        "button:Sign out",
+        "BODY",
+        "button:Explore the demo",
+        "button:Ice"
+      ],
+      "zoom_200_percent_desktop_equivalent": {
+        "horizontalOverflow": false,
+        "documentWidth": 640,
+        "viewportWidth": 640
+      },
+      "accessibility_tree_unnamed_interactive_roles": []
+    },
+    {
+      "name": "phillieswire",
+      "audited_at": "2026-08-12T08:25:56.274Z",
+      "mobile": {
+        "title": "Phillies Wire · Phillies @ Cardinals · Game 3 of 3 · Wed, Aug 12, 2026",
+        "url": "http://127.0.0.1:9411/",
+        "metrics": {
+          "cls": 0,
+          "lcp": 1168
+        },
+        "headings": [
+          {
+            "level": 1,
+            "text": "Phillies @ Cardinals · Game 3 of 3"
+          },
+          {
+            "level": 2,
+            "text": "Get the Wire in your inbox"
+          },
+          {
+            "level": 2,
+            "text": "Issue sections"
+          }
+        ],
+        "landmarks": {
+          "main": 1,
+          "nav": 2,
+          "header": 0,
+          "footer": 1
+        },
+        "controls": 20,
+        "unnamedControls": [],
+        "smallControls": [],
+        "horizontalOverflow": false,
+        "documentWidth": 390,
+        "viewportWidth": 390,
+        "activeAnimations": 0,
+        "resources": [
+          {
+            "name": "http://127.0.0.1:9411/manifest.webmanifest",
+            "type": "link",
+            "transferSize": 680,
+            "duration": 162
+          },
+          {
+            "name": "http://127.0.0.1:9411/fonts/HTxwL3I-JCGChYJ8VI-L6OO_au7B46r2z3bWuQ.woff2",
+            "type": "link",
+            "transferSize": 22744,
+            "duration": 563
+          },
+          {
+            "name": "http://127.0.0.1:9411/fonts/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2",
+            "type": "link",
+            "transferSize": 48556,
+            "duration": 826
+          },
+          {
+            "name": "http://127.0.0.1:9411/site.css",
+            "type": "link",
+            "transferSize": 65401,
+            "duration": 916
+          },
+          {
+            "name": "http://127.0.0.1:9411/live-feed.js",
+            "type": "script",
+            "transferSize": 10099,
+            "duration": 376
+          },
+          {
+            "name": "http://127.0.0.1:9411/fonts/HTxwL3I-JCGChYJ8VI-L6OO_au7B47b1z3bWuQ.woff2",
+            "type": "css",
+            "transferSize": 22764,
+            "duration": 627
+          },
+          {
+            "name": "http://127.0.0.1:9411/fonts/HTxwL3I-JCGChYJ8VI-L6OO_au7B4873z3bWuQ.woff2",
+            "type": "css",
+            "transferSize": 22608,
+            "duration": 637
+          },
+          {
+            "name": "http://127.0.0.1:9411/fonts/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7.woff2",
+            "type": "css",
+            "transferSize": 48556,
+            "duration": 772
+          },
+          {
+            "name": "http://127.0.0.1:9411/fonts/HTxwL3I-JCGChYJ8VI-L6OO_au7B4-Lwz3bWuQ.woff2",
+            "type": "css",
+            "transferSize": 21724,
+            "duration": 620
+          },
+          {
+            "name": "https://statsapi.mlb.com/api/v1/game/823017/linescore",
+            "type": "fetch",
+            "transferSize": 0,
+            "duration": 276
+          },
+          {
+            "name": "https://statsapi.mlb.com/api/v1.1/game/823017/feed/live?fields=gameData,status,detailedState,teams,home,away,abbreviation,teamName,clubName,name",
+            "type": "fetch",
+            "transferSize": 0,
+            "duration": 280
+          },
+          {
+            "name": "http://127.0.0.1:9411/favicon.svg",
+            "type": "other",
+            "transferSize": 555,
+            "duration": 160
+          },
+          {
+            "name": "http://127.0.0.1:9411/favicon.svg",
+            "type": "other",
+            "transferSize": 555,
+            "duration": 168
+          }
+        ]
+      },
+      "transfer_bytes": 299918,
+      "focus_order_first_20": [
+        "a:Skip to main content",
+        "a:Latest",
+        "a:Archive",
+        "a:Dashboard",
+        "a:Schedule",
+        "a:Inning by inning",
+        "a:RSS",
+        "a:Subscribe",
+        "a:Subscribe →",
+        "button:Game Status Starters, live tracker, and park notes ▲",
+        "button:Game-Day Lineup Pending Lineups pending · Zack Wheeler vs Kyle Leahy ▼",
+        "button:Roster & Lineup Lineup Pending Roster feed refreshed ▼",
+        "button:NL East Standings PHI 64-57 · 8.5 GB · L1 ▼",
+        "button:Injury Report Live Adolis García RF · Right latissimus dorsi tear · Johan Rojas ",
+        "button:Preview Zack Wheeler vs Kyle Leahy · Phillies @ Cardinals · Game 3 of 3 ▼",
+        "a:X / Twitter",
+        "a:Bluesky",
+        "a:Email",
+        "button:Copy link",
+        "button:Toggle dark mode"
+      ],
+      "zoom_200_percent_desktop_equivalent": {
+        "horizontalOverflow": false,
+        "documentWidth": 625,
+        "viewportWidth": 625
+      },
+      "accessibility_tree_unnamed_interactive_roles": []
+    },
+    {
+      "name": "frontiersignalslab",
+      "audited_at": "2026-08-12T08:26:02.418Z",
+      "mobile": {
+        "title": "Frontier Signals | Compute Field Notes",
+        "url": "http://127.0.0.1:9412/",
+        "metrics": {
+          "cls": 0,
+          "lcp": 620
+        },
+        "headings": [
+          {
+            "level": 1,
+            "text": "The new compute story is being written below the headline."
+          },
+          {
+            "level": 2,
+            "text": "Quantum research is clustering around hardware, control, and commercial movement."
+          },
+          {
+            "level": 2,
+            "text": "AI chip bottlenecks moved below the GPU headline."
+          },
+          {
+            "level": 2,
+            "text": "Power demand is turning compute growth into a physical constraint."
+          },
+          {
+            "level": 2,
+            "text": "One publication shell, three live desks."
+          },
+          {
+            "level": 3,
+            "text": "Sections"
+          },
+          {
+            "level": 3,
+            "text": "About"
+          },
+          {
+            "level": 3,
+            "text": "Legal"
+          }
+        ],
+        "landmarks": {
+          "main": 1,
+          "nav": 3,
+          "header": 1,
+          "footer": 1
+        },
+        "controls": 37,
+        "unnamedControls": [],
+        "smallControls": [],
+        "horizontalOverflow": false,
+        "documentWidth": 390,
+        "viewportWidth": 390,
+        "activeAnimations": 0,
+        "resources": [
+          {
+            "name": "http://127.0.0.1:9412/minisite.css",
+            "type": "link",
+            "transferSize": 18629,
+            "duration": 366
+          },
+          {
+            "name": "http://127.0.0.1:9412/images/quantum-hero-1204.webp",
+            "type": "img",
+            "transferSize": 196322,
+            "duration": 1703
+          },
+          {
+            "name": "http://127.0.0.1:9412/minisite.js?v=20260812-performance",
+            "type": "script",
+            "transferSize": 9695,
+            "duration": 308
+          },
+          {
+            "name": "http://127.0.0.1:9412/report.json",
+            "type": "fetch",
+            "transferSize": 43197,
+            "duration": 804
+          },
+          {
+            "name": "http://127.0.0.1:9412/power-report.json",
+            "type": "fetch",
+            "transferSize": 12938,
+            "duration": 414
+          },
+          {
+            "name": "http://127.0.0.1:9412/chip-report.json",
+            "type": "fetch",
+            "transferSize": 31237,
+            "duration": 684
+          }
+        ]
+      },
+      "transfer_bytes": 325484,
+      "focus_order_first_20": [
+        "a:Frontier Signals home",
+        "a:Quantum",
+        "a:Chips",
+        "a:Power",
+        "a:Daily Brief",
+        "a:frontiersignals.io",
+        "button:Quantum",
+        "button:Chips",
+        "button:Power",
+        "a:Research: From Koszul-Complex Stabilizer Models to Superselection Profiles: Topo",
+        "a:Research: Surface passivation for narrowing optical linewidth of silicon T cente",
+        "a:Silicon: NAVER Expands AI Infrastructure With NVIDIA to Serve Surging Global AI ",
+        "a:Silicon: NVIDIA RTX PRO Servers With Blackwell Coming to World’s Most Popular En",
+        "a:Power: Battery storage capacity averaged 70% growth over the last three years",
+        "a:Power: New York imports more electricity from Canada after high-voltage transmis",
+        "a:From Koszul-Complex Stabilizer Models to Superselection Profiles: Topological Ri",
+        "a:Surface passivation for narrowing optical linewidth of silicon T centers in nano",
+        "a:From Nonlinear Stochastic Differential Equations to Quantum Channels: The Kolmog",
+        "a:Entanglement-assisted quantum locally recoverable codes: bounds and construction",
+        "a:Open Daily Quantum brief"
+      ],
+      "zoom_200_percent_desktop_equivalent": {
+        "horizontalOverflow": false,
+        "documentWidth": 625,
+        "viewportWidth": 625
+      },
+      "accessibility_tree_unnamed_interactive_roles": []
+    },
+    {
+      "name": "hatinring",
+      "audited_at": "2026-08-12T08:26:09.462Z",
+      "mobile": {
+        "title": "Who's Running for President in 2028? Candidate Tracker — Hat-in-Ring Radar",
+        "url": "http://127.0.0.1:9413/",
+        "metrics": {
+          "cls": 0.025622961035403777,
+          "lcp": 2668
+        },
+        "headings": [
+          {
+            "level": 1,
+            "text": "The Field"
+          },
+          {
+            "level": 2,
+            "text": "Seriousness leaderboard"
+          },
+          {
+            "level": 2,
+            "text": "Latest movement"
+          },
+          {
+            "level": 2,
+            "text": "Status tiers"
+          }
+        ],
+        "landmarks": {
+          "main": 1,
+          "nav": 1,
+          "header": 1,
+          "footer": 1
+        },
+        "controls": 27,
+        "unnamedControls": [],
+        "smallControls": [],
+        "horizontalOverflow": false,
+        "documentWidth": 390,
+        "viewportWidth": 390,
+        "activeAnimations": 0,
+        "resources": [
+          {
+            "name": "http://127.0.0.1:9413/vendor/react.production.min.js",
+            "type": "script",
+            "transferSize": 11051,
+            "duration": 272
+          },
+          {
+            "name": "http://127.0.0.1:9413/vendor/react-dom.production.min.js",
+            "type": "script",
+            "transferSize": 132135,
+            "duration": 1315
+          },
+          {
+            "name": "http://127.0.0.1:9413/support.js",
+            "type": "script",
+            "transferSize": 54275,
+            "duration": 435
+          },
+          {
+            "name": "http://127.0.0.1:9413/fonts/fonts.css",
+            "type": "link",
+            "transferSize": 10367,
+            "duration": 207
+          },
+          {
+            "name": "http://127.0.0.1:9413/",
+            "type": "fetch",
+            "transferSize": 181147,
+            "duration": 2402
+          },
+          {
+            "name": "http://127.0.0.1:9413/fonts/fonts.css",
+            "type": "link",
+            "transferSize": 10367,
+            "duration": 249
+          },
+          {
+            "name": "http://127.0.0.1:9413/favicon.svg",
+            "type": "other",
+            "transferSize": 853,
+            "duration": 163
+          },
+          {
+            "name": "http://127.0.0.1:9413/fonts/PinyonScript-400-latin-a437a4.woff2",
+            "type": "css",
+            "transferSize": 28372,
+            "duration": 913
+          },
+          {
+            "name": "http://127.0.0.1:9413/fonts/SpaceGrotesk-400-latin-a57c94.woff2",
+            "type": "css",
+            "transferSize": 22620,
+            "duration": 798
+          },
+          {
+            "name": "http://127.0.0.1:9413/fonts/Newsreader-400-latin-f0c28d.woff2",
+            "type": "css",
+            "transferSize": 132148,
+            "duration": 2087
+          },
+          {
+            "name": "http://127.0.0.1:9413/fonts/SpaceMono-700-latin-df899b.woff2",
+            "type": "css",
+            "transferSize": 9852,
+            "duration": 446
+          },
+          {
+            "name": "http://127.0.0.1:9413/fonts/SpaceGrotesk-400-latin-a57c94.woff2",
+            "type": "css",
+            "transferSize": 22620,
+            "duration": 886
+          },
+          {
+            "name": "http://127.0.0.1:9413/fonts/SpaceMono-400-latin-391873.woff2",
+            "type": "css",
+            "transferSize": 9764,
+            "duration": 895
+          },
+          {
+            "name": "http://127.0.0.1:9413/fonts/SpaceGrotesk-400-latin-a57c94.woff2",
+            "type": "css",
+            "transferSize": 22620,
+            "duration": 1294
+          },
+          {
+            "name": "http://127.0.0.1:9413/assets/candidates/newsom/01_governor_of_california_gavin_newsom_cropped_3x4_jp-thumb-96.webp",
+            "type": "img",
+            "transferSize": 1986,
+            "duration": 208
+          },
+          {
+            "name": "http://127.0.0.1:9413/assets/candidates/kelly/01_sen_mark_kelly_d_az_official_portrait_119th_congre-thumb-96.webp",
+            "type": "img",
+            "transferSize": 2566,
+            "duration": 214
+          }
+        ]
+      },
+      "transfer_bytes": 876367,
+      "focus_order_first_20": [
+        "div:Hat-in-Ring Radar — go to The Field",
+        "button:The Field",
+        "button:Dossiers",
+        "button:The Wire",
+        "a:About",
+        "div:3 Formal 14 Considering 9 Positioning 7 Floated 7 Ruled out 41 Tracked",
+        "input:Search candidates",
+        "button:Dem",
+        "button:Rep",
+        "button:Lib",
+        "button:Ind",
+        "select:Filter by posture",
+        "button:Leaderboard",
+        "button:Sheet",
+        "button:Cards",
+        "button:Movers7",
+        "button:In the ring5",
+        "button:Poll leaders2",
+        "th:Candidate",
+        "th:Lane"
+      ],
+      "zoom_200_percent_desktop_equivalent": {
+        "horizontalOverflow": false,
+        "documentWidth": 625,
+        "viewportWidth": 625
+      },
+      "accessibility_tree_unnamed_interactive_roles": []
+    },
+    {
+      "name": "frontiersignals",
+      "audited_at": "2026-08-12T08:26:14.136Z",
+      "mobile": {
+        "title": "Frontier Signals",
+        "url": "https://frontiersignals.io/",
+        "metrics": {
+          "cls": 0,
+          "lcp": 480
+        },
+        "headings": [
+          {
+            "level": 1,
+            "text": "The infrastructure story beneath the press release."
+          },
+          {
+            "level": 2,
+            "text": "Desk taxonomy"
+          },
+          {
+            "level": 3,
+            "text": "Research layer signals across hardware, control, cryptography, and commercialization."
+          },
+          {
+            "level": 3,
+            "text": "Silicon supply, memory, packaging, interconnect, and custom accelerator constraints."
+          },
+          {
+            "level": 3,
+            "text": "Grid, cooling, data centers, interconnect queues, and the physical capacity layer."
+          },
+          {
+            "level": 3,
+            "text": "GPU clusters, factories, network buildouts, and infrastructure finance signals."
+          },
+          {
+            "level": 2,
+            "text": "Why a pain medication company just committed $120M to building a GPU network"
+          },
+          {
+            "level": 2,
+            "text": "The bottleneck has moved below the GPU headline."
+          },
+          {
+            "level": 2,
+            "text": "Compute demand is becoming a grid problem."
+          },
+          {
+            "level": 2,
+            "text": "Tracked items feed the weekly editorial read."
+          },
+          {
+            "level": 2,
+            "text": "Latest tracked items"
+          },
+          {
+            "level": 2,
+            "text": "Publish when the signal survives the source trail."
+          },
+          {
+            "level": 2,
+            "text": "Frontier Signals"
+          },
+          {
+            "level": 3,
+            "text": "Sections"
+          },
+          {
+            "level": 3,
+            "text": "Policy"
+          },
+          {
+            "level": 3,
+            "text": "Distribution"
+          }
+        ],
+        "landmarks": {
+          "main": 1,
+          "nav": 1,
+          "header": 1,
+          "footer": 1
+        },
+        "controls": 34,
+        "unnamedControls": [],
+        "smallControls": [],
+        "horizontalOverflow": false,
+        "documentWidth": 390,
+        "viewportWidth": 390,
+        "activeAnimations": 0,
+        "resources": [
+          {
+            "name": "https://frontiersignals.io/_astro/BaseLayout.DuijH-hS.css",
+            "type": "link",
+            "transferSize": 3494,
+            "duration": 177
+          },
+          {
+            "name": "https://frontiersignals.io/favicon.svg",
+            "type": "other",
+            "transferSize": 508,
+            "duration": 159
+          }
+        ]
+      },
+      "transfer_bytes": 72251,
+      "focus_order_first_20": [
+        "a:Frontier Signals home",
+        "a:Signals",
+        "a:Briefings",
+        "a:Trackers",
+        "a:Disclosures",
+        "a:RSS",
+        "a:Quantum",
+        "a:Chips",
+        "a:Power",
+        "a:AI Compute",
+        "a:Archive",
+        "a:U.S. coal retirements hit a 15-year low. The reason isn't policy. It's data cent",
+        "a:Meta's $20B capex revision points at memory, not GPUsSignal / May 4, 2026",
+        "a:Pain pharma underwrites 48,000-GPU edge network. The 'quantum' is encryption.Sig",
+        "a:Why a pain medication company just committed $120M to building a GPU networkBrie",
+        "a:QuantumResearch layer signals across hardware, control, cryptography, and commer",
+        "a:ChipsSilicon supply, memory, packaging, interconnect, and custom accelerator con",
+        "a:PowerGrid, cooling, data centers, interconnect queues, and the physical capacity",
+        "a:AI ComputeGPU clusters, factories, network buildouts, and infrastructure finance",
+        "a:Open briefing"
+      ],
+      "zoom_200_percent_desktop_equivalent": {
+        "horizontalOverflow": false,
+        "documentWidth": 625,
+        "viewportWidth": 625
+      },
+      "accessibility_tree_unnamed_interactive_roles": []
+    }
+  ]
+}

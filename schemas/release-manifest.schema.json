@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://systembydave.com/schemas/release-manifest.schema.json",
+  "title": "Portfolio release manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "product", "version", "commit_sha", "built_at", "owner", "status", "artifacts", "verification", "deployment", "rollback"],
+  "properties": {
+    "schema_version": { "const": "1.0.0" },
+    "product": { "type": "string", "enum": ["frontier-signals", "frontier-data-lab", "hat-in-ring", "curlplan", "phillies-wire"] },
+    "version": { "type": "string", "minLength": 1, "maxLength": 80 },
+    "commit_sha": { "type": "string", "pattern": "^[a-f0-9]{40}$" },
+    "built_at": { "type": "string", "format": "date-time" },
+    "owner": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "status": { "type": "string", "enum": ["candidate", "verified", "deployed", "rolled_back", "failed"] },
+    "source_run_ids": { "type": "array", "uniqueItems": true, "items": { "type": "string", "minLength": 1, "maxLength": 160 } },
+    "schema_versions": { "type": "object", "additionalProperties": { "type": "string", "minLength": 1, "maxLength": 40 } },
+    "artifacts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "path", "sha256"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1, "maxLength": 160 },
+          "path": { "type": "string", "minLength": 1, "maxLength": 500 },
+          "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+          "content_type": { "type": "string", "maxLength": 120 },
+          "bytes": { "type": "integer", "minimum": 0 }
+        }
+      }
+    },
+    "verification": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "status"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1, "maxLength": 160 },
+          "status": { "type": "string", "enum": ["passed", "failed", "blocked", "not_applicable"] },
+          "evidence_url": { "type": "string", "format": "uri" },
+          "note": { "type": "string", "maxLength": 1000 }
+        }
+      }
+    },
+    "deployment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["environment", "status"],
+      "properties": {
+        "environment": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "status": { "type": "string", "enum": ["pending", "deployed", "failed", "rolled_back"] },
+        "run_url": { "type": "string", "format": "uri" },
+        "live_url": { "type": "string", "format": "uri" },
+        "verified_at": { "type": "string", "format": "date-time" }
+      }
+    },
+    "rollback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["commit_sha", "procedure"],
+      "properties": {
+        "commit_sha": { "type": "string", "pattern": "^[a-f0-9]{40}$" },
+        "procedure": { "type": "string", "minLength": 1, "maxLength": 2000 }
+      }
+    },
+    "known_risks": { "type": "array", "items": { "type": "string", "maxLength": 1000 } }
+  }
+}

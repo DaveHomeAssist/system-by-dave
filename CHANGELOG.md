@@ -2,6 +2,15 @@
 
 ## 2026-08-12
 
+### Portfolio Now phase
+
+* Added versioned signal, evidence, release-manifest, and structured run-event schemas with verified examples.
+* Standardized portfolio logs as JSON Lines with one correlation ID across collection, verification, build, deployment, and smoke-check workflows.
+* Selected GitHub Actions logs and artifacts as the immediate evidence source and a vendor-neutral OpenTelemetry path to centralized Loki/Tempo search.
+* Executed and recorded the portfolio Now package across CurlPlan, Phillies Wire, Frontier Signals data lab, Hat in Ring, and the canonical Frontier Signals repository, including repository commits, CI/deploy evidence, and measured performance results.
+* Added an executable five-product browser audit and WCAG 2.2 AA baseline covering keyboard order, control names, target size, reduced motion, and 200% reflow, with the remaining VoiceOver and contrast work assigned as a release gate.
+* Added a proof-based release checklist and dated press-release drafts to the product repositories while initializing every missing changelog.
+
 ### DepotOps v0.5.0
 
 * Enforced consistent `/depotops/` shopping-run quantities and statuses, added visible Requested, Shopping status, and Purchased labels, and surfaced partial quantities and overages directly on each row.

@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://systembydave.com/schemas/evidence-record.schema.json",
+  "title": "Portfolio evidence record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "id", "product", "subject", "claim", "source_url", "publisher", "retrieved_at", "content_hash", "review_status"],
+  "properties": {
+    "schema_version": { "const": "1.0.0" },
+    "id": { "type": "string", "pattern": "^ev_[a-z0-9][a-z0-9_-]{7,127}$" },
+    "product": { "type": "string", "enum": ["frontier-signals", "frontier-data-lab", "hat-in-ring", "curlplan", "phillies-wire"] },
+    "subject": { "type": "string", "minLength": 1, "maxLength": 200 },
+    "claim": { "type": "string", "minLength": 1, "maxLength": 4000 },
+    "source_url": { "type": "string", "format": "uri", "pattern": "^https://" },
+    "publisher": { "type": "string", "minLength": 1, "maxLength": 160 },
+    "published_at": { "type": ["string", "null"], "format": "date-time" },
+    "retrieved_at": { "type": "string", "format": "date-time" },
+    "evidence_type": { "type": "string", "enum": ["primary_document", "official_data", "direct_quote", "reporting", "analysis", "correction"] },
+    "stance": { "type": "string", "enum": ["supports", "contradicts", "context", "supersedes"] },
+    "content_hash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "excerpt_hash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "review_status": { "type": "string", "enum": ["pending", "approved", "rejected", "corrected", "superseded"] },
+    "reviewed_at": { "type": "string", "format": "date-time" },
+    "reviewer": { "type": "string", "maxLength": 120 },
+    "supersedes": { "type": "string", "pattern": "^ev_[a-z0-9][a-z0-9_-]{7,127}$" },
+    "note": { "type": "string", "maxLength": 2000 }
+  }
+}

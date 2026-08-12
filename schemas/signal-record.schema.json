@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://systembydave.com/schemas/signal-record.schema.json",
+  "title": "Portfolio signal record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "id", "product", "desk", "observed_at", "collected_at", "source", "title", "status", "content_hash"],
+  "properties": {
+    "schema_version": { "const": "1.0.0" },
+    "id": { "type": "string", "pattern": "^sig_[a-z0-9][a-z0-9_-]{7,127}$" },
+    "product": { "type": "string", "enum": ["frontier-signals", "frontier-data-lab", "hat-in-ring", "curlplan", "phillies-wire"] },
+    "desk": { "type": "string", "minLength": 1, "maxLength": 64 },
+    "observed_at": { "type": "string", "format": "date-time" },
+    "collected_at": { "type": "string", "format": "date-time" },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["publisher", "url", "retrieved_at"],
+      "properties": {
+        "publisher": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "url": { "type": "string", "format": "uri", "pattern": "^https://" },
+        "canonical_url": { "type": "string", "format": "uri", "pattern": "^https://" },
+        "retrieved_at": { "type": "string", "format": "date-time" }
+      }
+    },
+    "title": { "type": "string", "minLength": 1, "maxLength": 500 },
+    "summary": { "type": "string", "maxLength": 4000 },
+    "confidence": { "type": "string", "enum": ["low", "medium", "high", "verified"] },
+    "status": { "type": "string", "enum": ["collected", "normalized", "needs_review", "reviewed", "promoted", "rejected", "superseded"] },
+    "content_hash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "evidence_ids": { "type": "array", "uniqueItems": true, "items": { "type": "string", "pattern": "^ev_[a-z0-9][a-z0-9_-]{7,127}$" } },
+    "extractor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1, "maxLength": 100 },
+        "version": { "type": "string", "minLength": 1, "maxLength": 64 }
+      }
+    },
+    "raw_ref": { "type": "string", "maxLength": 500 },
+    "review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status"],
+      "properties": {
+        "status": { "type": "string", "enum": ["pending", "approved", "rejected", "corrected"] },
+        "reviewed_at": { "type": "string", "format": "date-time" },
+        "reviewer": { "type": "string", "maxLength": 120 },
+        "note": { "type": "string", "maxLength": 2000 }
+      }
+    }
+  }
+}

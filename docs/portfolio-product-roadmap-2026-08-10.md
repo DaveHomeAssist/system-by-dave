@@ -6,7 +6,7 @@
 
 **Target horizon:** 12 months
 
-**Status:** Yellow — the public products are healthy, but CurlPlan branch reconciliation and evidence-governance work are blockers for the highest-risk expansion.
+**Status:** Yellow — the 2026-08-12 Now engineering package is deployed and CurlPlan is integrated; the remaining release gate is the owned human VoiceOver and visual-contrast pass.
 
 ## Executive direction
 
@@ -274,6 +274,22 @@ Owner types: **PO** product owner, **FE** frontend/design systems, **iOS**, **BE
 | Add shared dependency, secret, and source-integrity scanning | High/medium | DevOps, Sec | Zero unresolved critical/high findings; scheduled scans in every repo | None |
 | Define signal, evidence, and release schemas | **Automation blocker**, high/medium | Data, Editorial | Versioned schemas with contract tests | Editorial decisions |
 | Initialize missing changelogs and release templates | **Quick win**, medium/low | PO, DevOps | Every repo produces tag-linked changelogs and proof-based releases | None |
+
+#### Now execution record — 2026-08-12
+
+| Initiative | Result | Production evidence |
+| --- | --- | --- |
+| CurlPlan branch reconciliation | **Complete** | PR [DaveHomeAssist/curl-plan#4](https://github.com/DaveHomeAssist/curl-plan/pull/4) merged as `a3b97f8`; web, iOS simulator, security, and Pages checks passed. Development credential auth remains explicitly non-production. |
+| Phillies Wire critical rendering | **Complete** | `d7f6c419` shipped through Publish run `31578708448`; the subsequent generated snapshot is `71e7666f`. Live delivery uses one `site.css`. Lighthouse: performance 96, accessibility 100, best practices 100, SEO 100, CLS 0.02. |
+| Frontier data-lab hero and blocking dependencies | **Complete** | `dc3ed09` passed security and Pages deployment. Lighthouse: performance 98, accessibility 100, best practices 100, LCP 2.3 seconds, CLS 0. The SEO score remains 69 because the lab is intentionally `noindex`. |
+| Hat in Ring responsive portraits | **Complete** | `d6a0061` passed 207 tests, security, and Pages deployment. The 40-file 96px set is 97.0% smaller than the original portrait set; the 192px set is 92.3% smaller. |
+| CurlPlan web quick win | **Complete** | Live preview self-hosts fonts, has one H1, no unbacked social action hooks, explicit sample-location language, 44px targets, and reduced-motion handling. Lighthouse: performance 99 and all other category scores 100; LCP 1.8 seconds, CLS 0. |
+| Shared security baseline | **Complete** | All five repositories have pinned Trivy dependency/secret/misconfiguration scans, weekly Dependabot configuration, vulnerability alerts, and automated security fixes. All initial repository scans passed after the CurlPlan container was moved to a non-root user. |
+| Evidence and logging contracts | **Complete** | Versioned signal, evidence, release-manifest, and run-event schemas plus executable examples are in `schemas/`. `docs/portfolio-observability-standard.md` selects JSON Lines, GitHub Actions logs/artifacts, a shared correlation ID, and a vendor-neutral OpenTelemetry export path. |
+| Changelogs and release templates | **Complete** | Every repository now has a changelog and proof-based release checklist; CurlPlan and the three public performance changes also have dated press-release drafts. |
+| WCAG 2.2 AA baseline | **Yellow with owned gate** | `reports/portfolio-browser-audit-2026-08-12.json` records five executable surface audits with no unnamed controls, undersized active targets, horizontal overflow, or reduced-motion violations. `docs/portfolio-accessibility-baseline-2026-08-12.md` assigns the remaining VoiceOver and contrast checks to QA / accessibility before the next material UI release. |
+
+No Now engineering blocker remains. Managed production identity, public social authority, and the remaining human accessibility pass are deliberately not promoted to Green by this execution.
 
 ### Near term: 1–3 months
 
