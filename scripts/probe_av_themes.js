@@ -198,7 +198,10 @@ async function main() {
       const effectiveBackground = (element) => {
         const chain = [];
         for (let current = element; current; current = current.parentElement) chain.unshift(current);
-        let background = parseColor(value('--av-bg'));
+        // Throwline intentionally uses self-contained theme tokens rather
+        // than the shared AV variables. Start from the computed page surface
+        // so the audit remains accurate for every page.
+        let background = parseColor(getComputedStyle(document.body).backgroundColor);
         chain.forEach((current) => {
           background = composite(parseColor(getComputedStyle(current).backgroundColor), background);
         });
@@ -242,7 +245,15 @@ async function main() {
         tool: root.getAttribute('data-av-tool'),
         optIn: root.getAttribute('data-av-theme'),
         darkPreference: matchMedia('(prefers-color-scheme: dark)').matches,
-        tokens: {
+        tokens: location.pathname.includes('/ProjectorThrow/') ? {
+          bg: value('--deck'),
+          surface: value('--case'),
+          text: value('--chalk'),
+          muted: value('--dim'),
+          accent: value('--hazard'),
+          primaryInk: value('--primary-ink'),
+          focus: value('--hazard')
+        } : {
           bg: value('--av-bg'),
           surface: value('--av-surface'),
           text: value('--av-text'),
@@ -254,7 +265,7 @@ async function main() {
         bodyBackground: getComputedStyle(document.body).backgroundColor,
         overflowX: Math.max(document.documentElement.scrollWidth, document.body.scrollWidth) - innerWidth,
         showBoardDark: root.getAttribute('data-av-tool') === 'show-board' ? document.body.classList.contains('dark') : null,
-        throwlineDark: root.getAttribute('data-av-tool') === 'throwline' ? root.dataset.theme === 'dark' : null,
+        throwlineDark: location.pathname.includes('/ProjectorThrow/') ? root.dataset.theme === 'dark' : null,
         pixelForgeDark: root.getAttribute('data-av-tool') === 'pixelforge' && pixelForge ? pixelForge.classList.contains('pf-dark') : null,
         pixelForgeSystem: root.getAttribute('data-av-tool') === 'pixelforge' ? root.getAttribute('data-av-system-theme') : null,
         contrastViolations
@@ -280,7 +291,8 @@ async function main() {
           const screenshot = await cdp('Page.captureScreenshot', { format: 'png', fromSurface: true, captureBeyondViewport: false });
           fs.writeFileSync(path.join(captureDir, `${target.id}-${preference}-${viewportWidth}.png`), Buffer.from(screenshot.data, 'base64'));
         }
-        const expectedBg = preference === 'dark' ? '#0c1016' : '#eee8df';
+        const throwlineStandalone = target.id === 'throwline';
+        const expectedBg = throwlineStandalone ? '#f4f1ea' : (preference === 'dark' ? '#0c1016' : '#eee8df');
         const ratios = {
           text: contrast(value.tokens.text, value.tokens.bg),
           muted: contrast(value.tokens.muted, value.tokens.surface),
@@ -290,14 +302,18 @@ async function main() {
         };
         results.push({ id: target.id, preference, tokens: value.tokens, ratios, overflowX: value.overflowX });
 
-        if (value.tool !== target.id || value.optIn !== 'system') failures.push(`${target.id} ${preference}: wrong theme identity (${value.tool}/${value.optIn}).`);
+        if (throwlineStandalone) {
+          if (value.tool !== null || value.optIn !== null) failures.push(`throwline ${preference}: standalone app must not opt into the shared system theme (${value.tool}/${value.optIn}).`);
+        } else if (value.tool !== target.id || value.optIn !== 'system') {
+          failures.push(`${target.id} ${preference}: wrong theme identity (${value.tool}/${value.optIn}).`);
+        }
         if (value.tokens.bg.toLowerCase() !== expectedBg) failures.push(`${target.id} ${preference}: --av-bg is ${value.tokens.bg}, expected ${expectedBg}.`);
         if (ratios.text < 4.5 || ratios.muted < 4.5 || ratios.accent < 4.5 || ratios.primary < 4.5 || ratios.focus < 3) {
           failures.push(`${target.id} ${preference}: contrast contract failed ${JSON.stringify(ratios)}.`);
         }
         if (value.overflowX > 1) failures.push(`${target.id} ${preference}: mobile overflowX=${value.overflowX}.`);
         if (target.id === 'show-board' && value.showBoardDark !== (preference === 'dark')) failures.push(`show-board ${preference}: body theme does not match the system.`);
-        if (target.id === 'throwline' && value.throwlineDark !== (preference === 'dark')) failures.push(`throwline ${preference}: startup theme does not match the system.`);
+        if (target.id === 'throwline' && value.throwlineDark !== false) failures.push(`throwline ${preference}: standalone app does not retain its light default.`);
         if (target.id === 'pixelforge' && value.pixelForgeSystem !== preference) failures.push(`pixelforge ${preference}: launcher theme does not match the system.`);
         if (value.contrastViolations.length) failures.push(`${target.id} ${preference}: visible text contrast ${JSON.stringify(value.contrastViolations)}.`);
         if (exceptions.length) failures.push(`${target.id} ${preference}: ${exceptions.join('; ')}`);
