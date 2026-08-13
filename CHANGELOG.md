@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-08-13
+
+* Added `/av-tool-suite/index-v2/` as a parallel, workflow-first AV Tool Suite index. The dark graphite visual direction maps the 25 named legacy tools into Plan, Build, and Run & Support workspaces without changing `/av-suite.html`; it includes local control-room and advance-venue imagery at `/images/av-control-room.jpg` and `/images/av-venue-advance.jpg`.
+
 ## 2026-08-12
 
 ### AV Suite adaptive themes

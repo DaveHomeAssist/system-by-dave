@@ -26,6 +26,7 @@ STATIC_PAGES = [
     ("depotops/", "weekly", "0.7"),
     ("tailscale-manual.html", "monthly", "0.7"),
     ("av-suite.html", "weekly", "0.9"),
+    ("av-tool-suite/index-v2/", "monthly", "0.7"),
     ("av-workbook/", "weekly", "0.8"),
     ("pixelforge/", "weekly", "0.8"),
     ("ProjectorThrow/", "weekly", "0.8"),
