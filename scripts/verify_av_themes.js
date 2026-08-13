@@ -28,9 +28,12 @@ function routeFile(href) {
 }
 
 const avRegistry = registry();
+const SYSTEM_THEME_EXCEPTIONS = new Set(['throwline']);
 const routes = [
   { id: 'av-suite', href: 'av-suite.html', file: 'av-suite.html' },
-  ...avRegistry.tools.map((tool) => ({ ...tool, file: routeFile(tool.href) }))
+  ...avRegistry.tools
+    .filter((tool) => !SYSTEM_THEME_EXCEPTIONS.has(tool.id))
+    .map((tool) => ({ ...tool, file: routeFile(tool.href) }))
 ];
 
 const themeCss = read('css/av-theme.css');
@@ -80,11 +83,6 @@ if (/id="themebtn"/.test(showBoard) || !/matchMedia\("\(prefers-color-scheme: da
   fail('Show Board still owns a persistent page-level startup theme.');
 }
 
-const throwline = read('ProjectorThrow/index.html');
-if (/localStorage\.setItem\(STORAGE\.theme/.test(throwline)) {
-  fail('Throwline still persists a page-level startup theme.');
-}
-
 const pixelForge = read('pixelforge/index.html');
 if (!pixelForge.includes('src="../js/av-theme.js"')) {
   fail('PixelForge does not synchronize its compiled editor preference before boot.');
@@ -96,7 +94,7 @@ const offlineAssets = avRegistry.offlineAssets();
 });
 
 const audit = read('docs/av-suite-theme-audit-2026-08-12.md');
-avRegistry.tools.forEach((tool) => {
+avRegistry.tools.filter((tool) => !SYSTEM_THEME_EXCEPTIONS.has(tool.id)).forEach((tool) => {
   if (!audit.includes(`| ${tool.name} |`) || !audit.includes(`\`${tool.href.startsWith('/') ? tool.href : `/${tool.href}`}\``)) {
     fail(`Theme audit does not record ${tool.name} (${tool.href}).`);
   }

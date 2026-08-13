@@ -72,11 +72,11 @@ The suite now has two palettes, both owned by `css/av-theme.css`:
 
 Rules:
 
-1. Initial appearance follows `prefers-color-scheme`; no tool may ship a different persistent startup theme.
+1. Initial appearance follows `prefers-color-scheme` for every shared-theme surface. Throwline is the deliberate standalone exception: it defaults to light and stores an explicit local light/dark choice in `throwline:theme:v1` so a downloaded file remains independent of shared CSS and operating-system preference.
 2. Layout, density, typography, and product-specific work surfaces remain local.
 3. Functional colors remain local only when their meaning is intrinsic: teleprompter reader colors, stage zones, cable/status legends, PixelForge canvas colors, and Throwline measurement bands.
 4. Shared controls, surfaces, focus rings, status roles, tables, responsive cards, and System by Dave navigation consume the common tokens.
-5. A tool may offer a session-only view override, but the next load returns to the operating-system preference.
+5. A shared-theme tool may offer a session-only view override, but the next load returns to the operating-system preference. Throwline retains its documented persistent local override.
 
 ## Isolated primitives
 
@@ -88,4 +88,4 @@ Rules:
 
 ## Verification contract
 
-`scripts/verify_av_themes.js` treats the registry as the route source of truth and fails when a canonical tool omits theme metadata, the shared opt-in, or the shared stylesheet/import. `scripts/probe_av_themes.js` exercises both emulated `light` and `dark` preferences on every route, checks the shared tokens and specialist adapters, scans visible rendered text against WCAG contrast thresholds, and rejects horizontal overflow at phone and desktop widths.
+`scripts/verify_av_themes.js` treats the registry as the route source of truth and fails when a shared-theme canonical tool omits theme metadata, the shared opt-in, or the shared stylesheet/import. `scripts/verify_throwline_release.js` protects Throwline's intentional standalone exception. `scripts/probe_av_themes.js` exercises both emulated `light` and `dark` preferences on every route, checks the shared tokens and specialist adapters, scans visible rendered text against WCAG contrast thresholds, and rejects horizontal overflow at phone and desktop widths.

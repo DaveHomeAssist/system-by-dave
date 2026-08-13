@@ -42,6 +42,9 @@ jobs:
           npm run verify:gear-reference
           npm run verify:public-navigation
 
+      - name: Verify Throwline release contract
+        run: npm run verify:throwline
+
       - name: Verify AV Workbook
         run: |
           npm run typecheck:av-workbook
