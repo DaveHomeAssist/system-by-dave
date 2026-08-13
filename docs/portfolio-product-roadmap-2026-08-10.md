@@ -6,7 +6,7 @@
 
 **Target horizon:** 12 months
 
-**Status:** Yellow — the 2026-08-12 Now engineering package is deployed and CurlPlan is integrated; the remaining release gate is the owned human VoiceOver and visual-contrast pass.
+**Status:** Red — the 2026-08-12 Now engineering package is deployed and CurlPlan is integrated, but the completed five-product browser QA matrix found six release-blocking WCAG A/AA issues across CurlPlan, Hat in Ring, and Frontier Signals.
 
 ## Executive direction
 
@@ -32,7 +32,7 @@ The following are one-run mobile Lighthouse measurements, not field Core Web Vit
 | CurlPlan | 87 | 100 | 100 | 100 | 3.1 s | 0.031 | Fonts and a demo-first landing delay product value |
 | Phillies Wire | 82 | 100 | 100 | 100 | 2.5 s | 0.271 | Font-driven layout shift is the largest web defect |
 
-Automated accessibility scores are a useful regression signal, not WCAG certification. Every core journey still needs manual keyboard, VoiceOver, 200% zoom, contrast, target-size, and reduced-motion verification.
+Automated accessibility scores are a useful regression signal, not WCAG certification. The 2026-08-12 browser QA matrix now covers full keyboard traversal, representative journeys, 200% reflow, WCAG text spacing, contrast, target size, responsive screenshots, semantics, and reduced motion. Screen-reader testing is excluded from the current portfolio gate.
 
 ## Portfolio priorities
 
@@ -270,7 +270,7 @@ Owner types: **PO** product owner, **FE** frontend/design systems, **iOS**, **BE
 | Optimize Frontier lab hero and blocking animation | **Quick win**, high/low | FE | Mobile LCP at or below 2.5 seconds and performance at or above 90 | None |
 | Generate Hat candidate thumbnails and responsive images | **Quick win**, high/low | FE, Data | At least 80% less candidate-image transfer on mobile | Image build pipeline |
 | Improve CurlPlan web H1, fonts, product CTA, and hit areas | **Quick win**, medium/low | FE | LCP at or below 2.5 seconds; core targets at least 44 px | None |
-| Run a manual WCAG 2.2 AA baseline | High/medium | QA/A11y | Core keyboard, VoiceOver, zoom, contrast, and motion checks pass or have owned defects | Stable test URLs |
+| Run a WCAG 2.2 AA browser QA matrix | High/medium | QA/A11y | Keyboard, semantics, 200% reflow, text spacing, contrast, targets, responsive visuals, and motion pass or have owned defects | Stable test URLs |
 | Add shared dependency, secret, and source-integrity scanning | High/medium | DevOps, Sec | Zero unresolved critical/high findings; scheduled scans in every repo | None |
 | Define signal, evidence, and release schemas | **Automation blocker**, high/medium | Data, Editorial | Versioned schemas with contract tests | Editorial decisions |
 | Initialize missing changelogs and release templates | **Quick win**, medium/low | PO, DevOps | Every repo produces tag-linked changelogs and proof-based releases | None |
@@ -287,9 +287,9 @@ Owner types: **PO** product owner, **FE** frontend/design systems, **iOS**, **BE
 | Shared security baseline | **Complete** | All five repositories have pinned Trivy dependency/secret/misconfiguration scans, weekly Dependabot configuration, vulnerability alerts, and automated security fixes. All initial repository scans passed after the CurlPlan container was moved to a non-root user. |
 | Evidence and logging contracts | **Complete** | Versioned signal, evidence, release-manifest, and run-event schemas plus executable examples are in `schemas/`. `docs/portfolio-observability-standard.md` selects JSON Lines, GitHub Actions logs/artifacts, a shared correlation ID, and a vendor-neutral OpenTelemetry export path. |
 | Changelogs and release templates | **Complete** | Every repository now has a changelog and proof-based release checklist; CurlPlan and the three public performance changes also have dated press-release drafts. |
-| WCAG 2.2 AA baseline | **Yellow with owned gate** | `reports/portfolio-browser-audit-2026-08-12.json` records five executable surface audits with no unnamed controls, undersized active targets, horizontal overflow, or reduced-motion violations. `docs/portfolio-accessibility-baseline-2026-08-12.md` assigns the remaining VoiceOver and contrast checks to QA / accessibility before the next material UI release. |
+| WCAG 2.2 AA baseline | **Red with owned blockers** | `reports/portfolio-qa-matrix-2026-08-12.md` records the completed five-product keyboard, semantic, reflow, text-spacing, contrast, target-size, responsive, and reduced-motion matrix. Seven owned issues were opened; six contain release-blocking WCAG A/AA failures. Phillies Wire and the Frontier data lab are Green within the tested browser scope. |
 
-No Now engineering blocker remains. Managed production identity, public social authority, and the remaining human accessibility pass are deliberately not promoted to Green by this execution.
+The original Now engineering package remains deployed, but the portfolio accessibility initiative is Red until six release blockers close and the deployed fixes pass the same matrix. Managed production identity and public social authority remain separate future gates.
 
 ### Near term: 1–3 months
 

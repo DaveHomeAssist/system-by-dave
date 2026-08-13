@@ -1,54 +1,76 @@
 # Portfolio accessibility baseline
 
-**Date:** 2026-08-12
+**Date:** 2026-08-12 ET / 2026-08-13 UTC
 
-**Target:** WCAG 2.2 Level AA
+**Target:** WCAG 2.2 Level AA plus the portfolio's 44 by 44 CSS-pixel active-target baseline
 
 **Owner types:** QA / accessibility, frontend, product
 
-**Evidence:** `reports/portfolio-browser-audit-2026-08-12.json`
+**Evidence:** `reports/portfolio-browser-audit-2026-08-12.json` and `reports/portfolio-qa-matrix-2026-08-12.md`
 
 ## Result
 
-Status is **Yellow**. The executable browser baseline is green for the checks that can be measured through Chrome DevTools Protocol, and every defect found in the first pass has an owner and was corrected before this report was finalized. A human VoiceOver and visual contrast pass remains required before the next UI release; automation does not certify WCAG conformance.
+Status is **Red**. The expanded five-product QA matrix completed at 2026-08-13T03:40:20Z and recorded seven owned GitHub issues. Six issues contain release-blocking WCAG A/AA failures across CurlPlan, Hat in Ring, and Frontier Signals; one CurlPlan issue is non-blocking 44px target hardening.
+
+Phillies Wire and the Frontier Signals data lab are Green within the tested browser scope. Green here means no failure was found in the named checks, not that complete WCAG conformance has been certified.
 
 ## Scope and method
 
-The audit exercised CurlPlan web, Phillies Wire, Frontier Signals data lab, Hat in Ring, and the live canonical Frontier Signals site. Each surface was checked at a 390 by 844 mobile viewport with 4G network and 4x CPU throttling, `prefers-reduced-motion: reduce`, the first 20 keyboard focus stops, an accessibility-tree control-name scan, and a 640 CSS-pixel reflow check representing a 1280-pixel desktop viewport at 200% zoom.
+The run exercised CurlPlan web, Phillies Wire, Frontier Signals data lab, Hat in Ring, and the live canonical Frontier Signals site. Screen-reader testing was excluded. The executed matrix covered:
 
-This pass covers keyboard reachability indicators, programmatic control names, landmark presence, reflow, target size, and reduced-motion behavior. It does not replace VoiceOver speech-order review, human contrast inspection, cognition and language review, or complete journey testing.
+1. Full forward and reverse keyboard traversal.
+2. Representative core-journey activation with state verification.
+3. Programmatic names, labels, landmarks, table/action semantics, relationships, duplicate IDs, and hidden focus targets.
+4. Desktop and 390 by 844 mobile screenshot review.
+5. 640 CSS-pixel reflow, representing 200% zoom on a 1280-pixel desktop surface.
+6. WCAG 1.4.12 line, letter, word, and paragraph spacing overrides.
+7. Computed text contrast plus visual review for gradient and image-backed regions.
+8. Active-target measurements at desktop, reflow, and mobile widths.
+9. Reduced-motion emulation and active-animation inspection.
 
-## Final automated baseline
+The browser was Google Chrome 151.0.7922.109 on macOS 26.6. Automation and screenshot review do not replace cognition, language, or user-research testing.
 
-| Product | Keyboard first 20 | Named controls | 44px active targets | 200% reflow | Reduced motion | Synthetic CLS | Synthetic LCP |
-| --- | --- | --- | --- | --- | --- | ---: | ---: |
-| CurlPlan web | Pass | Pass | Pass | Pass | Pass | 0 | 1.068 s |
-| Phillies Wire | Pass | Pass | Pass | Pass | Pass | 0 | 1.168 s |
-| Frontier Signals data lab | Pass | Pass | Pass | Pass | Pass | 0 | 0.620 s |
-| Hat in Ring | Pass | Pass | Pass | Pass | Pass | 0.026 | 2.668 s |
-| Frontier Signals | Pass | Pass | Pass | Pass | Pass | 0 | 0.480 s |
+## Product baseline
 
-Performance values are single-run lab measurements, not field Core Web Vitals. They are included because unexpected layout shifts and long main-thread work can directly impair accessibility.
+| Product | Keyboard and journey | Reflow and spacing | Contrast | Targets and semantics | Status |
+| --- | --- | --- | --- | --- | --- |
+| CurlPlan web | Demo entry and tab navigation pass; closed Appearance controls incorrectly enter the initial focus order | No overflow or new text clipping | Pass in tested states | Four demo tabs miss 44px; closed dialogs are not inert or hidden | **Red** |
+| Phillies Wire | 20 active stops, reverse traversal, accordion, theme, and copy feedback pass | Pass; only intentionally hidden helper text was flagged | Pass | Pass | **Green in scope** |
+| Frontier Signals data lab | 37 active stops, reverse traversal, and Enter/Space desk changes pass | Pass | Pass | Pass | **Green in scope** |
+| Hat in Ring | View changes work, but 47 table action stops lack explicit action semantics | A card summary clips under required spacing | `Exploratory` badge fails at 4.22:1 | `The Wire` misses AA minimum; 12 more controls miss 44px | **Red** |
+| Frontier Signals | 34 active stops, reverse traversal, and Disclosures navigation pass | One latest-signal title becomes newly clipped under required spacing | Pass | Pass | **Red** |
 
-## Defect closure
+Every product remained free of page-level horizontal overflow at desktop, 200% reflow, and mobile widths. Every tested product reported zero active animations with reduced motion requested. The browser accessibility-tree scan found no unnamed interactive roles.
 
-| Defect | Owner | Resolution | Verification |
+## Defects and owners
+
+| Product | Issue | Blocking status | Owner |
 | --- | --- | --- | --- |
-| Phillies Wire Game Status trigger measured 39px high | Frontend | Added a 44px minimum height to accordion triggers | Re-run reports no undersized controls |
-| Phillies Wire theme toggle measured 23px high | Frontend | Added 44px minimum width and height | Re-run reports no undersized controls |
-| Frontier data lab focus controls measured 38px high | Frontend | Raised focus-control minimum height to 44px | Re-run reports no undersized controls |
-| Hat in Ring home control measured 42px high | Frontend | Added a 44px minimum height | Re-run reports no undersized controls |
+| CurlPlan | [#8 Closed sheets remain in the keyboard focus order](https://github.com/DaveHomeAssist/curl-plan/issues/8) | **Release blocker** | DaveHomeAssist / frontend |
+| CurlPlan | [#9 Post-demo tabs miss the 44px portfolio target](https://github.com/DaveHomeAssist/curl-plan/issues/9) | P2 hardening | DaveHomeAssist / frontend |
+| Hat in Ring | [#4 Exploratory badge contrast is 4.22:1](https://github.com/DaveHomeAssist/hatinring/issues/4) | **Release blocker** | DaveHomeAssist / frontend |
+| Hat in Ring | [#5 Sortable headers and candidate rows lack explicit action roles](https://github.com/DaveHomeAssist/hatinring/issues/5) | **Release blocker** | DaveHomeAssist / frontend |
+| Hat in Ring | [#6 Compact controls miss AA and portfolio target sizes](https://github.com/DaveHomeAssist/hatinring/issues/6) | **Release blocker** for `The Wire`; remaining targets are P2 | DaveHomeAssist / frontend |
+| Hat in Ring | [#7 Card summaries clip under required text spacing](https://github.com/DaveHomeAssist/hatinring/issues/7) | **Release blocker** | DaveHomeAssist / frontend |
+| Frontier Signals | [#2 Latest-signal title clips under required text spacing](https://github.com/DaveHomeAssist/frontier-signals/issues/2) | **Release blocker** | DaveHomeAssist / frontend |
 
-The Hat in Ring re-run also caught and closed a responsive-image binding error that requested `/96w`. The template now binds one complete `srcset` value, and the browser loads the intended 96px thumbnails.
+## Verified passes
 
-## Required human release gate
+- All five live product URLs returned HTTP 200 before the run.
+- Every representative keyboard journey changed the expected route, view, pressed state, expanded state, theme, or copy feedback.
+- Full traversal reached the document boundary and reversed to the last focusable item on every product.
+- No unnamed interactive accessibility-tree nodes were found.
+- No duplicate IDs, unlabeled form fields, invalid `aria-controls` references, or page-level overflow were found.
+- No newly clipped visible text was found under required spacing in CurlPlan, Phillies Wire, or the Frontier Signals data lab.
+- No active animation remained when reduced motion was requested.
 
-The QA / accessibility owner must complete and record these checks before the next material UI release in each product:
+## Release gate
 
-1. VoiceOver on macOS Safari and iOS Safari: landmark order, control purpose, expanded state, table interpretation, dynamic updates, and escape/recovery.
-2. Contrast: text, icons, focus indicators, disabled controls, status colors, and forced/high-contrast appearance where supported.
-3. Keyboard-only complete core journey, including reverse traversal, dialogs, errors, and recovery from every overlay.
-4. Text resizing and spacing overrides at 200%, including long labels and error messages.
-5. Motion and timeout review with reduced motion enabled and no information conveyed only by animation.
+The next material UI release must not mark the portfolio accessibility initiative Green until:
 
-Record failures as repository issues with product, route, WCAG criterion, reproduction steps, severity, owner, and release-blocking status. Critical journey failures and WCAG A/AA violations block release; cosmetic enhancements do not.
+1. The six release-blocking issues are closed with linked code and deployment evidence.
+2. The affected product checks are re-run using the same viewport, keyboard, spacing, contrast, target, and reduced-motion conditions.
+3. The deployed fixes pass, not only a local working copy.
+4. The updated matrix and issue closure evidence are linked from the roadmap and canonical status run.
+
+The non-blocking CurlPlan 44px issue remains required by the portfolio standard but does not alone hold the WCAG AA release gate Red.
