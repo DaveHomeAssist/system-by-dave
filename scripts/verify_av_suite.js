@@ -101,8 +101,8 @@ function assertPageContracts(registry) {
   }
 
   const avSuite = read('av-suite.html');
-  if (!/<meta name="theme-color" content="#EEE8DF">/.test(avSuite) || !/color-scheme:light/.test(avSuite) || !/--accent:#9E432B/.test(avSuite)) {
-    fail('AV Suite does not declare the warm light theme as its default.');
+  if (!/data-av-theme="system" data-av-tool="av-suite"/.test(avSuite) || !/href="css\/av-theme\.css"/.test(avSuite) || !/prefers-color-scheme: dark/.test(avSuite)) {
+    fail('AV Suite does not declare the shared system-adaptive theme contract.');
   }
   if (/oklch\(0\.68 0\.13 158|#30B27B|--bg:#0A0D14/.test(avSuite)) {
     fail('AV Suite still contains the retired green-led dark palette.');

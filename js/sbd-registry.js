@@ -109,10 +109,12 @@
     './js/av-suite-context.js',
     './js/sbd-nav.js',
     './js/sbd-public-nav.js',
+    './js/av-theme.js',
     './js/sbd-handoff.js',
     './js/responsive-tables.js',
     './js/av-domain-views.js',
     './css/sbd-public-nav.css',
+    './css/av-theme.css',
     './css/responsive-tables.css',
     './css/av-domain-views.css',
     './css/fonts.css',
@@ -172,7 +174,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool change — rolls the service-worker cache. */
-    version:'v20260812-av-suite-light',
+    version:'v20260812-av-adaptive-themes',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,

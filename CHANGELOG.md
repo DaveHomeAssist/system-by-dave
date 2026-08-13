@@ -2,10 +2,12 @@
 
 ## 2026-08-12
 
-### AV Suite warm light theme
+### AV Suite adaptive themes
 
-* Replaced the green-led dark AV Suite default with a warm paper palette, rust primary actions, blue readiness, restrained semantic status colors, and light system chrome while preserving the console layout and operator workflow.
-* Added automated theme-contract coverage and rolled the offline cache so returning operators receive the new presentation.
+* Unified the AV Suite hub and all 44 canonical tools under two system-driven palettes: Warm Paper for light mode and Stage Slate for dark mode, with rust primary actions, blue focus and readiness, and consistent success, warning, and issue semantics.
+* Preserved specialist work surfaces where color carries operational meaning, including Teleprompter reader looks, Throwline measurement bands, Stage Plot drafting, PixelForge canvas previews, and Show Board timelines.
+* Added a route-by-route palette and reusable-design audit plus automated metadata, token, rendered-contrast, responsive-overflow, and specialist-theme verification across both operating-system preferences.
+* Rolled the offline cache so returning operators receive the shared theme stylesheet and compiled specialist bridge.
 
 ### Gear Reference beta
 

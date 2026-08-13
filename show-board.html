@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-sbd-nav="off">
+<html lang="en" data-sbd-nav="off" data-av-theme="system" data-av-tool="show-board">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -8,7 +8,8 @@
 <meta name="robots" content="index,follow">
 <meta name="description" content="A live room-turn and technician-readiness board for breakout-room AV operations, with local backups, issue tracking, sign-text import, and offline support.">
 <link rel="canonical" href="https://systembydave.com/show-board.html">
-<meta name="theme-color" content="#1c1712">
+<meta name="theme-color" content="#EEE8DF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0C1016" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="System by Dave">
 <meta property="og:title" content="Show Board">
@@ -404,6 +405,7 @@ body.edit #addroom{display:inline-block}
   .head,.hdr-actions,#addroom,.daytabs,.foot-actions,.zoom,.data-health{display:none}
 }
 </style>
+<link rel="stylesheet" href="css/av-theme.css">
 </head>
 <body>
 
@@ -469,7 +471,6 @@ body.edit #addroom{display:inline-block}
     <a class="btn" href="index.html" aria-label="System by Dave home">Home</a>
     <button class="btn" id="showsbtn">Shows</button>
     <button class="btn" id="backupsbtn">Backups</button>
-    <button class="btn" id="themebtn">Dark</button>
     <button class="btn" id="settingsbtn">Setup</button>
     <button class="btn" id="editbtn">Edit</button>
   </div>
@@ -1225,12 +1226,12 @@ $("zoomin").addEventListener("click",()=>zoom(1));
 $("zoomout").addEventListener("click",()=>zoom(-1));
 
 /* ---------- theme ---------- */
+const themePreference=window.matchMedia("(prefers-color-scheme: dark)");
 function applyTheme(){
-  document.body.classList.toggle("dark",show&&show.theme==="dark");
-  $("themebtn").textContent=(show&&show.theme==="dark")?"Light":"Dark";
+  document.body.classList.toggle("dark",themePreference.matches);
 }
-$("themebtn").addEventListener("click",()=>{
-  show.theme=show.theme==="dark"?"light":"dark";applyTheme();save();});
+themePreference.addEventListener("change",applyTheme);
+applyTheme();
 
 /* ---------- edit mode ---------- */
 $("editbtn").addEventListener("click",()=>{
@@ -1529,7 +1530,7 @@ $("s_create").addEventListener("click",async()=>{
     grid:{tick:+$("s_tick").value,snap:+$("s_snap").value,pxPerHour:120},
     turnMax:Math.max(1,+$("s_turn").value||30),
     darkMax:Math.max(1,+$("s_dark").value||60),
-    theme:"light",active:0,days,savedAt:new Date().toISOString(),revision:1,
+    theme:"system",active:0,days,savedAt:new Date().toISOString(),revision:1,
     writeToken:uid()+TAB_ID
   };
   const t=todayISO();
