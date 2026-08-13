@@ -8,7 +8,8 @@
 
 * Closed and production-verified CurlPlan #8, Hat in Ring #4–#7, and Frontier Signals #2 after their commits passed repository verification, security, deployment, and affected live-browser checks.
 * Added the remediation rerun record with commit, workflow, live-header, issue-state, keyboard, semantics, contrast, target-size, text-spacing, focus, and reflow evidence.
-* Cleared the WCAG A/AA release gate in the re-tested browser scope and moved the broader portfolio baseline from Red to Amber; CurlPlan #9 remains the sole non-blocking 44px target-hardening gap.
+* Closed CurlPlan #9 after all four deployed demo tabs measured at least 44 by 44 CSS pixels at 390px and 640px with preserved order, visible focus, selected styling, and overflow behavior.
+* Cleared the WCAG A/AA release gate and moved the broader portfolio baseline from Red through Amber to Green in the re-tested browser scope; all seven matrix issues are closed.
 
 ## 2026-08-12
 

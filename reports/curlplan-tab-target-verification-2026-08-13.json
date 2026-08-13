@@ -1,0 +1,75 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2026-08-13T08:24:25Z",
+  "product": "CurlPlan",
+  "target_url": "https://davehomeassist.github.io/curl-plan/?verify=42dc0ed",
+  "commit": "42dc0ed4f33cf38d3cec894304411345dd57e608",
+  "method": "Fresh headless Chrome profile using the DevTools Protocol; enter demo, measure rendered CSS boxes, traverse by keyboard, inspect computed focus outline, and compare document and viewport widths",
+  "issue": {
+    "number": 9,
+    "url": "https://github.com/DaveHomeAssist/curl-plan/issues/9",
+    "state": "closed",
+    "closed_at": "2026-08-13T08:24:21Z",
+    "evidence_comment": "https://github.com/DaveHomeAssist/curl-plan/issues/9#issuecomment-5277882743"
+  },
+  "workflows": [
+    {
+      "name": "Verify",
+      "run_id": 31681653119,
+      "conclusion": "success"
+    },
+    {
+      "name": "Security baseline",
+      "run_id": 31681653128,
+      "conclusion": "success"
+    },
+    {
+      "name": "pages-build-deployment",
+      "run_id": 31681652388,
+      "conclusion": "success"
+    }
+  ],
+  "http": {
+    "status": 200,
+    "content_type": "text/html; charset=utf-8",
+    "last_modified": "2026-08-13T08:21:45Z"
+  },
+  "expected_order": [
+    "Passport",
+    "Locker",
+    "Spiels",
+    "Roster"
+  ],
+  "viewports": [
+    {
+      "width": 390,
+      "height": 844,
+      "horizontal_overflow": false,
+      "tabs": [
+        { "label": "Passport", "width": 47.69, "height": 44, "tab_index": 0, "focus_outline": "solid 3px" },
+        { "label": "Locker", "width": 44, "height": 44, "tab_index": 0, "focus_outline": "solid 3px" },
+        { "label": "Spiels", "width": 44, "height": 44, "tab_index": 0, "focus_outline": "solid 3px" },
+        { "label": "Roster", "width": 44, "height": 44, "tab_index": 0, "focus_outline": "solid 3px" }
+      ]
+    },
+    {
+      "width": 640,
+      "height": 900,
+      "horizontal_overflow": false,
+      "tabs": [
+        { "label": "Passport", "width": 47.69, "height": 44, "tab_index": 0, "focus_outline": "solid 3px" },
+        { "label": "Locker", "width": 44, "height": 44, "tab_index": 0, "focus_outline": "solid 3px" },
+        { "label": "Spiels", "width": 44, "height": 44, "tab_index": 0, "focus_outline": "solid 3px" },
+        { "label": "Roster", "width": 44, "height": 44, "tab_index": 0, "focus_outline": "solid 3px" }
+      ]
+    }
+  ],
+  "acceptance": {
+    "all_tabs_at_least_44_by_44": true,
+    "visual_spacing_and_selected_state_preserved": true,
+    "keyboard_order_preserved": true,
+    "visible_focus_preserved": true,
+    "horizontal_overflow": false
+  },
+  "result": "pass"
+}

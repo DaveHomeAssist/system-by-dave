@@ -6,7 +6,7 @@
 
 **Target horizon:** 12 months
 
-**Status:** Amber — the 2026-08-12 Now engineering package is deployed, all six WCAG A/AA release blockers are closed, and their affected production checks pass. CurlPlan #9 remains open as non-blocking 44px target hardening.
+**Status:** Green in the tested browser scope — the 2026-08-12 Now engineering package is deployed, all six WCAG A/AA release blockers and the remaining CurlPlan 44px hardening issue are closed, and their affected production checks pass.
 
 ## Executive direction
 
@@ -34,7 +34,7 @@ The following are one-run mobile Lighthouse measurements, not field Core Web Vit
 
 Automated accessibility scores are a useful regression signal, not WCAG certification. The 2026-08-12 browser QA matrix now covers full keyboard traversal, representative journeys, 200% reflow, WCAG text spacing, contrast, target size, responsive screenshots, semantics, and reduced motion. Screen-reader testing is excluded from the current portfolio gate.
 
-The 2026-08-13 remediation rerun closed and production-verified CurlPlan #8, Hat in Ring #4–#7, and Frontier Signals #2. The release gate is Green within those re-tested browser-observable checks; the broader portfolio target baseline is Amber while CurlPlan #9 remains open.
+The 2026-08-13 remediation reruns closed and production-verified CurlPlan #8 and #9, Hat in Ring #4–#7, and Frontier Signals #2. The release gate and broader portfolio target baseline are Green within those re-tested browser-observable checks.
 
 ## Portfolio priorities
 
@@ -289,9 +289,9 @@ Owner types: **PO** product owner, **FE** frontend/design systems, **iOS**, **BE
 | Shared security baseline | **Complete** | All five repositories have pinned Trivy dependency/secret/misconfiguration scans, weekly Dependabot configuration, vulnerability alerts, and automated security fixes. All initial repository scans passed after the CurlPlan container was moved to a non-root user. |
 | Evidence and logging contracts | **Complete** | Versioned signal, evidence, release-manifest, and run-event schemas plus executable examples are in `schemas/`. `docs/portfolio-observability-standard.md` selects JSON Lines, GitHub Actions logs/artifacts, a shared correlation ID, and a vendor-neutral OpenTelemetry export path. |
 | Changelogs and release templates | **Complete** | Every repository now has a changelog and proof-based release checklist; CurlPlan and the three public performance changes also have dated press-release drafts. |
-| WCAG 2.2 AA baseline | **Amber; release gate cleared** | `reports/portfolio-accessibility-remediation-2026-08-13.md` records deployed commits, CI/security/Pages provenance, issue closures, and production reruns for all six release blockers. CurlPlan #9 remains open as non-blocking 44px target hardening. |
+| WCAG 2.2 AA baseline | **Complete; Green in tested scope** | `reports/portfolio-accessibility-remediation-2026-08-13.md` records deployed commits, CI/security/Pages provenance, issue closures, and production reruns for all six release blockers plus CurlPlan #9. |
 
-The original Now engineering package remains deployed. The accessibility release gate is Green in the re-tested browser scope; the portfolio remains Amber until CurlPlan #9 reaches the 44px target in production. Managed production identity and public social authority remain separate future gates.
+The original Now engineering package remains deployed. The accessibility release gate and broader portfolio target baseline are Green in the re-tested browser scope. Managed production identity and public social authority remain separate future gates.
 
 ### Near term: 1–3 months
 

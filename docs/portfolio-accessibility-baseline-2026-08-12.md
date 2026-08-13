@@ -6,11 +6,11 @@
 
 **Owner types:** QA / accessibility, frontend, product
 
-**Evidence:** `reports/portfolio-browser-audit-2026-08-12.json`, `reports/portfolio-qa-matrix-2026-08-12.md`, `reports/portfolio-browser-audit-remediation-2026-08-13.json`, and `reports/portfolio-accessibility-remediation-2026-08-13.md`
+**Evidence:** `reports/portfolio-browser-audit-2026-08-12.json`, `reports/portfolio-qa-matrix-2026-08-12.md`, `reports/portfolio-browser-audit-remediation-2026-08-13.json`, `reports/curlplan-tab-target-verification-2026-08-13.json`, and `reports/portfolio-accessibility-remediation-2026-08-13.md`
 
 ## Result
 
-Status is **Amber**. The expanded five-product QA matrix completed at 2026-08-13T03:40:20Z and initially recorded seven owned GitHub issues. The six WCAG A/AA release blockers across CurlPlan, Hat in Ring, and Frontier Signals were then remediated, deployed, closed with production evidence, and rerun against the affected production checks. The release gate is Green in that re-tested browser scope. [CurlPlan #9](https://github.com/DaveHomeAssist/curl-plan/issues/9), a non-blocking 44px target-hardening issue, remains open and keeps the broader portfolio target baseline Amber.
+Status is **Green in the tested browser scope**. The expanded five-product QA matrix completed at 2026-08-13T03:40:20Z and recorded seven owned GitHub issues. All seven are now remediated, deployed, closed with production evidence, and rerun against their affected production checks. CurlPlan #9, the final non-blocking 44px target-hardening item, closed after all four primary demo tabs measured at least 44 by 44 CSS pixels at both 390px and 640px.
 
 Phillies Wire and the Frontier Signals data lab are Green within the tested browser scope. Green here means no failure was found in the named checks, not that complete WCAG conformance has been certified.
 
@@ -34,7 +34,7 @@ The browser was Google Chrome 151.0.7922.109 on macOS 26.6. Automation and scree
 
 | Product | Keyboard and journey | Reflow and spacing | Contrast | Targets and semantics | Status |
 | --- | --- | --- | --- | --- | --- |
-| CurlPlan web | Closed-sheet controls are skipped; opening focus, Tab containment, Escape/scrim close, and trigger focus return pass | No overflow or new text clipping | Pass in tested states | Dialog state and focus semantics pass; four demo tabs remain below the 44px portfolio target under #9 | **Amber** |
+| CurlPlan web | Closed-sheet controls are skipped; opening focus, Tab containment, Escape/scrim close, trigger focus return, and primary tab order pass | No overflow or new text clipping at 390px or 640px | Pass in tested states | Dialog state and focus semantics pass; Passport is 47.69 by 44px and Locker, Spiels, and Roster are 44 by 44px at both target viewports | **Green in re-tested scope** |
 | Phillies Wire | 20 active stops, reverse traversal, accordion, theme, and copy feedback pass | Pass; only intentionally hidden helper text was flagged | Pass | Pass | **Green in scope** |
 | Frontier Signals data lab | 37 active stops, reverse traversal, and Enter/Space desk changes pass | Pass | Pass | Pass | **Green in scope** |
 | Hat in Ring | Native sort buttons and one explicit dossier action per row pass; Enter/Space sorting passes | All 41 card summaries remain visible with required spacing at 640/390px | `Exploratory` badge passes at 4.91:1 | All 13 audited controls are at least 44px high; The Wire is 73.55 by 44px | **Green in re-tested scope** |
@@ -47,7 +47,7 @@ Every product remained free of page-level horizontal overflow at desktop, 200% r
 | Product | Issue | Blocking status | Owner |
 | --- | --- | --- | --- |
 | CurlPlan | [#8 Closed sheets remain in the keyboard focus order](https://github.com/DaveHomeAssist/curl-plan/issues/8) | **Closed; production pass** | DaveHomeAssist / frontend |
-| CurlPlan | [#9 Post-demo tabs miss the 44px portfolio target](https://github.com/DaveHomeAssist/curl-plan/issues/9) | **Open; P2 hardening** | DaveHomeAssist / frontend |
+| CurlPlan | [#9 Post-demo tabs miss the 44px portfolio target](https://github.com/DaveHomeAssist/curl-plan/issues/9) | **Closed; production pass** | DaveHomeAssist / frontend |
 | Hat in Ring | [#4 Exploratory badge contrast is 4.22:1](https://github.com/DaveHomeAssist/hatinring/issues/4) | **Closed; production pass** | DaveHomeAssist / frontend |
 | Hat in Ring | [#5 Sortable headers and candidate rows lack explicit action roles](https://github.com/DaveHomeAssist/hatinring/issues/5) | **Closed; production pass** | DaveHomeAssist / frontend |
 | Hat in Ring | [#6 Compact controls miss AA and portfolio target sizes](https://github.com/DaveHomeAssist/hatinring/issues/6) | **Closed; production pass** | DaveHomeAssist / frontend |
@@ -73,4 +73,4 @@ The four release-gate conditions below were satisfied on 2026-08-13. Detailed pr
 3. The deployed fixes pass, not only a local working copy.
 4. The updated matrix and issue closure evidence are linked from the roadmap and canonical status run.
 
-The non-blocking CurlPlan 44px issue remains required by the portfolio standard. It keeps the broader baseline Amber but does not re-close the WCAG A/AA release gate.
+The non-blocking CurlPlan 44px hardening issue is also closed with deployed production evidence. No recorded accessibility issue from this matrix remains open, so the broader portfolio target baseline is Green in the tested browser scope.
