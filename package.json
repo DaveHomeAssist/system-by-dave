@@ -8,6 +8,7 @@
     "test:av-workbook": "vitest run --config apps/av-workbook/vitest.config.ts",
     "typecheck:av-workbook": "tsc -p apps/av-workbook/tsconfig.json --noEmit",
     "verify:av": "node scripts/verify_av_suite.js",
+    "verify:gear-reference": "node scripts/verify_gear_reference.js",
     "verify:indexing": "node scripts/verify_indexing_policy.js",
     "verify:portfolio-schemas": "node scripts/verify_portfolio_schemas.js",
     "verify:public-navigation": "node scripts/verify_public_navigation.js"

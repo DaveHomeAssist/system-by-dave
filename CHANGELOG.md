@@ -2,6 +2,12 @@
 
 ## 2026-08-12
 
+### Gear Reference beta
+
+* Added `gear-reference.html`, a data-driven, offline AV equipment library with fixed-viewport panel navigation, full-text search, keyboard and swipe control, deep links, reduced motion, dark and light figure theming, and print-all output.
+* Added the first authored sheet for the Epson PowerLite X39, including two original schematic SVGs, twelve source-marked sections, and a required per-claim accuracy log.
+* Registered Gear Reference for Prep and Load In, added it to Logistics navigation and offline caching, linked matching Gear Prep rows into the library, and raised the public browser-tool count to 43.
+
 ### Portfolio Now phase
 
 * Added versioned signal, evidence, release-manifest, and structured run-event schemas with verified examples.

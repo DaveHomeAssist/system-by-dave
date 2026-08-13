@@ -39,6 +39,7 @@ jobs:
       - name: Verify AV Suite contracts
         run: |
           npm run verify:av
+          npm run verify:gear-reference
           npm run verify:public-navigation
 
       - name: Verify AV Workbook

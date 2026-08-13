@@ -61,6 +61,7 @@
     {id:'camera-shot-list',name:'Camera Shot List',href:'camera-shot-list.html',dept:'Camera',phases:['advance','prep','show'],tag:'Camera',desc:'Camera plan with shot rows, framing, movement, presets, ready and problem status, and take next.',storageKeys:[{key:'camera-shot-list.v1',label:'Camera Shot List'}]},
     {id:'plotforge',name:'Stage Plot',href:'stage-plot.html',dept:'Planning',phases:['advance','prep','loadin'],tag:'Plot',desc:'Offline-capable room layout planner with draggable stages, screens, cameras, speakers, mics, tables, power, and cable paths.',storageKeys:[{key:'stage-plot.v1',label:'Stage Plot'}]},
     {id:'gear-prep',name:'Gear Prep',href:'gear-prep.html',dept:'Logistics',phases:['prep'],tag:'Gear',desc:'Pull sheets, case IDs, quantities, departments, owners, test, pack, load, issues, and open items.',storageKeys:[{key:'gear-prep.v1',label:'Gear Prep'}]},
+    {id:'gear-reference',name:'Gear Reference',href:'gear-reference.html',dept:'Logistics',phases:['prep','loadin'],tag:'Reference',desc:'Offline per-device field sheets with specifications, schematics, procedures, consumables, intake checks, and source confidence.',storageKeys:[]},
     {id:'truck-pack',name:'Truck Pack Plan',href:'truck-pack.html',dept:'Logistics',phases:['prep','loadin','strike'],tag:'Truck',desc:'Cases, truck zones, load order, unload order, weights, owners, pack status, and issues.',storageKeys:[{key:'truck-pack.v1',label:'Truck Pack Plan'}]},
     {id:'load-in-plan',name:'Load In Plan',href:'load-in-plan.html',dept:'Logistics',phases:['loadin'],tag:'Load In',desc:'Trucks, docks, destinations, departments, items, owners, due times, build status, blockers, and gaps.',storageKeys:[{key:'load-in-plan.v1',label:'Load In Plan'}]},
     {id:'strike-plan',name:'Strike Plan',href:'strike-plan.html',dept:'Logistics',phases:['strike'],tag:'Strike',desc:'Departments, strike items, locations, owners, case IDs, destinations, load out status, missing gear, and issues.',storageKeys:[{key:'strike-plan.v1',label:'Strike Plan'}]},
@@ -71,8 +72,8 @@
   /* Per-phase recommendations shown by the console and the context dock. */
   var RECOMMENDED={
     advance:['av-workbook','show-advance','site-survey','breakout-room-matrix','crew-call','throwline','plotforge','pixelforge','input-list'],
-    prep:['av-workbook','gear-prep','truck-pack','cueforge','teleprompter','playback-check','pixelforge','audio-patch','video-patch','network-plan'],
-    loadin:['av-workbook','load-in-plan','room-check','show-board','power-plan','line-check','display-plan','projection-plan','throwline','speaker-plan','show-task-board'],
+    prep:['av-workbook','gear-prep','gear-reference','truck-pack','cueforge','teleprompter','playback-check','pixelforge','audio-patch','video-patch','network-plan'],
+    loadin:['av-workbook','load-in-plan','gear-reference','room-check','show-board','power-plan','line-check','display-plan','projection-plan','throwline','speaker-plan','show-task-board'],
     show:['av-workbook','teleprompter','show-timer','cueforge','show-board','show-task-board','breakout-room-matrix','pixelforge','record-log','comms-check','camera-shot-list'],
     strike:['av-workbook','strike-plan','truck-pack','cable-plan','show-task-board','crew-time-log'],
     closeout:['av-workbook','show-handoff','show-report','client-signoff','change-order','record-log','crew-time-log']
@@ -89,7 +90,7 @@
     {label:'Lighting',toolIds:['lighting-patch']},
     {label:'Power & data',toolIds:['power-plan','network-plan','cable-plan']},
     {label:'Spaces & staging',toolIds:['show-board','plotforge','room-check','breakout-room-matrix','site-survey']},
-    {label:'Logistics',toolIds:['gear-prep','truck-pack','load-in-plan','strike-plan','show-advance']},
+    {label:'Logistics',toolIds:['gear-prep','gear-reference','truck-pack','load-in-plan','strike-plan','show-advance']},
     {label:'Crew',toolIds:['crew-call','crew-time-log']},
     {label:'Show docs & client',toolIds:['show-handoff','show-report','show-task-board','change-order','client-signoff']},
     {label:'Calculators',toolIds:['av-calculator']},
@@ -115,6 +116,10 @@
     './css/responsive-tables.css',
     './css/av-domain-views.css',
     './css/fonts.css',
+    './data/gear/index.json',
+    './data/gear/epson-powerlite-x39.json',
+    './data/gear/figures/x39-chassis.svg',
+    './data/gear/figures/x39-io.svg',
     './av-workbook.html',
     './av-workbook/index.html',
     './av-workbook/assets/av-workbook.js',
@@ -167,7 +172,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool change — rolls the service-worker cache. */
-    version:'v20260810-throwline-first-release',
+    version:'v20260812-gear-reference-beta',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,

@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-430 -120 890 420" role="img" aria-label="Front three-quarter schematic of the Epson PowerLite X39 with labeled chassis features.">
+  <path class="face-top" d="M0-78.2 222.31 50.21 39 156.04-183.3 27.63Z"/>
+  <path class="face-side" d="M222.31 128.41 39 234.24V156.04L222.31 50.21Z"/>
+  <path class="face-front" d="M-183.3 105.83 39 234.24V156.04L-183.3 27.63Z"/>
+  <g transform="matrix(-.73613 .425 0 -.85 222.31 128.41)">
+    <rect class="part" x="148" y="14" width="92" height="58" rx="4"/>
+    <path class="hair" d="M154 19v48m8-48v48m8-48v48m8-48v48m8-48v48m8-48v48m8-48v48m8-48v48m8-48v48m8-48v48m8-48v48"/>
+  </g>
+  <g transform="matrix(.73613 .425 0 -.85 -183.3 105.83)">
+    <rect class="part" x="30" y="24" width="68" height="46" rx="4"/>
+    <path class="hair" d="M38 28v38m8-38v38m8-38v38m8-38v38m8-38v38m8-38v38m8-38v38m8-38v38"/>
+    <rect class="part-a" x="120" y="60" width="24" height="12" rx="3"/>
+    <circle class="part" cx="205" cy="48" r="36"/>
+    <circle class="part" cx="205" cy="48" r="27"/>
+    <circle class="glass" cx="205" cy="48" r="19"/>
+    <circle class="hair" cx="205" cy="48" r="10"/>
+    <rect class="part" x="246" y="-11" width="28" height="11" rx="2"/>
+  </g>
+  <g transform="matrix(.73613 .425 -.73613 .425 0 -78.2)">
+    <rect class="part" x="172" y="138" width="116" height="98" rx="5"/>
+    <rect class="part" x="186" y="28" width="100" height="92" rx="6"/>
+    <circle class="part-a" cx="270" cy="44" r="9"/>
+    <circle class="hair" cx="212" cy="46" r="7"/>
+    <circle class="hair" cx="212" cy="72" r="7"/>
+    <circle class="hair" cx="212" cy="98" r="7"/>
+    <circle class="hair" cx="240" cy="72" r="10"/>
+    <circle class="hair" cx="264" cy="98" r="7"/>
+    <rect class="part-a" x="26" y="192" width="48" height="18" rx="4"/>
+    <rect class="part" x="96" y="198" width="74" height="16" rx="8"/>
+    <circle class="part-a" cx="122" cy="206" r="6"/>
+  </g>
+  <path class="edge" d="M0-78.2 222.31 50.21 39 156.04-183.3 27.63Z"/>
+  <path class="edge" d="M-183.3 27.63v78.2L39 234.24l183.31-105.83v-78.2"/>
+  <path class="edge" d="M39 156.04v78.2"/>
+  <g class="leader">
+    <path d="M-236 0h56l68.8 28.5M-236 72h46l53.8 21.1M-236 144h46L-53.7 65.9M-236 208h46l103.9-102.2M-236 272h46L-32.4 152.2"/>
+  </g>
+  <g class="dot">
+    <circle cx="-111.2" cy="28.5" r="3.4"/><circle cx="-136.2" cy="93.1" r="3.4"/><circle cx="-53.7" cy="65.9" r="3.4"/><circle cx="-86.1" cy="105.8" r="3.4"/><circle cx="-32.4" cy="152.2" r="3.4"/>
+  </g>
+  <g text-anchor="end">
+    <text x="-244" y="5">A/V Mute slide lever</text><text x="-244" y="77">Exhaust vent</text><text x="-244" y="149">Horizontal keystone slider</text><text x="-244" y="213">Remote receiver</text><text x="-244" y="277">Lens · zoom + focus rings</text>
+  </g>
+  <g class="leader">
+    <path d="M272 16h-52L119.3 53.6M272 88h-52L31.7 99M272 162h-52L79.5 174.3M272 236h-52L8.1 221.4"/>
+  </g>
+  <g class="dot">
+    <circle cx="119.3" cy="53.6" r="3.4"/><circle cx="31.7" cy="99" r="3.4"/><circle cx="79.5" cy="174.3" r="3.4"/><circle cx="8.1" cy="221.4" r="3.4"/>
+  </g>
+  <g text-anchor="start">
+    <text x="280" y="21">Control panel</text><text x="280" y="93">Lamp cover</text><text x="280" y="167">Air filter / intake vent</text><text x="280" y="241">Front adjustable foot</text>
+  </g>
+</svg>
