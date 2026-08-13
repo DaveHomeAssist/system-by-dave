@@ -2,6 +2,11 @@
 
 ## 2026-08-12
 
+### AV Suite warm light theme
+
+* Replaced the green-led dark AV Suite default with a warm paper palette, rust primary actions, blue readiness, restrained semantic status colors, and light system chrome while preserving the console layout and operator workflow.
+* Added automated theme-contract coverage and rolled the offline cache so returning operators receive the new presentation.
+
 ### Gear Reference beta
 
 * Added `gear-reference.html`, a data-driven, offline AV equipment library with fixed-viewport panel navigation, full-text search, keyboard and swipe control, deep links, reduced motion, dark and light figure theming, and print-all output.

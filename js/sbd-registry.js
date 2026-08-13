@@ -172,7 +172,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool change — rolls the service-worker cache. */
-    version:'v20260812-gear-reference-beta',
+    version:'v20260812-av-suite-light',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,
