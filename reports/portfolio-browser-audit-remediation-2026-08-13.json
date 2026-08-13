@@ -1,0 +1,498 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2026-08-13T07:49:40.591Z",
+  "method": "Chrome DevTools Protocol, mobile 4G and 4x CPU throttle, reduced motion, keyboard traversal, 640px reflow check",
+  "limitations": [
+    "Lab metrics are synthetic local-run evidence, not field Core Web Vitals.",
+    "Assistive-technology speech output and meaning require a human pass.",
+    "Automated control-name and target checks do not certify WCAG conformance."
+  ],
+  "results": [
+    {
+      "name": "CurlPlan",
+      "audited_at": "2026-08-13T07:49:29.663Z",
+      "mobile": {
+        "title": "CurlPlan",
+        "url": "https://davehomeassist.github.io/curl-plan/?verify=b089f71",
+        "metrics": {
+          "cls": 0,
+          "lcp": 524
+        },
+        "headings": [
+          {
+            "level": 1,
+            "text": "Your season, your circle"
+          }
+        ],
+        "landmarks": {
+          "main": 1,
+          "nav": 0,
+          "header": 0,
+          "footer": 0
+        },
+        "controls": 1,
+        "unnamedControls": [],
+        "smallControls": [],
+        "horizontalOverflow": false,
+        "documentWidth": 390,
+        "viewportWidth": 390,
+        "activeAnimations": 0,
+        "resources": [
+          {
+            "name": "https://davehomeassist.github.io/curl-plan/fonts/hanken-grotesk-latin.woff2",
+            "type": "link",
+            "transferSize": 34964,
+            "duration": 461
+          },
+          {
+            "name": "https://davehomeassist.github.io/curl-plan/fonts/instrument-serif-400-latin.woff2",
+            "type": "link",
+            "transferSize": 15340,
+            "duration": 322
+          },
+          {
+            "name": "https://davehomeassist.github.io/curl-plan/fonts/dm-mono-500-latin.woff2",
+            "type": "css",
+            "transferSize": 9024,
+            "duration": 254
+          }
+        ]
+      },
+      "transfer_bytes": 88487,
+      "focus_order_first_20": [
+        "button:Explore the demo",
+        "BODY",
+        "button:Explore the demo",
+        "BODY",
+        "button:Explore the demo",
+        "BODY",
+        "button:Explore the demo",
+        "button:Explore the demo",
+        "BODY",
+        "button:Explore the demo",
+        "BODY",
+        "button:Explore the demo",
+        "BODY",
+        "button:Explore the demo",
+        "BODY",
+        "button:Explore the demo",
+        "BODY",
+        "button:Explore the demo",
+        "BODY",
+        "button:Explore the demo"
+      ],
+      "zoom_200_percent_desktop_equivalent": {
+        "horizontalOverflow": false,
+        "documentWidth": 640,
+        "viewportWidth": 640
+      },
+      "accessibility_tree_unnamed_interactive_roles": []
+    },
+    {
+      "name": "HatInRing",
+      "audited_at": "2026-08-13T07:49:35.655Z",
+      "mobile": {
+        "title": "Who's Running for President in 2028? Candidate Tracker — Hat-in-Ring Radar",
+        "url": "https://hatinring.com/?verify=15c289a",
+        "metrics": {
+          "cls": 0.00032403207410331856,
+          "lcp": 1628
+        },
+        "headings": [
+          {
+            "level": 1,
+            "text": "The Field"
+          },
+          {
+            "level": 2,
+            "text": "Seriousness leaderboard"
+          },
+          {
+            "level": 2,
+            "text": "Latest movement"
+          },
+          {
+            "level": 2,
+            "text": "Status tiers"
+          }
+        ],
+        "landmarks": {
+          "main": 1,
+          "nav": 1,
+          "header": 1,
+          "footer": 1
+        },
+        "controls": 74,
+        "unnamedControls": [],
+        "smallControls": [],
+        "horizontalOverflow": false,
+        "documentWidth": 390,
+        "viewportWidth": 390,
+        "activeAnimations": 0,
+        "resources": [
+          {
+            "name": "https://hatinring.com/vendor/react.production.min.js",
+            "type": "script",
+            "transferSize": 4568,
+            "duration": 246
+          },
+          {
+            "name": "https://hatinring.com/vendor/react-dom.production.min.js",
+            "type": "script",
+            "transferSize": 43687,
+            "duration": 379
+          },
+          {
+            "name": "https://hatinring.com/support.js",
+            "type": "script",
+            "transferSize": 15236,
+            "duration": 231
+          },
+          {
+            "name": "https://hatinring.com/fonts/fonts.css",
+            "type": "link",
+            "transferSize": 979,
+            "duration": 157
+          },
+          {
+            "name": "https://hatinring.com/?verify=15c289a",
+            "type": "fetch",
+            "transferSize": 48681,
+            "duration": 850
+          },
+          {
+            "name": "https://hatinring.com/fonts/SpaceGrotesk-400-latin-a57c94.woff2",
+            "type": "css",
+            "transferSize": 22620,
+            "duration": 697
+          },
+          {
+            "name": "https://hatinring.com/fonts/PinyonScript-400-latin-a437a4.woff2",
+            "type": "css",
+            "transferSize": 28372,
+            "duration": 769
+          },
+          {
+            "name": "https://hatinring.com/fonts/SpaceMono-400-latin-391873.woff2",
+            "type": "css",
+            "transferSize": 9764,
+            "duration": 453
+          },
+          {
+            "name": "https://hatinring.com/fonts/SpaceMono-700-latin-df899b.woff2",
+            "type": "css",
+            "transferSize": 9852,
+            "duration": 461
+          },
+          {
+            "name": "https://hatinring.com/fonts/Newsreader-400-latin-f0c28d.woff2",
+            "type": "css",
+            "transferSize": 132148,
+            "duration": 1638
+          },
+          {
+            "name": "https://hatinring.com/favicon.svg",
+            "type": "other",
+            "transferSize": 561,
+            "duration": 197
+          },
+          {
+            "name": "https://hatinring.com/assets/candidates/newsom/01_governor_of_california_gavin_newsom_cropped_3x4_jp-thumb-96.webp",
+            "type": "img",
+            "transferSize": 1986,
+            "duration": 364
+          },
+          {
+            "name": "https://hatinring.com/assets/candidates/kelly/01_sen_mark_kelly_d_az_official_portrait_119th_congre-thumb-96.webp",
+            "type": "img",
+            "transferSize": 2566,
+            "duration": 334
+          },
+          {
+            "name": "https://hatinring.com/assets/candidates/harris/01_kamala_harris_vice_presidential_portrait_jpg-thumb-96.webp",
+            "type": "img",
+            "transferSize": 2106,
+            "duration": 357
+          },
+          {
+            "name": "https://hatinring.com/assets/candidates/vance/01_march_2026_official_vice_presidential_portrait_of_-thumb-96.webp",
+            "type": "img",
+            "transferSize": 1886,
+            "duration": 341
+          },
+          {
+            "name": "https://hatinring.com/assets/candidates/buttigieg/01_pete_buttigieg_secretary_of_transportation_jpg-thumb-96.webp",
+            "type": "img",
+            "transferSize": 2626,
+            "duration": 379
+          },
+          {
+            "name": "https://hatinring.com/assets/candidates/jorgensen/01_jo_jorgensen_portrait_3_jpg-thumb-96.webp",
+            "type": "img",
+            "transferSize": 1422,
+            "duration": 184
+          },
+          {
+            "name": "https://hatinring.com/assets/candidates/aoc/01_alexandria_ocasio_cortez_official_portrait_jpg-thumb-96.webp",
+            "type": "img",
+            "transferSize": 2106,
+            "duration": 348
+          },
+          {
+            "name": "https://hatinring.com/assets/candidates/emanuel/01_ambassador_emanuel_portrait_jpg-thumb-96.webp",
+            "type": "img",
+            "transferSize": 2312,
+            "duration": 371
+          },
+          {
+            "name": "https://hatinring.com/assets/candidates/booker/01_cory_booker_official_portrait_119th_congress_jpg-thumb-96.webp",
+            "type": "img",
+            "transferSize": 1908,
+            "duration": 385
+          },
+          {
+            "name": "https://hatinring.com/assets/candidates/cruz/01_ted_cruz_official_116th_portrait_3x4_cropped_jpg-thumb-96.webp",
+            "type": "img",
+            "transferSize": 1880,
+            "duration": 408
+          },
+          {
+            "name": "https://hatinring.com/assets/candidates/beshear/01_andy_beshear_in_april_2026_cropped_jpg-thumb-96.webp",
+            "type": "img",
+            "transferSize": 2346,
+            "duration": 415
+          },
+          {
+            "name": "https://hatinring.com/assets/candidates/desantis/01_ron_desantis_official_photo_jpg-thumb-96.webp",
+            "type": "img",
+            "transferSize": 2286,
+            "duration": 424
+          },
+          {
+            "name": "https://hatinring.com/assets/candidates/pritzker/01_governor_jb_pritzker_official_portrait_2019_crop_j-thumb-96.webp",
+            "type": "img",
+            "transferSize": 2058,
+            "duration": 431
+          },
+          {
+            "name": "https://hatinring.com/assets/candidates/slotkin/01_elissa_slotkin_2026_official_portrait_cropped_jpg-thumb-96.webp",
+            "type": "img",
+            "transferSize": 1864,
+            "duration": 439
+          },
+          {
+            "name": "https://hatinring.com/assets/candidates/khanna/01_ro_khanna_official_portrait_115th_congress_3x4_jpg-thumb-96.webp",
+            "type": "img",
+            "transferSize": 1996,
+            "duration": 446
+          },
+          {
+            "name": "https://hatinring.com/assets/candidates/bovino/01_2026_border_patrol_chief_greg_bovino_in_minneapoli-thumb-96.webp",
+            "type": "img",
+            "transferSize": 2978,
+            "duration": 461
+          },
+          {
+            "name": "https://hatinring.com/assets/candidates/lemon/01_don_lemon_at_the_2018_pulitzer_prizes_jpg-thumb-96.webp",
+            "type": "img",
+            "transferSize": 1838,
+            "duration": 469
+          },
+          {
+            "name": "https://hatinring.com/assets/candidates/greaney/01_dan_greaney_campaign_jpg-thumb-96.webp",
+            "type": "img",
+            "transferSize": 4154,
+            "duration": 498
+          },
+          {
+            "name": "https://hatinring.com/assets/candidates/gallego/01_senator_ruben_gallego_official_portrait_jpg-thumb-96.webp",
+            "type": "img",
+            "transferSize": 3046,
+            "duration": 506
+          },
+          {
+            "name": "https://hatinring.com/assets/candidates/hunter/01_hunter_biden_september_30_2014_jpg-thumb-96.webp",
+            "type": "img",
+            "transferSize": 2158,
+            "duration": 453
+          },
+          {
+            "name": "https://hatinring.com/assets/candidates/whitmer/01_2025_gretchen_whitmer_cropped_jpg-thumb-96.webp",
+            "type": "img",
+            "transferSize": 1960,
+            "duration": 476
+          },
+          {
+            "name": "https://hatinring.com/assets/candidates/green/01_lieutenant_governor_of_hawaii_josh_green_jpg-thumb-96.webp",
+            "type": "img",
+            "transferSize": 2150,
+            "duration": 482
+          }
+        ]
+      },
+      "transfer_bytes": 412057,
+      "focus_order_first_20": [
+        "div:Hat-in-Ring Radar — go to The Field",
+        "button:The Field",
+        "button:Dossiers",
+        "button:The Wire",
+        "a:About",
+        "div:3 Formal 14 Considering 9 Positioning 7 Floated 7 Ruled out 41 Tracked",
+        "input:Search candidates",
+        "button:Dem",
+        "button:Rep",
+        "button:Lib",
+        "button:Ind",
+        "select:Filter by posture",
+        "button:Leaderboard",
+        "button:Sheet",
+        "button:Cards",
+        "button:Movers7",
+        "button:In the ring5",
+        "button:Poll leaders2",
+        "button:Candidate",
+        "button:Lane"
+      ],
+      "zoom_200_percent_desktop_equivalent": {
+        "horizontalOverflow": false,
+        "documentWidth": 625,
+        "viewportWidth": 625
+      },
+      "accessibility_tree_unnamed_interactive_roles": []
+    },
+    {
+      "name": "FrontierSignals",
+      "audited_at": "2026-08-13T07:49:40.379Z",
+      "mobile": {
+        "title": "Frontier Signals",
+        "url": "https://frontiersignals.io/?verify=930269b",
+        "metrics": {
+          "cls": 0,
+          "lcp": 484
+        },
+        "headings": [
+          {
+            "level": 1,
+            "text": "The infrastructure story beneath the press release."
+          },
+          {
+            "level": 2,
+            "text": "Desk taxonomy"
+          },
+          {
+            "level": 3,
+            "text": "Research layer signals across hardware, control, cryptography, and commercialization."
+          },
+          {
+            "level": 3,
+            "text": "Silicon supply, memory, packaging, interconnect, and custom accelerator constraints."
+          },
+          {
+            "level": 3,
+            "text": "Grid, cooling, data centers, interconnect queues, and the physical capacity layer."
+          },
+          {
+            "level": 3,
+            "text": "GPU clusters, factories, network buildouts, and infrastructure finance signals."
+          },
+          {
+            "level": 2,
+            "text": "Why a pain medication company just committed $120M to building a GPU network"
+          },
+          {
+            "level": 2,
+            "text": "The bottleneck has moved below the GPU headline."
+          },
+          {
+            "level": 2,
+            "text": "Compute demand is becoming a grid problem."
+          },
+          {
+            "level": 2,
+            "text": "Tracked items feed the weekly editorial read."
+          },
+          {
+            "level": 2,
+            "text": "Latest tracked items"
+          },
+          {
+            "level": 2,
+            "text": "Publish when the signal survives the source trail."
+          },
+          {
+            "level": 2,
+            "text": "Frontier Signals"
+          },
+          {
+            "level": 3,
+            "text": "Sections"
+          },
+          {
+            "level": 3,
+            "text": "Policy"
+          },
+          {
+            "level": 3,
+            "text": "Distribution"
+          }
+        ],
+        "landmarks": {
+          "main": 1,
+          "nav": 1,
+          "header": 1,
+          "footer": 1
+        },
+        "controls": 34,
+        "unnamedControls": [],
+        "smallControls": [],
+        "horizontalOverflow": false,
+        "documentWidth": 390,
+        "viewportWidth": 390,
+        "activeAnimations": 0,
+        "resources": [
+          {
+            "name": "https://frontiersignals.io/_astro/BaseLayout.mRaeQLxb.css",
+            "type": "link",
+            "transferSize": 3508,
+            "duration": 190
+          },
+          {
+            "name": "https://frontiersignals.io/favicon.svg",
+            "type": "other",
+            "transferSize": 508,
+            "duration": 159
+          }
+        ]
+      },
+      "transfer_bytes": 72303,
+      "focus_order_first_20": [
+        "a:Frontier Signals home",
+        "a:Signals",
+        "a:Briefings",
+        "a:Trackers",
+        "a:Disclosures",
+        "a:RSS",
+        "a:Quantum",
+        "a:Chips",
+        "a:Power",
+        "a:AI Compute",
+        "a:Archive",
+        "a:U.S. coal retirements hit a 15-year low. The reason isn't policy. It's data cent",
+        "a:Meta's $20B capex revision points at memory, not GPUsSignal / May 4, 2026",
+        "a:Pain pharma underwrites 48,000-GPU edge network. The 'quantum' is encryption.Sig",
+        "a:Why a pain medication company just committed $120M to building a GPU networkBrie",
+        "a:QuantumResearch layer signals across hardware, control, cryptography, and commer",
+        "a:ChipsSilicon supply, memory, packaging, interconnect, and custom accelerator con",
+        "a:PowerGrid, cooling, data centers, interconnect queues, and the physical capacity",
+        "a:AI ComputeGPU clusters, factories, network buildouts, and infrastructure finance",
+        "a:Open briefing"
+      ],
+      "zoom_200_percent_desktop_equivalent": {
+        "horizontalOverflow": false,
+        "documentWidth": 625,
+        "viewportWidth": 625
+      },
+      "accessibility_tree_unnamed_interactive_roles": []
+    }
+  ]
+}

@@ -4,6 +4,12 @@
 
 * Added `/av-tool-suite/index-v2/` as a parallel, workflow-first AV Tool Suite index. The dark graphite visual direction maps the 25 named legacy tools into Plan, Build, and Run & Support workspaces without changing `/av-suite.html`; it includes local control-room and advance-venue imagery at `/images/av-control-room.jpg` and `/images/av-venue-advance.jpg`.
 
+### Portfolio accessibility remediation
+
+* Closed and production-verified CurlPlan #8, Hat in Ring #4–#7, and Frontier Signals #2 after their commits passed repository verification, security, deployment, and affected live-browser checks.
+* Added the remediation rerun record with commit, workflow, live-header, issue-state, keyboard, semantics, contrast, target-size, text-spacing, focus, and reflow evidence.
+* Cleared the WCAG A/AA release gate in the re-tested browser scope and moved the broader portfolio baseline from Red to Amber; CurlPlan #9 remains the sole non-blocking 44px target-hardening gap.
+
 ## 2026-08-12
 
 ### AV Suite adaptive themes

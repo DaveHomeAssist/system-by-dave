@@ -6,7 +6,9 @@
 
 **Target:** WCAG 2.2 Level AA plus the portfolio's 44 by 44 CSS-pixel active-target baseline
 
-**Status:** Red — the matrix completed, seven owned defects were recorded, and six issues contain release-blocking WCAG A/AA failures.
+**Original run status:** Red — the matrix completed, seven owned defects were recorded, and six issues contained release-blocking WCAG A/AA failures.
+
+**Remediation status (2026-08-13):** Amber — all six release blockers are closed and pass their affected production reruns. The release gate is Green in the re-tested browser scope; CurlPlan #9 remains open as non-blocking 44px hardening. See `reports/portfolio-accessibility-remediation-2026-08-13.md`.
 
 ## Scope
 
@@ -72,4 +74,4 @@ All seven issues are assigned to `DaveHomeAssist` and include reproduction steps
 
 ## Release decision
 
-The portfolio accessibility initiative remains Red until the six release-blocking issues are closed and the same affected checks pass against the deployed fixes. CurlPlan issue 9 may close independently as non-blocking hardening, but it remains part of the documented 44px portfolio standard.
+The six release-blocking issues are closed and the same affected checks pass against the deployed fixes. The release gate is Green in the re-tested browser scope. CurlPlan issue 9 remains open as non-blocking hardening, so the broader portfolio target baseline is Amber until its deployed 44px check passes.
