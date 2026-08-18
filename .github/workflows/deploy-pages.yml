@@ -40,6 +40,8 @@ jobs:
         run: |
           npm run verify:av
           npm run verify:gear-reference
+          npm run verify:indexing
+          npm run verify:portfolio-schemas
           npm run verify:public-navigation
 
       - name: Verify Throwline release contract
