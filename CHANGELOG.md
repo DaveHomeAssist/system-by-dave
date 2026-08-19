@@ -2,6 +2,7 @@
 
 ## 2026-08-19
 
+- Kept the canonical NoteForge breadcrumb clear of the mobile sidebar controls and bounded the embedded app height to the remaining viewport.
 * Added a target-bounded NoteForge release sync and verification contract that preserves System by Dave navigation, records the exact upstream commit and artifact hashes, rejects unmanaged target files, and gates Pages deployment on canonical artifact integrity.
 
 ## 2026-08-13

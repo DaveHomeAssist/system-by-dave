@@ -26,6 +26,16 @@
   <script type="module" crossorigin src="/noteforge/assets/index-ZAQxfTk9.js"></script>
   <link rel="stylesheet" crossorigin href="/noteforge/assets/index-C0aK3v7O.css">
 <link rel="stylesheet" href="../css/sbd-public-nav.css">
+<style data-noteforge-sbd-shell>
+  .sbd-site-return { box-sizing: border-box; height: 44px; }
+  .sbd-site-return ~ .app { height: calc(100vh - 44px); }
+  @media (max-width: 760px) {
+    .sbd-site-return + .mobile-bar { top: 44px; }
+    .sbd-site-return ~ .sidebar-backdrop { top: 44px; }
+    .sbd-site-return ~ .app { height: calc(100vh - 92px); }
+    .sbd-site-return ~ .app .sidebar { top: 44px; }
+  }
+</style>
 </head>
 <body>
 <nav class="sbd-site-return" aria-label="Breadcrumb">

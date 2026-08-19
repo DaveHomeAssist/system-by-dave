@@ -88,6 +88,10 @@ if (!fs.existsSync(TARGET) || !fs.statSync(TARGET).isDirectory() || fs.lstatSync
     if ((index.match(/class="sbd-site-return"/g) || []).length !== 1) fail('exactly one static breadcrumb is required');
     if (!index.includes('href="../css/sbd-public-nav.css"')) fail('public-navigation stylesheet path is missing');
     if (!index.includes('src="../js/sbd-public-nav.js"')) fail('public-navigation script path is missing');
+    if ((index.match(/data-noteforge-sbd-shell/g) || []).length !== 1) fail('exactly one NoteForge shell integration style is required');
+    if (!index.includes('.sbd-site-return { box-sizing: border-box; height: 44px; }')) fail('canonical breadcrumb height is not bounded');
+    if (!index.includes('.sbd-site-return + .mobile-bar { top: 44px; }')) fail('mobile bar is not offset below the canonical breadcrumb');
+    if (!index.includes('.sbd-site-return ~ .app .sidebar { top: 44px; }')) fail('mobile sidebar is not offset below the canonical breadcrumb');
     if (!index.includes('href="/noteforge/manifest.webmanifest"')) fail('PWA manifest path is incorrect');
     const assetRefs = [...index.matchAll(/(?:src|href)="\/noteforge\/(assets\/[^"?]+)"/g)].map((match) => match[1]);
     if (!assetRefs.some((file) => file.endsWith('.js'))) fail('built JavaScript asset reference is missing');

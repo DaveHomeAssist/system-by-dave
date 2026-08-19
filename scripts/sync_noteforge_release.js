@@ -26,6 +26,16 @@ const BOOTSTRAP_MANAGED_FILES = new Set([
 ]);
 const PUBLIC_NAV_CSS = '<link rel="stylesheet" href="../css/sbd-public-nav.css">';
 const PUBLIC_NAV_SCRIPT = '<script src="../js/sbd-public-nav.js" defer></script>';
+const CANONICAL_SHELL_STYLE = `<style data-noteforge-sbd-shell>
+  .sbd-site-return { box-sizing: border-box; height: 44px; }
+  .sbd-site-return ~ .app { height: calc(100vh - 44px); }
+  @media (max-width: 760px) {
+    .sbd-site-return + .mobile-bar { top: 44px; }
+    .sbd-site-return ~ .sidebar-backdrop { top: 44px; }
+    .sbd-site-return ~ .app { height: calc(100vh - 92px); }
+    .sbd-site-return ~ .app .sidebar { top: 44px; }
+  }
+</style>`;
 const BREADCRUMB = `<nav class="sbd-site-return" aria-label="Breadcrumb">
   <a href="/">System by Dave</a>
   <span class="sbd-site-return__separator" aria-hidden="true">/</span>
@@ -130,11 +140,13 @@ function validateSource(source, sourceCommit) {
 function injectSystemByDaveNavigation(index) {
   let next = index;
   if (!next.includes(PUBLIC_NAV_CSS)) next = next.replace(/<\/head>/i, `${PUBLIC_NAV_CSS}\n</head>`);
+  if (!next.includes('data-noteforge-sbd-shell')) next = next.replace(/<\/head>/i, `${CANONICAL_SHELL_STYLE}\n</head>`);
   if (!next.includes('class="sbd-site-return"')) next = next.replace(/<body[^>]*>/i, (body) => `${body}\n${BREADCRUMB}`);
   if (!next.includes(PUBLIC_NAV_SCRIPT)) next = next.replace(/<\/body>/i, `${PUBLIC_NAV_SCRIPT}\n</body>`);
   if ((next.match(/class="sbd-site-return"/g) || []).length !== 1) fail('Canonical index must contain exactly one static System by Dave breadcrumb');
   if ((next.match(/sbd-public-nav\.css/g) || []).length !== 1) fail('Canonical index must contain exactly one public-navigation stylesheet');
   if ((next.match(/sbd-public-nav\.js/g) || []).length !== 1) fail('Canonical index must contain exactly one public-navigation script');
+  if ((next.match(/data-noteforge-sbd-shell/g) || []).length !== 1) fail('Canonical index must contain exactly one NoteForge shell integration style');
   return next;
 }
 
