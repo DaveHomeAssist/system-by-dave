@@ -13,6 +13,8 @@
     "probe:av-themes": "node scripts/probe_av_themes.js",
     "verify:gear-reference": "node scripts/verify_gear_reference.js",
     "verify:indexing": "node scripts/verify_indexing_policy.js",
+    "sync:noteforge": "node scripts/sync_noteforge_release.js",
+    "verify:noteforge": "node scripts/verify_noteforge_release.js",
     "verify:portfolio-schemas": "node scripts/verify_portfolio_schemas.js",
     "verify:public-navigation": "node scripts/verify_public_navigation.js"
   },

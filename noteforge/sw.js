@@ -4,11 +4,11 @@
 // (e.g. external banner images) are never touched, matching the app's CSP/privacy
 // posture. Registered only in production (see src/app/pwa.js).
 
-// eb3db9de7fbf is replaced at build time (vite.config.js) with a per-build id so
+// 8f48c8be040f is replaced at build time (vite.config.js) with a per-build id so
 // the SW bytes change every deploy — that's what makes the browser install the new
 // worker, re-run install/activate, and delete the previous cache. In dev the SW is
 // never registered (see src/app/pwa.js), so the literal placeholder is harmless.
-const CACHE = 'noteforge-eb3db9de7fbf';
+const CACHE = 'noteforge-8f48c8be040f';
 // Base path this SW is scoped to (e.g. "/noteforge/" on GitHub Pages, "/" at
 // root). Derived from the SW's own URL so the same file works under any deploy path.
 const BASE = new URL('./', self.location).pathname;

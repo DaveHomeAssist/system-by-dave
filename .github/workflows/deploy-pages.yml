@@ -53,6 +53,9 @@ jobs:
       - name: Verify Throwline release contract
         run: npm run verify:throwline
 
+      - name: Verify NoteForge release contract
+        run: npm run verify:noteforge
+
       - name: Verify AV Workbook
         run: |
           npm run typecheck:av-workbook

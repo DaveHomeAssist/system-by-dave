@@ -52,6 +52,23 @@ Pushes to the default branch deploy automatically via GitHub Pages. The custom
 domain is set in `CNAME`. Update `sitemap.xml` (`lastmod`) whenever page
 content changes.
 
+### NoteForge canonical release
+
+NoteForge is built in its own repository and committed here as the canonical
+`/noteforge/` production artifact. After its exact source commit passes CI,
+build it with Node.js 22 and sync that verified `dist/` without introducing a
+cross-repository deploy credential:
+
+```bash
+npm run sync:noteforge -- --source /absolute/path/to/noteforge/dist --source-commit <40-character-commit>
+npm run verify:noteforge
+```
+
+The sync command accepts only a clean NoteForge checkout whose `HEAD` matches
+the supplied commit. It preserves the System by Dave breadcrumb and public
+navigation, removes only previously recorded build artifacts, and writes
+`noteforge/source_provenance.json` with deterministic artifact hashes.
+
 ## Portfolio governance
 
 - [Portfolio product roadmap — August 2026](docs/portfolio-product-roadmap-2026-08-10.md)
