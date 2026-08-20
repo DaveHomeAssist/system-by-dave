@@ -4,11 +4,11 @@
 // (e.g. external banner images) are never touched, matching the app's CSP/privacy
 // posture. Registered only in production (see src/app/pwa.js).
 
-// 8f48c8be040f is replaced at build time (vite.config.js) with a per-build id so
+// 8c4e14d4a9e2 is replaced at build time (vite.config.js) with a per-build id so
 // the SW bytes change every deploy — that's what makes the browser install the new
 // worker, re-run install/activate, and delete the previous cache. In dev the SW is
 // never registered (see src/app/pwa.js), so the literal placeholder is harmless.
-const CACHE = 'noteforge-8f48c8be040f';
+const CACHE = 'noteforge-8c4e14d4a9e2';
 // Base path this SW is scoped to (e.g. "/noteforge/" on GitHub Pages, "/" at
 // root). Derived from the SW's own URL so the same file works under any deploy path.
 const BASE = new URL('./', self.location).pathname;
@@ -24,7 +24,14 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys()
-      .then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))))
+      // The canonical app shares an origin with other System by Dave tools.
+      // Prune only stale NoteForge caches; deleting every other origin cache
+      // would break offline state owned by those sibling applications.
+      .then((keys) => Promise.all(
+        keys
+          .filter((key) => key.startsWith('noteforge-') && key !== CACHE)
+          .map((key) => caches.delete(key)),
+      ))
       .then(() => self.clients.claim())
   );
 });
