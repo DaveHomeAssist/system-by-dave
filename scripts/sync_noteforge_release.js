@@ -100,6 +100,36 @@ function sha256(file) {
   return crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
 }
 
+function htmlAttribute(tag, name) {
+  const match = tag.match(new RegExp(`\\b${name}\\s*=\\s*(?:"([^"]*)"|'([^']*)'|([^\\s>]+))`, 'i'));
+  return match ? (match[1] ?? match[2] ?? match[3]) : null;
+}
+
+function htmlTags(index, name) {
+  return [...index.matchAll(new RegExp(`<${name}\\b[^>]*>`, 'gi'))].map((match) => match[0]);
+}
+
+function hasCanonicalLink(index) {
+  return htmlTags(index, 'link').some((tag) => {
+    const rel = htmlAttribute(tag, 'rel');
+    const href = htmlAttribute(tag, 'href');
+    return rel?.toLowerCase().split(/\s+/).includes('canonical')
+      && href === 'https://systembydave.com/noteforge/';
+  });
+}
+
+function assetReferences(index) {
+  const references = new Set();
+  for (const tag of [...htmlTags(index, 'link'), ...htmlTags(index, 'script')]) {
+    for (const name of ['href', 'src']) {
+      const value = htmlAttribute(tag, name);
+      if (!value?.startsWith('/noteforge/assets/')) continue;
+      references.add(value.slice('/noteforge/'.length).split(/[?#]/, 1)[0]);
+    }
+  }
+  return [...references];
+}
+
 function git(sourceRoot, args) {
   return execFileSync('git', ['-C', sourceRoot, ...args], { encoding: 'utf8' }).trim();
 }
@@ -125,10 +155,10 @@ function validateSource(source, sourceCommit) {
     if (!fs.existsSync(absolute) || !fs.statSync(absolute).isFile()) fail(`Source build is missing ${relative}`);
   }
   const index = fs.readFileSync(path.join(source, 'index.html'), 'utf8');
-  if (!index.includes('<link rel="canonical" href="https://systembydave.com/noteforge/">')) fail('Source index does not preserve the canonical System by Dave URL');
+  if (!hasCanonicalLink(index)) fail('Source index does not preserve the canonical System by Dave URL');
   if (!/Content-Security-Policy/i.test(index)) fail('Source index is missing its production CSP');
   if (/sbd-site-return|sbd-public-nav/i.test(index)) fail('Source index is already modified with System by Dave navigation');
-  const assetRefs = [...index.matchAll(/(?:src|href)="\/noteforge\/(assets\/[^"?]+)"/g)].map((match) => match[1]);
+  const assetRefs = assetReferences(index);
   if (!assetRefs.some((file) => file.endsWith('.js')) || !assetRefs.some((file) => file.endsWith('.css'))) {
     fail('Source index must reference built JavaScript and CSS under /noteforge/assets/');
   }

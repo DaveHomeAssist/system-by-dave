@@ -1,31 +1,4 @@
-<!DOCTYPE html>
-<html lang="en" data-theme="light">
-<head>
-  <meta http-equiv="Content-Security-Policy" content="default-src &#39;self&#39;; script-src &#39;self&#39;; style-src &#39;self&#39; &#39;unsafe-inline&#39;; img-src &#39;self&#39; data: https:; font-src &#39;self&#39; data:; connect-src &#39;self&#39;; object-src &#39;none&#39;; base-uri &#39;self&#39;; form-action &#39;none&#39;">
-
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#3b6ef6" />
-  <title>NoteForge</title>
-<meta name="description" content="NoteForge is a browser notes app with markdown, wikilinks, backlinks, tags, graph view, templates, offline support, and local export.">
-<link rel="canonical" href="https://systembydave.com/noteforge/">
-<meta name="robots" content="index,follow">
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="NoteForge">
-<meta property="og:title" content="NoteForge">
-<meta property="og:description" content="NoteForge is a browser notes app with markdown, wikilinks, backlinks, tags, graph view, templates, offline support, and local export.">
-<meta property="og:url" content="https://systembydave.com/noteforge/">
-<meta property="og:image" content="https://systembydave.com/noteforge/og-image.svg">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="NoteForge">
-<meta name="twitter:description" content="NoteForge is a browser notes app with markdown, wikilinks, backlinks, tags, graph view, templates, offline support, and local export.">
-<meta name="twitter:image" content="https://systembydave.com/noteforge/og-image.svg">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='14' font-size='14'>📝</text></svg>" />
-  <link rel="manifest" href="/noteforge/manifest.webmanifest" />
-  <link rel="apple-touch-icon" href="/noteforge/icon.svg" />
-  <script type="module" crossorigin src="/noteforge/assets/index-CfBbI07b.js"></script>
-  <link rel="stylesheet" crossorigin href="/noteforge/assets/index-C0aK3v7O.css">
-<link rel="stylesheet" href="../css/sbd-public-nav.css">
+<!DOCTYPE html><html lang=en data-theme=light><head><meta http-equiv=Content-Security-Policy content="default-src &#39;self&#39;; script-src &#39;self&#39;; style-src &#39;self&#39; &#39;unsafe-inline&#39;; img-src &#39;self&#39; data: https:; font-src &#39;self&#39; data:; connect-src &#39;self&#39;; object-src &#39;none&#39;; base-uri &#39;self&#39;; form-action &#39;none&#39;"><meta charset=UTF-8><meta name=viewport content="width=device-width, initial-scale=1.0"><meta name=theme-color content=#3b6ef6><title>NoteForge</title><meta name=description content="NoteForge is a local-first notes app with Markdown, wikilinks, backlinks, tags, graph view, templates, offline use, and export."><link rel=canonical href=https://systembydave.com/noteforge/><meta name=robots content="index,follow"><meta property=og:type content=website><meta property=og:site_name content=NoteForge><meta property=og:title content=NoteForge><meta property=og:description content="NoteForge is a local-first notes app with Markdown, wikilinks, backlinks, tags, graph view, templates, offline use, and export."><meta property=og:url content=https://systembydave.com/noteforge/><meta property=og:image content=https://systembydave.com/noteforge/og-image.svg><meta name=twitter:card content=summary_large_image><meta name=twitter:title content=NoteForge><meta name=twitter:description content="NoteForge is a local-first notes app with Markdown, wikilinks, backlinks, tags, graph view, templates, offline use, and export."><meta name=twitter:image content=https://systembydave.com/noteforge/og-image.svg><link rel=icon href=/noteforge/icon.svg><link rel=manifest href=/noteforge/manifest.webmanifest><link rel=apple-touch-icon href=/noteforge/icon.svg><script type=module crossorigin src=/noteforge/assets/index-C9X9iXpA.js></script><link rel=stylesheet crossorigin href=/noteforge/assets/index-F8mr7ArO.css><link rel="stylesheet" href="../css/sbd-public-nav.css">
 <style data-noteforge-sbd-shell>
   .sbd-site-return { box-sizing: border-box; height: 44px; }
   .sbd-site-return ~ .app { height: calc(100vh - 44px); }
@@ -36,118 +9,12 @@
     .sbd-site-return ~ .app .sidebar { top: 44px; }
   }
 </style>
-</head>
-<body>
+</head><body>
 <nav class="sbd-site-return" aria-label="Breadcrumb">
   <a href="/">System by Dave</a>
   <span class="sbd-site-return__separator" aria-hidden="true">/</span>
   <a href="/tools.html">Tools</a>
   <span class="sbd-site-return__separator" aria-hidden="true">/</span>
   <span class="sbd-site-return__current" aria-current="page">NoteForge</span>
-</nav>
-  <!-- Mobile-only top bar with the sidebar toggle -->
-  <div class="mobile-bar">
-    <button id="sidebar-toggle" class="btn btn--ghost" aria-label="Open notes sidebar" aria-expanded="false" aria-controls="app">☰</button>
-    <span class="mobile-bar__title">📝 NoteForge</span>
-  </div>
-  <div class="sidebar-backdrop" id="sidebar-backdrop" hidden></div>
-
-  <div class="app" id="app">
-    <!-- Sidebar: search, actions, note list, tags -->
-    <aside class="sidebar">
-      <header class="sidebar__header">
-        <h1 class="brand">📝 NoteForge</h1>
-        <div class="sidebar__actions">
-          <button id="new-note-btn" class="btn btn--primary" title="New note (Ctrl+N)">＋ New</button>
-          <button id="theme-btn" class="btn btn--ghost" title="Toggle theme" aria-label="Toggle theme">🌙</button>
-          <button id="graph-btn" class="btn btn--ghost" title="Toggle graph view" aria-label="Toggle graph view">🕸️</button>
-          <div class="menu">
-            <button id="menu-btn" class="btn btn--ghost" title="More" aria-label="More actions" aria-controls="menu-dropdown" aria-expanded="false">⋯</button>
-            <div class="menu__dropdown" id="menu-dropdown" hidden>
-              <button id="palette-btn" class="menu__item">⌘ Command palette <span class="menu__hint">Ctrl/⌘ P</span></button>
-              <button id="template-btn" class="menu__item">🧩 New from template…</button>
-              <button id="trash-btn" class="menu__item">🗑 Trash <span id="trash-badge" class="menu__badge" hidden></span></button>
-              <button id="settings-btn" class="menu__item">⚙ Settings</button>
-              <button id="export-btn" class="menu__item">⬇ Export JSON</button>
-              <button id="import-btn" class="menu__item">⬆ Import JSON</button>
-              <button id="seed-btn" class="menu__item">✨ Load sample notes</button>
-            </div>
-          </div>
-          <input type="file" id="import-file" accept="application/json" hidden />
-        </div>
-      </header>
-
-      <div class="search">
-        <input type="search" id="search-input" class="search__input"
-               placeholder="Search…  (Ctrl+K)  ·  tag: in:title has:banner" autocomplete="off" />
-      </div>
-
-      <div class="list-controls">
-        <label class="sort-field">Sort
-          <select id="sort-select" class="sort-select" title="Sort notes">
-            <option value="updated">Updated</option>
-            <option value="created">Created</option>
-            <option value="title">Title A–Z</option>
-          </select>
-        </label>
-      </div>
-
-      <div id="tag-filter" class="tag-filter"></div>
-
-      <div id="note-list" class="note-list"></div>
-
-      <footer class="sidebar__footer">
-        <span id="note-count" class="muted"></span>
-      </footer>
-    </aside>
-
-    <!-- Main content: editor or graph -->
-    <main class="main">
-      <section id="editor" class="editor"></section>
-      <section id="graph" class="graph" hidden></section>
-    </main>
-  </div>
-
-  <!-- Command palette (Ctrl/⌘+P) -->
-  <div class="modal palette" id="palette-overlay" hidden>
-    <div class="modal__backdrop" data-close></div>
-    <div class="modal__panel palette__panel" role="dialog" aria-modal="true" aria-label="Command palette" tabindex="-1">
-      <input id="palette-input" class="palette__input" type="text" autocomplete="off" spellcheck="false"
-             placeholder="Search notes…   ·   &gt; commands   ·   # headings"
-             role="combobox" aria-expanded="true" aria-controls="palette-list" aria-autocomplete="list" />
-      <div id="palette-list" class="palette__list" role="listbox" aria-label="Results"></div>
-    </div>
-  </div>
-
-  <!-- Trash (soft-deleted notes) -->
-  <div class="modal" id="trash-overlay" hidden>
-    <div class="modal__backdrop" data-close></div>
-    <div class="modal__panel" role="dialog" aria-modal="true" aria-label="Trash" tabindex="-1">
-      <header class="modal__header">
-        <h2 class="modal__title">🗑 Trash</h2>
-        <div class="modal__actions">
-          <button id="trash-empty" class="btn btn--danger-ghost">Empty trash</button>
-          <button class="btn btn--ghost" data-close title="Close">✕</button>
-        </div>
-      </header>
-      <div id="trash-list" class="trash-list"></div>
-    </div>
-  </div>
-
-  <!-- Settings -->
-  <div class="modal" id="settings-overlay" hidden>
-    <div class="modal__backdrop" data-close></div>
-    <div class="modal__panel" role="dialog" aria-modal="true" aria-label="Settings" tabindex="-1">
-      <header class="modal__header">
-        <h2 class="modal__title">⚙ Settings</h2>
-        <div class="modal__actions">
-          <button class="btn btn--ghost" data-close title="Close" aria-label="Close settings">✕</button>
-        </div>
-      </header>
-      <div id="settings-form" class="settings"></div>
-    </div>
-  </div>
-
-<script src="../js/sbd-public-nav.js" defer></script>
-</body>
-</html>
+</nav><div class=mobile-bar><button id=sidebar-toggle class="btn btn--ghost" aria-label="Open notes sidebar" aria-expanded=false aria-controls=app>☰</button><div class="nav-controls nav-controls--mobile" aria-label="Note history"><button id=mobile-nav-back class="btn btn--ghost" aria-label=Back disabled>←</button><button id=mobile-nav-forward class="btn btn--ghost" aria-label=Forward disabled>→</button></div><span class=mobile-bar__title>📝 NoteForge</span></div><div class=sidebar-backdrop id=sidebar-backdrop hidden></div><div class=app id=app><aside class=sidebar><header class=sidebar__header><h1 class=brand>📝 NoteForge</h1><div class=sidebar__actions><div class=nav-controls aria-label="Note history"><button id=nav-back class="btn btn--ghost" aria-label=Back title="Alt+Left" disabled>←</button><button id=nav-forward class="btn btn--ghost" aria-label=Forward title="Alt+Right" disabled>→</button></div><button id=new-note-btn class="btn btn--primary" title="New note (Ctrl+N)">＋ New</button><button id=capture-btn class="btn btn--ghost" aria-label="Open Quick Capture">↘</button><button id=theme-btn class="btn btn--ghost" title="Toggle theme" aria-label="Toggle theme">🌙</button><button id=graph-btn class="btn btn--ghost" title="Toggle graph view" aria-label="Toggle graph view">🕸️</button><div class=menu><button id=menu-btn class="btn btn--ghost" title=More aria-label="More actions" aria-controls=menu-dropdown aria-expanded=false>⋯</button><div class=menu__dropdown id=menu-dropdown hidden><button id=palette-btn class=menu__item>⌘ Command palette <span class=menu__hint>Ctrl/⌘ P</span></button><button id=template-btn class=menu__item>🧩 New from template…</button><button id=today-btn class=menu__item>◫ Open Today’s Note</button><button id=tasks-btn class=menu__item>☑ Tasks</button><button id=calendar-btn class=menu__item>▦ Calendar</button><button id=trash-btn class=menu__item>🗑 Trash <span id=trash-badge class=menu__badge hidden></span></button><button id=settings-btn class=menu__item>⚙ Settings</button><button id=history-btn class=menu__item disabled>↶ Revision history</button><button id=backup-btn class=menu__item>🛟 Backup center</button><button id=clipper-btn class=menu__item>✂ Web clipper setup</button><button id=reconcile-btn class=menu__item>⇄ Reconcile Markdown folder</button><button id=find-replace-btn class=menu__item>⌕ Find and replace <span class=menu__hint>Ctrl/⌘ F</span></button><button id=archive-btn class=menu__item>🗄 Archive</button><button id=link-report-btn class=menu__item>🔗 Link integrity report</button><button id=export-btn class=menu__item>⬇ Export JSON</button><button id=import-btn class=menu__item>⬆ Import JSON</button><button id=seed-btn class=menu__item>✨ Load sample notes</button></div></div><input type=file id=import-file accept=application/json hidden></div></header><div class=search><input type=search id=search-input class=search__input placeholder="Search…  (Ctrl+K)  ·  tag: in:title has:banner" autocomplete=off></div><div class=list-controls><label class=sort-field>Sort <select id=sort-select class=sort-select title="Sort notes"><option value=updated>Updated</option><option value=created>Created</option><option value=title>Title A–Z</option></select></label></div><div id=tag-filter class=tag-filter></div><div id=note-list class=note-list></div><footer class=sidebar__footer><span id=note-count class=muted></span></footer></aside><main class=main><section id=editor class=editor></section><section id=graph class=graph hidden></section></main></div><span id=app-status class=sr-only role=status aria-live=polite></span><script src="../js/sbd-public-nav.js" defer></script>
+</body></html>

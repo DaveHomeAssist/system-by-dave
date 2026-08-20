@@ -5,6 +5,15 @@
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
+  "share_target": {
+    "action": "./?source=share-target",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  },
   "background_color": "#16181d",
   "theme_color": "#3b6ef6",
   "icons": [

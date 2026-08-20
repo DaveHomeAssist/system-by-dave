@@ -46,6 +46,40 @@ function sha256(file) {
   return crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex');
 }
 
+function htmlAttribute(tag, name) {
+  const match = tag.match(new RegExp(`\\b${name}\\s*=\\s*(?:"([^"]*)"|'([^']*)'|([^\\s>]+))`, 'i'));
+  return match ? (match[1] ?? match[2] ?? match[3]) : null;
+}
+
+function htmlTags(index, name) {
+  return [...index.matchAll(new RegExp(`<${name}\\b[^>]*>`, 'gi'))].map((match) => match[0]);
+}
+
+function hasCanonicalLink(index) {
+  return htmlTags(index, 'link').some((tag) => {
+    const rel = htmlAttribute(tag, 'rel');
+    const href = htmlAttribute(tag, 'href');
+    return rel?.toLowerCase().split(/\s+/).includes('canonical')
+      && href === 'https://systembydave.com/noteforge/';
+  });
+}
+
+function hasResource(index, tagName, attribute, expected) {
+  return htmlTags(index, tagName).some((tag) => htmlAttribute(tag, attribute) === expected);
+}
+
+function assetReferences(index) {
+  const references = new Set();
+  for (const tag of [...htmlTags(index, 'link'), ...htmlTags(index, 'script')]) {
+    for (const name of ['href', 'src']) {
+      const value = htmlAttribute(tag, name);
+      if (!value?.startsWith('/noteforge/assets/')) continue;
+      references.add(value.slice('/noteforge/'.length).split(/[?#]/, 1)[0]);
+    }
+  }
+  return [...references];
+}
+
 if (!fs.existsSync(TARGET) || !fs.statSync(TARGET).isDirectory() || fs.lstatSync(TARGET).isSymbolicLink()) {
   fail('noteforge target is missing or is not a real directory');
 } else {
@@ -83,7 +117,7 @@ if (!fs.existsSync(TARGET) || !fs.statSync(TARGET).isDirectory() || fs.lstatSync
     fail('index.html is missing');
   } else {
     const index = fs.readFileSync(indexPath, 'utf8');
-    if (!index.includes('<link rel="canonical" href="https://systembydave.com/noteforge/">')) fail('canonical URL is missing or incorrect');
+    if (!hasCanonicalLink(index)) fail('canonical URL is missing or incorrect');
     if (!/Content-Security-Policy/i.test(index)) fail('production CSP is missing');
     if ((index.match(/class="sbd-site-return"/g) || []).length !== 1) fail('exactly one static breadcrumb is required');
     if (!index.includes('href="../css/sbd-public-nav.css"')) fail('public-navigation stylesheet path is missing');
@@ -92,8 +126,8 @@ if (!fs.existsSync(TARGET) || !fs.statSync(TARGET).isDirectory() || fs.lstatSync
     if (!index.includes('.sbd-site-return { box-sizing: border-box; height: 44px; }')) fail('canonical breadcrumb height is not bounded');
     if (!index.includes('.sbd-site-return + .mobile-bar { top: 44px; }')) fail('mobile bar is not offset below the canonical breadcrumb');
     if (!index.includes('.sbd-site-return ~ .app .sidebar { top: 44px; }')) fail('mobile sidebar is not offset below the canonical breadcrumb');
-    if (!index.includes('href="/noteforge/manifest.webmanifest"')) fail('PWA manifest path is incorrect');
-    const assetRefs = [...index.matchAll(/(?:src|href)="\/noteforge\/(assets\/[^"?]+)"/g)].map((match) => match[1]);
+    if (!hasResource(index, 'link', 'href', '/noteforge/manifest.webmanifest')) fail('PWA manifest path is incorrect');
+    const assetRefs = assetReferences(index);
     if (!assetRefs.some((file) => file.endsWith('.js'))) fail('built JavaScript asset reference is missing');
     if (!assetRefs.some((file) => file.endsWith('.css'))) fail('built CSS asset reference is missing');
     for (const relative of assetRefs) {
