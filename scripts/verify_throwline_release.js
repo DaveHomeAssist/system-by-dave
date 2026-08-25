@@ -9,6 +9,36 @@ const vm = require('node:vm');
 const ROOT = path.resolve(__dirname, '..');
 const failures = [];
 const APPENDIX_SHA256 = '8afbcad015b0b4ce5d5a2904dac7d5d60d259cc8547940e97224e2656527a674';
+const APPENDIX_ROWS_SHA256 = 'f1b3cb61adbf89cfd27965a383796ba90b763908a37bd5d45819211fcfc81ad7';
+const APPENDIX_ROW_KEYS = [
+  'projector_id',
+  'manufacturer_id',
+  'manufacturer_name',
+  'model_number',
+  'model_name',
+  'canonical_model_key',
+  'market_segment',
+  'product_status',
+  'projector_type',
+  'light_source',
+  'display_technology',
+  'native_resolution',
+  'native_aspect_ratio',
+  'brightness_ansi_lm',
+  'brightness_standard_or_mode',
+  'contrast_ratio',
+  'lens_mount_or_system',
+  'has_interchangeable_lens',
+  'operating_orientation_notes',
+  'product_page_url',
+  'primary_datasheet_url',
+  'primary_manual_url',
+  'last_verified_at',
+  'confidence',
+  'record_notes',
+];
+const APPENDIX_OVERLAP_POLICY = 'PRJ-001 through PRJ-004 retain the audited canonical records; appendix rows are raw evidence only.';
+const APPENDIX_REVIEW_DISPOSITION = 'Do not use lifecycle, brightness, resolution, contrast, lens-system, or confidence claims as planning inputs until field-level provenance is normalized.';
 const PILOT_ARRAY_SHA256 = {
   projectors: 'a8d02aac67d21ea571f0b0cf0d8735887e36325b0cc7e31fae846b7f5f8eea59',
   lenses: '710a30622899fdd1ef2c9e491298e4fb718f0e06d811585f29d7bb1e237f44e4',
@@ -89,6 +119,18 @@ function validateProjectorReferenceAppendix(catalog, pilotProjectorIds, manufact
   if (appendix.sourceSha256 !== APPENDIX_SHA256) {
     fail('Throwline projector reference appendix source fingerprint does not match the supplied reference.');
   }
+  if (appendix.sourceAttachment !== 'pasted-text.txt') {
+    fail('Throwline projector reference appendix sourceAttachment must be pasted-text.txt.');
+  }
+  if (appendix.receivedOn !== '2026-08-24') {
+    fail('Throwline projector reference appendix receivedOn must be 2026-08-24.');
+  }
+  if (appendix.overlapPolicy !== APPENDIX_OVERLAP_POLICY) {
+    fail('Throwline projector reference appendix overlapPolicy changed from the reviewed disposition.');
+  }
+  if (appendix.reviewDisposition !== APPENDIX_REVIEW_DISPOSITION) {
+    fail('Throwline projector reference appendix reviewDisposition changed from the reviewed disposition.');
+  }
   if (!Array.isArray(appendix.rows)) {
     fail('Throwline projector reference appendix rows must be an array.');
     return;
@@ -100,6 +142,19 @@ function validateProjectorReferenceAppendix(catalog, pilotProjectorIds, manufact
     return;
   }
   if (!validateObjectRows(rows, 'Throwline projector reference appendix')) return;
+
+  rows.forEach((row, index) => {
+    if (JSON.stringify(Object.keys(row)) !== JSON.stringify(APPENDIX_ROW_KEYS)) {
+      fail(`Throwline projector reference appendix row ${index + 1} must use the exact ordered 25-field schema.`);
+      return;
+    }
+    if (APPENDIX_ROW_KEYS.some((key) => typeof row[key] !== 'string')) {
+      fail(`Throwline projector reference appendix row ${index + 1} fields must all be strings.`);
+    }
+  });
+  if (hashJson(rows) !== APPENDIX_ROWS_SHA256) {
+    fail('Throwline projector reference appendix rows changed from the supplied reference.');
+  }
 
   const projectorIdValues = rows.map((row) => row.projector_id);
   const validProjectorIds = projectorIdValues.filter((value) => typeof value === 'string' && value.trim());
