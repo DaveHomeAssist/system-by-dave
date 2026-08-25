@@ -124,7 +124,7 @@
     }
     .toolbar button:active { transform: translateY(1px); }
     .toolbar button[disabled] { opacity: 0.5; pointer-events: none; }
-    .note {
+    .first-use {
       position: absolute;
       left: 16px;
       bottom: 16px;
@@ -137,6 +137,48 @@
       user-select: none;
       pointer-events: none;
     }
+    .first-use[hidden] { display: none; }
+    .controls-help {
+      position: absolute;
+      left: 16px;
+      bottom: 16px;
+      z-index: 2;
+    }
+    .controls-help[hidden] { display: none; }
+    .controls-help button {
+      min-width: 44px;
+      min-height: 44px;
+      padding: 8px 11px;
+      border: 1px solid var(--line, rgba(20, 20, 19, 0.2));
+      border-radius: var(--r, 4px);
+      background: var(--overlay, var(--case, #fff));
+      color: var(--chalk, #1a1915);
+      font: 700 10px/1 var(--mono, ui-monospace, monospace);
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+    .controls-help button:focus-visible {
+      outline: 2px solid var(--hazard, #8a6400);
+      outline-offset: 2px;
+    }
+    .controls-panel {
+      position: absolute;
+      left: 0;
+      bottom: calc(100% + 7px);
+      width: min(320px, calc(100vw - 32px));
+      padding: 10px 12px;
+      border: 1px solid var(--line, rgba(20, 20, 19, 0.2));
+      border-radius: var(--r, 4px);
+      background: var(--overlay, var(--case, #fff));
+      color: var(--dim, #4c535d);
+      font: 600 10px/1.55 var(--mono, ui-monospace, monospace);
+      letter-spacing: .04em;
+      text-transform: none;
+      box-shadow: 0 10px 28px rgba(0,0,0,.16);
+    }
+    .controls-panel[hidden] { display: none; }
+    :host([field-verify]) .toolbar { display: none; }
     .status {
       position: absolute;
       width: 1px;
@@ -190,7 +232,12 @@
         height: 320px;
         min-height: 320px;
       }
-      .note {
+      .first-use {
+        left: 12px;
+        bottom: 12px;
+        max-width: calc(100% - 24px);
+      }
+      .controls-help {
         position: static;
         grid-row: 2;
         max-width: none;
@@ -200,7 +247,11 @@
         padding: 8px 12px;
         border-top: 1px solid var(--line, rgba(20, 20, 19, 0.2));
         background: var(--case, #fff);
-        pointer-events: auto;
+      }
+      .controls-panel {
+        position: static;
+        width: auto;
+        margin-left: 8px;
       }
       .toolbar {
         position: static;
@@ -252,11 +303,31 @@
       this._err.className = 'err';
       this._err.hidden = true;
       this._viewport.appendChild(this._err);
+      this._firstUse = document.createElement('div');
+      this._firstUse.className = 'first-use';
+      this._firstUse.textContent = 'Drag to orbit · pinch to zoom';
+      root.appendChild(this._firstUse);
+      this._help = document.createElement('div');
+      this._help.className = 'controls-help';
+      this._help.hidden = true;
+      this._helpBtn = document.createElement('button');
+      this._helpBtn.id = 'controlsHelp';
+      this._helpBtn.type = 'button';
+      this._helpBtn.textContent = 'Controls';
+      this._helpBtn.setAttribute('aria-expanded', 'false');
+      this._helpBtn.setAttribute('aria-controls', 'stage-instructions');
       this._note = document.createElement('div');
       this._note.id = 'stage-instructions';
-      this._note.className = 'note';
-      this._note.textContent = 'Drag or touch to orbit · wheel or pinch to zoom · right-drag to pan · focus stage for keyboard';
-      root.appendChild(this._note);
+      this._note.className = 'controls-panel';
+      this._note.hidden = true;
+      this._note.textContent = 'Drag or touch to orbit. Wheel or pinch to zoom. Right-drag to pan. Focus the stage for keys 1–5, arrows, plus, minus, 0, or Home.';
+      this._helpBtn.addEventListener('click', () => {
+        const expanded = this._helpBtn.getAttribute('aria-expanded') === 'true';
+        this._helpBtn.setAttribute('aria-expanded', String(!expanded));
+        this._note.hidden = expanded;
+      });
+      this._help.append(this._helpBtn, this._note);
+      root.appendChild(this._help);
       this._toolbar = document.createElement('div');
       this._toolbar.className = 'toolbar';
       this._toolbar.setAttribute('role', 'group');
@@ -398,6 +469,7 @@
       controls.autoRotateSpeed = 1.2;
       controls.addEventListener('start', () => {
         controls.autoRotate = false;
+        this._completeFirstInteraction();
       });
       controls.addEventListener('end', () => this.announce('Stage view adjusted.'));
 
@@ -498,6 +570,13 @@
       if (options.announce !== false) this.announce((label || 'Stage') + ' camera selected.');
     }
 
+    _completeFirstInteraction() {
+      if (!this._firstUse || this._firstUse.hidden) return;
+      this._firstUse.hidden = true;
+      this._help.hidden = false;
+      this.dispatchEvent(new CustomEvent('stage-first-interaction', { bubbles: true }));
+    }
+
     setLightingTheme(theme) {
       const dark = theme === 'dark';
       if (this._hemi) {
@@ -556,6 +635,7 @@
       const key = event.key;
       if (/^[1-5]$/.test(key)) {
         event.preventDefault();
+        this._completeFirstInteraction();
         this.dispatchEvent(new CustomEvent('stage-camera-shortcut', {
           detail: { index: Number(key) - 1 },
           bubbles: true
@@ -578,6 +658,7 @@
       const action = actions[key];
       if (!action) return;
       event.preventDefault();
+      this._completeFirstInteraction();
       action();
     }
 

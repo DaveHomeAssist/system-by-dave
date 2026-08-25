@@ -97,6 +97,17 @@ if (/data-cam=["']flown["']/.test(stage)) fail('Stage 3D must not add a flown-pr
 requireMatch(stage, /dataset\.projectionState\s*=/, 'Stage 3D must expose its derived projection state to styling and diagnostics.');
 requireMatch(stage, /id=["']sceneSummary["'][^>]*role=["']status["']/, 'Stage 3D must expose an accessible scene summary status region.');
 requireMatch(sidecar, /Use keys 1 through 5 for cameras/, 'Stage 3D canvas instructions must expose all five camera shortcuts.');
+requireMatch(stage, /<details\b[^>]*class=["'][^"']*adjust-panel/, 'Stage 3D controls must use a native Adjust disclosure.');
+requireMatch(stage, /id=["']fieldVerifyToggle["']/, 'Stage 3D must expose a Field Verify control.');
+requireMatch(stage, /class=["'][^"']*scene-toolbar/, 'Stage 3D must expose camera and layer controls beside the scene.');
+requireMatch(stage, /grid-template-areas:[^}]*["']hud["'][^}]*["']controls["'][^}]*["']stage["']/s, 'Stage 3D phone layout must order the answer and controls before the scene.');
+requireMatch(stage, /dataset\.fieldVerify\s*=/, 'Stage 3D must expose Field Verify state on the document.');
+requireMatch(main, /id=["']plannerFieldVerify["']/, 'Throwline main app must expose a Field Verify mode control.');
+requireMatch(main, /dataset\.fieldVerify\s*=/, 'Throwline main app must expose Field Verify state on the document.');
+requireMatch(sidecar, /id\s*=\s*["']controlsHelp["']/, 'Stage 3D must retain a discoverable Controls help trigger.');
+requireMatch(sidecar, /stage-first-interaction/, 'Stage 3D must dismiss first-use help after a successful interaction.');
+requireMatch(stage, /min-height:\s*44px/, 'Stage 3D must retain 44-pixel touch targets on phone.');
+requireMatch(sidecar, /:host\(\[field-verify\]\)\s+\.toolbar/, 'Stage exports must yield to planning data in Field Verify mode.');
 
 const throwlineTools = (avRegistry?.tools || []).filter((tool) => tool.id === 'throwline');
 if (throwlineTools.length !== 1 || throwlineTools[0].href !== 'ProjectorThrow/') {

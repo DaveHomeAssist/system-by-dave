@@ -337,6 +337,29 @@
       color: var(--hazard)
     }
 
+    button.stage3d-link {
+      appearance: none;
+      cursor: pointer
+    }
+
+    #plannerFieldVerify[aria-pressed="true"] {
+      border-color: var(--go);
+      background: var(--go);
+      color: #fff
+    }
+
+    body[data-field-verify="true"] .rail .stage3d-link:not(#plannerFieldVerify),
+    body[data-field-verify="true"] .input-col>*:not([data-field-verify-panel]),
+    body[data-field-verify="true"] .readout-col>.cards .card:not(.verify-essential),
+    body[data-field-verify="true"] .readout-col>.actions,
+    body[data-field-verify="true"] .readout-col>details {
+      display: none
+    }
+
+    body[data-field-verify="true"] main {
+      grid-template-columns: minmax(300px, 360px) minmax(0, 1fr)
+    }
+
     main {
       display: grid;
       grid-template-columns: minmax(340px, 430px) minmax(0, 1fr);
@@ -1545,6 +1568,10 @@
         order: 1
       }
 
+      body[data-field-verify="true"] .readout-col {
+        order: -1
+      }
+
       fieldset,
       .readout,
       .plan-wrap,
@@ -1882,6 +1909,7 @@
     <div class="spacer"></div>
     <a class="stage3d-link" href="../index.html">System by Dave home</a>
     <a class="stage3d-link" href="Stage3D.html" aria-label="Open the optional online Stage 3D companion">Stage 3D · online</a>
+    <button class="stage3d-link" id="plannerFieldVerify" type="button" aria-pressed="false">Field Verify</button>
     <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false" aria-label="Switch to dark mode">
       <svg class="theme-icon-moon" viewBox="0 0 24 24" aria-hidden="true">
         <path d="M20.2 15.3A8.5 8.5 0 0 1 8.7 3.8 8.5 8.5 0 1 0 20.2 15.3Z" />
@@ -2006,7 +2034,7 @@
             profile</button><button class="chip" id="removeProfile" type="button">remove custom profile</button></div>
       </fieldset>
 
-      <fieldset>
+      <fieldset data-field-verify-panel>
         <legend><span class="idx">03</span>Placement</legend>
         <div class="row compact">
           <div class="f"><label for="dist">Set distance</label><input id="dist" type="text" inputmode="decimal"
@@ -2060,7 +2088,7 @@
           efficiency applies only when quantity is above one.</p>
       </fieldset>
 
-      <fieldset>
+      <fieldset data-field-verify-panel>
         <legend><span class="idx">05</span>Field verify</legend>
         <div class="row compact">
           <div class="f"><label for="actualDist">Actual optical distance</label><input id="actualDist" type="text"
@@ -2183,7 +2211,7 @@
       </div>
 
       <div class="cards">
-        <section class="card">
+        <section class="card verify-essential">
           <h2>Image geometry</h2>
           <div id="imageOut"></div>
         </section>
@@ -2191,7 +2219,7 @@
           <h2>Screen luminance</h2>
           <div id="brightOut"></div>
         </section>
-        <section class="card full">
+        <section class="card full verify-essential">
           <h2>Field verification</h2>
           <div id="verifyOut"></div>
         </section>
@@ -2428,7 +2456,7 @@
       plan: $("plan"), stage: $("stage"), drawingTitle: $("drawingTitle"), drawingTip: $("drawingTip"), cameraControls: $("cameraControls"), drawingLive: $("drawingLive"),
       imageOut: $("imageOut"), brightOut: $("brightOut"), verifyOut: $("verifyOut"), solverOut: $("solverOut"), finderOut: $("finderOut"), showOut: $("showOut"), warningsOut: $("warningsOut"), summary: $("summary"), showPrint: $("showPrint"),
       methodBody: $("methodBody"), savedList: $("savedList"), toast: $("toast"), mobileValue: $("mobileValue"), mobileStatus: $("mobileStatus"),
-      themeToggle: $("themeToggle"), themeLabel: $("themeLabel"), themeColor: $("themeColor")
+      themeToggle: $("themeToggle"), themeLabel: $("themeLabel"), themeColor: $("themeColor"), plannerFieldVerify: $("plannerFieldVerify")
     };
 
     function currentTheme() { return document.documentElement.dataset.theme === "dark" ? "dark" : "light"; }
@@ -2441,6 +2469,13 @@
       el.themeColor.content = dark ? "#15181d" : "#f4f1ea";
       if (persist) try { localStorage.setItem(STORAGE.theme, dark ? "dark" : "light"); } catch { }
       if (announce) toast(`${dark ? "Dark" : "Light"} mode`);
+    }
+
+    function setFieldVerify(enabled, { announce = false } = {}) {
+      document.body.dataset.fieldVerify = String(enabled);
+      el.plannerFieldVerify.setAttribute("aria-pressed", String(enabled));
+      el.plannerFieldVerify.textContent = enabled ? "Exit Verify" : "Field Verify";
+      if (announce) toast(enabled ? "Field Verify mode" : "Planning mode");
     }
 
     function allLenses() { return BUILTIN_LENSES.concat(customLenses); }
@@ -3413,6 +3448,7 @@
     }));
     $("mobileJump").addEventListener("click", () => $("results").scrollIntoView({ behavior: "smooth", block: "start" }));
     el.themeToggle.addEventListener("click", () => applyTheme(currentTheme() === "dark" ? "light" : "dark", { persist: true, announce: true }));
+    el.plannerFieldVerify.addEventListener("click", () => setFieldVerify(el.plannerFieldVerify.getAttribute("aria-pressed") !== "true", { announce: true }));
     $("print").addEventListener("click", () => { delete document.body.dataset.printMode; window.print(); });
     $("copySummary").addEventListener("click", () => copyText(el.summary.textContent, "Throw card copied"));
     $("copyLink").addEventListener("click", () => { writeHash(readState()); copyText(location.href, "Share link copied"); });
@@ -3456,6 +3492,7 @@
 
     function boot() {
       applyTheme(currentTheme());
+      setFieldVerify(false);
       loadCustomStorage(); loadJobsStorage(); loadProfileStorage(); loadInventoryStorage(); buildScreenOptions(); buildFamilyOptions(); const hasShow = loadShowStorage(); if (!hasShow && savedJobs.length) migrateSavedJobsToShow(); else if (!hasShow) currentShow = { version: 1, id: uid("show"), name: "Untitled show", outputs: [] };
       const loaded = readHash(); if (!loaded) applyDefaults();
       updateFamilyNotice(); syncDiag(); render();
