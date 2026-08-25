@@ -8,6 +8,7 @@
 * Redesigned the console presentation layer in the same warm-paper/rust drafting language: activated the self-hosted DM Serif Display as the display face, added registration-tick panel corners, a hatched tape rule under the command bar, indexed mono section labels, a mechanical segmented phase strip, squared status marks, larger readiness numerals, and a reduced-motion-safe staggered page reveal. Both inline scripts remain functionally intact and dark mode still flows entirely through `css/av-theme.css`.
 * Fixed stale `manifest.json` branding: name/short name are now `AV by Dave` and the retired `#0A0D14` background/theme colors now match the Warm Paper `#EEE8DF` chrome color.
 * Updated the homepage AV product card, hero CTA, and featured kicker to the AV by Dave name and corrected the stale tool count from 43 to 44.
+* Made Stage Slate (dark) the default theme for the AV suite and added a Dark / Light / System segmented control to the Operator Settings drawer on `av-suite.html`. The choice persists to `av-theme-mode.v1`, applies before styles evaluate via a head bootstrap script, and follows every AV tool page through `js/av-suite-context.js` (Throwline and PixelForge keep their own theme handling). In `css/av-theme.css`, `data-av-theme="dark"` now forces Stage Slate, `data-av-theme="light"` forces Warm Paper even under an OS dark preference, and `data-av-theme="system"` keeps following the OS.
 
 ### Throwline projector reference appendix
 

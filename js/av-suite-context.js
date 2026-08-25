@@ -1,4 +1,20 @@
 (function(){
+  /* Suite-wide theme: AV pages follow the operator's stored choice from the
+     AV by Dave console (Stage Slate dark by default). Specialist canvases
+     (Throwline, PixelForge) keep their own theme handling. */
+  (function(){
+    var root = document.documentElement;
+    if(!root.hasAttribute('data-av-theme')) return;
+    var tool = root.getAttribute('data-av-tool');
+    if(tool === 'throwline' || tool === 'pixelforge') return;
+    var mode = 'dark';
+    try{
+      var stored = localStorage.getItem('av-theme-mode.v1');
+      if(stored === 'dark' || stored === 'light' || stored === 'system') mode = stored;
+    }catch(e){}
+    root.setAttribute('data-av-theme', mode);
+  })();
+
   var params = new URLSearchParams(window.location.search);
   var context = {
     showName: clean(params.get('sbdShow'), 120),
