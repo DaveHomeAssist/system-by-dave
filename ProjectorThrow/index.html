@@ -1988,12 +1988,29 @@
 
       <fieldset>
         <legend><span class="idx">02</span>Projector &amp; lens</legend>
+        <div class="feature-kicker"><span class="badge info">audited pilot catalog</span><span>exact pair first</span></div>
         <div class="row">
-          <div class="f wide"><label for="family">Projector / ratio family</label><select id="family"></select></div>
+          <div class="f wide"><label for="catalogProjector">Exact projector model</label><select id="catalogProjector">
+              <option value="">Choose an audited projector…</option>
+            </select></div>
+        </div>
+        <div class="row">
+          <div class="f wide"><label for="catalogLens">Official compatible lens</label><select id="catalogLens" disabled>
+              <option value="">Choose a projector first…</option>
+            </select></div>
+        </div>
+        <div id="calculationGate" class="notice warn" role="status">Select an exact projector and lens to inspect its evidence. Automatic calculation remains fail-closed unless the profile is explicitly eligible.</div>
+        <details id="catalogEvidence" class="source-details">
+          <summary>Catalog evidence &amp; limitations</summary>
+          <div id="catalogEvidenceBody" class="hint">No exact catalog pair selected.</div>
+        </details>
+        <div class="feature-kicker" style="margin-top:16px"><span class="badge dim">manual / legacy</span><span>unverified planning input</span></div>
+        <div class="row">
+          <div class="f wide"><label for="family">Legacy / custom ratio family</label><select id="family"></select></div>
         </div>
         <div id="familyNotice" class="notice warn" hidden></div>
         <div class="row">
-          <div class="f wide"><label for="lens">Lens pairing</label><select id="lens">
+          <div class="f wide"><label for="lens">Legacy / custom lens row</label><select id="lens">
               <option value="">Custom throw ratio…</option>
             </select></div>
         </div>
@@ -2415,12 +2432,29 @@
       return prefix + "-" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
     }
 
+    function parseCatalog() {
+      try {
+        const node = document.getElementById("throwlineCatalog");
+        const data = JSON.parse(node?.textContent || "");
+        if (data?.schemaVersion !== 1 || !Array.isArray(data.projectors) || !Array.isArray(data.lenses) || !Array.isArray(data.compatibility) || !Array.isArray(data.opticalProfiles) || !Array.isArray(data.sources) || !Array.isArray(data.researchExceptions)) throw new Error("catalog schema is incomplete");
+        return { ok: true, error: "", data };
+      } catch (error) {
+        console.error("Throwline catalog rejected", error);
+        return { ok: false, error: String(error?.message || error), data: { projectors: [], lenses: [], compatibility: [], opticalProfiles: [], sources: [], researchExceptions: [] } };
+      }
+    }
+    function eligibleProfile(profile) {
+      return !!profile && profile.automaticCalculationAllowed === true && profile.calculationState === "verified_image_width" && Number.isFinite(Number(profile.throw_ratio_min)) && Number(profile.throw_ratio_min) > 0 && Number.isFinite(Number(profile.throw_ratio_max)) && Number(profile.throw_ratio_max) >= Number(profile.throw_ratio_min);
+    }
+    const CATALOG = parseCatalog();
+
     const BUILTIN_LENSES = RAW_LENSES.map((r, index) => {
       const [brand, family, model, note, min, max, status = "verified"] = r;
       const familyId = stableId("family", brand, family);
       return {
         id: stableId("lens", brand, family, model, note, cleanNum(min), cleanNum(max)),
         brand, family, familyId, model, note, min: +min, max: +max, status,
+        calculationState: "legacy_unverified", automaticCalculationAllowed: false,
         source: brand, verifiedOn: "2026-08-06",
         folded: /\bUST\b|90°|ultra short/i.test(model + " " + note),
         builtin: true, index
@@ -2464,6 +2498,7 @@
     const $ = id => document.getElementById(id);
     const el = {
       job: $("job"), preset: $("preset"), sw: $("sw"), sh: $("sh"), sbottom: $("sbottom"), sasp: $("sasp"), sdiag: $("sdiag"), diagUnit: $("diagUnit"),
+      catalogProjector: $("catalogProjector"), catalogLens: $("catalogLens"), catalogEvidence: $("catalogEvidence"), catalogEvidenceBody: $("catalogEvidenceBody"), calculationGate: $("calculationGate"),
       family: $("family"), familyNotice: $("familyNotice"), lens: $("lens"), trmin: $("trmin"), trmax: $("trmax"), raster: $("raster"),
       inventoryToggle: $("inventoryToggle"), shiftProfile: $("shiftProfile"), projectorModel: $("projectorModel"), shiftUp: $("shiftUp"), shiftDown: $("shiftDown"), shiftSource: $("shiftSource"),
       lumens: $("lumens"), qty: $("qty"), gain: $("gain"), includeEstimated: $("includeEstimated"), dist: $("dist"), depth: $("depth"), lensHeight: $("lensHeight"), body: $("body"), tol: $("tol"),
@@ -2501,6 +2536,68 @@
     function getLens(id = el.lens.value) { return allLenses().find(l => l.id === id) || null; }
     function getFamily(id = el.family.value) { return familyList().find(f => f.id === id) || null; }
     function getShiftProfile(id = el.shiftProfile.value) { return allProfiles().find(profile => profile.id === id) || null; }
+    function resolveCatalogSelection(projectorId = el.catalogProjector.value, lensId = el.catalogLens.value) {
+      const data = CATALOG.data;
+      const projector = data.projectors.find(item => item.projector_id === projectorId) || null;
+      const lens = data.lenses.find(item => item.lens_id === lensId) || null;
+      const compatibility = data.compatibility.find(item => item.projector_id === projectorId && item.lens_id === lensId) || null;
+      const profile = data.opticalProfiles.find(item => item.projector_id === projectorId && item.lens_id === lensId && (!compatibility || item.compatibility_id === compatibility.compatibility_id)) || null;
+      const sourceId = profile?.primary_source_id || compatibility?.compatibility_source_id || "";
+      const source = data.sources.find(item => item.source_id === sourceId) || null;
+      const entityIds = [projectorId, lensId, compatibility?.compatibility_id, profile?.optical_profile_id].filter(Boolean);
+      const exceptions = data.researchExceptions.filter(item => entityIds.some(id => String(item.entity_identifier || "").includes(id)));
+      return { projector, lens, compatibility, profile, source, exceptions };
+    }
+    function calculationInputFor({ profile, legacyLens, rawMin, rawMax, observedRatio, verificationStamp, hasCatalogSelection }) {
+      if (verificationStamp && finite(observedRatio) && observedRatio > 0) return { min: observedRatio, max: observedRatio, calculationState: "field_verified", source: "job-scoped field measurement" };
+      if (eligibleProfile(profile)) return { min: Number(profile.throw_ratio_min), max: Number(profile.throw_ratio_max), calculationState: profile.calculationState, source: profile.primary_source_id || "catalog" };
+      if (hasCatalogSelection || (legacyLens && legacyLens.calculationState === "legacy_unverified")) return null;
+      const min = Number(rawMin), maxRaw = Number(rawMax), max = finite(maxRaw) && maxRaw > 0 ? maxRaw : min;
+      if (finite(min) && min > 0 && finite(max) && max >= min) return { min, max, calculationState: "manual", source: legacyLens?.status === "custom" ? "local custom lens" : "operator input" };
+      return null;
+    }
+    function buildCatalogProjectorOptions(preferredId = null) {
+      const selected = preferredId ?? el.catalogProjector.value;
+      el.catalogProjector.innerHTML = '<option value="">Choose an audited projector…</option>';
+      CATALOG.data.projectors.slice().sort((a, b) => String(a.manufacturer_name).localeCompare(String(b.manufacturer_name)) || String(a.model_number).localeCompare(String(b.model_number))).forEach(projector => {
+        const option = document.createElement("option"); option.value = projector.projector_id; option.textContent = `${projector.manufacturer_name} · ${projector.model_number}`; el.catalogProjector.appendChild(option);
+      });
+      el.catalogProjector.value = [...el.catalogProjector.options].some(option => option.value === selected) ? selected : "";
+      buildCatalogLensOptions();
+    }
+    function buildCatalogLensOptions(preferredId = null) {
+      const selected = preferredId ?? el.catalogLens.value, projectorId = el.catalogProjector.value;
+      el.catalogLens.innerHTML = `<option value="">${projectorId ? "Choose an officially compatible lens…" : "Choose a projector first…"}</option>`;
+      const ids = new Set(CATALOG.data.compatibility.filter(item => item.projector_id === projectorId).map(item => item.lens_id));
+      CATALOG.data.lenses.filter(item => ids.has(item.lens_id)).sort((a, b) => String(a.lens_model_number).localeCompare(String(b.lens_model_number))).forEach(lens => {
+        const profile = CATALOG.data.opticalProfiles.find(item => item.projector_id === projectorId && item.lens_id === lens.lens_id);
+        const option = document.createElement("option"); option.value = lens.lens_id; option.textContent = `${lens.lens_model_number} · ${profile ? profile.throw_ratio_source_raw_value : "ratio profile incomplete"}`; el.catalogLens.appendChild(option);
+      });
+      el.catalogLens.disabled = !projectorId;
+      el.catalogLens.value = [...el.catalogLens.options].some(option => option.value === selected) ? selected : "";
+    }
+    function renderCatalogEvidence(c = null) {
+      const selection = resolveCatalogSelection();
+      const profile = selection.profile;
+      if (!CATALOG.ok) {
+        el.calculationGate.className = "notice bad"; el.calculationGate.textContent = `CALCULATION BLOCKED · embedded catalog rejected: ${CATALOG.error}`;
+        el.catalogEvidenceBody.textContent = "The app failed closed because its embedded catalog could not be parsed."; return;
+      }
+      if (selection.projector && selection.lens) {
+        const gateReason = profile?.calculationGateReason || "No complete optical profile exists for this officially compatible pair.";
+        el.calculationGate.className = `notice ${eligibleProfile(profile) || c?.calculationMode === "field_verified" ? "" : "bad"}`;
+        el.calculationGate.textContent = c?.calculationMode === "field_verified" ? "FIELD VERIFIED · job-scoped measured ratio is active." : eligibleProfile(profile) ? "CALCULATION ELIGIBLE · verified image-width profile." : `CALCULATION BLOCKED · ${gateReason}`;
+        const sourceLink = selection.source?.url ? `<a href="${esc(selection.source.url)}" target="_blank" rel="noopener">${esc(selection.source.source_title || selection.source.source_id)}</a>` : esc(selection.source?.source_title || "No linked source record");
+        const exceptionText = selection.exceptions.length ? selection.exceptions.map(item => `<li><strong>${esc(item.severity || "open")}:</strong> ${esc(item.description)}</li>`).join("") : "<li>No pair-specific exception record; the global calculation gate still applies.</li>";
+        el.catalogEvidenceBody.innerHTML = `<p><strong>${esc(selection.projector.manufacturer_name)} ${esc(selection.projector.model_number)} + ${esc(selection.lens.lens_model_number)}</strong></p><p>Compatibility: ${esc(selection.compatibility?.compatibility_status || "not established")} · confidence ${esc(selection.compatibility?.confidence || "unknown")}</p><p>Reported ratio: <strong>${esc(profile?.throw_ratio_source_raw_value || "not available")}</strong><br>Reported basis: ${esc(profile?.reportedThrowRatioBasis || "not available")}<br>Calculation state: <code>${esc(profile?.calculationState || "partial")}</code></p><p>Primary evidence: ${sourceLink}</p><ul>${exceptionText}</ul>`;
+        return;
+      }
+      const legacyLens = c?.lens || getLens();
+      const manualActive = c?.calculationMode === "manual";
+      el.calculationGate.className = `notice ${legacyLens?.calculationState === "legacy_unverified" ? "bad" : "warn"}`;
+      el.calculationGate.textContent = legacyLens?.calculationState === "legacy_unverified" ? "CALCULATION BLOCKED · this broad built-in row is legacy_unverified. Choose an exact catalog pair, use explicit manual input, or stamp a field measurement." : manualActive ? "MANUAL SIMULATION · operator-supplied ratio is active and unverified." : "Select an exact projector and lens to inspect its evidence. Automatic calculation remains fail-closed unless the profile is explicitly eligible.";
+      el.catalogEvidenceBody.textContent = "No exact catalog pair selected. Manual calculations are not manufacturer-verified and must be field-checked.";
+    }
     function buildShiftProfileOptions(preferredId = null) {
       const selected = preferredId ?? el.shiftProfile.value, familyId = el.family.value;
       el.shiftProfile.innerHTML = '<option value="">Unknown / manual profile…</option>';
@@ -2583,7 +2680,7 @@
       allLenses().filter(l => l.familyId === familyId).sort((a, b) => a.min - b.min || a.model.localeCompare(b.model)).forEach(l => {
         const o = document.createElement("option"); o.value = l.id;
         const range = l.min === l.max ? `${l.min.toFixed(3)} fixed` : `${l.min.toFixed(3)}–${l.max.toFixed(3)}`;
-        const flag = l.status === "estimated" ? " ≈" : l.status === "custom" ? " • custom" : "";
+        const flag = l.calculationState === "legacy_unverified" ? " · reference only" : l.status === "custom" ? " • custom manual" : "";
         o.textContent = `${l.model} · ${range}:1 · ${l.note}${flag}`; el.lens.appendChild(o);
       });
       if ([...el.lens.options].some(o => o.value === selected)) el.lens.value = selected; else el.lens.value = "";
@@ -2699,10 +2796,12 @@
     function solveGear(c) {
       const zoneNear = readLen("solverNear"), zoneFarRaw = readLen("solverFar"), zoneFar = finite(zoneFarRaw) ? zoneFarRaw : zoneNear, scope = el.solverScope.value;
       if (!c.img || !finite(zoneNear) || !finite(zoneFar) || zoneNear <= 0 || zoneFar < zoneNear) return { zoneNear, zoneFar, scope, results: [] };
-      let pool = allLenses();
-      if (scope === "family") pool = pool.filter(lens => lens.familyId === c.family?.id && (c.includeEstimated || lens.status !== "estimated"));
-      else if (scope === "inventory") pool = pool.filter(lens => inventory.has(lens.id));
-      else pool = pool.filter(lens => lens.status === "verified");
+      let pool = CATALOG.data.opticalProfiles.filter(profile => eligibleProfile(profile)).map(profile => {
+        const projector = CATALOG.data.projectors.find(item => item.projector_id === profile.projector_id), catalogLens = CATALOG.data.lenses.find(item => item.lens_id === profile.lens_id);
+        return { id: profile.optical_profile_id, brand: projector?.manufacturer_name || "Catalog", family: projector?.model_number || profile.projector_id, familyId: profile.projector_id, model: catalogLens?.lens_model_number || profile.lens_id, note: profile.profile_name, min: Number(profile.throw_ratio_min), max: Number(profile.throw_ratio_max), status: "verified", calculationState: profile.calculationState, automaticCalculationAllowed: true, catalogProjectorId: profile.projector_id, catalogLensId: profile.lens_id };
+      });
+      if (scope === "family") pool = pool.filter(lens => lens.catalogProjectorId === c.catalogSelection.projector?.projector_id);
+      else if (scope === "inventory") pool = [];
       const results = [];
       pool.forEach(lens => {
         const expected = expectedRasterForLens(lens), candidateImg = expected ? rasterFor(c.w, c.h, expected.asp, c.fitMode) : c.img; if (!candidateImg) return;
@@ -2721,13 +2820,12 @@
 
     function readState() {
       const w = readLen("sw"), h = readLen("sh");
-      const trMin = Number(el.trmin.value), trMaxRaw = Number(el.trmax.value);
-      const trA = finite(trMin) && trMin > 0 ? trMin : NaN;
-      const trB = finite(trMaxRaw) && trMaxRaw > 0 ? Math.max(trA, trMaxRaw) : trA;
+      const rawMin = el.trmin.value === "" ? NaN : Number(el.trmin.value), rawMax = el.trmax.value === "" ? NaN : Number(el.trmax.value);
       const raster = rasterSpec();
       const lens = getLens(), family = getFamily();
+      const catalogSelection = resolveCatalogSelection();
       const state = {
-        job: el.job.value.trim(), w, h, trA, trB, raster, lens, family,
+        job: el.job.value.trim(), w, h, trA: NaN, trB: NaN, rawMin, rawMax, raster, lens, family, catalogSelection,
         screenBottom: readLen("sbottom"), dist: readLen("dist"), depth: readLen("depth"), lensHeight: readLen("lensHeight"), bodyDepth: readLen("body"),
         lumens: Number(el.lumens.value), qty: clamp(Math.round(Number(el.qty.value) || 1), 1, 8), gain: Math.max(.1, Number(el.gain.value) || 1),
         tol: clamp(Number(el.tol.value) || 0, 0, 15) / 100, eff: clamp(Number(el.eff.value) || 85, 1, 100), stackEff: clamp(Number(el.stackEff.value) || 92, 1, 100),
@@ -2735,6 +2833,19 @@
         solverNear: readLen("solverNear"), solverFar: readLen("solverFar"), solverScope: el.solverScope.value
       };
       state.img = rasterFor(w, h, raster.asp, state.fitMode);
+      state.fieldVerification = fieldVerificationFor(state);
+      state.calculationInput = calculationInputFor({
+        profile: catalogSelection.profile, legacyLens: lens, rawMin, rawMax,
+        observedRatio: state.fieldVerification.observedRatio, verificationStamp: state.fieldVerification.verifiedAt,
+        hasCatalogSelection: !!(catalogSelection.projector || catalogSelection.lens)
+      });
+      state.calculationMode = state.calculationInput?.calculationState || catalogSelection.profile?.calculationState || lens?.calculationState || "blocked";
+      state.calculationGate = state.calculationInput ? null : {
+        state: state.calculationMode,
+        reason: catalogSelection.profile?.calculationGateReason || (catalogSelection.projector && catalogSelection.lens ? "No calculation-eligible optical profile exists for this exact pair." : lens?.calculationState === "legacy_unverified" ? "Broad built-in lens rows are retained for reference only." : "Use explicit manual ratios or a stamped field measurement.")
+      };
+      if (state.calculationInput) { state.trA = state.calculationInput.min; state.trB = state.calculationInput.max; }
+      const trA = state.trA, trB = state.trB;
       state.expected = expectedRasterForLens(lens);
       state.basisMismatch = !!(state.expected && Math.abs(state.expected.asp - raster.asp) > .02);
       if (state.img && finite(trA)) {
@@ -2787,7 +2898,7 @@
     }
     function render() {
       const c = readState(); lastCalc = c;
-      renderReadout(c); renderPlan(c); renderStage(c); renderImage(c); renderBrightness(c); renderVerification(c); renderSolver(c); renderFinder(c); renderShowBoard(c); renderWarnings(c); renderSummary(c); renderMethod(c); renderSavedJobs(); updateInventoryToggle();
+      renderCatalogEvidence(c); renderReadout(c); renderPlan(c); renderStage(c); renderImage(c); renderBrightness(c); renderVerification(c); renderSolver(c); renderFinder(c); renderShowBoard(c); renderWarnings(c); renderSummary(c); renderMethod(c); renderSavedJobs(); updateInventoryToggle();
       clearTimeout(hashTimer); hashTimer = setTimeout(() => writeHash(c), 120);
     }
 
@@ -2795,8 +2906,8 @@
       const ready = c.img && finite(c.near);
       if (!ready) {
         el.rdLabel.textContent = "Throw distance"; el.rdBig.textContent = "—"; el.rdBig.className = "rd-big";
-        el.rdSub.innerHTML = '<span class="k">Enter a screen size and lens ratio.</span>'; el.rdNote.textContent = ""; el.rdNote.className = "rd-note";
-        setBadge(el.fitBadge, "waiting", "dim"); setBadge(el.verifyBadge, "unverified", "dim");
+        el.rdSub.innerHTML = c.calculationGate ? '<span class="k">CALCULATION BLOCKED</span>' : '<span class="k">Enter a screen size and explicit manual ratio.</span>'; el.rdNote.textContent = c.calculationGate?.reason || ""; el.rdNote.className = `rd-note${c.calculationGate ? " bad" : ""}`;
+        setBadge(el.fitBadge, c.calculationGate ? "blocked" : "waiting", c.calculationGate ? "bad" : "dim"); setBadge(el.verifyBadge, c.calculationMode || "unverified", c.calculationMode === "field_verified" ? "go" : "dim");
         el.zoomNominal.style.width = "0%"; el.zoomSafe.style.width = "0%"; el.zoomPin.hidden = true; el.zoomA.textContent = "—"; el.zoomB.textContent = "—";
         el.mobileValue.textContent = "—"; setMobileStatus("waiting", "dim"); return;
       }
@@ -2807,10 +2918,9 @@
         ? `<span class="k">nominal</span> ${fmtLen(c.near)} <span class="k">· verify ±${Math.round(c.tol * 1000) / 10}%</span>`
         : `<span class="k">wide</span> ${fmtLen(c.near)} <span class="k">· tele</span> ${fmtLen(c.far)}${safeText}`;
       setBadge(el.fitBadge, c.place.label, c.place.kind);
-      const status = c.lens?.status || "custom";
-      if (status === "verified") setBadge(el.verifyBadge, "mfr source", "go");
-      else if (status === "estimated") setBadge(el.verifyBadge, "estimated", "warn");
-      else setBadge(el.verifyBadge, c.lens ? "custom lens" : "ratio only", "warn");
+      if (c.calculationMode === "field_verified") setBadge(el.verifyBadge, "field verified", "go");
+      else if (c.calculationMode === "verified_image_width") setBadge(el.verifyBadge, "mfr verified", "go");
+      else setBadge(el.verifyBadge, c.lens?.status === "custom" ? "custom manual" : "manual simulation", "warn");
 
       const notes = []; let noteKind = "";
       if (finite(c.dist)) {
@@ -3117,7 +3227,7 @@
       let html = `<div class="feature-kicker"><span class="badge info">placement intersection</span><span class="micro">${esc(scopeLabel)}</span></div>`;
       if (!finite(s.zoneNear) || !finite(s.zoneFar)) { el.solverOut.innerHTML = html + '<p class="empty">Enter the legal near and far placement limits to rank compatible projector/lens solutions.</p>'; return; }
       html += `<p class="hint" style="margin:0 0 11px">Legal zone ${esc(fmtLen(s.zoneNear))} → ${esc(fmtLen(s.zoneFar))}. Results favor a tolerance-safe zoom center, manufacturer sourcing and lenses already in crew inventory.</p>`;
-      if (!s.results.length) { el.solverOut.innerHTML = html + `<div class="result-banner bad">No lens in the ${esc(scopeLabel)} intersects this screen and placement zone.</div>`; return; }
+      if (!s.results.length) { el.solverOut.innerHTML = html + '<div class="result-banner bad">No calculation-eligible exact profile intersects this zone. Pilot and legacy rows remain fail-closed until image-width evidence is approved.</div>'; return; }
       const winner = s.results[0];
       html += `<div class="result-banner ${winner.hasSafe ? "go" : "warn"}"><strong>BEST FIT</strong> · ${esc(winner.lens.brand)} ${esc(winner.lens.model)} at ${esc(fmtLen(winner.pick))}. ${winner.hasSafe ? "Tolerance-safe midpoint available." : "Nominal overlap only; field verification required."}</div>`;
       html += '<div class="solver-results"><table><thead><tr><th>Ranked pairing</th><th class="num">Set mark</th><th class="num">Reserve</th></tr></thead><tbody>';
@@ -3127,7 +3237,10 @@
       });
       html += '</tbody></table></div>';
       el.solverOut.innerHTML = html;
-      el.solverOut.querySelectorAll("[data-solve]").forEach(button => button.addEventListener("click", () => { selectLens(button.dataset.solve, false); setLenInput(el.dist, Number(button.dataset.distance)); render(); toast("Best-fit lens and mark applied"); }));
+      el.solverOut.querySelectorAll("[data-solve]").forEach(button => button.addEventListener("click", () => {
+        const profile = CATALOG.data.opticalProfiles.find(item => item.optical_profile_id === button.dataset.solve); if (!eligibleProfile(profile)) return;
+        el.catalogProjector.value = profile.projector_id; buildCatalogLensOptions(profile.lens_id); el.catalogLens.value = profile.lens_id; el.lens.value = ""; el.trmin.value = ""; el.trmax.value = ""; setLenInput(el.dist, Number(button.dataset.distance)); render(); toast("Calculation-eligible exact pair and mark applied");
+      }));
     }
     function renderFinder(c) {
       if (!c.img) { el.finderOut.innerHTML = '<p class="empty">Set the screen first.</p>'; return; }
@@ -3135,13 +3248,13 @@
       if (!finite(target)) { el.finderOut.innerHTML = '<p class="empty">Enter a set distance or usable room depth to search the selected projector family.</p>'; return; }
       if (!c.family) { el.finderOut.innerHTML = '<p class="empty">Select a projector family before searching lenses.</p>'; return; }
       const need = target / c.img.w;
-      const candidates = allLenses().filter(l => l.familyId === c.family.id && (c.includeEstimated || l.status !== "estimated"));
+      const candidates = allLenses().filter(l => l.familyId === c.family.id && eligibleProfile(l));
       const fits = candidates.filter(l => need >= l.min - 1e-9 && need <= l.max + 1e-9).map(l => {
         const span = l.max - l.min, head = span > .0001 ? (need - l.min) / span : .5, edge = span > .0001 ? Math.min(head, 1 - head) : .5;
         return { lens: l, head, edge };
       }).sort((a, b) => b.edge - a.edge || a.lens.min - b.lens.min);
       let html = `<p class="hint" style="margin:0 0 11px">At ${esc(fmtLen(target))} onto ${esc(fmtLen(c.img.w))} of raster width, required ratio is <strong style="color:var(--chalk)">${need.toFixed(3)}:1</strong>. Filter: ${esc(c.family.brand)} · ${esc(c.family.label)}.</p>`;
-      if (!fits.length) { html += '<p class="empty">No enabled row in this family covers that ratio. Change placement, verify another exact projector family, or add a custom pairing.</p>'; el.finderOut.innerHTML = html; return; }
+      if (!fits.length) { html += '<p class="empty">No calculation-eligible profile is available. Legacy rows are reference-only; use an exact audited pair, explicit manual simulation, or a stamped field ratio.</p>'; el.finderOut.innerHTML = html; return; }
       html += '<table><thead><tr><th>Lens pairing</th><th class="num">Range</th><th class="num">Zoom</th></tr></thead><tbody>';
       fits.slice(0, 18).forEach(({ lens, head }) => {
         const range = lens.min === lens.max ? `${lens.min.toFixed(3)} fixed` : `${lens.min.toFixed(3)}–${lens.max.toFixed(3)}`;
@@ -3191,10 +3304,12 @@
     function collectWarnings(c) {
       const list = [];
       if (!finite(c.w) || !finite(c.h)) list.push({ kind: "bad", text: "Screen dimensions are missing or invalid." });
-      if (!finite(c.trA)) list.push({ kind: "bad", text: "Lens ratio is missing or invalid." });
+      if (c.calculationGate) list.push({ kind: "bad", text: `CALCULATION BLOCKED · ${c.calculationGate.reason}` });
+      else if (!finite(c.trA)) list.push({ kind: "bad", text: "Lens ratio is missing or invalid." });
       const familyNote = familyWarning(c.family); if (familyNote) list.push({ kind: "warn", text: familyNote });
       if (c.lens?.status === "estimated") list.push({ kind: "warn", text: "Selected lens row is derived/estimated and is excluded from finder results unless explicitly enabled." });
-      if (!c.lens && finite(c.trA)) list.push({ kind: "warn", text: "Manual ratio mode has no compatibility or source verification." });
+      if (c.calculationMode === "manual" && finite(c.trA)) list.push({ kind: "warn", text: "Manual simulation has no compatibility or source verification." });
+      if (c.calculationMode === "field_verified") list.push({ kind: "info", text: "A job-scoped stamped field ratio is driving geometry; it does not promote the catalog profile globally." });
       if (c.lens?.status === "custom") list.push({ kind: "warn", text: "Custom lens pairing is locally stored and unverified." });
       if (c.basisMismatch) list.push({ kind: "bad", text: `Selected raster conflicts with the lens row’s ${c.expected.label.replace(/\s+basis$/i, "")} basis.` });
       if (c.place?.code === "bad") list.push({ kind: "bad", text: "Set distance is outside the nominal lens envelope." });
@@ -3226,11 +3341,16 @@
       el.warningsOut.innerHTML = `<div class="warning-summary" aria-label="Warning counts">${summary}</div>` + groups.map(group => `<section class="warning-group" aria-label="${group.label}"><h3 class="${group.badge}"><span class="count">${group.items.length}</span>${group.label}</h3>${group.items.map(w => `<div class="notice ${w.kind === "bad" ? "bad" : w.kind === "warn" ? "warn" : ""}">${esc(w.text)}</div>`).join("")}</section>`).join("");
     }
     function summaryText(c) {
-      if (!c.img || !finite(c.near)) return "—";
+      if (!c.img) return "—";
       const line = (k, v) => `${k.padEnd(13)}${v}`;
       const lines = ["THROWLINE · SHOW CHECK"];
       if (c.job) lines.push(line("Job", c.job));
       lines.push(line("Screen", `${fmtLen(c.w)} W × ${fmtLen(c.h)} H · ${aspectName(c.w / c.h)} · ${Math.round(Math.hypot(c.w, c.h))}in diag`));
+      if (c.calculationGate || !finite(c.near)) {
+        const exact = c.catalogSelection?.projector && c.catalogSelection?.lens ? `${c.catalogSelection.projector.manufacturer_name} ${c.catalogSelection.projector.model_number} + ${c.catalogSelection.lens.lens_model_number}` : c.lens ? `${c.lens.brand} ${c.lens.model}` : "No source-backed pair selected";
+        lines.push(line("Pair", exact), line("Status", "CALCULATION BLOCKED"), line("Reason", c.calculationGate?.reason || "No eligible calculation input"), "", "Use explicit manual simulation or stamp a measured optical distance ÷ measured image width for this job.");
+        return lines.join("\n");
+      }
       lines.push(line("Projector", c.family ? `${c.family.brand} · ${c.family.label}` : "Manual / unknown family"));
       lines.push(line("Lens", c.lens ? `${c.lens.model} · ${c.lens.min === c.lens.max ? c.lens.min.toFixed(3) + ":1 fixed" : c.lens.min.toFixed(3) + "–" + c.lens.max.toFixed(3) + ":1"} · ${c.lens.status === "verified" ? "manufacturer sourced" : c.lens.status}` : `custom ratio · ${c.trA.toFixed(3)}${c.trB !== c.trA ? "–" + c.trB.toFixed(3) : ""}:1`));
       lines.push(line("Raster", `${c.raster.pxW}×${c.raster.pxH} · projected ${fmtLen(c.img.w)} × ${fmtLen(c.img.h)}`));
@@ -3286,13 +3406,37 @@
       }
     }
     function applyFamily() {
+      el.catalogProjector.value = ""; buildCatalogLensOptions();
       buildLensOptions(); el.lens.value = ""; el.trmin.value = ""; el.trmax.value = "";
       buildShiftProfileOptions(); applyShiftProfile(null, { renderNow: false }); el.raster.value = defaultRasterForFamily(getFamily()); updateFamilyNotice(); scheduleRender();
     }
+    function selectCatalogProjector() {
+      buildCatalogLensOptions(); el.lens.value = ""; el.trmin.value = ""; el.trmax.value = ""; verifiedAt = "";
+      const selection = resolveCatalogSelection();
+      if (selection.projector) {
+        el.projectorModel.value = selection.projector.model_number || "";
+        const aspect = String(selection.projector.native_aspect_ratio || "");
+        if (/17:9|4096x2160/i.test(aspect)) el.raster.value = "1.8962963|4096|2160";
+        else if (/16:9/i.test(aspect)) el.raster.value = "1.7777778|3840|2160";
+        else if (/16:10/i.test(aspect)) el.raster.value = "1.6|1920|1200";
+        const lumens = Number(selection.projector.brightness_ansi_lm); el.lumens.value = finite(lumens) && lumens > 0 ? String(lumens) : "";
+      }
+      render();
+    }
+    function selectCatalogLens() {
+      el.lens.value = ""; el.trmin.value = ""; el.trmax.value = ""; verifiedAt = ""; render();
+    }
+    function activateManualMode() {
+      if (suppress) return;
+      el.catalogProjector.value = ""; buildCatalogLensOptions(); el.lens.value = ""; verifiedAt = "";
+    }
     function selectLens(id, renderNow = false) {
       const lens = getLens(id); if (!lens) return;
+      const replacedCatalogPair = !!el.catalogProjector.value; el.catalogProjector.value = ""; buildCatalogLensOptions(); verifiedAt = "";
+      if (replacedCatalogPair) applyShiftProfile(null, { renderNow: false });
       if (el.family.value !== lens.familyId) { el.family.value = lens.familyId; buildLensOptions(id); buildShiftProfileOptions(); applyShiftProfile(null, { renderNow: false }); } else el.lens.value = id;
-      el.trmin.value = cleanNum(lens.min, 3); el.trmax.value = cleanNum(lens.max, 3);
+      if (lens.calculationState === "manual") { el.trmin.value = cleanNum(lens.min, 3); el.trmax.value = cleanNum(lens.max, 3); }
+      else { el.trmin.value = ""; el.trmax.value = ""; }
       const expected = expectedRasterForLens(lens);
       if (expected) {
         const option = [...el.raster.options].find(o => Math.abs(Number(o.value.split("|")[0]) - expected.asp) < .02);
@@ -3309,7 +3453,8 @@
     function stateObject(c = readState()) {
       return {
         version: APP_VERSION, unit, job: c.job, w: c.w, h: c.h, aspect: Number(el.sasp.value) || 0, preset: el.preset.value,
-        familyId: c.family?.id || el.family.value, lensId: c.lens?.id || "", trA: c.trA, trB: c.trB, raster: el.raster.value,
+        catalogProjectorId: c.catalogSelection.projector?.projector_id || "", catalogLensId: c.catalogSelection.lens?.lens_id || "", calculationState: c.calculationMode,
+        familyId: c.family?.id || el.family.value, lensId: c.lens?.id || "", trA: finite(c.rawMin) ? c.rawMin : c.trA, trB: finite(c.rawMax) ? c.rawMax : c.trB, raster: el.raster.value,
         shiftProfileId: c.shiftProfile?.id || "", projectorModel: el.projectorModel.value.trim(), shiftUp: el.shiftUp.value === "" ? NaN : Number(el.shiftUp.value), shiftDown: el.shiftDown.value === "" ? NaN : Number(el.shiftDown.value), shiftSource: el.shiftSource.value.trim(),
         screenBottom: c.screenBottom, dist: c.dist, depth: c.depth, lensHeight: c.lensHeight, bodyDepth: c.bodyDepth, tol: c.tol * 100, lumens: c.lumens, qty: c.qty, gain: c.gain,
         eff: c.eff, stackEff: c.stackEff, targetFl: c.targetFl, fitMode: c.fitMode, includeEstimated: c.includeEstimated, nPlusOne: c.nPlusOne,
@@ -3327,6 +3472,7 @@
       setLenInput(el.sbottom, storedNumber(data.screenBottom));
       const aspect = storedNumber(data.aspect); el.sasp.value = [...el.sasp.options].some(o => Number(o.value) === aspect) ? String(aspect) : "0";
       el.preset.value = [...el.preset.options].some(o => o.value === data.preset) ? data.preset : "";
+      el.catalogProjector.value = [...el.catalogProjector.options].some(o => o.value === data.catalogProjectorId) ? data.catalogProjectorId : ""; buildCatalogLensOptions(data.catalogLensId || "");
       if ([...el.family.options].some(o => o.value === data.familyId)) el.family.value = data.familyId;
       buildLensOptions(data.lensId || "");
       buildShiftProfileOptions(data.shiftProfileId || "");
@@ -3349,7 +3495,7 @@
     function writeHash(c = readState()) {
       const s = stateObject(c), p = new URLSearchParams(); p.set("v", String(APP_VERSION)); p.set("u", s.unit);
       const put = (k, v) => { if (v !== "" && v !== null && v !== undefined && !(typeof v === "number" && !finite(v))) p.set(k, String(v)); };
-      put("job", s.job); put("w", cleanNum(s.w, 4)); put("h", cleanNum(s.h, 4)); put("asp", s.aspect); put("screen", s.preset); put("family", s.familyId); put("lens", s.lensId);
+      put("job", s.job); put("w", cleanNum(s.w, 4)); put("h", cleanNum(s.h, 4)); put("asp", s.aspect); put("screen", s.preset); put("cp", s.catalogProjectorId); put("cl", s.catalogLensId); put("cs", s.calculationState); put("family", s.familyId); put("lens", s.lensId);
       put("a", cleanNum(s.trA, 4)); put("z", cleanNum(s.trB, 4)); put("r", s.raster); put("sp", s.shiftProfileId); put("pm", s.projectorModel); put("su", cleanNum(s.shiftUp, 2)); put("sd", cleanNum(s.shiftDown, 2)); put("ss", s.shiftSource); put("sb", cleanNum(s.screenBottom, 4)); put("d", cleanNum(s.dist, 4)); put("D", cleanNum(s.depth, 4)); put("lh", cleanNum(s.lensHeight, 4)); put("b", cleanNum(s.bodyDepth, 4));
       put("tol", cleanNum(s.tol, 2)); put("lm", s.lumens); put("q", s.qty); put("g", s.gain); put("eff", s.eff); put("se", s.stackEff); put("target", s.targetFl); put("fit", s.fitMode); if (s.nPlusOne) p.set("n1", "1"); put("ad", cleanNum(s.actualDist, 4)); put("aw", cleanNum(s.actualWidth, 4)); put("af", cleanNum(s.actualFl, 2)); put("vb", s.verifiedBy); put("va", s.verifiedAt); put("sn", cleanNum(s.solverNear, 4)); put("sf", cleanNum(s.solverFar, 4)); put("sc", s.solverScope); put("view", s.drawingView); put("cam", s.stageCamera); if (s.includeEstimated) p.set("est", "1");
       try { history.replaceState(null, "", `#${p.toString()}`); } catch (_) { }
@@ -3361,7 +3507,7 @@
         const num = key => p.has(key) ? Number(p.get(key)) : NaN;
         return applyState({
           unit: p.get("u") || "ftin", job: p.get("job") || "", w: num("w"), h: num("h"), aspect: num("asp"), preset: p.get("screen") || "",
-          familyId: p.get("family") || "", lensId: p.get("lens") || "", trA: num("a"), trB: num("z"), raster: p.get("r") || "", shiftProfileId: p.get("sp") || "", projectorModel: p.get("pm") || "", shiftUp: num("su"), shiftDown: num("sd"), shiftSource: p.get("ss") || "",
+          catalogProjectorId: p.get("cp") || "", catalogLensId: p.get("cl") || "", calculationState: p.get("cs") || "legacy_unverified", familyId: p.get("family") || "", lensId: p.get("lens") || "", trA: num("a"), trB: num("z"), raster: p.get("r") || "", shiftProfileId: p.get("sp") || "", projectorModel: p.get("pm") || "", shiftUp: num("su"), shiftDown: num("sd"), shiftSource: p.get("ss") || "",
           screenBottom: num("sb"), dist: num("d"), depth: num("D"), lensHeight: num("lh"), bodyDepth: num("b"), tol: num("tol"), lumens: num("lm"), qty: num("q"), gain: num("g"),
           eff: num("eff"), stackEff: num("se"), targetFl: num("target"), fitMode: p.get("fit"), includeEstimated: p.get("est") === "1", nPlusOne: version >= 4 ? p.get("n1") === "1" : true,
           actualDist: num("ad"), actualWidth: num("aw"), actualFl: num("af"), verifiedBy: p.get("vb") || "", verifiedAt: p.get("va") || "", solverNear: num("sn"), solverFar: num("sf"), solverScope: p.get("sc") || "all", drawingView: p.get("view"), stageCamera: p.get("cam")
@@ -3383,7 +3529,7 @@
       const model = String(raw.model ?? raw.m ?? "").trim().slice(0, 100); if (!model) return null;
       const note = String(raw.note ?? raw.n ?? "user supplied · unverified").trim().slice(0, 160) || "user supplied · unverified";
       const familyId = String(raw.familyId || stableId("family", brand, family));
-      return { id: String(raw.id || uid("custom-lens")), brand, family, familyId, model, note, min, max, status: "custom", source: null, verifiedOn: null, folded: !!raw.folded || /\bUST\b|90°|ultra short/i.test(model + " " + note), builtin: false };
+      return { id: String(raw.id || uid("custom-lens")), brand, family, familyId, model, note, min, max, status: "custom", calculationState: "manual", automaticCalculationAllowed: false, source: null, verifiedOn: null, folded: !!raw.folded || /\bUST\b|90°|ultra short/i.test(model + " " + note), builtin: false };
     }
     function saveCustomStorage() { try { localStorage.setItem(STORAGE.lenses, JSON.stringify({ version: 2, lenses: customLenses })); return true; } catch (err) { console.error(err); toast("Custom lens save failed"); return false; } }
     function loadCustomStorage() {
@@ -3435,19 +3581,23 @@
       unit = "ftin"; document.querySelectorAll("[data-unit]").forEach(b => b.setAttribute("aria-pressed", b.dataset.unit === unit ? "true" : "false"));
       suppress = true; el.job.value = ""; el.sasp.value = "1.7777778";
       const screen = SCREENS.find(s => s.w === 240 && s.h === 135 && s.group.includes("Heavy-Duty")) || SCREENS[0]; el.preset.value = screen.id; setLenInput(el.sw, screen.w); setLenInput(el.sh, screen.h); setLenInput(el.sbottom, 48);
-      const lens = BUILTIN_LENSES.find(l => l.brand === "Panasonic" && l.model === "ET-DLE105" && l.note === "WUXGA") || BUILTIN_LENSES[0]; el.family.value = lens.familyId; buildLensOptions(lens.id); el.lens.value = lens.id; el.trmin.value = cleanNum(lens.min, 3); el.trmax.value = cleanNum(lens.max, 3); el.raster.value = "1.6|1920|1200"; buildShiftProfileOptions(); applyShiftProfile(null, { renderNow: false });
+      el.catalogProjector.value = ""; buildCatalogLensOptions();
+      const lens = BUILTIN_LENSES.find(l => l.brand === "Panasonic" && l.model === "ET-DLE105" && l.note === "WUXGA") || BUILTIN_LENSES[0]; el.family.value = lens.familyId; buildLensOptions(); el.lens.value = ""; el.trmin.value = cleanNum(lens.min, 3); el.trmax.value = cleanNum(lens.max, 3); el.raster.value = "1.6|1920|1200"; buildShiftProfileOptions(); applyShiftProfile(null, { renderNow: false });
       ["dist", "depth", "body", "lumens", "actualDist", "actualWidth", "actualFl", "verifiedBy"].forEach(id => el[id].value = ""); verifiedAt = ""; setLenInput(el.lensHeight, 72); setLenInput(el.solverNear, 240); setLenInput(el.solverFar, 360); el.solverScope.value = "all"; el.qty.value = "1"; el.gain.value = "1"; el.tol.value = "5"; el.eff.value = "85"; el.stackEff.value = "92"; el.targetFl.value = "30"; el.fitMode.value = "screen"; el.includeEstimated.checked = false; el.nPlusOne.checked = true; drawingView = "plan"; stageCamera = "three-quarter"; setDrawingView("plan", { announce: false, persist: false }); setStageCamera("three-quarter", { announce: false, persist: false }); suppress = false; syncDiag(); updateFamilyNotice();
     }
 
     el.preset.addEventListener("change", () => applyPreset(true));
+    el.catalogProjector.addEventListener("change", selectCatalogProjector);
+    el.catalogLens.addEventListener("change", selectCatalogLens);
     el.family.addEventListener("change", applyFamily);
     el.lens.addEventListener("change", () => { if (el.lens.value) selectLens(el.lens.value, true); else scheduleRender(); });
     el.shiftProfile.addEventListener("change", () => applyShiftProfile(getShiftProfile(), { renderNow: true }));
     ["sw", "sh"].forEach(id => el[id].addEventListener("input", () => { if (suppress) return; el.preset.value = ""; lockAspect(id === "sw" ? "w" : "h"); syncDiag(); scheduleRender(); }));
     el.sdiag.addEventListener("input", () => { if (suppress || !Number(el.sasp.value)) return; el.preset.value = ""; lockAspect("d"); scheduleRender(); });
     el.sasp.addEventListener("change", () => { lockAspect("w"); syncDiag(); el.preset.value = ""; scheduleRender(); });
-    ["trmin", "trmax"].forEach(id => el[id].addEventListener("input", () => { el.lens.value = ""; scheduleRender(); }));
-    ["job", "sbottom", "body", "dist", "depth", "lensHeight", "lumens", "qty", "gain", "tol", "eff", "stackEff", "projectorModel", "shiftUp", "shiftDown", "shiftSource", "actualDist", "actualWidth", "actualFl", "verifiedBy", "solverNear", "solverFar"].forEach(id => el[id].addEventListener("input", scheduleRender));
+    ["trmin", "trmax"].forEach(id => el[id].addEventListener("input", () => { activateManualMode(); scheduleRender(); }));
+    ["job", "sbottom", "body", "dist", "depth", "lensHeight", "lumens", "qty", "gain", "tol", "eff", "stackEff", "projectorModel", "shiftUp", "shiftDown", "shiftSource", "solverNear", "solverFar"].forEach(id => el[id].addEventListener("input", scheduleRender));
+    ["actualDist", "actualWidth", "actualFl", "verifiedBy"].forEach(id => el[id].addEventListener("input", () => { verifiedAt = ""; scheduleRender(); }));
     ["raster", "targetFl", "fitMode", "solverScope"].forEach(id => el[id].addEventListener("change", scheduleRender));
     [el.includeEstimated, el.nPlusOne].forEach(node => node.addEventListener("change", scheduleRender));
     el.inventoryToggle.addEventListener("click", () => { const lens = getLens(); if (!lens) return; if (inventory.has(lens.id)) { inventory.delete(lens.id); toast("Lens removed from crew inventory"); } else { inventory.add(lens.id); toast("Lens added to crew inventory"); } saveInventoryStorage(); render(); });
@@ -3511,7 +3661,7 @@
     function boot() {
       applyTheme(currentTheme());
       setFieldVerify(false);
-      loadCustomStorage(); loadJobsStorage(); loadProfileStorage(); loadInventoryStorage(); buildScreenOptions(); buildFamilyOptions(); const hasShow = loadShowStorage(); if (!hasShow && savedJobs.length) migrateSavedJobsToShow(); else if (!hasShow) currentShow = { version: 1, id: uid("show"), name: "Untitled show", outputs: [] };
+      loadCustomStorage(); loadJobsStorage(); loadProfileStorage(); loadInventoryStorage(); buildScreenOptions(); buildCatalogProjectorOptions(); buildFamilyOptions(); const hasShow = loadShowStorage(); if (!hasShow && savedJobs.length) migrateSavedJobsToShow(); else if (!hasShow) currentShow = { version: 1, id: uid("show"), name: "Untitled show", outputs: [] };
       const loaded = readHash(); if (!loaded) applyDefaults();
       updateFamilyNotice(); syncDiag(); render();
       window.__throwline = { version: APP_VERSION, parseLen, rasterFor, brightnessFor, readState, stateObject, applyState, readHash, writeHash, solveGear, summaryText, allLenses: () => allLenses().map(l => ({ ...l })), profiles: () => allProfiles().map(profile => ({ ...profile })), inventory: () => [...inventory], show: () => JSON.parse(JSON.stringify(currentShow)), screens: SCREENS.map(s => ({ ...s })) };

@@ -144,6 +144,24 @@ if (/<link\b[^>]*\brel=["']stylesheet["'][^>]*>/i.test(main)) fail('Throwline ma
 if (/<script\b[^>]*\bsrc=/i.test(main)) fail('Throwline main app must not load an external script.');
 if (/unpkg\.com|three(?:\.module)?\.js/i.test(main)) fail('Throwline main app must not depend on Three.js or unpkg.');
 requireMatch(main, /const APP_VERSION = 4;/, 'Throwline must retain state schema 4.');
+['catalogProjector', 'catalogLens', 'catalogEvidence', 'calculationGate'].forEach((id) => {
+  requireMatch(main, new RegExp(`id=["']${id}["']`), `Throwline main app is missing the ${id} catalog control.`);
+});
+['parseCatalog', 'eligibleProfile', 'resolveCatalogSelection', 'calculationInputFor'].forEach((name) => {
+  requireMatch(main, new RegExp(`function\\s+${name}\\s*\\(`), `Throwline main app is missing the ${name} safety boundary.`);
+});
+['legacy_unverified', 'manufacturer_unspecified', 'manual', 'field_verified'].forEach((state) => {
+  if (!main.includes(state)) fail(`Throwline main app is missing the ${state} calculation state.`);
+});
+requireMatch(main, /calculationState:\s*["']legacy_unverified["']/, 'Legacy built-in lenses must be explicitly calculation-blocked.');
+requireMatch(main, /CALCULATION BLOCKED/, 'Throwline must visibly identify calculation-blocked catalog selections.');
+requireMatch(main, /function\s+solveGear\s*\([^)]+\)[\s\S]*?eligibleProfile\s*\(/, 'The gear solver must use the centralized automatic-calculation eligibility policy.');
+requireMatch(main, /catalogProjectorId:\s*c\.catalogSelection\.projector/, 'Saved Throwline jobs must preserve the exact catalog projector selection.');
+requireMatch(main, /catalogLensId:\s*c\.catalogSelection\.lens/, 'Saved Throwline jobs must preserve the exact catalog lens selection.');
+requireMatch(main, /calculationState:\s*c\.calculationMode/, 'Saved Throwline jobs must preserve their calculation state.');
+requireMatch(main, /put\(["']cp["'],\s*s\.catalogProjectorId\).*put\(["']cl["'],\s*s\.catalogLensId\).*put\(["']cs["'],\s*s\.calculationState\)/, 'Share links must preserve exact catalog IDs and calculation state.');
+requireMatch(main, /calculationState:\s*p\.get\(["']cs["']\)\s*\|\|\s*["']legacy_unverified["']/, 'Legacy share links must migrate to calculation-blocked state.');
+requireMatch(main, /\["actualDist",\s*"actualWidth",\s*"actualFl",\s*"verifiedBy"\][\s\S]*?verifiedAt\s*=\s*["']["']/, 'Editing field measurements must invalidate the field-verification stamp.');
 requireMatch(main, /theme:\s*["']throwline:theme:v1["']/, 'Throwline theme storage key is missing.');
 requireMatch(main, /localStorage\.getItem\(["']throwline:theme:v1["']\) === ["']dark["']/, 'Throwline startup must restore an explicit dark preference only.');
 requireMatch(main, /localStorage\.setItem\(STORAGE\.theme, dark \? ["']dark["'] : ["']light["']\)/, 'Throwline theme toggle must persist its explicit choice.');
