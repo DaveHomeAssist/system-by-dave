@@ -26,6 +26,18 @@
 <link rel="icon" href="svg/system_by_dave_logo_rust.svg" type="image/svg+xml">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="profile/assets/apple-touch-icon.png">
+<script>
+/* Theme bootstrap: apply the operator's stored suite-wide theme choice
+   before stylesheets evaluate. Stage Slate (dark) is the default. */
+(function(){
+  var mode='dark';
+  try{
+    var stored=localStorage.getItem('av-theme-mode.v1');
+    if(stored==='dark'||stored==='light'||stored==='system') mode=stored;
+  }catch(e){}
+  document.documentElement.setAttribute('data-av-theme',mode);
+})();
+</script>
 <link rel="stylesheet" href="css/sbd-public-nav.css">
 <style>
   /* ============================================================
@@ -904,6 +916,16 @@
     </section>
 
     <section class="drawer-group">
+      <h3>Theme</h3>
+      <div class="segmented" id="themeToggle" role="group" aria-label="Theme">
+        <button type="button" data-theme-mode="dark" aria-pressed="false">Dark</button>
+        <button type="button" data-theme-mode="light" aria-pressed="false">Light</button>
+        <button type="button" data-theme-mode="system" aria-pressed="false">System</button>
+      </div>
+      <p class="field-hint">Stage Slate dark is the suite default. System follows this device's OS appearance. Applies across the AV tools on this browser.</p>
+    </section>
+
+    <section class="drawer-group">
       <h3>Phase Handoff</h3>
       <div id="phaseHandoffSummary" class="scan-summary" aria-live="polite"></div>
       <div class="drawer-row">
@@ -1179,6 +1201,27 @@
   var densityToggle=$('densityToggle');
   if(densityToggle){densityToggle.addEventListener('click',function(e){var b=e.target.closest('[data-density]');if(b) applyDensity(b.getAttribute('data-density'),true);});}
   applyDensity(readUi().density==='compact'?'compact':'comfortable',false);
+
+  /* ---- Theme (Dark / Light / System) ---- */
+  var THEME_KEY='av-theme-mode.v1';
+  function readThemeMode(){
+    var mode='dark';
+    try{
+      var stored=localStorage.getItem(THEME_KEY);
+      if(stored==='dark'||stored==='light'||stored==='system') mode=stored;
+    }catch(e){}
+    return mode;
+  }
+  function applyThemeMode(mode,persist){
+    if(mode!=='dark'&&mode!=='light'&&mode!=='system') mode='dark';
+    document.documentElement.setAttribute('data-av-theme',mode);
+    var toggle=$('themeToggle');
+    if(toggle){Array.prototype.forEach.call(toggle.querySelectorAll('[data-theme-mode]'),function(b){b.setAttribute('aria-pressed',String(b.getAttribute('data-theme-mode')===mode));});}
+    if(persist){try{localStorage.setItem(THEME_KEY,mode);}catch(e){}}
+  }
+  var themeToggle=$('themeToggle');
+  if(themeToggle){themeToggle.addEventListener('click',function(e){var b=e.target.closest('[data-theme-mode]');if(b) applyThemeMode(b.getAttribute('data-theme-mode'),true);});}
+  applyThemeMode(readThemeMode(),false);
 
   /* ---- Department glyphs, navigator & grouped grid ---- */
   var GLYPH={
