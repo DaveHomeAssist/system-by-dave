@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-08-25
+
+### Throwline projector reference appendix
+
+* Embedded a 13-row user-supplied projector appendix as reference-only evidence with its source SHA recorded; the four audited canonical projectors remain unchanged, and the nine new IDs have no compatibility or optical profiles.
+* Kept appendix fields from driving planning inputs; known source claims require field-level normalization before promotion.
+
 ## 2026-08-24
 
 ### Throwline Stage 3D audit release
