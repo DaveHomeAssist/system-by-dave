@@ -687,28 +687,39 @@
       overflow: hidden
     }
 
+    .zoom-track::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      background: repeating-linear-gradient(90deg, transparent 0 31px, var(--line) 31px 32px);
+      opacity: .65;
+      pointer-events: none
+    }
+
     .zoom-nominal {
       position: absolute;
       inset-block: 0;
       background: var(--hazard-lo);
-      border-inline: 1px solid var(--hazard-mid)
+      border-inline: 2px solid var(--hazard)
     }
 
     .zoom-safe {
       position: absolute;
       top: 7px;
       bottom: 7px;
-      background: var(--go-lo);
-      border-inline: 1px solid var(--go-mid)
+      background: repeating-linear-gradient(135deg, var(--go-lo) 0 5px, transparent 5px 9px);
+      border-inline: 2px solid var(--go)
     }
 
     .zoom-pin {
       position: absolute;
       top: -2px;
       bottom: -2px;
-      width: 2px;
+      z-index: 3;
+      width: 3px;
       background: var(--hazard);
-      z-index: 3
+      box-shadow: 0 0 0 1px var(--case)
     }
 
     .zoom-pin.bad {
@@ -1552,6 +1563,10 @@
       }
 
       main {
+        grid-template-columns: 1fr
+      }
+
+      body[data-field-verify="true"] main {
         grid-template-columns: 1fr
       }
 

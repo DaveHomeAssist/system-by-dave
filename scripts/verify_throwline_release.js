@@ -98,16 +98,34 @@ requireMatch(stage, /dataset\.projectionState\s*=/, 'Stage 3D must expose its de
 requireMatch(stage, /id=["']sceneSummary["'][^>]*role=["']status["']/, 'Stage 3D must expose an accessible scene summary status region.');
 requireMatch(sidecar, /Use keys 1 through 5 for cameras/, 'Stage 3D canvas instructions must expose all five camera shortcuts.');
 requireMatch(stage, /<details\b[^>]*class=["'][^"']*adjust-panel/, 'Stage 3D controls must use a native Adjust disclosure.');
+requireMatch(stage, /function\s+syncAdjustLayout\s*\(/, 'Stage 3D must synchronize the Adjust disclosure when crossing its mobile breakpoint.');
 requireMatch(stage, /id=["']fieldVerifyToggle["']/, 'Stage 3D must expose a Field Verify control.');
 requireMatch(stage, /class=["'][^"']*scene-toolbar/, 'Stage 3D must expose camera and layer controls beside the scene.');
+requireMatch(stage, /class=["'][^"']*mobile-exports/, 'Stage 3D must place phone export actions after scene controls.');
 requireMatch(stage, /grid-template-areas:[^}]*["']hud["'][^}]*["']controls["'][^}]*["']stage["']/s, 'Stage 3D phone layout must order the answer and controls before the scene.');
 requireMatch(stage, /dataset\.fieldVerify\s*=/, 'Stage 3D must expose Field Verify state on the document.');
+requireMatch(stage, /if\s*\(enabled\s*&&\s*window\.innerWidth\s*>\s*820\)\s*adjustPanel\.open\s*=\s*true/, 'Stage 3D Field Verify must keep phone adjustments compact.');
 requireMatch(main, /id=["']plannerFieldVerify["']/, 'Throwline main app must expose a Field Verify mode control.');
 requireMatch(main, /dataset\.fieldVerify\s*=/, 'Throwline main app must expose Field Verify state on the document.');
+requireMatch(main, /@media\(max-width:760px\)[\s\S]*?body\[data-field-verify=["']true["']\]\s+main\s*\{[^}]*grid-template-columns:\s*1fr/s, 'Throwline main Field Verify must collapse to one column on phone.');
 requireMatch(sidecar, /id\s*=\s*["']controlsHelp["']/, 'Stage 3D must retain a discoverable Controls help trigger.');
 requireMatch(sidecar, /stage-first-interaction/, 'Stage 3D must dismiss first-use help after a successful interaction.');
 requireMatch(stage, /min-height:\s*44px/, 'Stage 3D must retain 44-pixel touch targets on phone.');
 requireMatch(sidecar, /:host\(\[field-verify\]\)\s+\.toolbar/, 'Stage exports must yield to planning data in Field Verify mode.');
+requireMatch(sidecar, /@media\s*\(max-width:\s*820px\)[\s\S]*?\.toolbar\s*\{[^}]*display:\s*none/s, 'Stage 3D must hide its internal export toolbar on phone.');
+requireMatch(sidecar, /\n\s+runExport\s*\(format\)/, 'Stage 3D must expose its existing export flow to phone controls.');
+requireMatch(stage, /function\s+disposeObject3D\s*\(/, 'Stage 3D must dispose resources replaced during model rebuilds.');
+requireMatch(sidecar, /visibilitychange/, 'Stage 3D must pause or gate rendering when the document is hidden.');
+requireMatch(sidecar, /requestRender\s*\(/, 'Stage 3D must use invalidation-driven rendering.');
+if (/preserveDrawingBuffer\s*:\s*true/.test(sidecar)) fail('Stage 3D must not keep preserveDrawingBuffer enabled globally.');
+requireMatch(sidecar, /captureCanvas\s*\(/, 'Stage 3D must expose a capture-specific immediate render path.');
+requireMatch(sidecar, /renderer\.dispose\s*\(/, 'Stage 3D must dispose its renderer on final teardown.');
+requireMatch(stage, /@media\s*\(prefers-reduced-motion:\s*reduce\)/, 'Stage 3D must respect reduced-motion preferences.');
+requireMatch(stage, /\.band::before/, 'Stage 3D range bars must include a non-color tick treatment.');
+requireMatch(stage, /if\s*\(objectMounted\)\s*setCamera\(activeCamera/, 'Stage 3D must reframe the active camera after geometry changes.');
+requireMatch(stage, /front:\s*\[0,\s*cy,\s*d\*0\.22\]/, 'Stage 3D front camera must inspect image fit from the projector side of the screen.');
+requireMatch(main, /\.zoom-track::before/, 'Throwline main range bars must include a non-color tick treatment.');
+requireMatch(read('CHANGELOG.md'), /Throwline Stage 3D audit/i, 'CHANGELOG must describe the Throwline Stage 3D audit release.');
 
 const throwlineTools = (avRegistry?.tools || []).filter((tool) => tool.id === 'throwline');
 if (throwlineTools.length !== 1 || throwlineTools[0].href !== 'ProjectorThrow/') {

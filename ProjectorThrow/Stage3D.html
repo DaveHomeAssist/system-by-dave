@@ -104,9 +104,10 @@ button[aria-pressed=true]{background:var(--line-lo);color:var(--chalk);border-co
 .hud .note{font-size:12px;margin-top:7px}
 .band{position:relative;height:12px;background:var(--deck);border:1px solid var(--line);border-radius:2px;overflow:hidden;margin-top:9px}
 .band .nom,.band .safe,.band .pin{position:absolute;top:0;bottom:0}
-.band .nom{background:var(--hazard-lo)}
-.band .safe{background:var(--go-lo);border-left:1px solid var(--go-mid);border-right:1px solid var(--go-mid)}
-.band .pin{width:2px;background:var(--hazard)}
+.band::before{content:"";position:absolute;inset:0;z-index:2;background:repeating-linear-gradient(90deg,transparent 0 23px,color-mix(in srgb,var(--line) 72%,transparent) 23px 24px);pointer-events:none}
+.band .nom{background:var(--hazard-lo);border-inline:1px solid var(--hazard-mid)}
+.band .safe{top:2px;bottom:2px;background:repeating-linear-gradient(135deg,var(--go-lo) 0 5px,transparent 5px 9px);border-left:2px solid var(--go);border-right:2px solid var(--go)}
+.band .pin{z-index:3;width:3px;background:var(--hazard);box-shadow:0 0 0 1px var(--case)}
 .facts{position:absolute;z-index:2;right:16px;top:16px;margin:0;background:var(--overlay);backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:var(--r);pointer-events:none;font-family:var(--mono);font-size:11px;overflow:hidden}
 .facts div{display:flex;gap:14px;justify-content:space-between;padding:7px 13px;border-bottom:1px solid var(--line-lo)}
 .facts div:last-child{border-bottom:0}
@@ -115,6 +116,7 @@ button[aria-pressed=true]{background:var(--line-lo);color:var(--chalk);border-co
 .scene-toolbar{position:absolute;z-index:3;right:16px;top:210px;width:min(310px,calc(100% - 32px));padding:10px;background:var(--overlay);backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:var(--r);box-shadow:0 8px 22px rgba(0,0,0,.08)}
 .scene-toolbar .grp{gap:8px}
 .scene-toolbar .row{justify-content:flex-end}
+.mobile-exports{display:none}
 .state-label{display:inline-flex;align-items:center;min-height:24px;margin-top:7px;padding:3px 7px;border:1px solid currentColor;border-radius:var(--r);font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--go)}
 .field-verify-toggle[aria-pressed=true]{background:var(--go);border-color:var(--go);color:#fff}
 .model-note{font-size:11.5px;color:var(--dimmer);margin:0;border-top:1px solid var(--line-lo);padding-top:12px}
@@ -123,13 +125,18 @@ body[data-field-verify=true] .companion,
 body[data-field-verify=true] .online-note,
 body[data-field-verify=true] .model-note,
 body[data-field-verify=true] .kbd-help,
-body[data-field-verify=true] .av-suite-link{display:none}
+body[data-field-verify=true] .av-suite-link,
+body[data-field-verify=true] .mobile-exports{display:none}
 body[data-field-verify=true] header{position:sticky;top:0;z-index:9}
 .kbd-help{font-size:11.5px;color:var(--dimmer);margin:0;border-top:1px solid var(--line-lo);padding-top:12px}
 .online-note{margin:0;padding:10px 11px;border-left:3px solid var(--info);background:var(--info-lo);font-size:11.5px;color:var(--dim)}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}
+  button:active{transform:none!important}
+}
 @media (max-width:820px){
   html,body{height:auto;min-height:100%}
-  .app{grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto auto auto auto auto;grid-template-areas:"header" "hud" "controls" "stage" "scene-controls" "facts";height:auto;min-height:100svh;background:var(--deck)}
+  .app{grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto auto auto auto auto auto;grid-template-areas:"header" "hud" "controls" "stage" "scene-controls" "exports" "facts";height:auto;min-height:100svh;background:var(--deck)}
   header{padding:10px 12px;gap:8px}
   .companion{display:none}
   .header-actions{margin-left:auto;flex:0 1 auto;order:0}
@@ -146,6 +153,8 @@ body[data-field-verify=true] header{position:sticky;top:0;z-index:9}
   .facts{grid-area:facts;margin-bottom:12px}
   .scene-toolbar{grid-area:scene-controls;position:static;width:auto;margin:0 12px;padding:12px;backdrop-filter:none;box-shadow:none}
   .scene-toolbar .row{justify-content:stretch}
+  .mobile-exports{grid-area:exports;display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 12px 10px}
+  .mobile-exports button{min-height:44px}
   .facts div{gap:8px}
   aside{grid-area:controls;border-right:0;border-top:0;overflow:visible;padding:10px 12px 0;background:var(--deck)}
   .adjust-panel{border:1px solid var(--line);border-radius:var(--r);background:var(--case);overflow:hidden}
@@ -241,6 +250,10 @@ body[data-field-verify=true] header{position:sticky;top:0;z-index:9}
         </div>
       </div>
     </section>
+    <section class="mobile-exports" aria-label="Stage export">
+      <button id="mobileObj" type="button" disabled>Download OBJ + MTL</button>
+      <button id="mobileGlb" type="button" disabled>Download GLB</button>
+    </section>
     <div class="stage-canvas">
       <three-d-stage name="throwline-stage" fallback="index.html" role="region" aria-label="Interactive Throwline Stage 3D"></three-d-stage>
     </div>
@@ -277,6 +290,8 @@ const themeLabel = document.getElementById('themeLabel');
 const themeColor = document.getElementById('themeColor');
 const fieldVerifyToggle = document.getElementById('fieldVerifyToggle');
 const adjustPanel = document.getElementById('adjustPanel');
+const mobileObj = document.getElementById('mobileObj');
+const mobileGlb = document.getElementById('mobileGlb');
 
 function announce(message){
   stageStatus.textContent = '';
@@ -303,18 +318,30 @@ function setFieldVerify(enabled,{announceChange=false}={}){
   fieldVerifyToggle.setAttribute('aria-pressed',String(enabled));
   fieldVerifyToggle.textContent = enabled ? 'Exit Verify' : 'Field Verify';
   stage.toggleAttribute('field-verify',enabled);
-  if (enabled) adjustPanel.open = true;
+  if (enabled && window.innerWidth > 820) adjustPanel.open = true;
   if (announceChange) announce(enabled?'Field Verify mode on':'Field Verify mode off');
 }
 fieldVerifyToggle.addEventListener('click',()=>setFieldVerify(fieldVerifyToggle.getAttribute('aria-pressed')!=='true',{announceChange:true}));
 setFieldVerify(false);
-if (window.innerWidth <= 820) adjustPanel.open = false;
+let compactAdjustLayout;
+function syncAdjustLayout(){
+  const nextCompact = window.innerWidth <= 820;
+  if (nextCompact === compactAdjustLayout) return;
+  compactAdjustLayout = nextCompact;
+  adjustPanel.open = !nextCompact;
+}
+syncAdjustLayout();
+window.addEventListener('resize',syncAdjustLayout,{passive:true});
 stage.addEventListener('stage-dependency-error',()=>{
   stageStatus.textContent = 'Stage 3D needs an internet connection. The offline Throwline main app remains available.';
 });
 
 try {
 const { THREE } = await stage.ready;
+mobileObj.disabled = false;
+mobileGlb.disabled = false;
+mobileObj.addEventListener('click',()=>stage.runExport('obj'));
+mobileGlb.addEventListener('click',()=>stage.runExport('glb'));
 
 /* ---------- materials ---------- */
 const M = {
@@ -337,6 +364,22 @@ const M = {
   spill: new THREE.MeshBasicMaterial({ name:'projection_spill_material', color:0xd94d42, transparent:true, opacity:0.34, side:THREE.DoubleSide, depthWrite:false, depthTest:false }),
   missing: new THREE.MeshBasicMaterial({ name:'missing_coverage_material', color:0xd94d42, transparent:true, opacity:0.22, side:THREE.DoubleSide, depthWrite:false, depthTest:false })
 };
+const SHARED_MATERIALS = new Set(Object.values(M));
+
+function disposeObject3D(object,{disposeShared=false}={}){
+  if (!object) return;
+  const geometries = new Set();
+  const materials = new Set();
+  object.traverse(part=>{
+    if (part.geometry) geometries.add(part.geometry);
+    const list = Array.isArray(part.material) ? part.material : [part.material];
+    list.filter(Boolean).forEach(material=>{
+      if (disposeShared || !SHARED_MATERIALS.has(material)) materials.add(material);
+    });
+  });
+  geometries.forEach(geometry=>geometry.dispose());
+  materials.forEach(material=>material.dispose());
+}
 
 function updateSceneTheme(theme){
   const dark = theme === 'dark';
@@ -594,6 +637,8 @@ root.add(proj);
 const els = id => document.getElementById(id);
 const state = { w:20, bottom:4, ar:1.7778, wide:0.978, tele:1.320, lh:6, dist:22,
                 cone:true, room:true, grid:true };
+let activeCamera = 'three';
+let objectMounted = false;
 
 function fmt(ft){
   const neg = ft<0; let v = Math.abs(ft);
@@ -618,11 +663,11 @@ function rebuild(){
   const w = state.w * FT, h = (state.w/state.ar) * FT, bottom = state.bottom * FT;
   const dist = state.dist * FT, lensY = state.lh * FT;
 
-  if (screenGrp) root.remove(screenGrp);
+  if (screenGrp) { root.remove(screenGrp); disposeObject3D(screenGrp); }
   screenGrp = buildScreen(w,h,bottom); root.add(screenGrp);
 
   const depth = Math.max(dist + 4*FT, 12);
-  if (roomGrp) root.remove(roomGrp);
+  if (roomGrp) { root.remove(roomGrp); disposeObject3D(roomGrp); }
   roomGrp = buildRoom(depth, Math.max(w + 6, 12)); root.add(roomGrp);
   roomGrp.visible = state.room;
   roomGrp.getObjectByName('deck_grid').visible = state.grid;
@@ -631,7 +676,7 @@ function rebuild(){
   proj.rotation.y = Math.PI;                       // face the screen (-Z)
   proj.position.set(0, lensY - proj.userData.lensY, dist + proj.userData.lensZ);
 
-  if (cartGrp) root.remove(cartGrp);
+  if (cartGrp) { root.remove(cartGrp); disposeObject3D(cartGrp); }
   const bodyBase = proj.position.y;
   if (bodyBase > 0.14){
     cartGrp = buildCart(bodyBase);
@@ -652,7 +697,7 @@ function rebuild(){
     new THREE.Vector3( imgW/2, cy + imgH/2, 0.004),
     new THREE.Vector3(-imgW/2, cy + imgH/2, 0.004)
   ];
-  if (projectionGrp) root.remove(projectionGrp);
+  if (projectionGrp) { root.remove(projectionGrp); disposeObject3D(projectionGrp); }
   projectionGrp = buildProjection(apex,rect,{w,h,imgW,imgH,cy},pstate);
   projectionGrp.visible = state.cone;
   projectionGrp.traverse(part=>{
@@ -661,6 +706,8 @@ function rebuild(){
   root.add(projectionGrp);
 
   readout(imgW,imgH,w,h,cy,lensY,pstate);
+  if (objectMounted) setCamera(activeCamera,{announceChange:false});
+  stage.requestRender();
 }
 
 // Ratio the lens is actually set to: the operator zooms to fit when the
@@ -750,6 +797,7 @@ function toggle(id, key, apply){
     state[key] = !state[key];
     b.setAttribute('aria-pressed', String(state[key]));
     apply();
+    stage.requestRender();
     announce(`${b.textContent.trim()} ${state[key] ? 'shown' : 'hidden'}`);
   };
 }
@@ -762,12 +810,13 @@ const cameraLabels = {three:'Three-quarter',side:'Side',front:'Front',top:'Top',
 function setCamera(camera,{saveDefault=false,announceChange=true}={}){
   const button = document.querySelector(`[data-cam="${camera}"]`);
   if (!button) return;
+  activeCamera = camera;
   document.querySelectorAll('[data-cam]').forEach(o=>o.setAttribute('aria-pressed', String(o===button)));
   const d = state.dist*FT, h = (state.w/state.ar)*FT, cy = state.bottom*FT + h/2;
   const views = {
     three: [d*0.95, cy + d*0.55, d*1.5],
     side:  [d*1.7, cy*1.1, d*0.55],
-    front: [0, cy, -d*0.72],
+    front: [0, cy, d*0.22],
     top:   [0.01, d*1.5, d*0.55],
     op:    [0, state.lh*FT, d*1.32]
   };
@@ -789,8 +838,10 @@ els('resetView').addEventListener('click',()=>{
 
 rebuild();
 stage.setObject(root);
+objectMounted = true;
 setCamera('three',{saveDefault:true,announceChange:false});
 announce('Stage 3D ready. Three-quarter camera selected.');
+window.addEventListener('pagehide',event=>{ if (!event.persisted) stage.destroy(); });
 } catch (error) {
   stageStatus.textContent = 'Stage 3D unavailable. Open the offline Throwline main app.';
 }

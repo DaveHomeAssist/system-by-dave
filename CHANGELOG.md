@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-08-24
+
+### Throwline Stage 3D audit release
+
+* Made projection state legible in the scene with a theme-aware beam volume, high-contrast edge rays, optical centerline, projected-image boundary, and explicit red spill or missing-coverage geometry.
+* Added front and reset camera access, an answer-first phone hierarchy, compact Adjust controls, progressive gesture help, 44-pixel touch targets, and Field Verify modes in Stage 3D and the offline planner.
+* Added synchronized non-color status and screen-reader summaries, reduced-motion behavior, higher-contrast patterned range bars, dark-room object separation, replaced-resource disposal, visibility-aware render invalidation, and a capture-specific canvas path.
+
 ## 2026-08-19
 
 - Kept the canonical NoteForge breadcrumb clear of the mobile sidebar controls and bounded the embedded app height to the remaining viewport.

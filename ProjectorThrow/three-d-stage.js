@@ -218,6 +218,10 @@
       font-family: var(--mono, ui-monospace, monospace);
       font-weight: 700;
     }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition: none !important; animation: none !important; }
+      .toolbar button:active { transform: none; }
+    }
     @media (max-width: 820px) {
       :host {
         height: auto;
@@ -256,7 +260,7 @@
       .toolbar {
         position: static;
         grid-row: 3;
-        display: grid;
+        display: none;
         grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
         padding: 0 12px 12px;
         background: var(--case, #fff);
@@ -360,10 +364,10 @@
 
     connectedCallback() {
       if (this._booted) {
-        // Re-attached after a removal — resume what disconnected stopped.
-        if (this._renderer) {
-          this._renderer.setAnimationLoop(this._loop);
+        // Re-attached after a move — resume observation and paint one frame.
+        if (this._renderer && !this._destroyed) {
           this._ro && this._ro.observe(this._viewport);
+          this.requestRender();
         }
         return;
       }
@@ -400,13 +404,9 @@
         import('three/addons/controls/OrbitControls.js'),
       ]);
       this._THREE = THREE;
-      // preserveDrawingBuffer keeps the last frame readable after
-      // compositing (toDataURL / drawImage) — it's what lets the
-      // screenshot tools capture the scene instead of a blank canvas.
       const renderer = new THREE.WebGLRenderer({
         antialias: true,
         alpha: true,
-        preserveDrawingBuffer: true,
       });
       renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
       renderer.shadowMap.enabled = true;
@@ -423,7 +423,8 @@
         'aria-keyshortcuts',
         '1 2 3 4 5 ArrowLeft ArrowRight ArrowUp ArrowDown + - 0 Home'
       );
-      renderer.domElement.addEventListener('keydown', (event) => this._handleKey(event));
+      this._keyHandler = (event) => this._handleKey(event);
+      renderer.domElement.addEventListener('keydown', this._keyHandler);
       this._viewport.insertBefore(renderer.domElement, this._err);
 
       const scene = new THREE.Scene();
@@ -469,29 +470,46 @@
       controls.autoRotateSpeed = 1.2;
       controls.addEventListener('start', () => {
         controls.autoRotate = false;
+        this._interacting = true;
         this._completeFirstInteraction();
+        this.requestRender();
       });
-      controls.addEventListener('end', () => this.announce('Stage view adjusted.'));
+      controls.addEventListener('change', () => this.requestRender());
+      controls.addEventListener('end', () => {
+        this._interacting = false;
+        this.requestRender();
+        this.announce('Stage view adjusted.');
+      });
 
       const fit = () => {
         const w = this._viewport.clientWidth || 1;
         const h = this._viewport.clientHeight || 1;
-        renderer.setSize(w, h);
+        renderer.setSize(w, h, false);
         camera.aspect = w / h;
         camera.updateProjectionMatrix();
+        this.requestRender();
       };
-      fit();
       this._ro = new ResizeObserver(fit);
-      this._loop = () => {
-        controls.update();
+      this._frame = () => {
+        this._frameId = undefined;
+        if (this._destroyed || document.hidden || !this.isConnected) return;
+        const changed = controls.update();
         renderer.render(scene, camera);
+        if (this._interacting || controls.autoRotate || changed) this.requestRender();
       };
-      // Detached while three.js was fetching? Stay idle — the
-      // connectedCallback resume starts the loop and observer on
-      // reattach.
+      this._visibilityHandler = () => {
+        if (document.hidden) {
+          if (this._frameId !== undefined) cancelAnimationFrame(this._frameId);
+          this._frameId = undefined;
+        } else {
+          this.requestRender();
+        }
+      };
+      document.addEventListener('visibilitychange', this._visibilityHandler);
+      fit();
       if (this.isConnected) {
         this._ro.observe(this._viewport);
-        renderer.setAnimationLoop(this._loop);
+        this.requestRender();
       }
 
       this.announce('Stage 3D loaded. Focus the stage for keyboard controls.');
@@ -499,10 +517,8 @@
     }
 
     disconnectedCallback() {
-      // Stop rendering and observing while detached; connectedCallback
-      // resumes both. (The renderer itself is kept — a move within the
-      // document must not rebuild the scene.)
-      if (this._renderer) this._renderer.setAnimationLoop(null);
+      if (this._frameId !== undefined) cancelAnimationFrame(this._frameId);
+      this._frameId = undefined;
       if (this._ro) this._ro.disconnect();
     }
 
@@ -512,7 +528,10 @@
     setObject(object) {
       const THREE = this._THREE;
       if (!THREE) throw new Error('three-d-stage: not ready — await stage.ready first');
-      if (this._object) this._scene.remove(this._object);
+      if (this._object) {
+        this._scene.remove(this._object);
+        this._disposeObject(this._object);
+      }
       this._object = object;
       object.traverse((o) => {
         if (o.isMesh) {
@@ -545,6 +564,7 @@
       }
       this._scene.add(object);
       this._setButtonsEnabled(true);
+      this.requestRender();
     }
 
     announce(message) {
@@ -560,6 +580,7 @@
       this._camera.position.set(position[0], position[1], position[2]);
       this._controls.target.set(target[0], target[1], target[2]);
       this._controls.update();
+      this.requestRender();
       if (options.saveDefault) {
         this._defaultView = {
           position: [...position],
@@ -596,6 +617,7 @@
         this._ground.material.opacity = dark ? 0.28 : 0.18;
         this._ground.material.needsUpdate = true;
       }
+      this.requestRender();
     }
 
     orbitBy(azimuthDelta, polarDelta) {
@@ -607,6 +629,7 @@
       offset.setFromSpherical(spherical);
       this._camera.position.copy(this._controls.target).add(offset);
       this._controls.update();
+      this.requestRender();
       this.announce('Stage camera orbited.');
     }
 
@@ -617,6 +640,7 @@
       offset.setLength(nextDistance);
       this._camera.position.copy(this._controls.target).add(offset);
       this._controls.update();
+      this.requestRender();
       this.announce(factor < 1 ? 'Stage zoomed in.' : 'Stage zoomed out.');
     }
 
@@ -629,6 +653,57 @@
         { announce: false }
       );
       this.announce('Stage camera reset to three-quarter view.');
+    }
+
+    requestRender() {
+      if (this._destroyed || document.hidden || !this.isConnected || !this._renderer || this._frameId !== undefined) return;
+      this._frameId = requestAnimationFrame(this._frame);
+    }
+
+    captureCanvas() {
+      if (this._destroyed || !this._renderer || !this._scene || !this._camera) return undefined;
+      if (this._controls) this._controls.update();
+      this._renderer.render(this._scene, this._camera);
+      return this._renderer.domElement;
+    }
+
+    _disposeObject(object) {
+      if (!object) return;
+      const geometries = new Set();
+      const materials = new Set();
+      const textures = new Set();
+      object.traverse((part) => {
+        if (part.geometry) geometries.add(part.geometry);
+        const list = Array.isArray(part.material) ? part.material : [part.material];
+        list.filter(Boolean).forEach((material) => {
+          materials.add(material);
+          Object.values(material).forEach((value) => {
+            if (value && value.isTexture) textures.add(value);
+          });
+        });
+      });
+      textures.forEach((texture) => texture.dispose());
+      geometries.forEach((geometry) => geometry.dispose());
+      materials.forEach((material) => material.dispose());
+    }
+
+    destroy() {
+      if (this._destroyed) return;
+      this._destroyed = true;
+      if (this._frameId !== undefined) cancelAnimationFrame(this._frameId);
+      this._frameId = undefined;
+      if (this._ro) this._ro.disconnect();
+      if (this._visibilityHandler) document.removeEventListener('visibilitychange', this._visibilityHandler);
+      if (this._renderer && this._keyHandler) this._renderer.domElement.removeEventListener('keydown', this._keyHandler);
+      if (this._controls) this._controls.dispose();
+      this._disposeObject(this._object);
+      this._object = undefined;
+      this._disposeObject(this._ground);
+      if (this._renderer) {
+        this._renderer.dispose();
+        this._renderer.forceContextLoss();
+      }
+      this._setButtonsEnabled(false);
     }
 
     _handleKey(event) {
@@ -704,6 +779,10 @@
      *  Rethrows so a failure stays visible on the guest console exactly as
      *  before. The no-object early return is not an attempt (the toolbar is
      *  disabled until the model loads) and reports nothing. */
+    runExport(format) {
+      return this._runExport(format);
+    }
+
     async _runExport(format) {
       if (!this._object) return;
       this.announce(format === 'obj' ? 'Preparing OBJ and MTL downloads.' : 'Preparing GLB download.');
