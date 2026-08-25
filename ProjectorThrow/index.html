@@ -2910,7 +2910,7 @@
         el.rdSub.innerHTML = c.calculationGate ? '<span class="k">CALCULATION BLOCKED</span>' : '<span class="k">Enter a screen size and explicit manual ratio.</span>'; el.rdNote.textContent = c.calculationGate?.reason || ""; el.rdNote.className = `rd-note${c.calculationGate ? " bad" : ""}`;
         setBadge(el.fitBadge, c.calculationGate ? "blocked" : "waiting", c.calculationGate ? "bad" : "dim"); setBadge(el.verifyBadge, c.calculationMode || "unverified", c.calculationMode === "field_verified" ? "go" : "dim");
         el.zoomNominal.style.width = "0%"; el.zoomSafe.style.width = "0%"; el.zoomPin.hidden = true; el.zoomA.textContent = "—"; el.zoomB.textContent = "—";
-        el.mobileValue.textContent = "—"; setMobileStatus("waiting", "dim"); return;
+        el.mobileValue.textContent = "—"; setMobileStatus(c.calculationGate ? "blocked" : "waiting", c.calculationGate ? "bad" : "dim"); return;
       }
       el.rdLabel.textContent = finite(c.dist) ? "Throw distance · set mark" : (c.fixed ? "Throw distance · fixed nominal" : "Throw distance · conservative midpoint");
       el.rdBig.textContent = fmtLen(c.shown); el.rdBig.className = `rd-big${c.place.kind === "bad" ? " bad" : c.place.kind === "warn" ? " edge" : ""}`;

@@ -247,7 +247,11 @@ requireMatch(stage, /\.band::before/, 'Stage 3D range bars must include a non-co
 requireMatch(stage, /if\s*\(objectMounted\)\s*setCamera\(activeCamera/, 'Stage 3D must reframe the active camera after geometry changes.');
 requireMatch(stage, /front:\s*\[0,\s*cy,\s*d\*0\.22\]/, 'Stage 3D front camera must inspect image fit from the projector side of the screen.');
 requireMatch(main, /\.zoom-track::before/, 'Throwline main range bars must include a non-color tick treatment.');
-requireMatch(read('CHANGELOG.md'), /Throwline Stage 3D audit/i, 'CHANGELOG must describe the Throwline Stage 3D audit release.');
+const changelog = read('CHANGELOG.md');
+requireMatch(changelog, /Throwline Stage 3D audit/i, 'CHANGELOG must describe the Throwline Stage 3D audit release.');
+['pilot catalog', 'exact compatibility', 'calculation gate', 'manual simulation', 'field calibration', 'legacy migration', 'optical geometry suppression'].forEach((term) => {
+  if (!changelog.toLowerCase().includes(term)) fail(`CHANGELOG must document Throwline ${term}.`);
+});
 
 const throwlineTools = (avRegistry?.tools || []).filter((tool) => tool.id === 'throwline');
 if (throwlineTools.length !== 1 || throwlineTools[0].href !== 'ProjectorThrow/') {

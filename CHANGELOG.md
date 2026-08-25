@@ -8,6 +8,14 @@
 * Added front and reset camera access, an answer-first phone hierarchy, compact Adjust controls, progressive gesture help, 44-pixel touch targets, and Field Verify modes in Stage 3D and the offline planner.
 * Added synchronized non-color status and screen-reader summaries, reduced-motion behavior, higher-contrast patterned range bars, dark-room object separation, replaced-resource disposal, visibility-aware render invalidation, and a capture-specific canvas path.
 
+### Throwline pilot catalog safety cutover
+
+* Added the audited, offline pilot catalog with 5 manufacturers, 4 exact projector models, 13 lenses, 13 exact compatibility joins, 8 raw optical profiles, 13 sources, and 6 research exceptions. The embedded catalog is fingerprinted to the source workbook and synchronized deterministically into the planner and Stage 3D.
+* Applied the newer research authority as a global calculation gate: the pilot contains zero calculation-ready profiles, all broad legacy rows migrate to `legacy_unverified`, and raw official ratios, basis text, confidence, source links, and exceptions remain visible without silently driving throw math.
+* Preserved explicit `MANUAL SIMULATION` and job-scoped field calibration workflows. A positive measured distance and image width require a fresh field stamp; editing a measurement revokes that stamp without modifying catalog data.
+* Added exact planner-to-Stage transfer validation. Stage 3D rejects forged verified states, retains non-optical scene/export controls for gated pairs, and applies optical geometry suppression to the beam, projected image, spill, missing coverage, and fit verdict until the calculation state is eligible.
+* Added fail-safe legacy migration for saved jobs and share links: source-backed legacy IDs remain blocked even when old ratio values are present, while ratio-only links continue as clearly labeled manual simulations without deleting stored user data.
+
 ## 2026-08-19
 
 - Kept the canonical NoteForge breadcrumb clear of the mobile sidebar controls and bounded the embedded app height to the remaining viewport.
