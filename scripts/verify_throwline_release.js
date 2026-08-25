@@ -53,8 +53,32 @@ const sitemap = read('sitemap.xml');
 const avRegistry = registry();
 const catalogSource = read('ProjectorThrow/data/throwline-pilot-catalog.v1.json');
 const catalog = readJson('ProjectorThrow/data/throwline-pilot-catalog.v1.json');
+const packageJson = readJson('package.json');
 
 if (catalogSource.includes('\uFFFD')) fail('Throwline pilot catalog contains Unicode replacement characters.');
+
+function embeddedCatalog(source, label) {
+  const match = source.match(/<!-- THROWLINE_CATALOG_START -->\s*<script id=["']throwlineCatalog["'] type=["']application\/json["']>([\s\S]*?)<\/script>\s*<!-- THROWLINE_CATALOG_END -->/);
+  if (!match) {
+    fail(`${label} is missing its embedded Throwline catalog snapshot.`);
+    return null;
+  }
+  try {
+    return JSON.parse(match[1]);
+  } catch (error) {
+    fail(`${label} contains an invalid embedded Throwline catalog: ${error.message}`);
+    return null;
+  }
+}
+
+const mainCatalog = embeddedCatalog(main, 'Throwline main app');
+const stageCatalog = embeddedCatalog(stage, 'Stage 3D');
+if (mainCatalog && JSON.stringify(mainCatalog) !== JSON.stringify(catalog)) fail('Throwline main embedded catalog is stale.');
+if (stageCatalog && JSON.stringify(stageCatalog) !== JSON.stringify(catalog)) fail('Stage 3D embedded catalog is stale.');
+if (!fs.existsSync(path.join(ROOT, 'scripts/sync_throwline_catalog.js'))) fail('Throwline catalog sync script is missing.');
+if (packageJson?.scripts?.['sync:throwline-catalog'] !== 'node scripts/sync_throwline_catalog.js') fail('Package catalog sync command is missing.');
+if (packageJson?.scripts?.['check:throwline-catalog'] !== 'node scripts/sync_throwline_catalog.js --check') fail('Package catalog check command is missing.');
+if (!String(packageJson?.scripts?.['verify:throwline'] || '').includes('sync_throwline_catalog.js --check')) fail('Throwline verification must reject stale embedded catalogs.');
 
 if (catalog) {
   const expectedCounts = {
