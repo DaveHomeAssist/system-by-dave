@@ -143,8 +143,8 @@ function verifyRenderer() {
   if (!prep.includes("fetch('data/gear/index.json'")) fail('Gear Prep does not read the authored reference index.');
   if (!prep.includes('id="gearReferenceLink"')) fail('Gear Prep inspector has no Gear Reference link.');
   if (!read('sitemap.xml').includes('https://systembydave.com/gear-reference.html')) fail('Sitemap does not include Gear Reference.');
-  if (!/>43<\/div>/.test(read('index.html')) || !/43 operator tools/.test(read('tools.html'))) {
-    fail('Public AV tool count was not raised to 43 browser tools.');
+  if (!/>44<\/div>/.test(read('index.html')) || !/44 operator tools/.test(read('tools.html'))) {
+    fail('Public AV tool count was not raised to 44 browser tools.');
   }
 }
 
