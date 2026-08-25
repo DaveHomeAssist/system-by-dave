@@ -1,12 +1,33 @@
 #!/usr/bin/env node
 'use strict';
 
+const crypto = require('node:crypto');
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 
 const ROOT = path.resolve(__dirname, '..');
 const failures = [];
+const APPENDIX_SHA256 = '8afbcad015b0b4ce5d5a2904dac7d5d60d259cc8547940e97224e2656527a674';
+const PILOT_ARRAY_SHA256 = {
+  projectors: 'a8d02aac67d21ea571f0b0cf0d8735887e36325b0cc7e31fae846b7f5f8eea59',
+  lenses: '710a30622899fdd1ef2c9e491298e4fb718f0e06d811585f29d7bb1e237f44e4',
+  compatibility: '97e740b4c48ea9913119256a7ea5268f2754ddf98c485daee540aaca604b4085',
+  opticalProfiles: 'ebf6e13760a75eb173a9ca76b012da613300b5df36dac08cd71b10f56a750142',
+};
+const APPENDIX_OVERLAP_PROJECTOR_IDS = ['PRJ-001', 'PRJ-002', 'PRJ-003', 'PRJ-004'];
+const APPENDIX_NEW_PROJECTOR_IDS = [
+  'PRJ-005',
+  'PRJ-006',
+  'PRJ-007',
+  'PRJ-008',
+  'PRJ-009',
+  'PRJ-010',
+  'PRJ-011',
+  'PRJ-012',
+  'PRJ-013',
+];
+const REFERENCE_ONLY_PROJECTOR_IDS = new Set(APPENDIX_NEW_PROJECTOR_IDS);
 
 function read(relativePath) {
   return fs.readFileSync(path.join(ROOT, relativePath), 'utf8');
@@ -23,6 +44,75 @@ function readJson(relativePath) {
 
 function fail(message) {
   failures.push(message);
+}
+
+function hashJson(value) {
+  return crypto.createHash('sha256').update(JSON.stringify(value)).digest('hex');
+}
+
+function setsMatch(values, expectedValues) {
+  return values.size === expectedValues.length && expectedValues.every((value) => values.has(value));
+}
+
+function validateProjectorReferenceAppendix(catalog, pilotProjectorIds) {
+  const appendix = catalog.projectorReferenceAppendix;
+  if (appendix === undefined) {
+    fail('Throwline pilot catalog is missing projectorReferenceAppendix.');
+    return;
+  }
+  if (!appendix || typeof appendix !== 'object' || Array.isArray(appendix)) {
+    fail('Throwline pilot catalog projectorReferenceAppendix must be an object.');
+    return;
+  }
+
+  if (appendix.catalogRole !== 'user_supplied_reference_only') {
+    fail('Throwline projector reference appendix catalogRole must be user_supplied_reference_only.');
+  }
+  if (appendix.automaticPlanningInputsAllowed !== false) {
+    fail('Throwline projector reference appendix must prohibit automatic planning inputs.');
+  }
+  if (appendix.sourceSha256 !== APPENDIX_SHA256) {
+    fail('Throwline projector reference appendix source fingerprint does not match the supplied reference.');
+  }
+  if (!Array.isArray(appendix.rows)) {
+    fail('Throwline projector reference appendix rows must be an array.');
+    return;
+  }
+
+  const rows = appendix.rows;
+  if (rows.length !== 13) fail('Throwline projector reference appendix must contain exactly 13 rows.');
+
+  const projectorIdValues = rows.map((row) => row?.projector_id);
+  const validProjectorIds = projectorIdValues.filter((value) => typeof value === 'string' && value.trim());
+  const projectorIds = new Set(validProjectorIds);
+  if (validProjectorIds.length !== 13 || projectorIds.size !== 13) {
+    fail('Throwline projector reference appendix must contain 13 unique nonempty projector_id values.');
+  }
+
+  const canonicalModelKeyValues = rows.map((row) => row?.canonical_model_key);
+  const validCanonicalModelKeys = canonicalModelKeyValues.filter((value) => typeof value === 'string' && value.trim());
+  if (validCanonicalModelKeys.length !== 13 || new Set(validCanonicalModelKeys).size !== 13) {
+    fail('Throwline projector reference appendix must contain 13 unique nonempty canonical_model_key values.');
+  }
+
+  const overlapIds = new Set([...projectorIds].filter((projectorId) => pilotProjectorIds.has(projectorId)));
+  const newIds = new Set([...projectorIds].filter((projectorId) => !pilotProjectorIds.has(projectorId)));
+  if (!setsMatch(overlapIds, APPENDIX_OVERLAP_PROJECTOR_IDS)) {
+    fail(`Throwline projector reference appendix overlap IDs must be exactly ${APPENDIX_OVERLAP_PROJECTOR_IDS.join(', ')}.`);
+  }
+  if (!setsMatch(newIds, APPENDIX_NEW_PROJECTOR_IDS)) {
+    fail(`Throwline projector reference appendix new IDs must be exactly ${APPENDIX_NEW_PROJECTOR_IDS.join(', ')}.`);
+  }
+
+  const manufacturerRows = Array.isArray(catalog.manufacturers) ? catalog.manufacturers : [];
+  const manufacturerNamesById = new Map(manufacturerRows.map((row) => [row.manufacturer_id, row.manufacturer_name]));
+  rows.forEach((row, index) => {
+    if (typeof row?.manufacturer_id !== 'string'
+      || typeof row?.manufacturer_name !== 'string'
+      || manufacturerNamesById.get(row.manufacturer_id) !== row.manufacturer_name) {
+      fail(`Throwline projector reference appendix row ${index + 1} manufacturer_id/name must resolve exactly to catalog.manufacturers.`);
+    }
+  });
 }
 
 function requireMatch(source, pattern, message) {
@@ -117,14 +207,32 @@ if (catalog) {
     if (values.some((value) => typeof value !== 'string' || !value)) fail(`Throwline pilot catalog ${name} contains a missing ID.`);
     if (ids[name].size !== values.length) fail(`Throwline pilot catalog ${name} contains duplicate IDs.`);
   });
-  catalog.compatibility.forEach((row) => {
+
+  Object.entries(PILOT_ARRAY_SHA256).forEach(([name, expectedSha256]) => {
+    const rows = Array.isArray(catalog[name]) ? catalog[name] : [];
+    if (hashJson(rows) !== expectedSha256) fail(`Throwline pilot catalog ${name} changed from the frozen pilot array.`);
+  });
+
+  validateProjectorReferenceAppendix(catalog, ids.projectors);
+
+  const compatibilityRows = Array.isArray(catalog.compatibility) ? catalog.compatibility : [];
+  const opticalProfileRows = Array.isArray(catalog.opticalProfiles) ? catalog.opticalProfiles : [];
+  const compatibilityById = new Map(compatibilityRows.map((row) => [row.compatibility_id, row]));
+  compatibilityRows.forEach((row) => {
     if (!ids.projectors.has(row.projector_id)) fail(`Compatibility ${row.compatibility_id} references a missing projector.`);
     if (!ids.lenses.has(row.lens_id)) fail(`Compatibility ${row.compatibility_id} references a missing lens.`);
+    if (REFERENCE_ONLY_PROJECTOR_IDS.has(row.projector_id)) fail(`Compatibility ${row.compatibility_id} must not reference appendix-only projector ${row.projector_id}.`);
   });
-  catalog.opticalProfiles.forEach((profile) => {
+  opticalProfileRows.forEach((profile) => {
     if (!ids.projectors.has(profile.projector_id)) fail(`Profile ${profile.optical_profile_id} references a missing projector.`);
     if (!ids.lenses.has(profile.lens_id)) fail(`Profile ${profile.optical_profile_id} references a missing lens.`);
-    if (!ids.compatibility.has(profile.compatibility_id)) fail(`Profile ${profile.optical_profile_id} references missing compatibility.`);
+    const compatibility = compatibilityById.get(profile.compatibility_id);
+    if (!compatibility) {
+      fail(`Profile ${profile.optical_profile_id} references missing compatibility.`);
+    } else if (compatibility.projector_id !== profile.projector_id || compatibility.lens_id !== profile.lens_id) {
+      fail(`Profile ${profile.optical_profile_id} compatibility ${profile.compatibility_id} must reference the same projector and lens.`);
+    }
+    if (REFERENCE_ONLY_PROJECTOR_IDS.has(profile.projector_id)) fail(`Profile ${profile.optical_profile_id} must not reference appendix-only projector ${profile.projector_id}.`);
     if (!Number.isFinite(profile.throw_ratio_min) || !Number.isFinite(profile.throw_ratio_max) || profile.throw_ratio_min <= 0 || profile.throw_ratio_max < profile.throw_ratio_min) {
       fail(`Profile ${profile.optical_profile_id} has an invalid throw-ratio range.`);
     }
