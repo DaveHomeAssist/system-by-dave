@@ -133,6 +133,8 @@ body[data-field-verify=true] .mobile-exports{display:none}
 body[data-field-verify=true] header{position:sticky;top:0;z-index:9}
 .kbd-help{font-size:11.5px;color:var(--dimmer);margin:0;border-top:1px solid var(--line-lo);padding-top:12px}
 .online-note{margin:0;padding:10px 11px;border-left:3px solid var(--info);background:var(--info-lo);font-size:11.5px;color:var(--dim)}
+.calculation-gate{margin:0;padding:10px 11px;border-left:3px solid var(--hazard);background:var(--hazard-lo);font-size:11.5px;color:var(--ink);line-height:1.45}
+html[data-calculation-mode="manufacturer_unspecified"] .calculation-gate,html[data-calculation-mode="conflicting"] .calculation-gate,html[data-calculation-mode="partial"] .calculation-gate,html[data-calculation-mode="legacy_unverified"] .calculation-gate,html[data-calculation-mode="blocked"] .calculation-gate{border-color:var(--safety);background:var(--safety-lo);color:var(--safety)}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}
   button:active{transform:none!important}
@@ -206,13 +208,14 @@ body[data-field-verify=true] header{position:sticky;top:0;z-index:9}
     </div>
 
     <div class="grp">
-      <h3>Lens</h3>
-      <div><label class="lab" for="lens">Pairing</label><select id="lens">
-        <option value="0.978,1.320" selected>ET-DLE105 · 0.978–1.320:1</option>
-        <option value="1.300,1.740">ET-DLE205 · 1.300–1.740:1</option>
-        <option value="1.700,2.400">ET-DLE305 · 1.700–2.400:1</option>
-        <option value="2.400,4.700">ET-DLE450 · 2.400–4.700:1</option>
-        <option value="0.650,0.650">TLD+ 0.65 UST · fixed</option>
+      <h3>Calculation input</h3>
+      <p class="calculation-gate" id="stageCalculationGate" role="status">MANUAL SIMULATION · operator-supplied ratio preset · unverified.</p>
+      <div><label class="lab" for="lens">Manual ratio preset</label><select id="lens">
+        <option value="0.978,1.320" selected>Manual preset A · 0.978–1.320:1</option>
+        <option value="1.300,1.740">Manual preset B · 1.300–1.740:1</option>
+        <option value="1.700,2.400">Manual preset C · 1.700–2.400:1</option>
+        <option value="2.400,4.700">Manual preset D · 2.400–4.700:1</option>
+        <option value="0.650,0.650">Manual fixed preset · 0.650:1</option>
       </select></div>
       <div><label class="lab" for="lh">Lens optical height <span class="val" id="lhv">6' 0"</span></label><input id="lh" type="range" min="1" max="16" step="0.25" value="6"></div>
     </div>
@@ -295,6 +298,49 @@ const fieldVerifyToggle = document.getElementById('fieldVerifyToggle');
 const adjustPanel = document.getElementById('adjustPanel');
 const mobileObj = document.getElementById('mobileObj');
 const mobileGlb = document.getElementById('mobileGlb');
+const stageCalculationGate = document.getElementById('stageCalculationGate');
+
+function parseStageCatalog(){
+  try {
+    const data = JSON.parse(document.getElementById('throwlineCatalog')?.textContent || '');
+    if (data?.schemaVersion !== 1 || !Array.isArray(data.projectors) || !Array.isArray(data.lenses) || !Array.isArray(data.compatibility) || !Array.isArray(data.opticalProfiles)) throw new Error('catalog schema is incomplete');
+    return {ok:true,error:'',data};
+  } catch (error) {
+    console.error('Stage 3D catalog rejected',error);
+    return {ok:false,error:String(error?.message || error),data:{projectors:[],lenses:[],compatibility:[],opticalProfiles:[]}};
+  }
+}
+function stageEligibleProfile(profile){
+  return !!profile && profile.automaticCalculationAllowed === true && profile.calculationState === 'verified_image_width' && Number.isFinite(Number(profile.throw_ratio_min)) && Number(profile.throw_ratio_min) > 0 && Number.isFinite(Number(profile.throw_ratio_max)) && Number(profile.throw_ratio_max) >= Number(profile.throw_ratio_min);
+}
+const STAGE_CATALOG = parseStageCatalog();
+function resolveStageTransfer(){
+  const params = new URLSearchParams(location.search);
+  const number = (key,fallback)=>{ if (!params.has(key) || params.get(key)==='') return fallback; const value = Number(params.get(key)); return Number.isFinite(value) ? value : fallback; };
+  const bounded = (key,fallback,min,max)=>Math.min(max,Math.max(min,number(key,fallback)));
+  const screenWidth = bounded('w',20,8,40), screenAspect = bounded('ar',1.7778,1,3), basisWidth = bounded('basisW',screenWidth,4,80), rasterAspect = bounded('rasterAr',screenAspect,1,3);
+  const base = {w:screenWidth,bottom:bounded('bottom',4,0,10),ar:screenAspect,basisW:basisWidth,basisScale:basisWidth/screenWidth,rasterAr:rasterAspect,lh:bounded('lh',6,1,16),dist:bounded('dist',22,6,60)};
+  const requestedMode = params.get('mode') || 'manual', projectorId = params.get('projector') || '', lensId = params.get('lens') || '', profileId = params.get('profile') || '';
+  const data = STAGE_CATALOG.data;
+  const projector = data.projectors.find(item=>item.projector_id===projectorId) || null;
+  const lens = data.lenses.find(item=>item.lens_id===lensId) || null;
+  const compatibility = data.compatibility.find(item=>item.projector_id===projectorId && item.lens_id===lensId) || null;
+  const profile = data.opticalProfiles.find(item=>item.projector_id===projectorId && item.lens_id===lensId && (!profileId || item.optical_profile_id===profileId)) || null;
+  const hasIds = !!(projectorId || lensId || profileId), validIds = !!(projector && lens && compatibility && (!profileId || profile?.optical_profile_id===profileId));
+  const ratio = number('ratio',NaN), stamp = params.get('stamp') || '';
+  if (requestedMode === 'field_verified' && hasIds && (!STAGE_CATALOG.ok || !validIds)) return {...base,mode:'blocked',wide:NaN,tele:NaN,allowed:false,label:'Invalid field transfer',reason:'CALCULATION BLOCKED · field-calibrated transfer IDs do not resolve to one exact compatible pair.',profile:null};
+  if (requestedMode === 'field_verified' && Number.isFinite(ratio) && ratio > 0 && stamp) return {...base,mode:'field_verified',wide:ratio,tele:ratio,allowed:true,label:`${projector?.model_number || 'Job'} + ${lens?.lens_model_number || 'measured optic'}`,reason:'FIELD VERIFIED · job-scoped measured ratio.',profile};
+  if (hasIds) {
+    if (!STAGE_CATALOG.ok) return {...base,mode:'blocked',wide:NaN,tele:NaN,allowed:false,label:'Catalog unavailable',reason:`CALCULATION BLOCKED · embedded catalog rejected: ${STAGE_CATALOG.error}`,profile:null};
+    if (!validIds) return {...base,mode:'blocked',wide:NaN,tele:NaN,allowed:false,label:'Invalid catalog transfer',reason:'CALCULATION BLOCKED · planner IDs do not resolve to one exact compatible catalog pair.',profile:null};
+    if (requestedMode === 'verified_image_width' && stageEligibleProfile(profile)) return {...base,mode:'verified_image_width',wide:Number(profile.throw_ratio_min),tele:Number(profile.throw_ratio_max),allowed:true,label:`${projector.model_number} + ${lens.lens_model_number}`,reason:'VERIFIED IMAGE-WIDTH PROFILE',profile};
+    return {...base,mode:profile?.calculationState || 'partial',wide:Number(profile?.throw_ratio_min),tele:Number(profile?.throw_ratio_max),allowed:false,label:`${projector.model_number} + ${lens.lens_model_number}`,reason:`CALCULATION BLOCKED · ${profile?.calculationGateReason || 'No complete calculation-eligible optical profile exists for this exact pair.'}`,profile};
+  }
+  const min = number('min',0.978), max = number('max',1.320);
+  if (requestedMode !== 'manual' || !Number.isFinite(min) || min <= 0 || !Number.isFinite(max) || max < min) return {...base,mode:'blocked',wide:NaN,tele:NaN,allowed:false,label:'Untrusted transfer',reason:'CALCULATION BLOCKED · transferred calculation state is invalid.',profile:null};
+  return {...base,mode:'manual',wide:min,tele:max,allowed:true,label:'Manual ratio preset',reason:'MANUAL SIMULATION · operator-supplied ratio · unverified.',profile:null};
+}
+const STAGE_TRANSFER = resolveStageTransfer();
 
 function announce(message){
   stageStatus.textContent = '';
@@ -638,10 +684,14 @@ let screenGrp = null, projectionGrp = null, roomGrp = null, cartGrp = null;
 root.add(proj);
 
 const els = id => document.getElementById(id);
-const state = { w:20, bottom:4, ar:1.7778, wide:0.978, tele:1.320, lh:6, dist:22,
+const state = { w:STAGE_TRANSFER.w, bottom:STAGE_TRANSFER.bottom, ar:STAGE_TRANSFER.ar, basisW:STAGE_TRANSFER.basisW, basisScale:STAGE_TRANSFER.basisScale, rasterAr:STAGE_TRANSFER.rasterAr, wide:STAGE_TRANSFER.wide, tele:STAGE_TRANSFER.tele, lh:STAGE_TRANSFER.lh, dist:STAGE_TRANSFER.dist, mode:STAGE_TRANSFER.mode, allowed:STAGE_TRANSFER.allowed, label:STAGE_TRANSFER.label, gateReason:STAGE_TRANSFER.reason, profile:STAGE_TRANSFER.profile,
                 cone:true, room:true, grid:true };
 let activeCamera = 'three';
 let objectMounted = false;
+
+function opticalGeometryAllowed(){
+  return state.allowed === true && ['verified_image_width','manual','field_verified'].includes(state.mode) && Number.isFinite(state.wide) && state.wide > 0 && Number.isFinite(state.tele) && state.tele >= state.wide;
+}
 
 function fmt(ft){
   const neg = ft<0; let v = Math.abs(ft);
@@ -651,9 +701,24 @@ function fmt(ft){
   return (neg?'-':'') + f + "' " + inch + marks[fr] + '"';
 }
 
+document.documentElement.dataset.calculationMode = state.mode;
+stageCalculationGate.textContent = state.gateReason;
+const lensControl = els('lens');
+if (state.mode !== 'manual') {
+  lensControl.labels[0].textContent = 'Exact catalog pair · raw evidence';
+  lensControl.innerHTML = `<option>${state.label}${Number.isFinite(state.wide) ? ` · raw ${state.wide.toFixed(3)}${state.tele!==state.wide?'–'+state.tele.toFixed(3):''}:1` : ''}</option>`;
+  lensControl.disabled = true;
+} else {
+  const exactPreset = [...lensControl.options].find(option=>option.value===`${state.wide.toFixed(3)},${state.tele.toFixed(3)}`);
+  if (exactPreset) lensControl.value = exactPreset.value;
+  else { const option = document.createElement('option'); option.value = `${state.wide},${state.tele}`; option.textContent = `Transferred manual ratio · ${state.wide.toFixed(3)}${state.tele!==state.wide?'–'+state.tele.toFixed(3):''}:1`; lensControl.appendChild(option); lensControl.value = option.value; }
+}
+[['sw','w','swv'],['st','bottom','stv'],['lh','lh','lhv'],['d','dist','dv']].forEach(([id,key,valueId])=>{ els(id).value=state[key]; els(valueId).textContent=fmt(state[key]); els(id).setAttribute('aria-valuetext',fmt(state[key])); });
+const aspectOption = [...els('ar').options].find(option=>Math.abs(Number(option.value)-state.ar)<0.001); if (aspectOption) els('ar').value=aspectOption.value;
+
 function projectionState(){
-  const wideD = state.wide*state.w;
-  const teleD = state.tele*state.w;
+  const wideD = state.wide*state.basisW;
+  const teleD = state.tele*state.basisW;
   const safeLo = wideD*1.05;
   const safeHi = teleD*0.95;
   if (state.dist > teleD+0.01) return {kind:'overshoot',label:'OVERSHOOT',color:'var(--safety)'};
@@ -687,41 +752,59 @@ function rebuild(){
     root.add(cartGrp);
   } else cartGrp = null;
 
-  // image rectangle at the screen plane
-  const imgW = dist / currentRatio();
-  const imgH = imgW / state.ar;
   const cy = bottom + h/2;                          // image centred on the screen
-  const pstate = projectionState();
-  document.documentElement.dataset.projectionState = pstate.kind;
-  const apex = new THREE.Vector3(0, lensY, dist);
-  const rect = [
-    new THREE.Vector3(-imgW/2, cy - imgH/2, 0.004),
-    new THREE.Vector3( imgW/2, cy - imgH/2, 0.004),
-    new THREE.Vector3( imgW/2, cy + imgH/2, 0.004),
-    new THREE.Vector3(-imgW/2, cy + imgH/2, 0.004)
-  ];
   if (projectionGrp) { root.remove(projectionGrp); disposeObject3D(projectionGrp); }
-  projectionGrp = buildProjection(apex,rect,{w,h,imgW,imgH,cy},pstate);
-  projectionGrp.visible = state.cone;
-  projectionGrp.traverse(part=>{
-    if (part.isMesh || part.isLine) { part.castShadow = false; part.receiveShadow = false; }
-  });
-  root.add(projectionGrp);
-
-  readout(imgW,imgH,w,h,cy,lensY,pstate);
+  projectionGrp = null;
+  if (opticalGeometryAllowed()) {
+    const imgW = dist / currentRatio();
+    const imgH = imgW / state.rasterAr;
+    const pstate = projectionState();
+    document.documentElement.dataset.projectionState = pstate.kind;
+    const apex = new THREE.Vector3(0, lensY, dist);
+    const rect = [
+      new THREE.Vector3(-imgW/2, cy - imgH/2, 0.004),
+      new THREE.Vector3( imgW/2, cy - imgH/2, 0.004),
+      new THREE.Vector3( imgW/2, cy + imgH/2, 0.004),
+      new THREE.Vector3(-imgW/2, cy + imgH/2, 0.004)
+    ];
+    projectionGrp = buildProjection(apex,rect,{w,h,imgW,imgH,cy},pstate);
+    projectionGrp.visible = state.cone;
+    projectionGrp.traverse(part=>{
+      if (part.isMesh || part.isLine) { part.castShadow = false; part.receiveShadow = false; }
+    });
+    root.add(projectionGrp);
+    readout(imgW,imgH,w,h,cy,lensY,pstate);
+  } else {
+    document.documentElement.dataset.projectionState = 'blocked';
+    readoutBlocked(w,h);
+  }
   if (objectMounted) setCamera(activeCamera,{announceChange:false});
   stage.requestRender();
+}
+
+function readoutBlocked(w,h){
+  els('hDist').textContent = '—'; els('hDist').style.color = 'var(--safety)';
+  const raw = Number.isFinite(state.wide) ? `${state.wide.toFixed(3)}${state.tele!==state.wide?'–'+state.tele.toFixed(3):''}:1 raw` : 'unavailable';
+  els('hWide').textContent = raw; els('hTele').textContent = 'not used';
+  els('hNote').textContent = state.gateReason; els('hNote').style.color = 'var(--safety)';
+  els('hState').textContent = 'CALCULATION BLOCKED'; els('hState').style.color = 'var(--safety)';
+  ['bNom','bSafe'].forEach(id=>{ els(id).style.width='0%'; }); els('bPin').style.left='0%';
+  els('fImg').textContent = 'optical geometry suppressed'; els('fScr').textContent = `${fmt(w/FT)} × ${fmt(h/FT)}`; els('fSpill').textContent = 'not calculated'; els('fSpill').style.color='var(--safety)';
+  els('fRatio').textContent = raw; els('fShift').textContent = 'not calculated'; els('fShift').style.color='var(--dimmer)'; els('fLens').textContent=state.label; els('fHeight').textContent=fmt(state.lh);
+  els('adjustSummary').textContent = `${fmt(state.w)} screen · calculation blocked`;
+  els('sceneSummary').textContent = `CALCULATION BLOCKED. ${state.label}. ${state.gateReason} Screen ${fmt(w/FT)} by ${fmt(h/FT)}. Projector placement ${fmt(state.dist)}. Optical geometry and fit verdict suppressed.`;
+  ['bw','bm','bt','tcone'].forEach(id=>els(id).disabled=true);
 }
 
 // Ratio the lens is actually set to: the operator zooms to fit when the
 // distance is in range, and is pinned at a stop when it is not.
 function currentRatio(){
-  const need = state.dist / state.w;
+  const need = state.dist / state.basisW;
   return Math.min(state.tele, Math.max(state.wide, need));
 }
 
 function readout(imgW,imgH,w,h,cy,lensY,pstate){
-  const wideD = state.wide * state.w, teleD = state.tele * state.w;
+  const wideD = state.wide * state.basisW, teleD = state.tele * state.basisW;
   const safeLo = wideD*1.05, safeHi = teleD*0.95;
   const d = state.dist;
   const inRange = d >= wideD - 0.01 && d <= teleD + 0.01;
@@ -758,7 +841,7 @@ function readout(imgW,imgH,w,h,cy,lensY,pstate){
   els('fSpill').textContent = Math.abs(spill) < 0.02 ? 'none'
     : (spill > 0 ? '+' : '−') + fmt(Math.abs(spill)) + ' each side';
   els('fSpill').style.color = Math.abs(spill) > 0.02 ? 'var(--safety)' : 'var(--dim)';
-  els('fRatio').textContent = (state.dist/state.w).toFixed(3) + ':1';
+  els('fRatio').textContent = (state.dist/state.basisW).toFixed(3) + ':1';
   const shiftPct = ((cy - lensY) / (imgH || 1)) * 100;
   els('fShift').textContent = (shiftPct>=0?'+':'') + shiftPct.toFixed(1) + '%';
   els('fShift').style.color = Math.abs(shiftPct) > 60 ? 'var(--safety)' : 'var(--info)';
@@ -766,7 +849,7 @@ function readout(imgW,imgH,w,h,cy,lensY,pstate){
   els('fLens').textContent = lensName.split('·')[0].trim();
   els('fHeight').textContent = fmt(state.lh);
   els('adjustSummary').textContent = `${fmt(state.w)} screen · ${fmt(state.dist)} set`;
-  els('sceneSummary').textContent = `${pstate.label}. Set mark ${fmt(d)}. ${lensName}. Image ${fmt(iw)} by ${fmt(ih)}; screen ${fmt(sw)} by ${fmt(sh)}. ${Math.abs(spill)<0.02?'No spill.':spill>0?`${fmt(Math.abs(spill))} spill at each side.`:`${fmt(Math.abs(spill))} missing coverage at each side.`} Optical height ${fmt(state.lh)}. Required ratio ${(state.dist/state.w).toFixed(3)} to one. Shift ${shiftPct>=0?'plus ':'minus '}${Math.abs(shiftPct).toFixed(1)} percent.`;
+  els('sceneSummary').textContent = `${pstate.label}. Set mark ${fmt(d)}. ${lensName}. Image ${fmt(iw)} by ${fmt(ih)}; screen ${fmt(sw)} by ${fmt(sh)}. ${Math.abs(spill)<0.02?'No spill.':spill>0?`${fmt(Math.abs(spill))} spill at each side.`:`${fmt(Math.abs(spill))} missing coverage at each side.`} Optical height ${fmt(state.lh)}. Required ratio ${(state.dist/state.basisW).toFixed(3)} to one. Shift ${shiftPct>=0?'plus ':'minus '}${Math.abs(shiftPct).toFixed(1)} percent.`;
 }
 
 /* ---------- controls ---------- */
@@ -779,20 +862,20 @@ function bind(id, key, fmtFn, after){
       els(id+'v').textContent = valueText;
       el.setAttribute('aria-valuetext', valueText);
     }
-    rebuild(); if (after) after();
+    if (after) after(); rebuild();
   });
   el.addEventListener('change', ()=>announce(`${el.labels[0].childNodes[0].textContent.trim()} ${fmtFn ? fmtFn(state[key]) : state[key]}`));
 }
-bind('sw','w',fmt); bind('st','bottom',fmt); bind('lh','lh',fmt); bind('d','dist',fmt);
-els('ar').addEventListener('change', e=>{ state.ar = parseFloat(e.target.value); rebuild(); announce(`Aspect ${e.target.selectedOptions[0].textContent}`); });
+bind('sw','w',fmt,()=>{ state.basisW=state.w*state.basisScale; }); bind('st','bottom',fmt); bind('lh','lh',fmt); bind('d','dist',fmt);
+els('ar').addEventListener('change', e=>{ state.ar = parseFloat(e.target.value); if (state.mode==='manual') { state.rasterAr=state.ar; state.basisScale=1; state.basisW=state.w; } rebuild(); announce(`Aspect ${e.target.selectedOptions[0].textContent}`); });
 els('lens').addEventListener('change', e=>{
   const [a,b] = e.target.value.split(',').map(Number);
   state.wide = a; state.tele = b; rebuild(); announce(`Lens ${e.target.selectedOptions[0].textContent}`);
 });
 const setDist = v => { state.dist = Math.round(v*4)/4; els('d').value = state.dist; els('dv').textContent = fmt(state.dist); els('d').setAttribute('aria-valuetext',fmt(state.dist)); rebuild(); announce(`Set distance ${fmt(state.dist)}`); };
-els('bw').onclick = ()=> setDist(state.wide * state.w);
-els('bt').onclick = ()=> setDist(state.tele * state.w);
-els('bm').onclick = ()=> setDist((state.wide*1.05 + state.tele*0.95)/2 * state.w);
+els('bw').onclick = ()=> setDist(state.wide * state.basisW);
+els('bt').onclick = ()=> setDist(state.tele * state.basisW);
+els('bm').onclick = ()=> setDist((state.wide*1.05 + state.tele*0.95)/2 * state.basisW);
 
 function toggle(id, key, apply){
   const b = els(id);

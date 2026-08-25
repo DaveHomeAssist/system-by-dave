@@ -206,6 +206,18 @@ if (/data-cam=["']flown["']/.test(stage)) fail('Stage 3D must not add a flown-pr
 });
 requireMatch(stage, /dataset\.projectionState\s*=/, 'Stage 3D must expose its derived projection state to styling and diagnostics.');
 requireMatch(stage, /id=["']sceneSummary["'][^>]*role=["']status["']/, 'Stage 3D must expose an accessible scene summary status region.');
+requireMatch(stage, /id=["']stageCalculationGate["'][^>]*role=["']status["']/, 'Stage 3D must expose its calculation gate as an accessible status.');
+if (!stage.includes('MANUAL SIMULATION')) fail('Direct-open Stage 3D must be explicitly labeled MANUAL SIMULATION.');
+['parseStageCatalog', 'resolveStageTransfer', 'opticalGeometryAllowed'].forEach((name) => {
+  requireMatch(stage, new RegExp(`function\\s+${name}\\s*\\(`), `Stage 3D is missing the ${name} safety boundary.`);
+});
+requireMatch(stage, /dataset\.calculationMode\s*=/, 'Stage 3D must expose its calculation mode for diagnostics.');
+requireMatch(stage, /new\s+URLSearchParams\(location\.search\)/, 'Stage 3D must validate planner transfer parameters.');
+requireMatch(stage, /if\s*\(opticalGeometryAllowed\(\)\)[\s\S]*?buildProjection\s*\(/, 'Stage 3D must gate projection geometry through opticalGeometryAllowed().');
+requireMatch(stage, /state\.wide\s*\*\s*state\.basisW/, 'Stage 3D throw limits must use the transferred projected-raster width basis.');
+requireMatch(stage, /state\.dist\s*\/\s*state\.basisW/, 'Stage 3D required ratio must use the projected-raster width basis.');
+requireMatch(main, /id=["']stage3dLink["']/, 'The planner Stage 3D link must be state-aware.');
+requireMatch(main, /function\s+stage3dUrlFor\s*\(/, 'The planner must serialize validated Stage 3D transfer state.');
 requireMatch(sidecar, /Use keys 1 through 5 for cameras/, 'Stage 3D canvas instructions must expose all five camera shortcuts.');
 requireMatch(stage, /<details\b[^>]*class=["'][^"']*adjust-panel/, 'Stage 3D controls must use a native Adjust disclosure.');
 requireMatch(stage, /function\s+syncAdjustLayout\s*\(/, 'Stage 3D must synchronize the Adjust disclosure when crossing its mobile breakpoint.');

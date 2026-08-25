@@ -1926,7 +1926,7 @@
     <div class="tagline">projector throw, fit, light and tape marks</div>
     <div class="spacer"></div>
     <a class="stage3d-link" href="../index.html">System by Dave home</a>
-    <a class="stage3d-link" href="Stage3D.html" aria-label="Open the optional online Stage 3D companion">Stage 3D · online</a>
+    <a class="stage3d-link" id="stage3dLink" href="Stage3D.html" aria-label="Open the optional online Stage 3D companion">Stage 3D · online</a>
     <button class="stage3d-link" id="plannerFieldVerify" type="button" aria-pressed="false">Field Verify</button>
     <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false" aria-label="Switch to dark mode">
       <svg class="theme-icon-moon" viewBox="0 0 24 24" aria-hidden="true">
@@ -2509,7 +2509,7 @@
       plan: $("plan"), stage: $("stage"), drawingTitle: $("drawingTitle"), drawingTip: $("drawingTip"), cameraControls: $("cameraControls"), drawingLive: $("drawingLive"),
       imageOut: $("imageOut"), brightOut: $("brightOut"), verifyOut: $("verifyOut"), solverOut: $("solverOut"), finderOut: $("finderOut"), showOut: $("showOut"), warningsOut: $("warningsOut"), summary: $("summary"), showPrint: $("showPrint"),
       methodBody: $("methodBody"), savedList: $("savedList"), toast: $("toast"), mobileValue: $("mobileValue"), mobileStatus: $("mobileStatus"),
-      themeToggle: $("themeToggle"), themeLabel: $("themeLabel"), themeColor: $("themeColor"), plannerFieldVerify: $("plannerFieldVerify")
+      themeToggle: $("themeToggle"), themeLabel: $("themeLabel"), themeColor: $("themeColor"), plannerFieldVerify: $("plannerFieldVerify"), stage3dLink: $("stage3dLink")
     };
 
     function currentTheme() { return document.documentElement.dataset.theme === "dark" ? "dark" : "light"; }
@@ -2898,6 +2898,7 @@
     }
     function render() {
       const c = readState(); lastCalc = c;
+      el.stage3dLink.href = stage3dUrlFor(c);
       renderCatalogEvidence(c); renderReadout(c); renderPlan(c); renderStage(c); renderImage(c); renderBrightness(c); renderVerification(c); renderSolver(c); renderFinder(c); renderShowBoard(c); renderWarnings(c); renderSummary(c); renderMethod(c); renderSavedJobs(); updateInventoryToggle();
       clearTimeout(hashTimer); hashTimer = setTimeout(() => writeHash(c), 120);
     }
@@ -3449,6 +3450,15 @@
       const values = {};["sw", "sh", "sbottom", "dist", "depth", "lensHeight", "body", "actualDist", "actualWidth", "solverNear", "solverFar"].forEach(id => values[id] = readLen(id));
       unit = next; document.querySelectorAll("[data-unit]").forEach(b => b.setAttribute("aria-pressed", b.dataset.unit === unit ? "true" : "false"));
       suppress = true; Object.entries(values).forEach(([id, v]) => setLenInput(el[id], v)); suppress = false; syncDiag(); scheduleRender();
+    }
+    function stage3dUrlFor(c = readState()) {
+      const p = new URLSearchParams();
+      const put = (key, value) => { if (value !== "" && value !== null && value !== undefined && !(typeof value === "number" && !finite(value))) p.set(key, String(value)); };
+      put("mode", c.calculationMode); put("w", cleanNum(c.w / 12, 4)); put("bottom", cleanNum(c.screenBottom / 12, 4)); put("ar", cleanNum(c.w / c.h, 6)); put("basisW", cleanNum(c.img?.w / 12, 4)); put("rasterAr", cleanNum(c.img?.w / c.img?.h, 6)); put("lh", cleanNum(c.lensHeight / 12, 4)); put("dist", cleanNum(c.shown / 12, 4));
+      put("projector", c.catalogSelection.projector?.projector_id || ""); put("lens", c.catalogSelection.lens?.lens_id || ""); put("profile", c.catalogSelection.profile?.optical_profile_id || "");
+      if (c.calculationMode === "manual") { put("min", cleanNum(c.trA, 5)); put("max", cleanNum(c.trB, 5)); }
+      if (c.calculationMode === "field_verified") { put("ratio", cleanNum(c.trA, 5)); put("stamp", c.fieldVerification.verifiedAt); }
+      return `Stage3D.html?${p.toString()}`;
     }
     function stateObject(c = readState()) {
       return {
