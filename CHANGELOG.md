@@ -2,6 +2,13 @@
 
 ## 2026-08-25
 
+### AV by Dave console rebrand and redesign
+
+* Rebranded the AV suite launch hub (`av-suite.html`) as **AV by Dave** — new masthead with a serif wordmark on a rust block mark, "Plan it. Patch it. Run the show." tagline, and a label-tape show readout — across the page title, meta description, Open Graph/Twitter cards, in-app copy decks (phase handoff, phase gate, review queue, launch list), and offline-cache messaging. The route, storage schemas, URL params, registry coupling, and the global header's `AV Suite` link are unchanged.
+* Redesigned the console presentation layer in the same warm-paper/rust drafting language: activated the self-hosted DM Serif Display as the display face, added registration-tick panel corners, a hatched tape rule under the command bar, indexed mono section labels, a mechanical segmented phase strip, squared status marks, larger readiness numerals, and a reduced-motion-safe staggered page reveal. Both inline scripts remain functionally intact and dark mode still flows entirely through `css/av-theme.css`.
+* Fixed stale `manifest.json` branding: name/short name are now `AV by Dave` and the retired `#0A0D14` background/theme colors now match the Warm Paper `#EEE8DF` chrome color.
+* Updated the homepage AV product card, hero CTA, and featured kicker to the AV by Dave name and corrected the stale tool count from 43 to 44.
+
 ### Throwline projector reference appendix
 
 * Embedded a 13-row user-supplied projector appendix as reference-only evidence with its source SHA recorded; the four audited canonical projectors remain unchanged, and the nine new IDs have no compatibility or optical profiles.
