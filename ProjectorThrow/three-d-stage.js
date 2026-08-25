@@ -345,12 +345,12 @@
       renderer.domElement.setAttribute('role', 'application');
       renderer.domElement.setAttribute(
         'aria-label',
-        'Interactive Throwline stage. Use keys 1 through 4 for cameras, arrow keys to orbit, plus and minus to zoom, and 0 to reset.'
+        'Interactive Throwline stage. Use keys 1 through 5 for cameras, arrow keys to orbit, plus and minus to zoom, and 0 to reset.'
       );
       renderer.domElement.setAttribute('aria-describedby', 'stage-instructions');
       renderer.domElement.setAttribute(
         'aria-keyshortcuts',
-        '1 2 3 4 ArrowLeft ArrowRight ArrowUp ArrowDown + - 0 Home'
+        '1 2 3 4 5 ArrowLeft ArrowRight ArrowUp ArrowDown + - 0 Home'
       );
       renderer.domElement.addEventListener('keydown', (event) => this._handleKey(event));
       this._viewport.insertBefore(renderer.domElement, this._err);
@@ -369,7 +369,9 @@
 
       // Neutral studio: soft sky/ground wash, a shadow-casting key light,
       // and a dim fill from behind so silhouettes never go black.
-      scene.add(new THREE.HemisphereLight(0xffffff, 0xd8d2c4, 1.0));
+      const hemi = new THREE.HemisphereLight(0xffffff, 0xd8d2c4, 1.0);
+      this._hemi = hemi;
+      scene.add(hemi);
       const key = new THREE.DirectionalLight(0xffffff, 2.2);
       key.position.set(4, 7, 5);
       key.castShadow = true;
@@ -379,6 +381,7 @@
       scene.add(key);
       const fill = new THREE.DirectionalLight(0xfff4e6, 0.5);
       fill.position.set(-5, 3, -4);
+      this._fill = fill;
       scene.add(fill);
 
       const ground = new THREE.Mesh(
@@ -495,6 +498,27 @@
       if (options.announce !== false) this.announce((label || 'Stage') + ' camera selected.');
     }
 
+    setLightingTheme(theme) {
+      const dark = theme === 'dark';
+      if (this._hemi) {
+        this._hemi.color.setHex(dark ? 0xd8e1ef : 0xffffff);
+        this._hemi.groundColor.setHex(dark ? 0x252d38 : 0xd8d2c4);
+        this._hemi.intensity = dark ? 1.35 : 1.0;
+      }
+      if (this._key) {
+        this._key.color.setHex(dark ? 0xfff0cf : 0xffffff);
+        this._key.intensity = dark ? 2.65 : 2.2;
+      }
+      if (this._fill) {
+        this._fill.color.setHex(dark ? 0xb9d6ff : 0xfff4e6);
+        this._fill.intensity = dark ? 0.88 : 0.5;
+      }
+      if (this._ground && this._ground.material) {
+        this._ground.material.opacity = dark ? 0.28 : 0.18;
+        this._ground.material.needsUpdate = true;
+      }
+    }
+
     orbitBy(azimuthDelta, polarDelta) {
       if (!this._THREE || !this._camera || !this._controls) return;
       const offset = this._camera.position.clone().sub(this._controls.target);
@@ -530,7 +554,7 @@
 
     _handleKey(event) {
       const key = event.key;
-      if (/^[1-4]$/.test(key)) {
+      if (/^[1-5]$/.test(key)) {
         event.preventDefault();
         this.dispatchEvent(new CustomEvent('stage-camera-shortcut', {
           detail: { index: Number(key) - 1 },

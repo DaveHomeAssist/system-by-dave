@@ -185,8 +185,9 @@ button[aria-pressed=true]{background:var(--line-lo);color:var(--chalk);border-co
       <div class="row" role="group" aria-label="Camera presets">
         <button type="button" data-cam="three" aria-pressed="true" aria-keyshortcuts="1">1 · 3/4</button>
         <button type="button" data-cam="side" aria-pressed="false" aria-keyshortcuts="2">2 · side</button>
-        <button type="button" data-cam="top" aria-pressed="false" aria-keyshortcuts="3">3 · top</button>
-        <button type="button" data-cam="op" aria-pressed="false" aria-keyshortcuts="4">4 · operator</button>
+        <button type="button" data-cam="front" aria-pressed="false" aria-keyshortcuts="3">3 · front</button>
+        <button type="button" data-cam="top" aria-pressed="false" aria-keyshortcuts="4">4 · top</button>
+        <button type="button" data-cam="op" aria-pressed="false" aria-keyshortcuts="5">5 · operator</button>
       </div>
       <div class="row" role="group" aria-label="Stage visibility">
         <button id="tcone" type="button" aria-pressed="true">throw cone</button>
@@ -197,7 +198,7 @@ button[aria-pressed=true]{background:var(--line-lo);color:var(--chalk);border-co
     </div>
 
     <p style="font-size:11.5px;color:var(--dimmer);margin:0;border-top:1px solid var(--line-lo);padding-top:12px">Every part is a named mesh, so the OBJ and GLB open in Blender with <em>screen</em>, <em>projector_body</em>, <em>lens_barrel</em> and <em>cart</em> as separate objects.</p>
-    <p class="kbd-help"><strong>Keyboard:</strong> focus the stage, then use 1–4 for cameras, arrow keys to orbit, +/− to zoom, and 0 or Home to reset.</p>
+    <p class="kbd-help"><strong>Keyboard:</strong> focus the stage, then use 1–5 for cameras, arrow keys to orbit, +/− to zoom, and 0 or Home to reset.</p>
   </aside>
 
   <main aria-labelledby="stageHeading">
@@ -221,6 +222,7 @@ button[aria-pressed=true]{background:var(--line-lo);color:var(--chalk);border-co
       <div><dt>Shift</dt><dd id="fShift">+29.0%</dd></div>
     </dl>
     <div class="sr-only" id="stageStatus" role="status" aria-live="polite" aria-atomic="true">Stage 3D loading.</div>
+    <div class="sr-only" id="sceneSummary" role="status" aria-live="polite" aria-atomic="true">Projection scene loading.</div>
   </main>
 </div>
 
@@ -247,6 +249,7 @@ function applyTheme(theme,{persist=false,announceChange=false}={}){
   themeLabel.textContent = dark ? 'light' : 'dark';
   themeColor.content = dark ? '#15181d' : '#f4f1ea';
   stage.style.setProperty('--stage-bg', 'var(--deck)');
+  stage.dispatchEvent(new CustomEvent('throwline-theme-change',{detail:{theme:dark?'dark':'light'}}));
   if (persist) try { localStorage.setItem('throwline:theme:v1', dark ? 'dark' : 'light'); } catch {}
   if (announceChange) announce(`${dark ? 'Dark' : 'Light'} mode`);
 }
@@ -272,8 +275,34 @@ const M = {
   frame:    new THREE.MeshStandardMaterial({ name:'screen_frame', color:0x22242a, roughness:0.7, metalness:0.15 }),
   drape:    new THREE.MeshStandardMaterial({ name:'drape',    color:0x2b2c30, roughness:0.98, metalness:0.0, side:THREE.DoubleSide }),
   deck:     new THREE.MeshStandardMaterial({ name:'deck',     color:0xcfc8bb, roughness:0.96, metalness:0.0 }),
-  cone:     new THREE.MeshBasicMaterial({ name:'throw_cone', color:0xd9a520, transparent:true, opacity:0.13, side:THREE.DoubleSide, depthWrite:false })
+  beamVolume: new THREE.MeshBasicMaterial({ name:'beam_volume_material', color:0xd9a520, transparent:true, opacity:0.11, side:THREE.DoubleSide, depthWrite:false }),
+  beamEdge: new THREE.LineBasicMaterial({ name:'beam_edge_material', color:0x8a6400, transparent:true, opacity:0.92, depthTest:false }),
+  centerline: new THREE.LineDashedMaterial({ name:'optical_centerline_material', color:0x6f5000, transparent:true, opacity:0.82, dashSize:0.20, gapSize:0.12, depthTest:false }),
+  image: new THREE.MeshBasicMaterial({ name:'projected_image_material', color:0xf2c012, transparent:true, opacity:0.13, side:THREE.DoubleSide, depthWrite:false, depthTest:false }),
+  imageEdge: new THREE.LineBasicMaterial({ name:'projected_image_edge_material', color:0x8a6400, transparent:true, opacity:0.96, depthTest:false }),
+  spill: new THREE.MeshBasicMaterial({ name:'projection_spill_material', color:0xd94d42, transparent:true, opacity:0.34, side:THREE.DoubleSide, depthWrite:false, depthTest:false }),
+  missing: new THREE.MeshBasicMaterial({ name:'missing_coverage_material', color:0xd94d42, transparent:true, opacity:0.22, side:THREE.DoubleSide, depthWrite:false, depthTest:false })
 };
+
+function updateSceneTheme(theme){
+  const dark = theme === 'dark';
+  M.chassis.color.setHex(dark ? 0x4a5059 : 0x2f3339);
+  M.chassisT.color.setHex(dark ? 0x5a616c : 0x3a3f46);
+  M.bezel.color.setHex(dark ? 0x303640 : 0x14171a);
+  M.frame.color.setHex(dark ? 0x505864 : 0x22242a);
+  M.drape.color.setHex(dark ? 0x333944 : 0x2b2c30);
+  M.deck.color.setHex(dark ? 0x252b34 : 0xcfc8bb);
+  M.beamVolume.color.setHex(dark ? 0xffc928 : 0xd9a520);
+  M.beamVolume.opacity = dark ? 0.19 : 0.11;
+  M.beamEdge.color.setHex(dark ? 0xffd75b : 0x8a6400);
+  M.centerline.color.setHex(dark ? 0xffe28a : 0x6f5000);
+  M.image.color.setHex(dark ? 0xffcf3d : 0xf2c012);
+  M.image.opacity = dark ? 0.22 : 0.13;
+  M.imageEdge.color.setHex(dark ? 0xffe07a : 0x8a6400);
+  stage.setLightingTheme(theme);
+}
+stage.addEventListener('throwline-theme-change',event=>updateSceneTheme(event.detail.theme));
+updateSceneTheme(currentTheme());
 
 function rbox(w,h,d,r,mat,name){
   r = Math.min(r, w/2-0.001, h/2-0.001);
@@ -403,8 +432,30 @@ function buildScreen(w,h,bottom){
   return g;
 }
 
-/* ---------- throw cone ---------- */
-function buildCone(apex, rect){
+/* ---------- projection system ---------- */
+function planePart(w,h,x,y,z,material,name){
+  if (w <= 0.0001 || h <= 0.0001) return null;
+  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(w,h),material);
+  mesh.name = name;
+  mesh.position.set(x,y,z);
+  mesh.renderOrder = material === M.spill || material === M.missing ? 5 : 4;
+  return mesh;
+}
+function rectangleOutline(w,h,x,y,z,material,name){
+  const points = [
+    new THREE.Vector3(x-w/2,y-h/2,z),
+    new THREE.Vector3(x+w/2,y-h/2,z),
+    new THREE.Vector3(x+w/2,y+h/2,z),
+    new THREE.Vector3(x-w/2,y+h/2,z)
+  ];
+  const line = new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(points),material);
+  line.name = name;
+  line.renderOrder = 6;
+  return line;
+}
+function buildProjection(apex,rect,screen,pstate){
+  const group = new THREE.Group();
+  group.name = 'projection_system';
   const p = rect; // [bl, br, tr, tl] as Vector3
   const v = [];
   const tri = (a,b)=>{ v.push(apex.x,apex.y,apex.z, a.x,a.y,a.z, b.x,b.y,b.z); };
@@ -412,8 +463,57 @@ function buildCone(apex, rect){
   const g = new THREE.BufferGeometry();
   g.setAttribute('position', new THREE.Float32BufferAttribute(v,3));
   g.computeVertexNormals();
-  const m = new THREE.Mesh(g, M.cone); m.name = 'throw_cone';
-  return m;
+  const volume = new THREE.Mesh(g,M.beamVolume);
+  volume.name = 'beam_volume';
+  volume.renderOrder = 1;
+  group.add(volume);
+
+  const edgePoints = p.flatMap(corner=>[apex,corner]);
+  const edges = new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(edgePoints),M.beamEdge);
+  edges.name = 'beam_edges';
+  edges.renderOrder = 3;
+  group.add(edges);
+
+  const center = new THREE.Vector3(0,screen.cy,0.018);
+  const centerline = new THREE.Line(new THREE.BufferGeometry().setFromPoints([apex,center]),M.centerline);
+  centerline.name = 'optical_centerline';
+  centerline.computeLineDistances();
+  centerline.renderOrder = 3;
+  group.add(centerline);
+
+  const shownW = Math.min(screen.imgW,screen.w);
+  const shownH = Math.min(screen.imgH,screen.h);
+  const projected = planePart(shownW,shownH,0,screen.cy,0.010,M.image,'projected_image');
+  if (projected) group.add(projected);
+  group.add(rectangleOutline(screen.imgW,screen.imgH,0,screen.cy,0.020,M.imageEdge,'projected_image_boundary'));
+
+  if (pstate.kind === 'overshoot'){
+    const sideW = Math.max(0,(screen.imgW-screen.w)/2);
+    const capH = Math.min(screen.imgH,screen.h);
+    const spillLeft = planePart(sideW,capH,-screen.w/2-sideW/2,screen.cy,0.026,M.spill,'spill_left');
+    const spillRight = planePart(sideW,capH,screen.w/2+sideW/2,screen.cy,0.026,M.spill,'spill_right');
+    const topH = Math.max(0,(screen.imgH-screen.h)/2);
+    const spillTop = planePart(screen.imgW,topH,0,screen.cy+screen.h/2+topH/2,0.026,M.spill,'spill_top');
+    const spillBottom = planePart(screen.imgW,topH,0,screen.cy-screen.h/2-topH/2,0.026,M.spill,'spill_bottom');
+    [spillLeft,spillRight,spillTop,spillBottom].filter(Boolean).forEach(part=>group.add(part));
+  }
+
+  if (pstate.kind === 'undershoot'){
+    const missingCoverage = new THREE.Group();
+    missingCoverage.name = 'missing_coverage';
+    const sideW = Math.max(0,(screen.w-screen.imgW)/2);
+    const capH = Math.min(screen.imgH,screen.h);
+    const topH = Math.max(0,(screen.h-screen.imgH)/2);
+    [
+      planePart(sideW,capH,-screen.w/2+sideW/2,screen.cy,0.026,M.missing,'missing_coverage_left'),
+      planePart(sideW,capH,screen.w/2-sideW/2,screen.cy,0.026,M.missing,'missing_coverage_right'),
+      planePart(screen.w,topH,0,screen.cy+screen.h/2-topH/2,0.026,M.missing,'missing_coverage_top'),
+      planePart(screen.w,topH,0,screen.cy-screen.h/2+topH/2,0.026,M.missing,'missing_coverage_bottom')
+    ].filter(Boolean).forEach(part=>missingCoverage.add(part));
+    group.add(missingCoverage);
+  }
+  group.userData.projectionState = pstate.kind;
+  return group;
 }
 
 /* ---------- room ---------- */
@@ -434,7 +534,7 @@ function buildRoom(depth, width){
 /* ---------- assembly ---------- */
 const root = new THREE.Group(); root.name = 'throwline_stage';
 const proj = buildProjector();
-let screenGrp = null, coneMesh = null, roomGrp = null, cartGrp = null;
+let screenGrp = null, projectionGrp = null, roomGrp = null, cartGrp = null;
 root.add(proj);
 
 const els = id => document.getElementById(id);
@@ -447,6 +547,17 @@ function fmt(ft){
   if (q>=48){ f++; q-=48; }
   const inch = Math.floor(q/4), fr = q%4, marks=['','¼','½','¾'];
   return (neg?'-':'') + f + "' " + inch + marks[fr] + '"';
+}
+
+function projectionState(){
+  const wideD = state.wide*state.w;
+  const teleD = state.tele*state.w;
+  const safeLo = wideD*1.05;
+  const safeHi = teleD*0.95;
+  if (state.dist > teleD+0.01) return {kind:'overshoot',label:'OVERSHOOT',color:'var(--safety)'};
+  if (state.dist < wideD-0.01) return {kind:'undershoot',label:'UNDERSHOOT',color:'var(--safety)'};
+  if (state.dist >= safeLo && state.dist <= safeHi) return {kind:'safe',label:'PASS · SAFE',color:'var(--go)'};
+  return {kind:'near-limit',label:'PASS · NEAR LIMIT',color:'var(--hazard)'};
 }
 
 function rebuild(){
@@ -478,6 +589,8 @@ function rebuild(){
   const imgW = dist / currentRatio();
   const imgH = imgW / state.ar;
   const cy = bottom + h/2;                          // image centred on the screen
+  const pstate = projectionState();
+  document.documentElement.dataset.projectionState = pstate.kind;
   const apex = new THREE.Vector3(0, lensY, dist);
   const rect = [
     new THREE.Vector3(-imgW/2, cy - imgH/2, 0.004),
@@ -485,13 +598,15 @@ function rebuild(){
     new THREE.Vector3( imgW/2, cy + imgH/2, 0.004),
     new THREE.Vector3(-imgW/2, cy + imgH/2, 0.004)
   ];
-  if (coneMesh) root.remove(coneMesh);
-  coneMesh = buildCone(apex, rect);
-  coneMesh.visible = state.cone;
-  coneMesh.castShadow = false; coneMesh.receiveShadow = false;
-  root.add(coneMesh);
+  if (projectionGrp) root.remove(projectionGrp);
+  projectionGrp = buildProjection(apex,rect,{w,h,imgW,imgH,cy},pstate);
+  projectionGrp.visible = state.cone;
+  projectionGrp.traverse(part=>{
+    if (part.isMesh || part.isLine) { part.castShadow = false; part.receiveShadow = false; }
+  });
+  root.add(projectionGrp);
 
-  readout(imgW, imgH, w, h, cy, lensY);
+  readout(imgW,imgH,w,h,cy,lensY,pstate);
 }
 
 // Ratio the lens is actually set to: the operator zooms to fit when the
@@ -501,7 +616,7 @@ function currentRatio(){
   return Math.min(state.tele, Math.max(state.wide, need));
 }
 
-function readout(imgW, imgH, w, h, cy, lensY){
+function readout(imgW,imgH,w,h,cy,lensY,pstate){
   const wideD = state.wide * state.w, teleD = state.tele * state.w;
   const safeLo = wideD*1.05, safeHi = teleD*0.95;
   const d = state.dist;
@@ -541,6 +656,8 @@ function readout(imgW, imgH, w, h, cy, lensY){
   const shiftPct = ((cy - lensY) / (imgH || 1)) * 100;
   els('fShift').textContent = (shiftPct>=0?'+':'') + shiftPct.toFixed(1) + '%';
   els('fShift').style.color = Math.abs(shiftPct) > 60 ? 'var(--safety)' : 'var(--info)';
+  const lensName = els('lens').selectedOptions[0].textContent;
+  els('sceneSummary').textContent = `${pstate.label}. Set mark ${fmt(d)}. ${lensName}. Image ${fmt(iw)} by ${fmt(ih)}; screen ${fmt(sw)} by ${fmt(sh)}. ${Math.abs(spill)<0.02?'No spill.':spill>0?`${fmt(Math.abs(spill))} spill at each side.`:`${fmt(Math.abs(spill))} missing coverage at each side.`} Optical height ${fmt(state.lh)}. Required ratio ${(state.dist/state.w).toFixed(3)} to one. Shift ${shiftPct>=0?'plus ':'minus '}${Math.abs(shiftPct).toFixed(1)} percent.`;
 }
 
 /* ---------- controls ---------- */
@@ -577,12 +694,12 @@ function toggle(id, key, apply){
     announce(`${b.textContent.trim()} ${state[key] ? 'shown' : 'hidden'}`);
   };
 }
-toggle('tcone','cone', ()=> coneMesh && (coneMesh.visible = state.cone));
+toggle('tcone','cone', ()=> projectionGrp && (projectionGrp.visible = state.cone));
 toggle('troom','room', ()=> roomGrp && (roomGrp.visible = state.room));
 toggle('tgrid','grid', ()=>{ const g = roomGrp && roomGrp.getObjectByName('deck_grid'); if (g) g.visible = state.grid; });
 
-const cameraOrder = ['three','side','top','op'];
-const cameraLabels = {three:'Three-quarter',side:'Side',top:'Top',op:'Operator'};
+const cameraOrder = ['three','side','front','top','op'];
+const cameraLabels = {three:'Three-quarter',side:'Side',front:'Front',top:'Top',op:'Operator'};
 function setCamera(camera,{saveDefault=false,announceChange=true}={}){
   const button = document.querySelector(`[data-cam="${camera}"]`);
   if (!button) return;
@@ -591,6 +708,7 @@ function setCamera(camera,{saveDefault=false,announceChange=true}={}){
   const views = {
     three: [d*0.95, cy + d*0.55, d*1.5],
     side:  [d*1.7, cy*1.1, d*0.55],
+    front: [0, cy, -d*0.72],
     top:   [0.01, d*1.5, d*0.55],
     op:    [0, state.lh*FT, d*1.32]
   };
@@ -612,7 +730,6 @@ els('resetView').addEventListener('click',()=>{
 
 rebuild();
 stage.setObject(root);
-coneMesh.castShadow = false; coneMesh.receiveShadow = false;
 setCamera('three',{saveDefault:true,announceChange:false});
 announce('Stage 3D ready. Three-quarter camera selected.');
 } catch (error) {

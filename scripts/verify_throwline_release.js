@@ -78,11 +78,25 @@ requireMatch(stage, /Optional online companion/i, 'Stage 3D must identify itself
 requireMatch(sidecar, /renderer\.shadowMap\.type = THREE\.PCFShadowMap;/, 'Stage 3D must use PCFShadowMap.');
 if (/PCFSoftShadowMap/.test(stage) || /PCFSoftShadowMap/.test(sidecar)) fail('Stage 3D must not use deprecated PCFSoftShadowMap.');
 const stageCameraIds = Array.from(stage.matchAll(/<button\b[^>]*\bdata-cam=["']([^"']+)["'][^>]*>/g), (match) => match[1]);
-const expectedStageCameraIds = ['three', 'side', 'top', 'op'];
+const expectedStageCameraIds = ['three', 'side', 'front', 'top', 'op'];
 if (stageCameraIds.length !== expectedStageCameraIds.length || expectedStageCameraIds.some((id, index) => stageCameraIds[index] !== id)) {
   fail(`Stage 3D camera contract must remain ${expectedStageCameraIds.join(', ')}; found ${stageCameraIds.join(', ') || 'none'}.`);
 }
-if (/data-cam=["'](?:front|flown)["']/.test(stage)) fail('Stage 3D must not add front-camera or flown-projector presets.');
+if (/data-cam=["']flown["']/.test(stage)) fail('Stage 3D must not add a flown-projector preset.');
+[
+  ['beam_volume', 'Stage 3D must render a named beam volume.'],
+  ['beam_edges', 'Stage 3D must render named structural beam edges.'],
+  ['optical_centerline', 'Stage 3D must render a named optical centerline.'],
+  ['projected_image', 'Stage 3D must render a named projected-image plane.'],
+  ['spill_left', 'Stage 3D must render named left spill geometry.'],
+  ['spill_right', 'Stage 3D must render named right spill geometry.'],
+  ['missing_coverage', 'Stage 3D must render named missing-coverage geometry.'],
+].forEach(([token, message]) => {
+  if (!stage.includes(token)) fail(message);
+});
+requireMatch(stage, /dataset\.projectionState\s*=/, 'Stage 3D must expose its derived projection state to styling and diagnostics.');
+requireMatch(stage, /id=["']sceneSummary["'][^>]*role=["']status["']/, 'Stage 3D must expose an accessible scene summary status region.');
+requireMatch(sidecar, /Use keys 1 through 5 for cameras/, 'Stage 3D canvas instructions must expose all five camera shortcuts.');
 
 const throwlineTools = (avRegistry?.tools || []).filter((tool) => tool.id === 'throwline');
 if (throwlineTools.length !== 1 || throwlineTools[0].href !== 'ProjectorThrow/') {
