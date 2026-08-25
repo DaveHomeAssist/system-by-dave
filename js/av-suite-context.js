@@ -241,7 +241,7 @@
     return {
       schema:'system-by-dave.av-suite.v1',
       savedAt:new Date().toISOString(),
-      showName:context.showName || 'AV Tool Suite',
+      showName:context.showName || 'AV by Dave',
       venue:context.venue || '',
       showDate:context.showDate || new Date().toISOString().slice(0, 10),
       operator:context.operator || '',
