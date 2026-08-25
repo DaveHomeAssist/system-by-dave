@@ -84,7 +84,7 @@ Run:
 node scripts/verify_throwline_release.js
 ```
 
-Expected: PASS for the canonical data contract, while the complete `verify:throwline` command still reports stale embedded snapshots.
+Expected: FAIL only for the two stale embedded catalog snapshots, with no appendix, provenance, immutability, or optical-join contract failures.
 
 - [ ] **Step 3: Commit the canonical appendix**
 
