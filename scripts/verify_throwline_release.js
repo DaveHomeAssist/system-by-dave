@@ -213,6 +213,7 @@ if (!stage.includes('MANUAL SIMULATION')) fail('Direct-open Stage 3D must be exp
 });
 requireMatch(stage, /dataset\.calculationMode\s*=/, 'Stage 3D must expose its calculation mode for diagnostics.');
 requireMatch(stage, /new\s+URLSearchParams\(location\.search\)/, 'Stage 3D must validate planner transfer parameters.');
+requireMatch(stage, /requestedMode\s*===\s*["']legacy_unverified["'][\s\S]*?Broad legacy source rows are reference-only/, 'Stage 3D must preserve the legacy-unverified gate reason from planner transfers.');
 requireMatch(stage, /if\s*\(opticalGeometryAllowed\(\)\)[\s\S]*?buildProjection\s*\(/, 'Stage 3D must gate projection geometry through opticalGeometryAllowed().');
 requireMatch(stage, /state\.wide\s*\*\s*state\.basisW/, 'Stage 3D throw limits must use the transferred projected-raster width basis.');
 requireMatch(stage, /state\.dist\s*\/\s*state\.basisW/, 'Stage 3D required ratio must use the projected-raster width basis.');

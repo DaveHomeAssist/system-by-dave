@@ -336,6 +336,7 @@ function resolveStageTransfer(){
     if (requestedMode === 'verified_image_width' && stageEligibleProfile(profile)) return {...base,mode:'verified_image_width',wide:Number(profile.throw_ratio_min),tele:Number(profile.throw_ratio_max),allowed:true,label:`${projector.model_number} + ${lens.lens_model_number}`,reason:'VERIFIED IMAGE-WIDTH PROFILE',profile};
     return {...base,mode:profile?.calculationState || 'partial',wide:Number(profile?.throw_ratio_min),tele:Number(profile?.throw_ratio_max),allowed:false,label:`${projector.model_number} + ${lens.lens_model_number}`,reason:`CALCULATION BLOCKED · ${profile?.calculationGateReason || 'No complete calculation-eligible optical profile exists for this exact pair.'}`,profile};
   }
+  if (requestedMode === 'legacy_unverified') return {...base,mode:'legacy_unverified',wide:NaN,tele:NaN,allowed:false,label:'Legacy planner selection',reason:'CALCULATION BLOCKED · Broad legacy source rows are reference-only.',profile:null};
   const min = number('min',0.978), max = number('max',1.320);
   if (requestedMode !== 'manual' || !Number.isFinite(min) || min <= 0 || !Number.isFinite(max) || max < min) return {...base,mode:'blocked',wide:NaN,tele:NaN,allowed:false,label:'Untrusted transfer',reason:'CALCULATION BLOCKED · transferred calculation state is invalid.',profile:null};
   return {...base,mode:'manual',wide:min,tele:max,allowed:true,label:'Manual ratio preset',reason:'MANUAL SIMULATION · operator-supplied ratio · unverified.',profile:null};
