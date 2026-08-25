@@ -110,6 +110,9 @@ function validateProjectorReferenceAppendix(catalog, pilotProjectorIds, manufact
 
   const canonicalModelKeyValues = rows.map((row) => row.canonical_model_key);
   const validCanonicalModelKeys = canonicalModelKeyValues.filter((value) => typeof value === 'string' && value.trim());
+  if (canonicalModelKeyValues.some((value) => typeof value === 'string' && value !== value.trim())) {
+    fail('Throwline projector reference appendix canonical_model_key values must not contain surrounding whitespace.');
+  }
   if (validCanonicalModelKeys.length !== 13 || new Set(validCanonicalModelKeys).size !== 13) {
     fail('Throwline projector reference appendix must contain 13 unique nonempty canonical_model_key values.');
   }
