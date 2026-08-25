@@ -4,24 +4,24 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; worker-src 'self'; connect-src 'self'; img-src 'self' data:; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'none'">
-<title>AV Suite — System by Dave</title>
+<title>AV by Dave — AV Show Operations Console</title>
 <meta name="robots" content="index,follow">
-<meta name="description" content="One operator console for the System by Dave AV tools. Loads your show, reads the current phase, tracks what is ready and what is blocking, and launches the right tool next offline.">
+<meta name="description" content="AV by Dave is the field-grade show operations console for the System by Dave AV tools. Plan it. Patch it. Run the show. Loads your show, reads the current phase, tracks what is ready and what is blocking, and launches the right tool next — online or off.">
 <link rel="canonical" href="https://systembydave.com/av-suite.html">
 <meta name="theme-color" content="#EEE8DF" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0C1016" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="System by Dave">
-<meta property="og:title" content="AV Suite">
-<meta property="og:description" content="One operator console for the System by Dave AV tools — show context, phase recommendations, readiness tracking, review queue, quick switcher, and offline cache.">
+<meta property="og:title" content="AV by Dave">
+<meta property="og:description" content="Field-grade AV show operations console by Dave Robertson — show context, phase recommendations, readiness tracking, review queue, quick switcher, and offline cache. Plan it. Patch it. Run the show.">
 <meta property="og:url" content="https://systembydave.com/av-suite.html">
 <meta property="og:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
 <meta property="og:image:width" content="1024">
 <meta property="og:image:height" content="412">
 <meta property="og:image:alt" content="System by Dave preview banner">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="AV Suite">
-<meta name="twitter:description" content="One operator console for the System by Dave AV tools — show context, phase recommendations, readiness tracking, review queue, quick switcher, and offline cache.">
+<meta name="twitter:title" content="AV by Dave">
+<meta name="twitter:description" content="Field-grade AV show operations console by Dave Robertson — show context, phase recommendations, readiness tracking, review queue, quick switcher, and offline cache. Plan it. Patch it. Run the show.">
 <meta name="twitter:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
 <link rel="icon" href="svg/system_by_dave_logo_rust.svg" type="image/svg+xml">
 <link rel="manifest" href="manifest.json">
@@ -29,10 +29,15 @@
 <link rel="stylesheet" href="css/sbd-public-nav.css">
 <style>
   /* ============================================================
-     SYSTEM BY DAVE — AV SUITE OPERATOR CONSOLE
-     Warm paper SYSTEM_BY_DAVE expression. Rust accent, drafting-grid
-     logic, square corners, mechanical motion. Token-driven; tool data
-     comes from js/sbd-registry.js (single source of truth).
+     AV BY DAVE — SHOW OPERATIONS CONSOLE  ·  SYSTEM BY DAVE
+     Plan it. Patch it. Run the show.
+     Warm paper SYSTEM_BY_DAVE expression evolved into a show-day
+     console: serif wordmark voice, registration-tick panel corners,
+     hatched tape rules, mechanical segmented controls. Rust is the
+     single accent; corners stay square; motion stays snappy.
+     Token-driven; tool data comes from js/sbd-registry.js (single
+     source of truth). css/av-theme.css re-points every legacy token
+     below to the shared --av-* palette pair after this block loads.
      ============================================================ */
 
   /* ---- Fonts (self-embedded, offline-safe) ---- */
@@ -101,18 +106,18 @@
     --info:#45667A;
     --info-tint:rgba(69,102,122,.11);
 
-    /* — Type — */
-    --font-display:'Space Grotesk','DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    /* — Type (DM Serif Display carries the wordmark + headings) — */
+    --font-display:'DM Serif Display',Georgia,'Times New Roman',serif;
     --font-sans:'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
     --font-mono:'JetBrains Mono',ui-monospace,'SFMono-Regular','Cascadia Code',Menlo,monospace;
 
     --fs-display:clamp(30px,4.4vw,52px);
-    --fs-h2:21px;
+    --fs-h2:22px;
     --fs-h3:16px;
     --fs-body:14.5px;
     --fs-meta:13px;
     --fs-label:11px;
-    --fs-mono-xl:34px;
+    --fs-mono-xl:38px;
 
     /* — Spacing (8px rhythm) — */
     --s1:4px; --s2:8px; --s3:12px; --s4:16px; --s5:20px; --s6:24px; --s8:32px; --s10:40px;
@@ -181,7 +186,7 @@
   *::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:0;border:3px solid transparent;background-clip:content-box}
   *::-webkit-scrollbar-thumb:hover{background:var(--line-strong);background-clip:content-box}
 
-  /* ---- Kicker / labels (mono, tracked, accent) ---- */
+  /* ---- Kicker / labels (mono, tracked, accent, sheet-indexed) ---- */
   .kicker{
     margin:0;color:var(--accent-pale);font-family:var(--font-mono);font-weight:500;
     font-size:var(--fs-label);text-transform:uppercase;letter-spacing:.2em;
@@ -189,6 +194,8 @@
   }
   .kicker::after{content:'';flex:0 0 auto;width:22px;height:1px;background:var(--accent-line)}
   .kicker.bare::after{display:none}
+  .k-ix{color:var(--muted);font-weight:400;letter-spacing:.06em}
+  .k-ix::after{content:'\00a0/';color:var(--line-strong)}
 
   label{
     display:block;margin:0 0 6px;color:var(--muted);font-family:var(--font-mono);
@@ -250,27 +257,55 @@
   kbd{font-family:var(--font-mono);font-size:10px;border:1px solid var(--line-strong);border-radius:var(--r-xs);
     padding:1px 5px;color:var(--muted);background:var(--surface);line-height:1.4}
 
-  /* ---- Panels ---- */
-  .panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow)}
+  /* ---- Panels (drafting sheets w/ registration-tick corners) ---- */
+  .panel{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow)}
+  .panel::after{
+    content:'';position:absolute;inset:0;pointer-events:none;z-index:3;
+    background:
+      linear-gradient(var(--accent) 0 0) left top/12px 2px,
+      linear-gradient(var(--accent) 0 0) left top/2px 12px,
+      linear-gradient(var(--line-strong) 0 0) right bottom/12px 2px,
+      linear-gradient(var(--line-strong) 0 0) right bottom/2px 12px;
+    background-repeat:no-repeat;opacity:.9;
+  }
 
   /* ============================================================
-     COMMAND BAR
+     COMMAND BAR — the AV BY DAVE masthead + live show readout.
+     Wordmark block left, show tape readout center, actions right,
+     hatched gaffer-tape rule along the bottom edge.
      ============================================================ */
   .command-bar{
     position:sticky;top:0;z-index:40;display:flex;align-items:center;justify-content:space-between;gap:var(--s5);
-    padding:13px clamp(14px,2.4vw,28px);
+    padding:12px clamp(14px,2.4vw,28px) 14px;
     background:linear-gradient(180deg, rgba(255,252,247,.97), rgba(247,242,234,.94));
     border-bottom:1px solid var(--line-2);backdrop-filter:blur(16px) saturate(1.1);
   }
-  .cb-left{display:flex;align-items:center;gap:16px;min-width:0}
-  .cb-mark{flex:0 0 auto;width:44px;height:44px;display:grid;place-items:center;background:var(--surface-3);border:1px solid var(--line-2);border-radius:var(--r-sm);color:var(--accent)}
-  .cb-mark svg{display:block}
+  .command-bar::after{
+    content:'';position:absolute;left:0;right:0;bottom:0;height:3px;pointer-events:none;opacity:.5;
+    background:repeating-linear-gradient(-45deg,var(--accent) 0 5px,transparent 5px 11px);
+  }
+  .cb-left{display:flex;align-items:center;gap:15px;min-width:0}
+  .cb-mark{
+    flex:0 0 auto;width:46px;height:46px;display:grid;place-items:center;
+    background:var(--accent);border:1px solid var(--accent-bright);border-radius:var(--r-sm);
+    color:var(--ink);font-family:var(--font-display);font-size:21px;line-height:1;letter-spacing:.01em;
+    box-shadow:3px 3px 0 var(--accent-tint-2);user-select:none;
+  }
+  .cb-brand{flex:0 0 auto;display:grid;gap:2px}
+  .cb-word{margin:0;font-family:var(--font-display);font-size:clamp(21px,2vw,26px);line-height:1;color:var(--text);white-space:nowrap}
+  .cb-word em{font-style:italic;color:var(--accent);padding:0 1px}
+  .cb-tagline{margin:0;color:var(--muted);font-family:var(--font-mono);font-weight:400;font-size:9.5px;letter-spacing:.18em;text-transform:uppercase;white-space:nowrap}
+  .cb-divider{flex:0 0 auto;align-self:stretch;width:1px;margin:2px 2px;background:linear-gradient(180deg,transparent,var(--line-strong),transparent)}
   .cb-id{min-width:0}
-  .cb-kicker{margin:0 0 3px;color:var(--accent-pale);font-family:var(--font-mono);font-weight:500;font-size:10px;letter-spacing:.26em;text-transform:uppercase}
-  .cb-title{font-family:var(--font-display);font-size:clamp(20px,2vw,27px);line-height:1;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:38vw}
-  .cb-meta{margin:5px 0 0;display:flex;align-items:center;gap:10px;font-family:var(--font-mono);font-size:11.5px;color:var(--muted);letter-spacing:.02em;white-space:nowrap;overflow:hidden}
+  .cb-kicker{margin:0 0 3px;color:var(--accent-pale);font-family:var(--font-mono);font-weight:500;font-size:9.5px;letter-spacing:.26em;text-transform:uppercase}
+  .cb-title{
+    display:inline-block;font-family:var(--font-mono);font-weight:600;font-size:clamp(13px,1.3vw,15.5px);line-height:1.3;
+    color:var(--ink);background:var(--text);padding:3px 10px 2px;letter-spacing:.04em;text-transform:uppercase;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:30vw;vertical-align:top;
+  }
+  .cb-meta{margin:5px 0 0;display:flex;align-items:center;gap:10px;font-family:var(--font-mono);font-size:11px;color:var(--muted);letter-spacing:.02em;white-space:nowrap;overflow:hidden}
   .cb-net{display:inline-flex;align-items:center;gap:6px;color:var(--muted);flex:0 0 auto}
-  .cb-net::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--ready);box-shadow:0 0 0 3px var(--ready-tint)}
+  .cb-net::before{content:'';width:7px;height:7px;background:var(--ready);box-shadow:0 0 0 3px var(--ready-tint)}
   .cb-net[data-online="false"]{color:var(--skip-pale)}
   .cb-net[data-online="false"]::before{background:var(--skip);box-shadow:0 0 0 3px var(--skip-tint)}
 
@@ -294,14 +329,15 @@
   .profile-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
   .profile-fields{display:grid;grid-template-columns:1.4fr 1.4fr 1fr 1.2fr;gap:12px}
   .phase-block{display:grid;gap:10px}
-  .phase-strip{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:6px}
+  /* mechanical transport strip: one housing, 1px internal rules */
+  .phase-strip{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:1px;background:var(--line-2);border:1px solid var(--line-2);box-shadow:var(--shadow)}
   .phase-strip button{
     font-family:var(--font-mono);font-size:var(--fs-label);text-transform:uppercase;letter-spacing:.1em;color:var(--muted);
-    padding:11px 6px;flex-direction:column;gap:0;border-radius:var(--r-sm);position:relative;
+    padding:12px 6px;flex-direction:column;gap:0;border:0;border-radius:0;position:relative;
   }
-  .phase-strip button[aria-pressed="true"]{
-    background:var(--accent-tint);border-color:var(--accent);color:var(--accent-pale);font-weight:700;
-    box-shadow:inset 0 -2px 0 var(--accent)}
+  .show-profile .phase-strip button[aria-pressed="true"]{
+    background:var(--accent-tint);border:0;color:var(--accent-pale);font-weight:700;
+    box-shadow:inset 0 -3px 0 var(--accent),inset 0 1px 0 var(--accent-line)}
   .hint{min-height:20px;margin:0;color:var(--muted);font-size:var(--fs-meta);font-weight:400}
   .hint.success{color:var(--ready-pale)}
   .hint.error{color:var(--issue-pale)}
@@ -310,9 +346,10 @@
   .readiness-strip{padding:var(--panel-pad);display:grid;gap:13px;align-content:start;position:relative;overflow:hidden}
   .strip-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
   .strip-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-  .stat{padding:13px 14px;border:1px solid var(--line-2);border-radius:var(--r-md);background:var(--surface-2);display:grid;gap:3px;position:relative}
+  .stat{padding:14px 14px 13px;border:1px solid var(--line-2);border-radius:var(--r-md);background:var(--surface-2);display:grid;gap:4px;position:relative;overflow:hidden}
+  .stat::before{content:'';position:absolute;top:0;left:0;width:26px;height:2px;background:var(--line-strong);opacity:.7}
   .stat span{color:var(--muted);font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:.12em;display:inline-flex;align-items:center;gap:6px}
-  .stat span::before{content:'';width:9px;height:9px;border-radius:50%;flex:0 0 auto}
+  .stat span::before{content:'';width:8px;height:8px;flex:0 0 auto}
   .stat strong{font-family:var(--font-mono);font-weight:700;font-size:var(--fs-mono-xl);line-height:1;color:var(--text)}
   .stat-ready span::before{background:var(--ready)}
   .stat-ready strong{color:var(--ready)}
@@ -347,7 +384,7 @@
   .recommend-card::before{content:'';position:absolute;inset:0 auto 0 0;width:3px;background:var(--accent);border-radius:var(--r-md) 0 0 var(--r-md)}
   .recommend-card:first-child{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent-line),0 14px 30px -18px rgba(158,67,43,.28)}
   .recommend-card>span{color:var(--muted);font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:.1em}
-  .recommend-card strong{font-family:var(--font-display);font-size:19px;line-height:1.05;color:var(--text)}
+  .recommend-card strong{font-family:var(--font-display);font-size:21px;line-height:1.08;color:var(--text)}
   .recommend-card button{margin-top:2px}
   .recommend-card:first-child>span::after{content:'· NEXT';color:var(--accent-pale);margin-left:6px;font-weight:600}
 
@@ -371,7 +408,7 @@
   .tool-card.ready-skipped{opacity:.72}
   .tool-card.ready-skipped::before{background:var(--skip)}
   .tool-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
-  .tool-head h3{font-family:var(--font-display);font-size:18px;line-height:1.1;color:var(--text);margin-top:8px}
+  .tool-head h3{font-family:var(--font-display);font-size:19px;line-height:1.12;color:var(--text);margin-top:8px;letter-spacing:.005em}
   .badge-row{display:flex;flex-wrap:wrap;gap:5px}
   .tool-card p{margin:0;color:var(--text-2);font-size:var(--fs-meta);line-height:1.5;font-weight:300}
   .tool-meta{color:var(--muted);font-family:var(--font-mono);font-size:10.5px;letter-spacing:.04em;text-transform:uppercase}
@@ -394,7 +431,7 @@
     font-family:var(--font-mono);font-weight:500;font-size:10px;text-transform:uppercase;letter-spacing:.08em}
   .badge.hot{border-color:var(--accent-line);color:var(--accent-pale);background:var(--accent-tint)}
   .badge.hot::before{content:'\25B8';color:var(--accent)}
-  .badge.ready-badge::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--muted)}
+  .badge.ready-badge::before{content:'';width:7px;height:7px;background:var(--muted)}
   .badge.ready-badge.ready-pending::before{background:var(--faint)}
   .badge.ready-badge.ready-ready{border-color:var(--ready-line);color:var(--ready-pale);background:var(--ready-tint)}
   .badge.ready-badge.ready-ready::before{background:var(--ready)}
@@ -425,7 +462,7 @@
   .tgh-glyph{flex:0 0 auto;width:30px;height:30px;display:grid;place-items:center;background:var(--surface-3);border:1px solid var(--line-2);border-radius:var(--r-xs);color:var(--accent-pale)}
   .tgh-glyph .dept-glyph{width:18px;height:18px}
   .tool-group-head h3{margin:0;font-family:var(--font-mono);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.16em;color:var(--text-2)}
-  .tgh-count{font-family:var(--font-mono);font-size:10px;color:var(--muted);border:1px solid var(--line-2);border-radius:var(--r-pill,999px);padding:1px 7px}
+  .tgh-count{font-family:var(--font-mono);font-size:10px;color:var(--muted);border:1px solid var(--line-2);border-radius:var(--r-xs);padding:1px 7px}
   .tool-group-head::after{content:'';flex:1;height:1px;background:var(--line)}
 
   /* — Department navigator — */
@@ -447,8 +484,8 @@
      ============================================================ */
   .side{display:grid;gap:var(--gap)}
   .side-section{padding:var(--panel-pad);display:grid;gap:12px}
-  .side-section h2{font-family:var(--font-display);font-size:var(--fs-h2);color:var(--text);display:flex;align-items:center;gap:9px}
-  .side-section h2::before{content:'';width:6px;height:18px;background:var(--accent);border-radius:1px;flex:0 0 auto}
+  .side-section h2{font-family:var(--font-display);font-size:var(--fs-h2);color:var(--text);display:flex;align-items:center;gap:10px}
+  .side-section h2::before{content:'';width:6px;height:19px;background:var(--accent);border-radius:0;flex:0 0 auto}
 
   .readiness-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
   .readiness-pill{border:1px solid var(--line-2);border-radius:var(--r-md);padding:10px 11px;background:var(--surface-2);display:grid;gap:3px}
@@ -483,7 +520,7 @@
   .phase-gate-item strong{display:block;font-size:var(--fs-meta);color:var(--text);font-weight:600}
   .phase-gate-item span{display:block;color:var(--muted);font-size:12px}
   .phase-gate-state{display:inline-flex!important;align-items:center;gap:5px;margin-bottom:5px;border:1px solid var(--line-2);border-radius:var(--r-xs);padding:2px 7px;font-family:var(--font-mono);font-size:9.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
-  .phase-gate-state::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--faint)}
+  .phase-gate-state::before{content:'';width:6px;height:6px;background:var(--faint)}
   .phase-gate-state[data-state="ready"]{border-color:var(--ready-line);color:var(--ready-pale)}
   .phase-gate-state[data-state="ready"]::before{background:var(--ready)}
   .phase-gate-state[data-state="issue"]{border-color:var(--issue-line);color:var(--issue-pale)}
@@ -506,8 +543,8 @@
 
   .operator-docs{display:grid;grid-template-columns:1.15fr 1fr;gap:var(--gap);padding:0 28px 28px}
   .docs-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-  .doc-card{border:1px solid var(--line-2);background:var(--surface-2);padding:16px}
-  .doc-card strong{display:block;margin-bottom:8px;color:var(--text);font-family:var(--font-display);font-size:18px;font-weight:500;line-height:1.15}
+  .doc-card{position:relative;border:1px solid var(--line-2);background:var(--surface-2);padding:18px 16px 16px;box-shadow:inset 0 2px 0 var(--line)}
+  .doc-card strong{display:block;margin-bottom:8px;color:var(--text);font-family:var(--font-display);font-size:18px;font-weight:400;line-height:1.15}
   .doc-card span{display:block;color:var(--muted);font-size:13px;line-height:1.45}
   .doc-card code{font-family:var(--font-mono);font-size:11px;color:var(--accent-pale)}
 
@@ -590,7 +627,7 @@
   .site-bar{position:relative;z-index:2;border-bottom:1px solid var(--line);background:rgba(255,252,247,.82)}
   .site-bar-inner{max-width:1480px;margin:0 auto;padding:0 clamp(14px,2.4vw,28px);height:58px;display:flex;align-items:center;justify-content:space-between;gap:24px}
   .site-brand{display:flex;align-items:center;gap:11px;text-decoration:none;color:var(--text)}
-  .site-mark{width:30px;height:30px;border:1px solid var(--line-strong);display:inline-flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:600;font-size:15px;background:var(--surface-2);color:var(--text)}
+  .site-mark{min-width:30px;height:30px;padding:0 6px;border:1px solid var(--accent-bright);display:inline-flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:400;font-size:14px;letter-spacing:.02em;background:var(--accent);color:var(--ink)}
   .site-word{font-family:var(--font-mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-2)}
   .site-word span{color:var(--faint)}
   .site-links{display:flex;align-items:center;gap:22px;flex-wrap:wrap}
@@ -615,6 +652,16 @@
   @keyframes successPulse{50%{box-shadow:0 0 0 4px var(--ready-tint)}}
   @keyframes errorShake{25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
 
+  /* ---- Page load: one mechanical staggered reveal ---- */
+  @media (prefers-reduced-motion:no-preference){
+    .command-bar{animation:barIn .36s var(--ease-out)}
+    main>section{animation:sheetIn .46s var(--ease-out) backwards}
+    main>section:nth-child(2){animation-delay:70ms}
+    main>section:nth-child(3){animation-delay:140ms}
+  }
+  @keyframes barIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+  @keyframes sheetIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
   @media (prefers-reduced-motion:reduce){
     *{transition-duration:.001ms!important;animation-duration:.001ms!important;animation-iteration-count:1!important}
     .tool-card:hover{transform:none}
@@ -628,17 +675,22 @@
     .hero{grid-template-columns:1fr}
     .workspace{grid-template-columns:1fr}
     .operator-docs{grid-template-columns:1fr}
-    .cb-title{max-width:46vw}
+    .cb-title{max-width:38vw}
   }
   @media (max-width:900px){
     .profile-fields{grid-template-columns:1fr 1fr}
     .recommendations{grid-template-columns:1fr}
     .toolbar{grid-template-columns:1fr 1fr}
+    .cb-tagline{display:none}
+    .cb-title{max-width:30vw}
   }
   @media (max-width:680px){
     button,.button-link,input,select{min-height:44px}
-    .command-bar{flex-direction:column;align-items:stretch;gap:12px;position:static}
-    .cb-title{max-width:none;white-space:normal}
+    .command-bar{flex-direction:column;align-items:stretch;gap:12px;position:relative}
+    .cb-left{flex-wrap:wrap;row-gap:10px}
+    .cb-divider{display:none}
+    .cb-id{flex:1 1 100%;min-width:0}
+    .cb-title{max-width:100%;white-space:normal}
     .cb-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));justify-content:stretch;align-items:stretch}
     .cb-actions .button-link,.cb-actions button,.cb-actions .cb-phase{width:100%;min-width:0;min-height:44px;white-space:normal;padding-left:8px;padding-right:8px}
     .cb-actions .cta{grid-column:1/-1}
@@ -662,7 +714,7 @@
 </head>
 <body>
 <a class="skip-link" href="#workspace">Skip to tools</a>
-<noscript><div class="empty" style="margin:18px">AV Suite needs JavaScript for pins, search, saved preferences, and quick launch state. The individual tool links in the page source still work.</div></noscript>
+<noscript><div class="empty" style="margin:18px">AV by Dave needs JavaScript for pins, search, saved preferences, and quick launch state. The individual tool links in the page source still work.</div></noscript>
 
 <header class="sbd-site-header">
   <nav class="sbd-site-header__inner" aria-label="Primary">
@@ -682,18 +734,15 @@
 
 <header class="command-bar">
   <div class="cb-left">
-    <div class="cb-mark" aria-hidden="true">
-      <svg width="26" height="31" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
-        <rect x="0" y="0" width="100" height="20" fill="currentColor"></rect>
-        <rect x="0" y="50" width="100" height="20" fill="currentColor"></rect>
-        <rect x="0" y="100" width="100" height="20" fill="currentColor"></rect>
-        <rect x="0" y="20" width="20" height="30" fill="currentColor"></rect>
-        <rect x="80" y="70" width="20" height="30" fill="currentColor"></rect>
-      </svg>
+    <div class="cb-mark" aria-hidden="true">AV</div>
+    <div class="cb-brand">
+      <p class="cb-word">AV <em>by</em> Dave</p>
+      <p class="cb-tagline">Plan it &middot; Patch it &middot; Run the show</p>
     </div>
+    <div class="cb-divider" aria-hidden="true"></div>
     <div class="cb-id">
-      <p class="cb-kicker">AV Suite · System by Dave</p>
-      <h1 class="cb-title" id="showTitleOut">AV Tool Suite</h1>
+      <p class="cb-kicker">On the desk &middot; System&nbsp;by&nbsp;Dave</p>
+      <h1 class="cb-title" id="showTitleOut">AV by Dave</h1>
       <p class="cb-meta"><span id="cbMeta">No venue set</span><span class="cb-net" id="cbNet" data-online="true">Online</span></p>
     </div>
   </div>
@@ -711,7 +760,7 @@
   <section class="hero">
     <section class="panel show-profile" aria-label="Show profile">
       <div class="profile-head">
-        <p class="kicker">Show Profile</p>
+        <p class="kicker"><span class="k-ix">01</span>Show Sheet</p>
       </div>
       <div class="profile-fields">
         <div><label for="showName">Show</label><input id="showName" type="text" autocomplete="off"></div>
@@ -728,7 +777,7 @@
 
     <aside class="panel readiness-strip" aria-label="Suite readiness">
       <div class="strip-head">
-        <p class="kicker bare">Readiness</p>
+        <p class="kicker bare"><span class="k-ix">02</span>Readiness</p>
         <p class="kicker bare" style="color:var(--muted)"><span id="toolCountOut">0</span>&nbsp;tools</p>
       </div>
       <div class="strip-grid">
@@ -746,9 +795,9 @@
   </section>
 
   <section class="workspace" id="workspace">
-    <section class="panel tool-panel" aria-label="AV suite launch tools">
+    <section class="panel tool-panel" aria-label="AV by Dave launch tools">
       <div class="panel-head">
-        <p class="kicker">Recommended Next</p>
+        <p class="kicker"><span class="k-ix">03</span>Recommended Next</p>
       </div>
       <div class="recommendations" id="recommendations"></div>
       <div class="dept-nav-wrap">
@@ -798,7 +847,7 @@
     </aside>
   </section>
 
-  <section class="operator-docs" aria-label="AV Suite operator documentation">
+  <section class="operator-docs" aria-label="AV by Dave operator documentation">
     <section class="panel side-section">
       <h2>Operator Start Pattern</h2>
       <div class="docs-grid">
@@ -822,7 +871,7 @@
 
 <footer class="site-foot">
   <div class="site-foot-inner">
-    <span class="site-foot-brand"><span class="site-mark" aria-hidden="true">S</span> System by Dave</span>
+    <span class="site-foot-brand"><span class="site-mark" aria-hidden="true">AV</span> AV by Dave &mdash; a System by Dave production</span>
     <div class="site-links">
       <a href="index.html" class="nav-link">Home</a>
       <a href="notion.html" class="nav-link">Notion</a>
@@ -932,7 +981,7 @@
   var offlineState={supported:false,online:navigator.onLine!==false,worker:'Checking',cache:'Checking',cached:0,total:OFFLINE_ASSETS.length,message:'Checking offline cache.',busy:false};
 
   function uniqueAssets(list){var seen={};return list.map(function(asset){return String(asset||'').trim();}).filter(function(asset){if(!asset||seen[asset]) return false;seen[asset]=true;return true;});}
-  function defaultState(){return {showName:'AV Tool Suite',venue:'',showDate:new Date().toISOString().slice(0,10),operator:'',phase:'show',favorites:['teleprompter','show-timer','cueforge'],recent:[],readiness:{},toolNotes:{},commandRecent:[],filters:{search:'',phase:'all',dept:'all',pin:'all'}};}
+  function defaultState(){return {showName:'AV by Dave',venue:'',showDate:new Date().toISOString().slice(0,10),operator:'',phase:'show',favorites:['teleprompter','show-timer','cueforge'],recent:[],readiness:{},toolNotes:{},commandRecent:[],filters:{search:'',phase:'all',dept:'all',pin:'all'}};}
   function storageAvailable(){try{var key='av-suite-probe';localStorage.setItem(key,key);localStorage.removeItem(key);return true;}catch(e){return false;}}
   function loadState(){if(!storageAvailable()) return;try{var raw=localStorage.getItem(STORAGE_KEY);if(!raw) return;var parsed=JSON.parse(raw);applySuitePayload(parsed);}catch(e){}}
   function applyUrlContext(){var params=new URLSearchParams(window.location.search);var changed=false;function cleanParam(name,limit){return String(params.get(name)||'').replace(/\s+/g,' ').trim().slice(0,limit);}function assign(key,name,limit){var value=cleanParam(name,limit);if(value&&state[key]!==value){state[key]=value;changed=true;}}assign('showName','sbdShow',120);assign('venue','sbdVenue',120);assign('showDate','sbdDate',20);assign('operator','sbdOperator',80);var phase=cleanParam('sbdPhase',30);if(phase&&phaseExists(phase)&&phase!=='all'&&state.phase!==phase){state.phase=phase;state.filters.phase=phase;changed=true;}if(changed) saveState();}
@@ -961,7 +1010,7 @@
   function readableStorageText(value){var raw=String(value||'');var parts=[];function walk(item){if(parts.length>120||item==null) return;if(typeof item==='string'||typeof item==='number'||typeof item==='boolean'){parts.push(String(item));return;}if(Array.isArray(item)){item.forEach(walk);return;}if(typeof item==='object'){Object.keys(item).forEach(function(key){walk(item[key]);});}}try{walk(JSON.parse(raw));}catch(e){return raw;}return parts.join(' ');}
   function issueSnippet(value){var compact=readableStorageText(value).replace(/\s+/g,' ').trim();var lower=compact.toLowerCase();var hitIndex=-1;ISSUE_TERMS.some(function(term){var index=lower.indexOf(term);if(index>=0&&(hitIndex<0||index<hitIndex)){hitIndex=index;return true;}return false;});if(hitIndex<0) return '';return compact.slice(Math.max(0,hitIndex-36),hitIndex+96);}
   function savedToolIssue(entries){var snippet='';entries.some(function(entry){snippet=issueSnippet(entry.value);return Boolean(snippet);});return snippet;}
-  function setInputValues(){inputs.showName.value=state.showName;inputs.venue.value=state.venue;inputs.showDate.value=state.showDate;inputs.operator.value=state.operator;inputs.search.value=state.filters.search;inputs.phase.value=state.filters.phase;inputs.dept.value=state.filters.dept;inputs.pin.value=state.filters.pin;$('showTitleOut').textContent=state.showName||'AV Tool Suite';}
+  function setInputValues(){inputs.showName.value=state.showName;inputs.venue.value=state.venue;inputs.showDate.value=state.showDate;inputs.operator.value=state.operator;inputs.search.value=state.filters.search;inputs.phase.value=state.filters.phase;inputs.dept.value=state.filters.dept;inputs.pin.value=state.filters.pin;$('showTitleOut').textContent=state.showName||'AV by Dave';}
   function renderPhaseButtons(){var wrap=$('phaseButtons');wrap.innerHTML=PHASES.map(function(phase){return '<button type="button" data-phase="'+phase.id+'" aria-pressed="'+String(state.phase===phase.id)+'">'+phase.label+'</button>';}).join('');}
   function renderFilters(){inputs.phase.innerHTML='<option value="all">All phases</option>'+PHASES.map(function(phase){return '<option value="'+phase.id+'">'+phase.label+'</option>';}).join('');inputs.dept.innerHTML='<option value="all">All departments</option>'+departments().map(function(dept){return '<option value="'+escapeAttr(dept)+'">'+escapeHtml(dept)+'</option>';}).join('');}
   function recommendedTools(){return (RECOMMENDED[state.phase]||[]).map(toolById).filter(Boolean);}
@@ -981,14 +1030,14 @@
   function offlineAvailable(){return Boolean(window.isSecureContext&&'serviceWorker' in navigator&&'caches' in window);}
   function renderOfflineStatus(){var summary=$('offlineSummary');var detail=$('offlineDetail');var cacheClass=offlineState.cache==='Ready'?'is-ready':(offlineState.cache==='Error'||offlineState.cache==='Unavailable'?'is-error':'');var workerClass=offlineState.worker==='Ready'?'is-ready':(offlineState.worker==='Error'||offlineState.worker==='Unavailable'?'is-error':'');var onlineLabel=offlineState.online?'Online':'Offline';var cacheText=offlineState.cached+'/'+offlineState.total+' files';if(!summary||!detail) return;summary.innerHTML='<div class="offline-pill"><span>Network</span><strong>'+onlineLabel+'</strong></div><div class="offline-pill '+workerClass+'"><span>Worker</span><strong>'+escapeHtml(offlineState.worker)+'</strong></div><div class="offline-pill '+cacheClass+'"><span>Cache</span><strong>'+escapeHtml(offlineState.cache)+'</strong></div><div class="offline-pill"><span>Files</span><strong>'+cacheText+'</strong></div>';detail.textContent=offlineState.message;['cacheToolsBtn','refreshCacheBtn'].forEach(function(id){if($(id)) $(id).disabled=!offlineState.supported||offlineState.busy;});if($('clearCacheBtn')) $('clearCacheBtn').disabled=!offlineState.supported||offlineState.busy||offlineState.cached===0;}
   function setOfflineMessage(cache,message){offlineState.cache=cache;offlineState.message=message;renderOfflineStatus();}
-  function refreshOfflineStatus(){offlineState.supported=offlineAvailable();offlineState.online=navigator.onLine!==false;offlineState.total=OFFLINE_ASSETS.length;if(!offlineState.supported){offlineState.worker='Unavailable';offlineState.cache='Unavailable';offlineState.cached=0;offlineState.message='This browser cannot prepare the AV Suite offline cache.';renderOfflineStatus();return Promise.resolve(false);}return caches.open(AV_CACHE_NAME).then(function(cache){return Promise.all(OFFLINE_ASSETS.map(function(asset){return cache.match(asset,{ignoreSearch:true}).then(function(found){return Boolean(found);}).catch(function(){return false;});}));}).then(function(matches){offlineState.cached=matches.filter(Boolean).length;offlineState.cache=offlineState.cached===offlineState.total?'Ready':(offlineState.cached?'Partial':'Not cached');offlineState.message=offlineState.cache==='Ready'?'AV Suite and tool routes are cached for offline loading.':(offlineState.cached?'Cache is partial. Use Refresh Cache before relying on it.':'Use Cache AV Tools before leaving network.');offlineState.busy=false;renderOfflineStatus();return offlineState.cache==='Ready';}).catch(function(){offlineState.cache='Error';offlineState.message='Could not read the AV Suite cache status.';offlineState.busy=false;renderOfflineStatus();return false;});}
+  function refreshOfflineStatus(){offlineState.supported=offlineAvailable();offlineState.online=navigator.onLine!==false;offlineState.total=OFFLINE_ASSETS.length;if(!offlineState.supported){offlineState.worker='Unavailable';offlineState.cache='Unavailable';offlineState.cached=0;offlineState.message='This browser cannot prepare the AV by Dave offline cache.';renderOfflineStatus();return Promise.resolve(false);}return caches.open(AV_CACHE_NAME).then(function(cache){return Promise.all(OFFLINE_ASSETS.map(function(asset){return cache.match(asset,{ignoreSearch:true}).then(function(found){return Boolean(found);}).catch(function(){return false;});}));}).then(function(matches){offlineState.cached=matches.filter(Boolean).length;offlineState.cache=offlineState.cached===offlineState.total?'Ready':(offlineState.cached?'Partial':'Not cached');offlineState.message=offlineState.cache==='Ready'?'AV by Dave and its tool routes are cached for offline loading.':(offlineState.cached?'Cache is partial. Use Refresh Cache before relying on it.':'Use Cache AV Tools before leaving network.');offlineState.busy=false;renderOfflineStatus();return offlineState.cache==='Ready';}).catch(function(){offlineState.cache='Error';offlineState.message='Could not read the AV by Dave cache status.';offlineState.busy=false;renderOfflineStatus();return false;});}
   function registerOfflineWorker(){offlineState.supported=offlineAvailable();offlineState.online=navigator.onLine!==false;if(!offlineState.supported){renderOfflineStatus();return refreshOfflineStatus();}offlineState.worker='Registering';offlineState.message='Registering offline cache worker.';renderOfflineStatus();return navigator.serviceWorker.register('av-suite-worker.js',{scope:'./'}).then(function(registration){if(registration.waiting) registration.waiting.postMessage({type:'SKIP_WAITING'});return navigator.serviceWorker.ready;}).then(function(){offlineState.worker='Ready';return refreshOfflineStatus();}).catch(function(){offlineState.worker='Unavailable';offlineState.cache='Unavailable';offlineState.message='Offline cache worker could not be registered.';offlineState.busy=false;renderOfflineStatus();return false;});}
   function fetchAndCacheAsset(cache,asset){return fetch(asset,{cache:'reload'}).then(function(response){if(!response||!response.ok) throw new Error('cache failed');return cache.put(asset,response.clone());});}
-  function cacheAvTools(refresh,button){if(!offlineAvailable()){setOfflineMessage('Unavailable','This browser cannot prepare the AV Suite offline cache.');showHint('Offline cache is unavailable in this browser.','error');if(button) signal(button,'error');return Promise.resolve(false);}offlineState.supported=true;offlineState.online=navigator.onLine!==false;offlineState.busy=true;offlineState.cache=refresh?'Refreshing':'Caching';offlineState.message=(refresh?'Refreshing':'Caching')+' AV Suite files for offline loading.';renderOfflineStatus();return caches.open(AV_CACHE_NAME).then(function(cache){var start=refresh?caches.delete(AV_CACHE_NAME).then(function(){return caches.open(AV_CACHE_NAME);}):Promise.resolve(cache);return start.then(function(nextCache){return Promise.all(OFFLINE_ASSETS.map(function(asset){return fetchAndCacheAsset(nextCache,asset);}));});}).then(function(){return refreshOfflineStatus();}).then(function(){showHint('AV tools cached for offline loading.','success');if(button) signal(button,'success');return true;}).catch(function(){offlineState.busy=false;offlineState.cache='Error';offlineState.message='Could not cache every AV Suite file. Check the connection, then try Refresh Cache.';renderOfflineStatus();showHint('Could not cache every AV Suite file.','error');if(button) signal(button,'error');return false;});}
-  function clearOfflineCache(button){if(!offlineAvailable()){setOfflineMessage('Unavailable','This browser cannot prepare the AV Suite offline cache.');showHint('Offline cache is unavailable in this browser.','error');if(button) signal(button,'error');return Promise.resolve(false);}offlineState.busy=true;offlineState.cache='Clearing';offlineState.message='Clearing AV Suite offline cache.';renderOfflineStatus();return caches.delete(AV_CACHE_NAME).then(function(){offlineState.cached=0;return refreshOfflineStatus();}).then(function(){showHint('Offline cache cleared.','success');if(button) signal(button,'success');return true;}).catch(function(){offlineState.busy=false;offlineState.cache='Error';offlineState.message='Could not clear the AV Suite offline cache.';renderOfflineStatus();showHint('Could not clear offline cache.','error');if(button) signal(button,'error');return false;});}
+  function cacheAvTools(refresh,button){if(!offlineAvailable()){setOfflineMessage('Unavailable','This browser cannot prepare the AV by Dave offline cache.');showHint('Offline cache is unavailable in this browser.','error');if(button) signal(button,'error');return Promise.resolve(false);}offlineState.supported=true;offlineState.online=navigator.onLine!==false;offlineState.busy=true;offlineState.cache=refresh?'Refreshing':'Caching';offlineState.message=(refresh?'Refreshing':'Caching')+' AV by Dave files for offline loading.';renderOfflineStatus();return caches.open(AV_CACHE_NAME).then(function(cache){var start=refresh?caches.delete(AV_CACHE_NAME).then(function(){return caches.open(AV_CACHE_NAME);}):Promise.resolve(cache);return start.then(function(nextCache){return Promise.all(OFFLINE_ASSETS.map(function(asset){return fetchAndCacheAsset(nextCache,asset);}));});}).then(function(){return refreshOfflineStatus();}).then(function(){showHint('AV tools cached for offline loading.','success');if(button) signal(button,'success');return true;}).catch(function(){offlineState.busy=false;offlineState.cache='Error';offlineState.message='Could not cache every AV by Dave file. Check the connection, then try Refresh Cache.';renderOfflineStatus();showHint('Could not cache every AV by Dave file.','error');if(button) signal(button,'error');return false;});}
+  function clearOfflineCache(button){if(!offlineAvailable()){setOfflineMessage('Unavailable','This browser cannot prepare the AV by Dave offline cache.');showHint('Offline cache is unavailable in this browser.','error');if(button) signal(button,'error');return Promise.resolve(false);}offlineState.busy=true;offlineState.cache='Clearing';offlineState.message='Clearing the AV by Dave offline cache.';renderOfflineStatus();return caches.delete(AV_CACHE_NAME).then(function(){offlineState.cached=0;return refreshOfflineStatus();}).then(function(){showHint('Offline cache cleared.','success');if(button) signal(button,'success');return true;}).catch(function(){offlineState.busy=false;offlineState.cache='Error';offlineState.message='Could not clear the AV by Dave offline cache.';renderOfflineStatus();showHint('Could not clear offline cache.','error');if(button) signal(button,'error');return false;});}
   function updateStats(visibleCount){var counts=readinessCounts();$('toolCountOut').textContent=TOOLS.length;$('readyCountOut').textContent=counts.ready;$('issueCountOut').textContent=counts.issue;$('skipCountOut').textContent=counts.skipped;$('pinnedCountOut').textContent=state.favorites.length;$('visibleCountOut').textContent=visibleCount;}
   function render(){renderPhaseButtons();renderFilters();setInputValues();renderRecommendations();renderTools();renderRecent();renderPhaseGate();renderReadiness();renderOfflineStatus();if(commandState.open) renderCommandPalette();}
-  function syncProfile(){state.showName=inputs.showName.value;state.venue=inputs.venue.value;state.showDate=inputs.showDate.value;state.operator=inputs.operator.value;$('showTitleOut').textContent=state.showName||'AV Tool Suite';saveState();}
+  function syncProfile(){state.showName=inputs.showName.value;state.venue=inputs.venue.value;state.showDate=inputs.showDate.value;state.operator=inputs.operator.value;$('showTitleOut').textContent=state.showName||'AV by Dave';saveState();}
   function setPhase(id){if(!phaseExists(id)||id==='all') return;state.phase=id;state.filters.phase=id;saveState();render();showHint('Recommended tools updated for '+titleCase(id)+'.','success');}
   function togglePin(id){var index=state.favorites.indexOf(id);var tool=toolById(id);if(!tool) return;if(index>=0){state.favorites.splice(index,1);showHint(tool.name+' unpinned.','success');}else{state.favorites.unshift(id);showHint(tool.name+' pinned.','success');}saveState();renderTools();renderRecent();}
   function setToolReadiness(id,value){var tool=toolById(id);if(!tool||READINESS_VALUES.indexOf(value)<0) return;if(value==='pending') delete state.readiness[id];else state.readiness[id]=value;saveState();renderTools();renderPhaseGate();renderReadiness();showHint(tool.name+' marked '+readinessLabel(value).toLowerCase()+'.','success');}
@@ -1003,9 +1052,9 @@
   function markdownCell(value){var text=String(value||'TBD').replace(/\|/g,'/').replace(/\s+/g,' ').trim();return text||'TBD';}
   function toolNameList(tools,limit){var max=limit||8;var names=tools.slice(0,max).map(function(tool){return tool.name;});if(tools.length>max) names.push('plus '+(tools.length-max)+' more');return names.length?names.join(', '):'None';}
   function noteLinesFor(tools){var lines=[];tools.forEach(function(tool){var note=toolNote(tool.id);if(note) lines.push(tool.name+': '+note);});return lines;}
-  function phaseHandoffLines(){var counts=readinessCounts();var recommended=recommendedTools();var issueTools=TOOLS.filter(function(tool){return toolReadiness(tool.id)==='issue';});var readyTools=TOOLS.filter(function(tool){return toolReadiness(tool.id)==='ready';});var skippedTools=TOOLS.filter(function(tool){return toolReadiness(tool.id)==='skipped';});var noteTools=TOOLS.filter(function(tool){return toolNote(tool.id);});var pendingRecommended=recommended.filter(function(tool){return toolReadiness(tool.id)==='pending';});var signalNotes=noteLinesFor(TOOLS.filter(function(tool){return ['Audio','Video','Network','Power','Comms','Show Flow'].indexOf(tool.dept)>=0;}));var clientCrewNotes=noteLinesFor(TOOLS.filter(function(tool){return ['Labor','Client','Closeout'].indexOf(tool.dept)>=0;}));var reviewItems=reviewQueueItems();var savedCount=savedToolCount();var matrixRows=[];var lines=['AV SUITE PHASE HANDOFF','','SHOW / PROJECT: '+(state.showName||'AV Tool Suite'),'CURRENT STATUS: '+titleCase(state.phase)+' phase. '+counts.ready+' ready, '+counts.issue+' issue, '+counts.skipped+' skipped, '+counts.pending+' pending.','WHAT IS WORKING: '+(readyTools.length?toolNameList(readyTools,10):'No tools marked Ready yet.'),'WHAT IS NOT WORKING: '+(issueTools.length?toolNameList(issueTools,10):'No tools marked Issue.'),'GEAR / SYSTEMS INVOLVED: Current phase recommendations: '+toolNameList(recommended,10),'SIGNAL FLOW / NETWORK / CONTROL NOTES: '+(signalNotes.length?signalNotes.join(' | '):'No signal, network, or control notes entered in AV Suite.'),'KEY DECISIONS: Current phase is '+titleCase(state.phase)+'. Pinned tools: '+toolNameList(state.favorites.map(toolById).filter(Boolean),10)+'.','CLIENT / CREW NOTES: '+(clientCrewNotes.length?clientCrewNotes.join(' | '):'No client or crew notes entered in AV Suite.'),'RISKS / GOTCHAS: '+(issueTools.length?toolNameList(issueTools,10)+' marked Issue.':(skippedTools.length?toolNameList(skippedTools,10)+' marked Skipped.':'No active issue tools marked.')),'QUESTIONS STILL OPEN: '+(pendingRecommended.length?toolNameList(pendingRecommended,10)+' still pending for '+titleCase(state.phase)+'.':'No pending current phase recommendations.'),'','SUMMARY TABLE','| Item | Status |','| --- | --- |','| Show | '+markdownCell(state.showName)+' |','| Venue | '+markdownCell(state.venue)+' |','| Date | '+markdownCell(state.showDate)+' |','| Operator | '+markdownCell(state.operator)+' |','| Phase | '+markdownCell(titleCase(state.phase))+' |','| Suite link | '+markdownCell(absoluteHref(suiteLinkHref()))+' |','| Readiness | '+counts.ready+' ready, '+counts.issue+' issue, '+counts.skipped+' skipped, '+counts.pending+' pending |','| Saved tool data | '+savedCount+' tools |','| Pinned tools | '+state.favorites.length+' tools |'];if(issueTools.length) matrixRows.push(['Issue tools','Hold or assign owner',issueTools.length+' tools marked Issue']);if(noteTools.length) matrixRows.push(['Readiness notes','Review before handoff',noteTools.length+' tools have notes']);if(skippedTools.length) matrixRows.push(['Skipped tools','Confirm waiver',skippedTools.length+' tools marked Skipped']);if(savedCount) matrixRows.push(['Saved tool data','Export show package',savedCount+' tools have saved data in this browser']);if(pendingRecommended.length) matrixRows.push(['Phase recommendations','Check next',pendingRecommended.length+' current phase tools still pending']);if(!matrixRows.length) matrixRows.push(['Current phase','Proceed','No active issue, note, skipped, or pending recommendation found']);lines.push('','DECISION MATRIX','| Area | Recommendation | Reason |','| --- | --- | --- |');matrixRows.forEach(function(row){lines.push('| '+markdownCell(row[0])+' | '+markdownCell(row[1])+' | '+markdownCell(row[2])+' |');});lines.push('','PRIORITIZED ACTIONS');reviewItems.forEach(function(item,index){lines.push((index+1)+'. '+item.label+' | '+item.detail+(item.tool?' | '+absoluteHref(toolHref(item.tool)):''));});lines.push('','RECOMMENDED LINKS','AV Suite | '+absoluteHref(suiteLinkHref()));recommended.forEach(function(tool){lines.push(launchLine(tool));});lines.push('','NEXT ACTIONS: Work the numbered actions above, then refresh readiness and export the show package if another machine needs the data.');return lines;}
+  function phaseHandoffLines(){var counts=readinessCounts();var recommended=recommendedTools();var issueTools=TOOLS.filter(function(tool){return toolReadiness(tool.id)==='issue';});var readyTools=TOOLS.filter(function(tool){return toolReadiness(tool.id)==='ready';});var skippedTools=TOOLS.filter(function(tool){return toolReadiness(tool.id)==='skipped';});var noteTools=TOOLS.filter(function(tool){return toolNote(tool.id);});var pendingRecommended=recommended.filter(function(tool){return toolReadiness(tool.id)==='pending';});var signalNotes=noteLinesFor(TOOLS.filter(function(tool){return ['Audio','Video','Network','Power','Comms','Show Flow'].indexOf(tool.dept)>=0;}));var clientCrewNotes=noteLinesFor(TOOLS.filter(function(tool){return ['Labor','Client','Closeout'].indexOf(tool.dept)>=0;}));var reviewItems=reviewQueueItems();var savedCount=savedToolCount();var matrixRows=[];var lines=['AV BY DAVE PHASE HANDOFF','','SHOW / PROJECT: '+(state.showName||'AV by Dave'),'CURRENT STATUS: '+titleCase(state.phase)+' phase. '+counts.ready+' ready, '+counts.issue+' issue, '+counts.skipped+' skipped, '+counts.pending+' pending.','WHAT IS WORKING: '+(readyTools.length?toolNameList(readyTools,10):'No tools marked Ready yet.'),'WHAT IS NOT WORKING: '+(issueTools.length?toolNameList(issueTools,10):'No tools marked Issue.'),'GEAR / SYSTEMS INVOLVED: Current phase recommendations: '+toolNameList(recommended,10),'SIGNAL FLOW / NETWORK / CONTROL NOTES: '+(signalNotes.length?signalNotes.join(' | '):'No signal, network, or control notes entered in AV by Dave.'),'KEY DECISIONS: Current phase is '+titleCase(state.phase)+'. Pinned tools: '+toolNameList(state.favorites.map(toolById).filter(Boolean),10)+'.','CLIENT / CREW NOTES: '+(clientCrewNotes.length?clientCrewNotes.join(' | '):'No client or crew notes entered in AV by Dave.'),'RISKS / GOTCHAS: '+(issueTools.length?toolNameList(issueTools,10)+' marked Issue.':(skippedTools.length?toolNameList(skippedTools,10)+' marked Skipped.':'No active issue tools marked.')),'QUESTIONS STILL OPEN: '+(pendingRecommended.length?toolNameList(pendingRecommended,10)+' still pending for '+titleCase(state.phase)+'.':'No pending current phase recommendations.'),'','SUMMARY TABLE','| Item | Status |','| --- | --- |','| Show | '+markdownCell(state.showName)+' |','| Venue | '+markdownCell(state.venue)+' |','| Date | '+markdownCell(state.showDate)+' |','| Operator | '+markdownCell(state.operator)+' |','| Phase | '+markdownCell(titleCase(state.phase))+' |','| Suite link | '+markdownCell(absoluteHref(suiteLinkHref()))+' |','| Readiness | '+counts.ready+' ready, '+counts.issue+' issue, '+counts.skipped+' skipped, '+counts.pending+' pending |','| Saved tool data | '+savedCount+' tools |','| Pinned tools | '+state.favorites.length+' tools |'];if(issueTools.length) matrixRows.push(['Issue tools','Hold or assign owner',issueTools.length+' tools marked Issue']);if(noteTools.length) matrixRows.push(['Readiness notes','Review before handoff',noteTools.length+' tools have notes']);if(skippedTools.length) matrixRows.push(['Skipped tools','Confirm waiver',skippedTools.length+' tools marked Skipped']);if(savedCount) matrixRows.push(['Saved tool data','Export show package',savedCount+' tools have saved data in this browser']);if(pendingRecommended.length) matrixRows.push(['Phase recommendations','Check next',pendingRecommended.length+' current phase tools still pending']);if(!matrixRows.length) matrixRows.push(['Current phase','Proceed','No active issue, note, skipped, or pending recommendation found']);lines.push('','DECISION MATRIX','| Area | Recommendation | Reason |','| --- | --- | --- |');matrixRows.forEach(function(row){lines.push('| '+markdownCell(row[0])+' | '+markdownCell(row[1])+' | '+markdownCell(row[2])+' |');});lines.push('','PRIORITIZED ACTIONS');reviewItems.forEach(function(item,index){lines.push((index+1)+'. '+item.label+' | '+item.detail+(item.tool?' | '+absoluteHref(toolHref(item.tool)):''));});lines.push('','RECOMMENDED LINKS','AV by Dave | '+absoluteHref(suiteLinkHref()));recommended.forEach(function(tool){lines.push(launchLine(tool));});lines.push('','NEXT ACTIONS: Work the numbered actions above, then refresh readiness and export the show package if another machine needs the data.');return lines;}
   function renderPhaseHandoffSummary(){var target=$('phaseHandoffSummary');var counts;if(!target) return;counts=readinessCounts();target.innerHTML='<strong>'+titleCase(state.phase)+' handoff:</strong> '+counts.ready+' ready, '+counts.issue+' issue, '+counts.skipped+' skipped, '+reviewQueueItems().length+' next actions.';}
-  function phaseGateLines(){var items=phaseGateItems();var counts=phaseGateCounts(items);var lines=['AV SUITE PHASE GATE','Show: '+state.showName,'Venue: '+state.venue,'Date: '+state.showDate,'Operator: '+state.operator,'Phase: '+titleCase(state.phase),'Gate: '+phaseGateSummaryText(items,counts),'Suite link: '+absoluteHref(suiteLinkHref()),'','Recommended tools:'];items.forEach(function(item,index){lines.push((index+1)+'. '+readinessLabel(item.ready)+' | '+item.tool.name+(item.note?' | Note: '+item.note:'')+(item.saved?' | Saved data: '+item.saved:'')+' | '+absoluteHref(toolHref(item.tool)));});if(!items.length) lines.push('No recommended tools mapped for this phase.');return lines;}
+  function phaseGateLines(){var items=phaseGateItems();var counts=phaseGateCounts(items);var lines=['AV BY DAVE PHASE GATE','Show: '+state.showName,'Venue: '+state.venue,'Date: '+state.showDate,'Operator: '+state.operator,'Phase: '+titleCase(state.phase),'Gate: '+phaseGateSummaryText(items,counts),'Suite link: '+absoluteHref(suiteLinkHref()),'','Recommended tools:'];items.forEach(function(item,index){lines.push((index+1)+'. '+readinessLabel(item.ready)+' | '+item.tool.name+(item.note?' | Note: '+item.note:'')+(item.saved?' | Saved data: '+item.saved:'')+' | '+absoluteHref(toolHref(item.tool)));});if(!items.length) lines.push('No recommended tools mapped for this phase.');return lines;}
   function copyPhaseGate(){copyText(phaseGateLines().join('\n')).then(function(){showHint('Phase gate copied.','success');signal($('copyPhaseGateBtn'),'success');}).catch(function(){showHint('Could not copy phase gate.','error');signal($('copyPhaseGateBtn'),'error');});}
   function copyPhaseHandoff(){copyText(phaseHandoffLines().join('\n')).then(function(){showHint('Phase handoff copied.','success');signal($('copyPhaseHandoffBtn'),'success');}).catch(function(){showHint('Could not copy phase handoff.','error');signal($('copyPhaseHandoffBtn'),'error');});}
   function copySuiteLink(){copyText(absoluteHref(suiteLinkHref())).then(function(){showHint('Suite link copied with show profile and phase.','success');signal($('copySuiteLinkBtn'),'success');}).catch(function(){showHint('Could not copy suite link.','error');signal($('copySuiteLinkBtn'),'error');});}
@@ -1013,7 +1062,7 @@
   function commandEntry(id,title,detail,kind,run,search,priority,badge){return {id:id,title:title,detail:detail,kind:kind,run:run,search:[title,detail,kind,search||''].join(' '),priority:priority||100,badge:badge||''};}
   function setSuiteView(value,label){state.filters.pin=value;if(['issues','notes','saved'].indexOf(value)>=0) state.filters.phase='all';saveState();render();showHint(label+' view active.','success');}
   function clearToolFilters(){state.filters={search:'',phase:'all',dept:'all',pin:'all'};saveState();render();showHint('Tool filters cleared.','success');}
-  function commandPool(){var items=[];var counts=readinessCounts();var recommended=recommendedTools();var recommendedIds=recommended.map(function(tool){return tool.id;});var first=recommended[0];reviewQueueItems().forEach(function(item,index){items.push(commandEntry('review:'+index,item.label,item.detail,'Review',function(){handleReviewAction(item.action);if(item.tool) openTool(item.tool.id);},item.tool?item.tool.name:'',10+index));});if(first){items.push(commandEntry('action:openRecommended','Open recommended tool',first.name+' for '+titleCase(state.phase),'Action',function(){openTool(first.id);},first.dept+' '+first.tag,22));}items.push(commandEntry('action:copyPhaseGate','Copy phase gate',titleCase(state.phase)+' recommended tool readiness','Action',copyPhaseGate,'phase gate checklist current recommendations',23));items.push(commandEntry('action:copyPhaseHandoff','Copy phase handoff',titleCase(state.phase)+' status packet with actions and links','Action',copyPhaseHandoff,'handoff status copy',24));items.push(commandEntry('action:copySuiteLink','Copy suite link','Show profile and current phase URL','Action',copySuiteLink,'suite link show profile phase URL',26));items.push(commandEntry('action:copyReviewQueue','Copy review queue',reviewQueueItems().length+' prioritized actions','Action',copyReviewQueue,'review queue next actions',28));items.push(commandEntry('action:copyLaunchList','Copy launch list',recommended.length+' current phase recommendations','Action',copyLaunchList,'launch links recommended',30));items.push(commandEntry('action:scanSavedData','Scan saved tool data',savedToolCount()+' tools have saved data now','Action',scanSavedToolData,'saved browser data issue scan',32));items.push(commandEntry('action:markRecommendedReady','Mark recommended ready',recommended.length+' current phase tools','Action',markRecommendedReady,'ready phase recommendations',34));items.push(commandEntry('action:showIssues','Show issues',counts.issue+' tools marked Issue','View',showIssues,'issue tools',36,'Issue'));items.push(commandEntry('action:showNotes','Show notes',TOOLS.filter(function(tool){return toolNote(tool.id);}).length+' tools have notes','View',showNotes,'notes handoff',38,'Notes'));items.push(commandEntry('action:pinRecommended','Pin recommended set',recommended.length+' tools for '+titleCase(state.phase),'Action',pinRecommended,'pin current phase',42));items.push(commandEntry('action:exportPackage','Export show package',packageToolData().length+' saved tool entries','Action',exportPackage,'backup transfer package',44));items.push(commandEntry('action:exportSuite','Export suite JSON','Profile, filters, readiness, notes, and recent commands','Action',exportSuite,'backup preferences json',46));items.push(commandEntry('action:cacheAvTools','Cache AV tools',offlineState.cached+'/'+offlineState.total+' files ready','Action',function(){cacheAvTools(false);},'offline cache tools network',48,offlineState.cache));items.push(commandEntry('action:refreshOfflineCache','Refresh offline cache','Reload AV Suite cache from the current site','Action',function(){cacheAvTools(true);},'offline cache refresh network',50));items.push(commandEntry('action:clearOfflineCache','Clear offline cache','Remove cached AV Suite files from this browser','Action',function(){clearOfflineCache();},'offline cache clear browser',52));PHASES.forEach(function(phase,index){items.push(commandEntry('phase:'+phase.id,'Switch phase: '+phase.label,(RECOMMENDED[phase.id]||[]).length+' recommended tools','Phase',function(){setPhase(phase.id);},phase.id+' '+phase.label,58+index));});[['all','All tools'],['pinned','Pinned only'],['recent','Recent only'],['ready','Ready only'],['issues','Issues only'],['skipped','Skipped only'],['notes','Notes only'],['saved','Saved data only']].forEach(function(view,index){items.push(commandEntry('view:'+view[0],'View: '+view[1],'Apply tool grid filter','View',function(){setSuiteView(view[0],view[1]);},view.join(' '),70+index));});TOOLS.forEach(function(tool){var ready=toolReadiness(tool.id);var note=toolNote(tool.id);var saved=savedEntriesForTool(tool.id).length;var priority=105;var flags=[];if(recommendedIds.indexOf(tool.id)>=0){priority-=38;flags.push('recommended');}if(ready==='issue'){priority-=34;flags.push('issue');}if(note){priority-=20;flags.push('note');}if(state.favorites.indexOf(tool.id)>=0){priority-=14;flags.push('pinned');}if(state.recent.indexOf(tool.id)>=0){priority-=10;flags.push('recent');}if(saved){priority-=8;flags.push(saved+' saved');}items.push(commandEntry('tool:'+tool.id,'Open '+tool.name,tool.dept+' | '+tool.tag+' | '+readinessLabel(ready)+(flags.length?' | '+flags.join(', '):''),'Tool',function(){openTool(tool.id);},[tool.name,tool.dept,tool.tag,tool.desc,tool.phases.join(' '),note,ready].join(' '),priority,readinessLabel(ready)));});return items;}
+  function commandPool(){var items=[];var counts=readinessCounts();var recommended=recommendedTools();var recommendedIds=recommended.map(function(tool){return tool.id;});var first=recommended[0];reviewQueueItems().forEach(function(item,index){items.push(commandEntry('review:'+index,item.label,item.detail,'Review',function(){handleReviewAction(item.action);if(item.tool) openTool(item.tool.id);},item.tool?item.tool.name:'',10+index));});if(first){items.push(commandEntry('action:openRecommended','Open recommended tool',first.name+' for '+titleCase(state.phase),'Action',function(){openTool(first.id);},first.dept+' '+first.tag,22));}items.push(commandEntry('action:copyPhaseGate','Copy phase gate',titleCase(state.phase)+' recommended tool readiness','Action',copyPhaseGate,'phase gate checklist current recommendations',23));items.push(commandEntry('action:copyPhaseHandoff','Copy phase handoff',titleCase(state.phase)+' status packet with actions and links','Action',copyPhaseHandoff,'handoff status copy',24));items.push(commandEntry('action:copySuiteLink','Copy suite link','Show profile and current phase URL','Action',copySuiteLink,'suite link show profile phase URL',26));items.push(commandEntry('action:copyReviewQueue','Copy review queue',reviewQueueItems().length+' prioritized actions','Action',copyReviewQueue,'review queue next actions',28));items.push(commandEntry('action:copyLaunchList','Copy launch list',recommended.length+' current phase recommendations','Action',copyLaunchList,'launch links recommended',30));items.push(commandEntry('action:scanSavedData','Scan saved tool data',savedToolCount()+' tools have saved data now','Action',scanSavedToolData,'saved browser data issue scan',32));items.push(commandEntry('action:markRecommendedReady','Mark recommended ready',recommended.length+' current phase tools','Action',markRecommendedReady,'ready phase recommendations',34));items.push(commandEntry('action:showIssues','Show issues',counts.issue+' tools marked Issue','View',showIssues,'issue tools',36,'Issue'));items.push(commandEntry('action:showNotes','Show notes',TOOLS.filter(function(tool){return toolNote(tool.id);}).length+' tools have notes','View',showNotes,'notes handoff',38,'Notes'));items.push(commandEntry('action:pinRecommended','Pin recommended set',recommended.length+' tools for '+titleCase(state.phase),'Action',pinRecommended,'pin current phase',42));items.push(commandEntry('action:exportPackage','Export show package',packageToolData().length+' saved tool entries','Action',exportPackage,'backup transfer package',44));items.push(commandEntry('action:exportSuite','Export suite JSON','Profile, filters, readiness, notes, and recent commands','Action',exportSuite,'backup preferences json',46));items.push(commandEntry('action:cacheAvTools','Cache AV tools',offlineState.cached+'/'+offlineState.total+' files ready','Action',function(){cacheAvTools(false);},'offline cache tools network',48,offlineState.cache));items.push(commandEntry('action:refreshOfflineCache','Refresh offline cache','Reload the AV by Dave cache from the current site','Action',function(){cacheAvTools(true);},'offline cache refresh network',50));items.push(commandEntry('action:clearOfflineCache','Clear offline cache','Remove cached AV by Dave files from this browser','Action',function(){clearOfflineCache();},'offline cache clear browser',52));PHASES.forEach(function(phase,index){items.push(commandEntry('phase:'+phase.id,'Switch phase: '+phase.label,(RECOMMENDED[phase.id]||[]).length+' recommended tools','Phase',function(){setPhase(phase.id);},phase.id+' '+phase.label,58+index));});[['all','All tools'],['pinned','Pinned only'],['recent','Recent only'],['ready','Ready only'],['issues','Issues only'],['skipped','Skipped only'],['notes','Notes only'],['saved','Saved data only']].forEach(function(view,index){items.push(commandEntry('view:'+view[0],'View: '+view[1],'Apply tool grid filter','View',function(){setSuiteView(view[0],view[1]);},view.join(' '),70+index));});TOOLS.forEach(function(tool){var ready=toolReadiness(tool.id);var note=toolNote(tool.id);var saved=savedEntriesForTool(tool.id).length;var priority=105;var flags=[];if(recommendedIds.indexOf(tool.id)>=0){priority-=38;flags.push('recommended');}if(ready==='issue'){priority-=34;flags.push('issue');}if(note){priority-=20;flags.push('note');}if(state.favorites.indexOf(tool.id)>=0){priority-=14;flags.push('pinned');}if(state.recent.indexOf(tool.id)>=0){priority-=10;flags.push('recent');}if(saved){priority-=8;flags.push(saved+' saved');}items.push(commandEntry('tool:'+tool.id,'Open '+tool.name,tool.dept+' | '+tool.tag+' | '+readinessLabel(ready)+(flags.length?' | '+flags.join(', '):''),'Tool',function(){openTool(tool.id);},[tool.name,tool.dept,tool.tag,tool.desc,tool.phases.join(' '),note,ready].join(' '),priority,readinessLabel(ready)));});return items;}
   function commandScore(command,query){var terms=String(query||'').toLowerCase().split(/\s+/).filter(Boolean);var text=command.search.toLowerCase();var title=command.title.toLowerCase();var recentIndex=state.commandRecent.indexOf(command.id);var score=command.priority+(recentIndex>=0?recentIndex-60:0);if(!terms.length) return score;terms.forEach(function(term){var index=text.indexOf(term);if(index<0){score=99999;return;}score+=index;if(title.indexOf(term)===0) score-=25;});return score;}
   function filteredCommands(){var query=commandState.query;return commandPool().map(function(command,index){return {command:command,score:commandScore(command,query),index:index};}).filter(function(entry){return entry.score<99999;}).sort(function(a,b){return a.score-b.score||a.index-b.index;}).slice(0,14).map(function(entry){return entry.command;});}
   function renderCommandPalette(){var input=$('commandInput');var list=$('commandList');var counts=readinessCounts();var items=filteredCommands();commandState.items=items;if(commandState.activeIndex>=items.length) commandState.activeIndex=Math.max(0,items.length-1);$('commandStatus').textContent=titleCase(state.phase)+' phase | '+counts.issue+' issue | '+reviewQueueItems().length+' next actions';if(input&&input.value!==commandState.query) input.value=commandState.query;if(!items.length){list.innerHTML='<div class="empty">No matching command.</div>';input.removeAttribute('aria-activedescendant');return;}list.innerHTML=items.map(function(command,index){var active=index===commandState.activeIndex;var badge=command.badge?'<span class="badge command-ready">'+escapeHtml(command.badge)+'</span>':'';return '<div id="command-option-'+index+'" class="command-row '+(active?'is-active':'')+'" role="option" aria-selected="'+String(active)+'" data-command-index="'+index+'"><div class="command-kind">'+escapeHtml(command.kind)+'</div><div><strong>'+escapeHtml(command.title)+'</strong><span>'+escapeHtml(command.detail)+'</span></div>'+badge+'</div>';}).join('');input.setAttribute('aria-activedescendant','command-option-'+commandState.activeIndex);}
@@ -1026,19 +1075,19 @@
   function scanSavedToolData(){var scanned=0;var ready=0;var issue=0;var kept=0;if(!storageAvailable()){showHint('Browser storage is unavailable, so saved tool data could not be scanned.','error');signal($('scanSavedDataBtn'),'error');return;}TOOLS.forEach(function(tool){var entries=savedEntriesForTool(tool.id);var current=toolReadiness(tool.id);var snippet;if(!entries.length) return;scanned++;snippet=savedToolIssue(entries);if(snippet){if(current!=='skipped') state.readiness[tool.id]='issue';else kept++;state.toolNotes[tool.id]=cleanNote('Saved data mentions: '+snippet);issue++;return;}if(current==='issue'||current==='skipped'){kept++;return;}state.readiness[tool.id]='ready';ready++;});state.filters.pin='saved';state.filters.phase='all';saveState();render();showHint(scanned?('Scanned '+scanned+' saved tools. '+ready+' ready, '+issue+' with issue language, '+kept+' existing exceptions kept.'):'No saved AV tool data found to scan.','success');signal($('scanSavedDataBtn'),scanned?'success':'error');}
   function showIssues(){state.filters.pin='issues';state.filters.phase='all';saveState();render();showHint('Showing tools marked with issues.','success');}
   function showNotes(){state.filters.pin='notes';state.filters.phase='all';saveState();render();showHint('Showing tools with readiness notes.','success');}
-  function resetReadiness(){if(!window.confirm('Reset readiness for all AV suite tools?')) return;state.readiness={};saveState();render();showHint('Suite readiness reset.','success');}
-  function copyReviewQueue(){var counts=readinessCounts();var lines=['AV SUITE REVIEW QUEUE','Show: '+state.showName,'Venue: '+state.venue,'Date: '+state.showDate,'Operator: '+state.operator,'Phase: '+titleCase(state.phase),'Readiness: '+counts.ready+' ready, '+counts.issue+' issue, '+counts.skipped+' skipped','Saved tool data: '+savedToolCount()+' tools','','Prioritized actions:'];reviewQueueItems().forEach(function(item,index){lines.push((index+1)+'. '+item.label+' | '+item.detail+(item.tool?' | '+absoluteHref(toolHref(item.tool)):''));});copyText(lines.join('\n')).then(function(){showHint('Review queue copied.','success');signal($('copyReviewQueueBtn'),'success');}).catch(function(){showHint('Could not copy review queue.','error');signal($('copyReviewQueueBtn'),'error');});}
+  function resetReadiness(){if(!window.confirm('Reset readiness for all AV by Dave tools?')) return;state.readiness={};saveState();render();showHint('Suite readiness reset.','success');}
+  function copyReviewQueue(){var counts=readinessCounts();var lines=['AV BY DAVE REVIEW QUEUE','Show: '+state.showName,'Venue: '+state.venue,'Date: '+state.showDate,'Operator: '+state.operator,'Phase: '+titleCase(state.phase),'Readiness: '+counts.ready+' ready, '+counts.issue+' issue, '+counts.skipped+' skipped','Saved tool data: '+savedToolCount()+' tools','','Prioritized actions:'];reviewQueueItems().forEach(function(item,index){lines.push((index+1)+'. '+item.label+' | '+item.detail+(item.tool?' | '+absoluteHref(toolHref(item.tool)):''));});copyText(lines.join('\n')).then(function(){showHint('Review queue copied.','success');signal($('copyReviewQueueBtn'),'success');}).catch(function(){showHint('Could not copy review queue.','error');signal($('copyReviewQueueBtn'),'error');});}
   function handleReviewAction(action){if(action==='scan'){scanSavedToolData();return;}if(action==='package'){exportPackage();return;}}
-  function copyLaunchList(){var tools=recommendedTools();var counts=readinessCounts();var issueTools=TOOLS.filter(function(tool){return toolReadiness(tool.id)==='issue';});var noteTools=TOOLS.filter(function(tool){return toolNote(tool.id);});var lines=['AV SUITE LAUNCH LIST','Show: '+state.showName,'Venue: '+state.venue,'Date: '+state.showDate,'Operator: '+state.operator,'Phase: '+titleCase(state.phase),'Suite link: '+absoluteHref(suiteLinkHref()),'Readiness: '+counts.ready+' ready, '+counts.issue+' issue, '+counts.skipped+' skipped','Saved tool data: '+savedToolCount()+' tools','','Recommended:'];tools.forEach(function(tool){lines.push(launchLine(tool));});lines.push('');lines.push('Pinned:');state.favorites.map(toolById).filter(Boolean).forEach(function(tool){lines.push(launchLine(tool));});lines.push('');lines.push('Issues:');if(issueTools.length){issueTools.forEach(function(tool){lines.push(launchLine(tool));});}else{lines.push('None');}lines.push('');lines.push('Notes:');if(noteTools.length){noteTools.forEach(function(tool){lines.push(tool.name+' | '+toolNote(tool.id));});}else{lines.push('None');}copyText(lines.join('\n')).then(function(){showHint('Launch list copied with show context and notes.','success');signal($('copyLaunchBtn'),'success');}).catch(function(){showHint('Could not copy launch list.','error');signal($('copyLaunchBtn'),'error');});}
+  function copyLaunchList(){var tools=recommendedTools();var counts=readinessCounts();var issueTools=TOOLS.filter(function(tool){return toolReadiness(tool.id)==='issue';});var noteTools=TOOLS.filter(function(tool){return toolNote(tool.id);});var lines=['AV BY DAVE LAUNCH LIST','Show: '+state.showName,'Venue: '+state.venue,'Date: '+state.showDate,'Operator: '+state.operator,'Phase: '+titleCase(state.phase),'Suite link: '+absoluteHref(suiteLinkHref()),'Readiness: '+counts.ready+' ready, '+counts.issue+' issue, '+counts.skipped+' skipped','Saved tool data: '+savedToolCount()+' tools','','Recommended:'];tools.forEach(function(tool){lines.push(launchLine(tool));});lines.push('');lines.push('Pinned:');state.favorites.map(toolById).filter(Boolean).forEach(function(tool){lines.push(launchLine(tool));});lines.push('');lines.push('Issues:');if(issueTools.length){issueTools.forEach(function(tool){lines.push(launchLine(tool));});}else{lines.push('None');}lines.push('');lines.push('Notes:');if(noteTools.length){noteTools.forEach(function(tool){lines.push(tool.name+' | '+toolNote(tool.id));});}else{lines.push('None');}copyText(lines.join('\n')).then(function(){showHint('Launch list copied with show context and notes.','success');signal($('copyLaunchBtn'),'success');}).catch(function(){showHint('Could not copy launch list.','error');signal($('copyLaunchBtn'),'error');});}
   function exportSuite(){downloadFile(fileStem()+'.av-suite.json',JSON.stringify(suitePayload(),null,2),'application/json;charset=utf-8');showHint('Suite JSON exported.','success');signal($('exportSuiteBtn'),'success');}
-  function importErrorMessage(error,label){if(error instanceof SyntaxError) return label+' is not valid JSON.';if(error&&error.message==='Invalid package') return label+' has the wrong schema or is missing tool data.';if(error&&error.message==='Invalid payload') return label+' is missing valid AV Suite state.';return 'Could not import '+label.toLowerCase()+'.';}
+  function importErrorMessage(error,label){if(error instanceof SyntaxError) return label+' is not valid JSON.';if(error&&error.message==='Invalid package') return label+' has the wrong schema or is missing tool data.';if(error&&error.message==='Invalid payload') return label+' is missing valid AV by Dave state.';return 'Could not import '+label.toLowerCase()+'.';}
   function importSuiteFile(file){var reader=new FileReader();reader.onload=function(){try{applySuitePayload(JSON.parse(String(reader.result||'')));saveState();render();showHint('Suite JSON imported.','success');signal($('importSuiteBtn'),'success');}catch(e){showHint(importErrorMessage(e,'Suite JSON file'),'error');signal($('importSuiteBtn'),'error');}};reader.onerror=function(){showHint('Could not read that suite JSON file.','error');signal($('importSuiteBtn'),'error');};reader.readAsText(file);}
   function allowedPackageKey(key){return !SENSITIVE_PACKAGE_KEYS[key]&&TOOL_STORAGE_KEYS.some(function(item){return item.key===key;});}
   function packageToolData(){var entries=[];if(!storageAvailable()) return entries;TOOL_STORAGE_KEYS.forEach(function(item){var value;if(SENSITIVE_PACKAGE_KEYS[item.key]) return;value=localStorage.getItem(item.key);if(value!==null){entries.push({tool:item.tool,label:item.label,key:item.key,value:String(value)});}});return entries;}
   function packagePayload(){return {schema:'system-by-dave.av-suite-package.v1',exportedAt:new Date().toISOString(),suite:suitePayload(),toolData:packageToolData()};}
   function exportPackage(){var payload=packagePayload();downloadFile(fileStem()+'.av-show-package.json',JSON.stringify(payload,null,2),'application/json;charset=utf-8');showHint('Show package exported with '+payload.toolData.length+' saved tool '+(payload.toolData.length===1?'entry.':'entries.'),'success');signal($('exportPackageBtn'),'success');}
   function importPackageFile(file){var reader=new FileReader();reader.onload=function(){try{var parsed=JSON.parse(String(reader.result||''));var restored=0;if(!parsed||parsed.schema!=='system-by-dave.av-suite-package.v1'||!Array.isArray(parsed.toolData)) throw new Error('Invalid package');if(parsed.suite) applySuitePayload(parsed.suite);parsed.toolData.forEach(function(entry){if(!entry||!allowedPackageKey(entry.key)) return;localStorage.setItem(entry.key,String(entry.value||''));restored++;});saveState();render();showHint('Show package imported. Restored '+restored+' saved tool '+(restored===1?'entry.':'entries.'),'success');signal($('importPackageBtn'),'success');}catch(e){showHint(importErrorMessage(e,'Show package JSON file'),'error');signal($('importPackageBtn'),'error');}};reader.onerror=function(){showHint('Could not read that show package file.','error');signal($('importPackageBtn'),'error');};reader.readAsText(file);}
-  function clearPrefs(){if(!window.confirm('Clear AV Suite saved profile, readiness, pins, and recent tools?')) return;if(storageAvailable()) localStorage.removeItem(STORAGE_KEY);state=defaultState();render();showHint('Suite preferences cleared.','success');}
+  function clearPrefs(){if(!window.confirm('Clear AV by Dave saved profile, readiness, pins, and recent tools?')) return;if(storageAvailable()) localStorage.removeItem(STORAGE_KEY);state=defaultState();render();showHint('Suite preferences cleared.','success');}
   function absoluteHref(href){return new URL(href, window.location.href).href;}
   function fileStem(){return (state.showName||'av-suite').toLowerCase().replace(/['"]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,60)||'av-suite';}
   function downloadFile(filename,content,type){var blob=new Blob([content],{type:type});var url=URL.createObjectURL(blob);var link=document.createElement('a');link.href=url;link.download=filename;link.style.display='none';document.body.appendChild(link);link.click();setTimeout(function(){URL.revokeObjectURL(url);if(link.parentNode) link.parentNode.removeChild(link);},0);}
