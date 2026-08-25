@@ -12,6 +12,15 @@ function read(relativePath) {
   return fs.readFileSync(path.join(ROOT, relativePath), 'utf8');
 }
 
+function readJson(relativePath) {
+  try {
+    return JSON.parse(read(relativePath));
+  } catch (error) {
+    fail(`${relativePath} could not be loaded: ${error.message}`);
+    return null;
+  }
+}
+
 function fail(message) {
   failures.push(message);
 }
@@ -42,6 +51,65 @@ const stage = read('ProjectorThrow/Stage3D.html');
 const sidecar = read('ProjectorThrow/three-d-stage.js');
 const sitemap = read('sitemap.xml');
 const avRegistry = registry();
+const catalogSource = read('ProjectorThrow/data/throwline-pilot-catalog.v1.json');
+const catalog = readJson('ProjectorThrow/data/throwline-pilot-catalog.v1.json');
+
+if (catalogSource.includes('\uFFFD')) fail('Throwline pilot catalog contains Unicode replacement characters.');
+
+if (catalog) {
+  const expectedCounts = {
+    manufacturers: 5,
+    projectors: 4,
+    lenses: 13,
+    compatibility: 13,
+    opticalProfiles: 8,
+    sources: 13,
+    researchExceptions: 6,
+  };
+  if (catalog.schemaVersion !== 1) fail('Throwline pilot catalog must use schema version 1.');
+  if (catalog.meta?.sourceWorkbookSha256 !== '4a70b2b553df12beee1373592e251e30ed1d84257304848b9c32cbc1e3ea818d') {
+    fail('Throwline pilot catalog workbook fingerprint does not match the audited source.');
+  }
+  if (JSON.stringify(catalog.meta?.counts) !== JSON.stringify(expectedCounts)) {
+    fail(`Throwline pilot catalog counts must be ${JSON.stringify(expectedCounts)}.`);
+  }
+  if (catalog.meta?.calculationReadyCount !== 0) fail('Throwline pilot catalog must contain zero calculation-ready profiles.');
+
+  const collections = [
+    ['manufacturers', 'manufacturer_id'],
+    ['projectors', 'projector_id'],
+    ['lenses', 'lens_id'],
+    ['compatibility', 'compatibility_id'],
+    ['opticalProfiles', 'optical_profile_id'],
+    ['sources', 'source_id'],
+    ['researchExceptions', 'exception_id'],
+  ];
+  const ids = {};
+  collections.forEach(([name, key]) => {
+    const rows = Array.isArray(catalog[name]) ? catalog[name] : [];
+    const values = rows.map((row) => row[key]);
+    ids[name] = new Set(values);
+    if (rows.length !== expectedCounts[name]) fail(`Throwline pilot catalog ${name} count is invalid.`);
+    if (values.some((value) => typeof value !== 'string' || !value)) fail(`Throwline pilot catalog ${name} contains a missing ID.`);
+    if (ids[name].size !== values.length) fail(`Throwline pilot catalog ${name} contains duplicate IDs.`);
+  });
+  catalog.compatibility.forEach((row) => {
+    if (!ids.projectors.has(row.projector_id)) fail(`Compatibility ${row.compatibility_id} references a missing projector.`);
+    if (!ids.lenses.has(row.lens_id)) fail(`Compatibility ${row.compatibility_id} references a missing lens.`);
+  });
+  catalog.opticalProfiles.forEach((profile) => {
+    if (!ids.projectors.has(profile.projector_id)) fail(`Profile ${profile.optical_profile_id} references a missing projector.`);
+    if (!ids.lenses.has(profile.lens_id)) fail(`Profile ${profile.optical_profile_id} references a missing lens.`);
+    if (!ids.compatibility.has(profile.compatibility_id)) fail(`Profile ${profile.optical_profile_id} references missing compatibility.`);
+    if (!Number.isFinite(profile.throw_ratio_min) || !Number.isFinite(profile.throw_ratio_max) || profile.throw_ratio_min <= 0 || profile.throw_ratio_max < profile.throw_ratio_min) {
+      fail(`Profile ${profile.optical_profile_id} has an invalid throw-ratio range.`);
+    }
+    if (profile.automaticCalculationAllowed !== false) fail(`Profile ${profile.optical_profile_id} must be calculation-blocked.`);
+    if (!['manufacturer_unspecified', 'conflicting', 'partial'].includes(profile.calculationState)) {
+      fail(`Profile ${profile.optical_profile_id} has an invalid calculation state.`);
+    }
+  });
+}
 
 if (!avRegistry || !Array.isArray(avRegistry.tools)) fail('SBD_REGISTRY.tools did not load.');
 
