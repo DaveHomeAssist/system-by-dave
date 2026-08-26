@@ -2,6 +2,13 @@
 
 ## 2026-08-26
 
+### AV Calculator visual and contrast pass
+
+* Fixed the calculator hero's light-theme contrast by giving its heading, supporting copy, and capability markers an explicit high-contrast field-console palette.
+* Added color-coded calculator rails, indexed headers, stronger result readouts, focus-within emphasis, and a restrained reduced-motion-safe entrance sequence without changing calculator behavior.
+* Increased calculator controls to 44-pixel targets and sharpened the contrast of the related-tool links.
+* Updated the browser theme probe to exercise the suite's stored Light and Dark operator modes instead of accidentally testing the default dark mode twice.
+
 ### AV Calculator power-estimate reliability
 
 * Relabeled the Power Load amperage output as a power-factor-1 estimate, removed circuit-safety verdicts, and made the summary direct operators to equipment nameplate current or VA plus startup and inrush demand.

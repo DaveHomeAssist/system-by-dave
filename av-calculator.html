@@ -52,6 +52,15 @@
     --med:180ms;
     --ease:cubic-bezier(.2,.8,.2,1);
     --press:cubic-bezier(.2,0,0,1);
+    --calc-hero:#17212b;
+    --calc-hero-deep:#0d131a;
+    --calc-hero-text:#fffaf4;
+    --calc-hero-muted:#d9d4cc;
+    --calc-hero-accent:#f0a46f;
+    --calc-hero-line:rgba(255,250,244,.18);
+    --card-accent:var(--av-accent);
+    --card-accent-soft:var(--av-accent-soft);
+    --card-accent-line:var(--av-accent-line);
   }
 
   *{box-sizing:border-box}
@@ -82,7 +91,7 @@
     font:inherit;
   }
   button{
-    min-height:40px;
+    min-height:44px;
     border:1px solid var(--line);
     border-radius:var(--radius);
     background:var(--panel-2);
@@ -125,7 +134,7 @@
   }
   input,select{
     width:100%;
-    min-height:40px;
+    min-height:44px;
     border:1px solid var(--line);
     border-radius:var(--radius);
     background:#0e1318;
@@ -226,9 +235,9 @@
     flex-wrap:wrap;
   }
   .top-link{
-    color:var(--muted);
+    color:var(--text-2);
     font-family:var(--mono);
-    font-size:12px;
+    font-size:12.5px;
     letter-spacing:.04em;
     text-transform:uppercase;
     text-decoration:none;
@@ -243,20 +252,48 @@
     padding:22px 18px 34px;
   }
   .hero{
+    position:relative;
+    isolation:isolate;
+    overflow:hidden;
     margin-bottom:18px;
-    padding:20px;
+    padding:clamp(22px,3vw,38px);
     display:grid;
     grid-template-columns:minmax(0,1fr) auto;
     gap:18px;
     align-items:end;
-    background:linear-gradient(180deg,rgba(18,23,29,.96),rgba(12,15,19,.96));
-    border:1px solid rgba(255,255,255,.09);
-    border-radius:14px;
+    background:
+      radial-gradient(circle at 84% 12%,rgba(114,184,255,.18),transparent 24rem),
+      linear-gradient(135deg,var(--calc-hero) 0%,var(--calc-hero-deep) 72%);
+    background-color:var(--calc-hero-deep);
+    border:1px solid var(--calc-hero-line);
+    border-radius:18px;
     box-shadow:var(--shadow);
   }
-  .eyebrow{
+  .hero::before{
+    content:"";
+    position:absolute;
+    z-index:-1;
+    inset:0;
+    background:
+      repeating-linear-gradient(90deg,rgba(255,255,255,.045) 0 1px,transparent 1px 52px),
+      repeating-linear-gradient(0deg,rgba(255,255,255,.035) 0 1px,transparent 1px 52px);
+    mask-image:linear-gradient(90deg,#000,transparent 72%);
+  }
+  .hero::after{
+    content:"";
+    position:absolute;
+    z-index:-1;
+    width:260px;
+    height:260px;
+    right:-96px;
+    bottom:-190px;
+    border:34px solid rgba(240,164,111,.16);
+    border-radius:50%;
+  }
+  .hero-copy{min-width:0}
+  .hero .eyebrow{
     margin:0 0 10px;
-    color:var(--rust-2);
+    color:var(--calc-hero-accent);
     font-family:var(--mono);
     font-size:11px;
     letter-spacing:.12em;
@@ -264,6 +301,7 @@
   }
   h1{
     margin:0;
+    color:var(--calc-hero-text);
     font-size:clamp(34px,5vw,64px);
     line-height:1.02;
     letter-spacing:-.05em;
@@ -271,8 +309,40 @@
   .hero p{
     max-width:760px;
     margin:12px 0 0;
-    color:var(--muted);
+    color:var(--calc-hero-muted);
     font-size:15px;
+  }
+  .hero-signals{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin:18px 0 0;
+    padding:0;
+    list-style:none;
+  }
+  .hero-signals li{
+    display:inline-flex;
+    align-items:center;
+    gap:7px;
+    min-height:28px;
+    padding:5px 9px;
+    border:1px solid var(--calc-hero-line);
+    border-radius:999px;
+    background:rgba(255,255,255,.055);
+    color:var(--calc-hero-muted);
+    font-family:var(--mono);
+    font-size:10px;
+    letter-spacing:.07em;
+    text-transform:uppercase;
+  }
+  .hero-signals li::before{
+    content:"";
+    width:6px;
+    height:6px;
+    flex:0 0 auto;
+    border-radius:50%;
+    background:var(--calc-hero-accent);
+    box-shadow:0 0 0 3px rgba(240,164,111,.13);
   }
   .hero-actions{
     display:flex;
@@ -289,28 +359,105 @@
   }
   .calc-card,
   .summary-panel{
-    background:linear-gradient(180deg,rgba(18,23,29,.96),rgba(12,15,19,.96));
-    border:1px solid rgba(255,255,255,.09);
+    position:relative;
+    isolation:isolate;
+    background:var(--av-surface);
+    border:1px solid var(--av-line);
     border-radius:14px;
     box-shadow:var(--shadow);
     overflow:hidden;
   }
+  html[data-av-tool="av-calculator"] .calc-card,
+  html[data-av-tool="av-calculator"] .summary-panel{
+    background:
+      linear-gradient(150deg,var(--card-accent-soft),transparent 13rem),
+      var(--av-surface);
+    border-color:var(--av-line);
+  }
+  .calc-card::before,
+  .summary-panel::before{
+    content:"";
+    position:absolute;
+    z-index:2;
+    inset:0 0 auto;
+    height:4px;
+    background:var(--card-accent);
+  }
+  .calc-card::after,
+  .summary-panel::after{
+    content:"";
+    position:absolute;
+    z-index:-1;
+    width:120px;
+    height:120px;
+    right:-72px;
+    top:-72px;
+    border:20px solid var(--card-accent-soft);
+    border-radius:50%;
+  }
+  #audioCard{
+    --card-accent:var(--av-focus);
+    --card-accent-soft:var(--av-focus-soft);
+    --card-accent-line:var(--av-focus-line);
+  }
+  #projectionCard{
+    --card-accent:var(--av-warning);
+    --card-accent-soft:var(--av-warning-soft);
+    --card-accent-line:var(--av-warning-line);
+  }
+  #storageCard{
+    --card-accent:var(--av-success);
+    --card-accent-soft:var(--av-success-soft);
+    --card-accent-line:var(--av-success-line);
+  }
+  #powerCard{
+    --card-accent:var(--av-accent);
+    --card-accent-soft:var(--av-accent-soft);
+    --card-accent-line:var(--av-accent-line);
+  }
+  #voltageDropCard{
+    --card-accent:var(--av-danger);
+    --card-accent-soft:var(--av-danger-soft);
+    --card-accent-line:var(--av-danger-line);
+  }
+  #splCard{
+    --card-accent:var(--av-purple);
+    --card-accent-soft:color-mix(in srgb,var(--av-purple) 11%,transparent);
+    --card-accent-line:color-mix(in srgb,var(--av-purple) 42%,transparent);
+  }
   .card-head{
     display:flex;
     justify-content:space-between;
+    align-items:center;
     gap:12px;
-    padding:16px;
-    border-bottom:1px solid rgba(255,255,255,.08);
+    min-height:58px;
+    padding:18px 16px 14px;
+    border-bottom:1px solid var(--av-line);
   }
   .card-head h2{
+    display:flex;
+    align-items:center;
+    gap:9px;
     margin:0;
     font-size:14px;
     font-family:var(--mono);
     letter-spacing:.1em;
     text-transform:uppercase;
   }
-  .card-head span{
-    color:var(--dim);
+  .card-index{
+    display:grid;
+    place-items:center;
+    width:24px;
+    height:24px;
+    border:1px solid var(--card-accent-line);
+    border-radius:6px;
+    background:var(--card-accent-soft);
+    color:var(--card-accent);
+    font-size:9px;
+    letter-spacing:0;
+  }
+  .card-head > span{
+    color:var(--av-dim);
     font-family:var(--mono);
     font-size:11px;
   }
@@ -343,9 +490,10 @@
   .result{
     min-width:0;
     padding:12px;
-    border:1px solid rgba(255,255,255,.08);
+    border:1px solid var(--av-line);
+    border-left:3px solid var(--card-accent);
     border-radius:var(--radius);
-    background:rgba(255,255,255,.035);
+    background:color-mix(in srgb,var(--av-surface-2) 88%,var(--card-accent-soft));
   }
   .result span{
     display:block;
@@ -370,6 +518,9 @@
 
   .summary-panel{
     margin-top:18px;
+    --card-accent:var(--av-accent);
+    --card-accent-soft:var(--av-accent-soft);
+    --card-accent-line:var(--av-accent-line);
   }
   .summary-body{
     display:grid;
@@ -382,7 +533,7 @@
     margin:0;
     min-height:132px;
     white-space:pre-wrap;
-    color:#dfe7f0;
+    color:var(--av-text);
     font-family:var(--mono);
     font-size:13px;
     line-height:1.55;
@@ -400,10 +551,15 @@
     line-height:1.45;
     padding:0 16px 16px;
   }
-  .hint.success{color:#bdf8ce}
-  .hint.error{color:#ffd0d0}
-  .hint.warning{color:var(--amber)}
+  .hint.success{color:var(--av-success)}
+  .hint.error{color:var(--av-danger)}
+  .hint.warning{color:var(--av-warning)}
   .status-message{min-height:1.45em}
+
+  .calc-card:focus-within{
+    border-color:var(--card-accent);
+    box-shadow:var(--shadow),0 0 0 3px var(--card-accent-soft);
+  }
 
   .feedback-success{
     animation:confirm var(--med) var(--ease);
@@ -451,6 +607,7 @@
       width:100%;
       justify-content:space-between;
     }
+    .hero-actions button{flex:1}
     main{
       padding:12px;
     }
@@ -463,6 +620,31 @@
       flex-direction:row;
       flex-wrap:wrap;
     }
+  }
+  @media (hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference){
+    .calc-card{
+      transition:transform var(--med) var(--ease),border-color var(--med) var(--ease),box-shadow var(--med) var(--ease);
+    }
+    .calc-card:hover{
+      transform:translateY(-3px);
+      border-color:var(--card-accent-line);
+      box-shadow:var(--shadow-pop);
+    }
+  }
+  @media (prefers-reduced-motion:no-preference){
+    .hero{animation:panel-arrive 420ms var(--ease) both}
+    .calc-card,
+    .summary-panel{animation:panel-arrive 460ms var(--ease) both}
+    .calc-card:nth-child(2){animation-delay:45ms}
+    .calc-card:nth-child(3){animation-delay:90ms}
+    .calc-card:nth-child(4){animation-delay:135ms}
+    .calc-card:nth-child(5){animation-delay:180ms}
+    .calc-card:nth-child(6){animation-delay:225ms}
+    .summary-panel{animation-delay:270ms}
+  }
+  @keyframes panel-arrive{
+    from{opacity:0;transform:translateY(10px)}
+    to{opacity:1;transform:translateY(0)}
   }
   @media (prefers-reduced-motion:reduce){
     *,
@@ -501,10 +683,15 @@
 
   <main id="main-content">
     <section class="hero" aria-label="AV calculator overview">
-      <div>
+      <div class="hero-copy">
         <p class="eyebrow">Field math</p>
         <h1>AV calculator</h1>
         <p>Fast operator checks for delay, projection, record storage, and power-load estimates. Values update as you type and the page remembers the last setup in this browser.</p>
+        <ul class="hero-signals" aria-label="Calculator capabilities">
+          <li>6 field calculators</li>
+          <li>Instant updates</li>
+          <li>Local save</li>
+        </ul>
       </div>
       <div class="hero-actions">
         <button type="button" class="primary" id="copySummaryBtn">Copy Summary</button>
@@ -515,7 +702,7 @@
     <section class="grid" aria-label="Calculator groups">
       <article class="calc-card" id="audioCard">
         <div class="card-head">
-          <h2>Audio Delay</h2>
+          <h2><span class="card-index" aria-hidden="true">01</span>Audio Delay</h2>
           <span>Distance to delay</span>
         </div>
         <div class="card-body">
@@ -556,7 +743,7 @@
 
       <article class="calc-card" id="projectionCard">
         <div class="card-head">
-          <h2>Projection</h2>
+          <h2><span class="card-index" aria-hidden="true">02</span>Projection</h2>
           <span>Screen and throw</span>
         </div>
         <div class="card-body">
@@ -592,7 +779,7 @@
 
       <article class="calc-card" id="storageCard">
         <div class="card-head">
-          <h2>Record Storage</h2>
+          <h2><span class="card-index" aria-hidden="true">03</span>Record Storage</h2>
           <span>Bitrate to drive size</span>
         </div>
         <div class="card-body">
@@ -623,7 +810,7 @@
 
       <article class="calc-card" id="powerCard">
         <div class="card-head">
-          <h2>Power Load</h2>
+          <h2><span class="card-index" aria-hidden="true">04</span>Power Load</h2>
           <span>PF 1 estimate</span>
         </div>
         <div class="card-body">
@@ -663,7 +850,7 @@
 
       <article class="calc-card" id="voltageDropCard">
         <div class="card-head">
-          <h2>Voltage Drop</h2>
+          <h2><span class="card-index" aria-hidden="true">05</span>Voltage Drop</h2>
           <span>Cable run loss</span>
         </div>
         <div class="card-body">
@@ -706,7 +893,7 @@
 
       <article class="calc-card" id="splCard">
         <div class="card-head">
-          <h2>SPL Distance</h2>
+          <h2><span class="card-index" aria-hidden="true">06</span>SPL Distance</h2>
           <span>Inverse square loss</span>
         </div>
         <div class="card-body">
@@ -734,7 +921,7 @@
 
     <section class="summary-panel" aria-label="Calculation summary">
       <div class="card-head">
-        <h2>Operator Summary</h2>
+        <h2><span class="card-index" aria-hidden="true">OUT</span>Operator Summary</h2>
         <span id="saveStatus">Saved</span>
       </div>
       <div class="summary-body">

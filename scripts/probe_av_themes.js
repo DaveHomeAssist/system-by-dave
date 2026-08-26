@@ -41,6 +41,7 @@ const allTargets = [
 const requestedTargets = targetArg ? new Set(targetArg.slice('--target='.length).split(',').filter(Boolean)) : null;
 const targets = requestedTargets ? allTargets.filter((target) => requestedTargets.has(target.id)) : allTargets;
 const preferences = ['light', 'dark'];
+const systemManagedTargets = new Set(['av-workbook', 'pixelforge']);
 const failures = [];
 const results = [];
 
@@ -281,6 +282,15 @@ async function main() {
         ]
       });
 
+      // The AV suite honors the operator's stored mode and defaults to dark,
+      // so seed the requested mode before each pass instead of relying on the
+      // operating-system preference alone.
+      await cdp('Page.navigate', { url: baseUrl });
+      await delay(180);
+      await cdp('Runtime.evaluate', {
+        expression: `localStorage.setItem('av-theme-mode.v1', ${JSON.stringify(preference)})`
+      });
+
       for (const target of targets) {
         exceptions = [];
         await cdp('Page.navigate', { url: new URL(target.href, baseUrl).href });
@@ -304,7 +314,7 @@ async function main() {
 
         if (throwlineStandalone) {
           if (value.tool !== null || value.optIn !== null) failures.push(`throwline ${preference}: standalone app must not opt into the shared system theme (${value.tool}/${value.optIn}).`);
-        } else if (value.tool !== target.id || value.optIn !== 'system') {
+        } else if (value.tool !== target.id || value.optIn !== (systemManagedTargets.has(target.id) ? 'system' : preference)) {
           failures.push(`${target.id} ${preference}: wrong theme identity (${value.tool}/${value.optIn}).`);
         }
         if (value.tokens.bg.toLowerCase() !== expectedBg) failures.push(`${target.id} ${preference}: --av-bg is ${value.tokens.bg}, expected ${expectedBg}.`);
