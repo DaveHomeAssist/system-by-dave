@@ -6,14 +6,14 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'none'">
 <title>AV Calculator | System by Dave</title>
 <meta name="robots" content="index,follow">
-<meta name="description" content="A browser based AV calculator for audio delay, projection throw, record storage, and power load estimates.">
+<meta name="description" content="A browser based AV calculator for audio delay, projection, storage, power, and cabinet-aware LED wall planning.">
 <link rel="canonical" href="https://systembydave.com/av-calculator.html">
 <meta name="theme-color" content="#EEE8DF" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0C1016" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="System by Dave">
 <meta property="og:title" content="AV Calculator">
-<meta property="og:description" content="A browser based AV calculator for audio delay, projection throw, record storage, and power load estimates.">
+<meta property="og:description" content="A browser based AV calculator for audio delay, projection, storage, power, and cabinet-aware LED wall planning.">
 <meta property="og:url" content="https://systembydave.com/av-calculator.html">
 <meta property="og:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
 <meta property="og:image:width" content="1024">
@@ -21,7 +21,7 @@
 <meta property="og:image:alt" content="System by Dave preview banner">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="AV Calculator">
-<meta name="twitter:description" content="A browser based AV calculator for audio delay, projection throw, record storage, and power load estimates.">
+<meta name="twitter:description" content="A browser based AV calculator for audio delay, projection, storage, power, and cabinet-aware LED wall planning.">
 <meta name="twitter:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
 <link rel="icon" href="svg/system_by_dave_logo_rust.svg" type="image/svg+xml">
 <link rel="manifest" href="manifest.json">
@@ -425,6 +425,11 @@
     --card-accent-soft:color-mix(in srgb,var(--av-purple) 11%,transparent);
     --card-accent-line:color-mix(in srgb,var(--av-purple) 42%,transparent);
   }
+  #ledWallConfigurator{
+    --card-accent:var(--av-purple);
+    --card-accent-soft:color-mix(in srgb,var(--av-purple) 11%,transparent);
+    --card-accent-line:color-mix(in srgb,var(--av-purple) 42%,transparent);
+  }
   .card-head{
     display:flex;
     justify-content:space-between;
@@ -564,6 +569,439 @@
     box-shadow:var(--shadow),0 0 0 3px var(--card-accent-soft);
   }
 
+  .led-suite{
+    position:relative;
+    isolation:isolate;
+    margin-top:18px;
+    overflow:hidden;
+    border:1px solid var(--av-line);
+    border-radius:18px;
+    background:
+      linear-gradient(145deg,var(--card-accent-soft),transparent 28rem),
+      var(--av-surface);
+    box-shadow:var(--shadow-pop);
+  }
+  .led-suite::before{
+    content:"";
+    position:absolute;
+    z-index:2;
+    inset:0 0 auto;
+    height:5px;
+    background:linear-gradient(90deg,var(--av-purple),var(--av-focus),var(--av-accent));
+  }
+  .led-suite-head{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:20px;
+    padding:24px 22px 20px;
+    border-bottom:1px solid var(--av-line);
+  }
+  .led-suite-title{
+    display:grid;
+    gap:7px;
+    min-width:0;
+  }
+  .led-suite-kicker{
+    margin:0;
+    color:var(--av-purple);
+    font-family:var(--mono);
+    font-size:10px;
+    font-weight:800;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+  }
+  .led-suite-title h2{
+    margin:0;
+    font-family:var(--mono);
+    font-size:clamp(22px,3vw,34px);
+    letter-spacing:-.035em;
+    text-transform:uppercase;
+  }
+  .led-suite-title p{
+    max-width:720px;
+    margin:0;
+    color:var(--av-muted);
+    font-size:14px;
+  }
+  .led-suite-actions{
+    display:flex;
+    justify-content:flex-end;
+    gap:8px;
+    flex-wrap:wrap;
+  }
+  .led-input-grid{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:14px;
+    padding:18px;
+  }
+  .led-module{
+    min-width:0;
+    margin:0;
+    padding:16px;
+    border:1px solid var(--av-line);
+    border-radius:12px;
+    background:color-mix(in srgb,var(--av-surface-2) 90%,var(--card-accent-soft));
+  }
+  .led-module legend{
+    padding:0 8px;
+    color:var(--av-text);
+    font-family:var(--mono);
+    font-size:11px;
+    font-weight:800;
+    letter-spacing:.09em;
+    text-transform:uppercase;
+  }
+  .led-module-fields{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:12px;
+  }
+  .led-mode-fields[hidden]{display:none}
+  .field-note{
+    margin:0;
+    color:var(--av-dim);
+    font-size:11px;
+    line-height:1.4;
+  }
+  .led-stage{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(230px,.34fr);
+    gap:18px;
+    align-items:center;
+    margin:0 18px 18px;
+    padding:20px;
+    overflow:hidden;
+    border:1px solid color-mix(in srgb,var(--av-purple) 48%,var(--av-line));
+    border-radius:14px;
+    background:
+      radial-gradient(circle at 22% 0%,color-mix(in srgb,var(--av-purple) 22%,transparent),transparent 45%),
+      radial-gradient(circle at 90% 100%,color-mix(in srgb,var(--av-focus) 15%,transparent),transparent 40%),
+      #0c121c;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 14px 34px rgba(7,10,16,.18);
+    color:#f7f2eb;
+  }
+  .led-stage-view{
+    position:relative;
+    display:grid;
+    grid-template-columns:auto minmax(0,1fr);
+    grid-template-rows:minmax(0,1fr) auto;
+    gap:8px 10px;
+    align-items:center;
+    min-width:0;
+    padding:16px 16px 10px 6px;
+    perspective:1200px;
+  }
+  .led-stage-view::before{
+    content:"";
+    position:absolute;
+    z-index:0;
+    right:3%;
+    bottom:-3%;
+    width:86%;
+    height:34%;
+    border-radius:50%;
+    background:radial-gradient(ellipse,rgba(155,128,255,.2),transparent 67%);
+    transform:rotateX(72deg);
+    filter:blur(3px);
+    pointer-events:none;
+  }
+  .led-stage-axis{
+    color:#aeb9c9;
+    font-family:var(--mono);
+    font-size:9px;
+    font-weight:800;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+  }
+  .led-stage-axis.vertical{
+    position:relative;
+    z-index:2;
+    grid-row:1;
+    writing-mode:vertical-rl;
+    transform:rotate(180deg);
+  }
+  .led-stage-axis.horizontal{
+    position:relative;
+    z-index:2;
+    grid-column:2;
+    text-align:center;
+  }
+  .led-wall-preview{
+    position:relative;
+    z-index:1;
+    grid-column:2;
+    width:min(100%,720px);
+    max-height:280px;
+    margin-inline:auto;
+    overflow:hidden;
+    border:4px solid #263244;
+    border-radius:6px;
+    aspect-ratio:var(--wall-ratio,1.6);
+    background:
+      linear-gradient(90deg,rgba(255,255,255,.34) 1px,transparent 1px),
+      linear-gradient(rgba(255,255,255,.34) 1px,transparent 1px),
+      repeating-linear-gradient(0deg,rgba(255,255,255,.035) 0 1px,transparent 1px 4px),
+      radial-gradient(circle at 68% 32%,rgba(155,128,255,.75),transparent 34%),
+      linear-gradient(135deg,#273567 0%,#764b9d 48%,#b5482c 100%);
+    background-size:
+      calc(100% / var(--wall-cols,8)) 100%,
+      100% calc(100% / var(--wall-rows,5)),
+      auto,
+      auto,
+      auto;
+    box-shadow:
+      1px 0 0 #46516a,
+      3px 2px 0 #303a4c,
+      6px 5px 0 #202938,
+      11px 10px 0 #141b27,
+      22px 26px 42px rgba(0,0,0,.48),
+      0 0 34px rgba(155,128,255,.22);
+    transform:rotateX(-3deg) rotateY(-10deg) rotateZ(.35deg);
+    transform-origin:center;
+    transition:transform var(--med) var(--ease),box-shadow var(--med) var(--ease);
+  }
+  .led-stage-view.front-view .led-wall-preview{
+    transform:none;
+    box-shadow:0 0 0 1px rgba(255,255,255,.16),0 18px 36px rgba(0,0,0,.38),0 0 34px rgba(155,128,255,.22);
+  }
+  .led-wall-preview::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:linear-gradient(115deg,rgba(255,255,255,.18),transparent 22% 74%,rgba(255,255,255,.08));
+    pointer-events:none;
+  }
+  .led-wall-preview::after{
+    content:"NATIVE LED CANVAS";
+    position:absolute;
+    right:10px;
+    bottom:8px;
+    padding:4px 6px;
+    border:1px solid rgba(255,255,255,.28);
+    border-radius:4px;
+    background:rgba(8,12,20,.72);
+    color:#fff;
+    font-family:var(--mono);
+    font-size:8px;
+    font-weight:800;
+    letter-spacing:.12em;
+  }
+  .led-stage-data{
+    display:grid;
+    gap:13px;
+    min-width:0;
+  }
+  .led-stage-kicker{
+    margin:0;
+    color:#d0b9ff;
+    font-family:var(--mono);
+    font-size:9px;
+    font-weight:800;
+    letter-spacing:.13em;
+    text-transform:uppercase;
+  }
+  .led-stage-data strong{
+    display:block;
+    font-family:var(--mono);
+    font-size:clamp(21px,3vw,34px);
+    line-height:1;
+    letter-spacing:-.04em;
+  }
+  .led-stage-data p{
+    margin:0;
+    color:#bdc7d4;
+    font-size:12px;
+    line-height:1.45;
+  }
+  .led-stage-rails{
+    display:grid;
+    gap:8px;
+  }
+  .led-view-toggle{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:6px;
+  }
+  .led-view-toggle button{
+    min-height:44px;
+    padding:7px 10px;
+    border-color:#3c4960;
+    background:#151e2b;
+    color:#d5dde7;
+    font-size:11px;
+  }
+  .led-view-toggle button[aria-pressed="true"]{
+    border-color:#b59af4;
+    background:#302750;
+    color:#fff;
+    box-shadow:inset 0 0 0 1px rgba(208,185,255,.28);
+  }
+  .led-stage-rail{
+    display:grid;
+    grid-template-columns:auto 1fr auto;
+    gap:8px;
+    align-items:center;
+    color:#d5dde7;
+    font-family:var(--mono);
+    font-size:9px;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+  }
+  .led-stage-rail i{
+    height:3px;
+    overflow:hidden;
+    border-radius:999px;
+    background:#313d50;
+  }
+  .led-stage-rail i::before{
+    content:"";
+    display:block;
+    width:var(--rail-fill,60%);
+    height:100%;
+    border-radius:inherit;
+    background:linear-gradient(90deg,#7bd4aa,#c9adff,#ef8f4d);
+  }
+  .led-result-strip{
+    display:grid;
+    grid-template-columns:repeat(5,minmax(0,1fr));
+    gap:1px;
+    border-block:1px solid var(--av-line);
+    background:var(--av-line);
+  }
+  .led-result{
+    min-width:0;
+    min-height:132px;
+    padding:16px;
+    background:var(--av-surface);
+    box-shadow:inset 0 3px 0 var(--card-accent);
+  }
+  .led-result span,
+  .led-detail-stat span{
+    display:block;
+    margin-bottom:8px;
+    color:var(--av-dim);
+    font-family:var(--mono);
+    font-size:10px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+  }
+  .led-result strong{
+    display:block;
+    color:var(--av-text);
+    font-family:var(--mono);
+    font-size:clamp(17px,2vw,23px);
+    line-height:1.15;
+    overflow-wrap:anywhere;
+  }
+  .led-result small{
+    display:block;
+    margin-top:7px;
+    color:var(--av-muted);
+    font-size:11px;
+    line-height:1.4;
+  }
+  .led-result.good{box-shadow:inset 0 3px 0 var(--av-success)}
+  .led-result.warn{box-shadow:inset 0 3px 0 var(--av-warning)}
+  .led-result.bad{box-shadow:inset 0 3px 0 var(--av-danger)}
+  .led-result.good strong{color:var(--av-success)}
+  .led-result.warn strong{color:var(--av-warning)}
+  .led-result.bad strong{color:var(--av-danger)}
+  .led-detail-grid{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:12px;
+    padding:18px;
+  }
+  .led-detail{
+    min-width:0;
+    border:1px solid var(--av-line);
+    border-radius:12px;
+    background:var(--av-surface-2);
+  }
+  .led-detail summary{
+    min-height:48px;
+    padding:14px 16px;
+    cursor:pointer;
+    color:var(--av-text);
+    font-family:var(--mono);
+    font-size:11px;
+    font-weight:800;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+  }
+  .led-detail summary:focus-visible{outline:2px solid var(--av-focus);outline-offset:3px}
+  .led-detail-body{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:10px;
+    padding:0 16px 16px;
+  }
+  .led-detail-stat{
+    min-width:0;
+    padding:11px;
+    border:1px solid var(--av-line);
+    border-radius:8px;
+    background:var(--av-surface);
+  }
+  .led-detail-stat strong{
+    display:block;
+    font-family:var(--mono);
+    font-size:14px;
+    overflow-wrap:anywhere;
+  }
+  .led-detail-copy{
+    grid-column:1 / -1;
+    margin:0;
+    color:var(--av-muted);
+    font-size:12px;
+    line-height:1.5;
+  }
+  .led-warning-list{
+    grid-column:1 / -1;
+    display:grid;
+    gap:8px;
+    margin:0;
+    padding:0;
+    list-style:none;
+  }
+  .led-warning-list li{
+    position:relative;
+    padding:10px 10px 10px 72px;
+    border:1px solid var(--av-line);
+    border-radius:8px;
+    background:var(--av-surface);
+    color:var(--av-text-2);
+    font-size:12px;
+  }
+  .led-warning-list li::before{
+    content:attr(data-label);
+    position:absolute;
+    top:10px;
+    left:10px;
+    color:var(--av-focus);
+    font-family:var(--mono);
+    font-size:9px;
+    font-weight:800;
+    letter-spacing:.07em;
+  }
+  .led-warning-list li[data-severity="warn"]::before{color:var(--av-warning)}
+  .led-warning-list li[data-severity="bad"]::before{color:var(--av-danger)}
+  .led-inline-actions{
+    grid-column:1 / -1;
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+  }
+  .led-disclaimer{
+    margin:0;
+    padding:0 18px 18px;
+    color:var(--av-warning);
+    font-size:12px;
+    line-height:1.5;
+  }
+
   .feedback-success{
     animation:confirm var(--med) var(--ease);
     border-color:rgba(107,224,146,.85) !important;
@@ -597,6 +1035,8 @@
     .grid{
       grid-template-columns:1fr;
     }
+    .led-result-strip{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .led-stage{grid-template-columns:minmax(0,1.4fr) minmax(210px,.6fr)}
   }
   @media (max-width:680px){
     .topbar,
@@ -616,13 +1056,32 @@
     }
     .card-body,
     .result-grid,
-    .summary-body{
+    .summary-body,
+    .led-input-grid,
+    .led-module-fields,
+    .led-result-strip,
+    .led-detail-grid,
+    .led-detail-body{
       grid-template-columns:1fr;
     }
+    .led-suite-head{flex-direction:column;padding:22px 18px 18px}
+    .led-suite-actions{width:100%;justify-content:stretch}
+    .led-suite-actions button{flex:1 1 140px}
+    .led-input-grid,
+    .led-detail-grid{padding:12px}
+    .led-stage{grid-template-columns:1fr;margin:0 12px 12px;padding:16px}
+    .led-stage-data{grid-template-columns:minmax(0,1fr) minmax(180px,.7fr);align-items:end}
+    .led-detail-copy,
+    .led-warning-list,
+    .led-inline-actions{grid-column:auto}
     .summary-actions{
       flex-direction:row;
       flex-wrap:wrap;
     }
+  }
+  @media (max-width:500px){
+    .led-stage-data{grid-template-columns:1fr}
+    .led-wall-preview{border-width:3px}
   }
   @media (hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference){
     .calc-card{
@@ -637,13 +1096,15 @@
   @media (prefers-reduced-motion:no-preference){
     .hero{animation:panel-arrive 420ms var(--ease) both}
     .calc-card,
-    .summary-panel{animation:panel-arrive 460ms var(--ease) both}
+    .summary-panel,
+    .led-suite{animation:panel-arrive 460ms var(--ease) both}
     .calc-card:nth-child(2){animation-delay:45ms}
     .calc-card:nth-child(3){animation-delay:90ms}
     .calc-card:nth-child(4){animation-delay:135ms}
     .calc-card:nth-child(5){animation-delay:180ms}
     .calc-card:nth-child(6){animation-delay:225ms}
-    .summary-panel{animation-delay:270ms}
+    .led-suite{animation-delay:270ms}
+    .summary-panel{animation-delay:315ms}
   }
   @keyframes panel-arrive{
     from{opacity:0;transform:translateY(10px)}
@@ -689,11 +1150,11 @@
       <div class="hero-copy">
         <p class="eyebrow">Field math</p>
         <h1>AV calculator</h1>
-        <p>Fast operator checks for delay, projection, record storage, and power-load estimates. Values update as you type and the page remembers the last setup in this browser.</p>
+        <p>Fast operator checks for delay, projection, record storage, power, and cabinet-aware LED wall planning. Values update as you type and the page remembers the last setup in this browser.</p>
         <ul class="hero-signals" aria-label="Calculator capabilities">
-          <li>6 field calculators</li>
+          <li>6 quick calculators</li>
+          <li>LED wall suite</li>
           <li>Instant updates</li>
-          <li>Local save</li>
         </ul>
       </div>
       <div class="hero-actions">
@@ -937,6 +1398,351 @@
       </article>
     </section>
 
+    <section class="led-suite" id="ledWallConfigurator" aria-labelledby="ledWallTitle">
+      <div class="led-suite-head">
+        <div class="led-suite-title">
+          <p class="led-suite-kicker">Advanced planning suite · cabinet aware</p>
+          <h2 id="ledWallTitle">LED Wall Configurator</h2>
+          <p>Turn an LED cabinet profile and deployment goal into buildable geometry, native raster, content-fit guidance, NovaStar port estimates, viewing distance, and separated typical and maximum power plans.</p>
+        </div>
+        <div class="led-suite-actions" aria-label="LED wall configuration actions">
+          <button type="button" id="saveLedPresetBtn">Save Preset</button>
+          <button type="button" class="primary" id="copyLedSummaryBtn">Copy LED Summary</button>
+          <button type="button" id="downloadLedSummaryBtn">Download TXT</button>
+        </div>
+      </div>
+
+      <div class="led-input-grid">
+        <fieldset class="led-module">
+          <legend>Product / Cabinet Profile</legend>
+          <div class="led-module-fields">
+            <div class="field full">
+              <label for="ledProfileSelect">Saved Profile</label>
+              <select id="ledProfileSelect">
+                <option value="">Current custom profile</option>
+              </select>
+            </div>
+            <div class="field full">
+              <label for="ledProductName">Product / Profile Name</label>
+              <input id="ledProductName" data-key="ledProductName" data-kind="text" type="text" maxlength="80" value="Custom P2.9 500 mm" autocomplete="off">
+            </div>
+            <div class="field">
+              <label for="ledPitchMm">Pixel Pitch Mm</label>
+              <input id="ledPitchMm" data-key="ledPitchMm" type="number" min="0.1" max="50" step="0.01" value="2.9" inputmode="decimal" aria-describedby="ledAssumption">
+            </div>
+            <div class="field">
+              <label for="ledCabinetRotation">Cabinet Rotation</label>
+              <select id="ledCabinetRotation" data-key="ledCabinetRotation">
+                <option value="0" selected>0 degrees</option>
+                <option value="90">90 degrees</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="ledCabinetWidthMm">Cabinet Width Mm</label>
+              <input id="ledCabinetWidthMm" data-key="ledCabinetWidthMm" type="number" min="1" max="10000" step="0.1" value="500" inputmode="decimal">
+            </div>
+            <div class="field">
+              <label for="ledCabinetHeightMm">Cabinet Height Mm</label>
+              <input id="ledCabinetHeightMm" data-key="ledCabinetHeightMm" type="number" min="1" max="10000" step="0.1" value="500" inputmode="decimal">
+            </div>
+            <div class="field">
+              <label for="ledCabinetPixelsWide">Cabinet Width Px</label>
+              <input id="ledCabinetPixelsWide" data-key="ledCabinetPixelsWide" data-optional="true" type="number" min="1" max="10000" step="1" value="172" placeholder="Derive from pitch" inputmode="numeric">
+            </div>
+            <div class="field">
+              <label for="ledCabinetPixelsHigh">Cabinet Height Px</label>
+              <input id="ledCabinetPixelsHigh" data-key="ledCabinetPixelsHigh" data-optional="true" type="number" min="1" max="10000" step="1" value="172" placeholder="Derive from pitch" inputmode="numeric">
+            </div>
+            <p class="field-note full">When both raster fields are entered, they are authoritative and pitch is a validation check. Leave both blank to derive cabinet pixels from dimensions ÷ pitch.</p>
+          </div>
+        </fieldset>
+
+        <fieldset class="led-module">
+          <legend>Layout</legend>
+          <div class="led-module-fields">
+            <div class="field full">
+              <label for="ledMode">Planning Mode</label>
+              <select id="ledMode" data-key="ledMode">
+                <option value="layout" selected>Cabinet Layout</option>
+                <option value="targetSize">Target Physical Size</option>
+                <option value="targetRaster">Target Raster</option>
+                <option value="custom">Custom Panel Layout</option>
+              </select>
+            </div>
+            <div class="led-mode-fields led-module-fields full" id="ledLayoutFields">
+              <div class="field">
+                <label for="ledCabinetsWide">Cabinets Wide</label>
+                <input id="ledCabinetsWide" data-key="ledCabinetsWide" type="number" min="1" max="1000" step="1" value="8" inputmode="numeric">
+              </div>
+              <div class="field">
+                <label for="ledCabinetsHigh">Cabinets High</label>
+                <input id="ledCabinetsHigh" data-key="ledCabinetsHigh" type="number" min="1" max="1000" step="1" value="5" inputmode="numeric">
+              </div>
+            </div>
+            <div class="led-mode-fields led-module-fields full" id="ledTargetSizeFields" hidden>
+              <div class="field">
+                <label for="ledTargetWidthFt">Target Width Ft</label>
+                <input id="ledTargetWidthFt" data-key="ledTargetWidthFt" type="number" min="0.1" max="10000" step="0.1" value="16" inputmode="decimal" disabled>
+              </div>
+              <div class="field">
+                <label for="ledTargetHeightFt">Target Height Ft</label>
+                <input id="ledTargetHeightFt" data-key="ledTargetHeightFt" type="number" min="0.1" max="10000" step="0.1" value="9" inputmode="decimal" disabled>
+              </div>
+            </div>
+            <div class="led-mode-fields led-module-fields full" id="ledTargetRasterFields" hidden>
+              <div class="field">
+                <label for="ledTargetWidthPx">Target Width Px</label>
+                <input id="ledTargetWidthPx" data-key="ledTargetWidthPx" type="number" min="1" max="1000000" step="1" value="1920" inputmode="numeric" disabled>
+              </div>
+              <div class="field">
+                <label for="ledTargetHeightPx">Target Height Px</label>
+                <input id="ledTargetHeightPx" data-key="ledTargetHeightPx" type="number" min="1" max="1000000" step="1" value="1080" inputmode="numeric" disabled>
+              </div>
+            </div>
+            <p class="field-note full" id="ledModeNote">Cabinet layout uses the entered whole-cabinet array directly.</p>
+          </div>
+        </fieldset>
+
+        <fieldset class="led-module">
+          <legend>Video / NovaStar Port Planner</legend>
+          <div class="led-module-fields">
+            <div class="field">
+              <label for="ledContentWidthPx">Content Width Px</label>
+              <input id="ledContentWidthPx" data-key="ledContentWidthPx" type="number" min="1" max="1000000" step="1" value="1920" inputmode="numeric">
+            </div>
+            <div class="field">
+              <label for="ledContentHeightPx">Content Height Px</label>
+              <input id="ledContentHeightPx" data-key="ledContentHeightPx" type="number" min="1" max="1000000" step="1" value="1080" inputmode="numeric">
+            </div>
+            <div class="field">
+              <label for="ledFitPolicy">Fit Policy</label>
+              <select id="ledFitPolicy" data-key="ledFitPolicy">
+                <option value="contain" selected>Contain / Letterbox</option>
+                <option value="cover">Cover / Crop</option>
+                <option value="stretch">Non-uniform Scale</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="ledRefreshHz">Target Refresh Hz</label>
+              <select id="ledRefreshHz" data-key="ledRefreshHz">
+                <option value="23.976">23.976</option>
+                <option value="24">24</option>
+                <option value="25">25</option>
+                <option value="29.97">29.97</option>
+                <option value="30">30</option>
+                <option value="50">50</option>
+                <option value="59.94">59.94</option>
+                <option value="60" selected>60</option>
+                <option value="120">120</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="ledBitDepth">Bit Depth / Color</label>
+              <select id="ledBitDepth" data-key="ledBitDepth">
+                <option value="8" selected>8 bit</option>
+                <option value="10">10 bit</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="ledPortBasePixels">Nominal Pixels / Port</label>
+              <input id="ledPortBasePixels" data-key="ledPortBasePixels" type="number" min="1000" max="10000000" step="1000" value="650000" inputmode="numeric" aria-describedby="ledAssumption">
+            </div>
+            <div class="field">
+              <label for="ledPortSafetyPercent">Planning Utilization %</label>
+              <input id="ledPortSafetyPercent" data-key="ledPortSafetyPercent" type="number" min="10" max="100" step="1" value="80" inputmode="decimal" aria-describedby="ledAssumption">
+            </div>
+            <div class="field">
+              <label for="ledProcessorPortCount">Processor Ports (optional)</label>
+              <input id="ledProcessorPortCount" data-key="ledProcessorPortCount" data-optional="true" type="number" min="1" max="1000" step="1" value="" placeholder="Not specified" inputmode="numeric">
+            </div>
+            <div class="field">
+              <label for="ledReceiverPixelsWide">Receiver Max Width Px</label>
+              <input id="ledReceiverPixelsWide" data-key="ledReceiverPixelsWide" data-optional="true" type="number" min="1" max="10000" step="1" value="" placeholder="Optional" inputmode="numeric">
+            </div>
+            <div class="field">
+              <label for="ledReceiverPixelsHigh">Receiver Max Height Px</label>
+              <input id="ledReceiverPixelsHigh" data-key="ledReceiverPixelsHigh" data-optional="true" type="number" min="1" max="10000" step="1" value="" placeholder="Optional" inputmode="numeric">
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="led-module">
+          <legend>LED Power Planner / Viewing Distance</legend>
+          <div class="led-module-fields">
+            <div class="field">
+              <label for="ledMaxWattsEach">Maximum Watts / Cabinet</label>
+              <input id="ledMaxWattsEach" data-key="ledMaxWattsEach" type="number" min="0" max="100000" step="1" value="180" inputmode="decimal" aria-describedby="ledAssumption">
+            </div>
+            <div class="field">
+              <label for="ledTypicalWattsEach">Typical Watts / Cabinet</label>
+              <input id="ledTypicalWattsEach" data-key="ledTypicalWattsEach" type="number" min="0" max="100000" step="1" value="65" inputmode="decimal" aria-describedby="ledAssumption">
+            </div>
+            <div class="field">
+              <label for="ledVoltage">Supply Voltage</label>
+              <select id="ledVoltage" data-key="ledVoltage">
+                <option value="120" selected>120 V</option>
+                <option value="208">208 V</option>
+                <option value="230">230 V</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="ledCircuitAmps">Circuit Rating</label>
+              <select id="ledCircuitAmps" data-key="ledCircuitAmps">
+                <option value="15">15 A</option>
+                <option value="20" selected>20 A</option>
+                <option value="30">30 A</option>
+                <option value="60">60 A</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="ledContinuousPercent">Continuous Target %</label>
+              <input id="ledContinuousPercent" data-key="ledContinuousPercent" type="number" min="10" max="100" step="1" value="80" inputmode="decimal">
+            </div>
+            <div class="field">
+              <label for="ledPhaseMode">Power Model</label>
+              <select id="ledPhaseMode" data-key="ledPhaseMode">
+                <option value="singlePhase" selected>Single Phase</option>
+                <option value="threePhase">Three Phase Balanced</option>
+              </select>
+            </div>
+            <div class="field" id="ledPowerFactorField" hidden>
+              <label for="ledPowerFactor">Power Factor</label>
+              <input id="ledPowerFactor" data-key="ledPowerFactor" type="number" min="0.1" max="1" step="0.01" value="0.95" inputmode="decimal" aria-describedby="ledAssumption" disabled>
+            </div>
+            <div class="field">
+              <label for="ledCabinetsPerHomeRun">Cabinets / Home Run</label>
+              <input id="ledCabinetsPerHomeRun" data-key="ledCabinetsPerHomeRun" data-optional="true" type="number" min="1" max="1000" step="1" value="" placeholder="Product specific" inputmode="numeric">
+            </div>
+            <div class="field">
+              <label for="ledClosestViewer">Closest Audience Distance</label>
+              <input id="ledClosestViewer" data-key="ledClosestViewer" type="number" min="0" max="100000" step="0.1" value="15" inputmode="decimal">
+            </div>
+            <div class="field">
+              <label for="ledClosestViewerUnit">Distance Unit</label>
+              <select id="ledClosestViewerUnit" data-key="ledClosestViewerUnit">
+                <option value="ft" selected>Feet</option>
+                <option value="m">Meters</option>
+              </select>
+            </div>
+          </div>
+        </fieldset>
+      </div>
+
+      <div class="led-stage" aria-label="Live LED cabinet map">
+        <div class="led-stage-view">
+          <span class="led-stage-axis vertical" id="ledPreviewRows">5 cabinets high</span>
+          <div class="led-wall-preview" id="ledWallPreview" role="img" aria-label="Preview of an 8 by 5 cabinet LED wall"></div>
+          <span class="led-stage-axis horizontal" id="ledPreviewColumns">8 cabinets wide</span>
+        </div>
+        <div class="led-stage-data">
+          <div>
+            <p class="led-stage-kicker">Live cabinet map</p>
+            <strong id="ledPreviewArray">8 × 5</strong>
+            <p id="ledPreviewCanvas">1,376 × 860 native canvas<br>4.00 × 2.50 m build</p>
+          </div>
+          <div class="led-view-toggle" aria-label="Cabinet map view">
+            <button type="button" id="ledPreviewIsoBtn" aria-pressed="true">Isometric</button>
+            <button type="button" id="ledPreviewFrontBtn" aria-pressed="false">Front</button>
+          </div>
+          <div class="led-stage-rails" aria-label="LED wall planning indicators">
+            <div class="led-stage-rail"><span>Port load</span><i id="ledPreviewPortRail"></i><b id="ledPreviewPort">61%</b></div>
+            <div class="led-stage-rail"><span>Viewer</span><i id="ledPreviewViewerRail"></i><b id="ledPreviewViewer">Review</b></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="led-result-strip" aria-label="LED wall primary results">
+        <div class="led-result" id="ledWallResult">
+          <span>Wall</span>
+          <strong id="ledWallDimensions">0 × 0 ft</strong>
+          <small id="ledWallDimensionsMetric">0 × 0 m</small>
+        </div>
+        <div class="led-result" id="ledRasterResult">
+          <span>Native Raster</span>
+          <strong id="ledNativeRaster">0 × 0 px</strong>
+          <small id="ledNativeMeta">0 MP · 0:1</small>
+        </div>
+        <div class="led-result" id="ledContentResult">
+          <span>Content Fit</span>
+          <strong id="ledContentFit">Review</strong>
+          <small id="ledContentMeta">1920 × 1080 source</small>
+        </div>
+        <div class="led-result" id="ledProcessingResult">
+          <span>NovaStar Planning</span>
+          <strong id="ledProcessing">0 data ports</strong>
+          <small id="ledProcessingMeta">Planning estimate</small>
+        </div>
+        <div class="led-result" id="ledPowerResult">
+          <span>Power</span>
+          <strong id="ledPower">0 kW max</strong>
+          <small id="ledPowerMeta">0 kW typical</small>
+        </div>
+      </div>
+
+      <div class="led-detail-grid">
+        <details class="led-detail">
+          <summary>Geometry Details</summary>
+          <div class="led-detail-body">
+            <div class="led-detail-stat"><span>Build Array</span><strong id="ledBuildArray">0 × 0 cabinets</strong></div>
+            <div class="led-detail-stat"><span>Cabinet Count</span><strong id="ledCabinetCount">0</strong></div>
+            <div class="led-detail-stat"><span>Metric Size</span><strong id="ledMetricSize">0 × 0 m</strong></div>
+            <div class="led-detail-stat"><span>Imperial Size</span><strong id="ledImperialSize">0 × 0</strong></div>
+            <div class="led-detail-stat"><span>Screen Area</span><strong id="ledArea">0 m² · 0 ft²</strong></div>
+            <div class="led-detail-stat"><span>Diagonal</span><strong id="ledDiagonal">0 m · 0 ft</strong></div>
+            <div class="led-detail-stat"><span>Effective Cabinet Raster</span><strong id="ledCabinetRaster">0 × 0 px</strong></div>
+            <div class="led-detail-stat"><span>Pitch-Derived Check</span><strong id="ledPitchDerivedRaster">0 × 0 px</strong></div>
+            <div class="led-detail-stat"><span>Implied Pitch W / H</span><strong id="ledImpliedPitch">0 × 0 mm</strong></div>
+            <p class="led-detail-copy" id="ledTargetOutcome">The entered cabinet layout is used directly.</p>
+          </div>
+        </details>
+
+        <details class="led-detail">
+          <summary>Content Fit</summary>
+          <div class="led-detail-body">
+            <div class="led-detail-stat"><span>Source → Wall</span><strong id="ledSourceToWall">0 × 0 → 0 × 0</strong></div>
+            <div class="led-detail-stat"><span>Scale X / Y</span><strong id="ledScaleFactors">0 × / 0 ×</strong></div>
+            <div class="led-detail-stat"><span>Active Wall Use</span><strong id="ledPixelUtilization">0%</strong></div>
+            <div class="led-detail-stat"><span>Aspect Difference</span><strong id="ledAspectMismatch">0%</strong></div>
+            <div class="led-detail-stat"><span>Suggested Canvas</span><strong id="ledSuggestedCanvas">0 × 0 px</strong></div>
+            <div class="led-detail-stat"><span>Source Bandwidth</span><strong id="ledSourceBandwidth">0 Gbps</strong></div>
+            <p class="led-detail-copy" id="ledContentGuidance">Native wall raster is the first-choice content canvas.</p>
+          </div>
+        </details>
+
+        <details class="led-detail">
+          <summary>Processing / Data</summary>
+          <div class="led-detail-body">
+            <div class="led-detail-stat"><span>Safe Pixels / Port</span><strong id="ledSafePixelsPerPort">0</strong></div>
+            <div class="led-detail-stat"><span>Average Port Load</span><strong id="ledAveragePortLoad">0</strong></div>
+            <div class="led-detail-stat"><span>Port Utilization</span><strong id="ledPortUtilization">0%</strong></div>
+            <div class="led-detail-stat"><span>Wall Payload</span><strong id="ledWallPayload">0 Gbps</strong></div>
+            <p class="led-detail-copy" id="ledProcessorGuidance">Processor output capacity is separate from production-network bandwidth and must be confirmed against the selected processor and receiver cards.</p>
+          </div>
+        </details>
+
+        <details class="led-detail">
+          <summary>Power / Viewing / Assumptions</summary>
+          <div class="led-detail-body">
+            <div class="led-detail-stat"><span>Maximum Load</span><strong id="ledMaxLoad">0 kW · 0 A</strong></div>
+            <div class="led-detail-stat"><span>Typical Load</span><strong id="ledTypicalLoad">0 kW · 0 A</strong></div>
+            <div class="led-detail-stat"><span>Planning Circuits</span><strong id="ledCircuitPlan">0 max · 0 typical</strong></div>
+            <div class="led-detail-stat"><span>Product Home Runs</span><strong id="ledHomeRuns">Not specified</strong></div>
+            <div class="led-detail-stat"><span>Viewing Range</span><strong id="ledViewingRange">0–0 ft</strong></div>
+            <div class="led-detail-stat"><span>Audience Check</span><strong id="ledAudienceCheck">Review</strong></div>
+            <div class="led-inline-actions">
+              <button type="button" id="sendLedTypicalPowerBtn">Send Typical Watts to Power Load</button>
+              <button type="button" id="sendLedMaxPowerBtn">Send Maximum Watts to Power Load</button>
+            </div>
+            <ul class="led-warning-list" id="ledWarnings" aria-label="LED wall planning checks">
+              <li data-severity="info" data-label="CHECK">Enter a cabinet profile to review planning assumptions.</li>
+            </ul>
+          </div>
+        </details>
+      </div>
+
+      <p class="led-disclaimer" id="ledAssumption"><strong>Planning estimates only:</strong> Verify final cabinet, receiver-card, processor, signal, and power specifications against the actual product documentation. Confirm electrical distribution with the venue and a qualified person; the calculator does not establish code compliance or a verified safe load.</p>
+    </section>
+
     <section class="summary-panel" aria-label="Calculation summary">
       <div class="card-head">
         <h2><span class="card-index" aria-hidden="true">OUT</span>Operator Summary</h2>
@@ -986,7 +1792,41 @@
     dropVoltage: 120,
     splRef: 100,
     splRefDist: 3,
-    splTargetDist: 50
+    splTargetDist: 50,
+    ledMode: 'layout',
+    ledProductName: 'Custom P2.9 500 mm',
+    ledPitchMm: 2.9,
+    ledCabinetWidthMm: 500,
+    ledCabinetHeightMm: 500,
+    ledCabinetPixelsWide: 172,
+    ledCabinetPixelsHigh: 172,
+    ledCabinetRotation: '0',
+    ledCabinetsWide: 8,
+    ledCabinetsHigh: 5,
+    ledTargetWidthFt: 16,
+    ledTargetHeightFt: 9,
+    ledTargetWidthPx: 1920,
+    ledTargetHeightPx: 1080,
+    ledContentWidthPx: 1920,
+    ledContentHeightPx: 1080,
+    ledFitPolicy: 'contain',
+    ledRefreshHz: 60,
+    ledBitDepth: 8,
+    ledPortBasePixels: 650000,
+    ledPortSafetyPercent: 80,
+    ledProcessorPortCount: null,
+    ledReceiverPixelsWide: null,
+    ledReceiverPixelsHigh: null,
+    ledMaxWattsEach: 180,
+    ledTypicalWattsEach: 65,
+    ledVoltage: 120,
+    ledCircuitAmps: 20,
+    ledContinuousPercent: 80,
+    ledPhaseMode: 'singlePhase',
+    ledPowerFactor: 0.95,
+    ledCabinetsPerHomeRun: null,
+    ledClosestViewer: 15,
+    ledClosestViewerUnit: 'ft'
   };
 
   const fields = Array.from(document.querySelectorAll('[data-key]'));
@@ -1026,6 +1866,73 @@
     splLoss: document.getElementById('splLoss'),
     splDoublings: document.getElementById('splDoublings'),
     splHint: document.getElementById('splHint'),
+    ledProfileSelect: document.getElementById('ledProfileSelect'),
+    ledLayoutFields: document.getElementById('ledLayoutFields'),
+    ledTargetSizeFields: document.getElementById('ledTargetSizeFields'),
+    ledTargetRasterFields: document.getElementById('ledTargetRasterFields'),
+    ledModeNote: document.getElementById('ledModeNote'),
+    ledPowerFactorField: document.getElementById('ledPowerFactorField'),
+    ledPowerFactor: document.getElementById('ledPowerFactor'),
+    ledWallResult: document.getElementById('ledWallResult'),
+    ledRasterResult: document.getElementById('ledRasterResult'),
+    ledContentResult: document.getElementById('ledContentResult'),
+    ledProcessingResult: document.getElementById('ledProcessingResult'),
+    ledPowerResult: document.getElementById('ledPowerResult'),
+    ledWallPreview: document.getElementById('ledWallPreview'),
+    ledPreviewRows: document.getElementById('ledPreviewRows'),
+    ledPreviewColumns: document.getElementById('ledPreviewColumns'),
+    ledPreviewArray: document.getElementById('ledPreviewArray'),
+    ledPreviewCanvas: document.getElementById('ledPreviewCanvas'),
+    ledPreviewPortRail: document.getElementById('ledPreviewPortRail'),
+    ledPreviewPort: document.getElementById('ledPreviewPort'),
+    ledPreviewViewerRail: document.getElementById('ledPreviewViewerRail'),
+    ledPreviewViewer: document.getElementById('ledPreviewViewer'),
+    ledPreviewIsoBtn: document.getElementById('ledPreviewIsoBtn'),
+    ledPreviewFrontBtn: document.getElementById('ledPreviewFrontBtn'),
+    ledWallDimensions: document.getElementById('ledWallDimensions'),
+    ledWallDimensionsMetric: document.getElementById('ledWallDimensionsMetric'),
+    ledNativeRaster: document.getElementById('ledNativeRaster'),
+    ledNativeMeta: document.getElementById('ledNativeMeta'),
+    ledContentFit: document.getElementById('ledContentFit'),
+    ledContentMeta: document.getElementById('ledContentMeta'),
+    ledProcessing: document.getElementById('ledProcessing'),
+    ledProcessingMeta: document.getElementById('ledProcessingMeta'),
+    ledPower: document.getElementById('ledPower'),
+    ledPowerMeta: document.getElementById('ledPowerMeta'),
+    ledBuildArray: document.getElementById('ledBuildArray'),
+    ledCabinetCount: document.getElementById('ledCabinetCount'),
+    ledMetricSize: document.getElementById('ledMetricSize'),
+    ledImperialSize: document.getElementById('ledImperialSize'),
+    ledArea: document.getElementById('ledArea'),
+    ledDiagonal: document.getElementById('ledDiagonal'),
+    ledCabinetRaster: document.getElementById('ledCabinetRaster'),
+    ledPitchDerivedRaster: document.getElementById('ledPitchDerivedRaster'),
+    ledImpliedPitch: document.getElementById('ledImpliedPitch'),
+    ledTargetOutcome: document.getElementById('ledTargetOutcome'),
+    ledSourceToWall: document.getElementById('ledSourceToWall'),
+    ledScaleFactors: document.getElementById('ledScaleFactors'),
+    ledPixelUtilization: document.getElementById('ledPixelUtilization'),
+    ledAspectMismatch: document.getElementById('ledAspectMismatch'),
+    ledSuggestedCanvas: document.getElementById('ledSuggestedCanvas'),
+    ledSourceBandwidth: document.getElementById('ledSourceBandwidth'),
+    ledContentGuidance: document.getElementById('ledContentGuidance'),
+    ledSafePixelsPerPort: document.getElementById('ledSafePixelsPerPort'),
+    ledAveragePortLoad: document.getElementById('ledAveragePortLoad'),
+    ledPortUtilization: document.getElementById('ledPortUtilization'),
+    ledWallPayload: document.getElementById('ledWallPayload'),
+    ledProcessorGuidance: document.getElementById('ledProcessorGuidance'),
+    ledMaxLoad: document.getElementById('ledMaxLoad'),
+    ledTypicalLoad: document.getElementById('ledTypicalLoad'),
+    ledCircuitPlan: document.getElementById('ledCircuitPlan'),
+    ledHomeRuns: document.getElementById('ledHomeRuns'),
+    ledViewingRange: document.getElementById('ledViewingRange'),
+    ledAudienceCheck: document.getElementById('ledAudienceCheck'),
+    ledWarnings: document.getElementById('ledWarnings'),
+    saveLedPresetBtn: document.getElementById('saveLedPresetBtn'),
+    copyLedSummaryBtn: document.getElementById('copyLedSummaryBtn'),
+    downloadLedSummaryBtn: document.getElementById('downloadLedSummaryBtn'),
+    sendLedTypicalPowerBtn: document.getElementById('sendLedTypicalPowerBtn'),
+    sendLedMaxPowerBtn: document.getElementById('sendLedMaxPowerBtn'),
     summaryOutput: document.getElementById('summaryOutput'),
     saveStatus: document.getElementById('saveStatus'),
     actionStatus: document.getElementById('actionStatus'),
@@ -1036,6 +1943,15 @@
 
   let storageLoadState = 'defaults';
   let calculationStatusTimer = 0;
+  let latestLedSummary = '';
+  let latestLedPower = null;
+  const LED_PROFILE_STORE = 'avCalculator.ledProfiles.v1';
+  const LED_PROFILE_KEYS = [
+    'ledProductName', 'ledPitchMm', 'ledCabinetWidthMm', 'ledCabinetHeightMm',
+    'ledCabinetPixelsWide', 'ledCabinetPixelsHigh', 'ledMaxWattsEach',
+    'ledTypicalWattsEach', 'ledVoltage', 'ledPortBasePixels',
+    'ledReceiverPixelsWide', 'ledReceiverPixelsHigh', 'ledCabinetsPerHomeRun'
+  ];
 
   const storage = (() => {
     try {
@@ -1079,6 +1995,7 @@
   })();
 
   let state = loadState();
+  let ledProfiles = loadLedProfiles();
 
   function loadState() {
     const saved = storage.get(STORE);
@@ -1100,6 +2017,66 @@
     }
   }
 
+  function loadLedProfiles() {
+    const saved = storage.get(LED_PROFILE_STORE);
+    if (!saved) return [];
+    try {
+      const parsed = JSON.parse(saved);
+      if (!Array.isArray(parsed)) return [];
+      return parsed.filter(profile => profile && typeof profile === 'object' && typeof profile.id === 'string' && typeof profile.name === 'string').slice(0, 20);
+    } catch (error) {
+      return [];
+    }
+  }
+
+  function refreshLedProfileOptions(selectedId = '') {
+    const defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.textContent = 'Current custom profile';
+    const options = ledProfiles.map(profile => {
+      const option = document.createElement('option');
+      option.value = profile.id;
+      option.textContent = profile.name;
+      return option;
+    });
+    els.ledProfileSelect.replaceChildren(defaultOption, ...options);
+    els.ledProfileSelect.value = selectedId;
+  }
+
+  function saveLedPreset() {
+    const normalizationMessages = normalizeFields();
+    const name = String(state.ledProductName || DEFAULTS.ledProductName).trim();
+    const id = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 56) || `led-profile-${Date.now()}`;
+    const values = Object.fromEntries(LED_PROFILE_KEYS.map(key => [key, state[key]]));
+    const profile = { id, name, values };
+    const existingIndex = ledProfiles.findIndex(item => item.id === id);
+    if (existingIndex >= 0) ledProfiles.splice(existingIndex, 1, profile);
+    else ledProfiles.unshift(profile);
+    ledProfiles = ledProfiles.slice(0, 20);
+    const saved = storage.set(LED_PROFILE_STORE, JSON.stringify(ledProfiles));
+    refreshLedProfileOptions(saved ? id : '');
+    const normalization = normalizationMessages.length ? ` ${normalizationMessages.join(' ')}` : '';
+    announceAction(saved ? `LED profile “${name}” saved.${normalization}` : 'LED profile could not be saved because browser storage is unavailable.', saved ? 'success' : 'error');
+    pulse(els.saveLedPresetBtn, saved ? 'success' : 'error');
+  }
+
+  function applyLedPreset() {
+    const profile = ledProfiles.find(item => item.id === els.ledProfileSelect.value);
+    if (!profile || !profile.values || typeof profile.values !== 'object') return;
+    LED_PROFILE_KEYS.forEach(key => {
+      if (Object.prototype.hasOwnProperty.call(profile.values, key)) state[key] = profile.values[key];
+    });
+    setFieldValues();
+    syncPowerMethodUI();
+    syncLedModeUI();
+    syncLedPowerModeUI();
+    const normalizationMessages = normalizeFields();
+    const saved = saveState();
+    calculate();
+    const normalized = normalizationMessages.length ? ` ${normalizationMessages.join(' ')}` : '';
+    announceAction(`LED profile “${profile.name}” loaded.${normalized}${saved ? '' : ' Calculator storage is unavailable.'}`, saved ? 'success' : 'error');
+  }
+
   function saveState() {
     const saved = storage.set(STORE, JSON.stringify(state));
     els.saveStatus.textContent = saved ? 'Saved' : 'Storage blocked';
@@ -1109,6 +2086,12 @@
   function numberValue(key) {
     const value = Number(state[key]);
     return Number.isFinite(value) ? value : Number(DEFAULTS[key]);
+  }
+
+  function optionalNumberValue(key) {
+    if (state[key] === null || state[key] === undefined || state[key] === '') return null;
+    const value = Number(state[key]);
+    return Number.isFinite(value) ? value : null;
   }
 
   function fieldLabel(field) {
@@ -1125,6 +2108,10 @@
   function normalizeNumericField(field) {
     const key = field.dataset.key;
     const raw = field.value.trim();
+    if (field.dataset.optional === 'true' && raw === '') {
+      field.removeAttribute('aria-invalid');
+      return { value: null, message: '' };
+    }
     const fallback = Number(DEFAULTS[key]);
     const min = field.min === '' ? Number.NEGATIVE_INFINITY : Number(field.min);
     const max = field.max === '' ? Number.POSITIVE_INFINITY : Number(field.max);
@@ -1175,6 +2162,16 @@
     fields.forEach(field => {
       if (field.disabled) return;
       const key = field.dataset.key;
+      if (field.dataset.kind === 'text') {
+        const maximumLength = field.maxLength > 0 ? field.maxLength : 120;
+        const fallback = String(DEFAULTS[key] || 'Custom LED profile');
+        const displayText = field.value.replace(/\s+/g, ' ').slice(0, maximumLength);
+        const storedText = displayText.trim() || fallback;
+        field.value = displayText || fallback;
+        state[key] = storedText;
+        field.removeAttribute('aria-invalid');
+        return;
+      }
       if (field.tagName === 'SELECT') {
         const allowed = Array.from(field.options, option => option.value);
         if (!allowed.includes(field.value)) {
@@ -1196,7 +2193,7 @@
     fields.forEach(field => {
       const key = field.dataset.key;
       if (state[key] === undefined) return;
-      field.value = String(state[key]);
+      field.value = state[key] === null ? '' : String(state[key]);
     });
   }
 
@@ -1213,9 +2210,44 @@
     els.powerMethodBadge.textContent = wattsMode ? 'Watts + PF estimate' : 'Nameplate current';
   }
 
+  function syncLedModeUI() {
+    const mode = ['layout', 'targetSize', 'targetRaster', 'custom'].includes(state.ledMode)
+      ? state.ledMode
+      : 'layout';
+    const layoutMode = mode === 'layout' || mode === 'custom';
+    const groups = [
+      [els.ledLayoutFields, layoutMode],
+      [els.ledTargetSizeFields, mode === 'targetSize'],
+      [els.ledTargetRasterFields, mode === 'targetRaster']
+    ];
+    groups.forEach(([group, active]) => {
+      group.hidden = !active;
+      Array.from(group.querySelectorAll('[data-key]')).forEach(field => {
+        field.disabled = !active;
+      });
+    });
+    if (mode === 'targetSize') {
+      els.ledModeNote.textContent = 'Columns and rows are independently rounded up from the requested physical size. Actual build dimensions and overbuild stay visible.';
+    } else if (mode === 'targetRaster') {
+      els.ledModeNote.textContent = 'Columns and rows are independently rounded up from the requested raster. The result is the nearest whole-cabinet canvas at or above the target.';
+    } else if (mode === 'custom') {
+      els.ledModeNote.textContent = 'Custom panel layout uses the entered cabinet geometry, raster, pitch, and whole-cabinet array without requiring a product database.';
+    } else {
+      els.ledModeNote.textContent = 'Cabinet layout uses the entered whole-cabinet array directly.';
+    }
+  }
+
+  function syncLedPowerModeUI() {
+    const threePhase = state.ledPhaseMode === 'threePhase';
+    els.ledPowerFactorField.hidden = !threePhase;
+    els.ledPowerFactor.disabled = !threePhase;
+  }
+
   function readFields() {
     const normalizationMessages = normalizeFields();
     syncPowerMethodUI();
+    syncLedModeUI();
+    syncLedPowerModeUI();
     const saved = saveState();
     calculate();
     queueCalculationStatus(normalizationMessages, saved);
@@ -1228,7 +2260,8 @@
     const power = calculatePower();
     const drop = calculateVoltageDrop();
     const spl = calculateSpl();
-    renderSummary(audio, projection, storageCalc, power, drop, spl);
+    const led = calculateLedWall();
+    renderSummary(audio, projection, storageCalc, power, drop, spl, led);
   }
 
   function calculateDelay() {
@@ -1364,7 +2397,393 @@
     return { refSpl, refDist, targetDist, loss, splAt, doublings };
   }
 
-  function renderSummary(audio, projection, storageCalc, power, drop, spl) {
+  function calculateLedWall() {
+    const mode = ['layout', 'targetSize', 'targetRaster', 'custom'].includes(state.ledMode)
+      ? state.ledMode
+      : 'layout';
+    const productName = String(state.ledProductName || DEFAULTS.ledProductName);
+    const pitchMm = numberValue('ledPitchMm');
+    const enteredCabinetWidthMm = numberValue('ledCabinetWidthMm');
+    const enteredCabinetHeightMm = numberValue('ledCabinetHeightMm');
+    const providedCabinetPixelsWide = optionalNumberValue('ledCabinetPixelsWide');
+    const providedCabinetPixelsHigh = optionalNumberValue('ledCabinetPixelsHigh');
+    const rasterIncomplete = Boolean(providedCabinetPixelsWide) !== Boolean(providedCabinetPixelsHigh);
+    const enteredRasterProvided = Boolean(providedCabinetPixelsWide && providedCabinetPixelsHigh);
+    const pitchDerivedEnteredWide = enteredCabinetWidthMm / pitchMm;
+    const pitchDerivedEnteredHigh = enteredCabinetHeightMm / pitchMm;
+    const enteredCabinetPixelsWide = enteredRasterProvided ? providedCabinetPixelsWide : Math.round(pitchDerivedEnteredWide);
+    const enteredCabinetPixelsHigh = enteredRasterProvided ? providedCabinetPixelsHigh : Math.round(pitchDerivedEnteredHigh);
+    const impliedPitchWideMm = enteredCabinetWidthMm / enteredCabinetPixelsWide;
+    const impliedPitchHighMm = enteredCabinetHeightMm / enteredCabinetPixelsHigh;
+    const rotated = String(state.ledCabinetRotation) === '90';
+    const cabinetWidthMm = rotated ? enteredCabinetHeightMm : enteredCabinetWidthMm;
+    const cabinetHeightMm = rotated ? enteredCabinetWidthMm : enteredCabinetHeightMm;
+    const cabinetPixelsWide = rotated ? enteredCabinetPixelsHigh : enteredCabinetPixelsWide;
+    const cabinetPixelsHigh = rotated ? enteredCabinetPixelsWide : enteredCabinetPixelsHigh;
+    const targetWidthFt = numberValue('ledTargetWidthFt');
+    const targetHeightFt = numberValue('ledTargetHeightFt');
+    const targetWidthPx = numberValue('ledTargetWidthPx');
+    const targetHeightPx = numberValue('ledTargetHeightPx');
+    const ceilCabinets = value => Math.max(1, Math.ceil(value - 1e-10));
+
+    let cabinetsWide = numberValue('ledCabinetsWide');
+    let cabinetsHigh = numberValue('ledCabinetsHigh');
+    let targetOutcome = 'The entered whole-cabinet layout is used directly.';
+    if (mode === 'targetSize') {
+      cabinetsWide = ceilCabinets((targetWidthFt * 304.8) / cabinetWidthMm);
+      cabinetsHigh = ceilCabinets((targetHeightFt * 304.8) / cabinetHeightMm);
+    } else if (mode === 'targetRaster') {
+      cabinetsWide = ceilCabinets(targetWidthPx / cabinetPixelsWide);
+      cabinetsHigh = ceilCabinets(targetHeightPx / cabinetPixelsHigh);
+    }
+
+    const cabinetsTotal = cabinetsWide * cabinetsHigh;
+    const wallWidthMm = cabinetWidthMm * cabinetsWide;
+    const wallHeightMm = cabinetHeightMm * cabinetsHigh;
+    const wallWidthPx = cabinetPixelsWide * cabinetsWide;
+    const wallHeightPx = cabinetPixelsHigh * cabinetsHigh;
+    const totalPixels = wallWidthPx * wallHeightPx;
+    const aspectRatio = wallWidthPx / wallHeightPx;
+    const wallWidthM = wallWidthMm / 1000;
+    const wallHeightM = wallHeightMm / 1000;
+    const wallWidthFt = wallWidthMm / 304.8;
+    const wallHeightFt = wallHeightMm / 304.8;
+    const areaM2 = wallWidthM * wallHeightM;
+    const areaFt2 = wallWidthFt * wallHeightFt;
+    const diagonalM = Math.hypot(wallWidthM, wallHeightM);
+    const diagonalFt = Math.hypot(wallWidthFt, wallHeightFt);
+
+    if (mode === 'targetSize') {
+      const widthOverMm = wallWidthMm - (targetWidthFt * 304.8);
+      const heightOverMm = wallHeightMm - (targetHeightFt * 304.8);
+      targetOutcome = `Requested ${format(targetWidthFt, 1)} × ${format(targetHeightFt, 1)} ft; independent column and row ceiling produces ${cabinetsWide} × ${cabinetsHigh} cabinets, adding ${format(widthOverMm, 0)} mm width and ${format(heightOverMm, 0)} mm height.`;
+    } else if (mode === 'targetRaster') {
+      targetOutcome = `Requested ${format(targetWidthPx, 0)} × ${format(targetHeightPx, 0)} px; independent column and row ceiling produces ${cabinetsWide} × ${cabinetsHigh} cabinets and ${format(wallWidthPx - targetWidthPx, 0)} × ${format(wallHeightPx - targetHeightPx, 0)} extra pixels.`;
+    } else if (mode === 'custom') {
+      targetOutcome = 'Custom panel mode uses the entered cabinet geometry, raster, pitch, rotation, and whole-cabinet array directly.';
+    }
+
+    const pitchDerivedWide = rotated ? pitchDerivedEnteredHigh : pitchDerivedEnteredWide;
+    const pitchDerivedHigh = rotated ? pitchDerivedEnteredWide : pitchDerivedEnteredHigh;
+    const pitchMismatchWide = enteredRasterProvided ? Math.abs(enteredCabinetPixelsWide - pitchDerivedEnteredWide) / pitchDerivedEnteredWide * 100 : 0;
+    const pitchMismatchHigh = enteredRasterProvided ? Math.abs(enteredCabinetPixelsHigh - pitchDerivedEnteredHigh) / pitchDerivedEnteredHigh * 100 : 0;
+    const pitchMismatchPercent = Math.max(pitchMismatchWide, pitchMismatchHigh);
+    const pitchFraction = Math.max(
+      Math.abs(pitchDerivedEnteredWide - Math.round(pitchDerivedEnteredWide)),
+      Math.abs(pitchDerivedEnteredHigh - Math.round(pitchDerivedEnteredHigh))
+    );
+
+    const content = calculateLedContentFit({ wallWidthPx, wallHeightPx, totalPixels, aspectRatio });
+    const processing = calculateLedProcessing({ wallWidthPx, wallHeightPx, totalPixels, cabinetPixelsWide, cabinetPixelsHigh });
+    const power = calculateLedPower({ cabinetsTotal, areaM2 });
+    const viewing = calculateLedViewing(pitchMm);
+    const warnings = [];
+
+    if (pitchFraction > 0.05) {
+      const rasterAuthority = enteredRasterProvided
+        ? 'The entered cabinet raster remains authoritative.'
+        : 'A whole-pixel pitch-derived raster is being used; verify it against the product specification.';
+      warnings.push({ severity: 'warn', label: 'PITCH', text: `Cabinet dimensions ÷ P${format(pitchMm, 2)} do not land on whole pixels (${format(pitchDerivedWide, 2)} × ${format(pitchDerivedHigh, 2)}). ${rasterAuthority}` });
+    }
+    if (rasterIncomplete) {
+      warnings.push({ severity: 'warn', label: 'RASTER', text: 'Enter both cabinet raster dimensions or leave both blank. Pitch-derived width and height are being used together for this calculation.' });
+    }
+    if (pitchMismatchPercent > 1) {
+      warnings.push({ severity: 'bad', label: 'RASTER', text: `Entered cabinet raster differs from the pitch-derived check by up to ${format(pitchMismatchPercent, 1)}%. Verify the exact product specification.` });
+    }
+    if (content.aspectMismatchPercent > 1) {
+      warnings.push({ severity: 'warn', label: 'CONTENT', text: `Source and wall aspect ratios differ by ${format(content.aspectMismatchPercent, 1)}%. ${content.fitLabel} requires deliberate scaling, crop, or letterbox review.` });
+    }
+    if (content.sourceLarger) {
+      warnings.push({ severity: 'info', label: 'SOURCE', text: 'Source raster is larger than the native wall raster, so the processor or playback chain must downscale it. This is not inherently an error.' });
+    }
+    if (!content.standardNativeRaster) {
+      warnings.push({ severity: 'info', label: 'CANVAS', text: 'Native wall raster is nonstandard. Confirm playback, switcher-scaling, graphics-canvas, and IMAG workflows at the exact native resolution.' });
+    }
+    if (processing.processorPortCount && processing.portsRequired > processing.processorPortCount) {
+      warnings.push({ severity: 'bad', label: 'PORTS', text: `${processing.portsRequired} estimated data ports exceed the ${processing.processorPortCount} physical ports entered for the processor.` });
+    } else if (processing.portUtilization > 80) {
+      warnings.push({ severity: 'bad', label: 'PORTS', text: `Average estimated port loading is ${format(processing.portUtilization, 1)}% of adjusted capacity. Add a port or use a product-specific loading plan.` });
+    } else if (processing.portUtilization > 70) {
+      warnings.push({ severity: 'warn', label: 'PORTS', text: `Average estimated port loading is ${format(processing.portUtilization, 1)}%. Preserve practical cabinet-chain boundaries and verify the map in the manufacturer software.` });
+    }
+    if (processing.receiverIncomplete) {
+      warnings.push({ severity: 'warn', label: 'RECEIVER', text: 'Enter both receiver-card width and height limits to validate cabinet loading.' });
+    } else if (processing.receiverExceeded) {
+      warnings.push({ severity: 'bad', label: 'RECEIVER', text: `The ${cabinetPixelsWide} × ${cabinetPixelsHigh} cabinet raster exceeds the entered ${processing.receiverPixelsWide} × ${processing.receiverPixelsHigh} receiver-card limit.` });
+    }
+    if (viewing.status === 'bad') {
+      warnings.push({ severity: 'bad', label: 'VIEWING', text: viewing.message });
+    } else if (viewing.status === 'warn') {
+      warnings.push({ severity: 'warn', label: 'VIEWING', text: viewing.message });
+    }
+    if (!warnings.length) {
+      warnings.push({ severity: 'info', label: 'CHECK', text: 'No generic planning thresholds are exceeded. Product-specific verification is still required.' });
+    }
+
+    renderLedWall({
+      mode, productName, pitchMm, rotated, cabinetWidthMm, cabinetHeightMm,
+      cabinetPixelsWide, cabinetPixelsHigh, cabinetsWide, cabinetsHigh, cabinetsTotal,
+      wallWidthMm, wallHeightMm, wallWidthM, wallHeightM, wallWidthFt, wallHeightFt,
+      wallWidthPx, wallHeightPx, totalPixels, aspectRatio, areaM2, areaFt2, diagonalM,
+      diagonalFt, pitchDerivedWide, pitchDerivedHigh, targetOutcome, content, processing,
+      power, viewing, warnings, enteredRasterProvided, rasterIncomplete,
+      impliedPitchWideMm, impliedPitchHighMm
+    });
+
+    const ledWall = {
+      mode, productName, pitchMm, rotated, cabinetWidthMm, cabinetHeightMm,
+      cabinetPixelsWide, cabinetPixelsHigh, cabinetsWide, cabinetsHigh, cabinetsTotal,
+      wallWidthMm, wallHeightMm, wallWidthM, wallHeightM, wallWidthFt, wallHeightFt,
+      wallWidthPx, wallHeightPx, totalPixels, aspectRatio, areaM2, areaFt2, diagonalM,
+      diagonalFt, pitchDerivedWide, pitchDerivedHigh, targetOutcome, content, processing,
+      power, viewing, warnings, enteredRasterProvided, rasterIncomplete,
+      impliedPitchWideMm, impliedPitchHighMm
+    };
+    latestLedPower = power;
+    latestLedSummary = buildLedSummary(ledWall);
+    return ledWall;
+  }
+
+  function calculateLedContentFit(ledWall) {
+    const sourceWidthPx = numberValue('ledContentWidthPx');
+    const sourceHeightPx = numberValue('ledContentHeightPx');
+    const sourceAspect = sourceWidthPx / sourceHeightPx;
+    const scaleX = ledWall.wallWidthPx / sourceWidthPx;
+    const scaleY = ledWall.wallHeightPx / sourceHeightPx;
+    const aspectMismatchPercent = Math.abs(ledWall.aspectRatio - sourceAspect) / sourceAspect * 100;
+    const fitPolicy = ['contain', 'cover', 'stretch'].includes(state.ledFitPolicy) ? state.ledFitPolicy : 'contain';
+    const exactRaster = sourceWidthPx === ledWall.wallWidthPx && sourceHeightPx === ledWall.wallHeightPx;
+    const sourceLarger = sourceWidthPx > ledWall.wallWidthPx || sourceHeightPx > ledWall.wallHeightPx;
+    const uniformScale = fitPolicy === 'cover' ? Math.max(scaleX, scaleY) : Math.min(scaleX, scaleY);
+    const activeWidth = fitPolicy === 'stretch' ? ledWall.wallWidthPx : Math.min(ledWall.wallWidthPx, sourceWidthPx * uniformScale);
+    const activeHeight = fitPolicy === 'stretch' ? ledWall.wallHeightPx : Math.min(ledWall.wallHeightPx, sourceHeightPx * uniformScale);
+    const activePixelUtilization = fitPolicy === 'cover' || fitPolicy === 'stretch'
+      ? 100
+      : activeWidth * activeHeight / ledWall.totalPixels * 100;
+    let fitLabel = exactRaster ? 'Native' : sourceLarger ? 'Downscale' : 'Upscale';
+    if (aspectMismatchPercent > 1) {
+      fitLabel = fitPolicy === 'cover' ? 'Crop / scale review' : fitPolicy === 'stretch' ? 'Non-uniform scale' : 'Letterbox review';
+    }
+    const standardNativeRaster = new Set(['1280x720', '1920x1080', '2560x1440', '3840x2160', '7680x4320'])
+      .has(`${ledWall.wallWidthPx}x${ledWall.wallHeightPx}`);
+    const bitsPerPixel = 3 * numberValue('ledBitDepth');
+    const sourceBandwidthGbps = sourceWidthPx * sourceHeightPx * numberValue('ledRefreshHz') * bitsPerPixel / 1e9 / 0.95;
+    return {
+      sourceWidthPx, sourceHeightPx, sourceAspect, scaleX, scaleY, aspectMismatchPercent,
+      fitPolicy, fitLabel, exactRaster, sourceLarger, activePixelUtilization,
+      standardNativeRaster, sourceBandwidthGbps
+    };
+  }
+
+  function calculateLedProcessing(ledWall) {
+    const refreshHz = numberValue('ledRefreshHz');
+    const bitDepth = numberValue('ledBitDepth');
+    const nominalPixelsPerPort = numberValue('ledPortBasePixels');
+    const planningUtilization = numberValue('ledPortSafetyPercent') / 100;
+    const processorPortCount = optionalNumberValue('ledProcessorPortCount');
+    const receiverPixelsWide = optionalNumberValue('ledReceiverPixelsWide');
+    const receiverPixelsHigh = optionalNumberValue('ledReceiverPixelsHigh');
+    const usablePayload = 0.95;
+    const bitsPerPixel = 3 * bitDepth;
+    const theoreticalPixelsPerPort = 1_000_000_000 * usablePayload / (refreshHz * bitsPerPixel);
+    const adjustedNominalPixelsPerPort = nominalPixelsPerPort * (60 / refreshHz) * (8 / bitDepth);
+    const cappedPixelsPerPort = Math.min(theoreticalPixelsPerPort, adjustedNominalPixelsPerPort);
+    const safePixelsPerPort = cappedPixelsPerPort * planningUtilization;
+    const portsRequired = Math.max(1, Math.ceil(ledWall.totalPixels / safePixelsPerPort));
+    const averagePixelsPerPort = ledWall.totalPixels / portsRequired;
+    const portUtilization = averagePixelsPerPort / cappedPixelsPerPort * 100;
+    const rawPayloadGbps = ledWall.totalPixels * refreshHz * bitsPerPixel / 1e9;
+    const plannedPayloadGbps = rawPayloadGbps / usablePayload;
+    const receiverIncomplete = Boolean(receiverPixelsWide) !== Boolean(receiverPixelsHigh);
+    const receiverExceeded = Boolean(receiverPixelsWide && receiverPixelsHigh) && (
+      ledWall.cabinetPixelsWide > receiverPixelsWide || ledWall.cabinetPixelsHigh > receiverPixelsHigh
+    );
+    return {
+      refreshHz, bitDepth, nominalPixelsPerPort, planningUtilization, processorPortCount,
+      receiverPixelsWide, receiverPixelsHigh, theoreticalPixelsPerPort,
+      adjustedNominalPixelsPerPort, cappedPixelsPerPort, safePixelsPerPort,
+      portsRequired, averagePixelsPerPort, portUtilization, rawPayloadGbps,
+      plannedPayloadGbps, receiverIncomplete, receiverExceeded
+    };
+  }
+
+  function calculateLedPower(ledWall) {
+    const maxWattsEach = numberValue('ledMaxWattsEach');
+    const typicalWattsEach = numberValue('ledTypicalWattsEach');
+    const voltage = numberValue('ledVoltage');
+    const breakerAmps = numberValue('ledCircuitAmps');
+    const continuousFactor = numberValue('ledContinuousPercent') / 100;
+    const phaseMode = state.ledPhaseMode === 'threePhase' ? 'threePhase' : 'singlePhase';
+    const powerFactor = numberValue('ledPowerFactor');
+    const cabinetsPerHomeRun = optionalNumberValue('ledCabinetsPerHomeRun');
+    const maxWatts = ledWall.cabinetsTotal * maxWattsEach;
+    const typicalWatts = ledWall.cabinetsTotal * typicalWattsEach;
+    const usableCircuitAmps = breakerAmps * continuousFactor;
+    const ampsFor = watts => phaseMode === 'threePhase'
+      ? watts / (Math.sqrt(3) * voltage * powerFactor)
+      : watts / voltage;
+    const maxAmps = ampsFor(maxWatts);
+    const typicalAmps = ampsFor(typicalWatts);
+    const maxCircuits = maxWatts > 0 ? Math.max(1, Math.ceil(maxAmps / usableCircuitAmps)) : 0;
+    const typicalCircuits = typicalWatts > 0 ? Math.max(1, Math.ceil(typicalAmps / usableCircuitAmps)) : 0;
+    const homeRunsRequired = cabinetsPerHomeRun ? Math.ceil(ledWall.cabinetsTotal / cabinetsPerHomeRun) : null;
+    return {
+      maxWattsEach, typicalWattsEach, voltage, breakerAmps, continuousFactor,
+      phaseMode, powerFactor, cabinetsPerHomeRun, maxWatts, typicalWatts,
+      maxAmps, typicalAmps, usableCircuitAmps, maxCircuits, typicalCircuits,
+      homeRunsRequired, maxPowerDensity: ledWall.areaM2 > 0 ? maxWatts / ledWall.areaM2 : 0
+    };
+  }
+
+  function calculateLedViewing(pitchMm) {
+    const closestDistance = numberValue('ledClosestViewer');
+    const closestUnit = state.ledClosestViewerUnit === 'm' ? 'm' : 'ft';
+    const minimumM = pitchMm;
+    const optimalM = pitchMm * 3;
+    const minimumFt = minimumM * 3.28084;
+    const optimalFt = optimalM * 3.28084;
+    const closestM = closestUnit === 'ft' ? closestDistance * 0.3048 : closestDistance;
+    let status = 'good';
+    let label = 'At or beyond optimal';
+    let message = 'Closest viewing position is at or beyond the optimal rule-of-thumb distance.';
+    if (closestM < minimumM) {
+      status = 'bad';
+      label = 'Inside minimum';
+      message = 'Closest viewer is inside the minimum planning distance; individual pixels may be obvious.';
+    } else if (closestM < optimalM) {
+      status = 'warn';
+      label = 'Between minimum and optimal';
+      message = 'Closest viewer is between minimum and optimal planning distances; validate with the actual product, content, and sightlines.';
+    }
+    return { closestDistance, closestUnit, closestM, minimumM, optimalM, minimumFt, optimalFt, status, label, message };
+  }
+
+  function renderLedWall(led) {
+    const viewerFill = Math.max(4, Math.min(100, led.viewing.closestM / led.viewing.optimalM * 100));
+    els.ledWallPreview.style.setProperty('--wall-cols', led.cabinetsWide);
+    els.ledWallPreview.style.setProperty('--wall-rows', led.cabinetsHigh);
+    els.ledWallPreview.style.setProperty('--wall-ratio', led.wallWidthMm / led.wallHeightMm);
+    els.ledWallPreview.setAttribute('aria-label', `${led.cabinetsWide} by ${led.cabinetsHigh} cabinet LED wall preview; ${format(led.wallWidthPx, 0)} by ${format(led.wallHeightPx, 0)} pixel native canvas.`);
+    els.ledPreviewRows.textContent = `${led.cabinetsHigh} cabinet${led.cabinetsHigh === 1 ? '' : 's'} high`;
+    els.ledPreviewColumns.textContent = `${led.cabinetsWide} cabinet${led.cabinetsWide === 1 ? '' : 's'} wide`;
+    els.ledPreviewArray.textContent = `${led.cabinetsWide} × ${led.cabinetsHigh}`;
+    els.ledPreviewCanvas.innerHTML = `${format(led.wallWidthPx, 0)} × ${format(led.wallHeightPx, 0)} native canvas<br>${format(led.wallWidthM, 2)} × ${format(led.wallHeightM, 2)} m build`;
+    els.ledPreviewPortRail.style.setProperty('--rail-fill', `${Math.min(100, led.processing.portUtilization)}%`);
+    els.ledPreviewPort.textContent = `${format(led.processing.portUtilization, 0)}%`;
+    els.ledPreviewViewerRail.style.setProperty('--rail-fill', `${viewerFill}%`);
+    els.ledPreviewViewer.textContent = led.viewing.status === 'good' ? 'Optimal' : led.viewing.status === 'warn' ? 'Review' : 'Too close';
+
+    els.ledWallDimensions.textContent = `${format(led.wallWidthFt, 2)} × ${format(led.wallHeightFt, 2)} ft`;
+    els.ledWallDimensionsMetric.textContent = `${format(led.wallWidthM, 2)} × ${format(led.wallHeightM, 2)} m`;
+    els.ledNativeRaster.textContent = `${format(led.wallWidthPx, 0)} × ${format(led.wallHeightPx, 0)} px`;
+    els.ledNativeMeta.textContent = `${format(led.totalPixels / 1e6, 2)} MP · ${format(led.aspectRatio, 3)}:1`;
+    els.ledContentFit.textContent = led.content.fitLabel;
+    els.ledContentMeta.textContent = `${format(led.content.sourceWidthPx, 0)} × ${format(led.content.sourceHeightPx, 0)} source`;
+    els.ledProcessing.textContent = `${led.processing.portsRequired} data port${led.processing.portsRequired === 1 ? '' : 's'}`;
+    els.ledProcessingMeta.textContent = `${format(led.processing.safePixelsPerPort, 0)} safe px / port estimate`;
+    els.ledPower.textContent = `${format(led.power.maxWatts / 1000, 2)} kW max`;
+    els.ledPowerMeta.textContent = `${format(led.power.typicalWatts / 1000, 2)} kW typical · ~${format(led.power.typicalAmps, 1)} A est.`;
+
+    els.ledBuildArray.textContent = `${led.cabinetsWide} × ${led.cabinetsHigh} cabinets${led.rotated ? ' · rotated' : ''}`;
+    els.ledCabinetCount.textContent = format(led.cabinetsTotal, 0);
+    els.ledMetricSize.textContent = `${format(led.wallWidthM, 3)} × ${format(led.wallHeightM, 3)} m`;
+    els.ledImperialSize.textContent = `${formatFeetInches(led.wallWidthMm)} × ${formatFeetInches(led.wallHeightMm)}`;
+    els.ledArea.textContent = `${format(led.areaM2, 2)} m² · ${format(led.areaFt2, 2)} ft²`;
+    els.ledDiagonal.textContent = `${format(led.diagonalM, 2)} m · ${format(led.diagonalFt, 2)} ft`;
+    els.ledCabinetRaster.textContent = `${format(led.cabinetPixelsWide, 0)} × ${format(led.cabinetPixelsHigh, 0)} px · ${led.enteredRasterProvided ? 'entered' : 'pitch derived'}`;
+    els.ledPitchDerivedRaster.textContent = `${format(led.pitchDerivedWide, 2)} × ${format(led.pitchDerivedHigh, 2)} px`;
+    els.ledImpliedPitch.textContent = `${format(led.impliedPitchWideMm, 3)} × ${format(led.impliedPitchHighMm, 3)} mm`;
+    els.ledTargetOutcome.textContent = led.targetOutcome;
+
+    els.ledSourceToWall.textContent = `${format(led.content.sourceWidthPx, 0)} × ${format(led.content.sourceHeightPx, 0)} → ${format(led.wallWidthPx, 0)} × ${format(led.wallHeightPx, 0)}`;
+    els.ledScaleFactors.textContent = `${format(led.content.scaleX, 3)}× / ${format(led.content.scaleY, 3)}×`;
+    els.ledPixelUtilization.textContent = `${format(led.content.activePixelUtilization, 1)}%`;
+    els.ledAspectMismatch.textContent = `${format(led.content.aspectMismatchPercent, 2)}%`;
+    els.ledSuggestedCanvas.textContent = `${format(led.wallWidthPx, 0)} × ${format(led.wallHeightPx, 0)} px`;
+    els.ledSourceBandwidth.textContent = `${format(led.content.sourceBandwidthGbps, 2)} Gbps uncompressed`;
+    els.ledContentGuidance.textContent = led.content.exactRaster
+      ? 'Source and wall rasters match exactly. Native wall raster remains the first-choice graphics canvas.'
+      : `${led.content.fitLabel}: use the native ${format(led.wallWidthPx, 0)} × ${format(led.wallHeightPx, 0)} canvas when possible and confirm the selected fit policy end to end.`;
+
+    els.ledSafePixelsPerPort.textContent = format(led.processing.safePixelsPerPort, 0);
+    els.ledAveragePortLoad.textContent = format(led.processing.averagePixelsPerPort, 0);
+    els.ledPortUtilization.textContent = `${format(led.processing.portUtilization, 1)}%`;
+    els.ledWallPayload.textContent = `${format(led.processing.plannedPayloadGbps, 2)} Gbps planned payload`;
+    els.ledProcessorGuidance.textContent = `${led.processing.portsRequired} generic 1 GbE output port(s) at ${format(led.processing.refreshHz, 2)} Hz / ${format(led.processing.bitDepth, 0)} bit. Do not turn this even pixel split into a cable map; allocate complete cabinets and verify the heaviest chain in the actual processor software.`;
+
+    const phaseLabel = led.power.phaseMode === 'threePhase'
+      ? `balanced 3-phase, PF ${format(led.power.powerFactor, 2)}`
+      : 'single-phase watts ÷ volts estimate';
+    els.ledMaxLoad.textContent = `${format(led.power.maxWatts / 1000, 2)} kW · ~${format(led.power.maxAmps, 1)} A estimate`;
+    els.ledTypicalLoad.textContent = `${format(led.power.typicalWatts / 1000, 2)} kW · ~${format(led.power.typicalAmps, 1)} A estimate`;
+    els.ledCircuitPlan.textContent = `${led.power.maxCircuits} max · ${led.power.typicalCircuits} typical (${format(led.power.breakerAmps, 0)} A)`;
+    els.ledHomeRuns.textContent = led.power.homeRunsRequired
+      ? `${led.power.homeRunsRequired} product run${led.power.homeRunsRequired === 1 ? '' : 's'} · ${format(led.power.cabinetsPerHomeRun, 0)} cabinets each`
+      : 'Not specified';
+    els.ledViewingRange.textContent = `${format(led.viewing.minimumFt, 1)}–${format(led.viewing.optimalFt, 1)} ft · ${format(led.viewing.minimumM, 1)}–${format(led.viewing.optimalM, 1)} m`;
+    els.ledAudienceCheck.textContent = led.viewing.label;
+    els.ledPowerResult.title = `${phaseLabel}; ${format(led.power.maxPowerDensity, 0)} W/m² maximum density`;
+
+    setLedResultState(els.ledContentResult, led.content.exactRaster ? 'good' : led.content.aspectMismatchPercent > 1 ? 'warn' : 'good');
+    const processingBad = led.processing.processorPortCount && led.processing.portsRequired > led.processing.processorPortCount;
+    setLedResultState(els.ledProcessingResult, processingBad ? 'bad' : led.processing.portUtilization > 70 ? 'warn' : 'good');
+    setLedResultState(els.ledPowerResult, '');
+    setLedResultState(els.ledWallResult, '');
+    setLedResultState(els.ledRasterResult, '');
+    renderLedWarnings(led.warnings);
+  }
+
+  function setLedResultState(element, status) {
+    element.classList.remove('good', 'warn', 'bad');
+    if (status) element.classList.add(status);
+  }
+
+  function setLedPreviewView(view) {
+    const front = view === 'front';
+    els.ledWallPreview.parentElement.classList.toggle('front-view', front);
+    els.ledPreviewFrontBtn.setAttribute('aria-pressed', String(front));
+    els.ledPreviewIsoBtn.setAttribute('aria-pressed', String(!front));
+    announceAction(`LED cabinet map switched to ${front ? 'front' : 'isometric'} view.`, 'success');
+  }
+
+  function renderLedWarnings(warnings) {
+    els.ledWarnings.replaceChildren(...warnings.map(item => {
+      const row = document.createElement('li');
+      row.dataset.severity = item.severity;
+      row.dataset.label = item.label;
+      row.textContent = item.text;
+      return row;
+    }));
+  }
+
+  function formatFeetInches(millimeters) {
+    const totalInches = millimeters / 25.4;
+    let feet = Math.floor(totalInches / 12);
+    let inches = totalInches - feet * 12;
+    if (inches >= 11.95) {
+      feet += 1;
+      inches = 0;
+    }
+    return `${feet} ft ${format(inches, 1)} in`;
+  }
+
+  function buildLedSummary(led) {
+    const phaseLabel = led.power.phaseMode === 'threePhase'
+      ? `balanced three-phase at PF ${format(led.power.powerFactor, 2)}`
+      : 'single-phase watts-divided-by-volts estimate';
+    return [
+      `LED profile: ${led.productName}; P${format(led.pitchMm, 2)}, ${format(led.cabinetWidthMm, 0)} × ${format(led.cabinetHeightMm, 0)} mm effective cabinet, ${format(led.cabinetPixelsWide, 0)} × ${format(led.cabinetPixelsHigh, 0)} px${led.rotated ? ', rotated 90 degrees' : ''}.`,
+      `LED wall: ${led.cabinetsWide} × ${led.cabinetsHigh} cabinets (${led.cabinetsTotal} total), ${format(led.wallWidthM, 2)} × ${format(led.wallHeightM, 2)} m / ${format(led.wallWidthFt, 2)} × ${format(led.wallHeightFt, 2)} ft, ${format(led.wallWidthPx, 0)} × ${format(led.wallHeightPx, 0)} px native raster (${format(led.totalPixels / 1e6, 2)} MP).`,
+      `LED content: ${format(led.content.sourceWidthPx, 0)} × ${format(led.content.sourceHeightPx, 0)} source to ${format(led.wallWidthPx, 0)} × ${format(led.wallHeightPx, 0)} native is ${led.content.fitLabel.toLowerCase()}; ${format(led.content.aspectMismatchPercent, 2)} percent aspect difference.`,
+      `NovaStar planning estimate: ${led.processing.portsRequired} generic 1 GbE data port(s) at ${format(led.processing.safePixelsPerPort, 0)} safe pixels per port; average adjusted-capacity loading ${format(led.processing.portUtilization, 1)} percent.`,
+      `LED power planning estimate: ${format(led.power.maxWatts / 1000, 2)} kW maximum / ${format(led.power.maxAmps, 1)} A and ${format(led.power.typicalWatts / 1000, 2)} kW typical / ${format(led.power.typicalAmps, 1)} A at ${format(led.power.voltage, 0)} V ${phaseLabel}; ${led.power.maxCircuits} maximum-load and ${led.power.typicalCircuits} typical-load ${format(led.power.breakerAmps, 0)} A circuit(s) at a ${format(led.power.continuousFactor * 100, 0)} percent planning target.`,
+      `LED viewing estimate: P${format(led.pitchMm, 2)} gives ${format(led.viewing.minimumFt, 1)} ft minimum and ${format(led.viewing.optimalFt, 1)} ft optimal rule-of-thumb distances; closest audience is ${format(led.viewing.closestDistance, 1)} ${led.viewing.closestUnit} (${led.viewing.label.toLowerCase()}).`,
+      'LED verification required: confirm cabinet, receiver-card, processor, signal, power, daisy-chain, and venue distribution specifications against actual product documentation.'
+    ].join('\n');
+  }
+
+  function renderSummary(audio, projection, storageCalc, power, drop, spl, led) {
     const powerSummary = power.method === 'amps'
       ? power.complete
         ? `Power planning: ${power.count} device(s) at ${format(power.ampsEach, 2)} nameplate A each total ${format(power.ampsEstimate, 2)} A, or ${format(power.percentOfReference, 0)} percent of an 80 percent circuit-rating reference. Include startup or inrush demand and verify the distribution.`
@@ -1378,7 +2797,9 @@
       `Record storage: ${storageCalc.feeds} feed(s) at ${format(storageCalc.bitrate, 0)} Mbps for ${format(storageCalc.hours, 2)} hr needs ${format(storageCalc.totalGb, 1)} GB with ${format(storageCalc.headroom, 0)} percent headroom.`,
       powerSummary,
       `Voltage drop: ${format(drop.amps, 1)} A over ${format(drop.lengthFt, 0)} ft of ${drop.gauge} AWG at ${format(drop.voltage, 0)} V drops ${format(drop.dropV, 2)} V (${format(drop.percent, 1)} percent), ending at ${format(drop.endV, 1)} V.`,
-      `SPL distance: ${format(spl.refSpl, 0)} dB at ${format(spl.refDist, 1)} ft is about ${format(spl.splAt, 1)} dB at ${format(spl.targetDist, 0)} ft (${format(spl.loss, 1)} dB loss).`
+      `SPL distance: ${format(spl.refSpl, 0)} dB at ${format(spl.refDist, 1)} ft is about ${format(spl.splAt, 1)} dB at ${format(spl.targetDist, 0)} ft (${format(spl.loss, 1)} dB loss).`,
+      '',
+      buildLedSummary(led)
     ].join('\n');
   }
 
@@ -1391,10 +2812,17 @@
   }
 
   async function copySummary(button) {
-    const text = els.summaryOutput.textContent;
+    await copyText(button, els.summaryOutput.textContent, 'Summary copied.');
+  }
+
+  async function copyLedSummary() {
+    await copyText(els.copyLedSummaryBtn, latestLedSummary, 'LED wall summary copied.');
+  }
+
+  async function copyText(button, text, successMessage) {
     try {
       await navigator.clipboard.writeText(text);
-      announceAction('Summary copied.', 'success');
+      announceAction(successMessage, 'success');
       pulse(button, 'success');
     } catch (error) {
       const area = document.createElement('textarea');
@@ -1408,28 +2836,60 @@
         copied = false;
       }
       area.remove();
-      announceAction(copied ? 'Summary copied.' : 'Copy failed.', copied ? 'success' : 'error');
+      announceAction(copied ? successMessage : 'Copy failed.', copied ? 'success' : 'error');
       pulse(button, copied ? 'success' : 'error');
     }
   }
 
   function downloadSummary() {
-    const blob = new Blob([els.summaryOutput.textContent], { type: 'text/plain' });
+    downloadText(els.summaryOutput.textContent, 'av-calculator-summary.txt', 'Summary downloaded.');
+  }
+
+  function downloadLedSummary() {
+    downloadText(latestLedSummary, 'led-wall-configuration.txt', 'LED wall summary downloaded.');
+  }
+
+  function downloadText(text, filename, successMessage) {
+    const blob = new Blob([text], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = 'av-calculator-summary.txt';
+    link.download = filename;
     document.body.appendChild(link);
     link.click();
     link.remove();
     window.setTimeout(() => URL.revokeObjectURL(url), 250);
-    announceAction('Summary downloaded.', 'success');
+    announceAction(successMessage, 'success');
+  }
+
+  function sendLedPowerToPowerLoad(kind) {
+    if (!latestLedPower) return;
+    const maximum = kind === 'maximum';
+    state.powerMethod = 'watts';
+    state.deviceAmps = 0;
+    state.deviceWatts = maximum ? latestLedPower.maxWatts : latestLedPower.typicalWatts;
+    state.powerFactor = 0;
+    state.deviceCount = 1;
+    state.voltage = latestLedPower.voltage;
+    state.circuitAmps = latestLedPower.breakerAmps;
+    setFieldValues();
+    syncPowerMethodUI();
+    syncLedModeUI();
+    syncLedPowerModeUI();
+    normalizeFields();
+    const saved = saveState();
+    calculate();
+    announceAction(`${maximum ? 'Maximum' : 'Typical'} LED wattage sent to Power Load. Enter the product’s manufacturer power factor before using its current estimate.${saved ? '' : ' Browser storage is unavailable.'}`, saved ? 'success' : 'error');
+    document.getElementById('powerCard').scrollIntoView({ block: 'center', behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
   }
 
   function resetValues() {
     state = { ...DEFAULTS };
     setFieldValues();
     syncPowerMethodUI();
+    syncLedModeUI();
+    syncLedPowerModeUI();
+    refreshLedProfileOptions();
     normalizeFields();
     const saved = saveState();
     calculate();
@@ -1485,13 +2945,24 @@
   els.resetBtn.addEventListener('click', resetValues);
   els.copyButtons.forEach(button => button.addEventListener('click', () => copySummary(button)));
   els.downloadSummaryBtn.addEventListener('click', downloadSummary);
+  els.saveLedPresetBtn.addEventListener('click', saveLedPreset);
+  els.copyLedSummaryBtn.addEventListener('click', copyLedSummary);
+  els.downloadLedSummaryBtn.addEventListener('click', downloadLedSummary);
+  els.ledProfileSelect.addEventListener('change', applyLedPreset);
+  els.sendLedTypicalPowerBtn.addEventListener('click', () => sendLedPowerToPowerLoad('typical'));
+  els.sendLedMaxPowerBtn.addEventListener('click', () => sendLedPowerToPowerLoad('maximum'));
+  els.ledPreviewIsoBtn.addEventListener('click', () => setLedPreviewView('isometric'));
+  els.ledPreviewFrontBtn.addEventListener('click', () => setLedPreviewView('front'));
   Array.from(document.querySelectorAll('button')).forEach(attachPressFeedback);
 
   if (!storage.available) {
     els.saveStatus.textContent = 'Storage blocked';
   }
+  refreshLedProfileOptions();
   setFieldValues();
   syncPowerMethodUI();
+  syncLedModeUI();
+  syncLedPowerModeUI();
   const initialNormalizations = normalizeFields();
   const initialSaved = saveState();
   calculate();

@@ -2,6 +2,13 @@
 
 ## 2026-08-26
 
+### Cabinet-aware LED Wall Configurator
+
+* Added an advanced LED planning suite to the AV Calculator with cabinet-layout, target-size, target-raster, and custom-panel modes; target dimensions independently round up to whole cabinet columns and rows instead of altering physical measurements.
+* Added profile persistence, cabinet rotation, entered-or-derived cabinet raster validation, a live front/isometric 3D cabinet map, exact physical geometry, native canvas and content-fit guidance, generic NovaStar port estimates, receiver-card checks, and conservative pixel-pitch viewing guidance.
+* Added distinct maximum and typical LED power plans, optional product home-run counts, a fail-safe handoff into the existing Power Load calculator, copy/download summaries, and persistent product/venue verification language.
+* Added a browser regression probe for cabinet ceilings, rotation, raster derivation, numeric normalization, preset round trips, Power Load handoff, accessible labeling, touch targets, and persistent warning behavior.
+
 ### AV Workbook flagship redesign
 
 * Rebuilt AV Workbook as the AV suite's visual main character: an obsidian show-control chassis, oversized editorial show title, illuminated status hardware, signal-line hierarchy, denser workbook metrics, stronger empty states, and a fully responsive phone layout.

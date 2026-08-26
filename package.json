@@ -13,6 +13,7 @@
     "check:throwline-catalog": "node scripts/sync_throwline_catalog.js --check",
     "verify:throwline": "node scripts/sync_throwline_catalog.js --check && node scripts/verify_throwline_release.js",
     "probe:av-themes": "node scripts/probe_av_themes.js",
+    "probe:led-configurator": "node scripts/probe_led_wall_configurator.js",
     "verify:gear-reference": "node scripts/verify_gear_reference.js",
     "verify:indexing": "node scripts/verify_indexing_policy.js",
     "sync:noteforge": "node scripts/sync_noteforge_release.js",
