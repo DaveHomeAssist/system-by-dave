@@ -155,6 +155,14 @@ function assertPageContracts(registry) {
   if (/createSampleWorkbook/.test(workbookStore)) {
     fail('AV Workbook store still seeds the sample workbook on first launch.');
   }
+  const workbookApp = read('apps/av-workbook/src/App.tsx');
+  const packageManifest = JSON.parse(read('package.json'));
+  if (!/useGSAP/.test(workbookApp) || !/ScrollTrigger/.test(workbookApp) || !/prefers-reduced-motion: reduce/.test(workbookApp)) {
+    fail('AV Workbook flagship motion is missing scoped GSAP, ScrollTrigger, or reduced-motion handling.');
+  }
+  if (!packageManifest.dependencies?.gsap || !packageManifest.dependencies?.['@gsap/react']) {
+    fail('AV Workbook GSAP dependencies are not declared as production dependencies.');
+  }
 
   const ontrack = read('ontrack.html');
   if (!/<h1 class="logo">/.test(ontrack)) fail('OnTrack is missing its page-level heading.');

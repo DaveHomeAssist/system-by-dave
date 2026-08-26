@@ -18,6 +18,8 @@ const chromeArg = args.find((arg) => arg.startsWith('--chrome='));
 const targetArg = args.find((arg) => arg.startsWith('--target='));
 const widthArg = args.find((arg) => arg.startsWith('--width='));
 const captureArg = args.find((arg) => arg.startsWith('--capture-dir='));
+const motionArg = args.find((arg) => arg.startsWith('--motion='));
+const sampleWorkbook = args.includes('--sample-workbook');
 const baseUrl = (baseArg ? baseArg.slice('--base='.length) : 'http://127.0.0.1:8000/').replace(/\/?$/, '/');
 const chromeBin = chromeArg ? chromeArg.slice('--chrome='.length) : (
   process.env.CHROME_BIN || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
@@ -25,6 +27,11 @@ const chromeBin = chromeArg ? chromeArg.slice('--chrome='.length) : (
 const root = path.resolve(__dirname, '..');
 const viewportWidth = widthArg ? Number(widthArg.slice('--width='.length)) : 390;
 const captureDir = captureArg ? path.resolve(captureArg.slice('--capture-dir='.length)) : '';
+const motionPreference = motionArg ? motionArg.slice('--motion='.length) : 'reduce';
+
+if (motionPreference !== 'reduce' && motionPreference !== 'no-preference') {
+  throw new Error('--motion must be reduce or no-preference.');
+}
 
 function loadRegistry() {
   const context = {};
@@ -278,7 +285,7 @@ async function main() {
         media: 'screen',
         features: [
           { name: 'prefers-color-scheme', value: preference },
-          { name: 'prefers-reduced-motion', value: 'reduce' }
+          { name: 'prefers-reduced-motion', value: motionPreference }
         ]
       });
 
@@ -294,9 +301,71 @@ async function main() {
       for (const target of targets) {
         exceptions = [];
         await cdp('Page.navigate', { url: new URL(target.href, baseUrl).href });
-        await delay(target.id === 'pixelforge' || target.id === 'av-workbook' ? 1100 : 420);
+        if (target.id === 'av-workbook' && sampleWorkbook) {
+          await delay(900);
+          await cdp('Runtime.evaluate', {
+            expression: `(() => {
+              window.confirm = () => true;
+              const button = Array.from(document.querySelectorAll('button')).find((candidate) => candidate.textContent.trim() === 'Load Sample');
+              if (!button) return false;
+              button.click();
+              return true;
+            })()`
+          });
+          await delay(900);
+        }
+        await delay(target.id === 'av-workbook' && motionPreference === 'no-preference'
+          ? 2800
+          : target.id === 'pixelforge' || target.id === 'av-workbook' ? 1100 : 420);
         const evaluated = await cdp('Runtime.evaluate', { expression, returnByValue: true });
         const value = evaluated.result.value;
+        if (target.id === 'av-workbook' && motionPreference === 'no-preference') {
+          await cdp('Runtime.evaluate', { expression: 'window.scrollTo(0, document.documentElement.scrollHeight)' });
+          await delay(650);
+          const motionProbe = await cdp('Runtime.evaluate', {
+            expression: `(() => ({
+              progress: getComputedStyle(document.querySelector('.show-progress span')).transform,
+              titleOpacity: getComputedStyle(document.querySelector('.hero-title')).opacity,
+              titleVisibility: getComputedStyle(document.querySelector('.hero-title')).visibility
+            }))()`,
+            returnByValue: true
+          });
+          const motion = motionProbe.result.value;
+          if (motion.progress === 'none' || motion.progress.includes('(0, 0')) {
+            failures.push(`${target.id} ${preference}: GSAP scroll progress did not activate ${JSON.stringify(motion)}.`);
+          }
+          if (motion.titleOpacity !== '1' || motion.titleVisibility !== 'visible') {
+            failures.push(`${target.id} ${preference}: GSAP boot sequence did not settle ${JSON.stringify(motion)}.`);
+          }
+          await cdp('Runtime.evaluate', { expression: 'window.scrollTo(0, 0)' });
+          await delay(180);
+        }
+        if (target.id === 'av-workbook' && sampleWorkbook) {
+          const engineProbe = await cdp('Runtime.evaluate', {
+            expression: `(() => {
+              const button = Array.from(document.querySelectorAll('[role="tab"]')).find((candidate) => candidate.textContent.includes('Engines'));
+              if (!button) return false;
+              button.click();
+              return true;
+            })()`,
+            returnByValue: true
+          });
+          await delay(650);
+          const engineView = await cdp('Runtime.evaluate', {
+            expression: `(() => ({
+              cards: document.querySelectorAll('.engine-card').length,
+              selected: document.querySelector('[role="tab"][aria-selected="true"]')?.textContent.trim() || ''
+            }))()`,
+            returnByValue: true
+          });
+          if (!engineProbe.result.value || engineView.result.value.cards !== 6 || !engineView.result.value.selected.includes('Engines')) {
+            failures.push(`${target.id} ${preference}: populated engine view did not render ${JSON.stringify(engineView.result.value)}.`);
+          }
+          await cdp('Runtime.evaluate', {
+            expression: `Array.from(document.querySelectorAll('[role="tab"]')).find((candidate) => candidate.textContent.includes('Overview'))?.click()`
+          });
+          await delay(420);
+        }
         if (target.id === 'av-calculator') {
           const calculatorProbe = await cdp('Runtime.evaluate', {
             expression: `(() => {
@@ -435,7 +504,7 @@ async function main() {
     focus: Math.min(current.focus, result.ratios.focus)
   }), { text: Infinity, muted: Infinity, accent: Infinity, primary: Infinity, focus: Infinity });
 
-  console.log(`AV theme browser probe passed (${targets.length} surfaces × ${preferences.length} preferences at ${viewportWidth}px).`);
+  console.log(`AV theme browser probe passed (${targets.length} surfaces × ${preferences.length} preferences at ${viewportWidth}px, motion=${motionPreference}${sampleWorkbook ? ', sample-workbook' : ''}).`);
   console.log(JSON.stringify({ registry: registry.version, minimumContrast: minimums }, null, 2));
 }
 

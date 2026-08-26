@@ -2,6 +2,12 @@
 
 ## 2026-08-26
 
+### AV Workbook flagship redesign
+
+* Rebuilt AV Workbook as the AV suite's visual main character: an obsidian show-control chassis, oversized editorial show title, illuminated status hardware, signal-line hierarchy, denser workbook metrics, stronger empty states, and a fully responsive phone layout.
+* Added a locally bundled GSAP motion system with a sequenced console boot, signal acquisition, scroll-progress rail, staged view transitions, and complete reduced-motion bypass and React cleanup.
+* Added automated contracts for the production GSAP dependencies and motion implementation, plus browser probes that exercise both reduced and full-motion paths across Dark and Light themes.
+
 ### AV Calculator power inputs and AV Workbook theme inheritance
 
 * Made nameplate amps the default Power Load input, added an explicit watts-plus-manufacturer-power-factor fallback, and kept the 80 percent output framed as a planning reference rather than a safety verdict.
