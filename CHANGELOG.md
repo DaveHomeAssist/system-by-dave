@@ -2,6 +2,12 @@
 
 ## 2026-08-26
 
+### AV Calculator power-estimate reliability
+
+* Relabeled the Power Load amperage output as a power-factor-1 estimate, removed circuit-safety verdicts, and made the summary direct operators to equipment nameplate current or VA plus startup and inrush demand.
+* Normalized every numeric field to its declared minimum, maximum, and step before calculation or browser storage, with the displayed value kept in sync.
+* Kept the equipment-and-venue verification warning persistent while routing calculation, storage, copy, download, and reset feedback through a separate polite live-status region.
+
 ### Show Board data-safety fixes
 
 * Fixed a Show Board defect that threw away a day's room pre-checks. Switching day tabs pruned the check record down to the day being viewed, so the ticks for the day actually being worked were lost on every glance at another date. Checks are now kept per day, and stale groups are collected only when a day is deleted.

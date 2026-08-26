@@ -6,14 +6,14 @@
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'none'">
 <title>AV Calculator | System by Dave</title>
 <meta name="robots" content="index,follow">
-<meta name="description" content="A browser based AV calculator for audio delay, projection throw, record storage, and power load checks.">
+<meta name="description" content="A browser based AV calculator for audio delay, projection throw, record storage, and power load estimates.">
 <link rel="canonical" href="https://systembydave.com/av-calculator.html">
 <meta name="theme-color" content="#EEE8DF" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0C1016" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="System by Dave">
 <meta property="og:title" content="AV Calculator">
-<meta property="og:description" content="A browser based AV calculator for audio delay, projection throw, record storage, and power load checks.">
+<meta property="og:description" content="A browser based AV calculator for audio delay, projection throw, record storage, and power load estimates.">
 <meta property="og:url" content="https://systembydave.com/av-calculator.html">
 <meta property="og:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
 <meta property="og:image:width" content="1024">
@@ -21,7 +21,7 @@
 <meta property="og:image:alt" content="System by Dave preview banner">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="AV Calculator">
-<meta name="twitter:description" content="A browser based AV calculator for audio delay, projection throw, record storage, and power load checks.">
+<meta name="twitter:description" content="A browser based AV calculator for audio delay, projection throw, record storage, and power load estimates.">
 <meta name="twitter:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
 <link rel="icon" href="svg/system_by_dave_logo_rust.svg" type="image/svg+xml">
 <link rel="manifest" href="manifest.json">
@@ -402,6 +402,8 @@
   }
   .hint.success{color:#bdf8ce}
   .hint.error{color:#ffd0d0}
+  .hint.warning{color:var(--amber)}
+  .status-message{min-height:1.45em}
 
   .feedback-success{
     animation:confirm var(--med) var(--ease);
@@ -502,7 +504,7 @@
       <div>
         <p class="eyebrow">Field math</p>
         <h1>AV calculator</h1>
-        <p>Fast operator checks for delay, projection, record storage, and power load. Values update as you type and the page remembers the last setup in this browser.</p>
+        <p>Fast operator checks for delay, projection, record storage, and power-load estimates. Values update as you type and the page remembers the last setup in this browser.</p>
       </div>
       <div class="hero-actions">
         <button type="button" class="primary" id="copySummaryBtn">Copy Summary</button>
@@ -519,7 +521,7 @@
         <div class="card-body">
           <div class="field">
             <label for="delayDistance">Distance</label>
-            <input id="delayDistance" data-key="delayDistance" type="number" min="0" step="0.1" value="72">
+            <input id="delayDistance" data-key="delayDistance" type="number" min="0" max="10000" step="0.1" value="72">
           </div>
           <div class="field">
             <label for="delayUnit">Unit</label>
@@ -530,7 +532,7 @@
           </div>
           <div class="field">
             <label for="delayTemp">Temperature F</label>
-            <input id="delayTemp" data-key="delayTemp" type="number" step="1" value="68">
+            <input id="delayTemp" data-key="delayTemp" type="number" min="-40" max="140" step="1" value="68">
           </div>
           <div class="field">
             <label for="delayFrameRate">Frame Rate</label>
@@ -560,7 +562,7 @@
         <div class="card-body">
           <div class="field">
             <label for="screenWidth">Screen Width Ft</label>
-            <input id="screenWidth" data-key="screenWidth" type="number" min="0.1" step="0.1" value="16">
+            <input id="screenWidth" data-key="screenWidth" type="number" min="0.1" max="1000" step="0.1" value="16">
           </div>
           <div class="field">
             <label for="aspectRatio">Aspect</label>
@@ -573,11 +575,11 @@
           </div>
           <div class="field">
             <label for="throwRatio">Throw Ratio</label>
-            <input id="throwRatio" data-key="throwRatio" type="number" min="0.1" step="0.01" value="1.5">
+            <input id="throwRatio" data-key="throwRatio" type="number" min="0.1" max="20" step="0.01" value="1.5">
           </div>
           <div class="field">
             <label for="throwDistance">Actual Distance Ft</label>
-            <input id="throwDistance" data-key="throwDistance" type="number" min="0" step="0.1" value="24">
+            <input id="throwDistance" data-key="throwDistance" type="number" min="0" max="10000" step="0.1" value="24">
           </div>
         </div>
         <div class="result-grid">
@@ -596,15 +598,15 @@
         <div class="card-body">
           <div class="field">
             <label for="bitrate">Bitrate Mbps</label>
-            <input id="bitrate" data-key="bitrate" type="number" min="0" step="1" value="50">
+            <input id="bitrate" data-key="bitrate" type="number" min="0" max="100000" step="1" value="50">
           </div>
           <div class="field">
             <label for="recordHours">Duration Hours</label>
-            <input id="recordHours" data-key="recordHours" type="number" min="0" step="0.25" value="2">
+            <input id="recordHours" data-key="recordHours" type="number" min="0" max="10000" step="0.25" value="2">
           </div>
           <div class="field">
             <label for="cameraCount">Record Feeds</label>
-            <input id="cameraCount" data-key="cameraCount" type="number" min="1" step="1" value="3">
+            <input id="cameraCount" data-key="cameraCount" type="number" min="1" max="1000" step="1" value="3">
           </div>
           <div class="field">
             <label for="storageHeadroom">Headroom Percent</label>
@@ -622,20 +624,20 @@
       <article class="calc-card" id="powerCard">
         <div class="card-head">
           <h2>Power Load</h2>
-          <span>Watts to amps</span>
+          <span>PF 1 estimate</span>
         </div>
         <div class="card-body">
           <div class="field">
             <label for="deviceWatts">Watts Each</label>
-            <input id="deviceWatts" data-key="deviceWatts" type="number" min="0" step="1" value="350">
+            <input id="deviceWatts" data-key="deviceWatts" type="number" min="0" max="1000000" step="1" value="350" aria-describedby="powerWarning">
           </div>
           <div class="field">
             <label for="deviceCount">Device Count</label>
-            <input id="deviceCount" data-key="deviceCount" type="number" min="1" step="1" value="4">
+            <input id="deviceCount" data-key="deviceCount" type="number" min="1" max="10000" step="1" value="4" aria-describedby="powerWarning">
           </div>
           <div class="field">
             <label for="voltage">Voltage</label>
-            <select id="voltage" data-key="voltage">
+            <select id="voltage" data-key="voltage" aria-describedby="powerWarning">
               <option value="120">120 V</option>
               <option value="208">208 V</option>
               <option value="230">230 V</option>
@@ -643,7 +645,7 @@
           </div>
           <div class="field">
             <label for="circuitAmps">Circuit Amps</label>
-            <select id="circuitAmps" data-key="circuitAmps">
+            <select id="circuitAmps" data-key="circuitAmps" aria-describedby="powerWarning">
               <option value="15">15 A</option>
               <option value="20" selected>20 A</option>
               <option value="30">30 A</option>
@@ -651,12 +653,12 @@
             </select>
           </div>
         </div>
-        <div class="result-grid">
+        <div class="result-grid" aria-describedby="powerWarning">
           <div class="result"><span>Total Watts</span><strong id="totalWatts">0 W</strong></div>
-          <div class="result"><span>Load</span><strong id="totalAmps">0 A</strong></div>
-          <div class="result" id="circuitResult"><span>80 Percent</span><strong id="circuitPercent">0%</strong></div>
+          <div class="result"><span>PF 1 Estimate</span><strong id="totalAmps">0 A</strong></div>
+          <div class="result" id="circuitResult"><span>Of 80% Reference</span><strong id="circuitPercent">0%</strong></div>
         </div>
-        <div class="hint" id="powerHint">Compare load against the 80 percent continuous circuit target.</div>
+        <div class="hint warning" id="powerWarning"><strong>Estimate only:</strong> watts &divide; volts assumes power factor 1. Use equipment nameplate current or VA and include startup or inrush demand before planning circuits.</div>
       </article>
 
       <article class="calc-card" id="voltageDropCard">
@@ -667,11 +669,11 @@
         <div class="card-body">
           <div class="field">
             <label for="dropAmps">Load Amps</label>
-            <input id="dropAmps" data-key="dropAmps" type="number" min="0" step="0.1" value="12">
+            <input id="dropAmps" data-key="dropAmps" type="number" min="0" max="10000" step="0.1" value="12">
           </div>
           <div class="field">
             <label for="dropLength">Run Ft (one way)</label>
-            <input id="dropLength" data-key="dropLength" type="number" min="0" step="1" value="100">
+            <input id="dropLength" data-key="dropLength" type="number" min="0" max="100000" step="1" value="100">
           </div>
           <div class="field">
             <label for="dropGauge">Wire Gauge</label>
@@ -710,15 +712,15 @@
         <div class="card-body">
           <div class="field">
             <label for="splRef">Reference SPL dB</label>
-            <input id="splRef" data-key="splRef" type="number" min="0" step="1" value="100">
+            <input id="splRef" data-key="splRef" type="number" min="0" max="200" step="1" value="100">
           </div>
           <div class="field">
             <label for="splRefDist">Reference Ft</label>
-            <input id="splRefDist" data-key="splRefDist" type="number" min="0.1" step="0.1" value="3">
+            <input id="splRefDist" data-key="splRefDist" type="number" min="0.1" max="100000" step="0.1" value="3">
           </div>
           <div class="field">
             <label for="splTargetDist">Target Ft</label>
-            <input id="splTargetDist" data-key="splTargetDist" type="number" min="0.1" step="1" value="50">
+            <input id="splTargetDist" data-key="splTargetDist" type="number" min="0.1" max="100000" step="0.1" value="50">
           </div>
         </div>
         <div class="result-grid">
@@ -742,7 +744,8 @@
           <button type="button" id="downloadSummaryBtn">Download TXT</button>
         </div>
       </div>
-      <div class="hint" id="globalHint">Calculations update as values change. Confirm final values against venue and equipment specs before show use.</div>
+      <div class="hint warning" id="verificationWarning"><strong>Field verification required:</strong> confirm every result against equipment specifications and venue conditions before show use. Calculator output does not verify electrical safety or suitability.</div>
+      <div class="hint status-message" id="actionStatus" role="status" aria-live="polite" aria-atomic="true"></div>
     </section>
   </main>
 </div>
@@ -795,8 +798,6 @@
     totalWatts: document.getElementById('totalWatts'),
     totalAmps: document.getElementById('totalAmps'),
     circuitPercent: document.getElementById('circuitPercent'),
-    circuitResult: document.getElementById('circuitResult'),
-    powerHint: document.getElementById('powerHint'),
     voltageDrop: document.getElementById('voltageDrop'),
     dropPercent: document.getElementById('dropPercent'),
     dropResult: document.getElementById('dropResult'),
@@ -808,11 +809,14 @@
     splHint: document.getElementById('splHint'),
     summaryOutput: document.getElementById('summaryOutput'),
     saveStatus: document.getElementById('saveStatus'),
-    globalHint: document.getElementById('globalHint'),
+    actionStatus: document.getElementById('actionStatus'),
     resetBtn: document.getElementById('resetBtn'),
     copyButtons: [document.getElementById('copySummaryBtn'), document.getElementById('copySummaryBtn2')],
     downloadSummaryBtn: document.getElementById('downloadSummaryBtn')
   };
+
+  let storageLoadState = 'defaults';
+  let calculationStatusTimer = 0;
 
   const storage = (() => {
     try {
@@ -821,12 +825,29 @@
       window.localStorage.removeItem(probe);
       return {
         available: true,
-        get: key => window.localStorage.getItem(key),
-        set: (key, value) => {
-          window.localStorage.setItem(key, value);
-          return true;
+        get: key => {
+          try {
+            return window.localStorage.getItem(key);
+          } catch (error) {
+            return null;
+          }
         },
-        remove: key => window.localStorage.removeItem(key)
+        set: (key, value) => {
+          try {
+            window.localStorage.setItem(key, value);
+            return true;
+          } catch (error) {
+            return false;
+          }
+        },
+        remove: key => {
+          try {
+            window.localStorage.removeItem(key);
+            return true;
+          } catch (error) {
+            return false;
+          }
+        }
       };
     } catch (error) {
       return {
@@ -845,8 +866,13 @@
     if (!saved) return { ...DEFAULTS };
     try {
       const parsed = JSON.parse(saved);
+      if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+        throw new TypeError('Saved calculator state must be an object.');
+      }
+      storageLoadState = 'loaded';
       return { ...DEFAULTS, ...parsed };
     } catch (error) {
+      storageLoadState = 'invalid';
       return { ...DEFAULTS };
     }
   }
@@ -854,12 +880,92 @@
   function saveState() {
     const saved = storage.set(STORE, JSON.stringify(state));
     els.saveStatus.textContent = saved ? 'Saved' : 'Storage blocked';
+    return saved;
   }
 
-  function numberValue(key, min, fallback) {
+  function numberValue(key) {
     const value = Number(state[key]);
-    if (!Number.isFinite(value)) return fallback;
-    return Math.max(min, value);
+    return Number.isFinite(value) ? value : Number(DEFAULTS[key]);
+  }
+
+  function fieldLabel(field) {
+    const label = Array.from(document.querySelectorAll('label')).find(candidate => candidate.htmlFor === field.id);
+    return label ? label.textContent.trim() : field.dataset.key;
+  }
+
+  function decimalPlaces(value) {
+    const text = String(value);
+    const dot = text.indexOf('.');
+    return dot === -1 ? 0 : text.length - dot - 1;
+  }
+
+  function normalizeNumericField(field) {
+    const key = field.dataset.key;
+    const raw = field.value.trim();
+    const fallback = Number(DEFAULTS[key]);
+    const min = field.min === '' ? Number.NEGATIVE_INFINITY : Number(field.min);
+    const max = field.max === '' ? Number.POSITIVE_INFINITY : Number(field.max);
+    const step = field.step === '' || field.step === 'any' ? 0 : Number(field.step);
+    const label = fieldLabel(field);
+    let value = Number(raw);
+    let normalization = '';
+
+    if (raw === '' || !Number.isFinite(value)) {
+      value = fallback;
+      normalization = 'fallback';
+    } else if (value < min) {
+      value = min;
+      normalization = 'minimum';
+    } else if (value > max) {
+      value = max;
+      normalization = 'maximum';
+    }
+
+    if (Number.isFinite(step) && step > 0) {
+      const base = Number.isFinite(min) ? min : 0;
+      const stepOffset = (value - base) / step;
+      const roundingNudge = Number.EPSILON * Math.max(1, Math.abs(stepOffset)) * 8;
+      const stepped = base + (Math.round(stepOffset + roundingNudge) * step);
+      const tolerance = Math.max(1, Math.abs(value)) * Number.EPSILON * 16;
+      if (!normalization && Math.abs(stepped - value) > tolerance) {
+        normalization = 'step';
+      }
+      value = stepped;
+    }
+
+    value = Math.min(max, Math.max(min, value));
+    const precision = Math.min(8, Math.max(decimalPlaces(step), Number.isFinite(min) ? decimalPlaces(min) : 0));
+    value = Number(value.toFixed(precision));
+    const displayValue = String(value);
+    field.value = displayValue;
+    field.removeAttribute('aria-invalid');
+
+    if (normalization === 'fallback') return { value, message: `${label} was blank or invalid and reset to ${displayValue}.` };
+    if (normalization === 'minimum') return { value, message: `${label} was below ${min} and clamped to ${displayValue}.` };
+    if (normalization === 'maximum') return { value, message: `${label} was above ${max} and clamped to ${displayValue}.` };
+    if (normalization === 'step') return { value, message: `${label} was normalized to ${displayValue} to match ${step} increments.` };
+    return { value, message: '' };
+  }
+
+  function normalizeFields() {
+    const messages = [];
+    fields.forEach(field => {
+      const key = field.dataset.key;
+      if (field.tagName === 'SELECT') {
+        const allowed = Array.from(field.options, option => option.value);
+        if (!allowed.includes(field.value)) {
+          field.value = String(DEFAULTS[key]);
+          messages.push(`${fieldLabel(field)} was invalid and reset to ${field.options[field.selectedIndex].text}.`);
+        }
+        state[key] = field.value;
+        return;
+      }
+
+      const normalized = normalizeNumericField(field);
+      state[key] = normalized.value;
+      if (normalized.message) messages.push(normalized.message);
+    });
+    return messages;
   }
 
   function setFieldValues() {
@@ -871,16 +977,10 @@
   }
 
   function readFields() {
-    fields.forEach(field => {
-      const key = field.dataset.key;
-      if (field.tagName === 'SELECT') {
-        state[key] = field.value;
-      } else {
-        state[key] = field.value;
-      }
-    });
-    saveState();
+    const normalizationMessages = normalizeFields();
+    const saved = saveState();
     calculate();
+    queueCalculationStatus(normalizationMessages, saved);
   }
 
   function calculate() {
@@ -894,15 +994,15 @@
   }
 
   function calculateDelay() {
-    const distanceInput = numberValue('delayDistance', 0, DEFAULTS.delayDistance);
+    const distanceInput = numberValue('delayDistance');
     const unit = state.delayUnit === 'm' ? 'm' : 'ft';
-    const tempF = numberValue('delayTemp', -40, DEFAULTS.delayTemp);
+    const tempF = numberValue('delayTemp');
     const tempC = (tempF - 32) * 5 / 9;
     const speedMps = 331.3 + (0.606 * tempC);
     const speedFps = speedMps * 3.28084;
     const distanceFt = unit === 'm' ? distanceInput * 3.28084 : distanceInput;
     const delayMs = speedFps > 0 ? distanceFt / speedFps * 1000 : 0;
-    const frameRate = numberValue('delayFrameRate', 1, DEFAULTS.delayFrameRate);
+    const frameRate = numberValue('delayFrameRate');
     const frames = delayMs / 1000 * frameRate;
     const samples = delayMs / 1000 * 48000;
     els.delayMs.textContent = `${format(delayMs, 1)} ms`;
@@ -915,10 +1015,10 @@
   }
 
   function calculateProjection() {
-    const widthFt = numberValue('screenWidth', 0.1, DEFAULTS.screenWidth);
-    const aspect = numberValue('aspectRatio', 0.1, DEFAULTS.aspectRatio);
-    const throwRatio = numberValue('throwRatio', 0.1, DEFAULTS.throwRatio);
-    const actualDistance = numberValue('throwDistance', 0, DEFAULTS.throwDistance);
+    const widthFt = numberValue('screenWidth');
+    const aspect = numberValue('aspectRatio');
+    const throwRatio = numberValue('throwRatio');
+    const actualDistance = numberValue('throwDistance');
     const heightFt = widthFt / aspect;
     const diagonalIn = Math.sqrt((widthFt * 12) ** 2 + (heightFt * 12) ** 2);
     const idealThrowFt = widthFt * throwRatio;
@@ -932,10 +1032,10 @@
   }
 
   function calculateStorage() {
-    const bitrate = numberValue('bitrate', 0, DEFAULTS.bitrate);
-    const hours = numberValue('recordHours', 0, DEFAULTS.recordHours);
-    const feeds = Math.max(1, Math.round(numberValue('cameraCount', 1, DEFAULTS.cameraCount)));
-    const headroom = numberValue('storageHeadroom', 0, DEFAULTS.storageHeadroom);
+    const bitrate = numberValue('bitrate');
+    const hours = numberValue('recordHours');
+    const feeds = numberValue('cameraCount');
+    const headroom = numberValue('storageHeadroom');
     const baseGb = bitrate * hours * 3600 / 8 / 1000 * feeds;
     const totalGb = baseGb * (1 + headroom / 100);
     const perHourGb = bitrate * 3600 / 8 / 1000 * feeds;
@@ -949,33 +1049,26 @@
   }
 
   function calculatePower() {
-    const wattsEach = numberValue('deviceWatts', 0, DEFAULTS.deviceWatts);
-    const count = Math.max(1, Math.round(numberValue('deviceCount', 1, DEFAULTS.deviceCount)));
-    const voltage = numberValue('voltage', 1, DEFAULTS.voltage);
-    const circuitAmps = numberValue('circuitAmps', 1, DEFAULTS.circuitAmps);
+    const wattsEach = numberValue('deviceWatts');
+    const count = numberValue('deviceCount');
+    const voltage = numberValue('voltage');
+    const circuitAmps = numberValue('circuitAmps');
     const totalWatts = wattsEach * count;
-    const amps = totalWatts / voltage;
-    const continuousLimit = circuitAmps * 0.8;
-    const percentOfTarget = continuousLimit > 0 ? amps / continuousLimit * 100 : 0;
+    const ampsEstimate = totalWatts / voltage;
+    const referenceAmps = circuitAmps * 0.8;
+    const percentOfReference = referenceAmps > 0 ? ampsEstimate / referenceAmps * 100 : 0;
     els.totalWatts.textContent = `${format(totalWatts, 0)} W`;
-    els.totalAmps.textContent = `${format(amps, 2)} A`;
-    els.circuitPercent.textContent = `${format(percentOfTarget, 0)}%`;
-    els.circuitResult.classList.remove('good', 'warn', 'bad');
-    els.circuitResult.classList.add(percentOfTarget <= 80 ? 'good' : percentOfTarget <= 100 ? 'warn' : 'bad');
-    els.powerHint.textContent = percentOfTarget <= 80
-      ? 'Load is comfortably under the continuous target.'
-      : percentOfTarget <= 100
-        ? 'Load is close to the continuous target. Split if gear may surge.'
-        : 'Load exceeds the continuous target. Split across circuits.';
-    return { wattsEach, count, voltage, circuitAmps, totalWatts, amps, continuousLimit, percentOfTarget };
+    els.totalAmps.textContent = `~${format(ampsEstimate, 2)} A`;
+    els.circuitPercent.textContent = `${format(percentOfReference, 0)}%`;
+    return { wattsEach, count, voltage, circuitAmps, totalWatts, ampsEstimate, referenceAmps, percentOfReference };
   }
 
   function calculateVoltageDrop() {
     const OHMS_PER_KFT = { '14': 2.525, '12': 1.588, '10': 0.999, '8': 0.628, '6': 0.395, '4': 0.249, '2': 0.156 };
-    const amps = numberValue('dropAmps', 0, DEFAULTS.dropAmps);
-    const lengthFt = numberValue('dropLength', 0, DEFAULTS.dropLength);
+    const amps = numberValue('dropAmps');
+    const lengthFt = numberValue('dropLength');
     const gauge = String(state.dropGauge || DEFAULTS.dropGauge);
-    const voltage = numberValue('dropVoltage', 1, DEFAULTS.dropVoltage);
+    const voltage = numberValue('dropVoltage');
     const ohmsPerFt = (OHMS_PER_KFT[gauge] || OHMS_PER_KFT['10']) / 1000;
     const dropV = 2 * lengthFt * amps * ohmsPerFt;
     const percent = voltage > 0 ? dropV / voltage * 100 : 0;
@@ -994,9 +1087,9 @@
   }
 
   function calculateSpl() {
-    const refSpl = numberValue('splRef', 0, DEFAULTS.splRef);
-    const refDist = numberValue('splRefDist', 0.1, DEFAULTS.splRefDist);
-    const targetDist = numberValue('splTargetDist', 0.1, DEFAULTS.splTargetDist);
+    const refSpl = numberValue('splRef');
+    const refDist = numberValue('splRefDist');
+    const targetDist = numberValue('splTargetDist');
     const ratio = refDist > 0 ? targetDist / refDist : 1;
     const loss = 20 * Math.log10(ratio);
     const splAt = refSpl - loss;
@@ -1015,7 +1108,7 @@
       `Audio delay: ${format(audio.delayMs, 1)} ms for ${format(audio.distanceInput, 1)} ${audio.unit} at ${format(audio.tempF, 0)} F (${format(audio.frames, 2)} frames at ${state.delayFrameRate} fps).`,
       `Projection: ${format(projection.widthFt, 1)} ft wide screen is ${format(projection.heightFt, 2)} ft high, ${format(projection.diagonalIn, 0)} in diagonal. Ideal throw at ${format(projection.throwRatio, 2)}:1 is ${format(projection.idealThrowFt, 1)} ft. Actual distance needs ${format(projection.requiredRatio, 2)}:1.`,
       `Record storage: ${storageCalc.feeds} feed(s) at ${format(storageCalc.bitrate, 0)} Mbps for ${format(storageCalc.hours, 2)} hr needs ${format(storageCalc.totalGb, 1)} GB with ${format(storageCalc.headroom, 0)} percent headroom.`,
-      `Power: ${power.count} device(s) at ${format(power.wattsEach, 0)} W each draw ${format(power.amps, 2)} A at ${format(power.voltage, 0)} V. This is ${format(power.percentOfTarget, 0)} percent of a ${format(power.circuitAmps, 0)} A circuit's 80 percent target.`,
+      `Power estimate (PF 1): ${power.count} device(s) at ${format(power.wattsEach, 0)} W each total ${format(power.totalWatts, 0)} W. Watts ÷ volts estimates ~${format(power.ampsEstimate, 2)} A at ${format(power.voltage, 0)} V, or ${format(power.percentOfReference, 0)} percent of an 80 percent circuit-rating reference. This is not a verified safe load; use equipment nameplate current or VA and include startup or inrush demand.`,
       `Voltage drop: ${format(drop.amps, 1)} A over ${format(drop.lengthFt, 0)} ft of ${drop.gauge} AWG at ${format(drop.voltage, 0)} V drops ${format(drop.dropV, 2)} V (${format(drop.percent, 1)} percent), ending at ${format(drop.endV, 1)} V.`,
       `SPL distance: ${format(spl.refSpl, 0)} dB at ${format(spl.refDist, 1)} ft is about ${format(spl.splAt, 1)} dB at ${format(spl.targetDist, 0)} ft (${format(spl.loss, 1)} dB loss).`
     ].join('\n');
@@ -1033,16 +1126,21 @@
     const text = els.summaryOutput.textContent;
     try {
       await navigator.clipboard.writeText(text);
-      announce('Summary copied.', 'success');
+      announceAction('Summary copied.', 'success');
       pulse(button, 'success');
     } catch (error) {
       const area = document.createElement('textarea');
       area.value = text;
       document.body.appendChild(area);
       area.select();
-      const copied = document.execCommand('copy');
+      let copied = false;
+      try {
+        copied = document.execCommand('copy');
+      } catch (copyError) {
+        copied = false;
+      }
       area.remove();
-      announce(copied ? 'Summary copied.' : 'Copy failed.', copied ? 'success' : 'error');
+      announceAction(copied ? 'Summary copied.' : 'Copy failed.', copied ? 'success' : 'error');
       pulse(button, copied ? 'success' : 'error');
     }
   }
@@ -1057,22 +1155,42 @@
     link.click();
     link.remove();
     window.setTimeout(() => URL.revokeObjectURL(url), 250);
-    announce('Summary downloaded.', 'success');
+    announceAction('Summary downloaded.', 'success');
   }
 
   function resetValues() {
     state = { ...DEFAULTS };
     setFieldValues();
-    saveState();
+    normalizeFields();
+    const saved = saveState();
     calculate();
-    announce('Calculator reset.', 'success');
+    announceAction(
+      saved ? 'Calculator reset. Default values saved in this browser.' : 'Calculator reset. Browser storage is unavailable, so defaults were not saved.',
+      saved ? 'success' : 'error'
+    );
     pulse(els.resetBtn, 'success');
   }
 
-  function announce(message, type) {
-    els.globalHint.textContent = message;
-    els.globalHint.classList.remove('success', 'error');
-    if (type) els.globalHint.classList.add(type);
+  function updateStatus(message, type) {
+    els.actionStatus.textContent = message;
+    els.actionStatus.classList.remove('success', 'error');
+    if (type) els.actionStatus.classList.add(type);
+  }
+
+  function announceAction(message, type) {
+    window.clearTimeout(calculationStatusTimer);
+    updateStatus(message, type);
+  }
+
+  function queueCalculationStatus(normalizationMessages, saved) {
+    window.clearTimeout(calculationStatusTimer);
+    const normalization = normalizationMessages.length ? `${normalizationMessages.join(' ')} ` : '';
+    const storageMessage = saved
+      ? 'Calculations updated and values saved in this browser.'
+      : 'Calculations updated. Browser storage is unavailable, so values were not saved.';
+    calculationStatusTimer = window.setTimeout(() => {
+      updateStatus(`${normalization}${storageMessage}`, saved ? 'success' : 'error');
+    }, 250);
   }
 
   function pulse(element, type) {
@@ -1102,10 +1220,21 @@
 
   if (!storage.available) {
     els.saveStatus.textContent = 'Storage blocked';
-    announce('Calculators work, but browser storage is unavailable.', 'error');
   }
   setFieldValues();
+  const initialNormalizations = normalizeFields();
+  const initialSaved = saveState();
   calculate();
+  if (!storage.available) {
+    updateStatus('Calculators work, but browser storage is unavailable. Values will not persist.', 'error');
+  } else if (storageLoadState === 'invalid') {
+    updateStatus('Saved calculator data was invalid. Default values were restored, calculated, and saved.', 'error');
+  } else if (storageLoadState === 'loaded') {
+    const normalization = initialNormalizations.length ? `${initialNormalizations.join(' ')} ` : '';
+    updateStatus(`${normalization}Saved calculator values loaded and calculations updated.`, initialNormalizations.length ? 'error' : 'success');
+  } else {
+    updateStatus(initialSaved ? 'Default calculator values loaded, calculated, and saved.' : 'Default calculator values loaded and calculated, but storage is unavailable.', initialSaved ? 'success' : 'error');
+  }
 })();
 </script>
 <script src="js/sbd-registry.js"></script>
