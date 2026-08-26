@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-08-13
+
+* Added `/av-tool-suite/index-v2/` as a parallel, workflow-first AV Tool Suite index. The dark graphite visual direction maps the 25 named legacy tools into Plan, Build, and Run & Support workspaces without changing `/av-suite.html`; it includes local control-room and advance-venue imagery at `/images/av-control-room.jpg` and `/images/av-venue-advance.jpg`.
+
 ## 2026-08-06 (later)
 
 * **`cross-project-dashboard.html` / `cross-project-actions.html` are no longer indexable.** Both were publicly served with no `robots` meta, no CSP, and no `Disallow` entry, exposing a 76-project inventory including per-repo dirty working-tree state. Added `noindex,nofollow,noarchive` and the standard CSP meta to the page *and* to the `cross-project-dashboard.gen.py` template so a regenerate can't undo it, plus `Disallow` entries in `robots.txt`.

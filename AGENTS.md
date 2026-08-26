@@ -65,6 +65,10 @@ Read `CLAUDE.md` first for project orientation. This file is the rulebook.
 
 - Inline `<script>` only where needed. No module bundling.
 - Prefer progressive enhancement — pages must render correctly with JS off.
+- The AV tool directory is hand-maintained in three places that must stay in
+  lockstep: `DEPARTMENTS` in `js/sbd-nav.js`, the department menu on
+  `index.html`, and `tools.html`. Adding, renaming, or removing a tool touches
+  all three (plus the `js/sbd-nav.js` include on the new page).
 
 ## SEO / housekeeping
 

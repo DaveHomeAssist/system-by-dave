@@ -74,7 +74,30 @@
 
   function currentRoute(){
     var file = (window.location.pathname.split('/').pop() || '').toLowerCase();
+    // GitHub Pages also serves these pages extensionless (/audio-patch).
+    if(file && file.indexOf('.') === -1) file += '.html';
     return ALIASES[file] || file;
+  }
+
+  /* Show context (?sbdShow= etc.) must survive navigation: the dock in
+     js/av-suite-context.js forwards these params on its own prev/next links,
+     so ours have to as well or the two controls silently diverge — clicking
+     here mid-run would drop the show and hide the dock on the next page.
+     Same param set av-suite-context.js reads. */
+  var CTX_KEYS = ['sbdShow', 'sbdVenue', 'sbdDate', 'sbdOperator', 'sbdPhase'];
+  function withContext(href){
+    try{
+      var src = new URLSearchParams(window.location.search);
+      var dst = new URLSearchParams();
+      for(var i = 0; i < CTX_KEYS.length; i++){
+        var v = src.get(CTX_KEYS[i]);
+        if(v) dst.set(CTX_KEYS[i], v);
+      }
+      var q = dst.toString();
+      return q ? href + '?' + q : href;
+    }catch(err){
+      return href;
+    }
   }
 
   function locate(route){
@@ -133,7 +156,7 @@
     nav.setAttribute('aria-label', 'Tool navigation');
 
     nav.appendChild(link('', 'index.html', '⌂ Home', 'Back to the System by Dave home page'));
-    nav.appendChild(link('', 'av-suite.html', '▦ AV Suite', 'Open the AV Suite hub'));
+    nav.appendChild(link('', withContext('av-suite.html'), '▦ AV Suite', 'Open the AV Suite hub'));
     nav.appendChild(link('', 'tools.html', '≡ All Tools', 'Browse all tools'));
 
     var here = locate(route);
@@ -143,8 +166,8 @@
       var n = here.dept.tools.length;
       var prev = here.dept.tools[(here.index - 1 + n) % n];
       var next = here.dept.tools[(here.index + 1) % n];
-      nav.appendChild(link('sbd-nav-step', prev.href, '‹ ' + prev.name, 'Previous in ' + here.dept.label + ': ' + prev.name));
-      nav.appendChild(link('sbd-nav-step', next.href, next.name + ' ›', 'Next in ' + here.dept.label + ': ' + next.name));
+      nav.appendChild(link('sbd-nav-step', withContext(prev.href), '‹ ' + prev.name, 'Previous in ' + here.dept.label + ': ' + prev.name));
+      nav.appendChild(link('sbd-nav-step', withContext(next.href), next.name + ' ›', 'Next in ' + here.dept.label + ': ' + next.name));
     }
 
     document.head.appendChild(style);
