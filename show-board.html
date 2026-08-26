@@ -482,6 +482,7 @@ body.edit #addroom{display:inline-block}
   <span class="snapshot" id="snapshotstate">Automatic snapshots on</span>
   <span class="grow"></span>
   <button class="btn xs" id="backupbtn">Download JSON</button>
+  <button class="btn xs" id="keepminebtn" hidden>Save mine anyway</button>
   <button class="btn danger xs" id="reloadbtn" hidden>Load newer copy</button>
 </div>
 
@@ -564,7 +565,7 @@ let index=null;     /* {shows:[{id,name,venue}], active} */
 let show=null;      /* the loaded show */
 let START=480,END=1080,SPAN=600;
 let editMode=false;
-let loadedRevision=0,loadedWriteToken=null,staleCopy=null;
+let loadedRevision=0,loadedWriteToken=null,staleCopy=null,forceNextSave=false;
 let sheetReturnFocus=null;
 
 /* ---------- utils ---------- */
@@ -608,6 +609,16 @@ async function sset(k,v){
   if(window.storage)return await window.storage.set(k,v);
   localStorage.setItem(k,v);return true;
 }
+/* Deleting a show used to drop only its index row, orphaning the record and
+   its snapshots — several full copies of a show each — in a storage budget
+   measured in single-digit megabytes. */
+async function sdel(k){
+  if(window.storage){
+    if(typeof window.storage.delete==="function")return await window.storage.delete(k);
+    return await window.storage.set(k,"");   /* no delete in that API; blank it */
+  }
+  localStorage.removeItem(k);return true;
+}
 async function loadIndex(){
   try{const raw=await sget(IDX_KEY);if(raw)return JSON.parse(raw)}catch(e){}
   return {shows:[],active:null};
@@ -635,14 +646,19 @@ function updateSnapshotState(count){
 function setStale(remote){
   staleCopy=remote||staleCopy;
   $("datahealth").classList.add("stale");
-  $("savestate").textContent="newer copy found";$("savestate").className="bad";
-  $("lastsaved").textContent="Newer changes exist in another tab";
+  /* Say plainly that edits are not landing. The old wording ("newer copy
+     found") read as informational, but this state blocks every future save
+     until it is resolved, so it has to name the consequence. */
+  $("savestate").textContent="NOT SAVING";$("savestate").className="bad";
+  $("lastsaved").textContent="Another tab has newer changes — your edits here are not being stored";
   $("reloadbtn").hidden=false;
+  $("keepminebtn").hidden=false;
 }
 function updateSaveHealth(){
   if(staleCopy)return setStale(staleCopy);
   $("datahealth").classList.remove("stale");
   $("reloadbtn").hidden=true;
+  $("keepminebtn").hidden=true;
   $("lastsaved").textContent=savedLabel(show&&show.savedAt);
 }
 let saveTimer=null;
@@ -654,8 +670,13 @@ function save(){
     try{
       const remoteRaw=await sget(SHOW_KEY(show.id));
       const remote=remoteRaw?JSON.parse(remoteRaw):null;
-      if(remote&&((Number(remote.revision)||0)>loadedRevision||
-        (loadedWriteToken&&remote.writeToken!==loadedWriteToken))){setStale(remote);return}
+      const conflicted=remote&&((Number(remote.revision)||0)>loadedRevision||
+        (loadedWriteToken&&remote.writeToken!==loadedWriteToken));
+      /* Without the override this is a dead end: the block clears only on a
+         successful save, which can never happen while it is blocking. Every
+         later edit would report a conflict and persist nothing. */
+      if(conflicted&&!forceNextSave){setStale(remote);return}
+      forceNextSave=false;
       const nextRevision=Math.max(loadedRevision,Number(remote&&remote.revision)||0)+1;
       show.savedAt=new Date().toISOString();show.revision=nextRevision;show.writeToken=uid()+TAB_ID;
       await sset(SHOW_KEY(show.id),JSON.stringify(show));
@@ -717,13 +738,25 @@ function ensure(r){
   if(!Array.isArray(r.sessions))r.sessions=[];
   return r;
 }
+const dayKey=d=>d.date||("d"+show.days.indexOf(d));
 function checkState(r){
   ensure(r);
-  const k=day().date||("d"+show.active);
+  const k=dayKey(day());
   if(!r.checks[k])r.checks[k]={};
-  /* keep only this day's ticks so yesterday never looks done */
-  Object.keys(r.checks).forEach(d=>{if(d!==k)delete r.checks[d]});
+  /* Never prune here. This runs on every render, including the render caused
+     by tapping another day tab — pruning to the *viewed* day silently wiped
+     the ticks for the day you were actually working. Checks are keyed per day
+     and kept; stale keys are collected once at load instead. */
   return r.checks[k];
+}
+/* Drop check groups whose day no longer exists in the show (deleted days),
+   so the record cannot grow without bound. Runs once, on load. */
+function pruneChecks(s){
+  const valid=new Set(s.days.map((d,i)=>d.date||("d"+i)));
+  s.days.forEach(d=>d.rooms.forEach(r=>{
+    if(!r.checks||typeof r.checks!=="object")return;
+    Object.keys(r.checks).forEach(k=>{if(!valid.has(k))delete r.checks[k]});
+  }));
 }
 const checkCount=r=>{const st=checkState(r);
   return{done:r.gear.filter(g=>st[g]).length,total:r.gear.length}};
@@ -821,7 +854,12 @@ function render(){
     ensure(r);
     const row=document.createElement("div");
     row.className="row";
-    row.style.setProperty("--zone-h",zoneHue(r.zone));
+    /* An unknown zone (renamed or deleted out from under the room) used to
+       fall back to hue 38 — identical to the first default zone, so a broken
+       reference was invisible. Render it grey instead, so it reads as wrong. */
+    const zn=zoneOf(r.zone);
+    row.style.setProperty("--zone-h",zn.flat?0:zn.h);
+    if(zn.flat)row.style.setProperty("--zone-sat","0%");
     row.style.animationDelay=(ri*28)+"ms";
 
     const lab=document.createElement("button");
@@ -899,7 +937,11 @@ function attentionCard(label,value,detail,tone,roomIndex){
 function renderAttention(ev,pin){
   const box=$("attentiongrid");if(!box)return;
   const rooms=day().rooms.map((r,i)=>({r:ensure(r),i}));
-  const unchecked=rooms.filter(x=>x.r.sessions.length&&checkCount(x.r).done<checkCount(x.r).total);
+  const unchecked=rooms.filter(x=>{
+    if(!x.r.sessions.length)return false;
+    const cc=checkCount(x.r);          /* once, not twice */
+    return cc.done<cc.total;
+  });
   const issueRooms=rooms.filter(x=>x.r.issues.length);
   const issueCount=issueRooms.reduce((sum,x)=>sum+x.r.issues.length,0);
   const now=new Date(),cur=now.getHours()*60+now.getMinutes(),ref=isToday()?cur:START;
@@ -1388,6 +1430,8 @@ $("showsbtn").addEventListener("click",()=>{
       if(!window.confirm("Delete "+(target?target.name:"this show")+" from this browser?"))return;
       index.shows=index.shows.filter(s=>s.id!==del);
       if(index.active===del)index.active=(index.shows[0]||{}).id||null;
+      await sdel(SHOW_KEY(del));
+      await sdel(SNAP_KEY(del));
       await sset(IDX_KEY,JSON.stringify(index));
       closeSheet();
       if(index.active)await openShow(index.active);else openSetup(false);
@@ -1451,8 +1495,8 @@ $("s_file").addEventListener("change",e=>{
   const fr=new FileReader();
   fr.onload=async()=>{
     let s;
-    try{s=JSON.parse(fr.result)}catch(_){return setupErr("That file is not valid JSON")}
-    if(!s||!Array.isArray(s.days))return setupErr("That does not look like a show export");
+    try{s=JSON.parse(fr.result)}catch(_){return notifyErr("That file is not valid JSON")}
+    if(!s||!Array.isArray(s.days))return notifyErr("That does not look like a show export");
     s.id=uid();
     s.savedAt=new Date().toISOString();s.revision=1;s.writeToken=uid()+TAB_ID;
     index.shows.push({id:s.id,name:s.name||"Imported show",venue:s.venue||""});
@@ -1467,6 +1511,18 @@ $("s_file").addEventListener("change",e=>{
 
 /* ---------- setup screen ---------- */
 function setupErr(msg){const e=$("s_err");e.textContent=msg;e.classList.add("show")}
+/* Import is reachable from the Shows sheet as well as the setup screen, and
+   #s_err lives inside #setup — so routing every failure there meant a bad
+   file failed silently whenever setup was hidden. Write to whatever surface
+   is actually on screen. */
+function notifyErr(msg){
+  if(document.body.classList.contains("setup"))return setupErr(msg);
+  const e=$("err");
+  if(e&&$("sheet").classList.contains("open")){
+    e.textContent=msg;e.classList.add("show");return;
+  }
+  window.alert(msg);
+}
 function parseRooms(raw){
   const zones=[],rooms=[];
   String(raw).split(/\r?\n/).forEach(line=>{
@@ -1555,6 +1611,7 @@ async function openShow(id){
   show.grid=show.grid||{tick:15,snap:5,pxPerHour:120};
   show.zones=show.zones||[{name:"Rooms",h:ZONE_HUES[0]}];
   show.turnMax=show.turnMax||30;show.darkMax=show.darkMax||60;
+  pruneChecks(show);
   loadedRevision=Number(show.revision)||0;loadedWriteToken=show.writeToken||null;staleCopy=null;
   index.active=id;
   await sset(IDX_KEY,JSON.stringify(index));
@@ -1567,12 +1624,26 @@ $("reloadbtn").addEventListener("click",()=>{
   if(!show||!window.confirm("Load the newer browser copy? Download JSON first if you need these unsaved edits."))return;
   openShow(show.id);
 });
+$("keepminebtn").addEventListener("click",()=>{
+  if(!show||!window.confirm("Keep what is on this screen and overwrite the newer copy? Changes made in the other tab will be lost."))return;
+  forceNextSave=true;staleCopy=null;save();
+});
 (async function(){
   index=await loadIndex();
   if(index.active&&index.shows.some(s=>s.id===index.active))await openShow(index.active);
   else if(index.shows.length)await openShow(index.shows[0].id);
   else openSetup(false);
   setInterval(tick,30000);
+  /* fitLabelWidth measures with Syne. On a cold load the webfont is usually
+     not ready, so the first measurement silently uses the fallback metrics
+     and mis-sizes the column — the exact overlap it exists to prevent. */
+  if(document.fonts&&document.fonts.ready)
+    document.fonts.ready.then(()=>{
+      /* render() clears the setup class, so re-rendering while the New Show
+         screen is open would throw the user back to the board mid-typing.
+         Setup exits through render() anyway, so skipping here loses nothing. */
+      if(show&&!document.body.classList.contains("setup"))render();
+    }).catch(()=>{});
   window.addEventListener("resize",()=>{if(show)render()});
   window.addEventListener("storage",e=>{
     if(!show||e.key!==SHOW_KEY(show.id)||!e.newValue)return;
