@@ -49,6 +49,7 @@ const requestedTargets = targetArg ? new Set(targetArg.slice('--target='.length)
 const targets = requestedTargets ? allTargets.filter((target) => requestedTargets.has(target.id)) : allTargets;
 const preferences = ['light', 'dark'];
 const systemManagedTargets = new Set(['pixelforge']);
+const lockedDarkTargets = new Set(['av-workbook']);
 const failures = [];
 const results = [];
 
@@ -454,7 +455,9 @@ async function main() {
           fs.writeFileSync(path.join(captureDir, `${target.id}-${preference}-${viewportWidth}.png`), Buffer.from(screenshot.data, 'base64'));
         }
         const throwlineStandalone = target.id === 'throwline';
-        const expectedBg = throwlineStandalone ? '#f4f1ea' : (preference === 'dark' ? '#0c1016' : '#eee8df');
+        const expectedBg = throwlineStandalone
+          ? '#f4f1ea'
+          : (lockedDarkTargets.has(target.id) || preference === 'dark' ? '#0c1016' : '#eee8df');
         const ratios = {
           text: contrast(value.tokens.text, value.tokens.bg),
           muted: contrast(value.tokens.muted, value.tokens.surface),
@@ -466,7 +469,9 @@ async function main() {
 
         if (throwlineStandalone) {
           if (value.tool !== null || value.optIn !== null) failures.push(`throwline ${preference}: standalone app must not opt into the shared system theme (${value.tool}/${value.optIn}).`);
-        } else if (value.tool !== target.id || value.optIn !== (systemManagedTargets.has(target.id) ? 'system' : preference)) {
+        } else if (value.tool !== target.id || value.optIn !== (lockedDarkTargets.has(target.id)
+          ? 'dark'
+          : (systemManagedTargets.has(target.id) ? 'system' : preference))) {
           failures.push(`${target.id} ${preference}: wrong theme identity (${value.tool}/${value.optIn}).`);
         }
         if (value.tokens.bg.toLowerCase() !== expectedBg) failures.push(`${target.id} ${preference}: --av-bg is ${value.tokens.bg}, expected ${expectedBg}.`);

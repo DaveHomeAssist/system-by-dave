@@ -4,11 +4,15 @@
   var root = document.documentElement;
   if(!root.hasAttribute('data-av-theme')) return;
 
-  var mode = 'dark';
-  try{
-    var stored = localStorage.getItem('av-theme-mode.v1');
-    if(stored === 'dark' || stored === 'light' || stored === 'system') mode = stored;
-  }catch(e){}
+  var locked = root.getAttribute('data-av-theme-lock');
+  var hasLock = locked === 'dark' || locked === 'light';
+  var mode = hasLock ? locked : 'dark';
+  if(!hasLock){
+    try{
+      var stored = localStorage.getItem('av-theme-mode.v1');
+      if(stored === 'dark' || stored === 'light' || stored === 'system') mode = stored;
+    }catch(e){}
+  }
 
   root.setAttribute('data-av-theme', mode);
 

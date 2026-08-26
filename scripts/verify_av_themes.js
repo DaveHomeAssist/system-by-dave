@@ -29,6 +29,7 @@ function routeFile(href) {
 
 const avRegistry = registry();
 const SYSTEM_THEME_EXCEPTIONS = new Set(['throwline']);
+const LOCKED_THEME_ROUTES = new Map([['av-workbook', 'dark']]);
 const routes = [
   { id: 'av-suite', href: 'av-suite.html', file: 'av-suite.html' },
   ...avRegistry.tools
@@ -47,8 +48,9 @@ const themeCss = read('css/av-theme.css');
 routes.forEach((route) => {
   const html = read(route.file);
   const escapedId = route.id.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  if (!new RegExp(`<html[^>]+data-av-theme="system"[^>]+data-av-tool="${escapedId}"`, 'i').test(html)) {
-    fail(`${route.file} does not opt into the system AV theme as ${route.id}.`);
+  const expectedTheme = LOCKED_THEME_ROUTES.get(route.id) || 'system';
+  if (!new RegExp(`<html[^>]+data-av-theme="${expectedTheme}"[^>]+data-av-tool="${escapedId}"`, 'i').test(html)) {
+    fail(`${route.file} does not opt into the ${expectedTheme} AV theme as ${route.id}.`);
   }
 
   if (route.id === 'throwline') {
@@ -56,10 +58,10 @@ routes.forEach((route) => {
       fail(`${route.file} does not initialize Throwline from the system preference.`);
     }
   } else {
-    if (!/name="theme-color" content="#EEE8DF" media="\(prefers-color-scheme: light\)"/.test(html)) {
+    if (route.id !== 'av-workbook' && !/name="theme-color" content="#EEE8DF" media="\(prefers-color-scheme: light\)"/.test(html)) {
       fail(`${route.file} is missing the Warm Paper browser-chrome color.`);
     }
-    if (!/name="theme-color" content="#0C1016" media="\(prefers-color-scheme: dark\)"/.test(html)) {
+    if (route.id !== 'av-workbook' && !/name="theme-color" content="#0C1016" media="\(prefers-color-scheme: dark\)"/.test(html)) {
       fail(`${route.file} is missing the Stage Slate browser-chrome color.`);
     }
   }
@@ -71,10 +73,14 @@ routes.forEach((route) => {
     }
     const workbookSource = read('apps/av-workbook/index.html');
     if (!workbookSource.includes('src="../js/av-theme-mode.js"')) {
-      fail('AV Workbook does not apply the stored AV theme before its app bundle loads.');
+      fail('AV Workbook does not apply its theme lock before the app bundle loads.');
     }
-    if (!/data-av-theme-color="light"/.test(workbookSource) || !/data-av-theme-color="dark"/.test(workbookSource)) {
-      fail('AV Workbook theme-color metadata is not controllable for explicit operator modes.');
+    if (!/data-av-theme="dark" data-av-theme-lock="dark"/.test(workbookSource)) {
+      fail('AV Workbook is not locked to its flagship dark theme.');
+    }
+    if (!/content="#EEE8DF" media="not all" data-av-theme-color="light"/.test(workbookSource)
+      || !/content="#0C1016" media="all" data-av-theme-color="dark"/.test(workbookSource)) {
+      fail('AV Workbook browser chrome is not locked to Stage Slate.');
     }
   } else {
     const expectedHref = route.file.includes('/') ? '../css/av-theme.css' : 'css/av-theme.css';

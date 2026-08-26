@@ -199,7 +199,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool change — rolls the service-worker cache. */
-    version:'v20260826-workbook-flagship',
+    version:'v20260826-workbook-dark-lock',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,

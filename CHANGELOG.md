@@ -2,6 +2,10 @@
 
 ## 2026-08-26
 
+### AV Workbook dark-theme lock
+
+* Locked AV Workbook to its Stage Slate flagship theme so saved Light or System preferences cannot repaint the page, and added browser regression coverage for both stored preference states.
+
 ### Cabinet-aware LED Wall Configurator
 
 * Added an advanced LED planning suite to the AV Calculator with cabinet-layout, target-size, target-raster, and custom-panel modes; target dimensions independently round up to whole cabinet columns and rows instead of altering physical measurements.
