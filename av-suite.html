@@ -53,7 +53,7 @@
   };
 })();
 </script>
-<link rel="stylesheet" href="css/av-theme.css">
+<link rel="stylesheet" href="css/sbd-public-nav.css">
 <style>
 /* ============================================================
    AV BY DAVE — SHOW OPERATIONS CONSOLE (app-shell rebuild)
@@ -80,8 +80,19 @@
 
 *{box-sizing:border-box}
 html,body{height:100%;margin:0;overflow:hidden}
-body{background:#0c1016}
+body{background:#0c1016;display:flex;flex-direction:column}
 noscript{display:block}
+
+/* ---- shared global site header (css/sbd-public-nav.css), compacted for
+   the console app shell and re-skinned onto the shared --av-* tokens so
+   it follows the site-wide Paper / Stage Slate mode ---- */
+.sbd-site-header{flex:none;position:static;background:var(--av-surface,rgba(10,13,20,.88));color:var(--av-text,#f3f4f7);border-bottom:1px solid var(--av-line,rgba(255,255,255,.09));-webkit-backdrop-filter:none;backdrop-filter:none}
+.sbd-site-header__inner{width:100%;min-height:40px;padding:0 16px}
+.sbd-site-brand{min-height:36px}
+.sbd-site-brand__mark{width:24px;height:24px;border-color:var(--av-line-strong,rgba(255,255,255,.34));color:var(--av-accent,#e08a4f)}
+.sbd-site-links a{color:var(--av-muted,inherit)}
+.sbd-site-links a:hover,.sbd-site-links a[aria-current="page"]{background:var(--av-accent-soft,rgba(224,138,79,.16));color:var(--av-accent-strong,#e08a4f)}
+.sbd-site-brand:focus-visible,.sbd-site-links a:focus-visible{outline-color:var(--av-accent,#e08a4f)}
 img,svg{display:block}
 ::selection{background:var(--c-accent-line,rgba(158,67,43,.3))}
 
@@ -192,7 +203,7 @@ img,svg{display:block}
    APP SHELL
    ============================================================ */
 #avApp{
-  height:100vh;display:grid;grid-template-rows:auto 1fr;overflow:hidden;position:relative;
+  flex:1 1 auto;min-height:0;display:grid;grid-template-rows:auto 1fr;overflow:hidden;position:relative;
   font-family:var(--font-body);color:var(--c-text);background:var(--c-bg);
   -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
 }
@@ -428,7 +439,7 @@ img,svg{display:block}
 /* ---- all tools grid ---- */
 #avApp .allgroup{margin-bottom:16px}
 #avApp .allgroup-head{display:flex;align-items:baseline;gap:8px;padding:6px 2px;border-bottom:1px solid var(--c-neutral-300);margin-bottom:7px}
-#avApp .allgroup-head strong{font-family:var(--f-head);font-size:13.5px;font-weight:var(--w-semi)}
+#avApp .allgroup-head strong,#avApp .allgroup-head h3{font-family:var(--f-head);font-size:13.5px;font-weight:var(--w-semi)}
 #avApp .allgroup-head span.n{font-family:var(--f-label);font-size:10px;color:var(--c-neutral-600)}
 #avApp .allgroup-head span.d{margin-left:auto;font-family:var(--f-label);font-size:9.5px;color:var(--c-neutral-500)}
 #avApp [data-r="allgrid"]{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
@@ -651,6 +662,7 @@ img,svg{display:block}
 }
 @media (max-width:900px){
   html,body{overflow:auto}
+  body{display:block}
   #avApp{height:auto;min-height:100vh;display:block;overflow:visible}
   #avApp [data-r="body"]{display:block;overflow:visible}
   #avApp [data-r="rail"]{display:none}
@@ -673,8 +685,24 @@ img,svg{display:block}
 }
 
 </style>
+<link rel="stylesheet" href="css/av-theme.css">
 </head>
 <body>
+<header class="sbd-site-header">
+  <nav class="sbd-site-header__inner" aria-label="Primary">
+    <a class="sbd-site-brand" href="/">
+      <span class="sbd-site-brand__mark" aria-hidden="true">SD</span>
+      <span class="sbd-site-brand__word">System by Dave</span>
+    </a>
+    <div class="sbd-site-links">
+      <a href="/tools.html">Tools</a>
+      <a href="/av-suite.html" aria-current="page">AV Suite</a>
+      <a href="/notion.html">Notion</a>
+      <a href="/prompt-lab.html">Prompt Lab</a>
+      <a href="/profile/">Dave</a>
+    </div>
+  </nav>
+</header>
 <noscript>
   <div style="position:fixed;inset:0;z-index:999;background:#0c1016;color:#f4f0e8;font:15px/1.5 -apple-system,sans-serif;padding:32px;overflow:auto">
     <h1 style="font-size:20px">AV by Dave needs JavaScript</h1>
@@ -1469,14 +1497,16 @@ function renderAllView(){
   function cardHtml(tool){var ready=toolReadiness(tool.id);var pinned=state.favorites.indexOf(tool.id)>=0;var dot=ready==='ready'||ready==='issue'?'<span class="stdot st-'+ready+'"></span>':(ready==='skipped'?'<span class="stdot st-skipped"></span>':'');return '<div class="allcard">'+dot+'<a href="'+escapeAttr(toolHref(tool))+'" data-tool="'+tool.id+'">'+escapeHtml(tool.name)+'</a><span class="ac-tag">'+escapeHtml(tool.tag)+'</span><button type="button" class="pinbtn" data-pin="'+tool.id+'" aria-pressed="'+String(pinned)+'" title="'+(pinned?'Unpin ':'Pin ')+escapeAttr(tool.name)+'"><svg class="ic" viewBox="0 0 24 24" style="width:11px;height:11px"><path d="M12 2 9 9l-6 1 4.5 4L6 21l6-3.5L18 21l-1.5-7L21 10l-6-1z"/></svg></button></div>';}
   var groupsHtml='';
   var wb=toolById('av-workbook');
-  if(wb&&visibleIds[wb.id]) groupsHtml+='<div class="allgroup"><div class="allgroup-head"><strong>Workbook</strong><span class="n">1 tool</span><span class="d">Spine</span></div><div data-r="allgrid">'+cardHtml(wb)+'</div></div>';
+  function groupHead(icon,label,count,dept){var d=escapeHtml(label);return '<div class="allgroup-head">'+(icon?iconSvg(icon,15):'')+'<h3>'+d+'</h3><span class="n">'+count+'</span><span class="d">'+escapeHtml(dept)+'</span></div>';}
+  if(wb&&visibleIds[wb.id]) groupsHtml+='<div class="allgroup">'+groupHead(null,'Workbook','1 tool','Spine')+'<div data-r="allgrid">'+cardHtml(wb)+'</div></div>';
   FAMILIES.forEach(function(fam){
     var tools=familyTools(fam).filter(function(t){return visibleIds[t.id];});
     if(!tools.length) return;
-    groupsHtml+='<div class="allgroup"><div class="allgroup-head">'+iconSvg(fam.icon,15)+'<strong>'+escapeHtml(fam.label)+'</strong><span class="n">'+tools.length+'</span><span class="d">'+escapeHtml(fam.depts)+'</span></div><div data-r="allgrid">'+tools.map(cardHtml).join('')+'</div></div>';
+    groupsHtml+='<div class="allgroup">'+groupHead(fam.icon,fam.label,tools.length,fam.depts)+'<div data-r="allgrid">'+tools.map(cardHtml).join('')+'</div></div>';
   });
-  $('allGroups').innerHTML=groupsHtml||'<div class="aside-empty">No tools match the current filters.</div>';
+  $('allGroups').innerHTML=groupsHtml||'<div class="aside-empty">No tools match the current filters.<div style="margin-top:10px"><button type="button" id="clearFiltersBtn">Clear filters</button></div></div>';
 }
+function clearToolFilters(){state.filters={search:'',phase:'all',dept:'all',pin:'all'};saveState();renderAllView();showHint('Tool filters cleared.');}
 function renderMainForView(){
   var showCtx=viewState.context==='show';
   $('showView').hidden=!showCtx;
@@ -1871,6 +1901,7 @@ function wireEvents(){
     var famSel=e.target.closest('[data-fam-select]');if(famSel){selectFamily(famSel.getAttribute('data-fam-select'));return;}
     var famTog=e.target.closest('[data-fam-toggle]');if(famTog){toggleFamOpen(famTog.getAttribute('data-fam-toggle'));return;}
     var subTog=e.target.closest('[data-sub-toggle]');if(subTog){toggleSubsOpen(subTog.getAttribute('data-sub-toggle'));return;}
+    var clearBtn=e.target.closest('#clearFiltersBtn');if(clearBtn){clearToolFilters();return;}
   });
   document.addEventListener('change',function(e){var sel=e.target.closest('[data-readiness]');if(sel){setToolReadiness(sel.getAttribute('data-readiness'),sel.value);return;}var note=e.target.closest('[data-note]');if(note) setToolNote(note.getAttribute('data-note'),note.value,true);});
   document.addEventListener('input',function(e){var note=e.target.closest('[data-note]');if(note) setToolNote(note.getAttribute('data-note'),note.value,false);});
