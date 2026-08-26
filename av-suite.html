@@ -654,9 +654,12 @@ img,svg{display:block}
 }
 @media (max-width:680px){
   #avApp .hd-right .lbl,#avApp .hd-right .kbd{display:none}
+  /* the brand chip's label IS its content — keep it, or the button goes blank */
+  #avApp #brandCycleBtn .lbl{display:inline}
   #avApp .hd-cache{display:none}
   #avApp .hd-right{gap:6px}
   #avApp .hd-icon-btn.labeled{padding:0;width:30px}
+  #avApp #brandCycleBtn.labeled{width:auto;padding:0 8px}
   #avApp .hd-left{max-width:100%;overflow-x:auto}
   #avApp .hd-ctx button{padding:0 8px;white-space:nowrap}
 }
