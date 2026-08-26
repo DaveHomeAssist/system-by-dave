@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0.0",
+  "product": "phillies-wire",
+  "version": "2026-08-12",
+  "commit_sha": "1111111111111111111111111111111111111111",
+  "built_at": "2026-08-12T08:00:00Z",
+  "owner": "release-engineering",
+  "status": "verified",
+  "source_run_ids": ["github:phillies-wire:123456789"],
+  "schema_versions": { "issue": "1.4.0", "release": "1.0.0" },
+  "artifacts": [
+    {
+      "name": "site",
+      "path": "site/",
+      "sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+      "content_type": "application/x-directory",
+      "bytes": 1200000
+    }
+  ],
+  "verification": [
+    {
+      "name": "test",
+      "status": "passed",
+      "evidence_url": "https://github.com/DaveHomeAssist/phillies-wire/actions/runs/123456789"
+    }
+  ],
+  "deployment": {
+    "environment": "production",
+    "status": "pending"
+  },
+  "rollback": {
+    "commit_sha": "3333333333333333333333333333333333333333",
+    "procedure": "Redeploy the last verified Pages artifact."
+  },
+  "known_risks": ["Live Core Web Vitals require field traffic after deployment."]
+}

@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none'">
+<meta name="theme-color" content="#f96302">
+<meta name="color-scheme" content="light">
+<meta name="robots" content="index,follow">
+<meta name="description" content="DepotOps — local-first home project shopping, warehouse inventory, and tool tracking.">
+<link rel="canonical" href="https://systembydave.com/depotops/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="System by Dave">
+<meta property="og:title" content="DepotOps — Projects, Shopping, and Warehouse">
+<meta property="og:description" content="A local-first field tool for home project requirements, shopping runs, warehouse inventory, and tool tracking.">
+<meta property="og:url" content="https://systembydave.com/depotops/">
+<meta property="og:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<meta property="og:image:width" content="1024">
+<meta property="og:image:height" content="412">
+<meta property="og:image:alt" content="System by Dave preview banner">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="DepotOps — Projects, Shopping, and Warehouse">
+<meta name="twitter:description" content="A local-first field tool for home project requirements, shopping runs, warehouse inventory, and tool tracking.">
+<meta name="twitter:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="DepotOps">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./icon.svg" type="image/svg+xml">
+<title>DepotOps v0.5.0 — Projects • Shopping • Warehouse</title>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<style>
+:root{
+  --orange:#f96302;--orange2:#dd5100;--ink:#151515;--ink2:#242424;--cream:#f3efe6;--paper:#fffdf8;
+  --line:#cec8bd;--muted:#69645d;--green:#24783b;--yellow:#b97d00;--red:#b8332a;--blue:#1f6299;
+  --shadow:0 10px 28px rgba(0,0,0,.10);--r:2px;--topbar-height:68px;
+}
+*{box-sizing:border-box} html{scroll-behavior:smooth}
+body{
+  margin:0;color:var(--ink);font:15px/1.4 Arial,Helvetica,sans-serif;
+  background:linear-gradient(rgba(249,99,2,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(249,99,2,.035) 1px,transparent 1px),var(--cream);
+  background-size:22px 22px
+}
+button,input,select,textarea{font:inherit} button{cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[tabindex]:focus-visible{outline:3px solid #111;outline-offset:2px}
+.topbar{position:sticky;top:0;z-index:50;background:var(--orange);color:#fff;border-bottom:4px solid #202020;box-shadow:0 4px 14px rgba(0,0,0,.2)}
+.topinner{max-width:1440px;margin:auto;padding:10px 18px;display:flex;align-items:center;gap:16px;justify-content:space-between}
+.brand{display:flex;gap:11px;align-items:center;font-weight:900;letter-spacing:-.03em}
+.logo{width:44px;height:44px;background:#fff;color:var(--orange);border:3px solid #222;display:grid;place-items:center;font-weight:900;font-size:22px;transform:rotate(-2deg)}
+.brand small{display:block;font-size:10px;letter-spacing:.12em;text-transform:uppercase}
+nav{display:flex;gap:7px;flex-wrap:wrap}.navbtn{min-height:44px;border:2px solid rgba(255,255,255,.65);background:rgba(255,255,255,.08);color:#fff;padding:7px 12px;font-weight:900}
+.navbtn.active,.navbtn[aria-pressed="true"],.navbtn:hover{background:#fff;color:#222}
+.shell{max-width:1440px;margin:auto;padding:16px}
+.hero{display:grid;grid-template-columns:1.35fr .65fr;gap:16px;background:var(--paper);border:2px solid #222;border-top:8px solid var(--orange);box-shadow:var(--shadow);padding:18px;margin-bottom:16px}
+.kicker{color:var(--orange);font-size:11px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}
+h1{margin:3px 0 8px;font-size:clamp(30px,5vw,54px);line-height:.96;text-transform:uppercase;letter-spacing:-.05em}.lead{color:var(--muted);max-width:850px}
+.storebox{border:2px dashed #222;background:#fff6ed;padding:13px}.storebox h3{margin:0 0 6px;text-transform:uppercase}.storeline{display:flex;gap:12px;justify-content:space-between;padding:3px 0}
+.page{display:none}.page.active{display:block}
+.toolbar{position:sticky;top:var(--topbar-height);z-index:35;background:#222;border:2px solid #222;padding:9px;display:grid;grid-template-columns:1.2fr .9fr 1fr auto auto auto;gap:8px;margin-bottom:12px}
+.toolbar input,.toolbar select{min-height:44px;min-width:0;width:100%;border:2px solid #555;padding:9px;background:#fff;color:#111}.toolbar .btn{min-width:0;width:100%}
+.btn{min-height:44px;border:2px solid #222;background:#fff;color:#222;padding:8px 11px;font-weight:900}.btn.orange{background:var(--orange);color:#fff}.btn.dark{background:#222;color:#fff;border-color:#fff}.btn.soft{background:#f1eee7}.btn.danger{background:#fff0ee;color:var(--red);border-color:var(--red)}.btn.small{min-height:36px;padding:5px 8px;font-size:12px}
+.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:9px;margin-bottom:12px}.stat{background:var(--paper);border:2px solid #222;padding:11px;box-shadow:var(--shadow)}.stat .num{font-size:27px;font-weight:900}.stat .lab{font-size:10px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);font-weight:900}.stats-note{grid-column:1/-1;color:var(--muted);font-size:11px;font-weight:800}.progress{grid-column:1/-1;height:12px;border:2px solid #222;background:#ddd;overflow:hidden}.progress>div{height:100%;width:0;background:var(--orange)}
+.grid{display:grid;grid-template-columns:1.72fr .78fr;gap:14px}.panel{background:var(--paper);border:2px solid #222;box-shadow:var(--shadow)}.panel-head{padding:11px 13px;border-bottom:2px solid #222;background:#f0ece4;display:flex;gap:10px;align-items:center;justify-content:space-between}.panel-head h2{margin:0;font-size:17px;text-transform:uppercase}.panel-head .actions{display:flex;gap:7px;flex-wrap:wrap}
+.items{padding:9px;display:grid;gap:8px}.runitem{border:2px solid #c9c3b8;background:#fff;padding:10px;display:grid;grid-template-columns:156px minmax(260px,1fr) minmax(148px,auto) 88px;gap:12px;align-items:start}.runitem[data-status="purchased"]{opacity:.65;background:#edf7ef}.runitem[data-status="partially_purchased"]{background:#fff8e5;border-color:#c89219}.runitem[data-status="hold"]{background:#eef7ff;border-color:#6a9fc8}.runitem[data-status="not_found"]{background:#fff3f1;border-color:#da8982}.runitem[data-status="skipped"]{opacity:.58}.runitem[data-workflow="active"]{border-left:8px solid var(--green)}.runitem[data-workflow="gated"]{border-left:8px solid var(--blue)}.runitem[data-workflow="parked"]{border-left:8px solid #777}.runitem[data-workflow="review"]{border-left:8px solid var(--yellow)}.runitem[data-workflow="superseded"]{border-left:8px solid var(--red);background:#fff6f4}.run-control{display:grid;gap:4px;min-width:0}.control-label{color:var(--muted);font-size:10px;font-weight:900;letter-spacing:.07em;text-transform:uppercase}.qtyctrl{display:grid;grid-template-columns:44px 1fr 44px;align-items:center;border:2px solid #222}.qtyctrl button{width:44px;height:44px;border:0;background:#eee;font-weight:900}.qtyctrl output{text-align:center;font-weight:900}.quantity-state{min-height:16px;font-size:10px;font-weight:900;text-transform:uppercase}.quantity-state.partial{color:#805600}.quantity-state.overage{color:var(--red)}.itemname{font-weight:900;min-width:0;overflow-wrap:anywhere}.meta{font-size:12px;color:var(--muted);overflow-wrap:anywhere}.workflow-note{font-size:11px;font-weight:800;margin-top:5px;color:var(--ink)}.runitem>div{min-width:0}.tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:4px}.tag{font-size:10px;text-transform:uppercase;font-weight:900;padding:4px 6px;border:1px solid currentColor}.tag.project{color:#555;background:#f4f4f4}.tag.must{color:var(--red);background:#fff1ef}.tag.buy{color:#805600;background:#fff8e5}.tag.verify{color:var(--blue);background:#eef7ff}.tag.state-active{color:var(--green);background:#edf7ef}.tag.state-gated{color:var(--blue);background:#eef7ff}.tag.state-parked{color:#555;background:#f0efec}.tag.state-review{color:#805600;background:#fff8e5}.tag.state-completed{color:var(--green);background:#edf7ef}.tag.state-superseded{color:var(--red);background:#fff1ef}.project-link{color:inherit;text-decoration-thickness:2px;text-underline-offset:2px}.project-link:hover{color:var(--orange2)}
+.product-link{
+  display:inline-flex;align-items:center;gap:5px;margin-top:7px;
+  color:#fff;background:var(--orange);border:2px solid #222;
+  padding:5px 8px;font-size:10px;font-weight:900;text-transform:uppercase;
+  text-decoration:none;min-height:32px
+}
+.product-link:hover{background:var(--orange2)}
+.product-link.search{background:#fff;color:#222}
+.product-meta{font-size:10px;color:var(--muted);margin-left:6px}
+
+.statussel{width:100%;min-height:44px;border:2px solid #222;background:white;padding:7px;font-weight:800}.pqty{width:100%;min-height:44px;border:2px solid #222;padding:7px}
+.sidebar{display:grid;gap:14px}.note-card{padding:13px}.note-card h3{margin:0 0 7px;text-transform:uppercase;font-size:15px}.warn{border-left:8px solid var(--yellow)}.goal{border-left:8px solid var(--green)}.holdbox{border-left:8px solid var(--blue)}ul.compact{margin:7px 0 0;padding-left:18px;color:var(--muted)}
+.empty{padding:26px;text-align:center;color:var(--muted)}
+.projects-workspace{display:grid;grid-template-columns:minmax(0,1fr) minmax(390px,.48fr);grid-template-areas:"board inspector";gap:14px;align-items:start}.project-board-panel{grid-area:board}.project-board{padding:10px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.project-card{border:2px solid #222;background:#fff;padding:13px;position:relative;transition:border-color .16s ease,box-shadow .16s ease,transform .16s ease}.project-card:hover{transform:translateY(-2px);box-shadow:0 6px 0 rgba(0,0,0,.12)}.project-card.is-selected{border-color:var(--orange);box-shadow:0 0 0 3px var(--orange),0 8px 0 rgba(249,99,2,.14)}.project-card.is-selected::before{content:"INSPECTING";position:absolute;left:12px;top:-10px;background:var(--orange);color:#fff;border:2px solid #222;padding:2px 6px;font-size:9px;font-weight:900;letter-spacing:.08em}.project-card h3{margin:2px 0 5px;text-transform:uppercase;padding-right:84px}.project-card .status{position:absolute;right:9px;top:9px}.project-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin:10px 0}.mini{background:#f2efe9;border:1px solid #ccc;padding:6px}.mini b{display:block;font-size:18px}.mini span{font-size:9px;text-transform:uppercase;color:var(--muted);font-weight:900}.card-actions{display:flex;gap:6px;flex-wrap:wrap}.project-next{border-top:1px solid var(--line);margin-top:9px;padding-top:8px;font-size:11px}.project-next b{display:block;text-transform:uppercase;letter-spacing:.06em;font-size:9px;color:var(--muted)}
+.project-inspector{grid-area:inspector;position:sticky;top:calc(var(--topbar-height) + 12px);scroll-margin-top:calc(var(--topbar-height) + 12px);display:flex;flex-direction:column;max-height:calc(100vh - var(--topbar-height) - 24px);border-top:8px solid var(--orange);box-shadow:0 14px 34px rgba(0,0,0,.18)}.project-inspector:focus{outline:3px solid var(--orange);outline-offset:3px}.project-inspector.is-updated{animation:inspector-pulse .42s ease-out}.inspector-head{align-items:flex-start;flex-direction:column}.inspector-heading{width:100%}.inspector-eyebrow{display:block;margin-bottom:3px;color:var(--orange2);font-size:10px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}.inspector-head h2{font-size:18px;line-height:1.05}.inspector-head .actions{width:100%}.inspector-head .actions .btn{flex:1}.project-detail{padding:10px;overflow:auto}.project-context{border:2px solid #222;background:#f7f3eb;padding:12px;margin-bottom:12px}.project-context h3{margin:0 0 5px;text-transform:uppercase}.project-context .context-grid{display:grid;grid-template-columns:1fr;gap:8px;margin-top:8px}.context-cell{background:#fff;border:1px solid var(--line);padding:8px}.context-cell b{display:block;font-size:9px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
+.inspector-section{border-top:2px solid #222;padding-top:12px;margin-top:12px}.inspector-section h3{margin:0 0 8px;font-size:12px;letter-spacing:.08em;text-transform:uppercase}.inspector-list,.requirement-list{display:grid;gap:7px}.linked-row,.requirement-card{border:1px solid var(--line);background:#fff;padding:9px}.linked-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center}.linked-row b{display:block;overflow-wrap:anywhere}.requirement-head{display:flex;gap:8px;justify-content:space-between;align-items:flex-start}.shortage-pill{flex:none;background:#222;color:#fff;border:2px solid #222;padding:4px 6px;font-size:10px;font-weight:900;text-transform:uppercase}.shortage-pill.is-covered{background:#edf7ef;color:var(--green);border-color:var(--green)}.requirement-metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin:8px 0}.requirement-metric{background:#f2efe9;border:1px solid #d7d1c7;padding:5px}.requirement-metric b{display:block;font-size:14px}.requirement-metric span{display:block;color:var(--muted);font-size:8px;font-weight:900;letter-spacing:.04em;text-transform:uppercase}.req-actions{display:flex;gap:5px;flex-wrap:wrap}
+@keyframes inspector-pulse{0%{box-shadow:0 0 0 0 rgba(249,99,2,.55),0 14px 34px rgba(0,0,0,.18)}100%{box-shadow:0 0 0 10px rgba(249,99,2,0),0 14px 34px rgba(0,0,0,.18)}}
+.warehouse-layout{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}.inventory-list{padding:9px;display:grid;gap:8px}.inventory-item{border:2px solid #c7c1b7;background:#fff;padding:10px}.inventory-item.low{border-color:var(--red);background:#fff5f3}.inventory-head{display:flex;justify-content:space-between;gap:10px}.stock{font-size:24px;font-weight:900}.stockline{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-top:7px}.stockctrl{display:flex;gap:4px}.stockctrl button{min-width:44px;min-height:44px;border:2px solid #222;background:#eee;font-weight:900}.type{color:var(--orange);font-size:10px;text-transform:uppercase;font-weight:900}.toolrow{padding:10px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:10px}.toolrow:last-child{border-bottom:0}.toolname{font-weight:900}
+.utility{display:flex;gap:7px;flex-wrap:wrap;padding:10px;background:#222;margin-bottom:12px}
+.footer{margin-top:14px;background:#222;color:#ddd;padding:11px 13px;border-top:4px solid var(--orange);display:flex;gap:10px;justify-content:space-between;align-items:center;flex-wrap:wrap}.footer a{color:#fff;font-weight:900}
+dialog{width:min(680px,calc(100vw - 24px));max-height:90vh;overflow:auto;border:3px solid #222;padding:0;background:var(--paper);box-shadow:0 24px 70px rgba(0,0,0,.35)}#reconcileDialog{width:min(820px,calc(100vw - 24px))}dialog::backdrop{background:rgba(0,0,0,.58)}.modal-head{position:sticky;top:0;z-index:3;background:var(--orange);color:#fff;padding:12px 14px;border-bottom:3px solid #222;display:flex;justify-content:space-between;align-items:center}.modal-head h2{margin:0;text-transform:uppercase;font-size:18px}.modal-body{padding:14px}.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.field{display:grid;gap:4px}.field.full{grid-column:1/-1}.field label{font-size:11px;text-transform:uppercase;font-weight:900;color:var(--muted)}.field input,.field select,.field textarea{min-height:44px;border:2px solid #333;padding:8px;background:#fff}.modal-actions{display:flex;justify-content:flex-end;gap:7px;margin-top:14px;flex-wrap:wrap}.closeout-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:12px 0}.closeout-summary .stat{box-shadow:none;padding:8px}.closeout-section{border-top:3px solid #222;margin-top:16px;padding-top:12px}.closeout-section h3{margin:0 0 4px;text-transform:uppercase;font-size:14px}.closeout-tools{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin:10px 0}.closeout-decision,.reconcile-row{border:2px solid #ccc;padding:10px;margin-bottom:8px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center}.decision-options{display:flex;gap:7px;flex-wrap:wrap}.decision-options label{display:flex;align-items:center;gap:6px;min-height:44px;border:2px solid #222;background:#fff;padding:7px 9px;font-weight:800}.decision-options input{width:20px;height:20px}.reconcile-row{grid-template-columns:minmax(0,1fr) 124px}.reconcile-row input{min-height:44px;border:2px solid #222;padding:7px;width:100%}.closeout-submitbar{position:sticky;bottom:0;z-index:3;margin:12px -14px -14px;padding:10px 14px;background:var(--paper);border-top:3px solid #222;box-shadow:0 -10px 24px rgba(0,0,0,.14)}.closeout-submitbar .modal-actions{margin-top:8px}.decision-status{min-height:22px;padding:9px;border:2px solid #222;background:#fff8e5;font-weight:900}.decision-status.ready{background:#edf7ef;color:var(--green);border-color:var(--green)}
+.toast{position:fixed;right:16px;bottom:16px;z-index:100;background:#222;color:#fff;border:3px solid var(--orange);padding:10px 12px;opacity:0;pointer-events:none}.selftest{display:none;white-space:pre-wrap}
+@media(max-width:1180px){.projects-workspace{grid-template-columns:1fr;grid-template-areas:"inspector" "board"}.project-inspector{position:static;max-height:none}.project-detail{overflow:visible}.inspector-head{flex-direction:row;align-items:center}.inspector-heading{width:auto}.inspector-head .actions{width:auto}}
+@media(max-width:980px){.hero,.grid,.warehouse-layout{grid-template-columns:1fr}.project-board{grid-template-columns:1fr 1fr}.toolbar{grid-template-columns:1fr 1fr auto}.runitem{grid-template-columns:156px minmax(0,1fr) 148px}.runitem .run-control.purchased{grid-column:3}.stats{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:680px){
+  :root{--topbar-height:64px}
+  .topinner{padding:8px 10px;align-items:center}.brand>div:last-child{display:none}.logo{width:40px;height:40px}nav{flex-wrap:nowrap}.navbtn{padding:6px 8px;font-size:11px;white-space:nowrap}
+  .shell{padding:9px}.hero{padding:12px;grid-template-columns:1fr}.storebox{display:none}.toolbar{grid-template-columns:1fr 1fr;padding:7px}.toolbar input{grid-column:1/-1}.toolbar .wide{grid-column:1/-1}
+  .stats{grid-template-columns:repeat(2,1fr)}.runitem{grid-template-columns:1fr 1fr;gap:8px}.runitem>div:nth-child(2){grid-column:1/-1}.run-control.requested{grid-column:1/-1}.run-control.status{grid-column:1!important}.run-control.purchased{grid-column:2!important}.qtyctrl{width:156px}.project-board{grid-template-columns:1fr}.inspector-head{flex-direction:column;align-items:flex-start}.inspector-head .actions{width:100%}.inspector-head .actions .btn{flex:1}.linked-row{grid-template-columns:1fr}.requirement-metrics{grid-template-columns:1fr 1fr}
+  .warehouse-layout{grid-template-columns:1fr}.formgrid,.project-context .context-grid{grid-template-columns:1fr}.closeout-summary{grid-template-columns:1fr 1fr}.field.full{grid-column:auto}.closeout-decision,.reconcile-row{grid-template-columns:1fr}.decision-options{display:grid;grid-template-columns:1fr 1fr}.decision-options label:only-child{grid-column:1/-1}.panel-head{align-items:flex-start}.panel-head .actions{justify-content:flex-end}.btn.small,.product-link,a.project-link{min-width:44px;min-height:44px}.tag.project-link,a.project-link{display:inline-flex;align-items:center}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}}
+</style>
+</head>
+<body>
+<noscript>
+  <div style="max-width:760px;margin:40px auto;padding:20px;border:3px solid #222;background:#fffdf8;font:16px/1.45 Arial,Helvetica,sans-serif">
+    <strong style="display:block;font-size:22px;margin-bottom:8px">DepotOps requires JavaScript.</strong>
+    Enable JavaScript and reload this page. Your project data is stored locally in this browser.
+  </div>
+</noscript>
+<header class="topbar">
+  <div class="topinner">
+    <div class="brand"><div class="logo">DO</div><div>DEPOTOPS <small>v0.5.0 • Projects • Shopping • Warehouse</small></div></div>
+    <nav aria-label="Primary">
+      <button class="navbtn active" data-page="shopping" aria-pressed="true">Shopping Run</button>
+      <button class="navbtn" data-page="projects" aria-pressed="false">Projects</button>
+      <button class="navbtn" data-page="warehouse" aria-pressed="false">Warehouse</button>
+    </nav>
+  </div>
+</header>
+
+<div class="shell">
+  <section class="hero">
+    <div><div class="kicker">Home Projects Command Center</div><h1>Build the cart.<br>Know what you own.</h1><div class="lead">Project requirements, warehouse coverage, multi-project shopping runs, and purchase reconciliation in one local-first field tool.</div></div>
+    <div class="storebox"><h3>Today’s Store</h3><div class="storeline"><b>Lawnside #0917</b><span>Primary</span></div><div class="storeline"><span>310 Whitehorse Pike</span><span>Lawnside, NJ</span></div><hr><div class="storeline"><b>Cherry Hill #0989</b><span>Backup</span></div><div class="storeline"><span>2160 Route 70 West</span><span>Cherry Hill, NJ</span></div></div>
+  </section>
+
+  <section id="shopping" class="page active">
+    <div class="toolbar">
+      <input id="runSearch" placeholder="Search active run…" aria-label="Search active shopping run">
+      <select id="runSelect" aria-label="Shopping run"></select>
+      <select id="runProjectFilter" aria-label="Filter run by project"><option value="all">All Projects</option></select>
+      <button class="btn orange" id="newRunBtn">New Run</button>
+      <button class="btn dark" id="focusOnlyBtn">Show All 48</button>
+      <button class="btn dark" id="neededOnlyBtn">Show Purchased</button>
+    </div>
+    <section class="stats">
+      <div class="stat"><div class="num" id="runVisible">0</div><div class="lab">Shown</div></div>
+      <div class="stat"><div class="num" id="runPurchased">0</div><div class="lab">Run Purchased</div></div>
+      <div class="stat"><div class="num" id="runMust">0</div><div class="lab">Ready to Buy</div></div>
+      <div class="stat"><div class="num" id="runProjects">0</div><div class="lab">Run Projects</div></div>
+      <div class="stat"><div class="num" id="runRemaining">0</div><div class="lab">Run Unresolved</div></div>
+      <div class="stats-note">Shown respects filters. Other totals describe the full run.</div>
+      <div class="progress"><div id="runProgress"></div></div>
+    </section>
+    <div class="grid">
+      <section class="panel">
+        <div class="panel-head"><h2 id="runTitle">Active Run</h2><div class="actions"><button class="btn small soft" id="completeRunBtn">Review & Close Run</button></div></div>
+        <div id="runItems" class="items"></div>
+      </section>
+      <aside class="sidebar">
+        <section class="panel note-card warn"><h3>Buying Gate</h3><b>Blue means linked, but blocked.</b><ul class="compact"><li>Panel-dependent garage materials stay gated</li><li>Measure attic, shower, drain, and concrete scopes first</li><li>Only green Active rows are purchase-ready</li></ul></section>
+        <section class="panel note-card goal"><h3>Current Source</h3><b><a class="project-link" href="https://app.notion.com/p/9d525113ae374418999ea58cfe3ab7a3" target="_blank" rel="noopener noreferrer">56 Harding completion sequence</a></b><div class="meta" style="margin-top:6px">Three work lanes · 19 open registry projects · canonical 48-row shopping list.</div></section>
+        <section class="panel note-card holdbox"><h3>Nothing Withheld</h3><b>Current + stopped work is the default view.</b><ul class="compact"><li>Show All 48 reveals purchased and superseded rows</li><li>Every row keeps its canonical Notion source link</li><li>Yellow rows flag source conflicts for your decision</li></ul></section>
+      </aside>
+    </div>
+  </section>
+
+  <section id="projects" class="page">
+    <div class="utility"><button class="btn orange" id="addProjectBtn">+ Project</button><button class="btn" id="addCatalogBtn">+ Catalog Item</button></div>
+    <div class="projects-workspace">
+      <section class="panel project-board-panel">
+        <div class="panel-head"><h2>Project Board</h2><span class="meta">Choose Inspect to load detail in the persistent inspector</span></div>
+        <div id="projectBoard" class="project-board"></div>
+      </section>
+      <aside id="projectDetailPanel" class="panel project-inspector" aria-labelledby="projectDetailTitle" tabindex="-1">
+        <div class="panel-head inspector-head"><div class="inspector-heading"><span class="inspector-eyebrow">Project Inspector</span><h2 id="projectDetailTitle">Project Detail</h2></div><div class="actions"><button class="btn small orange" id="addRequirementBtn">+ Requirement</button><button class="btn small soft" id="addShortagesBtn">Add Shortages to Run</button></div></div>
+        <div class="project-detail" id="projectDetail"></div>
+      </aside>
+    </div>
+  </section>
+
+  <section id="warehouse" class="page">
+    <div class="utility"><button class="btn orange" id="addInventoryBtn">+ Inventory Item</button><button class="btn" id="addToolBtn">+ Tool</button><button class="btn" id="exportBtn">Export JSON</button><button class="btn" id="importBtn">Import JSON</button><input type="file" id="importFile" accept="application/json" hidden><button class="btn danger" id="resetBtn">Reset App Data</button></div>
+    <div class="warehouse-layout">
+      <section class="panel"><div class="panel-head"><h2>Fasteners</h2><span>Bin Stock</span></div><div id="fasteners" class="inventory-list"></div></section>
+      <section class="panel"><div class="panel-head"><h2>Consumables & Materials</h2><span>Reorder Watch</span></div><div id="consumables" class="inventory-list"></div></section>
+      <section class="panel"><div class="panel-head"><h2>Tool Records</h2><span>Owned Gear</span></div><div id="tools"></div></section>
+    </div>
+  </section>
+
+  <div class="footer"><span><b>DepotOps v0.5.0:</b> enforced run state • explicit closeout decisions • safe follow-up runs • local-first state.</span><a href="../index.html">System by Dave home</a></div>
+</div>
+
+<dialog id="editorDialog"><form method="dialog" id="editorForm"><div class="modal-head"><h2 id="editorTitle">Edit</h2><button class="btn small dark" value="cancel">Close</button></div><div class="modal-body"><div class="formgrid" id="editorFields"></div><div class="modal-actions"><button class="btn" value="cancel">Cancel</button><button class="btn orange" id="editorSave" value="default">Save</button></div></div></form></dialog>
+<dialog id="reconcileDialog"><form method="dialog" id="reconcileForm"><div class="modal-head"><h2>Review & Close Run</h2><button class="btn small dark" value="cancel">Close</button></div><div class="modal-body"><p>Resolve every remainder and accept every overage before closing. DepotOps validates the full closeout before changing run or Warehouse state.</p><div id="closeoutSummary" class="closeout-summary"></div><section id="unresolvedSection" class="closeout-section"><div class="closeout-tools"><div><h3>Unresolved rows</h3><div class="meta">Carry remaining quantity into a follow-up run or skip it from this run.</div></div><button class="btn small soft" id="carryAllBtn" type="button">Carry all eligible</button></div><div class="field full"><label for="followupName">Follow-up run name</label><input id="followupName" name="followupName" type="text"></div><div id="closeoutDecisions"></div></section><section id="overageSection" class="closeout-section"><h3>Quantity overages</h3><div class="meta">Each quantity above the request needs explicit acceptance.</div><div id="overageDecisions"></div></section><section class="closeout-section"><h3>Warehouse allocation</h3><p class="meta">Enter how much of each acquired quantity becomes general stock or unused leftovers. Project-only material can remain at 0.</p><div id="reconcileRows"></div></section><div class="closeout-submitbar"><div id="closeoutRemaining" class="decision-status" role="status" aria-live="polite"></div><div class="modal-actions"><button class="btn" value="cancel">Cancel</button><button class="btn orange" id="reconcileSave" value="default" disabled>Close Run</button></div></div></div></form></dialog>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<pre id="selftest" class="selftest"></pre>
+
+<script>
+"use strict";
+const SCHEMA_VERSION=5, STORAGE_KEY="depotops-v0.2-state";
+const STATUS_ORDER=["needed","in_cart","partially_purchased","purchased","not_found","skipped","hold"];
+const EDITABLE_STATUS_ORDER=STATUS_ORDER.filter(x=>x!=="partially_purchased");
+const CLOSEOUT_DISPOSITIONS=new Set(["fulfilled","fulfilled_overage","carried_forward","skipped","skipped_remainder"]);
+const FOCUS_WORKFLOW_STATES=new Set(["active","gated","parked","review"]);
+const PRODUCT_LINKS={
+ "itm-pvc40":{url:"https://www.homedepot.com/p/202352537",exact:true,label:"Home Depot product",model:"A52BA12H",internet:"202352537"},
+ "itm-pvc80":{url:"https://www.homedepot.com/p/202352541",exact:true,label:"Home Depot product",model:"A53BA12H",internet:"202352541"},
+ "itm-sweep":{url:"https://www.homedepot.com/p/202043344",exact:true,label:"Home Depot product",model:"R5233825",internet:"202043344"},
+ "itm-coupling":{url:"https://www.homedepot.com/p/202043236",exact:true,label:"Home Depot product",model:"R6141625",internet:"202043236"},
+ "itm-adapter":{url:"https://www.homedepot.com/p/202043379",exact:true,label:"Home Depot product",model:"R5140105",internet:"202043379"},
+ "itm-lb":{url:"https://www.homedepot.com/p/202043405",exact:true,label:"Home Depot product",model:"R5133665",internet:"202043405"},
+ "itm-cement":{url:"https://www.homedepot.com/p/206751887",exact:true,label:"Home Depot product",model:"31040",internet:"206751887"},
+ "itm-primer":{url:"https://www.homedepot.com/p/100347769",exact:true,label:"Home Depot product",model:"3075633",internet:"100347769"},
+ "itm-string":{url:"https://www.homedepot.com/p/100660158",exact:true,label:"Home Depot product",model:"56108",internet:"100660158"},
+ "itm-warning":{url:"https://www.homedepot.com/p/202276217",exact:true,label:"Home Depot product",model:"42-101",internet:"202276217"},
+ "itm-ductseal":{url:"https://www.homedepot.com/p/100212441",exact:true,label:"Home Depot product",model:"DS-110",internet:"100212441"},
+ "itm-straps":{url:"https://www.homedepot.com/p/202043223",exact:true,label:"Home Depot product",model:"R5133738",internet:"202043223"}
+}
+function productLinkFor(cat){
+ if(!cat)return null;
+ if(cat.productUrl)return {url:cat.productUrl,exact:true,label:"Open product"};
+ if(PRODUCT_LINKS[cat.id])return PRODUCT_LINKS[cat.id];
+ return {url:`https://www.homedepot.com/s/${encodeURIComponent(cat.name)}`,exact:false,label:"Find at Home Depot"};
+}
+const $=id=>document.getElementById(id);
+const uid=(prefix="id")=>`${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2,8)}`;
+const clone=o=>JSON.parse(JSON.stringify(o));
+
+const NOTION_LIST_ITEMS=[
+ {id:"notion-5ad4cc4473ab4fd98126dc8dea9e4d0f",name:"Gate closer / spring",category:"Garden & Outdoor",department:"Outdoor",priority:"Urgent",purchased:false,notes:"Auto pull closed",productUrl:null,notionUrl:"https://app.notion.com/5ad4cc4473ab4fd98126dc8dea9e4d0f"},
+ {id:"notion-cfd5cc1f6fad4332894e98f7c5a86a47",name:"Gate hinge set",category:"Garden & Outdoor",department:"Outdoor",priority:"Urgent",purchased:false,notes:"Heavy duty",productUrl:null,notionUrl:"https://app.notion.com/cfd5cc1f6fad4332894e98f7c5a86a47"},
+ {id:"notion-d62928bec2d64e80a2ef25067c74e8c5",name:"Gate latch",category:"Garden & Outdoor",department:"Outdoor",priority:"Urgent",purchased:false,notes:"Dog proof",productUrl:null,notionUrl:"https://app.notion.com/d62928bec2d64e80a2ef25067c74e8c5"},
+ {id:"notion-8d3bc088e4fa457a974a968b7a6ddab8",name:"Shop vacuum bags",category:"Tools & Hardware",department:"Cleaning",priority:"High",purchased:false,notes:"For sanding debris",productUrl:null,notionUrl:"https://app.notion.com/8d3bc088e4fa457a974a968b7a6ddab8"},
+ {id:"notion-3b5df596fcd14547ada2ce977d2584c3",name:"Shop-Vac Small Cartridge Filter Retainer",category:"Tools & Hardware",department:"Cleaning",priority:"High",purchased:false,notes:"Shop-Vac item #3183000. Replacement retainer for small cartridge filters approx. 5.75 in diameter x 5 in high. $7.69 listed.",productUrl:"https://www.shopvac.com/products/3183000-replacement-small-cartridge-filter-retainer?variant=40067955458225",notionUrl:"https://app.notion.com/3b5df596fcd14547ada2ce977d2584c3"},
+ {id:"notion-9bbfb78eb1b44768aa11f464eb8918a7",name:"Shop-Vac Type AA Small Cartridge Filter",category:"Tools & Hardware",department:"Cleaning",priority:"High",purchased:false,notes:"Shop-Vac Type AA small cartridge filter. Product page shows item #9039833. Approx. 5.75 in diameter x 5 in high. Fits many 1-4 gallon Shop-Vac wet/dry vacuums. $18.80 listed.",productUrl:"https://www.shopvac.com/products/type-aa-9039800-shop-vac%C2%AE-small-cartridge-filter?variant=40072521121969",notionUrl:"https://app.notion.com/9bbfb78eb1b44768aa11f464eb8918a7"},
+ {id:"notion-37b0671bfbd04e0abdd73f8bb3421c82",name:"Conduit straps",category:"Electrical",department:"Electrical",priority:"High",purchased:false,notes:"Wall mounting",productUrl:null,notionUrl:"https://app.notion.com/37b0671bfbd04e0abdd73f8bb3421c82"},
+ {id:"notion-9d4783d608de46a4be6cbb7ef727b84e",name:"THHN wire (12/2 or 10/2)",category:"Electrical",department:"Electrical",priority:"High",purchased:false,notes:"For garage run",productUrl:null,notionUrl:"https://app.notion.com/9d4783d608de46a4be6cbb7ef727b84e"},
+ {id:"notion-cff4b5452d154d72950aed2be1771cfe",name:"2x4 lumber",category:"Materials",department:"Materials",priority:"High",purchased:false,notes:"Attic hatch reinforcement",productUrl:null,notionUrl:"https://app.notion.com/cff4b5452d154d72950aed2be1771cfe"},
+ {id:"notion-d444faaaf5b14ee9b003a64542c9f3fc",name:"Concrete patch mix",category:"Materials",department:"Materials",priority:"High",purchased:false,notes:"Exterior hole + basement",productUrl:null,notionUrl:"https://app.notion.com/d444faaaf5b14ee9b003a64542c9f3fc"},
+ {id:"notion-1ff53742066340dd9399a416802a2166",name:"Plywood sheets",category:"Materials",department:"Materials",priority:"High",purchased:false,notes:"Attic hatch panel",productUrl:null,notionUrl:"https://app.notion.com/1ff53742066340dd9399a416802a2166"},
+ {id:"notion-70c4e8d76a1e4ec48e6b9291557a787b",name:"PVC conduit",category:"Electrical",department:"Plumbing",priority:"High",purchased:false,notes:"For garage electrical",productUrl:null,notionUrl:"https://app.notion.com/70c4e8d76a1e4ec48e6b9291557a787b"},
+ {id:"notion-75553fa2c8fe46d8a08172f7af9a860b",name:"PVC fittings",category:"Plumbing",department:"Plumbing",priority:"High",purchased:false,notes:"Elbows for penetration",productUrl:null,notionUrl:"https://app.notion.com/75553fa2c8fe46d8a08172f7af9a860b"},
+ {id:"notion-2aa255fc8f44807da861e3374ab9f8e9",name:"Cat6a / Fiber LC to LC",category:"Electrical",department:"Unassigned",priority:"Medium",purchased:false,notes:"",productUrl:null,notionUrl:"https://app.notion.com/2aa255fc8f44807da861e3374ab9f8e9"},
+ {id:"notion-376255fc8f44818fbda2c3ec301f40e2",name:"Convection microwave (kitchen update)",category:"Appliances",department:"Materials",priority:"Medium",purchased:false,notes:"Mom request. Built-in or countertop; 120V 20A dedicated. With no range, no OTR mount, plan placement + separate cooktop hood.",productUrl:null,notionUrl:"https://app.notion.com/376255fc8f44818fbda2c3ec301f40e2"},
+ {id:"notion-376255fc8f4481ca956df4cdc1902c45",name:"Convection wall oven, single (kitchen update)",category:"Appliances",department:"Materials",priority:"Medium",purchased:false,notes:"Needs 240V dedicated circuit, 30A typical. Confirm cabinet opening and amperage on rating plate.",productUrl:null,notionUrl:"https://app.notion.com/376255fc8f4481ca956df4cdc1902c45"},
+ {id:"notion-d95cf140cc3543a39d0d1fcdaba93f21",name:"Drywall",category:"Materials",department:"Materials",priority:"Medium",purchased:false,notes:"For any interior patching",productUrl:null,notionUrl:"https://app.notion.com/d95cf140cc3543a39d0d1fcdaba93f21"},
+ {id:"notion-376255fc8f4481cfb946edf8ce9108f4",name:"Induction cooktop (kitchen update)",category:"Appliances",department:"Materials",priority:"Medium",purchased:false,notes:"Needs 240V dedicated circuit, 40A (30 in) or 50A (36 in). Confirm cutout dimensions vs counter. Verify amperage on rating plate.",productUrl:null,notionUrl:"https://app.notion.com/376255fc8f4481cfb946edf8ce9108f4"},
+ {id:"notion-45da8295d5c648fa9eedcad6aaf3c6ca",name:"Insulation",category:"Materials",department:"Materials",priority:"Medium",purchased:false,notes:"Attic + basement",productUrl:null,notionUrl:"https://app.notion.com/45da8295d5c648fa9eedcad6aaf3c6ca"},
+ {id:"notion-bf22ba1de6ae45c2ad0e46ea73ffcdd2",name:"Gutter scoop",category:"Garden & Outdoor",department:"Outdoor",priority:"Medium",purchased:false,notes:"For porch gutter clearing",productUrl:null,notionUrl:"https://app.notion.com/bf22ba1de6ae45c2ad0e46ea73ffcdd2"},
+ {id:"notion-92a94184458b4aba8f117fdd6e3704b3",name:"Pegboard",category:"Organization",department:"Tools & Hardware",priority:"Medium",purchased:false,notes:"Garage organization",productUrl:null,notionUrl:"https://app.notion.com/92a94184458b4aba8f117fdd6e3704b3"},
+ {id:"notion-47f00e659145450ebed184c629452498",name:"Trowel",category:"Tools & Hardware",department:"Tools & Hardware",priority:"Medium",purchased:false,notes:"For patching concrete",productUrl:null,notionUrl:"https://app.notion.com/47f00e659145450ebed184c629452498"},
+ {id:"notion-93ac379951c44884a85addc9b7a7cfad",name:"Flexzilla 1/4 in x 50 ft Hybrid Polymer Air Hose",category:"Tools & Hardware",department:"Workshop",priority:"Medium",purchased:false,notes:"Lowe's link. For Porter Cable pancake compressor setup. 1/4 in x 50 ft kink-free hybrid polymer air hose.",productUrl:"https://www.lowes.com/pd/Flexzilla-1-4-in-Kink-Free-50-ft-Hybrid-Polymer-Air-Hose/1001042344?user=shopping&feed=yes&utm_source=chatgpt.com&oppcref=63378c83-79ae-489a-9d67-3594747f6776",notionUrl:"https://app.notion.com/93ac379951c44884a85addc9b7a7cfad"},
+ {id:"notion-b4925cba7af240a6b7218d3c7fe3174d",name:"Interior paint",category:"Paint",department:"Paint",priority:"Low",purchased:false,notes:"For mom's refinished drawers area",productUrl:null,notionUrl:"https://app.notion.com/b4925cba7af240a6b7218d3c7fe3174d"},
+ {id:"notion-2fbf7fc9850c4dec9a0d6c81b31b65a8",name:"Painter's tape",category:"Paint",department:"Paint",priority:"Low",purchased:false,notes:"For edges",productUrl:null,notionUrl:"https://app.notion.com/2fbf7fc9850c4dec9a0d6c81b31b65a8"},
+ {id:"notion-827ed2c0f2de4e9a9265acc1f164e03a",name:"Wire nuts",category:"Electrical",department:"Electrical",priority:"High",purchased:true,notes:"For junction",productUrl:null,notionUrl:"https://app.notion.com/827ed2c0f2de4e9a9265acc1f164e03a"},
+ {id:"notion-116ac6b2770f42aca22ed4246f0e7705",name:"Exterior caulk",category:"Plumbing",department:"Plumbing",priority:"High",purchased:true,notes:"Gutter, window trim",productUrl:null,notionUrl:"https://app.notion.com/116ac6b2770f42aca22ed4246f0e7705"},
+ {id:"notion-28b722cba09247ceaca2bda954280483",name:"Silicone caulk",category:"Plumbing",department:"Plumbing",priority:"High",purchased:true,notes:"Window sealing",productUrl:null,notionUrl:"https://app.notion.com/28b722cba09247ceaca2bda954280483"},
+ {id:"notion-2aa91a53f1cd415f95a4c14b02f5c6e3",name:"Hinges / Gas Struts",category:"Tools & Hardware",department:"Tools & Hardware",priority:"High",purchased:true,notes:"For attic door",productUrl:null,notionUrl:"https://app.notion.com/2aa91a53f1cd415f95a4c14b02f5c6e3"},
+ {id:"notion-4b137420fc114f0aa334066161228e0a",name:"Power drill",category:"Power tools",department:"Tools & Hardware",priority:"High",purchased:true,notes:"For wood + masonry",productUrl:null,notionUrl:"https://app.notion.com/4b137420fc114f0aa334066161228e0a"},
+ {id:"notion-265811eb1e7d4a27a91bc30581b0c7b7",name:"Bolts and nuts",category:"Fasteners",department:"Fasteners",priority:"Medium",purchased:true,notes:"Gate hardware reinforcing",productUrl:null,notionUrl:"https://app.notion.com/265811eb1e7d4a27a91bc30581b0c7b7"},
+ {id:"notion-b9da34a73e9f48d8a656663ddd9367ba",name:"Exterior nails",category:"Fasteners",department:"Fasteners",priority:"Medium",purchased:true,notes:"For patch zones",productUrl:null,notionUrl:"https://app.notion.com/b9da34a73e9f48d8a656663ddd9367ba"},
+ {id:"notion-0be0957cae894708962cd67965c722f8",name:"Wall anchors",category:"Fasteners",department:"Fasteners",priority:"Medium",purchased:true,notes:"For attic hatch",productUrl:null,notionUrl:"https://app.notion.com/0be0957cae894708962cd67965c722f8"},
+ {id:"notion-3c347043feb54f2c8de05abd5736653d",name:"Interior caulk",category:"Plumbing",department:"Plumbing",priority:"Medium",purchased:true,notes:"House window sealing",productUrl:null,notionUrl:"https://app.notion.com/3c347043feb54f2c8de05abd5736653d"},
+ {id:"notion-1ae081aea19e47c8ada6f0c6af033698",name:"Utility knife",category:"Blades",department:"Tools & Hardware",priority:"Medium",purchased:true,notes:"New blades",productUrl:null,notionUrl:"https://app.notion.com/1ae081aea19e47c8ada6f0c6af033698"},
+ {id:"notion-294000c3276140fe83821c4466465dd3",name:"3D printer PLA/PETG",category:"Materials",department:"Workshop",priority:"Medium",purchased:true,notes:"For flange, dog collar",productUrl:null,notionUrl:"https://app.notion.com/294000c3276140fe83821c4466465dd3"},
+ {id:"notion-b5bb9f4d26774374ab769ba7db847173",name:"Work gloves",category:"Tools & Hardware",department:"Cleaning",priority:"Low",purchased:true,notes:"Spare pairs",productUrl:null,notionUrl:"https://app.notion.com/b5bb9f4d26774374ab769ba7db847173"},
+ {id:"notion-7d80713c4ae642298c967225e9965bf4",name:"LB Outdoor Conduit Box (2)",category:"Electrical",department:"Electrical",priority:"Low",purchased:true,notes:"Clean look in garage",productUrl:null,notionUrl:"https://app.notion.com/7d80713c4ae642298c967225e9965bf4"},
+ {id:"notion-006f803ad5ec4045aae66b04fe23ed11",name:"Assorted screws",category:"Fasteners",department:"Fasteners",priority:"Low",purchased:true,notes:"For gate hardware, attic door",productUrl:null,notionUrl:"https://app.notion.com/006f803ad5ec4045aae66b04fe23ed11"},
+ {id:"notion-3352e998172a4b68901fb13c8acb6695",name:"Drop cloths",category:"Paint",department:"Paint",priority:"Low",purchased:true,notes:"For sanding and leveling",productUrl:null,notionUrl:"https://app.notion.com/3352e998172a4b68901fb13c8acb6695"},
+ {id:"notion-4eed0d09de81488788542c33427f1fcc",name:"Paint brushes",category:"Paint",department:"Paint",priority:"Low",purchased:true,notes:"Always useful",productUrl:null,notionUrl:"https://app.notion.com/4eed0d09de81488788542c33427f1fcc"},
+ {id:"notion-b9d4bebabda64483918b5c95726402f6",name:"Paint supplies (trays, liners)",category:"Paint",department:"Paint",priority:"Low",purchased:true,notes:"For mom's room",productUrl:null,notionUrl:"https://app.notion.com/b9d4bebabda64483918b5c95726402f6"},
+ {id:"notion-e576e9f6e89343d2b3d6676d8cae5fc3",name:"Hammer",category:"Tools & Hardware",department:"Tools & Hardware",priority:"Low",purchased:true,notes:"Backup or upgrade if needed",productUrl:null,notionUrl:"https://app.notion.com/e576e9f6e89343d2b3d6676d8cae5fc3"},
+ {id:"notion-d9cf524b0410427cbf12a129b410abe0",name:"Level",category:"Tools & Hardware",department:"Tools & Hardware",priority:"Low",purchased:true,notes:"Needed for gate alignment",productUrl:null,notionUrl:"https://app.notion.com/d9cf524b0410427cbf12a129b410abe0"},
+ {id:"notion-bc72a062770042dabe9986885f4753da",name:"Measuring tape",category:"Tools & Hardware",department:"Tools & Hardware",priority:"Low",purchased:true,notes:"Confirm if current is in car/garage",productUrl:null,notionUrl:"https://app.notion.com/bc72a062770042dabe9986885f4753da"},
+ {id:"notion-d4448ac6c0074c62a7e4ad4071d6c380",name:"Sandpaper belts/sheets",category:"Tools & Hardware",department:"Tools & Hardware",priority:"Low",purchased:true,notes:"For miter and orbital sanders",productUrl:null,notionUrl:"https://app.notion.com/d4448ac6c0074c62a7e4ad4071d6c380"},
+ {id:"notion-8bf5d6c1d3774583b2efbe22b0eed2d6",name:"Screwdriver set",category:"Tools & Hardware",department:"Tools & Hardware",priority:"Low",purchased:true,notes:"Replace missing Philips bits",productUrl:null,notionUrl:"https://app.notion.com/8bf5d6c1d3774583b2efbe22b0eed2d6"},
+ {id:"notion-d9f2254b017447d6b8c1ce89841e8296",name:"Utility knife blades",category:"Blades",department:"Tools & Hardware",priority:"Low",purchased:true,notes:"Refill",productUrl:null,notionUrl:"https://app.notion.com/d9f2254b017447d6b8c1ce89841e8296"}
+];
+const LEGACY_NOTION_PROJECT_ID="prj-home-depot";
+const NOTION_PROJECTS=[
+ {id:"prj-panel",name:"200A Service & Main Panel",status:"Researching",workflowState:"active",location:"Electrical",priority:"Urgent",phase:"Procurement",procurement:"Quoting",description:"Upstream gate for garage, basement, and future electrical work.",blocker:"Licensed-electrician quotes, service scope, and permit path are not confirmed.",nextAction:"Request three comparable licensed-electrician quotes covering permits and garage-feeder sequencing.",notionUrl:"https://app.notion.com/3b5255fc8f4481ad9140f886e6b5aded",createdAt:"2026-08-07",updatedAt:"2026-08-10"},
+ {id:"prj-garage",name:"Garage Power & Network",status:"Waiting",workflowState:"gated",location:"Garage",priority:"High",phase:"Planning",procurement:"On hold",description:"Garage feeder and network route; purchasing is gated by the 200A service project.",blocker:"200A service and main-panel replacement is the upstream gate.",nextAction:"Confirm the panel replacement and permit path before revalidating the exact feeder shopping list.",notionUrl:"https://app.notion.com/3b5255fc8f4481a9885ed6d1ceaf3214",createdAt:"2026-08-07",updatedAt:"2026-08-10"},
+ {id:"prj-lighting",name:"Basement Electrical Buildout",status:"Waiting",workflowState:"gated",location:"Basement",priority:"Medium",phase:"Planning",procurement:"On hold",description:"Basement lighting and electrical buildout downstream of the service-panel decision.",blocker:"Panel-expansion path and field verification of circuits 13, 5, and 14 remain unresolved.",nextAction:"Resolve the panel path, then field-verify circuits before wiring ten ceiling fixtures.",notionUrl:"https://app.notion.com/3b5255fc8f44812eb4b8d80e0d4b81d7",createdAt:"2026-08-07",updatedAt:"2026-08-10"},
+ {id:"prj-box-fill",name:"NEC Box Fill Calculation",status:"Researching",workflowState:"active",location:"Electrical Reference",priority:"High",phase:"Permits",procurement:"Not applicable",description:"Calculation record supporting safe device and conductor selection.",blocker:"Circuit details and conductor/device counts are incomplete.",nextAction:"Verify circuit details and complete the box-fill calculation.",notionUrl:"https://app.notion.com/3a7255fc8f4480f2a06cd7f5453ded98",createdAt:"2026-08-07",updatedAt:"2026-08-10"},
+ {id:"prj-plumbing",name:"Home Plumbing Systems",status:"In progress",workflowState:"active",location:"Basement",priority:"High",phase:"Planning",procurement:"Researching",description:"Near-term repairs plus whole-house plumbing planning.",blocker:"PEX choice, route measurements, fixture counts, and permit approach are not locked.",nextAction:"Install the Dearborn trap, replace laundry valves and bidet line, and photograph survey gaps.",notionUrl:"https://app.notion.com/3a7255fc8f44808ba619d0e1db0059b2",createdAt:"2026-08-07",updatedAt:"2026-08-10"},
+ {id:"prj-shower",name:"Walk In Shower Remodel",status:"Waiting",workflowState:"gated",location:"Bathroom",priority:"High",phase:"Design",procurement:"On hold",description:"Water-shedding sill repair and remodel strategy.",blocker:"Sill measurements and interim-versus-remodel strategy are unresolved.",nextAction:"Measure the sill and choose the repair strategy before buying material.",notionUrl:"https://app.notion.com/3a7255fc8f4480409bc7df0574ac0ea7",createdAt:"2026-08-07",updatedAt:"2026-08-10"},
+ {id:"prj-drain",name:"Kitchen Drain Trap Replacement",status:"Waiting",workflowState:"gated",location:"Garage",priority:"High",phase:"Planning",procurement:"On hold",description:"Serviceable, properly pitched drain assembly.",blocker:"Pipe size, material, route, and local AAV allowance are not confirmed.",nextAction:"Photograph and measure the full assembly before buying or gluing fittings.",notionUrl:"https://app.notion.com/3b5255fc8f4481c6a338d208913c97a3",createdAt:"2026-08-07",updatedAt:"2026-08-10"},
+ {id:"prj-concrete",name:"Concrete Patching",status:"Waiting",workflowState:"gated",location:"Exterior / Basement",priority:"Medium",phase:"Planning",procurement:"On hold",description:"Side-of-house and basement-floor patch zones.",blocker:"Damage dimensions and the underlying moisture or movement cause are not identified.",nextAction:"Photograph and measure the damage; identify the cause before choosing patch material.",notionUrl:"https://app.notion.com/3b5255fc8f448159b401e4de1c472c00",createdAt:"2026-08-07",updatedAt:"2026-08-10"},
+ {id:"prj-kitchen",name:"Kitchen Appliance Update",status:"In progress",workflowState:"active",location:"Kitchen",priority:"High",phase:"Procurement",procurement:"Researching",description:"Current direction is a gas double-oven range plus over-the-range microwave.",blocker:"Models and cabinet, venting, gas, and 120V fit are not confirmed.",nextAction:"Confirm fit and compare installed pricing before purchase.",notionUrl:"https://app.notion.com/3b5255fc8f4481adad47cd2dded2e81e",createdAt:"2026-08-07",updatedAt:"2026-08-10"},
+ {id:"prj-attic",name:"Attic Lid Upgrade",status:"Waiting",workflowState:"gated",location:"Attic",priority:"Medium",phase:"Procurement",procurement:"On hold",description:"Reinforced, weatherstripped attic access lid.",blocker:"Existing lid weight, dimensions, and required strut force are not confirmed.",nextAction:"Measure and weigh the lid before selecting hinges, struts, weatherstrip, and handles.",notionUrl:"https://app.notion.com/3b5255fc8f4481be953cf81943e0048a",createdAt:"2026-08-07",updatedAt:"2026-08-10"},
+ {id:"prj-basement-materials",name:"Basement Materials Estimate",status:"Researching",workflowState:"gated",location:"Basement",priority:"Medium",phase:"Procurement",procurement:"Researching",description:"Measured materials and supplier comparison for the basement scope.",blocker:"Scope quantities and supplier comparison are incomplete.",nextAction:"Build the measured materials list, then compare supplier pricing.",notionUrl:"https://app.notion.com/3a7255fc8f4480c389c9d3dda15ec246",createdAt:"2026-08-07",updatedAt:"2026-08-10"},
+ {id:"prj-bedroom",name:"Bedroom & Office Layout",status:"Researching",workflowState:"active",location:"Bedroom / Office",priority:"Medium",phase:"Design",procurement:"Planning",description:"Bed, office, monitor, speaker, and doorway layout.",blocker:"Room dimensions and final positions are not verified.",nextAction:"Field-verify the room before locking the layout.",notionUrl:"https://app.notion.com/3b5255fc8f4481fd9fb9ed86014d05e0",createdAt:"2026-08-07",updatedAt:"2026-08-10"},
+ {id:"prj-potting",name:"Potting Area Plan",status:"In progress",workflowState:"active",location:"Potting Area",priority:"Medium",phase:"Planning",procurement:"Not set",description:"Sink, bench, and storage layout.",blocker:"",nextAction:"Define the potting area's sink, bench, and storage layout.",notionUrl:"https://app.notion.com/3a7255fc8f4480eb9497f518213fb149",createdAt:"2026-08-07",updatedAt:"2026-08-10"},
+ {id:"prj-docs-audit",name:"Home Docs Audit",status:"Researching",workflowState:"active",location:"Reference",priority:"Medium",phase:"Planning",procurement:"Not applicable",description:"Registry reconciliation and source-link cleanup.",blocker:"",nextAction:"Review active projects and fill canonical links as source pages mature.",notionUrl:"https://app.notion.com/3a7255fc8f448041ab2fdbfdd13f282a",createdAt:"2026-08-07",updatedAt:"2026-08-10"},
+ {id:"prj-stairwell",name:"Stairwell Utility Zone Redesign",status:"Researching",workflowState:"parked",location:"Stairwell",priority:"Medium",phase:"Design",procurement:"Not set",description:"Utility, storage, and circulation layout.",blocker:"",nextAction:"Sketch utility, storage, and circulation zones.",notionUrl:"https://app.notion.com/3a7255fc8f4480ecb1dcd7a38bcbc2d1",createdAt:"2026-08-07",updatedAt:"2026-08-10"},
+ {id:"prj-sink-floor",name:"Sink Window Flooring",status:"Planned",workflowState:"parked",location:"Potting Area",priority:"Medium",phase:"Finish",procurement:"Not set",description:"Floor substrate, finish, and transition detail.",blocker:"",nextAction:"Confirm the substrate, finish, and transition details.",notionUrl:"https://app.notion.com/3a7255fc8f44803fbb36ea6286d045d2",createdAt:"2026-08-07",updatedAt:"2026-08-10"},
+ {id:"prj-tool-organizer",name:"Tool Organizer Rebuild",status:"Planned",workflowState:"parked",location:"Tools",priority:"Medium",phase:"Build",procurement:"Not set",description:"Tool storage and DeWALT nailer capacity.",blocker:"",nextAction:"Inventory tools and confirm organizer dimensions and mounting.",notionUrl:"https://app.notion.com/3a7255fc8f44808a8d6fd831f2cae312",createdAt:"2026-08-07",updatedAt:"2026-08-10"},
+ {id:"prj-quiet-cuts",name:"Quiet 2x4 Cuts",status:"Planned",workflowState:"parked",location:"Tools",priority:"Low",phase:"Build",procurement:"Not set",description:"Low-noise cutting method for contained work.",blocker:"",nextAction:"Choose a quieter method and test it on scrap lumber.",notionUrl:"https://app.notion.com/3a7255fc8f44804687c4d8d465834bfd",createdAt:"2026-08-07",updatedAt:"2026-08-10"},
+ {id:"prj-stair-sketch",name:"Staircase Finish Sketch",status:"Planned",workflowState:"parked",location:"Stairwell",priority:"Low",phase:"Design",procurement:"Not set",description:"Finish treatment and material shortlist.",blocker:"",nextAction:"Select a finish treatment and make a material shortlist.",notionUrl:"https://app.notion.com/3a7255fc8f4480dc8dc5fce80e8b907a",createdAt:"2026-08-07",updatedAt:"2026-08-10"},
+ {id:"prj-fence",name:"Fence Gate & Hardware",status:"Complete / review",workflowState:"review",location:"Exterior",priority:"Urgent",phase:"Closeout",procurement:"Complete",description:"Registry says complete, while three gate-hardware rows remain unpurchased in the canonical list.",blocker:"Source conflict: the completion plan confirms the gate complete.",nextAction:"Decide whether to remove, retain as spares, or reopen the three hardware rows.",notionUrl:"https://app.notion.com/3b5255fc8f44815c9f2ced4640a149e0",createdAt:"2026-08-07",updatedAt:"2026-08-10"},
+ {id:"prj-back-stairs",name:"Back Stair Refinishing",status:"Waiting",workflowState:"gated",location:"Interior",priority:"Medium",phase:"Finish",procurement:"On hold",description:"Subfloor is exposed and sanded.",blocker:"Waiting on the finish choice.",nextAction:"Choose the finish before buying finishing material.",notionUrl:"https://app.notion.com/6e0d98369663483283fd4db8411f1e19",createdAt:"2026-06-06",updatedAt:"2026-08-10"},
+ {id:"prj-exterior-winter",name:"Parents' House Exterior Winterization",status:"In progress",workflowState:"active",location:"Exterior",priority:"Low",phase:"Maintenance",procurement:"Active",description:"Gate repairs, window and gutter caulking, and attic-access improvements.",blocker:"",nextAction:"Define the next exterior scope and first milestone.",notionUrl:"https://app.notion.com/dea12419c9004c67b5c607acac63f29c",createdAt:"2025-11-15",updatedAt:"2026-08-10"},
+ {id:"prj-workshop",name:"Workshop & Fabrication",status:"In progress",workflowState:"active",location:"Workshop",priority:"Medium",phase:"Build",procurement:"Active",description:"3D-print work, cleanup, compressor setup, and shop organization support.",blocker:"",nextAction:"Finish the current fabrication work before pulling another parked build forward.",notionUrl:"https://app.notion.com/p/2aa255fc8f44806a9b59f8cd9c7ea748",createdAt:"2026-06-06",updatedAt:"2026-08-10"},
+ {id:"prj-drawers",name:"Drawer Refinishing & Hardware",status:"Source conflict",workflowState:"review",location:"Interior",priority:"Medium",phase:"Closeout",procurement:"Review",description:"The task row says refinishing is complete, while the current Workshop hub still lists drawer work.",blocker:"Current hub and task status disagree.",nextAction:"Confirm whether only hardware installation remains, then keep or remove the paint rows.",notionUrl:"https://app.notion.com/527dd7113e6041eca6e4f27cd9c81425",createdAt:"2026-06-06",updatedAt:"2026-08-10"}
+];
+const ITEM_PROJECT_LINKS={
+ "notion-5ad4cc4473ab4fd98126dc8dea9e4d0f":{projectIds:["prj-fence"],workflowState:"review",workflowNote:"Gate is marked complete; decide whether this is a reopen item or spare."},
+ "notion-cfd5cc1f6fad4332894e98f7c5a86a47":{projectIds:["prj-fence"],workflowState:"review",workflowNote:"Gate is marked complete; decide whether this is a reopen item or spare."},
+ "notion-d62928bec2d64e80a2ef25067c74e8c5":{projectIds:["prj-fence"],workflowState:"review",workflowNote:"Gate is marked complete; decide whether this is a reopen item or spare."},
+ "notion-8d3bc088e4fa457a974a968b7a6ddab8":{projectIds:["prj-back-stairs","prj-workshop"],workflowState:"gated",workflowNote:"Linked to sanding cleanup; finish choice is still pending."},
+ "notion-3b5df596fcd14547ada2ce977d2584c3":{projectIds:["prj-back-stairs","prj-workshop"],workflowState:"gated",workflowNote:"Linked to sanding cleanup; finish choice is still pending."},
+ "notion-9bbfb78eb1b44768aa11f464eb8918a7":{projectIds:["prj-back-stairs","prj-workshop"],workflowState:"gated",workflowNote:"Linked to sanding cleanup; finish choice is still pending."},
+ "notion-37b0671bfbd04e0abdd73f8bb3421c82":{projectIds:["prj-garage","prj-panel"],workflowState:"gated",workflowNote:"Do not buy until the replacement panel and exact feeder scope are confirmed."},
+ "notion-9d4783d608de46a4be6cbb7ef727b84e":{projectIds:["prj-garage","prj-panel"],workflowState:"gated",workflowNote:"Conductor type and size must be revalidated against the approved feeder design."},
+ "notion-cff4b5452d154d72950aed2be1771cfe":{projectIds:["prj-attic","prj-quiet-cuts"],workflowState:"gated",workflowNote:"Measure and weigh the attic lid before final material selection."},
+ "notion-d444faaaf5b14ee9b003a64542c9f3fc":{projectIds:["prj-concrete"],workflowState:"gated",workflowNote:"Inspect moisture or movement and measure damage before choosing mix."},
+ "notion-1ff53742066340dd9399a416802a2166":{projectIds:["prj-attic"],workflowState:"gated",workflowNote:"Confirm lid dimensions and weight before choosing the panel."},
+ "notion-70c4e8d76a1e4ec48e6b9291557a787b":{projectIds:["prj-garage","prj-panel"],workflowState:"gated",workflowNote:"Revalidate conduit size and route after the panel scope is approved."},
+ "notion-75553fa2c8fe46d8a08172f7af9a860b":{projectIds:["prj-drain","prj-garage"],workflowState:"gated",workflowNote:"The drain and feeder records both require field verification before fittings are bought."},
+ "notion-2aa255fc8f44807da861e3374ab9f8e9":{projectIds:["prj-garage","prj-panel"],workflowState:"gated",workflowNote:"Network medium belongs to the garage scope, which remains panel-gated."},
+ "notion-376255fc8f44818fbda2c3ec301f40e2":{projectIds:["prj-kitchen"],workflowState:"superseded",workflowNote:"Current Notion direction is an over-the-range microwave, not this older concept."},
+ "notion-376255fc8f4481ca956df4cdc1902c45":{projectIds:["prj-kitchen"],workflowState:"superseded",workflowNote:"Current Notion direction is a gas double-oven range, not a single wall oven."},
+ "notion-d95cf140cc3543a39d0d1fcdaba93f21":{projectIds:["prj-basement-materials"],workflowState:"gated",workflowNote:"Quantities must come from the measured basement scope before purchase."},
+ "notion-376255fc8f4481cfb946edf8ce9108f4":{projectIds:["prj-kitchen"],workflowState:"superseded",workflowNote:"The locked gas-range decision supersedes the induction concept."},
+ "notion-45da8295d5c648fa9eedcad6aaf3c6ca":{projectIds:["prj-attic","prj-basement-materials"],workflowState:"gated",workflowNote:"Both linked scopes require measurements before product and quantity selection."},
+ "notion-bf22ba1de6ae45c2ad0e46ea73ffcdd2":{projectIds:["prj-exterior-winter"],workflowState:"active",workflowNote:"Linked to the active gutter and exterior-maintenance scope."},
+ "notion-92a94184458b4aba8f117fdd6e3704b3":{projectIds:["prj-tool-organizer"],workflowState:"parked",workflowNote:"Stage 5 work; inventory tools and lock the organizer layout first."},
+ "notion-47f00e659145450ebed184c629452498":{projectIds:["prj-concrete"],workflowState:"gated",workflowNote:"Keep with the concrete scope until damage inspection is complete."},
+ "notion-93ac379951c44884a85addc9b7a7cfad":{projectIds:["prj-workshop","prj-tool-organizer"],workflowState:"parked",workflowNote:"Relevant workshop equipment, but outside the three current completion lanes."},
+ "notion-b4925cba7af240a6b7218d3c7fe3174d":{projectIds:["prj-drawers"],workflowState:"review",workflowNote:"The drawer task is marked complete; confirm whether paint is still needed."},
+ "notion-2fbf7fc9850c4dec9a0d6c81b31b65a8":{projectIds:["prj-drawers"],workflowState:"review",workflowNote:"The drawer task is marked complete; confirm whether finishing work remains."},
+ "notion-827ed2c0f2de4e9a9265acc1f164e03a":{projectIds:["prj-lighting","prj-box-fill"],workflowState:"gated",workflowNote:"Purchased stock linked to the panel-dependent basement electrical scope."},
+ "notion-116ac6b2770f42aca22ed4246f0e7705":{projectIds:["prj-exterior-winter"],workflowState:"active",workflowNote:"Purchased for current exterior window and gutter maintenance."},
+ "notion-28b722cba09247ceaca2bda954280483":{projectIds:["prj-exterior-winter"],workflowState:"active",workflowNote:"Purchased for current exterior sealing work."},
+ "notion-2aa91a53f1cd415f95a4c14b02f5c6e3":{projectIds:["prj-attic"],workflowState:"gated",workflowNote:"Already purchased; verify sizing against the measured lid before installation."},
+ "notion-4b137420fc114f0aa334066161228e0a":{projectIds:["prj-workshop"],workflowState:"active",workflowNote:"Shared workshop tool supporting current work."},
+ "notion-265811eb1e7d4a27a91bc30581b0c7b7":{projectIds:["prj-fence"],workflowState:"review",workflowNote:"Purchased gate hardware; retain with the completed-project review."},
+ "notion-b9da34a73e9f48d8a656663ddd9367ba":{projectIds:["prj-concrete"],workflowState:"gated",workflowNote:"Purchased support material linked to the still-gated patch zones."},
+ "notion-0be0957cae894708962cd67965c722f8":{projectIds:["prj-attic"],workflowState:"gated",workflowNote:"Purchased support material; verify against the final attic-lid design."},
+ "notion-3c347043feb54f2c8de05abd5736653d":{projectIds:["prj-exterior-winter"],workflowState:"active",workflowNote:"Purchased for the active window-sealing scope."},
+ "notion-1ae081aea19e47c8ada6f0c6af033698":{projectIds:["prj-workshop"],workflowState:"active",workflowNote:"Shared workshop tool supporting current work."},
+ "notion-294000c3276140fe83821c4466465dd3":{projectIds:["prj-workshop"],workflowState:"active",workflowNote:"Purchased for current 3D-print fabrication work."},
+ "notion-b5bb9f4d26774374ab769ba7db847173":{projectIds:["prj-workshop"],workflowState:"active",workflowNote:"Shared PPE supporting current workshop work."},
+ "notion-7d80713c4ae642298c967225e9965bf4":{projectIds:["prj-garage","prj-panel"],workflowState:"gated",workflowNote:"Purchased, but installation remains gated by the panel decision."},
+ "notion-006f803ad5ec4045aae66b04fe23ed11":{projectIds:["prj-attic","prj-fence"],workflowState:"review",workflowNote:"Shared purchased stock; final allocation depends on the attic design and gate review."},
+ "notion-3352e998172a4b68901fb13c8acb6695":{projectIds:["prj-drawers","prj-back-stairs"],workflowState:"review",workflowNote:"Purchased finishing supply; confirm which incomplete finish scope still owns it."},
+ "notion-4eed0d09de81488788542c33427f1fcc":{projectIds:["prj-drawers"],workflowState:"review",workflowNote:"Purchased finishing supply linked to a task marked complete."},
+ "notion-b9d4bebabda64483918b5c95726402f6":{projectIds:["prj-drawers"],workflowState:"review",workflowNote:"Purchased finishing supply linked to a task marked complete."},
+ "notion-e576e9f6e89343d2b3d6676d8cae5fc3":{projectIds:["prj-workshop"],workflowState:"active",workflowNote:"Shared workshop tool supporting current work."},
+ "notion-d9cf524b0410427cbf12a129b410abe0":{projectIds:["prj-fence"],workflowState:"review",workflowNote:"Purchased gate-alignment tool retained with the completed-project review."},
+ "notion-bc72a062770042dabe9986885f4753da":{projectIds:["prj-workshop"],workflowState:"active",workflowNote:"Shared measurement tool for the current field-facts stage."},
+ "notion-d4448ac6c0074c62a7e4ad4071d6c380":{projectIds:["prj-back-stairs","prj-workshop"],workflowState:"gated",workflowNote:"Purchased sanding supply; the stair finish choice is still pending."},
+ "notion-8bf5d6c1d3774583b2efbe22b0eed2d6":{projectIds:["prj-workshop"],workflowState:"active",workflowNote:"Shared workshop tool supporting current work."},
+ "notion-d9f2254b017447d6b8c1ce89841e8296":{projectIds:["prj-workshop"],workflowState:"active",workflowNote:"Shared workshop consumable supporting current work."}
+};
+const NOTION_CATALOG_ITEMS=NOTION_LIST_ITEMS.map(x=>({id:x.id,name:x.name,category:"material",subtype:x.category,unit:"each",manufacturer:"",model:"",verificationStatus:"verified",notes:x.notes,department:x.department,productUrl:x.productUrl,notionUrl:x.notionUrl}));
+const NOTION_RUN={id:"run-notion-canonical",name:"Notion Home Depot List — 08/10",status:"active",storeId:"store-lawnside",createdAt:"2026-08-10",completedAt:null};
+const NOTION_RUN_ITEMS=NOTION_LIST_ITEMS.map(x=>{const link=ITEM_PROJECT_LINKS[x.id];return {id:`sri-${x.id}`,runId:NOTION_RUN.id,itemId:x.id,projectRequirementId:null,projectId:link.projectIds[0],projectIds:[...link.projectIds],workflowState:link.workflowState,workflowNote:link.workflowNote,requestedQty:1,purchasedQty:x.purchased?1:0,status:x.purchased?"purchased":"needed",priority:x.priority,source:"notion",notes:x.notes}});
+
+const seedState={
+ schemaVersion:5,
+ projects:[
+  ...NOTION_PROJECTS
+ ],
+ catalogItems:[
+  ...NOTION_CATALOG_ITEMS,
+  {id:"itm-pvc40",name:'1" × 10′ Schedule 40 electrical PVC conduit',category:"material",subtype:"electrical",unit:"stick",manufacturer:"Cantex",model:"A52BA12H",verificationStatus:"verified",notes:"Gray electrical PVC/RNC."},
+  {id:"itm-pvc80",name:'1" × 10′ Schedule 80 electrical PVC conduit',category:"material",subtype:"electrical",unit:"stick",manufacturer:"",model:"A53BA12H",verificationStatus:"verified",notes:"Exposed risers where subject to physical damage."},
+  {id:"itm-sweep",name:'1" PVC long-radius 90° sweep',category:"material",subtype:"electrical",unit:"each",manufacturer:"",model:"R5233825",verificationStatus:"verified",notes:"Electrical sweep, not plumbing elbow."},
+  {id:"itm-coupling",name:'1" PVC coupling',category:"material",subtype:"electrical",unit:"each",manufacturer:"",model:"R6141625",verificationStatus:"verified",notes:"Bell ends may reduce count."},
+  {id:"itm-adapter",name:'1" threaded terminal adapter',category:"material",subtype:"electrical",unit:"each",manufacturer:"",model:"R5140105",verificationStatus:"verified",notes:"LB/enclosure transition."},
+  {id:"itm-lb",name:'1" PVC LB body + cover/gasket',category:"material",subtype:"electrical",unit:"each",manufacturer:"",model:"R5133665",verificationStatus:"verified",notes:"House + garage penetrations."},
+  {id:"itm-cement",name:"PVC electrical conduit cement",category:"consumable",subtype:"electrical",unit:"can",manufacturer:"",model:"31040",verificationStatus:"verified",notes:"Verify PVC/RNC application."},
+  {id:"itm-primer",name:"PVC primer",category:"consumable",subtype:"electrical",unit:"can",manufacturer:"",model:"3075633",verificationStatus:"verify",notes:"Use if applicable to cement/system."},
+  {id:"itm-string",name:"Pull string / mule tape",category:"consumable",subtype:"electrical",unit:"roll",manufacturer:"",model:"56108",verificationStatus:"verified",notes:"Install during raceway assembly."},
+  {id:"itm-warning",name:"Electrical warning tape",category:"consumable",subtype:"electrical",unit:"roll",manufacturer:"",model:"42-101",verificationStatus:"verified",notes:"Above buried raceway."},
+  {id:"itm-ductseal",name:"Duct seal",category:"consumable",subtype:"electrical",unit:"pack",manufacturer:"",model:"DS-110",verificationStatus:"verify",notes:"For appropriate penetrations/ends."},
+  {id:"itm-straps",name:'1" PVC conduit straps',category:"material",subtype:"electrical",unit:"pack",manufacturer:"",model:"R5133738",verificationStatus:"verified",notes:"Secure exposed risers."},
+  {id:"itm-wago",name:"WAGO 221 connectors",category:"consumable",subtype:"electrical",unit:"pack",manufacturer:"WAGO",model:"221",verificationStatus:"verified",notes:"Fixture pigtail stock."},
+  {id:"itm-labels",name:"Panel directory labels",category:"consumable",subtype:"electrical",unit:"pack",manufacturer:"",model:"",verificationStatus:"verified",notes:"Circuit identification."},
+  {id:"itm-screw8",name:"#8 × 1¼ in construction screws",category:"fastener",subtype:"screw",unit:"each",manufacturer:"",model:"",verificationStatus:"verified",notes:""},
+  {id:"itm-screw10",name:"#10 × 2½ in construction screws",category:"fastener",subtype:"screw",unit:"each",manufacturer:"",model:"",verificationStatus:"verified",notes:""},
+  {id:"itm-bolt",name:"¼-20 × 1 in bolts",category:"fastener",subtype:"bolt",unit:"each",manufacturer:"",model:"",verificationStatus:"verified",notes:""},
+  {id:"itm-washer",name:"¼ in flat washers",category:"fastener",subtype:"washer",unit:"each",manufacturer:"",model:"",verificationStatus:"verified",notes:""},
+  {id:"itm-masonry",name:"Blue masonry screws",category:"fastener",subtype:"anchor",unit:"each",manufacturer:"",model:"",verificationStatus:"verified",notes:""},
+  {id:"itm-tape",name:"Electrical tape — black",category:"consumable",subtype:"electrical",unit:"roll",manufacturer:"",model:"",verificationStatus:"verified",notes:""},
+  {id:"itm-gloves",name:"Nitrile gloves",category:"consumable",subtype:"PPE",unit:"each",manufacturer:"",model:"",verificationStatus:"verified",notes:""},
+  {id:"itm-towels",name:"Shop towels",category:"consumable",subtype:"cleaning",unit:"roll",manufacturer:"",model:"",verificationStatus:"verified",notes:""}
+ ],
+ requirements:[
+  {id:"req-pvc40",projectId:"prj-garage",itemId:"itm-pvc40",requiredQty:6,allocatedQty:0,phase:"Raceway",priority:"Must",status:"hold",notes:"Gated until panel and exact feeder scope are confirmed."},
+  {id:"req-pvc80",projectId:"prj-garage",itemId:"itm-pvc80",requiredQty:1,allocatedQty:0,phase:"Raceway",priority:"Must",status:"hold",notes:"Gated until panel and exact feeder scope are confirmed."},
+  {id:"req-sweep",projectId:"prj-garage",itemId:"itm-sweep",requiredQty:2,allocatedQty:0,phase:"Raceway",priority:"Must",status:"hold",notes:"Gated until route and conduit size are confirmed."},
+  {id:"req-coupling",projectId:"prj-garage",itemId:"itm-coupling",requiredQty:3,allocatedQty:0,phase:"Raceway",priority:"Buy",status:"hold",notes:"Gated until route and exact count are confirmed."},
+  {id:"req-adapter",projectId:"prj-garage",itemId:"itm-adapter",requiredQty:2,allocatedQty:0,phase:"Raceway",priority:"Must",status:"hold",notes:"Gated until enclosure transitions are confirmed."},
+  {id:"req-lb",projectId:"prj-garage",itemId:"itm-lb",requiredQty:2,allocatedQty:0,phase:"Raceway",priority:"Must",status:"hold",notes:"Gated until penetrations and route are confirmed."},
+  {id:"req-cement",projectId:"prj-garage",itemId:"itm-cement",requiredQty:1,allocatedQty:0,phase:"Raceway",priority:"Must",status:"hold",notes:"Gated with the feeder raceway scope."},
+  {id:"req-primer",projectId:"prj-garage",itemId:"itm-primer",requiredQty:1,allocatedQty:0,phase:"Raceway",priority:"Buy",status:"verify",notes:"Verify cement/application."},
+  {id:"req-string",projectId:"prj-garage",itemId:"itm-string",requiredQty:1,allocatedQty:0,phase:"Raceway",priority:"Must",status:"hold",notes:"Gated with the feeder raceway scope."},
+  {id:"req-warning",projectId:"prj-garage",itemId:"itm-warning",requiredQty:1,allocatedQty:0,phase:"Raceway",priority:"Buy",status:"hold",notes:"Gated with the feeder raceway scope."},
+  {id:"req-ductseal",projectId:"prj-garage",itemId:"itm-ductseal",requiredQty:1,allocatedQty:0,phase:"Raceway",priority:"Buy",status:"verify",notes:""},
+  {id:"req-straps",projectId:"prj-garage",itemId:"itm-straps",requiredQty:1,allocatedQty:0,phase:"Raceway",priority:"Buy",status:"hold",notes:"Gated until route and mounting are confirmed."},
+  {id:"req-wago",projectId:"prj-lighting",itemId:"itm-wago",requiredQty:1,allocatedQty:0,phase:"Fixtures",priority:"Buy",status:"hold",notes:"Gated until circuits and panel path are verified."},
+  {id:"req-labels",projectId:"prj-panel",itemId:"itm-labels",requiredQty:1,allocatedQty:0,phase:"Closeout",priority:"Buy",status:"hold",notes:"Select after the approved panel scope is known."}
+ ],
+ inventory:[
+  {id:"inv-screw8",itemId:"itm-screw8",quantity:142,stockMode:"exact",minimumQty:60,locationId:"loc-a1",status:"available",updatedAt:"2026-08-09"},
+  {id:"inv-screw10",itemId:"itm-screw10",quantity:38,stockMode:"exact",minimumQty:40,locationId:"loc-a2",status:"available",updatedAt:"2026-08-09"},
+  {id:"inv-bolt",itemId:"itm-bolt",quantity:64,stockMode:"exact",minimumQty:24,locationId:"loc-b1",status:"available",updatedAt:"2026-08-09"},
+  {id:"inv-washer",itemId:"itm-washer",quantity:110,stockMode:"exact",minimumQty:40,locationId:"loc-b2",status:"available",updatedAt:"2026-08-09"},
+  {id:"inv-masonry",itemId:"itm-masonry",quantity:18,stockMode:"exact",minimumQty:20,locationId:"loc-c1",status:"available",updatedAt:"2026-08-09"},
+  {id:"inv-tape",itemId:"itm-tape",quantity:5,stockMode:"exact",minimumQty:3,locationId:"loc-electrical",status:"available",updatedAt:"2026-08-09"},
+  {id:"inv-cement",itemId:"itm-cement",quantity:1,stockMode:"exact",minimumQty:1,locationId:"loc-electrical",status:"available",updatedAt:"2026-08-09"},
+  {id:"inv-primer",itemId:"itm-primer",quantity:0,stockMode:"exact",minimumQty:1,locationId:"loc-electrical",status:"available",updatedAt:"2026-08-09"},
+  {id:"inv-gloves",itemId:"itm-gloves",quantity:32,stockMode:"exact",minimumQty:20,locationId:"loc-ppe",status:"available",updatedAt:"2026-08-09"},
+  {id:"inv-towels",itemId:"itm-towels",quantity:2,stockMode:"exact",minimumQty:2,locationId:"loc-cleaning",status:"available",updatedAt:"2026-08-09"},
+  {id:"inv-string",itemId:"itm-string",quantity:0,stockMode:"exact",minimumQty:1,locationId:"loc-electrical",status:"available",updatedAt:"2026-08-09"}
+ ],
+ shoppingRuns:[NOTION_RUN],
+ shoppingRunItems:[...NOTION_RUN_ITEMS],
+ tools:[
+  {id:"tool-bosch",name:"Bosch Laser Distance Meter",manufacturer:"Bosch",model:"",serial:"",status:"Owned",locationId:"loc-tools",capabilities:["measure distance"],accessories:[],purchaseDate:"",warrantyUntil:"",notes:"Primary measuring tool"},
+  {id:"tool-clamp",name:"Clamp Meter",manufacturer:"",model:"",serial:"",status:"Owned",locationId:"loc-electrical",capabilities:["measure current","electrical diagnostics"],accessories:[],purchaseDate:"",warrantyUntil:"",notes:"Electrical diagnostics"},
+  {id:"tool-pvc",name:"PVC Saw / Cutter",manufacturer:"",model:"",serial:"",status:"Verify",locationId:"loc-garage",capabilities:["cut PVC"],accessories:[],purchaseDate:"",warrantyUntil:"",notes:"Confirm before run"},
+  {id:"tool-torque",name:"Torque Wrench",manufacturer:"",model:"",serial:"",status:"Owned",locationId:"loc-tools",capabilities:["torque fasteners"],accessories:[],purchaseDate:"",warrantyUntil:"",notes:"General service"}
+ ],
+ locations:[
+  {id:"loc-garage",name:"Garage",parentId:null,type:"area"},{id:"loc-electrical",name:"Electrical Cabinet",parentId:"loc-garage",type:"cabinet"},
+  {id:"loc-tools",name:"Tool Cabinet",parentId:"loc-garage",type:"cabinet"},{id:"loc-a1",name:"Bin A1",parentId:"loc-garage",type:"bin"},
+  {id:"loc-a2",name:"Bin A2",parentId:"loc-garage",type:"bin"},{id:"loc-b1",name:"Bin B1",parentId:"loc-garage",type:"bin"},
+  {id:"loc-b2",name:"Bin B2",parentId:"loc-garage",type:"bin"},{id:"loc-c1",name:"Bin C1",parentId:"loc-garage",type:"bin"},
+  {id:"loc-ppe",name:"PPE",parentId:"loc-garage",type:"shelf"},{id:"loc-cleaning",name:"Cleaning",parentId:"loc-garage",type:"shelf"}
+ ],
+ stores:[
+  {id:"store-lawnside",retailer:"Home Depot",name:"Lawnside",storeNumber:"0917",address:"310 Whitehorse Pike, Lawnside, NJ 08045",preferred:true},
+  {id:"store-cherryhill",retailer:"Home Depot",name:"Cherry Hill",storeNumber:"0989",address:"2160 Route 70 West, Cherry Hill, NJ",preferred:false}
+ ],
+ settings:{activeRunId:NOTION_RUN.id,selectedProjectId:"prj-panel",neededOnly:true,focusOnly:true}
+};
+
+let state=loadState();
+
+function toCount(value){const n=Number(value);return Number.isFinite(n)?Math.max(0,Math.floor(n)):0}
+function normalizeRunItemState(row){
+ row.requestedQty=toCount(row.requestedQty);row.purchasedQty=toCount(row.purchasedQty);
+ if(row.purchasedQty>0)row.status=row.purchasedQty<row.requestedQty?"partially_purchased":"purchased";
+ else if(!EDITABLE_STATUS_ORDER.includes(row.status))row.status="needed";
+ return row
+}
+function validateState(s){
+ const arrays=["projects","catalogItems","requirements","inventory","shoppingRuns","shoppingRunItems","tools","locations","stores"];
+ if(!s||typeof s!=="object"||s.schemaVersion!==SCHEMA_VERSION) return {ok:false,error:`Expected schemaVersion ${SCHEMA_VERSION}.`};
+ for(const k of arrays) if(!Array.isArray(s[k])) return {ok:false,error:`Missing array: ${k}`};
+ const all=[...s.projects,...s.catalogItems,...s.requirements,...s.inventory,...s.shoppingRuns,...s.shoppingRunItems,...s.tools,...s.locations,...s.stores];
+ const ids=all.map(x=>x.id);
+ if(ids.some(x=>!x)||new Set(ids).size!==ids.length) return {ok:false,error:"IDs must be present and globally unique."};
+ const itemIds=new Set(s.catalogItems.map(x=>x.id)), projectIds=new Set(s.projects.map(x=>x.id)), runIds=new Set(s.shoppingRuns.map(x=>x.id)),runItemIds=new Set(s.shoppingRunItems.map(x=>x.id));
+ if(!s.settings||typeof s.settings!=="object") return {ok:false,error:"Missing settings."};
+ if(s.settings.activeRunId&&!runIds.has(s.settings.activeRunId)) return {ok:false,error:"Invalid active shopping run."};
+ if(s.settings.selectedProjectId&&!projectIds.has(s.settings.selectedProjectId)) return {ok:false,error:"Invalid selected project."};
+ if(typeof s.settings.neededOnly!=="boolean") return {ok:false,error:"Invalid needed-only setting."};
+ if(typeof s.settings.focusOnly!=="boolean") return {ok:false,error:"Invalid project-focus setting."};
+ if(s.requirements.some(x=>!itemIds.has(x.itemId)||!projectIds.has(x.projectId))) return {ok:false,error:"Invalid requirement relationship."};
+ if(s.inventory.some(x=>!itemIds.has(x.itemId))) return {ok:false,error:"Invalid inventory relationship."};
+ if(s.shoppingRunItems.some(x=>!itemIds.has(x.itemId)||!runIds.has(x.runId)||(x.projectId&&!projectIds.has(x.projectId))||(x.projectIds&&(!Array.isArray(x.projectIds)||x.projectIds.some(id=>!projectIds.has(id)))))) return {ok:false,error:"Invalid shopping-run relationship."};
+ if(s.shoppingRuns.some(x=>!["active","completed"].includes(x.status))) return {ok:false,error:"Invalid shopping-run status."};
+ if(s.shoppingRuns.some(x=>(x.sourceRunId&&!runIds.has(x.sourceRunId))||(x.closedWithFollowupRunId&&!runIds.has(x.closedWithFollowupRunId)))) return {ok:false,error:"Invalid shopping-run closeout relationship."};
+ for(const row of s.shoppingRunItems){
+  if(!Number.isInteger(row.requestedQty)||row.requestedQty<0||!Number.isInteger(row.purchasedQty)||row.purchasedQty<0) return {ok:false,error:`Invalid quantity on ${row.id}.`};
+  if(!STATUS_ORDER.includes(row.status)) return {ok:false,error:`Invalid shopping status on ${row.id}.`};
+  const expected=row.purchasedQty>0?(row.purchasedQty<row.requestedQty?"partially_purchased":"purchased"):row.status;
+  if(row.purchasedQty>0&&row.status!==expected) return {ok:false,error:`Purchased quantity and status disagree on ${row.id}.`};
+  if(row.purchasedQty===0&&["partially_purchased","purchased"].includes(row.status)) return {ok:false,error:`Purchase status has no quantity on ${row.id}.`};
+  if(row.closeoutDisposition&&!CLOSEOUT_DISPOSITIONS.has(row.closeoutDisposition)) return {ok:false,error:`Invalid closeout disposition on ${row.id}.`};
+  if(row.sourceRunItemId&&!runItemIds.has(row.sourceRunItemId)) return {ok:false,error:`Invalid carried-row source on ${row.id}.`};
+  if(row.carriedToRunId&&!runIds.has(row.carriedToRunId)) return {ok:false,error:`Invalid follow-up run on ${row.id}.`};
+  if(row.closeoutDisposition==="carried_forward"&&!row.carriedToRunId) return {ok:false,error:`Missing follow-up run on ${row.id}.`};
+ }
+ return {ok:true};
+}
+function mergeMissing(current=[],additions=[]){
+ const ids=new Set(current.map(x=>x.id));return [...current,...additions.filter(x=>!ids.has(x.id)).map(clone)]
+}
+function addCanonicalNotionList(s){
+ const n=clone(s);
+ n.projects=mergeMissing(n.projects,NOTION_PROJECTS);
+ n.catalogItems=mergeMissing(n.catalogItems,NOTION_CATALOG_ITEMS);
+ n.shoppingRuns=mergeMissing(n.shoppingRuns,[NOTION_RUN]);
+ n.shoppingRunItems=mergeMissing(n.shoppingRunItems,NOTION_RUN_ITEMS);
+ n.settings={...n.settings,activeRunId:NOTION_RUN.id,selectedProjectId:"prj-panel",neededOnly:true,focusOnly:true};
+ n.schemaVersion=3;return n
+}
+function upgradeToV4(s){
+ const n=clone(s),canonicalProjects=new Map(NOTION_PROJECTS.map(x=>[x.id,x])),canonicalCatalog=new Map(NOTION_CATALOG_ITEMS.map(x=>[x.id,x])),canonicalRows=new Map(NOTION_RUN_ITEMS.map(x=>[x.id,x])),seedRequirements=new Map(seedState.requirements.map(x=>[x.id,x]));
+ const existingProjects=new Map((n.projects||[]).filter(x=>x.id!==LEGACY_NOTION_PROJECT_ID).map(x=>[x.id,x])),customProjects=(n.projects||[]).filter(x=>x.id!==LEGACY_NOTION_PROJECT_ID&&!canonicalProjects.has(x.id));
+ n.projects=[...NOTION_PROJECTS.map(x=>({...clone(existingProjects.get(x.id)||{}),...clone(x)})),...customProjects];
+ n.catalogItems=(n.catalogItems||[]).map(x=>canonicalCatalog.has(x.id)?{...x,...clone(canonicalCatalog.get(x.id))}:x);
+ n.catalogItems=mergeMissing(n.catalogItems,NOTION_CATALOG_ITEMS);
+ n.shoppingRuns=mergeMissing(n.shoppingRuns,[NOTION_RUN]);
+ n.shoppingRunItems=(n.shoppingRunItems||[]).map(x=>{const canonical=canonicalRows.get(x.id);return canonical?{...x,projectId:canonical.projectId,projectIds:clone(canonical.projectIds),workflowState:canonical.workflowState,workflowNote:canonical.workflowNote,source:"notion"}:x});
+ n.shoppingRunItems=mergeMissing(n.shoppingRunItems,NOTION_RUN_ITEMS);
+ n.requirements=(n.requirements||[]).map(x=>{const canonical=seedRequirements.get(x.id);return canonical?{...x,projectId:canonical.projectId,status:canonical.status,notes:canonical.notes}:x});
+ n.settings={...n.settings,activeRunId:NOTION_RUN.id,selectedProjectId:n.settings?.selectedProjectId===LEGACY_NOTION_PROJECT_ID?"prj-panel":n.settings?.selectedProjectId||"prj-panel",neededOnly:true,focusOnly:true};
+ n.schemaVersion=4;return n
+}
+function upgradeToV5(s){
+ const n=clone(s);n.shoppingRunItems=(n.shoppingRunItems||[]).map(normalizeRunItemState);n.schemaVersion=SCHEMA_VERSION;return n
+}
+function migrateState(s){
+ if(!s||typeof s!=="object") return clone(seedState);
+ if(s.schemaVersion===5) return s;
+ if(s.schemaVersion===4) return upgradeToV5(s);
+ if(s.schemaVersion===3) return upgradeToV5(upgradeToV4(s));
+ if(s.schemaVersion===2) return upgradeToV5(upgradeToV4(addCanonicalNotionList(s)));
+ if(s.schemaVersion===1){const n=clone(seedState);n.settings={...n.settings,...s.settings,activeRunId:NOTION_RUN.id,selectedProjectId:"prj-panel",neededOnly:true,focusOnly:true};return n}
+ return clone(seedState);
+}
+function loadState(){
+ try{
+  const raw=localStorage.getItem(STORAGE_KEY);
+  if(!raw) return clone(seedState);
+  const migrated=migrateState(JSON.parse(raw)), v=validateState(migrated);
+  return v.ok?migrated:clone(seedState);
+ }catch(e){return clone(seedState)}
+}
+function saveState(){state.schemaVersion=SCHEMA_VERSION;localStorage.setItem(STORAGE_KEY,JSON.stringify(state))}
+function resetState(){state=clone(seedState);saveState();renderAll()}
+function exportState(){
+ const v=validateState(state); if(!v.ok){toast(`Export blocked: ${v.error}`);return}
+ const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"}),a=document.createElement("a");
+ a.href=URL.createObjectURL(blob);a.download=`depotops-v0.2-${new Date().toISOString().slice(0,10)}.json`;a.click();URL.revokeObjectURL(a.href)
+}
+function importStateObject(obj){
+ const migrated=migrateState(obj),v=validateState(migrated); if(!v.ok) throw new Error(v.error);
+ state=clone(migrated);saveState();renderAll();return true
+}
+async function importFile(file){
+ try{const obj=JSON.parse(await file.text());importStateObject(obj);toast("Import complete")}
+ catch(e){toast(`Import blocked: ${e.message}`)}
+}
+
+const byId=(arr,id)=>arr.find(x=>x.id===id);
+const item=id=>byId(state.catalogItems,id);
+const project=id=>byId(state.projects,id);
+const locationName=id=>byId(state.locations,id)?.name||"Unassigned";
+const activeRun=()=>byId(state.shoppingRuns,state.settings.activeRunId)||state.shoppingRuns.find(r=>r.status==="active")||state.shoppingRuns[0];
+const runItemProjects=x=>x.projectRequirementId?[project(byId(state.requirements,x.projectRequirementId)?.projectId)].filter(Boolean):(x.projectIds||[x.projectId]).map(project).filter(Boolean);
+const runItemProject=x=>runItemProjects(x)[0];
+const reqRunQty=reqId=>state.shoppingRunItems.filter(x=>x.projectRequirementId===reqId&&byId(state.shoppingRuns,x.runId)?.status!=="completed"&&!["skipped","not_found"].includes(x.status)).reduce((a,x)=>a+Number(x.requestedQty||0),0);
+function onHand(itemId){return state.inventory.filter(x=>x.itemId===itemId).reduce((a,x)=>a+Number(x.quantity||0),0)}
+function reservedByOthers(itemId,excludeReqId=null){return state.requirements.filter(r=>r.itemId===itemId&&r.id!==excludeReqId).reduce((a,r)=>a+Number(r.allocatedQty||0),0)}
+function availableForReq(r){return Math.max(0,onHand(r.itemId)-reservedByOthers(r.itemId,r.id)-Number(r.allocatedQty||0))}
+function effectiveCovered(r){return Number(r.allocatedQty||0)+Math.min(availableForReq(r),Math.max(0,Number(r.requiredQty||0)-Number(r.allocatedQty||0)))}
+function shortage(r){return Math.max(0,Number(r.requiredQty||0)-effectiveCovered(r)-reqRunQty(r.id))}
+function reserveRequirement(reqId){
+ const r=byId(state.requirements,reqId);if(!r)return;
+ const add=Math.min(availableForReq(r),Math.max(0,Number(r.requiredQty)-Number(r.allocatedQty||0)));
+ r.allocatedQty=Number(r.allocatedQty||0)+add;saveState();renderAll();toast(add?`Reserved ${add}`:"No available stock to reserve")
+}
+function getOrCreateInventory(itemId){
+ let inv=state.inventory.find(x=>x.itemId===itemId);if(inv)return inv;
+ inv={id:uid("inv"),itemId,quantity:0,stockMode:"exact",minimumQty:0,locationId:"loc-garage",status:"available",updatedAt:new Date().toISOString()};state.inventory.push(inv);return inv
+}
+function addRequirementShortageToRun(reqId,runId=activeRun()?.id){
+ const r=byId(state.requirements,reqId),run=byId(state.shoppingRuns,runId);if(!r||!run||run.status==="completed")return false;
+ const cat=item(r.itemId);
+ const qty=shortage(r); if(qty<=0)return false;
+ const existing=state.shoppingRunItems.find(x=>x.runId===runId&&x.projectRequirementId===reqId&&x.status!=="skipped");
+ const status=["verify","hold"].includes(r.status)||["verify","hold"].includes(cat?.verificationStatus)?"hold":"needed";
+ if(existing){existing.requestedQty=toCount(existing.requestedQty)+qty;if(existing.purchasedQty===0)existing.status=status;normalizeRunItemState(existing)}
+ else state.shoppingRunItems.push({id:uid("sri"),runId,itemId:r.itemId,projectRequirementId:reqId,projectId:r.projectId,projectIds:[r.projectId],workflowState:project(r.projectId)?.workflowState||"active",workflowNote:r.notes||"",requestedQty:qty,purchasedQty:0,status,priority:r.priority||"Buy",source:"project",notes:r.notes||""});
+ saveState();return true
+}
+function addLowStockToRun(invId,runId=activeRun()?.id){
+ const inv=byId(state.inventory,invId),run=byId(state.shoppingRuns,runId);if(!inv||!run||run.status==="completed")return false;
+ const cat=item(inv.itemId);
+ const qty=Math.max(0,Number(inv.minimumQty||0)-Number(inv.quantity||0));if(!qty)return false;
+ let ex=state.shoppingRunItems.find(x=>x.runId===runId&&x.itemId===inv.itemId&&x.source==="warehouse"&&x.status!=="skipped");
+ if(ex){ex.requestedQty=Math.max(ex.requestedQty,qty);normalizeRunItemState(ex)}
+ else state.shoppingRunItems.push({id:uid("sri"),runId,itemId:inv.itemId,projectRequirementId:null,projectId:null,projectIds:[],workflowState:"active",workflowNote:"Warehouse replenishment",requestedQty:qty,purchasedQty:0,status:["verify","hold"].includes(cat?.verificationStatus)?"hold":"needed",priority:"Reorder",source:"warehouse",notes:"Low-stock replenishment"});
+ saveState();return true
+}
+function isRunItemResolved(row,run=byId(state.shoppingRuns,row.runId)){
+ if(run?.status==="completed"&&CLOSEOUT_DISPOSITIONS.has(row.closeoutDisposition))return true;
+ return ["purchased","skipped"].includes(row.status)
+}
+function runCloseoutIssues(runId){
+ const run=byId(state.shoppingRuns,runId),rows=state.shoppingRunItems.filter(x=>x.runId===runId);
+ return {run,rows,unresolved:rows.filter(x=>!isRunItemResolved(x,run)),overages:rows.filter(x=>x.purchasedQty>x.requestedQty),acquired:rows.filter(x=>x.purchasedQty>0)}
+}
+function carryStatusFor(row){return row.status==="hold"||row.workflowState!=="active"?"hold":"needed"}
+function reconcileRun(runId,options={}){
+ const {warehouseAdds={},resolutions={},overages={},followupName=""}=options||{},issues=runCloseoutIssues(runId),run=issues.run;
+ if(!run)return {ok:false,error:"Run not found."};
+ if(run.status==="completed")return {ok:false,error:"Run is already completed."};
+ for(const row of issues.unresolved)if(!["carry","skip"].includes(resolutions[row.id]))return {ok:false,error:`Choose carry forward or skip for ${item(row.itemId)?.name||row.id}.`};
+ for(const row of issues.overages)if(overages[row.id]!==true)return {ok:false,error:`Accept the quantity overage for ${item(row.itemId)?.name||row.id}.`};
+ const carryRows=issues.unresolved.filter(x=>resolutions[x.id]==="carry");
+ if(carryRows.some(x=>Math.max(0,x.requestedQty-x.purchasedQty)===0))return {ok:false,error:"A zero-quantity remainder cannot be carried forward."};
+ const cleanFollowupName=String(followupName||"").trim();
+ if(carryRows.length&&!cleanFollowupName)return {ok:false,error:"Name the follow-up run before closing."};
+ const acquiredIds=new Set(issues.acquired.map(x=>x.id));
+ for(const [id,value] of Object.entries(warehouseAdds)){
+  const row=byId(issues.acquired,id),qty=Number(value||0);
+  if(!acquiredIds.has(id))return {ok:false,error:"Warehouse allocation references a row with no acquired quantity."};
+  if(!Number.isInteger(qty)||qty<0||qty>row.purchasedQty)return {ok:false,error:`Warehouse quantity for ${item(row.itemId)?.name||id} must be a whole number from 0 to ${row.purchasedQty}.`}
+ }
+ const next=clone(state),nextRun=byId(next.shoppingRuns,runId),nextRows=next.shoppingRunItems.filter(x=>x.runId===runId),completedAt=new Date().toISOString();
+ let followup=null;
+ if(carryRows.length){
+  followup={id:uid("run"),name:cleanFollowupName,status:"active",storeId:run.storeId,createdAt:completedAt,completedAt:null,sourceRunId:runId};next.shoppingRuns.push(followup)
+ }
+ for(const current of issues.rows){
+  const row=byId(nextRows,current.id);
+  if(!isRunItemResolved(current,run)){
+   if(resolutions[current.id]==="carry"){
+    row.closeoutDisposition="carried_forward";row.carriedToRunId=followup.id;
+    const carried={...clone(row),id:uid("sri"),runId:followup.id,requestedQty:Math.max(0,row.requestedQty-row.purchasedQty),purchasedQty:0,status:carryStatusFor(row),sourceRunItemId:row.id};
+    delete carried.closeoutDisposition;delete carried.carriedToRunId;next.shoppingRunItems.push(carried)
+   }else{
+    row.closeoutDisposition="skipped_remainder";if(row.purchasedQty===0)row.status="skipped"
+   }
+  }else if(row.status==="skipped")row.closeoutDisposition="skipped";
+  else row.closeoutDisposition=row.purchasedQty>row.requestedQty?"fulfilled_overage":"fulfilled"
+ }
+ for(const current of issues.acquired){
+  const qty=Number(warehouseAdds[current.id]||0);if(!qty)continue;
+  let inv=next.inventory.find(x=>x.itemId===current.itemId);
+  if(!inv){inv={id:uid("inv"),itemId:current.itemId,quantity:0,stockMode:"exact",minimumQty:0,locationId:"loc-garage",status:"available",updatedAt:completedAt};next.inventory.push(inv)}
+  inv.quantity=toCount(inv.quantity)+qty;inv.updatedAt=completedAt
+ }
+ nextRun.status="completed";nextRun.completedAt=completedAt;nextRun.closedWithFollowupRunId=followup?.id||null;
+ next.settings.activeRunId=followup?.id||next.shoppingRuns.find(x=>x.id!==runId&&x.status==="active")?.id||runId;
+ const validation=validateState(next);if(!validation.ok)return {ok:false,error:`Closeout blocked: ${validation.error}`};
+ state=next;saveState();return {ok:true,followup,carriedCount:carryRows.length,completedRunId:runId}
+}
+
+const reduced=window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+const motion={
+ from(sel,vars){if(reduced||!window.gsap||(typeof sel==="string"&&!document.querySelector(sel)))return;gsap.killTweensOf(sel);gsap.from(sel,{...vars,overwrite:"auto"})},
+ to(sel,vars){const el=typeof sel==="string"?document.querySelector(sel):sel;if(!el)return;if(reduced||!window.gsap){if(vars?.width&&el instanceof Element)el.style.width=vars.width;return}gsap.killTweensOf(sel);gsap.to(sel,{...vars,overwrite:"auto"})},
+ page(el){if(reduced||!window.gsap)return;gsap.killTweensOf(el);gsap.fromTo(el,{opacity:0,y:10},{opacity:1,y:0,duration:.24,ease:"power2.out",overwrite:true})}
+};
+function toast(msg){const t=$("toast");t.textContent=msg;if(reduced||!window.gsap){t.style.opacity=1;setTimeout(()=>t.style.opacity=0,1300);return}gsap.killTweensOf(t);gsap.fromTo(t,{opacity:0,y:14},{opacity:1,y:0,duration:.18,overwrite:true});gsap.to(t,{opacity:0,y:8,duration:.18,delay:1.2,overwrite:"auto"})}
+function switchPage(id){const current=document.querySelector(".page.active"),next=$(id);if(!next||next===current)return;current.classList.remove("active");next.classList.add("active");document.querySelectorAll(".navbtn").forEach(b=>{const active=b.dataset.page===id;b.classList.toggle("active",active);b.setAttribute("aria-pressed",String(active))});motion.page(next)}
+function fillProjectFilters(){
+ const select=$("runProjectFilter"),selected=select.value||"all";
+ const options=state.projects.map(p=>`<option value="${p.id}">${escapeHtml(p.name)}</option>`).join("");
+ select.innerHTML=`<option value="all">All Projects</option>${options}`;
+ select.value=[...select.options].some(option=>option.value===selected)?selected:"all";
+}
+function fillRunSelect(){
+ $("runSelect").innerHTML=state.shoppingRuns.map(r=>`<option value="${r.id}" ${r.id===state.settings.activeRunId?"selected":""}>${escapeHtml(r.name)}${r.status==="completed"?" ✓":""}</option>`).join("")
+}
+function escapeHtml(s=""){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]))}
+const WORKFLOW_LABELS={active:"Active",gated:"Waiting / gated",parked:"Parked",review:"Needs review",completed:"Complete",superseded:"Superseded"};
+const WORKFLOW_RANK={active:0,review:1,gated:2,parked:3,completed:4,superseded:5};
+
+function renderShopping(){
+ fillProjectFilters();fillRunSelect();
+ $("focusOnlyBtn").textContent=state.settings.focusOnly?"Show All 48":"Current + Stopped";
+ $("neededOnlyBtn").textContent=state.settings.neededOnly?"Show Purchased":"Needed Only";
+ const run=activeRun(); if(!run){$("runItems").innerHTML='<div class="empty">Create a shopping run.</div>';return}
+ $("runTitle").textContent=`${run.name} · ${run.status.toUpperCase()}`;
+ $("completeRunBtn").disabled=run.status==="completed";
+ const q=$("runSearch").value.toLowerCase().trim(),pf=$("runProjectFilter").value,neededOnly=!!state.settings.neededOnly,focusOnly=!!state.settings.focusOnly;
+ let rows=state.shoppingRunItems.filter(x=>x.runId===run.id).filter(x=>{
+  const projects=runItemProjects(x),cat=item(x.itemId),n=cat?.name||"";
+  if(pf!=="all"&&!projects.some(p=>p.id===pf))return false;
+  if(pf==="all"&&focusOnly&&!FOCUS_WORKFLOW_STATES.has(x.workflowState||"active"))return false;
+  if(neededOnly&&["purchased","skipped"].includes(x.status))return false;
+  return !q||`${n} ${projects.map(p=>p.name).join(" ")} ${cat?.category||""} ${cat?.department||""} ${cat?.notes||""} ${x.workflowNote||""} ${x.status} ${x.priority}`.toLowerCase().includes(q)
+ });
+	 rows=rows.map((x,index)=>({x,index})).sort((a,b)=>(WORKFLOW_RANK[a.x.workflowState]??9)-(WORKFLOW_RANK[b.x.workflowState]??9)||a.index-b.index).map(({x})=>x);
+	 $("runItems").innerHTML=rows.length?rows.map(x=>{
+	  const projects=runItemProjects(x),cat=item(x.itemId),locked=run.status==="completed",urgent=["must","urgent","high"].includes(String(x.priority).toLowerCase()),workflow=x.workflowState||"active",remainingQty=Math.max(0,x.requestedQty-x.purchasedQty),overage=Math.max(0,x.purchasedQty-x.requestedQty);
+	  const projectTags=projects.length?projects.map(p=>p.notionUrl?`<a class="tag project project-link" href="${escapeHtml(p.notionUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(p.name)}</a>`:`<span class="tag project">${escapeHtml(p.name)}</span>`).join(""):'<span class="tag project">Warehouse</span>';
+	  return `<article class="runitem" data-id="${x.id}" data-status="${x.status}" data-workflow="${escapeHtml(workflow)}">
+	   <div class="run-control requested"><span class="control-label" id="requested-${x.id}">Requested</span><div class="qtyctrl" aria-labelledby="requested-${x.id}"><button type="button" data-act="qty-" aria-label="Decrease requested quantity for ${escapeHtml(cat?.name||"item")}" ${locked?"disabled":""}>−</button><output>${x.requestedQty}</output><button type="button" data-act="qty+" aria-label="Increase requested quantity for ${escapeHtml(cat?.name||"item")}" ${locked?"disabled":""}>+</button></div></div>
+	   <div><div class="itemname">${escapeHtml(cat?.name||"Missing item")}</div><div class="meta">${escapeHtml([cat?.department,cat?.notes||x.notes].filter(Boolean).join(" · "))}</div><div class="workflow-note">${escapeHtml(x.workflowNote||"")}</div><div class="tags">${projectTags}<span class="tag state-${escapeHtml(workflow)}">${escapeHtml(WORKFLOW_LABELS[workflow]||workflow)}</span><span class="tag ${urgent?"must":"buy"}">${escapeHtml(x.priority)}</span>${x.source==="notion"?'<span class="tag verify">Notion</span>':cat?.verificationStatus==="verify"?'<span class="tag verify">Verify</span>':""}${x.closeoutDisposition?`<span class="tag project">${escapeHtml(x.closeoutDisposition.replaceAll("_"," "))}</span>`:""}</div>${(()=>{const link=productLinkFor(cat);return link?`<a class="product-link ${link.exact?"":"search"}" href="${escapeHtml(link.url)}" target="_blank" rel="noopener noreferrer">↗ ${escapeHtml(link.label)}</a>${link.exact&&(link.model||link.internet)?`<span class="product-meta">${link.model?`Model ${escapeHtml(link.model)}`:""}${link.model&&link.internet?" · ":""}${link.internet?`Internet # ${escapeHtml(link.internet)}`:""}</span>`:""}`:""})()}${cat?.notionUrl?`<a class="product-link search" href="${escapeHtml(cat.notionUrl)}" target="_blank" rel="noopener noreferrer">↗ List row</a>`:""}</div>
+	   <label class="run-control status"><span class="control-label">Shopping status</span><select class="statussel" data-act="status" ${locked?"disabled":""}>${STATUS_ORDER.map(s=>`<option value="${s}" ${s===x.status?"selected":""} ${s==="partially_purchased"?"disabled":""}>${s.replaceAll("_"," ")}${s==="partially_purchased"?" (derived)":""}</option>`).join("")}</select></label>
+	   <label class="run-control purchased"><span class="control-label">Purchased</span><input class="pqty" data-act="purchased" type="number" min="0" step="1" value="${x.purchasedQty}" ${locked?"disabled":""}><span class="quantity-state ${overage?"overage":remainingQty&&x.purchasedQty?"partial":""}">${overage?`Over by ${overage}`:remainingQty&&x.purchasedQty?`${remainingQty} left`:""}</span></label>
+	  </article>`
+	 }).join(""):'<div class="empty">No matching run items.</div>';
+	 $("runVisible").textContent=rows.length;
+	 const all=state.shoppingRunItems.filter(x=>x.runId===run.id),purchased=all.filter(x=>x.status==="purchased").length,remaining=all.filter(x=>!isRunItemResolved(x,run)).length;
+	 $("runPurchased").textContent=purchased;$("runRemaining").textContent=remaining;$("runMust").textContent=all.filter(x=>x.workflowState==="active"&&["needed","in_cart","partially_purchased"].includes(x.status)).length;
+ $("runProjects").textContent=new Set(all.flatMap(x=>runItemProjects(x).map(p=>p.id))).size;
+ motion.to("#runProgress",{width:`${all.length?purchased/all.length*100:0}%`,duration:.3});
+	 document.querySelectorAll(".runitem").forEach(el=>{
+	  const sri=byId(state.shoppingRunItems,el.dataset.id);
+	  el.querySelector('[data-act="qty-"]')?.addEventListener("click",()=>{sri.requestedQty=Math.max(0,sri.requestedQty-1);normalizeRunItemState(sri);saveState();renderShopping()});
+	  el.querySelector('[data-act="qty+"]')?.addEventListener("click",()=>{sri.requestedQty+=1;normalizeRunItemState(sri);saveState();renderShopping()});
+	  el.querySelector('[data-act="status"]')?.addEventListener("change",e=>{const selected=e.target.value;if(selected!=="purchased"&&sri.purchasedQty>0){toast("Clear Purchased before choosing a nonpurchase status");renderShopping();return}if(selected==="purchased"){if(sri.requestedQty===0)sri.requestedQty=1;sri.purchasedQty=sri.requestedQty}else sri.status=selected;normalizeRunItemState(sri);saveState();renderShopping();toast(`Status: ${sri.status.replaceAll("_"," ")}`)});
+	  el.querySelector('[data-act="purchased"]')?.addEventListener("change",e=>{sri.purchasedQty=toCount(e.target.value);normalizeRunItemState(sri);saveState();renderShopping()});
+	 });
+ motion.from(".runitem",{opacity:0,x:-8,duration:.22,stagger:.018});
+}
+function projectStats(pid){
+	 const rows=state.shoppingRunItems.filter(x=>runItemProjects(x).some(p=>p.id===pid));
+	 return {rows:rows.length,purchased:rows.filter(x=>x.status==="purchased").length,outstanding:rows.filter(x=>!isRunItemResolved(x)).length}
+}
+function syncProjectSelection(){
+ document.querySelectorAll(".project-card").forEach(c=>{
+  const selected=c.dataset.id===state.settings.selectedProjectId,button=c.querySelector('[data-act="inspect"]');
+  c.classList.toggle("is-selected",selected);c.toggleAttribute("data-selected",selected);
+  if(button){button.textContent=selected?"Inspecting":"Inspect";button.setAttribute("aria-pressed",String(selected));button.classList.toggle("dark",selected);button.classList.toggle("orange",!selected)}
+ })
+}
+function revealProjectInspector(){
+ const panel=$("projectDetailPanel");panel.classList.remove("is-updated");void panel.offsetWidth;panel.classList.add("is-updated");
+ panel.focus({preventScroll:true});
+ if(window.matchMedia("(max-width:1180px)").matches){const top=panel.getBoundingClientRect().top+window.scrollY-document.querySelector(".topbar").getBoundingClientRect().height-24;window.scrollTo({top,behavior:reduced?"auto":"smooth"})}
+ setTimeout(()=>panel.classList.remove("is-updated"),500)
+}
+function renderProjects(){
+ const selected=project(state.settings.selectedProjectId)||state.projects[0];if(selected)state.settings.selectedProjectId=selected.id;
+ $("projectBoard").innerHTML=state.projects.map(p=>{const k=projectStats(p.id),workflow=p.workflowState||"active",isSelected=p.id===state.settings.selectedProjectId;return `<article class="project-card ${isSelected?"is-selected":""}" data-id="${p.id}" ${isSelected?'data-selected=""':""}><span class="tag state-${escapeHtml(workflow)} status">${escapeHtml(p.status)}</span><div class="kicker">${escapeHtml([p.priority,p.phase,p.location].filter(Boolean).join(" · "))}</div><h3>${escapeHtml(p.name)}</h3><div class="meta">${escapeHtml(p.description||"")}</div><div class="project-kpis"><div class="mini"><b>${k.rows}</b><span>List rows</span></div><div class="mini"><b>${k.purchased}</b><span>Purchased</span></div><div class="mini"><b>${k.outstanding}</b><span>Outstanding</span></div></div>${p.nextAction?`<div class="project-next"><b>Next action</b>${escapeHtml(p.nextAction)}</div>`:""}<div class="card-actions"><button class="btn small ${isSelected?"dark":"orange"}" data-act="inspect" aria-controls="projectDetailPanel" aria-pressed="${isSelected}">${isSelected?"Inspecting":"Inspect"}</button><button class="btn small" data-act="shop">Filter list</button>${p.notionUrl?`<a class="btn small" href="${escapeHtml(p.notionUrl)}" target="_blank" rel="noopener noreferrer">Notion</a>`:""}<button class="btn small" data-act="edit">Edit</button></div></article>`}).join("");
+ document.querySelectorAll(".project-card").forEach(c=>{
+  c.querySelector('[data-act="inspect"]').onclick=()=>{state.settings.selectedProjectId=c.dataset.id;saveState();renderProjectDetail();syncProjectSelection();revealProjectInspector()};
+  c.querySelector('[data-act="shop"]').onclick=()=>{switchPage("shopping");fillProjectFilters();$("runProjectFilter").value=c.dataset.id;renderShopping()};
+  c.querySelector('[data-act="edit"]').onclick=()=>openProjectEditor(c.dataset.id)
+ });
+ renderProjectDetail();syncProjectSelection();motion.from(".project-card",{opacity:0,y:8,duration:.22,stagger:.03})
+}
+function renderProjectDetail(){
+ const p=project(state.settings.selectedProjectId);if(!p){$("projectDetail").innerHTML='<div class="empty">Create a project.</div>';return}
+ $("projectDetailTitle").textContent=`${p.name} — Project Detail`;
+ const reqs=state.requirements.filter(r=>r.projectId===p.id),linkedRows=state.shoppingRunItems.filter(x=>runItemProjects(x).some(linked=>linked.id===p.id));
+ const context=`<section class="project-context"><h3>${escapeHtml(p.name)}</h3><div class="meta">${escapeHtml([p.status,p.priority,p.phase,p.procurement].filter(Boolean).join(" · "))}</div><div class="context-grid"><div class="context-cell"><b>Blocker</b>${escapeHtml(p.blocker||"No blocker recorded")}</div><div class="context-cell"><b>Next action</b>${escapeHtml(p.nextAction||"No next action recorded")}</div></div>${p.notionUrl?`<a class="product-link" href="${escapeHtml(p.notionUrl)}" target="_blank" rel="noopener noreferrer">Open canonical project</a>`:""}</section>`;
+ const linked=`<section class="inspector-section"><h3>Linked Shopping Rows · ${linkedRows.length}</h3>${linkedRows.length?`<div class="inspector-list">${linkedRows.map(x=>`<article class="linked-row"><div><b>${escapeHtml(item(x.itemId)?.name||"Missing item")}</b><div class="meta">${escapeHtml(x.status.replace("_"," "))} · ${escapeHtml(x.priority)}</div></div><span class="tag state-${escapeHtml(x.workflowState||"active")}">${escapeHtml(WORKFLOW_LABELS[x.workflowState]||x.workflowState||"Active")}</span></article>`).join("")}</div>`:'<div class="empty">No canonical shopping rows are linked yet.</div>'}</section>`;
+ const requirements=reqs.length?`<section class="inspector-section"><h3>Modeled Requirements · ${reqs.length}</h3><div class="requirement-list">${reqs.map(r=>{
+  const cat=item(r.itemId),av=availableForReq(r),sh=shortage(r);
+  return `<article class="requirement-card" data-id="${r.id}"><div class="requirement-head"><div><b>${escapeHtml(cat?.name||"Missing item")}</b><div class="meta">${escapeHtml(r.phase)} · ${escapeHtml(r.priority)} ${r.status==="verify"?'· VERIFY':r.status==="hold"?'· HOLD':""}</div></div><span class="shortage-pill ${sh?"":"is-covered"}">${sh?`Short ${sh}`:"Covered"}</span></div><div class="requirement-metrics"><div class="requirement-metric"><b>${r.requiredQty}</b><span>Need</span></div><div class="requirement-metric"><b>${onHand(r.itemId)}</b><span>On hand</span></div><div class="requirement-metric"><b>${r.allocatedQty||0}</b><span>Reserved</span></div><div class="requirement-metric"><b>${av}</b><span>Available</span></div></div><div class="req-actions"><button class="btn small" data-act="reserve">Reserve</button><button class="btn small orange" data-act="add" ${!sh?"disabled":""}>Add shortage</button><button class="btn small" data-act="edit">Edit</button></div></article>`
+ }).join("")}</div></section>`:"";
+ $("projectDetail").innerHTML=context+linked+requirements;
+ document.querySelectorAll(".requirement-card[data-id]").forEach(card=>{
+  card.querySelector('[data-act="reserve"]').onclick=()=>reserveRequirement(card.dataset.id);
+  card.querySelector('[data-act="add"]').onclick=()=>{if(addRequirementShortageToRun(card.dataset.id)){renderAll();toast("Shortage added to run")}else toast("Nothing added — covered or already listed")};
+  card.querySelector('[data-act="edit"]').onclick=()=>openRequirementEditor(card.dataset.id)
+ })
+}
+function renderWarehouse(){
+ const fast=state.inventory.filter(inv=>item(inv.itemId)?.category==="fastener"),other=state.inventory.filter(inv=>item(inv.itemId)?.category!=="fastener");
+ const card=inv=>{const cat=item(inv.itemId),low=Number(inv.quantity)<Number(inv.minimumQty||0);return `<article class="inventory-item ${low?"low":""}" data-id="${inv.id}"><div class="inventory-head"><div><div class="type">${escapeHtml(locationName(inv.locationId))}</div><div class="itemname">${escapeHtml(cat?.name||"Missing item")}</div><div class="meta">Min ${inv.minimumQty} · ${escapeHtml(inv.stockMode)}</div>${(()=>{const link=productLinkFor(cat);return link?`<a class="product-link ${link.exact?"":"search"}" href="${escapeHtml(link.url)}" target="_blank" rel="noopener noreferrer">↗ ${escapeHtml(link.label)}</a>`:""})()}</div><div class="stock">${inv.quantity}</div></div><div class="stockline"><div class="stockctrl"><button data-act="minus">−</button><button data-act="plus">+</button></div><div><button class="btn small" data-act="edit">Edit</button> <button class="btn small orange" data-act="reorder" ${!low?"disabled":""}>Add Reorder</button></div></div></article>`};
+ $("fasteners").innerHTML=fast.map(card).join("")||'<div class="empty">No fasteners.</div>';
+ $("consumables").innerHTML=other.map(card).join("")||'<div class="empty">No materials.</div>';
+ document.querySelectorAll(".inventory-item").forEach(el=>{
+  const inv=byId(state.inventory,el.dataset.id);
+  el.querySelector('[data-act="minus"]').onclick=()=>{inv.quantity=Math.max(0,Number(inv.quantity)-1);inv.updatedAt=new Date().toISOString();saveState();renderAll()};
+  el.querySelector('[data-act="plus"]').onclick=()=>{inv.quantity=Number(inv.quantity)+1;inv.updatedAt=new Date().toISOString();saveState();renderAll()};
+  el.querySelector('[data-act="edit"]').onclick=()=>openInventoryEditor(inv.id);
+  el.querySelector('[data-act="reorder"]').onclick=()=>{if(addLowStockToRun(inv.id)){renderAll();toast("Reorder added to run")}else toast("No reorder added")}
+ });
+ $("tools").innerHTML=state.tools.map(t=>`<div class="toolrow" data-id="${t.id}"><div><div class="toolname">${escapeHtml(t.name)}</div><div class="meta">${escapeHtml(locationName(t.locationId))} · ${escapeHtml((t.capabilities||[]).join(", "))}<br>${escapeHtml(t.notes||"")}</div></div><div><span class="tag ${t.status==="Verify"?"verify":"project"}">${escapeHtml(t.status)}</span> <button class="btn small" data-act="edit">Edit</button></div></div>`).join("");
+ document.querySelectorAll(".toolrow [data-act='edit']").forEach(b=>b.onclick=()=>openToolEditor(b.closest(".toolrow").dataset.id));
+ motion.from(".inventory-item,.toolrow",{opacity:0,y:7,duration:.2,stagger:.015})
+}
+function renderAll(){renderShopping();renderProjects();renderWarehouse()}
+
+let editorMode=null,editorId=null;
+function openEditor(title,fields,onSave){
+ editorMode=onSave;$("editorTitle").textContent=title;$("editorFields").innerHTML=fields;$("editorDialog").showModal()
+}
+function field(name,label,value="",type="text",full=false,extra=""){return `<div class="field ${full?"full":""}"><label for="f-${name}">${label}</label><input id="f-${name}" name="${name}" type="${type}" value="${escapeHtml(value)}" ${extra}></div>`}
+function selectField(name,label,options,value="",full=false){return `<div class="field ${full?"full":""}"><label for="f-${name}">${label}</label><select id="f-${name}" name="${name}">${options.map(([v,l])=>`<option value="${escapeHtml(v)}" ${String(v)===String(value)?"selected":""}>${escapeHtml(l)}</option>`).join("")}</select></div>`}
+function openProjectEditor(id=null){const p=id?project(id):null;openEditor(p?"Edit Project":"New Project",field("name","Name",p?.name||"","text",true)+field("location","Location",p?.location||"")+selectField("status","Status",[["Planning","Planning"],["Researching","Researching"],["In progress","In progress"],["Waiting","Waiting"],["Active","Active"],["Hold","Hold"],["Complete","Complete"],["Source conflict","Source conflict"]],p?.status||"Planning")+field("description","Description",p?.description||"","text",true),form=>{if(p){Object.assign(p,form,{updatedAt:new Date().toISOString()})}else{const n={id:uid("prj"),workflowState:"active",...form,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()};state.projects.push(n);state.settings.selectedProjectId=n.id}saveState();renderAll()})}
+function openCatalogEditor(){openEditor("New Catalog Item",field("name","Item name","","text",true)+selectField("category","Category",[["material","Material"],["consumable","Consumable"],["fastener","Fastener"]],"material")+field("unit","Unit","each")+selectField("verificationStatus","Verification",[["verified","Verified"],["verify","Verify"],["hold","Hold"]],"verified")+field("notes","Notes","","text",true),form=>{state.catalogItems.push({id:uid("itm"),subtype:"",manufacturer:"",model:"",...form});saveState();renderAll()})}
+function openRequirementEditor(id=null){const p=project(state.settings.selectedProjectId),r=id?byId(state.requirements,id):null;if(!p)return;const opts=state.catalogItems.map(i=>[i.id,i.name]);openEditor(r?"Edit Requirement":`Add Requirement — ${p.name}`,selectField("itemId","Catalog item",opts,r?.itemId||opts[0]?.[0],true)+field("requiredQty","Required quantity",r?.requiredQty||1,"number",false,'min="0" step="1"')+field("phase","Phase",r?.phase||"")+selectField("priority","Priority",[["Must","Must"],["Buy","Buy"],["Optional","Optional"]],r?.priority||"Buy")+selectField("status","Status",[["ready","Ready"],["verify","Verify"],["hold","Hold"]],r?.status||"ready")+field("notes","Notes",r?.notes||"","text",true),form=>{form.requiredQty=Number(form.requiredQty||0);if(r)Object.assign(r,form);else state.requirements.push({id:uid("req"),projectId:p.id,allocatedQty:0,...form});saveState();renderAll()})}
+function openInventoryEditor(id=null){const inv=id?byId(state.inventory,id):null,opts=state.catalogItems.map(i=>[i.id,i.name]);openEditor(inv?"Edit Inventory":"Add Inventory Item",selectField("itemId","Catalog item",opts,inv?.itemId||opts[0]?.[0],true)+field("quantity","On hand",inv?.quantity||0,"number",false,'min="0" step="1"')+field("minimumQty","Minimum stock",inv?.minimumQty||0,"number",false,'min="0" step="1"')+selectField("stockMode","Stock mode",[["exact","Exact"],["approximate","Approximate"],["presence","Presence"]],inv?.stockMode||"exact")+selectField("locationId","Location",state.locations.map(l=>[l.id,l.name]),inv?.locationId||"loc-garage"),form=>{form.quantity=Number(form.quantity||0);form.minimumQty=Number(form.minimumQty||0);if(inv)Object.assign(inv,form,{updatedAt:new Date().toISOString()});else state.inventory.push({id:uid("inv"),status:"available",updatedAt:new Date().toISOString(),...form});saveState();renderAll()})}
+function openToolEditor(id=null){const t=id?byId(state.tools,id):null;openEditor(t?"Edit Tool":"Add Tool",field("name","Tool name",t?.name||"","text",true)+field("manufacturer","Manufacturer",t?.manufacturer||"")+field("model","Model",t?.model||"")+field("serial","Serial",t?.serial||"")+selectField("status","Status",[["Owned","Owned"],["Verify","Verify"],["Borrowed","Borrowed"],["Rented","Rented"]],t?.status||"Owned")+selectField("locationId","Location",state.locations.map(l=>[l.id,l.name]),t?.locationId||"loc-tools")+field("capabilities","Capabilities (comma separated)",(t?.capabilities||[]).join(", "),"text",true)+field("notes","Notes",t?.notes||"","text",true),form=>{form.capabilities=String(form.capabilities||"").split(",").map(x=>x.trim()).filter(Boolean);if(t)Object.assign(t,form);else state.tools.push({id:uid("tool"),accessories:[],purchaseDate:"",warrantyUntil:"",...form});saveState();renderAll()})}
+function openNewRun(){openEditor("New Shopping Run",field("name","Run name",`Shopping Run — ${new Date().toLocaleDateString()}`,"text",true)+selectField("storeId","Store",state.stores.map(s=>[s.id,`${s.retailer} ${s.name} #${s.storeNumber}`]),state.stores.find(s=>s.preferred)?.id||state.stores[0]?.id),form=>{const r={id:uid("run"),name:form.name,status:"active",storeId:form.storeId,createdAt:new Date().toISOString(),completedAt:null};state.shoppingRuns.push(r);state.settings.activeRunId=r.id;saveState();renderAll()})}
+$("editorForm").addEventListener("submit",e=>{if(e.submitter?.value==="cancel")return;e.preventDefault();const fd=Object.fromEntries(new FormData(e.currentTarget).entries());try{editorMode?.(fd);$("editorDialog").close();toast("Saved")}catch(err){toast(err.message)}});
+
+function openReconcile(){
+ const run=activeRun();if(!run||run.status==="completed"){toast("Active run is already completed");return}
+ const issues=runCloseoutIssues(run.id),fulfilled=issues.rows.filter(x=>isRunItemResolved(x,run)).length;
+ $("closeoutSummary").innerHTML=`<div class="stat"><div class="num">${issues.rows.length}</div><div class="lab">Run rows</div></div><div class="stat"><div class="num">${fulfilled}</div><div class="lab">Resolved</div></div><div class="stat"><div class="num">${issues.unresolved.length}</div><div class="lab">Need decision</div></div><div class="stat"><div class="num">${issues.overages.length}</div><div class="lab">Overages</div></div>`;
+ $("unresolvedSection").hidden=issues.unresolved.length===0;
+ $("closeoutDecisions").innerHTML=issues.unresolved.map(x=>{const remaining=Math.max(0,x.requestedQty-x.purchasedQty),name=item(x.itemId)?.name||"Missing item";return `<div class="closeout-decision" data-id="${x.id}"><div><b>${escapeHtml(name)}</b><div class="meta">${escapeHtml(x.status.replaceAll("_"," "))} · Requested ${x.requestedQty} · Purchased ${x.purchasedQty} · ${remaining} remaining</div></div><div class="decision-options" role="radiogroup" aria-label="Closeout decision for ${escapeHtml(name)}"><label><input type="radio" name="resolution-${x.id}" value="carry" ${remaining===0?"disabled":""}> Carry forward</label><label><input type="radio" name="resolution-${x.id}" value="skip"> Skip remainder</label></div></div>`}).join("");
+ $("followupName").value=`Follow-up — ${run.name}`;
+ $("overageSection").hidden=issues.overages.length===0;
+ $("overageDecisions").innerHTML=issues.overages.map(x=>{const over=x.purchasedQty-x.requestedQty,name=item(x.itemId)?.name||"Missing item";return `<div class="closeout-decision" data-id="${x.id}"><div><b>${escapeHtml(name)}</b><div class="meta">Requested ${x.requestedQty} · Purchased ${x.purchasedQty} · Over by ${over}</div></div><div class="decision-options"><label><input type="checkbox" name="overage-${x.id}" value="accept"> Accept overage</label></div></div>`}).join("");
+ $("reconcileRows").innerHTML=issues.acquired.length?issues.acquired.map(x=>`<div class="reconcile-row" data-id="${x.id}"><div><b>${escapeHtml(item(x.itemId)?.name||"")}</b><div class="meta">Acquired ${x.purchasedQty} · Source ${escapeHtml(x.source)}</div></div><div class="field"><label for="warehouse-${x.id}">To Warehouse</label><input id="warehouse-${x.id}" name="warehouse-${x.id}" type="number" min="0" max="${x.purchasedQty}" step="1" value="0"></div></div>`).join(""):'<div class="empty">No acquired quantities to allocate.</div>';
+ $("reconcileDialog").showModal();updateCloseoutReadiness()
+}
+function updateCloseoutReadiness(){
+ const run=activeRun(),issues=run?runCloseoutIssues(run.id):{unresolved:[],overages:[]},form=$("reconcileForm");
+ let remaining=issues.unresolved.filter(x=>!form.querySelector(`input[name="resolution-${x.id}"]:checked`)).length+issues.overages.filter(x=>!form.querySelector(`input[name="overage-${x.id}"]:checked`)).length;
+ const carryCount=issues.unresolved.filter(x=>form.querySelector(`input[name="resolution-${x.id}"]:checked`)?.value==="carry").length,followup=$("followupName");
+ followup.disabled=carryCount===0;if(carryCount&& !followup.value.trim())remaining++;
+ $("carryAllBtn").disabled=!issues.unresolved.some(x=>x.requestedQty>x.purchasedQty);
+ $("reconcileSave").disabled=remaining>0;$("closeoutRemaining").classList.toggle("ready",remaining===0);
+ $("closeoutRemaining").textContent=remaining?`${remaining} closeout decision${remaining===1?"":"s"} remaining`:`Ready to close ${run?.name||"run"}`
+}
+$("carryAllBtn").addEventListener("click",()=>{document.querySelectorAll('#closeoutDecisions input[value="carry"]:not(:disabled)').forEach(x=>x.checked=true);updateCloseoutReadiness()});
+$("reconcileForm").addEventListener("input",updateCloseoutReadiness);
+$("reconcileForm").addEventListener("submit",e=>{
+ if(e.submitter?.value==="cancel")return;e.preventDefault();
+ const run=activeRun(),issues=runCloseoutIssues(run.id),fd=new FormData(e.currentTarget),resolutions={},overages={},warehouseAdds={};
+ issues.unresolved.forEach(x=>resolutions[x.id]=fd.get(`resolution-${x.id}`));issues.overages.forEach(x=>overages[x.id]=fd.get(`overage-${x.id}`)==="accept");issues.acquired.forEach(x=>warehouseAdds[x.id]=fd.get(`warehouse-${x.id}`)||0);
+ const result=reconcileRun(run.id,{resolutions,overages,warehouseAdds,followupName:$("followupName").value});
+ if(!result.ok){$("closeoutRemaining").classList.remove("ready");$("closeoutRemaining").textContent=result.error;toast(result.error);return}
+ $("reconcileDialog").close();renderAll();toast(result.followup?`Run closed · ${result.carriedCount} carried forward`:"Run closed and reconciled")
+});
+
+document.querySelectorAll(".navbtn").forEach(b=>b.addEventListener("click",()=>switchPage(b.dataset.page)));
+$("runSearch").addEventListener("input",renderShopping);
+$("runSelect").addEventListener("change",e=>{state.settings.activeRunId=e.target.value;saveState();renderShopping()});
+$("runProjectFilter").addEventListener("change",renderShopping);
+$("focusOnlyBtn").addEventListener("click",()=>{const showAll=state.settings.focusOnly;state.settings.focusOnly=!showAll;state.settings.neededOnly=!showAll;$("runProjectFilter").value="all";saveState();renderShopping()});
+$("neededOnlyBtn").addEventListener("click",()=>{state.settings.neededOnly=!state.settings.neededOnly;saveState();renderShopping()});
+$("newRunBtn").onclick=openNewRun;$("completeRunBtn").onclick=openReconcile;
+$("addProjectBtn").onclick=()=>openProjectEditor();$("addCatalogBtn").onclick=openCatalogEditor;$("addRequirementBtn").onclick=()=>openRequirementEditor();
+$("addShortagesBtn").onclick=()=>{const pid=state.settings.selectedProjectId;let n=0;state.requirements.filter(r=>r.projectId===pid).forEach(r=>{if(addRequirementShortageToRun(r.id))n++});renderAll();toast(`${n} shortage${n===1?"":"s"} added`)};
+$("addInventoryBtn").onclick=()=>openInventoryEditor();$("addToolBtn").onclick=()=>openToolEditor();
+$("exportBtn").onclick=exportState;$("importBtn").onclick=()=>$("importFile").click();$("importFile").addEventListener("change",e=>e.target.files[0]&&importFile(e.target.files[0]));
+$("resetBtn").onclick=()=>{if(confirm("Reset all DepotOps local data to the canonical seeded state?")){resetState();toast("App data reset")}};
+
+function bootstrapLegacyCheckMigration(){
+ if(localStorage.getItem(STORAGE_KEY))return;
+ try{
+  const legacy=JSON.parse(localStorage.getItem("depotops-shopping-v2")||"{}");const keys=Object.keys(legacy).filter(k=>legacy[k]);
+  if(keys.length){keys.forEach(k=>{const x=state.shoppingRunItems[Number(k)];if(x&&x.purchasedQty===0)x.status="in_cart";if(x)normalizeRunItemState(x)});saveState();toast(`Migrated ${keys.length} v0.1 check-off(s) as In Cart`)}
+ }catch(e){}
+}
+
+function runSelfTests(){
+ const out=[],assert=(name,cond,detail="")=>out.push(`${cond?"PASS":"FAIL"} | ${name}${detail?` | ${detail}`:""}`);
+ const backup=clone(state),filterBackup=$("runProjectFilter").value;
+ try{
+  state=clone(seedState);
+  assert("schema validates",validateState(state).ok);
+  const invalidBackup=clone(state);delete invalidBackup.settings;assert("backup without settings is rejected",!validateState(invalidBackup).ok);
+  const ids=[...state.projects,...state.catalogItems,...state.requirements,...state.inventory,...state.shoppingRuns,...state.shoppingRunItems,...state.tools,...state.locations,...state.stores].map(x=>x.id);
+  assert("stable IDs globally unique",ids.length===new Set(ids).size);
+  const canonicalRows=state.shoppingRunItems.filter(x=>x.runId===NOTION_RUN.id);
+  assert("canonical Notion list includes all 48 rows",canonicalRows.length===48,`rows=${canonicalRows.length}`);
+  assert("canonical Notion list preserves 25 outstanding rows",canonicalRows.filter(x=>x.status==="needed").length===25,`needed=${canonicalRows.filter(x=>x.status==="needed").length}`);
+  assert("canonical Notion list preserves 23 purchased rows",canonicalRows.filter(x=>x.status==="purchased").length===23,`purchased=${canonicalRows.filter(x=>x.status==="purchased").length}`);
+  const focusedCanonical=canonicalRows.filter(x=>x.status==="needed"&&FOCUS_WORKFLOW_STATES.has(x.workflowState));assert("default focus contains 22 current or stopped outstanding rows",focusedCanonical.length===22,`focused=${focusedCanonical.length}`);
+  assert("every canonical row has project links",canonicalRows.every(x=>x.projectIds?.length&&x.projectIds.every(id=>!!project(id))),`linked=${canonicalRows.filter(x=>x.projectIds?.length).length}/48`);
+  assert("three obsolete kitchen concepts are explicit",canonicalRows.filter(x=>x.workflowState==="superseded").length===3,`superseded=${canonicalRows.filter(x=>x.workflowState==="superseded").length}`);
+  assert("project board includes the 19 open registry projects plus live legacy work",state.projects.length>=24,`projects=${state.projects.length}`);
+  renderProjects();const selectedProjectCard=document.querySelector(`.project-card[data-id="${state.settings.selectedProjectId}"]`),projectAreas=getComputedStyle(document.querySelector(".projects-workspace")).gridTemplateAreas;
+  assert("selected project is visibly tied to inspector",selectedProjectCard?.classList.contains("is-selected")&&selectedProjectCard.querySelector('[data-act="inspect"]')?.getAttribute("aria-pressed")==="true");
+  assert("project inspector uses compact detail cards",document.querySelector("#projectDetailPanel .linked-row")&&document.querySelector("#projectDetailPanel .requirement-card"));
+  assert("project inspector has responsive master-detail placement",window.innerWidth>1180?projectAreas.includes("board inspector"):projectAreas.indexOf("inspector")<projectAreas.indexOf("board"),`areas=${projectAreas}`);
+	  const legacy=clone(seedState);legacy.schemaVersion=3;legacy.projects=legacy.projects.filter(x=>!NOTION_PROJECTS.some(p=>p.id===x.id));legacy.projects.push({id:LEGACY_NOTION_PROJECT_ID,name:"Home Depot Shopping List",status:"Active",location:"56 Harding",description:"Legacy generic link"});legacy.shoppingRunItems.forEach(x=>{x.projectId=LEGACY_NOTION_PROJECT_ID;delete x.projectIds;delete x.workflowState;delete x.workflowNote});legacy.settings={activeRunId:NOTION_RUN.id,selectedProjectId:LEGACY_NOTION_PROJECT_ID,neededOnly:false};const migrated=migrateState(legacy);
+	  assert("v3 migration replaces generic links",migrated.schemaVersion===5&&!migrated.projects.some(x=>x.id===LEGACY_NOTION_PROJECT_ID)&&migrated.shoppingRunItems.filter(x=>x.runId===NOTION_RUN.id).every(x=>x.projectIds?.length)&&migrated.settings.focusOnly===true);
+	  const legacyV4=clone(seedState),legacyPartial=legacyV4.shoppingRunItems.find(x=>x.status==="needed");legacyV4.schemaVersion=4;legacyPartial.requestedQty=3;legacyPartial.purchasedQty=1;legacyPartial.status="needed";const migratedV5=migrateState(legacyV4);
+	  assert("v4 migration derives partial purchase state",migratedV5.schemaVersion===5&&byId(migratedV5.shoppingRunItems,legacyPartial.id).status==="partially_purchased");
+	  const inconsistent=clone(state),inconsistentRow=inconsistent.shoppingRunItems.find(x=>x.status==="needed");inconsistentRow.purchasedQty=1;assert("schema rejects contradictory purchase state",!validateState(inconsistent).ok);
+  assert("canonical item reused by requirement + inventory",byId(state.requirements,"req-cement").itemId===byId(state.inventory,"inv-cement").itemId);
+  assert("warehouse stock covers cement requirement",shortage(byId(state.requirements,"req-cement"))===0,`shortage=${shortage(byId(state.requirements,"req-cement"))}`);
+  assert("PVC40 shortage reflects no warehouse stock",shortage(byId(state.requirements,"req-pvc40"))===6,`shortage=${shortage(byId(state.requirements,"req-pvc40"))}`);
+  const before=state.shoppingRunItems.length;const added=addRequirementShortageToRun("req-primer");
+  assert("verify requirement stays visible as hold item",added&&state.shoppingRunItems.at(-1).status==="hold");
+  const inv=byId(state.inventory,"inv-string");const lowAdded=addLowStockToRun(inv.id);
+  assert("low stock replenishment connects warehouse to run",lowAdded&&state.shoppingRunItems.some(x=>x.source==="warehouse"&&x.itemId==="itm-string"));
+  const snap=JSON.parse(JSON.stringify(state));assert("JSON round-trip validates",validateState(snap).ok);
+	  const testRun={id:"run-test",name:"Test",status:"active",storeId:"store-lawnside",createdAt:"",completedAt:null};state.shoppingRuns.push(testRun);
+	  state.shoppingRunItems.push(
+	   {id:"sri-test-full",runId:"run-test",itemId:"itm-tape",projectRequirementId:null,requestedQty:2,purchasedQty:2,status:"purchased",workflowState:"active",priority:"Reorder",source:"warehouse",notes:""},
+	   {id:"sri-test-partial",runId:"run-test",itemId:"itm-string",projectRequirementId:null,requestedQty:3,purchasedQty:1,status:"partially_purchased",workflowState:"active",priority:"Reorder",source:"warehouse",notes:""},
+	   {id:"sri-test-over",runId:"run-test",itemId:"itm-primer",projectRequirementId:null,requestedQty:1,purchasedQty:2,status:"purchased",workflowState:"active",priority:"Reorder",source:"warehouse",notes:""},
+	   {id:"sri-test-hold",runId:"run-test",itemId:"itm-labels",projectRequirementId:null,requestedQty:1,purchasedQty:0,status:"hold",workflowState:"gated",priority:"Buy",source:"project",notes:""}
+	  );
+	  const tapeBefore=onHand("itm-tape"),stringBefore=onHand("itm-string"),blockedClose=reconcileRun("run-test");
+	  assert("closeout blocks unresolved rows and overages",!blockedClose.ok&&byId(state.shoppingRuns,"run-test").status==="active");
+	  assert("blocked closeout is atomic",onHand("itm-tape")===tapeBefore&&!state.shoppingRuns.some(x=>x.sourceRunId==="run-test"));
+	  const closeDecisions={resolutions:{"sri-test-partial":"carry","sri-test-hold":"skip"},overages:{"sri-test-over":true}};
+	  const namelessClose=reconcileRun("run-test",{...closeDecisions,followupName:""});assert("closeout requires a named follow-up",!namelessClose.ok&&byId(state.shoppingRuns,"run-test").status==="active");
+	  const invalidAllocation=reconcileRun("run-test",{...closeDecisions,warehouseAdds:{"sri-test-full":3},followupName:"Follow-up — Test"});assert("closeout rejects Warehouse quantity above acquired",!invalidAllocation.ok&&onHand("itm-tape")===tapeBefore);
+	  const closeResult=reconcileRun("run-test",{resolutions:{"sri-test-partial":"carry","sri-test-hold":"skip"},overages:{"sri-test-over":true},warehouseAdds:{"sri-test-full":1,"sri-test-partial":1,"sri-test-over":0},followupName:"Follow-up — Test"});
+	  assert("explicit closeout succeeds",closeResult.ok&&closeResult.carriedCount===1);
+	  assert("reconciliation bounds and adds Warehouse stock",onHand("itm-tape")===tapeBefore+1&&onHand("itm-string")===stringBefore+1);
+	  const followup=byId(state.shoppingRuns,closeResult.followup?.id),carried=state.shoppingRunItems.find(x=>x.runId===followup?.id&&x.sourceRunItemId==="sri-test-partial");
+	  assert("follow-up carries only remaining quantity",followup?.status==="active"&&carried?.requestedQty===2&&carried?.purchasedQty===0&&carried?.status==="needed");
+	  assert("closeout records row dispositions",byId(state.shoppingRunItems,"sri-test-partial").closeoutDisposition==="carried_forward"&&byId(state.shoppingRunItems,"sri-test-hold").closeoutDisposition==="skipped_remainder"&&byId(state.shoppingRunItems,"sri-test-over").closeoutDisposition==="fulfilled_overage");
+	  assert("run preserves resolved completed history",byId(state.shoppingRuns,"run-test").status==="completed"&&state.shoppingRunItems.filter(x=>x.runId==="run-test").every(x=>isRunItemResolved(x)));
+	  state.settings.activeRunId=NOTION_RUN.id;saveState();const parsed=JSON.parse(localStorage.getItem(STORAGE_KEY));assert("complete state persists",parsed.schemaVersion===5&&parsed.projects.length===state.projects.length);
+	  renderAll();
+	  assert("shopping quantity controls have visible labels",[...document.querySelectorAll(".runitem:first-child .control-label")].map(x=>x.textContent).join("|")==="Requested|Shopping status|Purchased");
+	  openReconcile();assert("closeout preflight blocks undecided rows",$("reconcileSave").disabled&&$("closeoutRemaining").textContent.includes("remaining"));$("carryAllBtn").click();assert("closeout preflight enables after explicit decisions",!$("reconcileSave").disabled);$("reconcileDialog").close();
+  $("runProjectFilter").value="prj-lighting";renderShopping();assert("project filter survives rerender",$("runProjectFilter").value==="prj-lighting"&&$("runVisible").textContent==="0",`selected=${$("runProjectFilter").value}, visible=${$("runVisible").textContent}`);$("runProjectFilter").value="all";renderShopping();
+  const target=document.querySelector(".navbtn");const rect=target.getBoundingClientRect();assert("primary touch target >=44px",rect.height>=44,`height=${rect.height.toFixed(1)}`);
+  const stickyTop=parseFloat(getComputedStyle($("runSearch").closest(".toolbar")).top),topbarHeight=document.querySelector(".topbar").getBoundingClientRect().height;assert("sticky toolbar clears top navigation",Math.abs(stickyTop-topbarHeight)<=1,`toolbar=${stickyTop.toFixed(1)}, topbar=${topbarHeight.toFixed(1)}`);
+  if(window.innerWidth<=680){const visibleTargets=[...document.querySelectorAll(".topbar button,.page.active button,.page.active a,.page.active input,.page.active select")].filter(el=>{const r=el.getBoundingClientRect();return r.width&&r.height}),smallTargets=visibleTargets.filter(el=>{const r=el.getBoundingClientRect();return r.width<44||r.height<44});assert("visible mobile controls meet 44px targets",smallTargets.length===0,smallTargets.map(el=>`${el.tagName.toLowerCase()}:${el.textContent.trim()||el.getAttribute("aria-label")} ${el.getBoundingClientRect().width.toFixed(0)}x${el.getBoundingClientRect().height.toFixed(0)}`).join(", "))}
+  assert("shopping rows expose store links",document.querySelectorAll(".runitem .product-link").length>0,`links=${document.querySelectorAll(".runitem .product-link").length}`);
+  const activeSeedItems=state.shoppingRunItems.filter(x=>x.runId===NOTION_RUN.id&&x.source==="notion");assert("every canonical row has a shopping link",activeSeedItems.length===48&&activeSeedItems.every(x=>!!productLinkFor(item(x.itemId))),`linked=${activeSeedItems.filter(x=>!!productLinkFor(item(x.itemId))).length}/${activeSeedItems.length}`);
+  state.settings.focusOnly=false;state.settings.neededOnly=false;renderShopping();const notionSourceLinks=document.querySelectorAll('.runitem .product-link.search[href*="app.notion.com/"]').length;assert("every canonical row links to its Notion source",notionSourceLinks===48,`links=${notionSourceLinks}`);
+  const firstRunItem=document.querySelector(".runitem"),firstQty=firstRunItem?.querySelector(".qtyctrl"),firstInfo=firstRunItem?.children?.[1];
+  if(firstRunItem&&firstQty&&firstInfo){const qr=firstQty.getBoundingClientRect(),ir=firstInfo.getBoundingClientRect();const intersects=!(qr.right<=ir.left||qr.left>=ir.right||qr.bottom<=ir.top||qr.top>=ir.bottom);assert("line item quantity does not overlap product info",!intersects,`qty=(${qr.left.toFixed(1)},${qr.top.toFixed(1)},${qr.right.toFixed(1)},${qr.bottom.toFixed(1)}), info=(${ir.left.toFixed(1)},${ir.top.toFixed(1)},${ir.right.toFixed(1)},${ir.bottom.toFixed(1)})`)}
+  assert("no horizontal overflow",document.documentElement.scrollWidth<=window.innerWidth,`scroll=${document.documentElement.scrollWidth}, viewport=${window.innerWidth}`);
+ }catch(e){assert("self-test exception",false,e.message)}
+ finally{state=backup;saveState();$("runProjectFilter").value=filterBackup||"all";renderAll()}
+ $("selftest").textContent=out.join("\n");$("selftest").style.display="block";document.body.dataset.selftest=out.some(x=>x.startsWith("FAIL"))?"fail":"pass"
+}
+
+bootstrapLegacyCheckMigration();renderAll();
+if(!reduced&&window.gsap){gsap.timeline().from(".topbar",{y:-50,opacity:0,duration:.32}).from(".hero",{y:12,opacity:0,duration:.3},"-=.12").from(".stat",{y:7,opacity:0,duration:.22,stagger:.025},"-=.1")}
+if(new URLSearchParams(location.search).get("selftest")==="1")setTimeout(runSelfTests,100);
+</script>
+</body>
+</html>

@@ -1,0 +1,937 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Throwline Stage 3D is the optional online Three.js companion for projector placement, throw geometry, camera inspection, and OBJ, MTL, or GLB export.">
+<meta name="theme-color" id="themeColor" content="#f4f1ea">
+<meta name="color-scheme" content="light dark">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com; style-src 'self' 'unsafe-inline'; connect-src 'self' https://unpkg.com; img-src 'self' data:; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'none'">
+<link rel="canonical" href="https://systembydave.com/ProjectorThrow/Stage3D.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Throwline Stage 3D · Online companion">
+<meta property="og:description" content="Inspect projector placement and throw geometry in an optional online 3D stage, then export OBJ, MTL, or GLB files.">
+<meta property="og:url" content="https://systembydave.com/ProjectorThrow/Stage3D.html">
+<meta property="og:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<meta property="og:image:alt" content="System by Dave preview banner">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Throwline Stage 3D · Online companion">
+<meta name="twitter:description" content="Optional online 3D projector placement and export companion for Throwline SHOW 2.0.">
+<meta name="twitter:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<title>Throwline Stage 3D · Online companion</title>
+<link rel="icon" href="../svg/system_by_dave_logo_rust.svg" type="image/svg+xml">
+<script>(()=>{try{if(localStorage.getItem('throwline:theme:v1')==='dark'){document.documentElement.dataset.theme='dark';document.getElementById('themeColor').content='#15181d';}}catch{}})();</script>
+<!-- THROWLINE_CATALOG_START -->
+<script id="throwlineCatalog" type="application/json">{"schemaVersion":1,"meta":{"catalogId":"throwline-pilot-2026-08-24","authorityPolicy":"deep-research-2026-08-25","sourceWorkbook":"Throwline_Projector_Lens_Database_Pilot.xlsx","sourceWorkbookSha256":"4a70b2b553df12beee1373592e251e30ed1d84257304848b9c32cbc1e3ea818d","verifiedOn":"2026-08-24","calculationReadyCount":0,"counts":{"manufacturers":5,"projectors":4,"lenses":13,"compatibility":13,"opticalProfiles":8,"sources":13,"researchExceptions":6}},"manufacturers":[{"manufacturer_id":"MFR-001","manufacturer_name":"Panasonic Connect","canonical_name":"panasonic connect","manufacturer_website":"https://connect.panasonic.com"},{"manufacturer_id":"MFR-002","manufacturer_name":"Epson","canonical_name":"epson","manufacturer_website":"https://epson.com"},{"manufacturer_id":"MFR-003","manufacturer_name":"Sony","canonical_name":"sony","manufacturer_website":"https://pro.sony"},{"manufacturer_id":"MFR-004","manufacturer_name":"Barco","canonical_name":"barco","manufacturer_website":"https://www.barco.com"},{"manufacturer_id":"MFR-005","manufacturer_name":"Christie Digital","canonical_name":"christie digital","manufacturer_website":"https://www.christiedigital.com","notes":"Legacy M/J series lens docs found; current large-venue models (e.g. Griffyn, Crimson) not yet researched in this pass"}],"projectors":[{"projector_id":"PRJ-001","manufacturer_id":"MFR-001","manufacturer_name":"Panasonic Connect","model_number":"PT-RQ50K","model_name":"PT-RQ50K","canonical_model_key":"panasonic pt-rq50k","market_segment":"large_venue_installation","product_status":"current","projector_type":"interchangeable_lens","light_source":"laser","display_technology":"DLP","native_resolution":"4K+ (5120x3200 processing)/WUXGA native panel","native_aspect_ratio":"17:9 (native panel); supports 16:10/16:9/4:3 image modes","brightness_ansi_lm":"50000","brightness_standard_or_mode":"Center lm (ANSI 50,000 lm)","contrast_ratio":"20000:1 (Full On/Full Off, Dynamic Contrast Mode 3)","lens_mount_or_system":"ET-D lens mount (3-Chip DLP)","has_interchangeable_lens":"TRUE","operating_orientation_notes":"Handle attachment changes vertical shift range (-8% to +50% with handle; -50% to +50% without)","product_page_url":"https://eu.connect.panasonic.com/pt/en/projectors/pt-rq50k","primary_datasheet_url":"https://docs.connect.panasonic.com/projector/download/catalog/pdf/PT_RQ50K_2P_ctlg_Eng_PC.pdf","primary_manual_url":"https://ap.connect.panasonic.com/sites/default/files/media/document/2019-11/rq50k_manual_en.pdf","last_verified_at":"2026-08-24","confidence":"official_primary","record_notes":"No lens included; sold lens-less"},{"projector_id":"PRJ-002","manufacturer_id":"MFR-002","manufacturer_name":"Epson","model_number":"Pro L30000UNL","model_name":"Pro L30000UNL (Epson US) / EB-L30000UNL (intl)","canonical_model_key":"epson l30000unl","market_segment":"large_venue_installation","product_status":"current","projector_type":"interchangeable_lens","light_source":"laser","display_technology":"3LCD","native_resolution":"WUXGA (1920x1200) with 4K enhancement","native_aspect_ratio":"16:10","brightness_ansi_lm":"30000","brightness_standard_or_mode":"White/Color Light Output (Normal)","contrast_ratio":"2500000:1 (per Epson spec)","lens_mount_or_system":"Epson interchangeable lens system (9 lens options)","has_interchangeable_lens":"TRUE","operating_orientation_notes":"Rear projection restricted to Wide/Short Throw/Zoom lens only per manual","product_page_url":"https://www.projectorcentral.com/Epson-Pro_L30000U.htm","primary_datasheet_url":"https://www.projectorcentral.com/pdf/projector_spec_10773.pdf","primary_manual_url":"https://files.support.epson.com/docid/cpd5/cpd59255.pdf","last_verified_at":"2026-08-24","confidence":"official_primary","record_notes":"Ships lens-less (UNL = unlensed); standard lens references ELPLM12 spec table"},{"projector_id":"PRJ-003","manufacturer_id":"MFR-003","manufacturer_name":"Sony","model_number":"VPL-GTZ380","model_name":"VPL-GTZ380","canonical_model_key":"sony vpl-gtz380","market_segment":"home_theater_high_end","product_status":"current","projector_type":"interchangeable_lens","light_source":"laser","display_technology":"SXRD","native_resolution":"4K (4096x2160)","native_aspect_ratio":"native 4096x2160 (multiple aspect support via lens/format)","brightness_ansi_lm":"10000","brightness_standard_or_mode":"Center (lm), per Sony marketing 10,000lm class","contrast_ratio":"Infinity:1 (dynamic, per some secondary listings) / not explicitly stated as static ratio in primary datasheet","lens_mount_or_system":"Sony ARC-F lens mount","has_interchangeable_lens":"TRUE","operating_orientation_notes":"Home-cinema market segment; included with bundled lens depending on package (varies by region)","product_page_url":"https://pro.sony/s3/2020/07/27124942/VPL-GTZ380-Datasheet.pdf","primary_datasheet_url":"https://pro.sony/s3/2020/07/27124942/VPL-GTZ380-Datasheet.pdf","primary_manual_url":"https://helpguide.sony.net/vpl/gtz380/v1/en/contents/TP1000003577.html","last_verified_at":"2026-08-24","confidence":"official_primary","record_notes":"Consumer/high-end home theater segment; included per user instruction to label market segment clearly"},{"projector_id":"PRJ-004","manufacturer_id":"MFR-004","manufacturer_name":"Barco","model_number":"UDX-4K32","model_name":"UDX-4K32","canonical_model_key":"barco udx-4k32","market_segment":"large_venue_installation","product_status":"current","projector_type":"interchangeable_lens","light_source":"laser","display_technology":"DLP","native_resolution":"3840x2400 (4K UHD)/2560x1600 native/5120x3200 processing","native_aspect_ratio":"16:10","brightness_ansi_lm":"31000","brightness_standard_or_mode":"(WQ) Center lumens; 30,000 ANSI lumens (4K UHD)","contrast_ratio":"2200:1 full field; 20000:1 with DynaBlack","lens_mount_or_system":"TLD/TLD+ lens mount","has_interchangeable_lens":"TRUE","operating_orientation_notes":"Shares TLD+ lens family with legacy UDX series projectors; reuses older TLD+ lenses per Barco","product_page_url":"https://assets.barco.com/asset/fbef349e-a817-4bcb-821d-b5e1154a2c29/UDX-4K32-en-Spec-sheet.pdf","primary_datasheet_url":"https://assets.barco.com/asset/fbef349e-a817-4bcb-821d-b5e1154a2c29/UDX-4K32-en-Spec-sheet.pdf","primary_manual_url":"https://www.rentex.com/wp-content/uploads/2017/06/Barco-UDX-4K32-User-Manual.pdf","last_verified_at":"2026-08-24","confidence":"official_primary","record_notes":"Lens shift range (-100% to +130% V, up to ±40% H) is stated as 'depending on lens' at the projector level only -- per-lens shift not broken out in this pass; see research_exceptions"}],"lenses":[{"lens_id":"LNS-001","manufacturer_id":"MFR-001","manufacturer_name":"Panasonic Connect","lens_model_number":"ET-D3QW200","lens_name":"ET-D3QW200 Short-Throw Zoom Lens","canonical_lens_key":"panasonic et-d3qw200","lens_type":"short_throw","lens_shift_horizontal_percent_min":-8,"lens_shift_horizontal_percent_max":8,"lens_shift_vertical_percent_min":-15,"lens_shift_vertical_percent_max":28,"lens_shift_basis":"percent of image height/width, from lens center (manufacturer basis not separately confirmed for H)","lens_shift_notes":"Vertical/Horizontal keystone-related figures given as ±15°/±28° in catalog context (keystone, not shift); shift % not isolated for this lens in sources reviewed -- flagged in exceptions","lens_page_url":"https://docs.connect.panasonic.com/projector/optional_lens_guide/","datasheet_url":"https://docs.connect.panasonic.com/projector/download/catalog/pdf/PT_RQ50K_2P_ctlg_Eng_PC.pdf","manual_url":"https://ap.connect.panasonic.com/sites/default/files/media/document/2019-11/rq50k_manual_en.pdf","product_status":"current","last_verified_at":"2026-08-24","confidence":"needs_verification","record_notes":"Throw ratio 0.548-0.650:1 (Native 4K) per catalog; separate ratio 0.55-0.65:1 per product page"},{"lens_id":"LNS-002","manufacturer_id":"MFR-001","manufacturer_name":"Panasonic Connect","lens_model_number":"ET-D3QW300","lens_name":"ET-D3QW300 Zoom Lens","canonical_lens_key":"panasonic et-d3qw300","lens_type":"zoom","lens_shift_horizontal_percent_min":-14,"lens_shift_horizontal_percent_max":14,"lens_shift_vertical_percent_min":-40,"lens_shift_vertical_percent_max":40,"lens_shift_basis":"percent, from center of screen, powered","lens_shift_notes":"Vertical ±40% max per projector spec sheet when this lens installed","lens_page_url":"https://docs.connect.panasonic.com/projector/optional_lens_guide/","datasheet_url":"https://docs.connect.panasonic.com/projector/download/catalog/pdf/PT_RQ50K_2P_ctlg_Eng_PC.pdf","manual_url":"https://ap.connect.panasonic.com/sites/default/files/media/document/2019-11/rq50k_manual_en.pdf","product_status":"current","last_verified_at":"2026-08-24","confidence":"official_primary","record_notes":"Throw ratio 1.11-1.70:1 (17:9 native); 1.32-2.02 (16:10); 1.18-1.81 (16:9); 1.58-2.43 (4:3) per manual"},{"lens_id":"LNS-003","manufacturer_id":"MFR-001","manufacturer_name":"Panasonic Connect","lens_model_number":"ET-D3QS400","lens_name":"ET-D3QS400 Zoom Lens","canonical_lens_key":"panasonic et-d3qs400","lens_type":"zoom","lens_shift_basis":"not isolated per-lens in sources reviewed","lens_shift_notes":"Projector-level max shift +/-45% V / +/-16% H (unless this lens is one of the exceptions listed)","lens_page_url":"https://docs.connect.panasonic.com/projector/optional_lens_guide/","datasheet_url":"https://docs.connect.panasonic.com/projector/download/catalog/pdf/PT_RQ50K_2P_ctlg_Eng_PC.pdf","manual_url":"https://ap.connect.panasonic.com/sites/default/files/media/document/2019-11/rq50k_manual_en.pdf","product_status":"current","last_verified_at":"2026-08-24","confidence":"needs_verification","record_notes":"Throw ratio 1.43-2.09:1 (17:9 native); 1.70-2.48 (16:10); 1.52-2.23 (16:9); 2.04-2.98 (4:3) per manual"},{"lens_id":"LNS-004","manufacturer_id":"MFR-001","manufacturer_name":"Panasonic Connect","lens_model_number":"ET-D3QT500","lens_name":"ET-D3QT500 Zoom Lens","canonical_lens_key":"panasonic et-d3qt500","lens_type":"zoom","focal_length_or_range":"61.4-105.2","f_number_or_range":"2.5","lens_shift_basis":"not isolated per-lens for shift; F-number and focal length per lens datasheet","lens_shift_notes":"F=2.5; Focal distance 61.4mm-105.2mm per lens spec sheet (ET-D3QT500G)","lens_page_url":"https://connect.na.panasonic.com/av/projectors/accessories/et-d3qt500-3-chip-dlp-projector-zoom-lens","datasheet_url":"https://eu.connect.panasonic.com/sites/default/files/media/document/2024-04/ET-D3QT500G_STE_01(sec)_1.pdf","manual_url":"https://ap.connect.panasonic.com/sites/default/files/media/document/2019-11/rq50k_manual_en.pdf","product_status":"current","last_verified_at":"2026-08-24","confidence":"official_primary","record_notes":"Throw ratio 2.00-3.41:1(17:9); 2.36-4.03(16:10); 2.13-3.63(16:9); 2.82-4.83(4:3), per lens datasheet & projector manual"},{"lens_id":"LNS-005","manufacturer_id":"MFR-001","manufacturer_name":"Panasonic Connect","lens_model_number":"ET-D3QT600","lens_name":"ET-D3QT600 Zoom Lens","canonical_lens_key":"panasonic et-d3qt600","lens_type":"zoom","lens_shift_horizontal_percent_min":-8,"lens_shift_horizontal_percent_max":8,"lens_shift_vertical_percent_min":-25,"lens_shift_vertical_percent_max":25,"lens_shift_basis":"percent, projector-level max when installed, from center of screen, powered","lens_shift_notes":"Vertical +/-25% / Horizontal +/-8% specifically when this lens is installed, per projector spec page","lens_page_url":"https://docs.connect.panasonic.com/projector/products/rq50k/spec/","datasheet_url":"https://docs.connect.panasonic.com/projector/download/catalog/pdf/PT_RQ50K_2P_ctlg_Eng_PC.pdf","manual_url":"https://ap.connect.panasonic.com/sites/default/files/media/document/2019-11/rq50k_manual_en.pdf","product_status":"current","last_verified_at":"2026-08-24","confidence":"official_primary","record_notes":"Throw ratio 2.69-3.88:1(17:9); 3.19-4.60(16:10); 2.87-4.13(16:9); 3.84-5.53(4:3) per manual"},{"lens_id":"LNS-006","manufacturer_id":"MFR-001","manufacturer_name":"Panasonic Connect","lens_model_number":"ET-D3QT700","lens_name":"ET-D3QT700 Zoom Lens","canonical_lens_key":"panasonic et-d3qt700","lens_type":"zoom","lens_shift_horizontal_percent_min":-10,"lens_shift_horizontal_percent_max":10,"lens_shift_vertical_percent_min":-30,"lens_shift_vertical_percent_max":30,"lens_shift_basis":"percent, projector-level max when installed, from center of screen, powered","lens_shift_notes":"Vertical +/-30% / Horizontal +/-10% when this lens installed, per projector spec page","lens_page_url":"https://docs.connect.panasonic.com/projector/products/rq50k/spec/","datasheet_url":"https://docs.connect.panasonic.com/projector/download/catalog/pdf/PT_RQ50K_2P_ctlg_Eng_PC.pdf","manual_url":"https://ap.connect.panasonic.com/sites/default/files/media/document/2019-11/rq50k_manual_en.pdf","product_status":"current","last_verified_at":"2026-08-24","confidence":"official_primary","record_notes":"Throw ratio 3.89-5.47:1(17:9); 4.61-6.49(16:10); overlap w/ QT600 4:3 col flagged in exceptions; 5.54-7.80(4:3) per manual"},{"lens_id":"LNS-007","manufacturer_id":"MFR-001","manufacturer_name":"Panasonic Connect","lens_model_number":"ET-D3QT800","lens_name":"ET-D3QT800 Zoom Lens","canonical_lens_key":"panasonic et-d3qt800","lens_type":"zoom","focal_length_or_range":"156.5-243.1","f_number_or_range":"2.5","lens_shift_horizontal_percent_min":-10,"lens_shift_horizontal_percent_max":10,"lens_shift_vertical_percent_min":-30,"lens_shift_vertical_percent_max":30,"lens_shift_basis":"percent, projector-level max when installed, from center of screen, powered","lens_shift_notes":"F=2.5; Focal distance 156.5-243.1mm per lens datasheet","lens_page_url":"https://connect.na.panasonic.com/av/projectors/accessories/et-d3qt800-3-chip-dlp-projector-zoom-lens","datasheet_url":"https://connect.na.panasonic.com/av/projectors/accessories/et-d3qt800-3-chip-dlp-projector-zoom-lens","manual_url":"https://ap.connect.panasonic.com/sites/default/files/media/document/2019-11/rq50k_manual_en.pdf","product_status":"current","last_verified_at":"2026-08-24","confidence":"official_primary","record_notes":"Throw ratio 4.97-7.76:1(17:9); 5.89-9.21(16:10); 5.30-8.28(16:9); 7.06-11.06(4:3) per lens datasheet"},{"lens_id":"LNS-008","manufacturer_id":"MFR-002","manufacturer_name":"Epson","lens_model_number":"ELPLM12","lens_name":"Middle Throw Zoom #1 Lens","canonical_lens_key":"epson elplm12","lens_type":"zoom","focal_length_or_range":"54.7-73.0","zoom_ratio":"1-1.35x","f_number_or_range":"1.9-2.1","lens_shift_horizontal_percent_min":-30,"lens_shift_horizontal_percent_max":30,"lens_shift_vertical_percent_min":-65,"lens_shift_vertical_percent_max":65,"lens_shift_basis":"percent, per Epson spec sheet (Vertical/Horizontal)","lens_shift_notes":"Standard/included reference lens for L30000UNL series in some configs; powered zoom/focus/shift","lens_page_url":"https://www.projectorcentral.com/Epson-Pro_L30000U.htm","datasheet_url":"https://www.projectorcentral.com/pdf/projector_spec_10773.pdf","manual_url":"https://files.support.epson.com/docid/cpd5/cpd59255.pdf","product_status":"current","last_verified_at":"2026-08-24","confidence":"official_primary","record_notes":"Throw ratio 1.74-2.35:1 (Wide-Tele) per Epson/ProjectorCentral spec sheet"},{"lens_id":"LNS-009","manufacturer_id":"MFR-002","manufacturer_name":"Epson","lens_model_number":"ELPLX03","lens_name":"Ultra Short-throw Zoom Lens","canonical_lens_key":"epson elplx03","lens_type":"ultra_short_throw","lens_shift_basis":"percent, per Epson manual (values vary by screen size per manual table)","lens_shift_notes":"Throw ratio listed as 0.35:1 (fixed) on ProjectorCentral; manual shows distance/shift table varying with image size rather than single % shift figure -- treat as needs_verification for shift %","lens_page_url":"https://www.projectorcentral.com/Epson-Pro_L30000U.htm","datasheet_url":"https://files.support.epson.com/docid/cpd5/cpd59255.pdf","manual_url":"https://files.support.epson.com/docid/cpd5/cpd59255.pdf","product_status":"current","last_verified_at":"2026-08-24","confidence":"needs_verification","record_notes":"Manual gives vertical lens shift as absolute distance ranges (e.g. -67.8 to -30.3 in @200in image) not percent; do not convert without explicit derivation"},{"lens_id":"LNS-010","manufacturer_id":"MFR-003","manufacturer_name":"Sony","lens_model_number":"VPLL-Z8008","lens_name":"VPLL-Z8008 Short-Throw Lens (ARC-F)","canonical_lens_key":"sony vpll-z8008","lens_type":"short_throw","f_number_or_range":"2.9","lens_shift_horizontal_percent_min":-18,"lens_shift_horizontal_percent_max":18,"lens_shift_vertical_percent_min":-50,"lens_shift_vertical_percent_max":50,"lens_shift_basis":"percent, per Sony datasheet","lens_shift_notes":"Datasheet: throw ratio 0.80-1.02:1; Sony CA site secondary value 0.85-1.09:1 for 16:9 -- conflicting values across regional pages, flagged in exceptions","lens_page_url":"https://pro.sony/s3/2020/07/27124942/VPL-GTZ380-Datasheet.pdf","datasheet_url":"https://pro.sony/s3/2020/07/27124942/VPL-GTZ380-Datasheet.pdf","manual_url":"https://helpguide.sony.net/vpl/gtz380/v1/en/contents/TP1000003577.html","product_status":"current","last_verified_at":"2026-08-24","confidence":"conflicting","record_notes":"Sony help guide: throw ratio 0.80:1 to 1.02:1, shift +/-50%V/+/-18%H; Sony datasheet secondary table: 0.85:1-1.09:1"},{"lens_id":"LNS-011","manufacturer_id":"MFR-003","manufacturer_name":"Sony","lens_model_number":"VPLL-Z8014","lens_name":"VPLL-Z8014 Standard Lens (ARC-F)","canonical_lens_key":"sony vpll-z8014","lens_type":"zoom","zoom_ratio":"2.06x","f_number_or_range":"2.9-3.2","lens_shift_horizontal_percent_min":-31,"lens_shift_horizontal_percent_max":31,"lens_shift_vertical_percent_min":-80,"lens_shift_vertical_percent_max":80,"lens_shift_basis":"percent, per Sony datasheet","lens_shift_notes":"Help guide lists +/-80%V/+/-31%H; datasheet lists throw ratio 1.40-2.73:1; Sony CA and help guide both list shift +/-80%V/+/-31%H consistently","lens_page_url":"https://pro.sony/s3/2020/07/27124942/VPL-GTZ380-Datasheet.pdf","datasheet_url":"https://pro.sony/s3/2020/07/27124942/VPL-GTZ380-Datasheet.pdf","manual_url":"https://helpguide.sony.net/vpl/gtz380/v1/en/contents/TP1000003577.html","product_status":"current","last_verified_at":"2026-08-24","confidence":"official_primary","record_notes":"Secondary source (16:9 display size) gives 1.49-2.91:1; treat 1.40-2.73:1 as primary basis (unspecified aspect) per Sony help guide"},{"lens_id":"LNS-012","manufacturer_id":"MFR-004","manufacturer_name":"Barco","lens_model_number":"TLD+ 0.37","lens_name":"TLD+ 0.37:1 Ultra-Short-Throw Lens","canonical_lens_key":"barco tld+ 0.37","lens_type":"ultra_short_throw","lens_shift_basis":"percent, projector-level range only, not isolated per-lens in this pass","lens_shift_notes":"Projector-level max shift stated as -100% to +130% V / up to +/-40% H 'depending on lens' -- per-lens breakdown not found in this pass","lens_page_url":"https://assets.barco.com/asset/fbef349e-a817-4bcb-821d-b5e1154a2c29/UDX-4K32-en-Spec-sheet.pdf","datasheet_url":"https://assets.barco.com/asset/fbef349e-a817-4bcb-821d-b5e1154a2c29/UDX-4K32-en-Spec-sheet.pdf","manual_url":"https://www.rentex.com/wp-content/uploads/2017/06/Barco-UDX-4K32-User-Manual.pdf","product_status":"current","last_verified_at":"2026-08-24","confidence":"needs_verification","record_notes":"Throw ratio 0.37:1 per UDX-4K32 spec sheet lens list"},{"lens_id":"LNS-013","manufacturer_id":"MFR-004","manufacturer_name":"Barco","lens_model_number":"TLD+ 1.25-1.6","lens_name":"TLD+ 1.25-1.6:1 Zoom Lens","canonical_lens_key":"barco tld+ 1.25-1.6","lens_type":"zoom","lens_shift_basis":"percent, projector-level range only, not isolated per-lens in this pass","lens_shift_notes":"Per-lens shift not broken out in spec sheet; only projector-level max range given","lens_page_url":"https://assets.barco.com/asset/fbef349e-a817-4bcb-821d-b5e1154a2c29/UDX-4K32-en-Spec-sheet.pdf","datasheet_url":"https://assets.barco.com/asset/fbef349e-a817-4bcb-821d-b5e1154a2c29/UDX-4K32-en-Spec-sheet.pdf","manual_url":"https://www.rentex.com/wp-content/uploads/2017/06/Barco-UDX-4K32-User-Manual.pdf","product_status":"current","last_verified_at":"2026-08-24","confidence":"needs_verification","record_notes":"Throw ratio 1.25-1.6:1 per UDX-4K32 spec sheet lens list"}],"compatibility":[{"compatibility_id":"COMP-001","projector_id":"PRJ-001","lens_id":"LNS-001","compatibility_status":"officially_compatible","compatibility_source_id":"SRC-003","compatibility_notes":"Listed as compatible lens for PT-RQ50K in official catalog PDF and optional lens guide","last_verified_at":"2026-08-24","confidence":"official_primary"},{"compatibility_id":"COMP-002","projector_id":"PRJ-001","lens_id":"LNS-002","compatibility_status":"officially_compatible","compatibility_source_id":"SRC-003","compatibility_notes":"Listed in projector manual throw ratio tables for all four aspect ratio modes","last_verified_at":"2026-08-24","confidence":"official_primary"},{"compatibility_id":"COMP-003","projector_id":"PRJ-001","lens_id":"LNS-003","compatibility_status":"officially_compatible","compatibility_source_id":"SRC-003","compatibility_notes":"Listed in projector manual throw ratio tables","last_verified_at":"2026-08-24","confidence":"official_primary"},{"compatibility_id":"COMP-004","projector_id":"PRJ-001","lens_id":"LNS-004","compatibility_status":"officially_compatible","compatibility_source_id":"SRC-005","compatibility_notes":"Applicable projector explicitly listed as PT-RQ50K on lens datasheet","last_verified_at":"2026-08-24","confidence":"official_primary"},{"compatibility_id":"COMP-005","projector_id":"PRJ-001","lens_id":"LNS-005","compatibility_status":"officially_compatible","compatibility_source_id":"SRC-003","compatibility_notes":"Listed in projector manual throw ratio tables","last_verified_at":"2026-08-24","confidence":"official_primary"},{"compatibility_id":"COMP-006","projector_id":"PRJ-001","lens_id":"LNS-006","compatibility_status":"officially_compatible","compatibility_source_id":"SRC-003","compatibility_notes":"Listed in projector manual throw ratio tables","last_verified_at":"2026-08-24","confidence":"official_primary"},{"compatibility_id":"COMP-007","projector_id":"PRJ-001","lens_id":"LNS-007","compatibility_status":"officially_compatible","compatibility_source_id":"SRC-006","compatibility_notes":"Applicable projector explicitly listed as PT-RQ50K on lens page","last_verified_at":"2026-08-24","confidence":"official_primary"},{"compatibility_id":"COMP-008","projector_id":"PRJ-002","lens_id":"LNS-008","compatibility_status":"officially_compatible","compatibility_source_id":"SRC-008","compatibility_notes":"Listed among 9 official optional/standard lenses for Pro L30000UNL series","last_verified_at":"2026-08-24","confidence":"official_primary"},{"compatibility_id":"COMP-009","projector_id":"PRJ-002","lens_id":"LNS-009","compatibility_status":"officially_compatible","compatibility_source_id":"SRC-008","compatibility_notes":"Listed among optional lenses; manual gives distance-based shift table specific to this lens on this projector","last_verified_at":"2026-08-24","confidence":"official_primary"},{"compatibility_id":"COMP-010","projector_id":"PRJ-003","lens_id":"LNS-010","compatibility_status":"officially_compatible","compatibility_source_id":"SRC-010","compatibility_notes":"Listed as optional lens for VPL-GTZ380 on Sony datasheet and help guide","last_verified_at":"2026-08-24","confidence":"official_primary"},{"compatibility_id":"COMP-011","projector_id":"PRJ-003","lens_id":"LNS-011","compatibility_status":"officially_compatible","compatibility_source_id":"SRC-010","compatibility_notes":"Listed as optional/bundled lens for VPL-GTZ380 on Sony datasheet and help guide","last_verified_at":"2026-08-24","confidence":"official_primary"},{"compatibility_id":"COMP-012","projector_id":"PRJ-004","lens_id":"LNS-012","compatibility_status":"officially_compatible","compatibility_source_id":"SRC-012","compatibility_notes":"Listed in Barco UDX-4K32 spec sheet lens lineup (TLD+ family)","last_verified_at":"2026-08-24","confidence":"official_primary"},{"compatibility_id":"COMP-013","projector_id":"PRJ-004","lens_id":"LNS-013","compatibility_status":"officially_compatible","compatibility_source_id":"SRC-012","compatibility_notes":"Listed in Barco UDX-4K32 spec sheet lens lineup (TLD+ family)","last_verified_at":"2026-08-24","confidence":"official_primary"}],"opticalProfiles":[{"optical_profile_id":"OPT-001","projector_id":"PRJ-001","lens_id":"LNS-002","compatibility_id":"COMP-002","profile_name":"PT-RQ50K + ET-D3QW300 (17:9 native)","throw_ratio_min":1.11,"throw_ratio_max":1.7,"throw_ratio_basis":"image_width (17:9 native panel)","throw_ratio_source_raw_value":"1.11-1.70:1","throw_ratio_is_derived":false,"supported_aspect_ratios":"17:9 (native)","aspect_ratio_condition_notes":"Ratio based on 200-inch diagonal reference image per manual footnote","screen_size_or_image_size_conditions":"Throw ratio computed at 200-inch (5.08m) diagonal image","zoom_control_type":"optical_manual","zoom_position_notes":"Powered zoom","lens_shift_horizontal_percent_min":-14,"lens_shift_horizontal_percent_max":14,"lens_shift_vertical_percent_min":-40,"lens_shift_vertical_percent_max":40,"lens_shift_reference_basis":"percent from center of screen","lens_shift_limit_notes":"Manual footnote: 'throw ratio based on value during projection with image size of 5.08m (200in)'","projection_distance_reference_point":"Not explicitly specified in sources reviewed","notes_for_throwline":"Use 17:9 basis for native Throwline calc; separate ratios exist per aspect ratio mode -- do not mix","primary_source_id":"SRC-003","source_raw_excerpt":"Throw ratio*1 1.11-1.70:1 ... *1 The throw ratio is based on the value during projection with the projected image size of 5.08m (200in.)","last_verified_at":"2026-08-24","confidence":"official_primary","data_quality_status":"usable_with_limits","reportedThrowRatioBasis":"image_width (17:9 native panel)","calculationState":"manufacturer_unspecified","automaticCalculationAllowed":false,"calculationGateReason":"The approved research authority does not confirm an image-width basis for this exact profile."},{"optical_profile_id":"OPT-002","projector_id":"PRJ-001","lens_id":"LNS-004","compatibility_id":"COMP-004","profile_name":"PT-RQ50K + ET-D3QT500 (17:9 native)","throw_ratio_min":2,"throw_ratio_max":3.41,"throw_ratio_basis":"image_width (17:9 native panel)","throw_ratio_source_raw_value":"2.00~3.41:1","throw_ratio_is_derived":false,"supported_aspect_ratios":"17:9 (native)","aspect_ratio_condition_notes":"Ratio based on 200-inch diagonal reference image per manual footnote","zoom_control_type":"optical_manual","zoom_position_notes":"Powered zoom, lens memory, stepping motor","lens_shift_reference_basis":"not isolated per-lens in sources reviewed","lens_shift_limit_notes":"Projector max spec (unless lens-specific exception applies): V +/-45%, H +/-16%","notes_for_throwline":"Distinct ratios exist for 16:10 (2.36-4.03), 16:9 (2.13-3.63), 4:3 (2.82-4.83) -- do not mix with 17:9 value","primary_source_id":"SRC-005","source_raw_excerpt":"2.00~3.41:1 for PT-RQ50K (Aspect 17:9); 2.36~4.03:1 (16:10); 2.13~3.63:1 (16:9); 2.82~4.83:1 (4:3)","last_verified_at":"2026-08-24","confidence":"official_primary","data_quality_status":"usable_with_limits","reportedThrowRatioBasis":"image_width (17:9 native panel)","calculationState":"manufacturer_unspecified","automaticCalculationAllowed":false,"calculationGateReason":"The approved research authority does not confirm an image-width basis for this exact profile."},{"optical_profile_id":"OPT-003","projector_id":"PRJ-001","lens_id":"LNS-007","compatibility_id":"COMP-007","profile_name":"PT-RQ50K + ET-D3QT800 (17:9 native)","throw_ratio_min":4.97,"throw_ratio_max":7.76,"throw_ratio_basis":"image_width (17:9 native panel)","throw_ratio_source_raw_value":"4.97~7.76:1","throw_ratio_is_derived":false,"supported_aspect_ratios":"17:9 (native)","aspect_ratio_condition_notes":"Same-panel diagonal-based reference applies per manual convention","zoom_control_type":"optical_manual","zoom_position_notes":"Powered zoom, lens memory, stepping motor","lens_shift_horizontal_percent_min":-10,"lens_shift_horizontal_percent_max":10,"lens_shift_vertical_percent_min":-30,"lens_shift_vertical_percent_max":30,"lens_shift_reference_basis":"percent, projector-level max when this lens installed","notes_for_throwline":"Distinct ratios for 16:10 (5.89-9.21), 16:9 (5.30-8.28), 4:3 (7.06-11.06) -- do not mix","primary_source_id":"SRC-006","source_raw_excerpt":"Throw ratio 4.97~7.76:1 for PT-RQ50K (Aspect 17:9) 5.89~9.21:1 (16:10) 5.30~8.28:1 (16:9) 7.06~11.06:1 (4:3)","last_verified_at":"2026-08-24","confidence":"official_primary","data_quality_status":"usable_with_limits","reportedThrowRatioBasis":"image_width (17:9 native panel)","calculationState":"manufacturer_unspecified","automaticCalculationAllowed":false,"calculationGateReason":"The approved research authority does not confirm an image-width basis for this exact profile."},{"optical_profile_id":"OPT-004","projector_id":"PRJ-002","lens_id":"LNS-008","compatibility_id":"COMP-008","profile_name":"Pro L30000UNL + ELPLM12 (WUXGA 16:10)","throw_ratio_min":1.74,"throw_ratio_max":2.35,"throw_ratio_basis":"image_width (per Epson spec table basis)","throw_ratio_source_raw_value":"1.74 (Wide) - 2.35 (Tele)","throw_ratio_is_derived":false,"supported_aspect_ratios":"16:10 (native WUXGA)","aspect_ratio_condition_notes":"Standard reference lens for L30000UNL series","screen_size_or_image_size_conditions":"Screen size range 100-1000in (zoom wide) documented separately per manual","zoom_control_type":"optical_manual","zoom_position_notes":"Powered zoom/focus/shift","lens_shift_horizontal_percent_min":-30,"lens_shift_horizontal_percent_max":30,"lens_shift_vertical_percent_min":-65,"lens_shift_vertical_percent_max":65,"lens_shift_reference_basis":"percent per Epson spec sheet","projection_distance_reference_point":"Not explicitly documented as distance from a specific physical reference point in sources reviewed","notes_for_throwline":"Zoom screen-size range (100-1000in wide, 100-1000in tele per Singapore brochure) documented separately from throw ratio -- do not conflate","primary_source_id":"SRC-009","source_raw_excerpt":"Throw Ratio (Base on ELPLM12): 1.74 (Wide) - 2.35 (Tele)","last_verified_at":"2026-08-24","confidence":"official_primary","data_quality_status":"usable_with_limits","reportedThrowRatioBasis":"image_width (per Epson spec table basis)","calculationState":"manufacturer_unspecified","automaticCalculationAllowed":false,"calculationGateReason":"The approved research authority does not confirm an image-width basis for this exact profile."},{"optical_profile_id":"OPT-005","projector_id":"PRJ-003","lens_id":"LNS-010","compatibility_id":"COMP-010","profile_name":"VPL-GTZ380 + VPLL-Z8008 (primary basis)","throw_ratio_min":0.8,"throw_ratio_max":1.02,"throw_ratio_basis":"manufacturer_unspecified","throw_ratio_source_raw_value":"0.80:1 to 1.02:1","throw_ratio_is_derived":false,"supported_aspect_ratios":"not specified as single value in primary source","aspect_ratio_condition_notes":"Sony help guide gives 0.80-1.02:1 without stated aspect basis; Sony datasheet secondary table (16:9 display size) gives conflicting 0.85-1.09:1","screen_size_or_image_size_conditions":"Screen size 60-1200in per help guide","zoom_control_type":"optical_motorized","zoom_position_notes":"Motorized","lens_shift_horizontal_percent_min":-18,"lens_shift_horizontal_percent_max":18,"lens_shift_vertical_percent_min":-50,"lens_shift_vertical_percent_max":50,"lens_shift_reference_basis":"percent, per Sony help guide and datasheet","projection_distance_reference_point":"Not explicitly documented","notes_for_throwline":"CONFLICTING SOURCE VALUES -- see research_exceptions EXC-002; do not treat 0.80-1.02 and 0.85-1.09 as interchangeable","primary_source_id":"SRC-010","source_raw_excerpt":"Throw ratio: 0.80:1 to 1.02:1 Shift: +/-50% (V), +/-18% (H)","last_verified_at":"2026-08-24","confidence":"conflicting","data_quality_status":"conflicting","reportedThrowRatioBasis":"manufacturer_unspecified","calculationState":"conflicting","automaticCalculationAllowed":false,"calculationGateReason":"Official ratio evidence conflicts; automatic calculation is blocked."},{"optical_profile_id":"OPT-006","projector_id":"PRJ-003","lens_id":"LNS-011","compatibility_id":"COMP-011","profile_name":"VPL-GTZ380 + VPLL-Z8014 (primary basis)","throw_ratio_min":1.4,"throw_ratio_max":2.73,"throw_ratio_basis":"manufacturer_unspecified","throw_ratio_source_raw_value":"1.40:1 to 2.73:1","throw_ratio_is_derived":false,"supported_aspect_ratios":"not specified as single value in primary source","aspect_ratio_condition_notes":"Sony datasheet secondary table (16:9 display size) gives 1.49-2.91:1 for same lens","screen_size_or_image_size_conditions":"Screen size 60-600in per help guide","zoom_control_type":"optical_motorized","zoom_position_notes":"Motorized","lens_shift_horizontal_percent_min":-31,"lens_shift_horizontal_percent_max":31,"lens_shift_vertical_percent_min":-80,"lens_shift_vertical_percent_max":80,"lens_shift_reference_basis":"percent, per Sony help guide and datasheet","projection_distance_reference_point":"Not explicitly documented","notes_for_throwline":"Two source values for same lens differ by display-size basis (unspecified vs 16:9) -- see EXC-002","primary_source_id":"SRC-010","source_raw_excerpt":"Throw ratio 1.40:1 to 2.73:1 Shift: +/-80% (V), +/-31% (H)","last_verified_at":"2026-08-24","confidence":"conflicting","data_quality_status":"conflicting","reportedThrowRatioBasis":"manufacturer_unspecified","calculationState":"conflicting","automaticCalculationAllowed":false,"calculationGateReason":"Official ratio evidence conflicts; automatic calculation is blocked."},{"optical_profile_id":"OPT-007","projector_id":"PRJ-004","lens_id":"LNS-012","compatibility_id":"COMP-012","profile_name":"UDX-4K32 + TLD+ 0.37 (basis unspecified)","throw_ratio_min":0.37,"throw_ratio_max":0.37,"throw_ratio_basis":"manufacturer_unspecified","throw_ratio_source_raw_value":"0.37","throw_ratio_is_derived":false,"supported_aspect_ratios":"16:10 (projector native)","aspect_ratio_condition_notes":"Spec sheet lists single ratio value 0.37 without explicit min/max range or stated width/diagonal basis","zoom_control_type":"unknown","zoom_position_notes":"Not specified in spec sheet","lens_shift_reference_basis":"not isolated per-lens; projector-level max only","lens_shift_limit_notes":"Projector spec: 'Vertical between -100% to +130%, depending on lens; Horizontal up to +/-40%, depending on lens' -- per-lens split not documented in this source","installation_orientation_constraints":"Per-lens shift and throw-ratio basis not fully documented in the UDX-4K32 spec sheet; full TLD+ lens datasheets not retrieved in this pass -- see EXC-003","notes_for_throwline":"Do not assume this lens gets full projector-max shift; treat as needs_verification","primary_source_id":"SRC-012","source_raw_excerpt":"Lenses TLD+ 0.37, 0.65-0.85, 0.8-1.16:1 ; 1.25-1.6:1 ; 1.5-2.0:1 ; 2.0-2.8:1 ; 2.8-4.5:1 ; 4.5-7.5:1 ; 7.5-11.5:1","last_verified_at":"2026-08-24","confidence":"needs_verification","data_quality_status":"partial","reportedThrowRatioBasis":"manufacturer_unspecified","calculationState":"partial","automaticCalculationAllowed":false,"calculationGateReason":"Optical profile is incomplete; automatic calculation is blocked."},{"optical_profile_id":"OPT-008","projector_id":"PRJ-004","lens_id":"LNS-013","compatibility_id":"COMP-013","profile_name":"UDX-4K32 + TLD+ 1.25-1.6 (basis unspecified)","throw_ratio_min":1.25,"throw_ratio_max":1.6,"throw_ratio_basis":"manufacturer_unspecified","throw_ratio_source_raw_value":"1.25-1.6:1","throw_ratio_is_derived":false,"supported_aspect_ratios":"16:10 (projector native)","aspect_ratio_condition_notes":"Basis (width/diagonal) not stated in spec sheet","zoom_control_type":"optical_manual","zoom_position_notes":"Not specified per-lens in this source","lens_shift_reference_basis":"not isolated per-lens; projector-level max only","lens_shift_limit_notes":"Same limitation as OPT-007","installation_orientation_constraints":"Per-lens optical datasheet not retrieved in this pass -- see EXC-003","notes_for_throwline":"Needs individual TLD+ lens datasheet lookup for shift/offset specifics","primary_source_id":"SRC-012","source_raw_excerpt":"Lenses TLD+ 0.37, 0.65-0.85, 0.8-1.16:1 ; 1.25-1.6:1 ...","last_verified_at":"2026-08-24","confidence":"needs_verification","data_quality_status":"partial","reportedThrowRatioBasis":"manufacturer_unspecified","calculationState":"partial","automaticCalculationAllowed":false,"calculationGateReason":"Optical profile is incomplete; automatic calculation is blocked."}],"sources":[{"source_id":"SRC-001","source_title":"PT-RQ50K Projector Product Page","source_type":"official_product_page","publisher":"Panasonic Connect EU","url":"https://eu.connect.panasonic.com/pt/en/projectors/pt-rq50k","document_date":"2024-04-22","retrieved_at":"2026-08-24T21:00:00Z","applicable_models":"PT-RQ50K","applicable_lenses":"ET-D3QW200 et al.","source_language":"en","source_notes":"Marketing page with throw ratio range summary"},{"source_id":"SRC-002","source_title":"PT-RQ50K | Projector | Panasonic Global","source_type":"official_product_page","publisher":"Panasonic Connect Global","url":"https://docs.connect.panasonic.com/projector/products/rq50k/","document_date":"2011-12-31","retrieved_at":"2026-08-24T21:00:00Z","applicable_models":"PT-RQ50K","source_language":"en","source_notes":"Global docs product hub"},{"source_id":"SRC-003","source_title":"PT-RQ50K 3-Chip DLP Projector Catalog / Operating Manual","source_type":"official_datasheet","publisher":"Panasonic Connect","url":"https://docs.connect.panasonic.com/projector/download/catalog/pdf/PT_RQ50K_2P_ctlg_Eng_PC.pdf","document_date":"2024-01-01","retrieved_at":"2026-08-24T21:00:00Z","applicable_models":"PT-RQ50K","applicable_lenses":"ET-D3QW200, ET-D3QW300, ET-D3QS400, ET-D3QT500, ET-D3QT600, ET-D3QT700, ET-D3QT800","source_language":"en","source_notes":"Catalog PDF; also cross-referenced against official manual at ap.connect.panasonic.com"},{"source_id":"SRC-004","source_title":"PT-RQ50K Spec Page","source_type":"official_product_page","publisher":"Panasonic Connect Global","url":"https://docs.connect.panasonic.com/projector/products/rq50k/spec/","document_date":"2019-12-31","retrieved_at":"2026-08-24T21:00:00Z","applicable_models":"PT-RQ50K","applicable_lenses":"ET-D3QT600, ET-D3QT700, ET-D3QT800, ET-D3QW300","source_language":"en","source_notes":"Per-lens shift limits when installed"},{"source_id":"SRC-005","source_title":"ET-D3QT500 Lens Datasheet","source_type":"official_datasheet","publisher":"Panasonic Connect EU","url":"https://eu.connect.panasonic.com/sites/default/files/media/document/2024-04/ET-D3QT500G_STE_01(sec)_1.pdf","document_date":"2024-04-01","retrieved_at":"2026-08-24T21:00:00Z","applicable_models":"PT-RQ50K","applicable_lenses":"ET-D3QT500","source_language":"en","source_notes":"Lens-specific F-number, focal length, throw ratio table"},{"source_id":"SRC-006","source_title":"ET-D3QT800 3-Chip DLP Projector Zoom Lens Product Page","source_type":"official_product_page","publisher":"Panasonic Connect NA","url":"https://connect.na.panasonic.com/av/projectors/accessories/et-d3qt800-3-chip-dlp-projector-zoom-lens","document_date":"2026-01-01","retrieved_at":"2026-08-24T21:00:00Z","applicable_models":"PT-RQ50K","applicable_lenses":"ET-D3QT800","source_language":"en","source_notes":"Lens product page with featured specs table"},{"source_id":"SRC-007","source_title":"PT-RQ50K Optional Lens Guide","source_type":"official_lens_chart","publisher":"Panasonic Connect Global","url":"https://docs.connect.panasonic.com/projector/optional_lens_guide/","document_date":"2026-01-01","retrieved_at":"2026-08-24T21:00:00Z","applicable_models":"PT-RQ50K","applicable_lenses":"ET-D3QW200, ET-D3QW300","source_language":"en","source_notes":"Manufacturer lens compatibility/throw ratio chart"},{"source_id":"SRC-008","source_title":"Epson Pro L30000UNL/L30002UNL User Manual","source_type":"official_manual","publisher":"Epson America","url":"https://files.support.epson.com/docid/cpd5/cpd59255.pdf","document_date":"2025-01-01","retrieved_at":"2026-08-24T21:00:00Z","applicable_models":"Pro L30000UNL, L30002UNL","applicable_lenses":"ELPLX03, ELPLM12 and other ELPL lenses","source_language":"en","source_notes":"Contains distance-based throw/shift tables per lens"},{"source_id":"SRC-009","source_title":"Pro L30000UNL Laser WUXGA 3LCD Projector Spec Sheet","source_type":"official_datasheet","publisher":"Epson America / ProjectorCentral (hosted PDF)","url":"https://www.projectorcentral.com/pdf/projector_spec_10773.pdf","document_date":"2026-01-01","retrieved_at":"2026-08-24T21:00:00Z","applicable_models":"Pro L30000UNL","applicable_lenses":"ELPLM12","source_language":"en","source_notes":"Hosted official Epson US spec PDF; cross-checked against Epson Singapore brochure"},{"source_id":"SRC-010","source_title":"VPL-GTZ380 Datasheet","source_type":"official_datasheet","publisher":"Sony Professional","url":"https://pro.sony/s3/2020/07/27124942/VPL-GTZ380-Datasheet.pdf","document_date":"2020-07-27","retrieved_at":"2026-08-24T21:00:00Z","applicable_models":"VPL-GTZ380","applicable_lenses":"VPLL-Z8008, VPLL-Z8014","source_language":"en","source_notes":"Contains two internally differing throw-ratio value sets (see EXC-002)"},{"source_id":"SRC-011","source_title":"VPL-GTZ380 Help Guide Specifications","source_type":"official_manual","publisher":"Sony Corporation","url":"https://helpguide.sony.net/vpl/gtz380/v1/en/contents/TP1000003577.html","document_date":"2019-12-31","retrieved_at":"2026-08-24T21:00:00Z","applicable_models":"VPL-GTZ380","applicable_lenses":"VPLL-Z8008, VPLL-Z8014","source_language":"en","source_notes":"Official online help guide specifications page"},{"source_id":"SRC-012","source_title":"UDX-4K32 Spec Sheet","source_type":"official_datasheet","publisher":"Barco","url":"https://assets.barco.com/asset/fbef349e-a817-4bcb-821d-b5e1154a2c29/UDX-4K32-en-Spec-sheet.pdf","document_date":"2026-06-18","retrieved_at":"2026-08-24T21:00:00Z","applicable_models":"UDX-4K32","applicable_lenses":"TLD+ lens family (0.37 through 7.5-11.5:1)","source_language":"en","source_notes":"Last updated 18 Jun 2026 per document footer; lens shift given only as projector-level max, not per-lens"},{"source_id":"SRC-013","source_title":"UDX series User Manual (hosted by Rentex)","source_type":"official_regional","publisher":"Barco (hosted by Rentex, AV rental distributor)","url":"https://www.rentex.com/wp-content/uploads/2017/06/Barco-UDX-4K32-User-Manual.pdf","document_date":"2017-06-01","retrieved_at":"2026-08-24T21:00:00Z","applicable_models":"UDX-4K32, UDX U32, UDX W32, UDX 4K22, UDX W22","applicable_lenses":"TLD+ lens family","source_language":"en","source_notes":"Original manufacturer manual hosted on a third-party rental distributor site; treated as official_regional since content matches Barco documentation but is not hosted on barco.com"}],"researchExceptions":[{"exception_id":"EXC-001","entity_type":"lens","entity_identifier":"LNS-001, LNS-003","issue_type":"nonstandard_shift_spec","description":"Per-lens mechanical shift % for ET-D3QW200 and ET-D3QS400 is not clearly isolated from projector-level max shift figures across the catalog and manual; degree values found appear to represent keystone correction angle, not shift percent","source_ids_considered":"SRC-003, SRC-004, SRC-007","recommendation":"Retrieve dedicated single-lens datasheet PDFs (e.g. ET-D3QW200 lens spec sheet) analogous to ET-D3QT500's if available, to isolate shift % per lens","severity":"medium"},{"exception_id":"EXC-002","entity_type":"optical_profile","entity_identifier":"OPT-005, OPT-006","issue_type":"conflicting_sources","description":"Sony VPL-GTZ380 lens throw ratios differ between the primary datasheet's main table (0.80-1.02:1 / 1.40-2.73:1, basis unstated) and a secondary table on the same PDF plus Sony Canada/Value Electronics reprints (0.85-1.09:1 / 1.49-2.91:1, explicitly for 16:9 display size)","source_ids_considered":"SRC-010, SRC-011, web:23, web:29","recommendation":"Confirm with Sony professional support whether the differing values represent different aspect-ratio/display-size bases (16:9 vs. panel-native) rather than a genuine discrepancy; do not average or pick arbitrarily","severity":"high"},{"exception_id":"EXC-003","entity_type":"lens","entity_identifier":"LNS-012, LNS-013","issue_type":"nonstandard_shift_spec","description":"Barco UDX-4K32 spec sheet gives only a projector-level combined lens-shift range (-100% to +130% V, up to +/-40% H) 'depending on lens' rather than per-TLD+-lens shift figures","source_ids_considered":"SRC-012, SRC-013","recommendation":"Locate individual TLD+ lens datasheets (e.g. TLD+ 0.37, TLD+ 1.25-1.6) on barco.com resource/downloads pages for lens-specific shift, F-number, and throw-basis data","severity":"high"},{"exception_id":"EXC-004","entity_type":"projector","entity_identifier":"PRJ-003","issue_type":"ratio_basis_unclear","description":"VPL-GTZ380 is a home-cinema/high-end consumer product rather than professional installation/rental gear; included per user instruction but market segment must remain clearly flagged as home_theater_high_end and not merged with professional large-venue categories","source_ids_considered":"SRC-010, SRC-011","recommendation":"Keep segregated in any filtered views of the database that target professional AV/rental use cases","severity":"low"},{"exception_id":"EXC-005","entity_type":"lens","entity_identifier":"LNS-004, LNS-005, LNS-006, LNS-007","issue_type":"conflicting_sources","description":"Panasonic manual throw-ratio tables for ET-D3QT600/ET-D3QT700 show an apparent value overlap between the 16:9 column of one lens and the 4:3 column description text extracted from the search snippet; this may be a search-tool extraction artifact rather than a true source conflict","source_ids_considered":"SRC-003","recommendation":"Re-verify exact per-aspect-ratio throw ratio table directly from the official manual PDF pages (not just search snippet) before using QT600/QT700 16:9 and 4:3 values in production calculations","severity":"medium"},{"exception_id":"EXC-006","entity_type":"projector","entity_identifier":"PRJ-004","issue_type":"missing_throw_ratio","description":"Full TLD+ lens family (0.65-0.85, 0.8-1.16:1, 1.5-2.0:1, 2.0-2.8:1, 2.8-4.5:1, 4.5-7.5:1, 7.5-11.5:1) referenced in UDX-4K32 spec sheet was not individually profiled in this pilot pass; only 0.37 and 1.25-1.6 lenses were built out as optical_profiles records","source_ids_considered":"SRC-012","recommendation":"Expand Barco lens coverage in next research phase by pulling each TLD+ lens's individual datasheet","severity":"medium"}],"projectorReferenceAppendix":{"catalogRole":"user_supplied_reference_only","automaticPlanningInputsAllowed":false,"sourceAttachment":"pasted-text.txt","sourceSha256":"8afbcad015b0b4ce5d5a2904dac7d5d60d259cc8547940e97224e2656527a674","receivedOn":"2026-08-24","overlapPolicy":"PRJ-001 through PRJ-004 retain the audited canonical records; appendix rows are raw evidence only.","reviewDisposition":"Do not use lifecycle, brightness, resolution, contrast, lens-system, or confidence claims as planning inputs until field-level provenance is normalized.","rows":[{"projector_id":"PRJ-001","manufacturer_id":"MFR-001","manufacturer_name":"Panasonic Connect","model_number":"PT-RQ50K","model_name":"PT-RQ50K","canonical_model_key":"panasonic pt-rq50k","market_segment":"large_venue_installation","product_status":"current","projector_type":"interchangeable_lens","light_source":"laser","display_technology":"DLP","native_resolution":"4K+ (5120x3200 processing)/WUXGA native panel","native_aspect_ratio":"17:9 (native panel); supports 16:10/16:9/4:3 image modes","brightness_ansi_lm":"50000","brightness_standard_or_mode":"Center lm (ANSI 50,000 lm)","contrast_ratio":"20000:1 (Full On/Full Off, Dynamic Contrast Mode 3)","lens_mount_or_system":"ET-D lens mount (3-Chip DLP)","has_interchangeable_lens":"TRUE","operating_orientation_notes":"Handle attachment changes vertical shift range (-8% to +50% with handle; -50% to +50% without)","product_page_url":"https://eu.connect.panasonic.com/pt/en/projectors/pt-rq50k","primary_datasheet_url":"https://docs.connect.panasonic.com/projector/download/catalog/pdf/PT_RQ50K_2P_ctlg_Eng_PC.pdf","primary_manual_url":"https://ap.connect.panasonic.com/sites/default/files/media/document/2019-11/rq50k_manual_en.pdf","last_verified_at":"2026-08-24","confidence":"official_primary","record_notes":"No lens included; sold lens-less"},{"projector_id":"PRJ-002","manufacturer_id":"MFR-002","manufacturer_name":"Epson","model_number":"Pro L30000UNL","model_name":"Pro L30000UNL (Epson US) / EB-L30000UNL (intl)","canonical_model_key":"epson l30000unl","market_segment":"large_venue_installation","product_status":"current","projector_type":"interchangeable_lens","light_source":"laser","display_technology":"3LCD","native_resolution":"WUXGA (1920x1200) with 4K enhancement","native_aspect_ratio":"16:10","brightness_ansi_lm":"30000","brightness_standard_or_mode":"White/Color Light Output (Normal)","contrast_ratio":"2500000:1 (per Epson spec)","lens_mount_or_system":"Epson interchangeable lens system (9 lens options)","has_interchangeable_lens":"TRUE","operating_orientation_notes":"Rear projection restricted to Wide/Short Throw/Zoom lens only per manual","product_page_url":"https://www.projectorcentral.com/Epson-Pro_L30000U.htm","primary_datasheet_url":"https://www.projectorcentral.com/pdf/projector_spec_10773.pdf","primary_manual_url":"https://files.support.epson.com/docid/cpd5/cpd59255.pdf","last_verified_at":"2026-08-24","confidence":"official_primary","record_notes":"Ships lens-less (UNL = unlensed)"},{"projector_id":"PRJ-003","manufacturer_id":"MFR-003","manufacturer_name":"Sony","model_number":"VPL-GTZ380","model_name":"VPL-GTZ380","canonical_model_key":"sony vpl-gtz380","market_segment":"home_theater_high_end","product_status":"current","projector_type":"interchangeable_lens","light_source":"laser","display_technology":"SXRD","native_resolution":"4K (4096x2160)","native_aspect_ratio":"native 4096x2160 (multiple aspect support via lens/format)","brightness_ansi_lm":"10000","brightness_standard_or_mode":"Center (lm), per Sony marketing 10,000lm class","contrast_ratio":"Infinity:1 (dynamic, per secondary listings)","lens_mount_or_system":"Sony ARC-F lens mount","has_interchangeable_lens":"TRUE","operating_orientation_notes":"Home-cinema market segment; included per user instruction, market segment clearly flagged","product_page_url":"https://pro.sony/s3/2020/07/27124942/VPL-GTZ380-Datasheet.pdf","primary_datasheet_url":"https://pro.sony/s3/2020/07/27124942/VPL-GTZ380-Datasheet.pdf","primary_manual_url":"https://helpguide.sony.net/vpl/gtz380/v1/en/contents/TP1000003577.html","last_verified_at":"2026-08-24","confidence":"official_primary","record_notes":"Consumer/high-end home theater segment"},{"projector_id":"PRJ-004","manufacturer_id":"MFR-004","manufacturer_name":"Barco","model_number":"UDX-4K32","model_name":"UDX-4K32","canonical_model_key":"barco udx-4k32","market_segment":"large_venue_installation","product_status":"current","projector_type":"interchangeable_lens","light_source":"laser","display_technology":"DLP","native_resolution":"3840x2400 (4K UHD)/2560x1600 native/5120x3200 processing","native_aspect_ratio":"16:10","brightness_ansi_lm":"31000","brightness_standard_or_mode":"(WQ) Center lumens; 30,000 ANSI lumens (4K UHD)","contrast_ratio":"2200:1 full field; 20000:1 with DynaBlack","lens_mount_or_system":"TLD/TLD+ lens mount","has_interchangeable_lens":"TRUE","operating_orientation_notes":"Shares TLD+ lens family with legacy UDX series projectors","product_page_url":"https://assets.barco.com/asset/fbef349e-a817-4bcb-821d-b5e1154a2c29/UDX-4K32-en-Spec-sheet.pdf","primary_datasheet_url":"https://assets.barco.com/asset/fbef349e-a817-4bcb-821d-b5e1154a2c29/UDX-4K32-en-Spec-sheet.pdf","primary_manual_url":"https://www.rentex.com/wp-content/uploads/2017/06/Barco-UDX-4K32-User-Manual.pdf","last_verified_at":"2026-08-24","confidence":"official_primary","record_notes":"Lens shift range (-100% to +130% V, up to +/-40% H) is stated as 'depending on lens' only at projector level"},{"projector_id":"PRJ-005","manufacturer_id":"MFR-001","manufacturer_name":"Panasonic Connect","model_number":"PT-RQ35K2","model_name":"PT-RQ35K2 Series","canonical_model_key":"panasonic pt-rq35k2","market_segment":"large_venue_installation","product_status":"current","projector_type":"interchangeable_lens","light_source":"laser","display_technology":"DLP","native_resolution":"4K (3840x2400)/native WUXGA panel","native_aspect_ratio":"16:10","brightness_ansi_lm":"30500","brightness_standard_or_mode":"Center lm / 30,500 ANSI lm / 32,000 lm (Center)","contrast_ratio":"20000:1 (typical)","lens_mount_or_system":"ET-D3LE / ET-D75LE lens mount (3-Chip DLP)","has_interchangeable_lens":"TRUE","operating_orientation_notes":"Shares optional lens lineup with RQ35K, RZ34K2, RZ34K, RQ32K, RZ31K, RS30K, RQ25K, RZ24K, RQ18K, RZ17K, RZ14K families","product_page_url":"https://docs.connect.panasonic.com/projector/products/rq35k/","primary_datasheet_url":"https://eu.connect.panasonic.com/sites/default/files/media/document/2024-04/rq35k_spec_en_2.pdf","primary_manual_url":"https://docs.connect.panasonic.com/projector/products/rq35k/options/","last_verified_at":"2026-08-24","confidence":"official_primary","record_notes":"Sold lens-less; throw ratios vary by exact model within shared family -- do not mix without checking model-specific table"},{"projector_id":"PRJ-006","manufacturer_id":"MFR-001","manufacturer_name":"Panasonic Connect","model_number":"PT-RZ34K2","model_name":"PT-RZ34K2","canonical_model_key":"panasonic pt-rz34k2","market_segment":"large_venue_installation","product_status":"current","projector_type":"interchangeable_lens","light_source":"laser","display_technology":"DLP","native_resolution":"WUXGA (1920x1200) native; converts 4K input to WUXGA","native_aspect_ratio":"16:10","brightness_ansi_lm":"30500","brightness_standard_or_mode":"Center lm / 30,500 ANSI lm","contrast_ratio":"20000:1 (typical)","lens_mount_or_system":"ET-D3LE / ET-D75LE lens mount (3-Chip DLP)","has_interchangeable_lens":"TRUE","operating_orientation_notes":"Paired sibling of PT-RQ35K2 (WUXGA native panel vs 4K panel); shares chassis and lens lineup","product_page_url":"https://docs.connect.panasonic.com/projector/products/rq35k/","primary_datasheet_url":"https://eu.connect.panasonic.com/sites/default/files/media/document/2025-01/rz34k_spec_en.pdf","primary_manual_url":"https://docs.connect.panasonic.com/projector/products/rq35k/options/","last_verified_at":"2026-08-24","confidence":"official_primary","record_notes":"Same lens ecosystem as PT-RQ35K2; throw ratios given per-model due to differing native panel aspect handling"},{"projector_id":"PRJ-007","manufacturer_id":"MFR-001","manufacturer_name":"Panasonic Connect","model_number":"PT-RQ25K","model_name":"PT-RQ25K Series","canonical_model_key":"panasonic pt-rq25k","market_segment":"large_venue_installation","product_status":"current","projector_type":"interchangeable_lens","light_source":"laser","display_technology":"DLP","native_resolution":"4K (3840x2400)/native WUXGA panel","native_aspect_ratio":"16:10","brightness_ansi_lm":"20000","brightness_standard_or_mode":"Center lm / 20,000 ANSI lm","contrast_ratio":"20000:1 (typical)","lens_mount_or_system":"ET-D3LE / ET-D75LE lens mount (3-Chip DLP)","has_interchangeable_lens":"TRUE","operating_orientation_notes":"Smaller/lighter member of shared-lens RQ/RZ family; own throw-ratio column in optional lens guide","product_page_url":"https://ap.connect.panasonic.com/sg/en/products","primary_datasheet_url":"https://docs.connect.panasonic.com/projector/optional_lens_guide/","primary_manual_url":"https://docs.connect.panasonic.com/projector/optional_lens_guide/","last_verified_at":"2026-08-24","confidence":"official_primary","record_notes":"World's smallest/lightest 20,000lm 3-Chip DLP 4K projector per Panasonic marketing"},{"projector_id":"PRJ-008","manufacturer_id":"MFR-002","manufacturer_name":"Epson","model_number":"Pro L25000U","model_name":"Pro L25000U Laser WUXGA 3LCD Projector w/4K Enhancement","canonical_model_key":"epson pro l25000u","market_segment":"large_venue_installation","product_status":"current","projector_type":"interchangeable_lens","light_source":"laser","display_technology":"3LCD","native_resolution":"WUXGA (1920x1200) with 4K Enhancement","native_aspect_ratio":"16:10","brightness_ansi_lm":"25000","brightness_standard_or_mode":"Color/White Light Output (Normal)","contrast_ratio":"","lens_mount_or_system":"Epson interchangeable lens system (8 optional lenses)","has_interchangeable_lens":"TRUE","operating_orientation_notes":"Flagship of Pro L series prior to L30000UNL; rental/staging focus per official page","product_page_url":"https://epson.com/For-Work/Projectors/Large-Venue/Pro-L25000U-Laser-WUXGA-3LCD-Projector-w-4K-Enhancement/p/V11H679820","primary_datasheet_url":"https://epson.com/For-Work/Projectors/Large-Venue/Pro-L25000U-Laser-WUXGA-3LCD-Projector-w-4K-Enhancement/p/V11H679820","primary_manual_url":"https://epson.com/For-Work/Projectors/Large-Venue/Pro-L25000U-Laser-WUXGA-3LCD-Projector-w-4K-Enhancement/p/V11H679820","last_verified_at":"2026-08-24","confidence":"official_primary","record_notes":"Contrast ratio not explicitly stated as single value in page reviewed; detailed datasheet PDF with full lens shift/throw table not yet retrieved -- see exceptions"},{"projector_id":"PRJ-009","manufacturer_id":"MFR-002","manufacturer_name":"Epson","model_number":"Pro L1755U / EB-L1755U","model_name":"Pro L1755U (US) / EB-L1755U (intl)","canonical_model_key":"epson l1755u","market_segment":"large_venue_installation","product_status":"current","projector_type":"interchangeable_lens","light_source":"laser","display_technology":"3LCD","native_resolution":"WUXGA (1920x1200) with 4K Enhancement","native_aspect_ratio":"16:10","brightness_ansi_lm":"15000","brightness_standard_or_mode":"Color/White Light Output (Normal)","contrast_ratio":"2500000:1 AbsoluteBlack (typical Pro L series spec)","lens_mount_or_system":"Epson interchangeable lens system","has_interchangeable_lens":"TRUE","operating_orientation_notes":"Mid-tier large-venue model; ships with standard lens option per region","product_page_url":"https://mediaserver.goepson.com/ImConvServlet/imconv/42e7d7214462d30563176a7aef32fb329b82a712/original?assetDescr=EB-L1755U-datasheet","primary_datasheet_url":"https://mediaserver.goepson.com/ImConvServlet/imconv/42e7d7214462d30563176a7aef32fb329b82a712/original?assetDescr=EB-L1755U-datasheet","primary_manual_url":"https://download.epson.com.sg/manuals/EB-L1505UH_1755U_User%20Guide.pdf","last_verified_at":"2026-08-24","confidence":"official_primary","record_notes":"EU/APAC EB- model number vs US Pro- model number; treated as regional variant with materially identical specs, retained under combined canonical key"},{"projector_id":"PRJ-010","manufacturer_id":"MFR-002","manufacturer_name":"Epson","model_number":"Pro L1500U","model_name":"Pro L1500U Laser WUXGA 3LCD Projector with 4K Enhancement","canonical_model_key":"epson l1500u","market_segment":"large_venue_installation","product_status":"current","projector_type":"interchangeable_lens","light_source":"laser","display_technology":"3LCD","native_resolution":"WUXGA (1920x1200) with 4K Enhancement","native_aspect_ratio":"16:10, also supports 4:3, 16:9","brightness_ansi_lm":"12000","brightness_standard_or_mode":"Color/White Light Output (Normal)","contrast_ratio":"2500000:1 AbsoluteBlack","lens_mount_or_system":"Epson interchangeable lens system (9 optional lenses)","has_interchangeable_lens":"TRUE","operating_orientation_notes":"Ships with Middle#2 Lens (V12H004M09) standard; ideal for events staging, auditoriums, sanctuaries per official page","product_page_url":"https://epson.com/For-Work/Projectors/Large-Venue/Pro-L1500U-Laser-WUXGA-3LCD-Projector-with-4K-Enhancement-&-Standard-Lens/p/V11H92","primary_datasheet_url":"https://mediaserver.goepson.com/ImConvServlet/imconv/3af826106b1817833ec04e49dee1b54b945ae73c/original","primary_manual_url":"https://mediaserver.goepson.com/ImConvServlet/imconv/3af826106b1817833ec04e49dee1b54b945ae73c/original","last_verified_at":"2026-08-24","confidence":"official_primary","record_notes":"House-of-worship/auditorium segment explicitly named by Epson"},{"projector_id":"PRJ-011","manufacturer_id":"MFR-004","manufacturer_name":"Barco","model_number":"UDX-4K22","model_name":"UDX-4K22","canonical_model_key":"barco udx-4k22","market_segment":"large_venue_installation","product_status":"current","projector_type":"interchangeable_lens","light_source":"laser","display_technology":"DLP","native_resolution":"3840x2400 (4K UHD)/2560x1600 native/5120x3200 processing","native_aspect_ratio":"16:10","brightness_ansi_lm":"19000-20000","brightness_standard_or_mode":"(WQ)/(4K UHD) center and ANSI lumens per spec sheet","contrast_ratio":"2200:1 full field / 20000:1 DynaBlack","lens_mount_or_system":"TLD+ lens mount (shared with UDX-4K32, UDM series)","has_interchangeable_lens":"TRUE","operating_orientation_notes":"Smaller-lumen sibling of UDX-4K32; same TLD+ lens family and mount","product_page_url":"https://www.barco.com/en/products/projection/rental-projectors/udx","primary_datasheet_url":"https://manuals.plus/m/66aad2840338f6dc1a93fd08fa0dd05135647e1f90adf09a8bc5cd8ae0cb354d","primary_manual_url":"https://manuals.plus/m/66aad2840338f6dc1a93fd08fa0dd05135647e1f90adf09a8bc5cd8ae0cb354d","last_verified_at":"2026-08-24","confidence":"official_regional","record_notes":"Spec sheet content sourced via manuals.plus regional mirror; cross-check against barco.com primary asset when available"},{"projector_id":"PRJ-012","manufacturer_id":"MFR-004","manufacturer_name":"Barco","model_number":"UDM-4K22","model_name":"UDM-4K22","canonical_model_key":"barco udm-4k22","market_segment":"large_venue_installation","product_status":"current","projector_type":"interchangeable_lens","light_source":"laser","display_technology":"DLP","native_resolution":"3840x2400 (4K UHD)/2560x1600 native/5120x3200 processing","native_aspect_ratio":"16:10","brightness_ansi_lm":"20000-21000","brightness_standard_or_mode":"Center/ANSI/ISO lumens per spec sheet","contrast_ratio":"2200:1 full field / 20000:1 DynaBlack","lens_mount_or_system":"TLD+ lens mount","has_interchangeable_lens":"TRUE","operating_orientation_notes":"Installation-oriented sibling of UDX line (UDM = fixed-install variant)","product_page_url":"https://assets.barco.com/m/5baeef26d9138bb3/original/UDM-4K22-en-Spec-sheet.pdf","primary_datasheet_url":"https://assets.barco.com/m/5baeef26d9138bb3/original/UDM-4K22-en-Spec-sheet.pdf","primary_manual_url":"https://assets.barco.com/m/5baeef26d9138bb3/original/UDM-4K22-en-Spec-sheet.pdf","last_verified_at":"2026-08-24","confidence":"official_primary","record_notes":"EN spec sheet: shift 'Vertical -100% to +130%, Horizontal up to +/-40%, depending on lens'; FR spec sheet gives differing wording 'up to 160%/down to 150%, Horizontal +/-50%' -- treated as conflicting, see EXC-007"},{"projector_id":"PRJ-013","manufacturer_id":"MFR-004","manufacturer_name":"Barco","model_number":"HDF-W30 FLEX","model_name":"HDF-W30 FLEX","canonical_model_key":"barco hdf-w30 flex","market_segment":"large_venue_installation","product_status":"discontinued","projector_type":"interchangeable_lens","light_source":"lamp","display_technology":"DLP","native_resolution":"1920x1200 (WUXGA)","native_aspect_ratio":"16:10","brightness_ansi_lm":"30000","brightness_standard_or_mode":"Center lumens / 28,000 ANSI lumens","contrast_ratio":"1900:1 standard / 2200:1 high contrast mode","lens_mount_or_system":"TLD+ lens mount (legacy)","has_interchangeable_lens":"TRUE","operating_orientation_notes":"Legacy xenon-lamp large-venue workhorse still common in rental inventories; laser variant sold separately as HDF-W30LP FLEX","product_page_url":"https://assets.barco.com/m/37e26d132fd4e9f4/original/HDF-W30-FLEX-en-Spec-sheet.pdf","primary_datasheet_url":"https://assets.barco.com/m/37e26d132fd4e9f4/original/HDF-W30-FLEX-en-Spec-sheet.pdf","primary_manual_url":"https://www.audiogeneral.com/barco/projector_manuals/HDF_Series_OM.pdf","last_verified_at":"2026-08-24","confidence":"official_primary","record_notes":"Rentex-hosted spec sheet gives different shift range (-10% to +110% V) vs Barco official (-30% to +120% V) -- flagged in exceptions as version/regional discrepancy"}]}}</script>
+<!-- THROWLINE_CATALOG_END -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.184.0/build/three.module.js",
+    "three/addons/controls/OrbitControls.js": "https://unpkg.com/three@0.184.0/examples/jsm/controls/OrbitControls.js",
+    "three/addons/exporters/OBJExporter.js": "https://unpkg.com/three@0.184.0/examples/jsm/exporters/OBJExporter.js",
+    "three/addons/exporters/GLTFExporter.js": "https://unpkg.com/three@0.184.0/examples/jsm/exporters/GLTFExporter.js"
+  },
+  "integrity": {
+    "https://unpkg.com/three@0.184.0/build/three.module.js": "sha384-8FCZ1eVO6it4+pbec2aDtnTrwjWXZLJRC+MAGCIPDgsYnUrl/E0A2YlF8ioMKI/J",
+    "https://unpkg.com/three@0.184.0/build/three.core.js": "sha384-dw2ooPewaEIrAgl6oFDBmmBWCE9oW9LxRGcfwZ0hLvEprzo202wXl7vCYHRlSnOT",
+    "https://unpkg.com/three@0.184.0/examples/jsm/controls/OrbitControls.js": "sha384-4rziNxOBZKQ69i+w+f89KJ55TCYquwchVbByQwmaOeIOXdOU2PLDn3kOfXHwIJC9",
+    "https://unpkg.com/three@0.184.0/examples/jsm/exporters/OBJExporter.js": "sha384-nbwtoZENJD3Vq+ACK0CuGQdPMuDWHkamC2KJD70EV5nfg6jQjfppKOea07YJN+N3",
+    "https://unpkg.com/three@0.184.0/examples/jsm/exporters/GLTFExporter.js": "sha384-VofkvpG6HERhFCYbsUOHeNXBCqID2nfqkQqnVzE1jc/oPcz+qJ13ADdXH08hE+cQ"
+  }
+}
+</script>
+<style>
+:root{
+  color-scheme:light;
+  --deck:#f4f1ea;--case:#fbfaf7;--case-hi:#ece7dd;--line:#b9b1a5;--line-lo:#d9d2c7;
+  --chalk:#1c2026;--dim:#4c535d;--dimmer:#666e79;
+  --hazard:#8a6400;--hazard-lo:rgba(138,100,0,.11);--hazard-mid:rgba(138,100,0,.32);
+  --safety:#b53f35;--safety-lo:rgba(181,63,53,.10);
+  --go:#25724b;--go-lo:rgba(37,114,75,.10);--go-mid:rgba(37,114,75,.55);
+  --info:#276b9e;--info-lo:rgba(39,107,158,.08);--primary-ink:#fffaf0;--overlay:rgba(251,250,247,.93);
+  --mono:ui-monospace,"SFMono-Regular","SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+  --sans:"Arial Narrow","Roboto Condensed","Segoe UI",Arial,sans-serif;
+  --r:4px;
+}
+html[data-theme=dark]{
+  color-scheme:dark;
+  --deck:#131519;--case:#1b1e24;--case-hi:#22262e;--line:#2e343e;--line-lo:#242931;
+  --chalk:#e9e7e2;--dim:#a9afb8;--dimmer:#9299a3;
+  --hazard:#f2c012;--hazard-lo:rgba(242,192,18,.13);--hazard-mid:rgba(242,192,18,.30);
+  --safety:#e65b4c;--safety-lo:rgba(230,91,76,.12);
+  --go:#65c596;--go-lo:rgba(101,197,150,.12);--go-mid:rgba(101,197,150,.55);
+  --info:#68a9df;--info-lo:rgba(104,169,223,.08);--primary-ink:#17140a;--overlay:rgba(27,30,36,.93);
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--deck);color:var(--chalk);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+a{color:var(--hazard)}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+three-d-stage:not(:defined){visibility:hidden}
+.app{display:grid;grid-template-columns:300px 1fr;grid-template-rows:auto 1fr;grid-template-areas:"header header" "controls stage";height:100%;min-height:0}
+header{grid-area:header;display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:11px 18px;background:var(--case);border-bottom:1px solid var(--line)}
+.brand{margin:0;font-family:var(--mono);font-weight:700;font-size:15px;letter-spacing:.2em;text-transform:uppercase}
+.tag{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--dimmer);border:1px solid var(--line);border-radius:var(--r);padding:3px 7px}
+.companion{margin:0;font-size:12px;color:var(--dimmer)}
+.header-actions{margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.header-more{display:none}
+.suite-link{display:inline-flex;align-items:center;min-height:34px;padding:6px 8px;font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+.theme-toggle{display:inline-flex;align-items:center;gap:7px;min-height:34px;padding:6px 9px;border:1px solid var(--line);border-radius:var(--r);background:var(--case-hi);color:var(--dim);font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
+.theme-toggle svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.theme-icon-sun{display:none}
+html[data-theme=dark] .theme-icon-moon{display:none}
+html[data-theme=dark] .theme-icon-sun{display:block}
+aside{grid-area:controls;background:var(--case);border-right:1px solid var(--line);overflow:auto;padding:16px;min-height:0}
+.adjust-panel{padding:0;border:0}
+.adjust-panel>summary{display:none}
+.adjust-content{display:flex;flex-direction:column;gap:16px}
+main{grid-area:stage;position:relative;min-width:0;min-height:0}
+.stage-canvas{position:absolute;inset:0;min-width:0;min-height:0}
+three-d-stage{width:100%;height:100%}
+.lab{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--dimmer);margin-bottom:6px}
+.grp{display:flex;flex-direction:column;gap:12px}
+.grp>h3{margin:0;font-family:var(--mono);font-size:10px;letter-spacing:.11em;text-transform:uppercase;color:var(--dimmer);font-weight:400;display:flex;align-items:center;gap:9px}
+.grp>h3::after{content:"";flex:1;height:1px;background:var(--line-lo)}
+select,input[type=text]{width:100%;background:var(--deck);color:var(--chalk);border:1px solid var(--line);border-radius:var(--r);padding:9px 10px;font-family:var(--mono);font-size:13px;min-height:38px}
+input[type=range]{width:100%;accent-color:var(--hazard);height:30px}
+.val{font-family:var(--mono);font-size:12px;font-variant-numeric:tabular-nums;color:var(--chalk);float:right;text-transform:none;letter-spacing:0}
+:focus-visible{outline:2px solid var(--hazard);outline-offset:2px}
+button{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;border-radius:var(--r);cursor:pointer;min-height:34px;padding:8px 10px;border:1px solid var(--line);background:var(--case-hi);color:var(--dim)}
+button.pri{background:var(--hazard);border-color:var(--hazard);color:var(--primary-ink);font-weight:700}
+button[aria-pressed=true]{background:var(--line-lo);color:var(--chalk);border-color:var(--line)}
+.row{display:flex;gap:7px;flex-wrap:wrap}
+.hud{position:absolute;z-index:2;left:16px;top:16px;background:var(--overlay);backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:var(--r);padding:13px 15px;min-width:250px;pointer-events:none;background-image:repeating-linear-gradient(135deg,transparent 0 9px,var(--hazard-lo) 9px 18px)}
+.hud .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--dimmer)}
+.hud .big{font-family:var(--mono);font-weight:700;font-size:40px;line-height:1;letter-spacing:-.035em;color:var(--hazard);margin:6px 0 5px;font-variant-numeric:tabular-nums}
+.hud .sub{font-family:var(--mono);font-size:11.5px;font-variant-numeric:tabular-nums;color:var(--dim)}
+.hud .note{font-size:12px;margin-top:7px}
+.band{position:relative;height:12px;background:var(--deck);border:1px solid var(--line);border-radius:2px;overflow:hidden;margin-top:9px}
+.band .nom,.band .safe,.band .pin{position:absolute;top:0;bottom:0}
+.band::before{content:"";position:absolute;inset:0;z-index:2;background:repeating-linear-gradient(90deg,transparent 0 23px,color-mix(in srgb,var(--line) 72%,transparent) 23px 24px);pointer-events:none}
+.band .nom{background:var(--hazard-lo);border-inline:1px solid var(--hazard-mid)}
+.band .safe{top:2px;bottom:2px;background:repeating-linear-gradient(135deg,var(--go-lo) 0 5px,transparent 5px 9px);border-left:2px solid var(--go);border-right:2px solid var(--go)}
+.band .pin{z-index:3;width:3px;background:var(--hazard);box-shadow:0 0 0 1px var(--case)}
+.facts{position:absolute;z-index:2;right:16px;top:16px;margin:0;background:var(--overlay);backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:var(--r);pointer-events:none;font-family:var(--mono);font-size:11px;overflow:hidden}
+.facts div{display:flex;gap:14px;justify-content:space-between;padding:7px 13px;border-bottom:1px solid var(--line-lo)}
+.facts div:last-child{border-bottom:0}
+.facts dt{color:var(--dimmer);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase}
+.facts dd{margin:0;font-variant-numeric:tabular-nums}
+.scene-toolbar{position:absolute;z-index:3;right:16px;top:210px;width:min(310px,calc(100% - 32px));padding:10px;background:var(--overlay);backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:var(--r);box-shadow:0 8px 22px rgba(0,0,0,.08)}
+.scene-toolbar .grp{gap:8px}
+.scene-toolbar .row{justify-content:flex-end}
+.mobile-exports{display:none}
+.state-label{display:inline-flex;align-items:center;min-height:24px;margin-top:7px;padding:3px 7px;border:1px solid currentColor;border-radius:var(--r);font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--go)}
+.field-verify-toggle[aria-pressed=true]{background:var(--go);border-color:var(--go);color:#fff}
+.model-note{font-size:11.5px;color:var(--dimmer);margin:0;border-top:1px solid var(--line-lo);padding-top:12px}
+.adjust-summary-value{color:var(--hazard);font-variant-numeric:tabular-nums}
+body[data-field-verify=true] .companion,
+body[data-field-verify=true] .online-note,
+body[data-field-verify=true] .model-note,
+body[data-field-verify=true] .kbd-help,
+body[data-field-verify=true] .av-suite-link,
+body[data-field-verify=true] .mobile-exports{display:none}
+body[data-field-verify=true] header{position:sticky;top:0;z-index:9}
+.kbd-help{font-size:11.5px;color:var(--dimmer);margin:0;border-top:1px solid var(--line-lo);padding-top:12px}
+.online-note{margin:0;padding:10px 11px;border-left:3px solid var(--info);background:var(--info-lo);font-size:11.5px;color:var(--dim)}
+.calculation-gate{margin:0;padding:10px 11px;border-left:3px solid var(--hazard);background:var(--hazard-lo);font-size:11.5px;color:var(--ink);line-height:1.45}
+html[data-calculation-mode="manufacturer_unspecified"] .calculation-gate,html[data-calculation-mode="conflicting"] .calculation-gate,html[data-calculation-mode="partial"] .calculation-gate,html[data-calculation-mode="legacy_unverified"] .calculation-gate,html[data-calculation-mode="blocked"] .calculation-gate{border-color:var(--safety);background:var(--safety-lo);color:var(--safety)}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}
+  button:active{transform:none!important}
+}
+@media (max-width:820px){
+  html,body{height:auto;min-height:100%}
+  .app{grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto auto auto auto auto auto;grid-template-areas:"header" "hud" "controls" "stage" "scene-controls" "exports" "facts";height:auto;min-height:100svh;background:var(--deck)}
+  header{padding:10px 12px;gap:8px}
+  .companion{display:none}
+  .header-actions{margin-left:auto;flex:0 1 auto;order:0}
+  .header-actions>*{min-height:44px}
+  .av-suite-link{display:none}
+  .header-more{display:inline-block;position:relative;padding:0}
+  .header-more summary{display:flex;align-items:center;min-height:44px;padding:6px 9px;border:1px solid var(--line);border-radius:var(--r);font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
+  .header-more .suite-link{position:absolute;right:0;top:calc(100% + 5px);z-index:12;width:max-content;background:var(--case);border:1px solid var(--line);box-shadow:0 8px 20px rgba(0,0,0,.18)}
+  main{display:contents}
+  .stage-canvas{grid-area:stage;position:relative;inset:auto;min-height:0;margin-top:10px}
+  three-d-stage{height:auto}
+  .hud,.facts{position:static;width:auto;min-width:0;margin:0 12px;pointer-events:auto;backdrop-filter:none}
+  .hud{grid-area:hud;margin-top:10px}
+  .facts{grid-area:facts;margin-bottom:12px}
+  .scene-toolbar{grid-area:scene-controls;position:static;width:auto;margin:0 12px;padding:12px;backdrop-filter:none;box-shadow:none}
+  .scene-toolbar .row{justify-content:stretch}
+  .mobile-exports{grid-area:exports;display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 12px 10px}
+  .mobile-exports button{min-height:44px}
+  .facts div{gap:8px}
+  aside{grid-area:controls;border-right:0;border-top:0;overflow:visible;padding:10px 12px 0;background:var(--deck)}
+  .adjust-panel{border:1px solid var(--line);border-radius:var(--r);background:var(--case);overflow:hidden}
+  .adjust-panel>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:44px;padding:9px 12px;font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;list-style:none}
+  .adjust-panel>summary::-webkit-details-marker{display:none}
+  .adjust-panel>summary::after{content:"+";font-size:16px;color:var(--hazard)}
+  .adjust-panel[open]>summary::after{content:"−"}
+  .adjust-content{padding:12px;border-top:1px solid var(--line-lo)}
+  button,select,input[type=range]{min-height:44px}
+  input[type=range]{height:44px}
+  .row button{flex:1 1 86px}
+  body[data-field-verify=true] .facts div:nth-child(n+6){display:none}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1 class="brand">THROW<span style="color:var(--hazard)">LINE</span></h1>
+    <span class="tag">Stage 3D · SHOW 2.0</span>
+    <p class="companion">Optional online companion · the SHOW 2.0 calculator remains fully offline</p>
+    <nav class="header-actions" aria-label="Throwline destinations">
+      <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false" aria-label="Switch to dark mode">
+        <svg class="theme-icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.2 15.3A8.5 8.5 0 0 1 8.7 3.8 8.5 8.5 0 1 0 20.2 15.3Z"/></svg>
+        <svg class="theme-icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.5"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+        <span id="themeLabel">dark</span>
+      </button>
+      <button class="field-verify-toggle" id="fieldVerifyToggle" type="button" aria-pressed="false">Field Verify</button>
+      <a class="suite-link" href="index.html">Offline main app</a>
+      <a class="suite-link av-suite-link" href="../av-suite.html">AV Suite</a>
+      <details class="header-more"><summary>More</summary><a class="suite-link" href="../av-suite.html">AV Suite</a></details>
+    </nav>
+  </header>
+
+  <aside aria-labelledby="controlsHeading">
+    <h2 class="sr-only" id="controlsHeading">Stage controls</h2>
+    <details class="adjust-panel" id="adjustPanel" open>
+      <summary>Adjust <span class="adjust-summary-value" id="adjustSummary">20' screen · 22' set</span></summary>
+      <div class="adjust-content">
+    <p class="online-note"><strong>Online companion.</strong> Three.js loads from pinned unpkg modules. If it is unavailable, return to the self-contained <a href="index.html">Throwline main app</a>.</p>
+    <div class="grp">
+      <h3>Screen</h3>
+      <div><label class="lab" for="sw">Width <span class="val" id="swv">20' 0"</span></label><input id="sw" type="range" min="8" max="40" step="0.5" value="20"></div>
+      <div><label class="lab" for="st">Bottom off deck <span class="val" id="stv">4' 0"</span></label><input id="st" type="range" min="0" max="10" step="0.25" value="4"></div>
+      <div><label class="lab" for="ar">Aspect</label><select id="ar"><option value="1.7778">16:9 · HD / UHD</option><option value="1.6">16:10 · WUXGA</option><option value="2.39">2.39:1 · scope</option><option value="1.3333">4:3 · legacy</option></select></div>
+    </div>
+
+    <div class="grp">
+      <h3>Calculation input</h3>
+      <p class="calculation-gate" id="stageCalculationGate" role="status">MANUAL SIMULATION · operator-supplied ratio preset · unverified.</p>
+      <div><label class="lab" for="lens">Manual ratio preset</label><select id="lens">
+        <option value="0.978,1.320" selected>Manual preset A · 0.978–1.320:1</option>
+        <option value="1.300,1.740">Manual preset B · 1.300–1.740:1</option>
+        <option value="1.700,2.400">Manual preset C · 1.700–2.400:1</option>
+        <option value="2.400,4.700">Manual preset D · 2.400–4.700:1</option>
+        <option value="0.650,0.650">Manual fixed preset · 0.650:1</option>
+      </select></div>
+      <div><label class="lab" for="lh">Lens optical height <span class="val" id="lhv">6' 0"</span></label><input id="lh" type="range" min="1" max="16" step="0.25" value="6"></div>
+    </div>
+
+    <div class="grp">
+      <h3>Placement</h3>
+      <div><label class="lab" for="d">Set distance <span class="val" id="dv">22' 0"</span></label><input id="d" type="range" min="6" max="60" step="0.25" value="22"></div>
+      <div class="row" role="group" aria-label="Distance snap controls">
+        <button id="bw" type="button">snap wide</button>
+        <button id="bm" class="pri" type="button">safe mid</button>
+        <button id="bt" type="button">snap tele</button>
+      </div>
+    </div>
+
+    <p class="model-note">Every part is a named mesh, so the OBJ and GLB open in Blender with <em>screen</em>, <em>projector_body</em>, <em>lens_barrel</em> and <em>cart</em> as separate objects.</p>
+    <p class="kbd-help"><strong>Keyboard:</strong> focus the stage, then use 1–5 for cameras, arrow keys to orbit, +/− to zoom, and 0 or Home to reset.</p>
+      </div>
+    </details>
+  </aside>
+
+  <main aria-labelledby="stageHeading">
+    <h2 class="sr-only" id="stageHeading">Interactive projector stage</h2>
+    <section class="scene-toolbar" aria-label="Scene controls">
+      <div class="grp">
+        <h3>View</h3>
+        <div class="row" role="group" aria-label="Camera presets">
+          <button type="button" data-cam="three" aria-pressed="true" aria-keyshortcuts="1">1 · 3/4</button>
+          <button type="button" data-cam="side" aria-pressed="false" aria-keyshortcuts="2">2 · side</button>
+          <button type="button" data-cam="front" aria-pressed="false" aria-keyshortcuts="3">3 · front</button>
+          <button type="button" data-cam="top" aria-pressed="false" aria-keyshortcuts="4">4 · top</button>
+          <button type="button" data-cam="op" aria-pressed="false" aria-keyshortcuts="5">5 · operator</button>
+        </div>
+        <div class="row" role="group" aria-label="Stage visibility">
+          <button id="tcone" type="button" aria-pressed="true">beam</button>
+          <button id="troom" type="button" aria-pressed="true">room</button>
+          <button id="tgrid" type="button" aria-pressed="true">grid</button>
+          <button id="resetView" type="button" aria-keyshortcuts="0 Home">reset</button>
+        </div>
+      </div>
+    </section>
+    <section class="mobile-exports" aria-label="Stage export">
+      <button id="mobileObj" type="button" disabled>Download OBJ + MTL</button>
+      <button id="mobileGlb" type="button" disabled>Download GLB</button>
+    </section>
+    <div class="stage-canvas">
+      <three-d-stage name="throwline-stage" fallback="index.html" role="region" aria-label="Interactive Throwline Stage 3D"></three-d-stage>
+    </div>
+    <section class="hud" aria-labelledby="setMarkHeading">
+      <h3 class="sr-only" id="setMarkHeading">Set mark</h3>
+      <div class="k">Set mark · screen to optical origin</div>
+      <div class="big" id="hDist">22' 0"</div>
+      <div class="sub"><span style="color:var(--dimmer)">wide </span><span id="hWide">19' 6¾"</span> <span style="color:var(--dimmer)">· tele </span><span id="hTele">26' 4¾"</span></div>
+      <div class="band"><div class="nom" id="bNom"></div><div class="safe" id="bSafe"></div><div class="pin" id="bPin"></div></div>
+      <div class="note" id="hNote">Inside the ±5% conservative planning zone.</div>
+      <div class="state-label" id="hState">PASS · SAFE</div>
+    </section>
+    <dl class="facts" aria-label="Stage facts">
+      <div><dt>Image</dt><dd id="fImg">20' 0" × 11' 3"</dd></div>
+      <div><dt>Screen</dt><dd id="fScr">20' 0" × 11' 3"</dd></div>
+      <div><dt>Spill</dt><dd id="fSpill">none</dd></div>
+      <div><dt>Required ratio</dt><dd id="fRatio">1.100:1</dd></div>
+      <div><dt>Shift</dt><dd id="fShift">+29.0%</dd></div>
+      <div><dt>Lens</dt><dd id="fLens">ET-DLE105</dd></div>
+      <div><dt>Optical height</dt><dd id="fHeight">6' 0"</dd></div>
+    </dl>
+    <div class="sr-only" id="stageStatus" role="status" aria-live="polite" aria-atomic="true">Stage 3D loading.</div>
+    <div class="sr-only" id="sceneSummary" role="status" aria-live="polite" aria-atomic="true">Projection scene loading.</div>
+  </main>
+</div>
+
+<script src="./three-d-stage.js"></script>
+<script type="module">
+const FT = 0.3048;
+const stage = document.querySelector('three-d-stage');
+const stageStatus = document.getElementById('stageStatus');
+const themeToggle = document.getElementById('themeToggle');
+const themeLabel = document.getElementById('themeLabel');
+const themeColor = document.getElementById('themeColor');
+const fieldVerifyToggle = document.getElementById('fieldVerifyToggle');
+const adjustPanel = document.getElementById('adjustPanel');
+const mobileObj = document.getElementById('mobileObj');
+const mobileGlb = document.getElementById('mobileGlb');
+const stageCalculationGate = document.getElementById('stageCalculationGate');
+
+function parseStageCatalog(){
+  try {
+    const data = JSON.parse(document.getElementById('throwlineCatalog')?.textContent || '');
+    if (data?.schemaVersion !== 1 || !Array.isArray(data.projectors) || !Array.isArray(data.lenses) || !Array.isArray(data.compatibility) || !Array.isArray(data.opticalProfiles)) throw new Error('catalog schema is incomplete');
+    return {ok:true,error:'',data};
+  } catch (error) {
+    console.error('Stage 3D catalog rejected',error);
+    return {ok:false,error:String(error?.message || error),data:{projectors:[],lenses:[],compatibility:[],opticalProfiles:[]}};
+  }
+}
+function stageEligibleProfile(profile){
+  return !!profile && profile.automaticCalculationAllowed === true && profile.calculationState === 'verified_image_width' && Number.isFinite(Number(profile.throw_ratio_min)) && Number(profile.throw_ratio_min) > 0 && Number.isFinite(Number(profile.throw_ratio_max)) && Number(profile.throw_ratio_max) >= Number(profile.throw_ratio_min);
+}
+const STAGE_CATALOG = parseStageCatalog();
+function resolveStageTransfer(){
+  const params = new URLSearchParams(location.search);
+  const number = (key,fallback)=>{ if (!params.has(key) || params.get(key)==='') return fallback; const value = Number(params.get(key)); return Number.isFinite(value) ? value : fallback; };
+  const bounded = (key,fallback,min,max)=>Math.min(max,Math.max(min,number(key,fallback)));
+  const screenWidth = bounded('w',20,8,40), screenAspect = bounded('ar',1.7778,1,3), basisWidth = bounded('basisW',screenWidth,4,80), rasterAspect = bounded('rasterAr',screenAspect,1,3);
+  const base = {w:screenWidth,bottom:bounded('bottom',4,0,10),ar:screenAspect,basisW:basisWidth,basisScale:basisWidth/screenWidth,rasterAr:rasterAspect,lh:bounded('lh',6,1,16),dist:bounded('dist',22,6,60)};
+  const requestedMode = params.get('mode') || 'manual', projectorId = params.get('projector') || '', lensId = params.get('lens') || '', profileId = params.get('profile') || '';
+  const data = STAGE_CATALOG.data;
+  const projector = data.projectors.find(item=>item.projector_id===projectorId) || null;
+  const lens = data.lenses.find(item=>item.lens_id===lensId) || null;
+  const compatibility = data.compatibility.find(item=>item.projector_id===projectorId && item.lens_id===lensId) || null;
+  const profile = data.opticalProfiles.find(item=>item.projector_id===projectorId && item.lens_id===lensId && (!profileId || item.optical_profile_id===profileId)) || null;
+  const hasIds = !!(projectorId || lensId || profileId), validIds = !!(projector && lens && compatibility && (!profileId || profile?.optical_profile_id===profileId));
+  const ratio = number('ratio',NaN), stamp = params.get('stamp') || '';
+  if (requestedMode === 'field_verified' && hasIds && (!STAGE_CATALOG.ok || !validIds)) return {...base,mode:'blocked',wide:NaN,tele:NaN,allowed:false,label:'Invalid field transfer',reason:'CALCULATION BLOCKED · field-calibrated transfer IDs do not resolve to one exact compatible pair.',profile:null};
+  if (requestedMode === 'field_verified' && Number.isFinite(ratio) && ratio > 0 && stamp) return {...base,mode:'field_verified',wide:ratio,tele:ratio,allowed:true,label:`${projector?.model_number || 'Job'} + ${lens?.lens_model_number || 'measured optic'}`,reason:'FIELD VERIFIED · job-scoped measured ratio.',profile};
+  if (hasIds) {
+    if (!STAGE_CATALOG.ok) return {...base,mode:'blocked',wide:NaN,tele:NaN,allowed:false,label:'Catalog unavailable',reason:`CALCULATION BLOCKED · embedded catalog rejected: ${STAGE_CATALOG.error}`,profile:null};
+    if (!validIds) return {...base,mode:'blocked',wide:NaN,tele:NaN,allowed:false,label:'Invalid catalog transfer',reason:'CALCULATION BLOCKED · planner IDs do not resolve to one exact compatible catalog pair.',profile:null};
+    if (requestedMode === 'verified_image_width' && stageEligibleProfile(profile)) return {...base,mode:'verified_image_width',wide:Number(profile.throw_ratio_min),tele:Number(profile.throw_ratio_max),allowed:true,label:`${projector.model_number} + ${lens.lens_model_number}`,reason:'VERIFIED IMAGE-WIDTH PROFILE',profile};
+    return {...base,mode:profile?.calculationState || 'partial',wide:Number(profile?.throw_ratio_min),tele:Number(profile?.throw_ratio_max),allowed:false,label:`${projector.model_number} + ${lens.lens_model_number}`,reason:`CALCULATION BLOCKED · ${profile?.calculationGateReason || 'No complete calculation-eligible optical profile exists for this exact pair.'}`,profile};
+  }
+  if (requestedMode === 'legacy_unverified') return {...base,mode:'legacy_unverified',wide:NaN,tele:NaN,allowed:false,label:'Legacy planner selection',reason:'CALCULATION BLOCKED · Broad legacy source rows are reference-only.',profile:null};
+  const min = number('min',0.978), max = number('max',1.320);
+  if (requestedMode !== 'manual' || !Number.isFinite(min) || min <= 0 || !Number.isFinite(max) || max < min) return {...base,mode:'blocked',wide:NaN,tele:NaN,allowed:false,label:'Untrusted transfer',reason:'CALCULATION BLOCKED · transferred calculation state is invalid.',profile:null};
+  return {...base,mode:'manual',wide:min,tele:max,allowed:true,label:'Manual ratio preset',reason:'MANUAL SIMULATION · operator-supplied ratio · unverified.',profile:null};
+}
+const STAGE_TRANSFER = resolveStageTransfer();
+
+function announce(message){
+  stageStatus.textContent = '';
+  requestAnimationFrame(()=>{ stageStatus.textContent = message; });
+  stage.announce(message);
+}
+function currentTheme(){ return document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light'; }
+function applyTheme(theme,{persist=false,announceChange=false}={}){
+  const dark = theme === 'dark';
+  if (dark) document.documentElement.dataset.theme = 'dark'; else delete document.documentElement.dataset.theme;
+  themeToggle.setAttribute('aria-pressed', String(dark));
+  themeToggle.setAttribute('aria-label', `Switch to ${dark ? 'light' : 'dark'} mode`);
+  themeLabel.textContent = dark ? 'light' : 'dark';
+  themeColor.content = dark ? '#15181d' : '#f4f1ea';
+  stage.style.setProperty('--stage-bg', 'var(--deck)');
+  stage.dispatchEvent(new CustomEvent('throwline-theme-change',{detail:{theme:dark?'dark':'light'}}));
+  if (persist) try { localStorage.setItem('throwline:theme:v1', dark ? 'dark' : 'light'); } catch {}
+  if (announceChange) announce(`${dark ? 'Dark' : 'Light'} mode`);
+}
+themeToggle.addEventListener('click',()=>applyTheme(currentTheme()==='dark'?'light':'dark',{persist:true,announceChange:true}));
+applyTheme(currentTheme());
+function setFieldVerify(enabled,{announceChange=false}={}){
+  document.body.dataset.fieldVerify = String(enabled);
+  fieldVerifyToggle.setAttribute('aria-pressed',String(enabled));
+  fieldVerifyToggle.textContent = enabled ? 'Exit Verify' : 'Field Verify';
+  stage.toggleAttribute('field-verify',enabled);
+  if (enabled && window.innerWidth > 820) adjustPanel.open = true;
+  if (announceChange) announce(enabled?'Field Verify mode on':'Field Verify mode off');
+}
+fieldVerifyToggle.addEventListener('click',()=>setFieldVerify(fieldVerifyToggle.getAttribute('aria-pressed')!=='true',{announceChange:true}));
+setFieldVerify(false);
+let compactAdjustLayout;
+function syncAdjustLayout(){
+  const nextCompact = window.innerWidth <= 820;
+  if (nextCompact === compactAdjustLayout) return;
+  compactAdjustLayout = nextCompact;
+  adjustPanel.open = !nextCompact;
+}
+syncAdjustLayout();
+window.addEventListener('resize',syncAdjustLayout,{passive:true});
+stage.addEventListener('stage-dependency-error',()=>{
+  stageStatus.textContent = 'Stage 3D needs an internet connection. The offline Throwline main app remains available.';
+});
+
+try {
+const { THREE } = await stage.ready;
+mobileObj.disabled = false;
+mobileGlb.disabled = false;
+mobileObj.addEventListener('click',()=>stage.runExport('obj'));
+mobileGlb.addEventListener('click',()=>stage.runExport('glb'));
+
+/* ---------- materials ---------- */
+const M = {
+  chassis:  new THREE.MeshStandardMaterial({ name:'chassis',  color:0x2f3339, roughness:0.62, metalness:0.28 }),
+  chassisT: new THREE.MeshStandardMaterial({ name:'chassis_top', color:0x3a3f46, roughness:0.55, metalness:0.3 }),
+  bezel:    new THREE.MeshStandardMaterial({ name:'bezel',    color:0x14171a, roughness:0.44, metalness:0.32 }),
+  glass:    new THREE.MeshStandardMaterial({ name:'lens_glass', color:0x9fc3d8, roughness:0.08, metalness:0.35, transparent:true, opacity:0.72 }),
+  ring:     new THREE.MeshStandardMaterial({ name:'lens_ring', color:0xb9b2a3, roughness:0.35, metalness:0.4 }),
+  alu:      new THREE.MeshStandardMaterial({ name:'aluminium', color:0xa9a49c, roughness:0.42, metalness:0.35 }),
+  rubber:   new THREE.MeshStandardMaterial({ name:'rubber',   color:0x1b1d20, roughness:0.9,  metalness:0.02 }),
+  screen:   new THREE.MeshStandardMaterial({ name:'screen_surface', color:0xfaf9f6, roughness:0.94, metalness:0.0, emissive:0xffffff, emissiveIntensity:0.22, side:THREE.DoubleSide }),
+  frame:    new THREE.MeshStandardMaterial({ name:'screen_frame', color:0x22242a, roughness:0.7, metalness:0.15 }),
+  drape:    new THREE.MeshStandardMaterial({ name:'drape',    color:0x2b2c30, roughness:0.98, metalness:0.0, side:THREE.DoubleSide }),
+  deck:     new THREE.MeshStandardMaterial({ name:'deck',     color:0xcfc8bb, roughness:0.96, metalness:0.0 }),
+  beamVolume: new THREE.MeshBasicMaterial({ name:'beam_volume_material', color:0xd9a520, transparent:true, opacity:0.11, side:THREE.DoubleSide, depthWrite:false }),
+  beamEdge: new THREE.LineBasicMaterial({ name:'beam_edge_material', color:0x8a6400, transparent:true, opacity:0.92, depthTest:false }),
+  centerline: new THREE.LineDashedMaterial({ name:'optical_centerline_material', color:0x6f5000, transparent:true, opacity:0.82, dashSize:0.20, gapSize:0.12, depthTest:false }),
+  image: new THREE.MeshBasicMaterial({ name:'projected_image_material', color:0xf2c012, transparent:true, opacity:0.13, side:THREE.DoubleSide, depthWrite:false, depthTest:false }),
+  imageEdge: new THREE.LineBasicMaterial({ name:'projected_image_edge_material', color:0x8a6400, transparent:true, opacity:0.96, depthTest:false }),
+  spill: new THREE.MeshBasicMaterial({ name:'projection_spill_material', color:0xd94d42, transparent:true, opacity:0.34, side:THREE.DoubleSide, depthWrite:false, depthTest:false }),
+  missing: new THREE.MeshBasicMaterial({ name:'missing_coverage_material', color:0xd94d42, transparent:true, opacity:0.22, side:THREE.DoubleSide, depthWrite:false, depthTest:false })
+};
+const SHARED_MATERIALS = new Set(Object.values(M));
+
+function disposeObject3D(object,{disposeShared=false}={}){
+  if (!object) return;
+  const geometries = new Set();
+  const materials = new Set();
+  object.traverse(part=>{
+    if (part.geometry) geometries.add(part.geometry);
+    const list = Array.isArray(part.material) ? part.material : [part.material];
+    list.filter(Boolean).forEach(material=>{
+      if (disposeShared || !SHARED_MATERIALS.has(material)) materials.add(material);
+    });
+  });
+  geometries.forEach(geometry=>geometry.dispose());
+  materials.forEach(material=>material.dispose());
+}
+
+function updateSceneTheme(theme){
+  const dark = theme === 'dark';
+  M.chassis.color.setHex(dark ? 0x4a5059 : 0x2f3339);
+  M.chassisT.color.setHex(dark ? 0x5a616c : 0x3a3f46);
+  M.bezel.color.setHex(dark ? 0x303640 : 0x14171a);
+  M.frame.color.setHex(dark ? 0x505864 : 0x22242a);
+  M.drape.color.setHex(dark ? 0x333944 : 0x2b2c30);
+  M.deck.color.setHex(dark ? 0x252b34 : 0xcfc8bb);
+  M.beamVolume.color.setHex(dark ? 0xffc928 : 0xd9a520);
+  M.beamVolume.opacity = dark ? 0.19 : 0.11;
+  M.beamEdge.color.setHex(dark ? 0xffd75b : 0x8a6400);
+  M.centerline.color.setHex(dark ? 0xffe28a : 0x6f5000);
+  M.image.color.setHex(dark ? 0xffcf3d : 0xf2c012);
+  M.image.opacity = dark ? 0.22 : 0.13;
+  M.imageEdge.color.setHex(dark ? 0xffe07a : 0x8a6400);
+  stage.setLightingTheme(theme);
+}
+stage.addEventListener('throwline-theme-change',event=>updateSceneTheme(event.detail.theme));
+updateSceneTheme(currentTheme());
+
+function rbox(w,h,d,r,mat,name){
+  r = Math.min(r, w/2-0.001, h/2-0.001);
+  const s = new THREE.Shape();
+  const x = -w/2, y = -h/2;
+  s.moveTo(x+r, y);
+  s.lineTo(x+w-r, y); s.quadraticCurveTo(x+w, y, x+w, y+r);
+  s.lineTo(x+w, y+h-r); s.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
+  s.lineTo(x+r, y+h); s.quadraticCurveTo(x, y+h, x, y+h-r);
+  s.lineTo(x, y+r); s.quadraticCurveTo(x, y, x+r, y);
+  const g = new THREE.ExtrudeGeometry(s, { depth:d, bevelEnabled:true, bevelThickness:0.006, bevelSize:0.006, bevelSegments:2, curveSegments:8 });
+  g.translate(0,0,-d/2);
+  const m = new THREE.Mesh(g, mat); m.name = name; m.castShadow = true; m.receiveShadow = true;
+  return m;
+}
+function box(w,h,d,mat,name){
+  const m = new THREE.Mesh(new THREE.BoxGeometry(w,h,d), mat); m.name = name;
+  m.castShadow = true; m.receiveShadow = true; return m;
+}
+function cyl(rt,rb,h,seg,mat,name){
+  const m = new THREE.Mesh(new THREE.CylinderGeometry(rt,rb,h,seg), mat); m.name = name;
+  m.castShadow = true; m.receiveShadow = true; return m;
+}
+
+/* ---------- projector on a cart ---------- */
+// Body local space: +Z points toward the screen (the throw direction).
+function buildProjector(){
+  const g = new THREE.Group(); g.name = 'projector';
+
+  const BW = 0.62, BH = 0.24, BD = 0.60;
+  const body = rbox(BW, BH, BD, 0.028, M.chassis, 'projector_body');
+  body.position.y = BH/2;
+  g.add(body);
+
+  const top = box(BW*0.86, 0.012, BD*0.80, M.chassisT, 'body_top_panel');
+  top.position.set(0, BH+0.004, -0.02); g.add(top);
+
+  const front = box(BW*0.98, BH*0.86, 0.016, M.bezel, 'front_bezel');
+  front.position.set(0, BH/2, BD/2 + 0.006); g.add(front);
+
+  // intake louvres on the operator side
+  for (let i=0;i<7;i++){
+    const l = box(0.008, BH*0.52, 0.30, M.bezel, 'louvre_'+(i+1));
+    l.position.set(-BW/2 - 0.004, BH/2, -0.18 + i*0.052);
+    g.add(l);
+  }
+  // exhaust grille at the rear
+  for (let i=0;i<5;i++){
+    const e = box(BW*0.52, 0.010, 0.008, M.bezel, 'exhaust_'+(i+1));
+    e.position.set(0.02, 0.07 + i*0.030, -BD/2 - 0.005);
+    g.add(e);
+  }
+  // recessed carry handle
+  const handle = box(0.30, 0.020, 0.026, M.bezel, 'handle');
+  handle.position.set(0, BH*0.74, -BD/2 - 0.014); g.add(handle);
+
+  // lens assembly, protruding — the silhouette cue that says "projector"
+  const mount = cyl(0.105, 0.105, 0.030, 40, M.bezel, 'lens_mount');
+  mount.rotation.x = Math.PI/2; mount.position.set(0, BH*0.56, BD/2 + 0.020); g.add(mount);
+
+  const barrel = cyl(0.086, 0.098, 0.20, 40, M.bezel, 'lens_barrel');
+  barrel.rotation.x = Math.PI/2; barrel.position.set(0, BH*0.56, BD/2 + 0.128); g.add(barrel);
+
+  const zoomRing = cyl(0.094, 0.094, 0.042, 40, M.ring, 'zoom_ring');
+  zoomRing.rotation.x = Math.PI/2; zoomRing.position.set(0, BH*0.56, BD/2 + 0.150); g.add(zoomRing);
+
+  const hood = cyl(0.090, 0.086, 0.028, 40, M.bezel, 'lens_hood');
+  hood.rotation.x = Math.PI/2; hood.position.set(0, BH*0.56, BD/2 + 0.238); g.add(hood);
+
+  const glass = cyl(0.078, 0.078, 0.010, 40, M.glass, 'front_element');
+  glass.rotation.x = Math.PI/2; glass.position.set(0, BH*0.56, BD/2 + 0.246); g.add(glass);
+
+  // adjustable feet
+  [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(([sx,sz],i)=>{
+    const f = cyl(0.026, 0.030, 0.036, 20, M.rubber, 'foot_'+(i+1));
+    f.position.set(sx*(BW/2-0.07), -0.018, sz*(BD/2-0.08)); g.add(f);
+  });
+
+  g.userData.lensY = BH*0.56;
+  g.userData.lensZ = BD/2 + 0.246;
+  return g;
+}
+
+// Rolling cart sized to carry the body at `height` metres off the deck.
+function buildCart(height){
+  const g = new THREE.Group(); g.name = 'cart';
+  const CW = 0.78, CD = 0.72, CT = 0.028;
+  const casterR = 0.052;
+  const legLen = Math.max(height - CT - casterR*2, 0.12);
+
+  const topDeck = box(CW, CT, CD, M.alu, 'cart_top');
+  topDeck.position.y = -CT/2; g.add(topDeck);
+
+  const shelf = box(CW*0.86, 0.020, CD*0.82, M.alu, 'cart_shelf');
+  shelf.position.y = -CT - legLen*0.62; g.add(shelf);
+
+  [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(([sx,sz],i)=>{
+    const leg = box(0.038, legLen, 0.038, M.alu, 'cart_leg_'+(i+1));
+    leg.position.set(sx*(CW/2-0.05), -CT - legLen/2, sz*(CD/2-0.05)); g.add(leg);
+    const caster = cyl(casterR, casterR, 0.032, 24, M.rubber, 'caster_'+(i+1));
+    caster.rotation.z = Math.PI/2;
+    caster.position.set(sx*(CW/2-0.05), -CT - legLen - casterR, sz*(CD/2-0.05)); g.add(caster);
+  });
+  return g;
+}
+
+/* ---------- screen ---------- */
+function buildScreen(w,h,bottom){
+  const g = new THREE.Group(); g.name = 'screen_assembly';
+  const surf = new THREE.Mesh(new THREE.PlaneGeometry(w,h), M.screen);
+  surf.name = 'screen_surface'; surf.receiveShadow = true;
+  surf.position.set(0, bottom + h/2, 0); g.add(surf);
+
+  const t = 0.055, dpt = 0.09;
+  const hbar = (y)=>{ const m = box(w + t*2, t, dpt, M.frame, 'frame_rail'); m.position.set(0, y, -dpt/2); return m; };
+  const vbar = (x)=>{ const m = box(t, h + t*2, dpt, M.frame, 'frame_stile'); m.position.set(x, bottom + h/2, -dpt/2); return m; };
+  g.add(hbar(bottom - t/2), hbar(bottom + h + t/2), vbar(-w/2 - t/2), vbar(w/2 + t/2));
+
+  if (bottom > 0.05){
+    const skirt = new THREE.Mesh(new THREE.PlaneGeometry(w + t*2, bottom), M.drape);
+    skirt.name = 'screen_skirt'; skirt.position.set(0, bottom/2, -0.01); g.add(skirt);
+    [-1,1].forEach((s,i)=>{
+      const leg = box(0.06, bottom + h, 0.06, M.frame, 'screen_leg_'+(i+1));
+      leg.position.set(s*(w/2 + t + 0.03), (bottom+h)/2, -dpt - 0.03); g.add(leg);
+    });
+  }
+  return g;
+}
+
+/* ---------- projection system ---------- */
+function planePart(w,h,x,y,z,material,name){
+  if (w <= 0.0001 || h <= 0.0001) return null;
+  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(w,h),material);
+  mesh.name = name;
+  mesh.position.set(x,y,z);
+  mesh.renderOrder = material === M.spill || material === M.missing ? 5 : 4;
+  return mesh;
+}
+function rectangleOutline(w,h,x,y,z,material,name){
+  const points = [
+    new THREE.Vector3(x-w/2,y-h/2,z),
+    new THREE.Vector3(x+w/2,y-h/2,z),
+    new THREE.Vector3(x+w/2,y+h/2,z),
+    new THREE.Vector3(x-w/2,y+h/2,z)
+  ];
+  const line = new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(points),material);
+  line.name = name;
+  line.renderOrder = 6;
+  return line;
+}
+function buildProjection(apex,rect,screen,pstate){
+  const group = new THREE.Group();
+  group.name = 'projection_system';
+  const p = rect; // [bl, br, tr, tl] as Vector3
+  const v = [];
+  const tri = (a,b)=>{ v.push(apex.x,apex.y,apex.z, a.x,a.y,a.z, b.x,b.y,b.z); };
+  tri(p[0],p[1]); tri(p[1],p[2]); tri(p[2],p[3]); tri(p[3],p[0]);
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(v,3));
+  g.computeVertexNormals();
+  const volume = new THREE.Mesh(g,M.beamVolume);
+  volume.name = 'beam_volume';
+  volume.renderOrder = 1;
+  group.add(volume);
+
+  const edgePoints = p.flatMap(corner=>[apex,corner]);
+  const edges = new THREE.LineSegments(new THREE.BufferGeometry().setFromPoints(edgePoints),M.beamEdge);
+  edges.name = 'beam_edges';
+  edges.renderOrder = 3;
+  group.add(edges);
+
+  const center = new THREE.Vector3(0,screen.cy,0.018);
+  const centerline = new THREE.Line(new THREE.BufferGeometry().setFromPoints([apex,center]),M.centerline);
+  centerline.name = 'optical_centerline';
+  centerline.computeLineDistances();
+  centerline.renderOrder = 3;
+  group.add(centerline);
+
+  const shownW = Math.min(screen.imgW,screen.w);
+  const shownH = Math.min(screen.imgH,screen.h);
+  const projected = planePart(shownW,shownH,0,screen.cy,0.010,M.image,'projected_image');
+  if (projected) group.add(projected);
+  group.add(rectangleOutline(screen.imgW,screen.imgH,0,screen.cy,0.020,M.imageEdge,'projected_image_boundary'));
+
+  if (pstate.kind === 'overshoot'){
+    const sideW = Math.max(0,(screen.imgW-screen.w)/2);
+    const capH = Math.min(screen.imgH,screen.h);
+    const spillLeft = planePart(sideW,capH,-screen.w/2-sideW/2,screen.cy,0.026,M.spill,'spill_left');
+    const spillRight = planePart(sideW,capH,screen.w/2+sideW/2,screen.cy,0.026,M.spill,'spill_right');
+    const topH = Math.max(0,(screen.imgH-screen.h)/2);
+    const spillTop = planePart(screen.imgW,topH,0,screen.cy+screen.h/2+topH/2,0.026,M.spill,'spill_top');
+    const spillBottom = planePart(screen.imgW,topH,0,screen.cy-screen.h/2-topH/2,0.026,M.spill,'spill_bottom');
+    [spillLeft,spillRight,spillTop,spillBottom].filter(Boolean).forEach(part=>group.add(part));
+  }
+
+  if (pstate.kind === 'undershoot'){
+    const missingCoverage = new THREE.Group();
+    missingCoverage.name = 'missing_coverage';
+    const sideW = Math.max(0,(screen.w-screen.imgW)/2);
+    const capH = Math.min(screen.imgH,screen.h);
+    const topH = Math.max(0,(screen.h-screen.imgH)/2);
+    [
+      planePart(sideW,capH,-screen.w/2+sideW/2,screen.cy,0.026,M.missing,'missing_coverage_left'),
+      planePart(sideW,capH,screen.w/2-sideW/2,screen.cy,0.026,M.missing,'missing_coverage_right'),
+      planePart(screen.w,topH,0,screen.cy+screen.h/2-topH/2,0.026,M.missing,'missing_coverage_top'),
+      planePart(screen.w,topH,0,screen.cy-screen.h/2+topH/2,0.026,M.missing,'missing_coverage_bottom')
+    ].filter(Boolean).forEach(part=>missingCoverage.add(part));
+    group.add(missingCoverage);
+  }
+  group.userData.projectionState = pstate.kind;
+  return group;
+}
+
+/* ---------- room ---------- */
+function buildRoom(depth, width){
+  const g = new THREE.Group(); g.name = 'room';
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(width, depth), M.deck);
+  floor.name = 'deck'; floor.rotation.x = -Math.PI/2;
+  floor.position.set(0, -0.002, depth/2 - 1.0); floor.receiveShadow = true;
+  g.add(floor);
+  const span = Math.max(width, depth);
+  const grid = new THREE.GridHelper(span, Math.max(2, Math.round(span/(4*FT))), 0x9c9488, 0xcdc5b8);
+  grid.name = 'deck_grid';
+  grid.position.set(0, 0.004, depth/2 - 1.0);
+  g.add(grid);
+  return g;
+}
+
+/* ---------- assembly ---------- */
+const root = new THREE.Group(); root.name = 'throwline_stage';
+const proj = buildProjector();
+let screenGrp = null, projectionGrp = null, roomGrp = null, cartGrp = null;
+root.add(proj);
+
+const els = id => document.getElementById(id);
+const state = { w:STAGE_TRANSFER.w, bottom:STAGE_TRANSFER.bottom, ar:STAGE_TRANSFER.ar, basisW:STAGE_TRANSFER.basisW, basisScale:STAGE_TRANSFER.basisScale, rasterAr:STAGE_TRANSFER.rasterAr, wide:STAGE_TRANSFER.wide, tele:STAGE_TRANSFER.tele, lh:STAGE_TRANSFER.lh, dist:STAGE_TRANSFER.dist, mode:STAGE_TRANSFER.mode, allowed:STAGE_TRANSFER.allowed, label:STAGE_TRANSFER.label, gateReason:STAGE_TRANSFER.reason, profile:STAGE_TRANSFER.profile,
+                cone:true, room:true, grid:true };
+let activeCamera = 'three';
+let objectMounted = false;
+
+function opticalGeometryAllowed(){
+  return state.allowed === true && ['verified_image_width','manual','field_verified'].includes(state.mode) && Number.isFinite(state.wide) && state.wide > 0 && Number.isFinite(state.tele) && state.tele >= state.wide;
+}
+
+function fmt(ft){
+  const neg = ft<0; let v = Math.abs(ft);
+  let f = Math.floor(v), q = Math.round((v-f)*48);
+  if (q>=48){ f++; q-=48; }
+  const inch = Math.floor(q/4), fr = q%4, marks=['','¼','½','¾'];
+  return (neg?'-':'') + f + "' " + inch + marks[fr] + '"';
+}
+
+document.documentElement.dataset.calculationMode = state.mode;
+stageCalculationGate.textContent = state.gateReason;
+const lensControl = els('lens');
+if (state.mode !== 'manual') {
+  lensControl.labels[0].textContent = 'Exact catalog pair · raw evidence';
+  lensControl.innerHTML = `<option>${state.label}${Number.isFinite(state.wide) ? ` · raw ${state.wide.toFixed(3)}${state.tele!==state.wide?'–'+state.tele.toFixed(3):''}:1` : ''}</option>`;
+  lensControl.disabled = true;
+} else {
+  const exactPreset = [...lensControl.options].find(option=>option.value===`${state.wide.toFixed(3)},${state.tele.toFixed(3)}`);
+  if (exactPreset) lensControl.value = exactPreset.value;
+  else { const option = document.createElement('option'); option.value = `${state.wide},${state.tele}`; option.textContent = `Transferred manual ratio · ${state.wide.toFixed(3)}${state.tele!==state.wide?'–'+state.tele.toFixed(3):''}:1`; lensControl.appendChild(option); lensControl.value = option.value; }
+}
+[['sw','w','swv'],['st','bottom','stv'],['lh','lh','lhv'],['d','dist','dv']].forEach(([id,key,valueId])=>{ els(id).value=state[key]; els(valueId).textContent=fmt(state[key]); els(id).setAttribute('aria-valuetext',fmt(state[key])); });
+const aspectOption = [...els('ar').options].find(option=>Math.abs(Number(option.value)-state.ar)<0.001); if (aspectOption) els('ar').value=aspectOption.value;
+
+function projectionState(){
+  const wideD = state.wide*state.basisW;
+  const teleD = state.tele*state.basisW;
+  const safeLo = wideD*1.05;
+  const safeHi = teleD*0.95;
+  if (state.dist > teleD+0.01) return {kind:'overshoot',label:'OVERSHOOT',color:'var(--safety)'};
+  if (state.dist < wideD-0.01) return {kind:'undershoot',label:'UNDERSHOOT',color:'var(--safety)'};
+  if (state.dist >= safeLo && state.dist <= safeHi) return {kind:'safe',label:'PASS · SAFE',color:'var(--go)'};
+  return {kind:'near-limit',label:'PASS · NEAR LIMIT',color:'var(--hazard)'};
+}
+
+function rebuild(){
+  const w = state.w * FT, h = (state.w/state.ar) * FT, bottom = state.bottom * FT;
+  const dist = state.dist * FT, lensY = state.lh * FT;
+
+  if (screenGrp) { root.remove(screenGrp); disposeObject3D(screenGrp); }
+  screenGrp = buildScreen(w,h,bottom); root.add(screenGrp);
+
+  const depth = Math.max(dist + 4*FT, 12);
+  if (roomGrp) { root.remove(roomGrp); disposeObject3D(roomGrp); }
+  roomGrp = buildRoom(depth, Math.max(w + 6, 12)); root.add(roomGrp);
+  roomGrp.visible = state.room;
+  roomGrp.getObjectByName('deck_grid').visible = state.grid;
+
+  // projector: lens front element sits exactly at the set distance
+  proj.rotation.y = Math.PI;                       // face the screen (-Z)
+  proj.position.set(0, lensY - proj.userData.lensY, dist + proj.userData.lensZ);
+
+  if (cartGrp) { root.remove(cartGrp); disposeObject3D(cartGrp); }
+  const bodyBase = proj.position.y;
+  if (bodyBase > 0.14){
+    cartGrp = buildCart(bodyBase);
+    cartGrp.position.set(0, bodyBase, dist + proj.userData.lensZ - 0.30);
+    root.add(cartGrp);
+  } else cartGrp = null;
+
+  const cy = bottom + h/2;                          // image centred on the screen
+  if (projectionGrp) { root.remove(projectionGrp); disposeObject3D(projectionGrp); }
+  projectionGrp = null;
+  if (opticalGeometryAllowed()) {
+    const imgW = dist / currentRatio();
+    const imgH = imgW / state.rasterAr;
+    const pstate = projectionState();
+    document.documentElement.dataset.projectionState = pstate.kind;
+    const apex = new THREE.Vector3(0, lensY, dist);
+    const rect = [
+      new THREE.Vector3(-imgW/2, cy - imgH/2, 0.004),
+      new THREE.Vector3( imgW/2, cy - imgH/2, 0.004),
+      new THREE.Vector3( imgW/2, cy + imgH/2, 0.004),
+      new THREE.Vector3(-imgW/2, cy + imgH/2, 0.004)
+    ];
+    projectionGrp = buildProjection(apex,rect,{w,h,imgW,imgH,cy},pstate);
+    projectionGrp.visible = state.cone;
+    projectionGrp.traverse(part=>{
+      if (part.isMesh || part.isLine) { part.castShadow = false; part.receiveShadow = false; }
+    });
+    root.add(projectionGrp);
+    readout(imgW,imgH,w,h,cy,lensY,pstate);
+  } else {
+    document.documentElement.dataset.projectionState = 'blocked';
+    readoutBlocked(w,h);
+  }
+  if (objectMounted) setCamera(activeCamera,{announceChange:false});
+  stage.requestRender();
+}
+
+function readoutBlocked(w,h){
+  els('hDist').textContent = '—'; els('hDist').style.color = 'var(--safety)';
+  const raw = Number.isFinite(state.wide) ? `${state.wide.toFixed(3)}${state.tele!==state.wide?'–'+state.tele.toFixed(3):''}:1 raw` : 'unavailable';
+  els('hWide').textContent = raw; els('hTele').textContent = 'not used';
+  els('hNote').textContent = state.gateReason; els('hNote').style.color = 'var(--safety)';
+  els('hState').textContent = 'CALCULATION BLOCKED'; els('hState').style.color = 'var(--safety)';
+  ['bNom','bSafe'].forEach(id=>{ els(id).style.width='0%'; }); els('bPin').style.left='0%';
+  els('fImg').textContent = 'optical geometry suppressed'; els('fScr').textContent = `${fmt(w/FT)} × ${fmt(h/FT)}`; els('fSpill').textContent = 'not calculated'; els('fSpill').style.color='var(--safety)';
+  els('fRatio').textContent = raw; els('fShift').textContent = 'not calculated'; els('fShift').style.color='var(--dimmer)'; els('fLens').textContent=state.label; els('fHeight').textContent=fmt(state.lh);
+  els('adjustSummary').textContent = `${fmt(state.w)} screen · calculation blocked`;
+  els('sceneSummary').textContent = `CALCULATION BLOCKED. ${state.label}. ${state.gateReason} Screen ${fmt(w/FT)} by ${fmt(h/FT)}. Projector placement ${fmt(state.dist)}. Optical geometry and fit verdict suppressed.`;
+  ['bw','bm','bt','tcone'].forEach(id=>els(id).disabled=true);
+}
+
+// Ratio the lens is actually set to: the operator zooms to fit when the
+// distance is in range, and is pinned at a stop when it is not.
+function currentRatio(){
+  const need = state.dist / state.basisW;
+  return Math.min(state.tele, Math.max(state.wide, need));
+}
+
+function readout(imgW,imgH,w,h,cy,lensY,pstate){
+  const wideD = state.wide * state.basisW, teleD = state.tele * state.basisW;
+  const safeLo = wideD*1.05, safeHi = teleD*0.95;
+  const d = state.dist;
+  const inRange = d >= wideD - 0.01 && d <= teleD + 0.01;
+  const safe = d >= safeLo && d <= safeHi;
+  const col = !inRange ? 'var(--safety)' : safe ? 'var(--go)' : 'var(--hazard)';
+
+  els('hDist').textContent = fmt(d);
+  els('hDist').style.color = inRange ? 'var(--hazard)' : 'var(--safety)';
+  els('hWide').textContent = fmt(wideD);
+  els('hTele').textContent = fmt(teleD);
+  const note = els('hNote');
+  note.style.color = col;
+  note.textContent = !inRange
+    ? (d > teleD ? 'Past the tele stop. The image overshoots the screen.'
+                 : 'Inside the wide stop. The image falls short of the screen.')
+    : safe ? 'Inside the ±5% conservative planning zone.'
+           : 'In range but outside the safe band. Little margin at the stop.';
+  els('hState').textContent = pstate.label;
+  els('hState').style.color = pstate.color;
+
+  const lo = wideD - 3, hi = teleD + 3;
+  const pc = v => Math.min(100, Math.max(0, (v-lo)/(hi-lo)*100));
+  els('bNom').style.left = pc(wideD)+'%';
+  els('bNom').style.width = (pc(teleD)-pc(wideD))+'%';
+  els('bSafe').style.left = pc(safeLo)+'%';
+  els('bSafe').style.width = (pc(safeHi)-pc(safeLo))+'%';
+  els('bPin').style.left = pc(d)+'%';
+  els('bPin').style.background = col;
+
+  const iw = imgW/FT, ih = imgH/FT, sw = w/FT, sh = h/FT;
+  els('fImg').textContent = fmt(iw) + ' × ' + fmt(ih);
+  els('fScr').textContent = fmt(sw) + ' × ' + fmt(sh);
+  const spill = (iw - sw)/2;
+  els('fSpill').textContent = Math.abs(spill) < 0.02 ? 'none'
+    : (spill > 0 ? '+' : '−') + fmt(Math.abs(spill)) + ' each side';
+  els('fSpill').style.color = Math.abs(spill) > 0.02 ? 'var(--safety)' : 'var(--dim)';
+  els('fRatio').textContent = (state.dist/state.basisW).toFixed(3) + ':1';
+  const shiftPct = ((cy - lensY) / (imgH || 1)) * 100;
+  els('fShift').textContent = (shiftPct>=0?'+':'') + shiftPct.toFixed(1) + '%';
+  els('fShift').style.color = Math.abs(shiftPct) > 60 ? 'var(--safety)' : 'var(--info)';
+  const lensName = els('lens').selectedOptions[0].textContent;
+  els('fLens').textContent = lensName.split('·')[0].trim();
+  els('fHeight').textContent = fmt(state.lh);
+  els('adjustSummary').textContent = `${fmt(state.w)} screen · ${fmt(state.dist)} set`;
+  els('sceneSummary').textContent = `${pstate.label}. Set mark ${fmt(d)}. ${lensName}. Image ${fmt(iw)} by ${fmt(ih)}; screen ${fmt(sw)} by ${fmt(sh)}. ${Math.abs(spill)<0.02?'No spill.':spill>0?`${fmt(Math.abs(spill))} spill at each side.`:`${fmt(Math.abs(spill))} missing coverage at each side.`} Optical height ${fmt(state.lh)}. Required ratio ${(state.dist/state.basisW).toFixed(3)} to one. Shift ${shiftPct>=0?'plus ':'minus '}${Math.abs(shiftPct).toFixed(1)} percent.`;
+}
+
+/* ---------- controls ---------- */
+function bind(id, key, fmtFn, after){
+  const el = els(id);
+  el.addEventListener('input', ()=>{
+    state[key] = parseFloat(el.value);
+    if (fmtFn){
+      const valueText = fmtFn(state[key]);
+      els(id+'v').textContent = valueText;
+      el.setAttribute('aria-valuetext', valueText);
+    }
+    if (after) after(); rebuild();
+  });
+  el.addEventListener('change', ()=>announce(`${el.labels[0].childNodes[0].textContent.trim()} ${fmtFn ? fmtFn(state[key]) : state[key]}`));
+}
+bind('sw','w',fmt,()=>{ state.basisW=state.w*state.basisScale; }); bind('st','bottom',fmt); bind('lh','lh',fmt); bind('d','dist',fmt);
+els('ar').addEventListener('change', e=>{ state.ar = parseFloat(e.target.value); if (state.mode==='manual') { state.rasterAr=state.ar; state.basisScale=1; state.basisW=state.w; } rebuild(); announce(`Aspect ${e.target.selectedOptions[0].textContent}`); });
+els('lens').addEventListener('change', e=>{
+  const [a,b] = e.target.value.split(',').map(Number);
+  state.wide = a; state.tele = b; rebuild(); announce(`Lens ${e.target.selectedOptions[0].textContent}`);
+});
+const setDist = v => { state.dist = Math.round(v*4)/4; els('d').value = state.dist; els('dv').textContent = fmt(state.dist); els('d').setAttribute('aria-valuetext',fmt(state.dist)); rebuild(); announce(`Set distance ${fmt(state.dist)}`); };
+els('bw').onclick = ()=> setDist(state.wide * state.basisW);
+els('bt').onclick = ()=> setDist(state.tele * state.basisW);
+els('bm').onclick = ()=> setDist((state.wide*1.05 + state.tele*0.95)/2 * state.basisW);
+
+function toggle(id, key, apply){
+  const b = els(id);
+  b.onclick = ()=>{
+    state[key] = !state[key];
+    b.setAttribute('aria-pressed', String(state[key]));
+    apply();
+    stage.requestRender();
+    announce(`${b.textContent.trim()} ${state[key] ? 'shown' : 'hidden'}`);
+  };
+}
+toggle('tcone','cone', ()=> projectionGrp && (projectionGrp.visible = state.cone));
+toggle('troom','room', ()=> roomGrp && (roomGrp.visible = state.room));
+toggle('tgrid','grid', ()=>{ const g = roomGrp && roomGrp.getObjectByName('deck_grid'); if (g) g.visible = state.grid; });
+
+const cameraOrder = ['three','side','front','top','op'];
+const cameraLabels = {three:'Three-quarter',side:'Side',front:'Front',top:'Top',op:'Operator'};
+function setCamera(camera,{saveDefault=false,announceChange=true}={}){
+  const button = document.querySelector(`[data-cam="${camera}"]`);
+  if (!button) return;
+  activeCamera = camera;
+  document.querySelectorAll('[data-cam]').forEach(o=>o.setAttribute('aria-pressed', String(o===button)));
+  const d = state.dist*FT, h = (state.w/state.ar)*FT, cy = state.bottom*FT + h/2;
+  const views = {
+    three: [d*0.95, cy + d*0.55, d*1.5],
+    side:  [d*1.7, cy*1.1, d*0.55],
+    front: [0, cy, d*0.22],
+    top:   [0.01, d*1.5, d*0.55],
+    op:    [0, state.lh*FT, d*1.32]
+  };
+  stage.setView(views[camera],[0,cy,d*0.35],cameraLabels[camera],{saveDefault,announce:false});
+  if (announceChange) announce(`${cameraLabels[camera]} camera selected`);
+}
+document.querySelectorAll('[data-cam]').forEach(button=>{
+  button.addEventListener('click',()=>setCamera(button.dataset.cam));
+});
+stage.addEventListener('stage-camera-shortcut',event=>setCamera(cameraOrder[event.detail.index]));
+stage.addEventListener('stage-reset',()=>{
+  setCamera('three',{announceChange:false});
+  announce('Stage camera reset to three-quarter view');
+});
+els('resetView').addEventListener('click',()=>{
+  setCamera('three',{announceChange:false});
+  announce('Stage camera reset to three-quarter view');
+});
+
+rebuild();
+stage.setObject(root);
+objectMounted = true;
+setCamera('three',{saveDefault:true,announceChange:false});
+announce('Stage 3D ready. Three-quarter camera selected.');
+window.addEventListener('pagehide',event=>{ if (!event.persisted) stage.destroy(); });
+} catch (error) {
+  stageStatus.textContent = 'Stage 3D unavailable. Open the offline Throwline main app.';
+}
+</script>
+</body>
+</html>

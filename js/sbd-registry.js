@@ -53,6 +53,7 @@
     {id:'video-patch',name:'Video Patch',href:'video-patch.html',dept:'Video',phases:['prep','loadin','show'],tag:'Video',desc:'Sources, formats, connectors, switcher inputs, converters, destinations, routes, backups, and tests.',storageKeys:[{key:'sbd.videoPatch.v1',label:'Video Patch'}]},
     {id:'display-plan',name:'Display Plan',href:'display-plan.html',dept:'Video',phases:['advance','prep','loadin'],tag:'Displays',desc:'Displays, inputs, processors, resolutions, aspect ratios, refresh rates, routes, backups, and status.',storageKeys:[{key:'display-plan.v1',label:'Display Plan'}]},
     {id:'projection-plan',name:'Projection Plan',href:'projection-plan.html',dept:'Video',phases:['advance','prep','loadin'],tag:'Projection',desc:'Screens, surfaces, projectors, lenses, throw, positions, routes, blends, backup paths, and alignment.',storageKeys:[{key:'sbd.projectionPlan.v1',label:'Projection Plan'}]},
+    {id:'throwline',name:'Throwline',href:'ProjectorThrow/',dept:'Video',phases:['advance','prep','loadin','show'],tag:'Projection',desc:'Offline projector throw, fit, brightness, field verification, equipment selection, drawings, and multi-screen handoff.',storageKeys:[{key:'throwline:lenses:v2',label:'Throwline custom lenses'},{key:'throwline:jobs:v2',label:'Throwline saved jobs'},{key:'throwline:shift-profiles:v1',label:'Throwline shift profiles'},{key:'throwline:inventory:v1',label:'Throwline crew inventory'},{key:'throwline:show:v1',label:'Throwline current show'},{key:'throwline:theme:v1',label:'Throwline theme'}]},
     {id:'lighting-patch',name:'Lighting Patch',href:'lighting-patch.html',dept:'Lighting',phases:['advance','prep','loadin','show'],tag:'LX',desc:'Fixtures, positions, modes, universes, addresses, channels, dimmers, colors, focus notes, and status.',storageKeys:[{key:'lighting-patch.v1',label:'Lighting Patch'}]},
     {id:'cable-plan',name:'Cable Plan',href:'cable-plan.html',dept:'Build',phases:['prep','loadin','strike'],tag:'Cable',desc:'Cable types, lengths, source, destination, path, labels, owners, pull status, trip, and slack issues.',storageKeys:[{key:'cable-plan.v1',label:'Cable Plan'}]},
     {id:'rf-coordination',name:'RF Coordination',href:'rf-coordination.html',dept:'Comms',phases:['advance','prep','show'],tag:'RF',desc:'Wireless mics, IEM, IFB, comms packs, receivers, frequencies, bands, conflicts, and backups.',storageKeys:[{key:'rf-coordination.v1',label:'RF Coordination'}]},
@@ -60,6 +61,7 @@
     {id:'camera-shot-list',name:'Camera Shot List',href:'camera-shot-list.html',dept:'Camera',phases:['advance','prep','show'],tag:'Camera',desc:'Camera plan with shot rows, framing, movement, presets, ready and problem status, and take next.',storageKeys:[{key:'camera-shot-list.v1',label:'Camera Shot List'}]},
     {id:'plotforge',name:'Stage Plot',href:'stage-plot.html',dept:'Planning',phases:['advance','prep','loadin'],tag:'Plot',desc:'Offline-capable room layout planner with draggable stages, screens, cameras, speakers, mics, tables, power, and cable paths.',storageKeys:[{key:'stage-plot.v1',label:'Stage Plot'}]},
     {id:'gear-prep',name:'Gear Prep',href:'gear-prep.html',dept:'Logistics',phases:['prep'],tag:'Gear',desc:'Pull sheets, case IDs, quantities, departments, owners, test, pack, load, issues, and open items.',storageKeys:[{key:'gear-prep.v1',label:'Gear Prep'}]},
+    {id:'gear-reference',name:'Gear Reference',href:'gear-reference.html',dept:'Logistics',phases:['prep','loadin'],tag:'Reference',desc:'Offline per-device field sheets with specifications, schematics, procedures, consumables, intake checks, and source confidence.',storageKeys:[]},
     {id:'truck-pack',name:'Truck Pack Plan',href:'truck-pack.html',dept:'Logistics',phases:['prep','loadin','strike'],tag:'Truck',desc:'Cases, truck zones, load order, unload order, weights, owners, pack status, and issues.',storageKeys:[{key:'truck-pack.v1',label:'Truck Pack Plan'}]},
     {id:'load-in-plan',name:'Load In Plan',href:'load-in-plan.html',dept:'Logistics',phases:['loadin'],tag:'Load In',desc:'Trucks, docks, destinations, departments, items, owners, due times, build status, blockers, and gaps.',storageKeys:[{key:'load-in-plan.v1',label:'Load In Plan'}]},
     {id:'strike-plan',name:'Strike Plan',href:'strike-plan.html',dept:'Logistics',phases:['strike'],tag:'Strike',desc:'Departments, strike items, locations, owners, case IDs, destinations, load out status, missing gear, and issues.',storageKeys:[{key:'strike-plan.v1',label:'Strike Plan'}]},
@@ -69,9 +71,9 @@
 
   /* Per-phase recommendations shown by the console and the context dock. */
   var RECOMMENDED={
-    advance:['av-workbook','show-advance','site-survey','breakout-room-matrix','crew-call','plotforge','pixelforge','input-list'],
-    prep:['av-workbook','gear-prep','truck-pack','cueforge','teleprompter','playback-check','pixelforge','audio-patch','video-patch','network-plan'],
-    loadin:['av-workbook','load-in-plan','room-check','show-board','power-plan','line-check','display-plan','projection-plan','speaker-plan','show-task-board'],
+    advance:['av-workbook','show-advance','site-survey','breakout-room-matrix','crew-call','throwline','plotforge','pixelforge','input-list'],
+    prep:['av-workbook','gear-prep','gear-reference','truck-pack','cueforge','teleprompter','playback-check','pixelforge','audio-patch','video-patch','network-plan'],
+    loadin:['av-workbook','load-in-plan','gear-reference','room-check','show-board','power-plan','line-check','display-plan','projection-plan','throwline','speaker-plan','show-task-board'],
     show:['av-workbook','teleprompter','show-timer','cueforge','show-board','show-task-board','breakout-room-matrix','pixelforge','record-log','comms-check','camera-shot-list'],
     strike:['av-workbook','strike-plan','truck-pack','cable-plan','show-task-board','crew-time-log'],
     closeout:['av-workbook','show-handoff','show-report','client-signoff','change-order','record-log','crew-time-log']
@@ -84,11 +86,11 @@
     {label:'Run of show',toolIds:['teleprompter','show-timer','cueforge','playback-check','comms-check']},
     {label:'Graphics',toolIds:['pixelforge','playback-check','display-plan','projection-plan']},
     {label:'Audio',toolIds:['audio-patch','line-check','input-list','signal-flow','speaker-plan','rf-coordination']},
-    {label:'Video',toolIds:['video-patch','display-plan','projection-plan','stream-plan','record-log','camera-shot-list']},
+    {label:'Video',toolIds:['video-patch','display-plan','projection-plan','throwline','stream-plan','record-log','camera-shot-list']},
     {label:'Lighting',toolIds:['lighting-patch']},
     {label:'Power & data',toolIds:['power-plan','network-plan','cable-plan']},
     {label:'Spaces & staging',toolIds:['show-board','plotforge','room-check','breakout-room-matrix','site-survey']},
-    {label:'Logistics',toolIds:['gear-prep','truck-pack','load-in-plan','strike-plan','show-advance']},
+    {label:'Logistics',toolIds:['gear-prep','gear-reference','truck-pack','load-in-plan','strike-plan','show-advance']},
     {label:'Crew',toolIds:['crew-call','crew-time-log']},
     {label:'Show docs & client',toolIds:['show-handoff','show-report','show-task-board','change-order','client-signoff']},
     {label:'Calculators',toolIds:['av-calculator']},
@@ -107,13 +109,19 @@
     './js/av-suite-context.js',
     './js/sbd-nav.js',
     './js/sbd-public-nav.js',
+    './js/av-theme.js',
     './js/sbd-handoff.js',
     './js/responsive-tables.js',
     './js/av-domain-views.js',
     './css/sbd-public-nav.css',
+    './css/av-theme.css',
     './css/responsive-tables.css',
     './css/av-domain-views.css',
     './css/fonts.css',
+    './data/gear/index.json',
+    './data/gear/epson-powerlite-x39.json',
+    './data/gear/figures/x39-chassis.svg',
+    './data/gear/figures/x39-io.svg',
     './av-workbook.html',
     './av-workbook/index.html',
     './av-workbook/assets/av-workbook.js',
@@ -146,6 +154,30 @@
     './fonts/space-mono-bold.woff2'
   ];
 
+  /* Console family taxonomy (av-suite.html rail navigation only — a coarser,
+     14-group alternative to NAV_DEPARTMENTS above, purpose-built for the
+     AV Suite console's left rail + "All tools" grid). av-workbook is
+     deliberately NOT a member of any family — it renders as the console's
+     always-visible "Show file / Spine" rail entry instead. `subs` (only on
+     teleprompter, throwline, av-calculator) are informational mode/citation
+     chips shown when a tool row is expanded — not separate routes. */
+  var CONSOLE_FAMILIES=[
+    {id:'planning',label:'Planning',depts:'Planning',icon:['M9 2h6v4H9z','M9 4H6a1 1 0 0 0-1 1v15a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1h-3','m9 13 2 2 4-4'],toolIds:['show-advance','site-survey','plotforge','breakout-room-matrix']},
+    {id:'runofshow',label:'Run of show',depts:'Show Flow',icon:['M8 5.14v14l11-7z'],toolIds:['cueforge','teleprompter','show-timer'],subs:{teleprompter:[{label:'Read view',kind:'Mode',source:'Saved looks, this browser'},{label:'Remote',kind:'Mode',source:'Second-screen driver'},{label:'Rundown',kind:'Mode',source:'WPM pace presets'},{label:'Bookmarks',kind:'Mode',source:'Marker set, per script'}]}},
+    {id:'audio',label:'Audio',depts:'Audio',icon:['M2 12h1','M6 8v8','M10 4v16','M14 7v10','M18 10v4','M21 12h1'],toolIds:['input-list','audio-patch','line-check','speaker-plan']},
+    {id:'video',label:'Video',depts:'Video · Streaming · Playback',icon:['m16 9 5-3v12l-5-3z','M3 6h13v12H3z'],toolIds:['signal-flow','video-patch','display-plan','projection-plan','throwline','stream-plan','record-log','playback-check','camera-shot-list'],subs:{throwline:[{label:'Throw & fit',kind:'Calc',source:'Manufacturer lens spec sheets'},{label:'Brightness',kind:'Calc',source:'ANSI/INFOCOMM 3M-2011 contrast'},{label:'Field verify',kind:'Check',source:'Measured on-site reading'},{label:'Drawings',kind:'Output',source:'ANSI D print validation'}]}},
+    {id:'lighting',label:'Lighting',depts:'Lighting',icon:['M9 18h6','M10 22h4','M12 2a7 7 0 0 0-4 12.7c.6.6 1 1.4 1 2.3h6c0-.9.4-1.7 1-2.3A7 7 0 0 0 12 2z'],toolIds:['lighting-patch']},
+    {id:'power',label:'Power & data',depts:'Power · Network · Build',icon:['M13 2 4 14h7l-1 8 9-12h-7z'],toolIds:['power-plan','network-plan','cable-plan']},
+    {id:'comms',label:'Comms & RF',depts:'Comms',icon:['M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z','M19 10v2a7 7 0 0 1-14 0v-2','M12 19v3'],toolIds:['rf-coordination','comms-check']},
+    {id:'spaces',label:'Spaces',depts:'Rooms',icon:['M3 3h8v8H3z','M13 3h8v5h-8z','M13 10h8v11h-8z','M3 13h8v8H3z'],toolIds:['show-board','room-check']},
+    {id:'logistics',label:'Logistics',depts:'Logistics',icon:['M3 6h11v10H3z','M14 9h4l3 3v4h-7z','M7.5 19a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z','M17.5 19a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z'],toolIds:['gear-prep','gear-reference','truck-pack','load-in-plan','strike-plan']},
+    {id:'crew',label:'Crew',depts:'Labor',icon:['M16 20v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2','M9 10a4 4 0 1 0 0-8 4 4 0 0 0 0 8z','M22 20v-2a4 4 0 0 0-3-3.9','M16 3.1a4 4 0 0 1 0 7.8'],toolIds:['crew-call','crew-time-log']},
+    {id:'docs',label:'Docs & client',depts:'Closeout · Client · Rooms',icon:['M15 2H6a1 1 0 0 0-1 1v18a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V6z','M14 2v5h5','m9 14 2 2 4-4'],toolIds:['show-task-board','show-handoff','show-report','change-order','client-signoff']},
+    {id:'graphics',label:'Graphics',depts:'Graphics',icon:['M3 4h18v16H3z','M8.5 10a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z','m21 15-5-5L3 20'],toolIds:['pixelforge']},
+    {id:'calc',label:'Calculators',depts:'Utility',icon:['M5 2h14v20H5z','M8 6h8','M8 11h.01','M12 11h.01','M16 11h.01','M8 15h.01','M12 15h.01','M16 15v4'],toolIds:['av-calculator'],subs:{'av-calculator':[{label:'Audio delay',kind:'Calc',source:'343 m/s at 20°C, dry air'},{label:'Projection throw',kind:'Calc',source:'Manufacturer lens ratio'},{label:'Record storage',kind:'Calc',source:'Codec bitrate tables'},{label:'Power load',kind:'Calc',source:'NEC 210.20(A) 80% rule'}]}},
+    {id:'music',label:'Music',depts:'Music · outside AV scope',icon:['M9 18V5l12-2v13','M6 21a3 3 0 1 0 0-6 3 3 0 0 0 0 6z','M18 19a3 3 0 1 0 0-6 3 3 0 0 0 0 6z'],toolIds:['ontrack']}
+  ];
+
   function offlineAssets(){
     var seen={};
     return BASE_ASSETS
@@ -166,11 +198,12 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool change — rolls the service-worker cache. */
-    version:'v20260806-site-navigation',
+    version:'v20260825-av-console-rebuild',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,
     navDepartments:NAV_DEPARTMENTS,
+    consoleFamilies:CONSOLE_FAMILIES,
     aliases:ALIASES,
     baseAssets:BASE_ASSETS,
     offlineAssets:offlineAssets,

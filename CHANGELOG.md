@@ -1,11 +1,114 @@
 # Changelog
 
-## 2026-08-08
+## 2026-08-26
+
+### Show Board data-safety fixes
 
 * Fixed a Show Board defect that threw away a day's room pre-checks. Switching day tabs pruned the check record down to the day being viewed, so the ticks for the day actually being worked were lost on every glance at another date. Checks are now kept per day, and stale groups are collected only when a day is deleted.
 * Gave cross-tab overwrite detection a way out. Once another tab saved, the board refused every subsequent write while reporting only "newer copy found", so edits quietly stopped persisting and loading the newer copy discarded them. The status now reads NOT SAVING, and a Save mine anyway control resolves the conflict in favour of what is on screen.
 * Deleting a show now removes its saved record and its snapshots instead of orphaning them in browser storage.
-* Smaller Show Board repairs: room label widths re-measure once the display font finishes loading, import failures surface on whichever screen is showing rather than a hidden one, and a room pointing at a missing zone renders grey instead of silently borrowing the first zone's colour.
+* Smaller Show Board repairs: room label widths re-measure once the display font finishes loading (without closing the setup screen if it is open), import failures surface on whichever screen is showing rather than a hidden one, and a room pointing at a missing zone renders grey instead of silently borrowing the first zone's colour.
+
+## 2026-08-25
+
+### AV by Dave console rebrand and redesign
+
+* Rebranded the AV suite launch hub (`av-suite.html`) as **AV by Dave** — new masthead with a serif wordmark on a rust block mark, "Plan it. Patch it. Run the show." tagline, and a label-tape show readout — across the page title, meta description, Open Graph/Twitter cards, in-app copy decks (phase handoff, phase gate, review queue, launch list), and offline-cache messaging. The route, storage schemas, URL params, registry coupling, and the global header's `AV Suite` link are unchanged.
+* Redesigned the console presentation layer in the same warm-paper/rust drafting language: activated the self-hosted DM Serif Display as the display face, added registration-tick panel corners, a hatched tape rule under the command bar, indexed mono section labels, a mechanical segmented phase strip, squared status marks, larger readiness numerals, and a reduced-motion-safe staggered page reveal. Both inline scripts remain functionally intact and dark mode still flows entirely through `css/av-theme.css`.
+* Fixed stale `manifest.json` branding: name/short name are now `AV by Dave` and the retired `#0A0D14` background/theme colors now match the Warm Paper `#EEE8DF` chrome color.
+* Updated the homepage AV product card, hero CTA, and featured kicker to the AV by Dave name and corrected the stale tool count from 43 to 44.
+* Made Stage Slate (dark) the default theme for the AV suite and added a Dark / Light / System segmented control to the Operator Settings drawer on `av-suite.html`. The choice persists to `av-theme-mode.v1`, applies before styles evaluate via a head bootstrap script, and follows every AV tool page through `js/av-suite-context.js` (Throwline and PixelForge keep their own theme handling). In `css/av-theme.css`, `data-av-theme="dark"` now forces Stage Slate, `data-av-theme="light"` forces Warm Paper even under an OS dark preference, and `data-av-theme="system"` keeps following the OS.
+
+### Throwline projector reference appendix
+
+* Embedded a 13-row user-supplied projector appendix as reference-only evidence with its source SHA recorded; the four audited canonical projectors remain unchanged, and the nine new IDs have no compatibility or optical profiles.
+* Kept appendix fields from driving planning inputs; known source claims require field-level normalization before promotion.
+
+## 2026-08-24
+
+### Throwline Stage 3D audit release
+
+* Made projection state legible in the scene with a theme-aware beam volume, high-contrast edge rays, optical centerline, projected-image boundary, and explicit red spill or missing-coverage geometry.
+* Added front and reset camera access, an answer-first phone hierarchy, compact Adjust controls, progressive gesture help, 44-pixel touch targets, and Field Verify modes in Stage 3D and the offline planner.
+* Added synchronized non-color status and screen-reader summaries, reduced-motion behavior, higher-contrast patterned range bars, dark-room object separation, replaced-resource disposal, visibility-aware render invalidation, and a capture-specific canvas path.
+
+### Throwline pilot catalog safety cutover
+
+* Added the audited, offline pilot catalog with 5 manufacturers, 4 exact projector models, 13 lenses, 13 exact compatibility joins, 8 raw optical profiles, 13 sources, and 6 research exceptions. The embedded catalog is fingerprinted to the source workbook and synchronized deterministically into the planner and Stage 3D.
+* Applied the newer research authority as a global calculation gate: the pilot contains zero calculation-ready profiles, all broad legacy rows migrate to `legacy_unverified`, and raw official ratios, basis text, confidence, source links, and exceptions remain visible without silently driving throw math.
+* Preserved explicit `MANUAL SIMULATION` and job-scoped field calibration workflows. A positive measured distance and image width require a fresh field stamp; editing a measurement revokes that stamp without modifying catalog data.
+* Added exact planner-to-Stage transfer validation. Stage 3D rejects forged verified states, retains non-optical scene/export controls for gated pairs, and applies optical geometry suppression to the beam, projected image, spill, missing coverage, and fit verdict until the calculation state is eligible.
+* Added fail-safe legacy migration for saved jobs and share links: source-backed legacy IDs remain blocked even when old ratio values are present, while ratio-only links continue as clearly labeled manual simulations without deleting stored user data.
+
+## 2026-08-19
+
+- Kept the canonical NoteForge breadcrumb clear of the mobile sidebar controls and bounded the embedded app height to the remaining viewport.
+* Added a target-bounded NoteForge release sync and verification contract that preserves System by Dave navigation, records the exact upstream commit and artifact hashes, rejects unmanaged target files, and gates Pages deployment on canonical artifact integrity.
+
+## 2026-08-13
+
+* Added `/av-tool-suite/index-v2/` as a parallel, workflow-first AV Tool Suite index. The dark graphite visual direction maps the 25 named legacy tools into Plan, Build, and Run & Support workspaces without changing `/av-suite.html`; it includes local control-room and advance-venue imagery at `/images/av-control-room.jpg` and `/images/av-venue-advance.jpg`.
+
+### Portfolio accessibility remediation
+
+* Closed and production-verified CurlPlan #8, Hat in Ring #4–#7, and Frontier Signals #2 after their commits passed repository verification, security, deployment, and affected live-browser checks.
+* Added the remediation rerun record with commit, workflow, live-header, issue-state, keyboard, semantics, contrast, target-size, text-spacing, focus, and reflow evidence.
+* Closed CurlPlan #9 after all four deployed demo tabs measured at least 44 by 44 CSS pixels at 390px and 640px with preserved order, visible focus, selected styling, and overflow behavior.
+* Cleared the WCAG A/AA release gate and moved the broader portfolio baseline from Red through Amber to Green in the re-tested browser scope; all seven matrix issues are closed.
+
+## 2026-08-12
+
+### AV Suite adaptive themes
+
+* Unified the AV Suite hub and all 44 canonical tools under two system-driven palettes: Warm Paper for light mode and Stage Slate for dark mode, with rust primary actions, blue focus and readiness, and consistent success, warning, and issue semantics.
+* Preserved specialist work surfaces where color carries operational meaning, including Teleprompter reader looks, Throwline measurement bands, Stage Plot drafting, PixelForge canvas previews, and Show Board timelines.
+* Added a route-by-route palette and reusable-design audit plus automated metadata, token, rendered-contrast, responsive-overflow, and specialist-theme verification across both operating-system preferences.
+* Rolled the offline cache so returning operators receive the shared theme stylesheet and compiled specialist bridge.
+
+### Gear Reference beta
+
+* Added `gear-reference.html`, a data-driven, offline AV equipment library with fixed-viewport panel navigation, full-text search, keyboard and swipe control, deep links, reduced motion, dark and light figure theming, and print-all output.
+* Added the first authored sheet for the Epson PowerLite X39, including two original schematic SVGs, twelve source-marked sections, and a required per-claim accuracy log.
+* Registered Gear Reference for Prep and Load In, added it to Logistics navigation and offline caching, linked matching Gear Prep rows into the library, and raised the public browser-tool count to 43.
+
+### Portfolio Now phase
+
+* Completed the expanded five-product WCAG 2.2 AA browser QA matrix across full keyboard traversal, representative journeys, semantics, 200% reflow, text spacing, contrast, target size, responsive screenshots, and reduced motion; screen-reader testing is excluded from this gate.
+* Recorded seven owned accessibility defects across CurlPlan, Hat in Ring, and Frontier Signals, including six release-blocking A/AA failures, and moved the canonical accessibility baseline and roadmap status to Red pending deployed remediation and re-test.
+* Added versioned signal, evidence, release-manifest, and structured run-event schemas with verified examples.
+* Standardized portfolio logs as JSON Lines with one correlation ID across collection, verification, build, deployment, and smoke-check workflows.
+* Selected GitHub Actions logs and artifacts as the immediate evidence source and a vendor-neutral OpenTelemetry path to centralized Loki/Tempo search.
+* Executed and recorded the portfolio Now package across CurlPlan, Phillies Wire, Frontier Signals data lab, Hat in Ring, and the canonical Frontier Signals repository, including repository commits, CI/deploy evidence, and measured performance results.
+* Added an executable five-product browser audit and WCAG 2.2 AA baseline covering keyboard order, control names, target size, reduced motion, and 200% reflow.
+* Added a proof-based release checklist and dated press-release drafts to the product repositories while initializing every missing changelog.
+
+### DepotOps v0.5.0
+
+* Enforced consistent `/depotops/` shopping-run quantities and statuses, added visible Requested, Shopping status, and Purchased labels, and surfaced partial quantities and overages directly on each row.
+* Replaced unconditional run completion with an atomic closeout preflight that keeps readiness and close actions visible, requires carry-or-skip decisions for every unresolved row, requires explicit overage acceptance, bounds Warehouse allocations, and names a follow-up run when remaining quantities are carried forward.
+* Added schema v5 migration and regression coverage for contradictory legacy state, blocked closeouts, Warehouse reconciliation, row dispositions, follow-up quantities, responsive controls, and decision gating.
+
+## 2026-08-10
+
+* Added the 12-month portfolio product roadmap for Frontier Signals, Hat in Ring, CurlPlan, and Phillies Wire, covering feature sequencing, UX and accessibility, visual systems, screen flows, security and compliance, SEO, performance, technical debt, owners, measurable release gates, structured logs, blockers, and risk controls.
+* Added `/ProjectorThrow/` for Throwline SHOW 2.0: a self-contained offline projector planning and show-handoff app plus an optional online Stage 3D companion with responsive overlays, keyboard camera control, persistent light and dark themes, dependency fallback messaging, and OBJ, MTL, and GLB export.
+* Reconciled the unlisted-route search policy: handoff gateways now point canonical signals at their destinations, PixelForge compatibility routes consolidate under `/pixelforge/`, and internal/source-only routes are explicitly excluded from crawling.
+
+### DepotOps v0.4.1
+
+* Upgraded `/depotops/` to v0.4.1 with a persistent Project Inspector: the selected project stays visible beside the board on wide screens, moves above the board on narrower screens, uses compact detail cards instead of wide tables, and clearly marks the project currently being inspected.
+
+### DepotOps v0.4.0
+
+* Linked all 48 canonical `/depotops/` shopping rows to evidence-backed project context, classified active, gated, parked, review, and superseded work, focused the default view on 22 outstanding rows tied to current or previously stopped projects, and migrated existing browser state to schema v4 without replacing saved quantities, statuses, older runs, or custom data.
+
+### DepotOps v0.3.0
+
+* Synced `/depotops/` to the canonical Notion Home Depot list: all 48 rows are present, with 25 outstanding and 23 purchased; every row links back to its Notion source, existing browser data migrates additively, and Verify/Hold rows remain visible instead of being suppressed.
+
+### DepotOps v0.2.3
+
+* Added `/depotops/`, a local-first home project operations tool for project requirements, multi-project shopping runs, warehouse inventory, tool records, purchase reconciliation, and JSON backup and restore.
 
 ## 2026-08-06
 

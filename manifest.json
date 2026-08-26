@@ -1,13 +1,13 @@
 {
-  "name": "AV Suite — System by Dave",
-  "short_name": "AV Suite",
-  "description": "Operator console for live-show AV tools - planning, patching, timing, cueing, graphics, and run-of-show. Offline-capable and free.",
+  "name": "AV by Dave",
+  "short_name": "AV by Dave",
+  "description": "Field-grade AV show operations console by Dave Robertson - planning, patching, timing, cueing, graphics, and run-of-show. Offline-capable and free.",
   "lang": "en-US",
   "start_url": "./av-suite.html",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#0A0D14",
-  "theme_color": "#0A0D14",
+  "background_color": "#EEE8DF",
+  "theme_color": "#EEE8DF",
   "icons": [
     { "src": "profile/assets/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
     { "src": "profile/assets/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }

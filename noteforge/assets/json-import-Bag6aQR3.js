@@ -1,0 +1,1 @@
+function t(e){const r=JSON.parse(e);if(!Array.isArray(r))throw new Error("Expected a JSON array of notes.");return r}function o(e){return e.filter(r=>r&&typeof r.content=="string")}export{t as parseNoteMergeImport,o as selectImportableNotes};

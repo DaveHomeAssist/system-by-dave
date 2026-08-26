@@ -1,0 +1,748 @@
+/* System by Dave AV Suite theme contract.
+   Two palettes only: Warm Paper (light) and Stage Slate (dark).
+   Pages opt in with <html data-av-theme="system" data-av-tool="…">.
+   Product-specific layout and operator semantics stay local; color authority
+   lives here and follows the operating-system preference by default. */
+
+:root {
+  color-scheme: light;
+
+  /* Warm Paper */
+  --av-bg: #eee8df;
+  --av-surface: #fffcf7;
+  --av-surface-2: #f7f2ea;
+  --av-surface-3: #efe7dd;
+  --av-raised: #e7dcd0;
+  --av-control: #f4ede4;
+  --av-line: #d6cabc;
+  --av-line-strong: #a99584;
+  --av-text: #211d1a;
+  --av-text-2: #4e463f;
+  --av-muted: #62594f;
+  --av-dim: #70645a;
+  --av-accent: #9e432b;
+  --av-accent-strong: #7d3322;
+  --av-primary-ink: #fffaf4;
+  --av-focus: #2f658d;
+  --av-success: #2e704e;
+  --av-warning: #77510f;
+  --av-danger: #9a392d;
+  --av-info: #2f658d;
+  --av-purple: #6b4f91;
+  --av-accent-soft: rgba(158, 67, 43, .10);
+  --av-accent-line: rgba(158, 67, 43, .40);
+  --av-focus-soft: rgba(47, 101, 141, .11);
+  --av-focus-line: rgba(47, 101, 141, .42);
+  --av-success-soft: rgba(46, 112, 78, .10);
+  --av-success-line: rgba(46, 112, 78, .40);
+  --av-warning-soft: rgba(119, 81, 15, .10);
+  --av-warning-line: rgba(119, 81, 15, .40);
+  --av-danger-soft: rgba(154, 57, 45, .10);
+  --av-danger-line: rgba(154, 57, 45, .42);
+  --av-grid: rgba(77, 57, 39, .055);
+  --av-overlay: rgba(32, 24, 18, .48);
+  --av-shadow: 0 16px 50px -28px rgba(57, 41, 29, .34);
+  --av-shadow-pop: 0 28px 80px -26px rgba(57, 41, 29, .42);
+}
+
+@media (prefers-color-scheme: dark) {
+  html:not([data-av-theme="light"]) {
+    color-scheme: dark;
+
+    /* Stage Slate */
+    --av-bg: #0c1016;
+    --av-surface: #131922;
+    --av-surface-2: #19212c;
+    --av-surface-3: #202a37;
+    --av-raised: #273342;
+    --av-control: #101720;
+    --av-line: #2d3948;
+    --av-line-strong: #526174;
+    --av-text: #f4f0e8;
+    --av-text-2: #d0c8bc;
+    --av-muted: #b4ac9f;
+    --av-dim: #909baa;
+    --av-accent: #e08a4f;
+    --av-accent-strong: #f0a46f;
+    --av-primary-ink: #1c0f05;
+    --av-focus: #72b8ff;
+    --av-success: #78c997;
+    --av-warning: #f0c36f;
+    --av-danger: #f08d7d;
+    --av-info: #72b8ff;
+    --av-purple: #b99be7;
+    --av-accent-soft: rgba(224, 138, 79, .14);
+    --av-accent-line: rgba(224, 138, 79, .46);
+    --av-focus-soft: rgba(114, 184, 255, .13);
+    --av-focus-line: rgba(114, 184, 255, .46);
+    --av-success-soft: rgba(120, 201, 151, .12);
+    --av-success-line: rgba(120, 201, 151, .44);
+    --av-warning-soft: rgba(240, 195, 111, .12);
+    --av-warning-line: rgba(240, 195, 111, .44);
+    --av-danger-soft: rgba(240, 141, 125, .12);
+    --av-danger-line: rgba(240, 141, 125, .46);
+    --av-grid: rgba(255, 255, 255, .026);
+    --av-overlay: rgba(3, 5, 8, .66);
+    --av-shadow: 0 18px 58px -30px rgba(0, 0, 0, .82);
+    --av-shadow-pop: 0 30px 88px -24px rgba(0, 0, 0, .84);
+  }
+}
+
+/* An explicit operator choice of Stage Slate wins regardless of the OS
+   preference. Keep this block byte-for-byte in sync with the media block
+   above. */
+html[data-av-theme="dark"] {
+  color-scheme: dark;
+
+  /* Stage Slate */
+  --av-bg: #0c1016;
+  --av-surface: #131922;
+  --av-surface-2: #19212c;
+  --av-surface-3: #202a37;
+  --av-raised: #273342;
+  --av-control: #101720;
+  --av-line: #2d3948;
+  --av-line-strong: #526174;
+  --av-text: #f4f0e8;
+  --av-text-2: #d0c8bc;
+  --av-muted: #b4ac9f;
+  --av-dim: #909baa;
+  --av-accent: #e08a4f;
+  --av-accent-strong: #f0a46f;
+  --av-primary-ink: #1c0f05;
+  --av-focus: #72b8ff;
+  --av-success: #78c997;
+  --av-warning: #f0c36f;
+  --av-danger: #f08d7d;
+  --av-info: #72b8ff;
+  --av-purple: #b99be7;
+  --av-accent-soft: rgba(224, 138, 79, .14);
+  --av-accent-line: rgba(224, 138, 79, .46);
+  --av-focus-soft: rgba(114, 184, 255, .13);
+  --av-focus-line: rgba(114, 184, 255, .46);
+  --av-success-soft: rgba(120, 201, 151, .12);
+  --av-success-line: rgba(120, 201, 151, .44);
+  --av-warning-soft: rgba(240, 195, 111, .12);
+  --av-warning-line: rgba(240, 195, 111, .44);
+  --av-danger-soft: rgba(240, 141, 125, .12);
+  --av-danger-line: rgba(240, 141, 125, .46);
+  --av-grid: rgba(255, 255, 255, .026);
+  --av-overlay: rgba(3, 5, 8, .66);
+  --av-shadow: 0 18px 58px -30px rgba(0, 0, 0, .82);
+  --av-shadow-pop: 0 30px 88px -24px rgba(0, 0, 0, .84);
+}
+
+/* Legacy aliases let the existing tools keep their layout and behavior while
+   consuming the same palette. Throwline and PixelForge keep specialist token
+   names and are bridged separately below. */
+html[data-av-theme]:not([data-av-tool="throwline"]):not([data-av-tool="pixelforge"]) {
+  --bg: var(--av-bg);
+  --surface: var(--av-surface);
+  --surface-2: var(--av-surface-2);
+  --surface-3: var(--av-surface-3);
+  --raised: var(--av-raised);
+  --panel: var(--av-surface);
+  --panel-2: var(--av-surface-2);
+  --panel-3: var(--av-surface-3);
+  --line: var(--av-line);
+  --line-2: var(--av-line);
+  --line-soft: var(--av-line);
+  --line-strong: var(--av-line-strong);
+  --text: var(--av-text);
+  --text-2: var(--av-text-2);
+  --txt: var(--av-text);
+  --muted: var(--av-muted);
+  --mut: var(--av-muted);
+  --dim: var(--av-dim);
+  --faint: var(--av-dim);
+  --accent: var(--av-accent);
+  --accent-2: var(--av-focus);
+  --accent-bright: var(--av-accent-strong);
+  --accent-strong: var(--av-accent-strong);
+  --accent-deep: var(--av-accent-strong);
+  --accent-pale: var(--av-accent-strong);
+  --accent-soft: var(--av-accent-soft);
+  --accent-tint: var(--av-accent-soft);
+  --accent-tint-2: var(--av-accent-soft);
+  --accent-line: var(--av-accent-line);
+  --rust: var(--av-accent);
+  --rust-2: var(--av-accent-strong);
+  --blue: var(--av-focus);
+  --cyan: var(--av-info);
+  --green: var(--av-success);
+  --good: var(--av-success);
+  --amber: var(--av-warning);
+  --yellow: var(--av-warning);
+  --warn: var(--av-warning);
+  --red: var(--av-danger);
+  --bad: var(--av-danger);
+  --danger: var(--av-danger);
+  --purple: var(--av-purple);
+  --violet: var(--av-purple);
+  --ready: var(--av-focus);
+  --ready-pale: var(--av-focus);
+  --ready-tint: var(--av-focus-soft);
+  --ready-line: var(--av-focus-line);
+  --issue: var(--av-danger);
+  --issue-pale: var(--av-danger);
+  --issue-tint: var(--av-danger-soft);
+  --issue-line: var(--av-danger-line);
+  --pin: var(--av-warning);
+  --pin-pale: var(--av-warning);
+  --pin-tint: var(--av-warning-soft);
+  --pin-line: var(--av-warning-line);
+  --skip: var(--av-dim);
+  --skip-pale: var(--av-muted);
+  --skip-tint: var(--av-focus-soft);
+  --skip-line: var(--av-line-strong);
+  --info: var(--av-info);
+  --info-tint: var(--av-focus-soft);
+  --shadow: var(--av-shadow);
+  --shadow-pop: var(--av-shadow-pop);
+  --ring: 0 0 0 3px var(--av-accent-soft);
+}
+
+html[data-av-theme]:not([data-av-tool="show-board"]):not([data-av-tool="throwline"]):not([data-av-tool="pixelforge"]) {
+  --ink: var(--av-primary-ink);
+}
+
+/* Base canvas and drafting grid. Specialist projector and creative-editor
+   canvases retain their own functional backgrounds. */
+html[data-av-theme]:not([data-av-tool="throwline"]):not([data-av-tool="pixelforge"]) body {
+  background:
+    radial-gradient(900px 460px at 14% -10%, var(--av-accent-soft), transparent 62%),
+    radial-gradient(760px 420px at 88% 0%, var(--av-focus-soft), transparent 66%),
+    var(--av-bg) !important;
+  color: var(--av-text);
+}
+
+html[data-av-theme]:not([data-av-tool="throwline"]):not([data-av-tool="pixelforge"]) body::before {
+  background:
+    repeating-linear-gradient(90deg, var(--av-grid) 0 1px, transparent 1px 80px),
+    repeating-linear-gradient(0deg, var(--av-grid) 0 1px, transparent 1px 80px) !important;
+}
+
+html[data-av-theme] :where(input, select, textarea) {
+  border-color: var(--av-line);
+  background-color: var(--av-control);
+  color: var(--av-text);
+}
+
+html[data-av-theme] :where(input, select, textarea):hover,
+html[data-av-theme] :where(input, select, textarea):focus {
+  border-color: var(--av-line-strong);
+  background-color: var(--av-surface-2);
+}
+
+html[data-av-theme] :where(input, textarea)::placeholder {
+  color: var(--av-dim);
+  opacity: 1;
+}
+
+html[data-av-theme] :where(button, .btn, .button-link, .file-button):not(.primary):not(.pri):not(.danger) {
+  border-color: var(--av-line);
+  background-color: var(--av-surface-2);
+  color: var(--av-text-2);
+}
+
+html[data-av-theme] :where(button, .btn, .button-link, .file-button):not(.primary):not(.pri):not(.danger):hover {
+  border-color: var(--av-line-strong);
+  background-color: var(--av-surface-3);
+  color: var(--av-text);
+}
+
+html[data-av-theme] button.primary,
+html[data-av-theme] .btn.primary,
+html[data-av-theme] .btn.pri,
+html[data-av-theme] .button-link.primary,
+html[data-av-theme] .pf-page-btn.primary {
+  border-color: var(--av-accent);
+  background: var(--av-accent);
+  color: var(--av-primary-ink);
+}
+
+html[data-av-theme] button.danger,
+html[data-av-theme] .btn.danger {
+  border-color: var(--av-danger-line);
+  background: var(--av-danger-soft);
+  color: var(--av-danger);
+}
+
+html[data-av-theme] :where(button, a, input, select, textarea, [tabindex]):focus-visible {
+  outline-color: var(--av-focus);
+}
+
+html[data-av-theme] :where(
+  .panel, .hero-panel, .timer-panel, .calc-card, .card, .metric-card,
+  .engine-shell, .engine-card, .grid-panel, .loading-panel, .data-health,
+  .command-palette, .drawer, .recommend-card, .tool-card, .hero-main,
+  .status-panel, .meta-panel, .plot-card, .inspector, .operator-panel,
+  .workbench, .preview-panel, .side-panel, .caller-deck-panel
+) {
+  border-color: var(--av-line);
+  background: var(--av-surface);
+  color: var(--av-text);
+  box-shadow: var(--av-shadow);
+}
+
+html[data-av-theme] :where(
+  .topbar, header.bar, .toolbar, .plate, .rail, .command-bar,
+  .drawer-head, .drawer-foot, .command-input-wrap, .section-head,
+  .preview-toolbar
+) {
+  border-color: var(--av-line);
+  background: color-mix(in srgb, var(--av-surface) 94%, transparent);
+  color: var(--av-text);
+}
+
+html[data-av-theme] :where(
+  .stat, .metric, .selected-card, .item-node, .route-card, .rf-marker,
+  .zone-card, .meter, .review-item, .data-list li, .next-card,
+  .record-node, .cue-card
+) {
+  border-color: var(--av-line);
+  background: var(--av-surface-2);
+}
+
+html[data-av-theme] :where(th, .workbook-grid th) {
+  border-color: var(--av-line);
+  background: var(--av-surface-3);
+  color: var(--av-muted);
+}
+
+html[data-av-theme] :where(td, .workbook-grid td) {
+  border-color: var(--av-line);
+}
+
+html[data-av-theme] :where(tbody tr:hover, .workbook-grid tr:focus-within td) {
+  background-color: var(--av-focus-soft);
+}
+
+html[data-av-theme] .table-wrap tbody tr {
+  border-color: var(--av-line) !important;
+  background-color: var(--av-surface) !important;
+}
+
+html[data-av-theme] .table-wrap tbody :where(td, th) {
+  border-bottom-color: var(--av-line) !important;
+}
+
+html[data-av-theme] :where(.av-domain-view, .av-domain-card, .av-domain-count) {
+  border-color: var(--av-line);
+  background: var(--av-surface-2);
+  color: var(--av-text);
+}
+
+html[data-av-theme] .av-domain-card.is-selected {
+  border-color: var(--av-focus);
+  box-shadow: 0 0 0 3px var(--av-focus-soft);
+}
+
+html[data-av-theme] .av-domain-status {
+  border-color: var(--av-line-strong);
+  background: var(--av-surface-3);
+  color: var(--av-text-2);
+}
+
+html[data-av-theme] :is(
+  .av-domain-status.is-ready, .av-domain-status.is-checked,
+  .av-domain-status.is-passed, .av-domain-status.is-hot,
+  .av-domain-status.is-online, .av-domain-status.is-clean,
+  .av-domain-status.is-tested, .av-domain-status.is-loaded,
+  .av-domain-status.is-arrived, .av-domain-status.is-delivered,
+  .av-domain-status.is-built, .av-domain-status.is-returned,
+  .av-domain-status.is-done, .av-domain-status.is-taken,
+  .av-domain-status.is-verified
+) {
+  border-color: var(--av-success-line);
+  background: var(--av-success-soft);
+  color: var(--av-success);
+}
+
+html[data-av-theme] :is(
+  .av-domain-status.is-patched, .av-domain-status.is-linecheck,
+  .av-domain-status.is-gained, .av-domain-status.is-scanned,
+  .av-domain-status.is-pulled, .av-domain-status.is-staged,
+  .av-domain-status.is-strapped, .av-domain-status.is-struck,
+  .av-domain-status.is-active
+) {
+  border-color: var(--av-focus-line);
+  background: var(--av-focus-soft);
+  color: var(--av-focus);
+}
+
+html[data-av-theme] :is(
+  .av-domain-status.is-open, .av-domain-status.is-pending,
+  .av-domain-status.is-planned, .av-domain-status.is-needed,
+  .av-domain-status.is-hold, .av-domain-status.is-watch,
+  .av-domain-status.is-deferred, .av-domain-status.is-building,
+  .av-domain-status.is-strike, .av-domain-status.is-backup
+) {
+  border-color: var(--av-warning-line);
+  background: var(--av-warning-soft);
+  color: var(--av-warning);
+}
+
+html[data-av-theme] :is(
+  .av-domain-status.is-problem, .av-domain-status.is-muted,
+  .av-domain-status.is-missing, .av-domain-status.is-blocked,
+  .av-domain-status.is-issue
+) {
+  border-color: var(--av-danger-line);
+  background: var(--av-danger-soft);
+  color: var(--av-danger);
+}
+
+html[data-av-theme] :is(.av-domain-status.is-spare, .av-domain-status.is-na) {
+  border-color: var(--av-line-strong);
+  background: var(--av-surface-3);
+  color: var(--av-muted);
+}
+
+/* Shared System by Dave navigation follows the same pair of palettes. */
+html[data-av-theme] .sbd-public-nav,
+html[data-av-theme] .sbd-site-header,
+html[data-av-theme] .sbd-site-return,
+html[data-av-theme] .sbd-section-nav {
+  border-color: var(--av-line);
+  background: color-mix(in srgb, var(--av-surface) 94%, transparent);
+  color: var(--av-text);
+  box-shadow: var(--av-shadow);
+}
+
+html[data-av-theme] .sbd-public-nav :where(a, button) {
+  border-color: var(--av-line);
+  background: var(--av-surface-2);
+  color: var(--av-text-2);
+}
+
+html[data-av-theme] :where(.sbd-public-nav a, .sbd-public-nav button, .sbd-site-links a, .sbd-section-nav a):hover,
+html[data-av-theme] :where(.sbd-site-links a, .sbd-section-nav a)[aria-current="page"] {
+  border-color: var(--av-accent);
+  background: var(--av-accent-soft);
+  color: var(--av-accent-strong);
+}
+
+html[data-av-theme] .sbd-site-brand__mark {
+  border-color: var(--av-line-strong);
+  color: var(--av-accent);
+}
+
+html[data-av-theme] .brand-mark {
+  border-color: var(--av-accent-line);
+  background: var(--av-accent-soft);
+  color: var(--av-accent);
+}
+
+html[data-av-theme] .sbd-site-links a,
+html[data-av-theme] .sbd-section-nav a,
+html[data-av-theme] .sbd-site-return__current {
+  color: var(--av-muted);
+}
+
+html[data-av-theme] .sbd-site-return__separator {
+  color: var(--av-dim);
+}
+
+html[data-av-theme] .sbd-skip-link {
+  background: var(--av-text);
+  color: var(--av-bg);
+}
+
+/* OnTrack keeps the excellent deck/rail/screen composition, but the hardware
+   shell now consumes the shared surfaces and rust action language. */
+html[data-av-tool="ontrack"] {
+  --case: var(--av-surface);
+  --inset: var(--av-control);
+  --line2: var(--av-line-strong);
+  --acc: var(--av-accent);
+  --ok: var(--av-success);
+  --warn: var(--av-danger);
+  --add: var(--av-focus);
+}
+
+html[data-av-tool="ontrack"] :where(.plate, .rail, .screen, .drawer, .tblwrap, .setlist, .note) {
+  border-color: var(--av-line);
+  background: var(--av-surface);
+  color: var(--av-text);
+}
+
+/* PlotForge keeps its black drafting surface, while its surrounding planning
+   shell uses the shared surfaces. This prevents its former hard-coded dark
+   cards from carrying dark text in Warm Paper mode. */
+html[data-av-tool="plotforge"] :where(
+  .hero-main, .status-panel, .meta-panel, .plot-card, .inspector,
+  .operator-panel
+) {
+  border-color: var(--av-line);
+  background: var(--av-surface);
+  color: var(--av-text);
+}
+
+html[data-av-tool="plotforge"] :where(.metric, .selected-card) {
+  border-color: var(--av-line);
+  background: var(--av-surface-2);
+  color: var(--av-text);
+}
+
+/* The timer's display and controls remain one visual system in either mode. */
+html[data-av-tool="show-timer"] :where(.control-panel, .info-panel) {
+  border-color: var(--av-line);
+  background: var(--av-surface);
+  color: var(--av-text);
+}
+
+html[data-av-tool="show-timer"] :where(.state-pill, .shortcut-list dt) {
+  border-color: var(--av-line);
+  background: var(--av-surface-2);
+  color: var(--av-text);
+}
+
+html[data-av-tool="show-timer"] .panel-title {
+  border-color: var(--av-line);
+}
+
+/* Show Board keeps its timeline, room blocks and parchment character. Theme
+   selection is system-owned; these aliases align its semantics with the pair. */
+html[data-av-tool="show-board"] {
+  --panel: var(--av-surface);
+  --panel-2: var(--av-surface-2);
+  --line: var(--av-line);
+  --parchment: var(--av-text);
+  --muted: var(--av-muted);
+  --sand: var(--av-warning);
+  --rust: var(--av-danger);
+  --olive: var(--av-success);
+  --txdead: var(--av-danger);
+}
+
+@media (prefers-color-scheme: dark) {
+  html:not([data-av-theme="light"])[data-av-tool="show-board"] body.dark {
+    --ink: var(--av-bg);
+    --panel: var(--av-surface);
+    --panel-2: var(--av-surface-2);
+    --line: var(--av-line);
+    --parchment: var(--av-text);
+    --muted: var(--av-muted);
+    --sand: var(--av-warning);
+    --rust: var(--av-danger);
+    --olive: var(--av-success);
+    --txdead: var(--av-danger);
+  }
+}
+
+html[data-av-theme="dark"][data-av-tool="show-board"] body.dark {
+  --ink: var(--av-bg);
+  --panel: var(--av-surface);
+  --panel-2: var(--av-surface-2);
+  --line: var(--av-line);
+  --parchment: var(--av-text);
+  --muted: var(--av-muted);
+  --sand: var(--av-warning);
+  --rust: var(--av-danger);
+  --olive: var(--av-success);
+  --txdead: var(--av-danger);
+}
+
+/* PixelForge retains its canvas/editor ergonomics and product color roles.
+   Launch pages follow the OS; the editor's existing manual override remains. */
+html[data-av-tool="pixelforge"] .pf-page {
+  --page-bg: var(--av-bg);
+  --page-panel: var(--av-surface);
+  --page-panel-2: var(--av-surface-2);
+  --page-line: var(--av-line);
+  --page-line-strong: var(--av-line-strong);
+  --page-text: var(--av-text);
+  --page-muted: var(--av-muted);
+  --page-muted-2: var(--av-dim);
+  --page-amber: var(--av-accent);
+  --page-teal: var(--av-success);
+  --page-blue: var(--av-focus);
+  --page-coral: var(--av-danger);
+}
+
+html[data-av-tool="pixelforge"] :where(
+  .pf-hero-panel, .pf-launch-section, .pf-guide-card, .pf-ob-shell,
+  .pf-ob-complete, .pf-brand-card, .pf-page-modal
+) {
+  border-color: var(--av-line);
+  background: color-mix(in srgb, var(--av-surface) 94%, transparent);
+  color: var(--av-text);
+}
+
+html[data-av-tool="pixelforge"] .pf-launch-sidebar {
+  border-color: var(--av-line);
+  background: color-mix(in srgb, var(--av-surface) 96%, transparent);
+  color: var(--av-text);
+}
+
+html[data-av-tool="pixelforge"] .pf-launch-nav-link:hover,
+html[data-av-tool="pixelforge"] .pf-launch-nav-link.active {
+  border-color: var(--av-line);
+  background: var(--av-accent-soft);
+  color: var(--av-text);
+}
+
+html[data-av-tool="pixelforge"] .pf-page-btn.primary {
+  border-color: var(--av-accent);
+  background: var(--av-accent);
+  color: var(--av-primary-ink);
+}
+
+html[data-av-tool="pixelforge"] .pf-brand-mark {
+  background: var(--av-accent);
+  color: var(--av-primary-ink);
+}
+
+/* The launcher preview is a miniature creative canvas, so it stays Stage
+   Slate even when the surrounding launcher follows Warm Paper. */
+html[data-av-tool="pixelforge"] .pf-hero-art .layer {
+  border-color: #526174;
+  background: rgba(12, 16, 22, .90);
+  color: #f4f0e8;
+}
+
+html[data-av-tool="pixelforge"] .pf:not(.pf-dark) {
+  --pf-bg: #eee8df;
+  --pf-bg-soft: #f7f2ea;
+  --pf-panel: rgba(255, 252, 247, .88);
+  --pf-panel-strong: rgba(255, 255, 255, .96);
+  --pf-line: #d6cabc;
+  --pf-line-strong: #a99584;
+  --pf-text: #25343f;
+  --pf-muted: #62594f;
+  --pf-soft: #756a60;
+  --pf-accent: #9e432b;
+  --pf-accent-strong: #7d3322;
+  --pf-accent-soft: rgba(158, 67, 43, .12);
+  --pf-highlight: #b4791b;
+}
+
+html[data-av-tool="pixelforge"] .pf.pf-dark {
+  --pf-bg: #0c1016;
+  --pf-bg-soft: #19212c;
+  --pf-panel: rgba(19, 25, 34, .92);
+  --pf-panel-strong: rgba(32, 42, 55, .96);
+  --pf-line: #2d3948;
+  --pf-line-strong: #526174;
+  --pf-text: #f4f0e8;
+  --pf-muted: #b4ac9f;
+  --pf-soft: #909baa;
+  --pf-accent: #e08a4f;
+  --pf-accent-strong: #f0a46f;
+  --pf-accent-soft: rgba(224, 138, 79, .14);
+  --pf-highlight: #f0c36f;
+}
+
+@media (prefers-color-scheme: dark) {
+  html:not([data-av-theme="light"])[data-av-tool="pixelforge"] .pf-page {
+    --page-bg: var(--av-bg);
+    --page-panel: var(--av-surface);
+    --page-panel-2: var(--av-surface-2);
+    --page-line: var(--av-line);
+    --page-line-strong: var(--av-line-strong);
+    --page-text: var(--av-text);
+    --page-muted: var(--av-muted);
+    --page-muted-2: var(--av-dim);
+    --page-amber: var(--av-accent);
+  }
+}
+
+html[data-av-theme="dark"][data-av-tool="pixelforge"] .pf-page {
+  --page-bg: var(--av-bg);
+  --page-panel: var(--av-surface);
+  --page-panel-2: var(--av-surface-2);
+  --page-line: var(--av-line);
+  --page-line-strong: var(--av-line-strong);
+  --page-text: var(--av-text);
+  --page-muted: var(--av-muted);
+  --page-muted-2: var(--av-dim);
+  --page-amber: var(--av-accent);
+}
+
+@media (prefers-color-scheme: light) {
+  html:not([data-av-theme="dark"])[data-av-tool="teleprompter"] #controlsToggleBtn {
+    border-color: var(--av-accent);
+    background: var(--av-accent);
+    color: var(--av-primary-ink);
+  }
+
+  html:not([data-av-theme="dark"])[data-av-tool="teleprompter"] :where(.controls-toggle-inline, .editor-head .editor-controls-btn) {
+    border-color: var(--av-accent-line);
+    background: var(--av-accent-soft);
+    color: var(--av-accent-strong);
+  }
+
+  html:not([data-av-theme="dark"])[data-av-tool="teleprompter"] :where(.toolbar-compact-toggle, button.cue-active) {
+    border-color: var(--av-warning-line);
+    background: var(--av-warning-soft);
+    color: var(--av-warning);
+  }
+
+  html:not([data-av-theme="dark"])[data-av-tool="teleprompter"] .hint.next-action-ready,
+  html:not([data-av-theme="dark"])[data-av-tool="teleprompter"] .script-meta {
+    color: var(--av-muted);
+  }
+
+  html:not([data-av-theme="dark"])[data-av-tool="teleprompter"] .format-bar {
+    border-color: var(--av-line);
+    background: var(--av-surface-3);
+  }
+
+  html:not([data-av-theme="dark"])[data-av-tool="teleprompter"] .format-bar .fb-label {
+    color: var(--av-muted);
+  }
+}
+
+html[data-av-theme="light"][data-av-tool="teleprompter"] #controlsToggleBtn {
+  border-color: var(--av-accent);
+  background: var(--av-accent);
+  color: var(--av-primary-ink);
+}
+
+html[data-av-theme="light"][data-av-tool="teleprompter"] :where(.controls-toggle-inline, .editor-head .editor-controls-btn) {
+  border-color: var(--av-accent-line);
+  background: var(--av-accent-soft);
+  color: var(--av-accent-strong);
+}
+
+html[data-av-theme="light"][data-av-tool="teleprompter"] :where(.toolbar-compact-toggle, button.cue-active) {
+  border-color: var(--av-warning-line);
+  background: var(--av-warning-soft);
+  color: var(--av-warning);
+}
+
+html[data-av-theme="light"][data-av-tool="teleprompter"] .hint.next-action-ready,
+html[data-av-theme="light"][data-av-tool="teleprompter"] .script-meta {
+  color: var(--av-muted);
+}
+
+html[data-av-theme="light"][data-av-tool="teleprompter"] .format-bar {
+  border-color: var(--av-line);
+  background: var(--av-surface-3);
+}
+
+html[data-av-theme="light"][data-av-tool="teleprompter"] .format-bar .fb-label {
+  color: var(--av-muted);
+}
+
+@media (max-width: 680px) {
+  html[data-av-theme] :where(button, .btn, .button-link, .file-button, input, select) {
+    min-height: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-av-theme] *,
+  html[data-av-theme] *::before,
+  html[data-av-theme] *::after {
+    scroll-behavior: auto !important;
+  }
+}
+
+@media print {
+  html[data-av-theme] body {
+    background: #fff !important;
+    color: #111 !important;
+  }
+}

@@ -34,6 +34,7 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
 - `agents.html`: agents catalog (cards are deep-linked)
 - `skills.html`: skills catalog
 - `widgets.html`: widget previews (poster cards, not live iframes)
+- `depotops/index.html`: local-first home project shopping, inventory, and tool tracking
 - `av-suite.html`: AV suite launch hub
 - `teleprompter.html`: AV teleprompter
 - `show-timer.html`: AV show timer
@@ -57,6 +58,7 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
 - `rf-coordination.html`: AV RF coordination sheet
 - `site-survey.html`: AV site survey
 - `gear-prep.html`: AV gear prep checklist
+- `gear-reference.html`: offline AV gear field reference library
 - `truck-pack.html`: AV truck pack plan
 - `load-in-plan.html`: AV load in plan
 - `strike-plan.html`: AV strike plan
@@ -213,6 +215,9 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
   locations, owners, test status, pack status, load status, issues, open
   items, copyable summaries, print output, JSON import and export, and CSV
   export.
+- `gear-reference.html` renders structured, authored per-device field sheets
+  from `data/gear/`, including local SVG schematics, procedures, consumables,
+  intake checks, source references, and per-claim confidence.
 - `truck-pack.html` tracks cases, truck zones, load order, unload order,
   weights, owners, pack status, issues, open items, copyable summaries, print
   output, JSON import and export, and CSV export.
@@ -264,7 +269,7 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
   `network-plan.html`,
   `cable-plan.html`,
   `rf-coordination.html`,
-  `site-survey.html`, `gear-prep.html`, `truck-pack.html`, `load-in-plan.html`, `strike-plan.html`, `show-advance.html`, `crew-call.html`, `crew-time-log.html`,
+  `site-survey.html`, `gear-prep.html`, `gear-reference.html`, `truck-pack.html`, `load-in-plan.html`, `strike-plan.html`, `show-advance.html`, `crew-call.html`, `crew-time-log.html`,
   `signal-flow.html`,
   `input-list.html`, `stage-plot.html`, `plotforge.html`, `show-board.html`, `show-handoff.html`, `show-report.html`, `show-task-board.html`, `change-order.html`, `client-signoff.html`,
   `camera-shot-list.html`, `comms-check.html`, `av-calculator.html`,

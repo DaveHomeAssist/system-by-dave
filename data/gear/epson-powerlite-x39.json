@@ -1,0 +1,429 @@
+{
+  "schema": "system-by-dave.gear-reference-entry.v1",
+  "id": "epson-powerlite-x39",
+  "displayName": "Epson PowerLite X39",
+  "aka": [
+    "Epson EX39",
+    "Epson EB-X39",
+    "EX39",
+    "EB-X39"
+  ],
+  "brand": "Epson",
+  "category": "Video",
+  "subcategory": "Projectors",
+  "status": "discontinued",
+  "updated": "2026-08-12",
+  "summary": "Portable 3LCD XGA projector field reference covering identification, placement, power, I/O, consumables, intake, and source confidence.",
+  "tags": [
+    "3LCD",
+    "XGA",
+    "3,500 lm",
+    "ELPLP96"
+  ],
+  "sections": [
+    {
+      "id": "id",
+      "title": "Identification",
+      "type": "specTable",
+      "lede": "The badge on the chassis rarely matches what you will search for. All three names are the same hardware.",
+      "rows": [
+        ["Badge on unit", "EX39"],
+        ["US model name", "PowerLite X39 — V11H855020"],
+        ["International", "EB-X39 — V11H855041 and regional variants"],
+        ["Chassis code", "H855A"],
+        ["Series", "S39 / W39 / X39 family — one shared user's guide"],
+        ["Released", "December 2017"],
+        ["Status", "Discontinued May 2021 · original MSRP $449 USD"],
+        ["Form factor", "Compact portable, white chassis"],
+        ["Weight", "2.7 kg (5.95 lb)"],
+        ["Dimensions", "302 × 249 × 92 mm (11.8 × 9.8 × 3.6 in) W×D×H, with feet"]
+      ],
+      "notes": [
+        {
+          "tone": "info",
+          "label": "Searching for parts",
+          "text": "Search PowerLite X39 in the US and EB-X39 everywhere else. EX39 alone returns mostly resale listings, not documentation. The user's guide is filed under the S39/W39/X39 series."
+        }
+      ],
+      "sourceRefs": ["epson-spec-sheet", "epson-users-guide", "epson-uk", "projectorcentral"]
+    },
+    {
+      "id": "chassis",
+      "title": "Chassis & controls",
+      "type": "figure",
+      "lede": "Front three-quarter view. Body proportions are drawn to the published 302 × 249 × 92 mm dimensions; feature positions are indicative.",
+      "figure": {
+        "src": "data/gear/figures/x39-chassis.svg",
+        "alt": "Front three-quarter schematic of the Epson PowerLite X39 with callouts for the mute slide, exhaust, keystone slider, receiver, lens, control panel, lamp cover, air filter, and adjustable foot.",
+        "caption": "Figure 1 — Front three-quarter, schematic. Drawn from Epson's part callouts. This is a line drawing, not a photograph: body proportions match Epson's dimensions, but exact feature placement should be confirmed against the unit. The zoom ring is present on the X39 and W39 only."
+      },
+      "subheading": "Control panel buttons, in labeled order",
+      "paragraphs": [
+        "Source Search · Enter · vertical keystone and arrow buttons · Esc · volume and horizontal keystone buttons · Menu · Home · Power · status lights."
+      ],
+      "sourceRefs": ["epson-users-guide", "epson-uk"]
+    },
+    {
+      "id": "optical",
+      "title": "Optical & image",
+      "type": "specTable",
+      "rows": [
+        ["Technology", "3LCD, 3-chip · poly-silicon TFT active matrix"],
+        ["Panel", "0.55 in with MLA (micro lens array), D10 generation"],
+        ["Native resolution", "XGA 1024 × 768"],
+        ["Native aspect ratio", "4:3"],
+        ["Max input signal", "Accepts up to 1080p, scaled to XGA"],
+        ["Brightness — Normal", "3,500 lumens white and color light output (ISO 21118)"],
+        ["Brightness — ECO", "2,230 lumens (about 64% of Normal)"],
+        ["Contrast ratio", "15,000:1 dynamic, Auto Iris enabled"],
+        ["Color depth", "Up to 1.07 billion colors · 10-bit processing"],
+        ["Image size", "30–300 in diagonal"],
+        ["Lens", "F 1.49–1.72 · focal length 16.9–20.28 mm"],
+        ["Zoom", "1.0–1.2× manual optical"],
+        ["Focus", "Manual"],
+        ["Keystone", "±30° vertical automatic · ±30° horizontal manual slider"],
+        ["Noise", "37 dB Normal · 28 dB ECO"],
+        ["Audio", "5 W mono built-in speaker"]
+      ],
+      "notes": [
+        {
+          "tone": "good",
+          "label": "Why the equal-lumen figure matters",
+          "text": "Color light output equals white light output at 3,500 lumens, a 3LCD trait. That makes slides, charts, and saturated graphics look stronger than the headline number alone suggests."
+        }
+      ],
+      "sourceRefs": ["epson-spec-sheet", "epson-users-guide", "epson-uk"]
+    },
+    {
+      "id": "throw",
+      "title": "Throw & placement",
+      "type": "cards",
+      "lede": "Throw ratio 1.48–1.77:1. Wide means closer placement or a larger image; Tele means farther placement or a smaller image. The 1.2× zoom fills everything between.",
+      "cards": [
+        {
+          "label": "Rule of thumb",
+          "value": "≈ 1.5× the width",
+          "text": "Screen width in feet × 1.5 puts you near the wide end. Fine-tune with zoom."
+        },
+        {
+          "label": "Total range",
+          "value": "35–431 in",
+          "text": "0.89–10.95 m lens-to-screen across the full 30–300 in image range."
+        },
+        {
+          "label": "Offset",
+          "value": "Fixed, downward",
+          "text": "No lens shift. Plan the table height instead of correcting placement with keystone."
+        }
+      ],
+      "caption": "Official projection distances, 4:3 — Epson PowerLite S39/W39/X39 User's Guide",
+      "columns": ["Screen size", "Distance (wide → tele)", "In feet", "Lens offset"],
+      "rows": [
+        ["50 in", "59–71 in (150–180 cm)", "4.9–5.9 ft", "−3.3 in (−8 cm)"],
+        ["80 in", "95–114 in (241–290 cm)", "7.9–9.5 ft", "−5.3 in (−14 cm)"],
+        ["100 in", "119–143 in (302–363 cm)", "9.9–11.9 ft", "−6.7 in (−17 cm)"],
+        ["150 in", "179–215 in (454–546 cm)", "14.9–17.9 ft", "−10 in (−25 cm)"]
+      ],
+      "notes": [
+        {
+          "tone": "info",
+          "label": "Reading the offset",
+          "text": "Offset is measured from lens center to the bottom edge of the image. Negative means the image begins below lens center for table mounting; ceiling mounting flips the relationship."
+        }
+      ],
+      "sourceRefs": ["epson-users-guide"]
+    },
+    {
+      "id": "lamp",
+      "title": "Lamp",
+      "type": "specTable",
+      "rows": [
+        ["Type", "210 W UHE"],
+        ["Part number", "ELPLP96 / V13H010L96"],
+        ["Life — Normal", "Up to 6,000 hours"],
+        ["Life — ECO", "Up to 12,000 hours"],
+        ["Access", "Lamp cover on top of the chassis"],
+        ["Street price", "$70–$130", "estimate"]
+      ],
+      "paragraphs": [
+        "ECO mode doubles rated lamp life and cuts fan noise by 9 dB. Unless the room demands the full 3,500 lumens, ECO is the better default."
+      ],
+      "sourceRefs": ["epson-spec-sheet", "epson-users-guide"]
+    },
+    {
+      "id": "power",
+      "title": "Power draw",
+      "type": "table",
+      "lede": "Published figures differ between Epson's US spec sheet and Epson Europe's EB-X39 data. Size any power source against the higher number.",
+      "columns": ["Mode", "Epson US", "Epson EU", "Plan for"],
+      "rows": [
+        ["Normal", "326 W", "309 W peak", "about 330 W"],
+        ["ECO", "237 W", "227 W peak", "about 240 W"],
+        ["Standby", "2.0 W comms on / 0.2 W off", "0.2 W", "2 W"]
+      ],
+      "notes": [
+        {
+          "tone": "warn",
+          "label": "The number that decides battery use",
+          "text": "Normal mode exceeds 300 W under every published source; ECO sits below it. A 300 W-limited source can support steady ECO draw but cannot support Normal, and lamp-strike surge still matters."
+        }
+      ],
+      "sourceRefs": ["epson-spec-sheet", "epson-uk"]
+    },
+    {
+      "id": "eco",
+      "title": "ECO mode / battery",
+      "type": "procedure",
+      "lede": "Set ECO before moving to a limited-wattage source. The startup sequence may demand Normal-mode power before the menu is reachable.",
+      "menuPath": ["Menu", "ECO", "Power Consumption", "ECO", "Enter"],
+      "paragraphs": [
+        "The setting is expected to persist across power cycles until changed or Reset All is performed. A leaf icon identifies active power-saving settings. High-altitude mode or high ambient temperature may limit the option; persistence should be verified on the unit."
+      ],
+      "subheading": "First start on a limited-wattage source",
+      "steps": [
+        "Power the projector from a wall outlet that can supply Normal mode, about 330 W.",
+        "Set Power Consumption to ECO using the menu path above.",
+        "Power off fully and let the cool-down cycle finish. Do not pull the plug mid-fan.",
+        "Connect the battery pack and power on. Confirm the unit remains in ECO."
+      ],
+      "notes": [
+        {
+          "tone": "warn",
+          "label": "If it trips the pack anyway",
+          "text": "Lamp strike can exceed steady-state draw. A pack rated at exactly 300 W continuous with no surge headroom may still cut out at ignition. Check the surge rating."
+        }
+      ],
+      "sourceRefs": ["epson-spec-sheet", "epson-uk"],
+      "confidence": "unverified"
+    },
+    {
+      "id": "io",
+      "title": "I/O panel",
+      "type": "figure+table",
+      "lede": "Fifteen connectors on the rear, numbered here to match Epson's callouts in the user's guide.",
+      "figure": {
+        "src": "data/gear/figures/x39-io.svg",
+        "alt": "Rear connector panel schematic with fifteen numbered callouts for power, control, video, audio, network, and USB connections.",
+        "caption": "Figure 2 — Rear connector panel, schematic. Connector sequence and shapes follow Epson's callouts; spacing and row arrangement on the physical chassis may differ. Callouts 16 and 17 in Epson's diagram are not connectors.",
+        "minWidth": 720
+      },
+      "columns": ["#", "Port", "Notes"],
+      "rows": [
+        ["1", "AC input", "IEC inlet, 100–240 V"],
+        ["2", "RS-232C", "Serial control for room automation"],
+        ["3", "Video", "Composite RCA, legacy sources"],
+        ["4", "L / R audio", "RCA pair for the composite input"],
+        ["5", "Monitor Out", "VGA loop to a confidence monitor"],
+        ["6", "Audio1", "Stereo mini jack for Computer1"],
+        ["7", "Audio Out", "Stereo mini jack to powered audio"],
+        ["8", "Audio2", "Stereo mini jack for Computer2"],
+        ["9", "Computer2", "VGA in; component video with the correct adapter"],
+        ["10", "Speaker", "5 W mono, built in"],
+        ["11", "HDMI", "Primary digital input; up to 1080p, scaled to XGA"],
+        ["12", "Computer1", "Default VGA input"],
+        ["13", "Network (LAN)", "RJ-45, 100/10 Base-T"],
+        ["14", "USB-B", "USB Display and USB mouse control"],
+        ["15", "USB-A", "Media playback and wireless LAN module host"],
+        ["—", "Wireless", "Optional ELPAP10 / V12H731P02, not included"]
+      ],
+      "sourceRefs": ["epson-users-guide", "epson-spec-sheet"]
+    },
+    {
+      "id": "parts",
+      "title": "Consumables",
+      "type": "table",
+      "columns": ["Part", "Part number", "Typical price"],
+      "rows": [
+        ["Lamp", "ELPLP96 / V13H010L96", "$70–$130"],
+        ["Air filter", "ELPAF32 / V13H134A32", "$15–$30"],
+        ["Wireless LAN module", "ELPAP10 / V12H731P02", "$50–$90"],
+        ["Remote", "Aftermarket compatible", "$10–$25"]
+      ],
+      "paragraphs": [
+        "Prices are 2026 street estimates for a discontinued product and will drift. Replace or clean the air filter whenever the lamp is changed."
+      ],
+      "sourceRefs": ["epson-spec-sheet"],
+      "confidence": "estimate"
+    },
+    {
+      "id": "intake",
+      "title": "Intake checklist",
+      "type": "checklist",
+      "lede": "Run this on any used unit before it is committed to a job.",
+      "items": [
+        {
+          "title": "Read lamp hours",
+          "detail": "Menu → Info → Lamp Hours. Compare with 6,000 h Normal / 12,000 h ECO."
+        },
+        {
+          "title": "Confirm clean startup",
+          "detail": "Image appears and no warning indicators remain on the control panel."
+        },
+        {
+          "title": "Check for even brightness",
+          "detail": "Use a full white field. Look for colored blobs, dim corners, or a yellow-green cast."
+        },
+        {
+          "title": "Test the inputs you will use",
+          "detail": "At minimum test HDMI. Inspect used VGA ports for bent pins."
+        },
+        {
+          "title": "Exercise focus and both keystone axes",
+          "detail": "Confirm the focus ring travels smoothly and the horizontal slider is not seized."
+        },
+        {
+          "title": "Run for ten minutes and listen",
+          "detail": "The fan should settle to a steady tone without rattling or cyclical whine."
+        },
+        {
+          "title": "Clean filter and lens",
+          "detail": "Do this before the first real job, not after a thermal shutdown."
+        },
+        {
+          "title": "Set ECO for battery use",
+          "detail": "Follow section 07 on wall power before connecting a limited-wattage battery."
+        }
+      ],
+      "sourceRefs": ["epson-users-guide", "epson-spec-sheet"]
+    },
+    {
+      "id": "notes",
+      "title": "Practical notes",
+      "type": "cards",
+      "cards": [
+        {
+          "label": "Aspect ratio",
+          "text": "Native 4:3. Widescreen content letterboxes into roughly 1024×576 usable pixels."
+        },
+        {
+          "label": "Color",
+          "text": "Equal white and color output makes the unit strong for slides, charts, and saturated graphics."
+        },
+        {
+          "label": "Best use",
+          "text": "Portable business or classroom projection, or a backup unit where some ambient light remains."
+        },
+        {
+          "label": "Network features",
+          "text": "LAN projection, USB Display, and RS-232 control remain useful for multi-presenter setups."
+        }
+      ],
+      "sourceRefs": ["epson-spec-sheet", "epson-users-guide"]
+    },
+    {
+      "id": "accuracy",
+      "title": "Accuracy log",
+      "type": "accuracyLog",
+      "lede": "What was checked against source documentation on 12 August 2026, including corrections, estimates, and unresolved conflicts.",
+      "sourceRefs": ["epson-spec-sheet", "epson-users-guide", "epson-uk", "projectorcentral"]
+    }
+  ],
+  "accuracy": [
+    {
+      "item": "Figures 1 and 2",
+      "status": "estimate",
+      "detail": "Original schematic line drawings, not photographs. Labels and sequence are sourced; exact feature placement remains indicative.",
+      "sourceRefs": ["epson-users-guide", "epson-uk"]
+    },
+    {
+      "item": "Rear connector list",
+      "status": "confirmed",
+      "detail": "All fifteen connectors and their order match Projector Parts — Rear.",
+      "sourceRefs": ["epson-users-guide"]
+    },
+    {
+      "item": "Front and top part names",
+      "status": "confirmed",
+      "detail": "Names match Projector Parts — Front/Top; the guide identifies the zoom ring as X39/W39 only.",
+      "sourceRefs": ["epson-users-guide"]
+    },
+    {
+      "item": "Wireless module part number",
+      "status": "corrected",
+      "detail": "Corrected to ELPAP10 / V12H731P02. An earlier draft named a nonexistent part for this series.",
+      "sourceRefs": ["epson-users-guide", "epson-spec-sheet"]
+    },
+    {
+      "item": "Power consumption",
+      "status": "corrected",
+      "detail": "US and European Epson sources publish different figures, so both sets are shown and planning uses the higher value.",
+      "sourceRefs": ["epson-spec-sheet", "epson-uk"]
+    },
+    {
+      "item": "Projection distances and offsets",
+      "status": "confirmed",
+      "detail": "All four rows match the user's guide, including metric offsets.",
+      "sourceRefs": ["epson-users-guide"]
+    },
+    {
+      "item": "Brightness",
+      "status": "confirmed",
+      "detail": "3,500 lm Normal and 2,230 lm ECO are supported by Epson sources.",
+      "sourceRefs": ["epson-spec-sheet", "epson-uk"]
+    },
+    {
+      "item": "Lamp and filter part numbers",
+      "status": "confirmed",
+      "detail": "ELPLP96 / V13H010L96 and ELPAF32 / V13H134A32 are supported by Epson documentation.",
+      "sourceRefs": ["epson-spec-sheet"]
+    },
+    {
+      "item": "Panel generation",
+      "status": "confirmed",
+      "detail": "0.55 in panel with MLA, D10 generation.",
+      "sourceRefs": ["epson-uk"]
+    },
+    {
+      "item": "Throw, zoom, keystone, noise, and speaker",
+      "status": "confirmed",
+      "detail": "1.48–1.77:1, 1.2×, ±30°/±30°, 37/28 dB, and 5 W mono all match source documentation.",
+      "sourceRefs": ["epson-spec-sheet", "epson-users-guide", "epson-uk"]
+    },
+    {
+      "item": "Weight and dimensions",
+      "status": "confirmed",
+      "detail": "2.7 kg and 302 × 249 × 92 mm are supported by Epson's European page.",
+      "sourceRefs": ["epson-uk"]
+    },
+    {
+      "item": "ECO menu path and persistence",
+      "status": "unverified",
+      "detail": "The menu path matches this Epson generation, but persistence could not be confirmed verbatim. Verify on the unit.",
+      "sourceRefs": ["epson-users-guide"]
+    },
+    {
+      "item": "Color count",
+      "status": "unverified",
+      "detail": "The US sheet says 1.07 billion; the user's guide says up to 1 billion. This appears to be rounding.",
+      "sourceRefs": ["epson-spec-sheet", "epson-users-guide"]
+    },
+    {
+      "item": "All prices",
+      "status": "estimate",
+      "detail": "Street estimates for a discontinued product, not quotes. Re-check before ordering.",
+      "sourceRefs": ["projectorcentral"]
+    }
+  ],
+  "sources": [
+    {
+      "id": "epson-spec-sheet",
+      "label": "Epson PowerLite X39 XGA 3LCD Projector Specification Sheet",
+      "reference": "cpd54395"
+    },
+    {
+      "id": "epson-users-guide",
+      "label": "Epson PowerLite S39/W39/X39 User's Guide",
+      "reference": "cpd54237"
+    },
+    {
+      "id": "epson-uk",
+      "label": "Epson UK EB-X39 product page",
+      "reference": "V11H855041"
+    },
+    {
+      "id": "projectorcentral",
+      "label": "ProjectorCentral Epson PowerLite X39 specifications",
+      "reference": "release, discontinuation, and MSRP context"
+    }
+  ]
+}

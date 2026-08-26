@@ -1,1 +1,2 @@
 *.pdf binary
+noteforge/assets/*.js -whitespace

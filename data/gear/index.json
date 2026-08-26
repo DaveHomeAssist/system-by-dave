@@ -1,0 +1,31 @@
+{
+  "schema": "system-by-dave.gear-reference-index.v1",
+  "displayName": "Gear Reference",
+  "status": "Beta",
+  "updated": "2026-08-12",
+  "entries": [
+    {
+      "id": "epson-powerlite-x39",
+      "displayName": "Epson PowerLite X39",
+      "aka": [
+        "Epson EX39",
+        "Epson EB-X39",
+        "EX39",
+        "EB-X39"
+      ],
+      "brand": "Epson",
+      "category": "Video",
+      "subcategory": "Projectors",
+      "status": "discontinued",
+      "sheetStatus": "authored",
+      "updated": "2026-08-12",
+      "file": "data/gear/epson-powerlite-x39.json",
+      "tags": [
+        "3LCD",
+        "XGA",
+        "3,500 lm",
+        "ELPLP96"
+      ]
+    }
+  ]
+}
