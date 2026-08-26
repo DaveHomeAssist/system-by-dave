@@ -41,7 +41,7 @@ const allTargets = [
 const requestedTargets = targetArg ? new Set(targetArg.slice('--target='.length).split(',').filter(Boolean)) : null;
 const targets = requestedTargets ? allTargets.filter((target) => requestedTargets.has(target.id)) : allTargets;
 const preferences = ['light', 'dark'];
-const systemManagedTargets = new Set(['av-workbook', 'pixelforge']);
+const systemManagedTargets = new Set(['pixelforge']);
 const failures = [];
 const results = [];
 
@@ -297,6 +297,89 @@ async function main() {
         await delay(target.id === 'pixelforge' || target.id === 'av-workbook' ? 1100 : 420);
         const evaluated = await cdp('Runtime.evaluate', { expression, returnByValue: true });
         const value = evaluated.result.value;
+        if (target.id === 'av-calculator') {
+          const calculatorProbe = await cdp('Runtime.evaluate', {
+            expression: `(() => {
+              const set = (id, value, eventName) => {
+                const field = document.getElementById(id);
+                field.value = String(value);
+                field.dispatchEvent(new Event(eventName || 'input', { bubbles: true }));
+              };
+
+              set('powerMethod', 'amps', 'change');
+              set('deviceAmps', 3.2);
+              set('deviceCount', 4);
+              set('circuitAmps', 20, 'change');
+              const amps = {
+                total: document.getElementById('totalAmps').textContent,
+                reference: document.getElementById('circuitPercent').textContent,
+                fields: [
+                  getComputedStyle(document.getElementById('nameplateAmpsField')).display,
+                  getComputedStyle(document.getElementById('wattsField')).display,
+                  getComputedStyle(document.getElementById('powerFactorField')).display
+                ]
+              };
+
+              set('powerMethod', 'watts', 'change');
+              set('deviceWatts', 350);
+              set('powerFactor', 0.7);
+              set('voltage', 120, 'change');
+              const watts = {
+                total: document.getElementById('totalAmps').textContent,
+                reference: document.getElementById('circuitPercent').textContent,
+                fields: [
+                  getComputedStyle(document.getElementById('nameplateAmpsField')).display,
+                  getComputedStyle(document.getElementById('wattsField')).display,
+                  getComputedStyle(document.getElementById('powerFactorField')).display
+                ]
+              };
+
+              set('powerFactor', 0);
+              const missingPowerFactor = {
+                total: document.getElementById('totalAmps').textContent,
+                warning: document.getElementById('powerWarning').textContent
+              };
+
+              return { amps, watts, missingPowerFactor };
+            })()`,
+            returnByValue: true
+          });
+          const calculator = calculatorProbe.result.value;
+          if (calculator.amps.total !== '12.80 A' || calculator.amps.reference !== '80%' || JSON.stringify(calculator.amps.fields) !== '["grid","none","none"]') {
+            failures.push(`${target.id} ${preference}: nameplate-amps calculation returned ${JSON.stringify(calculator.amps)}.`);
+          }
+          if (calculator.watts.total !== '~16.67 A' || calculator.watts.reference !== '104%' || JSON.stringify(calculator.watts.fields) !== '["none","grid","grid"]') {
+            failures.push(`${target.id} ${preference}: watts-plus-PF calculation returned ${JSON.stringify(calculator.watts)}.`);
+          }
+          if (calculator.missingPowerFactor.total !== '—' || !calculator.missingPowerFactor.warning.includes('will not silently assume PF 1')) {
+            failures.push(`${target.id} ${preference}: missing power factor did not fail closed ${JSON.stringify(calculator.missingPowerFactor)}.`);
+          }
+
+          await cdp('Runtime.evaluate', {
+            expression: `localStorage.setItem('avCalculator.v1', JSON.stringify({ deviceWatts: 500, deviceCount: 2, voltage: 120, circuitAmps: 20 }))`
+          });
+          await cdp('Page.reload');
+          await delay(420);
+          const migratedProbe = await cdp('Runtime.evaluate', {
+            expression: `(() => ({
+              method: document.getElementById('powerMethod').value,
+              powerFactor: document.getElementById('powerFactor').value,
+              total: document.getElementById('totalAmps').textContent,
+              status: document.getElementById('actionStatus').textContent,
+              fields: [
+                getComputedStyle(document.getElementById('nameplateAmpsField')).display,
+                getComputedStyle(document.getElementById('wattsField')).display,
+                getComputedStyle(document.getElementById('powerFactorField')).display
+              ]
+            }))()`,
+            returnByValue: true
+          });
+          const migrated = migratedProbe.result.value;
+          if (migrated.method !== 'watts' || migrated.powerFactor !== '0' || migrated.total !== '—' || !migrated.status.includes('Saved watts were migrated') || JSON.stringify(migrated.fields) !== '["none","grid","grid"]') {
+            failures.push(`${target.id} ${preference}: legacy watts migration returned ${JSON.stringify(migrated)}.`);
+          }
+          await cdp('Runtime.evaluate', { expression: `localStorage.removeItem('avCalculator.v1')` });
+        }
         if (captureDir) {
           const screenshot = await cdp('Page.captureScreenshot', { format: 'png', fromSurface: true, captureBeyondViewport: false });
           fs.writeFileSync(path.join(captureDir, `${target.id}-${preference}-${viewportWidth}.png`), Buffer.from(screenshot.data, 'base64'));

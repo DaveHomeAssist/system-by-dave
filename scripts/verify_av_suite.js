@@ -126,6 +126,20 @@ function assertPageContracts(registry) {
     fail('AV Suite tool groups do not preserve the page heading hierarchy.');
   }
 
+  const calculator = read('av-calculator.html');
+  if (!/id="powerMethod"[\s\S]*value="amps"[\s\S]*value="watts"/.test(calculator)) {
+    fail('AV Calculator power load does not offer nameplate-amps and watts-plus-PF methods.');
+  }
+  if (!/totalWatts \/ \(voltage \* powerFactor\)/.test(calculator)) {
+    fail('AV Calculator watts mode does not calculate single-phase current with power factor.');
+  }
+  if (!/calculator will not silently assume PF 1/.test(calculator)) {
+    fail('AV Calculator does not require an explicit manufacturer power factor in watts mode.');
+  }
+  if (!/hasOwnProperty\.call\(parsed, 'powerMethod'\)[\s\S]*powerMethod: 'watts', powerFactor: 0/.test(calculator)) {
+    fail('AV Calculator does not migrate saved watt inputs without assuming a power factor.');
+  }
+
   const autoSeedPatterns = [
     /:\s*sampleCues\.map\(cloneCue\)/,
     /:\s*sampleItems\.map\(cloneItem\)/,

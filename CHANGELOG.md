@@ -2,6 +2,12 @@
 
 ## 2026-08-26
 
+### AV Calculator power inputs and AV Workbook theme inheritance
+
+* Made nameplate amps the default Power Load input, added an explicit watts-plus-manufacturer-power-factor fallback, and kept the 80 percent output framed as a planning reference rather than a safety verdict.
+* Migrated previously saved watt inputs into the new fallback mode without assuming power factor, and made exported summaries record the selected method and its assumptions.
+* Applied the AV by Dave stored Dark, Light, or System preference before the AV Workbook app paints, including matching browser theme-color metadata and offline caching for the bootstrap script.
+
 ### AV Calculator visual and contrast pass
 
 * Fixed the calculator hero's light-theme contrast by giving its heading, supporting copy, and capability markers an explicit high-contrast field-console palette.

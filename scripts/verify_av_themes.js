@@ -69,6 +69,13 @@ routes.forEach((route) => {
     if (!/@import "\.\.\/\.\.\/\.\.\/css\/av-theme\.css"/.test(sourceCss)) {
       fail('AV Workbook does not import the shared theme from source.');
     }
+    const workbookSource = read('apps/av-workbook/index.html');
+    if (!workbookSource.includes('src="../js/av-theme-mode.js"')) {
+      fail('AV Workbook does not apply the stored AV theme before its app bundle loads.');
+    }
+    if (!/data-av-theme-color="light"/.test(workbookSource) || !/data-av-theme-color="dark"/.test(workbookSource)) {
+      fail('AV Workbook theme-color metadata is not controllable for explicit operator modes.');
+    }
   } else {
     const expectedHref = route.file.includes('/') ? '../css/av-theme.css' : 'css/av-theme.css';
     if (!html.includes(`href="${expectedHref}"`)) fail(`${route.file} does not load ${expectedHref}.`);
@@ -89,7 +96,7 @@ if (!pixelForge.includes('src="../js/av-theme.js"')) {
 }
 
 const offlineAssets = avRegistry.offlineAssets();
-['./css/av-theme.css', './js/av-theme.js'].forEach((asset) => {
+['./css/av-theme.css', './js/av-theme.js', './js/av-theme-mode.js'].forEach((asset) => {
   if (!offlineAssets.includes(asset)) fail(`${asset} is missing from the AV offline cache.`);
 });
 

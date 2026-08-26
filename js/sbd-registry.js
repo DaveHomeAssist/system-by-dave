@@ -110,6 +110,7 @@
     './js/sbd-nav.js',
     './js/sbd-public-nav.js',
     './js/av-theme.js',
+    './js/av-theme-mode.js',
     './js/sbd-handoff.js',
     './js/responsive-tables.js',
     './js/av-domain-views.js',
@@ -198,7 +199,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool change — rolls the service-worker cache. */
-    version:'v20260826-nav-context-fix',
+    version:'v20260826-workbook-theme-fix',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,

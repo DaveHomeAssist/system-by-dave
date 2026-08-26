@@ -471,6 +471,9 @@
     display:grid;
     gap:7px;
   }
+  .field[hidden]{
+    display:none;
+  }
   .field label{
     color:var(--muted);
     font-family:var(--mono);
@@ -811,12 +814,27 @@
       <article class="calc-card" id="powerCard">
         <div class="card-head">
           <h2><span class="card-index" aria-hidden="true">04</span>Power Load</h2>
-          <span>PF 1 estimate</span>
+          <span id="powerMethodBadge">Nameplate current</span>
         </div>
         <div class="card-body">
           <div class="field">
+            <label for="powerMethod">Input Method</label>
+            <select id="powerMethod" data-key="powerMethod" aria-describedby="powerWarning">
+              <option value="amps" selected>Nameplate Amps</option>
+              <option value="watts">Watts + Power Factor</option>
+            </select>
+          </div>
+          <div class="field" id="nameplateAmpsField">
+            <label for="deviceAmps">Nameplate Amps Each</label>
+            <input id="deviceAmps" data-key="deviceAmps" type="number" min="0" max="10000" step="0.01" value="0" inputmode="decimal" aria-describedby="powerWarning">
+          </div>
+          <div class="field" id="wattsField" hidden>
             <label for="deviceWatts">Watts Each</label>
-            <input id="deviceWatts" data-key="deviceWatts" type="number" min="0" max="1000000" step="1" value="350" aria-describedby="powerWarning">
+            <input id="deviceWatts" data-key="deviceWatts" type="number" min="0" max="1000000" step="1" value="350" inputmode="decimal" aria-describedby="powerWarning" disabled>
+          </div>
+          <div class="field" id="powerFactorField" hidden>
+            <label for="powerFactor">Power Factor (required)</label>
+            <input id="powerFactor" data-key="powerFactor" type="number" min="0" max="1" step="0.01" value="0" inputmode="decimal" aria-describedby="powerWarning" disabled>
           </div>
           <div class="field">
             <label for="deviceCount">Device Count</label>
@@ -841,11 +859,11 @@
           </div>
         </div>
         <div class="result-grid" aria-describedby="powerWarning">
-          <div class="result"><span>Total Watts</span><strong id="totalWatts">0 W</strong></div>
-          <div class="result"><span>PF 1 Estimate</span><strong id="totalAmps">0 A</strong></div>
-          <div class="result" id="circuitResult"><span>Of 80% Reference</span><strong id="circuitPercent">0%</strong></div>
+          <div class="result"><span id="powerInputLabel">Per Device Current</span><strong id="totalWatts">—</strong></div>
+          <div class="result"><span id="powerCurrentLabel">Total Nameplate</span><strong id="totalAmps">—</strong></div>
+          <div class="result" id="circuitResult"><span>Of 80% Planning Reference</span><strong id="circuitPercent">—</strong></div>
         </div>
-        <div class="hint warning" id="powerWarning"><strong>Estimate only:</strong> watts &divide; volts assumes power factor 1. Use equipment nameplate current or VA and include startup or inrush demand before planning circuits.</div>
+        <div class="hint warning" id="powerWarning"><strong id="powerWarningLabel">Planning reference:</strong> <span id="powerWarningText">Enter the equipment nameplate current. Include startup or inrush demand and verify the distribution before assigning circuits.</span></div>
       </article>
 
       <article class="calc-card" id="voltageDropCard">
@@ -955,7 +973,10 @@
     recordHours: 2,
     cameraCount: 3,
     storageHeadroom: 20,
+    powerMethod: 'amps',
+    deviceAmps: 0,
     deviceWatts: 350,
+    powerFactor: 0,
     deviceCount: 4,
     voltage: 120,
     circuitAmps: 20,
@@ -982,6 +1003,17 @@
     totalStorage: document.getElementById('totalStorage'),
     perHourStorage: document.getElementById('perHourStorage'),
     storageHint: document.getElementById('storageHint'),
+    powerMethodBadge: document.getElementById('powerMethodBadge'),
+    nameplateAmpsField: document.getElementById('nameplateAmpsField'),
+    wattsField: document.getElementById('wattsField'),
+    powerFactorField: document.getElementById('powerFactorField'),
+    deviceAmps: document.getElementById('deviceAmps'),
+    deviceWatts: document.getElementById('deviceWatts'),
+    powerFactor: document.getElementById('powerFactor'),
+    powerInputLabel: document.getElementById('powerInputLabel'),
+    powerCurrentLabel: document.getElementById('powerCurrentLabel'),
+    powerWarningLabel: document.getElementById('powerWarningLabel'),
+    powerWarningText: document.getElementById('powerWarningText'),
     totalWatts: document.getElementById('totalWatts'),
     totalAmps: document.getElementById('totalAmps'),
     circuitPercent: document.getElementById('circuitPercent'),
@@ -1055,6 +1087,10 @@
       const parsed = JSON.parse(saved);
       if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
         throw new TypeError('Saved calculator state must be an object.');
+      }
+      if (!Object.prototype.hasOwnProperty.call(parsed, 'powerMethod')) {
+        storageLoadState = 'migrated';
+        return { ...DEFAULTS, ...parsed, powerMethod: 'watts', powerFactor: 0 };
       }
       storageLoadState = 'loaded';
       return { ...DEFAULTS, ...parsed };
@@ -1137,6 +1173,7 @@
   function normalizeFields() {
     const messages = [];
     fields.forEach(field => {
+      if (field.disabled) return;
       const key = field.dataset.key;
       if (field.tagName === 'SELECT') {
         const allowed = Array.from(field.options, option => option.value);
@@ -1163,8 +1200,22 @@
     });
   }
 
+  function syncPowerMethodUI() {
+    const wattsMode = state.powerMethod === 'watts';
+    els.nameplateAmpsField.hidden = wattsMode;
+    els.wattsField.hidden = !wattsMode;
+    els.powerFactorField.hidden = !wattsMode;
+    els.deviceAmps.disabled = wattsMode;
+    els.deviceAmps.required = !wattsMode;
+    els.deviceWatts.disabled = !wattsMode;
+    els.powerFactor.disabled = !wattsMode;
+    els.powerFactor.required = wattsMode;
+    els.powerMethodBadge.textContent = wattsMode ? 'Watts + PF estimate' : 'Nameplate current';
+  }
+
   function readFields() {
     const normalizationMessages = normalizeFields();
+    syncPowerMethodUI();
     const saved = saveState();
     calculate();
     queueCalculationStatus(normalizationMessages, saved);
@@ -1236,18 +1287,41 @@
   }
 
   function calculatePower() {
+    const method = state.powerMethod === 'watts' ? 'watts' : 'amps';
+    const ampsEach = numberValue('deviceAmps');
     const wattsEach = numberValue('deviceWatts');
+    const powerFactor = numberValue('powerFactor');
     const count = numberValue('deviceCount');
     const voltage = numberValue('voltage');
     const circuitAmps = numberValue('circuitAmps');
     const totalWatts = wattsEach * count;
-    const ampsEstimate = totalWatts / voltage;
+    const complete = method === 'amps' ? ampsEach > 0 : wattsEach > 0 && powerFactor > 0;
+    const ampsEstimate = method === 'amps'
+      ? ampsEach * count
+      : complete && voltage > 0 ? totalWatts / (voltage * powerFactor) : 0;
     const referenceAmps = circuitAmps * 0.8;
-    const percentOfReference = referenceAmps > 0 ? ampsEstimate / referenceAmps * 100 : 0;
-    els.totalWatts.textContent = `${format(totalWatts, 0)} W`;
-    els.totalAmps.textContent = `~${format(ampsEstimate, 2)} A`;
-    els.circuitPercent.textContent = `${format(percentOfReference, 0)}%`;
-    return { wattsEach, count, voltage, circuitAmps, totalWatts, ampsEstimate, referenceAmps, percentOfReference };
+    const percentOfReference = complete && referenceAmps > 0 ? ampsEstimate / referenceAmps * 100 : 0;
+
+    if (method === 'amps') {
+      els.powerInputLabel.textContent = 'Per Device Current';
+      els.powerCurrentLabel.textContent = 'Total Nameplate';
+      els.totalWatts.textContent = complete ? `${format(ampsEach, 2)} A` : '—';
+      els.totalAmps.textContent = complete ? `${format(ampsEstimate, 2)} A` : '—';
+      els.powerWarningLabel.textContent = 'Planning reference:';
+      els.powerWarningText.textContent = 'Sum equipment nameplate current, include startup or inrush demand, and verify the distribution before assigning circuits.';
+    } else {
+      els.powerInputLabel.textContent = 'Total Real Power';
+      els.powerCurrentLabel.textContent = 'Estimated Current';
+      els.totalWatts.textContent = complete ? `${format(totalWatts, 0)} W` : '—';
+      els.totalAmps.textContent = complete ? `~${format(ampsEstimate, 2)} A` : '—';
+      els.powerWarningLabel.textContent = complete ? 'Single-phase estimate:' : 'Power factor required:';
+      els.powerWarningText.textContent = complete
+        ? `Current uses watts ÷ (${format(voltage, 0)} V × ${format(powerFactor, 2)} PF). Include startup or inrush demand and verify the distribution.`
+        : 'Enter the manufacturer power factor; the calculator will not silently assume PF 1. Include startup or inrush demand before assigning circuits.';
+    }
+
+    els.circuitPercent.textContent = complete ? `${format(percentOfReference, 0)}%` : '—';
+    return { method, complete, ampsEach, wattsEach, powerFactor, count, voltage, circuitAmps, totalWatts, ampsEstimate, referenceAmps, percentOfReference };
   }
 
   function calculateVoltageDrop() {
@@ -1291,11 +1365,18 @@
   }
 
   function renderSummary(audio, projection, storageCalc, power, drop, spl) {
+    const powerSummary = power.method === 'amps'
+      ? power.complete
+        ? `Power planning: ${power.count} device(s) at ${format(power.ampsEach, 2)} nameplate A each total ${format(power.ampsEstimate, 2)} A, or ${format(power.percentOfReference, 0)} percent of an 80 percent circuit-rating reference. Include startup or inrush demand and verify the distribution.`
+        : 'Power planning: enter the equipment nameplate current. Include startup or inrush demand and verify the distribution before assigning circuits.'
+      : power.complete
+        ? `Power estimate: ${power.count} device(s) at ${format(power.wattsEach, 0)} W each total ${format(power.totalWatts, 0)} W. Watts ÷ (${format(power.voltage, 0)} V × ${format(power.powerFactor, 2)} PF) estimates ~${format(power.ampsEstimate, 2)} A, or ${format(power.percentOfReference, 0)} percent of an 80 percent circuit-rating reference. Include startup or inrush demand and verify the distribution.`
+        : 'Power estimate: enter the manufacturer power factor; the calculator will not silently assume PF 1. Include startup or inrush demand and verify the distribution before assigning circuits.';
     els.summaryOutput.textContent = [
       `Audio delay: ${format(audio.delayMs, 1)} ms for ${format(audio.distanceInput, 1)} ${audio.unit} at ${format(audio.tempF, 0)} F (${format(audio.frames, 2)} frames at ${state.delayFrameRate} fps).`,
       `Projection: ${format(projection.widthFt, 1)} ft wide screen is ${format(projection.heightFt, 2)} ft high, ${format(projection.diagonalIn, 0)} in diagonal. Ideal throw at ${format(projection.throwRatio, 2)}:1 is ${format(projection.idealThrowFt, 1)} ft. Actual distance needs ${format(projection.requiredRatio, 2)}:1.`,
       `Record storage: ${storageCalc.feeds} feed(s) at ${format(storageCalc.bitrate, 0)} Mbps for ${format(storageCalc.hours, 2)} hr needs ${format(storageCalc.totalGb, 1)} GB with ${format(storageCalc.headroom, 0)} percent headroom.`,
-      `Power estimate (PF 1): ${power.count} device(s) at ${format(power.wattsEach, 0)} W each total ${format(power.totalWatts, 0)} W. Watts ÷ volts estimates ~${format(power.ampsEstimate, 2)} A at ${format(power.voltage, 0)} V, or ${format(power.percentOfReference, 0)} percent of an 80 percent circuit-rating reference. This is not a verified safe load; use equipment nameplate current or VA and include startup or inrush demand.`,
+      powerSummary,
       `Voltage drop: ${format(drop.amps, 1)} A over ${format(drop.lengthFt, 0)} ft of ${drop.gauge} AWG at ${format(drop.voltage, 0)} V drops ${format(drop.dropV, 2)} V (${format(drop.percent, 1)} percent), ending at ${format(drop.endV, 1)} V.`,
       `SPL distance: ${format(spl.refSpl, 0)} dB at ${format(spl.refDist, 1)} ft is about ${format(spl.splAt, 1)} dB at ${format(spl.targetDist, 0)} ft (${format(spl.loss, 1)} dB loss).`
     ].join('\n');
@@ -1348,6 +1429,7 @@
   function resetValues() {
     state = { ...DEFAULTS };
     setFieldValues();
+    syncPowerMethodUI();
     normalizeFields();
     const saved = saveState();
     calculate();
@@ -1409,6 +1491,7 @@
     els.saveStatus.textContent = 'Storage blocked';
   }
   setFieldValues();
+  syncPowerMethodUI();
   const initialNormalizations = normalizeFields();
   const initialSaved = saveState();
   calculate();
@@ -1419,6 +1502,8 @@
   } else if (storageLoadState === 'loaded') {
     const normalization = initialNormalizations.length ? `${initialNormalizations.join(' ')} ` : '';
     updateStatus(`${normalization}Saved calculator values loaded and calculations updated.`, initialNormalizations.length ? 'error' : 'success');
+  } else if (storageLoadState === 'migrated') {
+    updateStatus('Saved watts were migrated to Watts + Power Factor mode. Enter the manufacturer power factor to calculate current.', 'success');
   } else {
     updateStatus(initialSaved ? 'Default calculator values loaded, calculated, and saved.' : 'Default calculator values loaded and calculated, but storage is unavailable.', initialSaved ? 'success' : 'error');
   }
