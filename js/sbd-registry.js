@@ -154,6 +154,30 @@
     './fonts/space-mono-bold.woff2'
   ];
 
+  /* Console family taxonomy (av-suite.html rail navigation only — a coarser,
+     14-group alternative to NAV_DEPARTMENTS above, purpose-built for the
+     AV Suite console's left rail + "All tools" grid). av-workbook is
+     deliberately NOT a member of any family — it renders as the console's
+     always-visible "Show file / Spine" rail entry instead. `subs` (only on
+     teleprompter, throwline, av-calculator) are informational mode/citation
+     chips shown when a tool row is expanded — not separate routes. */
+  var CONSOLE_FAMILIES=[
+    {id:'planning',label:'Planning',depts:'Planning',icon:['M9 2h6v4H9z','M9 4H6a1 1 0 0 0-1 1v15a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1h-3','m9 13 2 2 4-4'],toolIds:['show-advance','site-survey','plotforge','breakout-room-matrix']},
+    {id:'runofshow',label:'Run of show',depts:'Show Flow',icon:['M8 5.14v14l11-7z'],toolIds:['cueforge','teleprompter','show-timer'],subs:{teleprompter:[{label:'Read view',kind:'Mode',source:'Saved looks, this browser'},{label:'Remote',kind:'Mode',source:'Second-screen driver'},{label:'Rundown',kind:'Mode',source:'WPM pace presets'},{label:'Bookmarks',kind:'Mode',source:'Marker set, per script'}]}},
+    {id:'audio',label:'Audio',depts:'Audio',icon:['M2 12h1','M6 8v8','M10 4v16','M14 7v10','M18 10v4','M21 12h1'],toolIds:['input-list','audio-patch','line-check','speaker-plan']},
+    {id:'video',label:'Video',depts:'Video · Streaming · Playback',icon:['m16 9 5-3v12l-5-3z','M3 6h13v12H3z'],toolIds:['signal-flow','video-patch','display-plan','projection-plan','throwline','stream-plan','record-log','playback-check','camera-shot-list'],subs:{throwline:[{label:'Throw & fit',kind:'Calc',source:'Manufacturer lens spec sheets'},{label:'Brightness',kind:'Calc',source:'ANSI/INFOCOMM 3M-2011 contrast'},{label:'Field verify',kind:'Check',source:'Measured on-site reading'},{label:'Drawings',kind:'Output',source:'ANSI D print validation'}]}},
+    {id:'lighting',label:'Lighting',depts:'Lighting',icon:['M9 18h6','M10 22h4','M12 2a7 7 0 0 0-4 12.7c.6.6 1 1.4 1 2.3h6c0-.9.4-1.7 1-2.3A7 7 0 0 0 12 2z'],toolIds:['lighting-patch']},
+    {id:'power',label:'Power & data',depts:'Power · Network · Build',icon:['M13 2 4 14h7l-1 8 9-12h-7z'],toolIds:['power-plan','network-plan','cable-plan']},
+    {id:'comms',label:'Comms & RF',depts:'Comms',icon:['M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z','M19 10v2a7 7 0 0 1-14 0v-2','M12 19v3'],toolIds:['rf-coordination','comms-check']},
+    {id:'spaces',label:'Spaces',depts:'Rooms',icon:['M3 3h8v8H3z','M13 3h8v5h-8z','M13 10h8v11h-8z','M3 13h8v8H3z'],toolIds:['show-board','room-check']},
+    {id:'logistics',label:'Logistics',depts:'Logistics',icon:['M3 6h11v10H3z','M14 9h4l3 3v4h-7z','M7.5 19a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z','M17.5 19a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z'],toolIds:['gear-prep','gear-reference','truck-pack','load-in-plan','strike-plan']},
+    {id:'crew',label:'Crew',depts:'Labor',icon:['M16 20v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2','M9 10a4 4 0 1 0 0-8 4 4 0 0 0 0 8z','M22 20v-2a4 4 0 0 0-3-3.9','M16 3.1a4 4 0 0 1 0 7.8'],toolIds:['crew-call','crew-time-log']},
+    {id:'docs',label:'Docs & client',depts:'Closeout · Client · Rooms',icon:['M15 2H6a1 1 0 0 0-1 1v18a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V6z','M14 2v5h5','m9 14 2 2 4-4'],toolIds:['show-task-board','show-handoff','show-report','change-order','client-signoff']},
+    {id:'graphics',label:'Graphics',depts:'Graphics',icon:['M3 4h18v16H3z','M8.5 10a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z','m21 15-5-5L3 20'],toolIds:['pixelforge']},
+    {id:'calc',label:'Calculators',depts:'Utility',icon:['M5 2h14v20H5z','M8 6h8','M8 11h.01','M12 11h.01','M16 11h.01','M8 15h.01','M12 15h.01','M16 15v4'],toolIds:['av-calculator'],subs:{'av-calculator':[{label:'Audio delay',kind:'Calc',source:'343 m/s at 20°C, dry air'},{label:'Projection throw',kind:'Calc',source:'Manufacturer lens ratio'},{label:'Record storage',kind:'Calc',source:'Codec bitrate tables'},{label:'Power load',kind:'Calc',source:'NEC 210.20(A) 80% rule'}]}},
+    {id:'music',label:'Music',depts:'Music · outside AV scope',icon:['M9 18V5l12-2v13','M6 21a3 3 0 1 0 0-6 3 3 0 0 0 0 6z','M18 19a3 3 0 1 0 0-6 3 3 0 0 0 0 6z'],toolIds:['ontrack']}
+  ];
+
   function offlineAssets(){
     var seen={};
     return BASE_ASSETS
@@ -174,11 +198,12 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool change — rolls the service-worker cache. */
-    version:'v20260812-av-adaptive-themes',
+    version:'v20260825-av-console-rebuild',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,
     navDepartments:NAV_DEPARTMENTS,
+    consoleFamilies:CONSOLE_FAMILIES,
     aliases:ALIASES,
     baseAssets:BASE_ASSETS,
     offlineAssets:offlineAssets,
