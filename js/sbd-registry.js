@@ -198,7 +198,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool change — rolls the service-worker cache. */
-    version:'v20260825-av-console-rebuild',
+    version:'v20260826-nav-context-fix',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,
