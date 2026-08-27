@@ -6,6 +6,30 @@
 
 **Target state:** The public site presents one accurate product story, routes every commercial action to a valid destination, applies a predictable navigation and accessibility contract, and prevents known content drift through automated verification.
 
+## Execution status
+
+**Status:** Complete
+
+| Work package | Result | Release evidence |
+| --- | --- | --- |
+| SBD-R00 | Clean authority baseline established with 81 sitemap routes and 44 AV tools. | `af03229`; Pages run `33033490806`. |
+| SBD-R01–R03 | Prompt Lab trust copy, agent destinations, and Production Work routing corrected. | `ef9e1ca`; Pages run `33034326626`. |
+| SBD-R04–R06 | Same-origin fonts, widget privacy wording, and two-audience resume routing released. | `01a2673`; Pages run `33034473650`. |
+| SBD-R07–R08 | Minimum shell contract and twelve-route skip-link coverage released and automated. | `8c2abe2`; Pages run `33034907403`. |
+| SBD-R09–R12 | Metadata, canonical naming/counts, and `verify:public-consistency` added to the renamed public-site CI gate. | `76adab9`; Pages run `33035139949`. |
+| SBD-R13 | Four-viewport rendered journeys, principal targets, focus transfer, visual wrapping, dialog/menu focus return, filter/storage behavior, external destinations, and offline loading verified. | `fd12ede`, `522b38b`, `102a5d6`; Pages runs `33035803448`, `33036197134`, `33036332925`. |
+
+### Completion evidence
+
+- Full release suite passed: AV and theme contracts, gear reference, indexing, schemas, public navigation, public consistency, Throwline, NoteForge, AV Workbook typecheck/15 tests/build, generated sitemap, diff checks, and `npm audit --audit-level=high` with zero vulnerabilities.
+- Production matched the committed artifact by SHA-256 for all 15 changed public artifacts in the rendered-accessibility release; the final homepage and AV Suite files also matched their later production commits exactly.
+- The production journey audit covered 14 routes and 56 required viewport states with zero overflow, undersized principal controls, unnamed accessibility-tree roles, failed skip activations, or reduced-motion animation leaks.
+- The live sitemap crawl returned 81 of 81 routes and 109 of 109 unique static internal links without failure.
+- Prompt Lab’s product and sign-in destinations rendered at all four viewports; all four Notion Widget destinations returned HTTP 200.
+- AV Suite’s service worker controlled the page and cached all 95 assets; with network requests blocked, AV Suite and CueForge still rendered their working surfaces.
+- Guided Setup and Quick Switcher focus return, modal focus trapping, the Skills filter, and CueForge’s eight-row `cueSheet.v1` persistence passed on production.
+- The original audit is closed in [SITE_INCONSISTENCY_AUDIT.md](SITE_INCONSISTENCY_AUDIT.md). The only unperformed optional check is manual VoiceOver speech-output review.
+
 ## 1. Boundary
 
 ### In scope

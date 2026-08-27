@@ -2,15 +2,32 @@
 
 **Audit date:** August 26, 2026
 
-**Status:** Yellow
+**Status:** Green
 
 **Scope:** Live public routes under [systembydave.com](https://systembydave.com/), plus the Prompt Lab and Notion Widget destinations reached from the site.
 
 ## Executive summary
 
-The core navigation and route availability are healthy, but several trust, conversion, privacy, accessibility, and naming inconsistencies need correction. The most important issues are stale Prompt Lab promises, paid Notion agent cards that do not lead to agent-specific destinations, and broken links from the systems resume to `digitalfootprints.live`.
+All ten original findings are closed. Prompt Lab claims now match the current product, agent and resume actions have truthful destinations, privacy copy matches the site’s network behavior, the navigation/accessibility/metadata contracts cover the public sitemap, and repeated counts and product names are release-gated.
 
-This was a live route and source audit. Browser-level visual inspection was unavailable, so responsive rendering, visible focus behavior, and screenshot-level spacing remain unverified.
+The closure was verified against deployed production, not HTTP availability alone: 14 System by Dave journey routes passed 56 rendered viewport states in Chrome, external Prompt Lab product and sign-in surfaces rendered at four viewports each, AV Suite and CueForge loaded from the 95-asset service-worker cache with the network blocked, and the final live crawl passed all 81 sitemap routes plus 109 unique static internal destinations.
+
+## Remediation closure
+
+| Finding | Status | Closure evidence |
+| --- | --- | --- |
+| 1. Prompt Lab claim drift | Closed | Product-specific free/Pro, sign-in, storage, proxy, and A/B Compare language released in `ef9e1ca` and consistency-gated in `76adab9`. |
+| 2. Generic paid-agent redirects | Closed | Four distinct internal detail targets and truthful contact actions released in `ef9e1ca`; duplicate/generic destinations now fail CI. |
+| 3. Unresolved Production Work domain | Closed | Unavailable links and structured-data reference replaced with the live Profile destination in `ef9e1ca`. |
+| 4. Privacy implementation mismatch | Closed | Fonts are same-origin and widget-policy wording matches outbound links in `01a2673`; third-party font requests and iframe-policy drift now fail CI. |
+| 5. Resume audience ambiguity | Closed | Profile exposes AV and systems choices and both resumes cross-link with audience language in `01a2673`. |
+| 6. Navigation shell drift | Closed | Minimum shell contract, complete Notion sibling navigation, and custom-shell coverage released in `8c2abe2`. |
+| 7. Missing skip links | Closed | Twelve uncovered routes fixed in `8c2abe2`; journey focus targets and custom-shell first stops hardened in `fd12ede` and `102a5d6`. |
+| 8. Metadata gaps | Closed | CSP and social metadata completed and all 81 sitemap routes verified in `76adab9`. |
+| 9. Stale AV count | Closed | All public markers now agree with the 44-entry registry and deliberate drift fails CI as of `76adab9`. |
+| 10. Naming and taxonomy drift | Closed | Prompt Lab and Davai display names normalized and verified in `76adab9`. |
+
+The final application commit is `102a5d6`; exact-commit Pages run `33036332925` completed successfully. The preceding rendered-accessibility release, `fd12ede`, passed Pages run `33035803448`, and the narrow-phone visual correction, `522b38b`, passed run `33036197134`.
 
 ## Route map
 
@@ -24,19 +41,17 @@ Home
 │   └── 44 operator tools
 ├── Notion
 │   ├── Skills
-│   ├── Agents ── currently exits to Prompt Lab
+│   ├── Agents ── internal detail targets and contact actions
 │   ├── Widgets
 │   └── Prompt Library
 ├── Prompt Lab ── external product at promptlab.tools
 └── Dave
     ├── Profile
-    └── AV Resume
-
-Additional, weakly surfaced route:
-└── Systems Resume
+    ├── AV Resume
+    └── Systems Resume
 ```
 
-## Findings
+## Original findings (historical snapshot)
 
 ### High priority
 
@@ -179,12 +194,10 @@ An HTTP 200 result confirms route availability, not successful rendering or inte
 7. Add missing skip links, CSP, canonical, and social metadata.
 8. Generate public counts and product naming from canonical registries.
 
-## Verification limitations
+## Closure verification and limitations
 
-The interactive browser connection was unavailable during this audit. The findings are based on live HTTP responses, current HTML and JavaScript source, sitemap crawling, DNS resolution, and destination comparison. A separate rendered-browser pass is still required for:
-
-- Desktop and 680-pixel layouts.
-- Visual hierarchy and cross-route spacing.
-- Keyboard focus order and focus visibility.
-- Menu, dialog, filter, storage, and offline interactions.
-- Screen-reader announcements and landmark behavior.
+- Chrome/CDP rendered 14 production routes at 390, 680, 1024, and 1440 pixels: no horizontal overflow, undersized principal targets, unnamed accessibility-tree controls, reduced-motion animation leaks, or failed skip activations remained.
+- The five required journeys reached their promised internal or external destinations. Prompt Lab product and sign-in pages rendered with their expected headings at all four viewports; all four Notion Widget destinations returned HTTP 200.
+- Guided Setup and Quick Switcher focus entry, trapping, Escape/Close restoration, the Skills category filter, and CueForge local persistence were exercised on production.
+- The AV service worker controlled the production page, cached all 95 manifest assets, blocked an uncached external request while offline, and rendered both AV Suite and CueForge from cache.
+- The in-app browser connector was unavailable, so equivalent Chrome DevTools Protocol automation and production screenshots were used. A manual VoiceOver speech-output pass was not performed; automated landmark, focus, label, and accessibility-tree evidence does not replace that optional human check.
