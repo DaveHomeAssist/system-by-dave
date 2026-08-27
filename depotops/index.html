@@ -28,6 +28,7 @@
 <meta name="apple-mobile-web-app-title" content="DepotOps">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="icon" href="./icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../css/sbd-public-nav.css">
 <title>DepotOps v0.5.0 — Projects • Shopping • Warehouse</title>
 <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <style>
@@ -98,6 +99,14 @@ dialog{width:min(680px,calc(100vw - 24px));max-height:90vh;overflow:auto;border:
 </style>
 </head>
 <body>
+<a class="sbd-skip-link" href="#depotops-workspace">Skip to DepotOps workspace</a>
+<nav class="sbd-site-return" aria-label="Breadcrumb">
+  <a href="/">System by Dave</a>
+  <span class="sbd-site-return__separator" aria-hidden="true">/</span>
+  <a href="/tools.html">Tools</a>
+  <span class="sbd-site-return__separator" aria-hidden="true">/</span>
+  <span class="sbd-site-return__current" aria-current="page">DepotOps</span>
+</nav>
 <noscript>
   <div style="max-width:760px;margin:40px auto;padding:20px;border:3px solid #222;background:#fffdf8;font:16px/1.45 Arial,Helvetica,sans-serif">
     <strong style="display:block;font-size:22px;margin-bottom:8px">DepotOps requires JavaScript.</strong>
@@ -115,7 +124,7 @@ dialog{width:min(680px,calc(100vw - 24px));max-height:90vh;overflow:auto;border:
   </div>
 </header>
 
-<div class="shell">
+<div class="shell" id="depotops-workspace" role="main" tabindex="-1">
   <section class="hero">
     <div><div class="kicker">Home Projects Command Center</div><h1>Build the cart.<br>Know what you own.</h1><div class="lead">Project requirements, warehouse coverage, multi-project shopping runs, and purchase reconciliation in one local-first field tool.</div></div>
     <div class="storebox"><h3>Today’s Store</h3><div class="storeline"><b>Lawnside #0917</b><span>Primary</span></div><div class="storeline"><span>310 Whitehorse Pike</span><span>Lawnside, NJ</span></div><hr><div class="storeline"><b>Cherry Hill #0989</b><span>Backup</span></div><div class="storeline"><span>2160 Route 70 West</span><span>Cherry Hill, NJ</span></div></div>

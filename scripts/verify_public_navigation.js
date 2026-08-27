@@ -39,6 +39,26 @@ const STANDALONE_RETURNS = [
   'prompts/index.html',
   'noteforge/index.html'
 ];
+const REQUIRED_SKIP_LINKS = new Map([
+  ['depotops/index.html', 'depotops-workspace'],
+  ['av-workbook/index.html', 'root'],
+  ['pixelforge/index.html', 'root'],
+  ['ProjectorThrow/index.html', 'throwline-workspace'],
+  ['ProjectorThrow/Stage3D.html', 'stage-workspace'],
+  ['world-cup/index.html', 'root'],
+  ['fifa-pitch-crew/index.html', 'scr-menu'],
+  ['scorecard/index.html', 'scorecard-workspace'],
+  ['noteforge/index.html', 'app'],
+  ['prompts/index.html', 'prompt-library'],
+  ['teleprompter.html', 'teleprompter-workspace'],
+  ['show-board.html', 'setup']
+]);
+const CUSTOM_SHELLS = new Map([
+  ['depotops/index.html', ['href="/"', 'href="/tools.html"', 'aria-current="page">DepotOps']],
+  ['av-tool-suite/index-v2/index.html', ['href="/"', 'href="/av-suite.html"', 'System by Dave / AV Tool Suite']],
+  ['ProjectorThrow/index.html', ['href="../index.html"', 'href="../av-suite.html"', 'id="throwline-workspace"']],
+  ['ProjectorThrow/Stage3D.html', ['href="../index.html"', 'href="index.html"', 'href="../av-suite.html"', 'id="stage-workspace"']]
+]);
 
 function fail(message) {
   failures.push(message);
@@ -56,6 +76,15 @@ function walk(dir, out = []) {
 
 function read(rel) {
   return fs.readFileSync(path.join(ROOT, rel), 'utf8');
+}
+
+function escapeRegex(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function focusTargetTag(source, target) {
+  const escaped = escapeRegex(target);
+  return source.match(new RegExp(`<[^>]+\\bid=(?:["']${escaped}["']|${escaped})(?:\\s|>)[^>]*>`, 'i'))?.[0] || '';
 }
 
 function isDocument(source) {
@@ -136,6 +165,20 @@ function verifyNavigationContract() {
   });
   STANDALONE_RETURNS.forEach((file) => {
     if (!/class="sbd-site-return"/.test(read(file))) fail(`${file} is missing a static site-return breadcrumb.`);
+  });
+  REQUIRED_SKIP_LINKS.forEach((target, file) => {
+    const source = read(file);
+    const bodyFirst = new RegExp(`<body[^>]*>\\s*<a class="sbd-skip-link" href="#${escapeRegex(target)}">`, 'i');
+    if (!bodyFirst.test(source)) fail(`${file} does not place its skip link first in the body.`);
+    const targetTag = focusTargetTag(source, target);
+    if (!targetTag) fail(`${file} is missing skip target #${target}.`);
+    else if (!/\btabindex=(?:["']-1["']|-1)(?:\s|>)/i.test(targetTag)) fail(`${file} skip target #${target} is not programmatically focusable.`);
+  });
+  CUSTOM_SHELLS.forEach((snippets, file) => {
+    const source = read(file);
+    snippets.forEach((snippet) => {
+      if (!source.includes(snippet)) fail(`${file} is missing custom shell marker ${snippet}.`);
+    });
   });
 
   const publicNav = read('js/sbd-public-nav.js');

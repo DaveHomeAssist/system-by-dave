@@ -90,6 +90,7 @@ kbd{background:var(--raised);border:1px solid var(--border);border-radius:4px;pa
 </style><link rel="stylesheet" href="../css/sbd-public-nav.css">
 </head>
 <body>
+<a class="sbd-skip-link" href="#prompt-library">Skip to Prompt Library</a>
 <nav class="sbd-site-return" aria-label="Breadcrumb">
   <a href="/">System by Dave</a>
   <span class="sbd-site-return__separator" aria-hidden="true">/</span>
@@ -119,10 +120,10 @@ kbd{background:var(--raised);border:1px solid var(--border);border-radius:4px;pa
     <button id="clear" class="btn">Clear</button>
   </div>
 </div>
-<div class="wrap">
+<main class="wrap" id="prompt-library" tabindex="-1">
   <p class="intro">Copy-ready AI prompts &amp; templates — click <strong>Copy</strong> on any card. Prompts with <code>{{variables}}</code> get a <strong>Fill ✎</strong> button. Works with ChatGPT, Claude, Gemini, Notion AI, and more.</p>
   <div id="list"></div>
-</div>
+</main>
 <footer id="foot"></footer>
 <div class="pal" id="pal" role="dialog" aria-modal="true" aria-label="Command palette">
   <div class="palbox"><input id="pinput" placeholder="Type a command or prompt name…  (↑↓ to move, Enter to run, Esc to close)" aria-label="Command palette input"><div id="presults" role="listbox"></div></div>

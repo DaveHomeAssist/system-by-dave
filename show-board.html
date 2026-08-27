@@ -26,6 +26,7 @@
 <link rel="icon" href="svg/system_by_dave_logo_rust.svg" type="image/svg+xml">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="profile/assets/apple-touch-icon.png">
+<link rel="stylesheet" href="css/sbd-public-nav.css">
 <style>
 @font-face{font-family:"Syne";font-style:normal;font-weight:600 800;font-display:swap;
   src:url(fonts/syne-800.woff2) format("woff2")}
@@ -408,9 +409,10 @@ body.edit #addroom{display:inline-block}
 <link rel="stylesheet" href="css/av-theme.css">
 </head>
 <body>
+<a class="sbd-skip-link" href="#setup">Skip to Show Board workspace</a>
 
 <!-- ============ SETUP ============ -->
-<section id="setup">
+<section id="setup" tabindex="-1">
   <h2>New show</h2>
   <p class="lede">Set the rooms and the shape of the day once. Everything after that is
     scanning signs and ticking boxes.</p>
@@ -460,7 +462,7 @@ body.edit #addroom{display:inline-block}
 </section>
 
 <!-- ============ APP ============ -->
-<div id="app">
+<div id="app" role="main" tabindex="-1">
 <header class="masthead">
   <div>
     <h1 id="showname">Show Board <em id="daylabel"></em></h1>

@@ -119,6 +119,9 @@ if (!fs.existsSync(TARGET) || !fs.statSync(TARGET).isDirectory() || fs.lstatSync
     const index = fs.readFileSync(indexPath, 'utf8');
     if (!hasCanonicalLink(index)) fail('canonical URL is missing or incorrect');
     if (!/Content-Security-Policy/i.test(index)) fail('production CSP is missing');
+    if ((index.match(/class="sbd-skip-link"/g) || []).length !== 1) fail('exactly one skip link is required');
+    if (!/<body[^>]*>\s*<a class="sbd-skip-link" href="#app">/i.test(index)) fail('skip link must be the first body content');
+    if (!/<div\s+class=app\s+id=app\s+tabindex=-1>/i.test(index)) fail('NoteForge workspace is not programmatically focusable');
     if ((index.match(/class="sbd-site-return"/g) || []).length !== 1) fail('exactly one static breadcrumb is required');
     if (!index.includes('href="../css/sbd-public-nav.css"')) fail('public-navigation stylesheet path is missing');
     if (!index.includes('src="../js/sbd-public-nav.js"')) fail('public-navigation script path is missing');

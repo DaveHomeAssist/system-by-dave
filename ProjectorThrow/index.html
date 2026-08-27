@@ -1917,15 +1917,35 @@
         margin: 0 0 14px
       }
     }
+
+    .sbd-skip-link {
+      position: fixed;
+      top: 8px;
+      left: 8px;
+      z-index: 2147483647;
+      padding: 12px 14px;
+      border-radius: 8px;
+      background: #f4f6fb;
+      color: #0b0e13;
+      font: 700 14px var(--sans);
+      text-decoration: none;
+      transform: translateY(-160%);
+    }
+
+    .sbd-skip-link:focus {
+      transform: translateY(0);
+    }
   </style>
 </head>
 
 <body>
+  <a class="sbd-skip-link" href="#throwline-workspace">Skip to Throwline workspace</a>
   <header class="rail">
     <div class="mark">THROW<b>LINE</b></div><span class="version">SHOW 2.0</span>
     <div class="tagline">projector throw, fit, light and tape marks</div>
     <div class="spacer"></div>
     <a class="stage3d-link" href="../index.html">System by Dave home</a>
+    <a class="stage3d-link" href="../av-suite.html">AV Suite</a>
     <a class="stage3d-link" id="stage3dLink" href="Stage3D.html" aria-label="Open the optional online Stage 3D companion">Stage 3D · online</a>
     <button class="stage3d-link" id="plannerFieldVerify" type="button" aria-pressed="false">Field Verify</button>
     <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false" aria-label="Switch to dark mode">
@@ -1944,7 +1964,7 @@
       <button type="button" data-unit="m" aria-pressed="false">m</button>
     </div>
   </header>
-  <main>
+  <main id="throwline-workspace" tabindex="-1">
     <section class="col input-col" aria-label="Calculation inputs">
       <fieldset>
         <legend><span class="idx">01</span>Job &amp; screen</legend>

@@ -26,6 +26,7 @@ const BOOTSTRAP_MANAGED_FILES = new Set([
 ]);
 const PUBLIC_NAV_CSS = '<link rel="stylesheet" href="../css/sbd-public-nav.css">';
 const PUBLIC_NAV_SCRIPT = '<script src="../js/sbd-public-nav.js" defer></script>';
+const SKIP_LINK = '<a class="sbd-skip-link" href="#app">Skip to NoteForge workspace</a>';
 const CANONICAL_SHELL_STYLE = `<style data-noteforge-sbd-shell>
   .sbd-site-return { box-sizing: border-box; height: 44px; }
   .sbd-site-return ~ .app { height: calc(100vh - 44px); }
@@ -171,7 +172,12 @@ function injectSystemByDaveNavigation(index) {
   let next = index;
   if (!next.includes(PUBLIC_NAV_CSS)) next = next.replace(/<\/head>/i, `${PUBLIC_NAV_CSS}\n</head>`);
   if (!next.includes('data-noteforge-sbd-shell')) next = next.replace(/<\/head>/i, `${CANONICAL_SHELL_STYLE}\n</head>`);
-  if (!next.includes('class="sbd-site-return"')) next = next.replace(/<body[^>]*>/i, (body) => `${body}\n${BREADCRUMB}`);
+  if (!next.includes('class="sbd-skip-link"')) next = next.replace(/<body[^>]*>/i, (body) => `${body}\n${SKIP_LINK}`);
+  if (!next.includes('class="sbd-site-return"')) next = next.replace(SKIP_LINK, `${SKIP_LINK}\n${BREADCRUMB}`);
+  next = next.replace(/<div\s+class=app\s+id=app(?![^>]*\btabindex=)/i, '<div class=app id=app tabindex=-1');
+  if ((next.match(/class="sbd-skip-link"/g) || []).length !== 1) fail('Canonical index must contain exactly one skip link');
+  if (!/<body[^>]*>\s*<a class="sbd-skip-link" href="#app">/i.test(next)) fail('Skip link must be the first body content');
+  if (!/<div\s+class=app\s+id=app\s+tabindex=-1>/i.test(next)) fail('NoteForge workspace must be programmatically focusable');
   if (!next.includes(PUBLIC_NAV_SCRIPT)) next = next.replace(/<\/body>/i, `${PUBLIC_NAV_SCRIPT}\n</body>`);
   if ((next.match(/class="sbd-site-return"/g) || []).length !== 1) fail('Canonical index must contain exactly one static System by Dave breadcrumb');
   if ((next.match(/sbd-public-nav\.css/g) || []).length !== 1) fail('Canonical index must contain exactly one public-navigation stylesheet');

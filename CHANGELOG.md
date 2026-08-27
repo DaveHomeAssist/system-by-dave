@@ -2,6 +2,13 @@
 
 ## 2026-08-26
 
+### Public navigation and keyboard access remediation
+
+* Defined the site's public shell contract for shared headers, static breadcrumbs, AV operator navigation, and custom compact shells.
+* Added first-focus skip links with programmatically focusable workspace targets to the twelve previously uncovered standalone tools, including the managed NoteForge release artifact and future sync contract.
+* Added explicit System by Dave, parent, and current-location cues to DepotOps and both Throwline surfaces, and made the parallel AV Tool Suite index focus-safe.
+* Expanded public-navigation verification to enforce the remediated skip-link targets and custom-shell destinations.
+
 ### Public trust and routing remediation
 
 * Aligned System by Dave's Prompt Lab copy with the current hosted product: sign-in is explicit, the free editor and optional Pro plan are separated, A/B Compare is labeled Pro, and hosted proxy behavior no longer conflicts with the local-storage claim.

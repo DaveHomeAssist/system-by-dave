@@ -16,6 +16,8 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
 - Each page may have an inline `<style>` block for page-specific overrides.
 - Shared browser helpers may live in `js/` when multiple static AV pages need
   the same small behavior.
+- `docs/public-shell-contract.md` defines the required home, parent, current,
+  return, and keyboard-focus behavior for every public navigation shell.
 - App-grade surfaces may use frameworks, bundlers, package managers, generated
   assets, or other stronger architecture when the product calls for it.
 - **`js/sbd-registry.js` is the single source of truth for the AV tools**
