@@ -59,6 +59,7 @@
   .product-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px;}
   .mini-cta{display:inline-flex;align-items:center;gap:8px;min-height:34px;padding:8px 11px;border:1px solid rgba(255,255,255,0.13);font-family:var(--ff-mono);font-size:10.5px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;color:rgba(243,244,247,0.72);transition:border-color .2s ease,color .2s ease,background .2s ease;}
   .mini-cta:hover{border-color:rgba(243,244,247,0.42);color:#F3F4F7;background:rgba(255,255,255,0.045);}
+  .hero h1 br.mobile-break{display:none;}
   a:focus-visible,button:focus-visible{outline:2px solid var(--blue);outline-offset:3px;}
   @media (max-width:880px){
     .specs{grid-template-columns:repeat(2,1fr)!important;}
@@ -77,10 +78,12 @@
     .nav-links{width:100%;display:grid!important;grid-template-columns:1fr!important;gap:10px!important;}
     .nav-links a{text-align:center;width:100%;}
     .hero{padding-top:54px!important;text-align:left!important;}
-    .hero>div:first-child{display:flex!important;flex-wrap:wrap!important;align-items:flex-start!important;max-width:100%;width:100%;white-space:normal!important;line-height:1.4;overflow-wrap:anywhere;word-break:break-word;}
+    .hero>div:first-child{display:flex!important;flex-wrap:nowrap!important;align-items:flex-start!important;max-width:100%;width:100%;white-space:normal!important;line-height:1.4;overflow-wrap:anywhere;word-break:break-word;border-radius:18px!important;}
+    .hero-badge-copy{flex:1;min-width:0;white-space:normal;overflow-wrap:break-word;}
     .hero h1{max-width:100%;font-size:34px!important;line-height:1.06!important;letter-spacing:0!important;text-wrap:auto;white-space:normal!important;overflow-wrap:anywhere;word-break:break-word;}
     .hero h1 span{display:block;max-width:100%;white-space:normal!important;overflow-wrap:anywhere;word-break:break-word;}
     .hero h1 br{display:block;}
+    .hero h1 br.mobile-break{display:block;}
     .hero p{font-size:16px!important;max-width:100%!important;width:100%!important;white-space:normal!important;overflow-wrap:anywhere;word-break:break-word;}
     .hero-actions{display:grid!important;grid-template-columns:1fr!important;align-items:stretch!important;}
     .hero-actions a{justify-content:center;min-width:0;}
@@ -123,9 +126,9 @@
     <!-- HERO -->
     <section id="main-content" class="hero" tabindex="-1" style="max-width:1200px;margin:0 auto;padding:104px 40px 80px;text-align:center;">
       <div style="display:inline-flex;align-items:center;gap:10px;font-family:var(--ff-mono);font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(243,244,247,0.55);border:1px solid rgba(255,255,255,0.1);padding:8px 16px;border-radius:100px;margin-bottom:36px;">
-        <span style="width:7px;height:7px;border-radius:50%;background:oklch(0.68 0.13 158);box-shadow:0 0 10px oklch(0.68 0.13 158);"></span>Built by one person · tested in production
+        <span style="width:7px;height:7px;flex:none;border-radius:50%;background:oklch(0.68 0.13 158);box-shadow:0 0 10px oklch(0.68 0.13 158);"></span><span class="hero-badge-copy">Built by one person · tested in production</span>
       </div>
-      <h1 style="font-family:var(--ff-display);font-weight:600;font-size:clamp(46px,7vw,92px);line-height:0.98;letter-spacing:-0.03em;margin-bottom:30px;">Software tools that<br><span style="color:rgba(243,244,247,0.45);">do the unglamorous work.</span></h1>
+      <h1 style="font-family:var(--ff-display);font-weight:600;font-size:clamp(46px,7vw,92px);line-height:0.98;letter-spacing:-0.03em;margin-bottom:30px;">Software tools that<br><span style="color:rgba(243,244,247,0.45);">do the unglamorous<br class="mobile-break"> work.</span></h1>
       <p style="font-size:18px;font-weight:300;line-height:1.7;color:rgba(243,244,247,0.62);max-width:580px;margin:0 auto 44px;">Notion agents and widgets, Prompt Lab, and a full kit of browser-based AV show tools. Three product lines with clear free, local, and optional paid paths.</p>
       <div class="hero-actions" style="display:flex;gap:14px;align-items:center;justify-content:center;flex-wrap:wrap;">
         <a href="#audiences" class="cta-1" data-track-cta="home:audience-paths" style="display:inline-flex;align-items:center;gap:10px;padding:16px 30px;background:#F3F4F7;color:#0A0D14;font-family:var(--ff-mono);font-size:12px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;">Choose your path <span>→</span></a>
