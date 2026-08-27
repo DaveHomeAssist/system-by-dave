@@ -167,23 +167,35 @@ const PAGE_AUDIT_SCRIPT = `
     return style.display !== "none" && style.visibility !== "hidden" && rect.width > 0 && rect.height > 0;
   };
   const controls = [...document.querySelectorAll("button,input,select,textarea,[role=button],a[href]")].filter(visible);
-  const unnamed = controls.filter((el) => {
-    const text = (el.getAttribute("aria-label") || el.getAttribute("title") || el.textContent || el.value || "").trim();
-    return !text && !el.getAttribute("aria-labelledby");
-  }).map((el) => el.outerHTML.slice(0, 180));
-  const smallControls = controls.filter((el) => {
-    if (el.matches("a[href]:not([role=button])")) return false;
+  const controlName = (el) => {
+    const label = el.id ? document.querySelector('label[for="' + CSS.escape(el.id) + '"]') : null;
+    return (el.getAttribute("aria-label") || el.getAttribute("title") ||
+      (label && label.textContent) || (el.closest("label") && el.closest("label").textContent) ||
+      el.textContent || el.value || "").trim();
+  };
+  const measureControls = (items) => items.filter((el) => {
     const rect = el.getBoundingClientRect();
     return rect.width < 44 || rect.height < 44;
   }).map((el) => {
     const rect = el.getBoundingClientRect();
     return {
       tag: el.tagName.toLowerCase(),
-      name: (el.getAttribute("aria-label") || el.textContent || el.value || "").trim().slice(0, 80),
+      name: controlName(el).slice(0, 80),
       width: Math.round(rect.width),
       height: Math.round(rect.height)
     };
   }).slice(0, 40);
+  const unnamed = controls.filter((el) => {
+    const text = controlName(el);
+    return !text && !el.getAttribute("aria-labelledby");
+  }).map((el) => el.outerHTML.slice(0, 180));
+  const smallControls = measureControls(controls.filter((el) => !el.matches("a[href]:not([role=button])")));
+  const primaryControls = [...document.querySelectorAll([
+    ".cta-1", ".cta-2", ".agent-cta", ".button-primary", ".primary", ".cat-pill",
+    ".theme-toggle", "#avApp .hd-ctx button", "#avApp .hd-phase-strip button",
+    "#avApp .hd-icon-btn", "#avApp .seg button", ".bar input", ".bar select",
+    ".bar .tog", ".bar .btn", ".copy", ".fill", ".link"
+  ].join(","))].filter(visible);
   return {
     title: document.title,
     url: location.href,
@@ -201,6 +213,11 @@ const PAGE_AUDIT_SCRIPT = `
     controls: controls.length,
     unnamedControls: unnamed,
     smallControls,
+    smallPrimaryControls: measureControls(primaryControls),
+    links: [...document.querySelectorAll("a[href]")].filter(visible).map((el) => ({
+      text: el.textContent.trim().replace(/\s+/g, " ").slice(0, 100),
+      href: el.href
+    })).slice(0, 200),
     horizontalOverflow: document.documentElement.scrollWidth > document.documentElement.clientWidth + 2,
     documentWidth: document.documentElement.scrollWidth,
     viewportWidth: document.documentElement.clientWidth,
@@ -238,12 +255,13 @@ async function auditPage(name, url) {
     connectionType: "cellular4g"
   });
   await cdp.send("Emulation.setCPUThrottlingRate", { rate: 4 });
-  await cdp.send("Emulation.setDeviceMetricsOverride", {
-    width: 390,
-    height: 844,
-    deviceScaleFactor: 3,
-    mobile: true
-  });
+  const requiredViewports = [
+    { name: "narrow-phone", width: 390, height: 844, deviceScaleFactor: 3, mobile: true },
+    { name: "680-breakpoint", width: 680, height: 900, deviceScaleFactor: 2, mobile: false },
+    { name: "tablet", width: 1024, height: 768, deviceScaleFactor: 2, mobile: false },
+    { name: "desktop", width: 1440, height: 900, deviceScaleFactor: 1, mobile: false }
+  ];
+  await cdp.send("Emulation.setDeviceMetricsOverride", requiredViewports[0]);
   await cdp.send("Emulation.setEmulatedMedia", {
     features: [{ name: "prefers-reduced-motion", value: "reduce" }]
   });
@@ -257,7 +275,13 @@ async function auditPage(name, url) {
   }
   await new Promise((resolve) => setTimeout(resolve, 2500));
 
-  const mobile = await evaluate(cdp, PAGE_AUDIT_SCRIPT);
+  const viewportResults = [];
+  for (const viewport of requiredViewports) {
+    await cdp.send("Emulation.setDeviceMetricsOverride", viewport);
+    await new Promise((resolve) => setTimeout(resolve, 350));
+    viewportResults.push({ viewport, audit: await evaluate(cdp, PAGE_AUDIT_SCRIPT) });
+  }
+  const mobile = viewportResults[0].audit;
   await evaluate(cdp, "document.body.focus(); document.activeElement && document.activeElement.blur()");
   const focusOrder = [];
   for (let i = 0; i < 20; i += 1) {
@@ -270,18 +294,22 @@ async function auditPage(name, url) {
     })()`));
   }
 
-  await cdp.send("Emulation.setDeviceMetricsOverride", {
-    width: 640,
-    height: 450,
-    deviceScaleFactor: 2,
-    mobile: false
-  });
-  await new Promise((resolve) => setTimeout(resolve, 500));
-  const zoom = await evaluate(cdp, `({
-    horizontalOverflow: document.documentElement.scrollWidth > document.documentElement.clientWidth + 2,
-    documentWidth: document.documentElement.scrollWidth,
-    viewportWidth: document.documentElement.clientWidth
-  })`);
+  const skipActivation = await evaluate(cdp, `(() => {
+    const skip = document.querySelector(".sbd-skip-link,.skip-link");
+    if (!skip) return { available: false };
+    skip.focus();
+    return { available: true, label: skip.textContent.trim(), href: skip.getAttribute("href") };
+  })()`);
+  if (skipActivation.available) {
+    await cdp.send("Input.dispatchKeyEvent", { type: "keyDown", key: "Enter", code: "Enter", windowsVirtualKeyCode: 13, nativeVirtualKeyCode: 13 });
+    await cdp.send("Input.dispatchKeyEvent", { type: "keyUp", key: "Enter", code: "Enter", windowsVirtualKeyCode: 13, nativeVirtualKeyCode: 13 });
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    Object.assign(skipActivation, await evaluate(cdp, `(() => ({
+      hash: location.hash,
+      activeId: document.activeElement && document.activeElement.id,
+      targetId: document.querySelector(location.hash) && document.querySelector(location.hash).id
+    }))()`));
+  }
 
   const ax = await cdp.send("Accessibility.getFullAXTree");
   const axUnnamedInteractive = (ax.nodes || []).filter((node) => {
@@ -295,9 +323,10 @@ async function auditPage(name, url) {
     name,
     audited_at: new Date().toISOString(),
     mobile,
+    required_viewports: viewportResults,
     transfer_bytes: Math.round(encodedBytes),
     focus_order_first_20: focusOrder,
-    zoom_200_percent_desktop_equivalent: zoom,
+    skip_activation: skipActivation,
     accessibility_tree_unnamed_interactive_roles: axUnnamedInteractive
   };
 }
@@ -358,7 +387,7 @@ async function main() {
   const report = {
     schema_version: "1.0.0",
     generated_at: new Date().toISOString(),
-    method: "Chrome DevTools Protocol, mobile 4G and 4x CPU throttle, reduced motion, keyboard traversal, 640px reflow check",
+    method: "Chrome DevTools Protocol, mobile 4G and 4x CPU throttle, reduced motion, keyboard traversal, and 390/680/1024/1440 viewport checks",
     limitations: [
       "Lab metrics are synthetic local-run evidence, not field Core Web Vitals.",
       "VoiceOver speech output and meaning require a human assistive-technology pass.",

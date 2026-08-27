@@ -41,7 +41,7 @@
   button.danger{border-color:rgba(255,107,107,.55);color:#ffd5d5;background:rgba(255,107,107,.1)}
   button:disabled{cursor:not-allowed;opacity:.52;transform:none;box-shadow:none}
   button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,a:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
-  input,select,textarea{width:100%;min-height:40px;border:1px solid var(--line);border-radius:var(--radius);background:#0e1318;color:var(--text);padding:9px 10px;transition:border-color var(--fast) var(--ease),background var(--fast) var(--ease),box-shadow var(--fast) var(--ease)}
+  input,select,textarea{width:100%;min-height:44px;border:1px solid var(--line);border-radius:var(--radius);background:#0e1318;color:var(--text);padding:9px 10px;transition:border-color var(--fast) var(--ease),background var(--fast) var(--ease),box-shadow var(--fast) var(--ease)}
   textarea{min-height:42px;resize:vertical}
   input:hover,input:focus,select:hover,select:focus,textarea:hover,textarea:focus{border-color:var(--line-strong);background:#111821}
   input::placeholder,textarea::placeholder{color:var(--dim)}
@@ -176,7 +176,7 @@
       </aside>
     </section>
     <section class="workspace">
-      <div class="panel main-panel" id="report">
+      <div class="panel main-panel" id="report" tabindex="-1">
         <div class="toolbar" role="toolbar" aria-label="Show report controls">
           <input id="searchInput" type="search" placeholder="Search time, type, area, subject, owner, details, resolution" aria-label="Search show report">
           <select id="typeFilter" aria-label="Filter by type"></select>

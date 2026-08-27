@@ -31,14 +31,14 @@ a{color:var(--teal);text-decoration:none}a:hover{text-decoration:underline}
 .bar h1 .count{margin-left:auto;font-size:12px;font-weight:500;color:var(--dim)}
 .home{font-size:12px;color:var(--dim)}
 .controls{display:flex;flex-wrap:wrap;gap:8px;margin-top:11px;align-items:center}
-#q{flex:1;min-width:200px;background:var(--raised);border:1px solid var(--border);color:var(--text);border-radius:9px;padding:9px 13px;font-size:14px;outline:none}
+#q{flex:1;min-width:200px;min-height:44px;background:var(--raised);border:1px solid var(--border);color:var(--text);border-radius:9px;padding:9px 13px;font-size:14px;outline:none}
 #q:focus{border-color:var(--violet)}
-select{background:var(--raised);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:8px 9px;font-size:12.5px;outline:none;max-width:210px}
+select{min-height:44px;background:var(--raised);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:8px 9px;font-size:12.5px;outline:none;max-width:210px}
 select:focus{border-color:var(--violet)}
-.tog{display:inline-flex;align-items:center;gap:6px;background:var(--raised);border:1px solid var(--border);border-radius:8px;padding:7px 11px;font-size:12.5px;color:var(--dim);cursor:pointer;user-select:none}
+.tog{display:inline-flex;align-items:center;gap:6px;min-height:44px;background:var(--raised);border:1px solid var(--border);border-radius:8px;padding:7px 11px;font-size:12.5px;color:var(--dim);cursor:pointer;user-select:none}
 .tog.on{color:var(--text);border-color:var(--violet);background:var(--violet-d)}
 .tog input{display:none}
-.btn{background:none;border:1px solid var(--border);color:var(--dim);border-radius:8px;padding:7px 11px;font-size:12.5px;cursor:pointer}
+.btn{min-height:44px;background:none;border:1px solid var(--border);color:var(--dim);border-radius:8px;padding:7px 11px;font-size:12.5px;cursor:pointer}
 .btn:hover{color:var(--text);border-color:var(--violet)}
 .hint{font-size:11px;color:var(--mut);margin-left:auto}
 .wrap{max-width:1040px;margin:0 auto;padding:18px 20px 80px}
@@ -50,7 +50,7 @@ select:focus{border-color:var(--violet)}
 .chead{display:flex;align-items:flex-start;gap:12px}
 .cname{font-size:15px;font-weight:650;letter-spacing:-.2px;line-height:1.35;word-break:break-word;flex:1}
 .cbtns{display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end}
-.copy,.fill,.link{border-radius:8px;padding:7px 12px;font-size:12.5px;font-weight:600;cursor:pointer;white-space:nowrap;transition:.13s;border:1px solid}
+.copy,.fill,.link{min-width:44px;min-height:44px;border-radius:8px;padding:7px 12px;font-size:12.5px;font-weight:600;cursor:pointer;white-space:nowrap;transition:.13s;border:1px solid}
 .copy{background:var(--violet-d);border-color:rgba(167,139,250,.4);color:var(--violet)}
 .copy:hover{background:rgba(167,139,250,.26)}
 .copy.done{background:rgba(52,211,153,.18);border-color:rgba(52,211,153,.5);color:var(--green)}
@@ -66,13 +66,13 @@ select:focus{border-color:var(--violet)}
 mark{background:rgba(251,191,36,.32);color:#fde68a;border-radius:3px;padding:0 1px}
 .desc{color:var(--mut);font-size:12.5px;margin-top:9px;font-style:italic}
 pre.body{background:#0a0b10;border:1px solid var(--border);border-radius:9px;padding:12px 14px;margin-top:11px;font:12.5px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;white-space:pre-wrap;word-break:break-word;color:#cdd2e4}
-.morebtn{background:none;border:none;color:var(--violet);font-size:12px;cursor:pointer;margin-top:7px;padding:0;font-weight:600}
-.imgtog{background:none;border:1px dashed var(--border);color:var(--dim);font-size:11.5px;border-radius:7px;padding:5px 10px;cursor:pointer;margin-top:9px}
+.morebtn{min-height:44px;background:none;border:none;color:var(--violet);font-size:12px;cursor:pointer;margin-top:7px;padding:0;font-weight:600}
+.imgtog{min-height:44px;background:none;border:1px dashed var(--border);color:var(--dim);font-size:11.5px;border-radius:7px;padding:5px 10px;cursor:pointer;margin-top:9px}
 .imgtog:hover{color:var(--text)}
 .fillbox{margin-top:11px;border:1px solid rgba(45,212,191,.3);border-radius:9px;padding:12px;background:rgba(45,212,191,.05)}
 .vrow{display:flex;align-items:center;gap:10px;margin-bottom:7px}
 .vrow span{font-family:ui-monospace,monospace;font-size:11.5px;color:var(--teal);min-width:120px;text-align:right}
-.vrow input{flex:1;background:var(--raised);border:1px solid var(--border);color:var(--text);border-radius:7px;padding:6px 9px;font-size:13px;outline:none}
+.vrow input{flex:1;min-height:44px;background:var(--raised);border:1px solid var(--border);color:var(--text);border-radius:7px;padding:6px 9px;font-size:13px;outline:none}
 .vrow input:focus{border-color:var(--teal)}
 .vstrip{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--dim);margin:4px 0 8px}
 .vprev{background:#0a0b10;border:1px solid var(--border);border-radius:8px;padding:10px;font:12px/1.5 ui-monospace,monospace;white-space:pre-wrap;word-break:break-word;color:#cdd2e4;max-height:200px;overflow:auto;margin-bottom:8px}
@@ -111,7 +111,7 @@ kbd{background:var(--raised);border:1px solid var(--border);border-radius:4px;pa
   <h1><span class="logo">⌘</span> Prompt Library <span class="home">· <a href="https://systembydave.com/">System by Dave</a></span> <span class="count" id="cnt" role="status" aria-live="polite"></span></h1>
   <div class="controls">
     <label for="q" class="sr-only">Search prompts</label>
-    <input id="q" placeholder="Search prompts…  ( / to focus,  ⌘K palette )" autocomplete="off" aria-describedby="qhint">
+    <input id="q" placeholder="Search prompts…  ( / to focus,  ⌘K palette )" autocomplete="off" aria-label="Search prompts" aria-describedby="qhint">
     <span id="qhint" class="sr-only">Press slash to focus search, Command or Control K for the command palette, j and k to move between results.</span>
     <select id="f-src" aria-label="Filter by collection"></select><select id="f-area" aria-label="Filter by area"></select><select id="f-pack" aria-label="Filter by pack"></select>
     <select id="f-fmt" aria-label="Filter by format"></select><select id="f-plat" aria-label="Filter by platform"></select>

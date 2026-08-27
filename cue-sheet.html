@@ -84,7 +84,7 @@
     font:inherit;
   }
   button{
-    min-height:40px;
+    min-height:44px;
     border:1px solid var(--line);
     border-radius:var(--radius);
     background:var(--panel-2);
@@ -511,8 +511,8 @@
     width:44px;
   }
   .row-grip{
-    width:30px;
-    min-height:34px;
+    width:44px;
+    min-height:44px;
     padding:0;
     color:var(--dim);
     font-family:var(--mono);
@@ -524,7 +524,7 @@
   .row-input,
   .row-select,
   .row-textarea{
-    min-height:36px;
+    min-height:44px;
     padding:7px 8px;
     border-radius:7px;
     font-size:13px;
@@ -859,7 +859,7 @@
     </div>
   </header>
 
-  <main id="main-content">
+  <main id="main-content" tabindex="-1">
     <section class="hero-panel" aria-label="Cue sheet setup">
       <div class="title-stack">
         <p class="eyebrow">Run of show</p>
@@ -872,7 +872,7 @@
         <button type="button" id="exportJsonBtn">Export JSON</button>
         <button type="button" id="exportCsvBtn">Export CSV</button>
         <button type="button" id="importBtn">Import JSON</button>
-        <input class="sr-only" type="file" id="importFile" accept="application/json,.json">
+        <input class="sr-only" type="file" id="importFile" accept="application/json,.json" aria-label="Import cue sheet JSON">
       </div>
     </section>
 

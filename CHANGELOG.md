@@ -8,6 +8,8 @@
 * Corrected the Tools directory's stale AV Suite count and release-gated homepage, Tools, AV console, and README count markers against the 44-entry canonical registry.
 * Standardized public Prompt Lab prose and applied the full Davai — System by Dave Memory Architecture display name with an explicit brand relationship on its overview.
 * Added a public content contract and a CI-enforced consistency verifier for sitemap metadata, product claims and labels, agent destinations, external links, counts, navigation, skip links, and privacy behavior.
+* Expanded the reusable portfolio browser audit to cover desktop, tablet, the 680-pixel breakpoint, and narrow-phone layouts while retaining reduced-motion, keyboard-order, accessibility-tree, and touch-target evidence.
+* Corrected first-focus skip-link behavior, focus transfer, AV Resume tablet overflow, and principal 44-pixel control targets across the audited Notion, resume, AV Suite, Prompt Library, CueForge, Show Advance, and Show Report journeys.
 
 ### Public navigation and keyboard access remediation
 

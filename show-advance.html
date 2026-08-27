@@ -131,7 +131,7 @@
   }
   input,select,textarea{
     width:100%;
-    min-height:40px;
+    min-height:44px;
     border:1px solid var(--line);
     border-radius:var(--radius);
     background:#0e1318;
@@ -289,9 +289,9 @@
   tbody tr.status-confirmed{box-shadow:inset 3px 0 0 rgba(107,224,146,.72)}
   tbody tr.status-issue{box-shadow:inset 3px 0 0 rgba(255,107,107,.72)}
   tbody tr.status-deferred{box-shadow:inset 3px 0 0 rgba(118,131,145,.72)}
-  .row-input,.row-select,.row-textarea{min-height:36px;padding:7px 8px;font-size:13px}
+  .row-input,.row-select,.row-textarea{min-height:44px;padding:7px 8px;font-size:13px}
   .row-input.mono{font-family:var(--mono);font-size:12px}
-  .row-textarea{min-height:36px;max-height:130px;line-height:1.35}
+  .row-textarea{min-height:44px;max-height:130px;line-height:1.35}
   .field-xs{width:92px}
   .field-small{width:126px}
   .field-medium{width:168px}
@@ -413,7 +413,7 @@
     </section>
 
     <section class="workspace">
-      <div class="panel main-panel" id="items">
+      <div class="panel main-panel" id="items" tabindex="-1">
         <div class="toolbar" role="toolbar" aria-label="Advance list controls">
           <input id="searchInput" type="search" placeholder="Search section, ask, owner, details, notes" aria-label="Search advance items">
           <select id="sectionFilter" aria-label="Filter by section"></select>

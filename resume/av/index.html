@@ -145,7 +145,7 @@
     max-width: 960px;
     background: var(--black);
     position: relative;
-    overflow: visible;
+    overflow: hidden;
     display: grid;
     grid-template-columns: 280px 1fr;
     grid-template-rows: auto 1fr;
@@ -826,6 +826,7 @@
     border: 1px solid var(--tag-border);
     border-radius: 6px;
     padding: 8px 12px;
+    min-height: 44px;
     cursor: pointer;
     font-family: 'Barlow Condensed', sans-serif;
     font-size: 13px;
@@ -1463,6 +1464,7 @@
 </style>
 </head>
 <body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
 <nav class="sbd-site-return" aria-label="Breadcrumb">
   <a href="/">System by Dave</a>
   <span class="sbd-site-return__separator" aria-hidden="true">/</span>
@@ -1470,7 +1472,6 @@
   <span class="sbd-site-return__separator" aria-hidden="true">/</span>
   <span class="sbd-site-return__current" aria-current="page">AV Resume</span>
 </nav>
-<a class="skip-link" href="#main-content">Skip to main content</a>
 <div class="page" role="document">
   <div class="corner corner-tl" aria-hidden="true"></div>
   <div class="corner corner-tr" aria-hidden="true"></div>
@@ -1579,7 +1580,7 @@
   </aside>
 
   <!-- RIGHT MAIN -->
-  <main class="main" id="main-content">
+  <main class="main" id="main-content" tabindex="-1">
     <section class="hero-panel" aria-labelledby="selection-title">
       <p class="hero-eyebrow">Philadelphia, PA · IATSE Local 8 · Arena / Theatrical / Corporate / Broadcast</p>
       <h2 class="hero-title" id="selection-title">Selected for signal-heavy live shows that need calm crew leadership.</h2>
