@@ -41,8 +41,13 @@
   .agent-flow span{display:block;color:rgba(243,244,247,0.58);font-size:13px;line-height:1.55;}
   .agent-cta{display:inline-flex;align-items:center;justify-content:center;min-height:36px;margin-top:16px;padding:9px 12px;border:1px solid rgba(255,255,255,0.14);font-family:var(--ff-mono);font-size:10.5px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;color:#F3F4F7;}
   .agent-cta:hover{border-color:oklch(0.72 0.19 33);background:rgba(255,255,255,0.045);}
+  .agent-details{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;}
+  .agent-detail{scroll-margin-top:32px;padding:26px;border:1px solid rgba(255,255,255,0.09);background:rgba(255,255,255,0.025);}
+  .agent-detail:target{border-color:oklch(0.72 0.19 33);box-shadow:0 0 0 1px oklch(0.72 0.19 33 / .35);}
+  .agent-detail h2{font-family:var(--ff-display);font-size:25px;line-height:1.15;margin-bottom:10px;}
+  .agent-detail p{color:rgba(243,244,247,0.62);font-size:14px;line-height:1.65;}
   a:focus-visible,button:focus-visible{outline:2px solid var(--rust);outline-offset:3px;}
-  @media (max-width:880px){.agrid,.agent-flow{grid-template-columns:1fr!important;}nav.bar{flex-wrap:wrap;height:auto!important;padding:14px 20px!important;gap:14px!important;}.nav-links{gap:18px!important;}}
+  @media (max-width:880px){.agrid,.agent-flow,.agent-details{grid-template-columns:1fr!important;}nav.bar{flex-wrap:wrap;height:auto!important;padding:14px 20px!important;gap:14px!important;}.nav-links{gap:18px!important;}}
 </style>
 <link rel="stylesheet" href="css/sbd-public-nav.css">
 </head>
@@ -78,55 +83,65 @@
 
     <section id="main-content" style="max-width:1200px;margin:0 auto;padding:88px 40px 40px;">
       <div style="font-family:var(--ff-mono);font-size:12px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(243,244,247,0.4);margin-bottom:28px;"><a href="index.html" class="nav-link" style="text-decoration:none;">Home</a> / <a href="notion.html" class="nav-link" style="text-decoration:none;">Notion</a> / <span style="color:oklch(0.72 0.19 33);">Agents</span></div>
-      <div style="display:inline-flex;align-items:center;gap:9px;font-family:var(--ff-mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:oklch(0.72 0.19 33);margin-bottom:22px;"><span style="width:7px;height:7px;border-radius:50%;background:oklch(0.65 0.19 33);"></span>Paid · native to Notion AI</div>
+      <div style="display:inline-flex;align-items:center;gap:9px;font-family:var(--ff-mono);font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:oklch(0.72 0.19 33);margin-bottom:22px;"><span style="width:7px;height:7px;border-radius:50%;background:oklch(0.65 0.19 33);"></span>Workflow concepts · native to Notion AI</div>
       <h1 style="font-family:var(--ff-display);font-weight:600;font-size:clamp(40px,5.4vw,68px);line-height:1.0;letter-spacing:-0.03em;margin-bottom:22px;">All Agents</h1>
       <p style="font-size:17px;font-weight:300;line-height:1.7;color:rgba(243,244,247,0.62);max-width:620px;">Purpose-built agents that automate real workflows inside Notion. Each one handles a specific job — triaging your inbox, assembling your daily briefing, or keeping your prompts organized.</p>
       <div class="agent-flow" aria-label="Agent setup flow">
         <div><strong>Pick the workflow</strong><span>Start from the agent that matches the recurring Notion job you want removed.</span></div>
-        <div><strong>Review scope</strong><span>Each card now has a stable anchor for handoff, review, and purchase discussion.</span></div>
-        <div><strong>Request setup</strong><span>Open the request path with the chosen agent in context.</span></div>
+        <div><strong>Review scope</strong><span>Each card opens a distinct detail section with the workflow and intended outcome.</span></div>
+        <div><strong>Contact Dave</strong><span>Agent fulfillment is not currently automated; use the named contact action to discuss setup.</span></div>
         <div><strong>Run natively</strong><span>Agents stay inside Notion AI, with no external runtime or API key.</span></div>
       </div>
     </section>
 
     <section style="max-width:1200px;margin:0 auto;padding:24px 40px 80px;">
       <div class="agrid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:18px;">
-        <a id="promptkeeper" href="https://promptlab.tools?agent=promptkeeper" target="_blank" rel="noopener noreferrer" class="card" data-track-cta="agents:promptkeeper" style="display:flex;flex-direction:column;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.09);text-decoration:none;color:inherit;overflow:hidden;">
+        <a id="promptkeeper" href="#promptkeeper-details" class="card" data-track-cta="agents:promptkeeper" style="display:flex;flex-direction:column;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.09);text-decoration:none;color:inherit;overflow:hidden;">
           <div style="aspect-ratio:4/3;overflow:hidden;background:#EDE9DD;border-bottom:1px solid rgba(255,255,255,0.08);"><img src="img/agent-promptkeeper.webp" alt="PromptKeeper" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
           <div style="padding:22px;display:flex;flex-direction:column;flex-grow:1;">
             <div style="display:flex;align-items:center;gap:8px;font-family:var(--ff-mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:oklch(0.72 0.19 33);margin-bottom:12px;"><span style="width:6px;height:6px;border-radius:50%;background:oklch(0.65 0.19 33);"></span>Agent</div>
             <h3 style="font-family:var(--ff-display);font-weight:600;font-size:21px;margin-bottom:9px;">PromptKeeper</h3>
             <p style="font-size:13px;font-weight:300;line-height:1.6;color:rgba(243,244,247,0.58);flex-grow:1;margin-bottom:20px;">Save, organize, and recall your best AI prompts inside Notion. Version history, tagging, and instant recall across your entire workspace.</p>
-            <div style="display:flex;align-items:center;justify-content:space-between;padding-top:15px;border-top:1px solid rgba(255,255,255,0.08);"><span style="font-family:var(--ff-mono);font-size:15px;"><span style="font-size:10px;color:rgba(243,244,247,0.5);">$</span>15</span><span style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:oklch(0.72 0.19 33);">Request →</span></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding-top:15px;border-top:1px solid rgba(255,255,255,0.08);"><span style="font-family:var(--ff-mono);font-size:11px;color:rgba(243,244,247,0.5);">Details</span><span style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:oklch(0.72 0.19 33);">Review →</span></div>
           </div>
         </a>
-        <a id="daily-prophet" href="https://promptlab.tools?agent=daily-prophet" target="_blank" rel="noopener noreferrer" class="card" data-track-cta="agents:daily-prophet" style="display:flex;flex-direction:column;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.09);text-decoration:none;color:inherit;overflow:hidden;">
+        <a id="daily-prophet" href="#daily-prophet-details" class="card" data-track-cta="agents:daily-prophet" style="display:flex;flex-direction:column;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.09);text-decoration:none;color:inherit;overflow:hidden;">
           <div style="aspect-ratio:4/3;overflow:hidden;background:#EDE9DD;border-bottom:1px solid rgba(255,255,255,0.08);"><img src="img/agent-daily-prophet.webp" alt="Daily Prophet" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
           <div style="padding:22px;display:flex;flex-direction:column;flex-grow:1;">
             <div style="display:flex;align-items:center;gap:8px;font-family:var(--ff-mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:oklch(0.72 0.19 33);margin-bottom:12px;"><span style="width:6px;height:6px;border-radius:50%;background:oklch(0.65 0.19 33);"></span>Agent</div>
             <h3 style="font-family:var(--ff-display);font-weight:600;font-size:21px;margin-bottom:9px;">Daily Prophet</h3>
             <p style="font-size:13px;font-weight:300;line-height:1.6;color:rgba(243,244,247,0.58);flex-grow:1;margin-bottom:20px;">Your morning briefing — tasks, calendar, and notes assembled automatically from workspace activity. Shows up ready to go every day.</p>
-            <div style="display:flex;align-items:center;justify-content:space-between;padding-top:15px;border-top:1px solid rgba(255,255,255,0.08);"><span style="font-family:var(--ff-mono);font-size:15px;"><span style="font-size:10px;color:rgba(243,244,247,0.5);">$</span>12</span><span style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:oklch(0.72 0.19 33);">Request →</span></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding-top:15px;border-top:1px solid rgba(255,255,255,0.08);"><span style="font-family:var(--ff-mono);font-size:11px;color:rgba(243,244,247,0.5);">Details</span><span style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:oklch(0.72 0.19 33);">Review →</span></div>
           </div>
         </a>
-        <a id="formatting-wizard" href="https://promptlab.tools?agent=formatting-wizard" target="_blank" rel="noopener noreferrer" class="card" data-track-cta="agents:formatting-wizard" style="display:flex;flex-direction:column;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.09);text-decoration:none;color:inherit;overflow:hidden;">
+        <a id="formatting-wizard" href="#formatting-wizard-details" class="card" data-track-cta="agents:formatting-wizard" style="display:flex;flex-direction:column;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.09);text-decoration:none;color:inherit;overflow:hidden;">
           <div style="aspect-ratio:4/3;overflow:hidden;background:#EDE9DD;border-bottom:1px solid rgba(255,255,255,0.08);"><img src="img/agent-formatting-wizard.webp" alt="Formatting Wizard" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
           <div style="padding:22px;display:flex;flex-direction:column;flex-grow:1;">
             <div style="display:flex;align-items:center;gap:8px;font-family:var(--ff-mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:oklch(0.72 0.19 33);margin-bottom:12px;"><span style="width:6px;height:6px;border-radius:50%;background:oklch(0.65 0.19 33);"></span>Agent</div>
             <h3 style="font-family:var(--ff-display);font-weight:600;font-size:21px;margin-bottom:9px;">Formatting Wizard</h3>
             <p style="font-size:13px;font-weight:300;line-height:1.6;color:rgba(243,244,247,0.58);flex-grow:1;margin-bottom:20px;">Transform messy notes into clean, structured Notion pages with proper headings, toggles, callouts, and visual hierarchy.</p>
-            <div style="display:flex;align-items:center;justify-content:space-between;padding-top:15px;border-top:1px solid rgba(255,255,255,0.08);"><span style="font-family:var(--ff-mono);font-size:15px;"><span style="font-size:10px;color:rgba(243,244,247,0.5);">$</span>12</span><span style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:oklch(0.72 0.19 33);">Request →</span></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding-top:15px;border-top:1px solid rgba(255,255,255,0.08);"><span style="font-family:var(--ff-mono);font-size:11px;color:rgba(243,244,247,0.5);">Details</span><span style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:oklch(0.72 0.19 33);">Review →</span></div>
           </div>
         </a>
-        <a id="sort-inbox" href="https://promptlab.tools?agent=sort-inbox" target="_blank" rel="noopener noreferrer" class="card" data-track-cta="agents:sort-inbox" style="display:flex;flex-direction:column;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.09);text-decoration:none;color:inherit;overflow:hidden;">
+        <a id="sort-inbox" href="#sort-inbox-details" class="card" data-track-cta="agents:sort-inbox" style="display:flex;flex-direction:column;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.09);text-decoration:none;color:inherit;overflow:hidden;">
           <div style="aspect-ratio:4/3;overflow:hidden;background:#EDE9DD;border-bottom:1px solid rgba(255,255,255,0.08);"><img src="img/agent-sort-inbox.webp" alt="Sort Inbox" loading="lazy" style="width:100%;height:100%;object-fit:cover;display:block;"></div>
           <div style="padding:22px;display:flex;flex-direction:column;flex-grow:1;">
             <div style="display:flex;align-items:center;gap:8px;font-family:var(--ff-mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:oklch(0.72 0.19 33);margin-bottom:12px;"><span style="width:6px;height:6px;border-radius:50%;background:oklch(0.65 0.19 33);"></span>Agent</div>
             <h3 style="font-family:var(--ff-display);font-weight:600;font-size:21px;margin-bottom:9px;">Sort Inbox</h3>
             <p style="font-size:13px;font-weight:300;line-height:1.6;color:rgba(243,244,247,0.58);flex-grow:1;margin-bottom:20px;">Weekly triage that classifies, routes, and prioritizes every item in your Notion inbox. Turns chaos into a clean routing table.</p>
-            <div style="display:flex;align-items:center;justify-content:space-between;padding-top:15px;border-top:1px solid rgba(255,255,255,0.08);"><span style="font-family:var(--ff-mono);font-size:15px;"><span style="font-size:10px;color:rgba(243,244,247,0.5);">$</span>19</span><span style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:oklch(0.72 0.19 33);">Request →</span></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding-top:15px;border-top:1px solid rgba(255,255,255,0.08);"><span style="font-family:var(--ff-mono);font-size:11px;color:rgba(243,244,247,0.5);">Details</span><span style="font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;color:oklch(0.72 0.19 33);">Review →</span></div>
           </div>
         </a>
+      </div>
+    </section>
+
+    <section style="max-width:1200px;margin:0 auto;padding:0 40px 88px;" aria-labelledby="agent-details-title">
+      <h2 id="agent-details-title" style="font-family:var(--ff-display);font-size:clamp(28px,3.5vw,42px);margin-bottom:24px;">Agent details</h2>
+      <div class="agent-details">
+        <article class="agent-detail" id="promptkeeper-details" tabindex="-1"><h2>PromptKeeper</h2><p>For teams that need a governed prompt library inside Notion: capture, tag, version, and retrieve reusable prompts without introducing another runtime.</p><a class="agent-cta" href="mailto:DaveRobertson9353@gmail.com?subject=PromptKeeper%20agent%20details">Contact Dave about PromptKeeper</a></article>
+        <article class="agent-detail" id="daily-prophet-details" tabindex="-1"><h2>Daily Prophet</h2><p>For a repeatable morning briefing assembled from the tasks, calendar items, and notes already present in a Notion workspace.</p><a class="agent-cta" href="mailto:DaveRobertson9353@gmail.com?subject=Daily%20Prophet%20agent%20details">Contact Dave about Daily Prophet</a></article>
+        <article class="agent-detail" id="formatting-wizard-details" tabindex="-1"><h2>Formatting Wizard</h2><p>For turning rough workspace notes into a consistent hierarchy of headings, callouts, toggles, and scannable content blocks.</p><a class="agent-cta" href="mailto:DaveRobertson9353@gmail.com?subject=Formatting%20Wizard%20agent%20details">Contact Dave about Formatting Wizard</a></article>
+        <article class="agent-detail" id="sort-inbox-details" tabindex="-1"><h2>Sort Inbox</h2><p>For scheduled Notion inbox triage that classifies new entries, applies routing rules, and leaves a clear review queue.</p><a class="agent-cta" href="mailto:DaveRobertson9353@gmail.com?subject=Sort%20Inbox%20agent%20details">Contact Dave about Sort Inbox</a></article>
       </div>
     </section>
 

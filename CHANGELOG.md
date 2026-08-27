@@ -2,6 +2,12 @@
 
 ## 2026-08-26
 
+### Public trust and routing remediation
+
+* Aligned System by Dave's Prompt Lab copy with the current hosted product: sign-in is explicit, the free editor and optional Pro plan are separated, A/B Compare is labeled Pro, and hosted proxy behavior no longer conflicts with the local-storage claim.
+* Replaced unfulfilled agent pricing and generic Prompt Lab redirects with four distinct internal detail destinations and truthful named contact actions.
+* Removed the unavailable Digital Footprints domain from the systems resume, including structured data, and routed Production Work actions to the live Profile surface.
+
 ### AV Workbook dark-theme lock
 
 * Locked AV Workbook to its Stage Slate flagship theme so saved Light or System preferences cannot repaint the page, and added browser regression coverage for both stored preference states.
