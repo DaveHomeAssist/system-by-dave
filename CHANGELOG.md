@@ -8,6 +8,12 @@
 * Replaced unfulfilled agent pricing and generic Prompt Lab redirects with four distinct internal detail destinations and truthful named contact actions.
 * Removed the unavailable Digital Footprints domain from the systems resume, including structured data, and routed Production Work actions to the live Profile surface.
 
+### Privacy and resume audience remediation
+
+* Removed the remaining Google Fonts requests from Profile, AV Resume, and PixelForge, mapped each surface to existing self-hosted type assets, and tightened their CSP font and style directives to same-origin resources.
+* Corrected the privacy policy to describe the Widgets page's local poster cards and outbound NotionWidgets links instead of nonexistent embedded iframes.
+* Added explicit AV and systems resume choices to Profile and cross-linked both resumes with audience-specific language while preserving their canonical routes and AV-first production contact.
+
 ### AV Workbook dark-theme lock
 
 * Locked AV Workbook to its Stage Slate flagship theme so saved Light or System preferences cannot repaint the page, and added browser regression coverage for both stored preference states.

@@ -15,9 +15,9 @@
   --amber: #e8a13a;
   --amber-soft: #f0c074;
   --signal: #4fd1c5;
-  --display: "Archivo", sans-serif;
+  --display: "DM Sans", system-ui, sans-serif;
   --mono: "JetBrains Mono", monospace;
-  --body: "Newsreader", Georgia, serif;
+  --body: "DM Serif Display", Georgia, serif;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }

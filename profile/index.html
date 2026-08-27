@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self'; base-uri 'self'; form-action 'none'" />
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self'; style-src 'self'; font-src 'self' data:; script-src 'self'; base-uri 'self'; form-action 'none'" />
 <title>Dave Robertson — Live Event &amp; Broadcast Technology</title>
 <meta name="robots" content="index,follow">
 <meta name="description" content="David 'Dave' Robertson — live event and broadcast technology professional based in Oaklyn, NJ, working throughout the Philadelphia region." />
@@ -35,9 +35,7 @@
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
 <link rel="manifest" href="site.webmanifest" />
 
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=JetBrains+Mono:wght@400;500;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../css/fonts.css" />
 <link rel="stylesheet" href="styles.css" />
 <script src="vendor/gsap.min.js" defer></script>
 <script src="vendor/ScrollTrigger.min.js" defer></script>
@@ -318,7 +316,8 @@
         </div>
       </div>
       <div class="comms-cta">
-        <a class="btn-primary" href="/resume/av/" target="_blank" rel="noopener noreferrer">View AV resume</a>
+        <a class="btn-primary" href="/resume/av/">AV Resume · live production</a>
+        <a class="btn-secondary" href="/resume/">Systems Resume · infrastructure &amp; software</a>
         <a class="btn-secondary" href="/resume/av/david-robertson-av-resume.pdf" target="_blank" rel="noopener noreferrer">Download PDF</a>
         <a class="btn-secondary" href="mailto:avbydave@gmail.com">Open a channel</a>
         <span aria-live="polite" class="sr-only" id="copy-status"></span>

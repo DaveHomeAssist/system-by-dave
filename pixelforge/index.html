@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self' https://api.anthropic.com https://api.replicate.com; script-src 'self';"
+      content="default-src 'self'; img-src 'self' data: blob:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; connect-src 'self' https://api.anthropic.com https://api.replicate.com; script-src 'self';"
     />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>PixelForge | Browser Pixel Art and Image Editor</title>
@@ -28,12 +28,7 @@
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:title" content="PixelForge | Browser Pixel Art and Image Editor" />
     <meta name="twitter:description" content="Create pixel art, layered raster edits, vector shapes, text, and AI-generated imagery in PixelForge, a browser-based editor for quick creative work." />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Instrument+Serif&display=swap"
-    />
+    <link rel="stylesheet" href="../css/fonts.css" />
     <style>
       html,
       body,
@@ -50,6 +45,13 @@
     <script src="../js/av-theme.js"></script>
     <script type="module" crossorigin src="/pixelforge/assets/index-DmbrXj61.js"></script>
     <link rel="stylesheet" crossorigin href="/pixelforge/assets/index-CrzKMytk.css">
+    <style>
+      .pf, .pf-page {
+        --pf-font: 'DM Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        --pf-font-ui: 'DM Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        --pf-font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Consolas, monospace;
+      }
+    </style>
   <link rel="stylesheet" href="../css/sbd-public-nav.css">
 <script src="../js/sbd-public-nav.js" defer></script>
 <link rel="stylesheet" href="../css/av-theme.css">
