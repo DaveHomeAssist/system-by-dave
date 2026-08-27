@@ -18,6 +18,8 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
   the same small behavior.
 - `docs/public-shell-contract.md` defines the required home, parent, current,
   return, and keyboard-focus behavior for every public navigation shell.
+- `docs/public-content-contract.md` defines canonical product names, title
+  families, registry-backed counts, and the public consistency release gate.
 - App-grade surfaces may use frameworks, bundlers, package managers, generated
   assets, or other stronger architecture when the product calls for it.
 - **`js/sbd-registry.js` is the single source of truth for the AV tools**

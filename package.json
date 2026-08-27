@@ -19,7 +19,8 @@
     "sync:noteforge": "node scripts/sync_noteforge_release.js",
     "verify:noteforge": "node scripts/verify_noteforge_release.js",
     "verify:portfolio-schemas": "node scripts/verify_portfolio_schemas.js",
-    "verify:public-navigation": "node scripts/verify_public_navigation.js"
+    "verify:public-navigation": "node scripts/verify_public_navigation.js",
+    "verify:public-consistency": "node scripts/verify_public_consistency.js"
   },
   "devDependencies": {
     "@types/react": "^19.2.17",

@@ -186,7 +186,7 @@ function verifyNavigationContract() {
   if (!/\.sbd-nav/.test(publicNav)) fail('Public navigation does not defer to the AV operator bar.');
   const tools = read('tools.html');
   if (!/https:\/\/hatinring\.com\//.test(tools)) fail('Tools does not link Hat-in-Ring to its production domain.');
-  ['NoteForge', 'Ballpark Scorecard', 'Davai Memory Architecture', 'Tailscale Manual'].forEach((name) => {
+  ['NoteForge', 'Ballpark Scorecard', 'Davai — System by Dave Memory Architecture', 'Tailscale Manual'].forEach((name) => {
     if (!tools.includes(name)) fail(`Tools is missing ${name}.`);
   });
   if (!read('sitemap.xml').includes('https://systembydave.com/noteforge/')) fail('Sitemap is missing NoteForge.');

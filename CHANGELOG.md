@@ -2,6 +2,13 @@
 
 ## 2026-08-26
 
+### Public metadata and content consistency remediation
+
+* Added route-specific CSP to Prompt Library, FIFA Pitch Crew, and Ballpark Scorecard, and completed Scorecard's canonical, Open Graph, and Twitter metadata.
+* Corrected the Tools directory's stale AV Suite count and release-gated homepage, Tools, AV console, and README count markers against the 44-entry canonical registry.
+* Standardized public Prompt Lab prose and applied the full Davai — System by Dave Memory Architecture display name with an explicit brand relationship on its overview.
+* Added a public content contract and a CI-enforced consistency verifier for sitemap metadata, product claims and labels, agent destinations, external links, counts, navigation, skip links, and privacy behavior.
+
 ### Public navigation and keyboard access remediation
 
 * Defined the site's public shell contract for shared headers, static breadcrumbs, AV operator navigation, and custom compact shells.

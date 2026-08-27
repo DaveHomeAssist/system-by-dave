@@ -42,13 +42,14 @@ jobs:
       - name: Install verification dependencies
         run: npm ci
 
-      - name: Verify AV Suite contracts
+      - name: Verify public site contracts
         run: |
           npm run verify:av
           npm run verify:gear-reference
           npm run verify:indexing
           npm run verify:portfolio-schemas
           npm run verify:public-navigation
+          npm run verify:public-consistency
 
       - name: Verify Throwline release contract
         run: npm run verify:throwline
