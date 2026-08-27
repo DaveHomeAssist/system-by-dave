@@ -2,6 +2,21 @@
 
 ## 2026-08-27
 
+### Agent documentation contract
+
+* Refactored `CLAUDE.md` into a stable project and architecture orientation,
+  replacing duplicated page inventories and feature history with canonical
+  source maps and focused documentation pointers.
+* Strengthened `AGENTS.md` with explicit instruction precedence, release
+  authority, source-of-truth ownership, persistence boundaries, a scoped
+  documentation policy, project-specific verification commands, and a full
+  Definition of Done.
+* Documented the actual motion policy: simple transitions stay native, while
+  the existing GSAP dependency is reserved for coordinated or runtime-managed
+  motion with reduced-motion handling and cleanup.
+* Corrected the README to identify `scripts/gen_sitemap.py` as the sitemap
+  authority instead of instructing contributors to edit generated XML.
+
 ### Cue Sheet live playback, source I/O, and product boundary
 
 * Reworked Cue Sheet into a layered browser operator surface with equal-size Video, Audio, Image, Live, Text, and Color quick-add controls; visible Preview and Program monitors; audible preview transport; four-layer visibility, mute, opacity, and clear controls; and a persisted full-width timeline focus mode.
