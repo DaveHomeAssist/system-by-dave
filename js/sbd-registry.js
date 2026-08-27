@@ -26,7 +26,7 @@
     {id:'av-workbook',name:'AV Workbook',href:'av-workbook/',dept:'Workbook',phases:['advance','prep','loadin','show','strike','closeout'],tag:'Show File',desc:'Shared show workbook for rooms, crew, gear, signal sources, patching, validation, and handoff state.',storageKeys:[{key:'system-by-dave.av-workbook.active.v1',label:'AV Workbook active workbook'},{key:'system-by-dave.av-workbook.fallback.v1',label:'AV Workbook fallback'}]},
     {id:'teleprompter',name:'Teleprompter',href:'teleprompter.html',dept:'Show Flow',phases:['prep','show'],tag:'Script',desc:'Script reader with formatting, saved scripts, cues, remote mode, rundown, and a compact read view.',storageKeys:[{key:'teleprompter.v1',label:'Teleprompter state'},{key:'teleprompter.script.v1',label:'Teleprompter script'},{key:'teleprompter.preferences.v1',label:'Teleprompter preferences'},{key:'teleprompter.savedScripts.v1',label:'Teleprompter saved scripts'},{key:'teleprompter.savedFormats.v1',label:'Teleprompter saved looks'},{key:'teleprompter.pacePresets.v1',label:'Teleprompter saved paces'},{key:'teleprompter.bookmarks.v1',label:'Teleprompter bookmarks'},{key:'teleprompter.customColors.v1',label:'Teleprompter custom colors'}]},
     {id:'show-timer',name:'Show Timer',href:'show-timer.html',dept:'Show Flow',phases:['prep','show'],tag:'Clock',desc:'Countdown, count up, clock mode, stage view, warning states, and keyboard control.',storageKeys:[{key:'showTimer.preferences.v1',label:'Show Timer preferences'}]},
-    {id:'cueforge',name:'CueForge',href:'cue-sheet.html',dept:'Show Flow',phases:['advance','prep','show'],tag:'Cues',desc:'Run of show cue control with next actions, status tracking, print, JSON, and CSV.',storageKeys:[{key:'cueSheet.v1',label:'CueForge cue sheet'}]},
+    {id:'cue-sheet',name:'Cue Sheet',href:'cue-sheet.html',dept:'Show Flow',phases:['advance','prep','show'],tag:'Cues',desc:'Browser based rundown control with preview, lightweight layered playback, monitor output, capture inputs, print, JSON, and CSV.',storageKeys:[{key:'cueSheet.v1',label:'Cue Sheet state'}]},
     {id:'playback-check',name:'Playback Check',href:'playback-check.html',dept:'Playback',phases:['prep','show'],tag:'Media',desc:'Playback file checklist with routes, backups, duration, ready state, and export.',storageKeys:[{key:'playback-check.v1',label:'Playback Check'}]},
     {id:'pixelforge',name:'PixelForge',href:'pixelforge/',dept:'Graphics',phases:['advance','prep','show','closeout'],tag:'Graphics',desc:'Raster, vector, text, and image-editing workspace for show graphics, signage fixes, simple overlays, and PNG export.',storageKeys:[{key:'PixelForge.prefs.v1',label:'PixelForge preferences'},{key:'pf:palettes:v1',label:'PixelForge palettes'}]},
     {id:'record-log',name:'Record Log',href:'record-log.html',dept:'Playback',phases:['show','closeout'],tag:'Record',desc:'Program records, camera ISOs, audio captures, media destinations, backup status, and handoff notes.',storageKeys:[{key:'record-log.v1',label:'Record Log'}]},
@@ -72,9 +72,9 @@
   /* Per-phase recommendations shown by the console and the context dock. */
   var RECOMMENDED={
     advance:['av-workbook','show-advance','site-survey','breakout-room-matrix','crew-call','throwline','plotforge','pixelforge','input-list'],
-    prep:['av-workbook','gear-prep','gear-reference','truck-pack','cueforge','teleprompter','playback-check','pixelforge','audio-patch','video-patch','network-plan'],
+    prep:['av-workbook','gear-prep','gear-reference','truck-pack','cue-sheet','teleprompter','playback-check','pixelforge','audio-patch','video-patch','network-plan'],
     loadin:['av-workbook','load-in-plan','gear-reference','room-check','show-board','power-plan','line-check','display-plan','projection-plan','throwline','speaker-plan','show-task-board'],
-    show:['av-workbook','teleprompter','show-timer','cueforge','show-board','show-task-board','breakout-room-matrix','pixelforge','record-log','comms-check','camera-shot-list'],
+    show:['av-workbook','teleprompter','show-timer','cue-sheet','show-board','show-task-board','breakout-room-matrix','pixelforge','record-log','comms-check','camera-shot-list'],
     strike:['av-workbook','strike-plan','truck-pack','cable-plan','show-task-board','crew-time-log'],
     closeout:['av-workbook','show-handoff','show-report','client-signoff','change-order','record-log','crew-time-log']
   };
@@ -83,7 +83,7 @@
      Coarser than tool.dept on purpose — ten browseable groups. */
   var NAV_DEPARTMENTS=[
     {label:'Workbook',toolIds:['av-workbook','show-advance','show-task-board','show-handoff','show-report']},
-    {label:'Run of show',toolIds:['teleprompter','show-timer','cueforge','playback-check','comms-check']},
+    {label:'Run of show',toolIds:['teleprompter','show-timer','cue-sheet','playback-check','comms-check']},
     {label:'Graphics',toolIds:['pixelforge','playback-check','display-plan','projection-plan']},
     {label:'Audio',toolIds:['audio-patch','line-check','input-list','signal-flow','speaker-plan','rf-coordination']},
     {label:'Video',toolIds:['video-patch','display-plan','projection-plan','throwline','stream-plan','record-log','camera-shot-list']},
@@ -98,8 +98,12 @@
   ];
 
   /* Compatibility routes normalize to their canonical local applications. */
-  var ALIASES={'cueforge.html':'cue-sheet.html','plotforge.html':'stage-plot.html','av-workbook.html':'av-workbook/','av-workbook/index.html':'av-workbook/'};
-  var ALIAS_FILES=['./cueforge.html','./plotforge.html'];
+  var ALIASES={'plotforge.html':'stage-plot.html','av-workbook.html':'av-workbook/','av-workbook/index.html':'av-workbook/'};
+  var ALIAS_FILES=['./plotforge.html'];
+
+  /* Persisted suite state used `cueforge` before the browser tool was correctly
+     separated from the Electron app. Normalize that legacy id on read only. */
+  var ID_ALIASES={'cueforge':'cue-sheet'};
 
   /* Shared shell assets every offline session needs. */
   var BASE_ASSETS=[
@@ -114,6 +118,7 @@
     './js/sbd-handoff.js',
     './js/responsive-tables.js',
     './js/av-domain-views.js',
+    './js/vendor/gsap.min.js',
     './css/sbd-public-nav.css',
     './css/av-theme.css',
     './css/responsive-tables.css',
@@ -164,7 +169,7 @@
      chips shown when a tool row is expanded — not separate routes. */
   var CONSOLE_FAMILIES=[
     {id:'planning',label:'Planning',depts:'Planning',icon:['M9 2h6v4H9z','M9 4H6a1 1 0 0 0-1 1v15a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1h-3','m9 13 2 2 4-4'],toolIds:['show-advance','site-survey','plotforge','breakout-room-matrix']},
-    {id:'runofshow',label:'Run of show',depts:'Show Flow',icon:['M8 5.14v14l11-7z'],toolIds:['cueforge','teleprompter','show-timer'],subs:{teleprompter:[{label:'Read view',kind:'Mode',source:'Saved looks, this browser'},{label:'Remote',kind:'Mode',source:'Second-screen driver'},{label:'Rundown',kind:'Mode',source:'WPM pace presets'},{label:'Bookmarks',kind:'Mode',source:'Marker set, per script'}]}},
+    {id:'runofshow',label:'Run of show',depts:'Show Flow',icon:['M8 5.14v14l11-7z'],toolIds:['cue-sheet','teleprompter','show-timer'],subs:{teleprompter:[{label:'Read view',kind:'Mode',source:'Saved looks, this browser'},{label:'Remote',kind:'Mode',source:'Second-screen driver'},{label:'Rundown',kind:'Mode',source:'WPM pace presets'},{label:'Bookmarks',kind:'Mode',source:'Marker set, per script'}]}},
     {id:'audio',label:'Audio',depts:'Audio',icon:['M2 12h1','M6 8v8','M10 4v16','M14 7v10','M18 10v4','M21 12h1'],toolIds:['input-list','audio-patch','line-check','speaker-plan']},
     {id:'video',label:'Video',depts:'Video · Streaming · Playback',icon:['m16 9 5-3v12l-5-3z','M3 6h13v12H3z'],toolIds:['signal-flow','video-patch','display-plan','projection-plan','throwline','stream-plan','record-log','playback-check','camera-shot-list'],subs:{throwline:[{label:'Throw & fit',kind:'Calc',source:'Manufacturer lens spec sheets'},{label:'Brightness',kind:'Calc',source:'ANSI/INFOCOMM 3M-2011 contrast'},{label:'Field verify',kind:'Check',source:'Measured on-site reading'},{label:'Drawings',kind:'Output',source:'ANSI D print validation'}]}},
     {id:'lighting',label:'Lighting',depts:'Lighting',icon:['M9 18h6','M10 22h4','M12 2a7 7 0 0 0-4 12.7c.6.6 1 1.4 1 2.3h6c0-.9.4-1.7 1-2.3A7 7 0 0 0 12 2z'],toolIds:['lighting-patch']},
@@ -192,22 +197,30 @@
       });
   }
 
+  function normalizeToolId(id){
+    id=String(id||'');
+    return ID_ALIASES[id]||id;
+  }
+
   function toolById(id){
+    id=normalizeToolId(id);
     for(var i=0;i<TOOLS.length;i++){if(TOOLS[i].id===id) return TOOLS[i];}
     return null;
   }
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool change — rolls the service-worker cache. */
-    version:'v20260826-workbook-dark-lock',
+    version:'v20260827-cue-sheet-live',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,
     navDepartments:NAV_DEPARTMENTS,
     consoleFamilies:CONSOLE_FAMILIES,
     aliases:ALIASES,
+    idAliases:ID_ALIASES,
     baseAssets:BASE_ASSETS,
     offlineAssets:offlineAssets,
-    toolById:toolById
+    toolById:toolById,
+    normalizeToolId:normalizeToolId
   };
 })(typeof self!=='undefined'?self:this);

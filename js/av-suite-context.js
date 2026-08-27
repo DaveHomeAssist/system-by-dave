@@ -26,7 +26,8 @@
   if(!context.showName && !context.venue && !context.showDate && !context.operator) return;
   var STORAGE_KEY = 'av-suite-dashboard.v1';
   var DOCK_COMPACT_KEY = 'av-suite-dock-compact.v1';
-  var DEFAULT_FAVORITES = ['teleprompter', 'show-timer', 'cueforge'];
+  var DEFAULT_FAVORITES = ['teleprompter', 'show-timer', 'cue-sheet'];
+  var TOOL_ID_ALIASES = {cueforge:'cue-sheet'};
   var READINESS_LABELS = {pending:'Pending', ready:'Ready', issue:'Issue', skipped:'Skipped'};
   var READINESS_BUTTON_LABELS = {pending:'Pending', ready:'Ready', issue:'Issue', skipped:'Skip'};
   var READINESS_VALUES = ['pending', 'ready', 'issue', 'skipped'];
@@ -43,7 +44,7 @@
     prep:[
       {name:'Gear Prep',href:'gear-prep.html'},
       {name:'Truck Pack Plan',href:'truck-pack.html'},
-      {name:'CueForge',href:'cueforge.html'},
+      {name:'Cue Sheet',href:'cue-sheet.html'},
       {name:'Teleprompter',href:'teleprompter.html'},
       {name:'Playback Check',href:'playback-check.html'},
       {name:'Audio Patch',href:'audio-patch.html'},
@@ -63,7 +64,7 @@
     show:[
       {name:'Teleprompter',href:'teleprompter.html'},
       {name:'Show Timer',href:'show-timer.html'},
-      {name:'CueForge',href:'cueforge.html'},
+      {name:'Cue Sheet',href:'cue-sheet.html'},
       {name:'Show Task Board',href:'show-task-board.html'},
       {name:'Breakout Room Matrix',href:'breakout-room-matrix.html'},
       {name:'Record Log',href:'record-log.html'},
@@ -86,7 +87,7 @@
       {name:'Crew Time Log',href:'crew-time-log.html'}
     ]
   };
-  var ROUTE_ALIASES={'cue-sheet.html':'cueforge.html','stage-plot.html':'plotforge.html'};
+  var ROUTE_ALIASES={'stage-plot.html':'plotforge.html'};
 
   /* Prefer js/sbd-registry.js (single source of truth) when a page loads it
      before this script; the literals above remain as a fallback so the dock
@@ -103,10 +104,32 @@
     });
     PHASE_TOOLS = next;
     if(REG.aliases) ROUTE_ALIASES = REG.aliases;
+    if(REG.idAliases) TOOL_ID_ALIASES = REG.idAliases;
   })();
 
   function clean(value, limit){
     return String(value || '').replace(/\s+/g, ' ').trim().slice(0, limit);
+  }
+
+  function normalizeToolId(value){
+    value = String(value || '');
+    return TOOL_ID_ALIASES[value] || value;
+  }
+
+  function migrateIds(value, limit){
+    var seen = {};
+    return Array.isArray(value) ? value.map(normalizeToolId).filter(function(id){
+      if(!id || seen[id]) return false;
+      seen[id] = true;
+      return true;
+    }).slice(0, limit) : [];
+  }
+
+  function migrateToolMap(value){
+    var next = {};
+    value = cleanObject(value);
+    Object.keys(value).forEach(function(id){next[normalizeToolId(id)] = value[id];});
+    return next;
   }
 
   function byId(id){
@@ -291,11 +314,14 @@
     state.showDate = clean(parsed.showDate || state.showDate, 20);
     state.operator = clean(parsed.operator || state.operator, 80);
     state.phase = clean(parsed.phase || state.phase, 30);
-    state.favorites = Array.isArray(parsed.favorites) ? parsed.favorites.map(String).slice(0, 60) : state.favorites;
-    state.recent = Array.isArray(parsed.recent) ? parsed.recent.map(String).slice(0, 12) : state.recent;
-    state.readiness = cleanObject(parsed.readiness);
-    state.toolNotes = cleanObject(parsed.toolNotes);
-    state.commandRecent = Array.isArray(parsed.commandRecent) ? parsed.commandRecent.map(String).slice(0, 10) : state.commandRecent;
+    state.favorites = Array.isArray(parsed.favorites) ? migrateIds(parsed.favorites, 60) : state.favorites;
+    state.recent = Array.isArray(parsed.recent) ? migrateIds(parsed.recent, 12) : state.recent;
+    state.readiness = migrateToolMap(parsed.readiness);
+    state.toolNotes = migrateToolMap(parsed.toolNotes);
+    state.commandRecent = Array.isArray(parsed.commandRecent) ? parsed.commandRecent.map(function(id){
+      id = String(id);
+      return id.indexOf('tool:') === 0 ? 'tool:' + normalizeToolId(id.slice(5)) : id;
+    }).slice(0, 10) : state.commandRecent;
     state.filters = cleanObject(parsed.filters);
     if(!state.filters.search) state.filters.search = '';
     if(!state.filters.phase) state.filters.phase = 'all';

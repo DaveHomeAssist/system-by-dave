@@ -187,18 +187,25 @@ function assertPageContracts(registry) {
     fail('Show Timer does not announce meaningful timer state transitions.');
   }
 
-  const cueforge = read('cueforge.html');
-  if (!/<meta name="robots" content="noindex,follow">/.test(cueforge)) {
-    fail('CueForge compatibility route is indexable.');
+  const cueforgeBoundary = read('cueforge.html');
+  if (!/<meta name="robots" content="noindex,follow">/.test(cueforgeBoundary)) {
+    fail('CueForge product-boundary route is indexable.');
   }
-  if (!/<link rel="canonical" href="https:\/\/systembydave\.com\/cue-sheet\.html">/.test(cueforge)) {
-    fail('CueForge compatibility route canonical does not point to Cue Sheet.');
+  if (!/<link rel="canonical" href="https:\/\/systembydave\.com\/cueforge\.html">/.test(cueforgeBoundary)) {
+    fail('CueForge product-boundary route is not self-canonical.');
+  }
+  if (/window\.location\.replace|destination=['"]cue-sheet\.html/.test(cueforgeBoundary)) {
+    fail('CueForge product-boundary route still redirects to Cue Sheet.');
+  }
+  if (!/separate Electron desktop application/.test(cueforgeBoundary) || !/Open Cue Sheet/.test(cueforgeBoundary)) {
+    fail('CueForge product-boundary route does not explain the product distinction.');
   }
 
   const sitemap = read('sitemap.xml');
-  ['av-workbook.html', 'cueforge.html', 'plotforge.html'].forEach((alias) => {
+  ['av-workbook.html', 'plotforge.html'].forEach((alias) => {
     if (sitemap.includes(alias)) fail(`Sitemap includes compatibility alias ${alias}.`);
   });
+  if (sitemap.includes('cueforge.html')) fail('Sitemap includes the noindex CueForge product-boundary route.');
 }
 
 async function assertRemoteChecks(registry) {

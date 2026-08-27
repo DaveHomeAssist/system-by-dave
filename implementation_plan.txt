@@ -25,7 +25,7 @@ Assumptions
 - Core marketing and directory pages receive the full global header. Standalone apps receive a compact static site-return breadcrumb. AV tools receive only the AV operator bar.
 - GitHub moves from the primary header to the footer. The Dave destination is /profile/.
 - Tools remains a curated top-level product directory. Its copy changes from an exhaustive claim to a category-based directory, while AV Suite remains the detailed directory for AV leaf tools.
-- /cue-sheet.html remains the canonical local CueForge route; /cueforge.html remains a noindex compatibility alias.
+- /cue-sheet.html remains the canonical Cue Sheet browser route; /cueforge.html is a noindex boundary notice for the separate Electron app, never a compatibility alias.
 - /stage-plot.html remains the canonical offline-capable local stage plot tool; /plotforge.html remains a noindex external handoff until a separate product decision replaces it.
 - /hat-in-ring/ remains a noindex handoff, and the Tools card links directly to https://hatinring.com.
 - /noteforge/ is an active public product and will be added to Tools and sitemap.xml. Moved, private, error, and compatibility routes remain outside global navigation.
@@ -159,7 +159,7 @@ Key Milestones
 - Refactor js/sbd-nav.js to render only AV Suite, All Tools, department label, Previous, and Next; remove duplicate Home from the operator bar.
 - Prefer a compact sticky top placement. If a bottom placement is retained for a specific tool, reserve body space and prove it does not cover controls, tables, footers, safe areas, or the AV Suite context dock.
 - Keep tool order and department data sourced from js/sbd-registry.js; do not duplicate the registry in navigation code.
-- Point CueForge navigation to cue-sheet.html and the local stage plot navigation to stage-plot.html while retaining noindex compatibility aliases.
+- Point Cue Sheet navigation to cue-sheet.html and the local stage plot navigation to stage-plot.html while retaining only verified compatibility aliases; cueforge.html remains a product-boundary notice.
 - Bump the SBD registry/service-worker version and update offline assets if navigation or registry files change.
 
 Dependencies
@@ -236,7 +236,7 @@ Key Milestones
 - Add or verify cards for NoteForge, Davai, Tailscale Manual, Scorecard, and other active public top-level products; retain one AV Suite card rather than duplicating all AV leaf tools.
 - Change Hat-in-Ring’s card to https://hatinring.com and keep the local handoff noindex,follow.
 - Add /noteforge/ to sitemap.xml with an accurate lastmod, and verify active public pages are intentionally included or excluded.
-- Keep /cueforge.html, /plotforge.html, and /av-workbook.html as noindex compatibility routes; ensure visible navigation points to the selected canonical destination.
+- Keep /cueforge.html as a noindex product-boundary notice and /plotforge.html plus /av-workbook.html as noindex compatibility routes; ensure visible navigation points to each selected canonical destination.
 - Add explicit noindex metadata to moved or unmanaged stubs such as /marsscape/ and classify /aom-show-board.html as either an active AV tool or a private/retired page before leaving it deployed.
 - Verify private house, Command53, Career Market, dashboards, contract reviews, prototypes, 404, and 500 pages remain outside the sitemap and public navigation.
 

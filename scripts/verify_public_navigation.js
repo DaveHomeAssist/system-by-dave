@@ -215,8 +215,10 @@ function verifyAvWorkbookRegistry() {
   });
   const navHasWorkbook = (registry.navDepartments || []).some((group) => (group.toolIds || []).includes('av-workbook'));
   if (!navHasWorkbook) fail('AV Workbook is not present in universal nav departments.');
-  const cueforge = registry.toolById && registry.toolById('cueforge');
-  if (!cueforge || cueforge.href !== 'cue-sheet.html') fail('CueForge does not point to canonical cue-sheet.html.');
+  const cueSheet = registry.toolById && registry.toolById('cue-sheet');
+  if (!cueSheet || cueSheet.name !== 'Cue Sheet' || cueSheet.href !== 'cue-sheet.html') fail('Cue Sheet is not registered at canonical cue-sheet.html.');
+  const legacyCueForgeId = registry.toolById && registry.toolById('cueforge');
+  if (!legacyCueForgeId || legacyCueForgeId.id !== 'cue-sheet') fail('Legacy cueforge suite state does not normalize to Cue Sheet.');
   const plot = registry.toolById && registry.toolById('plotforge');
   if (!plot || plot.href !== 'stage-plot.html') fail('Stage Plot does not point to canonical stage-plot.html.');
   notes.push(`registry=${registry.version}`);

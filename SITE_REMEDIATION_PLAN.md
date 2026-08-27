@@ -26,8 +26,8 @@
 - The production journey audit covered 14 routes and 56 required viewport states with zero overflow, undersized principal controls, unnamed accessibility-tree roles, failed skip activations, or reduced-motion animation leaks.
 - The live sitemap crawl returned 81 of 81 routes and 109 of 109 unique static internal links without failure.
 - Prompt Lab’s product and sign-in destinations rendered at all four viewports; all four Notion Widget destinations returned HTTP 200.
-- AV Suite’s service worker controlled the page and cached all 95 assets; with network requests blocked, AV Suite and CueForge still rendered their working surfaces.
-- Guided Setup and Quick Switcher focus return, modal focus trapping, the Skills filter, and CueForge’s eight-row `cueSheet.v1` persistence passed on production.
+- AV Suite’s service worker controlled the page and cached all 95 assets; with network requests blocked, AV Suite and Cue Sheet still rendered their working surfaces.
+- Guided Setup and Quick Switcher focus return, modal focus trapping, the Skills filter, and Cue Sheet’s eight-row `cueSheet.v1` persistence passed on production.
 - The original audit is closed in [SITE_INCONSISTENCY_AUDIT.md](SITE_INCONSISTENCY_AUDIT.md). The only unperformed optional check is manual VoiceOver speech-output review.
 
 ## 1. Boundary

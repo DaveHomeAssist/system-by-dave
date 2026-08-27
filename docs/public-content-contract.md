@@ -8,7 +8,10 @@ Public System by Dave copy uses canonical names, title families, and registry-ba
 - **AV by Dave** — flagship AV operations console. `AV Suite` remains the stable route and global-navigation label.
 - **Prompt Lab** — public prose and navigation spelling. `PromptLab` is reserved for a deliberate external identifier, code symbol, asset filename, or historical prompt content.
 - **Davai — System by Dave Memory Architecture** — full display name on the Tools directory and Davai overview metadata. Davai subpage titles may use the compact `Page | Davai` suffix after the overview establishes the relationship.
-- **CueForge**, **PlotForge**, **PixelForge**, **NoteForge**, and **Ballpark Scorecard** retain their product spellings.
+- **Cue Sheet** is the browser AV rundown tool. **CueForge** is a separate
+  private Electron desktop application and must not be used as a name, route
+  alias, registry id, export schema, or description for Cue Sheet.
+- **PlotForge**, **PixelForge**, **NoteForge**, and **Ballpark Scorecard** retain their product spellings.
 
 ## Title families
 

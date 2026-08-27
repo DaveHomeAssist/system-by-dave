@@ -99,7 +99,7 @@ hatFiles.forEach((file) => {
 
 [
   ['av-workbook.html', 'https://systembydave.com/av-workbook/'],
-  ['cueforge.html', 'https://systembydave.com/cue-sheet.html'],
+  ['cueforge.html', 'https://systembydave.com/cueforge.html'],
   ['plotforge.html', 'https://plotforge-beta.vercel.app/'],
   ['marsscape/index.html', 'https://mixmash.games/mars/'],
   ['command53/index.html', 'https://davehomeassist.github.io/command-center-061eed/private.html']
