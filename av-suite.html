@@ -924,7 +924,7 @@ img,svg{display:block}
 <div id="onboardOverlay" class="ob-overlay" hidden>
   <section class="ob-dialog bp" role="dialog" aria-modal="true" aria-labelledby="obTitle">
     <div class="ob-head">
-      <div><div class="eyebrow">Guided setup</div><h2 id="obTitle">Name the show</h2></div>
+      <div><div class="eyebrow">Guided setup</div><h2 id="obTitle" tabindex="-1">Name the show</h2></div>
       <button type="button" id="obCloseBtn">Close</button>
     </div>
     <div class="ob-progress" id="obProgress"><i></i><i></i><i></i><i></i></div>
@@ -1054,7 +1054,7 @@ var uiState={
 var commandState={open:false,query:'',activeIndex:0,items:[],lastFocus:null};
 var offlineState={supported:false,online:navigator.onLine!==false,worker:'Checking',cache:'Checking',cached:0,total:OFFLINE_ASSETS.length,message:'Checking offline cache.',busy:false};
 var viewState={context:'show',view:'family',fam:null,openFams:{},openSubs:{}};
-var obState={step:0};
+var obState={step:0,lastFocus:null};
 var toastTimer=null;
 var toastUndo=null;
 
@@ -1746,8 +1746,8 @@ function renderOnboardStep(){
     $('obExportBtn').addEventListener('click',function(){exportPackage(this);});
   }
 }
-function openOnboarding(){obState.step=1;$('onboardOverlay').hidden=false;renderOnboardStep();}
-function closeOnboarding(){obState.step=0;$('onboardOverlay').hidden=true;uiState.onboardingSeen=true;writeUi({onboardingSeen:true});renderAll();}
+function openOnboarding(){obState.step=1;obState.lastFocus=document.activeElement;$('onboardOverlay').hidden=false;renderOnboardStep();setTimeout(function(){var first=$('obShowName')||$('obCloseBtn');if(first) first.focus();},0);}
+function closeOnboarding(){var restoreTo=obState.lastFocus;obState.step=0;obState.lastFocus=null;$('onboardOverlay').hidden=true;uiState.onboardingSeen=true;writeUi({onboardingSeen:true});renderAll();if(restoreTo&&restoreTo.focus) restoreTo.focus();}
 function obNext(){if(obState.step>=4){closeOnboarding();return;}obState.step++;renderOnboardStep();}
 function obPrev(){obState.step=Math.max(1,obState.step-1);renderOnboardStep();}
 
@@ -1963,6 +1963,15 @@ function wireEvents(){
   $('obSkipBtn').addEventListener('click',closeOnboarding);
   $('obBackBtn').addEventListener('click',obPrev);
   $('obNextBtn').addEventListener('click',obNext);
+  $('onboardOverlay').addEventListener('keydown',function(e){
+    if(e.key!=='Tab') return;
+    var dialog=$('onboardOverlay').querySelector('.ob-dialog');
+    var focusables=Array.prototype.filter.call(dialog.querySelectorAll('button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[href],[tabindex]:not([tabindex="-1"])'),function(el){return !el.hidden&&el.offsetParent!==null;});
+    if(!focusables.length) return;
+    var first=focusables[0];var last=focusables[focusables.length-1];
+    if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
+    else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
+  });
 
   /* global keys */
   document.addEventListener('keydown',function(e){

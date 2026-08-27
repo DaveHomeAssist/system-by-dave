@@ -11,6 +11,7 @@
 * Expanded the reusable portfolio browser audit to cover desktop, tablet, the 680-pixel breakpoint, and narrow-phone layouts while retaining reduced-motion, keyboard-order, accessibility-tree, and touch-target evidence.
 * Corrected first-focus skip-link behavior, focus transfer, AV Resume tablet overflow, and principal 44-pixel control targets across the audited Notion, resume, AV Suite, Prompt Library, CueForge, Show Advance, and Show Report journeys.
 * Corrected the narrow-phone homepage hero badge and headline wrapping found during final production screenshot review.
+* Added Guided Setup modal focus entry, Tab trapping, and trigger restoration so its keyboard behavior matches the existing Quick Switcher contract.
 
 ### Public navigation and keyboard access remediation
 
