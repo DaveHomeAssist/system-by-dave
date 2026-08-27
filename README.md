@@ -51,8 +51,9 @@ use the tooling selected for that surface.
 ## Deploy
 
 Pushes to the default branch deploy automatically via GitHub Pages. The custom
-domain is set in `CNAME`. Update `sitemap.xml` (`lastmod`) whenever page
-content changes.
+domain is set in `CNAME`. After changing an indexable page or route, run
+`python3 scripts/gen_sitemap.py`; do not edit the generated `sitemap.xml`
+directly.
 
 ### NoteForge canonical release
 
