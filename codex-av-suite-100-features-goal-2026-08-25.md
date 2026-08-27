@@ -327,7 +327,7 @@ starting Section A and Section J:
 92. Rigging weight rolled into the Stage Plot rigging layer (Section E.42).
 93. Alignment checklist with referenced test patterns and per-screen sign-off.
 94. Sightline check: first-row image height vs. last-row legibility for actual deck text size.
-95. Backup-path failover procedure handed to CueForge as a cue.
+95. Backup-path failover procedure handed to Cue Sheet as a cue.
 
 ### Section K — Input List (`input-list.html`) — unverified live, re-check before building
 

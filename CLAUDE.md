@@ -42,8 +42,8 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
 - `av-suite.html`: AV suite launch hub
 - `teleprompter.html`: AV teleprompter
 - `show-timer.html`: AV show timer
-- `cue-sheet.html`: CueForge cue sheet and run of show control
-- `cueforge.html`: CueForge route alias
+- `cue-sheet.html`: Cue Sheet browser rundown and lightweight layered playback control
+- `cueforge.html`: noindex boundary notice for the separate CueForge Electron app
 - `playback-check.html`: AV playback checklist
 - `stream-plan.html`: AV stream plan
 - `record-log.html`: AV record log
@@ -148,8 +148,16 @@ Notion skills, agents, widgets, and templates built by Dave Robertson.
   same show profile values, with current tool readiness and note controls,
   compact dock mode, an inline note editor, and previous and next links for
   the current phase's recommended tools.
-- `cue-sheet.html` is rolled into the AV suite as CueForge, with
-  `cueforge.html` as a context preserving route alias and fallback card.
+- `cue-sheet.html` is the AV Suite's browser-based Cue Sheet. It is separate
+  from the private CueForge Electron application; `cueforge.html` is a noindex
+  boundary notice and never redirects to Cue Sheet. Cue Sheet includes
+  equal-size quick-add source types, Preview and Program
+  monitors, audible preview transport, four persistent playback layers,
+  session-local image/audio/video attachment, live capture and virtual-camera
+  input, browser-playable HTTPS gateway streams, a separate multi-display
+  program window, and an expandable timeline focus mode. Native NDI requires
+  NDI Virtual Input / Webcam Input or a gateway; the browser does not decode
+  native NDI directly. See `docs/cue-sheet-media-io.md`.
 - `stage-plot.html` is rolled into the AV suite as PlotForge, with
   `plotforge.html` as a context preserving route alias and fallback card.
 - `playback-check.html` tracks media playback files, destinations, audio

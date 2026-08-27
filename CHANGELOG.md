@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-08-27
+
+### Cue Sheet live playback, source I/O, and product boundary
+
+* Reworked Cue Sheet into a layered browser operator surface with equal-size Video, Audio, Image, Live, Text, and Color quick-add controls; visible Preview and Program monitors; audible preview transport; four-layer visibility, mute, opacity, and clear controls; and a persisted full-width timeline focus mode.
+* Added session-local media attachment, live program playback, a separate program-output window, optional multi-display placement through the Screen Details API, UVC capture-card and virtual-camera discovery, and browser-playable HTTPS network stream attachment.
+* Documented the native NDI boundary: Cue Sheet can use NDI Virtual Input / Webcam Input as a browser camera or receive an NDI gateway's browser-safe output, but browser JavaScript does not decode native NDI directly.
+* Added reduced-motion-safe GSAP cue, program, and workspace transitions; raised Cue Sheet text and control-boundary contrast; preserved 44-pixel targets; and expanded the browser probe across layered playback, image/audio preview, imports, exports, persistence, timeline focus, and 390-pixel containment.
+* Restored the durable product boundary: Cue Sheet is the System by Dave browser tool, while CueForge is a separate private Electron application. Renamed the registry id, export schema, docs, and probe; migrated historical `cueforge` suite state on read; and replaced the old `/cueforge.html` redirect with a noindex boundary notice.
+
+Historical entries below that used “CueForge” for the browser surface refer to the tool now correctly named Cue Sheet; they do not describe the Electron application.
+
 ## 2026-08-26
 
 ### Public metadata and content consistency remediation

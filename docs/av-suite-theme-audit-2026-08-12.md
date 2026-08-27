@@ -21,7 +21,7 @@ Scope: the AV Suite hub plus all 44 canonical tool routes in `js/sbd-registry.js
 | AV Workbook | `/av-workbook/` | Navy/green dark-only | Workbook grid, validation engine, metric cards, tool-group launch panels | Operator Core |
 | Teleprompter | `/teleprompter.html` | Charcoal/rust dark-only; separate user-controlled reader colors | Full-viewport reader, wake control, progress rail, marker rundown | Specialist Translation |
 | Show Timer | `/show-timer.html` | Ops dark | Oversized timer readout, stage grid, preset and transport controls | Operator Core |
-| CueForge | `/cue-sheet.html` | Ops dark | Caller deck, on-deck state, next-cue card, cue status rows | Operator Core |
+| Cue Sheet | `/cue-sheet.html` | Ops dark | Caller deck, on-deck state, next-cue card, cue status rows | Operator Core |
 | Playback Check | `/playback-check.html` | Ops dark | Selected-cue inspector, readiness progression, next-cue card | Operator Core |
 | PixelForge | `/pixelforge/` | Amber/teal dark launch pages; light blue editor default with optional dark editor | Pixel mark, canvas-first editor shell, tool docks, layer stack, creative preview cards | Specialist Translation |
 | Record Log | `/record-log.html` | Ops dark | Recording status cards, selected-record inspector, fast actions | Operator Core |

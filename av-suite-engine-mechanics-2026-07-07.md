@@ -79,7 +79,7 @@ should be implemented as overlays across existing pages rather than new routes.
 | EDID / Timing Validator | `display-plan.html`, `projection-plan.html`, `video-patch.html` | Not a standalone current page. Add validation rules over video/display fields. |
 | Rigging / Vector Load Calculator | No current non-PlotForge route | Defer unless a future rigging page is added. Do not fold into PlotForge during this pass. |
 | Power Balance Ledger | `power-plan.html` | Add circuit, breaker, load, phase, and 80 percent headroom calculations. |
-| Show Timing / Master Cue Engine | `show-timer.html`, `cueforge.html`, `show-advance.html`, `show-task-board.html` | App surface is outside the 33-table count, but the data model should feed the workbook and ROS exports. |
+| Show Timing / Master Cue Engine | `show-timer.html`, `cue-sheet.html`, `show-advance.html`, `show-task-board.html` | App surface is outside the 33-table count, but the data model should feed the workbook and ROS exports. |
 | Truck Pack Space Allocator | `gear-prep.html`, `truck-pack.html`, `load-in-plan.html`, `strike-plan.html` | Gear Prep becomes source manifest; Truck Pack becomes calculation and layout layer. |
 | Intercom / Comms Matrix | `comms-check.html`, `rf-coordination.html` | Start with beltpack/channel allocation in Comms Check; RF remains wireless safety layer. |
 
@@ -436,7 +436,7 @@ Live verification after deploy should continue using:
 - Should the workbook shell be a new `av-workbook.html` route, or should
   `av-suite.html` become the workbook shell?
 - Which page should be the first shared-grid migration: Crew Call or Room Check?
-- Should Show Timer and CueForge stay as separate app surfaces while syncing
+- Should Show Timer and Cue Sheet stay as separate app surfaces while syncing
   timing/cue data into the workbook, or should they become tabs inside the
   workbook later?
 - What is the minimum audit requirement for local-only static storage: operator

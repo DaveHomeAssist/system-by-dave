@@ -975,6 +975,7 @@ var AV_CACHE_NAME='sbd-av-suite-'+(REG.version||'v-fallback');
 var PHASES=REG.phases||[];
 var TOOLS=REG.tools||[];
 var RECOMMENDED=REG.recommended||{};
+var TOOL_ID_ALIASES=REG.idAliases||{};
 var FAMILIES=(REG.consoleFamilies||[]).filter(function(f){return f.toolIds&&f.toolIds.length;});
 var TOOL_STORAGE_KEYS=TOOLS.reduce(function(list,tool){(tool.storageKeys||[]).forEach(function(entry){list.push({tool:tool.id,label:entry.label,key:entry.key});});return list;},[]);
 var SENSITIVE_PACKAGE_KEYS={'PixelForge.ai.v1':true};
@@ -989,11 +990,12 @@ var $=function(id){return document.getElementById(id);};
    with js/av-suite-context.js's writes on the other 40+ tool pages.
    Schema: system-by-dave.av-suite.v1 under localStorage[av-suite-dashboard.v1]
    ============================================================ */
-function defaultState(){return {showName:'AV by Dave',venue:'',showDate:new Date().toISOString().slice(0,10),operator:'',phase:'show',favorites:['teleprompter','show-timer','cueforge'],recent:[],readiness:{},toolNotes:{},commandRecent:[],filters:{search:'',phase:'all',dept:'all',pin:'all'}};}
+function defaultState(){return {showName:'AV by Dave',venue:'',showDate:new Date().toISOString().slice(0,10),operator:'',phase:'show',favorites:['teleprompter','show-timer','cue-sheet'],recent:[],readiness:{},toolNotes:{},commandRecent:[],filters:{search:'',phase:'all',dept:'all',pin:'all'}};}
 var state=defaultState();
 
 function storageAvailable(){try{var key='av-suite-probe';localStorage.setItem(key,key);localStorage.removeItem(key);return true;}catch(e){return false;}}
-function toolById(id){return TOOLS.find(function(t){return t.id===id;})||null;}
+function normalizeToolId(id){id=String(id||'');return REG.normalizeToolId?REG.normalizeToolId(id):(TOOL_ID_ALIASES[id]||id);}
+function toolById(id){id=normalizeToolId(id);return TOOLS.find(function(t){return t.id===id;})||null;}
 function phaseExists(id){return id==='all'||PHASES.some(function(p){return p.id===id;});}
 function departments(){var map={};TOOLS.forEach(function(t){map[t.dept]=true;});return Object.keys(map).sort();}
 function deptExists(name){return name==='all'||departments().indexOf(name)>=0;}
@@ -1005,12 +1007,13 @@ function titleCase(value){return String(value||'').replace(/-/g,' ').replace(/\b
 function phaseLabel(id){var p=PHASES.find(function(x){return x.id===id;});return p?p.label:titleCase(id);}
 
 function cleanFilters(filters){filters=filters&&typeof filters==='object'?filters:{};return {search:String(filters.search||''),phase:phaseExists(filters.phase)?filters.phase:'all',dept:deptExists(filters.dept)?filters.dept:'all',pin:['all','pinned','recent','ready','issues','skipped','notes','saved'].indexOf(filters.pin)>=0?filters.pin:'all'};}
-function cleanIds(ids){return Array.isArray(ids)?ids.filter(function(id){return toolById(id);}):[];}
+function cleanIds(ids){var seen={};return Array.isArray(ids)?ids.map(function(id){var tool=toolById(id);return tool?tool.id:'';}).filter(function(id){if(!id||seen[id]) return false;seen[id]=true;return true;}):[];}
 function commandIdAllowed(id){var value=String(id||'');var viewValues=['all','pinned','recent','ready','issues','skipped','notes','saved'];var actionValues=['action:openRecommended','action:copyPhaseGate','action:copyPhaseHandoff','action:copySuiteLink','action:copyLaunchList','action:copyReviewQueue','action:scanSavedData','action:markRecommendedReady','action:showIssues','action:showNotes','action:pinRecommended','action:exportSuite','action:exportPackage','action:cacheAvTools','action:refreshOfflineCache','action:clearOfflineCache','action:toggleHelp','action:openOnboarding','action:toggleCitations','action:cycleBrand','action:toggleMode','action:openSettings','action:viewAll','action:showShop','action:showOffice','action:showShow'];if(value.indexOf('tool:')===0) return Boolean(toolById(value.slice(5)));if(value.indexOf('phase:')===0) return phaseExists(value.slice(6))&&value.slice(6)!=='all';if(value.indexOf('family:')===0) return familyExists(value.slice(7));if(value.indexOf('view:')===0) return viewValues.indexOf(value.slice(5))>=0;return actionValues.indexOf(value)>=0;}
-function cleanCommandRecent(ids){var seen={};return Array.isArray(ids)?ids.map(function(id){return String(id||'').slice(0,80);}).filter(function(id){if(!id||seen[id]||!commandIdAllowed(id)) return false;seen[id]=true;return true;}).slice(0,10):[];}
-function cleanReadiness(map){var next={};if(!map||typeof map!=='object') return next;Object.keys(map).forEach(function(id){var value=String(map[id]||'pending');if(toolById(id)&&READINESS_VALUES.indexOf(value)>=0&&value!=='pending') next[id]=value;});return next;}
+function normalizeCommandId(id){id=String(id||'').slice(0,80);if(id.indexOf('tool:')===0){var tool=toolById(id.slice(5));if(tool) return 'tool:'+tool.id;}return id;}
+function cleanCommandRecent(ids){var seen={};return Array.isArray(ids)?ids.map(normalizeCommandId).filter(function(id){if(!id||seen[id]||!commandIdAllowed(id)) return false;seen[id]=true;return true;}).slice(0,10):[];}
+function cleanReadiness(map){var next={};if(!map||typeof map!=='object') return next;Object.keys(map).forEach(function(id){var tool=toolById(id);var value=String(map[id]||'pending');if(tool&&READINESS_VALUES.indexOf(value)>=0&&value!=='pending') next[tool.id]=value;});return next;}
 function cleanNote(value){return String(value||'').replace(/\s+/g,' ').trim().slice(0,240);}
-function cleanNotes(map){var next={};if(!map||typeof map!=='object') return next;Object.keys(map).forEach(function(id){var value=cleanNote(map[id]);if(toolById(id)&&value) next[id]=value;});return next;}
+function cleanNotes(map){var next={};if(!map||typeof map!=='object') return next;Object.keys(map).forEach(function(id){var tool=toolById(id);var value=cleanNote(map[id]);if(tool&&value) next[tool.id]=value;});return next;}
 
 function suitePayload(){return {schema:'system-by-dave.av-suite.v1',savedAt:new Date().toISOString(),showName:state.showName,venue:state.venue,showDate:state.showDate,operator:state.operator,phase:state.phase,favorites:state.favorites,recent:state.recent,readiness:state.readiness,toolNotes:state.toolNotes,commandRecent:state.commandRecent,filters:state.filters};}
 function saveState(){if(!storageAvailable()) return false;try{localStorage.setItem(STORAGE_KEY,JSON.stringify(suitePayload()));return true;}catch(e){showHint('Suite preferences could not be saved in this browser.','error');return false;}}
@@ -1701,7 +1704,7 @@ function renderAll(){
    reopenable from the header Setup button.
    ============================================================ */
 var OB_PHASE_BLURB={advance:'Contacts, survey, budget shape.',prep:'Pull, patch, cue and script.',loadin:'Trucks, power, rooms, line check.',show:'Cues, timers, comms, issues.',strike:'Break, pack, cable, hours.',closeout:'Report, handoff, sign-off.'};
-var OB_PIN_SET=[{id:'av-workbook',name:'AV Workbook'},{id:'input-list',name:'Input List'},{id:'load-in-plan',name:'Load In Plan'},{id:'power-plan',name:'Power Plan'},{id:'show-board',name:'Show Board'},{id:'cueforge',name:'CueForge'}];
+var OB_PIN_SET=[{id:'av-workbook',name:'AV Workbook'},{id:'input-list',name:'Input List'},{id:'load-in-plan',name:'Load In Plan'},{id:'power-plan',name:'Power Plan'},{id:'show-board',name:'Show Board'},{id:'cue-sheet',name:'Cue Sheet'}];
 function obTitleFor(step){return step===1?'Name the show':step===2?'Pick your phase':step===3?'Pin your kit':'Go offline-safe';}
 function renderOnboardStep(){
   var step=obState.step;

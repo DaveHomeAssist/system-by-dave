@@ -27,7 +27,7 @@ const allTargets = [
   ['ontrack', 'ontrack.html'],
   ['show-timer', 'show-timer.html'],
   ['playback-check', 'playback-check.html'],
-  ['cueforge', 'cueforge.html'],
+  ['cue-sheet', 'cue-sheet.html'],
   ['audio-patch', 'audio-patch.html'],
   ['av-calculator', 'av-calculator.html'],
   ['show-handoff', 'show-handoff.html']
@@ -161,7 +161,7 @@ async function main() {
           mobile: width <= 430
         });
         await cdp('Page.navigate', { url: new URL(rel, baseUrl).href });
-        await delay(rel === 'cueforge.html' ? 2600 : 1800);
+        await delay(rel === 'cue-sheet.html' ? 2600 : 1800);
         const evaluated = await cdp('Runtime.evaluate', { expression, returnByValue: true });
         const value = evaluated.result.value;
         results.push({ name, width, overflowX: value.overflowX, clipped: value.clipped.length, overflowElements: value.overflowElements, drawerInert: value.drawerInert });

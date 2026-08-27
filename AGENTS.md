@@ -15,6 +15,17 @@ Read `CLAUDE.md` first for project orientation. This file is the rulebook.
    App-grade workflows may use framework code, shared packages, or generated
    assets when the added complexity is justified by the product behavior.
 
+## Product boundaries
+
+- **Cue Sheet** is the System by Dave browser tool at `cue-sheet.html`. Its
+  registry id is `cue-sheet`, its persisted browser key is `cueSheet.v1`, and
+  its current export schema is `system-by-dave.cue-sheet.v2`.
+- **CueForge** is a separate private Electron desktop application in the
+  `DaveHomeAssist/cueforge` repository. Do not use CueForge as a name, route
+  alias, registry id, schema, probe name, or description for Cue Sheet.
+- `cueforge.html` is a noindex product-boundary notice. It must never redirect
+  or canonicalize to `cue-sheet.html`.
+
 ## HTML conventions
 
 - Every user-facing page (`index`, `agents`, `skills`, `widgets`,

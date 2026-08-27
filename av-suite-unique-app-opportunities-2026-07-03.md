@@ -16,7 +16,7 @@ domain-shaped primary surface.
   and CSV.
 - The strongest outliers are already more memorable: Teleprompter is a reader,
   Show Timer is a clock, and AV Calculator is a set of calculator cards.
-- CueForge is a good first target because the table is still valuable for
+- Cue Sheet is a good first target because the table is still valuable for
   editing, but the live use case is actually cue calling and sequence control.
 
 ## Design Direction
@@ -37,9 +37,9 @@ Each AV tool should have:
 
 ## Priority App Concepts
 
-### CueForge
+### Cue Sheet
 
-Current problem: CueForge is a cue sheet, but the first working surface is still
+Current problem: Cue Sheet is a cue sheet, but the first working surface is still
 an editable table. That is good for setup, but not distinctive for show mode.
 
 Opportunity:
@@ -123,14 +123,14 @@ Current problem: shot calling is sequence and framing, not just row data.
 
 Opportunity:
 - Add shot cards grouped by camera and show segment.
-- Add a current/next shot rail similar to CueForge.
+- Add a current/next shot rail similar to Cue Sheet.
 - Keep the table for export and bulk editing.
 
-## CueForge Patch In This Pass
+## Cue Sheet Patch In This Pass
 
 This pass adds the first concrete example of the pattern:
 
-- A Caller Deck appears above the CueForge table.
+- A Caller Deck appears above the Cue Sheet table.
 - It shows the next five open cues as operator cards.
 - Cards carry cue position, status, action, time/type/owner metadata, and notes.
 - Clicking a card selects and scrolls the matching table row.
@@ -141,13 +141,13 @@ This pass adds the first concrete example of the pattern:
 
 New smoke coverage:
 
-- `node scripts/probe_cueforge.js --base=http://127.0.0.1:8000/`
-- `node scripts/probe_cueforge.js --base=https://systembydave.com/` after the
+- `node scripts/probe_cue_sheet.js --base=http://127.0.0.1:8000/`
+- `node scripts/probe_cue_sheet.js --base=https://systembydave.com/` after the
   caller deck is deployed.
 
 Coverage includes:
 
-- `cueforge.html` routing to `cue-sheet.html`
+- `cue-sheet.html` routing to `cue-sheet.html`
 - AV Suite context query preservation and show title hydration
 - sample load
 - add/edit/filter/duplicate/move/delete
@@ -161,7 +161,7 @@ Coverage includes:
 
 ## Recommended Next Slices
 
-1. Build a true CueForge show mode: current cue, standby cue, next stack,
+1. Build a true Cue Sheet show mode: current cue, standby cue, next stack,
    issue strip, and large operator buttons.
 2. Convert Signal Flow into a route-chain view backed by the existing table.
 3. Convert Audio Patch/Input List into console-strip and stagebox views.
@@ -176,5 +176,5 @@ Coverage includes:
   once.
 - Keep the AV Suite registry as the route/storage source of truth.
 - Bump the registry cache version when cached tool pages change.
-- Run the AV Suite verifier, responsive probe, and the CueForge smoke probe
+- Run the AV Suite verifier, responsive probe, and the Cue Sheet smoke probe
   before considering the pass complete.
