@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-08-28
+
+### Throwline no-scroll control deck
+
+* Rebuilt the Throwline planner as a viewport-locked projection control deck: nine setup stages, a persistent live plan or 3D drawing, and nine selectable diagnostic panels replace the previous full-document scroll.
+* Added compact Setup, Live, and Inspect workspaces for tablet and phone layouts while keeping Home, AV Suite, Stage 3D, Field Verify, theme, and unit controls visible at the 680-pixel breakpoint.
+* Added a locally bundled GSAP console boot and panel-change motion system with automatic reduced-motion bypass, keyboard-operable tablists, contained pane overflow, and release checks for the new no-page-scroll contract.
+
 ## 2026-08-27
 
 ### Agent documentation contract

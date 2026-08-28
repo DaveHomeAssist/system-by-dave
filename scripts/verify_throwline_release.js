@@ -359,9 +359,21 @@ requireMatch(main, /<!DOCTYPE html>/i, 'ProjectorThrow/index.html is missing its
 requireMatch(main, /<html\s+lang=["']en["']>/i, 'Throwline must remain a standalone HTML document without shared-theme opt-in attributes.');
 if (/data-av-theme|data-av-tool|av-theme\.css/i.test(main)) fail('Throwline must not load or opt into the shared AV theme.');
 if (/<link\b[^>]*\brel=["']stylesheet["'][^>]*>/i.test(main)) fail('Throwline main app must not load an external stylesheet.');
-if (/<script\b[^>]*\bsrc=/i.test(main)) fail('Throwline main app must not load an external script.');
+const mainScriptSources = Array.from(main.matchAll(/<script\b[^>]*\bsrc=["']([^"']+)["'][^>]*>/gi), (match) => match[1]);
+if (mainScriptSources.length !== 1 || mainScriptSources[0] !== '../js/vendor/gsap.min.js') {
+  fail('Throwline main app must load only the locally bundled GSAP runtime.');
+}
+if (!fs.existsSync(path.join(ROOT, 'js/vendor/gsap.min.js'))) fail('Throwline locally bundled GSAP runtime is missing.');
+if (!avRegistry?.offlineAssets?.().includes('./js/vendor/gsap.min.js')) fail('Throwline GSAP runtime must remain in the AV offline asset manifest.');
 if (/unpkg\.com|three(?:\.module)?\.js/i.test(main)) fail('Throwline main app must not depend on Three.js or unpkg.');
 requireMatch(main, /const APP_VERSION = 4;/, 'Throwline must retain state schema 4.');
+requireMatch(main, /html,\s*body\s*\{[\s\S]*?overflow:\s*hidden;/, 'Throwline must keep the document viewport locked without page scrolling.');
+requireMatch(main, /class=["']workspace-tabs["'][^>]*role=["']tablist["']/, 'Throwline must expose setup stages as an accessible tablist.');
+requireMatch(main, /class=["']result-tabs["'][^>]*role=["']tablist["']/, 'Throwline must expose diagnostics as an accessible tablist.');
+requireMatch(main, /function\s+setSetupPanel\s*\(/, 'Throwline must retain setup-panel navigation.');
+requireMatch(main, /function\s+setResultPanel\s*\(/, 'Throwline must retain diagnostic-panel navigation.');
+requireMatch(main, /function\s+setMobileView\s*\(/, 'Throwline must retain the compact Setup, Live, and Inspect workspace switcher.');
+requireMatch(main, /window\.gsap\.matchMedia\s*\(/, 'Throwline motion must use GSAP matchMedia for reduced-motion handling.');
 ['catalogProjector', 'catalogLens', 'catalogEvidence', 'calculationGate'].forEach((id) => {
   requireMatch(main, new RegExp(`id=["']${id}["']`), `Throwline main app is missing the ${id} catalog control.`);
 });
@@ -384,7 +396,7 @@ requireMatch(main, /theme:\s*["']throwline:theme:v1["']/, 'Throwline theme stora
 requireMatch(main, /localStorage\.getItem\(["']throwline:theme:v1["']\) === ["']dark["']/, 'Throwline startup must restore an explicit dark preference only.');
 requireMatch(main, /localStorage\.setItem\(STORAGE\.theme, dark \? ["']dark["'] : ["']light["']\)/, 'Throwline theme toggle must persist its explicit choice.');
 if (/localStorage\.removeItem\(["']throwline:theme:v1["']\)/.test(main)) fail('Throwline must not remove a saved theme preference.');
-if (/matchMedia\(/.test(main)) fail('Throwline must not override its explicit light default from the operating-system theme.');
+if (/matchMedia\(["'`]\s*\(prefers-color-scheme/i.test(main)) fail('Throwline must not override its explicit light default from the operating-system theme.');
 requireMatch(main, /<meta\s+http-equiv=["']Content-Security-Policy["'][^>]*default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'/i, 'Throwline main CSP is missing the offline standalone policy.');
 ['canonical', 'og:type', 'og:title', 'og:description', 'og:url', 'twitter:card', 'twitter:title', 'twitter:description'].forEach((token) => {
   if (!main.includes(token)) fail(`Throwline main metadata is missing ${token}.`);

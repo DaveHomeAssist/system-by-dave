@@ -1797,6 +1797,731 @@
       }
     }
 
+    /* Viewport control deck: the document stays fixed while each active work pane owns its overflow. */
+    @media screen {
+      :root {
+        --rail-h: 64px;
+        --panel-scrollbar: color-mix(in srgb, var(--hazard) 58%, var(--line));
+      }
+
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        min-height: 0;
+        overflow: hidden;
+        overscroll-behavior: none;
+      }
+
+      body {
+        padding-bottom: 0;
+        background:
+          radial-gradient(circle at 68% -20%, var(--hazard-lo), transparent 35%),
+          var(--deck);
+      }
+
+      .rail {
+        position: relative;
+        height: var(--rail-h);
+        min-height: var(--rail-h);
+        padding: 8px 14px 8px 18px;
+        flex-wrap: nowrap;
+        gap: 12px;
+        box-shadow: 0 10px 28px var(--shadow);
+      }
+
+      .brand-lockup {
+        display: grid;
+        gap: 1px;
+        flex: 0 0 auto;
+      }
+
+      .brand-lockup>div:first-child {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+      }
+
+      .brand-lockup .tagline {
+        font-family: var(--mono);
+        font-size: 9px;
+        letter-spacing: .14em;
+        text-transform: uppercase;
+      }
+
+      .rail-nav {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 7px;
+        min-width: 0;
+        margin-left: auto;
+      }
+
+      .rail-nav .stage3d-link,
+      .rail-nav .theme-toggle {
+        min-height: 38px;
+        padding: 7px 9px;
+      }
+
+      main {
+        position: relative;
+        height: calc(100dvh - var(--rail-h));
+        min-height: 0;
+        grid-template-columns: clamp(332px, 27vw, 402px) minmax(0, 1fr);
+        overflow: hidden;
+        isolation: isolate;
+      }
+
+      main::after {
+        content: "";
+        position: absolute;
+        z-index: 5;
+        top: 0;
+        bottom: 0;
+        left: clamp(332px, 27vw, 402px);
+        width: 1px;
+        background: linear-gradient(180deg, var(--hazard), var(--line) 20%, var(--line) 80%, var(--hazard));
+        box-shadow: 0 0 18px var(--hazard-mid);
+        pointer-events: none;
+      }
+
+      .col {
+        min-height: 0;
+        height: 100%;
+        padding: 0;
+        overflow: hidden;
+      }
+
+      .input-col {
+        display: grid;
+        grid-template-rows: auto auto minmax(0, 1fr);
+        background: color-mix(in srgb, var(--deck) 94%, var(--case));
+      }
+
+      .workspace-tabs,
+      .result-tabs {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 1px;
+        padding: 1px;
+        background: var(--line);
+      }
+
+      .workspace-tabs button,
+      .result-tabs button {
+        position: relative;
+        appearance: none;
+        min-width: 0;
+        min-height: 39px;
+        padding: 7px 8px 7px 27px;
+        border: 0;
+        background: var(--case);
+        color: var(--dim);
+        font-family: var(--mono);
+        font-size: 9.5px;
+        font-weight: 700;
+        letter-spacing: .075em;
+        text-align: left;
+        text-transform: uppercase;
+        cursor: pointer;
+      }
+
+      .workspace-tabs button>span,
+      .result-tabs button>span {
+        position: absolute;
+        top: 8px;
+        left: 8px;
+        color: var(--dimmer);
+        font-size: 8px;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .workspace-tabs button:hover,
+      .result-tabs button:hover {
+        background: var(--case-hi);
+        color: var(--chalk);
+      }
+
+      .workspace-tabs button[aria-selected="true"],
+      .result-tabs button[aria-selected="true"] {
+        background:
+          linear-gradient(90deg, var(--hazard) 0 3px, transparent 3px),
+          var(--hazard-lo);
+        color: var(--chalk);
+        box-shadow: inset 0 -1px var(--hazard);
+      }
+
+      .workspace-tabs button[aria-selected="true"]>span,
+      .result-tabs button[aria-selected="true"]>span {
+        color: var(--hazard);
+      }
+
+      .pane-label {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 27px;
+        padding: 5px 12px;
+        border-bottom: 1px solid var(--line);
+        background: var(--rail-bottom);
+        color: var(--dimmer);
+        font-family: var(--mono);
+        font-size: 8.5px;
+        letter-spacing: .14em;
+        text-transform: uppercase;
+      }
+
+      .pane-label span:first-child {
+        color: var(--hazard);
+      }
+
+      [data-setup-panel] {
+        min-height: 0;
+        overflow: auto;
+        overscroll-behavior: contain;
+        scrollbar-color: var(--panel-scrollbar) transparent;
+        scrollbar-width: thin;
+        padding: 18px 18px 26px;
+      }
+
+      [data-setup-panel][hidden],
+      [data-result-panel][hidden] {
+        display: none !important;
+      }
+
+      [data-setup-panel] legend {
+        margin-bottom: 16px;
+        color: var(--chalk);
+      }
+
+      .readout-col {
+        position: relative;
+        display: grid;
+        grid-template-columns: minmax(390px, 1fr) clamp(318px, 29vw, 405px);
+        grid-template-rows: auto minmax(0, 1fr);
+        min-width: 0;
+        background: var(--deck);
+      }
+
+      .readout {
+        position: relative;
+        grid-column: 1 / -1;
+        grid-row: 1;
+        min-height: 145px;
+        padding: 14px 18px 12px;
+        overflow: hidden;
+        border-bottom-color: var(--line);
+      }
+
+      .readout::after {
+        content: "";
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, var(--hazard) 22%, var(--hazard) 78%, transparent);
+        box-shadow: 0 0 16px var(--hazard-mid);
+        opacity: .72;
+      }
+
+      .rd-big {
+        margin: 5px 0 3px;
+        font-size: clamp(38px, 5.1vw, 58px);
+      }
+
+      .rd-note {
+        max-width: 1020px;
+        margin-top: 5px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .zoom {
+        margin-top: 9px;
+      }
+
+      .zoom-track {
+        height: 23px;
+      }
+
+      .plan-wrap {
+        grid-column: 1;
+        grid-row: 2;
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        min-height: 0;
+        padding: 14px 16px 12px;
+        overflow: hidden;
+        border-right: 1px solid var(--line);
+        border-bottom: 0;
+        background:
+          linear-gradient(var(--draw-grid) 1px, transparent 1px),
+          linear-gradient(90deg, var(--draw-grid) 1px, transparent 1px),
+          var(--deck);
+        background-size: 26px 26px;
+      }
+
+      .plan-head {
+        flex: 0 0 auto;
+        margin-bottom: 8px;
+      }
+
+      .camera-controls {
+        flex: 0 0 auto;
+        margin-bottom: 8px;
+      }
+
+      svg.drawing:not([hidden]) {
+        flex: 1 1 auto;
+        width: 100%;
+        height: 100%;
+        min-height: 0;
+        max-height: none;
+        background: color-mix(in srgb, var(--deck) 94%, transparent);
+      }
+
+      .drawing-help {
+        flex: 0 0 auto;
+        margin-top: 6px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .result-inspector {
+        grid-column: 2;
+        grid-row: 2;
+        display: grid;
+        grid-template-rows: auto auto minmax(0, 1fr) auto;
+        min-width: 0;
+        min-height: 0;
+        overflow: hidden;
+        background: var(--case);
+      }
+
+      .result-tabs button {
+        min-height: 38px;
+        padding-left: 25px;
+      }
+
+      .result-inspector .cards {
+        display: block;
+        min-width: 0;
+        min-height: 0;
+        overflow: hidden;
+        background: var(--case);
+      }
+
+      [data-result-panel] {
+        height: 100%;
+        min-width: 0;
+        min-height: 0;
+        padding: 16px;
+        overflow: auto;
+        overscroll-behavior: contain;
+        scrollbar-color: var(--panel-scrollbar) transparent;
+        scrollbar-width: thin;
+        background: var(--case);
+      }
+
+      [data-result-panel] h2 {
+        display: flex;
+        align-items: center;
+        min-height: 25px;
+        margin-bottom: 14px;
+        color: var(--chalk);
+      }
+
+      [data-result-panel] h2::before {
+        content: "";
+        width: 18px;
+        height: 1px;
+        margin-right: 8px;
+        background: var(--hazard);
+        box-shadow: 0 0 8px var(--hazard-mid);
+      }
+
+      .result-inspector .actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1px;
+        padding: 1px;
+        border-top: 1px solid var(--line);
+        background: var(--line);
+      }
+
+      .result-inspector .actions button {
+        min-height: 39px;
+        padding: 7px 8px;
+        border: 0;
+        border-radius: 0;
+        font-size: 9.5px;
+      }
+
+      .result-inspector .actions .primary {
+        grid-column: auto;
+      }
+
+      pre.summary {
+        min-height: 0;
+      }
+
+      .mobile-bar {
+        display: none;
+      }
+
+      body[data-field-verify="true"] .input-col>* {
+        display: none;
+      }
+
+      body[data-field-verify="true"] .input-col>.workspace-tabs {
+        display: grid;
+      }
+
+      body[data-field-verify="true"] .input-col>.pane-label {
+        display: flex;
+      }
+
+      body[data-field-verify="true"] .input-col>[data-setup-panel]:not([hidden]) {
+        display: block;
+      }
+
+      body[data-field-verify="true"] .readout-col>.result-inspector {
+        display: grid;
+      }
+
+      body[data-field-verify="true"] .readout-col>.result-inspector .card:not([hidden]) {
+        display: block;
+      }
+    }
+
+    @media screen and (max-width:1180px) {
+      :root {
+        --rail-h: 60px;
+      }
+
+      .rail {
+        padding-inline: 12px;
+      }
+
+      .brand-lockup .tagline,
+      .rail-nav .nav-home {
+        display: none;
+      }
+
+      .rail-nav {
+        gap: 5px;
+      }
+
+      .rail-nav .stage3d-link,
+      .rail-nav .theme-toggle {
+        padding-inline: 7px;
+        font-size: 9px;
+      }
+
+      main {
+        grid-template-columns: 320px minmax(0, 1fr);
+      }
+
+      main::after {
+        left: 320px;
+      }
+
+      .readout-col {
+        grid-template-columns: minmax(330px, 1fr) 300px;
+      }
+    }
+
+    @media screen and (max-width:980px) {
+      :root {
+        --mobile-bar-h: 66px;
+      }
+
+      main {
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-template-rows: minmax(0, 1fr);
+        height: calc(100dvh - var(--rail-h) - var(--mobile-bar-h));
+      }
+
+      main::after {
+        display: none;
+      }
+
+      .input-col,
+      .readout-col {
+        grid-column: 1;
+        grid-row: 1;
+      }
+
+      .readout-col {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto minmax(0, 1fr);
+      }
+
+      .readout {
+        grid-column: 1;
+        min-height: 126px;
+      }
+
+      .plan-wrap,
+      .result-inspector {
+        grid-column: 1;
+        grid-row: 2;
+        border-right: 0;
+      }
+
+      body[data-mobile-view="setup"] .readout-col,
+      body[data-mobile-view="stage"] .input-col,
+      body[data-mobile-view="inspect"] .input-col {
+        display: none;
+      }
+
+      body[data-mobile-view="setup"] .input-col,
+      body[data-mobile-view="stage"] .readout-col,
+      body[data-mobile-view="inspect"] .readout-col {
+        display: grid;
+      }
+
+      body[data-mobile-view="stage"] .result-inspector,
+      body[data-mobile-view="inspect"] .plan-wrap {
+        display: none;
+      }
+
+      body[data-mobile-view="inspect"] .result-inspector {
+        display: grid;
+      }
+
+      .mobile-bar {
+        position: fixed;
+        z-index: 70;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        display: grid;
+        grid-template-columns: 1fr 1.45fr 1fr;
+        gap: 1px;
+        height: var(--mobile-bar-h);
+        min-height: var(--mobile-bar-h);
+        padding: 1px 1px env(safe-area-inset-bottom);
+        border-top: 1px solid var(--line);
+        background: var(--line);
+        box-shadow: 0 -10px 30px var(--mobile-shadow);
+        align-items: stretch;
+      }
+
+      .mobile-bar button {
+        appearance: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: 100%;
+        min-height: 44px;
+        padding: 6px 8px;
+        border: 0;
+        background: var(--mobile-bg);
+        color: var(--dim);
+        text-align: center;
+        cursor: pointer;
+      }
+
+      .mobile-bar button[aria-selected="true"] {
+        background: var(--hazard-lo);
+        color: var(--chalk);
+        box-shadow: inset 0 3px var(--hazard);
+      }
+
+      .mobile-bar button>span {
+        display: grid;
+        gap: 1px;
+      }
+
+      .mobile-mode {
+        font-family: var(--mono);
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .mobile-v {
+        font-size: 18px;
+      }
+
+      .mobile-status {
+        margin-left: 0;
+      }
+    }
+
+    @media screen and (max-width:680px) {
+      :root {
+        --rail-h: 106px;
+        --mobile-bar-h: calc(66px + env(safe-area-inset-bottom));
+      }
+
+      .rail {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        grid-template-rows: 44px 44px;
+        gap: 6px;
+        height: var(--rail-h);
+        min-height: var(--rail-h);
+        padding: 6px 8px;
+      }
+
+      .brand-lockup {
+        grid-column: 1 / 3;
+        grid-row: 1;
+      }
+
+      .brand-lockup .tagline,
+      .version {
+        display: none;
+      }
+
+      .rail-nav {
+        display: contents;
+      }
+
+      .rail-nav .stage3d-link {
+        justify-content: center;
+        min-height: 44px;
+      }
+
+      .rail-nav .stage3d-link::before {
+        width: 5px;
+        height: 5px;
+        box-shadow: none;
+      }
+
+      .rail-nav .nav-home,
+      .rail-nav .nav-suite,
+      .rail-nav .nav-stage,
+      #plannerFieldVerify {
+        grid-row: 2;
+      }
+
+      .rail-nav .nav-home {
+        display: inline-flex;
+        grid-column: 1;
+      }
+
+      .rail-nav .nav-suite {
+        grid-column: 2;
+      }
+
+      .rail-nav .nav-stage {
+        grid-column: 3;
+      }
+
+      #plannerFieldVerify {
+        grid-column: 4;
+      }
+
+      .theme-toggle {
+        grid-column: 3;
+        grid-row: 1;
+        min-width: 44px;
+        min-height: 44px;
+      }
+
+      .unit-switch {
+        grid-column: 4;
+        grid-row: 1;
+        justify-self: end;
+      }
+
+      .unit-switch button {
+        min-width: 31px;
+        min-height: 44px;
+        padding-inline: 6px;
+      }
+
+      .workspace-tabs button,
+      .result-tabs button {
+        min-height: 44px;
+      }
+
+      [data-setup-panel] {
+        padding: 15px 15px 24px;
+      }
+
+      .readout {
+        min-height: 122px;
+        padding: 10px 12px;
+      }
+
+      .rd-big {
+        font-size: clamp(34px, 10vw, 46px);
+      }
+
+      .rd-note {
+        display: none;
+      }
+
+      .plan-wrap {
+        padding: 9px;
+      }
+
+      .drawing-switch+.tip,
+      .drawing-help {
+        display: none;
+      }
+
+      .result-tabs button {
+        padding-left: 25px;
+      }
+
+      [data-result-panel] {
+        padding: 14px;
+      }
+    }
+
+    @media screen and (max-width:420px) {
+      .rail-nav .stage3d-link,
+      #plannerFieldVerify {
+        padding-inline: 4px;
+        font-size: 8px;
+        letter-spacing: .04em;
+      }
+
+      .rail-nav .stage3d-link::before {
+        display: none;
+      }
+
+      .workspace-tabs button,
+      .result-tabs button {
+        padding-left: 22px;
+        font-size: 8.5px;
+        letter-spacing: .035em;
+      }
+
+      .workspace-tabs button>span,
+      .result-tabs button>span {
+        left: 6px;
+      }
+
+      .camera-controls .micro {
+        display: none;
+      }
+
+      .camera-controls .chip {
+        min-height: 34px;
+        padding: 5px;
+      }
+
+      .mobile-bar {
+        grid-template-columns: .85fr 1.5fr .85fr;
+      }
+
+      .mobile-status {
+        display: none;
+      }
+    }
+
     @media print {
       body {
         background: white;
@@ -1941,32 +2666,47 @@
 <body>
   <a class="sbd-skip-link" href="#throwline-workspace">Skip to Throwline workspace</a>
   <header class="rail">
-    <div class="mark">THROW<b>LINE</b></div><span class="version">SHOW 2.0</span>
-    <div class="tagline">projector throw, fit, light and tape marks</div>
-    <div class="spacer"></div>
-    <a class="stage3d-link" href="../index.html">System by Dave home</a>
-    <a class="stage3d-link" href="../av-suite.html">AV Suite</a>
-    <a class="stage3d-link" id="stage3dLink" href="Stage3D.html" aria-label="Open the optional online Stage 3D companion">Stage 3D · online</a>
-    <button class="stage3d-link" id="plannerFieldVerify" type="button" aria-pressed="false">Field Verify</button>
-    <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false" aria-label="Switch to dark mode">
-      <svg class="theme-icon-moon" viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M20.2 15.3A8.5 8.5 0 0 1 8.7 3.8 8.5 8.5 0 1 0 20.2 15.3Z" />
-      </svg>
-      <svg class="theme-icon-sun" viewBox="0 0 24 24" aria-hidden="true">
-        <circle cx="12" cy="12" r="3.5" />
-        <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
-      </svg>
-      <span class="theme-label" id="themeLabel">dark</span>
-    </button>
-    <div class="seg" role="group" aria-label="Display units">
-      <button type="button" data-unit="ftin" aria-pressed="true">ft in</button>
-      <button type="button" data-unit="ft" aria-pressed="false">ft</button>
-      <button type="button" data-unit="m" aria-pressed="false">m</button>
+    <div class="brand-lockup">
+      <div><span class="mark">THROW<b>LINE</b></span><span class="version">SHOW 2.0</span></div>
+      <div class="tagline">projection position control</div>
     </div>
+    <nav class="rail-nav" aria-label="Throwline destinations and settings">
+      <a class="stage3d-link nav-home" href="../index.html">Home</a>
+      <a class="stage3d-link nav-suite" href="../av-suite.html">AV Suite</a>
+      <a class="stage3d-link nav-stage" id="stage3dLink" href="Stage3D.html" aria-label="Open the optional online Stage 3D companion">Stage 3D</a>
+      <button class="stage3d-link" id="plannerFieldVerify" type="button" aria-pressed="false">Field Verify</button>
+      <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false" aria-label="Switch to dark mode">
+        <svg class="theme-icon-moon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M20.2 15.3A8.5 8.5 0 0 1 8.7 3.8 8.5 8.5 0 1 0 20.2 15.3Z" />
+        </svg>
+        <svg class="theme-icon-sun" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="12" r="3.5" />
+          <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
+        </svg>
+        <span class="theme-label" id="themeLabel">dark</span>
+      </button>
+      <div class="seg unit-switch" role="group" aria-label="Display units">
+        <button type="button" data-unit="ftin" aria-pressed="true">ft in</button>
+        <button type="button" data-unit="ft" aria-pressed="false">ft</button>
+        <button type="button" data-unit="m" aria-pressed="false">m</button>
+      </div>
+    </nav>
   </header>
   <main id="throwline-workspace" tabindex="-1">
     <section class="col input-col" aria-label="Calculation inputs">
-      <fieldset>
+      <div class="workspace-tabs" role="tablist" aria-label="Setup stages">
+        <button type="button" role="tab" id="setup-tab-screen" aria-controls="setup-panel-screen" aria-selected="true" data-setup-tab="screen"><span>01</span>Screen</button>
+        <button type="button" role="tab" id="setup-tab-optics" aria-controls="setup-panel-optics" aria-selected="false" data-setup-tab="optics"><span>02</span>Optics</button>
+        <button type="button" role="tab" id="setup-tab-shift" aria-controls="setup-panel-shift" aria-selected="false" data-setup-tab="shift"><span>03</span>Shift</button>
+        <button type="button" role="tab" id="setup-tab-placement" aria-controls="setup-panel-placement" aria-selected="false" data-setup-tab="placement"><span>04</span>Place</button>
+        <button type="button" role="tab" id="setup-tab-light" aria-controls="setup-panel-light" aria-selected="false" data-setup-tab="light"><span>05</span>Light</button>
+        <button type="button" role="tab" id="setup-tab-verify" aria-controls="setup-panel-verify" aria-selected="false" data-setup-tab="verify"><span>06</span>Verify</button>
+        <button type="button" role="tab" id="setup-tab-solver" aria-controls="setup-panel-solver" aria-selected="false" data-setup-tab="solver"><span>07</span>Solve</button>
+        <button type="button" role="tab" id="setup-tab-library" aria-controls="setup-panel-library" aria-selected="false" data-setup-tab="library"><span>08</span>Library</button>
+        <button type="button" role="tab" id="setup-tab-jobs" aria-controls="setup-panel-jobs" aria-selected="false" data-setup-tab="jobs"><span>09</span>Jobs</button>
+      </div>
+      <div class="pane-label" aria-hidden="true"><span>Setup deck</span><span>live inputs</span></div>
+      <fieldset id="setup-panel-screen" role="tabpanel" aria-labelledby="setup-tab-screen" data-setup-panel="screen">
         <legend><span class="idx">01</span>Job &amp; screen</legend>
         <div class="row">
           <div class="f wide"><label for="job">Job / room</label><input id="job" type="text" autocomplete="off"
@@ -2006,7 +2746,7 @@
           frame.</p>
       </fieldset>
 
-      <fieldset>
+      <fieldset id="setup-panel-optics" role="tabpanel" aria-labelledby="setup-tab-optics" data-setup-panel="optics">
         <legend><span class="idx">02</span>Projector &amp; lens</legend>
         <div class="feature-kicker"><span class="badge info">audited pilot catalog</span><span>exact pair first</span></div>
         <div class="row">
@@ -2064,7 +2804,11 @@
             estimated / derived lens rows in finder</label></div>
         <p class="hint"><strong>Family filtering prevents cross-mount recommendations.</strong> It does not replace an
           exact projector manual or manufacturer calculator.</p>
-        <div class="feature-kicker" style="margin-top:14px"><span class="badge info">shift guard</span><span
+      </fieldset>
+
+      <fieldset id="setup-panel-shift" role="tabpanel" aria-labelledby="setup-tab-shift" data-setup-panel="shift">
+        <legend><span class="idx">03</span>Shift envelope</legend>
+        <div class="feature-kicker"><span class="badge info">shift guard</span><span
             class="micro">exact projector envelope</span></div>
         <div class="row">
           <div class="f wide"><label for="shiftProfile">Projector shift profile</label><select id="shiftProfile">
@@ -2089,8 +2833,8 @@
             profile</button><button class="chip" id="removeProfile" type="button">remove custom profile</button></div>
       </fieldset>
 
-      <fieldset data-field-verify-panel>
-        <legend><span class="idx">03</span>Placement</legend>
+      <fieldset id="setup-panel-placement" role="tabpanel" aria-labelledby="setup-tab-placement" data-setup-panel="placement" data-field-verify-panel>
+        <legend><span class="idx">04</span>Placement</legend>
         <div class="row compact">
           <div class="f"><label for="dist">Set distance</label><input id="dist" type="text" inputmode="decimal"
               placeholder="drag plan or type"></div>
@@ -2115,8 +2859,8 @@
           marks are suppressed for folded/UST optics.</p>
       </fieldset>
 
-      <fieldset>
-        <legend><span class="idx">04</span>Light &amp; target</legend>
+      <fieldset id="setup-panel-light" role="tabpanel" aria-labelledby="setup-tab-light" data-setup-panel="light">
+        <legend><span class="idx">05</span>Light &amp; target</legend>
         <div class="row compact">
           <div class="f"><label for="eff">Real-world output %</label><input id="eff" type="number" value="85" min="1"
               max="100" step="1"></div>
@@ -2143,8 +2887,8 @@
           efficiency applies only when quantity is above one.</p>
       </fieldset>
 
-      <fieldset data-field-verify-panel>
-        <legend><span class="idx">05</span>Field verify</legend>
+      <fieldset id="setup-panel-verify" role="tabpanel" aria-labelledby="setup-tab-verify" data-setup-panel="verify" data-field-verify-panel>
+        <legend><span class="idx">06</span>Field verify</legend>
         <div class="row compact">
           <div class="f"><label for="actualDist">Actual optical distance</label><input id="actualDist" type="text"
               inputmode="decimal" placeholder="laser measure"></div>
@@ -2163,8 +2907,8 @@
           exactly how far to move.</p>
       </fieldset>
 
-      <fieldset>
-        <legend><span class="idx">06</span>Fit solver</legend>
+      <fieldset id="setup-panel-solver" role="tabpanel" aria-labelledby="setup-tab-solver" data-setup-panel="solver">
+        <legend><span class="idx">07</span>Fit solver</legend>
         <div class="row compact">
           <div class="f"><label for="solverNear">Placement zone near</label><input id="solverNear" type="text"
               inputmode="decimal" placeholder="minimum"></div>
@@ -2182,8 +2926,8 @@
           position—not merely the first lens that fits.</p>
       </fieldset>
 
-      <details>
-        <summary>Custom lens library</summary>
+      <fieldset id="setup-panel-library" role="tabpanel" aria-labelledby="setup-tab-library" data-setup-panel="library">
+        <legend><span class="idx">08</span>Custom lens library</legend>
         <div class="body">
           <div class="row compact">
             <div class="f"><label for="clBrand">Make</label><input id="clBrand" type="text" placeholder="Christie">
@@ -2206,16 +2950,16 @@
               id="exportLens" type="button">export JSON</button><button class="chip" id="importLens"
               type="button">import JSON</button></div>
         </div>
-      </details>
-      <details>
-        <summary>Saved jobs</summary>
+      </fieldset>
+      <fieldset id="setup-panel-jobs" role="tabpanel" aria-labelledby="setup-tab-jobs" data-setup-panel="jobs">
+        <legend><span class="idx">09</span>Saved jobs</legend>
         <div class="body">
           <div class="inline-actions"><button class="chip" id="saveJob" type="button">save current job</button><button
               class="chip" id="exportJob" type="button">export job JSON</button><button class="chip" id="importJob"
               type="button">import job JSON</button></div>
           <div id="savedList" class="saved-list"></div>
         </div>
-      </details>
+      </fieldset>
     </section>
 
     <section class="col readout-col" id="results" aria-label="Calculation results">
@@ -2265,56 +3009,75 @@
         <div class="sr-only" id="drawingLive" role="status" aria-live="polite" aria-atomic="true"></div>
       </div>
 
-      <div class="cards">
-        <section class="card verify-essential">
+      <aside class="result-inspector" aria-label="Calculation diagnostics">
+        <div class="result-tabs" role="tablist" aria-label="Diagnostic panels">
+          <button type="button" role="tab" id="result-tab-image" aria-controls="result-panel-image" aria-selected="true" data-result-tab="image"><span>01</span>Image</button>
+          <button type="button" role="tab" id="result-tab-light" aria-controls="result-panel-light" aria-selected="false" data-result-tab="light"><span>02</span>Light</button>
+          <button type="button" role="tab" id="result-tab-verify" aria-controls="result-panel-verify" aria-selected="false" data-result-tab="verify"><span>03</span>Verify</button>
+          <button type="button" role="tab" id="result-tab-solver" aria-controls="result-panel-solver" aria-selected="false" data-result-tab="solver"><span>04</span>Solver</button>
+          <button type="button" role="tab" id="result-tab-lenses" aria-controls="result-panel-lenses" aria-selected="false" data-result-tab="lenses"><span>05</span>Lenses</button>
+          <button type="button" role="tab" id="result-tab-show" aria-controls="result-panel-show" aria-selected="false" data-result-tab="show"><span>06</span>Show</button>
+          <button type="button" role="tab" id="result-tab-warnings" aria-controls="result-panel-warnings" aria-selected="false" data-result-tab="warnings"><span>07</span>Warnings</button>
+          <button type="button" role="tab" id="result-tab-handoff" aria-controls="result-panel-handoff" aria-selected="false" data-result-tab="handoff"><span>08</span>Handoff</button>
+          <button type="button" role="tab" id="result-tab-method" aria-controls="result-panel-method" aria-selected="false" data-result-tab="method"><span>09</span>Method</button>
+        </div>
+        <div class="pane-label" aria-hidden="true"><span>Result rack</span><span>selected diagnostic</span></div>
+        <div class="cards">
+        <section class="card verify-essential" id="result-panel-image" role="tabpanel" aria-labelledby="result-tab-image" data-result-panel="image">
           <h2>Image geometry</h2>
           <div id="imageOut"></div>
         </section>
-        <section class="card">
+        <section class="card" id="result-panel-light" role="tabpanel" aria-labelledby="result-tab-light" data-result-panel="light">
           <h2>Screen luminance</h2>
           <div id="brightOut"></div>
         </section>
-        <section class="card full verify-essential">
+        <section class="card full verify-essential" id="result-panel-verify" role="tabpanel" aria-labelledby="result-tab-verify" data-result-panel="verify">
           <h2>Field verification</h2>
           <div id="verifyOut"></div>
         </section>
-        <section class="card full">
+        <section class="card full" id="result-panel-solver" role="tabpanel" aria-labelledby="result-tab-solver" data-result-panel="solver">
           <h2>Constraint-first gear solver</h2>
           <div id="solverOut"></div>
         </section>
-        <section class="card full">
+        <section class="card full" id="result-panel-lenses" role="tabpanel" aria-labelledby="result-tab-lenses" data-result-panel="lenses">
           <h2>Compatible lens finder</h2>
           <div id="finderOut"></div>
         </section>
-        <section class="card full">
+        <section class="card full" id="result-panel-show" role="tabpanel" aria-labelledby="result-tab-show" data-result-panel="show">
           <h2>Multi-screen show board</h2>
           <div id="showOut"></div>
         </section>
-        <section class="card full">
+        <section class="card full" id="result-panel-warnings" role="tabpanel" aria-labelledby="result-tab-warnings" data-result-panel="warnings">
           <h2>Show warnings</h2>
           <div id="warningsOut"></div>
         </section>
-        <section class="card full">
+        <section class="card full" id="result-panel-handoff" role="tabpanel" aria-labelledby="result-tab-handoff" data-result-panel="handoff">
           <h2>Send it</h2>
           <pre class="summary" id="summary">—</pre>
+        </section>
+        <section class="card full" id="result-panel-method" role="tabpanel" aria-labelledby="result-tab-method" data-result-panel="method">
+          <h2>Method, sources &amp; limitations</h2>
+          <div class="body" id="methodBody"></div>
         </section>
       </div>
       <div class="actions"><button class="act primary" id="copySummary" type="button">copy throw card</button><button
           class="act" id="copyLink" type="button">copy link</button><button class="act" id="print" type="button">print /
           PDF</button><button class="act ghost" id="reset" type="button">reset</button></div>
-      <details>
-        <summary>Method, sources &amp; limitations</summary>
-        <div class="body" id="methodBody"></div>
-      </details>
+      </aside>
     </section>
   </main>
   <section class="show-print" id="showPrint" aria-label="Printable show pack"></section>
-  <div class="mobile-bar"><button type="button" id="mobileJump"><span><span class="mobile-k">throw</span><span
+  <div class="mobile-bar" role="tablist" aria-label="Mobile workspace">
+    <button type="button" role="tab" data-mobile-view="setup" aria-selected="false"><span class="mobile-k">Setup</span><span class="mobile-mode">Inputs</span></button>
+    <button type="button" role="tab" id="mobileJump" data-mobile-view="stage" aria-selected="true"><span><span class="mobile-k">Live mark</span><span
           class="mobile-v" id="mobileValue">—</span></span><span class="mobile-status badge dim"
-        id="mobileStatus">waiting</span></button></div>
+        id="mobileStatus">waiting</span></button>
+    <button type="button" role="tab" data-mobile-view="inspect" aria-selected="false"><span class="mobile-k">Inspect</span><span class="mobile-mode">Details</span></button>
+  </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <input type="file" id="lensFile" accept="application/json,.json" hidden><input type="file" id="jobFile"
     accept="application/json,.json" hidden><input type="file" id="showFile" accept="application/json,.json" hidden>
+  <script src="../js/vendor/gsap.min.js"></script>
   <script>
     "use strict";
     const APP_VERSION = 4;
@@ -2532,6 +3295,125 @@
       themeToggle: $("themeToggle"), themeLabel: $("themeLabel"), themeColor: $("themeColor"), plannerFieldVerify: $("plannerFieldVerify"), stage3dLink: $("stage3dLink")
     };
 
+    const shell = {
+      setupTabs: [...document.querySelectorAll("[data-setup-tab]")],
+      setupPanels: [...document.querySelectorAll("[data-setup-panel]")],
+      resultTabs: [...document.querySelectorAll("[data-result-tab]")],
+      resultPanels: [...document.querySelectorAll("[data-result-panel]")],
+      mobileTabs: [...document.querySelectorAll("[data-mobile-view]")]
+    };
+    let activeSetupPanel = "screen";
+    let activeResultPanel = "image";
+    let activeMobileView = "stage";
+    let gsapMotionEnabled = false;
+    let shellMotion = null;
+
+    function animatePanel(panel, axis = "x") {
+      if (!gsapMotionEnabled || !window.gsap || !panel) return;
+      const from = axis === "y" ? { autoAlpha: 0, y: 12 } : { autoAlpha: 0, x: 12 };
+      const to = axis === "y" ? { autoAlpha: 1, y: 0 } : { autoAlpha: 1, x: 0 };
+      window.gsap.killTweensOf(panel);
+      window.gsap.fromTo(panel, from, { ...to, duration: .26, ease: "power3.out", clearProps: "opacity,visibility,transform" });
+    }
+
+    function setSetupPanel(next, { focus = false, animate = true } = {}) {
+      if (!shell.setupPanels.some(panel => panel.dataset.setupPanel === next)) return;
+      activeSetupPanel = next;
+      shell.setupTabs.forEach(tab => {
+        const selected = tab.dataset.setupTab === next;
+        tab.setAttribute("aria-selected", String(selected));
+        tab.tabIndex = selected ? 0 : -1;
+        if (selected && focus) tab.focus();
+      });
+      let active = null;
+      shell.setupPanels.forEach(panel => {
+        const selected = panel.dataset.setupPanel === next;
+        panel.hidden = !selected;
+        if (selected) active = panel;
+      });
+      if (animate) animatePanel(active);
+    }
+
+    function setResultPanel(next, { focus = false, animate = true } = {}) {
+      if (!shell.resultPanels.some(panel => panel.dataset.resultPanel === next)) return;
+      activeResultPanel = next;
+      shell.resultTabs.forEach(tab => {
+        const selected = tab.dataset.resultTab === next;
+        tab.setAttribute("aria-selected", String(selected));
+        tab.tabIndex = selected ? 0 : -1;
+        if (selected && focus) tab.focus();
+      });
+      let active = null;
+      shell.resultPanels.forEach(panel => {
+        const selected = panel.dataset.resultPanel === next;
+        panel.hidden = !selected;
+        if (selected) active = panel;
+      });
+      if (animate) animatePanel(active);
+    }
+
+    function setMobileView(next, { focus = false, animate = true } = {}) {
+      if (!shell.mobileTabs.some(tab => tab.dataset.mobileView === next)) return;
+      activeMobileView = next;
+      document.body.dataset.mobileView = next;
+      shell.mobileTabs.forEach(tab => {
+        const selected = tab.dataset.mobileView === next;
+        tab.setAttribute("aria-selected", String(selected));
+        tab.tabIndex = selected ? 0 : -1;
+        if (selected && focus) tab.focus();
+      });
+      if (animate && window.innerWidth <= 980) {
+        const target = next === "setup" ? document.querySelector(".input-col") : next === "inspect" ? document.querySelector(".result-inspector") : document.querySelector(".plan-wrap");
+        animatePanel(target, "y");
+      }
+    }
+
+    function bindTablist(tabs, dataKey, activate) {
+      tabs.forEach(tab => {
+        tab.addEventListener("click", () => activate(tab.dataset[dataKey]));
+        tab.addEventListener("keydown", event => {
+          const keys = ["ArrowRight", "ArrowDown", "ArrowLeft", "ArrowUp", "Home", "End"];
+          if (!keys.includes(event.key)) return;
+          event.preventDefault();
+          const index = tabs.indexOf(tab);
+          const nextIndex = event.key === "Home" ? 0 : event.key === "End" ? tabs.length - 1 : (index + (["ArrowLeft", "ArrowUp"].includes(event.key) ? -1 : 1) + tabs.length) % tabs.length;
+          activate(tabs[nextIndex].dataset[dataKey], { focus: true });
+        });
+      });
+    }
+
+    function initWorkspaceShell() {
+      setSetupPanel(activeSetupPanel, { animate: false });
+      setResultPanel(activeResultPanel, { animate: false });
+      setMobileView(activeMobileView, { animate: false });
+      bindTablist(shell.setupTabs, "setupTab", setSetupPanel);
+      bindTablist(shell.resultTabs, "resultTab", setResultPanel);
+      bindTablist(shell.mobileTabs, "mobileView", setMobileView);
+    }
+
+    function initWorkspaceMotion() {
+      if (!window.gsap) return;
+      shellMotion = window.gsap.matchMedia();
+      shellMotion.add("(prefers-reduced-motion: no-preference)", () => {
+        gsapMotionEnabled = true;
+        const intro = window.gsap.timeline({ defaults: { ease: "power3.out" } });
+        intro.fromTo(".brand-lockup", { autoAlpha: 0, x: -14 }, { autoAlpha: 1, x: 0, duration: .36 })
+          .fromTo(".rail-nav", { autoAlpha: 0, x: 14 }, { autoAlpha: 1, x: 0, duration: .36 }, "<")
+          .fromTo(".workspace-tabs button", { autoAlpha: 0, y: -8 }, { autoAlpha: 1, y: 0, duration: .24, stagger: .025 }, "-=.12")
+          .fromTo(".readout", { autoAlpha: 0, y: -10 }, { autoAlpha: 1, y: 0, duration: .34 }, "-=.18")
+          .fromTo(".plan-wrap,.result-inspector", { autoAlpha: 0, y: 12 }, { autoAlpha: 1, y: 0, duration: .4, stagger: .07 }, "-=.2");
+        return () => {
+          gsapMotionEnabled = false;
+          intro.kill();
+        };
+      });
+      shellMotion.add("(prefers-reduced-motion: reduce)", () => {
+        gsapMotionEnabled = false;
+        window.gsap.set(".brand-lockup,.rail-nav,.workspace-tabs button,.readout,.plan-wrap,.result-inspector", { clearProps: "all" });
+      });
+      window.addEventListener("pagehide", () => shellMotion?.revert(), { once: true });
+    }
+
     function currentTheme() { return document.documentElement.dataset.theme === "dark" ? "dark" : "light"; }
     function applyTheme(theme, { persist = false, announce = false } = {}) {
       const dark = theme === "dark";
@@ -2548,6 +3430,11 @@
       document.body.dataset.fieldVerify = String(enabled);
       el.plannerFieldVerify.setAttribute("aria-pressed", String(enabled));
       el.plannerFieldVerify.textContent = enabled ? "Exit Verify" : "Field Verify";
+      if (enabled) {
+        setSetupPanel("verify");
+        setResultPanel("verify");
+        setMobileView("setup");
+      }
       if (announce) toast(enabled ? "Field Verify mode" : "Planning mode");
     }
 
@@ -3644,7 +4531,6 @@
       const c = lastCalc; if (!c || !finite(c.near)) return;
       const map = { near: c.near, safe: c.safeMid, mid: c.mid, far: c.far }; setLenInput(el.dist, map[b.dataset.snap]); render();
     }));
-    $("mobileJump").addEventListener("click", () => $("results").scrollIntoView({ behavior: "smooth", block: "start" }));
     el.themeToggle.addEventListener("click", () => applyTheme(currentTheme() === "dark" ? "light" : "dark", { persist: true, announce: true }));
     el.plannerFieldVerify.addEventListener("click", () => setFieldVerify(el.plannerFieldVerify.getAttribute("aria-pressed") !== "true", { announce: true }));
     $("print").addEventListener("click", () => { delete document.body.dataset.printMode; window.print(); });
@@ -3689,11 +4575,13 @@
     });
 
     function boot() {
+      initWorkspaceShell();
       applyTheme(currentTheme());
       setFieldVerify(false);
       loadCustomStorage(); loadJobsStorage(); loadProfileStorage(); loadInventoryStorage(); buildScreenOptions(); buildCatalogProjectorOptions(); buildFamilyOptions(); const hasShow = loadShowStorage(); if (!hasShow && savedJobs.length) migrateSavedJobsToShow(); else if (!hasShow) currentShow = { version: 1, id: uid("show"), name: "Untitled show", outputs: [] };
       const loaded = readHash(); if (!loaded) applyDefaults();
       updateFamilyNotice(); syncDiag(); render();
+      initWorkspaceMotion();
       window.__throwline = { version: APP_VERSION, parseLen, rasterFor, brightnessFor, readState, stateObject, applyState, readHash, writeHash, solveGear, summaryText, allLenses: () => allLenses().map(l => ({ ...l })), profiles: () => allProfiles().map(profile => ({ ...profile })), inventory: () => [...inventory], show: () => JSON.parse(JSON.stringify(currentShow)), screens: SCREENS.map(s => ({ ...s })) };
     }
     boot();
