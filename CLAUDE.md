@@ -68,10 +68,16 @@ metadata, and title families are release-gated by the public content contract.
 
 ### AV by Dave
 
-`av-suite.html` is the AV console and launcher. The registry drives its tool
-inventory, phase recommendations, local-storage keys, navigation, offline
-assets, and generated sitemap entries. `js/av-theme-mode.js` and
-`js/av-theme.js` apply the operator's Warm Paper, Stage Slate, or System choice.
+`av-suite.html` is one doorway with two addressable workspaces: Show Console at
+`?entry=show` and the show-independent AV Toolbox at `?entry=toolbox`. A neutral
+first visit asks the operator to choose; any explicit `sbd*` show parameter
+forces Show Console. The registry drives both workspaces' tool inventory,
+storage metadata, navigation, offline assets, and generated sitemap entries.
+Toolbox-only pins, recents, search, and filter preferences live in
+`av-suite-ui.v1` and must never mutate the show dashboard in
+`av-suite-dashboard.v1`. See `docs/av-suite-doorway.md` for the complete routing
+and persistence contract. `js/av-theme-mode.js` and `js/av-theme.js` apply the
+operator's Warm Paper, Stage Slate, or System choice.
 
 ### Cross-tool state
 
@@ -119,6 +125,7 @@ Throwline's catalog is synchronized and verified through its dedicated scripts.
 - Cue Sheet media and native NDI boundary: `docs/cue-sheet-media-io.md`
 - AV inventory and storage keys: `js/sbd-registry.js`
 - Sitemap membership: `scripts/gen_sitemap.py`
+- AV Suite doorway and storage: `docs/av-suite-doorway.md`
 - Verification commands: `package.json` and `AGENTS.md`
 - Deployment gates: `.github/workflows/deploy-pages.yml`
 - Recent changes: `CHANGELOG.md`

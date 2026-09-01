@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-08-31
+
+### Addressable AV Toolbox doorway
+
+* Split the stable AV Suite route into addressable Show Console and AV Toolbox workspaces, with explicit `entry=show` and `entry=toolbox` URLs, show-context precedence, browser-history restoration, and an accessible two-door chooser for neutral first visits.
+* Replaced the concept Shop inventory with a registry-backed, show-independent Toolbox that renders all 44 AV tools, highlights PixelForge, Throwline, Gear Reference, and AV Calculator, and supports use-anytime, pinned, recent, family, and search views without leaking show parameters into tool links.
+* Isolated Toolbox pins, recents, search, and filters in `av-suite-ui.v1` so Toolbox use cannot mutate the existing `av-suite-dashboard.v1` show state, while Show Console retains show-context links, phase flow, readiness, and setup behavior.
+* Added local GSAP workspace transitions with reduced-motion bypass, homepage and Tools-directory entry points, install-manifest shortcuts, static contract checks, and browser coverage across 390-, 680-, and 1280-pixel layouts.
+
 ## 2026-08-28
 
 ### Throwline no-scroll control deck

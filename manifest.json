@@ -11,5 +11,19 @@
   "icons": [
     { "src": "profile/assets/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
     { "src": "profile/assets/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "shortcuts": [
+    {
+      "name": "Show Console",
+      "short_name": "Show Console",
+      "description": "Open the AV Suite with show context, phase gates, readiness, and handoff controls.",
+      "url": "./av-suite.html?entry=show"
+    },
+    {
+      "name": "AV Toolbox",
+      "short_name": "AV Toolbox",
+      "description": "Browse and launch every AV tool without attaching a show.",
+      "url": "./av-suite.html?entry=toolbox"
+    }
   ]
 }

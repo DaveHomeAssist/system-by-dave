@@ -4,16 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; worker-src 'self'; connect-src 'self'; img-src 'self' data:; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'none'">
-<title>AV by Dave — AV Show Operations Console</title>
+<title>AV by Dave — Show Console and AV Toolbox</title>
 <meta name="robots" content="index,follow">
-<meta name="description" content="AV by Dave is the field-grade show operations console for the System by Dave AV tools. Plan it. Patch it. Run the show. Loads your show, reads the current phase, tracks what is ready and what is blocking, and launches the right tool next — online or off.">
+<meta name="description" content="Open the AV by Dave Show Console for show-attached operations or browse every registered AV tool from the show-independent AV Toolbox.">
 <link rel="canonical" href="https://systembydave.com/av-suite.html">
 <meta name="theme-color" content="#EEE8DF" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0C1016" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="System by Dave">
 <meta property="og:title" content="AV by Dave">
-<meta property="og:description" content="Field-grade AV show operations console by Dave Robertson — show context, phase recommendations, readiness tracking, review queue, quick switcher, and offline cache. Plan it. Patch it. Run the show.">
+<meta property="og:description" content="Two AV workspaces in one address: a show-attached operations console and a show-independent toolbox backed by the live System by Dave registry.">
 <meta property="og:url" content="https://systembydave.com/av-suite.html">
 <meta property="og:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
 <meta property="og:image:width" content="1024">
@@ -21,7 +21,7 @@
 <meta property="og:image:alt" content="System by Dave preview banner">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="AV by Dave">
-<meta name="twitter:description" content="Field-grade AV show operations console by Dave Robertson — show context, phase recommendations, readiness tracking, review queue, quick switcher, and offline cache. Plan it. Patch it. Run the show.">
+<meta name="twitter:description" content="Work a show with readiness and handoff context, or browse every registered AV tool with no show attached.">
 <meta name="twitter:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
 <link rel="icon" href="svg/system_by_dave_logo_rust.svg" type="image/svg+xml">
 <link rel="manifest" href="manifest.json">
@@ -203,7 +203,7 @@ img,svg{display:block}
    APP SHELL
    ============================================================ */
 #avApp{
-  flex:1 1 auto;min-height:0;display:grid;grid-template-rows:auto 1fr;overflow:hidden;position:relative;
+  flex:1 1 auto;min-width:0;width:100%;min-height:0;display:grid;grid-template-rows:auto 1fr;overflow:hidden;position:relative;
   font-family:var(--font-body);color:var(--c-text);background:var(--c-bg);
   -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
 }
@@ -321,8 +321,8 @@ img,svg{display:block}
 /* ============================================================
    BODY GRID — rail / main / aside
    ============================================================ */
-#avApp [data-r="body"]{display:grid;grid-template-columns:238px minmax(0,1fr) 316px;min-height:0}
-#avApp [data-r="rail"],#avApp [data-r="main"],#avApp [data-r="aside"]{overflow-y:auto;min-height:0}
+#avApp [data-r="body"]{display:grid;grid-template-columns:238px minmax(0,1fr) 316px;min-width:0;min-height:0}
+#avApp [data-r="rail"],#avApp [data-r="main"],#avApp [data-r="aside"]{overflow-y:auto;min-width:0;min-height:0}
 #avApp [data-r="rail"]{background:var(--c-neutral-100);border-right:1px solid var(--c-neutral-300);padding:14px 0 24px}
 #avApp [data-r="aside"]{border-left:1px solid var(--c-neutral-300);padding:16px 14px 28px;background:var(--c-surface)}
 #avApp [data-r="main"]{padding:18px 20px 40px}
@@ -476,6 +476,30 @@ img,svg{display:block}
 #avApp .ctx-proposed-card p{margin:4px 0 0;font-size:11.5px;color:var(--c-neutral-600);line-height:1.4}
 #avApp .ctx-close{font-size:12.5px;line-height:1.55;color:var(--c-neutral-700);margin:18px 0 0;max-width:74ch}
 
+/* ---- live Toolbox workspace ---- */
+#avApp[data-entry="toolbox"] #showFileRailBlock,#avApp[data-entry="toolbox"] [data-show-only]{display:none!important}
+#avApp .toolbox-hero{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px;align-items:center}
+#avApp .toolbox-status{display:inline-flex;align-items:center;gap:8px;font-family:var(--f-label);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--st-ready);margin-bottom:8px}
+#avApp .toolbox-status::before{content:'';width:8px;height:8px;background:var(--st-ready)}
+#avApp .toolbox-hero-actions{display:grid;gap:8px;min-width:154px}
+#avApp .toolbox-toolbar{display:grid;grid-template-columns:minmax(220px,1fr) minmax(150px,.45fr);gap:10px;margin:0 0 12px}
+#avApp .toolbox-filter-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+#avApp .toolbox-filter-row button{min-height:44px}
+#avApp .toolbox-filter-row button[aria-pressed="true"]{background:var(--c-accent);border-color:var(--c-accent);color:var(--st-ink)}
+#avApp .toolbox-group{margin-bottom:18px}
+#avApp .toolbox-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+#avApp .toolbox-card{border:1px solid var(--c-neutral-300);background:var(--c-surface);padding:12px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;min-width:0}
+#avApp .toolbox-card-main{min-width:0}
+#avApp .toolbox-card-head{display:flex;align-items:baseline;gap:8px;min-width:0}
+#avApp .toolbox-card-head a{font-family:var(--f-head);font-size:15px;font-weight:var(--w-semi);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#avApp .toolbox-card-head .ac-tag{font-family:var(--f-label);font-size:9px;color:var(--c-neutral-500);flex:none}
+#avApp .toolbox-card p{margin:5px 0 0;font-size:11.5px;line-height:1.45;color:var(--c-neutral-600)}
+#avApp .toolbox-card-actions{display:flex;align-items:flex-start;gap:5px}
+#avApp .toolbox-card-actions button{width:44px;height:44px;padding:0}
+#avApp .toolbox-card-actions .toolbox-open{background:var(--c-accent);border-color:var(--c-accent);color:var(--st-ink)}
+#avApp .toolbox-empty{border:1px dashed var(--c-neutral-400);padding:22px;text-align:center;color:var(--c-neutral-600)}
+#avApp .roadmap-badge{display:inline-flex;border:1px solid var(--st-pin-line);background:var(--st-pin-tint);color:var(--st-pin);font-family:var(--f-label);font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;margin-bottom:8px}
+
 /* ---- aside panels ---- */
 #avApp .aside-title{font-family:var(--f-head);font-size:17px;font-weight:var(--w-bold);margin-bottom:8px;display:flex;align-items:center;gap:8px}
 #avApp .aside-p{font-size:12px;line-height:1.5;color:var(--c-neutral-600);margin:0 0 12px}
@@ -495,7 +519,8 @@ img,svg{display:block}
 #avApp .help-detail li{margin-bottom:4px}
 #avApp .gate-line{font-size:12px;color:var(--c-neutral-700);margin-bottom:8px;line-height:1.5}
 #avApp .queue-list{display:grid;gap:6px;margin-bottom:10px}
-#avApp .queue-card{display:flex;gap:8px;align-items:center;border:1px solid var(--c-neutral-300);padding:8px 9px}
+#avApp #asideQueue,#avApp .queue-list{min-width:0;width:100%;max-width:100%}
+#avApp .queue-card{display:flex;gap:8px;align-items:center;width:100%;min-width:0;max-width:100%;border:1px solid var(--c-neutral-300);padding:8px 9px}
 #avApp .queue-card.priority-issue{border-color:var(--st-issue-line);background:var(--st-issue-tint)}
 #avApp .queue-rank{width:20px;height:20px;flex:none;display:grid;place-items:center;background:var(--c-accent-100);color:var(--c-accent-700,var(--c-accent));font-family:var(--f-label);font-size:10.5px;font-weight:700}
 #avApp .queue-card.priority-issue .queue-rank{background:var(--st-issue);color:var(--st-ink)}
@@ -589,6 +614,21 @@ img,svg{display:block}
 #avApp .ob-foot-right{display:flex;gap:8px}
 #avApp .ob-skip{border:0;background:transparent;color:var(--c-neutral-600);text-decoration:underline;padding:0}
 
+/* ---- neutral two-door entry chooser ---- */
+#avApp .entry-overlay{position:fixed;inset:0;z-index:100;background:var(--c-overlay);display:grid;place-items:center;padding:18px}
+#avApp .entry-dialog{width:min(780px,100%);max-height:90vh;overflow:auto;background:var(--c-surface);border:1px solid var(--c-neutral-400);box-shadow:var(--c-shadow-pop);padding:20px}
+#avApp .entry-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:8px}
+#avApp .entry-head .eyebrow{font-family:var(--f-label);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--c-accent-700,var(--c-accent))}
+#avApp .entry-head h2{font-family:var(--f-head);font-size:clamp(24px,4vw,36px);font-weight:var(--w-bold);margin-top:4px}
+#avApp .entry-intro{margin:0 0 18px;max-width:66ch;color:var(--c-neutral-700);line-height:1.55}
+#avApp .entry-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+#avApp .entry-door{min-height:190px;padding:20px;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;text-align:left;border:1px solid var(--c-neutral-400);background:var(--c-surface-2)}
+#avApp .entry-door:hover,#avApp .entry-door:focus-visible{border-color:var(--c-accent);background:var(--c-accent-100)}
+#avApp .entry-door .entry-kicker{font-family:var(--f-label);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--c-accent-700,var(--c-accent));margin-bottom:18px}
+#avApp .entry-door strong{font-family:var(--f-head);font-size:23px;font-weight:var(--w-semi);margin-bottom:8px}
+#avApp .entry-door span:last-child{font-size:12.5px;line-height:1.55;color:var(--c-neutral-600)}
+#avApp .entry-foot{margin:14px 0 0;font-family:var(--f-label);font-size:10px;color:var(--c-neutral-600)}
+
 /* ---- toast ---- */
 #avApp .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:95;display:flex;align-items:center;gap:10px;border:1px solid var(--c-neutral-400);background:var(--c-raised);box-shadow:var(--c-shadow-pop);padding:9px 14px;font-size:12.5px}
 #avApp .toast[hidden]{display:none}
@@ -662,6 +702,12 @@ img,svg{display:block}
   #avApp #brandCycleBtn.labeled{width:auto;padding:0 8px}
   #avApp .hd-left{max-width:100%;overflow-x:auto}
   #avApp .hd-ctx button{padding:0 8px;white-space:nowrap}
+  #avApp .toolbox-hero{grid-template-columns:1fr}
+  #avApp .toolbox-hero-actions{grid-template-columns:1fr 1fr;min-width:0}
+  #avApp .toolbox-toolbar{grid-template-columns:1fr}
+  #avApp .toolbox-grid{grid-template-columns:1fr}
+  #avApp .entry-grid{grid-template-columns:1fr}
+  #avApp .entry-door{min-height:156px}
 }
 @media (max-width:900px){
   html,body{overflow:auto}
@@ -727,10 +773,10 @@ img,svg{display:block}
   <div class="hd-left">
     <a class="hd-mark" id="brandLink" href="/" aria-label="System by Dave home" title="System by Dave home">SD</a>
     <span class="hd-word">AV Suite</span>
-    <div class="hd-ctx" role="group" aria-label="Context">
-      <button type="button" id="ctxShowBtn" aria-pressed="true"><svg class="ic" viewBox="0 0 24 24"><path d="M2 5h20v12H2z"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>Show</button>
-      <button type="button" id="ctxShopBtn" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24"><path d="M3 10h18"/><path d="M3 10V7a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v3"/><path d="M6 10v9"/><path d="M18 10v9"/><path d="M10 14h4"/></svg>Shop</button>
-      <button type="button" id="ctxOfficeBtn" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24"><path d="M4 21V5a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v16"/><path d="M15 9h4a1 1 0 0 1 1 1v11"/><path d="M2 21h20"/><path d="M8 8h3"/><path d="M8 13h3"/></svg>Front office</button>
+    <div class="hd-ctx" role="group" aria-label="Workspace">
+      <button type="button" id="ctxShowBtn" aria-pressed="true"><svg class="ic" viewBox="0 0 24 24"><path d="M2 5h20v12H2z"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>Show Console</button>
+      <button type="button" id="ctxShopBtn" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24"><path d="M3 10h18"/><path d="M3 10V7a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v3"/><path d="M6 10v9"/><path d="M18 10v9"/><path d="M10 14h4"/></svg>Toolbox</button>
+      <button type="button" id="ctxOfficeBtn" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24"><path d="M4 21V5a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v16"/><path d="M15 9h4a1 1 0 0 1 1 1v11"/><path d="M2 21h20"/><path d="M8 8h3"/><path d="M8 13h3"/></svg>Front Office</button>
     </div>
   </div>
   <div data-r="phases">
@@ -744,7 +790,10 @@ img,svg{display:block}
     <button type="button" id="helpBtn" class="hd-icon-btn" title="Toggle help mode" aria-label="Toggle help mode" aria-pressed="false">
       <svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.2 9a2.8 2.8 0 1 1 3.9 2.6c-.8.4-1.1.9-1.1 1.7v.4"/><path d="M12 17h.01"/></svg>
     </button>
-    <button type="button" id="setupBtn" class="hd-icon-btn labeled" title="Reopen guided setup">
+    <button type="button" id="doorwayBtn" class="hd-icon-btn labeled" title="Choose AV Suite doorway">
+      <svg class="ic" viewBox="0 0 24 24"><path d="M4 21V3h13v18"/><path d="M8 12h.01"/><path d="M17 21h3"/></svg><span class="lbl">Doorway</span>
+    </button>
+    <button type="button" id="setupBtn" class="hd-icon-btn labeled" title="Reopen guided setup" data-show-only>
       <svg class="ic" viewBox="0 0 24 24"><path d="M3 6a1 1 0 0 1 1-1h5l2 2h9a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/><path d="M12 11v6M9 14h6"/></svg><span class="lbl">Setup</span>
     </button>
     <button type="button" id="settingsBtn" class="hd-icon-btn" aria-haspopup="dialog" aria-controls="settingsDrawer" aria-expanded="false" title="Operator settings" aria-label="Operator settings">
@@ -760,8 +809,8 @@ img,svg{display:block}
 <nav id="mobFamStrip" data-mob aria-label="Families"></nav>
 
 <div data-r="body">
-  <nav data-r="rail" aria-label="Console navigation">
-    <div class="rail-block">
+  <nav data-r="rail" data-workspace-region aria-label="Console navigation">
+    <div class="rail-block" id="showFileRailBlock">
       <div class="rail-head"><span class="hb" id="hbFile" hidden>3</span>Show file</div>
       <a class="rail-file-link" id="railWorkbookLink" href="av-workbook/">
         <svg class="ic" viewBox="0 0 24 24"><path d="M4 3h16v18H4z"/><path d="M8 8h8M8 12h8M8 16h5"/><path d="M15 3v18" opacity=".4"/></svg>
@@ -779,12 +828,12 @@ img,svg{display:block}
     <div class="rail-foot">
       <button type="button" class="rail-foot-link" id="railRecentBtn">Recent</button>
       <button type="button" class="rail-foot-link" id="railAllBtn">All <span id="railAllCount">44</span> tools</button>
-      <button type="button" class="rail-foot-link" id="railShopBtn">The Shop</button>
+      <button type="button" class="rail-foot-link" id="railShopBtn">Toolbox</button>
       <button type="button" class="rail-foot-link" id="railOfficeBtn">Front Office</button>
     </div>
   </nav>
 
-  <main data-r="main" id="main-content" tabindex="-1">
+  <main data-r="main" data-workspace-region id="main-content" tabindex="-1">
     <div id="showView">
       <section class="card bp" data-r="profilecard">
         <div class="card-head"><span class="hb" id="hbProfile" hidden>2</span>Show profile</div>
@@ -821,7 +870,7 @@ img,svg{display:block}
     <div id="shopOfficeView" hidden></div>
   </main>
 
-  <aside data-r="aside" aria-label="Console side panel">
+  <aside data-r="aside" data-workspace-region aria-label="Console side panel">
     <div id="asideNoShow" hidden></div>
     <div id="asideHelp" hidden></div>
     <div id="asideQueue" hidden></div>
@@ -863,7 +912,7 @@ img,svg{display:block}
       <p class="drawer-hint">When on, recommendation and sub-module cards show the rule or saved-data key that produced them.</p>
     </section>
 
-    <section class="drawer-group">
+    <section class="drawer-group" data-show-only>
       <h3>Phase Handoff</h3>
       <div id="phaseHandoffSummary" class="drawer-summary" aria-live="polite"></div>
       <div class="drawer-row">
@@ -885,7 +934,7 @@ img,svg{display:block}
       <div id="offlineDetail" class="drawer-summary" aria-live="polite"></div>
     </section>
 
-    <section class="drawer-group">
+    <section class="drawer-group" data-show-only>
       <h3>Transfer &amp; Backup</h3>
       <div class="drawer-row">
         <button type="button" id="exportSuiteBtn">Export Suite JSON</button>
@@ -898,7 +947,7 @@ img,svg{display:block}
       <p class="drawer-hint">Show profile, readiness, notes, pins, recents, saved tool scans, and show packages use this browser's storage when available. Tool and suite links carry show context in the URL so supported tools prefill metadata. Export JSON before moving to another machine.</p>
     </section>
 
-    <section class="drawer-group danger-zone">
+    <section class="drawer-group danger-zone" data-show-only>
       <h3>Danger Zone</h3>
       <div class="drawer-row">
         <button type="button" id="resetReadinessBtn" class="ghost">Reset Readiness</button>
@@ -939,6 +988,31 @@ img,svg{display:block}
   </section>
 </div>
 
+<!-- ============ AV SUITE DOORWAY ============ -->
+<div id="entryChooser" class="entry-overlay" hidden>
+  <section class="entry-dialog bp" role="dialog" aria-modal="true" aria-labelledby="entryTitle" aria-describedby="entryIntro">
+    <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+    <div class="entry-head">
+      <div><div class="eyebrow">AV Suite doorway</div><h2 id="entryTitle" tabindex="-1">What are you here to do?</h2></div>
+      <button type="button" id="entryCloseBtn">Close</button>
+    </div>
+    <p class="entry-intro" id="entryIntro">Choose a show-attached operations workspace or open the complete AV tool registry cold. This choice becomes the default for later neutral visits, and the Doorway button always brings you back here.</p>
+    <div class="entry-grid">
+      <button type="button" class="entry-door" data-entry-choice="show">
+        <span class="entry-kicker">Show attached</span>
+        <strong>Work a show</strong>
+        <span>Open the Show Console with profile, phase, readiness, recommendations, notes, imports, exports, and contextual tool links.</span>
+      </button>
+      <button type="button" class="entry-door" data-entry-choice="toolbox">
+        <span class="entry-kicker">No show attached</span>
+        <strong>Open the toolbox</strong>
+        <span>Search, filter, pin, and launch every registered AV tool from its plain URL without adding show parameters.</span>
+      </button>
+    </div>
+    <p class="entry-foot" id="entryDefaultNote">No default doorway selected yet.</p>
+  </section>
+</div>
+
 <!-- ============ TOAST ============ -->
 <div id="toast" class="toast" role="status" aria-live="polite" hidden>
   <svg class="ic" viewBox="0 0 24 24"><path d="m5 13 4 4L19 7"/></svg>
@@ -960,6 +1034,7 @@ img,svg{display:block}
 
 </div><!-- /#avApp -->
 
+<script src="js/vendor/gsap.min.js"></script>
 <script src="js/sbd-registry.js"></script>
 <script>
 (function(){
@@ -983,6 +1058,9 @@ var OFFLINE_ASSETS=REG.offlineAssets?REG.offlineAssets():[];
 var READINESS_VALUES=['pending','ready','issue','skipped'];
 var READINESS_LABELS={pending:'Pending',ready:'Ready',issue:'Issue',skipped:'Skipped'};
 var ISSUE_TERMS=['issue','problem','blocker','blocked','risk','missing','fail','failed','open item','open question','conflict','not ready','not tested','backup missing','gap'];
+var SHOW_CONTEXT_PARAMS=['sbdShow','sbdVenue','sbdDate','sbdOperator','sbdPhase'];
+var TOOLBOX_FILTERS=['all','featured','pinned','recent'];
+var TOOLBOX_FEATURED=TOOLS.filter(function(tool){return tool.toolboxFeatured===true;});
 var $=function(id){return document.getElementById(id);};
 
 /* ============================================================
@@ -1008,7 +1086,7 @@ function phaseLabel(id){var p=PHASES.find(function(x){return x.id===id;});return
 
 function cleanFilters(filters){filters=filters&&typeof filters==='object'?filters:{};return {search:String(filters.search||''),phase:phaseExists(filters.phase)?filters.phase:'all',dept:deptExists(filters.dept)?filters.dept:'all',pin:['all','pinned','recent','ready','issues','skipped','notes','saved'].indexOf(filters.pin)>=0?filters.pin:'all'};}
 function cleanIds(ids){var seen={};return Array.isArray(ids)?ids.map(function(id){var tool=toolById(id);return tool?tool.id:'';}).filter(function(id){if(!id||seen[id]) return false;seen[id]=true;return true;}):[];}
-function commandIdAllowed(id){var value=String(id||'');var viewValues=['all','pinned','recent','ready','issues','skipped','notes','saved'];var actionValues=['action:openRecommended','action:copyPhaseGate','action:copyPhaseHandoff','action:copySuiteLink','action:copyLaunchList','action:copyReviewQueue','action:scanSavedData','action:markRecommendedReady','action:showIssues','action:showNotes','action:pinRecommended','action:exportSuite','action:exportPackage','action:cacheAvTools','action:refreshOfflineCache','action:clearOfflineCache','action:toggleHelp','action:openOnboarding','action:toggleCitations','action:cycleBrand','action:toggleMode','action:openSettings','action:viewAll','action:showShop','action:showOffice','action:showShow'];if(value.indexOf('tool:')===0) return Boolean(toolById(value.slice(5)));if(value.indexOf('phase:')===0) return phaseExists(value.slice(6))&&value.slice(6)!=='all';if(value.indexOf('family:')===0) return familyExists(value.slice(7));if(value.indexOf('view:')===0) return viewValues.indexOf(value.slice(5))>=0;return actionValues.indexOf(value)>=0;}
+function commandIdAllowed(id){var value=String(id||'');var viewValues=['all','pinned','recent','ready','issues','skipped','notes','saved'];var actionValues=['action:openRecommended','action:copyPhaseGate','action:copyPhaseHandoff','action:copySuiteLink','action:copyLaunchList','action:copyReviewQueue','action:scanSavedData','action:markRecommendedReady','action:showIssues','action:showNotes','action:pinRecommended','action:exportSuite','action:exportPackage','action:cacheAvTools','action:refreshOfflineCache','action:clearOfflineCache','action:toggleHelp','action:openOnboarding','action:toggleCitations','action:cycleBrand','action:toggleMode','action:openSettings','action:viewAll','action:showShop','action:showToolbox','action:showOffice','action:showShow','action:openDoorway','action:toolboxAll','action:toolboxFeatured','action:toolboxPinned','action:toolboxRecent'];if(value.indexOf('tool:')===0) return Boolean(toolById(value.slice(5)));if(value.indexOf('phase:')===0) return phaseExists(value.slice(6))&&value.slice(6)!=='all';if(value.indexOf('family:')===0) return familyExists(value.slice(7));if(value.indexOf('view:')===0) return viewValues.indexOf(value.slice(5))>=0;return actionValues.indexOf(value)>=0;}
 function normalizeCommandId(id){id=String(id||'').slice(0,80);if(id.indexOf('tool:')===0){var tool=toolById(id.slice(5));if(tool) return 'tool:'+tool.id;}return id;}
 function cleanCommandRecent(ids){var seen={};return Array.isArray(ids)?ids.map(normalizeCommandId).filter(function(id){if(!id||seen[id]||!commandIdAllowed(id)) return false;seen[id]=true;return true;}).slice(0,10):[];}
 function cleanReadiness(map){var next={};if(!map||typeof map!=='object') return next;Object.keys(map).forEach(function(id){var tool=toolById(id);var value=String(map[id]||'pending');if(tool&&READINESS_VALUES.indexOf(value)>=0&&value!=='pending') next[tool.id]=value;});return next;}
@@ -1036,8 +1114,9 @@ function recommendedTools(){return (RECOMMENDED[state.phase]||[]).map(toolById).
 /* ============================================================
    UI-ONLY PREFERENCES — localStorage[av-suite-ui.v1], merge-patch,
    page-local (no other tool page reads this key). `density` is the
-   pre-existing field; brand/mode/help/showCitations/onboardingSeen
-   are new fields this rebuild adds to the same key.
+   pre-existing field; brand/mode/help/showCitations/onboardingSeen plus
+   the isolated Toolbox pins, recents, filters, family, command recents,
+   and preferred doorway all remain in this page-local key.
    ============================================================ */
 function readUi(){try{return JSON.parse(localStorage.getItem(UI_KEY)||'{}')||{};}catch(e){return {};}}
 function writeUi(patch){try{var cur=readUi();Object.keys(patch).forEach(function(k){cur[k]=patch[k];});localStorage.setItem(UI_KEY,JSON.stringify(cur));}catch(e){}}
@@ -1052,14 +1131,28 @@ var uiState={
   mode:initialTheme.mode,
   help:Boolean(ui.help),
   showCitations:ui.showCitations!==false,
-  onboardingSeen:Boolean(ui.onboardingSeen)
+  onboardingSeen:Boolean(ui.onboardingSeen),
+  preferredEntry:ui.preferredEntry==='show'||ui.preferredEntry==='toolbox'?ui.preferredEntry:''
 };
+var toolboxState={
+  pinned:cleanIds(ui.toolboxPinned).slice(0,60),
+  recent:cleanIds(ui.toolboxRecent).slice(0,12),
+  search:String(ui.toolboxSearch||'').slice(0,120),
+  filter:TOOLBOX_FILTERS.indexOf(ui.toolboxFilter)>=0?ui.toolboxFilter:'all',
+  family:familyExists(ui.toolboxFamily)?ui.toolboxFamily:'all',
+  commandRecent:cleanCommandRecent(ui.toolboxCommandRecent)
+};
+var entryState={mode:null,chooserOpen:false,lastFocus:null};
 var commandState={open:false,query:'',activeIndex:0,items:[],lastFocus:null};
 var offlineState={supported:false,online:navigator.onLine!==false,worker:'Checking',cache:'Checking',cached:0,total:OFFLINE_ASSETS.length,message:'Checking offline cache.',busy:false};
 var viewState={context:'show',view:'family',fam:null,openFams:{},openSubs:{}};
 var obState={step:0,lastFocus:null};
 var toastTimer=null;
 var toastUndo=null;
+
+function saveToolboxState(){writeUi({toolboxPinned:toolboxState.pinned,toolboxRecent:toolboxState.recent,toolboxSearch:toolboxState.search,toolboxFilter:toolboxState.filter,toolboxFamily:toolboxState.family,toolboxCommandRecent:toolboxState.commandRecent});}
+function activePins(){return entryState.mode==='toolbox'?toolboxState.pinned:state.favorites;}
+function activeRecents(){return entryState.mode==='toolbox'?toolboxState.recent:state.recent;}
 
 /* ============================================================
    SMALL UTILITIES
@@ -1068,7 +1161,7 @@ function escapeHtml(value){return String(value==null?'':value).replace(/&/g,'&am
 function escapeAttr(value){return escapeHtml(value);}
 function relativeHref(url){var path=url.pathname.replace(/^\/+/,'');return path+url.search+url.hash;}
 function absoluteHref(href){return new URL(href, window.location.href).href;}
-function toolHref(tool){var url=new URL(tool.href, window.location.href);if(state.showName) url.searchParams.set('sbdShow',state.showName);if(state.venue) url.searchParams.set('sbdVenue',state.venue);if(state.showDate) url.searchParams.set('sbdDate',state.showDate);if(state.operator) url.searchParams.set('sbdOperator',state.operator);if(state.phase) url.searchParams.set('sbdPhase',state.phase);return relativeHref(url);}
+function toolHref(tool){var url=new URL(tool.href,window.location.href);if(entryState.mode==='toolbox'){SHOW_CONTEXT_PARAMS.forEach(function(name){url.searchParams.delete(name);});return relativeHref(url);}if(state.showName) url.searchParams.set('sbdShow',state.showName);if(state.venue) url.searchParams.set('sbdVenue',state.venue);if(state.showDate) url.searchParams.set('sbdDate',state.showDate);if(state.operator) url.searchParams.set('sbdOperator',state.operator);if(state.phase) url.searchParams.set('sbdPhase',state.phase);return relativeHref(url);}
 function suiteLinkHref(){var url=new URL('av-suite.html',window.location.href);if(state.showName) url.searchParams.set('sbdShow',state.showName);if(state.venue) url.searchParams.set('sbdVenue',state.venue);if(state.showDate) url.searchParams.set('sbdDate',state.showDate);if(state.operator) url.searchParams.set('sbdOperator',state.operator);if(state.phase) url.searchParams.set('sbdPhase',state.phase);return relativeHref(url);}
 function fileStem(){return (state.showName||'av-suite').toLowerCase().replace(/['"]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,60)||'av-suite';}
 function downloadFile(filename,content,type){var blob=new Blob([content],{type:type});var url=URL.createObjectURL(blob);var link=document.createElement('a');link.href=url;link.download=filename;link.style.display='none';document.body.appendChild(link);link.click();setTimeout(function(){URL.revokeObjectURL(url);if(link.parentNode) link.parentNode.removeChild(link);},0);}
@@ -1134,6 +1227,24 @@ function cycleBrand(){
 }
 
 /* ============================================================
+   ADDRESSABLE ENTRY MODE — URL authority first, then the isolated
+   preferred doorway. Any explicit sbd* show context always wins.
+   ============================================================ */
+function hasShowContext(params){return SHOW_CONTEXT_PARAMS.some(function(name){return params.has(name);});}
+function explicitEntryFromLocation(){var params=new URLSearchParams(window.location.search);if(hasShowContext(params)) return 'show';var entry=params.get('entry');return entry==='show'||entry==='toolbox'?entry:'';}
+function resolvedEntryFromLocation(){var explicit=explicitEntryFromLocation();if(explicit) return explicit;if(window.history.state&&window.history.state.avEntry==='chooser') return '';return uiState.preferredEntry;}
+function entryUrl(mode){var url=new URL(window.location.href);url.searchParams.set('entry',mode);if(mode==='toolbox') SHOW_CONTEXT_PARAMS.forEach(function(name){url.searchParams.delete(name);});return url.pathname+url.search+url.hash;}
+function setChooserBackgroundInert(inert){['[data-r="head"]','[data-r="body"]','[data-dosbar]'].forEach(function(selector){var el=$('avApp').querySelector(selector);if(!el) return;if(inert) el.setAttribute('inert','');else el.removeAttribute('inert');});var siteHeader=document.querySelector('.sbd-site-header');if(siteHeader){if(inert) siteHeader.setAttribute('inert','');else siteHeader.removeAttribute('inert');}}
+function updateEntryDefaultNote(){var note=$('entryDefaultNote');if(!note) return;note.textContent=uiState.preferredEntry?(uiState.preferredEntry==='toolbox'?'Default doorway: AV Toolbox.':'Default doorway: Show Console.'):'No default doorway selected yet.';}
+function openEntryChooser(){entryState.lastFocus=document.activeElement;entryState.chooserOpen=true;updateEntryDefaultNote();$('entryCloseBtn').hidden=!entryState.mode;$('entryChooser').hidden=false;setChooserBackgroundInert(true);window.setTimeout(function(){var first=$('entryChooser').querySelector('[data-entry-choice]');if(first) first.focus();},0);}
+function closeEntryChooser(restoreFocus){if(!entryState.chooserOpen||!entryState.mode) return;entryState.chooserOpen=false;$('entryChooser').hidden=true;setChooserBackgroundInert(false);if(restoreFocus!==false&&entryState.lastFocus&&entryState.lastFocus.focus) entryState.lastFocus.focus();entryState.lastFocus=null;}
+function animateWorkspace(){var regions=Array.prototype.filter.call($('avApp').querySelectorAll('[data-workspace-region]'),function(el){return !el.hidden&&getComputedStyle(el).display!=='none';});var reduced=Boolean(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);if(window.gsap&&typeof window.gsap.killTweensOf==='function'){window.gsap.killTweensOf(regions);if(reduced){window.gsap.set(regions,{clearProps:'transform,opacity'});return;}window.gsap.fromTo(regions,{opacity:0,y:12},{opacity:1,y:0,duration:.28,stagger:.04,ease:'power2.out',clearProps:'transform,opacity',overwrite:true});return;}regions.forEach(function(el){el.style.removeProperty('opacity');el.style.removeProperty('transform');});}
+function applyEntryMode(mode,options){if(mode!=='show'&&mode!=='toolbox') return;options=options||{};entryState.mode=mode;viewState.context=mode==='toolbox'?'shop':'show';$('avApp').setAttribute('data-entry',mode);if(mode==='show'&&!viewState.fam) viewState.fam=defaultFamilyForPhase();if(mode==='toolbox'&&!$('onboardOverlay').hidden){$('onboardOverlay').hidden=true;obState.step=0;}renderAll();animateWorkspace();if(options.focusMain){window.setTimeout(function(){$('main-content').focus();},0);}if(mode==='show'&&options.allowOnboarding&&!uiState.onboardingSeen) window.setTimeout(openOnboarding,0);}
+function chooseEntry(mode){uiState.preferredEntry=mode;writeUi({preferredEntry:mode});entryState.chooserOpen=false;$('entryChooser').hidden=true;setChooserBackgroundInert(false);window.history.pushState({avEntry:mode},'',entryUrl(mode));applyEntryMode(mode,{focusMain:true,allowOnboarding:true});entryState.lastFocus=null;}
+function navigateEntry(mode){if(mode!=='show'&&mode!=='toolbox') return;uiState.preferredEntry=mode;writeUi({preferredEntry:mode});window.history.pushState({avEntry:mode},'',entryUrl(mode));applyEntryMode(mode,{focusMain:true,allowOnboarding:mode==='show'});}
+function handleEntryPopstate(){var mode=resolvedEntryFromLocation();if(!mode){openEntryChooser();return;}if(entryState.chooserOpen){entryState.chooserOpen=false;$('entryChooser').hidden=true;setChooserBackgroundInert(false);}if(mode==='show') applyUrlContext();applyEntryMode(mode,{focusMain:true,allowOnboarding:false});}
+
+/* ============================================================
    CORE ACTIONS — data model mutations (identical semantics to the
    previous console; still the single source of truth other tool
    pages' context dock reads and writes).
@@ -1151,11 +1262,11 @@ function setPhase(id){
   showHint('Recommended tools updated for '+phaseLabel(id)+'.');
 }
 function togglePin(id,announce){
-  var index=state.favorites.indexOf(id);var tool=toolById(id);if(!tool) return;
+  var pins=activePins();var index=pins.indexOf(id);var tool=toolById(id);if(!tool) return;
   var wasIn=index>=0;
-  if(wasIn){state.favorites.splice(index,1);} else {state.favorites.unshift(id);}
-  saveState();
-  renderRail();renderMainForView();renderTilesAndGate();
+  if(wasIn){pins.splice(index,1);} else {pins.unshift(id);}
+  if(entryState.mode==='toolbox') saveToolboxState();else saveState();
+  renderRail();renderMainForView();if(entryState.mode==='show') renderTilesAndGate();
   if(announce!==false) showHint(wasIn?tool.name+' unpinned.':tool.name+' pinned.',null,function(){togglePin(id,false);renderAll();});
 }
 function setToolReadiness(id,value){
@@ -1171,7 +1282,7 @@ function setToolNote(id,value,announce){
   saveState();
   if(announce){renderTilesAndGate();renderAsideQueue();showHint(note?tool.name+' note saved.':tool.name+' note cleared.');}
 }
-function rememberTool(id){state.recent=state.recent.filter(function(i){return i!==id;});state.recent.unshift(id);state.recent=state.recent.slice(0,12);saveState();}
+function rememberTool(id){if(!toolById(id)) return;if(entryState.mode==='toolbox'){toolboxState.recent=toolboxState.recent.filter(function(i){return i!==id;});toolboxState.recent.unshift(id);toolboxState.recent=toolboxState.recent.slice(0,12);saveToolboxState();return;}state.recent=state.recent.filter(function(i){return i!==id;});state.recent.unshift(id);state.recent=state.recent.slice(0,12);saveState();}
 function openTool(id){var tool=toolById(id);if(!tool) return;rememberTool(id);window.location.href=toolHref(tool);}
 function launchLine(tool){var note=toolNote(tool.id);var line=tool.name+' ['+readinessLabel(toolReadiness(tool.id))+'] | '+absoluteHref(toolHref(tool));if(note) line+=' | Note: '+note;return line;}
 
@@ -1369,7 +1480,7 @@ function clearPrefs(){if(!window.confirm('Clear AV by Dave saved profile, readin
 /* ============================================================
    RENDER — header
    ============================================================ */
-function contextNoteText(){return viewState.context==='shop'?'The Shop · gear, reference and math · no show file':'Front Office · clients, venues, templates · no show file';}
+function contextNoteText(){return viewState.context==='shop'?'Toolbox · No show attached · '+TOOLS.length+' registered tools':'Front Office · roadmap concept · no persistence';}
 function renderHeader(){
   $('ctxShowBtn').setAttribute('aria-pressed',String(viewState.context==='show'));
   $('ctxShopBtn').setAttribute('aria-pressed',String(viewState.context==='shop'));
@@ -1387,19 +1498,19 @@ function renderHeader(){
 /* ============================================================
    RENDER — rail (show file, pinned, families)
    ============================================================ */
-function pinDotClass(id){var r=toolReadiness(id);return r==='ready'||r==='issue'||r==='skipped'?'st-'+r:'';}
+function pinDotClass(id){if(entryState.mode==='toolbox') return '';var r=toolReadiness(id);return r==='ready'||r==='issue'||r==='skipped'?'st-'+r:'';}
 function renderPinList(){
   var list=$('pinList');var count=$('pinCountOut');
-  count.textContent=state.favorites.length?(' · '+state.favorites.length):'';
-  var tools=state.favorites.map(toolById).filter(Boolean);
-  if(!tools.length){list.innerHTML='<div class="pin-empty">Nothing pinned. Pin a tool and it lands here for the whole show.</div>';return;}
+  var pins=activePins();count.textContent=pins.length?(' · '+pins.length):'';
+  var tools=pins.map(toolById).filter(Boolean);
+  if(!tools.length){list.innerHTML='<div class="pin-empty">'+(entryState.mode==='toolbox'?'Nothing pinned in the Toolbox yet.':'Nothing pinned. Pin a tool and it lands here for the whole show.')+'</div>';return;}
   list.innerHTML=tools.map(function(t){return '<div class="pin-row"><span class="stdot '+pinDotClass(t.id)+'"></span><a href="'+escapeAttr(toolHref(t))+'" data-tool="'+t.id+'">'+escapeHtml(t.name)+'</a><button type="button" data-pin="'+t.id+'" title="Unpin '+escapeAttr(t.name)+'" aria-label="Unpin '+escapeAttr(t.name)+'"><svg class="ic" viewBox="0 0 24 24" style="width:12px;height:12px"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>';}).join('');
 }
 function familySubsFlat(fam){var subs=[];if(!fam.subs) return subs;fam.toolIds.forEach(function(id){(fam.subs[id]||[]).forEach(function(s){subs.push(Object.assign({toolId:id},s));});});return subs;}
 function renderFamilyList(){
   var wrap=$('famList');
   wrap.innerHTML=FAMILIES.map(function(fam){
-    var active=viewState.context==='show'&&viewState.view==='family'&&viewState.fam===fam.id;
+    var active=(viewState.context==='show'&&viewState.view==='family'&&viewState.fam===fam.id)||(viewState.context==='shop'&&toolboxState.family===fam.id);
     var hasSubs=fam.subs&&Object.keys(fam.subs).length;
     var open=Boolean(viewState.openFams[fam.id]);
     var subs=hasSubs?familySubsFlat(fam):[];
@@ -1412,13 +1523,14 @@ function renderFamilyList(){
       +'</div>'+subsHtml+'</div>';
   }).join('');
   $('railAllCount').textContent=TOOLS.length;
-  $('railAllBtn').classList.toggle('is-active',viewState.context==='show'&&viewState.view==='all');
+  $('railAllBtn').classList.toggle('is-active',(viewState.context==='show'&&viewState.view==='all')||(viewState.context==='shop'&&toolboxState.filter==='all'&&toolboxState.family==='all'));
+  $('railRecentBtn').classList.toggle('is-active',(viewState.context==='show'&&state.filters.pin==='recent'&&viewState.view==='all')||(viewState.context==='shop'&&toolboxState.filter==='recent'));
   $('railShopBtn').classList.toggle('is-active',viewState.context==='shop');
   $('railOfficeBtn').classList.toggle('is-active',viewState.context==='office');
 }
 function renderMobileFamStrip(){
   var wrap=$('mobFamStrip');
-  wrap.innerHTML=FAMILIES.map(function(fam){var on=viewState.context==='show'&&viewState.view==='family'&&viewState.fam===fam.id;return '<button type="button" class="mob-fam-btn" data-fam-select="'+fam.id+'" aria-pressed="'+String(on)+'">'+escapeHtml(fam.label)+'</button>';}).join('');
+  wrap.innerHTML=FAMILIES.map(function(fam){var on=(viewState.context==='show'&&viewState.view==='family'&&viewState.fam===fam.id)||(viewState.context==='shop'&&toolboxState.family===fam.id);return '<button type="button" class="mob-fam-btn" data-fam-select="'+fam.id+'" aria-pressed="'+String(on)+'">'+escapeHtml(fam.label)+'</button>';}).join('');
 }
 function renderRail(){
   var wb=toolById('av-workbook');
@@ -1531,37 +1643,18 @@ function renderMainForView(){
 }
 
 /* ============================================================
-   RENDER — Shop / Front Office context
-   Copy is real product narrative (kept close to the source design's
-   own wording); every fictional show/venue mention and invented
-   number from the source mockup has been replaced with either real
-   registry facts or honestly-generic phrasing.
+   RENDER — Toolbox / Front Office context. Toolbox inventory is
+   derived only from the live registry; Front Office remains a clearly
+   labeled roadmap concept with no persistence.
    ============================================================ */
+function toolboxHaystack(tool){return [tool.name,tool.dept,tool.tag,tool.desc,(tool.phases||[]).join(' ')].join(' ').toLowerCase();}
+function toolboxFilteredTools(){var query=toolboxState.search.trim().toLowerCase();var tools=TOOLS.filter(function(tool){if(query&&toolboxHaystack(tool).indexOf(query)===-1) return false;if(toolboxState.family!=='all'){var family=familyById(toolboxState.family);if(!family||family.toolIds.indexOf(tool.id)<0) return false;}if(toolboxState.filter==='featured'&&!tool.toolboxFeatured) return false;if(toolboxState.filter==='pinned'&&toolboxState.pinned.indexOf(tool.id)<0) return false;if(toolboxState.filter==='recent'&&toolboxState.recent.indexOf(tool.id)<0) return false;return true;});if(toolboxState.filter==='recent') tools.sort(function(a,b){return toolboxState.recent.indexOf(a.id)-toolboxState.recent.indexOf(b.id);});return tools;}
+function toolboxCardHtml(tool){var pinned=toolboxState.pinned.indexOf(tool.id)>=0;var featured=tool.toolboxFeatured?'<span class="ac-tag">Use anytime</span>':'<span class="ac-tag">'+escapeHtml(tool.tag)+'</span>';return '<article class="toolbox-card"><div class="toolbox-card-main"><div class="toolbox-card-head"><a href="'+escapeAttr(toolHref(tool))+'" data-tool="'+tool.id+'">'+escapeHtml(tool.name)+'</a>'+featured+'</div><p>'+escapeHtml(tool.desc)+'</p></div><div class="toolbox-card-actions"><button type="button" data-pin="'+tool.id+'" aria-pressed="'+String(pinned)+'" title="'+(pinned?'Unpin ':'Pin ')+escapeAttr(tool.name)+'" aria-label="'+(pinned?'Unpin ':'Pin ')+escapeAttr(tool.name)+'"><svg class="ic" viewBox="0 0 24 24"><path d="M12 2 9 9l-6 1 4.5 4L6 21l6-3.5L18 21l-1.5-7L21 10l-6-1z"/></svg></button><button type="button" class="toolbox-open" data-open="'+tool.id+'" title="Open '+escapeAttr(tool.name)+'" aria-label="Open '+escapeAttr(tool.name)+'"><svg class="ic" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div></article>';}
+function toolboxGroupHead(label,count,depts,icon){return '<div class="allgroup-head">'+(icon?iconSvg(icon,15):'')+'<h3>'+escapeHtml(label)+'</h3><span class="n">'+count+' tool'+(count===1?'':'s')+'</span><span class="d">'+escapeHtml(depts)+'</span></div>';}
+function renderToolboxResults(){var tools=toolboxFilteredTools();var ids={};tools.forEach(function(tool){ids[tool.id]=true;});$('toolboxResultCount').textContent=tools.length+' of '+TOOLS.length+' registered tools';var groups='';var seen={};var workbook=toolById('av-workbook');if(toolboxState.family==='all'&&workbook&&ids[workbook.id]){seen[workbook.id]=true;groups+='<section class="toolbox-group">'+toolboxGroupHead('Workbook',1,'Spine',null)+'<div class="toolbox-grid">'+toolboxCardHtml(workbook)+'</div></section>';}FAMILIES.forEach(function(family){if(toolboxState.family!=='all'&&toolboxState.family!==family.id) return;var familyToolsVisible=familyTools(family).filter(function(tool){return ids[tool.id]&&!seen[tool.id];});familyToolsVisible.forEach(function(tool){seen[tool.id]=true;});if(familyToolsVisible.length) groups+='<section class="toolbox-group">'+toolboxGroupHead(family.label,familyToolsVisible.length,family.depts,family.icon)+'<div class="toolbox-grid">'+familyToolsVisible.map(toolboxCardHtml).join('')+'</div></section>';});var remaining=tools.filter(function(tool){return !seen[tool.id];});if(remaining.length) groups+='<section class="toolbox-group">'+toolboxGroupHead('Other',remaining.length,'Registry',null)+'<div class="toolbox-grid">'+remaining.map(toolboxCardHtml).join('')+'</div></section>';$('toolboxGroups').innerHTML=groups||'<div class="toolbox-empty">No tools match these Toolbox filters.<div style="margin-top:10px"><button type="button" id="toolboxClearBtn">Clear Toolbox filters</button></div></div>';}
+function renderToolbox(){var familyOptions='<option value="all">All families</option>'+FAMILIES.map(function(family){return '<option value="'+family.id+'"'+(toolboxState.family===family.id?' selected':'')+'>'+escapeHtml(family.label)+'</option>';}).join('');$('shopOfficeView').innerHTML='<section class="ctx-hero toolbox-hero bp"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i><div><div class="toolbox-status">No show attached</div><h2>AV Toolbox</h2><p>Launch any registered AV tool cold. Toolbox search, family, pins, and recents stay in AV Suite UI preferences and never touch the saved show dashboard.</p><div class="ctx-keys"><span class="ctx-key-pill">'+TOOLS.length+' live tools</span><span class="ctx-key-pill">'+FAMILIES.length+' families</span><span class="ctx-key-pill">'+TOOLBOX_FEATURED.length+' use anytime</span></div></div><div class="toolbox-hero-actions"><button type="button" class="primary" id="toolboxWorkShowBtn">Work a show</button><button type="button" id="toolboxDoorwayBtn">Choose doorway</button></div></section><div class="toolbox-toolbar"><div><label class="rail-head" for="toolboxSearchInput">Search Toolbox</label><input type="search" id="toolboxSearchInput" autocomplete="off" value="'+escapeAttr(toolboxState.search)+'" placeholder="Search tools, departments, tags…"></div><div><label class="rail-head" for="toolboxFamilySelect">Family</label><select id="toolboxFamilySelect">'+familyOptions+'</select></div></div><div class="toolbox-filter-row" role="group" aria-label="Filter Toolbox"><button type="button" data-toolbox-filter="all">All tools</button><button type="button" data-toolbox-filter="featured">Use anytime</button><button type="button" data-toolbox-filter="pinned">Pinned</button><button type="button" data-toolbox-filter="recent">Recent</button><span class="fam-view-count" id="toolboxResultCount"></span></div><div id="toolboxGroups"></div>';$('toolboxWorkShowBtn').addEventListener('click',function(){navigateEntry('show');});$('toolboxDoorwayBtn').addEventListener('click',openEntryChooser);$('toolboxSearchInput').addEventListener('input',function(){toolboxState.search=this.value.slice(0,120);saveToolboxState();renderToolboxResults();});$('toolboxFamilySelect').addEventListener('change',function(){toolboxState.family=familyExists(this.value)?this.value:'all';saveToolboxState();renderRail();renderMobileFamStrip();renderToolboxResults();});Array.prototype.forEach.call($('shopOfficeView').querySelectorAll('[data-toolbox-filter]'),function(button){button.setAttribute('aria-pressed',String(button.getAttribute('data-toolbox-filter')===toolboxState.filter));button.addEventListener('click',function(){toolboxState.filter=button.getAttribute('data-toolbox-filter');saveToolboxState();renderRail();renderToolbox();});});renderToolboxResults();}
+
 var CTX_COPY={
-  shop:{
-    title:'The Shop — gear, reference and math',
-    p1:'The Shop is where you stand at a bench with a piece of gear or a spec sheet in front of you. Checking a lens against a room, looking up a projector’s intake procedure, running a delay number, fixing a sign in a graphics editor. The work is physical and technical, and it is real whether or not a show is booked.',
-    p2:'Nothing here writes to a show file. Its state is keyed to gear and to standards: a lens you added, a case ID, a service interval, a palette. That state should survive every job and be openable cold, from a phone, in a warehouse, offline.',
-    keys:['a device','a case','a standard'],
-    shippedHead:'Already show-independent',shippedNote:'Move these out of the show arc',
-    tools:[
-      {id:'av-calculator',kind:'Math',desc:'Delay, throw, storage and power load. Four sub-modules, each citing its constant.',state:'shipped'},
-      {id:'throwline',kind:'Projection',desc:'Throw, fit, brightness and field verification. Already saves lenses and jobs with no show attached.',state:'shipped'},
-      {id:'gear-reference',kind:'Reference',desc:'Offline device field sheets — specs, schematics, procedures, source confidence.',state:'shipped'},
-      {id:'pixelforge',kind:'Studio',desc:'Graphics workspace. Palettes and templates are yours, not the show’s.',state:'shipped'},
-      {id:'ontrack',kind:'Unfiled',desc:'DJ library and set debrief. Not AV at all — parked in the Shop until it gets its own home.',state:'regroup'}
-    ],
-    propHead:'What the Shop unlocks',
-    proposed:[
-      {name:'Gear inventory',key:'Case ID',desc:'Owned kit with case IDs, quantities and photos. Gear Prep pulls from it instead of retyping a pull sheet.'},
-      {name:'Maintenance log',key:'Device',desc:'Service intervals, repairs, lamp hours, dead gear. The reason a specific unit is not in the truck.'},
-      {name:'Intake & QC',key:'Device',desc:'Check-in procedure for new or returned gear, feeding Gear Reference so the field sheet exists before the show does.'},
-      {name:'Shop standards',key:'Standard',desc:'Cable labelling, case numbering, patch conventions. The rules every show tool should default to.'}
-    ],
-    close:'Every item here is keyed to a device, a case or a standard — never to a show. That is the test for whether something belongs in the Shop: if loading a different show would change the answer, it is not Shop work.',
-    asideTitle:'Shop state',
-    asideBody:'What already lives outside a single show file, and what still does not.'
-  },
   office:{
     title:'Front Office — the business around the show',
     p1:'The Front Office is everything around the show rather than inside it. Who the client is, what was quoted, which venues you have been to, which crew you call, what last season’s equivalent show looked like. It is the layer a TD or owner works in between jobs — and today the suite has no room for it at all.',
@@ -1582,12 +1675,13 @@ var CTX_COPY={
       {name:'Show templates',key:'Template',desc:'Save a finished show as a starting point. The next one inherits crew, patch, gear and cues.'},
       {name:'Show archive',key:'Archive',desc:'Past show packages, searchable, importable. Where Show Reports accumulate into something you can read.'}
     ],
-    close:'Every item here is keyed to a client, a venue or a template. The Shop makes the current show faster; the Front Office makes the next one cheaper. Splitting them matters because they have different owners — the Shop is the A2 and the warehouse, the Front Office is the TD and whoever signs the quote.',
+    close:'Every item here is keyed to a client, a venue or a template. The Toolbox makes the current show faster; the Front Office would make the next one cheaper. Splitting them matters because they have different owners — the Toolbox is for operators and the warehouse, while the Front Office would serve the TD and whoever signs the quote.',
     asideTitle:'Front office state',
     asideBody:'What a client- or venue-level layer would hold that a single browser-local show file cannot.'
   }
 };
 function renderShopOffice(){
+  if(viewState.context==='shop'){renderToolbox();return;}
   var copy=CTX_COPY[viewState.context];if(!copy) return;
   var keysHtml=copy.keys.map(function(k){return '<span class="ctx-key-pill">Keyed to '+escapeHtml(k)+'</span>';}).join('');
   var toolsHtml=copy.tools.map(function(t){
@@ -1598,7 +1692,7 @@ function renderShopOffice(){
   var proposedHtml=copy.proposed.map(function(p){return '<div class="ctx-proposed-card bp"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i><strong>'+escapeHtml(p.name)+'</strong><span class="cpc-key">'+escapeHtml(p.key)+'</span><p>'+escapeHtml(p.desc)+'</p></div>';}).join('');
   $('shopOfficeView').innerHTML=
     '<div class="ctx-hero bp"><i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>'
-    +'<div class="eyebrow">The concept</div><h2>'+escapeHtml(copy.title)+'</h2>'
+    +'<div class="roadmap-badge">Roadmap concept · no persistence</div><h2>'+escapeHtml(copy.title)+'</h2>'
     +'<p>'+escapeHtml(copy.p1)+'</p><p>'+escapeHtml(copy.p2)+'</p>'
     +'<div class="ctx-keys">'+keysHtml+'</div></div>'
     +'<div class="fam-view-head"><h2 style="font-size:15px">'+escapeHtml(copy.shippedHead)+'</h2><span class="fam-view-count">'+escapeHtml(copy.shippedNote)+'</span></div>'
@@ -1612,15 +1706,6 @@ function renderShopOffice(){
    RENDER — aside (no-show / help / review queue+gate+recent)
    ============================================================ */
 function realAsideCards(){
-  var throwlineSaved=savedEntriesForTool('throwline').length;
-  var pixelforgeSaved=savedEntriesForTool('pixelforge').length;
-  if(viewState.context==='shop'){
-    return [
-      {title:'Saved locally',accent:true,body:(throwlineSaved||pixelforgeSaved)?('Throwline: '+throwlineSaved+' saved '+(throwlineSaved===1?'entry':'entries')+' · PixelForge: '+pixelforgeSaved+' saved '+(pixelforgeSaved===1?'entry':'entries')+' in this browser. Persist across every show.'):'No Throwline or PixelForge data saved in this browser yet — both persist independently of any show.'},
-      {title:'Not yet anywhere',accent:false,body:'Inventory, maintenance and intake have no store. They are the argument for Shop-level persistence.'},
-      {title:'This show',accent:false,body:(state.showName||'AV by Dave')+' · '+phaseLabel(state.phase)+'. Return to it any time from the Show context.'}
-    ];
-  }
   return [
     {title:'Would be keyed here',accent:true,body:'Clients, venues, and past shows would live here instead of inside one browser’s local storage.'},
     {title:'Cost of the gap',accent:false,body:'A venue surveyed on one show can’t be found again from the next — every return visit starts cold.'},
@@ -1628,10 +1713,17 @@ function realAsideCards(){
   ];
 }
 function renderAsideNoShow(){
+  if(viewState.context==='shop'){
+    var recent=toolboxState.recent.map(toolById).filter(Boolean).slice(0,5);
+    var recentHtml=recent.length?recent.map(function(tool){return '<div class="recent-row"><a href="'+escapeAttr(toolHref(tool))+'" data-tool="'+tool.id+'">'+escapeHtml(tool.name)+'</a><button type="button" data-open="'+tool.id+'">Open</button></div>';}).join(''):'<div class="aside-empty">No recent Toolbox launches yet.</div>';
+    $('asideNoShow').innerHTML='<div class="aside-title">Toolbox state</div><p class="aside-p"><strong>No show attached.</strong> These controls use <code>av-suite-ui.v1</code>, separate from the saved show.</p><div class="aside-card accent"><strong>'+TOOLS.length+' registered tools</strong><span>'+TOOLBOX_FEATURED.length+' marked Use anytime · '+toolboxState.pinned.length+' pinned · '+toolboxState.recent.length+' recent.</span></div><div class="aside-sub">Recent</div>'+recentHtml+'<button type="button" id="backToShowBtn" class="primary" style="width:100%;margin-top:8px">Work a show</button>';
+    $('backToShowBtn').addEventListener('click',function(){navigateEntry('show');});
+    return;
+  }
   var copy=CTX_COPY[viewState.context];if(!copy) return;
   var cards=realAsideCards().map(function(c){return '<div class="aside-card'+(c.accent?' accent':'')+'"><strong>'+escapeHtml(c.title)+'</strong><span>'+escapeHtml(c.body)+'</span></div>';}).join('');
   $('asideNoShow').innerHTML='<div class="aside-title">'+escapeHtml(copy.asideTitle)+'</div><p class="aside-p">'+escapeHtml(copy.asideBody)+'</p>'+cards+'<button type="button" id="backToShowBtn" class="primary" style="width:100%;margin-top:6px">Back to the show</button>';
-  var back=$('backToShowBtn');if(back) back.addEventListener('click',function(){setContext('show');});
+  var back=$('backToShowBtn');if(back) back.addEventListener('click',function(){navigateEntry('show');});
 }
 var HELP_LEGEND=[
   {n:1,title:'Families',body:'Fourteen families replace the flat '+TOOLS.length+'-tool list. Tools with modes nest underneath — expand the chevron.'},
@@ -1683,9 +1775,9 @@ function renderAside(){
    VIEW / CONTEXT ACTIONS
    ============================================================ */
 function defaultFamilyForPhase(){var first=recommendedTools()[0];if(first){var fam=familyForTool(first.id);if(fam) return fam.id;}return FAMILIES.length?FAMILIES[0].id:null;}
-function setContext(c){if(['show','shop','office'].indexOf(c)<0) return;viewState.context=c;renderHeader();renderRail();renderMainForView();renderAside();}
+function setContext(c){if(c==='show'){navigateEntry('show');return;}if(c==='shop'){navigateEntry('toolbox');return;}if(c!=='office') return;viewState.context='office';renderHeader();renderRail();renderMainForView();renderAside();animateWorkspace();}
 function setView(v){viewState.context='show';viewState.view=v==='all'?'all':'family';renderHeader();renderRail();renderMainForView();renderAside();}
-function selectFamily(id){if(!familyExists(id)) return;viewState.context='show';viewState.view='family';viewState.fam=id;renderHeader();renderRail();renderMainForView();renderAside();}
+function selectFamily(id){if(!familyExists(id)) return;if(entryState.mode==='toolbox'){viewState.context='shop';toolboxState.family=id;saveToolboxState();renderHeader();renderRail();renderMainForView();renderAside();return;}viewState.context='show';viewState.view='family';viewState.fam=id;renderHeader();renderRail();renderMainForView();renderAside();}
 function toggleFamOpen(id){viewState.openFams[id]=!viewState.openFams[id];renderFamilyList();}
 function toggleSubsOpen(id){viewState.openSubs[id]=!viewState.openSubs[id];renderFamView();}
 function toggleHelp(){uiState.help=!uiState.help;writeUi({help:uiState.help});renderHeader();renderAside();}
@@ -1693,6 +1785,7 @@ function toggleCitations(on){uiState.showCitations=on;writeUi({showCitations:on}
 
 function renderAll(){
   if(!viewState.fam||!familyExists(viewState.fam)) viewState.fam=defaultFamilyForPhase();
+  $('avApp').setAttribute('data-entry',entryState.mode||'chooser');
   renderHeader();
   renderRail();
   renderMainForView();
@@ -1758,9 +1851,11 @@ function obPrev(){obState.step=Math.max(1,obState.step-1);renderOnboardStep();}
    QUICK SWITCHER — same ranking engine as the previous console,
    extended with commands for the new family/context/theme model.
    ============================================================ */
-function recordCommand(id){if(!commandIdAllowed(id)) return;state.commandRecent=state.commandRecent.filter(function(i){return i!==id;});state.commandRecent.unshift(id);state.commandRecent=state.commandRecent.slice(0,10);saveState();}
+function recordCommand(id){if(!commandIdAllowed(id)) return;if(entryState.mode==='toolbox'){toolboxState.commandRecent=toolboxState.commandRecent.filter(function(i){return i!==id;});toolboxState.commandRecent.unshift(id);toolboxState.commandRecent=toolboxState.commandRecent.slice(0,10);saveToolboxState();return;}state.commandRecent=state.commandRecent.filter(function(i){return i!==id;});state.commandRecent.unshift(id);state.commandRecent=state.commandRecent.slice(0,10);saveState();}
 function commandEntry(id,title,detail,kind,run,search,priority,badge){return {id:id,title:title,detail:detail,kind:kind,run:run,search:[title,detail,kind,search||''].join(' '),priority:priority||100,badge:badge||''};}
+function toolboxCommandPool(){var items=[];items.push(commandEntry('action:showShow','Work a show','Open the Show Console with saved profile and phase context','Action',function(){navigateEntry('show');},'attach show console',10));items.push(commandEntry('action:openDoorway','Choose doorway','Reopen the AV Suite doorway chooser','Action',openEntryChooser,'doorway default entry',12));items.push(commandEntry('action:toolboxAll','Show all tools',TOOLS.length+' registered tools across '+FAMILIES.length+' families','Filter',function(){toolboxState.filter='all';toolboxState.family='all';saveToolboxState();renderAll();},'all registry',14));items.push(commandEntry('action:toolboxFeatured','Show Use anytime',TOOLBOX_FEATURED.length+' registry-featured cold-start tools','Filter',function(){toolboxState.filter='featured';toolboxState.family='all';saveToolboxState();renderAll();},'featured anytime',16));items.push(commandEntry('action:toolboxPinned','Show pinned',toolboxState.pinned.length+' Toolbox pins','Filter',function(){toolboxState.filter='pinned';saveToolboxState();renderAll();},'pins favorites',18));items.push(commandEntry('action:toolboxRecent','Show recent',toolboxState.recent.length+' recent Toolbox launches','Filter',function(){toolboxState.filter='recent';saveToolboxState();renderAll();},'history recents',20));items.push(commandEntry('action:showOffice','Open Front Office roadmap','Conceptual only · no Front Office persistence','Roadmap',function(){setContext('office');},'clients venues templates concept',24,'Concept'));FAMILIES.forEach(function(family,index){items.push(commandEntry('family:'+family.id,'Browse family: '+family.label,family.toolIds.length+' tools · '+family.depts,'Family',function(){selectFamily(family.id);},family.label+' '+family.depts,40+index));});TOOLS.forEach(function(tool){var priority=90;var flags=[];if(tool.toolboxFeatured){priority-=28;flags.push('use anytime');}if(toolboxState.pinned.indexOf(tool.id)>=0){priority-=18;flags.push('pinned');}if(toolboxState.recent.indexOf(tool.id)>=0){priority-=12;flags.push('recent');}items.push(commandEntry('tool:'+tool.id,'Open '+tool.name,tool.dept+' | '+tool.tag+(flags.length?' | '+flags.join(', '):''),'Tool',function(){openTool(tool.id);},[tool.name,tool.dept,tool.tag,tool.desc,(tool.phases||[]).join(' ')].join(' '),priority,tool.toolboxFeatured?'Anytime':''));});return items;}
 function commandPool(){
+  if(entryState.mode==='toolbox') return toolboxCommandPool();
   var items=[];var counts=readinessCounts();var recommended=recommendedTools();var recommendedIds=recommended.map(function(t){return t.id;});var first=recommended[0];
   reviewQueueItems().forEach(function(item,index){items.push(commandEntry('review:'+index,item.label,item.detail,'Review',function(){handleReviewAction(item.action);if(item.tool) openTool(item.tool.id);},item.tool?item.tool.name:'',10+index));});
   if(first) items.push(commandEntry('action:openRecommended','Open recommended tool',first.name+' for '+phaseLabel(state.phase),'Action',function(){openTool(first.id);},first.dept+' '+first.tag,22));
@@ -1785,7 +1880,7 @@ function commandPool(){
   items.push(commandEntry('action:toggleCitations',uiState.showCitations?'Hide source citations':'Show source citations','Recommendation and sub-module cite lines','Action',function(){toggleCitations(!uiState.showCitations);},'citations trust sources',57));
   items.push(commandEntry('action:cycleBrand','Cycle design theme','SBD → Industry → Borland DOS','Action',cycleBrand,'theme brand industry dos sbd',59));
   items.push(commandEntry('action:showShow','Switch to Show context','Back to the current show file','Action',function(){setContext('show');},'show context',60));
-  items.push(commandEntry('action:showShop','Switch to the Shop','Gear, reference and math — no show file','Action',function(){setContext('shop');},'shop context gear',61));
+  items.push(commandEntry('action:showShop','Open AV Toolbox','Every registered tool · no show attached','Action',function(){setContext('shop');},'toolbox registry no show',61));
   items.push(commandEntry('action:showOffice','Switch to Front Office','Clients, venues, templates — no show file','Action',function(){setContext('office');},'office context clients',62));
   items.push(commandEntry('action:viewAll','View: all tools','Every tool grouped by family','View',function(){setView('all');},'all tools grid registry',63));
   PHASES.forEach(function(phase,index){items.push(commandEntry('phase:'+phase.id,'Switch phase: '+phase.label,(RECOMMENDED[phase.id]||[]).length+' recommended tools','Phase',function(){setPhase(phase.id);},phase.id+' '+phase.label,66+index));});
@@ -1805,7 +1900,7 @@ function commandPool(){
 }
 function commandScore(command,query){
   var terms=String(query||'').toLowerCase().split(/\s+/).filter(Boolean);var text=command.search.toLowerCase();var title=command.title.toLowerCase();
-  var recentIndex=state.commandRecent.indexOf(command.id);var score=command.priority+(recentIndex>=0?recentIndex-60:0);
+  var commandRecent=entryState.mode==='toolbox'?toolboxState.commandRecent:state.commandRecent;var recentIndex=commandRecent.indexOf(command.id);var score=command.priority+(recentIndex>=0?recentIndex-60:0);
   if(!terms.length) return score;
   terms.forEach(function(term){var index=text.indexOf(term);if(index<0){score=99999;return;}score+=index;if(title.indexOf(term)===0) score-=25;});
   return score;
@@ -1814,7 +1909,7 @@ function filteredCommands(){var query=commandState.query;return commandPool().ma
 function renderCommandPalette(){
   var input=$('commandInput');var list=$('commandList');var counts=readinessCounts();var items=filteredCommands();commandState.items=items;
   if(commandState.activeIndex>=items.length) commandState.activeIndex=Math.max(0,items.length-1);
-  $('commandStatus').textContent=phaseLabel(state.phase)+' phase | '+counts.issue+' issue | '+reviewQueueItems().length+' next actions';
+  $('commandStatus').textContent=entryState.mode==='toolbox'?('Toolbox | '+TOOLS.length+' tools | No show attached'):(phaseLabel(state.phase)+' phase | '+counts.issue+' issue | '+reviewQueueItems().length+' next actions');
   if(input&&input.value!==commandState.query) input.value=commandState.query;
   if(!items.length){list.innerHTML='<div class="aside-empty">No matching command.</div>';input.removeAttribute('aria-activedescendant');return;}
   list.innerHTML=items.map(function(command,index){
@@ -1880,6 +1975,7 @@ function wireEvents(){
   $('brandCycleBtn').addEventListener('click',cycleBrand);
   $('modeToggleBtn').addEventListener('click',toggleMode);
   $('helpBtn').addEventListener('click',toggleHelp);
+  $('doorwayBtn').addEventListener('click',openEntryChooser);
   $('setupBtn').addEventListener('click',openOnboarding);
   $('settingsBtn').addEventListener('click',openDrawer);
   $('searchBtn').addEventListener('click',openCommandPalette);
@@ -1887,8 +1983,8 @@ function wireEvents(){
   $('mobFamStrip').addEventListener('click',function(e){var b=e.target.closest('[data-fam-select]');if(b) selectFamily(b.getAttribute('data-fam-select'));});
 
   /* rail */
-  $('railRecentBtn').addEventListener('click',function(){state.filters.pin='recent';saveState();setView('all');});
-  $('railAllBtn').addEventListener('click',function(){state.filters.pin='all';saveState();setView('all');});
+  $('railRecentBtn').addEventListener('click',function(){if(entryState.mode==='toolbox'){toolboxState.filter='recent';saveToolboxState();viewState.context='shop';renderAll();return;}state.filters.pin='recent';saveState();setView('all');});
+  $('railAllBtn').addEventListener('click',function(){if(entryState.mode==='toolbox'){toolboxState.filter='all';toolboxState.family='all';saveToolboxState();viewState.context='shop';renderAll();return;}state.filters.pin='all';saveState();setView('all');});
   $('railShopBtn').addEventListener('click',function(){setContext('shop');});
   $('railOfficeBtn').addEventListener('click',function(){setContext('office');});
 
@@ -1909,6 +2005,7 @@ function wireEvents(){
     var famTog=e.target.closest('[data-fam-toggle]');if(famTog){toggleFamOpen(famTog.getAttribute('data-fam-toggle'));return;}
     var subTog=e.target.closest('[data-sub-toggle]');if(subTog){toggleSubsOpen(subTog.getAttribute('data-sub-toggle'));return;}
     var clearBtn=e.target.closest('#clearFiltersBtn');if(clearBtn){clearToolFilters();return;}
+    var toolboxClear=e.target.closest('#toolboxClearBtn');if(toolboxClear){toolboxState.search='';toolboxState.filter='all';toolboxState.family='all';saveToolboxState();renderRail();renderToolbox();return;}
   });
   document.addEventListener('change',function(e){var sel=e.target.closest('[data-readiness]');if(sel){setToolReadiness(sel.getAttribute('data-readiness'),sel.value);return;}var note=e.target.closest('[data-note]');if(note) setToolNote(note.getAttribute('data-note'),note.value,true);});
   document.addEventListener('input',function(e){var note=e.target.closest('[data-note]');if(note) setToolNote(note.getAttribute('data-note'),note.value,false);});
@@ -1976,6 +2073,11 @@ function wireEvents(){
     else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
   });
 
+  /* doorway chooser */
+  $('entryChooser').addEventListener('click',function(e){var choice=e.target.closest('[data-entry-choice]');if(choice) chooseEntry(choice.getAttribute('data-entry-choice'));});
+  $('entryCloseBtn').addEventListener('click',function(){closeEntryChooser(true);});
+  $('entryChooser').addEventListener('keydown',function(e){if(e.key==='Escape'){e.preventDefault();closeEntryChooser(true);return;}if(e.key!=='Tab') return;var focusables=Array.prototype.filter.call($('entryChooser').querySelectorAll('button:not([disabled])'),function(el){return !el.hidden&&el.offsetParent!==null;});if(!focusables.length) return;var first=focusables[0],last=focusables[focusables.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}});
+
   /* global keys */
   document.addEventListener('keydown',function(e){
     var key=String(e.key||'').toLowerCase();
@@ -1983,23 +2085,28 @@ function wireEvents(){
     if(e.key!=='Escape') return;
     if(commandState.open){e.preventDefault();closeCommandPalette();return;}
     if($('settingsDrawer').classList.contains('open')){e.preventDefault();closeDrawer();return;}
-    if(!$('onboardOverlay').hidden){e.preventDefault();closeOnboarding();}
+    if(!$('onboardOverlay').hidden){e.preventDefault();closeOnboarding();return;}
+    if(entryState.chooserOpen){e.preventDefault();closeEntryChooser(true);}
   });
   window.addEventListener('online',refreshOfflineStatus);
   window.addEventListener('offline',refreshOfflineStatus);
+  window.addEventListener('popstate',handleEntryPopstate);
 }
 
 function init(){
   loadState();
-  applyUrlContext();
+  var explicitEntry=explicitEntryFromLocation();
+  if(explicitEntry==='show') applyUrlContext();
+  var initialEntry=resolvedEntryFromLocation();
+  if(!explicitEntry&&!uiState.preferredEntry){var chooserState=Object.assign({},window.history.state||{},{avEntry:'chooser'});window.history.replaceState(chooserState,'',window.location.href);initialEntry='';}
+  else {var resolvedState=Object.assign({},window.history.state||{},{avEntry:initialEntry});window.history.replaceState(resolvedState,'',window.location.href);}
   viewState.fam=defaultFamilyForPhase();
   applyDensity(uiState.density,false);
   applyShellTheme();
   wireEvents();
-  renderAll();
+  if(initialEntry) applyEntryMode(initialEntry,{allowOnboarding:initialEntry==='show'});else {renderAll();openEntryChooser();}
   if(!TOOLS.length) showHint('Tool registry failed to load — refresh this page.','error');
   registerOfflineWorker().then(function(){renderAll();});
-  if(!uiState.onboardingSeen) openOnboarding();
 }
 init();
 

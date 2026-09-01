@@ -108,7 +108,7 @@ function verifyCounts() {
   }
   const contracts = new Map([
     ['index.html', [`>${count}</div>`, `${count} tools · offline`]],
-    ['tools.html', [`bundles ${count} operator tools`, `groups ${count} browser-based AV show tools`]],
+    ['tools.html', [`bundles ${count} operator tools`, `all ${count} registered AV tools`]],
     ['av-suite.html', [`id="railAllCount">${count}</span> tools`, `placeholder="Search all ${count} tools`]],
     ['README.md', [`contains **${count} browser tools**`]]
   ]);
