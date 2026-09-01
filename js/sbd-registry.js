@@ -59,7 +59,7 @@
     {id:'rf-coordination',name:'RF Coordination',href:'rf-coordination.html',dept:'Comms',phases:['advance','prep','show'],tag:'RF',desc:'Wireless mics, IEM, IFB, comms packs, receivers, frequencies, bands, conflicts, and backups.',storageKeys:[{key:'rf-coordination.v1',label:'RF Coordination'}]},
     {id:'comms-check',name:'Comms Check',href:'comms-check.html',dept:'Comms',phases:['prep','show'],tag:'Comms',desc:'Intercom, radio, and IFB assignments with channels, devices, battery, backups, and issue flags.',storageKeys:[{key:'comms-check.v1',label:'Comms Check'}]},
     {id:'camera-shot-list',name:'Camera Shot List',href:'camera-shot-list.html',dept:'Camera',phases:['advance','prep','show'],tag:'Camera',desc:'Camera plan with shot rows, framing, movement, presets, ready and problem status, and take next.',storageKeys:[{key:'camera-shot-list.v1',label:'Camera Shot List'}]},
-    {id:'plotforge',name:'Stage Plot',href:'stage-plot.html',dept:'Planning',phases:['advance','prep','loadin'],tag:'Plot',desc:'Offline-capable room layout planner with draggable stages, screens, cameras, speakers, mics, tables, power, and cable paths.',storageKeys:[{key:'stage-plot.v1',label:'Stage Plot'}]},
+    {id:'stageplotter',name:'StagePlotter',href:'stage-plot.html',dept:'Planning',phases:['advance','prep','loadin'],tag:'Room Plot',desc:'Offline-capable room layout sketcher with illustrated stages, screens, cameras, speakers, mics, furniture, power, people, and cable paths.',storageKeys:[{key:'stage-plot.v1',label:'StagePlotter'}]},
     {id:'gear-prep',name:'Gear Prep',href:'gear-prep.html',dept:'Logistics',phases:['prep'],tag:'Gear',desc:'Pull sheets, case IDs, quantities, departments, owners, test, pack, load, issues, and open items.',storageKeys:[{key:'gear-prep.v1',label:'Gear Prep'}]},
     {id:'gear-reference',name:'Gear Reference',href:'gear-reference.html',dept:'Logistics',phases:['prep','loadin'],tag:'Reference',desc:'Offline per-device field sheets with specifications, schematics, procedures, consumables, intake checks, and source confidence.',storageKeys:[],toolboxFeatured:true},
     {id:'truck-pack',name:'Truck Pack Plan',href:'truck-pack.html',dept:'Logistics',phases:['prep','loadin','strike'],tag:'Truck',desc:'Cases, truck zones, load order, unload order, weights, owners, pack status, and issues.',storageKeys:[{key:'truck-pack.v1',label:'Truck Pack Plan'}]},
@@ -71,7 +71,7 @@
 
   /* Per-phase recommendations shown by the console and the context dock. */
   var RECOMMENDED={
-    advance:['av-workbook','show-advance','site-survey','breakout-room-matrix','crew-call','throwline','plotforge','pixelforge','input-list'],
+    advance:['av-workbook','show-advance','site-survey','breakout-room-matrix','crew-call','throwline','stageplotter','pixelforge','input-list'],
     prep:['av-workbook','gear-prep','gear-reference','truck-pack','cue-sheet','teleprompter','playback-check','pixelforge','audio-patch','video-patch','network-plan'],
     loadin:['av-workbook','load-in-plan','gear-reference','room-check','show-board','power-plan','line-check','display-plan','projection-plan','throwline','speaker-plan','show-task-board'],
     show:['av-workbook','teleprompter','show-timer','cue-sheet','show-board','show-task-board','breakout-room-matrix','pixelforge','record-log','comms-check','camera-shot-list'],
@@ -89,7 +89,7 @@
     {label:'Video',toolIds:['video-patch','display-plan','projection-plan','throwline','stream-plan','record-log','camera-shot-list']},
     {label:'Lighting',toolIds:['lighting-patch']},
     {label:'Power & data',toolIds:['power-plan','network-plan','cable-plan']},
-    {label:'Spaces & staging',toolIds:['show-board','plotforge','room-check','breakout-room-matrix','site-survey']},
+    {label:'Spaces & staging',toolIds:['show-board','stageplotter','room-check','breakout-room-matrix','site-survey']},
     {label:'Logistics',toolIds:['gear-prep','gear-reference','truck-pack','load-in-plan','strike-plan','show-advance']},
     {label:'Crew',toolIds:['crew-call','crew-time-log']},
     {label:'Show docs & client',toolIds:['show-handoff','show-report','show-task-board','change-order','client-signoff']},
@@ -98,12 +98,12 @@
   ];
 
   /* Compatibility routes normalize to their canonical local applications. */
-  var ALIASES={'plotforge.html':'stage-plot.html','av-workbook.html':'av-workbook/','av-workbook/index.html':'av-workbook/'};
+  var ALIASES={'av-workbook.html':'av-workbook/','av-workbook/index.html':'av-workbook/'};
   var ALIAS_FILES=['./plotforge.html'];
 
   /* Persisted suite state used `cueforge` before the browser tool was correctly
      separated from the Electron app. Normalize that legacy id on read only. */
-  var ID_ALIASES={'cueforge':'cue-sheet'};
+  var ID_ALIASES={'cueforge':'cue-sheet','plotforge':'stageplotter'};
 
   /* Shared shell assets every offline session needs. */
   var BASE_ASSETS=[
@@ -168,7 +168,7 @@
      teleprompter, throwline, av-calculator) are informational mode/citation
      chips shown when a tool row is expanded — not separate routes. */
   var CONSOLE_FAMILIES=[
-    {id:'planning',label:'Planning',depts:'Planning',icon:['M9 2h6v4H9z','M9 4H6a1 1 0 0 0-1 1v15a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1h-3','m9 13 2 2 4-4'],toolIds:['show-advance','site-survey','plotforge','breakout-room-matrix']},
+    {id:'planning',label:'Planning',depts:'Planning',icon:['M9 2h6v4H9z','M9 4H6a1 1 0 0 0-1 1v15a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1h-3','m9 13 2 2 4-4'],toolIds:['show-advance','site-survey','stageplotter','breakout-room-matrix']},
     {id:'runofshow',label:'Run of show',depts:'Show Flow',icon:['M8 5.14v14l11-7z'],toolIds:['cue-sheet','teleprompter','show-timer'],subs:{teleprompter:[{label:'Read view',kind:'Mode',source:'Saved looks, this browser'},{label:'Remote',kind:'Mode',source:'Second-screen driver'},{label:'Rundown',kind:'Mode',source:'WPM pace presets'},{label:'Bookmarks',kind:'Mode',source:'Marker set, per script'}]}},
     {id:'audio',label:'Audio',depts:'Audio',icon:['M2 12h1','M6 8v8','M10 4v16','M14 7v10','M18 10v4','M21 12h1'],toolIds:['input-list','audio-patch','line-check','speaker-plan']},
     {id:'video',label:'Video',depts:'Video · Streaming · Playback',icon:['m16 9 5-3v12l-5-3z','M3 6h13v12H3z'],toolIds:['signal-flow','video-patch','display-plan','projection-plan','throwline','stream-plan','record-log','playback-check','camera-shot-list'],subs:{throwline:[{label:'Throw & fit',kind:'Calc',source:'Manufacturer lens spec sheets'},{label:'Brightness',kind:'Calc',source:'ANSI/INFOCOMM 3M-2011 contrast'},{label:'Field verify',kind:'Check',source:'Measured on-site reading'},{label:'Drawings',kind:'Output',source:'ANSI D print validation'}]}},
@@ -210,7 +210,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool change — rolls the service-worker cache. */
-    version:'v20260831-av-toolbox-doorway',
+    version:'v20260901-stageplotter-graphics',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,

@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-09-01
+
+### StagePlotter product boundary and illustrated plot symbols
+
+* Renamed the lightweight System by Dave room-layout tool from the conflicting PlotForge identity to StagePlotter while preserving `/stage-plot.html`, `stage-plot.v1` browser data, and the legacy export schema.
+* Separated the AV registry identities so historical `plotforge` suite state migrates to `stageplotter`, while `/plotforge.html` continues to hand off to the full PlotForge lighting application.
+* Replaced text-filled rectangles with semantic top-down SVG stage, screen, camera, speaker, mic, table, power, cable, and person symbols on a richer drafting grid with centerline, plaster line, stage-side labels, and sightline guides.
+* Added locally bundled GSAP workbench, placement, and selection motion with reduced-motion bypass, plus a direct PlotForge lighting-app action from the StagePlotter header.
+
 ## 2026-08-31
 
 ### Addressable AV Toolbox doorway

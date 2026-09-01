@@ -54,7 +54,7 @@ Scope: the AV Suite hub plus all 44 canonical tool routes in `js/sbd-registry.js
 | RF Coordination | `/rf-coordination.html` | Ops dark | Frequency/unit cards, coordination status, selected-unit inspector | Operator Core |
 | Comms Check | `/comms-check.html` | Ops dark | Selected-assignment card, output summary, check progression | Operator Core |
 | Camera Shot List | `/camera-shot-list.html` | Ops dark | Selected-shot card, output summary, shot progression | Operator Core |
-| Stage Plot | `/stage-plot.html` | Ops dark | Stage canvas, tool palette, inspector, nudge grid, operator summary | Specialist Translation |
+| StagePlotter | `/stage-plot.html` | Ops dark | Illustrated room-layout canvas, tool palette, inspector, nudge grid, operator summary | Specialist Translation |
 | Gear Prep | `/gear-prep.html` | Ops dark | Prep readiness cards, exceptions, selected-item inspector | Operator Core |
 | Gear Reference | `/gear-reference.html` | OS-adaptive green/navy dark and monochrome light | Fixed rail, full-viewport reference stage, confidence state, technical figures | Specialist Translation |
 | Truck Pack Plan | `/truck-pack.html` | Ops dark | Pack/load states, logistics rows, selected-item detail | Operator Core |
