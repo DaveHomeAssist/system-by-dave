@@ -1,27 +1,27 @@
 <!DOCTYPE html>
-<html lang="en" data-av-theme="system" data-av-tool="plotforge">
+<html lang="en" data-av-theme="system" data-av-tool="stageplotter">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'none'">
-<title>PlotForge | System by Dave</title>
+<title>StagePlotter | System by Dave</title>
 <meta name="robots" content="index,follow">
-<meta name="description" content="PlotForge is a browser based AV stage plot tool for room layouts, equipment positions, camera marks, speaker placement, cable runs, notes, print output, and JSON handoff.">
+<meta name="description" content="StagePlotter is a fast browser based AV room layout tool with illustrated stages, screens, cameras, speakers, mics, furniture, power, cable runs, notes, print output, and JSON handoff.">
 <link rel="canonical" href="https://systembydave.com/stage-plot.html">
 <meta name="theme-color" content="#EEE8DF" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0C1016" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="System by Dave">
-<meta property="og:title" content="PlotForge">
-<meta property="og:description" content="PlotForge is a browser based AV stage plot tool for room layouts, equipment positions, camera marks, speaker placement, cable runs, notes, print output, and JSON handoff.">
+<meta property="og:title" content="StagePlotter">
+<meta property="og:description" content="Sketch an AV room layout with illustrated stages, screens, cameras, speakers, mics, furniture, power, people, and cable paths.">
 <meta property="og:url" content="https://systembydave.com/stage-plot.html">
 <meta property="og:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
 <meta property="og:image:width" content="1024">
 <meta property="og:image:height" content="412">
 <meta property="og:image:alt" content="System by Dave preview banner">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="PlotForge">
-<meta name="twitter:description" content="PlotForge is a browser based AV stage plot tool for room layouts, equipment positions, camera marks, speaker placement, cable runs, notes, print output, and JSON handoff.">
+<meta name="twitter:title" content="StagePlotter">
+<meta name="twitter:description" content="Sketch an AV room layout with illustrated stages, screens, cameras, speakers, mics, furniture, power, people, and cable paths.">
 <meta name="twitter:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
 <link rel="icon" href="svg/system_by_dave_logo_rust.svg" type="image/svg+xml">
 <link rel="manifest" href="manifest.json">
@@ -119,6 +119,28 @@
     color:#ffd5d5;
     background:rgba(255,107,107,.1);
   }
+  .button-link{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    min-height:40px;
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:9px 12px;
+    background:var(--panel-2);
+    color:var(--text);
+    font-weight:700;
+    text-decoration:none;
+    transition:transform var(--fast) var(--press),border-color var(--fast) var(--ease),background var(--fast) var(--ease),box-shadow var(--fast) var(--ease);
+  }
+  .button-link:hover{
+    border-color:var(--purple);
+    background:var(--panel-3);
+    transform:translateY(-1px);
+    box-shadow:0 8px 22px rgba(0,0,0,.18);
+  }
+  .button-link:active{transform:translateY(1px) scale(.975)}
   button:focus-visible,
   input:focus-visible,
   select:focus-visible,
@@ -392,10 +414,12 @@
     border-radius:var(--radius);
     overflow:hidden;
     background:
-      linear-gradient(180deg,rgba(255,255,255,.06) 0 1px,transparent 1px 10%),
-      linear-gradient(90deg,rgba(255,255,255,.06) 0 1px,transparent 1px 10%),
-      radial-gradient(circle at 50% 8%,rgba(114,184,255,.16),transparent 22%),
-      #0a0f14;
+      linear-gradient(180deg,rgba(255,255,255,.07) 0 1px,transparent 1px 10%),
+      linear-gradient(90deg,rgba(255,255,255,.07) 0 1px,transparent 1px 10%),
+      linear-gradient(180deg,rgba(255,255,255,.025) 0 1px,transparent 1px 2%),
+      linear-gradient(90deg,rgba(255,255,255,.025) 0 1px,transparent 1px 2%),
+      radial-gradient(circle at 50% 10%,rgba(114,184,255,.12),transparent 24%),
+      #091016;
     box-shadow:inset 0 0 0 1px rgba(0,0,0,.5);
     touch-action:none;
   }
@@ -422,19 +446,69 @@
     font-size:11px;
     letter-spacing:.16em;
   }
+  .plot-markings{
+    position:absolute;
+    inset:0;
+    z-index:1;
+    overflow:hidden;
+    pointer-events:none;
+  }
+  .plot-guides{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    color:rgba(114,184,255,.14);
+  }
+  .plot-guides path{
+    fill:none;
+    stroke:currentColor;
+    stroke-width:.32;
+    stroke-dasharray:1.4 1.4;
+    vector-effect:non-scaling-stroke;
+  }
+  .plot-guides .plot-guide-strong{
+    color:rgba(229,138,92,.3);
+    stroke-width:.72;
+    stroke-dasharray:3 1.5;
+  }
+  .plot-zone,
+  .plot-centerline,
+  .plot-proscenium{
+    position:absolute;
+    color:rgba(255,255,255,.24);
+    font-family:var(--mono);
+    font-size:9px;
+    letter-spacing:.12em;
+  }
+  .plot-zone{top:38%}
+  .plot-zone-left{left:12px}
+  .plot-zone-right{right:12px}
+  .plot-centerline{
+    top:11px;
+    left:50%;
+    transform:translateX(-50%);
+    color:rgba(114,184,255,.46);
+  }
+  .plot-proscenium{
+    top:35.5%;
+    left:50%;
+    transform:translate(-50%,-100%);
+    padding:0 6px;
+    background:#091016;
+    color:rgba(229,138,92,.6);
+  }
   .plot-item{
+    --item-accent:var(--text);
     position:absolute;
     z-index:4;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:4px;
+    display:block;
     min-width:44px;
     min-height:34px;
-    padding:6px;
-    border:1px solid rgba(255,255,255,.32);
-    border-radius:7px;
-    background:rgba(18,23,29,.94);
+    padding:0;
+    border:0;
+    border-radius:8px;
+    background:transparent;
     color:var(--text);
     font-family:var(--mono);
     font-size:11px;
@@ -442,56 +516,122 @@
     text-align:center;
     cursor:grab;
     user-select:none;
-    box-shadow:0 8px 18px rgba(0,0,0,.28);
-    transition:border-color var(--fast) var(--ease),box-shadow var(--fast) var(--ease),background var(--fast) var(--ease),transform var(--fast) var(--press);
+    box-shadow:none;
+    overflow:visible;
   }
   .plot-item:hover{
-    border-color:var(--blue);
-    background:#18212a;
+    background:transparent;
+    box-shadow:none;
   }
   .plot-item:active,
   .plot-item.dragging{
     cursor:grabbing;
-    transform:scale(.985);
-    box-shadow:0 2px 8px rgba(0,0,0,.34);
+    box-shadow:none;
   }
-  .plot-item.selected{
+  .item-graphic{
+    position:absolute;
+    inset:0;
+    display:grid;
+    place-items:center;
+    border:1px solid color-mix(in srgb,var(--item-accent) 58%,transparent);
+    border-radius:8px;
+    background:rgba(18,23,29,.9);
+    color:var(--item-accent);
+    box-shadow:0 8px 18px rgba(0,0,0,.32),inset 0 0 0 1px rgba(255,255,255,.025);
+    transition:border-color var(--fast) var(--ease),background var(--fast) var(--ease),box-shadow var(--fast) var(--ease),filter var(--fast) var(--ease),transform var(--fast) var(--press);
+  }
+  .plot-item:hover .item-graphic{
+    border-color:var(--blue);
+    filter:brightness(1.13);
+    box-shadow:0 10px 24px rgba(0,0,0,.38),0 0 18px rgba(114,184,255,.1);
+  }
+  .plot-item.dragging .item-graphic{transform:scale(.975)}
+  .plot-item.selected .item-graphic{
     border-color:var(--rust-2);
-    box-shadow:0 0 0 3px rgba(229,138,92,.2),0 10px 24px rgba(0,0,0,.3);
+    box-shadow:0 0 0 3px rgba(229,138,92,.22),0 12px 28px rgba(0,0,0,.42);
   }
-  .plot-item .item-icon{
-    display:block;
-    font-weight:900;
-    font-size:15px;
-    line-height:1;
+  .item-symbol{
+    width:calc(100% - 8px);
+    height:calc(100% - 8px);
+    overflow:visible;
+  }
+  .item-symbol path,
+  .item-symbol rect,
+  .item-symbol circle{
+    fill:none;
+    stroke:currentColor;
+    stroke-width:2;
+    stroke-linecap:round;
+    stroke-linejoin:round;
+    vector-effect:non-scaling-stroke;
+  }
+  .item-symbol .symbol-fill{
+    fill:currentColor;
+    fill-opacity:.12;
+  }
+  .item-symbol .symbol-detail{
+    opacity:.48;
+    stroke-dasharray:2 2;
   }
   .plot-item .item-label{
+    position:absolute;
+    left:50%;
+    top:calc(100% + 4px);
+    z-index:2;
     display:block;
-    max-width:100%;
+    width:max-content;
+    max-width:160px;
+    min-height:17px;
+    padding:3px 5px;
+    border:1px solid rgba(255,255,255,.14);
+    border-radius:4px;
+    background:rgba(6,11,15,.9);
+    color:var(--text);
     overflow:hidden;
     text-overflow:ellipsis;
     white-space:nowrap;
+    pointer-events:none;
+    transform:translateX(-50%);
+    box-shadow:0 3px 10px rgba(0,0,0,.3);
   }
-  .type-stage{background:rgba(192,98,58,.26)}
-  .type-screen{background:rgba(114,184,255,.22)}
-  .type-camera{background:rgba(185,150,255,.22)}
-  .type-speaker{background:rgba(107,224,146,.18)}
-  .type-mic{background:rgba(255,209,102,.18)}
-  .type-table{background:rgba(255,255,255,.1)}
-  .type-power{background:rgba(255,107,107,.18)}
-  .type-cable{background:rgba(169,180,193,.16)}
-  .type-person{border-radius:999px;background:rgba(114,184,255,.14)}
+  .type-stage{--item-accent:var(--rust-2)}
+  .type-screen{--item-accent:var(--blue)}
+  .type-camera{--item-accent:var(--purple)}
+  .type-speaker{--item-accent:var(--green)}
+  .type-mic{--item-accent:var(--amber)}
+  .type-table{--item-accent:#dfe6ef}
+  .type-power{--item-accent:var(--red)}
+  .type-cable{--item-accent:#a9b4c1}
+  .type-person{--item-accent:var(--blue)}
+  .type-person .item-graphic{border-radius:50%;background:rgba(114,184,255,.08)}
+  .type-stage .item-graphic{background:linear-gradient(180deg,rgba(192,98,58,.22),rgba(18,23,29,.94))}
+  .type-screen .item-graphic{background:linear-gradient(180deg,rgba(114,184,255,.18),rgba(18,23,29,.94))}
+  .type-speaker .item-graphic{background:linear-gradient(180deg,rgba(107,224,146,.13),rgba(18,23,29,.94))}
+  .type-camera .item-graphic{background:linear-gradient(180deg,rgba(185,150,255,.16),rgba(18,23,29,.94))}
   .cable-line{
     height:24px !important;
     min-height:24px;
     border-radius:999px;
     padding:0;
-    background:
-      linear-gradient(180deg,transparent 0 9px,rgba(169,180,193,.72) 9px 15px,transparent 15px 100%),
-      rgba(169,180,193,.08);
+    background:transparent;
   }
-  .cable-line .item-label,
-  .cable-line .item-icon{display:none}
+  .cable-line .item-graphic{
+    border:0;
+    background:transparent;
+    box-shadow:none;
+  }
+  .item-symbol-cable{width:100%;height:100%}
+  .item-symbol-cable .cable-sleeve{
+    fill:none;
+    stroke:rgba(6,11,15,.9);
+    stroke-width:8;
+  }
+  .item-symbol-cable .cable-core{
+    fill:none;
+    stroke:currentColor;
+    stroke-width:3;
+    stroke-dasharray:5 3;
+  }
   .inspector{
     padding:16px;
     position:sticky;
@@ -631,6 +771,7 @@
     }
     .top-actions button,
     .hero-tools button,
+    .hero-tools .button-link,
     .tool-grid button,
     .toolbar button{
       flex:1 1 auto;
@@ -639,6 +780,17 @@
     .inspector-grid,
     .stack-actions{
       grid-template-columns:1fr;
+    }
+  }
+  @media (prefers-reduced-motion:reduce){
+    .button-link,
+    .plot-item,
+    .item-graphic{
+      transition:none !important;
+    }
+    .feedback-success,
+    .feedback-error{
+      animation:none !important;
     }
   }
   @media print{
@@ -685,10 +837,28 @@
     }
     .plot-item{
       color:#000;
-      background:#fff !important;
-      border:1px solid #000;
+      background:transparent !important;
+      border:0;
       box-shadow:none;
     }
+    .item-graphic{
+      color:#000;
+      border:1px solid #000;
+      background:#fff !important;
+      box-shadow:none !important;
+      filter:none !important;
+    }
+    .plot-item .item-label{
+      border-color:#555;
+      background:#fff;
+      color:#000;
+      box-shadow:none;
+    }
+    .plot-guides{color:#aaa}
+    .plot-guides .plot-guide-strong{color:#555}
+    .plot-zone,
+    .plot-centerline,
+    .plot-proscenium{color:#555;background:#fff}
   }
 </style>
 <link rel="stylesheet" href="css/sbd-public-nav.css">
@@ -702,7 +872,7 @@
       <span class="brand-mark">S</span>
       <span class="brand-text">
         <strong>System by Dave</strong>
-        <span>AV Tools / PlotForge</span>
+        <span>AV Tools / StagePlotter</span>
       </span>
     </a>
     <div class="top-actions">
@@ -717,13 +887,14 @@
     <section class="hero" aria-labelledby="pageTitle">
       <div class="hero-main">
         <div>
-          <p class="eyebrow">PlotForge room layout and handoff</p>
-          <h1 id="pageTitle">PlotForge</h1>
-          <p class="hero-copy">Build the stage plot with screens, cameras, speakers, mics, tables, power, cable paths, and people before the load in gets messy.</p>
+          <p class="eyebrow">Fast room sketching and handoff</p>
+          <h1 id="pageTitle">StagePlotter</h1>
+          <p class="hero-copy">Block the room with readable stage, screen, camera, PA, mic, furniture, power, cable, and crew symbols before load in. Need fixture paperwork and lighting data? Use the full PlotForge app.</p>
         </div>
         <div class="hero-tools">
           <button id="sampleBtn" class="primary" type="button">Load Sample</button>
           <button id="centerBtn" type="button">Center Selected</button>
+          <a class="button-link" href="plotforge.html">Open PlotForge <span aria-hidden="true">↗</span></a>
           <button id="resetBtn" class="danger" type="button">Reset</button>
         </div>
       </div>
@@ -797,7 +968,18 @@
           </div>
         </div>
         <div class="plot-wrap">
-          <div id="plotSurface" class="plot-surface" role="application" aria-label="Stage plot surface" tabindex="0"></div>
+          <div id="plotSurface" class="plot-surface" role="application" aria-label="StagePlotter room layout surface" tabindex="0">
+            <div class="plot-markings" aria-hidden="true">
+              <svg class="plot-guides" viewBox="0 0 160 90" preserveAspectRatio="none">
+                <path d="M80 89 18 30M80 89 142 30M80 89V2" />
+                <path class="plot-guide-strong" d="M8 34H152" />
+              </svg>
+              <span class="plot-zone plot-zone-left">STAGE LEFT</span>
+              <span class="plot-zone plot-zone-right">STAGE RIGHT</span>
+              <span class="plot-centerline">CL</span>
+              <span class="plot-proscenium">PLASTER LINE</span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -875,11 +1057,13 @@
 
 <input id="jsonInput" class="file-input" type="file" accept="application/json,.json">
 
+<script src="js/vendor/gsap.min.js"></script>
 <script>
 (function(){
   "use strict";
 
   var STORE = "stage-plot.v1";
+  /* Kept as the legacy public schema so existing exports and integrations stay compatible. */
   var EXPORT_SCHEMA = "system-by-dave.plotforge.v1";
   var GRID = 2;
   var MAX_ITEMS = 80;
@@ -892,17 +1076,30 @@
   var selectedId = "";
   var saveTimer = null;
   var drag = null;
+  var motionContext = null;
   var metaFields = ["showName","venueName","showDate","designerName"];
   var typeConfig = {
-    stage:{label:"Stage", icon:"ST", w:52, h:18},
-    screen:{label:"Screen", icon:"SC", w:28, h:8},
-    camera:{label:"Camera", icon:"CAM", w:9, h:8},
-    speaker:{label:"Speaker", icon:"SPK", w:9, h:11},
-    mic:{label:"Mic", icon:"MIC", w:7, h:7},
-    table:{label:"Table", icon:"TBL", w:16, h:9},
-    power:{label:"Power", icon:"PWR", w:8, h:8},
-    cable:{label:"Cable", icon:"CBL", w:24, h:3},
-    person:{label:"Person", icon:"P", w:7, h:7}
+    stage:{label:"Stage", w:52, h:18},
+    screen:{label:"Screen", w:28, h:8},
+    camera:{label:"Camera", w:9, h:8},
+    speaker:{label:"Speaker", w:9, h:11},
+    mic:{label:"Mic", w:7, h:7},
+    table:{label:"Table", w:16, h:9},
+    power:{label:"Power", w:8, h:8},
+    cable:{label:"Cable", w:24, h:3},
+    person:{label:"Person", w:7, h:7}
+  };
+
+  var itemGraphics = {
+    stage:"<svg class='item-symbol' viewBox='0 0 96 48' focusable='false'><rect class='symbol-fill' x='3' y='5' width='90' height='35' rx='2'/><path d='M3 31h90M20 31v9m18-9v9m20-9v9m18-9v9M48 5v26'/><path class='symbol-detail' d='M7 10h82M7 36h82'/></svg>",
+    screen:"<svg class='item-symbol' viewBox='0 0 96 48' focusable='false'><rect class='symbol-fill' x='10' y='5' width='76' height='29' rx='2'/><path d='M10 5h76v29H10zM15 10h66v19H15zM24 34l-7 10m55-10 7 10M48 34v10'/><path class='symbol-detail' d='M18 12l60 15'/></svg>",
+    camera:"<svg class='item-symbol' viewBox='0 0 64 64' focusable='false'><path class='symbol-fill' d='M13 15h30a5 5 0 0 1 5 5v17a5 5 0 0 1-5 5H13a5 5 0 0 1-5-5V20a5 5 0 0 1 5-5Z'/><path d='M48 23 59 17v23L48 34M28 42v8m0 0L15 60m13-10 13 10'/><circle cx='28' cy='28' r='8'/><circle class='symbol-detail' cx='28' cy='28' r='3'/></svg>",
+    speaker:"<svg class='item-symbol' viewBox='0 0 64 80' focusable='false'><rect class='symbol-fill' x='12' y='5' width='40' height='64' rx='5'/><circle cx='32' cy='24' r='9'/><circle cx='32' cy='49' r='13'/><circle class='symbol-detail' cx='32' cy='49' r='5'/><path d='M19 69l-5 7m31-7 5 7'/></svg>",
+    mic:"<svg class='item-symbol' viewBox='0 0 64 64' focusable='false'><rect class='symbol-fill' x='24' y='5' width='16' height='29' rx='8'/><path d='M18 27a14 14 0 0 0 28 0M32 41v14m-12 0h24'/><path class='symbol-detail' d='M27 12h10m-10 6h10m-10 6h10'/></svg>",
+    table:"<svg class='item-symbol' viewBox='0 0 96 56' focusable='false'><rect class='symbol-fill' x='15' y='13' width='66' height='30' rx='3'/><path d='M15 13h66v30H15zM23 6h12v7M43 6h12v7M63 6h12v7M23 43v7h12m8-7v7h12m8-7v7h12'/><path class='symbol-detail' d='M48 13v30'/></svg>",
+    power:"<svg class='item-symbol' viewBox='0 0 64 64' focusable='false'><rect class='symbol-fill' x='10' y='7' width='44' height='50' rx='8'/><circle cx='24' cy='24' r='4'/><circle cx='40' cy='24' r='4'/><path d='M32 20v9M29 42h6'/><path class='symbol-detail' d='m36 31-10 12h7l-4 9 10-13h-7z'/></svg>",
+    cable:"<svg class='item-symbol item-symbol-cable' viewBox='0 0 120 32' preserveAspectRatio='none' focusable='false'><path class='symbol-fill cable-sleeve' d='M5 22C28 2 46 30 67 13s35-2 48-5'/><path class='cable-core' d='M5 22C28 2 46 30 67 13s35-2 48-5'/><path d='M3 18v8m114-22v8M1 18h7m105-6h7'/></svg>",
+    person:"<svg class='item-symbol' viewBox='0 0 64 64' focusable='false'><circle class='symbol-fill' cx='32' cy='19' r='11'/><circle cx='32' cy='19' r='11'/><path class='symbol-fill' d='M12 57c2-16 10-24 20-24s18 8 20 24Z'/><path d='M12 57c2-16 10-24 20-24s18 8 20 24M22 39l10 8 10-8'/></svg>"
   };
 
   var sampleItems = [
@@ -914,6 +1111,7 @@
     {type:"table",label:"Panel table",x:35,y:36,w:30,h:10,rotation:0,notes:"4 chairs"},
     {type:"camera",label:"Cam 1",x:45,y:76,w:10,h:8,rotation:0,notes:"Center lockoff"},
     {type:"camera",label:"Cam 2",x:14,y:60,w:10,h:8,rotation:12,notes:"House left"},
+    {type:"person",label:"Presenter",x:71,y:47,w:7,h:7,rotation:0,notes:"Walk-on mark"},
     {type:"power",label:"Power",x:86,y:42,w:8,h:8,rotation:0,notes:"20A quad"},
     {type:"cable",label:"Cable path",x:54,y:47,w:34,h:3,rotation:18,notes:"Tape down"}
   ];
@@ -1082,6 +1280,62 @@
     return "plot-item type-" + item.type + (item.id === selectedId ? " selected" : "") + (item.type === "cable" ? " cable-line" : "");
   }
 
+  function itemMarkup(item){
+    return '<span class="item-graphic" aria-hidden="true">' + itemGraphics[item.type] + '</span><span class="item-label">' + esc(item.label) + '</span>';
+  }
+
+  function motionAllowed(){
+    return !!window.gsap && !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  }
+
+  function animatePlacedItem(id){
+    var item = surface.querySelector('[data-id="' + id + '"] .item-graphic');
+    if(!item || !motionAllowed()) return;
+    window.gsap.killTweensOf(item);
+    window.gsap.fromTo(item,
+      {scale:.72, opacity:0},
+      {scale:1, opacity:1, duration:.46, ease:"back.out(1.55)", clearProps:"transform,opacity"}
+    );
+  }
+
+  function animateSelection(id){
+    var symbol = surface.querySelector('[data-id="' + id + '"] .item-symbol');
+    if(!symbol || !motionAllowed()) return;
+    window.gsap.killTweensOf(symbol);
+    window.gsap.fromTo(symbol,
+      {scale:.88, opacity:.58},
+      {scale:1, opacity:1, duration:.28, ease:"power2.out", clearProps:"transform,opacity"}
+    );
+  }
+
+  function runIntroMotion(){
+    var regions;
+    var symbols;
+    var motionTargets;
+    if(!window.gsap){
+      document.documentElement.dataset.stageplotterMotion = "static";
+      return;
+    }
+    document.documentElement.dataset.stageplotterMotion = "gsap";
+    regions = document.querySelectorAll(".hero-main,.status-panel,.meta-panel,.plot-card,.inspector");
+    symbols = surface.querySelectorAll(".item-symbol");
+    motionTargets = Array.prototype.slice.call(regions).concat(Array.prototype.slice.call(symbols));
+    motionContext = window.gsap.matchMedia();
+    motionContext.add("(prefers-reduced-motion: no-preference)", function(){
+      var timeline = window.gsap.timeline({defaults:{ease:"power3.out"}});
+      window.gsap.set(regions, {opacity:0, y:14});
+      timeline.to(regions, {opacity:1, y:0, duration:.52, stagger:.055, clearProps:"transform,opacity"})
+        .from(symbols, {opacity:0, scale:.84, duration:.34, stagger:{amount:.28, from:"center"}, clearProps:"transform,opacity"}, "-=.28");
+      return function(){
+        timeline.kill();
+        window.gsap.set(motionTargets, {clearProps:"transform,opacity,visibility"});
+      };
+    });
+    motionContext.add("(prefers-reduced-motion: reduce)", function(){
+      window.gsap.set(motionTargets, {clearProps:"transform,opacity,visibility"});
+    });
+  }
+
   function updateItemElement(item){
     var el = surface.querySelector('[data-id="' + item.id + '"]');
     if(!el) return;
@@ -1092,11 +1346,11 @@
     el.style.height = item.h + "%";
     el.style.transform = "rotate(" + item.rotation + "deg)";
     el.setAttribute("aria-label", typeConfig[item.type].label + " " + item.label);
-    el.innerHTML = '<span class="item-icon">' + esc(typeConfig[item.type].icon) + '</span><span class="item-label">' + esc(item.label) + '</span>';
+    el.innerHTML = itemMarkup(item);
   }
 
   function renderItems(){
-    surface.innerHTML = "";
+    surface.querySelectorAll(".plot-item").forEach(function(node){ node.remove(); });
     items.forEach(function(item){
       var el = document.createElement("button");
       el.type = "button";
@@ -1108,7 +1362,7 @@
       el.style.height = item.h + "%";
       el.style.transform = "rotate(" + item.rotation + "deg)";
       el.setAttribute("aria-label", typeConfig[item.type].label + " " + item.label);
-      el.innerHTML = '<span class="item-icon">' + esc(typeConfig[item.type].icon) + '</span><span class="item-label">' + esc(item.label) + '</span>';
+      el.innerHTML = itemMarkup(item);
       surface.appendChild(el);
     });
     updateInspector();
@@ -1167,7 +1421,7 @@
   function updateSummary(){
     var meta = getMeta();
     var lines = [];
-    lines.push("STAGE PLOT");
+    lines.push("STAGEPLOTTER");
     lines.push("Show: " + (meta.showName || "Untitled"));
     lines.push("Venue: " + (meta.venueName || "Not set"));
     lines.push("Date: " + (meta.showDate || "Not set"));
@@ -1190,8 +1444,10 @@
 
   function selectItem(id){
     selectedId = id || "";
-    var item = items.filter(function(i){ return i.id === selectedId; })[0];
-    if(item) updateItemElement(item);
+    surface.querySelectorAll(".plot-item").forEach(function(node){
+      node.classList.toggle("selected", node.dataset.id === selectedId);
+    });
+    animateSelection(selectedId);
     updateInspector();
     updateMetrics();
     updateSummary();
@@ -1221,6 +1477,7 @@
     selectedId = item.id;
     $("itemLabel").value = "";
     renderItems();
+    animatePlacedItem(item.id);
     saveNow();
     showMessage("Item added.", "success");
     flash($("addItemBtn"), "feedback-success");
@@ -1239,6 +1496,7 @@
     items.splice(index + 1, 0, copy);
     selectedId = copy.id;
     renderItems();
+    animatePlacedItem(copy.id);
     saveNow();
     showMessage("Item duplicated.", "success");
     flash($("duplicateBtn"), "feedback-success");
@@ -1334,24 +1592,24 @@
   }
 
   function loadSample(){
-    if(items.length && !window.confirm("Replace the current PlotForge plot with the sample?")) return;
+    if(items.length && !window.confirm("Replace the current StagePlotter layout with the sample?")) return;
     applyMeta(defaultMeta());
     items = sampleItems.map(normalizeItem);
     selectedId = items[0] ? items[0].id : "";
     renderItems();
     saveNow();
-    showMessage("Sample PlotForge plot loaded.", "success");
+    showMessage("Sample StagePlotter layout loaded.", "success");
     flash($("sampleBtn"), "feedback-success");
   }
 
   function resetPlot(){
-    if(!window.confirm("Clear the current PlotForge plot?")) return;
+    if(!window.confirm("Clear the current StagePlotter layout?")) return;
     applyMeta(defaultMeta());
     items = [];
     selectedId = "";
     renderItems();
     saveNow();
-    showMessage("PlotForge plot cleared.", "success");
+    showMessage("StagePlotter layout cleared.", "success");
     flash($("resetBtn"), "feedback-success");
   }
 
@@ -1365,8 +1623,8 @@
   }
 
   function fileStem(){
-    var stem = (getMeta().showName || "plotforge").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-    return stem || "plotforge";
+    var stem = (getMeta().showName || "stageplotter").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    return stem || "stageplotter";
   }
 
   function downloadText(filename, type, text, button){
@@ -1394,13 +1652,13 @@
   }
 
   function exportJson(){
-    downloadText(fileStem() + ".plotforge.json", "application/json;charset=utf-8", JSON.stringify(exportPayload(), null, 2), $("exportJsonBtn"));
+    downloadText(fileStem() + ".stageplotter.json", "application/json;charset=utf-8", JSON.stringify(exportPayload(), null, 2), $("exportJsonBtn"));
     showMessage("JSON exported.", "success");
   }
 
   function importPayload(payload){
     if(!payload || typeof payload !== "object" || !Array.isArray(payload.items)){
-      throw new Error("Invalid PlotForge plot");
+      throw new Error("Invalid StagePlotter layout");
     }
     applyMeta(payload.meta || {});
     items = payload.items.map(normalizeItem).slice(0, MAX_ITEMS);
@@ -1414,7 +1672,7 @@
     reader.onload = function(){
       try{
         importPayload(JSON.parse(String(reader.result || "")));
-        showMessage("PlotForge plot imported.", "success");
+        showMessage("StagePlotter layout imported.", "success");
         flash($("importJsonBtn"), "feedback-success");
       }catch(e){
         showMessage("Could not import that JSON file.", "error");
@@ -1597,6 +1855,10 @@
   loadState();
   bindEvents();
   renderItems();
+  runIntroMotion();
+  window.addEventListener("pagehide", function(){
+    if(motionContext) motionContext.revert();
+  }, {once:true});
   if(!storage.available()){
     showMessage("Browser storage is unavailable. Export JSON to keep a copy.", "error");
   }

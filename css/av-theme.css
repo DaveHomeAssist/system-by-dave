@@ -467,10 +467,10 @@ html[data-av-tool="ontrack"] :where(.plate, .rail, .screen, .drawer, .tblwrap, .
   color: var(--av-text);
 }
 
-/* PlotForge keeps its black drafting surface, while its surrounding planning
+/* StagePlotter keeps its black drafting surface, while its surrounding planning
    shell uses the shared surfaces. This prevents its former hard-coded dark
    cards from carrying dark text in Warm Paper mode. */
-html[data-av-tool="plotforge"] :where(
+html[data-av-tool="stageplotter"] :where(
   .hero-main, .status-panel, .meta-panel, .plot-card, .inspector,
   .operator-panel
 ) {
@@ -479,7 +479,7 @@ html[data-av-tool="plotforge"] :where(
   color: var(--av-text);
 }
 
-html[data-av-tool="plotforge"] :where(.metric, .selected-card) {
+html[data-av-tool="stageplotter"] :where(.metric, .selected-card) {
   border-color: var(--av-line);
   background: var(--av-surface-2);
   color: var(--av-text);

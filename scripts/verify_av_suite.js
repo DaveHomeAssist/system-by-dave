@@ -240,6 +240,31 @@ function assertPageContracts(registry) {
     fail('CueForge product-boundary route does not explain the product distinction.');
   }
 
+  const stagePlotter = registry.toolById && registry.toolById('stageplotter');
+  if (!stagePlotter || stagePlotter.name !== 'StagePlotter' || stagePlotter.href !== 'stage-plot.html') {
+    fail('StagePlotter is not registered at its canonical stage-plot.html route.');
+  }
+  if ((registry.aliases || {})['plotforge.html']) {
+    fail('PlotForge route still normalizes to StagePlotter.');
+  }
+  const stagePlotterPage = read('stage-plot.html');
+  if (!/data-av-tool="stageplotter"/.test(stagePlotterPage) || !/<h1 id="pageTitle">StagePlotter<\/h1>/.test(stagePlotterPage)) {
+    fail('StagePlotter page identity is incomplete.');
+  }
+  ['stage', 'screen', 'camera', 'speaker', 'mic', 'table', 'power', 'cable', 'person'].forEach((type) => {
+    if (!new RegExp(`\\b${type}:"<svg class='item-symbol`).test(stagePlotterPage)) fail(`StagePlotter is missing the ${type} SVG symbol.`);
+  });
+  if (!/src="js\/vendor\/gsap\.min\.js"/.test(stagePlotterPage) || !/gsap\.matchMedia\(\)/.test(stagePlotterPage) || !/prefers-reduced-motion: reduce/.test(stagePlotterPage)) {
+    fail('StagePlotter motion is missing local GSAP or its reduced-motion bypass.');
+  }
+  if (!/var STORE = "stage-plot\.v1"/.test(stagePlotterPage) || !/var EXPORT_SCHEMA = "system-by-dave\.plotforge\.v1"/.test(stagePlotterPage)) {
+    fail('StagePlotter does not preserve its existing storage and export contracts.');
+  }
+  const plotForgeBoundary = read('plotforge.html');
+  if (!/<link rel="canonical" href="https:\/\/plotforge-beta\.vercel\.app\/">/.test(plotForgeBoundary) || !/window\.location\.replace\(target\.href\)/.test(plotForgeBoundary)) {
+    fail('PlotForge handoff no longer points to the full deployed application.');
+  }
+
   const sitemap = read('sitemap.xml');
   ['av-workbook.html', 'plotforge.html'].forEach((alias) => {
     if (sitemap.includes(alias)) fail(`Sitemap includes compatibility alias ${alias}.`);

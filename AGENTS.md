@@ -49,6 +49,13 @@ to make stale documentation true.
   alias, registry id, schema, probe name, or description for Cue Sheet.
 - `cueforge.html` is a noindex product-boundary notice. It must never redirect
   or canonicalize to `cue-sheet.html`.
+- **StagePlotter** is the lightweight System by Dave room-layout tool at
+  `stage-plot.html`. Its registry id is `stageplotter`; preserve the
+  `stage-plot.v1` storage key and the legacy `system-by-dave.plotforge.v1`
+  export schema unless a separately tested migration is commissioned.
+- **PlotForge** is the separate full lighting-plot application in the
+  `DaveHomeAssist/plotforge` repository. `plotforge.html` is its noindex handoff
+  and must not normalize or redirect back to StagePlotter.
 
 ## Source-of-truth map
 

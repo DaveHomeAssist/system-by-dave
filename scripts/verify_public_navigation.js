@@ -219,8 +219,10 @@ function verifyAvWorkbookRegistry() {
   if (!cueSheet || cueSheet.name !== 'Cue Sheet' || cueSheet.href !== 'cue-sheet.html') fail('Cue Sheet is not registered at canonical cue-sheet.html.');
   const legacyCueForgeId = registry.toolById && registry.toolById('cueforge');
   if (!legacyCueForgeId || legacyCueForgeId.id !== 'cue-sheet') fail('Legacy cueforge suite state does not normalize to Cue Sheet.');
-  const plot = registry.toolById && registry.toolById('plotforge');
-  if (!plot || plot.href !== 'stage-plot.html') fail('Stage Plot does not point to canonical stage-plot.html.');
+  const plot = registry.toolById && registry.toolById('stageplotter');
+  if (!plot || plot.name !== 'StagePlotter' || plot.href !== 'stage-plot.html') fail('StagePlotter does not point to canonical stage-plot.html.');
+  const legacyPlotForgeId = registry.toolById && registry.toolById('plotforge');
+  if (!legacyPlotForgeId || legacyPlotForgeId.id !== 'stageplotter') fail('Legacy plotforge suite state does not normalize to StagePlotter.');
   notes.push(`registry=${registry.version}`);
   notes.push(`avTools=${registry.tools.length}`);
 }

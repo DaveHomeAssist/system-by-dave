@@ -101,8 +101,11 @@ Throwline's catalog is synchronized and verified through its dedicated scripts.
 - **CueForge** is a separate private Electron application in
   `DaveHomeAssist/cueforge`. `cueforge.html` is a noindex boundary notice and
   must not redirect or canonicalize to Cue Sheet.
-- `stage-plot.html` is the PlotForge implementation; `plotforge.html` is its
-  context-preserving route alias.
+- **StagePlotter** is the lightweight room-layout tool at `stage-plot.html`,
+  with registry id `stageplotter` and preserved storage key `stage-plot.v1`.
+- **PlotForge** is the separate full lighting-plot application in
+  `DaveHomeAssist/plotforge`; `plotforge.html` is its noindex handoff to the
+  deployed app and must not alias StagePlotter.
 - Throwline and PixelForge keep specialist product tokens and chrome while
   satisfying the shared public-shell contract.
 - `html/sbd-brand.html` is an internal, noindex design reference rather than a

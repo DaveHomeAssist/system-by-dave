@@ -27,7 +27,7 @@
   var STORAGE_KEY = 'av-suite-dashboard.v1';
   var DOCK_COMPACT_KEY = 'av-suite-dock-compact.v1';
   var DEFAULT_FAVORITES = ['teleprompter', 'show-timer', 'cue-sheet'];
-  var TOOL_ID_ALIASES = {cueforge:'cue-sheet'};
+  var TOOL_ID_ALIASES = {cueforge:'cue-sheet',plotforge:'stageplotter'};
   var READINESS_LABELS = {pending:'Pending', ready:'Ready', issue:'Issue', skipped:'Skipped'};
   var READINESS_BUTTON_LABELS = {pending:'Pending', ready:'Ready', issue:'Issue', skipped:'Skip'};
   var READINESS_VALUES = ['pending', 'ready', 'issue', 'skipped'];
@@ -38,7 +38,7 @@
       {name:'Site Survey',href:'site-survey.html'},
       {name:'Breakout Room Matrix',href:'breakout-room-matrix.html'},
       {name:'Crew Call',href:'crew-call.html'},
-      {name:'PlotForge',href:'plotforge.html'},
+      {name:'StagePlotter',href:'stage-plot.html'},
       {name:'Input List',href:'input-list.html'}
     ],
     prep:[
@@ -87,7 +87,7 @@
       {name:'Crew Time Log',href:'crew-time-log.html'}
     ]
   };
-  var ROUTE_ALIASES={'stage-plot.html':'plotforge.html'};
+  var ROUTE_ALIASES={'av-workbook.html':'av-workbook/','av-workbook/index.html':'av-workbook/'};
 
   /* Prefer js/sbd-registry.js (single source of truth) when a page loads it
      before this script; the literals above remain as a fallback so the dock
