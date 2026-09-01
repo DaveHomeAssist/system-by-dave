@@ -39,6 +39,8 @@ use the tooling selected for that surface.
 | `agents.html` | Agents catalog |
 | `skills.html` | Skills catalog |
 | `widgets.html` | Widget gallery |
+| `av-suite.html?entry=show` | Show Console for show-attached AV operations |
+| `av-suite.html?entry=toolbox` | Show-independent AV Toolbox directory |
 | `depotops/index.html` | Local-first project shopping, inventory, and tool tracking |
 | `pixelforge/` | PixelForge editor |
 | `resume/index.html` | Public resume |

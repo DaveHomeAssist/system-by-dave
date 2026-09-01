@@ -78,6 +78,12 @@ function assertSourceChecks(registry) {
   if (registeredStorageKeys.includes('PixelForge.ai.v1')) {
     fail('PixelForge AI credentials must not be registered for saved-data scans or show-package export.');
   }
+
+  const toolboxFeatured = registry.tools.filter((tool) => tool.toolboxFeatured === true).map((tool) => tool.id).sort();
+  const expectedFeatured = ['av-calculator', 'gear-reference', 'pixelforge', 'throwline'];
+  if (JSON.stringify(toolboxFeatured) !== JSON.stringify(expectedFeatured)) {
+    fail(`Toolbox Use anytime registry set is wrong: ${toolboxFeatured.join(', ')}.`);
+  }
 }
 
 function assertPageContracts(registry) {
@@ -124,6 +130,39 @@ function assertPageContracts(registry) {
   }
   if (!avSuite.includes("<h3>'+d+'</h3>")) {
     fail('AV Suite tool groups do not preserve the page heading hierarchy.');
+  }
+  if (!/href="https:\/\/systembydave\.com\/av-suite\.html"/.test(avSuite) || /rel="canonical"[^>]+\?entry=/.test(avSuite)) {
+    fail('AV Suite canonical must remain the query-free /av-suite.html URL.');
+  }
+  if (!/id="entryChooser"[\s\S]*data-entry-choice="show"[\s\S]*data-entry-choice="toolbox"/.test(avSuite) || !/id="doorwayBtn"/.test(avSuite)) {
+    fail('AV Suite is missing the keyboard-addressable two-door chooser or its reopen control.');
+  }
+  if (!/SHOW_CONTEXT_PARAMS=\['sbdShow','sbdVenue','sbdDate','sbdOperator','sbdPhase'\]/.test(avSuite) || !/if\(hasShowContext\(params\)\) return 'show'/.test(avSuite)) {
+    fail('Explicit sbd* context does not source-authoritatively force Show Console.');
+  }
+  if (!/function toolHref\(tool\)[\s\S]*entryState\.mode==='toolbox'[\s\S]*url\.searchParams\.delete\(name\)/.test(avSuite)) {
+    fail('Toolbox toolHref does not strip every show-context parameter.');
+  }
+  ['toolboxPinned', 'toolboxRecent', 'toolboxSearch', 'toolboxFilter', 'toolboxFamily', 'preferredEntry'].forEach((field) => {
+    if (!avSuite.includes(field)) fail(`AV Suite UI preferences are missing ${field}.`);
+  });
+  if (!/TOOLBOX_FEATURED=TOOLS\.filter\(function\(tool\)\{return tool\.toolboxFeatured===true;\}\)/.test(avSuite)) {
+    fail('AV Toolbox Use anytime inventory is not derived from registry.toolboxFeatured.');
+  }
+  if (!/src="js\/vendor\/gsap\.min\.js"/.test(avSuite) || !/gsap\.killTweensOf\(regions\)/.test(avSuite) || !/prefers-reduced-motion: reduce/.test(avSuite)) {
+    fail('AV Suite doorway motion is missing local GSAP, tween cleanup, or reduced-motion bypass.');
+  }
+
+  const manifest = JSON.parse(read('manifest.json'));
+  const shortcutUrls = (manifest.shortcuts || []).map((shortcut) => shortcut.url);
+  ['./av-suite.html?entry=show', './av-suite.html?entry=toolbox'].forEach((url) => {
+    if (!shortcutUrls.includes(url)) fail(`PWA manifest is missing shortcut ${url}.`);
+  });
+  if (!index.includes('href="av-suite.html?entry=toolbox"') || !index.includes('Browse AV tools')) {
+    fail('Homepage is missing the addressable AV Toolbox doorway.');
+  }
+  if (!tools.includes("url: 'av-suite.html?entry=toolbox'") || !tools.includes('AV Toolbox')) {
+    fail('Tools directory is missing the addressable AV Toolbox entry.');
   }
 
   const calculator = read('av-calculator.html');
