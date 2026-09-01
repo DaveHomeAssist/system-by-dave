@@ -4,6 +4,7 @@
 
 ### StagePlotter product boundary and illustrated plot symbols
 
+* Corrected Stage Left and Stage Right to the performer-facing-audience perspective used by stage crews.
 * Renamed the lightweight System by Dave room-layout tool from the conflicting PlotForge identity to StagePlotter while preserving `/stage-plot.html`, `stage-plot.v1` browser data, and the legacy export schema.
 * Separated the AV registry identities so historical `plotforge` suite state migrates to `stageplotter`, while `/plotforge.html` continues to hand off to the full PlotForge lighting application.
 * Replaced text-filled rectangles with semantic top-down SVG stage, screen, camera, speaker, mic, table, power, cable, and person symbols on a richer drafting grid with centerline, plaster line, stage-side labels, and sightline guides.

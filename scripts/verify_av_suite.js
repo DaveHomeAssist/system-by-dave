@@ -251,6 +251,9 @@ function assertPageContracts(registry) {
   if (!/data-av-tool="stageplotter"/.test(stagePlotterPage) || !/<h1 id="pageTitle">StagePlotter<\/h1>/.test(stagePlotterPage)) {
     fail('StagePlotter page identity is incomplete.');
   }
+  if (!/\.plot-zone-left\{right:12px\}/.test(stagePlotterPage) || !/\.plot-zone-right\{left:12px\}/.test(stagePlotterPage)) {
+    fail('StagePlotter stage-left and stage-right labels are not positioned from the performer perspective.');
+  }
   ['stage', 'screen', 'camera', 'speaker', 'mic', 'table', 'power', 'cable', 'person'].forEach((type) => {
     if (!new RegExp(`\\b${type}:"<svg class='item-symbol`).test(stagePlotterPage)) fail(`StagePlotter is missing the ${type} SVG symbol.`);
   });
