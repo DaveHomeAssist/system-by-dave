@@ -1802,6 +1802,31 @@
       :root {
         --rail-h: 64px;
         --panel-scrollbar: color-mix(in srgb, var(--hazard) 58%, var(--line));
+        --console-raised: #fffdf8;
+        --console-mid: #f1ece3;
+        --console-sunken: #e6dfd4;
+        --console-highlight: rgba(255, 255, 255, .82);
+        --console-shadow: rgba(55, 45, 30, .14);
+        --console-shadow-deep: rgba(55, 45, 30, .22);
+        --signal: #216f9d;
+        --signal-lo: rgba(33, 111, 157, .10);
+        --signal-mid: rgba(33, 111, 157, .24);
+        --beam-wash: rgba(138, 100, 0, .12);
+        --control-radius: 7px;
+        --panel-radius: 11px;
+      }
+
+      html[data-theme="dark"] {
+        --console-raised: #20242b;
+        --console-mid: #191c22;
+        --console-sunken: #111318;
+        --console-highlight: rgba(255, 255, 255, .055);
+        --console-shadow: rgba(0, 0, 0, .34);
+        --console-shadow-deep: rgba(0, 0, 0, .52);
+        --signal: #6bb8eb;
+        --signal-lo: rgba(107, 184, 235, .09);
+        --signal-mid: rgba(107, 184, 235, .22);
+        --beam-wash: rgba(242, 192, 18, .13);
       }
 
       html,
@@ -1816,7 +1841,9 @@
       body {
         padding-bottom: 0;
         background:
-          radial-gradient(circle at 68% -20%, var(--hazard-lo), transparent 35%),
+          radial-gradient(circle at 67% -18%, var(--beam-wash), transparent 34%),
+          radial-gradient(circle at 4% 96%, var(--signal-lo), transparent 28%),
+          linear-gradient(135deg, color-mix(in srgb, var(--deck) 96%, var(--case)), var(--deck) 62%),
           var(--deck);
       }
 
@@ -1827,7 +1854,13 @@
         padding: 8px 14px 8px 18px;
         flex-wrap: nowrap;
         gap: 12px;
-        box-shadow: 0 10px 28px var(--shadow);
+        border-bottom-color: color-mix(in srgb, var(--line) 78%, var(--hazard));
+        background:
+          linear-gradient(90deg, var(--hazard) 0 3px, transparent 3px),
+          linear-gradient(180deg, var(--console-raised), var(--console-mid));
+        box-shadow:
+          inset 0 1px var(--console-highlight),
+          0 12px 30px var(--console-shadow-deep);
       }
 
       .brand-lockup {
@@ -1840,6 +1873,21 @@
         display: flex;
         align-items: center;
         gap: 9px;
+      }
+
+      .brand-lockup .mark {
+        line-height: 1;
+        text-shadow: 0 1px 0 var(--console-highlight);
+      }
+
+      .brand-lockup .mark b {
+        text-shadow: 0 0 16px var(--hazard-mid);
+      }
+
+      .brand-lockup .version {
+        border-color: color-mix(in srgb, var(--line) 84%, var(--signal));
+        background: color-mix(in srgb, var(--console-sunken) 72%, transparent);
+        box-shadow: inset 0 1px var(--console-highlight);
       }
 
       .brand-lockup .tagline {
@@ -1862,6 +1910,43 @@
       .rail-nav .theme-toggle {
         min-height: 38px;
         padding: 7px 9px;
+        border-color: color-mix(in srgb, var(--line) 88%, var(--signal));
+        background: linear-gradient(180deg, var(--console-raised), var(--console-mid));
+        box-shadow:
+          inset 0 1px var(--console-highlight),
+          0 2px 7px var(--console-shadow);
+        transition: border-color 140ms ease, color 140ms ease, box-shadow 140ms ease, transform 140ms ease;
+      }
+
+      .rail-nav .stage3d-link:hover,
+      .rail-nav .theme-toggle:hover {
+        box-shadow:
+          inset 0 1px var(--console-highlight),
+          0 4px 12px var(--console-shadow),
+          0 0 0 1px var(--hazard-lo);
+        transform: translateY(-1px);
+      }
+
+      .rail-nav .stage3d-link:active,
+      .rail-nav .theme-toggle:active {
+        transform: translateY(1px);
+        box-shadow: inset 0 2px 5px var(--console-shadow);
+      }
+
+      .rail-nav .stage3d-link::before {
+        background: var(--signal);
+        box-shadow: 0 0 0 3px var(--signal-lo), 0 0 10px var(--signal-mid);
+      }
+
+      .rail-nav .unit-switch {
+        border-color: color-mix(in srgb, var(--line) 88%, var(--signal));
+        background: var(--console-sunken);
+        box-shadow: inset 0 2px 5px var(--console-shadow);
+      }
+
+      .rail-nav .unit-switch button[aria-pressed="true"] {
+        background: linear-gradient(180deg, var(--case-hi), var(--console-mid));
+        box-shadow: inset 0 1px var(--console-highlight), 0 1px 4px var(--console-shadow);
       }
 
       main {
@@ -1896,16 +1981,21 @@
       .input-col {
         display: grid;
         grid-template-rows: auto auto minmax(0, 1fr);
-        background: color-mix(in srgb, var(--deck) 94%, var(--case));
+        background:
+          linear-gradient(145deg, var(--signal-lo), transparent 20%),
+          color-mix(in srgb, var(--deck) 94%, var(--case));
+        box-shadow: inset -12px 0 30px color-mix(in srgb, var(--console-shadow) 55%, transparent);
       }
 
       .workspace-tabs,
       .result-tabs {
         display: grid;
         grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 1px;
-        padding: 1px;
-        background: var(--line);
+        gap: 3px;
+        padding: 5px;
+        border-bottom: 1px solid var(--line);
+        background: var(--console-sunken);
+        box-shadow: inset 0 -4px 10px var(--console-shadow);
       }
 
       .workspace-tabs button,
@@ -1913,10 +2003,11 @@
         position: relative;
         appearance: none;
         min-width: 0;
-        min-height: 39px;
+        min-height: 37px;
         padding: 7px 8px 7px 27px;
-        border: 0;
-        background: var(--case);
+        border: 1px solid transparent;
+        border-radius: 4px;
+        background: color-mix(in srgb, var(--console-raised) 80%, transparent);
         color: var(--dim);
         font-family: var(--mono);
         font-size: 9.5px;
@@ -1925,6 +2016,8 @@
         text-align: left;
         text-transform: uppercase;
         cursor: pointer;
+        box-shadow: inset 0 1px var(--console-highlight);
+        transition: background 140ms ease, border-color 140ms ease, color 140ms ease, transform 140ms ease, box-shadow 140ms ease;
       }
 
       .workspace-tabs button>span,
@@ -1939,17 +2032,25 @@
 
       .workspace-tabs button:hover,
       .result-tabs button:hover {
-        background: var(--case-hi);
+        border-color: color-mix(in srgb, var(--line) 70%, var(--signal));
+        background: var(--console-raised);
         color: var(--chalk);
+        transform: translateY(-1px);
       }
 
       .workspace-tabs button[aria-selected="true"],
       .result-tabs button[aria-selected="true"] {
         background:
           linear-gradient(90deg, var(--hazard) 0 3px, transparent 3px),
-          var(--hazard-lo);
+          linear-gradient(135deg, var(--beam-wash), transparent 62%),
+          var(--console-raised);
+        border-color: color-mix(in srgb, var(--hazard) 58%, var(--line));
         color: var(--chalk);
-        box-shadow: inset 0 -1px var(--hazard);
+        box-shadow:
+          inset 0 1px var(--console-highlight),
+          inset 0 -2px var(--hazard),
+          0 3px 9px var(--console-shadow);
+        transform: none;
       }
 
       .workspace-tabs button[aria-selected="true"]>span,
@@ -1963,8 +2064,10 @@
         justify-content: space-between;
         min-height: 27px;
         padding: 5px 12px;
-        border-bottom: 1px solid var(--line);
-        background: var(--rail-bottom);
+        border-bottom: 1px solid color-mix(in srgb, var(--line) 82%, var(--signal));
+        background:
+          linear-gradient(90deg, var(--signal-lo), transparent 40%),
+          var(--console-mid);
         color: var(--dimmer);
         font-family: var(--mono);
         font-size: 8.5px;
@@ -1983,6 +2086,7 @@
         scrollbar-color: var(--panel-scrollbar) transparent;
         scrollbar-width: thin;
         padding: 18px 18px 26px;
+        background: linear-gradient(180deg, color-mix(in srgb, var(--console-raised) 42%, transparent), transparent 28%);
       }
 
       [data-setup-panel][hidden],
@@ -1992,7 +2096,56 @@
 
       [data-setup-panel] legend {
         margin-bottom: 16px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid var(--line-lo);
         color: var(--chalk);
+      }
+
+      [data-setup-panel] legend .idx {
+        display: inline-grid;
+        place-items: center;
+        min-width: 25px;
+        height: 20px;
+        margin-right: 9px;
+        border: 1px solid color-mix(in srgb, var(--hazard) 62%, var(--line));
+        border-radius: 999px;
+        background: var(--hazard-lo);
+        box-shadow: 0 0 12px var(--hazard-lo);
+      }
+
+      [data-setup-panel] input[type="text"],
+      [data-setup-panel] input[type="number"],
+      [data-setup-panel] select {
+        border-color: color-mix(in srgb, var(--line) 88%, var(--signal));
+        border-radius: var(--control-radius);
+        background-color: color-mix(in srgb, var(--console-raised) 88%, var(--deck));
+        box-shadow: inset 0 1px 2px var(--console-shadow);
+        transition: border-color 140ms ease, background-color 140ms ease, box-shadow 140ms ease;
+      }
+
+      [data-setup-panel] input[type="text"]:hover,
+      [data-setup-panel] input[type="number"]:hover,
+      [data-setup-panel] select:hover {
+        border-color: color-mix(in srgb, var(--line) 52%, var(--signal));
+        background-color: var(--console-raised);
+      }
+
+      [data-setup-panel] input:focus-visible,
+      [data-setup-panel] select:focus-visible {
+        border-color: var(--hazard);
+        box-shadow: inset 0 1px 2px var(--console-shadow), 0 0 0 3px var(--hazard-lo);
+      }
+
+      [data-setup-panel] .chip {
+        border-radius: var(--control-radius);
+        background: color-mix(in srgb, var(--console-raised) 76%, transparent);
+        box-shadow: inset 0 1px var(--console-highlight);
+        transition: border-color 140ms ease, color 140ms ease, background 140ms ease, transform 140ms ease;
+      }
+
+      [data-setup-panel] .chip:hover {
+        background: var(--console-raised);
+        transform: translateY(-1px);
       }
 
       .readout-col {
@@ -2011,7 +2164,34 @@
         min-height: 145px;
         padding: 14px 18px 12px;
         overflow: hidden;
-        border-bottom-color: var(--line);
+        border-bottom-color: color-mix(in srgb, var(--line) 72%, var(--hazard));
+        background:
+          radial-gradient(circle at 78% 42%, var(--signal-lo), transparent 20%),
+          radial-gradient(circle at 79% 42%, transparent 0 34px, var(--signal-mid) 35px, transparent 37px),
+          linear-gradient(105deg, var(--beam-wash), transparent 42%),
+          repeating-linear-gradient(-45deg, transparent 0 13px, var(--readout-stripe) 13px 26px),
+          linear-gradient(180deg, var(--console-raised), var(--console-mid));
+        box-shadow: inset 0 1px var(--console-highlight), inset 0 -12px 26px var(--console-shadow);
+      }
+
+      .readout::before {
+        content: "";
+        position: absolute;
+        z-index: 0;
+        top: -44px;
+        right: 14%;
+        width: 180px;
+        height: 180px;
+        border: 1px solid var(--signal-mid);
+        border-radius: 50%;
+        box-shadow: inset 0 0 0 9px var(--signal-lo), 0 0 34px var(--signal-lo);
+        opacity: .48;
+        pointer-events: none;
+      }
+
+      .readout>* {
+        position: relative;
+        z-index: 1;
       }
 
       .readout::after {
@@ -2029,6 +2209,17 @@
       .rd-big {
         margin: 5px 0 3px;
         font-size: clamp(38px, 5.1vw, 58px);
+        text-shadow: 0 0 22px var(--hazard-lo), 0 1px 0 var(--console-highlight);
+      }
+
+      .rd-label::before {
+        content: "";
+        display: inline-block;
+        width: 18px;
+        height: 2px;
+        margin: 0 8px 3px 0;
+        background: var(--signal);
+        box-shadow: 0 0 9px var(--signal-mid);
       }
 
       .rd-note {
@@ -2045,6 +2236,29 @@
 
       .zoom-track {
         height: 23px;
+        border-color: color-mix(in srgb, var(--line) 72%, var(--signal));
+        border-radius: 999px;
+        background: linear-gradient(180deg, var(--console-sunken), color-mix(in srgb, var(--console-mid) 72%, var(--deck)));
+        box-shadow: inset 0 2px 5px var(--console-shadow), 0 1px var(--console-highlight);
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        border-radius: 999px;
+        background: color-mix(in srgb, currentColor 7%, var(--console-raised));
+        box-shadow: inset 0 1px var(--console-highlight), 0 2px 6px var(--console-shadow);
+      }
+
+      .badge::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        flex: 0 0 auto;
+        border-radius: 50%;
+        background: currentColor;
+        box-shadow: 0 0 8px currentColor;
       }
 
       .plan-wrap {
@@ -2056,18 +2270,50 @@
         min-height: 0;
         padding: 14px 16px 12px;
         overflow: hidden;
-        border-right: 1px solid var(--line);
+        border-right: 1px solid color-mix(in srgb, var(--line) 80%, var(--signal));
         border-bottom: 0;
         background:
           linear-gradient(var(--draw-grid) 1px, transparent 1px),
           linear-gradient(90deg, var(--draw-grid) 1px, transparent 1px),
+          radial-gradient(circle at 55% 54%, var(--signal-lo), transparent 38%),
           var(--deck);
-        background-size: 26px 26px;
+        background-size: 26px 26px, 26px 26px, auto, auto;
+        background-repeat: repeat, repeat, no-repeat, no-repeat;
+        box-shadow: inset -10px 0 26px var(--console-shadow);
       }
 
       .plan-head {
         flex: 0 0 auto;
         margin-bottom: 8px;
+      }
+
+      .plan-head h2 {
+        display: inline-flex;
+        align-items: center;
+        color: var(--chalk);
+      }
+
+      .plan-head h2::before {
+        content: "";
+        width: 7px;
+        height: 7px;
+        margin-right: 8px;
+        border: 1px solid var(--signal);
+        border-radius: 50%;
+        background: var(--signal-lo);
+        box-shadow: 0 0 9px var(--signal-mid);
+      }
+
+      .plan-head .drawing-switch {
+        border-color: color-mix(in srgb, var(--line) 80%, var(--signal));
+        border-radius: var(--control-radius);
+        background: var(--console-sunken);
+        box-shadow: inset 0 2px 5px var(--console-shadow);
+      }
+
+      .plan-head .drawing-switch button[aria-pressed="true"] {
+        background: linear-gradient(180deg, var(--console-raised), var(--console-mid));
+        box-shadow: inset 0 1px var(--console-highlight);
       }
 
       .camera-controls {
@@ -2081,7 +2327,12 @@
         height: 100%;
         min-height: 0;
         max-height: none;
+        border-color: color-mix(in srgb, var(--line) 80%, var(--signal));
+        border-radius: var(--panel-radius);
         background: color-mix(in srgb, var(--deck) 94%, transparent);
+        box-shadow:
+          inset 0 1px var(--console-highlight),
+          0 10px 28px var(--console-shadow-deep);
       }
 
       .drawing-help {
@@ -2100,7 +2351,9 @@
         min-width: 0;
         min-height: 0;
         overflow: hidden;
-        background: var(--case);
+        border-left: 1px solid color-mix(in srgb, var(--line) 82%, var(--signal));
+        background: var(--console-mid);
+        box-shadow: inset 10px 0 24px var(--console-shadow);
       }
 
       .result-tabs button {
@@ -2113,7 +2366,7 @@
         min-width: 0;
         min-height: 0;
         overflow: hidden;
-        background: var(--case);
+        background: var(--console-mid);
       }
 
       [data-result-panel] {
@@ -2125,7 +2378,9 @@
         overscroll-behavior: contain;
         scrollbar-color: var(--panel-scrollbar) transparent;
         scrollbar-width: thin;
-        background: var(--case);
+        background:
+          linear-gradient(145deg, var(--signal-lo), transparent 22%),
+          linear-gradient(180deg, color-mix(in srgb, var(--console-raised) 82%, var(--case)), var(--case));
       }
 
       [data-result-panel] h2 {
@@ -2139,27 +2394,39 @@
       [data-result-panel] h2::before {
         content: "";
         width: 18px;
-        height: 1px;
+        height: 2px;
         margin-right: 8px;
-        background: var(--hazard);
-        box-shadow: 0 0 8px var(--hazard-mid);
+        background: linear-gradient(90deg, var(--signal), var(--hazard));
+        box-shadow: 0 0 8px var(--signal-mid);
       }
 
       .result-inspector .actions {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 1px;
-        padding: 1px;
+        gap: 4px;
+        padding: 5px;
         border-top: 1px solid var(--line);
-        background: var(--line);
+        background: var(--console-sunken);
+        box-shadow: inset 0 4px 10px var(--console-shadow);
       }
 
       .result-inspector .actions button {
         min-height: 39px;
         padding: 7px 8px;
-        border: 0;
-        border-radius: 0;
+        border: 1px solid color-mix(in srgb, var(--line) 84%, var(--signal));
+        border-radius: 5px;
         font-size: 9.5px;
+        box-shadow: inset 0 1px var(--console-highlight);
+        transition: border-color 140ms ease, color 140ms ease, transform 140ms ease, box-shadow 140ms ease;
+      }
+
+      .result-inspector .actions button:hover {
+        transform: translateY(-1px);
+        box-shadow: inset 0 1px var(--console-highlight), 0 3px 8px var(--console-shadow);
+      }
+
+      .result-inspector .actions button:active {
+        transform: translateY(1px);
       }
 
       .result-inspector .actions .primary {
@@ -3310,10 +3577,10 @@
 
     function animatePanel(panel, axis = "x") {
       if (!gsapMotionEnabled || !window.gsap || !panel) return;
-      const from = axis === "y" ? { autoAlpha: 0, y: 12 } : { autoAlpha: 0, x: 12 };
+      const from = axis === "y" ? { autoAlpha: 0, y: 9, scale: .995 } : { autoAlpha: 0, x: 9, scale: .995 };
       const to = axis === "y" ? { autoAlpha: 1, y: 0 } : { autoAlpha: 1, x: 0 };
       window.gsap.killTweensOf(panel);
-      window.gsap.fromTo(panel, from, { ...to, duration: .26, ease: "power3.out", clearProps: "opacity,visibility,transform" });
+      window.gsap.fromTo(panel, from, { ...to, scale: 1, duration: .22, ease: "power2.out", clearProps: "opacity,visibility,transform" });
     }
 
     function setSetupPanel(next, { focus = false, animate = true } = {}) {
@@ -3396,12 +3663,13 @@
       shellMotion = window.gsap.matchMedia();
       shellMotion.add("(prefers-reduced-motion: no-preference)", () => {
         gsapMotionEnabled = true;
-        const intro = window.gsap.timeline({ defaults: { ease: "power3.out" } });
-        intro.fromTo(".brand-lockup", { autoAlpha: 0, x: -14 }, { autoAlpha: 1, x: 0, duration: .36 })
-          .fromTo(".rail-nav", { autoAlpha: 0, x: 14 }, { autoAlpha: 1, x: 0, duration: .36 }, "<")
-          .fromTo(".workspace-tabs button", { autoAlpha: 0, y: -8 }, { autoAlpha: 1, y: 0, duration: .24, stagger: .025 }, "-=.12")
-          .fromTo(".readout", { autoAlpha: 0, y: -10 }, { autoAlpha: 1, y: 0, duration: .34 }, "-=.18")
-          .fromTo(".plan-wrap,.result-inspector", { autoAlpha: 0, y: 12 }, { autoAlpha: 1, y: 0, duration: .4, stagger: .07 }, "-=.2");
+        const intro = window.gsap.timeline({ defaults: { ease: "power2.out" } });
+        intro.fromTo(".brand-lockup", { autoAlpha: 0, x: -12 }, { autoAlpha: 1, x: 0, duration: .28 })
+          .fromTo(".rail-nav", { autoAlpha: 0, x: 12 }, { autoAlpha: 1, x: 0, duration: .28 }, "<")
+          .fromTo(".workspace-tabs button", { autoAlpha: 0, y: -7 }, { autoAlpha: 1, y: 0, duration: .18, stagger: .018 }, "-=.1")
+          .fromTo(".readout", { autoAlpha: 0, y: -8 }, { autoAlpha: 1, y: 0, duration: .28 }, "-=.12")
+          .fromTo(".rd-big", { autoAlpha: 0, scale: .96, transformOrigin: "left center" }, { autoAlpha: 1, scale: 1, duration: .24 }, "-=.16")
+          .fromTo(".plan-wrap,.result-inspector", { autoAlpha: 0, y: 10 }, { autoAlpha: 1, y: 0, duration: .32, stagger: .055 }, "-=.16");
         return () => {
           gsapMotionEnabled = false;
           intro.kill();
@@ -3409,7 +3677,7 @@
       });
       shellMotion.add("(prefers-reduced-motion: reduce)", () => {
         gsapMotionEnabled = false;
-        window.gsap.set(".brand-lockup,.rail-nav,.workspace-tabs button,.readout,.plan-wrap,.result-inspector", { clearProps: "all" });
+        window.gsap.set(".brand-lockup,.rail-nav,.workspace-tabs button,.readout,.rd-big,.plan-wrap,.result-inspector", { clearProps: "all" });
       });
       window.addEventListener("pagehide", () => shellMotion?.revert(), { once: true });
     }
