@@ -7,6 +7,7 @@
 * Refined Throwline’s light and dark workspaces into a layered optical-bench console with raised instrument surfaces, recessed controls, tactile stage tabs, illuminated status badges, and a clearer blue-and-gold signal hierarchy.
 * Strengthened the live throw readout, zoom scale, plan drawing, diagnostics rack, form controls, and action deck while preserving the viewport-locked Setup, Live, and Inspect workflow at desktop, 680-pixel, and narrow-phone layouts.
 * Tightened the existing local GSAP choreography into shorter snap transitions and added live-number emphasis while retaining the reduced-motion bypass and transform-and-opacity-only motion contract.
+* Refreshed the audited browser-compatibility toolchain lockfile to clear the high-severity Browserslist advisory that blocked the Pages release gate.
 
 ## 2026-09-01
 
