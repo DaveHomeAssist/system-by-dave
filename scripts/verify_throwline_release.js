@@ -368,6 +368,10 @@ if (!avRegistry?.offlineAssets?.().includes('./js/vendor/gsap.min.js')) fail('Th
 if (/unpkg\.com|three(?:\.module)?\.js/i.test(main)) fail('Throwline main app must not depend on Three.js or unpkg.');
 requireMatch(main, /const APP_VERSION = 4;/, 'Throwline must retain state schema 4.');
 requireMatch(main, /html,\s*body\s*\{[\s\S]*?overflow:\s*hidden;/, 'Throwline must keep the document viewport locked without page scrolling.');
+requireMatch(main, /--console-raised:\s*#fffdf8;[\s\S]*?--signal:\s*#216f9d;/, 'Throwline must retain the light optical-console surface and signal tokens.');
+requireMatch(main, /html\[data-theme=["']dark["']\]\s*\{[\s\S]*?--console-raised:\s*#20242b;[\s\S]*?--signal:\s*#6bb8eb;/, 'Throwline must retain the dark optical-console surface and signal tokens.');
+requireMatch(main, /\.readout::before\s*\{[\s\S]*?border-radius:\s*50%;/, 'Throwline must retain the live readout lens treatment.');
+requireMatch(main, /\.badge::before\s*\{[\s\S]*?box-shadow:\s*0 0 8px currentColor;/, 'Throwline must retain illuminated status indicators.');
 requireMatch(main, /class=["']workspace-tabs["'][^>]*role=["']tablist["']/, 'Throwline must expose setup stages as an accessible tablist.');
 requireMatch(main, /class=["']result-tabs["'][^>]*role=["']tablist["']/, 'Throwline must expose diagnostics as an accessible tablist.');
 requireMatch(main, /function\s+setSetupPanel\s*\(/, 'Throwline must retain setup-panel navigation.');
