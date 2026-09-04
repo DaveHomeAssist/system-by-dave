@@ -393,7 +393,7 @@ requireMatch(main, /window\.gsap\.matchMedia\s*\(/, 'Throwline motion must use G
   if (!main.includes(state)) fail(`Throwline main app is missing the ${state} calculation state.`);
 });
 requireMatch(main, /calculationState:\s*["']legacy_unverified["']/, 'Legacy built-in lenses must be explicitly calculation-blocked.');
-requireMatch(main, /CALCULATION BLOCKED/, 'Throwline must visibly identify calculation-blocked catalog selections.');
+requireMatch(main, /CAN[’']T CALCULATE YET/, 'Throwline must visibly identify calculation-blocked catalog selections in plain language.');
 requireMatch(main, /function\s+solveGear\s*\([^)]+\)[\s\S]*?eligibleProfile\s*\(/, 'The gear solver must use the centralized automatic-calculation eligibility policy.');
 requireMatch(main, /catalogProjectorId:\s*c\.catalogSelection\.projector/, 'Saved Throwline jobs must preserve the exact catalog projector selection.');
 requireMatch(main, /catalogLensId:\s*c\.catalogSelection\.lens/, 'Saved Throwline jobs must preserve the exact catalog lens selection.');

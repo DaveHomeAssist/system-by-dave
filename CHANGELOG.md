@@ -2,6 +2,11 @@
 
 ## 2026-09-04
 
+### Throwline planner plain-language readouts
+
+* Rewrote the Throwline planner’s on-screen wording in plain language to match Stage 3D: verdicts read `too close`, `too far back`, `good distance`, or `check on site`; paused states read `CAN’T CALCULATE YET` with a reason anyone can act on; the checklist groups are `Fix before you hang it`, `Check before you commit`, and `Good to know`; lens-shift, room, field-check, lens-finder, and how-it-works text describe distances, walls, and pictures instead of envelopes, rasters, and profiles.
+* Internal state codes, saved-job and share-link formats, and the Stage 3D handoff are unchanged; the release verifier now looks for the plain-language paused phrase.
+
 ### Throwline Stage 3D plain-language readouts
 
 * Rewrote every operator-facing verdict, note, warning, alert, button, and announcement in Stage 3D in plain language: headlines now read `Needs a fix`, `Worth a look`, or `Ready — everything checks out`; placement reads `Too close`, `Too far back`, `Good distance`, or `Fits the ratio you entered`; blocked states read `Can’t calculate yet` with a reason anyone can act on; room and obstruction alerts describe walls, ceilings, and the light path.
