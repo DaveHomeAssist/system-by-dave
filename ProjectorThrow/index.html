@@ -4649,6 +4649,7 @@
       put("mode", shared?.projector.provenance.mode || c.calculationMode); put("w", cleanNum(shared?.screen.width ?? c.w / 12, 4)); put("bottom", cleanNum(shared?.screen.bottom ?? c.screenBottom / 12, 4)); put("ar", cleanNum(shared?.screen.aspect ?? c.w / c.h, 6)); put("basisW", cleanNum(shared?.projector.optical.basisWidth ?? c.img?.w / 12, 4)); put("rasterAr", cleanNum(shared?.projector.optical.rasterAspect ?? c.img?.w / c.img?.h, 6)); put("lh", cleanNum(shared?.projector.position.lensHeight ?? c.lensHeight / 12, 4)); put("dist", cleanNum(shared?.projector.position.distance ?? c.shown / 12, 4));
       put("projector", c.catalogSelection.projector?.projector_id || ""); put("lens", c.catalogSelection.lens?.lens_id || ""); put("profile", c.catalogSelection.profile?.optical_profile_id || "");
       if (c.shiftProfile) { put("su", cleanNum(c.shiftProfile.up, 2)); put("sd", cleanNum(c.shiftProfile.down, 2)); }
+      put("tolPct", cleanNum(c.tol * 100, 2));
       if (c.calculationMode === "manual") { put("min", cleanNum(c.trA, 5)); put("max", cleanNum(c.trB, 5)); }
       if (c.calculationMode === "field_verified") { put("ratio", cleanNum(c.trA, 5)); put("stamp", c.fieldVerification.verifiedAt); put("md", cleanNum(c.fieldVerification.actualDist / 12, 4)); put("mw", cleanNum(c.fieldVerification.actualWidth / 12, 4)); put("vb", c.fieldVerification.verifiedBy); }
       return `Stage3D.html?${p.toString()}`;
