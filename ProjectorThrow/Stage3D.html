@@ -120,6 +120,9 @@ button[aria-pressed=true]{background:var(--line-lo);color:var(--chalk);border-co
 .mobile-exports{display:none}
 .state-label{display:inline-flex;align-items:center;min-height:24px;margin-top:7px;padding:3px 7px;border:1px solid currentColor;border-radius:var(--r);font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--go)}
 .field-verify-toggle[aria-pressed=true]{background:var(--go);border-color:var(--go);color:#fff}
+.quick-start-toggle{display:inline-flex;align-items:center;gap:6px;min-height:34px;padding:6px 9px;border:1px solid var(--hazard);border-radius:var(--r);background:var(--hazard-lo);color:var(--hazard);font-weight:700}
+.quick-start-toggle::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;box-shadow:0 0 0 3px var(--hazard-lo)}
+.quick-label-short{display:none}
 .model-note{font-size:11.5px;color:var(--dimmer);margin:0;border-top:1px solid var(--line-lo);padding-top:12px}
 .adjust-summary-value{color:var(--hazard);font-variant-numeric:tabular-nums}
 body[data-field-verify=true] .companion,
@@ -133,6 +136,31 @@ body[data-field-verify=true] header{position:sticky;top:0;z-index:9}
 .online-note{margin:0;padding:10px 11px;border-left:3px solid var(--info);background:var(--info-lo);font-size:11.5px;color:var(--dim)}
 .calculation-gate{margin:0;padding:10px 11px;border-left:3px solid var(--hazard);background:var(--hazard-lo);font-size:11.5px;color:var(--ink);line-height:1.45}
 html[data-calculation-mode="manufacturer_unspecified"] .calculation-gate,html[data-calculation-mode="conflicting"] .calculation-gate,html[data-calculation-mode="partial"] .calculation-gate,html[data-calculation-mode="legacy_unverified"] .calculation-gate,html[data-calculation-mode="blocked"] .calculation-gate{border-color:var(--safety);background:var(--safety-lo);color:var(--safety)}
+.onboarding-dialog{width:min(760px,calc(100vw - 32px));max-height:calc(100dvh - 32px);margin:auto;padding:0;border:1px solid var(--line);border-radius:8px;background:var(--case);color:var(--chalk);box-shadow:0 28px 90px rgba(15,17,20,.38);overflow:auto}
+.onboarding-dialog::backdrop{background:rgba(15,17,20,.64);backdrop-filter:blur(5px)}
+.onboarding-shell{position:relative;padding:28px;background:linear-gradient(145deg,var(--case) 0 67%,var(--hazard-lo) 100%)}
+.onboarding-close{position:absolute;z-index:2;right:16px;top:16px;width:44px;min-height:44px;padding:0;font-size:19px;line-height:1}
+.onboarding-kicker{margin:0 48px 7px 0;color:var(--hazard);font:700 10px var(--mono);letter-spacing:.14em;text-transform:uppercase}
+.onboarding-title{max-width:560px;margin:0;font:700 clamp(29px,5vw,52px)/.98 var(--sans);letter-spacing:-.035em;text-transform:uppercase}
+.onboarding-intro{max-width:590px;margin:13px 0 0;color:var(--dim);font-size:15px;line-height:1.5}
+.optic-sketch{display:grid;grid-template-columns:70px minmax(100px,1fr) 24px;align-items:center;gap:0;min-height:76px;margin:22px 0 18px;padding:0 12px;border-block:1px solid var(--line-lo);overflow:hidden}
+.optic-projector{position:relative;width:58px;height:30px;border:2px solid var(--chalk);border-radius:3px;background:var(--case-hi)}
+.optic-projector::before{content:"";position:absolute;right:-12px;top:7px;width:14px;height:13px;border:2px solid var(--chalk);border-left:0;border-radius:0 9px 9px 0}
+.optic-projector::after{content:"P01";position:absolute;left:7px;top:7px;color:var(--dimmer);font:700 8px var(--mono);letter-spacing:.08em}
+.optic-beam{height:24px;clip-path:polygon(0 38%,100% 0,100% 100%,0 62%);background:linear-gradient(90deg,var(--hazard-mid),var(--hazard-lo));border-right:1px solid var(--hazard)}
+.optic-screen{width:8px;height:56px;border:2px solid var(--chalk);border-radius:2px;background:var(--case-hi);box-shadow:-4px 0 0 var(--hazard-lo)}
+.workflow-route{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.workflow-step{position:relative;display:grid;grid-template-columns:auto 1fr;align-items:start;gap:10px;min-height:112px;padding:14px;text-align:left;background:var(--deck);color:var(--chalk);border-color:var(--line)}
+.workflow-step:hover{border-color:var(--hazard);background:var(--hazard-lo)}
+.workflow-step-index{display:grid;place-items:center;width:28px;height:28px;border:1px solid var(--hazard);border-radius:50%;color:var(--hazard);font-weight:700}
+.workflow-step-copy{display:grid;gap:6px;min-width:0}
+.workflow-step-copy strong{font:700 12px var(--mono);letter-spacing:.06em;text-transform:uppercase}
+.workflow-step-copy span{color:var(--dimmer);font:12px/1.35 var(--sans);letter-spacing:0;text-transform:none}
+.onboarding-footer{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:18px}
+.onboarding-note{margin:0;color:var(--dimmer);font:10px/1.4 var(--mono);letter-spacing:.04em;text-transform:uppercase}
+.onboarding-actions{display:flex;gap:8px;flex:0 0 auto}
+.onboarding-actions button{min-height:44px}
+.workflow-target{outline:2px solid var(--hazard);outline-offset:6px;border-radius:var(--r);background:var(--hazard-lo)}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}
   button:active{transform:none!important}
@@ -219,11 +247,27 @@ html[data-calculation-mode=blocked] .provenance-badge,html[data-calculation-mode
   body[data-sheet-open=true] main::after{content:"";position:absolute;inset:0;z-index:10;background:rgba(15,17,20,.2);pointer-events:none}
 }
 
-@media (max-width:420px){
+@media (max-width:560px){
   .hud{width:calc(100% - 20px)}
   .hud .sub{display:none}
   .header-actions .suite-link{display:none}
   .field-verify-toggle{font-size:8px}
+  .quick-start-toggle{padding-inline:8px}
+  .quick-label-wide{display:none}.quick-label-short{display:inline}
+}
+
+@media (max-width:680px){
+  .onboarding-dialog{width:calc(100vw - 20px);max-height:calc(100dvh - 20px)}
+  .onboarding-shell{padding:22px 16px 18px}
+  .onboarding-title{font-size:34px;max-width:290px}
+  .onboarding-intro{font-size:13px}
+  .optic-sketch{margin-block:16px 12px;min-height:60px;grid-template-columns:58px minmax(60px,1fr) 18px}
+  .optic-projector{width:48px;height:26px}.optic-screen{height:44px}.optic-beam{height:19px}
+  .workflow-route{grid-template-columns:1fr}
+  .workflow-step{min-height:72px;padding:11px}
+  .onboarding-footer{align-items:stretch;flex-direction:column}
+  .onboarding-actions{display:grid;grid-template-columns:1fr 1.2fr}
+  .onboarding-note{order:2;text-align:center}
 }
 </style>
 <link rel="stylesheet" href="../css/sbd-public-nav.css">
@@ -243,6 +287,7 @@ html[data-calculation-mode=blocked] .provenance-badge,html[data-calculation-mode
         <span id="themeLabel">dark</span>
       </button>
       <button class="field-verify-toggle" id="fieldVerifyToggle" type="button" aria-pressed="false">Field Verify</button>
+      <button class="quick-start-toggle" id="quickStartToggle" type="button" aria-label="Open Quick Start"><span class="quick-label-wide">Quick Start</span><span class="quick-label-short">Start</span></button>
       <a class="suite-link" href="index.html?workspace=planner">Planner</a>
       <a class="suite-link av-suite-link" href="../av-suite.html">AV Suite</a>
       <details class="header-more"><summary>More</summary><a class="suite-link" href="../av-suite.html">AV Suite</a></details>
@@ -406,6 +451,25 @@ html[data-calculation-mode=blocked] .provenance-badge,html[data-calculation-mode
   </nav>
 </div>
 
+<dialog class="onboarding-dialog" id="onboardingDialog" aria-labelledby="onboardingTitle" aria-describedby="onboardingIntro">
+  <div class="onboarding-shell">
+    <button class="onboarding-close" id="onboardingClose" type="button" aria-label="Close quick start">×</button>
+    <p class="onboarding-kicker">First projection // three passes</p>
+    <h2 class="onboarding-title" id="onboardingTitle">Build your first projection</h2>
+    <p class="onboarding-intro" id="onboardingIntro">Work in signal order: size the target, place the projector, then inspect the room and record field evidence.</p>
+    <div class="optic-sketch" aria-hidden="true"><span class="optic-projector"></span><span class="optic-beam"></span><span class="optic-screen"></span></div>
+    <div class="workflow-route" aria-label="Throwline quick start steps">
+      <button class="workflow-step" type="button" data-onboarding-target="screen"><span class="workflow-step-index">01</span><span class="workflow-step-copy"><strong>Size the screen</strong><span>Set width, aspect, and bottom height.</span></span></button>
+      <button class="workflow-step" type="button" data-onboarding-target="projector"><span class="workflow-step-index">02</span><span class="workflow-step-copy"><strong>Place the projector</strong><span>Choose ratio, optical height, and set mark.</span></span></button>
+      <button class="workflow-step" type="button" data-onboarding-target="verify"><span class="workflow-step-index">03</span><span class="workflow-step-copy"><strong>Inspect and verify</strong><span>Check the room, obstructions, and field measurement.</span></span></button>
+    </div>
+    <div class="onboarding-footer">
+      <p class="onboarding-note">Reopen this route from Quick Start.</p>
+      <div class="onboarding-actions"><button id="onboardingExplore" type="button">Use current scene</button><button class="pri" id="onboardingStart" type="button">Start with screen</button></div>
+    </div>
+  </div>
+</dialog>
+
 <script src="./throwline-scene-state.js"></script>
 <script src="../js/vendor/gsap.min.js"></script>
 <script src="./three-d-stage.js"></script>
@@ -425,6 +489,10 @@ const mobileGlb = document.getElementById('mobileGlb');
 const stageCalculationGate = document.getElementById('stageCalculationGate');
 const unitStrip = document.getElementById('unitStrip');
 const collisionAlert = document.getElementById('collisionAlert');
+const quickStartToggle = document.getElementById('quickStartToggle');
+const onboardingDialog = document.getElementById('onboardingDialog');
+const onboardingStart = document.getElementById('onboardingStart');
+const ONBOARDING_STORAGE_KEY = 'throwline:stage-onboarding:v1';
 
 const mobilePanelButtons=[...document.querySelectorAll('[data-mobile-panel-button]')];
 function setMobilePanel(panel,{focusPanel=false}={}){
@@ -438,6 +506,79 @@ function setMobilePanel(panel,{focusPanel=false}={}){
 }
 mobilePanelButtons.forEach(button=>button.addEventListener('click',()=>setMobilePanel(button.dataset.mobilePanelButton,{focusPanel:true})));
 document.addEventListener('keydown',event=>{ if(event.key==='Escape'&&document.body.dataset.mobilePanel){ const trigger=mobilePanelButtons.find(button=>button.getAttribute('aria-expanded')==='true'); setMobilePanel(document.body.dataset.mobilePanel); trigger?.focus(); } });
+
+let onboardingTrigger = null;
+let onboardingMotion = null;
+let workflowMotion = null;
+let workflowTimer = 0;
+function onboardingSeen(){try{return localStorage.getItem(ONBOARDING_STORAGE_KEY)==='complete';}catch{return false;}}
+function rememberOnboarding(){try{localStorage.setItem(ONBOARDING_STORAGE_KEY,'complete');}catch{}}
+function animateOnboarding(){
+  onboardingMotion?.revert();
+  if(!window.gsap)return;
+  onboardingMotion=window.gsap.matchMedia();
+  onboardingMotion.add('(prefers-reduced-motion: no-preference)',()=>{
+    const timeline=window.gsap.timeline();
+    timeline.fromTo('.onboarding-kicker,.onboarding-title,.onboarding-intro',{y:10},{y:0,duration:.24,stagger:.035,ease:'power2.out'},0)
+      .fromTo('.optic-projector,.optic-screen',{scale:.92},{scale:1,duration:.22,stagger:.06,ease:'back.out(1.5)'},.08)
+      .fromTo('.optic-beam',{scaleX:0,transformOrigin:'left center'},{scaleX:1,duration:.3,ease:'power2.out'},.14)
+      .fromTo('.workflow-step',{y:7},{y:0,duration:.22,stagger:.04,ease:'power2.out'},.2);
+    return()=>timeline.kill();
+  });
+}
+function openOnboarding({trigger=null}={}){
+  if(trigger)onboardingTrigger=trigger;
+  if(onboardingDialog.open)return;
+  if(typeof onboardingDialog.showModal==='function')onboardingDialog.showModal();else onboardingDialog.setAttribute('open','');
+  requestAnimationFrame(()=>{if(!onboardingDialog.open)return;animateOnboarding();onboardingStart.focus();});
+}
+function closeOnboarding({remember=true,restoreFocus=true}={}){
+  if(remember)rememberOnboarding();
+  onboardingDialog.dataset.restoreFocus=String(restoreFocus);
+  if(typeof onboardingDialog.close==='function')onboardingDialog.close();else{onboardingDialog.removeAttribute('open');if(restoreFocus)onboardingTrigger?.focus();}
+}
+function highlightWorkflowTarget(target){
+  clearTimeout(workflowTimer);
+  workflowMotion?.revert();
+  document.querySelectorAll('.workflow-target').forEach(item=>item.classList.remove('workflow-target'));
+  target.classList.add('workflow-target');
+  if(window.gsap){
+    workflowMotion=window.gsap.matchMedia();
+    workflowMotion.add('(prefers-reduced-motion: no-preference)',()=>{
+      const tween=window.gsap.fromTo(target,{x:-8,opacity:.72},{x:0,opacity:1,duration:.36,ease:'power2.out',clearProps:'transform,opacity'});
+      return()=>tween.kill();
+    });
+  }
+  workflowTimer=window.setTimeout(()=>{target.classList.remove('workflow-target');workflowMotion?.revert();workflowMotion=null;},1800);
+}
+function beginWorkflowStep(step){
+  const config={
+    screen:{control:'sw',message:'Start by sizing the screen.'},
+    projector:{control:document.getElementById('lens').disabled?'lh':'lens',message:'Next, place the projector and set its optical height.'},
+    verify:{control:'measuredDistance',message:'Inspect the room, then record the field measurement.'}
+  }[step];
+  if(!config)return;
+  closeOnboarding({restoreFocus:false});
+  if(window.innerWidth<=820&&document.body.dataset.mobilePanel!=='adjust')setMobilePanel('adjust');
+  adjustPanel.open=true;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    const control=document.getElementById(config.control);
+    const target=control?.closest('.grp')||control;
+    target?.scrollIntoView({block:'center',behavior:'auto'});
+    control?.focus({preventScroll:true});
+    if(target)highlightWorkflowTarget(target);
+    announce(config.message);
+  }));
+}
+quickStartToggle.addEventListener('click',()=>openOnboarding({trigger:quickStartToggle}));
+document.getElementById('onboardingClose').addEventListener('click',()=>closeOnboarding());
+document.getElementById('onboardingExplore').addEventListener('click',()=>{closeOnboarding({restoreFocus:false});requestAnimationFrame(()=>document.getElementById('stage-workspace').focus());});
+onboardingStart.addEventListener('click',()=>beginWorkflowStep('screen'));
+document.querySelectorAll('[data-onboarding-target]').forEach(button=>button.addEventListener('click',()=>beginWorkflowStep(button.dataset.onboardingTarget)));
+onboardingDialog.addEventListener('cancel',rememberOnboarding);
+onboardingDialog.addEventListener('close',()=>{onboardingMotion?.revert();onboardingMotion=null;if(onboardingDialog.dataset.restoreFocus!=='false')onboardingTrigger?.focus();delete onboardingDialog.dataset.restoreFocus;});
+const forceOnboarding=new URLSearchParams(location.search).get('onboarding')==='1';
+if(forceOnboarding||!onboardingSeen())requestAnimationFrame(()=>openOnboarding());
 
 function parseStageCatalog(){
   try {

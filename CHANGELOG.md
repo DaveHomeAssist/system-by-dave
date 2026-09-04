@@ -11,6 +11,11 @@
 * Lens shift is judged per direction and per axis, with horizontal aim offset reported, and room conflicts now cover ceilings, side walls, projected-image bounds, and inactive units.
 * Added scene-state regression tests, a headless-Chrome Stage 3D probe (`npm run probe:throwline-stage`), release-verifier contract checks, and rolled the AV Suite offline cache version.
 
+### Throwline Stage 3D quick start
+
+* Added an accessible first-run Quick Start dialog that routes operators through screen sizing, projector placement, and inspection/field verification using the real Stage 3D controls.
+* Added remembered completion, a persistent reopen control, deterministic dialog focus return, responsive phone layout, visible workflow targeting, and reduced-motion-safe GSAP entrance choreography.
+
 ### Throwline default workspace
 
 * Made Stage 3D the default `/ProjectorThrow/` launch while preserving the detailed planner through an explicit workspace URL, existing hash-based share links, and the JavaScript-disabled fallback.

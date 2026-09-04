@@ -19,6 +19,8 @@ The scene JSON uses schema version 1 and stores locally under `throwline:stage-s
 - Lens shift is judged per axis against the limit for the direction the image actually moves: a positive vertical value against the up limit, a negative value against the down limit, and lateral aim offset against the left or right limit. Combined-axis (elliptical) limits are not modeled and the readout says `limits unknown` when the transfer carried none.
 - Room conflicts come from `roomConflicts()` and cover every unit, not only the active one: beyond room depth, lens above the ceiling, outside the room width, screen wider than the room, screen top above the ceiling, and a projected image that breaks the ceiling, floor, or side walls.
 
+The first Stage 3D visit opens a three-pass Quick Start route through screen sizing, projector placement, and inspection/field verification. Choosing a step closes the dialog, opens the live adjustment surface, focuses the corresponding control, and briefly marks its control group. Completion is remembered under `throwline:stage-onboarding:v1`; the header Quick Start control always reopens the route.
+
 ## Provenance rules
 
 - Manual ratios are labeled `MANUAL ESTIMATE`. A valid result may say `FITS SUPPLIED RANGE`; it must never claim verified safety.
@@ -33,4 +35,4 @@ Run `npm run verify:throwline`. This checks the embedded catalog, scene-state un
 
 Run `npm run probe:throwline-stage` for the browser-level regression probe. It serves the repository, drives `Stage3D.html` in headless Chrome, and checks the audited production link, exact-stop snapping, field-transfer URL trust, field-stamp calibration, direction-aware shift limits, and room-boundary conflicts against the rendered readouts. Pass `--chrome=` for a non-default browser binary and `--base=` to reuse a running static server.
 
-Browser release checks cover desktop and phone no-scroll containment, WebGL readiness, exclusive mobile sheets, direct manipulation, scene save and restore, obstruction collision alerts, multi-projector layouts, and field-stamp invalidation.
+Browser release checks cover desktop and phone no-scroll containment, first-run onboarding and its remembered/reopen flows, WebGL readiness, exclusive mobile sheets, direct manipulation, scene save and restore, obstruction collision alerts, multi-projector layouts, and field-stamp invalidation.
