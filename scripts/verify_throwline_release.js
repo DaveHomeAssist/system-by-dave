@@ -39,12 +39,21 @@ const APPENDIX_ROW_KEYS = [
 ];
 const APPENDIX_OVERLAP_POLICY = 'PRJ-001 through PRJ-004 retain the audited canonical records; appendix rows are raw evidence only.';
 const APPENDIX_REVIEW_DISPOSITION = 'Do not use lifecycle, brightness, resolution, contrast, lens-system, or confidence claims as planning inputs until field-level provenance is normalized.';
+// Frozen after the 2026-09-04 verification pass; any catalog edit must re-pin these deliberately.
 const PILOT_ARRAY_SHA256 = {
-  projectors: 'a8d02aac67d21ea571f0b0cf0d8735887e36325b0cc7e31fae846b7f5f8eea59',
-  lenses: '710a30622899fdd1ef2c9e491298e4fb718f0e06d811585f29d7bb1e237f44e4',
+  projectors: '34599a9db73725c42c7afae5d83919a31db8596178c86189bb34d334392dc7da',
+  lenses: 'da1bd0a9c89e9e1ff00fb369d930a5af09a9d4c8714ad283ccd2232aa7b0447e',
   compatibility: '97e740b4c48ea9913119256a7ea5268f2754ddf98c485daee540aaca604b4085',
-  opticalProfiles: 'ebf6e13760a75eb173a9ca76b012da613300b5df36dac08cd71b10f56a750142',
+  opticalProfiles: '1ad1f31f8d472b4dd7b73d3d2da554b918b8cba0c63927087c420b8d0619ea9d',
 };
+const MAKER_DOMAINS = {
+  'MFR-001': ['panasonic.com'],
+  'MFR-002': ['epson.com'],
+  'MFR-003': ['sony.net', 'sony.com'],
+  'MFR-004': ['barco.com'],
+};
+const CALCULATION_READY_PROFILE_IDS = ['OPT-001', 'OPT-002', 'OPT-003', 'OPT-004', 'OPT-005', 'OPT-006', 'OPT-009', 'OPT-010', 'OPT-011', 'OPT-012'];
+const CALCULATION_BLOCKED_PROFILE_IDS = ['OPT-007', 'OPT-008'];
 const APPENDIX_OVERLAP_PROJECTOR_IDS = ['PRJ-001', 'PRJ-002', 'PRJ-003', 'PRJ-004'];
 const APPENDIX_NEW_PROJECTOR_IDS = [
   'PRJ-005',
@@ -257,9 +266,9 @@ if (catalog) {
     projectors: 4,
     lenses: 13,
     compatibility: 13,
-    opticalProfiles: 8,
-    sources: 13,
-    researchExceptions: 6,
+    opticalProfiles: 12,
+    sources: 18,
+    researchExceptions: 8,
   };
   if (catalog.schemaVersion !== 1) fail('Throwline pilot catalog must use schema version 1.');
   if (catalog.meta?.sourceWorkbookSha256 !== '4a70b2b553df12beee1373592e251e30ed1d84257304848b9c32cbc1e3ea818d') {
@@ -268,7 +277,10 @@ if (catalog) {
   if (JSON.stringify(catalog.meta?.counts) !== JSON.stringify(expectedCounts)) {
     fail(`Throwline pilot catalog counts must be ${JSON.stringify(expectedCounts)}.`);
   }
-  if (catalog.meta?.calculationReadyCount !== 0) fail('Throwline pilot catalog must contain zero calculation-ready profiles.');
+  const readyProfiles = Array.isArray(catalog.opticalProfiles) ? catalog.opticalProfiles.filter((profile) => profile && profile.automaticCalculationAllowed === true) : [];
+  if (catalog.meta?.calculationReadyCount !== readyProfiles.length) fail('Throwline catalog calculationReadyCount must equal the number of calculation-ready profiles.');
+  if (catalog.meta?.calculationReadyCount !== CALCULATION_READY_PROFILE_IDS.length) fail(`Throwline catalog must contain exactly ${CALCULATION_READY_PROFILE_IDS.length} calculation-ready profiles.`);
+  if (!catalog.meta?.verificationPass?.id || !catalog.meta.verificationPass.rule) fail('Throwline catalog must record the verification pass and its rule.');
 
   const collections = [
     ['manufacturers', 'manufacturer_id'],
@@ -346,10 +358,47 @@ if (catalog) {
       if (!Number.isFinite(profile.throw_ratio_min) || !Number.isFinite(profile.throw_ratio_max) || profile.throw_ratio_min <= 0 || profile.throw_ratio_max < profile.throw_ratio_min) {
         fail(`Profile ${profile.optical_profile_id} has an invalid throw-ratio range.`);
       }
-      if (profile.automaticCalculationAllowed !== false) fail(`Profile ${profile.optical_profile_id} must be calculation-blocked.`);
-      if (!['manufacturer_unspecified', 'conflicting', 'partial'].includes(profile.calculationState)) {
-        fail(`Profile ${profile.optical_profile_id} has an invalid calculation state.`);
+      const projectorRow = collectionRows.projectors.find((row) => row.projector_id === profile.projector_id);
+      const sourcesById = new Map((collectionRows.sources || []).map((row) => [row.source_id, row]));
+      if (CALCULATION_READY_PROFILE_IDS.includes(profile.optical_profile_id)) {
+        // Calculation-ready profiles must carry maker evidence that the ratio is distance over image width.
+        if (profile.automaticCalculationAllowed !== true || profile.calculationState !== 'verified_image_width') fail(`Profile ${profile.optical_profile_id} must be calculation-ready.`);
+        if (profile.throw_ratio_basis !== 'image_width') fail(`Profile ${profile.optical_profile_id} must declare an image_width basis.`);
+        if (!Number.isFinite(profile.basisAspect) || profile.basisAspect <= 0 || !profile.basisAspectLabel) fail(`Profile ${profile.optical_profile_id} must declare its basis picture shape.`);
+        const evidence = profile.verificationEvidence;
+        if (!evidence || !evidence.checkedOn || !evidence.method || !evidence.excerpt || !Array.isArray(evidence.crossChecks) || !evidence.crossChecks.length) {
+          fail(`Profile ${profile.optical_profile_id} is missing verification evidence.`);
+        } else {
+          const source = sourcesById.get(evidence.source_id);
+          const domains = MAKER_DOMAINS[projectorRow?.manufacturer_id] || [];
+          let host = '';
+          try { host = new URL(source?.url || '').hostname; } catch (error) { host = ''; }
+          if (!source || !domains.some((domain) => host === domain || host.endsWith(`.${domain}`))) fail(`Profile ${profile.optical_profile_id} evidence must cite a document on the maker's own domain (${domains.join(', ')}).`);
+          evidence.crossChecks.forEach((check, index) => {
+            const min = check.distanceMinM / check.imageWidthM;
+            const max = check.distanceMaxM / check.imageWidthM;
+            if (!(Math.abs(min - check.ratioMinPublished) / check.ratioMinPublished <= 0.02) || !(Math.abs(max - check.ratioMaxPublished) / check.ratioMaxPublished <= 0.02)) {
+              fail(`Profile ${profile.optical_profile_id} cross-check ${index + 1} does not reproduce the published ratio within 2 percent.`);
+            }
+          });
+        }
+        (Array.isArray(profile.aspectVariants) ? profile.aspectVariants : []).forEach((item) => {
+          if (!Number.isFinite(item.aspect) || !Number.isFinite(item.throw_ratio_min) || !Number.isFinite(item.throw_ratio_max) || item.throw_ratio_min <= 0 || item.throw_ratio_max < item.throw_ratio_min || !item.label) {
+            fail(`Profile ${profile.optical_profile_id} has an invalid aspect variant.`);
+          }
+        });
+      } else {
+        if (!CALCULATION_BLOCKED_PROFILE_IDS.includes(profile.optical_profile_id)) fail(`Profile ${profile.optical_profile_id} is not in the reviewed ready or blocked lists.`);
+        if (profile.automaticCalculationAllowed !== false) fail(`Profile ${profile.optical_profile_id} must be calculation-blocked.`);
+        if (!['manufacturer_unspecified', 'conflicting', 'partial'].includes(profile.calculationState)) {
+          fail(`Profile ${profile.optical_profile_id} has an invalid calculation state.`);
+        }
+        if (!String(profile.calculationGateReason || '').trim()) fail(`Profile ${profile.optical_profile_id} must explain why it is blocked.`);
       }
+    });
+    collectionRows.projectors.forEach((row) => {
+      const body = row.body;
+      if (!body || ![body.width_mm, body.height_mm, body.depth_mm, body.weight_kg].every((value) => Number.isFinite(value) && value > 0) || !body.source_id) fail(`Projector ${row.projector_id} must carry maker-published body dimensions with a source.`);
     });
   }
 }
@@ -477,7 +526,7 @@ requireMatch(stage, /SceneState\.roomConflicts\(/, 'Stage 3D must derive room co
 requireMatch(stage, /geometry\.shift\b/, 'Stage 3D must judge lens shift through the direction-aware scene-state assessment.');
 requireMatch(stage, /requestedMode\s*===\s*['"]field_verified['"][\s\S]*?number\(['"]md['"][\s\S]*?number\(['"]mw['"][\s\S]*?Date\.parse\(stamp\)/, 'Stage 3D must require measurement evidence and a real timestamp before honoring a FIELD VERIFIED transfer.');
 requireMatch(main, /put\(["']md["'][\s\S]*?put\(["']mw["'][\s\S]*?put\(["']vb["']/, 'The planner must transfer the field measurement evidence with a field-verified Stage 3D link.');
-['roomConflicts', 'PLACEMENT_TOLERANCE', "'snap-distance'"].forEach((token) => {
+['roomConflicts', 'PLACEMENT_TOLERANCE', "'snap-distance'", 'resolveProfileRatio'].forEach((token) => {
   if (!sceneState.includes(token)) fail(`Throwline scene-state contract is missing ${token}.`);
 });
 if (!fs.existsSync(path.join(ROOT, 'scripts/probe_throwline_stage3d.js'))) fail('The Stage 3D browser regression probe is missing.');
@@ -488,6 +537,8 @@ const stageTryIndex = stage.indexOf('const { THREE } = await stage.ready');
 });
 requireMatch(stage, /SceneState\.assessInstallation\(/, 'Stage 3D headline must come from the aggregate installation check.');
 requireMatch(stage, /bounded\(['"]tolPct['"]/, 'Stage 3D must accept the transferred planning tolerance.');
+requireMatch(stage, /SceneState\.resolveProfileRatio\(profile,\s*rasterAspect\)/, 'Stage 3D must resolve verified catalog ratios by picture shape.');
+requireMatch(main, /sceneApi\.resolveProfileRatio\(catalogSelection\.profile,\s*raster\.asp\)/, 'The planner must resolve verified catalog ratios by picture shape.');
 requireMatch(main, /put\(["']tolPct["']/, 'The planner must transfer its planning tolerance to Stage 3D.');
 ['assessInstallation', "'set-tolerance'", 'axisOverlapInterval', 'COVERAGE_TOLERANCE'].forEach((token) => {
   if (!sceneState.includes(token)) fail(`Throwline scene-state contract is missing ${token}.`);

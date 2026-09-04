@@ -285,6 +285,25 @@
   }
 
   const COVERAGE_TOLERANCE = 0.02;
+  const ASPECT_TOLERANCE = 0.02;
+
+  // A verified catalog profile is width-based for specific picture shapes. Pick the variant that matches the raster the
+  // operator chose; any other shape is not covered by the maker's data and must not calculate as verified.
+  function resolveProfileRatio(profile, rasterAspect) {
+    const eligible = !!profile && profile.automaticCalculationAllowed === true && profile.calculationState === 'verified_image_width';
+    const wanted = Number(rasterAspect);
+    const entries = [];
+    const add = (min, max, aspect, label, variant) => { if (finite(min) && finite(max) && Number(min) > 0 && Number(max) >= Number(min)) entries.push({ min: Number(min), max: Number(max), aspect: finite(aspect) ? Number(aspect) : undefined, label: String(label || ''), variant }); };
+    if (profile) add(profile.throw_ratio_min, profile.throw_ratio_max, profile.basisAspect, profile.basisAspectLabel, false);
+    (Array.isArray(profile?.aspectVariants) ? profile.aspectVariants : []).forEach(item => add(item.throw_ratio_min, item.throw_ratio_max, item.aspect, item.label, true));
+    const base = entries[0] || { min: NaN, max: NaN, aspect: undefined, label: '' };
+    const matched = Number.isFinite(wanted) ? entries.find(entry => entry.aspect !== undefined && Math.abs(entry.aspect - wanted) <= ASPECT_TOLERANCE) : undefined;
+    if (matched) return { eligible, matched: true, min: matched.min, max: matched.max, aspect: matched.aspect, label: matched.label, reason: '' };
+    const shapes = entries.filter(entry => entry.aspect !== undefined).map(entry => entry.label || `${entry.aspect.toFixed(3)}:1`);
+    const reason = shapes.length ? `The maker measured this lens for ${shapes.join(', ')} pictures. Pick one of those picture shapes to calculate from verified data.` : 'The maker data for this lens does not say which picture shape it was measured with.';
+    return { eligible, matched: false, min: base.min, max: base.max, aspect: base.aspect, label: base.label, reason };
+  }
+
   function assessInstallation(input) {
     const scene = normalizeSceneState(input);
     const issues = [];
@@ -376,5 +395,5 @@
     return normalizeSceneState(scene);
   }
 
-  return Object.freeze({ SCHEMA_VERSION, STORAGE_KEY, PLACEMENT_TOLERANCE, COVERAGE_TOLERANCE, normalizeProvenance, normalizeSceneState, createSceneState, activeProjector, calculateProjectorGeometry, roomConflicts, assessInstallation, obstacleIntersectsBeam, applyIntent, stampFieldVerification });
+  return Object.freeze({ SCHEMA_VERSION, STORAGE_KEY, PLACEMENT_TOLERANCE, COVERAGE_TOLERANCE, ASPECT_TOLERANCE, normalizeProvenance, normalizeSceneState, createSceneState, activeProjector, calculateProjectorGeometry, roomConflicts, assessInstallation, resolveProfileRatio, obstacleIntersectsBeam, applyIntent, stampFieldVerification });
 });
