@@ -5,7 +5,7 @@
 ### Throwline Stage 3D quick start
 
 * Added an accessible first-run Quick Start dialog that routes operators through screen sizing, projector placement, and inspection/field verification using the real Stage 3D controls.
-* Added remembered completion, a persistent reopen control, responsive phone layout, visible workflow targeting, and reduced-motion-safe GSAP entrance choreography.
+* Added remembered completion, a persistent reopen control, deterministic dialog focus return, responsive phone layout, visible workflow targeting, and reduced-motion-safe GSAP entrance choreography.
 
 ### Throwline default workspace
 

@@ -488,6 +488,7 @@ requireMatch(stage, /id=["']quickStartToggle["']/, 'Stage 3D must expose a persi
 requireMatch(stage, /const ONBOARDING_STORAGE_KEY = ["']throwline:stage-onboarding:v1["']/, 'Stage 3D onboarding must use its registered versioned storage key.');
 requireMatch(stage, /window\.gsap\.matchMedia\(\)/, 'Stage 3D onboarding motion must use GSAP matchMedia.');
 requireMatch(stage, /function\s+beginWorkflowStep\s*\(/, 'Stage 3D onboarding must launch real workflow controls.');
+requireMatch(stage, /requestAnimationFrame\(\(\)=>\{if\(!onboardingDialog\.open\)return;animateOnboarding\(\);onboardingStart\.focus\(\);\}\)/, 'Stage 3D onboarding must not move focus after a same-frame dismissal.');
 requireMatch(stage, /html,body\{overflow:hidden\}/, 'Stage 3D must lock the document to one viewport.');
 requireMatch(stage, /height:100dvh;[^}]*grid-template-areas:"header" "stage" "dock"/, 'Stage 3D phone layout must keep the stage permanent above the dock.');
 requireMatch(stage, /class=["']mobile-dock["'][^>]*>[\s\S]*data-mobile-panel-button=["']adjust["'][\s\S]*data-mobile-panel-button=["']view["'][\s\S]*data-mobile-panel-button=["']facts["'][\s\S]*data-mobile-panel-button=["']export["']/, 'Stage 3D phone workspace must expose Adjust, View, Facts, and Export sheets.');
