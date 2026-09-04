@@ -3039,18 +3039,18 @@
               <option value="">Choose a projector first…</option>
             </select></div>
         </div>
-        <div id="calculationGate" class="notice warn" role="status">Select an exact projector and lens to inspect its evidence. Automatic calculation remains fail-closed unless the profile is explicitly eligible.</div>
+        <div id="calculationGate" class="notice warn" role="status">Pick an exact projector and lens to see its source data. Calculations stay paused until the data is confirmed good.</div>
         <details id="catalogEvidence" class="source-details">
-          <summary>Catalog evidence &amp; limitations</summary>
-          <div id="catalogEvidenceBody" class="hint">No exact catalog pair selected.</div>
+          <summary>Where this lens data comes from</summary>
+          <div id="catalogEvidenceBody" class="hint">No projector and lens picked from the catalog yet.</div>
         </details>
-        <div class="feature-kicker" style="margin-top:16px"><span class="badge dim">manual / legacy</span><span>unverified planning input</span></div>
+        <div class="feature-kicker" style="margin-top:16px"><span class="badge dim">typed in or older lens</span><span>not verified yet</span></div>
         <div class="row">
-          <div class="f wide"><label for="family">Legacy / custom ratio family</label><select id="family"></select></div>
+          <div class="f wide"><label for="family">Projector family (older list or your own)</label><select id="family"></select></div>
         </div>
         <div id="familyNotice" class="notice warn" hidden></div>
         <div class="row">
-          <div class="f wide"><label for="lens">Legacy / custom lens row</label><select id="lens">
+          <div class="f wide"><label for="lens">Lens (older list or your own)</label><select id="lens">
               <option value="">Custom throw ratio…</option>
             </select></div>
         </div>
@@ -3063,7 +3063,7 @@
               placeholder="1.320"></div>
         </div>
         <div class="row compact">
-          <div class="f"><label for="raster">Native raster</label><select id="raster">
+          <div class="f"><label for="raster">Projector picture shape</label><select id="raster">
               <option value="1.3333333|1024|768">4:3 · XGA</option>
               <option value="1.6|1920|1200">16:10 · WUXGA</option>
               <option value="1.7777778|1920|1080">16:9 · HD</option>
@@ -3082,12 +3082,12 @@
         <div class="checkrow"><input id="includeEstimated" type="checkbox"><label for="includeEstimated"
             style="margin:0;text-transform:none;letter-spacing:0;font-family:var(--sans);font-size:12px">Include
             estimated / derived lens rows in finder</label></div>
-        <p class="hint"><strong>Family filtering prevents cross-mount recommendations.</strong> It does not replace an
-          exact projector manual or manufacturer calculator.</p>
+        <p class="hint"><strong>Keeping to one projector family stops the finder suggesting lenses that don’t fit.</strong> It doesn’t
+          replace the exact projector manual or the maker’s own calculator.</p>
       </fieldset>
 
       <fieldset id="setup-panel-shift" role="tabpanel" aria-labelledby="setup-tab-shift" data-setup-panel="shift">
-        <legend><span class="idx">03</span>Shift envelope</legend>
+        <legend><span class="idx">03</span>Lens shift limits</legend>
         <div class="feature-kicker"><span class="badge info">shift guard</span><span
             class="micro">exact projector envelope</span></div>
         <div class="row">
@@ -3135,8 +3135,8 @@
           <div class="f wide"><label for="tol">Throw tolerance ± %</label><input id="tol" type="number" value="5"
               min="0" max="15" step="0.5"></div>
         </div>
-        <p class="hint">Distance is screen surface to the selected lens pairing’s quoted optical origin. Rear-of-body
-          marks are suppressed for folded/UST optics.</p>
+        <p class="hint">Distance is measured from the screen surface to the point on the lens the maker measures from. For
+          short-throw or mirrored lenses, the back-of-projector mark isn’t shown; use the maker’s drawing.</p>
       </fieldset>
 
       <fieldset id="setup-panel-light" role="tabpanel" aria-labelledby="setup-tab-light" data-setup-panel="light">
@@ -3157,7 +3157,7 @@
             </select></div>
           <div class="f"><label for="fitMode">Image fit</label><select id="fitMode">
               <option value="screen">Fill screen · content-safe</option>
-              <option value="raster">Fit full raster · bars</option>
+              <option value="raster">Show the whole picture · bars</option>
             </select></div>
         </div>
         <div class="checkrow"><input id="nPlusOne" type="checkbox" checked><label for="nPlusOne"
@@ -3183,8 +3183,8 @@
         </div>
         <div class="inline-actions"><button class="chip" id="stampVerify" type="button">stamp field
             check</button><button class="chip" id="clearVerify" type="button">clear field check</button></div>
-        <p class="hint">Measured distance ÷ measured image width recalibrates the real throw ratio and tells the crew
-          exactly how far to move.</p>
+        <p class="hint">Measure the throw distance and the picture width on site. That gives the real throw ratio and tells the
+          crew exactly how far to move the projector.</p>
       </fieldset>
 
       <fieldset id="setup-panel-solver" role="tabpanel" aria-labelledby="setup-tab-solver" data-setup-panel="solver">
@@ -3202,8 +3202,8 @@
               <option value="inventory">Crew inventory only</option>
             </select></div>
         </div>
-        <p class="hint">The solver intersects real lens ranges with the legal placement zone, then ranks the safest zoom
-          position—not merely the first lens that fits.</p>
+        <p class="hint">The lens finder matches real lens ranges against your placement zone, then ranks the lenses with the
+          most room to adjust, not just the first one that fits.</p>
       </fieldset>
 
       <fieldset id="setup-panel-library" role="tabpanel" aria-labelledby="setup-tab-library" data-setup-panel="library">
@@ -3769,23 +3769,23 @@
       const selection = resolveCatalogSelection();
       const profile = selection.profile;
       if (!CATALOG.ok) {
-        el.calculationGate.className = "notice bad"; el.calculationGate.textContent = `CALCULATION BLOCKED · embedded catalog rejected: ${CATALOG.error}`;
-        el.catalogEvidenceBody.textContent = "The app failed closed because its embedded catalog could not be parsed."; return;
+        el.calculationGate.className = "notice bad"; el.calculationGate.textContent = `CAN’T CALCULATE YET · the built-in lens catalog couldn’t be read (${CATALOG.error}).`;
+        el.catalogEvidenceBody.textContent = "The lens catalog built into this page couldn’t be read, so calculations are paused to stay safe."; return;
       }
       if (selection.projector && selection.lens) {
-        const gateReason = profile?.calculationGateReason || "No complete optical profile exists for this officially compatible pair.";
+        const gateReason = profile?.calculationGateReason || "The maker’s data for this projector and lens isn’t complete enough to calculate from.";
         el.calculationGate.className = `notice ${eligibleProfile(profile) || c?.calculationMode === "field_verified" ? "" : "bad"}`;
-        el.calculationGate.textContent = c?.calculationMode === "field_verified" ? "FIELD VERIFIED · job-scoped measured ratio is active." : eligibleProfile(profile) ? "CALCULATION ELIGIBLE · verified image-width profile." : `CALCULATION BLOCKED · ${gateReason}`;
+        el.calculationGate.textContent = c?.calculationMode === "field_verified" ? "FIELD VERIFIED · using the ratio you measured on site for this job." : eligibleProfile(profile) ? "READY TO CALCULATE · maker-published lens data, checked." : `CAN’T CALCULATE YET · ${gateReason}`;
         const sourceLink = selection.source?.url ? `<a href="${esc(selection.source.url)}" target="_blank" rel="noopener">${esc(selection.source.source_title || selection.source.source_id)}</a>` : esc(selection.source?.source_title || "No linked source record");
-        const exceptionText = selection.exceptions.length ? selection.exceptions.map(item => `<li><strong>${esc(item.severity || "open")}:</strong> ${esc(item.description)}</li>`).join("") : "<li>No pair-specific exception record; the global calculation gate still applies.</li>";
+        const exceptionText = selection.exceptions.length ? selection.exceptions.map(item => `<li><strong>${esc(item.severity || "open")}:</strong> ${esc(item.description)}</li>`).join("") : "<li>No special notes for this pair. The usual checks still apply.</li>";
         el.catalogEvidenceBody.innerHTML = `<p><strong>${esc(selection.projector.manufacturer_name)} ${esc(selection.projector.model_number)} + ${esc(selection.lens.lens_model_number)}</strong></p><p>Compatibility: ${esc(selection.compatibility?.compatibility_status || "not established")} · confidence ${esc(selection.compatibility?.confidence || "unknown")}</p><p>Reported ratio: <strong>${esc(profile?.throw_ratio_source_raw_value || "not available")}</strong><br>Reported basis: ${esc(profile?.reportedThrowRatioBasis || "not available")}<br>Calculation state: <code>${esc(profile?.calculationState || "partial")}</code></p><p>Primary evidence: ${sourceLink}</p><ul>${exceptionText}</ul>`;
         return;
       }
       const legacyLens = c?.lens || getLens();
       const manualActive = c?.calculationMode === "manual";
       el.calculationGate.className = `notice ${legacyLens?.calculationState === "legacy_unverified" ? "bad" : "warn"}`;
-      el.calculationGate.textContent = legacyLens?.calculationState === "legacy_unverified" ? "CALCULATION BLOCKED · this broad built-in row is legacy_unverified. Choose an exact catalog pair, use explicit manual input, or stamp a field measurement." : manualActive ? "MANUAL SIMULATION · operator-supplied ratio is active and unverified." : "Select an exact projector and lens to inspect its evidence. Automatic calculation remains fail-closed unless the profile is explicitly eligible.";
-      el.catalogEvidenceBody.textContent = "No exact catalog pair selected. Manual calculations are not manufacturer-verified and must be field-checked.";
+      el.calculationGate.textContent = legacyLens?.calculationState === "legacy_unverified" ? "CAN’T CALCULATE YET · this built-in lens is an older reference entry. Pick an exact projector and lens from the catalog, type in a throw ratio yourself, or stamp an on-site measurement." : manualActive ? "MANUAL SIMULATION · using the throw ratio you typed in · not verified yet." : "Pick an exact projector and lens to see its source data. Calculations stay paused until the data is confirmed good.";
+      el.catalogEvidenceBody.textContent = "No projector and lens picked from the catalog yet. A typed-in ratio hasn’t been checked against the maker’s data, so confirm it on site.";
     }
     function buildShiftProfileOptions(preferredId = null) {
       const selected = preferredId ?? el.shiftProfile.value, familyId = el.family.value;
@@ -3977,8 +3977,8 @@
       const result = { actualDist, actualWidth, actualFl: finite(actualFl) && actualFl >= 0 ? actualFl : NaN, verifiedBy: el.verifiedBy.value.trim(), verifiedAt };
       if (c.img && finite(actualDist) && actualDist > 0 && finite(actualWidth) && actualWidth > 0) {
         result.observedRatio = actualDist / actualWidth; result.desiredDist = result.observedRatio * c.img.w; result.move = result.desiredDist - actualDist; result.widthError = (actualWidth - c.img.w) / c.img.w * 100;
-        const error = Math.abs(result.widthError); result.kind = error <= .5 ? "go" : error <= 5 ? "warn" : "bad"; result.label = error <= .5 ? "geometry verified" : error <= 5 ? "trim placement" : "correct before show";
-      } else { result.kind = "info"; result.label = "awaiting measurements"; }
+        const error = Math.abs(result.widthError); result.kind = error <= .5 ? "go" : error <= 5 ? "warn" : "bad"; result.label = error <= .5 ? "picture matches the plan" : error <= 5 ? "small adjustment needed" : "fix before the show";
+      } else { result.kind = "info"; result.label = "waiting for measurements"; }
       if (c.brightness && finite(result.actualFl)) result.lightFactor = result.actualFl / c.brightness.fl;
       return result;
     }
@@ -4049,13 +4049,14 @@
         }
         state.safeMid = finite(state.safeNear) ? (state.safeNear + state.safeFar) / 2 : state.mid;
         state.shown = finite(state.dist) ? state.dist : state.safeMid;
-        if (!finite(state.dist)) state.place = { code: "planning", label: state.fixed ? "fixed mark" : "planning", kind: "info" };
+        if (!finite(state.dist)) state.place = { code: "planning", label: state.fixed ? "one set distance" : "planning", kind: "info" };
         else if (state.fixed) {
-          if (state.dist >= state.tolNear && state.dist <= state.tolFar) state.place = { code: "edge", label: "fixed · verify", kind: "warn" };
-          else state.place = { code: "bad", label: "out of range", kind: "bad" };
-        } else if (state.dist < state.near - .01 || state.dist > state.far + .01) state.place = { code: "bad", label: "out of range", kind: "bad" };
-        else if (finite(state.safeNear) && state.dist >= state.safeNear && state.dist <= state.safeFar) state.place = { code: "safe", label: "safe zone", kind: "go" };
-        else state.place = { code: "edge", label: "zoom edge", kind: "warn" };
+          if (state.dist >= state.tolNear && state.dist <= state.tolFar) state.place = { code: "edge", label: "check on site", kind: "warn" };
+          else state.place = { code: "bad", label: "too far off", kind: "bad" };
+        } else if (state.dist < state.near - .01) state.place = { code: "bad", label: "too close", kind: "bad" };
+        else if (state.dist > state.far + .01) state.place = { code: "bad", label: "too far back", kind: "bad" };
+        else if (finite(state.safeNear) && state.dist >= state.safeNear && state.dist <= state.safeFar) state.place = { code: "safe", label: "good distance", kind: "go" };
+        else state.place = { code: "edge", label: "close to the lens limit", kind: "warn" };
         state.zoomPos = state.fixed ? .5 : clamp((state.shown - state.near) / Math.max(.001, state.far - state.near), 0, 1);
         state.requiredRatio = state.shown / state.img.w;
         state.rearValid = finite(state.bodyDepth) && state.bodyDepth > 0 && !(state.lens?.folded);
@@ -4096,42 +4097,42 @@
       const ready = c.img && finite(c.near);
       if (!ready) {
         el.rdLabel.textContent = "Throw distance"; el.rdBig.textContent = "—"; el.rdBig.className = "rd-big";
-        el.rdSub.innerHTML = c.calculationGate ? '<span class="k">CALCULATION BLOCKED</span>' : '<span class="k">Enter a screen size and explicit manual ratio.</span>'; el.rdNote.textContent = c.calculationGate?.reason || ""; el.rdNote.className = `rd-note${c.calculationGate ? " bad" : ""}`;
-        setBadge(el.fitBadge, c.calculationGate ? "blocked" : "waiting", c.calculationGate ? "bad" : "dim"); setBadge(el.verifyBadge, c.calculationMode || "unverified", c.calculationMode === "field_verified" ? "go" : "dim");
+        el.rdSub.innerHTML = c.calculationGate ? '<span class="k">Can’t calculate yet</span>' : '<span class="k">Enter a screen size and a throw ratio to begin.</span>'; el.rdNote.textContent = c.calculationGate?.reason || ""; el.rdNote.className = `rd-note${c.calculationGate ? " bad" : ""}`;
+        setBadge(el.fitBadge, c.calculationGate ? "paused" : "waiting", c.calculationGate ? "bad" : "dim"); setBadge(el.verifyBadge, c.calculationMode === "field_verified" ? "field verified" : c.calculationMode === "verified_image_width" ? "maker verified" : "not verified", c.calculationMode === "field_verified" ? "go" : "dim");
         el.zoomNominal.style.width = "0%"; el.zoomSafe.style.width = "0%"; el.zoomPin.hidden = true; el.zoomA.textContent = "—"; el.zoomB.textContent = "—";
-        el.mobileValue.textContent = "—"; setMobileStatus(c.calculationGate ? "blocked" : "waiting", c.calculationGate ? "bad" : "dim"); return;
+        el.mobileValue.textContent = "—"; setMobileStatus(c.calculationGate ? "paused" : "waiting", c.calculationGate ? "bad" : "dim"); return;
       }
-      el.rdLabel.textContent = finite(c.dist) ? "Throw distance · set mark" : (c.fixed ? "Throw distance · fixed nominal" : "Throw distance · conservative midpoint");
+      el.rdLabel.textContent = finite(c.dist) ? "Throw distance · your set mark" : (c.fixed ? "Throw distance · this lens’s set distance" : "Throw distance · suggested middle");
       el.rdBig.textContent = fmtLen(c.shown); el.rdBig.className = `rd-big${c.place.kind === "bad" ? " bad" : c.place.kind === "warn" ? " edge" : ""}`;
-      const safeText = finite(c.safeNear) ? ` <span class="k">· safe</span> ${fmtLen(c.safeNear)}–${fmtLen(c.safeFar)}` : "";
+      const safeText = finite(c.safeNear) ? ` <span class="k">· comfort zone</span> ${fmtLen(c.safeNear)}–${fmtLen(c.safeFar)}` : "";
       el.rdSub.innerHTML = c.fixed
-        ? `<span class="k">nominal</span> ${fmtLen(c.near)} <span class="k">· verify ±${Math.round(c.tol * 1000) / 10}%</span>`
-        : `<span class="k">wide</span> ${fmtLen(c.near)} <span class="k">· tele</span> ${fmtLen(c.far)}${safeText}`;
+        ? `<span class="k">set distance</span> ${fmtLen(c.near)} <span class="k">· check on site ±${Math.round(c.tol * 1000) / 10}%</span>`
+        : `<span class="k">closest</span> ${fmtLen(c.near)} <span class="k">· farthest</span> ${fmtLen(c.far)}${safeText}`;
       setBadge(el.fitBadge, c.place.label, c.place.kind);
       if (c.calculationMode === "field_verified") setBadge(el.verifyBadge, "field verified", "go");
-      else if (c.calculationMode === "verified_image_width") setBadge(el.verifyBadge, "mfr verified", "go");
-      else setBadge(el.verifyBadge, c.lens?.status === "custom" ? "custom manual" : "manual simulation", "warn");
+      else if (c.calculationMode === "verified_image_width") setBadge(el.verifyBadge, "maker verified", "go");
+      else setBadge(el.verifyBadge, c.lens?.status === "custom" ? "your own lens · not verified" : "typed-in ratio · not verified", "warn");
 
       const notes = []; let noteKind = "";
       if (finite(c.dist)) {
         if (c.place.code === "bad") {
           noteKind = "bad";
-          if (c.fixed) notes.push(`Set mark is ${fmtLen(Math.abs(c.dist - c.near))} off the fixed nominal.`);
-          else if (c.dist < c.near) notes.push(`Too close by ${fmtLen(c.near - c.dist)}; the lens cannot open wide enough.`);
-          else notes.push(`Too far by ${fmtLen(c.dist - c.far)}; move in or use a longer lens.`);
+          if (c.fixed) notes.push(`Your mark is ${fmtLen(Math.abs(c.dist - c.near))} away from this lens’s set distance.`);
+          else if (c.dist < c.near) notes.push(`Too close by ${fmtLen(c.near - c.dist)}. The lens can’t go wide enough from here, so move the projector back.`);
+          else notes.push(`Too far back by ${fmtLen(c.dist - c.far)}. Move the projector closer or use a longer lens.`);
         } else if (c.place.code === "edge") {
           noteKind = "warn";
-          notes.push(c.fixed ? "Fixed optic: use the projector-specific formula and field-check the image." : "Inside the nominal zoom range but outside the conservative tolerance zone.");
-        } else if (c.place.code === "safe") { noteKind = "ok"; notes.push(`Inside the ±${Math.round(c.tol * 1000) / 10}% conservative planning zone.`); }
+          notes.push(c.fixed ? "This lens has one set distance. Check the maker’s formula for this projector and confirm the picture on site." : "Inside the lens range, but close to the limit. There’s little room to adjust.");
+        } else if (c.place.code === "safe") { noteKind = "ok"; notes.push(`Inside the ±${Math.round(c.tol * 1000) / 10}% comfort zone.`); }
       }
       if (finite(c.depth)) {
-        if (c.near > c.depth) { noteKind = "bad"; notes.push(`Usable depth is ${fmtLen(c.depth)}; even the wide stop needs ${fmtLen(c.near)}.`); }
-        else if (c.far > c.depth) { if (noteKind !== "bad") noteKind = "warn"; notes.push(`Room reaches the lens, but the tele end extends ${fmtLen(c.far - c.depth)} past the usable depth.`); }
-        else notes.push(`${fmtLen(c.depth - c.far)} remains beyond the tele limit.`);
+        if (c.near > c.depth) { noteKind = "bad"; notes.push(`The room only has ${fmtLen(c.depth)} to work with, but this lens needs at least ${fmtLen(c.near)}.`); }
+        else if (c.far > c.depth) { if (noteKind !== "bad") noteKind = "warn"; notes.push(`The room fits the lens, but its farthest distance runs ${fmtLen(c.far - c.depth)} past the back wall.`); }
+        else notes.push(`${fmtLen(c.depth - c.far)} of room to spare behind the farthest distance.`);
       }
-      if (c.rearValid) notes.push(`Rear-of-body tape mark: ${fmtLen(c.rear)} from screen.`);
-      else if (finite(c.bodyDepth) && c.bodyDepth > 0 && c.lens?.folded) { if (noteKind !== "bad") noteKind = "warn"; notes.push("Rear mark suppressed: folded/UST optical geometry needs the manufacturer chassis drawing."); }
-      if (c.basisMismatch) { if (noteKind !== "bad") noteKind = "warn"; notes.push(`Raster override does not match the selected lens row’s ${c.expected.label.replace(/\s+basis$/i, "")} basis.`); }
+      if (c.rearValid) notes.push(`Tape mark for the back of the projector: ${fmtLen(c.rear)} from the screen.`);
+      else if (finite(c.bodyDepth) && c.bodyDepth > 0 && c.lens?.folded) { if (noteKind !== "bad") noteKind = "warn"; notes.push("No back-of-projector mark: this is a short-throw or mirrored lens, so use the maker’s drawing for the body position."); }
+      if (c.basisMismatch) { if (noteKind !== "bad") noteKind = "warn"; notes.push(`The picture shape you chose doesn’t match the ${c.expected.label.replace(/\s+basis$/i, "")} shape this lens data was measured with.`); }
       el.rdNote.textContent = notes.join("  "); el.rdNote.className = `rd-note${noteKind ? " " + noteKind : ""}`;
 
       if (c.fixed) {
@@ -4403,23 +4404,23 @@
     function renderVerification(c) {
       const v = c.fieldVerification;
       if (!finite(v.observedRatio)) {
-        el.verifyOut.innerHTML = '<div class="result-banner">Enter the laser distance and measured image width to turn a field observation into a calibrated move instruction.</div><div class="metric-grid"><div class="metric"><span class="k">Observed ratio</span><span class="v">—</span></div><div class="metric"><span class="k">Move</span><span class="v">—</span></div><div class="metric"><span class="k">Field stamp</span><span class="v">OPEN</span></div></div>'; return;
+        el.verifyOut.innerHTML = '<div class="result-banner">Measure the throw distance and the picture width on site, enter them here, and this turns into a simple move-the-projector instruction.</div><div class="metric-grid"><div class="metric"><span class="k">Observed ratio</span><span class="v">—</span></div><div class="metric"><span class="k">Move</span><span class="v">—</span></div><div class="metric"><span class="k">Field stamp</span><span class="v">OPEN</span></div></div>'; return;
       }
-      const movement = Math.abs(v.move) < .25 ? "hold mark" : `move ${v.move > 0 ? "back" : "forward"} ${fmtLen(Math.abs(v.move))}`;
+      const movement = Math.abs(v.move) < .25 ? "keep the projector where it is" : `move the projector ${v.move > 0 ? "back" : "forward"} ${fmtLen(Math.abs(v.move))}`;
       const stamp = v.verifiedAt ? new Date(v.verifiedAt).toLocaleString() : "not stamped";
-      let html = `<div class="result-banner ${v.kind}"><strong>${esc(v.label.toUpperCase())}</strong> · ${esc(movement)}. Measured image is ${Math.abs(v.widthError).toFixed(1)}% ${v.widthError >= 0 ? "wide" : "narrow"} against the planned raster width.</div>`;
-      html += `<div class="metric-grid"><div class="metric ${v.kind}"><span class="k">Observed ratio</span><span class="v">${v.observedRatio.toFixed(3)}:1</span></div><div class="metric ${v.kind}"><span class="k">Corrected optical mark</span><span class="v">${esc(fmtLen(v.desiredDist))}</span></div><div class="metric ${v.verifiedAt ? "go" : "warn"}"><span class="k">Field stamp</span><span class="v">${v.verifiedAt ? "LOCKED" : "OPEN"}</span></div></div>`;
-      html += `<table><tbody>${tableRow("Measured", `${fmtLen(v.actualDist)} throw · ${fmtLen(v.actualWidth)} image`, `${v.verifiedBy || "operator not named"}`)}${finite(v.actualFl) ? tableRow("Light meter", `${Number(v.actualFl.toFixed(1))} fL`, finite(v.lightFactor) ? `${Math.round(v.lightFactor * 100)}% of planned luminance` : "add rated lumens for calibration") : tableRow("Light meter", "not entered", "geometry check remains valid")}${tableRow("Verification stamp", stamp, v.verifiedAt ? `by ${v.verifiedBy || "unnamed operator"}` : "stamp after the final field check")}</tbody></table>`;
+      let html = `<div class="result-banner ${v.kind}"><strong>${esc(v.label.toUpperCase())}</strong> · ${esc(movement)}. The measured picture is ${Math.abs(v.widthError).toFixed(1)}% ${v.widthError >= 0 ? "wider" : "narrower"} than planned.</div>`;
+      html += `<div class="metric-grid"><div class="metric ${v.kind}"><span class="k">Observed ratio</span><span class="v">${v.observedRatio.toFixed(3)}:1</span></div><div class="metric ${v.kind}"><span class="k">Corrected distance</span><span class="v">${esc(fmtLen(v.desiredDist))}</span></div><div class="metric ${v.verifiedAt ? "go" : "warn"}"><span class="k">Field stamp</span><span class="v">${v.verifiedAt ? "LOCKED" : "OPEN"}</span></div></div>`;
+      html += `<table><tbody>${tableRow("Measured", `${fmtLen(v.actualDist)} throw · ${fmtLen(v.actualWidth)} image`, `${v.verifiedBy || "no name given"}`)}${finite(v.actualFl) ? tableRow("Light meter", `${Number(v.actualFl.toFixed(1))} fL`, finite(v.lightFactor) ? `${Math.round(v.lightFactor * 100)}% of the planned brightness` : "add the projector’s rated lumens to compare") : tableRow("Light meter", "not entered", "the distance check still stands")}${tableRow("Verification stamp", stamp, v.verifiedAt ? `by ${v.verifiedBy || "unnamed operator"}` : "stamp after the final field check")}</tbody></table>`;
       el.verifyOut.innerHTML = html;
     }
     function renderSolver(c) {
       const s = c.solver, scopeLabel = s.scope === "family" ? "current family" : s.scope === "inventory" ? "crew inventory" : "manufacturer-sourced library";
       let html = `<div class="feature-kicker"><span class="badge info">placement intersection</span><span class="micro">${esc(scopeLabel)}</span></div>`;
       if (!finite(s.zoneNear) || !finite(s.zoneFar)) { el.solverOut.innerHTML = html + '<p class="empty">Enter the legal near and far placement limits to rank compatible projector/lens solutions.</p>'; return; }
-      html += `<p class="hint" style="margin:0 0 11px">Legal zone ${esc(fmtLen(s.zoneNear))} → ${esc(fmtLen(s.zoneFar))}. Results favor a tolerance-safe zoom center, manufacturer sourcing and lenses already in crew inventory.</p>`;
-      if (!s.results.length) { el.solverOut.innerHTML = html + '<div class="result-banner bad">No calculation-eligible exact profile intersects this zone. Pilot and legacy rows remain fail-closed until image-width evidence is approved.</div>'; return; }
+      html += `<p class="hint" style="margin:0 0 11px">Placement zone ${esc(fmtLen(s.zoneNear))} → ${esc(fmtLen(s.zoneFar))}. Results favour lenses with a comfortable middle distance, maker-sourced data, and lenses you already own.</p>`;
+      if (!s.results.length) { el.solverOut.innerHTML = html + '<div class="result-banner bad">No projector and lens in the catalog can reach this zone. Older reference lenses stay paused until their maker data is confirmed.</div>'; return; }
       const winner = s.results[0];
-      html += `<div class="result-banner ${winner.hasSafe ? "go" : "warn"}"><strong>BEST FIT</strong> · ${esc(winner.lens.brand)} ${esc(winner.lens.model)} at ${esc(fmtLen(winner.pick))}. ${winner.hasSafe ? "Tolerance-safe midpoint available." : "Nominal overlap only; field verification required."}</div>`;
+      html += `<div class="result-banner ${winner.hasSafe ? "go" : "warn"}"><strong>BEST FIT</strong> · ${esc(winner.lens.brand)} ${esc(winner.lens.model)} at ${esc(fmtLen(winner.pick))}. ${winner.hasSafe ? "There is a comfortable middle distance." : "Only just reaches the zone; confirm it on site."}</div>`;
       html += '<div class="solver-results"><table><thead><tr><th>Ranked pairing</th><th class="num">Set mark</th><th class="num">Reserve</th></tr></thead><tbody>';
       s.results.slice(0, 12).forEach((result, index) => {
         const zoom = result.lens.min === result.lens.max ? "fixed" : `${Math.round(result.zoom * 100)}% zoom`, flag = result.hasSafe ? "safe" : "edge";
@@ -4429,7 +4430,7 @@
       el.solverOut.innerHTML = html;
       el.solverOut.querySelectorAll("[data-solve]").forEach(button => button.addEventListener("click", () => {
         const profile = CATALOG.data.opticalProfiles.find(item => item.optical_profile_id === button.dataset.solve); if (!eligibleProfile(profile)) return;
-        el.catalogProjector.value = profile.projector_id; buildCatalogLensOptions(profile.lens_id); el.catalogLens.value = profile.lens_id; el.lens.value = ""; el.trmin.value = ""; el.trmax.value = ""; setLenInput(el.dist, Number(button.dataset.distance)); render(); toast("Calculation-eligible exact pair and mark applied");
+        el.catalogProjector.value = profile.projector_id; buildCatalogLensOptions(profile.lens_id); el.catalogLens.value = profile.lens_id; el.lens.value = ""; el.trmin.value = ""; el.trmax.value = ""; setLenInput(el.dist, Number(button.dataset.distance)); render(); toast("Projector, lens, and distance applied");
       }));
     }
     function renderFinder(c) {
@@ -4443,8 +4444,8 @@
         const span = l.max - l.min, head = span > .0001 ? (need - l.min) / span : .5, edge = span > .0001 ? Math.min(head, 1 - head) : .5;
         return { lens: l, head, edge };
       }).sort((a, b) => b.edge - a.edge || a.lens.min - b.lens.min);
-      let html = `<p class="hint" style="margin:0 0 11px">At ${esc(fmtLen(target))} onto ${esc(fmtLen(c.img.w))} of raster width, required ratio is <strong style="color:var(--chalk)">${need.toFixed(3)}:1</strong>. Filter: ${esc(c.family.brand)} · ${esc(c.family.label)}.</p>`;
-      if (!fits.length) { html += '<p class="empty">No calculation-eligible profile is available. Legacy rows are reference-only; use an exact audited pair, explicit manual simulation, or a stamped field ratio.</p>'; el.finderOut.innerHTML = html; return; }
+      let html = `<p class="hint" style="margin:0 0 11px">At ${esc(fmtLen(target))} for a ${esc(fmtLen(c.img.w))}-wide picture, the lens needs a ratio of <strong style="color:var(--chalk)">${need.toFixed(3)}:1</strong>. Showing: ${esc(c.family.brand)} · ${esc(c.family.label)}.</p>`;
+      if (!fits.length) { html += '<p class="empty">Nothing in the catalog is ready to calculate from yet. Pick an exact projector and lens, type in a throw ratio yourself, or stamp an on-site measurement.</p>'; el.finderOut.innerHTML = html; return; }
       html += '<table><thead><tr><th>Lens pairing</th><th class="num">Range</th><th class="num">Zoom</th></tr></thead><tbody>';
       fits.slice(0, 18).forEach(({ lens, head }) => {
         const range = lens.min === lens.max ? `${lens.min.toFixed(3)} fixed` : `${lens.min.toFixed(3)}–${lens.max.toFixed(3)}`;
@@ -4493,41 +4494,41 @@
     function printShowPack() { if (!currentShow.outputs.length) return; renderShowPrint(); document.body.dataset.printMode = "show"; window.print(); }
     function collectWarnings(c) {
       const list = [];
-      if (!finite(c.w) || !finite(c.h)) list.push({ kind: "bad", text: "Screen dimensions are missing or invalid." });
-      if (c.calculationGate) list.push({ kind: "bad", text: `CALCULATION BLOCKED · ${c.calculationGate.reason}` });
-      else if (!finite(c.trA)) list.push({ kind: "bad", text: "Lens ratio is missing or invalid." });
+      if (!finite(c.w) || !finite(c.h)) list.push({ kind: "bad", text: "Enter the screen width and height to begin." });
+      if (c.calculationGate) list.push({ kind: "bad", text: `CAN’T CALCULATE YET · ${c.calculationGate.reason}` });
+      else if (!finite(c.trA)) list.push({ kind: "bad", text: "Enter a throw ratio for the lens to begin." });
       const familyNote = familyWarning(c.family); if (familyNote) list.push({ kind: "warn", text: familyNote });
-      if (c.lens?.status === "estimated") list.push({ kind: "warn", text: "Selected lens row is derived/estimated and is excluded from finder results unless explicitly enabled." });
-      if (c.calculationMode === "manual" && finite(c.trA)) list.push({ kind: "warn", text: "Manual simulation has no compatibility or source verification." });
-      if (c.calculationMode === "field_verified") list.push({ kind: "info", text: "A job-scoped stamped field ratio is driving geometry; it does not promote the catalog profile globally." });
-      if (c.lens?.status === "custom") list.push({ kind: "warn", text: "Custom lens pairing is locally stored and unverified." });
-      if (c.basisMismatch) list.push({ kind: "bad", text: `Selected raster conflicts with the lens row’s ${c.expected.label.replace(/\s+basis$/i, "")} basis.` });
-      if (c.place?.code === "bad") list.push({ kind: "bad", text: "Set distance is outside the nominal lens envelope." });
-      else if (c.place?.code === "edge") list.push({ kind: "warn", text: c.fixed ? "Fixed-lens mark is within the tolerance display only; calculate from the exact projector manual." : "Set distance is close to a zoom stop after applying the tolerance margin." });
-      if (finite(c.depth) && finite(c.near) && c.depth < c.near) list.push({ kind: "bad", text: "Usable room depth is shorter than the lens’s wide-limit throw." });
-      if (finite(c.bodyDepth) && c.bodyDepth > 0 && c.lens?.folded) list.push({ kind: "warn", text: "Folded/UST optic selected: simple body-depth addition is not a valid chassis mark." });
-      if (!finite(c.screenBottom) || !finite(c.lensHeight)) list.push({ kind: "info", text: "Add screen bottom and lens optical height to calculate required vertical shift." });
-      else if (c.shiftGuard.kind === "bad") list.push({ kind: "bad", text: `Required ${c.shiftGuard.required.toFixed(1)}% image ${c.shiftGuard.direction} exceeds the ${c.shiftGuard.limit.toFixed(1)}% exact-profile limit by ${Math.abs(c.shiftGuard.remaining).toFixed(1)}% of image height.` });
-      else if (c.shiftGuard.kind === "warn") list.push({ kind: "warn", text: `Shift uses ${c.shiftGuard.required.toFixed(1)}% of ${c.shiftGuard.limit.toFixed(1)}% ${c.shiftGuard.direction} travel. ${c.shiftProfile.status === "conditional" ? "Manufacturer limit is lens-dependent; confirm this lens." : c.shiftProfile.status === "manual" ? "Manual envelope requires source confirmation." : "Reserve is below the preferred 10%."}` });
-      else if (c.shiftGuard.kind === "info" && finite(c.verticalShift)) list.push({ kind: "warn", text: `Required vertical shift is ${Math.abs(c.verticalShift).toFixed(1)}% of full image height, but no exact projector shift envelope is loaded.` });
-      if (c.fitMode === "raster" && c.img?.relation === "unused") list.push({ kind: "warn", text: "Full-raster mode leaves part of the physical screen unfilled." });
+      if (c.lens?.status === "estimated") list.push({ kind: "warn", text: "This lens entry is an estimate, so the lens finder leaves it out unless you switch it on." });
+      if (c.calculationMode === "manual" && finite(c.trA)) list.push({ kind: "warn", text: "This throw ratio was typed in by hand and hasn’t been checked against the maker’s data." });
+      if (c.calculationMode === "field_verified") list.push({ kind: "info", text: "Using the ratio you measured on site for this job. It doesn’t change the shared lens catalog." });
+      if (c.lens?.status === "custom") list.push({ kind: "warn", text: "This is a lens you added yourself. It’s saved on this device and hasn’t been verified." });
+      if (c.basisMismatch) list.push({ kind: "bad", text: `The picture shape you chose doesn’t match the ${c.expected.label.replace(/\s+basis$/i, "")} shape this lens data was measured with.` });
+      if (c.place?.code === "bad") list.push({ kind: "bad", text: "The set distance is outside what this lens can do. Move the projector or change the lens." });
+      else if (c.place?.code === "edge") list.push({ kind: "warn", text: c.fixed ? "This lens has one set distance. Check the exact projector manual before you trust the mark." : "The set distance is close to the lens limit, with little room to adjust." });
+      if (finite(c.depth) && finite(c.near) && c.depth < c.near) list.push({ kind: "bad", text: "The room is shorter than the closest distance this lens can work from." });
+      if (finite(c.bodyDepth) && c.bodyDepth > 0 && c.lens?.folded) list.push({ kind: "warn", text: "Short-throw or mirrored lens: adding the body depth doesn’t give a true mark. Use the maker’s drawing." });
+      if (!finite(c.screenBottom) || !finite(c.lensHeight)) list.push({ kind: "info", text: "Add the screen bottom height and the lens height to work out how much lens shift you need." });
+      else if (c.shiftGuard.kind === "bad") list.push({ kind: "bad", text: `The picture needs to shift ${c.shiftGuard.required.toFixed(1)}% ${c.shiftGuard.direction}, but this lens only allows ${c.shiftGuard.limit.toFixed(1)}%. That’s ${Math.abs(c.shiftGuard.remaining).toFixed(1)}% too far.` });
+      else if (c.shiftGuard.kind === "warn") list.push({ kind: "warn", text: `The shift uses ${c.shiftGuard.required.toFixed(1)}% of the ${c.shiftGuard.limit.toFixed(1)}% this lens allows ${c.shiftGuard.direction}. ${c.shiftProfile.status === "conditional" ? "The maker’s limit depends on the lens, so confirm it for this one." : c.shiftProfile.status === "manual" ? "These limits were typed in by hand, so confirm them against the maker’s data." : "That leaves less than the 10% spare we like to keep."}` });
+      else if (c.shiftGuard.kind === "info" && finite(c.verticalShift)) list.push({ kind: "warn", text: `The picture needs to shift ${Math.abs(c.verticalShift).toFixed(1)}% of its height, but this projector’s shift limits aren’t loaded yet.` });
+      if (c.fitMode === "raster" && c.img?.relation === "unused") list.push({ kind: "warn", text: "Showing the whole picture leaves part of the screen unfilled." });
       if (c.brightness && c.brightness.fl < c.brightness.target) list.push({ kind: c.brightness.fl < c.brightness.target * .8 ? "bad" : "warn", text: `Estimated ${Math.round(c.brightness.fl)} fL is below the ${c.brightness.target} fL target.` });
       if (c.nPlusOne && c.brightness && c.brightness.oneDownFl < c.brightness.target) list.push({ kind: c.brightness.oneDownFl < c.brightness.target * .8 ? "bad" : "warn", text: `N+1 fails: one projector offline leaves ${Math.round(c.brightness.oneDownFl)} fL against the ${c.brightness.target} fL target. Minimum modeled stack: ${c.brightness.minNPlusOne ?? ">8"}.` });
-      if (c.qty > 1) list.push({ kind: "info", text: `Brightness assumes ${c.qty} projectors are optically stacked and aligned at ${c.stackEff}% stack efficiency.` });
-      if (finite(c.fieldVerification.observedRatio) && c.fieldVerification.kind !== "go") list.push({ kind: c.fieldVerification.kind, text: `Field measurement calls for ${Math.abs(c.fieldVerification.move) < .25 ? "holding the current mark" : `moving ${c.fieldVerification.move > 0 ? "back" : "forward"} ${fmtLen(Math.abs(c.fieldVerification.move))}`}.` });
-      if (c.fieldVerification.verifiedAt && !c.fieldVerification.verifiedBy) list.push({ kind: "warn", text: "Field check is stamped without an operator name or initials." });
-      if (finite(c.solver.zoneNear) && finite(c.solver.zoneFar) && !c.solver.results.length) list.push({ kind: "bad", text: "No enabled gear pairing intersects the entered placement zone." });
-      list.push({ kind: "info", text: "Final hang check: exact projector model, lens support, projection-distance formula, optical origin, lens shift, orientation and rigging clearance." });
+      if (c.qty > 1) list.push({ kind: "info", text: `Brightness assumes ${c.qty} projectors stacked and lined up on the same picture, at ${c.stackEff}% combined efficiency.` });
+      if (finite(c.fieldVerification.observedRatio) && c.fieldVerification.kind !== "go") list.push({ kind: c.fieldVerification.kind, text: `Your on-site measurement says ${Math.abs(c.fieldVerification.move) < .25 ? "keep the projector where it is" : `move the projector ${c.fieldVerification.move > 0 ? "back" : "forward"} ${fmtLen(Math.abs(c.fieldVerification.move))}`}.` });
+      if (c.fieldVerification.verifiedAt && !c.fieldVerification.verifiedBy) list.push({ kind: "warn", text: "The on-site check was saved without a name or initials." });
+      if (finite(c.solver.zoneNear) && finite(c.solver.zoneFar) && !c.solver.results.length) list.push({ kind: "bad", text: "No projector and lens in the catalog can reach the placement zone you entered." });
+      list.push({ kind: "info", text: "Before you hang it, double-check: exact projector model, that the lens fits it, the maker’s distance formula, where the lens sits on the body, lens shift, orientation, and rigging clearance." });
       return list;
     }
     function renderWarnings(c) {
       const warnings = collectWarnings(c);
       const groups = [
-        { kind: "bad", label: "Stop before hang", badge: "bad" },
-        { kind: "warn", label: "Verify before commit", badge: "warn" },
-        { kind: "info", label: "Planning notes", badge: "info" }
+        { kind: "bad", label: "Fix before you hang it", badge: "bad" },
+        { kind: "warn", label: "Check before you commit", badge: "warn" },
+        { kind: "info", label: "Good to know", badge: "info" }
       ].map(group => ({ ...group, items: warnings.filter(w => w.kind === group.kind) })).filter(group => group.items.length);
-      const summary = groups.map(group => `<span class="badge ${group.badge}">${group.items.length} ${group.kind === "bad" ? "stop" : group.kind === "warn" ? "verify" : "note"}${group.items.length === 1 ? "" : "s"}</span>`).join("");
+      const summary = groups.map(group => `<span class="badge ${group.badge}">${group.items.length} ${group.kind === "bad" ? "fix" : group.kind === "warn" ? "check" : "note"}${group.items.length === 1 ? "" : "s"}</span>`).join("");
       el.warningsOut.innerHTML = `<div class="warning-summary" aria-label="Warning counts">${summary}</div>` + groups.map(group => `<section class="warning-group" aria-label="${group.label}"><h3 class="${group.badge}"><span class="count">${group.items.length}</span>${group.label}</h3>${group.items.map(w => `<div class="notice ${w.kind === "bad" ? "bad" : w.kind === "warn" ? "warn" : ""}">${esc(w.text)}</div>`).join("")}</section>`).join("");
     }
     function summaryText(c) {
@@ -4538,37 +4539,37 @@
       lines.push(line("Screen", `${fmtLen(c.w)} W × ${fmtLen(c.h)} H · ${aspectName(c.w / c.h)} · ${Math.round(Math.hypot(c.w, c.h))}in diag`));
       if (c.calculationGate || !finite(c.near)) {
         const exact = c.catalogSelection?.projector && c.catalogSelection?.lens ? `${c.catalogSelection.projector.manufacturer_name} ${c.catalogSelection.projector.model_number} + ${c.catalogSelection.lens.lens_model_number}` : c.lens ? `${c.lens.brand} ${c.lens.model}` : "No source-backed pair selected";
-        lines.push(line("Pair", exact), line("Status", "CALCULATION BLOCKED"), line("Reason", c.calculationGate?.reason || "No eligible calculation input"), "", "Use explicit manual simulation or stamp a measured optical distance ÷ measured image width for this job.");
+        lines.push(line("Pair", exact), line("Status", "CAN’T CALCULATE YET"), line("Reason", c.calculationGate?.reason || "Nothing trusted to calculate from yet"), "", "Use explicit manual simulation or stamp a measured optical distance ÷ measured image width for this job.");
         return lines.join("\n");
       }
       lines.push(line("Projector", c.family ? `${c.family.brand} · ${c.family.label}` : "Manual / unknown family"));
       lines.push(line("Lens", c.lens ? `${c.lens.model} · ${c.lens.min === c.lens.max ? c.lens.min.toFixed(3) + ":1 fixed" : c.lens.min.toFixed(3) + "–" + c.lens.max.toFixed(3) + ":1"} · ${c.lens.status === "verified" ? "manufacturer sourced" : c.lens.status}` : `custom ratio · ${c.trA.toFixed(3)}${c.trB !== c.trA ? "–" + c.trB.toFixed(3) : ""}:1`));
       lines.push(line("Raster", `${c.raster.pxW}×${c.raster.pxH} · projected ${fmtLen(c.img.w)} × ${fmtLen(c.img.h)}`));
       if (c.img.relation !== "exact") lines.push(line(c.img.relation === "spill" ? "Spill" : "Unused", `${fmtLen(c.img.amount)} ${c.img.axis === "horizontal" ? "each side" : "top + bottom"}`));
-      lines.push(line("Throw", c.fixed ? `${fmtLen(c.near)} nominal · verify ±${Math.round(c.tol * 1000) / 10}%` : `${fmtLen(c.near)} wide → ${fmtLen(c.far)} tele`));
-      if (finite(c.safeNear)) lines.push(line("Safe zone", `${fmtLen(c.safeNear)} → ${fmtLen(c.safeFar)} · ±${Math.round(c.tol * 1000) / 10}% planning margin`));
+      lines.push(line("Throw", c.fixed ? `${fmtLen(c.near)} set distance · check on site ±${Math.round(c.tol * 1000) / 10}%` : `${fmtLen(c.near)} closest → ${fmtLen(c.far)} farthest`));
+      if (finite(c.safeNear)) lines.push(line("Comfort zone", `${fmtLen(c.safeNear)} → ${fmtLen(c.safeFar)} · ±${Math.round(c.tol * 1000) / 10}% margin`));
       lines.push(line(finite(c.dist) ? "Set mark" : "Plan mark", `${fmtLen(c.shown)} screen → optical origin · ${c.place.label.toUpperCase()}`));
       if (c.rearValid) lines.push(line("Rear mark", `${fmtLen(c.rear)} from screen`));
-      else if (finite(c.bodyDepth) && c.bodyDepth > 0 && c.lens?.folded) lines.push(line("Rear mark", "NOT CALCULATED · folded/UST optic"));
+      else if (finite(c.bodyDepth) && c.bodyDepth > 0 && c.lens?.folded) lines.push(line("Rear mark", "NOT CALCULATED · short-throw or mirrored lens, use the maker’s drawing"));
       if (finite(c.verticalShift)) lines.push(line("Shift", `${c.verticalShift >= 0 ? "+" : ""}${c.verticalShift.toFixed(1)}% vertical · full image basis · lens ${fmtLen(c.lensHeight)} high`));
-      else lines.push(line("Shift", "NOT CALCULATED · add screen bottom + lens height"));
+      else lines.push(line("Shift", "NOT CALCULATED · add the screen bottom height and lens height"));
       if (finite(c.shiftGuard.limit)) lines.push(line("Shift guard", `${c.shiftGuard.required.toFixed(1)}% / ${c.shiftGuard.limit.toFixed(1)}% ${c.shiftGuard.direction} · ${c.shiftGuard.label.toUpperCase()} · ${c.shiftProfile.model}${c.shiftProfile.lensOverride ? ` · ${c.shiftProfile.lensOverride} limit` : ""}`));
-      else lines.push(line("Shift guard", "UNKNOWN · load exact projector envelope"));
-      if (finite(c.depth)) lines.push(line("Room", `${fmtLen(c.depth)} usable depth`));
+      else lines.push(line("Shift limits", "UNKNOWN · load this projector’s shift limits"));
+      if (finite(c.depth)) lines.push(line("Room", `${fmtLen(c.depth)} from screen to back wall`));
       if (c.brightness) {
         lines.push(line("Light", `${Math.round(c.brightness.fl)} fL normal · ${Math.round(c.brightness.effective).toLocaleString()} effective lm · target ${c.brightness.target} fL`));
         lines.push(line("N+1", `${Math.round(c.brightness.oneDownFl)} fL with one offline · ${c.nPlusOne ? (c.brightness.oneDownFl >= c.brightness.target ? "SURVIVES" : "FAILS") : "not required"} · minimum modeled count ${c.brightness.minNPlusOne ?? ">8"}`));
       }
       if (finite(c.fieldVerification.observedRatio)) {
-        const v = c.fieldVerification, move = Math.abs(v.move) < .25 ? "hold current mark" : `move ${v.move > 0 ? "back" : "forward"} ${fmtLen(Math.abs(v.move))}`;
-        lines.push(line("Field verify", `${v.observedRatio.toFixed(3)}:1 observed · ${move} · ${v.label.toUpperCase()}`));
+        const v = c.fieldVerification, move = Math.abs(v.move) < .25 ? "keep the projector where it is" : `move the projector ${v.move > 0 ? "back" : "forward"} ${fmtLen(Math.abs(v.move))}`;
+        lines.push(line("On-site check", `${v.observedRatio.toFixed(3)}:1 measured · ${move} · ${v.label.toUpperCase()}`));
         if (finite(v.actualFl)) lines.push(line("Meter", `${Number(v.actualFl.toFixed(1))} fL measured${finite(v.lightFactor) ? ` · ${Math.round(v.lightFactor * 100)}% of plan` : ""}`));
-        if (v.verifiedAt) lines.push(line("Stamped", `${new Date(v.verifiedAt).toLocaleString()} · ${v.verifiedBy || "operator unnamed"}`));
+        if (v.verifiedAt) lines.push(line("Stamped", `${new Date(v.verifiedAt).toLocaleString()} · ${v.verifiedBy || "no name given"}`));
       }
       const stopWarnings = collectWarnings(c).filter(warning => warning.kind === "bad");
       if (stopWarnings.length) {
-        lines.push("", "STOP BEFORE HANG");
-        stopWarnings.forEach((warning, index) => lines.push(line(`STOP ${index + 1}`, warning.text)));
+        lines.push("", "FIX BEFORE YOU HANG IT");
+        stopWarnings.forEach((warning, index) => lines.push(line(`FIX ${index + 1}`, warning.text)));
       }
       if (c.lens?.source) lines.push(line("Source", `${SOURCES[c.lens.source]?.label || c.lens.source} · checked ${c.lens.verifiedOn || "locally"}`));
       lines.push("", `Planning estimate. Confirm the exact projector/lens manual and field-check before rigging or flying.`);
@@ -4578,7 +4579,7 @@
     function renderMethod() {
       const links = Object.entries(SOURCES).map(([brand, s]) => `<a href="${esc(s.url)}" target="_blank" rel="noopener noreferrer">${esc(brand)}</a>`).join(" · ");
       const shiftLinks = BUILTIN_PROFILES.map(profile => `<a href="${esc(profile.sourceUrl)}" target="_blank" rel="noopener noreferrer">${esc(profile.model)}</a>`).join(" · ");
-      el.methodBody.innerHTML = `<p><strong>Throw:</strong> projected raster width × lens throw ratio. “Fill screen” expands the native raster until the whole screen is covered; “Fit full raster” keeps the complete native raster on the screen and may leave unused screen area.</p><p><strong>Shift guard:</strong> image center height minus lens optical height, divided by projected image height, then compared with the selected exact-body envelope. Limits use full image height. Built-in exact profiles: ${shiftLinks}. Conditional and manual profiles remain verify states.</p><p><strong>Tolerance + solver:</strong> nominal lens limits remain visible in yellow. The green zone moves the wide limit farther back and the tele limit forward by the selected planning percentage. The solver intersects that envelope with the entered legal placement zone and ranks zoom reserve.</p><p><strong>Field verify:</strong> actual optical distance ÷ measured image width produces the observed throw ratio; multiplying it by planned raster width gives the corrected optical mark. A meter reading reports an observed-to-planned light factor.</p><p><strong>Light:</strong> rated lumens × real-world efficiency × stack efficiency × gain ÷ projected raster area. N+1 recomputes the same model with one fewer unit online.</p><p><strong>Library:</strong> lens rows are filtered by projector/ratio family. Manufacturer-sourced rows and estimated rows are visibly separated; exact model compatibility still requires the manufacturer documentation. Sources: ${links}.</p><p>This dependency-free file stores custom lenses, shift profiles, crew inventory, saved jobs and the current show board only in this browser’s local storage.</p>`;
+      el.methodBody.innerHTML = `<p><strong>Throw distance:</strong> the projected picture width × the lens throw ratio. “Fill screen” grows the picture until the whole screen is covered; “Show the whole picture” keeps the entire picture on the screen and may leave some screen unused.</p><p><strong>Lens shift:</strong> how far the picture centre sits above or below the lens, as a share of the picture height, compared with what the maker says this projector can shift. Built-in limits: ${shiftLinks}. Limits that depend on the lens, or that were typed in by hand, still need checking.</p><p><strong>Comfort zone + lens finder:</strong> the lens’s own limits stay visible in yellow. The green zone pulls the closest and farthest distances inward by your chosen margin. The lens finder matches lens ranges against the placement zone you entered and ranks the ones with the most room to adjust.</p><p><strong>Field verify:</strong> actual optical distance ÷ measured image width produces the observed throw ratio; multiplying it by planned raster width gives the corrected optical mark. A meter reading reports an observed-to-planned light factor.</p><p><strong>Light:</strong> rated lumens × real-world efficiency × stack efficiency × gain ÷ projected raster area. N+1 recomputes the same model with one fewer unit online.</p><p><strong>Library:</strong> lens rows are filtered by projector/ratio family. Manufacturer-sourced rows and estimated rows are visibly separated; exact model compatibility still requires the manufacturer documentation. Sources: ${links}.</p><p>This dependency-free file stores custom lenses, shift profiles, crew inventory, saved jobs and the current show board only in this browser’s local storage.</p>`;
     }
 
     function applyPreset(renderNow = true) {
@@ -4778,7 +4779,7 @@
       const ok = () => toast(message);
       if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(text).then(ok).catch(() => fallbackCopy(text, ok)); else fallbackCopy(text, ok);
     }
-    function fallbackCopy(text, done) { const ta = document.createElement("textarea"); ta.value = text; ta.style.cssText = "position:fixed;opacity:0;inset:0"; document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); done(); } catch (_) { toast("Copy blocked · select the throw card"); } ta.remove(); }
+    function fallbackCopy(text, done) { const ta = document.createElement("textarea"); ta.value = text; ta.style.cssText = "position:fixed;opacity:0;inset:0"; document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); done(); } catch (_) { toast("Nothing to copy yet · open the throw card first"); } ta.remove(); }
     let toastTimer; function toast(message) { el.toast.textContent = message; el.toast.classList.add("on"); clearTimeout(toastTimer); toastTimer = setTimeout(() => el.toast.classList.remove("on"), 1900); }
 
     function applyDefaults() {
@@ -4806,13 +4807,13 @@
     [el.includeEstimated, el.nPlusOne].forEach(node => node.addEventListener("change", scheduleRender));
     el.inventoryToggle.addEventListener("click", () => { const lens = getLens(); if (!lens) return; if (inventory.has(lens.id)) { inventory.delete(lens.id); toast("Lens removed from crew inventory"); } else { inventory.add(lens.id); toast("Lens added to crew inventory"); } saveInventoryStorage(); render(); });
     $("saveProfile").addEventListener("click", () => {
-      const candidate = sanitizeProfile({ familyId: el.family.value, model: el.projectorModel.value, up: el.shiftUp.value, down: el.shiftDown.value, source: el.shiftSource.value }); if (!candidate) { toast("Exact model and valid up/down limits required"); return; }
+      const candidate = sanitizeProfile({ familyId: el.family.value, model: el.projectorModel.value, up: el.shiftUp.value, down: el.shiftDown.value, source: el.shiftSource.value }); if (!candidate) { toast("Enter the exact model and its up and down shift limits first"); return; }
       const selected = getShiftProfile(); if (selected && !selected.builtin) { candidate.id = selected.id; customProfiles = customProfiles.map(profile => profile.id === selected.id ? candidate : profile); } else customProfiles.push(candidate);
       saveProfileStorage(); buildShiftProfileOptions(candidate.id); applyShiftProfile(candidate, { renderNow: true }); toast("Exact shift profile saved locally");
     });
     $("removeProfile").addEventListener("click", () => { const profile = getShiftProfile(); if (!profile || profile.builtin) { toast("Select a custom shift profile first"); return; } customProfiles = customProfiles.filter(item => item.id !== profile.id); saveProfileStorage(); buildShiftProfileOptions(); applyShiftProfile(null, { renderNow: true }); toast("Custom shift profile removed"); });
-    $("stampVerify").addEventListener("click", () => { const c = readState(); if (!finite(c.fieldVerification.observedRatio)) { toast("Distance and image width required"); return; } verifiedAt = new Date().toISOString(); render(); toast("Field check stamped"); });
-    $("clearVerify").addEventListener("click", () => { ["actualDist", "actualWidth", "actualFl", "verifiedBy"].forEach(id => el[id].value = ""); verifiedAt = ""; render(); toast("Field check cleared"); });
+    $("stampVerify").addEventListener("click", () => { const c = readState(); if (!finite(c.fieldVerification.observedRatio)) { toast("Enter the measured distance and picture width first"); return; } verifiedAt = new Date().toISOString(); render(); toast("On-site check saved"); });
+    $("clearVerify").addEventListener("click", () => { ["actualDist", "actualWidth", "actualFl", "verifiedBy"].forEach(id => el[id].value = ""); verifiedAt = ""; render(); toast("On-site check cleared"); });
     document.querySelectorAll("[data-unit]").forEach(b => b.addEventListener("click", () => setUnit(b.dataset.unit)));
     document.querySelectorAll("[data-snap]").forEach(b => b.addEventListener("click", () => {
       const c = lastCalc; if (!c || !finite(c.near)) return;
@@ -4827,8 +4828,8 @@
     $("saveJob").addEventListener("click", saveCurrentJob);
     $("exportJob").addEventListener("click", () => { const c = readState(), name = (c.job || "throwline-job").replace(/[^a-z0-9_-]+/gi, "-").replace(/^-|-$/g, "").toLowerCase() || "throwline-job"; downloadJson(`${name}.json`, { type: "throwline-job", version: 2, exportedAt: new Date().toISOString(), state: stateObject(c) }); });
     $("importJob").addEventListener("click", () => $("jobFile").click());
-    $("jobFile").addEventListener("change", ev => { const file = ev.target.files?.[0]; if (!file) return; readJsonFile(file, (err, data) => { if (err || !data?.state) { toast("Job file did not parse"); return; } applyState(data.state); toast("Job imported"); }); ev.target.value = ""; });
-    $("showFile").addEventListener("change", ev => { const file = ev.target.files?.[0]; if (!file) return; readJsonFile(file, (err, data) => { const show = data?.show; if (err || data?.type !== "throwline-show" || !show || !Array.isArray(show.outputs)) { toast("Show file did not parse"); return; } currentShow = { version: 1, id: String(show.id || uid("show")), name: String(show.name || "Imported show").slice(0, 120), outputs: show.outputs.filter(output => output?.state).map(output => ({ ...output, id: String(output.id || uid("output")) })) }; activeOutputId = currentShow.outputs[0]?.id || ""; saveShowStorage(); if (activeOutputId) applyState(currentShow.outputs[0].state); else render(); toast("Show imported"); }); ev.target.value = ""; });
+    $("jobFile").addEventListener("change", ev => { const file = ev.target.files?.[0]; if (!file) return; readJsonFile(file, (err, data) => { if (err || !data?.state) { toast("That job file couldn’t be read"); return; } applyState(data.state); toast("Job imported"); }); ev.target.value = ""; });
+    $("showFile").addEventListener("change", ev => { const file = ev.target.files?.[0]; if (!file) return; readJsonFile(file, (err, data) => { const show = data?.show; if (err || data?.type !== "throwline-show" || !show || !Array.isArray(show.outputs)) { toast("That show file couldn’t be read"); return; } currentShow = { version: 1, id: String(show.id || uid("show")), name: String(show.name || "Imported show").slice(0, 120), outputs: show.outputs.filter(output => output?.state).map(output => ({ ...output, id: String(output.id || uid("output")) })) }; activeOutputId = currentShow.outputs[0]?.id || ""; saveShowStorage(); if (activeOutputId) applyState(currentShow.outputs[0].state); else render(); toast("Show imported"); }); ev.target.value = ""; });
     window.addEventListener("afterprint", () => { delete document.body.dataset.printMode; });
 
     $("addLens").addEventListener("click", () => {
@@ -4837,7 +4838,7 @@
       const familyLabel = ($("clFamily").value || ((brand === current?.brand) ? current?.label : "") || `${brand} · custom projector family`).trim();
       const familyId = (brand === current?.brand && familyLabel === current?.label) ? current?.id : stableId("family", brand, familyLabel);
       const candidate = sanitizeCustomLens({ brand, family: familyLabel, familyId, model: $("clModel").value, note: $("clNote").value, min: $("clMin").value, max: $("clMax").value }, current);
-      if (!candidate) { toast("Model and valid ratio required"); return; }
+      if (!candidate) { toast("Enter a lens model and a valid throw ratio first"); return; }
       const duplicate = allLenses().some(l => l.familyId === candidate.familyId && l.model.toLowerCase() === candidate.model.toLowerCase() && Math.abs(l.min - candidate.min) < .0001 && Math.abs(l.max - candidate.max) < .0001);
       if (duplicate) { toast("That lens row already exists"); return; }
       customLenses.push(candidate); saveCustomStorage(); buildFamilyOptions(); el.family.value = candidate.familyId; buildLensOptions(candidate.id); selectLens(candidate.id, true);
@@ -4854,7 +4855,7 @@
     $("lensFile").addEventListener("change", ev => {
       const file = ev.target.files?.[0]; if (!file) return;
       readJsonFile(file, (err, data) => {
-        if (err) { toast("Lens file did not parse"); return; }
+        if (err) { toast("That lens file couldn’t be read"); return; }
         const rows = Array.isArray(data) ? data : (Array.isArray(data?.lenses) ? data.lenses : []); let added = 0;
         rows.forEach(raw => { const lens = sanitizeCustomLens(raw, getFamily()); if (!lens) return; const dup = allLenses().some(l => l.id === lens.id || (l.familyId === lens.familyId && l.model.toLowerCase() === lens.model.toLowerCase() && Math.abs(l.min - lens.min) < .0001 && Math.abs(l.max - lens.max) < .0001)); if (!dup) { customLenses.push(lens); added++; } });
         saveCustomStorage(); buildFamilyOptions(); buildLensOptions(); render(); toast(`${added} lens${added === 1 ? "" : "es"} imported`);
