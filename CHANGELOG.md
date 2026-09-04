@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-09-04
+
+### Throwline Stage 3D spatial workspace
+
+* Promoted Stage 3D into an offline-ready, viewport-locked spatial workspace with a permanent canvas, desktop adjustment rail, and mutually exclusive mobile Adjust, View, Facts, and Export sheets.
+* Added a shared scene-state contract and pure geometry boundary with explicit manual, manufacturer, and field-verification provenance; driving edits now invalidate job-scoped verification instead of retaining a stale green status.
+* Added direct canvas manipulation for projector distance, lens height, lateral placement, image aim, screen width, and screen bottom, with pointer previews routed back through named scene intents.
+* Added visible placement envelopes, optical stops, shift and dimension guides, room walls, editable beam obstructions with collision alerts, and stack or blend layouts for up to eight projector units.
+* Added normalized scene save, restore, import, download, and reset flows, and vendored the pinned Three.js engine and exporters locally so Stage 3D participates in the AV Suite offline asset manifest.
+* Expanded Throwline release tests and documentation around the renderer boundary, scene schema, provenance safety, no-scroll behavior, local engine assets, spatial planning controls, and persistence.
+
 ## 2026-09-02
 
 ### Throwline optical console refinement

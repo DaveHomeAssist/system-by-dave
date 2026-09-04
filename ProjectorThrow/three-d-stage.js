@@ -11,24 +11,16 @@
  * OBJ + MTL or GLB (binary glTF). FBX cannot be exported in the browser;
  * GLB is the interchange format every modern 3D tool imports.
  *
- * three.js loads through the page's import map. Include this EXACT pinned
- * map in <head>, before any module runs — versions and integrity hashes
- * stay together (same map the "3D object" skill mandates):
+ * three.js loads through the page's import map. Throwline vendors the pinned
+ * modules locally so the renderer works without a network connection:
  *
  *   <script type="importmap">
  *   {
  *     "imports": {
- *       "three": "https://unpkg.com/three@0.184.0/build/three.module.js",
- *       "three/addons/controls/OrbitControls.js": "https://unpkg.com/three@0.184.0/examples/jsm/controls/OrbitControls.js",
- *       "three/addons/exporters/OBJExporter.js": "https://unpkg.com/three@0.184.0/examples/jsm/exporters/OBJExporter.js",
- *       "three/addons/exporters/GLTFExporter.js": "https://unpkg.com/three@0.184.0/examples/jsm/exporters/GLTFExporter.js"
- *     },
- *     "integrity": {
- *       "https://unpkg.com/three@0.184.0/build/three.module.js": "sha384-8FCZ1eVO6it4+pbec2aDtnTrwjWXZLJRC+MAGCIPDgsYnUrl/E0A2YlF8ioMKI/J",
- *       "https://unpkg.com/three@0.184.0/build/three.core.js": "sha384-dw2ooPewaEIrAgl6oFDBmmBWCE9oW9LxRGcfwZ0hLvEprzo202wXl7vCYHRlSnOT",
- *       "https://unpkg.com/three@0.184.0/examples/jsm/controls/OrbitControls.js": "sha384-4rziNxOBZKQ69i+w+f89KJ55TCYquwchVbByQwmaOeIOXdOU2PLDn3kOfXHwIJC9",
- *       "https://unpkg.com/three@0.184.0/examples/jsm/exporters/OBJExporter.js": "sha384-nbwtoZENJD3Vq+ACK0CuGQdPMuDWHkamC2KJD70EV5nfg6jQjfppKOea07YJN+N3",
- *       "https://unpkg.com/three@0.184.0/examples/jsm/exporters/GLTFExporter.js": "sha384-VofkvpG6HERhFCYbsUOHeNXBCqID2nfqkQqnVzE1jc/oPcz+qJ13ADdXH08hE+cQ"
+ *       "three": "./vendor/three/three.module.js",
+ *       "three/addons/controls/OrbitControls.js": "./vendor/three/addons/controls/OrbitControls.js",
+ *       "three/addons/exporters/OBJExporter.js": "./vendor/three/addons/exporters/OBJExporter.js",
+ *       "three/addons/exporters/GLTFExporter.js": "./vendor/three/addons/exporters/GLTFExporter.js"
  *     }
  *   }
  *   </script>
@@ -88,13 +80,15 @@
       outline: none;
       touch-action: none;
     }
+    canvas[data-manipulating="true"] { cursor: grabbing; }
     canvas:focus-visible {
       outline: 3px solid var(--hazard, #8a6400);
       outline-offset: -3px;
     }
     .toolbar {
       position: absolute;
-      right: 16px;
+      left: 16px;
+      right: auto;
       bottom: 16px;
       z-index: 2;
       display: flex;
@@ -190,6 +184,26 @@
       white-space: nowrap;
       border: 0;
     }
+    .drag-readout {
+      position: absolute;
+      left: 50%;
+      bottom: 18px;
+      z-index: 3;
+      translate: -50% 0;
+      display: inline-flex;
+      align-items: center;
+      min-height: 32px;
+      padding: 6px 10px;
+      border: 1px solid var(--hazard, #8a6400);
+      border-radius: 999px;
+      background: var(--overlay, var(--case, #fff));
+      color: var(--hazard, #8a6400);
+      font: 700 10px/1 var(--mono, ui-monospace, monospace);
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      pointer-events: none;
+    }
+    .drag-readout[hidden] { display: none; }
     .err {
       position: absolute;
       inset: 0;
@@ -224,17 +238,15 @@
     }
     @media (max-width: 820px) {
       :host {
-        height: auto;
-        overflow: visible;
-        display: grid;
-        grid-template-rows: 320px auto auto;
+        height: 100%;
+        min-height: 0;
+        overflow: hidden;
       }
       .viewport {
-        position: relative;
-        inset: auto;
-        grid-row: 1;
-        height: 320px;
-        min-height: 320px;
+        position: absolute;
+        inset: 0;
+        height: auto;
+        min-height: 0;
       }
       .first-use {
         left: 12px;
@@ -242,30 +254,20 @@
         max-width: calc(100% - 24px);
       }
       .controls-help {
-        position: static;
-        grid-row: 2;
-        max-width: none;
-        min-height: 44px;
-        display: flex;
-        align-items: center;
-        padding: 8px 12px;
-        border-top: 1px solid var(--line, rgba(20, 20, 19, 0.2));
-        background: var(--case, #fff);
+        position: absolute;
+        left: 12px;
+        bottom: 12px;
       }
       .controls-panel {
-        position: static;
-        width: auto;
-        margin-left: 8px;
+        position: absolute;
+        width: min(320px, calc(100vw - 24px));
       }
       .toolbar {
-        position: static;
-        grid-row: 3;
+        position: absolute;
         display: none;
-        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-        padding: 0 12px 12px;
-        background: var(--case, #fff);
       }
       .toolbar button { min-height: 44px; }
+      .drag-readout { bottom: 14px; }
     }
   `;
 
@@ -353,6 +355,11 @@
       this._status.setAttribute('aria-live', 'polite');
       this._status.setAttribute('aria-atomic', 'true');
       root.appendChild(this._status);
+      this._dragReadout = document.createElement('div');
+      this._dragReadout.className = 'drag-readout';
+      this._dragReadout.hidden = true;
+      root.appendChild(this._dragReadout);
+      this._manipulationTargets = [];
       this._setButtonsEnabled(false);
       /** Resolves with { THREE } once the scene is live — build the model
        *  in `await stage.ready` so nothing races the library load. */
@@ -380,11 +387,11 @@
 
     _showDependencyError(err) {
       const title = document.createElement('strong');
-      title.textContent = 'Stage 3D needs an internet connection';
+      title.textContent = 'Stage 3D could not start';
       const message = document.createElement('p');
       message.textContent =
-        'The optional companion could not load its pinned Three.js modules from unpkg. ' +
-        'Your calculation data is not affected; use the self-contained Throwline app offline.';
+        'The local 3D engine or WebGL renderer could not start. ' +
+        'Your calculation data is not affected; use the Throwline main app.';
       const fallback = document.createElement('a');
       fallback.href = this.getAttribute('fallback') || 'index.html';
       fallback.textContent = 'Open the offline Throwline app';
@@ -438,6 +445,15 @@
       controls.enableDamping = true;
       controls.dampingFactor = 0.08;
       this._controls = controls;
+      this._raycaster = new THREE.Raycaster();
+      this._pointer = new THREE.Vector2();
+      this._pointerDownHandler = event => this._handleManipulationStart(event);
+      this._pointerMoveHandler = event => this._handleManipulationMove(event);
+      this._pointerUpHandler = event => this._handleManipulationEnd(event);
+      renderer.domElement.addEventListener('pointerdown', this._pointerDownHandler, true);
+      renderer.domElement.addEventListener('pointermove', this._pointerMoveHandler, true);
+      renderer.domElement.addEventListener('pointerup', this._pointerUpHandler, true);
+      renderer.domElement.addEventListener('pointercancel', this._pointerUpHandler, true);
 
       // Neutral studio: soft sky/ground wash, a shadow-casting key light,
       // and a dim fill from behind so silhouettes never go black.
@@ -591,6 +607,85 @@
       if (options.announce !== false) this.announce((label || 'Stage') + ' camera selected.');
     }
 
+    /** Register host-owned meshes as direct-manipulation handles. The stage
+     * emits preview/commit intents and never owns Throwline calculations. */
+    setManipulationTargets(targets) {
+      this._manipulationTargets = Array.isArray(targets)
+        ? targets.filter(target => target && target.object && target.id && Array.isArray(target.axis))
+        : [];
+    }
+
+    _targetForObject(object) {
+      let current = object;
+      while (current) {
+        const match = this._manipulationTargets.find(target => target.object === current);
+        if (match) return match;
+        current = current.parent;
+      }
+      return undefined;
+    }
+
+    _pointerPosition(event) {
+      const rect = this._renderer.domElement.getBoundingClientRect();
+      return { rect, x: event.clientX - rect.left, y: event.clientY - rect.top, ndcX: ((event.clientX - rect.left) / Math.max(rect.width, 1)) * 2 - 1, ndcY: -((event.clientY - rect.top) / Math.max(rect.height, 1)) * 2 + 1 };
+    }
+
+    _screenAxis(target, rect) {
+      const origin = new this._THREE.Vector3();
+      target.object.getWorldPosition(origin);
+      const axis = new this._THREE.Vector3(target.axis[0], target.axis[1], target.axis[2]).normalize();
+      const unitScale = Number(target.metersPerUnit) || 1;
+      const projectedOrigin = origin.clone().project(this._camera);
+      const projectedEnd = origin.clone().add(axis.multiplyScalar(unitScale)).project(this._camera);
+      return { x: (projectedEnd.x - projectedOrigin.x) * rect.width / 2, y: -(projectedEnd.y - projectedOrigin.y) * rect.height / 2 };
+    }
+
+    _handleManipulationStart(event) {
+      if (event.button !== 0 || !this._renderer || !this._raycaster || !this._manipulationTargets.length) return;
+      const pointer = this._pointerPosition(event);
+      this._pointer.set(pointer.ndcX, pointer.ndcY);
+      this._raycaster.setFromCamera(this._pointer, this._camera);
+      const hit = this._raycaster.intersectObjects(this._manipulationTargets.map(target => target.object), true)[0];
+      const target = hit && this._targetForObject(hit.object);
+      if (!target) return;
+      event.preventDefault(); event.stopImmediatePropagation();
+      this._controls.enabled = false;
+      this._renderer.domElement.setPointerCapture(event.pointerId);
+      this._renderer.domElement.dataset.manipulating = 'true';
+      this._manipulation = { pointerId: event.pointerId, target, startX: pointer.x, startY: pointer.y, startValue: Number(target.value), axis: this._screenAxis(target, pointer.rect), value: Number(target.value) };
+      this._dragReadout.hidden = false;
+      this._dragReadout.textContent = `${target.label} · ${Number(target.value).toFixed(2)} ft`;
+      this._completeFirstInteraction();
+    }
+
+    _handleManipulationMove(event) {
+      const active = this._manipulation;
+      if (!active || event.pointerId !== active.pointerId) return;
+      event.preventDefault(); event.stopImmediatePropagation();
+      const pointer = this._pointerPosition(event);
+      const axisLength = Math.max(1, active.axis.x * active.axis.x + active.axis.y * active.axis.y);
+      const delta = ((pointer.x - active.startX) * active.axis.x + (pointer.y - active.startY) * active.axis.y) / axisLength;
+      const step = event.shiftKey ? (Number(active.target.fineStep) || Number(active.target.step) || 0.01) : (Number(active.target.step) || 0.25);
+      const raw = active.startValue + delta * (Number(active.target.sensitivity) || 1);
+      const value = Math.min(Number(active.target.max), Math.max(Number(active.target.min), Math.round(raw / step) * step));
+      if (!Number.isFinite(value) || value === active.value) return;
+      active.value = value;
+      this._dragReadout.textContent = `${active.target.label} · ${value.toFixed(2)} ft`;
+      this.dispatchEvent(new CustomEvent('stage-manipulation', { bubbles: true, detail: { id: active.target.id, type: active.target.type, projectorId: active.target.projectorId, value, phase: 'preview' } }));
+    }
+
+    _handleManipulationEnd(event) {
+      const active = this._manipulation;
+      if (!active || event.pointerId !== active.pointerId) return;
+      event.preventDefault(); event.stopImmediatePropagation();
+      this._manipulation = undefined;
+      this._controls.enabled = true;
+      delete this._renderer.domElement.dataset.manipulating;
+      this._dragReadout.hidden = true;
+      this.dispatchEvent(new CustomEvent('stage-manipulation', { bubbles: true, detail: { id: active.target.id, type: active.target.type, projectorId: active.target.projectorId, value: active.value, phase: 'commit' } }));
+      this.requestRender();
+    }
+
     _completeFirstInteraction() {
       if (!this._firstUse || this._firstUse.hidden) return;
       this._firstUse.hidden = true;
@@ -695,6 +790,12 @@
       if (this._ro) this._ro.disconnect();
       if (this._visibilityHandler) document.removeEventListener('visibilitychange', this._visibilityHandler);
       if (this._renderer && this._keyHandler) this._renderer.domElement.removeEventListener('keydown', this._keyHandler);
+      if (this._renderer && this._pointerDownHandler) {
+        this._renderer.domElement.removeEventListener('pointerdown', this._pointerDownHandler, true);
+        this._renderer.domElement.removeEventListener('pointermove', this._pointerMoveHandler, true);
+        this._renderer.domElement.removeEventListener('pointerup', this._pointerUpHandler, true);
+        this._renderer.domElement.removeEventListener('pointercancel', this._pointerUpHandler, true);
+      }
       if (this._controls) this._controls.dispose();
       this._disposeObject(this._object);
       this._object = undefined;

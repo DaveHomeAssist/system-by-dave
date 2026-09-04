@@ -3,22 +3,22 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="description" content="Throwline Stage 3D is the optional online Three.js companion for projector placement, throw geometry, camera inspection, and OBJ, MTL, or GLB export.">
+<meta name="description" content="Throwline Stage 3D is an offline-ready spatial workspace for projector placement, throw geometry, field verification, room planning, and model export.">
 <meta name="theme-color" id="themeColor" content="#f4f1ea">
 <meta name="color-scheme" content="light dark">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com; style-src 'self' 'unsafe-inline'; connect-src 'self' https://unpkg.com; img-src 'self' data:; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data: blob:; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'none'">
 <link rel="canonical" href="https://systembydave.com/ProjectorThrow/Stage3D.html">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Throwline Stage 3D · Online companion">
-<meta property="og:description" content="Inspect projector placement and throw geometry in an optional online 3D stage, then export OBJ, MTL, or GLB files.">
+<meta property="og:title" content="Throwline Stage 3D · Spatial workspace">
+<meta property="og:description" content="Plan projector placement, room geometry, obstructions, and multiple units in an offline-ready 3D workspace.">
 <meta property="og:url" content="https://systembydave.com/ProjectorThrow/Stage3D.html">
 <meta property="og:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
 <meta property="og:image:alt" content="System by Dave preview banner">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Throwline Stage 3D · Online companion">
-<meta name="twitter:description" content="Optional online 3D projector placement and export companion for Throwline SHOW 2.0.">
+<meta name="twitter:title" content="Throwline Stage 3D · Spatial workspace">
+<meta name="twitter:description" content="Offline-ready 3D projector placement, room planning, verification, and export for Throwline.">
 <meta name="twitter:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
-<title>Throwline Stage 3D · Online companion</title>
+<title>Throwline Stage 3D · Spatial workspace</title>
 <link rel="icon" href="../svg/system_by_dave_logo_rust.svg" type="image/svg+xml">
 <script>(()=>{try{if(localStorage.getItem('throwline:theme:v1')==='dark'){document.documentElement.dataset.theme='dark';document.getElementById('themeColor').content='#15181d';}}catch{}})();</script>
 <!-- THROWLINE_CATALOG_START -->
@@ -27,17 +27,10 @@
 <script type="importmap">
 {
   "imports": {
-    "three": "https://unpkg.com/three@0.184.0/build/three.module.js",
-    "three/addons/controls/OrbitControls.js": "https://unpkg.com/three@0.184.0/examples/jsm/controls/OrbitControls.js",
-    "three/addons/exporters/OBJExporter.js": "https://unpkg.com/three@0.184.0/examples/jsm/exporters/OBJExporter.js",
-    "three/addons/exporters/GLTFExporter.js": "https://unpkg.com/three@0.184.0/examples/jsm/exporters/GLTFExporter.js"
-  },
-  "integrity": {
-    "https://unpkg.com/three@0.184.0/build/three.module.js": "sha384-8FCZ1eVO6it4+pbec2aDtnTrwjWXZLJRC+MAGCIPDgsYnUrl/E0A2YlF8ioMKI/J",
-    "https://unpkg.com/three@0.184.0/build/three.core.js": "sha384-dw2ooPewaEIrAgl6oFDBmmBWCE9oW9LxRGcfwZ0hLvEprzo202wXl7vCYHRlSnOT",
-    "https://unpkg.com/three@0.184.0/examples/jsm/controls/OrbitControls.js": "sha384-4rziNxOBZKQ69i+w+f89KJ55TCYquwchVbByQwmaOeIOXdOU2PLDn3kOfXHwIJC9",
-    "https://unpkg.com/three@0.184.0/examples/jsm/exporters/OBJExporter.js": "sha384-nbwtoZENJD3Vq+ACK0CuGQdPMuDWHkamC2KJD70EV5nfg6jQjfppKOea07YJN+N3",
-    "https://unpkg.com/three@0.184.0/examples/jsm/exporters/GLTFExporter.js": "sha384-VofkvpG6HERhFCYbsUOHeNXBCqID2nfqkQqnVzE1jc/oPcz+qJ13ADdXH08hE+cQ"
+    "three": "./vendor/three/three.module.js",
+    "three/addons/controls/OrbitControls.js": "./vendor/three/addons/controls/OrbitControls.js",
+    "three/addons/exporters/OBJExporter.js": "./vendor/three/addons/exporters/OBJExporter.js",
+    "three/addons/exporters/GLTFExporter.js": "./vendor/three/addons/exporters/GLTFExporter.js"
   }
 }
 </script>
@@ -173,6 +166,60 @@ html[data-calculation-mode="manufacturer_unspecified"] .calculation-gate,html[da
   .row button{flex:1 1 86px}
   body[data-field-verify=true] .facts div:nth-child(n+6){display:none}
 }
+
+/* Stage 3D live workspace: the scene never leaves the viewport. */
+html,body{overflow:hidden}
+.app{grid-template-columns:320px minmax(0,1fr)}
+.companion{font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase}
+.unit-strip{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:thin}
+.unit-strip button{flex:0 0 auto}
+.unit-strip button[aria-pressed=true]{border-color:var(--hazard);color:var(--hazard);background:var(--hazard-lo)}
+.scene-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.scene-actions button{min-width:0}
+.field-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.field-grid label{display:block}
+.field-grid input{width:100%;min-height:38px;padding:8px;border:1px solid var(--line);border-radius:var(--r);background:var(--deck);color:var(--chalk);font:12px var(--mono)}
+.field-grid .wide{grid-column:1/-1}
+.provenance-line{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-top:8px}
+.provenance-badge{display:inline-flex;align-items:center;min-height:24px;padding:3px 7px;border:1px solid currentColor;border-radius:var(--r);font:700 9.5px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--hazard)}
+html[data-calculation-mode=verified_image_width] .provenance-badge,html[data-calculation-mode=field_verified] .provenance-badge{color:var(--go)}
+html[data-calculation-mode=blocked] .provenance-badge,html[data-calculation-mode=conflicting] .provenance-badge,html[data-calculation-mode=partial] .provenance-badge,html[data-calculation-mode=legacy_unverified] .provenance-badge{color:var(--safety)}
+.collision-alert{display:none;margin-top:7px;padding:7px 9px;border:1px solid var(--safety);background:var(--safety-lo);color:var(--safety);font:700 10px/1.4 var(--mono);letter-spacing:.05em;text-transform:uppercase}
+.collision-alert[data-active=true]{display:block}
+.mobile-dock{display:none}
+.stage-canvas::after{content:"DRAG GOLD HANDLES TO SET GEOMETRY";position:absolute;right:50%;bottom:16px;z-index:2;translate:50% 0;padding:5px 8px;border:1px solid var(--line);border-radius:999px;background:var(--overlay);color:var(--dimmer);font:700 9px var(--mono);letter-spacing:.08em;pointer-events:none}
+.scene-toolbar{top:auto;bottom:16px}
+
+@media (max-width:820px){
+  html,body{height:100%;min-height:0;overflow:hidden;overscroll-behavior:none}
+  .app{height:100dvh;min-height:0;grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) calc(58px + env(safe-area-inset-bottom));grid-template-areas:"header" "stage" "dock"}
+  header{grid-area:header;min-height:52px;flex-wrap:nowrap;padding:7px 10px}
+  .brand{font-size:13px}.tag{display:none}.header-actions{flex-wrap:nowrap}.theme-toggle{min-width:44px}.theme-toggle span{display:none}.field-verify-toggle{padding-inline:8px}.header-more{display:none}
+  main{grid-area:stage;display:block;position:relative;min-height:0;overflow:hidden}
+  .stage-canvas{position:absolute;inset:0;margin:0;min-height:0}
+  three-d-stage{height:100%;min-height:0}
+  .hud{position:absolute;left:10px;top:10px;right:auto;width:min(330px,calc(100% - 20px));margin:0;padding:9px 11px;pointer-events:none;backdrop-filter:blur(8px)}
+  .hud .big{font-size:28px;margin:3px 0}.hud .sub{font-size:10px}.hud .note{font-size:10px;margin-top:5px}.band{height:9px;margin-top:6px}.provenance-line{margin-top:5px}.state-label,.provenance-badge{min-height:20px;font-size:8px;padding:2px 5px}
+  .collision-alert{font-size:8.5px;padding:5px 7px}
+  aside,.scene-toolbar,.facts,.mobile-exports{position:fixed;z-index:20;left:8px;right:8px;bottom:calc(66px + env(safe-area-inset-bottom));top:auto;width:auto;max-height:min(66dvh,560px);margin:0;padding:0;border:1px solid var(--line);border-radius:8px;background:var(--case);box-shadow:0 18px 56px rgba(0,0,0,.32);overflow:auto;display:none}
+  body[data-mobile-panel=adjust] aside,body[data-mobile-panel=view] .scene-toolbar,body[data-mobile-panel=facts] .facts,body[data-mobile-panel=export] .mobile-exports{display:block}
+  aside{grid-area:auto}.adjust-panel{border:0}.adjust-panel>summary{display:none}.adjust-content{padding:14px;gap:14px;border:0}
+  .scene-toolbar{padding:14px}.scene-toolbar .row{justify-content:stretch}.scene-toolbar .row button{flex:1 1 82px}
+  .facts{font-size:11px}.facts div{padding:9px 12px}
+  .mobile-exports{grid-template-columns:1fr 1fr;gap:8px;padding:14px}.mobile-exports button{min-height:48px}
+  .mobile-dock{grid-area:dock;z-index:30;display:grid;grid-template-columns:repeat(4,1fr);gap:4px;padding:6px 8px calc(6px + env(safe-area-inset-bottom));border-top:1px solid var(--line);background:var(--case)}
+  .mobile-dock button{min-width:0;min-height:46px;padding:5px 2px;font-size:8.5px;letter-spacing:.04em}
+  .mobile-dock button[aria-expanded=true]{background:var(--hazard);border-color:var(--hazard);color:var(--primary-ink)}
+  .stage-canvas::after{right:10px;bottom:10px;max-width:48%;font-size:7.5px;text-align:right;translate:0 0}
+  body[data-sheet-open=true] main::after{content:"";position:absolute;inset:0;z-index:10;background:rgba(15,17,20,.2);pointer-events:none}
+}
+
+@media (max-width:420px){
+  .hud{width:calc(100% - 20px)}
+  .hud .sub{display:none}
+  .header-actions .suite-link{display:none}
+  .field-verify-toggle{font-size:8px}
+}
 </style>
 <link rel="stylesheet" href="../css/sbd-public-nav.css">
 </head>
@@ -181,8 +228,8 @@ html[data-calculation-mode="manufacturer_unspecified"] .calculation-gate,html[da
 <div class="app">
   <header>
     <h1 class="brand">THROW<span style="color:var(--hazard)">LINE</span></h1>
-    <span class="tag">Stage 3D · SHOW 2.0</span>
-    <p class="companion">Optional online companion · the SHOW 2.0 calculator remains fully offline</p>
+    <span class="tag">Stage 3D · Live workspace</span>
+    <p class="companion">Offline ready · direct spatial control</p>
     <nav class="header-actions" aria-label="Throwline destinations">
       <a class="suite-link" href="../index.html">System by Dave</a>
       <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false" aria-label="Switch to dark mode">
@@ -197,12 +244,22 @@ html[data-calculation-mode="manufacturer_unspecified"] .calculation-gate,html[da
     </nav>
   </header>
 
-  <aside aria-labelledby="controlsHeading">
+  <aside id="stageAdjustSheet" aria-labelledby="controlsHeading">
     <h2 class="sr-only" id="controlsHeading">Stage controls</h2>
     <details class="adjust-panel" id="adjustPanel" open>
       <summary>Adjust <span class="adjust-summary-value" id="adjustSummary">20' screen · 22' set</span></summary>
       <div class="adjust-content">
-    <p class="online-note"><strong>Online companion.</strong> Three.js loads from pinned unpkg modules. If it is unavailable, return to the self-contained <a href="index.html">Throwline main app</a>.</p>
+    <p class="online-note"><strong>Offline-ready workspace.</strong> The pinned 3D engine is local. If WebGL is unavailable, calculation data remains safe in the <a href="index.html">Throwline main app</a>.</p>
+    <div class="grp">
+      <h3>Projectors</h3>
+      <div class="unit-strip" id="unitStrip" role="group" aria-label="Projector units"></div>
+      <div class="scene-actions">
+        <button id="addUnit" type="button">Duplicate unit</button>
+        <button id="removeUnit" type="button">Remove unit</button>
+        <button id="stackUnits" type="button">Stack units</button>
+        <button id="blendUnits" type="button">Blend spread</button>
+      </div>
+    </div>
     <div class="grp">
       <h3>Screen</h3>
       <div><label class="lab" for="sw">Width <span class="val" id="swv">20' 0"</span></label><input id="sw" type="range" min="8" max="40" step="0.5" value="20"></div>
@@ -226,11 +283,53 @@ html[data-calculation-mode="manufacturer_unspecified"] .calculation-gate,html[da
     <div class="grp">
       <h3>Placement</h3>
       <div><label class="lab" for="d">Set distance <span class="val" id="dv">22' 0"</span></label><input id="d" type="range" min="6" max="60" step="0.25" value="22"></div>
+      <div><label class="lab" for="px">Projector lateral <span class="val" id="pxv">0' 0"</span></label><input id="px" type="range" min="-30" max="30" step="0.25" value="0"></div>
+      <div><label class="lab" for="targetX">Image aim <span class="val" id="targetXv">0' 0"</span></label><input id="targetX" type="range" min="-30" max="30" step="0.25" value="0"></div>
       <div class="row" role="group" aria-label="Distance snap controls">
         <button id="bw" type="button">snap wide</button>
         <button id="bm" class="pri" type="button">safe mid</button>
         <button id="bt" type="button">snap tele</button>
       </div>
+    </div>
+
+    <div class="grp">
+      <h3>Room</h3>
+      <div><label class="lab" for="roomW">Width <span class="val" id="roomWv">40' 0"</span></label><input id="roomW" type="range" min="12" max="120" step="0.5" value="40"></div>
+      <div><label class="lab" for="roomD">Depth <span class="val" id="roomDv">40' 0"</span></label><input id="roomD" type="range" min="12" max="180" step="0.5" value="40"></div>
+      <div><label class="lab" for="roomH">Ceiling <span class="val" id="roomHv">20' 0"</span></label><input id="roomH" type="range" min="8" max="60" step="0.5" value="20"></div>
+      <div class="scene-actions"><button id="addObstacle" type="button">Add obstruction</button><button id="clearObstacles" type="button">Clear obstructions</button></div>
+      <div id="obstacleEditor" hidden>
+        <div class="unit-strip" id="obstacleStrip" role="group" aria-label="Room obstructions"></div>
+        <div><label class="lab" for="obstacleX">Obstruction lateral <span class="val" id="obstacleXv">0' 0"</span></label><input id="obstacleX" type="range" min="-30" max="30" step="0.25" value="0"></div>
+        <div><label class="lab" for="obstacleY">Center height <span class="val" id="obstacleYv">3' 0"</span></label><input id="obstacleY" type="range" min="0" max="30" step="0.25" value="3"></div>
+        <div><label class="lab" for="obstacleZ">Distance from screen <span class="val" id="obstacleZv">10' 0"</span></label><input id="obstacleZ" type="range" min="0" max="120" step="0.25" value="10"></div>
+        <div class="field-grid">
+          <label><span class="lab">Width · ft</span><input id="obstacleWidth" type="number" min="0.25" max="100" step="0.25" inputmode="decimal"></label>
+          <label><span class="lab">Height · ft</span><input id="obstacleHeight" type="number" min="0.25" max="100" step="0.25" inputmode="decimal"></label>
+          <label><span class="lab">Depth · ft</span><input id="obstacleDepth" type="number" min="0.25" max="100" step="0.25" inputmode="decimal"></label>
+        </div>
+        <button id="removeObstacle" type="button">Remove selected</button>
+      </div>
+    </div>
+
+    <div class="grp" id="fieldVerificationPanel">
+      <h3>Field verification</h3>
+      <div class="field-grid">
+        <label><span class="lab">Measured throw · ft</span><input id="measuredDistance" type="number" min="0.01" max="300" step="0.01" inputmode="decimal"></label>
+        <label><span class="lab">Measured image · ft</span><input id="measuredWidth" type="number" min="0.01" max="200" step="0.01" inputmode="decimal"></label>
+        <label class="wide"><span class="lab">Verified by</span><input id="verifiedBy" type="text" maxlength="120" autocomplete="name"></label>
+      </div>
+      <button id="stampVerification" class="pri" type="button">Stamp job measurement</button>
+    </div>
+
+    <div class="grp">
+      <h3>Scene data</h3>
+      <div class="scene-actions">
+        <button id="saveScene" type="button">Save scene</button><button id="restoreScene" type="button">Restore scene</button>
+        <button id="importScene" type="button">Import JSON</button><button id="downloadScene" type="button">Download JSON</button>
+        <button id="resetScene" type="button">Reset scene</button>
+      </div>
+      <input id="sceneFile" type="file" accept="application/json,.json" hidden>
     </div>
 
     <p class="model-note">Every part is a named mesh, so the OBJ and GLB open in Blender with <em>screen</em>, <em>projector_body</em>, <em>lens_barrel</em> and <em>cart</em> as separate objects.</p>
@@ -241,7 +340,7 @@ html[data-calculation-mode="manufacturer_unspecified"] .calculation-gate,html[da
 
   <main id="stage-workspace" tabindex="-1" aria-labelledby="stageHeading">
     <h2 class="sr-only" id="stageHeading">Interactive projector stage</h2>
-    <section class="scene-toolbar" aria-label="Scene controls">
+    <section class="scene-toolbar" id="stageViewSheet" aria-label="Scene controls">
       <div class="grp">
         <h3>View</h3>
         <div class="row" role="group" aria-label="Camera presets">
@@ -255,11 +354,14 @@ html[data-calculation-mode="manufacturer_unspecified"] .calculation-gate,html[da
           <button id="tcone" type="button" aria-pressed="true">beam</button>
           <button id="troom" type="button" aria-pressed="true">room</button>
           <button id="tgrid" type="button" aria-pressed="true">grid</button>
+          <button id="tenvelope" type="button" aria-pressed="true">envelope</button>
+          <button id="tshift" type="button" aria-pressed="true">shift</button>
+          <button id="tdimensions" type="button" aria-pressed="true">dimensions</button>
           <button id="resetView" type="button" aria-keyshortcuts="0 Home">reset</button>
         </div>
       </div>
     </section>
-    <section class="mobile-exports" aria-label="Stage export">
+    <section class="mobile-exports" id="stageExportSheet" aria-label="Stage export">
       <button id="mobileObj" type="button" disabled>Download OBJ + MTL</button>
       <button id="mobileGlb" type="button" disabled>Download GLB</button>
     </section>
@@ -273,9 +375,10 @@ html[data-calculation-mode="manufacturer_unspecified"] .calculation-gate,html[da
       <div class="sub"><span style="color:var(--dimmer)">wide </span><span id="hWide">19' 6¾"</span> <span style="color:var(--dimmer)">· tele </span><span id="hTele">26' 4¾"</span></div>
       <div class="band"><div class="nom" id="bNom"></div><div class="safe" id="bSafe"></div><div class="pin" id="bPin"></div></div>
       <div class="note" id="hNote">Inside the ±5% conservative planning zone.</div>
-      <div class="state-label" id="hState">PASS · SAFE</div>
+      <div class="provenance-line"><div class="state-label" id="hState">FITS SUPPLIED RANGE</div><div class="provenance-badge" id="provenanceBadge">MANUAL ESTIMATE</div></div>
+      <div class="collision-alert" id="collisionAlert" data-active="false">Beam obstruction detected</div>
     </section>
-    <dl class="facts" aria-label="Stage facts">
+    <dl class="facts" id="stageFactsSheet" aria-label="Stage facts">
       <div><dt>Image</dt><dd id="fImg">20' 0" × 11' 3"</dd></div>
       <div><dt>Screen</dt><dd id="fScr">20' 0" × 11' 3"</dd></div>
       <div><dt>Spill</dt><dd id="fSpill">none</dd></div>
@@ -283,15 +386,28 @@ html[data-calculation-mode="manufacturer_unspecified"] .calculation-gate,html[da
       <div><dt>Shift</dt><dd id="fShift">+29.0%</dd></div>
       <div><dt>Lens</dt><dd id="fLens">ET-DLE105</dd></div>
       <div><dt>Optical height</dt><dd id="fHeight">6' 0"</dd></div>
+      <div><dt>Room</dt><dd id="fRoom">40' × 40' × 20'</dd></div>
+      <div><dt>Units</dt><dd id="fUnits">1</dd></div>
+      <div><dt>Obstructions</dt><dd id="fObstacles">none</dd></div>
     </dl>
     <div class="sr-only" id="stageStatus" role="status" aria-live="polite" aria-atomic="true">Stage 3D loading.</div>
     <div class="sr-only" id="sceneSummary" role="status" aria-live="polite" aria-atomic="true">Projection scene loading.</div>
   </main>
+  <nav class="mobile-dock" aria-label="Stage workspace panels">
+    <button type="button" data-mobile-panel-button="adjust" aria-controls="stageAdjustSheet" aria-expanded="false">Adjust</button>
+    <button type="button" data-mobile-panel-button="view" aria-controls="stageViewSheet" aria-label="Open view and layer controls" aria-expanded="false">View</button>
+    <button type="button" data-mobile-panel-button="facts" aria-controls="stageFactsSheet" aria-label="Open scene facts" aria-expanded="false">Facts</button>
+    <button type="button" data-mobile-panel-button="export" aria-controls="stageExportSheet" aria-label="Open export controls" aria-expanded="false">Export</button>
+  </nav>
 </div>
 
+<script src="./throwline-scene-state.js"></script>
+<script src="../js/vendor/gsap.min.js"></script>
 <script src="./three-d-stage.js"></script>
 <script type="module">
 const FT = 0.3048;
+const SceneState = window.ThrowlineSceneState;
+if (!SceneState) throw new Error('Throwline scene-state contract failed to load.');
 const stage = document.querySelector('three-d-stage');
 const stageStatus = document.getElementById('stageStatus');
 const themeToggle = document.getElementById('themeToggle');
@@ -302,6 +418,21 @@ const adjustPanel = document.getElementById('adjustPanel');
 const mobileObj = document.getElementById('mobileObj');
 const mobileGlb = document.getElementById('mobileGlb');
 const stageCalculationGate = document.getElementById('stageCalculationGate');
+const unitStrip = document.getElementById('unitStrip');
+const collisionAlert = document.getElementById('collisionAlert');
+
+const mobilePanelButtons=[...document.querySelectorAll('[data-mobile-panel-button]')];
+function setMobilePanel(panel,{focusPanel=false}={}){
+  const next=document.body.dataset.mobilePanel===panel?'':panel;
+  document.body.dataset.mobilePanel=next;
+  document.body.dataset.sheetOpen=String(Boolean(next));
+  mobilePanelButtons.forEach(button=>button.setAttribute('aria-expanded',String(button.dataset.mobilePanelButton===next)));
+  const target=next==='adjust'?document.querySelector('aside'):next==='view'?document.querySelector('.scene-toolbar'):next==='facts'?document.querySelector('.facts'):document.querySelector('.mobile-exports');
+  if (next && focusPanel) requestAnimationFrame(()=>target?.querySelector('button,input,select')?.focus());
+  if (next && window.gsap && !matchMedia('(prefers-reduced-motion: reduce)').matches) window.gsap.fromTo(target,{y:18,autoAlpha:0},{y:0,autoAlpha:1,duration:.24,ease:'power2.out',clearProps:'transform,opacity,visibility'});
+}
+mobilePanelButtons.forEach(button=>button.addEventListener('click',()=>setMobilePanel(button.dataset.mobilePanelButton,{focusPanel:true})));
+document.addEventListener('keydown',event=>{ if(event.key==='Escape'&&document.body.dataset.mobilePanel){ const trigger=mobilePanelButtons.find(button=>button.getAttribute('aria-expanded')==='true'); setMobilePanel(document.body.dataset.mobilePanel); trigger?.focus(); } });
 
 function parseStageCatalog(){
   try {
@@ -322,7 +453,9 @@ function resolveStageTransfer(){
   const number = (key,fallback)=>{ if (!params.has(key) || params.get(key)==='') return fallback; const value = Number(params.get(key)); return Number.isFinite(value) ? value : fallback; };
   const bounded = (key,fallback,min,max)=>Math.min(max,Math.max(min,number(key,fallback)));
   const screenWidth = bounded('w',20,8,40), screenAspect = bounded('ar',1.7778,1,3), basisWidth = bounded('basisW',screenWidth,4,80), rasterAspect = bounded('rasterAr',screenAspect,1,3);
-  const base = {w:screenWidth,bottom:bounded('bottom',4,0,10),ar:screenAspect,basisW:basisWidth,basisScale:basisWidth/screenWidth,rasterAr:rasterAspect,lh:bounded('lh',6,1,16),dist:bounded('dist',22,6,60)};
+  const shiftUp=number('su',NaN),shiftDown=number('sd',NaN),shiftLeft=number('sl',NaN),shiftRight=number('sr',NaN);
+  const shift=[shiftUp,shiftDown,shiftLeft,shiftRight].some(Number.isFinite)?{up:shiftUp,down:shiftDown,left:shiftLeft,right:shiftRight}:undefined;
+  const base = {w:screenWidth,bottom:bounded('bottom',4,0,10),ar:screenAspect,basisW:basisWidth,basisScale:basisWidth/screenWidth,rasterAr:rasterAspect,lh:bounded('lh',6,1,16),dist:bounded('dist',22,6,60),shift};
   const requestedMode = params.get('mode') || 'manual', projectorId = params.get('projector') || '', lensId = params.get('lens') || '', profileId = params.get('profile') || '';
   const data = STAGE_CATALOG.data;
   const projector = data.projectors.find(item=>item.projector_id===projectorId) || null;
@@ -381,12 +514,12 @@ function syncAdjustLayout(){
   const nextCompact = window.innerWidth <= 820;
   if (nextCompact === compactAdjustLayout) return;
   compactAdjustLayout = nextCompact;
-  adjustPanel.open = !nextCompact;
+  adjustPanel.open = true;
 }
 syncAdjustLayout();
 window.addEventListener('resize',syncAdjustLayout,{passive:true});
 stage.addEventListener('stage-dependency-error',()=>{
-  stageStatus.textContent = 'Stage 3D needs an internet connection. The offline Throwline main app remains available.';
+  stageStatus.textContent = 'Stage 3D unavailable. The Throwline main app remains available.';
 });
 
 try {
@@ -415,7 +548,13 @@ const M = {
   image: new THREE.MeshBasicMaterial({ name:'projected_image_material', color:0xf2c012, transparent:true, opacity:0.13, side:THREE.DoubleSide, depthWrite:false, depthTest:false }),
   imageEdge: new THREE.LineBasicMaterial({ name:'projected_image_edge_material', color:0x8a6400, transparent:true, opacity:0.96, depthTest:false }),
   spill: new THREE.MeshBasicMaterial({ name:'projection_spill_material', color:0xd94d42, transparent:true, opacity:0.34, side:THREE.DoubleSide, depthWrite:false, depthTest:false }),
-  missing: new THREE.MeshBasicMaterial({ name:'missing_coverage_material', color:0xd94d42, transparent:true, opacity:0.22, side:THREE.DoubleSide, depthWrite:false, depthTest:false })
+  missing: new THREE.MeshBasicMaterial({ name:'missing_coverage_material', color:0xd94d42, transparent:true, opacity:0.22, side:THREE.DoubleSide, depthWrite:false, depthTest:false }),
+  envelope: new THREE.MeshBasicMaterial({ name:'placement_envelope_material', color:0x4f8db7, transparent:true, opacity:0.09, side:THREE.DoubleSide, depthWrite:false }),
+  envelopeEdge: new THREE.LineDashedMaterial({ name:'placement_envelope_edge', color:0x4f8db7, transparent:true, opacity:0.76, dashSize:0.18, gapSize:0.12, depthTest:false }),
+  stop: new THREE.LineBasicMaterial({ name:'optical_stop', color:0xd94d42, transparent:true, opacity:0.86, depthTest:false }),
+  obstacle: new THREE.MeshStandardMaterial({ name:'obstruction', color:0xd94d42, roughness:0.74, metalness:0.08, transparent:true, opacity:0.72 }),
+  wall: new THREE.MeshStandardMaterial({ name:'room_wall', color:0xd7d0c3, roughness:0.98, metalness:0, transparent:true, opacity:0.16, side:THREE.DoubleSide, depthWrite:false }),
+  handle: new THREE.MeshStandardMaterial({ name:'manipulation_handle', color:0xf2c012, roughness:0.38, metalness:0.22, emissive:0x6e4d00, emissiveIntensity:0.34 })
 };
 const SHARED_MATERIALS = new Set(Object.values(M));
 
@@ -449,6 +588,9 @@ function updateSceneTheme(theme){
   M.image.color.setHex(dark ? 0xffcf3d : 0xf2c012);
   M.image.opacity = dark ? 0.22 : 0.13;
   M.imageEdge.color.setHex(dark ? 0xffe07a : 0x8a6400);
+  M.envelope.color.setHex(dark ? 0x6eb8e8 : 0x4f8db7);
+  M.envelopeEdge.color.setHex(dark ? 0x9ed7fa : 0x4f8db7);
+  M.wall.color.setHex(dark ? 0x758191 : 0xd7d0c3);
   stage.setLightingTheme(theme);
 }
 stage.addEventListener('throwline-theme-change',event=>updateSceneTheme(event.detail.theme));
@@ -624,74 +766,168 @@ function buildProjection(apex,rect,screen,pstate){
   edges.renderOrder = 3;
   group.add(edges);
 
-  const center = new THREE.Vector3(0,screen.cy,0.018);
+  const center = new THREE.Vector3(screen.cx,screen.cy,0.018);
   const centerline = new THREE.Line(new THREE.BufferGeometry().setFromPoints([apex,center]),M.centerline);
   centerline.name = 'optical_centerline';
   centerline.computeLineDistances();
   centerline.renderOrder = 3;
   group.add(centerline);
 
-  const shownW = Math.min(screen.imgW,screen.w);
-  const shownH = Math.min(screen.imgH,screen.h);
-  const projected = planePart(shownW,shownH,0,screen.cy,0.010,M.image,'projected_image');
+  const imageLeft = screen.cx-screen.imgW/2, imageRight = screen.cx+screen.imgW/2;
+  const imageBottom = screen.cy-screen.imgH/2, imageTop = screen.cy+screen.imgH/2;
+  const screenLeft = -screen.w/2, screenRight = screen.w/2;
+  const screenBottom = screen.cy-screen.h/2, screenTop = screen.cy+screen.h/2;
+  const shownLeft = Math.max(imageLeft,screenLeft), shownRight = Math.min(imageRight,screenRight);
+  const shownBottom = Math.max(imageBottom,screenBottom), shownTop = Math.min(imageTop,screenTop);
+  const shownW = Math.max(0,shownRight-shownLeft), shownH = Math.max(0,shownTop-shownBottom);
+  const projected = planePart(shownW,shownH,(shownLeft+shownRight)/2,(shownBottom+shownTop)/2,0.010,M.image,'projected_image');
   if (projected) group.add(projected);
-  group.add(rectangleOutline(screen.imgW,screen.imgH,0,screen.cy,0.020,M.imageEdge,'projected_image_boundary'));
+  group.add(rectangleOutline(screen.imgW,screen.imgH,screen.cx,screen.cy,0.020,M.imageEdge,'projected_image_boundary'));
 
-  if (pstate.kind === 'overshoot'){
-    const sideW = Math.max(0,(screen.imgW-screen.w)/2);
-    const capH = Math.min(screen.imgH,screen.h);
-    const spillLeft = planePart(sideW,capH,-screen.w/2-sideW/2,screen.cy,0.026,M.spill,'spill_left');
-    const spillRight = planePart(sideW,capH,screen.w/2+sideW/2,screen.cy,0.026,M.spill,'spill_right');
-    const topH = Math.max(0,(screen.imgH-screen.h)/2);
-    const spillTop = planePart(screen.imgW,topH,0,screen.cy+screen.h/2+topH/2,0.026,M.spill,'spill_top');
-    const spillBottom = planePart(screen.imgW,topH,0,screen.cy-screen.h/2-topH/2,0.026,M.spill,'spill_bottom');
-    [spillLeft,spillRight,spillTop,spillBottom].filter(Boolean).forEach(part=>group.add(part));
-  }
+  const spillParts = [
+    planePart(Math.max(0,screenLeft-imageLeft),screen.imgH,(imageLeft+screenLeft)/2,screen.cy,0.026,M.spill,'spill_left'),
+    planePart(Math.max(0,imageRight-screenRight),screen.imgH,(screenRight+imageRight)/2,screen.cy,0.026,M.spill,'spill_right'),
+    planePart(shownW,Math.max(0,imageTop-screenTop),(shownLeft+shownRight)/2,(screenTop+imageTop)/2,0.026,M.spill,'spill_top'),
+    planePart(shownW,Math.max(0,screenBottom-imageBottom),(shownLeft+shownRight)/2,(imageBottom+screenBottom)/2,0.026,M.spill,'spill_bottom')
+  ].filter(Boolean);
+  spillParts.forEach(part=>group.add(part));
 
-  if (pstate.kind === 'undershoot'){
-    const missingCoverage = new THREE.Group();
-    missingCoverage.name = 'missing_coverage';
-    const sideW = Math.max(0,(screen.w-screen.imgW)/2);
-    const capH = Math.min(screen.imgH,screen.h);
-    const topH = Math.max(0,(screen.h-screen.imgH)/2);
-    [
-      planePart(sideW,capH,-screen.w/2+sideW/2,screen.cy,0.026,M.missing,'missing_coverage_left'),
-      planePart(sideW,capH,screen.w/2-sideW/2,screen.cy,0.026,M.missing,'missing_coverage_right'),
-      planePart(screen.w,topH,0,screen.cy+screen.h/2-topH/2,0.026,M.missing,'missing_coverage_top'),
-      planePart(screen.w,topH,0,screen.cy-screen.h/2+topH/2,0.026,M.missing,'missing_coverage_bottom')
-    ].filter(Boolean).forEach(part=>missingCoverage.add(part));
-    group.add(missingCoverage);
-  }
+  const missingCoverage = new THREE.Group();
+  missingCoverage.name = 'missing_coverage';
+  [
+    planePart(Math.max(0,shownLeft-screenLeft),screen.h,(screenLeft+shownLeft)/2,screen.cy,0.027,M.missing,'missing_coverage_left'),
+    planePart(Math.max(0,screenRight-shownRight),screen.h,(shownRight+screenRight)/2,screen.cy,0.027,M.missing,'missing_coverage_right'),
+    planePart(shownW,Math.max(0,screenTop-shownTop),(shownLeft+shownRight)/2,(shownTop+screenTop)/2,0.027,M.missing,'missing_coverage_top'),
+    planePart(shownW,Math.max(0,shownBottom-screenBottom),(shownLeft+shownRight)/2,(screenBottom+shownBottom)/2,0.027,M.missing,'missing_coverage_bottom')
+  ].filter(Boolean).forEach(part=>missingCoverage.add(part));
+  if (missingCoverage.children.length) group.add(missingCoverage);
   group.userData.projectionState = pstate.kind;
   return group;
 }
 
 /* ---------- room ---------- */
-function buildRoom(depth, width){
+function buildRoom(depth, width, height){
   const g = new THREE.Group(); g.name = 'room';
   const floor = new THREE.Mesh(new THREE.PlaneGeometry(width, depth), M.deck);
   floor.name = 'deck'; floor.rotation.x = -Math.PI/2;
-  floor.position.set(0, -0.002, depth/2 - 1.0); floor.receiveShadow = true;
+  floor.position.set(0, -0.002, depth/2); floor.receiveShadow = true;
   g.add(floor);
   const span = Math.max(width, depth);
   const grid = new THREE.GridHelper(span, Math.max(2, Math.round(span/(4*FT))), 0x9c9488, 0xcdc5b8);
   grid.name = 'deck_grid';
-  grid.position.set(0, 0.004, depth/2 - 1.0);
+  grid.position.set(0, 0.004, depth/2);
   g.add(grid);
+  const back = new THREE.Mesh(new THREE.PlaneGeometry(width,height),M.wall);
+  back.name='room_back_wall'; back.position.set(0,height/2,depth); back.rotation.y=Math.PI; g.add(back);
+  [-1,1].forEach((side,index)=>{
+    const wall=new THREE.Mesh(new THREE.PlaneGeometry(depth,height),M.wall);
+    wall.name=`room_side_wall_${index+1}`; wall.position.set(side*width/2,height/2,depth/2); wall.rotation.y=side*Math.PI/2; g.add(wall);
+  });
   return g;
+}
+
+function buildPlacementEnvelope(projector,geometry){
+  const group=new THREE.Group(); group.name=`placement_envelope_${projector.id}`;
+  if(!geometry.envelope) return group;
+  const x=projector.position.x*FT;
+  const y=0.018;
+  const near=geometry.envelope.wideDistance*FT, far=geometry.envelope.teleDistance*FT;
+  const width=Math.max(1.2,sceneState.screen.width*FT*0.12);
+  const surface=new THREE.Mesh(new THREE.PlaneGeometry(width,Math.max(0.01,far-near)),M.envelope);
+  surface.name='placement_envelope'; surface.rotation.x=-Math.PI/2; surface.position.set(x,y,(near+far)/2); group.add(surface);
+  [near,far].forEach((z,index)=>{
+    const line=new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(x-width/2,y+0.004,z),new THREE.Vector3(x+width/2,y+0.004,z)]),index?M.stop:M.envelopeEdge);
+    line.name=index?'tele_stop':'wide_stop'; if(line.computeLineDistances) line.computeLineDistances(); group.add(line);
+  });
+  return group;
+}
+
+function buildGuides(projector,geometry){
+  const group=new THREE.Group(); group.name=`planning_guides_${projector.id}`;
+  if(!geometry.image) return group;
+  const screenZ=0.04, cx=projector.position.targetX*FT, cy=geometry.screen.centerY*FT;
+  if(sceneState.overlays.shift){
+    const line=new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(cx,projector.position.lensHeight*FT,screenZ),new THREE.Vector3(cx,cy,screenZ)]),M.envelopeEdge);
+    line.name='shift_guide'; line.computeLineDistances(); group.add(line);
+    const shift=geometry.shiftEnvelope;
+    if(Number.isFinite(shift?.up)&&Number.isFinite(shift?.down)){
+      const imageH=geometry.image.height*FT,lensY=projector.position.lensHeight*FT;
+      const minY=lensY-shift.down*imageH/100,maxY=lensY+shift.up*imageH/100;
+      const left=Number.isFinite(shift.left)?shift.left:0,right=Number.isFinite(shift.right)?shift.right:0;
+      const envelopeW=geometry.image.width*FT*(1+(left+right)/100);
+      const outline=rectangleOutline(envelopeW,Math.max(.01,maxY-minY),cx+(right-left)*geometry.image.width*FT/200,(minY+maxY)/2,screenZ+.003,M.envelopeEdge,'lens_shift_envelope');
+      outline.computeLineDistances();group.add(outline);
+    }
+  }
+  if(sceneState.overlays.dimensions){
+    const y=sceneState.screen.bottom*FT-0.26;
+    const line=new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(-sceneState.screen.width*FT/2,y,screenZ),new THREE.Vector3(sceneState.screen.width*FT/2,y,screenZ)]),M.envelopeEdge);
+    line.name='screen_width_dimension'; line.computeLineDistances(); group.add(line);
+  }
+  return group;
+}
+
+function buildObstacles(){
+  const group=new THREE.Group(); group.name='room_obstructions';
+  sceneState.obstacles.forEach(obstacle=>{
+    const mesh=box(obstacle.size.width*FT,obstacle.size.height*FT,obstacle.size.depth*FT,M.obstacle,obstacle.id);
+    mesh.position.set(obstacle.position.x*FT,obstacle.position.y*FT,obstacle.position.z*FT);
+    mesh.userData.obstacleId=obstacle.id; group.add(mesh);
+  });
+  return group;
+}
+
+function buildManipulators(projector,geometry){
+  const group=new THREE.Group(); group.name='direct_manipulation_handles';
+  const targets=[];
+  const add=(id,type,label,value,min,max,axis,position,scale=0.13)=>{
+    const mesh=new THREE.Mesh(new THREE.SphereGeometry(scale,18,12),M.handle); mesh.name=`handle_${id}`; mesh.position.copy(position); mesh.renderOrder=10; group.add(mesh);
+    targets.push({id,type,label,value,min,max,step:0.25,fineStep:0.05,axis,metersPerUnit:FT,object:mesh,projectorId:projector.id});
+  };
+  add('distance','set-distance','Set distance',projector.position.distance,1,300,[0,0,1],new THREE.Vector3(projector.position.x*FT,0.22,projector.position.distance*FT));
+  add('lens-height','set-lens-height','Lens height',projector.position.lensHeight,0,100,[0,1,0],new THREE.Vector3(projector.position.x*FT,projector.position.lensHeight*FT,projector.position.distance*FT));
+  add('projector-x','set-projector-x','Projector lateral',projector.position.x,-100,100,[1,0,0],new THREE.Vector3(projector.position.x*FT,0.46,projector.position.distance*FT));
+  add('screen-width','set-screen-width','Screen width',sceneState.screen.width,2,200,[1,0,0],new THREE.Vector3(sceneState.screen.width*FT/2,sceneState.screen.bottom*FT-0.16,0.18));
+  add('screen-bottom','set-screen-bottom','Screen bottom',sceneState.screen.bottom,0,100,[0,1,0],new THREE.Vector3(-sceneState.screen.width*FT/2-0.18,sceneState.screen.bottom*FT,0.18));
+  if(geometry.image) add('image-aim','set-projector-target-x','Image aim',projector.position.targetX,-100,100,[1,0,0],new THREE.Vector3(projector.position.targetX*FT,geometry.screen.centerY*FT,0.18));
+  return {group,targets};
 }
 
 /* ---------- assembly ---------- */
 const root = new THREE.Group(); root.name = 'throwline_stage';
 const proj = buildProjector();
 let screenGrp = null, projectionGrp = null, roomGrp = null, cartGrp = null;
+let extraUnitsGrp = null, envelopeGrp = null, obstacleGrp = null, manipulatorGrp = null, guideGrp = null;
 root.add(proj);
 
 const els = id => document.getElementById(id);
-const state = { w:STAGE_TRANSFER.w, bottom:STAGE_TRANSFER.bottom, ar:STAGE_TRANSFER.ar, basisW:STAGE_TRANSFER.basisW, basisScale:STAGE_TRANSFER.basisScale, rasterAr:STAGE_TRANSFER.rasterAr, wide:STAGE_TRANSFER.wide, tele:STAGE_TRANSFER.tele, lh:STAGE_TRANSFER.lh, dist:STAGE_TRANSFER.dist, mode:STAGE_TRANSFER.mode, allowed:STAGE_TRANSFER.allowed, label:STAGE_TRANSFER.label, gateReason:STAGE_TRANSFER.reason, profile:STAGE_TRANSFER.profile,
-                cone:true, room:true, grid:true };
+let sceneState = SceneState.createSceneState({
+  w:STAGE_TRANSFER.w,bottom:STAGE_TRANSFER.bottom,ar:STAGE_TRANSFER.ar,
+  basisW:STAGE_TRANSFER.basisW,rasterAr:STAGE_TRANSFER.rasterAr,
+  wide:STAGE_TRANSFER.wide,tele:STAGE_TRANSFER.tele,lh:STAGE_TRANSFER.lh,
+  dist:STAGE_TRANSFER.dist,mode:STAGE_TRANSFER.mode,allowed:STAGE_TRANSFER.allowed,
+  label:STAGE_TRANSFER.label,reason:STAGE_TRANSFER.reason,shift:STAGE_TRANSFER.shift
+});
+const initialScene = JSON.stringify(sceneState);
+const state = {};
 let activeCamera = 'three';
 let objectMounted = false;
+let lastVerdict = '';
+
+function syncFlatState(){
+  const projector=SceneState.activeProjector(sceneState);
+  Object.assign(state,{
+    w:sceneState.screen.width,bottom:sceneState.screen.bottom,ar:sceneState.screen.aspect,
+    basisW:projector.optical.basisWidth,basisScale:projector.optical.basisWidth/sceneState.screen.width,
+    rasterAr:projector.optical.rasterAspect,wide:projector.optical.min,tele:projector.optical.max,
+    lh:projector.position.lensHeight,dist:projector.position.distance,x:projector.position.x,targetX:projector.position.targetX,
+    mode:projector.provenance.mode,allowed:projector.allowed,label:projector.label,gateReason:projector.provenance.reason,
+    cone:sceneState.overlays.beam,room:sceneState.overlays.room,grid:sceneState.overlays.grid
+  });
+  document.documentElement.dataset.calculationMode=state.mode;
+  stageCalculationGate.textContent=state.gateReason;
+}
+syncFlatState();
 
 function opticalGeometryAllowed(){
   return state.allowed === true && ['verified_image_width','manual','field_verified'].includes(state.mode) && Number.isFinite(state.wide) && state.wide > 0 && Number.isFinite(state.tele) && state.tele >= state.wide;
@@ -705,88 +941,96 @@ function fmt(ft){
   return (neg?'-':'') + f + "' " + inch + marks[fr] + '"';
 }
 
-document.documentElement.dataset.calculationMode = state.mode;
-stageCalculationGate.textContent = state.gateReason;
 const lensControl = els('lens');
-if (state.mode !== 'manual') {
-  lensControl.labels[0].textContent = 'Exact catalog pair · raw evidence';
-  lensControl.innerHTML = `<option>${state.label}${Number.isFinite(state.wide) ? ` · raw ${state.wide.toFixed(3)}${state.tele!==state.wide?'–'+state.tele.toFixed(3):''}:1` : ''}</option>`;
-  lensControl.disabled = true;
-} else {
-  const exactPreset = [...lensControl.options].find(option=>option.value===`${state.wide.toFixed(3)},${state.tele.toFixed(3)}`);
-  if (exactPreset) lensControl.value = exactPreset.value;
-  else { const option = document.createElement('option'); option.value = `${state.wide},${state.tele}`; option.textContent = `Transferred manual ratio · ${state.wide.toFixed(3)}${state.tele!==state.wide?'–'+state.tele.toFixed(3):''}:1`; lensControl.appendChild(option); lensControl.value = option.value; }
-}
-[['sw','w','swv'],['st','bottom','stv'],['lh','lh','lhv'],['d','dist','dv']].forEach(([id,key,valueId])=>{ els(id).value=state[key]; els(valueId).textContent=fmt(state[key]); els(id).setAttribute('aria-valuetext',fmt(state[key])); });
-const aspectOption = [...els('ar').options].find(option=>Math.abs(Number(option.value)-state.ar)<0.001); if (aspectOption) els('ar').value=aspectOption.value;
+const manualLensMarkup=lensControl.innerHTML;
 
 function projectionState(){
-  const wideD = state.wide*state.basisW;
-  const teleD = state.tele*state.basisW;
-  const safeLo = wideD*1.05;
-  const safeHi = teleD*0.95;
-  if (state.dist > teleD+0.01) return {kind:'overshoot',label:'OVERSHOOT',color:'var(--safety)'};
-  if (state.dist < wideD-0.01) return {kind:'undershoot',label:'UNDERSHOOT',color:'var(--safety)'};
-  if (state.dist >= safeLo && state.dist <= safeHi) return {kind:'safe',label:'PASS · SAFE',color:'var(--go)'};
-  return {kind:'near-limit',label:'PASS · NEAR LIMIT',color:'var(--hazard)'};
+  const geometry=SceneState.calculateProjectorGeometry(sceneState);
+  const color=geometry.placement.tone==='bad'?'var(--safety)':geometry.placement.tone==='go'?'var(--go)':'var(--hazard)';
+  return {...geometry.placement,color,geometry};
 }
 
+function replaceGroup(current,next){ if(current){root.remove(current);disposeObject3D(current);} if(next)root.add(next); return next; }
+
 function rebuild(){
+  syncFlatState();
+  const active=SceneState.activeProjector(sceneState);
+  const geometry=SceneState.calculateProjectorGeometry(sceneState,active.id);
   const w = state.w * FT, h = (state.w/state.ar) * FT, bottom = state.bottom * FT;
   const dist = state.dist * FT, lensY = state.lh * FT;
 
-  if (screenGrp) { root.remove(screenGrp); disposeObject3D(screenGrp); }
-  screenGrp = buildScreen(w,h,bottom); root.add(screenGrp);
+  screenGrp=replaceGroup(screenGrp,buildScreen(w,h,bottom));
 
-  const depth = Math.max(dist + 4*FT, 12);
-  if (roomGrp) { root.remove(roomGrp); disposeObject3D(roomGrp); }
-  roomGrp = buildRoom(depth, Math.max(w + 6, 12)); root.add(roomGrp);
+  roomGrp=replaceGroup(roomGrp,buildRoom(sceneState.room.depth*FT,sceneState.room.width*FT,sceneState.room.height*FT));
   roomGrp.visible = state.room;
   roomGrp.getObjectByName('deck_grid').visible = state.grid;
 
   // projector: lens front element sits exactly at the set distance
   proj.rotation.y = Math.PI;                       // face the screen (-Z)
-  proj.position.set(0, lensY - proj.userData.lensY, dist + proj.userData.lensZ);
+  proj.position.set(state.x*FT, lensY - proj.userData.lensY, dist + proj.userData.lensZ);
 
-  if (cartGrp) { root.remove(cartGrp); disposeObject3D(cartGrp); }
   const bodyBase = proj.position.y;
   if (bodyBase > 0.14){
-    cartGrp = buildCart(bodyBase);
-    cartGrp.position.set(0, bodyBase, dist + proj.userData.lensZ - 0.30);
-    root.add(cartGrp);
-  } else cartGrp = null;
+    const cart = buildCart(bodyBase); cart.position.set(state.x*FT,bodyBase,dist+proj.userData.lensZ-0.30);
+    cartGrp=replaceGroup(cartGrp,cart);
+  } else cartGrp=replaceGroup(cartGrp,null);
 
-  const cy = bottom + h/2;                          // image centred on the screen
-  if (projectionGrp) { root.remove(projectionGrp); disposeObject3D(projectionGrp); }
-  projectionGrp = null;
+  const extras=new THREE.Group(); extras.name='additional_projector_units';
+  sceneState.projectors.filter(item=>item.id!==active.id).forEach(item=>{
+    const unit=buildProjector(); unit.rotation.y=Math.PI;
+    unit.position.set(item.position.x*FT,item.position.lensHeight*FT-unit.userData.lensY,item.position.distance*FT+unit.userData.lensZ);
+    unit.userData.projectorId=item.id; extras.add(unit);
+  });
+  extraUnitsGrp=replaceGroup(extraUnitsGrp,extras);
+
+  const cy = bottom + h/2;
+  projectionGrp=replaceGroup(projectionGrp,null);
   if (opticalGeometryAllowed()) {
-    const imgW = dist / currentRatio();
-    const imgH = imgW / state.rasterAr;
+    const imgW = geometry.image.width*FT;
+    const imgH = geometry.image.height*FT;
     const pstate = projectionState();
     document.documentElement.dataset.projectionState = pstate.kind;
-    const apex = new THREE.Vector3(0, lensY, dist);
+    const cx=active.position.targetX*FT;
+    const apex = new THREE.Vector3(active.position.x*FT,lensY,dist);
     const rect = [
-      new THREE.Vector3(-imgW/2, cy - imgH/2, 0.004),
-      new THREE.Vector3( imgW/2, cy - imgH/2, 0.004),
-      new THREE.Vector3( imgW/2, cy + imgH/2, 0.004),
-      new THREE.Vector3(-imgW/2, cy + imgH/2, 0.004)
+      new THREE.Vector3(cx-imgW/2,cy-imgH/2,0.004),new THREE.Vector3(cx+imgW/2,cy-imgH/2,0.004),
+      new THREE.Vector3(cx+imgW/2,cy+imgH/2,0.004),new THREE.Vector3(cx-imgW/2,cy+imgH/2,0.004)
     ];
-    projectionGrp = buildProjection(apex,rect,{w,h,imgW,imgH,cy},pstate);
+    projectionGrp = buildProjection(apex,rect,{w,h,imgW,imgH,cx,cy},pstate); root.add(projectionGrp);
+    sceneState.projectors.filter(item=>item.id!==active.id).forEach(item=>{
+      const itemGeometry=SceneState.calculateProjectorGeometry(sceneState,item.id);
+      if(!itemGeometry.allowed||!itemGeometry.image)return;
+      const itemW=itemGeometry.image.width*FT,itemH=itemGeometry.image.height*FT,itemCx=item.position.targetX*FT;
+      const itemRect=[
+        new THREE.Vector3(itemCx-itemW/2,cy-itemH/2,0.003),new THREE.Vector3(itemCx+itemW/2,cy-itemH/2,0.003),
+        new THREE.Vector3(itemCx+itemW/2,cy+itemH/2,0.003),new THREE.Vector3(itemCx-itemW/2,cy+itemH/2,0.003)
+      ];
+      const itemState={...itemGeometry.placement,color:itemGeometry.placement.tone==='bad'?'var(--safety)':itemGeometry.placement.tone==='go'?'var(--go)':'var(--hazard)'};
+      const itemProjection=buildProjection(new THREE.Vector3(item.position.x*FT,item.position.lensHeight*FT,item.position.distance*FT),itemRect,{w,h,imgW:itemW,imgH:itemH,cx:itemCx,cy},itemState);
+      itemProjection.name=`projection_system_${item.id}`;projectionGrp.add(itemProjection);
+    });
     projectionGrp.visible = state.cone;
     projectionGrp.traverse(part=>{
       if (part.isMesh || part.isLine) { part.castShadow = false; part.receiveShadow = false; }
     });
-    root.add(projectionGrp);
-    readout(imgW,imgH,w,h,cy,lensY,pstate);
+    readout(geometry,w,h,pstate);
   } else {
     document.documentElement.dataset.projectionState = 'blocked';
-    readoutBlocked(w,h);
+    readoutBlocked(w,h,geometry);
   }
+
+  const envelopes=new THREE.Group(); envelopes.name='projector_placement_envelopes';
+  sceneState.projectors.forEach(item=>{ const itemGeometry=SceneState.calculateProjectorGeometry(sceneState,item.id); envelopes.add(buildPlacementEnvelope(item,itemGeometry)); });
+  envelopes.visible=sceneState.overlays.envelope; envelopeGrp=replaceGroup(envelopeGrp,envelopes);
+  guideGrp=replaceGroup(guideGrp,buildGuides(active,geometry));
+  obstacleGrp=replaceGroup(obstacleGrp,buildObstacles()); obstacleGrp.visible=sceneState.overlays.room;
+  const handles=buildManipulators(active,geometry); manipulatorGrp=replaceGroup(manipulatorGrp,handles.group); stage.setManipulationTargets(handles.targets);
+  renderUnitStrip(); syncSceneControls(); updateWorkspaceFacts(geometry);
   if (objectMounted) setCamera(activeCamera,{announceChange:false});
   stage.requestRender();
 }
 
-function readoutBlocked(w,h){
+function readoutBlocked(w,h,geometry){
   els('hDist').textContent = '—'; els('hDist').style.color = 'var(--safety)';
   const raw = Number.isFinite(state.wide) ? `${state.wide.toFixed(3)}${state.tele!==state.wide?'–'+state.tele.toFixed(3):''}:1 raw` : 'unavailable';
   els('hWide').textContent = raw; els('hTele').textContent = 'not used';
@@ -798,6 +1042,7 @@ function readoutBlocked(w,h){
   els('adjustSummary').textContent = `${fmt(state.w)} screen · calculation blocked`;
   els('sceneSummary').textContent = `CALCULATION BLOCKED. ${state.label}. ${state.gateReason} Screen ${fmt(w/FT)} by ${fmt(h/FT)}. Projector placement ${fmt(state.dist)}. Optical geometry and fit verdict suppressed.`;
   ['bw','bm','bt','tcone'].forEach(id=>els(id).disabled=true);
+  updateWorkspaceFacts(geometry);
 }
 
 // Ratio the lens is actually set to: the operator zooms to fit when the
@@ -807,9 +1052,8 @@ function currentRatio(){
   return Math.min(state.tele, Math.max(state.wide, need));
 }
 
-function readout(imgW,imgH,w,h,cy,lensY,pstate){
-  const wideD = state.wide * state.basisW, teleD = state.tele * state.basisW;
-  const safeLo = wideD*1.05, safeHi = teleD*0.95;
+function readout(geometry,w,h,pstate){
+  const {wideDistance:wideD,teleDistance:teleD,safeLow:safeLo,safeHigh:safeHi}=geometry.envelope;
   const d = state.dist;
   const inRange = d >= wideD - 0.01 && d <= teleD + 0.01;
   const safe = d >= safeLo && d <= safeHi;
@@ -824,7 +1068,7 @@ function readout(imgW,imgH,w,h,cy,lensY,pstate){
   note.textContent = !inRange
     ? (d > teleD ? 'Past the tele stop. The image overshoots the screen.'
                  : 'Inside the wide stop. The image falls short of the screen.')
-    : safe ? 'Inside the ±5% conservative planning zone.'
+    : safe ? (state.mode==='manual'?'Fits the supplied range; field verification is still required.':'Inside the ±5% conservative planning zone.')
            : 'In range but outside the safe band. Little margin at the stop.';
   els('hState').textContent = pstate.label;
   els('hState').style.color = pstate.color;
@@ -838,62 +1082,108 @@ function readout(imgW,imgH,w,h,cy,lensY,pstate){
   els('bPin').style.left = pc(d)+'%';
   els('bPin').style.background = col;
 
-  const iw = imgW/FT, ih = imgH/FT, sw = w/FT, sh = h/FT;
+  const iw = geometry.image.width, ih = geometry.image.height, sw = w/FT, sh = h/FT;
   els('fImg').textContent = fmt(iw) + ' × ' + fmt(ih);
   els('fScr').textContent = fmt(sw) + ' × ' + fmt(sh);
-  const spill = (iw - sw)/2;
-  els('fSpill').textContent = Math.abs(spill) < 0.02 ? 'none'
-    : (spill > 0 ? '+' : '−') + fmt(Math.abs(spill)) + ' each side';
-  els('fSpill').style.color = Math.abs(spill) > 0.02 ? 'var(--safety)' : 'var(--dim)';
+  const imageLeft=state.targetX-iw/2,imageRight=state.targetX+iw/2,screenLeft=-sw/2,screenRight=sw/2;
+  const left=Math.max(0,screenLeft-imageLeft),right=Math.max(0,imageRight-screenRight);
+  const missingLeft=Math.max(0,imageLeft-screenLeft),missingRight=Math.max(0,screenRight-imageRight);
+  const spill=Math.max(left,right,missingLeft,missingRight,Math.abs(ih-sh)/2);
+  els('fSpill').textContent=spill<0.02?'none':`${fmt(spill)} max edge variance`;
+  els('fSpill').style.color=spill>0.02?'var(--safety)':'var(--dim)';
   els('fRatio').textContent = (state.dist/state.basisW).toFixed(3) + ':1';
-  const shiftPct = ((cy - lensY) / (imgH || 1)) * 100;
+  const shiftPct = geometry.image.shiftPercent;
   els('fShift').textContent = (shiftPct>=0?'+':'') + shiftPct.toFixed(1) + '%';
-  els('fShift').style.color = Math.abs(shiftPct) > 60 ? 'var(--safety)' : 'var(--info)';
+  const shiftLimit=geometry.shiftEnvelope?.up;
+  els('fShift').style.color = Number.isFinite(shiftLimit)&&Math.abs(shiftPct)>shiftLimit?'var(--safety)':'var(--info)';
+  if(!geometry.shiftEnvelope) els('fShift').textContent+= ' · limits unknown';
   const lensName = els('lens').selectedOptions[0].textContent;
   els('fLens').textContent = lensName.split('·')[0].trim();
   els('fHeight').textContent = fmt(state.lh);
   els('adjustSummary').textContent = `${fmt(state.w)} screen · ${fmt(state.dist)} set`;
-  els('sceneSummary').textContent = `${pstate.label}. Set mark ${fmt(d)}. ${lensName}. Image ${fmt(iw)} by ${fmt(ih)}; screen ${fmt(sw)} by ${fmt(sh)}. ${Math.abs(spill)<0.02?'No spill.':spill>0?`${fmt(Math.abs(spill))} spill at each side.`:`${fmt(Math.abs(spill))} missing coverage at each side.`} Optical height ${fmt(state.lh)}. Required ratio ${(state.dist/state.basisW).toFixed(3)} to one. Shift ${shiftPct>=0?'plus ':'minus '}${Math.abs(shiftPct).toFixed(1)} percent.`;
+  els('sceneSummary').textContent = `${pstate.label}. ${geometry.provenance.label}. Set mark ${fmt(d)}. ${lensName}. Image ${fmt(iw)} by ${fmt(ih)}; screen ${fmt(sw)} by ${fmt(sh)}. ${spill<0.02?'No edge variance.':`${fmt(spill)} maximum spill or missing coverage.`} Optical height ${fmt(state.lh)}. Required ratio ${(state.dist/state.basisW).toFixed(3)} to one. Shift ${shiftPct>=0?'plus ':'minus '}${Math.abs(shiftPct).toFixed(1)} percent.`;
 }
 
 /* ---------- controls ---------- */
-function bind(id, key, fmtFn, after){
-  const el = els(id);
-  el.addEventListener('input', ()=>{
-    state[key] = parseFloat(el.value);
-    if (fmtFn){
-      const valueText = fmtFn(state[key]);
-      els(id+'v').textContent = valueText;
-      el.setAttribute('aria-valuetext', valueText);
-    }
-    if (after) after(); rebuild();
-  });
-  el.addEventListener('change', ()=>announce(`${el.labels[0].childNodes[0].textContent.trim()} ${fmtFn ? fmtFn(state[key]) : state[key]}`));
+function updateWorkspaceFacts(geometry){
+  els('provenanceBadge').textContent=geometry.provenance.label;
+  els('fRoom').textContent=`${fmt(sceneState.room.width)} × ${fmt(sceneState.room.depth)} × ${fmt(sceneState.room.height)}`;
+  const layoutLabel=sceneState.layoutMode==='blend'?'blend spread':sceneState.layoutMode;
+  els('fUnits').textContent=`${sceneState.projectors.length} · ${layoutLabel}`;
+  els('fObstacles').textContent=sceneState.obstacles.length?`${sceneState.obstacles.length} · ${geometry.collisions.length} collision${geometry.collisions.length===1?'':'s'}`:'none';
+  const roomConflicts=[];
+  if(state.dist>sceneState.room.depth)roomConflicts.push('projector is beyond room depth');
+  if(state.w>sceneState.room.width)roomConflicts.push('screen is wider than room');
+  const alerts=[...geometry.collisions.map(item=>item.label),...roomConflicts];
+  collisionAlert.dataset.active=String(alerts.length>0); collisionAlert.textContent=alerts.length?`Resolve · ${alerts.join(' · ')}`:'No spatial conflicts';
+  const verdict=`${geometry.placement.label}|${geometry.provenance.label}|${alerts.join('|')}`;
+  if(verdict!==lastVerdict&&alerts.length)window.gsap?.fromTo(collisionAlert,{scale:.98,opacity:.45},{scale:1,opacity:1,duration:.28,ease:'power2.out'});
+  lastVerdict=verdict;
 }
-bind('sw','w',fmt,()=>{ state.basisW=state.w*state.basisScale; }); bind('st','bottom',fmt); bind('lh','lh',fmt); bind('d','dist',fmt);
-els('ar').addEventListener('change', e=>{ state.ar = parseFloat(e.target.value); if (state.mode==='manual') { state.rasterAr=state.ar; state.basisScale=1; state.basisW=state.w; } rebuild(); announce(`Aspect ${e.target.selectedOptions[0].textContent}`); });
-els('lens').addEventListener('change', e=>{
-  const [a,b] = e.target.value.split(',').map(Number);
-  state.wide = a; state.tele = b; rebuild(); announce(`Lens ${e.target.selectedOptions[0].textContent}`);
-});
-const setDist = v => { state.dist = Math.round(v*4)/4; els('d').value = state.dist; els('dv').textContent = fmt(state.dist); els('d').setAttribute('aria-valuetext',fmt(state.dist)); rebuild(); announce(`Set distance ${fmt(state.dist)}`); };
-els('bw').onclick = ()=> setDist(state.wide * state.basisW);
-els('bt').onclick = ()=> setDist(state.tele * state.basisW);
-els('bm').onclick = ()=> setDist((state.wide*1.05 + state.tele*0.95)/2 * state.basisW);
 
-function toggle(id, key, apply){
-  const b = els(id);
-  b.onclick = ()=>{
-    state[key] = !state[key];
-    b.setAttribute('aria-pressed', String(state[key]));
-    apply();
-    stage.requestRender();
-    announce(`${b.textContent.trim()} ${state[key] ? 'shown' : 'hidden'}`);
-  };
+function renderUnitStrip(){
+  unitStrip.replaceChildren(...sceneState.projectors.map((item,index)=>{
+    const button=document.createElement('button');button.type='button';button.textContent=item.label||`Unit ${index+1}`;
+    button.setAttribute('aria-pressed',String(item.id===sceneState.activeProjectorId));
+    button.addEventListener('click',()=>applySceneIntent({type:'select-projector',projectorId:item.id},{announceText:`${button.textContent} selected`}));return button;
+  }));
+  els('removeUnit').disabled=sceneState.projectors.length===1;els('addUnit').disabled=sceneState.projectors.length>=8;
 }
-toggle('tcone','cone', ()=> projectionGrp && (projectionGrp.visible = state.cone));
-toggle('troom','room', ()=> roomGrp && (roomGrp.visible = state.room));
-toggle('tgrid','grid', ()=>{ const g = roomGrp && roomGrp.getObjectByName('deck_grid'); if (g) g.visible = state.grid; });
+
+function activeObstacle(){return sceneState.obstacles.find(item=>item.id===sceneState.activeObstacleId);}
+function renderObstacleEditor(){
+  const obstacle=activeObstacle(),editor=els('obstacleEditor');editor.hidden=!obstacle;
+  els('obstacleStrip').replaceChildren(...sceneState.obstacles.map(item=>{const button=document.createElement('button');button.type='button';button.textContent=item.label;button.setAttribute('aria-pressed',String(item.id===sceneState.activeObstacleId));button.addEventListener('click',()=>applySceneIntent({type:'select-obstacle',obstacleId:item.id}));return button;}));
+  if(!obstacle)return;
+  [['obstacleX','x'],['obstacleY','y'],['obstacleZ','z']].forEach(([id,key])=>{els(id).value=obstacle.position[key];els(`${id}v`).textContent=fmt(obstacle.position[key]);});
+  [['obstacleWidth','width'],['obstacleHeight','height'],['obstacleDepth','depth']].forEach(([id,key])=>els(id).value=obstacle.size[key]);
+}
+
+function syncInputsFromState(){
+  syncFlatState();
+  const values={sw:state.w,st:state.bottom,lh:state.lh,d:state.dist,px:state.x,targetX:state.targetX,roomW:sceneState.room.width,roomD:sceneState.room.depth,roomH:sceneState.room.height};
+  Object.entries(values).forEach(([id,value])=>{els(id).value=value;els(`${id}v`).textContent=fmt(value);els(id).setAttribute('aria-valuetext',fmt(value));});
+  const aspectOption=[...els('ar').options].find(option=>Math.abs(Number(option.value)-state.ar)<.001);if(aspectOption)els('ar').value=aspectOption.value;
+  if(state.mode==='manual'){
+    lensControl.labels[0].textContent='Manual ratio preset';
+    if(lensControl.disabled)lensControl.innerHTML=manualLensMarkup;
+    lensControl.disabled=false;
+    const value=`${state.wide.toFixed(3)},${state.tele.toFixed(3)}`;
+    let option=[...lensControl.options].find(item=>item.value===value||item.value===`${state.wide},${state.tele}`);
+    if(!option){option=document.createElement('option');option.value=value;option.textContent=`Transferred manual ratio · ${state.wide.toFixed(3)}${state.tele!==state.wide?'–'+state.tele.toFixed(3):''}:1`;lensControl.appendChild(option);}lensControl.value=option.value;
+  }else{
+    lensControl.labels[0].textContent='Exact catalog pair · raw evidence';lensControl.innerHTML=`<option>${state.label}${Number.isFinite(state.wide)?` · raw ${state.wide.toFixed(3)}${state.tele!==state.wide?'–'+state.tele.toFixed(3):''}:1`:''}</option>`;lensControl.disabled=true;
+  }
+  renderObstacleEditor();
+}
+
+function syncSceneControls(){
+  const map={tcone:'beam',troom:'room',tgrid:'grid',tenvelope:'envelope',tshift:'shift',tdimensions:'dimensions'};
+  Object.entries(map).forEach(([id,key])=>els(id).setAttribute('aria-pressed',String(sceneState.overlays[key])));
+  ['bw','bm','bt','tcone'].forEach(id=>els(id).disabled=!opticalGeometryAllowed());
+}
+
+function applySceneIntent(intent,{announceText=''}={}){sceneState=SceneState.applyIntent(sceneState,intent);syncInputsFromState();rebuild();if(announceText)announce(announceText);}
+function bindSceneRange(id,type){const input=els(id);input.addEventListener('input',()=>applySceneIntent({type,value:Number(input.value)}));input.addEventListener('change',()=>announce(`${input.labels[0].childNodes[0].textContent.trim()} ${fmt(Number(input.value))}`));}
+[['sw','set-screen-width'],['st','set-screen-bottom'],['lh','set-lens-height'],['d','set-distance'],['px','set-projector-x'],['targetX','set-projector-target-x']].forEach(([id,type])=>bindSceneRange(id,type));
+[['roomW','width'],['roomD','depth'],['roomH','height']].forEach(([id,key])=>{els(id).addEventListener('input',event=>applySceneIntent({type:'set-room',key,value:Number(event.target.value)}));});
+els('ar').addEventListener('change',event=>applySceneIntent({type:'set-screen-aspect',value:Number(event.target.value)},{announceText:`Aspect ${event.target.selectedOptions[0].textContent}`}));
+els('lens').addEventListener('change',event=>{const[min,max]=event.target.value.split(',').map(Number);applySceneIntent({type:'set-optical-range',min,max},{announceText:`Lens ${event.target.selectedOptions[0].textContent}`});});
+const setDist=value=>applySceneIntent({type:'set-distance',value},{announceText:`Set distance ${fmt(value)}`});
+els('bw').onclick=()=>setDist(state.wide*state.basisW);els('bt').onclick=()=>setDist(state.tele*state.basisW);els('bm').onclick=()=>setDist((state.wide*1.05+state.tele*.95)/2*state.basisW);
+const overlayMap={tcone:'beam',troom:'room',tgrid:'grid',tenvelope:'envelope',tshift:'shift',tdimensions:'dimensions'};
+Object.entries(overlayMap).forEach(([id,key])=>els(id).addEventListener('click',()=>applySceneIntent({type:'toggle-overlay',key},{announceText:`${els(id).textContent.trim()} ${sceneState.overlays[key]?'hidden':'shown'}`})));
+els('addUnit').onclick=()=>applySceneIntent({type:'add-projector'},{announceText:'Projector duplicated'});els('removeUnit').onclick=()=>applySceneIntent({type:'remove-projector'},{announceText:'Projector removed'});
+els('stackUnits').onclick=()=>applySceneIntent({type:'arrange-projectors',mode:'stack'},{announceText:'Projectors arranged as a stack'});els('blendUnits').onclick=()=>applySceneIntent({type:'arrange-projectors',mode:'blend'},{announceText:'Projectors spread for blending'});
+els('addObstacle').onclick=()=>applySceneIntent({type:'add-obstacle'},{announceText:'Obstruction added'});els('clearObstacles').onclick=()=>applySceneIntent({type:'clear-obstacles'},{announceText:'Obstructions cleared'});els('removeObstacle').onclick=()=>applySceneIntent({type:'remove-obstacle',obstacleId:sceneState.activeObstacleId},{announceText:'Obstruction removed'});
+[['obstacleX','x'],['obstacleY','y'],['obstacleZ','z'],['obstacleWidth','width'],['obstacleHeight','height'],['obstacleDepth','depth']].forEach(([id,key])=>els(id).addEventListener('input',event=>applySceneIntent({type:'set-obstacle',obstacleId:sceneState.activeObstacleId,key,value:Number(event.target.value)})));
+els('stampVerification').onclick=()=>{try{sceneState=SceneState.stampFieldVerification(sceneState,{measuredDistance:Number(els('measuredDistance').value),measuredWidth:Number(els('measuredWidth').value),verifiedBy:els('verifiedBy').value});syncInputsFromState();rebuild();announce('Job measurement stamped as field verified');}catch(error){announce(error.message);}};
+els('saveScene').onclick=()=>{try{localStorage.setItem(SceneState.STORAGE_KEY,JSON.stringify(sceneState));announce('Scene saved on this device');}catch{announce('Scene could not be saved');}};
+els('restoreScene').onclick=()=>{try{const saved=localStorage.getItem(SceneState.STORAGE_KEY);if(!saved)throw new Error('No saved scene');sceneState=SceneState.normalizeSceneState(JSON.parse(saved));syncInputsFromState();rebuild();announce('Saved scene restored');}catch(error){announce(error.message);}};
+els('downloadScene').onclick=()=>{const blob=new Blob([JSON.stringify(sceneState,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download='throwline-stage-scene.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),0);announce('Scene JSON downloaded');};
+els('importScene').onclick=()=>els('sceneFile').click();els('sceneFile').addEventListener('change',async event=>{try{const file=event.target.files[0];if(!file)return;sceneState=SceneState.normalizeSceneState(JSON.parse(await file.text()));syncInputsFromState();rebuild();announce('Scene JSON imported');}catch{announce('Scene JSON could not be imported');}finally{event.target.value='';}});
+els('resetScene').onclick=()=>{sceneState=SceneState.normalizeSceneState(JSON.parse(initialScene));syncInputsFromState();rebuild();announce('Scene reset to transferred values');};
+stage.addEventListener('stage-manipulation',event=>applySceneIntent({type:event.detail.type,projectorId:event.detail.projectorId,value:event.detail.value},{announceText:event.detail.phase==='commit'?`${event.detail.id} set to ${fmt(event.detail.value)}`:''}));
 
 const cameraOrder = ['three','side','front','top','op'];
 const cameraLabels = {three:'Three-quarter',side:'Side',front:'Front',top:'Top',op:'Operator'};
@@ -901,6 +1191,7 @@ function setCamera(camera,{saveDefault=false,announceChange=true}={}){
   const button = document.querySelector(`[data-cam="${camera}"]`);
   if (!button) return;
   activeCamera = camera;
+  if(sceneState.view.camera!==camera)sceneState=SceneState.applyIntent(sceneState,{type:'set-camera',camera});
   document.querySelectorAll('[data-cam]').forEach(o=>o.setAttribute('aria-pressed', String(o===button)));
   const d = state.dist*FT, h = (state.w/state.ar)*FT, cy = state.bottom*FT + h/2;
   const views = {
@@ -926,10 +1217,11 @@ els('resetView').addEventListener('click',()=>{
   announce('Stage camera reset to three-quarter view');
 });
 
+syncInputsFromState();
 rebuild();
 stage.setObject(root);
 objectMounted = true;
-setCamera('three',{saveDefault:true,announceChange:false});
+setCamera(sceneState.view.camera,{saveDefault:true,announceChange:false});
 announce('Stage 3D ready. Three-quarter camera selected.');
 window.addEventListener('pagehide',event=>{ if (!event.persisted) stage.destroy(); });
 } catch (error) {
