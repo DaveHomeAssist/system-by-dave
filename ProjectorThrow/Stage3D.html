@@ -530,7 +530,7 @@ function openOnboarding({trigger=null}={}){
   if(trigger)onboardingTrigger=trigger;
   if(onboardingDialog.open)return;
   if(typeof onboardingDialog.showModal==='function')onboardingDialog.showModal();else onboardingDialog.setAttribute('open','');
-  requestAnimationFrame(()=>{animateOnboarding();onboardingStart.focus();});
+  requestAnimationFrame(()=>{if(!onboardingDialog.open)return;animateOnboarding();onboardingStart.focus();});
 }
 function closeOnboarding({remember=true,restoreFocus=true}={}){
   if(remember)rememberOnboarding();
