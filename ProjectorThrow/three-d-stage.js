@@ -397,10 +397,49 @@
       fallback.textContent = 'Open the Throwline planner';
       this._err.replaceChildren(title, message, fallback);
       this._err.hidden = false;
-      this.announce('Stage 3D unavailable. Open the offline Throwline app.');
+      this.announce('Stage 3D unavailable. Open the Throwline planner.');
       this.dispatchEvent(new CustomEvent('stage-dependency-error', {
         detail: { message: String(err && err.message ? err.message : err) }
       }));
+    }
+
+    _showContextLoss() {
+      if (this._destroyed || this._contextLost) return;
+      this._contextLost = true;
+      this.setAttribute('context-lost', '');
+      if (this._frameId !== undefined) cancelAnimationFrame(this._frameId);
+      this._frameId = undefined;
+      this._setButtonsEnabled(false);
+      const title = document.createElement('strong');
+      title.textContent = '3D view paused';
+      const message = document.createElement('p');
+      message.textContent =
+        'The graphics context was interrupted. Throwline is keeping your numbers and will restore the 3D view automatically when the device recovers.';
+      const fallback = document.createElement('a');
+      fallback.href = this.getAttribute('fallback') || 'index.html?workspace=planner';
+      fallback.textContent = 'Open the Throwline planner';
+      this._err.replaceChildren(title, message, fallback);
+      this._err.hidden = false;
+      this.announce('The 3D view paused. Your calculation data is safe while graphics recover.');
+      this.dispatchEvent(new CustomEvent('stage-context-lost', { bubbles: true }));
+    }
+
+    _restoreContext() {
+      if (this._destroyed || !this._contextLost) return;
+      this._contextLost = false;
+      this.removeAttribute('context-lost');
+      this._err.hidden = true;
+      this._setButtonsEnabled(Boolean(this._object));
+      if (this._viewport && this._renderer && this._camera) {
+        const width = this._viewport.clientWidth || 1;
+        const height = this._viewport.clientHeight || 1;
+        this._renderer.setSize(width, height, false);
+        this._camera.aspect = width / height;
+        this._camera.updateProjectionMatrix();
+      }
+      this.requestRender();
+      this.announce('The 3D view recovered. Scene controls and downloads are ready.');
+      this.dispatchEvent(new CustomEvent('stage-context-restored', { bubbles: true }));
     }
 
     async _boot() {
@@ -432,6 +471,13 @@
       );
       this._keyHandler = (event) => this._handleKey(event);
       renderer.domElement.addEventListener('keydown', this._keyHandler);
+      this._contextLostHandler = (event) => {
+        event.preventDefault();
+        this._showContextLoss();
+      };
+      this._contextRestoredHandler = () => this._restoreContext();
+      renderer.domElement.addEventListener('webglcontextlost', this._contextLostHandler, false);
+      renderer.domElement.addEventListener('webglcontextrestored', this._contextRestoredHandler, false);
       this._viewport.insertBefore(renderer.domElement, this._err);
 
       const scene = new THREE.Scene();
@@ -508,7 +554,7 @@
       this._ro = new ResizeObserver(fit);
       this._frame = () => {
         this._frameId = undefined;
-        if (this._destroyed || document.hidden || !this.isConnected) return;
+        if (this._destroyed || this._contextLost || document.hidden || !this.isConnected) return;
         const changed = controls.update();
         renderer.render(scene, camera);
         if (this._interacting || controls.autoRotate || changed) this.requestRender();
@@ -579,7 +625,7 @@
         this._key.shadow.camera.updateProjectionMatrix();
       }
       this._scene.add(object);
-      this._setButtonsEnabled(true);
+      this._setButtonsEnabled(!this._contextLost);
       this.requestRender();
     }
 
@@ -751,12 +797,12 @@
     }
 
     requestRender() {
-      if (this._destroyed || document.hidden || !this.isConnected || !this._renderer || this._frameId !== undefined) return;
+      if (this._destroyed || this._contextLost || document.hidden || !this.isConnected || !this._renderer || this._frameId !== undefined) return;
       this._frameId = requestAnimationFrame(this._frame);
     }
 
     captureCanvas() {
-      if (this._destroyed || !this._renderer || !this._scene || !this._camera) return undefined;
+      if (this._destroyed || this._contextLost || !this._renderer || !this._scene || !this._camera) return undefined;
       if (this._controls) this._controls.update();
       this._renderer.render(this._scene, this._camera);
       return this._renderer.domElement;
@@ -790,6 +836,10 @@
       if (this._ro) this._ro.disconnect();
       if (this._visibilityHandler) document.removeEventListener('visibilitychange', this._visibilityHandler);
       if (this._renderer && this._keyHandler) this._renderer.domElement.removeEventListener('keydown', this._keyHandler);
+      if (this._renderer && this._contextLostHandler) {
+        this._renderer.domElement.removeEventListener('webglcontextlost', this._contextLostHandler, false);
+        this._renderer.domElement.removeEventListener('webglcontextrestored', this._contextRestoredHandler, false);
+      }
       if (this._renderer && this._pointerDownHandler) {
         this._renderer.domElement.removeEventListener('pointerdown', this._pointerDownHandler, true);
         this._renderer.domElement.removeEventListener('pointermove', this._pointerMoveHandler, true);
@@ -885,7 +935,10 @@
     }
 
     async _runExport(format) {
-      if (!this._object) return;
+      if (!this._object || this._contextLost) {
+        if (this._contextLost) this.announce('Model downloads will return when the 3D view recovers.');
+        return;
+      }
       this.announce(format === 'obj' ? 'Preparing OBJ and MTL downloads.' : 'Preparing GLB download.');
       try {
         await (format === 'obj' ? this._exportObj() : this._exportGlb());

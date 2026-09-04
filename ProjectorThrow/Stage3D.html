@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="description" content="Throwline Stage 3D is an offline-ready spatial workspace for projector placement, throw geometry, field verification, room planning, and model export.">
+<meta name="description" content="Throwline Stage 3D is an offline-capable spatial workspace for projector placement, throw geometry, field verification, room planning, and model export.">
 <meta name="theme-color" id="themeColor" content="#f4f1ea">
 <meta name="color-scheme" content="light dark">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data: blob:; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'none'">
 <link rel="canonical" href="https://systembydave.com/ProjectorThrow/Stage3D.html">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Throwline Stage 3D · Spatial workspace">
-<meta property="og:description" content="Plan projector placement, room geometry, obstructions, and multiple units in an offline-ready 3D workspace.">
+<meta property="og:description" content="Plan projector placement, room geometry, obstructions, and multiple units in a locally bundled 3D workspace.">
 <meta property="og:url" content="https://systembydave.com/ProjectorThrow/Stage3D.html">
 <meta property="og:image" content="https://systembydave.com/img/throwline-og.jpg">
 <meta property="og:image:secure_url" content="https://systembydave.com/img/throwline-og.jpg">
@@ -20,7 +20,7 @@
 <meta property="og:image:alt" content="Two large-venue projectors casting measured light cones across a 3D stage toward a projection screen">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Throwline Stage 3D · Spatial workspace">
-<meta name="twitter:description" content="Offline-ready 3D projector placement, room planning, verification, and export for Throwline.">
+<meta name="twitter:description" content="Locally bundled 3D projector placement, room planning, verification, and export for Throwline.">
 <meta name="twitter:image" content="https://systembydave.com/img/throwline-og.jpg">
 <meta name="twitter:image:alt" content="Two large-venue projectors casting measured light cones across a 3D stage toward a projection screen">
 <title>Throwline Stage 3D · Spatial workspace</title>
@@ -212,7 +212,10 @@ html,body{overflow:hidden}
 .field-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .field-grid label{display:block}
 .field-grid input{width:100%;min-height:38px;padding:8px;border:1px solid var(--line);border-radius:var(--r);background:var(--deck);color:var(--chalk);font:12px var(--mono)}
+.field-grid input[aria-invalid=true]{border-color:var(--safety);box-shadow:0 0 0 2px var(--safety-lo)}
 .field-grid .wide{grid-column:1/-1}
+.field-error{margin:9px 0 0;padding:8px 10px;border:1px solid var(--safety);border-radius:var(--r);background:var(--safety-lo);color:var(--safety);font:700 10px/1.45 var(--mono)}
+.field-error[hidden]{display:none}
 .provenance-line{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-top:8px}
 .provenance-badge{display:inline-flex;align-items:center;min-height:24px;padding:3px 7px;border:1px solid currentColor;border-radius:var(--r);font:700 9.5px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--hazard)}
 html[data-calculation-mode=verified_image_width] .provenance-badge,html[data-calculation-mode=field_verified] .provenance-badge{color:var(--go)}
@@ -278,7 +281,7 @@ html[data-calculation-mode=blocked] .provenance-badge,html[data-calculation-mode
   <header>
     <h1 class="brand">THROW<span style="color:var(--hazard)">LINE</span></h1>
     <span class="tag">Stage 3D · Live workspace</span>
-    <p class="companion">Offline ready · direct spatial control</p>
+    <p class="companion" id="offlineBadge" role="status" aria-live="polite">Preparing offline use · local engine</p>
     <nav class="header-actions" aria-label="Throwline destinations">
       <a class="suite-link" href="../index.html">System by Dave</a>
       <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false" aria-label="Switch to dark mode">
@@ -299,7 +302,7 @@ html[data-calculation-mode=blocked] .provenance-badge,html[data-calculation-mode
     <details class="adjust-panel" id="adjustPanel" open>
       <summary>Adjust <span class="adjust-summary-value" id="adjustSummary">20' screen · 22' set</span></summary>
       <div class="adjust-content">
-    <p class="online-note"><strong>Offline-ready workspace.</strong> The pinned 3D engine is local. If WebGL is unavailable, calculation data remains safe in the <a href="index.html?workspace=planner">Throwline planner</a>.</p>
+    <p class="online-note"><strong id="offlineStatusTitle">Offline after this first successful load.</strong> <span id="offlineStatusDetail">The pinned 3D engine is local and Throwline is preparing its cache.</span> If WebGL is unavailable, calculation data remains safe in the <a href="index.html?workspace=planner">Throwline planner</a>.</p>
     <div class="grp">
       <h3>Projectors</h3>
       <div class="unit-strip" id="unitStrip" role="group" aria-label="Projector units"></div>
@@ -378,10 +381,11 @@ html[data-calculation-mode=blocked] .provenance-badge,html[data-calculation-mode
     <div class="grp" id="fieldVerificationPanel">
       <h3>Field verification</h3>
       <div class="field-grid">
-        <label><span class="lab">Measured throw · ft</span><input id="measuredDistance" type="number" min="0.01" max="300" step="0.01" inputmode="decimal"></label>
-        <label><span class="lab">Measured image · ft</span><input id="measuredWidth" type="number" min="0.01" max="200" step="0.01" inputmode="decimal"></label>
-        <label class="wide"><span class="lab">Verified by</span><input id="verifiedBy" type="text" maxlength="120" autocomplete="name"></label>
+        <label><span class="lab">Measured throw · ft</span><input id="measuredDistance" type="number" min="0.01" max="300" step="0.01" inputmode="decimal" required aria-describedby="fieldVerificationError"></label>
+        <label><span class="lab">Measured image · ft</span><input id="measuredWidth" type="number" min="0.01" max="200" step="0.01" inputmode="decimal" required aria-describedby="fieldVerificationError"></label>
+        <label class="wide"><span class="lab">Verified by</span><input id="verifiedBy" type="text" maxlength="120" autocomplete="name" required aria-describedby="fieldVerificationError"></label>
       </div>
+      <p class="field-error" id="fieldVerificationError" role="alert" hidden></p>
       <button id="stampVerification" class="pri" type="button">Stamp job measurement</button>
     </div>
 
@@ -506,7 +510,54 @@ const collisionAlert = document.getElementById('collisionAlert');
 const quickStartToggle = document.getElementById('quickStartToggle');
 const onboardingDialog = document.getElementById('onboardingDialog');
 const onboardingStart = document.getElementById('onboardingStart');
+const offlineBadge = document.getElementById('offlineBadge');
+const offlineStatusTitle = document.getElementById('offlineStatusTitle');
+const offlineStatusDetail = document.getElementById('offlineStatusDetail');
 const ONBOARDING_STORAGE_KEY = 'throwline:stage-onboarding:v1';
+const OFFLINE_CACHE_VERSION = 'v20260904-throwline-runtime-recovery';
+
+function setOfflineStatus(state,badge,title,detail){
+  document.documentElement.dataset.offline=state;
+  offlineBadge.textContent=badge;
+  offlineStatusTitle.textContent=title;
+  offlineStatusDetail.textContent=detail;
+}
+function controllingWorkerVersion(){
+  const controller=navigator.serviceWorker?.controller;
+  if(!controller)return Promise.resolve('');
+  return new Promise(resolve=>{
+    const channel=new MessageChannel();
+    const timer=window.setTimeout(()=>resolve(''),1200);
+    channel.port1.onmessage=event=>{window.clearTimeout(timer);resolve(String(event.data?.version||''));};
+    controller.postMessage({type:'SBD_OFFLINE_VERSION'},[channel.port2]);
+  });
+}
+async function markOfflineReady(){
+  const version=await controllingWorkerVersion();
+  document.documentElement.dataset.offlineVersion=version;
+  if(version!==OFFLINE_CACHE_VERSION)return false;
+  setOfflineStatus('ready','Offline ready · direct spatial control','Offline ready.','This workspace and its pinned 3D engine are saved on this device.');
+  return true;
+}
+async function prepareOfflineUse(){
+  if(location.protocol==='file:'||!('serviceWorker' in navigator)){
+    setOfflineStatus('unavailable','Local engine · offline cache unavailable','Offline cache unavailable.','This browser cannot save the workspace for offline use; the bundled 3D engine still loads locally.');
+    return;
+  }
+  try{
+    setOfflineStatus('installing','Preparing offline use · local engine','Preparing offline use.','Throwline is saving the workspace and pinned 3D engine on this device.');
+    const registration=await navigator.serviceWorker.register('../av-suite-worker.js');
+    await navigator.serviceWorker.ready;
+    if(await markOfflineReady())return;
+    setOfflineStatus('updating','Updating offline files · stay online','Updating offline files.','Keep this page online while the current workspace replaces an older cache.');
+    navigator.serviceWorker.addEventListener('controllerchange',()=>markOfflineReady(),{once:true});
+    registration.update().catch(()=>{});
+  }catch(error){
+    console.warn('Throwline offline cache unavailable',error);
+    setOfflineStatus('error','Local engine · offline cache failed','Offline cache could not be prepared.','The workspace is available now, but a network connection will be required to reopen it.');
+  }
+}
+prepareOfflineUse();
 
 const mobilePanelButtons=[...document.querySelectorAll('[data-mobile-panel-button]')];
 function setMobilePanel(panel,{focusPanel=false}={}){
@@ -700,6 +751,18 @@ syncAdjustLayout();
 window.addEventListener('resize',syncAdjustLayout,{passive:true});
 stage.addEventListener('stage-dependency-error',()=>{
   stageStatus.textContent = 'The 3D view couldn’t load on this device. The Throwline planner still works.';
+});
+stage.addEventListener('stage-context-lost',()=>{
+  document.documentElement.dataset.renderer='recovering';
+  mobileObj.disabled=true;
+  mobileGlb.disabled=true;
+  stageStatus.textContent='The 3D view paused while graphics recover. Your numbers, results, and controls still work.';
+});
+stage.addEventListener('stage-context-restored',()=>{
+  document.documentElement.dataset.renderer='ready';
+  mobileObj.disabled=false;
+  mobileGlb.disabled=false;
+  stageStatus.textContent='The 3D view recovered. Scene controls and model downloads are ready.';
 });
 
 const els = id => document.getElementById(id);
@@ -913,7 +976,59 @@ els('addUnit').onclick=()=>applySceneIntent({type:'add-projector'},{announceText
 els('stackUnits').onclick=()=>applySceneIntent({type:'arrange-projectors',mode:'stack'},{announceText:'Projectors arranged as a stack'});els('blendUnits').onclick=()=>applySceneIntent({type:'arrange-projectors',mode:'blend'},{announceText:'Projectors spread out for blending. This is a rough layout; overlap is not calculated yet.'});
 els('addObstacle').onclick=()=>applySceneIntent({type:'add-obstacle'},{announceText:'Obstruction added'});els('clearObstacles').onclick=()=>applySceneIntent({type:'clear-obstacles'},{announceText:'Obstructions cleared'});els('removeObstacle').onclick=()=>applySceneIntent({type:'remove-obstacle',obstacleId:sceneState.activeObstacleId},{announceText:'Obstruction removed'});
 [['obstacleX','x'],['obstacleY','y'],['obstacleZ','z'],['obstacleWidth','width'],['obstacleHeight','height'],['obstacleDepth','depth']].forEach(([id,key])=>els(id).addEventListener('input',event=>applySceneIntent({type:'set-obstacle',obstacleId:sceneState.activeObstacleId,key,value:Number(event.target.value)})));
-els('stampVerification').onclick=()=>{try{sceneState=SceneState.stampFieldVerification(sceneState,{measuredDistance:Number(els('measuredDistance').value),measuredWidth:Number(els('measuredWidth').value),verifiedBy:els('verifiedBy').value});syncInputsFromState();rebuild();announce('On-site measurement saved. This unit is now field verified.');}catch(error){announce(error.message);}};
+const fieldVerificationError=els('fieldVerificationError');
+const fieldVerificationInputs=[els('measuredDistance'),els('measuredWidth'),els('verifiedBy')];
+let animateFieldVerificationError=null;
+const fieldVerificationMotion=window.gsap?.matchMedia();
+fieldVerificationMotion?.add('(prefers-reduced-motion: no-preference)',()=>{
+  animateFieldVerificationError=(inputs)=>{
+    window.gsap.killTweensOf([fieldVerificationError,...inputs]);
+    return window.gsap.timeline()
+      .fromTo(fieldVerificationError,{x:-6,autoAlpha:.55},{x:0,autoAlpha:1,duration:.2,ease:'power2.out',clearProps:'transform,opacity,visibility'})
+      .fromTo(inputs,{x:-3},{x:0,duration:.18,stagger:.04,ease:'power2.out',clearProps:'transform'},0);
+  };
+  return()=>{animateFieldVerificationError=null;window.gsap.killTweensOf([fieldVerificationError,...fieldVerificationInputs]);};
+});
+function clearFieldVerificationError(){
+  fieldVerificationError.hidden=true;
+  fieldVerificationError.textContent='';
+  fieldVerificationInputs.forEach(input=>input.removeAttribute('aria-invalid'));
+}
+function fieldVerificationIssues(){
+  const issues=[];
+  const distance=els('measuredDistance');
+  const width=els('measuredWidth');
+  const verifier=els('verifiedBy');
+  if(!distance.value.trim()||!distance.validity.valid)issues.push({input:distance,message:'Enter a measured throw from 0.01 to 300 ft.'});
+  if(!width.value.trim()||!width.validity.valid)issues.push({input:width,message:'Enter a measured image width from 0.01 to 200 ft.'});
+  if(!verifier.value.trim()||!verifier.validity.valid)issues.push({input:verifier,message:'Enter who verified the measurement.'});
+  return issues;
+}
+function showFieldVerificationError(issues){
+  fieldVerificationInputs.forEach(input=>input.removeAttribute('aria-invalid'));
+  issues.forEach(issue=>issue.input?.setAttribute('aria-invalid','true'));
+  fieldVerificationError.textContent=issues.map(issue=>issue.message).join(' ');
+  fieldVerificationError.hidden=false;
+  animateFieldVerificationError?.(issues.map(issue=>issue.input).filter(Boolean));
+  issues[0]?.input?.focus();
+  announce(fieldVerificationError.textContent);
+}
+fieldVerificationInputs.forEach(input=>input.addEventListener('input',()=>{
+  if(fieldVerificationError.hidden)return;
+  const issues=fieldVerificationIssues();
+  if(!issues.length){clearFieldVerificationError();return;}
+  fieldVerificationInputs.forEach(field=>field.removeAttribute('aria-invalid'));
+  issues.forEach(issue=>issue.input.setAttribute('aria-invalid','true'));
+  fieldVerificationError.textContent=issues.map(issue=>issue.message).join(' ');
+}));
+els('stampVerification').onclick=()=>{
+  const issues=fieldVerificationIssues();
+  if(issues.length){showFieldVerificationError(issues);return;}
+  try{
+    sceneState=SceneState.stampFieldVerification(sceneState,{measuredDistance:Number(els('measuredDistance').value),measuredWidth:Number(els('measuredWidth').value),verifiedBy:els('verifiedBy').value.trim()});
+    clearFieldVerificationError();syncInputsFromState();rebuild();announce('On-site measurement saved. This unit is now field verified.');
+  }catch(error){showFieldVerificationError([{input:els('measuredDistance'),message:String(error?.message||'The field measurement could not be saved.')}]);}
+};
 els('saveScene').onclick=()=>{try{localStorage.setItem(SceneState.STORAGE_KEY,JSON.stringify(sceneState));announce('Scene saved on this device');}catch{announce('Scene could not be saved');}};
 els('restoreScene').onclick=()=>{try{const saved=localStorage.getItem(SceneState.STORAGE_KEY);if(!saved)throw new Error('No saved scene');sceneState=SceneState.normalizeSceneState(JSON.parse(saved));syncInputsFromState();rebuild();announce('Saved scene restored');}catch(error){announce(error.message);}};
 els('downloadScene').onclick=()=>{const blob=new Blob([JSON.stringify(sceneState,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download='throwline-stage-scene.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),0);announce('Scene JSON downloaded');};
@@ -1105,12 +1220,12 @@ function buildProjector(dims){
 
 // Rolling cart sized to carry the body at `height` metres off the deck.
 function buildCart(height){
-  const g = new THREE.Group(); g.name = 'cart';
+  const g = new THREE.Group(); g.name = 'cart_assembly';
   const CW = 0.78, CD = 0.72, CT = 0.028;
   const casterR = 0.052;
   const legLen = Math.max(height - CT - casterR*2, 0.12);
 
-  const topDeck = box(CW, CT, CD, M.alu, 'cart_top');
+  const topDeck = box(CW, CT, CD, M.alu, 'cart');
   topDeck.position.y = -CT/2; g.add(topDeck);
 
   const shelf = box(CW*0.86, 0.020, CD*0.82, M.alu, 'cart_shelf');
@@ -1130,7 +1245,7 @@ function buildCart(height){
 function buildScreen(w,h,bottom){
   const g = new THREE.Group(); g.name = 'screen_assembly';
   const surf = new THREE.Mesh(new THREE.PlaneGeometry(w,h), M.screen);
-  surf.name = 'screen_surface'; surf.receiveShadow = true;
+  surf.name = 'screen'; surf.receiveShadow = true;
   surf.position.set(0, bottom + h/2, 0); g.add(surf);
 
   const t = 0.055, dpt = 0.09;
@@ -1438,10 +1553,11 @@ sceneRenderer = { rebuild: rebuildScene };
 syncInputsFromState();
 rebuild();
 stage.setObject(root);
+if(!stage.hasAttribute('context-lost'))document.documentElement.dataset.renderer = 'ready';
 objectMounted = true;
 setCamera(sceneState.view.camera,{saveDefault:true,announceChange:false});
 announce('Stage 3D ready. Three-quarter camera selected.');
-window.addEventListener('pagehide',event=>{ if (!event.persisted) stage.destroy(); });
+window.addEventListener('pagehide',event=>{fieldVerificationMotion?.revert();if(!event.persisted)stage.destroy();});
 } catch (error) {
   document.documentElement.dataset.renderer = 'unavailable';
   stageStatus.textContent = 'The 3D view couldn’t start on this device. Your numbers, results, and controls still work; only the 3D picture and model downloads are off. The Throwline planner has drawings.';

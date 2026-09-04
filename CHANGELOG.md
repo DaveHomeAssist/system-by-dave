@@ -2,6 +2,14 @@
 
 ## 2026-09-04
 
+### Throwline runtime recovery and release gate
+
+* Stage 3D now catches live WebGL context loss, keeps every calculated fact and control available behind a visible recovery panel, suspends model downloads, and restores the existing scene when the browser recovers.
+* Field Verify now rejects missing or out-of-range measurements with a visible alert, `aria-invalid` fields, first-error focus, and reduced-motion-safe GSAP feedback; valid stamps keep the existing provenance rules.
+* Direct visits now register the shared AV service worker and only claim `Offline ready` after its cache is installed and controlling the page. First-load, unavailable, and failed-cache states use explicit wording.
+* OBJ and GLB exports now honor the promised `screen` and `cart` object names. The browser probe downloads and inspects both formats, forces and restores a real WebGL loss, verifies field errors, and performs an offline reload; both WebGL and no-WebGL runs now hard-fail the Pages workflow.
+* Updated the Throwline release verifier, architecture notes, and AV Suite offline cache version.
+
 ### Throwline projector body and clearance
 
 * Projector units can carry a body (width, height, depth, lens protrusion). A catalog pair fills it from maker dimensions automatically; otherwise it can be typed in Stage 3D or transferred from the planner. Stage 3D draws the body at true size.
