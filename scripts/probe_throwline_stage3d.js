@@ -76,8 +76,12 @@ async function main() {
   const profile = fs.mkdtempSync(path.join(os.tmpdir(), 'sbd-throwline-stage-probe-'));
   // Root containers (CI runners, remote sessions) cannot use Chrome's sandbox; local operator runs keep it on.
   const sandboxFlags = args.includes('--no-sandbox') || (typeof process.getuid === 'function' && process.getuid() === 0) ? ['--no-sandbox'] : [];
+  // A remote --base behind an egress proxy: Chrome does not read HTTPS_PROXY on its own, so hand it the proxy
+  // explicitly (its CA is expected in the browser trust store); local bases stay direct.
+  const remoteBase = !/^https?:\/\/(127\.0\.0\.1|localhost)[:/]/.test(baseUrl);
+  const proxyFlags = remoteBase && process.env.HTTPS_PROXY ? [`--proxy-server=${process.env.HTTPS_PROXY}`, '--proxy-bypass-list=127.0.0.1;localhost'] : [];
   const chrome = spawn(chromeBin, [
-    ...sandboxFlags,
+    ...sandboxFlags, ...proxyFlags,
     '--headless=new', '--disable-gpu', '--use-angle=swiftshader', '--enable-unsafe-swiftshader',
     '--disable-background-networking', '--disable-component-update', '--no-default-browser-check', '--no-first-run',
     `--remote-debugging-port=${port}`, `--user-data-dir=${profile}`, 'about:blank'
@@ -115,11 +119,12 @@ async function main() {
     }
     async function open(query) {
       await cdp('Page.navigate', { url: stageUrl(query) });
-      for (let attempt = 0; attempt < 80; attempt += 1) {
-        const ready = await evaluate(`Boolean(document.getElementById('fRatio') && document.getElementById('provenanceBadge')?.textContent && document.documentElement.dataset.calculationMode)`);
-        if (ready) break;
-        await delay(125);
+      let ready = false;
+      for (let attempt = 0; attempt < 160 && !ready; attempt += 1) {
+        ready = await evaluate(`Boolean(document.getElementById('fRatio') && document.getElementById('provenanceBadge')?.textContent && document.documentElement.dataset.calculationMode)`);
+        if (!ready) await delay(125);
       }
+      if (!ready) throw new Error(`Stage 3D never became ready at ${stageUrl(query)}: ${await evaluate('JSON.stringify({ href: location.href, title: document.title, readyState: document.readyState })')}`);
       await delay(150);
       return readout();
     }
