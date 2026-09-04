@@ -469,8 +469,18 @@ requireMatch(stage, /dataset\.calculationMode\s*=/, 'Stage 3D must expose its ca
 requireMatch(stage, /new\s+URLSearchParams\(location\.search\)/, 'Stage 3D must validate planner transfer parameters.');
 requireMatch(stage, /requestedMode\s*===\s*["']legacy_unverified["'][\s\S]*?Broad legacy source rows are reference-only/, 'Stage 3D must preserve the legacy-unverified gate reason from planner transfers.');
 requireMatch(stage, /if\s*\(opticalGeometryAllowed\(\)\)[\s\S]*?buildProjection\s*\(/, 'Stage 3D must gate projection geometry through opticalGeometryAllowed().');
-requireMatch(stage, /state\.wide\s*\*\s*state\.basisW/, 'Stage 3D throw limits must use the transferred projected-raster width basis.');
+requireMatch(sceneState, /optical\.min\s*\*\s*optical\.basisWidth/, 'Throwline throw limits must use the transferred projected-raster width basis.');
+requireMatch(stage, /geometry\.envelope\.wideDistance/, 'Stage 3D throw limits must come from the shared scene-state envelope.');
 requireMatch(stage, /state\.dist\s*\/\s*state\.basisW/, 'Stage 3D required ratio must use the projected-raster width basis.');
+requireMatch(stage, /type:\s*['"]snap-distance['"]/, 'Stage 3D snap controls must use the exact optical-stop intent instead of quarter-foot rounding.');
+requireMatch(stage, /SceneState\.roomConflicts\(/, 'Stage 3D must derive room conflicts from the shared scene-state contract.');
+requireMatch(stage, /geometry\.shift\b/, 'Stage 3D must judge lens shift through the direction-aware scene-state assessment.');
+requireMatch(stage, /requestedMode\s*===\s*['"]field_verified['"][\s\S]*?number\(['"]md['"][\s\S]*?number\(['"]mw['"][\s\S]*?Date\.parse\(stamp\)/, 'Stage 3D must require measurement evidence and a real timestamp before honoring a FIELD VERIFIED transfer.');
+requireMatch(main, /put\(["']md["'][\s\S]*?put\(["']mw["'][\s\S]*?put\(["']vb["']/, 'The planner must transfer the field measurement evidence with a field-verified Stage 3D link.');
+['roomConflicts', 'PLACEMENT_TOLERANCE', "'snap-distance'"].forEach((token) => {
+  if (!sceneState.includes(token)) fail(`Throwline scene-state contract is missing ${token}.`);
+});
+if (!fs.existsSync(path.join(ROOT, 'scripts/probe_throwline_stage3d.js'))) fail('The Stage 3D browser regression probe is missing.');
 requireMatch(main, /id=["']stage3dLink["']/, 'The planner Stage 3D link must be state-aware.');
 requireMatch(main, /function\s+stage3dUrlFor\s*\(/, 'The planner must serialize validated Stage 3D transfer state.');
 requireMatch(main, /ThrowlineSceneState[\s\S]*?createSceneState/, 'The planner must normalize Stage 3D transfer values through the shared scene-state contract.');

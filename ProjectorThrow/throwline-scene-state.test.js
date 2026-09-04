@@ -85,3 +85,119 @@ test('shift limits remain part of the derived spatial envelope', () => {
   const scene = Scene.createSceneState({ w: 20, ar: 16 / 9, basisW: 20, rasterAr: 16 / 10, lh: 6, dist: 22, wide: 0.978, tele: 1.32, mode: 'manual', allowed: true, shift: { up: 60, down: 40, left: 20, right: 20 } });
   assert.deepEqual(Scene.calculateProjectorGeometry(scene).shiftEnvelope, { up: 60, down: 40, left: 20, right: 20 });
 });
+
+// Regression coverage from the Stage 3D calculation audit (exact production link:
+// ?mode=manual&w=20&bottom=4&ar=1.777778&basisW=20&rasterAr=1.6&lh=6&dist=7.3229&min=0.978&max=1.32).
+function auditScene(overrides = {}) {
+  return Scene.createSceneState({ w: 20, bottom: 4, ar: 1.777778, basisW: 20, rasterAr: 1.6, lh: 6, dist: 7.3229, wide: 0.978, tele: 1.32, mode: 'manual', allowed: true, ...overrides });
+}
+const near = (actual, expected, tolerance = 1e-6) => assert.ok(Math.abs(actual - expected) <= tolerance, `${actual} is not within ${tolerance} of ${expected}`);
+
+test('audit link reproduces the documented throw geometry in feet', () => {
+  const geometry = Scene.calculateProjectorGeometry(auditScene());
+  near(geometry.screen.height, 11.25, 1e-5);
+  near(geometry.envelope.wideDistance, 19.56);
+  near(geometry.envelope.teleDistance, 26.4);
+  near(geometry.envelope.safeLow, 20.538);
+  near(geometry.envelope.safeHigh, 25.08);
+  near(geometry.image.requiredRatio, 0.366145);
+  near(geometry.image.currentRatio, 0.978);
+  near(geometry.image.width, 7.487628, 1e-6);
+  near(geometry.image.height, 4.679767, 1e-6);
+  near(geometry.image.shiftPercent, 77.4611, 1e-4);
+  assert.equal(geometry.placement.kind, 'undershoot');
+  assert.equal(Scene.calculateProjectorGeometry(auditScene({ dist: 7.3229 / 0.3048 })).placement.kind, 'safe');
+});
+
+test('snap intents land on the exact optical stops instead of quarter-foot marks', () => {
+  const wide = Scene.applyIntent(auditScene(), { type: 'snap-distance', target: 'wide' });
+  const tele = Scene.applyIntent(auditScene(), { type: 'snap-distance', target: 'tele' });
+  const mid = Scene.applyIntent(auditScene(), { type: 'snap-distance', target: 'mid' });
+  near(Scene.activeProjector(wide).position.distance, 19.56);
+  near(Scene.activeProjector(tele).position.distance, 26.4);
+  near(Scene.activeProjector(mid).position.distance, 22.809);
+  assert.equal(Scene.calculateProjectorGeometry(wide).placement.kind, 'near-limit');
+  assert.equal(Scene.calculateProjectorGeometry(tele).placement.kind, 'near-limit');
+  assert.equal(Scene.calculateProjectorGeometry(mid).placement.kind, 'safe');
+  const rounded = Scene.applyIntent(auditScene(), { type: 'set-distance', value: 19.56 });
+  assert.equal(Scene.calculateProjectorGeometry(rounded).placement.kind, 'undershoot', 'quarter-foot rounding is the documented failure mode for the raw distance intent');
+});
+
+test('snap intents never fall outside the envelope across random ratio ranges', () => {
+  let seed = 7;
+  const random = () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; };
+  for (let index = 0; index < 2000; index += 1) {
+    const min = 0.3 + random() * 2, max = min + random() * 2, basisW = 4 + random() * 60;
+    const scene = Scene.createSceneState({ w: basisW, ar: 1.7778, bottom: 4, basisW, rasterAr: 1.6, lh: 6, dist: 22, wide: min, tele: max, mode: 'manual', allowed: true });
+    ['wide', 'tele', 'mid'].forEach(target => {
+      const kind = Scene.calculateProjectorGeometry(Scene.applyIntent(scene, { type: 'snap-distance', target })).placement.kind;
+      assert.ok(kind === 'safe' || kind === 'near-limit', `${target} snap produced ${kind} for ${min}-${max} × ${basisW}`);
+    });
+  }
+});
+
+test('snap intents are ignored while optical geometry is blocked', () => {
+  const blocked = Scene.createSceneState({ mode: 'partial', allowed: false, dist: 22 });
+  assert.equal(Scene.activeProjector(Scene.applyIntent(blocked, { type: 'snap-distance', target: 'wide' })).position.distance, 22);
+});
+
+test('field stamps certify the ratio against the planned basis, not the measured throw', () => {
+  const stamped = Scene.stampFieldVerification(auditScene({ dist: 22.75 }), { measuredDistance: 12, measuredWidth: 10, verifiedBy: 'Dave' });
+  const projector = Scene.activeProjector(stamped);
+  const geometry = Scene.calculateProjectorGeometry(stamped);
+  assert.equal(projector.optical.basisWidth, 20);
+  near(projector.optical.min, 1.2);
+  near(geometry.envelope.wideDistance, 24);
+  near(geometry.envelope.teleDistance, 24);
+  assert.equal(geometry.placement.kind, 'undershoot');
+  assert.deepEqual({ ...projector.provenance.verification, verifiedAt: '' }, { ratio: 1.2, measuredDistance: 12, measuredWidth: 10, verifiedBy: 'Dave', verifiedAt: '', note: '' });
+});
+
+test('a fixed ratio passes at its exact mark instead of an inverted safe band', () => {
+  const stamped = Scene.stampFieldVerification(auditScene({ dist: 24 }), { measuredDistance: 24, measuredWidth: 20, verifiedBy: 'Dave' });
+  const geometry = Scene.calculateProjectorGeometry(stamped);
+  assert.ok(geometry.envelope.safeLow <= geometry.envelope.safeHigh);
+  assert.equal(geometry.placement.kind, 'safe');
+  assert.equal(geometry.placement.label, 'PASS · SAFE');
+  assert.equal(geometry.provenance.mode, 'field_verified');
+});
+
+test('shift utilization is judged against the limit for its own direction and axis', () => {
+  const downward = Scene.calculateProjectorGeometry(auditScene({ dist: 22, lh: 14, shift: { up: 10, down: 80, left: 5, right: 5 } }));
+  near(downward.image.shiftPercent, -35, 1e-3);
+  assert.equal(downward.shift.vertical.direction, 'down');
+  assert.equal(downward.shift.vertical.limit, 80);
+  assert.equal(downward.shift.vertical.exceeded, false);
+  const upward = Scene.calculateProjectorGeometry(auditScene({ dist: 22, lh: 2, shift: { up: 10, down: 80 } }));
+  assert.equal(upward.shift.vertical.direction, 'up');
+  assert.equal(upward.shift.vertical.exceeded, true);
+  assert.equal(upward.shift.horizontal.limit, undefined);
+  assert.equal(upward.shift.horizontal.exceeded, undefined);
+  const lateral = Scene.applyIntent(auditScene({ dist: 22, shift: { up: 50, down: 50, left: 10, right: 10 } }), { type: 'set-projector-x', value: -6 });
+  const lateralGeometry = Scene.calculateProjectorGeometry(lateral);
+  near(lateralGeometry.image.horizontalShiftPercent, 6 / lateralGeometry.image.width * 100, 1e-9);
+  assert.equal(lateralGeometry.shift.horizontal.direction, 'right');
+  assert.equal(lateralGeometry.shift.horizontal.exceeded, true);
+  assert.equal(Scene.calculateProjectorGeometry(auditScene({ dist: 22 })).shift.vertical.limit, undefined);
+});
+
+test('room conflicts cover ceiling, lateral bounds, projected image, and inactive units', () => {
+  const base = auditScene({ dist: 22 });
+  assert.deepEqual(Scene.roomConflicts(base), []);
+  const ceiling = Scene.normalizeSceneState({ ...base, screen: { width: 20, aspect: 1.777778, bottom: 10 }, room: { width: 40, depth: 40, height: 8 } });
+  assert.deepEqual(Scene.roomConflicts(ceiling).map(item => item.kind), ['screen-height', 'image-height']);
+  const lateral = Scene.applyIntent(base, { type: 'set-projector-x', value: 25 });
+  assert.ok(Scene.roomConflicts(lateral).some(item => item.kind === 'projector-width'));
+  const lens = Scene.normalizeSceneState({ ...base, room: { width: 40, depth: 40, height: 8 }, projectors: [{ ...Scene.activeProjector(base), position: { ...Scene.activeProjector(base).position, lensHeight: 12 } }] });
+  assert.ok(Scene.roomConflicts(lens).some(item => item.kind === 'projector-height'));
+  let multi = Scene.applyIntent(base, { type: 'add-projector' });
+  multi = Scene.applyIntent(multi, { type: 'set-distance', value: 60 });
+  multi = Scene.applyIntent(multi, { type: 'select-projector', projectorId: 'projector-a' });
+  const inactive = Scene.roomConflicts(multi).filter(item => item.kind === 'projector-depth');
+  assert.equal(inactive.length, 1);
+  assert.equal(inactive[0].projectorId, 'projector-2');
+  assert.match(inactive[0].label, /^Unit B is beyond room depth$/);
+  const onFloor = Scene.normalizeSceneState({ ...base, screen: { width: 20, aspect: 1.777778, bottom: 0 } });
+  assert.deepEqual(Scene.roomConflicts(Scene.applyIntent(onFloor, { type: 'set-distance', value: 22 })).map(item => item.kind), ['image-floor'], 'a 16:10 raster on a floor-level 16:9 screen overshoots the floor');
+  assert.deepEqual(Scene.roomConflicts(Scene.applyIntent(onFloor, { type: 'set-distance', value: 7.3229 })), [], 'an undersized image inside the screen does not breach the floor');
+});

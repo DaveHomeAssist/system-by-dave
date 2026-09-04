@@ -4650,7 +4650,7 @@
       put("projector", c.catalogSelection.projector?.projector_id || ""); put("lens", c.catalogSelection.lens?.lens_id || ""); put("profile", c.catalogSelection.profile?.optical_profile_id || "");
       if (c.shiftProfile) { put("su", cleanNum(c.shiftProfile.up, 2)); put("sd", cleanNum(c.shiftProfile.down, 2)); }
       if (c.calculationMode === "manual") { put("min", cleanNum(c.trA, 5)); put("max", cleanNum(c.trB, 5)); }
-      if (c.calculationMode === "field_verified") { put("ratio", cleanNum(c.trA, 5)); put("stamp", c.fieldVerification.verifiedAt); }
+      if (c.calculationMode === "field_verified") { put("ratio", cleanNum(c.trA, 5)); put("stamp", c.fieldVerification.verifiedAt); put("md", cleanNum(c.fieldVerification.actualDist / 12, 4)); put("mw", cleanNum(c.fieldVerification.actualWidth / 12, 4)); put("vb", c.fieldVerification.verifiedBy); }
       return `Stage3D.html?${p.toString()}`;
     }
     function stateObject(c = readState()) {

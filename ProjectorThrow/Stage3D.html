@@ -611,7 +611,17 @@ function resolveStageTransfer(){
   const hasIds = !!(projectorId || lensId || profileId), validIds = !!(projector && lens && compatibility && (!profileId || profile?.optical_profile_id===profileId));
   const ratio = number('ratio',NaN), stamp = params.get('stamp') || '';
   if (requestedMode === 'field_verified' && hasIds && (!STAGE_CATALOG.ok || !validIds)) return {...base,mode:'blocked',wide:NaN,tele:NaN,allowed:false,label:'Invalid field transfer',reason:'CALCULATION BLOCKED · field-calibrated transfer IDs do not resolve to one exact compatible pair.',profile:null};
-  if (requestedMode === 'field_verified' && Number.isFinite(ratio) && ratio > 0 && stamp) return {...base,mode:'field_verified',wide:ratio,tele:ratio,allowed:true,label:`${projector?.model_number || 'Job'} + ${lens?.lens_model_number || 'measured optic'}`,reason:'FIELD VERIFIED · job-scoped measured ratio.',profile};
+  if (requestedMode === 'field_verified') {
+    // A URL is not a stamp. FIELD VERIFIED is honored only when the transfer carries the measurement that produced the ratio
+    // (md = measured throw ft, mw = measured image width ft), the ratio agrees with it, and the stamp is a real timestamp.
+    const measuredDistance = number('md',NaN), measuredWidth = number('mw',NaN), verifiedBy = (params.get('vb') || '').slice(0,120);
+    const measuredRatio = measuredDistance > 0 && measuredWidth > 0 ? measuredDistance / measuredWidth : NaN;
+    const ratioAgrees = Number.isFinite(measuredRatio) && (!Number.isFinite(ratio) || Math.abs(ratio - measuredRatio) <= measuredRatio * 0.005);
+    const stampValid = !!stamp && Number.isFinite(Date.parse(stamp));
+    if (ratioAgrees && stampValid) return {...base,mode:'field_verified',wide:measuredRatio,tele:measuredRatio,allowed:true,label:`${projector?.model_number || 'Job'} + ${lens?.lens_model_number || 'measured optic'}`,reason:'FIELD VERIFIED · job-scoped measured ratio.',profile,verification:{ratio:measuredRatio,measuredDistance,measuredWidth,verifiedBy,verifiedAt:stamp}};
+    if (Number.isFinite(ratio) && ratio > 0) return {...base,mode:'manual',wide:ratio,tele:ratio,allowed:true,label:'Transferred field ratio · unverified',reason:'MANUAL ESTIMATE · transferred field verification lacked measurement evidence; re-stamp the job measurement on site.',profile:null};
+    return {...base,mode:'blocked',wide:NaN,tele:NaN,allowed:false,label:'Untrusted field transfer',reason:'CALCULATION BLOCKED · field verification transfer carried no measured ratio.',profile:null};
+  }
   if (hasIds) {
     if (!STAGE_CATALOG.ok) return {...base,mode:'blocked',wide:NaN,tele:NaN,allowed:false,label:'Catalog unavailable',reason:`CALCULATION BLOCKED · embedded catalog rejected: ${STAGE_CATALOG.error}`,profile:null};
     if (!validIds) return {...base,mode:'blocked',wide:NaN,tele:NaN,allowed:false,label:'Invalid catalog transfer',reason:'CALCULATION BLOCKED · planner IDs do not resolve to one exact compatible catalog pair.',profile:null};
@@ -1052,7 +1062,7 @@ let sceneState = SceneState.createSceneState({
   basisW:STAGE_TRANSFER.basisW,rasterAr:STAGE_TRANSFER.rasterAr,
   wide:STAGE_TRANSFER.wide,tele:STAGE_TRANSFER.tele,lh:STAGE_TRANSFER.lh,
   dist:STAGE_TRANSFER.dist,mode:STAGE_TRANSFER.mode,allowed:STAGE_TRANSFER.allowed,
-  label:STAGE_TRANSFER.label,reason:STAGE_TRANSFER.reason,shift:STAGE_TRANSFER.shift
+  label:STAGE_TRANSFER.label,reason:STAGE_TRANSFER.reason,shift:STAGE_TRANSFER.shift,verification:STAGE_TRANSFER.verification
 });
 const initialScene = JSON.stringify(sceneState);
 const state = {};
@@ -1238,11 +1248,14 @@ function readout(geometry,w,h,pstate){
   els('fSpill').textContent=spill<0.02?'none':`${fmt(spill)} max edge variance`;
   els('fSpill').style.color=spill>0.02?'var(--safety)':'var(--dim)';
   els('fRatio').textContent = (state.dist/state.basisW).toFixed(3) + ':1';
-  const shiftPct = geometry.image.shiftPercent;
-  els('fShift').textContent = (shiftPct>=0?'+':'') + shiftPct.toFixed(1) + '%';
-  const shiftLimit=geometry.shiftEnvelope?.up;
-  els('fShift').style.color = Number.isFinite(shiftLimit)&&Math.abs(shiftPct)>shiftLimit?'var(--safety)':'var(--info)';
-  if(!geometry.shiftEnvelope) els('fShift').textContent+= ' · limits unknown';
+  const shiftPct = geometry.image.shiftPercent, shiftH = geometry.image.horizontalShiftPercent;
+  const signed=value=>(value>=0?'+':'')+value.toFixed(1)+'%';
+  const shiftText=`${signed(shiftPct)} V${Math.abs(shiftH)>=0.05?` · ${signed(shiftH)} H`:''}`;
+  const {vertical,horizontal}=geometry.shift;
+  const shiftExceeded=vertical.exceeded===true||horizontal.exceeded===true;
+  const limitsKnown=vertical.limit!==undefined&&(Math.abs(shiftH)<0.05||horizontal.limit!==undefined);
+  els('fShift').textContent = shiftText + (shiftExceeded?` · exceeds ${vertical.exceeded?vertical.direction:horizontal.direction} limit`:limitsKnown?'':' · limits unknown');
+  els('fShift').style.color = shiftExceeded?'var(--safety)':'var(--info)';
   const lensName = els('lens').selectedOptions[0].textContent;
   els('fLens').textContent = lensName.split('·')[0].trim();
   els('fHeight').textContent = fmt(state.lh);
@@ -1257,9 +1270,7 @@ function updateWorkspaceFacts(geometry){
   const layoutLabel=sceneState.layoutMode==='blend'?'blend spread':sceneState.layoutMode;
   els('fUnits').textContent=`${sceneState.projectors.length} · ${layoutLabel}`;
   els('fObstacles').textContent=sceneState.obstacles.length?`${sceneState.obstacles.length} · ${geometry.collisions.length} collision${geometry.collisions.length===1?'':'s'}`:'none';
-  const roomConflicts=[];
-  if(state.dist>sceneState.room.depth)roomConflicts.push('projector is beyond room depth');
-  if(state.w>sceneState.room.width)roomConflicts.push('screen is wider than room');
+  const roomConflicts=SceneState.roomConflicts(sceneState).map(item=>item.label);
   const alerts=[...geometry.collisions.map(item=>item.label),...roomConflicts];
   collisionAlert.dataset.active=String(alerts.length>0); collisionAlert.textContent=alerts.length?`Resolve · ${alerts.join(' · ')}`:'No spatial conflicts';
   const verdict=`${geometry.placement.label}|${geometry.provenance.label}|${alerts.join('|')}`;
@@ -1315,8 +1326,8 @@ function bindSceneRange(id,type){const input=els(id);input.addEventListener('inp
 [['roomW','width'],['roomD','depth'],['roomH','height']].forEach(([id,key])=>{els(id).addEventListener('input',event=>applySceneIntent({type:'set-room',key,value:Number(event.target.value)}));});
 els('ar').addEventListener('change',event=>applySceneIntent({type:'set-screen-aspect',value:Number(event.target.value)},{announceText:`Aspect ${event.target.selectedOptions[0].textContent}`}));
 els('lens').addEventListener('change',event=>{const[min,max]=event.target.value.split(',').map(Number);applySceneIntent({type:'set-optical-range',min,max},{announceText:`Lens ${event.target.selectedOptions[0].textContent}`});});
-const setDist=value=>applySceneIntent({type:'set-distance',value},{announceText:`Set distance ${fmt(value)}`});
-els('bw').onclick=()=>setDist(state.wide*state.basisW);els('bt').onclick=()=>setDist(state.tele*state.basisW);els('bm').onclick=()=>setDist((state.wide*1.05+state.tele*.95)/2*state.basisW);
+const snapDist=(target,label)=>applySceneIntent({type:'snap-distance',target},{announceText:`${label} ${fmt(state.dist)}`});
+els('bw').onclick=()=>snapDist('wide','Snapped to wide stop');els('bt').onclick=()=>snapDist('tele','Snapped to tele stop');els('bm').onclick=()=>snapDist('mid','Snapped to conservative center');
 const overlayMap={tcone:'beam',troom:'room',tgrid:'grid',tenvelope:'envelope',tshift:'shift',tdimensions:'dimensions'};
 Object.entries(overlayMap).forEach(([id,key])=>els(id).addEventListener('click',()=>applySceneIntent({type:'toggle-overlay',key},{announceText:`${els(id).textContent.trim()} ${sceneState.overlays[key]?'hidden':'shown'}`})));
 els('addUnit').onclick=()=>applySceneIntent({type:'add-projector'},{announceText:'Projector duplicated'});els('removeUnit').onclick=()=>applySceneIntent({type:'remove-projector'},{announceText:'Projector removed'});

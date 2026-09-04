@@ -2,6 +2,15 @@
 
 ## 2026-09-04
 
+### Throwline Stage 3D calculation verification
+
+* Audited the Stage 3D projector model against the production link and confirmed the core throw algebra across a 10,000-case randomized matrix; repaired the defects the audit reproduced.
+* Snap wide, tele, and mid now land on the exact optical stops through a `snap-distance` scene intent instead of quarter-foot rounding that pushed both stops outside their own envelope.
+* Field stamps now certify the measured ratio against the planned raster basis, so a 12 ft throw producing a 10 ft image on a 20 ft raster corrects the mark to 24 ft; a fixed ratio passes at its exact mark instead of an inverted safe band.
+* A `mode=field_verified` URL is honored only when it carries the measurement evidence and a real timestamp; the planner now transfers that evidence, and bare ratio-plus-stamp links open as manual estimates.
+* Lens shift is judged per direction and per axis, with horizontal aim offset reported, and room conflicts now cover ceilings, side walls, projected-image bounds, and inactive units.
+* Added scene-state regression tests, a headless-Chrome Stage 3D probe (`npm run probe:throwline-stage`), release-verifier contract checks, and rolled the AV Suite offline cache version.
+
 ### Throwline Stage 3D quick start
 
 * Added an accessible first-run Quick Start dialog that routes operators through screen sizing, projector placement, and inspection/field verification using the real Stage 3D controls.
