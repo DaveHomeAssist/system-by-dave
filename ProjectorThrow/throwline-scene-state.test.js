@@ -131,7 +131,7 @@ test('snap intents never fall outside the envelope across random ratio ranges', 
     const scene = Scene.createSceneState({ w: basisW, ar: 1.7778, bottom: 4, basisW, rasterAr: 1.6, lh: 6, dist: 22, wide: min, tele: max, mode: 'manual', allowed: true });
     ['wide', 'tele', 'mid'].forEach(target => {
       const kind = Scene.calculateProjectorGeometry(Scene.applyIntent(scene, { type: 'snap-distance', target })).placement.kind;
-      assert.ok(kind === 'safe' || kind === 'near-limit', `${target} snap produced ${kind} for ${min}-${max} × ${basisW}`);
+      assert.ok(kind === 'safe' || kind === 'near-limit' || kind === 'nominal', `${target} snap produced ${kind} for ${min}-${max} × ${basisW}`);
     });
   }
 });
@@ -158,8 +158,12 @@ test('a fixed ratio passes at its exact mark instead of an inverted safe band', 
   const geometry = Scene.calculateProjectorGeometry(stamped);
   assert.ok(geometry.envelope.safeLow <= geometry.envelope.safeHigh);
   assert.equal(geometry.placement.kind, 'safe');
-  assert.equal(geometry.placement.label, 'PASS · SAFE');
+  assert.equal(geometry.placement.label, 'PASS · MEASURED MARK');
   assert.equal(geometry.provenance.mode, 'field_verified');
+  const off = Scene.applyIntent(stamped, { type: 'set-distance', value: 23 });
+  assert.equal(Scene.calculateProjectorGeometry(off).placement.kind, 'nominal', 'after a driving edit the fixed ratio is manual again and 23 ft sits in the verify band');
+  const measuredOff = Scene.stampFieldVerification(auditScene({ dist: 23 }), { measuredDistance: 24, measuredWidth: 20, verifiedBy: 'Dave' });
+  assert.equal(Scene.calculateProjectorGeometry(measuredOff).placement.kind, 'undershoot', 'a measured ratio has no verify band: off the mark is out of range');
 });
 
 test('shift utilization is judged against the limit for its own direction and axis', () => {
@@ -200,4 +204,123 @@ test('room conflicts cover ceiling, lateral bounds, projected image, and inactiv
   const onFloor = Scene.normalizeSceneState({ ...base, screen: { width: 20, aspect: 1.777778, bottom: 0 } });
   assert.deepEqual(Scene.roomConflicts(Scene.applyIntent(onFloor, { type: 'set-distance', value: 22 })).map(item => item.kind), ['image-floor'], 'a 16:10 raster on a floor-level 16:9 screen overshoots the floor');
   assert.deepEqual(Scene.roomConflicts(Scene.applyIntent(onFloor, { type: 'set-distance', value: 7.3229 })), [], 'an undersized image inside the screen does not breach the floor');
+});
+
+// Second-audit regressions: validation, depth-aware collision, tolerance, fixed lenses, coverage, installation check.
+test('missing, blank, and boolean optical values never normalize into an allowed ratio', () => {
+  [null, '', '   ', true, false, undefined].forEach(value => {
+    const projector = Scene.normalizeSceneState({ projectors: [{ allowed: true, optical: { min: value, max: value, mode: 'manual' }, provenance: { mode: 'manual' } }] }).projectors[0];
+    assert.equal(projector.allowed, false, `${JSON.stringify(value)} must not be calculation-enabled`);
+    assert.ok(Number.isNaN(projector.optical.min));
+  });
+});
+
+test('an inverted ratio range blocks instead of collapsing to a fixed ratio', () => {
+  const projector = Scene.normalizeSceneState({ projectors: [{ allowed: true, optical: { min: 2, max: 1, mode: 'manual' }, provenance: { mode: 'manual' } }] }).projectors[0];
+  assert.equal(projector.allowed, false);
+  assert.equal(projector.provenance.mode, 'conflicting');
+  assert.match(projector.provenance.reason, /inverted/i);
+  const scene = Scene.applyIntent(auditScene(), { type: 'set-optical-range', min: 2, max: 1 });
+  near(Scene.activeProjector(scene).optical.min, 0.978, 1e-9);
+});
+
+test('field stamps outside the optical model are rejected rather than clamped in one place', () => {
+  assert.throws(() => Scene.stampFieldVerification(auditScene(), { measuredDistance: 100, measuredWidth: 1 }), RangeError);
+  assert.throws(() => Scene.stampFieldVerification(auditScene(), { measuredDistance: 1, measuredWidth: 100 }), RangeError);
+});
+
+test('a deep obstruction that only clips the wide end of the beam is a collision', () => {
+  const base = Scene.createSceneState({ w: 20, ar: 1.7778, bottom: 4, basisW: 20, rasterAr: 1.7778, lh: 9.625, dist: 20, wide: 1, tele: 1, mode: 'manual', allowed: true });
+  const scene = Scene.normalizeSceneState({ ...base, obstacles: [{ position: { x: 5, y: 9.625, z: 15 }, size: { width: 1, height: 1, depth: 10 } }] });
+  assert.equal(Scene.calculateProjectorGeometry(scene).collisions.length, 1);
+  const clear = Scene.normalizeSceneState({ ...base, obstacles: [{ position: { x: 5, y: 9.625, z: 15 }, size: { width: 1, height: 1, depth: 2 } }] });
+  assert.equal(Scene.calculateProjectorGeometry(clear).collisions.length, 0);
+});
+
+test('collision detection matches an exact frustum/box oracle across random geometry', () => {
+  let seed = 99;
+  const random = () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; };
+  const oracle = (obstacle, scene, projector, image) => {
+    const d = projector.position.distance;
+    const lo = Math.max(0, obstacle.position.z - obstacle.size.depth / 2), hi = Math.min(d, obstacle.position.z + obstacle.size.depth / 2);
+    if (hi < lo) return false;
+    const centerY = scene.screen.bottom + scene.screen.width / scene.screen.aspect / 2;
+    const axes = [
+      [projector.position.x, projector.position.targetX, image.width / 2, obstacle.position.x, obstacle.size.width / 2],
+      [projector.position.lensHeight, centerY, image.height / 2, obstacle.position.y, obstacle.size.height / 2]
+    ];
+    const ok = z => axes.every(([apex, target, half, center, size]) => Math.abs(center - (target + (apex - target) * z / d)) <= half * (1 - z / d) + size + 1e-7);
+    // Each constraint is linear in z, so the feasible set is an interval whose endpoints are constraint roots or lo/hi.
+    const candidates = [lo, hi];
+    axes.forEach(([apex, target, half, center, size]) => {
+      const cs = (apex - target) / d, es = -half / d;
+      [[cs - es, center + half + size - target], [-cs - es, target + half + size - center]].forEach(([slope, offset]) => { if (Math.abs(slope) > 1e-12) candidates.push(Math.min(hi, Math.max(lo, offset / slope))); });
+    });
+    return candidates.some(ok);
+  };
+  let disagreements = 0;
+  for (let index = 0; index < 4000; index += 1) {
+    const dist = 5 + random() * 40;
+    const scene = Scene.normalizeSceneState({
+      screen: { width: 5 + random() * 30, aspect: 1.2 + random() * 1.2, bottom: random() * 6 },
+      projectors: [{ allowed: true, position: { x: random() * 20 - 10, targetX: random() * 10 - 5, distance: dist, lensHeight: random() * 14 }, optical: { min: 0.5 + random(), max: 1.5 + random(), basisWidth: 5 + random() * 30, rasterAspect: 1.6 }, provenance: { mode: 'manual' } }],
+      obstacles: [{ position: { x: random() * 30 - 15, y: random() * 16, z: random() * dist * 1.2 }, size: { width: 0.2 + random() * 4, height: 0.2 + random() * 6, depth: 0.2 + random() * 12 } }]
+    });
+    const projector = scene.projectors[0];
+    const geometry = Scene.calculateProjectorGeometry(scene);
+    const expected = oracle(scene.obstacles[0], scene, projector, geometry.image);
+    if (Scene.obstacleIntersectsBeam(scene.obstacles[0], scene, projector, geometry.image) !== expected) disagreements += 1;
+  }
+  assert.equal(disagreements, 0);
+});
+
+test('planning tolerance is scene state and drives the conservative band', () => {
+  const scene = Scene.createSceneState({ ...{ w: 20, bottom: 4, ar: 1.777778, basisW: 20, rasterAr: 1.6, lh: 6, dist: 21, wide: 0.978, tele: 1.32, mode: 'manual', allowed: true }, tolerance: 10 });
+  const geometry = Scene.calculateProjectorGeometry(scene);
+  assert.equal(scene.tolerance, 10);
+  near(geometry.envelope.safeLow, 19.56 * 1.1);
+  near(geometry.envelope.safeHigh, 26.4 * 0.9);
+  assert.equal(geometry.placement.kind, 'near-limit');
+  assert.equal(Scene.calculateProjectorGeometry(auditScene({ dist: 21 })).placement.kind, 'safe');
+  assert.equal(Scene.applyIntent(scene, { type: 'set-tolerance', value: 40 }).tolerance, 15);
+  assert.equal(Scene.normalizeSceneState({ tolerance: 'abc' }).tolerance, 5);
+});
+
+test('a fixed manual lens has a nominal verify band and no safe interior', () => {
+  const fixed = Scene.createSceneState({ w: 20, bottom: 4, ar: 1.777778, basisW: 20, rasterAr: 1.6, lh: 6, dist: 13, wide: 0.65, tele: 0.65, mode: 'manual', allowed: true });
+  const geometry = Scene.calculateProjectorGeometry(fixed);
+  assert.equal(geometry.envelope.fixed, true);
+  assert.ok(geometry.envelope.safeLow <= geometry.envelope.safeHigh);
+  assert.equal(geometry.placement.kind, 'nominal');
+  assert.equal(geometry.placement.label, 'NOMINAL MARK · VERIFY');
+  assert.equal(Scene.calculateProjectorGeometry(Scene.applyIntent(fixed, { type: 'set-distance', value: 13.5 })).placement.kind, 'nominal');
+  assert.equal(Scene.calculateProjectorGeometry(Scene.applyIntent(fixed, { type: 'set-distance', value: 14 })).placement.kind, 'overshoot');
+});
+
+test('coverage reports missing width and spill separately', () => {
+  const short = Scene.calculateProjectorGeometry(auditScene()).coverage;
+  near(short.missing, 6.256186, 1e-5);
+  near(short.spill, 0, 1e-9);
+  const over = Scene.calculateProjectorGeometry(auditScene({ dist: 24 })).coverage;
+  near(over.spill, 0.625, 1e-6, 'a 16:10 raster on a 16:9 screen spills vertically');
+  near(over.missing, 0, 1e-9);
+});
+
+test('installation check aggregates every unit and never passes on a manual ratio', () => {
+  const audit = Scene.assessInstallation(auditScene());
+  assert.equal(audit.tone, 'bad');
+  assert.match(audit.label, /^FAIL · undershoot/);
+  assert.ok(audit.issues.some(issue => issue.kind === 'coverage-missing'));
+  const manualGood = Scene.assessInstallation(auditScene({ dist: 22, shift: { up: 60, down: 40, left: 10, right: 10 }, rasterAr: 1.777778 }));
+  assert.equal(manualGood.tone, 'warn');
+  assert.ok(manualGood.issues.every(issue => issue.tone === 'warn'));
+  assert.ok(manualGood.issues.some(issue => issue.kind === 'provenance-manual'));
+  const verified = Scene.stampFieldVerification(auditScene({ dist: 22, shift: { up: 60, down: 40, left: 10, right: 10 }, rasterAr: 1.777778 }), { measuredDistance: 22, measuredWidth: 20, verifiedBy: 'Dave' });
+  assert.equal(Scene.assessInstallation(verified).tone, 'go');
+  let multi = Scene.applyIntent(verified, { type: 'add-projector' });
+  multi = Scene.applyIntent(multi, { type: 'set-distance', value: 60 });
+  multi = Scene.applyIntent(multi, { type: 'select-projector', projectorId: 'projector-a' });
+  const aggregate = Scene.assessInstallation(multi);
+  assert.equal(aggregate.tone, 'bad');
+  assert.ok(aggregate.issues.some(issue => issue.projectorId === 'projector-2' && issue.kind === 'room-projector-depth'));
 });

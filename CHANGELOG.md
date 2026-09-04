@@ -2,6 +2,16 @@
 
 ## 2026-09-04
 
+### Throwline Stage 3D second-audit repairs
+
+* Numerical planning no longer depends on WebGL: the scene model, readouts, verdicts, and controls hydrate before the renderer starts, hard-coded demo facts are gone from the markup, and a renderer failure only disables the 3D view and exports.
+* Stage 3D transfer bounds now match the shared scene contract and the range controls stretch to the transferred value, so a 50 ft screen at an 80 ft throw is no longer silently clamped into a passing verdict.
+* Obstruction collision is evaluated across the obstacle's full depth with an exact linear frustum/box test instead of only its center plane, verified against an independent oracle.
+* The planner's planning tolerance transfers to Stage 3D (`tolPct`); fixed or narrow lenses expose a nominal verify band with no safe interior instead of an inverted safe band, while a measured ratio passes only at its exact mark.
+* The headline is now an aggregate installation check across every unit (ratio fit, screen coverage, shift limits, obstructions, room bounds, provenance); the ratio verdict remains in the note.
+* Missing, blank, and boolean optical values and inverted ratio ranges now block calculation; out-of-model field stamps are rejected; the shift envelope is centered on the lens axis; custom aspect transfers show their own option; the blend layout announces itself as illustrative.
+* Added unit tests for each item, a `--no-webgl` probe mode that asserts readout parity without WebGL, verifier contracts, and rolled the AV Suite offline cache version.
+
 ### Throwline Stage 3D calculation verification
 
 * Audited the Stage 3D projector model against the production link and confirmed the core throw algebra across a 10,000-case randomized matrix; repaired the defects the audit reproduced.

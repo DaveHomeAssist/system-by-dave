@@ -481,6 +481,18 @@ requireMatch(main, /put\(["']md["'][\s\S]*?put\(["']mw["'][\s\S]*?put\(["']vb["'
   if (!sceneState.includes(token)) fail(`Throwline scene-state contract is missing ${token}.`);
 });
 if (!fs.existsSync(path.join(ROOT, 'scripts/probe_throwline_stage3d.js'))) fail('The Stage 3D browser regression probe is missing.');
+const stageTryIndex = stage.indexOf('const { THREE } = await stage.ready');
+['function rebuildFacts(', 'function readout(', 'function updateWorkspaceFacts(', 'function applySceneIntent(', 'SceneState.createSceneState('].forEach((token) => {
+  const index = stage.indexOf(token);
+  if (index < 0 || stageTryIndex < 0 || index > stageTryIndex) fail(`Stage 3D must hydrate ${token.trim()} before awaiting the WebGL renderer so calculations survive a renderer failure.`);
+});
+requireMatch(stage, /SceneState\.assessInstallation\(/, 'Stage 3D headline must come from the aggregate installation check.');
+requireMatch(stage, /bounded\(['"]tolPct['"]/, 'Stage 3D must accept the transferred planning tolerance.');
+requireMatch(main, /put\(["']tolPct["']/, 'The planner must transfer its planning tolerance to Stage 3D.');
+['assessInstallation', "'set-tolerance'", 'axisOverlapInterval', 'COVERAGE_TOLERANCE'].forEach((token) => {
+  if (!sceneState.includes(token)) fail(`Throwline scene-state contract is missing ${token}.`);
+});
+if (/id=["']hState["'][^>]*>FITS SUPPLIED RANGE</.test(stage)) fail('Stage 3D must not ship a hard-coded verdict in its markup.');
 requireMatch(main, /id=["']stage3dLink["']/, 'The planner Stage 3D link must be state-aware.');
 requireMatch(main, /function\s+stage3dUrlFor\s*\(/, 'The planner must serialize validated Stage 3D transfer state.');
 requireMatch(main, /ThrowlineSceneState[\s\S]*?createSceneState/, 'The planner must normalize Stage 3D transfer values through the shared scene-state contract.');

@@ -9,7 +9,7 @@
   const SCHEMA_VERSION = 1;
   const STORAGE_KEY = 'throwline:stage-scene:v1';
   const MODES = new Set(['manual', 'verified_image_width', 'field_verified', 'manufacturer_unspecified', 'conflicting', 'partial', 'legacy_unverified', 'blocked']);
-  const finite = value => Number.isFinite(Number(value));
+  const finite = value => (typeof value === 'number' || (typeof value === 'string' && value.trim() !== '')) && Number.isFinite(Number(value));
   const clamp = (value, min, max) => Math.min(max, Math.max(min, Number(value)));
   const stepped = (value, step) => Math.round(Number(value) / step) * step;
   const copy = value => JSON.parse(JSON.stringify(value));
@@ -54,9 +54,10 @@
     const position = input.position || {};
     const optical = input.optical || {};
     const min = finite(optical.min) ? clamp(optical.min, 0.05, 20) : NaN;
-    const max = finite(optical.max) ? clamp(optical.max, min || 0.05, 20) : NaN;
-    const provenance = normalizeProvenance(input.provenance || { mode: optical.mode });
-    const allowed = input.allowed === true && finite(min) && finite(max) && max >= min && ['manual', 'verified_image_width', 'field_verified'].includes(provenance.mode);
+    const max = finite(optical.max) ? clamp(optical.max, 0.05, 20) : NaN;
+    const inverted = finite(min) && finite(max) && Number(optical.max) < Number(optical.min);
+    const provenance = normalizeProvenance(inverted ? { mode: 'conflicting', reason: 'CALCULATION BLOCKED · the supplied ratio range is inverted (tele below wide).' } : (input.provenance || { mode: optical.mode }));
+    const allowed = input.allowed === true && !inverted && finite(min) && finite(max) && max >= min && ['manual', 'verified_image_width', 'field_verified'].includes(provenance.mode);
     return {
       id: cleanId(input.id, `projector-${index + 1}`),
       label: String(input.label || `Unit ${String.fromCharCode(65 + index)}`).slice(0, 80),
@@ -120,6 +121,7 @@
         depth: finite(room.depth) ? clamp(room.depth, 8, 600) : 40,
         height: finite(room.height) ? clamp(room.height, 8, 150) : 20
       },
+      tolerance: finite(input.tolerance) ? clamp(input.tolerance, 0, 15) : 5,
       projectors,
       activeProjectorId: projectors.some(projector => projector.id === requestedActive) ? requestedActive : projectors[0].id,
       obstacles,
@@ -143,6 +145,7 @@
     return normalizeSceneState({
       screen: { width: transfer.w, aspect: transfer.ar, bottom: transfer.bottom },
       room: transfer.room,
+      tolerance: transfer.tolerance,
       projectors: [{
         id: 'projector-a',
         label: transfer.label || 'Unit A',
@@ -158,20 +161,34 @@
     return scene.projectors.find(projector => projector.id === scene.activeProjectorId) || scene.projectors[0];
   }
 
+  // Solve a*z + b <= c*z + e (i.e. (a - c) z <= e - b) over [lo, hi]; returns the feasible sub-interval or null.
+  function linearInterval(slope, offset, lo, hi) {
+    if (Math.abs(slope) < 1e-12) return offset >= -1e-9 ? [lo, hi] : null;
+    const bound = offset / slope;
+    const next = slope > 0 ? [lo, Math.min(hi, bound)] : [Math.max(lo, bound), hi];
+    return next[0] <= next[1] + 1e-9 ? next : null;
+  }
+  function axisOverlapInterval(apex, target, halfImage, center, halfSize, distance, lo, hi) {
+    // Beam center along this axis at depth z: target + (apex - target) * z / d. Beam half-extent: halfImage * (1 - z / d).
+    // Overlap requires |center - beamCenter(z)| <= halfExtent(z) + halfSize, i.e. two linear inequalities in z.
+    const centerSlope = (apex - target) / distance, extentSlope = -halfImage / distance;
+    // beamCenter(z) - center <= halfExtent(z) + halfSize
+    const upper = linearInterval(centerSlope - extentSlope, center + halfImage + halfSize - target, lo, hi);
+    if (!upper) return null;
+    // center - beamCenter(z) <= halfExtent(z) + halfSize
+    return linearInterval(-centerSlope - extentSlope, target + halfImage + halfSize - center, upper[0], upper[1]);
+  }
   function obstacleIntersectsBeam(obstacle, scene, projector, image) {
     const distance = projector.position.distance;
-    if (!finite(distance) || distance <= 0) return false;
-    const nearZ = obstacle.position.z - obstacle.size.depth / 2;
-    const farZ = obstacle.position.z + obstacle.size.depth / 2;
-    if (farZ < 0 || nearZ > distance) return false;
-    const z = clamp(obstacle.position.z, 0, distance);
-    const progress = 1 - z / distance;
+    if (!finite(distance) || distance <= 0 || !image) return false;
+    const nearZ = Math.max(0, obstacle.position.z - obstacle.size.depth / 2);
+    const farZ = Math.min(distance, obstacle.position.z + obstacle.size.depth / 2);
+    if (farZ < nearZ) return false;
     const screenHeight = scene.screen.width / scene.screen.aspect;
     const screenCenterY = scene.screen.bottom + screenHeight / 2;
-    const beamCenterX = projector.position.x * (z / distance) + projector.position.targetX * progress;
-    const beamCenterY = projector.position.lensHeight + (screenCenterY - projector.position.lensHeight) * progress;
-    return Math.abs(obstacle.position.x - beamCenterX) <= image.width * progress / 2 + obstacle.size.width / 2 &&
-      Math.abs(obstacle.position.y - beamCenterY) <= image.height * progress / 2 + obstacle.size.height / 2;
+    const zx = axisOverlapInterval(projector.position.x, projector.position.targetX, image.width / 2, obstacle.position.x, obstacle.size.width / 2, distance, nearZ, farZ);
+    if (!zx) return false;
+    return !!axisOverlapInterval(projector.position.lensHeight, screenCenterY, image.height / 2, obstacle.position.y, obstacle.size.height / 2, distance, zx[0], zx[1]);
   }
 
   const PLACEMENT_TOLERANCE = 0.01;
@@ -224,17 +241,30 @@
 
     const wideDistance = optical.min * optical.basisWidth;
     const teleDistance = optical.max * optical.basisWidth;
-    let safeLow = wideDistance * 1.05;
-    let safeHigh = teleDistance * 0.95;
-    if (safeLow > safeHigh) { const mark = (wideDistance + teleDistance) / 2; safeLow = mark - PLACEMENT_TOLERANCE; safeHigh = mark + PLACEMENT_TOLERANCE; }
+    const tolerance = scene.tolerance;
+    const factor = tolerance / 100;
+    let safeLow = wideDistance * (1 + factor);
+    let safeHigh = teleDistance * (1 - factor);
+    // A fixed ratio, or a zoom span narrower than the margin, has no conservative interior: the mark is nominal and
+    // the ±tolerance band is a verify zone, never a safe zone (this mirrors the planner's fixed-lens handling).
+    const fixed = safeLow > safeHigh;
+    const nominal = (wideDistance + teleDistance) / 2;
+    if (fixed) { safeLow = nominal; safeHigh = nominal; }
     const distance = projector.position.distance;
     const requiredRatio = distance / optical.basisWidth;
     const currentRatio = clamp(requiredRatio, optical.min, optical.max);
     const imageWidth = distance / currentRatio;
     const imageHeight = imageWidth / optical.rasterAspect;
     let kind = 'near-limit'; let rawLabel = 'PASS · NEAR LIMIT'; let tone = 'warn';
-    if (distance > teleDistance + PLACEMENT_TOLERANCE) { kind = 'overshoot'; rawLabel = 'OVERSHOOT'; tone = 'bad'; }
-    else if (distance < wideDistance - PLACEMENT_TOLERANCE) { kind = 'undershoot'; rawLabel = 'UNDERSHOOT'; tone = 'bad'; }
+    const measured = projector.provenance.mode === 'field_verified';
+    const verifyLow = fixed && !measured ? nominal * (1 - factor) : wideDistance, verifyHigh = fixed && !measured ? nominal * (1 + factor) : teleDistance;
+    if (distance > verifyHigh + PLACEMENT_TOLERANCE) { kind = 'overshoot'; rawLabel = 'OVERSHOOT'; tone = 'bad'; }
+    else if (distance < verifyLow - PLACEMENT_TOLERANCE) { kind = 'undershoot'; rawLabel = 'UNDERSHOOT'; tone = 'bad'; }
+    else if (fixed) {
+      const atMark = Math.abs(distance - nominal) <= PLACEMENT_TOLERANCE;
+      if (measured) { kind = 'safe'; rawLabel = 'PASS · MEASURED MARK'; tone = 'go'; }
+      else { kind = 'nominal'; rawLabel = atMark ? 'NOMINAL MARK · VERIFY' : 'NEAR NOMINAL · VERIFY'; tone = 'warn'; }
+    }
     else if (distance >= safeLow && distance <= safeHigh) { kind = 'safe'; rawLabel = 'PASS · SAFE'; tone = 'go'; }
     const label = projector.provenance.mode === 'manual' && kind === 'safe' ? 'FITS SUPPLIED RANGE' : projector.provenance.mode === 'manual' && kind === 'near-limit' ? 'FITS · NEAR LIMIT' : rawLabel;
     const shiftPercent = ((base.screen.centerY - projector.position.lensHeight) / imageHeight) * 100;
@@ -242,7 +272,42 @@
     const image = { width: imageWidth, height: imageHeight, centerX: projector.position.targetX, requiredRatio, currentRatio, shiftPercent, horizontalShiftPercent };
     const shift = { vertical: assessShift(shiftPercent, optical.shift, 'up', 'down'), horizontal: assessShift(horizontalShiftPercent, optical.shift, 'right', 'left') };
     const collisions = scene.obstacles.filter(obstacle => obstacleIntersectsBeam(obstacle, scene, projector, image)).map(obstacle => ({ obstacleId: obstacle.id, label: obstacle.label, kind: 'beam-obstruction' }));
-    return { ...base, placement: { kind, label, tone }, reason: collisions.length ? `${collisions.length} obstruction${collisions.length === 1 ? '' : 's'} intersect the beam.` : '', envelope: { wideDistance, teleDistance, safeLow, safeHigh }, image, shift, shiftEnvelope: optical.shift, collisions };
+    const screenLeft = -scene.screen.width / 2, screenRight = scene.screen.width / 2;
+    const imageLeft = image.centerX - imageWidth / 2, imageRight = image.centerX + imageWidth / 2;
+    const heightVariance = (imageHeight - screenHeight) / 2;
+    const coverage = {
+      spill: Math.max(0, screenLeft - imageLeft, imageRight - screenRight, heightVariance),
+      missing: Math.max(0, imageLeft - screenLeft, screenRight - imageRight, -heightVariance)
+    };
+    coverage.maxEdgeVariance = Math.max(coverage.spill, coverage.missing);
+    return { ...base, placement: { kind, label, tone }, reason: collisions.length ? `${collisions.length} obstruction${collisions.length === 1 ? '' : 's'} intersect the beam.` : '', envelope: { wideDistance, teleDistance, safeLow, safeHigh, tolerance, fixed, nominal }, image, shift, shiftEnvelope: optical.shift, coverage, collisions };
+  }
+
+  const COVERAGE_TOLERANCE = 0.02;
+  function assessInstallation(input) {
+    const scene = normalizeSceneState(input);
+    const issues = [];
+    const push = (tone, kind, label, projectorId) => issues.push({ tone, kind, label, projectorId });
+    scene.projectors.forEach(projector => {
+      const name = scene.projectors.length > 1 ? `${projector.label}: ` : '';
+      const geometry = calculateProjectorGeometry(scene, projector.id);
+      if (!geometry.allowed) { push('bad', 'blocked', `${name}calculation blocked`, projector.id); return; }
+      if (geometry.placement.tone !== 'go') push(geometry.placement.tone, `placement-${geometry.placement.kind}`, `${name}${geometry.placement.label.toLowerCase()}`, projector.id);
+      if (geometry.coverage.missing > COVERAGE_TOLERANCE) push('bad', 'coverage-missing', `${name}image does not cover the screen`, projector.id);
+      else if (geometry.coverage.spill > COVERAGE_TOLERANCE) push('warn', 'coverage-spill', `${name}image spills past the screen`, projector.id);
+      ['vertical', 'horizontal'].forEach(axis => {
+        const shift = geometry.shift[axis];
+        if (shift.exceeded === true) push('bad', `shift-${axis}`, `${name}${axis} shift exceeds the ${shift.direction} limit`, projector.id);
+        else if (shift.exceeded === undefined && Math.abs(shift.percent) > 0.05) push('warn', `shift-${axis}-unknown`, `${name}${axis} shift limit unknown`, projector.id);
+      });
+      geometry.collisions.forEach(collision => push('bad', 'beam-obstruction', `${name}beam hits ${collision.label}`, projector.id));
+      if (geometry.provenance.mode === 'manual') push('warn', 'provenance-manual', `${name}manual ratio is unverified`, projector.id);
+    });
+    roomConflicts(scene).forEach(conflict => push('bad', `room-${conflict.kind}`, conflict.label, conflict.projectorId));
+    const tone = issues.some(issue => issue.tone === 'bad') ? 'bad' : issues.some(issue => issue.tone === 'warn') ? 'warn' : 'go';
+    const first = issues.find(issue => issue.tone === tone);
+    const label = tone === 'go' ? 'INSTALLATION CHECKS PASS' : tone === 'warn' ? `REVIEW · ${first.label}` : `FAIL · ${first.label}`;
+    return { tone, label, issues };
   }
 
   function invalidateFieldVerification(projector) {
@@ -278,6 +343,7 @@
     else if (type === 'set-screen-bottom') { scene.screen.bottom = clamp(stepped(intent.value, 0.25), 0, 100); scene.projectors = scene.projectors.map(invalidateFieldVerification); }
     else if (type === 'set-screen-aspect') { scene.screen.aspect = clamp(Number(intent.value), 0.2, 10); scene.projectors = scene.projectors.map(invalidateFieldVerification); }
     else if (type === 'set-optical-range' && finite(intent.min) && Number(intent.min) > 0 && finite(intent.max) && Number(intent.max) >= Number(intent.min)) updateProjector({ ...projector, allowed: true, optical: { ...projector.optical, min: Number(intent.min), max: Number(intent.max) }, provenance: normalizeProvenance({ mode: 'manual', reason: 'MANUAL ESTIMATE · operator-supplied ratio range.' }) });
+    else if (type === 'set-tolerance' && finite(intent.value)) scene.tolerance = clamp(intent.value, 0, 15);
     else if (type === 'set-room') { const key = ['width', 'depth', 'height'].includes(intent.key) ? intent.key : 'depth'; scene.room[key] = clamp(stepped(intent.value, 0.5), 8, key === 'depth' ? 600 : 400); }
     else if (type === 'select-projector' && scene.projectors.some(item => item.id === intent.projectorId)) scene.activeProjectorId = intent.projectorId;
     else if (type === 'add-projector' && scene.projectors.length < 8) { const source = copy(projector); const nextIndex = scene.projectors.length; source.id = nextId(scene.projectors, 'projector'); source.label = `Unit ${String.fromCharCode(65 + nextIndex)}`; source.position.x = clamp(projector.position.x + 2, -100, 100); source.provenance = normalizeProvenance({ mode: projector.provenance.mode === 'field_verified' ? 'manual' : projector.provenance.mode, reason: projector.provenance.mode === 'field_verified' ? 'MANUAL ESTIMATE · duplicated from a field-verified unit.' : projector.provenance.reason }); scene.projectors.push(normalizeProjector(source, nextIndex)); scene.activeProjectorId = source.id; scene.layoutMode = 'independent'; }
@@ -301,6 +367,7 @@
     const measuredDistance = Number(values.measuredDistance); const measuredWidth = Number(values.measuredWidth);
     if (!finite(measuredDistance) || measuredDistance <= 0 || !finite(measuredWidth) || measuredWidth <= 0) throw new TypeError('Measured distance and image width must be positive numbers.');
     const ratio = measuredDistance / measuredWidth;
+    if (ratio < 0.05 || ratio > 20) throw new RangeError(`Measured ratio ${ratio.toFixed(3)}:1 is outside the 0.05–20:1 optical model; check the measurements.`);
     // The measurement certifies the throw ratio only. The planned raster basis stays, so the corrected mark is ratio × basis
     // (the same relationship the planner uses), not the measured throw itself.
     scene.projectors[index] = normalizeProjector({ ...projector, allowed: true, optical: { ...projector.optical, min: ratio, max: ratio }, provenance: { mode: 'field_verified', reason: 'FIELD VERIFIED · job-scoped measured ratio.', verification: { ratio, measuredDistance, measuredWidth, verifiedBy: values.verifiedBy, verifiedAt: values.verifiedAt || new Date().toISOString(), note: values.note } } }, index);
@@ -308,5 +375,5 @@
     return normalizeSceneState(scene);
   }
 
-  return Object.freeze({ SCHEMA_VERSION, STORAGE_KEY, PLACEMENT_TOLERANCE, normalizeProvenance, normalizeSceneState, createSceneState, activeProjector, calculateProjectorGeometry, roomConflicts, obstacleIntersectsBeam, applyIntent, stampFieldVerification });
+  return Object.freeze({ SCHEMA_VERSION, STORAGE_KEY, PLACEMENT_TOLERANCE, COVERAGE_TOLERANCE, normalizeProvenance, normalizeSceneState, createSceneState, activeProjector, calculateProjectorGeometry, roomConflicts, assessInstallation, obstacleIntersectsBeam, applyIntent, stampFieldVerification });
 });

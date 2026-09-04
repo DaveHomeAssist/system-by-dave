@@ -8,7 +8,7 @@
  * URL trust for FIELD VERIFIED transfers, field-stamp calibration against the planned
  * basis, direction-aware lens-shift limits, and room-boundary conflicts.
  *
- * Usage: node scripts/probe_throwline_stage3d.js [--base=http://127.0.0.1:8000/] [--chrome=/path/to/chrome] [--no-sandbox]
+ * Usage: node scripts/probe_throwline_stage3d.js [--base=http://127.0.0.1:8000/] [--chrome=/path/to/chrome] [--no-sandbox] [--no-webgl]
  * Without --base the probe serves the repository root itself on a random port.
  */
 
@@ -76,8 +76,14 @@ async function main() {
   const profile = fs.mkdtempSync(path.join(os.tmpdir(), 'sbd-throwline-stage-probe-'));
   // Root containers (CI runners, remote sessions) cannot use Chrome's sandbox; local operator runs keep it on.
   const sandboxFlags = args.includes('--no-sandbox') || (typeof process.getuid === 'function' && process.getuid() === 0) ? ['--no-sandbox'] : [];
+  // A remote --base behind an egress proxy: Chrome does not read HTTPS_PROXY on its own, so hand it the proxy
+  // explicitly (its CA is expected in the browser trust store); local bases stay direct.
+  const remoteBase = !/^https?:\/\/(127\.0\.0\.1|localhost)[:/]/.test(baseUrl);
+  const proxyFlags = remoteBase && process.env.HTTPS_PROXY ? [`--proxy-server=${process.env.HTTPS_PROXY}`, '--proxy-bypass-list=127.0.0.1;localhost'] : [];
+  // --no-webgl disables WebGL so the degraded renderer path is exercised: every numerical readout must match a WebGL run.
+  const noWebgl = args.includes('--no-webgl');
   const chrome = spawn(chromeBin, [
-    ...sandboxFlags,
+    ...sandboxFlags, ...proxyFlags, ...(noWebgl ? ['--disable-3d-apis'] : []),
     '--headless=new', '--disable-gpu', '--use-angle=swiftshader', '--enable-unsafe-swiftshader',
     '--disable-background-networking', '--disable-component-update', '--no-default-browser-check', '--no-first-run',
     `--remote-debugging-port=${port}`, `--user-data-dir=${profile}`, 'about:blank'
@@ -115,18 +121,20 @@ async function main() {
     }
     async function open(query) {
       await cdp('Page.navigate', { url: stageUrl(query) });
-      for (let attempt = 0; attempt < 80; attempt += 1) {
-        const ready = await evaluate(`Boolean(document.getElementById('fRatio') && document.getElementById('provenanceBadge')?.textContent && document.documentElement.dataset.calculationMode)`);
-        if (ready) break;
-        await delay(125);
+      let ready = false;
+      for (let attempt = 0; attempt < 160 && !ready; attempt += 1) {
+        ready = await evaluate(`Boolean(document.getElementById('fRatio') && document.getElementById('provenanceBadge')?.textContent && document.documentElement.dataset.calculationMode)`);
+        if (!ready) await delay(125);
       }
+      if (!ready) throw new Error(`Stage 3D never became ready at ${stageUrl(query)}: ${await evaluate('JSON.stringify({ href: location.href, title: document.title, readyState: document.readyState })')}`);
       await delay(150);
       return readout();
     }
     const READOUT = `(() => { const text = (id) => document.getElementById(id)?.textContent.trim() || ''; return {
       mode: document.documentElement.dataset.calculationMode || '', projection: document.documentElement.dataset.projectionState || '',
       badge: text('provenanceBadge'), gate: text('stageCalculationGate'), ratio: text('fRatio'), image: text('fImg'), spill: text('fSpill'), shift: text('fShift'),
-      shiftColor: document.getElementById('fShift')?.style.color || '', distance: text('dv'), alert: text('collisionAlert'), summary: text('sceneSummary'), lens: text('fLens') }; })()`;
+      shiftColor: document.getElementById('fShift')?.style.color || '', distance: text('dv'), alert: text('collisionAlert'), summary: text('sceneSummary'), lens: text('fLens'),
+      headline: text('hState'), note: text('hNote'), wide: text('hWide'), tele: text('hTele'), safeWidth: document.getElementById('bSafe')?.style.width || '', renderer: document.documentElement.dataset.renderer || 'ready', status: text('stageStatus'), aspect: document.getElementById('ar')?.selectedOptions[0]?.textContent.trim() || '' }; })()`;
     const readout = () => evaluate(READOUT);
     const click = async (id) => { await evaluate(`document.getElementById(${JSON.stringify(id)}).click()`); await delay(120); return readout(); };
     const setInput = async (id, value, eventName = 'input') => { await evaluate(`(() => { const input = document.getElementById(${JSON.stringify(id)}); input.value = ${JSON.stringify(String(value))}; input.dispatchEvent(new Event(${JSON.stringify(eventName)}, { bubbles: true })); })()`); await delay(120); return readout(); };
@@ -156,8 +164,9 @@ async function main() {
     check('stamped unit is FIELD VERIFIED', stamped.badge === 'FIELD VERIFIED' && stamped.mode === 'field_verified', stamped);
     check('stamped unit at the old mark reads undershoot against the corrected 24 ft mark', stamped.projection === 'undershoot', stamped);
     const corrected = await click('bw');
-    check('snapping the stamped unit moves it to exactly 24\' 0"', corrected.distance === '24\' 0"' && corrected.projection === 'safe', corrected);
+    check('snapping the stamped unit moves it to exactly 24\' 0" as a nominal verify mark', corrected.distance === '24\' 0"' && corrected.projection === 'nominal' && /^REVIEW/.test(corrected.headline), corrected);
     check('driving edit after the stamp returns the unit to a manual estimate', corrected.badge === 'MANUAL ESTIMATE', corrected);
+    check('the stamped readout used the measured mark with no verify band', stamped.wide === '24\' 0"' && stamped.safeWidth === '0%' && /^FAIL/.test(stamped.headline), stamped);
 
     // 4. URL trust for field verification.
     const forged = await open('mode=field_verified&ratio=1.2&stamp=verified');
@@ -185,6 +194,27 @@ async function main() {
     check('raising the ceiling clears the conflict', restored.alert === 'No spatial conflicts', restored);
     const outside = await setInput('px', 30);
     check('a projector outside the room width is a spatial conflict', /outside room width/.test(outside.alert), outside);
+
+    // 7. Degraded renderer parity: with --no-webgl the renderer is reported unavailable, yet every fact above was identical.
+    const rendererState = await open(AUDIT_QUERY);
+    check(noWebgl ? 'renderer reports unavailable without WebGL' : 'renderer is ready with WebGL', noWebgl ? rendererState.renderer === 'unavailable' && /renderer unavailable/i.test(rendererState.status) : rendererState.renderer === 'ready', rendererState);
+    check('headline is the aggregate installation check, not the bare ratio fit', /^(FAIL|REVIEW|INSTALLATION)/.test(rendererState.headline) && /undershoot/i.test(rendererState.headline), rendererState);
+    const slider = await setInput('d', 10);
+    check('distance slider stays live and drives the readout', slider.distance === '10\' 0"' && slider.ratio === '0.500:1', slider);
+
+    // 8. Transfer bounds are not silently narrowed: a 50 ft screen at an 80 ft throw stays out of range.
+    const wide50 = await open('mode=manual&w=50&bottom=4&ar=1.777778&basisW=50&rasterAr=1.6&lh=6&dist=80&min=0.978&max=1.32');
+    check('a 50 ft screen / 80 ft throw transfer is preserved and reads overshoot', wide50.ratio === '1.600:1' && wide50.projection === 'overshoot' && wide50.distance === '80\' 0"', wide50);
+    const custom = await open('mode=manual&w=20&bottom=4&ar=2&basisW=20&rasterAr=2&lh=6&dist=22&min=0.978&max=1.32');
+    check('a custom 2.000:1 aspect shows as the selected option', /2\.000:1/.test(custom.aspect), custom);
+
+    // 9. Fixed lens: no safe interior, nominal verify band, no negative safe bar.
+    const fixed = await open('mode=manual&w=20&bottom=4&ar=1.777778&basisW=20&rasterAr=1.6&lh=6&dist=13&min=0.65&max=0.65');
+    check('a fixed 0.65:1 lens at 13 ft reads as a nominal verify mark with an empty safe band', fixed.projection === 'nominal' && /nominal/i.test(fixed.note) && fixed.safeWidth === '0%', fixed);
+    const tol10 = await open('mode=manual&w=20&bottom=4&ar=1.777778&basisW=20&rasterAr=1.6&lh=6&dist=21&min=0.978&max=1.32&tolPct=10');
+    check('a transferred 10% tolerance narrows the safe band so 21 ft is near-limit', tol10.projection === 'near-limit' && /10%/.test(tol10.note), tol10);
+    const tol5 = await open('mode=manual&w=20&bottom=4&ar=1.777778&basisW=20&rasterAr=1.6&lh=6&dist=21&min=0.978&max=1.32');
+    check('the default 5% tolerance keeps 21 ft inside the safe band', tol5.projection === 'safe', tol5);
 
     check('no uncaught browser exceptions', exceptions.length === 0, exceptions);
   } finally {
