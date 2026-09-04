@@ -2,6 +2,11 @@
 
 ## 2026-09-04
 
+### Throwline default workspace
+
+* Made Stage 3D the default `/ProjectorThrow/` launch while preserving the detailed planner through an explicit workspace URL, existing hash-based share links, and the JavaScript-disabled fallback.
+* Relabeled Stage 3D navigation and WebGL recovery paths around the planner role, aligned both public entry points to the dedicated Throwline social card, and rolled the AV Suite offline cache version.
+
 ### Throwline social preview
 
 * Replaced the generic System by Dave social card on `/ProjectorThrow/` with a dedicated 3D stage-planning image featuring large-venue projectors, visible throw geometry, and route-specific Open Graph and Twitter metadata.

@@ -391,10 +391,10 @@
       const message = document.createElement('p');
       message.textContent =
         'The local 3D engine or WebGL renderer could not start. ' +
-        'Your calculation data is not affected; use the Throwline main app.';
+        'Your calculation data is not affected; use the Throwline planner.';
       const fallback = document.createElement('a');
-      fallback.href = this.getAttribute('fallback') || 'index.html';
-      fallback.textContent = 'Open the offline Throwline app';
+      fallback.href = this.getAttribute('fallback') || 'index.html?workspace=planner';
+      fallback.textContent = 'Open the Throwline planner';
       this._err.replaceChildren(title, message, fallback);
       this._err.hidden = false;
       this.announce('Stage 3D unavailable. Open the offline Throwline app.');

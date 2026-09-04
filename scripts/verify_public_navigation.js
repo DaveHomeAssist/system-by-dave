@@ -57,7 +57,7 @@ const CUSTOM_SHELLS = new Map([
   ['depotops/index.html', ['href="/"', 'href="/tools.html"', 'aria-current="page">DepotOps']],
   ['av-tool-suite/index-v2/index.html', ['href="/"', 'href="/av-suite.html"', 'System by Dave / AV Tool Suite']],
   ['ProjectorThrow/index.html', ['href="../index.html"', 'href="../av-suite.html"', 'id="throwline-workspace"']],
-  ['ProjectorThrow/Stage3D.html', ['href="../index.html"', 'href="index.html"', 'href="../av-suite.html"', 'id="stage-workspace"']]
+  ['ProjectorThrow/Stage3D.html', ['href="../index.html"', 'href="index.html?workspace=planner"', 'href="../av-suite.html"', 'id="stage-workspace"']]
 ]);
 
 function fail(message) {

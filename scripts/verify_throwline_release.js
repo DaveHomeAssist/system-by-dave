@@ -358,6 +358,10 @@ if (!avRegistry || !Array.isArray(avRegistry.tools)) fail('SBD_REGISTRY.tools di
 
 requireMatch(main, /<!DOCTYPE html>/i, 'ProjectorThrow/index.html is missing its HTML document type.');
 requireMatch(main, /<html\s+lang=["']en["']>/i, 'Throwline must remain a standalone HTML document without shared-theme opt-in attributes.');
+requireMatch(main, /const DEFAULT_WORKSPACE = ["']Stage3D\.html["']/, 'Throwline must make Stage 3D the default workspace.');
+requireMatch(main, /query\.get\(["']workspace["']\) === ["']planner["']/, 'Throwline must retain an explicit planner launch route.');
+requireMatch(main, /window\.location\.hash\.length > 1/, 'Throwline must preserve existing hash-based planner share links.');
+requireMatch(main, /window\.location\.replace\(`\$\{DEFAULT_WORKSPACE\}\$\{window\.location\.search\}`\)/, 'Throwline default launch must preserve query parameters when opening Stage 3D.');
 if (/data-av-theme|data-av-tool|av-theme\.css/i.test(main)) fail('Throwline must not load or opt into the shared AV theme.');
 if (/<link\b[^>]*\brel=["']stylesheet["'][^>]*>/i.test(main)) fail('Throwline main app must not load an external stylesheet.');
 const mainScriptSources = Array.from(main.matchAll(/<script\b[^>]*\bsrc=["']([^"']+)["'][^>]*>/gi), (match) => match[1]);
@@ -420,7 +424,9 @@ if (/unpkg\.com|cdn\.jsdelivr\.net/.test(stage) || /unpkg\.com|cdn\.jsdelivr\.ne
 requireMatch(stage, /"three":\s*"\.\/vendor\/three\/three\.module\.js"/, 'Stage 3D import map must use the locally vendored Three.js engine.');
 requireMatch(stage, /<script\s+src=["']\.\/throwline-scene-state\.js["']><\/script>[\s\S]*?<script\s+src=["']\.\.\/js\/vendor\/gsap\.min\.js["']><\/script>[\s\S]*?<script\s+src=["']\.\/three-d-stage\.js["']><\/script>/, 'Stage 3D must load the scene contract, local GSAP runtime, and sidecar in order.');
 requireMatch(stage, /<script\s+src=["']\.\/three-d-stage\.js["']><\/script>/, 'Stage 3D must load its colocated sidecar.');
-requireMatch(stage, /fallback=["']index\.html["']/, 'Stage 3D must offer the offline main-app fallback.');
+requireMatch(stage, /href=["']index\.html\?workspace=planner["']/, 'Stage 3D must expose the detailed Throwline planner.');
+requireMatch(stage, /fallback=["']index\.html\?workspace=planner["']/, 'Stage 3D must offer the offline planner fallback.');
+requireMatch(sidecar, /this\.getAttribute\(["']fallback["']\) \|\| ["']index\.html\?workspace=planner["']/, 'Stage 3D renderer failures must return to the explicit planner route.');
 requireMatch(stage, /Offline ready · direct spatial control/i, 'Stage 3D must identify itself as an offline-ready spatial workspace.');
 const localThreeAssets = [
   'ProjectorThrow/vendor/three/three.module.js',

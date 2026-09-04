@@ -1,6 +1,6 @@
 # Throwline
 
-Throwline is the offline-first projector planning surface at `/ProjectorThrow/`. The main planner remains the detailed calculation and show-handoff console; `Stage3D.html` is its primary spatial workspace for placement, room, obstruction, multi-projector, and field-verification decisions.
+Throwline is the offline-first projector planning surface at `/ProjectorThrow/`. Normal launches open `Stage3D.html` as the primary spatial workspace for placement, room, obstruction, multi-projector, and field-verification decisions. The detailed calculation and show-handoff planner remains available at `index.html?workspace=planner`; existing hash-based planner share links bypass the default launch switch and continue opening the planner directly. With JavaScript unavailable, `index.html` remains the self-contained fallback.
 
 ## Stage 3D architecture
 
