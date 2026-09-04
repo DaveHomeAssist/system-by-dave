@@ -12,12 +12,17 @@
 <meta property="og:title" content="Throwline Stage 3D · Spatial workspace">
 <meta property="og:description" content="Plan projector placement, room geometry, obstructions, and multiple units in an offline-ready 3D workspace.">
 <meta property="og:url" content="https://systembydave.com/ProjectorThrow/Stage3D.html">
-<meta property="og:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
-<meta property="og:image:alt" content="System by Dave preview banner">
+<meta property="og:image" content="https://systembydave.com/img/throwline-og.jpg">
+<meta property="og:image:secure_url" content="https://systembydave.com/img/throwline-og.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Two large-venue projectors casting measured light cones across a 3D stage toward a projection screen">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Throwline Stage 3D · Spatial workspace">
 <meta name="twitter:description" content="Offline-ready 3D projector placement, room planning, verification, and export for Throwline.">
-<meta name="twitter:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<meta name="twitter:image" content="https://systembydave.com/img/throwline-og.jpg">
+<meta name="twitter:image:alt" content="Two large-venue projectors casting measured light cones across a 3D stage toward a projection screen">
 <title>Throwline Stage 3D · Spatial workspace</title>
 <link rel="icon" href="../svg/system_by_dave_logo_rust.svg" type="image/svg+xml">
 <script>(()=>{try{if(localStorage.getItem('throwline:theme:v1')==='dark'){document.documentElement.dataset.theme='dark';document.getElementById('themeColor').content='#15181d';}}catch{}})();</script>
@@ -238,7 +243,7 @@ html[data-calculation-mode=blocked] .provenance-badge,html[data-calculation-mode
         <span id="themeLabel">dark</span>
       </button>
       <button class="field-verify-toggle" id="fieldVerifyToggle" type="button" aria-pressed="false">Field Verify</button>
-      <a class="suite-link" href="index.html">Offline main app</a>
+      <a class="suite-link" href="index.html?workspace=planner">Planner</a>
       <a class="suite-link av-suite-link" href="../av-suite.html">AV Suite</a>
       <details class="header-more"><summary>More</summary><a class="suite-link" href="../av-suite.html">AV Suite</a></details>
     </nav>
@@ -249,7 +254,7 @@ html[data-calculation-mode=blocked] .provenance-badge,html[data-calculation-mode
     <details class="adjust-panel" id="adjustPanel" open>
       <summary>Adjust <span class="adjust-summary-value" id="adjustSummary">20' screen · 22' set</span></summary>
       <div class="adjust-content">
-    <p class="online-note"><strong>Offline-ready workspace.</strong> The pinned 3D engine is local. If WebGL is unavailable, calculation data remains safe in the <a href="index.html">Throwline main app</a>.</p>
+    <p class="online-note"><strong>Offline-ready workspace.</strong> The pinned 3D engine is local. If WebGL is unavailable, calculation data remains safe in the <a href="index.html?workspace=planner">Throwline planner</a>.</p>
     <div class="grp">
       <h3>Projectors</h3>
       <div class="unit-strip" id="unitStrip" role="group" aria-label="Projector units"></div>
@@ -366,7 +371,7 @@ html[data-calculation-mode=blocked] .provenance-badge,html[data-calculation-mode
       <button id="mobileGlb" type="button" disabled>Download GLB</button>
     </section>
     <div class="stage-canvas">
-      <three-d-stage name="throwline-stage" fallback="index.html" role="region" aria-label="Interactive Throwline Stage 3D"></three-d-stage>
+      <three-d-stage name="throwline-stage" fallback="index.html?workspace=planner" role="region" aria-label="Interactive Throwline Stage 3D"></three-d-stage>
     </div>
     <section class="hud" aria-labelledby="setMarkHeading">
       <h3 class="sr-only" id="setMarkHeading">Set mark</h3>
