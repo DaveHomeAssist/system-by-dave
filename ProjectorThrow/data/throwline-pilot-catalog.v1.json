@@ -1,20 +1,27 @@
 {
   "schemaVersion": 1,
   "meta": {
-    "catalogId": "throwline-pilot-2026-08-24",
+    "catalogId": "throwline-verified-2026-09-04",
     "authorityPolicy": "deep-research-2026-08-25",
     "sourceWorkbook": "Throwline_Projector_Lens_Database_Pilot.xlsx",
     "sourceWorkbookSha256": "4a70b2b553df12beee1373592e251e30ed1d84257304848b9c32cbc1e3ea818d",
-    "verifiedOn": "2026-08-24",
-    "calculationReadyCount": 0,
+    "verifiedOn": "2026-09-04",
+    "calculationReadyCount": 10,
     "counts": {
       "manufacturers": 5,
       "projectors": 4,
       "lenses": 13,
       "compatibility": 13,
-      "opticalProfiles": 8,
-      "sources": 13,
-      "researchExceptions": 6
+      "opticalProfiles": 12,
+      "sources": 18,
+      "researchExceptions": 8
+    },
+    "verificationPass": {
+      "id": "verification-2026-09-04",
+      "completedOn": "2026-09-04",
+      "rule": "A profile is calculation-ready only when a document on the maker\u2019s own domain, read in full, lists projection distance beside projected image width (or states distance over width) and distance / width reproduces the published ratio within 2 percent.",
+      "readableOnly": true,
+      "unreadableSources": "barco.com product and spare-part pages (HTTP 403 for automated readers); projectorcentral.com (HTTP 403)."
     }
   },
   "manufacturers": [
@@ -76,7 +83,17 @@
       "primary_manual_url": "https://ap.connect.panasonic.com/sites/default/files/media/document/2019-11/rq50k_manual_en.pdf",
       "last_verified_at": "2026-08-24",
       "confidence": "official_primary",
-      "record_notes": "No lens included; sold lens-less"
+      "record_notes": "No lens included; sold lens-less",
+      "body": {
+        "width_mm": 720,
+        "height_mm": 445,
+        "depth_mm": 1070,
+        "weight_kg": 126,
+        "notes": "Excluding handle, adjuster feet, and protruding parts; weight without lens.",
+        "source_id": "SRC-004",
+        "basis": "maker-published outer dimensions",
+        "last_verified_at": "2026-09-04"
+      }
     },
     {
       "projector_id": "PRJ-002",
@@ -103,7 +120,17 @@
       "primary_manual_url": "https://files.support.epson.com/docid/cpd5/cpd59255.pdf",
       "last_verified_at": "2026-08-24",
       "confidence": "official_primary",
-      "record_notes": "Ships lens-less (UNL = unlensed); standard lens references ELPLM12 spec table"
+      "record_notes": "Ships lens-less (UNL = unlensed); standard lens references ELPLM12 spec table",
+      "body": {
+        "width_mm": 790,
+        "height_mm": 299,
+        "depth_mm": 710,
+        "weight_kg": 63.8,
+        "notes": "Not including raised section; mass without handles (EB-L30000U).",
+        "source_id": "SRC-018",
+        "basis": "maker-published outer dimensions",
+        "last_verified_at": "2026-09-04"
+      }
     },
     {
       "projector_id": "PRJ-003",
@@ -130,7 +157,17 @@
       "primary_manual_url": "https://helpguide.sony.net/vpl/gtz380/v1/en/contents/TP1000003577.html",
       "last_verified_at": "2026-08-24",
       "confidence": "official_primary",
-      "record_notes": "Consumer/high-end home theater segment; included per user instruction to label market segment clearly"
+      "record_notes": "Consumer/high-end home theater segment; included per user instruction to label market segment clearly",
+      "body": {
+        "width_mm": 560,
+        "height_mm": 228,
+        "depth_mm": 760,
+        "weight_kg": 51,
+        "notes": "Excluding the lens.",
+        "source_id": "SRC-011",
+        "basis": "maker-published outer dimensions",
+        "last_verified_at": "2026-09-04"
+      }
     },
     {
       "projector_id": "PRJ-004",
@@ -157,7 +194,17 @@
       "primary_manual_url": "https://www.rentex.com/wp-content/uploads/2017/06/Barco-UDX-4K32-User-Manual.pdf",
       "last_verified_at": "2026-08-24",
       "confidence": "official_primary",
-      "record_notes": "Lens shift range (-100% to +130% V, up to \u00b140% H) is stated as 'depending on lens' at the projector level only -- per-lens shift not broken out in this pass; see research_exceptions"
+      "record_notes": "Lens shift range (-100% to +130% V, up to \u00b140% H) is stated as 'depending on lens' at the projector level only -- per-lens shift not broken out in this pass; see research_exceptions",
+      "body": {
+        "width_mm": 660,
+        "height_mm": 350,
+        "depth_mm": 830,
+        "weight_kg": 92,
+        "notes": "Spec sheet lists W x L x H 660 x 830 x 350 mm; depth is the length.",
+        "source_id": "SRC-012",
+        "basis": "maker-published outer dimensions",
+        "last_verified_at": "2026-09-04"
+      }
     }
   ],
   "lenses": [
@@ -195,15 +242,17 @@
       "lens_shift_horizontal_percent_max": 14,
       "lens_shift_vertical_percent_min": -40,
       "lens_shift_vertical_percent_max": 40,
-      "lens_shift_basis": "percent, from center of screen, powered",
-      "lens_shift_notes": "Vertical \u00b140% max per projector spec sheet when this lens installed",
+      "lens_shift_basis": "percent of projected image width (horizontal) and height (vertical) from the optical centre",
+      "lens_shift_notes": "Per PT-RQ50K manual lens shift range figures (desk/floor installation) and the PT-RQ50K specification page.",
       "lens_page_url": "https://docs.connect.panasonic.com/projector/optional_lens_guide/",
       "datasheet_url": "https://docs.connect.panasonic.com/projector/download/catalog/pdf/PT_RQ50K_2P_ctlg_Eng_PC.pdf",
       "manual_url": "https://ap.connect.panasonic.com/sites/default/files/media/document/2019-11/rq50k_manual_en.pdf",
       "product_status": "current",
-      "last_verified_at": "2026-08-24",
+      "last_verified_at": "2026-09-04",
       "confidence": "official_primary",
-      "record_notes": "Throw ratio 1.11-1.70:1 (17:9 native); 1.32-2.02 (16:10); 1.18-1.81 (16:9); 1.58-2.43 (4:3) per manual"
+      "record_notes": "Throw ratio 1.11-1.70:1 (17:9 native); 1.32-2.02 (16:10); 1.18-1.81 (16:9); 1.58-2.43 (4:3) per manual",
+      "lens_protrusion_mm": 246,
+      "lens_protrusion_source_id": "SRC-014"
     },
     {
       "lens_id": "LNS-003",
@@ -213,15 +262,21 @@
       "lens_name": "ET-D3QS400 Zoom Lens",
       "canonical_lens_key": "panasonic et-d3qs400",
       "lens_type": "zoom",
-      "lens_shift_basis": "not isolated per-lens in sources reviewed",
-      "lens_shift_notes": "Projector-level max shift +/-45% V / +/-16% H (unless this lens is one of the exceptions listed)",
+      "lens_shift_basis": "percent of projected image width (horizontal) and height (vertical) from the optical centre",
+      "lens_shift_notes": "Per PT-RQ50K manual lens shift range figures (desk/floor installation) and the PT-RQ50K specification page.",
       "lens_page_url": "https://docs.connect.panasonic.com/projector/optional_lens_guide/",
       "datasheet_url": "https://docs.connect.panasonic.com/projector/download/catalog/pdf/PT_RQ50K_2P_ctlg_Eng_PC.pdf",
       "manual_url": "https://ap.connect.panasonic.com/sites/default/files/media/document/2019-11/rq50k_manual_en.pdf",
       "product_status": "current",
-      "last_verified_at": "2026-08-24",
+      "last_verified_at": "2026-09-04",
       "confidence": "needs_verification",
-      "record_notes": "Throw ratio 1.43-2.09:1 (17:9 native); 1.70-2.48 (16:10); 1.52-2.23 (16:9); 2.04-2.98 (4:3) per manual"
+      "record_notes": "Throw ratio 1.43-2.09:1 (17:9 native); 1.70-2.48 (16:10); 1.52-2.23 (16:9); 2.04-2.98 (4:3) per manual",
+      "lens_protrusion_mm": 232,
+      "lens_protrusion_source_id": "SRC-014",
+      "lens_shift_horizontal_percent_min": -16,
+      "lens_shift_horizontal_percent_max": 16,
+      "lens_shift_vertical_percent_min": -45,
+      "lens_shift_vertical_percent_max": 45
     },
     {
       "lens_id": "LNS-004",
@@ -233,15 +288,21 @@
       "lens_type": "zoom",
       "focal_length_or_range": "61.4-105.2",
       "f_number_or_range": "2.5",
-      "lens_shift_basis": "not isolated per-lens for shift; F-number and focal length per lens datasheet",
-      "lens_shift_notes": "F=2.5; Focal distance 61.4mm-105.2mm per lens spec sheet (ET-D3QT500G)",
+      "lens_shift_basis": "percent of projected image width (horizontal) and height (vertical) from the optical centre",
+      "lens_shift_notes": "Per PT-RQ50K manual lens shift range figures (desk/floor installation) and the PT-RQ50K specification page.",
       "lens_page_url": "https://connect.na.panasonic.com/av/projectors/accessories/et-d3qt500-3-chip-dlp-projector-zoom-lens",
       "datasheet_url": "https://eu.connect.panasonic.com/sites/default/files/media/document/2024-04/ET-D3QT500G_STE_01(sec)_1.pdf",
       "manual_url": "https://ap.connect.panasonic.com/sites/default/files/media/document/2019-11/rq50k_manual_en.pdf",
       "product_status": "current",
-      "last_verified_at": "2026-08-24",
+      "last_verified_at": "2026-09-04",
       "confidence": "official_primary",
-      "record_notes": "Throw ratio 2.00-3.41:1(17:9); 2.36-4.03(16:10); 2.13-3.63(16:9); 2.82-4.83(4:3), per lens datasheet & projector manual"
+      "record_notes": "Throw ratio 2.00-3.41:1(17:9); 2.36-4.03(16:10); 2.13-3.63(16:9); 2.82-4.83(4:3), per lens datasheet & projector manual",
+      "lens_protrusion_mm": 208,
+      "lens_protrusion_source_id": "SRC-014",
+      "lens_shift_horizontal_percent_min": -16,
+      "lens_shift_horizontal_percent_max": 16,
+      "lens_shift_vertical_percent_min": -45,
+      "lens_shift_vertical_percent_max": 45
     },
     {
       "lens_id": "LNS-005",
@@ -255,15 +316,17 @@
       "lens_shift_horizontal_percent_max": 8,
       "lens_shift_vertical_percent_min": -25,
       "lens_shift_vertical_percent_max": 25,
-      "lens_shift_basis": "percent, projector-level max when installed, from center of screen, powered",
-      "lens_shift_notes": "Vertical +/-25% / Horizontal +/-8% specifically when this lens is installed, per projector spec page",
+      "lens_shift_basis": "percent of projected image width (horizontal) and height (vertical) from the optical centre",
+      "lens_shift_notes": "Per PT-RQ50K manual lens shift range figures (desk/floor installation) and the PT-RQ50K specification page.",
       "lens_page_url": "https://docs.connect.panasonic.com/projector/products/rq50k/spec/",
       "datasheet_url": "https://docs.connect.panasonic.com/projector/download/catalog/pdf/PT_RQ50K_2P_ctlg_Eng_PC.pdf",
       "manual_url": "https://ap.connect.panasonic.com/sites/default/files/media/document/2019-11/rq50k_manual_en.pdf",
       "product_status": "current",
-      "last_verified_at": "2026-08-24",
+      "last_verified_at": "2026-09-04",
       "confidence": "official_primary",
-      "record_notes": "Throw ratio 2.69-3.88:1(17:9); 3.19-4.60(16:10); 2.87-4.13(16:9); 3.84-5.53(4:3) per manual"
+      "record_notes": "Throw ratio 2.69-3.88:1(17:9); 3.19-4.60(16:10); 2.87-4.13(16:9); 3.84-5.53(4:3) per manual",
+      "lens_protrusion_mm": 149,
+      "lens_protrusion_source_id": "SRC-014"
     },
     {
       "lens_id": "LNS-006",
@@ -277,15 +340,17 @@
       "lens_shift_horizontal_percent_max": 10,
       "lens_shift_vertical_percent_min": -30,
       "lens_shift_vertical_percent_max": 30,
-      "lens_shift_basis": "percent, projector-level max when installed, from center of screen, powered",
-      "lens_shift_notes": "Vertical +/-30% / Horizontal +/-10% when this lens installed, per projector spec page",
+      "lens_shift_basis": "percent of projected image width (horizontal) and height (vertical) from the optical centre",
+      "lens_shift_notes": "Per PT-RQ50K manual lens shift range figures (desk/floor installation) and the PT-RQ50K specification page.",
       "lens_page_url": "https://docs.connect.panasonic.com/projector/products/rq50k/spec/",
       "datasheet_url": "https://docs.connect.panasonic.com/projector/download/catalog/pdf/PT_RQ50K_2P_ctlg_Eng_PC.pdf",
       "manual_url": "https://ap.connect.panasonic.com/sites/default/files/media/document/2019-11/rq50k_manual_en.pdf",
       "product_status": "current",
-      "last_verified_at": "2026-08-24",
+      "last_verified_at": "2026-09-04",
       "confidence": "official_primary",
-      "record_notes": "Throw ratio 3.89-5.47:1(17:9); 4.61-6.49(16:10); overlap w/ QT600 4:3 col flagged in exceptions; 5.54-7.80(4:3) per manual"
+      "record_notes": "Throw ratio 3.89-5.47:1(17:9); 4.61-6.49(16:10); overlap w/ QT600 4:3 col flagged in exceptions; 5.54-7.80(4:3) per manual",
+      "lens_protrusion_mm": 221,
+      "lens_protrusion_source_id": "SRC-014"
     },
     {
       "lens_id": "LNS-007",
@@ -301,15 +366,17 @@
       "lens_shift_horizontal_percent_max": 10,
       "lens_shift_vertical_percent_min": -30,
       "lens_shift_vertical_percent_max": 30,
-      "lens_shift_basis": "percent, projector-level max when installed, from center of screen, powered",
-      "lens_shift_notes": "F=2.5; Focal distance 156.5-243.1mm per lens datasheet",
+      "lens_shift_basis": "percent of projected image width (horizontal) and height (vertical) from the optical centre",
+      "lens_shift_notes": "Per PT-RQ50K manual lens shift range figures (desk/floor installation) and the PT-RQ50K specification page.",
       "lens_page_url": "https://connect.na.panasonic.com/av/projectors/accessories/et-d3qt800-3-chip-dlp-projector-zoom-lens",
       "datasheet_url": "https://connect.na.panasonic.com/av/projectors/accessories/et-d3qt800-3-chip-dlp-projector-zoom-lens",
       "manual_url": "https://ap.connect.panasonic.com/sites/default/files/media/document/2019-11/rq50k_manual_en.pdf",
       "product_status": "current",
-      "last_verified_at": "2026-08-24",
+      "last_verified_at": "2026-09-04",
       "confidence": "official_primary",
-      "record_notes": "Throw ratio 4.97-7.76:1(17:9); 5.89-9.21(16:10); 5.30-8.28(16:9); 7.06-11.06(4:3) per lens datasheet"
+      "record_notes": "Throw ratio 4.97-7.76:1(17:9); 5.89-9.21(16:10); 5.30-8.28(16:9); 7.06-11.06(4:3) per lens datasheet",
+      "lens_protrusion_mm": 267,
+      "lens_protrusion_source_id": "SRC-014"
     },
     {
       "lens_id": "LNS-008",
@@ -326,15 +393,17 @@
       "lens_shift_horizontal_percent_max": 30,
       "lens_shift_vertical_percent_min": -65,
       "lens_shift_vertical_percent_max": 65,
-      "lens_shift_basis": "percent, per Epson spec sheet (Vertical/Horizontal)",
-      "lens_shift_notes": "Standard/included reference lens for L30000UNL series in some configs; powered zoom/focus/shift",
+      "lens_shift_basis": "percent of projected image width (horizontal) and height (vertical) from the optical centre",
+      "lens_shift_notes": "Vertical approx. 65%, horizontal approx. 30% per EB-L30000U specification (with ELPLM12); the lens cannot be shifted to the maximum in both directions at once.",
       "lens_page_url": "https://www.projectorcentral.com/Epson-Pro_L30000U.htm",
       "datasheet_url": "https://www.projectorcentral.com/pdf/projector_spec_10773.pdf",
       "manual_url": "https://files.support.epson.com/docid/cpd5/cpd59255.pdf",
       "product_status": "current",
-      "last_verified_at": "2026-08-24",
+      "last_verified_at": "2026-09-04",
       "confidence": "official_primary",
-      "record_notes": "Throw ratio 1.74-2.35:1 (Wide-Tele) per Epson/ProjectorCentral spec sheet"
+      "record_notes": "Throw ratio 1.74-2.35:1 (Wide-Tele) per Epson/ProjectorCentral spec sheet",
+      "lens_protrusion_mm": 0.3,
+      "lens_protrusion_source_id": "SRC-018"
     },
     {
       "lens_id": "LNS-009",
@@ -344,15 +413,19 @@
       "lens_name": "Ultra Short-throw Zoom Lens",
       "canonical_lens_key": "epson elplx03",
       "lens_type": "ultra_short_throw",
-      "lens_shift_basis": "percent, per Epson manual (values vary by screen size per manual table)",
-      "lens_shift_notes": "Throw ratio listed as 0.35:1 (fixed) on ProjectorCentral; manual shows distance/shift table varying with image size rather than single % shift figure -- treat as needs_verification for shift %",
+      "lens_shift_basis": "percent of projected image height from the home position",
+      "lens_shift_notes": "ELPLX03 maximum motion range: up 20%, down 5% of image height (EB-L30000U specification p.23); horizontal limit not stated in readable maker text. When the horizontal direction is at maximum the image cannot be moved upward.",
       "lens_page_url": "https://www.projectorcentral.com/Epson-Pro_L30000U.htm",
       "datasheet_url": "https://files.support.epson.com/docid/cpd5/cpd59255.pdf",
       "manual_url": "https://files.support.epson.com/docid/cpd5/cpd59255.pdf",
       "product_status": "current",
-      "last_verified_at": "2026-08-24",
+      "last_verified_at": "2026-09-04",
       "confidence": "needs_verification",
-      "record_notes": "Manual gives vertical lens shift as absolute distance ranges (e.g. -67.8 to -30.3 in @200in image) not percent; do not convert without explicit derivation"
+      "record_notes": "Manual gives vertical lens shift as absolute distance ranges (e.g. -67.8 to -30.3 in @200in image) not percent; do not convert without explicit derivation",
+      "lens_protrusion_mm": 100,
+      "lens_protrusion_source_id": "SRC-018",
+      "lens_shift_vertical_percent_min": -5,
+      "lens_shift_vertical_percent_max": 20
     },
     {
       "lens_id": "LNS-010",
@@ -367,13 +440,13 @@
       "lens_shift_horizontal_percent_max": 18,
       "lens_shift_vertical_percent_min": -50,
       "lens_shift_vertical_percent_max": 50,
-      "lens_shift_basis": "percent, per Sony datasheet",
-      "lens_shift_notes": "Datasheet: throw ratio 0.80-1.02:1; Sony CA site secondary value 0.85-1.09:1 for 16:9 -- conflicting values across regional pages, flagged in exceptions",
+      "lens_shift_basis": "percent of projected image width (horizontal) and height (vertical) from the optical centre",
+      "lens_shift_notes": "+/-50% V, +/-18% H for the native 17:9 picture; +/-19% H when projecting 16:9 (Sony help guide).",
       "lens_page_url": "https://pro.sony/s3/2020/07/27124942/VPL-GTZ380-Datasheet.pdf",
       "datasheet_url": "https://pro.sony/s3/2020/07/27124942/VPL-GTZ380-Datasheet.pdf",
       "manual_url": "https://helpguide.sony.net/vpl/gtz380/v1/en/contents/TP1000003577.html",
       "product_status": "current",
-      "last_verified_at": "2026-08-24",
+      "last_verified_at": "2026-09-04",
       "confidence": "conflicting",
       "record_notes": "Sony help guide: throw ratio 0.80:1 to 1.02:1, shift +/-50%V/+/-18%H; Sony datasheet secondary table: 0.85:1-1.09:1"
     },
@@ -391,13 +464,13 @@
       "lens_shift_horizontal_percent_max": 31,
       "lens_shift_vertical_percent_min": -80,
       "lens_shift_vertical_percent_max": 80,
-      "lens_shift_basis": "percent, per Sony datasheet",
-      "lens_shift_notes": "Help guide lists +/-80%V/+/-31%H; datasheet lists throw ratio 1.40-2.73:1; Sony CA and help guide both list shift +/-80%V/+/-31%H consistently",
+      "lens_shift_basis": "percent of projected image width (horizontal) and height (vertical) from the optical centre",
+      "lens_shift_notes": "+/-80% V, +/-31% H for the native 17:9 picture; +/-33% H when projecting 16:9 (Sony help guide).",
       "lens_page_url": "https://pro.sony/s3/2020/07/27124942/VPL-GTZ380-Datasheet.pdf",
       "datasheet_url": "https://pro.sony/s3/2020/07/27124942/VPL-GTZ380-Datasheet.pdf",
       "manual_url": "https://helpguide.sony.net/vpl/gtz380/v1/en/contents/TP1000003577.html",
       "product_status": "current",
-      "last_verified_at": "2026-08-24",
+      "last_verified_at": "2026-09-04",
       "confidence": "official_primary",
       "record_notes": "Secondary source (16:9 display size) gives 1.49-2.91:1; treat 1.40-2.73:1 as primary basis (unspecified aspect) per Sony help guide"
     },
@@ -579,7 +652,7 @@
       "profile_name": "PT-RQ50K + ET-D3QW300 (17:9 native)",
       "throw_ratio_min": 1.11,
       "throw_ratio_max": 1.7,
-      "throw_ratio_basis": "image_width (17:9 native panel)",
+      "throw_ratio_basis": "image_width",
       "throw_ratio_source_raw_value": "1.11-1.70:1",
       "throw_ratio_is_derived": false,
       "supported_aspect_ratios": "17:9 (native)",
@@ -591,19 +664,125 @@
       "lens_shift_horizontal_percent_max": 14,
       "lens_shift_vertical_percent_min": -40,
       "lens_shift_vertical_percent_max": 40,
-      "lens_shift_reference_basis": "percent from center of screen",
-      "lens_shift_limit_notes": "Manual footnote: 'throw ratio based on value during projection with image size of 5.08m (200in)'",
-      "projection_distance_reference_point": "Not explicitly specified in sources reviewed",
-      "notes_for_throwline": "Use 17:9 basis for native Throwline calc; separate ratios exist per aspect ratio mode -- do not mix",
+      "lens_shift_reference_basis": "fraction of projected image width (H) and height (V) from the optical axis centre, desk/floor installation",
+      "lens_shift_limit_notes": "PT-RQ50K manual lens shift range: +/-0.14 H, +/-0.4 V for ET-D3QW300; matches the PT-RQ50K specification page.",
+      "projection_distance_reference_point": "front end of the projection lens to the screen surface (L); lens protrusion L1 listed separately",
+      "notes_for_throwline": "Width-based ratio for each picture shape; Throwline selects the variant that matches the chosen picture shape and blocks other shapes.",
       "primary_source_id": "SRC-003",
       "source_raw_excerpt": "Throw ratio*1 1.11-1.70:1 ... *1 The throw ratio is based on the value during projection with the projected image size of 5.08m (200in.)",
-      "last_verified_at": "2026-08-24",
+      "last_verified_at": "2026-09-04",
       "confidence": "official_primary",
-      "data_quality_status": "usable_with_limits",
-      "reportedThrowRatioBasis": "image_width (17:9 native panel)",
-      "calculationState": "manufacturer_unspecified",
-      "automaticCalculationAllowed": false,
-      "calculationGateReason": "The approved research authority does not confirm an image-width basis for this exact profile."
+      "data_quality_status": "verified",
+      "reportedThrowRatioBasis": "image_width (17:9 (DCI 4K) picture)",
+      "calculationState": "verified_image_width",
+      "automaticCalculationAllowed": true,
+      "calculationGateReason": "",
+      "basisAspect": 1.8962963,
+      "basisAspectLabel": "17:9 (DCI 4K)",
+      "aspectVariants": [
+        {
+          "aspect": 1.8962963,
+          "label": "17:9 (DCI 4K)",
+          "throw_ratio_min": 1.11,
+          "throw_ratio_max": 1.7,
+          "source_raw_value": "1.11-1.70:1",
+          "distanceFormula": {
+            "unit": "m",
+            "variable": "projected image diagonal SD in metres",
+            "min": {
+              "a": 0.9981,
+              "b": -0.1156
+            },
+            "max": {
+              "a": 1.5291,
+              "b": -0.1143
+            },
+            "expression": "L = a x SD + b"
+          }
+        },
+        {
+          "aspect": 1.6,
+          "label": "16:10",
+          "throw_ratio_min": 1.32,
+          "throw_ratio_max": 2.02,
+          "source_raw_value": "1.32-2.02:1",
+          "distanceFormula": {
+            "unit": "m",
+            "variable": "projected image diagonal SD in metres",
+            "min": {
+              "a": 1.1341,
+              "b": -0.1156
+            },
+            "max": {
+              "a": 1.7374,
+              "b": -0.1143
+            },
+            "expression": "L = a x SD + b"
+          }
+        },
+        {
+          "aspect": 1.7777778,
+          "label": "16:9",
+          "throw_ratio_min": 1.18,
+          "throw_ratio_max": 1.81,
+          "source_raw_value": "1.18-1.81:1",
+          "distanceFormula": {
+            "unit": "m",
+            "variable": "projected image diagonal SD in metres",
+            "min": {
+              "a": 1.049,
+              "b": -0.1156
+            },
+            "max": {
+              "a": 1.6072,
+              "b": -0.1143
+            },
+            "expression": "L = a x SD + b"
+          }
+        },
+        {
+          "aspect": 1.3333333,
+          "label": "4:3",
+          "throw_ratio_min": 1.58,
+          "throw_ratio_max": 2.43,
+          "source_raw_value": "1.58-2.43:1",
+          "distanceFormula": {
+            "unit": "m",
+            "variable": "projected image diagonal SD in metres",
+            "min": {
+              "a": 1.2839,
+              "b": -0.1156
+            },
+            "max": {
+              "a": 1.9669,
+              "b": -0.1143
+            },
+            "expression": "L = a x SD + b"
+          }
+        }
+      ],
+      "verificationEvidence": {
+        "checkedOn": "2026-09-04",
+        "checkedBy": "Throwline catalog verification pass 2026-09-04 (documents read in full from the maker domain)",
+        "method": "Read the PT-RQ50K Operating Instructions in full. The 17:9, 16:10, 16:9, and 4:3 tables list the projected image width (SW) beside the minimum and maximum projection distance, and distance / width reproduces the published throw ratio at the 200-inch reference size, so the ratio is width-based for every listed picture shape.",
+        "source_id": "SRC-014",
+        "excerpt": "\"When the image aspect ratio is 17:9 ... ET-D3QW300 Throw ratio*1 1.11-1.70:1 ... Projected image size Diagonal (SD) Height (SH) Width (SW) ... Projection distance (L)\" and \"SW Projected image width; L (LW/LT) Projection distance (distance from the front end of the projection lens to the screen)\"; \"*1 The throw ratio is based on the value during projection with the projected image size of 5.08 m (200\")\".",
+        "crossChecks": [
+          {
+            "aspectLabel": "17:9 (DCI 4K)",
+            "screenSizeIn": 200,
+            "imageWidthM": 4.49,
+            "distanceMinM": 4.95,
+            "distanceMaxM": 7.65,
+            "ratioMinComputed": 1.1024,
+            "ratioMaxComputed": 1.7038,
+            "ratioMinPublished": 1.11,
+            "ratioMaxPublished": 1.7,
+            "source_id": "SRC-014"
+          }
+        ]
+      },
+      "distance_tolerance_note": "Panasonic: a +/-5% error in listed projection distances may occur."
     },
     {
       "optical_profile_id": "OPT-002",
@@ -611,27 +790,138 @@
       "lens_id": "LNS-004",
       "compatibility_id": "COMP-004",
       "profile_name": "PT-RQ50K + ET-D3QT500 (17:9 native)",
-      "throw_ratio_min": 2,
+      "throw_ratio_min": 2.0,
       "throw_ratio_max": 3.41,
-      "throw_ratio_basis": "image_width (17:9 native panel)",
+      "throw_ratio_basis": "image_width",
       "throw_ratio_source_raw_value": "2.00~3.41:1",
       "throw_ratio_is_derived": false,
       "supported_aspect_ratios": "17:9 (native)",
       "aspect_ratio_condition_notes": "Ratio based on 200-inch diagonal reference image per manual footnote",
       "zoom_control_type": "optical_manual",
       "zoom_position_notes": "Powered zoom, lens memory, stepping motor",
-      "lens_shift_reference_basis": "not isolated per-lens in sources reviewed",
-      "lens_shift_limit_notes": "Projector max spec (unless lens-specific exception applies): V +/-45%, H +/-16%",
-      "notes_for_throwline": "Distinct ratios exist for 16:10 (2.36-4.03), 16:9 (2.13-3.63), 4:3 (2.82-4.83) -- do not mix with 17:9 value",
+      "lens_shift_reference_basis": "fraction of projected image width (H) and height (V) from the optical axis centre, desk/floor installation",
+      "lens_shift_limit_notes": "PT-RQ50K manual lens shift range: +/-0.16 H, +/-0.45 V for ET-D3QT500; matches the PT-RQ50K specification page.",
+      "notes_for_throwline": "Width-based ratio for each picture shape; Throwline selects the variant that matches the chosen picture shape and blocks other shapes.",
       "primary_source_id": "SRC-005",
       "source_raw_excerpt": "2.00~3.41:1 for PT-RQ50K (Aspect 17:9); 2.36~4.03:1 (16:10); 2.13~3.63:1 (16:9); 2.82~4.83:1 (4:3)",
-      "last_verified_at": "2026-08-24",
+      "last_verified_at": "2026-09-04",
       "confidence": "official_primary",
-      "data_quality_status": "usable_with_limits",
-      "reportedThrowRatioBasis": "image_width (17:9 native panel)",
-      "calculationState": "manufacturer_unspecified",
-      "automaticCalculationAllowed": false,
-      "calculationGateReason": "The approved research authority does not confirm an image-width basis for this exact profile."
+      "data_quality_status": "verified",
+      "reportedThrowRatioBasis": "image_width (17:9 (DCI 4K) picture)",
+      "calculationState": "verified_image_width",
+      "automaticCalculationAllowed": true,
+      "calculationGateReason": "",
+      "basisAspect": 1.8962963,
+      "basisAspectLabel": "17:9 (DCI 4K)",
+      "aspectVariants": [
+        {
+          "aspect": 1.8962963,
+          "label": "17:9 (DCI 4K)",
+          "throw_ratio_min": 2.0,
+          "throw_ratio_max": 3.41,
+          "source_raw_value": "2.00 - 3.41:1",
+          "distanceFormula": {
+            "unit": "m",
+            "variable": "projected image diagonal SD in metres",
+            "min": {
+              "a": 1.706,
+              "b": 0.3072
+            },
+            "max": {
+              "a": 2.9627,
+              "b": 0.2772
+            },
+            "expression": "L = a x SD + b"
+          }
+        },
+        {
+          "aspect": 1.6,
+          "label": "16:10",
+          "throw_ratio_min": 2.36,
+          "throw_ratio_max": 4.03,
+          "source_raw_value": "2.36 - 4.03:1",
+          "distanceFormula": {
+            "unit": "m",
+            "variable": "projected image diagonal SD in metres",
+            "min": {
+              "a": 1.9384,
+              "b": 0.3072
+            },
+            "max": {
+              "a": 3.3663,
+              "b": 0.2772
+            },
+            "expression": "L = a x SD + b"
+          }
+        },
+        {
+          "aspect": 1.7777778,
+          "label": "16:9",
+          "throw_ratio_min": 2.13,
+          "throw_ratio_max": 3.63,
+          "source_raw_value": "2.13 - 3.63:1",
+          "distanceFormula": {
+            "unit": "m",
+            "variable": "projected image diagonal SD in metres",
+            "min": {
+              "a": 1.7931,
+              "b": 0.3072
+            },
+            "max": {
+              "a": 3.1139,
+              "b": 0.2772
+            },
+            "expression": "L = a x SD + b"
+          }
+        },
+        {
+          "aspect": 1.3333333,
+          "label": "4:3",
+          "throw_ratio_min": 2.82,
+          "throw_ratio_max": 4.83,
+          "source_raw_value": "2.82 - 4.83:1",
+          "distanceFormula": {
+            "unit": "m",
+            "variable": "projected image diagonal SD in metres",
+            "min": {
+              "a": 2.1944,
+              "b": 0.3072
+            },
+            "max": {
+              "a": 3.8109,
+              "b": 0.2772
+            },
+            "expression": "L = a x SD + b"
+          }
+        }
+      ],
+      "verificationEvidence": {
+        "checkedOn": "2026-09-04",
+        "checkedBy": "Throwline catalog verification pass 2026-09-04 (documents read in full from the maker domain)",
+        "method": "Read the PT-RQ50K Operating Instructions in full. The 17:9, 16:10, 16:9, and 4:3 tables list the projected image width (SW) beside the minimum and maximum projection distance, and distance / width reproduces the published throw ratio at the 200-inch reference size, so the ratio is width-based for every listed picture shape.",
+        "source_id": "SRC-014",
+        "excerpt": "\"When the image aspect ratio is 17:9 ... ET-D3QT500 Throw ratio*1 2.00 - 3.41:1 ... Projected image size Diagonal (SD) Height (SH) Width (SW) ... Projection distance (L)\" and \"SW Projected image width; L (LW/LT) Projection distance (distance from the front end of the projection lens to the screen)\"; \"*1 The throw ratio is based on the value during projection with the projected image size of 5.08 m (200\")\".",
+        "crossChecks": [
+          {
+            "aspectLabel": "17:9 (DCI 4K)",
+            "screenSizeIn": 200,
+            "imageWidthM": 4.49,
+            "distanceMinM": 8.97,
+            "distanceMaxM": 15.33,
+            "ratioMinComputed": 1.9978,
+            "ratioMaxComputed": 3.4143,
+            "ratioMinPublished": 2.0,
+            "ratioMaxPublished": 3.41,
+            "source_id": "SRC-014"
+          }
+        ]
+      },
+      "lens_shift_horizontal_percent_min": -16,
+      "lens_shift_horizontal_percent_max": 16,
+      "lens_shift_vertical_percent_min": -45,
+      "lens_shift_vertical_percent_max": 45,
+      "projection_distance_reference_point": "front end of the projection lens to the screen surface (L); lens protrusion L1 listed separately",
+      "distance_tolerance_note": "Panasonic: a +/-5% error in listed projection distances may occur."
     },
     {
       "optical_profile_id": "OPT-003",
@@ -641,7 +931,7 @@
       "profile_name": "PT-RQ50K + ET-D3QT800 (17:9 native)",
       "throw_ratio_min": 4.97,
       "throw_ratio_max": 7.76,
-      "throw_ratio_basis": "image_width (17:9 native panel)",
+      "throw_ratio_basis": "image_width",
       "throw_ratio_source_raw_value": "4.97~7.76:1",
       "throw_ratio_is_derived": false,
       "supported_aspect_ratios": "17:9 (native)",
@@ -652,17 +942,125 @@
       "lens_shift_horizontal_percent_max": 10,
       "lens_shift_vertical_percent_min": -30,
       "lens_shift_vertical_percent_max": 30,
-      "lens_shift_reference_basis": "percent, projector-level max when this lens installed",
-      "notes_for_throwline": "Distinct ratios for 16:10 (5.89-9.21), 16:9 (5.30-8.28), 4:3 (7.06-11.06) -- do not mix",
+      "lens_shift_reference_basis": "fraction of projected image width (H) and height (V) from the optical axis centre, desk/floor installation",
+      "notes_for_throwline": "Width-based ratio for each picture shape; Throwline selects the variant that matches the chosen picture shape and blocks other shapes.",
       "primary_source_id": "SRC-006",
       "source_raw_excerpt": "Throw ratio 4.97~7.76:1 for PT-RQ50K (Aspect 17:9) 5.89~9.21:1 (16:10) 5.30~8.28:1 (16:9) 7.06~11.06:1 (4:3)",
-      "last_verified_at": "2026-08-24",
+      "last_verified_at": "2026-09-04",
       "confidence": "official_primary",
-      "data_quality_status": "usable_with_limits",
-      "reportedThrowRatioBasis": "image_width (17:9 native panel)",
-      "calculationState": "manufacturer_unspecified",
-      "automaticCalculationAllowed": false,
-      "calculationGateReason": "The approved research authority does not confirm an image-width basis for this exact profile."
+      "data_quality_status": "verified",
+      "reportedThrowRatioBasis": "image_width (17:9 (DCI 4K) picture)",
+      "calculationState": "verified_image_width",
+      "automaticCalculationAllowed": true,
+      "calculationGateReason": "",
+      "basisAspect": 1.8962963,
+      "basisAspectLabel": "17:9 (DCI 4K)",
+      "aspectVariants": [
+        {
+          "aspect": 1.8962963,
+          "label": "17:9 (DCI 4K)",
+          "throw_ratio_min": 4.97,
+          "throw_ratio_max": 7.76,
+          "source_raw_value": "4.97 - 7.76:1",
+          "distanceFormula": {
+            "unit": "m",
+            "variable": "projected image diagonal SD in metres",
+            "min": {
+              "a": 4.4498,
+              "b": -0.3333
+            },
+            "max": {
+              "a": 6.9524,
+              "b": -0.4407
+            },
+            "expression": "L = a x SD + b"
+          }
+        },
+        {
+          "aspect": 1.6,
+          "label": "16:10",
+          "throw_ratio_min": 5.89,
+          "throw_ratio_max": 9.21,
+          "source_raw_value": "5.89 - 9.21:1",
+          "distanceFormula": {
+            "unit": "m",
+            "variable": "projected image diagonal SD in metres",
+            "min": {
+              "a": 5.0559,
+              "b": -0.3333
+            },
+            "max": {
+              "a": 7.8994,
+              "b": -0.4407
+            },
+            "expression": "L = a x SD + b"
+          }
+        },
+        {
+          "aspect": 1.7777778,
+          "label": "16:9",
+          "throw_ratio_min": 5.3,
+          "throw_ratio_max": 8.28,
+          "source_raw_value": "5.30 - 8.28:1",
+          "distanceFormula": {
+            "unit": "m",
+            "variable": "projected image diagonal SD in metres",
+            "min": {
+              "a": 4.6768,
+              "b": -0.3333
+            },
+            "max": {
+              "a": 7.3071,
+              "b": -0.4407
+            },
+            "expression": "L = a x SD + b"
+          }
+        },
+        {
+          "aspect": 1.3333333,
+          "label": "4:3",
+          "throw_ratio_min": 7.06,
+          "throw_ratio_max": 11.06,
+          "source_raw_value": "7.06 - 11.06:1",
+          "distanceFormula": {
+            "unit": "m",
+            "variable": "projected image diagonal SD in metres",
+            "min": {
+              "a": 5.7237,
+              "b": -0.3333
+            },
+            "max": {
+              "a": 8.9427,
+              "b": -0.4407
+            },
+            "expression": "L = a x SD + b"
+          }
+        }
+      ],
+      "verificationEvidence": {
+        "checkedOn": "2026-09-04",
+        "checkedBy": "Throwline catalog verification pass 2026-09-04 (documents read in full from the maker domain)",
+        "method": "Read the PT-RQ50K Operating Instructions in full. The 17:9, 16:10, 16:9, and 4:3 tables list the projected image width (SW) beside the minimum and maximum projection distance, and distance / width reproduces the published throw ratio at the 200-inch reference size, so the ratio is width-based for every listed picture shape.",
+        "source_id": "SRC-014",
+        "excerpt": "\"When the image aspect ratio is 17:9 ... ET-D3QT800 Throw ratio*1 4.97 - 7.76:1 ... Projected image size Diagonal (SD) Height (SH) Width (SW) ... Projection distance (L)\" and \"SW Projected image width; L (LW/LT) Projection distance (distance from the front end of the projection lens to the screen)\"; \"*1 The throw ratio is based on the value during projection with the projected image size of 5.08 m (200\")\".",
+        "crossChecks": [
+          {
+            "aspectLabel": "17:9 (DCI 4K)",
+            "screenSizeIn": 200,
+            "imageWidthM": 4.49,
+            "distanceMinM": 22.27,
+            "distanceMaxM": 34.88,
+            "ratioMinComputed": 4.9599,
+            "ratioMaxComputed": 7.7684,
+            "ratioMinPublished": 4.97,
+            "ratioMaxPublished": 7.76,
+            "source_id": "SRC-014"
+          }
+        ]
+      },
+      "lens_shift_limit_notes": "PT-RQ50K manual lens shift range: +/-0.1 H, +/-0.3 V for ET-D3QT800; matches the PT-RQ50K specification page.",
+      "projection_distance_reference_point": "front end of the projection lens to the screen surface (L); lens protrusion L1 listed separately",
+      "distance_tolerance_note": "Panasonic: a +/-5% error in listed projection distances may occur."
     },
     {
       "optical_profile_id": "OPT-004",
@@ -672,7 +1070,7 @@
       "profile_name": "Pro L30000UNL + ELPLM12 (WUXGA 16:10)",
       "throw_ratio_min": 1.74,
       "throw_ratio_max": 2.35,
-      "throw_ratio_basis": "image_width (per Epson spec table basis)",
+      "throw_ratio_basis": "image_width",
       "throw_ratio_source_raw_value": "1.74 (Wide) - 2.35 (Tele)",
       "throw_ratio_is_derived": false,
       "supported_aspect_ratios": "16:10 (native WUXGA)",
@@ -684,32 +1082,98 @@
       "lens_shift_horizontal_percent_max": 30,
       "lens_shift_vertical_percent_min": -65,
       "lens_shift_vertical_percent_max": 65,
-      "lens_shift_reference_basis": "percent per Epson spec sheet",
-      "projection_distance_reference_point": "Not explicitly documented as distance from a specific physical reference point in sources reviewed",
-      "notes_for_throwline": "Zoom screen-size range (100-1000in wide, 100-1000in tele per Singapore brochure) documented separately from throw ratio -- do not conflate",
+      "lens_shift_reference_basis": "percent of projected image height (V) and width (H) from the lens centre",
+      "projection_distance_reference_point": "projection distance (3) from the lens to the screen per the specification figure; lens protrusion 0.3 mm",
+      "notes_for_throwline": "Width-based ratio; 16:10 and 16:9 pictures share the same value because both use the full panel width.",
       "primary_source_id": "SRC-009",
       "source_raw_excerpt": "Throw Ratio (Base on ELPLM12): 1.74 (Wide) - 2.35 (Tele)",
-      "last_verified_at": "2026-08-24",
+      "last_verified_at": "2026-09-04",
       "confidence": "official_primary",
-      "data_quality_status": "usable_with_limits",
-      "reportedThrowRatioBasis": "image_width (per Epson spec table basis)",
-      "calculationState": "manufacturer_unspecified",
-      "automaticCalculationAllowed": false,
-      "calculationGateReason": "The approved research authority does not confirm an image-width basis for this exact profile."
+      "data_quality_status": "verified",
+      "reportedThrowRatioBasis": "image_width (16:10 picture)",
+      "calculationState": "verified_image_width",
+      "automaticCalculationAllowed": true,
+      "calculationGateReason": "",
+      "basisAspect": 1.6,
+      "basisAspectLabel": "16:10",
+      "aspectVariants": [
+        {
+          "aspect": 1.6,
+          "label": "16:10",
+          "throw_ratio_min": 1.74,
+          "throw_ratio_max": 2.35,
+          "source_raw_value": "1.74 - 2.35 (Throw Ratio, 16:10 table)",
+          "distanceFormula": {
+            "unit": "cm",
+            "variable": "screen size in inches (diagonal)",
+            "min": {
+              "a": 3.81,
+              "b": -12.74
+            },
+            "max": {
+              "a": 5.12,
+              "b": -12.04
+            },
+            "expression": "L = a x size + b"
+          }
+        },
+        {
+          "aspect": 1.7777778,
+          "label": "16:9",
+          "throw_ratio_min": 1.74,
+          "throw_ratio_max": 2.35,
+          "source_raw_value": "1.74 - 2.35 (Throw Ratio, 16:9 table)",
+          "distanceFormula": {
+            "unit": "cm",
+            "variable": "screen size in inches (diagonal)",
+            "min": {
+              "a": 3.91,
+              "b": -12.74
+            },
+            "max": {
+              "a": 5.26,
+              "b": -12.04
+            },
+            "expression": "L = a x size + b"
+          }
+        }
+      ],
+      "verificationEvidence": {
+        "checkedOn": "2026-09-04",
+        "checkedBy": "Throwline catalog verification pass 2026-09-04 (documents read in full from the maker domain)",
+        "method": "Read the EB-L30000U specification and the user manual in full. The formula table labels the throw ratio as projection distance over screen width, and distance / width from the 16:10 size table reproduces 1.74-2.35 at 200 inches. The same width-based ratio applies to 16:9 pictures.",
+        "source_id": "SRC-018",
+        "excerpt": "\"Projection Distance Formula by Lens <For screens with an aspect ratio of 16:10> ... ELPLM12 Minimum Projection distance (cm) = Projection screen size (inches) x 3.81 - 12.74 ... Throw Ratio (3/x) 1.74 - 2.35\"; screen size table row \"100 | 215 x 135 | ELPLM12 368 - 500\" and \"200 | 431 x 269 | 749 - 1011\" (cm).",
+        "crossChecks": [
+          {
+            "aspectLabel": "16:10",
+            "screenSizeIn": 200,
+            "imageWidthM": 4.31,
+            "distanceMinM": 7.49,
+            "distanceMaxM": 10.11,
+            "ratioMinComputed": 1.7378,
+            "ratioMaxComputed": 2.3457,
+            "ratioMinPublished": 1.74,
+            "ratioMaxPublished": 2.35,
+            "source_id": "SRC-018"
+          }
+        ]
+      },
+      "lens_shift_limit_notes": "EB-L30000U specification: vertical approx. 65%, horizontal approx. 30% with ELPLM12; the lens cannot be shifted to the maximum in both directions at once."
     },
     {
       "optical_profile_id": "OPT-005",
       "projector_id": "PRJ-003",
       "lens_id": "LNS-010",
       "compatibility_id": "COMP-010",
-      "profile_name": "VPL-GTZ380 + VPLL-Z8008 (primary basis)",
+      "profile_name": "VPL-GTZ380 + VPLL-Z8008 (17:9 native)",
       "throw_ratio_min": 0.8,
       "throw_ratio_max": 1.02,
-      "throw_ratio_basis": "manufacturer_unspecified",
+      "throw_ratio_basis": "image_width",
       "throw_ratio_source_raw_value": "0.80:1 to 1.02:1",
       "throw_ratio_is_derived": false,
-      "supported_aspect_ratios": "not specified as single value in primary source",
-      "aspect_ratio_condition_notes": "Sony help guide gives 0.80-1.02:1 without stated aspect basis; Sony datasheet secondary table (16:9 display size) gives conflicting 0.85-1.09:1",
+      "supported_aspect_ratios": "17:9 native; 16:9 variant",
+      "aspect_ratio_condition_notes": "Help guide tables per picture shape; 0.80-1.02:1 is the native 17:9 width basis, 0.85-1.09:1 the 16:9 width basis.",
       "screen_size_or_image_size_conditions": "Screen size 60-1200in per help guide",
       "zoom_control_type": "optical_motorized",
       "zoom_position_notes": "Motorized",
@@ -717,32 +1181,111 @@
       "lens_shift_horizontal_percent_max": 18,
       "lens_shift_vertical_percent_min": -50,
       "lens_shift_vertical_percent_max": 50,
-      "lens_shift_reference_basis": "percent, per Sony help guide and datasheet",
-      "projection_distance_reference_point": "Not explicitly documented",
-      "notes_for_throwline": "CONFLICTING SOURCE VALUES -- see research_exceptions EXC-002; do not treat 0.80-1.02 and 0.85-1.09 as interchangeable",
+      "lens_shift_reference_basis": "percent of full projected image width (H) and height (V) from the optical centre",
+      "projection_distance_reference_point": "front of the lens to the projected surface",
+      "notes_for_throwline": "Home-cinema product retained per catalog note EXC-004; width-based ratio verified for 17:9 and 16:9 pictures.",
       "primary_source_id": "SRC-010",
       "source_raw_excerpt": "Throw ratio: 0.80:1 to 1.02:1 Shift: +/-50% (V), +/-18% (H)",
-      "last_verified_at": "2026-08-24",
-      "confidence": "conflicting",
-      "data_quality_status": "conflicting",
-      "reportedThrowRatioBasis": "manufacturer_unspecified",
-      "calculationState": "conflicting",
-      "automaticCalculationAllowed": false,
-      "calculationGateReason": "Official ratio evidence conflicts; automatic calculation is blocked."
+      "last_verified_at": "2026-09-04",
+      "confidence": "official_primary",
+      "data_quality_status": "verified",
+      "reportedThrowRatioBasis": "image_width (17:9 (DCI 4K) picture)",
+      "calculationState": "verified_image_width",
+      "automaticCalculationAllowed": true,
+      "calculationGateReason": "",
+      "basisAspect": 1.8962963,
+      "basisAspectLabel": "17:9 (DCI 4K)",
+      "aspectVariants": [
+        {
+          "aspect": 1.8962963,
+          "label": "17:9 (DCI 4K)",
+          "throw_ratio_min": 0.8,
+          "throw_ratio_max": 1.02,
+          "source_raw_value": "Throw ratio: 0.80:1 to 1.02:1 (native 17:9)",
+          "distanceFormula": {
+            "unit": "m",
+            "variable": "screen size D in inches (diagonal)",
+            "min": {
+              "a": 0.01856,
+              "b": -0.0706
+            },
+            "max": {
+              "a": 0.02348,
+              "b": -0.0658
+            },
+            "expression": "L = a x D + b"
+          }
+        },
+        {
+          "aspect": 1.7777778,
+          "label": "16:9",
+          "throw_ratio_min": 0.85,
+          "throw_ratio_max": 1.09,
+          "source_raw_value": "0.85-1.09:1 (16:9 display size table)",
+          "distanceFormula": {
+            "unit": "m",
+            "variable": "screen size D in inches (diagonal)",
+            "min": {
+              "a": 0.019507,
+              "b": -0.0706
+            },
+            "max": {
+              "a": 0.024679,
+              "b": -0.0658
+            },
+            "expression": "L = a x D + b"
+          }
+        }
+      ],
+      "verificationEvidence": {
+        "checkedOn": "2026-09-04",
+        "checkedBy": "Throwline catalog verification pass 2026-09-04 (documents read in full from the maker domain)",
+        "method": "Read the Sony help guide pages in full. Distance / image width from the native 17:9 table reproduces the specification value 0.80-1.02:1, and the 16:9 table reproduces 0.85-1.09:1, so the two published figures are the same width-based ratio at two picture shapes, not a conflict.",
+        "source_id": "SRC-016",
+        "excerpt": "\"When Projecting in 1.90:1 (Native Full Display 17:9) Format ... VPLL-Z8008 ... 100 inch: 2.25 m x 1.18 m, minimum 1.79 m, maximum 2.28 m\"; SRC-015: \"The projection distance (L) refers to the distance between the front of the lens and the projected surface\".",
+        "crossChecks": [
+          {
+            "aspectLabel": "17:9 (DCI 4K)",
+            "screenSizeIn": 100,
+            "imageWidthM": 2.25,
+            "distanceMinM": 1.79,
+            "distanceMaxM": 2.28,
+            "ratioMinComputed": 0.7956,
+            "ratioMaxComputed": 1.0133,
+            "ratioMinPublished": 0.8,
+            "ratioMaxPublished": 1.02,
+            "source_id": "SRC-016"
+          },
+          {
+            "aspectLabel": "16:9",
+            "screenSizeIn": 100,
+            "imageWidthM": 2.21,
+            "distanceMinM": 1.89,
+            "distanceMaxM": 2.4,
+            "ratioMinComputed": 0.8552,
+            "ratioMaxComputed": 1.086,
+            "ratioMinPublished": 0.85,
+            "ratioMaxPublished": 1.09,
+            "source_id": "SRC-017"
+          }
+        ]
+      },
+      "lens_shift_limit_notes": "+/-50% V, +/-18% H for the native 17:9 picture (+/-19% H when projecting 16:9).",
+      "distance_tolerance_note": "Sony formulas carry a fixed offset of about -0.07 m, so the effective ratio rises slightly with screen size (0.80 at 100 inches, 0.82 at 1200 inches)."
     },
     {
       "optical_profile_id": "OPT-006",
       "projector_id": "PRJ-003",
       "lens_id": "LNS-011",
       "compatibility_id": "COMP-011",
-      "profile_name": "VPL-GTZ380 + VPLL-Z8014 (primary basis)",
+      "profile_name": "VPL-GTZ380 + VPLL-Z8014 (17:9 native)",
       "throw_ratio_min": 1.4,
       "throw_ratio_max": 2.73,
-      "throw_ratio_basis": "manufacturer_unspecified",
+      "throw_ratio_basis": "image_width",
       "throw_ratio_source_raw_value": "1.40:1 to 2.73:1",
       "throw_ratio_is_derived": false,
-      "supported_aspect_ratios": "not specified as single value in primary source",
-      "aspect_ratio_condition_notes": "Sony datasheet secondary table (16:9 display size) gives 1.49-2.91:1 for same lens",
+      "supported_aspect_ratios": "17:9 native; 16:9 variant",
+      "aspect_ratio_condition_notes": "Help guide tables per picture shape; 1.40-2.73:1 is the native 17:9 width basis, 1.49-2.91:1 the 16:9 width basis.",
       "screen_size_or_image_size_conditions": "Screen size 60-600in per help guide",
       "zoom_control_type": "optical_motorized",
       "zoom_position_notes": "Motorized",
@@ -750,18 +1293,97 @@
       "lens_shift_horizontal_percent_max": 31,
       "lens_shift_vertical_percent_min": -80,
       "lens_shift_vertical_percent_max": 80,
-      "lens_shift_reference_basis": "percent, per Sony help guide and datasheet",
-      "projection_distance_reference_point": "Not explicitly documented",
-      "notes_for_throwline": "Two source values for same lens differ by display-size basis (unspecified vs 16:9) -- see EXC-002",
+      "lens_shift_reference_basis": "percent of full projected image width (H) and height (V) from the optical centre",
+      "projection_distance_reference_point": "front of the lens to the projected surface",
+      "notes_for_throwline": "Width-based ratio verified for 17:9 and 16:9 pictures.",
       "primary_source_id": "SRC-010",
       "source_raw_excerpt": "Throw ratio 1.40:1 to 2.73:1 Shift: +/-80% (V), +/-31% (H)",
-      "last_verified_at": "2026-08-24",
-      "confidence": "conflicting",
-      "data_quality_status": "conflicting",
-      "reportedThrowRatioBasis": "manufacturer_unspecified",
-      "calculationState": "conflicting",
-      "automaticCalculationAllowed": false,
-      "calculationGateReason": "Official ratio evidence conflicts; automatic calculation is blocked."
+      "last_verified_at": "2026-09-04",
+      "confidence": "official_primary",
+      "data_quality_status": "verified",
+      "reportedThrowRatioBasis": "image_width (17:9 (DCI 4K) picture)",
+      "calculationState": "verified_image_width",
+      "automaticCalculationAllowed": true,
+      "calculationGateReason": "",
+      "basisAspect": 1.8962963,
+      "basisAspectLabel": "17:9 (DCI 4K)",
+      "aspectVariants": [
+        {
+          "aspect": 1.8962963,
+          "label": "17:9 (DCI 4K)",
+          "throw_ratio_min": 1.4,
+          "throw_ratio_max": 2.73,
+          "source_raw_value": "Throw ratio: 1.40:1 to 2.73:1 (native 17:9)",
+          "distanceFormula": {
+            "unit": "m",
+            "variable": "screen size D in inches (diagonal)",
+            "min": {
+              "a": 0.032079,
+              "b": -0.082
+            },
+            "max": {
+              "a": 0.061888,
+              "b": -0.0737
+            },
+            "expression": "L = a x D + b"
+          }
+        },
+        {
+          "aspect": 1.7777778,
+          "label": "16:9",
+          "throw_ratio_min": 1.49,
+          "throw_ratio_max": 2.91,
+          "source_raw_value": "1.49-2.91:1 (16:9 display size table)",
+          "distanceFormula": {
+            "unit": "m",
+            "variable": "screen size D in inches (diagonal)",
+            "min": {
+              "a": 0.033716,
+              "b": -0.082
+            },
+            "max": {
+              "a": 0.065046,
+              "b": -0.0737
+            },
+            "expression": "L = a x D + b"
+          }
+        }
+      ],
+      "verificationEvidence": {
+        "checkedOn": "2026-09-04",
+        "checkedBy": "Throwline catalog verification pass 2026-09-04 (documents read in full from the maker domain)",
+        "method": "Read the Sony help guide pages in full. Distance / image width reproduces 1.40-2.73:1 for the native 17:9 picture and 1.49-2.91:1 for 16:9.",
+        "source_id": "SRC-016",
+        "excerpt": "\"VPLL-Z8014 ... 100 inch: 2.25 m x 1.18 m, minimum 3.13 m, maximum 6.11 m\"; 16:9 table \"100 inch: 2.21 m x 1.25 m, minimum 3.29 m, maximum 6.43 m\".",
+        "crossChecks": [
+          {
+            "aspectLabel": "17:9 (DCI 4K)",
+            "screenSizeIn": 100,
+            "imageWidthM": 2.25,
+            "distanceMinM": 3.13,
+            "distanceMaxM": 6.11,
+            "ratioMinComputed": 1.3911,
+            "ratioMaxComputed": 2.7156,
+            "ratioMinPublished": 1.4,
+            "ratioMaxPublished": 2.73,
+            "source_id": "SRC-016"
+          },
+          {
+            "aspectLabel": "16:9",
+            "screenSizeIn": 100,
+            "imageWidthM": 2.21,
+            "distanceMinM": 3.29,
+            "distanceMaxM": 6.43,
+            "ratioMinComputed": 1.4887,
+            "ratioMaxComputed": 2.9095,
+            "ratioMinPublished": 1.49,
+            "ratioMaxPublished": 2.91,
+            "source_id": "SRC-017"
+          }
+        ]
+      },
+      "lens_shift_limit_notes": "+/-80% V, +/-31% H for the native 17:9 picture (+/-33% H when projecting 16:9).",
+      "distance_tolerance_note": "Sony formulas carry a fixed offset of about -0.08 m; the effective ratio rises slightly with screen size."
     },
     {
       "optical_profile_id": "OPT-007",
@@ -781,16 +1403,16 @@
       "lens_shift_reference_basis": "not isolated per-lens; projector-level max only",
       "lens_shift_limit_notes": "Projector spec: 'Vertical between -100% to +130%, depending on lens; Horizontal up to +/-40%, depending on lens' -- per-lens split not documented in this source",
       "installation_orientation_constraints": "Per-lens shift and throw-ratio basis not fully documented in the UDX-4K32 spec sheet; full TLD+ lens datasheets not retrieved in this pass -- see EXC-003",
-      "notes_for_throwline": "Do not assume this lens gets full projector-max shift; treat as needs_verification",
+      "notes_for_throwline": "Do not calculate until a readable Barco document states the ratio and width basis for the UDX-4K32 chip.",
       "primary_source_id": "SRC-012",
       "source_raw_excerpt": "Lenses TLD+ 0.37, 0.65-0.85, 0.8-1.16:1 ; 1.25-1.6:1 ; 1.5-2.0:1 ; 2.0-2.8:1 ; 2.8-4.5:1 ; 4.5-7.5:1 ; 7.5-11.5:1",
-      "last_verified_at": "2026-08-24",
-      "confidence": "needs_verification",
-      "data_quality_status": "partial",
+      "last_verified_at": "2026-09-04",
+      "confidence": "conflicting",
+      "data_quality_status": "conflicting",
       "reportedThrowRatioBasis": "manufacturer_unspecified",
-      "calculationState": "partial",
+      "calculationState": "conflicting",
       "automaticCalculationAllowed": false,
-      "calculationGateReason": "Optical profile is incomplete; automatic calculation is blocked."
+      "calculationGateReason": "Barco lists this lens as TLD+ 0.37 on the UDX-4K32 sheet, but its lens listing gives 0.42:1 for the projector\u2019s WQXGA 0.90-inch chip (0.39:1 WUXGA, 0.36:1 0.98-inch 4K). The maker\u2019s own lens page could not be read to settle it."
     },
     {
       "optical_profile_id": "OPT-008",
@@ -810,16 +1432,542 @@
       "lens_shift_reference_basis": "not isolated per-lens; projector-level max only",
       "lens_shift_limit_notes": "Same limitation as OPT-007",
       "installation_orientation_constraints": "Per-lens optical datasheet not retrieved in this pass -- see EXC-003",
-      "notes_for_throwline": "Needs individual TLD+ lens datasheet lookup for shift/offset specifics",
+      "notes_for_throwline": "Consistent value across Barco documents; blocked only on the unread width-basis statement.",
       "primary_source_id": "SRC-012",
       "source_raw_excerpt": "Lenses TLD+ 0.37, 0.65-0.85, 0.8-1.16:1 ; 1.25-1.6:1 ...",
-      "last_verified_at": "2026-08-24",
+      "last_verified_at": "2026-09-04",
       "confidence": "needs_verification",
       "data_quality_status": "partial",
       "reportedThrowRatioBasis": "manufacturer_unspecified",
-      "calculationState": "partial",
+      "calculationState": "manufacturer_unspecified",
       "automaticCalculationAllowed": false,
-      "calculationGateReason": "Optical profile is incomplete; automatic calculation is blocked."
+      "calculationGateReason": "Barco\u2019s UDX-4K32 sheet lists TLD+ 1.25-1.6:1 and its lens listing gives 1.25-1.60:1 for the WQXGA 0.90-inch chip, but no Barco document readable in this pass states that the ratio is distance over image width. Barco\u2019s website blocks automated reading."
+    },
+    {
+      "optical_profile_id": "OPT-009",
+      "projector_id": "PRJ-001",
+      "lens_id": "LNS-003",
+      "compatibility_id": "COMP-003",
+      "profile_name": "PT-RQ50K + ET-D3QS400 (17:9 native)",
+      "throw_ratio_is_derived": false,
+      "supported_aspect_ratios": "17:9 native; 16:10, 16:9, 4:3 variants",
+      "zoom_control_type": "optical_powered",
+      "zoom_position_notes": "Powered zoom",
+      "primary_source_id": "SRC-014",
+      "throw_ratio_source_raw_value": "1.43 - 2.09:1",
+      "throw_ratio_min": 1.43,
+      "throw_ratio_max": 2.09,
+      "throw_ratio_basis": "image_width",
+      "basisAspect": 1.8962963,
+      "basisAspectLabel": "17:9 (DCI 4K)",
+      "reportedThrowRatioBasis": "image_width (17:9 (DCI 4K) picture)",
+      "aspectVariants": [
+        {
+          "aspect": 1.8962963,
+          "label": "17:9 (DCI 4K)",
+          "throw_ratio_min": 1.43,
+          "throw_ratio_max": 2.09,
+          "source_raw_value": "1.43 - 2.09:1",
+          "distanceFormula": {
+            "unit": "m",
+            "variable": "projected image diagonal SD in metres",
+            "min": {
+              "a": 1.2841,
+              "b": -0.1267
+            },
+            "max": {
+              "a": 1.8748,
+              "b": -0.1207
+            },
+            "expression": "L = a x SD + b"
+          }
+        },
+        {
+          "aspect": 1.6,
+          "label": "16:10",
+          "throw_ratio_min": 1.7,
+          "throw_ratio_max": 2.48,
+          "source_raw_value": "1.70 - 2.48:1",
+          "distanceFormula": {
+            "unit": "m",
+            "variable": "projected image diagonal SD in metres",
+            "min": {
+              "a": 1.459,
+              "b": -0.1267
+            },
+            "max": {
+              "a": 2.1302,
+              "b": -0.1207
+            },
+            "expression": "L = a x SD + b"
+          }
+        },
+        {
+          "aspect": 1.7777778,
+          "label": "16:9",
+          "throw_ratio_min": 1.52,
+          "throw_ratio_max": 2.23,
+          "source_raw_value": "1.52 - 2.23:1",
+          "distanceFormula": {
+            "unit": "m",
+            "variable": "projected image diagonal SD in metres",
+            "min": {
+              "a": 1.3496,
+              "b": -0.1267
+            },
+            "max": {
+              "a": 1.9705,
+              "b": -0.1207
+            },
+            "expression": "L = a x SD + b"
+          }
+        },
+        {
+          "aspect": 1.3333333,
+          "label": "4:3",
+          "throw_ratio_min": 2.04,
+          "throw_ratio_max": 2.98,
+          "source_raw_value": "2.04 - 2.98:1",
+          "distanceFormula": {
+            "unit": "m",
+            "variable": "projected image diagonal SD in metres",
+            "min": {
+              "a": 1.6517,
+              "b": -0.1267
+            },
+            "max": {
+              "a": 2.4115,
+              "b": -0.1207
+            },
+            "expression": "L = a x SD + b"
+          }
+        }
+      ],
+      "verificationEvidence": {
+        "checkedOn": "2026-09-04",
+        "checkedBy": "Throwline catalog verification pass 2026-09-04 (documents read in full from the maker domain)",
+        "method": "Read the PT-RQ50K Operating Instructions in full. The 17:9, 16:10, 16:9, and 4:3 tables list the projected image width (SW) beside the minimum and maximum projection distance, and distance / width reproduces the published throw ratio at the 200-inch reference size, so the ratio is width-based for every listed picture shape.",
+        "source_id": "SRC-014",
+        "excerpt": "\"When the image aspect ratio is 17:9 ... ET-D3QS400 Throw ratio*1 1.43 - 2.09:1 ... Projected image size Diagonal (SD) Height (SH) Width (SW) ... Projection distance (L)\" and \"SW Projected image width; L (LW/LT) Projection distance (distance from the front end of the projection lens to the screen)\"; \"*1 The throw ratio is based on the value during projection with the projected image size of 5.08 m (200\")\".",
+        "crossChecks": [
+          {
+            "aspectLabel": "17:9 (DCI 4K)",
+            "screenSizeIn": 200,
+            "imageWidthM": 4.49,
+            "distanceMinM": 6.4,
+            "distanceMaxM": 9.4,
+            "ratioMinComputed": 1.4254,
+            "ratioMaxComputed": 2.0935,
+            "ratioMinPublished": 1.43,
+            "ratioMaxPublished": 2.09,
+            "source_id": "SRC-014"
+          }
+        ]
+      },
+      "calculationState": "verified_image_width",
+      "automaticCalculationAllowed": true,
+      "calculationGateReason": "",
+      "last_verified_at": "2026-09-04",
+      "confidence": "official_primary",
+      "data_quality_status": "verified",
+      "lens_shift_horizontal_percent_min": -16,
+      "lens_shift_horizontal_percent_max": 16,
+      "lens_shift_vertical_percent_min": -45,
+      "lens_shift_vertical_percent_max": 45,
+      "lens_shift_reference_basis": "fraction of projected image width (H) and height (V) from the optical axis centre, desk/floor installation",
+      "lens_shift_limit_notes": "PT-RQ50K manual lens shift range: +/-0.16 H, +/-0.45 V for ET-D3QS400; matches the PT-RQ50K specification page.",
+      "projection_distance_reference_point": "front end of the projection lens to the screen surface (L); lens protrusion L1 listed separately",
+      "distance_tolerance_note": "Panasonic: a +/-5% error in listed projection distances may occur.",
+      "notes_for_throwline": "Width-based ratio for each picture shape; Throwline selects the variant that matches the chosen picture shape and blocks other shapes."
+    },
+    {
+      "optical_profile_id": "OPT-010",
+      "projector_id": "PRJ-001",
+      "lens_id": "LNS-005",
+      "compatibility_id": "COMP-005",
+      "profile_name": "PT-RQ50K + ET-D3QT600 (17:9 native)",
+      "throw_ratio_is_derived": false,
+      "supported_aspect_ratios": "17:9 native; 16:10, 16:9, 4:3 variants",
+      "zoom_control_type": "optical_powered",
+      "zoom_position_notes": "Powered zoom",
+      "primary_source_id": "SRC-014",
+      "throw_ratio_source_raw_value": "2.69 - 3.88:1",
+      "throw_ratio_min": 2.69,
+      "throw_ratio_max": 3.88,
+      "throw_ratio_basis": "image_width",
+      "basisAspect": 1.8962963,
+      "basisAspectLabel": "17:9 (DCI 4K)",
+      "reportedThrowRatioBasis": "image_width (17:9 (DCI 4K) picture)",
+      "aspectVariants": [
+        {
+          "aspect": 1.8962963,
+          "label": "17:9 (DCI 4K)",
+          "throw_ratio_min": 2.69,
+          "throw_ratio_max": 3.88,
+          "source_raw_value": "2.69 - 3.88:1",
+          "distanceFormula": {
+            "unit": "m",
+            "variable": "projected image diagonal SD in metres",
+            "min": {
+              "a": 2.4187,
+              "b": -0.2235
+            },
+            "max": {
+              "a": 3.4871,
+              "b": -0.2915
+            },
+            "expression": "L = a x SD + b"
+          }
+        },
+        {
+          "aspect": 1.6,
+          "label": "16:10",
+          "throw_ratio_min": 3.19,
+          "throw_ratio_max": 4.6,
+          "source_raw_value": "3.19 - 4.60:1",
+          "distanceFormula": {
+            "unit": "m",
+            "variable": "projected image diagonal SD in metres",
+            "min": {
+              "a": 2.7482,
+              "b": -0.2235
+            },
+            "max": {
+              "a": 3.9621,
+              "b": -0.2915
+            },
+            "expression": "L = a x SD + b"
+          }
+        },
+        {
+          "aspect": 1.7777778,
+          "label": "16:9",
+          "throw_ratio_min": 2.87,
+          "throw_ratio_max": 4.13,
+          "source_raw_value": "2.87 - 4.13:1",
+          "distanceFormula": {
+            "unit": "m",
+            "variable": "projected image diagonal SD in metres",
+            "min": {
+              "a": 2.5421,
+              "b": -0.2235
+            },
+            "max": {
+              "a": 3.6651,
+              "b": -0.2915
+            },
+            "expression": "L = a x SD + b"
+          }
+        },
+        {
+          "aspect": 1.3333333,
+          "label": "4:3",
+          "throw_ratio_min": 3.84,
+          "throw_ratio_max": 5.53,
+          "source_raw_value": "3.84 - 5.53:1",
+          "distanceFormula": {
+            "unit": "m",
+            "variable": "projected image diagonal SD in metres",
+            "min": {
+              "a": 3.1111,
+              "b": -0.2235
+            },
+            "max": {
+              "a": 4.4855,
+              "b": -0.2915
+            },
+            "expression": "L = a x SD + b"
+          }
+        }
+      ],
+      "verificationEvidence": {
+        "checkedOn": "2026-09-04",
+        "checkedBy": "Throwline catalog verification pass 2026-09-04 (documents read in full from the maker domain)",
+        "method": "Read the PT-RQ50K Operating Instructions in full. The 17:9, 16:10, 16:9, and 4:3 tables list the projected image width (SW) beside the minimum and maximum projection distance, and distance / width reproduces the published throw ratio at the 200-inch reference size, so the ratio is width-based for every listed picture shape.",
+        "source_id": "SRC-014",
+        "excerpt": "\"When the image aspect ratio is 17:9 ... ET-D3QT600 Throw ratio*1 2.69 - 3.88:1 ... Projected image size Diagonal (SD) Height (SH) Width (SW) ... Projection distance (L)\" and \"SW Projected image width; L (LW/LT) Projection distance (distance from the front end of the projection lens to the screen)\"; \"*1 The throw ratio is based on the value during projection with the projected image size of 5.08 m (200\")\".",
+        "crossChecks": [
+          {
+            "aspectLabel": "17:9 (DCI 4K)",
+            "screenSizeIn": 200,
+            "imageWidthM": 4.49,
+            "distanceMinM": 12.06,
+            "distanceMaxM": 17.42,
+            "ratioMinComputed": 2.686,
+            "ratioMaxComputed": 3.8797,
+            "ratioMinPublished": 2.69,
+            "ratioMaxPublished": 3.88,
+            "source_id": "SRC-014"
+          }
+        ]
+      },
+      "calculationState": "verified_image_width",
+      "automaticCalculationAllowed": true,
+      "calculationGateReason": "",
+      "last_verified_at": "2026-09-04",
+      "confidence": "official_primary",
+      "data_quality_status": "verified",
+      "lens_shift_horizontal_percent_min": -8,
+      "lens_shift_horizontal_percent_max": 8,
+      "lens_shift_vertical_percent_min": -25,
+      "lens_shift_vertical_percent_max": 25,
+      "lens_shift_reference_basis": "fraction of projected image width (H) and height (V) from the optical axis centre, desk/floor installation",
+      "lens_shift_limit_notes": "PT-RQ50K manual lens shift range: +/-0.08 H, +/-0.25 V for ET-D3QT600; matches the PT-RQ50K specification page.",
+      "projection_distance_reference_point": "front end of the projection lens to the screen surface (L); lens protrusion L1 listed separately",
+      "distance_tolerance_note": "Panasonic: a +/-5% error in listed projection distances may occur.",
+      "notes_for_throwline": "Width-based ratio for each picture shape; Throwline selects the variant that matches the chosen picture shape and blocks other shapes."
+    },
+    {
+      "optical_profile_id": "OPT-011",
+      "projector_id": "PRJ-001",
+      "lens_id": "LNS-006",
+      "compatibility_id": "COMP-006",
+      "profile_name": "PT-RQ50K + ET-D3QT700 (17:9 native)",
+      "throw_ratio_is_derived": false,
+      "supported_aspect_ratios": "17:9 native; 16:10, 16:9, 4:3 variants",
+      "zoom_control_type": "optical_powered",
+      "zoom_position_notes": "Powered zoom",
+      "primary_source_id": "SRC-014",
+      "throw_ratio_source_raw_value": "3.89 - 5.47:1",
+      "throw_ratio_min": 3.89,
+      "throw_ratio_max": 5.47,
+      "throw_ratio_basis": "image_width",
+      "basisAspect": 1.8962963,
+      "basisAspectLabel": "17:9 (DCI 4K)",
+      "reportedThrowRatioBasis": "image_width (17:9 (DCI 4K) picture)",
+      "aspectVariants": [
+        {
+          "aspect": 1.8962963,
+          "label": "17:9 (DCI 4K)",
+          "throw_ratio_min": 3.89,
+          "throw_ratio_max": 5.47,
+          "source_raw_value": "3.89 - 5.47:1",
+          "distanceFormula": {
+            "unit": "m",
+            "variable": "projected image diagonal SD in metres",
+            "min": {
+              "a": 3.4871,
+              "b": -0.2923
+            },
+            "max": {
+              "a": 4.9121,
+              "b": -0.3863
+            },
+            "expression": "L = a x SD + b"
+          }
+        },
+        {
+          "aspect": 1.6,
+          "label": "16:10",
+          "throw_ratio_min": 4.61,
+          "throw_ratio_max": 6.49,
+          "source_raw_value": "4.61 - 6.49:1",
+          "distanceFormula": {
+            "unit": "m",
+            "variable": "projected image diagonal SD in metres",
+            "min": {
+              "a": 3.9621,
+              "b": -0.2923
+            },
+            "max": {
+              "a": 5.5812,
+              "b": -0.3863
+            },
+            "expression": "L = a x SD + b"
+          }
+        },
+        {
+          "aspect": 1.7777778,
+          "label": "16:9",
+          "throw_ratio_min": 4.14,
+          "throw_ratio_max": 5.83,
+          "source_raw_value": "4.14 - 5.83:1",
+          "distanceFormula": {
+            "unit": "m",
+            "variable": "projected image diagonal SD in metres",
+            "min": {
+              "a": 3.6651,
+              "b": -0.2923
+            },
+            "max": {
+              "a": 5.1627,
+              "b": -0.3863
+            },
+            "expression": "L = a x SD + b"
+          }
+        },
+        {
+          "aspect": 1.3333333,
+          "label": "4:3",
+          "throw_ratio_min": 5.54,
+          "throw_ratio_max": 7.8,
+          "source_raw_value": "5.54 - 7.80:1",
+          "distanceFormula": {
+            "unit": "m",
+            "variable": "projected image diagonal SD in metres",
+            "min": {
+              "a": 4.4855,
+              "b": -0.2923
+            },
+            "max": {
+              "a": 6.3184,
+              "b": -0.3863
+            },
+            "expression": "L = a x SD + b"
+          }
+        }
+      ],
+      "verificationEvidence": {
+        "checkedOn": "2026-09-04",
+        "checkedBy": "Throwline catalog verification pass 2026-09-04 (documents read in full from the maker domain)",
+        "method": "Read the PT-RQ50K Operating Instructions in full. The 17:9, 16:10, 16:9, and 4:3 tables list the projected image width (SW) beside the minimum and maximum projection distance, and distance / width reproduces the published throw ratio at the 200-inch reference size, so the ratio is width-based for every listed picture shape.",
+        "source_id": "SRC-014",
+        "excerpt": "\"When the image aspect ratio is 17:9 ... ET-D3QT700 Throw ratio*1 3.89 - 5.47:1 ... Projected image size Diagonal (SD) Height (SH) Width (SW) ... Projection distance (L)\" and \"SW Projected image width; L (LW/LT) Projection distance (distance from the front end of the projection lens to the screen)\"; \"*1 The throw ratio is based on the value during projection with the projected image size of 5.08 m (200\")\".",
+        "crossChecks": [
+          {
+            "aspectLabel": "17:9 (DCI 4K)",
+            "screenSizeIn": 200,
+            "imageWidthM": 4.49,
+            "distanceMinM": 17.42,
+            "distanceMaxM": 24.57,
+            "ratioMinComputed": 3.8797,
+            "ratioMaxComputed": 5.4722,
+            "ratioMinPublished": 3.89,
+            "ratioMaxPublished": 5.47,
+            "source_id": "SRC-014"
+          }
+        ]
+      },
+      "calculationState": "verified_image_width",
+      "automaticCalculationAllowed": true,
+      "calculationGateReason": "",
+      "last_verified_at": "2026-09-04",
+      "confidence": "official_primary",
+      "data_quality_status": "verified",
+      "lens_shift_horizontal_percent_min": -10,
+      "lens_shift_horizontal_percent_max": 10,
+      "lens_shift_vertical_percent_min": -30,
+      "lens_shift_vertical_percent_max": 30,
+      "lens_shift_reference_basis": "fraction of projected image width (H) and height (V) from the optical axis centre, desk/floor installation",
+      "lens_shift_limit_notes": "PT-RQ50K manual lens shift range: +/-0.1 H, +/-0.3 V for ET-D3QT700; matches the PT-RQ50K specification page.",
+      "projection_distance_reference_point": "front end of the projection lens to the screen surface (L); lens protrusion L1 listed separately",
+      "distance_tolerance_note": "Panasonic: a +/-5% error in listed projection distances may occur.",
+      "notes_for_throwline": "Width-based ratio for each picture shape; Throwline selects the variant that matches the chosen picture shape and blocks other shapes."
+    },
+    {
+      "optical_profile_id": "OPT-012",
+      "projector_id": "PRJ-002",
+      "lens_id": "LNS-009",
+      "compatibility_id": "COMP-009",
+      "profile_name": "Pro L30000UNL + ELPLX03 (WUXGA 16:10, ultra short throw)",
+      "throw_ratio_is_derived": false,
+      "supported_aspect_ratios": "16:10 native; 16:9 and 4:3 variants",
+      "zoom_control_type": "fixed",
+      "zoom_position_notes": "Fixed ultra short throw (mirror type); no zoom",
+      "primary_source_id": "SRC-018",
+      "throw_ratio_source_raw_value": "0.35",
+      "throw_ratio_min": 0.35,
+      "throw_ratio_max": 0.35,
+      "throw_ratio_basis": "image_width",
+      "basisAspect": 1.6,
+      "basisAspectLabel": "16:10",
+      "reportedThrowRatioBasis": "image_width (16:10 picture)",
+      "aspectVariants": [
+        {
+          "aspect": 1.6,
+          "label": "16:10",
+          "throw_ratio_min": 0.35,
+          "throw_ratio_max": 0.35,
+          "source_raw_value": "0.35 (Throw Ratio, 16:10 table)",
+          "distanceFormula": {
+            "unit": "cm",
+            "variable": "screen size in inches (diagonal)",
+            "min": {
+              "a": 0.78,
+              "b": -4.24
+            },
+            "max": {
+              "a": 0.78,
+              "b": -4.24
+            },
+            "expression": "L = a x size + b"
+          }
+        },
+        {
+          "aspect": 1.7777778,
+          "label": "16:9",
+          "throw_ratio_min": 0.35,
+          "throw_ratio_max": 0.35,
+          "source_raw_value": "0.35 (Throw Ratio, 16:9 table)",
+          "distanceFormula": {
+            "unit": "cm",
+            "variable": "screen size in inches (diagonal)",
+            "min": {
+              "a": 0.8,
+              "b": -4.24
+            },
+            "max": {
+              "a": 0.8,
+              "b": -4.24
+            },
+            "expression": "L = a x size + b"
+          }
+        },
+        {
+          "aspect": 1.3333333,
+          "label": "4:3",
+          "throw_ratio_min": 0.42,
+          "throw_ratio_max": 0.42,
+          "source_raw_value": "0.42 (Throw Ratio, 4:3 table)",
+          "distanceFormula": {
+            "unit": "cm",
+            "variable": "screen size in inches (diagonal)",
+            "min": {
+              "a": 0.88,
+              "b": -4.24
+            },
+            "max": {
+              "a": 0.88,
+              "b": -4.24
+            },
+            "expression": "L = a x size + b"
+          }
+        }
+      ],
+      "verificationEvidence": {
+        "checkedOn": "2026-09-04",
+        "checkedBy": "Throwline catalog verification pass 2026-09-04 (documents read in full from the maker domain)",
+        "method": "Read the EB-L30000U specification and user manual in full. The formula table gives the width-based throw ratio 0.35 for 16:10 and 16:9 pictures (0.42 for 4:3), and the manual distance table reproduces it at 200 inches (151 cm / 431 cm = 0.350).",
+        "source_id": "SRC-018",
+        "excerpt": "\"ELPLX03 Minimum Projection distance (cm) = Projection screen size (inches) x 0.78 - 4.24 ... Throw Ratio (3/x) 0.35\"; user manual table \"200 inches | 59 inches (151 cm)\".",
+        "crossChecks": [
+          {
+            "aspectLabel": "16:10",
+            "screenSizeIn": 200,
+            "imageWidthM": 4.31,
+            "distanceMinM": 1.51,
+            "distanceMaxM": 1.51,
+            "ratioMinComputed": 0.3503,
+            "ratioMaxComputed": 0.3503,
+            "ratioMinPublished": 0.35,
+            "ratioMaxPublished": 0.35,
+            "source_id": "SRC-008"
+          }
+        ]
+      },
+      "calculationState": "verified_image_width",
+      "automaticCalculationAllowed": true,
+      "calculationGateReason": "",
+      "last_verified_at": "2026-09-04",
+      "confidence": "official_primary",
+      "data_quality_status": "verified",
+      "lens_shift_vertical_percent_min": -5,
+      "lens_shift_vertical_percent_max": 20,
+      "lens_shift_reference_basis": "percent of projected image height from the home position",
+      "lens_shift_limit_notes": "ELPLX03 maximum motion range: up 20%, down 5% (EB-L30000U specification p.23); horizontal limit not stated in readable maker text.",
+      "projection_distance_reference_point": "projection distance (3) from the lens to the screen per the specification figure; lens protrusion approx. 100 mm",
+      "distance_tolerance_note": "Fixed mirror-type lens: the maker table ratio drifts from 0.344 at 120 inches to 0.358 at 600 inches because of the fixed offset; plan with the tolerance margin and confirm on site.",
+      "notes_for_throwline": "Ultra short throw mirror lens: no back-of-projector mark; use the maker drawing for body position."
     }
   ],
   "sources": [
@@ -990,6 +2138,71 @@
       "applicable_lenses": "TLD+ lens family",
       "source_language": "en",
       "source_notes": "Original manufacturer manual hosted on a third-party rental distributor site; treated as official_regional since content matches Barco documentation but is not hosted on barco.com"
+    },
+    {
+      "source_id": "SRC-014",
+      "source_title": "PT-RQ50K Operating Instructions (Functional Manual), TQBJ0985 series",
+      "source_type": "official_manual",
+      "publisher": "Panasonic Connect",
+      "url": "https://ap.connect.panasonic.com/sites/default/files/media/document/2019-11/rq50k_manual_en.pdf",
+      "document_date": "2019-11-01",
+      "retrieved_at": "2026-09-04T20:30:00Z",
+      "applicable_models": "PT-RQ50K",
+      "applicable_lenses": "ET-D3QW300, ET-D3QS400, ET-D3QT500, ET-D3QT600, ET-D3QT700, ET-D3QT800",
+      "source_language": "en",
+      "source_notes": "Pages 46-48: projection distance tables per aspect ratio (17:9, 16:10, 16:9, 4:3) listing projected image width (SW) beside LW/LT, throw ratio footnote (200-inch reference), lens protrusion (L1), and distance formulas L = a x SD + b. Pages 75-76: lens shift range per lens as fractions of projected image width (H) and height (V). Distance L is measured from the front end of the projection lens to the screen."
+    },
+    {
+      "source_id": "SRC-015",
+      "source_title": "VPL-GTZ380 Help Guide: Projection Distance and Lens Shift Range",
+      "source_type": "official_manual",
+      "publisher": "Sony",
+      "url": "https://helpguide.sony.net/vpl/gtz380/v1/en/contents/TP1000003583.html",
+      "document_date": "2020-07-01",
+      "retrieved_at": "2026-09-04T20:30:00Z",
+      "applicable_models": "VPL-GTZ380",
+      "applicable_lenses": "VPLL-Z8008, VPLL-Z8014",
+      "source_language": "en",
+      "source_notes": "Defines projection distance L as the distance between the front of the lens and the projected surface, and lens shift 0% at the optical centre with full image width or height as 100%."
+    },
+    {
+      "source_id": "SRC-016",
+      "source_title": "VPL-GTZ380 Help Guide: When Projecting in 1.90:1 (Native Full Display 17:9) Format",
+      "source_type": "official_manual",
+      "publisher": "Sony",
+      "url": "https://helpguide.sony.net/vpl/gtz380/v1/en/contents/TP1000003584.html",
+      "document_date": "2020-07-01",
+      "retrieved_at": "2026-09-04T20:30:00Z",
+      "applicable_models": "VPL-GTZ380",
+      "applicable_lenses": "VPLL-Z8008, VPLL-Z8014",
+      "source_language": "en",
+      "source_notes": "Screen size (width x height) versus minimum and maximum projection distance tables, distance formulas L = a x D + b (D = diagonal inches), and lens shift range per lens for the native 17:9 picture."
+    },
+    {
+      "source_id": "SRC-017",
+      "source_title": "VPL-GTZ380 Help Guide: When Projecting in 1.78:1 (16:9) Format",
+      "source_type": "official_manual",
+      "publisher": "Sony",
+      "url": "https://helpguide.sony.net/vpl/gtz380/v1/en/contents/TP1000003585.html",
+      "document_date": "2020-07-01",
+      "retrieved_at": "2026-09-04T20:30:00Z",
+      "applicable_models": "VPL-GTZ380",
+      "applicable_lenses": "VPLL-Z8008, VPLL-Z8014",
+      "source_language": "en",
+      "source_notes": "Same tables and formulas for a 16:9 picture; explains the 0.85-1.09:1 and 1.49-2.91:1 figures printed in the datasheet secondary table."
+    },
+    {
+      "source_id": "SRC-018",
+      "source_title": "EB-L30002U / EB-L30000U Specifications v1.20",
+      "source_type": "official_datasheet",
+      "publisher": "Seiko Epson",
+      "url": "https://files.support.epson.com/pdf/specs/specification_l30000useries_v120_en.pdf",
+      "document_date": "2025-01-01",
+      "retrieved_at": "2026-09-04T20:30:00Z",
+      "applicable_models": "Pro L30000UNL (EB-L30000U), L30002UNL (EB-L30002U)",
+      "applicable_lenses": "ELPLX03, ELPLM12 and other ELPL lenses",
+      "source_language": "en",
+      "source_notes": "Page 16: projection distance formula by lens with the throw ratio column (distance / screen width) for 16:10, 16:9, and 4:3 screens. Page 21: screen size (width x height) versus projection distance tables. Pages 23-24: available lens shift adjustment range per lens. Page 3-6: lens shift range, dimensions, mass, lens protrusion."
     }
   ],
   "researchExceptions": [
@@ -1001,7 +2214,10 @@
       "description": "Per-lens mechanical shift % for ET-D3QW200 and ET-D3QS400 is not clearly isolated from projector-level max shift figures across the catalog and manual; degree values found appear to represent keystone correction angle, not shift percent",
       "source_ids_considered": "SRC-003, SRC-004, SRC-007",
       "recommendation": "Retrieve dedicated single-lens datasheet PDFs (e.g. ET-D3QW200 lens spec sheet) analogous to ET-D3QT500's if available, to isolate shift % per lens",
-      "severity": "medium"
+      "severity": "medium",
+      "resolution_status": "partially_resolved",
+      "resolution": "ET-D3QS400 shift is +/-0.16 H, +/-0.45 V per the PT-RQ50K manual lens shift range (p.76). ET-D3QW200 remains unresolved: it is absent from the 2019 manual and the Optional Lens Guide gives no width basis.",
+      "resolved_on": "2026-09-04"
     },
     {
       "exception_id": "EXC-002",
@@ -1011,17 +2227,21 @@
       "description": "Sony VPL-GTZ380 lens throw ratios differ between the primary datasheet's main table (0.80-1.02:1 / 1.40-2.73:1, basis unstated) and a secondary table on the same PDF plus Sony Canada/Value Electronics reprints (0.85-1.09:1 / 1.49-2.91:1, explicitly for 16:9 display size)",
       "source_ids_considered": "SRC-010, SRC-011, web:23, web:29",
       "recommendation": "Confirm with Sony professional support whether the differing values represent different aspect-ratio/display-size bases (16:9 vs. panel-native) rather than a genuine discrepancy; do not average or pick arbitrarily",
-      "severity": "high"
+      "severity": "high",
+      "resolution_status": "resolved",
+      "resolution": "The Sony help guide projection tables show 0.80-1.02:1 / 1.40-2.73:1 are distance over image width for the native 17:9 picture and 0.85-1.09:1 / 1.49-2.91:1 the same for a 16:9 picture. Both are recorded as aspect variants; no conflict remains.",
+      "resolved_on": "2026-09-04"
     },
     {
       "exception_id": "EXC-003",
       "entity_type": "lens",
       "entity_identifier": "LNS-012, LNS-013",
       "issue_type": "nonstandard_shift_spec",
-      "description": "Barco UDX-4K32 spec sheet gives only a projector-level combined lens-shift range (-100% to +130% V, up to +/-40% H) 'depending on lens' rather than per-TLD+-lens shift figures",
+      "description": "Barco UDX-4K32 spec sheet gives only a projector-level combined lens-shift range (-100% to +130% V, up to +/-40% H) 'depending on lens' rather than per-TLD+-lens shift figures In the 2026-09-04 pass Barco\u2019s per-lens pages could not be read (HTTP 403 for automated access), so per-lens shift and the width basis of the TLD+ ratios remain unconfirmed.",
       "source_ids_considered": "SRC-012, SRC-013",
       "recommendation": "Locate individual TLD+ lens datasheets (e.g. TLD+ 0.37, TLD+ 1.25-1.6) on barco.com resource/downloads pages for lens-specific shift, F-number, and throw-basis data",
-      "severity": "high"
+      "severity": "high",
+      "resolution_status": "open"
     },
     {
       "exception_id": "EXC-004",
@@ -1041,7 +2261,10 @@
       "description": "Panasonic manual throw-ratio tables for ET-D3QT600/ET-D3QT700 show an apparent value overlap between the 16:9 column of one lens and the 4:3 column description text extracted from the search snippet; this may be a search-tool extraction artifact rather than a true source conflict",
       "source_ids_considered": "SRC-003",
       "recommendation": "Re-verify exact per-aspect-ratio throw ratio table directly from the official manual PDF pages (not just search snippet) before using QT600/QT700 16:9 and 4:3 values in production calculations",
-      "severity": "medium"
+      "severity": "medium",
+      "resolution_status": "resolved",
+      "resolution": "Reading the manual directly shows distinct columns: ET-D3QT600 16:9 2.87-4.13:1 and 4:3 3.84-5.53:1; ET-D3QT700 16:9 4.14-5.83:1 and 4:3 5.54-7.80:1. The overlap was a search-snippet artifact.",
+      "resolved_on": "2026-09-04"
     },
     {
       "exception_id": "EXC-006",
@@ -1051,6 +2274,26 @@
       "description": "Full TLD+ lens family (0.65-0.85, 0.8-1.16:1, 1.5-2.0:1, 2.0-2.8:1, 2.8-4.5:1, 4.5-7.5:1, 7.5-11.5:1) referenced in UDX-4K32 spec sheet was not individually profiled in this pilot pass; only 0.37 and 1.25-1.6 lenses were built out as optical_profiles records",
       "source_ids_considered": "SRC-012",
       "recommendation": "Expand Barco lens coverage in next research phase by pulling each TLD+ lens's individual datasheet",
+      "severity": "medium"
+    },
+    {
+      "exception_id": "EXC-007",
+      "entity_type": "optical_profile",
+      "entity_identifier": "OPT-007",
+      "issue_type": "conflicting_sources",
+      "description": "The UDX-4K32 spec sheet names the lens \"TLD+ 0.37\" while Barco\u2019s lens listing (search-indexed title of the R9801661 page) gives 0.39:1 for WUXGA 0.96-inch, 0.42:1 for WQXGA 0.90-inch, and 0.36:1 for 0.98-inch 4K chips. The UDX-4K32 uses the 0.90-inch WQXGA chip, so its ratio is most likely 0.42:1, not 0.37.",
+      "source_ids_considered": "SRC-012, SRC-013, web:barco.com/en/support/spare-parts/R9801661",
+      "recommendation": "Read the Barco lens page or datasheet from a normal network and record the WQXGA value with its width basis before enabling calculation.",
+      "severity": "high"
+    },
+    {
+      "exception_id": "EXC-008",
+      "entity_type": "lens",
+      "entity_identifier": "LNS-001",
+      "issue_type": "missing_basis",
+      "description": "ET-D3QW200 is listed in the Panasonic Optional Lens Guide at 0.548-0.650:1 (Native 4K) but the 2019 PT-RQ50K Operating Instructions predate the lens and the guide does not state an image-width basis, so no optical profile was created.",
+      "source_ids_considered": "SRC-007, SRC-014",
+      "recommendation": "Obtain the ET-D3QW200 datasheet or a later manual revision with a projection distance table listing image width.",
       "severity": "medium"
     }
   ],

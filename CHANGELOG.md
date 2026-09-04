@@ -2,6 +2,13 @@
 
 ## 2026-09-04
 
+### Throwline lens catalog verification pass
+
+* Verified ten projector-and-lens profiles against documents read in full on the makers' own domains: Panasonic PT-RQ50K with six ET-D3Q zoom lenses (operating instructions, projected-width tables and distance formulas for 17:9, 16:10, 16:9, and 4:3), Epson Pro L30000UNL with ELPLM12 and ELPLX03 (specification formula table with the distance-over-width ratio column), and Sony VPL-GTZ380 with VPLL-Z8008 and VPLL-Z8014 (help-guide tables that resolve the earlier "conflicting" ratios as 17:9 and 16:9 width bases). These now open as MANUFACTURER VERIFIED in the planner and Stage 3D.
+* Added per-shape ratio variants, maker distance formulas, cross-checks, lens shift limits, lens protrusion, and projector body dimensions to the catalog; `resolveProfileRatio()` selects the variant for the chosen picture shape and blocks uncovered shapes with a plain-language reason.
+* The two Barco UDX-4K32 profiles stay paused with precise reasons (site blocks automated reading; TLD+ 0.37 label versus Barco's 0.42:1 WQXGA value; no readable width-basis statement). Research exceptions record what was resolved and what remains.
+* Re-pinned the catalog fingerprints, replaced the zero-ready rule with an evidence policy in the release verifier, extended the browser probe with verified transfers and planner checks, and rolled the AV Suite offline cache version.
+
 ### Throwline planner plain-language readouts
 
 * Rewrote the Throwline planner’s on-screen wording in plain language to match Stage 3D: verdicts read `too close`, `too far back`, `good distance`, or `check on site`; paused states read `CAN’T CALCULATE YET` with a reason anyone can act on; the checklist groups are `Fix before you hang it`, `Check before you commit`, and `Good to know`; lens-shift, room, field-check, lens-finder, and how-it-works text describe distances, walls, and pictures instead of envelopes, rasters, and profiles.

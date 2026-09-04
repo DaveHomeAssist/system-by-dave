@@ -324,3 +324,35 @@ test('installation check aggregates every unit and never passes on a manual rati
   assert.equal(aggregate.tone, 'bad');
   assert.ok(aggregate.issues.some(issue => issue.projectorId === 'projector-2' && issue.kind === 'room-projector-depth'));
 });
+
+test('verified catalog profiles resolve the ratio for the chosen picture shape and block other shapes', () => {
+  const profile = { automaticCalculationAllowed: true, calculationState: 'verified_image_width', throw_ratio_min: 2, throw_ratio_max: 3.41, basisAspect: 4096 / 2160, basisAspectLabel: '17:9 (DCI 4K)', aspectVariants: [{ aspect: 1.6, label: '16:10', throw_ratio_min: 2.36, throw_ratio_max: 4.03 }, { aspect: 16 / 9, label: '16:9', throw_ratio_min: 2.13, throw_ratio_max: 3.63 }] };
+  const native = Scene.resolveProfileRatio(profile, 4096 / 2160);
+  assert.deepEqual([native.eligible, native.matched, native.min, native.max, native.label], [true, true, 2, 3.41, '17:9 (DCI 4K)']);
+  const wide = Scene.resolveProfileRatio(profile, 1.6);
+  assert.deepEqual([wide.matched, wide.min, wide.max], [true, 2.36, 4.03]);
+  const off = Scene.resolveProfileRatio(profile, 4 / 3);
+  assert.equal(off.matched, false);
+  assert.match(off.reason, /17:9 \(DCI 4K\), 16:10, 16:9/);
+  near(off.min, 2, 1e-9, 'the base ratio is still reported for display');
+  const blocked = Scene.resolveProfileRatio({ automaticCalculationAllowed: false, calculationState: 'partial', throw_ratio_min: 1.25, throw_ratio_max: 1.6 }, 1.6);
+  assert.equal(blocked.eligible, false);
+  assert.equal(blocked.matched, false);
+  assert.equal(Scene.resolveProfileRatio(null, 1.6).eligible, false);
+});
+
+test('every calculation-ready catalog profile resolves at its own basis shape', () => {
+  const fs = require('node:fs');
+  const catalog = JSON.parse(fs.readFileSync(require('node:path').join(__dirname, 'data/throwline-pilot-catalog.v1.json'), 'utf8'));
+  const ready = catalog.opticalProfiles.filter(profile => profile.automaticCalculationAllowed === true);
+  assert.equal(ready.length, catalog.meta.calculationReadyCount);
+  ready.forEach(profile => {
+    const resolved = Scene.resolveProfileRatio(profile, profile.basisAspect);
+    assert.equal(resolved.matched, true, profile.optical_profile_id);
+    assert.equal(resolved.min, profile.throw_ratio_min);
+    profile.verificationEvidence.crossChecks.forEach(check => {
+      assert.ok(Math.abs(check.distanceMinM / check.imageWidthM - check.ratioMinPublished) / check.ratioMinPublished <= 0.02, `${profile.optical_profile_id} min cross-check`);
+      assert.ok(Math.abs(check.distanceMaxM / check.imageWidthM - check.ratioMaxPublished) / check.ratioMaxPublished <= 0.02, `${profile.optical_profile_id} max cross-check`);
+    });
+  });
+});

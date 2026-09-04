@@ -216,6 +216,27 @@ async function main() {
     const tol5 = await open('mode=manual&w=20&bottom=4&ar=1.777778&basisW=20&rasterAr=1.6&lh=6&dist=21&min=0.978&max=1.32');
     check('the default 5% tolerance keeps 21 ft inside the safe band', tol5.projection === 'safe', tol5);
 
+    // 10. Verified catalog transfers: the maker's width-based ratio for the chosen picture shape, and a block for other shapes.
+    const verified = await open('mode=verified_image_width&projector=PRJ-001&lens=LNS-004&profile=OPT-002&w=20&bottom=4&ar=1.8962963&basisW=20&rasterAr=1.8962963&lh=6&dist=50');
+    check('a verified Panasonic pair opens MANUFACTURER VERIFIED with the 17:9 ratio 2.00–3.41', verified.badge === 'MANUFACTURER VERIFIED' && verified.wide === '40\' 0"' && verified.tele === '68\' 2½"' && verified.projection === 'safe', verified);
+    const variant = await open('mode=verified_image_width&projector=PRJ-001&lens=LNS-004&profile=OPT-002&w=20&bottom=4&ar=1.6&basisW=20&rasterAr=1.6&lh=6&dist=50');
+    check('the same pair at a 16:10 picture uses the maker\'s 16:10 ratio 2.36–4.03', variant.badge === 'MANUFACTURER VERIFIED' && variant.wide === '47\' 2½"' && variant.projection === 'safe', variant);
+    const uncovered = await open('mode=verified_image_width&projector=PRJ-001&lens=LNS-004&profile=OPT-002&w=20&bottom=4&ar=2.35&basisW=20&rasterAr=2.35&lh=6&dist=50');
+    check('a picture shape the maker did not measure cannot calculate as verified', uncovered.mode === 'partial' && /picture shapes/i.test(uncovered.gate), uncovered);
+    const sony = await open('mode=verified_image_width&projector=PRJ-003&lens=LNS-010&profile=OPT-005&w=20&bottom=4&ar=1.7777778&basisW=20&rasterAr=1.7777778&lh=6&dist=19');
+    check('the Sony pair at 16:9 uses the 0.85–1.09 width basis', sony.badge === 'MANUFACTURER VERIFIED' && sony.wide === '17\' 0"' && sony.tele === '21\' 9½"', sony);
+    const barco = await open('mode=verified_image_width&projector=PRJ-004&lens=LNS-013&profile=OPT-008&w=20&bottom=4&ar=1.6&basisW=20&rasterAr=1.6&lh=6&dist=30');
+    check('the Barco pair stays paused with a plain-language reason', barco.badge !== 'MANUFACTURER VERIFIED' && /CAN’T CALCULATE YET/.test(barco.gate) && /width basis|Barco/.test(barco.gate), barco);
+
+    // 11. Planner: picking a verified pair reads READY TO CALCULATE; a covered shape switch keeps it verified.
+    await cdp('Page.navigate', { url: `${baseUrl}ProjectorThrow/index.html?workspace=planner` });
+    await delay(2500);
+    const planner = await evaluate(`(() => { const set = (id, value) => { const el = document.getElementById(id); el.value = value; el.dispatchEvent(new Event('change', { bubbles: true })); };
+      set('catalogProjector', 'PRJ-001'); set('catalogLens', 'LNS-004'); return new Promise(resolve => setTimeout(() => resolve({ gate: document.getElementById('calculationGate').textContent.trim(), raster: document.getElementById('raster').value, verify: document.getElementById('verifyBadge').textContent.trim() }), 400)); })()`);
+    check('planner reads READY TO CALCULATE for a verified pair at its native shape', /^READY TO CALCULATE/.test(planner.gate) && planner.raster.startsWith('1.8962963') && planner.verify === 'maker verified', planner);
+    const plannerShape = await evaluate(`(() => { const el = document.getElementById('raster'); el.value = '1.6|1920|1200'; el.dispatchEvent(new Event('change', { bubbles: true })); return new Promise(resolve => setTimeout(() => resolve({ gate: document.getElementById('calculationGate').textContent.trim(), sub: document.getElementById('rdSub').textContent.trim() }), 400)); })()`);
+    check('planner switches to the maker\'s 16:10 ratio when the picture shape changes', /^READY TO CALCULATE/.test(plannerShape.gate) && /closest/.test(plannerShape.sub), plannerShape);
+
     check('no uncaught browser exceptions', exceptions.length === 0, exceptions);
   } finally {
     chrome.kill('SIGKILL');
