@@ -145,8 +145,8 @@ async function main() {
     check('audit link reports the required ratio 0.366:1', audit.ratio === '0.366:1', audit);
     check('audit link verdict is undershoot', audit.projection === 'undershoot', audit);
     check('audit link image is 7\' 5¾" × 4\' 8¼"', audit.image === '7\' 5¾" × 4\' 8¼"', audit);
-    check('audit link reports the +77.5% vertical shift with unknown limits', audit.shift === '+77.5% V · limits unknown', audit);
-    check('audit link has no spatial conflicts in the default 40 × 40 × 20 room', audit.alert === 'No spatial conflicts', audit);
+    check('audit link reports the +77.5% vertical shift with lens limits not set', audit.shift === '+77.5% V · lens limits not set', audit);
+    check('audit link has no spatial conflicts in the default 40 × 40 × 20 room', audit.alert === 'Nothing in the way', audit);
 
     // 2. Snap controls must land inside the envelope.
     const wide = await click('bw');
@@ -164,13 +164,13 @@ async function main() {
     check('stamped unit is FIELD VERIFIED', stamped.badge === 'FIELD VERIFIED' && stamped.mode === 'field_verified', stamped);
     check('stamped unit at the old mark reads undershoot against the corrected 24 ft mark', stamped.projection === 'undershoot', stamped);
     const corrected = await click('bw');
-    check('snapping the stamped unit moves it to exactly 24\' 0" as a nominal verify mark', corrected.distance === '24\' 0"' && corrected.projection === 'nominal' && /^REVIEW/.test(corrected.headline), corrected);
+    check('snapping the stamped unit moves it to exactly 24\' 0" as a nominal verify mark', corrected.distance === '24\' 0"' && corrected.projection === 'nominal' && /^Worth a look/.test(corrected.headline), corrected);
     check('driving edit after the stamp returns the unit to a manual estimate', corrected.badge === 'MANUAL ESTIMATE', corrected);
-    check('the stamped readout used the measured mark with no verify band', stamped.wide === '24\' 0"' && stamped.safeWidth === '0%' && /^FAIL/.test(stamped.headline), stamped);
+    check('the stamped readout used the measured mark with no verify band', stamped.wide === '24\' 0"' && stamped.safeWidth === '0%' && /^Needs a fix/.test(stamped.headline), stamped);
 
     // 4. URL trust for field verification.
     const forged = await open('mode=field_verified&ratio=1.2&stamp=verified');
-    check('a bare ratio plus stamp does not assert FIELD VERIFIED', forged.badge !== 'FIELD VERIFIED' && forged.mode === 'manual' && /re-stamp/i.test(forged.gate), forged);
+    check('a bare ratio plus stamp does not assert FIELD VERIFIED', forged.badge !== 'FIELD VERIFIED' && forged.mode === 'manual' && /re-measure/i.test(forged.gate), forged);
     const evidence = await open('mode=field_verified&ratio=1.2&stamp=2026-09-04T12%3A00%3A00.000Z&md=12&mw=10&vb=Dave&w=20&basisW=20&rasterAr=1.6&dist=24');
     check('a planner transfer carrying its measurement is FIELD VERIFIED at the corrected mark', evidence.badge === 'FIELD VERIFIED' && evidence.projection === 'safe', evidence);
     const mismatch = await open('mode=field_verified&ratio=1.5&stamp=2026-09-04T12%3A00%3A00.000Z&md=12&mw=10&w=20&basisW=20&dist=24');
@@ -182,23 +182,23 @@ async function main() {
     const downward = await open('mode=manual&w=20&bottom=4&ar=1.777778&basisW=20&rasterAr=1.6&lh=14&dist=22&min=0.978&max=1.32&su=10&sd=80');
     check('a −35% downward shift is within the 80% down limit', downward.shift === '-35.0% V' && downward.shiftColor === 'var(--info)', downward);
     const upward = await open('mode=manual&w=20&bottom=4&ar=1.777778&basisW=20&rasterAr=1.6&lh=2&dist=22&min=0.978&max=1.32&su=10&sd=80');
-    check('an upward shift beyond the 10% up limit is flagged', /exceeds up limit/.test(upward.shift) && upward.shiftColor === 'var(--safety)', upward);
+    check('an upward shift beyond the 10% up limit is flagged', /more than the lens allows up/.test(upward.shift) && upward.shiftColor === 'var(--safety)', upward);
     const lateral = await setInput('px', -6);
     check('horizontal shift is reported alongside vertical', /H/.test(lateral.shift) && /\+/.test(lateral.shift.split('·')[1] || ''), lateral);
 
     // 6. Room boundaries.
     const tall = await open('mode=manual&w=20&bottom=10&ar=1.777778&basisW=20&rasterAr=1.6&lh=6&dist=22&min=0.978&max=1.32');
     const lowCeiling = await setInput('roomH', 8);
-    check('an 8 ft ceiling under a 21 ft screen top is a spatial conflict', /screen extends above ceiling/.test(lowCeiling.alert), lowCeiling);
+    check('an 8 ft ceiling under a 21 ft screen top is a spatial conflict', /top of the screen is above the ceiling/.test(lowCeiling.alert), lowCeiling);
     const restored = await setInput('roomH', 30);
-    check('raising the ceiling clears the conflict', restored.alert === 'No spatial conflicts', restored);
+    check('raising the ceiling clears the conflict', restored.alert === 'Nothing in the way', restored);
     const outside = await setInput('px', 30);
-    check('a projector outside the room width is a spatial conflict', /outside room width/.test(outside.alert), outside);
+    check('a projector outside the room width is a spatial conflict', /outside the side walls/.test(outside.alert), outside);
 
     // 7. Degraded renderer parity: with --no-webgl the renderer is reported unavailable, yet every fact above was identical.
     const rendererState = await open(AUDIT_QUERY);
-    check(noWebgl ? 'renderer reports unavailable without WebGL' : 'renderer is ready with WebGL', noWebgl ? rendererState.renderer === 'unavailable' && /renderer unavailable/i.test(rendererState.status) : rendererState.renderer === 'ready', rendererState);
-    check('headline is the aggregate installation check, not the bare ratio fit', /^(FAIL|REVIEW|INSTALLATION)/.test(rendererState.headline) && /undershoot/i.test(rendererState.headline), rendererState);
+    check(noWebgl ? 'renderer reports unavailable without WebGL' : 'renderer is ready with WebGL', noWebgl ? rendererState.renderer === 'unavailable' && /couldn\u2019t start/i.test(rendererState.status) : rendererState.renderer === 'ready', rendererState);
+    check('headline is the aggregate installation check, not the bare ratio fit', /^(Needs a fix|Worth a look|Ready)/.test(rendererState.headline) && /too close/i.test(rendererState.headline), rendererState);
     const slider = await setInput('d', 10);
     check('distance slider stays live and drives the readout', slider.distance === '10\' 0"' && slider.ratio === '0.500:1', slider);
 
@@ -210,7 +210,7 @@ async function main() {
 
     // 9. Fixed lens: no safe interior, nominal verify band, no negative safe bar.
     const fixed = await open('mode=manual&w=20&bottom=4&ar=1.777778&basisW=20&rasterAr=1.6&lh=6&dist=13&min=0.65&max=0.65');
-    check('a fixed 0.65:1 lens at 13 ft reads as a nominal verify mark with an empty safe band', fixed.projection === 'nominal' && /nominal/i.test(fixed.note) && fixed.safeWidth === '0%', fixed);
+    check('a fixed 0.65:1 lens at 13 ft reads as a nominal verify mark with an empty safe band', fixed.projection === 'nominal' && /one set distance/i.test(fixed.note) && fixed.safeWidth === '0%', fixed);
     const tol10 = await open('mode=manual&w=20&bottom=4&ar=1.777778&basisW=20&rasterAr=1.6&lh=6&dist=21&min=0.978&max=1.32&tolPct=10');
     check('a transferred 10% tolerance narrows the safe band so 21 ft is near-limit', tol10.projection === 'near-limit' && /10%/.test(tol10.note), tol10);
     const tol5 = await open('mode=manual&w=20&bottom=4&ar=1.777778&basisW=20&rasterAr=1.6&lh=6&dist=21&min=0.978&max=1.32');

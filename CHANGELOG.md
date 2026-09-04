@@ -2,6 +2,11 @@
 
 ## 2026-09-04
 
+### Throwline Stage 3D plain-language readouts
+
+* Rewrote every operator-facing verdict, note, warning, alert, button, and announcement in Stage 3D in plain language: headlines now read `Needs a fix`, `Worth a look`, or `Ready — everything checks out`; placement reads `Too close`, `Too far back`, `Good distance`, or `Fits the ratio you entered`; blocked states read `Can’t calculate yet` with a reason anyone can act on; room and obstruction alerts describe walls, ceilings, and the light path.
+* Internal state kinds, storage keys, and export shapes are unchanged; tests, the browser probe, and docs follow the new wording.
+
 ### Throwline Stage 3D second-audit repairs
 
 * Numerical planning no longer depends on WebGL: the scene model, readouts, verdicts, and controls hydrate before the renderer starts, hard-coded demo facts are gone from the markup, and a renderer failure only disables the 3D view and exports.
