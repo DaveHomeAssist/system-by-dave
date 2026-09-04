@@ -53,7 +53,7 @@
     {id:'video-patch',name:'Video Patch',href:'video-patch.html',dept:'Video',phases:['prep','loadin','show'],tag:'Video',desc:'Sources, formats, connectors, switcher inputs, converters, destinations, routes, backups, and tests.',storageKeys:[{key:'sbd.videoPatch.v1',label:'Video Patch'}]},
     {id:'display-plan',name:'Display Plan',href:'display-plan.html',dept:'Video',phases:['advance','prep','loadin'],tag:'Displays',desc:'Displays, inputs, processors, resolutions, aspect ratios, refresh rates, routes, backups, and status.',storageKeys:[{key:'display-plan.v1',label:'Display Plan'}]},
     {id:'projection-plan',name:'Projection Plan',href:'projection-plan.html',dept:'Video',phases:['advance','prep','loadin'],tag:'Projection',desc:'Screens, surfaces, projectors, lenses, throw, positions, routes, blends, backup paths, and alignment.',storageKeys:[{key:'sbd.projectionPlan.v1',label:'Projection Plan'}]},
-    {id:'throwline',name:'Throwline',href:'ProjectorThrow/',dept:'Video',phases:['advance','prep','loadin','show'],tag:'Projection',desc:'Offline projector throw, fit, brightness, field verification, equipment selection, drawings, and multi-screen handoff.',storageKeys:[{key:'throwline:lenses:v2',label:'Throwline custom lenses'},{key:'throwline:jobs:v2',label:'Throwline saved jobs'},{key:'throwline:shift-profiles:v1',label:'Throwline shift profiles'},{key:'throwline:inventory:v1',label:'Throwline crew inventory'},{key:'throwline:show:v1',label:'Throwline current show'},{key:'throwline:theme:v1',label:'Throwline theme'}],toolboxFeatured:true},
+    {id:'throwline',name:'Throwline',href:'ProjectorThrow/',dept:'Video',phases:['advance','prep','loadin','show'],tag:'Projection',desc:'Offline projector throw, fit, brightness, field verification, spatial room planning, multi-projector layouts, drawings, and show handoff.',storageKeys:[{key:'throwline:lenses:v2',label:'Throwline custom lenses'},{key:'throwline:jobs:v2',label:'Throwline saved jobs'},{key:'throwline:shift-profiles:v1',label:'Throwline shift profiles'},{key:'throwline:inventory:v1',label:'Throwline crew inventory'},{key:'throwline:show:v1',label:'Throwline current show'},{key:'throwline:stage-scene:v1',label:'Throwline Stage scenes'},{key:'throwline:theme:v1',label:'Throwline theme'}],toolboxFeatured:true},
     {id:'lighting-patch',name:'Lighting Patch',href:'lighting-patch.html',dept:'Lighting',phases:['advance','prep','loadin','show'],tag:'LX',desc:'Fixtures, positions, modes, universes, addresses, channels, dimmers, colors, focus notes, and status.',storageKeys:[{key:'lighting-patch.v1',label:'Lighting Patch'}]},
     {id:'cable-plan',name:'Cable Plan',href:'cable-plan.html',dept:'Build',phases:['prep','loadin','strike'],tag:'Cable',desc:'Cable types, lengths, source, destination, path, labels, owners, pull status, trip, and slack issues.',storageKeys:[{key:'cable-plan.v1',label:'Cable Plan'}]},
     {id:'rf-coordination',name:'RF Coordination',href:'rf-coordination.html',dept:'Comms',phases:['advance','prep','show'],tag:'RF',desc:'Wireless mics, IEM, IFB, comms packs, receivers, frequencies, bands, conflicts, and backups.',storageKeys:[{key:'rf-coordination.v1',label:'RF Coordination'}]},
@@ -119,6 +119,15 @@
     './js/responsive-tables.js',
     './js/av-domain-views.js',
     './js/vendor/gsap.min.js',
+    './ProjectorThrow/index.html',
+    './ProjectorThrow/Stage3D.html',
+    './ProjectorThrow/throwline-scene-state.js',
+    './ProjectorThrow/three-d-stage.js',
+    './ProjectorThrow/vendor/three/three.module.js',
+    './ProjectorThrow/vendor/three/three.core.js',
+    './ProjectorThrow/vendor/three/addons/controls/OrbitControls.js',
+    './ProjectorThrow/vendor/three/addons/exporters/OBJExporter.js',
+    './ProjectorThrow/vendor/three/addons/exporters/GLTFExporter.js',
     './css/sbd-public-nav.css',
     './css/av-theme.css',
     './css/responsive-tables.css',
@@ -210,7 +219,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool change — rolls the service-worker cache. */
-    version:'v20260901-stageplotter-directions',
+    version:'v20260904-throwline-stage-workspace',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,

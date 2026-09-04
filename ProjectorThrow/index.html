@@ -2940,7 +2940,7 @@
     <nav class="rail-nav" aria-label="Throwline destinations and settings">
       <a class="stage3d-link nav-home" href="../index.html">Home</a>
       <a class="stage3d-link nav-suite" href="../av-suite.html">AV Suite</a>
-      <a class="stage3d-link nav-stage" id="stage3dLink" href="Stage3D.html" aria-label="Open the optional online Stage 3D companion">Stage 3D</a>
+      <a class="stage3d-link nav-stage" id="stage3dLink" href="Stage3D.html" aria-label="Open the offline-ready Stage 3D spatial workspace">Stage 3D</a>
       <button class="stage3d-link" id="plannerFieldVerify" type="button" aria-pressed="false">Field Verify</button>
       <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false" aria-label="Switch to dark mode">
         <svg class="theme-icon-moon" viewBox="0 0 24 24" aria-hidden="true">
@@ -3344,6 +3344,7 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <input type="file" id="lensFile" accept="application/json,.json" hidden><input type="file" id="jobFile"
     accept="application/json,.json" hidden><input type="file" id="showFile" accept="application/json,.json" hidden>
+  <script src="./throwline-scene-state.js"></script>
   <script src="../js/vendor/gsap.min.js"></script>
   <script>
     "use strict";
@@ -4629,8 +4630,12 @@
     function stage3dUrlFor(c = readState()) {
       const p = new URLSearchParams();
       const put = (key, value) => { if (value !== "" && value !== null && value !== undefined && !(typeof value === "number" && !finite(value))) p.set(key, String(value)); };
-      put("mode", c.calculationMode); put("w", cleanNum(c.w / 12, 4)); put("bottom", cleanNum(c.screenBottom / 12, 4)); put("ar", cleanNum(c.w / c.h, 6)); put("basisW", cleanNum(c.img?.w / 12, 4)); put("rasterAr", cleanNum(c.img?.w / c.img?.h, 6)); put("lh", cleanNum(c.lensHeight / 12, 4)); put("dist", cleanNum(c.shown / 12, 4));
+      const sceneApi = window.ThrowlineSceneState;
+      const scene = sceneApi?.createSceneState({ mode: c.calculationMode, allowed: !!c.calculationInput, w: c.w / 12, bottom: c.screenBottom / 12, ar: c.w / c.h, basisW: c.img?.w / 12, rasterAr: c.img?.w / c.img?.h, lh: c.lensHeight / 12, dist: c.shown / 12, wide: c.trA, tele: c.trB, reason: c.calculationGate?.reason || c.calculationInput?.reason });
+      const shared = scene ? { screen: scene.screen, projector: sceneApi.activeProjector(scene) } : null;
+      put("mode", shared?.projector.provenance.mode || c.calculationMode); put("w", cleanNum(shared?.screen.width ?? c.w / 12, 4)); put("bottom", cleanNum(shared?.screen.bottom ?? c.screenBottom / 12, 4)); put("ar", cleanNum(shared?.screen.aspect ?? c.w / c.h, 6)); put("basisW", cleanNum(shared?.projector.optical.basisWidth ?? c.img?.w / 12, 4)); put("rasterAr", cleanNum(shared?.projector.optical.rasterAspect ?? c.img?.w / c.img?.h, 6)); put("lh", cleanNum(shared?.projector.position.lensHeight ?? c.lensHeight / 12, 4)); put("dist", cleanNum(shared?.projector.position.distance ?? c.shown / 12, 4));
       put("projector", c.catalogSelection.projector?.projector_id || ""); put("lens", c.catalogSelection.lens?.lens_id || ""); put("profile", c.catalogSelection.profile?.optical_profile_id || "");
+      if (c.shiftProfile) { put("su", cleanNum(c.shiftProfile.up, 2)); put("sd", cleanNum(c.shiftProfile.down, 2)); }
       if (c.calculationMode === "manual") { put("min", cleanNum(c.trA, 5)); put("max", cleanNum(c.trB, 5)); }
       if (c.calculationMode === "field_verified") { put("ratio", cleanNum(c.trA, 5)); put("stamp", c.fieldVerification.verifiedAt); }
       return `Stage3D.html?${p.toString()}`;

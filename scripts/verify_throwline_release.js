@@ -219,6 +219,7 @@ function duplicateIds(source) {
 const main = read('ProjectorThrow/index.html');
 const stage = read('ProjectorThrow/Stage3D.html');
 const sidecar = read('ProjectorThrow/three-d-stage.js');
+const sceneState = read('ProjectorThrow/throwline-scene-state.js');
 const sitemap = read('sitemap.xml');
 const avRegistry = registry();
 const catalogSource = read('ProjectorThrow/data/throwline-pilot-catalog.v1.json');
@@ -360,8 +361,8 @@ requireMatch(main, /<html\s+lang=["']en["']>/i, 'Throwline must remain a standal
 if (/data-av-theme|data-av-tool|av-theme\.css/i.test(main)) fail('Throwline must not load or opt into the shared AV theme.');
 if (/<link\b[^>]*\brel=["']stylesheet["'][^>]*>/i.test(main)) fail('Throwline main app must not load an external stylesheet.');
 const mainScriptSources = Array.from(main.matchAll(/<script\b[^>]*\bsrc=["']([^"']+)["'][^>]*>/gi), (match) => match[1]);
-if (mainScriptSources.length !== 1 || mainScriptSources[0] !== '../js/vendor/gsap.min.js') {
-  fail('Throwline main app must load only the locally bundled GSAP runtime.');
+if (JSON.stringify(mainScriptSources) !== JSON.stringify(['./throwline-scene-state.js', '../js/vendor/gsap.min.js'])) {
+  fail('Throwline main app must load only its shared scene-state contract and locally bundled GSAP runtime.');
 }
 if (!fs.existsSync(path.join(ROOT, 'js/vendor/gsap.min.js'))) fail('Throwline locally bundled GSAP runtime is missing.');
 if (!avRegistry?.offlineAssets?.().includes('./js/vendor/gsap.min.js')) fail('Throwline GSAP runtime must remain in the AV offline asset manifest.');
@@ -414,11 +415,24 @@ if (cameras.length !== expectedCameras.length || expectedCameras.some((camera) =
 const duplicatedIds = duplicateIds(main);
 if (duplicatedIds.length) fail(`Throwline has duplicate IDs: ${duplicatedIds.join(', ')}.`);
 
-requireMatch(stage, /<meta\s+http-equiv=["']Content-Security-Policy["'][^>]*https:\/\/unpkg\.com/i, 'Stage 3D CSP must allow its pinned unpkg modules.');
-requireMatch(stage, /https:\/\/unpkg\.com\/three@0\.184\.0\/build\/three\.module\.js/, 'Stage 3D import map must pin Three.js r184.');
+requireMatch(stage, /<meta\s+http-equiv=["']Content-Security-Policy["'][^>]*script-src 'self' 'unsafe-inline'[^>]*connect-src 'self'/i, 'Stage 3D CSP must keep the runtime local and offline-ready.');
+if (/unpkg\.com|cdn\.jsdelivr\.net/.test(stage) || /unpkg\.com|cdn\.jsdelivr\.net/.test(sidecar)) fail('Stage 3D must not depend on a remote module CDN.');
+requireMatch(stage, /"three":\s*"\.\/vendor\/three\/three\.module\.js"/, 'Stage 3D import map must use the locally vendored Three.js engine.');
+requireMatch(stage, /<script\s+src=["']\.\/throwline-scene-state\.js["']><\/script>[\s\S]*?<script\s+src=["']\.\.\/js\/vendor\/gsap\.min\.js["']><\/script>[\s\S]*?<script\s+src=["']\.\/three-d-stage\.js["']><\/script>/, 'Stage 3D must load the scene contract, local GSAP runtime, and sidecar in order.');
 requireMatch(stage, /<script\s+src=["']\.\/three-d-stage\.js["']><\/script>/, 'Stage 3D must load its colocated sidecar.');
 requireMatch(stage, /fallback=["']index\.html["']/, 'Stage 3D must offer the offline main-app fallback.');
-requireMatch(stage, /Optional online companion/i, 'Stage 3D must identify itself as an optional online companion.');
+requireMatch(stage, /Offline ready · direct spatial control/i, 'Stage 3D must identify itself as an offline-ready spatial workspace.');
+const localThreeAssets = [
+  'ProjectorThrow/vendor/three/three.module.js',
+  'ProjectorThrow/vendor/three/three.core.js',
+  'ProjectorThrow/vendor/three/addons/controls/OrbitControls.js',
+  'ProjectorThrow/vendor/three/addons/exporters/OBJExporter.js',
+  'ProjectorThrow/vendor/three/addons/exporters/GLTFExporter.js',
+];
+localThreeAssets.forEach((asset) => {
+  if (!fs.existsSync(path.join(ROOT, asset))) fail(`Stage 3D local engine asset is missing: ${asset}.`);
+  if (!avRegistry?.offlineAssets?.().includes(`./${asset}`)) fail(`Stage 3D offline manifest is missing ./${asset}.`);
+});
 requireMatch(sidecar, /renderer\.shadowMap\.type = THREE\.PCFShadowMap;/, 'Stage 3D must use PCFShadowMap.');
 if (/PCFSoftShadowMap/.test(stage) || /PCFSoftShadowMap/.test(sidecar)) fail('Stage 3D must not use deprecated PCFSoftShadowMap.');
 const stageCameraIds = Array.from(stage.matchAll(/<button\b[^>]*\bdata-cam=["']([^"']+)["'][^>]*>/g), (match) => match[1]);
@@ -453,13 +467,17 @@ requireMatch(stage, /state\.wide\s*\*\s*state\.basisW/, 'Stage 3D throw limits m
 requireMatch(stage, /state\.dist\s*\/\s*state\.basisW/, 'Stage 3D required ratio must use the projected-raster width basis.');
 requireMatch(main, /id=["']stage3dLink["']/, 'The planner Stage 3D link must be state-aware.');
 requireMatch(main, /function\s+stage3dUrlFor\s*\(/, 'The planner must serialize validated Stage 3D transfer state.');
+requireMatch(main, /ThrowlineSceneState[\s\S]*?createSceneState/, 'The planner must normalize Stage 3D transfer values through the shared scene-state contract.');
 requireMatch(sidecar, /Use keys 1 through 5 for cameras/, 'Stage 3D canvas instructions must expose all five camera shortcuts.');
 requireMatch(stage, /<details\b[^>]*class=["'][^"']*adjust-panel/, 'Stage 3D controls must use a native Adjust disclosure.');
 requireMatch(stage, /function\s+syncAdjustLayout\s*\(/, 'Stage 3D must synchronize the Adjust disclosure when crossing its mobile breakpoint.');
 requireMatch(stage, /id=["']fieldVerifyToggle["']/, 'Stage 3D must expose a Field Verify control.');
 requireMatch(stage, /class=["'][^"']*scene-toolbar/, 'Stage 3D must expose camera and layer controls beside the scene.');
 requireMatch(stage, /class=["'][^"']*mobile-exports/, 'Stage 3D must place phone export actions after scene controls.');
-requireMatch(stage, /grid-template-areas:[^}]*["']hud["'][^}]*["']controls["'][^}]*["']stage["']/s, 'Stage 3D phone layout must order the answer and controls before the scene.');
+requireMatch(stage, /html,body\{overflow:hidden\}/, 'Stage 3D must lock the document to one viewport.');
+requireMatch(stage, /height:100dvh;[^}]*grid-template-areas:"header" "stage" "dock"/, 'Stage 3D phone layout must keep the stage permanent above the dock.');
+requireMatch(stage, /class=["']mobile-dock["'][^>]*>[\s\S]*data-mobile-panel-button=["']adjust["'][\s\S]*data-mobile-panel-button=["']view["'][\s\S]*data-mobile-panel-button=["']facts["'][\s\S]*data-mobile-panel-button=["']export["']/, 'Stage 3D phone workspace must expose Adjust, View, Facts, and Export sheets.');
+requireMatch(stage, /body\[data-mobile-panel=adjust\][\s\S]*body\[data-mobile-panel=view\][\s\S]*body\[data-mobile-panel=facts\][\s\S]*body\[data-mobile-panel=export\]/, 'Stage 3D phone sheets must use one exclusive mobile-panel state.');
 requireMatch(stage, /dataset\.fieldVerify\s*=/, 'Stage 3D must expose Field Verify state on the document.');
 requireMatch(stage, /if\s*\(enabled\s*&&\s*window\.innerWidth\s*>\s*820\)\s*adjustPanel\.open\s*=\s*true/, 'Stage 3D Field Verify must keep phone adjustments compact.');
 requireMatch(main, /id=["']plannerFieldVerify["']/, 'Throwline main app must expose a Field Verify mode control.');
@@ -467,6 +485,25 @@ requireMatch(main, /dataset\.fieldVerify\s*=/, 'Throwline main app must expose F
 requireMatch(main, /@media\(max-width:760px\)[\s\S]*?body\[data-field-verify=["']true["']\]\s+main\s*\{[^}]*grid-template-columns:\s*1fr/s, 'Throwline main Field Verify must collapse to one column on phone.');
 requireMatch(sidecar, /id\s*=\s*["']controlsHelp["']/, 'Stage 3D must retain a discoverable Controls help trigger.');
 requireMatch(sidecar, /stage-first-interaction/, 'Stage 3D must dismiss first-use help after a successful interaction.');
+requireMatch(sidecar, /setManipulationTargets\s*\(targets\)/, 'Stage 3D renderer must expose registered direct-manipulation targets.');
+requireMatch(sidecar, /stage-manipulation/, 'Stage 3D renderer must emit manipulation intents instead of owning geometry.');
+['set-distance','set-lens-height','set-projector-x','set-projector-target-x','set-screen-width','set-screen-bottom'].forEach((intent) => {
+  if (!stage.includes(intent)) fail(`Stage 3D is missing its ${intent} direct-manipulation path.`);
+});
+['placement_envelope','wide_stop','tele_stop','shift_guide','lens_shift_envelope','screen_width_dimension'].forEach((token) => {
+  if (!stage.includes(token)) fail(`Stage 3D is missing the ${token} spatial overlay.`);
+});
+['addUnit','stackUnits','blendUnits','addObstacle','collisionAlert','roomW','roomD','roomH'].forEach((id) => {
+  requireMatch(stage, new RegExp(`id=["']${id}["']`), `Stage 3D is missing the ${id} planning control.`);
+});
+['saveScene','restoreScene','importScene','downloadScene','resetScene'].forEach((id) => {
+  requireMatch(stage, new RegExp(`id=["']${id}["']`), `Stage 3D is missing the ${id} scene-data control.`);
+});
+['normalizeSceneState','calculateProjectorGeometry','applyIntent','stampFieldVerification','obstacleIntersectsBeam'].forEach((name) => {
+  requireMatch(sceneState, new RegExp(`function\\s+${name}\\s*\\(`), `Throwline scene state is missing the pure ${name} boundary.`);
+});
+requireMatch(sceneState, /provenance\.mode !== 'field_verified'[\s\S]*?MANUAL ESTIMATE/, 'Driving scene edits must invalidate field verification.');
+requireMatch(sceneState, /const STORAGE_KEY = 'throwline:stage-scene:v1'/, 'Stage 3D scene storage must use the registered versioned key.');
 requireMatch(stage, /min-height:\s*44px/, 'Stage 3D must retain 44-pixel touch targets on phone.');
 requireMatch(sidecar, /:host\(\[field-verify\]\)\s+\.toolbar/, 'Stage exports must yield to planning data in Field Verify mode.');
 requireMatch(sidecar, /@media\s*\(max-width:\s*820px\)[\s\S]*?\.toolbar\s*\{[^}]*display:\s*none/s, 'Stage 3D must hide its internal export toolbar on phone.');
@@ -484,6 +521,8 @@ requireMatch(stage, /front:\s*\[0,\s*cy,\s*d\*0\.22\]/, 'Stage 3D front camera m
 requireMatch(main, /\.zoom-track::before/, 'Throwline main range bars must include a non-color tick treatment.');
 const changelog = read('CHANGELOG.md');
 requireMatch(changelog, /Throwline Stage 3D audit/i, 'CHANGELOG must describe the Throwline Stage 3D audit release.');
+requireMatch(changelog, /Throwline Stage 3D spatial workspace/i, 'CHANGELOG must describe the no-scroll spatial workspace release.');
+if (!fs.existsSync(path.join(ROOT, 'ProjectorThrow/README.md'))) fail('Throwline architecture documentation is missing.');
 ['pilot catalog', 'exact compatibility', 'calculation gate', 'manual simulation', 'field calibration', 'legacy migration', 'optical geometry suppression'].forEach((term) => {
   if (!changelog.toLowerCase().includes(term)) fail(`CHANGELOG must document Throwline ${term}.`);
 });
@@ -491,6 +530,9 @@ requireMatch(changelog, /Throwline Stage 3D audit/i, 'CHANGELOG must describe th
 const throwlineTools = (avRegistry?.tools || []).filter((tool) => tool.id === 'throwline');
 if (throwlineTools.length !== 1 || throwlineTools[0].href !== 'ProjectorThrow/') {
   fail('Registry must contain exactly one Throwline entry at ProjectorThrow/.');
+}
+if (!throwlineTools[0]?.storageKeys?.some((item) => item.key === 'throwline:stage-scene:v1')) {
+  fail('Registry must include the versioned Throwline Stage scene storage key.');
 }
 ['https://systembydave.com/ProjectorThrow/', 'https://systembydave.com/ProjectorThrow/Stage3D.html'].forEach((url) => {
   if (!sitemap.includes(`<loc>${url}</loc>`)) fail(`Sitemap is missing ${url}.`);
