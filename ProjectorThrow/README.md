@@ -11,6 +11,8 @@ Throwline is the offline-first projector planning surface at `/ProjectorThrow/`.
 
 The scene JSON uses schema version 1 and stores locally under `throwline:stage-scene:v1`. Import always normalizes and caps the scene to eight projector units and 24 obstructions.
 
+The first Stage 3D visit opens a three-pass Quick Start route through screen sizing, projector placement, and inspection/field verification. Choosing a step closes the dialog, opens the live adjustment surface, focuses the corresponding control, and briefly marks its control group. Completion is remembered under `throwline:stage-onboarding:v1`; the header Quick Start control always reopens the route.
+
 ## Provenance rules
 
 - Manual ratios are labeled `MANUAL ESTIMATE`. A valid result may say `FITS SUPPLIED RANGE`; it must never claim verified safety.
@@ -22,4 +24,4 @@ The scene JSON uses schema version 1 and stores locally under `throwline:stage-s
 
 Run `npm run verify:throwline`. This checks the embedded catalog, scene-state unit tests, locally vendored Three.js assets, offline registry, Stage 3D workspace contract, metadata, and release documentation.
 
-Browser release checks cover desktop and phone no-scroll containment, WebGL readiness, exclusive mobile sheets, direct manipulation, scene save and restore, obstruction collision alerts, multi-projector layouts, and field-stamp invalidation.
+Browser release checks cover desktop and phone no-scroll containment, first-run onboarding and its remembered/reopen flows, WebGL readiness, exclusive mobile sheets, direct manipulation, scene save and restore, obstruction collision alerts, multi-projector layouts, and field-stamp invalidation.

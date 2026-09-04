@@ -480,6 +480,14 @@ requireMatch(stage, /function\s+syncAdjustLayout\s*\(/, 'Stage 3D must synchroni
 requireMatch(stage, /id=["']fieldVerifyToggle["']/, 'Stage 3D must expose a Field Verify control.');
 requireMatch(stage, /class=["'][^"']*scene-toolbar/, 'Stage 3D must expose camera and layer controls beside the scene.');
 requireMatch(stage, /class=["'][^"']*mobile-exports/, 'Stage 3D must place phone export actions after scene controls.');
+requireMatch(stage, /<dialog\b[^>]*id=["']onboardingDialog["'][^>]*aria-labelledby=["']onboardingTitle["'][^>]*aria-describedby=["']onboardingIntro["']/, 'Stage 3D must expose an accessible first-run onboarding dialog.');
+requireMatch(stage, /id=["']quickStartToggle["']/, 'Stage 3D must expose a persistent Quick Start control.');
+['screen','projector','verify'].forEach((target) => {
+  requireMatch(stage, new RegExp(`data-onboarding-target=["']${target}["']`), `Stage 3D onboarding is missing the ${target} workflow step.`);
+});
+requireMatch(stage, /const ONBOARDING_STORAGE_KEY = ["']throwline:stage-onboarding:v1["']/, 'Stage 3D onboarding must use its registered versioned storage key.');
+requireMatch(stage, /window\.gsap\.matchMedia\(\)/, 'Stage 3D onboarding motion must use GSAP matchMedia.');
+requireMatch(stage, /function\s+beginWorkflowStep\s*\(/, 'Stage 3D onboarding must launch real workflow controls.');
 requireMatch(stage, /html,body\{overflow:hidden\}/, 'Stage 3D must lock the document to one viewport.');
 requireMatch(stage, /height:100dvh;[^}]*grid-template-areas:"header" "stage" "dock"/, 'Stage 3D phone layout must keep the stage permanent above the dock.');
 requireMatch(stage, /class=["']mobile-dock["'][^>]*>[\s\S]*data-mobile-panel-button=["']adjust["'][\s\S]*data-mobile-panel-button=["']view["'][\s\S]*data-mobile-panel-button=["']facts["'][\s\S]*data-mobile-panel-button=["']export["']/, 'Stage 3D phone workspace must expose Adjust, View, Facts, and Export sheets.');
@@ -539,6 +547,9 @@ if (throwlineTools.length !== 1 || throwlineTools[0].href !== 'ProjectorThrow/')
 }
 if (!throwlineTools[0]?.storageKeys?.some((item) => item.key === 'throwline:stage-scene:v1')) {
   fail('Registry must include the versioned Throwline Stage scene storage key.');
+}
+if (!throwlineTools[0]?.storageKeys?.some((item) => item.key === 'throwline:stage-onboarding:v1')) {
+  fail('Registry must include the versioned Throwline Stage onboarding key.');
 }
 ['https://systembydave.com/ProjectorThrow/', 'https://systembydave.com/ProjectorThrow/Stage3D.html'].forEach((url) => {
   if (!sitemap.includes(`<loc>${url}</loc>`)) fail(`Sitemap is missing ${url}.`);

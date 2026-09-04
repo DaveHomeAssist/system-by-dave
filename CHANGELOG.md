@@ -2,6 +2,11 @@
 
 ## 2026-09-04
 
+### Throwline Stage 3D quick start
+
+* Added an accessible first-run Quick Start dialog that routes operators through screen sizing, projector placement, and inspection/field verification using the real Stage 3D controls.
+* Added remembered completion, a persistent reopen control, responsive phone layout, visible workflow targeting, and reduced-motion-safe GSAP entrance choreography.
+
 ### Throwline default workspace
 
 * Made Stage 3D the default `/ProjectorThrow/` launch while preserving the detailed planner through an explicit workspace URL, existing hash-based share links, and the JavaScript-disabled fallback.
