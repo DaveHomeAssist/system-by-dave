@@ -219,7 +219,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool change — rolls the service-worker cache. */
-    version:'v20260904-throwline-stage-audit-two',
+    version:'v20260904-throwline-stage-plain-language',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,

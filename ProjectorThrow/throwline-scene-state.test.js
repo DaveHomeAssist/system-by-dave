@@ -12,7 +12,7 @@ test('manual state is explicit and never claims verified safety', () => {
   const geometry = Scene.calculateProjectorGeometry(manualScene());
   assert.equal(geometry.allowed, true);
   assert.equal(geometry.provenance.label, 'MANUAL ESTIMATE');
-  assert.equal(geometry.placement.label, 'FITS SUPPLIED RANGE');
+  assert.equal(geometry.placement.label, 'Fits the ratio you entered');
 });
 
 test('blocked state suppresses optical geometry', () => {
@@ -27,7 +27,7 @@ test('driving edits invalidate job-scoped field verification', () => {
   assert.equal(Scene.activeProjector(stamped).provenance.mode, 'field_verified');
   const edited = Scene.applyIntent(stamped, { type: 'set-distance', value: 24 });
   assert.equal(Scene.activeProjector(edited).provenance.mode, 'manual');
-  assert.match(Scene.activeProjector(edited).provenance.reason, /driving value changed/i);
+  assert.match(Scene.activeProjector(edited).provenance.reason, /measure again/i);
 });
 
 test('duplicate projectors do not inherit field verification', () => {
@@ -158,7 +158,7 @@ test('a fixed ratio passes at its exact mark instead of an inverted safe band', 
   const geometry = Scene.calculateProjectorGeometry(stamped);
   assert.ok(geometry.envelope.safeLow <= geometry.envelope.safeHigh);
   assert.equal(geometry.placement.kind, 'safe');
-  assert.equal(geometry.placement.label, 'PASS · MEASURED MARK');
+  assert.equal(geometry.placement.label, 'At the measured distance');
   assert.equal(geometry.provenance.mode, 'field_verified');
   const off = Scene.applyIntent(stamped, { type: 'set-distance', value: 23 });
   assert.equal(Scene.calculateProjectorGeometry(off).placement.kind, 'nominal', 'after a driving edit the fixed ratio is manual again and 23 ft sits in the verify band');
@@ -200,7 +200,7 @@ test('room conflicts cover ceiling, lateral bounds, projected image, and inactiv
   const inactive = Scene.roomConflicts(multi).filter(item => item.kind === 'projector-depth');
   assert.equal(inactive.length, 1);
   assert.equal(inactive[0].projectorId, 'projector-2');
-  assert.match(inactive[0].label, /^Unit B is beyond room depth$/);
+  assert.match(inactive[0].label, /^Unit B is behind the back wall$/);
   const onFloor = Scene.normalizeSceneState({ ...base, screen: { width: 20, aspect: 1.777778, bottom: 0 } });
   assert.deepEqual(Scene.roomConflicts(Scene.applyIntent(onFloor, { type: 'set-distance', value: 22 })).map(item => item.kind), ['image-floor'], 'a 16:10 raster on a floor-level 16:9 screen overshoots the floor');
   assert.deepEqual(Scene.roomConflicts(Scene.applyIntent(onFloor, { type: 'set-distance', value: 7.3229 })), [], 'an undersized image inside the screen does not breach the floor');
@@ -219,7 +219,7 @@ test('an inverted ratio range blocks instead of collapsing to a fixed ratio', ()
   const projector = Scene.normalizeSceneState({ projectors: [{ allowed: true, optical: { min: 2, max: 1, mode: 'manual' }, provenance: { mode: 'manual' } }] }).projectors[0];
   assert.equal(projector.allowed, false);
   assert.equal(projector.provenance.mode, 'conflicting');
-  assert.match(projector.provenance.reason, /inverted/i);
+  assert.match(projector.provenance.reason, /tele ratio is smaller/i);
   const scene = Scene.applyIntent(auditScene(), { type: 'set-optical-range', min: 2, max: 1 });
   near(Scene.activeProjector(scene).optical.min, 0.978, 1e-9);
 });
@@ -292,7 +292,7 @@ test('a fixed manual lens has a nominal verify band and no safe interior', () =>
   assert.equal(geometry.envelope.fixed, true);
   assert.ok(geometry.envelope.safeLow <= geometry.envelope.safeHigh);
   assert.equal(geometry.placement.kind, 'nominal');
-  assert.equal(geometry.placement.label, 'NOMINAL MARK · VERIFY');
+  assert.equal(geometry.placement.label, 'At this lens\u2019s set distance \u2014 check it on site');
   assert.equal(Scene.calculateProjectorGeometry(Scene.applyIntent(fixed, { type: 'set-distance', value: 13.5 })).placement.kind, 'nominal');
   assert.equal(Scene.calculateProjectorGeometry(Scene.applyIntent(fixed, { type: 'set-distance', value: 14 })).placement.kind, 'overshoot');
 });
@@ -309,7 +309,7 @@ test('coverage reports missing width and spill separately', () => {
 test('installation check aggregates every unit and never passes on a manual ratio', () => {
   const audit = Scene.assessInstallation(auditScene());
   assert.equal(audit.tone, 'bad');
-  assert.match(audit.label, /^FAIL · undershoot/);
+  assert.match(audit.label, /^Needs a fix · too close/i);
   assert.ok(audit.issues.some(issue => issue.kind === 'coverage-missing'));
   const manualGood = Scene.assessInstallation(auditScene({ dist: 22, shift: { up: 60, down: 40, left: 10, right: 10 }, rasterAr: 1.777778 }));
   assert.equal(manualGood.tone, 'warn');

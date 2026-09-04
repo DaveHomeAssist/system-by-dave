@@ -319,7 +319,7 @@ html[data-calculation-mode=blocked] .provenance-badge,html[data-calculation-mode
 
     <div class="grp">
       <h3>Calculation input</h3>
-      <p class="calculation-gate" id="stageCalculationGate" role="status">MANUAL SIMULATION · operator-supplied ratio preset · unverified.</p>
+      <p class="calculation-gate" id="stageCalculationGate" role="status">MANUAL SIMULATION · using the throw ratio you supplied · not verified yet.</p>
       <div><label class="lab" for="lens">Manual ratio preset</label><select id="lens">
         <option value="0.978,1.320" selected>Manual preset A · 0.978–1.320:1</option>
         <option value="1.300,1.740">Manual preset B · 1.300–1.740:1</option>
@@ -336,9 +336,9 @@ html[data-calculation-mode=blocked] .provenance-badge,html[data-calculation-mode
       <div><label class="lab" for="px">Projector lateral <span class="val" id="pxv">0' 0"</span></label><input id="px" type="range" min="-30" max="30" step="0.25" value="0"></div>
       <div><label class="lab" for="targetX">Image aim <span class="val" id="targetXv">0' 0"</span></label><input id="targetX" type="range" min="-30" max="30" step="0.25" value="0"></div>
       <div class="row" role="group" aria-label="Distance snap controls">
-        <button id="bw" type="button">snap wide</button>
-        <button id="bm" class="pri" type="button">safe mid</button>
-        <button id="bt" type="button">snap tele</button>
+        <button id="bw" type="button">closest</button>
+        <button id="bm" class="pri" type="button">best spot</button>
+        <button id="bt" type="button">farthest</button>
       </div>
     </div>
 
@@ -611,7 +611,7 @@ function resolveStageTransfer(){
   const profile = data.opticalProfiles.find(item=>item.projector_id===projectorId && item.lens_id===lensId && (!profileId || item.optical_profile_id===profileId)) || null;
   const hasIds = !!(projectorId || lensId || profileId), validIds = !!(projector && lens && compatibility && (!profileId || profile?.optical_profile_id===profileId));
   const ratio = number('ratio',NaN), stamp = params.get('stamp') || '';
-  if (requestedMode === 'field_verified' && hasIds && (!STAGE_CATALOG.ok || !validIds)) return {...base,mode:'blocked',wide:NaN,tele:NaN,allowed:false,label:'Invalid field transfer',reason:'CALCULATION BLOCKED · field-calibrated transfer IDs do not resolve to one exact compatible pair.',profile:null};
+  if (requestedMode === 'field_verified' && hasIds && (!STAGE_CATALOG.ok || !validIds)) return {...base,mode:'blocked',wide:NaN,tele:NaN,allowed:false,label:'Invalid field transfer',reason:'CAN’T CALCULATE YET · this link names a projector and lens that don’t match a known pair.',profile:null};
   if (requestedMode === 'field_verified') {
     // A URL is not a stamp. FIELD VERIFIED is honored only when the transfer carries the measurement that produced the ratio
     // (md = measured throw ft, mw = measured image width ft), the ratio agrees with it, and the stamp is a real timestamp.
@@ -619,20 +619,20 @@ function resolveStageTransfer(){
     const measuredRatio = measuredDistance > 0 && measuredWidth > 0 ? measuredDistance / measuredWidth : NaN;
     const ratioAgrees = Number.isFinite(measuredRatio) && (!Number.isFinite(ratio) || Math.abs(ratio - measuredRatio) <= measuredRatio * 0.005);
     const stampValid = !!stamp && Number.isFinite(Date.parse(stamp));
-    if (ratioAgrees && stampValid) return {...base,mode:'field_verified',wide:measuredRatio,tele:measuredRatio,allowed:true,label:`${projector?.model_number || 'Job'} + ${lens?.lens_model_number || 'measured optic'}`,reason:'FIELD VERIFIED · job-scoped measured ratio.',profile,verification:{ratio:measuredRatio,measuredDistance,measuredWidth,verifiedBy,verifiedAt:stamp}};
-    if (Number.isFinite(ratio) && ratio > 0) return {...base,mode:'manual',wide:ratio,tele:ratio,allowed:true,label:'Transferred field ratio · unverified',reason:'MANUAL ESTIMATE · transferred field verification lacked measurement evidence; re-stamp the job measurement on site.',profile:null};
-    return {...base,mode:'blocked',wide:NaN,tele:NaN,allowed:false,label:'Untrusted field transfer',reason:'CALCULATION BLOCKED · field verification transfer carried no measured ratio.',profile:null};
+    if (ratioAgrees && stampValid) return {...base,mode:'field_verified',wide:measuredRatio,tele:measuredRatio,allowed:true,label:`${projector?.model_number || 'Job'} + ${lens?.lens_model_number || 'measured optic'}`,reason:'FIELD VERIFIED · measured on site for this job.',profile,verification:{ratio:measuredRatio,measuredDistance,measuredWidth,verifiedBy,verifiedAt:stamp}};
+    if (Number.isFinite(ratio) && ratio > 0) return {...base,mode:'manual',wide:ratio,tele:ratio,allowed:true,label:'Throw ratio from the planner · not verified',reason:'MANUAL ESTIMATE · this link didn’t include the on-site measurement. Please re-measure and stamp it here.',profile:null};
+    return {...base,mode:'blocked',wide:NaN,tele:NaN,allowed:false,label:'Link is missing its ratio',reason:'CAN’T CALCULATE YET · this link didn’t include a throw ratio.',profile:null};
   }
   if (hasIds) {
-    if (!STAGE_CATALOG.ok) return {...base,mode:'blocked',wide:NaN,tele:NaN,allowed:false,label:'Catalog unavailable',reason:`CALCULATION BLOCKED · embedded catalog rejected: ${STAGE_CATALOG.error}`,profile:null};
-    if (!validIds) return {...base,mode:'blocked',wide:NaN,tele:NaN,allowed:false,label:'Invalid catalog transfer',reason:'CALCULATION BLOCKED · planner IDs do not resolve to one exact compatible catalog pair.',profile:null};
-    if (requestedMode === 'verified_image_width' && stageEligibleProfile(profile)) return {...base,mode:'verified_image_width',wide:Number(profile.throw_ratio_min),tele:Number(profile.throw_ratio_max),allowed:true,label:`${projector.model_number} + ${lens.lens_model_number}`,reason:'VERIFIED IMAGE-WIDTH PROFILE',profile};
-    return {...base,mode:profile?.calculationState || 'partial',wide:Number(profile?.throw_ratio_min),tele:Number(profile?.throw_ratio_max),allowed:false,label:`${projector.model_number} + ${lens.lens_model_number}`,reason:`CALCULATION BLOCKED · ${profile?.calculationGateReason || 'No complete calculation-eligible optical profile exists for this exact pair.'}`,profile};
+    if (!STAGE_CATALOG.ok) return {...base,mode:'blocked',wide:NaN,tele:NaN,allowed:false,label:'Lens catalog unavailable',reason:`CAN’T CALCULATE YET · the built-in lens catalog couldn’t be read (${STAGE_CATALOG.error}).`,profile:null};
+    if (!validIds) return {...base,mode:'blocked',wide:NaN,tele:NaN,allowed:false,label:'Projector and lens don’t match',reason:'CAN’T CALCULATE YET · this link names a projector and lens that don’t match a known pair.',profile:null};
+    if (requestedMode === 'verified_image_width' && stageEligibleProfile(profile)) return {...base,mode:'verified_image_width',wide:Number(profile.throw_ratio_min),tele:Number(profile.throw_ratio_max),allowed:true,label:`${projector.model_number} + ${lens.lens_model_number}`,reason:'MANUFACTURER VERIFIED · maker-published lens data, ready to calculate.',profile};
+    return {...base,mode:profile?.calculationState || 'partial',wide:Number(profile?.throw_ratio_min),tele:Number(profile?.throw_ratio_max),allowed:false,label:`${projector.model_number} + ${lens.lens_model_number}`,reason:`CAN’T CALCULATE YET · ${profile?.calculationGateReason || 'The maker’s data for this projector and lens isn’t complete enough to calculate from.'}`,profile};
   }
-  if (requestedMode === 'legacy_unverified') return {...base,mode:'legacy_unverified',wide:NaN,tele:NaN,allowed:false,label:'Legacy planner selection',reason:'CALCULATION BLOCKED · Broad legacy source rows are reference-only.',profile:null};
+  if (requestedMode === 'legacy_unverified') return {...base,mode:'legacy_unverified',wide:NaN,tele:NaN,allowed:false,label:'Older reference lens',reason:'CAN’T CALCULATE YET · Broad legacy source rows are reference-only, so this lens can be looked at but not calculated from.',profile:null};
   const min = number('min',0.978), max = number('max',1.320);
-  if (requestedMode !== 'manual' || !Number.isFinite(min) || min <= 0 || !Number.isFinite(max) || max < min) return {...base,mode:'blocked',wide:NaN,tele:NaN,allowed:false,label:'Untrusted transfer',reason:'CALCULATION BLOCKED · transferred calculation state is invalid.',profile:null};
-  return {...base,mode:'manual',wide:min,tele:max,allowed:true,label:'Manual ratio preset',reason:'MANUAL SIMULATION · operator-supplied ratio · unverified.',profile:null};
+  if (requestedMode !== 'manual' || !Number.isFinite(min) || min <= 0 || !Number.isFinite(max) || max < min) return {...base,mode:'blocked',wide:NaN,tele:NaN,allowed:false,label:'Link can’t be used',reason:'CAN’T CALCULATE YET · this link’s lens numbers don’t make sense. Please open it from the planner again.',profile:null};
+  return {...base,mode:'manual',wide:min,tele:max,allowed:true,label:'Manual ratio preset',reason:'MANUAL SIMULATION · using the throw ratio you supplied · not verified yet.',profile:null};
 }
 const STAGE_TRANSFER = resolveStageTransfer();
 
@@ -676,7 +676,7 @@ function syncAdjustLayout(){
 syncAdjustLayout();
 window.addEventListener('resize',syncAdjustLayout,{passive:true});
 stage.addEventListener('stage-dependency-error',()=>{
-  stageStatus.textContent = 'Stage 3D unavailable. The Throwline main app remains available.';
+  stageStatus.textContent = 'The 3D view couldn’t load on this device. The Throwline planner still works.';
 });
 
 const els = id => document.getElementById(id);
@@ -734,12 +734,12 @@ function readoutBlocked(w,h,geometry){
   const raw = Number.isFinite(state.wide) ? `${state.wide.toFixed(3)}${state.tele!==state.wide?'–'+state.tele.toFixed(3):''}:1 raw` : 'unavailable';
   els('hWide').textContent = raw; els('hTele').textContent = 'not used';
   els('hNote').textContent = state.gateReason; els('hNote').style.color = 'var(--safety)';
-  els('hState').textContent = 'CALCULATION BLOCKED'; els('hState').style.color = 'var(--safety)';
+  els('hState').textContent = 'Can’t calculate yet'; els('hState').style.color = 'var(--safety)';
   ['bNom','bSafe'].forEach(id=>{ els(id).style.width='0%'; }); els('bPin').style.left='0%';
-  els('fImg').textContent = 'optical geometry suppressed'; els('fScr').textContent = `${fmt(w/FT)} × ${fmt(h/FT)}`; els('fSpill').textContent = 'not calculated'; els('fSpill').style.color='var(--safety)';
-  els('fRatio').textContent = raw; els('fShift').textContent = 'not calculated'; els('fShift').style.color='var(--dimmer)'; els('fLens').textContent=state.label; els('fHeight').textContent=fmt(state.lh);
-  els('adjustSummary').textContent = `${fmt(state.w)} screen · calculation blocked`;
-  els('sceneSummary').textContent = `CALCULATION BLOCKED. ${state.label}. ${state.gateReason} Screen ${fmt(w/FT)} by ${fmt(h/FT)}. Projector placement ${fmt(state.dist)}. Optical geometry and fit verdict suppressed.`;
+  els('fImg').textContent = 'not calculated yet'; els('fScr').textContent = `${fmt(w/FT)} × ${fmt(h/FT)}`; els('fSpill').textContent = 'not calculated yet'; els('fSpill').style.color='var(--safety)';
+  els('fRatio').textContent = raw; els('fShift').textContent = 'not calculated yet'; els('fShift').style.color='var(--dimmer)'; els('fLens').textContent=state.label; els('fHeight').textContent=fmt(state.lh);
+  els('adjustSummary').textContent = `${fmt(state.w)} screen · can’t calculate yet`;
+  els('sceneSummary').textContent = `Can’t calculate yet. ${state.label}. ${state.gateReason} Screen ${fmt(w/FT)} by ${fmt(h/FT)}. Projector placement ${fmt(state.dist)}. Optical geometry and fit verdict suppressed.`;
   ['bw','bm','bt','tcone'].forEach(id=>els(id).disabled=true);
   updateWorkspaceFacts(geometry);
 }
@@ -767,11 +767,11 @@ function readout(geometry,w,h,pstate){
   note.style.color = col;
   const tolText=`±${Number(tolerance.toFixed(1))}%`;
   note.textContent = `${pstate.label}. ` + (!inRange
-    ? (d > (fixed?nominal:teleD) ? 'Past the tele stop. The image overshoots the screen.'
-                 : 'Inside the wide stop. The image falls short of the screen.')
-    : fixed ? `Fixed ratio: ${fmt(nominal)} is the nominal mark with no conservative interior; verify within ${tolText} on site.`
-    : safe ? (state.mode==='manual'?`Fits the supplied range inside the ${tolText} planning zone; field verification is still required.`:`Inside the ${tolText} conservative planning zone.`)
-           : `In range but outside the ${tolText} safe band. Little margin at the stop.`);
+    ? (d > (fixed?nominal:teleD) ? 'Move the projector closer to the screen.'
+                 : 'Move the projector farther from the screen.')
+    : fixed ? `This lens has one set distance, ${fmt(nominal)}. Check the picture on site and allow ${tolText}.`
+    : safe ? (state.mode==='manual'?`Inside the ${tolText} comfort zone for the ratio you entered. Still confirm it on site.`:`Inside the ${tolText} comfort zone.`)
+           : `Inside the lens range but outside the ${tolText} comfort zone, so there is little room to adjust.`);
   els('hState').textContent = installation.label;
   els('hState').style.color = installation.tone==='bad'?'var(--safety)':installation.tone==='go'?'var(--go)':'var(--hazard)';
 
@@ -788,7 +788,7 @@ function readout(geometry,w,h,pstate){
   els('fImg').textContent = fmt(iw) + ' × ' + fmt(ih);
   els('fScr').textContent = fmt(sw) + ' × ' + fmt(sh);
   const spill=geometry.coverage.maxEdgeVariance;
-  els('fSpill').textContent=spill<0.02?'none':`${fmt(spill)} max edge variance`;
+  els('fSpill').textContent=spill<0.02?'none':`${fmt(spill)} off at the widest edge`;
   els('fSpill').style.color=spill>0.02?'var(--safety)':'var(--dim)';
   els('fRatio').textContent = (state.dist/state.basisW).toFixed(3) + ':1';
   const shiftPct = geometry.image.shiftPercent, shiftH = geometry.image.horizontalShiftPercent;
@@ -797,7 +797,7 @@ function readout(geometry,w,h,pstate){
   const {vertical,horizontal}=geometry.shift;
   const shiftExceeded=vertical.exceeded===true||horizontal.exceeded===true;
   const limitsKnown=vertical.limit!==undefined&&(Math.abs(shiftH)<0.05||horizontal.limit!==undefined);
-  els('fShift').textContent = shiftText + (shiftExceeded?` · exceeds ${vertical.exceeded?vertical.direction:horizontal.direction} limit`:limitsKnown?'':' · limits unknown');
+  els('fShift').textContent = shiftText + (shiftExceeded?` · more than the lens allows ${vertical.exceeded?vertical.direction:horizontal.direction}`:limitsKnown?'':' · lens limits not set');
   els('fShift').style.color = shiftExceeded?'var(--safety)':'var(--info)';
   const lensName = els('lens').selectedOptions[0].textContent;
   els('fLens').textContent = lensName.split('·')[0].trim();
@@ -812,10 +812,10 @@ function updateWorkspaceFacts(geometry){
   els('fRoom').textContent=`${fmt(sceneState.room.width)} × ${fmt(sceneState.room.depth)} × ${fmt(sceneState.room.height)}`;
   const layoutLabel=sceneState.layoutMode==='blend'?'blend spread':sceneState.layoutMode;
   els('fUnits').textContent=`${sceneState.projectors.length} · ${layoutLabel}`;
-  els('fObstacles').textContent=sceneState.obstacles.length?`${sceneState.obstacles.length} · ${geometry.collisions.length} collision${geometry.collisions.length===1?'':'s'}`:'none';
+  els('fObstacles').textContent=sceneState.obstacles.length?`${sceneState.obstacles.length} · ${geometry.collisions.length} in the light path`:'none';
   const roomConflicts=SceneState.roomConflicts(sceneState).map(item=>item.label);
   const alerts=[...geometry.collisions.map(item=>item.label),...roomConflicts];
-  collisionAlert.dataset.active=String(alerts.length>0); collisionAlert.textContent=alerts.length?`Resolve · ${alerts.join(' · ')}`:'No spatial conflicts';
+  collisionAlert.dataset.active=String(alerts.length>0); collisionAlert.textContent=alerts.length?`Fix · ${alerts.join(' · ')}`:'Nothing in the way';
   const verdict=`${geometry.placement.label}|${geometry.provenance.label}|${alerts.join('|')}`;
   if(verdict!==lastVerdict&&alerts.length)window.gsap?.fromTo(collisionAlert,{scale:.98,opacity:.45},{scale:1,opacity:1,duration:.28,ease:'power2.out'});
   lastVerdict=verdict;
@@ -855,7 +855,7 @@ function syncInputsFromState(){
     let option=[...lensControl.options].find(item=>item.value===value||item.value===`${state.wide},${state.tele}`);
     if(!option){option=document.createElement('option');option.value=value;option.textContent=`Transferred manual ratio · ${state.wide.toFixed(3)}${state.tele!==state.wide?'–'+state.tele.toFixed(3):''}:1`;lensControl.appendChild(option);}lensControl.value=option.value;
   }else{
-    lensControl.labels[0].textContent='Exact catalog pair · raw evidence';lensControl.innerHTML=`<option>${state.label}${Number.isFinite(state.wide)?` · raw ${state.wide.toFixed(3)}${state.tele!==state.wide?'–'+state.tele.toFixed(3):''}:1`:''}</option>`;lensControl.disabled=true;
+    lensControl.labels[0].textContent='Projector and lens from the catalog';lensControl.innerHTML=`<option>${state.label}${Number.isFinite(state.wide)?` · raw ${state.wide.toFixed(3)}${state.tele!==state.wide?'–'+state.tele.toFixed(3):''}:1`:''}</option>`;lensControl.disabled=true;
   }
   renderObstacleEditor();
 }
@@ -873,14 +873,14 @@ function bindSceneRange(id,type){const input=els(id);input.addEventListener('inp
 els('ar').addEventListener('change',event=>applySceneIntent({type:'set-screen-aspect',value:Number(event.target.value)},{announceText:`Aspect ${event.target.selectedOptions[0].textContent}`}));
 els('lens').addEventListener('change',event=>{const[min,max]=event.target.value.split(',').map(Number);applySceneIntent({type:'set-optical-range',min,max},{announceText:`Lens ${event.target.selectedOptions[0].textContent}`});});
 const snapDist=(target,label)=>applySceneIntent({type:'snap-distance',target},{announceText:`${label} ${fmt(state.dist)}`});
-els('bw').onclick=()=>snapDist('wide','Snapped to wide stop');els('bt').onclick=()=>snapDist('tele','Snapped to tele stop');els('bm').onclick=()=>snapDist('mid','Snapped to conservative center');
+els('bw').onclick=()=>snapDist('wide','Moved to the closest distance this lens allows,');els('bt').onclick=()=>snapDist('tele','Moved to the farthest distance this lens allows,');els('bm').onclick=()=>snapDist('mid','Moved to the middle of the comfort zone,');
 const overlayMap={tcone:'beam',troom:'room',tgrid:'grid',tenvelope:'envelope',tshift:'shift',tdimensions:'dimensions'};
 Object.entries(overlayMap).forEach(([id,key])=>els(id).addEventListener('click',()=>applySceneIntent({type:'toggle-overlay',key},{announceText:`${els(id).textContent.trim()} ${sceneState.overlays[key]?'hidden':'shown'}`})));
 els('addUnit').onclick=()=>applySceneIntent({type:'add-projector'},{announceText:'Projector duplicated'});els('removeUnit').onclick=()=>applySceneIntent({type:'remove-projector'},{announceText:'Projector removed'});
-els('stackUnits').onclick=()=>applySceneIntent({type:'arrange-projectors',mode:'stack'},{announceText:'Projectors arranged as a stack'});els('blendUnits').onclick=()=>applySceneIntent({type:'arrange-projectors',mode:'blend'},{announceText:'Projectors spread for blending. Illustrative layout only; overlap and blend geometry are not solved.'});
+els('stackUnits').onclick=()=>applySceneIntent({type:'arrange-projectors',mode:'stack'},{announceText:'Projectors arranged as a stack'});els('blendUnits').onclick=()=>applySceneIntent({type:'arrange-projectors',mode:'blend'},{announceText:'Projectors spread out for blending. This is a rough layout; overlap is not calculated yet.'});
 els('addObstacle').onclick=()=>applySceneIntent({type:'add-obstacle'},{announceText:'Obstruction added'});els('clearObstacles').onclick=()=>applySceneIntent({type:'clear-obstacles'},{announceText:'Obstructions cleared'});els('removeObstacle').onclick=()=>applySceneIntent({type:'remove-obstacle',obstacleId:sceneState.activeObstacleId},{announceText:'Obstruction removed'});
 [['obstacleX','x'],['obstacleY','y'],['obstacleZ','z'],['obstacleWidth','width'],['obstacleHeight','height'],['obstacleDepth','depth']].forEach(([id,key])=>els(id).addEventListener('input',event=>applySceneIntent({type:'set-obstacle',obstacleId:sceneState.activeObstacleId,key,value:Number(event.target.value)})));
-els('stampVerification').onclick=()=>{try{sceneState=SceneState.stampFieldVerification(sceneState,{measuredDistance:Number(els('measuredDistance').value),measuredWidth:Number(els('measuredWidth').value),verifiedBy:els('verifiedBy').value});syncInputsFromState();rebuild();announce('Job measurement stamped as field verified');}catch(error){announce(error.message);}};
+els('stampVerification').onclick=()=>{try{sceneState=SceneState.stampFieldVerification(sceneState,{measuredDistance:Number(els('measuredDistance').value),measuredWidth:Number(els('measuredWidth').value),verifiedBy:els('verifiedBy').value});syncInputsFromState();rebuild();announce('On-site measurement saved. This unit is now field verified.');}catch(error){announce(error.message);}};
 els('saveScene').onclick=()=>{try{localStorage.setItem(SceneState.STORAGE_KEY,JSON.stringify(sceneState));announce('Scene saved on this device');}catch{announce('Scene could not be saved');}};
 els('restoreScene').onclick=()=>{try{const saved=localStorage.getItem(SceneState.STORAGE_KEY);if(!saved)throw new Error('No saved scene');sceneState=SceneState.normalizeSceneState(JSON.parse(saved));syncInputsFromState();rebuild();announce('Saved scene restored');}catch(error){announce(error.message);}};
 els('downloadScene').onclick=()=>{const blob=new Blob([JSON.stringify(sceneState,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download='throwline-stage-scene.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),0);announce('Scene JSON downloaded');};
@@ -1406,7 +1406,7 @@ announce('Stage 3D ready. Three-quarter camera selected.');
 window.addEventListener('pagehide',event=>{ if (!event.persisted) stage.destroy(); });
 } catch (error) {
   document.documentElement.dataset.renderer = 'unavailable';
-  stageStatus.textContent = 'Stage 3D renderer unavailable. Calculations, verdicts, and controls remain live; the 3D view and model exports are off. Open the offline Throwline main app for drawings.';
+  stageStatus.textContent = 'The 3D view couldn’t start on this device. Your numbers, results, and controls still work; only the 3D picture and model downloads are off. The Throwline planner has drawings.';
 }
 </script>
 </body>
