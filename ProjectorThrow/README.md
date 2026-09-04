@@ -11,15 +11,26 @@ Throwline is the offline-first projector planning surface at `/ProjectorThrow/`.
 
 The scene JSON uses schema version 1 and stores locally under `throwline:stage-scene:v1`. Import always normalizes and caps the scene to eight projector units and 24 obstructions.
 
+## Calculation model
+
+- Every transferred and stored length is feet. The planner converts before it builds a Stage 3D link; a hand-written URL carries no unit marker, so a value entered in metres is silently read as feet.
+- Throw distance = projected-raster basis width × throw ratio. The wide and tele stops are exact products of the ratio range and the basis; the conservative band is 5 % inside each stop. A fixed ratio (a field stamp) collapses that band to the exact mark ± 0.01 ft instead of inverting it.
+- Slider and handle edits round to 0.25 ft. The snap wide, snap tele, and snap mid controls use the `snap-distance` intent, which lands on the exact optical stop so a snapped unit can never read UNDERSHOOT or OVERSHOOT against its own envelope.
+- Lens shift is judged per axis against the limit for the direction the image actually moves: a positive vertical value against the up limit, a negative value against the down limit, and lateral aim offset against the left or right limit. Combined-axis (elliptical) limits are not modeled and the readout says `limits unknown` when the transfer carried none.
+- Room conflicts come from `roomConflicts()` and cover every unit, not only the active one: beyond room depth, lens above the ceiling, outside the room width, screen wider than the room, screen top above the ceiling, and a projected image that breaks the ceiling, floor, or side walls.
+
 ## Provenance rules
 
 - Manual ratios are labeled `MANUAL ESTIMATE`. A valid result may say `FITS SUPPLIED RANGE`; it must never claim verified safety.
 - Exact calculation-eligible catalog inputs are labeled `MANUFACTURER VERIFIED`.
-- A measured distance and image width can be stamped `FIELD VERIFIED` for the current job only. Any driving geometry edit invalidates that stamp and returns the unit to manual-estimate status.
+- A measured distance and image width can be stamped `FIELD VERIFIED` for the current job only. The stamp certifies the throw ratio; the planned raster basis is kept, so the corrected mark is ratio × basis exactly as the planner reports it. Any driving geometry edit, including snapping to that corrected mark, invalidates the stamp and returns the unit to manual-estimate status.
+- A URL is not a stamp. A `mode=field_verified` transfer is honored only when it carries the measured throw and image width (`md`, `mw` in feet) that agree with `ratio` within 0.5 % and a parseable `stamp` timestamp; the planner adds these automatically. A transfer with a ratio but no evidence opens as a `MANUAL ESTIMATE` that asks for an on-site re-stamp, and a transfer with neither is blocked.
 - Partial, conflicting, legacy, unspecified, or invalid inputs fail closed and suppress optical geometry.
 
 ## Verification
 
 Run `npm run verify:throwline`. This checks the embedded catalog, scene-state unit tests, locally vendored Three.js assets, offline registry, Stage 3D workspace contract, metadata, and release documentation.
+
+Run `npm run probe:throwline-stage` for the browser-level regression probe. It serves the repository, drives `Stage3D.html` in headless Chrome, and checks the audited production link, exact-stop snapping, field-transfer URL trust, field-stamp calibration, direction-aware shift limits, and room-boundary conflicts against the rendered readouts. Pass `--chrome=` for a non-default browser binary and `--base=` to reuse a running static server.
 
 Browser release checks cover desktop and phone no-scroll containment, WebGL readiness, exclusive mobile sheets, direct manipulation, scene save and restore, obstruction collision alerts, multi-projector layouts, and field-stamp invalidation.
