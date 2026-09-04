@@ -2,6 +2,10 @@
 
 ## 2026-09-04
 
+### Throwline social preview
+
+* Replaced the generic System by Dave social card on `/ProjectorThrow/` with a dedicated 3D stage-planning image featuring large-venue projectors, visible throw geometry, and route-specific Open Graph and Twitter metadata.
+
 ### Throwline Stage 3D spatial workspace
 
 * Promoted Stage 3D into an offline-ready, viewport-locked spatial workspace with a permanent canvas, desktop adjustment rail, and mutually exclusive mobile Adjust, View, Facts, and Export sheets.
