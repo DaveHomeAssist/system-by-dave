@@ -79,8 +79,23 @@
           right: finite(optical.shift.right) ? clamp(optical.shift.right, 0, 500) : undefined
         } : undefined
       },
+      body: normalizeBody(input.body),
       allowed,
       provenance
+    };
+  }
+
+  function normalizeBody(input) {
+    if (!input || typeof input !== 'object') return undefined;
+    const width = finite(input.width) ? clamp(input.width, 0.1, 20) : NaN;
+    const height = finite(input.height) ? clamp(input.height, 0.1, 20) : NaN;
+    const depth = finite(input.depth) ? clamp(input.depth, 0.1, 20) : NaN;
+    if (![width, height, depth].every(Number.isFinite)) return undefined;
+    return {
+      width, height, depth,
+      lensProtrusion: finite(input.lensProtrusion) ? clamp(input.lensProtrusion, 0, 5) : 0,
+      source: ['catalog', 'manual'].includes(input.source) ? input.source : 'manual',
+      label: String(input.label || '').slice(0, 120)
     };
   }
 
@@ -119,7 +134,9 @@
       room: {
         width: finite(room.width) ? clamp(room.width, 8, 400) : 40,
         depth: finite(room.depth) ? clamp(room.depth, 8, 600) : 40,
-        height: finite(room.height) ? clamp(room.height, 8, 150) : 20
+        height: finite(room.height) ? clamp(room.height, 8, 150) : 20,
+        // Keep-clear margin around each projector body for rigging, cabling, and airflow. Saved scenes without it get 0.
+        clearance: finite(room.clearance) ? clamp(room.clearance, 0, 10) : 0
       },
       tolerance: finite(input.tolerance) ? clamp(input.tolerance, 0, 15) : 5,
       projectors,
@@ -150,6 +167,7 @@
         id: 'projector-a',
         label: transfer.label || 'Unit A',
         position: { x: transfer.x, distance: transfer.dist, lensHeight: transfer.lh, targetX: transfer.targetX },
+        body: transfer.body,
         optical: { min: transfer.wide, max: transfer.tele, basisWidth: transfer.basisW, rasterAspect: transfer.rasterAr, shift: transfer.shift, mode },
         allowed: transfer.allowed,
         provenance: { mode, reason: transfer.reason, verification: transfer.verification }
@@ -202,26 +220,51 @@
     return { percent, direction, limit, exceeded: limit === undefined ? undefined : Math.abs(percent) > limit };
   }
 
+  function bodyExtents(projector) {
+    const body = projector.body;
+    if (!body) return undefined;
+    const front = projector.position.distance + body.lensProtrusion;
+    return {
+      front, rear: front + body.depth,
+      top: projector.position.lensHeight + body.height / 2, bottom: projector.position.lensHeight - body.height / 2,
+      left: projector.position.x - body.width / 2, right: projector.position.x + body.width / 2
+    };
+  }
+
   function roomConflicts(input) {
     const scene = normalizeSceneState(input);
     const conflicts = [];
     const screenHeight = scene.screen.width / scene.screen.aspect;
     const screenTop = scene.screen.bottom + screenHeight;
-    if (scene.screen.width > scene.room.width + PLACEMENT_TOLERANCE) conflicts.push({ kind: 'screen-width', label: 'the screen is wider than the room' });
-    if (screenTop > scene.room.height + PLACEMENT_TOLERANCE) conflicts.push({ kind: 'screen-height', label: 'the top of the screen is above the ceiling' });
+    const clearance = scene.room.clearance;
+    const fmtClear = `${clearance % 1 === 0 ? clearance : clearance.toFixed(2)} ft`;
+    if (scene.screen.width > scene.room.width + PLACEMENT_TOLERANCE) conflicts.push({ kind: 'screen-width', tone: 'bad', label: 'the screen is wider than the room' });
+    if (screenTop > scene.room.height + PLACEMENT_TOLERANCE) conflicts.push({ kind: 'screen-height', tone: 'bad', label: 'the top of the screen is above the ceiling' });
     scene.projectors.forEach(projector => {
       const name = scene.projectors.length > 1 ? projector.label : 'the projector';
       const its = scene.projectors.length > 1 ? `${projector.label}\u2019s` : 'the';
-      if (projector.position.distance > scene.room.depth + PLACEMENT_TOLERANCE) conflicts.push({ projectorId: projector.id, kind: 'projector-depth', label: `${name} is behind the back wall` });
-      if (projector.position.lensHeight > scene.room.height + PLACEMENT_TOLERANCE) conflicts.push({ projectorId: projector.id, kind: 'projector-height', label: `${its} lens is above the ceiling` });
-      if (Math.abs(projector.position.x) > scene.room.width / 2 + PLACEMENT_TOLERANCE) conflicts.push({ projectorId: projector.id, kind: 'projector-width', label: `${name} is outside the side walls` });
+      const extents = bodyExtents(projector);
+      if (extents) {
+        // With a known body, judge the body itself: through a wall is a failure, inside the keep-clear margin is a review.
+        if (extents.rear > scene.room.depth + PLACEMENT_TOLERANCE) conflicts.push({ projectorId: projector.id, kind: 'body-depth', tone: 'bad', label: `the back of ${name === 'the projector' ? 'the projector' : name} is through the back wall` });
+        else if (clearance > 0 && extents.rear + clearance > scene.room.depth + PLACEMENT_TOLERANCE) conflicts.push({ projectorId: projector.id, kind: 'body-depth-clearance', tone: 'warn', label: `less than ${fmtClear} behind ${name}` });
+        if (extents.top > scene.room.height + PLACEMENT_TOLERANCE) conflicts.push({ projectorId: projector.id, kind: 'body-height', tone: 'bad', label: `the top of ${name === 'the projector' ? 'the projector' : name} is above the ceiling` });
+        else if (clearance > 0 && extents.top + clearance > scene.room.height + PLACEMENT_TOLERANCE) conflicts.push({ projectorId: projector.id, kind: 'body-height-clearance', tone: 'warn', label: `less than ${fmtClear} above ${name}` });
+        if (extents.bottom < -PLACEMENT_TOLERANCE) conflicts.push({ projectorId: projector.id, kind: 'body-floor', tone: 'bad', label: `${name} sits below the floor` });
+        if (extents.left < -scene.room.width / 2 - PLACEMENT_TOLERANCE || extents.right > scene.room.width / 2 + PLACEMENT_TOLERANCE) conflicts.push({ projectorId: projector.id, kind: 'body-width', tone: 'bad', label: `${name} is through a side wall` });
+        else if (clearance > 0 && (extents.left - clearance < -scene.room.width / 2 - PLACEMENT_TOLERANCE || extents.right + clearance > scene.room.width / 2 + PLACEMENT_TOLERANCE)) conflicts.push({ projectorId: projector.id, kind: 'body-width-clearance', tone: 'warn', label: `less than ${fmtClear} beside ${name}` });
+      } else {
+        if (projector.position.distance > scene.room.depth + PLACEMENT_TOLERANCE) conflicts.push({ projectorId: projector.id, kind: 'projector-depth', tone: 'bad', label: `${name} is behind the back wall` });
+        if (projector.position.lensHeight > scene.room.height + PLACEMENT_TOLERANCE) conflicts.push({ projectorId: projector.id, kind: 'projector-height', tone: 'bad', label: `${its} lens is above the ceiling` });
+        if (Math.abs(projector.position.x) > scene.room.width / 2 + PLACEMENT_TOLERANCE) conflicts.push({ projectorId: projector.id, kind: 'projector-width', tone: 'bad', label: `${name} is outside the side walls` });
+      }
       const geometry = calculateProjectorGeometry(scene, projector.id);
       if (!geometry.image) return;
       const imageTop = geometry.screen.centerY + geometry.image.height / 2;
       const imageBottom = geometry.screen.centerY - geometry.image.height / 2;
-      if (imageTop > scene.room.height + PLACEMENT_TOLERANCE) conflicts.push({ projectorId: projector.id, kind: 'image-height', label: `${its} picture runs above the ceiling` });
-      if (imageBottom < -PLACEMENT_TOLERANCE) conflicts.push({ projectorId: projector.id, kind: 'image-floor', label: `${its} picture runs below the floor` });
-      if (Math.abs(geometry.image.centerX) + geometry.image.width / 2 > scene.room.width / 2 + PLACEMENT_TOLERANCE) conflicts.push({ projectorId: projector.id, kind: 'image-width', label: `${its} picture runs past the side walls` });
+      if (imageTop > scene.room.height + PLACEMENT_TOLERANCE) conflicts.push({ projectorId: projector.id, kind: 'image-height', tone: 'bad', label: `${its} picture runs above the ceiling` });
+      if (imageBottom < -PLACEMENT_TOLERANCE) conflicts.push({ projectorId: projector.id, kind: 'image-floor', tone: 'bad', label: `${its} picture runs below the floor` });
+      if (Math.abs(geometry.image.centerX) + geometry.image.width / 2 > scene.room.width / 2 + PLACEMENT_TOLERANCE) conflicts.push({ projectorId: projector.id, kind: 'image-width', tone: 'bad', label: `${its} picture runs past the side walls` });
     });
     return conflicts;
   }
@@ -323,7 +366,7 @@
       geometry.collisions.forEach(collision => push('bad', 'beam-obstruction', `${name}the light path hits ${collision.label}`, projector.id));
       if (geometry.provenance.mode === 'manual') push('warn', 'provenance-manual', `${name}the throw ratio hasn\u2019t been verified yet`, projector.id);
     });
-    roomConflicts(scene).forEach(conflict => push('bad', `room-${conflict.kind}`, conflict.label, conflict.projectorId));
+    roomConflicts(scene).forEach(conflict => push(conflict.tone === 'warn' ? 'warn' : 'bad', `room-${conflict.kind}`, conflict.label, conflict.projectorId));
     const tone = issues.some(issue => issue.tone === 'bad') ? 'bad' : issues.some(issue => issue.tone === 'warn') ? 'warn' : 'go';
     const first = issues.find(issue => issue.tone === tone);
     const label = tone === 'go' ? 'Ready \u2014 everything checks out' : tone === 'warn' ? `Worth a look \u00b7 ${first.label}` : `Needs a fix \u00b7 ${first.label}`;
@@ -364,7 +407,13 @@
     else if (type === 'set-screen-aspect') { scene.screen.aspect = clamp(Number(intent.value), 0.2, 10); scene.projectors = scene.projectors.map(invalidateFieldVerification); }
     else if (type === 'set-optical-range' && finite(intent.min) && Number(intent.min) > 0 && finite(intent.max) && Number(intent.max) >= Number(intent.min)) updateProjector({ ...projector, allowed: true, optical: { ...projector.optical, min: Number(intent.min), max: Number(intent.max) }, provenance: normalizeProvenance({ mode: 'manual', reason: 'MANUAL ESTIMATE · throw ratio entered by hand.' }) });
     else if (type === 'set-tolerance' && finite(intent.value)) scene.tolerance = clamp(intent.value, 0, 15);
+    else if (type === 'set-room' && intent.key === 'clearance' && finite(intent.value)) scene.room.clearance = clamp(stepped(intent.value, 0.25), 0, 10);
     else if (type === 'set-room') { const key = ['width', 'depth', 'height'].includes(intent.key) ? intent.key : 'depth'; scene.room[key] = clamp(stepped(intent.value, 0.5), 8, key === 'depth' ? 600 : 400); }
+    else if (type === 'set-body' && ['width', 'height', 'depth', 'lensProtrusion'].includes(intent.key) && finite(intent.value)) {
+      const current = projector.body || { width: 2, height: 1, depth: 2.5, lensProtrusion: 0 };
+      updateProjector({ ...projector, body: { ...current, [intent.key]: Number(intent.value), source: 'manual', label: 'typed in' } });
+    }
+    else if (type === 'clear-body') updateProjector({ ...projector, body: undefined });
     else if (type === 'select-projector' && scene.projectors.some(item => item.id === intent.projectorId)) scene.activeProjectorId = intent.projectorId;
     else if (type === 'add-projector' && scene.projectors.length < 8) { const source = copy(projector); const nextIndex = scene.projectors.length; source.id = nextId(scene.projectors, 'projector'); source.label = `Unit ${String.fromCharCode(65 + nextIndex)}`; source.position.x = clamp(projector.position.x + 2, -100, 100); source.provenance = normalizeProvenance({ mode: projector.provenance.mode === 'field_verified' ? 'manual' : projector.provenance.mode, reason: projector.provenance.mode === 'field_verified' ? 'MANUAL ESTIMATE · copied from a unit that was measured on site; measure this one too.' : projector.provenance.reason }); scene.projectors.push(normalizeProjector(source, nextIndex)); scene.activeProjectorId = source.id; scene.layoutMode = 'independent'; }
     else if (type === 'remove-projector' && scene.projectors.length > 1) { scene.projectors = scene.projectors.filter(item => item.id !== projector.id); scene.activeProjectorId = scene.projectors[0].id; }
@@ -395,5 +444,5 @@
     return normalizeSceneState(scene);
   }
 
-  return Object.freeze({ SCHEMA_VERSION, STORAGE_KEY, PLACEMENT_TOLERANCE, COVERAGE_TOLERANCE, ASPECT_TOLERANCE, normalizeProvenance, normalizeSceneState, createSceneState, activeProjector, calculateProjectorGeometry, roomConflicts, assessInstallation, resolveProfileRatio, obstacleIntersectsBeam, applyIntent, stampFieldVerification });
+  return Object.freeze({ SCHEMA_VERSION, STORAGE_KEY, PLACEMENT_TOLERANCE, COVERAGE_TOLERANCE, ASPECT_TOLERANCE, normalizeProvenance, normalizeSceneState, createSceneState, activeProjector, calculateProjectorGeometry, roomConflicts, bodyExtents, assessInstallation, resolveProfileRatio, obstacleIntersectsBeam, applyIntent, stampFieldVerification });
 });

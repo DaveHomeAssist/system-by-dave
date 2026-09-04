@@ -228,12 +228,28 @@ async function main() {
     const barco = await open('mode=verified_image_width&projector=PRJ-004&lens=LNS-013&profile=OPT-008&w=20&bottom=4&ar=1.6&basisW=20&rasterAr=1.6&lh=6&dist=30');
     check('the Barco pair stays paused with a plain-language reason', barco.badge !== 'MANUFACTURER VERIFIED' && /CAN’T CALCULATE YET/.test(barco.gate) && /width basis|Barco/.test(barco.gate), barco);
 
+    // 10b. Projector body from the catalog: back wall, keep-clear margin, and the body facts line.
+    // Lens front at 44 ft; the PT-RQ50K body (3.51 ft) starts 0.68 ft behind it, so its back sits at 48.19 ft.
+    await open('mode=verified_image_width&projector=PRJ-001&lens=LNS-004&profile=OPT-002&w=20&bottom=4&ar=1.8962963&basisW=20&rasterAr=1.8962963&lh=6&dist=44&clr=1');
+    const bodied = await setInput('roomD', 60);
+    const bodyFacts = await evaluate(`document.getElementById('fBody').textContent.trim()`);
+    check('a catalog pair carries the maker body dimensions', /from maker data/.test(bodyFacts) && /2' 4/.test(bodyFacts) && bodied.alert === 'Nothing in the way', { bodyFacts, alert: bodied.alert });
+    const throughWall = await setInput('roomD', 48);
+    check('a body that ends behind the back wall is a fix', /Fix · .*back of the projector is through the back wall/.test(throughWall.alert) && /^Needs a fix/.test(throughWall.headline), throughWall);
+    const tightMargin = await setInput('roomD', 49);
+    check('a body inside the keep-clear margin is a check, not a fail', /Check · less than 1 ft behind the projector/.test(tightMargin.alert) && /^Worth a look/.test(tightMargin.headline), tightMargin);
+    const roomy = await setInput('roomD', 52);
+    check('enough room behind the body clears the alert', roomy.alert === 'Nothing in the way', roomy);
+    const cleared = await click('clearBody');
+    check('clearing the body falls back to the lens-position check', /lens position only/.test(await evaluate(`document.getElementById('fBody').textContent.trim()`)) && cleared.alert === 'Nothing in the way', cleared);
+
     // 11. Planner: picking a verified pair reads READY TO CALCULATE; a covered shape switch keeps it verified.
     await cdp('Page.navigate', { url: `${baseUrl}ProjectorThrow/index.html?workspace=planner` });
     await delay(2500);
     const planner = await evaluate(`(() => { const set = (id, value) => { const el = document.getElementById(id); el.value = value; el.dispatchEvent(new Event('change', { bubbles: true })); };
-      set('catalogProjector', 'PRJ-001'); set('catalogLens', 'LNS-004'); return new Promise(resolve => setTimeout(() => resolve({ gate: document.getElementById('calculationGate').textContent.trim(), raster: document.getElementById('raster').value, verify: document.getElementById('verifyBadge').textContent.trim() }), 400)); })()`);
+      set('catalogProjector', 'PRJ-001'); set('catalogLens', 'LNS-004'); return new Promise(resolve => setTimeout(() => resolve({ gate: document.getElementById('calculationGate').textContent.trim(), raster: document.getElementById('raster').value, verify: document.getElementById('verifyBadge').textContent.trim(), body: document.getElementById('body').value.trim(), stageLink: document.getElementById('stage3dLink').getAttribute('href') }), 400)); })()`);
     check('planner reads READY TO CALCULATE for a verified pair at its native shape', /^READY TO CALCULATE/.test(planner.gate) && planner.raster.startsWith('1.8962963') && planner.verify === 'maker verified', planner);
+    check('planner fills the rear-mark body depth from maker data and transfers it to Stage 3D', planner.body !== '' && /bw=2\.362/.test(planner.stageLink) && /bd=3\.51/.test(planner.stageLink) && /lp=0\.682/.test(planner.stageLink), planner);
     const plannerShape = await evaluate(`(() => { const el = document.getElementById('raster'); el.value = '1.6|1920|1200'; el.dispatchEvent(new Event('change', { bubbles: true })); return new Promise(resolve => setTimeout(() => resolve({ gate: document.getElementById('calculationGate').textContent.trim(), sub: document.getElementById('rdSub').textContent.trim() }), 400)); })()`);
     check('planner switches to the maker\'s 16:10 ratio when the picture shape changes', /^READY TO CALCULATE/.test(plannerShape.gate) && /closest/.test(plannerShape.sub), plannerShape);
 

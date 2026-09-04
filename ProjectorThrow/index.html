@@ -3547,6 +3547,18 @@
     let currentShow = { version: 1, id: "", name: "Untitled show", outputs: [] };
     let activeOutputId = "";
     let verifiedAt = "";
+    let bodyAutoFilled = false;
+    function catalogBodyInches(selection) {
+      const body = selection?.projector?.body, lens = selection?.lens;
+      if (!body || !lens || !finite(body.depth_mm)) return NaN;
+      return (Number(body.depth_mm) + (finite(lens.lens_protrusion_mm) ? Number(lens.lens_protrusion_mm) : 0)) / 25.4;
+    }
+    function fillBodyFromCatalog() {
+      // Maker body depth plus lens protrusion gives the lens-origin-to-rear distance the rear tape mark needs.
+      const inches = catalogBodyInches(resolveCatalogSelection());
+      if (finite(inches) && (bodyAutoFilled || !el.body.value.trim())) { setLenInput(el.body, inches); bodyAutoFilled = true; }
+      else if (!finite(inches) && bodyAutoFilled) { el.body.value = ""; bodyAutoFilled = false; }
+    }
     let unit = "ftin";
     let lastCalc = null;
     let renderQueued = false;
@@ -4019,7 +4031,7 @@
       const catalogSelection = resolveCatalogSelection();
       const state = {
         job: el.job.value.trim(), w, h, trA: NaN, trB: NaN, rawMin, rawMax, raster, lens, family, catalogSelection,
-        screenBottom: readLen("sbottom"), dist: readLen("dist"), depth: readLen("depth"), lensHeight: readLen("lensHeight"), bodyDepth: readLen("body"),
+        screenBottom: readLen("sbottom"), dist: readLen("dist"), depth: readLen("depth"), lensHeight: readLen("lensHeight"), bodyDepth: readLen("body"), bodyFromCatalog: bodyAutoFilled,
         lumens: Number(el.lumens.value), qty: clamp(Math.round(Number(el.qty.value) || 1), 1, 8), gain: Math.max(.1, Number(el.gain.value) || 1),
         tol: clamp(Number(el.tol.value) || 0, 0, 15) / 100, eff: clamp(Number(el.eff.value) || 85, 1, 100), stackEff: clamp(Number(el.stackEff.value) || 92, 1, 100),
         targetFl: Number(el.targetFl.value) || 30, fitMode: el.fitMode.value === "raster" ? "raster" : "screen", includeEstimated: el.includeEstimated.checked, nPlusOne: el.nPlusOne.checked,
@@ -4140,7 +4152,7 @@
         else if (c.far > c.depth) { if (noteKind !== "bad") noteKind = "warn"; notes.push(`The room fits the lens, but its farthest distance runs ${fmtLen(c.far - c.depth)} past the back wall.`); }
         else notes.push(`${fmtLen(c.depth - c.far)} of room to spare behind the farthest distance.`);
       }
-      if (c.rearValid) notes.push(`Tape mark for the back of the projector: ${fmtLen(c.rear)} from the screen.`);
+      if (c.rearValid) notes.push(`Tape mark for the back of the projector: ${fmtLen(c.rear)} from the screen${c.bodyFromCatalog ? " (maker body depth plus lens)" : ""}.`);
       else if (finite(c.bodyDepth) && c.bodyDepth > 0 && c.lens?.folded) { if (noteKind !== "bad") noteKind = "warn"; notes.push("No back-of-projector mark: this is a short-throw or mirrored lens, so use the maker’s drawing for the body position."); }
       if (c.basisMismatch) { if (noteKind !== "bad") noteKind = "warn"; notes.push(`The picture shape you chose doesn’t match the ${c.expected.label.replace(/\s+basis$/i, "")} shape this lens data was measured with.`); }
       el.rdNote.textContent = notes.join("  "); el.rdNote.className = `rd-note${noteKind ? " " + noteKind : ""}`;
@@ -4258,7 +4270,8 @@
       const imageCenter = screenBottom + c.h / 2;
       const lensHeight = finite(c.lensHeight) ? c.lensHeight : imageCenter;
       const bodyDepth = finite(c.bodyDepth) && c.bodyDepth > 0 ? c.bodyDepth : clamp(c.w * .13, 24, 42);
-      const bodyWidth = clamp(c.w * .14, 24, 44), bodyHeight = clamp(c.h * .13, 11, 20);
+      const catalogBody = c.catalogSelection?.projector?.body;
+      const bodyWidth = catalogBody && finite(catalogBody.width_mm) ? catalogBody.width_mm / 25.4 : clamp(c.w * .14, 24, 44), bodyHeight = catalogBody && finite(catalogBody.height_mm) ? catalogBody.height_mm / 25.4 : clamp(c.h * .13, 11, 20);
       const maxDepth = Math.max(c.far, c.shown + bodyDepth, finite(c.depth) ? c.depth : 0, 144) * 1.08;
       const deckHalf = Math.max(c.w, c.img.w, 144) * .68;
       const guardLow = c.shiftProfile ? imageCenter - c.shiftProfile.up * c.img.h / 100 : 0;
@@ -4622,10 +4635,11 @@
         else if (/16:10/i.test(aspect)) el.raster.value = "1.6|1920|1200";
         const lumens = Number(selection.projector.brightness_ansi_lm); el.lumens.value = finite(lumens) && lumens > 0 ? String(lumens) : "";
       }
+      fillBodyFromCatalog();
       render();
     }
     function selectCatalogLens() {
-      el.lens.value = ""; el.trmin.value = ""; el.trmax.value = ""; verifiedAt = ""; render();
+      el.lens.value = ""; el.trmin.value = ""; el.trmax.value = ""; verifiedAt = ""; fillBodyFromCatalog(); render();
     }
     function activateManualMode() {
       if (suppress) return;
@@ -4633,7 +4647,7 @@
     }
     function selectLens(id, renderNow = false) {
       const lens = getLens(id); if (!lens) return;
-      const replacedCatalogPair = !!el.catalogProjector.value; el.catalogProjector.value = ""; buildCatalogLensOptions(); verifiedAt = "";
+      const replacedCatalogPair = !!el.catalogProjector.value; el.catalogProjector.value = ""; buildCatalogLensOptions(); verifiedAt = ""; if (bodyAutoFilled) { el.body.value = ""; bodyAutoFilled = false; }
       if (replacedCatalogPair) applyShiftProfile(null, { renderNow: false });
       if (el.family.value !== lens.familyId) { el.family.value = lens.familyId; buildLensOptions(id); buildShiftProfileOptions(); applyShiftProfile(null, { renderNow: false }); } else el.lens.value = id;
       if (lens.calculationState === "manual") { el.trmin.value = cleanNum(lens.min, 3); el.trmax.value = cleanNum(lens.max, 3); }
@@ -4660,7 +4674,9 @@
       put("mode", shared?.projector.provenance.mode || c.calculationMode); put("w", cleanNum(shared?.screen.width ?? c.w / 12, 4)); put("bottom", cleanNum(shared?.screen.bottom ?? c.screenBottom / 12, 4)); put("ar", cleanNum(shared?.screen.aspect ?? c.w / c.h, 6)); put("basisW", cleanNum(shared?.projector.optical.basisWidth ?? c.img?.w / 12, 4)); put("rasterAr", cleanNum(shared?.projector.optical.rasterAspect ?? c.img?.w / c.img?.h, 6)); put("lh", cleanNum(shared?.projector.position.lensHeight ?? c.lensHeight / 12, 4)); put("dist", cleanNum(shared?.projector.position.distance ?? c.shown / 12, 4));
       put("projector", c.catalogSelection.projector?.projector_id || ""); put("lens", c.catalogSelection.lens?.lens_id || ""); put("profile", c.catalogSelection.profile?.optical_profile_id || "");
       if (c.shiftProfile) { put("su", cleanNum(c.shiftProfile.up, 2)); put("sd", cleanNum(c.shiftProfile.down, 2)); }
-      put("tolPct", cleanNum(c.tol * 100, 2));
+      put("tolPct", cleanNum(c.tol * 100, 2)); put("clr", 1);
+      const bodyForStage = c.catalogSelection?.projector?.body;
+      if (bodyForStage && c.catalogSelection.lens) { put("bw", cleanNum(bodyForStage.width_mm / 304.8, 3)); put("bh", cleanNum(bodyForStage.height_mm / 304.8, 3)); put("bd", cleanNum(bodyForStage.depth_mm / 304.8, 3)); put("lp", cleanNum((Number(c.catalogSelection.lens.lens_protrusion_mm) || 0) / 304.8, 3)); }
       if (c.calculationMode === "manual") { put("min", cleanNum(c.trA, 5)); put("max", cleanNum(c.trB, 5)); }
       if (c.calculationMode === "field_verified") { put("ratio", cleanNum(c.trA, 5)); put("stamp", c.fieldVerification.verifiedAt); put("md", cleanNum(c.fieldVerification.actualDist / 12, 4)); put("mw", cleanNum(c.fieldVerification.actualWidth / 12, 4)); put("vb", c.fieldVerification.verifiedBy); }
       return `Stage3D.html?${p.toString()}`;
@@ -4813,6 +4829,7 @@
     ["trmin", "trmax"].forEach(id => el[id].addEventListener("input", () => { activateManualMode(); scheduleRender(); }));
     ["job", "sbottom", "body", "dist", "depth", "lensHeight", "lumens", "qty", "gain", "tol", "eff", "stackEff", "projectorModel", "shiftUp", "shiftDown", "shiftSource", "solverNear", "solverFar"].forEach(id => el[id].addEventListener("input", scheduleRender));
     ["actualDist", "actualWidth", "actualFl", "verifiedBy"].forEach(id => el[id].addEventListener("input", () => { verifiedAt = ""; scheduleRender(); }));
+    el.body.addEventListener("input", () => { bodyAutoFilled = false; });
     ["raster", "targetFl", "fitMode", "solverScope"].forEach(id => el[id].addEventListener("change", scheduleRender));
     [el.includeEstimated, el.nPlusOne].forEach(node => node.addEventListener("change", scheduleRender));
     el.inventoryToggle.addEventListener("click", () => { const lens = getLens(); if (!lens) return; if (inventory.has(lens.id)) { inventory.delete(lens.id); toast("Lens removed from crew inventory"); } else { inventory.add(lens.id); toast("Lens added to crew inventory"); } saveInventoryStorage(); render(); });

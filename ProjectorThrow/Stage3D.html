@@ -342,11 +342,24 @@ html[data-calculation-mode=blocked] .provenance-badge,html[data-calculation-mode
       </div>
     </div>
 
+    <div class="grp" id="bodyGroup">
+      <h3>Projector body</h3>
+      <div class="lab" id="bodySource">Not set. The room check uses the lens position only.</div>
+      <div class="field-grid">
+        <label><span class="lab">Width · ft</span><input id="bodyW" type="number" min="0.1" max="20" step="0.05" inputmode="decimal"></label>
+        <label><span class="lab">Height · ft</span><input id="bodyH" type="number" min="0.1" max="20" step="0.05" inputmode="decimal"></label>
+        <label><span class="lab">Depth · ft</span><input id="bodyD" type="number" min="0.1" max="20" step="0.05" inputmode="decimal"></label>
+        <label><span class="lab">Lens sticks out · ft</span><input id="bodyLp" type="number" min="0" max="5" step="0.05" inputmode="decimal"></label>
+      </div>
+      <button id="clearBody" type="button">Clear body</button>
+    </div>
+
     <div class="grp">
       <h3>Room</h3>
       <div><label class="lab" for="roomW">Width <span class="val" id="roomWv">40' 0"</span></label><input id="roomW" type="range" min="12" max="120" step="0.5" value="40"></div>
       <div><label class="lab" for="roomD">Depth <span class="val" id="roomDv">40' 0"</span></label><input id="roomD" type="range" min="12" max="180" step="0.5" value="40"></div>
       <div><label class="lab" for="roomH">Ceiling <span class="val" id="roomHv">20' 0"</span></label><input id="roomH" type="range" min="8" max="60" step="0.5" value="20"></div>
+      <div><label class="lab" for="roomC">Keep clear around projector <span class="val" id="roomCv">1' 0"</span></label><input id="roomC" type="range" min="0" max="6" step="0.25" value="1"></div>
       <div class="scene-actions"><button id="addObstacle" type="button">Add obstruction</button><button id="clearObstacles" type="button">Clear obstructions</button></div>
       <div id="obstacleEditor" hidden>
         <div class="unit-strip" id="obstacleStrip" role="group" aria-label="Room obstructions"></div>
@@ -437,6 +450,7 @@ html[data-calculation-mode=blocked] .provenance-badge,html[data-calculation-mode
       <div><dt>Lens</dt><dd id="fLens">—</dd></div>
       <div><dt>Optical height</dt><dd id="fHeight">6' 0"</dd></div>
       <div><dt>Room</dt><dd id="fRoom">40' × 40' × 20'</dd></div>
+      <div><dt>Projector body</dt><dd id="fBody">—</dd></div>
       <div><dt>Units</dt><dd id="fUnits">1</dd></div>
       <div><dt>Obstructions</dt><dd id="fObstacles">none</dd></div>
     </dl>
@@ -602,7 +616,6 @@ function resolveStageTransfer(){
   const screenWidth = bounded('w',20,2,200), screenAspect = bounded('ar',1.7778,0.2,10), basisWidth = bounded('basisW',screenWidth,1,300), rasterAspect = bounded('rasterAr',screenAspect,0.2,10);
   const shiftUp=number('su',NaN),shiftDown=number('sd',NaN),shiftLeft=number('sl',NaN),shiftRight=number('sr',NaN);
   const shift=[shiftUp,shiftDown,shiftLeft,shiftRight].some(Number.isFinite)?{up:shiftUp,down:shiftDown,left:shiftLeft,right:shiftRight}:undefined;
-  const base = {w:screenWidth,bottom:bounded('bottom',4,0,100),ar:screenAspect,basisW:basisWidth,basisScale:basisWidth/screenWidth,rasterAr:rasterAspect,lh:bounded('lh',6,0,100),dist:bounded('dist',22,1,300),shift,tolerance:bounded('tolPct',5,0,15)};
   const requestedMode = params.get('mode') || 'manual', projectorId = params.get('projector') || '', lensId = params.get('lens') || '', profileId = params.get('profile') || '';
   const data = STAGE_CATALOG.data;
   const projector = data.projectors.find(item=>item.projector_id===projectorId) || null;
@@ -610,6 +623,11 @@ function resolveStageTransfer(){
   const compatibility = data.compatibility.find(item=>item.projector_id===projectorId && item.lens_id===lensId) || null;
   const profile = data.opticalProfiles.find(item=>item.projector_id===projectorId && item.lens_id===lensId && (!profileId || item.optical_profile_id===profileId)) || null;
   const hasIds = !!(projectorId || lensId || profileId), validIds = !!(projector && lens && compatibility && (!profileId || profile?.optical_profile_id===profileId));
+  // Projector body: maker dimensions for a valid catalog pair, otherwise the planner's typed-in dimensions (feet).
+  const mmToFt = value => Number.isFinite(Number(value)) && Number(value) > 0 ? Number(value) / 304.8 : NaN;
+  const catalogBody = validIds && projector.body ? {width:mmToFt(projector.body.width_mm),height:mmToFt(projector.body.height_mm),depth:mmToFt(projector.body.depth_mm),lensProtrusion:Number.isFinite(mmToFt(lens.lens_protrusion_mm))?mmToFt(lens.lens_protrusion_mm):0,source:'catalog',label:`${projector.model_number} + ${lens.lens_model_number}`} : undefined;
+  const paramBody = ['bw','bh','bd'].every(key=>Number.isFinite(number(key,NaN)) && number(key,NaN) > 0) ? {width:number('bw'),height:number('bh'),depth:number('bd'),lensProtrusion:Math.max(0,number('lp',0)),source:'manual',label:'from the planner'} : undefined;
+  const base = {w:screenWidth,bottom:bounded('bottom',4,0,100),ar:screenAspect,basisW:basisWidth,basisScale:basisWidth/screenWidth,rasterAr:rasterAspect,lh:bounded('lh',6,0,100),dist:bounded('dist',22,1,300),shift,tolerance:bounded('tolPct',5,0,15),body:catalogBody||paramBody,room:{clearance:bounded('clr',1,0,10)}};
   const ratio = number('ratio',NaN), stamp = params.get('stamp') || '';
   if (requestedMode === 'field_verified' && hasIds && (!STAGE_CATALOG.ok || !validIds)) return {...base,mode:'blocked',wide:NaN,tele:NaN,allowed:false,label:'Invalid field transfer',reason:'CAN’T CALCULATE YET · this link names a projector and lens that don’t match a known pair.',profile:null};
   if (requestedMode === 'field_verified') {
@@ -690,7 +708,8 @@ let sceneState = SceneState.createSceneState({
   basisW:STAGE_TRANSFER.basisW,rasterAr:STAGE_TRANSFER.rasterAr,
   wide:STAGE_TRANSFER.wide,tele:STAGE_TRANSFER.tele,lh:STAGE_TRANSFER.lh,
   dist:STAGE_TRANSFER.dist,mode:STAGE_TRANSFER.mode,allowed:STAGE_TRANSFER.allowed,
-  label:STAGE_TRANSFER.label,reason:STAGE_TRANSFER.reason,shift:STAGE_TRANSFER.shift,verification:STAGE_TRANSFER.verification,tolerance:STAGE_TRANSFER.tolerance
+  label:STAGE_TRANSFER.label,reason:STAGE_TRANSFER.reason,shift:STAGE_TRANSFER.shift,verification:STAGE_TRANSFER.verification,tolerance:STAGE_TRANSFER.tolerance,
+  body:STAGE_TRANSFER.body,room:STAGE_TRANSFER.room
 });
 const initialScene = JSON.stringify(sceneState);
 const state = {};
@@ -818,9 +837,12 @@ function updateWorkspaceFacts(geometry){
   const layoutLabel=sceneState.layoutMode==='blend'?'blend spread':sceneState.layoutMode;
   els('fUnits').textContent=`${sceneState.projectors.length} · ${layoutLabel}`;
   els('fObstacles').textContent=sceneState.obstacles.length?`${sceneState.obstacles.length} · ${geometry.collisions.length} in the light path`:'none';
-  const roomConflicts=SceneState.roomConflicts(sceneState).map(item=>item.label);
-  const alerts=[...geometry.collisions.map(item=>item.label),...roomConflicts];
-  collisionAlert.dataset.active=String(alerts.length>0); collisionAlert.textContent=alerts.length?`Fix · ${alerts.join(' · ')}`:'Nothing in the way';
+  const roomConflicts=SceneState.roomConflicts(sceneState);
+  const alerts=[...geometry.collisions.map(item=>item.label),...roomConflicts.map(item=>item.label)];
+  const mustFix=geometry.collisions.length>0||roomConflicts.some(item=>item.tone!=='warn');
+  collisionAlert.dataset.active=String(alerts.length>0); collisionAlert.textContent=alerts.length?`${mustFix?'Fix':'Check'} · ${alerts.join(' · ')}`:'Nothing in the way';
+  const body=SceneState.activeProjector(sceneState).body;
+  els('fBody').textContent=body?`${fmt(body.width)} W × ${fmt(body.height)} H × ${fmt(body.depth)} D · lens +${fmt(body.lensProtrusion)} · ${body.source==='catalog'?'from maker data':'typed in'}`:'not set · lens position only';
   const verdict=`${geometry.placement.label}|${geometry.provenance.label}|${alerts.join('|')}`;
   if(verdict!==lastVerdict&&alerts.length)window.gsap?.fromTo(collisionAlert,{scale:.98,opacity:.45},{scale:1,opacity:1,duration:.28,ease:'power2.out'});
   lastVerdict=verdict;
@@ -846,7 +868,11 @@ function renderObstacleEditor(){
 
 function syncInputsFromState(){
   syncFlatState();
-  const values={sw:state.w,st:state.bottom,lh:state.lh,d:state.dist,px:state.x,targetX:state.targetX,roomW:sceneState.room.width,roomD:sceneState.room.depth,roomH:sceneState.room.height};
+  const values={sw:state.w,st:state.bottom,lh:state.lh,d:state.dist,px:state.x,targetX:state.targetX,roomW:sceneState.room.width,roomD:sceneState.room.depth,roomH:sceneState.room.height,roomC:sceneState.room.clearance};
+  const body=SceneState.activeProjector(sceneState).body;
+  [['bodyW','width'],['bodyH','height'],['bodyD','depth'],['bodyLp','lensProtrusion']].forEach(([id,key])=>{els(id).value=body?String(Number(body[key].toFixed(2))):'';});
+  els('bodySource').textContent=body?`${body.source==='catalog'?'From maker data':'Typed in'}${body.label?` · ${body.label}`:''}. Room and clearance checks use this body.`:'Not set. The room check uses the lens position only.';
+  els('clearBody').disabled=!body;
   Object.entries(values).forEach(([id,value])=>{const input=els(id);if(value>Number(input.max))input.max=Math.ceil(value*1.25);if(value<Number(input.min))input.min=Math.floor(value*1.25);input.value=value;els(`${id}v`).textContent=fmt(value);input.setAttribute('aria-valuetext',fmt(value));});
   const aspectSelect=els('ar');[...aspectSelect.options].filter(option=>option.dataset.transferred).forEach(option=>option.remove());
   let aspectOption=[...aspectSelect.options].find(option=>Math.abs(Number(option.value)-state.ar)<.001);
@@ -874,7 +900,9 @@ function syncSceneControls(){
 function applySceneIntent(intent,{announceText=''}={}){sceneState=SceneState.applyIntent(sceneState,intent);syncInputsFromState();rebuild();if(announceText)announce(announceText);}
 function bindSceneRange(id,type){const input=els(id);input.addEventListener('input',()=>applySceneIntent({type,value:Number(input.value)}));input.addEventListener('change',()=>announce(`${input.labels[0].childNodes[0].textContent.trim()} ${fmt(Number(input.value))}`));}
 [['sw','set-screen-width'],['st','set-screen-bottom'],['lh','set-lens-height'],['d','set-distance'],['px','set-projector-x'],['targetX','set-projector-target-x']].forEach(([id,type])=>bindSceneRange(id,type));
-[['roomW','width'],['roomD','depth'],['roomH','height']].forEach(([id,key])=>{els(id).addEventListener('input',event=>applySceneIntent({type:'set-room',key,value:Number(event.target.value)}));});
+[['roomW','width'],['roomD','depth'],['roomH','height'],['roomC','clearance']].forEach(([id,key])=>{els(id).addEventListener('input',event=>applySceneIntent({type:'set-room',key,value:Number(event.target.value)}));});
+[['bodyW','width'],['bodyH','height'],['bodyD','depth'],['bodyLp','lensProtrusion']].forEach(([id,key])=>els(id).addEventListener('input',event=>{const value=Number(event.target.value);if(Number.isFinite(value)&&event.target.value!=='')applySceneIntent({type:'set-body',key,value});}));
+els('clearBody').onclick=()=>applySceneIntent({type:'clear-body'},{announceText:'Projector body cleared. The room check uses the lens position only.'});
 els('ar').addEventListener('change',event=>applySceneIntent({type:'set-screen-aspect',value:Number(event.target.value)},{announceText:`Aspect ${event.target.selectedOptions[0].textContent}`}));
 els('lens').addEventListener('change',event=>{const[min,max]=event.target.value.split(',').map(Number);applySceneIntent({type:'set-optical-range',min,max},{announceText:`Lens ${event.target.selectedOptions[0].textContent}`});});
 const snapDist=(target,label)=>applySceneIntent({type:'snap-distance',target},{announceText:`${label} ${fmt(state.dist)}`});
@@ -1015,10 +1043,13 @@ function cyl(rt,rb,h,seg,mat,name){
 
 /* ---------- projector on a cart ---------- */
 // Body local space: +Z points toward the screen (the throw direction).
-function buildProjector(){
+function bodyDims(item){ const body=item?.body; return body?{width:body.width*FT,height:body.height*FT,depth:body.depth*FT,lensProtrusion:body.lensProtrusion*FT}:null; }
+function buildProjector(dims){
   const g = new THREE.Group(); g.name = 'projector';
 
-  const BW = 0.62, BH = 0.24, BD = 0.60;
+  // Generic silhouette by default; true maker dimensions when the scene carries a body (lens on the body's centre line).
+  const BW = dims ? dims.width : 0.62, BH = dims ? dims.height : 0.24, BD = dims ? dims.depth : 0.60;
+  const lensYf = dims ? 0.5 : 0.56, k = dims ? Math.max(0.05, dims.lensProtrusion) / 0.246 : 1, rk = Math.min(1, BH / 0.24);
   const body = rbox(BW, BH, BD, 0.028, M.chassis, 'projector_body');
   body.position.y = BH/2;
   g.add(body);
@@ -1046,20 +1077,20 @@ function buildProjector(){
   handle.position.set(0, BH*0.74, -BD/2 - 0.014); g.add(handle);
 
   // lens assembly, protruding — the silhouette cue that says "projector"
-  const mount = cyl(0.105, 0.105, 0.030, 40, M.bezel, 'lens_mount');
-  mount.rotation.x = Math.PI/2; mount.position.set(0, BH*0.56, BD/2 + 0.020); g.add(mount);
+  const mount = cyl(0.105*rk, 0.105*rk, 0.030*k, 40, M.bezel, 'lens_mount');
+  mount.rotation.x = Math.PI/2; mount.position.set(0, BH*lensYf, BD/2 + 0.020*k); g.add(mount);
 
-  const barrel = cyl(0.086, 0.098, 0.20, 40, M.bezel, 'lens_barrel');
-  barrel.rotation.x = Math.PI/2; barrel.position.set(0, BH*0.56, BD/2 + 0.128); g.add(barrel);
+  const barrel = cyl(0.086*rk, 0.098*rk, 0.20*k, 40, M.bezel, 'lens_barrel');
+  barrel.rotation.x = Math.PI/2; barrel.position.set(0, BH*lensYf, BD/2 + 0.128*k); g.add(barrel);
 
-  const zoomRing = cyl(0.094, 0.094, 0.042, 40, M.ring, 'zoom_ring');
-  zoomRing.rotation.x = Math.PI/2; zoomRing.position.set(0, BH*0.56, BD/2 + 0.150); g.add(zoomRing);
+  const zoomRing = cyl(0.094*rk, 0.094*rk, 0.042*k, 40, M.ring, 'zoom_ring');
+  zoomRing.rotation.x = Math.PI/2; zoomRing.position.set(0, BH*lensYf, BD/2 + 0.150*k); g.add(zoomRing);
 
-  const hood = cyl(0.090, 0.086, 0.028, 40, M.bezel, 'lens_hood');
-  hood.rotation.x = Math.PI/2; hood.position.set(0, BH*0.56, BD/2 + 0.238); g.add(hood);
+  const hood = cyl(0.090*rk, 0.086*rk, 0.028*k, 40, M.bezel, 'lens_hood');
+  hood.rotation.x = Math.PI/2; hood.position.set(0, BH*lensYf, BD/2 + 0.238*k); g.add(hood);
 
-  const glass = cyl(0.078, 0.078, 0.010, 40, M.glass, 'front_element');
-  glass.rotation.x = Math.PI/2; glass.position.set(0, BH*0.56, BD/2 + 0.246); g.add(glass);
+  const glass = cyl(0.078*rk, 0.078*rk, 0.010*k, 40, M.glass, 'front_element');
+  glass.rotation.x = Math.PI/2; glass.position.set(0, BH*lensYf, BD/2 + 0.246*k); g.add(glass);
 
   // adjustable feet
   [[-1,-1],[1,-1],[-1,1],[1,1]].forEach(([sx,sz],i)=>{
@@ -1067,8 +1098,8 @@ function buildProjector(){
     f.position.set(sx*(BW/2-0.07), -0.018, sz*(BD/2-0.08)); g.add(f);
   });
 
-  g.userData.lensY = BH*0.56;
-  g.userData.lensZ = BD/2 + 0.246;
+  g.userData.lensY = BH*lensYf;
+  g.userData.lensZ = BD/2 + 0.246*k;
   return g;
 }
 
@@ -1289,7 +1320,7 @@ function buildManipulators(projector,geometry){
 
 /* ---------- assembly ---------- */
 const root = new THREE.Group(); root.name = 'throwline_stage';
-const proj = buildProjector();
+let proj = buildProjector(); let projSignature = '';
 let screenGrp = null, projectionGrp = null, roomGrp = null, cartGrp = null;
 let extraUnitsGrp = null, envelopeGrp = null, obstacleGrp = null, manipulatorGrp = null, guideGrp = null;
 root.add(proj);
@@ -1309,7 +1340,9 @@ function rebuildScene(){
   roomGrp.visible = state.room;
   roomGrp.getObjectByName('deck_grid').visible = state.grid;
 
-  // projector: lens front element sits exactly at the set distance
+  // projector: lens front element sits exactly at the set distance; rebuild the model when the body dimensions change
+  const bodySignature = JSON.stringify(active.body || null);
+  if (bodySignature !== projSignature) { root.remove(proj); disposeObject3D(proj); proj = buildProjector(bodyDims(active)); root.add(proj); projSignature = bodySignature; }
   proj.rotation.y = Math.PI;                       // face the screen (-Z)
   proj.position.set(state.x*FT, lensY - proj.userData.lensY, dist + proj.userData.lensZ);
 
@@ -1321,7 +1354,7 @@ function rebuildScene(){
 
   const extras=new THREE.Group(); extras.name='additional_projector_units';
   sceneState.projectors.filter(item=>item.id!==active.id).forEach(item=>{
-    const unit=buildProjector(); unit.rotation.y=Math.PI;
+    const unit=buildProjector(bodyDims(item)); unit.rotation.y=Math.PI;
     unit.position.set(item.position.x*FT,item.position.lensHeight*FT-unit.userData.lensY,item.position.distance*FT+unit.userData.lensZ);
     unit.userData.projectorId=item.id; extras.add(unit);
   });

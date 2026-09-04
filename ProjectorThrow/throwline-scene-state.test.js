@@ -356,3 +356,37 @@ test('every calculation-ready catalog profile resolves at its own basis shape', 
     });
   });
 });
+
+test('projector bodies are normalized, edited through intents, and dropped when incomplete', () => {
+  const scene = Scene.createSceneState({ ...{ w: 20, bottom: 4, ar: 1.777778, basisW: 20, rasterAr: 1.6, lh: 6, dist: 22, wide: 0.978, tele: 1.32, mode: 'manual', allowed: true }, body: { width: 2.36, height: 1.46, depth: 3.51, lensProtrusion: 0.68, source: 'catalog', label: 'PT-RQ50K + ET-D3QT500' } });
+  const body = Scene.activeProjector(scene).body;
+  assert.deepEqual(body, { width: 2.36, height: 1.46, depth: 3.51, lensProtrusion: 0.68, source: 'catalog', label: 'PT-RQ50K + ET-D3QT500' });
+  const extents = Scene.bodyExtents(Scene.activeProjector(scene));
+  near(extents.front, 22.68); near(extents.rear, 26.19); near(extents.top, 6.73); near(extents.bottom, 5.27); near(extents.left, -1.18); near(extents.right, 1.18);
+  const edited = Scene.applyIntent(scene, { type: 'set-body', key: 'depth', value: 4 });
+  assert.equal(Scene.activeProjector(edited).body.depth, 4);
+  assert.equal(Scene.activeProjector(edited).body.source, 'manual');
+  assert.equal(Scene.activeProjector(Scene.applyIntent(scene, { type: 'clear-body' })).body, undefined);
+  assert.equal(Scene.normalizeSceneState({ projectors: [{ body: { width: 2, height: '' } }] }).projectors[0].body, undefined);
+  assert.equal(Scene.normalizeSceneState({ room: {} }).room.clearance, 0, 'saved scenes without a margin keep 0');
+  assert.equal(Scene.applyIntent(scene, { type: 'set-room', key: 'clearance', value: 1.4 }).room.clearance, 1.5);
+});
+
+test('room checks judge the projector body and the keep-clear margin', () => {
+  const base = Scene.createSceneState({ w: 20, bottom: 4, ar: 1.777778, basisW: 20, rasterAr: 1.6, lh: 6, dist: 22, wide: 0.978, tele: 1.32, mode: 'manual', allowed: true, body: { width: 2, height: 1.5, depth: 3, lensProtrusion: 0.5 } });
+  const kinds = scene => Scene.roomConflicts(scene).map(item => `${item.kind}:${item.tone}`);
+  assert.deepEqual(kinds(base), []);
+  const tightDepth = Scene.normalizeSceneState({ ...base, room: { ...base.room, depth: 25 } });
+  assert.deepEqual(kinds(tightDepth), ['body-depth:bad'], 'lens at 22 ft plus 0.5 ft protrusion plus 3 ft body = 25.5 ft rear, through a 25 ft wall');
+  const margin = Scene.normalizeSceneState({ ...base, room: { ...base.room, depth: 26, clearance: 1 } });
+  assert.deepEqual(kinds(margin), ['body-depth-clearance:warn']);
+  assert.equal(Scene.assessInstallation(margin).tone, 'warn');
+  const lowCeiling = Scene.normalizeSceneState({ ...base, screen: { width: 20, aspect: 1.777778, bottom: 0 }, room: { ...base.room, height: 8 }, projectors: [{ ...base.projectors[0], position: { ...base.projectors[0].position, lensHeight: 7.5 } }] });
+  assert.ok(kinds(lowCeiling).includes('body-height:bad'));
+  const floor = Scene.normalizeSceneState({ ...base, projectors: [{ ...base.projectors[0], position: { ...base.projectors[0].position, lensHeight: 0.5 } }] });
+  assert.ok(kinds(floor).includes('body-floor:bad'));
+  const side = Scene.applyIntent(base, { type: 'set-projector-x', value: 19.5 });
+  assert.ok(kinds(side).includes('body-width:bad'));
+  const noBody = Scene.normalizeSceneState({ ...tightDepth, projectors: [{ ...tightDepth.projectors[0], body: undefined }] });
+  assert.deepEqual(kinds(noBody), [], 'without body data the lens position alone is inside the room');
+});
