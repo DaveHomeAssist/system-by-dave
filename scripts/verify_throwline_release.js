@@ -526,7 +526,7 @@ requireMatch(stage, /SceneState\.roomConflicts\(/, 'Stage 3D must derive room co
 requireMatch(stage, /geometry\.shift\b/, 'Stage 3D must judge lens shift through the direction-aware scene-state assessment.');
 requireMatch(stage, /requestedMode\s*===\s*['"]field_verified['"][\s\S]*?number\(['"]md['"][\s\S]*?number\(['"]mw['"][\s\S]*?Date\.parse\(stamp\)/, 'Stage 3D must require measurement evidence and a real timestamp before honoring a FIELD VERIFIED transfer.');
 requireMatch(main, /put\(["']md["'][\s\S]*?put\(["']mw["'][\s\S]*?put\(["']vb["']/, 'The planner must transfer the field measurement evidence with a field-verified Stage 3D link.');
-['roomConflicts', 'PLACEMENT_TOLERANCE', "'snap-distance'", 'resolveProfileRatio'].forEach((token) => {
+['roomConflicts', 'PLACEMENT_TOLERANCE', "'snap-distance'", 'resolveProfileRatio', 'bodyExtents', "'set-body'", 'clearance'].forEach((token) => {
   if (!sceneState.includes(token)) fail(`Throwline scene-state contract is missing ${token}.`);
 });
 if (!fs.existsSync(path.join(ROOT, 'scripts/probe_throwline_stage3d.js'))) fail('The Stage 3D browser regression probe is missing.');
@@ -538,6 +538,10 @@ const stageTryIndex = stage.indexOf('const { THREE } = await stage.ready');
 requireMatch(stage, /SceneState\.assessInstallation\(/, 'Stage 3D headline must come from the aggregate installation check.');
 requireMatch(stage, /bounded\(['"]tolPct['"]/, 'Stage 3D must accept the transferred planning tolerance.');
 requireMatch(stage, /SceneState\.resolveProfileRatio\(profile,\s*rasterAspect\)/, 'Stage 3D must resolve verified catalog ratios by picture shape.');
+requireMatch(stage, /id=["']roomC["']/, 'Stage 3D must expose the keep-clear margin control.');
+requireMatch(stage, /type:\s*['"]set-body['"]/, 'Stage 3D must edit projector bodies through the scene contract.');
+requireMatch(stage, /buildProjector\(bodyDims\(/, 'Stage 3D must draw projector bodies at their scene dimensions.');
+requireMatch(main, /put\(["']bw["']/, 'The planner must transfer maker body dimensions to Stage 3D.');
 requireMatch(main, /sceneApi\.resolveProfileRatio\(catalogSelection\.profile,\s*raster\.asp\)/, 'The planner must resolve verified catalog ratios by picture shape.');
 requireMatch(main, /put\(["']tolPct["']/, 'The planner must transfer its planning tolerance to Stage 3D.');
 ['assessInstallation', "'set-tolerance'", 'axisOverlapInterval', 'COVERAGE_TOLERANCE'].forEach((token) => {

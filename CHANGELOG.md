@@ -2,6 +2,12 @@
 
 ## 2026-09-04
 
+### Throwline projector body and clearance
+
+* Projector units can carry a body (width, height, depth, lens protrusion). A catalog pair fills it from maker dimensions automatically; otherwise it can be typed in Stage 3D or transferred from the planner. Stage 3D draws the body at true size.
+* Room checks now judge the body: through the back wall, ceiling, floor, or a side wall reads Needs a fix; inside the new keep-clear margin (`room.clearance`, default 1 ft for new transfers) reads Worth a look. The planner's rear tape mark uses the same maker depth plus lens protrusion and says so.
+* Added scene-state tests, probe checks, and verifier contracts; rolled the AV Suite offline cache version.
+
 ### Throwline lens catalog verification pass
 
 * Verified ten projector-and-lens profiles against documents read in full on the makers' own domains: Panasonic PT-RQ50K with six ET-D3Q zoom lenses (operating instructions, projected-width tables and distance formulas for 17:9, 16:10, 16:9, and 4:3), Epson Pro L30000UNL with ELPLM12 and ELPLX03 (specification formula table with the distance-over-width ratio column), and Sony VPL-GTZ380 with VPLL-Z8008 and VPLL-Z8014 (help-guide tables that resolve the earlier "conflicting" ratios as 17:9 and 16:9 width bases). These now open as MANUFACTURER VERIFIED in the planner and Stage 3D.
