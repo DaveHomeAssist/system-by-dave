@@ -485,3 +485,26 @@ test('link lengths convert to feet by their unit marker', () => {
   assert.ok(Number.isNaN(Scene.lengthToFeet('', 'm')));
   near(Scene.LENGTH_UNITS.m, 3.280839895, 1e-9);
 });
+
+test('a scene turns back into a Stage 3D link that carries the unit, catalog identity, shift, body, room, and stamp', () => {
+  const verified = Scene.createSceneState({ w: 20, bottom: 4, ar: 1.8962963, basisW: 20, rasterAr: 1.8962963, lh: 6, dist: 50, x: -2, targetX: 0.5, wide: 2, tele: 3.41, mode: 'verified_image_width', allowed: true, label: 'PT-RQ50K + ET-D3QT500', catalog: { projector: 'PRJ-001', lens: 'LNS-004', profile: 'OPT-002' }, shift: { up: 45, down: 45, left: 16, right: 16, combined: 'ellipse.assumed' }, tolerance: 7, room: { clearance: 1.5, depth: 60 } });
+  const params = Scene.transferParamsFor(verified);
+  assert.equal(params.u, 'ft');
+  assert.deepEqual([params.mode, params.projector, params.lens, params.profile], ['verified_image_width', 'PRJ-001', 'LNS-004', 'OPT-002']);
+  assert.deepEqual([params.w, params.bottom, params.dist, params.lh, params.px, params.tx, params.tolPct, params.clr, params.rd], ['20', '4', '50', '6', '-2', '0.5', '7', '1.5', '60']);
+  assert.deepEqual([params.su, params.sl, params.sc], ['45', '16', 'ellipse.assumed']);
+  assert.equal(params.min, undefined, 'catalog scenes re-resolve the maker ratio instead of carrying numbers');
+  assert.equal(params.bw, undefined, 'catalog bodies come back from the ids');
+  assert.equal(Scene.activeProjector(verified).provenance.catalog.profile, 'OPT-002');
+  const manual = Scene.applyIntent(Scene.createSceneState({ w: 20, bottom: 4, ar: 16 / 9, basisW: 20, rasterAr: 1.6, lh: 6, dist: 22, wide: 0.978, tele: 1.32, mode: 'manual', allowed: true, body: { width: 2, height: 1, depth: 3, lensProtrusion: 0.5, source: 'manual' } }), { type: 'set-distance', value: 24 });
+  const manualParams = Scene.transferParamsFor(manual);
+  assert.deepEqual([manualParams.mode, manualParams.min, manualParams.max, manualParams.dist, manualParams.bw, manualParams.bd, manualParams.lp], ['manual', '0.978', '1.32', '24', '2', '3', '0.5']);
+  assert.equal(manualParams.projector, undefined);
+  const stamped = Scene.stampFieldVerification(manual, { measuredDistance: 12, measuredWidth: 10, verifiedBy: 'Dave' });
+  const stampParams = Scene.transferParamsFor(stamped);
+  assert.deepEqual([stampParams.mode, stampParams.ratio, stampParams.md, stampParams.mw, stampParams.vb], ['field_verified', '1.2', '12', '10', 'Dave']);
+  assert.ok(Number.isFinite(Date.parse(stampParams.stamp)));
+  const restored = Scene.createSceneState({ w: Number(stampParams.w), bottom: Number(stampParams.bottom), ar: Number(stampParams.ar), basisW: Number(stampParams.basisW), rasterAr: Number(stampParams.rasterAr), lh: Number(stampParams.lh), dist: Number(stampParams.dist), wide: Number(stampParams.ratio), tele: Number(stampParams.ratio), mode: stampParams.mode, allowed: true, verification: { ratio: Number(stampParams.ratio), measuredDistance: Number(stampParams.md), measuredWidth: Number(stampParams.mw), verifiedBy: stampParams.vb, verifiedAt: stampParams.stamp } });
+  assert.equal(Scene.calculateProjectorGeometry(restored).envelope.wideDistance, Scene.calculateProjectorGeometry(stamped).envelope.wideDistance);
+  assert.equal(Scene.activeProjector(Scene.createSceneState({ catalog: { projector: '', lens: 'LNS-004' } })).provenance.catalog, undefined);
+});

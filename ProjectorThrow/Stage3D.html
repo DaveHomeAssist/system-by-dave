@@ -140,6 +140,15 @@ body[data-field-verify=true] header{position:sticky;top:0;z-index:9}
 html[data-calculation-mode="manufacturer_unspecified"] .calculation-gate,html[data-calculation-mode="conflicting"] .calculation-gate,html[data-calculation-mode="partial"] .calculation-gate,html[data-calculation-mode="legacy_unverified"] .calculation-gate,html[data-calculation-mode="blocked"] .calculation-gate{border-color:var(--safety);background:var(--safety-lo);color:var(--safety)}
 .onboarding-dialog{width:min(760px,calc(100vw - 32px));max-height:calc(100dvh - 32px);margin:auto;padding:0;border:1px solid var(--line);border-radius:8px;background:var(--case);color:var(--chalk);box-shadow:0 28px 90px rgba(15,17,20,.38);overflow:auto}
 .onboarding-dialog::backdrop{background:rgba(15,17,20,.64);backdrop-filter:blur(5px)}
+.job-sheet{padding:22px 26px;font-family:inherit;color:var(--chalk);line-height:1.45}
+.job-sheet h3{margin:14px 0 4px;font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+.job-sheet ul{margin:0;padding-left:18px}.job-sheet li,.job-sheet p{margin:2px 0;font-size:14px}
+.job-sheet-actions{display:flex;gap:8px;justify-content:flex-end;margin-bottom:6px}.job-sheet-actions button{min-height:44px}
+.job-sheet-headline{font-size:17px;font-weight:600}
+.job-sheet-link{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:start;margin-top:12px}
+.job-sheet-qr svg{width:168px;height:168px;background:#fff;border-radius:6px}
+.job-sheet-link a{word-break:break-all;font-size:12px;color:var(--info)}
+@media print{html,body{overflow:visible!important;height:auto!important;background:#fff}body>*:not(#jobSheetDialog){display:none!important}#jobSheetDialog{display:block;position:static;width:auto;max-width:none;max-height:none;border:0;box-shadow:none;background:#fff;color:#000;margin:0;padding:0;overflow:visible}#jobSheetDialog::backdrop{display:none}.job-sheet{color:#000}.job-sheet h3{color:#333}.job-sheet-actions{display:none!important}.job-sheet-link a{color:#000}}
 .onboarding-shell{position:relative;padding:28px;background:linear-gradient(145deg,var(--case) 0 67%,var(--hazard-lo) 100%)}
 .onboarding-close{position:absolute;z-index:2;right:16px;top:16px;width:44px;min-height:44px;padding:0;font-size:19px;line-height:1}
 .onboarding-kicker{margin:0 48px 7px 0;color:var(--hazard);font:700 10px var(--mono);letter-spacing:.14em;text-transform:uppercase}
@@ -398,6 +407,7 @@ html[data-calculation-mode=blocked] .provenance-badge,html[data-calculation-mode
         <button id="saveScene" type="button">Save scene</button><button id="restoreScene" type="button">Restore scene</button>
         <button id="importScene" type="button">Import JSON</button><button id="downloadScene" type="button">Download JSON</button>
         <button id="resetScene" type="button">Reset scene</button>
+        <button id="jobSheetOpen" class="pri" type="button">Job sheet</button>
       </div>
       <input id="sceneFile" type="file" accept="application/json,.json" hidden>
     </div>
@@ -434,6 +444,7 @@ html[data-calculation-mode=blocked] .provenance-badge,html[data-calculation-mode
     <section class="mobile-exports" id="stageExportSheet" aria-label="Stage export">
       <button id="mobileObj" type="button" disabled>Download OBJ + MTL</button>
       <button id="mobileGlb" type="button" disabled>Download GLB</button>
+      <button id="mobileJobSheet" type="button">Job sheet</button>
     </section>
     <div class="stage-canvas">
       <three-d-stage name="throwline-stage" fallback="index.html?workspace=planner" role="region" aria-label="Interactive Throwline Stage 3D"></three-d-stage>
@@ -491,10 +502,29 @@ html[data-calculation-mode=blocked] .provenance-badge,html[data-calculation-mode
     </div>
   </div>
 </dialog>
+<dialog class="onboarding-dialog job-sheet-dialog" id="jobSheetDialog" aria-labelledby="jobSheetTitle">
+  <article class="job-sheet" id="jobSheet">
+    <div class="job-sheet-actions"><button class="pri" id="jobSheetPrint" type="button">Print</button><button id="jobSheetClose" type="button">Close</button></div>
+    <p class="onboarding-kicker">Throwline · crew job sheet</p>
+    <h2 class="onboarding-title" id="jobSheetTitle">Projector job sheet</h2>
+    <p class="job-sheet-meta"><span id="jsUnit">—</span> · printed <span id="jsDate">—</span></p>
+    <p class="job-sheet-status" id="jsStatus">—</p>
+    <p class="job-sheet-headline" id="jsHeadline">—</p>
+    <section><h3>Where the projector goes</h3><ul id="jsPlacement"></ul></section>
+    <section><h3>Screen and picture</h3><ul id="jsScreen"></ul></section>
+    <section><h3>Lens and set mark</h3><ul id="jsLens"></ul></section>
+    <section><h3>Lens shift</h3><p id="jsShift">—</p></section>
+    <section><h3>Room</h3><ul id="jsRoom"></ul></section>
+    <section><h3>What to check on site</h3><ul id="jsChecks"></ul></section>
+    <section><h3>Measured on site</h3><p id="jsVerify">—</p></section>
+    <section class="job-sheet-link"><div id="jobSheetQr" class="job-sheet-qr" aria-label="QR code for this scene"></div><div><h3>Open this scene</h3><p id="jsLinkNote">—</p><a id="jobSheetLink" href="#">—</a><p id="jsUnits">—</p></div></section>
+  </article>
+</dialog>
 
 <script src="./throwline-scene-state.js"></script>
 <script src="../js/vendor/gsap.min.js"></script>
 <script src="./three-d-stage.js"></script>
+<script src="./vendor/qrcode-generator/qrcode.js"></script>
 <script type="module">
 const FT = 0.3048;
 const SceneState = window.ThrowlineSceneState;
@@ -518,7 +548,7 @@ const offlineBadge = document.getElementById('offlineBadge');
 const offlineStatusTitle = document.getElementById('offlineStatusTitle');
 const offlineStatusDetail = document.getElementById('offlineStatusDetail');
 const ONBOARDING_STORAGE_KEY = 'throwline:stage-onboarding:v1';
-const OFFLINE_CACHE_VERSION = 'v20260905-throwline-verify-units';
+const OFFLINE_CACHE_VERSION = 'v20260905-throwline-job-sheet';
 
 function setOfflineStatus(state,badge,title,detail){
   document.documentElement.dataset.offline=state;
@@ -705,7 +735,10 @@ function resolveStageTransfer(){
   const mmToFt = value => Number.isFinite(Number(value)) && Number(value) > 0 ? Number(value) / 304.8 : NaN;
   const catalogBody = validIds && projector.body ? {width:mmToFt(projector.body.width_mm),height:mmToFt(projector.body.height_mm),depth:mmToFt(projector.body.depth_mm),lensProtrusion:Number.isFinite(mmToFt(lens.lens_protrusion_mm))?mmToFt(lens.lens_protrusion_mm):0,source:'catalog',label:`${projector.model_number} + ${lens.lens_model_number}`} : undefined;
   const paramBody = ['bw','bh','bd'].every(key=>Number.isFinite(length(key,NaN)) && length(key,NaN) > 0) ? {width:length('bw',NaN),height:length('bh',NaN),depth:length('bd',NaN),lensProtrusion:Math.max(0,length('lp',0)),source:'manual',label:'from the planner'} : undefined;
-  const base = {w:screenWidth,bottom:boundedLength('bottom',4,0,100),ar:screenAspect,basisW:basisWidth,basisScale:basisWidth/screenWidth,rasterAr:rasterAspect,lh:boundedLength('lh',6,0,100),dist:boundedLength('dist',22,1,300),linkUnit,shift,shiftSource,tolerance:bounded('tolPct',5,0,15),body:catalogBody||paramBody,room:{clearance:bounded('clr',1,0,10)}};
+  // Position, room, and catalog identity round-trip through job-sheet links (px, tx, rw, rd, rh; projector/lens/profile).
+  const catalog = validIds ? {projector:projectorId,lens:lensId,profile:profile?.optical_profile_id||''} : undefined;
+  const room = {clearance:boundedLength('clr',1,0,10),width:length('rw',undefined),depth:length('rd',undefined),height:length('rh',undefined)};
+  const base = {w:screenWidth,bottom:boundedLength('bottom',4,0,100),ar:screenAspect,basisW:basisWidth,basisScale:basisWidth/screenWidth,rasterAr:rasterAspect,lh:boundedLength('lh',6,0,100),dist:boundedLength('dist',22,1,300),x:boundedLength('px',0,-100,100),targetX:boundedLength('tx',0,-100,100),linkUnit,shift,shiftSource,tolerance:bounded('tolPct',5,0,15),body:catalogBody||paramBody,room,catalog};
   const ratio = number('ratio',NaN), stamp = params.get('stamp') || '';
   if (requestedMode === 'field_verified' && hasIds && (!STAGE_CATALOG.ok || !validIds)) return {...base,mode:'blocked',wide:NaN,tele:NaN,allowed:false,label:'Invalid field transfer',reason:'CAN’T CALCULATE YET · this link names a projector and lens that don’t match a known pair.',profile:null};
   if (requestedMode === 'field_verified') {
@@ -797,7 +830,7 @@ let sceneState = SceneState.createSceneState({
   w:STAGE_TRANSFER.w,bottom:STAGE_TRANSFER.bottom,ar:STAGE_TRANSFER.ar,
   basisW:STAGE_TRANSFER.basisW,rasterAr:STAGE_TRANSFER.rasterAr,
   wide:STAGE_TRANSFER.wide,tele:STAGE_TRANSFER.tele,lh:STAGE_TRANSFER.lh,
-  dist:STAGE_TRANSFER.dist,mode:STAGE_TRANSFER.mode,allowed:STAGE_TRANSFER.allowed,
+  dist:STAGE_TRANSFER.dist,x:STAGE_TRANSFER.x,targetX:STAGE_TRANSFER.targetX,catalog:STAGE_TRANSFER.catalog,mode:STAGE_TRANSFER.mode,allowed:STAGE_TRANSFER.allowed,
   label:STAGE_TRANSFER.label,reason:STAGE_TRANSFER.reason,shift:STAGE_TRANSFER.shift,verification:STAGE_TRANSFER.verification,tolerance:STAGE_TRANSFER.tolerance,
   body:STAGE_TRANSFER.body,room:STAGE_TRANSFER.room
 });
@@ -1089,6 +1122,46 @@ els('stampVerification').onclick=()=>{
     clearFieldVerificationError();syncInputsFromState();rebuild();announce('On-site measurement saved. This unit is now field verified.');
   }catch(error){showFieldVerificationError([{input:els('measuredDistance'),message:String(error?.message||'The field measurement could not be saved.')}]);}
 };
+/* Crew job sheet: the scene in plain language, printable, with a QR link that reopens this exact scene. */
+const jobSheetDialog=els('jobSheetDialog');
+function sceneLinkFor(){ return new URL(`Stage3D.html?${new URLSearchParams(SceneState.transferParamsFor(sceneState)).toString()}`,location.href).href; }
+function sideText(value,positiveWord,negativeWord){ return Math.abs(value)<0.005?null:`${fmt(Math.abs(value))} to the ${value>0?positiveWord:negativeWord}`; }
+function buildJobSheet(){
+  const projector=SceneState.activeProjector(sceneState);
+  const geometry=SceneState.calculateProjectorGeometry(sceneState,projector.id);
+  const verdict=SceneState.assessInstallation(sceneState);
+  const conflicts=SceneState.roomConflicts(sceneState);
+  const body=projector.body, extents=body?SceneState.bodyExtents(projector):null;
+  const link=sceneLinkFor();
+  const set=(id,text)=>{els(id).textContent=text;};
+  const list=(id,items,empty)=>{els(id).replaceChildren(...(items.length?items:[empty]).map(text=>{const li=document.createElement('li');li.textContent=text;return li;}));};
+  set('jsUnit',`${projector.label||'Unit A'} · ${state.label}`);
+  set('jsDate',new Date().toLocaleString());
+  set('jsStatus',`${projector.provenance.label} · ${projector.provenance.reason}`);
+  set('jsHeadline',verdict.label);
+  const side=sideText(projector.position.x,'right','left'), aim=sideText(projector.position.targetX,'right','left');
+  const placement=[`Lens front ${fmt(projector.position.distance)} from the screen surface.`,`Lens centre ${fmt(projector.position.lensHeight)} above the floor.`,side?`Projector ${side} of the screen centre, looking at the screen.`:'Projector in line with the screen centre.',aim?`Picture aimed ${aim} of the screen centre.`:'Picture aimed at the screen centre.'];
+  if(extents)placement.push(`Back of the projector ${fmt(extents.rear)} from the screen. Body ${fmt(body.width)} wide, ${fmt(body.height)} high, ${fmt(body.depth)} deep (${body.source==='catalog'?'maker data':'typed in'}).`);
+  list('jsPlacement',placement);
+  const screen=[`Screen ${fmt(sceneState.screen.width)} wide by ${fmt(sceneState.screen.width/sceneState.screen.aspect)} high, bottom edge ${fmt(sceneState.screen.bottom)} above the floor (${sceneState.screen.aspect.toFixed(3)}:1).`];
+  if(geometry.image){screen.push(`Picture at this distance: ${fmt(geometry.image.width)} by ${fmt(geometry.image.height)}.`);screen.push(geometry.coverage.maxEdgeVariance<0.02?'The picture matches the screen edges.':geometry.coverage.missing>0.02?`The picture leaves ${fmt(geometry.coverage.missing)} of screen uncovered at the worst edge.`:`The picture spills ${fmt(geometry.coverage.spill)} past the screen at the widest edge.`);}
+  list('jsScreen',screen);
+  const lens=geometry.allowed?[`Lens ratio ${state.wide.toFixed(3)}${state.tele!==state.wide?'–'+state.tele.toFixed(3):''}:1 · this spot needs ${geometry.image.requiredRatio.toFixed(3)}:1.`,`${geometry.placement.label}. Marks: wide ${fmt(geometry.envelope.wideDistance)}, tele ${fmt(geometry.envelope.teleDistance)}.`]:[`${projector.provenance.label} · ${projector.provenance.reason}`];
+  list('jsLens',lens);
+  set('jsShift',geometry.image?els('fShift').textContent:'Not calculated yet.');
+  list('jsRoom',[`Room ${fmt(sceneState.room.width)} wide, ${fmt(sceneState.room.depth)} deep, ${fmt(sceneState.room.height)} high · keep ${fmt(sceneState.room.clearance)} clear around the projector.`,...conflicts.map(item=>`${item.tone==='warn'?'Check':'Fix'} · ${item.label}`),...geometry.collisions.map(item=>`Fix · the light path hits ${item.label}`)]);
+  list('jsChecks',verdict.issues.map(issue=>`${issue.tone==='bad'?'Fix':'Check'} · ${issue.label}`),'Ready — everything checks out.');
+  const v=projector.provenance.verification;
+  set('jsVerify',projector.provenance.mode==='field_verified'&&v?`Measured on site: throw ${fmt(v.measuredDistance)}, picture width ${fmt(v.measuredWidth)} (${Number(v.ratio).toFixed(3)}:1), by ${v.verifiedBy||'no name given'} on ${v.verifiedAt?new Date(v.verifiedAt).toLocaleString():'an unknown date'}.`:'Not measured on site yet. Measure the throw and the picture width, then stamp them in Stage 3D or the planner.');
+  set('jsUnits',displayUnit==='m'?'All measurements in metres.':'All measurements in feet and inches.');
+  const linkNode=els('jobSheetLink');linkNode.href=link;linkNode.textContent=link;
+  try{const qr=qrcode(0,'M');qr.addData(link);qr.make();els('jobSheetQr').innerHTML=qr.createSvgTag({cellSize:4,margin:2,scalable:true});}catch(error){els('jobSheetQr').textContent='QR code unavailable · use the link below.';}
+  set('jsLinkNote',`Scan to open this scene on a phone. The link carries ${projector.label||'this unit'}${sceneState.projectors.length>1?' only; the other units are not included':''}.`);
+}
+function openJobSheet(){buildJobSheet();if(typeof jobSheetDialog.showModal==='function')jobSheetDialog.showModal();else jobSheetDialog.setAttribute('open','');announce('Job sheet ready to print');}
+els('jobSheetOpen').onclick=openJobSheet;els('mobileJobSheet').onclick=openJobSheet;
+els('jobSheetClose').onclick=()=>{if(typeof jobSheetDialog.close==='function')jobSheetDialog.close();else jobSheetDialog.removeAttribute('open');};
+els('jobSheetPrint').onclick=()=>window.print();
 els('saveScene').onclick=()=>{try{localStorage.setItem(SceneState.STORAGE_KEY,JSON.stringify(sceneState));announce('Scene saved on this device');}catch{announce('Scene could not be saved');}};
 els('restoreScene').onclick=()=>{try{const saved=localStorage.getItem(SceneState.STORAGE_KEY);if(!saved)throw new Error('No saved scene');sceneState=SceneState.normalizeSceneState(JSON.parse(saved));syncInputsFromState();rebuild();announce('Saved scene restored');}catch(error){announce(error.message);}};
 els('downloadScene').onclick=()=>{const blob=new Blob([JSON.stringify(sceneState,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download='throwline-stage-scene.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),0);announce('Scene JSON downloaded');};

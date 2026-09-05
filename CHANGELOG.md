@@ -2,6 +2,12 @@
 
 ## 2026-09-05
 
+### Throwline crew job sheet
+
+* Stage 3D gained a printable crew job sheet (Scene data › Job sheet, and Job sheet in the phone Export sheet): the active unit in plain language, with where the projector goes, the screen and picture, the lens and set mark, lens shift, the room, what to check on site, the on-site measurement, and a QR code plus link that reopens the exact scene. Printing shows only the sheet.
+* The scene contract turns a scene back into a Stage 3D link (`transferParamsFor()`): feet with `u=ft`, catalog identity (now carried in `provenance.catalog`), position, room, shift, tolerance, clearance, a typed-in body, and the stamp for a field-verified unit. Stage 3D reads position (`px`, `tx`) and room (`rw`, `rd`, `rh`) back from links.
+* Vendored the MIT `qrcode-generator` encoder for offline QR codes, added it to the offline manifest, extended the tests, probe, and verifier, and rolled the AV Suite offline cache version.
+
 ### Throwline one on-site verification model with units
 
 * The scene contract now publishes the on-site verification rule (`FIELD_VERIFICATION`: the shared reason and the list of driving edits) and `applyIntent` uses that list; tolerance, room, overlay, camera, and obstacle edits keep a stamp, driving edits drop it.
