@@ -14,14 +14,15 @@
       "compatibility": 13,
       "opticalProfiles": 12,
       "sources": 18,
-      "researchExceptions": 8
+      "researchExceptions": 9
     },
     "verificationPass": {
       "id": "verification-2026-09-04",
       "completedOn": "2026-09-04",
       "rule": "A profile is calculation-ready only when a document on the maker\u2019s own domain, read in full, lists projection distance beside projected image width (or states distance over width) and distance / width reproduces the published ratio within 2 percent.",
       "readableOnly": true,
-      "unreadableSources": "barco.com product and spare-part pages (HTTP 403 for automated readers); projectorcentral.com (HTTP 403)."
+      "unreadableSources": "barco.com product and spare-part pages (HTTP 403 for automated readers); projectorcentral.com (HTTP 403).",
+      "combinedShiftRule": "Each profile with maker shift limits carries lens_shift_combined_rule: maker_formula when the maker publishes the combined range as a formula (Sony), maker_note when the maker states the maximums cannot be combined but gives no formula (Epson), assumed when the maker shows the range only as a figure (Panasonic)."
     }
   },
   "manufacturers": [
@@ -782,7 +783,13 @@
           }
         ]
       },
-      "distance_tolerance_note": "Panasonic: a +/-5% error in listed projection distances may occur."
+      "distance_tolerance_note": "Panasonic: a +/-5% error in listed projection distances may occur.",
+      "lens_shift_combined_rule": {
+        "shape": "ellipse",
+        "basis": "assumed",
+        "source_id": "SRC-014",
+        "note": "The PT-RQ50K operating instructions (pages 75-76) give the lens shift range as an illustration showing the vertical and horizontal maximums; the text does not state how far the lens can move up and sideways at the same time. Throwline uses an oval inside those maximums until the maker's figure is transcribed, and reports a combined shift past that oval as something to check."
+      }
     },
     {
       "optical_profile_id": "OPT-002",
@@ -921,7 +928,13 @@
       "lens_shift_vertical_percent_min": -45,
       "lens_shift_vertical_percent_max": 45,
       "projection_distance_reference_point": "front end of the projection lens to the screen surface (L); lens protrusion L1 listed separately",
-      "distance_tolerance_note": "Panasonic: a +/-5% error in listed projection distances may occur."
+      "distance_tolerance_note": "Panasonic: a +/-5% error in listed projection distances may occur.",
+      "lens_shift_combined_rule": {
+        "shape": "ellipse",
+        "basis": "assumed",
+        "source_id": "SRC-014",
+        "note": "The PT-RQ50K operating instructions (pages 75-76) give the lens shift range as an illustration showing the vertical and horizontal maximums; the text does not state how far the lens can move up and sideways at the same time. Throwline uses an oval inside those maximums until the maker's figure is transcribed, and reports a combined shift past that oval as something to check."
+      }
     },
     {
       "optical_profile_id": "OPT-003",
@@ -1060,7 +1073,13 @@
       },
       "lens_shift_limit_notes": "PT-RQ50K manual lens shift range: +/-0.1 H, +/-0.3 V for ET-D3QT800; matches the PT-RQ50K specification page.",
       "projection_distance_reference_point": "front end of the projection lens to the screen surface (L); lens protrusion L1 listed separately",
-      "distance_tolerance_note": "Panasonic: a +/-5% error in listed projection distances may occur."
+      "distance_tolerance_note": "Panasonic: a +/-5% error in listed projection distances may occur.",
+      "lens_shift_combined_rule": {
+        "shape": "ellipse",
+        "basis": "assumed",
+        "source_id": "SRC-014",
+        "note": "The PT-RQ50K operating instructions (pages 75-76) give the lens shift range as an illustration showing the vertical and horizontal maximums; the text does not state how far the lens can move up and sideways at the same time. Throwline uses an oval inside those maximums until the maker's figure is transcribed, and reports a combined shift past that oval as something to check."
+      }
     },
     {
       "optical_profile_id": "OPT-004",
@@ -1159,7 +1178,13 @@
           }
         ]
       },
-      "lens_shift_limit_notes": "EB-L30000U specification: vertical approx. 65%, horizontal approx. 30% with ELPLM12; the lens cannot be shifted to the maximum in both directions at once."
+      "lens_shift_limit_notes": "EB-L30000U specification: vertical approx. 65%, horizontal approx. 30% with ELPLM12; the lens cannot be shifted to the maximum in both directions at once.",
+      "lens_shift_combined_rule": {
+        "shape": "ellipse",
+        "basis": "maker_note",
+        "source_id": "SRC-018",
+        "note": "EB-L30000U specification note *6: 'The lens cannot be shifted to the maximum in all four directions.' No formula or figure is published in readable text, so Throwline uses an oval inside the vertical and horizontal maximums and reports a combined shift past it as something to check."
+      }
     },
     {
       "optical_profile_id": "OPT-005",
@@ -1271,7 +1296,14 @@
         ]
       },
       "lens_shift_limit_notes": "+/-50% V, +/-18% H for the native 17:9 picture (+/-19% H when projecting 16:9).",
-      "distance_tolerance_note": "Sony formulas carry a fixed offset of about -0.07 m, so the effective ratio rises slightly with screen size (0.80 at 100 inches, 0.82 at 1200 inches)."
+      "distance_tolerance_note": "Sony formulas carry a fixed offset of about -0.07 m, so the effective ratio rises slightly with screen size (0.80 at 100 inches, 0.82 at 1200 inches).",
+      "lens_shift_combined_rule": {
+        "shape": "linear",
+        "basis": "maker_formula",
+        "source_id": "SRC-016",
+        "formula": "17:9: VS+ = 50 - 2.778 x (HS+ or HS-) [%]; HS+ = HS- = 18 - 0.360 x (VS+) [%]. 16:9 (SRC-017): VS+ = 50 - 2.632 x HS [%]; HS = 19 - 0.380 x VS [%].",
+        "note": "Sony's help guide gives the combined range as straight lines between the vertical and horizontal maximums: moving sideways reduces the available vertical shift in proportion (|V|/50 + |H|/18 <= 1). Throwline applies the native 17:9 maximums (+/-50% V, +/-18% H) for every picture shape; the 16:9 horizontal maximum is 19%."
+      }
     },
     {
       "optical_profile_id": "OPT-006",
@@ -1383,7 +1415,14 @@
         ]
       },
       "lens_shift_limit_notes": "+/-80% V, +/-31% H for the native 17:9 picture (+/-33% H when projecting 16:9).",
-      "distance_tolerance_note": "Sony formulas carry a fixed offset of about -0.08 m; the effective ratio rises slightly with screen size."
+      "distance_tolerance_note": "Sony formulas carry a fixed offset of about -0.08 m; the effective ratio rises slightly with screen size.",
+      "lens_shift_combined_rule": {
+        "shape": "linear",
+        "basis": "maker_formula",
+        "source_id": "SRC-016",
+        "formula": "17:9: VS+ = 80 - 2.581 x (HS+ or HS-) [%]; HS+ = HS- = 31 - 0.388 x (VS+) [%]. 16:9 (SRC-017): VS+ = 80 - 2.424 x HS [%]; HS = 33 - 0.413 x VS [%].",
+        "note": "Sony's help guide gives the combined range as straight lines between the vertical and horizontal maximums: moving sideways reduces the available vertical shift in proportion (|V|/80 + |H|/31 <= 1). Throwline applies the native 17:9 maximums (+/-80% V, +/-31% H) for every picture shape; the 16:9 horizontal maximum is 33%."
+      }
     },
     {
       "optical_profile_id": "OPT-007",
@@ -1578,7 +1617,13 @@
       "lens_shift_limit_notes": "PT-RQ50K manual lens shift range: +/-0.16 H, +/-0.45 V for ET-D3QS400; matches the PT-RQ50K specification page.",
       "projection_distance_reference_point": "front end of the projection lens to the screen surface (L); lens protrusion L1 listed separately",
       "distance_tolerance_note": "Panasonic: a +/-5% error in listed projection distances may occur.",
-      "notes_for_throwline": "Width-based ratio for each picture shape; Throwline selects the variant that matches the chosen picture shape and blocks other shapes."
+      "notes_for_throwline": "Width-based ratio for each picture shape; Throwline selects the variant that matches the chosen picture shape and blocks other shapes.",
+      "lens_shift_combined_rule": {
+        "shape": "ellipse",
+        "basis": "assumed",
+        "source_id": "SRC-014",
+        "note": "The PT-RQ50K operating instructions (pages 75-76) give the lens shift range as an illustration showing the vertical and horizontal maximums; the text does not state how far the lens can move up and sideways at the same time. Throwline uses an oval inside those maximums until the maker's figure is transcribed, and reports a combined shift past that oval as something to check."
+      }
     },
     {
       "optical_profile_id": "OPT-010",
@@ -1715,7 +1760,13 @@
       "lens_shift_limit_notes": "PT-RQ50K manual lens shift range: +/-0.08 H, +/-0.25 V for ET-D3QT600; matches the PT-RQ50K specification page.",
       "projection_distance_reference_point": "front end of the projection lens to the screen surface (L); lens protrusion L1 listed separately",
       "distance_tolerance_note": "Panasonic: a +/-5% error in listed projection distances may occur.",
-      "notes_for_throwline": "Width-based ratio for each picture shape; Throwline selects the variant that matches the chosen picture shape and blocks other shapes."
+      "notes_for_throwline": "Width-based ratio for each picture shape; Throwline selects the variant that matches the chosen picture shape and blocks other shapes.",
+      "lens_shift_combined_rule": {
+        "shape": "ellipse",
+        "basis": "assumed",
+        "source_id": "SRC-014",
+        "note": "The PT-RQ50K operating instructions (pages 75-76) give the lens shift range as an illustration showing the vertical and horizontal maximums; the text does not state how far the lens can move up and sideways at the same time. Throwline uses an oval inside those maximums until the maker's figure is transcribed, and reports a combined shift past that oval as something to check."
+      }
     },
     {
       "optical_profile_id": "OPT-011",
@@ -1852,7 +1903,13 @@
       "lens_shift_limit_notes": "PT-RQ50K manual lens shift range: +/-0.1 H, +/-0.3 V for ET-D3QT700; matches the PT-RQ50K specification page.",
       "projection_distance_reference_point": "front end of the projection lens to the screen surface (L); lens protrusion L1 listed separately",
       "distance_tolerance_note": "Panasonic: a +/-5% error in listed projection distances may occur.",
-      "notes_for_throwline": "Width-based ratio for each picture shape; Throwline selects the variant that matches the chosen picture shape and blocks other shapes."
+      "notes_for_throwline": "Width-based ratio for each picture shape; Throwline selects the variant that matches the chosen picture shape and blocks other shapes.",
+      "lens_shift_combined_rule": {
+        "shape": "ellipse",
+        "basis": "assumed",
+        "source_id": "SRC-014",
+        "note": "The PT-RQ50K operating instructions (pages 75-76) give the lens shift range as an illustration showing the vertical and horizontal maximums; the text does not state how far the lens can move up and sideways at the same time. Throwline uses an oval inside those maximums until the maker's figure is transcribed, and reports a combined shift past that oval as something to check."
+      }
     },
     {
       "optical_profile_id": "OPT-012",
@@ -1967,7 +2024,13 @@
       "lens_shift_limit_notes": "ELPLX03 maximum motion range: up 20%, down 5% (EB-L30000U specification p.23); horizontal limit not stated in readable maker text.",
       "projection_distance_reference_point": "projection distance (3) from the lens to the screen per the specification figure; lens protrusion approx. 100 mm",
       "distance_tolerance_note": "Fixed mirror-type lens: the maker table ratio drifts from 0.344 at 120 inches to 0.358 at 600 inches because of the fixed offset; plan with the tolerance margin and confirm on site.",
-      "notes_for_throwline": "Ultra short throw mirror lens: no back-of-projector mark; use the maker drawing for body position."
+      "notes_for_throwline": "Ultra short throw mirror lens: no back-of-projector mark; use the maker drawing for body position.",
+      "lens_shift_combined_rule": {
+        "shape": "ellipse",
+        "basis": "maker_note",
+        "source_id": "SRC-018",
+        "note": "EB-L30000U specification: when the horizontal direction is at its maximum the image cannot be moved upward. The horizontal maximum for ELPLX03 is not stated in readable maker text, so the combined check cannot run until it is."
+      }
     }
   ],
   "sources": [
@@ -2295,6 +2358,16 @@
       "source_ids_considered": "SRC-007, SRC-014",
       "recommendation": "Obtain the ET-D3QW200 datasheet or a later manual revision with a projection distance table listing image width.",
       "severity": "medium"
+    },
+    {
+      "exception_id": "EXC-009",
+      "entity_type": "optical_profile",
+      "entity_identifier": "OPT-001, OPT-009, OPT-002, OPT-010, OPT-011, OPT-003",
+      "issue_type": "combined_shift_figure_only",
+      "description": "The PT-RQ50K operating instructions show the combined lens shift range only as an illustration (pages 75-76); the text gives the vertical and horizontal maximums but not the shape of the combined range. Throwline models it as an oval inside the maximums (lens_shift_combined_rule basis: assumed).",
+      "source_ids_considered": "SRC-002, SRC-004, SRC-014",
+      "recommendation": "Transcribe the maker figure (corner cut-offs or curve) into a stated rule, or obtain a Panasonic document that gives the combined range as a formula.",
+      "severity": "low"
     }
   ],
   "projectorReferenceAppendix": {

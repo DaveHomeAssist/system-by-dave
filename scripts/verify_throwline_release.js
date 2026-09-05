@@ -44,7 +44,7 @@ const PILOT_ARRAY_SHA256 = {
   projectors: '34599a9db73725c42c7afae5d83919a31db8596178c86189bb34d334392dc7da',
   lenses: 'da1bd0a9c89e9e1ff00fb369d930a5af09a9d4c8714ad283ccd2232aa7b0447e',
   compatibility: '97e740b4c48ea9913119256a7ea5268f2754ddf98c485daee540aaca604b4085',
-  opticalProfiles: '1ad1f31f8d472b4dd7b73d3d2da554b918b8cba0c63927087c420b8d0619ea9d',
+  opticalProfiles: 'c8cbab5b81422d0a06a05db2d1af197e2e627fc4455e1ce7861e7a4eef602f83',
 };
 const MAKER_DOMAINS = {
   'MFR-001': ['panasonic.com'],
@@ -268,7 +268,7 @@ if (catalog) {
     compatibility: 13,
     opticalProfiles: 12,
     sources: 18,
-    researchExceptions: 8,
+    researchExceptions: 9,
   };
   if (catalog.schemaVersion !== 1) fail('Throwline pilot catalog must use schema version 1.');
   if (catalog.meta?.sourceWorkbookSha256 !== '4a70b2b553df12beee1373592e251e30ed1d84257304848b9c32cbc1e3ea818d') {
@@ -387,6 +387,16 @@ if (catalog) {
             fail(`Profile ${profile.optical_profile_id} has an invalid aspect variant.`);
           }
         });
+        // Maker shift limits must say how up and sideways shift combine, with the evidence level stated honestly.
+        if (Number.isFinite(profile.lens_shift_vertical_percent_max)) {
+          const rule = profile.lens_shift_combined_rule;
+          const ruleSource = sourcesById.get(rule?.source_id);
+          if (!rule || !['linear', 'ellipse'].includes(rule.shape) || !['maker_formula', 'maker_note', 'assumed'].includes(rule.basis) || !String(rule.note || '').trim() || !ruleSource) {
+            fail(`Profile ${profile.optical_profile_id} must carry a lens_shift_combined_rule with a shape, an evidence basis, a note, and a source.`);
+          } else if (rule.basis === 'maker_formula' && (rule.shape !== 'linear' || !String(rule.formula || '').trim())) {
+            fail(`Profile ${profile.optical_profile_id} claims a maker formula for combined shift but does not record it.`);
+          }
+        }
       } else {
         if (!CALCULATION_BLOCKED_PROFILE_IDS.includes(profile.optical_profile_id)) fail(`Profile ${profile.optical_profile_id} is not in the reviewed ready or blocked lists.`);
         if (profile.automaticCalculationAllowed !== false) fail(`Profile ${profile.optical_profile_id} must be calculation-blocked.`);
@@ -526,7 +536,7 @@ requireMatch(stage, /SceneState\.roomConflicts\(/, 'Stage 3D must derive room co
 requireMatch(stage, /geometry\.shift\b/, 'Stage 3D must judge lens shift through the direction-aware scene-state assessment.');
 requireMatch(stage, /requestedMode\s*===\s*['"]field_verified['"][\s\S]*?number\(['"]md['"][\s\S]*?number\(['"]mw['"][\s\S]*?Date\.parse\(stamp\)/, 'Stage 3D must require measurement evidence and a real timestamp before honoring a FIELD VERIFIED transfer.');
 requireMatch(main, /put\(["']md["'][\s\S]*?put\(["']mw["'][\s\S]*?put\(["']vb["']/, 'The planner must transfer the field measurement evidence with a field-verified Stage 3D link.');
-['roomConflicts', 'PLACEMENT_TOLERANCE', "'snap-distance'", 'resolveProfileRatio', 'bodyExtents', "'set-body'", 'clearance'].forEach((token) => {
+['roomConflicts', 'PLACEMENT_TOLERANCE', "'snap-distance'", 'resolveProfileRatio', 'bodyExtents', "'set-body'", 'clearance', 'assessCombinedShift', "'shift-combined'", 'normalizeCombinedRule'].forEach((token) => {
   if (!sceneState.includes(token)) fail(`Throwline scene-state contract is missing ${token}.`);
 });
 if (!fs.existsSync(path.join(ROOT, 'scripts/probe_throwline_stage3d.js'))) fail('The Stage 3D browser regression probe is missing.');
@@ -542,6 +552,15 @@ requireMatch(stage, /id=["']roomC["']/, 'Stage 3D must expose the keep-clear mar
 requireMatch(stage, /type:\s*['"]set-body['"]/, 'Stage 3D must edit projector bodies through the scene contract.');
 requireMatch(stage, /buildProjector\(bodyDims\(/, 'Stage 3D must draw projector bodies at their scene dimensions.');
 requireMatch(main, /put\(["']bw["']/, 'The planner must transfer maker body dimensions to Stage 3D.');
+requireMatch(stage, /function\s+catalogShiftFor\s*\(/, 'Stage 3D must read maker shift limits from the catalog pair.');
+requireMatch(stage, /params\.get\(['"]sc['"]\)\s*\|\|\s*catalogShift\?\.combined/, 'Stage 3D must take the combined shift rule from the link or the catalog profile.');
+requireMatch(stage, /geometry\.shift[\s\S]*?combined/, 'Stage 3D must report the combined up-and-sideways shift judgement.');
+requireMatch(stage, /shape===['"]linear['"][\s\S]*?shape===['"]ellipse['"]/, 'Stage 3D must draw the combined shift envelope in the maker rule shape.');
+['shiftLeft', 'shiftRight', 'shiftCatalogNote'].forEach((id) => {
+  requireMatch(main, new RegExp(`id=["']${id}["']`), `The planner is missing the ${id} shift control.`);
+});
+requireMatch(main, /function\s+catalogShiftProfileFor\s*\(/, 'The planner must fill shift limits from the catalog pair.');
+requireMatch(main, /put\(["']sl["'][\s\S]*?put\(["']sr["'][\s\S]*?put\(["']sc["']/, 'The planner must transfer sideways limits and the combined rule to Stage 3D.');
 requireMatch(main, /sceneApi\.resolveProfileRatio\(catalogSelection\.profile,\s*raster\.asp\)/, 'The planner must resolve verified catalog ratios by picture shape.');
 requireMatch(main, /put\(["']tolPct["']/, 'The planner must transfer its planning tolerance to Stage 3D.');
 ['assessInstallation', "'set-tolerance'", 'axisOverlapInterval', 'COVERAGE_TOLERANCE'].forEach((token) => {
