@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-09-05
+
+### Throwline catalog shift limits and combined up-and-sideways rule
+
+* A projector and lens picked from the catalog now fill the planner's shift limits (up, down, left, right) from maker data, marked `maker data from the catalog`, with the maker's note on how the limits combine; the planner gained left and right limit fields and transfers them (`sl`, `sr`) with the combined rule (`sc`) to Stage 3D.
+* Stage 3D reads the same limits from the catalog pair when a link carries none, keeps link values when it does, and says `limits from maker data` in the Shift fact.
+* Combined shift is judged by the maker's rule: Sony's published formula (a straight-line limit between the vertical and horizontal maximums) reads `Needs a fix` when exceeded; Epson's stated note and Panasonic's drawn-only range use an oval inside the maximums and read `Worth a look · … check the maker's shift diagram`. The Stage 3D shift envelope is drawn as a diamond, oval, or box to match.
+* Catalog: every profile with shift limits carries `lens_shift_combined_rule` with its evidence level and source; research exception EXC-009 records that Panasonic's combined range is a figure only. Re-pinned the optical-profile fingerprint, added scene-state tests, probe checks, and verifier contracts, and rolled the AV Suite offline cache version.
+
 ## 2026-09-04
 
 ### Throwline runtime recovery and release gate

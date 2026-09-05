@@ -219,7 +219,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool change — rolls the service-worker cache. */
-    version:'v20260904-throwline-runtime-recovery',
+    version:'v20260905-throwline-shift-catalog',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,

@@ -72,17 +72,39 @@
         max,
         basisWidth: finite(optical.basisWidth) ? clamp(optical.basisWidth, 1, 300) : 20,
         rasterAspect: finite(optical.rasterAspect) ? clamp(optical.rasterAspect, 0.2, 10) : 1.7778,
-        shift: optical.shift && typeof optical.shift === 'object' ? {
-          up: finite(optical.shift.up) ? clamp(optical.shift.up, 0, 500) : undefined,
-          down: finite(optical.shift.down) ? clamp(optical.shift.down, 0, 500) : undefined,
-          left: finite(optical.shift.left) ? clamp(optical.shift.left, 0, 500) : undefined,
-          right: finite(optical.shift.right) ? clamp(optical.shift.right, 0, 500) : undefined
-        } : undefined
+        shift: normalizeShift(optical.shift)
       },
       body: normalizeBody(input.body),
       allowed,
       provenance
     };
+  }
+
+  function normalizeShift(input) {
+    if (!input || typeof input !== 'object') return undefined;
+    const shift = {
+      up: finite(input.up) ? clamp(input.up, 0, 500) : undefined,
+      down: finite(input.down) ? clamp(input.down, 0, 500) : undefined,
+      left: finite(input.left) ? clamp(input.left, 0, 500) : undefined,
+      right: finite(input.right) ? clamp(input.right, 0, 500) : undefined
+    };
+    const combined = normalizeCombinedRule(input.combined);
+    if (combined) shift.combined = combined;
+    return shift;
+  }
+
+  // The combined (up-and-sideways) shift rule: how the maker limits both directions used together.
+  // shape 'linear' is a straight-line (diamond) limit, |v|/V + |h|/H <= 1 (Sony publishes it as a formula);
+  // shape 'ellipse' is an oval inside the four maximums, used when the maker only says the maximums can't be combined
+  // (basis 'maker_note') or only shows the range as a figure (basis 'assumed').
+  const COMBINED_SHAPES = ['linear', 'ellipse'];
+  const COMBINED_BASES = ['maker_formula', 'maker_note', 'assumed'];
+  function normalizeCombinedRule(input) {
+    if (!input) return undefined;
+    const parts = typeof input === 'string' ? input.split('.') : [input.shape, input.basis];
+    const shape = COMBINED_SHAPES.includes(parts[0]) ? parts[0] : undefined;
+    if (!shape) return undefined;
+    return { shape, basis: COMBINED_BASES.includes(parts[1]) ? parts[1] : 'assumed' };
   }
 
   function normalizeBody(input) {
@@ -220,6 +242,18 @@
     return { percent, direction, limit, exceeded: limit === undefined ? undefined : Math.abs(percent) > limit };
   }
 
+  function assessCombinedShift(vertical, horizontal, envelope) {
+    const rule = envelope && envelope.combined;
+    const v = vertical.limit > 0 ? Math.abs(vertical.percent) / vertical.limit : NaN;
+    const h = horizontal.limit > 0 ? Math.abs(horizontal.percent) / horizontal.limit : NaN;
+    if (!rule || !finite(v) || !finite(h)) return { shape: rule?.shape, basis: rule?.basis, use: undefined, exceeded: undefined, tone: undefined };
+    // use = 1 means the picture centre sits exactly on the maker's combined limit.
+    const use = rule.shape === 'linear' ? v + h : Math.sqrt(v * v + h * h);
+    const exceeded = use > 1 + 1e-9;
+    const tone = !exceeded ? 'go' : rule.basis === 'maker_formula' ? 'bad' : 'warn';
+    return { shape: rule.shape, basis: rule.basis, use, exceeded, tone };
+  }
+
   function bodyExtents(projector) {
     const body = projector.body;
     if (!body) return undefined;
@@ -315,6 +349,7 @@
     const horizontalShiftPercent = ((projector.position.targetX - projector.position.x) / imageWidth) * 100;
     const image = { width: imageWidth, height: imageHeight, centerX: projector.position.targetX, requiredRatio, currentRatio, shiftPercent, horizontalShiftPercent };
     const shift = { vertical: assessShift(shiftPercent, optical.shift, 'up', 'down'), horizontal: assessShift(horizontalShiftPercent, optical.shift, 'right', 'left') };
+    shift.combined = assessCombinedShift(shift.vertical, shift.horizontal, optical.shift);
     const collisions = scene.obstacles.filter(obstacle => obstacleIntersectsBeam(obstacle, scene, projector, image)).map(obstacle => ({ obstacleId: obstacle.id, label: obstacle.label, kind: 'beam-obstruction' }));
     const screenLeft = -scene.screen.width / 2, screenRight = scene.screen.width / 2;
     const imageLeft = image.centerX - imageWidth / 2, imageRight = image.centerX + imageWidth / 2;
@@ -363,6 +398,12 @@
         if (shift.exceeded === true) push('bad', `shift-${axis}`, `${name}the lens can\u2019t shift the picture that far ${shift.direction}`, projector.id);
         else if (shift.exceeded === undefined && Math.abs(shift.percent) > 0.05) push('warn', `shift-${axis}-unknown`, `${name}${axis} lens shift limits aren\u2019t known yet`, projector.id);
       });
+      const combined = geometry.shift.combined;
+      if (combined.exceeded === true && geometry.shift.vertical.exceeded !== true && geometry.shift.horizontal.exceeded !== true) {
+        const ways = `${geometry.shift.vertical.direction} and to the ${geometry.shift.horizontal.direction} at the same time`;
+        if (combined.tone === 'bad') push('bad', 'shift-combined', `${name}the lens can\u2019t shift the picture that far ${ways}`, projector.id);
+        else push('warn', 'shift-combined', `${name}the lens may not shift the picture that far ${ways} \u2014 check the maker\u2019s shift diagram`, projector.id);
+      }
       geometry.collisions.forEach(collision => push('bad', 'beam-obstruction', `${name}the light path hits ${collision.label}`, projector.id));
       if (geometry.provenance.mode === 'manual') push('warn', 'provenance-manual', `${name}the throw ratio hasn\u2019t been verified yet`, projector.id);
     });
@@ -444,5 +485,5 @@
     return normalizeSceneState(scene);
   }
 
-  return Object.freeze({ SCHEMA_VERSION, STORAGE_KEY, PLACEMENT_TOLERANCE, COVERAGE_TOLERANCE, ASPECT_TOLERANCE, normalizeProvenance, normalizeSceneState, createSceneState, activeProjector, calculateProjectorGeometry, roomConflicts, bodyExtents, assessInstallation, resolveProfileRatio, obstacleIntersectsBeam, applyIntent, stampFieldVerification });
+  return Object.freeze({ SCHEMA_VERSION, STORAGE_KEY, PLACEMENT_TOLERANCE, COVERAGE_TOLERANCE, ASPECT_TOLERANCE, normalizeProvenance, normalizeSceneState, createSceneState, activeProjector, calculateProjectorGeometry, roomConflicts, bodyExtents, assessInstallation, assessCombinedShift, resolveProfileRatio, obstacleIntersectsBeam, applyIntent, stampFieldVerification });
 });

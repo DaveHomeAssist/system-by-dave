@@ -6,7 +6,8 @@
  * Drives the real page in headless Chromium over the DevTools protocol and checks the
  * rendered readouts and runtime boundaries for: the audited production link, exact
  * optical-stop snapping, visible field-validation errors, URL trust for FIELD VERIFIED
- * transfers, field-stamp calibration, direction-aware lens-shift limits, room conflicts,
+ * transfers, field-stamp calibration, direction-aware lens-shift limits, catalog shift limits with
+ * the maker's combined up-and-sideways rule, room conflicts,
  * WebGL context recovery, export object names, and a real offline reload.
  *
  * Usage: node scripts/probe_throwline_stage3d.js [--base=http://127.0.0.1:8000/] [--chrome=/path/to/chrome] [--no-sandbox] [--no-webgl]
@@ -221,6 +222,20 @@ async function main() {
     const lateral = await setInput('px', -6);
     check('horizontal shift is reported alongside vertical', /H/.test(lateral.shift) && /\+/.test(lateral.shift.split('·')[1] || ''), lateral);
 
+    // 6b. Up and sideways together. Sony publishes the combined range as a formula, so passing it is a fix; Panasonic only draws it, so it is a check.
+    // Sony VPLL-Z8008 at 16:9, 19 ft on a 20 ft basis: image 20 × 11.25, screen centre 9.625 ft; lens at 6.25 ft = +30% up; x = −3 ft aims 15% right → 30/50 + 15/18 > 1.
+    const sonyShift = await open('mode=verified_image_width&projector=PRJ-003&lens=LNS-010&profile=OPT-005&w=20&bottom=4&ar=1.7777778&basisW=20&rasterAr=1.7777778&lh=6.25&dist=19');
+    check('a catalog pair carries the maker shift limits without any limits in the link', /^\+30\.0% V · limits from maker data$/.test(sonyShift.shift) && /^Ready/.test(sonyShift.headline), sonyShift);
+    const sonyCombined = await setInput('px', -3);
+    check('up and sideways past Sony’s published formula is a fix', /more than the lens allows up and sideways together/.test(sonyCombined.shift) && sonyCombined.shiftColor === 'var(--safety)' && /^Needs a fix · the lens can’t shift the picture that far up and to the right at the same time/.test(sonyCombined.headline), sonyCombined);
+    // Panasonic ET-D3QT500 at 17:9, 50 ft: image 20 × 10.55, screen centre 9.27 ft; lens at 5.5 ft ≈ +35.8% up; x = −2.5 ft aims 12.5% right → oval use ≈ 1.11.
+    await open('mode=verified_image_width&projector=PRJ-001&lens=LNS-004&profile=OPT-002&w=20&bottom=4&ar=1.8962963&basisW=20&rasterAr=1.8962963&lh=5.5&dist=50');
+    await setInput('roomD', 60); // the PT-RQ50K body at a 50 ft mark needs more than the default 40 ft room
+    const panaCombined = await setInput('px', -2.5);
+    check('past the oval for a drawn-only Panasonic range is a check, not a fail', /may be more than the lens allows up and sideways together/.test(panaCombined.shift) && panaCombined.shiftColor === 'var(--hazard)' && /^Worth a look · the lens may not shift the picture that far up and to the right/.test(panaCombined.headline), panaCombined);
+    const edited = await open('mode=verified_image_width&projector=PRJ-003&lens=LNS-010&profile=OPT-005&w=20&bottom=4&ar=1.7777778&basisW=20&rasterAr=1.7777778&lh=6.25&dist=19&su=40');
+    check('a link that edits a limit is honoured over the catalog and no longer reads as maker data', edited.shift === '+30.0% V', edited);
+
     // 7. Room boundaries.
     const tall = await open('mode=manual&w=20&bottom=10&ar=1.777778&basisW=20&rasterAr=1.6&lh=6&dist=22&min=0.978&max=1.32');
     const lowCeiling = await setInput('roomH', 8);
@@ -317,11 +332,17 @@ async function main() {
     await cdp('Page.navigate', { url: `${baseUrl}ProjectorThrow/index.html?workspace=planner` });
     await delay(2500);
     const planner = await evaluate(`(() => { const set = (id, value) => { const el = document.getElementById(id); el.value = value; el.dispatchEvent(new Event('change', { bubbles: true })); };
-      set('catalogProjector', 'PRJ-001'); set('catalogLens', 'LNS-004'); return new Promise(resolve => setTimeout(() => resolve({ gate: document.getElementById('calculationGate').textContent.trim(), raster: document.getElementById('raster').value, verify: document.getElementById('verifyBadge').textContent.trim(), body: document.getElementById('body').value.trim(), stageLink: document.getElementById('stage3dLink').getAttribute('href') }), 400)); })()`);
+      set('catalogProjector', 'PRJ-001'); set('catalogLens', 'LNS-004'); return new Promise(resolve => setTimeout(() => resolve({ gate: document.getElementById('calculationGate').textContent.trim(), raster: document.getElementById('raster').value, verify: document.getElementById('verifyBadge').textContent.trim(), shiftProfile: document.getElementById('shiftProfile').value, shiftUp: document.getElementById('shiftUp').value, shiftLeft: document.getElementById('shiftLeft').value, shiftNote: document.getElementById('shiftCatalogNote').textContent.trim(), body: document.getElementById('body').value.trim(), stageLink: document.getElementById('stage3dLink').getAttribute('href') }), 400)); })()`);
     check('planner reads READY TO CALCULATE for a verified pair at its native shape', /^READY TO CALCULATE/.test(planner.gate) && planner.raster.startsWith('1.8962963') && planner.verify === 'maker verified', planner);
     check('planner fills the rear-mark body depth from maker data and transfers it to Stage 3D', planner.body !== '' && /bw=2\.362/.test(planner.stageLink) && /bd=3\.51/.test(planner.stageLink) && /lp=0\.682/.test(planner.stageLink), planner);
+    check('planner fills the shift limits from maker data when a catalog pair is picked', planner.shiftProfile === 'catalog:OPT-002' && planner.shiftUp === '45' && planner.shiftLeft === '16' && /maker’s data/.test(planner.shiftNote), planner);
+    check('planner transfers the sideways limits and the combined rule to Stage 3D', /su=45/.test(planner.stageLink) && /sl=16/.test(planner.stageLink) && /sr=16/.test(planner.stageLink) && /sc=ellipse\.assumed/.test(planner.stageLink), planner);
     const plannerShape = await evaluate(`(() => { const el = document.getElementById('raster'); el.value = '1.6|1920|1200'; el.dispatchEvent(new Event('change', { bubbles: true })); return new Promise(resolve => setTimeout(() => resolve({ gate: document.getElementById('calculationGate').textContent.trim(), sub: document.getElementById('rdSub').textContent.trim() }), 400)); })()`);
     check('planner switches to the maker\'s 16:10 ratio when the picture shape changes', /^READY TO CALCULATE/.test(plannerShape.gate) && /closest/.test(plannerShape.sub), plannerShape);
+    const plannerHash = await evaluate(`location.hash`);
+    check('planner share link keeps the sideways limits', /sl=16/.test(plannerHash) && /sr=16/.test(plannerHash) && /sp=catalog%3AOPT-002/.test(plannerHash), plannerHash);
+    const plannerManual = await evaluate(`(() => { const el = document.getElementById('trmin'); el.value = '1.2'; el.dispatchEvent(new Event('input', { bubbles: true })); return new Promise(resolve => setTimeout(() => resolve({ profile: document.getElementById('shiftProfile').value, up: document.getElementById('shiftUp').value, left: document.getElementById('shiftLeft').value, noteHidden: document.getElementById('shiftCatalogNote').hidden }), 400)); })()`);
+    check('typing a ratio by hand drops the catalog shift profile instead of leaving stale maker limits', plannerManual.profile === '' && plannerManual.up === '' && plannerManual.left === '' && plannerManual.noteHidden === true, plannerManual);
 
     // 15. The service worker must earn the Offline ready label and serve a cold-network reload.
     await open(AUDIT_QUERY);

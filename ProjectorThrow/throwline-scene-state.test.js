@@ -390,3 +390,73 @@ test('room checks judge the projector body and the keep-clear margin', () => {
   const noBody = Scene.normalizeSceneState({ ...tightDepth, projectors: [{ ...tightDepth.projectors[0], body: undefined }] });
   assert.deepEqual(kinds(noBody), [], 'without body data the lens position alone is inside the room');
 });
+
+test('combined up-and-sideways shift follows the maker rule shape and its evidence tone', () => {
+  // 22 ft on a 20 ft basis: image 20 × 12.5; screen centre 9.625 ft; lens at 6 ft → +29% up. x = −3 ft aims 15% to the right.
+  const sony = { up: 50, down: 50, left: 18, right: 18, combined: { shape: 'linear', basis: 'maker_formula' } };
+  const scene = Scene.applyIntent(auditScene({ dist: 22, shift: sony }), { type: 'set-projector-x', value: -3 });
+  const geometry = Scene.calculateProjectorGeometry(scene);
+  near(geometry.image.shiftPercent, 29, 1e-4);
+  near(geometry.image.horizontalShiftPercent, 15, 1e-6);
+  assert.equal(geometry.shift.vertical.exceeded, false);
+  assert.equal(geometry.shift.horizontal.exceeded, false);
+  near(geometry.shift.combined.use, 29 / 50 + 15 / 18, 1e-5);
+  assert.equal(geometry.shift.combined.exceeded, true);
+  assert.equal(geometry.shift.combined.tone, 'bad');
+  const verdict = Scene.assessInstallation(scene);
+  assert.equal(verdict.tone, 'bad');
+  assert.equal(verdict.label, 'Needs a fix · the lens can’t shift the picture that far up and to the right at the same time');
+  const assumed = Scene.applyIntent(auditScene({ dist: 22, shift: { ...sony, combined: { shape: 'ellipse', basis: 'assumed' } } }), { type: 'set-projector-x', value: -3 });
+  const oval = Scene.calculateProjectorGeometry(assumed).shift.combined;
+  near(oval.use, Math.hypot(29 / 50, 15 / 18), 1e-5);
+  assert.equal(oval.exceeded, true);
+  assert.equal(oval.tone, 'warn');
+  const softVerdict = Scene.assessInstallation(assumed);
+  assert.equal(softVerdict.tone, 'warn');
+  assert.match(softVerdict.issues.find(issue => issue.kind === 'shift-combined').label, /may not shift the picture that far up and to the right at the same time — check the maker’s shift diagram/);
+  const inside = Scene.applyIntent(auditScene({ dist: 22, shift: { ...sony, combined: { shape: 'ellipse', basis: 'assumed' } } }), { type: 'set-projector-x', value: -2 });
+  assert.equal(Scene.calculateProjectorGeometry(inside).shift.combined.exceeded, false);
+  assert.ok(!Scene.assessInstallation(inside).issues.some(issue => issue.kind === 'shift-combined'));
+});
+
+test('combined shift needs both limits and defers to a single-axis failure', () => {
+  const noSideways = Scene.applyIntent(auditScene({ dist: 22, shift: { up: 50, down: 50, combined: 'linear.maker_formula' } }), { type: 'set-projector-x', value: -3 });
+  const partial = Scene.calculateProjectorGeometry(noSideways).shift.combined;
+  assert.equal(partial.exceeded, undefined);
+  assert.equal(partial.shape, 'linear');
+  assert.ok(!Scene.assessInstallation(noSideways).issues.some(issue => issue.kind === 'shift-combined'));
+  const tooHigh = Scene.applyIntent(auditScene({ dist: 22, shift: { up: 10, down: 50, left: 18, right: 18, combined: 'linear.maker_formula' } }), { type: 'set-projector-x', value: -3 });
+  const issues = Scene.assessInstallation(tooHigh).issues;
+  assert.ok(issues.some(issue => issue.kind === 'shift-vertical'));
+  assert.ok(!issues.some(issue => issue.kind === 'shift-combined'));
+  assert.equal(Scene.calculateProjectorGeometry(auditScene({ dist: 22, shift: { up: 50, down: 50, left: 18, right: 18 } })).shift.combined.exceeded, undefined);
+});
+
+test('combined shift rules normalize from transfer strings and objects', () => {
+  const asString = Scene.activeProjector(Scene.createSceneState({ shift: { up: 50, down: 50, left: 18, right: 18, combined: 'linear.maker_formula' } })).optical.shift.combined;
+  assert.deepEqual(asString, { shape: 'linear', basis: 'maker_formula' });
+  const bareShape = Scene.activeProjector(Scene.createSceneState({ shift: { up: 50, down: 50, combined: 'ellipse' } })).optical.shift.combined;
+  assert.deepEqual(bareShape, { shape: 'ellipse', basis: 'assumed' });
+  const unknown = Scene.activeProjector(Scene.createSceneState({ shift: { up: 50, down: 50, combined: { shape: 'square', basis: 'maker_formula' } } })).optical.shift.combined;
+  assert.equal(unknown, undefined);
+  const roundTrip = Scene.normalizeSceneState(JSON.parse(JSON.stringify(Scene.createSceneState({ shift: { up: 50, down: 50, left: 18, right: 18, combined: { shape: 'ellipse', basis: 'maker_note' } } }))));
+  assert.deepEqual(Scene.activeProjector(roundTrip).optical.shift.combined, { shape: 'ellipse', basis: 'maker_note' });
+});
+
+test('catalog combined shift rules exist for every profile with maker shift limits and reproduce Sony’s coefficients', () => {
+  const catalog = require('./data/throwline-pilot-catalog.v1.json');
+  catalog.opticalProfiles.forEach(profile => {
+    if (!Number.isFinite(profile.lens_shift_vertical_percent_max)) return;
+    const rule = profile.lens_shift_combined_rule;
+    assert.ok(rule && ['linear', 'ellipse'].includes(rule.shape) && ['maker_formula', 'maker_note', 'assumed'].includes(rule.basis), `${profile.optical_profile_id} needs a combined shift rule`);
+    assert.deepEqual(Scene.activeProjector(Scene.createSceneState({ shift: { up: profile.lens_shift_vertical_percent_max, down: -profile.lens_shift_vertical_percent_min, combined: rule } })).optical.shift.combined, { shape: rule.shape, basis: rule.basis });
+  });
+  // Sony's published slope is the ratio of the two maximums, which is exactly the straight-line (diamond) rule.
+  const z8008 = catalog.opticalProfiles.find(profile => profile.lens_id === 'LNS-010');
+  near(z8008.lens_shift_vertical_percent_max / z8008.lens_shift_horizontal_percent_max, 2.778, 1e-3);
+  const z8014 = catalog.opticalProfiles.find(profile => profile.lens_id === 'LNS-011');
+  near(z8014.lens_shift_vertical_percent_max / z8014.lens_shift_horizontal_percent_max, 2.581, 1e-3);
+  assert.equal(z8008.lens_shift_combined_rule.basis, 'maker_formula');
+  assert.equal(catalog.opticalProfiles.find(profile => profile.lens_id === 'LNS-008').lens_shift_combined_rule.basis, 'maker_note');
+  assert.equal(catalog.opticalProfiles.find(profile => profile.lens_id === 'LNS-004').lens_shift_combined_rule.basis, 'assumed');
+});
