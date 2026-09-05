@@ -76,6 +76,8 @@ header{grid-area:header;display:flex;align-items:center;gap:14px;flex-wrap:wrap;
 .suite-link{display:inline-flex;align-items:center;min-height:34px;padding:6px 8px;font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
 .theme-toggle{display:inline-flex;align-items:center;gap:7px;min-height:34px;padding:6px 9px;border:1px solid var(--line);border-radius:var(--r);background:var(--case-hi);color:var(--dim);font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
 .theme-toggle svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.unit-toggle{display:inline-flex;align-items:center;justify-content:center;min-height:34px;min-width:44px;padding:6px 9px;border:1px solid var(--line);border-radius:var(--r);background:var(--case-hi);color:var(--dim);font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
+.unit-toggle[aria-pressed=true]{background:var(--info);border-color:var(--info);color:#fff}
 .theme-icon-sun{display:none}
 html[data-theme=dark] .theme-icon-moon{display:none}
 html[data-theme=dark] .theme-icon-sun{display:block}
@@ -289,6 +291,7 @@ html[data-calculation-mode=blocked] .provenance-badge,html[data-calculation-mode
         <svg class="theme-icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.5"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
         <span id="themeLabel">dark</span>
       </button>
+      <button class="unit-toggle" id="unitToggle" type="button" aria-pressed="false" aria-label="Show measurements in metres"><span id="unitLabel">m</span></button>
       <button class="field-verify-toggle" id="fieldVerifyToggle" type="button" aria-pressed="false">Field Verify</button>
       <button class="quick-start-toggle" id="quickStartToggle" type="button" aria-label="Open Quick Start"><span class="quick-label-wide">Quick Start</span><span class="quick-label-short">Start</span></button>
       <a class="suite-link" href="index.html?workspace=planner">Planner</a>
@@ -454,6 +457,7 @@ html[data-calculation-mode=blocked] .provenance-badge,html[data-calculation-mode
       <div><dt>Lens</dt><dd id="fLens">—</dd></div>
       <div><dt>Optical height</dt><dd id="fHeight">6' 0"</dd></div>
       <div><dt>Room</dt><dd id="fRoom">40' × 40' × 20'</dd></div>
+      <div><dt>Measurements</dt><dd id="fMeasure">feet and inches</dd></div>
       <div><dt>Projector body</dt><dd id="fBody">—</dd></div>
       <div><dt>Units</dt><dd id="fUnits">1</dd></div>
       <div><dt>Obstructions</dt><dd id="fObstacles">none</dd></div>
@@ -514,7 +518,7 @@ const offlineBadge = document.getElementById('offlineBadge');
 const offlineStatusTitle = document.getElementById('offlineStatusTitle');
 const offlineStatusDetail = document.getElementById('offlineStatusDetail');
 const ONBOARDING_STORAGE_KEY = 'throwline:stage-onboarding:v1';
-const OFFLINE_CACHE_VERSION = 'v20260905-throwline-shift-catalog';
+const OFFLINE_CACHE_VERSION = 'v20260905-throwline-verify-units';
 
 function setOfflineStatus(state,badge,title,detail){
   document.documentElement.dataset.offline=state;
@@ -672,8 +676,12 @@ function resolveStageTransfer(){
   const params = new URLSearchParams(location.search);
   const number = (key,fallback)=>{ if (!params.has(key) || params.get(key)==='') return fallback; const value = Number(params.get(key)); return Number.isFinite(value) ? value : fallback; };
   const bounded = (key,fallback,min,max)=>Math.min(max,Math.max(min,number(key,fallback)));
+  // Lengths in a link are feet unless the link says otherwise (u=m or u=in); everything inside the scene is feet.
+  const linkUnit = ['ft','m','in'].includes(params.get('u')) ? params.get('u') : 'ft';
+  const length = (key,fallback)=>{ const value = SceneState.lengthToFeet(params.get(key), linkUnit); return Number.isFinite(value) ? value : fallback; };
+  const boundedLength = (key,fallback,min,max)=>Math.min(max,Math.max(min,length(key,fallback)));
   // Bounds are the shared scene-state limits; the range controls stretch to the transferred value rather than clamping it.
-  const screenWidth = bounded('w',20,2,200), screenAspect = bounded('ar',1.7778,0.2,10), basisWidth = bounded('basisW',screenWidth,1,300), rasterAspect = bounded('rasterAr',screenAspect,0.2,10);
+  const screenWidth = boundedLength('w',20,2,200), screenAspect = bounded('ar',1.7778,0.2,10), basisWidth = boundedLength('basisW',screenWidth,1,300), rasterAspect = bounded('rasterAr',screenAspect,0.2,10);
   const linkShift={up:number('su',NaN),down:number('sd',NaN),left:number('sl',NaN),right:number('sr',NaN)};
   const requestedMode = params.get('mode') || 'manual', projectorId = params.get('projector') || '', lensId = params.get('lens') || '', profileId = params.get('profile') || '';
   const data = STAGE_CATALOG.data;
@@ -696,14 +704,14 @@ function resolveStageTransfer(){
   // Projector body: maker dimensions for a valid catalog pair, otherwise the planner's typed-in dimensions (feet).
   const mmToFt = value => Number.isFinite(Number(value)) && Number(value) > 0 ? Number(value) / 304.8 : NaN;
   const catalogBody = validIds && projector.body ? {width:mmToFt(projector.body.width_mm),height:mmToFt(projector.body.height_mm),depth:mmToFt(projector.body.depth_mm),lensProtrusion:Number.isFinite(mmToFt(lens.lens_protrusion_mm))?mmToFt(lens.lens_protrusion_mm):0,source:'catalog',label:`${projector.model_number} + ${lens.lens_model_number}`} : undefined;
-  const paramBody = ['bw','bh','bd'].every(key=>Number.isFinite(number(key,NaN)) && number(key,NaN) > 0) ? {width:number('bw'),height:number('bh'),depth:number('bd'),lensProtrusion:Math.max(0,number('lp',0)),source:'manual',label:'from the planner'} : undefined;
-  const base = {w:screenWidth,bottom:bounded('bottom',4,0,100),ar:screenAspect,basisW:basisWidth,basisScale:basisWidth/screenWidth,rasterAr:rasterAspect,lh:bounded('lh',6,0,100),dist:bounded('dist',22,1,300),shift,shiftSource,tolerance:bounded('tolPct',5,0,15),body:catalogBody||paramBody,room:{clearance:bounded('clr',1,0,10)}};
+  const paramBody = ['bw','bh','bd'].every(key=>Number.isFinite(length(key,NaN)) && length(key,NaN) > 0) ? {width:length('bw',NaN),height:length('bh',NaN),depth:length('bd',NaN),lensProtrusion:Math.max(0,length('lp',0)),source:'manual',label:'from the planner'} : undefined;
+  const base = {w:screenWidth,bottom:boundedLength('bottom',4,0,100),ar:screenAspect,basisW:basisWidth,basisScale:basisWidth/screenWidth,rasterAr:rasterAspect,lh:boundedLength('lh',6,0,100),dist:boundedLength('dist',22,1,300),linkUnit,shift,shiftSource,tolerance:bounded('tolPct',5,0,15),body:catalogBody||paramBody,room:{clearance:bounded('clr',1,0,10)}};
   const ratio = number('ratio',NaN), stamp = params.get('stamp') || '';
   if (requestedMode === 'field_verified' && hasIds && (!STAGE_CATALOG.ok || !validIds)) return {...base,mode:'blocked',wide:NaN,tele:NaN,allowed:false,label:'Invalid field transfer',reason:'CAN’T CALCULATE YET · this link names a projector and lens that don’t match a known pair.',profile:null};
   if (requestedMode === 'field_verified') {
     // A URL is not a stamp. FIELD VERIFIED is honored only when the transfer carries the measurement that produced the ratio
     // (md = measured throw ft, mw = measured image width ft), the ratio agrees with it, and the stamp is a real timestamp.
-    const measuredDistance = number('md',NaN), measuredWidth = number('mw',NaN), verifiedBy = (params.get('vb') || '').slice(0,120);
+    const measuredDistance = length('md',NaN), measuredWidth = length('mw',NaN), verifiedBy = (params.get('vb') || '').slice(0,120);
     const measuredRatio = measuredDistance > 0 && measuredWidth > 0 ? measuredDistance / measuredWidth : NaN;
     const ratioAgrees = Number.isFinite(measuredRatio) && (!Number.isFinite(ratio) || Math.abs(ratio - measuredRatio) <= measuredRatio * 0.005);
     const stampValid = !!stamp && Number.isFinite(Date.parse(stamp));
@@ -798,6 +806,31 @@ const state = {};
 let activeCamera = 'three';
 let objectMounted = false;
 let lastVerdict = '';
+// Display units: feet and inches by default, metres on request (remembered on this device). Scene values stay in feet.
+const UNITS_STORAGE_KEY = 'throwline:stage-units:v1';
+let displayUnit = 'ftin';
+try { if (localStorage.getItem(UNITS_STORAGE_KEY) === 'm') displayUnit = 'm'; } catch {}
+const unitToggle = els('unitToggle');
+function applyDisplayUnit(unit,{persist=false,announceChange=false,refresh=true}={}){
+  const previous = displayUnit;
+  displayUnit = unit === 'm' ? 'm' : 'ftin';
+  const metric = displayUnit === 'm';
+  unitToggle.setAttribute('aria-pressed', String(metric));
+  unitToggle.setAttribute('aria-label', metric ? 'Show measurements in feet and inches' : 'Show measurements in metres');
+  els('unitLabel').textContent = metric ? 'ft in' : 'm';
+  // Field Verify inputs are typed in the display unit; convert what is already there so nothing silently changes meaning.
+  [['measuredDistance',300],['measuredWidth',200]].forEach(([id,maxFeet])=>{
+    const input = els(id); const label = input.labels[0]?.querySelector('.lab');
+    if (label) label.textContent = label.textContent.replace(/·\s*(ft|m)$/, metric ? '· m' : '· ft');
+    input.max = metric ? String(Number((maxFeet*0.3048).toFixed(2))) : String(maxFeet);
+    if (previous !== displayUnit && input.value !== '') { const feet = SceneState.lengthToFeet(input.value, previous === 'm' ? 'm' : 'ft'); if (Number.isFinite(feet)) input.value = String(Number((metric ? feet*0.3048 : feet).toFixed(3))); }
+  });
+  if (persist) try { localStorage.setItem(UNITS_STORAGE_KEY, displayUnit); } catch {}
+  if (refresh) { syncInputsFromState(); rebuild(); }
+  if (announceChange) announce(metric ? 'Measurements now in metres' : 'Measurements now in feet and inches');
+}
+unitToggle.addEventListener('click',()=>applyDisplayUnit(displayUnit==='m'?'ftin':'m',{persist:true,announceChange:true}));
+applyDisplayUnit(displayUnit,{refresh:false});
 
 function syncFlatState(){
   const projector=SceneState.activeProjector(sceneState);
@@ -819,6 +852,7 @@ function opticalGeometryAllowed(){
 }
 
 function fmt(ft){
+  if (displayUnit === 'm') { const metres = ft*0.3048; return `${(Math.abs(metres) < 0.005 ? 0 : metres).toFixed(2)} m`; }
   const neg = ft<0; let v = Math.abs(ft);
   let f = Math.floor(v), q = Math.round((v-f)*48);
   if (q>=48){ f++; q-=48; }
@@ -920,6 +954,7 @@ function readout(geometry,w,h,pstate){
 function updateWorkspaceFacts(geometry){
   els('provenanceBadge').textContent=geometry.provenance.label;
   els('fRoom').textContent=`${fmt(sceneState.room.width)} × ${fmt(sceneState.room.depth)} × ${fmt(sceneState.room.height)}`;
+  els('fMeasure').textContent=`${displayUnit==='m'?'metres':'feet and inches'} · link values read as ${({ft:'feet',m:'metres',in:'inches'})[STAGE_TRANSFER.linkUnit]||'feet'}`;
   const layoutLabel=sceneState.layoutMode==='blend'?'blend spread':sceneState.layoutMode;
   els('fUnits').textContent=`${sceneState.projectors.length} · ${layoutLabel}`;
   els('fObstacles').textContent=sceneState.obstacles.length?`${sceneState.obstacles.length} · ${geometry.collisions.length} in the light path`:'none';
@@ -1022,8 +1057,9 @@ function fieldVerificationIssues(){
   const distance=els('measuredDistance');
   const width=els('measuredWidth');
   const verifier=els('verifiedBy');
-  if(!distance.value.trim()||!distance.validity.valid)issues.push({input:distance,message:'Enter a measured throw from 0.01 to 300 ft.'});
-  if(!width.value.trim()||!width.validity.valid)issues.push({input:width,message:'Enter a measured image width from 0.01 to 200 ft.'});
+  const metric = displayUnit === 'm';
+  if(!distance.value.trim()||!distance.validity.valid)issues.push({input:distance,message:metric?'Enter a measured throw from 0.01 to 91 m.':'Enter a measured throw from 0.01 to 300 ft.'});
+  if(!width.value.trim()||!width.validity.valid)issues.push({input:width,message:metric?'Enter a measured image width from 0.01 to 61 m.':'Enter a measured image width from 0.01 to 200 ft.'});
   if(!verifier.value.trim()||!verifier.validity.valid)issues.push({input:verifier,message:'Enter who verified the measurement.'});
   return issues;
 }
@@ -1048,7 +1084,8 @@ els('stampVerification').onclick=()=>{
   const issues=fieldVerificationIssues();
   if(issues.length){showFieldVerificationError(issues);return;}
   try{
-    sceneState=SceneState.stampFieldVerification(sceneState,{measuredDistance:Number(els('measuredDistance').value),measuredWidth:Number(els('measuredWidth').value),verifiedBy:els('verifiedBy').value.trim()});
+    const typedUnit = displayUnit === 'm' ? 'm' : 'ft';
+    sceneState=SceneState.stampFieldVerification(sceneState,{measuredDistance:SceneState.lengthToFeet(els('measuredDistance').value,typedUnit),measuredWidth:SceneState.lengthToFeet(els('measuredWidth').value,typedUnit),verifiedBy:els('verifiedBy').value.trim()});
     clearFieldVerificationError();syncInputsFromState();rebuild();announce('On-site measurement saved. This unit is now field verified.');
   }catch(error){showFieldVerificationError([{input:els('measuredDistance'),message:String(error?.message||'The field measurement could not be saved.')}]);}
 };

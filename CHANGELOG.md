@@ -2,6 +2,13 @@
 
 ## 2026-09-05
 
+### Throwline one on-site verification model with units
+
+* The scene contract now publishes the on-site verification rule (`FIELD_VERIFICATION`: the shared reason and the list of driving edits) and `applyIntent` uses that list; tolerance, room, overlay, camera, and obstacle edits keep a stamp, driving edits drop it.
+* The planner follows the same rule: changing the set distance, lens height, screen size, bottom, shape, picture shape, or fit drops its stamp and shows `MANUAL ESTIMATE · something changed after the on-site check, so please measure again.` under Field verify; new measurements or a fresh stamp clear the note.
+* Stage 3D links carry a unit marker: the planner sends `u=ft`, and Stage 3D reads `u=m` or `u=in` links through `lengthToFeet()` so a metric link is the same scene. A Measurements fact states the display unit and the link unit.
+* Stage 3D gained an `m` / `ft in` toggle (remembered on the device under `throwline:stage-units:v1`) for every readout, slider label, and fact; Field Verify inputs typed in metres convert before stamping. Added scene-state tests, probe checks, verifier contracts, the registry storage key, and rolled the AV Suite offline cache version.
+
 ### Throwline catalog shift limits and combined up-and-sideways rule
 
 * A projector and lens picked from the catalog now fill the planner's shift limits (up, down, left, right) from maker data, marked `maker data from the catalog`, with the maker's note on how the limits combine; the planner gained left and right limit fields and transfers them (`sl`, `sr`) with the combined rule (`sc`) to Stage 3D.

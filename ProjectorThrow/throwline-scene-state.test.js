@@ -460,3 +460,28 @@ test('catalog combined shift rules exist for every profile with maker shift limi
   assert.equal(catalog.opticalProfiles.find(profile => profile.lens_id === 'LNS-008').lens_shift_combined_rule.basis, 'maker_note');
   assert.equal(catalog.opticalProfiles.find(profile => profile.lens_id === 'LNS-004').lens_shift_combined_rule.basis, 'assumed');
 });
+
+test('the field-verification rule is one shared list: driving edits drop the stamp, other edits keep it', () => {
+  const stamped = Scene.stampFieldVerification(manualScene(), { measuredDistance: 22, measuredWidth: 20, verifiedBy: 'Dave' });
+  ['set-distance', 'set-lens-height', 'set-screen-width', 'set-screen-bottom', 'set-screen-aspect', 'set-projector-x', 'set-body', 'clear-body'].forEach(type => {
+    assert.ok(Scene.invalidatesFieldVerification(type), `${type} is a driving edit`);
+  });
+  const moved = Scene.applyIntent(stamped, { type: 'set-lens-height', value: 7 });
+  assert.equal(Scene.activeProjector(moved).provenance.mode, 'manual');
+  assert.equal(Scene.activeProjector(moved).provenance.reason, Scene.FIELD_VERIFICATION.reason);
+  assert.match(Scene.FIELD_VERIFICATION.reason, /measure again/);
+  [{ type: 'set-tolerance', value: 8 }, { type: 'set-room', key: 'depth', value: 60 }, { type: 'toggle-overlay', key: 'grid' }, { type: 'set-camera', camera: 'side' }, { type: 'add-obstacle' }].forEach(intent => {
+    assert.ok(!Scene.invalidatesFieldVerification(intent.type), `${intent.type} is not a driving edit`);
+    assert.equal(Scene.activeProjector(Scene.applyIntent(stamped, intent)).provenance.mode, 'field_verified', `${intent.type} keeps the stamp`);
+  });
+});
+
+test('link lengths convert to feet by their unit marker', () => {
+  assert.equal(Scene.lengthToFeet(22, 'ft'), 22);
+  assert.equal(Scene.lengthToFeet(22), 22);
+  near(Scene.lengthToFeet(6.7056, 'm'), 22, 1e-9);
+  assert.equal(Scene.lengthToFeet(264, 'in'), 22);
+  assert.equal(Scene.lengthToFeet(22, 'furlongs'), 22);
+  assert.ok(Number.isNaN(Scene.lengthToFeet('', 'm')));
+  near(Scene.LENGTH_UNITS.m, 3.280839895, 1e-9);
+});

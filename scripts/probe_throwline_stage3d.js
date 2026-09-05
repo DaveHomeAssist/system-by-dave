@@ -236,6 +236,18 @@ async function main() {
     const edited = await open('mode=verified_image_width&projector=PRJ-003&lens=LNS-010&profile=OPT-005&w=20&bottom=4&ar=1.7777778&basisW=20&rasterAr=1.7777778&lh=6.25&dist=19&su=40');
     check('a link that edits a limit is honoured over the catalog and no longer reads as maker data', edited.shift === '+30.0% V', edited);
 
+    // 6c. Units: a link marked in metres is the same scene in feet, and the display can switch to metres.
+    const metricLink = await open('mode=manual&u=m&w=6.096&bottom=1.2192&ar=1.777778&basisW=6.096&rasterAr=1.6&lh=1.8288&dist=6.7056&min=0.978&max=1.32');
+    const measureFact = () => evaluate(`document.getElementById('fMeasure').textContent.trim()`);
+    check('a link marked in metres reads as the same 20 ft / 22 ft scene', metricLink.distance === '22\' 0"' && metricLink.ratio === '1.100:1' && /link values read as metres/.test(await measureFact()), metricLink);
+    const metricView = await click('unitToggle');
+    check('the unit toggle shows the set mark and image in metres', metricView.distance === '6.71 m' && /^6\.10 m × 3\.81 m$/.test(metricView.image) && /^metres/.test(await measureFact()), metricView);
+    await setInput('measuredDistance', 3.66); await setInput('measuredWidth', 3.05); await setInput('verifiedBy', 'Probe'); // 1.2:1 typed in metres, within the 0.01 step
+    const metricStamp = await click('stampVerification');
+    check('a stamp typed in metres is stored as the 1.2:1 ratio and marks 7.32 m', metricStamp.badge === 'FIELD VERIFIED' && metricStamp.wide === '7.32 m', metricStamp);
+    const backToFeet = await click('unitToggle');
+    check('switching back to feet keeps the same verified scene', backToFeet.wide === '24\' 0"' && backToFeet.badge === 'FIELD VERIFIED' && /^feet and inches/.test(await measureFact()), backToFeet);
+
     // 7. Room boundaries.
     const tall = await open('mode=manual&w=20&bottom=10&ar=1.777778&basisW=20&rasterAr=1.6&lh=6&dist=22&min=0.978&max=1.32');
     const lowCeiling = await setInput('roomH', 8);
@@ -343,6 +355,14 @@ async function main() {
     check('planner share link keeps the sideways limits', /sl=16/.test(plannerHash) && /sr=16/.test(plannerHash) && /sp=catalog%3AOPT-002/.test(plannerHash), plannerHash);
     const plannerManual = await evaluate(`(() => { const el = document.getElementById('trmin'); el.value = '1.2'; el.dispatchEvent(new Event('input', { bubbles: true })); return new Promise(resolve => setTimeout(() => resolve({ profile: document.getElementById('shiftProfile').value, up: document.getElementById('shiftUp').value, left: document.getElementById('shiftLeft').value, noteHidden: document.getElementById('shiftCatalogNote').hidden }), 400)); })()`);
     check('typing a ratio by hand drops the catalog shift profile instead of leaving stale maker limits', plannerManual.profile === '' && plannerManual.up === '' && plannerManual.left === '' && plannerManual.noteHidden === true, plannerManual);
+    // The planner shares Stage 3D's on-site rule: a stamp survives non-driving edits and drops on a driving edit, saying why.
+    const plannerStamp = await evaluate(`(() => { const set = (id, value, type = 'input') => { const el = document.getElementById(id); el.value = value; el.dispatchEvent(new Event(type, { bubbles: true })); };
+      set('actualDist', '12'); set('actualWidth', '10'); set('verifiedBy', 'Probe'); document.getElementById('stampVerify').click();
+      return new Promise(resolve => setTimeout(() => { const before = { badge: document.getElementById('verifyBadge').textContent.trim(), link: document.getElementById('stage3dLink').getAttribute('href') };
+        set('tol', '7'); setTimeout(() => { const kept = document.getElementById('verifyBadge').textContent.trim();
+          set('dist', '30'); setTimeout(() => resolve({ before, kept, after: document.getElementById('verifyBadge').textContent.trim(), reset: document.getElementById('verifyReset').textContent.trim(), resetHidden: document.getElementById('verifyReset').hidden }), 400); }, 400); }, 400)); })()`);
+    check('planner stamp reads field verified and its Stage 3D link carries the unit marker and measurement', plannerStamp.before.badge === 'field verified' && /u=ft/.test(plannerStamp.before.link) && /md=12/.test(plannerStamp.before.link) && /mw=10/.test(plannerStamp.before.link), plannerStamp);
+    check('a non-driving edit keeps the planner stamp; a distance change drops it with the shared reason', plannerStamp.kept === 'field verified' && plannerStamp.after !== 'field verified' && plannerStamp.resetHidden === false && /measure again/.test(plannerStamp.reset), plannerStamp);
 
     // 15. The service worker must earn the Offline ready label and serve a cold-network reload.
     await open(AUDIT_QUERY);

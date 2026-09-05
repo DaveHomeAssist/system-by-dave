@@ -3190,6 +3190,7 @@
         </div>
         <div class="inline-actions"><button class="chip" id="stampVerify" type="button">stamp field
             check</button><button class="chip" id="clearVerify" type="button">clear field check</button></div>
+        <p class="notice warn" id="verifyReset" hidden></p>
         <p class="hint">Measure the throw distance and the picture width on site. That gives the real throw ratio and tells the
           crew exactly how far to move the projector.</p>
       </fieldset>
@@ -3554,6 +3555,10 @@
     let currentShow = { version: 1, id: "", name: "Untitled show", outputs: [] };
     let activeOutputId = "";
     let verifiedAt = "";
+    // Same on-site rule as Stage 3D (scene-state FIELD_VERIFICATION): a driving edit drops the stamp and says why.
+    let verificationReset = "";
+    function dropVerification() { if (verifiedAt) verificationReset = window.ThrowlineSceneState?.FIELD_VERIFICATION?.reason || "MANUAL ESTIMATE · something changed after the on-site check, so please measure again."; verifiedAt = ""; }
+    function noteDrivingEdit() { if (suppress || !verifiedAt) return; dropVerification(); toast("On-site check reset · measure again"); }
     let bodyAutoFilled = false;
     function catalogBodyInches(selection) {
       const body = selection?.projector?.body, lens = selection?.lens;
@@ -3581,7 +3586,7 @@
     const $ = id => document.getElementById(id);
     const el = {
       job: $("job"), preset: $("preset"), sw: $("sw"), sh: $("sh"), sbottom: $("sbottom"), sasp: $("sasp"), sdiag: $("sdiag"), diagUnit: $("diagUnit"),
-      catalogProjector: $("catalogProjector"), catalogLens: $("catalogLens"), catalogEvidence: $("catalogEvidence"), catalogEvidenceBody: $("catalogEvidenceBody"), calculationGate: $("calculationGate"),
+      catalogProjector: $("catalogProjector"), catalogLens: $("catalogLens"), catalogEvidence: $("catalogEvidence"), catalogEvidenceBody: $("catalogEvidenceBody"), calculationGate: $("calculationGate"), verifyReset: $("verifyReset"),
       family: $("family"), familyNotice: $("familyNotice"), lens: $("lens"), trmin: $("trmin"), trmax: $("trmax"), raster: $("raster"),
       inventoryToggle: $("inventoryToggle"), shiftProfile: $("shiftProfile"), projectorModel: $("projectorModel"), shiftUp: $("shiftUp"), shiftDown: $("shiftDown"), shiftLeft: $("shiftLeft"), shiftRight: $("shiftRight"), shiftSource: $("shiftSource"), shiftCatalogNote: $("shiftCatalogNote"),
       lumens: $("lumens"), qty: $("qty"), gain: $("gain"), includeEstimated: $("includeEstimated"), dist: $("dist"), depth: $("depth"), lensHeight: $("lensHeight"), body: $("body"), tol: $("tol"),
@@ -4172,6 +4177,7 @@
         ? `<span class="k">set distance</span> ${fmtLen(c.near)} <span class="k">· check on site ±${Math.round(c.tol * 1000) / 10}%</span>`
         : `<span class="k">closest</span> ${fmtLen(c.near)} <span class="k">· farthest</span> ${fmtLen(c.far)}${safeText}`;
       setBadge(el.fitBadge, c.place.label, c.place.kind);
+      el.verifyReset.hidden = !verificationReset || c.calculationMode === "field_verified"; el.verifyReset.textContent = verificationReset;
       if (c.calculationMode === "field_verified") setBadge(el.verifyBadge, "field verified", "go");
       else if (c.calculationMode === "verified_image_width") setBadge(el.verifyBadge, "maker verified", "go");
       else setBadge(el.verifyBadge, c.lens?.status === "custom" ? "your own lens · not verified" : "typed-in ratio · not verified", "warn");
@@ -4667,7 +4673,7 @@
       buildShiftProfileOptions(); applyShiftProfile(null, { renderNow: false }); el.raster.value = defaultRasterForFamily(getFamily()); updateFamilyNotice(); scheduleRender();
     }
     function selectCatalogProjector() {
-      buildCatalogLensOptions(); el.lens.value = ""; el.trmin.value = ""; el.trmax.value = ""; verifiedAt = "";
+      buildCatalogLensOptions(); el.lens.value = ""; el.trmin.value = ""; el.trmax.value = ""; dropVerification();
       const selection = resolveCatalogSelection();
       if (selection.projector) {
         el.projectorModel.value = selection.projector.model_number || "";
@@ -4681,16 +4687,16 @@
       render();
     }
     function selectCatalogLens() {
-      el.lens.value = ""; el.trmin.value = ""; el.trmax.value = ""; verifiedAt = ""; fillBodyFromCatalog(); applyCatalogShiftProfile(); render();
+      el.lens.value = ""; el.trmin.value = ""; el.trmax.value = ""; dropVerification(); fillBodyFromCatalog(); applyCatalogShiftProfile(); render();
     }
     function activateManualMode() {
       if (suppress) return;
-      el.catalogProjector.value = ""; buildCatalogLensOptions(); el.lens.value = ""; verifiedAt = "";
+      el.catalogProjector.value = ""; buildCatalogLensOptions(); el.lens.value = ""; dropVerification();
       if (el.shiftProfile.value.startsWith("catalog:")) { buildShiftProfileOptions(""); applyShiftProfile(null, { renderNow: false }); }
     }
     function selectLens(id, renderNow = false) {
       const lens = getLens(id); if (!lens) return;
-      const replacedCatalogPair = !!el.catalogProjector.value; el.catalogProjector.value = ""; buildCatalogLensOptions(); verifiedAt = ""; if (bodyAutoFilled) { el.body.value = ""; bodyAutoFilled = false; }
+      const replacedCatalogPair = !!el.catalogProjector.value; el.catalogProjector.value = ""; buildCatalogLensOptions(); dropVerification(); if (bodyAutoFilled) { el.body.value = ""; bodyAutoFilled = false; }
       if (replacedCatalogPair) { buildShiftProfileOptions(""); applyShiftProfile(null, { renderNow: false }); }
       if (el.family.value !== lens.familyId) { el.family.value = lens.familyId; buildLensOptions(id); buildShiftProfileOptions(); applyShiftProfile(null, { renderNow: false }); } else el.lens.value = id;
       if (lens.calculationState === "manual") { el.trmin.value = cleanNum(lens.min, 3); el.trmax.value = cleanNum(lens.max, 3); }
@@ -4714,7 +4720,7 @@
       const sceneApi = window.ThrowlineSceneState;
       const scene = sceneApi?.createSceneState({ mode: c.calculationMode, allowed: !!c.calculationInput, w: c.w / 12, bottom: c.screenBottom / 12, ar: c.w / c.h, basisW: c.img?.w / 12, rasterAr: c.img?.w / c.img?.h, lh: c.lensHeight / 12, dist: c.shown / 12, wide: c.trA, tele: c.trB, reason: c.calculationGate?.reason || c.calculationInput?.reason });
       const shared = scene ? { screen: scene.screen, projector: sceneApi.activeProjector(scene) } : null;
-      put("mode", shared?.projector.provenance.mode || c.calculationMode); put("w", cleanNum(shared?.screen.width ?? c.w / 12, 4)); put("bottom", cleanNum(shared?.screen.bottom ?? c.screenBottom / 12, 4)); put("ar", cleanNum(shared?.screen.aspect ?? c.w / c.h, 6)); put("basisW", cleanNum(shared?.projector.optical.basisWidth ?? c.img?.w / 12, 4)); put("rasterAr", cleanNum(shared?.projector.optical.rasterAspect ?? c.img?.w / c.img?.h, 6)); put("lh", cleanNum(shared?.projector.position.lensHeight ?? c.lensHeight / 12, 4)); put("dist", cleanNum(shared?.projector.position.distance ?? c.shown / 12, 4));
+      put("mode", shared?.projector.provenance.mode || c.calculationMode); put("u", "ft"); put("w", cleanNum(shared?.screen.width ?? c.w / 12, 4)); put("bottom", cleanNum(shared?.screen.bottom ?? c.screenBottom / 12, 4)); put("ar", cleanNum(shared?.screen.aspect ?? c.w / c.h, 6)); put("basisW", cleanNum(shared?.projector.optical.basisWidth ?? c.img?.w / 12, 4)); put("rasterAr", cleanNum(shared?.projector.optical.rasterAspect ?? c.img?.w / c.img?.h, 6)); put("lh", cleanNum(shared?.projector.position.lensHeight ?? c.lensHeight / 12, 4)); put("dist", cleanNum(shared?.projector.position.distance ?? c.shown / 12, 4));
       put("projector", c.catalogSelection.projector?.projector_id || ""); put("lens", c.catalogSelection.lens?.lens_id || ""); put("profile", c.catalogSelection.profile?.optical_profile_id || "");
       if (c.shiftProfile) { put("su", cleanNum(c.shiftProfile.up, 2)); put("sd", cleanNum(c.shiftProfile.down, 2)); put("sl", cleanNum(c.shiftProfile.left, 2)); put("sr", cleanNum(c.shiftProfile.right, 2)); if (c.shiftProfile.combined) put("sc", `${c.shiftProfile.combined.shape}.${c.shiftProfile.combined.basis}`); }
       put("tolPct", cleanNum(c.tol * 100, 2)); put("clr", 1);
@@ -4864,20 +4870,22 @@
       ["dist", "depth", "body", "lumens", "actualDist", "actualWidth", "actualFl", "verifiedBy"].forEach(id => el[id].value = ""); verifiedAt = ""; setLenInput(el.lensHeight, 72); setLenInput(el.solverNear, 240); setLenInput(el.solverFar, 360); el.solverScope.value = "all"; el.qty.value = "1"; el.gain.value = "1"; el.tol.value = "5"; el.eff.value = "85"; el.stackEff.value = "92"; el.targetFl.value = "30"; el.fitMode.value = "screen"; el.includeEstimated.checked = false; el.nPlusOne.checked = true; drawingView = "plan"; stageCamera = "three-quarter"; setDrawingView("plan", { announce: false, persist: false }); setStageCamera("three-quarter", { announce: false, persist: false }); suppress = false; syncDiag(); updateFamilyNotice();
     }
 
-    el.preset.addEventListener("change", () => applyPreset(true));
+    el.preset.addEventListener("change", () => { noteDrivingEdit(); applyPreset(true); });
     el.catalogProjector.addEventListener("change", selectCatalogProjector);
     el.catalogLens.addEventListener("change", selectCatalogLens);
     el.family.addEventListener("change", applyFamily);
     el.lens.addEventListener("change", () => { if (el.lens.value) selectLens(el.lens.value, true); else scheduleRender(); });
     el.shiftProfile.addEventListener("change", () => applyShiftProfile(getShiftProfile(), { renderNow: true }));
-    ["sw", "sh"].forEach(id => el[id].addEventListener("input", () => { if (suppress) return; el.preset.value = ""; lockAspect(id === "sw" ? "w" : "h"); syncDiag(); scheduleRender(); }));
+    ["sw", "sh"].forEach(id => el[id].addEventListener("input", () => { if (suppress) return; noteDrivingEdit(); el.preset.value = ""; lockAspect(id === "sw" ? "w" : "h"); syncDiag(); scheduleRender(); }));
     el.sdiag.addEventListener("input", () => { if (suppress || !Number(el.sasp.value)) return; el.preset.value = ""; lockAspect("d"); scheduleRender(); });
-    el.sasp.addEventListener("change", () => { lockAspect("w"); syncDiag(); el.preset.value = ""; scheduleRender(); });
+    el.sasp.addEventListener("change", () => { noteDrivingEdit(); lockAspect("w"); syncDiag(); el.preset.value = ""; scheduleRender(); });
     ["trmin", "trmax"].forEach(id => el[id].addEventListener("input", () => { activateManualMode(); scheduleRender(); }));
     ["job", "sbottom", "body", "dist", "depth", "lensHeight", "lumens", "qty", "gain", "tol", "eff", "stackEff", "projectorModel", "shiftUp", "shiftDown", "shiftLeft", "shiftRight", "shiftSource", "solverNear", "solverFar"].forEach(id => el[id].addEventListener("input", scheduleRender));
-    ["actualDist", "actualWidth", "actualFl", "verifiedBy"].forEach(id => el[id].addEventListener("input", () => { verifiedAt = ""; scheduleRender(); }));
+    ["actualDist", "actualWidth", "actualFl", "verifiedBy"].forEach(id => el[id].addEventListener("input", () => { verifiedAt = ""; verificationReset = ""; scheduleRender(); }));
     el.body.addEventListener("input", () => { bodyAutoFilled = false; });
     ["raster", "targetFl", "fitMode", "solverScope"].forEach(id => el[id].addEventListener("change", scheduleRender));
+    ["sbottom", "dist", "lensHeight"].forEach(id => el[id].addEventListener("input", noteDrivingEdit));
+    ["raster", "fitMode"].forEach(id => el[id].addEventListener("change", noteDrivingEdit));
     [el.includeEstimated, el.nPlusOne].forEach(node => node.addEventListener("change", scheduleRender));
     el.inventoryToggle.addEventListener("click", () => { const lens = getLens(); if (!lens) return; if (inventory.has(lens.id)) { inventory.delete(lens.id); toast("Lens removed from crew inventory"); } else { inventory.add(lens.id); toast("Lens added to crew inventory"); } saveInventoryStorage(); render(); });
     $("saveProfile").addEventListener("click", () => {
@@ -4886,8 +4894,8 @@
       saveProfileStorage(); buildShiftProfileOptions(candidate.id); applyShiftProfile(candidate, { renderNow: true }); toast("Exact shift profile saved locally");
     });
     $("removeProfile").addEventListener("click", () => { const profile = getShiftProfile(); if (!profile || profile.builtin) { toast("Select a custom shift profile first"); return; } customProfiles = customProfiles.filter(item => item.id !== profile.id); saveProfileStorage(); buildShiftProfileOptions(); applyShiftProfile(null, { renderNow: true }); toast("Custom shift profile removed"); });
-    $("stampVerify").addEventListener("click", () => { const c = readState(); if (!finite(c.fieldVerification.observedRatio)) { toast("Enter the measured distance and picture width first"); return; } verifiedAt = new Date().toISOString(); render(); toast("On-site check saved"); });
-    $("clearVerify").addEventListener("click", () => { ["actualDist", "actualWidth", "actualFl", "verifiedBy"].forEach(id => el[id].value = ""); verifiedAt = ""; render(); toast("On-site check cleared"); });
+    $("stampVerify").addEventListener("click", () => { const c = readState(); if (!finite(c.fieldVerification.observedRatio)) { toast("Enter the measured distance and picture width first"); return; } verifiedAt = new Date().toISOString(); verificationReset = ""; render(); toast("On-site check saved"); });
+    $("clearVerify").addEventListener("click", () => { ["actualDist", "actualWidth", "actualFl", "verifiedBy"].forEach(id => el[id].value = ""); verifiedAt = ""; verificationReset = ""; render(); toast("On-site check cleared"); });
     document.querySelectorAll("[data-unit]").forEach(b => b.addEventListener("click", () => setUnit(b.dataset.unit)));
     document.querySelectorAll("[data-snap]").forEach(b => b.addEventListener("click", () => {
       const c = lastCalc; if (!c || !finite(c.near)) return;
