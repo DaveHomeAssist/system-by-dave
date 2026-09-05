@@ -383,6 +383,17 @@ async function main() {
     const offlineReloadStatus = await evaluate(`({ state:document.documentElement.dataset.offline, controlled:Boolean(navigator.serviceWorker?.controller) })`);
     check('Stage 3D reloads with calculated facts while the network is offline', offlineReload.ratio === '0.366:1' && offlineReloadStatus.state === 'ready' && offlineReloadStatus.controlled === true, { readout: offlineReload, offline: offlineReloadStatus });
 
+    // 15b. Crew job sheet: plain-language placement, the verdict, and a QR link that reopens the same scene.
+    await open('mode=verified_image_width&projector=PRJ-001&lens=LNS-004&profile=OPT-002&w=20&bottom=4&ar=1.8962963&basisW=20&rasterAr=1.8962963&lh=6&dist=50&clr=1');
+    await setInput('roomD', 60); await setInput('px', -2);
+    await click('jobSheetOpen');
+    const sheet = await evaluate(`(() => ({ open: document.getElementById('jobSheetDialog').open, text: document.getElementById('jobSheet').textContent.replace(/\\s+/g, ' '), link: document.getElementById('jobSheetLink').getAttribute('href'), svg: !!document.querySelector('#jobSheetQr svg'), modules: document.querySelectorAll('#jobSheetQr svg path, #jobSheetQr svg rect').length }))()`);
+    check('the job sheet opens with plain-language placement and the verdict', sheet.open && /Lens front 50' 0" from the screen surface/.test(sheet.text) && /2' 0" to the left of the screen centre/.test(sheet.text) && /Back of the projector 54' 2/.test(sheet.text) && /Ready — everything checks out/.test(sheet.text) && /Not measured on site yet/.test(sheet.text), sheet);
+    check('the job sheet carries a QR code and a link back to this exact scene', sheet.svg && sheet.modules > 0 && /projector=PRJ-001/.test(sheet.link) && /lens=LNS-004/.test(sheet.link) && /dist=50/.test(sheet.link) && /px=-2/.test(sheet.link) && /rd=60/.test(sheet.link) && /u=ft/.test(sheet.link), sheet);
+    await evaluate(`document.getElementById('jobSheetClose').click()`);
+    const reopened = await open(sheet.link.split('?')[1]);
+    check('the job sheet link reopens the same verified scene', reopened.badge === 'MANUFACTURER VERIFIED' && reopened.distance === '50\' 0"' && reopened.wide === '40\' 0"' && reopened.alert === 'Nothing in the way' && /^Ready/.test(reopened.headline), reopened);
+
     // 16. Required responsive widths must keep the workspace contained and the mobile error visible.
     for (const viewport of [{ width: 680, height: 900 }, { width: 390, height: 844 }]) {
       await cdp('Emulation.setDeviceMetricsOverride', { ...viewport, deviceScaleFactor: viewport.width === 390 ? 3 : 2, mobile: viewport.width === 390 });

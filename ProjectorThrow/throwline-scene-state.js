@@ -47,7 +47,39 @@
       verifiedAt: String(input.verification.verifiedAt || '').slice(0, 80),
       note: String(input.verification.note || '').slice(0, 500)
     } : undefined;
-    return { mode, label, reason: String(input.reason || fallbackReason).slice(0, 500), tone, verification };
+    // Catalog identity travels with the provenance so a scene can be turned back into a link that re-resolves the maker data.
+    const catalogInput = input.catalog && typeof input.catalog === 'object' ? input.catalog : null;
+    const catalog = catalogInput && typeof catalogInput.projector === 'string' && catalogInput.projector && typeof catalogInput.lens === 'string' && catalogInput.lens
+      ? { projector: catalogInput.projector.slice(0, 40), lens: catalogInput.lens.slice(0, 40), profile: String(catalogInput.profile || '').slice(0, 40) } : undefined;
+    return { mode, label, reason: String(input.reason || fallbackReason).slice(0, 500), tone, verification, ...(catalog ? { catalog } : {}) };
+  }
+
+  // The scene as a Stage 3D link: every value the transfer reader understands, in feet, for the chosen (default active) unit.
+  function transferParamsFor(input, projectorId) {
+    const scene = normalizeSceneState(input);
+    const projector = scene.projectors.find(item => item.id === projectorId) || activeProjector(scene);
+    const num = (value, digits = 4) => finite(value) ? String(Number(Number(value).toFixed(digits))) : undefined;
+    const params = {
+      mode: projector.provenance.mode, u: 'ft',
+      w: num(scene.screen.width), bottom: num(scene.screen.bottom), ar: num(scene.screen.aspect, 6),
+      basisW: num(projector.optical.basisWidth), rasterAr: num(projector.optical.rasterAspect, 6),
+      lh: num(projector.position.lensHeight), dist: num(projector.position.distance), px: num(projector.position.x), tx: num(projector.position.targetX),
+      tolPct: num(scene.tolerance, 2), clr: num(scene.room.clearance, 2), rw: num(scene.room.width, 2), rd: num(scene.room.depth, 2), rh: num(scene.room.height, 2)
+    };
+    const catalog = projector.provenance.catalog;
+    if (catalog) { params.projector = catalog.projector; params.lens = catalog.lens; if (catalog.profile) params.profile = catalog.profile; }
+    const verification = projector.provenance.verification;
+    if (projector.provenance.mode === 'field_verified' && verification) {
+      params.ratio = num(verification.ratio, 5); params.md = num(verification.measuredDistance); params.mw = num(verification.measuredWidth);
+      params.stamp = verification.verifiedAt || undefined; params.vb = verification.verifiedBy || undefined;
+    } else if (!catalog || projector.provenance.mode === 'manual') { params.min = num(projector.optical.min, 5); params.max = num(projector.optical.max, 5); }
+    const shift = projector.optical.shift;
+    if (shift) {
+      params.su = num(shift.up, 2); params.sd = num(shift.down, 2); params.sl = num(shift.left, 2); params.sr = num(shift.right, 2);
+      if (shift.combined) params.sc = `${shift.combined.shape}.${shift.combined.basis}`;
+    }
+    if (projector.body && projector.body.source === 'manual') { params.bw = num(projector.body.width, 3); params.bh = num(projector.body.height, 3); params.bd = num(projector.body.depth, 3); params.lp = num(projector.body.lensProtrusion, 3); }
+    return Object.fromEntries(Object.entries(params).filter(([, value]) => value !== undefined && value !== ''));
   }
 
   function normalizeProjector(input = {}, index = 0) {
@@ -192,7 +224,7 @@
         body: transfer.body,
         optical: { min: transfer.wide, max: transfer.tele, basisWidth: transfer.basisW, rasterAspect: transfer.rasterAr, shift: transfer.shift, mode },
         allowed: transfer.allowed,
-        provenance: { mode, reason: transfer.reason, verification: transfer.verification }
+        provenance: { mode, reason: transfer.reason, verification: transfer.verification, catalog: transfer.catalog }
       }]
     });
   }
@@ -504,5 +536,5 @@
     return normalizeSceneState(scene);
   }
 
-  return Object.freeze({ SCHEMA_VERSION, STORAGE_KEY, PLACEMENT_TOLERANCE, COVERAGE_TOLERANCE, ASPECT_TOLERANCE, normalizeProvenance, normalizeSceneState, createSceneState, activeProjector, calculateProjectorGeometry, roomConflicts, bodyExtents, assessInstallation, assessCombinedShift, resolveProfileRatio, FIELD_VERIFICATION, invalidatesFieldVerification, lengthToFeet, LENGTH_UNITS, obstacleIntersectsBeam, applyIntent, stampFieldVerification });
+  return Object.freeze({ SCHEMA_VERSION, STORAGE_KEY, PLACEMENT_TOLERANCE, COVERAGE_TOLERANCE, ASPECT_TOLERANCE, normalizeProvenance, normalizeSceneState, createSceneState, activeProjector, calculateProjectorGeometry, roomConflicts, bodyExtents, assessInstallation, assessCombinedShift, resolveProfileRatio, transferParamsFor, FIELD_VERIFICATION, invalidatesFieldVerification, lengthToFeet, LENGTH_UNITS, obstacleIntersectsBeam, applyIntent, stampFieldVerification });
 });

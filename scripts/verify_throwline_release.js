@@ -501,6 +501,7 @@ const localThreeAssets = [
   'ProjectorThrow/vendor/three/addons/controls/OrbitControls.js',
   'ProjectorThrow/vendor/three/addons/exporters/OBJExporter.js',
   'ProjectorThrow/vendor/three/addons/exporters/GLTFExporter.js',
+  'ProjectorThrow/vendor/qrcode-generator/qrcode.js',
 ];
 localThreeAssets.forEach((asset) => {
   if (!fs.existsSync(path.join(ROOT, asset))) fail(`Stage 3D local engine asset is missing: ${asset}.`);
@@ -639,6 +640,20 @@ requireMatch(main, /put\(["']u["'],\s*["']ft["']\)/, 'The planner must mark its 
 requireMatch(main, /function\s+noteDrivingEdit\s*\(/, 'The planner must drop the on-site stamp on driving edits like Stage 3D.');
 requireMatch(main, /ThrowlineSceneState\?\.FIELD_VERIFICATION\?\.reason/, 'The planner must reuse the shared on-site verification reason.');
 requireMatch(main, /id=["']verifyReset["']/, 'The planner must show why an on-site stamp was dropped.');
+// Crew job sheet: printable, plain language, with a QR link that reopens the exact scene offline.
+requireMatch(stage, /<script\s+src=["']\.\/vendor\/qrcode-generator\/qrcode\.js["']><\/script>/, 'Stage 3D must load the vendored QR encoder locally.');
+['jobSheetDialog', 'jobSheet', 'jobSheetOpen', 'mobileJobSheet', 'jobSheetPrint', 'jobSheetClose', 'jobSheetQr', 'jobSheetLink', 'jsPlacement', 'jsChecks', 'jsVerify'].forEach((id) => {
+  requireMatch(stage, new RegExp(`id=["']${id}["']`), `Stage 3D job sheet is missing ${id}.`);
+});
+['function buildJobSheet(', 'function sceneLinkFor(', 'SceneState.transferParamsFor(sceneState)', "qrcode(0,'M')", 'window.print()'].forEach((token) => {
+  if (!stage.includes(token)) fail(`Stage 3D job sheet is missing ${token}.`);
+});
+requireMatch(stage, /@media print\{html,body\{overflow:visible!important/, 'Stage 3D must unlock the viewport for printing the job sheet.');
+requireMatch(stage, /body>\*:not\(#jobSheetDialog\)\{display:none!important\}/, 'Printing must show only the job sheet.');
+requireMatch(stage, /length\(['"]rw['"][\s\S]*?boundedLength\(['"]px['"][\s\S]*?boundedLength\(['"]tx['"]/, 'Stage 3D must read position and room values back from a job-sheet link.');
+['transferParamsFor', 'catalog: transfer.catalog'].forEach((token) => {
+  if (!sceneState.includes(token)) fail(`Throwline scene-state contract is missing ${token}.`);
+});
 requireMatch(sceneState, /const STORAGE_KEY = 'throwline:stage-scene:v1'/, 'Stage 3D scene storage must use the registered versioned key.');
 requireMatch(stage, /min-height:\s*44px/, 'Stage 3D must retain 44-pixel touch targets on phone.');
 requireMatch(sidecar, /:host\(\[field-verify\]\)\s+\.toolbar/, 'Stage exports must yield to planning data in Field Verify mode.');

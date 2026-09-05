@@ -128,6 +128,7 @@
     './ProjectorThrow/vendor/three/addons/controls/OrbitControls.js',
     './ProjectorThrow/vendor/three/addons/exporters/OBJExporter.js',
     './ProjectorThrow/vendor/three/addons/exporters/GLTFExporter.js',
+    './ProjectorThrow/vendor/qrcode-generator/qrcode.js',
     './css/sbd-public-nav.css',
     './css/av-theme.css',
     './css/responsive-tables.css',
@@ -219,7 +220,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool change — rolls the service-worker cache. */
-    version:'v20260905-throwline-verify-units',
+    version:'v20260905-throwline-job-sheet',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,
