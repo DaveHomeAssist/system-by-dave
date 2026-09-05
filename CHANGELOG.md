@@ -2,6 +2,14 @@
 
 ## 2026-09-05
 
+### Throwline Stage 3D sidebar clarity and responsive menu
+
+* The Stage 3D Adjust rail now groups its controls under four native workflow disclosures — Screen, Projector, Room & Obstructions, and Verify & Deliver — beneath a sticky compact summary of the screen width and set mark. Every control keeps its ID, value, event path, disabled state, URL parameter, storage key, and accessible-name wiring; reviewed labels were applied (Bottom edge height, Lens & calculation, Throw-ratio range, Lens center height, Screen-to-lens distance, Projector left / right, Image center left / right, Recommended, Projector dimensions, Lens extension, Verify on site, Confirm site measurement, Save & share, Export scene file).
+* Once offline readiness is confirmed the full offline explanation collapses to a compact status row; the preparation, unavailable, updating, and failure explanations are unchanged. Lateral sliders gained a visible Left · Centre · Right scale with worded values, destructive actions are visually distinct, Clear obstructions disables when no obstruction exists, and unit buttons carry their provenance state (Unit A · Manual).
+* Field Verify at phone widths (820px and below) now opens the Adjust sheet, discloses Verify & Deliver, scrolls the verification panel into view, and focuses the measured-distance field, keeping the existing validation, `aria-invalid`, alert, and provenance behavior.
+* New 821–1299px mode keeps the desktop rail but removes the permanent Facts overlay from the canvas: a visible, keyboard-operable Facts button opens it as an on-demand, Escape-dismissible sheet; the 820px four-button dock is unchanged. A 360px-and-below header rule keeps Theme, Units, Field Verify, and Start inside the viewport at full touch height, and phone number and text inputs are at least 44px tall.
+* The browser probe now sweeps 320–2750px (13 widths) for header containment, the viewport lock, HUD/Facts overlay separation, bounded and mutually exclusive sheets, 44px mobile controls, the mobile Field Verify reveal, dark and light themes, reduced motion, keyboard operation, and the complete control/camera/export inventory; the release verifier pins the new structures and probe assertions. Updated the Throwline architecture notes, Stage 3D sitemap date, and AV Suite offline cache version.
+
 ### Throwline WebGL 2 startup fallback
 
 * Stage 3D now retries renderer startup with lower graphics demand, then replaces a failed WebGL 2 canvas with a live 2D plan of the same room, screen, beams, projector units, and obstructions. Calculations, placement controls, scene JSON, and the job sheet stay active; controls that only affect the 3D view and OBJ/GLB model downloads are disabled.
