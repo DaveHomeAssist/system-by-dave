@@ -610,7 +610,8 @@ requireMatch(stage, /height:100dvh;[^}]*grid-template-areas:"header" "stage" "do
 requireMatch(stage, /class=["']mobile-dock["'][^>]*>[\s\S]*data-mobile-panel-button=["']adjust["'][\s\S]*data-mobile-panel-button=["']view["'][\s\S]*data-mobile-panel-button=["']facts["'][\s\S]*data-mobile-panel-button=["']export["']/, 'Stage 3D phone workspace must expose Adjust, View, Facts, and Export sheets.');
 requireMatch(stage, /body\[data-mobile-panel=adjust\][\s\S]*body\[data-mobile-panel=view\][\s\S]*body\[data-mobile-panel=facts\][\s\S]*body\[data-mobile-panel=export\]/, 'Stage 3D phone sheets must use one exclusive mobile-panel state.');
 requireMatch(stage, /dataset\.fieldVerify\s*=/, 'Stage 3D must expose Field Verify state on the document.');
-requireMatch(stage, /if\s*\(enabled\s*&&\s*window\.innerWidth\s*>\s*820\)\s*adjustPanel\.open\s*=\s*true/, 'Stage 3D Field Verify must keep phone adjustments compact.');
+requireMatch(stage, /function\s+revealFieldVerification\s*\([\s\S]*?window\.innerWidth\s*<=\s*820[\s\S]*?setMobilePanel\(['"]adjust['"]\)[\s\S]*?sectionVerify[\s\S]*?fieldVerificationPanel[\s\S]*?scrollIntoView[\s\S]*?measuredDistance[\s\S]*?\.focus\(/, 'Stage 3D Field Verify must open the Adjust sheet, disclose Verify & Deliver, scroll the panel into view, and focus the measured distance on phone widths.');
+requireMatch(stage, /if\s*\(enabled\s*&&\s*announceChange\)\s*revealFieldVerification\(\)/, 'Stage 3D Field Verify must reveal the verification fields when the operator enables it.');
 requireMatch(main, /id=["']plannerFieldVerify["']/, 'Throwline main app must expose a Field Verify mode control.');
 requireMatch(main, /dataset\.fieldVerify\s*=/, 'Throwline main app must expose Field Verify state on the document.');
 requireMatch(main, /@media\(max-width:760px\)[\s\S]*?body\[data-field-verify=["']true["']\]\s+main\s*\{[^}]*grid-template-columns:\s*1fr/s, 'Throwline main Field Verify must collapse to one column on phone.');
@@ -663,6 +664,44 @@ requireMatch(stage, /length\(['"]rw['"][\s\S]*?boundedLength\(['"]px['"][\s\S]*?
 });
 requireMatch(sceneState, /const STORAGE_KEY = 'throwline:stage-scene:v1'/, 'Stage 3D scene storage must use the registered versioned key.');
 requireMatch(stage, /min-height:\s*44px/, 'Stage 3D must retain 44-pixel touch targets on phone.');
+
+// Sidebar clarity and responsive menu contract (2026-09-05).
+['sectionScreen', 'sectionProjector', 'sectionRoom', 'sectionVerify'].forEach((id) => {
+  requireMatch(stage, new RegExp(`<details\\b[^>]*class=["']adjust-section["'][^>]*id=["']${id}["'][^>]*open`), `Stage 3D Adjust must group controls under the open-by-default ${id} workflow disclosure.`);
+});
+requireMatch(stage, /<summary>Screen<\/summary>[\s\S]*?<summary>Projector<\/summary>[\s\S]*?<summary>Room &amp; Obstructions<\/summary>[\s\S]*?<summary>Verify &amp; Deliver<\/summary>/, 'Stage 3D workflow disclosures must be named Screen, Projector, Room & Obstructions, and Verify & Deliver.');
+requireMatch(stage, /\.adjust-panel>summary\{position:sticky/, 'Stage 3D must keep the compact Adjust summary sticky above the rail.');
+requireMatch(stage, /html\[data-offline=ready\] \.online-note\{[^}]*\}\s*html\[data-offline=ready\] \.online-note #offlineStatusDetail,html\[data-offline=ready\] \.online-note \.online-note-fallback\{display:none\}/, 'Stage 3D must collapse the offline explanation to a compact row only once readiness is confirmed.');
+['Bottom edge height', 'Lens &amp; calculation', 'Throw-ratio range', 'Lens center height', 'Screen-to-lens distance', 'Projector left / right', 'Image center left / right', 'Recommended', 'Projector dimensions', 'Lens extension', 'Verify on site', 'Confirm site measurement', 'Save &amp; share', 'Export scene file', 'Projector units'].forEach((label) => {
+  if (!stage.includes(label)) fail(`Stage 3D is missing the reviewed label "${label}".`);
+});
+requireMatch(stage, /UNIT_PROVENANCE_SHORT/, 'Stage 3D unit strip buttons must carry their provenance state.');
+requireMatch(stage, /class=["']slider-scale["'][^>]*aria-hidden=["']true["'][^>]*><span>Left<\/span><span>Centre<\/span><span>Right<\/span>/, 'Stage 3D lateral sliders must show visible Left/Centre/Right meaning.');
+requireMatch(stage, /function\s+sideFmt\s*\(/, 'Stage 3D lateral values must read left/right in words.');
+requireMatch(stage, /button\.danger\{/, 'Stage 3D must visually distinguish destructive actions.');
+requireMatch(stage, /button:disabled\{/, 'Stage 3D must visually distinguish disabled actions.');
+requireMatch(stage, /clearObstacles['"]\)\.disabled=sceneState\.obstacles\.length===0/, 'Stage 3D must disable Clear obstructions when no obstruction exists.');
+requireMatch(stage, /id=["']factsTrigger["'][^>]*type=["']button["'][^>]*aria-controls=["']stageFactsSheet["'][^>]*aria-expanded/, 'Stage 3D must expose a keyboard-operable Facts trigger for the intermediate widths.');
+requireMatch(stage, /@media \(min-width:821px\) and \(max-width:1299px\)\{[\s\S]*?\.facts-trigger\{display:inline-flex\}[\s\S]*?\.facts\{display:none\}[\s\S]*?body\[data-facts-open=true\] \.facts\{display:block/, 'Stage 3D must define the 821-1299px intermediate mode: no permanent Facts, an on-demand sheet behind the trigger.');
+requireMatch(stage, /function\s+setFactsSheet\s*\([\s\S]*?aria-expanded[\s\S]*?Escape[\s\S]*?setFactsSheet\(false,\{focusTrigger:true\}\)/, 'Stage 3D Facts sheet must be dismissible from the keyboard.');
+requireMatch(stage, /@media \(max-width:360px\)\{[\s\S]*?\.theme-toggle,\.unit-toggle\{min-width:40px/, 'Stage 3D must keep the 360px header controls inside the viewport without shrinking their touch height.');
+requireMatch(stage, /\.field-grid input,input\[type=text\]\{min-height:44px\}/, 'Stage 3D phone number and text inputs must be at least 44px tall.');
+requireMatch(browserProbe, /320, 360, 390, 560, 680, 820, 821, 1024, 1200, 1299, 1300, 1440, 2750/, 'The browser probe must sweep the full responsive width matrix.');
+[
+  ['Field Verify reveals the verification fields in the open Adjust sheet', 'the mobile Field Verify reveal'],
+  ['keeps every visible header control inside the viewport at full height', 'header containment'],
+  ['document does not page-scroll', 'the viewport lock'],
+  ['clear of the HUD', 'HUD and Facts overlay separation'],
+  ['active Adjust sheet stays inside the viewport', 'mobile sheet bounds'],
+  ['mobile inputs meet the 44px touch target', '44px mobile controls'],
+  ['mobile sheets stay mutually exclusive', 'sheet exclusivity'],
+  ['every baseline control, camera, and export route is present', 'the control inventory'],
+  ['prefers-reduced-motion', 'reduced-motion coverage'],
+  ['Escape dismisses the Facts sheet', 'keyboard dismissal of the Facts sheet'],
+  ['dark theme keeps the locked viewport', 'dark-theme responsive coverage'],
+].forEach(([token, name]) => {
+  if (!browserProbe.includes(token)) fail(`The browser probe must hard-fail ${name}.`);
+});
 requireMatch(sidecar, /:host\(\[field-verify\]\)\s+\.toolbar/, 'Stage exports must yield to planning data in Field Verify mode.');
 requireMatch(sidecar, /@media\s*\(max-width:\s*820px\)[\s\S]*?\.toolbar\s*\{[^}]*display:\s*none/s, 'Stage 3D must hide its internal export toolbar on phone.');
 requireMatch(sidecar, /\n\s+runExport\s*\(format\)/, 'Stage 3D must expose its existing export flow to phone controls.');

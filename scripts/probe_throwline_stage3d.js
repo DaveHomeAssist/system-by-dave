@@ -424,6 +424,124 @@ async function main() {
       }
     }
 
+    // 17. Sidebar clarity and responsive menu contract. The full width matrix keeps the workspace
+    // viewport-locked, the header controls visible at full touch height, the HUD and Facts overlays
+    // separated, the sheets exclusive and bounded, and every baseline control route present.
+    const pressEscape = async () => {
+      await cdp('Input.dispatchKeyEvent', { type: 'rawKeyDown', key: 'Escape', code: 'Escape', windowsVirtualKeyCode: 27, nativeVirtualKeyCode: 27 });
+      await cdp('Input.dispatchKeyEvent', { type: 'keyUp', key: 'Escape', code: 'Escape', windowsVirtualKeyCode: 27, nativeVirtualKeyCode: 27 });
+      await delay(150);
+    };
+    const intersects = (a, b) => !!a && !!b && a.left < b.right - 1 && b.left < a.right - 1 && a.top < b.bottom - 1 && b.top < a.bottom - 1;
+    const contained = (r, layout) => !!r && r.left >= -0.5 && r.top >= -0.5 && r.right <= layout.clientWidth + 0.5 && r.bottom <= layout.clientHeight + 0.5;
+    const LAYOUT_SNAPSHOT = `(() => {
+      const doc=document.documentElement;
+      const rect=el=>{ if(!el)return null; const r=el.getBoundingClientRect(); return {left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height}; };
+      const visible=el=>{ if(!el)return false; const s=getComputedStyle(el); if(s.display==='none'||s.visibility==='hidden')return false; const r=el.getBoundingClientRect(); return r.width>0&&r.height>0; };
+      const header=['themeToggle','unitToggle','fieldVerifyToggle','quickStartToggle'].map(id=>{ const el=document.getElementById(id); return {id,visible:visible(el),rect:rect(el)}; });
+      const hud=document.querySelector('.hud'), facts=document.querySelector('.facts'), trigger=document.getElementById('factsTrigger'), toolbar=document.querySelector('.scene-toolbar'), dock=document.querySelector('.mobile-dock');
+      const layer=el=>Number(getComputedStyle(el).zIndex)||0;
+      return { clientWidth:doc.clientWidth, clientHeight:doc.clientHeight, header,
+        hud:{visible:visible(hud),rect:rect(hud),layer:layer(hud)}, facts:{visible:visible(facts),rect:rect(facts),layer:layer(facts)},
+        trigger:{visible:visible(trigger),rect:rect(trigger),tag:trigger?trigger.tagName:'',expanded:trigger?trigger.getAttribute('aria-expanded'):''},
+        toolbar:{visible:visible(toolbar),rect:rect(toolbar)}, dock:{visible:visible(dock),rect:rect(dock)} };
+    })()`;
+    const CONTROL_IDS = ['adjustPanel','sectionScreen','sectionProjector','sectionRoom','sectionVerify','adjustSummary','unitStrip','addUnit','removeUnit','stackUnits','blendUnits','sw','st','ar','lens','lh','d','px','targetX','bw','bm','bt','bodyW','bodyH','bodyD','bodyLp','clearBody','roomW','roomD','roomH','roomC','addObstacle','clearObstacles','obstacleX','obstacleY','obstacleZ','obstacleWidth','obstacleHeight','obstacleDepth','removeObstacle','measuredDistance','measuredWidth','verifiedBy','stampVerification','saveScene','restoreScene','importScene','downloadScene','resetScene','jobSheetOpen','sceneFile','tcone','troom','tgrid','tenvelope','tshift','tdimensions','resetView','mobileObj','mobileGlb','mobileJobSheet','factsTrigger','themeToggle','unitToggle','fieldVerifyToggle','quickStartToggle'];
+
+    await cdp('Emulation.setDeviceMetricsOverride', { width: 1280, height: 900, deviceScaleFactor: 1, mobile: false });
+    await open(AUDIT_QUERY);
+    const inventory = await evaluate(`(() => { const missing=${JSON.stringify(CONTROL_IDS)}.filter(id=>!document.getElementById(id)); const cams=[...document.querySelectorAll('[data-cam]')].map(button=>button.dataset.cam); const sections=[...document.querySelectorAll('.adjust-section')].map(section=>section.querySelector('summary').textContent.trim()); return { missing, cams, sections, clearDisabled:document.getElementById('clearObstacles').disabled }; })()`);
+    check('every baseline control, camera, and export route is present', inventory.missing.length === 0 && inventory.cams.join(',') === 'three,side,front,top,op', inventory);
+    check('the Adjust rail groups its controls under the four workflow disclosures', inventory.sections.length === 4 && inventory.sections[0] === 'Screen' && inventory.sections[1] === 'Projector' && inventory.sections[2] === 'Room & Obstructions' && inventory.sections[3] === 'Verify & Deliver', inventory);
+    check('Clear obstructions is disabled while no obstruction exists', inventory.clearDisabled === true, inventory);
+    await click('addObstacle');
+    const clearEnabled = await evaluate(`document.getElementById('clearObstacles').disabled`);
+    await click('clearObstacles');
+    const clearReDisabled = await evaluate(`document.getElementById('clearObstacles').disabled`);
+    check('Clear obstructions enables with an obstruction and disables again when cleared', clearEnabled === false && clearReDisabled === true, { clearEnabled, clearReDisabled });
+    const sticky = await evaluate(`(() => { const aside=document.querySelector('aside'); aside.scrollTop=aside.scrollHeight; const summary=document.querySelector('.adjust-panel>summary'); const s=summary.getBoundingClientRect(); const a=aside.getBoundingClientRect(); return { summaryTop:s.top, asideTop:a.top, scrolled:aside.scrollTop>0, value:document.getElementById('adjustSummary').textContent.trim() }; })()`);
+    check('the compact Adjust summary stays pinned while the rail scrolls', sticky.scrolled && Math.abs(sticky.summaryTop - sticky.asideTop) <= 1 && /screen/.test(sticky.value) && /set/.test(sticky.value), sticky);
+    let offlineCompact = null;
+    for (let attempt = 0; attempt < 160; attempt += 1) {
+      offlineCompact = await evaluate(`(() => { const detail=document.getElementById('offlineStatusDetail'); return { state:document.documentElement.dataset.offline||'', detailDisplay:getComputedStyle(detail).display, title:document.getElementById('offlineStatusTitle').textContent.trim() }; })()`);
+      if (offlineCompact.state === 'ready') break;
+      await delay(125);
+    }
+    check('confirmed offline readiness collapses the explanation to a compact status row', offlineCompact?.state === 'ready' && offlineCompact.detailDisplay === 'none' && /^Offline ready/.test(offlineCompact.title), offlineCompact);
+
+    const MATRIX_WIDTHS = [320, 360, 390, 560, 680, 820, 821, 1024, 1200, 1299, 1300, 1440, 2750];
+    const MATRIX_HEIGHTS = { 320: 568, 360: 740, 390: 844, 560: 720, 680: 900, 820: 1080, 821: 900, 1024: 768, 1200: 800, 1299: 850, 1300: 850, 1440: 900, 2750: 1200 };
+    for (const width of MATRIX_WIDTHS) {
+      await cdp('Emulation.setDeviceMetricsOverride', { width, height: MATRIX_HEIGHTS[width], deviceScaleFactor: 1, mobile: width <= 820 });
+      await open(AUDIT_QUERY);
+      const layout = await evaluate(LAYOUT_SNAPSHOT);
+      const minControl = width <= 820 ? 44 : 34;
+      check(`${width}px keeps every visible header control inside the viewport at full height`, layout.header.filter(control => control.visible).length === 4 && layout.header.every(control => !control.visible || (contained(control.rect, layout) && control.rect.height >= minControl - 0.5)), layout.header);
+      const scrollProbe = await evaluate(`(() => { window.scrollTo(0,120); const y=window.pageYOffset; window.scrollTo(120,0); const x=window.pageXOffset; window.scrollTo(0,0); return { x, y, overflowX:document.documentElement.scrollWidth-document.documentElement.clientWidth }; })()`);
+      check(`${width}px document does not page-scroll`, scrollProbe.x === 0 && scrollProbe.y === 0 && scrollProbe.overflowX <= 1, scrollProbe);
+      if (width <= 820) {
+        check(`${width}px keeps the four-button dock with the Facts overlay and trigger hidden`, layout.dock.visible && !layout.facts.visible && !layout.trigger.visible, layout);
+        await evaluate(`document.getElementById('fieldVerifyToggle').click()`);
+        await delay(280);
+        const reveal = await evaluate(`(() => { const aside=document.querySelector('aside'); const a=aside.getBoundingClientRect(); const field=document.getElementById('measuredDistance'); const f=field.getBoundingClientRect(); return { panel:document.body.dataset.mobilePanel||'', sectionOpen:document.getElementById('sectionVerify').open, adjustOpen:document.getElementById('adjustPanel').open, focus:document.activeElement?document.activeElement.id:'', asideDisplay:getComputedStyle(aside).display, aside:{left:a.left,top:a.top,right:a.right,bottom:a.bottom}, field:{top:f.top,bottom:f.bottom,height:f.height}, clientWidth:document.documentElement.clientWidth, clientHeight:document.documentElement.clientHeight }; })()`);
+        check(`${width}px Field Verify reveals the verification fields in the open Adjust sheet`, reveal.panel === 'adjust' && reveal.sectionOpen === true && reveal.adjustOpen === true && reveal.asideDisplay !== 'none' && reveal.focus === 'measuredDistance' && reveal.field.height >= 44 && reveal.field.top >= reveal.aside.top - 1 && reveal.field.bottom <= reveal.aside.bottom + 1, reveal);
+        check(`${width}px active Adjust sheet stays inside the viewport`, reveal.aside.left >= -0.5 && reveal.aside.top >= -0.5 && reveal.aside.right <= reveal.clientWidth + 0.5 && reveal.aside.bottom <= reveal.clientHeight + 0.5, reveal);
+      } else if (width <= 1299) {
+        check(`${width}px replaces the permanent Facts overlay with a visible keyboard-operable trigger`, layout.trigger.visible && layout.trigger.tag === 'BUTTON' && !layout.facts.visible && !layout.dock.visible && contained(layout.trigger.rect, layout), layout);
+        await evaluate(`document.getElementById('factsTrigger').focus()`);
+        const triggerFocus = await evaluate(`document.activeElement?document.activeElement.id:''`);
+        await evaluate(`document.getElementById('factsTrigger').click()`);
+        await delay(200);
+        const openState = await evaluate(LAYOUT_SNAPSHOT);
+        check(`${width}px Facts opens as a bounded dismissible sheet layered above the HUD, clear of the scene controls`, triggerFocus === 'factsTrigger' && openState.facts.visible && contained(openState.facts.rect, openState) && (openState.facts.layer > openState.hud.layer || !intersects(openState.hud.rect, openState.facts.rect)) && !intersects(openState.toolbar.rect, openState.facts.rect) && openState.trigger.expanded === 'true', openState);
+        await pressEscape();
+        const closedState = await evaluate(`({ open:document.body.dataset.factsOpen||'', focus:document.activeElement?document.activeElement.id:'', factsDisplay:getComputedStyle(document.querySelector('.facts')).display })`);
+        check(`${width}px Escape dismisses the Facts sheet and returns focus to the trigger`, closedState.open === 'false' && closedState.focus === 'factsTrigger' && closedState.factsDisplay === 'none', closedState);
+      } else {
+        check(`${width}px keeps the permanent Facts overlay bounded, clear of the HUD, without the trigger`, layout.facts.visible && !layout.trigger.visible && !layout.dock.visible && contained(layout.facts.rect, layout) && !intersects(layout.hud.rect, layout.facts.rect), layout);
+      }
+      if (width === 390) {
+        await open(AUDIT_QUERY);
+        await evaluate(`document.querySelector('[data-mobile-panel-button="adjust"]').click()`);
+        await delay(140);
+        await evaluate(`document.querySelector('[data-mobile-panel-button="view"]').click()`);
+        await delay(140);
+        const exclusivity = await evaluate(`(() => { const shown=el=>getComputedStyle(el).display!=='none'; return { panel:document.body.dataset.mobilePanel||'', adjust:shown(document.querySelector('aside')), view:shown(document.querySelector('.scene-toolbar')), facts:shown(document.querySelector('.facts')), exports:shown(document.querySelector('.mobile-exports')) }; })()`);
+        check('390px mobile sheets stay mutually exclusive', exclusivity.panel === 'view' && exclusivity.view && !exclusivity.adjust && !exclusivity.facts && !exclusivity.exports, exclusivity);
+        await evaluate(`document.querySelector('[data-mobile-panel-button="adjust"]').click()`);
+        await delay(140);
+        const touch = await evaluate(`(() => { const h=id=>document.getElementById(id).getBoundingClientRect().height; return { sw:h('sw'), ar:h('ar'), md:h('measuredDistance'), vb:h('verifiedBy'), stamp:h('stampVerification'), dock:[...document.querySelectorAll('.mobile-dock button')].map(button=>button.getBoundingClientRect().height) }; })()`);
+        check('390px mobile inputs meet the 44px touch target', touch.sw >= 44 && touch.ar >= 44 && touch.md >= 44 && touch.vb >= 44 && touch.stamp >= 44 && touch.dock.every(value => value >= 44), touch);
+        await evaluate(`document.getElementById('themeToggle').click()`);
+        await delay(160);
+        const dark = await evaluate(`(() => { window.scrollTo(0,120); const y=window.pageYOffset; window.scrollTo(0,0); return { theme:document.documentElement.dataset.theme||'', y }; })()`);
+        check('390px dark theme keeps the locked viewport', dark.theme === 'dark' && dark.y === 0, dark);
+        await evaluate(`document.getElementById('themeToggle').click()`);
+        await delay(120);
+      }
+      if (width === 1024) {
+        await cdp('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-motion', value: 'reduce' }] });
+        await open(AUDIT_QUERY);
+        await evaluate(`document.getElementById('factsTrigger').focus()`);
+        const reducedFocus = await evaluate(`document.activeElement?document.activeElement.id:''`);
+        await evaluate(`document.getElementById('factsTrigger').click()`);
+        await delay(160);
+        const reducedOpen = await evaluate(`getComputedStyle(document.querySelector('.facts')).display`);
+        await pressEscape();
+        const reducedClosed = await evaluate(`({ display:getComputedStyle(document.querySelector('.facts')).display, focus:document.activeElement?document.activeElement.id:'' })`);
+        check('1024px reduced-motion Facts trigger stays keyboard operable', reducedFocus === 'factsTrigger' && reducedOpen !== 'none' && reducedClosed.display === 'none' && reducedClosed.focus === 'factsTrigger', { reducedFocus, reducedOpen, reducedClosed });
+        await cdp('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-motion', value: '' }] });
+        await open(AUDIT_QUERY);
+        await evaluate(`document.getElementById('themeToggle').click()`);
+        await delay(160);
+        const darkMid = await evaluate(`document.documentElement.dataset.theme||''`);
+        check('1024px dark theme applies on the intermediate rail', darkMid === 'dark', darkMid);
+        await evaluate(`document.getElementById('themeToggle').click()`);
+        await delay(120);
+      }
+    }
+    await cdp('Emulation.setDeviceMetricsOverride', { width: 1280, height: 900, deviceScaleFactor: 1, mobile: false });
+
     const unexpectedExceptions = noWebgl
       ? exceptions.filter((exception) => !/Error creating WebGL context\.|three-d-stage: WebGL 2 unavailable after standard and low-power startup attempts/.test(exception))
       : exceptions;

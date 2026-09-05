@@ -81,10 +81,21 @@ header{grid-area:header;display:flex;align-items:center;gap:14px;flex-wrap:wrap;
 .theme-icon-sun{display:none}
 html[data-theme=dark] .theme-icon-moon{display:none}
 html[data-theme=dark] .theme-icon-sun{display:block}
-aside{grid-area:controls;background:var(--case);border-right:1px solid var(--line);overflow:auto;padding:16px;min-height:0}
+aside{grid-area:controls;background:var(--case);border-right:1px solid var(--line);overflow:auto;padding:0;min-height:0}
 .adjust-panel{padding:0;border:0}
-.adjust-panel>summary{display:none}
-.adjust-content{display:flex;flex-direction:column;gap:16px}
+.adjust-panel>summary{position:sticky;top:0;z-index:6;display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:44px;padding:10px 16px;background:var(--case);border-bottom:1px solid var(--line-lo);font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;list-style:none}
+.adjust-panel>summary::-webkit-details-marker{display:none}
+.adjust-content{display:flex;flex-direction:column;gap:14px;padding:14px 16px 16px}
+.adjust-section{border:1px solid var(--line-lo);border-radius:var(--r)}
+.adjust-section>summary{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:40px;padding:9px 12px;font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--chalk);cursor:pointer;list-style:none}
+.adjust-section>summary::-webkit-details-marker{display:none}
+.adjust-section>summary::after{content:"+";font-size:15px;color:var(--hazard)}
+.adjust-section[open]>summary::after{content:"−"}
+.adjust-section>.section-content{display:flex;flex-direction:column;gap:16px;padding:12px 12px 14px;border-top:1px solid var(--line-lo)}
+.slider-scale{display:flex;justify-content:space-between;margin-top:2px;font-family:var(--mono);font-size:8.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--dimmer)}
+button.danger{color:var(--safety);border-color:color-mix(in srgb,var(--safety) 45%,var(--line));background:var(--case-hi)}
+button.danger:hover:not(:disabled){background:var(--safety-lo);border-color:var(--safety)}
+button:disabled{opacity:.45;cursor:not-allowed}
 main{grid-area:stage;position:relative;min-width:0;min-height:0}
 .stage-canvas{position:absolute;inset:0;min-width:0;min-height:0}
 three-d-stage{width:100%;height:100%}
@@ -118,7 +129,7 @@ button{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transfor
 button.pri{background:var(--hazard);border-color:var(--hazard);color:var(--primary-ink);font-weight:700}
 button[aria-pressed=true]{background:var(--line-lo);color:var(--chalk);border-color:var(--line)}
 .row{display:flex;gap:7px;flex-wrap:wrap}
-.hud{position:absolute;z-index:2;left:16px;top:16px;background:var(--overlay);backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:var(--r);padding:13px 15px;min-width:250px;pointer-events:none;background-image:repeating-linear-gradient(135deg,transparent 0 9px,var(--hazard-lo) 9px 18px)}
+.hud{position:absolute;z-index:2;left:16px;top:16px;background:var(--overlay);backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:var(--r);padding:13px 15px;min-width:250px;max-width:min(420px,calc(100% - 32px));pointer-events:none;background-image:repeating-linear-gradient(135deg,transparent 0 9px,var(--hazard-lo) 9px 18px)}
 .hud .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--dimmer)}
 .hud .big{font-family:var(--mono);font-weight:700;font-size:40px;line-height:1;letter-spacing:-.035em;color:var(--hazard);margin:6px 0 5px;font-variant-numeric:tabular-nums}
 .hud .sub{font-family:var(--mono);font-size:11.5px;font-variant-numeric:tabular-nums;color:var(--dim)}
@@ -154,6 +165,10 @@ body[data-field-verify=true] .mobile-exports{display:none}
 body[data-field-verify=true] header{position:sticky;top:0;z-index:9}
 .kbd-help{font-size:11.5px;color:var(--dimmer);margin:0;border-top:1px solid var(--line-lo);padding-top:12px}
 .online-note{margin:0;padding:10px 11px;border-left:3px solid var(--info);background:var(--info-lo);font-size:11.5px;color:var(--dim)}
+/* Once offline readiness is confirmed the explanation collapses to a compact status row; every other
+   offline state (preparing, unavailable, updating, failed) keeps its complete explanation. */
+html[data-offline=ready] .online-note{display:flex;align-items:center;gap:8px;padding:6px 10px;font-size:10.5px}
+html[data-offline=ready] .online-note #offlineStatusDetail,html[data-offline=ready] .online-note .online-note-fallback{display:none}
 .calculation-gate{margin:0;padding:10px 11px;border-left:3px solid var(--hazard);background:var(--hazard-lo);font-size:11.5px;color:var(--ink);line-height:1.45}
 html[data-calculation-mode="manufacturer_unspecified"] .calculation-gate,html[data-calculation-mode="conflicting"] .calculation-gate,html[data-calculation-mode="partial"] .calculation-gate,html[data-calculation-mode="legacy_unverified"] .calculation-gate,html[data-calculation-mode="blocked"] .calculation-gate{border-color:var(--safety);background:var(--safety-lo);color:var(--safety)}
 .onboarding-dialog{width:min(760px,calc(100vw - 32px));max-height:calc(100dvh - 32px);margin:auto;padding:0;border:1px solid var(--line);border-radius:8px;background:var(--case);color:var(--chalk);box-shadow:0 28px 90px rgba(15,17,20,.38);overflow:auto}
@@ -254,6 +269,17 @@ html[data-calculation-mode=blocked] .provenance-badge,html[data-calculation-mode
 .mobile-dock{display:none}
 .stage-canvas::after{content:"DRAG GOLD HANDLES TO SET GEOMETRY";position:absolute;right:50%;bottom:16px;z-index:2;translate:50% 0;padding:5px 8px;border:1px solid var(--line);border-radius:999px;background:var(--overlay);color:var(--dimmer);font:700 9px var(--mono);letter-spacing:.08em;pointer-events:none}
 .scene-toolbar{top:auto;bottom:16px}
+.facts-trigger{display:none;position:absolute;z-index:4;right:16px;top:16px;align-items:center;gap:6px;min-height:34px;background:var(--overlay);backdrop-filter:blur(6px)}
+.facts-trigger[aria-expanded=true]{background:var(--hazard);border-color:var(--hazard);color:var(--primary-ink)}
+
+/* Intermediate workspaces (821-1299px) keep the desktop adjustment rail but swap the permanent
+   Facts overlay for an on-demand dismissible sheet behind a visible, keyboard-operable trigger.
+   The 820px four-button mobile dock below is unchanged. */
+@media (min-width:821px) and (max-width:1299px){
+  .facts-trigger{display:inline-flex}
+  .facts{display:none}
+  body[data-facts-open=true] .facts{display:block;z-index:4;top:60px;max-height:calc(100% - 76px);overflow:auto;pointer-events:auto;box-shadow:0 14px 40px rgba(0,0,0,.18)}
+}
 
 @media (max-width:820px){
   html,body{height:100%;min-height:0;overflow:hidden;overscroll-behavior:none}
@@ -271,6 +297,7 @@ html[data-calculation-mode=blocked] .provenance-badge,html[data-calculation-mode
   aside,.scene-toolbar,.facts,.mobile-exports{position:fixed;z-index:20;left:8px;right:8px;bottom:calc(66px + env(safe-area-inset-bottom));top:auto;width:auto;max-height:min(66dvh,560px);margin:0;padding:0;border:1px solid var(--line);border-radius:8px;background:var(--case);box-shadow:0 18px 56px rgba(0,0,0,.32);overflow:auto;display:none}
   body[data-mobile-panel=adjust] aside,body[data-mobile-panel=view] .scene-toolbar,body[data-mobile-panel=facts] .facts,body[data-mobile-panel=export] .mobile-exports{display:block}
   aside{grid-area:auto}.adjust-panel{border:0}.adjust-panel>summary{display:none}.adjust-content{padding:14px;gap:14px;border:0}
+  .field-grid input,input[type=text]{min-height:44px}
   .scene-toolbar{padding:14px}.scene-toolbar .row{justify-content:stretch}.scene-toolbar .row button{flex:1 1 82px}
   .facts{font-size:11px}.facts div{padding:9px 12px}
   .mobile-exports{grid-template-columns:1fr 1fr;gap:8px;padding:14px}.mobile-exports button{min-height:48px}
@@ -303,6 +330,16 @@ html[data-calculation-mode=blocked] .provenance-badge,html[data-calculation-mode
   .onboarding-actions{display:grid;grid-template-columns:1fr 1.2fr}
   .onboarding-note{order:2;text-align:center}
 }
+
+/* Narrow phone headers (360px and below) keep Theme, Units, Field Verify, and Start fully inside the
+   viewport without reducing their vertical touch size (min-height stays at the 44px phone target). */
+@media (max-width:360px){
+  header{padding:6px;gap:6px}
+  .brand{font-size:11px;letter-spacing:.14em}
+  .header-actions{gap:4px}
+  .theme-toggle,.unit-toggle{min-width:40px;padding-inline:6px}
+  .field-verify-toggle,.quick-start-toggle{padding-inline:6px}
+}
 </style>
 <link rel="stylesheet" href="../css/sbd-public-nav.css">
 </head>
@@ -334,71 +371,83 @@ html[data-calculation-mode=blocked] .provenance-badge,html[data-calculation-mode
     <details class="adjust-panel" id="adjustPanel" open>
       <summary>Adjust <span class="adjust-summary-value" id="adjustSummary">20' screen · 22' set</span></summary>
       <div class="adjust-content">
-    <p class="online-note"><strong id="offlineStatusTitle">Offline after this first successful load.</strong> <span id="offlineStatusDetail">The pinned 3D engine is local and Throwline is preparing its cache.</span> If WebGL is unavailable, calculation data remains safe in the <a href="index.html?workspace=planner">Throwline planner</a>.</p>
+    <p class="online-note"><strong id="offlineStatusTitle">Offline after this first successful load.</strong> <span id="offlineStatusDetail">The pinned 3D engine is local and Throwline is preparing its cache.</span> <span class="online-note-fallback">If WebGL is unavailable, calculation data remains safe in the <a href="index.html?workspace=planner">Throwline planner</a>.</span></p>
+
+    <details class="adjust-section" id="sectionScreen" open>
+      <summary>Screen</summary>
+      <div class="section-content">
     <div class="grp">
-      <h3>Projectors</h3>
+      <div><label class="lab" for="sw">Width <span class="val" id="swv">20' 0"</span></label><input id="sw" type="range" min="8" max="40" step="0.5" value="20"></div>
+      <div><label class="lab" for="st">Bottom edge height <span class="val" id="stv">4' 0"</span></label><input id="st" type="range" min="0" max="10" step="0.25" value="4"></div>
+      <div><label class="lab" for="ar">Aspect</label><select id="ar"><option value="1.7778">16:9 · HD / UHD</option><option value="1.6">16:10 · WUXGA</option><option value="2.39">2.39:1 · scope</option><option value="1.3333">4:3 · legacy</option></select></div>
+    </div>
+      </div>
+    </details>
+
+    <details class="adjust-section" id="sectionProjector" open>
+      <summary>Projector</summary>
+      <div class="section-content">
+    <div class="grp">
+      <h3>Projector units</h3>
       <div class="unit-strip" id="unitStrip" role="group" aria-label="Projector units"></div>
       <div class="scene-actions">
         <button id="addUnit" type="button">Duplicate unit</button>
-        <button id="removeUnit" type="button">Remove unit</button>
+        <button id="removeUnit" class="danger" type="button">Remove unit</button>
         <button id="stackUnits" type="button">Stack units</button>
         <button id="blendUnits" type="button">Blend spread</button>
       </div>
     </div>
     <div class="grp">
-      <h3>Screen</h3>
-      <div><label class="lab" for="sw">Width <span class="val" id="swv">20' 0"</span></label><input id="sw" type="range" min="8" max="40" step="0.5" value="20"></div>
-      <div><label class="lab" for="st">Bottom off deck <span class="val" id="stv">4' 0"</span></label><input id="st" type="range" min="0" max="10" step="0.25" value="4"></div>
-      <div><label class="lab" for="ar">Aspect</label><select id="ar"><option value="1.7778">16:9 · HD / UHD</option><option value="1.6">16:10 · WUXGA</option><option value="2.39">2.39:1 · scope</option><option value="1.3333">4:3 · legacy</option></select></div>
-    </div>
-
-    <div class="grp">
-      <h3>Calculation input</h3>
+      <h3>Lens &amp; calculation</h3>
       <p class="calculation-gate" id="stageCalculationGate" role="status">MANUAL SIMULATION · using the throw ratio you supplied · not verified yet.</p>
-      <div><label class="lab" for="lens">Manual ratio preset</label><select id="lens">
+      <div><label class="lab" for="lens">Throw-ratio range</label><select id="lens">
         <option value="0.978,1.320" selected>Manual preset A · 0.978–1.320:1</option>
         <option value="1.300,1.740">Manual preset B · 1.300–1.740:1</option>
         <option value="1.700,2.400">Manual preset C · 1.700–2.400:1</option>
         <option value="2.400,4.700">Manual preset D · 2.400–4.700:1</option>
         <option value="0.650,0.650">Manual fixed preset · 0.650:1</option>
       </select></div>
-      <div><label class="lab" for="lh">Lens optical height <span class="val" id="lhv">6' 0"</span></label><input id="lh" type="range" min="1" max="16" step="0.25" value="6"></div>
+      <div><label class="lab" for="lh">Lens center height <span class="val" id="lhv">6' 0"</span></label><input id="lh" type="range" min="1" max="16" step="0.25" value="6"></div>
     </div>
 
     <div class="grp">
       <h3>Placement</h3>
-      <div><label class="lab" for="d">Set distance <span class="val" id="dv">22' 0"</span></label><input id="d" type="range" min="6" max="60" step="0.25" value="22"></div>
-      <div><label class="lab" for="px">Projector lateral <span class="val" id="pxv">0' 0"</span></label><input id="px" type="range" min="-30" max="30" step="0.25" value="0"></div>
-      <div><label class="lab" for="targetX">Image aim <span class="val" id="targetXv">0' 0"</span></label><input id="targetX" type="range" min="-30" max="30" step="0.25" value="0"></div>
+      <div><label class="lab" for="d">Screen-to-lens distance <span class="val" id="dv">22' 0"</span></label><input id="d" type="range" min="6" max="60" step="0.25" value="22"></div>
+      <div><label class="lab" for="px">Projector left / right <span class="val" id="pxv">centred</span></label><input id="px" type="range" min="-30" max="30" step="0.25" value="0"><div class="slider-scale" aria-hidden="true"><span>Left</span><span>Centre</span><span>Right</span></div></div>
+      <div><label class="lab" for="targetX">Image center left / right <span class="val" id="targetXv">centred</span></label><input id="targetX" type="range" min="-30" max="30" step="0.25" value="0"><div class="slider-scale" aria-hidden="true"><span>Left</span><span>Centre</span><span>Right</span></div></div>
       <div class="row" role="group" aria-label="Distance snap controls">
         <button id="bw" type="button">closest</button>
-        <button id="bm" class="pri" type="button">best spot</button>
+        <button id="bm" class="pri" type="button">Recommended</button>
         <button id="bt" type="button">farthest</button>
       </div>
     </div>
 
     <div class="grp" id="bodyGroup">
-      <h3>Projector body</h3>
+      <h3>Projector dimensions</h3>
       <div class="lab" id="bodySource">Not set. The room check uses the lens position only.</div>
       <div class="field-grid">
         <label><span class="lab">Width · ft</span><input id="bodyW" type="number" min="0.1" max="20" step="0.05" inputmode="decimal"></label>
         <label><span class="lab">Height · ft</span><input id="bodyH" type="number" min="0.1" max="20" step="0.05" inputmode="decimal"></label>
         <label><span class="lab">Depth · ft</span><input id="bodyD" type="number" min="0.1" max="20" step="0.05" inputmode="decimal"></label>
-        <label><span class="lab">Lens sticks out · ft</span><input id="bodyLp" type="number" min="0" max="5" step="0.05" inputmode="decimal"></label>
+        <label><span class="lab">Lens extension · ft</span><input id="bodyLp" type="number" min="0" max="5" step="0.05" inputmode="decimal"></label>
       </div>
-      <button id="clearBody" type="button">Clear body</button>
+      <button id="clearBody" class="danger" type="button">Clear body</button>
     </div>
+      </div>
+    </details>
 
+    <details class="adjust-section" id="sectionRoom" open>
+      <summary>Room &amp; Obstructions</summary>
+      <div class="section-content">
     <div class="grp">
-      <h3>Room</h3>
       <div><label class="lab" for="roomW">Width <span class="val" id="roomWv">40' 0"</span></label><input id="roomW" type="range" min="12" max="120" step="0.5" value="40"></div>
       <div><label class="lab" for="roomD">Depth <span class="val" id="roomDv">40' 0"</span></label><input id="roomD" type="range" min="12" max="180" step="0.5" value="40"></div>
       <div><label class="lab" for="roomH">Ceiling <span class="val" id="roomHv">20' 0"</span></label><input id="roomH" type="range" min="8" max="60" step="0.5" value="20"></div>
       <div><label class="lab" for="roomC">Keep clear around projector <span class="val" id="roomCv">1' 0"</span></label><input id="roomC" type="range" min="0" max="6" step="0.25" value="1"></div>
-      <div class="scene-actions"><button id="addObstacle" type="button">Add obstruction</button><button id="clearObstacles" type="button">Clear obstructions</button></div>
+      <div class="scene-actions"><button id="addObstacle" type="button">Add obstruction</button><button id="clearObstacles" class="danger" type="button" disabled>Clear obstructions</button></div>
       <div id="obstacleEditor" hidden>
         <div class="unit-strip" id="obstacleStrip" role="group" aria-label="Room obstructions"></div>
-        <div><label class="lab" for="obstacleX">Obstruction lateral <span class="val" id="obstacleXv">0' 0"</span></label><input id="obstacleX" type="range" min="-30" max="30" step="0.25" value="0"></div>
+        <div><label class="lab" for="obstacleX">Obstruction left / right <span class="val" id="obstacleXv">centred</span></label><input id="obstacleX" type="range" min="-30" max="30" step="0.25" value="0"><div class="slider-scale" aria-hidden="true"><span>Left</span><span>Centre</span><span>Right</span></div></div>
         <div><label class="lab" for="obstacleY">Center height <span class="val" id="obstacleYv">3' 0"</span></label><input id="obstacleY" type="range" min="0" max="30" step="0.25" value="3"></div>
         <div><label class="lab" for="obstacleZ">Distance from screen <span class="val" id="obstacleZv">10' 0"</span></label><input id="obstacleZ" type="range" min="0" max="120" step="0.25" value="10"></div>
         <div class="field-grid">
@@ -406,31 +455,38 @@ html[data-calculation-mode=blocked] .provenance-badge,html[data-calculation-mode
           <label><span class="lab">Height · ft</span><input id="obstacleHeight" type="number" min="0.25" max="100" step="0.25" inputmode="decimal"></label>
           <label><span class="lab">Depth · ft</span><input id="obstacleDepth" type="number" min="0.25" max="100" step="0.25" inputmode="decimal"></label>
         </div>
-        <button id="removeObstacle" type="button">Remove selected</button>
+        <button id="removeObstacle" class="danger" type="button">Remove selected</button>
       </div>
     </div>
+      </div>
+    </details>
 
+    <details class="adjust-section" id="sectionVerify" open>
+      <summary>Verify &amp; Deliver</summary>
+      <div class="section-content">
     <div class="grp" id="fieldVerificationPanel">
-      <h3>Field verification</h3>
+      <h3>Verify on site</h3>
       <div class="field-grid">
         <label><span class="lab">Measured throw · ft</span><input id="measuredDistance" type="number" min="0.01" max="300" step="0.01" inputmode="decimal" required aria-describedby="fieldVerificationError"></label>
         <label><span class="lab">Measured image · ft</span><input id="measuredWidth" type="number" min="0.01" max="200" step="0.01" inputmode="decimal" required aria-describedby="fieldVerificationError"></label>
         <label class="wide"><span class="lab">Verified by</span><input id="verifiedBy" type="text" maxlength="120" autocomplete="name" required aria-describedby="fieldVerificationError"></label>
       </div>
       <p class="field-error" id="fieldVerificationError" role="alert" hidden></p>
-      <button id="stampVerification" class="pri" type="button">Stamp job measurement</button>
+      <button id="stampVerification" class="pri" type="button">Confirm site measurement</button>
     </div>
 
     <div class="grp">
-      <h3>Scene data</h3>
+      <h3>Save &amp; share</h3>
       <div class="scene-actions">
         <button id="saveScene" type="button">Save scene</button><button id="restoreScene" type="button">Restore scene</button>
-        <button id="importScene" type="button">Import JSON</button><button id="downloadScene" type="button">Download JSON</button>
-        <button id="resetScene" type="button">Reset scene</button>
+        <button id="importScene" type="button">Import JSON</button><button id="downloadScene" type="button">Export scene file</button>
+        <button id="resetScene" class="danger" type="button">Reset scene</button>
         <button id="jobSheetOpen" class="pri" type="button">Job sheet</button>
       </div>
       <input id="sceneFile" type="file" accept="application/json,.json" hidden>
     </div>
+      </div>
+    </details>
 
     <p class="model-note">Every part is a named mesh, so the OBJ and GLB open in Blender with <em>screen</em>, <em>projector_body</em>, <em>lens_barrel</em> and <em>cart</em> as separate objects.</p>
     <p class="kbd-help"><strong>Keyboard:</strong> focus the stage, then use 1–5 for cameras, arrow keys to orbit, +/− to zoom, and 0 or Home to reset.</p>
@@ -466,6 +522,7 @@ html[data-calculation-mode=blocked] .provenance-badge,html[data-calculation-mode
       <button id="mobileGlb" type="button" disabled>Download GLB</button>
       <button id="mobileJobSheet" type="button">Job sheet</button>
     </section>
+    <button class="facts-trigger" id="factsTrigger" type="button" aria-controls="stageFactsSheet" aria-expanded="false">Facts</button>
     <div class="stage-canvas">
       <three-d-stage name="throwline-stage" fallback="index.html?workspace=planner" role="region" aria-label="Interactive Throwline Stage 3D"></three-d-stage>
       <section class="stage-fallback" id="stageFallback" aria-labelledby="stageFallbackTitle" hidden>
@@ -586,7 +643,7 @@ const offlineBadge = document.getElementById('offlineBadge');
 const offlineStatusTitle = document.getElementById('offlineStatusTitle');
 const offlineStatusDetail = document.getElementById('offlineStatusDetail');
 const ONBOARDING_STORAGE_KEY = 'throwline:stage-onboarding:v1';
-const OFFLINE_CACHE_VERSION = 'v20260905-throwline-webgl-fallback';
+const OFFLINE_CACHE_VERSION = 'v20260905-stage3d-sidebar-clarity';
 let fallbackShown = false;
 
 function activateStageFallback(){
@@ -659,6 +716,19 @@ function setMobilePanel(panel,{focusPanel=false}={}){
 mobilePanelButtons.forEach(button=>button.addEventListener('click',()=>setMobilePanel(button.dataset.mobilePanelButton,{focusPanel:true})));
 document.addEventListener('keydown',event=>{ if(event.key==='Escape'&&document.body.dataset.mobilePanel){ const trigger=mobilePanelButtons.find(button=>button.getAttribute('aria-expanded')==='true'); setMobilePanel(document.body.dataset.mobilePanel); trigger?.focus(); } });
 
+// Intermediate widths (821-1299px) show Facts as an on-demand sheet behind this trigger; the button
+// toggles it, Escape dismisses it, and both leave the 820px mobile dock and the wide layout untouched.
+const factsTrigger=document.getElementById('factsTrigger');
+function setFactsSheet(open,{focusTrigger=false}={}){
+  document.body.dataset.factsOpen=String(open);
+  factsTrigger.setAttribute('aria-expanded',String(open));
+  factsTrigger.textContent=open?'Hide facts':'Facts';
+  if(focusTrigger)factsTrigger.focus();
+}
+factsTrigger.addEventListener('click',()=>setFactsSheet(document.body.dataset.factsOpen!=='true'));
+document.addEventListener('keydown',event=>{ if(event.key==='Escape'&&document.body.dataset.factsOpen==='true')setFactsSheet(false,{focusTrigger:true}); });
+setFactsSheet(false);
+
 let onboardingTrigger = null;
 let onboardingMotion = null;
 let workflowMotion = null;
@@ -715,6 +785,8 @@ function beginWorkflowStep(step){
   adjustPanel.open=true;
   requestAnimationFrame(()=>requestAnimationFrame(()=>{
     const control=document.getElementById(config.control);
+    const section=control?.closest('.adjust-section');
+    if(section)section.open=true;
     const target=control?.closest('.grp')||control;
     target?.scrollIntoView({block:'center',behavior:'auto'});
     control?.focus({preventScroll:true});
@@ -843,12 +915,24 @@ function applyTheme(theme,{persist=false,announceChange=false}={}){
 }
 themeToggle.addEventListener('click',()=>applyTheme(currentTheme()==='dark'?'light':'dark',{persist:true,announceChange:true}));
 applyTheme(currentTheme());
+// Field Verify always leads to the verification fields: on phone widths (820px and below) that means
+// opening the Adjust sheet, disclosing Verify & Deliver, scrolling the panel into view, and focusing
+// the measured-distance field; wider layouts open the rail to the same disclosure.
+function revealFieldVerification(){
+  if (window.innerWidth <= 820 && document.body.dataset.mobilePanel !== 'adjust') setMobilePanel('adjust');
+  adjustPanel.open = true;
+  document.getElementById('sectionVerify').open = true;
+  requestAnimationFrame(()=>{
+    document.getElementById('fieldVerificationPanel').scrollIntoView({block:'nearest',behavior:'auto'});
+    if (window.innerWidth <= 820) document.getElementById('measuredDistance').focus({preventScroll:true});
+  });
+}
 function setFieldVerify(enabled,{announceChange=false}={}){
   document.body.dataset.fieldVerify = String(enabled);
   fieldVerifyToggle.setAttribute('aria-pressed',String(enabled));
   fieldVerifyToggle.textContent = enabled ? 'Exit Verify' : 'Field Verify';
   stage.toggleAttribute('field-verify',enabled);
-  if (enabled && window.innerWidth > 820) adjustPanel.open = true;
+  if (enabled && announceChange) revealFieldVerification();
   if (announceChange) announce(enabled?'Field Verify mode on':'Field Verify mode off');
 }
 fieldVerifyToggle.addEventListener('click',()=>setFieldVerify(fieldVerifyToggle.getAttribute('aria-pressed')!=='true',{announceChange:true}));
@@ -946,6 +1030,10 @@ function fmt(ft){
   const inch = Math.floor(q/4), fr = q%4, marks=['','¼','½','¾'];
   return (neg?'-':'') + f + "' " + inch + marks[fr] + '"';
 }
+// Lateral sliders read left/right in words instead of a signed length, matching the Left · Centre · Right scale.
+function sideFmt(value){ return Math.abs(value)<0.005?'centred':`${fmt(Math.abs(value))} ${value<0?'left':'right'}`; }
+const SIDE_VALUE_IDS=new Set(['px','targetX','obstacleX']);
+const valueText=(id,value)=>SIDE_VALUE_IDS.has(id)?sideFmt(value):fmt(value);
 
 const lensControl = els('lens');
 const manualLensMarkup=lensControl.innerHTML;
@@ -1056,9 +1144,11 @@ function updateWorkspaceFacts(geometry){
   lastVerdict=verdict;
 }
 
+// Each unit button carries its provenance state, e.g. "Unit A · Manual", so the strip says what backs each ratio.
+const UNIT_PROVENANCE_SHORT={manual:'Manual',verified_image_width:'Maker',field_verified:'Field'};
 function renderUnitStrip(){
   unitStrip.replaceChildren(...sceneState.projectors.map((item,index)=>{
-    const button=document.createElement('button');button.type='button';button.textContent=item.label||`Unit ${index+1}`;
+    const button=document.createElement('button');button.type='button';button.textContent=`${item.label||`Unit ${index+1}`} · ${UNIT_PROVENANCE_SHORT[item.provenance.mode]||'Blocked'}`;
     button.setAttribute('aria-pressed',String(item.id===sceneState.activeProjectorId));
     button.addEventListener('click',()=>applySceneIntent({type:'select-projector',projectorId:item.id},{announceText:`${button.textContent} selected`}));return button;
   }));
@@ -1068,9 +1158,10 @@ function renderUnitStrip(){
 function activeObstacle(){return sceneState.obstacles.find(item=>item.id===sceneState.activeObstacleId);}
 function renderObstacleEditor(){
   const obstacle=activeObstacle(),editor=els('obstacleEditor');editor.hidden=!obstacle;
+  els('clearObstacles').disabled=sceneState.obstacles.length===0;
   els('obstacleStrip').replaceChildren(...sceneState.obstacles.map(item=>{const button=document.createElement('button');button.type='button';button.textContent=item.label;button.setAttribute('aria-pressed',String(item.id===sceneState.activeObstacleId));button.addEventListener('click',()=>applySceneIntent({type:'select-obstacle',obstacleId:item.id}));return button;}));
   if(!obstacle)return;
-  [['obstacleX','x'],['obstacleY','y'],['obstacleZ','z']].forEach(([id,key])=>{els(id).value=obstacle.position[key];els(`${id}v`).textContent=fmt(obstacle.position[key]);});
+  [['obstacleX','x'],['obstacleY','y'],['obstacleZ','z']].forEach(([id,key])=>{els(id).value=obstacle.position[key];els(`${id}v`).textContent=valueText(id,obstacle.position[key]);});
   [['obstacleWidth','width'],['obstacleHeight','height'],['obstacleDepth','depth']].forEach(([id,key])=>els(id).value=obstacle.size[key]);
 }
 
@@ -1081,13 +1172,13 @@ function syncInputsFromState(){
   [['bodyW','width'],['bodyH','height'],['bodyD','depth'],['bodyLp','lensProtrusion']].forEach(([id,key])=>{els(id).value=body?String(Number(body[key].toFixed(2))):'';});
   els('bodySource').textContent=body?`${body.source==='catalog'?'From maker data':'Typed in'}${body.label?` · ${body.label}`:''}. Room and clearance checks use this body.`:'Not set. The room check uses the lens position only.';
   els('clearBody').disabled=!body;
-  Object.entries(values).forEach(([id,value])=>{const input=els(id);if(value>Number(input.max))input.max=Math.ceil(value*1.25);if(value<Number(input.min))input.min=Math.floor(value*1.25);input.value=value;els(`${id}v`).textContent=fmt(value);input.setAttribute('aria-valuetext',fmt(value));});
+  Object.entries(values).forEach(([id,value])=>{const input=els(id);if(value>Number(input.max))input.max=Math.ceil(value*1.25);if(value<Number(input.min))input.min=Math.floor(value*1.25);input.value=value;const text=valueText(id,value);els(`${id}v`).textContent=text;input.setAttribute('aria-valuetext',text);});
   const aspectSelect=els('ar');[...aspectSelect.options].filter(option=>option.dataset.transferred).forEach(option=>option.remove());
   let aspectOption=[...aspectSelect.options].find(option=>Math.abs(Number(option.value)-state.ar)<.001);
   if(!aspectOption){aspectOption=document.createElement('option');aspectOption.value=String(state.ar);aspectOption.dataset.transferred='true';aspectOption.textContent=`Transferred ${state.ar.toFixed(3)}:1`;aspectSelect.appendChild(aspectOption);}
   aspectSelect.value=aspectOption.value;
   if(state.mode==='manual'){
-    lensControl.labels[0].textContent='Manual ratio preset';
+    lensControl.labels[0].textContent='Throw-ratio range';
     if(lensControl.disabled)lensControl.innerHTML=manualLensMarkup;
     lensControl.disabled=false;
     const value=`${state.wide.toFixed(3)},${state.tele.toFixed(3)}`;
@@ -1106,7 +1197,7 @@ function syncSceneControls(){
 }
 
 function applySceneIntent(intent,{announceText=''}={}){sceneState=SceneState.applyIntent(sceneState,intent);syncInputsFromState();rebuild();if(announceText)announce(announceText);}
-function bindSceneRange(id,type){const input=els(id);input.addEventListener('input',()=>applySceneIntent({type,value:Number(input.value)}));input.addEventListener('change',()=>announce(`${input.labels[0].childNodes[0].textContent.trim()} ${fmt(Number(input.value))}`));}
+function bindSceneRange(id,type){const input=els(id);input.addEventListener('input',()=>applySceneIntent({type,value:Number(input.value)}));input.addEventListener('change',()=>announce(`${input.labels[0].childNodes[0].textContent.trim()} ${valueText(id,Number(input.value))}`));}
 [['sw','set-screen-width'],['st','set-screen-bottom'],['lh','set-lens-height'],['d','set-distance'],['px','set-projector-x'],['targetX','set-projector-target-x']].forEach(([id,type])=>bindSceneRange(id,type));
 [['roomW','width'],['roomD','depth'],['roomH','height'],['roomC','clearance']].forEach(([id,key])=>{els(id).addEventListener('input',event=>applySceneIntent({type:'set-room',key,value:Number(event.target.value)}));});
 [['bodyW','width'],['bodyH','height'],['bodyD','depth'],['bodyLp','lensProtrusion']].forEach(([id,key])=>els(id).addEventListener('input',event=>{const value=Number(event.target.value);if(Number.isFinite(value)&&event.target.value!=='')applySceneIntent({type:'set-body',key,value});}));
