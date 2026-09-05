@@ -390,8 +390,8 @@
       title.textContent = 'Stage 3D could not start';
       const message = document.createElement('p');
       message.textContent =
-        'The local 3D engine or WebGL renderer could not start. ' +
-        'Your calculation data is not affected; use the Throwline planner.';
+        'The WebGL 2 renderer could not start. ' +
+        'Throwline will keep the live 2D plan, calculations, placement controls, scene JSON, and job sheet available.';
       const fallback = document.createElement('a');
       fallback.href = this.getAttribute('fallback') || 'index.html?workspace=planner';
       fallback.textContent = 'Open the Throwline planner';
@@ -450,10 +450,25 @@
         import('three/addons/controls/OrbitControls.js'),
       ]);
       this._THREE = THREE;
-      const renderer = new THREE.WebGLRenderer({
-        antialias: true,
-        alpha: true,
-      });
+      let renderer;
+      try {
+        renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      } catch (standardError) {
+        try {
+          renderer = new THREE.WebGLRenderer({
+            antialias: false,
+            alpha: true,
+            powerPreference: 'low-power',
+            failIfMajorPerformanceCaveat: false,
+          });
+          this.dataset.rendererStartup = 'low-power';
+        } catch (lowPowerError) {
+          const unavailable = new Error('three-d-stage: WebGL 2 unavailable after standard and low-power startup attempts');
+          unavailable.cause = lowPowerError;
+          unavailable.standardError = standardError;
+          throw unavailable;
+        }
+      }
       renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
       renderer.shadowMap.enabled = true;
       renderer.shadowMap.type = THREE.PCFShadowMap;

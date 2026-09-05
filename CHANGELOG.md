@@ -2,6 +2,12 @@
 
 ## 2026-09-05
 
+### Throwline WebGL 2 startup fallback
+
+* Stage 3D now retries renderer startup with lower graphics demand, then replaces a failed WebGL 2 canvas with a live 2D plan of the same room, screen, beams, projector units, and obstructions. Calculations, placement controls, scene JSON, and the job sheet stay active; controls that only affect the 3D view and OBJ/GLB model downloads are disabled.
+* The hard-fail no-WebGL browser run now requires the fallback to be visible and populated, confirms model downloads stay disabled, and proves a set-mark change redraws the 2D plan from the same scene state.
+* Updated the Throwline release verifier, architecture notes, Stage 3D sitemap date, and AV Suite offline cache version.
+
 ### Throwline crew job sheet
 
 * Stage 3D gained a printable crew job sheet (Scene data › Job sheet, and Job sheet in the phone Export sheet): the active unit in plain language, with where the projector goes, the screen and picture, the lens and set mark, lens shift, the room, what to check on site, the on-site measurement, and a QR code plus link that reopens the exact scene. Printing shows only the sheet.

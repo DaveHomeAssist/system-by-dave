@@ -220,7 +220,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool change — rolls the service-worker cache. */
-    version:'v20260905-throwline-job-sheet',
+    version:'v20260905-throwline-webgl-fallback',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,
