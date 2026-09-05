@@ -257,12 +257,23 @@ async function main() {
     const outside = await setInput('px', 30);
     check('a projector outside the room width is a spatial conflict', /outside the side walls/.test(outside.alert), outside);
 
-    // 8. Degraded renderer parity: with --no-webgl the renderer is reported unavailable, yet every fact above was identical.
+    // 8. Degraded renderer parity: with --no-webgl a live 2D plan replaces the 3D canvas and every fact stays identical.
     const rendererState = await open(AUDIT_QUERY);
-    check(noWebgl ? 'renderer reports unavailable without WebGL' : 'renderer is ready with WebGL', noWebgl ? rendererState.renderer === 'unavailable' && /couldn\u2019t start/i.test(rendererState.status) : rendererState.renderer === 'ready', rendererState);
+    check(noWebgl ? 'renderer reports the live 2D fallback without WebGL' : 'renderer is ready with WebGL', noWebgl ? rendererState.renderer === 'unavailable' && /2D plan view is active/i.test(rendererState.status) : rendererState.renderer === 'ready', rendererState);
+    let fallbackBefore = null;
+    if (noWebgl) {
+      fallbackBefore = await evaluate(`(() => { const fallback=document.getElementById('stageFallback'); const active=fallback.querySelector('[data-fallback-projector][data-active="true"]'); return { hidden:fallback.hidden, display:getComputedStyle(fallback).display, title:document.getElementById('stageFallbackTitle').textContent.trim(), description:document.getElementById('stageFallbackSvgDescription').textContent.trim(), projectors:fallback.querySelectorAll('[data-fallback-projector]').length, beams:fallback.querySelectorAll('.fallback-beam').length, transform:active?.getAttribute('transform')||'', webglDisplay:getComputedStyle(document.querySelector('three-d-stage')).display, unavailable3DControls:[...document.querySelectorAll('[data-cam],#resetView,#tenvelope,#tshift,#tdimensions')].map(control=>control.disabled), exports:[document.getElementById('mobileObj').disabled,document.getElementById('mobileGlb').disabled] }; })()`);
+      check('no-WebGL mode visibly replaces the failed canvas with a populated 2D plan', fallbackBefore.hidden === false && fallbackBefore.display !== 'none' && fallbackBefore.webglDisplay === 'none' && fallbackBefore.title === '2D plan view active' && fallbackBefore.projectors > 0 && fallbackBefore.beams > 0 && /Active set mark/.test(fallbackBefore.description), fallbackBefore);
+      check('2D fallback disables controls that only operate the 3D view', fallbackBefore.unavailable3DControls.length === 9 && fallbackBefore.unavailable3DControls.every(Boolean), fallbackBefore);
+      check('2D fallback keeps model downloads disabled', fallbackBefore.exports.every(Boolean), fallbackBefore);
+    }
     check('headline is the aggregate installation check, not the bare ratio fit', /^(Needs a fix|Worth a look|Ready)/.test(rendererState.headline) && /too close/i.test(rendererState.headline), rendererState);
     const slider = await setInput('d', 10);
     check('distance slider stays live and drives the readout', slider.distance === '10\' 0"' && slider.ratio === '0.500:1', slider);
+    if (noWebgl) {
+      const fallbackAfter = await evaluate(`(() => { const fallback=document.getElementById('stageFallback'); const active=fallback.querySelector('[data-fallback-projector][data-active="true"]'); return { setMark:fallback.dataset.activeSetMark, transform:active?.getAttribute('transform')||'', description:document.getElementById('stageFallbackSvgDescription').textContent.trim() }; })()`);
+      check('2D fallback redraws from the same live scene state', fallbackAfter.setMark === '10' && fallbackAfter.transform !== fallbackBefore.transform && /Active set mark 10\' 0"/.test(fallbackAfter.description), { before:fallbackBefore, after:fallbackAfter });
+    }
 
     // 9. A real WebGL loss must visibly pause and then recover the existing scene.
     if (!noWebgl) {
@@ -414,7 +425,7 @@ async function main() {
     }
 
     const unexpectedExceptions = noWebgl
-      ? exceptions.filter((exception) => !/Error creating WebGL context\./.test(exception))
+      ? exceptions.filter((exception) => !/Error creating WebGL context\.|three-d-stage: WebGL 2 unavailable after standard and low-power startup attempts/.test(exception))
       : exceptions;
     check(noWebgl ? 'no unexpected browser exceptions in the intentional no-WebGL run' : 'no uncaught browser exceptions', unexpectedExceptions.length === 0, unexpectedExceptions);
   } finally {

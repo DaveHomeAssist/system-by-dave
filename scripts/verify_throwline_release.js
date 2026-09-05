@@ -230,6 +230,7 @@ const stage = read('ProjectorThrow/Stage3D.html');
 const sidecar = read('ProjectorThrow/three-d-stage.js');
 const avWorker = read('av-suite-worker.js');
 const sceneState = read('ProjectorThrow/throwline-scene-state.js');
+const browserProbe = read('scripts/probe_throwline_stage3d.js');
 const sitemap = read('sitemap.xml');
 const avRegistry = registry();
 const catalogSource = read('ProjectorThrow/data/throwline-pilot-catalog.v1.json');
@@ -488,6 +489,11 @@ requireMatch(stage, /<script\s+src=["']\.\/three-d-stage\.js["']><\/script>/, 'S
 requireMatch(stage, /href=["']index\.html\?workspace=planner["']/, 'Stage 3D must expose the detailed Throwline planner.');
 requireMatch(stage, /fallback=["']index\.html\?workspace=planner["']/, 'Stage 3D must offer the offline planner fallback.');
 requireMatch(sidecar, /this\.getAttribute\(["']fallback["']\) \|\| ["']index\.html\?workspace=planner["']/, 'Stage 3D renderer failures must return to the explicit planner route.');
+requireMatch(sidecar, /new THREE\.WebGLRenderer\(\{ antialias: true, alpha: true \}\)[\s\S]*?antialias: false[\s\S]*?powerPreference: ['"]low-power['"]/, 'Stage 3D must retry WebGL startup with lower graphics demand before using the 2D fallback.');
+requireMatch(stage, /id=["']stageFallback["'][\s\S]*?id=["']stageFallbackDrawing["'][\s\S]*?2D plan view active/, 'Stage 3D must contain a visible live 2D fallback for browsers without WebGL 2.');
+requireMatch(stage, /function\s+updateFallbackDiagram\s*\([\s\S]*?data-fallback-projector[\s\S]*?stageFallbackSvgDescription/, 'Stage 3D must redraw fallback projectors and its accessible scene description from live scene state.');
+requireMatch(stage, /stage-dependency-error[\s\S]*?activateStageFallback\(\)[\s\S]*?2D plan view is active/, 'Stage 3D renderer startup failure must activate the live 2D plan.');
+requireMatch(stage, /function\s+activateStageFallback\s*\([\s\S]*?\[data-cam\],[^\n]*#tenvelope,#tshift,#tdimensions[^\n]*\)[\s\S]*?control\.disabled=true/, 'Stage 3D fallback must disable controls that only operate the unavailable 3D view.');
 requireMatch(stage, /Preparing offline use · local engine/i, 'Stage 3D must start with truthful offline-preparation wording.');
 requireMatch(stage, /navigator\.serviceWorker\.register\(['"]\.\.\/av-suite-worker\.js['"]\)/, 'Stage 3D must register the existing AV offline worker on direct visits.');
 requireMatch(stage, /function\s+controllingWorkerVersion\s*\([\s\S]*?navigator\.serviceWorker\?\.controller[\s\S]*?SBD_OFFLINE_VERSION/, 'Stage 3D must read the controlling service worker version before claiming offline readiness.');
@@ -549,6 +555,7 @@ requireMatch(main, /put\(["']md["'][\s\S]*?put\(["']mw["'][\s\S]*?put\(["']vb["'
   if (!sceneState.includes(token)) fail(`Throwline scene-state contract is missing ${token}.`);
 });
 if (!fs.existsSync(path.join(ROOT, 'scripts/probe_throwline_stage3d.js'))) fail('The Stage 3D browser regression probe is missing.');
+requireMatch(browserProbe, /no-WebGL mode visibly replaces the failed canvas with a populated 2D plan[\s\S]*?2D fallback redraws from the same live scene state/, 'The browser probe must hard-fail unless the no-WebGL 2D fallback is visible, populated, and live.');
 if (packageJson?.scripts?.['test:throwline-browser'] !== 'node scripts/probe_throwline_stage3d.js --no-sandbox && node scripts/probe_throwline_stage3d.js --no-sandbox --no-webgl') fail('Throwline browser verification must hard-fail both WebGL and degraded-renderer probe runs.');
 requireMatch(pagesWorkflow, /Verify Throwline browser runtime[\s\S]*?run:\s*npm run test:throwline-browser/, 'The Pages release gate must run the hard-fail Throwline browser regression suite.');
 const stageTryIndex = stage.indexOf('const { THREE } = await stage.ready');

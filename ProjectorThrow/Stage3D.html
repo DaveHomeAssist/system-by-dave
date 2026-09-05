@@ -88,6 +88,24 @@ aside{grid-area:controls;background:var(--case);border-right:1px solid var(--lin
 main{grid-area:stage;position:relative;min-width:0;min-height:0}
 .stage-canvas{position:absolute;inset:0;min-width:0;min-height:0}
 three-d-stage{width:100%;height:100%}
+.stage-fallback{position:absolute;inset:0;z-index:1;overflow:hidden;background:var(--deck);color:var(--dim)}
+.stage-fallback[hidden]{display:none}
+.stage-fallback svg{display:block;width:100%;height:100%}
+.stage-fallback .fallback-grid{fill:url(#fallback-grid)}
+.stage-fallback .fallback-room{fill:var(--case-hi);fill-opacity:.52;stroke:var(--line);stroke-width:2}
+.stage-fallback .fallback-center{stroke:var(--line);stroke-width:1.5;stroke-dasharray:7 9}
+.stage-fallback .fallback-screen{stroke:var(--chalk);stroke-width:10;stroke-linecap:square}
+.stage-fallback .fallback-beam{fill:var(--hazard);fill-opacity:.13;stroke:var(--hazard);stroke-width:2}
+.stage-fallback .fallback-projector{fill:var(--info);stroke:var(--case);stroke-width:3}
+.stage-fallback .fallback-projector[data-active=true]{fill:var(--hazard)}
+.stage-fallback .fallback-obstruction{fill:var(--safety);fill-opacity:.72;stroke:var(--safety);stroke-width:2}
+.stage-fallback .fallback-label{fill:var(--dim);font:700 13px var(--mono);letter-spacing:.05em;text-anchor:middle;text-transform:uppercase}
+.stage-fallback-status{position:absolute;left:16px;bottom:16px;width:min(600px,calc(100% - 340px));padding:10px 14px;border:1px solid var(--hazard);border-radius:var(--r);background:var(--overlay);box-shadow:0 10px 28px rgba(0,0,0,.14);text-align:center}
+.stage-fallback-status strong{display:block;color:var(--hazard);font:700 11px/1.3 var(--mono);letter-spacing:.09em;text-transform:uppercase}
+.stage-fallback-status span{display:block;margin-top:4px;color:var(--dim);font:12px/1.4 var(--sans)}
+.stage-fallback-status a{display:inline-block;min-height:32px;margin-top:6px;padding:6px 8px;font:700 10px/1.8 var(--mono);letter-spacing:.07em;text-transform:uppercase}
+html[data-renderer=unavailable] .stage-canvas>three-d-stage{display:none}
+html[data-renderer=unavailable] .stage-canvas::after{display:none}
 .lab{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--dimmer);margin-bottom:6px}
 .grp{display:flex;flex-direction:column;gap:12px}
 .grp>h3{margin:0;font-family:var(--mono);font-size:10px;letter-spacing:.11em;text-transform:uppercase;color:var(--dimmer);font-weight:400;display:flex;align-items:center;gap:9px}
@@ -245,6 +263,8 @@ html[data-calculation-mode=blocked] .provenance-badge,html[data-calculation-mode
   main{grid-area:stage;display:block;position:relative;min-height:0;overflow:hidden}
   .stage-canvas{position:absolute;inset:0;margin:0;min-height:0}
   three-d-stage{height:100%;min-height:0}
+  .stage-fallback-status{left:10px;bottom:10px;width:calc(100% - 20px);padding:8px 10px}
+  .stage-fallback-status span{font-size:10px}
   .hud{position:absolute;left:10px;top:10px;right:auto;width:min(330px,calc(100% - 20px));margin:0;padding:9px 11px;pointer-events:none;backdrop-filter:blur(8px)}
   .hud .big{font-size:28px;margin:3px 0}.hud .sub{font-size:10px}.hud .note{font-size:10px;margin-top:5px}.band{height:9px;margin-top:6px}.provenance-line{margin-top:5px}.state-label,.provenance-badge{min-height:20px;font-size:8px;padding:2px 5px}
   .collision-alert{font-size:8.5px;padding:5px 7px}
@@ -448,6 +468,23 @@ html[data-calculation-mode=blocked] .provenance-badge,html[data-calculation-mode
     </section>
     <div class="stage-canvas">
       <three-d-stage name="throwline-stage" fallback="index.html?workspace=planner" role="region" aria-label="Interactive Throwline Stage 3D"></three-d-stage>
+      <section class="stage-fallback" id="stageFallback" aria-labelledby="stageFallbackTitle" hidden>
+        <svg id="stageFallbackDrawing" viewBox="0 0 1000 620" preserveAspectRatio="xMidYMid meet" role="img" aria-labelledby="stageFallbackSvgTitle stageFallbackSvgDescription">
+          <title id="stageFallbackSvgTitle">Throwline live 2D plan view</title>
+          <desc id="stageFallbackSvgDescription">A plan view of the room, screen, projector beam, projector units, and obstructions.</desc>
+          <defs><pattern id="fallback-grid" width="32" height="32" patternUnits="userSpaceOnUse"><path d="M 32 0 L 0 0 0 32" fill="none" stroke="currentColor" stroke-opacity=".12" stroke-width="1"/></pattern></defs>
+          <rect class="fallback-grid" id="stageFallbackGrid" width="1000" height="620"/>
+          <g id="stageFallbackRoom"></g>
+          <g id="stageFallbackBeams"></g>
+          <g id="stageFallbackObstructions"></g>
+          <g id="stageFallbackProjectors"></g>
+        </svg>
+        <div class="stage-fallback-status">
+          <strong id="stageFallbackTitle">2D plan view active</strong>
+          <span>The 3D renderer is unavailable in this browser. Calculations, placement controls, scene JSON, and the job sheet still work; 3D view controls and model downloads need WebGL 2.</span>
+          <a href="index.html?workspace=planner">Open detailed planner</a>
+        </div>
+      </section>
     </div>
     <section class="hud" aria-labelledby="setMarkHeading">
       <h3 class="sr-only" id="setMarkHeading">Set mark</h3>
@@ -530,6 +567,7 @@ const FT = 0.3048;
 const SceneState = window.ThrowlineSceneState;
 if (!SceneState) throw new Error('Throwline scene-state contract failed to load.');
 const stage = document.querySelector('three-d-stage');
+const stageFallback = document.getElementById('stageFallback');
 const stageStatus = document.getElementById('stageStatus');
 const themeToggle = document.getElementById('themeToggle');
 const themeLabel = document.getElementById('themeLabel');
@@ -548,7 +586,22 @@ const offlineBadge = document.getElementById('offlineBadge');
 const offlineStatusTitle = document.getElementById('offlineStatusTitle');
 const offlineStatusDetail = document.getElementById('offlineStatusDetail');
 const ONBOARDING_STORAGE_KEY = 'throwline:stage-onboarding:v1';
-const OFFLINE_CACHE_VERSION = 'v20260905-throwline-job-sheet';
+const OFFLINE_CACHE_VERSION = 'v20260905-throwline-webgl-fallback';
+let fallbackShown = false;
+
+function activateStageFallback(){
+  document.documentElement.dataset.renderer='unavailable';
+  stageFallback.hidden=false;
+  document.querySelectorAll('[data-cam],#resetView,#tenvelope,#tshift,#tdimensions').forEach(control=>{
+    control.disabled=true;
+    control.title='Available when the 3D renderer is running';
+  });
+  if(fallbackShown)return;
+  fallbackShown=true;
+  if(window.gsap&&!matchMedia('(prefers-reduced-motion: reduce)').matches){
+    window.gsap.fromTo(stageFallback,{autoAlpha:0},{autoAlpha:1,duration:.24,ease:'power2.out',clearProps:'opacity,visibility'});
+  }
+}
 
 function setOfflineStatus(state,badge,title,detail){
   document.documentElement.dataset.offline=state;
@@ -810,7 +863,8 @@ function syncAdjustLayout(){
 syncAdjustLayout();
 window.addEventListener('resize',syncAdjustLayout,{passive:true});
 stage.addEventListener('stage-dependency-error',()=>{
-  stageStatus.textContent = 'The 3D view couldn’t load on this device. The Throwline planner still works.';
+  activateStageFallback();
+  stageStatus.textContent = 'The 3D view couldn’t load on this device. The live 2D plan view is active; calculations, placement controls, scene JSON, and the job sheet still work.';
 });
 stage.addEventListener('stage-context-lost',()=>{
   document.documentElement.dataset.renderer='recovering';
@@ -1175,6 +1229,51 @@ rebuildFacts();
 let sceneRenderer = null;
 /* Numerical planning never depends on WebGL: facts, verdicts, and controls hydrate from the pure scene model first;
    the renderer is an optional view registered later. */
+function stageSvg(tag,attributes={},text=''){
+  const node=document.createElementNS('http://www.w3.org/2000/svg',tag);
+  Object.entries(attributes).forEach(([name,value])=>node.setAttribute(name,String(value)));
+  if(text)node.textContent=text;
+  return node;
+}
+function updateFallbackDiagram(activeGeometry){
+  const roomGroup=els('stageFallbackRoom'),beamGroup=els('stageFallbackBeams'),obstructionGroup=els('stageFallbackObstructions'),projectorGroup=els('stageFallbackProjectors');
+  if(!roomGroup||!beamGroup||!obstructionGroup||!projectorGroup)return;
+  const bodyHalf=item=>(item.body?.width||1.4)/2;
+  const lateralExtent=Math.max(1,sceneState.room.width/2,sceneState.screen.width/2,...sceneState.projectors.map(item=>Math.abs(item.position.x)+bodyHalf(item)),...sceneState.obstacles.map(item=>Math.abs(item.position.x)+item.size.width/2));
+  const depthExtent=Math.max(1,sceneState.room.depth,...sceneState.projectors.map(item=>item.position.distance+(item.body?.depth||1)),...sceneState.obstacles.map(item=>item.position.z+item.size.depth/2));
+  const xScale=410/lateralExtent,zScale=430/depthExtent,x=value=>500+value*xScale,z=value=>100+value*zScale;
+  const roomLeft=x(-sceneState.room.width/2),roomRight=x(sceneState.room.width/2),roomBottom=z(sceneState.room.depth);
+  const roomStyle=sceneState.overlays.room?'':'display:none',gridStyle=sceneState.overlays.grid?'':'display:none';
+  roomGroup.replaceChildren(
+    stageSvg('rect',{class:'fallback-room',style:roomStyle,x:roomLeft,y:100,width:roomRight-roomLeft,height:roomBottom-100}),
+    stageSvg('line',{class:'fallback-center',style:gridStyle,x1:500,y1:82,x2:500,y2:z(depthExtent)}),
+    stageSvg('line',{class:'fallback-screen',x1:x(-sceneState.screen.width/2),y1:100,x2:x(sceneState.screen.width/2),y2:100}),
+    stageSvg('text',{class:'fallback-label',x:500,y:78},`screen · ${fmt(sceneState.screen.width)} wide`),
+    stageSvg('text',{class:'fallback-label',style:roomStyle,x:(roomLeft+roomRight)/2,y:roomBottom+24},`room · ${fmt(sceneState.room.width)} × ${fmt(sceneState.room.depth)}`)
+  );
+  els('stageFallbackGrid').style.display=sceneState.overlays.grid?'':'none';
+  const beams=[];
+  if(sceneState.overlays.beam)sceneState.projectors.forEach(item=>{
+    const geometry=SceneState.calculateProjectorGeometry(sceneState,item.id);
+    if(!geometry.image)return;
+    beams.push(stageSvg('polygon',{class:'fallback-beam','data-projector-id':item.id,points:`${x(item.position.x)},${z(item.position.distance)} ${x(geometry.image.centerX-geometry.image.width/2)},100 ${x(geometry.image.centerX+geometry.image.width/2)},100`}));
+  });
+  beamGroup.replaceChildren(...beams);
+  obstructionGroup.style.display=sceneState.overlays.room?'':'none';
+  obstructionGroup.replaceChildren(...sceneState.obstacles.map(item=>stageSvg('rect',{class:'fallback-obstruction','data-obstruction-id':item.id,x:x(item.position.x-item.size.width/2),y:z(item.position.z-item.size.depth/2),width:Math.max(4,item.size.width*xScale),height:Math.max(4,item.size.depth*zScale),rx:3})));
+  projectorGroup.replaceChildren(...sceneState.projectors.map(item=>{
+    const group=stageSvg('g',{'data-fallback-projector':item.id,'data-active':item.id===sceneState.activeProjectorId,transform:`translate(${x(item.position.x).toFixed(2)} ${z(item.position.distance).toFixed(2)})`});
+    group.append(stageSvg('path',{class:'fallback-projector',d:'M -11 15 L 0 -13 L 11 15 Z'}),stageSvg('text',{class:'fallback-label',x:0,y:32},item.label||'projector'));
+    return group;
+  }));
+  const active=SceneState.activeProjector(sceneState);
+  const description=`${sceneState.projectors.length} projector ${sceneState.projectors.length===1?'unit':'units'}. Active set mark ${fmt(active.position.distance)}. Screen ${fmt(sceneState.screen.width)} wide. Room ${fmt(sceneState.room.width)} by ${fmt(sceneState.room.depth)}. ${sceneState.obstacles.length?`${sceneState.obstacles.length} room ${sceneState.obstacles.length===1?'obstruction':'obstructions'}.`:'No room obstructions.'}`;
+  els('stageFallbackSvgDescription').textContent=description;
+  stageFallback.dataset.projectors=String(sceneState.projectors.length);
+  stageFallback.dataset.obstructions=String(sceneState.obstacles.length);
+  stageFallback.dataset.activeSetMark=String(active.position.distance);
+  stageFallback.dataset.placement=activeGeometry.placement.kind;
+}
 function rebuildFacts(){
   syncFlatState();
   const active=SceneState.activeProjector(sceneState);
@@ -1188,6 +1287,7 @@ function rebuildFacts(){
     document.documentElement.dataset.projectionState = 'blocked';
     readoutBlocked(w,h,geometry);
   }
+  updateFallbackDiagram(geometry);
   renderUnitStrip(); syncSceneControls(); updateWorkspaceFacts(geometry);
 }
 function rebuild(){ rebuildFacts(); if (sceneRenderer) sceneRenderer.rebuild(); }
@@ -1697,8 +1797,8 @@ setCamera(sceneState.view.camera,{saveDefault:true,announceChange:false});
 announce('Stage 3D ready. Three-quarter camera selected.');
 window.addEventListener('pagehide',event=>{fieldVerificationMotion?.revert();if(!event.persisted)stage.destroy();});
 } catch (error) {
-  document.documentElement.dataset.renderer = 'unavailable';
-  stageStatus.textContent = 'The 3D view couldn’t start on this device. Your numbers, results, and controls still work; only the 3D picture and model downloads are off. The Throwline planner has drawings.';
+  activateStageFallback();
+  stageStatus.textContent = 'The 3D view couldn’t start on this device. The live 2D plan view is active; calculations, placement controls, scene JSON, and the job sheet still work. 3D view controls and model downloads are off.';
 }
 </script>
 </body>
