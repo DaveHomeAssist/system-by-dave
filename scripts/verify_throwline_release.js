@@ -228,12 +228,14 @@ function duplicateIds(source) {
 const main = read('ProjectorThrow/index.html');
 const stage = read('ProjectorThrow/Stage3D.html');
 const sidecar = read('ProjectorThrow/three-d-stage.js');
+const avWorker = read('av-suite-worker.js');
 const sceneState = read('ProjectorThrow/throwline-scene-state.js');
 const sitemap = read('sitemap.xml');
 const avRegistry = registry();
 const catalogSource = read('ProjectorThrow/data/throwline-pilot-catalog.v1.json');
 const catalog = readJson('ProjectorThrow/data/throwline-pilot-catalog.v1.json');
 const packageJson = readJson('package.json');
+const pagesWorkflow = read('.github/workflows/deploy-pages.yml');
 
 if (catalogSource.includes('\uFFFD')) fail('Throwline pilot catalog contains Unicode replacement characters.');
 
@@ -486,7 +488,13 @@ requireMatch(stage, /<script\s+src=["']\.\/three-d-stage\.js["']><\/script>/, 'S
 requireMatch(stage, /href=["']index\.html\?workspace=planner["']/, 'Stage 3D must expose the detailed Throwline planner.');
 requireMatch(stage, /fallback=["']index\.html\?workspace=planner["']/, 'Stage 3D must offer the offline planner fallback.');
 requireMatch(sidecar, /this\.getAttribute\(["']fallback["']\) \|\| ["']index\.html\?workspace=planner["']/, 'Stage 3D renderer failures must return to the explicit planner route.');
-requireMatch(stage, /Offline ready · direct spatial control/i, 'Stage 3D must identify itself as an offline-ready spatial workspace.');
+requireMatch(stage, /Preparing offline use · local engine/i, 'Stage 3D must start with truthful offline-preparation wording.');
+requireMatch(stage, /navigator\.serviceWorker\.register\(['"]\.\.\/av-suite-worker\.js['"]\)/, 'Stage 3D must register the existing AV offline worker on direct visits.');
+requireMatch(stage, /function\s+controllingWorkerVersion\s*\([\s\S]*?navigator\.serviceWorker\?\.controller[\s\S]*?SBD_OFFLINE_VERSION/, 'Stage 3D must read the controlling service worker version before claiming offline readiness.');
+requireMatch(stage, /if\(version!==OFFLINE_CACHE_VERSION\)return false;[\s\S]*?setOfflineStatus\(['"]ready['"]/, 'Stage 3D must claim Offline ready only for the current cache version.');
+if (!stage.includes(`const OFFLINE_CACHE_VERSION = '${avRegistry?.version}';`)) fail('Stage 3D offline readiness must pin the current AV cache version.');
+requireMatch(avWorker, /SBD_OFFLINE_VERSION[\s\S]*?SBD_REGISTRY\.version/, 'The AV service worker must report its active offline cache version.');
+requireMatch(stage, /id=["']offlineBadge["'][^>]*role=["']status["'][^>]*aria-live=["']polite["']/, 'Stage 3D must expose its offline state visibly and accessibly.');
 const localThreeAssets = [
   'ProjectorThrow/vendor/three/three.module.js',
   'ProjectorThrow/vendor/three/three.core.js',
@@ -540,6 +548,8 @@ requireMatch(main, /put\(["']md["'][\s\S]*?put\(["']mw["'][\s\S]*?put\(["']vb["'
   if (!sceneState.includes(token)) fail(`Throwline scene-state contract is missing ${token}.`);
 });
 if (!fs.existsSync(path.join(ROOT, 'scripts/probe_throwline_stage3d.js'))) fail('The Stage 3D browser regression probe is missing.');
+if (packageJson?.scripts?.['test:throwline-browser'] !== 'node scripts/probe_throwline_stage3d.js --no-sandbox && node scripts/probe_throwline_stage3d.js --no-sandbox --no-webgl') fail('Throwline browser verification must hard-fail both WebGL and degraded-renderer probe runs.');
+requireMatch(pagesWorkflow, /Verify Throwline browser runtime[\s\S]*?run:\s*npm run test:throwline-browser/, 'The Pages release gate must run the hard-fail Throwline browser regression suite.');
 const stageTryIndex = stage.indexOf('const { THREE } = await stage.ready');
 ['function rebuildFacts(', 'function readout(', 'function updateWorkspaceFacts(', 'function applySceneIntent(', 'SceneState.createSceneState('].forEach((token) => {
   const index = stage.indexOf(token);
@@ -574,6 +584,8 @@ requireMatch(sidecar, /Use keys 1 through 5 for cameras/, 'Stage 3D canvas instr
 requireMatch(stage, /<details\b[^>]*class=["'][^"']*adjust-panel/, 'Stage 3D controls must use a native Adjust disclosure.');
 requireMatch(stage, /function\s+syncAdjustLayout\s*\(/, 'Stage 3D must synchronize the Adjust disclosure when crossing its mobile breakpoint.');
 requireMatch(stage, /id=["']fieldVerifyToggle["']/, 'Stage 3D must expose a Field Verify control.');
+requireMatch(stage, /id=["']fieldVerificationError["'][^>]*role=["']alert["'][^>]*hidden/, 'Stage 3D Field Verify must expose a visible validation alert.');
+requireMatch(stage, /function\s+showFieldVerificationError\s*\([\s\S]*?aria-invalid[\s\S]*?\.focus\(\)/, 'Stage 3D Field Verify must mark invalid fields and focus the first error.');
 requireMatch(stage, /class=["'][^"']*scene-toolbar/, 'Stage 3D must expose camera and layer controls beside the scene.');
 requireMatch(stage, /class=["'][^"']*mobile-exports/, 'Stage 3D must place phone export actions after scene controls.');
 requireMatch(stage, /<dialog\b[^>]*id=["']onboardingDialog["'][^>]*aria-labelledby=["']onboardingTitle["'][^>]*aria-describedby=["']onboardingIntro["']/, 'Stage 3D must expose an accessible first-run onboarding dialog.');
@@ -621,6 +633,11 @@ requireMatch(sidecar, /@media\s*\(max-width:\s*820px\)[\s\S]*?\.toolbar\s*\{[^}]
 requireMatch(sidecar, /\n\s+runExport\s*\(format\)/, 'Stage 3D must expose its existing export flow to phone controls.');
 requireMatch(stage, /function\s+disposeObject3D\s*\(/, 'Stage 3D must dispose resources replaced during model rebuilds.');
 requireMatch(sidecar, /visibilitychange/, 'Stage 3D must pause or gate rendering when the document is hidden.');
+requireMatch(sidecar, /_contextLostHandler\s*=\s*\(event\)[\s\S]*?event\.preventDefault\(\)[\s\S]*?_showContextLoss\(\)[\s\S]*?webglcontextlost/, 'Stage 3D must handle runtime WebGL loss and permit restoration.');
+requireMatch(sidecar, /_contextRestoredHandler\s*=\s*\(\)[\s\S]*?_restoreContext\(\)[\s\S]*?webglcontextrestored/, 'Stage 3D must restore its existing scene after WebGL returns.');
+requireMatch(sidecar, /stage-context-lost[\s\S]*?stage-context-restored/, 'Stage 3D must report both runtime graphics transitions to the workspace.');
+requireMatch(stage, /surf\.name\s*=\s*['"]screen['"]/, 'Stage 3D exports must name the screen mesh exactly screen.');
+requireMatch(stage, /M\.alu,\s*['"]cart['"]\)/, 'Stage 3D exports must name the cart mesh exactly cart.');
 requireMatch(sidecar, /requestRender\s*\(/, 'Stage 3D must use invalidation-driven rendering.');
 if (/preserveDrawingBuffer\s*:\s*true/.test(sidecar)) fail('Stage 3D must not keep preserveDrawingBuffer enabled globally.');
 requireMatch(sidecar, /captureCanvas\s*\(/, 'Stage 3D must expose a capture-specific immediate render path.');

@@ -4,10 +4,11 @@
 /*
  * Browser-level regression probe for Throwline Stage 3D calculation modeling.
  * Drives the real page in headless Chromium over the DevTools protocol and checks the
- * rendered readouts for: the audited production link, exact optical-stop snapping,
- * URL trust for FIELD VERIFIED transfers, field-stamp calibration against the planned
- * basis, direction-aware lens-shift limits, catalog shift limits with the maker's combined
- * up-and-sideways rule, and room-boundary conflicts.
+ * rendered readouts and runtime boundaries for: the audited production link, exact
+ * optical-stop snapping, visible field-validation errors, URL trust for FIELD VERIFIED
+ * transfers, field-stamp calibration, direction-aware lens-shift limits, catalog shift limits with
+ * the maker's combined up-and-sideways rule, room conflicts,
+ * WebGL context recovery, export object names, and a real offline reload.
  *
  * Usage: node scripts/probe_throwline_stage3d.js [--base=http://127.0.0.1:8000/] [--chrome=/path/to/chrome] [--no-sandbox] [--no-webgl]
  * Without --base the probe serves the repository root itself on a random port.
@@ -46,6 +47,24 @@ function check(name, condition, detail = '') {
 }
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
+async function waitForPath(filePath, attempts = 120) {
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
+    if (fs.existsSync(filePath) && fs.statSync(filePath).size > 0) return filePath;
+    await delay(100);
+  }
+  throw new Error(`Download did not finish: ${filePath}`);
+}
+
+function glbNodeNames(filePath) {
+  const buffer = fs.readFileSync(filePath);
+  if (buffer.length < 20 || buffer.readUInt32LE(0) !== 0x46546c67 || buffer.readUInt32LE(16) !== 0x4e4f534a) {
+    throw new Error(`${filePath} is not a valid binary glTF file.`);
+  }
+  const jsonLength = buffer.readUInt32LE(12);
+  const document = JSON.parse(buffer.subarray(20, 20 + jsonLength).toString('utf8').trim());
+  return (document.nodes || []).map((node) => node.name).filter(Boolean);
+}
+
 async function waitForHttp(url, attempts = 80) {
   for (let attempt = 0; attempt < attempts; attempt += 1) {
     try {
@@ -75,6 +94,8 @@ async function main() {
 
   const port = 9500 + Math.floor(Math.random() * 300);
   const profile = fs.mkdtempSync(path.join(os.tmpdir(), 'sbd-throwline-stage-probe-'));
+  const downloadDir = path.join(profile, 'downloads');
+  fs.mkdirSync(downloadDir);
   // Root containers (CI runners, remote sessions) cannot use Chrome's sandbox; local operator runs keep it on.
   const sandboxFlags = args.includes('--no-sandbox') || (typeof process.getuid === 'function' && process.getuid() === 0) ? ['--no-sandbox'] : [];
   // A remote --base behind an egress proxy: Chrome does not read HTTPS_PROXY on its own, so hand it the proxy
@@ -113,6 +134,8 @@ async function main() {
     const cdp = (method, params = {}) => { const id = sequence += 1; socket.send(JSON.stringify({ id, method, params })); return new Promise((resolve, reject) => pending.set(id, { resolve, reject })); };
     await cdp('Page.enable');
     await cdp('Runtime.enable');
+    await cdp('Network.enable');
+    await cdp('Browser.setDownloadBehavior', { behavior: 'allow', downloadPath: downloadDir, eventsEnabled: true });
     await cdp('Emulation.setDeviceMetricsOverride', { width: 1280, height: 900, deviceScaleFactor: 1, mobile: false });
 
     async function evaluate(expression) {
@@ -124,10 +147,15 @@ async function main() {
       await cdp('Page.navigate', { url: stageUrl(query) });
       let ready = false;
       for (let attempt = 0; attempt < 160 && !ready; attempt += 1) {
-        ready = await evaluate(`Boolean(document.getElementById('fRatio') && document.getElementById('provenanceBadge')?.textContent && document.documentElement.dataset.calculationMode)`);
+        try {
+          ready = await evaluate(`Boolean(document.getElementById('fRatio') && document.getElementById('provenanceBadge')?.textContent && document.documentElement.dataset.calculationMode)`);
+        } catch (error) {
+          ready = false;
+        }
         if (!ready) await delay(125);
       }
       if (!ready) throw new Error(`Stage 3D never became ready at ${stageUrl(query)}: ${await evaluate('JSON.stringify({ href: location.href, title: document.title, readyState: document.readyState })')}`);
+      await evaluate(`(() => { const dialog=document.getElementById('onboardingDialog'); if(dialog?.open)dialog.close(); })()`);
       await delay(150);
       return readout();
     }
@@ -157,7 +185,14 @@ async function main() {
     const mid = await click('bm');
     check('snap mid lands in the conservative band', mid.projection === 'safe', mid);
 
-    // 3. Field stamp keeps the planned basis: 12 ft throw / 10 ft image on a 20 ft raster corrects the mark to 24 ft.
+    // 3. Field errors are visible and actionable before a valid stamp is accepted.
+    await evaluate(`document.getElementById('stampVerification').click()`);
+    await delay(120);
+    const invalidFieldStamp = await evaluate(`(() => { const error=document.getElementById('fieldVerificationError'); return { hidden:error.hidden, text:error.textContent.trim(), role:error.getAttribute('role'), focus:document.activeElement?.id, invalid:['measuredDistance','measuredWidth','verifiedBy'].map(id=>document.getElementById(id).getAttribute('aria-invalid')) }; })()`);
+    check('blank Field Verify shows a visible alert', invalidFieldStamp.hidden === false && invalidFieldStamp.role === 'alert' && /measured throw/i.test(invalidFieldStamp.text), invalidFieldStamp);
+    check('blank Field Verify marks every field invalid and focuses the first field', invalidFieldStamp.focus === 'measuredDistance' && invalidFieldStamp.invalid.every(value => value === 'true'), invalidFieldStamp);
+
+    // 4. Field stamp keeps the planned basis: 12 ft throw / 10 ft image on a 20 ft raster corrects the mark to 24 ft.
     await setInput('measuredDistance', 12);
     await setInput('measuredWidth', 10);
     await setInput('verifiedBy', 'Probe');
@@ -169,7 +204,7 @@ async function main() {
     check('driving edit after the stamp returns the unit to a manual estimate', corrected.badge === 'MANUAL ESTIMATE', corrected);
     check('the stamped readout used the measured mark with no verify band', stamped.wide === '24\' 0"' && stamped.safeWidth === '0%' && /^Needs a fix/.test(stamped.headline), stamped);
 
-    // 4. URL trust for field verification.
+    // 5. URL trust for field verification.
     const forged = await open('mode=field_verified&ratio=1.2&stamp=verified');
     check('a bare ratio plus stamp does not assert FIELD VERIFIED', forged.badge !== 'FIELD VERIFIED' && forged.mode === 'manual' && /re-measure/i.test(forged.gate), forged);
     const evidence = await open('mode=field_verified&ratio=1.2&stamp=2026-09-04T12%3A00%3A00.000Z&md=12&mw=10&vb=Dave&w=20&basisW=20&rasterAr=1.6&dist=24');
@@ -179,7 +214,7 @@ async function main() {
     const noRatio = await open('mode=field_verified&stamp=2026-09-04T12%3A00%3A00.000Z');
     check('a field transfer without any ratio is blocked', noRatio.mode === 'blocked' && noRatio.projection !== 'safe', noRatio);
 
-    // 5. Direction-aware lens shift.
+    // 6. Direction-aware lens shift.
     const downward = await open('mode=manual&w=20&bottom=4&ar=1.777778&basisW=20&rasterAr=1.6&lh=14&dist=22&min=0.978&max=1.32&su=10&sd=80');
     check('a −35% downward shift is within the 80% down limit', downward.shift === '-35.0% V' && downward.shiftColor === 'var(--info)', downward);
     const upward = await open('mode=manual&w=20&bottom=4&ar=1.777778&basisW=20&rasterAr=1.6&lh=2&dist=22&min=0.978&max=1.32&su=10&sd=80');
@@ -187,7 +222,7 @@ async function main() {
     const lateral = await setInput('px', -6);
     check('horizontal shift is reported alongside vertical', /H/.test(lateral.shift) && /\+/.test(lateral.shift.split('·')[1] || ''), lateral);
 
-    // 5b. Up and sideways together. Sony publishes the combined range as a formula, so passing it is a fix; Panasonic only draws it, so it is a check.
+    // 6b. Up and sideways together. Sony publishes the combined range as a formula, so passing it is a fix; Panasonic only draws it, so it is a check.
     // Sony VPLL-Z8008 at 16:9, 19 ft on a 20 ft basis: image 20 × 11.25, screen centre 9.625 ft; lens at 6.25 ft = +30% up; x = −3 ft aims 15% right → 30/50 + 15/18 > 1.
     const sonyShift = await open('mode=verified_image_width&projector=PRJ-003&lens=LNS-010&profile=OPT-005&w=20&bottom=4&ar=1.7777778&basisW=20&rasterAr=1.7777778&lh=6.25&dist=19');
     check('a catalog pair carries the maker shift limits without any limits in the link', /^\+30\.0% V · limits from maker data$/.test(sonyShift.shift) && /^Ready/.test(sonyShift.headline), sonyShift);
@@ -201,7 +236,7 @@ async function main() {
     const edited = await open('mode=verified_image_width&projector=PRJ-003&lens=LNS-010&profile=OPT-005&w=20&bottom=4&ar=1.7777778&basisW=20&rasterAr=1.7777778&lh=6.25&dist=19&su=40');
     check('a link that edits a limit is honoured over the catalog and no longer reads as maker data', edited.shift === '+30.0% V', edited);
 
-    // 6. Room boundaries.
+    // 7. Room boundaries.
     const tall = await open('mode=manual&w=20&bottom=10&ar=1.777778&basisW=20&rasterAr=1.6&lh=6&dist=22&min=0.978&max=1.32');
     const lowCeiling = await setInput('roomH', 8);
     check('an 8 ft ceiling under a 21 ft screen top is a spatial conflict', /top of the screen is above the ceiling/.test(lowCeiling.alert), lowCeiling);
@@ -210,20 +245,55 @@ async function main() {
     const outside = await setInput('px', 30);
     check('a projector outside the room width is a spatial conflict', /outside the side walls/.test(outside.alert), outside);
 
-    // 7. Degraded renderer parity: with --no-webgl the renderer is reported unavailable, yet every fact above was identical.
+    // 8. Degraded renderer parity: with --no-webgl the renderer is reported unavailable, yet every fact above was identical.
     const rendererState = await open(AUDIT_QUERY);
     check(noWebgl ? 'renderer reports unavailable without WebGL' : 'renderer is ready with WebGL', noWebgl ? rendererState.renderer === 'unavailable' && /couldn\u2019t start/i.test(rendererState.status) : rendererState.renderer === 'ready', rendererState);
     check('headline is the aggregate installation check, not the bare ratio fit', /^(Needs a fix|Worth a look|Ready)/.test(rendererState.headline) && /too close/i.test(rendererState.headline), rendererState);
     const slider = await setInput('d', 10);
     check('distance slider stays live and drives the readout', slider.distance === '10\' 0"' && slider.ratio === '0.500:1', slider);
 
-    // 8. Transfer bounds are not silently narrowed: a 50 ft screen at an 80 ft throw stays out of range.
+    // 9. A real WebGL loss must visibly pause and then recover the existing scene.
+    if (!noWebgl) {
+      const beforeLoss = await readout();
+      const lossExtension = await evaluate(`(() => { const stage=document.querySelector('three-d-stage'); const gl=stage?._renderer?.getContext(); const extension=gl?.getExtension('WEBGL_lose_context'); if(!extension)return false; window.__throwlineWebglLoss=extension; extension.loseContext(); return true; })()`);
+      check('browser exposes WEBGL_lose_context for the runtime recovery regression', lossExtension === true, { lossExtension });
+      let lostState = null;
+      for (let attempt = 0; attempt < 80; attempt += 1) {
+        lostState = await evaluate(`(() => { const stage=document.querySelector('three-d-stage'); return { renderer:document.documentElement.dataset.renderer, fallbackHidden:stage.shadowRoot.querySelector('.err').hidden, fallback:stage.shadowRoot.querySelector('.err').textContent.trim(), exports:[...stage.shadowRoot.querySelectorAll('.toolbar button')].map(button=>button.disabled), ratio:document.getElementById('fRatio').textContent.trim(), mobile:[document.getElementById('mobileObj').disabled,document.getElementById('mobileGlb').disabled] }; })()`);
+        if (lostState.renderer === 'recovering') break;
+        await delay(100);
+      }
+      check('WebGL loss shows the recovery fallback without losing calculated facts', lostState?.renderer === 'recovering' && lostState.fallbackHidden === false && /3D view paused/.test(lostState.fallback) && lostState.ratio === beforeLoss.ratio, lostState);
+      check('WebGL loss disables every model export', lostState?.exports.every(Boolean) && lostState?.mobile.every(Boolean), lostState);
+      if (lossExtension) await evaluate(`window.__throwlineWebglLoss.restoreContext()`);
+      let recoveredState = null;
+      for (let attempt = 0; attempt < 120; attempt += 1) {
+        recoveredState = await evaluate(`(() => { const stage=document.querySelector('three-d-stage'); return { renderer:document.documentElement.dataset.renderer, fallbackHidden:stage.shadowRoot.querySelector('.err').hidden, exports:[...stage.shadowRoot.querySelectorAll('.toolbar button')].map(button=>button.disabled), status:document.getElementById('stageStatus').textContent.trim() }; })()`);
+        if (recoveredState.renderer === 'ready') break;
+        await delay(100);
+      }
+      check('WebGL restoration returns the same scene to ready state', recoveredState?.renderer === 'ready' && recoveredState.fallbackHidden === true && recoveredState.exports.every(value => value === false) && /recovered/i.test(recoveredState.status), recoveredState);
+
+      // 10. Actual OBJ and GLB downloads must contain the object names promised in the UI.
+      await evaluate(`document.querySelector('three-d-stage').runExport('obj')`);
+      await waitForPath(path.join(downloadDir, 'throwline-stage.obj'));
+      await waitForPath(path.join(downloadDir, 'throwline-stage.mtl'));
+      await evaluate(`document.querySelector('three-d-stage').runExport('glb')`);
+      await waitForPath(path.join(downloadDir, 'throwline-stage.glb'));
+      const objNames = [...fs.readFileSync(path.join(downloadDir, 'throwline-stage.obj'), 'utf8').matchAll(/^o (.+)$/gm)].map(match => match[1]);
+      const glbNames = glbNodeNames(path.join(downloadDir, 'throwline-stage.glb'));
+      const promisedNames = ['screen', 'projector_body', 'lens_barrel', 'cart'];
+      check('OBJ export uses every promised object name', promisedNames.every(name => objNames.includes(name)) && !objNames.includes('screen_surface'), { promisedNames, objNames });
+      check('GLB export uses every promised object name', promisedNames.every(name => glbNames.includes(name)) && !glbNames.includes('screen_surface'), { promisedNames, glbNames });
+    }
+
+    // 11. Transfer bounds are not silently narrowed: a 50 ft screen at an 80 ft throw stays out of range.
     const wide50 = await open('mode=manual&w=50&bottom=4&ar=1.777778&basisW=50&rasterAr=1.6&lh=6&dist=80&min=0.978&max=1.32');
     check('a 50 ft screen / 80 ft throw transfer is preserved and reads overshoot', wide50.ratio === '1.600:1' && wide50.projection === 'overshoot' && wide50.distance === '80\' 0"', wide50);
     const custom = await open('mode=manual&w=20&bottom=4&ar=2&basisW=20&rasterAr=2&lh=6&dist=22&min=0.978&max=1.32');
     check('a custom 2.000:1 aspect shows as the selected option', /2\.000:1/.test(custom.aspect), custom);
 
-    // 9. Fixed lens: no safe interior, nominal verify band, no negative safe bar.
+    // 12. Fixed lens: no safe interior, nominal verify band, no negative safe bar.
     const fixed = await open('mode=manual&w=20&bottom=4&ar=1.777778&basisW=20&rasterAr=1.6&lh=6&dist=13&min=0.65&max=0.65');
     check('a fixed 0.65:1 lens at 13 ft reads as a nominal verify mark with an empty safe band', fixed.projection === 'nominal' && /one set distance/i.test(fixed.note) && fixed.safeWidth === '0%', fixed);
     const tol10 = await open('mode=manual&w=20&bottom=4&ar=1.777778&basisW=20&rasterAr=1.6&lh=6&dist=21&min=0.978&max=1.32&tolPct=10');
@@ -231,7 +301,7 @@ async function main() {
     const tol5 = await open('mode=manual&w=20&bottom=4&ar=1.777778&basisW=20&rasterAr=1.6&lh=6&dist=21&min=0.978&max=1.32');
     check('the default 5% tolerance keeps 21 ft inside the safe band', tol5.projection === 'safe', tol5);
 
-    // 10. Verified catalog transfers: the maker's width-based ratio for the chosen picture shape, and a block for other shapes.
+    // 13. Verified catalog transfers: the maker's width-based ratio for the chosen picture shape, and a block for other shapes.
     const verified = await open('mode=verified_image_width&projector=PRJ-001&lens=LNS-004&profile=OPT-002&w=20&bottom=4&ar=1.8962963&basisW=20&rasterAr=1.8962963&lh=6&dist=50');
     check('a verified Panasonic pair opens MANUFACTURER VERIFIED with the 17:9 ratio 2.00–3.41', verified.badge === 'MANUFACTURER VERIFIED' && verified.wide === '40\' 0"' && verified.tele === '68\' 2½"' && verified.projection === 'safe', verified);
     const variant = await open('mode=verified_image_width&projector=PRJ-001&lens=LNS-004&profile=OPT-002&w=20&bottom=4&ar=1.6&basisW=20&rasterAr=1.6&lh=6&dist=50');
@@ -243,7 +313,7 @@ async function main() {
     const barco = await open('mode=verified_image_width&projector=PRJ-004&lens=LNS-013&profile=OPT-008&w=20&bottom=4&ar=1.6&basisW=20&rasterAr=1.6&lh=6&dist=30');
     check('the Barco pair stays paused with a plain-language reason', barco.badge !== 'MANUFACTURER VERIFIED' && /CAN’T CALCULATE YET/.test(barco.gate) && /width basis|Barco/.test(barco.gate), barco);
 
-    // 10b. Projector body from the catalog: back wall, keep-clear margin, and the body facts line.
+    // 13b. Projector body from the catalog: back wall, keep-clear margin, and the body facts line.
     // Lens front at 44 ft; the PT-RQ50K body (3.51 ft) starts 0.68 ft behind it, so its back sits at 48.19 ft.
     await open('mode=verified_image_width&projector=PRJ-001&lens=LNS-004&profile=OPT-002&w=20&bottom=4&ar=1.8962963&basisW=20&rasterAr=1.8962963&lh=6&dist=44&clr=1');
     const bodied = await setInput('roomD', 60);
@@ -258,7 +328,7 @@ async function main() {
     const cleared = await click('clearBody');
     check('clearing the body falls back to the lens-position check', /lens position only/.test(await evaluate(`document.getElementById('fBody').textContent.trim()`)) && cleared.alert === 'Nothing in the way', cleared);
 
-    // 11. Planner: picking a verified pair reads READY TO CALCULATE; a covered shape switch keeps it verified.
+    // 14. Planner: picking a verified pair reads READY TO CALCULATE; a covered shape switch keeps it verified.
     await cdp('Page.navigate', { url: `${baseUrl}ProjectorThrow/index.html?workspace=planner` });
     await delay(2500);
     const planner = await evaluate(`(() => { const set = (id, value) => { const el = document.getElementById(id); el.value = value; el.dispatchEvent(new Event('change', { bubbles: true })); };
@@ -274,11 +344,55 @@ async function main() {
     const plannerManual = await evaluate(`(() => { const el = document.getElementById('trmin'); el.value = '1.2'; el.dispatchEvent(new Event('input', { bubbles: true })); return new Promise(resolve => setTimeout(() => resolve({ profile: document.getElementById('shiftProfile').value, up: document.getElementById('shiftUp').value, left: document.getElementById('shiftLeft').value, noteHidden: document.getElementById('shiftCatalogNote').hidden }), 400)); })()`);
     check('typing a ratio by hand drops the catalog shift profile instead of leaving stale maker limits', plannerManual.profile === '' && plannerManual.up === '' && plannerManual.left === '' && plannerManual.noteHidden === true, plannerManual);
 
-    check('no uncaught browser exceptions', exceptions.length === 0, exceptions);
+    // 15. The service worker must earn the Offline ready label and serve a cold-network reload.
+    await open(AUDIT_QUERY);
+    let offlineStatus = null;
+    for (let attempt = 0; attempt < 160; attempt += 1) {
+      offlineStatus = await evaluate(`({ state:document.documentElement.dataset.offline, badge:document.getElementById('offlineBadge').textContent.trim(), controlled:Boolean(navigator.serviceWorker?.controller) })`);
+      if (offlineStatus.state === 'ready') break;
+      await delay(125);
+    }
+    check('Offline ready appears only after the service worker controls the page', offlineStatus?.state === 'ready' && offlineStatus.controlled === true && /^Offline ready/.test(offlineStatus.badge), offlineStatus);
+    await cdp('Network.emulateNetworkConditions', { offline: true, latency: 0, downloadThroughput: 0, uploadThroughput: 0 });
+    let offlineReload;
+    try {
+      offlineReload = await open(AUDIT_QUERY);
+    } finally {
+      await cdp('Network.emulateNetworkConditions', { offline: false, latency: 0, downloadThroughput: -1, uploadThroughput: -1 });
+    }
+    const offlineReloadStatus = await evaluate(`({ state:document.documentElement.dataset.offline, controlled:Boolean(navigator.serviceWorker?.controller) })`);
+    check('Stage 3D reloads with calculated facts while the network is offline', offlineReload.ratio === '0.366:1' && offlineReloadStatus.state === 'ready' && offlineReloadStatus.controlled === true, { readout: offlineReload, offline: offlineReloadStatus });
+
+    // 16. Required responsive widths must keep the workspace contained and the mobile error visible.
+    for (const viewport of [{ width: 680, height: 900 }, { width: 390, height: 844 }]) {
+      await cdp('Emulation.setDeviceMetricsOverride', { ...viewport, deviceScaleFactor: viewport.width === 390 ? 3 : 2, mobile: viewport.width === 390 });
+      await open(AUDIT_QUERY);
+      const layout = await evaluate(`(() => { const stage=document.querySelector('.stage-canvas').getBoundingClientRect(); const dock=document.querySelector('.mobile-dock').getBoundingClientRect(); return { clientWidth:document.documentElement.clientWidth, scrollWidth:document.documentElement.scrollWidth, innerHeight, bodyHeight:document.body.getBoundingClientRect().height, stage:{ width:stage.width, height:stage.height, top:stage.top, bottom:stage.bottom }, dock:{ width:dock.width, height:dock.height, top:dock.top, bottom:dock.bottom }, buttons:[...document.querySelectorAll('.mobile-dock button')].map(button=>({ width:button.getBoundingClientRect().width, height:button.getBoundingClientRect().height })) }; })()`);
+      check(`${viewport.width}px workspace has no horizontal overflow and keeps a visible stage`, layout.scrollWidth <= layout.clientWidth + 1 && layout.stage.width > 200 && layout.stage.height > 240 && layout.stage.top >= 0 && layout.stage.bottom <= layout.innerHeight, layout);
+      check(`${viewport.width}px mobile dock stays visible with four touch targets`, layout.dock.width > 200 && layout.dock.height >= 44 && layout.dock.bottom <= layout.innerHeight + 1 && layout.buttons.length === 4 && layout.buttons.every(button => button.height >= 44), layout);
+      if (viewport.width === 390) {
+        await evaluate(`document.querySelector('[data-mobile-panel-button="adjust"]').click()`);
+        await delay(120);
+        await evaluate(`document.getElementById('stampVerification').scrollIntoView({ block:'center' })`);
+        await delay(120);
+        await evaluate(`document.getElementById('stampVerification').click()`);
+        await delay(120);
+        const mobileError = await evaluate(`(() => { const error=document.getElementById('fieldVerificationError'); const panel=document.querySelector('aside'); const rect=error.getBoundingClientRect(); const panelRect=panel.getBoundingClientRect(); return { hidden:error.hidden, display:getComputedStyle(error).display, text:error.textContent.trim(), panelDisplay:getComputedStyle(panel).display, rect:{top:rect.top,bottom:rect.bottom}, panel:{top:panelRect.top,bottom:panelRect.bottom}, focus:document.activeElement?.id }; })()`);
+        check('390px Field Verify error is visible inside the open Adjust sheet', mobileError.hidden === false && mobileError.display !== 'none' && mobileError.panelDisplay !== 'none' && mobileError.rect.bottom > mobileError.panel.top && mobileError.rect.top < mobileError.panel.bottom && mobileError.focus === 'measuredDistance', mobileError);
+      }
+    }
+
+    const unexpectedExceptions = noWebgl
+      ? exceptions.filter((exception) => !/Error creating WebGL context\./.test(exception))
+      : exceptions;
+    check(noWebgl ? 'no unexpected browser exceptions in the intentional no-WebGL run' : 'no uncaught browser exceptions', unexpectedExceptions.length === 0, unexpectedExceptions);
   } finally {
     chrome.kill('SIGKILL');
     if (staticServer) staticServer.server.kill('SIGKILL');
-    fs.rmSync(profile, { recursive: true, force: true });
+    for (let attempt = 0; attempt < 8; attempt += 1) {
+      try { fs.rmSync(profile, { recursive: true, force: true }); break; }
+      catch (error) { if (attempt === 7) throw error; await delay(125 * (attempt + 1)); }
+    }
   }
 
   if (failures.length) { console.error(`Throwline Stage 3D probe failed: ${failures.length} check(s).`); process.exit(1); }

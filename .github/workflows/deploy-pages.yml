@@ -54,6 +54,9 @@ jobs:
       - name: Verify Throwline release contract
         run: npm run verify:throwline
 
+      - name: Verify Throwline browser runtime
+        run: npm run test:throwline-browser
+
       - name: Verify NoteForge release contract
         run: npm run verify:noteforge
 

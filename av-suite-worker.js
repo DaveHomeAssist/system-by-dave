@@ -56,6 +56,9 @@ self.addEventListener('activate',function(event){
 
 self.addEventListener('message',function(event){
   if(event.data&&event.data.type==='SKIP_WAITING') self.skipWaiting();
+  if(event.data&&event.data.type==='SBD_OFFLINE_VERSION'&&event.ports&&event.ports[0]){
+    event.ports[0].postMessage({version:self.SBD_REGISTRY.version,cache:CACHE_NAME});
+  }
 });
 
 self.addEventListener('fetch',function(event){
