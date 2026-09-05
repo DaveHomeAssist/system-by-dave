@@ -414,9 +414,26 @@
     return { tone, label, issues };
   }
 
+  // One on-site verification rule for the planner and Stage 3D: a stamp certifies the throw ratio as measured for this
+  // installation, so any edit that moves the picture or the projector (a driving edit) drops the stamp and says why.
+  const FIELD_VERIFICATION = Object.freeze({
+    reason: 'MANUAL ESTIMATE · something changed after the on-site check, so please measure again.',
+    drivingIntents: Object.freeze(['set-distance', 'snap-distance', 'set-lens-height', 'set-projector-x', 'set-projector-target-x', 'set-screen-width', 'set-screen-bottom', 'set-screen-aspect', 'set-optical-range', 'set-body', 'clear-body', 'arrange-projectors'])
+  });
+  function invalidatesFieldVerification(intentType) { return FIELD_VERIFICATION.drivingIntents.includes(String(intentType || '')); }
+
+  // Link and display units. Scene lengths are feet; links may carry feet (default), metres, or inches.
+  const LENGTH_UNITS = Object.freeze({ ft: 1, m: 1 / 0.3048, in: 1 / 12 });
+  function lengthToFeet(value, unit = 'ft') {
+    if (value === '' || value === null || value === undefined || typeof value === 'boolean') return NaN;
+    const number = Number(value);
+    if (!finite(number)) return NaN;
+    return number * (LENGTH_UNITS[unit] || 1);
+  }
+
   function invalidateFieldVerification(projector) {
     if (projector.provenance.mode !== 'field_verified') return projector;
-    return { ...projector, provenance: normalizeProvenance({ mode: 'manual', reason: 'MANUAL ESTIMATE · something changed after the on-site check, so please measure again.' }) };
+    return { ...projector, provenance: normalizeProvenance({ mode: 'manual', reason: FIELD_VERIFICATION.reason }) };
   }
 
   function applyIntent(input, intent = {}) {
@@ -424,7 +441,9 @@
     const type = String(intent.type || '');
     const index = scene.projectors.findIndex(projector => projector.id === (intent.projectorId || scene.activeProjectorId));
     const projector = scene.projectors[index >= 0 ? index : 0];
-    const updateProjector = next => { scene.projectors[index >= 0 ? index : 0] = invalidateFieldVerification(next); };
+    // Driving edits drop the on-site stamp (FIELD_VERIFICATION.drivingIntents); anything else keeps it.
+    const keepOrDrop = invalidatesFieldVerification(type) ? invalidateFieldVerification : projectorState => projectorState;
+    const updateProjector = next => { scene.projectors[index >= 0 ? index : 0] = keepOrDrop(next); };
     if (type === 'set-distance') updateProjector({ ...projector, position: { ...projector.position, distance: clamp(stepped(intent.value, 0.25), 1, 300) } });
     else if (type === 'snap-distance' && projector.allowed && finite(projector.optical.min) && finite(projector.optical.max)) {
       // Optical stops are exact ratios times the basis width; quarter-foot rounding would push a stop outside its own envelope.
@@ -485,5 +504,5 @@
     return normalizeSceneState(scene);
   }
 
-  return Object.freeze({ SCHEMA_VERSION, STORAGE_KEY, PLACEMENT_TOLERANCE, COVERAGE_TOLERANCE, ASPECT_TOLERANCE, normalizeProvenance, normalizeSceneState, createSceneState, activeProjector, calculateProjectorGeometry, roomConflicts, bodyExtents, assessInstallation, assessCombinedShift, resolveProfileRatio, obstacleIntersectsBeam, applyIntent, stampFieldVerification });
+  return Object.freeze({ SCHEMA_VERSION, STORAGE_KEY, PLACEMENT_TOLERANCE, COVERAGE_TOLERANCE, ASPECT_TOLERANCE, normalizeProvenance, normalizeSceneState, createSceneState, activeProjector, calculateProjectorGeometry, roomConflicts, bodyExtents, assessInstallation, assessCombinedShift, resolveProfileRatio, FIELD_VERIFICATION, invalidatesFieldVerification, lengthToFeet, LENGTH_UNITS, obstacleIntersectsBeam, applyIntent, stampFieldVerification });
 });

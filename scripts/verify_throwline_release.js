@@ -542,7 +542,7 @@ requireMatch(stage, /state\.dist\s*\/\s*state\.basisW/, 'Stage 3D required ratio
 requireMatch(stage, /type:\s*['"]snap-distance['"]/, 'Stage 3D snap controls must use the exact optical-stop intent instead of quarter-foot rounding.');
 requireMatch(stage, /SceneState\.roomConflicts\(/, 'Stage 3D must derive room conflicts from the shared scene-state contract.');
 requireMatch(stage, /geometry\.shift\b/, 'Stage 3D must judge lens shift through the direction-aware scene-state assessment.');
-requireMatch(stage, /requestedMode\s*===\s*['"]field_verified['"][\s\S]*?number\(['"]md['"][\s\S]*?number\(['"]mw['"][\s\S]*?Date\.parse\(stamp\)/, 'Stage 3D must require measurement evidence and a real timestamp before honoring a FIELD VERIFIED transfer.');
+requireMatch(stage, /requestedMode\s*===\s*['"]field_verified['"][\s\S]*?length\(['"]md['"][\s\S]*?length\(['"]mw['"][\s\S]*?Date\.parse\(stamp\)/, 'Stage 3D must require measurement evidence and a real timestamp before honoring a FIELD VERIFIED transfer.');
 requireMatch(main, /put\(["']md["'][\s\S]*?put\(["']mw["'][\s\S]*?put\(["']vb["']/, 'The planner must transfer the field measurement evidence with a field-verified Stage 3D link.');
 ['roomConflicts', 'PLACEMENT_TOLERANCE', "'snap-distance'", 'resolveProfileRatio', 'bodyExtents', "'set-body'", 'clearance', 'assessCombinedShift', "'shift-combined'", 'normalizeCombinedRule'].forEach((token) => {
   if (!sceneState.includes(token)) fail(`Throwline scene-state contract is missing ${token}.`);
@@ -625,7 +625,20 @@ requireMatch(sidecar, /stage-manipulation/, 'Stage 3D renderer must emit manipul
 ['normalizeSceneState','calculateProjectorGeometry','applyIntent','stampFieldVerification','obstacleIntersectsBeam'].forEach((name) => {
   requireMatch(sceneState, new RegExp(`function\\s+${name}\\s*\\(`), `Throwline scene state is missing the pure ${name} boundary.`);
 });
-requireMatch(sceneState, /provenance\.mode !== 'field_verified'[\s\S]*?MANUAL ESTIMATE/, 'Driving scene edits must invalidate field verification.');
+requireMatch(sceneState, /provenance\.mode !== 'field_verified'[\s\S]*?FIELD_VERIFICATION\.reason/, 'Driving scene edits must invalidate field verification with the shared reason.');
+requireMatch(sceneState, /const FIELD_VERIFICATION = Object\.freeze\(\{[\s\S]*?reason: 'MANUAL ESTIMATE[\s\S]*?drivingIntents:/, 'The scene contract must publish the one on-site verification rule (reason and driving intents).');
+['invalidatesFieldVerification', 'lengthToFeet', 'LENGTH_UNITS'].forEach((token) => {
+  if (!sceneState.includes(token)) fail(`Throwline scene-state contract is missing ${token}.`);
+});
+requireMatch(stage, /const UNITS_STORAGE_KEY = ['"]throwline:stage-units:v1['"]/, 'Stage 3D measurement units must use the registered versioned storage key.');
+requireMatch(stage, /id=["']unitToggle["']/, 'Stage 3D must expose the metres / feet-and-inches toggle.');
+requireMatch(stage, /id=["']fMeasure["']/, 'Stage 3D must say which units it shows and which units the link carried.');
+requireMatch(stage, /SceneState\.lengthToFeet\(params\.get\(key\),\s*linkUnit\)/, 'Stage 3D must read link lengths through the shared unit marker.');
+requireMatch(stage, /SceneState\.lengthToFeet\(els\(['"]measuredDistance['"]\)\.value,\s*typedUnit\)/, 'Stage 3D field measurements must convert from the display unit before stamping.');
+requireMatch(main, /put\(["']u["'],\s*["']ft["']\)/, 'The planner must mark its Stage 3D link lengths as feet.');
+requireMatch(main, /function\s+noteDrivingEdit\s*\(/, 'The planner must drop the on-site stamp on driving edits like Stage 3D.');
+requireMatch(main, /ThrowlineSceneState\?\.FIELD_VERIFICATION\?\.reason/, 'The planner must reuse the shared on-site verification reason.');
+requireMatch(main, /id=["']verifyReset["']/, 'The planner must show why an on-site stamp was dropped.');
 requireMatch(sceneState, /const STORAGE_KEY = 'throwline:stage-scene:v1'/, 'Stage 3D scene storage must use the registered versioned key.');
 requireMatch(stage, /min-height:\s*44px/, 'Stage 3D must retain 44-pixel touch targets on phone.');
 requireMatch(sidecar, /:host\(\[field-verify\]\)\s+\.toolbar/, 'Stage exports must yield to planning data in Field Verify mode.');
@@ -664,6 +677,9 @@ if (!throwlineTools[0]?.storageKeys?.some((item) => item.key === 'throwline:stag
 }
 if (!throwlineTools[0]?.storageKeys?.some((item) => item.key === 'throwline:stage-onboarding:v1')) {
   fail('Registry must include the versioned Throwline Stage onboarding key.');
+}
+if (!throwlineTools[0]?.storageKeys?.some((item) => item.key === 'throwline:stage-units:v1')) {
+  fail('Registry must include the versioned Throwline Stage measurement-units key.');
 }
 ['https://systembydave.com/ProjectorThrow/', 'https://systembydave.com/ProjectorThrow/Stage3D.html'].forEach((url) => {
   if (!sitemap.includes(`<loc>${url}</loc>`)) fail(`Sitemap is missing ${url}.`);
