@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-09-07
+
+### FMP working index
+
+* Added `/fmp-index/` with 17 verified destinations across field operations, venue records, project guidance, and work in development. The dated September 7 snapshot distinguishes available records from unverified integrations and planned deliverables; record counts are explicitly not hardware totals.
+* Included direct Walk and Technical Overview links, local search and purpose filters, a clear empty state, full navigation without JavaScript, responsive layouts, and a link to the canonical verification record. Existing Notion permissions still apply.
+* Reused the Stage Slate palette, local fonts, and shared skip-link style. Excluded this personal working index from search and the sitemap, and extended the indexing verification contract for the new route.
+
 ## 2026-09-05
 
 ### Throwline Stage 3D sidebar clarity and responsive menu
