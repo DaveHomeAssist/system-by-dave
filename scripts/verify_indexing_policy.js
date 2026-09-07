@@ -55,11 +55,12 @@ const files = walk(ROOT);
 const unlisted = files.filter((file) => !sitemapRoutes.has(routeFor(file)));
 const robots = read('robots.txt');
 
-if (unlisted.length !== 120) fail(`Expected 120 tracked routes outside the sitemap; found ${unlisted.length}.`);
+if (unlisted.length !== 121) fail(`Expected 121 tracked routes outside the sitemap; found ${unlisted.length}.`);
 
 [
   '/apps/av-workbook/',
   '/cross-project-actions.html',
+  '/fmp-index/',
   '/html/sbd-brand.html'
 ].forEach((route) => {
   if (!robots.includes(`Disallow: ${route}`)) fail(`robots.txt does not exclude internal/source route ${route}.`);
@@ -99,6 +100,7 @@ hatFiles.forEach((file) => {
 
 [
   ['av-workbook.html', 'https://systembydave.com/av-workbook/'],
+  ['fmp-index/index.html', 'https://systembydave.com/fmp-index/'],
   ['cueforge.html', 'https://systembydave.com/cueforge.html'],
   ['plotforge.html', 'https://plotforge-beta.vercel.app/'],
   ['marsscape/index.html', 'https://mixmash.games/mars/'],
