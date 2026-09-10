@@ -2,6 +2,10 @@
 
 ## 2026-09-10 (architecture audit)
 
+### Offline cache version invariant gated from git history
+
+* `av-suite-worker.js` states that `SBD_REGISTRY.version` must be bumped whenever a tool or shared offline asset changes, because the worker serves offline assets cache-first under a cache named after that version. Nothing checked it. New `scripts/verify_offline_cache_version.js` (part of `npm run verify:av`) fails when any registry offline asset has a commit newer than the last change to the version line, or is modified in the working tree while the version line is untouched; it warns rather than passes silently on a shallow clone. Bumped the cache version to `v20260910-architecture-audit` for the scene contract comment change in this audit, and mirrored it in Stage 3D's pinned `OFFLINE_CACHE_VERSION`.
+
 ### Throwline evidence tied to the ratios the app calculates with
 
 * The release verifier recomputed each calculation-ready profile's `verificationEvidence.crossChecks` (distance ÷ width within 2 % of the published ratio) but never compared that published ratio to the `throw_ratio_min`/`throw_ratio_max` the profile and its aspect variants actually feed `resolveProfileRatio()`. Evidence could therefore vouch for a number that lived only in the evidence block. Each cross-check must now cite a picture shape the profile carries and match its ratio exactly, and the basis variant must match the profile ratio.

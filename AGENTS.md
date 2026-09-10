@@ -161,7 +161,10 @@ Pages workflow before a production claim.
 - **Public shell or public copy:** `npm run verify:public-navigation` and
   `npm run verify:public-consistency`.
 - **AV registry, tools, themes, or offline assets:** `npm run verify:av`; add
-  the relevant Gear Reference or browser probe when affected.
+  the relevant Gear Reference or browser probe when affected. Any change to a
+  registry offline asset requires a new `SBD_REGISTRY.version` (mirrored in
+  Stage 3D's `OFFLINE_CACHE_VERSION`); `verify:offline-cache-version` enforces
+  it from git history.
 - **AV Workbook:** `npm run typecheck:av-workbook`,
   `npm run test:av-workbook`, and `npm run build:av-workbook`.
 - **Throwline:** `npm run verify:throwline`.
