@@ -57,6 +57,18 @@ const robots = read('robots.txt');
 
 if (unlisted.length !== 122) fail(`Expected 122 tracked routes outside the sitemap; found ${unlisted.length}.`);
 
+// The documented rule (AGENTS.md): every route kept out of the sitemap needs an explicit indexing
+// policy, either a noindex meta tag or a robots.txt Disallow. The count above only detects new
+// unlisted routes; this enforces the policy itself for every one of them.
+const disallowedPrefixes = Array.from(robots.matchAll(/^Disallow:\s*(\S+)/gm), (match) => match[1]);
+unlisted.forEach((file) => {
+  const route = routeFor(file);
+  const disallowed = disallowedPrefixes.some((prefix) => route.startsWith(prefix));
+  if (!disallowed && !hasNoIndex(read(file))) {
+    fail(`${file} is outside the sitemap but has neither a noindex meta tag nor a robots.txt Disallow.`);
+  }
+});
+
 [
   '/apps/av-workbook/',
   '/cross-project-actions.html',

@@ -2,6 +2,10 @@
 
 ## 2026-09-10 (architecture audit)
 
+### Indexing policy verified per route, not by count
+
+* `scripts/verify_indexing_policy.js` proved the "every unlisted route carries an explicit indexing policy" rule only by pinning the number of routes outside the sitemap plus a hand-enumerated subset. The verifier now checks every tracked HTML route outside the sitemap for a `noindex` meta tag or a `robots.txt` Disallow, keeping the count pin as the new-route tripwire.
+
 ### Registry-derived tool count in the Gear Reference verifier
 
 * `scripts/verify_gear_reference.js` pinned the public AV tool count as the literal `44`, a second count contract beside the registry-derived check in `verify_public_consistency.js` that would have failed with a misleading message on the next registered tool. The gate now reads the count from `js/sbd-registry.js`.
