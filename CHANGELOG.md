@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-09-10
+
+### Pier 68 run of show at /afterbreak/
+
+* Published the crew run of show for the Pier 68 Breakaway afterparty at `/afterbreak/` as a six-tab phone shell — Timeline, Bar, Promo, Gear, Crew, Open — with per-item done ticks and theme choice persisted on the device under `pier68` and `pier68-theme`.
+* Corrected the countdown, which anchored to 21:00 and labelled it "9pm load-in" while the timeline puts load-in open at 20:00 and 21:00 at "Nick on site". It now counts to the 20:00 load-in open, and the day branch pluralises (it rendered "1 days"). Moved "Breakaway lets out ~11p" ahead of the 4-to-5am closing set so the timeline reads in order.
+* Gave every done tick and disclosure an accessible name, replaced the `role="button"` bar wrapper (which nested a real button inside it) with real caret buttons carrying `aria-expanded`/`aria-controls`, and made the tab bar a keyboard-operable tablist. Done ticks, the theme toggle, and the breadcrumb links all meet the 44px target; a `noscript` notice states plainly that the timeline, tabs, countdown, and step detail need JavaScript.
+* Added the full public head — description, canonical, theme colour per scheme, Open Graph, Twitter Card, and a self-only CSP — plus the skip link and System by Dave / Tools / current-page return required by the public shell contract.
+* This is a private crew page: `noindex,nofollow`, excluded from the sitemap, and disallowed in `robots.txt`. Extended the indexing verifier to pin that policy and its route count.
+
 ## 2026-09-07
 
 ### FMP working index

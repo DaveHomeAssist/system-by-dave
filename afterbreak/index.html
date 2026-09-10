@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; base-uri 'none'; form-action 'none'">
+<title>Pier 68 Run of Show — System by Dave</title>
+<meta name="description" content="Crew run of show for the Pier 68 Breakaway afterparty: timeline, bar list, promo assignments, gear, crew, and open items.">
+<link rel="canonical" href="https://systembydave.com/afterbreak/">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#070B10" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#F4F6F5" media="(prefers-color-scheme: light)">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="System by Dave">
+<meta property="og:title" content="Pier 68 Run of Show — System by Dave">
+<meta property="og:description" content="Crew run of show for the Pier 68 Breakaway afterparty: timeline, bar list, promo assignments, gear, crew, and open items.">
+<meta property="og:url" content="https://systembydave.com/afterbreak/">
+<meta property="og:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Pier 68 Run of Show — System by Dave">
+<meta name="twitter:description" content="Crew run of show for the Pier 68 Breakaway afterparty: timeline, bar list, promo assignments, gear, crew, and open items.">
+<meta name="twitter:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<link rel="icon" href="/svg/system_by_dave_logo_rust.svg" type="image/svg+xml">
+<script>(function(){try{var t=localStorage.getItem("pier68-theme");if(!t){t=(window.matchMedia&&matchMedia("(prefers-color-scheme: light)").matches)?"light":"dark";}document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
+<style>
+:root,[data-theme="dark"]{
+  --bg:#070B10; --panel:#0E141C; --raise:#161E28; --line:#26313E;
+  --ink:#EDE7DC; --mute:#8A97A6;
+  --key:#FFAE2B; --cool:#4FD1C5; --alarm:#FF5B4A;
+  --keyfill:rgba(255,174,43,.10); --alarmfill:rgba(255,91,74,.09); --coolfill:rgba(79,209,197,.09);
+}
+[data-theme="light"]{
+  --bg:#F4F6F5; --panel:#FFFFFF; --raise:#EAEEEE; --line:#CBD4D6;
+  --ink:#10161E; --mute:#5D6B75;
+  --key:#A85D00; --cool:#0C6E68; --alarm:#C0342A;
+  --keyfill:rgba(168,93,0,.09); --alarmfill:rgba(192,52,42,.08); --coolfill:rgba(12,110,104,.08);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;margin:0}
+body{background:var(--bg);color:var(--ink);
+  font:400 15px/1.5 "Helvetica Neue",Helvetica,Arial,sans-serif;
+  display:flex;flex-direction:column;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);}
+.mono{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-variant-numeric:tabular-nums}
+
+/* ─── public shell: skip link + deterministic return ─── */
+.skip-link{position:absolute;left:-9999px;top:0;z-index:30;
+  display:inline-flex;align-items:center;min-height:44px;padding:0 16px;
+  background:var(--key);color:#0B0B0B;font-weight:700;font-size:14px;border-radius:0 0 3px 0;text-decoration:none}
+.skip-link:focus{left:0}
+.skip-link:focus-visible{outline:2px solid var(--cool);outline-offset:2px}
+.sbd-site-return{flex:0 0 auto;display:flex;align-items:center;flex-wrap:wrap;gap:0 7px;
+  padding:0 16px;background:var(--panel);border-bottom:1px solid var(--line);font-size:12.5px}
+.sbd-site-return a,.sbd-site-return span{display:inline-flex;align-items:center;min-height:44px}
+.sbd-site-return a{min-width:44px;justify-content:center}
+.sbd-site-return a{color:var(--mute);text-decoration:none;border-bottom:1px solid transparent}
+.sbd-site-return a:hover{color:var(--ink);border-bottom-color:var(--line)}
+.sbd-site-return a:focus-visible{outline:2px solid var(--cool);outline-offset:2px;border-radius:2px}
+.sbd-site-return__separator{color:var(--line)}
+.sbd-site-return__current{color:var(--ink);font-weight:600}
+
+header{flex:0 0 auto;padding:14px 16px 12px;border-bottom:1px solid var(--line);background:var(--panel)}
+.top{display:flex;align-items:flex-start;gap:12px}
+h1{margin:0;font-size:26px;font-weight:700;letter-spacing:-.6px;line-height:1;flex:1}
+h1 em{font-style:normal;color:var(--key)}
+#theme{flex:0 0 auto;background:var(--raise);border:1px solid var(--line);color:var(--mute);
+  border-radius:3px;min-width:44px;min-height:44px;padding:0 9px;font-size:20px;line-height:1;cursor:pointer;
+  display:inline-flex;align-items:center;justify-content:center;margin:-6px -4px -6px 0}
+#theme:focus-visible{outline:2px solid var(--cool);outline-offset:2px}
+.sub{margin-top:5px;color:var(--mute);font-size:13px}
+#now{margin-top:11px;display:flex;align-items:baseline;gap:10px;padding:9px 11px;
+  background:var(--bg);border:1px solid var(--line);border-radius:3px}
+#clock{font-size:21px;font-weight:700;color:var(--cool);letter-spacing:.5px}
+#next{font-size:13px;line-height:1.35}
+#next b{color:var(--key);font-weight:600}
+
+main{flex:1 1 auto;min-height:0;position:relative}
+main:focus{outline:none}
+.panel{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 16px 26px;display:none}
+.panel.on{display:block}
+.panel:focus-visible{outline:2px solid var(--cool);outline-offset:-3px}
+h2{margin:20px 0 9px;font-size:12px;font-weight:700;letter-spacing:1.4px;color:var(--mute)}
+h2:first-child{margin-top:2px}
+p.note{margin:0 0 12px;color:var(--mute);font-size:13.5px}
+
+.row{border:1px solid var(--line);border-radius:3px;background:var(--panel);margin-bottom:7px;overflow:hidden}
+.row.hot{border-color:var(--key);background:var(--keyfill)}
+.row.done{opacity:.42}
+.bar{display:flex;align-items:flex-start;gap:10px;padding:11px 12px}
+.row:has(.steps) .bar{cursor:pointer}
+.tick{position:relative;flex:0 0 auto;width:26px;height:26px;border:1px solid var(--line);border-radius:3px;
+  background:var(--raise);color:transparent;font-size:15px;line-height:24px;text-align:center;cursor:pointer;padding:0}
+.tick::after{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:44px;height:44px}
+.tick[aria-pressed="true"]{color:var(--cool);border-color:var(--cool)}
+.tick:focus-visible{outline:2px solid var(--cool);outline-offset:2px}
+.when{flex:0 0 60px;font-size:13px;font-weight:700;color:var(--key);padding-top:4px}
+.what{flex:1 1 auto;min-width:0}
+.what strong{display:block;font-weight:600;font-size:15px}
+.who{margin-top:2px;font-size:12.5px;color:var(--mute)}
+.caret{flex:0 0 auto;align-self:stretch;width:44px;min-height:44px;margin:-11px -12px -11px 0;
+  display:flex;align-items:center;justify-content:center;
+  background:none;border:0;color:var(--mute);font-size:12px;cursor:pointer;transition:transform .18s}
+.caret:focus-visible{outline:2px solid var(--cool);outline-offset:-3px}
+.row.open .caret{transform:rotate(90deg)}
+.steps{display:none;padding:2px 12px 13px;border-top:1px solid var(--line);background:var(--raise)}
+.row.open .steps{display:block}
+.steps ol{margin:11px 0 0;padding-left:20px}
+.steps li{margin-bottom:8px;font-size:14px;line-height:1.5}
+.steps li:last-child{margin-bottom:0}
+.flag{margin-top:11px;padding:9px 10px;border-left:2px solid var(--alarm);background:var(--alarmfill);font-size:13.5px}
+.flag.ok{border-left-color:var(--cool);background:var(--coolfill)}
+
+table{width:100%;border-collapse:collapse;margin-bottom:12px;font-size:14px}
+th{text-align:left;font-size:11px;letter-spacing:1.1px;color:var(--mute);font-weight:700;padding:0 8px 6px 0;border-bottom:1px solid var(--line)}
+td{padding:8px 8px 8px 0;border-bottom:1px solid var(--line);vertical-align:top}
+td:last-child,th:last-child{padding-right:0}
+.n{color:var(--mute);font-size:12.5px}
+
+nav{flex:0 0 auto;border-top:1px solid var(--line);background:var(--panel)}
+nav [role="tablist"]{display:flex}
+nav button{flex:1;background:none;border:0;border-top:2px solid transparent;color:var(--mute);
+  min-height:48px;padding:9px 2px 11px;font:inherit;font-size:10.5px;font-weight:600;cursor:pointer}
+nav button i{display:block;font-style:normal;font-size:17px;margin-bottom:3px;filter:grayscale(1);opacity:.55}
+nav button.on{color:var(--key);border-top-color:var(--key)}
+nav button.on i{filter:none;opacity:1}
+nav button:focus-visible{outline:2px solid var(--cool);outline-offset:-3px}
+
+.noscript{margin:0;padding:12px 16px;background:var(--alarmfill);border-bottom:1px solid var(--alarm);font-size:13.5px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<a class="skip-link" href="#run-of-show">Skip to the run of show</a>
+
+<nav class="sbd-site-return" aria-label="Breadcrumb">
+  <a href="/">System by Dave</a>
+  <span class="sbd-site-return__separator" aria-hidden="true">/</span>
+  <a href="/tools.html">Tools</a>
+  <span class="sbd-site-return__separator" aria-hidden="true">/</span>
+  <span class="sbd-site-return__current" aria-current="page">Pier 68 Run of Show</span>
+</nav>
+
+<noscript><p class="noscript"><strong>JavaScript is off.</strong> The Friday timeline, the tab bar, the countdown, and the step detail under each item all need it. Turn JavaScript on to use this page — what you can see below is not the whole run of show.</p></noscript>
+
+<header>
+  <div class="top">
+    <h1>Pier 68 <em>/ Run of Show</em></h1>
+    <button id="theme" type="button" aria-label="Switch to light mode">◐</button>
+  </div>
+  <div class="sub">Breakaway afterparty · Fri Sep 11 · Night 2 Sat Sep 12</div>
+  <div id="now"><span id="clock" class="mono">--:--</span><span id="next">Loading schedule</span></div>
+</header>
+
+<main id="run-of-show" tabindex="-1">
+
+<section class="panel on" id="p-time" role="tabpanel" tabindex="0" aria-labelledby="t-time">
+  <h2>FRIDAY SEPTEMBER 11</h2>
+  <p class="note">Load-in is the whole ballgame. The crew named it as the source of roughly 90% of past problems, and the target is two clear hours before doors.</p>
+  <div id="timeline"></div>
+  <h2>SATURDAY SEPTEMBER 12</h2>
+  <div class="row"><div class="bar"><button class="tick" type="button" aria-pressed="false" aria-label="Mark done: Graffiti Pier"></button>
+    <span class="when">Night 2</span>
+    <span class="what"><strong>Graffiti Pier</strong><span class="who">Unconfirmed. Plan for it, update the event page if it moves</span></span></div></div>
+</section>
+
+<section class="panel" id="p-bar" role="tabpanel" tabindex="0" aria-labelledby="t-bar">
+  <h2>BLOCKER</h2>
+  <div class="row hot"><div class="bar"><button class="tick" type="button" aria-pressed="false" aria-label="Mark done: Is anyone bartending?"></button>
+    <span class="when">🔴 P0</span>
+    <span class="what"><strong>Is anyone bartending?</strong><span class="who">Raised on the call, never answered</span></span>
+    <button class="caret" type="button" aria-expanded="false" aria-controls="s-bartender" aria-label="Show steps: Is anyone bartending?">▸</button></div>
+    <div class="steps" id="s-bartender"><ol>
+      <li>Ask in the group chat so there is a written answer.</li>
+      <li>If yes, get the name and confirm they are on site before doors.</li>
+      <li>If no, the mixed drink menu is dead. Cans and straight pours only.</li>
+      <li>Settle it before the shopping run. It changes the buy list: no mixers, no Aperol.</li>
+    </ol>
+    <div class="flag">Everything below assumes a bartender exists. Nobody has confirmed one.</div></div></div>
+
+  <h2>BUY LIST</h2>
+  <table>
+    <tr><th>Item</th><th>Why</th></tr>
+    <tr><td>Vodka</td><td class="n">Light liquor</td></tr>
+    <tr><td>Tequila</td><td class="n">Agave slot</td></tr>
+    <tr><td>Whiskey or rum</td><td class="n">Pick one, not both</td></tr>
+    <tr><td><strong>White Claw</strong></td><td class="n">Named the best return on the call</td></tr>
+    <tr><td>Miller Lite or PBR</td><td class="n">Domestic floor</td></tr>
+    <tr><td>Sapporo or Modelo</td><td class="n">Instant $1 premium over domestic</td></tr>
+    <tr><td>Soju, Sun Hari, ~$6</td><td class="n">Bottle sells $11 to $12, or a shot beside a beer for +$1</td></tr>
+    <tr><td>Monster + Jäger</td><td class="n">Only if the sponsorship lands</td></tr>
+  </table>
+
+  <h2>DO NOT BUY</h2>
+  <table>
+    <tr><td>Surfside and trendy seltzers</td><td class="n">Overpriced, no margin</td></tr>
+    <tr><td>9% IPA</td><td class="n">One drink, then they sit on it an hour</td></tr>
+    <tr><td>Aperol spritz build</td><td class="n">Raised and rejected as too complex</td></tr>
+  </table>
+  <p class="note">Governing rule, stated twice: the shorter the menu, the fewer things to track. Light liquor, dark liquor, light beer, one girly drink.</p>
+
+  <h2>HANDOFF</h2>
+  <div class="row"><div class="bar"><button class="tick" type="button" aria-pressed="false" aria-label="Mark done: Send the buy list"></button>
+    <span class="when">Nick</span>
+    <span class="what"><strong>Send the buy list</strong><span class="who">"No list, no booze." Shopping cannot start without it</span></span></div></div>
+  <div class="row"><div class="bar"><button class="tick" type="button" aria-pressed="false" aria-label="Mark done: Buy in Jersey, drop at Nick's after 3"></button>
+    <span class="when">Matt</span>
+    <span class="what"><strong>Buy in Jersey, drop at Nick's after 3</strong><span class="who">Collects flyers on the same trip</span></span></div></div>
+  <div class="row"><div class="bar"><button class="tick" type="button" aria-pressed="false" aria-label="Mark done: Close out the order-ahead plan"></button>
+    <span class="when">Open</span>
+    <span class="what"><strong>Close out the order-ahead plan</strong><span class="who">Accepted conditionally, never finished</span></span>
+    <button class="caret" type="button" aria-expanded="false" aria-controls="s-orderahead" aria-label="Show steps: Close out the order-ahead plan">▸</button></div>
+    <div class="steps" id="s-orderahead"><ol>
+      <li>Find a Jersey store with online order and in-store pickup. Roger Wilco came up but was called out of the way, so check what sits on the pickup route first.</li>
+      <li>Send the direct link to Nick.</li>
+      <li>Nick places and pays online. That removes the money argument entirely.</li>
+      <li>Pickup is a prepared box instead of a shop. Faster, and there is a receipt with no cash changing hands.</li>
+    </ol>
+    <div class="flag ok">The stated condition: if it is somewhere in Jersey, pickup is quick and easy.</div></div></div>
+
+  <div class="flag">Two money disputes surfaced and neither was settled. The bar credit, and whether vendor promo comes out of pay. Both ended with "we'll figure it out." Paying the order online sidesteps the first one.</div>
+</section>
+
+<section class="panel" id="p-promo" role="tabpanel" tabindex="0" aria-labelledby="t-promo">
+  <h2>OWNERSHIP GAP</h2>
+  <div class="row hot"><div class="bar"><button class="tick" type="button" aria-pressed="false" aria-label="Mark done: The poster and flyer run has no owner"></button>
+    <span class="when">🔴 P0</span>
+    <span class="what"><strong>The poster and flyer run has no owner</strong><span class="who">It was attached to a crew member who is now committed elsewhere</span></span>
+    <button class="caret" type="button" aria-expanded="false" aria-controls="s-postergap" aria-label="Show steps: The poster and flyer run has no owner">▸</button></div>
+    <div class="steps" id="s-postergap"><ol>
+      <li>One crew member is already booked to flyer for The Ave, an official Breakaway afterparty. Prior commitment, so they cannot work both events.</li>
+      <li>That means poster pickup, the city poster run, and on-site flyer distribution are all currently unassigned.</li>
+      <li>Name a replacement in the group chat before Thursday. Flyers get picked up Thursday and the posters are same-day prints.</li>
+      <li>If nobody takes it, cut the poster run and put everything into the 1,000 handouts and the pier signage instead.</li>
+    </ol>
+    <div class="flag">1,000 flyers exist. Last year roughly half went unused because they sat in a car. Same failure mode is live right now.</div></div></div>
+
+  <h2>DISTRIBUTION</h2>
+  <div class="row"><div class="bar"><button class="tick" type="button" aria-pressed="false" aria-label="Mark done: Flyers into the Spaga show"></button>
+    <span class="when">Open</span>
+    <span class="what"><strong>Flyers into the Spaga show</strong><span class="who">Penn's Landing, free, ends early. Best feeder on the board</span></span>
+    <button class="caret" type="button" aria-expanded="false" aria-controls="s-spaga" aria-label="Show steps: Flyers into the Spaga show">▸</button></div>
+    <div class="steps" id="s-spaga"><ol>
+      <li>A crew member has friends attending. Get a stack to one of them.</li>
+      <li>That crowd is free hours before doors, so the timing works better than Breakaway.</li>
+      <li>Hand off the stack Thursday or Friday morning, not at the show.</li>
+    </ol></div></div>
+  <div class="row"><div class="bar"><button class="tick" type="button" aria-pressed="false" aria-label="Mark done: Stack to a contact inside Breakaway"></button>
+    <span class="when">Open</span>
+    <span class="what"><strong>Stack to a contact inside Breakaway</strong><span class="who">Distribution by someone with no competing commitment</span></span></div></div>
+  <div class="row"><div class="bar"><button class="tick" type="button" aria-pressed="false" aria-label="Mark done: Windshields in the Breakaway lot"></button>
+    <span class="when">Open</span>
+    <span class="what"><strong>Windshields in the Breakaway lot</strong><span class="who">Off property duty only. Named as better than exit flyering</span></span></div></div>
+
+  <h2>SPONSORSHIP</h2>
+  <div class="row hot"><div class="bar"><button class="tick" type="button" aria-pressed="false" aria-label="Mark done: Monster and Jägerbombs"></button>
+    <span class="when">🟠 P1</span>
+    <span class="what"><strong>Monster and Jägerbombs</strong><span class="who">John, Monster ambassador · highest leverage item, no owner</span></span>
+    <button class="caret" type="button" aria-expanded="false" aria-controls="s-monster" aria-label="Show steps: Monster and Jägerbombs">▸</button></div>
+    <div class="steps" id="s-monster"><ol>
+      <li>Whoever knows John contacts him. Two asks: can he pull a case load of Monster, and can he come Friday night.</li>
+      <li>The trade on the table is a spare Breakaway ticket plus promo help.</li>
+      <li>Explain the outcome: Monster covers the mixer, Nick buys Jäger, the bar runs Jägerbombs all night.</li>
+      <li>Get a yes or no by Thursday so the buy list can be finalized either way.</li>
+    </ol></div></div>
+
+  <h2>SIGNAGE</h2>
+  <div class="row hot"><div class="bar"><button class="tick" type="button" aria-pressed="false" aria-label="Mark done: Sign at the wrong pier"></button>
+    <span class="when">🟠 P1</span>
+    <span class="what"><strong>Sign at the wrong pier</strong><span class="who">Nick has the press and the metal line stand</span></span>
+    <button class="caret" type="button" aria-expanded="false" aria-controls="s-signage" aria-label="Show steps: Sign at the wrong pier">▸</button></div>
+    <div class="steps" id="s-signage"><ol>
+      <li>People were already told "the Walmart pier." That is the wrong pier and the message is already out.</li>
+      <li>Real distance is a two minute walk. This is a signage problem, not a distance problem.</li>
+      <li>Sign goes at the regular Walmart pier spot, pointing to Pier 68.</li>
+      <li>Agreed backstop: they will hear the music.</li>
+      <li>Optional, a body posted at the split for the first hour or two.</li>
+    </ol></div></div>
+
+  <h2>NUMBERS</h2>
+  <table>
+    <tr><th>Item</th><th>Status</th></tr>
+    <tr><td>Flyer handouts</td><td>1,000 · pickup Thursday</td></tr>
+    <tr><td>Last year's usage</td><td>🟥🟥🟥🟥🟥⬜️⬜️⬜️⬜️⬜️ ~5/10, half left in a car</td></tr>
+    <tr><td>This year's target</td><td>🟩🟩🟩🟩🟩🟩🟩🟩🟩🟩 all of them</td></tr>
+    <tr><td>Door price</td><td>$30, or $20 with a flyer handed in</td></tr>
+    <tr><td>Advance tickets</td><td>1 sold · crew agreed this is normal now</td></tr>
+    <tr><td>Instagram</td><td>Old accounts were nuked. New account running, the official post still pulls likes daily</td></tr>
+  </table>
+
+  <h2>THE WEEKEND FIELD</h2>
+  <table>
+    <tr><th>Event</th><th>Read</th></tr>
+    <tr><td>Breakaway, Subaru Park</td><td class="n">🟨 Ends ~11p. Feeder, not competitor</td></tr>
+    <tr><td><strong>The Ave</strong></td><td class="n">🟧 Official Breakaway afters. Has a crew member's flyering commitment</td></tr>
+    <tr><td>Spaga, Penn's Landing, free</td><td class="n">🟩 Ends early. Best feeder on the board</td></tr>
+    <tr><td>Lil Wayne, Camden</td><td class="n">🟨 Pulls bodies into the city. Net positive</td></tr>
+    <tr><td>Battleship</td><td class="n">🟧 Direct all-nighter. Ben running it</td></tr>
+    <tr><td>Barstool afters</td><td class="n">🟧 Direct competitor</td></tr>
+    <tr><td>Elysium</td><td class="n">⚫️ Reported cancelled</td></tr>
+  </table>
+</section>
+
+<section class="panel" id="p-gear" role="tabpanel" tabindex="0" aria-labelledby="t-gear">
+  <h2>BLOCKER</h2>
+  <div class="row hot"><div class="bar"><button class="tick" type="button" aria-pressed="false" aria-label="Mark done: No gear list exists"></button>
+    <span class="when">🔴 P0</span>
+    <span class="what"><strong>No gear list exists</strong><span class="who">Raised on the call. The answer was "a list of what?"</span></span>
+    <button class="caret" type="button" aria-expanded="false" aria-controls="s-gearlist" aria-label="Show steps: No gear list exists">▸</button></div>
+    <div class="steps" id="s-gearlist"><ol>
+      <li>Start a shared doc and drop the link in the group chat. Someone said this should happen and nobody did it.</li>
+      <li>Three columns only: item, who brings it, confirmed yes or no.</li>
+      <li>Seed it with what is already known, below.</li>
+      <li>Each person fills their own row instead of being chased individually.</li>
+      <li>Lock it Thursday night. Anything unconfirmed by then, assume it is not coming.</li>
+    </ol></div></div>
+
+  <h2>CONFIRMED</h2>
+  <table>
+    <tr><th>Item</th><th>Who</th></tr>
+    <tr><td>Door table</td><td>Nick 🟢</td></tr>
+    <tr><td>Subwoofer + one speaker</td><td>Warren 🟢 <span class="n">not attending, arrange the drop</span></td></tr>
+    <tr><td>Press + metal line stand for signage</td><td>Nick 🟢</td></tr>
+  </table>
+
+  <h2>UNRESOLVED</h2>
+  <table>
+    <tr><td>Second table for the bar</td><td>🟡 "might need"</td></tr>
+    <tr><td>Ice and coolers</td><td>⚪️ Never mentioned. Someone had water bottles freezing</td></tr>
+    <tr><td>Cups, cash box, float</td><td>⚪️ Never mentioned</td></tr>
+    <tr><td>Power and distro at the pier</td><td>⚪️ Never mentioned</td></tr>
+    <tr><td>Lighting</td><td>⚪️ Never mentioned, unclaimed</td></tr>
+    <tr><td>VJ playback and media</td><td>⚪️ Steve is VJing. Nobody asked what he needs</td></tr>
+  </table>
+</section>
+
+<section class="panel" id="p-crew" role="tabpanel" tabindex="0" aria-labelledby="t-crew">
+  <h2>CORE</h2>
+  <table>
+    <tr><th>Name</th><th>Role</th></tr>
+    <tr><td><strong>Nick</strong></td><td>Promoter. Venue, flyers, posters, door price, bar list, buys Jäger</td></tr>
+    <tr><td><strong>Ervin</strong></td><td>Artist. Pushed hardest on signage and the two hour load-in</td></tr>
+    <tr><td><strong>Matt, Mr. G</strong></td><td>Bar run in Jersey. Apartment tours Friday, free before 11:30 and after 3</td></tr>
+    <tr><td><strong>Evan Rodman</strong></td><td>@evanrodmanyosocks · new to the group</td></tr>
+  </table>
+
+  <h2>LINEUP</h2>
+  <table>
+    <tr><td><strong>Steve</strong></td><td>First set, and VJing 🟢</td></tr>
+    <tr><td><strong>Nick + Tethra</strong></td><td>Back to back. Both hard dance, playing <strong>speed house</strong> because the afterparty crowd does not call for hard dance. Baseline house and UKG, ~150 BPM by 4 or 5am 🟨</td></tr>
+  </table>
+
+  <h2>SUPPORT</h2>
+  <table>
+    <tr><td>Rachel, Rachie</td><td class="n">🟠 Door, night 2 fill-in. Wants cash, came through Dee</td></tr>
+    <tr><td>Marissa, ginger</td><td class="n">🟠 Ghosted the bar list. Nick calling her</td></tr>
+    <tr><td>Alex</td><td class="n">🟡 Volunteering. Needs to pick load-in or load-out and commit</td></tr>
+    <tr><td>John</td><td class="n">⚪️ Monster ambassador. Sponsorship contact</td></tr>
+    <tr><td>Warren</td><td class="n">🟢 Sub and speaker, not attending. Sat silent on the call and logged out early</td></tr>
+    <tr><td>Dylan, Hi-Day</td><td class="n">🟠 Weed vendor. No contact since May</td></tr>
+  </table>
+
+  <h2>GUEST LIST POLICY</h2>
+  <p class="note">There is no guest list. Artists get plus ones. Promoters may have some flexibility. Friends get in free only in exchange for load-in or load-out, one or the other, chosen up front. The stated position: you do not need to be a customer, you need to help. Set that expectation before the night, not at the door.</p>
+</section>
+
+<section class="panel" id="p-open" role="tabpanel" tabindex="0" aria-labelledby="t-open">
+  <h2>P0 — STOP OTHER WORK</h2>
+  <table>
+    <tr><td>🔴</td><td><strong>Confirm a bartender</strong><span class="n"> · kills the mixed menu if no</span></td></tr>
+    <tr><td>🔴</td><td><strong>Send the buy list</strong><span class="n"> · Nick · no list, no booze</span></td></tr>
+    <tr><td>🔴</td><td><strong>Reassign the poster and flyer run</strong><span class="n"> · previous owner is committed to The Ave</span></td></tr>
+    <tr><td>🔴</td><td><strong>Start the gear doc</strong><span class="n"> · nobody has</span></td></tr>
+  </table>
+
+  <h2>P1 — THIS SESSION</h2>
+  <table>
+    <tr><td>🟠</td><td>Lock the Monster sponsorship</td></tr>
+    <tr><td>🟠</td><td>Confirm night 2 is Graffiti Pier</td></tr>
+    <tr><td>🟠</td><td>Confirm doors time<span class="n"> · never stated out loud</span></td></tr>
+    <tr><td>🟠</td><td>Get flyers to the Spaga contact</td></tr>
+    <tr><td>🟠</td><td>Confirm Rachel for door</td></tr>
+  </table>
+
+  <h2>P2 — THIS WEEK</h2>
+  <table>
+    <tr><td>🟡</td><td>Pin Matt's exact dropoff time at Nick's</td></tr>
+    <tr><td>🟡</td><td>Nick calls Marissa, lead with "we could use some suggestions"</td></tr>
+    <tr><td>🟡</td><td>Reach Dylan at Hi-Day about THC vendor presence</td></tr>
+    <tr><td>🟡</td><td>Settle the vendor pay question in writing</td></tr>
+    <tr><td>🟡</td><td>Arrange Warren's sub and speaker pickup</td></tr>
+  </table>
+
+  <h2>BACKLOG</h2>
+  <table>
+    <tr><td>🔵</td><td>Paul, fall and winter venue numbers. Messaged, no response</td></tr>
+    <tr><td>🔵</td><td>Gary, Inspire Art Smith. Outstanding deposit, small claims threatened</td></tr>
+    <tr><td>🔵</td><td>Zelda themed event, November or December</td></tr>
+    <tr><td>🔵</td><td>Hard dance slot open in Philly since Habibi moved to Tampa</td></tr>
+  </table>
+
+  <div class="flag">Two disputes are unresolved and both got waved off with "we'll figure it out." The bar credit, and whether vendor promo comes out of pay. They will resurface on the night if nobody writes them down.</div>
+</section>
+
+</main>
+
+<nav aria-label="Run of show sections">
+  <div role="tablist" aria-label="Run of show sections">
+  <button class="on" type="button" role="tab" id="t-time" aria-selected="true" aria-controls="p-time" data-p="p-time"><i aria-hidden="true">🕘</i>Timeline</button>
+  <button type="button" role="tab" id="t-bar" aria-selected="false" tabindex="-1" aria-controls="p-bar" data-p="p-bar"><i aria-hidden="true">🍺</i>Bar</button>
+  <button type="button" role="tab" id="t-promo" aria-selected="false" tabindex="-1" aria-controls="p-promo" data-p="p-promo"><i aria-hidden="true">📣</i>Promo</button>
+  <button type="button" role="tab" id="t-gear" aria-selected="false" tabindex="-1" aria-controls="p-gear" data-p="p-gear"><i aria-hidden="true">🔧</i>Gear</button>
+  <button type="button" role="tab" id="t-crew" aria-selected="false" tabindex="-1" aria-controls="p-crew" data-p="p-crew"><i aria-hidden="true">👥</i>Crew</button>
+  <button type="button" role="tab" id="t-open" aria-selected="false" tabindex="-1" aria-controls="p-open" data-p="p-open"><i aria-hidden="true">⚠️</i>Open</button>
+  </div>
+</nav>
+
+<script>
+/* Load-in opens at 8:00p — two clear hours before doors. 9:00p is when Nick is
+   on site with load-in fully underway, which is not the crew call time. */
+const LOADIN=new Date(2026,8,11,20,0,0);
+
+const SCHEDULE=[
+ {t:"11:30a",title:"Matt's first free window closes",who:"Free before 11:30, then apartment tours"},
+ {t:"12:15p",title:"Apartment tour, Brewerytown",who:"Matt · runs 45 to 60 minutes"},
+ {t:"2:30p",title:"Apartment tour two, in the city",who:"Matt · ends around 3"},
+ {t:"3:00p",title:"Booze drops at Nick's, flyers go back out",who:"Matt + Nick",
+  steps:["Buy in Jersey. Cheaper, and it is the whole reason for the run.","Drop happens at Nick's after 3. It is not sitting in a car all day.","The flyer stack goes back on the same trip. One trip, two jobs.","Matt leaves for Breakaway from there."]},
+ {t:"Day",title:"Poster run",who:"⚠️ Unassigned · previous owner is committed to The Ave",
+  steps:["Posters are 13x19 same-day prints, so pickup and posting happen the same day.","Target the spots where the crowd already is, not general foot traffic.","This needs a name on it before Thursday or it does not happen."]},
+ {t:"Day",title:"Flyering at Breakaway",who:"⚠️ Unassigned · The Ave has the prior commitment",
+  steps:["A crew member is already booked to flyer for The Ave, an official Breakaway afters. They cannot work both.","Anyone picking this up should stick to windshields in the lot and verbal referrals.","Exit flyering at the gates was raised and is the highest risk version. Avoid it.","A stack handed to someone already inside is the lowest effort path."]},
+ {t:"8:00p",k:"hot",title:"Load-in opens",who:"Two clear hours before doors",
+  steps:["The reasoning: an hour is not enough once something goes wrong, so give it two.","The load-in area is very close to the parking lot, which helps.","Crew consensus was that roughly 90% of past problems trace back to load-in running long."]},
+ {t:"8:30p",title:"Crew arrivals",who:"Staggered between 8:00 and 8:30"},
+ {t:"9:00p",k:"hot",title:"Nick on site",who:"Load-in fully underway",
+  steps:["Nick committed to 9.","Everyone acknowledged the crew runs late, which is exactly why the target is early.","Finish load-in before doors. This is the single most important logistical item of the night."]},
+ {t:"Doors",title:"Doors open",who:"⚠️ Time never stated on the call",
+  steps:["Nobody said a doors time out loud. Get it in writing.","Door price is $30, or $20 if a flyer is handed in.","Door is the top priority position. Confirm who is standing it."]},
+ {t:"Set 1",title:"Steve opens, and VJs",who:"Playing the first set and running visuals"},
+ {t:"~11p",title:"Breakaway lets out",who:"Exit flow starts. This is the feeder window"},
+ {t:"Late",title:"Nick + Tethra back to back",who:"Speed house, baseline house, UKG · ~150 BPM by 4 or 5am"}
+];
+
+const tl=document.getElementById('timeline');
+SCHEDULE.forEach((s,i)=>{
+  const row=document.createElement('div');
+  row.className='row'+(s.k==='hot'?' hot':'');
+  const id='s-tl-'+i;
+  const steps=s.steps?'<div class="steps" id="'+id+'"><ol>'+s.steps.map(x=>'<li>'+x+'</li>').join('')+'</ol></div>':'';
+  row.innerHTML='<div class="bar"><button class="tick" type="button" aria-pressed="false" aria-label="Mark done: '+s.title+'"></button>'+
+    '<span class="when">'+s.t+'</span><span class="what"><strong>'+s.title+'</strong>'+
+    '<span class="who">'+s.who+'</span></span>'+
+    (s.steps?'<button class="caret" type="button" aria-expanded="false" aria-controls="'+id+'" aria-label="Show steps: '+s.title+'">▸</button>':'')+
+    '</div>'+steps;
+  tl.appendChild(row);
+});
+
+document.addEventListener('click',e=>{
+  const tick=e.target.closest('.tick');
+  if(tick){
+    const on=tick.getAttribute('aria-pressed')==='true';
+    tick.setAttribute('aria-pressed',String(!on));
+    tick.textContent=on?'':'✓';
+    tick.closest('.row').classList.toggle('done',!on);
+    save(); e.stopPropagation(); return;
+  }
+  const row=e.target.closest('.row');
+  if(!row||!row.querySelector('.steps')) return;
+  if(!e.target.closest('.bar')) return;
+  const open=row.classList.toggle('open');
+  const caret=row.querySelector('.caret');
+  if(caret) caret.setAttribute('aria-expanded',String(open));
+});
+
+/* tabs */
+const tabs=[...document.querySelectorAll('[role="tab"]')];
+function selectTab(b,focus){
+  tabs.forEach(x=>{
+    const on=x===b;
+    x.classList.toggle('on',on);
+    x.setAttribute('aria-selected',String(on));
+    if(on) x.removeAttribute('tabindex'); else x.setAttribute('tabindex','-1');
+  });
+  document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('on',p.id===b.dataset.p));
+  if(focus) b.focus();
+}
+tabs.forEach(b=>{
+  b.addEventListener('click',()=>selectTab(b));
+  b.addEventListener('keydown',e=>{
+    const i=tabs.indexOf(b);
+    let n=-1;
+    if(e.key==='ArrowRight') n=(i+1)%tabs.length;
+    else if(e.key==='ArrowLeft') n=(i-1+tabs.length)%tabs.length;
+    else if(e.key==='Home') n=0;
+    else if(e.key==='End') n=tabs.length-1;
+    if(n>=0){e.preventDefault();selectTab(tabs[n],true);}
+  });
+});
+
+/* theme */
+const root=document.documentElement, tbtn=document.getElementById('theme');
+function setTheme(t){
+  root.setAttribute('data-theme',t);
+  tbtn.textContent = t==='dark' ? '◐' : '◑';
+  tbtn.setAttribute('aria-label', t==='dark' ? 'Switch to light mode' : 'Switch to dark mode');
+  try{localStorage.setItem('pier68-theme',t);}catch(e){}
+}
+let saved=null;
+try{saved=localStorage.getItem('pier68-theme');}catch(e){}
+setTheme(saved || (window.matchMedia&&matchMedia('(prefers-color-scheme: light)').matches?'light':'dark'));
+tbtn.onclick=()=>setTheme(root.getAttribute('data-theme')==='dark'?'light':'dark');
+
+/* checkbox persistence */
+function save(){
+  try{
+    const s=[...document.querySelectorAll('.tick')].map(t=>t.getAttribute('aria-pressed'));
+    localStorage.setItem('pier68',JSON.stringify(s));
+  }catch(e){}
+}
+try{
+  const s=JSON.parse(localStorage.getItem('pier68')||'[]');
+  [...document.querySelectorAll('.tick')].forEach((t,i)=>{
+    if(s[i]==='true'){t.setAttribute('aria-pressed','true');t.textContent='✓';t.closest('.row').classList.add('done');}
+  });
+}catch(e){}
+
+/* clock */
+function tick(){
+  const n=new Date();
+  document.getElementById('clock').textContent=n.toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});
+  const d=LOADIN-n, h=Math.floor(d/3.6e6);
+  const el=document.getElementById('next');
+  if(d>0){
+    if(h>=24){
+      const days=Math.floor(h/24);
+      el.innerHTML='<b>'+days+(days===1?' day':' days')+'</b> until load-in opens at Pier 68';
+    } else {
+      el.innerHTML='<b>'+h+'h '+Math.floor(d%3.6e6/6e4)+'m</b> until load-in opens, 8p';
+    }
+  } else if(d>-36e5*10){ el.innerHTML='<b>Doors window.</b> Load-in should be finished.'; }
+  else { el.innerHTML='Friday has passed. Night two is Graffiti Pier.'; }
+}
+tick(); setInterval(tick,20000);
+</script>
+</body>
+</html>
