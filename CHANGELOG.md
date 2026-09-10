@@ -2,6 +2,10 @@
 
 ## 2026-09-10 (architecture audit)
 
+### Throwline evidence tied to the ratios the app calculates with
+
+* The release verifier recomputed each calculation-ready profile's `verificationEvidence.crossChecks` (distance ÷ width within 2 % of the published ratio) but never compared that published ratio to the `throw_ratio_min`/`throw_ratio_max` the profile and its aspect variants actually feed `resolveProfileRatio()`. Evidence could therefore vouch for a number that lived only in the evidence block. Each cross-check must now cite a picture shape the profile carries and match its ratio exactly, and the basis variant must match the profile ratio.
+
 ### Indexing policy verified per route, not by count
 
 * `scripts/verify_indexing_policy.js` proved the "every unlisted route carries an explicit indexing policy" rule only by pinning the number of routes outside the sitemap plus a hand-enumerated subset. The verifier now checks every tracked HTML route outside the sitemap for a `noindex` meta tag or a `robots.txt` Disallow, keeping the count pin as the new-route tripwire.

@@ -377,11 +377,25 @@ if (catalog) {
           let host = '';
           try { host = new URL(source?.url || '').hostname; } catch (error) { host = ''; }
           if (!source || !domains.some((domain) => host === domain || host.endsWith(`.${domain}`))) fail(`Profile ${profile.optical_profile_id} evidence must cite a document on the maker's own domain (${domains.join(', ')}).`);
+          const variants = Array.isArray(profile.aspectVariants) ? profile.aspectVariants : [];
+          const basisVariant = variants.find((item) => Number.isFinite(item.aspect) && Math.abs(item.aspect - profile.basisAspect) <= 0.02);
+          if (!basisVariant) {
+            fail(`Profile ${profile.optical_profile_id} has no aspect variant for its basis picture shape.`);
+          } else if (basisVariant.throw_ratio_min !== profile.throw_ratio_min || basisVariant.throw_ratio_max !== profile.throw_ratio_max) {
+            fail(`Profile ${profile.optical_profile_id} basis variant ratio does not match the profile ratio.`);
+          }
           evidence.crossChecks.forEach((check, index) => {
             const min = check.distanceMinM / check.imageWidthM;
             const max = check.distanceMaxM / check.imageWidthM;
             if (!(Math.abs(min - check.ratioMinPublished) / check.ratioMinPublished <= 0.02) || !(Math.abs(max - check.ratioMaxPublished) / check.ratioMaxPublished <= 0.02)) {
               fail(`Profile ${profile.optical_profile_id} cross-check ${index + 1} does not reproduce the published ratio within 2 percent.`);
+            }
+            // Evidence must vouch for the ratio the app calculates with, not a number that only lives in the evidence block.
+            const target = check.aspectLabel ? variants.find((item) => item.label === check.aspectLabel) : basisVariant;
+            if (!target) {
+              fail(`Profile ${profile.optical_profile_id} cross-check ${index + 1} names picture shape ${check.aspectLabel} that the profile does not carry.`);
+            } else if (check.ratioMinPublished !== target.throw_ratio_min || check.ratioMaxPublished !== target.throw_ratio_max) {
+              fail(`Profile ${profile.optical_profile_id} cross-check ${index + 1} published ratio ${check.ratioMinPublished}-${check.ratioMaxPublished} does not match the ${target.label} ratio ${target.throw_ratio_min}-${target.throw_ratio_max} the app uses.`);
             }
           });
         }
