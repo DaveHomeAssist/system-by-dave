@@ -55,7 +55,7 @@ const files = walk(ROOT);
 const unlisted = files.filter((file) => !sitemapRoutes.has(routeFor(file)));
 const robots = read('robots.txt');
 
-if (unlisted.length !== 121) fail(`Expected 121 tracked routes outside the sitemap; found ${unlisted.length}.`);
+if (unlisted.length !== 122) fail(`Expected 122 tracked routes outside the sitemap; found ${unlisted.length}.`);
 
 [
   '/apps/av-workbook/',
@@ -111,6 +111,7 @@ hatFiles.forEach((file) => {
   if (canonical(source) !== expectedCanonical) fail(`${file} has the wrong canonical target.`);
 });
 
+if (!hasNoIndex(read('afterbreak/index.html'))) fail('afterbreak/index.html is missing noindex.');
 if (!hasNoIndex(read('cross-project-actions.html'))) fail('cross-project-actions.html is missing noindex.');
 if (!hasNoIndex(read('html/sbd-brand.html'))) fail('html/sbd-brand.html is missing noindex.');
 
