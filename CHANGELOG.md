@@ -2,6 +2,10 @@
 
 ## 2026-09-10 (architecture audit)
 
+### Registry-derived tool count in the Gear Reference verifier
+
+* `scripts/verify_gear_reference.js` pinned the public AV tool count as the literal `44`, a second count contract beside the registry-derived check in `verify_public_consistency.js` that would have failed with a misleading message on the next registered tool. The gate now reads the count from `js/sbd-registry.js`.
+
 ### Davai bundle generator reconciled with its tracked output
 
 * `build_site.py` had fallen behind the hand-edited `systembydave/` pages: it still emitted the pre-August title, lede, and a shell without the breadcrumb return, `css/sbd-public-nav.css`, or `js/sbd-public-nav.js`, so a rebuild would have regressed the public shell and public content contracts. The generator now produces the tracked bundle byte for byte, honours `SBD_BUILD_DATE`, resolves its paths from the repository root, and gained `--check`, exposed as `npm run verify:davai` and run in the Pages workflow, so the generated pages can no longer drift from their source unnoticed.
