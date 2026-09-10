@@ -74,6 +74,9 @@ to make stale documentation true.
   `npm run sync:noteforge`; do not hand-edit managed artifact files.
 - **Throwline catalog:** use `npm run sync:throwline-catalog` and
   `npm run verify:throwline`.
+- **Davai bundle:** `build_site.py` generates `systembydave/`; edit the
+  generator, run `python3 build_site.py`, and gate with `npm run verify:davai`.
+  Do not hand-edit the generated pages.
 - **History:** record material behavior, architecture, content, or layout
   changes in `CHANGELOG.md`. Keep feature ledgers out of `CLAUDE.md`.
 
@@ -162,6 +165,7 @@ Pages workflow before a production claim.
 - **AV Workbook:** `npm run typecheck:av-workbook`,
   `npm run test:av-workbook`, and `npm run build:av-workbook`.
 - **Throwline:** `npm run verify:throwline`.
+- **Davai bundle:** `npm run verify:davai`.
 - **NoteForge artifact:** `npm run verify:noteforge`.
 - **Rendered UI changes:** verify desktop, the 680px breakpoint, and a narrow
   phone; check keyboard order, visible focus, reduced motion, containment,
