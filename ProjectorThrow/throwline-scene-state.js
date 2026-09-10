@@ -267,7 +267,7 @@
 
   // Shift utilization is judged against the limit for the direction the image actually moves:
   // a positive value uses `positiveKey` (up or right) and a negative value uses `negativeKey` (down or left).
-  // Combined-axis (elliptical) limits are not modeled; each axis is reported independently.
+  // Each axis is reported independently here; assessCombinedShift() below applies the maker's combined rule.
   function assessShift(percent, envelope, positiveKey, negativeKey) {
     const direction = percent >= 0 ? positiveKey : negativeKey;
     const limit = envelope && finite(envelope[direction]) ? Number(envelope[direction]) : undefined;

@@ -1,5 +1,27 @@
 # Changelog
 
+## 2026-09-10 (architecture audit)
+
+### Offline cache version invariant gated from git history
+
+* `av-suite-worker.js` states that `SBD_REGISTRY.version` must be bumped whenever a tool or shared offline asset changes, because the worker serves offline assets cache-first under a cache named after that version. Nothing checked it. New `scripts/verify_offline_cache_version.js` (part of `npm run verify:av`) fails when any registry offline asset has a commit newer than the last change to the version line, or is modified in the working tree while the version line is untouched; it warns rather than passes silently on a shallow clone. Bumped the cache version to `v20260910-architecture-audit` for the scene contract comment change in this audit, and mirrored it in Stage 3D's pinned `OFFLINE_CACHE_VERSION`.
+
+### Throwline evidence tied to the ratios the app calculates with
+
+* The release verifier recomputed each calculation-ready profile's `verificationEvidence.crossChecks` (distance ÷ width within 2 % of the published ratio) but never compared that published ratio to the `throw_ratio_min`/`throw_ratio_max` the profile and its aspect variants actually feed `resolveProfileRatio()`. Evidence could therefore vouch for a number that lived only in the evidence block. Each cross-check must now cite a picture shape the profile carries and match its ratio exactly, and the basis variant must match the profile ratio.
+
+### Indexing policy verified per route, not by count
+
+* `scripts/verify_indexing_policy.js` proved the "every unlisted route carries an explicit indexing policy" rule only by pinning the number of routes outside the sitemap plus a hand-enumerated subset. The verifier now checks every tracked HTML route outside the sitemap for a `noindex` meta tag or a `robots.txt` Disallow, keeping the count pin as the new-route tripwire.
+
+### Registry-derived tool count in the Gear Reference verifier
+
+* `scripts/verify_gear_reference.js` pinned the public AV tool count as the literal `44`, a second count contract beside the registry-derived check in `verify_public_consistency.js` that would have failed with a misleading message on the next registered tool. The gate now reads the count from `js/sbd-registry.js`.
+
+### Davai bundle generator reconciled with its tracked output
+
+* `build_site.py` had fallen behind the hand-edited `systembydave/` pages: it still emitted the pre-August title, lede, and a shell without the breadcrumb return, `css/sbd-public-nav.css`, or `js/sbd-public-nav.js`, so a rebuild would have regressed the public shell and public content contracts. The generator now produces the tracked bundle byte for byte, honours `SBD_BUILD_DATE`, resolves its paths from the repository root, and gained `--check`, exposed as `npm run verify:davai` and run in the Pages workflow, so the generated pages can no longer drift from their source unnoticed.
+
 ## 2026-09-10
 
 ### Pier 68 run of show at /afterbreak/

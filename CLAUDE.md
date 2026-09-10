@@ -50,6 +50,8 @@ handoffs.
 - `apps/av-workbook/`: React/TypeScript source for AV Workbook
 - `av-workbook/`: generated AV Workbook Pages artifact
 - `ProjectorThrow/`: Throwline planner and Stage 3D companion
+- `systembydave/`: generated Davai memory-architecture bundle; `build_site.py`
+  is its source and `npm run verify:davai` its drift gate
 - `depotops/`, `pixelforge/`, `noteforge/`: product-specific public surfaces;
   NoteForge is a managed release artifact synchronized from its own repository
 - `data/`: authored product data such as the Gear Reference library

@@ -1,24 +1,38 @@
 #!/usr/bin/env python3
-"""Generate the systembydave.com static site bundle."""
+"""Generate the systembydave.com static site bundle.
+
+`systembydave/` is a generated artifact of this script. Edit the generator, then
+run `python3 build_site.py` from the repository root to regenerate the bundle,
+or `python3 build_site.py --check` to prove the tracked bundle still matches
+the generator without writing anything. The generated pages carry the shared
+public shell (breadcrumb return, `css/sbd-public-nav.css`, `js/sbd-public-nav.js`)
+and the canonical Davai naming that the public navigation and public content
+release gates verify.
+"""
 
 from __future__ import annotations
 
 import datetime as dt
 import html
+import os
 import posixpath
+import re
 import shutil
+import sys
 import textwrap
 import zipfile
 from pathlib import Path
 
 
+REPO_ROOT = Path(__file__).resolve().parent
 SITE_URL = "https://systembydave.com/systembydave"
 OG_IMAGE = f"{SITE_URL}/assets/img/04_folder_tree.svg"
-OUT_DIR = Path("systembydave")
+OUT_DIR = REPO_ROOT / "systembydave"
 ASSET_DIR = OUT_DIR / "assets"
 IMG_DIR = ASSET_DIR / "img"
-ZIP_PATH = Path("systembydave-site.zip")
-BUILD_DATE = dt.date.today().isoformat()
+ZIP_PATH = REPO_ROOT / "systembydave-site.zip"
+HOME_TITLE = "Davai — System by Dave Memory Architecture"
+BUILD_DATE = os.environ.get("SBD_BUILD_DATE") or dt.date.today().isoformat()
 
 
 LAYERS = [
@@ -190,11 +204,36 @@ def diagram(current_path: str, filename: str, alt: str, caption: str) -> str:
     )
 
 
+def site_root_prefix(current_path: str) -> str:
+    """Relative path from a generated page back to the repository root."""
+    depth = current_path.count("/") + 1
+    return "../" * depth
+
+
+def public_shell_return(current_path: str, current_label: str) -> str:
+    """Shared public-shell breadcrumb required by docs/public-shell-contract.md."""
+    if current_path.startswith("layers/"):
+        parent_href, parent_label = "/systembydave/", "Davai"
+    else:
+        parent_href, parent_label = "/tools.html", "Tools"
+    return (
+        '<nav class="sbd-site-return" aria-label="Breadcrumb">\n'
+        '  <a href="/">System by Dave</a>\n'
+        '  <span class="sbd-site-return__separator" aria-hidden="true">/</span>\n'
+        f'  <a href="{parent_href}">{esc(parent_label)}</a>\n'
+        '  <span class="sbd-site-return__separator" aria-hidden="true">/</span>\n'
+        f'  <span class="sbd-site-return__current" aria-current="page">{esc(current_label)}</span>\n'
+        "</nav>"
+    )
+
+
 def page_shell(current_path: str, title: str, description: str, body: str) -> str:
     stylesheet = rel_url(current_path, "assets/styles.css")
     index_href = rel_url(current_path, "index.html")
-    page_title = "Davai Memory Architecture" if current_path == "index.html" else f"{title} | Davai"
+    page_title = HOME_TITLE if current_path == "index.html" else f"{title} | Davai"
     top_nav = "\n".join(nav_link(current_path, path, label) for path, label in TOP_PAGES)
+    root = site_root_prefix(current_path)
+    site_return = public_shell_return(current_path, page_title if current_path == "index.html" else title)
     return clean(
         f"""
         <!doctype html>
@@ -221,8 +260,10 @@ def page_shell(current_path: str, title: str, description: str, body: str) -> st
           <meta name="twitter:image" content="{OG_IMAGE}">
           <link rel="icon" type="image/svg+xml" href="{rel_url(current_path, 'favicon.svg')}">
           <link rel="stylesheet" href="{stylesheet}">
-        </head>
+        <link rel="stylesheet" href="{root}css/sbd-public-nav.css">
+</head>
         <body>
+{site_return}
           <a class="skip-link" href="#main">Skip to content</a>
           <header class="site-header">
             <div class="shell header-inner">
@@ -259,7 +300,8 @@ def page_shell(current_path: str, title: str, description: str, body: str) -> st
               </div>
             </div>
           </footer>
-        </body>
+        <script src="{root}js/sbd-public-nav.js" defer></script>
+</body>
         </html>
         """
     )
@@ -324,7 +366,7 @@ def home_page() -> str:
                 <span>memory</span>
                 <span>architecture</span>
               </h1>
-              <p class="lede">A seven-layer static guide for deciding where memory belongs, how it should change over time, and how operators keep current state separate from evidence and architectural commitments.</p>
+              <p class="lede">Davai is the System by Dave memory architecture: a seven-layer static guide for deciding where memory belongs, how it should change over time, and how operators keep current state separate from evidence and architectural commitments.</p>
               <div class="hero-actions">
                 <a class="button button-primary" href="{rel_url(current, 'implementation.html')}">Build from zero</a>
                 <a class="button button-secondary" href="{rel_url(current, 'routing.html')}">Open PROTOCOL.md</a>
@@ -2381,19 +2423,57 @@ def build_zip() -> None:
                 archive.write(path, path.relative_to(OUT_DIR))
 
 
+def render_bundle() -> dict[str, str]:
+    """Every generated file in the bundle, keyed by path relative to OUT_DIR."""
+    files: dict[str, str] = dict(render_pages())
+    files["assets/styles.css"] = styles_css()
+    for filename, content in diagrams().items():
+        files[f"assets/img/{filename}"] = content
+    files["favicon.svg"] = favicon_svg()
+    files["sitemap.xml"] = sitemap()
+    files["robots.txt"] = robots_txt()
+    return files
+
+
+def tracked_build_date() -> str | None:
+    """The build date stamped into the tracked bundle, so a check renders the same date."""
+    index_path = OUT_DIR / "index.html"
+    if not index_path.exists():
+        return None
+    match = re.search(r"Generated (\d{4}-\d{2}-\d{2})", index_path.read_text(encoding="utf-8"))
+    return match.group(1) if match else None
+
+
+def check() -> int:
+    """Fail when the tracked bundle no longer matches what this generator produces."""
+    global BUILD_DATE
+    stamped = tracked_build_date()
+    if stamped and not os.environ.get("SBD_BUILD_DATE"):
+        BUILD_DATE = stamped
+    drift: list[str] = []
+    for rel_path, content in render_bundle().items():
+        target = OUT_DIR / rel_path
+        if not target.exists():
+            drift.append(f"missing: systembydave/{rel_path}")
+            continue
+        if target.read_text(encoding="utf-8") != content + "\n":
+            drift.append(f"differs from generator: systembydave/{rel_path}")
+    if drift:
+        print("Davai bundle drift detected. Edit build_site.py, then run `python3 build_site.py`:", file=sys.stderr)
+        for line in drift:
+            print(f"- {line}", file=sys.stderr)
+        return 1
+    print(f"Davai bundle matches build_site.py ({len(render_pages())} pages, build date {BUILD_DATE}).")
+    return 0
+
+
 def main() -> None:
     if OUT_DIR.exists():
         shutil.rmtree(OUT_DIR)
     IMG_DIR.mkdir(parents=True, exist_ok=True)
 
-    for rel_path, content in render_pages().items():
+    for rel_path, content in render_bundle().items():
         write(OUT_DIR / rel_path, content)
-    write(ASSET_DIR / "styles.css", styles_css())
-    for filename, content in diagrams().items():
-        write(IMG_DIR / filename, content)
-    write(OUT_DIR / "favicon.svg", favicon_svg())
-    write(OUT_DIR / "sitemap.xml", sitemap())
-    write(OUT_DIR / "robots.txt", robots_txt())
     build_zip()
 
     page_count = len(render_pages())
@@ -2403,4 +2483,6 @@ def main() -> None:
 
 
 if __name__ == "__main__":
+    if "--check" in sys.argv[1:]:
+        sys.exit(check())
     main()

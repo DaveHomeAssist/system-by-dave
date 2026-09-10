@@ -120,7 +120,7 @@ function verifyData() {
   return index;
 }
 
-function verifyRenderer() {
+function verifyRenderer(registry) {
   const page = read('gear-reference.html');
   [
     '<title>Gear Reference</title>',
@@ -143,14 +143,16 @@ function verifyRenderer() {
   if (!prep.includes("fetch('data/gear/index.json'")) fail('Gear Prep does not read the authored reference index.');
   if (!prep.includes('id="gearReferenceLink"')) fail('Gear Prep inspector has no Gear Reference link.');
   if (!read('sitemap.xml').includes('https://systembydave.com/gear-reference.html')) fail('Sitemap does not include Gear Reference.');
-  if (!/>44<\/div>/.test(read('index.html')) || !/44 operator tools/.test(read('tools.html'))) {
-    fail('Public AV tool count was not raised to 44 browser tools.');
+  // The public tool count is registry-backed; never pin a literal here or the gate goes stale on the next tool.
+  const count = registry && Array.isArray(registry.tools) ? registry.tools.length : 0;
+  if (!count || !read('index.html').includes(`>${count}</div>`) || !read('tools.html').includes(`${count} operator tools`)) {
+    fail(`Public AV tool count does not match the ${count}-tool registry.`);
   }
 }
 
 const registry = verifyRegistry();
 const index = verifyData();
-verifyRenderer();
+verifyRenderer(registry);
 
 if (failures.length) {
   console.error('Gear Reference verification failed:');
