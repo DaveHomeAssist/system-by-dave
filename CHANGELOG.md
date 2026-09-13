@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-09-13
+
+### Back Focus preshow guide at /backfocus/
+
+* Published the camera-operator flange back focus field guide at `/backfocus/`, built from the FMP lens back focus guide: when to run the check, camera preparation, method identification, both Fujinon procedures, the verification pass, and the troubleshooting table. Copy follows the source procedure, including the "one lens, one method" rule and the escalation conditions.
+* Built it as a fixed-height operator shell rather than a document. The desktop viewport never scrolls: a section rail, one panel at a time, and a step runner that shows a single numbered instruction at full size with the method's standing caution kept on screen. Arrow keys and the footer page through a flat stop list where each procedure step is its own stop.
+* At 860px and below the rail becomes a horizontal strip and only the content region scrolls, so the guide stays usable one-handed at the camera position. Touch targets meet 44px, step dots keep a padded hit area, and the safety strip stays in the header at every width.
+* Selected method, step position, and the six-item hand-back checklist persist per device under `backfocus.v1`, normalising unknown methods, sections, step indexes, and checklist keys on load. "Reset for next show" clears them behind a confirmation.
+* Four references from the FMP Camera Videos playlist embed as click-to-load facades — the electronic calibration demo on Method A, the Fujinon mechanical demo on Method B, focus assist for preparation, and the ATEM camera control panel for shading context. Nothing is requested from YouTube until the operator presses play, and the cards are real links without JavaScript.
+* Without JavaScript the page is a complete, readable procedure document with every panel and both methods expanded; the app chrome hides itself instead. Added the route to the sitemap generator and the Tools directory, and regenerated `sitemap.xml`.
+
 ## 2026-09-10
 
 ### Pier 68 run of show at /afterbreak/
