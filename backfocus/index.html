@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="en" data-av-theme="system" data-av-tool="backfocus">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; frame-src https://www.youtube-nocookie.com; connect-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none'">
+<title>Back Focus | System by Dave</title>
+<meta name="description" content="A preshow field guide for camera operators: diagnose flange back focus, run the electronic or mechanical Fujinon procedure step by step, verify it, and hand the camera back.">
+<meta name="theme-color" content="#0c1016">
+<link rel="canonical" href="https://systembydave.com/backfocus/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="System by Dave">
+<meta property="og:title" content="Back Focus | System by Dave">
+<meta property="og:description" content="A preshow field guide for camera operators: diagnose flange back focus, run the electronic or mechanical Fujinon procedure step by step, verify it, and hand the camera back.">
+<meta property="og:url" content="https://systembydave.com/backfocus/">
+<meta property="og:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Back Focus | System by Dave">
+<meta name="twitter:description" content="A preshow field guide for camera operators: diagnose flange back focus, run the electronic or mechanical Fujinon procedure step by step, verify it, and hand the camera back.">
+<meta name="twitter:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<link rel="icon" href="/svg/system_by_dave_logo_rust.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/css/fonts.css">
+<link rel="stylesheet" href="/css/av-theme.css">
+<link rel="stylesheet" href="/css/sbd-public-nav.css">
+<style>
+  :root {
+    --ff: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    --ff-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --r: 8px;
+    --pad: 18px;
+    --gap: 14px;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body {
+    margin: 0;
+    min-height: 100dvh;
+    background: var(--av-bg);
+    color: var(--av-text);
+    font: 400 15px/1.5 var(--ff);
+    -webkit-font-smoothing: antialiased;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    opacity: .55;
+  }
+  ::selection { background: var(--av-accent); color: var(--av-primary-ink); }
+  a { color: var(--av-accent); }
+  button { font: inherit; color: inherit; }
+  :focus-visible { outline: 2px solid var(--av-focus); outline-offset: 3px; border-radius: 3px; }
+  .mono { font-family: var(--ff-mono); }
+  .vh {
+    position: absolute; width: 1px; height: 1px; margin: -1px;
+    padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+  }
+
+  /* ── App frame ─────────────────────────────────────────────── */
+  html.has-js, html.has-js body { height: 100dvh; overflow: hidden; }
+  html.has-js body { display: flex; flex-direction: column; }
+  html.has-js .sbd-site-return { flex: 0 0 auto; }
+
+  .app { position: relative; z-index: 1; }
+  html.has-js .app {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: clamp(178px, 15vw, 236px) minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    grid-template-areas: "head head" "rail stage" "foot foot";
+    font-size: clamp(12.5px, 1.62vh, 17px);
+  }
+  html.has-js .app { --pad: clamp(10px, 1.9vh, 22px); --gap: clamp(8px, 1.4vh, 16px); }
+
+  /* ── Header ────────────────────────────────────────────────── */
+  .app-head {
+    grid-area: head;
+    display: flex;
+    align-items: center;
+    gap: var(--gap);
+    flex-wrap: wrap;
+    padding: var(--pad);
+    border-bottom: 1px solid var(--av-line);
+    background: color-mix(in srgb, var(--av-surface) 70%, transparent);
+  }
+  .app-head h1 {
+    margin: 0;
+    font-size: clamp(17px, 2.5vh, 25px);
+    font-weight: 500;
+    letter-spacing: -.03em;
+    line-height: 1.1;
+  }
+  .app-head h1 span { color: var(--av-muted); font-weight: 400; }
+  .kicker {
+    margin: 0 0 2px;
+    font-family: var(--ff-mono);
+    font-size: .72em;
+    letter-spacing: .11em;
+    text-transform: uppercase;
+    color: var(--av-accent);
+  }
+  .head-warn {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    max-width: 46ch;
+    padding: 8px 12px;
+    border: 1px solid var(--av-danger-line);
+    border-radius: var(--r);
+    background: var(--av-danger-soft);
+    color: var(--av-text);
+    font-size: .84em;
+    line-height: 1.35;
+  }
+  .head-warn b { color: var(--av-danger); }
+  .head-tools { display: flex; align-items: center; gap: 8px; }
+
+  /* ── Rail ──────────────────────────────────────────────────── */
+  .rail { grid-area: rail; border-right: 1px solid var(--av-line); min-height: 0; overflow: auto; padding: var(--pad) 10px; }
+  .rail ol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 3px; }
+  .rail-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    min-height: 44px;
+    padding: 7px 10px;
+    border: 1px solid transparent;
+    border-radius: var(--r);
+    background: none;
+    text-align: left;
+    text-decoration: none;
+    color: var(--av-text-2);
+    cursor: pointer;
+    line-height: 1.2;
+  }
+  .rail-link:hover { background: var(--av-surface-2); color: var(--av-text); }
+  .rail-link[aria-current="true"] {
+    background: var(--av-accent-soft);
+    border-color: var(--av-accent-line);
+    color: var(--av-text);
+    font-weight: 500;
+  }
+  .rail-n {
+    flex: none;
+    width: 22px; height: 22px;
+    display: grid; place-items: center;
+    border: 1px solid var(--av-line-strong);
+    border-radius: 50%;
+    font-family: var(--ff-mono);
+    font-size: 10px;
+  }
+  .rail-link[aria-current="true"] .rail-n { border-color: var(--av-accent); color: var(--av-accent); }
+  .rail-link.is-done .rail-n { background: var(--av-success); border-color: var(--av-success); color: var(--av-bg); }
+  .rail-foot { margin-top: var(--gap); padding: 0 10px; color: var(--av-dim); font-size: .78em; line-height: 1.45; }
+
+  /* ── Stage ─────────────────────────────────────────────────── */
+  .stage { grid-area: stage; min-height: 0; overflow: auto; overscroll-behavior: contain; padding: var(--pad); }
+  html.has-js .stage { display: grid; grid-template-columns: minmax(0, 1fr); align-content: safe center; }
+  html:not(.has-js) .stage { padding: 22px max(18px, 4vw) 60px; max-width: 980px; margin-inline: auto; }
+  .panel { width: 100%; max-width: 1180px; margin-inline: auto; }
+  html:not(.has-js) .panel { padding-bottom: 26px; border-bottom: 1px solid var(--av-line); margin-bottom: 26px; }
+  .panel > h2 {
+    margin: 0 0 4px;
+    font-size: clamp(16px, 2.35vh, 23px);
+    font-weight: 500;
+    letter-spacing: -.02em;
+  }
+  .panel > .lede { margin: 0 0 var(--gap); color: var(--av-muted); font-size: .94em; max-width: 82ch; }
+  .cols { display: grid; gap: var(--gap); grid-template-columns: repeat(auto-fit, minmax(min(310px, 100%), 1fr)); align-items: stretch; }
+  .cols > .card, .cols > div { min-width: 0; }
+  html:not(.has-js) .cols { align-items: start; }
+  .cols.tight { grid-template-columns: 1.15fr .85fr; }
+  @media (max-width: 860px) { .cols.tight { grid-template-columns: 1fr; } }
+
+  .card {
+    border: 1px solid var(--av-line);
+    border-radius: var(--r);
+    background: var(--av-surface);
+    padding: calc(var(--pad) * .85);
+  }
+  .card h3 {
+    margin: 0 0 8px;
+    font-family: var(--ff-mono);
+    font-size: .76em;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--av-muted);
+    font-weight: 500;
+  }
+  .note {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-content: center;
+    gap: 10px;
+    padding: calc(var(--pad) * .7);
+    border: 1px solid var(--av-line);
+    border-radius: var(--r);
+    background: var(--av-surface-2);
+    font-size: .94em;
+    line-height: 1.45;
+  }
+  .note p { margin: 0; }
+  .note p + p { margin-top: 5px; }
+  .note .ico { font-size: 1.1em; line-height: 1.25; }
+  .note.danger { border-color: var(--av-danger-line); background: var(--av-danger-soft); }
+  .note.warn { border-color: var(--av-warning-line); background: var(--av-warning-soft); }
+  .note.good { border-color: var(--av-success-line); background: var(--av-success-soft); }
+  .note.info { border-color: var(--av-focus-line); background: var(--av-focus-soft); }
+
+  ul.plain, ol.plain { margin: 0; padding-left: 1.15em; display: grid; gap: 6px; }
+  ul.plain li, ol.plain li { line-height: 1.42; }
+  ol.plain { counter-reset: none; }
+
+  table { width: 100%; border-collapse: collapse; font-size: .92em; }
+  th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--av-line); vertical-align: top; line-height: 1.38; }
+  thead th {
+    font-family: var(--ff-mono);
+    font-size: .78em;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--av-muted);
+    font-weight: 500;
+    border-bottom-color: var(--av-line-strong);
+  }
+  tbody tr:last-child td { border-bottom: 0; }
+
+  /* ── Method chooser ────────────────────────────────────────── */
+  .methods { display: grid; gap: var(--gap); grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); }
+  .method-card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: calc(var(--pad) * .9);
+    border: 1px solid var(--av-line-strong);
+    border-radius: var(--r);
+    background: var(--av-surface);
+    text-align: left;
+    cursor: pointer;
+    transition: border-color .16s ease, background .16s ease, transform .16s ease;
+  }
+  .method-card:hover { border-color: var(--av-accent); transform: translateY(-2px); }
+  .method-card[aria-pressed="true"] { border-color: var(--av-accent); background: var(--av-accent-soft); box-shadow: inset 0 0 0 1px var(--av-accent-line); }
+  .method-card .tag {
+    font-family: var(--ff-mono);
+    font-size: .72em;
+    letter-spacing: .11em;
+    text-transform: uppercase;
+    color: var(--av-accent);
+  }
+  .method-card strong { font-size: 1.2em; font-weight: 500; letter-spacing: -.02em; }
+  .method-card p { margin: 0; color: var(--av-muted); font-size: .92em; line-height: 1.42; }
+  .method-card .id-on { margin-top: auto; padding-top: 8px; border-top: 1px dashed var(--av-line); font-size: .88em; }
+
+  /* ── Step runner ───────────────────────────────────────────── */
+  .runner-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: var(--gap); }
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 4px 10px;
+    border: 1px solid var(--av-line-strong);
+    border-radius: 20px;
+    font-family: var(--ff-mono);
+    font-size: .74em;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .chip.on { border-color: var(--av-accent); color: var(--av-accent); }
+  .steps { list-style: none; margin: 0; padding: 0; }
+  html:not(.has-js) .steps { list-style: decimal; padding-left: 1.4em; display: grid; gap: 8px; }
+  html.has-js .steps > li {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: clamp(12px, 2.4vw, 28px);
+    align-items: start;
+  }
+  html.has-js .steps > li::before {
+    content: attr(data-step);
+    font-family: var(--ff-mono);
+    font-size: clamp(30px, 7.6vh, 72px);
+    line-height: .9;
+    letter-spacing: -.06em;
+    color: var(--av-accent);
+    opacity: .85;
+  }
+  html.has-js .steps .step-body { font-size: clamp(15px, 2.5vh, 24px); line-height: 1.34; letter-spacing: -.01em; }
+  .step-body em { display: block; margin-top: 8px; font-size: .66em; font-style: normal; color: var(--av-muted); line-height: 1.45; }
+  .step-body code, .kbdish {
+    font-family: var(--ff-mono);
+    font-size: .84em;
+    padding: 1px 6px;
+    border: 1px solid var(--av-line);
+    border-radius: 4px;
+    background: var(--av-control);
+  }
+  .dots { display: flex; flex-wrap: wrap; gap: 5px; margin-top: var(--gap); }
+  .dots .dot {
+    width: 28px;
+    height: 22px;
+    min-height: 0;
+    padding: 8px 0;
+    border: 0;
+    border-radius: 3px;
+    background-color: var(--av-line);
+    background-clip: content-box;
+    cursor: pointer;
+  }
+  .dots .dot:hover { background-color: var(--av-line-strong); }
+  .dots .dot[aria-current="true"] { background-color: var(--av-accent); }
+  .dots .dot.is-past { background-color: color-mix(in srgb, var(--av-accent) 45%, var(--av-line)); }
+
+  /* ── Checklist ─────────────────────────────────────────────── */
+  .checks { list-style: none; margin: 0; padding: 0; display: grid; gap: 5px; }
+  .checks label {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    min-height: 44px;
+    padding: 6px 11px;
+    border: 1px solid var(--av-line);
+    border-radius: var(--r);
+    background: var(--av-surface);
+    cursor: pointer;
+    line-height: 1.35;
+    font-size: .95em;
+  }
+  .checks label:hover { border-color: var(--av-line-strong); }
+  .checks input { width: 19px; height: 19px; flex: none; accent-color: var(--av-success); cursor: pointer; }
+  .checks input:checked + span { color: var(--av-muted); text-decoration: line-through; text-decoration-color: var(--av-success); }
+  .tally { font-family: var(--ff-mono); font-size: .8em; color: var(--av-muted); }
+
+  /* ── Video facades ─────────────────────────────────────────── */
+  .videos { display: grid; gap: var(--gap); grid-template-columns: repeat(auto-fit, minmax(min(186px, 100%), 1fr)); }
+  .vid { border: 1px solid var(--av-line); border-radius: var(--r); background: var(--av-surface); overflow: hidden; display: flex; flex-direction: column; }
+  .vid-frame { position: relative; aspect-ratio: 16 / 9; background: var(--av-surface-3); }
+  .vid-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+  .vid-play {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    text-decoration: none;
+    color: inherit;
+    display: grid;
+    place-items: center;
+    gap: 8px;
+    border: 0;
+    cursor: pointer;
+    background:
+      radial-gradient(120% 120% at 22% 8%, var(--av-accent-soft), transparent 62%),
+      linear-gradient(150deg, var(--av-surface-3), var(--av-raised));
+  }
+  .vid-play:hover .vid-glyph { transform: scale(1.07); border-color: var(--av-accent); }
+  .vid-glyph {
+    width: clamp(38px, 6vh, 54px);
+    aspect-ratio: 1;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--av-line-strong);
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--av-bg) 72%, transparent);
+    transition: transform .18s ease, border-color .18s ease;
+  }
+  .vid-glyph svg { width: 42%; height: 42%; fill: var(--av-accent); margin-left: 8%; }
+  .vid-play small { font-family: var(--ff-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--av-muted); }
+  .vid-meta { padding: 10px 12px; display: grid; gap: 4px; }
+  .vid-meta strong { font-size: .95em; font-weight: 500; line-height: 1.3; }
+  .vid-meta span { font-family: var(--ff-mono); font-size: .72em; letter-spacing: .05em; text-transform: uppercase; color: var(--av-dim); }
+  .vid-meta p { margin: 2px 0 0; font-size: .86em; color: var(--av-muted); line-height: 1.4; }
+  .vid-badge {
+    position: absolute;
+    z-index: 1;
+    top: 8px; left: 8px;
+    padding: 3px 8px;
+    border-radius: 20px;
+    border: 1px solid var(--av-accent-line);
+    background: color-mix(in srgb, var(--av-bg) 76%, transparent);
+    font-family: var(--ff-mono);
+    font-size: 9px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--av-accent);
+  }
+
+  .inline-video { display: inline-flex; align-items: center; gap: 7px; font-size: .9em; text-decoration: none; }
+  .inline-video::before { content: '▶'; font-size: .8em; }
+  .inline-video:hover { text-decoration: underline; }
+
+  /* ── Footer bar ────────────────────────────────────────────── */
+  .app-foot {
+    grid-area: foot;
+    display: flex;
+    align-items: center;
+    gap: var(--gap);
+    flex-wrap: wrap;
+    padding: calc(var(--pad) * .62) var(--pad);
+    border-top: 1px solid var(--av-line);
+    background: color-mix(in srgb, var(--av-surface) 70%, transparent);
+  }
+  .progress { flex: 1 1 160px; min-width: 120px; height: 5px; border-radius: 3px; background: var(--av-line); overflow: hidden; }
+  .progress i { display: block; height: 100%; width: 0; background: var(--av-accent); transition: width .22s ease; }
+  .where { font-family: var(--ff-mono); font-size: .76em; letter-spacing: .05em; color: var(--av-muted); white-space: nowrap; }
+  .btn {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 10px 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    border: 1px solid var(--av-line-strong);
+    border-radius: var(--r);
+    background: var(--av-control);
+    color: var(--av-text);
+    font-size: .92em;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .btn:hover { border-color: var(--av-accent); }
+  .btn.primary { background: var(--av-accent); border-color: var(--av-accent); color: var(--av-primary-ink); }
+  .btn.primary:hover { background: var(--av-accent-strong); }
+  .app-head .btn.quiet, .app-foot .btn.quiet {
+    background: none;
+    background-color: transparent;
+    border-color: var(--av-line);
+    color: var(--av-muted);
+    min-height: 38px;
+    padding: 8px 12px;
+    font-size: .84em;
+  }
+  .app-head .btn.quiet:hover, .app-foot .btn.quiet:hover { background-color: var(--av-surface-2); color: var(--av-text); }
+  .btn.quiet:hover { color: var(--av-text); }
+  .btn[disabled] { opacity: .38; cursor: not-allowed; border-color: var(--av-line); }
+  .btn[disabled]:hover { border-color: var(--av-line); }
+
+  /* ── Progressive enhancement ───────────────────────────────── */
+  /* The document ships complete. JS hides what it takes over, and this rule
+     covers the parse gap so the app never flashes every panel at once. */
+  html.has-js:not(.js-ready) .panel:not(#brief),
+  html.has-js:not(.js-ready) #stepsB,
+  html.has-js:not(.js-ready) #runNoteB { display: none; }
+  html.has-js:not(.js-ready) .steps > li:not(:first-child) { display: none; }
+
+  /* Without JS this is a plain, complete, scrollable procedure document. */
+  html:not(.has-js) .app-foot,
+  html:not(.has-js) #resetBtn,
+  html:not(.has-js) .runner-head,
+  html:not(.has-js) #dots,
+  html:not(.has-js) #runEmpty { display: none; }
+  html:not(.has-js) .runlabel {
+    position: static;
+    width: auto; height: auto;
+    margin: 20px 0 8px;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+    font-size: 1.05em;
+    font-weight: 500;
+  }
+  html:not(.has-js) .rail { position: sticky; top: 0; z-index: 2; background: var(--av-bg); }
+
+  /* ── Short desktop windows ─────────────────────────────────── */
+  @media (min-width: 861px) and (max-height: 780px) {
+    html.has-js .app { --pad: clamp(8px, 1.5vh, 15px); --gap: clamp(6px, 1.15vh, 12px); }
+    .panel > .lede { font-size: .88em; }
+    .card { padding: calc(var(--pad) * .78); }
+    .head-warn { padding: 6px 10px; }
+  }
+
+  /* ── Mobile ────────────────────────────────────────────────── */
+  @media (max-width: 860px) {
+    html.has-js .app {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-rows: auto auto minmax(0, 1fr) auto;
+      grid-template-areas: "head" "rail" "stage" "foot";
+      font-size: 15px;
+      --pad: 14px;
+      --gap: 12px;
+    }
+    .app-head { padding-bottom: 12px; }
+    .app-head h1 { font-size: 20px; }
+    .head-warn { margin-left: 0; order: 3; width: 100%; max-width: none; font-size: 13px; }
+    .app-head > div:first-child { flex: 1 1 auto; min-width: 0; }
+    .head-tools { order: 2; margin-left: auto; }
+    .app-head .btn.quiet { min-height: 40px; padding: 7px 11px; font-size: 12px; }
+    .dots { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); }
+    .dots .dot { width: auto; height: 44px; padding: 19px 0; }
+    .rail { border-right: 0; border-bottom: 1px solid var(--av-line); overflow-x: auto; overflow-y: hidden; padding: 8px var(--pad); scrollbar-width: none; }
+    .rail::-webkit-scrollbar { display: none; }
+    .rail ol { flex-direction: row; gap: 6px; }
+    .rail-link { white-space: nowrap; min-height: 40px; padding: 6px 12px; border-color: var(--av-line); }
+    .rail-foot { display: none; }
+    html.has-js .steps > li::before { font-size: 40px; }
+    html.has-js .steps .step-body { font-size: 19px; }
+    .app-foot { padding: 10px var(--pad) max(10px, env(safe-area-inset-bottom)); }
+    .where { flex: 1 1 100%; order: -1; }
+    .btn { flex: 1 1 40%; }
+    .btn.quiet { flex: 0 0 auto; }
+    .cols.tight { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 860px) {
+    .videos { grid-template-columns: repeat(auto-fit, minmax(min(250px, 100%), 1fr)); }
+  }
+  @media (max-width: 520px) {
+    .app-head h1 span { display: none; }
+  }
+  @media (max-width: 420px) {
+    .app-head h1 { font-size: 18px; }
+    .videos { grid-template-columns: 1fr; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+    .method-card:hover { transform: none; }
+    .vid-play:hover .vid-glyph { transform: none; }
+  }
+
+  @media print {
+    html.has-js, html.has-js body { height: auto; overflow: visible; }
+    .rail, .app-foot, .vid-frame { display: none !important; }
+    .panel[hidden], .steps > li[hidden] { display: block !important; }
+  }
+</style>
+<script>document.documentElement.className += ' has-js';</script>
+</head>
+<body>
+<a class="sbd-skip-link" href="#backfocus-workspace">Skip to the Back Focus guide</a>
+<nav class="sbd-site-return" aria-label="Breadcrumb">
+  <a href="/">System by Dave</a>
+  <span class="sbd-site-return__separator" aria-hidden="true">/</span>
+  <a href="/av-suite.html">AV Suite</a>
+  <span class="sbd-site-return__separator" aria-hidden="true">/</span>
+  <span class="sbd-site-return__current" aria-current="page">Back Focus</span>
+</nav>
+
+<main class="app" id="backfocus-workspace" tabindex="-1">
+
+  <header class="app-head">
+    <div>
+      <p class="kicker">Preshow field guide</p>
+      <h1>Back Focus <span>&middot; Fujinon B4 zoom lenses</span></h1>
+    </div>
+    <p class="head-warn">
+      <span aria-hidden="true">🛑</span>
+      <span><b>Never adjust back focus during a live shot.</b> Take the camera off program and clear it with the director, TD, or shader first.</span>
+    </p>
+    <div class="head-tools">
+      <button type="button" class="btn quiet" id="resetBtn">Reset for next show</button>
+    </div>
+  </header>
+
+  <nav class="rail" id="rail" aria-label="Guide sections">
+    <ol>
+      <li><a class="rail-link" href="#brief" data-go="brief"><span class="rail-n">1</span><span>Start here</span></a></li>
+      <li><a class="rail-link" href="#prep" data-go="prep"><span class="rail-n">2</span><span>Prepare the camera</span></a></li>
+      <li><a class="rail-link" href="#method" data-go="method"><span class="rail-n">3</span><span>Identify the method</span></a></li>
+      <li><a class="rail-link" href="#run" data-go="run"><span class="rail-n">4</span><span>Run the procedure</span></a></li>
+      <li><a class="rail-link" href="#verify" data-go="verify"><span class="rail-n">5</span><span>Verify and hand back</span></a></li>
+      <li><a class="rail-link" href="#trouble" data-go="trouble"><span class="rail-n">6</span><span>Still soft?</span></a></li>
+      <li><a class="rail-link" href="#watch" data-go="watch"><span class="rail-n">7</span><span>Watch it done</span></a></li>
+    </ol>
+    <p class="rail-foot">Arrow keys page through steps. Your method, position, and checklist are kept on this device only.</p>
+  </nav>
+
+  <div class="stage" id="stage">
+
+    <!-- 1 ─────────────────────────────────────────────── -->
+    <section class="panel" id="brief" aria-labelledby="brief-h">
+      <h2 id="brief-h">Start here</h2>
+      <p class="lede">One field guide for both flange back focus systems used on the house Fujinon zoom lenses. Each lens uses <strong>one method only</strong>: electronic calibration or a mechanical flange focal length ring.</p>
+      <div class="cols tight">
+        <div class="card" style="display:grid;gap:var(--gap);align-content:start">
+          <div>
+            <h3>When to run this procedure</h3>
+            <ul class="plain">
+              <li>The lens is sharp at telephoto but soft after zooming wide.</li>
+              <li>A lens has been mounted on a different camera body.</li>
+              <li>The lens or B4 mount has been removed and reinstalled.</li>
+              <li>The camera cannot hold focus through the zoom range during setup.</li>
+            </ul>
+          </div>
+          <div class="note good">
+            <span class="ico" aria-hidden="true">💡</span>
+            <div>
+              <p><strong>Quick diagnosis.</strong> Focus at full telephoto, then zoom fully wide without touching the focus control. If the image becomes soft, flange back focus needs adjustment.</p>
+            </div>
+          </div>
+        </div>
+        <div style="display:grid;gap:var(--gap)">
+          <div class="note danger">
+            <span class="ico" aria-hidden="true">🛑</span>
+            <div>
+              <p><strong>Do not adjust back focus during a live shot.</strong> Coordinate with the director, TD, or shader, take the camera off program, and confirm the lens method before touching any calibration control.</p>
+            </div>
+          </div>
+          <div class="note info">
+            <span class="ico" aria-hidden="true">🎯</span>
+            <div>
+              <p><strong>Applies to cameras 1 to 3.</strong> The pit pair are documented as 16&times; and the FOH lens as 22&times;. Barrel model numbers and the method assigned to each position still need field verification, so identify the installed controls before every adjustment.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2 ─────────────────────────────────────────────── -->
+    <section class="panel" id="prep" aria-labelledby="prep-h">
+      <h2 id="prep-h">Prepare the camera</h2>
+      <p class="lede">Do all six before you touch a calibration control. Skipping the iris or macro check is the most common reason a good procedure still lands soft.</p>
+      <div class="cols tight">
+        <div class="card">
+          <h3>Setup</h3>
+          <ol class="plain">
+            <li>Put a high-detail focus chart at a suitable working distance and light it evenly.</li>
+            <li>Set the iris fully open. Use ND or reduce light level to control exposure.</li>
+            <li>Disable or disconnect external focus control if it can move the lens during calibration.</li>
+            <li>Confirm the lens is not in macro mode.</li>
+            <li>Put the camera on a stable shot and make sure you can clearly judge focus with peaking or focus assist.</li>
+            <li>Identify which adjustment system is fitted before continuing.</li>
+          </ol>
+          <p style="margin:10px 0 0"><a class="inline-video" href="#watch" data-go="watch">Refresher: focus assist and peaking</a></p>
+        </div>
+        <div style="display:grid;gap:var(--gap)">
+          <div class="card">
+            <h3>Identify the system</h3>
+            <table>
+              <thead><tr><th scope="col">If the lens has&hellip;</th><th scope="col">Use&hellip;</th></tr></thead>
+              <tbody>
+                <tr><td>A servo-mode switch and electronic calibration button near the servo housing</td><td><strong>Method A</strong><br>Electronic calibration</td></tr>
+                <tr><td>A locking knob on the flange focal length or back-focus ring</td><td><strong>Method B</strong><br>Mechanical adjustment</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="note warn">
+            <span class="ico" aria-hidden="true">⚠️</span>
+            <div><p>Do not use both methods on one lens. If the controls do not clearly match either description, stop and have the lens identified before adjusting it.</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 ─────────────────────────────────────────────── -->
+    <section class="panel" id="method" aria-labelledby="method-h">
+      <h2 id="method-h">Identify the method</h2>
+      <p class="lede">Pick the system fitted to the lens in front of you. The runner then shows only that procedure, one step at a time.</p>
+      <div class="methods">
+        <button type="button" class="method-card" data-method="a" aria-pressed="false">
+          <span class="tag">Method A</span>
+          <strong>Electronic calibration</strong>
+          <p>The lens drives its own zoom positions while you focus a chart at each end. Roughly a minute once the camera is prepared.</p>
+          <span class="id-on"><strong>Identify it by:</strong> a servo-mode switch with a calibration button beside it on the servo housing.</span>
+        </button>
+        <button type="button" class="method-card" data-method="b" aria-pressed="false">
+          <span class="tag">Method B</span>
+          <strong>Mechanical flange-back ring</strong>
+          <p>You loosen a locking knob and turn the flange focal length ring, cycling telephoto to wide until both ends hold the same plane.</p>
+          <span class="id-on"><strong>Identify it by:</strong> a locking knob on the flange focal length or back-focus ring.</span>
+        </button>
+      </div>
+      <div class="note warn" style="margin-top:var(--gap)">
+        <span class="ico" aria-hidden="true">⚠️</span>
+        <div><p>One lens, one method. If the controls do not clearly match either card, stop and have the lens identified before adjusting it.</p></div>
+      </div>
+    </section>
+
+    <!-- 4 ─────────────────────────────────────────────── -->
+    <section class="panel" id="run" aria-labelledby="run-h">
+      <h2 id="run-h" class="vh runlabel">Run the procedure</h2>
+
+      <div id="runEmpty" class="note info">
+        <span class="ico" aria-hidden="true">👆</span>
+        <div><p><strong>Choose a method first.</strong> <button type="button" class="btn quiet" data-go="method" style="margin-left:6px">Identify the method</button></p></div>
+      </div>
+
+      <div class="runner-head">
+        <span class="chip on" id="runMethodChip">Method A &middot; Electronic</span>
+        <span class="chip" id="runCountChip">Step 1 of 11</span>
+        <a class="inline-video" id="runVideoLink" href="#watch" data-go="watch">Watch this method</a>
+      </div>
+
+      <h3 class="vh runlabel" id="runA-h">Method A: electronic calibration</h3>
+      <ol class="steps" id="stepsA" data-method="a" aria-labelledby="runA-h">
+        <li data-step="1"><span class="step-body">Set the iris to <strong>manual</strong> and fully open it.<em>Use ND or reduce the light level rather than closing down.</em></span></li>
+        <li data-step="2"><span class="step-body">Confirm macro mode is disengaged.<em>The green reference line should be visible beneath the macro ring lip.</em></span></li>
+        <li data-step="3"><span class="step-body">Disable or unplug any external focus controller.<em>A demand that creeps mid-routine will bake the error into the stored calibration.</em></span></li>
+        <li data-step="4"><span class="step-body">Set the lens zoom control to <strong>servo</strong> mode.</span></li>
+        <li data-step="5"><span class="step-body">Press and hold the calibration button beside the servo-mode switch for about <code>5 seconds</code>.</span></li>
+        <li data-step="6"><span class="step-body">Wait for the lens to zoom in and for the red indicator to blink.</span></li>
+        <li data-step="7"><span class="step-body">Use the normal focus control to make the chart as sharp as possible.</span></li>
+        <li data-step="8"><span class="step-body">Press the calibration button once. The lens will zoom wide.</span></li>
+        <li data-step="9"><span class="step-body">Focus the chart again as directed by the lens calibration sequence.</span></li>
+        <li data-step="10"><span class="step-body">Press the calibration button a final time to store the calibration.</span></li>
+        <li data-step="11"><span class="step-body">Run the verification check before the camera goes back on program.<em>Section 5 of this guide.</em></span></li>
+      </ol>
+
+      <h3 class="vh runlabel" id="runB-h">Method B: mechanical flange-back adjustment</h3>
+      <ol class="steps" id="stepsB" data-method="b" aria-labelledby="runB-h">
+        <li data-step="1"><span class="step-body">From the FOH camera position, choose one <strong>fixed, high-contrast stage reference</strong> near center stage.<em>Good targets: a sharp LED-wall seam on a static image, scenic lettering, the edge of a set piece, or a well-lit truss clamp.</em></span></li>
+        <li data-step="2"><span class="step-body">Do not use a performer, moving light beam, animated video, haze edge, curtain movement, or any reference that can change while you adjust.</span></li>
+        <li data-step="3"><span class="step-body">Open the iris fully.<em>Use ND or coordinate a temporary light-level change to keep the image properly exposed.</em></span></li>
+        <li data-step="4"><span class="step-body">Loosen the locking knob on the flange focal length ring. Do not remove it.</span></li>
+        <li data-step="5"><span class="step-body">Zoom fully <strong>telephoto</strong> onto the selected stage reference and focus it with the normal focus control.</span></li>
+        <li data-step="6"><span class="step-body">Zoom fully <strong>wide</strong> without touching the normal focus control.<em>Keep evaluating the same stage plane and reference area.</em></span></li>
+        <li data-step="7"><span class="step-body">Turn the flange focal length or back-focus ring until that stage reference is as sharp as possible.</span></li>
+        <li data-step="8"><span class="step-body">Zoom fully telephoto again and refocus with the normal focus control.</span></li>
+        <li data-step="9"><span class="step-body">Return fully wide and adjust only the flange focal length ring.</span></li>
+        <li data-step="10"><span class="step-body">Repeat the telephoto and wide cycle until the same stage plane stays sharp at both ends of the zoom range.</span></li>
+        <li data-step="11"><span class="step-body">Tighten the locking knob without shifting the ring, then run the verification check.<em>Section 5 of this guide.</em></span></li>
+      </ol>
+
+      <div class="dots" id="dots" aria-hidden="true"></div>
+
+      <div class="note warn" id="runNoteA" style="margin-top:var(--gap)">
+        <span class="ico" aria-hidden="true">📝</span>
+        <div><p>The lens drives the zoom positions during this routine. Do not fight the servo or move the camera while calibration is running.</p></div>
+      </div>
+      <div class="note warn" id="runNoteB" style="margin-top:var(--gap)">
+        <span class="ico" aria-hidden="true">⚠️</span>
+        <div><p>At telephoto, use the normal focus control. At wide, use the flange focal length ring. Always judge the same fixed stage plane from the FOH position so distance changes do not mislead the adjustment.</p></div>
+      </div>
+    </section>
+
+    <!-- 5 ─────────────────────────────────────────────── -->
+    <section class="panel" id="verify" aria-labelledby="verify-h">
+      <h2 id="verify-h">Verify and hand back</h2>
+      <p class="lede">The adjustment is not finished until focus holds across the whole range twice and the shot is restored to show settings.</p>
+      <div class="cols tight">
+        <div class="card">
+          <h3>Verification pass</h3>
+          <ol class="plain">
+            <li>Zoom fully telephoto and focus the selected target: the chart for Method A, or the fixed stage reference for Method B.</li>
+            <li>Slowly zoom through the entire range without touching focus.</li>
+            <li>Confirm the same target stays sharp at telephoto, midrange, and full wide.</li>
+            <li>Repeat the test at least twice.</li>
+            <li>Restore the agreed iris, ND, zoom-control mode, focus-control connection, and viewfinder settings.</li>
+            <li>Compare the result with the other cameras and tell the director, TD, or shader the camera is ready.</li>
+          </ol>
+        </div>
+        <div class="card">
+          <h3>Hand-back checklist <span class="tally" id="tally">0 / 6</span></h3>
+          <ul class="checks" id="checks">
+            <li><label><input type="checkbox" data-check="c1"><span>Focus holds through the full usable zoom range</span></label></li>
+            <li><label><input type="checkbox" data-check="c2"><span>Calibration control or locking knob is secure</span></label></li>
+            <li><label><input type="checkbox" data-check="c3"><span>Macro mode is disengaged</span></label></li>
+            <li><label><input type="checkbox" data-check="c4"><span>External zoom and focus demands respond normally</span></label></li>
+            <li><label><input type="checkbox" data-check="c5"><span>Show exposure and shading settings are restored</span></label></li>
+            <li><label><input type="checkbox" data-check="c6"><span>Director, TD, or shader has acknowledged the camera</span></label></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 ─────────────────────────────────────────────── -->
+    <section class="panel" id="trouble" aria-labelledby="trouble-h">
+      <h2 id="trouble-h">If it still will not hold focus</h2>
+      <p class="lede">Work the symptom, not the ring. Repeating a procedure that already failed rarely fixes a seating or mount problem.</p>
+      <div class="cols tight">
+        <div class="card">
+          <table>
+            <thead><tr><th scope="col">Symptom</th><th scope="col">Next check</th></tr></thead>
+            <tbody>
+              <tr><td>Sharp at telephoto, soft at wide</td><td>Repeat the correct flange-back procedure and confirm the iris is fully open</td></tr>
+              <tr><td>Soft at every focal length</td><td>Check normal focus, chart distance, focus-assist setup, lens seating, and the B4 mount</td></tr>
+              <tr><td>Calibration routine will not start</td><td>Confirm servo mode, external focus-control disconnection, and the correct electronic button</td></tr>
+              <tr><td>Mechanical ring reaches its limit</td><td>Stop. Check lens seating, mount installation, and whether the correct control is being adjusted</td></tr>
+              <tr><td>Focus shifts after tightening</td><td>Hold the flange ring steady while securing the locking knob, then verify again</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="note danger">
+          <span class="ico" aria-hidden="true">🛑</span>
+          <div><p><strong>Stop and escalate</strong> if the lens is loose, the B4 mount is not fully seated, a control binds, the ring reaches its limit, or the exact lens method cannot be identified. Do not force the mechanism.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7 ─────────────────────────────────────────────── -->
+    <section class="panel" id="watch" aria-labelledby="watch-h">
+      <h2 id="watch-h">Watch it done</h2>
+      <p class="lede">Nothing loads from YouTube until you press play, so the guide still opens fast on venue wifi. <a href="https://www.youtube.com/playlist?list=PLNnGnp5X0rJc" target="_blank" rel="noopener noreferrer">Open the full FMP Camera Videos playlist</a>.</p>
+      <div class="videos">
+        <article class="vid">
+          <div class="vid-frame" data-video="Qx0zMkbzb5s" data-title="Quick Guide: Calibrate Back Focus on Fujinon LA16X8BRM-XB1A 4K Lens">
+            <span class="vid-badge">Method A</span>
+            <a class="vid-play" href="https://www.youtube.com/watch?v=Qx0zMkbzb5s" target="_blank" rel="noopener noreferrer">
+              <span class="vid-glyph"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 1l12 7-12 7z"/></svg></span>
+              <small>Play &middot; 2:01</small>
+              <span class="vh">Play Quick Guide: Calibrate Back Focus on Fujinon LA16X8BRM-XB1A 4K Lens</span>
+            </a>
+          </div>
+          <div class="vid-meta">
+            <span>The AV Coach &middot; 2:01</span>
+            <strong>Calibrate back focus on a Fujinon LA16x8BRM 4K lens</strong>
+            <p>The electronic routine end to end: servo mode, the five-second press, and both focus passes.</p>
+          </div>
+        </article>
+        <article class="vid">
+          <div class="vid-frame" data-video="SpjUF2IkJo4" data-title="How to Back Focus a Portable FUJINON Broadcast or Cinema Zoom Lens">
+            <span class="vid-badge">Method B</span>
+            <a class="vid-play" href="https://www.youtube.com/watch?v=SpjUF2IkJo4" target="_blank" rel="noopener noreferrer">
+              <span class="vid-glyph"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 1l12 7-12 7z"/></svg></span>
+              <small>Play &middot; 1:34</small>
+              <span class="vh">Play How to Back Focus a Portable FUJINON Broadcast or Cinema Zoom Lens</span>
+            </a>
+          </div>
+          <div class="vid-meta">
+            <span>FUJINON Lenses &middot; 1:34</span>
+            <strong>Back focus a portable Fujinon broadcast zoom</strong>
+            <p>The manufacturer's own take on the telephoto-to-wide cycle behind the mechanical method.</p>
+          </div>
+        </article>
+        <article class="vid">
+          <div class="vid-frame" data-video="xftInRzRRhw" data-title="BMPCC 6K Pro, 4K - Focus Assist (Focus Peaking)">
+            <span class="vid-badge">Prep</span>
+            <a class="vid-play" href="https://www.youtube.com/watch?v=xftInRzRRhw" target="_blank" rel="noopener noreferrer">
+              <span class="vid-glyph"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 1l12 7-12 7z"/></svg></span>
+              <small>Play &middot; 1:05</small>
+              <span class="vh">Play BMPCC 6K Pro, 4K - Focus Assist (Focus Peaking)</span>
+            </a>
+          </div>
+          <div class="vid-meta">
+            <span>Sam On Set &middot; 1:05</span>
+            <strong>Focus assist and peaking</strong>
+            <p>Preparation step 5: set peaking up so you can actually judge the chart or stage reference.</p>
+          </div>
+        </article>
+        <article class="vid">
+          <div class="vid-frame" data-video="F1SepO8iYiE" data-title="Hands on walkthrough of Blackmagic Design ATEM Camera Control Panel">
+            <span class="vid-badge">Shading</span>
+            <a class="vid-play" href="https://www.youtube.com/watch?v=F1SepO8iYiE" target="_blank" rel="noopener noreferrer">
+              <span class="vid-glyph"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 1l12 7-12 7z"/></svg></span>
+              <small>Play &middot; 14:02</small>
+              <span class="vh">Play Hands on walkthrough of Blackmagic Design ATEM Camera Control Panel</span>
+            </a>
+          </div>
+          <div class="vid-meta">
+            <span>Hildreth Media Group &middot; 14:02</span>
+            <strong>ATEM Camera Control Panel walkthrough</strong>
+            <p>Context for the iris, ND, and shading settings you coordinate before and after the adjustment.</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+  </div>
+
+  <footer class="app-foot">
+    <button type="button" class="btn" id="prevBtn">&larr; Back</button>
+    <span class="where" id="where">Start here</span>
+    <span class="progress" aria-hidden="true"><i id="bar"></i></span>
+    <button type="button" class="btn primary" id="nextBtn">Next &rarr;</button>
+  </footer>
+
+  <p aria-live="polite" class="vh" id="live"></p>
+</main>
+
+<script>
+(function () {
+  'use strict';
+
+  var KEY = 'backfocus.v1';
+  var SECTIONS = ['brief', 'prep', 'method', 'run', 'verify', 'trouble', 'watch'];
+  var LABELS = {
+    brief: 'Start here', prep: 'Prepare the camera', method: 'Identify the method',
+    run: 'Run the procedure', verify: 'Verify and hand back', trouble: 'Still soft?', watch: 'Watch it done'
+  };
+  var CHECKS = ['c1', 'c2', 'c3', 'c4', 'c5', 'c6'];
+  var METHOD_META = {
+    a: { chip: 'Method A · Electronic', note: 'runNoteA', where: 'Method A · Electronic calibration' },
+    b: { chip: 'Method B · Mechanical', note: 'runNoteB', where: 'Method B · Mechanical flange-back' }
+  };
+
+  var $ = function (id) { return document.getElementById(id); };
+  var stage = $('stage');
+  var stepsA = $('stepsA');
+  var stepsB = $('stepsB');
+  var dotsBox = $('dots');
+  var live = $('live');
+
+  var state = load();
+
+  function defaults() { return { method: null, section: 'brief', step: 0, checks: {} }; }
+
+  function load() {
+    var base = defaults();
+    var raw;
+    try { raw = window.localStorage.getItem(KEY); } catch (err) { return base; }
+    if (!raw) return base;
+    var parsed;
+    try { parsed = JSON.parse(raw); } catch (err) { return base; }
+    if (!parsed || typeof parsed !== 'object') return base;
+    if (parsed.method === 'a' || parsed.method === 'b') base.method = parsed.method;
+    if (SECTIONS.indexOf(parsed.section) > -1) base.section = parsed.section;
+    var step = parseInt(parsed.step, 10);
+    base.step = isNaN(step) || step < 0 ? 0 : step;
+    if (parsed.checks && typeof parsed.checks === 'object') {
+      CHECKS.forEach(function (id) { if (parsed.checks[id] === true) base.checks[id] = true; });
+    }
+    return base;
+  }
+
+  function save() {
+    try { window.localStorage.setItem(KEY, JSON.stringify(state)); } catch (err) { /* private mode */ }
+  }
+
+  function activeSteps() {
+    if (!state.method) return null;
+    return state.method === 'a' ? stepsA : stepsB;
+  }
+
+  function stepCount() {
+    var list = activeSteps();
+    return list ? list.children.length : 0;
+  }
+
+  /* ── Rendering ─────────────────────────────────────── */
+  function render() {
+    SECTIONS.forEach(function (id) { $(id).hidden = id !== state.section; });
+
+    document.querySelectorAll('.rail-link').forEach(function (link) {
+      var id = link.getAttribute('data-go');
+      var current = id === state.section;
+      link.setAttribute('aria-current', current ? 'true' : 'false');
+      link.classList.toggle('is-done', SECTIONS.indexOf(id) < SECTIONS.indexOf(state.section));
+    });
+
+    document.querySelectorAll('.method-card').forEach(function (card) {
+      card.setAttribute('aria-pressed', card.getAttribute('data-method') === state.method ? 'true' : 'false');
+    });
+
+    renderRun();
+    renderFoot();
+    save();
+  }
+
+  function renderRun() {
+    var chosen = !!state.method;
+    $('runEmpty').hidden = chosen;
+    $('runMethodChip').hidden = !chosen;
+    $('runCountChip').hidden = !chosen;
+    $('runVideoLink').hidden = !chosen;
+    dotsBox.hidden = !chosen;
+    stepsA.hidden = state.method !== 'a';
+    stepsB.hidden = state.method !== 'b';
+    $('runNoteA').hidden = state.method !== 'a';
+    $('runNoteB').hidden = state.method !== 'b';
+    if (!chosen) { dotsBox.innerHTML = ''; return; }
+
+    var list = activeSteps();
+    var total = list.children.length;
+    if (state.step > total - 1) state.step = total - 1;
+
+    Array.prototype.forEach.call(list.children, function (li, i) { li.hidden = i !== state.step; });
+    $('runMethodChip').textContent = METHOD_META[state.method].chip;
+    $('runCountChip').textContent = 'Step ' + (state.step + 1) + ' of ' + total;
+
+    if (dotsBox.childElementCount !== total) {
+      dotsBox.innerHTML = '';
+      for (var i = 0; i < total; i++) {
+        var dot = document.createElement('button');
+        dot.type = 'button';
+        dot.className = 'dot';
+        dot.setAttribute('data-dot', String(i));
+        dot.innerHTML = '<span class="vh">Go to step ' + (i + 1) + '</span>';
+        dotsBox.appendChild(dot);
+      }
+      dotsBox.removeAttribute('aria-hidden');
+    }
+    Array.prototype.forEach.call(dotsBox.children, function (dot, i) {
+      dot.setAttribute('aria-current', i === state.step ? 'true' : 'false');
+      dot.classList.toggle('is-past', i < state.step);
+    });
+  }
+
+  function renderFoot() {
+    var pos = position();
+    $('where').textContent = state.section === 'run' && state.method
+      ? METHOD_META[state.method].where + ' · step ' + (state.step + 1)
+      : LABELS[state.section];
+    $('bar').style.width = (pos.total > 1 ? (pos.index / (pos.total - 1)) * 100 : 0) + '%';
+    $('prevBtn').disabled = pos.index === 0;
+    $('nextBtn').disabled = pos.index === pos.total - 1;
+    $('nextBtn').innerHTML = pos.index === pos.total - 1 ? 'Done' : 'Next &rarr;';
+  }
+
+  /* Flat stop list: every section is one stop, except the runner where each
+     step of the chosen method is its own stop. */
+  function stops() {
+    var out = [];
+    SECTIONS.forEach(function (id) {
+      if (id === 'run' && state.method) {
+        for (var i = 0; i < stepCount(); i++) out.push({ section: 'run', step: i });
+      } else {
+        out.push({ section: id, step: 0 });
+      }
+    });
+    return out;
+  }
+
+  function position() {
+    var all = stops();
+    var index = 0;
+    for (var i = 0; i < all.length; i++) {
+      if (all[i].section === state.section && (state.section !== 'run' || all[i].step === state.step)) { index = i; break; }
+    }
+    return { index: index, total: all.length, all: all };
+  }
+
+  function move(delta) {
+    var pos = position();
+    var next = pos.all[pos.index + delta];
+    if (!next) return;
+    state.section = next.section;
+    state.step = next.step;
+    render();
+    stage.scrollTop = 0;
+    announce();
+  }
+
+  function goSection(id) {
+    if (SECTIONS.indexOf(id) < 0) return;
+    state.section = id;
+    if (id === 'run') state.step = 0;
+    render();
+    stage.scrollTop = 0;
+    announce();
+  }
+
+  function announce() {
+    live.textContent = $('where').textContent;
+  }
+
+  /* ── Events ────────────────────────────────────────── */
+  document.addEventListener('click', function (event) {
+    var go = event.target.closest('[data-go]');
+    if (go) { event.preventDefault(); goSection(go.getAttribute('data-go')); return; }
+
+    var method = event.target.closest('.method-card');
+    if (method) {
+      state.method = method.getAttribute('data-method');
+      state.step = 0;
+      state.section = 'run';
+      render();
+      stage.scrollTop = 0;
+      announce();
+      return;
+    }
+
+    var dot = event.target.closest('[data-dot]');
+    if (dot) { state.step = parseInt(dot.getAttribute('data-dot'), 10) || 0; render(); announce(); return; }
+
+    var play = event.target.closest('.vid-play');
+    if (play) { event.preventDefault(); mount(play.parentNode); }
+  });
+
+  $('prevBtn').addEventListener('click', function () { move(-1); });
+  $('nextBtn').addEventListener('click', function () { move(1); });
+
+  $('resetBtn').addEventListener('click', function () {
+    if (!window.confirm('Clear the selected method, step position, and hand-back checklist?')) return;
+    state = defaults();
+    document.querySelectorAll('#checks input').forEach(function (box) { box.checked = false; });
+    tally();
+    render();
+    announce();
+  });
+
+  document.querySelectorAll('#checks input').forEach(function (box) {
+    var id = box.getAttribute('data-check');
+    box.checked = state.checks[id] === true;
+    box.addEventListener('change', function () {
+      if (box.checked) state.checks[id] = true; else delete state.checks[id];
+      tally();
+      save();
+    });
+  });
+
+  function tally() {
+    var done = CHECKS.filter(function (id) { return state.checks[id] === true; }).length;
+    $('tally').textContent = done + ' / ' + CHECKS.length;
+  }
+
+  document.addEventListener('keydown', function (event) {
+    if (event.metaKey || event.ctrlKey || event.altKey) return;
+    var tag = (event.target.tagName || '').toLowerCase();
+    if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
+    if (event.key === 'ArrowRight') { event.preventDefault(); move(1); }
+    else if (event.key === 'ArrowLeft') { event.preventDefault(); move(-1); }
+  });
+
+  function mount(frame) {
+    var id = frame.getAttribute('data-video');
+    if (!id || frame.querySelector('iframe')) return;
+    var iframe = document.createElement('iframe');
+    iframe.src = 'https://www.youtube-nocookie.com/embed/' + id + '?rel=0&autoplay=1';
+    iframe.title = frame.getAttribute('data-title') || 'Video';
+    iframe.allow = 'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen';
+    iframe.setAttribute('allowfullscreen', '');
+    iframe.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+    frame.appendChild(iframe);
+    var button = frame.querySelector('.vid-play');
+    if (button) button.hidden = true;
+    var badge = frame.querySelector('.vid-badge');
+    if (badge) badge.hidden = true;
+  }
+
+  tally();
+  render();
+  document.documentElement.classList.add('js-ready');
+})();
+</script>
+</body>
+</html>
