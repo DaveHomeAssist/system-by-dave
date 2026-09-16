@@ -1,24 +1,24 @@
 {
   "schema": "fmp.public.release.v1",
   "sourceRepository": "DaveHomeAssist/fmpwalk",
-  "sourceCommit": "84f889c4b71e557e9f0fdb40f841029340f43264",
+  "sourceCommit": "2fd3eebda390d55732762d18b560c7e74669d81c",
   "mode": "commissioning",
   "files": {
-    "camera-core.js": "421026e8a7fcb59f6f13a9208454fdc86609ef26101bd8da0d07d65c7d6a1118",
-    "camera-view.js": "32c51593b3c0353467275155ba7ec3e08f5c567a3b08748d6e305ded3925fe8e",
-    "camera.css": "01461ac5a04a14449e8ec3e1e8239f426408d0f41e5fb28be4c90d8735edcbb5",
-    "camera.js": "75a1ec8db9e01e726cb036f31469720cce92c89875c51408d29baccfa9edec55",
-    "camera/catwalk/index.html": "4f33fd773bf3c744d7a5b06aa199e8d073eb2b67264c0c8be5ac0c27e10ce2bc",
-    "camera/front-of-house/index.html": "fbadc7570486deb6a050b67dd569541a918d7a45015e3e9411def1ded6015fbf",
-    "camera/index.html": "11cf659306e1f0edbd0e42b9034482cb45d02efc4875117ec613847f7a22c042",
-    "camera/pit-center/index.html": "1e3e5ca5042a6097639495f903e8c743f0596921aabc876dcfbb69fb64cc6972",
-    "camera/pit-stage-left/index.html": "7aca8fe8c72ad3560febfb514b273b9a5a458c2597170418d97699de520328f6",
-    "index.html": "e14eb57b7cc80a70d37f9de213cd3f0effac3362853a5647ae1f621b80176dd4",
+    "camera-core.js": "86ae252646f022ea5e03ffe2d3be05a7344f1cc2299bb4c7a39cee9bb9ebedcb",
+    "camera-view.js": "18b1847c9d57a162f5cb80687899fe357d5bb1a40351b938c45387f41ce0f9ab",
+    "camera.css": "2a7720d5aff263e29bb1abdb2a6d4477483bbcc7d4ffd0949d58d8429d070d1e",
+    "camera.js": "4e31ed1a545532cd7f03965962254a3985cf49ab64ed993ed196e04c0eeafcd4",
+    "camera/catwalk/index.html": "30e436214e41c10c5a71d4eae423419bf28a27628c32e1ac0857c0cb84f70fba",
+    "camera/front-of-house/index.html": "de8500e4a67836e8b67d04153f01a7265ee11babe070388a9cbf52b33fcf5216",
+    "camera/index.html": "aa71cdcab9b32331de3c5e801932dc2ae8bc9411b4b4cbed71b23924f4d37d61",
+    "camera/pit-center/index.html": "548249c1a96c60ed1dbed3ccd72e130333029b05863fa609985316f9b73056d0",
+    "camera/pit-stage-left/index.html": "bc4cf1d358f30b0a4d2df5ffe2d8b8957141115217db55c4903f52fb47980dfe",
+    "index.html": "3c3aeeaec7e22e0ca4bd26fa2fd87dce51a37e626100eb40e5fbb504efca4b24",
     "mail.js": "b045f5b092b5a95b92d7187f1831088719fe335c71b1d2341da83f344a1667da",
     "notion-config.js": "b675c734abe301f46f50f05a65ae58b9d25bd07c57fa8b01ef07e456e32271fc",
     "photos.js": "cd1feeb0fd50c5df4df81fa55b3fb37ca708127d793d438a62e98e596fbec3ff",
-    "public.css": "f51e2f1ace583a06d0329ca63e6c5e5dc0ca026ef69b0aa16cea753344a50e9d",
-    "public.js": "2edd6e0f5530b57a162b50d840ac7c8be8659b7c642b4e7db7d3a656b61f1171"
+    "public.css": "09e74110e15894d5e5653d193b6dba67f4956c0200df9e5270443a9a2a4b0673",
+    "public.js": "c4886d983df4bd179ca5b77c8fc31d221fa677bea224da0d8e3fbb39a8cd686a"
   },
-  "artifactSha256": "183d0bcbef043e14f0661967dff26f0498a0f9cfe02c82a0cdf4217fd9c6aab8"
+  "artifactSha256": "f8d1e34311a038a8617e4df9369d03ea1d5c3d3c64f18389d1688d61b42d2ed5"
 }

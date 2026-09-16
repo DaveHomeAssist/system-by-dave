@@ -35,9 +35,13 @@ for (const name of expected.sort()) {
   if (name.startsWith('camera/')) {
     assert.ok(source.includes('data-setup-test-only="true"'));
     assert.ok(source.includes('data-public-release="true"'));
+    assert.ok(source.includes("style-src-elem 'self' 'unsafe-inline' https://accounts.google.com/gsi/style; style-src-attr 'none';"));
     assert.ok(source.includes(route === 'camera/' ? '<base href="../">' : '<base href="../../">'));
   }
 }
+const entry = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
+assert.match(entry, /class="startup-guidance"/);
+assert.match(entry, /Recover drafts on the previous Site/);
 assert.equal(hash(JSON.stringify(hashes)), provenance.artifactSha256, 'Combined artifact digest');
 assert.ok(fs.readFileSync(path.join(root, '../robots.txt'), 'utf8').includes('Disallow: /fmp/'));
 assert.ok(fs.readFileSync(path.join(root, '../fmp-index/index.html'), 'utf8').includes('href="/fmp/"'));

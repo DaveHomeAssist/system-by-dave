@@ -1,12 +1,12 @@
 import {
   FALLBACK_REGISTRY, checkInPayload, checkoutPayload, createDraft,
-  positionFor, positionKeyFromLocation, setCheck, setPosition, visibleDrafts
-} from './camera-core.js?v=20260915camera';
+  positionFor, positionKeyFromLocation, resumeAccountDraft, setCheck, setPosition, visibleDrafts
+} from './camera-core.js?v=20260916recovery';
 import { CLIENT_ID } from './mail.js?v=20260915camera';
 import { loadPhotoBlob, loadPhotoFiles, storePhoto } from './photos.js?v=20260915camera';
 import { NOTION_API_URL } from './notion-config.js?v=20260915camera';
 
-import { CAMERA_STAGES, cameraPages, cameraShell } from './camera-view.js?v=20260915viewport';
+import { CAMERA_STAGES, cameraPages, cameraShell } from './camera-view.js?v=20260916recovery';
 
 const view = { stage: 'setup', page: 0 };
 let activePages;
@@ -162,6 +162,8 @@ function render(preferredFocus = '') {
     updateDraft(draft);
   }
   const position = positionFor(store.registry, draft.positionKey);
+  const savedDrafts = identity ? visibleDrafts(store.drafts, ownerKey).filter(item => item.positionKey === draft.positionKey) : [];
+  const draftOptions = savedDrafts.map(item => `<option value="${escapeHtml(item.draftId)}" ${item.draftId === draft.draftId ? 'selected' : ''}>${escapeHtml(item.eventName || 'Show not selected')} · ${item.checkedOutReceipt ? 'Checked out' : item.pendingAction ? 'Pending' : item.checkedInReceipt ? 'Checked in' : 'Draft'} · ${escapeHtml(item.updatedAt)}</option>`).join('');
   const [dotClass, connectionText] = backendState(draft);
   const messages = [
     ...(!storageOk ? ['Browser storage is unavailable. Keep this page open. This draft may not survive a reload.'] : []),
@@ -171,7 +173,7 @@ function render(preferredFocus = '') {
     ...(SETUP_TEST_ONLY ? [`${PUBLIC_RELEASE ? 'Commissioning build' : 'Private test build'} · not venue accepted. Use synthetic observations only. Every new record is marked SETUP TEST; signed-in saving still needs verification.`] : [])
   ];
   activePages = cameraPages({ draft, position, identity, eventOptions: eventOptions(draft),
-    references: referenceCards(position), testOnly: SETUP_TEST_ONLY, busy, messages });
+    references: referenceCards(position), draftOptions, testOnly: SETUP_TEST_ONLY, busy, messages });
   app.innerHTML = cameraShell({ draft, position, registry: store.registry, pages: activePages, view,
     testOnly: SETUP_TEST_ONLY, publicRelease: PUBLIC_RELEASE, connectionText, dotClass, hasAlert: noticeError || !storageOk });
   bind(draft);
@@ -195,6 +197,20 @@ function bind(draft) {
   document.getElementById('faultPicker')?.addEventListener('change', event => {
     if (event.target.value) go('faults', Number(event.target.value));
   });
+  document.getElementById('draftPicker')?.addEventListener('change', event => {
+    const selected = store.drafts[event.target.value];
+    if (!selected || selected.ownerKey !== ownerKey || selected.positionKey !== draft.positionKey || busy) return;
+    store.activeDraftId = selected.draftId;
+    saveStore();
+    go('setup');
+  });
+  app.querySelectorAll('[data-correction], [data-correction-reason]').forEach(field => field.addEventListener('input', () => {
+    if (busy || draft.leadCorrection?.pending) return;
+    draft.leadCorrection ||= { overrideId: crypto.randomUUID(), changes: { ...draft.assignment }, reason: '' };
+    if (field.hasAttribute('data-correction-reason')) draft.leadCorrection.reason = field.value;
+    else draft.leadCorrection.changes[field.dataset.correction] = field.value;
+    updateDraft(draft);
+  }));
   for (const id of ['showStatus', 'statusDetails']) document.getElementById(id).addEventListener('click', () => go('status'));
   document.getElementById('positionPicker').addEventListener('change', event => {
     if (draft.checkedInReceipt) return;
@@ -406,19 +422,30 @@ function startHandoff(draft) {
 }
 
 async function submitOverride(draft) {
-  const reason = document.getElementById('overrideReason')?.value.trim();
+  const correction = draft.leadCorrection;
+  const reason = correction?.reason.trim();
   if (!reason) { setNotice('Enter the reason for the lead correction.', true); render(); return; }
+  if (!Object.entries(correction.changes).some(([key, value]) => value.trim() && value.trim() !== draft.assignment[key])) {
+    setNotice('Change at least one assignment value before applying a correction.', true); render(); return;
+  }
   if (!confirm('Apply these assignment values as an attributed lead correction?')) return;
+  correction.pending = true;
+  updateDraft(draft);
   busy = true; setNotice('Applying the lead correction.'); render();
   try {
     await api('/api/camera/override', { method: 'POST', body: JSON.stringify({
       sessionId: draft.checkedInReceipt.sessionId,
-      overrideId: crypto.randomUUID(),
+      overrideId: correction.overrideId,
       reason,
-      changes: { ...draft.assignment }
+      changes: { ...correction.changes }
     }) });
+    Object.entries(correction.changes).forEach(([key, value]) => { if (value.trim()) draft.assignment[key] = value.trim(); });
+    delete draft.leadCorrection;
+    updateDraft(draft);
     setNotice('Lead correction confirmed and read back from Notion.');
   } catch (error) {
+    correction.pending = Boolean(uncertainSubmission(error));
+    updateDraft(draft);
     setNotice(error.message, true);
   } finally {
     busy = false;
@@ -461,17 +488,16 @@ async function handleCredential(result) {
     const accountOwner = await accountOwnerKey(claims.sub);
     credential = result.credential;
     credentialExpires = claims.exp * 1000 - 60000;
-    const draft = store.drafts[store.activeDraftId];
     const context = await api('/api/camera/context');
     ownerKey = accountOwner;
-    if (draft?.ownerKey === priorOwner && priorOwner.startsWith('local:')) draft.ownerKey = ownerKey;
+    const { draft, resumed } = resumeAccountDraft(store, accountOwner, priorOwner, routePosition());
     identity = { email: claims.email, roles: context.roles || [] };
     store.events = context.events || [];
     if (context.registry?.schema === 'FMP_CAMERA_POSITION_REGISTRY_V1') store.registry = context.registry;
     if (draft) updateDraft(draft); else saveStore();
     clearTimeout(credentialTimer);
     credentialTimer = setTimeout(() => { disconnect(false); setNotice('Google sign-in expired. Sign in again before submitting.'); render(); }, credentialExpires - Date.now());
-    setNotice('Connected to the FMP backend. No data is submitted until you confirm an action.');
+    setNotice(resumed ? 'Resumed your saved account draft. Any separate local draft is preserved. Nothing was submitted.' : 'Connected to the FMP backend. No data is submitted until you confirm an action.');
   } catch (error) {
     disconnect(false);
     setNotice(error.message, true);

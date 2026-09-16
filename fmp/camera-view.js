@@ -1,4 +1,4 @@
-import { CHECK_STATES, checksFor, pendingLabel } from './camera-core.js?v=20260915camera';
+import { CHECK_STATES, checksFor, pendingLabel } from './camera-core.js?v=20260916recovery';
 
 const esc = value => String(value ?? '').replace(/[&<>"']/g, character =>
   ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]);
@@ -6,7 +6,7 @@ export const CAMERA_STAGES = ['setup', 'build', 'faults', 'stow', 'refs'];
 const names = { setup: 'Setup', build: 'Build', faults: 'Faults', stow: 'Stow', refs: 'References', status: 'Status', lead: 'Lead' };
 
 // Each page is a bounded task, not a clipped portion of a longer scrolling form.
-export function cameraPages({ draft, position, identity, eventOptions, references, testOnly, busy, messages }) {
+export function cameraPages({ draft, position, identity, eventOptions, references, draftOptions = '', testOnly, busy, messages }) {
   const locked = Boolean(draft.checkedInReceipt);
   const closed = Boolean(draft.checkedOutReceipt);
   const page = (title, detail, body) => ({ title, detail, body });
@@ -33,6 +33,8 @@ export function cameraPages({ draft, position, identity, eventOptions, reference
     page('Verify the assignment', 'Blank fields stay unknown. This step does not submit anything.',
       `<label class="check-confirm"><input type="checkbox" data-field="assignmentConfirmed" ${draft.assignmentConfirmed ? 'checked' : ''} ${locked ? 'disabled' : ''}><span>I verified the position, show and tonight’s assignment.</span></label><label class="check-confirm"><input type="checkbox" data-field="setupTest" ${draft.setupTest ? 'checked' : ''} ${locked || testOnly ? 'disabled' : ''}><span>Mark records as SETUP TEST.${testOnly ? ' Required here.' : ''}</span></label>`)
   ];
+  if (draftOptions) setup.push(page('Saved sessions', 'Only your drafts for this physical position. Changing the selection does not submit anything.',
+    `<label>Resume a saved session<select id="draftPicker" ${busy ? 'disabled' : ''}>${draftOptions}</select></label>`));
   const build = [...checkPages('build'), page('Review & check in', 'Only Confirm check-in submits. Not checked never means passed.',
     `${summary('build')}<button class="primary" type="button" id="checkIn" ${locked || busy ? 'disabled' : ''}>${draft.pendingAction === 'check-in' ? 'Retry pending check-in' : 'Confirm check-in'}</button>`)];
   if (locked) build.push(page('Check-in receipt', 'The server confirmed this check-in and read it back from Notion.', `${receipt(draft.checkedInReceipt, 'Server-confirmed check-in')}${!closed ? '<button class="secondary" type="button" id="handoff">Start operator handoff</button>' : ''}`));
@@ -55,8 +57,15 @@ export function cameraPages({ draft, position, identity, eventOptions, reference
     const chunks = message.match(/[\s\S]{1,200}(?:\s|$)|[\s\S]{1,200}/g) || ['No new messages.'];
     return chunks.map((text, index) => page(index ? 'Status · continued' : 'Connection & draft status', 'No automatic submissions. Keep this tab open while work is pending.', `<p class="status-message">${esc(text)}</p>`));
   });
-  const lead = identity?.roles?.some(role => ['lead', 'admin'].includes(role)) && locked ? [page('Lead correction', 'Uses the current assignment values and requires an attributed reason.',
-    '<label>Reason<textarea id="overrideReason" maxlength="1000" rows="2" placeholder="Why the assignment must change"></textarea></label><button class="secondary" type="button" id="override">Apply lead correction</button>')] : [];
+  const correction = draft.leadCorrection;
+  const correctionField = (key, label, max = 120) => `<label>${label}<input data-correction="${key}" maxlength="${max}" value="${esc(correction?.changes?.[key] ?? draft.assignment[key])}" ${busy || correction?.pending ? 'disabled' : ''}></label>`;
+  const lead = identity?.roles?.some(role => ['lead', 'admin'].includes(role)) && locked ? [
+    page('Correct camera identity', 'Local correction draft. No server changes until you confirm.', `<div class="field-grid">${correctionField('cameraNumber', 'Camera number', 30)}${correctionField('bodyIdentifier', 'Body identifier')}</div>`),
+    page('Correct body & lens', 'Blank corrections leave the server value unchanged.', `<div class="field-grid">${correctionField('bodyModel', 'Body model')}${correctionField('lens', 'Lens')}</div>`),
+    page('Correct signal & control', 'Verify tonight’s routing before applying a correction.', `<div class="field-grid">${correctionField('switcherInput', 'Switcher input', 80)}${correctionField('controlChannel', 'Control channel')}</div>`),
+    page('Confirm lead correction', correction?.pending ? 'Outcome uncertain. Values are locked so an explicit retry can reconcile the same correction.' : 'Requires a reason and explicit confirmation. Earlier evidence stays intact.',
+      `<label>Reason<textarea id="overrideReason" data-correction-reason maxlength="1000" rows="2" ${busy || correction?.pending ? 'disabled' : ''}>${esc(correction?.reason || '')}</textarea></label><button class="secondary" type="button" id="override" ${busy ? 'disabled' : ''}>${correction?.pending ? 'Retry lead correction' : 'Apply lead correction'}</button>`)
+  ] : [];
   const refs = references.map(reference => page('Position reference', 'Opens separately. Your draft stays here.', reference));
   if (lead.length) refs.push(page('Lead controls', 'Assignment corrections require a reason and explicit confirmation.', '<button type="button" class="secondary" data-stage="lead">Open lead correction</button>'));
   return { setup, build, faults, stow, refs, status, lead };
