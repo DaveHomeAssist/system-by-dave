@@ -38,7 +38,7 @@
     --sbd-bg:#f4eee3;--sbd-bg-raised:#fbf7ef;--sbd-bg-sunken:#eae2d3;
     --sbd-sand:#241f1b;--sbd-sand-dim:#564e45;--sbd-sand-faint:#766c5e;
     --sbd-rust-on-dark:#a8512e;--sbd-rust-dim:#7c3a21;--sbd-charcoal:#d8cdba;--sbd-border-dk:#b8ac97;
-    --sbd-ok-dk:#5e7a4e;--sbd-warn-dk:#8a6420;--sbd-alert-dk:#9e3b2a;
+    --sbd-ok-dk:#5e7a4e;--sbd-warn-dk:#8a6420;--sbd-alert-dk:#9e3b2a;--sbd-stage:#d8e0e2;
     --sbd-serif:'DM Serif Display',Georgia,serif;--sbd-sans:'DM Sans',system-ui,sans-serif;--sbd-mono:'JetBrains Mono',ui-monospace,monospace;
     --sbd-ease:cubic-bezier(.2,.6,.2,1)
   }
@@ -47,7 +47,7 @@
     --sbd-bg:#1c1917;--sbd-bg-raised:#222019;--sbd-bg-sunken:#15120f;
     --sbd-sand:#e8dece;--sbd-sand-dim:#b8afa2;--sbd-sand-faint:#8f867a;
     --sbd-rust-on-dark:#d7825a;--sbd-rust-dim:#8a4428;--sbd-charcoal:#2e2b28;--sbd-border-dk:#3a3632;
-    --sbd-ok-dk:#7fae7a;--sbd-warn-dk:#d6a24e;--sbd-alert-dk:#cf6b5a
+    --sbd-ok-dk:#7fae7a;--sbd-warn-dk:#d6a24e;--sbd-alert-dk:#cf6b5a;--sbd-stage:#78858d
   }
   html,body{margin:0;height:100%}
   body{background:var(--sbd-bg);color:var(--sbd-sand);font-family:var(--sbd-sans);overflow:hidden}
@@ -74,7 +74,7 @@
   .subbar .lbl{flex:none;white-space:nowrap;font:500 11px/1 var(--sbd-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--sbd-rust-on-dark)}
   .pose{flex:none;min-height:44px;padding:0 13px;background:transparent;border:1px solid var(--sbd-charcoal);color:var(--sbd-sand-dim);font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;transition:border-color .18s var(--sbd-ease),color .18s var(--sbd-ease)}
   .pose:hover{border-color:var(--sbd-rust-on-dark);color:var(--sbd-rust-on-dark)}
-  #stagewrap{position:relative;min-height:0;background:var(--sbd-bg-sunken)}
+  #stagewrap{position:relative;min-height:0;background:var(--sbd-stage)}
   canvas{display:block;width:100%;height:100%;touch-action:none}
   .hint{position:absolute;left:14px;bottom:12px;font:400 11px/1.5 var(--sbd-mono);letter-spacing:.02em;color:var(--sbd-sand-faint);pointer-events:none}
   .hover{position:absolute;left:14px;top:12px;padding:6px 10px;background:rgba(21,18,15,.86);border:1px solid var(--sbd-border-dk);font:500 11px/1 var(--sbd-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--sbd-sand);pointer-events:none;opacity:0;transition:opacity .16s var(--sbd-ease)}
@@ -222,6 +222,7 @@ RIG.groups.forEach(g => g.categories.forEach(c => c.parts.forEach(p => { flat[p.
 const el = id => document.getElementById(id);
 let state = { group: 'rig', cat: 'Camera', part: 'body' };
 let scene, camera, renderer, controls, models = {}, parts = new Map(), poses = {}, raycaster, pointer, built = null;
+let sceneLights = {}, sceneGrounds = [];
 let hovered = '', live = false;
 
 function groupDef() { return RIG.groups.find(g => g.key === state.group); }
@@ -400,15 +401,46 @@ function framePart(slug) {
   frame(g, pose.az, pose.el, Math.max(1.5, r * 3.6));
 }
 
+function applySceneTheme(theme) {
+  if (!scene || !renderer || !sceneLights.hemisphere) return;
+  const dark = theme === 'dark';
+  const palette = dark ? {
+    background: 0x78858d, sky: 0xe7eff2, ground: 0x1b252c,
+    key: 0xffeed6, fill: 0x9ccbe0, rim: 0xe5f4ff,
+    hemisphereIntensity: 1.10, keyIntensity: 1.85, fillIntensity: 0.85, rimIntensity: 1.35,
+    shadowOpacity: 0.30, exposure: 1.08
+  } : {
+    background: 0xd8e0e2, sky: 0xf7faf9, ground: 0x53636c,
+    key: 0xfff4df, fill: 0xb9d9e8, rim: 0xe9f7ff,
+    hemisphereIntensity: 1.25, keyIntensity: 2.10, fillIntensity: 0.90, rimIntensity: 1.40,
+    shadowOpacity: 0.22, exposure: 1.12
+  };
+  scene.background.setHex(palette.background);
+  sceneLights.hemisphere.color.setHex(palette.sky);
+  sceneLights.hemisphere.groundColor.setHex(palette.ground);
+  sceneLights.hemisphere.intensity = palette.hemisphereIntensity;
+  sceneLights.key.color.setHex(palette.key);
+  sceneLights.key.intensity = palette.keyIntensity;
+  sceneLights.fill.color.setHex(palette.fill);
+  sceneLights.fill.intensity = palette.fillIntensity;
+  sceneLights.rim.color.setHex(palette.rim);
+  sceneLights.rim.intensity = palette.rimIntensity;
+  sceneGrounds.forEach(ground => { ground.material.opacity = palette.shadowOpacity; });
+  renderer.toneMappingExposure = palette.exposure;
+  renderer.domElement.dataset.surfaceTheme = dark ? 'medium-slate' : 'light-neutral';
+}
+
 function boot() {
   const canvas = el('scene');
   renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFShadowMap;
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
 
   scene = new THREE.Scene();
-  scene.background = new THREE.Color('#15120F');
+  scene.background = new THREE.Color('#d8e0e2');
 
   camera = new THREE.PerspectiveCamera(42, 1, 0.1, 200);
 
@@ -419,7 +451,8 @@ function boot() {
   el('lcdrange').addEventListener('input', e => { const d = built.setLcdOpening(e.target.value); el('lcdout').textContent = d === 0 ? 'Closed' : d + '°'; });
   el('fiberrange').addEventListener('input', e => { const d = built.setFiberAngle(e.target.value); el('fiberout').textContent = d + '°'; placeMarker(); });
 
-  scene.add(new THREE.HemisphereLight(0xE8DECE, 0x15120F, 0.62));
+  const hemisphere = new THREE.HemisphereLight(0xf7faf9, 0x53636c, 1.25);
+  scene.add(hemisphere);
   const key = new THREE.DirectionalLight(0xfff2e2, 1.45);
   key.position.set(-5.5, 9, 7); key.castShadow = true;
   key.shadow.mapSize.set(1024, 1024);
@@ -427,17 +460,22 @@ function boot() {
   key.shadow.camera.top = 9; key.shadow.camera.bottom = -13;
   key.shadow.normalBias = 0.025;
   scene.add(key);
-  const fill = new THREE.DirectionalLight(0xB8AFA2, 0.5);
+  const fill = new THREE.DirectionalLight(0xb9d9e8, 0.90);
   fill.position.set(6, 4, -6); scene.add(fill);
+  const rim = new THREE.DirectionalLight(0xe9f7ff, 1.40);
+  rim.position.set(-7, 6, -8); scene.add(rim);
+  sceneLights = { hemisphere, key, fill, rim };
 
   for (const k of ['rig', 'studio']) {
-    const ground = new THREE.Mesh(new THREE.PlaneGeometry(60, 60), new THREE.ShadowMaterial({ opacity: 0.4 }));
+    const ground = new THREE.Mesh(new THREE.PlaneGeometry(60, 60), new THREE.ShadowMaterial({ opacity: 0.22 }));
     ground.rotation.x = -Math.PI / 2;
     ground.position.y = built.floors[k];
     ground.receiveShadow = true;
     ground.userData.noHighlight = true;
     models[k].add(ground);
+    sceneGrounds.push(ground);
   }
+  applySceneTheme(document.documentElement.dataset.theme || 'light');
 
   controls = new OrbitControls(camera, canvas);
   controls.enableDamping = true;
@@ -552,6 +590,7 @@ function applyTheme(theme) {
   themeButton.textContent = theme === 'dark' ? 'Light' : 'Dark';
   themeButton.setAttribute('aria-label', `Use ${theme === 'dark' ? 'light' : 'dark'} theme`);
   document.querySelector('meta[name="theme-color"]').content = theme === 'dark' ? '#1c1917' : '#f4eee3';
+  applySceneTheme(theme);
 }
 let savedTheme = 'light';
 try { savedTheme = localStorage.getItem(themeKey) === 'dark' ? 'dark' : 'light'; } catch {}

@@ -7,8 +7,8 @@ export function buildRigModels(T, catalog) {
   let fiberPivot, fiberCable, lcdHinge;
   function material(color,metalness=.3,roughness=.5){return new T.MeshStandardMaterial({color,metalness,roughness});}
   const mats={
-    body:material(0x292d32,.46,.45), edge:material(0x495057,.64,.35), dark:material(0x111518,.15,.65),
-    rubber:material(0x15181b,.03,.92), silver:material(0xb5bdc6,.87,.22), gold:material(0xc4a46a,.8,.24),
+    body:material(0x36424b,.34,.52), edge:material(0x66727b,.52,.40), dark:material(0x1c252b,.12,.68),
+    rubber:material(0x273138,.03,.90), silver:material(0xb5bdc6,.87,.22), gold:material(0xc4a46a,.8,.24),
     glass:new T.MeshPhysicalMaterial({color:0x142c39,metalness:.35,roughness:.09,clearcoat:1,clearcoatRoughness:.06}),
     red:material(0xa32c2c,.12,.43), blue:material(0x1684ad,.35,.45), pin:material(0xbda66d,.78,.3)
   };

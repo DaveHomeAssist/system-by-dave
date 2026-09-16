@@ -1,7 +1,7 @@
 {
   "schema": "fmp.public.release.v2",
   "sourceRepository": "DaveHomeAssist/fmpwalk",
-  "sourceCommit": "ab419630d77cba86f9e1eb94aee0145f0f50f4ca",
+  "sourceCommit": "3944f292e91e11157e28ebfac7e0ca0b6f4ac547",
   "mode": "commissioning",
   "files": {
     "camera-core.js": "86ae252646f022ea5e03ffe2d3be05a7344f1cc2299bb4c7a39cee9bb9ebedcb",
@@ -40,11 +40,11 @@
     "rig/assets/v2-vf-back.webp": "78d8670c544e5d872c853ffca7e73854add93e3bb71eac63767189c0641773b4",
     "rig/assets/v2-vf-front.webp": "3b93068f203cda45fa387e2a55f2d4a286a50dcdec44e01c0949bf190f17aa08",
     "rig/fmp-guide-data.js": "611f7de6e0e1042f061f0ad3ec07d083ed876b579f7dd612edf3572713bb7a16",
-    "rig/index.html": "e35b7797798d075c8e039048cf3b885bbfd89c6488f93b8b6b4071238e14eb08",
-    "rig/rig-model.js": "a02014d65fc37f11ed83761dfa7095b8992deaf4e254cfffce7d88d4abf9779e",
+    "rig/index.html": "0fb7e6c84dc5facf8e2e7d3ffe0716025e5fb0d2f911d7fe5610343fe693380f",
+    "rig/rig-model.js": "dff258f9667f2c5c0b598d8bbc250867783c3fda07f5a5760e70e2d851bc7271",
     "rig/vendor/three/addons/controls/OrbitControls.js": "97170e1b59a71a5d1395d227a6be626a0aefa4e349f263e0539171d8c4840d51",
     "rig/vendor/three/three.core.js": "66e03b5d8f633bb9501c9668609b99a9eaca105f764d5c780a45bf96b6888357",
     "rig/vendor/three/three.module.js": "a476b88d0df406dca0e30c65b4cdf0180c7337110accec828c103655b56a361c"
   },
-  "artifactSha256": "97f230b4027accea575a07c44ba5e5d29945b19f5c89d2ec803e71bf8a2701d6"
+  "artifactSha256": "259f3b51618ed36d976dd893b92947916dc121a557e4aee4e132c8daa9a3e168"
 }
