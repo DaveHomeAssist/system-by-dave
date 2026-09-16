@@ -1,0 +1,15 @@
+{
+  "schema": "fmp.public.release.v2",
+  "sourceRepository": "DaveHomeAssist/fmpwalk",
+  "sourceCommit": "ab419630d77cba86f9e1eb94aee0145f0f50f4ca",
+  "mode": "local-first",
+  "files": {
+    "email.js": "167b00464e40dcf7f03a1a03dd5c69ddb043d63020eb0eebcf5692ed2c4085e8",
+    "index.html": "a8838d6a1556da5109c68b4570be376303c42531b6836a12fce737bacbee5364",
+    "mail.js": "4a521185a33c8463a3b34493771e381d7982bb59f0f8d9b5096d074727e32a91",
+    "notion-config.js": "b675c734abe301f46f50f05a65ae58b9d25bd07c57fa8b01ef07e456e32271fc",
+    "notion.js": "1e4ade1a6663fcde54db689c6cfe10d9d739fa51aaa37da0b925f78258f6e915",
+    "photos.js": "cd1feeb0fd50c5df4df81fa55b3fb37ca708127d793d438a62e98e596fbec3ff"
+  },
+  "artifactSha256": "9de2b8b9ad3cadaf530ece3f1bbaf5ae6dad9e4c3a3934dd82bc15a383b46f79"
+}

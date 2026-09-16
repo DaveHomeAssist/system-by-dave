@@ -6,23 +6,23 @@
   <meta name="robots" content="noindex,nofollow,noarchive">
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
-  <title>FMP Camera Operations | System by Dave</title>
-  <meta name="description" content="FMP camera check-in, build checks, fault capture and stow. Public frontend; authorized Google sign-in required for operational records.">
+  <title>FMP Video Operations | System by Dave</title>
+  <meta name="description" content="FMP camera commissioning, preshow venue walk, operator training, and source-backed camera rig references.">
   <link rel="canonical" href="https://systembydave.com/fmp/">
   <meta name="theme-color" content="#0c1016">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="System by Dave">
-  <meta property="og:title" content="FMP Camera Operations | System by Dave">
-  <meta property="og:description" content="One position. One task. Explicit saves.">
+  <meta property="og:title" content="FMP Video Operations | System by Dave">
+  <meta property="og:description" content="Operate. Walk. Learn. Explicit saves.">
   <meta property="og:url" content="https://systembydave.com/fmp/">
   <meta property="og:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="FMP Camera Operations | System by Dave">
-  <meta name="twitter:description" content="One position. One task. Explicit saves.">
+  <meta name="twitter:title" content="FMP Video Operations | System by Dave">
+  <meta name="twitter:description" content="Operate. Walk. Learn. Explicit saves.">
   <meta name="twitter:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
   <link rel="icon" href="/svg/system_by_dave_logo_rust.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/css/av-theme.css">
-  <link rel="stylesheet" href="public.css?v=09e74110e15894d5">
+  <link rel="stylesheet" href="public.css?v=b0acf8b5856a0704">
   <script src="/js/av-theme-mode.js"></script>
   <script src="public.js?v=c4886d983df4bd17" defer></script>
 </head>
@@ -30,8 +30,8 @@
   <a class="skip" href="#main">Skip to FMP workspace</a>
   <header class="portal-header"><nav aria-label="Breadcrumb"><a href="/">System by Dave</a><a href="/fmp-index/">FMP index</a></nav><label class="theme-label"><span class="sr-only">Theme</span><select id="theme" aria-label="Theme"><option value="system">System</option><option value="dark">Dark</option><option value="light">Light</option></select></label></header>
   <main id="main" tabindex="-1">
-    <header class="portal-title"><p class="eyebrow">Freedom Mortgage Pavilion</p><h1>Camera operations<span>.</span></h1><p class="subhead">One position. One task. Explicit saves.</p></header>
-    <nav class="portal-tabs" aria-label="FMP workspace"><button data-panel="positions" aria-current="page">Cameras</button><button data-panel="references" aria-current="false">References</button><button data-panel="connection" aria-current="false">Setup</button></nav>
+    <header class="portal-title"><p class="eyebrow">Freedom Mortgage Pavilion</p><h1>Video operations<span>.</span></h1><p class="subhead">Operate. Walk. Learn. Explicit saves.</p></header>
+    <nav class="portal-tabs" aria-label="FMP workspace"><button data-panel="positions" aria-current="page">Cameras</button><button data-panel="walk" aria-current="false">Walk</button><button data-panel="references" aria-current="false">Learn</button><button data-panel="connection" aria-current="false">Setup</button></nav>
     <section id="positions" class="portal-panel" aria-label="Camera positions">
       <div class="position-cards">
         <a href="camera/pit-center/"><span class="position-code">PC</span><span><strong>Pit · Center</strong><small>Stage edge · verify tonight’s assignment</small></span><span aria-hidden="true">↗</span></a>
@@ -41,19 +41,25 @@
       </div>
       <p class="panel-note">Location context only. Mounts, access and exact sightlines require venue verification.</p>
     </section>
+    <section id="walk" class="portal-panel" hidden aria-label="Preshow walk">
+      <a class="launch-card" href="/fmpwalk/"><span class="position-code">WALK</span><span><strong>Open the preshow walk</strong><small>Setup · route checks · fault photos · Markdown and JSON export · optional Gmail send</small></span><span aria-hidden="true">→</span></a>
+      <p class="panel-note">The walk is a separate local-first workflow for venue displays and preshow evidence. Camera Crew Calls stay in Camera operations; nothing transfers or submits silently.</p>
+    </section>
     <section id="references" class="portal-panel" hidden aria-label="Reference links">
       <div class="reference-links">
-        <a href="/backfocus/">Back focus field guide <span>↗</span></a>
-        <a href="https://aviewfrommyseat.com/venue/Freedom+Mortgage+Pavilion/seating-chart/concert/" target="_blank" rel="noopener noreferrer">Venue seating layout <span>↗</span></a>
-        <a href="https://aviewfrommyseat.com/large-photo/305422/Freedom+Mortgage+Pavilion/section-202/row-J/seat-41/" target="_blank" rel="noopener noreferrer">FOH area · audience reference <span>↗</span></a>
-        <a href="https://aviewfrommyseat.com/photo/64716/freedom+mortgage+pavilion/section-ga+pit/row-/seat-/" target="_blank" rel="noopener noreferrer">Pit · audience reference <span>↗</span></a>
+        <a href="guide/"><span class="reference-code">CALL</span><span><strong>Bowl camera guide</strong><small>House and tour modes, camera meeting, song flow, directing and failure recovery</small></span><span aria-hidden="true">→</span></a>
+        <a href="rig/"><span class="reference-code">3D</span><span><strong>Camera rig explorer</strong><small>72 documented parts, photo evidence, operating notes and keyboard navigation</small></span><span aria-hidden="true">→</span></a>
+        <a href="/backfocus/"><span class="reference-code">BF</span><span><strong>Back focus field guide</strong><small>Frame, zoom, focus and repeat before the show</small></span><span aria-hidden="true">→</span></a>
+        <a href="https://aviewfrommyseat.com/venue/Freedom+Mortgage+Pavilion/seating-chart/concert/" target="_blank" rel="noopener noreferrer"><span class="reference-code">MAP</span><span><strong>Venue seating layout</strong><small>Public audience reference · not a surveyed venue plan</small></span><span aria-hidden="true">↗</span></a>
+        <a href="https://aviewfrommyseat.com/large-photo/305422/Freedom+Mortgage+Pavilion/section-202/row-J/seat-41/" target="_blank" rel="noopener noreferrer"><span class="reference-code">FOH</span><span><strong>Front of House area</strong><small>Audience reference · not camera output or calibrated framing</small></span><span aria-hidden="true">↗</span></a>
+        <a href="https://aviewfrommyseat.com/photo/64716/freedom+mortgage+pavilion/section-ga+pit/row-/seat-/" target="_blank" rel="noopener noreferrer"><span class="reference-code">PIT</span><span><strong>Pit area</strong><small>Audience reference · verify tonight's stage and security boundaries</small></span><span aria-hidden="true">↗</span></a>
       </div>
-      <p class="panel-note">Seat photos are reference views, not camera outputs or calibrated framing. Updated map and coverage planner are not released yet.</p>
+      <p class="panel-note">Training and equipment references do not certify tonight's assignment, installed model, access, or framing. Verify each against the physical rig and the current show plan.</p>
     </section>
     <section id="connection" class="portal-panel" hidden aria-label="Connection setup">
       <div class="setup-copy"><h2>Public page. Protected records.</h2><p>Google sign-in and the existing backend allowlist protect Notion operations. Public access does not grant crew access.</p><p><strong>Commissioning:</strong> use synthetic SETUP TEST observations until signed-in saves and attachments are verified.</p><p>Existing drafts stay on the old hostname. Finish pending work there; this release does not move or delete it.</p><a href="https://fmp-video-house-ops.davein4k.chatgpt.site" target="_blank" rel="noopener noreferrer">Open previous private Site ↗</a></div>
     </section>
-    <aside class="startup-guidance"><h2>Camera workspace loading</h2><p>JavaScript is required for camera forms. If this message stays visible, enable JavaScript and reload. Nothing is submitted automatically.</p><p>This is a public frontend with protected operational records. Use synthetic <strong>SETUP TEST</strong> observations only until commissioning is verified.</p><p>Old drafts stay on the previous hostname. They have not been moved or deleted.</p><a href="https://fmp-video-house-ops.davein4k.chatgpt.site" target="_blank" rel="noopener noreferrer">Recover drafts on the previous Site ↗</a></aside>
+    <aside class="startup-guidance"><h2>Camera workspace loading</h2><p>JavaScript is required for camera forms. If this message stays visible, enable JavaScript and reload. Nothing is submitted automatically.</p><p>This is a public frontend with protected operational records. Use synthetic <strong>SETUP TEST</strong> observations only until commissioning is verified.</p><p>Training and recovery links remain available without the camera app:</p><p><a href="/fmpwalk/">Open the preshow walk</a> · <a href="guide/">Open the bowl camera guide</a> · <a href="rig/">Open the camera rig explorer</a></p><p>Old drafts stay on the previous hostname. They have not been moved or deleted.</p><a href="https://fmp-video-house-ops.davein4k.chatgpt.site" target="_blank" rel="noopener noreferrer">Recover drafts on the previous Site ↗</a></aside>
   </main>
   <footer class="portal-footer"><strong>SETUP TEST</strong><span>Not venue accepted · Google sign-in to submit</span></footer>
 </body>

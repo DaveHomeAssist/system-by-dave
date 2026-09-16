@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none'">
+<meta name="theme-color" content="#eceae4">
+<meta name="description" content="FMP bowl camera training for house and tour nights: operator discipline, camera meetings, song flow, directing, the house plot, preshow checks, and failure recovery.">
+<link rel="canonical" href="https://systembydave.com/fmp/guide/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="System by Dave">
+<meta property="og:title" content="FMP Bowl Camera Guide | System by Dave">
+<meta property="og:description" content="Operator and director training for FMP house and tour camera workflows.">
+<meta property="og:url" content="https://systembydave.com/fmp/guide/">
+<meta property="og:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="FMP Bowl Camera Guide | System by Dave">
+<meta name="twitter:description" content="Operator and director training for FMP house and tour camera workflows.">
+<meta name="twitter:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<title>FMP Bowl Camera Guide | System by Dave</title>
+<style>
+@font-face{font-family:"Barlow Condensed";font-style:normal;font-weight:500 700;font-display:swap;src:url('/fonts/space-grotesk.woff2') format('woff2')}
+@font-face{font-family:"IBM Plex Mono";font-style:normal;font-weight:400 600;font-display:swap;src:url('/fonts/jetbrains-mono.woff2') format('woff2')}
+@font-face{font-family:"Source Sans 3";font-style:normal;font-weight:400 700;font-display:swap;src:url('/fonts/dm-sans.woff2') format('woff2')}
+:root{
+  color-scheme:light;
+  --bg:#eceae4; --bg2:#e2dfd7; --panel:#f7f6f2; --line:#d3cfc4; --line2:#b9b4a7;
+  --ink:#16181b; --ink2:#4a505a; --ink3:#6b717a;
+  --tally:#b33b2d; --tally-dim:rgba(179,59,45,.10);
+  --pvw:#1d7f3b; --pvw-dim:rgba(29,127,59,.10);
+  --amber:#9a5e00; --amber-dim:rgba(154,94,0,.10);
+  --umd:#1b1e22;
+  --font-d:"Barlow Condensed","Arial Narrow",sans-serif;
+  --font-b:"Source Sans 3","Segoe UI",Helvetica,sans-serif;
+  --font-m:"IBM Plex Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    --bg:#eceae4; --bg2:#e2dfd7; --panel:#f7f6f2; --line:#d3cfc4; --line2:#b9b4a7;
+    --ink:#16181b; --ink2:#4a505a; --ink3:#7b818a;
+    --tally:#d62c20; --tally-dim:rgba(214,44,32,.10);
+    --pvw:#1d8f42; --pvw-dim:rgba(29,143,66,.10);
+    --amber:#b86e00; --amber-dim:rgba(184,110,0,.10);
+    --umd:#1b1e22;
+  }
+}
+:root[data-theme="light"]{
+  color-scheme:light;
+  --bg:#eceae4; --bg2:#e2dfd7; --panel:#f7f6f2; --line:#d3cfc4; --line2:#b9b4a7;
+  --ink:#16181b; --ink2:#4a505a; --ink3:#7b818a;
+  --tally:#d62c20; --tally-dim:rgba(214,44,32,.10);
+  --pvw:#1d8f42; --pvw-dim:rgba(29,143,66,.10);
+  --amber:#b86e00; --amber-dim:rgba(184,110,0,.10);
+  --umd:#1b1e22;
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0d0f12; --bg2:#14171c; --panel:#191d23; --line:#2a3039; --line2:#3a424d;
+  --ink:#e8ebef; --ink2:#a3acb8; --ink3:#6f7885;
+  --tally:#ff3b30; --tally-dim:rgba(255,59,48,.14);
+  --pvw:#30d158; --pvw-dim:rgba(48,209,88,.13);
+  --amber:#ffb020; --amber-dim:rgba(255,176,32,.13);
+  --umd:#0a0c0f;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-b);font-size:15px;line-height:1.5;
+  background-image:radial-gradient(circle at 1px 1px,var(--line) 1px,transparent 0);background-size:22px 22px}
+.skip{position:fixed;left:12px;top:-80px;z-index:20;display:inline-flex;align-items:center;min-height:44px;padding:0 14px;background:var(--ink);color:var(--bg);font-family:var(--font-m);text-decoration:none}
+.skip:focus{top:8px}
+.shell{height:100vh;display:flex;flex-direction:column}
+
+/* header */
+header{display:flex;align-items:center;gap:16px;padding:12px 20px;border-bottom:1px solid var(--line);background:var(--bg2)}
+.tallylight{width:12px;height:12px;border-radius:50%;background:var(--tally);box-shadow:0 0 12px var(--tally);flex:none;animation:pulse 2.4s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.45;box-shadow:0 0 4px var(--tally)}}
+.brand h1{font-family:var(--font-d);font-weight:700;font-size:24px;letter-spacing:.04em;text-transform:uppercase;line-height:1}
+.brand p{font-family:var(--font-m);font-size:11px;color:var(--ink3);letter-spacing:.06em;text-transform:uppercase;margin-top:3px}
+.spacer{flex:1}
+.theme-btn{font-family:var(--font-m);font-size:12px;background:var(--panel);color:var(--ink);border:1px solid var(--line2);border-radius:4px;padding:6px 12px;cursor:pointer}
+.theme-btn:hover{border-color:var(--ink3)}
+
+/* tabs as multiviewer tiles */
+nav{display:flex;gap:6px;padding:10px 20px;border-bottom:1px solid var(--line);overflow-x:auto;background:var(--bg2)}
+.tab{flex:none;position:relative;background:var(--umd);color:#cfd5dc;border:1px solid var(--line2);border-radius:3px;
+  font-family:var(--font-m);font-size:12px;letter-spacing:.05em;text-transform:uppercase;padding:9px 14px 9px 30px;cursor:pointer}
+.tab::before{content:"";position:absolute;left:10px;top:50%;transform:translateY(-50%);width:10px;height:10px;border-radius:2px;background:#3a424d}
+.tab:hover::before{background:var(--pvw)}
+.tab[aria-selected="true"]{border-color:var(--tally);box-shadow:inset 0 -3px 0 var(--tally)}
+.tab[aria-selected="true"]::before{background:var(--tally);box-shadow:0 0 8px var(--tally)}
+.tab:focus-visible{outline:2px solid var(--pvw);outline-offset:2px}
+
+main{flex:1;min-height:0;position:relative}
+.panel{position:absolute;inset:0;overflow:auto;padding:24px 20px 48px}
+.panel[hidden]{display:none}
+.inner{max-width:1380px;margin:0 auto;animation:rise .35s ease both}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+h2{font-family:var(--font-d);font-weight:700;font-size:34px;text-transform:uppercase;letter-spacing:.02em;line-height:1.05}
+h3{font-family:var(--font-d);font-weight:600;font-size:21px;text-transform:uppercase;letter-spacing:.04em;margin:28px 0 10px;display:flex;align-items:center;gap:10px}
+h3::before{content:"";width:18px;height:3px;background:var(--tally)}
+.lede{color:var(--ink2);font-size:16px;margin:8px 0 18px;max-width:780px}
+p+p{margin-top:8px}
+.kicker{font-family:var(--font-m);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--tally);margin-bottom:6px}
+
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:6px;background:var(--panel)}
+table{width:100%;border-collapse:collapse;font-size:14px;min-width:620px}
+th{font-family:var(--font-m);font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);text-align:left;padding:10px 12px;border-bottom:1px solid var(--line2);background:var(--bg2)}
+td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:none}
+td strong{color:var(--ink)}
+.mono{font-family:var(--font-m);font-size:13px}
+
+.callout{border-left:4px solid var(--tally);background:var(--tally-dim);padding:14px 16px;border-radius:0 6px 6px 0;margin:18px 0}
+.callout.pvw{border-color:var(--pvw);background:var(--pvw-dim)}
+.callout.amber{border-color:var(--amber);background:var(--amber-dim)}
+.callout b{font-family:var(--font-d);font-size:17px;letter-spacing:.04em;text-transform:uppercase;display:block;margin-bottom:2px}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:14px 16px;position:relative;overflow:hidden}
+.card .umd{font-family:var(--font-m);font-size:11px;letter-spacing:.08em;text-transform:uppercase;background:var(--umd);color:#dfe4ea;margin:-14px -16px 12px;padding:6px 16px;display:flex;justify-content:space-between}
+.card h4{font-family:var(--font-d);font-size:20px;text-transform:uppercase;letter-spacing:.03em;line-height:1.1;margin-bottom:6px}
+.card ul{padding-left:18px;color:var(--ink2);font-size:14px}
+.card li+li{margin-top:4px}
+.card.live{border-color:var(--tally)}
+.card.live .umd{background:var(--tally);color:#fff}
+
+.calls{display:grid;gap:8px}
+.call{display:grid;grid-template-columns:minmax(220px,1.1fr) 1fr;gap:12px;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:10px 14px;align-items:center}
+.call .say{font-family:var(--font-m);font-size:13px;color:var(--ink)}
+.call .why{color:var(--ink2);font-size:14px}
+@media (max-width:640px){.call{grid-template-columns:1fr}}
+
+pre{font-family:var(--font-m);font-size:13px;background:var(--umd);color:#dfe4ea;padding:14px 16px;border-radius:6px;overflow-x:auto}
+
+/* checklist */
+.check{display:grid;grid-template-columns:28px 1fr auto;gap:10px;align-items:start;background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:10px 14px}
+.check+.check{margin-top:8px}
+.check input{width:18px;height:18px;margin-top:3px;accent-color:var(--pvw)}
+.check .t{font-weight:700}
+.check .how{color:var(--ink2);font-size:14px;margin-top:2px}
+.check .own{font-family:var(--font-m);font-size:11px;text-transform:uppercase;color:var(--ink3);white-space:nowrap}
+.check:has(input:checked){border-color:var(--pvw)}
+.check:has(input:checked) .t{text-decoration:line-through;color:var(--ink3)}
+
+/* operator card form */
+.opcard{background:var(--panel);border:1px solid var(--line2);border-radius:8px;padding:0;overflow:hidden}
+.opcard .head{background:var(--umd);color:#e7ebf0;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;font-family:var(--font-m);font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+.opgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;padding:16px}
+.field label{display:block;font-family:var(--font-m);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);margin-bottom:4px}
+.field input,.field select{width:100%;font-family:var(--font-b);font-size:15px;color:var(--ink);background:var(--bg);border:1px solid var(--line2);border-radius:4px;padding:8px 10px}
+.field input:focus,.field select:focus{outline:2px solid var(--pvw);outline-offset:1px}
+.field.wide{grid-column:1/-1}
+.fixed{grid-column:1/-1;font-family:var(--font-m);font-size:12px;color:var(--tally);border-top:1px dashed var(--line2);padding-top:10px}
+.btn{font-family:var(--font-m);font-size:12px;text-transform:uppercase;letter-spacing:.06em;background:transparent;color:var(--ink);border:1px solid var(--line2);border-radius:4px;padding:5px 10px;cursor:pointer}
+.btn:hover{border-color:var(--tally)}
+.saved{font-family:var(--font-m);font-size:11px;color:var(--ink3);padding:0 16px 14px}
+.guide-boundary{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;border:1px solid var(--line2);background:var(--amber-dim);padding:12px 14px;margin:0 0 18px}
+.guide-boundary strong{font-family:var(--font-m);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--amber)}
+.guide-boundary span{color:var(--ink2);font-size:14px}
+.guide-boundary a{color:var(--ink);font-family:var(--font-m);font-size:11px;text-transform:uppercase;text-underline-offset:3px}
+
+.modes{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-top:6px}
+.who{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:14px;margin-top:6px}
+.who span:nth-child(odd){font-family:var(--font-m);font-size:11px;text-transform:uppercase;color:var(--ink3);padding-top:2px}
+@media (max-width:700px){
+  .shell{padding-bottom:74px}
+  nav{position:fixed;z-index:20;left:0;right:0;bottom:0;padding:8px 10px calc(8px + env(safe-area-inset-bottom));box-shadow:0 -1px 0 var(--line2)}
+  .panel{padding:18px 14px 32px}
+  header{padding:10px 14px}
+  .brand p{display:none}
+  .guide-boundary{grid-template-columns:1fr}.guide-boundary a{min-height:44px;display:flex;align-items:center}
+}
+@media (prefers-reduced-motion:reduce){.tallylight{animation:none}.inner{animation:none}}
+</style>
+</head>
+<body>
+  <a class="skip" href="#guide-content">Skip to guide content</a>
+<div class="shell">
+  <header>
+    <div class="tallylight" aria-hidden="true"></div>
+    <div class="brand">
+      <h1>FMP Bowl Camera Guide</h1>
+      <p>Local camera operators · house nights and tour nights</p>
+    </div>
+    <div class="spacer"></div>
+    <a class="theme-btn" href="/fmp/">FMP operations</a>
+    <button class="theme-btn" id="themeBtn" type="button" aria-label="Toggle light and dark mode">Theme</button>
+  </header>
+
+  <nav role="tablist" aria-label="Guide sections">
+    <button class="tab" role="tab" id="t-modes" aria-controls="p-modes" aria-selected="true">01 Show Modes</button>
+    <button class="tab" role="tab" id="t-ops" aria-controls="p-ops" aria-selected="false" tabindex="-1">02 Operators</button>
+    <button class="tab" role="tab" id="t-meet" aria-controls="p-meet" aria-selected="false" tabindex="-1">03 Camera Meeting</button>
+    <button class="tab" role="tab" id="t-song" aria-controls="p-song" aria-selected="false" tabindex="-1">04 Song Flow</button>
+    <button class="tab" role="tab" id="t-dir" aria-controls="p-dir" aria-selected="false" tabindex="-1">05 Directing</button>
+    <button class="tab" role="tab" id="t-plot" aria-controls="p-plot" aria-selected="false" tabindex="-1">06 House Plot</button>
+    <button class="tab" role="tab" id="t-pre" aria-controls="p-pre" aria-selected="false" tabindex="-1">07 Preshow</button>
+    <button class="tab" role="tab" id="t-fail" aria-controls="p-fail" aria-selected="false" tabindex="-1">08 Failure Modes</button>
+  </nav>
+
+  <main id="guide-content" tabindex="-1">
+    <!-- 01 SHOW MODES -->
+    <section class="panel" role="tabpanel" id="p-modes" aria-labelledby="t-modes">
+      <div class="inner">
+        <div class="guide-boundary"><strong>Training reference</strong><span>Tonight's director, stage plot, restrictions, and verified assignments control. This guide stores local notes only and does not submit operational records.</span><a href="/fmpwalk/">Open preshow walk</a></div>
+        <div class="kicker">Start here</div>
+        <h2>The operators stay. The caller changes.</h2>
+        <p class="lede">FMP camera positions are worked by Local operators on house nights and on most tour nights. Tours occasionally pay to bring their own operators and have ours shadow, but they usually defer to the house crew. This guide is built so a Local operator can walk in on any night, ask seven questions, fill one card, and cut clean for a director they met an hour ago.</p>
+
+        <div class="modes">
+          <div class="card">
+            <div class="umd"><span>Mode A</span><span>House</span></div>
+            <h4>House cameras</h4>
+            <div class="who"><span>Calls</span><span>Head of Video</span><span>Operates</span><span>Local operators</span><span>Use</span><span>All tabs</span></div>
+          </div>
+          <div class="card live">
+            <div class="umd"><span>Mode B</span><span>Most common tour night</span></div>
+            <h4>Tour cameras, deferred to house</h4>
+            <div class="who"><span>Calls</span><span>Tour director</span><span>Operates</span><span>Local operators</span><span>Use</span><span>02, 03, 04, 06, 08</span></div>
+          </div>
+          <div class="card">
+            <div class="umd"><span>Mode C</span><span>Occasional</span></div>
+            <h4>Tour cameras, shadowed</h4>
+            <div class="who"><span>Calls</span><span>Tour director</span><span>Operates</span><span>Tour operators, Local shadows</span><span>Use</span><span>02, 03, 06 (shadow hands the house notes over)</span></div>
+          </div>
+        </div>
+
+        <h3>How this guide is split</h3>
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>Layer</th><th>Tabs</th><th>Who reads it</th><th>Purpose</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Operator</strong></td><td class="mono">02 · 03 · 04</td><td>Every Local operator, every night</td><td>Deliver usable shots to any caller without being told twice</td></tr>
+            <tr><td><strong>Director</strong></td><td class="mono">05</td><td>Head of Video, anyone calling a house show</td><td>Calling discipline, ownership, cutting on the music</td></tr>
+            <tr><td><strong>Venue</strong></td><td class="mono">06 · 07 · 08</td><td>Everyone, and worth sharing with tour directors</td><td>What is specific to the FMP bowl: plot, IMAG, PTZ limits, preshow</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="callout">
+          <b>The one rule</b>
+          Before any cut, the next shot must show the viewer something the current shot does not. Operators make that possible by never offering the same frame as the live camera.
+        </div>
+      </div>
+    </section>
+
+    <!-- 02 OPERATORS -->
+    <section class="panel" role="tabpanel" id="p-ops" aria-labelledby="t-ops" hidden>
+      <div class="inner">
+        <div class="kicker">Operator layer</div>
+        <h2>Deliver for a caller you don't know</h2>
+        <p class="lede">A new director will not know your position, your glass, or the room. They assume you will default somewhere useful. These rules hold on house and tour nights alike.</p>
+
+        <h3>Core operator rules</h3>
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>Rule</th><th>What it means on the stick</th><th>Why it survives any caller</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Know your home, return to it</strong></td><td>After any call finishes, go back to your assigned subject without being asked</td><td>The director can always find you</td></tr>
+            <tr><td><strong>Compose ahead</strong></td><td>Off tally, frame the next likely shot before the call comes</td><td>Unfamiliar callers are often late; be ready early</td></tr>
+            <tr><td><strong>Hold on tally</strong></td><td>No reframes on air unless slow and motivated. Let the performer move inside a stable frame</td><td>A searching live frame reads as a production catching up</td></tr>
+            <tr><td><strong>Offer contrast</strong></td><td>Never match the frame size and angle of the camera that is live</td><td>Gives the director a real cut instead of a jump</td></tr>
+            <tr><td><strong>Watch the music</strong></td><td>Anticipate fills, solos, walks, entrances, and lighting hits</td><td>You see the stage better than the video position does</td></tr>
+            <tr><td><strong>Safe camera stays put</strong></td><td>If you are named safe camera, you do not wander for a pretty shot</td><td>The one rule that saves a show with a new caller</td></tr>
+            <tr><td><strong>Match the comms style</strong></td><td>Offer shots on headset only if the director asked for offers</td><td>Some callers want quiet channels; ask at the meeting</td></tr>
+            <tr><td><strong>Focus and exposure are yours</strong></td><td>Stay sharp through zoom moves; flag exposure problems to shading off air</td><td>Nobody in the truck can fix a soft shot fast enough</td></tr>
+          </tbody>
+        </table></div>
+
+        <h3>Position discipline</h3>
+        <div class="grid">
+          <div class="card">
+            <div class="umd"><span>FOH</span><span>Long lens sticks</span></div>
+            <h4>Sustained tight work</h4>
+            <ul>
+              <li>Best glass and most stable platform; usually the lead vocal</li>
+              <li>Frame, hold, follow naturally. No constant reframing</li>
+              <li>Watch headroom against stage height; aim near performer eye level when the platform allows</li>
+            </ul>
+          </div>
+          <div class="card">
+            <div class="umd"><span>Pit</span><span>SC/SR and SL</span></div>
+            <h4>Players and angles</h4>
+            <ul>
+              <li>Own a player, not the whole stage</li>
+              <li>Low angles on guitar and bass read strong on IMAG</li>
+              <li>Keep clear of security lanes and performer no go zones</li>
+              <li>Do not shoot into the drum riser from below; you get cymbals and a kick drum head</li>
+            </ul>
+          </div>
+          <div class="card live">
+            <div class="umd"><span>PTZ</span><span>Presets only</span></div>
+            <h4>No live moves</h4>
+            <ul>
+              <li>The house PTZ will not drive pan and tilt together cleanly when following a mark</li>
+              <li>Recall presets only while off program, then trim small if needed</li>
+              <li>Tell every tour director this at the camera meeting</li>
+            </ul>
+          </div>
+          <div class="card">
+            <div class="umd"><span>Tour add</span><span>Handheld / shoulder</span></div>
+            <h4>Motivated movement</h4>
+            <ul>
+              <li>Move for entrances, solos, reveals, or walking with the artist</li>
+              <li>Permission to hold; you do not need to move every second</li>
+              <li>Keep horizons intentional; never let two roaming cameras leave stage coverage together</li>
+            </ul>
+          </div>
+        </div>
+
+        <h3>Shadowing a tour operator (Mode C)</h3>
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>Do</th><th>Why</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Hand over the house notes first</strong>: PTZ limits, cable paths, pit boundaries, IMAG wall layout</td><td>The tour op knows the show, you know the room</td></tr>
+            <tr><td><strong>Stay on headset</strong> and know the call style they are using</td><td>You may be asked to take the position mid show</td></tr>
+            <tr><td><strong>Watch their home and secondary</strong> so you can match them</td><td>If they step off, the director should not notice the swap</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+    </section>
+
+    <!-- 03 CAMERA MEETING -->
+    <section class="panel" role="tabpanel" id="p-meet" aria-labelledby="t-meet" hidden>
+      <div class="inner">
+        <div class="kicker">Before doors, every tour night</div>
+        <h2>Seven questions, one card</h2>
+        <p class="lede">Ask these at the camera meeting. If there is no meeting, grab the director on headset during checks. Fill the card for your position before doors.</p>
+
+        <h3>Ask the director</h3>
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>#</th><th>Ask</th><th>Catches</th></tr></thead>
+          <tbody>
+            <tr><td class="mono">1</td><td><strong>How are you numbering us? By number or by position?</strong></td><td>Tour calling "Pit Left" while the house sheet says Cam 3</td></tr>
+            <tr><td class="mono">2</td><td><strong>What is my home, and who is your safe camera?</strong></td><td>Two operators both thinking they are free to roam</td></tr>
+            <tr><td class="mono">3</td><td><strong>"Ready, take" or just "take"?</strong></td><td>Missed cuts from mismatched calling habits</td></tr>
+            <tr><td class="mono">4</td><td><strong>Do you want shot offers on headset, or quiet?</strong></td><td>Comms clutter or missed opportunities</td></tr>
+            <tr><td class="mono">5</td><td><strong>IMAG notes: no shoot sides, crowd shots, restricted angles?</strong></td><td>An artist complaint after song one</td></tr>
+            <tr><td class="mono">6</td><td><strong>Any walk ons, B stage, guests, or pyro I am framing around?</strong></td><td>Blown reveals and unsafe positions</td></tr>
+            <tr><td class="mono">7</td><td><strong>Tour gear or house gear on my position?</strong></td><td>An unfamiliar body, lens, or zoom demand at the downbeat</td></tr>
+          </tbody>
+        </table></div>
+
+        <h3>Operator card</h3>
+        <div class="opcard">
+          <div class="head"><span>Position card</span><button class="btn" id="clearCard" type="button">Clear card</button></div>
+          <div class="opgrid" id="cardGrid">
+            <div class="field"><label for="c-show">Show / date</label><input id="c-show" data-k="show"></div>
+            <div class="field"><label for="c-caller">Caller</label><input id="c-caller" data-k="caller"></div>
+            <div class="field"><label for="c-mode">Show mode</label>
+              <select id="c-mode" data-k="mode"><option value="">Select</option><option>A · House cameras</option><option>B · Tour, deferred to house</option><option>C · Tour, shadowed</option></select></div>
+            <div class="field"><label for="c-pos">My position</label>
+              <select id="c-pos" data-k="pos"><option value="">Select</option><option>Cam 1 · Pit SC/SR</option><option>Cam 2 · FOH</option><option>Cam 3 · Pit SL</option><option>PTZ</option><option>Tour add position</option></select></div>
+            <div class="field"><label for="c-called">Called as</label><input id="c-called" data-k="called" placeholder="e.g. Pit Right, Camera 4"></div>
+            <div class="field"><label for="c-safe">Safe camera tonight</label><input id="c-safe" data-k="safe" placeholder="Which camera? Is it me?"></div>
+            <div class="field"><label for="c-home">Home</label><input id="c-home" data-k="home"></div>
+            <div class="field"><label for="c-sec">Secondary</label><input id="c-sec" data-k="sec"></div>
+            <div class="field"><label for="c-style">Call style</label>
+              <select id="c-style" data-k="style"><option value="">Select</option><option>Ready + take</option><option>Take only</option></select></div>
+            <div class="field"><label for="c-offers">Shot offers</label>
+              <select id="c-offers" data-k="offers"><option value="">Select</option><option>Welcome</option><option>Quiet channel</option></select></div>
+            <div class="field wide"><label for="c-imag">IMAG restrictions</label><input id="c-imag" data-k="imag" placeholder="No shoot sides, crowd rules, angles"></div>
+            <div class="field wide"><label for="c-cues">Walk ons / guests / B stage / pyro</label><input id="c-cues" data-k="cues"></div>
+            <div class="field"><label for="c-gear">Gear</label>
+              <select id="c-gear" data-k="gear"><option value="">Select</option><option>House</option><option>Tour</option></select></div>
+            <div class="field"><label for="c-lens">Lens</label><input id="c-lens" data-k="lens"></div>
+            <div class="fixed">■ STANDING NOTE · PTZ is presets only, no live moves. Director has been told: <label style="display:inline;color:var(--ink2)"><input type="checkbox" data-k="ptztold" style="vertical-align:middle;accent-color:var(--pvw)"> yes</label></div>
+          </div>
+          <div class="saved" id="savedNote">Saves in this browser only.</div>
+        </div>
+
+        <h3>Plain text version</h3>
+<pre>SHOW / DATE: ______________   CALLER: ______________
+Mode: A House / B Tour deferred / C Tour shadowed
+My position: ________   Called as: ________
+Home: ______________________
+Secondary: _________________
+Safe camera tonight: ________   (Me? Y / N)
+Call style: Ready+Take / Take only
+Shot offers: Welcome / Quiet
+IMAG restrictions: _________________
+Walk ons / guests / B stage / pyro: ________
+Gear: House / Tour   Lens: ________
+PTZ: presets only, no live moves (director told? Y / N)</pre>
+      </div>
+    </section>
+
+    <!-- 04 SONG FLOW -->
+    <section class="panel" role="tabpanel" id="p-song" aria-labelledby="t-song" hidden>
+      <div class="inner">
+        <div class="kicker">Director and operator, side by side</div>
+        <h2>A typical song</h2>
+        <p class="lede">What the caller is going for in each section, and what the operator does so the shot is already there.</p>
+
+        <div class="tbl-wrap"><table>
+          <thead><tr><th style="width:16%">Section</th><th>Director is going for</th><th>Operator does</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Intro</strong></td><td>Orientation: artist reveal or band establish. On IMAG, keep any wide brief; the room already sees the stage</td><td>Safe camera locks home. Pit operators find their player before the downbeat. PTZ sits on its opening preset</td></tr>
+            <tr><td><strong>Verse</strong></td><td>Lead vocal on the safe camera, alternate angle for contrast, instruments as punctuation</td><td>On tally, hold. Off tally, offer a different frame size than the live shot</td></tr>
+            <tr><td><strong>Pre chorus</strong></td><td>Build anticipation: slow push, profile angle, composed musician detail</td><td>Set up the push start frame off tally so it runs clean the moment it is called</td></tr>
+            <tr><td><strong>Chorus</strong></td><td>Open up: lead close, alternate angle, band, crowd response if the tour allows it. Cut on lighting hits and big lyric moments</td><td>Be on your best frame of the song by the chorus downbeat. Do not start searching at the downbeat</td></tr>
+            <tr><td><strong>Solo</strong></td><td>The featured player owns the cut, long enough to show the idea develop. Reactions only if they support the solo</td><td>Your player? Frame before the first note. Not your player? Find a useful reaction and hold it ready</td></tr>
+            <tr><td><strong>Outro / applause</strong></td><td>Stay on lead through the last note and final gesture, then acknowledgment or room</td><td>Safe camera stays on lead through the button. Nobody leaves early to chase applause</td></tr>
+          </tbody>
+        </table></div>
+
+        <h3>Song sheet (caller)</h3>
+<pre>SONG: ______________________
+Lead vocal: Cam ___            Safe: Cam ___
+Feature instruments: Cam ___ / Cam ___
+Crowd / reaction: Cam ___      (tour allows crowd? Y / N)
+Planned solo(s): ______________________
+Guest / walk on cue: __________________
+Must capture lighting or scenic cue: __________________
+PTZ preset for this song: _____________
+End frame: ______________________</pre>
+      </div>
+    </section>
+
+    <!-- 05 DIRECTING -->
+    <section class="panel" role="tabpanel" id="p-dir" aria-labelledby="t-dir" hidden>
+      <div class="inner">
+        <div class="kicker">Director layer</div>
+        <h2>Calling the show</h2>
+        <p class="lede">A strong concert cut preserves the performance so viewers always understand who is playing and why it matters, then adds energy without making the camera work the subject.</p>
+
+        <h3>Core rules</h3>
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>Rule</th><th>In practice</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Protect a safe shot</strong></td><td>For IMAG, the safe shot is a <strong>lead vocal medium on FOH</strong>, not a stage wide. For a stream or record, add a wide safe as well. Do not take the safe camera tight unless the next two shots are composed</td></tr>
+            <tr><td><strong>Assign ownership</strong></td><td>One camera owns lead vocal, others own players. A camera helps another only when its own home is covered</td></tr>
+            <tr><td><strong>Cut on musical intent</strong></td><td>Phrase, lyric turn, fill, riff, entrance, lighting hit. Never mid action</td></tr>
+            <tr><td><strong>Build contrast</strong></td><td>Alternate size, angle, static and moving, performer and audience. No near identical close up to close up</td></tr>
+            <tr><td><strong>Hold shots</strong></td><td>Let performers move inside a stable frame</td></tr>
+            <tr><td><strong>Move selectively</strong></td><td>Push toward a chorus, pull out after a peak, moving camera for entrances and solos. Not every verse</td></tr>
+            <tr><td><strong>Call early</strong></td><td>Call the next source before the current shot becomes unusable. An early clean cut beats a late reaction</td></tr>
+          </tbody>
+        </table></div>
+
+        <h3>IMAG versus stream</h3>
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>Decision</th><th>IMAG (bowl walls)</th><th>Stream / record</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Safe shot</strong></td><td>Lead vocal medium</td><td>Stage wide plus lead medium</td></tr>
+            <tr><td><strong>Shot size bias</strong></td><td>Tight and medium; the room has the wide</td><td>Full range</td></tr>
+            <tr><td><strong>Crowd shots</strong></td><td>Sparing and tour approved</td><td>Proof of connection at choruses and applause</td></tr>
+            <tr><td><strong>Cut pace</strong></td><td>Slower; a lawn audience is reading faces</td><td>Can run faster on high energy material</td></tr>
+          </tbody>
+        </table></div>
+
+        <h3>Calling language</h3>
+        <div class="calls">
+          <div class="call"><div class="say">"Camera 2, lead tight. Ready 2… take 2."</div><div class="why">Standard ready and take</div></div>
+          <div class="call"><div class="say">"Camera 1, find guitar, medium."</div><div class="why">Assigns subject and size in one line</div></div>
+          <div class="call"><div class="say">"Camera 3, bass ready after this line."</div><div class="why">Gives the operator a musical landmark</div></div>
+          <div class="call"><div class="say">"Camera 1, build me a slow push on the solo."</div><div class="why">Move requested with its motivation</div></div>
+          <div class="call"><div class="say">"Two, you're safe. Stay on lead."</div><div class="why">Locks the FOH operator as recovery shot</div></div>
+          <div class="call"><div class="say">"PTZ, recall drums. Don't take."</div><div class="why">Separates recall from take so the move never airs</div></div>
+          <div class="call"><div class="say">"One, guitar low. Three, hold bass for the turnaround."</div><div class="why">Keeps both pit cameras off the lead in instrumentals</div></div>
+          <div class="call"><div class="say">"Camera 1, hold."</div><div class="why">Emergency: stop moving</div></div>
+          <div class="call"><div class="say">"All cameras, reset for next song."</div><div class="why">Everyone returns home</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 06 HOUSE PLOT -->
+    <section class="panel" role="tabpanel" id="p-plot" aria-labelledby="t-plot" hidden>
+      <div class="inner">
+        <div class="kicker">Venue layer · FMP bowl</div>
+        <h2>House camera plot</h2>
+        <p class="lede">Three manned URSA positions plus one PTZ, cut on the house switcher and shaded at the video position. Output feeds IMAG on the two stage flanking walls and four lawn delay walls, and the venue TVs when the broadcast feed is taken.</p>
+
+        <div class="grid">
+          <div class="card"><div class="umd"><span>Cam 1</span><span>Pit SC/SR</span></div><h4>Stage right player</h4><ul><li>URSA body</li><li>Home: guitar (standard plot)</li><li>Secondary: lead alternate angle</li></ul></div>
+          <div class="card live"><div class="umd"><span>Cam 2</span><span>FOH · Safe</span></div><h4>Lead vocal</h4><ul><li>URSA body, Fujinon broadcast lens, viewfinder</li><li>Home: lead medium</li><li>Secondary: lead tight, full body on thrust walks</li></ul></div>
+          <div class="card"><div class="umd"><span>Cam 3</span><span>Pit SL</span></div><h4>Stage left player</h4><ul><li>URSA body</li><li>Home: bass (standard plot)</li><li>Secondary: keys when featured, lead from SL</li></ul></div>
+          <div class="card"><div class="umd"><span>PTZ</span><span>Presets only</span></div><h4>Riser</h4><ul><li>Home: drums preset</li><li>Secondary: keys preset, band wide at intros</li><li>Never moved on air</li></ul></div>
+        </div>
+
+        <h3>Five piece band assignments</h3>
+        <p style="color:var(--ink2);margin-bottom:10px">Assumes guitar SR, bass SL, drums and keys on the upstage riser. Swap Cam 1 and Cam 3 duties if the stage plot is mirrored.</p>
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>Source</th><th>Home</th><th>Secondary</th><th>Avoid</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Cam 2 FOH</strong></td><td>Lead vocal medium (safe)</td><td>Lead tight on key lyrics, full body on walks</td><td>Leaving lead to chase a solo</td></tr>
+            <tr><td><strong>Cam 1 Pit SC/SR</strong></td><td>Guitar, low angle</td><td>Lead alternate angle for chorus contrast</td><td>Matching Cam 2's frame size on lead</td></tr>
+            <tr><td><strong>Cam 3 Pit SL</strong></td><td>Bass</td><td>Keys when featured, lead from SL</td><td>Shooting up into the drum riser</td></tr>
+            <tr><td><strong>PTZ</strong></td><td>Drums preset</td><td>Keys preset, band wide for intros and outros</td><td>Any on air move</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="callout amber">
+          <b>The trade off</b>
+          Four sources for five players means someone rides a preset. Drums and keys go to the PTZ because their positions do not move. The cost: no drum coverage while the PTZ is on a band wide, so call the wide at intros and outros only and keep drums as the resting preset.
+        </div>
+
+        <h3>When a tour adds positions</h3>
+        <p style="color:var(--ink2);margin-bottom:10px">Added cameras are still usually Local operated. Common adds and what each should own so nothing duplicates the house plot:</p>
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>Added position</th><th>Should own</th><th>Typical use</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Second FOH or side stage sticks</strong></td><td>Full body lead, second vocalist, or featured player</td><td>Alternate angle, body language, stage geography</td></tr>
+            <tr><td><strong>Additional robotic</strong></td><td>Drums or keys, freeing the house PTZ for a wide</td><td>Instrument punctuation, cover while another camera resets</td></tr>
+            <tr><td><strong>Handheld / shoulder in the pit</strong></td><td>Artist movement and solos</td><td>Entrances, chorus energy, artist to audience moments</td></tr>
+            <tr><td><strong>Roaming handheld</strong></td><td>Crowd, reverse, behind the band</td><td>Intros, outros, singalongs, applause</td></tr>
+            <tr><td><strong>High wide (stream or record only)</strong></td><td>Locked full stage safe</td><td>Openers, closers, lighting reveals, recovery</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+    </section>
+
+    <!-- 07 PRESHOW -->
+    <section class="panel" role="tabpanel" id="p-pre" aria-labelledby="t-pre" hidden>
+      <div class="inner">
+        <div class="kicker">Venue layer</div>
+        <h2>Preshow checklist</h2>
+        <p class="lede">Run under show lighting where possible, not only work lights. Checks save in this browser only.</p>
+
+        <div id="checks">
+          <div class="check"><input type="checkbox" data-c="plot" id="k1"><label for="k1"><div class="t">Get the stage plot and setlist</div><div class="how">Mark intros, solos, guests, walk ons, B stage, acoustic sections, and endings. Confirm which side guitar and bass are on so Cam 1 and Cam 3 homes are right.</div></label><div class="own">Caller</div></div>
+          <div class="check"><input type="checkbox" data-c="meet" id="k2"><label for="k2"><div class="t">Hold the camera meeting</div><div class="how">Run the seven questions in tab 03. Every operator fills a position card.</div></label><div class="own">Caller + ops</div></div>
+          <div class="check"><input type="checkbox" data-c="shade" id="k3"><label for="k3"><div class="t">Match the cameras</div><div class="how">Shade all three URSAs from the 4 camera shader at the video position. Confirm white balance and look match on a common subject.</div></label><div class="own">Head of Video</div></div>
+          <div class="check"><input type="checkbox" data-c="comms" id="k4"><label for="k4"><div class="t">Check tally and comms at every position</div><div class="how">Take each camera to program in turn and confirm the operator sees tally. Talk to each position on headset.</div></label><div class="own">Video</div></div>
+          <div class="check"><input type="checkbox" data-c="ptz" id="k5"><label for="k5"><div class="t">Verify PTZ presets</div><div class="how">With the PTZ off program, recall each preset from the controller. Confirm each lands framed and does not drift. Re store any that miss.</div></label><div class="own">Video</div></div>
+          <div class="check"><input type="checkbox" data-c="ptztell" id="k6"><label for="k6"><div class="t">Tell the director the PTZ is presets only</div><div class="how">It will not drive pan and tilt together cleanly when following a mark. No live moves.</div></label><div class="own">Video</div></div>
+          <div class="check"><input type="checkbox" data-c="led" id="k7"><label for="k7"><div class="t">Check LED wall scaling</div><div class="how">Put full frame program on the walls. Check edges and scaling on SR, SL, Lawn 1/2, and Lawn 3/4. A prior tour has altered scaling before.</div></label><div class="own">Video</div></div>
+          <div class="check"><input type="checkbox" data-c="cv" id="k8"><label for="k8"><div class="t">Agree ConcertVision takeover timing</div><div class="how">Taking the broadcast feed during the bowl blackout also blacks the venue TVs. Confirm blackout length with the tour and plan the switch for the last second.</div></label><div class="own">Head of Video</div></div>
+          <div class="check"><input type="checkbox" data-c="bounds" id="k9"><label for="k9"><div class="t">Walk pit boundaries and cable paths</div><div class="how">Confirm security lanes, performer no go zones, and whether any handheld may step on stage.</div></label><div class="own">Ops + security</div></div>
+          <div class="check"><input type="checkbox" data-c="imag" id="k10"><label for="k10"><div class="t">Confirm IMAG restrictions</div><div class="how">No shoot sides, crowd shot rules, restricted angles. Pass them to every operator card.</div></label><div class="own">Caller</div></div>
+        </div>
+        <div style="margin-top:12px"><button class="theme-btn" id="clearChecks" type="button">Reset checklist</button></div>
+      </div>
+    </section>
+
+    <!-- 08 FAILURE MODES -->
+    <section class="panel" role="tabpanel" id="p-fail" aria-labelledby="t-fail" hidden>
+      <div class="inner">
+        <div class="kicker">What goes wrong</div>
+        <h2>Failure modes</h2>
+        <p class="lede">Severity: Critical means on-air emergency; Visible means the audience sees it; Quality means the cut is weakened.</p>
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>Sev</th><th>Failure</th><th>What it causes</th><th>Prevention</th></tr></thead>
+          <tbody>
+            <tr><td>Critical</td><td><strong>Safe camera wanders</strong></td><td>Missed focus or blocked shot has no recovery</td><td>Name the safe camera at the meeting; that operator stays home</td></tr>
+            <tr><td>Critical</td><td><strong>PTZ moved on air</strong></td><td>Jerky, stair stepped move on every wall</td><td>Presets only, recall off program, director told</td></tr>
+            <tr><td>Visible</td><td><strong>Numbering mismatch with tour caller</strong></td><td>Wrong camera moves or takes</td><td>Question 1 at the meeting; write "called as" on the card</td></tr>
+            <tr><td>Visible</td><td><strong>IMAG restriction broken</strong></td><td>Artist complaint, tour notes after song one</td><td>Question 5; restrictions on every card</td></tr>
+            <tr><td>Visible</td><td><strong>Late cuts</strong></td><td>Solo or hit is over when the shot lands</td><td>Operators compose ahead; caller calls early</td></tr>
+            <tr><td>Visible</td><td><strong>ConcertVision taken at the wrong moment</strong></td><td>Venue TVs black early or show ads over the open</td><td>Agree blackout timing preshow</td></tr>
+            <tr><td>Quality</td><td><strong>Every camera on the singer</strong></td><td>No musical context, no reserve coverage</td><td>Homes assigned per player</td></tr>
+            <tr><td>Quality</td><td><strong>Frame matched to the live camera</strong></td><td>Jump cuts, no new information</td><td>Operators offer a different size or angle off tally</td></tr>
+            <tr><td>Quality</td><td><strong>Overused crowd shots</strong></td><td>Performance replaced with filler</td><td>Choruses, applause, transitions only, and tour approved</td></tr>
+            <tr><td>Quality</td><td><strong>Unplanned handheld movement</strong></td><td>Blocked sightlines, stage collisions</td><td>Boundaries walked preshow; one roaming camera at a time</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="callout pvw">
+          <b>The practical test</b>
+          Before calling any cut, name what the viewer learns from the next shot that the current one does not show. Before offering any shot, make sure it answers that question.
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+(function(){
+  var store = {
+    get: function(k){ try { return localStorage.getItem(k); } catch(e){ return null; } },
+    set: function(k,v){ try { localStorage.setItem(k,v); } catch(e){} },
+    del: function(k){ try { localStorage.removeItem(k); } catch(e){} }
+  };
+
+  // theme
+  var root = document.documentElement;
+  var saved = store.get('fmpcam-theme');
+  if (saved === 'light' || saved === 'dark') root.setAttribute('data-theme', saved);
+  document.getElementById('themeBtn').addEventListener('click', function(){
+    var cur = root.getAttribute('data-theme');
+    if (!cur) cur = 'light';
+    var next = cur === 'light' ? 'dark' : 'light';
+    root.setAttribute('data-theme', next);
+    store.set('fmpcam-theme', next);
+  });
+
+  // tabs
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('[role="tab"]'));
+  function select(tab, focus){
+    tabs.forEach(function(t){
+      var on = t === tab;
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+      t.tabIndex = on ? 0 : -1;
+      document.getElementById(t.getAttribute('aria-controls')).hidden = !on;
+    });
+    if (focus) tab.focus();
+    store.set('fmpcam-tab', tab.id);
+  }
+  tabs.forEach(function(t, i){
+    t.addEventListener('click', function(){ select(t, false); });
+    t.addEventListener('keydown', function(e){
+      var n = null;
+      if (e.key === 'ArrowRight') n = tabs[(i + 1) % tabs.length];
+      if (e.key === 'ArrowLeft') n = tabs[(i - 1 + tabs.length) % tabs.length];
+      if (e.key === 'Home') n = tabs[0];
+      if (e.key === 'End') n = tabs[tabs.length - 1];
+      if (n){ e.preventDefault(); select(n, true); }
+    });
+  });
+  var lastTab = document.getElementById(store.get('fmpcam-tab') || '');
+  if (lastTab) select(lastTab, false);
+
+  // operator card
+  var fields = document.querySelectorAll('#cardGrid [data-k]');
+  var card = {};
+  try { card = JSON.parse(store.get('fmpcam-card') || '{}') || {}; } catch(e){ card = {}; }
+  fields.forEach(function(f){
+    var k = f.getAttribute('data-k');
+    if (f.type === 'checkbox') f.checked = !!card[k]; else if (card[k] != null) f.value = card[k];
+    f.addEventListener('input', saveCard);
+    f.addEventListener('change', saveCard);
+  });
+  function saveCard(){
+    fields.forEach(function(f){
+      var k = f.getAttribute('data-k');
+      card[k] = f.type === 'checkbox' ? f.checked : f.value;
+    });
+    store.set('fmpcam-card', JSON.stringify(card));
+  }
+  document.getElementById('clearCard').addEventListener('click', function(){
+    fields.forEach(function(f){ if (f.type === 'checkbox') f.checked = false; else f.value = ''; });
+    card = {}; store.del('fmpcam-card');
+  });
+
+  // checklist
+  var checks = document.querySelectorAll('#checks [data-c]');
+  var cs = {};
+  try { cs = JSON.parse(store.get('fmpcam-checks') || '{}') || {}; } catch(e){ cs = {}; }
+  checks.forEach(function(c){
+    c.checked = !!cs[c.getAttribute('data-c')];
+    c.addEventListener('change', function(){
+      cs[c.getAttribute('data-c')] = c.checked;
+      store.set('fmpcam-checks', JSON.stringify(cs));
+    });
+  });
+  document.getElementById('clearChecks').addEventListener('click', function(){
+    checks.forEach(function(c){ c.checked = false; });
+    cs = {}; store.del('fmpcam-checks');
+  });
+})();
+</script>
+</body>
+</html>

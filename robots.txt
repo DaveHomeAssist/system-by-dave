@@ -16,6 +16,7 @@ Disallow: /html/sbd-brand.html
 Disallow: /cross-project-dashboard.html
 Disallow: /fmp-index/
 Disallow: /fmp/
+Disallow: /fmpwalk/
 Disallow: /wedding-ops.html
 Disallow: /afterbreak/
 Sitemap: https://systembydave.com/sitemap.xml

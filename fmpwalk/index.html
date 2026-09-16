@@ -1,0 +1,2142 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/style; img-src 'self' data: blob:; connect-src 'self' https://accounts.google.com https://gmail.googleapis.com https://openidconnect.googleapis.com https://fmp-walk-notion-6u2y7s4nzq-ue.a.run.app; frame-src https://accounts.google.com; object-src 'none'; base-uri 'self'; form-action 'none'">
+<meta name="color-scheme" content="dark light">
+<meta name="theme-color" content="#FFFFFF">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="FMP Walk">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>FMP Preshow Walk | System by Dave</title>
+<meta name="description" content="Local-first FMP preshow display walk, fault capture, evidence export, and optional reviewed delivery.">
+<link rel="canonical" href="https://systembydave.com/fmpwalk/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="System by Dave">
+<meta property="og:title" content="FMP Preshow Walk | System by Dave">
+<meta property="og:description" content="Walk the venue, capture faults, and explicitly export or send a reviewed report.">
+<meta property="og:url" content="https://systembydave.com/fmpwalk/">
+<meta name="twitter:card" content="summary">
+<style>
+/* ============================================================
+   FMP PRESHOW WALK. Offline walk capture; optional online Gmail delivery.
+   Night: the position, house lights down.
+   Day:   the plazas and the lot, before doors.
+   Status vocabulary is Dave's own: green / amber / red / blue.
+   ============================================================ */
+
+/* ---------- night tokens (default) ---------- */
+:root{
+  color-scheme:dark;
+  --bg:#0E1216;
+  --surface:#161C22;
+  --surface-2:#1E262E;
+  --surface-3:#27313A;
+  --line:#2C363F;
+  --line-soft:#222A31;
+  --text:#E6EDF3;
+  --muted:#8A99A8;
+  --dim:#5E6C79;
+
+  --accent:#F0A72E;
+  --accent-fill:#F0A72E;
+  --accent-on:#14100A;
+  --accent-line:#7A5514;
+
+  --green:#3FB984;
+  --yellow:#E8C547;
+  --red:#E5484D;
+  --blue:#5A9FD4;
+
+  --ok-bg:#153327;    --ok-fg:#3FB984;
+  --warn-bg:#2A2413;  --warn-fg:#E8C547;
+  --bad-bg:#361619;   --bad-fg:#FF8085;
+  --info-bg:#132330;  --info-fg:#5A9FD4;
+  --sev-crit-on:#FFFFFF;
+  --sev-deg-on:#191400;
+  --sev-cos-on:#08131C;
+  --pass-on:#061A10;
+  --flag-on:#240406;
+  --shadow:0 10px 34px rgba(0,0,0,.55);
+
+  --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --tap:52px;
+  --safe-b:env(safe-area-inset-bottom,0px);
+  --safe-t:env(safe-area-inset-top,0px);
+  --safe-l:env(safe-area-inset-left,0px);
+  --safe-r:env(safe-area-inset-right,0px);
+}
+
+/* ---------- day tokens ---------- */
+:root[data-theme="light"]{
+  color-scheme:light;
+  --bg:#F3F6F8;
+  --surface:#FFFFFF;
+  --surface-2:#EDF1F5;
+  --surface-3:#DEE5EB;
+  --line:#C6D0D9;
+  --line-soft:#E5EAEF;
+  --text:#0F171E;
+  --muted:#4A5866;
+  --dim:#71808D;
+
+  --accent:#8A5100;
+  --accent-fill:#F0A72E;
+  --accent-on:#231600;
+  --accent-line:#C08A2E;
+
+  --green:#0C7048;
+  --yellow:#7E6000;
+  --red:#BC1E24;
+  --blue:#175A90;
+
+  --ok-bg:#DCF2E7;    --ok-fg:#0A6340;
+  --warn-bg:#FAEFC9;  --warn-fg:#6E5300;
+  --bad-bg:#FBE1E2;   --bad-fg:#A2181E;
+  --info-bg:#DEECF8;  --info-fg:#134E80;
+  --sev-crit-on:#FFFFFF;
+  --sev-deg-on:#1A1400;
+  --sev-cos-on:#04121E;
+  --pass-on:#FFFFFF;
+  --flag-on:#FFFFFF;
+  --shadow:0 10px 30px rgba(15,35,55,.16);
+}
+
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;height:100%}
+body{
+  background:var(--bg);color:var(--text);font-family:var(--sans);
+  font-size:16px;line-height:1.45;overscroll-behavior-y:none;
+  -webkit-text-size-adjust:100%;touch-action:manipulation;
+  display:flex;flex-direction:column;
+}
+button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
+button{cursor:pointer;border:none;background:none;touch-action:manipulation}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+.skip-link{
+  position:fixed;left:12px;top:12px;z-index:100;padding:10px 14px;border-radius:7px;
+  background:var(--accent-fill);color:var(--accent-on);font-weight:700;
+  transform:translateY(-180%);transition:transform .15s;
+}
+.skip-link:focus{transform:translateY(0)}
+
+/* ---------- header ---------- */
+header{
+  position:sticky;top:0;z-index:40;background:var(--surface);
+  border-bottom:1px solid var(--line);
+  padding-top:var(--safe-t);padding-left:var(--safe-l);padding-right:var(--safe-r);
+}
+.hdr-top{display:flex;align-items:center;gap:10px;padding:10px 14px 8px}
+.hdr-home{display:inline-flex;align-items:center;min-height:44px;color:var(--accent);font:700 10px/1 var(--mono);letter-spacing:.08em;text-decoration:none;text-transform:uppercase}
+.hdr-mark{
+  margin:0;
+  font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--accent);
+  border:1px solid var(--accent-line);border-radius:3px;padding:3px 6px;white-space:nowrap;
+}
+.hdr-show{flex:1;min-width:0}
+.hdr-show b{display:block;font-size:15px;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hdr-show span{display:block;font-size:11.5px;color:var(--muted);font-family:var(--mono)}
+.hdr-count{font-family:var(--mono);font-size:12px;color:var(--muted);text-align:right;line-height:1.25}
+.hdr-count b{display:block;font-size:17px;color:var(--text)}
+.theme-btn{
+  width:44px;height:44px;border-radius:9px;border:1px solid var(--line);background:var(--surface-2);
+  display:flex;align-items:center;justify-content:center;font-size:19px;flex:0 0 auto;
+}
+@media (max-width:400px){ .hdr-mark{display:none} }
+
+/* ---------- signature: the meter-bridge status rail ---------- */
+.rail{display:flex;gap:2px;padding:0 14px 10px;height:26px;align-items:stretch;width:100%;max-width:100%;overflow:hidden}
+.rail-seg{
+  flex:1 1 0;width:0;min-width:0;border-radius:2px;background:var(--surface-3);
+  border-bottom:3px solid var(--dim);position:relative;
+}
+.rail-seg[data-s="pass"]{background:var(--ok-bg);border-bottom-color:var(--green)}
+.rail-seg[data-s="flag"]{background:var(--bad-bg);border-bottom-color:var(--red)}
+.rail-seg[data-s="skip"]{background:var(--warn-bg);border-bottom-color:var(--yellow)}
+.rail-seg.here{background:var(--accent-fill);border-bottom-color:var(--text)}
+.rail-lbl{display:flex;justify-content:space-between;gap:10px;padding:0 14px 8px;font-family:var(--mono);font-size:10.5px;color:var(--dim);letter-spacing:.06em}
+.rail-lbl span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#railR{flex:0 0 auto;color:var(--muted)}
+
+/* ---------- storage warning ---------- */
+.warnbar{
+  background:var(--bad-bg);border-top:1px solid var(--red);color:var(--bad-fg);
+  padding:9px 14px;font-size:12.5px;line-height:1.4;
+  padding-left:calc(14px + var(--safe-l));padding-right:calc(14px + var(--safe-r));
+}
+.warnbar b{color:var(--text)}
+
+/* ---------- main ---------- */
+main{
+  flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  padding:14px 14px 26px;padding-left:calc(14px + var(--safe-l));padding-right:calc(14px + var(--safe-r));
+}
+.panel{display:none}
+.panel.on{display:block}
+h2{font-size:19px;font-weight:680;margin:0 0 4px;letter-spacing:-.01em}
+h3{font-size:13px;font-weight:640;margin:22px 0 8px;color:var(--muted);letter-spacing:.02em}
+h3:first-child{margin-top:0}
+p.lede{margin:0 0 16px;color:var(--muted);font-size:14px}
+
+/* ---------- cards ---------- */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:12px}
+.card.tight{padding:11px 13px}
+.card-hd{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px}
+.card-hd h4{margin:0;font-size:17px;font-weight:650;flex:1;letter-spacing:-.01em}
+.tag{
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;padding:3px 7px;
+  border-radius:3px;background:var(--surface-3);color:var(--muted);white-space:nowrap;
+}
+.tag.a{background:var(--info-bg);color:var(--info-fg)}
+.tag.c{background:var(--warn-bg);color:var(--warn-fg)}
+.tag.b{background:var(--ok-bg);color:var(--ok-fg)}
+
+.spec{display:flex;flex-wrap:wrap;gap:5px 14px;font-family:var(--mono);font-size:11.5px;color:var(--dim);margin-bottom:12px}
+.spec b{color:var(--muted);font-weight:500}
+.spec i{font-style:normal;color:var(--text)}
+
+/* ---------- pass / flag ---------- */
+.pf{display:flex;gap:9px}
+.pf button{
+  flex:1;min-height:var(--tap);border-radius:8px;font-weight:650;font-size:15px;
+  border:1.5px solid var(--line);background:var(--surface-2);color:var(--muted);
+  display:flex;align-items:center;justify-content:center;gap:7px;transition:background .12s,border-color .12s,color .12s;
+}
+.pf button.p{background:var(--ok-bg);border-color:var(--green);color:var(--ok-fg)}
+.pf button.f{background:var(--bad-bg);border-color:var(--red);color:var(--bad-fg)}
+.pf button.p.on{background:var(--green);color:var(--pass-on)}
+.pf button.f.on{background:var(--red);color:var(--flag-on)}
+.pf button.s{flex:0 0 70px;font-size:13px}
+.pf button.s.on{background:var(--warn-bg);border-color:var(--yellow);color:var(--warn-fg)}
+
+/* ---------- fields ---------- */
+.rd{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:12px 0 2px}
+.rd label{display:block;font-size:11px;color:var(--muted);margin-bottom:4px;font-weight:560}
+.rd input,.fld input,.fld select,.fld textarea{
+  width:100%;min-height:46px;background:var(--surface-2);border:1px solid var(--line);
+  border-radius:7px;padding:10px 11px;color:var(--text);
+}
+.rd input{font-family:var(--mono)}
+.rd .base{font-family:var(--mono);font-size:10.5px;color:var(--dim);margin-top:4px;display:block}
+.fld{margin-bottom:12px}
+.fld label{display:block;font-size:11.5px;color:var(--muted);margin-bottom:5px;font-weight:560}
+.choice-group{border:0;padding:0;margin:0 0 12px;min-width:0}
+.choice-group legend{display:block;font-size:11.5px;color:var(--muted);margin-bottom:5px;font-weight:560;padding:0}
+.fld textarea{min-height:76px;resize:vertical;line-height:1.4}
+.email-card fieldset{border:0;padding:0;margin:0;min-width:0}
+.email-card button{min-height:var(--tap)}
+.email-card button:disabled{opacity:.55;cursor:not-allowed}
+.email-card button:not(:disabled):hover{border-color:var(--accent)}
+.email-card .email-pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.email-card .note,.email-card .mini{overflow-wrap:anywhere}
+.email-card summary{cursor:pointer;padding:12px 0;color:var(--muted)}
+.email-card a{color:var(--accent);text-underline-offset:3px}
+.photo-label{display:block;font-weight:700}
+.photo-label input{display:block;margin:8px 0;max-width:100%;font-size:14px}
+.photo-label input::file-selector-button{min-height:44px;padding:8px 12px;margin-right:10px;background:var(--surface-2);color:var(--text);border:1px solid var(--line);border-radius:6px;font:inherit;cursor:pointer}
+.photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;margin-top:12px}
+.photo-card{min-width:0;border:1px solid var(--line);border-radius:8px;padding:10px}
+.photo-card img{width:100%;height:150px;object-fit:contain;display:block;margin-bottom:8px;background:var(--bg)}
+.photo-card a{display:block;overflow-wrap:anywhere;color:var(--accent);text-underline-offset:3px}
+.photo-card button{min-height:44px;width:100%}
+@media(max-width:520px){.email-card .email-pair{grid-template-columns:1fr;gap:0}}
+.notefld{margin-top:14px}
+.notefld label{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--muted);margin-bottom:5px;font-weight:560}
+.notefld textarea{
+  width:100%;min-height:58px;resize:vertical;line-height:1.4;
+  background:var(--surface-2);border:1px solid var(--line);border-radius:7px;padding:10px 11px;color:var(--text);
+}
+.notefld textarea:not(:placeholder-shown){border-color:var(--accent-line)}
+select{appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);background-position:calc(100% - 17px) 21px,calc(100% - 12px) 21px;background-size:5px 5px;background-repeat:no-repeat}
+
+/* ---------- chips ---------- */
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{
+  min-height:40px;padding:8px 12px;border-radius:6px;font-size:13.5px;font-weight:550;
+  background:var(--surface-2);border:1px solid var(--line);color:var(--muted);
+}
+.chip.on{background:var(--accent-fill);border-color:var(--accent-fill);color:var(--accent-on);font-weight:660}
+.zone-chips{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.zone-chip{min-height:66px;text-align:left;display:flex;flex-direction:column;justify-content:center;gap:4px;overflow-wrap:anywhere}
+.zone-chip small{font-size:11px;font-weight:450}
+.zone-chip[aria-pressed="mixed"]{border-color:var(--accent);border-style:dashed;color:var(--text)}
+.zone-state{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:650;margin-bottom:3px}
+.zone-switch{display:inline-block;position:relative;width:36px;height:20px;border:1.5px solid currentColor;border-radius:20px}
+.zone-switch::after{content:"";position:absolute;width:12px;height:12px;top:2.5px;left:3px;border-radius:50%;background:currentColor}
+.zone-chip[aria-pressed="true"] .zone-switch::after{left:18px}
+.zone-chip[aria-pressed="mixed"] .zone-switch::after{left:10px;border-radius:2px;height:4px;top:6.5px}
+.zone-summary{margin-top:10px}
+.route-total{font-size:20px;font-weight:700;color:var(--text);line-height:1.3;margin-bottom:8px}
+.zone-instruction{font-size:13px;color:var(--muted);margin:0 0 14px}
+.visual-checklist{border:1px solid var(--line);border-radius:8px;margin:14px 0;padding:10px 12px;min-width:0}
+.visual-checklist legend{font-size:15px;font-weight:650;padding:0 5px}
+.visual-checklist label{display:flex;gap:10px;align-items:center;min-height:44px;padding:7px 0;font-size:14px;cursor:pointer}
+.visual-checklist input{flex:0 0 21px;width:21px;height:21px;margin:0;accent-color:var(--green)}
+.visual-checklist label:has(input:checked){color:var(--ok-fg)}
+.checklist-progress{font-size:12px;color:var(--muted);margin-bottom:6px}
+.checklist-help{font-size:12px;color:var(--muted);margin:7px 0 0}
+.walk-zone{color:var(--muted);font-size:12px;margin-bottom:10px}
+@media(max-width:360px){.zone-chips{grid-template-columns:1fr}}
+.chip.sev.on[data-v="crit"]{background:var(--red);border-color:var(--red);color:var(--sev-crit-on)}
+.chip.sev.on[data-v="deg"]{background:var(--yellow);border-color:var(--yellow);color:var(--sev-deg-on)}
+.chip.sev.on[data-v="cos"]{background:var(--blue);border-color:var(--blue);color:var(--sev-cos-on)}
+
+/* ---------- notes ---------- */
+.note{
+  border-left:3px solid var(--line);background:var(--surface);padding:10px 12px;
+  border-radius:0 7px 7px 0;font-size:13px;color:var(--muted);margin:12px 0;line-height:1.45;
+}
+.note b{color:var(--text);font-weight:620}
+.note.warn{border-left-color:var(--yellow);background:var(--warn-bg);color:var(--warn-fg)}
+.note.crit{border-left-color:var(--red);background:var(--bad-bg);color:var(--bad-fg)}
+.note.info{border-left-color:var(--blue);background:var(--info-bg);color:var(--info-fg)}
+.note.warn b,.note.crit b,.note.info b{color:var(--text)}
+
+/* ---------- resume banner ---------- */
+.resume{
+  background:var(--warn-bg);border:1px solid var(--yellow);border-radius:10px;
+  padding:13px;margin-bottom:12px;color:var(--warn-fg);font-size:13.5px;line-height:1.45;
+}
+.resume b{color:var(--text);display:block;margin-bottom:6px;font-size:15px}
+.resume .btnrow{margin:11px 0 0}
+
+/* ---------- step nav ---------- */
+.stepnav{display:flex;gap:9px;margin-top:16px}
+.stepnav button{
+  min-height:var(--tap);border-radius:8px;font-weight:620;font-size:15px;
+  background:var(--surface-2);border:1px solid var(--line);color:var(--text);
+  display:flex;align-items:center;justify-content:center;
+}
+.stepnav .prev{flex:0 0 82px;color:var(--muted)}
+.stepnav .next{flex:1;background:var(--accent-fill);border-color:var(--accent-fill);color:var(--accent-on)}
+.stepnav .next-preview{min-width:0;padding:10px 14px;flex-direction:column;gap:2px;overflow-wrap:anywhere}
+.next-preview small{font-size:11px;font-weight:500}
+.stepnav button[disabled]{opacity:.35;pointer-events:none}
+
+/* ---------- route list, the tablet left pane ---------- */
+#routeList{display:none}
+.rt{
+  width:100%;display:flex;align-items:center;gap:9px;padding:10px 11px;
+  border:1px solid transparent;border-radius:8px;text-align:left;color:var(--muted);
+  font-size:13.5px;line-height:1.3;margin-bottom:3px;
+}
+.rt .dot{flex:0 0 9px;height:9px;border-radius:50%;background:var(--surface-3);border:1px solid var(--dim)}
+.rt[data-s="pass"] .dot{background:var(--green);border-color:var(--green)}
+.rt[data-s="flag"] .dot{background:var(--red);border-color:var(--red)}
+.rt[data-s="skip"] .dot{background:var(--yellow);border-color:var(--yellow)}
+.rt .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rt .pen{color:var(--accent);font-size:12px;flex:0 0 auto}
+.rt .en{font-family:var(--mono);font-size:10px;color:var(--dim);flex:0 0 auto}
+.rt.here{background:var(--surface);border-color:var(--accent-line);color:var(--text);font-weight:620}
+.rt-hd{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;color:var(--dim);padding:0 11px 7px}
+.rt-zone{font-size:11.5px;font-weight:650;color:var(--muted);padding:15px 11px 6px;margin:0}
+
+/* ---------- tickets ---------- */
+.tk{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--dim);border-radius:0 9px 9px 0;padding:12px 13px;margin-bottom:10px}
+.tk[data-sev="crit"]{border-left-color:var(--red)}
+.tk[data-sev="deg"]{border-left-color:var(--yellow)}
+.tk[data-sev="cos"]{border-left-color:var(--blue)}
+.tk-hd{display:flex;gap:9px;align-items:baseline;margin-bottom:5px}
+.tk-hd b{flex:1;font-size:15px;font-weight:640}
+.tk-id{font-family:var(--mono);font-size:10.5px;color:var(--dim)}
+.tk-sym{font-size:13px;color:var(--muted);margin-bottom:7px}
+.tk-ft{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-family:var(--mono);font-size:10.5px;color:var(--dim)}
+.tk-ft .route{background:var(--surface-3);padding:2px 6px;border-radius:3px;color:var(--muted)}
+.tk-del{margin-left:auto;color:var(--red);font-size:12px;padding:6px 8px;font-family:var(--sans)}
+.repeat{background:var(--bad-bg);color:var(--bad-fg);padding:2px 6px;border-radius:3px;font-weight:600}
+
+/* ---------- tables ---------- */
+table{width:100%;border-collapse:collapse;font-size:13px;margin:10px 0}
+th{text-align:left;font-weight:600;color:var(--muted);font-size:11px;padding:6px 8px;border-bottom:1px solid var(--line)}
+td{padding:8px;border-bottom:1px solid var(--line-soft);vertical-align:top}
+td.m{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+
+/* ---------- camera kit strike ---------- */
+.kit-hero{
+  position:relative;overflow:hidden;background:var(--surface);border:1px solid var(--line);
+  border-radius:12px;padding:18px;margin-bottom:14px;
+}
+.kit-hero::after{
+  content:"";position:absolute;right:-54px;top:-76px;width:180px;height:180px;border-radius:50%;
+  border:30px solid var(--accent-line);opacity:.2;pointer-events:none;
+}
+.kit-kicker{
+  position:relative;z-index:1;font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;
+  color:var(--accent);text-transform:uppercase;margin-bottom:8px;
+}
+.kit-hero h2{position:relative;z-index:1;font-size:clamp(25px,5vw,38px);line-height:1.08;margin-bottom:8px;max-width:620px}
+.kit-hero .lede{position:relative;z-index:1;max-width:680px;margin-bottom:0}
+.kit-rule{
+  display:flex;align-items:flex-start;gap:11px;background:var(--warn-bg);border:1px solid var(--yellow);
+  border-radius:10px;padding:12px 13px;margin-bottom:18px;color:var(--warn-fg);font-size:13.5px;
+}
+.kit-rule-mark{
+  flex:0 0 auto;font-family:var(--mono);font-weight:800;font-size:11px;letter-spacing:.08em;
+  border:1px solid currentColor;border-radius:4px;padding:3px 6px;margin-top:1px;
+}
+.kit-rule b{color:var(--text)}
+.kit-block{margin:0 0 20px}
+.kit-block-hd{display:flex;align-items:end;justify-content:space-between;gap:12px;margin-bottom:9px}
+.kit-block-hd h3{margin:0;color:var(--text);font-size:16px;letter-spacing:0}
+.kit-block-hd span{font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase}
+.kit-steps{list-style:none;padding:0;margin:0;border:1px solid var(--line);border-radius:11px;overflow:hidden;background:var(--surface)}
+.kit-steps li{display:grid;grid-template-columns:45px minmax(0,1fr);border-bottom:1px solid var(--line-soft);min-width:0}
+.kit-steps li:last-child{border-bottom:0}
+.kit-num{
+  display:flex;align-items:flex-start;justify-content:center;padding-top:16px;background:var(--surface-2);
+  border-right:1px solid var(--line-soft);font-family:var(--mono);font-size:12px;font-weight:700;color:var(--accent);
+}
+.kit-step{padding:13px 14px 14px;min-width:0}
+.kit-step-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.kit-step h4{margin:0;font-size:15px;font-weight:680;line-height:1.35}
+.kit-step p{margin:5px 0 0;color:var(--muted);font-size:13px;line-height:1.5}
+.kit-tag{
+  flex:0 0 auto;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--warn-fg);background:var(--warn-bg);border:1px solid var(--yellow);
+  border-radius:4px;padding:3px 6px;white-space:nowrap;
+}
+.kit-check{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-top:10px;
+  font-family:var(--mono);font-size:10.5px;color:var(--muted);
+}
+.kit-check span{background:var(--surface-2);border:1px solid var(--line);border-radius:6px;padding:8px 9px}
+@media(max-width:520px){
+  .kit-hero{padding:16px}
+  .kit-step-top{display:block}
+  .kit-tag{display:inline-block;margin-top:7px}
+  .kit-check{grid-template-columns:1fr}
+}
+
+/* ---------- report ---------- */
+pre.out{
+  background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:13px;
+  font-family:var(--mono);font-size:11px;line-height:1.5;white-space:pre-wrap;word-break:break-word;
+  max-height:46vh;overflow-y:auto;color:var(--muted);margin:0 0 12px;
+}
+.btnrow{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:12px}
+.btnrow button{
+  flex:1;min-width:120px;min-height:var(--tap);border-radius:8px;font-weight:620;
+  background:var(--surface-2);border:1px solid var(--line);color:var(--text);
+}
+.btnrow button.pri{background:var(--accent-fill);border-color:var(--accent-fill);color:var(--accent-on)}
+.btnrow button.dgr{color:var(--red);border-color:var(--red)}
+.btnrow button.sm{min-height:44px;font-size:14px}
+.launch-link{
+  display:inline-flex;align-items:center;justify-content:center;min-height:var(--tap);padding:0 18px;
+  border-radius:8px;background:var(--accent-fill);color:var(--accent-on);font-weight:700;text-decoration:none;
+}
+
+/* ---------- nav ---------- */
+nav{
+  display:flex;background:var(--surface);border-top:1px solid var(--line);
+  padding-bottom:var(--safe-b);padding-left:var(--safe-l);padding-right:var(--safe-r);
+  position:sticky;bottom:0;z-index:40;
+}
+nav button{
+  flex:1;padding:9px 2px 10px;display:flex;flex-direction:column;align-items:center;gap:3px;
+  color:var(--dim);font-size:10.5px;font-weight:560;min-height:var(--tap);position:relative;
+}
+nav button .ic{font-size:19px;line-height:1}
+nav button.on{color:var(--accent)}
+nav button.on::before{content:"";position:absolute;top:0;left:22%;right:22%;height:2px;background:var(--accent)}
+nav .badge{
+  position:absolute;top:5px;right:calc(50% - 22px);background:var(--red);color:#fff;
+  font-family:var(--mono);font-size:9.5px;min-width:16px;height:16px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;padding:0 4px;font-weight:700;
+}
+
+/* ---------- fault sheet ---------- */
+.sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:60;display:none}
+:root[data-theme="light"] .sheet-bg{background:rgba(20,35,50,.42)}
+.sheet-bg.on{display:block}
+.sheet{
+  position:fixed;left:0;right:0;bottom:0;z-index:61;background:var(--bg);
+  border-top:1px solid var(--line);border-radius:15px 15px 0 0;
+  max-height:92vh;overflow-y:auto;padding:0 14px calc(18px + var(--safe-b));display:none;
+}
+.sheet.on{display:block}
+.sheet-hd{
+  position:sticky;top:0;background:var(--bg);padding:13px 0 11px;margin-bottom:4px;
+  border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;z-index:2;
+}
+.sheet-hd h3{margin:0;font-size:16px;color:var(--text);flex:1}
+.sheet-hd button{color:var(--muted);font-size:14px;padding:8px 10px;font-weight:600}
+.grab{width:36px;height:4px;background:var(--line);border-radius:2px;margin:8px auto 0}
+
+.mini{font-size:11.5px;color:var(--dim);margin-top:6px;line-height:1.4}
+.hide{display:none!important}
+.k{font-family:var(--mono);font-size:12px;background:var(--surface-3);padding:1px 5px;border-radius:3px;color:var(--muted)}
+.empty{text-align:center;color:var(--dim);padding:40px 20px;font-size:14px;line-height:1.6}
+.empty .big{font-size:32px;display:block;margin-bottom:10px}
+.toast{
+  position:fixed;left:50%;transform:translateX(-50%);bottom:calc(78px + var(--safe-b));
+  background:var(--surface-3);border:1px solid var(--line);color:var(--text);
+  padding:11px 17px;border-radius:8px;font-size:13.5px;font-weight:560;z-index:80;
+  opacity:0;pointer-events:none;transition:opacity .2s;box-shadow:var(--shadow);
+}
+.toast.on{opacity:1}
+kbd{
+  font-family:var(--mono);font-size:11px;background:var(--surface-3);border:1px solid var(--line);
+  border-bottom-width:2px;border-radius:4px;padding:1px 6px;color:var(--text);
+}
+
+@media (hover:hover) and (pointer:fine){
+  .chip:hover,.pf button:hover,.stepnav button:hover,.btnrow button:hover,.theme-btn:hover{filter:brightness(1.09)}
+  .rt:hover{background:var(--surface-2);color:var(--text)}
+  nav button:hover{color:var(--muted)}
+}
+
+/* ============================================================
+   TABLET. iPad portrait is 744 to 1024 depending on model, so the
+   side rail engages at 760. Split View reports the pane width, so a
+   narrow split correctly falls back to the phone layout.
+   ============================================================ */
+@media (min-width:760px){
+  body{display:grid;grid-template-columns:96px 1fr;grid-template-rows:auto 1fr;height:100dvh}
+  header{grid-column:1/-1;grid-row:1}
+  nav{
+    grid-column:1;grid-row:2;flex-direction:column;align-content:start;
+    border-top:none;border-right:1px solid var(--line);position:static;
+    padding:10px 6px calc(10px + var(--safe-b)) calc(6px + var(--safe-l));gap:4px;
+  }
+  nav button{flex:0 0 auto;border-radius:9px;padding:12px 4px;font-size:11px;gap:5px}
+  nav button.on{background:var(--surface-2)}
+  nav button.on::before{top:14px;bottom:14px;left:0;right:auto;width:2px;height:auto}
+  nav .badge{top:7px;right:14px}
+  main{grid-column:2;grid-row:2;padding:20px 24px 40px;padding-right:calc(24px + var(--safe-r))}
+  .hdr-top{padding:12px 22px 9px;padding-left:calc(22px + var(--safe-l))}
+  .rail{padding:0 22px 11px;padding-left:calc(22px + var(--safe-l))}
+  .rail-lbl{padding:0 22px 9px;padding-left:calc(22px + var(--safe-l))}
+  .hdr-show b{font-size:16.5px}
+  .theme-btn{width:46px;height:46px}
+  .toast{bottom:32px}
+
+  .sheet{
+    left:50%;right:auto;bottom:auto;top:50%;transform:translate(-50%,-50%);
+    width:min(620px,92vw);max-height:86vh;border-radius:14px;
+    border:1px solid var(--line);box-shadow:var(--shadow);padding:0 20px 20px;
+  }
+  .grab{display:none}
+  .sheet-hd{padding:16px 0 12px}
+}
+
+/* ---------- iPad landscape and 12.9 portrait: two-pane walk ---------- */
+@media (min-width:1000px){
+  body{font-size:17px}
+  main{padding:24px 28px 48px}
+  .panel.on{max-width:1180px}
+  #p-walk.on{display:grid;grid-template-columns:290px minmax(0,1fr);gap:22px;align-items:start;max-width:1180px}
+  #routeList{
+    display:block;background:var(--surface-2);border:1px solid var(--line);
+    border-radius:11px;padding:12px 6px;position:sticky;top:0;
+    max-height:calc(100dvh - 190px);overflow-y:auto;
+  }
+  /* the route list supersedes the position name, but the save state stays useful */
+  #railL{display:none}
+  .rail-lbl{justify-content:flex-end}
+  #p-setup.on,#p-ref.on{column-count:2;column-gap:26px}
+  #p-setup.on>*,#p-ref.on>*{break-inside:avoid}
+  #p-setup.on>h3{break-after:avoid}
+  #p-setup.on>h2,#p-setup.on>p.lede,#p-ref.on>h2{column-span:all}
+  #p-cam.on{max-width:860px}
+  #tkList{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start}
+  #tkList .tk{margin-bottom:0}
+  pre.out{max-height:52vh;font-size:12px}
+  .btnrow button{flex:0 1 auto;min-width:170px}
+  .rd{grid-template-columns:1fr 1fr 1fr}
+}
+
+@media (min-width:1280px){
+  #p-walk.on{grid-template-columns:320px minmax(0,1fr)}
+  #tkList{grid-template-columns:1fr 1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<a class="skip-link" id="skipLink" href="#main-content">Skip to main content</a>
+
+<header>
+  <div class="hdr-top">
+    <a class="hdr-home" href="https://systembydave.com/fmp/" aria-label="Return to FMP Video Operations">FMP&nbsp;VIDEO</a>
+    <div class="hdr-show"><b id="hShow">No show set</b><span id="hMeta">Open Setup to begin</span></div>
+    <div class="hdr-count"><b id="hDone">0</b><span id="hTot">of 0</span></div>
+    <button class="theme-btn" id="themeBtn" title="Auto, day, night" aria-label="Change display mode">AUTO</button>
+  </div>
+  <div class="rail" id="rail"></div>
+  <div class="rail-lbl"><span id="railL">No walk started</span><span id="railR"></span></div>
+  <div class="warnbar hide" id="storageWarn" role="alert">
+    🔴 <b>This copy cannot save.</b> The browser is blocking storage, so nothing survives a reload or a swipe away.
+    Export the report before you leave this screen. To fix it, open the file from Files, share it to Safari, then Add to Home Screen.
+  </div>
+</header>
+
+<main id="main-content" tabindex="-1">
+
+<!-- ══════════════ SETUP ══════════════ -->
+<section class="panel" id="p-setup">
+  <h2>Set up tonight's walk</h2>
+  <p class="lede">Takes about thirty seconds. Everything after this is one tap per position.</p>
+
+  <div class="card">
+    <div class="card-hd"><h4>Camera operators</h4></div>
+    <p class="mini">Open a position-specific check-in, build, fault, and checkout record. No Notion write happens without an explicit confirmation.</p>
+    <a class="launch-link" href="./camera/">Open camera operations</a>
+  </div>
+
+  <div class="card">
+    <div class="fld"><label for="fDate">Show date</label><input type="date" id="fDate"></div>
+    <div class="fld"><label for="fShow">Artist or event</label><input type="text" id="fShow" placeholder="e.g. Mt. Joy" autocomplete="off"></div>
+    <div class="fld">
+      <label for="fOp">Walked by</label>
+      <select id="fOp">
+        <option value="">Choose a name</option>
+        <option value="David">David</option>
+        <option value="Charlie">Charlie</option>
+        <option value="John">John</option>
+        <option value="custom">Custom</option>
+      </select>
+    </div>
+    <div class="fld hide" id="customOpField"><label for="fOpCustom">Custom name</label><input type="text" id="fOpCustom" placeholder="Enter a name" autocomplete="off"></div>
+    <div class="fld">
+      <label for="fCfg">Rig configuration</label>
+      <select id="fCfg">
+        <option value="summer">Summer - Full Venue</option>
+        <option value="winter">Winter - Indoor Seating Only</option>
+      </select>
+      <div class="mini">🟢 Oct 15 2026 is the last night the summer rig exists. 🔴 What winter does to the 4 lawn delay walls and 14 lawn TVs is unverified. Ask Charlie before changeover.</div>
+    </div>
+  </div>
+
+  <h3>Display mode</h3>
+  <div class="card tight">
+    <div class="chips" id="themeChips">
+      <button type="button" class="chip" data-t="auto" aria-pressed="false">🌗 Auto</button>
+      <button type="button" class="chip" data-t="light" aria-pressed="false">☀️ Day</button>
+      <button type="button" class="chip" data-t="dark" aria-pressed="false">🌙 Night</button>
+    </div>
+    <div class="mini" style="margin-top:10px">🔵 <b>Day</b> for the plazas and the lot before doors, where a dark screen is unreadable in sun. <b>Night</b> for the position once house lights are down and you need to keep your eyes. <b>Auto</b> follows the tablet.</div>
+  </div>
+
+  <h3 id="zoneHeading">Zones to walk</h3>
+  <div class="card tight">
+    <div class="route-total" id="zoneSummary" role="status"></div>
+    <p class="zone-instruction" id="zoneHelp">Tap an optional zone to turn it on or off. <b>On</b> adds it to the walk; <b>Off</b> leaves it out. Tier 2 checks are <b>Required</b> on every walk.</p>
+    <div class="zone-chips" id="secChips" role="group" aria-labelledby="zoneHeading" aria-describedby="zoneHelp"></div>
+    <div class="mini zone-summary">Checks in each area stay together. Counts are checks, not screens; the 2 spectaculars have 4 controller checks. Saved readings stay here when a zone is turned off.</div>
+  </div>
+
+  <div class="stepnav"><button class="next" id="btnStart">Start walk</button></div>
+</section>
+
+<!-- ══════════════ WALK ══════════════ -->
+<section class="panel" id="p-walk">
+  <div id="routeList"></div>
+  <div id="walkBody"></div>
+</section>
+
+<!-- ══════════════ TICKETS ══════════════ -->
+<section class="panel" id="p-tk">
+  <h2>Fault tickets</h2>
+  <p class="lede" id="tkLede">Nothing flagged yet.</p>
+  <div class="btnrow"><button id="btnAddFree">Log a fault not on the walk</button></div>
+  <div id="tkList"></div>
+</section>
+
+<!-- ══════════════ REPORT ══════════════ -->
+<section class="panel" id="p-rep">
+  <h2>Report</h2>
+  <p class="lede">Send a report snapshot by Gmail or download it for your personal records.</p>
+  <div class="btnrow">
+    <button class="pri" id="btnCopy">Copy report</button>
+    <button id="btnDl">Download .md</button>
+    <button id="btnJson">Export walk as JSON</button>
+  </div>
+  <p class="note info hide" id="exportStatus" role="alert" aria-live="assertive" aria-atomic="true"></p>
+  <section class="card" aria-labelledby="photosTitle">
+    <h3 id="photosTitle">Report photos</h3>
+    <p class="mini">Add general photos here, or attach photos to a fault under Faults → Edit. Images stay in this browser until you download or send them. Confirm venue permission before photographing.</p>
+    <div id="reportPhotos">Loading photo controls…</div>
+    <p class="mini" id="faultPhotoSummary"></p>
+    <p class="mini">Export walk as JSON includes the actual images. Browser data can be cleared or evicted; download a copy before starting another walk.</p>
+  </section>
+  <section class="card email-card" aria-labelledby="emailTitle">
+    <h3 id="emailTitle">Email this report</h3>
+    <p class="mini">From <b>avbydave@gmail.com</b>. Includes the report text, a Markdown file, a JSON snapshot, and saved photo attachments. Requires internet and your Google permission; nothing sends automatically.</p>
+    <fieldset id="emailFields" aria-label="Email recipients">
+      <div class="fld"><label for="emailPreset">Saved recipient list</label><select id="emailPreset"></select></div>
+      <div class="fld"><label for="emailTo">To</label><input id="emailTo" type="text" inputmode="email" autocomplete="off" spellcheck="false" aria-describedby="emailAddressHint"></div>
+      <div class="email-pair">
+        <div class="fld"><label for="emailCc">CC (optional)</label><input id="emailCc" type="text" inputmode="email" autocomplete="off" spellcheck="false"></div>
+        <div class="fld"><label for="emailBcc">BCC (optional)</label><input id="emailBcc" type="text" inputmode="email" autocomplete="off" spellcheck="false"></div>
+      </div>
+      <p class="mini" id="emailAddressHint">Separate addresses with commas or semicolons. Lists stay in this browser; they do not sync to Notion.</p>
+      <details><summary>Save these recipients as a list</summary>
+        <div class="fld"><label for="emailListName">List name</label><input id="emailListName" type="text" maxlength="60" value="Personal copy"></div>
+        <div class="btnrow"><button type="button" id="emailSaveList">Save recipient list</button></div>
+      </details>
+    </fieldset>
+    <div class="btnrow">
+      <button type="button" id="emailConnect">Connect Gmail</button>
+      <button type="button" class="pri" id="emailSend" disabled>Send report</button>
+      <button type="button" id="emailDisconnect" hidden>Disconnect this tab</button>
+    </div>
+    <p class="note info" id="emailStatus" role="status" aria-live="polite" aria-atomic="true">Loading email controls. Downloads remain available if email is unavailable.</p>
+    <details><summary>Google sign-in help</summary>
+      <p class="mini">If the Google popup says <b>401 invalid_client / no registered origin</b>, open the FMP Walk web client in Google Cloud and add <code>https://systembydave.com</code> under <b>Authorized JavaScript origins</b> (no /fmpwalk path), then Save. This is a client setting, not a billing issue.</p>
+      <p class="mini">If sign-in cannot load, retry once. If it still fails, open this site in Safari or Chrome and allow Google sign-in scripts and popups. Walks and photos are stored separately in each browser; export before switching. No email is sent by connecting.</p>
+    </details>
+    <p class="mini" id="emailReceipt"></p>
+    <div class="btnrow"><button type="button" id="emailRetry" hidden>Allow another send of this report</button></div>
+    <p class="mini"><a href="https://mail.google.com/mail/u/?authuser=avbydave%40gmail.com#sent" target="_blank" rel="noopener noreferrer">Open Gmail Sent</a> to check a submission. Gmail acceptance is not proof of delivery to every recipient.</p>
+  </section>
+  <section class="card" aria-labelledby="notionTitle">
+    <h3 id="notionTitle">Personal Notion record</h3>
+    <p class="mini">Save a reviewed snapshot, its files, and linked fault observations to FMP Walk Records. This is your personal record, not a venue ticket submission. Email sending is separate.</p>
+    <div id="notionGoogle"></div>
+    <label><input type="checkbox" id="notionSetupTest"> Mark as a setup test, not a field walk</label>
+    <div class="btnrow">
+      <button type="button" id="notionRetry">Retry Notion sign-in</button>
+      <button type="button" class="pri" id="notionSave" disabled>Save to Notion</button>
+      <button type="button" id="notionDisconnect" hidden>Disconnect Notion</button>
+    </div>
+    <p class="note info" id="notionStatus" role="status" aria-live="polite">Notion setup is not complete. Downloads remain available.</p>
+    <a id="notionReceipt" hidden target="_blank" rel="noopener noreferrer">Open saved Notion report</a>
+  </section>
+  <pre class="out" id="repOut">Nothing to report yet.</pre>
+  <h3>Session data</h3>
+  <div class="btnrow">
+    <button class="dgr" id="btnReset">Clear and start over</button>
+  </div>
+  <div id="undoRow"></div>
+  <div class="note info">🔵 <b>No silent writes.</b> Email and Notion saves each require their own confirmation. Download or copy your report whenever a connection is unavailable.</div>
+  <div class="note" id="saveNote"></div>
+</section>
+
+<!-- ══════════════ CAMERA KIT ══════════════ -->
+<section class="panel" id="p-cam">
+  <div class="kit-hero">
+    <div class="kit-kicker">Strike order · camera position</div>
+    <h2>Camera kit pack-down</h2>
+    <p class="lede">Secure the camera body first, then break down the tripod and support hardware.</p>
+  </div>
+
+  <div class="kit-rule">
+    <span class="kit-rule-mark">HOLD</span>
+    <div><b>Stay in position for every camera-body step.</b> Do not move the camera or tripod until the camera section is complete.</div>
+  </div>
+
+  <section class="kit-block" aria-labelledby="cameraBodyTitle">
+    <div class="kit-block-hd"><h3 id="cameraBodyTitle">Camera body</h3><span>Complete in order</span></div>
+    <ol class="kit-steps">
+      <li>
+        <span class="kit-num" aria-hidden="true">01</span>
+        <div class="kit-step"><div class="kit-step-top"><h4>Leave the body and lens together</h4><span class="kit-tag">Stay in position</span></div><p>Keep the lens attached to the camera body.</p></div>
+      </li>
+      <li>
+        <span class="kit-num" aria-hidden="true">02</span>
+        <div class="kit-step"><div class="kit-step-top"><h4>Unplug the lens cable</h4><span class="kit-tag">Stay in position</span></div><p>Disconnect the cable marked <span class="k">LENS</span>.</p></div>
+      </li>
+      <li>
+        <span class="kit-num" aria-hidden="true">03</span>
+        <div class="kit-step"><div class="kit-step-top"><h4>Remove the viewfinder</h4><span class="kit-tag">Stay in position</span></div><p>Remove and secure the viewfinder before handling the support.</p></div>
+      </li>
+      <li>
+        <span class="kit-num" aria-hidden="true">04</span>
+        <div class="kit-step"><div class="kit-step-top"><h4>Remove the zoom and focus handles</h4><span class="kit-tag">Stay in position</span></div><p>Detach both handle attachments from the camera.</p></div>
+      </li>
+      <li>
+        <span class="kit-num" aria-hidden="true">05</span>
+        <div class="kit-step"><div class="kit-step-top"><h4>Retract the handles</h4><span class="kit-tag">Stay in position</span></div><p>Return both handles to their retracted storage positions.</p></div>
+      </li>
+    </ol>
+  </section>
+
+  <section class="kit-block" aria-labelledby="tripodTitle">
+    <div class="kit-block-hd"><h3 id="tripodTitle">Tripod and support</h3><span>Move only after step 05</span></div>
+    <ol class="kit-steps" start="6">
+      <li>
+        <span class="kit-num" aria-hidden="true">06</span>
+        <div class="kit-step"><div class="kit-step-top"><h4>Remove the floor support</h4></div><p>Loosen and remove the spreader or dolly.</p></div>
+      </li>
+      <li>
+        <span class="kit-num" aria-hidden="true">07</span>
+        <div class="kit-step"><div class="kit-step-top"><h4>Secure the legs</h4></div><p>Replace the bungee, tie line, or tape used to hold the legs together.</p></div>
+      </li>
+      <li>
+        <span class="kit-num" aria-hidden="true">08</span>
+        <div class="kit-step"><div class="kit-step-top"><h4>Retract and release the legs</h4></div><p>Retract the legs fully, then back each leg lock off one turn for storage.</p></div>
+      </li>
+    </ol>
+  </section>
+
+  <div class="card tight">
+    <div class="kit-block-hd"><h3>Before leaving the position</h3><span>Final count</span></div>
+    <div class="kit-check" aria-label="Equipment to account for">
+      <span>VIEWFINDER</span><span>ZOOM + FOCUS HANDLES</span><span>SPREADER / DOLLY</span>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ REFERENCE ══════════════ -->
+<section class="panel" id="p-ref">
+  <h2>Reference</h2>
+
+  <h3>Brightness baselines</h3>
+  <table>
+    <tr><th scope="col">Position</th><th scope="col">Baseline</th><th scope="col"></th></tr>
+    <tr><td>4 × VX4S, bowl</td><td class="m">20%</td><td>🟢</td></tr>
+    <tr><td>MCTRL660 tower primary</td><td class="m">4%</td><td>🟡</td></tr>
+    <tr><td>MCTRL660 tower backup</td><td class="m">0%</td><td>🔴</td></tr>
+    <tr><td>MCTRL660 wall pair</td><td class="m">3% / 3%</td><td>🟢</td></tr>
+  </table>
+  <div class="note crit">🚨 <b>The tower pair does not match.</b> If those two are a primary and a backup, a backup sitting at 0% comes up dark the night it is needed, on a display that carries paid advertising. 🟡 Whether the four 660s are redundancy or canvas extension is still unsettled. Trace one follower's output.</div>
+
+  <h3>Bowl walls</h3>
+  <table>
+    <tr><th scope="col">Wall</th><th scope="col">Controller</th><th scope="col">Pitch</th></tr>
+    <tr><td>Stage right flanking</td><td class="m">192.168.2.10</td><td class="m">10 mm</td></tr>
+    <tr><td>Stage left flanking</td><td class="m">192.168.2.11</td><td class="m">10 mm</td></tr>
+    <tr><td>Lawn delay 1 and 2</td><td class="m">192.168.2.12</td><td class="m">7 mm</td></tr>
+    <tr><td>Lawn delay 3 and 4</td><td class="m">192.168.2.13</td><td class="m">7 mm</td></tr>
+  </table>
+  <div class="mini">🟢 Panels are ANC. NovaStar is control and processing only. 🟢 All four on SDI 1, 1080i60. 🟢 Pitch is not uniform, so two <span class="k">.rcfgx</span> cabinet files minimum.</div>
+
+  <h3>Notes versus faults</h3>
+  <div class="note info">🔵 <b>A note records something. A fault asks someone to do something.</b> Drift you want to watch next show is a note. Anything that needs a person, a ladder, or a part is a fault. Notes reach the report without becoming a ticket, so use them freely.</div>
+
+  <h3>What is saved, and when</h3>
+  <table>
+    <tr><th scope="col">Event</th><th scope="col">Saved</th></tr>
+    <tr><td>Pass, flag, skip</td><td>🟢 Immediately</td></tr>
+    <tr><td>Typing a reading or a note</td><td>🟢 Within a second, and on leaving the field</td></tr>
+    <tr><td>Half-finished fault sheet</td><td>🟢 Kept as a draft, offered back on return</td></tr>
+    <tr><td>App backgrounded or swiped away</td><td>🟢 Flushed before it suspends</td></tr>
+    <tr><td>Clear and start over</td><td>🟢 One undo available</td></tr>
+  </table>
+
+  <h3>Who gets the ticket</h3>
+  <table>
+    <tr><th scope="col">Route</th><th scope="col">Scope</th></tr>
+    <tr><td>Video</td><td>Locate and report. Bowl brightness. Switcher.</td></tr>
+    <tr><td>Teddy · IT</td><td>🟢 Owns the ladder to the DMP boxes and services the players. Video locates, Teddy services.</td></tr>
+    <tr><td>GoVision</td><td class="m">🟡 817-783-4244 · Support@jumbo.tv</td></tr>
+    <tr><td>Rigging</td><td>Wall level, mount, hang</td></tr>
+    <tr><td>Emily · house audio</td><td>Black Box VIP sync. Fix is delay at her console.</td></tr>
+    <tr><td>Charlie</td><td>Head of Video. Anything undocumented.</td></tr>
+    <tr><td>John Ogle · steward</td><td class="m">🟢 john@tristatestaging.com · 609-458-9534</td></tr>
+    <tr><td>Videri console</td><td>🔴 Contact unknown. Ask Charlie by name.</td></tr>
+    <tr><td>ConcertVision</td><td>🔴 Contact unknown. Ask Charlie by name.</td></tr>
+    <tr><td>Live Nation / 2024 integrator</td><td>🔴 Unidentified after two documented sessions. Highest-value open thread.</td></tr>
+  </table>
+
+  <h3>Keyboard, with a Magic Keyboard attached</h3>
+  <table>
+    <tr><td><kbd>P</kbd></td><td>Pass this position</td></tr>
+    <tr><td><kbd>F</kbd></td><td>Flag it and open the fault sheet</td></tr>
+    <tr><td><kbd>S</kbd></td><td>Skip</td></tr>
+    <tr><td><kbd>N</kbd></td><td>Jump into the note field</td></tr>
+    <tr><td><kbd>&larr;</kbd> <kbd>&rarr;</kbd></td><td>Previous and next position</td></tr>
+    <tr><td><kbd>1</kbd> to <kbd>6</kbd></td><td>Jump to a tab</td></tr>
+    <tr><td><kbd>D</kbd></td><td>Cycle auto, day, night</td></tr>
+    <tr><td><kbd>esc</kbd></td><td>Close the fault sheet</td></tr>
+  </table>
+
+  <h3>Naming</h3>
+  <div class="note">Four levels: <b>official venue space → operational AV zone → map key → device ID.</b> Canonical names, never legacy shorthand. 🟢 Charlie endorsed this scheme unprompted and in his own words, so it is department convention now.
+  <br><br>🔴 <b>Do not expand</b> <span class="k">TC2</span> <span class="k">TC4</span> <span class="k">NBB</span> <span class="k">BB1</span> <span class="k">781</span> <span class="k">791</span>. They are location keys with no decodable scheme. Record them exactly as printed.
+  <br><br>⛔ <b>Black Box VIP, Black Box VIP Patio, and VIP Club are three separate spaces.</b> Never merge them on a ticket.</div>
+
+  <h3>Photography</h3>
+  <div class="note warn">🟡 <b>Unresolved conflict.</b> The venue record says no photos or video inside. The documentation need is not permission. Clear it with Charlie or the steward once, then the photo field on every ticket stops being a question.</div>
+
+  <h3>What this walk closes</h3>
+  <div class="note info">🔵 Every Tier 2 zone is on every route. One full pass produces the verified per-zone count that ramp-up step 9 is waiting on, including the <span class="k">WALT CON</span> recount and the duplicate Videri ID <span class="k">087</span>. Record counts as you go and the audit finishes itself.</div>
+
+  <div class="note">🔵 <b>Environments A, B and C stay separate.</b> The bowl, the distributed TVs, and the advertising spectaculars share a room and nothing traced. Never draw a path between the MCTRL660 layer and the VX4S layer.</div>
+</section>
+
+</main>
+
+<nav aria-label="FMP walk sections">
+  <button type="button" data-tab="setup"><span class="ic">🎛️</span>Setup</button>
+  <button type="button" data-tab="walk" class="on"><span class="ic">🚶</span>Walk</button>
+  <button type="button" data-tab="tk"><span class="ic">🎫</span>Faults<span class="badge hide" id="tkBadge">0</span></button>
+  <button type="button" data-tab="rep"><span class="ic">📤</span>Report</button>
+  <button type="button" data-tab="cam"><span class="ic">📷</span>Camera</button>
+  <button type="button" data-tab="ref"><span class="ic">📖</span>Ref</button>
+</nav>
+
+<div class="sheet-bg" id="sheetBg" aria-hidden="true"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="shTitle" aria-hidden="true">
+  <div class="grab"></div>
+  <div class="sheet-hd"><h3 id="shTitle">Log a fault</h3><button type="button" id="shCancel">Cancel</button></div>
+  <div id="shBody"></div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+<script>
+"use strict";
+
+(function redirectLegacyCameraLink(){
+  var params = new URLSearchParams(location.search);
+  var position = params.get("position");
+  var legacy = { "1":"pit-center", "2":"front-of-house", "3":"pit-stage-left", "4":"catwalk" };
+  var allowed = ["pit-center", "front-of-house", "pit-stage-left", "catwalk"];
+  var target = legacy[params.get("camera")] || (allowed.indexOf(position) > -1 ? position : "");
+  if(target) location.replace(new URL("./camera/" + target + "/", location.href).href);
+})();
+
+function $(id){ return document.getElementById(id); }
+
+/* ══════════════════════ storage ══════════════════════
+   Probed, not assumed. A copy that cannot save says so out loud
+   rather than quietly losing a walk.
+   ═══════════════════════════════════════════════════════ */
+var MEM = {};
+var STORAGE_OK = (function(){
+  try{
+    var k = "__fmp_probe__";
+    localStorage.setItem(k,"1");
+    var ok = localStorage.getItem(k) === "1";
+    localStorage.removeItem(k);
+    return ok;
+  }catch(e){ return false; }
+})();
+var store = {
+  get: function(k){ try { return localStorage.getItem(k); } catch(e){ return MEM[k] || null; } },
+  set: function(k,v){
+    try { localStorage.setItem(k,v); return true; }
+    catch(e){ MEM[k]=v; return false; }
+  },
+  del: function(k){ try { localStorage.removeItem(k); } catch(e){ delete MEM[k]; } }
+};
+
+/* ══════════════════════ theme: auto / day / night ══════════════════════ */
+var THEME_KEY = "fmpTheme";
+var themePref = store.get(THEME_KEY) || "light";
+var mqLight = window.matchMedia ? window.matchMedia("(prefers-color-scheme: light)") : null;
+
+function resolveTheme(){
+  if(themePref === "auto") return (mqLight && mqLight.matches) ? "light" : "dark";
+  return themePref;
+}
+function applyTheme(){
+  var r = resolveTheme();
+  document.documentElement.setAttribute("data-theme", r);
+  var meta = document.querySelector('meta[name="theme-color"]');
+  if(meta) meta.setAttribute("content", r === "light" ? "#FFFFFF" : "#161C22");
+  var b = $("themeBtn");
+  if(b) b.textContent = themePref === "auto" ? "AUTO" : (themePref === "light" ? "DAY" : "NIGHT");
+  var cw = $("themeChips");
+  if(cw){
+    var cs = cw.querySelectorAll("[data-t]");
+    for(var i=0;i<cs.length;i++){
+      var selected = cs[i].getAttribute("data-t") === themePref;
+      cs[i].classList.toggle("on", selected);
+      cs[i].setAttribute("aria-pressed", selected ? "true" : "false");
+    }
+  }
+}
+function setTheme(p){ themePref = p; store.set(THEME_KEY, p); applyTheme(); }
+function cycleTheme(){
+  var order = ["auto","light","dark"];
+  setTheme(order[(order.indexOf(themePref) + 1) % 3]);
+}
+if(mqLight){
+  var onMq = function(){ if(themePref === "auto") applyTheme(); };
+  if(mqLight.addEventListener) mqLight.addEventListener("change", onMq);
+  else if(mqLight.addListener) mqLight.addListener(onMq);
+}
+applyTheme();
+
+/* ══════════════════════ seed data ══════════════════════
+   Every value here is traceable to the FMP docs. Where the docs do not
+   establish a fact, the field is left blank and marked, never guessed.
+   ═══════════════════════════════════════════════════════ */
+
+var BOWL = [
+  {id:"FLK-SR",env:"A",kind:"led",name:"Stage right flanking wall",zone:"Pavilion",
+   spec:[["Ctrl","VX4S stage right"],["IP","192.168.2.10"],["Pitch","10 mm"],["In2","DVI"]],base:"20%",level:false},
+  {id:"FLK-SL",env:"A",kind:"led",name:"Stage left flanking wall",zone:"Pavilion",
+   spec:[["Ctrl","VX4S stage left"],["IP","192.168.2.11"],["Pitch","10 mm"],["In2","SDI"]],base:"20%",level:false},
+  {id:"DLY-1",env:"A",kind:"led",name:"Lawn delay wall 1",zone:"Lawn",
+   spec:[["Ctrl","VX4S lawn 1/2"],["IP","192.168.2.12"],["Pitch","7 mm"],["In2","DVI"]],base:"20%",level:true},
+  {id:"DLY-2",env:"A",kind:"led",name:"Lawn delay wall 2",zone:"Lawn",
+   spec:[["Ctrl","VX4S lawn 1/2"],["IP","192.168.2.12"],["Pitch","7 mm"],["In2","DVI"]],base:"20%",level:true},
+  {id:"DLY-3",env:"A",kind:"led",name:"Lawn delay wall 3",zone:"Lawn",
+   spec:[["Ctrl","VX4S lawn 3/4"],["IP","192.168.2.13"],["Pitch","7 mm"],["In2","HDMI"]],base:"20%",level:true},
+  {id:"DLY-4",env:"A",kind:"led",name:"Lawn delay wall 4",zone:"Lawn",
+   spec:[["Ctrl","VX4S lawn 3/4"],["IP","192.168.2.13"],["Pitch","7 mm"],["In2","HDMI"]],base:"20%",level:true}
+];
+
+/* IPs .20 to .23 are the documented range for the four MCTRL660 PRO units.
+   Which IP belongs to which unit is NOT established. Left blank on purpose. */
+var SPEC = [
+  {id:"SPC-TP",env:"C",kind:"spec",name:"Tower · primary",zone:"Building advertising LED",
+   spec:[["Plate","TOWER PRIMARY"],["Sticker","TOWER LEADER"],["IP","🔴 not mapped"]],base:"4%"},
+  {id:"SPC-TB",env:"C",kind:"spec",name:"Tower · backup",zone:"Building advertising LED",
+   spec:[["Plate","TOWER BACKUP"],["Sticker","TOWER FOLLOWER"],["IP","🔴 not mapped"]],base:"0% 🔴"},
+  {id:"SPC-WP",env:"C",kind:"spec",name:"Wall · primary",zone:"Building advertising LED",
+   spec:[["Plate","WALL PRIMARY"],["Sticker","WALL LEADER"],["IP","🔴 not mapped"]],base:"3%"},
+  {id:"SPC-WB",env:"C",kind:"spec",name:"Wall · backup",zone:"Building advertising LED",
+   spec:[["Plate","WALL BACKUP"],["Sticker","WALL FOLLOWER"],["IP","🔴 not mapped"]],base:"3%"}
+];
+
+/* The 21 enumerated ConcertVision positions, grouped as they are named.
+   Device IDs are not established for these positions, so they are captured, not assumed. */
+var CV = [
+  {id:"CV-WWL-ED",zone:"Walt Whitman Lobby",key:"ENTRANCE DOORS",qty:4},
+  {id:"CV-WWL-CA",zone:"Walt Whitman Lobby",key:"CAROUSEL",qty:3},
+  {id:"CV-WWL-MR",zone:"Walt Whitman Lobby",key:"MERCH",qty:2},
+  {id:"CV-BFL-CA",zone:"Ben Franklin Lobby",key:"CAROUSEL",qty:4,note:"🔵 Fourth unit not yet identified in the inventory."},
+  {id:"CV-BFL-MR",zone:"Ben Franklin Lobby",key:"MERCH",qty:2},
+  {id:"CV-WWP-EA",zone:"Walt Whitman Plaza",key:"EA BAR LOUNGE",qty:2},
+  {id:"CV-VIP-ST",zone:"VIP Club",key:"STREET SIDE",qty:2,note:"🟡 Legacy key reads VIP. Confirm on foot whether this is VIP Club or Black Box VIP. They are separate spaces."},
+  {id:"CV-VIP-LB",zone:"VIP Club",key:"LOBBY SIDE",qty:2,note:"🟡 Legacy key reads VIP. Confirm the space on foot."}
+];
+
+/* Tier 2 zones. Counts are deliberately unknown: recording them is the point. */
+var TIER2 = [
+  {id:"BLK-WWL",name:"Walt Whitman Lobby",hint:"🔵 Count on foot. Concentration of unkeyed Videri positions."},
+  {id:"BLK-WWP",name:"Walt Whitman Plaza",hint:"🔵 Count on foot. Videri units here are indoor-rated hardware sitting outdoors."},
+  {id:"BLK-BFL",name:"Ben Franklin Lobby",hint:"🔵 Count on foot. Concentration of unkeyed Videri positions."},
+  {id:"BLK-BFP",name:"Ben Franklin Plaza",hint:"⚠️ Source sheet duplicated two rows here, 8 units. Recount settles it."},
+  {id:"BLK-LWN",name:"Lawn",hint:"🔴 Hard deadline Oct 15. After changeover the lawn is cut off until spring."},
+  {id:"BLK-VIP",name:"Black Box VIP · Patio · VIP Club",hint:"⛔ Three separate spaces. Record them separately, never merged."},
+  {id:"BLK-BST",name:"Backstage and admin",hint:"🔵 The dressing room and admin SDI branch. Documented, not yet walked end to end."},
+  {id:"BLK-CON",name:"Concessions · WALT CON recount",hint:"🚨 WALT CON states qty 16 against an ID range covering 14. This recount settles the site total."}
+];
+
+/* Optional area requested by the operator. Room/device totals are not yet established. */
+var DRESSING = {id:"DR-ROOMS",env:"B",kind:"tv",name:"Dressing Rooms",zone:"Dressing Rooms",
+  hint:"Record room names and display counts on foot. No room or device count is assumed. The broader Backstage and admin check is separate; note any overlap rather than treating the two counts as additive.",
+  spec:[["Feed","Dressing room SDI branch"],["Count","record on foot"]]};
+
+var SYM = {
+  led:["Wall dark","Dead cabinet","Dead module","Brightness mismatch","Colour shift","Scan or refresh artifact","Scaling wrong","No signal or wrong input","Not level","Flicker or power sag","Water ingress","Data run fault"],
+  spec:["Display dark","Content stalled","Brightness mismatch across pair","Backup reading zero","Colour shift","Dead cabinet","No signal"],
+  tv:["Dark, no power","No signal","Wrong content","Frozen image","Colour cast","Washed out","Backlight clouding","Dead pixels or lines","Wrong aspect","Flicker","Burn in","Cracked or damaged","Mount loose or crooked","Water ingress","Audio out of sync"]
+};
+
+var SEV = [
+  {v:"crit",l:"🔴 Revenue or show critical"},
+  {v:"deg", l:"🟡 Degraded but usable"},
+  {v:"cos", l:"🔵 Cosmetic, monitor it"}
+];
+
+var ROUTES = ["Video (self)","Teddy · IT, DMP service","GoVision · bowl LED","Rigging","Emily · house audio","Charlie","ConcertVision 🔴","Videri 🔴","Live Nation facility 🔴","Undecided"];
+
+/* ══════════════════════ state and persistence ══════════════════════ */
+var S = {
+  meta:{date:"",show:"",op:"",cfg:"summer"},
+  res:{}, faults:[], draft:null, idx:0, tab:"walk"
+};
+
+var WALK_KEY = "fmpWalk", PREV_KEY = "fmpWalkPrev", HIST_KEY = "fmpWalkHistory";
+var saveTimer = null, lastSaveAt = null, sheetTrigger = null;
+
+function save(){
+  var persisted = store.set(WALK_KEY, JSON.stringify(S));
+  if(persisted){
+    lastSaveAt = new Date();
+  } else {
+    STORAGE_OK = false;
+    var warning = $("storageWarn");
+    if(warning) warning.classList.remove("hide");
+  }
+  paintSaveState();
+  return persisted;
+}
+/* Debounced for keystrokes. Writing on every character is wasteful and
+   a lost second of typing is not a lost walk. */
+function saveSoon(){
+  if(saveTimer) clearTimeout(saveTimer);
+  saveTimer = setTimeout(function(){ saveTimer = null; save(); }, 600);
+}
+/* Synchronous, unconditional. Called before the app can be suspended. */
+function flush(){
+  if(saveTimer){ clearTimeout(saveTimer); saveTimer = null; }
+  grabSetup();
+  if(window.__grab) window.__grab();
+  if(window.__grabSheet) window.__grabSheet();
+  save();
+}
+/* iOS discards background tabs without firing beforeunload, so pagehide
+   and visibilitychange are the events that actually run. beforeunload is
+   kept only for the desktop case. */
+window.addEventListener("pagehide", flush);
+window.addEventListener("beforeunload", flush);
+document.addEventListener("visibilitychange", function(){
+  if(document.visibilityState === "hidden") flush();
+});
+window.addEventListener("blur", flush);
+
+function load(){
+  var raw = store.get(WALK_KEY);
+  if(!raw) return;
+  try{
+    var o = JSON.parse(raw);
+    if(o && o.meta){
+      restoreWalk(o);
+    }
+  }catch(e){}
+}
+
+function history(){ try{ return JSON.parse(store.get(HIST_KEY)||"[]"); }catch(e){ return []; } }
+function repeatCount(posKey){
+  if(!posKey) return 0;
+  var h = history(), n = 0;
+  for(var i=0;i<h.length;i++){ if(h[i].pos === posKey) n++; }
+  return n;
+}
+function pushHistory(){
+  var h = history();
+  for(var i=0;i<S.faults.length;i++){
+    h.push({pos:S.faults[i].pos, date:S.meta.date, sym:S.faults[i].sym.join(", ")});
+  }
+  while(h.length > 400) h.shift();
+  try{ store.set(HIST_KEY, JSON.stringify(h)); }catch(e){}
+}
+
+function hhmm(d){
+  if(!d) return "";
+  var p = function(n){ return (n<10?"0":"") + n; };
+  return p(d.getHours()) + ":" + p(d.getMinutes());
+}
+function paintSaveState(){
+  var el = $("railR"); if(!el) return;
+  var bits = [];
+  if(S.faults.length) bits.push(S.faults.length + " flagged");
+  bits.push(STORAGE_OK ? (lastSaveAt ? "saved " + hhmm(lastSaveAt) : "saving") : "NOT SAVING");
+  el.textContent = bits.join(" · ");
+  el.style.color = STORAGE_OK ? "" : "var(--red)";
+}
+
+/* ══════════════════════ station builder ══════════════════════ */
+var PRIMARY_ZONE_ORDER = ["Pavilion","Lawn","Building advertising LED","Walt Whitman Lobby","Walt Whitman Plaza","Ben Franklin Lobby","VIP Club"];
+var ZONE_ORDER = PRIMARY_ZONE_ORDER.concat(["Ben Franklin Plaza","Black Box VIP · Patio · VIP Club","Backstage and admin","Concessions · WALT CON recount","Dressing Rooms"]);
+function visualItems(s){
+  if(s.kind !== "led") return [];
+  var items = [
+    {key:"powered",label:"Powered and showing content"},
+    {key:"brightness",label:"Brightness matches the partner wall by eye"},
+    {key:"modules",label:"No dead cabinets or modules"},
+    {key:"colour",label:"No colour shift across the display"}
+  ];
+  if(s.level) items.push({key:"level",label:"Level against the fixed horizontal reference"});
+  return items;
+}
+function positionLabel(s){
+  return s.name + (s.key ? " · " + s.key : "");
+}
+function zoneLabel(zone){
+  return zone === "Building advertising LED" ? "Building spectaculars" : zone;
+}
+function cvStation(c){
+  return {id:c.id,env:"B",kind:"tv",tier:1,name:c.zone,zone:c.zone,key:c.key,qty:c.qty,note:c.note,
+    spec:[["Key",c.key],["Positions",String(c.qty)],["Tech","ConcertVision DMP, wired HDMI"]]};
+}
+function tier2Station(item){
+  return {id:item.id,env:"B",kind:"tv",tier:2,name:item.name,zone:item.name,hint:item.hint,
+    spec:[["Tier","2"],["Count","record on foot"]]};
+}
+function knownStation(id){
+  return BOWL.concat(SPEC,CV,TIER2,[DRESSING]).some(function(item){ return item.id === id; });
+}
+/* One-time compatibility only: find the operator's current station in saves made
+   before the all-zones route, then discard the old selector value. */
+function previousRoute(meta){
+  var m = meta || {}, checks = m.checks || null, sections = m.sections || {};
+  var out = [];
+  BOWL.forEach(function(s){ if(!(m.cfg === "winter" && s.zone === "Lawn")) out.push(s); });
+  SPEC.forEach(function(s){ out.push(s); });
+  CV.forEach(function(s){ out.push(cvStation(s)); });
+  out.push(DRESSING);
+  var selected = TIER2.find(function(item){ return item.id === m.block; });
+  if(selected && !(m.cfg === "winter" && selected.id === "BLK-LWN")) out.push(tier2Station(selected));
+  function enabled(s){
+    if(checks && typeof checks[s.id] === "boolean") return checks[s.id];
+    if(s.id === DRESSING.id) return false;
+    if(BOWL.some(function(item){ return item.id === s.id; })) return sections.bowl !== false;
+    if(SPEC.some(function(item){ return item.id === s.id; })) return sections.spec !== false;
+    if(CV.some(function(item){ return item.id === s.id; })) return sections.cv !== false;
+    return sections.tier2 !== false;
+  }
+  var filtered = out.filter(enabled);
+  if(!checks) return filtered;
+  var oldOrder = ["Pavilion","Lawn","Building advertising LED","Walt Whitman Lobby","Walt Whitman Plaza",
+    "Ben Franklin Lobby","Ben Franklin Plaza","VIP Club","Black Box VIP · Patio · VIP Club","Dressing Rooms","Backstage and admin","Concessions · WALT CON recount"];
+  return oldOrder.flatMap(function(zone){
+    return filtered.filter(function(s){ return s.zone === zone; });
+  });
+}
+function prepareMeta(meta){
+  var m = Object.assign({date:"",show:"",op:"",cfg:"summer"}, meta);
+  var legacy = m.sections || {};
+  // Keep exclusions at check level so a legacy mixed zone is not silently expanded.
+  m.checks = Object.assign({}, m.checks);
+  [[BOWL,"bowl"],[SPEC,"spec"],[CV,"cv"]].forEach(function(group){
+    group[0].forEach(function(s){
+      if(typeof m.checks[s.id] !== "boolean") m.checks[s.id] = legacy[group[1]] !== false;
+    });
+  });
+  TIER2.forEach(function(s){ delete m.checks[s.id]; });
+  // New optional coverage must not silently change a saved route or its completion.
+  if(typeof m.checks[DRESSING.id] !== "boolean") m.checks[DRESSING.id] = false;
+  delete m.sections;
+  delete m.block;
+  delete m.nextBlock;
+  delete m.rotationBlock;
+  return m;
+}
+function restoreWalk(o){
+  var oldPolicy = Object.prototype.hasOwnProperty.call(o.meta,"block") ||
+    TIER2.some(function(s){ return o.meta.checks && Object.prototype.hasOwnProperty.call(o.meta.checks,s.id); });
+  var oldRoute = oldPolicy ? previousRoute(o.meta) : [];
+  var oldCurrent = oldPolicy ? oldRoute[o.idx] : null;
+  var oldComplete = oldPolicy && oldRoute.length > 0 && o.idx >= oldRoute.length;
+  S.meta = prepareMeta(o.meta);
+  S.res = o.res || {}; S.faults = o.faults || []; S.draft = o.draft || null;
+  S.idx = Math.max(0, Number.isInteger(o.idx) ? o.idx : 0);
+  S.faults.forEach(function(fault){
+    if(fault.station && knownStation(fault.station) && !(S.res[fault.station] || {}).status){
+      var result = S.res[fault.station] || {};
+      result.status = "flag"; result.ts = fault.ts || new Date().toISOString();
+      S.res[fault.station] = result;
+    }
+  });
+  if(oldPolicy){
+    S.idx = oldCurrent ? stations().findIndex(function(s){ return s.id === oldCurrent.id; }) : oldComplete ? stations().length : 0;
+  }
+  S.idx = Math.min(S.idx, stations().length);
+}
+function availableStations(){
+  var out = [], m = S.meta;
+  for(var i=0;i<BOWL.length;i++){
+    var w = BOWL[i];
+    if(m.cfg === "winter" && w.zone === "Lawn") continue;
+    out.push(w);
+  }
+  for(var j=0;j<SPEC.length;j++) out.push(SPEC[j]);
+  for(var k=0;k<CV.length;k++) out.push(cvStation(CV[k]));
+  out.push(DRESSING);
+  for(var q=0;q<TIER2.length;q++) out.push(tier2Station(TIER2[q]));
+  return out;
+}
+function zoneGroups(){
+  var available = availableStations();
+  return ZONE_ORDER.map(function(zone){
+    return {zone:zone,checks:available.filter(function(s){ return s.zone === zone; })};
+  }).filter(function(group){ return group.checks.length; });
+}
+function stations(){
+  return zoneGroups().flatMap(function(group){
+    return group.checks.filter(function(s){ return s.tier === 2 || S.meta.checks[s.id]; });
+  });
+}
+
+/* ══════════════════════ rendering ══════════════════════ */
+function esc(s){
+  return String(s==null?"":s).replace(/[&<>"]/g,function(c){
+    return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c];
+  });
+}
+function toast(msg){
+  var t = $("toast"); t.textContent = msg; t.classList.add("on");
+  setTimeout(function(){ t.classList.remove("on"); }, 2100);
+}
+function mdLine(value){
+  return String(value == null ? "" : value).replace(/\r?\n/g, " ").trim();
+}
+function mdCell(value){
+  return mdLine(value).replace(/\\/g, "\\\\").replace(/\|/g, "\\|");
+}
+
+function renderHeader(){
+  var st = stations(), done = 0;
+  for(var i=0;i<st.length;i++){ if(S.res[st[i].id] && S.res[st[i].id].status) done++; }
+  $("hShow").textContent = S.meta.show || "No show set";
+  $("hMeta").textContent = (S.meta.date || "no date") + " · " + (S.meta.cfg === "winter" ? "winter rig" : "summer rig");
+  $("hDone").textContent = done;
+  $("hTot").textContent = "of " + st.length;
+
+  var rail = $("rail"); rail.innerHTML = "";
+  for(var j=0;j<st.length;j++){
+    var seg = document.createElement("button");
+    seg.type = "button";
+    seg.className = "rail-seg" + (j === S.idx && S.tab === "walk" ? " here" : "");
+    var r = S.res[st[j].id];
+    if(r && r.status) seg.setAttribute("data-s", r.status);
+    seg.title = st[j].name;
+    seg.setAttribute("aria-label", "Jump to " + st[j].name);
+    if(j === S.idx && S.tab === "walk") seg.setAttribute("aria-current", "step");
+    (function(n){ seg.onclick = function(){ if(window.__grab) window.__grab(); S.idx = n; go("walk"); }; })(j);
+    rail.appendChild(seg);
+  }
+  var cur = st[S.idx];
+  $("railL").textContent = cur ? (S.idx + 1) + " · " + cur.name : (st.length ? "walk complete" : "no route");
+  paintSaveState();
+
+  var b = $("tkBadge");
+  if(S.faults.length){ b.textContent = S.faults.length; b.classList.remove("hide"); }
+  else b.classList.add("hide");
+}
+
+function renderRoute(){
+  var st = stations(), el = $("routeList");
+  if(!st.length){ el.innerHTML = ""; return; }
+  var h = '<div class="rt-hd">TONIGHT&rsquo;S ROUTE</div>';
+  for(var i=0;i<st.length;i++){
+    var r = S.res[st[i].id] || {};
+    if(i === 0 || st[i].zone !== st[i-1].zone) h += '<h3 class="rt-zone">' + esc(zoneLabel(st[i].zone)) + '</h3>';
+    h += '<button type="button" class="rt' + (i === S.idx ? " here" : "") + '"' +
+      (i === S.idx ? ' aria-current="step"' : "") +
+      (r.status ? ' data-s="' + r.status + '"' : "") + ' data-i="' + i + '">' +
+      '<span class="dot"></span><span class="nm">' + esc(st[i].name) +
+      (st[i].key ? " · " + esc(st[i].key) : "") + "</span>" +
+      (r.note ? '<span class="pen" title="has a note">&#9998;</span>' : "") +
+      '<span class="en">' + st[i].env + "</span></button>";
+  }
+  el.innerHTML = h;
+  el.onclick = function(e){
+    var b = e.target.closest("[data-i]"); if(!b) return;
+    if(window.__grab) window.__grab();
+    S.idx = parseInt(b.getAttribute("data-i"),10);
+    renderAll();
+  };
+}
+
+function envTag(e){
+  if(e === "A") return '<span class="tag a">ENV A · BOWL</span>';
+  if(e === "C") return '<span class="tag c">ENV C · ADS</span>';
+  return '<span class="tag b">ENV B · TVS</span>';
+}
+
+/* banner offering back a fault sheet that was interrupted */
+function resumeBanner(){
+  var d = S.draft;
+  if(!d) return "";
+  var has = (d.sym && d.sym.length) || (d.photos && d.photos.length) || d.pos || d.notes || d.dev;
+  if(!has) return "";
+  return '<div class="resume"><b>Unfinished fault</b>' +
+    'You were logging a fault on <b style="display:inline">' + esc(d.pos || "an unnamed position") + '</b> when the app was interrupted. ' +
+    (d.sym && d.sym.length ? esc(d.sym.join(", ")) + "." : "No symptom picked yet.") +
+    '<div class="btnrow"><button class="pri sm" id="rsResume">Resume it</button>' +
+    '<button class="dgr sm" id="rsDrop">Discard</button></div></div>';
+}
+
+function renderWalk(){
+  var st = stations(), body = $("walkBody");
+  renderRoute();
+  if(!st.length){
+    window.__grab = null;
+    body.innerHTML = '<div class="empty"><span class="big">🎛️</span>No zones selected.<br>Open Setup and choose what to walk.</div>';
+    return;
+  }
+  if(S.idx >= st.length){
+    var flagged = S.faults.length, noted = 0;
+    for(var z=0;z<st.length;z++){ if(S.res[st[z].id] && S.res[st[z].id].note) noted++; }
+    body.innerHTML = resumeBanner() +
+      '<div class="card"><div class="card-hd"><h4>Walk complete</h4></div>' +
+      '<div class="spec"><b>Positions</b><i>' + st.length + '</i><b>Flagged</b><i>' + flagged + '</i><b>Noted</b><i>' + noted + "</i></div>" +
+      (flagged
+        ? '<div class="note crit">🔴 ' + flagged + ' fault' + (flagged>1?'s':'') + ' logged. Open the Report tab, copy it into the FMP working page, and route anything critical before doors.</div>'
+        : '<div class="note">🟢 Nothing flagged. Log the clean walk anyway. A run of clean nights is what makes the first bad one legible.</div>') +
+      '<div class="stepnav"><button class="prev" id="wPrev">Back</button><button class="next" id="wRep">Go to report</button></div></div>';
+    window.__grab = null;
+    wireResume();
+    $("wPrev").onclick = function(){ S.idx = st.length - 1; renderAll(); };
+    $("wRep").onclick = function(){ go("rep"); };
+    return;
+  }
+
+  var s = st[S.idx], r = S.res[s.id] || {};
+  var h = resumeBanner();
+
+  h += '<div class="card"><div class="walk-zone">' + esc(zoneLabel(s.zone)) + '</div><div class="card-hd"><h4>' + esc(s.name) + '</h4>' + envTag(s.env) + '</div>';
+
+  if(s.spec && s.spec.length){
+    h += '<div class="spec">';
+    for(var i=0;i<s.spec.length;i++) h += "<b>" + esc(s.spec[i][0]) + "</b><i>" + esc(s.spec[i][1]) + "</i>";
+    h += "</div>";
+  }
+  if(s.note) h += '<div class="note">' + s.note + "</div>";
+  if(s.hint) h += '<div class="note warn">' + s.hint + "</div>";
+
+  var items = visualItems(s);
+  if(items.length){
+    h += '<fieldset class="visual-checklist" id="visualChecklist" aria-describedby="visualHelp"><legend>Visual checks</legend>' +
+      '<div class="checklist-progress" id="visualProgress" role="status"></div>';
+    items.forEach(function(item){
+      h += '<label><input type="checkbox" data-check="' + item.key + '"' +
+        (r.visual && r.visual[item.key] === true ? ' checked' : '') + '><span>' + esc(item.label) + '</span></label>';
+    });
+    h += '<p class="checklist-help" id="visualHelp">Tick what you confirm. Unchecked means not confirmed, not a fault. Pass and Flag record your overall result separately.</p></fieldset>';
+  } else if(s.kind === "spec"){
+    h += '<div class="note info">🔵 <b>Read the number, then look at the display.</b> A pair that does not match is the finding, even when both are lit. These carry paid advertising.</div>';
+  } else if(s.tier === 1){
+    h += '<div class="note info">🔵 <b>Program-capable positions.</b> These are the ones that show the wrong thing on a missed restore. Check content as well as picture.</div>';
+  }
+
+  if(s.kind === "led" || s.kind === "spec"){
+    h += '<div class="rd">' +
+      '<div><label>Brightness read</label><input type="text" inputmode="decimal" id="rB" value="' + esc(r.bright||"") + '" placeholder="%">' +
+      '<span class="base">baseline ' + esc(s.base) + "</span></div>" +
+      '<div><label>Matches partner</label><input type="text" id="rM" value="' + esc(r.match||"") + '" placeholder="yes / no"></div>' +
+      "</div>";
+  }
+  if(s.level){
+    h += '<div class="rd"><div style="grid-column:1/-1"><label>Level, against your fixed reference</label>' +
+         '<input type="text" id="rL" value="' + esc(r.level||"") + '" placeholder="level / suspect / off"></div></div>' +
+         '<div class="mini">🟡 Stand at the same mark every night and sight against the same horizontal line. Precision is not the point. Change is.</div>';
+  }
+  if(s.kind === "tv"){
+    h += '<div class="rd">' +
+      '<div><label>Positions counted</label><input type="text" inputmode="numeric" id="rC" value="' + esc(r.count||"") + '" placeholder="' + (s.qty ? s.qty : "n") + '"></div>' +
+      '<div><label>On expected content</label><input type="text" id="rM" value="' + esc(r.match||"") + '" placeholder="yes / no"></div>' +
+      "</div>" +
+      '<div class="mini">🔵 The count is the point. One clean pass of every Tier 2 zone closes the estate audit.</div>';
+  }
+
+  /* per-position note. Not a fault, and it still reaches the report. */
+  h += '<div class="notefld"><label for="rN">Note' + (r.note ? " &#9998;" : "") + "</label>" +
+    '<textarea id="rN" placeholder="Anything worth recording that does not need anyone to act">' + esc(r.note||"") + "</textarea>" +
+    '<div class="mini">🔵 Notes reach the report without becoming a ticket. Use it for drift you want to watch, or for what you tried.</div></div>';
+
+  h += '<div class="pf" style="margin-top:14px">' +
+    '<button class="p' + (r.status === "pass" ? " on" : "") + '" id="bP">✓ Pass</button>' +
+    '<button class="f' + (r.status === "flag" ? " on" : "") + '" id="bF">⚑ Flag</button>' +
+    '<button class="s' + (r.status === "skip" ? " on" : "") + '" id="bS">Skip</button>' +
+    "</div>";
+
+  h += '<div class="stepnav">' +
+    '<button class="prev" id="wPrev"' + (S.idx === 0 ? " disabled" : "") + ">Back</button>" +
+    '<button class="next next-preview" id="wNext">' + (S.idx === st.length - 1 ? "Finish walk" :
+      '<small>Next position:</small><span>' + esc(positionLabel(st[S.idx + 1])) + '</span>') + "</button></div>";
+
+  h += "</div>";
+  body.innerHTML = h;
+  ["bP","bF","bS"].forEach(function(id){
+    var control = $(id);
+    if(control){
+      control.type = "button";
+      control.setAttribute("aria-pressed", control.id === "bP"
+        ? String(r.status === "pass")
+        : control.id === "bF" ? String(r.status === "flag") : String(r.status === "skip"));
+    }
+  });
+  wireResume();
+
+  function grab(){
+    /* The card may be off screen (another tab, or the walk was cleared).
+       Writing then would resurrect an empty record for this station. */
+    if(!$("rN")) return;
+    var o = S.res[s.id] || {};
+    if($("rB")) o.bright = $("rB").value;
+    if($("rM")) o.match = $("rM").value;
+    if($("rL")) o.level = $("rL").value;
+    if($("rC")) o.count = $("rC").value;
+    if($("rN")) o.note = $("rN").value;
+    S.res[s.id] = o;
+  }
+  window.__grab = grab;
+  if(items.length){
+    function updateVisualProgress(){
+      var checked = $("visualChecklist").querySelectorAll("input:checked").length;
+      $("visualProgress").textContent = checked + " of " + items.length + " confirmed";
+    }
+    updateVisualProgress();
+    $("visualChecklist").addEventListener("change", function(e){
+      var key = e.target.getAttribute("data-check"); if(!key) return;
+      grab();
+      var result = S.res[s.id];
+      result.visual = Object.assign({}, result.visual);
+      if(e.target.checked) result.visual[key] = true;
+      else delete result.visual[key];
+      if(!Object.keys(result.visual).length) delete result.visual;
+      save(); updateVisualProgress();
+    });
+  }
+
+  /* input, not change. On iOS change only fires on blur, so a value typed
+     and never blurred was previously lost. */
+  ["rB","rM","rL","rC","rN"].forEach(function(k){
+    var el = $(k); if(!el) return;
+    el.addEventListener("input", function(){ grab(); saveSoon(); });
+    el.addEventListener("blur",  function(){ grab(); save(); });
+  });
+
+  $("bP").onclick = function(){ grab(); mark(s,"pass"); };
+  $("bS").onclick = function(){ grab(); mark(s,"skip"); };
+  $("bF").onclick = function(){ grab(); openSheet(s); };
+  $("wPrev").onclick = function(){ grab(); save(); if(S.idx > 0){ S.idx--; renderAll(); } };
+  $("wNext").onclick = function(){ grab(); save(); S.idx++; renderAll(); };
+}
+
+function wireResume(){
+  if(!$("rsResume")) return;
+  $("rsResume").onclick = function(){ openSheet(null, S.draft); };
+  $("rsDrop").onclick = function(){ S.draft = null; save(); renderAll(); toast("Draft discarded"); };
+}
+
+function mark(s, status){
+  var o = S.res[s.id] || {};
+  o.status = status; o.ts = new Date().toISOString();
+  S.res[s.id] = o; save();
+  if(status !== "flag"){ S.idx++; }
+  renderAll();
+}
+
+/* ══════════════════════ fault sheet ══════════════════════
+   Works on a clone so Cancel really cancels, and the clone is kept
+   in S.draft so an interrupted sheet can be handed back.
+   ═══════════════════════════════════════════════════════ */
+function setPageInert(isInert){
+  ["skipLink","main-content"].forEach(function(id){
+    var el = $(id); if(el) el.inert = isInert;
+  });
+  ["header","nav"].forEach(function(selector){
+    var el = document.querySelector(selector); if(el) el.inert = isInert;
+  });
+}
+function sheetFocusable(){
+  var els = $("sheet").querySelectorAll('button:not([disabled]),input,select,textarea,[href],[tabindex]:not([tabindex="-1"])');
+  var out = [];
+  for(var i=0;i<els.length;i++) if(els[i].getClientRects().length) out.push(els[i]);
+  return out;
+}
+function restoreSheetFocus(){
+  var target = sheetTrigger;
+  sheetTrigger = null;
+  if(target && target.isConnected && !target.disabled){ target.focus(); return; }
+  var main = $("main-content"); if(main) main.focus({preventScroll:true});
+}
+function openSheet(station, existing){
+  sheetTrigger = document.activeElement;
+  var f;
+  if(existing){
+    f = JSON.parse(JSON.stringify(existing));
+    if(!f.__new && !f.__editId) f.__editId = existing.id;
+  } else {
+    f = {
+      id:"F" + Date.now().toString(36).toUpperCase(),
+      __new:true,
+      station: station ? station.id : "",
+      zone: station ? (station.zone || "") : "",
+      pos: station ? (station.name || "") : "",
+      dev:"", sym:[], sev:"deg", route:"Undecided", notes:"", photo:false,
+      ts:new Date().toISOString(), kind: station ? station.kind : "tv"
+    };
+  }
+  S.draft = f;
+
+  var list = SYM[f.kind] || SYM.tv;
+  var h = "";
+
+  h += '<div class="fld"><label for="sPos">Position, canonical name</label>' +
+    '<input type="text" id="sPos" value="' + esc(f.pos) + '" placeholder="e.g. Walt Whitman Plaza · beer garden 2"></div>';
+
+  h += '<div class="fld"><label for="sDev">Vendor key or device ID, exactly as printed</label>' +
+    '<input type="text" id="sDev" value="' + esc(f.dev) + '" placeholder="leave blank if unkeyed"></div>' +
+    '<div class="mini" style="margin:-6px 0 14px">🔴 Do not expand or interpret the code. 🔵 41 positions carry a zone label and nothing else. Blank is a valid, useful answer.</div>';
+
+  h += '<fieldset class="choice-group"><legend>What is wrong</legend><div class="chips" id="symChips">';
+  for(var i=0;i<list.length;i++){
+    h += '<button type="button" class="chip' + (f.sym.indexOf(list[i]) > -1 ? " on" : "") + '" aria-pressed="' + (f.sym.indexOf(list[i]) > -1 ? "true" : "false") + '" data-sym="' + esc(list[i]) + '">' + esc(list[i]) + "</button>";
+  }
+  h += "</div></fieldset>";
+
+  h += '<fieldset class="choice-group"><legend>Severity</legend><div class="chips" id="sevChips">';
+  for(var j=0;j<SEV.length;j++){
+    h += '<button type="button" class="chip sev' + (f.sev === SEV[j].v ? " on" : "") + '" aria-pressed="' + (f.sev === SEV[j].v ? "true" : "false") + '" data-v="' + SEV[j].v + '">' + SEV[j].l + "</button>";
+  }
+  h += "</div>";
+  h += '<div class="mini" style="margin-top:8px">🟢 A dark display is uncounted advertising inventory. That is a revenue argument, not a cosmetic one, and it is the language that gets a unit replaced.</div></fieldset>';
+
+  h += '<div class="fld"><label for="sRoute">Route to</label><select id="sRoute">';
+  for(var k=0;k<ROUTES.length;k++){
+    h += '<option' + (f.route === ROUTES[k] ? " selected" : "") + ">" + esc(ROUTES[k]) + "</option>";
+  }
+  h += "</select><div class=\"mini\" style=\"margin-top:6px\">🟢 Video locates and reports. Teddy services the players and owns the ladder.</div></div>";
+
+  h += '<fieldset class="choice-group"><legend>Photographed</legend><div class="chips">' +
+    '<button type="button" class="chip' + (f.photo ? " on" : "") + '" aria-pressed="' + (f.photo ? "true" : "false") + '" id="sPhoto">📷 Photo taken</button></div>' +
+    '<div class="mini" style="margin-top:8px">This checkbox records an observation only. Attach actual images below. 🟡 The venue record says no photos or video inside. Clear it with Charlie or the steward before you rely on this.</div></fieldset>';
+  h += '<fieldset class="choice-group"><legend>Photo attachments</legend><div id="faultPhotos">Loading photo controls…</div></fieldset>';
+
+  h += '<div class="fld"><label for="sNotes">Notes</label><textarea id="sNotes" placeholder="What you saw, and anything you already tried">' + esc(f.notes) + "</textarea></div>";
+
+  var rc = repeatCount(f.pos);
+  if(rc >= 2) h += '<div class="note crit">🚨 <b>This position has failed on ' + rc + ' previous walks.</b> Stop resetting it and escalate for replacement.</div>';
+
+  h += '<div class="btnrow"><button class="pri" id="sSave">Save fault</button></div>';
+
+  $("shTitle").textContent = f.__new ? "Log a fault" : "Edit fault";
+  $("shBody").innerHTML = h;
+  $("sheet").classList.add("on");
+  $("sheetBg").classList.add("on");
+  $("sheet").setAttribute("aria-hidden","false");
+  $("sheetBg").setAttribute("aria-hidden","false");
+  setPageInert(true);
+  $("sheet").scrollTop = 0;
+  var first = $("sPos") || $("sSave");
+  if(first) first.focus();
+
+  function grabSheet(){
+    if(!$("sPos")) return;
+    f.pos = $("sPos").value;
+    f.dev = $("sDev").value;
+    f.route = $("sRoute").value;
+    f.notes = $("sNotes").value;
+  }
+  window.__grabSheet = grabSheet;
+  if(window.FMPPhotos) window.FMPPhotos.mountFault(f);
+
+  ["sPos","sDev","sNotes"].forEach(function(k){
+    $(k).addEventListener("input", function(){ grabSheet(); saveSoon(); });
+    $(k).addEventListener("blur",  function(){ grabSheet(); save(); });
+  });
+  $("sRoute").addEventListener("change", function(){ grabSheet(); save(); });
+
+  $("symChips").onclick = function(e){
+    var b = e.target.closest("[data-sym]"); if(!b) return;
+    var v = b.getAttribute("data-sym"), i = f.sym.indexOf(v);
+    if(i > -1) f.sym.splice(i,1); else f.sym.push(v);
+    b.classList.toggle("on");
+    b.setAttribute("aria-pressed", b.classList.contains("on") ? "true" : "false");
+    save();
+  };
+  $("sevChips").onclick = function(e){
+    var b = e.target.closest("[data-v]"); if(!b) return;
+    f.sev = b.getAttribute("data-v");
+    var all = $("sevChips").querySelectorAll(".chip");
+    for(var i2=0;i2<all.length;i2++){
+      all[i2].classList.remove("on");
+      all[i2].setAttribute("aria-pressed","false");
+    }
+    b.classList.add("on");
+    b.setAttribute("aria-pressed","true");
+    save();
+  };
+  $("sPhoto").onclick = function(){
+    f.photo = !f.photo;
+    this.classList.toggle("on");
+    this.setAttribute("aria-pressed", f.photo ? "true" : "false");
+    save();
+  };
+
+  $("sSave").onclick = function(){
+    try{ if(window.FMPPhotos) window.FMPPhotos.ensureReady(); }catch(e){ toast(e.message); return; }
+    grabSheet();
+    f.pos = f.pos.trim(); f.dev = f.dev.trim(); f.notes = f.notes.trim();
+    if(!f.sym.length){ toast("Pick at least one symptom"); return; }
+    var stationId = station ? station.id : f.station;
+    if(stationId && !knownStation(stationId)){ toast("This fault no longer matches a known station. Keep it open and check the position."); return; }
+    if(f.__new){
+      delete f.__new;
+      S.faults.push(f);
+    } else if(f.__editId){
+      var eid = f.__editId; delete f.__editId;
+      for(var i3=0;i3<S.faults.length;i3++){ if(S.faults[i3].id === eid){ S.faults[i3] = f; break; } }
+    }
+    if(stationId){
+      var result = S.res[stationId] || {};
+      result.status = "flag";
+      result.ts = new Date().toISOString();
+      S.res[stationId] = result;
+    }
+    S.draft = null;
+    closeSheet(false,false); save(); renderAll(); restoreSheetFocus();
+    toast("Fault logged");
+  };
+}
+function closeSheet(discardDraft, restoreFocus){
+  if(window.FMPPhotos) window.FMPPhotos.closeFault();
+  if(discardDraft) S.draft = null;
+  window.__grabSheet = null;
+  setPageInert(false);
+  $("sheet").classList.remove("on");
+  $("sheetBg").classList.remove("on");
+  $("sheet").setAttribute("aria-hidden","true");
+  $("sheetBg").setAttribute("aria-hidden","true");
+  if(restoreFocus !== false) restoreSheetFocus();
+}
+$("shCancel").onclick = function(){ closeSheet(true,false); save(); renderAll(); restoreSheetFocus(); };
+$("sheetBg").onclick  = function(){ closeSheet(true,false); save(); renderAll(); restoreSheetFocus(); };
+
+/* ══════════════════════ tickets ══════════════════════ */
+function renderTickets(){
+  var el = $("tkList");
+  if(!S.faults.length){
+    $("tkLede").textContent = "Nothing flagged yet.";
+    el.innerHTML = '<div class="empty"><span class="big">🎫</span>No faults logged.<br>Flag a position on the walk, or log one directly.</div>';
+    return;
+  }
+  var crit = 0;
+  for(var c=0;c<S.faults.length;c++){ if(S.faults[c].sev === "crit") crit++; }
+  $("tkLede").textContent = S.faults.length + " logged" + (crit ? ", " + crit + " critical" : "") + ".";
+
+  var h = "";
+  for(var i=0;i<S.faults.length;i++){
+    var f = S.faults[i], rc = repeatCount(f.pos);
+    h += '<div class="tk" data-sev="' + f.sev + '">' +
+      '<div class="tk-hd"><b>' + esc(f.pos || "Unnamed position") + "</b>" +
+      '<span class="tk-id">' + esc(f.dev || "unkeyed") + "</span></div>" +
+      '<div class="tk-sym">' + esc(f.sym.join(" · ")) + "</div>" +
+      (f.notes ? '<div class="tk-sym" style="color:var(--dim)">' + esc(f.notes) + "</div>" : "") +
+      '<div class="tk-ft">' +
+      '<span class="route">' + esc(f.route) + "</span>" +
+      (f.photos && f.photos.length ? '<span>📷 ' + f.photos.length + ' attached</span>' : f.photo ? "<span>📷 recorded, no file</span>" : "") +
+      (rc >= 2 ? '<span class="repeat">' + rc + "× repeat</span>" : "") +
+      '<button class="tk-del" data-e="' + f.id + '">Edit</button>' +
+      '<button class="tk-del" data-d="' + f.id + '">Delete</button>' +
+      "</div></div>";
+  }
+  el.innerHTML = h;
+  el.onclick = function(e){
+    var d = e.target.closest("[data-d]"), ed = e.target.closest("[data-e]");
+    if(d){
+      if(!confirm("Delete this fault ticket?")) return;
+      var id = d.getAttribute("data-d");
+      S.faults = S.faults.filter(function(x){ return x.id !== id; });
+      save(); renderAll(); return;
+    }
+    if(ed){
+      var eid = ed.getAttribute("data-e");
+      for(var i=0;i<S.faults.length;i++){ if(S.faults[i].id === eid) openSheet(null, S.faults[i]); }
+    }
+  };
+}
+$("btnAddFree").onclick = function(){ openSheet(null); };
+
+/* ══════════════════════ report ══════════════════════ */
+function buildReport(){
+  var st = stations(), m = S.meta, faults = S.faults.slice();
+  if(!m.show && !faults.length && !Object.keys(S.res).length) return {markdown:"Nothing to report yet.",faultCount:0};
+
+  var pass = 0, flag = 0, skip = 0;
+  for(var i=0;i<st.length;i++){
+    var r = S.res[st[i].id];
+    if(!r || !r.status) continue;
+    if(r.status === "pass") pass++;
+    else if(r.status === "flag") flag++;
+    else skip++;
+  }
+  var unwalked = st.length - pass - flag - skip;
+  var crit = 0;
+  for(var cc=0;cc<faults.length;cc++){ if(faults[cc].sev === "crit") crit++; }
+  var health = crit ? "🔴" : (faults.length ? "🟡" : (unwalked === st.length ? "⬜" : "🟢"));
+
+  var o = [];
+  o.push("# 📺 Preshow video walk · " + mdLine(m.show || "untitled") + " · " + mdLine(m.date || "no date"));
+  o.push("");
+  o.push("> " + health + " **" + faults.length + " fault" + (faults.length === 1 ? "" : "s") +
+    (crit ? ", " + crit + " critical" : "") + "**");
+  o.push("> " + pass + " pass · " + skip + " skipped · " + unwalked + " not walked · " + st.length + " positions on tonight's route");
+  o.push("> Walked by " + mdLine(m.op || "walker required"));
+  o.push("> Rig: " + (m.cfg === "winter" ? "Winter" : "Summer"));
+  o.push("> Route: all zones");
+  o.push("> Rotation Block: All zones");
+  o.push("> Zones: " + (Array.from(new Set(st.map(function(s){ return zoneLabel(s.zone); }))).map(mdLine).join(" → ") || "none selected"));
+  o.push("");
+  o.push("---");
+  o.push("");
+  o.push("## 📊 Readings");
+  o.push("");
+  o.push("| Position | Env | Result | Reading | Baseline |");
+  o.push("| --- | --- | --- | --- | --- |");
+  for(var j=0;j<st.length;j++){
+    var s = st[j], rr = S.res[s.id] || {};
+    var mk = rr.status === "pass" ? "🟢 pass" : rr.status === "flag" ? "🔴 flag" : rr.status === "skip" ? "🟡 skip" : "⬜ not walked";
+    if(rr.note) mk += " ✎";
+    var read = [];
+    if(rr.bright) read.push("bright " + rr.bright);
+    if(rr.match) read.push("match " + rr.match);
+    if(rr.level) read.push("level " + rr.level);
+    if(rr.count) read.push("count " + rr.count);
+    o.push("| " + mdCell(s.name) + (s.key ? " · " + String.fromCharCode(96) + mdCell(s.key).replace(/`/g, "'") + String.fromCharCode(96) : "") + " | " + mdCell(s.env) + " | " + mdCell(mk) + " | " +
+      (read.length ? mdCell(read.join(", ")) : "n/a") + " | " + mdCell(s.base || "n/a") + " |");
+  }
+  o.push("");
+
+  var visualStations = st.filter(function(s){ return visualItems(s).length; });
+  if(visualStations.length){
+    o.push("## Visual checklist", "", "> Checked means confirmed by the operator. Unchecked means not confirmed; the overall Pass/Flag result is recorded separately.", "");
+    visualStations.forEach(function(s){
+      var visual = (S.res[s.id] || {}).visual || {};
+      o.push("### " + mdLine(s.name), "");
+      visualItems(s).forEach(function(item){
+        o.push("- [" + (visual[item.key] === true ? "x" : " ") + "] " + item.label);
+      });
+      o.push("");
+    });
+  }
+
+  /* field notes: observations that did not warrant a ticket */
+  var fieldNotes = [];
+  for(var fn=0;fn<st.length;fn++){
+    var fr = S.res[st[fn].id];
+    if(fr && fr.note && fr.note.trim()) fieldNotes.push([st[fn].name, fr.note.trim()]);
+  }
+  if(fieldNotes.length){
+    o.push("## ✎ Field notes");
+    o.push("");
+    o.push("> Observations recorded on the walk that did not warrant a ticket. Watch these next show.");
+    o.push("");
+    for(var fi=0;fi<fieldNotes.length;fi++) o.push("- **" + mdCell(fieldNotes[fi][0]) + ".** " + mdCell(fieldNotes[fi][1]));
+    o.push("");
+  }
+
+  if(faults.length){
+    o.push("## 🎫 Faults");
+    o.push("");
+    o.push("| Position | Key | Symptom | Severity | Route | Photo |");
+    o.push("| --- | --- | --- | --- | --- | --- |");
+    for(var k=0;k<faults.length;k++){
+      var f = faults[k];
+      var sv = f.sev === "crit" ? "🔴 critical" : f.sev === "deg" ? "🟡 degraded" : "🔵 cosmetic";
+      o.push("| " + mdCell(f.pos || "unnamed") + " | " + String.fromCharCode(96) + mdCell(f.dev || "unkeyed").replace(/`/g, "'") + String.fromCharCode(96) + " | " + mdCell(f.sym.join(", ")) +
+        " | " + mdCell(sv) + " | " + mdCell(f.route) + " | " + (f.photos && f.photos.length ? f.photos.length + " attached" : f.photo ? "Recorded, no file attached" : "n/a") + " |");
+    }
+    o.push("");
+    var notes = faults.filter(function(x){ return x.notes; });
+    if(notes.length){
+      o.push("### 🗒️ Fault notes");
+      o.push("");
+      for(var n=0;n<notes.length;n++) o.push("- **" + mdCell(notes[n].pos || "unnamed") + ".** " + mdCell(notes[n].notes));
+      o.push("");
+    }
+    var reps = faults.filter(function(x){ return repeatCount(x.pos) >= 2; });
+    if(reps.length){
+      o.push("### 🚨 Repeat offenders");
+      o.push("");
+      o.push("> Each of these has failed on at least two previous walks. A position that fails repeatedly is not a reset, it is uncounted advertising inventory. Escalate for replacement.");
+      o.push("");
+      for(var rp=0;rp<reps.length;rp++) o.push("- " + mdCell(reps[rp].pos || "unnamed") + " · " + repeatCount(reps[rp].pos) + " prior");
+      o.push("");
+    }
+  } else {
+    o.push("## 🎫 Faults");
+    o.push("");
+    o.push("🟢 None logged.");
+    o.push("");
+  }
+
+  o.push("---");
+  o.push("");
+  var photoOwners = [{label:"General report",photos:S.meta.photos || []}].concat(faults.map(function(f){return {label:f.pos || "Unnamed fault",photos:f.photos || []};}));
+  if(photoOwners.some(function(owner){return owner.photos.length;})){
+    o.push("## Photo attachments", "", "> Images are attached separately to email and embedded in the JSON export. This Markdown file lists them but does not embed image data.", "");
+    photoOwners.forEach(function(owner){ owner.photos.forEach(function(photo){ o.push("- " + mdLine(owner.label) + ": " + mdLine(photo.name)); }); });
+    o.push("");
+  }
+  o.push("## ❓ Still open after this walk");
+  o.push("");
+  o.push("| # | Item | Who answers |");
+  o.push("| --- | --- | --- |");
+  o.push("| 1 | 🔴 Which MCTRL660 IP maps to which unit, and are the four redundancy or canvas extension | Trace one follower's output |");
+  o.push("| 2 | 🔴 Which zones the ConcertVision button actually moves | Charlie, or the 2024 as-builts |");
+  o.push("| 3 | 🔴 Who installed the 2024 IP system and where the commissioning package is | Charlie, Live Nation facility, or the integrator |");
+  o.push("| 4 | 🔴 What the winter configuration does to the 4 lawn walls and 14 lawn TVs | Charlie, before changeover |");
+  o.push("");
+  o.push("**Confidence: medium.** Field observation only. No controller logs pulled, no network state checked, no content source verified upstream of the display.");
+  o.push("");
+  o.push("_Generated by the FMP preshow walk tool. Paste into the FMP Technical Overview working page. Do not paste unresolved items into the John deliverable._");
+  return {markdown:o.join("\n"),faultCount:faults.length};
+}
+function report(){
+  return buildReport().markdown;
+}
+function renderReport(){
+  $("repOut").textContent = report();
+  if(window.FMPPhotos) window.FMPPhotos.renderReport();
+
+  var prev = store.get(PREV_KEY);
+  $("undoRow").innerHTML = prev
+    ? '<div class="btnrow"><button id="btnUndo">Undo the last clear</button></div>'
+    : "";
+  if($("btnUndo")) $("btnUndo").onclick = function(){
+    try{
+      var o = JSON.parse(prev);
+      window.__grab = null; window.__grabSheet = null;
+      restoreWalk(o);
+      store.del(PREV_KEY); save(); syncSetup(); go("walk"); toast("Walk restored");
+    }catch(e){ toast("That backup could not be read"); }
+  };
+
+  var n = $("saveNote");
+  n.className = STORAGE_OK ? "note info" : "note crit";
+  n.innerHTML = STORAGE_OK
+    ? "🟢 <b>Saving works on this copy.</b> Taps save instantly, typing saves within a second and on leaving the field, and everything is flushed when the app is backgrounded or closed. Last save " + (lastSaveAt ? hhmm(lastSaveAt) : "not yet") + "."
+    : "🔴 <b>Saving does not work on this copy.</b> The browser is blocking storage, so nothing survives a reload. Export the report or the JSON before you leave this screen.";
+}
+
+function showExportStatus(message, error){
+  var el = $("exportStatus");
+  el.textContent = message || "";
+  el.className = message ? "note " + (error ? "crit" : "info") : "note info hide";
+}
+function exportBlocked(message){
+  showExportStatus(message,true);
+  throw new Error(message);
+}
+function prepareExport(){
+  flush();
+  if(!mdLine(S.meta.op)) exportBlocked("Choose or enter the walker name in Setup before exporting.");
+  if(S.draft) exportBlocked("Finish the unfinished fault before exporting: resume it and Save fault, or discard it.");
+  var badFault = S.faults.find(function(fault){ return fault.station && !knownStation(fault.station); });
+  if(badFault) exportBlocked("A saved fault no longer matches a known station. Edit " + (badFault.pos || "the unnamed fault") + " before exporting.");
+  var built = buildReport();
+  var walk = structuredClone(S);
+  walk.rotationBlock = "All zones";
+  delete walk.meta.block;
+  delete walk.meta.nextBlock;
+  delete walk.meta.rotationBlock;
+  var appFaultCount = S.faults.length;
+  var jsonFaultCount = Array.isArray(walk.faults) ? walk.faults.length : -1;
+  if(built.faultCount !== appFaultCount || jsonFaultCount !== appFaultCount){
+    exportBlocked("Export blocked: the report fault count does not match the " + appFaultCount + " faults in the app. Keep this tab open and reload before trying again.");
+  }
+  showExportStatus("Export check passed: " + appFaultCount + " fault" + (appFaultCount === 1 ? "" : "s") + " included.",false);
+  return {walk:walk,markdown:built.markdown,faultCount:built.faultCount};
+}
+
+$("btnCopy").onclick = function(){
+  try{
+    var t = prepareExport().markdown;
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(t).then(function(){ toast("Report copied"); },function(){ fallbackCopy(t); });
+    } else fallbackCopy(t);
+  }catch(e){ /* prepareExport shows the actionable inline error. */ }
+};
+function fallbackCopy(t){
+  var ta = document.createElement("textarea");
+  ta.value = t; ta.style.position = "fixed"; ta.style.opacity = "0";
+  document.body.appendChild(ta); ta.select();
+  try{ document.execCommand("copy"); toast("Report copied"); }
+  catch(e){ toast("Select the text and copy manually"); }
+  document.body.removeChild(ta);
+}
+function dl(name, text, type){
+  var b = new Blob([text], {type:type || "text/plain"});
+  var u = URL.createObjectURL(b);
+  var a = document.createElement("a");
+  a.href = u; a.download = name; document.body.appendChild(a); a.click();
+  document.body.removeChild(a); setTimeout(function(){ URL.revokeObjectURL(u); }, 800);
+}
+$("btnDl").onclick = function(){
+  try{
+    var prepared = prepareExport();
+    dl("fmp-walk-" + (prepared.walk.meta.date || "undated") + ".md", prepared.markdown, "text/markdown");
+    toast("Downloaded");
+  }catch(e){ /* prepareExport shows the actionable inline error. */ }
+};
+$("btnJson").onclick = async function(){
+  this.disabled = true;
+  try{
+    if(!window.FMPPhotos) throw new Error("Photo export is still loading. Try again in a moment.");
+    await window.FMPPhotos.exportWalk(); toast("Exported with photos");
+  }catch(e){ showExportStatus(e.message || "Export failed. Keep this tab open and try again.",true); }
+  finally{ this.disabled = false; }
+};
+$("btnReset").onclick = function(){
+  if(!confirm("Save this walk to the repeat-offender history and start a new one? One undo is available afterwards.")) return;
+  pushHistory();
+  try{ store.set(PREV_KEY, JSON.stringify({meta:S.meta,res:S.res,faults:S.faults,draft:S.draft,idx:S.idx})); }catch(e){}
+  window.__grab = null; window.__grabSheet = null;
+  if(saveTimer){ clearTimeout(saveTimer); saveTimer = null; }
+  S.res = {}; S.faults = []; S.draft = null; S.idx = 0;
+  S.meta = Object.assign({}, S.meta);
+  S.meta.show = ""; S.meta.date = todayISO();
+  delete S.meta.photos;
+  save(); syncSetup(); go("setup"); toast("New walk started. Undo is on the Report tab.");
+};
+
+/* ══════════════════════ setup ══════════════════════ */
+function todayISO(){
+  var d = new Date(), p = function(n){ return (n<10?"0":"") + n; };
+  return d.getFullYear() + "-" + p(d.getMonth()+1) + "-" + p(d.getDate());
+}
+function syncSetup(){
+  S.meta = prepareMeta(S.meta);
+  $("fDate").value = S.meta.date || todayISO();
+  $("fShow").value = S.meta.show;
+  var custom = S.meta.op && ["David","Charlie","John"].indexOf(S.meta.op) === -1;
+  $("fOp").value = custom ? "custom" : S.meta.op;
+  $("fOpCustom").value = custom ? S.meta.op : "";
+  syncOperator();
+  $("fCfg").value = S.meta.cfg;
+  renderZones();
+  applyTheme();
+}
+function renderZones(){
+  var groups = zoneGroups(), selectedZones = 0, total = 0;
+  var cw = $("secChips"); cw.innerHTML = "";
+  groups.forEach(function(group){
+    var required = group.checks.filter(function(s){ return s.tier === 2; });
+    var selectable = group.checks.filter(function(s){ return s.tier !== 2; });
+    var selectedSelectable = selectable.filter(function(s){ return S.meta.checks[s.id]; });
+    var count = required.length + selectedSelectable.length;
+    var full = count === group.checks.length;
+    if(count) selectedZones++;
+    total += count;
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "chip zone-chip" + (full ? " on" : "");
+    b.setAttribute("data-zone", group.zone);
+    b.setAttribute("aria-pressed", full ? "true" : count ? "mixed" : "false");
+    if(!selectable.length) b.disabled = true;
+    var detail = (count && !full ? count + " of " : "") + group.checks.length + " check" + (group.checks.length === 1 ? "" : "s");
+    if(count && !full) detail += " · partial";
+    if(required.length) detail += " · Tier 2 required";
+    b.innerHTML = '<span class="zone-state"><span class="zone-switch" aria-hidden="true"></span>' +
+      (!selectable.length ? "Required" : full ? "On" : count ? "Partial" : "Off") + '</span><span>' + esc(zoneLabel(group.zone)) + '</span><small>' + esc(detail) + '</small>';
+    b.title = !selectable.length ? zoneLabel(group.zone) + " is required on every walk" : (full ? "Turn off selectable checks in " : "Turn on ") + zoneLabel(group.zone);
+    cw.appendChild(b);
+  });
+  $("zoneSummary").textContent = total ? selectedZones + " zones · " + total + " checks on tonight’s route" : "No zones selected. Choose an area to begin.";
+  $("btnStart").disabled = total === 0;
+  cw.onclick = function(e){
+    var b = e.target.closest("[data-zone]"); if(!b) return;
+    var group = groups.find(function(g){ return g.zone === b.getAttribute("data-zone"); });
+    var selectable = group.checks.filter(function(s){ return s.tier !== 2; });
+    if(!selectable.length) return;
+    var enabled = selectable.some(function(s){ return !S.meta.checks[s.id]; });
+    selectable.forEach(function(s){ S.meta.checks[s.id] = enabled; });
+    var index = groups.indexOf(group);
+    S.idx = 0; save(); renderZones(); renderHeader(); renderRoute();
+    cw.children[index].focus({preventScroll:true});
+  };
+}
+function syncOperator(){
+  $("customOpField").classList.toggle("hide", $("fOp").value !== "custom");
+}
+function grabSetup(){
+  S.meta.date  = $("fDate").value;
+  S.meta.show  = $("fShow").value.trim();
+  S.meta.op    = $("fOp").value === "custom" ? $("fOpCustom").value.trim() : $("fOp").value;
+  S.meta.cfg   = $("fCfg").value;
+}
+["fDate","fShow","fOp","fOpCustom","fCfg"].forEach(function(id){
+  $(id).addEventListener("input",  function(){ grabSetup(); syncOperator(); showExportStatus("",false); saveSoon(); renderHeader(); });
+  $(id).addEventListener("change", function(){
+    grabSetup(); syncOperator(); showExportStatus("",false); S.idx = 0; save();
+    if(id === "fCfg") renderZones();
+    renderHeader(); renderRoute();
+    if(id === "fOp" && $("fOp").value === "custom") $("fOpCustom").focus();
+  });
+});
+$("btnStart").onclick = function(){ grabSetup(); S.idx = 0; save(); go("walk"); };
+$("themeBtn").onclick = cycleTheme;
+$("themeChips").onclick = function(e){
+  var b = e.target.closest("[data-t]"); if(!b) return;
+  setTheme(b.getAttribute("data-t"));
+};
+
+/* ══════════════════════ tabs ══════════════════════ */
+var TABS = ["setup","walk","tk","rep","cam","ref"];
+function go(tab){
+  if(window.__grab) window.__grab();
+  S.tab = tab; save();
+  var panels = document.querySelectorAll(".panel");
+  for(var i=0;i<panels.length;i++) panels[i].classList.remove("on");
+  $("p-" + tab).classList.add("on");
+  var btns = document.querySelectorAll("nav button");
+  for(var j=0;j<btns.length;j++){
+    var current = btns[j].getAttribute("data-tab") === tab;
+    btns[j].classList.toggle("on", current);
+    if(current) btns[j].setAttribute("aria-current","page");
+    else btns[j].removeAttribute("aria-current");
+  }
+  document.querySelector("main").scrollTop = 0;
+  renderAll();
+}
+document.querySelector("nav").onclick = function(e){
+  var b = e.target.closest("[data-tab]"); if(!b) return;
+  go(b.getAttribute("data-tab"));
+};
+
+/* ══════════════════════ keyboard ══════════════════════ */
+document.addEventListener("keydown", function(e){
+  var t = e.target, tn = t && t.tagName;
+  var typing = tn === "INPUT" || tn === "TEXTAREA" || tn === "SELECT" || (t && t.isContentEditable);
+  var sheetOpen = $("sheet").classList.contains("on");
+
+  if(sheetOpen){
+    if(e.key === "Escape"){
+      closeSheet(true,false); save(); renderAll(); restoreSheetFocus(); e.preventDefault(); return;
+    }
+    if(e.key === "Tab"){
+      var focusables = sheetFocusable();
+      if(focusables.length){
+        var first = focusables[0], last = focusables[focusables.length - 1];
+        if(e.shiftKey && document.activeElement === first){
+          last.focus(); e.preventDefault();
+        } else if(!e.shiftKey && document.activeElement === last){
+          first.focus(); e.preventDefault();
+        }
+      }
+      return;
+    }
+    return;
+  }
+  if(e.key === "Escape"){
+    if(typing && t.blur){ t.blur(); return; }
+  }
+  if(typing || e.metaKey || e.ctrlKey || e.altKey) return;
+
+  var k = (e.key || "").toLowerCase();
+  if(k.length === 1 && k >= "1" && k <= "6"){ go(TABS[parseInt(k,10) - 1]); e.preventDefault(); return; }
+  if(k === "d"){ cycleTheme(); e.preventDefault(); return; }
+  if(S.tab !== "walk") return;
+
+  var st = stations();
+  if(e.key === "ArrowRight"){ if(window.__grab) window.__grab(); S.idx = Math.min(S.idx + 1, st.length); save(); renderAll(); e.preventDefault(); return; }
+  if(e.key === "ArrowLeft"){ if(window.__grab) window.__grab(); S.idx = Math.max(S.idx - 1, 0); save(); renderAll(); e.preventDefault(); return; }
+  if(S.idx >= st.length) return;
+  if(k === "n" && $("rN")){ $("rN").focus(); e.preventDefault(); return; }
+  if(k === "p" && $("bP")){ $("bP").click(); e.preventDefault(); }
+  if(k === "f" && $("bF")){ $("bF").click(); e.preventDefault(); }
+  if(k === "s" && $("bS")){ $("bS").click(); e.preventDefault(); }
+});
+
+function renderAll(){
+  renderHeader();
+  if(S.tab === "walk") renderWalk();
+  if(S.tab === "tk") renderTickets();
+  if(S.tab === "rep") renderReport();
+  save();
+}
+
+/* ══════════════════════ boot ══════════════════════ */
+if(!STORAGE_OK) $("storageWarn").classList.remove("hide");
+load();
+if(!S.meta.date) S.meta.date = todayISO();
+syncSetup();
+go(S.meta.show ? (S.tab || "walk") : "setup");
+
+(function announceRestore(){
+  var st = stations(), done = 0, noted = 0;
+  for(var i=0;i<st.length;i++){
+    var r = S.res[st[i].id];
+    if(r && r.status) done++;
+    if(r && r.note) noted++;
+  }
+  if(!STORAGE_OK){ toast("Storage blocked. Nothing will be saved."); return; }
+  if(done || S.faults.length){
+    toast("Restored " + done + " of " + st.length +
+      (S.faults.length ? ", " + S.faults.length + " flagged" : "") +
+      (noted ? ", " + noted + " noted" : ""));
+  }
+})();
+</script>
+<script type="module" src="./email.js?v=167b00464e40dcf7"></script>
+<script type="module" src="./notion.js?v=1e4ade1a6663fcde"></script>
+</body>
+</html>

@@ -101,6 +101,7 @@ function hasReturnPath(source) {
     || /System by Dave home/i.test(source)
     || /href=["']\/(?:["'#?]|index\.html)/i.test(source)
     || /href=["'](?:\.\.\/)*index\.html/i.test(source)
+    || /href=["'](?:https:\/\/systembydave\.com)?\/fmp\//i.test(source)
     || /href=["']https:\/\/systembydave\.com\/(?:["'#?]|index\.html)/i.test(source);
 }
 

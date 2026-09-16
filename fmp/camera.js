@@ -124,17 +124,22 @@ function referenceCards(position) {
     refs.fieldGuide = '/resources/ursa-broadcast-g2-reference.html';
   }
   const items = [
-    ['BF', 'Back-focus card', 'Frame, zoom, focus, repeat', refs.backFocus],
-    ['G2', 'URSA Broadcast G2 field guide', 'Build, media, viewfinder and body reference', refs.fieldGuide],
-    ['OP', 'Build and stow instructions', 'House camera operating sequence', refs.cameraOps],
-    ['PTZ', 'PTZ control notes', 'Controller and catwalk checks', refs.ptzOps],
+    ...(PUBLIC_RELEASE ? [
+      ['WALK', 'Preshow venue walk', 'Route checks, fault photos and report export', '/fmpwalk/', false],
+      ['CALL', 'Bowl camera guide', 'Tour modes, meeting, song flow and directing', '/fmp/guide/', false],
+      ['3D', 'Camera rig explorer', '72 parts, photo evidence and operating notes', '/fmp/rig/', false]
+    ] : []),
+    ['BF', 'Back-focus card', 'Frame, zoom, focus, repeat', refs.backFocus, !PUBLIC_RELEASE],
+    ['G2', 'URSA Broadcast G2 field guide', 'Build, media, viewfinder and body reference', refs.fieldGuide, true],
+    ['OP', 'Build and stow instructions', 'House camera operating sequence', refs.cameraOps, true],
+    ['PTZ', 'PTZ control notes', 'Controller and catwalk checks', refs.ptzOps, true],
     ...(SETUP_TEST_ONLY && !PUBLIC_RELEASE ? [
-      ['PDF', 'Printable G2 reference', 'Existing house reference PDF', '/resources/ursa-broadcast-g2-reference.pdf'],
-      ['MAP', 'Venue and signal maps', 'Select a zone or device, then read its evidence', '/#maps']
+      ['PDF', 'Printable G2 reference', 'Existing house reference PDF', '/resources/ursa-broadcast-g2-reference.pdf', true],
+      ['MAP', 'Venue and signal maps', 'Select a zone or device, then read its evidence', '/#maps', true]
     ] : [])
   ].filter(item => position.ptz || item[0] !== 'PTZ');
-  return items.map(([icon, name, copy, url]) => `
-    <a class="reference" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">
+  return items.map(([icon, name, copy, url, newTab = true]) => `
+    <a class="reference" href="${escapeHtml(url)}"${newTab ? ' target="_blank" rel="noopener noreferrer"' : ''}>
       <span class="reference-icon" aria-hidden="true">${icon}</span>
       <span><strong>${escapeHtml(name)}</strong><small>${escapeHtml(copy)}</small></span>
     </a>`);

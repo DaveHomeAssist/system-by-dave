@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-09-16
+
+### Unified FMP video operations suite
+
+* Expanded `/fmp/` from a camera-only doorway into a four-part video operations hub: camera commissioning, the separate preshow walk, bowl camera training, and a 72-part 3D/photo rig reference. The camera workflow keeps owner-bound drafts, authenticated SETUP TEST writes, and explicit receipts; the walk remains local-first with separate download, Gmail, and Notion confirmations.
+* Added managed `/fmpwalk/`, `/fmp/guide/`, and `/fmp/rig/` routes from canonical `DaveHomeAssist/fmpwalk` source. The guide records the tonight-plan/training boundary, and the rig explorer vendors Three.js locally with an exact allowlist of supplied WebP evidence rather than a CDN runtime.
+* Upgraded the release contract to provenance schema v2 with independent `commissioning` and `local-first` modes, exact file lists, binary-safe SHA-256 verification, source commit pinning, and refusal of unmanaged destination files. Extended noindex, robots, FMP index, navigation, and Pages verification for the new routes.
+* Restyled the camera workflow with the System by Dave workshop palette and local fonts, placed the stage rail at the bottom on phones while keeping it stable at the side in landscape/desktop, and retained four explicit evidence states. Responsive browser coverage now includes the hub, both reference apps, and the managed walk at six viewport sizes with zero writes.
+
 ## 2026-09-15
 
 ### FMP public camera commissioning frontend

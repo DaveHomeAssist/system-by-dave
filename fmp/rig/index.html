@@ -1,0 +1,570 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none'">
+<meta name="theme-color" content="#f4eee3">
+<meta name="description" content="Interactive FMP camera rig and fiber-converter reference with 72 documented parts, photo evidence, operating notes, and keyboard access.">
+<link rel="canonical" href="https://systembydave.com/fmp/rig/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="System by Dave">
+<meta property="og:title" content="FMP Camera Rig | System by Dave">
+<meta property="og:description" content="Explore the FMP camera rig, support, viewfinder, and fiber converters in 3D with source-backed operating notes.">
+<meta property="og:url" content="https://systembydave.com/fmp/rig/">
+<meta property="og:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="FMP Camera Rig | System by Dave">
+<meta name="twitter:description" content="Interactive camera rig and converter reference with 72 documented parts.">
+<meta name="twitter:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<title>FMP Camera Rig | System by Dave</title>
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three/three.module.js",
+    "three/addons/controls/OrbitControls.js": "./vendor/three/addons/controls/OrbitControls.js"
+  }
+}
+</script>
+<script src="fmp-guide-data.js"></script>
+<style>
+  @font-face{font-family:'DM Serif Display';font-style:normal;font-weight:400;font-display:swap;src:url('/fonts/dm-serif-display.woff2') format('woff2')}
+  @font-face{font-family:'DM Sans';font-style:normal;font-weight:300 500;font-display:swap;src:url('/fonts/dm-sans.woff2') format('woff2')}
+  @font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:400 500;font-display:swap;src:url('/fonts/jetbrains-mono.woff2') format('woff2')}
+  :root{
+    color-scheme:light;
+    --sbd-bg:#f4eee3;--sbd-bg-raised:#fbf7ef;--sbd-bg-sunken:#eae2d3;
+    --sbd-sand:#241f1b;--sbd-sand-dim:#564e45;--sbd-sand-faint:#766c5e;
+    --sbd-rust-on-dark:#a8512e;--sbd-rust-dim:#7c3a21;--sbd-charcoal:#d8cdba;--sbd-border-dk:#b8ac97;
+    --sbd-ok-dk:#5e7a4e;--sbd-warn-dk:#8a6420;--sbd-alert-dk:#9e3b2a;
+    --sbd-serif:'DM Serif Display',Georgia,serif;--sbd-sans:'DM Sans',system-ui,sans-serif;--sbd-mono:'JetBrains Mono',ui-monospace,monospace;
+    --sbd-ease:cubic-bezier(.2,.6,.2,1)
+  }
+  :root[data-theme="dark"]{
+    color-scheme:dark;
+    --sbd-bg:#1c1917;--sbd-bg-raised:#222019;--sbd-bg-sunken:#15120f;
+    --sbd-sand:#e8dece;--sbd-sand-dim:#b8afa2;--sbd-sand-faint:#8f867a;
+    --sbd-rust-on-dark:#d7825a;--sbd-rust-dim:#8a4428;--sbd-charcoal:#2e2b28;--sbd-border-dk:#3a3632;
+    --sbd-ok-dk:#7fae7a;--sbd-warn-dk:#d6a24e;--sbd-alert-dk:#cf6b5a
+  }
+  html,body{margin:0;height:100%}
+  body{background:var(--sbd-bg);color:var(--sbd-sand);font-family:var(--sbd-sans);overflow:hidden}
+  body::before{display:none}
+  a{color:var(--sbd-rust-on-dark);text-decoration:none}
+  a:hover{color:var(--sbd-sand)}
+  button{font-family:var(--sbd-mono);cursor:pointer}
+  .vh{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+  .skip{position:absolute;left:8px;top:-60px;z-index:50;display:inline-flex;align-items:center;min-height:44px;padding:0 14px;background:var(--sbd-sand);color:var(--sbd-bg);font:500 11px/1 var(--sbd-mono);letter-spacing:.1em;text-transform:uppercase;transition:top .16s var(--sbd-ease)}
+  .skip:focus{top:8px;color:var(--sbd-bg)}
+  a:focus-visible,button:focus-visible,canvas:focus-visible{outline:3px solid var(--sbd-rust-on-dark);outline-offset:2px}
+  #app{height:100%;display:grid;grid-template-rows:auto auto minmax(160px,1fr) minmax(0,46%)}
+  .bar{display:flex;align-items:center;gap:10px;padding:10px 14px;padding-top:calc(10px + env(safe-area-inset-top));background:var(--sbd-bg);border-bottom:1px solid var(--sbd-charcoal);box-shadow:0 1px 0 var(--sbd-rust-on-dark)}
+  .mark{width:28px;height:28px;flex:none;display:flex;align-items:center;justify-content:center;border:1px solid var(--sbd-rust-on-dark);font:500 10px/1 var(--sbd-mono);letter-spacing:.04em;color:var(--sbd-rust-on-dark)}
+  .lock{font:500 11px/1.2 var(--sbd-mono);letter-spacing:.12em;text-transform:uppercase;white-space:nowrap;color:var(--sbd-sand)}
+  .lock i{font-style:normal;color:var(--sbd-sand-dim)}
+  .grow{flex:1}
+  .eqrow{display:flex;gap:1px;background:var(--sbd-charcoal);border:1px solid var(--sbd-charcoal)}
+  .eqrow button{min-height:44px;padding:0 13px;border:0;background:var(--sbd-bg-sunken);color:var(--sbd-sand-dim);font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;transition:background .18s var(--sbd-ease),color .18s var(--sbd-ease)}
+  .eqrow button[aria-pressed="true"]{background:var(--sbd-bg-raised);color:var(--sbd-rust-on-dark)}
+  .back{flex:none;display:inline-flex;align-items:center;justify-content:center;min-height:44px;min-width:44px;padding:0 10px;border:1px solid var(--sbd-charcoal);font:500 11px/1 var(--sbd-mono);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap}
+  .subbar{display:flex;align-items:center;gap:8px;padding:8px 14px;background:var(--sbd-bg-sunken);border-bottom:1px solid var(--sbd-charcoal);overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .subbar::-webkit-scrollbar{display:none}
+  .subbar .lbl{flex:none;white-space:nowrap;font:500 11px/1 var(--sbd-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--sbd-rust-on-dark)}
+  .pose{flex:none;min-height:44px;padding:0 13px;background:transparent;border:1px solid var(--sbd-charcoal);color:var(--sbd-sand-dim);font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;transition:border-color .18s var(--sbd-ease),color .18s var(--sbd-ease)}
+  .pose:hover{border-color:var(--sbd-rust-on-dark);color:var(--sbd-rust-on-dark)}
+  #stagewrap{position:relative;min-height:0;background:var(--sbd-bg-sunken)}
+  canvas{display:block;width:100%;height:100%;touch-action:none}
+  .hint{position:absolute;left:14px;bottom:12px;font:400 11px/1.5 var(--sbd-mono);letter-spacing:.02em;color:var(--sbd-sand-faint);pointer-events:none}
+  .hover{position:absolute;left:14px;top:12px;padding:6px 10px;background:rgba(21,18,15,.86);border:1px solid var(--sbd-border-dk);font:500 11px/1 var(--sbd-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--sbd-sand);pointer-events:none;opacity:0;transition:opacity .16s var(--sbd-ease)}
+  .hover.on{opacity:1}
+  .zoomrow{position:absolute;right:12px;bottom:12px;display:flex;flex-direction:column;gap:6px}
+  .zoomrow button{width:48px;height:48px;background:rgba(21,18,15,.82);border:1px solid var(--sbd-border-dk);color:var(--sbd-sand-dim);font-size:16px;font-weight:500;transition:border-color .18s var(--sbd-ease),color .18s var(--sbd-ease)}
+  .zoomrow button:hover{border-color:var(--sbd-rust-on-dark);color:var(--sbd-rust-on-dark)}
+  .fail{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:32px;text-align:center}
+  .fail.on{display:flex}
+  #detail{min-height:0;overflow:auto;background:var(--sbd-bg);border-top:1px solid var(--sbd-rust-on-dark)}
+  .dwrap{padding:16px}
+  .dhead{display:flex;align-items:flex-start;gap:12px}
+  .dnum{width:30px;height:30px;flex:none;display:flex;align-items:center;justify-content:center;border:1px solid var(--sbd-rust-dim);font:500 12px/1 var(--sbd-mono);color:var(--sbd-rust-on-dark)}
+  .dtitle{font-family:var(--sbd-serif);font-size:23px;line-height:1.15;color:var(--sbd-sand);margin:0}
+  .ddir{margin:4px 0 0;font:500 11px/1.3 var(--sbd-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--sbd-sand-dim)}
+  .row{margin-top:14px}
+  .rlbl{display:block;margin-bottom:5px;font:500 11px/1 var(--sbd-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--sbd-sand-dim)}
+  .rlbl.ok{color:var(--sbd-ok-dk)}
+  .rval{display:block;font:400 14px/1.5 var(--sbd-sans);color:var(--sbd-sand);text-wrap:pretty}
+  .tip{display:flex;gap:10px;margin-top:14px;padding:12px;background:var(--sbd-bg-sunken);border:1px solid var(--sbd-charcoal)}
+  .tip span:first-child{flex:none;font:500 11px/1.4 var(--sbd-mono);color:var(--sbd-warn-dk)}
+  .tip span:last-child{font:400 13px/1.45 var(--sbd-sans);color:var(--sbd-sand-dim);text-wrap:pretty}
+  .adjust{display:flex;align-items:center;gap:10px;margin-top:14px;padding:10px 12px;border:1px solid var(--sbd-charcoal);background:var(--sbd-bg-sunken)}
+  .adjust label{flex:none;font:500 11px/1 var(--sbd-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--sbd-sand-dim)}
+  .adjust input[type=range]{flex:1;min-width:0;accent-color:var(--sbd-rust-on-dark);height:44px;margin:0}
+  .adjust output{flex:none;min-width:5ch;text-align:right;font:500 12px/1 var(--sbd-mono);color:var(--sbd-rust-on-dark)}
+  .evid{margin:12px 0 0;font:400 12px/1.5 var(--sbd-sans);color:var(--sbd-sand-dim);text-wrap:pretty}
+  .photo{display:grid;grid-template-columns:minmax(96px,160px) 1fr;gap:12px;margin:14px 0 0;padding:10px;border:1px solid var(--sbd-charcoal);background:var(--sbd-bg-sunken)}
+  .photo[hidden]{display:none}
+  .photo img{display:block;width:100%;height:108px;object-fit:contain;background:var(--sbd-bg)}
+  .photo figcaption{align-self:center;font:400 12px/1.5 var(--sbd-sans);color:var(--sbd-sand-dim)}
+  .foot{margin:16px 0 0;font:400 11px/1.5 var(--sbd-mono);letter-spacing:.02em;color:var(--sbd-sand-dim)}
+  .foot a{display:inline-flex;align-items:center;min-height:44px;padding:0 2px}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;padding:0 16px;padding-bottom:calc(16px + env(safe-area-inset-bottom))}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;padding:0 16px 16px}
+  .chip{flex:1 1 calc(50% - 3px);min-height:52px;display:flex;align-items:center;gap:8px;text-align:left;padding:8px 10px;background:transparent;border:1px solid var(--sbd-charcoal);transition:border-color .18s var(--sbd-ease),background .18s var(--sbd-ease)}
+  .chip[aria-pressed="true"]{background:var(--sbd-bg-raised);border-color:var(--sbd-rust-on-dark)}
+  .chip .n{width:20px;flex:none;text-align:center;font:500 11px/1 var(--sbd-mono);color:var(--sbd-sand-faint)}
+  .chip[aria-pressed="true"] .n{color:var(--sbd-rust-on-dark)}
+  .chip .t{flex:1;min-width:0;font:400 12px/1.25 var(--sbd-sans);color:var(--sbd-sand-dim)}
+  .chip[aria-pressed="true"] .t{color:var(--sbd-sand)}
+  .catrow{display:flex;flex-wrap:wrap;gap:6px;padding:12px 16px 0}
+  .cat{flex:none;min-height:44px;padding:0 13px;display:flex;align-items:center;gap:7px;background:transparent;border:1px solid var(--sbd-charcoal);transition:border-color .18s var(--sbd-ease),background .18s var(--sbd-ease)}
+  .cat[aria-pressed="true"]{background:var(--sbd-bg-raised);border-color:var(--sbd-rust-on-dark)}
+  .cat .t{font:500 11px/1 var(--sbd-mono);letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;color:var(--sbd-sand-dim)}
+  .cat[aria-pressed="true"] .t{color:var(--sbd-rust-on-dark)}
+  .cat .c{font:400 11px/1 var(--sbd-mono);color:var(--sbd-sand-faint)}
+  .chip .sel{flex:none;width:9px;height:9px;background:var(--sbd-rust-on-dark);visibility:hidden}
+  .chip[aria-pressed="true"] .sel{visibility:visible}
+  .cat .sel{flex:none;width:8px;height:8px;background:var(--sbd-rust-on-dark);visibility:hidden}
+  .cat[aria-pressed="true"] .sel{visibility:visible}
+  .eqrow button .sm{display:none}
+  @media (prefers-reduced-motion:reduce){
+    .skip,.pose,.cat,.chip,.eqrow button,.zoomrow button,.hover{transition:none}
+  }
+  @media (max-width:560px){
+    .lock{display:none}
+    .hint{display:none}
+    .subbar .lbl{display:none}
+    .eqrow button .lg{display:none}
+    .eqrow button .sm{display:inline}
+    .eqrow button{padding:0 11px}
+    #app{grid-template-rows:auto auto minmax(38vh,1fr) minmax(0,44%)}
+    .chip{flex:1 1 100%}
+    .photo{grid-template-columns:96px 1fr}.photo img{height:84px}
+  }
+  @media (min-width:980px){
+    #app{grid-template-rows:auto auto minmax(0,1fr);grid-template-columns:minmax(0,1fr) 420px;grid-template-areas:"bar bar" "sub detail" "stage detail"}
+    .bar{grid-area:bar}
+    .subbar{grid-area:sub}
+    #stagewrap{grid-area:stage}
+    #detail{grid-area:detail;border-top:0;border-left:1px solid var(--sbd-charcoal);box-shadow:-1px 0 0 var(--sbd-rust-on-dark)}
+  }
+</style>
+</head>
+<body class="on-dark">
+<a class="skip" href="#detail">Skip to part details</a>
+<div id="app">
+  <header class="bar">
+    <span class="mark" aria-hidden="true">FMP</span>
+    <h1 class="vh">FMP rig — 3D explorer</h1>
+    <span class="lock" aria-hidden="true">Rig <i>/ 3D explorer</i></span>
+    <span class="grow"></span>
+    <div class="eqrow" id="eqrow" role="group" aria-label="Choose equipment"></div>
+    <button class="back" type="button" id="themeBtn" aria-label="Use dark theme">Dark</button>
+    <a class="back" href="/fmp/">← Ops</a>
+  </header>
+
+  <nav class="subbar" aria-label="Camera views">
+    <span class="lbl" aria-hidden="true">§ Views</span>
+    <span id="poserow" style="display:flex;gap:6px"></span>
+  </nav>
+
+  <div id="stagewrap" role="region" aria-label="3D viewport">
+    <canvas id="scene" tabindex="0" role="img" aria-label="3D view of the camera rig. The selected part is highlighted." aria-describedby="canvashelp"></canvas>
+    <span class="hover" id="hover" aria-hidden="true"></span>
+    <p class="hint" id="canvashelp">Drag to orbit · scroll to zoom · click a part. With the view focused: arrow keys orbit, + and − zoom, Home refits.</p>
+    <div class="zoomrow">
+      <button type="button" id="zin" aria-label="Zoom in">+</button>
+      <button type="button" id="zout" aria-label="Zoom out">−</button>
+      <button type="button" id="zfit" aria-label="Refit the view" style="font:500 10px/1 var(--sbd-mono);letter-spacing:.06em">FIT</button>
+    </div>
+    <div class="fail" id="fail">
+      <p style="margin:0;font:500 11px/1 var(--sbd-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--sbd-warn-dk)">▲ 3D unavailable</p>
+      <p style="margin:0;max-width:44ch;font:400 14px/1.55 var(--sbd-sans);color:var(--sbd-sand-dim)">This browser could not start WebGL. Every part description and check is still readable in the list below.</p>
+    </div>
+  </div>
+
+  <main id="detail">
+    <h2 class="vh">Part details</h2>
+    <div class="catrow" id="catrow" role="group" aria-label="Part categories"></div>
+    <div class="dwrap" aria-live="polite">
+      <div class="dhead">
+        <span class="dnum" id="dnum" aria-hidden="true">01</span>
+        <div style="flex:1;min-width:0">
+          <h3 class="dtitle" id="dtitle">Explore the rig</h3>
+          <p class="ddir" id="ddir">Pick a part in 3D or from the list</p>
+        </div>
+      </div>
+      <div class="row"><span class="rlbl" id="l-purpose">What it does</span><span class="rval" id="dpurpose"></span></div>
+      <div class="row"><span class="rlbl" id="l-use">How to use it</span><span class="rval" id="duse"></span></div>
+      <div class="row"><span class="rlbl ok" id="l-check">Check</span><span class="rval" id="dcheck"></span></div>
+      <div class="tip" id="dtipwrap" hidden><span aria-hidden="true">▲</span><span id="dtip"></span></div>
+      <figure class="photo" id="dphotoWrap" hidden><img id="dphoto" alt=""><figcaption id="dphotoNote"></figcaption></figure>
+      <div class="adjust" id="lcdadj" hidden><label for="lcdrange">LCD door</label><input id="lcdrange" type="range" min="0" max="90" step="5" value="90"><output id="lcdout" for="lcdrange">90°</output></div>
+      <div class="adjust" id="fiberadj" hidden><label for="fiberrange">Cable angle</label><input id="fiberrange" type="range" min="0" max="60" step="5" value="15"><output id="fiberout" for="fiberrange">15°</output></div>
+      <p class="evid" id="devid" hidden></p>
+      <p class="foot" id="dfoot"></p>
+    </div>
+    <div class="chips" id="chips" role="group" aria-label="Parts in this category"></div>
+  </main>
+</div>
+</div>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { buildRigModels } from './rig-model.js';
+
+const RIG = window.FMP_RIG;
+const flat = {};
+const catOf = {};
+RIG.groups.forEach(g => g.categories.forEach(c => c.parts.forEach(p => { flat[p.slug] = { ...p, group: g.key, groupLabel: g.label, basis: g.basis, category: c.name }; catOf[p.slug] = c.name; })));
+
+const el = id => document.getElementById(id);
+let state = { group: 'rig', cat: 'Camera', part: 'body' };
+let scene, camera, renderer, controls, models = {}, parts = new Map(), poses = {}, raycaster, pointer, built = null;
+let hovered = '', live = false;
+
+function groupDef() { return RIG.groups.find(g => g.key === state.group); }
+function catDef() { const g = groupDef(); return g.categories.find(c => c.name === state.cat) || g.categories[0]; }
+
+function renderEq() {
+  el('eqrow').innerHTML = RIG.groups.map(g =>
+    `<button type="button" data-eq="${g.key}" aria-pressed="${g.key === state.group}"><span class="lg">${g.label}</span><span class="sm">${g.key === 'rig' ? 'Rig' : 'Converter'}</span></button>`).join('');
+  el('eqrow').querySelectorAll('button').forEach(b => b.onclick = () => {
+    const g = RIG.groups.find(x => x.key === b.dataset.eq);
+    setPart(g.categories[0].parts[0].slug, true);
+  });
+}
+function renderPoses() {
+  const list = state.group === 'rig'
+    ? [['beauty', 'Overview'], ['rig-top', 'Camera'], ['operator', 'Operator side'], ['lcd', 'LCD'], ['lens', 'Lens'], ['grip', 'Grip'], ['front', 'Front I/O'], ['rear', 'Rear I/O'], ['fiber-rear', 'Fiber rear'], ['viewfinder', 'Viewfinder'], ['support', 'Head & bars'], ['tripod', 'Tripod'], ['ground', 'Spreader']]
+    : [['studio-beauty', 'Overview'], ['studio-front', 'Front panel'], ['studio-rear', 'Rear panel']];
+  el('poserow').innerHTML = list.map(([k, label]) => `<button type="button" class="pose" data-pose="${k}">${label}</button>`).join('');
+  el('poserow').querySelectorAll('button').forEach(b => b.onclick = () => applyPose(b.dataset.pose));
+}
+function renderCats() {
+  el('catrow').innerHTML = groupDef().categories.map(c =>
+    `<button type="button" class="cat" data-cat="${c.name}" aria-pressed="${c.name === state.cat}"><span class="sel" aria-hidden="true"></span><span class="t">${c.name}</span><span class="c">${c.parts.length}</span></button>`).join('');
+  el('catrow').querySelectorAll('button').forEach(b => b.onclick = () => {
+    const c = groupDef().categories.find(x => x.name === b.dataset.cat);
+    setPart(c.parts[0].slug, true);
+  });
+}
+function renderChips() {
+  const c = catDef();
+  el('chips').innerHTML = c.parts.map((p, i) =>
+    `<button type="button" class="chip" data-slug="${p.slug}" aria-pressed="${p.slug === state.part}"><span class="sel" aria-hidden="true"></span><span class="n" aria-hidden="true">${String(i + 1).padStart(2, '0')}</span><span class="t">${p.title}</span></button>`).join('');
+  el('chips').querySelectorAll('button').forEach(b => b.onclick = () => setPart(b.dataset.slug));
+}
+function renderDetail() {
+  const p = flat[state.part];
+  const c = catDef();
+  const i = c.parts.findIndex(x => x.slug === p.slug);
+  el('dnum').textContent = String(i + 1).padStart(2, '0');
+  el('dtitle').textContent = p.title;
+  el('ddir').textContent = p.direction;
+  el('dpurpose').textContent = p.purpose;
+  el('duse').textContent = p.use;
+  el('dcheck').textContent = p.check;
+  el('dtipwrap').hidden = !p.tip;
+  el('dtip').textContent = p.tip || '';
+  el('devid').hidden = !p.evidence;
+  el('devid').textContent = p.evidence || '';
+  const photo = p.photo && RIG.photos[p.photo];
+  el('dphotoWrap').hidden = !photo;
+  if (photo) {
+    el('dphoto').src = photo.src;
+    el('dphoto').width = photo.w;
+    el('dphoto').height = photo.h;
+    el('dphoto').alt = `${p.title} reference photo`;
+    el('dphotoNote').textContent = p.photoNote || 'Supplied equipment reference. Confirm the installed unit before operating.';
+  }
+  el('lcdadj').hidden = p.slug !== 'lcd';
+  el('fiberadj').hidden = p.slug !== 'fiber-hybrid';
+  const links = [p.source ? `<a href="${p.source}" target="_blank" rel="noopener noreferrer">${p.sourceLabel || 'Reference'} ↗</a>` : '',
+    p.equipmentSource ? `<a href="${p.equipmentSource}" target="_blank" rel="noopener noreferrer">${p.equipmentSourceLabel || 'FMP gear record'} ↗</a>` : ''].filter(Boolean);
+  el('dfoot').innerHTML = p.basis + (links.length ? ' ' + links.join(' · ') : '');
+}
+function setPart(slug, jump) {
+  const p = flat[slug];
+  if (!p) return;
+  const changedGroup = p.group !== state.group;
+  const focusKey = document.activeElement && (document.activeElement.dataset.slug || document.activeElement.dataset.cat || document.activeElement.dataset.eq);
+  const focusAttr = document.activeElement && (document.activeElement.dataset.slug ? 'slug' : document.activeElement.dataset.cat ? 'cat' : document.activeElement.dataset.eq ? 'eq' : '');
+  state = { group: p.group, cat: p.category, part: slug };
+  renderEq(); renderCats(); renderChips(); renderDetail();
+  if (changedGroup) { renderPoses(); showGroup(); }
+  if (focusAttr) {
+    const next = document.querySelector(`[data-${focusAttr}="${CSS.escape(focusKey)}"]`)
+      || document.querySelector(`[data-slug="${CSS.escape(slug)}"]`);
+    if (next) next.focus();
+  }
+  if (live) { paintSelection(); placeMarker(); framePart(slug); }
+}
+
+// ── 3D ──────────────────────────────────────────────────────────────
+const HILITE = new THREE.Color('#D7825A');
+const originals = new Map();
+let marker = null;
+
+function makeMarker() {
+  const g = new THREE.Group();
+  const mat = new THREE.MeshBasicMaterial({ color: HILITE, transparent: true, opacity: 0.95, depthTest: false, depthWrite: false, side: THREE.DoubleSide });
+  const ring = new THREE.Mesh(new THREE.RingGeometry(0.96, 1, 64), mat);
+  ring.name = 'locator ring';
+  g.add(ring);
+  for (let i = 0; i < 4; i++) {
+    const tick = new THREE.Mesh(new THREE.PlaneGeometry(0.34, 0.035), mat);
+    const a = i * Math.PI / 2;
+    tick.position.set(Math.cos(a) * 1.22, Math.sin(a) * 1.22, 0);
+    tick.rotation.z = a;
+    g.add(tick);
+  }
+  g.renderOrder = 999;
+  g.userData.noHighlight = true;
+  g.traverse(o => { o.userData.noHighlight = true; o.castShadow = false; o.receiveShadow = false; });
+  return g;
+}
+function placeMarker() {
+  if (!marker) { marker = makeMarker(); scene.add(marker); }
+  const g = parts.get(state.part);
+  if (!g) { marker.visible = false; return; }
+  const box = new THREE.Box3().setFromObject(g);
+  if (box.isEmpty()) { marker.visible = false; return; }
+  const s = box.getBoundingSphere(new THREE.Sphere());
+  marker.visible = true;
+  marker.position.copy(s.center);
+  const r = Math.max(s.radius * 1.65, 0.18);
+  marker.scale.setScalar(r);
+}
+
+function paintSelection() {
+  for (const [mesh, mat] of originals) mesh.material = mat;
+  originals.clear();
+  const g = parts.get(state.part);
+  if (!g) return;
+  g.traverse(o => {
+    if (!o.isMesh || o.userData.noHighlight) return;
+    originals.set(o, o.material);
+    const m = o.material.clone();
+    m.color = HILITE.clone();
+    m.emissive = HILITE.clone().multiplyScalar(0.28);
+    o.material = m;
+  });
+}
+function showGroup() {
+  if (!models.rig) return;
+  models.rig.visible = state.group === 'rig';
+  models.studio.visible = state.group === 'studio';
+}
+function fitRadius(box) {
+  const sphere = box.getBoundingSphere(new THREE.Sphere());
+  const vfov = THREE.MathUtils.degToRad(camera.fov);
+  const vDist = sphere.radius / Math.tan(vfov / 2);
+  const hfov = 2 * Math.atan(Math.tan(vfov / 2) * camera.aspect);
+  const hDist = sphere.radius / Math.tan(hfov / 2);
+  return { center: sphere.center, dist: Math.max(vDist, hDist) * 1.28 };
+}
+function frame(object, az, el, minDist) {
+  const box = new THREE.Box3().setFromObject(object);
+  if (box.isEmpty()) return;
+  const { center, dist } = fitRadius(box);
+  const d = Math.min(controls.maxDistance, Math.max(controls.minDistance, minDist ? Math.max(dist, minDist) : dist));
+  controls.target.copy(center);
+  camera.position.set(
+    center.x + d * Math.cos(el) * Math.sin(az),
+    center.y + d * Math.sin(el),
+    center.z + d * Math.cos(el) * Math.cos(az)
+  );
+  controls.update();
+}
+function applyPose(key) {
+  const p = poses[key];
+  if (!p || !controls) return;
+  const narrow = el('stagewrap').clientWidth < 550;
+  const d = Math.min(controls.maxDistance, Math.max(controls.minDistance, p.radius * (narrow ? 1.15 : 1)));
+  controls.target.set(...p.target);
+  camera.position.set(
+    p.target[0] + d * Math.cos(p.el) * Math.sin(p.az),
+    p.target[1] + d * Math.sin(p.el),
+    p.target[2] + d * Math.cos(p.el) * Math.cos(p.az)
+  );
+  controls.update();
+}
+function framePart(slug) {
+  const g = parts.get(slug);
+  if (!g || !controls) return;
+  const p = flat[slug];
+  const pose = poses[p.pose] || poses[state.group === 'rig' ? 'beauty' : 'studio-beauty'];
+  const r = new THREE.Box3().setFromObject(g).getBoundingSphere(new THREE.Sphere()).radius;
+  frame(g, pose.az, pose.el, Math.max(1.5, r * 3.6));
+}
+
+function boot() {
+  const canvas = el('scene');
+  renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFShadowMap;
+
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color('#15120F');
+
+  camera = new THREE.PerspectiveCamera(42, 1, 0.1, 200);
+
+  built = buildRigModels(THREE, Object.fromEntries(Object.entries(flat).map(([k, v]) => [k, { title: v.title }])));
+  models.rig = built.rig; models.studio = built.studio;
+  parts = built.parts; poses = built.poses;
+  scene.add(built.rig, built.studio);
+  el('lcdrange').addEventListener('input', e => { const d = built.setLcdOpening(e.target.value); el('lcdout').textContent = d === 0 ? 'Closed' : d + '°'; });
+  el('fiberrange').addEventListener('input', e => { const d = built.setFiberAngle(e.target.value); el('fiberout').textContent = d + '°'; placeMarker(); });
+
+  scene.add(new THREE.HemisphereLight(0xE8DECE, 0x15120F, 0.62));
+  const key = new THREE.DirectionalLight(0xfff2e2, 1.45);
+  key.position.set(-5.5, 9, 7); key.castShadow = true;
+  key.shadow.mapSize.set(1024, 1024);
+  key.shadow.camera.left = -9; key.shadow.camera.right = 9;
+  key.shadow.camera.top = 9; key.shadow.camera.bottom = -13;
+  key.shadow.normalBias = 0.025;
+  scene.add(key);
+  const fill = new THREE.DirectionalLight(0xB8AFA2, 0.5);
+  fill.position.set(6, 4, -6); scene.add(fill);
+
+  for (const k of ['rig', 'studio']) {
+    const ground = new THREE.Mesh(new THREE.PlaneGeometry(60, 60), new THREE.ShadowMaterial({ opacity: 0.4 }));
+    ground.rotation.x = -Math.PI / 2;
+    ground.position.y = built.floors[k];
+    ground.receiveShadow = true;
+    ground.userData.noHighlight = true;
+    models[k].add(ground);
+  }
+
+  controls = new OrbitControls(camera, canvas);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.08;
+  controls.minDistance = 1.6;
+  controls.maxDistance = 40;
+  controls.maxPolarAngle = Math.PI * 0.86;
+
+  raycaster = new THREE.Raycaster();
+  pointer = new THREE.Vector2();
+
+  canvas.addEventListener('pointermove', e => {
+    const r = canvas.getBoundingClientRect();
+    pointer.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+    const hit = pick();
+    hovered = hit || '';
+    const h = el('hover');
+    if (hit && hit !== state.part) { h.textContent = flat[hit].title; h.classList.add('on'); }
+    else h.classList.remove('on');
+    canvas.style.cursor = hit ? 'pointer' : 'grab';
+  });
+  canvas.addEventListener('pointerleave', () => el('hover').classList.remove('on'));
+  let down = null;
+  canvas.addEventListener('pointerdown', e => { down = [e.clientX, e.clientY]; });
+  canvas.addEventListener('pointerup', e => {
+    if (!down) return;
+    const moved = Math.hypot(e.clientX - down[0], e.clientY - down[1]);
+    down = null;
+    if (moved > 6) return;
+    const hit = pick();
+    if (hit) setPart(hit);
+  });
+
+  el('zin').onclick = () => zoomBy(0.82);
+  el('zout').onclick = () => zoomBy(1.22);
+  el('zfit').onclick = () => applyPose(state.group === 'rig' ? 'beauty' : 'studio-beauty');
+
+  canvas.addEventListener('keydown', e => {
+    const step = e.shiftKey ? 0.28 : 0.12;
+    let handled = true;
+    switch (e.key) {
+      case 'ArrowLeft': orbitBy(-step, 0); break;
+      case 'ArrowRight': orbitBy(step, 0); break;
+      case 'ArrowUp': orbitBy(0, step); break;
+      case 'ArrowDown': orbitBy(0, -step); break;
+      case '+': case '=': zoomBy(0.85); break;
+      case '-': case '_': zoomBy(1.18); break;
+      case 'Home': applyPose(state.group === 'rig' ? 'beauty' : 'studio-beauty'); break;
+      default: handled = false;
+    }
+    if (handled) e.preventDefault();
+  });
+
+  addEventListener('resize', resize);
+  resize();
+  showGroup();
+  live = true;
+  paintSelection();
+  placeMarker();
+  framePart(state.part);
+  tick();
+}
+function orbitBy(dAz, dEl) {
+  const off = camera.position.clone().sub(controls.target);
+  const r = off.length();
+  let az = Math.atan2(off.x, off.z) + dAz;
+  let el = Math.asin(THREE.MathUtils.clamp(off.y / r, -1, 1)) + dEl;
+  el = THREE.MathUtils.clamp(el, -1.2, 1.35);
+  camera.position.set(
+    controls.target.x + r * Math.cos(el) * Math.sin(az),
+    controls.target.y + r * Math.sin(el),
+    controls.target.z + r * Math.cos(el) * Math.cos(az)
+  );
+  controls.update();
+}
+function zoomBy(f) {
+  const dir = camera.position.clone().sub(controls.target);
+  const d = Math.min(controls.maxDistance, Math.max(controls.minDistance, dir.length() * f));
+  camera.position.copy(controls.target).add(dir.setLength(d));
+  controls.update();
+}
+function pick() {
+  raycaster.setFromCamera(pointer, camera);
+  const root = state.group === 'rig' ? models.rig : models.studio;
+  const hits = raycaster.intersectObject(root, true);
+  for (const h of hits) {
+    let o = h.object;
+    if (o.userData.noHighlight) continue;
+    while (o && !o.userData.cid && o !== root) o = o.parent;
+    if (o && o.userData.cid && flat[o.userData.cid]) return o.userData.cid;
+  }
+  return '';
+}
+function resize() {
+  const w = el('stagewrap').clientWidth, h = el('stagewrap').clientHeight;
+  if (!w || !h) return;
+  renderer.setSize(w, h, false);
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+}
+function tick() {
+  controls.update();
+  if (marker && marker.visible) marker.quaternion.copy(camera.quaternion);
+  renderer.render(scene, camera);
+  requestAnimationFrame(tick);
+}
+
+const themeKey = 'fmpRigTheme';
+const themeButton = el('themeBtn');
+function applyTheme(theme) {
+  document.documentElement.dataset.theme = theme;
+  themeButton.textContent = theme === 'dark' ? 'Light' : 'Dark';
+  themeButton.setAttribute('aria-label', `Use ${theme === 'dark' ? 'light' : 'dark'} theme`);
+  document.querySelector('meta[name="theme-color"]').content = theme === 'dark' ? '#1c1917' : '#f4eee3';
+}
+let savedTheme = 'light';
+try { savedTheme = localStorage.getItem(themeKey) === 'dark' ? 'dark' : 'light'; } catch {}
+applyTheme(savedTheme);
+themeButton.addEventListener('click', () => {
+  const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+  applyTheme(next);
+  try { localStorage.setItem(themeKey, next); } catch {}
+});
+
+renderEq(); renderPoses(); renderCats(); renderChips(); renderDetail();
+try { boot(); }
+catch (err) { console.error(err); el('fail').classList.add('on'); }
+</script>
+</body>
+</html>

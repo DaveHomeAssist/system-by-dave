@@ -55,13 +55,14 @@ const files = walk(ROOT);
 const unlisted = files.filter((file) => !sitemapRoutes.has(routeFor(file)));
 const robots = read('robots.txt');
 
-if (unlisted.length !== 128) fail(`Expected 128 tracked routes outside the sitemap; found ${unlisted.length}.`);
+if (unlisted.length !== 131) fail(`Expected 131 tracked routes outside the sitemap; found ${unlisted.length}.`);
 
 [
   '/apps/av-workbook/',
   '/cross-project-actions.html',
   '/fmp-index/',
   '/fmp/',
+  '/fmpwalk/',
   '/html/sbd-brand.html'
 ].forEach((route) => {
   if (!robots.includes(`Disallow: ${route}`)) fail(`robots.txt does not exclude internal/source route ${route}.`);
