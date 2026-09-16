@@ -1,0 +1,201 @@
+export const CHECK_STATES = Object.freeze([
+  { value: 'pass', label: 'Pass' },
+  { value: 'issue', label: 'Issue' },
+  { value: 'not_checked', label: 'Not checked' },
+  { value: 'na', label: 'Not applicable' }
+]);
+
+export const FALLBACK_REGISTRY = Object.freeze({
+  schema: 'FMP_CAMERA_POSITION_REGISTRY_V1',
+  updated: '2026-09-15',
+  source: 'bundled documented fallback',
+  positions: [
+    { key: 'pit-center', displayName: 'Pit · Center', notionPosition: 'Cam 1 · Pit SR', legacyCamera: '1', ptz: false },
+    { key: 'front-of-house', displayName: 'Front of House', notionPosition: 'Cam 2 · FOH', legacyCamera: '2', ptz: false },
+    { key: 'pit-stage-left', displayName: 'Pit · Stage Left', notionPosition: 'Cam 3 · Pit SL', legacyCamera: '3', ptz: false },
+    { key: 'catwalk', displayName: 'Catwalk', notionPosition: 'Cam 4 · PTZ', legacyCamera: '4', ptz: true }
+  ],
+  references: {
+    backFocus: 'https://app.notion.com/p/3db255fc8f448091abdbd520fa0e2508',
+    fieldGuide: 'https://app.notion.com/p/3cf255fc8f4481828900fab47d08adf7',
+    cameraOps: 'https://app.notion.com/p/3d9255fc8f448087aa8cfe3b8384e375',
+    ptzOps: 'https://app.notion.com/p/3d9255fc8f4480d48259ee1dca33324f'
+  }
+});
+
+export const HUMAN_BUILD_CHECKS = Object.freeze([
+  ['power', 'Power and body start'],
+  ['viewfinder', 'Viewfinder image'],
+  ['signal', 'Signal at switcher'],
+  ['tally', 'Tally'],
+  ['comms', 'Comms'],
+  ['backFocus', 'Back focus']
+]);
+export const PTZ_BUILD_CHECKS = Object.freeze([
+  ['power', 'Power'],
+  ['network', 'Network and control link'],
+  ['video', 'Video at switcher'],
+  ['controller', 'Correct controller camera'],
+  ['preset', 'Preset recall'],
+  ['simultaneousPanTilt', 'Pan and tilt together']
+]);
+export const HUMAN_STOW_CHECKS = Object.freeze([
+  ['viewfinder', 'Viewfinder stowed'],
+  ['cables', 'Cables coiled and inside case'],
+  ['lensCap', 'Lens capped'],
+  ['bodyCase', 'Body seated in case']
+]);
+export const PTZ_STOW_CHECKS = Object.freeze([
+  ['parked', 'PTZ parked'],
+  ['powerState', 'Approved power state'],
+  ['controller', 'Controller left ready'],
+  ['areaClear', 'Catwalk area clear']
+]);
+
+const POSITION_KEYS = new Set(FALLBACK_REGISTRY.positions.map(position => position.key));
+const LEGACY = Object.fromEntries(FALLBACK_REGISTRY.positions.map(position => [position.legacyCamera, position.key]));
+const STATES = new Set(CHECK_STATES.map(state => state.value));
+
+export function positionKeyFromLocation(pathname, search = '') {
+  const pathKey = pathname.split('/').filter(Boolean).at(-1);
+  if (POSITION_KEYS.has(pathKey)) return pathKey;
+  const params = new URLSearchParams(search);
+  if (POSITION_KEYS.has(params.get('position'))) return params.get('position');
+  return LEGACY[params.get('camera')] || '';
+}
+
+export function positionFor(registry, key) {
+  return registry?.positions?.find(position => position.key === key) ||
+    FALLBACK_REGISTRY.positions.find(position => position.key === key) ||
+    FALLBACK_REGISTRY.positions[0];
+}
+
+export function checksFor(position, stage) {
+  if (stage === 'build') return position.ptz ? PTZ_BUILD_CHECKS : HUMAN_BUILD_CHECKS;
+  return position.ptz ? PTZ_STOW_CHECKS : HUMAN_STOW_CHECKS;
+}
+
+export function initialChecks(position, stage) {
+  return Object.fromEntries(checksFor(position, stage).map(([key]) => [key, 'not_checked']));
+}
+
+export function createDraft(positionKey, ownerKey, now = new Date()) {
+  const position = positionFor(FALLBACK_REGISTRY, positionKey);
+  return {
+    draftId: crypto.randomUUID(),
+    ownerKey,
+    positionKey: position.key,
+    eventId: '',
+    eventName: '',
+    operatorName: '',
+    assignment: {
+      cameraNumber: position.legacyCamera || '',
+      bodyIdentifier: '',
+      bodyModel: '',
+      lens: '',
+      switcherInput: position.legacyCamera || '',
+      controlChannel: position.ptz ? 'PTZ control' : ''
+    },
+    assignmentConfirmed: false,
+    buildChecks: initialChecks(position, 'build'),
+    stowChecks: initialChecks(position, 'stow'),
+    faults: [],
+    checkedInReceipt: null,
+    checkedOutReceipt: null,
+    previousSessionId: '',
+    setupTest: false,
+    pendingAction: '',
+    updatedAt: now.toISOString()
+  };
+}
+
+export function setPosition(draft, registry, key) {
+  const previous = positionFor(registry, draft.positionKey);
+  const position = positionFor(registry, key);
+  if (!POSITION_KEYS.has(position.key)) throw new Error('Choose a valid camera position.');
+  draft.positionKey = position.key;
+  if (!draft.assignment.cameraNumber || draft.assignment.cameraNumber === previous.legacyCamera) {
+    draft.assignment.cameraNumber = position.legacyCamera || '';
+  }
+  if (!draft.assignment.switcherInput || draft.assignment.switcherInput === previous.legacyCamera) {
+    draft.assignment.switcherInput = position.legacyCamera || '';
+  }
+  const previousControl = previous.ptz ? 'PTZ control' : '';
+  if (!draft.assignment.controlChannel || draft.assignment.controlChannel === previousControl) {
+    draft.assignment.controlChannel = position.ptz ? 'PTZ control' : '';
+  }
+  draft.buildChecks = initialChecks(position, 'build');
+  draft.stowChecks = initialChecks(position, 'stow');
+  draft.assignmentConfirmed = false;
+  draft.updatedAt = new Date().toISOString();
+  return draft;
+}
+
+export function setCheck(checks, name, value) {
+  if (!(name in checks) || !STATES.has(value)) throw new Error('Invalid check state.');
+  checks[name] = value;
+  return checks;
+}
+
+export function checkInIssues(draft) {
+  const issues = [];
+  if (!draft.eventId) issues.push('Choose the show.');
+  if (!draft.operatorName.trim()) issues.push('Enter the operator name.');
+  if (!draft.assignmentConfirmed) issues.push('Confirm tonight’s assignment.');
+  if (Object.values(draft.buildChecks).some(value => !STATES.has(value))) issues.push('Complete each build check.');
+  return issues;
+}
+
+export function checkoutIssues(draft) {
+  const issues = [];
+  if (!draft.checkedInReceipt?.sessionId) issues.push('Confirm check-in before check-out.');
+  if (Object.values(draft.stowChecks).some(value => !STATES.has(value))) issues.push('Complete each stow check.');
+  for (const fault of draft.faults) {
+    if (!fault.description?.trim()) issues.push('Describe every saved fault.');
+    if (!['Critical', 'Degraded', 'Cosmetic'].includes(fault.severity)) issues.push('Choose a valid fault severity.');
+  }
+  return issues;
+}
+
+export function visibleDrafts(drafts, ownerKey) {
+  return Object.values(drafts || {}).filter(draft => draft.ownerKey === ownerKey);
+}
+
+export function checkInPayload(draft, capturedAt = new Date().toISOString()) {
+  const issues = checkInIssues(draft);
+  if (issues.length) throw new Error(issues[0]);
+  return {
+    draftId: draft.draftId,
+    positionKey: draft.positionKey,
+    eventId: draft.eventId,
+    operatorName: draft.operatorName.trim(),
+    assignment: { ...draft.assignment },
+    assignmentConfirmed: draft.assignmentConfirmed,
+    checks: { ...draft.buildChecks },
+    capturedAt,
+    previousSessionId: draft.previousSessionId || '',
+    setupTest: Boolean(draft.setupTest)
+  };
+}
+
+export function checkoutPayload(draft, faults, capturedAt = new Date().toISOString()) {
+  const issues = checkoutIssues(draft);
+  if (issues.length) throw new Error(issues[0]);
+  return {
+    sessionId: draft.checkedInReceipt.sessionId,
+    positionKey: draft.positionKey,
+    checks: { ...draft.stowChecks },
+    faults,
+    capturedAt,
+    headsetReturned: Boolean(draft.headsetReturned),
+    setupTest: Boolean(draft.setupTest)
+  };
+}
+
+export function pendingLabel(draft) {
+  if (draft.pendingAction === 'check-in') return 'Check-in is saved only on this device. Sign in and retry explicitly.';
+  if (draft.pendingAction === 'check-out') return 'Check-out is saved only on this device. Sign in and retry explicitly.';
+  if (draft.checkedOutReceipt) return `Checked out · ${draft.checkedOutReceipt.state}`;
+  if (draft.checkedInReceipt) return 'Checked in · open';
+  return 'Draft · not submitted';
+}

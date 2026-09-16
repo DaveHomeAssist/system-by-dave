@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
+    "verify:fmp": "node scripts/verify_fmp_release.js",
     "build:av-workbook": "vite build --config apps/av-workbook/vite.config.ts",
     "dev:av-workbook": "vite --config apps/av-workbook/vite.config.ts",
     "test:av-workbook": "vitest run --config apps/av-workbook/vitest.config.ts",

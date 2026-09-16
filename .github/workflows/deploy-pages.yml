@@ -50,6 +50,7 @@ jobs:
           npm run verify:portfolio-schemas
           npm run verify:public-navigation
           npm run verify:public-consistency
+          npm run verify:fmp
 
       - name: Verify Throwline release contract
         run: npm run verify:throwline
