@@ -40,6 +40,7 @@ use the tooling selected for that surface.
 | `skills.html` | Skills catalog |
 | `widgets.html` | Widget gallery |
 | `fmp-index/index.html` | FMP working index: dated destination snapshot with search and purpose filters; noindex |
+| `fmp/` | Managed public camera commissioning app; authenticated operational API, SETUP TEST only; [release and sync contract](docs/fmp-public-release.md) |
 | `afterbreak/index.html` | Pier 68 run of show: private crew timeline, bar, promo, gear, crew, and open items; noindex |
 | `av-suite.html?entry=show` | Show Console for show-attached AV operations |
 | `av-suite.html?entry=toolbox` | Show-independent AV Toolbox directory |

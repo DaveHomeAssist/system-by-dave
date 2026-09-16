@@ -1,0 +1,24 @@
+{
+  "schema": "fmp.public.release.v1",
+  "sourceRepository": "DaveHomeAssist/fmpwalk",
+  "sourceCommit": "84f889c4b71e557e9f0fdb40f841029340f43264",
+  "mode": "commissioning",
+  "files": {
+    "camera-core.js": "421026e8a7fcb59f6f13a9208454fdc86609ef26101bd8da0d07d65c7d6a1118",
+    "camera-view.js": "32c51593b3c0353467275155ba7ec3e08f5c567a3b08748d6e305ded3925fe8e",
+    "camera.css": "01461ac5a04a14449e8ec3e1e8239f426408d0f41e5fb28be4c90d8735edcbb5",
+    "camera.js": "75a1ec8db9e01e726cb036f31469720cce92c89875c51408d29baccfa9edec55",
+    "camera/catwalk/index.html": "4f33fd773bf3c744d7a5b06aa199e8d073eb2b67264c0c8be5ac0c27e10ce2bc",
+    "camera/front-of-house/index.html": "fbadc7570486deb6a050b67dd569541a918d7a45015e3e9411def1ded6015fbf",
+    "camera/index.html": "11cf659306e1f0edbd0e42b9034482cb45d02efc4875117ec613847f7a22c042",
+    "camera/pit-center/index.html": "1e3e5ca5042a6097639495f903e8c743f0596921aabc876dcfbb69fb64cc6972",
+    "camera/pit-stage-left/index.html": "7aca8fe8c72ad3560febfb514b273b9a5a458c2597170418d97699de520328f6",
+    "index.html": "e14eb57b7cc80a70d37f9de213cd3f0effac3362853a5647ae1f621b80176dd4",
+    "mail.js": "b045f5b092b5a95b92d7187f1831088719fe335c71b1d2341da83f344a1667da",
+    "notion-config.js": "b675c734abe301f46f50f05a65ae58b9d25bd07c57fa8b01ef07e456e32271fc",
+    "photos.js": "cd1feeb0fd50c5df4df81fa55b3fb37ca708127d793d438a62e98e596fbec3ff",
+    "public.css": "f51e2f1ace583a06d0329ca63e6c5e5dc0ca026ef69b0aa16cea753344a50e9d",
+    "public.js": "2edd6e0f5530b57a162b50d840ac7c8be8659b7c642b4e7db7d3a656b61f1171"
+  },
+  "artifactSha256": "183d0bcbef043e14f0661967dff26f0498a0f9cfe02c82a0cdf4217fd9c6aab8"
+}
