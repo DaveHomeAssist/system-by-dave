@@ -4,6 +4,8 @@
 
 ### FMP public camera commissioning frontend
 
+* Release review follow-up restores account-owned checked-in and pending drafts after reauthentication, adds same-position saved-session selection, and makes lead corrections editable with preserved reasons and stable retry IDs. The no-JavaScript/loading state now carries commissioning and recovery guidance. Google sign-in styling is allowed through stylesheet-element CSP without allowing inline scripts.
+
 * Added `/fmp/` and all four stable camera routes using a pinned, hashed export from the canonical FMP app. The public entry shell links the existing paged setup/build/fault/stow workflow, approved external references and old-origin draft recovery. Backend authorization and Notion records remain separate; every new capture is marked SETUP TEST pending signed-in commissioning.
 * Preserved `/fmp-index/`, the existing Walk and the private Site. Added a camera launch link without redirects. The public export excludes private atlas snapshots, original photos, backend files and credentials. The full map and coverage-planner overhaul remains unreleased.
 * Added public metadata, parent/home navigation, theme integration, noindex policy and a release verification gate. Canonical browser checks cover phone, tablet, desktop and landscape containment; physical route navigation no longer reopens a different position's draft.

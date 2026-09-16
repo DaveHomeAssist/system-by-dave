@@ -161,6 +161,22 @@ export function visibleDrafts(drafts, ownerKey) {
   return Object.values(drafts || {}).filter(draft => draft.ownerKey === ownerKey);
 }
 
+// Run only after backend identity verification. Preserve local work when an
+// account already has an open session; never rebind another account's draft.
+export function resumeAccountDraft(store, accountOwner, priorOwner, positionKey) {
+  const active = store.drafts[store.activeDraftId];
+  const existing = active?.ownerKey === accountOwner && active.positionKey === positionKey ? active :
+    visibleDrafts(store.drafts, accountOwner).filter(item => item.positionKey === positionKey && !item.checkedOutReceipt)
+      .sort((a, b) => Number(Boolean(b.pendingAction || b.checkedInReceipt)) - Number(Boolean(a.pendingAction || a.checkedInReceipt)) || String(b.updatedAt).localeCompare(String(a.updatedAt)))[0];
+  if (existing) { store.activeDraftId = existing.draftId; return { draft: existing, resumed: true }; }
+  const draft = active?.ownerKey === priorOwner && priorOwner.startsWith('local:') && active.positionKey === positionKey
+    ? active : createDraft(positionKey, accountOwner);
+  draft.ownerKey = accountOwner;
+  store.drafts[draft.draftId] = draft;
+  store.activeDraftId = draft.draftId;
+  return { draft, resumed: false };
+}
+
 export function checkInPayload(draft, capturedAt = new Date().toISOString()) {
   const issues = checkInIssues(draft);
   if (issues.length) throw new Error(issues[0]);

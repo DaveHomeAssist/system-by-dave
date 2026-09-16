@@ -8,3 +8,4 @@ document.querySelectorAll('[data-panel]').forEach(button => button.addEventListe
   document.querySelectorAll('[data-panel]').forEach(item => item.setAttribute('aria-current', String(item === button ? 'page' : 'false')));
   document.querySelectorAll('.portal-panel').forEach(panel => { panel.hidden = panel.id !== button.dataset.panel; });
 }));
+document.documentElement.dataset.enhanced = 'true';
