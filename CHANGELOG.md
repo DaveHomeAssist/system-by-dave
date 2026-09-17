@@ -8,6 +8,8 @@
 * Kept the surfaces whose darkness is functional. The preview and program monitor raster stays black in both palettes and now carries fixed `--raster`/`--raster-text`/`--raster-muted` ink so its slate text no longer follows the palette; the StagePlotter drafting surface keeps its black canvas, with item labels reading as palette-backed tags on it.
 * Preserved operational color meaning. Layer index chips take the palette's primary ink over their blue, purple and amber backgrounds, while the always-light program-green chip keeps dark `--bus-ink`; the GO chip and success/error hints now use the success and danger tokens rather than fixed light greens and reds.
 * Clears the remaining desktop-width failures that the shared-control-palette work below recorded as outstanding, so `npm run probe:av-themes` now passes at both widths in both preferences. The monitor caption bar moves on from `--panel-2` to `--panel-3` because the monitor card it sits on is itself now `--panel-2`.
+* Bumped the AV offline cache version to `v20260917-warm-paper-tool-contrast` in `js/sbd-registry.js` and `ProjectorThrow/Stage3D.html`. Both changed pages are offline assets, and `av-suite-worker.js` only rebuilds its cache when the registry version changes, so installed suites would otherwise keep serving the pre-fix HTML.
+* Regenerated `sitemap.xml`: editing `stage-plot.html` moved its `lastmod` to 2026-09-17, which the Pages deploy's generated-file check would have rejected.
 * Verified with `npm run probe:av-themes` at 1440px and 390px across both preferences, `npm run verify:av`, and the Cue Sheet smoke probe.
 
 ### FMP suite theme: light first, one preference, a toggle on every page
