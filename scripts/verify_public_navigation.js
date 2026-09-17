@@ -183,7 +183,8 @@ function fmpShellGaps(file, source) {
   }
   const targetTag = focusTargetTag(source, target);
   if (!targetTag) gaps.push(`skip target #${target} is missing`);
-  else if (!/\btabindex=(?:["']-1["']|-1)(?:\s|>)/i.test(targetTag) && !/^<(?:a|button|input|select|textarea)\b/i.test(targetTag)) {
+  // tabindex="0" is also focusable: the rig's scrollable tabpanel uses it so keyboard users can reach and scroll it.
+  else if (!/\btabindex=(?:["'](?:-1|0)["']|-1|0)(?:\s|>)/i.test(targetTag) && !/^<(?:a|button|input|select|textarea)\b/i.test(targetTag)) {
     gaps.push(`skip target #${target} is not programmatically focusable`);
   }
   return gaps;

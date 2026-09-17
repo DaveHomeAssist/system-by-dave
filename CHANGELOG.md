@@ -15,6 +15,13 @@
 
 ## 2026-09-17
 
+### FMP rig workspace locked to the viewport
+
+* Exported `DaveHomeAssist/fmpwalk` `7327caf` to `fmp/` and `fmpwalk/`. It merges the rig workspace commit `be801a1` into canonical `main`. On normal desktop, tablet and phone portrait viewports, the rig now fills the screen with a tabbed inspector (Component, Tripod lessons, Help) that scrolls on its own, so the page no longer scrolls. Short and very narrow screens reflow, and selection links such as `?equipment=rig&part=nd-filter` open a component directly. This replaces an unpushed local export of the same rig bytes, which had been built on an older canonical commit.
+* Fixed two hub layout defects that came in with the house video references and are already live. At 320px, the short-phone Learn grid pushed its right column of cards off the screen. In phone landscape, the tab rail hid Setup below the fold. Learn now uses `minmax(0, 1fr)` columns without the decorative arrow at that size, and the landscape rail shows its five tabs in two columns.
+* `verify:public-navigation` now accepts `tabindex="0"` as a focusable FMP skip target. The rig's scrollable Component tabpanel uses it so keyboard users can reach and scroll it, and the verifier had rejected it for not being `-1`.
+* Verified with canonical `npm run check` (55 tests) and the public, rig workspace (12 viewports), hub, camera, walk and house browser suites, then `verify:fmp`, `verify:public-navigation`, `verify:indexing` and `verify:public-consistency`.
+
 ### Warm Paper contrast for Cue Sheet and StagePlotter
 
 * Fixed dark-ink-on-dark-panel text in the Warm Paper AV theme. Page-local rules that painted a hard-coded Stage Slate background while taking their text color from a shared palette token now consume the palette surfaces instead: the Cue Sheet operator stage, quick-add panel and icon, monitor card and caption bar, transport volume control, Source I/O rack, layer rows, status chips, hint states and shortcut keys, plus the StagePlotter canvas item labels. Worst measured ratio was 1.04:1.

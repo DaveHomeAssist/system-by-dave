@@ -120,9 +120,15 @@ walk photos as part of a frontend rollback.
 ## Rig explorer layout update — September 17, 2026
 
 The managed rig now includes 112 components, camera-body and ND controls, and
-tripod control lessons. A single scrolling layout replaces the fixed-height
-pane stack. Wide screens use a bounded model beside instructions; narrower
-screens stack content. Native component selection, visible keyboard focus,
+tripod control lessons. At normal desktop, tablet and phone portrait sizes the
+rig is a viewport-height workspace. Desktop keeps the model beside a scrolling
+information panel; phones keep the model above it with Component, Tripod lessons
+and Help tabs. **Expand reading** hides the model until **Show model** restores it.
+Short screens and very narrow widths fall back to normal document reflow, and
+ultrawide screens widen the model while instructions keep a readable measure.
+Selection links such as `?equipment=rig&part=nd-filter` open a component
+directly. The skip link focuses the Component panel, which carries
+`tabindex="0"` so keyboard users can reach and scroll it. Native component selection, visible keyboard focus,
 44px controls, non-drag rotation/tilt/zoom buttons, optional touch gestures and
 reduced-motion behavior provide alternate ways to operate the model. The rig
 uses the suite theme preference below and the local Three.js runtime.

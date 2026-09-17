@@ -42,8 +42,9 @@ button {cursor:pointer}
       --popover:#fbf7ef; --popover-foreground:#241f1b; --secondary:#fbf7ef; --secondary-foreground:#241f1b;
       --border:#b8ac97; --input:#877966; --blue:#9a4525; --ring:#9a4525;
       --r-stage-bg:#dde5ed; --r-selected:#f0ddcc;
-      color:var(--foreground); background:var(--background); width:100%; max-width:112rem; margin:0 auto;
-      padding:clamp(12px,1.5vw,24px); font-size:1rem; line-height:1.5;
+      color:var(--foreground); background:var(--background); width:100%; margin:0 auto;
+      padding:12px clamp(12px,1.5vw,24px); font-size:1rem; line-height:1.5;
+      padding-bottom:max(12px,env(safe-area-inset-bottom));
     }
     :root[data-theme="dark"] #fmp-rig-3d {
         --background:#1c1917; --foreground:#f2e9dc; --muted:#292621; --muted-foreground:#c3b8a8;
@@ -60,10 +61,11 @@ button {cursor:pointer}
     #fmp-rig-3d .text-muted { color:var(--muted-foreground); }
     #fmp-rig-3d [hidden] { display:none !important; }
     #fmp-rig-3d :is(button,select,input,summary,a):focus-visible,
+    #fmp-rig-3d [tabindex]:focus-visible,
     #fmp-rig-3d canvas:focus-visible { outline:3px solid var(--ring); outline-offset:3px; }
     #fmp-rig-3d :target { scroll-margin-top:1rem; }
     #fmp-rig-3d a { color:var(--blue); text-decoration:underline; text-underline-offset:.2em; overflow-wrap:anywhere; }
-    #fmp-rig-3d .btn { min-height:44px; min-width:44px; padding:8px 12px; white-space:normal; border:1px solid var(--input); border-radius:6px; color:var(--foreground); background:var(--secondary); font-size:.9375rem; line-height:1.3; }
+    #fmp-rig-3d .btn { min-height:44px; min-width:44px; padding:8px 12px; white-space:normal; overflow-wrap:anywhere; border:1px solid var(--input); border-radius:6px; color:var(--foreground); background:var(--secondary); font-size:.9375rem; line-height:1.3; }
     #fmp-rig-3d .btn:hover:not(:disabled) { background:var(--r-selected); border-color:var(--blue); }
     #fmp-rig-3d .btn[aria-pressed="true"] { background:var(--r-selected); box-shadow:inset 0 -3px 0 var(--blue); border-color:var(--blue); font-weight:700; }
     #fmp-rig-3d .btn:disabled { opacity:.55; cursor:default; }
@@ -72,13 +74,13 @@ button {cursor:pointer}
     #fmp-rig-3d .form-range { width:100%; min-height:44px; margin:0; accent-color:var(--blue); }
     #fmp-rig-3d .form-range::-webkit-slider-thumb { min-width:24px; min-height:24px; }
     #fmp-rig-3d .form-range::-moz-range-thumb { width:24px; height:24px; }
-    #fmp-rig-3d .r-head { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; margin-bottom:16px; }
+    #fmp-rig-3d .r-head { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px; }
     #fmp-rig-3d .r-caption { color:var(--muted-foreground); margin-top:4px; }
     #fmp-rig-3d .viz-row { display:flex; flex-wrap:wrap; gap:8px; }
-    #fmp-rig-3d .r-controls { display:flex; flex-wrap:wrap; align-items:end; gap:8px; margin-bottom:12px; }
+    #fmp-rig-3d .r-controls { display:flex; align-items:end; gap:8px; position:relative; z-index:3; }
     #fmp-rig-3d .r-selector { flex:1 1 18rem; }
-    #fmp-rig-3d .r-workspace { display:grid; grid-template-columns:minmax(0,1fr); gap:20px; align-items:start; }
-    #fmp-rig-3d .r-viewer { min-width:0; }
+    #fmp-rig-3d .r-workspace { display:grid; grid-template-columns:minmax(0,1fr); gap:10px; min-height:0; }
+    #fmp-rig-3d .r-viewer { min-width:0; min-height:0; display:grid; grid-template-rows:minmax(0,1fr) auto; gap:6px; }
     #fmp-rig-3d .r-stage {
       position:relative; width:100%; height:clamp(16rem,52vh,34rem); height:clamp(16rem,52svh,34rem); overflow:hidden;
       border:1px solid var(--border); border-radius:8px; isolation:isolate;
@@ -92,10 +94,10 @@ button {cursor:pointer}
     #fmp-rig-3d .r-hover { position:absolute; left:10px; bottom:10px; padding:6px 10px; color:var(--popover-foreground); background:var(--popover); border-radius:5px; pointer-events:none; max-width:calc(100% - 20px); }
     #fmp-rig-3d .r-hover:empty { display:none; }
     #fmp-rig-3d .r-failure { position:absolute; inset:0; display:grid; align-content:center; text-align:center; color:var(--foreground); background:var(--background); padding:20px; overflow:auto; }
-    #fmp-rig-3d .r-under { display:grid; gap:10px; margin-top:12px; }
+    #fmp-rig-3d .r-under { display:flex; flex-wrap:wrap; align-items:center; gap:6px; }
     #fmp-rig-3d .r-view-actions { display:flex; flex-wrap:wrap; gap:8px; }
     #fmp-rig-3d .r-help { color:var(--muted-foreground); max-width:66ch; }
-    #fmp-rig-3d .r-detail { display:grid; grid-template-columns:minmax(0,1fr); gap:16px; padding:16px; border:1px solid var(--border); border-radius:8px; background:var(--background); overflow-wrap:anywhere; }
+    #fmp-rig-3d .r-detail { display:grid; grid-template-columns:minmax(0,1fr); gap:16px; align-content:start; }
     #fmp-rig-3d .r-type { color:var(--muted-foreground); margin:6px 0 10px; }
     #fmp-rig-3d dl { margin:0; }
     #fmp-rig-3d dt { font-weight:700; margin-bottom:4px; }
@@ -107,49 +109,85 @@ button {cursor:pointer}
     #fmp-rig-3d summary:hover { color:var(--blue); }
     #fmp-rig-3d .r-foot { display:flex; flex-direction:column; align-items:start; gap:4px; margin-top:12px; }
     #fmp-rig-3d .r-foot a { display:flex; align-items:center; min-height:44px; }
-    #fmp-rig-3d .r-training { border:1px solid var(--border); border-radius:8px; padding:0 12px; margin:0 0 16px; background:var(--muted); }
-    #fmp-rig-3d .r-training[open] { padding-bottom:12px; }
+    #fmp-rig-3d .r-training > p { margin-top:8px; }
     #fmp-rig-3d .r-training-nav { display:flex; align-items:center; flex-wrap:wrap; gap:8px; margin-top:8px; }
     #fmp-rig-3d .r-training-step { margin-top:12px; padding-top:12px; border-top:1px solid var(--border); }
     #fmp-rig-3d .r-training-step h2 { margin-bottom:4px; font-size:1rem; }
     #fmp-rig-3d .r-training-result { font-weight:600; margin-top:8px; }
-    #fmp-rig-3d .r-support-note { padding:8px 0 0; color:var(--muted-foreground); }
+    #fmp-rig-3d .r-support-note { position:absolute; top:42px; left:10px; right:10px; width:fit-content; max-width:calc(100% - 20px); padding:3px 7px; border-radius:4px; font-size:.75rem; color:var(--muted-foreground); background:var(--background); pointer-events:none; }
     #fmp-rig-3d .r-nd { padding:12px; background:var(--muted); border-radius:6px; }
     #fmp-rig-3d .r-nd .r-training-nav { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); }
     #fmp-rig-3d .r-nd-summary { display:block; font-weight:700; margin:12px 0 6px; }
     #fmp-rig-3d .r-sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; border:0; }
-    #fmp-rig-3d .skip { position:absolute; left:12px; top:0; transform:translateY(-200%); z-index:10; padding:12px; background:var(--background); }
+    #fmp-rig-3d .skip { position:fixed; left:12px; top:0; transform:translateY(-200%); z-index:10; padding:12px; background:var(--background); }
     #fmp-rig-3d .skip:focus { transform:translateY(0); }
-    @media(min-width:64rem) {
-      #fmp-rig-3d .r-workspace { grid-template-columns:minmax(0,1fr) minmax(19rem,23rem); }
-      #fmp-rig-3d .r-viewer { position:sticky; top:16px; }
-      #fmp-rig-3d .r-stage { height:clamp(18rem,calc(100vh - 23rem),52rem); height:clamp(18rem,calc(100svh - 23rem),52rem); }
-    }
-    @media(max-width:40rem) {
-      #fmp-rig-3d .r-head { align-items:stretch; }
-      #fmp-rig-3d .r-head > .viz-row { width:100%; }
-      #fmp-rig-3d .r-head > .viz-row .btn { flex:1 1 0; }
-      #fmp-rig-3d .r-controls { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); }
-      #fmp-rig-3d .r-selector { grid-column:1 / -1; }
-      #fmp-rig-3d .r-controls .btn { width:100%; }
-      #fmp-rig-3d .r-detail { padding:12px; }
-      #fmp-rig-3d .r-stage-label { font-size:.75rem; }
-    }
-    @media(max-height:34rem) { #fmp-rig-3d .r-viewer { position:static; } #fmp-rig-3d .r-stage { height:18rem; } }
     @media(prefers-reduced-motion:reduce) { #fmp-rig-3d *, #fmp-rig-3d *::before, #fmp-rig-3d *::after { scroll-behavior:auto; transition:none !important; animation:none !important; } }
     @media(forced-colors:active) { #fmp-rig-3d .btn[aria-pressed="true"] { outline:2px solid Highlight; outline-offset:-4px; } #fmp-rig-3d :focus-visible { outline-color:Highlight; } }
-    #fmp-rig-3d .r-site-nav { display:flex; flex-wrap:wrap; align-items:center; gap:8px 16px; margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid var(--border); }
+    #fmp-rig-3d .r-site-nav { display:flex; flex-wrap:wrap; align-items:center; gap:4px 12px; border-bottom:1px solid var(--border); }
     #fmp-rig-3d .r-site-nav a { display:inline-flex; align-items:center; min-height:44px; }
     #fmp-rig-3d .r-site-nav button { margin-left:auto; }
     #fmp-rig-3d h1 { font-family:'DM Serif Display',Georgia,serif; font-weight:400; }
     #fmp-rig-3d .r-stage { background:radial-gradient(ellipse at 45% 38%,#f5f7f7,#d8e0e2); }
     :root[data-theme="dark"] #fmp-rig-3d .r-stage { background:radial-gradient(ellipse at 45% 38%,#a0acb2,#78858d); }
+    #fmp-rig-3d[data-ready="true"] { height:100vh; height:100dvh; display:grid; grid-template-rows:auto auto auto minmax(0,1fr); gap:10px; }
+    #fmp-rig-3d[data-ready="true"] .r-workspace { grid-template-rows:minmax(10rem,.95fr) minmax(14rem,1fr); }
+    #fmp-rig-3d[data-ready="true"] .r-stage { height:100%; min-height:0; }
+    #fmp-rig-3d .r-inspector { display:flex; flex-direction:column; min-height:0; border:1px solid var(--border); border-radius:8px; overflow:hidden; background:var(--secondary); }
+    #fmp-rig-3d .r-inspector-actions { display:flex; flex-wrap:wrap; justify-content:space-between; gap:4px; padding:4px 8px; border-bottom:1px solid var(--border); }
+    #fmp-rig-3d .r-inspector-actions .btn { padding:6px 10px; background:transparent; }
+    #fmp-rig-3d .r-panel { min-height:0; overflow:auto; overscroll-behavior:contain; scrollbar-gutter:stable; padding:14px; flex:1; overflow-wrap:anywhere; scroll-padding:14px; }
+    #fmp-rig-3d .r-panel:focus-visible { outline-offset:-4px; }
+    #fmp-rig-3d .r-tabs { display:grid; grid-template-columns:1fr 1.25fr .7fr; gap:4px; padding:4px; border-top:1px solid var(--border); background:var(--muted); }
+    #fmp-rig-3d .r-tabs .btn { border-color:transparent; background:transparent; padding:6px; overflow-wrap:anywhere; }
+    #fmp-rig-3d .r-tabs [aria-selected="true"] { background:var(--secondary); border-color:var(--blue); box-shadow:inset 0 -3px 0 var(--blue); font-weight:700; }
+    #fmp-rig-3d .r-view-menu { flex:0 0 auto; }
+    #fmp-rig-3d .r-view-menu > summary { list-style:none; }
+    #fmp-rig-3d .r-view-menu > summary::-webkit-details-marker { display:none; }
+    #fmp-rig-3d .r-view-menu > summary::after { content:' +'; }
+    #fmp-rig-3d .r-view-menu[open] > summary::after { content:' −'; }
+    #fmp-rig-3d .r-view-menu-body { position:absolute; right:0; top:calc(100% + 6px); width:min(32rem,100%); max-height:min(32rem,60dvh); overflow:auto; padding:16px; border:1px solid var(--input); border-radius:8px; background:var(--secondary); box-shadow:0 8px 28px #0003; display:grid; gap:12px; }
+    #fmp-rig-3d .r-control-group { display:flex; flex-wrap:wrap; gap:6px; }
+    #fmp-rig-3d .r-control-group > .form-label { flex-basis:100%; margin:0; }
+    #fmp-rig-3d .r-gesture-state { display:inline-flex; align-items:center; gap:8px; }
+    #fmp-rig-3d .r-gesture-state::before { content:''; width:14px; height:14px; border:2px solid currentColor; border-radius:50%; }
+    #fmp-rig-3d .r-gesture-state[aria-pressed="true"]::before { background:currentColor; box-shadow:inset 0 0 0 3px var(--secondary); }
+    #fmp-rig-3d .r-help > * + * { margin-top:14px; }
+    #fmp-rig-3d .r-link-fallback input { width:100%; min-height:44px; padding:8px; border:1px solid var(--input); border-radius:6px; background:var(--background); color:var(--foreground); }
+    #fmp-rig-3d .r-link-fallback { padding:8px 12px; }
+    #fmp-rig-3d[data-expanded="true"] .r-viewer { display:none; }
+    #fmp-rig-3d[data-ready="true"][data-expanded="true"] .r-workspace { grid-template-columns:minmax(0,1fr); grid-template-rows:minmax(0,1fr); }
+    @media(min-width:56rem) {
+      #fmp-rig-3d[data-ready="true"] .r-workspace { grid-template-columns:minmax(0,1fr) minmax(22rem,28rem); grid-template-rows:minmax(0,1fr); }
+      #fmp-rig-3d .r-tabs { order:-1; border-top:0; border-bottom:1px solid var(--border); }
+    }
+    @media(min-width:160rem) { #fmp-rig-3d[data-ready="true"] .r-workspace { grid-template-columns:minmax(0,1fr) minmax(26rem,34rem); } }
+    @media(max-width:40rem) {
+      #fmp-rig-3d[data-ready="true"] { gap:6px; padding-top:6px; }
+      #fmp-rig-3d .r-site-nav { gap:4px 8px; font-size:.75rem; }
+      #fmp-rig-3d .r-site-nav .btn { font-size:.75rem; padding:6px 8px; }
+      #fmp-rig-3d .r-head { gap:6px; }
+      #fmp-rig-3d h1 { font-size:1.25rem; }
+      #fmp-rig-3d .r-caption { display:none; }
+      #fmp-rig-3d .r-head > .viz-row { width:100%; }
+      #fmp-rig-3d .r-head > .viz-row .btn { flex:1 1 0; }
+      #fmp-rig-3d .r-stage-label { font-size:.75rem; }
+      #fmp-rig-3d .r-panel { padding:12px; }
+    }
+    @media(max-height:40rem), (max-width:22rem) {
+      #fmp-rig-3d[data-ready="true"] { height:auto; min-height:100dvh; grid-template-rows:auto auto auto auto; }
+      #fmp-rig-3d[data-ready="true"] .r-workspace { grid-template-columns:minmax(0,1fr); grid-template-rows:18rem minmax(24rem,auto); }
+      #fmp-rig-3d .r-inspector { min-height:24rem; overflow:visible; }
+      #fmp-rig-3d .r-panel { overflow:visible; flex:initial; }
+      #fmp-rig-3d .r-tabs { order:0; border-top:1px solid var(--border); border-bottom:0; position:sticky; bottom:0; }
+      #fmp-rig-3d[data-ready="true"][data-expanded="true"] .r-workspace { grid-template-rows:minmax(24rem,auto); }
+    }
+    @media(forced-colors:active) { #fmp-rig-3d .r-tabs [aria-selected="true"] { outline:2px solid Highlight; outline-offset:-4px; } }
   </style>
   <a class="skip" href="#fmp-part-details">Skip to component instructions</a>
   <p class="r-sr-only" data-announcement role="status" aria-live="polite" aria-atomic="true"></p>
   <nav class="r-site-nav" aria-label="Site navigation"><a href="/" aria-label="System by Dave home">System by Dave</a><a href="/fmp/">FMP Video Operations</a><button type="button" class="btn" id="themeBtn" aria-label="Use dark theme">Dark theme</button></nav>
   <header class="r-head">
-    <div><h1 id="fmp-guide-title">Camera rig · 3D explorer</h1><p class="r-caption text-small">Camera body &amp; ND · tripod controls · complete rig</p></div>
+    <div><h1 id="fmp-guide-title" data-guide-title>Camera rig · 3D explorer</h1><p class="r-caption text-small" data-guide-caption>Camera body &amp; ND · tripod controls · complete rig</p></div>
     <div class="viz-row" role="group" aria-label="Equipment">
       <button type="button" class="btn" data-equipment="rig" aria-pressed="true">Camera rig</button>
       <button type="button" class="btn" data-equipment="studio" aria-pressed="false">Studio converter</button>
@@ -157,68 +195,64 @@ button {cursor:pointer}
   </header>
   <div class="r-controls">
     <div class="r-selector"><label class="form-label" for="fmp-rig-part">Component</label><select id="fmp-rig-part" class="form-select" data-part-select><option value="">Entire rig</option></select></div>
+    <details class="r-view-menu" data-view-menu>
+    <summary class="btn" data-view-toggle>Views</summary>
+    <div class="r-view-menu-body">
+    <div class="r-control-group" role="group" aria-label="Views">
+    <span class="form-label">Views · change the angle</span>
     <button type="button" class="btn btn-ghost" data-pose="beauty">Overview</button>
     <button type="button" class="btn btn-ghost" data-pose="operator">Operator side</button>
     <button type="button" class="btn btn-ghost" data-pose="connections">Connections</button>
     <button type="button" class="btn btn-ghost" data-pose="support">Tripod &amp; handles</button>
-  </div>
-  <div class="r-controls" data-body-shortcuts role="group" aria-label="Camera body close-ups">
+    </div>
+  <div class="r-control-group" data-body-shortcuts role="group" aria-label="Common parts">
+    <span class="form-label">Common parts · select and locate</span>
     <button type="button" class="btn" data-quick-part="nd-filter">ND filter</button>
     <button type="button" class="btn btn-ghost" data-quick-part="body">Body controls</button>
     <button type="button" class="btn btn-ghost" data-quick-part="door-status">LCD outer panel</button>
     <button type="button" class="btn btn-ghost" data-quick-part="lcd">Open LCD</button>
   </div>
-  <details class="r-training" data-training aria-label="Tripod controls training">
-    <summary data-training-toggle>Tripod controls · locks, drag &amp; camera plate</summary>
-    <p class="text-small text-muted">Illustrative control locations. Match the actual head and plate with the house lead before using these as a field guide.</p>
-    <div class="r-training-nav" role="group" aria-label="Training topics">
-      <button type="button" class="btn" data-lesson="locks" aria-pressed="false">1 · Locks</button>
-      <button type="button" class="btn" data-lesson="drag" aria-pressed="false">2 · Drag &amp; balance</button>
-      <button type="button" class="btn" data-lesson="plate" aria-pressed="false">3 · Camera plate</button>
-      <button type="button" class="btn" data-lesson="practice" aria-pressed="false">Find the control</button>
+    <div class="r-control-group" role="group" aria-label="Orbit">
+      <span class="form-label">Orbit</span>
+      <button type="button" class="btn" data-orbit="-1" aria-label="Rotate left">←</button>
+      <button type="button" class="btn" data-orbit="1" aria-label="Rotate right">→</button>
+      <button type="button" class="btn" data-tilt="1" aria-label="View from higher angle">↑</button>
+      <button type="button" class="btn" data-tilt="-1" aria-label="View from lower angle">↓</button>
     </div>
-    <div class="r-training-step" data-training-step hidden>
-      <div class="text-small text-muted" data-training-progress></div>
-      <h2 data-training-title></h2><p class="text-small" data-training-action></p>
-      <p class="r-training-result text-small" data-training-result role="status" aria-live="polite"></p>
-      <div class="r-training-nav">
-        <button type="button" class="btn btn-ghost" data-training-prev>Previous</button>
-        <button type="button" class="btn btn-ghost" data-training-show>Show me</button>
-        <button type="button" class="btn" data-training-next>Next</button>
-        <button type="button" class="btn btn-ghost" data-training-close>Close lesson</button>
-      </div>
-      <p class="text-small text-muted">Practice here is control familiarization. It does not record a physical rig check.</p>
+    <div class="r-control-group" role="group" aria-label="Zoom">
+      <span class="form-label">Zoom</span>
+      <button type="button" class="btn" data-zoom="0.82" aria-label="Zoom in">+</button>
+      <button type="button" class="btn" data-zoom="1.22" aria-label="Zoom out">−</button>
     </div>
-  </details>
+    <button type="button" class="btn r-gesture-state" data-gesture-toggle aria-pressed="false" aria-describedby="fmp-touch-help">Touch rotation: off</button>
+    <p class="text-small text-muted" data-locate-hint hidden>Select a component to locate it in the model.</p>
+    <a class="btn" href="#fmp-part-details">Read component</a>
+    <button type="button" class="btn" data-view-close>Close views</button>
+    </div>
+    </details>
+  </div>
   <div class="r-workspace">
   <section class="r-viewer" aria-label="Model and view controls">
   <div class="r-stage" data-stage>
     <canvas id="scene" data-scene role="img" tabindex="0" aria-describedby="fmp-view-help" aria-label="Interactive 3D camera rig. Use the Component menu to select any part.">Select any component from the Component menu to read its description.</canvas>
     <span class="r-stage-label text-small" data-stage-label>URSA G2 · Fujinon LA16 · Vinten support</span>
     <span class="r-hover text-small" data-hover></span>
-    <div class="r-failure" data-failure role="status" hidden><p>This browser could not start the 3D view. Enable WebGL to use the 3D view. Component descriptions and photo references remain available below.</p></div>
+    <p class="r-support-note text-small" data-support-note hidden>Training layout · actual control locations unverified</p>
+    <div class="r-failure" data-failure role="status" hidden><p>This browser could not start the 3D view. Component descriptions and photo references remain available in the Component panel.</p></div>
   </div>
-  <p class="r-support-note text-small" data-support-note hidden>Training layout · actual control locations unverified</p>
   <div class="r-under">
-    <div class="r-view-actions" role="group" aria-label="3D view controls">
-      <button type="button" class="btn" data-orbit="-1" aria-label="Rotate left">←</button>
-      <button type="button" class="btn" data-orbit="1" aria-label="Rotate right">→</button>
-      <button type="button" class="btn" data-tilt="1" aria-label="View from higher angle">↑</button>
-      <button type="button" class="btn" data-tilt="-1" aria-label="View from lower angle">↓</button>
-      <button type="button" class="btn" data-zoom="0.82" aria-label="Zoom in">+</button>
-      <button type="button" class="btn" data-zoom="1.22" aria-label="Zoom out">−</button>
-      <button type="button" class="btn" data-fit-part>Find selected</button>
-      <button type="button" class="btn" data-fit>Fit rig</button>
-    </div>
-    <div class="r-view-actions">
-      <button type="button" class="btn" data-gesture-toggle aria-pressed="false" aria-describedby="fmp-touch-help">Touch rotation: off</button>
-      <a class="btn" href="#fmp-part-details">Read component</a>
-    </div>
-    <p class="text-small r-help" id="fmp-touch-help" data-touch-help>Touch: tap a part; swipe to scroll the page. Turn on touch rotation to drag or pinch the model.</p>
-    <p class="text-small r-help" id="fmp-view-help">Mouse: drag to orbit; Shift + scroll to zoom. Keyboard on the model: arrows rotate, +/− zoom, Home fits the rig. Escape turns touch rotation off. All parts are available in the Component menu.</p>
+    <button type="button" class="btn" data-fit-part aria-describedby="fmp-locate-status">Locate part</button>
+    <button type="button" class="btn" data-fit>Fit rig</button>
+    <span class="text-small text-muted" id="fmp-locate-status" data-locate-status>Tap a part to explore.</span>
   </div>
   </section>
-  <section class="r-detail" id="fmp-part-details" tabindex="-1" aria-labelledby="fmp-part-title" data-detail>
+  <aside class="r-inspector" aria-label="Component instructions and training">
+  <div class="r-inspector-actions">
+    <button type="button" class="btn" data-expand aria-expanded="false" aria-controls="fmp-part-details fmp-lessons fmp-help">Expand reading</button>
+    <button type="button" class="btn" data-copy-link>Copy link</button>
+  </div>
+  <div class="r-link-fallback" data-link-fallback hidden><label class="form-label" for="fmp-share-url">Copy this link</label><input id="fmp-share-url" data-share-url readonly type="text"><p class="text-small" data-copy-status role="status"></p></div>
+  <section class="r-detail r-panel" id="fmp-part-details" role="tabpanel" tabindex="0" aria-labelledby="fmp-tab-component" data-detail data-panel="component">
     <div class="r-summary"><h2 id="fmp-part-title" data-title>Explore the camera rig</h2><div class="r-type text-small" data-direction>Camera, lens, Vinten support and pan-bar controls</div><p data-purpose>Select the actual component in 3D to see its function and operating notes.</p></div>
     <div class="r-summary r-nd" data-nd-guide hidden>
       <strong>ND teaching example</strong>
@@ -244,6 +278,45 @@ button {cursor:pointer}
     <dl data-usage hidden><dt>Use</dt><dd data-use></dd><dt>Check</dt><dd data-check></dd></dl>
     <div data-reference hidden><details data-photo-reference><summary>Photo reference</summary><img class="r-photo" data-photo alt="" loading="lazy"><p class="text-small text-muted" data-photo-note></p></details><p class="r-notes text-small" data-tip></p><p class="r-notes text-small" data-evidence hidden></p><p class="r-foot text-small"><a data-source target="_blank" rel="noopener noreferrer"></a><a data-equipment-source target="_blank" rel="noopener noreferrer" hidden></a></p></div>
   </section>
+  <section class="r-panel" id="fmp-lessons" role="tabpanel" tabindex="0" aria-labelledby="fmp-tab-lessons" data-panel="lessons" hidden>
+  <p data-no-lessons hidden>Tripod lessons belong to the camera rig. Select Camera rig to explore its locks, drag and plate controls.</p>
+  <div class="r-training" data-training>
+    <h2>Tripod controls</h2>
+    <p class="text-small text-muted">Illustrative control locations. Match the actual head and plate with the house lead before using these as a field guide.</p>
+    <div class="r-training-nav" role="group" aria-label="Training topics">
+      <button type="button" class="btn" data-lesson="locks" aria-pressed="false">1 · Locks</button>
+      <button type="button" class="btn" data-lesson="drag" aria-pressed="false">2 · Drag &amp; balance</button>
+      <button type="button" class="btn" data-lesson="plate" aria-pressed="false">3 · Camera plate</button>
+      <button type="button" class="btn" data-lesson="practice" aria-pressed="false">Find the control</button>
+    </div>
+    <div class="r-training-step" data-training-step hidden>
+      <div class="text-small text-muted" data-training-progress></div>
+      <h3 data-training-title tabindex="-1"></h3><p class="text-small" data-training-action></p>
+      <p class="r-training-result text-small" data-training-result role="status" aria-live="polite"></p>
+      <div class="r-training-nav">
+        <button type="button" class="btn btn-ghost" data-training-prev>Previous</button>
+        <button type="button" class="btn btn-ghost" data-training-show>Show me</button>
+        <button type="button" class="btn" data-training-next>Next</button>
+        <button type="button" class="btn btn-ghost" data-training-close>Close lesson</button>
+      </div>
+      <p class="text-small text-muted">Practice here is control familiarization. It does not record a physical rig check.</p>
+    </div>
+  </div>
+  </section>
+  <section class="r-panel r-help" id="fmp-help" role="tabpanel" tabindex="0" aria-labelledby="fmp-tab-help" data-panel="help" hidden>
+    <h2>Explore the model</h2>
+    <p>Choose any part from the Component menu or tap its shape. Views change the angle; Common parts select and locate a component.</p>
+    <p class="text-small" id="fmp-touch-help" data-touch-help>Touch: tap a part. Turn on touch rotation in Views to drag or pinch the model.</p>
+    <p class="text-small" id="fmp-view-help">Mouse: drag to orbit; Shift + scroll to zoom. Keyboard on the model: arrows rotate, +/− zoom, Home fits the equipment. Escape turns touch rotation off. All parts are available in the Component menu.</p>
+    <p class="text-small">Scroll inside the reading panel for Use, Check and photo references. Expand reading for more space; Show model brings the model back. Tab between controls, or use the panel tabs and arrow keys to change sections.</p>
+    <p class="text-small">Copy link shares the selected equipment and component. It does not share lesson progress or record a physical rig check.</p>
+  </section>
+  <div class="r-tabs" role="tablist" aria-label="Rig information">
+    <button type="button" class="btn" role="tab" id="fmp-tab-component" data-tab="component" aria-controls="fmp-part-details" aria-selected="true">Component</button>
+    <button type="button" class="btn" role="tab" id="fmp-tab-lessons" data-tab="lessons" data-training-toggle aria-controls="fmp-lessons" aria-selected="false" tabindex="-1">Tripod lessons</button>
+    <button type="button" class="btn" role="tab" id="fmp-tab-help" data-tab="help" aria-controls="fmp-help" aria-selected="false" tabindex="-1">Help</button>
+  </div>
+  </aside>
   </div>
 </main><noscript><section class="noscript"><h2>Enable JavaScript for the interactive guide</h2><p>ND positions are 1 Clear, 2 two stops, 3 four stops and 4 six stops. Coordinate ND changes with the shader.</p><p>Locks hold pan or tilt still. Drag changes movement resistance. Counterbalance supports the camera's tilt load. Verify the fitted head and camera plate with the house lead before releasing the plate.</p><p><a href="/fmp/">Return to FMP Video Operations</a></p></section></noscript>
-</div><script type="module" src="./rig-model.js?v=3f71506cb5742890"></script></body></html>
+</div><script type="module" src="./rig-model.js?v=eae765ca62d5bb87"></script></body></html>
