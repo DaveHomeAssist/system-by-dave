@@ -239,13 +239,17 @@ html[data-av-theme] :where(input, textarea)::placeholder {
   opacity: 1;
 }
 
-html[data-av-theme] :where(button, .btn, .button-link, .file-button):not(.primary):not(.pri):not(.danger) {
+/* Resting control paint is a default, not an override. Both the element list
+   and the primary/danger exclusions stay inside :where() so the rule keeps the
+   specificity of `html[data-av-theme]` alone and any page-local state selector
+   — current tab, current step, pressed segment — still wins. */
+html[data-av-theme] :where(button, .btn, .button-link, .file-button):where(:not(.primary, .pri, .danger)) {
   border-color: var(--av-line);
   background-color: var(--av-surface-2);
   color: var(--av-text-2);
 }
 
-html[data-av-theme] :where(button, .btn, .button-link, .file-button):not(.primary):not(.pri):not(.danger):hover {
+html[data-av-theme] :where(button, .btn, .button-link, .file-button):where(:not(.primary, .pri, .danger)):hover {
   border-color: var(--av-line-strong);
   background-color: var(--av-surface-3);
   color: var(--av-text);
