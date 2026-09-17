@@ -8,7 +8,7 @@ const assert = require('node:assert/strict');
 const site = path.resolve(__dirname, '..');
 const hash = data => crypto.createHash('sha256').update(data).digest('hex');
 const cameraRoutes = ['camera/', ...['pit-center', 'front-of-house', 'pit-stage-left', 'catwalk'].map(key => `camera/${key}/`)];
-const rigPhotos = ['fmp-camera', 'fmp-lens', 'fmp-panel', 'rig-camera', 'rig-front', 'rig-grip', 'rig-lens', 'rig-panel', 'rig-rear', 'rig-rings', 'rig-underside', 'v2-fiber-operator', 'v2-fiber-rear', 'v2-fiber-side', 'v2-fiber', 'v2-lcd-closed', 'v2-studio-front', 'v2-vf-back', 'v2-vf-front'];
+const rigPhotos = ['fmp-camera', 'fmp-lens', 'fmp-panel', 'rig-camera', 'rig-front', 'rig-grip', 'rig-lens', 'rig-panel', 'rig-rear', 'rig-rings', 'rig-underside', 'v2-fiber-operator', 'v2-fiber-rear', 'v2-fiber-side', 'v2-fiber', 'v2-lcd-closed', 'v2-studio-front', 'v2-vf-back', 'v2-vf-front', 'body-controls'];
 const releases = [
   {
     directory: 'fmp',

@@ -77,3 +77,18 @@ provenance commit/hashes after deployment.
 Rollback only the FMP release commit through a normal revert/release, retaining
 other site changes. Never clear Notion records, retry journals, browser drafts, or
 walk photos as part of a frontend rollback.
+
+## Rig explorer layout update — September 17, 2026
+
+The managed rig now includes 112 components, camera-body and ND controls, and
+tripod control lessons. A single scrolling layout replaces the fixed-height
+pane stack. Wide screens use a bounded model beside instructions; narrower
+screens stack content. Native component selection, visible keyboard focus,
+44px controls, non-drag rotation/tilt/zoom buttons, optional touch gestures and
+reduced-motion behavior provide alternate ways to operate the model. The
+existing `fmpRigTheme` preference and local Three.js runtime remain in use.
+
+The new body-control photograph is an allowlisted WebP reference. No operational
+records, backend changes, new storage keys or service worker are part of this
+release. Geometry/input tests and contrast checks are distinct from browser or
+physical-device acceptance; see the canonical source's release notes and tests.

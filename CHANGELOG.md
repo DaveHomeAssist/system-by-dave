@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-09-17
+
+### FMP rig accessibility and controls
+
+* Updated the managed rig explorer to 112 selectable components, adding body/ND controls and tripod lock, drag, balance and camera-plate lessons.
+* Replaced fixed-height scrolling panes with a bounded desktop viewer and naturally scrolling tablet/phone layout. Added 44px targets, visible keyboard focus, a native component menu, rotation/tilt buttons, concise selection announcements and opt-in touch rotation.
+* Preserved the rig theme preference, supplied photo references and local Three.js runtime. Canonical geometry/input checks cover all components and eight viewer aspect ratios; GPU rendering and physical-device acceptance are separate checks.
+
 ## 2026-09-16
 
 ### Unified FMP video operations suite

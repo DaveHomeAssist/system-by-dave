@@ -1,7 +1,7 @@
 {
   "schema": "fmp.public.release.v2",
   "sourceRepository": "DaveHomeAssist/fmpwalk",
-  "sourceCommit": "3944f292e91e11157e28ebfac7e0ca0b6f4ac547",
+  "sourceCommit": "ce48b231518e4ade8a53599af3db84177a9d720a",
   "mode": "commissioning",
   "files": {
     "camera-core.js": "86ae252646f022ea5e03ffe2d3be05a7344f1cc2299bb4c7a39cee9bb9ebedcb",
@@ -14,12 +14,13 @@
     "camera/pit-center/index.html": "a695429463470a5c570976462710f5cf1593dc6c43b74065b82ca0be2c16b09a",
     "camera/pit-stage-left/index.html": "e27303ab9a06203772b8cc8f34c0ddd003deadde1e559f7c021852e2512f4341",
     "guide/index.html": "bb3794fbb6170060b65005f016eefa635c71b73c506eeea2a95a15c442f72ec7",
-    "index.html": "a7cfd2762008b194e33d17d0ac6d71f8d4d10a247ddc2ddf8c91df33e1376424",
+    "index.html": "98cf94695f7a558a1aeb2ec0cef9d3608fce975abc6ed59c989ecc9c44582a5b",
     "mail.js": "b045f5b092b5a95b92d7187f1831088719fe335c71b1d2341da83f344a1667da",
     "notion-config.js": "b675c734abe301f46f50f05a65ae58b9d25bd07c57fa8b01ef07e456e32271fc",
     "photos.js": "cd1feeb0fd50c5df4df81fa55b3fb37ca708127d793d438a62e98e596fbec3ff",
     "public.css": "b0acf8b5856a0704918da915a5b71609b8fb3449407c74690453af373b1e3e57",
     "public.js": "c4886d983df4bd179ca5b77c8fc31d221fa677bea224da0d8e3fbb39a8cd686a",
+    "rig/assets/body-controls.webp": "b1a7619b8749b8f1baf34ae5c0f19075e5dbf82e2a958246749bcabddd7d4d57",
     "rig/assets/fmp-camera.webp": "9ab6235d2ec7f72e10858b9813d4f6d05887e28292f3cc0b16ea3723947f66fd",
     "rig/assets/fmp-lens.webp": "2746777e3c1440ccf6b5c98cc51825b5044e556ac6fa4a5b43133125e161a824",
     "rig/assets/fmp-panel.webp": "a1e29cf2e6617b00ba1f64df784480e74f9eaca95ca853c992bfbd09584a0ea1",
@@ -39,12 +40,12 @@
     "rig/assets/v2-studio-front.webp": "796eda107c4425587d3ffbdf5ec611a517e33e79d37339ab83a3552c5ce2874b",
     "rig/assets/v2-vf-back.webp": "78d8670c544e5d872c853ffca7e73854add93e3bb71eac63767189c0641773b4",
     "rig/assets/v2-vf-front.webp": "3b93068f203cda45fa387e2a55f2d4a286a50dcdec44e01c0949bf190f17aa08",
-    "rig/fmp-guide-data.js": "611f7de6e0e1042f061f0ad3ec07d083ed876b579f7dd612edf3572713bb7a16",
-    "rig/index.html": "0fb7e6c84dc5facf8e2e7d3ffe0716025e5fb0d2f911d7fe5610343fe693380f",
-    "rig/rig-model.js": "dff258f9667f2c5c0b598d8bbc250867783c3fda07f5a5760e70e2d851bc7271",
+    "rig/fmp-guide-data.js": "cd103fa126450197bea25d7031aaa9d542c1dc2ebd083c49e62267eabaca6d0f",
+    "rig/index.html": "13e59aa1291d67e2d2f3dc53e256b0723677843fd75c8a31a419752005b39a49",
+    "rig/rig-model.js": "02c9d4a00fb0bfd86819eb9f6e64d31fef8426c440d001dbbee6a5ba3cdbcbd2",
     "rig/vendor/three/addons/controls/OrbitControls.js": "97170e1b59a71a5d1395d227a6be626a0aefa4e349f263e0539171d8c4840d51",
     "rig/vendor/three/three.core.js": "66e03b5d8f633bb9501c9668609b99a9eaca105f764d5c780a45bf96b6888357",
     "rig/vendor/three/three.module.js": "a476b88d0df406dca0e30c65b4cdf0180c7337110accec828c103655b56a361c"
   },
-  "artifactSha256": "259f3b51618ed36d976dd893b92947916dc121a557e4aee4e132c8daa9a3e168"
+  "artifactSha256": "c3860a4d11852d984b7644bd0547ee03629997d143276de37a1c795f0beab75b"
 }

@@ -1,7 +1,7 @@
 {
   "schema": "fmp.public.release.v2",
   "sourceRepository": "DaveHomeAssist/fmpwalk",
-  "sourceCommit": "3944f292e91e11157e28ebfac7e0ca0b6f4ac547",
+  "sourceCommit": "ce48b231518e4ade8a53599af3db84177a9d720a",
   "mode": "local-first",
   "files": {
     "email.js": "167b00464e40dcf7f03a1a03dd5c69ddb043d63020eb0eebcf5692ed2c4085e8",

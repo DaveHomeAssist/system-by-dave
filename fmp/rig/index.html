@@ -1,13 +1,13 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex,nofollow,noarchive">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none'">
 <meta name="theme-color" content="#f4eee3">
-<meta name="description" content="Interactive FMP camera rig and fiber-converter reference with 72 documented parts, photo evidence, operating notes, and keyboard access.">
+<meta name="description" content="Interactive FMP camera rig and fiber-converter reference with 112 documented components, photo evidence, operating notes, and keyboard access.">
 <link rel="canonical" href="https://systembydave.com/fmp/rig/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="System by Dave">
@@ -17,593 +17,232 @@
 <meta property="og:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="FMP Camera Rig | System by Dave">
-<meta name="twitter:description" content="Interactive camera rig and converter reference with 72 documented parts.">
+<meta name="twitter:description" content="Interactive camera rig and converter reference with 112 documented components.">
 <meta name="twitter:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
 <title>FMP Camera Rig | System by Dave</title>
-<script type="importmap">
-{
-  "imports": {
-    "three": "./vendor/three/three.module.js",
-    "three/addons/controls/OrbitControls.js": "./vendor/three/addons/controls/OrbitControls.js"
-  }
-}
-</script>
-<script src="fmp-guide-data.js"></script>
+<link rel="modulepreload" href="./vendor/three/three.module.js">
 <style>
-  @font-face{font-family:'DM Serif Display';font-style:normal;font-weight:400;font-display:swap;src:url('/fonts/dm-serif-display.woff2') format('woff2')}
-  @font-face{font-family:'DM Sans';font-style:normal;font-weight:300 500;font-display:swap;src:url('/fonts/dm-sans.woff2') format('woff2')}
-  @font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:400 500;font-display:swap;src:url('/fonts/jetbrains-mono.woff2') format('woff2')}
-  :root{
-    color-scheme:light;
-    --sbd-bg:#f4eee3;--sbd-bg-raised:#fbf7ef;--sbd-bg-sunken:#eae2d3;
-    --sbd-sand:#241f1b;--sbd-sand-dim:#564e45;--sbd-sand-faint:#766c5e;
-    --sbd-rust-on-dark:#a8512e;--sbd-rust-dim:#7c3a21;--sbd-charcoal:#d8cdba;--sbd-border-dk:#b8ac97;
-    --sbd-ok-dk:#5e7a4e;--sbd-warn-dk:#8a6420;--sbd-alert-dk:#9e3b2a;--sbd-stage:#d8e0e2;
-    --sbd-serif:'DM Serif Display',Georgia,serif;--sbd-sans:'DM Sans',system-ui,sans-serif;--sbd-mono:'JetBrains Mono',ui-monospace,monospace;
-    --sbd-ease:cubic-bezier(.2,.6,.2,1)
-  }
-  :root[data-theme="dark"]{
-    color-scheme:dark;
-    --sbd-bg:#1c1917;--sbd-bg-raised:#222019;--sbd-bg-sunken:#15120f;
-    --sbd-sand:#e8dece;--sbd-sand-dim:#b8afa2;--sbd-sand-faint:#8f867a;
-    --sbd-rust-on-dark:#d7825a;--sbd-rust-dim:#8a4428;--sbd-charcoal:#2e2b28;--sbd-border-dk:#3a3632;
-    --sbd-ok-dk:#7fae7a;--sbd-warn-dk:#d6a24e;--sbd-alert-dk:#cf6b5a;--sbd-stage:#78858d
-  }
-  html,body{margin:0;height:100%}
-  body{background:var(--sbd-bg);color:var(--sbd-sand);font-family:var(--sbd-sans);overflow:hidden}
-  body::before{display:none}
-  a{color:var(--sbd-rust-on-dark);text-decoration:none}
-  a:hover{color:var(--sbd-sand)}
-  button{font-family:var(--sbd-mono);cursor:pointer}
-  .vh{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
-  .skip{position:absolute;left:8px;top:-60px;z-index:50;display:inline-flex;align-items:center;min-height:44px;padding:0 14px;background:var(--sbd-sand);color:var(--sbd-bg);font:500 11px/1 var(--sbd-mono);letter-spacing:.1em;text-transform:uppercase;transition:top .16s var(--sbd-ease)}
-  .skip:focus{top:8px;color:var(--sbd-bg)}
-  a:focus-visible,button:focus-visible,canvas:focus-visible{outline:3px solid var(--sbd-rust-on-dark);outline-offset:2px}
-  #app{height:100%;display:grid;grid-template-rows:auto auto minmax(160px,1fr) minmax(0,46%)}
-  .bar{display:flex;align-items:center;gap:10px;padding:10px 14px;padding-top:calc(10px + env(safe-area-inset-top));background:var(--sbd-bg);border-bottom:1px solid var(--sbd-charcoal);box-shadow:0 1px 0 var(--sbd-rust-on-dark)}
-  .mark{width:28px;height:28px;flex:none;display:flex;align-items:center;justify-content:center;border:1px solid var(--sbd-rust-on-dark);font:500 10px/1 var(--sbd-mono);letter-spacing:.04em;color:var(--sbd-rust-on-dark)}
-  .lock{font:500 11px/1.2 var(--sbd-mono);letter-spacing:.12em;text-transform:uppercase;white-space:nowrap;color:var(--sbd-sand)}
-  .lock i{font-style:normal;color:var(--sbd-sand-dim)}
-  .grow{flex:1}
-  .eqrow{display:flex;gap:1px;background:var(--sbd-charcoal);border:1px solid var(--sbd-charcoal)}
-  .eqrow button{min-height:44px;padding:0 13px;border:0;background:var(--sbd-bg-sunken);color:var(--sbd-sand-dim);font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;transition:background .18s var(--sbd-ease),color .18s var(--sbd-ease)}
-  .eqrow button[aria-pressed="true"]{background:var(--sbd-bg-raised);color:var(--sbd-rust-on-dark)}
-  .back{flex:none;display:inline-flex;align-items:center;justify-content:center;min-height:44px;min-width:44px;padding:0 10px;border:1px solid var(--sbd-charcoal);font:500 11px/1 var(--sbd-mono);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap}
-  .subbar{display:flex;align-items:center;gap:8px;padding:8px 14px;background:var(--sbd-bg-sunken);border-bottom:1px solid var(--sbd-charcoal);overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
-  .subbar::-webkit-scrollbar{display:none}
-  .subbar .lbl{flex:none;white-space:nowrap;font:500 11px/1 var(--sbd-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--sbd-rust-on-dark)}
-  .pose{flex:none;min-height:44px;padding:0 13px;background:transparent;border:1px solid var(--sbd-charcoal);color:var(--sbd-sand-dim);font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;transition:border-color .18s var(--sbd-ease),color .18s var(--sbd-ease)}
-  .pose:hover{border-color:var(--sbd-rust-on-dark);color:var(--sbd-rust-on-dark)}
-  #stagewrap{position:relative;min-height:0;background:var(--sbd-stage)}
-  canvas{display:block;width:100%;height:100%;touch-action:none}
-  .hint{position:absolute;left:14px;bottom:12px;font:400 11px/1.5 var(--sbd-mono);letter-spacing:.02em;color:var(--sbd-sand-faint);pointer-events:none}
-  .hover{position:absolute;left:14px;top:12px;padding:6px 10px;background:rgba(21,18,15,.86);border:1px solid var(--sbd-border-dk);font:500 11px/1 var(--sbd-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--sbd-sand);pointer-events:none;opacity:0;transition:opacity .16s var(--sbd-ease)}
-  .hover.on{opacity:1}
-  .zoomrow{position:absolute;right:12px;bottom:12px;display:flex;flex-direction:column;gap:6px}
-  .zoomrow button{width:48px;height:48px;background:rgba(21,18,15,.82);border:1px solid var(--sbd-border-dk);color:var(--sbd-sand-dim);font-size:16px;font-weight:500;transition:border-color .18s var(--sbd-ease),color .18s var(--sbd-ease)}
-  .zoomrow button:hover{border-color:var(--sbd-rust-on-dark);color:var(--sbd-rust-on-dark)}
-  .fail{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:32px;text-align:center}
-  .fail.on{display:flex}
-  #detail{min-height:0;overflow:auto;background:var(--sbd-bg);border-top:1px solid var(--sbd-rust-on-dark)}
-  .dwrap{padding:16px}
-  .dhead{display:flex;align-items:flex-start;gap:12px}
-  .dnum{width:30px;height:30px;flex:none;display:flex;align-items:center;justify-content:center;border:1px solid var(--sbd-rust-dim);font:500 12px/1 var(--sbd-mono);color:var(--sbd-rust-on-dark)}
-  .dtitle{font-family:var(--sbd-serif);font-size:23px;line-height:1.15;color:var(--sbd-sand);margin:0}
-  .ddir{margin:4px 0 0;font:500 11px/1.3 var(--sbd-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--sbd-sand-dim)}
-  .row{margin-top:14px}
-  .rlbl{display:block;margin-bottom:5px;font:500 11px/1 var(--sbd-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--sbd-sand-dim)}
-  .rlbl.ok{color:var(--sbd-ok-dk)}
-  .rval{display:block;font:400 14px/1.5 var(--sbd-sans);color:var(--sbd-sand);text-wrap:pretty}
-  .tip{display:flex;gap:10px;margin-top:14px;padding:12px;background:var(--sbd-bg-sunken);border:1px solid var(--sbd-charcoal)}
-  .tip span:first-child{flex:none;font:500 11px/1.4 var(--sbd-mono);color:var(--sbd-warn-dk)}
-  .tip span:last-child{font:400 13px/1.45 var(--sbd-sans);color:var(--sbd-sand-dim);text-wrap:pretty}
-  .adjust{display:flex;align-items:center;gap:10px;margin-top:14px;padding:10px 12px;border:1px solid var(--sbd-charcoal);background:var(--sbd-bg-sunken)}
-  .adjust label{flex:none;font:500 11px/1 var(--sbd-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--sbd-sand-dim)}
-  .adjust input[type=range]{flex:1;min-width:0;accent-color:var(--sbd-rust-on-dark);height:44px;margin:0}
-  .adjust output{flex:none;min-width:5ch;text-align:right;font:500 12px/1 var(--sbd-mono);color:var(--sbd-rust-on-dark)}
-  .evid{margin:12px 0 0;font:400 12px/1.5 var(--sbd-sans);color:var(--sbd-sand-dim);text-wrap:pretty}
-  .photo{display:grid;grid-template-columns:minmax(96px,160px) 1fr;gap:12px;margin:14px 0 0;padding:10px;border:1px solid var(--sbd-charcoal);background:var(--sbd-bg-sunken)}
-  .photo[hidden]{display:none}
-  .photo img{display:block;width:100%;height:108px;object-fit:contain;background:var(--sbd-bg)}
-  .photo figcaption{align-self:center;font:400 12px/1.5 var(--sbd-sans);color:var(--sbd-sand-dim)}
-  .foot{margin:16px 0 0;font:400 11px/1.5 var(--sbd-mono);letter-spacing:.02em;color:var(--sbd-sand-dim)}
-  .foot a{display:inline-flex;align-items:center;min-height:44px;padding:0 2px}
-  .chips{display:flex;flex-wrap:wrap;gap:6px;padding:0 16px;padding-bottom:calc(16px + env(safe-area-inset-bottom))}
-  .chips{display:flex;flex-wrap:wrap;gap:6px;padding:0 16px 16px}
-  .chip{flex:1 1 calc(50% - 3px);min-height:52px;display:flex;align-items:center;gap:8px;text-align:left;padding:8px 10px;background:transparent;border:1px solid var(--sbd-charcoal);transition:border-color .18s var(--sbd-ease),background .18s var(--sbd-ease)}
-  .chip[aria-pressed="true"]{background:var(--sbd-bg-raised);border-color:var(--sbd-rust-on-dark)}
-  .chip .n{width:20px;flex:none;text-align:center;font:500 11px/1 var(--sbd-mono);color:var(--sbd-sand-faint)}
-  .chip[aria-pressed="true"] .n{color:var(--sbd-rust-on-dark)}
-  .chip .t{flex:1;min-width:0;font:400 12px/1.25 var(--sbd-sans);color:var(--sbd-sand-dim)}
-  .chip[aria-pressed="true"] .t{color:var(--sbd-sand)}
-  .catrow{display:flex;flex-wrap:wrap;gap:6px;padding:12px 16px 0}
-  .cat{flex:none;min-height:44px;padding:0 13px;display:flex;align-items:center;gap:7px;background:transparent;border:1px solid var(--sbd-charcoal);transition:border-color .18s var(--sbd-ease),background .18s var(--sbd-ease)}
-  .cat[aria-pressed="true"]{background:var(--sbd-bg-raised);border-color:var(--sbd-rust-on-dark)}
-  .cat .t{font:500 11px/1 var(--sbd-mono);letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;color:var(--sbd-sand-dim)}
-  .cat[aria-pressed="true"] .t{color:var(--sbd-rust-on-dark)}
-  .cat .c{font:400 11px/1 var(--sbd-mono);color:var(--sbd-sand-faint)}
-  .chip .sel{flex:none;width:9px;height:9px;background:var(--sbd-rust-on-dark);visibility:hidden}
-  .chip[aria-pressed="true"] .sel{visibility:visible}
-  .cat .sel{flex:none;width:8px;height:8px;background:var(--sbd-rust-on-dark);visibility:hidden}
-  .cat[aria-pressed="true"] .sel{visibility:visible}
-  .eqrow button .sm{display:none}
-  @media (prefers-reduced-motion:reduce){
-    .skip,.pose,.cat,.chip,.eqrow button,.zoomrow button,.hover{transition:none}
-  }
-  @media (max-width:560px){
-    .lock{display:none}
-    .hint{display:none}
-    .subbar .lbl{display:none}
-    .eqrow button .lg{display:none}
-    .eqrow button .sm{display:inline}
-    .eqrow button{padding:0 11px}
-    #app{grid-template-rows:auto auto minmax(38vh,1fr) minmax(0,44%)}
-    .chip{flex:1 1 100%}
-    .photo{grid-template-columns:96px 1fr}.photo img{height:84px}
-  }
-  @media (min-width:980px){
-    #app{grid-template-rows:auto auto minmax(0,1fr);grid-template-columns:minmax(0,1fr) 420px;grid-template-areas:"bar bar" "sub detail" "stage detail"}
-    .bar{grid-area:bar}
-    .subbar{grid-area:sub}
-    #stagewrap{grid-area:stage}
-    #detail{grid-area:detail;border-top:0;border-left:1px solid var(--sbd-charcoal);box-shadow:-1px 0 0 var(--sbd-rust-on-dark)}
-  }
+@font-face{font-family:'DM Serif Display';font-style:normal;font-weight:400;font-display:swap;src:url('/fonts/dm-serif-display.woff2') format('woff2')}
+@font-face{font-family:'DM Sans';font-style:normal;font-weight:300 500;font-display:swap;src:url('/fonts/dm-sans.woff2') format('woff2')}
+html {font-size:100%;color-scheme:light;background:#f4eee3;scroll-behavior:auto}
+html[data-theme="dark"] {color-scheme:dark;background:#1c1917}
+body {margin:0;font-family:'DM Sans',system-ui,sans-serif}
+main {box-sizing:border-box}
+button,input,select {font:inherit}
+button {cursor:pointer}
+.form-select {padding:8px 12px}
+.noscript {padding:16px;max-width:65ch;line-height:1.5;background:#f4eee3;color:#241f1b}
 </style>
-</head>
-<body class="on-dark">
-<a class="skip" href="#detail">Skip to part details</a>
-<div id="app">
-  <header class="bar">
-    <span class="mark" aria-hidden="true">FMP</span>
-    <h1 class="vh">FMP rig — 3D explorer</h1>
-    <span class="lock" aria-hidden="true">Rig <i>/ 3D explorer</i></span>
-    <span class="grow"></span>
-    <div class="eqrow" id="eqrow" role="group" aria-label="Choose equipment"></div>
-    <button class="back" type="button" id="themeBtn" aria-label="Use dark theme">Dark</button>
-    <a class="back" href="/fmp/">← Ops</a>
-  </header>
-
-  <nav class="subbar" aria-label="Camera views">
-    <span class="lbl" aria-hidden="true">§ Views</span>
-    <span id="poserow" style="display:flex;gap:6px"></span>
-  </nav>
-
-  <div id="stagewrap" role="region" aria-label="3D viewport">
-    <canvas id="scene" tabindex="0" role="img" aria-label="3D view of the camera rig. The selected part is highlighted." aria-describedby="canvashelp"></canvas>
-    <span class="hover" id="hover" aria-hidden="true"></span>
-    <p class="hint" id="canvashelp">Drag to orbit · scroll to zoom · click a part. With the view focused: arrow keys orbit, + and − zoom, Home refits.</p>
-    <div class="zoomrow">
-      <button type="button" id="zin" aria-label="Zoom in">+</button>
-      <button type="button" id="zout" aria-label="Zoom out">−</button>
-      <button type="button" id="zfit" aria-label="Refit the view" style="font:500 10px/1 var(--sbd-mono);letter-spacing:.06em">FIT</button>
-    </div>
-    <div class="fail" id="fail">
-      <p style="margin:0;font:500 11px/1 var(--sbd-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--sbd-warn-dk)">▲ 3D unavailable</p>
-      <p style="margin:0;max-width:44ch;font:400 14px/1.55 var(--sbd-sans);color:var(--sbd-sand-dim)">This browser could not start WebGL. Every part description and check is still readable in the list below.</p>
-    </div>
-  </div>
-
-  <main id="detail">
-    <h2 class="vh">Part details</h2>
-    <div class="catrow" id="catrow" role="group" aria-label="Part categories"></div>
-    <div class="dwrap" aria-live="polite">
-      <div class="dhead">
-        <span class="dnum" id="dnum" aria-hidden="true">01</span>
-        <div style="flex:1;min-width:0">
-          <h3 class="dtitle" id="dtitle">Explore the rig</h3>
-          <p class="ddir" id="ddir">Pick a part in 3D or from the list</p>
-        </div>
-      </div>
-      <div class="row"><span class="rlbl" id="l-purpose">What it does</span><span class="rval" id="dpurpose"></span></div>
-      <div class="row"><span class="rlbl" id="l-use">How to use it</span><span class="rval" id="duse"></span></div>
-      <div class="row"><span class="rlbl ok" id="l-check">Check</span><span class="rval" id="dcheck"></span></div>
-      <div class="tip" id="dtipwrap" hidden><span aria-hidden="true">▲</span><span id="dtip"></span></div>
-      <figure class="photo" id="dphotoWrap" hidden><img id="dphoto" alt=""><figcaption id="dphotoNote"></figcaption></figure>
-      <div class="adjust" id="lcdadj" hidden><label for="lcdrange">LCD door</label><input id="lcdrange" type="range" min="0" max="90" step="5" value="90"><output id="lcdout" for="lcdrange">90°</output></div>
-      <div class="adjust" id="fiberadj" hidden><label for="fiberrange">Cable angle</label><input id="fiberrange" type="range" min="0" max="60" step="5" value="15"><output id="fiberout" for="fiberrange">15°</output></div>
-      <p class="evid" id="devid" hidden></p>
-      <p class="foot" id="dfoot"></p>
-    </div>
-    <div class="chips" id="chips" role="group" aria-label="Parts in this category"></div>
-  </main>
-</div>
-</div>
-
-<script type="module">
-import * as THREE from 'three';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { buildRigModels } from './rig-model.js';
-
-const RIG = window.FMP_RIG;
-const flat = {};
-const catOf = {};
-RIG.groups.forEach(g => g.categories.forEach(c => c.parts.forEach(p => { flat[p.slug] = { ...p, group: g.key, groupLabel: g.label, basis: g.basis, category: c.name }; catOf[p.slug] = c.name; })));
-
-const el = id => document.getElementById(id);
-let state = { group: 'rig', cat: 'Camera', part: 'body' };
-let scene, camera, renderer, controls, models = {}, parts = new Map(), poses = {}, raycaster, pointer, built = null;
-let sceneLights = {}, sceneGrounds = [];
-let hovered = '', live = false;
-
-function groupDef() { return RIG.groups.find(g => g.key === state.group); }
-function catDef() { const g = groupDef(); return g.categories.find(c => c.name === state.cat) || g.categories[0]; }
-
-function renderEq() {
-  el('eqrow').innerHTML = RIG.groups.map(g =>
-    `<button type="button" data-eq="${g.key}" aria-pressed="${g.key === state.group}"><span class="lg">${g.label}</span><span class="sm">${g.key === 'rig' ? 'Rig' : 'Converter'}</span></button>`).join('');
-  el('eqrow').querySelectorAll('button').forEach(b => b.onclick = () => {
-    const g = RIG.groups.find(x => x.key === b.dataset.eq);
-    setPart(g.categories[0].parts[0].slug, true);
-  });
-}
-function renderPoses() {
-  const list = state.group === 'rig'
-    ? [['beauty', 'Overview'], ['rig-top', 'Camera'], ['operator', 'Operator side'], ['lcd', 'LCD'], ['lens', 'Lens'], ['grip', 'Grip'], ['front', 'Front I/O'], ['rear', 'Rear I/O'], ['fiber-rear', 'Fiber rear'], ['viewfinder', 'Viewfinder'], ['support', 'Head & bars'], ['tripod', 'Tripod'], ['ground', 'Spreader']]
-    : [['studio-beauty', 'Overview'], ['studio-front', 'Front panel'], ['studio-rear', 'Rear panel']];
-  el('poserow').innerHTML = list.map(([k, label]) => `<button type="button" class="pose" data-pose="${k}">${label}</button>`).join('');
-  el('poserow').querySelectorAll('button').forEach(b => b.onclick = () => applyPose(b.dataset.pose));
-}
-function renderCats() {
-  el('catrow').innerHTML = groupDef().categories.map(c =>
-    `<button type="button" class="cat" data-cat="${c.name}" aria-pressed="${c.name === state.cat}"><span class="sel" aria-hidden="true"></span><span class="t">${c.name}</span><span class="c">${c.parts.length}</span></button>`).join('');
-  el('catrow').querySelectorAll('button').forEach(b => b.onclick = () => {
-    const c = groupDef().categories.find(x => x.name === b.dataset.cat);
-    setPart(c.parts[0].slug, true);
-  });
-}
-function renderChips() {
-  const c = catDef();
-  el('chips').innerHTML = c.parts.map((p, i) =>
-    `<button type="button" class="chip" data-slug="${p.slug}" aria-pressed="${p.slug === state.part}"><span class="sel" aria-hidden="true"></span><span class="n" aria-hidden="true">${String(i + 1).padStart(2, '0')}</span><span class="t">${p.title}</span></button>`).join('');
-  el('chips').querySelectorAll('button').forEach(b => b.onclick = () => setPart(b.dataset.slug));
-}
-function renderDetail() {
-  const p = flat[state.part];
-  const c = catDef();
-  const i = c.parts.findIndex(x => x.slug === p.slug);
-  el('dnum').textContent = String(i + 1).padStart(2, '0');
-  el('dtitle').textContent = p.title;
-  el('ddir').textContent = p.direction;
-  el('dpurpose').textContent = p.purpose;
-  el('duse').textContent = p.use;
-  el('dcheck').textContent = p.check;
-  el('dtipwrap').hidden = !p.tip;
-  el('dtip').textContent = p.tip || '';
-  el('devid').hidden = !p.evidence;
-  el('devid').textContent = p.evidence || '';
-  const photo = p.photo && RIG.photos[p.photo];
-  el('dphotoWrap').hidden = !photo;
-  if (photo) {
-    el('dphoto').src = photo.src;
-    el('dphoto').width = photo.w;
-    el('dphoto').height = photo.h;
-    el('dphoto').alt = `${p.title} reference photo`;
-    el('dphotoNote').textContent = p.photoNote || 'Supplied equipment reference. Confirm the installed unit before operating.';
-  }
-  el('lcdadj').hidden = p.slug !== 'lcd';
-  el('fiberadj').hidden = p.slug !== 'fiber-hybrid';
-  const links = [p.source ? `<a href="${p.source}" target="_blank" rel="noopener noreferrer">${p.sourceLabel || 'Reference'} ↗</a>` : '',
-    p.equipmentSource ? `<a href="${p.equipmentSource}" target="_blank" rel="noopener noreferrer">${p.equipmentSourceLabel || 'FMP gear record'} ↗</a>` : ''].filter(Boolean);
-  el('dfoot').innerHTML = p.basis + (links.length ? ' ' + links.join(' · ') : '');
-}
-function setPart(slug, jump) {
-  const p = flat[slug];
-  if (!p) return;
-  const changedGroup = p.group !== state.group;
-  const focusKey = document.activeElement && (document.activeElement.dataset.slug || document.activeElement.dataset.cat || document.activeElement.dataset.eq);
-  const focusAttr = document.activeElement && (document.activeElement.dataset.slug ? 'slug' : document.activeElement.dataset.cat ? 'cat' : document.activeElement.dataset.eq ? 'eq' : '');
-  state = { group: p.group, cat: p.category, part: slug };
-  renderEq(); renderCats(); renderChips(); renderDetail();
-  if (changedGroup) { renderPoses(); showGroup(); }
-  if (focusAttr) {
-    const next = document.querySelector(`[data-${focusAttr}="${CSS.escape(focusKey)}"]`)
-      || document.querySelector(`[data-slug="${CSS.escape(slug)}"]`);
-    if (next) next.focus();
-  }
-  if (live) { paintSelection(); placeMarker(); framePart(slug); }
-}
-
-// ── 3D ──────────────────────────────────────────────────────────────
-const HILITE = new THREE.Color('#D7825A');
-const originals = new Map();
-let marker = null;
-
-function makeMarker() {
-  const g = new THREE.Group();
-  const mat = new THREE.MeshBasicMaterial({ color: HILITE, transparent: true, opacity: 0.95, depthTest: false, depthWrite: false, side: THREE.DoubleSide });
-  const ring = new THREE.Mesh(new THREE.RingGeometry(0.96, 1, 64), mat);
-  ring.name = 'locator ring';
-  g.add(ring);
-  for (let i = 0; i < 4; i++) {
-    const tick = new THREE.Mesh(new THREE.PlaneGeometry(0.34, 0.035), mat);
-    const a = i * Math.PI / 2;
-    tick.position.set(Math.cos(a) * 1.22, Math.sin(a) * 1.22, 0);
-    tick.rotation.z = a;
-    g.add(tick);
-  }
-  g.renderOrder = 999;
-  g.userData.noHighlight = true;
-  g.traverse(o => { o.userData.noHighlight = true; o.castShadow = false; o.receiveShadow = false; });
-  return g;
-}
-function placeMarker() {
-  if (!marker) { marker = makeMarker(); scene.add(marker); }
-  const g = parts.get(state.part);
-  if (!g) { marker.visible = false; return; }
-  const box = new THREE.Box3().setFromObject(g);
-  if (box.isEmpty()) { marker.visible = false; return; }
-  const s = box.getBoundingSphere(new THREE.Sphere());
-  marker.visible = true;
-  marker.position.copy(s.center);
-  const r = Math.max(s.radius * 1.65, 0.18);
-  marker.scale.setScalar(r);
-}
-
-function paintSelection() {
-  for (const [mesh, mat] of originals) mesh.material = mat;
-  originals.clear();
-  const g = parts.get(state.part);
-  if (!g) return;
-  g.traverse(o => {
-    if (!o.isMesh || o.userData.noHighlight) return;
-    originals.set(o, o.material);
-    const m = o.material.clone();
-    m.color = HILITE.clone();
-    m.emissive = HILITE.clone().multiplyScalar(0.28);
-    o.material = m;
-  });
-}
-function showGroup() {
-  if (!models.rig) return;
-  models.rig.visible = state.group === 'rig';
-  models.studio.visible = state.group === 'studio';
-}
-function fitRadius(box) {
-  const sphere = box.getBoundingSphere(new THREE.Sphere());
-  const vfov = THREE.MathUtils.degToRad(camera.fov);
-  const vDist = sphere.radius / Math.tan(vfov / 2);
-  const hfov = 2 * Math.atan(Math.tan(vfov / 2) * camera.aspect);
-  const hDist = sphere.radius / Math.tan(hfov / 2);
-  return { center: sphere.center, dist: Math.max(vDist, hDist) * 1.28 };
-}
-function frame(object, az, el, minDist) {
-  const box = new THREE.Box3().setFromObject(object);
-  if (box.isEmpty()) return;
-  const { center, dist } = fitRadius(box);
-  const d = Math.min(controls.maxDistance, Math.max(controls.minDistance, minDist ? Math.max(dist, minDist) : dist));
-  controls.target.copy(center);
-  camera.position.set(
-    center.x + d * Math.cos(el) * Math.sin(az),
-    center.y + d * Math.sin(el),
-    center.z + d * Math.cos(el) * Math.cos(az)
-  );
-  controls.update();
-}
-function applyPose(key) {
-  const p = poses[key];
-  if (!p || !controls) return;
-  const narrow = el('stagewrap').clientWidth < 550;
-  const d = Math.min(controls.maxDistance, Math.max(controls.minDistance, p.radius * (narrow ? 1.15 : 1)));
-  controls.target.set(...p.target);
-  camera.position.set(
-    p.target[0] + d * Math.cos(p.el) * Math.sin(p.az),
-    p.target[1] + d * Math.sin(p.el),
-    p.target[2] + d * Math.cos(p.el) * Math.cos(p.az)
-  );
-  controls.update();
-}
-function framePart(slug) {
-  const g = parts.get(slug);
-  if (!g || !controls) return;
-  const p = flat[slug];
-  const pose = poses[p.pose] || poses[state.group === 'rig' ? 'beauty' : 'studio-beauty'];
-  const r = new THREE.Box3().setFromObject(g).getBoundingSphere(new THREE.Sphere()).radius;
-  frame(g, pose.az, pose.el, Math.max(1.5, r * 3.6));
-}
-
-function applySceneTheme(theme) {
-  if (!scene || !renderer || !sceneLights.hemisphere) return;
-  const dark = theme === 'dark';
-  const palette = dark ? {
-    background: 0x78858d, sky: 0xe7eff2, ground: 0x1b252c,
-    key: 0xffeed6, fill: 0x9ccbe0, rim: 0xe5f4ff,
-    hemisphereIntensity: 1.10, keyIntensity: 1.85, fillIntensity: 0.85, rimIntensity: 1.35,
-    shadowOpacity: 0.30, exposure: 1.08
-  } : {
-    background: 0xd8e0e2, sky: 0xf7faf9, ground: 0x53636c,
-    key: 0xfff4df, fill: 0xb9d9e8, rim: 0xe9f7ff,
-    hemisphereIntensity: 1.25, keyIntensity: 2.10, fillIntensity: 0.90, rimIntensity: 1.40,
-    shadowOpacity: 0.22, exposure: 1.12
-  };
-  scene.background.setHex(palette.background);
-  sceneLights.hemisphere.color.setHex(palette.sky);
-  sceneLights.hemisphere.groundColor.setHex(palette.ground);
-  sceneLights.hemisphere.intensity = palette.hemisphereIntensity;
-  sceneLights.key.color.setHex(palette.key);
-  sceneLights.key.intensity = palette.keyIntensity;
-  sceneLights.fill.color.setHex(palette.fill);
-  sceneLights.fill.intensity = palette.fillIntensity;
-  sceneLights.rim.color.setHex(palette.rim);
-  sceneLights.rim.intensity = palette.rimIntensity;
-  sceneGrounds.forEach(ground => { ground.material.opacity = palette.shadowOpacity; });
-  renderer.toneMappingExposure = palette.exposure;
-  renderer.domElement.dataset.surfaceTheme = dark ? 'medium-slate' : 'light-neutral';
-}
-
-function boot() {
-  const canvas = el('scene');
-  renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
-  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-  renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFShadowMap;
-  renderer.outputColorSpace = THREE.SRGBColorSpace;
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
-
-  scene = new THREE.Scene();
-  scene.background = new THREE.Color('#d8e0e2');
-
-  camera = new THREE.PerspectiveCamera(42, 1, 0.1, 200);
-
-  built = buildRigModels(THREE, Object.fromEntries(Object.entries(flat).map(([k, v]) => [k, { title: v.title }])));
-  models.rig = built.rig; models.studio = built.studio;
-  parts = built.parts; poses = built.poses;
-  scene.add(built.rig, built.studio);
-  el('lcdrange').addEventListener('input', e => { const d = built.setLcdOpening(e.target.value); el('lcdout').textContent = d === 0 ? 'Closed' : d + '°'; });
-  el('fiberrange').addEventListener('input', e => { const d = built.setFiberAngle(e.target.value); el('fiberout').textContent = d + '°'; placeMarker(); });
-
-  const hemisphere = new THREE.HemisphereLight(0xf7faf9, 0x53636c, 1.25);
-  scene.add(hemisphere);
-  const key = new THREE.DirectionalLight(0xfff2e2, 1.45);
-  key.position.set(-5.5, 9, 7); key.castShadow = true;
-  key.shadow.mapSize.set(1024, 1024);
-  key.shadow.camera.left = -9; key.shadow.camera.right = 9;
-  key.shadow.camera.top = 9; key.shadow.camera.bottom = -13;
-  key.shadow.normalBias = 0.025;
-  scene.add(key);
-  const fill = new THREE.DirectionalLight(0xb9d9e8, 0.90);
-  fill.position.set(6, 4, -6); scene.add(fill);
-  const rim = new THREE.DirectionalLight(0xe9f7ff, 1.40);
-  rim.position.set(-7, 6, -8); scene.add(rim);
-  sceneLights = { hemisphere, key, fill, rim };
-
-  for (const k of ['rig', 'studio']) {
-    const ground = new THREE.Mesh(new THREE.PlaneGeometry(60, 60), new THREE.ShadowMaterial({ opacity: 0.22 }));
-    ground.rotation.x = -Math.PI / 2;
-    ground.position.y = built.floors[k];
-    ground.receiveShadow = true;
-    ground.userData.noHighlight = true;
-    models[k].add(ground);
-    sceneGrounds.push(ground);
-  }
-  applySceneTheme(document.documentElement.dataset.theme || 'light');
-
-  controls = new OrbitControls(camera, canvas);
-  controls.enableDamping = true;
-  controls.dampingFactor = 0.08;
-  controls.minDistance = 1.6;
-  controls.maxDistance = 40;
-  controls.maxPolarAngle = Math.PI * 0.86;
-
-  raycaster = new THREE.Raycaster();
-  pointer = new THREE.Vector2();
-
-  canvas.addEventListener('pointermove', e => {
-    const r = canvas.getBoundingClientRect();
-    pointer.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
-    const hit = pick();
-    hovered = hit || '';
-    const h = el('hover');
-    if (hit && hit !== state.part) { h.textContent = flat[hit].title; h.classList.add('on'); }
-    else h.classList.remove('on');
-    canvas.style.cursor = hit ? 'pointer' : 'grab';
-  });
-  canvas.addEventListener('pointerleave', () => el('hover').classList.remove('on'));
-  let down = null;
-  canvas.addEventListener('pointerdown', e => { down = [e.clientX, e.clientY]; });
-  canvas.addEventListener('pointerup', e => {
-    if (!down) return;
-    const moved = Math.hypot(e.clientX - down[0], e.clientY - down[1]);
-    down = null;
-    if (moved > 6) return;
-    const hit = pick();
-    if (hit) setPart(hit);
-  });
-
-  el('zin').onclick = () => zoomBy(0.82);
-  el('zout').onclick = () => zoomBy(1.22);
-  el('zfit').onclick = () => applyPose(state.group === 'rig' ? 'beauty' : 'studio-beauty');
-
-  canvas.addEventListener('keydown', e => {
-    const step = e.shiftKey ? 0.28 : 0.12;
-    let handled = true;
-    switch (e.key) {
-      case 'ArrowLeft': orbitBy(-step, 0); break;
-      case 'ArrowRight': orbitBy(step, 0); break;
-      case 'ArrowUp': orbitBy(0, step); break;
-      case 'ArrowDown': orbitBy(0, -step); break;
-      case '+': case '=': zoomBy(0.85); break;
-      case '-': case '_': zoomBy(1.18); break;
-      case 'Home': applyPose(state.group === 'rig' ? 'beauty' : 'studio-beauty'); break;
-      default: handled = false;
+</head><body><div id="app">
+<main id="fmp-rig-3d" aria-labelledby="fmp-guide-title">
+  <style>
+    #fmp-rig-3d {
+      --background:#f4eee3; --foreground:#241f1b; --muted:#eae2d3; --muted-foreground:#564e45;
+      --popover:#fbf7ef; --popover-foreground:#241f1b; --secondary:#fbf7ef; --secondary-foreground:#241f1b;
+      --border:#b8ac97; --input:#877966; --blue:#9a4525; --ring:#9a4525;
+      --r-stage-bg:#dde5ed; --r-selected:#f0ddcc;
+      color:var(--foreground); background:var(--background); width:100%; max-width:112rem; margin:0 auto;
+      padding:clamp(12px,1.5vw,24px); font-size:1rem; line-height:1.5;
     }
-    if (handled) e.preventDefault();
-  });
-
-  addEventListener('resize', resize);
-  resize();
-  showGroup();
-  live = true;
-  paintSelection();
-  placeMarker();
-  framePart(state.part);
-  tick();
-}
-function orbitBy(dAz, dEl) {
-  const off = camera.position.clone().sub(controls.target);
-  const r = off.length();
-  let az = Math.atan2(off.x, off.z) + dAz;
-  let el = Math.asin(THREE.MathUtils.clamp(off.y / r, -1, 1)) + dEl;
-  el = THREE.MathUtils.clamp(el, -1.2, 1.35);
-  camera.position.set(
-    controls.target.x + r * Math.cos(el) * Math.sin(az),
-    controls.target.y + r * Math.sin(el),
-    controls.target.z + r * Math.cos(el) * Math.cos(az)
-  );
-  controls.update();
-}
-function zoomBy(f) {
-  const dir = camera.position.clone().sub(controls.target);
-  const d = Math.min(controls.maxDistance, Math.max(controls.minDistance, dir.length() * f));
-  camera.position.copy(controls.target).add(dir.setLength(d));
-  controls.update();
-}
-function pick() {
-  raycaster.setFromCamera(pointer, camera);
-  const root = state.group === 'rig' ? models.rig : models.studio;
-  const hits = raycaster.intersectObject(root, true);
-  for (const h of hits) {
-    let o = h.object;
-    if (o.userData.noHighlight) continue;
-    while (o && !o.userData.cid && o !== root) o = o.parent;
-    if (o && o.userData.cid && flat[o.userData.cid]) return o.userData.cid;
-  }
-  return '';
-}
-function resize() {
-  const w = el('stagewrap').clientWidth, h = el('stagewrap').clientHeight;
-  if (!w || !h) return;
-  renderer.setSize(w, h, false);
-  camera.aspect = w / h;
-  camera.updateProjectionMatrix();
-}
-function tick() {
-  controls.update();
-  if (marker && marker.visible) marker.quaternion.copy(camera.quaternion);
-  renderer.render(scene, camera);
-  requestAnimationFrame(tick);
-}
-
-const themeKey = 'fmpRigTheme';
-const themeButton = el('themeBtn');
-function applyTheme(theme) {
-  document.documentElement.dataset.theme = theme;
-  themeButton.textContent = theme === 'dark' ? 'Light' : 'Dark';
-  themeButton.setAttribute('aria-label', `Use ${theme === 'dark' ? 'light' : 'dark'} theme`);
-  document.querySelector('meta[name="theme-color"]').content = theme === 'dark' ? '#1c1917' : '#f4eee3';
-  applySceneTheme(theme);
-}
-let savedTheme = 'light';
-try { savedTheme = localStorage.getItem(themeKey) === 'dark' ? 'dark' : 'light'; } catch {}
-applyTheme(savedTheme);
-themeButton.addEventListener('click', () => {
-  const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
-  applyTheme(next);
-  try { localStorage.setItem(themeKey, next); } catch {}
-});
-
-renderEq(); renderPoses(); renderCats(); renderChips(); renderDetail();
-try { boot(); }
-catch (err) { console.error(err); el('fail').classList.add('on'); }
-</script>
-</body>
-</html>
+    :root[data-theme="dark"] #fmp-rig-3d {
+        --background:#1c1917; --foreground:#f2e9dc; --muted:#292621; --muted-foreground:#c3b8a8;
+        --popover:#292621; --popover-foreground:#f2e9dc; --secondary:#292621; --secondary-foreground:#f2e9dc;
+        --border:#83776a; --input:#a29380; --blue:#edaa85; --ring:#edaa85;
+        --r-stage-bg:#78858d; --r-selected:#48352b;
+    }
+    #fmp-rig-3d * { box-sizing:border-box; min-width:0; }
+    #fmp-rig-3d :is(h1,h2,h3,p) { margin:0; }
+    #fmp-rig-3d h1 { font-size:clamp(1.35rem,2.2vw,1.8rem); line-height:1.2; letter-spacing:-.025em; }
+    #fmp-rig-3d h2 { font-size:1.2rem; line-height:1.3; }
+    #fmp-rig-3d h3 { font-size:1rem; }
+    #fmp-rig-3d .text-small { font-size:.875rem; }
+    #fmp-rig-3d .text-muted { color:var(--muted-foreground); }
+    #fmp-rig-3d [hidden] { display:none !important; }
+    #fmp-rig-3d :is(button,select,input,summary,a):focus-visible,
+    #fmp-rig-3d canvas:focus-visible { outline:3px solid var(--ring); outline-offset:3px; }
+    #fmp-rig-3d :target { scroll-margin-top:1rem; }
+    #fmp-rig-3d a { color:var(--blue); text-decoration:underline; text-underline-offset:.2em; overflow-wrap:anywhere; }
+    #fmp-rig-3d .btn { min-height:44px; min-width:44px; padding:8px 12px; white-space:normal; border:1px solid var(--input); border-radius:6px; color:var(--foreground); background:var(--secondary); font-size:.9375rem; line-height:1.3; }
+    #fmp-rig-3d .btn:hover:not(:disabled) { background:var(--r-selected); border-color:var(--blue); }
+    #fmp-rig-3d .btn[aria-pressed="true"] { background:var(--r-selected); box-shadow:inset 0 -3px 0 var(--blue); border-color:var(--blue); font-weight:700; }
+    #fmp-rig-3d .btn:disabled { opacity:.55; cursor:default; }
+    #fmp-rig-3d .form-label { display:block; font-size:.875rem; font-weight:600; margin-bottom:4px; }
+    #fmp-rig-3d .form-select { display:block; width:100%; min-height:44px; max-width:100%; font-size:1rem; color:var(--foreground); background-color:var(--secondary); border:1px solid var(--input); border-radius:6px; }
+    #fmp-rig-3d .form-range { width:100%; min-height:44px; margin:0; accent-color:var(--blue); }
+    #fmp-rig-3d .form-range::-webkit-slider-thumb { min-width:24px; min-height:24px; }
+    #fmp-rig-3d .form-range::-moz-range-thumb { width:24px; height:24px; }
+    #fmp-rig-3d .r-head { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; margin-bottom:16px; }
+    #fmp-rig-3d .r-caption { color:var(--muted-foreground); margin-top:4px; }
+    #fmp-rig-3d .viz-row { display:flex; flex-wrap:wrap; gap:8px; }
+    #fmp-rig-3d .r-controls { display:flex; flex-wrap:wrap; align-items:end; gap:8px; margin-bottom:12px; }
+    #fmp-rig-3d .r-selector { flex:1 1 18rem; }
+    #fmp-rig-3d .r-workspace { display:grid; grid-template-columns:minmax(0,1fr); gap:20px; align-items:start; }
+    #fmp-rig-3d .r-viewer { min-width:0; }
+    #fmp-rig-3d .r-stage {
+      position:relative; width:100%; height:clamp(16rem,52vh,34rem); height:clamp(16rem,52svh,34rem); overflow:hidden;
+      border:1px solid var(--border); border-radius:8px; isolation:isolate;
+      background:radial-gradient(ellipse at 45% 38%,var(--background),var(--r-stage-bg));
+    }
+    #fmp-rig-3d canvas[data-scene] { position:absolute; inset:0; display:block; width:100%; height:100%; touch-action:pan-y pinch-zoom; cursor:grab; }
+    #fmp-rig-3d[data-gestures="true"] canvas[data-scene] { touch-action:none; }
+    #fmp-rig-3d canvas[data-scene]:active { cursor:grabbing; }
+    #fmp-rig-3d canvas[data-scene]:focus-visible { outline-offset:-5px; }
+    #fmp-rig-3d .r-stage-label { position:absolute; top:10px; left:10px; right:10px; pointer-events:none; color:var(--foreground); width:fit-content; max-width:calc(100% - 20px); background:var(--background); padding:3px 7px; border-radius:4px; }
+    #fmp-rig-3d .r-hover { position:absolute; left:10px; bottom:10px; padding:6px 10px; color:var(--popover-foreground); background:var(--popover); border-radius:5px; pointer-events:none; max-width:calc(100% - 20px); }
+    #fmp-rig-3d .r-hover:empty { display:none; }
+    #fmp-rig-3d .r-failure { position:absolute; inset:0; display:grid; align-content:center; text-align:center; color:var(--foreground); background:var(--background); padding:20px; overflow:auto; }
+    #fmp-rig-3d .r-under { display:grid; gap:10px; margin-top:12px; }
+    #fmp-rig-3d .r-view-actions { display:flex; flex-wrap:wrap; gap:8px; }
+    #fmp-rig-3d .r-help { color:var(--muted-foreground); max-width:66ch; }
+    #fmp-rig-3d .r-detail { display:grid; grid-template-columns:minmax(0,1fr); gap:16px; padding:16px; border:1px solid var(--border); border-radius:8px; background:var(--background); overflow-wrap:anywhere; }
+    #fmp-rig-3d .r-type { color:var(--muted-foreground); margin:6px 0 10px; }
+    #fmp-rig-3d dl { margin:0; }
+    #fmp-rig-3d dt { font-weight:700; margin-bottom:4px; }
+    #fmp-rig-3d dd { margin:0 0 12px; }
+    #fmp-rig-3d dd:last-child { margin-bottom:0; }
+    #fmp-rig-3d .r-notes { color:var(--muted-foreground); margin-top:10px; }
+    #fmp-rig-3d .r-photo { width:100%; height:auto; max-height:320px; object-fit:contain; object-position:left center; display:block; margin:8px 0; }
+    #fmp-rig-3d summary { cursor:pointer; min-height:44px; padding:9px 4px; font-weight:600; }
+    #fmp-rig-3d summary:hover { color:var(--blue); }
+    #fmp-rig-3d .r-foot { display:flex; flex-direction:column; align-items:start; gap:4px; margin-top:12px; }
+    #fmp-rig-3d .r-foot a { display:flex; align-items:center; min-height:44px; }
+    #fmp-rig-3d .r-training { border:1px solid var(--border); border-radius:8px; padding:0 12px; margin:0 0 16px; background:var(--muted); }
+    #fmp-rig-3d .r-training[open] { padding-bottom:12px; }
+    #fmp-rig-3d .r-training-nav { display:flex; align-items:center; flex-wrap:wrap; gap:8px; margin-top:8px; }
+    #fmp-rig-3d .r-training-step { margin-top:12px; padding-top:12px; border-top:1px solid var(--border); }
+    #fmp-rig-3d .r-training-step h2 { margin-bottom:4px; font-size:1rem; }
+    #fmp-rig-3d .r-training-result { font-weight:600; margin-top:8px; }
+    #fmp-rig-3d .r-support-note { padding:8px 0 0; color:var(--muted-foreground); }
+    #fmp-rig-3d .r-nd { padding:12px; background:var(--muted); border-radius:6px; }
+    #fmp-rig-3d .r-nd .r-training-nav { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); }
+    #fmp-rig-3d .r-nd-summary { display:block; font-weight:700; margin:12px 0 6px; }
+    #fmp-rig-3d .r-sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; border:0; }
+    #fmp-rig-3d .skip { position:absolute; left:12px; top:0; transform:translateY(-200%); z-index:10; padding:12px; background:var(--background); }
+    #fmp-rig-3d .skip:focus { transform:translateY(0); }
+    @media(min-width:64rem) {
+      #fmp-rig-3d .r-workspace { grid-template-columns:minmax(0,1fr) minmax(19rem,23rem); }
+      #fmp-rig-3d .r-viewer { position:sticky; top:16px; }
+      #fmp-rig-3d .r-stage { height:clamp(18rem,calc(100vh - 23rem),52rem); height:clamp(18rem,calc(100svh - 23rem),52rem); }
+    }
+    @media(max-width:40rem) {
+      #fmp-rig-3d .r-head { align-items:stretch; }
+      #fmp-rig-3d .r-head > .viz-row { width:100%; }
+      #fmp-rig-3d .r-head > .viz-row .btn { flex:1 1 0; }
+      #fmp-rig-3d .r-controls { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); }
+      #fmp-rig-3d .r-selector { grid-column:1 / -1; }
+      #fmp-rig-3d .r-controls .btn { width:100%; }
+      #fmp-rig-3d .r-detail { padding:12px; }
+      #fmp-rig-3d .r-stage-label { font-size:.75rem; }
+    }
+    @media(max-height:34rem) { #fmp-rig-3d .r-viewer { position:static; } #fmp-rig-3d .r-stage { height:18rem; } }
+    @media(prefers-reduced-motion:reduce) { #fmp-rig-3d *, #fmp-rig-3d *::before, #fmp-rig-3d *::after { scroll-behavior:auto; transition:none !important; animation:none !important; } }
+    @media(forced-colors:active) { #fmp-rig-3d .btn[aria-pressed="true"] { outline:2px solid Highlight; outline-offset:-4px; } #fmp-rig-3d :focus-visible { outline-color:Highlight; } }
+    #fmp-rig-3d .r-site-nav { display:flex; flex-wrap:wrap; align-items:center; gap:8px 16px; margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid var(--border); }
+    #fmp-rig-3d .r-site-nav a { display:inline-flex; align-items:center; min-height:44px; }
+    #fmp-rig-3d .r-site-nav button { margin-left:auto; }
+    #fmp-rig-3d h1 { font-family:'DM Serif Display',Georgia,serif; font-weight:400; }
+    #fmp-rig-3d .r-stage { background:radial-gradient(ellipse at 45% 38%,#f5f7f7,#d8e0e2); }
+    :root[data-theme="dark"] #fmp-rig-3d .r-stage { background:radial-gradient(ellipse at 45% 38%,#a0acb2,#78858d); }
+  </style>
+  <a class="skip" href="#fmp-part-details">Skip to component instructions</a>
+  <p class="r-sr-only" data-announcement role="status" aria-live="polite" aria-atomic="true"></p>
+  <nav class="r-site-nav" aria-label="Site navigation"><a href="/" aria-label="System by Dave home">System by Dave</a><a href="/fmp/">FMP Operations</a><button type="button" class="btn" id="themeBtn" aria-label="Use dark theme">Dark theme</button></nav>
+  <header class="r-head">
+    <div><h1 id="fmp-guide-title">Camera rig · 3D explorer</h1><p class="r-caption text-small">Camera body &amp; ND · tripod controls · complete rig</p></div>
+    <div class="viz-row" role="group" aria-label="Equipment">
+      <button type="button" class="btn" data-equipment="rig" aria-pressed="true">Camera rig</button>
+      <button type="button" class="btn" data-equipment="studio" aria-pressed="false">Studio converter</button>
+    </div>
+  </header>
+  <div class="r-controls">
+    <div class="r-selector"><label class="form-label" for="fmp-rig-part">Component</label><select id="fmp-rig-part" class="form-select" data-part-select><option value="">Entire rig</option></select></div>
+    <button type="button" class="btn btn-ghost" data-pose="beauty">Overview</button>
+    <button type="button" class="btn btn-ghost" data-pose="operator">Operator side</button>
+    <button type="button" class="btn btn-ghost" data-pose="connections">Connections</button>
+    <button type="button" class="btn btn-ghost" data-pose="support">Tripod &amp; handles</button>
+  </div>
+  <div class="r-controls" data-body-shortcuts role="group" aria-label="Camera body close-ups">
+    <button type="button" class="btn" data-quick-part="nd-filter">ND filter</button>
+    <button type="button" class="btn btn-ghost" data-quick-part="body">Body controls</button>
+    <button type="button" class="btn btn-ghost" data-quick-part="door-status">LCD outer panel</button>
+    <button type="button" class="btn btn-ghost" data-quick-part="lcd">Open LCD</button>
+  </div>
+  <details class="r-training" data-training aria-label="Tripod controls training">
+    <summary data-training-toggle>Tripod controls · locks, drag &amp; camera plate</summary>
+    <p class="text-small text-muted">Illustrative control locations. Match the actual head and plate with the house lead before using these as a field guide.</p>
+    <div class="r-training-nav" role="group" aria-label="Training topics">
+      <button type="button" class="btn" data-lesson="locks" aria-pressed="false">1 · Locks</button>
+      <button type="button" class="btn" data-lesson="drag" aria-pressed="false">2 · Drag &amp; balance</button>
+      <button type="button" class="btn" data-lesson="plate" aria-pressed="false">3 · Camera plate</button>
+      <button type="button" class="btn" data-lesson="practice" aria-pressed="false">Find the control</button>
+    </div>
+    <div class="r-training-step" data-training-step hidden>
+      <div class="text-small text-muted" data-training-progress></div>
+      <h2 data-training-title></h2><p class="text-small" data-training-action></p>
+      <p class="r-training-result text-small" data-training-result role="status" aria-live="polite"></p>
+      <div class="r-training-nav">
+        <button type="button" class="btn btn-ghost" data-training-prev>Previous</button>
+        <button type="button" class="btn btn-ghost" data-training-show>Show me</button>
+        <button type="button" class="btn" data-training-next>Next</button>
+        <button type="button" class="btn btn-ghost" data-training-close>Close lesson</button>
+      </div>
+      <p class="text-small text-muted">Practice here is control familiarization. It does not record a physical rig check.</p>
+    </div>
+  </details>
+  <div class="r-workspace">
+  <section class="r-viewer" aria-label="Model and view controls">
+  <div class="r-stage" data-stage>
+    <canvas id="scene" data-scene role="img" tabindex="0" aria-describedby="fmp-view-help" aria-label="Interactive 3D camera rig. Use the Component menu to select any part.">Select any component from the Component menu to read its description.</canvas>
+    <span class="r-stage-label text-small" data-stage-label>URSA G2 · Fujinon LA16 · Vinten support</span>
+    <span class="r-hover text-small" data-hover></span>
+    <div class="r-failure" data-failure role="status" hidden><p>This browser could not start the 3D view. Enable WebGL to use the 3D view. Component descriptions and photo references remain available below.</p></div>
+  </div>
+  <p class="r-support-note text-small" data-support-note hidden>Training layout · actual control locations unverified</p>
+  <div class="r-under">
+    <div class="r-view-actions" role="group" aria-label="3D view controls">
+      <button type="button" class="btn" data-orbit="-1" aria-label="Rotate left">←</button>
+      <button type="button" class="btn" data-orbit="1" aria-label="Rotate right">→</button>
+      <button type="button" class="btn" data-tilt="1" aria-label="View from higher angle">↑</button>
+      <button type="button" class="btn" data-tilt="-1" aria-label="View from lower angle">↓</button>
+      <button type="button" class="btn" data-zoom="0.82" aria-label="Zoom in">+</button>
+      <button type="button" class="btn" data-zoom="1.22" aria-label="Zoom out">−</button>
+      <button type="button" class="btn" data-fit-part>Find selected</button>
+      <button type="button" class="btn" data-fit>Fit rig</button>
+    </div>
+    <div class="r-view-actions">
+      <button type="button" class="btn" data-gesture-toggle aria-pressed="false" aria-describedby="fmp-touch-help">Touch rotation: off</button>
+      <a class="btn" href="#fmp-part-details">Read component</a>
+    </div>
+    <p class="text-small r-help" id="fmp-touch-help" data-touch-help>Touch: tap a part; swipe to scroll the page. Turn on touch rotation to drag or pinch the model.</p>
+    <p class="text-small r-help" id="fmp-view-help">Mouse: drag to orbit; Shift + scroll to zoom. Keyboard on the model: arrows rotate, +/− zoom, Home fits the rig. Escape turns touch rotation off. All parts are available in the Component menu.</p>
+  </div>
+  </section>
+  <section class="r-detail" id="fmp-part-details" tabindex="-1" aria-labelledby="fmp-part-title" data-detail>
+    <div class="r-summary"><h2 id="fmp-part-title" data-title>Explore the camera rig</h2><div class="r-type text-small" data-direction>Camera, lens, Vinten support and pan-bar controls</div><p data-purpose>Select the actual component in 3D to see its function and operating notes.</p></div>
+    <div class="r-summary r-nd" data-nd-guide hidden>
+      <strong>ND teaching example</strong>
+      <p class="text-small">Choose a wheel position to see its light reduction. These buttons do not show or change the physical camera setting.</p>
+      <div class="r-training-nav" role="group" aria-label="ND filter examples">
+        <button type="button" class="btn" data-nd-position="1" aria-pressed="true">1 · Clear</button>
+        <button type="button" class="btn" data-nd-position="2" aria-pressed="false">2 · 2 stops</button>
+        <button type="button" class="btn" data-nd-position="3" aria-pressed="false">3 · 4 stops</button>
+        <button type="button" class="btn" data-nd-position="4" aria-pressed="false">4 · 6 stops</button>
+      </div>
+      <output class="r-nd-summary" data-nd-summary></output><p class="text-small" data-nd-effect></p>
+      <p class="r-notes text-small">ND changes sensor exposure. Coordinate a filter change with the shader; monitor brightness is a separate adjustment.</p>
+    </div>
+    <div class="r-summary" data-fiber-adjust hidden>
+      <label class="form-label" for="fmp-fiber-angle">Cable exit · illustrative angle <output class="tabular-nums" data-fiber-angle-value for="fmp-fiber-angle">15°</output></label>
+      <input class="form-range" id="fmp-fiber-angle" data-fiber-angle type="range" min="0" max="60" step="1" value="15" aria-label="Illustrative fiber connector angle">
+    </div>
+    <div class="r-summary" data-lcd-adjust hidden>
+      <label class="form-label" for="fmp-lcd-opening">LCD opening <output class="tabular-nums" data-lcd-opening-value for="fmp-lcd-opening">90°</output></label>
+      <input class="form-range" id="fmp-lcd-opening" data-lcd-opening type="range" min="0" max="90" step="1" value="90" aria-label="Open or close the camera LCD">
+      <div class="viz-row text-small" style="justify-content:space-between"><span>Closed</span><span>Open</span></div>
+    </div>
+    <dl data-usage hidden><dt>Use</dt><dd data-use></dd><dt>Check</dt><dd data-check></dd></dl>
+    <div data-reference hidden><details data-photo-reference><summary>Photo reference</summary><img class="r-photo" data-photo alt="" loading="lazy"><p class="text-small text-muted" data-photo-note></p></details><p class="r-notes text-small" data-tip></p><p class="r-notes text-small" data-evidence hidden></p><p class="r-foot text-small"><a data-source target="_blank" rel="noopener noreferrer"></a><a data-equipment-source target="_blank" rel="noopener noreferrer" hidden></a></p></div>
+  </section>
+  </div>
+</main><noscript><section class="noscript"><h2>Enable JavaScript for the interactive guide</h2><p>ND positions are 1 Clear, 2 two stops, 3 four stops and 4 six stops. Coordinate ND changes with the shader.</p><p>Locks hold pan or tilt still. Drag changes movement resistance. Counterbalance supports the camera's tilt load. Verify the fitted head and camera plate with the house lead before releasing the plate.</p><p><a href="/fmp/">Return to FMP Operations</a></p></section></noscript>
+</div><script type="module" src="./rig-model.js?v=02c9d4a00fb0bfd8"></script></body></html>
