@@ -90,6 +90,18 @@ responses are never bundled for offline use.
    pass. A deployed URL, health response, or mocked browser test is not evidence
    of a successful live save or email delivery.
 
+## Theme
+
+The FMP suite has one theme preference, `fmpTheme` (`light`, `dark`, or `auto`),
+shared with the preshow walk. The managed `fmp/theme.js` applies it in the head of
+the hub, camera, guide, and rig pages, and `/fmp-index/` loads the same file. A
+first visit is light regardless of the system setting (WEB-1); `auto` follows the
+system. Earlier rig (`fmpRigTheme`) and guide (`fmpcam-theme`) choices move into
+`fmpTheme` once. FMP pages never read or write the AV Suite-wide
+`av-theme-mode.v1`. Every page shows a toggle; on camera pages it moves from the
+top bar to the status row on phones and landscape phones. `npm run verify:fmp`
+enforces the head script, the shared key, the light default, and the index toggle.
+
 ## Release checks and recovery
 
 Run `npm run verify:fmp`, indexing/navigation/consistency checks, and the complete
@@ -109,8 +121,8 @@ tripod control lessons. A single scrolling layout replaces the fixed-height
 pane stack. Wide screens use a bounded model beside instructions; narrower
 screens stack content. Native component selection, visible keyboard focus,
 44px controls, non-drag rotation/tilt/zoom buttons, optional touch gestures and
-reduced-motion behavior provide alternate ways to operate the model. The
-existing `fmpRigTheme` preference and local Three.js runtime remain in use.
+reduced-motion behavior provide alternate ways to operate the model. The rig
+uses the suite theme preference below and the local Three.js runtime.
 
 The new body-control photograph is an allowlisted WebP reference. No operational
 records, backend changes, new storage keys or service worker are part of this

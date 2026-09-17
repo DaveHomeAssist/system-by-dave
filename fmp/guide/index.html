@@ -7,6 +7,7 @@
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none'">
 <meta name="theme-color" content="#eceae4">
+<script src="../theme.js?v=d4c1024bbd62d45a"></script>
 <meta name="description" content="FMP bowl camera training for house and tour nights: operator discipline, camera meetings, song flow, directing, the house plot, preshow checks, and failure recovery.">
 <link rel="canonical" href="https://systembydave.com/fmp/guide/">
 <meta property="og:type" content="website">
@@ -194,8 +195,8 @@ pre{font-family:var(--font-m);font-size:13px;background:var(--umd);color:#dfe4ea
     <div class="spacer"></div>
     <div class="header-actions">
       <a class="theme-btn" href="/">System by Dave</a>
-      <a class="theme-btn" href="/fmp/">FMP operations</a>
-      <button class="theme-btn" id="themeBtn" type="button" aria-label="Toggle light and dark mode">Theme</button>
+      <a class="theme-btn" href="/fmp/">FMP Video Operations</a>
+      <button class="theme-btn" id="themeBtn" type="button" data-theme-toggle aria-label="Dark theme" aria-pressed="false">Theme</button>
     </div>
   </header>
 
@@ -581,17 +582,7 @@ End frame: ______________________</pre>
     del: function(k){ try { localStorage.removeItem(k); } catch(e){} }
   };
 
-  // theme
-  var root = document.documentElement;
-  var saved = store.get('fmpcam-theme');
-  if (saved === 'light' || saved === 'dark') root.setAttribute('data-theme', saved);
-  document.getElementById('themeBtn').addEventListener('click', function(){
-    var cur = root.getAttribute('data-theme');
-    if (!cur) cur = 'light';
-    var next = cur === 'light' ? 'dark' : 'light';
-    root.setAttribute('data-theme', next);
-    store.set('fmpcam-theme', next);
-  });
+  // Theme: ../theme.js applies the shared FMP preference and handles #themeBtn.
 
   // tabs
   var tabs = Array.prototype.slice.call(document.querySelectorAll('[role="tab"]'));

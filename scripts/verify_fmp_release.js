@@ -15,7 +15,7 @@ const releases = [
     directory: 'fmp',
     mode: 'commissioning',
     expected: [
-      'index.html', 'public.css', 'public.js', 'camera.js', 'camera-core.js', 'camera-view.js', 'camera.css', 'photos.js', 'mail.js', 'notion-config.js',
+      'index.html', 'public.css', 'public.js', 'theme.js', 'camera.js', 'camera-core.js', 'camera-view.js', 'camera.css', 'photos.js', 'mail.js', 'notion-config.js',
       ...cameraRoutes.map(route => `${route}index.html`),
       'guide/index.html', 'rig/index.html', 'rig/rig-model.js', 'rig/fmp-guide-data.js',
       ...rigPhotos.map(name => `rig/assets/${name}.webp`),
@@ -79,6 +79,11 @@ for (const release of releases) {
     const canonical = `https://systembydave.com/${release.directory}/${route}`;
     assert.ok(source.includes(`href="${canonical}"`), `${release.directory}/${name}: ${canonical}`);
     assert.ok(!sitemap.includes(`<loc>${canonical}</loc>`));
+    if (release.directory === 'fmp') {
+      // WEB-1: every FMP page takes the light-first fmpTheme preference before first paint, never the AV Suite key.
+      assert.match(source.slice(0, source.indexOf('</head>')), /<script src="(?:\.\.\/)*theme\.js\?v=[a-f0-9]{16}"><\/script>/, `${release.directory}/${name}: load theme.js in <head>`);
+      assert.doesNotMatch(source, /av-theme-mode/, `${release.directory}/${name}: FMP pages must not read or write av-theme-mode.v1`);
+    }
     if (release.directory === 'fmp' && name.startsWith('camera/')) {
       assert.ok(source.includes('data-setup-test-only="true"'));
       assert.ok(source.includes('data-public-release="true"'));
@@ -99,6 +104,15 @@ const cameraView = fs.readFileSync(path.join(site, 'fmp/camera-view.js'), 'utf8'
 assert.match(cameraView, /href="#screenTitle"/);
 assert.match(cameraView, /id="screenTitle"/);
 const walkEntry = fs.readFileSync(path.join(site, 'fmpwalk/index.html'), 'utf8');
+// One suite theme preference: theme.js and the walk share fmpTheme, a first visit is light, and the index uses it too.
+const theme = fs.readFileSync(path.join(site, 'fmp/theme.js'), 'utf8');
+assert.match(theme, /const KEY = 'fmpTheme';/);
+assert.match(theme, /preference = legacy \|\| 'light';/);
+assert.match(walkEntry, /var THEME_KEY = "fmpTheme";/);
+const workingIndex = fs.readFileSync(path.join(site, 'fmp-index/index.html'), 'utf8');
+assert.match(workingIndex, /<html lang="en" data-av-theme="light">/);
+assert.match(workingIndex.slice(0, workingIndex.indexOf('</head>')), /<script src="\/fmp\/theme\.js"><\/script>/, 'fmp-index/index.html: load /fmp/theme.js in <head>');
+assert.match(workingIndex, /data-theme-toggle/, 'fmp-index/index.html: visible theme toggle');
 assert.match(walkEntry, /No silent writes/);
 // /fmpwalk/camera/ does not exist; the walk's camera link and legacy redirect must use /fmp/camera/.
 assert.match(walkEntry, /id="cameraLaunch" href="\/fmp\/camera\/"/);

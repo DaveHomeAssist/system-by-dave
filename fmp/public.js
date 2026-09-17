@@ -1,9 +1,7 @@
+// theme.js owns the FMP preference; the hub offers it as a select.
 const theme = document.getElementById('theme');
-theme.value = document.documentElement.dataset.avTheme || 'system';
-theme.addEventListener('change', () => {
-  document.documentElement.dataset.avTheme = theme.value;
-  try { localStorage.setItem('av-theme-mode.v1', theme.value); } catch { /* Theme still applies in this tab. */ }
-});
+theme.value = window.fmpTheme.preference;
+theme.addEventListener('change', () => window.fmpTheme.set(theme.value));
 // Tabs are hash links, so the open panel survives reload, can be shared and follows Back and Forward.
 const tabs = [...document.querySelectorAll('.portal-tabs [data-panel]')];
 const show = hash => {
