@@ -67,6 +67,16 @@ body[data-public-release] .system-home { display: flex; align-items: center; jus
 body[data-public-release] .topbar { background: var(--av-surface-2); color: var(--av-text); }
 body[data-public-release] .brand, body[data-public-release] .connection { color: var(--av-text); }
 body[data-public-release] .brand-sub { color: var(--av-muted); }
+body[data-public-release] .theme-toggle { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-width: 44px; min-height: 44px; padding: 0 12px; font-size: 13px; white-space: nowrap; color: var(--av-text); background: transparent; border: 1px solid var(--av-line-strong); border-radius: 6px; }
+body[data-public-release] .theme-toggle[aria-pressed="true"] { background: var(--av-surface); }
+body[data-public-release] .status-row { display: flex; min-width: 0; }
+body[data-public-release] .status-row .status-bar { flex: 1; min-width: 0; width: auto; }
+body[data-public-release] .theme-toggle-bottom { display: none; width: 44px; padding: 0; border-width: 1px 0 0 1px; border-color: var(--av-line); border-radius: 0; }
+@media (max-width: 760px), (max-height: 520px) {
+  body[data-public-release] .theme-toggle-top { display: none; }
+  body[data-public-release] .theme-toggle-bottom { display: inline-flex; }
+  body[data-public-release] .theme-toggle-bottom .theme-toggle-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+}
 body[data-public-release] .eyebrow { margin: 0; }
 body[data-public-release] input, body[data-public-release] select, body[data-public-release] textarea,
 body[data-public-release] .secondary, body[data-public-release] .segmented button,

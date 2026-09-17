@@ -10,12 +10,11 @@ function applyTheme(theme) {
   document.querySelector('meta[name="theme-color"]').content=theme==='dark'?'#1c1917':'#f4eee3';
   root.querySelector('[data-scene]').dataset.surfaceTheme=theme==='dark'?'medium-slate':'light-neutral';
 }
-let savedTheme='light';
-try {savedTheme=localStorage.getItem('fmpRigTheme')==='dark'?'dark':'light';} catch {}
-applyTheme(savedTheme);
+// ../theme.js resolves and stores the shared FMP preference; without it the rig starts light.
+applyTheme(globalThis.fmpTheme?.theme||'light');
 themeButton.addEventListener('click',()=>{
   const next=document.documentElement.dataset.theme==='dark'?'light':'dark';
-  applyTheme(next);try {localStorage.setItem('fmpRigTheme',next);} catch {}
+  globalThis.fmpTheme?.set(next);applyTheme(next);
 });
 // BEGIN SHARED VIEWER
 const $=selector=>root.querySelector(selector);

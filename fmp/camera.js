@@ -6,7 +6,7 @@ import { CLIENT_ID } from './mail.js?v=4a521185a33c8463';
 import { loadPhotoBlob, loadPhotoFiles, storePhoto } from './photos.js?v=cd1feeb0fd50c5df';
 import { NOTION_API_URL } from './notion-config.js?v=b675c734abe301f4';
 
-import { CAMERA_STAGES, cameraPages, cameraShell } from './camera-view.js?v=be5658a7dd7fa28d';
+import { CAMERA_STAGES, cameraPages, cameraShell } from './camera-view.js?v=169595810d8af6a2';
 
 const view = { stage: 'setup', page: 0 };
 let activePages;

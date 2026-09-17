@@ -10,6 +10,13 @@
 * Clears the remaining desktop-width failures that the shared-control-palette work below recorded as outstanding, so `npm run probe:av-themes` now passes at both widths in both preferences. The monitor caption bar moves on from `--panel-2` to `--panel-3` because the monitor card it sits on is itself now `--panel-2`.
 * Verified with `npm run probe:av-themes` at 1440px and 390px across both preferences, `npm run verify:av`, and the Cue Sheet smoke probe.
 
+### FMP suite theme: light first, one preference, a toggle on every page
+
+* Exported `DaveHomeAssist/fmpwalk` `9aef845` to `fmp/` and `fmpwalk/`. A new managed `fmp/theme.js` loads in the head of the hub, the five camera pages, the guide, and the rig. It stores `light`, `dark`, or `auto` in `fmpTheme`, the key the preshow walk already uses, so a first visit is light even when the system prefers dark (WEB-1, baseline H7, probe W6). Before this change the hub and camera pages followed the AV Suite default and opened dark.
+* The suite had four theme keys. A light or dark choice saved under the rig's `fmpRigTheme` or the guide's `fmpcam-theme` now moves into `fmpTheme` once, and the old keys stay in place. The hub's theme select offers Light, Dark, and Auto and no longer writes the AV Suite-wide `av-theme-mode.v1`, so choosing a theme in FMP no longer changes every AV tool.
+* Camera pages gain a **Dark theme** toggle in the top bar. On phones and landscape phones it sits in the status row, because the top bar has no room at 320px. `/fmp-index/` now opens light and has its own toggle backed by `/fmp/theme.js`. The guide and rig link to FMP Video Operations.
+* `verify:fmp` adds `fmp/theme.js` to the allowlist. It now requires every FMP page to load it in `<head>` with a content-hash token and never reference `av-theme-mode`, requires the walk and `theme.js` to share `fmpTheme` with a light default, and requires `/fmp-index/` to load `/fmp/theme.js`, open light, and show a toggle.
+
 ### FMP hub: fixed tab row, addressable tabs, and a visible current step
 
 * Exported `DaveHomeAssist/fmpwalk` `c38166e` to `fmp/` and `fmpwalk/`. The `/fmp/` tabs are now links to `#cameras`, `#walk`, `#learn`, and `#setup`, so the open panel survives reload, can be shared, and follows Back and Forward.
