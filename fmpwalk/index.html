@@ -123,6 +123,7 @@ button{cursor:pointer;border:none;background:none;touch-action:manipulation}
   transform:translateY(-180%);transition:transform .15s;
 }
 .skip-link:focus{transform:translateY(0)}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}
 
 /* ---------- header ---------- */
 header{
@@ -131,7 +132,9 @@ header{
   padding-top:var(--safe-t);padding-left:var(--safe-l);padding-right:var(--safe-r);
 }
 .hdr-top{display:flex;align-items:center;gap:10px;padding:10px 14px 8px}
-.hdr-home{display:inline-flex;align-items:center;min-height:44px;color:var(--accent);font:700 10px/1 var(--mono);letter-spacing:.08em;text-decoration:none;text-transform:uppercase}
+.hdr-nav{display:flex;align-items:center;gap:2px;flex:0 0 auto}
+.hdr-nav .sep{color:var(--muted);font:700 10px/1 var(--mono)}
+.hdr-home{display:inline-flex;align-items:center;justify-content:center;min-height:44px;min-width:44px;color:var(--accent);font:700 10px/1 var(--mono);letter-spacing:.08em;text-decoration:none;text-transform:uppercase}
 .hdr-mark{
   margin:0;
   font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--accent);
@@ -147,6 +150,7 @@ header{
   display:flex;align-items:center;justify-content:center;font-size:19px;flex:0 0 auto;
 }
 @media (max-width:400px){ .hdr-mark{display:none} }
+@media (max-width:360px){ .hdr-nav .sep,.hdr-sub{display:none} }
 
 /* ---------- signature: the meter-bridge status rail ---------- */
 .rail{display:flex;gap:2px;padding:0 14px 10px;height:26px;align-items:stretch;width:100%;max-width:100%;overflow:hidden}
@@ -562,7 +566,12 @@ kbd{
 
 <header>
   <div class="hdr-top">
-    <a class="hdr-home" href="https://systembydave.com/fmp/" aria-label="Return to FMP Video Operations">FMP&nbsp;VIDEO</a>
+    <h1 class="sr-only">FMP preshow walk</h1>
+    <div class="hdr-nav">
+      <a class="hdr-home" href="https://systembydave.com/">SBD<span class="sr-only"> · System by Dave home</span></a>
+      <span class="sep" aria-hidden="true">/</span>
+      <a class="hdr-home" href="https://systembydave.com/fmp/" aria-label="Return to FMP Video Operations">FMP<span class="hdr-sub">&nbsp;VIDEO</span></a>
+    </div>
     <div class="hdr-show"><b id="hShow">No show set</b><span id="hMeta">Open Setup to begin</span></div>
     <div class="hdr-count"><b id="hDone">0</b><span id="hTot">of 0</span></div>
     <button class="theme-btn" id="themeBtn" title="Auto, day, night" aria-label="Change display mode">AUTO</button>
@@ -585,7 +594,7 @@ kbd{
   <div class="card">
     <div class="card-hd"><h4>Camera operators</h4></div>
     <p class="mini">Open a position-specific check-in, build, fault, and checkout record. No Notion write happens without an explicit confirmation.</p>
-    <a class="launch-link" href="./camera/">Open camera operations</a>
+    <a class="launch-link" id="cameraLaunch" href="/fmp/camera/">Open camera operations</a>
   </div>
 
   <div class="card">
@@ -596,8 +605,6 @@ kbd{
       <select id="fOp">
         <option value="">Choose a name</option>
         <option value="David">David</option>
-        <option value="Charlie">Charlie</option>
-        <option value="John">John</option>
         <option value="custom">Custom</option>
       </select>
     </div>
@@ -608,7 +615,7 @@ kbd{
         <option value="summer">Summer - Full Venue</option>
         <option value="winter">Winter - Indoor Seating Only</option>
       </select>
-      <div class="mini">🟢 Oct 15 2026 is the last night the summer rig exists. 🔴 What winter does to the 4 lawn delay walls and 14 lawn TVs is unverified. Ask Charlie before changeover.</div>
+      <div class="mini">🟢 Oct 15 2026 is the last night the summer rig exists. 🔴 What winter does to the 4 lawn delay walls and 14 lawn TVs is unverified. Ask the Head of Video before changeover.</div>
     </div>
   </div>
 
@@ -820,17 +827,18 @@ kbd{
   </table>
 
   <h3>Who gets the ticket</h3>
+  <div class="note info">🔵 <b>Contact details are not published here.</b> Names, phone numbers and email addresses for these routes are kept in Notion, behind sign-in. Route the ticket by role.</div>
   <table>
     <tr><th scope="col">Route</th><th scope="col">Scope</th></tr>
     <tr><td>Video</td><td>Locate and report. Bowl brightness. Switcher.</td></tr>
-    <tr><td>Teddy · IT</td><td>🟢 Owns the ladder to the DMP boxes and services the players. Video locates, Teddy services.</td></tr>
-    <tr><td>GoVision</td><td class="m">🟡 817-783-4244 · Support@jumbo.tv</td></tr>
+    <tr><td>IT</td><td>🟢 Owns the ladder to the DMP boxes and services the players. Video locates, IT services.</td></tr>
+    <tr><td>GoVision</td><td>🟡 Bowl LED vendor. Contact details are in Notion.</td></tr>
     <tr><td>Rigging</td><td>Wall level, mount, hang</td></tr>
-    <tr><td>Emily · house audio</td><td>Black Box VIP sync. Fix is delay at her console.</td></tr>
-    <tr><td>Charlie</td><td>Head of Video. Anything undocumented.</td></tr>
-    <tr><td>John Ogle · steward</td><td class="m">🟢 john@tristatestaging.com · 609-458-9534</td></tr>
-    <tr><td>Videri console</td><td>🔴 Contact unknown. Ask Charlie by name.</td></tr>
-    <tr><td>ConcertVision</td><td>🔴 Contact unknown. Ask Charlie by name.</td></tr>
+    <tr><td>House audio</td><td>Black Box VIP sync. Fix is delay at the house audio console.</td></tr>
+    <tr><td>Head of Video</td><td>Anything undocumented.</td></tr>
+    <tr><td>Venue steward</td><td>🟢 Contact details are in Notion.</td></tr>
+    <tr><td>Videri console</td><td>🔴 Contact unknown. Ask the Head of Video.</td></tr>
+    <tr><td>ConcertVision</td><td>🔴 Contact unknown. Ask the Head of Video.</td></tr>
     <tr><td>Live Nation / 2024 integrator</td><td>🔴 Unidentified after two documented sessions. Highest-value open thread.</td></tr>
   </table>
 
@@ -847,12 +855,12 @@ kbd{
   </table>
 
   <h3>Naming</h3>
-  <div class="note">Four levels: <b>official venue space → operational AV zone → map key → device ID.</b> Canonical names, never legacy shorthand. 🟢 Charlie endorsed this scheme unprompted and in his own words, so it is department convention now.
+  <div class="note">Four levels: <b>official venue space → operational AV zone → map key → device ID.</b> Canonical names, never legacy shorthand. 🟢 The Head of Video endorsed this scheme unprompted, so it is department convention now.
   <br><br>🔴 <b>Do not expand</b> <span class="k">TC2</span> <span class="k">TC4</span> <span class="k">NBB</span> <span class="k">BB1</span> <span class="k">781</span> <span class="k">791</span>. They are location keys with no decodable scheme. Record them exactly as printed.
   <br><br>⛔ <b>Black Box VIP, Black Box VIP Patio, and VIP Club are three separate spaces.</b> Never merge them on a ticket.</div>
 
   <h3>Photography</h3>
-  <div class="note warn">🟡 <b>Unresolved conflict.</b> The venue record says no photos or video inside. The documentation need is not permission. Clear it with Charlie or the steward once, then the photo field on every ticket stops being a question.</div>
+  <div class="note warn">🟡 <b>Unresolved conflict.</b> The venue record says no photos or video inside. The documentation need is not permission. Clear it with the Head of Video or the venue steward once, then the photo field on every ticket stops being a question.</div>
 
   <h3>What this walk closes</h3>
   <div class="note info">🔵 Every Tier 2 zone is on every route. One full pass produces the verified per-zone count that ramp-up step 9 is waiting on, including the <span class="k">WALT CON</span> recount and the duplicate Videri ID <span class="k">087</span>. Record counts as you go and the audit finishes itself.</div>
@@ -889,7 +897,9 @@ kbd{
   var legacy = { "1":"pit-center", "2":"front-of-house", "3":"pit-stage-left", "4":"catwalk" };
   var allowed = ["pit-center", "front-of-house", "pit-stage-left", "catwalk"];
   var target = legacy[params.get("camera")] || (allowed.indexOf(position) > -1 ? position : "");
-  if(target) location.replace(new URL("./camera/" + target + "/", location.href).href);
+  // The public export rewrites this camera root to /fmp/camera/.
+  var cameraRoot = "/fmp/camera/";
+  if(target) location.replace(new URL(cameraRoot + target + "/", location.href).href);
 })();
 
 function $(id){ return document.getElementById(id); }
@@ -1030,7 +1040,7 @@ var SEV = [
   {v:"cos", l:"🔵 Cosmetic, monitor it"}
 ];
 
-var ROUTES = ["Video (self)","Teddy · IT, DMP service","GoVision · bowl LED","Rigging","Emily · house audio","Charlie","ConcertVision 🔴","Videri 🔴","Live Nation facility 🔴","Undecided"];
+var ROUTES = ["Video (self)","IT · DMP service","GoVision · bowl LED","Rigging","House audio","Head of Video","ConcertVision 🔴","Videri 🔴","Live Nation facility 🔴","Undecided"];
 
 /* ══════════════════════ state and persistence ══════════════════════ */
 var S = {
@@ -1560,14 +1570,15 @@ function openSheet(station, existing){
   h += '<div class="mini" style="margin-top:8px">🟢 A dark display is uncounted advertising inventory. That is a revenue argument, not a cosmetic one, and it is the language that gets a unit replaced.</div></fieldset>';
 
   h += '<div class="fld"><label for="sRoute">Route to</label><select id="sRoute">';
-  for(var k=0;k<ROUTES.length;k++){
-    h += '<option' + (f.route === ROUTES[k] ? " selected" : "") + ">" + esc(ROUTES[k]) + "</option>";
+  var routeOptions = f.route && ROUTES.indexOf(f.route) === -1 ? [f.route].concat(ROUTES) : ROUTES;
+  for(var k=0;k<routeOptions.length;k++){
+    h += '<option' + (f.route === routeOptions[k] ? " selected" : "") + ">" + esc(routeOptions[k]) + "</option>";
   }
-  h += "</select><div class=\"mini\" style=\"margin-top:6px\">🟢 Video locates and reports. Teddy services the players and owns the ladder.</div></div>";
+  h += "</select><div class=\"mini\" style=\"margin-top:6px\">🟢 Video locates and reports. IT services the players and owns the ladder.</div></div>";
 
   h += '<fieldset class="choice-group"><legend>Photographed</legend><div class="chips">' +
     '<button type="button" class="chip' + (f.photo ? " on" : "") + '" aria-pressed="' + (f.photo ? "true" : "false") + '" id="sPhoto">📷 Photo taken</button></div>' +
-    '<div class="mini" style="margin-top:8px">This checkbox records an observation only. Attach actual images below. 🟡 The venue record says no photos or video inside. Clear it with Charlie or the steward before you rely on this.</div></fieldset>';
+    '<div class="mini" style="margin-top:8px">This checkbox records an observation only. Attach actual images below. 🟡 The venue record says no photos or video inside. Clear it with the Head of Video or the venue steward before you rely on this.</div></fieldset>';
   h += '<fieldset class="choice-group"><legend>Photo attachments</legend><div id="faultPhotos">Loading photo controls…</div></fieldset>';
 
   h += '<div class="fld"><label for="sNotes">Notes</label><textarea id="sNotes" placeholder="What you saw, and anything you already tried">' + esc(f.notes) + "</textarea></div>";
@@ -1841,13 +1852,13 @@ function buildReport(){
   o.push("| # | Item | Who answers |");
   o.push("| --- | --- | --- |");
   o.push("| 1 | 🔴 Which MCTRL660 IP maps to which unit, and are the four redundancy or canvas extension | Trace one follower's output |");
-  o.push("| 2 | 🔴 Which zones the ConcertVision button actually moves | Charlie, or the 2024 as-builts |");
-  o.push("| 3 | 🔴 Who installed the 2024 IP system and where the commissioning package is | Charlie, Live Nation facility, or the integrator |");
-  o.push("| 4 | 🔴 What the winter configuration does to the 4 lawn walls and 14 lawn TVs | Charlie, before changeover |");
+  o.push("| 2 | 🔴 Which zones the ConcertVision button actually moves | Head of Video, or the 2024 as-builts |");
+  o.push("| 3 | 🔴 Who installed the 2024 IP system and where the commissioning package is | Head of Video, Live Nation facility, or the integrator |");
+  o.push("| 4 | 🔴 What the winter configuration does to the 4 lawn walls and 14 lawn TVs | Head of Video, before changeover |");
   o.push("");
   o.push("**Confidence: medium.** Field observation only. No controller logs pulled, no network state checked, no content source verified upstream of the display.");
   o.push("");
-  o.push("_Generated by the FMP preshow walk tool. Paste into the FMP Technical Overview working page. Do not paste unresolved items into the John deliverable._");
+  o.push("_Generated by the FMP preshow walk tool. Paste into the FMP Technical Overview working page. Do not paste unresolved items into the venue deliverable._");
   return {markdown:o.join("\n"),faultCount:faults.length};
 }
 function report(){
@@ -1967,7 +1978,7 @@ function syncSetup(){
   S.meta = prepareMeta(S.meta);
   $("fDate").value = S.meta.date || todayISO();
   $("fShow").value = S.meta.show;
-  var custom = S.meta.op && ["David","Charlie","John"].indexOf(S.meta.op) === -1;
+  var custom = S.meta.op && ["David"].indexOf(S.meta.op) === -1;
   $("fOp").value = custom ? "custom" : S.meta.op;
   $("fOpCustom").value = custom ? S.meta.op : "";
   syncOperator();
@@ -2136,7 +2147,7 @@ go(S.meta.show ? (S.tab || "walk") : "setup");
   }
 })();
 </script>
-<script type="module" src="./email.js?v=167b00464e40dcf7"></script>
-<script type="module" src="./notion.js?v=1e4ade1a6663fcde"></script>
+<script type="module" src="./email.js?v=81495faf250100aa"></script>
+<script type="module" src="./notion.js?v=6c7a642be575c64b"></script>
 </body>
 </html>

@@ -81,6 +81,7 @@ header{display:flex;align-items:center;gap:16px;padding:12px 20px;border-bottom:
 .spacer{flex:1}
 .theme-btn{font-family:var(--font-m);font-size:12px;background:var(--panel);color:var(--ink);border:1px solid var(--line2);border-radius:4px;padding:6px 12px;cursor:pointer}
 .theme-btn:hover{border-color:var(--ink3)}
+.header-actions{display:flex;align-items:center;gap:8px}
 
 /* tabs as multiviewer tiles */
 nav{display:flex;gap:6px;padding:10px 20px;border-bottom:1px solid var(--line);overflow-x:auto;background:var(--bg2)}
@@ -169,7 +170,12 @@ pre{font-family:var(--font-m);font-size:13px;background:var(--umd);color:#dfe4ea
   .shell{padding-bottom:74px}
   nav{position:fixed;z-index:20;left:0;right:0;bottom:0;padding:8px 10px calc(8px + env(safe-area-inset-bottom));box-shadow:0 -1px 0 var(--line2)}
   .panel{padding:18px 14px 32px}
-  header{padding:10px 14px}
+  header{padding:10px 14px;flex-wrap:wrap;gap:10px 14px}
+  .spacer{display:none}
+  .brand{flex:1 1 0;min-width:0}
+  .header-actions{flex:1 1 100%}
+  .header-actions .theme-btn{display:inline-flex;align-items:center;min-height:44px}
+  .header-actions #themeBtn{margin-left:auto}
   .brand p{display:none}
   .guide-boundary{grid-template-columns:1fr}.guide-boundary a{min-height:44px;display:flex;align-items:center}
 }
@@ -186,8 +192,11 @@ pre{font-family:var(--font-m);font-size:13px;background:var(--umd);color:#dfe4ea
       <p>Local camera operators · house nights and tour nights</p>
     </div>
     <div class="spacer"></div>
-    <a class="theme-btn" href="/fmp/">FMP operations</a>
-    <button class="theme-btn" id="themeBtn" type="button" aria-label="Toggle light and dark mode">Theme</button>
+    <div class="header-actions">
+      <a class="theme-btn" href="/">System by Dave</a>
+      <a class="theme-btn" href="/fmp/">FMP operations</a>
+      <button class="theme-btn" id="themeBtn" type="button" aria-label="Toggle light and dark mode">Theme</button>
+    </div>
   </header>
 
   <nav role="tablist" aria-label="Guide sections">

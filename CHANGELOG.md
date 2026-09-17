@@ -2,6 +2,15 @@
 
 ## 2026-09-17
 
+### FMP hygiene Batch B: contact privacy, camera routes, skip links, and tokens
+
+* Exported `DaveHomeAssist/fmpwalk` `dac4906` to `fmp/` and `fmpwalk/`. The public walk no longer publishes a steward's personal email address and mobile number, a vendor phone number and email address, or staff names with roles. Ticket routes, report questions, and notes now name roles, and contacts stay in Notion behind sign-in. The walker presets are now David and Custom; a walker name saved from a removed preset restores as Custom (P0 privacy finding, probe S2).
+* `verify:fmp` now rejects any released file that contains a phone number, a `tel:` link, or an email address other than the report sender. Failures report the file name and a count, never the matched value. The canonical exporter and release tests enforce the same rule before export.
+* Pointed the walk's **Open camera operations** link and its legacy `?camera=N` and `?position=` redirect at `/fmp/camera/` and `/fmp/camera/<key>/`. Both previously built `/fmpwalk/camera/…`, which returns 404 (H1, probe L1).
+* Removed `<base>` from the five camera pages and loaded their assets through depth-relative paths, so the `#startup` and `#screenTitle` skip links stay on the page (H2, probe L4). `verify:fmp` rejects `<base>` and any `href="#…"` without a target in the same file. Added a home link to `/fmp/guide/` and to `/fmpwalk/`, and an `h1` to `/fmpwalk/` (H5, probe S1). Emptied `FMP_KNOWN_SHELL_GAPS` in `verify:public-navigation`, because all seven listed gaps are fixed.
+* The camera reference card now takes its rig count from the catalog (112 components, previously a hard-coded "72 parts"). The exporter stamps the count into `data-rig-components` and refuses to export a count claim that disagrees with the catalog (H9, probe C1). Every `?v=` module and page-asset token is now the content hash of the released file. The walk previously loaded `mail.js` with a token for different bytes, and the camera modules used dated tokens (H8, probe P3). Removed three unreferenced rig photos from the allowlist (H16).
+* Hardened the canonical exporter. It refuses to export from a commit that does not contain the currently released commit, so an older branch cannot overwrite a newer release. It removes a retired file only when the previous provenance lists it. The rig page, model, catalog, and remaining photos are byte-identical to the previous release.
+
 ### Shared control palette stops overriding page state
 
 * `css/av-theme.css` chained three `:not()` class weights onto its resting and hover control defaults, so the shared palette scored (0,4,1) and (0,5,1) — above almost every page-local state selector. Both exclusions now sit inside `:where(:not(…))`, leaving the defaults at the weight of `html[data-av-theme]` alone.

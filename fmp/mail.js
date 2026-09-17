@@ -1,5 +1,5 @@
 // Pure report packaging. No Google credentials or browser storage in this module.
-import { photoRefs, validatePhoto, MAX_PHOTOS } from './photos.js?v=20260915camera';
+import { photoRefs, validatePhoto, MAX_PHOTOS } from './photos.js?v=cd1feeb0fd50c5df';
 export const SENDER = 'avbydave@gmail.com';
 export const CLIENT_ID = '1055607889332-6seksmcrl3n06euvf127514fp5qg6t66.apps.googleusercontent.com';
 export const SEND_SCOPE = 'https://www.googleapis.com/auth/gmail.send';
