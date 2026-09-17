@@ -16,6 +16,7 @@ Disallow: /html/sbd-brand.html
 Disallow: /cross-project-dashboard.html
 Disallow: /fmp-index/
 Disallow: /fmp/
+Disallow: /fmp-walk/
 Disallow: /fmpwalk/
 Disallow: /wedding-ops.html
 Disallow: /afterbreak/

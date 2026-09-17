@@ -2,6 +2,13 @@
 
 ## 2026-09-17
 
+### FMP hygiene Batch A: recovery, typed address, and shell gate
+
+* Made every `404.html` link, stylesheet, icon, and script root-absolute. Before this change, "Back home", "All tools", the fonts, and the logo resolved under the missing path at nested addresses such as `/fmp/camera/typo/` (baseline H3, probe R3).
+* Added `/fmp-walk/` as a noindex redirect to `/fmpwalk/` that keeps the query string and hash. It follows the Hat-in-Ring handoff pattern: full head metadata, a self-contained CSP, meta refresh, and real links to the walk, the FMP hub, and home. Added a `robots.txt` disallow, pinned the redirect in `verify:indexing`, and raised the expected unlisted-route count from 131 to 132 (H10, R2). `/fmp/walk/` still returns 404. A file there would sit inside the managed `fmp/` export, so that alias belongs to `DaveHomeAssist/fmpwalk`.
+* Removed the navigation verifier's exemption that accepted any link to `/fmp/` as a return path (H6). Each FMP page now has an explicit entry that checks for a home link, a `/fmp/` parent link (except on the hub), and a first-focus skip link whose target exists on the same document after `<base>` resolution. An HTML page under `fmp/` or `fmpwalk/` without an entry fails.
+* The new check found seven current gaps in managed pages: the five camera skip links leave the page through `<base>` (H2), and the guide and the walk have no home link (H5). They are recorded in `FMP_KNOWN_SHELL_GAPS` with a dated TODO and printed as warnings. Any other gap fails. So does a listed gap that no longer occurs, so the `fmpwalk` export that fixes one must remove its entry in the same commit. Documented the FMP operations shell and the 404 and alias rules in `docs/public-shell-contract.md`.
+
 ### FMP hygiene routine
 
 * Added `docs/fmp-hygiene-routine.md`, a recurring show-day, post-release, weekly, and season-change routine. It covers the live FMP website, navigation and architecture, and the Notion documentation. It includes an ownership map, a P0–P3 severity scale, and recording rules that keep private Notion and operational detail out of this public repository.

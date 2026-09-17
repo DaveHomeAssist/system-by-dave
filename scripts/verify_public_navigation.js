@@ -59,6 +59,39 @@ const CUSTOM_SHELLS = new Map([
   ['ProjectorThrow/index.html', ['href="../index.html"', 'href="../av-suite.html"', 'id="throwline-workspace"']],
   ['ProjectorThrow/Stage3D.html', ['href="../index.html"', 'href="index.html?workspace=planner"', 'href="../av-suite.html"', 'id="stage-workspace"']]
 ]);
+const SITE_ORIGIN = 'https://systembydave.com';
+// FMP video operations shell. fmp/ and fmpwalk/ are managed exports from
+// DaveHomeAssist/fmpwalk, so every page is listed explicitly and checked for a
+// home link, a /fmp/ hub link (except the hub), and a first-focus skip link whose
+// target is on the same document after <base> resolution.
+const FMP_HUB = 'fmp/index.html';
+const FMP_MANAGED_DIRS = ['fmp', 'fmpwalk'];
+const FMP_SHELL_PAGES = [
+  FMP_HUB,
+  'fmp/camera/index.html',
+  'fmp/camera/catwalk/index.html',
+  'fmp/camera/front-of-house/index.html',
+  'fmp/camera/pit-center/index.html',
+  'fmp/camera/pit-stage-left/index.html',
+  'fmp/guide/index.html',
+  'fmp/rig/index.html',
+  'fmpwalk/index.html',
+  'fmp-index/index.html'
+];
+// Known gaps from reports/fmp-hygiene-baseline-2026-09-17.md (H2 camera skip
+// links, H5 guide and walk home links). Each fix belongs in DaveHomeAssist/fmpwalk.
+// TODO(2026-09-17): remove each entry in the same commit as the fmpwalk export that
+// fixes it. An entry that no longer fails is itself a failure, so this list can
+// only shrink, and any gap not listed here fails immediately.
+const FMP_KNOWN_SHELL_GAPS = new Map([
+  ['fmp/camera/index.html', ['skip link #startup leaves the document for /fmp/']],
+  ['fmp/camera/catwalk/index.html', ['skip link #startup leaves the document for /fmp/']],
+  ['fmp/camera/front-of-house/index.html', ['skip link #startup leaves the document for /fmp/']],
+  ['fmp/camera/pit-center/index.html', ['skip link #startup leaves the document for /fmp/']],
+  ['fmp/camera/pit-stage-left/index.html', ['skip link #startup leaves the document for /fmp/']],
+  ['fmp/guide/index.html', ['no home link']],
+  ['fmpwalk/index.html', ['no home link']]
+]);
 
 function fail(message) {
   failures.push(message);
@@ -101,8 +134,62 @@ function hasReturnPath(source) {
     || /System by Dave home/i.test(source)
     || /href=["']\/(?:["'#?]|index\.html)/i.test(source)
     || /href=["'](?:\.\.\/)*index\.html/i.test(source)
-    || /href=["'](?:https:\/\/systembydave\.com)?\/fmp\//i.test(source)
     || /href=["']https:\/\/systembydave\.com\/(?:["'#?]|index\.html)/i.test(source);
+}
+
+function routeFor(file) {
+  const posix = file.split(path.sep).join('/');
+  if (posix === 'index.html') return '/';
+  if (posix.endsWith('/index.html')) return `/${posix.slice(0, -10)}`;
+  return `/${posix}`;
+}
+
+function bodyMarkup(source) {
+  const body = source.match(/<body[^>]*>([\s\S]*)<\/body>/i)?.[1] || '';
+  return body
+    .replace(/<!--[\s\S]*?-->/g, '')
+    .replace(/<script\b[\s\S]*?<\/script>/gi, '')
+    .replace(/<style\b[\s\S]*?<\/style>/gi, '')
+    .replace(/<template\b[\s\S]*?<\/template>/gi, '');
+}
+
+function attribute(tag, name) {
+  return tag.match(new RegExp(`\\s${name}=(?:"([^"]*)"|'([^']*)'|([^\\s>]+))`, 'i'))?.slice(1).find((value) => value !== undefined);
+}
+
+function fmpShellGaps(file, source) {
+  const pageUrl = new URL(routeFor(file), SITE_ORIGIN);
+  const baseTag = source.match(/<base\s[^>]*>/i)?.[0];
+  const baseUrl = baseTag && attribute(baseTag, 'href') !== undefined ? new URL(attribute(baseTag, 'href'), pageUrl) : pageUrl;
+  const body = bodyMarkup(source);
+  const links = Array.from(body.matchAll(/<a\s[^>]*>/gi), (match) => attribute(match[0], 'href'))
+    .filter((href) => href !== undefined)
+    .map((href) => new URL(href, baseUrl));
+  const isPath = (url, paths) => url.origin === SITE_ORIGIN && paths.includes(url.pathname);
+  const gaps = [];
+  if (!links.some((url) => isPath(url, ['/', '/index.html']))) gaps.push('no home link');
+  if (file !== FMP_HUB && !links.some((url) => isPath(url, ['/fmp/', '/fmp/index.html']))) gaps.push('no /fmp/ parent link');
+
+  const firstFocusable = body.match(/<(?:a\s[^>]*\bhref=[^>]*|button\b[^>]*|select\b[^>]*|textarea\b[^>]*|summary\b[^>]*|input\b(?![^>]*\btype=["']?hidden)[^>]*|[a-z][a-z0-9-]*\s[^>]*\btabindex=["']?(?:0|[1-9])[^>]*)>/i)?.[0] || '';
+  const skipHref = /^<a\s/i.test(firstFocusable) ? attribute(firstFocusable, 'href') : undefined;
+  if (!skipHref || !skipHref.includes('#')) {
+    gaps.push('first focusable element is not a skip link');
+    return gaps;
+  }
+  const skipUrl = new URL(skipHref, baseUrl);
+  const target = decodeURIComponent(skipUrl.hash.slice(1));
+  const skipDocument = new URL(skipUrl.href);
+  skipDocument.hash = '';
+  if (skipDocument.href !== pageUrl.href) {
+    gaps.push(`skip link #${target} leaves the document for ${skipDocument.pathname}`);
+    return gaps;
+  }
+  const targetTag = focusTargetTag(source, target);
+  if (!targetTag) gaps.push(`skip target #${target} is missing`);
+  else if (!/\btabindex=(?:["']-1["']|-1)(?:\s|>)/i.test(targetTag) && !/^<(?:a|button|input|select|textarea)\b/i.test(targetTag)) {
+    gaps.push(`skip target #${target} is not programmatically focusable`);
+  }
+  return gaps;
 }
 
 function isNoIndex(source) {
@@ -133,12 +220,13 @@ function verifyPublicHtml() {
     const source = read(file);
     if (!isDocument(source)) return;
     pages += 1;
-    if (!isHomeFile(file) && !hasReturnPath(source)) fail(`${file} has no verified return path.`);
+    const fmpShell = FMP_SHELL_PAGES.includes(file.split(path.sep).join('/'));
+    if (!isHomeFile(file) && !fmpShell && !hasReturnPath(source)) fail(`${file} has no verified return path.`);
     if (!isNoIndex(source) && hasPublicCommand53Exposure(source)) fail(`${file} exposes private Command53 routing on a public page.`);
     if (/sbd-public-nav\.js/i.test(source)) {
       const prefix = prefixFor(file);
-      if (!source.includes(`href="${prefix}css/sbd-public-nav.css"`)) fail(`${file} loads public nav JS without matching CSS path.`);
-      if (!source.includes(`src="${prefix}js/sbd-public-nav.js"`)) fail(`${file} has an unexpected public nav JS path.`);
+      if (!source.includes(`href="${prefix}css/sbd-public-nav.css"`) && !source.includes('href="/css/sbd-public-nav.css"')) fail(`${file} loads public nav JS without matching CSS path.`);
+      if (!source.includes(`src="${prefix}js/sbd-public-nav.js"`) && !source.includes('src="/js/sbd-public-nav.js"')) fail(`${file} has an unexpected public nav JS path.`);
     }
   });
   notes.push(`publicPages=${pages}`);
@@ -193,6 +281,49 @@ function verifyNavigationContract() {
   if (!read('sitemap.xml').includes('https://systembydave.com/noteforge/')) fail('Sitemap is missing NoteForge.');
 }
 
+// 404.html is served at whatever path was missing, so every same-origin reference
+// must be root-absolute to keep its recovery links and styles working below the root.
+function verifyNotFoundPage() {
+  const source = read('404.html');
+  Array.from(source.matchAll(/\s(?:href|src)=["']([^"']*)["']/gi), (match) => match[1]).forEach((value) => {
+    if (!/^(?:\/|#|https:\/\/|mailto:)/i.test(value)) fail(`404.html reference ${value} is not root-absolute.`);
+  });
+  ['href="/"', 'href="/tools.html"'].forEach((snippet) => {
+    if (!source.includes(snippet)) fail(`404.html is missing recovery link ${snippet}.`);
+  });
+}
+
+function verifyFmpShells() {
+  const listed = new Set(FMP_SHELL_PAGES);
+  FMP_MANAGED_DIRS.forEach((dir) => {
+    walk(path.join(ROOT, dir)).forEach((rel) => {
+      const file = rel.split(path.sep).join('/');
+      if (isDocument(read(file)) && !listed.has(file)) fail(`${file} is an FMP page without an explicit FMP shell entry.`);
+    });
+  });
+  FMP_KNOWN_SHELL_GAPS.forEach((_, file) => {
+    if (!listed.has(file)) fail(`FMP_KNOWN_SHELL_GAPS lists ${file}, which is not an FMP shell page.`);
+  });
+  let known = 0;
+  FMP_SHELL_PAGES.forEach((file) => {
+    const gaps = fmpShellGaps(file, read(file));
+    const allowed = FMP_KNOWN_SHELL_GAPS.get(file) || [];
+    gaps.forEach((gap) => {
+      if (allowed.includes(gap)) {
+        known += 1;
+        console.warn(`Known FMP shell gap (fix in DaveHomeAssist/fmpwalk): ${file}: ${gap}`);
+      } else {
+        fail(`${file}: ${gap}.`);
+      }
+    });
+    allowed.filter((gap) => !gaps.includes(gap)).forEach((gap) => {
+      fail(`${file} no longer has known FMP shell gap "${gap}"; remove it from FMP_KNOWN_SHELL_GAPS.`);
+    });
+  });
+  notes.push(`fmpShells=${FMP_SHELL_PAGES.length}`);
+  notes.push(`fmpKnownGaps=${known}`);
+}
+
 function loadRegistry() {
   const code = read('js/sbd-registry.js');
   const context = { self: {} };
@@ -230,6 +361,8 @@ function verifyAvWorkbookRegistry() {
 
 verifyPublicHtml();
 verifyNavigationContract();
+verifyNotFoundPage();
+verifyFmpShells();
 verifyAvWorkbookRegistry();
 
 if (failures.length) {
