@@ -169,6 +169,41 @@ function verifyAgentDestinations() {
   if (/promptlab\.tools\/\?agent=/i.test(source)) fail('agents.html still routes agents through a generic Prompt Lab destination.');
 }
 
+// Graph Explorer (the standalone Labs app) and Workspace Map (the Notion widget)
+// are different products whose URLs both end in "graph-explorer". Nothing caught
+// the collision, so a rename on either side could silently alias the other.
+// See docs/public-content-contract.md on canonical product names.
+const GRAPH_EXPLORER_APP = 'https://davehomeassist.github.io/graph-explorer/';
+const WORKSPACE_MAP_WIDGET = 'https://davehomeassist.github.io/NotionWidgets/graph-explorer.html';
+
+function verifyGraphExplorerBoundary() {
+  if (GRAPH_EXPLORER_APP === WORKSPACE_MAP_WIDGET) {
+    fail('Graph Explorer and Workspace Map must not resolve to the same destination.');
+  }
+
+  const tools = read('tools.html');
+  if (!tools.includes(GRAPH_EXPLORER_APP)) {
+    fail(`tools.html is missing the Graph Explorer destination ${GRAPH_EXPLORER_APP}.`);
+  }
+  if (tools.includes(WORKSPACE_MAP_WIDGET)) {
+    fail('tools.html must not point the Graph Explorer card at the Workspace Map widget.');
+  }
+
+  ['widgets.html', 'notion.html'].forEach((file) => {
+    const source = read(file);
+    if (!source.includes(WORKSPACE_MAP_WIDGET)) {
+      fail(`${file} is missing the Workspace Map destination ${WORKSPACE_MAP_WIDGET}.`);
+    }
+    if (source.includes(GRAPH_EXPLORER_APP)) {
+      fail(`${file} must not point a widget card at the standalone Graph Explorer app.`);
+    }
+    const tag = tags(source, 'a').find((candidate) => attribute(candidate, 'href') === WORKSPACE_MAP_WIDGET);
+    if (tag && /Graph Explorer/i.test(tag)) {
+      fail(`${file} names the Workspace Map widget "Graph Explorer"; the two are separate products.`);
+    }
+  });
+}
+
 function verifyRequiredExternalLinks() {
   const contracts = new Map([
     ['prompt-lab.html', ['https://promptlab.tools/#pricing', 'https://promptlab.tools/app']],
@@ -222,6 +257,7 @@ verifyCounts();
 verifyPromptLabClaims();
 verifyAgentDestinations();
 verifyRequiredExternalLinks();
+verifyGraphExplorerBoundary();
 verifyNamesAndPrivacy(entries);
 
 if (failures.length) {
