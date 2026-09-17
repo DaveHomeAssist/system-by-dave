@@ -42,9 +42,38 @@ and any other finding that needs private detail.
 | H16 | P3 | Three allowlisted rig photos are never referenced | Release allowlist review | fmpwalk | Remove them from the export |
 | H17 | P3 | External seating references return 403 to automated requests | Probe L3 | — | Manual browser check only |
 
+## Re-run after Batches A and B
+
+Run on 2026-09-17 against the live site after the `system-by-dave` `35d2467`
+Pages deploy.
+
+**Traffic light: 🟡**
+
+- **Probe:** 0 fail, 8 warn, 24 pass. The baseline had 4 fail, 13 warn, and 15 pass.
+- **Released source:** `DaveHomeAssist/fmpwalk` `dac4906f49a5`, which is canonical `main`. Both releases pin it (P4, P5).
+- **Gates:** `verify:fmp`, `verify:public-navigation` (no known FMP shell gaps), `verify:indexing`, and `verify:public-consistency` pass locally and in the Pages run.
+
+| ID | Status | Evidence |
+| --- | --- | --- |
+| H1 | Fixed (B) | L1 passes. In a live browser, `/fmpwalk/?camera=4` lands on `/fmp/camera/catwalk/`, and **Open camera operations** opens `/fmp/camera/` |
+| H2 | Fixed (B) | L4 passes. On live `/fmp/camera/pit-center/`, the skip link keeps the URL and focuses `#screenTitle` |
+| H3 | Fixed (A) | R3 passes |
+| H5 | Fixed (B) | S1 and W4 pass |
+| H6 | Fixed (A) | Each FMP page has an explicit `verify:public-navigation` entry, and `FMP_KNOWN_SHELL_GAPS` is empty |
+| H8 | Fixed (B) | P3 passes for both releases |
+| H9 | Fixed (B) | C1 passes. The live camera card reads 112 components |
+| H10 | Partly fixed (A) | `/fmp-walk` resolves. R2 still warns on `/fmp/walk/` (owner: fmpwalk) |
+| H12 | Partly fixed (B) | `verify:fmp` now checks commit equality and skip-target existence. The allowlists are still copied by hand |
+| H16 | Fixed (B) | Removed from the allowlist and the release |
+| S2 | Fixed (B) | S2 passes. `verify:fmp` and the canonical exporter now reject phone numbers and email addresses other than the sender. Private detail belongs in the Notion audit |
+
+Still open: H4 (R4), H7 (W6), H11, H13 (L2), H14 (W5), H15 (W1, W2), and
+H17 (L3).
+
 ## In flight
 
-The canonical checkout has uncommitted rig work in progress: a responsive
-workspace, tabs, and deep links. When it is released, re-run the probe and
-Area 2 checks A4 and A8. `docs/fmp-public-release.md` and `CHANGELOG.md` will
-then describe the previous rig layout.
+The canonical rig work (a responsive workspace, tabs, and deep links) is still
+unreleased. It was branched before `dac4906`. The exporter now refuses to export
+from a commit that does not contain the released commit, so rebase that work onto
+canonical `main` before exporting. When it is released, re-run the probe and
+Area 2 checks A4 and A8.
