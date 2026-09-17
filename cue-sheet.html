@@ -55,6 +55,15 @@
     --press:cubic-bezier(.2,0,0,1);
     --program:#78ef9d;
     --preview:#ffd166;
+    /* Bus colors above stay light in both palettes because program green and
+       preview amber carry operational meaning, so their ink stays dark. */
+    --bus-ink:#071016;
+    /* The preview and program monitors are a video raster in both palettes: a
+       monitor reads as black whatever the operator's theme is, so the raster
+       carries its own fixed ink instead of the palette text tokens. */
+    --raster:#05070a;
+    --raster-text:#f7f9fb;
+    --raster-muted:#c9d2dc;
   }
   html[data-av-theme][data-av-tool="cue-sheet"]{
     --av-line:#9a806c;
@@ -326,7 +335,7 @@
   }
   .show-title:hover,
   .show-title:focus{
-    background:#10161d;
+    background:var(--panel-2);
     border-color:var(--line);
   }
   .hero-actions{
@@ -344,8 +353,8 @@
     gap:14px;
     background:
       linear-gradient(135deg,rgba(114,184,255,.08),transparent 34%),
-      linear-gradient(180deg,rgba(18,23,29,.98),rgba(9,12,16,.98));
-    border:1px solid rgba(255,255,255,.12);
+      var(--panel);
+    border:1px solid var(--line);
     border-radius:14px;
     box-shadow:var(--shadow);
   }
@@ -388,7 +397,7 @@
     overflow:hidden;
     border:1px solid var(--line);
     border-radius:10px;
-    background:#05070a;
+    background:var(--panel-2);
   }
   .monitor figcaption{
     min-height:42px;
@@ -399,7 +408,7 @@
     gap:10px;
     border-bottom:1px solid var(--line);
     color:var(--text);
-    background:#111820;
+    background:var(--panel-3);
     font-family:var(--mono);
     font-size:11px;
     font-weight:800;
@@ -424,8 +433,9 @@
     isolation:isolate;
     background:
       linear-gradient(45deg,rgba(255,255,255,.025) 25%,transparent 25%,transparent 75%,rgba(255,255,255,.025) 75%),
-      #05070a;
+      var(--raster);
     background-size:22px 22px;
+    color:var(--raster-text);
   }
   .monitor-surface video,
   .monitor-surface img{
@@ -445,18 +455,19 @@
     text-align:center;
   }
   .monitor-slate span{
-    color:var(--muted);
+    color:var(--raster-muted);
     font-family:var(--mono);
     font-size:11px;
     letter-spacing:.08em;
     text-transform:uppercase;
   }
   .monitor-slate strong{
+    color:var(--raster-text);
     font-size:clamp(16px,2.2vw,26px);
     line-height:1.2;
   }
   .monitor-slate small{
-    color:var(--dim);
+    color:var(--raster-muted);
     font-size:12px;
   }
   .program-layer{
@@ -480,7 +491,7 @@
     border:1px solid rgba(255,255,255,.18);
     border-radius:6px;
     background:rgba(3,5,7,.78);
-    color:#f7f9fb;
+    color:var(--raster-text);
     font-family:var(--mono);
     font-size:10px;
     text-overflow:ellipsis;
@@ -504,7 +515,7 @@
     gap:8px;
     border:1px solid var(--line);
     border-radius:var(--radius);
-    background:#0d1319;
+    background:var(--panel-2);
     color:var(--muted);
     font-family:var(--mono);
     font-size:10px;
@@ -520,7 +531,7 @@
     padding:14px;
     border:1px solid var(--line);
     border-radius:10px;
-    background:rgba(10,14,18,.84);
+    background:var(--panel-2);
   }
   .source-fieldset{
     min-width:0;
@@ -534,7 +545,7 @@
   .source-fieldset legend,
   .field-label{
     margin:0 0 7px;
-    color:#d9e1e9;
+    color:var(--text);
     font-family:var(--mono);
     font-size:10px;
     font-weight:800;
@@ -553,13 +564,13 @@
     font-size:11px;
     line-height:1.45;
   }
-  .source-help strong{color:#d9e1e9}
+  .source-help strong{color:var(--text)}
   .quick-add-panel{
     margin-bottom:18px;
     padding:14px 16px 16px;
-    border:1px solid rgba(255,255,255,.1);
+    border:1px solid var(--line);
     border-radius:14px;
-    background:linear-gradient(180deg,rgba(18,23,29,.96),rgba(11,14,18,.96));
+    background:var(--panel);
     box-shadow:var(--shadow);
   }
   .quick-add-grid{
@@ -587,7 +598,7 @@
     border:1px solid var(--line-strong);
     border-radius:7px;
     color:var(--rust-2);
-    background:#0a0f14;
+    background:var(--panel-2);
     font-family:var(--mono);
     font-size:10px;
     font-weight:900;
@@ -951,14 +962,14 @@
     gap:9px;
     border:1px solid var(--line);
     border-radius:8px;
-    background:#0d1319;
+    background:var(--panel-2);
   }
   .layer-index{
     min-height:36px;
     display:grid;
     place-items:center;
     border-radius:6px;
-    color:#071016;
+    color:var(--ink);
     background:var(--blue);
     font-family:var(--mono);
     font-size:11px;
@@ -966,7 +977,7 @@
   }
   .layer-row[data-layer="2"] .layer-index{background:var(--purple)}
   .layer-row[data-layer="3"] .layer-index{background:var(--amber)}
-  .layer-row[data-layer="4"] .layer-index{background:var(--program)}
+  .layer-row[data-layer="4"] .layer-index{background:var(--program);color:var(--bus-ink)}
   .layer-meta{
     min-width:0;
     display:grid;
@@ -1018,14 +1029,14 @@
     border:1px solid var(--line);
     border-radius:999px;
     color:var(--muted);
-    background:#0e1318;
+    background:var(--panel-2);
     font-family:var(--mono);
     font-size:9px;
     font-weight:800;
     letter-spacing:.06em;
     text-transform:uppercase;
   }
-  .status-chip.go{border-color:var(--green);color:#c9f9d8}
+  .status-chip.go{border-color:var(--green);color:var(--green)}
   .timeline-expanded main{
     max-width:none;
     padding-left:10px;
@@ -1055,8 +1066,8 @@
     font-size:13px;
     line-height:1.45;
   }
-  .hint.success{color:#bdf8ce}
-  .hint.error{color:#ffd0d0}
+  .hint.success{color:var(--green)}
+  .hint.error{color:var(--red)}
   .shortcut-list{
     display:grid;
     grid-template-columns:auto 1fr;
@@ -1070,7 +1081,7 @@
     padding:2px 6px;
     border:1px solid var(--line);
     border-radius:6px;
-    background:#0e1318;
+    background:var(--panel-2);
     color:var(--text);
     font-family:var(--mono);
     text-align:center;

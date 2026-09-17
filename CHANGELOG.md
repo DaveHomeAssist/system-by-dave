@@ -2,6 +2,13 @@
 
 ## 2026-09-17
 
+### Warm Paper contrast for Cue Sheet and StagePlotter
+
+* Fixed dark-ink-on-dark-panel text in the Warm Paper AV theme. Page-local rules that painted a hard-coded Stage Slate background while taking their text color from a shared palette token now consume the palette surfaces instead: the Cue Sheet operator stage, quick-add panel and icon, monitor card and caption bar, transport volume control, Source I/O rack, layer rows, status chips, hint states and shortcut keys, plus the StagePlotter canvas item labels. Worst measured ratio was 1.04:1.
+* Kept the surfaces whose darkness is functional. The preview and program monitor raster stays black in both palettes and now carries fixed `--raster`/`--raster-text`/`--raster-muted` ink so its slate text no longer follows the palette; the StagePlotter drafting surface keeps its black canvas, with item labels reading as palette-backed tags on it.
+* Preserved operational color meaning. Layer index chips take the palette's primary ink over their blue, purple and amber backgrounds, while the always-light program-green chip keeps dark `--bus-ink`; the GO chip and success/error hints now use the success and danger tokens rather than fixed light greens and reds.
+* Verified with `npm run probe:av-themes` at 1440px and 390px across both preferences, `npm run verify:av`, and the Cue Sheet smoke probe.
+
 ### FMP hygiene routine
 
 * Added `docs/fmp-hygiene-routine.md`, a recurring show-day, post-release, weekly, and season-change routine. It covers the live FMP website, navigation and architecture, and the Notion documentation. It includes an ownership map, a P0–P3 severity scale, and recording rules that keep private Notion and operational detail out of this public repository.
