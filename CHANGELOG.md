@@ -2,6 +2,15 @@
 
 ## 2026-09-17
 
+### Shared control palette stops overriding page state
+
+* `css/av-theme.css` chained three `:not()` class weights onto its resting and hover control defaults, so the shared palette scored (0,4,1) and (0,5,1) — above almost every page-local state selector. Both exclusions now sit inside `:where(:not(…))`, leaving the defaults at the weight of `html[data-av-theme]` alone.
+* This restores state that the suite was painting identically to its inactive siblings: the `/fmp/` portal tabs (`aria-current="page"`), the Setup/Build/Faults/Stow step rail on all four `/fmp/camera/*/` positions (`aria-current="step"`), the signed-in segmented evidence states (`aria-pressed="true"`), and the Warm Paper teleprompter control tints that `css/av-theme.css` already declared but could not apply. The managed `fmp/` and `fmpwalk/` artifacts needed no edit; `npm run verify:fmp` still pins them.
+* Swept all 54 surfaces that load the shared theme, in Warm Paper and Stage Slate at 1440px and 390px — 4,698 button paints compared before and after. 442 controls changed, all of them page-local state and status treatments the shared rule had been masking.
+* Fixed the regressions that sweep exposed on two tools, where a page-local state rule carried hard-coded Stage Slate values and had been silently suppressed: the OnTrack rail's hover and active items and the Show Timer mode and preset selections now take Warm Paper from the shared tokens instead of rendering dark ink on a dark slab. No button paint on any swept surface now falls below 4.5:1 in either palette.
+* Also fixed the one pre-existing Warm Paper failure that `npm run probe:av-themes` reported at phone width before this change: the Cue Sheet preview/program monitor caption used a hard-coded dark background under themed text. At desktop width the probe still reports the same pre-existing defect class — themed text over hard-coded dark surfaces — on Cue Sheet's monitor slate and Source I/O panel and on StagePlotter's canvas item labels. Those are unchanged by this work and fail identically before and after it.
+* Bumped the AV offline cache version so installed suites replace the cached stylesheet rather than keep serving the masked states, and added an `npm run verify:av` guard that fails if a shared default reintroduces a chained `:not()`.
+
 ### FMP hygiene Batch A: recovery, typed address, and shell gate
 
 * Made every `404.html` link, stylesheet, icon, and script root-absolute. Before this change, "Back home", "All tools", the fonts, and the logo resolved under the missing path at nested addresses such as `/fmp/camera/typo/` (baseline H3, probe R3).

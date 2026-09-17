@@ -45,6 +45,25 @@ const themeCss = read('css/av-theme.css');
   if (!themeCss.includes(token)) fail(`css/av-theme.css is missing ${token}.`);
 });
 
+// Shared descendant rules are palette defaults. They must stay at the
+// specificity of `html[data-av-theme]` alone so page-local state selectors
+// (current tab, current step, pressed segment) keep winning. A chained
+// `:not(.x)` silently adds a class weight and hides those states.
+[
+  'html[data-av-theme] :where(button, .btn, .button-link, .file-button):where(:not(.primary, .pri, .danger)) {',
+  'html[data-av-theme] :where(button, .btn, .button-link, .file-button):where(:not(.primary, .pri, .danger)):hover {'
+].forEach((selector) => {
+  if (!themeCss.includes(selector)) {
+    fail(`css/av-theme.css no longer declares the low-specificity control default "${selector.slice(0, -2)}".`);
+  }
+});
+
+themeCss.split('\n').forEach((line, index) => {
+  if (!line.startsWith('html[data-av-theme] ')) return;
+  if (!line.replace(/:where\(:not\(/g, '').includes(':not(')) return;
+  fail(`css/av-theme.css line ${index + 1} raises a shared default's specificity with a bare :not(); wrap the exclusion in :where(:not(…)).`);
+});
+
 routes.forEach((route) => {
   const html = read(route.file);
   const escapedId = route.id.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
