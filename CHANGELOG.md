@@ -2,6 +2,14 @@
 
 ## 2026-09-17
 
+### FMP hub: fixed tab row, addressable tabs, and a visible current step
+
+* Exported `DaveHomeAssist/fmpwalk` `c38166e` to `fmp/` and `fmpwalk/`. The `/fmp/` tabs are now links to `#cameras`, `#walk`, `#learn`, and `#setup`, so the open panel survives reload, can be shared, and follows Back and Forward.
+* The hub workspace now starts directly under the header instead of centering in the viewport. Before this change the tab row moved up to 150px between panels at 375x812. The open panel scrolls above the SETUP TEST footer; Learn previously ran under the footer at 375x812. The no-JavaScript guidance scrolls the same way.
+* The current tab and the camera page's current Setup, Build, Faults, or Stow step now use the accent fill with primary ink. After the shared palette fix above, the current step was still only a surface tint, under 1.5:1 against its siblings.
+* No hub text is under 12px. The camera position cards use → because they stay on the site, and only external links keep ↗. The catwalk card reads Catwalk, matching its route. The hub heading, the camera back link, and the camera loading fallback all say FMP Video Operations. The rig page's own link still says FMP Operations and will change with the next rig release.
+* The canonical repository adds `tests/public-hub-browser.mjs`, which checks the tab row, header anchoring, footer clearance, current-tab and current-step contrast, and 12px text at 375x812, 987x1278, and the existing public browser sizes in both themes.
+
 ### FMP hygiene Batch B: contact privacy, camera routes, skip links, and tokens
 
 * Exported `DaveHomeAssist/fmpwalk` `dac4906` to `fmp/` and `fmpwalk/`. The public walk no longer publishes a steward's personal email address and mobile number, a vendor phone number and email address, or staff names with roles. Ticket routes, report questions, and notes now name roles, and contacts stay in Notion behind sign-in. The walker presets are now David and Custom; a walker name saved from a removed preset restores as Custom (P0 privacy finding, probe S2).

@@ -15,16 +15,20 @@ button { cursor: pointer; }
 .portal-header nav { display: flex; gap: 24px; }
 .portal-header a { display: inline-flex; align-items: center; min-height: 44px; text-decoration: none; font-size: 14px; }
 .portal-header select { max-width: 100px; padding: 0 10px; }
-.portal main { width: min(1440px, 100%); margin: auto; padding: 28px; display: grid; grid-template-rows: auto 48px minmax(0, 1fr); gap: 24px; max-height: 100%; min-height: 0; }
+/* The workspace starts under the header at a fixed height, so the tab row never moves and the panel scrolls above the footer. */
+.portal main { width: min(1440px, 100%); height: 100%; margin: 0 auto; padding: 28px 28px 0; display: grid; grid-template-rows: auto 48px minmax(0, 1fr); gap: 24px; min-height: 0; }
 .eyebrow { font-size: 12px; text-transform: uppercase; letter-spacing: .13em; color: var(--av-accent); margin: 0 0 10px; font-weight: 700; }
 .portal h1 { font-size: clamp(28px, 4vw, 56px); letter-spacing: -.045em; line-height: 1.05; margin: 0; }
 .portal h1 span { color: var(--av-accent); }
 .subhead { color: var(--av-muted); margin: 12px 0 0; }
 .portal-tabs { display: flex; gap: 8px; }
-.portal-tabs button { min-width: 108px; padding: 8px 16px; background: transparent; }
-.portal-tabs button[aria-current="page"] { background: var(--av-accent); color: var(--av-primary-ink); border-color: var(--av-accent); }
-.portal-panel { min-height: 0; }
-.startup-guidance { max-width: 65ch; font-size: 14px; line-height: 1.4; }
+.portal-tabs a { display: inline-flex; align-items: center; justify-content: center; min-width: 108px; min-height: 44px; padding: 8px 16px; color: var(--av-text); text-decoration: none; border: 1px solid var(--av-line-strong); border-radius: 6px; }
+.portal-tabs a:hover { background: var(--av-surface-2); }
+/* Links, not buttons: the shared AV control palette never reaches the current tab. */
+.portal-tabs a[aria-current="page"] { background: var(--av-accent); color: var(--av-primary-ink); border-color: var(--av-accent); font-weight: 700; }
+/* The padding keeps focus rings inside the scroll box; the negative margin keeps the cards aligned. */
+.portal-panel { min-height: 0; overflow-y: auto; overscroll-behavior: contain; margin: -6px -6px 0; padding: 6px 6px 24px; }
+.startup-guidance { max-width: 65ch; min-height: 0; overflow-y: auto; padding-bottom: 24px; font-size: 14px; line-height: 1.4; }
 .startup-guidance h2 { font-size: 22px; margin: 0 0 12px; }
 .startup-guidance p { margin: 10px 0; }
 .startup-guidance a { display: inline-flex; align-items: center; min-height: 44px; color: var(--av-accent); }
@@ -44,7 +48,7 @@ html:not([data-enhanced]) .portal main { grid-template-rows: auto minmax(0, 1fr)
 .reference-links a > span:nth-child(2) { flex: 1; min-width: 0; }
 .reference-links strong { display: block; font-size: 17px; }
 .reference-links small { display: block; margin-top: 6px; color: var(--av-muted); font-size: 12px; line-height: 1.4; }
-.reference-code { display: grid; place-items: center; flex: 0 0 44px; height: 44px; border: 1px solid var(--av-accent); color: var(--av-accent); font: 700 11px ui-monospace, monospace; letter-spacing: .06em; }
+.reference-code { display: grid; place-items: center; flex: 0 0 44px; height: 44px; border: 1px solid var(--av-accent); color: var(--av-accent); font: 700 12px ui-monospace, monospace; letter-spacing: .04em; }
 @media (min-width: 900px) { .reference-links { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 .launch-card { display: flex; align-items: center; gap: 20px; min-height: 180px; padding: 32px; text-decoration: none; border: 1px solid var(--av-line-strong); border-left: 4px solid var(--av-accent); background: var(--av-surface); }
 .launch-card > span:last-child { margin-left: auto; color: var(--av-accent); font-size: 20px; }
@@ -74,38 +78,38 @@ body[data-public-release] .reference-icon { color: var(--av-bg); }
 body[data-public-release] .screen-footer, body[data-public-release] .status-bar { background: var(--av-surface-2); }
 body[data-public-release] .check-number { color: var(--av-line-strong); }
 body[data-public-release] .stage-nav > button { background: transparent; color: var(--av-muted); }
-body[data-public-release] .stage-nav > button[aria-current="step"] { background: var(--av-surface); color: var(--av-text); }
+body[data-public-release] .stage-nav > button[aria-current="step"] { background: var(--av-accent); border-color: var(--av-accent); color: var(--av-primary-ink); font-weight: 700; }
 body[data-public-release] .attention { background: var(--av-danger-soft); color: var(--av-danger); }
 @media (max-width: 680px) {
   .portal { grid-template-rows: 56px minmax(0, 1fr) 48px; }
   .portal-header { padding: 0 16px; gap: 8px; }
   .portal-header nav { gap: 16px; }
   .portal-header a { font-size: 12px; }
-  .portal main { width: 100%; padding: 16px; gap: 16px; margin: auto 0; }
+  .portal main { width: 100%; padding: 16px 16px 0; gap: 16px; }
   .portal h1 { font-size: 32px; }
-  .eyebrow { font-size: 10px; }
+  .eyebrow { font-size: 12px; }
   .subhead { font-size: 14px; margin-top: 8px; }
-  .portal-tabs button { flex: 1; min-width: 0; padding: 8px; font-size: 14px; }
+  .portal-tabs a { flex: 1; min-width: 0; padding: 8px; font-size: 14px; }
   .position-cards, .reference-links { grid-template-columns: 1fr; gap: 6px; }
   .position-cards a { min-height: 72px; padding: 12px; gap: 12px; }
   .position-code { width: 40px; font-size: 15px; }
   .position-cards strong { font-size: 17px; }
-  .position-cards small { font-size: 11px; margin-top: 4px; }
+  .position-cards small { font-size: 12px; margin-top: 4px; }
   .reference-links a { min-height: 52px; padding: 10px 12px; font-size: 14px; }
   .reference-links strong { font-size: 15px; }
-  .reference-links small { font-size: 11px; margin-top: 3px; }
-  .reference-code { flex-basis: 38px; height: 38px; font-size: 9px; }
+  .reference-links small { font-size: 12px; margin-top: 3px; }
+  .reference-code { flex-basis: 44px; height: 44px; }
   .launch-card { min-height: 128px; padding: 18px 14px; gap: 12px; }
   .launch-card strong { font-size: 22px; }
   .launch-card small { font-size: 12px; margin-top: 6px; }
   .panel-note { font-size: 12px; margin-top: 12px; }
-  .portal-footer { padding: 0 16px; gap: 12px; font-size: 10px; }
+  .portal-footer { padding: 0 16px; gap: 12px; }
   .setup-copy { font-size: 13px; }
   .setup-copy h2 { font-size: 21px; }
   body[data-public-release] .topbar { gap: 8px; }
 }
 @media (max-height: 700px) {
-  .portal main { padding-top: 12px; padding-bottom: 12px; gap: 10px; }
+  .portal main { padding-top: 12px; gap: 10px; }
   .portal-title .subhead { display: none; }
   .position-cards a { min-height: 68px; }
   .launch-card { min-height: 96px; padding: 12px; }
@@ -115,13 +119,13 @@ body[data-public-release] .attention { background: var(--av-danger-soft); color:
   .eyebrow { margin-bottom: 6px; }
   .position-cards a { min-height: 60px; padding: 8px 10px; }
   .position-cards strong { font-size: 16px; }
-  .position-cards small { font-size: 10px; }
+  .position-cards small { font-size: 12px; }
   .reference-links { grid-template-columns: 1fr 1fr; }
   .reference-links a { min-height: 52px; padding: 8px; gap: 6px; }
   .reference-links small { display: none; }
-  .reference-code { flex-basis: 32px; height: 32px; }
-  .panel-note { font-size: 11px; margin-top: 8px; }
-  .startup-guidance { font-size: 11.5px; line-height: 1.25; }
+  .reference-code { flex-basis: 40px; height: 40px; }
+  .panel-note { margin-top: 8px; }
+  .startup-guidance { font-size: 12px; line-height: 1.3; }
   .startup-guidance h2 { font-size: 18px; margin-bottom: 6px; }
   .startup-guidance p { margin: 5px 0; }
 }
@@ -144,12 +148,12 @@ body[data-public-release] .attention { background: var(--av-danger-soft); color:
   .portal-title { grid-column: 1; }
   .portal-tabs { grid-column: 1; grid-row: 2; flex-direction: column; gap: 4px; }
   .portal-panel { grid-column: 2; grid-row: 1 / 3; }
-  .portal h1 { font-size: 28px; }
+  .portal h1 { font-size: 22px; }
   .position-cards { grid-template-columns: 1fr 1fr; }
   .reference-links { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
   .reference-links a { min-height: 72px; padding: 8px; gap: 6px; }
   .reference-links small { display: none; }
-  .reference-code { flex-basis: 32px; height: 32px; }
+  .reference-code { flex-basis: 40px; height: 40px; }
   .position-cards a { padding: 12px; gap: 8px; }
   .position-cards strong { font-size: 16px; }
   .position-code { width: 34px; font-size: 14px; }
