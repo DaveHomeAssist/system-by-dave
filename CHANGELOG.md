@@ -2,6 +2,12 @@
 
 ## 2026-09-17
 
+### FMP hygiene routine
+
+* Added `docs/fmp-hygiene-routine.md`, a recurring show-day, post-release, weekly, and season-change routine. It covers the live FMP website, navigation and architecture, and the Notion documentation. It includes an ownership map, a P0–P3 severity scale, and recording rules that keep private Notion and operational detail out of this public repository.
+* Added `npm run hygiene:fmp` (`scripts/fmp_hygiene_probe.js`), a read-only live probe. It checks routes, aliases, and 404 recovery; legacy origins; release parity, cache tokens, and canonical drift; indexing, links, and `<base>`-affected in-page links; shell links, contact-detail exposure, and count agreement; index freshness; the unsigned backend boundary; and rendered console, overflow, target, and theme behavior.
+* Recorded the first baseline in `reports/fmp-hygiene-baseline-2026-09-17.md`: 🔴, with a P0 walk-to-camera link that returns 404 and P1 camera skip-link, 404 recovery, legacy-origin, and shell gaps. The baseline did not edit managed FMP artifacts.
+
 ### FMP rig accessibility and controls
 
 * Updated the managed rig explorer to 112 selectable components, adding body/ND controls and tripod lock, drag, balance and camera-plate lessons.
