@@ -78,20 +78,12 @@ const FMP_SHELL_PAGES = [
   'fmpwalk/index.html',
   'fmp-index/index.html'
 ];
-// Known gaps from reports/fmp-hygiene-baseline-2026-09-17.md (H2 camera skip
-// links, H5 guide and walk home links). Each fix belongs in DaveHomeAssist/fmpwalk.
-// TODO(2026-09-17): remove each entry in the same commit as the fmpwalk export that
-// fixes it. An entry that no longer fails is itself a failure, so this list can
-// only shrink, and any gap not listed here fails immediately.
-const FMP_KNOWN_SHELL_GAPS = new Map([
-  ['fmp/camera/index.html', ['skip link #startup leaves the document for /fmp/']],
-  ['fmp/camera/catwalk/index.html', ['skip link #startup leaves the document for /fmp/']],
-  ['fmp/camera/front-of-house/index.html', ['skip link #startup leaves the document for /fmp/']],
-  ['fmp/camera/pit-center/index.html', ['skip link #startup leaves the document for /fmp/']],
-  ['fmp/camera/pit-stage-left/index.html', ['skip link #startup leaves the document for /fmp/']],
-  ['fmp/guide/index.html', ['no home link']],
-  ['fmpwalk/index.html', ['no home link']]
-]);
+// Known FMP shell gaps, each to be fixed in DaveHomeAssist/fmpwalk. The export
+// that fixes a gap removes its entry in the same commit: an entry that no longer
+// fails is itself a failure, and any gap not listed here fails immediately.
+// Hygiene Batch B (fmpwalk dac4906) fixed the baseline H2 camera skip links and
+// the H5 guide and walk home links, so the list is empty.
+const FMP_KNOWN_SHELL_GAPS = new Map([]);
 
 function fail(message) {
   failures.push(message);

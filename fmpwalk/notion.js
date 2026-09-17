@@ -1,4 +1,4 @@
-import { CLIENT_ID, snapshot } from './mail.js?v=b045f5b092b5a95b';
+import { CLIENT_ID, snapshot } from './mail.js?v=4a521185a33c8463';
 import { ensurePhotosReady, photoFiles } from './photos.js?v=cd1feeb0fd50c5df';
 import { NOTION_API_URL } from './notion-config.js?v=b675c734abe301f4';
 

@@ -1,4 +1,4 @@
-import { CHECK_STATES, checksFor, pendingLabel } from './camera-core.js?v=20260916recovery';
+import { CHECK_STATES, checksFor, pendingLabel } from './camera-core.js?v=86ae252646f022ea';
 
 const esc = value => String(value ?? '').replace(/[&<>"']/g, character =>
   ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]);
@@ -71,13 +71,13 @@ export function cameraPages({ draft, position, identity, eventOptions, reference
   return { setup, build, faults, stow, refs, status, lead };
 }
 
-export function cameraShell({ draft, position, registry, pages, view, testOnly, publicRelease = false, connectionText, dotClass, hasAlert }) {
+export function cameraShell({ draft, position, registry, pages, view, testOnly, publicRelease = false, appHome = './', connectionText, dotClass, hasAlert }) {
   if (!pages[view.stage]?.length) view.stage = 'setup';
   view.page = Math.max(0, Math.min(view.page, pages[view.stage].length - 1));
   const page = pages[view.stage][view.page];
   const last = view.page === pages[view.stage].length - 1;
   const nextStage = CAMERA_STAGES[CAMERA_STAGES.indexOf(view.stage) + 1];
-  const home = publicRelease ? '/fmp/' : testOnly ? '/#cameras' : './';
+  const home = publicRelease ? '/fmp/' : testOnly ? '/#cameras' : appHome;
   const homeLabel = publicRelease ? 'Back to FMP Operations' : testOnly ? 'Back to House Operations' : 'Back to FMP Walk';
   return `<a class="skip" href="#screenTitle">Skip to current task</a><div class="shell">
     <header class="topbar"><a class="brand" href="${home}" aria-label="${homeLabel}"><span class="brand-mark">FMP</span><span>CAMERA<span class="brand-sub">OPERATIONS</span></span></a>${publicRelease ? '<a class="system-home" href="/" aria-label="System by Dave home" title="System by Dave home">SBD</a>' : ''}<label class="position-select"><span>Physical position</span><select id="positionPicker" ${draft.checkedInReceipt ? 'disabled' : ''}>${registry.positions.map(item => `<option value="${esc(item.key)}" ${item.key === draft.positionKey ? 'selected' : ''}>${esc(item.displayName)}</option>`).join('')}</select></label><button id="showStatus" class="connection ${hasAlert ? 'attention' : ''}" aria-label="Open connection and draft status"><span class="dot ${dotClass}"></span><span>${hasAlert ? 'Attention' : identityLabel(connectionText)}</span></button></header>

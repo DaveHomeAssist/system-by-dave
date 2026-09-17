@@ -1,12 +1,12 @@
 import {
   FALLBACK_REGISTRY, checkInPayload, checkoutPayload, createDraft,
   positionFor, positionKeyFromLocation, resumeAccountDraft, setCheck, setPosition, visibleDrafts
-} from './camera-core.js?v=20260916recovery';
-import { CLIENT_ID } from './mail.js?v=20260915camera';
-import { loadPhotoBlob, loadPhotoFiles, storePhoto } from './photos.js?v=20260915camera';
-import { NOTION_API_URL } from './notion-config.js?v=20260915camera';
+} from './camera-core.js?v=86ae252646f022ea';
+import { CLIENT_ID } from './mail.js?v=4a521185a33c8463';
+import { loadPhotoBlob, loadPhotoFiles, storePhoto } from './photos.js?v=cd1feeb0fd50c5df';
+import { NOTION_API_URL } from './notion-config.js?v=b675c734abe301f4';
 
-import { CAMERA_STAGES, cameraPages, cameraShell } from './camera-view.js?v=20260916recovery';
+import { CAMERA_STAGES, cameraPages, cameraShell } from './camera-view.js?v=2db7af2c799b83c1';
 
 const view = { stage: 'setup', page: 0 };
 let activePages;
@@ -15,6 +15,10 @@ const OWNER_KEY = 'fmpCameraLocalOwnerV1';
 const API_BASE = /^https:\/\/[a-z0-9-]+\.[a-z0-9.-]*run\.app$/.test(NOTION_API_URL) ? NOTION_API_URL : '';
 const SETUP_TEST_ONLY = document.body.dataset.setupTestOnly === 'true';
 const PUBLIC_RELEASE = document.body.dataset.publicRelease === 'true';
+// The public export stamps the rig catalog size here so the reference card cannot drift from the data.
+const RIG_COMPONENTS = Number.parseInt(document.body.dataset.rigComponents, 10) || 0;
+// Camera pages have no <base>, so the app root comes from this module's own URL.
+const APP_HOME = new URL('./', import.meta.url).pathname;
 const app = document.getElementById('cameraApp');
 const announcements = document.getElementById('cameraAnnouncements');
 const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, character =>
@@ -127,7 +131,7 @@ function referenceCards(position) {
     ...(PUBLIC_RELEASE ? [
       ['WALK', 'Preshow venue walk', 'Route checks, fault photos and report export', '/fmpwalk/', false],
       ['CALL', 'Bowl camera guide', 'Tour modes, meeting, song flow and directing', '/fmp/guide/', false],
-      ['3D', 'Camera rig explorer', '72 parts, photo evidence and operating notes', '/fmp/rig/', false]
+      ['3D', 'Camera rig explorer', `${RIG_COMPONENTS ? `${RIG_COMPONENTS} components` : 'Components'}, photo evidence and operating notes`, '/fmp/rig/', false]
     ] : []),
     ['BF', 'Back-focus card', 'Frame, zoom, focus, repeat', refs.backFocus, !PUBLIC_RELEASE],
     ['G2', 'URSA Broadcast G2 field guide', 'Build, media, viewfinder and body reference', refs.fieldGuide, true],
@@ -180,7 +184,7 @@ function render(preferredFocus = '') {
   activePages = cameraPages({ draft, position, identity, eventOptions: eventOptions(draft),
     references: referenceCards(position), draftOptions, testOnly: SETUP_TEST_ONLY, busy, messages });
   app.innerHTML = cameraShell({ draft, position, registry: store.registry, pages: activePages, view,
-    testOnly: SETUP_TEST_ONLY, publicRelease: PUBLIC_RELEASE, connectionText, dotClass, hasAlert: noticeError || !storageOk });
+    testOnly: SETUP_TEST_ONLY, publicRelease: PUBLIC_RELEASE, appHome: APP_HOME, connectionText, dotClass, hasAlert: noticeError || !storageOk });
   bind(draft);
   paintPhotos(draft);
   mountGoogle();

@@ -41,6 +41,29 @@ artifact digest. Repeated generation must be byte-identical. `npm run verify:fmp
 rejects drift, extras, missing physical routes, changed release modes, remote rig
 runtime dependencies, or missing public metadata. It runs in the Pages pipeline.
 
+The exporter refuses to run from a commit that does not contain the currently
+released source commit, so a branch cut before a release cannot overwrite it.
+Rebase onto canonical `main` before exporting. It removes a retired file only when
+the previous provenance lists it.
+
+`npm run verify:fmp` also enforces these public release rules. The exporter and
+canonical `tests/public-release.test.js` enforce the same rules before export:
+
+- **No personal contact details.** No phone number, `tel:` link, or email address
+  other than the report sender appears in any released file. Contacts and ticket
+  routing details stay in Notion, behind sign-in. Failures name the file and a
+  count, never the value.
+- **No `<base>` on any page.** Every `href="#…"` target must exist in the same
+  file, so skip links stay on the page. Camera pages load their assets through
+  depth-relative paths.
+- **Walk routes leave `/fmpwalk/`.** The walk's camera link and its legacy
+  `?camera=N` and `?position=` redirect use `/fmp/camera/`.
+- **Content-hash tokens.** Every `?v=` token is the first 16 hex digits of the
+  SHA-256 of the released file it loads.
+- **Counts come from the catalog.** Camera pages carry `data-rig-components`, and
+  every "N components" or "N parts" claim must equal the rig catalog size.
+- **One export.** `fmp` and `fmpwalk` pin the same source commit.
+
 The FMP release includes only client modules, shells, local Three.js runtime,
 allowlisted rig reference photos, and route metadata. It excludes backend code,
 credentials, dated event/crew/fault snapshots, private atlas/plant records,

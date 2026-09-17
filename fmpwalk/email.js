@@ -1,4 +1,4 @@
-import { SENDER, CLIENT_ID, SEND_SCOPE, SCOPES, recipients, snapshot, subjectFor, fingerprint, buildMessage, sendFailure } from './mail.js?v=b045f5b092b5a95b';
+import { SENDER, CLIENT_ID, SEND_SCOPE, SCOPES, recipients, snapshot, subjectFor, fingerprint, buildMessage, sendFailure } from './mail.js?v=4a521185a33c8463';
 import { initializePhotos, ensurePhotosReady, photoFiles } from './photos.js?v=cd1feeb0fd50c5df';
 
 const $ = id => document.getElementById(id);
