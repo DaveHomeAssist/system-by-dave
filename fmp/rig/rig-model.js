@@ -31,6 +31,71 @@ const ndSettings=[{position:1,stops:0,density:'Clear',fraction:'1',percent:'100%
 const supportControlIds=['pan-lock','tilt-lock','pan-drag','tilt-drag','counterbalance','plate-clamp','plate-release','plate-safety'];
 const lessonSteps={locks:supportControlIds.slice(0,2),drag:supportControlIds.slice(2,5),plate:supportControlIds.slice(5),practice:supportControlIds};
 let lesson=null;
+let activePanel='component', readingExpanded=false;
+const viewMenu=$('[data-view-menu]');
+function closeViews(restoreFocus=false){
+  viewMenu.open=false;
+  if(restoreFocus)$('[data-view-toggle]').focus();
+}
+function showPanel(name,focus=false){
+  activePanel=['component','lessons','help'].includes(name)?name:'component';
+  root.dataset.panel=activePanel;
+  root.querySelectorAll('[data-panel]').forEach(panel=>{panel.hidden=panel.dataset.panel!==activePanel;});
+  root.querySelectorAll('[data-tab]').forEach(tab=>{
+    const active=tab.dataset.tab===activePanel;
+    tab.setAttribute('aria-selected',String(active));tab.tabIndex=active?0:-1;
+  });
+  if(focus)$(`[data-panel="${activePanel}"]`).focus({preventScroll:true});
+}
+function expandReading(expanded){
+  readingExpanded=Boolean(expanded);root.dataset.expanded=String(readingExpanded);
+  $('[data-expand]').setAttribute('aria-expanded',String(readingExpanded));
+  $('[data-expand]').textContent=readingExpanded?'Show model':'Expand reading';
+  resize();
+  $('[data-expand]').scrollIntoView?.({block:'nearest'});
+}
+function selectionURL(){
+  const url=new URL(window.location.href);
+  url.searchParams.set('equipment',equipment);
+  if(selected)url.searchParams.set('part',selected);else url.searchParams.delete('part');
+  return url;
+}
+function writeSelection(mode='push'){
+  const url=selectionURL();
+  if(url.href!==window.location.href)window.history[mode==='replace'?'replaceState':'pushState'](null,'',url.href);
+}
+function restoreSelection(){
+  const url=new URL(window.location.href),id=url.searchParams.get('part');
+  const item=Object.hasOwn(catalog,id)?catalog[id]:null;
+  const requested=url.searchParams.get('equipment');
+  const hasSelection=url.searchParams.has('equipment')||url.searchParams.has('part');
+  const next=item?.equipment||(requested==='studio'?'studio':'rig');
+  switchEquipment(next);
+  const target=item?id:hasSelection?'':'nd-filter';
+  selectPart(target,true);
+  setPose(target?catalog[target].pose:next==='rig'?'beauty':'studio-beauty',true);
+  showPanel('component');$('[data-detail]').scrollTop=0;
+  if(hasSelection){
+    writeSelection('replace');
+    if((id&&!item)||(requested&&!['rig','studio'].includes(requested)))$('[data-announcement]').textContent='That component link was not recognized. Choose a component from the menu.';
+  }
+}
+function focusInstructions(){
+  closeViews();showPanel('component',true);$('[data-detail]').scrollTop=0;
+}
+async function copySelectionLink(){
+  const url=selectionURL();url.hash='';
+  try{
+    await navigator.clipboard.writeText(url.href);
+    $('[data-link-fallback]').hidden=true;
+    $('[data-announcement]').textContent='Component link copied.';
+  }catch{
+    $('[data-link-fallback]').hidden=false;
+    $('[data-share-url]').value=url.href;
+    $('[data-copy-status]').textContent='Automatic copy is unavailable. Select and copy the link above.';
+    $('[data-share-url]').focus();$('[data-share-url]').select();
+  }
+}
 const reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)');
 const state={az:-0.62,el:0.15,radius:27.5,target:new T.Vector3(0,-1.55,0)};
 const poses={
@@ -727,12 +792,15 @@ function populateParts(){
   }
 }
 function selectPart(id,focus=false){
+  $('[data-link-fallback]').hidden=true;
   selected=id;partSelect.value=id;const item=catalog[id];
   $('[data-usage]').hidden=!item;$('[data-reference]').hidden=!item;
   $('[data-fiber-adjust]').hidden=id!=='fiber-hybrid';
   $('[data-lcd-adjust]').hidden=id!=='lcd';
   $('[data-nd-guide]').hidden=id!=='nd-filter';
   $('[data-fit-part]').disabled=!item;
+  $('[data-locate-hint]').hidden=Boolean(item);
+  $('[data-locate-status]').textContent=item?'Tap a part to explore.':'Select a component to locate it.';
   if(item){
     for(const key of ['title','direction','purpose','use','check','tip'])$(`[data-${key}]`).textContent=item[key];
     $('[data-photo-reference]').hidden=!photos[item.photo];
@@ -761,7 +829,7 @@ function setNdPosition(position){
 }
 function startLesson(mode){
   if(equipment!=='rig')switchEquipment('rig');
-  $('[data-training]').open=true;
+  showPanel('lessons');
   lesson={mode,index:0,results:new Map(),done:false};
   $('[data-training-step]').hidden=false;
   root.querySelectorAll('[data-lesson]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.lesson===mode)));
@@ -780,9 +848,13 @@ function showLessonStep(){
   $('[data-training-next]').textContent=lesson.index===ids.length-1?(practice?'Finish practice':lesson.mode==='plate'?'Try practice':'Next topic'):'Next';
   selectPart(practice&&!lesson.results.has(id)?'':id);
   setPose(item.pose);
+  writeSelection('replace');
+  $('[data-training-title]').focus();
 }
 function choosePart(id,focus=false){
   selectPart(id,focus);
+  writeSelection(lesson?'replace':'push');
+  if(!lesson){showPanel('component');$('[data-detail]').scrollTop=0;}
   if(!lesson||lesson.mode!=='practice'||lesson.done||!id)return;
   const expected=lessonSteps.practice[lesson.index];
   if(id===expected){
@@ -798,6 +870,7 @@ function revealLessonPart(){
   const id=lessonSteps[lesson.mode][lesson.index];
   if(!lesson.results.has(id))lesson.results.set(id,'reviewed');
   selectPart(id,true);
+  writeSelection('replace');
   $('[data-training-result]').textContent=`${lesson.results.get(id)==='found'?'Found earlier.':'Revealed for review.'} ${catalog[id].purpose}`;
   $('[data-training-next]').disabled=false;
 }
@@ -829,10 +902,15 @@ function switchEquipment(next){
   for(const [id,model] of Object.entries(models))model.visible=id===equipment;
   root.querySelectorAll('[data-equipment]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.equipment===equipment)));
   $('[data-stage-label]').textContent=equipment==='rig'?'URSA G2 · Fujinon LA16 · Vinten support':'Studio Fiber Converter · front and rear';
+  $('[data-guide-title]').textContent=equipment==='rig'?'Camera rig · 3D explorer':'Studio converter · 3D explorer';
+  $('[data-guide-caption]').textContent=equipment==='rig'?'Camera body & ND · tripod controls · complete rig':'Control room · front controls · rear connections';
+  document.title=`FMP ${equipment==='rig'?'Camera Rig':'Studio Converter'} | System by Dave`;
+  $('[data-fit]').textContent=equipment==='rig'?'Fit rig':'Fit converter';
   $('[data-pose="operator"]').textContent=equipment==='rig'?'Operator side':'Rear panel';
   $('[data-pose="connections"]').textContent=equipment==='rig'?'Connections':'Front panel';
   $('[data-pose="support"]').hidden=equipment!=='rig';
   $('[data-training]').hidden=equipment!=='rig';
+  $('[data-no-lessons]').hidden=equipment==='rig';
   $('[data-body-shortcuts]').hidden=equipment!=='rig';
   canvas.setAttribute('aria-label',`Interactive 3D ${equipment==='rig'?'camera rig':'studio converter'}. Use the Component menu to select any part.`);
   populateParts();selectPart('');setPose(equipment==='rig'?'beauty':'studio-beauty');
@@ -878,16 +956,16 @@ function fitSelected(){if(selected)selectPart(selected,true);}
 function setTouchRotation(active,announce=true){
   touchRotation=Boolean(active);root.dataset.gestures=String(touchRotation);
   const toggle=$('[data-gesture-toggle]');toggle.setAttribute('aria-pressed',String(touchRotation));toggle.textContent=`Touch rotation: ${touchRotation?'on':'off'}`;
-  $('[data-touch-help]').textContent=touchRotation?'Touch rotation is on. Drag or pinch the model. Turn this off to swipe-scroll through the model area.':'Touch: tap a part; swipe to scroll the page. Turn on touch rotation to drag or pinch the model.';
+  $('[data-touch-help]').textContent=touchRotation?'Touch rotation is on. Drag or pinch the model. Turn it off to restore browser gestures over the model.':'Touch: tap a part. Turn on touch rotation in Views to drag or pinch the model. Browser gestures remain available while it is off.';
   if(announce)$('[data-announcement]').textContent=touchRotation?'Touch rotation on. Drag or pinch the model.':'Touch rotation off. Swipe to scroll the page.';
 }
-populateParts();setNdPosition(1);selectPart('nd-filter',true);setPose('body-nd',true);resize();
+setNdPosition(1);restoreSelection();resize();
 setTouchRotation(false,false);
 resizeObserver=new ResizeObserver(resize);resizeObserver.observe(stage);
 themeObserver=new MutationObserver(()=>{highlight=themeColor('--blue');updateHighlight();});themeObserver.observe(document.documentElement,{attributes:true,attributeFilter:['class','style','data-theme']});
 visibilityObserver=new IntersectionObserver(entries=>{suspended=!entries[0].isIntersecting;if(!suspended)requestDraw();});visibilityObserver.observe(stage);
 partSelect.addEventListener('change',()=>choosePart(partSelect.value,true));
-root.querySelectorAll('[data-quick-part]').forEach(button=>button.addEventListener('click',()=>{closeLesson();choosePart(button.dataset.quickPart,true);}));
+root.querySelectorAll('[data-quick-part]').forEach(button=>button.addEventListener('click',()=>{closeLesson();choosePart(button.dataset.quickPart,true);closeViews(true);}));
 root.querySelectorAll('[data-nd-position]').forEach(button=>button.addEventListener('click',()=>setNdPosition(button.dataset.ndPosition)));
 root.querySelectorAll('[data-lesson]').forEach(b=>b.addEventListener('click',()=>startLesson(b.dataset.lesson)));
 $('[data-training-prev]').addEventListener('click',()=>{if(lesson&&!lesson.done&&lesson.index>0){lesson.index--;showLessonStep();}});
@@ -896,10 +974,10 @@ $('[data-training-show]').addEventListener('click',revealLessonPart);
 $('[data-training-close]').addEventListener('click',()=>closeLesson(true));
 $('[data-fiber-angle]').addEventListener('input',event=>setFiberAngle(event.target.value));
 $('[data-lcd-opening]').addEventListener('input',event=>setLcdOpening(event.target.value));
-root.querySelectorAll('[data-equipment]').forEach(b=>b.addEventListener('click',()=>switchEquipment(b.dataset.equipment)));
+root.querySelectorAll('[data-equipment]').forEach(b=>b.addEventListener('click',()=>{switchEquipment(b.dataset.equipment);showPanel('component');$('[data-detail]').scrollTop=0;writeSelection();closeViews();}));
 root.querySelectorAll('[data-pose]').forEach(b=>b.addEventListener('click',()=>{
   const key=equipment==='rig'?b.dataset.pose:({beauty:'studio-beauty',operator:'studio-operator',connections:'studio-front'}[b.dataset.pose]);
-  setPose(key);
+  setPose(key);closeViews(true);
 }));
 root.querySelectorAll('[data-zoom]').forEach(b=>b.addEventListener('click',()=>zoomView(Number(b.dataset.zoom))));
 root.querySelectorAll('[data-orbit]').forEach(b=>b.addEventListener('click',()=>rotateView(Number(b.dataset.orbit)*Math.PI/8)));
@@ -907,6 +985,25 @@ root.querySelectorAll('[data-tilt]').forEach(b=>b.addEventListener('click',()=>r
 $('[data-fit-part]').addEventListener('click',fitSelected);
 $('[data-gesture-toggle]').addEventListener('click',()=>setTouchRotation(!touchRotation));
 $('[data-fit]').addEventListener('click',()=>setPose(equipment==='rig'?'beauty':'studio-beauty'));
+root.querySelectorAll('[data-tab]').forEach(tab=>{
+  tab.addEventListener('click',()=>{closeViews();showPanel(tab.dataset.tab);});
+  tab.addEventListener('keydown',event=>{
+    const tabs=[...root.querySelectorAll('[data-tab]')],index=tabs.indexOf(tab);
+    const next={ArrowRight:(index+1)%tabs.length,ArrowLeft:(index+tabs.length-1)%tabs.length,Home:0,End:tabs.length-1}[event.key];
+    if(next===undefined)return;
+    event.preventDefault();showPanel(tabs[next].dataset.tab);tabs[next].focus();
+  });
+});
+$('[data-expand]').addEventListener('click',()=>expandReading(!readingExpanded));
+$('[data-copy-link]').addEventListener('click',copySelectionLink);
+$('[data-view-close]').addEventListener('click',()=>closeViews(true));
+viewMenu.addEventListener('keydown',event=>{if(event.key==='Escape'){event.preventDefault();closeViews(true);}});
+viewMenu.addEventListener('focusout',event=>{if(event.relatedTarget&&!viewMenu.contains(event.relatedTarget))closeViews();});
+document.addEventListener('pointerdown',event=>{if(!viewMenu.contains(event.target))closeViews();});
+root.querySelectorAll('a[href="#fmp-part-details"]').forEach(link=>link.addEventListener('click',event=>{event.preventDefault();focusInstructions();}));
+window.addEventListener('popstate',restoreSelection);
+window.addEventListener('hashchange',()=>{if(window.location.hash==='#fmp-part-details')focusInstructions();});
+if(window.location.hash==='#fmp-part-details')focusInstructions();
 const raycaster=new T.Raycaster(),pointer=new T.Vector2(),touches=new Map();
 let pointerStart,previous,dragged=false,pinchDistance;
 function pick(clientX,clientY){
@@ -961,7 +1058,7 @@ canvas.addEventListener('wheel',event=>{
 canvas.addEventListener('keydown',event=>{
   if(event.altKey||event.ctrlKey||event.metaKey)return;
   const step=Math.PI/24;
-  const actions={ArrowLeft:()=>rotateView(-step),ArrowRight:()=>rotateView(step),ArrowUp:()=>rotateView(0,step),ArrowDown:()=>rotateView(0,-step),'+':()=>zoomView(.82),'=':()=>zoomView(.82),'-':()=>zoomView(1.22),Home:()=>setPose(equipment==='rig'?'beauty':'studio-beauty'),Escape:()=>{setTouchRotation(false);$('[data-gesture-toggle]').focus();}};
+  const actions={ArrowLeft:()=>rotateView(-step),ArrowRight:()=>rotateView(step),ArrowUp:()=>rotateView(0,step),ArrowDown:()=>rotateView(0,-step),'+':()=>zoomView(.82),'=':()=>zoomView(.82),'-':()=>zoomView(1.22),Home:()=>setPose(equipment==='rig'?'beauty':'studio-beauty'),Escape:()=>{setTouchRotation(false);viewMenu.open=true;$('[data-gesture-toggle]').focus();}};
   if(actions[event.key]){event.preventDefault();actions[event.key]();}
 });
 canvas.addEventListener('dblclick',fitSelected);
@@ -976,6 +1073,6 @@ function dispose(){
 window.addEventListener('pagehide',event=>{if(!event.persisted)dispose();},{once:true});
 // Read-only diagnostics support checks of the actual rendered model and ray picking.
 root.rigDiagnostics={
-  snapshot:()=>({equipment,selected,lcdOpening,fiberAngle,azimuth:state.az,elevation:state.el,radius:state.radius,parts:parts.size,meshes:pickables.length,renderer:!!renderer,drawCalls:renderer?.info.render.calls}),
+  snapshot:()=>({equipment,selected,activePanel,readingExpanded,lcdOpening,fiberAngle,azimuth:state.az,elevation:state.el,radius:state.radius,parts:parts.size,meshes:pickables.length,renderer:!!renderer,drawCalls:renderer?.info.render.calls}),
   project:(id)=>{const g=parts.get(id);if(!g||!camera)return null;scene.updateMatrixWorld(true);const p=new T.Box3().setFromObject(g).getCenter(new T.Vector3());p.project(camera);return {x:(p.x+1)/2*canvas.clientWidth,y:(1-p.y)/2*canvas.clientHeight};}
 };
