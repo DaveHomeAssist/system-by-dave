@@ -11,6 +11,19 @@
 * Also fixed the one pre-existing Warm Paper failure that `npm run probe:av-themes` reported at phone width before this change: the Cue Sheet preview/program monitor caption used a hard-coded dark background under themed text. At desktop width the probe still reports the same pre-existing defect class — themed text over hard-coded dark surfaces — on Cue Sheet's monitor slate and Source I/O panel and on StagePlotter's canvas item labels. Those are unchanged by this work and fail identically before and after it.
 * Bumped the AV offline cache version so installed suites replace the cached stylesheet rather than keep serving the masked states, and added an `npm run verify:av` guard that fails if a shared default reintroduces a chained `:not()`.
 
+### FMP hygiene Batch A: recovery, typed address, and shell gate
+
+* Made every `404.html` link, stylesheet, icon, and script root-absolute. Before this change, "Back home", "All tools", the fonts, and the logo resolved under the missing path at nested addresses such as `/fmp/camera/typo/` (baseline H3, probe R3).
+* Added `/fmp-walk/` as a noindex redirect to `/fmpwalk/` that keeps the query string and hash. It follows the Hat-in-Ring handoff pattern: full head metadata, a self-contained CSP, meta refresh, and real links to the walk, the FMP hub, and home. Added a `robots.txt` disallow, pinned the redirect in `verify:indexing`, and raised the expected unlisted-route count from 131 to 132 (H10, R2). `/fmp/walk/` still returns 404. A file there would sit inside the managed `fmp/` export, so that alias belongs to `DaveHomeAssist/fmpwalk`.
+* Removed the navigation verifier's exemption that accepted any link to `/fmp/` as a return path (H6). Each FMP page now has an explicit entry that checks for a home link, a `/fmp/` parent link (except on the hub), and a first-focus skip link whose target exists on the same document after `<base>` resolution. An HTML page under `fmp/` or `fmpwalk/` without an entry fails.
+* The new check found seven current gaps in managed pages: the five camera skip links leave the page through `<base>` (H2), and the guide and the walk have no home link (H5). They are recorded in `FMP_KNOWN_SHELL_GAPS` with a dated TODO and printed as warnings. Any other gap fails. So does a listed gap that no longer occurs, so the `fmpwalk` export that fixes one must remove its entry in the same commit. Documented the FMP operations shell and the 404 and alias rules in `docs/public-shell-contract.md`.
+
+### FMP hygiene routine
+
+* Added `docs/fmp-hygiene-routine.md`, a recurring show-day, post-release, weekly, and season-change routine. It covers the live FMP website, navigation and architecture, and the Notion documentation. It includes an ownership map, a P0–P3 severity scale, and recording rules that keep private Notion and operational detail out of this public repository.
+* Added `npm run hygiene:fmp` (`scripts/fmp_hygiene_probe.js`), a read-only live probe. It checks routes, aliases, and 404 recovery; legacy origins; release parity, cache tokens, and canonical drift; indexing, links, and `<base>`-affected in-page links; shell links, contact-detail exposure, and count agreement; index freshness; the unsigned backend boundary; and rendered console, overflow, target, and theme behavior.
+* Recorded the first baseline in `reports/fmp-hygiene-baseline-2026-09-17.md`: 🔴, with a P0 walk-to-camera link that returns 404 and P1 camera skip-link, 404 recovery, legacy-origin, and shell gaps. The baseline did not edit managed FMP artifacts.
+
 ### FMP rig accessibility and controls
 
 * Updated the managed rig explorer to 112 selectable components, adding body/ND controls and tripod lock, drag, balance and camera-plate lessons.

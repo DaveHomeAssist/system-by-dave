@@ -163,6 +163,8 @@ Pages workflow before a production claim.
   `npm run test:av-workbook`, and `npm run build:av-workbook`.
 - **Throwline:** `npm run verify:throwline`.
 - **NoteForge artifact:** `npm run verify:noteforge`.
+- **FMP managed release:** `npm run verify:fmp`; after deployment, run the live
+  `npm run hygiene:fmp` probe described in `docs/fmp-hygiene-routine.md`.
 - **Rendered UI changes:** verify desktop, the 680px breakpoint, and a narrow
   phone; check keyboard order, visible focus, reduced motion, containment,
   touch targets, and unexpected browser-console errors.

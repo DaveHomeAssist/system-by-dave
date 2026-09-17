@@ -130,6 +130,8 @@ Throwline's catalog is synchronized and verified through its dedicated scripts.
 - Sitemap membership: `scripts/gen_sitemap.py`
 - AV Suite doorway and storage: `docs/av-suite-doorway.md`
 - Verification commands: `package.json` and `AGENTS.md`
+- FMP release and hygiene: `docs/fmp-public-release.md` and
+  `docs/fmp-hygiene-routine.md`
 - Deployment gates: `.github/workflows/deploy-pages.yml`
 - Recent changes: `CHANGELOG.md`
 
