@@ -1,25 +1,25 @@
 {
   "schema": "fmp.public.release.v2",
   "sourceRepository": "DaveHomeAssist/fmpwalk",
-  "sourceCommit": "dac4906f49a5e27abb3b74b292665d37887e0d56",
+  "sourceCommit": "c38166e2a7c47d7d0abb17d161261735169e41cb",
   "mode": "commissioning",
   "files": {
     "camera-core.js": "86ae252646f022ea5e03ffe2d3be05a7344f1cc2299bb4c7a39cee9bb9ebedcb",
-    "camera-view.js": "2db7af2c799b83c171c2c93813ad78b46e816f093f6547283de50c12e92471b2",
+    "camera-view.js": "be5658a7dd7fa28dfa3621a89f922f74f3ffb868ae5eb69f1291129ff1c3b928",
     "camera.css": "b8377944e416535e1997988c8ba94541a40b225b11d9d6ea994d3a8a3640673d",
-    "camera.js": "44f0714c56b7e9a2d724c66a0c038c1821cd1864300876ca780a43ded4e8d667",
-    "camera/catwalk/index.html": "da7dbe5c2847ee21b0b35d67f95370cddc7412cc5e93f28c477951bfc124082a",
-    "camera/front-of-house/index.html": "0b04ec8f4d52665867209ef689db24543dbfc717ad0d40022e9a6db03a283c46",
-    "camera/index.html": "433f36f4a4469ea17a2510a342fd6f8b01234940a9f45771aea3bce1f82c7f29",
-    "camera/pit-center/index.html": "5d58e9880153019a92bb68e13e4294fc683b555efc6a1165cafe8152477eeab7",
-    "camera/pit-stage-left/index.html": "1e3f5d63414a0251f5aafe75f05455e7bc04b0b0c5a15b5c40f87625a3a30102",
+    "camera.js": "ed0dd360f3fba853e0ea49ad2fd63f2939cafe728c95fd820e1498e286764c04",
+    "camera/catwalk/index.html": "f58ea3d3765adea45db10b0d8f4f7e8a067eead1f5825a9de9152fc59c1c8ec7",
+    "camera/front-of-house/index.html": "7d09a474cd2f4f506dd03be03f78f77761d65b6745b85308fa3f21d311e616ce",
+    "camera/index.html": "fb0d1b9504012f868677a334248614c5322a3b37ff6dc42422ede2d4d1c1a56a",
+    "camera/pit-center/index.html": "d91f5cf20214c6e73a3a7048f79e95bee0f0655d29850eda903e779d51abd9f3",
+    "camera/pit-stage-left/index.html": "540a84d398371e31e712e9f9dcf68ec6eae88fbd14769962be4c703d904f9f60",
     "guide/index.html": "64e4d56d0968b69300b629dca6e73f4299743ff9a033fe5bf0d8770c8cf287cc",
-    "index.html": "98cf94695f7a558a1aeb2ec0cef9d3608fce975abc6ed59c989ecc9c44582a5b",
+    "index.html": "1dcabe7b30c96db8d078730cefb0e0ef084d68737a2e6f6d0d68baddd230d0a7",
     "mail.js": "4a521185a33c8463a3b34493771e381d7982bb59f0f8d9b5096d074727e32a91",
     "notion-config.js": "b675c734abe301f46f50f05a65ae58b9d25bd07c57fa8b01ef07e456e32271fc",
     "photos.js": "cd1feeb0fd50c5df4df81fa55b3fb37ca708127d793d438a62e98e596fbec3ff",
-    "public.css": "b0acf8b5856a0704918da915a5b71609b8fb3449407c74690453af373b1e3e57",
-    "public.js": "c4886d983df4bd179ca5b77c8fc31d221fa677bea224da0d8e3fbb39a8cd686a",
+    "public.css": "7b2591bd0f15e0d929ba7c15ae9e1a0d9cc2bdf9144045ce31f3829a24dcf96a",
+    "public.js": "64f4628bc7f93ffc09e0f74068869e1eab901b448991bcfb010665aa0db6898e",
     "rig/assets/body-controls.webp": "b1a7619b8749b8f1baf34ae5c0f19075e5dbf82e2a958246749bcabddd7d4d57",
     "rig/assets/rig-camera.webp": "007d62a3bc4f9b368e88d5fd71fd222a8f55bff14aabac421b7955fa63ec50ff",
     "rig/assets/rig-front.webp": "e96423d51e90c17b0f6ffb4e2fee8296594190d528d974ddb8fef492eff79c37",
@@ -44,5 +44,5 @@
     "rig/vendor/three/three.core.js": "66e03b5d8f633bb9501c9668609b99a9eaca105f764d5c780a45bf96b6888357",
     "rig/vendor/three/three.module.js": "a476b88d0df406dca0e30c65b4cdf0180c7337110accec828c103655b56a361c"
   },
-  "artifactSha256": "d11f853d6baca1a5c88854ddea6de0e59ab62bab8c7443f304b304b40e6b0f2e"
+  "artifactSha256": "8ef1f4007fda1db0106c6cad4d281031979487261cb1b71af5ea9e7796855c0c"
 }

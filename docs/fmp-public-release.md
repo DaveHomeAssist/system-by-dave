@@ -10,7 +10,8 @@ access control.
 
 ## Product boundaries
 
-- `/fmp/`: choose a camera position or open Walk, Learn, and Setup.
+- `/fmp/`: choose a camera position or open Walk, Learn, and Setup. Each tab
+  is addressable as `/fmp/#cameras`, `#walk`, `#learn`, or `#setup`.
 - `/fmp/camera/...`: owner-bound drafts and explicit authenticated operational
   actions. SETUP TEST remains mandatory until live acceptance is complete.
 - `/fmpwalk/`: venue route, readings, faults, photos, and report preparation.
