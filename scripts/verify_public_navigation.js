@@ -30,6 +30,8 @@ const CORE_HEADERS = new Map([
   ['profile/index.html', 'Dave']
 ]);
 const STANDALONE_RETURNS = [
+  'switcher/index.html',
+  'shader/index.html',
   'resume/av/index.html',
   'av-workbook/index.html',
   'pixelforge/index.html',
@@ -40,6 +42,8 @@ const STANDALONE_RETURNS = [
   'noteforge/index.html'
 ];
 const REQUIRED_SKIP_LINKS = new Map([
+  ['switcher/index.html', 'reference-main'],
+  ['shader/index.html', 'reference-main'],
   ['depotops/index.html', 'depotops-workspace'],
   ['av-workbook/index.html', 'root'],
   ['pixelforge/index.html', 'root'],
@@ -73,6 +77,7 @@ const FMP_SHELL_PAGES = [
   'fmp/camera/front-of-house/index.html',
   'fmp/camera/pit-center/index.html',
   'fmp/camera/pit-stage-left/index.html',
+  'fmp/house/index.html',
   'fmp/guide/index.html',
   'fmp/rig/index.html',
   'fmpwalk/index.html',

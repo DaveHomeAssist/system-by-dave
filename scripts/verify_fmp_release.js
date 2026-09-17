@@ -17,6 +17,7 @@ const releases = [
     expected: [
       'index.html', 'public.css', 'public.js', 'theme.js', 'camera.js', 'camera-core.js', 'camera-view.js', 'camera.css', 'photos.js', 'mail.js', 'notion-config.js',
       ...cameraRoutes.map(route => `${route}index.html`),
+      'house/index.html', 'house/house.css', 'house/house.js', 'house/house-data.js', 'house/site-plan.png', 'house/display-estate.csv',
       'guide/index.html', 'rig/index.html', 'rig/rig-model.js', 'rig/fmp-guide-data.js',
       ...rigPhotos.map(name => `rig/assets/${name}.webp`),
       'rig/vendor/three/three.module.js', 'rig/vendor/three/three.core.js', 'rig/vendor/three/addons/controls/OrbitControls.js'
@@ -59,7 +60,7 @@ for (const release of releases) {
     const data = fs.readFileSync(path.join(root, name));
     hashes[name] = hash(data);
     assert.equal(hashes[name], provenance.files[name], `Managed artifact drift: ${release.directory}/${name}`);
-    if (name.endsWith('.webp')) continue;
+    if (/\.(?:webp|png)$/.test(name)) continue;
     const source = data.toString('utf8');
     assert.doesNotMatch(source, /-----BEGIN .*PRIVATE KEY-----|\b(?:ntn_|secret_)[A-Za-z0-9]{30,}/);
     const exposed = contactDetails(source);

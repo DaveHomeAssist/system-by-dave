@@ -128,3 +128,27 @@ The new body-control photograph is an allowlisted WebP reference. No operational
 records, backend changes, new storage keys or service worker are part of this
 release. Geometry/input tests and contrast checks are distinct from browser or
 physical-device acceptance; see the canonical source's release notes and tests.
+
+## House video review — September 17, 2026
+
+The companion source review [fmpwalk #3](https://github.com/DaveHomeAssist/fmpwalk/pull/3)
+adds `/fmp/house/` and the House hub tab. This checkout was exported from canonical
+review commit `14fa315731eb29b6dc9fea6e6e46b494ad0698aa`; the release manifests record
+its exact file hashes. The two generic model references live at `/switcher/` and
+`/shader/` in this repository and are indexable. The House route stays noindex.
+
+Source conflicts remain visible: 151 CSV rows versus the dashboard's 152 claim,
+37 unresolved lobby rows, different G2 camera identities, and disputed AMX signal
+direction. The visitor map supplies zone context, not equipment coordinates.
+Protected workflows, credentials and draft storage are unchanged.
+
+Validation: 55 source tests, the managed-release and public shell/indexing checks,
+and browser interactions at six viewport sizes. Browser coverage includes deep
+links and history, inventory filters and conflict details, modal focus, rack
+front/rear/evidence views, shared theme, CSV/map and no-JavaScript references. No
+browser-console errors were observed. Rack checks and authenticated commissioning
+remain separate from this read-only reference release.
+
+Merge the canonical source review first. If the resulting source commit changes,
+re-export from that clean commit before releasing this companion; do not edit the
+managed files or provenance by hand. This review has not been deployed.

@@ -29,6 +29,8 @@ STATIC_PAGES = [
     ("av-tool-suite/index-v2/", "monthly", "0.7"),
     ("av-workbook/", "weekly", "0.8"),
     ("backfocus/", "monthly", "0.7"),
+    ("switcher/", "monthly", "0.7"),
+    ("shader/", "monthly", "0.7"),
     ("pixelforge/", "weekly", "0.8"),
     ("ProjectorThrow/", "weekly", "0.8"),
     ("ProjectorThrow/Stage3D.html", "weekly", "0.6"),

@@ -22,7 +22,7 @@
   <meta name="twitter:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
   <link rel="icon" href="/svg/system_by_dave_logo_rust.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/css/av-theme.css">
-  <link rel="stylesheet" href="public.css?v=1fb937881b9d3116">
+  <link rel="stylesheet" href="public.css?v=91b1ba23e8351c22">
   <script src="theme.js?v=d4c1024bbd62d45a"></script>
   <script src="public.js?v=b8461164864183bd" defer></script>
 </head>
@@ -31,7 +31,7 @@
   <header class="portal-header"><nav aria-label="Breadcrumb"><a href="/">System by Dave</a><a href="/fmp-index/">FMP index</a></nav><label class="theme-label"><span class="sr-only">Theme</span><select id="theme" aria-label="Theme"><option value="light">Light</option><option value="dark">Dark</option><option value="auto">Auto</option></select></label></header>
   <main id="main" tabindex="-1">
     <header class="portal-title"><p class="eyebrow">Freedom Mortgage Pavilion</p><h1>FMP Video Operations<span>.</span></h1><p class="subhead">Operate. Walk. Learn. Explicit saves.</p></header>
-    <nav class="portal-tabs" aria-label="FMP workspace"><a href="#cameras" data-panel="positions" aria-controls="cameras" aria-current="page">Cameras</a><a href="#walk" data-panel="walk" aria-controls="walk" aria-current="false">Walk</a><a href="#learn" data-panel="references" aria-controls="learn" aria-current="false">Learn</a><a href="#setup" data-panel="connection" aria-controls="setup" aria-current="false">Setup</a></nav>
+    <nav class="portal-tabs" aria-label="FMP workspace"><a href="#cameras" data-panel="positions" aria-controls="cameras" aria-current="page">Cameras</a><a href="#house" data-panel="house" aria-controls="house" aria-current="false">House</a><a href="#walk" data-panel="walk" aria-controls="walk" aria-current="false">Walk</a><a href="#learn" data-panel="references" aria-controls="learn" aria-current="false">Learn</a><a href="#setup" data-panel="connection" aria-controls="setup" aria-current="false">Setup</a></nav>
     <section id="cameras" class="portal-panel" aria-label="Camera positions">
       <div class="position-cards">
         <a href="camera/pit-center/"><span class="position-code">PC</span><span><strong>Pit · Center</strong><small>Stage edge · verify tonight’s assignment</small></span><span aria-hidden="true">→</span></a>
@@ -41,12 +41,23 @@
       </div>
       <p class="panel-note">Location context only. Mounts, access and exact sightlines require venue verification.</p>
     </section>
+    <section id="house" class="portal-panel" hidden aria-label="House video reference">
+      <a class="launch-card" href="house/"><span class="position-code">HV</span><span><strong>House video reference</strong><small>Bowl walls · searchable display inventory · rack front/rear views · venue map · source reconciliation</small></span><span aria-hidden="true">→</span></a>
+      <div class="reference-links house-links">
+        <a href="house/#bowl"><span class="reference-code">BOWL</span><span><strong>Six bowl walls</strong><small>Curved delay layout and processor pairs</small></span><span aria-hidden="true">→</span></a>
+        <a href="house/#displays"><span class="reference-code">DISP</span><span><strong>151 inventory rows</strong><small>Paper evidence and unresolved placement</small></span><span aria-hidden="true">→</span></a>
+        <a href="house/#rack"><span class="reference-code">RACK</span><span><strong>Four rack groups</strong><small>Read recorded, inferred and unknown details</small></span><span aria-hidden="true">→</span></a>
+      </div>
+      <p class="panel-note">Reference evidence from Aug 30–Sep 1, 2026, combined September 17. No live monitoring. The dashboard's 152-display claim and the CSV's 151 records remain explicitly unresolved.</p>
+    </section>
     <section id="walk" class="portal-panel" hidden aria-label="Preshow walk">
       <a class="launch-card" href="/fmpwalk/"><span class="position-code">WALK</span><span><strong>Open the preshow walk</strong><small>Setup · route checks · fault photos · Markdown and JSON export · optional Gmail send</small></span><span aria-hidden="true">→</span></a>
       <p class="panel-note">The walk is a separate local-first workflow for venue displays and preshow evidence. Camera Crew Calls stay in Camera operations; nothing transfers or submits silently.</p>
     </section>
     <section id="learn" class="portal-panel" hidden aria-label="Reference links">
       <div class="reference-links">
+        <a href="/switcher/"><span class="reference-code">ATEM</span><span><strong>Switcher field reference</strong><small>HD8 ISO outputs, routing, recording limits and source evidence</small></span><span aria-hidden="true">→</span></a>
+        <a href="/shader/"><span class="reference-code">CCU</span><span><strong>Shader field reference</strong><small>Four control channels, camera selection and the G2 ND wheel</small></span><span aria-hidden="true">→</span></a>
         <a href="guide/"><span class="reference-code">CALL</span><span><strong>Bowl camera guide</strong><small>House and tour modes, camera meeting, song flow, directing and failure recovery</small></span><span aria-hidden="true">→</span></a>
         <a href="rig/"><span class="reference-code">3D</span><span><strong>Camera rig explorer</strong><small>112 components, ND filter examples, tripod controls and keyboard navigation</small></span><span aria-hidden="true">→</span></a>
         <a href="/backfocus/"><span class="reference-code">BF</span><span><strong>Back focus field guide</strong><small>Frame, zoom, focus and repeat before the show</small></span><span aria-hidden="true">→</span></a>
@@ -59,7 +70,7 @@
     <section id="setup" class="portal-panel" hidden aria-label="Connection setup">
       <div class="setup-copy"><h2>Public page. Protected records.</h2><p>Google sign-in and the existing backend allowlist protect Notion operations. Public access does not grant crew access.</p><p><strong>Commissioning:</strong> use synthetic SETUP TEST observations until signed-in saves and attachments are verified.</p><p>Existing drafts stay on the old hostname. Finish pending work there; this release does not move or delete it.</p><a href="https://fmp-video-house-ops.davein4k.chatgpt.site" target="_blank" rel="noopener noreferrer">Open previous private Site ↗</a></div>
     </section>
-    <aside class="startup-guidance"><h2>Camera workspace loading</h2><p>JavaScript is required for camera forms. If this message stays visible, enable JavaScript and reload. Nothing is submitted automatically.</p><p>This is a public frontend with protected operational records. Use synthetic <strong>SETUP TEST</strong> observations only until commissioning is verified.</p><p>Training and recovery links remain available without the camera app:</p><p><a href="/fmpwalk/">Open the preshow walk</a> · <a href="guide/">Open the bowl camera guide</a> · <a href="rig/">Open the camera rig explorer</a></p><p>Old drafts stay on the previous hostname. They have not been moved or deleted.</p><a href="https://fmp-video-house-ops.davein4k.chatgpt.site" target="_blank" rel="noopener noreferrer">Recover drafts on the previous Site ↗</a></aside>
+    <aside class="startup-guidance"><h2>Camera workspace loading</h2><p>JavaScript is required for camera forms. If this message stays visible, enable JavaScript and reload. Nothing is submitted automatically.</p><p>This is a public frontend with protected operational records. Use synthetic <strong>SETUP TEST</strong> observations only until commissioning is verified.</p><p>Training and recovery links remain available without the camera app:</p><p><a href="house/">Open the house video reference</a> · <a href="/fmpwalk/">Open the preshow walk</a> · <a href="guide/">Open the bowl camera guide</a> · <a href="rig/">Open the camera rig explorer</a></p><p>Old drafts stay on the previous hostname. They have not been moved or deleted.</p><a href="https://fmp-video-house-ops.davein4k.chatgpt.site" target="_blank" rel="noopener noreferrer">Recover drafts on the previous Site ↗</a></aside>
   </main>
   <footer class="portal-footer"><strong>SETUP TEST</strong><span>Not venue accepted · Google sign-in to submit</span></footer>
 </body>
