@@ -70,10 +70,27 @@ Pages deploy.
 Still open: H4 (R4), H7 (W6), H11, H13 (L2), H14 (W5), H15 (W1, W2), and
 H17 (L3).
 
+## Re-run after the hub and theme releases
+
+Run on 2026-09-17 against the live site after the `system-by-dave` `e48982c`
+Pages deploy.
+
+**Traffic light: 🟡**
+
+- **Probe:** 0 fail, 7 warn, 25 pass (after Batches A and B: 0 fail, 8 warn, 24 pass).
+- **Released source:** `DaveHomeAssist/fmpwalk` `9aef84565aad`, which is canonical `main`. Both releases pin it.
+- **Gates:** `verify:fmp`, `verify:public-navigation`, `verify:indexing`, `verify:public-consistency`, and `verify:av` pass locally and in the Pages run. The canonical `tests/public-hub-browser.mjs` passes against the live site.
+
+| ID | Status | Evidence |
+| --- | --- | --- |
+| H7 | Fixed | W6 passes on all six pages. One `fmpTheme` preference, light on a first visit in light and dark system schemes, a toggle on every page, and old rig and guide choices carried over. `verify:fmp` enforces it |
+
+Still open: H4 (R4), H11, H13 (L2), H14 (W5), H15 (W1, W2), and H17 (L3). H10
+and H12 remain partly fixed.
+
 ## In flight
 
 The canonical rig work (a responsive workspace, tabs, and deep links) is still
-unreleased. It was branched before `dac4906`. The exporter now refuses to export
-from a commit that does not contain the released commit, so rebase that work onto
-canonical `main` before exporting. When it is released, re-run the probe and
-Area 2 checks A4 and A8.
+unreleased and uncommitted in its Codex worktree. It now sits on canonical `main`
+`9aef845`, and its tests pass there, so the exporter will accept it once it is
+committed. When it is released, re-run the probe and Area 2 checks A4 and A8.
