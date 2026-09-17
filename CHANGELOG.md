@@ -15,6 +15,16 @@
 
 ## 2026-09-17
 
+### Warm Paper contrast for Cue Sheet and StagePlotter
+
+* Fixed dark-ink-on-dark-panel text in the Warm Paper AV theme. Page-local rules that painted a hard-coded Stage Slate background while taking their text color from a shared palette token now consume the palette surfaces instead: the Cue Sheet operator stage, quick-add panel and icon, monitor card and caption bar, transport volume control, Source I/O rack, layer rows, status chips, hint states and shortcut keys, plus the StagePlotter canvas item labels. Worst measured ratio was 1.04:1.
+* Kept the surfaces whose darkness is functional. The preview and program monitor raster stays black in both palettes and now carries fixed `--raster`/`--raster-text`/`--raster-muted` ink so its slate text no longer follows the palette; the StagePlotter drafting surface keeps its black canvas, with item labels reading as palette-backed tags on it.
+* Preserved operational color meaning. Layer index chips take the palette's primary ink over their blue, purple and amber backgrounds, while the always-light program-green chip keeps dark `--bus-ink`; the GO chip and success/error hints now use the success and danger tokens rather than fixed light greens and reds.
+* Clears the remaining desktop-width failures that the shared-control-palette work below recorded as outstanding, so `npm run probe:av-themes` now passes at both widths in both preferences. The monitor caption bar moves on from `--panel-2` to `--panel-3` because the monitor card it sits on is itself now `--panel-2`.
+* Bumped the AV offline cache version to `v20260917-warm-paper-tool-contrast` in `js/sbd-registry.js` and `ProjectorThrow/Stage3D.html`. Both changed pages are offline assets, and `av-suite-worker.js` only rebuilds its cache when the registry version changes, so installed suites would otherwise keep serving the pre-fix HTML.
+* Regenerated `sitemap.xml`: editing `stage-plot.html` moved its `lastmod` to 2026-09-17, which the Pages deploy's generated-file check would have rejected.
+* Verified with `npm run probe:av-themes` at 1440px and 390px across both preferences, `npm run verify:av`, and the Cue Sheet smoke probe.
+
 ### FMP suite theme: light first, one preference, a toggle on every page
 
 * Exported `DaveHomeAssist/fmpwalk` `9aef845` to `fmp/` and `fmpwalk/`. A new managed `fmp/theme.js` loads in the head of the hub, the five camera pages, the guide, and the rig. It stores `light`, `dark`, or `auto` in `fmpTheme`, the key the preshow walk already uses, so a first visit is light even when the system prefers dark (WEB-1, baseline H7, probe W6). Before this change the hub and camera pages followed the AV Suite default and opened dark.
