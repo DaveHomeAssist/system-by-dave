@@ -1,2 +1,5 @@
 *.pdf binary
 noteforge/assets/*.js -whitespace
+
+# Preserve the supplied CSV byte for byte, including its CRLF record endings.
+fmp/house/display-estate.csv -text whitespace=cr-at-eol
