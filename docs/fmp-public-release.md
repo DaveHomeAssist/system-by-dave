@@ -10,8 +10,11 @@ access control.
 
 ## Product boundaries
 
-- `/fmp/`: choose a camera position or open Walk, Learn, and Setup. Each tab
-  is addressable as `/fmp/#cameras`, `#walk`, `#learn`, or `#setup`.
+- `/fmp/`: choose a camera position or open House, Walk, Learn, and Setup. Each
+  tab is addressable as `/fmp/#cameras`, `#house`, `#walk`, `#learn`, or `#setup`.
+- `/fmp/house/`: dated house-video reference, display inventory, bowl schematic,
+  rack views and visitor map. Source conflicts stay visible; there is no live
+  monitoring connection or operational write action.
 - `/fmp/camera/...`: owner-bound drafts and explicit authenticated operational
   actions. SETUP TEST remains mandatory until live acceptance is complete.
 - `/fmpwalk/`: venue route, readings, faults, photos, and report preparation.
@@ -128,3 +131,29 @@ The new body-control photograph is an allowlisted WebP reference. No operational
 records, backend changes, new storage keys or service worker are part of this
 release. Geometry/input tests and contrast checks are distinct from browser or
 physical-device acceptance; see the canonical source's release notes and tests.
+
+## House video integration | September 17, 2026
+
+The merged source [fmpwalk #3](https://github.com/DaveHomeAssist/fmpwalk/pull/3)
+adds `/fmp/house/` and the House hub tab. This release was exported from canonical
+main commit `d565abd64b1383441147b169af20c2a93322f165`; the release manifests record
+its exact file hashes. The two generic model references live at `/switcher/` and
+`/shader/` in this repository and are indexable. The House route stays noindex.
+
+Source conflicts remain visible: 151 CSV rows versus the dashboard's 152 claim,
+37 unresolved lobby rows, different G2 camera identities, and disputed AMX signal
+direction. The visitor map supplies zone context, not equipment coordinates.
+Protected workflows, credentials and draft storage are unchanged.
+
+Validation: 55 source tests, the managed-release and public shell/indexing checks,
+and browser interactions at six viewport sizes. Browser coverage includes deep
+links and history, inventory filters and conflict details, modal focus, rack
+front/rear/evidence views, shared theme, CSV/map and no-JavaScript references. No
+browser-console errors were observed. Rack checks and authenticated commissioning
+remain separate from this read-only reference release.
+
+The exported file digests match the reviewed source; the provenance now records
+its canonical merge commit. The GitHub Pages workflow and exact live-route and
+provenance readback remain the release acceptance gates. Future changes must be
+exported from clean canonical source; do not edit managed files or provenance by
+hand.

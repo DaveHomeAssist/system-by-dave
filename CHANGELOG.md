@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-09-17 — House video references in the FMP suite
+
+- Add the canonical FMP House view: bowl schematic, searchable display inventory,
+  rack front/rear and evidence views, venue map, and dated source reconciliation.
+- Preserve the CSV's 151 rows separately from the dashboard's 152-display claim;
+  retain unresolved lobby placement, AMX direction and camera-model conflicts.
+- Add indexable `/switcher/` and `/shader/` model references, linked from Learn.
+  Correct aux/webcam counting, Fairlight channel count, G2 local ND control and
+  four-channel panel assignment; keep vendor manuals linked at source.
+- Extend the managed FMP allowlist, provenance and shell checks. Camera and walk
+  storage, authentication, commissioning and explicit submission remain intact.
+
+
 ## 2026-09-17
 
 ### Warm Paper contrast for Cue Sheet and StagePlotter

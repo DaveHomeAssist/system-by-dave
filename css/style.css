@@ -655,3 +655,41 @@ body { transition: background-color .3s ease, color .3s ease; }
 .theme-toggle:hover { border-color: var(--rust); color: var(--rust); }
 .theme-toggle:focus-visible { outline: 2px solid var(--rust); outline-offset: 2px; }
 .nav-links .theme-toggle-item { display: flex; align-items: center; }
+
+/* Equipment field references: a cool, legible document surface shared by switcher and shader. */
+.field-reference { --cream:#f4f6f8; --cream-dark:#e9eef3; --charcoal:#182631; --charcoal-light:#526170; --rust:#285e8d; --rust-light:#285e8d; --rust-dark:#1c4568; --grid-line:transparent; --grid-line-accent:transparent; overflow-x:visible; }
+.field-reference main { max-width:1100px; margin:auto; padding:36px 28px 50px; }
+.field-reference a { color:var(--rust); text-underline-offset:4px; }
+.field-reference :focus-visible { outline:3px solid var(--rust); outline-offset:4px; }
+.field-reference .sbd-skip-link { color:#fff; }
+.field-reference .sbd-site-return { position:relative; flex-wrap:wrap; background:#fff; border-bottom:1px solid #ccd5dd; }
+.field-reference .sbd-site-return a { display:inline-flex; align-items:center; min-height:44px; }
+.field-reference .fr-kicker { font:11px/1.6 var(--font-mono); text-transform:uppercase; letter-spacing:.09em; color:var(--rust); margin:0 0 12px; }
+.field-reference h1 { font:600 clamp(34px,5vw,62px)/1.12 var(--font-body); letter-spacing:-.045em; margin:0 0 16px; }
+.field-reference h1 span { color:var(--rust); }
+.field-reference .fr-head>p:not(.fr-kicker) { color:var(--charcoal-light); margin-bottom:14px; }
+.field-reference .fr-scope { font-size:13px; max-width:70ch; }
+.field-reference .fr-nav { display:flex; flex-wrap:wrap; gap:8px; border-block:1px solid #ccd5dd; padding:12px 0; margin:28px 0; }
+.field-reference .fr-nav a { display:inline-flex; align-items:center; justify-content:center; min-height:44px; min-width:88px; padding:8px 15px; background:#fff; border:1px solid #ccd5dd; text-decoration:none; font:12px var(--font-mono); }
+.field-reference .fr-nav a:hover { background:var(--cream-dark); }
+.field-reference .fr-body { max-width:920px; }
+.field-reference section { background:#fff; border:1px solid #ccd5dd; padding:28px; margin:0 0 22px; scroll-margin-top:20px; }
+.field-reference h2 { font:600 25px/1.25 var(--font-body); letter-spacing:-.025em; margin:0 0 16px; }
+.field-reference p { margin:0 0 16px; }
+.field-reference p:last-child { margin-bottom:0; }
+.field-reference ol,.field-reference ul { padding-left:22px; margin:18px 0; }
+.field-reference li { padding-left:4px; margin-bottom:12px; }
+.field-reference .fr-scroll { overflow:auto; margin:20px 0; }
+.field-reference table { border-collapse:collapse; width:100%; font-size:14px; min-width:480px; text-align:left; }
+.field-reference caption { text-align:left; font:11px/1.6 var(--font-mono); color:var(--charcoal-light); padding-bottom:14px; }
+.field-reference th { font:600 11px/1.6 var(--font-mono); text-transform:uppercase; border-bottom:2px solid #ccd5dd; padding:10px 14px 10px 0; }
+.field-reference td { padding:12px 16px 12px 0; border-bottom:1px solid #ccd5dd; vertical-align:top; }
+.field-reference .fr-source { font-size:12px; color:var(--charcoal-light); }
+.field-reference .fr-source a { display:inline-block; padding:7px 0; }
+.field-reference .fr-callout { padding:16px 20px; margin:20px 0; background:var(--cream-dark); border-left:3px solid var(--rust); }
+.field-reference .fr-links { display:flex; flex-wrap:wrap; gap:14px; }
+.field-reference .fr-links a { display:inline-flex; align-items:center; min-height:44px; }
+.field-reference .fr-footer { display:flex; flex-wrap:wrap; align-items:center; gap:24px; padding:24px 28px; border-top:1px solid #ccd5dd; font-size:12px; }
+.field-reference .fr-footer a { display:inline-flex; align-items:center; min-height:44px; }
+@media(max-width:680px){.field-reference main{padding:24px 16px 32px}.field-reference section{padding:20px}.field-reference h2{font-size:22px}.field-reference .fr-nav{display:grid;grid-template-columns:repeat(3,1fr)}.field-reference .fr-nav a{min-width:0;padding:8px;font-size:11px}.field-reference .sbd-site-return{gap:8px;padding:8px 16px;font-size:11px}.field-reference .fr-footer{padding:16px;gap:12px}}
+@media print{.field-reference .sbd-site-return,.field-reference .fr-nav,.field-reference .sbd-skip-link,.field-reference .fr-footer{display:none}.field-reference main{padding:0}.field-reference section{break-inside:avoid}.field-reference table{min-width:0}}

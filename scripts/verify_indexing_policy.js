@@ -55,8 +55,8 @@ const files = walk(ROOT);
 const unlisted = files.filter((file) => !sitemapRoutes.has(routeFor(file)));
 const robots = read('robots.txt');
 
-// 132 = 131 before 2026-09-17 plus the /fmp-walk/ typed-address redirect.
-if (unlisted.length !== 132) fail(`Expected 132 tracked routes outside the sitemap; found ${unlisted.length}.`);
+// 133 includes the /fmp-walk/ redirect and the managed /fmp/house/ reference.
+if (unlisted.length !== 133) fail(`Expected 133 tracked routes outside the sitemap; found ${unlisted.length}.`);
 
 [
   '/apps/av-workbook/',
