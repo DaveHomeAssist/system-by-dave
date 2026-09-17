@@ -1,7 +1,7 @@
 {
   "schema": "fmp.public.release.v2",
   "sourceRepository": "DaveHomeAssist/fmpwalk",
-  "sourceCommit": "14fa315731eb29b6dc9fea6e6e46b494ad0698aa",
+  "sourceCommit": "d565abd64b1383441147b169af20c2a93322f165",
   "mode": "commissioning",
   "files": {
     "camera-core.js": "86ae252646f022ea5e03ffe2d3be05a7344f1cc2299bb4c7a39cee9bb9ebedcb",
