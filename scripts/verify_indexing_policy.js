@@ -55,13 +55,15 @@ const files = walk(ROOT);
 const unlisted = files.filter((file) => !sitemapRoutes.has(routeFor(file)));
 const robots = read('robots.txt');
 
-if (unlisted.length !== 131) fail(`Expected 131 tracked routes outside the sitemap; found ${unlisted.length}.`);
+// 132 = 131 before 2026-09-17 plus the /fmp-walk/ typed-address redirect.
+if (unlisted.length !== 132) fail(`Expected 132 tracked routes outside the sitemap; found ${unlisted.length}.`);
 
 [
   '/apps/av-workbook/',
   '/cross-project-actions.html',
   '/fmp-index/',
   '/fmp/',
+  '/fmp-walk/',
   '/fmpwalk/',
   '/html/sbd-brand.html'
 ].forEach((route) => {
@@ -112,6 +114,14 @@ hatFiles.forEach((file) => {
   if (!hasNoIndex(source)) fail(`${file} is missing noindex.`);
   if (canonical(source) !== expectedCanonical) fail(`${file} has the wrong canonical target.`);
 });
+
+// /fmp-walk/ is the hyphenated address people type for the managed /fmpwalk/ release.
+const fmpWalkAlias = read('fmp-walk/index.html');
+if (!hasNoIndex(fmpWalkAlias)) fail('fmp-walk/index.html is missing noindex.');
+if (refreshTarget(fmpWalkAlias) !== '/fmpwalk/') fail('fmp-walk/index.html does not refresh to /fmpwalk/.');
+if (!fmpWalkAlias.includes('location.replace("/fmpwalk/" + location.search + location.hash)')) fail('fmp-walk/index.html does not preserve query and hash when redirecting.');
+if (canonical(fmpWalkAlias) !== 'https://systembydave.com/fmpwalk/') fail('fmp-walk/index.html canonical does not match its redirect target.');
+if (sitemapRoutes.has('/fmp-walk/')) fail('fmp-walk/index.html appears in the sitemap.');
 
 if (!hasNoIndex(read('afterbreak/index.html'))) fail('afterbreak/index.html is missing noindex.');
 if (!hasNoIndex(read('cross-project-actions.html'))) fail('cross-project-actions.html is missing noindex.');

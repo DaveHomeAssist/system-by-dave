@@ -125,7 +125,9 @@ Run after releases (A1–A4) and in the weekly pass (all).
 - **A1 Hub and spoke.** Every FMP surface is reachable from `/fmp/` in one step,
   and every surface returns to `/fmp/`. No dead ends and no one-way links.
 - **A2 Public shell.** Home, parent, current location, return, and a working
-  skip link on every page (`docs/public-shell-contract.md`).
+  skip link on every page (`docs/public-shell-contract.md`). `npm run
+  verify:public-navigation` enforces home, parent, and skip target for each FMP
+  page and prints the known gaps that are still open.
 - **A3 Release integrity.** `npm run verify:fmp` passes. `git log --format='%h %s'
   -- fmp fmpwalk` shows only export commits (no hand edits). The provenance of both
   releases pins the same source commit.
@@ -144,8 +146,11 @@ Run after releases (A1–A4) and in the weekly pass (all).
   `docs/public-camera-release.md` describe the deployed state, not a past or
   planned one.
 - **A9 Verifier fragility.** When the rig or routes grow, the allowlist in
-  `scripts/verify_fmp_release.js` changes in the same release. A red Pages run
-  from an allowlist mismatch counts as a routine finding, not a surprise.
+  `scripts/verify_fmp_release.js` changes in the same release. So do
+  `FMP_SHELL_PAGES` and `FMP_KNOWN_SHELL_GAPS` in
+  `scripts/verify_public_navigation.js` when a page is added or a shell gap is
+  fixed. A red Pages run from an allowlist mismatch counts as a routine finding,
+  not a surprise.
 
 ## Area 3: Notion documentation
 

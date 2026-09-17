@@ -16,6 +16,12 @@ Every public System by Dave route must give a visitor five reliable orientation 
 - **Static site return** — standalone products use `.sbd-site-return` with System by Dave, a parent destination, and the current page.
 - **AV operator shell** — registry-backed AV tools use the AV Suite operator bar and deterministic suite/phase links.
 - **Custom compact shell** — DepotOps, AV Tool Suite index v2, Throwline, and Throwline Stage 3D may retain product-specific chrome when all five required cues are present.
+- **FMP operations shell** — the `/fmp/` hub, the camera, guide, and rig routes, `/fmpwalk/`, and `/fmp-index/` keep product chrome exported from `DaveHomeAssist/fmpwalk` (the index is maintained here). Every page links to System by Dave home, every page except the hub links to `/fmp/` as its parent, and the first focusable element is a skip link whose target is on the same document. Pages that use `<base>` must still resolve the skip link to their own URL. Fix gaps at the exporter, never by hand-editing `fmp/` or `fmpwalk/`.
+
+## Error and alias pages
+
+- `404.html` is served at whatever path was requested, so its links, styles, icon, and scripts use root-absolute URLs (`/`, `/tools.html`, `/css/…`).
+- Typed-address aliases such as `/fmp-walk/` are noindex redirect pages. They carry a real link to the target, home, and the parent hub for visitors without JavaScript or meta refresh.
 
 ## Responsive and focus behavior
 
@@ -27,4 +33,6 @@ Every public System by Dave route must give a visitor five reliable orientation 
 
 ## Verification
 
-`npm run verify:public-navigation` checks shared headers, deterministic returns, required standalone skip links, focusable targets, and custom-shell destinations. Rendered keyboard testing remains part of release QA because source checks cannot prove stacking, clipping, or theme contrast.
+`npm run verify:public-navigation` checks shared headers, deterministic returns, required standalone skip links, focusable targets, custom-shell destinations, root-absolute `404.html` references, and every FMP page listed in `FMP_SHELL_PAGES`. A link to `/fmp/` is not a return path by itself: an FMP page must pass the home, parent, and skip-target checks. An HTML page under `fmp/` or `fmpwalk/` without an explicit entry fails.
+
+`FMP_KNOWN_SHELL_GAPS` records the FMP gaps found in the 2026-09-17 hygiene baseline, and the verifier prints each one as a warning. Any gap not on that list fails. So does a listed gap that no longer occurs, which means the `fmpwalk` export that fixes a gap must remove its entry in the same commit. Rendered keyboard testing remains part of release QA because source checks cannot prove stacking, clipping, or theme contrast.
