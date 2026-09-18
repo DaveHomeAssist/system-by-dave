@@ -42,6 +42,9 @@ const COUNT_CLAIM = /\b(\d{2,4})[- ](?:part|component)s?\b/g;
 // The walk's explicit Save to Notion receipt (fmpwalk/notion.js) opens the walker's own record and is exempt.
 const NOTION_URL = /https?:\/\/(?:[\w-]+\.)*notion\.(?:so|site|com)\b/i;
 const NOTION_RECEIPT = 'fmpwalk/notion.js';
+// No FMP page links an old version of the suite: the retired private ChatGPT Site, the fmpwalk GitHub
+// Pages copy, or a pre-cutover systembydave.com FMP address (Dave, 2026-09-18). Only URLs count.
+const OLD_VERSION_URL = /https?:\/\/(?:(?:[\w-]+\.)*chatgpt\.site\b|davehomeassist\.github\.io\b|(?:www\.)?systembydave\.com\/(?:fmp|fmpwalk|fmp-index|fmp-walk)(?=[\/?#"'\s]|$))/i;
 
 function walk(directory, prefix = '') {
   return fs.readdirSync(directory, {withFileTypes:true}).flatMap(entry => {
@@ -70,6 +73,7 @@ for (const release of releases) {
     const source = data.toString('utf8');
     assert.doesNotMatch(source, /-----BEGIN .*PRIVATE KEY-----|\b(?:ntn_|secret_)[A-Za-z0-9]{30,}/);
     if (`${release.directory}/${name}` !== NOTION_RECEIPT) assert.doesNotMatch(source, NOTION_URL, `${release.directory}/${name}: links a Notion page; link the suite's HTML reference instead`);
+    assert.doesNotMatch(source, OLD_VERSION_URL, `${release.directory}/${name}: links an old version of the suite`);
     const exposed = contactDetails(source);
     assert.ok(!exposed.emails && !exposed.phones, `${release.directory}/${name}: ${exposed.emails} email address(es) and ${exposed.phones} phone number(s) published; keep contacts in Notion`);
     for (const [, target, token] of source.matchAll(TOKEN_REFERENCE)) {
@@ -105,7 +109,6 @@ for (const release of releases) {
 
 const entry = fs.readFileSync(path.join(site, 'fmp/index.html'), 'utf8');
 assert.match(entry, /class="startup-guidance"/);
-assert.match(entry, /Recover drafts on the previous Site/);
 assert.match(entry, /href="\/fmpwalk\/"/);
 assert.equal(releases[0].provenance.sourceCommit, releases[1].provenance.sourceCommit, 'fmp and fmpwalk must ship from one export');
 const cameraView = fs.readFileSync(path.join(site, 'fmp/camera-view.js'), 'utf8');
@@ -145,7 +148,9 @@ assert.match(index, /<meta name="robots" content="noindex,follow">/);
 assert.doesNotMatch(entry, /href="\/fmp-index\/"/, 'fmp/index.html: the hub must not link the retired index');
 // The hand-maintained pages published beside the suite follow the same rule.
 for (const name of ['fmp-index/index.html', 'fmp-walk/index.html', 'switcher/index.html', 'shader/index.html', 'backfocus/index.html']) {
-  assert.doesNotMatch(fs.readFileSync(path.join(site, name), 'utf8'), NOTION_URL, `${name}: links a Notion page`);
+  const page = fs.readFileSync(path.join(site, name), 'utf8');
+  assert.doesNotMatch(page, NOTION_URL, `${name}: links a Notion page`);
+  assert.doesNotMatch(page, OLD_VERSION_URL, `${name}: links an old version of the suite`);
 }
 // Every rig count claim, including the one the camera card renders, must match the catalog.
 // The data module holds only object literals; evaluate it in an empty context rather than importing ESM from CommonJS.

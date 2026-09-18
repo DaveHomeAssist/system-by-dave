@@ -92,7 +92,7 @@ check. Add `--strict` to exit non-zero on any failure.
 | P5 | Both releases pin the same source commit | `fmp/` and `fmpwalk/` must ship from one export |
 | I1–I3 | Noindex on every FMP page, robots disallow, sitemap exclusion | Discovery policy (not access control) |
 | L1 | Same-origin links, assets, and script-built routes resolve | Catches broken links, including ones built at runtime from `./camera/` |
-| L2 | No links to legacy or private origins | Legacy origins need a retirement date |
+| L2 | No links to legacy or private origins | Fails since 2026-09-18: no FMP page links an old version (Dave) |
 | L3 | External references respond | Some sites block bots with 403. Confirm in a browser before filing |
 | L4 | In-page `#` links stay on pages that use `<base>` | With `<base>`, a skip link resolves to another document and leaves the page |
 | S1 | Pages link home and back to `/fmp/` | Shell contract: home, parent, and return |
@@ -143,8 +143,10 @@ Run after releases (A1–A4) and in the weekly pass (all).
   its own HTML page.
 - **A6 Theme architecture.** One theme default and one storage convention across
   the suite, or a documented reason for each exception.
-- **A7 Legacy origins.** Every link to the previous private Site or GitHub Pages
-  origin has an owner and a retirement condition.
+- **A7 Legacy origins.** No FMP page links the previous private Site, the fmpwalk
+  GitHub Pages copy or a pre-cutover systembydave.com FMP address; `verify:fmp`
+  and probe L2 enforce it. The copies themselves still need an owner and a
+  retirement condition.
 - **A8 Documentation agreement.** `docs/fmp-public-release.md`, `CHANGELOG.md`,
   and the canonical `docs/fmp-suite-architecture.md` and
   `docs/public-camera-release.md` describe the deployed state, not a past or

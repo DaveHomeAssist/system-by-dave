@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-09-18 — FMP suite: no links to old versions
+
+- Exported fmpwalk `2a700ff`. The hub's Setup tab and its no-JavaScript guidance
+  no longer link the retired private ChatGPT Site for draft recovery, or say that
+  drafts wait on the old hostname.
+- `verify:fmp` and the canonical exporter now reject any link to an old version of
+  the suite: the private ChatGPT Site, the `davehomeassist.github.io/fmpwalk` copy,
+  or a pre-cutover systembydave.com FMP address. Hygiene check L2 now fails instead
+  of warning. The copies themselves are unchanged.
+
 ## 2026-09-18 — FMP rig: comms notes point at Clear-Com
 
 - Exported fmpwalk `e3beb5f`. Five rig operating notes still told operators to
