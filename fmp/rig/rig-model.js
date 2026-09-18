@@ -1,5 +1,5 @@
 import * as T from './vendor/three/three.module.js';
-import { photos, catalog } from './fmp-guide-data.js?v=b322be9523bcb8c5';
+import { photos, catalog } from './fmp-guide-data.js?v=1352090a47dfda15';
 const root=document.getElementById('fmp-rig-3d');
 root.dataset.ready='true';
 const themeButton=document.getElementById('themeBtn');
