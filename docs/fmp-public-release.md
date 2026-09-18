@@ -77,13 +77,15 @@ responses are never bundled for offline use.
 
 ## housevideo.app
 
-The exported suite, `/fmp-index/`, `/fmp-walk/` and the `/switcher/`, `/shader/`
-and `/backfocus/` references are also published unchanged at housevideo.app
-(`docs/domain-sites.md`). Until that site's cutover their canonical URLs stay on
-systembydave.com. Before cutover, add `https://housevideo.app` to the Google
-client's JavaScript origins and redeploy the backend, whose default allowed
-origins include it from fmpwalk `c816ea8`; then repeat gates 3 and 4 below on
-housevideo.app.
+housevideo.app is the canonical home of the exported suite, `/fmp-index/`,
+`/fmp-walk/` and the `/switcher/`, `/shader/` and `/backfocus/` references, with
+unchanged paths (`docs/domain-sites.md`). It was cut over on 2026-09-18 from
+fmpwalk `a5d262c`. The systembydave.com addresses are redirect stubs that offer
+to move saved walk and camera data (browser storage and walk photos) before
+redirecting. The Google client and the `fmp-walk-notion` backend
+(`FMP_ALLOWED_ORIGINS`) allow `https://housevideo.app`; keep
+`https://systembydave.com` in both while old drafts may still be moved. Run gates 3 and 4
+below on housevideo.app.
 
 ## Commissioning gates
 

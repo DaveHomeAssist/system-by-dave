@@ -69,6 +69,8 @@ unavailable.
 
 ```bash
 npm run hygiene:fmp -- --markdown=/tmp/fmp-hygiene.md --output=/tmp/fmp-hygiene.json
+# Probes https://housevideo.app by default (the suite's canonical origin);
+# pass --base=<origin> to probe another deployment.
 ```
 
 The probe is read-only. It calls the backend only through unauthenticated GET

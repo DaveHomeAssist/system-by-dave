@@ -1,5 +1,22 @@
 # Changelog
 
+## 2026-09-18 — FMP suite cut over to housevideo.app
+
+- housevideo.app serves the FMP suite over HTTPS (Let's Encrypt, enforced), and
+  `housevideo` is cut over in `scripts/domain-sites.json`. On systembydave.com
+  the 15 FMP pages (hub, house, guide, rig, camera routes, walk, index, alias,
+  switcher, shader, back focus) are now redirect stubs to the same path on
+  housevideo.app, offering once to move saved walk and camera data, including
+  walk photos. The three indexable references leave the systembydave.com
+  sitemap for housevideo.app's own.
+- Exported fmpwalk `a5d262c`, whose canonical and Open Graph URLs name
+  housevideo.app; the hand-maintained index, alias and references were
+  rewritten with `scripts/domain_cutover_rewrite.mjs`. The backend already
+  allows the `https://housevideo.app` origin.
+- The navigation gate resolves FMP shell links from each page's own origin, the
+  FMP release gate checks the walk's hub link at the suite's canonical origin,
+  and `npm run hygiene:fmp` probes housevideo.app by default.
+
 ## 2026-09-18 — AV by Dave cut over to avbydave.com
 
 - avbydave.com serves the AV by Dave suite over HTTPS (Let's Encrypt, enforced),

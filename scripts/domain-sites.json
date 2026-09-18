@@ -9,7 +9,7 @@
       "domain": "housevideo.app",
       "repository": "DaveHomeAssist/housevideo",
       "deployKeySecret": "HOUSEVIDEO_DEPLOY_KEY",
-      "cutover": false,
+      "cutover": true,
       "home": "/fmp/",
       "pages": ["fmp/", "fmpwalk/", "fmp-index/", "fmp-walk/", "switcher/", "shader/", "backfocus/"],
       "assets": [],
