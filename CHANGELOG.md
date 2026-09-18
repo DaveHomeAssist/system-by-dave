@@ -1,5 +1,30 @@
 # Changelog
 
+## 2026-09-17 — FMP suite and AV by Dave published on their own domains
+
+- `scripts/domain-sites.json` names the pages that also publish to housevideo.app
+  (the FMP suite with its routes, `/fmpwalk/`, `/fmp-index/`, `/fmp-walk/`,
+  `/switcher/`, `/shader/`, `/backfocus/`) and avbydave.com (AV by Dave: the
+  doorway, every registry tool and offline page, AV Workbook, `av-tool-suite/`).
+  Paths are unchanged on the new domains.
+- `scripts/stage_domain_sites.mjs` stages each site, adds its home redirect,
+  404, robots, provenance and transfer page, and fails on any reference that
+  would break there, including a registry offline asset the service worker
+  needs. It runs as `npm run verify:domain-sites` and in the Pages workflow,
+  which then pushes each site to `DaveHomeAssist/housevideo` or
+  `DaveHomeAssist/avbydave` with that repository's deploy key.
+- Links labelled System by Dave, and links to Tools, Notion, Prompt Lab and the
+  profile, are now absolute in pages that publish elsewhere, including the
+  fmpwalk export (source `c816ea8`), AV Workbook and Throwline. The fallback
+  public nav names systembydave.com when it runs on another domain.
+- Until each site's cutover, systembydave.com is unchanged and the new domains
+  are uncrawled mirrors. At cutover, moved pages become redirect stubs that
+  offer to carry saved browser data (browser storage and IndexedDB, including
+  PixelForge projects and walk photos) to the new domain first. The old AV
+  offline worker then retires itself. Sitemaps split per domain
+  (`gen_sitemap.py --site`). Headless Chromium checks covered the move, conflict
+  handling, backup import, skip and worker retirement against simulated origins.
+
 ## 2026-09-17 — House video references in the FMP suite
 
 - Add the canonical FMP House view: bowl schematic, searchable display inventory,

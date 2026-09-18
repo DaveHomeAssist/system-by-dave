@@ -5,6 +5,9 @@ name: Deploy site to Pages
 # SAME files the legacy build did: the whole repo root, minus VCS + CI tooling
 # (.git / .github), so the git history is never exposed. .nojekyll + CNAME are
 # carried through, so no Jekyll processing and the custom domain is preserved.
+# The pages listed in scripts/domain-sites.json are also staged as their own
+# sites and pushed to the Pages repositories for housevideo.app and
+# avbydave.com after this deploy (see docs/domain-sites.md).
 on:
   push:
     branches: [main]
@@ -51,6 +54,7 @@ jobs:
           npm run verify:public-navigation
           npm run verify:public-consistency
           npm run verify:fmp
+          npm run verify:domain-sites
 
       - name: Verify Throwline release contract
         run: npm run verify:throwline
@@ -76,8 +80,11 @@ jobs:
       - name: Stage site (everything except VCS + CI tooling)
         run: |
           mkdir -p _site
-          rsync -a --exclude='.git' --exclude='.github' --exclude='_site' ./ _site/
+          rsync -a --exclude='.git' --exclude='.github' --exclude='_site' --exclude='_sites' ./ _site/
           echo "Staged $(find _site -type f | wc -l) files."
+
+      - name: Stage domain sites (housevideo.app, avbydave.com)
+        run: node scripts/stage_domain_sites.mjs --out _sites --site-root _site
 
       - name: Configure Pages
         uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
@@ -90,3 +97,16 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5.0.0
+
+      # Each target repository deploys its own Pages site when this push lands.
+      - name: Publish housevideo.app
+        if: github.ref == 'refs/heads/main'
+        env:
+          DEPLOY_KEY: ${{ secrets.HOUSEVIDEO_DEPLOY_KEY }}
+        run: scripts/publish_domain_site.sh housevideo _sites/housevideo DaveHomeAssist/housevideo "$GITHUB_SHA"
+
+      - name: Publish avbydave.com
+        if: github.ref == 'refs/heads/main'
+        env:
+          DEPLOY_KEY: ${{ secrets.AVBYDAVE_DEPLOY_KEY }}
+        run: scripts/publish_domain_site.sh avbydave _sites/avbydave DaveHomeAssist/avbydave "$GITHUB_SHA"

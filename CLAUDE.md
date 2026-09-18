@@ -12,7 +12,9 @@ handoffs.
 
 - Production: [systembydave.com](https://systembydave.com)
 - Repository: `DaveHomeAssist/system-by-dave`
-- Hosting: GitHub Pages from `main`, with `CNAME` preserving the custom domain
+- Hosting: GitHub Pages from `main`, with `CNAME` preserving the custom domain.
+  The FMP suite and AV by Dave are also published from here to housevideo.app
+  and avbydave.com (`docs/domain-sites.md`).
 
 ## Architecture
 
@@ -34,6 +36,10 @@ handoffs.
   keyboard escape cues. `docs/public-content-contract.md` defines canonical
   product names, title families, registry-backed counts, and the public-copy
   release gate.
+- `scripts/domain-sites.json` lists the pages published on housevideo.app and
+  avbydave.com (AV by Dave pages come from the registry).
+  `scripts/stage_domain_sites.mjs` stages and checks those sites, and the Pages
+  workflow pushes them to their own repositories with per-repository deploy keys.
 - `manifest.json`, `av-suite-worker.js`, and per-page manifest links provide
   installable and offline AV field use.
 - GSAP is available through the package dependencies and the vendored browser
@@ -130,6 +136,8 @@ Throwline's catalog is synchronized and verified through its dedicated scripts.
 - Sitemap membership: `scripts/gen_sitemap.py`
 - AV Suite doorway and storage: `docs/av-suite-doorway.md`
 - Verification commands: `package.json` and `AGENTS.md`
+- Other domains (housevideo.app, avbydave.com), saved-data transfer and
+  cutover: `docs/domain-sites.md`
 - FMP release and hygiene: `docs/fmp-public-release.md` and
   `docs/fmp-hygiene-routine.md`
 - Deployment gates: `.github/workflows/deploy-pages.yml`

@@ -61,6 +61,20 @@ domain is set in `CNAME`. After changing an indexable page or route, run
 `python3 scripts/gen_sitemap.py`; do not edit the generated `sitemap.xml`
 directly.
 
+### housevideo.app and avbydave.com
+
+The FMP suite and AV by Dave are also published on their own domains. The
+Pages workflow stages them with `scripts/stage_domain_sites.mjs` and pushes each
+to its repository (`DaveHomeAssist/housevideo`, `DaveHomeAssist/avbydave`)
+with that repository's deploy key. Check the staged sites locally with:
+
+```bash
+npm run verify:domain-sites
+```
+
+`docs/domain-sites.md` covers the page lists, saved-data transfer, and the
+cutover checklist.
+
 ### NoteForge canonical release
 
 NoteForge is built in its own repository and committed here as the canonical

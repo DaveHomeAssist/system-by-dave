@@ -75,6 +75,16 @@ private documents, and source maps. Third-party audience photos are linked, not
 copied. No FMP service worker or new offline cache is registered; protected API
 responses are never bundled for offline use.
 
+## housevideo.app
+
+The exported suite, `/fmp-index/`, `/fmp-walk/` and the `/switcher/`, `/shader/`
+and `/backfocus/` references are also published unchanged at housevideo.app
+(`docs/domain-sites.md`). Until that site's cutover their canonical URLs stay on
+systembydave.com. Before cutover, add `https://housevideo.app` to the Google
+client's JavaScript origins and redeploy the backend, whose default allowed
+origins include it from fmpwalk `c816ea8`; then repeat gates 3 and 4 below on
+housevideo.app.
+
 ## Commissioning gates
 
 1. Add the exact `https://systembydave.com` JavaScript origin to the existing FMP

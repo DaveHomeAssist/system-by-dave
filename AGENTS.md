@@ -74,6 +74,10 @@ to make stale documentation true.
   `npm run sync:noteforge`; do not hand-edit managed artifact files.
 - **Throwline catalog:** use `npm run sync:throwline-catalog` and
   `npm run verify:throwline`.
+- **Domain sites:** `scripts/domain-sites.json` owns which pages are also
+  published on housevideo.app and avbydave.com, and each site's cutover state.
+  Those pages link systembydave.com-only destinations absolutely
+  (`https://systembydave.com/...`); see `docs/domain-sites.md`.
 - **History:** record material behavior, architecture, content, or layout
   changes in `CHANGELOG.md`. Keep feature ledgers out of `CLAUDE.md`.
 
@@ -163,6 +167,8 @@ Pages workflow before a production claim.
   `npm run test:av-workbook`, and `npm run build:av-workbook`.
 - **Throwline:** `npm run verify:throwline`.
 - **NoteForge artifact:** `npm run verify:noteforge`.
+- **Pages published on another domain, `scripts/domain-sites.json`, or the
+  publishing scripts:** `npm run verify:domain-sites`.
 - **FMP managed release:** `npm run verify:fmp`; after deployment, run the live
   `npm run hygiene:fmp` probe described in `docs/fmp-hygiene-routine.md`.
 - **Rendered UI changes:** verify desktop, the 680px breakpoint, and a narrow
