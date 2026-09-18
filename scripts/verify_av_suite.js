@@ -4,6 +4,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
+const { originFor, sitemapFor } = require('./domain_sites_lib');
 
 const ROOT = path.resolve(__dirname, '..');
 const args = process.argv.slice(2);
@@ -131,7 +132,8 @@ function assertPageContracts(registry) {
   if (!avSuite.includes("<h3>'+d+'</h3>")) {
     fail('AV Suite tool groups do not preserve the page heading hierarchy.');
   }
-  if (!/href="https:\/\/systembydave\.com\/av-suite\.html"/.test(avSuite) || /rel="canonical"[^>]+\?entry=/.test(avSuite)) {
+  // The canonical origin follows the AV by Dave cutover (scripts/domain-sites.json).
+  if (!avSuite.includes(`href="${originFor('av-suite.html')}/av-suite.html"`) || /rel="canonical"[^>]+\?entry=/.test(avSuite)) {
     fail('AV Suite canonical must remain the query-free /av-suite.html URL.');
   }
   if (!/id="entryChooser"[\s\S]*data-entry-choice="show"[\s\S]*data-entry-choice="toolbox"/.test(avSuite) || !/id="doorwayBtn"/.test(avSuite)) {

@@ -5,10 +5,10 @@ systembydave.com. The source stays here and passes the same release gates; the
 Pages workflow stages each set as its own site and pushes it to that domain's
 GitHub Pages repository.
 
-| Site id | Domain | Repository | Pages |
-| --- | --- | --- | --- |
-| `housevideo` | housevideo.app | `DaveHomeAssist/housevideo` | `/fmp/` and its routes, `/fmpwalk/`, `/fmp-index/`, `/fmp-walk/`, `/switcher/`, `/shader/`, `/backfocus/` |
-| `avbydave` | avbydave.com | `DaveHomeAssist/avbydave` | `av-suite.html`, every registry tool and offline page (including `plotforge.html`), `av-workbook.html`, `av-tool-suite/` |
+| Site id | Domain | Repository | Pages | Cutover |
+| --- | --- | --- | --- | --- |
+| `housevideo` | housevideo.app | `DaveHomeAssist/housevideo` | `/fmp/` and its routes, `/fmpwalk/`, `/fmp-index/`, `/fmp-walk/`, `/switcher/`, `/shader/`, `/backfocus/` | Pending (backend origin) |
+| `avbydave` | avbydave.com | `DaveHomeAssist/avbydave` | `av-suite.html`, every registry tool and offline page (including `plotforge.html`), `av-workbook.html`, `av-tool-suite/` | 2026-09-18 |
 
 `scripts/domain-sites.json` owns this list, each site's home route, robots rules
 and the browser storage its tools own. AV by Dave pages come from
@@ -72,6 +72,11 @@ storage key). With none, it redirects immediately. Otherwise it offers:
 - **Download a backup**: a JSON file that `transfer.html` imports later.
 - **Continue without moving**.
 
+Portfolio pages keep their relative links to moved pages, so a returning
+visitor passes through a stub and gets the move offer once; after they move or
+skip, later stubs redirect immediately. Revisit direct links once most saved
+data has moved.
+
 Imports never overwrite: keys and records that already exist on the new domain
 are kept and listed, with an explicit, confirmed option to replace them.
 Nothing is deleted on systembydave.com, and the choice is remembered in
@@ -94,12 +99,16 @@ Do these per site, in order, and verify each before the next:
    OAuth client's authorized JavaScript origins, redeploy the `fmp-walk-notion`
    backend (its default allowed origins include housevideo.app since fmpwalk
    `c816ea8`), and repeat the SETUP TEST and walk acceptance on the new domain.
-4. Move canonical and Open Graph URLs to the new domain: the fmpwalk exporter
-   and source pages for `fmp/` and `fmpwalk/`, `apps/av-workbook/` for
-   `av-workbook/`, and the hand-maintained pages here; update the gates that
-   pin systembydave.com canonicals, the live FMP hygiene probe routes, and the
-   portfolio links in `index.html` and `tools.html`.
-5. Set `"cutover": true`, regenerate `sitemap.xml`, and release.
+4. Set `"cutover": true`, then move canonical, Open Graph and structured-data
+   URLs to the new domain: `node scripts/domain_cutover_rewrite.mjs --site <id>`
+   lists every absolute systembydave.com URL naming a moved page, and `--write`
+   rewrites the hand-maintained ones. Change generated files at their source
+   (`apps/av-workbook/` then `npm run build:av-workbook`; the fmpwalk exporter
+   for `fmp/` and `fmpwalk/`). Release gates read expected canonical origins and
+   sitemap membership from `scripts/domain_sites_lib.js`, so they follow the
+   flag; `npm run verify:domain-sites` fails until no stale URL remains. For
+   housevideo.app, also point `scripts/fmp_hygiene_probe.js` at the new domain.
+5. Regenerate `sitemap.xml` and release.
 6. Read back: a stub redirects with path and query intact, a browser with saved
    data sees the move offer, both sitemaps and robots files are correct, and
    `npm run hygiene:fmp` passes against housevideo.app.

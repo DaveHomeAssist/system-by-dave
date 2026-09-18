@@ -5,6 +5,7 @@ const path = require('node:path');
 const crypto = require('node:crypto');
 const assert = require('node:assert/strict');
 const vm = require('node:vm');
+const { originFor } = require('./domain_sites_lib');
 
 const site = path.resolve(__dirname, '..');
 const hash = data => crypto.createHash('sha256').update(data).digest('hex');
@@ -77,7 +78,7 @@ for (const release of releases) {
     assert.doesNotMatch(source, /<base\b/i, `${release.directory}/${name}: <base> breaks in-page skip links`);
     for (const [, target] of source.matchAll(/href="#([^"]+)"/g)) assert.ok(source.includes(`id="${target}"`), `${release.directory}/${name}: missing skip target #${target}`);
     const route = name.replace(/index\.html$/, '');
-    const canonical = `https://systembydave.com/${release.directory}/${route}`;
+    const canonical = `${originFor(`${release.directory}/`)}/${release.directory}/${route}`;
     assert.ok(source.includes(`href="${canonical}"`), `${release.directory}/${name}: ${canonical}`);
     assert.ok(!sitemap.includes(`<loc>${canonical}</loc>`));
     if (release.directory === 'fmp') {

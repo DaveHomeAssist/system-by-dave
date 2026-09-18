@@ -154,6 +154,8 @@ const HTML_SRCSET = /\ssrcset\s*=\s*(?:"([^"]*)"|'([^']*)')/gi;
 const HTML_STYLE_ATTR = /\sstyle\s*=\s*(?:"([^"]*)"|'([^']*)')/gi;
 const META_REFRESH = /<meta[^>]+http-equiv\s*=\s*["']refresh["'][^>]*content\s*=\s*["'][^"']*url\s*=\s*([^"'\s>]+)/gi;
 const SCRIPT_BLOCK = /<script\b([^>]*)>([\s\S]*?)<\/script\s*>/gi;
+const META_TAG = /<meta\b[^>]*>/gi;
+const SOURCE_URL = /https:\/\/(?:www\.)?systembydave\.com\/[^"'\\\s<>)]*/g;
 const STYLE_BLOCK = /<style\b[^>]*>([\s\S]*?)<\/style\s*>/gi;
 const CSS_URL = /url\(\s*(?:"([^"]*)"|'([^']*)'|([^)"'\s]+))\s*\)/gi;
 const CSS_IMPORT = /@import\s+(?:"([^"]+)"|'([^']+)')/gi;
@@ -189,7 +191,10 @@ function htmlRefs(text) {
         } catch {
           // An unparsable import map is the page's own bug; the browser rejects it too.
         }
-      } else if (!/\bsrc\s*=/i.test(attrs) && !/\btype\s*=\s*["'](?:application\/(?:ld\+)?json|text\/(?:template|plain))["']/i.test(attrs)) {
+      } else if (/\btype\s*=\s*["']application\/ld\+json["']/i.test(attrs)) {
+        // Structured data names canonical URLs; only systembydave.com ones matter here.
+        refs.push(...(body.match(SOURCE_URL) || []));
+      } else if (!/\bsrc\s*=/i.test(attrs) && !/\btype\s*=\s*["'](?:application\/json|text\/(?:template|plain))["']/i.test(attrs)) {
         inline.push(body);
       }
       return `<script${attrs}></script>`;
@@ -206,6 +211,12 @@ function htmlRefs(text) {
     }
   }
   for (const m of markup.matchAll(META_REFRESH)) refs.push(m[1]);
+  // og:url and twitter:url name the page's canonical address like rel=canonical does.
+  for (const [tag] of markup.matchAll(META_TAG)) {
+    if (!/(?:property|name)\s*=\s*["'](?:og:url|twitter:url)["']/i.test(tag)) continue;
+    const content = tag.match(/\scontent\s*=\s*(?:"([^"]*)"|'([^']*)')/i);
+    if (content) refs.push(content[1] ?? content[2]);
+  }
   for (const m of markup.matchAll(HTML_STYLE_ATTR)) refs.push(...cssRefs(m[1] ?? m[2]));
   for (const body of styles) refs.push(...cssRefs(body));
   for (const body of inline) refs.push(...jsRefs(body));
@@ -723,4 +734,6 @@ function main() {
   }
 }
 
-main();
+export { CONFIG_FILE, read, loadRegistry, siteEntries, routeFor };
+
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) main();
