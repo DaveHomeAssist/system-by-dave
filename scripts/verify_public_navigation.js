@@ -82,9 +82,11 @@ const FMP_SHELL_PAGES = [
   'fmp/camera/pit-stage-left/index.html',
   'fmp/house/index.html',
   'fmp/guide/index.html',
+  'fmp/gear/index.html',
+  'fmp/build/index.html',
+  'fmp/ptz/index.html',
   'fmp/rig/index.html',
-  'fmpwalk/index.html',
-  'fmp-index/index.html'
+  'fmpwalk/index.html'
 ];
 // Known FMP shell gaps, each to be fixed in DaveHomeAssist/fmpwalk. The export
 // that fixes a gap removes its entry in the same commit: an entry that no longer

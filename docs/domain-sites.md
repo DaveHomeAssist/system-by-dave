@@ -7,7 +7,7 @@ GitHub Pages repository.
 
 | Site id | Domain | Repository | Pages | Cutover |
 | --- | --- | --- | --- | --- |
-| `housevideo` | housevideo.app | `DaveHomeAssist/housevideo` | `/fmp/` and its routes, `/fmpwalk/`, `/fmp-index/`, `/fmp-walk/`, `/switcher/`, `/shader/`, `/backfocus/` | 2026-09-18 |
+| `housevideo` | housevideo.app | `DaveHomeAssist/housevideo` | `/fmp/` and its routes, `/fmpwalk/`, the `/fmp-index/` and `/fmp-walk/` redirects, `/switcher/`, `/shader/`, `/backfocus/` | 2026-09-18 |
 | `avbydave` | avbydave.com | `DaveHomeAssist/avbydave` | `av-suite.html`, every registry tool and offline page (including `plotforge.html`), `av-workbook.html`, `av-tool-suite/` | 2026-09-18 |
 
 `scripts/domain-sites.json` owns this list, each site's home route, robots rules

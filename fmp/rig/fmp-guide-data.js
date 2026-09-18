@@ -32,8 +32,8 @@ export const catalog = {
     "photo": "body-controls",
     "source": "https://www.blackmagicdesign.com/products/blackmagicursabroadcast/design",
     "sourceLabel": "Camera design reference",
-    "equipmentSource": "https://app.notion.com/p/3cf255fc8f4481828900fab47d08adf7",
-    "equipmentSourceLabel": "FMP gear record",
+    "equipmentSource": "/fmp/gear/#g2",
+    "equipmentSourceLabel": "Camera equipment · body",
     "evidence": "Broadcast G2 identification follows Dave’s correction. The supplied product reference supports control layout; it does not inspect every house body.",
     "lcdOpening": 0
   },
@@ -50,8 +50,8 @@ export const catalog = {
     "photo": "camera",
     "source": "https://www.blackmagicdesign.com/products/blackmagicursabroadcast/design",
     "sourceLabel": "Camera design reference",
-    "equipmentSource": "https://app.notion.com/p/3cf255fc8f4481828900fab47d08adf7",
-    "equipmentSourceLabel": "FMP gear record"
+    "equipmentSource": "/fmp/gear/#g2",
+    "equipmentSourceLabel": "Camera equipment · body"
   },
   "lcd": {
     "title": "Onboard flip-out LCD assembly",
@@ -66,8 +66,8 @@ export const catalog = {
     "photo": "lcd-closed",
     "source": "https://www.blackmagicdesign.com/products/blackmagicursabroadcast/design",
     "sourceLabel": "Camera design reference",
-    "equipmentSource": "https://app.notion.com/p/3cf255fc8f4481828900fab47d08adf7",
-    "equipmentSourceLabel": "FMP gear record",
+    "equipmentSource": "/fmp/gear/#g2",
+    "equipmentSourceLabel": "Camera equipment · body",
     "photoNote": "Your supplied closed-door reference establishes the outer controls and lens-side hinge. Inner touchscreen layout follows Blackmagic’s monitor reference.",
     "lcdOpening": 90
   },
@@ -84,8 +84,8 @@ export const catalog = {
     "photo": "camera",
     "source": "https://www.blackmagicdesign.com/products/blackmagicursabroadcast/design",
     "sourceLabel": "Camera design reference",
-    "equipmentSource": "https://app.notion.com/p/3cf255fc8f4481828900fab47d08adf7",
-    "equipmentSourceLabel": "FMP gear record"
+    "equipmentSource": "/fmp/gear/#g2",
+    "equipmentSourceLabel": "Camera equipment · body"
   },
   "hood": {
     "title": "Lens hood",
@@ -100,8 +100,8 @@ export const catalog = {
     "photo": "lens",
     "source": "",
     "sourceLabel": "",
-    "equipmentSource": "https://app.notion.com/p/3cf255fc8f44818681c8f71323201534",
-    "equipmentSourceLabel": "FMP gear record"
+    "equipmentSource": "/fmp/gear/#lens",
+    "equipmentSourceLabel": "Camera equipment · lens"
   },
   "focus": {
     "title": "Focus ring",
@@ -116,8 +116,8 @@ export const catalog = {
     "photo": "rings",
     "source": "https://documents.blackmagicdesign.com/UserManuals/BlackmagicURSABroadcastG2Manual.pdf#page=13",
     "sourceLabel": "Lens control reference",
-    "equipmentSource": "https://app.notion.com/p/3cf255fc8f44818681c8f71323201534",
-    "equipmentSourceLabel": "FMP gear record"
+    "equipmentSource": "/fmp/gear/#lens",
+    "equipmentSourceLabel": "Camera equipment · lens"
   },
   "zoom": {
     "title": "Zoom ring and lever",
@@ -132,8 +132,8 @@ export const catalog = {
     "photo": "rings",
     "source": "https://documents.blackmagicdesign.com/UserManuals/BlackmagicURSABroadcastG2Manual.pdf#page=13",
     "sourceLabel": "Lens control reference",
-    "equipmentSource": "https://app.notion.com/p/3cf255fc8f44818681c8f71323201534",
-    "equipmentSourceLabel": "FMP gear record"
+    "equipmentSource": "/fmp/gear/#lens",
+    "equipmentSourceLabel": "Camera equipment · lens"
   },
   "iris": {
     "title": "Iris ring",
@@ -148,8 +148,8 @@ export const catalog = {
     "photo": "rings",
     "source": "https://documents.blackmagicdesign.com/UserManuals/BlackmagicURSABroadcastG2Manual.pdf#page=13",
     "sourceLabel": "Lens control reference",
-    "equipmentSource": "https://app.notion.com/p/3cf255fc8f44818681c8f71323201534",
-    "equipmentSourceLabel": "FMP gear record"
+    "equipmentSource": "/fmp/gear/#lens",
+    "equipmentSourceLabel": "Camera equipment · lens"
   },
   "focus-module": {
     "title": "Fujinon FMM-X1 manual focus module",
@@ -164,8 +164,8 @@ export const catalog = {
     "photo": "lens",
     "source": "https://www.fujinon.com/fujinon-product-guide/",
     "sourceLabel": "Fujinon product guide",
-    "equipmentSource": "https://app.notion.com/p/3cf255fc8f44818681c8f71323201534",
-    "equipmentSourceLabel": "FMP gear record",
+    "equipmentSource": "/fmp/gear/#lens",
+    "equipmentSourceLabel": "Camera equipment · lens",
     "evidence": "The Notion lens row calls this a servo. Its photographed FMM-X1 marking, your twist-focus description and Fujinon’s manual-focus system distinguish the mechanism."
   },
   "focus-cable": {
@@ -181,8 +181,8 @@ export const catalog = {
     "photo": "lens",
     "source": "https://www.fujifilm.com/bo/en/business/cine-and-broadcast/portablelens/accessories/control",
     "sourceLabel": "Fujinon manual-focus system",
-    "equipmentSource": "https://app.notion.com/p/3cf255fc8f44818681c8f71323201534",
-    "equipmentSourceLabel": "FMP gear record"
+    "equipmentSource": "/fmp/gear/#lens",
+    "equipmentSourceLabel": "Camera equipment · lens"
   },
   "rocker": {
     "title": "T / W zoom rocker",
@@ -197,8 +197,8 @@ export const catalog = {
     "photo": "grip",
     "source": "https://documents.blackmagicdesign.com/UserManuals/BlackmagicURSABroadcastG2Manual.pdf#page=13",
     "sourceLabel": "Lens controls · manual pp. 13–17",
-    "equipmentSource": "https://app.notion.com/p/3cf255fc8f44818681c8f71323201534",
-    "equipmentSourceLabel": "FMP gear record"
+    "equipmentSource": "/fmp/gear/#lens",
+    "equipmentSourceLabel": "Camera equipment · lens"
   },
   "iris-mode": {
     "title": "Iris A / M selector",
@@ -213,8 +213,8 @@ export const catalog = {
     "photo": "grip",
     "source": "https://documents.blackmagicdesign.com/UserManuals/BlackmagicURSABroadcastG2Manual.pdf#page=13",
     "sourceLabel": "Lens controls · manual pp. 13–17",
-    "equipmentSource": "https://app.notion.com/p/3cf255fc8f44818681c8f71323201534",
-    "equipmentSourceLabel": "FMP gear record"
+    "equipmentSource": "/fmp/gear/#lens",
+    "equipmentSourceLabel": "Camera equipment · lens"
   },
   "push-auto": {
     "title": "PUSH AUTO",
@@ -229,8 +229,8 @@ export const catalog = {
     "photo": "grip",
     "source": "https://documents.blackmagicdesign.com/UserManuals/BlackmagicURSABroadcastG2Manual.pdf#page=13",
     "sourceLabel": "Lens controls · manual pp. 13–17",
-    "equipmentSource": "https://app.notion.com/p/3cf255fc8f44818681c8f71323201534",
-    "equipmentSourceLabel": "FMP gear record"
+    "equipmentSource": "/fmp/gear/#lens",
+    "equipmentSourceLabel": "Camera equipment · lens"
   },
   "ret": {
     "title": "RET button",
@@ -245,8 +245,8 @@ export const catalog = {
     "photo": "grip",
     "source": "https://documents.blackmagicdesign.com/UserManuals/BlackmagicURSABroadcastG2Manual.pdf#page=13",
     "sourceLabel": "Lens controls · manual pp. 13–17",
-    "equipmentSource": "https://app.notion.com/p/3cf255fc8f44818681c8f71323201534",
-    "equipmentSourceLabel": "FMP gear record"
+    "equipmentSource": "/fmp/gear/#lens",
+    "equipmentSourceLabel": "Camera equipment · lens"
   },
   "zoom-mode": {
     "title": "Zoom MANUAL / SERVO selector",
@@ -261,8 +261,8 @@ export const catalog = {
     "photo": "underside",
     "source": "https://documents.blackmagicdesign.com/UserManuals/BlackmagicURSABroadcastG2Manual.pdf#page=14",
     "sourceLabel": "Zoom modes · manual p. 14",
-    "equipmentSource": "https://app.notion.com/p/3cf255fc8f44818681c8f71323201534",
-    "equipmentSourceLabel": "FMP gear record"
+    "equipmentSource": "/fmp/gear/#lens",
+    "equipmentSourceLabel": "Camera equipment · lens"
   },
   "back-focus": {
     "equipment": "rig",
@@ -277,8 +277,8 @@ export const catalog = {
     "tip": "Use the normal focus control during the two focus steps. Manage any external focus controller before starting; the linked FMP guide covers preparation and verification.",
     "source": "https://documents.blackmagicdesign.com/UserManuals/BlackmagicURSABroadcastG2Manual.pdf#page=17",
     "sourceLabel": "LA16 back focus · manual p. 17",
-    "equipmentSource": "https://app.notion.com/p/3db255fc8f448091abdbd520fa0e2508",
-    "equipmentSourceLabel": "FMP back-focus field guide"
+    "equipmentSource": "/backfocus/",
+    "equipmentSourceLabel": "Back focus field guide"
   },
   "front-sdi": {
     "title": "Front SDI OUT",
@@ -293,8 +293,8 @@ export const catalog = {
     "photo": "front",
     "source": "https://documents.blackmagicdesign.com/UserManuals/BlackmagicURSABroadcastG2Manual.pdf#page=56",
     "sourceLabel": "Front connections · manual p. 56",
-    "equipmentSource": "https://app.notion.com/p/3cf255fc8f4481828900fab47d08adf7",
-    "equipmentSourceLabel": "FMP gear record"
+    "equipmentSource": "/fmp/gear/#g2",
+    "equipmentSourceLabel": "Camera equipment · body"
   },
   "accessory-power": {
     "title": "+12V OUT",
@@ -309,8 +309,8 @@ export const catalog = {
     "photo": "front",
     "source": "https://documents.blackmagicdesign.com/UserManuals/BlackmagicURSABroadcastG2Manual.pdf#page=56",
     "sourceLabel": "Front connections · manual p. 56",
-    "equipmentSource": "https://app.notion.com/p/3cf255fc8f4481828900fab47d08adf7",
-    "equipmentSourceLabel": "FMP gear record"
+    "equipmentSource": "/fmp/gear/#g2",
+    "equipmentSourceLabel": "Camera equipment · body"
   },
   "lanc": {
     "title": "LANC jack",
@@ -325,8 +325,8 @@ export const catalog = {
     "photo": "front",
     "source": "https://documents.blackmagicdesign.com/UserManuals/BlackmagicURSABroadcastG2Manual.pdf#page=56",
     "sourceLabel": "Front connections · manual p. 56",
-    "equipmentSource": "https://app.notion.com/p/3cf255fc8f4481828900fab47d08adf7",
-    "equipmentSourceLabel": "FMP gear record"
+    "equipmentSource": "/fmp/gear/#g2",
+    "equipmentSourceLabel": "Camera equipment · body"
   },
   "lens-control": {
     "title": "Broadcast lens connection",
@@ -341,8 +341,8 @@ export const catalog = {
     "photo": "front",
     "source": "https://documents.blackmagicdesign.com/UserManuals/BlackmagicURSABroadcastG2Manual.pdf#page=56",
     "sourceLabel": "Front connections · manual p. 56",
-    "equipmentSource": "https://app.notion.com/p/3cf255fc8f4481828900fab47d08adf7",
-    "equipmentSourceLabel": "FMP gear record"
+    "equipmentSource": "/fmp/gear/#g2",
+    "equipmentSourceLabel": "Camera equipment · body"
   },
   "rear-sdi-out": {
     "title": "Rear SDI OUT",
@@ -357,8 +357,8 @@ export const catalog = {
     "photo": "rear",
     "source": "https://documents.blackmagicdesign.com/UserManuals/BlackmagicURSABroadcastG2Manual.pdf#page=57",
     "sourceLabel": "Rear connections · manual pp. 57–58",
-    "equipmentSource": "https://app.notion.com/p/3cf255fc8f4481828900fab47d08adf7",
-    "equipmentSourceLabel": "FMP gear record"
+    "equipmentSource": "/fmp/gear/#g2",
+    "equipmentSourceLabel": "Camera equipment · body"
   },
   "rear-sdi-in": {
     "title": "Rear SDI IN",
@@ -373,8 +373,8 @@ export const catalog = {
     "photo": "rear",
     "source": "https://documents.blackmagicdesign.com/UserManuals/BlackmagicURSABroadcastG2Manual.pdf#page=57",
     "sourceLabel": "Rear connections · manual pp. 57–58",
-    "equipmentSource": "https://app.notion.com/p/3cf255fc8f4481828900fab47d08adf7",
-    "equipmentSourceLabel": "FMP gear record"
+    "equipmentSource": "/fmp/gear/#g2",
+    "equipmentSourceLabel": "Camera equipment · body"
   },
   "reference": {
     "title": "REF IN / TC IN",
@@ -389,8 +389,8 @@ export const catalog = {
     "photo": "rear",
     "source": "https://documents.blackmagicdesign.com/UserManuals/BlackmagicURSABroadcastG2Manual.pdf#page=57",
     "sourceLabel": "Rear connections · manual pp. 57–58",
-    "equipmentSource": "https://app.notion.com/p/3cf255fc8f4481828900fab47d08adf7",
-    "equipmentSourceLabel": "FMP gear record"
+    "equipmentSource": "/fmp/gear/#g2",
+    "equipmentSourceLabel": "Camera equipment · body"
   },
   "dc-in": {
     "title": "DC power input",
@@ -405,8 +405,8 @@ export const catalog = {
     "photo": "rear",
     "source": "https://documents.blackmagicdesign.com/UserManuals/BlackmagicURSABroadcastG2Manual.pdf#page=57",
     "sourceLabel": "Rear connections · manual pp. 57–58",
-    "equipmentSource": "https://app.notion.com/p/3cf255fc8f4481828900fab47d08adf7",
-    "equipmentSourceLabel": "FMP gear record"
+    "equipmentSource": "/fmp/gear/#g2",
+    "equipmentSourceLabel": "Camera equipment · body"
   },
   "headset": {
     "title": "Headphone / headset jack",
@@ -421,8 +421,8 @@ export const catalog = {
     "photo": "rear",
     "source": "https://documents.blackmagicdesign.com/UserManuals/BlackmagicURSABroadcastG2Manual.pdf#page=57",
     "sourceLabel": "Rear connections · manual pp. 57–58",
-    "equipmentSource": "https://app.notion.com/p/3cf255fc8f4481828900fab47d08adf7",
-    "equipmentSourceLabel": "FMP gear record"
+    "equipmentSource": "/fmp/gear/#g2",
+    "equipmentSourceLabel": "Camera equipment · body"
   },
   "usb": {
     "title": "Rear USB-C",
@@ -437,8 +437,8 @@ export const catalog = {
     "photo": "rear",
     "source": "https://documents.blackmagicdesign.com/UserManuals/BlackmagicURSABroadcastG2Manual.pdf#page=57",
     "sourceLabel": "Rear connections · manual pp. 57–58",
-    "equipmentSource": "https://app.notion.com/p/3cf255fc8f4481828900fab47d08adf7",
-    "equipmentSourceLabel": "FMP gear record"
+    "equipmentSource": "/fmp/gear/#g2",
+    "equipmentSourceLabel": "Camera equipment · body"
   },
   "camera-fiber": {
     "title": "Blackmagic Camera Fiber Converter",
@@ -453,8 +453,8 @@ export const catalog = {
     "category": "Camera",
     "pose": "fiber-rear",
     "photo": "fiber",
-    "equipmentSource": "https://app.notion.com/p/3cf255fc8f4481ad9406e65054a2d00a",
-    "equipmentSourceLabel": "FMP gear record",
+    "equipmentSource": "/fmp/gear/#camera-converter",
+    "equipmentSourceLabel": "Camera equipment · camera fiber",
     "evidence": "You identified this as the actual converter type. The product views establish its layout; they do not establish serial numbers, live connectivity or the fitted status of every inventory unit.",
     "photoNote": "Your supplied Camera Fiber Converter product reference. Geometry is approximate; indicator lights are not live status."
   },
@@ -471,8 +471,8 @@ export const catalog = {
     "tip": "The model label is confirmed by IMG_4659.",
     "source": "https://www.fujifilm.com/us/en/business/cine-and-broadcast/portable-lens/4k-portable-lens",
     "sourceLabel": "Fujinon specifications",
-    "equipmentSource": "https://app.notion.com/p/3cf255fc8f44818681c8f71323201534",
-    "equipmentSourceLabel": "FMP gear record"
+    "equipmentSource": "/fmp/gear/#lens",
+    "equipmentSourceLabel": "Camera equipment · lens"
   },
   "lens-barrel": {
     "equipment": "rig",
@@ -487,8 +487,8 @@ export const catalog = {
     "tip": "The barrel plate establishes this model for the photographed lens.",
     "source": "https://www.fujifilm.com/us/en/business/cine-and-broadcast/portable-lens/4k-portable-lens",
     "sourceLabel": "Fujinon specifications",
-    "equipmentSource": "https://app.notion.com/p/3cf255fc8f44818681c8f71323201534",
-    "equipmentSourceLabel": "FMP gear record",
+    "equipmentSource": "/fmp/gear/#lens",
+    "equipmentSourceLabel": "Camera equipment · lens",
     "evidence": "FMP gear record: one of the two 16× barrels was read. The photo is not tied to a camera position; the second barrel and the separate 22× FOH lens are not identified by this model."
   },
   "studio-audio": {
@@ -504,8 +504,8 @@ export const catalog = {
     "photo": "panel",
     "source": "https://www.blackmagicdesign.com/products/blackmagicfiberconverters",
     "sourceLabel": "Fiber converter connections",
-    "equipmentSource": "https://app.notion.com/p/3cf255fc8f448171ad06d754e09c8051",
-    "equipmentSourceLabel": "FMP gear record"
+    "equipmentSource": "/fmp/gear/#studio-converter",
+    "equipmentSourceLabel": "Camera equipment · rack fiber"
   },
   "studio-ac": {
     "title": "AC input",
@@ -520,8 +520,8 @@ export const catalog = {
     "photo": "panel",
     "source": "https://www.blackmagicdesign.com/products/blackmagicfiberconverters",
     "sourceLabel": "Fiber converter connections",
-    "equipmentSource": "https://app.notion.com/p/3cf255fc8f448171ad06d754e09c8051",
-    "equipmentSourceLabel": "FMP gear record"
+    "equipmentSource": "/fmp/gear/#studio-converter",
+    "equipmentSourceLabel": "Camera equipment · rack fiber"
   },
   "studio-intercom": {
     "title": "Intercom / tally",
@@ -536,8 +536,8 @@ export const catalog = {
     "photo": "panel",
     "source": "https://www.blackmagicdesign.com/products/blackmagicfiberconverters",
     "sourceLabel": "Fiber converter connections",
-    "equipmentSource": "https://app.notion.com/p/3cf255fc8f448171ad06d754e09c8051",
-    "equipmentSourceLabel": "FMP gear record"
+    "equipmentSource": "/fmp/gear/#studio-converter",
+    "equipmentSourceLabel": "Camera equipment · rack fiber"
   },
   "studio-ptz": {
     "title": "PTZ connection",
@@ -552,8 +552,8 @@ export const catalog = {
     "photo": "panel",
     "source": "https://www.blackmagicdesign.com/products/blackmagicfiberconverters",
     "sourceLabel": "Fiber converter connections",
-    "equipmentSource": "https://app.notion.com/p/3cf255fc8f448171ad06d754e09c8051",
-    "equipmentSourceLabel": "FMP gear record"
+    "equipmentSource": "/fmp/gear/#studio-converter",
+    "equipmentSourceLabel": "Camera equipment · rack fiber"
   },
   "studio-optical": {
     "title": "Optical I/O",
@@ -568,8 +568,8 @@ export const catalog = {
     "category": "Rear panel",
     "pose": "studio-rear",
     "photo": "panel",
-    "equipmentSource": "https://app.notion.com/p/3cf255fc8f448171ad06d754e09c8051",
-    "equipmentSourceLabel": "FMP gear record"
+    "equipmentSource": "/fmp/gear/#studio-converter",
+    "equipmentSourceLabel": "Camera equipment · rack fiber"
   },
   "studio-ethernet": {
     "title": "Ethernet jack",
@@ -584,8 +584,8 @@ export const catalog = {
     "photo": "panel",
     "source": "https://www.blackmagicdesign.com/products/blackmagicfiberconverters",
     "sourceLabel": "Fiber converter connections",
-    "equipmentSource": "https://app.notion.com/p/3cf255fc8f448171ad06d754e09c8051",
-    "equipmentSourceLabel": "FMP gear record"
+    "equipmentSource": "/fmp/gear/#studio-converter",
+    "equipmentSourceLabel": "Camera equipment · rack fiber"
   },
   "studio-out": {
     "title": "12G-SDI outputs 1–2",
@@ -600,8 +600,8 @@ export const catalog = {
     "photo": "panel",
     "source": "https://www.blackmagicdesign.com/products/blackmagicfiberconverters",
     "sourceLabel": "Fiber converter connections",
-    "equipmentSource": "https://app.notion.com/p/3cf255fc8f448171ad06d754e09c8051",
-    "equipmentSourceLabel": "FMP gear record",
+    "equipmentSource": "/fmp/gear/#studio-converter",
+    "equipmentSourceLabel": "Camera equipment · rack fiber",
     "evidence": "In the supplied rear photo, OUT 2 is cabled and OUT 1 is empty. Port geometry here is shown clear for identification."
   },
   "studio-returns": {
@@ -617,8 +617,8 @@ export const catalog = {
     "category": "Rear panel",
     "pose": "studio-rear",
     "photo": "panel",
-    "equipmentSource": "https://app.notion.com/p/3cf255fc8f448171ad06d754e09c8051",
-    "equipmentSourceLabel": "FMP gear record",
+    "equipmentSource": "/fmp/gear/#studio-converter",
+    "equipmentSourceLabel": "Camera equipment · rack fiber",
     "evidence": "In the supplied rear photo, RETURN IN 1 is cabled and 2–3 are empty. That establishes connector occupancy, not which services were active."
   },
   "studio-ref": {
@@ -634,8 +634,8 @@ export const catalog = {
     "photo": "panel",
     "source": "https://www.blackmagicdesign.com/products/blackmagicfiberconverters",
     "sourceLabel": "Fiber converter connections",
-    "equipmentSource": "https://app.notion.com/p/3cf255fc8f448171ad06d754e09c8051",
-    "equipmentSourceLabel": "FMP gear record"
+    "equipmentSource": "/fmp/gear/#studio-converter",
+    "equipmentSourceLabel": "Camera equipment · rack fiber"
   },
   "studio-body": {
     "equipment": "studio",
@@ -650,8 +650,8 @@ export const catalog = {
     "tip": "The front is rebuilt from your latest product image. Enclosure proportions follow Blackmagic’s dimension drawing; the rear I/O remains available from Rear panel.",
     "source": "https://www.blackmagicdesign.com/products/blackmagicfiberconverters",
     "sourceLabel": "Blackmagic fiber converters",
-    "equipmentSource": "https://app.notion.com/p/3cf255fc8f448171ad06d754e09c8051",
-    "equipmentSourceLabel": "FMP gear record",
+    "equipmentSource": "/fmp/gear/#studio-converter",
+    "equipmentSourceLabel": "Camera equipment · rack fiber",
     "evidence": "FMP inventory: three rack-end CINEURSANWFRSTUD units and no rack-end spare. Your rear and front references establish both panel layouts."
   },
   "fluid-head": {
@@ -758,8 +758,8 @@ export const catalog = {
     "title": "Return selectors and RET buttons",
     "pose": "fiber-rear",
     "photo": "fiber-rear",
-    "equipmentSource": "https://app.notion.com/p/3cf255fc8f4481ad9406e65054a2d00a",
-    "equipmentSourceLabel": "FMP converter record",
+    "equipmentSource": "/fmp/gear/#camera-converter",
+    "equipmentSourceLabel": "Camera equipment · camera fiber",
     "source": "https://documents.blackmagicdesign.com/UserManuals/BlackmagicURSABroadcastG2Manual.pdf#page=195",
     "sourceLabel": "Converter manual · p. 195",
     "photoNote": "Supplied product reference · approximate 3D geometry and cable routing.",
@@ -775,8 +775,8 @@ export const catalog = {
     "title": "Side RET 1, RET 2 and CALL buttons",
     "pose": "fiber-operator",
     "photo": "fiber-operator",
-    "equipmentSource": "https://app.notion.com/p/3cf255fc8f4481ad9406e65054a2d00a",
-    "equipmentSourceLabel": "FMP converter record",
+    "equipmentSource": "/fmp/gear/#camera-converter",
+    "equipmentSourceLabel": "Camera equipment · camera fiber",
     "source": "https://documents.blackmagicdesign.com/UserManuals/BlackmagicURSABroadcastG2Manual.pdf#page=195",
     "sourceLabel": "Converter manual · p. 195",
     "photoNote": "Supplied product reference · approximate 3D geometry and cable routing.",
@@ -792,8 +792,8 @@ export const catalog = {
     "title": "LIGHT, FOCUS, REC and IRIS controls",
     "pose": "fiber-rear",
     "photo": "fiber-rear",
-    "equipmentSource": "https://app.notion.com/p/3cf255fc8f4481ad9406e65054a2d00a",
-    "equipmentSourceLabel": "FMP converter record",
+    "equipmentSource": "/fmp/gear/#camera-converter",
+    "equipmentSourceLabel": "Camera equipment · camera fiber",
     "source": "https://documents.blackmagicdesign.com/UserManuals/BlackmagicURSABroadcastG2Manual.pdf#page=200",
     "sourceLabel": "Converter manual · p. 200",
     "photoNote": "Supplied product reference · approximate 3D geometry and cable routing.",
@@ -809,8 +809,8 @@ export const catalog = {
     "title": "Two intercom mixes and headset sockets",
     "pose": "fiber-rear",
     "photo": "fiber-rear",
-    "equipmentSource": "https://app.notion.com/p/3cf255fc8f4481ad9406e65054a2d00a",
-    "equipmentSourceLabel": "FMP converter record",
+    "equipmentSource": "/fmp/gear/#camera-converter",
+    "equipmentSourceLabel": "Camera equipment · camera fiber",
     "source": "https://documents.blackmagicdesign.com/UserManuals/BlackmagicURSABroadcastG2Manual.pdf#page=196",
     "sourceLabel": "Converter manual · p. 196",
     "photoNote": "Supplied product reference · approximate 3D geometry and cable routing.",
@@ -826,8 +826,8 @@ export const catalog = {
     "title": "Two XLR audio inputs and input switches",
     "pose": "fiber-rear",
     "photo": "fiber-rear",
-    "equipmentSource": "https://app.notion.com/p/3cf255fc8f4481ad9406e65054a2d00a",
-    "equipmentSourceLabel": "FMP converter record",
+    "equipmentSource": "/fmp/gear/#camera-converter",
+    "equipmentSourceLabel": "Camera equipment · camera fiber",
     "source": "https://documents.blackmagicdesign.com/UserManuals/BlackmagicURSABroadcastG2Manual.pdf#page=198",
     "sourceLabel": "Converter manual · p. 198",
     "photoNote": "Supplied product reference · approximate 3D geometry and cable routing.",
@@ -843,8 +843,8 @@ export const catalog = {
     "title": "Three SDI return loop outputs",
     "pose": "fiber-rear",
     "photo": "fiber-rear",
-    "equipmentSource": "https://app.notion.com/p/3cf255fc8f4481ad9406e65054a2d00a",
-    "equipmentSourceLabel": "FMP converter record",
+    "equipmentSource": "/fmp/gear/#camera-converter",
+    "equipmentSourceLabel": "Camera equipment · camera fiber",
     "source": "https://documents.blackmagicdesign.com/UserManuals/BlackmagicURSABroadcastG2Manual.pdf#page=191",
     "sourceLabel": "Converter manual · p. 191",
     "photoNote": "Supplied product reference · approximate 3D geometry and cable routing.",
@@ -860,8 +860,8 @@ export const catalog = {
     "title": "Accessory, service and covered utility ports",
     "pose": "fiber-operator",
     "photo": "fiber-operator",
-    "equipmentSource": "https://app.notion.com/p/3cf255fc8f4481ad9406e65054a2d00a",
-    "equipmentSourceLabel": "FMP converter record",
+    "equipmentSource": "/fmp/gear/#camera-converter",
+    "equipmentSourceLabel": "Camera equipment · camera fiber",
     "source": "https://documents.blackmagicdesign.com/UserManuals/BlackmagicURSABroadcastG2Manual.pdf#page=209",
     "sourceLabel": "Converter manual · p. 209",
     "photoNote": "Supplied product reference · approximate 3D geometry and cable routing.",
@@ -877,8 +877,8 @@ export const catalog = {
     "title": "Side SDI IN, SDI OUT and REF OUT",
     "pose": "fiber-side",
     "photo": "fiber-side",
-    "equipmentSource": "https://app.notion.com/p/3cf255fc8f4481ad9406e65054a2d00a",
-    "equipmentSourceLabel": "FMP converter record",
+    "equipmentSource": "/fmp/gear/#camera-converter",
+    "equipmentSourceLabel": "Camera equipment · camera fiber",
     "source": "https://documents.blackmagicdesign.com/UserManuals/BlackmagicURSABroadcastG2Manual.pdf#page=191",
     "sourceLabel": "Converter manual · p. 191",
     "photoNote": "Supplied product reference · approximate 3D geometry and cable routing.",
@@ -894,8 +894,8 @@ export const catalog = {
     "title": "Rotating hybrid fiber connector and cable",
     "pose": "fiber-side",
     "photo": "fiber-side",
-    "equipmentSource": "https://app.notion.com/p/3cf255fc8f4481ad9406e65054a2d00a",
-    "equipmentSourceLabel": "FMP converter record",
+    "equipmentSource": "/fmp/gear/#camera-converter",
+    "equipmentSourceLabel": "Camera equipment · camera fiber",
     "source": "https://documents.blackmagicdesign.com/UserManuals/BlackmagicURSABroadcastG2Manual.pdf#page=190",
     "sourceLabel": "Converter manual · p. 190",
     "photoNote": "Supplied product reference · approximate 3D geometry and cable routing.",
@@ -911,8 +911,8 @@ export const catalog = {
     "title": "Studio LCD monitor",
     "pose": "studio-front",
     "photo": "studio-front",
-    "equipmentSource": "https://app.notion.com/p/3cf255fc8f448171ad06d754e09c8051",
-    "equipmentSourceLabel": "FMP studio-converter record",
+    "equipmentSource": "/fmp/gear/#studio-converter",
+    "equipmentSourceLabel": "Camera equipment · rack fiber",
     "source": "https://documents.blackmagicdesign.com/UserManuals/BlackmagicURSABroadcastG2Manual.pdf#page=201",
     "sourceLabel": "Studio converter manual · p. 201",
     "photoNote": "Your supplied studio-converter front view. The 3D LCD is unlit; no live picture or status is simulated.",
@@ -928,8 +928,8 @@ export const catalog = {
     "title": "MENU, SET and source-selection buttons",
     "pose": "studio-front",
     "photo": "studio-front",
-    "equipmentSource": "https://app.notion.com/p/3cf255fc8f448171ad06d754e09c8051",
-    "equipmentSourceLabel": "FMP studio-converter record",
+    "equipmentSource": "/fmp/gear/#studio-converter",
+    "equipmentSourceLabel": "Camera equipment · rack fiber",
     "source": "https://documents.blackmagicdesign.com/UserManuals/BlackmagicURSABroadcastG2Manual.pdf#page=202",
     "sourceLabel": "Studio converter manual · p. 202",
     "photoNote": "Your supplied studio-converter front view. The 3D LCD is unlit; no live picture or status is simulated.",
@@ -945,8 +945,8 @@ export const catalog = {
     "title": "Front SMPTE hybrid fiber socket",
     "pose": "studio-front",
     "photo": "studio-front",
-    "equipmentSource": "https://app.notion.com/p/3cf255fc8f448171ad06d754e09c8051",
-    "equipmentSourceLabel": "FMP studio-converter record",
+    "equipmentSource": "/fmp/gear/#studio-converter",
+    "equipmentSourceLabel": "Camera equipment · rack fiber",
     "source": "https://documents.blackmagicdesign.com/UserManuals/BlackmagicURSABroadcastG2Manual.pdf#page=189",
     "sourceLabel": "Studio converter manual · p. 189",
     "photoNote": "Your supplied studio-converter front view. The 3D LCD is unlit; no live picture or status is simulated.",
@@ -962,8 +962,8 @@ export const catalog = {
     "title": "Studio power switch",
     "pose": "studio-front",
     "photo": "studio-front",
-    "equipmentSource": "https://app.notion.com/p/3cf255fc8f448171ad06d754e09c8051",
-    "equipmentSourceLabel": "FMP studio-converter record",
+    "equipmentSource": "/fmp/gear/#studio-converter",
+    "equipmentSourceLabel": "Camera equipment · rack fiber",
     "source": "https://documents.blackmagicdesign.com/UserManuals/BlackmagicURSABroadcastG2Manual.pdf#page=189",
     "sourceLabel": "Studio converter manual · p. 189",
     "photoNote": "Your supplied studio-converter front view. The 3D LCD is unlit; no live picture or status is simulated.",
@@ -979,8 +979,8 @@ export const catalog = {
     "title": "Front USB-C service port and cover",
     "pose": "studio-front",
     "photo": "studio-front",
-    "equipmentSource": "https://app.notion.com/p/3cf255fc8f448171ad06d754e09c8051",
-    "equipmentSourceLabel": "FMP studio-converter record",
+    "equipmentSource": "/fmp/gear/#studio-converter",
+    "equipmentSourceLabel": "Camera equipment · rack fiber",
     "source": "https://www.blackmagicdesign.com/products/blackmagicfiberconverters/techspecs",
     "sourceLabel": "Blackmagic converter specifications",
     "photoNote": "Your supplied studio-converter front view. The 3D LCD is unlit; no live picture or status is simulated.",

@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en" data-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Camera Build &amp; Strike | FMP | System by Dave</title><meta name="description" content="How an FMP house camera operator builds, proves, holds and strikes a position: assignment, safe build, signal path, Clear-Com comms, commissioning, the show-ready gate and troubleshooting order."><meta name="theme-color" content="#f4f6f8"><meta name="robots" content="noindex, nofollow">
+<link rel="canonical" href="https://housevideo.app/fmp/build/"><meta property="og:type" content="website"><meta property="og:site_name" content="System by Dave"><meta property="og:title" content="Camera Build &amp; Strike | FMP | System by Dave"><meta property="og:description" content="Build, prove, hold and strike an FMP house camera position."><meta property="og:url" content="https://housevideo.app/fmp/build/"><meta property="og:image" content="https://systembydave.com/img/card-cover-banner-wide.png"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Camera Build &amp; Strike | FMP | System by Dave"><meta name="twitter:description" content="Build, prove, hold and strike an FMP house camera position."><meta name="twitter:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<script src="../theme.js?v=d4c1024bbd62d45a"></script><link rel="stylesheet" href="../house/house.css?v=f429823db69552ae"><link rel="stylesheet" href="../ref.css?v=2d9b441dad74f859"><script src="../ref.js?v=6857c5c998216e1c" type="module"></script></head>
+<body>
+<a class="skip" href="#main">Skip to camera build and strike</a>
+<header class="top"><nav aria-label="Breadcrumb"><a href="https://systembydave.com/">System by Dave</a><span>/</span><a href="/fmp/">FMP Video Operations</a><span>/</span><span aria-current="page">Camera build &amp; strike</span></nav><button id="theme" data-theme-toggle type="button" aria-pressed="false">Dark mode</button></header>
+<main id="main" tabindex="-1">
+<header class="mast"><div><p class="eyebrow">Freedom Mortgage Pavilion · Cameras 1–3</p><h1>Camera build &amp; strike<span>.</span></h1><p class="intro">Build it safely, prove every path, hold the shot, and strike it clean. Yesterday's setup is not proof of tonight's routing.</p></div><div class="record"><strong>OPERATING REFERENCE</strong><span>Drafted September 12 · field capture September 14</span><span>Compiled · September 18, 2026</span><b>Field checks open</b></div></header>
+<nav class="tabs" aria-label="Camera build and strike sections"><a href="#rules" aria-current="page">01 <span>Rules</span></a><a href="#build">02 <span>Build</span></a><a href="#prove">03 <span>Prove</span></a><a href="#ready">04 <span>Show-ready</span></a><a href="#troubleshoot">05 <span>Troubleshoot</span></a><a href="#strike">06 <span>Strike</span></a></nav>
+
+<section id="rules" class="panel" aria-labelledby="rules-title"><div class="section-head"><div><p class="eyebrow">01 / Before you touch it</p><h2 id="rules-title">Confirm it tonight.</h2></div><a class="action" href="../camera/">Open camera check-in →</a></div>
+<p class="lede">On every call, confirm with the director or TD the camera number, position, signal path, format, return feed, tally, comms channel and who owns shading. The camera check-in records the same checks; this page explains them.</p>
+<div class="split"><div class="stack">
+<article class="sheet"><div class="sheet-head"><h3>House camera map</h3><span class="stamp">Convention stated September 12, 2026</span></div>
+<div class="table-scroll"><table><caption class="sr-only">Camera positions, switcher inputs and comms points</caption><thead><tr><th scope="col">Camera</th><th scope="col">Position</th><th scope="col">Switcher</th><th scope="col">Comms point</th></tr></thead><tbody>
+<tr><td>1</td><td>Pit, stage-right side toward center · 16×</td><td>Input 1</td><td>Pink video-comms patch downstage right, daisy-chained on to Camera 3</td></tr>
+<tr><td>2</td><td>Front of house · 22×</td><td>Input 2</td><td>Front-of-house patch panel, house-left side of the booth</td></tr>
+<tr><td>3</td><td>Pit, stage-left side · 16×</td><td>Input 3</td><td>Daisy chain from Camera 1</td></tr>
+<tr><td>4</td><td>Catwalk PTZ</td><td>Input 4</td><td><a href="../ptz/">Catwalk PTZ</a></td></tr>
+</tbody></table></div>
+<p class="note">Your camera lands on the multiview tile with its number. If it does not, stop there. Equipment details and open reads: <a href="../gear/">Camera equipment</a>.</p></article>
+<article class="sheet caution"><span class="label warn">Do not build from an assumption</span><p>Rack fiber converters in the rack do not prove a camera-end converter is on your body. One body was photographed with one fitted on September 14; that does not generalize to the other two, and another frame shows a body on a single coax. Inspect the body you are building and confirm the live path before you connect it.</p></article>
+</div><div class="stack">
+<article class="sheet stop"><span class="label bad">Stop conditions</span><ul>
+<li>Do not change the camera ID, system format, reference, return routing, white balance, shader values, PTZ settings or stored presets without director or TD approval.</li>
+<li>Do not connect or disconnect hybrid SMPTE fiber until the responsible technician confirms fiber power is off.</li>
+<li>Do not use an SMPTE connector that is dirty, wet, damaged or uncapped. Isolate it and report it.</li>
+<li>Do not declare a camera ready from picture alone. Return, tally, comms, control and lens operation must also pass.</li>
+</ul></article>
+<article class="sheet"><h3>Comms format</h3><p>Camera first, then the symptom and its impact: <em>“Camera 2, soft at wide, need a back focus check.”</em> Keep the channel clear while the director is calling shots.</p><p class="see">Working to a caller you do not know: <a href="../guide/">Bowl camera guide</a></p></article>
+</div></div>
+</section>
+
+<section id="build" class="panel" aria-labelledby="build-title"><div class="section-head"><div><p class="eyebrow">02 / Build</p><h2 id="build-title">Assignment, rig, signal path.</h2></div><a class="action" href="../rig/">Camera rig explorer →</a></div>
+<div class="trio">
+<article class="sheet"><span class="label">01 · Check in</span><h3>Identify the assignment</h3><ul class="checks">
+<li>Camera number and physical position.</li>
+<li>Expected switcher input and tally identity.</li>
+<li>Production format and frame rate.</li>
+<li>Default shot, coverage priorities, framing rules and restricted angles.</li>
+<li>Who owns iris, white balance, gain, shutter and color in rehearsal and in the show.</li>
+<li>Open faults for your position.</li>
+</ul></article>
+<article class="sheet"><span class="label">02 · Build</span><h3>Build the camera safely</h3><ol class="steps">
+<li>Seat the spreader or feet fully, level the head, and set the brakes and locks before the camera goes on.</li>
+<li>Open the plate lock first: press the red button and pull out the release handle. Head models are unread at all three positions, so confirm the release on the head in front of you.</li>
+<li>Support the body while you seat the plate in the receiver, then retighten the handle. Confirm the release cannot open by accident and test-lift before you let go.</li>
+<li>Attach the lens, viewfinder, pan handle, zoom and focus demands and any supports.</li>
+<li>Dress cables with a service loop for full pan and tilt, out of walkways, pinch points and the operator's feet.</li>
+<li>Balance last: unlock tilt while supporting the camera, set fore and aft balance, then pan and tilt drag for smooth starts and stops.</li>
+</ol></article>
+<article class="sheet"><span class="label">03 · Signal path</span><h3>Establish the path you have</h3><p><strong>If a camera-end fiber converter is fitted</strong></p><ul class="checks">
+<li>Confirm the matching rack converter and its camera channel.</li>
+<li>With fiber power confirmed off, inspect, clean if authorized, and connect the capped SMPTE path without twisting or loading the connector.</li>
+<li>Confirm the camera-feed and return jumpers at the body.</li>
+<li>Confirm stable fiber power before removing any local power.</li>
+</ul><p><strong>If no converter is fitted</strong></p><ul class="checks">
+<li>Confirm local camera power.</li>
+<li>Confirm the direct SDI feed to the assigned switcher input.</li>
+<li>Confirm the SDI return and control path to the camera input.</li>
+<li>At front of house, confirm reclocking or distribution rather than assuming a long SDI run is valid.</li>
+</ul></article>
+</div>
+<article class="sheet caution"><span class="label warn">Handle with care</span><p>Do not force connectors. Remove lens caps carefully; the B4 mount is the fragile point on these rigs. Camera 2's right side handle clamp is broken and runs on a magic arm, so do not try to tighten it. Carry the correct Allen key for the handle, and recheck every latch, clamp and lock before power goes on.</p></article>
+</section>
+
+<section id="prove" class="panel" aria-labelledby="prove-title"><div class="section-head"><div><p class="eyebrow">03 / Prove</p><h2 id="prove-title">Comms, commissioning, picture.</h2></div><a class="action" href="/shader/">Shader field reference →</a></div>
+<div class="trio">
+<article class="sheet"><span class="label">04 · Comms</span><h3>Connect and prove Clear-Com</h3><ol class="steps">
+<li>Connect the assigned Clear-Com beltpack and headset to the correct video-comms patch.</li>
+<li>Set headset level conservatively and confirm sidetone and the listen path.</li>
+<li>Test talk and listen with the director, then the call light if it is used.</li>
+<li>Cameras 1 and 3: the pink patch feeds Camera 1's beltpack XLR in, and Camera 1's loop-through feeds Camera 3. Camera 3's comms depend on Camera 1's beltpack staying connected and powered.</li>
+<li>Fiber talkback is unused at FMP. Do not connect a headset to the 5-pin XLR on a camera fiber converter. The audio department manages Clear-Com.</li>
+</ol></article>
+<article class="sheet"><span class="label">05 · Commission</span><h3>Prove every path</h3><ul class="checks">
+<li>Camera output and switcher format match: 1080i. Frame rate is unrecorded; read it at the switcher.</li>
+<li>The right image appears on the expected switcher input.</li>
+<li>Camera ID matches the switcher input and tally. A wrong ID makes a live camera look dead on the control panel.</li>
+<li>The return feed reaches the viewfinder. Confirm Returns 1, 2 and 3 at the rack converter rather than inferring them.</li>
+<li>Preview and program tally respond.</li>
+<li>Shading control moves only your camera.</li>
+<li>Zoom, focus, iris and demands respond through their range.</li>
+<li>Zebra and focus assist are set on the front SDI output only, never the main SDI.</li>
+<li>Cables stay safe through the full operating range.</li>
+<li>Reference and genlock are not in use at FMP. Skip them unless the TD says otherwise.</li>
+</ul></article>
+<article class="sheet"><span class="label">06 · Picture</span><h3>White balance, exposure, viewfinder</h3><ol class="steps">
+<li>Coordinate with the shader or TD before changing any image parameter.</li>
+<li>Balance on a neutral white target under representative show light, filling the frame as directed, and store it in the assigned preset.</li>
+<li>Check the result against the other cameras. Do not re-balance once central shading begins.</li>
+<li>Use ND, iris, gain and shutter only within the agreed exposure plan. Do not close the iris so far that depth of field hides a focus problem.</li>
+<li>Configure overlays on the operator's monitor output and confirm none reach the main camera feed.</li>
+</ol></article>
+</div>
+<article class="sheet caution"><span class="label warn">Camera 1 watch items</span><p>Two separate faults are open. The front SDI output failed, which made the viewfinder unusable and put the operator on the body LCD. Separately, shading control was lost and the selectable return behaved unpredictably; Return 2 restored a usable viewfinder feed. Do not collapse them into one return-path fault unless a controlled test proves a common cause.</p></article>
+</section>
+
+<section id="ready" class="panel" aria-labelledby="ready-title"><div class="section-head"><div><p class="eyebrow">04 / Show-ready</p><h2 id="ready-title">Focus, then the gate.</h2></div><a class="action" href="/backfocus/">Back focus field guide →</a></div>
+<div class="split"><div class="stack">
+<article class="sheet"><span class="label">07 · Focus through the zoom</span><h3>Run it when the pairing changes</h3><p>Run the back-focus check whenever a lens and body are paired differently, or a shot is sharp at telephoto and soft at wide. Zoom in, focus a detailed chart, zoom out without touching focus. If it goes soft, adjust with the procedure for the exact lens on the body.</p><p>Only one 16× barrel has been read, and it is not tagged to a position, so do not assume the lens in front of you is that model.</p><p class="see"><a href="/backfocus/">Back focus field guide →</a> · <a href="../gear/#lens">Lens records</a></p></article>
+<article class="sheet"><h3>During the show</h3><p>Protect the live shot. Make deliberate starts and stops, keep the horizon and headroom, avoid radical reframing while on tally unless directed, and call hazards or failures early.</p><p class="see">Song flow, coverage and calling language: <a href="../guide/">Bowl camera guide</a></p></article>
+</div><div class="stack">
+<article class="sheet good"><span class="label good">08 · Show-ready gate</span><h3>Ready means all of these</h3><ul class="checks">
+<li>Default safe shot framed and repeatable.</li>
+<li>Smooth pan, tilt, zoom, focus and drag.</li>
+<li>Focus holds through the usable zoom range.</li>
+<li>Exposure and color match the other cameras.</li>
+<li>Return, tally, comms and shading control pass.</li>
+<li>Cable path and operator area secure for doors.</li>
+<li>The director or TD acknowledges the camera as ready.</li>
+</ul></article>
+<article class="sheet"><h3>Camera 4</h3><p>The catwalk PTZ has its own controller, checks and known follow fault.</p><p class="see"><a href="../ptz/">Catwalk PTZ →</a></p></article>
+</div></div>
+</section>
+
+<section id="troubleshoot" class="panel" aria-labelledby="troubleshoot-title"><div class="section-head"><div><p class="eyebrow">05 / Troubleshoot</p><h2 id="troubleshoot-title">Check in this order.</h2></div><a class="action" href="../gear/#chain">Camera chain →</a></div>
+<article class="sheet"><div class="table-scroll"><table><caption class="sr-only">Symptoms, the order to check, and how to escalate</caption><thead><tr><th scope="col">Symptom</th><th scope="col">Check in order</th><th scope="col">Escalate as</th></tr></thead><tbody>
+<tr><td>No image</td><td>Power → physical connections → camera output → assigned input → common format</td><td>Camera number and last known good point</td></tr>
+<tr><td>Image, no return or shading control</td><td>Return jumper and path → camera input → camera ID → switcher return and control routing</td><td>Return-path fault. Do not disturb the working camera feed</td></tr>
+<tr><td>No tally</td><td>Camera ID → switcher assignment → preview and program state → return path</td><td>Tally or control fault</td></tr>
+<tr><td>No comms</td><td>Patch → XLR and daisy chain → beltpack power → headset → talk and listen controls</td><td>Position and the last point where comms work</td></tr>
+<tr><td>Soft after zooming wide</td><td>Normal focus at telephoto → telephoto-to-wide test → the lens's back-focus procedure</td><td>Lens and body pairing, with the exact symptom</td></tr>
+<tr><td>PTZ will not pan and tilt together</td><td>See the catwalk PTZ follow-fault test order</td><td>Known Camera 4 follow fault, FMP-8</td></tr>
+</tbody></table></div>
+<p class="note">Report faults with the camera number, symptom, time, observed state, workaround, and whether the problem reproduced. Record them in the camera check-out so they reach the fault log.</p></article>
+</section>
+
+<section id="strike" class="panel" aria-labelledby="strike-title"><div class="section-head"><div><p class="eyebrow">06 / Strike</p><h2 id="strike-title">Release, cap, pack, report.</h2></div><a class="action" href="../camera/">Open camera check-out →</a></div>
+<div class="split"><div class="stack">
+<article class="sheet"><span class="label">Strike</span><ol class="steps">
+<li>Wait for the director or TD to release the position.</li>
+<li>Power down in the approved sequence. The responsible technician disables fiber power before hybrid SMPTE is disconnected.</li>
+<li>Cap both ends of every SMPTE connection immediately, and keep the caps off the ground.</li>
+<li>Remove signal, power, comms and control cables without pulling on connector bodies.</li>
+<li>Support the camera while you release the plate, then pack the lens, demands, viewfinder, plate, headset and beltpack.</li>
+<li>Report faults with the camera number, symptom, time, observed state, workaround, and whether it reproduced.</li>
+</ol></article>
+</div><div class="stack">
+<article class="sheet"><h3>Field checks this page still needs</h3><ul class="checks">
+<li>Photograph the tripod head model plates at all three positions and correct the build step if the release differs.</li>
+<li>Read the production frame rate at the switcher.</li>
+<li>Confirm at the rack converters what Returns 2 and 3 carry.</li>
+<li>Recheck the Camera 1 return and shading fault.</li>
+</ul><p class="see">Equipment reads: <a href="../gear/#checks">Camera equipment, open checks</a> · Camera 4: <a href="../ptz/#troubleshoot">Catwalk PTZ</a></p></article>
+</div></div>
+</section>
+</main>
+<footer><span>FMP Video Operations · Camera build &amp; strike</span><span>Draft operating reference · field checks open</span><a href="/fmp/#learn">Back to Learn</a></footer>
+</body></html>

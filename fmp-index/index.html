@@ -1,211 +1,31 @@
-<!DOCTYPE html>
-<html lang="en" data-av-theme="light">
+<!doctype html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none'">
-  <title>FMP Index — System by Dave</title>
-  <meta name="description" content="Freedom Mortgage Pavilion working index: the preshow walk app, venue records, inventory, project guidance, and work in development.">
-  <meta name="robots" content="noindex,nofollow,noarchive">
-  <meta name="theme-color" content="#eee8df">
-  <link rel="canonical" href="https://housevideo.app/fmp-index/">
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="System by Dave">
-  <meta property="og:title" content="FMP Index — System by Dave">
-  <meta property="og:description" content="One directory for FMP field operations, venue records, and project guidance.">
-  <meta property="og:url" content="https://housevideo.app/fmp-index/">
-  <meta property="og:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="FMP Index — System by Dave">
-  <meta name="twitter:description" content="One directory for FMP field operations, venue records, and project guidance.">
-  <meta name="twitter:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
-  <link rel="icon" href="/svg/system_by_dave_logo_rust.svg" type="image/svg+xml">
-  <script src="/fmp/theme.js"></script>
-  <link rel="stylesheet" href="/css/fonts.css">
-  <link rel="stylesheet" href="/css/av-theme.css">
-  <link rel="stylesheet" href="/css/sbd-public-nav.css">
-  <style>
-    :root { --ff-body: 'DM Sans', sans-serif; --ff-mono: 'JetBrains Mono', monospace; --radius: 6px; }
-    * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; scroll-padding-top: 20px; }
-    body { margin: 0; background: var(--av-bg); color: var(--av-text); font: 400 15px/1.5 var(--ff-body); -webkit-font-smoothing: antialiased; }
-    ::selection { color: var(--av-bg); background: var(--av-accent); }
-    * { scrollbar-color: var(--av-line-strong) var(--av-bg); }
-    a { color: inherit; }
-    button, input { font: inherit; }
-    a:focus-visible, button:focus-visible, input:focus-visible { outline: 2px solid var(--av-focus); outline-offset: 4px; }
-    [hidden] { display: none !important; }
-    .shell { width: min(1160px, calc(100% - 48px)); margin-inline: auto; }
-    .topbar { border-bottom: 1px solid var(--av-line); }
-    .topbar nav { display: flex; align-items: center; justify-content: space-between; min-height: 68px; gap: 16px; }
-    .topbar-actions { display: flex; align-items: center; gap: 16px; }
-    .theme-toggle { gap: 8px; min-width: 44px; padding-inline: 12px; }
-    .brand, .parent { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; text-decoration: none; }
-    .brand { font-weight: 500; }
-    .brand img { width: 28px; height: 28px; }
-    .parent { font: 11px var(--ff-mono); color: var(--av-muted); text-transform: uppercase; letter-spacing: .06em; }
-    .brand:hover, .parent:hover { color: var(--av-accent); }
-    .hero { padding: 40px 0 28px; display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 24px; }
-    .eyebrow, .mono { font-family: var(--ff-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; }
-    .eyebrow { color: var(--av-accent); margin: 0 0 12px; display: flex; align-items: center; gap: 10px; }
-    .eyebrow::before { content: ''; width: 20px; height: 2px; background: currentColor; }
-    h1 { font-size: clamp(34px, 4.8vw, 58px); line-height: 1.06; letter-spacing: -.045em; font-weight: 500; margin: 0; }
-    h1 span { color: var(--av-muted); }
-    .subtitle { margin: 14px 0 0; max-width: 550px; color: var(--av-muted); }
-    .edition { border-left: 1px solid var(--av-line-strong); padding-left: 24px; min-width: 174px; }
-    .edition strong { display: block; font: 500 56px/1 var(--ff-mono); letter-spacing: -.08em; }
-    .edition p { color: var(--av-muted); margin: 8px 0 0; }
-    .launch { display: grid; grid-template-columns: 1.3fr 1fr; border: 1px solid var(--av-accent-line); border-radius: var(--radius); overflow: hidden; background: var(--av-surface); }
-    .launch-main { padding: 24px; background: var(--av-accent-soft); }
-    .launch-top { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
-    .launch h2 { font-size: 24px; font-weight: 500; letter-spacing: -.025em; margin: 0; }
-    .launch p { margin: 8px 0 16px; color: var(--av-text-2); max-width: 510px; }
-    .launch-actions { display: flex; gap: 10px; flex-wrap: wrap; }
-    .button { min-height: 44px; padding: 11px 16px; border-radius: 3px; display: inline-flex; justify-content: center; align-items: center; gap: 20px; font-size: 13px; font-weight: 500; text-decoration: none; border: 1px solid var(--av-line-strong); background: var(--av-control); color: var(--av-text); cursor: pointer; }
-    .button.primary { background: var(--av-accent); border-color: var(--av-accent); color: var(--av-primary-ink); }
-    .button:hover { border-color: var(--av-accent); background: var(--av-surface-3); }
-    .button.primary:hover { background: var(--av-accent-strong); }
-    .launch-note { padding: 24px; border-left: 1px solid var(--av-accent-line); display: flex; flex-direction: column; justify-content: center; }
-    .launch-note p { margin: 10px 0 0; font-size: 13px; }
-    .pill { display: inline-flex; align-items: center; gap: 6px; width: fit-content; white-space: nowrap; border: 1px solid var(--av-line); border-radius: 20px; padding: 3px 8px; font: 10px/1.4 var(--ff-mono); }
-    .pill::before { content: ''; width: 5px; height: 5px; background: currentColor; border-radius: 50%; flex: none; }
-    .available { color: var(--av-success); border-color: var(--av-success-line); }
-    .partial { color: var(--av-warning); border-color: var(--av-warning-line); }
-    .planned { color: var(--av-dim); }
-    .stats { display: grid; grid-template-columns: repeat(4, 1fr); padding: 24px 0; border-bottom: 1px solid var(--av-line); gap: 16px; }
-    .stat { display: flex; align-items: baseline; gap: 10px; }
-    .stat strong { font: 400 25px var(--ff-mono); }
-    .stat span { color: var(--av-muted); font-size: 12px; }
-    .toolbar { padding: 24px 0 18px; display: flex; align-items: center; gap: 16px; justify-content: space-between; flex-wrap: wrap; }
-    .search { display: flex; align-items: center; gap: 10px; background: var(--av-control); border: 1px solid var(--av-line-strong); border-radius: var(--radius); padding-left: 12px; flex: 1; min-width: 220px; max-width: 360px; }
-    .search svg { color: var(--av-muted); flex: none; }
-    input { min-width: 0; width: 100%; height: 44px; padding: 8px 10px 8px 0; color: var(--av-text); background: transparent; border: 0; }
-    input::placeholder { color: var(--av-dim); }
-    .filters { display: flex; gap: 4px; flex-wrap: wrap; }
-    .filter { color: var(--av-muted); background: transparent; border: 1px solid transparent; border-radius: 4px; min-height: 44px; padding: 8px 12px; font-size: 12px; cursor: pointer; }
-    .filter:hover { background: var(--av-surface-2); color: var(--av-text); }
-    .filter[aria-pressed="true"] { color: var(--av-text); background: var(--av-surface-2); border-color: var(--av-line-strong); }
-    .directory-caption { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin: 0 0 12px; color: var(--av-muted); font-size: 11px; }
-    .directory-caption p { margin: 0; }
-    .directory { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
-    .group { border: 1px solid var(--av-line); border-radius: var(--radius); overflow: hidden; background: var(--av-surface); }
-    .group-head { display: flex; align-items: baseline; padding: 18px 20px; border-bottom: 1px solid var(--av-line); gap: 12px; background: var(--av-surface-2); }
-    .group-head .number { color: var(--av-accent); font: 11px var(--ff-mono); }
-    .group h2 { font-size: 16px; font-weight: 500; margin: 0; }
-    .group-count { margin-left: auto; font: 10px var(--ff-mono); color: var(--av-dim); }
-    .rows { margin: 0; padding: 0; list-style: none; }
-    .row + .row { border-top: 1px solid var(--av-line); }
-    .destination { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; padding: 16px 20px; text-decoration: none; min-height: 78px; transition: background .15s ease; }
-    .destination:hover { background: var(--av-surface-2); }
-    .destination:focus-visible { outline-offset: -3px; }
-    .row-title { display: block; font-size: 14px; font-weight: 500; }
-    .row-description { display: block; margin-top: 4px; color: var(--av-muted); font-size: 12px; line-height: 1.55; }
-    .row-meta { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; justify-content: center; }
-    .row-meta .arrow { color: var(--av-dim); }
-    .destination:hover .arrow { color: var(--av-accent); }
-    .detail-note { padding: 14px 20px; margin: 0; font-size: 12px; color: var(--av-muted); border-top: 1px solid var(--av-line); }
-    .empty { padding: 44px 24px; text-align: center; background: var(--av-surface); border: 1px dashed var(--av-line-strong); border-radius: var(--radius); }
-    .empty h2 { font-size: 20px; font-weight: 500; margin: 0; }
-    .empty p { color: var(--av-muted); }
-    .snapshot { margin-top: 24px; display: grid; grid-template-columns: 150px 1fr; padding: 20px 0; border-top: 1px solid var(--av-line); gap: 24px; color: var(--av-muted); font-size: 12px; }
-    .snapshot h2 { font: 11px var(--ff-mono); color: var(--av-text-2); text-transform: uppercase; margin: 3px 0; }
-    .snapshot p { margin: 0 0 8px; }
-    .snapshot a { display: inline-flex; align-items: center; min-height: 44px; gap: 8px; color: var(--av-text-2); text-underline-offset: 4px; }
-    .snapshot a:hover { color: var(--av-accent); }
-    footer { border-top: 1px solid var(--av-line); padding: 20px 0 30px; color: var(--av-dim); }
-    footer .shell { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; font-size: 11px; }
-    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
-    @media (max-width: 900px) { .toolbar { align-items: stretch; } .search { max-width: none; } .filters { width: 100%; } .directory { gap: 16px; } }
-    @media (max-width: 680px) { .shell { width: calc(100% - 32px); } .topbar-actions { gap: 8px; } .theme-toggle { padding-inline: 0; } .theme-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; } .hero { padding-top: 28px; grid-template-columns: 1fr; } .edition { display: none; } .launch { grid-template-columns: 1fr; } .launch-note { border-left: 0; border-top: 1px solid var(--av-accent-line); padding: 18px; } .launch-main { padding: 20px 18px; } .launch h2 { font-size: 21px; } .stats { grid-template-columns: 1fr 1fr; gap: 12px 20px; padding: 20px 0; } .directory { grid-template-columns: 1fr; } .directory-caption { align-items: start; } .directory-caption p:last-child { max-width: 190px; text-align: right; } .snapshot { grid-template-columns: 1fr; gap: 8px; } .filter { padding-inline: 10px; } .destination { padding: 16px; gap: 8px; } .group-head { padding: 16px; } .row-meta .pill { font-size: 9px; } }
-    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { transition: none !important; animation: none !important; } }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
+<title>FMP index has moved | System by Dave</title>
+<meta property="og:site_name" content="System by Dave">
+<meta property="og:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<meta name="twitter:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<meta name="description" content="The FMP index is now FMP Video Operations at housevideo.app/fmp/.">
+<link rel="canonical" href="https://housevideo.app/fmp/">
+<meta name="robots" content="noindex,follow">
+<meta name="theme-color" content="#FFFFFF">
+<meta property="og:type" content="website">
+<meta property="og:title" content="FMP index has moved | System by Dave">
+<meta property="og:description" content="The FMP index is now FMP Video Operations at housevideo.app/fmp/.">
+<meta property="og:url" content="https://housevideo.app/fmp/">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="FMP index has moved | System by Dave">
+<meta name="twitter:description" content="The FMP index is now FMP Video Operations at housevideo.app/fmp/.">
+<meta http-equiv="refresh" content="0; url=/fmp/">
+<style>:root{color-scheme:light dark}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;background:#fff;color:#1b1b1b;display:grid;place-items:center;min-height:100vh;margin:0;padding:24px;text-align:center}main{max-width:34rem}a{color:#9a4525;display:inline-block;padding:12px 4px}@media (prefers-color-scheme:dark){body{background:#0f1115;color:#eee}a{color:#f0a37f}}</style>
+<script>location.replace("/fmp/" + location.search + location.hash);</script>
 </head>
 <body>
-  <a class="sbd-skip-link" href="#fmp-workspace">Skip to FMP index</a>
-  <header class="topbar">
-    <nav class="shell" aria-label="Site navigation">
-      <a class="brand" href="https://systembydave.com/"><img src="/svg/system_by_dave_logo_rust.svg" alt="" width="28" height="28">System by Dave</a>
-      <div class="topbar-actions"><a class="parent" href="https://avbydave.com/av-suite.html">AV Suite <span aria-hidden="true">↗</span></a><button class="button theme-toggle" type="button" data-theme-toggle aria-pressed="false"><span aria-hidden="true">◐</span><span class="theme-label">Dark theme</span></button></div>
-    </nav>
-  </header>
-  <main id="fmp-workspace" class="shell" tabindex="-1">
-    <div class="hero">
-      <div><p class="eyebrow">FMP / Working index</p><h1>Freedom Mortgage<br><span>Pavilion.</span></h1><p class="subtitle">The walk app, the working records, and the next build.<br>One place to get where you need to go.</p></div>
-      <div class="edition" aria-hidden="true"><strong>FMP</strong><p class="mono">Video operations<br>Camden, New Jersey</p></div>
-    </div>
-    <section class="launch" aria-labelledby="launch-title">
-      <div class="launch-main">
-        <div class="launch-top"><h2 id="launch-title">Start with the walk.</h2><span class="pill partial">Partially verified</span></div>
-        <p>Preshow checks, fault capture, photos, and report exports. The public app is reachable; email and Notion connections still need verification.</p>
-        <div class="launch-actions"><a class="button primary" href="/fmp/">Open video operations <span aria-hidden="true">↗</span></a><a class="button" href="/fmpwalk/">Open preshow walk <span aria-hidden="true">↗</span></a><a class="button" href="https://app.notion.com/p/3ca255fc8f44804f953bd76763bf3b10" rel="noopener noreferrer">Technical Overview <span aria-hidden="true">↗</span></a></div>
-      </div>
-      <div class="launch-note"><span class="eyebrow">Verification snapshot</span><strong><time datetime="2026-09-07T17:18:00Z">07 September 2026 · 13:18 ET</time></strong><p>Links and records were checked on this date. This index does not monitor live system health. Notion destinations require your existing access.</p></div>
-    </section>
-    <div class="stats" aria-label="Indexed surfaces"><div class="stat"><strong>01</strong><span>Web app</span></div><div class="stat"><strong>06</strong><span>Databases</span></div><div class="stat"><strong>08</strong><span>Documents &amp; hubs</span></div><div class="stat"><strong>02</strong><span>In development</span></div></div>
-    <div class="toolbar" id="filter-tools" hidden>
-      <label class="search"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><span class="sr-only">Search FMP surfaces</span><input id="surface-search" type="search" placeholder="Find a record, tool, or reference…" autocomplete="off"></label>
-      <div class="filters" role="group" aria-label="Filter by purpose"><button class="filter" type="button" data-filter="all" aria-pressed="true">All surfaces</button><button class="filter" type="button" data-filter="field" aria-pressed="false">Field</button><button class="filter" type="button" data-filter="venue" aria-pressed="false">Venue</button><button class="filter" type="button" data-filter="guidance" aria-pressed="false">Guidance</button><button class="filter" type="button" data-filter="development" aria-pressed="false">In development</button></div>
-    </div>
-    <div class="directory-caption"><p id="result-count" role="status" aria-live="polite">17 surfaces</p><p>“Available” confirms a record exists, not completed work.</p></div>
-    <div class="directory">
-      <section class="group" data-group="field" aria-labelledby="field-title"><div class="group-head"><span class="number">01</span><h2 id="field-title">Field operations</h2><span class="group-count">05 LINKS</span></div><ul class="rows">
-        <li class="row"><a class="destination" href="/fmpwalk/"><span><span class="row-title">FMP Preshow Walk</span><span class="row-description">Setup · Walk · Faults · Report · Ref. Markdown and JSON export controls present.</span></span><span class="row-meta"><span class="pill partial">Partial</span><span class="arrow" aria-hidden="true">↗</span></span></a></li>
-        <li class="row"><a class="destination" href="https://app.notion.com/p/3d3255fc8f4481f792b5e300315df8d5" rel="noopener noreferrer"><span><span class="row-title">Walk Records Hub</span><span class="row-description">Personal reporting workflow and connection status. Manual records are available.</span></span><span class="row-meta"><span class="pill partial">Setup open</span><span class="arrow" aria-hidden="true">↗</span></span></a></li>
-        <li class="row"><a class="destination" href="https://app.notion.com/p/bc3ac03a5a6a4a99b4a2ff177bb4c1af" rel="noopener noreferrer"><span><span class="row-title">Walk Reports</span><span class="row-description">Dated report snapshots, exported files, and email status.</span></span><span class="row-meta"><span class="pill available">0 records</span><span class="arrow" aria-hidden="true">↗</span></span></a></li>
-        <li class="row"><a class="destination" href="https://app.notion.com/p/9dcb304a745648e78ff32b753d459179" rel="noopener noreferrer"><span><span class="row-title">FMP Faults</span><span class="row-description">Linked fault records, investigation, resolution, and retests.</span></span><span class="row-meta"><span class="pill available">0 records</span><span class="arrow" aria-hidden="true">↗</span></span></a></li>
-        <li class="row"><a class="destination" href="https://app.notion.com/p/6696f7e08f694168aa36c10cc48a8194" rel="noopener noreferrer"><span><span class="row-title">Email Groups</span><span class="row-description">One Personal copy preset. Disabled pending sender authorization and testing.</span></span><span class="row-meta"><span class="pill partial">Disabled</span><span class="arrow" aria-hidden="true">↗</span></span></a></li>
-      </ul><p class="detail-note">Zero saved records does not mean no walk occurred or no venue faults exist.</p></section>
-      <section class="group" data-group="venue" aria-labelledby="venue-title"><div class="group-head"><span class="number">02</span><h2 id="venue-title">Venue records</h2><span class="group-count">05 LINKS</span></div><ul class="rows">
-        <li class="row"><a class="destination" href="https://app.notion.com/p/3ca255fc8f44804f953bd76763bf3b10" rel="noopener noreferrer"><span><span class="row-title">Technical Overview</span><span class="row-description">Canonical venue record: dated observations, corrections, and the open question ledger.</span></span><span class="row-meta"><span class="pill available">Available</span><span class="arrow" aria-hidden="true">↗</span></span></a></li>
-        <li class="row"><a class="destination" href="https://app.notion.com/p/7356b5f6801f46f8808a9ddb4ad03ad3" rel="noopener noreferrer"><span><span class="row-title">Video Gear</span><span class="row-description">Equipment inventory and its supporting evidence.</span></span><span class="row-meta"><span class="pill available">50 rows</span><span class="arrow" aria-hidden="true">↗</span></span></a></li>
-        <li class="row"><a class="destination" href="https://app.notion.com/p/0ec333f6376c49649a1fbe73aaafecb2" rel="noopener noreferrer"><span><span class="row-title">Display Estate</span><span class="row-description">Display positions and device identities. Record count is not a verified hardware total.</span></span><span class="row-meta"><span class="pill available">151 rows</span><span class="arrow" aria-hidden="true">↗</span></span></a></li>
-        <li class="row"><a class="destination" href="https://app.notion.com/p/d11ce607c57a40958db8d16884e4b172" rel="noopener noreferrer"><span><span class="row-title">Display Zones</span><span class="row-description">Zone mapping, serving feeds, and verification state.</span></span><span class="row-meta"><span class="pill available">10 rows</span><span class="arrow" aria-hidden="true">↗</span></span></a></li>
-        <li class="row"><a class="destination" href="https://app.notion.com/p/3cb255fc8f44814eb537ecb1d6d585c5" rel="noopener noreferrer"><span><span class="row-title">House Video Review · John Deliverable</span><span class="row-description">Reader-facing technical review. Last edited September 2; completion was not re-audited.</span></span><span class="row-meta"><span class="pill available">Available</span><span class="arrow" aria-hidden="true">↗</span></span></a></li>
-      </ul><p class="detail-note">Use the Technical Overview’s latest applicable correction before quoting an inherited figure.</p></section>
-      <section class="group" data-group="guidance" aria-labelledby="guidance-title"><div class="group-head"><span class="number">03</span><h2 id="guidance-title">Project guidance</h2><span class="group-count">05 LINKS</span></div><ul class="rows">
-        <li class="row"><a class="destination" href="https://app.notion.com/p/3d4255fc8f4480518320c4f19fa7487a" rel="noopener noreferrer"><span><span class="row-title">FMP Project Instructions</span><span class="row-description">Canonical project rules, evidence standards, and destination map.</span></span><span class="row-meta"><span class="pill available">Available</span><span class="arrow" aria-hidden="true">↗</span></span></a></li>
-        <li class="row"><a class="destination" href="https://app.notion.com/p/3d4255fc8f4481b5af85f02aaad3335b" rel="noopener noreferrer"><span><span class="row-title">Context Pack</span><span class="row-description">Venue and system reference with pointers to current source records.</span></span><span class="row-meta"><span class="pill available">Available</span><span class="arrow" aria-hidden="true">↗</span></span></a></li>
-        <li class="row"><a class="destination" href="https://app.notion.com/p/3d4255fc8f44810987dfc06d8e8fca47" rel="noopener noreferrer"><span><span class="row-title">Video Assistant Ramp-Up</span><span class="row-description">Priorities, field sequence, questions, and completion evidence.</span></span><span class="row-meta"><span class="pill available">Available</span><span class="arrow" aria-hidden="true">↗</span></span></a></li>
-        <li class="row"><a class="destination" href="https://app.notion.com/p/3d4255fc8f448109a3f2da6a6307d25b" rel="noopener noreferrer"><span><span class="row-title">History and Corrections</span><span class="row-description">Attributed project history and corrections that should not be lost.</span></span><span class="row-meta"><span class="pill available">Available</span><span class="arrow" aria-hidden="true">↗</span></span></a></li>
-        <li class="row"><a class="destination" href="https://app.notion.com/p/3d3255fc8f4480bd91e5d939b96fed0e" rel="noopener noreferrer"><span><span class="row-title">Walk Implementation Log</span><span class="row-description">App history, repository references, and Gmail / Notion setup evidence.</span></span><span class="row-meta"><span class="pill available">Available</span><span class="arrow" aria-hidden="true">↗</span></span></a></li>
-      </ul></section>
-      <section class="group" data-group="development" aria-labelledby="development-title"><div class="group-head"><span class="number">04</span><h2 id="development-title">In development</h2><span class="group-count">02 LINKS</span></div><ul class="rows">
-        <li class="row"><a class="destination" href="https://app.notion.com/p/3d1255fc8f44810b8e42ca49741e8526" rel="noopener noreferrer"><span><span class="row-title">FMP Video Control Surface</span><span class="row-description">Companion panel and restore-clock project. Bench checklist open; no live control panel verified.</span></span><span class="row-meta"><span class="pill planned">Planned</span><span class="arrow" aria-hidden="true">↗</span></span></a></li>
-        <li class="row"><a class="destination" href="https://app.notion.com/p/3b7255fc8f448057a2fef4e50cf3915f" rel="noopener noreferrer"><span><span class="row-title">Signal Flow</span><span class="row-description">Existing project record marked Doing. Page body is blank and no diagram is linked.</span></span><span class="row-meta"><span class="pill partial">Doing</span><span class="arrow" aria-hidden="true">↗</span></span></a></li>
-      </ul><p class="detail-note">These links open project records. Their existence does not establish a working tool or completed deliverable.</p></section>
-    </div>
-    <section class="empty" id="empty-state" hidden><h2>No matching surfaces</h2><p>Try “walk”, “display”, or clear the filters to see every destination.</p><button class="button" type="button" id="reset-filters">Clear search and filters</button></section>
-    <section class="snapshot" aria-labelledby="snapshot-title"><h2 id="snapshot-title">About this index</h2><div><p>A dated directory of verified destinations. Status labels distinguish record availability from integration readiness and planned work. Database numbers are rows returned by the September 7 query.</p><p>App page content and Notion records were inspected. Gmail sending, app-to-Notion persistence, and venue hardware were not tested in this check.</p><a href="https://app.notion.com/p/3d4255fc8f44812b83c0e4dc1f4a8e09" rel="noopener noreferrer">View verification record <span class="mono">RUN-20260907-1718 ↗</span></a></div></section>
-  </main>
-  <footer><div class="shell"><span>System by Dave / FMP Index</span><span>Personal working index · Notion access required</span></div></footer>
-  <script>
-    'use strict';
-    const search = document.getElementById('surface-search');
-    const filters = [...document.querySelectorAll('[data-filter]')];
-    const groups = [...document.querySelectorAll('[data-group]')];
-    let selected = 'all';
-    function applyFilters() {
-      const query = search.value.trim().toLocaleLowerCase();
-      let total = 0;
-      for (const group of groups) {
-        let visible = 0;
-        for (const row of group.querySelectorAll('.row')) {
-          const matches = (selected === 'all' || selected === group.dataset.group) && row.textContent.toLocaleLowerCase().includes(query);
-          row.hidden = !matches;
-          if (matches) visible += 1;
-        }
-        group.hidden = visible === 0;
-        group.querySelector('.group-count').textContent = `${String(visible).padStart(2, '0')} ${visible === 1 ? 'LINK' : 'LINKS'}`;
-        total += visible;
-      }
-      document.getElementById('result-count').textContent = `${total} ${total === 1 ? 'surface' : 'surfaces'}${query || selected !== 'all' ? ' found' : ''}`;
-      document.getElementById('empty-state').hidden = total !== 0;
-      for (const button of filters) button.setAttribute('aria-pressed', String(button.dataset.filter === selected));
-    }
-    for (const button of filters) button.addEventListener('click', () => { selected = button.dataset.filter; applyFilters(); });
-    search.addEventListener('input', applyFilters);
-    document.getElementById('reset-filters').addEventListener('click', () => { search.value = ''; selected = 'all'; applyFilters(); search.focus(); });
-    document.getElementById('filter-tools').hidden = false;
-  </script>
+<main>
+<p>The FMP index is now <a href="/fmp/">FMP Video Operations</a>. Redirecting.<br><a href="/fmpwalk/">Preshow walk</a> · <a href="https://systembydave.com/">System by Dave home</a></p>
+</main>
 </body>
 </html>

@@ -61,8 +61,9 @@ const files = walk(ROOT);
 const unlisted = files.filter((file) => !sitemapRoutes.has(routeFor(file)));
 const robots = read('robots.txt');
 
-// 133 includes the /fmp-walk/ redirect and the managed /fmp/house/ reference.
-if (unlisted.length !== 133) fail(`Expected 133 tracked routes outside the sitemap; found ${unlisted.length}.`);
+// 136 includes the /fmp-walk/ and /fmp-index/ redirects, the managed /fmp/house/ reference, and the
+// /fmp/gear/, /fmp/build/ and /fmp/ptz/ pages that replaced Notion links on 2026-09-18.
+if (unlisted.length !== 136) fail(`Expected 136 tracked routes outside the sitemap; found ${unlisted.length}.`);
 
 [
   '/apps/av-workbook/',
@@ -110,7 +111,6 @@ hatFiles.forEach((file) => {
 
 [
   ['av-workbook.html', `${originFor('av-workbook/')}/av-workbook/`],
-  ['fmp-index/index.html', `${originFor('fmp-index/')}/fmp-index/`],
   ['cueforge.html', 'https://systembydave.com/cueforge.html'],
   ['plotforge.html', 'https://plotforge-beta.vercel.app/'],
   ['marsscape/index.html', 'https://mixmash.games/mars/'],
@@ -128,6 +128,14 @@ if (refreshTarget(fmpWalkAlias) !== '/fmpwalk/') fail('fmp-walk/index.html does 
 if (!fmpWalkAlias.includes('location.replace("/fmpwalk/" + location.search + location.hash)')) fail('fmp-walk/index.html does not preserve query and hash when redirecting.');
 if (canonical(fmpWalkAlias) !== `${originFor('fmpwalk/')}/fmpwalk/`) fail('fmp-walk/index.html canonical does not match its redirect target.');
 if (sitemapRoutes.has('/fmp-walk/')) fail('fmp-walk/index.html appears in the sitemap.');
+
+// /fmp-index/ is retired: the /fmp/ hub is the one FMP directory, so the old index redirects to it.
+const fmpIndexAlias = read('fmp-index/index.html');
+if (!hasNoIndex(fmpIndexAlias)) fail('fmp-index/index.html is missing noindex.');
+if (refreshTarget(fmpIndexAlias) !== '/fmp/') fail('fmp-index/index.html does not refresh to /fmp/.');
+if (!fmpIndexAlias.includes('location.replace("/fmp/" + location.search + location.hash)')) fail('fmp-index/index.html does not preserve query and hash when redirecting.');
+if (canonical(fmpIndexAlias) !== `${originFor('fmp/')}/fmp/`) fail('fmp-index/index.html canonical does not match its redirect target.');
+if (sitemapRoutes.has('/fmp-index/')) fail('fmp-index/index.html appears in the sitemap.');
 
 if (!hasNoIndex(read('afterbreak/index.html'))) fail('afterbreak/index.html is missing noindex.');
 if (!hasNoIndex(read('cross-project-actions.html'))) fail('cross-project-actions.html is missing noindex.');

@@ -24,6 +24,15 @@ access control.
   verified assignments control.
 - `/fmp/rig/`: read-only 3D/photo equipment reference. It does not report live
   status or establish serial numbers, fitted state, signal health, or access.
+- `/fmp/gear/`, `/fmp/build/`, `/fmp/ptz/`: camera equipment, camera build and
+  strike, and catwalk PTZ references translated from Notion records. Dated
+  evidence stays visible; roles replace names; no network addresses.
+- `/fmp-index/`: retired. It redirects to `/fmp/`, keeping query and hash.
+
+No public FMP page links a Notion page. Crews and tour engineers have no Notion
+account, so anything they need from Notion becomes its own page in the suite. The
+walk's explicit Save to Notion receipt opens the walker's own record and is the one
+exception. `npm run verify:fmp` and the hygiene probe's S3 check enforce this.
 
 Opening one workflow does not copy, submit, or reinterpret another workflow's
 records. The old owner-only Site remains available for its origin-local drafts;
@@ -77,8 +86,8 @@ responses are never bundled for offline use.
 
 ## housevideo.app
 
-housevideo.app is the canonical home of the exported suite, `/fmp-index/`,
-`/fmp-walk/` and the `/switcher/`, `/shader/` and `/backfocus/` references, with
+housevideo.app is the canonical home of the exported suite, the `/fmp-index/`
+and `/fmp-walk/` redirects, and the `/switcher/`, `/shader/` and `/backfocus/` references, with
 unchanged paths (`docs/domain-sites.md`). It was cut over on 2026-09-18 from
 fmpwalk `a5d262c`. The systembydave.com addresses are redirect stubs that offer
 to move saved walk and camera data (browser storage and walk photos) before
@@ -109,7 +118,7 @@ below on housevideo.app.
 
 The FMP suite has one theme preference, `fmpTheme` (`light`, `dark`, or `auto`),
 shared with the preshow walk. The managed `fmp/theme.js` applies it in the head of
-the hub, camera, guide, and rig pages, and `/fmp-index/` loads the same file. A
+the hub, camera, house, guide, gear, build, ptz and rig pages. A
 first visit is light regardless of the system setting (WEB-1); `auto` follows the
 system. Earlier rig (`fmpRigTheme`) and guide (`fmpcam-theme`) choices move into
 `fmpTheme` once. FMP pages never read or write the AV Suite-wide
@@ -175,3 +184,27 @@ its canonical merge commit. The GitHub Pages workflow and exact live-route and
 provenance readback remain the release acceptance gates. Future changes must be
 exported from clean canonical source; do not edit managed files or provenance by
 hand.
+
+## Notion pages replaced with HTML | September 18, 2026
+
+Exported fmpwalk `9012646`. The suite no longer links Notion:
+
+- `/fmp/gear/` replaces the four camera gear records (URSA G2 body, Fujinon lenses,
+  Camera Fiber Converter, Studio Fiber Converter). The rig's 53 citations now open
+  its sections (`#g2`, `#lens`, `#camera-converter`, `#studio-converter`), and its
+  back-focus citation opens `/backfocus/`.
+- `/fmp/build/` and `/fmp/ptz/` replace the Cam Ops and PTZ Ops SOPs. The camera
+  References panel opens them and `/backfocus/`. The signed-in backend registry
+  still names Notion pages, so the public camera overrides it, and its receipts
+  name the Crew Call instead of linking to it.
+- Learn lists each reference once. The three audience seat views moved to the
+  House venue section, and the hub no longer links `/fmp-index/`.
+- `/fmp-index/` became a redirect. Its personal pages (walk records, email groups,
+  project instructions, logs) were not translated; its venue records already live
+  in House, Camera equipment and the rig.
+
+The Notion pages themselves are unchanged and remain the system of record for the
+backend. Validation: 59 canonical tests; the hub, public, camera, house and walk
+browser suites; `verify:fmp`, `verify:public-navigation`, `verify:indexing`,
+`verify:public-consistency` and `verify:domain-sites`; and the hygiene probe
+against a local build (S3 pass, no new warnings).

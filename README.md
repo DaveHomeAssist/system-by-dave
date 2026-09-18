@@ -39,7 +39,7 @@ use the tooling selected for that surface.
 | `agents.html` | Agents catalog |
 | `skills.html` | Skills catalog |
 | `widgets.html` | Widget gallery |
-| `fmp-index/index.html` | FMP working index: dated destination snapshot with search and purpose filters; noindex |
+| `fmp-index/index.html` | Retired FMP working index: noindex redirect to the `/fmp/` hub, keeping query and hash |
 | `fmp/` | Managed FMP video operations hub, camera commissioning, bowl training, and rig reference; authenticated camera API remains SETUP TEST only; [release and sync contract](docs/fmp-public-release.md) |
 | `fmpwalk/` | Managed local-first preshow venue walk; explicit download, Gmail, and Notion actions; no silent writes |
 | `afterbreak/index.html` | Pier 68 run of show: private crew timeline, bar, promo, gear, crew, and open items; noindex |
