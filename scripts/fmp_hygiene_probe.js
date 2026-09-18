@@ -213,7 +213,7 @@ async function checkLinks() {
     if (res.status >= 400 || res.status === 0) brokenInternal.push(`${[...from].join(', ')} → ${url.replace(BASE, '')} (${res.status || res.error})`);
   }
   record('L1', 'links', brokenInternal.length ? 'fail' : 'pass', 'Same-origin links, assets, and script-built routes resolve', brokenInternal.join('; ') || `${internal.size} targets`);
-  record('L2', 'links', legacy.length ? 'warn' : 'pass', 'No links to legacy or private origins', unique(legacy).join('; ') || 'none');
+  record('L2', 'links', legacy.length ? 'fail' : 'pass', 'No links to legacy or private origins', unique(legacy).join('; ') || 'none');
   record('L4', 'links', baseFragments.length ? 'fail' : 'pass', 'In-page (#) links stay on pages that use <base>', baseFragments.join('; ') || 'none');
 
   if (flag('skip-external')) {

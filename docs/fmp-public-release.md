@@ -35,8 +35,10 @@ walk's explicit Save to Notion receipt opens the walker's own record and is the 
 exception. `npm run verify:fmp` and the hygiene probe's S3 check enforce this.
 
 Opening one workflow does not copy, submit, or reinterpret another workflow's
-records. The old owner-only Site remains available for its origin-local drafts;
-those drafts are not migrated, removed, or published.
+records. No FMP page links an old version of the suite: the retired owner-only
+ChatGPT Site, the fmpwalk GitHub Pages copy, or a pre-cutover systembydave.com FMP
+address. The old Site's origin-local drafts were not migrated, removed, or
+published, but the suite no longer links to them (Dave, 2026-09-18).
 
 ## Managed source
 

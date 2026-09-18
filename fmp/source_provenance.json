@@ -1,7 +1,7 @@
 {
   "schema": "fmp.public.release.v2",
   "sourceRepository": "DaveHomeAssist/fmpwalk",
-  "sourceCommit": "e3beb5f3c7a7c8f16f201ea81517afd20eadca2e",
+  "sourceCommit": "2a700ff9a3f1fd61bbcd5f127da20806ee4ac4a0",
   "mode": "commissioning",
   "files": {
     "build/index.html": "d64826cc7fadb549d48b1f9910154ec44a27e644269e719d184fb8c6ca97f681",
@@ -22,7 +22,7 @@
     "house/house.js": "b73442e5fec192337cbd7b1c973264013a8aa0343b6ca5c34746df359c73d026",
     "house/index.html": "2064e5cdaf6f84bcb4e7849bb350ebadeb13b16e4f50e2172a43d15ee314b441",
     "house/site-plan.png": "655d27449a2f686ad17b74bed39b11edc69af9d342d46d079b98c042e4876f2e",
-    "index.html": "e44b74bab3c40a704a14b1ba816b59306f2598241ca58a6019b60a12145b1aaa",
+    "index.html": "3fb57e3ace913664220c3a88e93e37850cc4b70c19fa93a10146d7d0fb28d5b6",
     "mail.js": "4a521185a33c8463a3b34493771e381d7982bb59f0f8d9b5096d074727e32a91",
     "notion-config.js": "b675c734abe301f46f50f05a65ae58b9d25bd07c57fa8b01ef07e456e32271fc",
     "photos.js": "cd1feeb0fd50c5df4df81fa55b3fb37ca708127d793d438a62e98e596fbec3ff",
@@ -56,5 +56,5 @@
     "rig/vendor/three/three.module.js": "a476b88d0df406dca0e30c65b4cdf0180c7337110accec828c103655b56a361c",
     "theme.js": "d4c1024bbd62d45a05183c64413421b3de386a21bbbcb361d0a56d8bb389f27a"
   },
-  "artifactSha256": "66385baa74a65d74d429d203adace7849ab24e9051dba343ba04a3364138b915"
+  "artifactSha256": "d7ae32d96c25681e070fa3ce44a1fe5ba9155970b3c5aeb9b15ffff8f3264d53"
 }
