@@ -3,6 +3,7 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+const { originFor, siteSitemap, cutoverSites } = require('./domain_sites_lib');
 
 const ROOT = path.resolve(__dirname, '..');
 const failures = [];
@@ -51,6 +52,11 @@ const sitemap = read('sitemap.xml');
 const sitemapRoutes = new Set(
   Array.from(sitemap.matchAll(/<loc>https:\/\/systembydave\.com([^<]*)<\/loc>/g), (match) => match[1] || '/')
 );
+// Pages that moved to another domain are listed in that site's generated sitemap.
+for (const site of cutoverSites()) {
+  const origin = `https://${site.domain}`.replace(/\./g, '\\.');
+  for (const match of siteSitemap(site.id).matchAll(new RegExp(`<loc>${origin}([^<]*)</loc>`, 'g'))) sitemapRoutes.add(match[1] || '/');
+}
 const files = walk(ROOT);
 const unlisted = files.filter((file) => !sitemapRoutes.has(routeFor(file)));
 const robots = read('robots.txt');
@@ -97,14 +103,14 @@ hatFiles.forEach((file) => {
 ].forEach((file) => {
   const source = read(file);
   if (!hasNoIndex(source)) fail(`${file} is missing noindex.`);
-  if (canonical(source) !== 'https://systembydave.com/pixelforge/') {
+  if (canonical(source) !== `${originFor('pixelforge/')}/pixelforge/`) {
     fail(`${file} does not consolidate canonical signals under /pixelforge/.`);
   }
 });
 
 [
-  ['av-workbook.html', 'https://systembydave.com/av-workbook/'],
-  ['fmp-index/index.html', 'https://systembydave.com/fmp-index/'],
+  ['av-workbook.html', `${originFor('av-workbook/')}/av-workbook/`],
+  ['fmp-index/index.html', `${originFor('fmp-index/')}/fmp-index/`],
   ['cueforge.html', 'https://systembydave.com/cueforge.html'],
   ['plotforge.html', 'https://plotforge-beta.vercel.app/'],
   ['marsscape/index.html', 'https://mixmash.games/mars/'],
@@ -120,7 +126,7 @@ const fmpWalkAlias = read('fmp-walk/index.html');
 if (!hasNoIndex(fmpWalkAlias)) fail('fmp-walk/index.html is missing noindex.');
 if (refreshTarget(fmpWalkAlias) !== '/fmpwalk/') fail('fmp-walk/index.html does not refresh to /fmpwalk/.');
 if (!fmpWalkAlias.includes('location.replace("/fmpwalk/" + location.search + location.hash)')) fail('fmp-walk/index.html does not preserve query and hash when redirecting.');
-if (canonical(fmpWalkAlias) !== 'https://systembydave.com/fmpwalk/') fail('fmp-walk/index.html canonical does not match its redirect target.');
+if (canonical(fmpWalkAlias) !== `${originFor('fmpwalk/')}/fmpwalk/`) fail('fmp-walk/index.html canonical does not match its redirect target.');
 if (sitemapRoutes.has('/fmp-walk/')) fail('fmp-walk/index.html appears in the sitemap.');
 
 if (!hasNoIndex(read('afterbreak/index.html'))) fail('afterbreak/index.html is missing noindex.');

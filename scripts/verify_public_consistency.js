@@ -5,6 +5,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 const { spawnSync } = require('node:child_process');
+const { siteSitemap, cutoverSites } = require('./domain_sites_lib');
 
 const ROOT = path.resolve(__dirname, '..');
 const failures = [];
@@ -49,11 +50,15 @@ function verifyNavigation() {
   }
 }
 
+// systembydave.com's sitemap plus the generated sitemap of every site that has
+// cut over (scripts/domain-sites.json), so moved pages keep their metadata gate.
 function sitemapEntries() {
-  return [...read('sitemap.xml').matchAll(/<loc>(https:\/\/systembydave\.com[^<]*)<\/loc>/g)].map((match) => ({
+  const sitemaps = [['systembydave\\.com', read('sitemap.xml')]]
+    .concat(cutoverSites().map((site) => [site.domain.replace(/\./g, '\\.'), siteSitemap(site.id)]));
+  return sitemaps.flatMap(([host, xml]) => [...xml.matchAll(new RegExp(`<loc>(https://${host}[^<]*)</loc>`, 'g'))].map((match) => ({
     url: match[1],
     file: routeFile(match[1])
-  }));
+  })));
 }
 
 function verifyMetadata(entries) {

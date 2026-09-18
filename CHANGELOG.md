@@ -1,5 +1,23 @@
 # Changelog
 
+## 2026-09-18 — AV by Dave cut over to avbydave.com
+
+- avbydave.com serves the AV by Dave suite over HTTPS (Let's Encrypt, enforced),
+  and `avbydave` is cut over in `scripts/domain-sites.json`. On
+  systembydave.com the 61 AV pages are now redirect stubs to the same path on
+  avbydave.com, offering once to move saved tool data. The old AV offline
+  worker retires itself there. AV pages left the systembydave.com sitemap for
+  avbydave.com's own sitemap, which the staged `robots.txt` names.
+- Canonical, Open Graph and structured-data URLs of the AV pages (including
+  PixelForge's own sitemap and robots, AV Workbook's source, and the
+  housevideo-bound references' AV Suite links) name avbydave.com, applied with
+  the new `scripts/domain_cutover_rewrite.mjs`.
+- `scripts/domain_sites_lib.js` gives release gates each page's canonical origin
+  and sitemap; the AV Suite, Gear Reference, Throwline, FMP, indexing and
+  public-consistency gates use it, and the metadata gate still covers the AV
+  pages through avbydave.com's sitemap. `verify:domain-sites` now also checks
+  og:url, twitter:url and structured-data URLs for stale addresses.
+
 ## 2026-09-17 — FMP suite and AV by Dave published on their own domains
 
 - `scripts/domain-sites.json` names the pages that also publish to housevideo.app

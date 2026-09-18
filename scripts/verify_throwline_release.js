@@ -5,6 +5,7 @@ const crypto = require('node:crypto');
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
+const { originFor, sitemapFor } = require('./domain_sites_lib');
 
 const ROOT = path.resolve(__dirname, '..');
 const failures = [];
@@ -742,8 +743,9 @@ if (!throwlineTools[0]?.storageKeys?.some((item) => item.key === 'throwline:stag
 if (!throwlineTools[0]?.storageKeys?.some((item) => item.key === 'throwline:stage-units:v1')) {
   fail('Registry must include the versioned Throwline Stage measurement-units key.');
 }
-['https://systembydave.com/ProjectorThrow/', 'https://systembydave.com/ProjectorThrow/Stage3D.html'].forEach((url) => {
-  if (!sitemap.includes(`<loc>${url}</loc>`)) fail(`Sitemap is missing ${url}.`);
+['ProjectorThrow/', 'ProjectorThrow/Stage3D.html'].forEach((route) => {
+  const url = `${originFor(route)}/${route}`;
+  if (!sitemapFor(route).includes(`<loc>${url}</loc>`)) fail(`Sitemap is missing ${url}.`);
 });
 
 if (failures.length) {

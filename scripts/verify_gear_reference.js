@@ -4,6 +4,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
+const { originFor, sitemapFor } = require('./domain_sites_lib');
 
 const ROOT = path.resolve(__dirname, '..');
 const failures = [];
@@ -142,7 +143,7 @@ function verifyRenderer() {
   const prep = read('gear-prep.html');
   if (!prep.includes("fetch('data/gear/index.json'")) fail('Gear Prep does not read the authored reference index.');
   if (!prep.includes('id="gearReferenceLink"')) fail('Gear Prep inspector has no Gear Reference link.');
-  if (!read('sitemap.xml').includes('https://systembydave.com/gear-reference.html')) fail('Sitemap does not include Gear Reference.');
+  if (!sitemapFor('gear-reference.html').includes(`${originFor('gear-reference.html')}/gear-reference.html`)) fail('Sitemap does not include Gear Reference.');
   if (!/>44<\/div>/.test(read('index.html')) || !/44 operator tools/.test(read('tools.html'))) {
     fail('Public AV tool count was not raised to 44 browser tools.');
   }

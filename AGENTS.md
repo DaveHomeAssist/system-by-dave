@@ -77,7 +77,9 @@ to make stale documentation true.
 - **Domain sites:** `scripts/domain-sites.json` owns which pages are also
   published on housevideo.app and avbydave.com, and each site's cutover state.
   Those pages link systembydave.com-only destinations absolutely
-  (`https://systembydave.com/...`); see `docs/domain-sites.md`.
+  (`https://systembydave.com/...`); see `docs/domain-sites.md`. Release gates
+  take expected canonical origins and sitemap membership from
+  `scripts/domain_sites_lib.js`, never a hard-coded domain.
 - **History:** record material behavior, architecture, content, or layout
   changes in `CHANGELOG.md`. Keep feature ledgers out of `CLAUDE.md`.
 
