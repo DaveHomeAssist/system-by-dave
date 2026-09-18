@@ -22,9 +22,14 @@ trap 'rm -rf "$WORK"' EXIT
 umask 077
 printf '%s\n' "$DEPLOY_KEY" > "$WORK/key"
 # Pin GitHub's published SSH host keys instead of trusting a first connection.
-curl -fsSL https://api.github.com/meta \
+# Unauthenticated API calls from shared runners hit per-IP rate limits, so send
+# the job token when the workflow provides one.
+AUTH=()
+[ -n "${GITHUB_TOKEN:-}" ] && AUTH=(-H "Authorization: Bearer ${GITHUB_TOKEN}")
+curl -fsSL --retry 3 --retry-delay 5 ${AUTH[@]+"${AUTH[@]}"} https://api.github.com/meta \
   | python3 -c 'import json,sys; [print("github.com " + key) for key in json.load(sys.stdin)["ssh_keys"]]' \
   > "$WORK/known_hosts"
+[ -s "$WORK/known_hosts" ] || { echo "FATAL: could not read GitHub's SSH host keys"; exit 1; }
 export GIT_SSH_COMMAND="ssh -i $WORK/key -o IdentitiesOnly=yes -o UserKnownHostsFile=$WORK/known_hosts -o StrictHostKeyChecking=yes"
 
 git clone --quiet --depth 1 "git@github.com:${REPO}.git" "$WORK/site"
