@@ -40,6 +40,12 @@ ChatGPT Site, the fmpwalk GitHub Pages copy, or a pre-cutover systembydave.com F
 address. The old Site's origin-local drafts were not migrated, removed, or
 published, but the suite no longer links to them (Dave, 2026-09-18).
 
+No FMP page names a private network address. Controller addresses and readings
+belong to a control-room check, not the visual walk (Dave, 2026-09-18).
+`npm run verify:fmp` and the canonical exporter reject a private IPv4 address in
+any released file or hand-maintained FMP page, naming the file and a count, never
+the address.
+
 ## Managed source
 
 Canonical app: `DaveHomeAssist/fmpwalk`. Do not hand-edit generated `fmp/` or

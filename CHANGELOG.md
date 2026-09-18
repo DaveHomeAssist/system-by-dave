@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-09-18 — FMP walk: no controller addresses
+
+- Exported fmpwalk `5657de8`. The walk's Reference tab no longer carries the
+  static brightness-baseline and bowl-wall controller tables, and its ten LED
+  station cards no longer show an IP chip. Controller addresses and readings
+  belong to a control-room check, not the visual walk (Dave). Station brightness
+  fields and baselines are unchanged.
+- `verify:fmp` and the canonical exporter now reject a private IPv4 address
+  (10/8, 172.16/12, 192.168/16, 169.254/16) in any released FMP file or the
+  hand-maintained pages beside it, naming the file and a count, never the address.
+
 ## 2026-09-18 — FMP suite: no links to old versions
 
 - Exported fmpwalk `2a700ff`. The hub's Setup tab and its no-JavaScript guidance
