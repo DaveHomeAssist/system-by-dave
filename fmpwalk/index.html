@@ -793,26 +793,6 @@ kbd{
 <section class="panel" id="p-ref">
   <h2>Reference</h2>
 
-  <h3>Brightness baselines</h3>
-  <table>
-    <tr><th scope="col">Position</th><th scope="col">Baseline</th><th scope="col"></th></tr>
-    <tr><td>4 × VX4S, bowl</td><td class="m">20%</td><td>🟢</td></tr>
-    <tr><td>MCTRL660 tower primary</td><td class="m">4%</td><td>🟡</td></tr>
-    <tr><td>MCTRL660 tower backup</td><td class="m">0%</td><td>🔴</td></tr>
-    <tr><td>MCTRL660 wall pair</td><td class="m">3% / 3%</td><td>🟢</td></tr>
-  </table>
-  <div class="note crit">🚨 <b>The tower pair does not match.</b> If those two are a primary and a backup, a backup sitting at 0% comes up dark the night it is needed, on a display that carries paid advertising. 🟡 Whether the four 660s are redundancy or canvas extension is still unsettled. Trace one follower's output.</div>
-
-  <h3>Bowl walls</h3>
-  <table>
-    <tr><th scope="col">Wall</th><th scope="col">Controller</th><th scope="col">Pitch</th></tr>
-    <tr><td>Stage right flanking</td><td class="m">192.168.2.10</td><td class="m">10 mm</td></tr>
-    <tr><td>Stage left flanking</td><td class="m">192.168.2.11</td><td class="m">10 mm</td></tr>
-    <tr><td>Lawn delay 1 and 2</td><td class="m">192.168.2.12</td><td class="m">7 mm</td></tr>
-    <tr><td>Lawn delay 3 and 4</td><td class="m">192.168.2.13</td><td class="m">7 mm</td></tr>
-  </table>
-  <div class="mini">🟢 Panels are ANC. NovaStar is control and processing only. 🟢 All four on SDI 1, 1080i60. 🟢 Pitch is not uniform, so two <span class="k">.rcfgx</span> cabinet files minimum.</div>
-
   <h3>Notes versus faults</h3>
   <div class="note info">🔵 <b>A note records something. A fault asks someone to do something.</b> Drift you want to watch next show is a note. Anything that needs a person, a ladder, or a part is a fault. Notes reach the report without becoming a ticket, so use them freely.</div>
 
@@ -972,30 +952,30 @@ applyTheme();
 
 var BOWL = [
   {id:"FLK-SR",env:"A",kind:"led",name:"Stage right flanking wall",zone:"Pavilion",
-   spec:[["Ctrl","VX4S stage right"],["IP","192.168.2.10"],["Pitch","10 mm"],["In2","DVI"]],base:"20%",level:false},
+   spec:[["Ctrl","VX4S stage right"],["Pitch","10 mm"],["In2","DVI"]],base:"20%",level:false},
   {id:"FLK-SL",env:"A",kind:"led",name:"Stage left flanking wall",zone:"Pavilion",
-   spec:[["Ctrl","VX4S stage left"],["IP","192.168.2.11"],["Pitch","10 mm"],["In2","SDI"]],base:"20%",level:false},
+   spec:[["Ctrl","VX4S stage left"],["Pitch","10 mm"],["In2","SDI"]],base:"20%",level:false},
   {id:"DLY-1",env:"A",kind:"led",name:"Lawn delay wall 1",zone:"Lawn",
-   spec:[["Ctrl","VX4S lawn 1/2"],["IP","192.168.2.12"],["Pitch","7 mm"],["In2","DVI"]],base:"20%",level:true},
+   spec:[["Ctrl","VX4S lawn 1/2"],["Pitch","7 mm"],["In2","DVI"]],base:"20%",level:true},
   {id:"DLY-2",env:"A",kind:"led",name:"Lawn delay wall 2",zone:"Lawn",
-   spec:[["Ctrl","VX4S lawn 1/2"],["IP","192.168.2.12"],["Pitch","7 mm"],["In2","DVI"]],base:"20%",level:true},
+   spec:[["Ctrl","VX4S lawn 1/2"],["Pitch","7 mm"],["In2","DVI"]],base:"20%",level:true},
   {id:"DLY-3",env:"A",kind:"led",name:"Lawn delay wall 3",zone:"Lawn",
-   spec:[["Ctrl","VX4S lawn 3/4"],["IP","192.168.2.13"],["Pitch","7 mm"],["In2","HDMI"]],base:"20%",level:true},
+   spec:[["Ctrl","VX4S lawn 3/4"],["Pitch","7 mm"],["In2","HDMI"]],base:"20%",level:true},
   {id:"DLY-4",env:"A",kind:"led",name:"Lawn delay wall 4",zone:"Lawn",
-   spec:[["Ctrl","VX4S lawn 3/4"],["IP","192.168.2.13"],["Pitch","7 mm"],["In2","HDMI"]],base:"20%",level:true}
+   spec:[["Ctrl","VX4S lawn 3/4"],["Pitch","7 mm"],["In2","HDMI"]],base:"20%",level:true}
 ];
 
 /* IPs .20 to .23 are the documented range for the four MCTRL660 PRO units.
    Which IP belongs to which unit is NOT established. Left blank on purpose. */
 var SPEC = [
   {id:"SPC-TP",env:"C",kind:"spec",name:"Tower · primary",zone:"Building advertising LED",
-   spec:[["Plate","TOWER PRIMARY"],["Sticker","TOWER LEADER"],["IP","🔴 not mapped"]],base:"4%"},
+   spec:[["Plate","TOWER PRIMARY"],["Sticker","TOWER LEADER"]],base:"4%"},
   {id:"SPC-TB",env:"C",kind:"spec",name:"Tower · backup",zone:"Building advertising LED",
-   spec:[["Plate","TOWER BACKUP"],["Sticker","TOWER FOLLOWER"],["IP","🔴 not mapped"]],base:"0% 🔴"},
+   spec:[["Plate","TOWER BACKUP"],["Sticker","TOWER FOLLOWER"]],base:"0% 🔴"},
   {id:"SPC-WP",env:"C",kind:"spec",name:"Wall · primary",zone:"Building advertising LED",
-   spec:[["Plate","WALL PRIMARY"],["Sticker","WALL LEADER"],["IP","🔴 not mapped"]],base:"3%"},
+   spec:[["Plate","WALL PRIMARY"],["Sticker","WALL LEADER"]],base:"3%"},
   {id:"SPC-WB",env:"C",kind:"spec",name:"Wall · backup",zone:"Building advertising LED",
-   spec:[["Plate","WALL BACKUP"],["Sticker","WALL FOLLOWER"],["IP","🔴 not mapped"]],base:"3%"}
+   spec:[["Plate","WALL BACKUP"],["Sticker","WALL FOLLOWER"]],base:"3%"}
 ];
 
 /* The 21 enumerated ConcertVision positions, grouped as they are named.

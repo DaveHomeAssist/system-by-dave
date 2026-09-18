@@ -45,6 +45,11 @@ const NOTION_RECEIPT = 'fmpwalk/notion.js';
 // No FMP page links an old version of the suite: the retired private ChatGPT Site, the fmpwalk GitHub
 // Pages copy, or a pre-cutover systembydave.com FMP address (Dave, 2026-09-18). Only URLs count.
 const OLD_VERSION_URL = /https?:\/\/(?:(?:[\w-]+\.)*chatgpt\.site\b|davehomeassist\.github\.io\b|(?:www\.)?systembydave\.com\/(?:fmp|fmpwalk|fmp-index|fmp-walk)(?=[\/?#"'\s]|$))/i;
+// No FMP page names a private network address: controller addresses belong to a control-room check, not
+// the visual walk (Dave, 2026-09-18). Failures name the file and a count, never the address.
+const OCTET = '(?:25[0-5]|2[0-4]\\d|1\\d\\d|[1-9]?\\d)';
+const PRIVATE_IPV4 = new RegExp(`(?<![\\d.])(?:10\\.${OCTET}|172\\.(?:1[6-9]|2\\d|3[01])|192\\.168|169\\.254)\\.${OCTET}\\.${OCTET}(?!\\.?\\d)`, 'g');
+const privateAddresses = text => new Set(text.match(PRIVATE_IPV4) || []).size;
 
 function walk(directory, prefix = '') {
   return fs.readdirSync(directory, {withFileTypes:true}).flatMap(entry => {
@@ -74,6 +79,7 @@ for (const release of releases) {
     assert.doesNotMatch(source, /-----BEGIN .*PRIVATE KEY-----|\b(?:ntn_|secret_)[A-Za-z0-9]{30,}/);
     if (`${release.directory}/${name}` !== NOTION_RECEIPT) assert.doesNotMatch(source, NOTION_URL, `${release.directory}/${name}: links a Notion page; link the suite's HTML reference instead`);
     assert.doesNotMatch(source, OLD_VERSION_URL, `${release.directory}/${name}: links an old version of the suite`);
+    assert.equal(privateAddresses(source), 0, `${release.directory}/${name}: ${privateAddresses(source)} private network address(es) published; keep controller addresses with the control-room records`);
     const exposed = contactDetails(source);
     assert.ok(!exposed.emails && !exposed.phones, `${release.directory}/${name}: ${exposed.emails} email address(es) and ${exposed.phones} phone number(s) published; keep contacts in Notion`);
     for (const [, target, token] of source.matchAll(TOKEN_REFERENCE)) {
@@ -151,6 +157,7 @@ for (const name of ['fmp-index/index.html', 'fmp-walk/index.html', 'switcher/ind
   const page = fs.readFileSync(path.join(site, name), 'utf8');
   assert.doesNotMatch(page, NOTION_URL, `${name}: links a Notion page`);
   assert.doesNotMatch(page, OLD_VERSION_URL, `${name}: links an old version of the suite`);
+  assert.equal(privateAddresses(page), 0, `${name}: publishes a private network address`);
 }
 // Every rig count claim, including the one the camera card renders, must match the catalog.
 // The data module holds only object literals; evaluate it in an empty context rather than importing ESM from CommonJS.
