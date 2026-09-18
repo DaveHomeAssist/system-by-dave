@@ -17,6 +17,7 @@ Every public System by Dave route must give a visitor five reliable orientation 
 - **AV operator shell** — registry-backed AV tools use the AV Suite operator bar and deterministic suite/phase links.
 - **Custom compact shell** — DepotOps, AV Tool Suite index v2, Throwline, and Throwline Stage 3D may retain product-specific chrome when all five required cues are present.
 - **FMP operations shell** — the `/fmp/` hub, the camera, guide, and rig routes, `/fmpwalk/`, and `/fmp-index/` keep product chrome exported from `DaveHomeAssist/fmpwalk` (the index is maintained here). Every page links to System by Dave home, every page except the hub links to `/fmp/` as its parent, and the first focusable element is a skip link whose target is on the same document. Pages that use `<base>` must still resolve the skip link to their own URL. Fix gaps at the exporter, never by hand-editing `fmp/` or `fmpwalk/`.
+- **Pages on another domain** — pages listed in `scripts/domain-sites.json` are also served from housevideo.app or avbydave.com, where `/` is that site's own home. Their System by Dave home link and every other systembydave.com-only destination are absolute (`https://systembydave.com/`); `npm run verify:domain-sites` fails on a relative one.
 
 ## Error and alias pages
 

@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "verify:fmp": "node scripts/verify_fmp_release.js",
+    "verify:domain-sites": "node scripts/stage_domain_sites.mjs --check",
     "hygiene:fmp": "node scripts/fmp_hygiene_probe.js",
     "build:av-workbook": "vite build --config apps/av-workbook/vite.config.ts",
     "dev:av-workbook": "vite --config apps/av-workbook/vite.config.ts",

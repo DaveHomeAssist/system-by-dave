@@ -6,9 +6,15 @@ hub pages are listed below. lastmod is each file's last git-commit date, or
 today when the file has uncommitted changes.
 
 Usage (repo root):  python scripts/gen_sitemap.py
+
+Pages that moved to another domain (scripts/domain-sites.json) leave this
+sitemap at their site's cutover. The same list, rooted at the new domain, is
+written with:  python scripts/gen_sitemap.py --site <id> --out <path>
 """
+import argparse
 import datetime
 import io
+import json
 import os
 import re
 import subprocess
@@ -73,6 +79,25 @@ TOOL_CHANGEFREQ = "weekly"
 TOOL_PRIORITY = "0.7"
 
 
+def load_domain_sites():
+    return json.load(io.open(os.path.join(ROOT, "scripts", "domain-sites.json"), encoding="utf-8"))["sites"]
+
+
+def registry_hrefs():
+    src = io.open(os.path.join(ROOT, "js", "sbd-registry.js"), encoding="utf-8").read()
+    return re.findall(r"href:'([^']+)'", src)
+
+
+def site_for(path, sites, hrefs):
+    """The domain site that serves `path`, or None when systembydave.com does."""
+    for site in sites:
+        entries = list(site.get("pages", [])) + (hrefs if site.get("registry") else [])
+        for entry in entries:
+            if path == entry or (entry.endswith("/") and path.startswith(entry)):
+                return site
+    return None
+
+
 def registry_tool_pages():
     src = io.open(os.path.join(ROOT, "js", "sbd-registry.js"), encoding="utf-8").read()
     hrefs = re.findall(r"href:'([a-z0-9-]+\.html)'", src)
@@ -111,12 +136,35 @@ def lastmod_for(path, dirty):
 
 
 def main():
+    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser.add_argument("--site", help="write the sitemap for this scripts/domain-sites.json site id")
+    parser.add_argument("--out", help="output path (default: sitemap.xml in the repository root)")
+    args = parser.parse_args()
+    sites = load_domain_sites()
+    hrefs = registry_hrefs()
+    site = None
+    if args.site:
+        site = next((item for item in sites if item["id"] == args.site), None)
+        if site is None:
+            parser.error("unknown site id: %s" % args.site)
+    base = "https://%s/" % site["domain"] if site else BASE
+
+    def belongs(path):
+        owner = site_for(path, sites, hrefs)
+        if site:
+            return owner is not None and owner["id"] == site["id"]
+        return owner is None or not owner.get("cutover")
+
     dirty = dirty_paths()
     entries = []
     for path, freq, prio in STATIC_PAGES:
+        if not belongs(path):
+            continue
         if not path or is_indexable(path):
             entries.append((path, lastmod_for(path, dirty), freq, prio))
     for href in registry_tool_pages():
+        if not belongs(href):
+            continue
         if not os.path.exists(os.path.join(ROOT, href)):
             print("skip (missing file):", href, file=sys.stderr)
             continue
@@ -127,14 +175,15 @@ def main():
              '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
     for path, mod, freq, prio in entries:
         lines += ["  <url>",
-                  "    <loc>%s%s</loc>" % (BASE, path),
+                  "    <loc>%s%s</loc>" % (base, path),
                   "    <lastmod>%s</lastmod>" % mod,
                   "    <changefreq>%s</changefreq>" % freq,
                   "    <priority>%s</priority>" % prio,
                   "  </url>"]
     lines.append("</urlset>")
-    io.open(os.path.join(ROOT, "sitemap.xml"), "w", encoding="utf-8", newline="\n").write("\n".join(lines) + "\n")
-    print("sitemap.xml written: %d urls" % len(entries))
+    out = args.out or os.path.join(ROOT, "sitemap.xml")
+    io.open(out, "w", encoding="utf-8", newline="\n").write("\n".join(lines) + "\n")
+    print("%s written: %d urls" % (os.path.relpath(out, ROOT) if not args.out else out, len(entries)))
 
 
 if __name__ == "__main__":

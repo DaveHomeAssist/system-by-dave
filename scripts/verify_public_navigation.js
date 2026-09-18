@@ -59,9 +59,11 @@ const REQUIRED_SKIP_LINKS = new Map([
 ]);
 const CUSTOM_SHELLS = new Map([
   ['depotops/index.html', ['href="/"', 'href="/tools.html"', 'aria-current="page">DepotOps']],
-  ['av-tool-suite/index-v2/index.html', ['href="/"', 'href="/av-suite.html"', 'System by Dave / AV Tool Suite']],
-  ['ProjectorThrow/index.html', ['href="../index.html"', 'href="../av-suite.html"', 'id="throwline-workspace"']],
-  ['ProjectorThrow/Stage3D.html', ['href="../index.html"', 'href="index.html?workspace=planner"', 'href="../av-suite.html"', 'id="stage-workspace"']]
+  // AV by Dave pages are also published on avbydave.com, so their System by Dave
+  // home link is absolute (scripts/domain-sites.json).
+  ['av-tool-suite/index-v2/index.html', ['href="https://systembydave.com/"', 'href="/av-suite.html"', 'System by Dave / AV Tool Suite']],
+  ['ProjectorThrow/index.html', ['href="https://systembydave.com/"', 'href="../av-suite.html"', 'id="throwline-workspace"']],
+  ['ProjectorThrow/Stage3D.html', ['href="https://systembydave.com/"', 'href="index.html?workspace=planner"', 'href="../av-suite.html"', 'id="stage-workspace"']]
 ]);
 const SITE_ORIGIN = 'https://systembydave.com';
 // FMP video operations shell. fmp/ and fmpwalk/ are managed exports from
@@ -234,8 +236,10 @@ function verifyNavigationContract() {
   CORE_HEADERS.forEach((active, file) => {
     const source = read(file);
     if (!/class="sbd-site-header"/.test(source)) fail(`${file} is missing the shared global header.`);
+    // Pages also published on another domain (scripts/domain-sites.json) name
+    // their systembydave.com destinations absolutely.
     ['/tools.html', '/av-suite.html', '/notion.html', '/prompt-lab.html', '/profile/'].forEach((href) => {
-      if (!source.includes(`href="${href}"`)) fail(`${file} is missing global destination ${href}.`);
+      if (!source.includes(`href="${href}"`) && !source.includes(`href="${SITE_ORIGIN}${href}"`)) fail(`${file} is missing global destination ${href}.`);
     });
     if (active === 'Home') {
       if (!source.includes('<a class="sbd-site-brand" href="/" aria-current="page">')) fail(`${file} does not mark Home current.`);

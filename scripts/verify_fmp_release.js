@@ -128,7 +128,8 @@ assert.doesNotMatch(rigEntry, /unpkg|https:\/\/cdn/i);
 assert.match(rigEntry, /\.\/vendor\/three\/three\.module\.js/);
 const guideEntry = fs.readFileSync(path.join(site, 'fmp/guide/index.html'), 'utf8');
 assert.match(guideEntry, /Tonight's director, stage plot, restrictions, and verified assignments control/);
-assert.match(guideEntry, /href="\/"/);
+// The guide is also served from housevideo.app, so its System by Dave link is absolute.
+assert.match(guideEntry, /href="https:\/\/systembydave\.com\/"/);
 const robots = fs.readFileSync(path.join(site, 'robots.txt'), 'utf8');
 assert.ok(robots.includes('Disallow: /fmp/'));
 assert.ok(robots.includes('Disallow: /fmpwalk/'));

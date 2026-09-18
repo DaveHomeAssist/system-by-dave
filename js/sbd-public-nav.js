@@ -12,6 +12,14 @@
     return path === '/' || path === '/index.html';
   }
 
+  // AV by Dave and FMP pages are also served from avbydave.com and
+  // housevideo.app, where Home and Tools must still reach systembydave.com.
+  function siteUrl(path){
+    var host = window.location.hostname;
+    var local = host === 'localhost' || host === '127.0.0.1' || host === '';
+    return local || /(^|\.)systembydave\.com$/.test(host) ? path : 'https://systembydave.com' + path;
+  }
+
   function el(tag, className, text){
     var node = document.createElement(tag);
     if(className) node.className = className;
@@ -26,11 +34,11 @@
     nav.setAttribute('aria-label', 'Page escape navigation');
 
     var home = el('a', '', 'Home');
-    home.href = '/';
+    home.href = siteUrl('/');
     home.setAttribute('aria-label', 'Return to the System by Dave home page');
 
     var tools = el('a', '', 'Tools');
-    tools.href = '/tools.html';
+    tools.href = siteUrl('/tools.html');
     tools.setAttribute('aria-label', 'Browse the System by Dave tools directory');
 
     nav.appendChild(home);
