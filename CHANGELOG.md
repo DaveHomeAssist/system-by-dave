@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-09-18 — FMP rig: comms notes point at Clear-Com
+
+- Exported fmpwalk `e3beb5f`. Five rig operating notes still told operators to
+  plug a headset into the camera fiber converter, set its PGM and INCOM levels, and
+  test talk and listen over the fiber or the camera return. FMP comms is Clear-Com,
+  managed by the audio department, and fiber talkback is not used, as
+  `/fmp/build/` already says. The notes now say so; the hardware descriptions are
+  unchanged, and a canonical test keeps the operating notes on Clear-Com.
+
 ## 2026-09-18 — FMP suite: Notion links replaced with HTML pages
 
 - Exported fmpwalk `9012646`. Three new suite pages replace the Notion pages the
