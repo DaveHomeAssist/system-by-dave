@@ -1,5 +1,5 @@
 import * as T from './vendor/three/three.module.js';
-import { photos, catalog } from './fmp-guide-data.js?v=cd103fa126450197';
+import { photos, catalog } from './fmp-guide-data.js?v=b322be9523bcb8c5';
 const root=document.getElementById('fmp-rig-3d');
 root.dataset.ready='true';
 const themeButton=document.getElementById('themeBtn');
@@ -807,7 +807,7 @@ function selectPart(id,focus=false){
     if(photos[item.photo])$('[data-photo]').src=photos[item.photo];$('[data-photo]').alt=`Reference photograph for ${item.title}`;
     $('[data-photo-note]').textContent=item.photoNote||'Supplied photo · model proportions and cable curves are approximate.';
     $('[data-source]').href=item.source||'';$('[data-source]').textContent=item.sourceLabel||'';$('[data-source]').hidden=!item.source;
-    $('[data-equipment-source]').href=item.equipmentSource||'';$('[data-equipment-source]').textContent=item.equipmentSourceLabel||'FMP gear record';$('[data-equipment-source]').hidden=!item.equipmentSource;
+    $('[data-equipment-source]').href=item.equipmentSource||'';$('[data-equipment-source]').textContent=item.equipmentSourceLabel||'Camera equipment record';$('[data-equipment-source]').hidden=!item.equipmentSource;
     $('[data-evidence]').textContent=item.evidence||'';$('[data-evidence]').hidden=!item.evidence;
     if(focus){if(item.lcdOpening!==undefined)setLcdOpening(item.lcdOpening);setPose(item.pose);}
   }else{

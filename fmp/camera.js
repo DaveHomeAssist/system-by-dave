@@ -1,12 +1,12 @@
 import {
   FALLBACK_REGISTRY, checkInPayload, checkoutPayload, createDraft,
   positionFor, positionKeyFromLocation, resumeAccountDraft, setCheck, setPosition, visibleDrafts
-} from './camera-core.js?v=86ae252646f022ea';
+} from './camera-core.js?v=0442961e13762458';
 import { CLIENT_ID } from './mail.js?v=4a521185a33c8463';
 import { loadPhotoBlob, loadPhotoFiles, storePhoto } from './photos.js?v=cd1feeb0fd50c5df';
 import { NOTION_API_URL } from './notion-config.js?v=b675c734abe301f4';
 
-import { CAMERA_STAGES, cameraPages, cameraShell } from './camera-view.js?v=1ddf09313f6d716a';
+import { CAMERA_STAGES, cameraPages, cameraShell } from './camera-view.js?v=25cab35ca01eced2';
 
 const view = { stage: 'setup', page: 0 };
 let activePages;
@@ -14,6 +14,7 @@ const STORAGE_KEY = 'fmpCameraOperationsV1';
 const OWNER_KEY = 'fmpCameraLocalOwnerV1';
 const API_BASE = /^https:\/\/[a-z0-9-]+\.[a-z0-9.-]*run\.app$/.test(NOTION_API_URL) ? NOTION_API_URL : '';
 const SETUP_TEST_ONLY = document.body.dataset.setupTestOnly === 'true';
+const PUBLIC_REFERENCES = Object.freeze({ backFocus: '/backfocus/', fieldGuide: '/fmp/gear/#g2', cameraOps: '/fmp/build/', ptzOps: '/fmp/ptz/' });
 const PUBLIC_RELEASE = document.body.dataset.publicRelease === 'true';
 // The public export stamps the rig catalog size here so the reference card cannot drift from the data.
 const RIG_COMPONENTS = Number.parseInt(document.body.dataset.rigComponents, 10) || 0;
@@ -122,7 +123,8 @@ function eventOptions(draft) {
 
 function referenceCards(position) {
   const refs = { ...FALLBACK_REGISTRY.references, ...(store.registry.references || {}) };
-  if (PUBLIC_RELEASE) refs.backFocus = '/backfocus/';
+  // The signed-in registry still names Notion pages. The public release always opens its own HTML pages.
+  if (PUBLIC_RELEASE) Object.assign(refs, PUBLIC_REFERENCES);
   if (SETUP_TEST_ONLY && !PUBLIC_RELEASE) {
     refs.backFocus = '/resources/fmp-back-focus-card.html';
     refs.fieldGuide = '/resources/ursa-broadcast-g2-reference.html';
@@ -133,15 +135,16 @@ function referenceCards(position) {
       ['CALL', 'Bowl camera guide', 'Tour modes, meeting, song flow and directing', '/fmp/guide/', false],
       ['3D', 'Camera rig explorer', `${RIG_COMPONENTS ? `${RIG_COMPONENTS} components` : 'Components'}, photo evidence and operating notes`, '/fmp/rig/', false]
     ] : []),
-    ['BF', 'Back-focus card', 'Frame, zoom, focus, repeat', refs.backFocus, !PUBLIC_RELEASE],
-    ['G2', 'URSA Broadcast G2 field guide', 'Build, media, viewfinder and body reference', refs.fieldGuide, true],
-    ['OP', 'Build and stow instructions', 'House camera operating sequence', refs.cameraOps, true],
-    ['PTZ', 'PTZ control notes', 'Controller and catwalk checks', refs.ptzOps, true],
+    ['BF', 'Back focus field guide', 'Frame, zoom, focus and repeat', refs.backFocus, !PUBLIC_RELEASE],
+    // Operators open these mid-task, so they keep the camera workspace open behind them, as before.
+    ['OPS', 'Camera build & strike', 'Assignment, safe build, signal path, comms and strike', refs.cameraOps, true],
+    ['GEAR', 'Camera equipment', 'Body, lens and fiber converters, with open reads', refs.fieldGuide, true],
+    ['CAM4', 'Catwalk PTZ', 'SuperJoy, presets, modes and the follow fault', refs.ptzOps, true],
     ...(SETUP_TEST_ONLY && !PUBLIC_RELEASE ? [
       ['PDF', 'Printable G2 reference', 'Existing house reference PDF', '/resources/ursa-broadcast-g2-reference.pdf', true],
       ['MAP', 'Venue and signal maps', 'Select a zone or device, then read its evidence', '/#maps', true]
     ] : [])
-  ].filter(item => position.ptz || item[0] !== 'PTZ');
+  ].filter(item => position.ptz || item[0] !== 'CAM4');
   return items.map(([icon, name, copy, url, newTab = true]) => `
     <a class="reference" href="${escapeHtml(url)}"${newTab ? ' target="_blank" rel="noopener noreferrer"' : ''}>
       <span class="reference-icon" aria-hidden="true">${icon}</span>
@@ -182,7 +185,7 @@ function render(preferredFocus = '') {
     ...(SETUP_TEST_ONLY ? [`${PUBLIC_RELEASE ? 'Commissioning build' : 'Private test build'} · not venue accepted. Use synthetic observations only. Every new record is marked SETUP TEST; signed-in saving still needs verification.`] : [])
   ];
   activePages = cameraPages({ draft, position, identity, eventOptions: eventOptions(draft),
-    references: referenceCards(position), draftOptions, testOnly: SETUP_TEST_ONLY, busy, messages });
+    references: referenceCards(position), draftOptions, testOnly: SETUP_TEST_ONLY, publicRelease: PUBLIC_RELEASE, busy, messages });
   app.innerHTML = cameraShell({ draft, position, registry: store.registry, pages: activePages, view,
     testOnly: SETUP_TEST_ONLY, publicRelease: PUBLIC_RELEASE, appHome: APP_HOME, connectionText, dotClass, hasAlert: noticeError || !storageOk });
   bind(draft);

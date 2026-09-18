@@ -15,11 +15,12 @@ export const FALLBACK_REGISTRY = Object.freeze({
     { key: 'pit-stage-left', displayName: 'Pit · Stage Left', notionPosition: 'Cam 3 · Pit SL', legacyCamera: '3', ptz: false },
     { key: 'catwalk', displayName: 'Catwalk', notionPosition: 'Cam 4 · PTZ', legacyCamera: '4', ptz: true }
   ],
+  // Public HTML references on the suite's canonical home, never Notion pages: crews need no Notion account.
   references: {
-    backFocus: 'https://app.notion.com/p/3db255fc8f448091abdbd520fa0e2508',
-    fieldGuide: 'https://app.notion.com/p/3cf255fc8f4481828900fab47d08adf7',
-    cameraOps: 'https://app.notion.com/p/3d9255fc8f448087aa8cfe3b8384e375',
-    ptzOps: 'https://app.notion.com/p/3d9255fc8f4480d48259ee1dca33324f'
+    backFocus: 'https://housevideo.app/backfocus/',
+    fieldGuide: 'https://housevideo.app/fmp/gear/#g2',
+    cameraOps: 'https://housevideo.app/fmp/build/',
+    ptzOps: 'https://housevideo.app/fmp/ptz/'
   }
 });
 

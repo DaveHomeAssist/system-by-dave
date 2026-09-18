@@ -7,9 +7,10 @@ operational workflows.
 
 Covered surfaces:
 
-- `/fmp/`: the hub, four camera routes, `/fmp/guide/`, and `/fmp/rig/`
+- `/fmp/`: the hub, four camera routes, `/fmp/house/`, `/fmp/guide/`, `/fmp/gear/`,
+  `/fmp/build/`, `/fmp/ptz/`, and `/fmp/rig/`
 - `/fmpwalk/`: the preshow venue walk
-- `/fmp-index/` and `/backfocus/`: the working index and the public field guide
+- `/backfocus/`: the public field guide, and the `/fmp-index/` and `/fmp-walk/` redirects
 - The Notion databases and pages that the suite reads, writes, or documents
 
 `docs/fmp-public-release.md` is the release contract. This routine checks that
@@ -37,7 +38,7 @@ the contract still holds after releases, edits, and time.
 | Problem location | Owner | How to fix |
 | --- | --- | --- |
 | Anything under `/fmp/` or `/fmpwalk/` | `DaveHomeAssist/fmpwalk` | Fix the source, pass `npm run check`, re-export, run `npm run verify:fmp` here |
-| Aliases, `404.html`, `robots.txt`, sitemap, `/fmp-index/`, `/backfocus/`, this probe | `DaveHomeAssist/system-by-dave` | Normal repository change and Pages release |
+| Aliases (including the `/fmp-index/` redirect), `404.html`, `robots.txt`, sitemap, `/backfocus/`, this probe | `DaveHomeAssist/system-by-dave` | Normal repository change and Pages release |
 | Notion hub, docs, schemas, records | Notion workspace | Targeted edit with readback (`NOTION-1` to `NOTION-5`) |
 | Notion API, Google client origins, Firestore | Google Cloud project for FMP Walk | Follow the canonical `docs/notion-setup.md` |
 
@@ -97,7 +98,7 @@ check. Add `--strict` to exit non-zero on any failure.
 | S1 | Pages link home and back to `/fmp/` | Shell contract: home, parent, and return |
 | S2 | Public FMP files carry no personal contact details | Reports counts and file names only, never the values |
 | C1 | Rig part and component counts agree | Stale counts erode trust in the reference |
-| C2 | The `/fmp-index/` snapshot is under 14 days old | The index is a dated snapshot, not a live view |
+| S3 | Public FMP pages link no Notion pages | Crews have no Notion account; the walk's own Save to Notion receipt is the one exception. Replaced C2, the index snapshot age, when `/fmp-index/` became a redirect on 2026-09-18 |
 | B1–B2 | Notion API health responds and unsigned requests get 401 | The backend is up and its auth boundary holds |
 | W1–W2 | No console errors or failed requests on load | Runtime regressions |
 | W3 | No horizontal overflow at 390px or 1440px | Phone use at the venue |
@@ -135,10 +136,11 @@ Run after releases (A1–A4) and in the weekly pass (all).
   releases pins the same source commit.
 - **A4 Counts and names.** Rig component counts, route names (Catwalk and
   Spotlight area, Walk and Preshow walk), and titles agree across the hub, the
-  rig data, `CHANGELOG.md`, `/fmp-index/`, and this repository's docs.
-- **A5 Two entry points.** `/fmp/` is the operational hub, and `/fmp-index/` is
-  a dated working index. Check that the index snapshot date and destinations
-  are still true, and that neither page contradicts the other.
+  rig data, `CHANGELOG.md`, and this repository's docs.
+- **A5 One entry point.** `/fmp/` is the only FMP directory; `/fmp-index/`
+  redirects to it. Check that Learn lists each reference once, that no reference
+  repeats a House or Cameras link, and that anything readers need from Notion has
+  its own HTML page.
 - **A6 Theme architecture.** One theme default and one storage convention across
   the suite, or a documented reason for each exception.
 - **A7 Legacy origins.** Every link to the previous private Site or GitHub Pages

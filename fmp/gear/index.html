@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en" data-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Camera Equipment | FMP | System by Dave</title><meta name="description" content="The FMP house camera chain: URSA G2 bodies, Fujinon lenses and Blackmagic fiber converters, with what is fitted, what is proven and what still needs a read."><meta name="theme-color" content="#f4f6f8"><meta name="robots" content="noindex, nofollow">
+<link rel="canonical" href="https://housevideo.app/fmp/gear/"><meta property="og:type" content="website"><meta property="og:site_name" content="System by Dave"><meta property="og:title" content="Camera Equipment | FMP | System by Dave"><meta property="og:description" content="The FMP house camera chain: bodies, lenses and fiber converters, with evidence gaps preserved."><meta property="og:url" content="https://housevideo.app/fmp/gear/"><meta property="og:image" content="https://systembydave.com/img/card-cover-banner-wide.png"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Camera Equipment | FMP | System by Dave"><meta name="twitter:description" content="The FMP house camera chain: bodies, lenses and fiber converters, with evidence gaps preserved."><meta name="twitter:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<script src="../theme.js?v=d4c1024bbd62d45a"></script><link rel="stylesheet" href="../house/house.css?v=f429823db69552ae"><link rel="stylesheet" href="../ref.css?v=2d9b441dad74f859"><script src="../ref.js?v=6857c5c998216e1c" type="module"></script></head>
+<body>
+<a class="skip" href="#main">Skip to camera equipment</a>
+<header class="top"><nav aria-label="Breadcrumb"><a href="https://systembydave.com/">System by Dave</a><span>/</span><a href="/fmp/">FMP Video Operations</a><span>/</span><span aria-current="page">Camera equipment</span></nav><button id="theme" data-theme-toggle type="button" aria-pressed="false">Dark mode</button></header>
+<main id="main" tabindex="-1">
+<header class="mast"><div><p class="eyebrow">Freedom Mortgage Pavilion · Camden, NJ</p><h1>Camera equipment<span>.</span></h1><p class="intro">Three URSA bodies, their lenses, and the fiber that carries them. What is fitted, what is proven, and what still needs a read.</p></div><div class="record"><strong>REFERENCE RECORD</strong><span>Gear observations · Sep 1–17, 2026</span><span>Compiled · September 18, 2026</span><b>No live connection</b></div></header>
+<nav class="tabs" aria-label="Camera equipment sections"><a href="#chain" aria-current="page">01 <span>Chain</span></a><a href="#g2">02 <span>Body</span></a><a href="#lens">03 <span>Lens</span></a><a href="#camera-converter">04 <span>Camera fiber</span></a><a href="#studio-converter">05 <span>Rack fiber</span></a><a href="#checks">06 <span>Checks</span></a></nav>
+
+<section id="chain" class="panel" aria-labelledby="chain-title"><div class="section-head"><div><p class="eyebrow">01 / Camera chain</p><h2 id="chain-title">One camera, five links.</h2></div><a class="action" href="../rig/">Open the rig explorer →</a></div>
+<p class="lede">A house camera leaves the body on SDI, crosses to the rack on SMPTE hybrid fiber when a camera-end converter is fitted, and lands on a switcher input. The return runs back the same way and carries the viewfinder picture, tally and camera control.</p>
+<ol class="chain" aria-label="Signal path from camera to switcher">
+<li><strong>URSA G2 body</strong><span>12G-SDI main out · SDI return in</span></li>
+<li><strong>Camera fiber converter</strong><span>Bolted to the body · 1 of 3 seen fitted</span></li>
+<li><strong>SMPTE hybrid fiber</strong><span>Picture, return and power on one cable</span></li>
+<li><strong>Rack fiber converter</strong><span>3 racked and live · no spare</span></li>
+<li><strong>Switcher inputs 1–3</strong><span>Program returns to Return 1</span></li>
+</ol>
+<div class="board-grid"><article class="sheet"><div class="sheet-head"><h3>House convention</h3><span class="stamp">Stated September 12, 2026</span></div>
+<div class="table-scroll"><table><caption class="sr-only">House camera numbers, positions, lenses and switcher inputs</caption><thead><tr><th scope="col">Camera</th><th scope="col">Position</th><th scope="col">Lens</th><th scope="col">Switcher</th></tr></thead><tbody>
+<tr><td>1</td><td>Pit, stage-right side toward center</td><td>Fujinon 16×</td><td>Input 1</td></tr>
+<tr><td>2</td><td>Front of house, always</td><td>Fujinon 22×</td><td>Input 2</td></tr>
+<tr><td>3</td><td>Pit, stage-left side, mirroring Camera 1</td><td>Fujinon 16×</td><td>Input 3</td></tr>
+<tr><td>4</td><td>Catwalk PTZ, always · <a href="../ptz/">Catwalk PTZ</a></td><td>BirdDog P240</td><td>Input 4</td></tr>
+<tr><td>5–6</td><td>Tour lines, not house bodies</td><td>Tour</td><td>Inputs 5, 6</td></tr>
+</tbody></table></div>
+<p class="note">Lens pairing follows the position, not a nightly call: the longer front-of-house throw takes the 22×. Pit placement inside the convention is the tour's call; the house advises and sets ground rules. One baseplate is hand-marked CAM 3.</p></article>
+<article class="sheet caution"><span class="label warn">Return 1 carries five services</span><h3>One failed leg, five symptoms</h3><p>On the rack converter, Return 1 carries program, camera control, tally, genlock and intercom. If that leg fails, the viewfinder picture and shading control go together, which matches Camera 1 on September 11.</p><p>At FMP, genlock is not in use and fiber talkback is deliberately unused. Comms run on Clear-Com, which the audio department manages.</p><p class="see">Troubleshooting order: <a href="../build/#troubleshoot">Camera build &amp; strike</a></p></article></div>
+<div class="trio">
+<article class="sheet good"><span class="label good">Confirmed</span><ul><li>Three G2 bodies on switcher inputs 1–3; the G2 stamp is legible on the hardware.</li><li>Three rack fiber converters racked and live, one per body, no spare.</li><li>At least one camera-end fiber converter fitted (September 14; body not identified).</li><li>One 16× barrel reads <code>LA16x8BRM-XB1A</code>, 1:1.9/8-128mm.</li><li>Lenses sit on Blackmagic's own 4K B4 mount. No third-party adapter.</li></ul></article>
+<article class="sheet caution"><span class="label warn">Documented or inferred</span><ul><li>Body model: URSA Broadcast G2 is the working identification. URSA Mini Pro 4.6K G2 is the recorded alternative until a side plate is read.</li><li>Camera-end converter model <code>CINEURSANWFRCAM</code> is inferred; its plate is unread.</li><li>Production format is 1080i (Head of Video, September 1). Frame rate is unrecorded.</li></ul></article>
+<article class="sheet stop"><span class="label bad">Not yet verified</span><ul><li>Side-plate model name on any body.</li><li>Serial numbers on all three bodies.</li><li>The second 16× barrel and the 22× barrel.</li><li>Camera-end converters on the other two bodies.</li><li>How each position is powered: fiber, battery or mains.</li></ul><p class="see"><a href="#checks">All open checks →</a></p></article></div>
+</section>
+
+<section id="g2" class="panel" aria-labelledby="g2-title"><div class="section-head"><div><p class="eyebrow">02 / Camera body</p><h2 id="g2-title">URSA Broadcast G2.</h2></div><a class="action" href="https://documents.blackmagicdesign.com/UserManuals/BlackmagicURSABroadcastG2Manual.pdf" target="_blank" rel="noopener noreferrer">Blackmagic manual ↗</a></div>
+<p class="lede">Three bodies, one per staffed position. The G2 stamp is confirmed on the hardware. The exact model is not: evidence leans Broadcast G2 because the 4K B4 mount ships installed on that model and the turret carries a 4K BROADCAST badge, but a Mini Pro 4.6K G2 with the optional B4 mount looks the same from the available angles.</p>
+<div class="split"><div class="stack">
+<article class="sheet"><div class="sheet-head"><h3>Identity</h3><span class="stamp">Last observed September 11, 2026</span></div><dl class="facts">
+<div><dt>QUANTITY</dt><dd>3 in service · no spare recorded</dd></div>
+<div><dt>WORKING MODEL</dt><dd>URSA Broadcast G2 · part <code>CINEURSAMWC6KG2</code></dd></div>
+<div><dt>RECORDED ALTERNATIVE</dt><dd>URSA Mini Pro 4.6K G2 · part <code>CINEURSAMUPRO46KG2</code></dd></div>
+<div><dt>DECISIVE CHECK</dt><dd>Photograph the full model name on the body side plate. Ask the Head of Video for clearance first.</dd></div>
+<div><dt>WHY IT MATTERS</dt><dd>The 4K B4 mount costs about 1.1 stops of light, which drives lens and spare choices in a dark bowl.</dd></div>
+<div><dt>SERIALS</dt><dd>Not read on any body</dd></div>
+</dl></article>
+<article class="sheet caution"><span class="label warn">Known issues</span><ul>
+<li><strong>Camera 1, September 11:</strong> the front SDI output stopped feeding the viewfinder and CCU control was lost; the other bodies were fine. Tracked as two faults, the front SDI output and the control/return behavior. Return 2 restored a usable viewfinder feed. Do not merge them until a controlled test proves a common cause.</li>
+<li><strong>Camera 3, reported September 17:</strong> a curved, color-fringed arc split the frame warm and cool. Cause: the ND wheel was not fully seated. Reseated in the field and it now clicks firmly into each detent. If it drifts again without anyone touching it, flag the detent for service.</li>
+<li><strong>Camera 2:</strong> the right side handle clamp is broken and runs on a magic arm. Do not try to tighten it.</li>
+</ul></article>
+</div><div class="stack">
+<article class="sheet"><h3>Connections</h3><dl class="facts">
+<div><dt>INPUTS</dt><dd>12G-SDI in (program return, tally, CCU, reference, timecode) · BNC reference/timecode in · 2 XLR mic/line/AES with phantom · 3.5 mm headset · 2.5 mm LANC · 12-pin Hirose lens · 4-pin XLR 12–18 V DC · 12-pin Molex under the battery plate for the fiber converter</dd></div>
+<div><dt>OUTPUTS</dt><dd>12G-SDI main out (rear) · 3G-SDI front monitoring out, which feeds the viewfinder · +12 V 4-pin XLR out (shares 2 A with the lens connector) · D-tap 12 V 1.5 A on the V-plate · USB-C for media and zoom/focus demands · a second USB-C for updates</dd></div>
+<div><dt>NOT ON THE BODY</dt><dd>No HDMI and no Ethernet. Control arrives over the SDI return from the switcher, or by Bluetooth, LANC and USB Camera Setup.</dd></div>
+<div><dt>FORMATS</dt><dd>1080p23.98–60 · 1080i50/59.94/60 · 2160p23.98–60 · ND wheel clear, 2, 4 and 6 stops</dd></div>
+</dl></article>
+<article class="sheet"><h3>Settings that catch people</h3><ul>
+<li><strong>Camera ID:</strong> the switcher Camera ID set on the body must equal its switcher input. A wrong number makes a live camera look dead on the camera control panel.</li>
+<li><strong>Per-output monitoring:</strong> the LCD, front SDI and main SDI each have their own MONITOR page. Clean feed, status text, zebra and focus assist set on one output do not carry to another. Set operator overlays on the front SDI page only, never the main SDI.</li>
+<li><strong>Reference:</strong> referencing to the switcher return needs <em>program</em> selected as the reference source in Setup.</li>
+</ul></article>
+<article class="sheet"><h3>Power</h3><p>4-pin XLR 12–18 V DC from the supplied 100 W adapter, a V-Lock battery, or fiber-delivered power through the camera-end converter. External power takes priority and fails over to the battery. Which method is live at each position is not recorded.</p></article>
+</div></div>
+<p class="see">Part by part: <a href="../rig/?equipment=rig&amp;part=body">Camera rig explorer, body</a> · Shading and the ND wheel: <a href="/shader/">Shader field reference</a></p>
+</section>
+
+<section id="lens" class="panel" aria-labelledby="lens-title"><div class="section-head"><div><p class="eyebrow">03 / Lens</p><h2 id="lens-title">Fujinon 4K broadcast zooms.</h2></div><a class="action" href="https://www.fujifilm.com/us/en/business/cine-and-broadcast/portable-lens/4k-portable-lens" target="_blank" rel="noopener noreferrer">Fujifilm 4K lenses ↗</a></div>
+<p class="lede">Three lenses on a B4 mount: two 16× on the pit bodies and one 22× at front of house. Only one barrel has been read, and the capture did not record which body wore it.</p>
+<div class="split"><div class="stack">
+<article class="sheet"><div class="sheet-head"><h3>Identity</h3><span class="stamp">Barrel read September 14, 2026</span></div><dl class="facts">
+<div><dt>QUANTITY</dt><dd>2 × 16× (pit) · 1 × 22× (front of house)</dd></div>
+<div><dt>READ</dt><dd>One 16× barrel: FUJINON <code>LA16x8BRM-XB1A</code>, 1:1.9/8-128mm. Position not tagged.</dd></div>
+<div><dt>UNREAD</dt><dd>The second 16× and the 22×. Do not assume both 16× lenses are the same model.</dd></div>
+<div><dt>MOUNT</dt><dd>B4 on Blackmagic's first-party 4K B4 mount, visible as a 4K BROADCAST badge at the turret. No adapter is involved. The mount costs about 1.1 stops.</dd></div>
+<div><dt>DRIVE MODULE</dt><dd>A FUJINON FMM-X1 unit sits on the underside. What drives it, and from where, is untraced.</dd></div>
+</dl></article>
+</div><div class="stack">
+<article class="sheet"><h3>Two lens types by sight</h3><p>The September 1 frames show a second, visibly different optic with a white and green focus scale in feet and meters and an iris scale of 1.9, 2.8, 4, 5.6, 8, 11 and 16. That corroborates two distinct lens types before either model number is read.</p></article>
+<article class="sheet"><h3>Focus through the zoom</h3><p>When a lens and body are paired differently, or a shot is sharp at telephoto but soft at wide, run the back-focus procedure for the lens actually on the body. Reading a model number does not supply the procedure.</p><p class="see"><a href="/backfocus/">Back focus field guide →</a></p></article>
+</div></div>
+<p class="see">Rings, selectors and the grip: <a href="../rig/?equipment=rig&amp;part=lens-barrel">Camera rig explorer, lens</a> · <a href="https://www.fujifilm.com/bo/en/business/cine-and-broadcast/portablelens/accessories/control" target="_blank" rel="noopener noreferrer">Fujinon control accessories ↗</a></p>
+</section>
+
+<section id="camera-converter" class="panel" aria-labelledby="camera-converter-title"><div class="section-head"><div><p class="eyebrow">04 / Camera fiber converter</p><h2 id="camera-converter-title">The camera end of the fiber.</h2></div><a class="action" href="https://www.blackmagicdesign.com/products/blackmagicfiberconverters/techspecs" target="_blank" rel="noopener noreferrer">Converter specifications ↗</a></div>
+<p class="lede">Blackmagic pairs one camera-end converter with one rack converter per camera. Three rack units are live, so three camera-end units should exist. One has been seen. Look at the back of the body you are building before you trust the fiber.</p>
+<div class="split"><div class="stack">
+<article class="sheet caution"><div class="sheet-head"><h3>What has been seen</h3><span class="stamp">September 14, 2026</span></div><ul>
+<li>One body with a camera-mounted box feeding three short BNC jumpers into SDI OUT, SDI IN and REF IN/TC IN, plus a large round multipin connector consistent with a male SMPTE 304. A camera-end converter is fitted on that body. Its model is inferred; the plate is unread.</li>
+<li>A separate frame shows a body whose SDI OUT runs to a single coax with no converter jumpers. It cannot tell a second body on copper from the same body seen from another side.</li>
+<li>Neither capture recorded the camera position.</li>
+</ul><p>If a body has no converter, SDI is its live path. That matters most at front of house, where SDI needs reclocking beyond roughly 200 ft.</p></article>
+<article class="sheet"><h3>Identity</h3><dl class="facts">
+<div><dt>EXPECTED</dt><dd>3, one per body · Blackmagic Camera Fiber Converter <code>CINEURSANWFRCAM</code></dd></div>
+<div><dt>FORM</dt><dd>Mounts on the rear of the body by bracket. The battery plate comes off and the V-Lock plate rides on top of the converter. 19.1 × 14 × 13.8 cm, 2.2 kg.</dd></div>
+<div><dt>IN THE BOX</dt><dd>Converter, mounting bracket and three short 12G-SDI jumpers. No camera-end spare exists if all three are fitted.</dd></div>
+</dl></article>
+</div><div class="stack">
+<article class="sheet"><h3>Connections</h3><dl class="facts">
+<div><dt>INPUTS</dt><dd>SMPTE 304 hybrid fiber (male) · 12G-SDI camera feed in · 2 XLR mic/line/AES with 48 V · 10-pin Hirose tracker · DE-9 PTZ (RS-422) · USB-C · Molex to the camera</dd></div>
+<div><dt>OUTPUTS</dt><dd>3G-SDI return to the camera · 3 × 3G-SDI return loop outs · REF OUT · 2 × 5-pin XLR headset · +12 V D-tap (the manual states both 2 A and 500 mA; the conflict is retained) · 4-pin DC out 12 V 500 mA</dd></div>
+<div><dt>JUMPERS</dt><dd>Short 12G-SDI from the camera main out to the converter feed in · short 3G-SDI from the converter return out to the camera SDI in</dd></div>
+<div><dt>FORMATS</dt><dd>720p50–60 · 1080p/PsF/i at all rates · 2160p23.98–60 · 4:2:2 10-bit. UHD returns down-convert to 1080p. Needs camera software 4.6 or later.</dd></div>
+</dl></article>
+<article class="sheet stop"><span class="label bad">FMP rules</span><ul>
+<li>Do not connect a headset to the converter's 5-pin XLR. Fiber talkback is unused at FMP; Clear-Com is the comms path.</li>
+<li>Do not connect or disconnect hybrid fiber until the responsible technician confirms fiber power is off.</li>
+<li>Cap the SMPTE connector the moment the fiber comes off. Two cap sets exist unfitted, and the Head of Video will not reuse a cable that took dust.</li>
+</ul></article>
+<article class="sheet"><h3>Power</h3><p>Powered over the SMPTE hybrid fiber from the rack unit, which also powers the camera and its accessories through the Molex. If fiber power drops, the camera on its own 4-pin XLR, or a V-Lock battery on top of the converter, can carry it. Firmware: unplug the fiber, power the camera from mains, then use Blackmagic Camera Setup over USB-C.</p></article>
+</div></div>
+<p class="see">Controls and connectors, part by part: <a href="../rig/?equipment=rig&amp;part=camera-fiber">Camera rig explorer, camera fiber converter</a></p>
+</section>
+
+<section id="studio-converter" class="panel" aria-labelledby="studio-converter-title"><div class="section-head"><div><p class="eyebrow">05 / Rack fiber converter</p><h2 id="studio-converter-title">The rack end of the fiber.</h2></div><a class="action" href="https://www.blackmagicdesign.com/products/blackmagicfiberconverters" target="_blank" rel="noopener noreferrer">Blackmagic fiber converters ↗</a></div>
+<p class="lede">Three Blackmagic Studio Fiber Converters are racked and live, one per body, with no spare. A fourth unit is the only way to cover a failure without dropping a camera to SDI.</p>
+<div class="split"><div class="stack">
+<article class="sheet"><div class="sheet-head"><h3>Identity</h3><span class="stamp">Hardware verified · September 1, 2026</span></div><dl class="facts">
+<div><dt>QUANTITY</dt><dd>3 racked and live · <code>CINEURSANWFRSTUD</code> · labels and serials not read</dd></div>
+<div><dt>FORM</dt><dd>2RU half-rack width. The front carries the SMPTE connector, USB-C, a 5-inch LCD and the power switch, so the unit mounts facing the rack rear by design. 21 × 8.8 × 37.2 cm, 2.8 kg.</dd></div>
+<div><dt>POWER</dt><dd>Single IEC inlet, 100–240 V AC. It sends about 200 V over the fiber to the camera end, with a power handshake and a 30 mA imbalance cutoff. It carries the camera and camera-end load, so budget the circuit accordingly.</dd></div>
+<div><dt>CONFIGURATION</dt><dd>All on the front LCD. PTZ source is SDI (switcher) or 9-pin; talkback source is SDI plus DB-25, or DB-25 only. The language prompt returns after every firmware update.</dd></div>
+</dl></article>
+<article class="sheet caution"><span class="label warn">Failures on record</span><ul>
+<li><strong>September 1:</strong> one unit dropped on a firmware fault and was recovered by reflashing through the front USB-C with Blackmagic Camera Setup. The unit and version were not recorded.</li>
+<li><strong>September 11:</strong> Camera 1 lost its return (viewfinder and CCU control). Check that unit's LCD first.</li>
+</ul></article>
+</div><div class="stack">
+<article class="sheet"><h3>Connections</h3><dl class="facts">
+<div><dt>FRONT</dt><dd>SMPTE 304 hybrid fiber (female) · USB-C</dd></div>
+<div><dt>REAR INPUTS</dt><dd>3 × 12G-SDI return in · REF IN · DE-9 PTZ (RS-422) · DB-25 intercom/tally · IEC</dd></div>
+<div><dt>REAR OUTPUTS</dt><dd>2 × 12G-SDI camera out · REF OUT · 4 × XLR analog audio out</dd></div>
+<div><dt>NOT THE FIBER PORT</dt><dd>The blue optical I/O cage on the rear is a 10 GbE port the product does not activate. It is not the camera fiber and not a spare network port, so an idle cage proves nothing about fiber service.</dd></div>
+</dl></article>
+<article class="sheet"><div class="sheet-head"><h3>One rear panel, as found</h3><span class="stamp">September 14 · rack position not identified</span></div><ul>
+<li>12G OUT 2 populated, OUT 1 empty.</li>
+<li>RETURN IN 1 populated, 2 and 3 empty.</li>
+<li>REF IN and REF OUT, intercom/tally, PTZ, Ethernet and all four audio outputs empty.</li>
+</ul><p>That matches the house practice: fiber talkback deliberately unused and genlock not in use.</p></article>
+<article class="sheet"><h3>Front-of-house loop</h3><p>When a tour asks for a house front-of-house camera iso and accepts a loop, the 12G-SDI camera outputs here are the probable loop point, not anything at the camera. Settle it before the advance.</p></article>
+</div></div>
+<p class="see">Front panel, LCD and sockets: <a href="../rig/?equipment=studio&amp;part=studio-body">Camera rig explorer, rack fiber converter</a></p>
+</section>
+
+<section id="checks" class="panel" aria-labelledby="checks-title"><div class="section-head"><div><p class="eyebrow">06 / Open checks</p><h2 id="checks-title">Close these on the next call.</h2></div><a class="action" href="../build/">Camera build &amp; strike →</a></div>
+<p class="lede">Each check below is a look, a photo or a read, not a repair. Record what you find with the date and position so the next person does not repeat it.</p>
+<div class="split"><div class="stack">
+<article class="sheet"><h3>Bodies</h3><ul class="checks"><li>Photograph the side-plate model name on one body, with clearance from the Head of Video. This settles Broadcast G2 against Mini Pro 4.6K G2.</li><li>Read the serial numbers on all three bodies.</li><li>Confirm each body's switcher Camera ID matches its input, Camera 1 first.</li><li>Record how each position is powered: fiber, battery or mains.</li></ul></article>
+<article class="sheet"><h3>Lenses</h3><ul class="checks"><li>Photograph the plates on the second 16× and the 22×.</li><li>Tag each barrel to the position it was on.</li><li>Trace what drives the FMM-X1 module, and from where.</li></ul></article>
+</div><div class="stack">
+<article class="sheet"><h3>Camera-end fiber</h3><ul class="checks"><li>Look at the rear of the other two bodies and count converters.</li><li>Record whether SMPTE caps are fitted at breakdown.</li><li>Confirm the return jumper from the converter to Camera 1's SDI in.</li></ul></article>
+<article class="sheet"><h3>Rack-end fiber</h3><ul class="checks"><li>Read and record each unit's firmware version from its LCD.</li><li>Label each unit with its camera number.</li><li>Confirm which output feeds the switcher and which is free for a front-of-house loop.</li><li>Confirm what Returns 2 and 3 carry.</li><li>Photograph each front panel with the SMPTE 304 connector mated.</li></ul></article>
+</div></div>
+</section>
+</main>
+<footer><span>FMP Video Operations · Camera equipment</span><span>Reference only · no live monitoring or control</span><a href="/fmp/#learn">Back to Learn</a></footer>
+</body></html>

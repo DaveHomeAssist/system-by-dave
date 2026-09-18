@@ -1,5 +1,28 @@
 # Changelog
 
+## 2026-09-18 — FMP suite: Notion links replaced with HTML pages
+
+- Exported fmpwalk `9012646`. Three new suite pages replace the Notion pages the
+  public FMP suite linked: `/fmp/gear/` (URSA G2 bodies, Fujinon lenses and both
+  fiber converters), `/fmp/build/` (camera build, prove, show-ready gate and strike)
+  and `/fmp/ptz/` (the catwalk BirdDog P240 and SuperJoy, presets, modes and the
+  FMP-8 follow fault). They keep the records' dated evidence, name roles instead of
+  people, and carry no network addresses.
+- The rig's 53 Notion citations now open `/fmp/gear/` sections or `/backfocus/`.
+  The camera References panel opens the new pages even after sign-in, when the
+  backend registry still names Notion, and check-in and checkout receipts name the
+  Crew Call instead of linking to it.
+- Learn lists each reference once. The venue seating chart and the front-of-house
+  and pit audience photos moved to the House page's venue section, so Learn no
+  longer repeats House or reuses camera position badges.
+- `/fmp-index/` is retired to a noindex redirect to `/fmp/`, like `/fmp-walk/`.
+  Its 18 Notion links go with it; its personal pages are not carried over, and its
+  venue records already live in House, Camera equipment and the rig.
+- `verify:fmp` now fails on a Notion URL in any published FMP file or
+  hand-maintained FMP page, except the walk's own Save to Notion receipt. The
+  navigation, indexing and hygiene checks cover the new pages and the redirect,
+  and hygiene check S3 replaces C2, the retired index's snapshot age.
+
 ## 2026-09-18 — FMP suite cut over to housevideo.app
 
 - housevideo.app serves the FMP suite over HTTPS (Let's Encrypt, enforced), and

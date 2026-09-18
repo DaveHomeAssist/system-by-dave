@@ -1,0 +1,41 @@
+/* Components the FMP reference pages add to the shared House shell (house/house.css).
+   Colors, type, tabs, panels, sheets and tables all come from that file. */
+.chain { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:10px; margin:0 0 24px; padding:0; list-style:none; counter-reset:hop }
+.chain li { counter-increment:hop; background:var(--surface); border:1px solid var(--line); border-top:3px solid var(--accent); padding:14px 16px 16px; font-size:13px }
+.chain li::before { content:counter(hop,decimal-leading-zero); display:block; font:11px/1.5 var(--mono); color:var(--accent); margin-bottom:6px }
+.chain li strong { display:block; font-size:14px; line-height:1.35; margin-bottom:4px }
+.chain li span { color:var(--muted) }
+.split { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:24px; margin-bottom:24px }
+.trio { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; margin-bottom:24px }
+.stack { display:grid; gap:24px; align-content:start }
+.sheet.stop { border-left:4px solid var(--bad) }
+.sheet.caution { border-left:4px solid var(--warn) }
+.sheet.good { border-left:4px solid var(--good) }
+.label { display:block; font:600 11px/1.5 var(--mono); letter-spacing:.08em; text-transform:uppercase; margin:0 0 10px; color:var(--accent) }
+.label.good { color:var(--good) }
+.label.warn { color:var(--warn) }
+.label.bad { color:var(--bad) }
+.sheet ul:not(.checks), .sheet ol:not(.steps) { margin:0 0 12px; padding-left:20px }
+.sheet li { margin:0 0 7px }
+.sheet > :last-child { margin-bottom:0 }
+.steps { margin:0; padding:0; list-style:none; counter-reset:step }
+.steps > li { counter-increment:step; display:grid; grid-template-columns:34px minmax(0,1fr); gap:10px; padding:11px 0; border-top:1px solid var(--line); margin:0 }
+.steps > li::before { content:counter(step,decimal-leading-zero); font:12px/1.8 var(--mono); color:var(--accent) }
+.checks { margin:0; padding:0; list-style:none }
+.checks > li { position:relative; padding:10px 0 10px 28px; border-top:1px solid var(--line); margin:0 }
+.checks > li::before { content:""; position:absolute; left:0; top:15px; width:13px; height:13px; border:1.5px solid var(--muted) }
+.checks > li.done { color:var(--muted) }
+.checks > li.done::before { background:var(--good); border-color:var(--good) }
+.sheet h3 + .checks, .sheet h3 + .steps, .sheet .label + .checks, .sheet .label + .steps { margin-top:4px }
+code, kbd { font:12px/1.4 var(--mono); background:var(--soft); padding:1px 5px; border-radius:2px; white-space:nowrap }
+.status { font:12px var(--mono); white-space:nowrap }
+.status.good { color:var(--good) }
+.status.warn { color:var(--warn) }
+.status.bad { color:var(--bad) }
+.see { font-size:13px; color:var(--muted); margin-top:14px }
+.see a { font-weight:600 }
+@media(max-width:1200px) { .chain { grid-template-columns:repeat(3,minmax(0,1fr)) } }
+@media(max-width:900px) { .split, .trio { grid-template-columns:1fr } .chain { grid-template-columns:repeat(2,minmax(0,1fr)) } }
+@media(max-width:680px) { .chain { grid-template-columns:1fr } }
+@media print { .sheet.stop, .sheet.caution, .sheet.good { border-left-width:2px } }
+.board-grid + .trio { margin-top:24px }

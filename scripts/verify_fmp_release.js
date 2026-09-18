@@ -19,7 +19,8 @@ const releases = [
       'index.html', 'public.css', 'public.js', 'theme.js', 'camera.js', 'camera-core.js', 'camera-view.js', 'camera.css', 'photos.js', 'mail.js', 'notion-config.js',
       ...cameraRoutes.map(route => `${route}index.html`),
       'house/index.html', 'house/house.css', 'house/house.js', 'house/house-data.js', 'house/site-plan.png', 'house/display-estate.csv',
-      'guide/index.html', 'rig/index.html', 'rig/rig-model.js', 'rig/fmp-guide-data.js',
+      'guide/index.html', 'gear/index.html', 'build/index.html', 'ptz/index.html', 'ref.css', 'ref.js',
+      'rig/index.html', 'rig/rig-model.js', 'rig/fmp-guide-data.js',
       ...rigPhotos.map(name => `rig/assets/${name}.webp`),
       'rig/vendor/three/three.module.js', 'rig/vendor/three/three.core.js', 'rig/vendor/three/addons/controls/OrbitControls.js'
     ]
@@ -37,6 +38,10 @@ function contactDetails(text) {
 }
 const TOKEN_REFERENCE = /(?:\bfrom\s*|\bimport\s*\(\s*|\bimport\s+|\b(?:src|href)=)["']((?:\.{1,2}\/)*[\w-][\w./-]*\.(?:js|css))\?v=([^"']*)["']/g;
 const COUNT_CLAIM = /\b(\d{2,4})[- ](?:part|component)s?\b/g;
+// No FMP page links a Notion page: crews have no Notion account, so what they need is its own HTML page.
+// The walk's explicit Save to Notion receipt (fmpwalk/notion.js) opens the walker's own record and is exempt.
+const NOTION_URL = /https?:\/\/(?:[\w-]+\.)*notion\.(?:so|site|com)\b/i;
+const NOTION_RECEIPT = 'fmpwalk/notion.js';
 
 function walk(directory, prefix = '') {
   return fs.readdirSync(directory, {withFileTypes:true}).flatMap(entry => {
@@ -64,6 +69,7 @@ for (const release of releases) {
     if (/\.(?:webp|png)$/.test(name)) continue;
     const source = data.toString('utf8');
     assert.doesNotMatch(source, /-----BEGIN .*PRIVATE KEY-----|\b(?:ntn_|secret_)[A-Za-z0-9]{30,}/);
+    if (`${release.directory}/${name}` !== NOTION_RECEIPT) assert.doesNotMatch(source, NOTION_URL, `${release.directory}/${name}: links a Notion page; link the suite's HTML reference instead`);
     const exposed = contactDetails(source);
     assert.ok(!exposed.emails && !exposed.phones, `${release.directory}/${name}: ${exposed.emails} email address(es) and ${exposed.phones} phone number(s) published; keep contacts in Notion`);
     for (const [, target, token] of source.matchAll(TOKEN_REFERENCE)) {
@@ -111,10 +117,6 @@ const theme = fs.readFileSync(path.join(site, 'fmp/theme.js'), 'utf8');
 assert.match(theme, /const KEY = 'fmpTheme';/);
 assert.match(theme, /preference = legacy \|\| 'light';/);
 assert.match(walkEntry, /var THEME_KEY = "fmpTheme";/);
-const workingIndex = fs.readFileSync(path.join(site, 'fmp-index/index.html'), 'utf8');
-assert.match(workingIndex, /<html lang="en" data-av-theme="light">/);
-assert.match(workingIndex.slice(0, workingIndex.indexOf('</head>')), /<script src="\/fmp\/theme\.js"><\/script>/, 'fmp-index/index.html: load /fmp/theme.js in <head>');
-assert.match(workingIndex, /data-theme-toggle/, 'fmp-index/index.html: visible theme toggle');
 assert.match(walkEntry, /No silent writes/);
 // /fmpwalk/camera/ does not exist; the walk's camera link and legacy redirect must use /fmp/camera/.
 assert.match(walkEntry, /id="cameraLaunch" href="\/fmp\/camera\/"/);
@@ -134,9 +136,17 @@ assert.match(guideEntry, /href="https:\/\/systembydave\.com\/"/);
 const robots = fs.readFileSync(path.join(site, 'robots.txt'), 'utf8');
 assert.ok(robots.includes('Disallow: /fmp/'));
 assert.ok(robots.includes('Disallow: /fmpwalk/'));
+// /fmp-index/ is retired: the /fmp/ hub is the one directory, so the old index redirects there like /fmp-walk/.
 const index = fs.readFileSync(path.join(site, 'fmp-index/index.html'), 'utf8');
-assert.ok(index.includes('href="/fmp/"'));
-assert.ok(index.includes('href="/fmpwalk/"'));
+assert.match(index, /<meta http-equiv="refresh" content="0; url=\/fmp\/">/, 'fmp-index/index.html: redirect to /fmp/');
+assert.ok(index.includes('location.replace("/fmp/" + location.search + location.hash)'), 'fmp-index/index.html: keep query and hash');
+assert.ok(index.includes(`<link rel="canonical" href="${originFor('fmp/')}/fmp/">`), 'fmp-index/index.html: canonical is the hub');
+assert.match(index, /<meta name="robots" content="noindex,follow">/);
+assert.doesNotMatch(entry, /href="\/fmp-index\/"/, 'fmp/index.html: the hub must not link the retired index');
+// The hand-maintained pages published beside the suite follow the same rule.
+for (const name of ['fmp-index/index.html', 'fmp-walk/index.html', 'switcher/index.html', 'shader/index.html', 'backfocus/index.html']) {
+  assert.doesNotMatch(fs.readFileSync(path.join(site, name), 'utf8'), NOTION_URL, `${name}: links a Notion page`);
+}
 // Every rig count claim, including the one the camera card renders, must match the catalog.
 // The data module holds only object literals; evaluate it in an empty context rather than importing ESM from CommonJS.
 const guideData = fs.readFileSync(path.join(site, 'fmp/rig/fmp-guide-data.js'), 'utf8');

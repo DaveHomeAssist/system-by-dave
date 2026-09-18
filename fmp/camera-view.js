@@ -1,4 +1,4 @@
-import { CHECK_STATES, checksFor, pendingLabel } from './camera-core.js?v=86ae252646f022ea';
+import { CHECK_STATES, checksFor, pendingLabel } from './camera-core.js?v=0442961e13762458';
 
 const esc = value => String(value ?? '').replace(/[&<>"']/g, character =>
   ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]);
@@ -6,7 +6,7 @@ export const CAMERA_STAGES = ['setup', 'build', 'faults', 'stow', 'refs'];
 const names = { setup: 'Setup', build: 'Build', faults: 'Faults', stow: 'Stow', refs: 'References', status: 'Status', lead: 'Lead' };
 
 // Each page is a bounded task, not a clipped portion of a longer scrolling form.
-export function cameraPages({ draft, position, identity, eventOptions, references, draftOptions = '', testOnly, busy, messages }) {
+export function cameraPages({ draft, position, identity, eventOptions, references, draftOptions = '', testOnly, busy, messages, publicRelease = false }) {
   const locked = Boolean(draft.checkedInReceipt);
   const closed = Boolean(draft.checkedOutReceipt);
   const page = (title, detail, body) => ({ title, detail, body });
@@ -18,7 +18,8 @@ export function cameraPages({ draft, position, identity, eventOptions, reference
     const values = Object.values(draft[stage === 'build' ? 'buildChecks' : 'stowChecks']);
     return `<div class="check-summary">${CHECK_STATES.map(state => `<span><strong>${values.filter(value => value === state.value).length}</strong>${esc(state.label)}</span>`).join('')}</div>`;
   };
-  const receipt = (result, label) => result ? `<div class="receipt"><strong>${esc(label)}</strong><a href="${esc(result.url)}" target="_blank" rel="noopener">Open Crew Call ↗</a></div>` : '';
+  // Crews have no Notion account, so the public receipt names the record instead of linking to it.
+  const receipt = (result, label) => result ? `<div class="receipt"><strong>${esc(label)}</strong>${publicRelease ? '<span>Recorded as a Crew Call</span>' : `<a href="${esc(result.url)}" target="_blank" rel="noopener">Open Crew Call ↗</a>`}</div>` : '';
   const setup = [
     page('Connect your account', 'Sign in to load shows and submit. Draft work stays on this device.',
       `<div class="account-card"><div id="cameraGoogle"></div>${identity ? `<strong class="account-email">${esc(identity.email)}</strong><button class="secondary" type="button" id="disconnect">Sign out of this tab</button>` : '<p>No Notion account needed.</p>'}</div><button class="text-button" type="button" id="changeLocalOwner">Change local operator profile</button>`),

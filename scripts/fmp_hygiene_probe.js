@@ -36,18 +36,22 @@ const DEBUG_PORT = 9347;
 const TIMEOUT_MS = 15000;
 
 const RELEASES = ['fmp', 'fmpwalk'];
-const ROUTES = ['/fmp/', '/fmp/camera/', '/fmp/camera/pit-center/', '/fmp/camera/front-of-house/', '/fmp/camera/pit-stage-left/', '/fmp/camera/catwalk/', '/fmp/guide/', '/fmp/rig/', '/fmpwalk/', '/fmp-index/', '/backfocus/'];
+const ROUTES = ['/fmp/', '/fmp/camera/', '/fmp/camera/pit-center/', '/fmp/camera/front-of-house/', '/fmp/camera/pit-stage-left/', '/fmp/camera/catwalk/', '/fmp/guide/', '/fmp/house/', '/fmp/gear/', '/fmp/build/', '/fmp/ptz/', '/fmp/rig/', '/fmpwalk/', '/backfocus/'];
 // Addresses operators plausibly type or were given; each should resolve or be deliberately retired.
-const ALIASES = ['/fmp-walk', '/fmp-walk/', '/fmp/walk/'];
+// /fmp-index/ was retired to a redirect to the /fmp/ hub on 2026-09-18.
+const ALIASES = ['/fmp-walk', '/fmp-walk/', '/fmp/walk/', '/fmp-index/'];
 // /backfocus/ is an indexable public field guide; only FMP operational pages must stay noindex.
 const NOINDEX_PAGES = ['/fmp-index/'];
-const BROWSER_PAGES = ['/fmp/', '/fmpwalk/', '/fmp/rig/', '/fmp/guide/', '/fmp/camera/pit-center/', '/fmp-index/'];
+const BROWSER_PAGES = ['/fmp/', '/fmpwalk/', '/fmp/rig/', '/fmp/guide/', '/fmp/camera/pit-center/', '/fmp/gear/', '/fmp/build/', '/fmp/ptz/'];
 const LEGACY_ORIGINS = [/davehomeassist\.github\.io/i, /\.chatgpt\.site/i];
 const LEGACY_APP_URLS = ['https://davehomeassist.github.io/fmpwalk/', 'https://davehomeassist.github.io/fmpwalk/camera/pit-center/'];
 // Pages that must offer both a home link and a return to the FMP hub.
-const SHELL_PAGES = ['/fmp/', '/fmp/camera/pit-center/', '/fmp/guide/', '/fmp/rig/', '/fmpwalk/', '/fmp-index/'];
+const SHELL_PAGES = ['/fmp/', '/fmp/camera/pit-center/', '/fmp/guide/', '/fmp/gear/', '/fmp/build/', '/fmp/ptz/', '/fmp/rig/', '/fmpwalk/'];
 const ALLOWED_EMAILS = ['avbydave@gmail.com'];
-const INDEX_STALE_DAYS = 14;
+// No public FMP page links a Notion page; the walk's own Save to Notion receipt is the exception.
+const NOTION_URL = /https?:\/\/(?:[\w-]+\.)*notion\.(?:so|site|com)\b/gi;
+const NOTION_RECEIPT = 'fmpwalk/notion.js';
+const HAND_MAINTAINED = ['/fmp-index/', '/fmp-walk/', '/switcher/', '/shader/', '/backfocus/'];
 const CANONICAL_REPO = 'DaveHomeAssist/fmpwalk';
 
 const findings = [];
@@ -239,6 +243,7 @@ async function checkContent() {
 
   // Report counts and file names only; never print the matched values.
   const exposed = [];
+  const notion = [];
   const counts = new Map();
   for (const dir of RELEASES) {
     const files = Object.keys(JSON.parse(fs.readFileSync(path.join(site, dir, 'source_provenance.json'), 'utf8')).files).filter(name => /\.(?:html|js)$/.test(name));
@@ -247,16 +252,18 @@ async function checkContent() {
       const emails = (text.match(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[a-z]{2,}/g) || []).filter(email => !ALLOWED_EMAILS.includes(email.toLowerCase()) && !/\.(?:png|webp|jpg|svg|js)$/i.test(email));
       const phones = text.match(/\(?\b\d{3}\)?[-. ]\d{3}[-. ]\d{4}\b/g) || [];
       if (emails.length || phones.length) exposed.push(`${dir}/${name}: ${unique(emails).length} email(s), ${unique(phones).length} phone number(s)`);
+      if (`${dir}/${name}` !== NOTION_RECEIPT && (text.match(NOTION_URL) || []).length) notion.push(`${dir}/${name}: ${(text.match(NOTION_URL) || []).length}`);
       for (const [, number] of text.matchAll(/\b(\d{2,4})[- ](?:part|component)s?\b/g)) counts.set(number, [...(counts.get(number) || []), `${dir}/${name}`]);
     }
   }
   record('S2', 'privacy', exposed.length ? 'fail' : 'pass', 'Public FMP files carry no personal contact details', exposed.join('; ') || 'none found');
   record('C1', 'content', counts.size > 1 ? 'warn' : 'pass', 'Rig part and component counts agree', [...counts].map(([number, files]) => `${number} in ${unique(files).join(', ')}`).join('; ') || 'no count claims');
 
-  const index = (await statusOf(`${BASE}/fmp-index/`)).body.toString('utf8');
-  const stamp = index.match(/\b(\d{1,2}) (January|February|March|April|May|June|July|August|September|October|November|December) (20\d{2})\b/);
-  const age = stamp ? Math.floor((Date.now() - Date.parse(`${stamp[2]} ${stamp[1]}, ${stamp[3]}`)) / 86400000) : null;
-  record('C2', 'content', age === null ? 'grey' : age > INDEX_STALE_DAYS ? 'warn' : 'pass', `FMP index snapshot is under ${INDEX_STALE_DAYS} days old`, age === null ? 'no dated snapshot found' : `${stamp[0]} (${age} days)`);
+  for (const page of HAND_MAINTAINED) {
+    const text = (await statusOf(BASE + page)).body.toString('utf8');
+    if ((text.match(NOTION_URL) || []).length) notion.push(`${page}: ${(text.match(NOTION_URL) || []).length}`);
+  }
+  record('S3', 'privacy', notion.length ? 'fail' : 'pass', 'Public FMP pages link no Notion pages', notion.join('; ') || 'none found');
 }
 
 async function checkBackend() {
