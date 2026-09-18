@@ -122,7 +122,7 @@ assert.match(walkEntry, /var cameraRoot = "\/fmp\/camera\/";/);
 assert.doesNotMatch(walkEntry, /["']\.{1,2}\/camera\//);
 assert.match(walkEntry, /href="https:\/\/systembydave\.com\/"/);
 assert.equal((walkEntry.match(/<h1\b/g) || []).length, 1);
-assert.match(walkEntry, /href="https:\/\/systembydave\.com\/fmp\/"/);
+assert.ok(walkEntry.includes(`href="${originFor('fmp/')}/fmp/"`), 'The walk must link its operations hub at the suite\'s canonical origin.');
 assert.doesNotMatch(walkEntry, /davehomeassist\.github\.io/);
 const rigEntry = fs.readFileSync(path.join(site, 'fmp/rig/index.html'), 'utf8');
 assert.doesNotMatch(rigEntry, /unpkg|https:\/\/cdn/i);

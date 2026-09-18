@@ -4,6 +4,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
+const { originFor } = require('./domain_sites_lib');
 
 const ROOT = path.resolve(__dirname, '..');
 const SKIP_DIRS = new Set(['.git', 'node_modules']);
@@ -157,16 +158,19 @@ function attribute(tag, name) {
 }
 
 function fmpShellGaps(file, source) {
-  const pageUrl = new URL(routeFor(file), SITE_ORIGIN);
+  // Resolve links from the page's own origin: housevideo.app once that site has
+  // cut over (scripts/domain-sites.json). Home may be that site's / or System by Dave.
+  const origin = originFor(file.split(path.sep).join('/'));
+  const pageUrl = new URL(routeFor(file), origin);
   const baseTag = source.match(/<base\s[^>]*>/i)?.[0];
   const baseUrl = baseTag && attribute(baseTag, 'href') !== undefined ? new URL(attribute(baseTag, 'href'), pageUrl) : pageUrl;
   const body = bodyMarkup(source);
   const links = Array.from(body.matchAll(/<a\s[^>]*>/gi), (match) => attribute(match[0], 'href'))
     .filter((href) => href !== undefined)
     .map((href) => new URL(href, baseUrl));
-  const isPath = (url, paths) => url.origin === SITE_ORIGIN && paths.includes(url.pathname);
+  const isPath = (url, paths, origins = [origin]) => origins.includes(url.origin) && paths.includes(url.pathname);
   const gaps = [];
-  if (!links.some((url) => isPath(url, ['/', '/index.html']))) gaps.push('no home link');
+  if (!links.some((url) => isPath(url, ['/', '/index.html'], [origin, SITE_ORIGIN]))) gaps.push('no home link');
   if (file !== FMP_HUB && !links.some((url) => isPath(url, ['/fmp/', '/fmp/index.html']))) gaps.push('no /fmp/ parent link');
 
   const firstFocusable = body.match(/<(?:a\s[^>]*\bhref=[^>]*|button\b[^>]*|select\b[^>]*|textarea\b[^>]*|summary\b[^>]*|input\b(?![^>]*\btype=["']?hidden)[^>]*|[a-z][a-z0-9-]*\s[^>]*\btabindex=["']?(?:0|[1-9])[^>]*)>/i)?.[0] || '';

@@ -11,7 +11,8 @@
  * browser checks. It never signs in, submits,
  * saves, or writes to any service.
  *
- * Usage: node scripts/fmp_hygiene_probe.js [--base=https://systembydave.com]
+ * Usage: node scripts/fmp_hygiene_probe.js [--base=https://housevideo.app]
+ * The default base is the suite's canonical origin from scripts/domain-sites.json.
  *   [--output=report.json] [--markdown=report.md] [--skip-browser]
  *   [--skip-external] [--strict] [--no-sandbox]
  */
@@ -19,6 +20,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const crypto = require('node:crypto');
 const { spawn, execFileSync } = require('node:child_process');
+const { originFor } = require('./domain_sites_lib');
 
 const site = path.resolve(__dirname, '..');
 const args = process.argv.slice(2);
@@ -27,7 +29,8 @@ const option = (name, fallback) => {
   return hit ? hit.slice(name.length + 3) : fallback;
 };
 const flag = name => args.includes(`--${name}`);
-const BASE = option('base', 'https://systembydave.com').replace(/\/$/, '');
+const BASE = option('base', originFor('fmp/')).replace(/\/$/, '');
+const ORIGIN_PATTERN = `(?:${[new URL(BASE).origin, 'https://systembydave.com'].map(value => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})`;
 const CHROME = option('chrome', '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome');
 const DEBUG_PORT = 9347;
 const TIMEOUT_MS = 15000;
@@ -227,8 +230,9 @@ async function checkContent() {
   for (const page of SHELL_PAGES) {
     const html = (await statusOf(BASE + page)).body.toString('utf8');
     const gaps = [];
-    if (!/href=["'](?:https:\/\/systembydave\.com)?\/["']/.test(html)) gaps.push('no home link');
-    if (page !== '/fmp/' && !/href=["'](?:https:\/\/systembydave\.com)?\/fmp\/["']/.test(html)) gaps.push('no /fmp/ return');
+    // Links may be relative or name the probed origin or systembydave.com absolutely.
+    if (!new RegExp(`href=["']${ORIGIN_PATTERN}?/["']`).test(html)) gaps.push('no home link');
+    if (page !== '/fmp/' && !new RegExp(`href=["']${ORIGIN_PATTERN}?/fmp/["']`).test(html)) gaps.push('no /fmp/ return');
     if (gaps.length) shellGaps.push(`${page}: ${gaps.join(', ')}`);
   }
   record('S1', 'navigation', shellGaps.length ? 'warn' : 'pass', 'Pages link home and back to the FMP hub', shellGaps.join('; ') || `${SHELL_PAGES.length} pages`);
