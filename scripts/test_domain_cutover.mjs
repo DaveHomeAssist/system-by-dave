@@ -154,6 +154,13 @@ try {
       await page.goto(source + site.route);
       await page.waitForURL(site.origin + site.route);
       assert.equal(await page.evaluate(key => localStorage.getItem(key), site.key), 'new destination edit');
+      if (site.id === 'avbydave') {
+        await page.waitForFunction(() => navigator.serviceWorker.controller, null, { timeout: 30000 });
+        await context.setOffline(true);
+        await page.reload();
+        assert.equal(await page.evaluate(key => localStorage.getItem(key), site.key), 'new destination edit');
+        assert.ok((await page.locator('body').innerText()).includes('AV SUITE'));
+      }
     });
 
     await test(`${site.id} interrupted popup retries`, async (page, context) => {
@@ -251,6 +258,19 @@ try {
       await page.waitForURL(site.origin + site.route + '?cutover=acceptance#preserved');
     });
   }
+
+  await test('source worker retires only its own caches', async page => {
+    await page.goto(source + '/index.html');
+    await page.evaluate(async () => {
+      await (await caches.open('sbd-av-suite-acceptance-old')).put('/av-suite.html', new Response('old AV shell'));
+      await (await caches.open('unrelated-acceptance-cache')).put('/unrelated', new Response('keep'));
+      localStorage.setItem('sbd.showboard.retirement-acceptance', 'keep draft');
+      await navigator.serviceWorker.register('/av-suite-worker.js', { scope: '/' });
+    });
+    await page.waitForFunction(async () => !(await caches.keys()).some(name => name.startsWith('sbd-av-suite-')) && !(await navigator.serviceWorker.getRegistrations()).length);
+    assert.ok(await page.evaluate(async () => (await caches.keys()).includes('unrelated-acceptance-cache')));
+    assert.equal(await page.evaluate(() => localStorage.getItem('sbd.showboard.retirement-acceptance')), 'keep draft');
+  });
 
   for (const site of sites) {
     await test(`${site.id} all published pages and home links`, async page => {
