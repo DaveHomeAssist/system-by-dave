@@ -83,6 +83,12 @@ Nothing is deleted on systembydave.com, and the choice is remembered in
 `sbd.domainMove.<site>.v1`. `js/domain-storage.js`, `js/domain-move.js` and
 `js/domain-transfer.js` implement this; `css/domain-move.css` styles both pages.
 
+The source records a completed move only after the destination acknowledges all
+attempted writes. A full storage quota or incompatible database layout leaves
+the move incomplete and offers retry or backup recovery. Already copied items
+are kept when retrying. A source read failure also stays on the source page with
+a retry button; it cannot silently skip unreadable saved data.
+
 ### Cutover checklist
 
 Do these per site, in order, and verify each before the next:
@@ -128,3 +134,24 @@ node scripts/stage_domain_sites.mjs --out /tmp/sites --site-root /tmp/sbd-site -
 rsync the workflow runs). Serve it on 8801 and each staged site on its port.
 `--simulate` refuses to run without local origins, and it reports stale
 canonical URLs as warnings rather than failures.
+
+For repeatable browser acceptance, run `npm run test:domain-cutover` after
+`npm ci` and `npx playwright install chromium`. The harness stages the current
+source on three disposable local origins and uses new browser contexts for
+each scenario. `CHROME_CHANNEL=chrome` uses an installed Chrome instead.
+`CUTOVER_CAPTURE_DIR=/absolute/path` saves JSON results and recovery screenshots.
+The Pages release workflow runs this acceptance before deployment.
+
+`node scripts/test_domain_cutover.mjs --live` repeats the same tests on the
+published domains using disposable synthetic browser state. It does not sign in,
+submit operational records, or use an operator's browser profile. Coverage
+includes clean and upgrade visits, binary IndexedDB records, retained source
+copies, duplicate backup imports, interrupted transfers, storage read/write
+failures, incompatible databases, invalid backups, history, all published pages,
+absolute home links, and every registry-declared offline AV asset and HTML page.
+
+Offline acceptance applies to the AV registry's declared offline pages. The FMP
+suite remains online-only under `docs/fmp-public-release.md`; no protected API
+response or authentication state is cached. Its strict `connect-src 'none'`
+reference pages are tested by navigation; a deliberately blocked test fetch is
+recorded as expected CSP enforcement.

@@ -140,8 +140,30 @@
     go();
     return;
   }
-  storage.collect(policy).then(function(data){
-    if(!data.count){ go(); return; }
-    whenReady(function(){ render(data); });
-  }, go);
+  function readData(){
+    // A read failure is not proof of an empty source. Keep the operator here
+    // until they can retry or explicitly choose to leave without moving data.
+    Promise.resolve().then(function(){ return storage.collect(policy); }).then(function(data){
+      if(!data.count){ go(); return; }
+      whenReady(function(){ render(data); });
+    }).catch(function(error){
+      whenReady(function(){
+        say('Saved data could not be read: ' + String(error && error.message || error) + ' Nothing was removed.');
+        var panel = document.getElementById('movePanel');
+        if(!panel) return;
+        panel.textContent = '';
+        panel.hidden = false;
+        var retry = el('button', 'sbd-move-button primary', 'Try reading saved data again');
+        retry.type = 'button';
+        retry.addEventListener('click', function(){ retry.disabled = true; readData(); });
+        panel.appendChild(retry);
+        var skip = el('button', 'sbd-move-button', 'Continue without moving');
+        skip.type = 'button';
+        skip.addEventListener('click', function(){ writeFlag('skipped'); go(); });
+        panel.appendChild(skip);
+        retry.focus();
+      });
+    });
+  }
+  readData();
 })();

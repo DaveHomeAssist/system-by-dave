@@ -62,6 +62,9 @@
 
   function apply(payload){
     return storage.importPayload(policy, payload).then(function(result){
+      if(result.failed.length){
+        throw new Error(plural(result.failed.length, 'item') + ' could not be saved. Free browser storage and try again; items already copied will be kept.');
+      }
       say('Moved ' + plural(result.imported, 'item') + ' to ' + config.domain + '.');
       render(result, payload);
       return result;

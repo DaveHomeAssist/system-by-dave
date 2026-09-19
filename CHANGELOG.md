@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-09-19 — Recoverable domain transfers
+
+- A full destination storage quota or incompatible IndexedDB layout no longer
+  acknowledges a completed move. Source data and the retry path remain available.
+- Unreadable source data now produces a visible retry or explicit continue
+  choice instead of silently omitting saved records.
+- Added real browser acceptance across three origins and a Pages release gate
+  for migration, backup recovery, offline AV pages and all published domain
+  pages. Playwright is a development dependency for popup, IndexedDB and network
+  failure coverage. FMP's existing online-only boundary is unchanged.
+
 ## 2026-09-18 — FMP walk: no controller addresses
 
 - Exported fmpwalk `5657de8`. The walk's Reference tab no longer carries the

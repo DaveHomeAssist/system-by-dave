@@ -26,13 +26,14 @@
         if(matches(policy, key)) out[key] = localStorage.getItem(key);
       }
     }catch(e){
-      // Storage can be disabled; there is then nothing to move.
+      throw new Error('Saved browser storage could not be read. Allow storage access and try again.');
     }
     return out;
   }
 
   function presentDatabases(names){
-    if(!names.length || !window.indexedDB) return Promise.resolve([]);
+    if(!names.length) return Promise.resolve([]);
+    if(!window.indexedDB) return Promise.reject(new Error('Saved databases are unavailable. Allow storage access and try again.'));
     if(typeof indexedDB.databases !== 'function') return Promise.resolve(names.slice());
     return indexedDB.databases().then(function(list){
       var present = list.map(function(db){ return db.name; });
@@ -42,23 +43,25 @@
 
   // Resolves null instead of creating a database that does not exist yet.
   function openExisting(name){
-    return new Promise(function(resolve){
+    return new Promise(function(resolve, reject){
       var created = false;
+      var blocked = false;
       var request;
-      try{ request = indexedDB.open(name); }catch(e){ resolve(null); return; }
+      try{ request = indexedDB.open(name); }catch(e){ reject(e); return; }
       request.onupgradeneeded = function(){
         created = true;
         request.transaction.abort();
       };
       request.onsuccess = function(){
-        if(created){ request.result.close(); resolve(null); }
+        if(created || blocked){ request.result.close(); resolve(null); }
         else resolve(request.result);
       };
       request.onerror = function(event){
         if(event && event.preventDefault) event.preventDefault();
-        resolve(null);
+        if(created) resolve(null);
+        else reject(request.error || new Error('Could not read ' + name + '.'));
       };
-      request.onblocked = function(){ resolve(null); };
+      request.onblocked = function(){ blocked = true; reject(new Error('Close other tabs using ' + name + ' and try again.')); };
     });
   }
 
@@ -103,7 +106,7 @@
     var local = readLocal(policy);
     return presentDatabases(policy.indexedDB).then(function(names){
       return Promise.all(names.map(function(name){
-        return exportDatabase(name).catch(function(){ return null; });
+        return exportDatabase(name);
       }));
     }).then(function(dbs){
       dbs = dbs.filter(function(db){ return recordCount(db) > 0; });
@@ -155,6 +158,9 @@
       return db.objectStoreNames.contains(name);
     });
     var counts = { imported: 0, kept: 0 };
+    if(names.length !== dbExport.stores.length){
+      return Promise.reject(new Error('The saved database ' + dbExport.name + ' has an incompatible layout. Keep your source data and download a backup.'));
+    }
     if(!names.length) return Promise.resolve(counts);
     return new Promise(function(resolve, reject){
       var tx = db.transaction(names, 'readwrite');
