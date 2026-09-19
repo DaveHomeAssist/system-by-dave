@@ -37,3 +37,14 @@
   document.addEventListener('DOMContentLoaded', apply);
   apply();
 })();
+
+// Keep the published chrome in canonical source. Resolve beside this script so
+// the raw source and the managed /fmp/ export use the same implementation.
+(() => {
+  if (document.querySelector('script[data-fmp-chrome]')) return;
+  const script = document.createElement('script');
+  script.src = new URL('chrome.js', document.currentScript.src).href;
+  script.defer = true;
+  script.dataset.fmpChrome = '1';
+  document.head.appendChild(script);
+})();

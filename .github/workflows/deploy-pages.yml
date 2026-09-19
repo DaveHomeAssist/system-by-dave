@@ -24,7 +24,11 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  domain-cutover:
+    uses: ./.github/workflows/domain-cutover.yml
+
   deploy:
+    needs: domain-cutover
     runs-on: ubuntu-latest
     environment:
       name: github-pages

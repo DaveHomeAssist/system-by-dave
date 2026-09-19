@@ -16,9 +16,9 @@ const releases = [
     directory: 'fmp',
     mode: 'commissioning',
     expected: [
-      'index.html', 'public.css', 'public.js', 'theme.js', 'camera.js', 'camera-core.js', 'camera-view.js', 'camera.css', 'photos.js', 'mail.js', 'notion-config.js',
+      'index.html', 'public.css', 'public.js', 'theme.js', 'chrome.js', 'chrome.css', 'camera.js', 'camera-core.js', 'camera-view.js', 'camera.css', 'photos.js', 'mail.js', 'notion-config.js',
       ...cameraRoutes.map(route => `${route}index.html`),
-      'house/index.html', 'house/house.css', 'house/house.js', 'house/house-data.js', 'house/site-plan.png', 'house/display-estate.csv',
+      'house/index.html', 'house/house.css', 'house/house.js', 'house/house-data.js', 'house/house-tokens.css', 'house/site-plan.png', 'house/display-estate.csv',
       'guide/index.html', 'gear/index.html', 'build/index.html', 'ptz/index.html', 'ref.css', 'ref.js',
       'rig/index.html', 'rig/rig-model.js', 'rig/fmp-guide-data.js',
       ...rigPhotos.map(name => `rig/assets/${name}.webp`),
