@@ -399,11 +399,12 @@ function notFoundPage(site) {
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self' 'unsafe-inline'; base-uri 'none'; form-action 'none'">
 <title>Page not found | ${title}</title>
 <meta name="description" content="That address is not part of ${title}.">
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#FFFFFF">
+<link rel="stylesheet" href="/css/domain-move.css">
 <style>${REDIRECT_STYLE}</style>
 </head>
 <body>

@@ -220,7 +220,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool change — rolls the service-worker cache. */
-    version:'v20260917-warm-paper-tool-contrast',
+    version:'v20260919-cutover-recovery',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,

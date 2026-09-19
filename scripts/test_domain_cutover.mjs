@@ -307,6 +307,8 @@ try {
     for (const route of pages) {
       const response = await page.goto(site.origin + route, { waitUntil: 'domcontentloaded' });
       assert.equal(response.status(), 200, route);
+      await page.waitForLoadState('networkidle');
+      assert.equal(new URL(page.url()).origin, site.origin, route + ' remains available offline');
       assert.ok((await page.locator('body').innerText()).trim().length > 20, route);
     }
     return { assets: manifest.expected.length, offlinePages: pages.length };
@@ -320,6 +322,7 @@ try {
     for (const route of routes) {
       const response = await page.goto(site.origin + route, { waitUntil: 'load' });
       assert.equal(response.status(), 200, route);
+      await page.waitForLoadState('networkidle');
       assert.ok((await page.locator('body').innerText()).trim().length > 30, route);
     }
     await page.goto(site.origin + '/fmp/house/');

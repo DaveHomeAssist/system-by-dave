@@ -6,6 +6,12 @@
   acknowledges a completed move. Source data and the retry path remain available.
 - Unreadable source data now produces a visible retry or explicit continue
   choice instead of silently omitting saved records.
+- The cached PlotForge handoff stays readable offline instead of automatically
+  navigating to its unreachable external application.
+- Reconciled the published housevideo theme changes into canonical FMP source
+  and re-exported them with verified provenance; repaired the resulting rig
+  error, clipped phone header, undersized theme select and missing walk icon.
+  Redirect templates preserve the published shared styling under their CSP.
 - Added real browser acceptance across three origins and a Pages release gate
   for migration, backup recovery, offline AV pages and all published domain
   pages. Playwright is a development dependency for popup, IndexedDB and network

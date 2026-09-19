@@ -5,17 +5,20 @@ root.dataset.ready='true';
 const themeButton=document.getElementById('themeBtn');
 function applyTheme(theme) {
   document.documentElement.dataset.theme=theme;
-  themeButton.textContent=theme==='dark'?'Light theme':'Dark theme';
-  themeButton.setAttribute('aria-label',`Use ${theme==='dark'?'light':'dark'} theme`);
+  if(themeButton){
+    themeButton.textContent=theme==='dark'?'Light theme':'Dark theme';
+    themeButton.setAttribute('aria-label',`Use ${theme==='dark'?'light':'dark'} theme`);
+  }
   document.querySelector('meta[name="theme-color"]').content=theme==='dark'?'#1c1917':'#f4eee3';
   root.querySelector('[data-scene]').dataset.surfaceTheme=theme==='dark'?'medium-slate':'light-neutral';
 }
 // ../theme.js resolves and stores the shared FMP preference; without it the rig starts light.
 applyTheme(globalThis.fmpTheme?.theme||'light');
-themeButton.addEventListener('click',()=>{
+themeButton?.addEventListener('click',()=>{
   const next=document.documentElement.dataset.theme==='dark'?'light':'dark';
   globalThis.fmpTheme?.set(next);applyTheme(next);
 });
+document.addEventListener('fmp-theme',()=>applyTheme(globalThis.fmpTheme?.theme||'light'));
 // BEGIN SHARED VIEWER
 const $=selector=>root.querySelector(selector);
 const canvas=$('[data-scene]'), stage=$('[data-stage]');

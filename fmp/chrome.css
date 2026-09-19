@@ -1,0 +1,63 @@
+/* Shared FMP top chrome for static Pages. Color comes from av-theme tokens. */
+:root[data-fmp-guide-fonts] { --font-d: "DM Sans", ui-sans-serif, system-ui, sans-serif; --font-b: "DM Sans", ui-sans-serif, system-ui, sans-serif; --font-m: "JetBrains Mono", ui-monospace, monospace; }
+:root[data-fmp-guide-fonts] :is(body, .brand h1, h2, h3) { font-family: var(--font-b); }
+.fmp-chrome,
+header.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 28px;
+  border-bottom: 1px solid var(--av-line, var(--line, #d6cabc));
+  background: color-mix(in srgb, var(--av-surface, var(--surface, #fffcf7)) 94%, transparent);
+  color: var(--av-text, var(--ink, #211d1a));
+}
+.fmp-chrome nav,
+header.top nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+.fmp-chrome nav a,
+header.top nav a {
+  color: inherit;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+.fmp-chrome nav a:hover,
+header.top nav a:hover { color: var(--av-accent, var(--accent, #9e432b)); }
+.fmp-chrome nav [aria-current="page"],
+header.top nav [aria-current="page"],
+.fmp-chrome nav .crumb-current,
+header.top nav > span:last-child { color: var(--av-muted, var(--muted, #62594f)); }
+.fmp-chrome nav .crumb-sep,
+header.top nav > span:not([aria-current]) { color: var(--av-dim, #70645a); }
+.theme-label,
+.fmp-chrome .theme-label,
+header.top .theme-label { display: inline-flex; align-items: center; gap: 8px; margin: 0; }
+.theme-label select[data-fmp-theme],
+.fmp-chrome select,
+header.top select#theme,
+header.top select[data-fmp-theme] {
+  min-height: 44px;
+  max-width: 110px;
+  padding: 0 10px;
+  border: 1px solid var(--av-line-strong, var(--line, #a99584));
+  border-radius: 6px;
+  background: var(--av-control, var(--surface, #f4ede4));
+  color: var(--av-text, var(--ink, #211d1a));
+  font: inherit;
+}
+.portal-header nav { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.portal-header .crumb-sep { color: var(--av-dim); }
+.portal-header [aria-current="page"] { color: var(--av-muted); }
+@media (max-width: 680px) {
+  .fmp-chrome, header.top { padding: 8px 16px; gap: 10px; }
+}
+
+.theme-label > .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.r-site-nav .theme-label, .header-actions .theme-label { margin-left: auto; }

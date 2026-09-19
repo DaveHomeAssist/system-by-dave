@@ -10,7 +10,7 @@ button { cursor: pointer; }
 .skip { position: fixed; left: 12px; top: -100px; z-index: 10; padding: 12px; min-height: 44px; background: var(--av-text); color: var(--av-bg); }
 .skip:focus { top: 0; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
-.portal { margin: 0; height: 100dvh; display: grid; grid-template-rows: 60px minmax(0, 1fr) 48px; overflow: hidden; color: var(--av-text); background: var(--av-bg); }
+.portal { margin: 0; height: 100dvh; display: grid; grid-template-rows: minmax(60px, auto) minmax(0, 1fr) 48px; overflow: hidden; color: var(--av-text); background: var(--av-bg); }
 .portal-header { display: flex; align-items: center; justify-content: space-between; padding: 0 28px; border-bottom: 1px solid var(--av-line); gap: 16px; }
 .portal-header nav { display: flex; gap: 24px; }
 .portal-header a { display: inline-flex; align-items: center; min-height: 44px; text-decoration: none; font-size: 14px; }
@@ -91,7 +91,7 @@ body[data-public-release] .stage-nav > button { background: transparent; color: 
 body[data-public-release] .stage-nav > button[aria-current="step"] { background: var(--av-accent); border-color: var(--av-accent); color: var(--av-primary-ink); font-weight: 700; }
 body[data-public-release] .attention { background: var(--av-danger-soft); color: var(--av-danger); }
 @media (max-width: 680px) {
-  .portal { grid-template-rows: 56px minmax(0, 1fr) 48px; }
+  .portal { grid-template-rows: minmax(56px, auto) minmax(0, 1fr) 48px; }
   .portal-header { padding: 0 16px; gap: 8px; }
   .portal-header nav { gap: 16px; }
   .portal-header a { font-size: 12px; }

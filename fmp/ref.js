@@ -23,7 +23,7 @@ addEventListener('hashchange', () => showPanel(location.hash));
 addEventListener('popstate', () => showPanel(location.hash));
 
 const themeButton = document.querySelector('#theme');
-const syncThemeLabel = () => { themeButton.textContent = window.fmpTheme?.theme === 'dark' ? 'Light mode' : 'Dark mode'; };
+const syncThemeLabel = () => { if (themeButton && themeButton.tagName !== 'SELECT') themeButton.textContent = window.fmpTheme?.theme === 'dark' ? 'Light mode' : 'Dark mode'; };
 // theme.js owns the preference and the delegated toggle; this only keeps the label in step.
 document.addEventListener('fmp-theme', syncThemeLabel);
 syncThemeLabel();

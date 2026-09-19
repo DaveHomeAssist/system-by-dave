@@ -1,0 +1,42 @@
+/* Bind the house-family local tokens to av-theme (rust accent) + DM Sans.
+   Loaded after house.css so layout stays local while color/type follow the hub. */
+html[data-av-theme] {
+  color-scheme: light;
+  --bg: var(--av-bg);
+  --surface: var(--av-surface);
+  --soft: var(--av-surface-2);
+  --ink: var(--av-text);
+  --muted: var(--av-muted);
+  --line: var(--av-line);
+  --accent: var(--av-accent);
+  --good: var(--av-success);
+  --warn: var(--av-warning);
+  --bad: var(--av-danger);
+  --rack: var(--av-text);
+  --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-family: "DM Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+html[data-av-theme][data-theme="dark"],
+html[data-av-theme="dark"],
+html[data-av-theme="system"] {
+  /* Resolved dark surfaces come from av-theme.css; keep aliases live. */
+  --bg: var(--av-bg);
+  --surface: var(--av-surface);
+  --soft: var(--av-surface-2);
+  --ink: var(--av-text);
+  --muted: var(--av-muted);
+  --line: var(--av-line);
+  --accent: var(--av-accent);
+  --good: var(--av-success);
+  --warn: var(--av-warning);
+  --bad: var(--av-danger);
+  --rack: var(--av-text);
+}
+html[data-av-theme] .tabs a[aria-current="page"],
+html[data-av-theme] button[aria-pressed="true"] {
+  color: var(--av-primary-ink, #fffaf4);
+}
+
+/* In house references, ink means body text. AV tools use the root ink alias
+   for text on primary buttons; keep that alias from reaching this content. */
+html[data-av-theme] body { --ink: var(--av-text); }
