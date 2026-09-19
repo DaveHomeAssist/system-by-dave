@@ -70,16 +70,20 @@ try {
     if (process.env.CUTOVER_FILTER && !name.includes(process.env.CUTOVER_FILTER)) return;
     const context = await browser.newContext({ acceptDownloads: true });
     context.setDefaultTimeout(7000);
+    if (captureDir) await context.tracing.start({ screenshots: true, snapshots: true });
     const page = await context.newPage();
     try {
       const details = await fn(page, context);
       results.push({ name, pass: true, ...(details ? { details } : {}) });
       console.log(`PASS ${name}`);
     } catch (error) {
-      results.push({ name, pass: false, error: error.message });
+      results.push({ name, pass: false, error: error.message, url: page.url() });
       console.error(`FAIL ${name}: ${error.message}`);
       if (captureDir && !page.isClosed()) await page.screenshot({ path: path.join(captureDir, name.replace(/[^a-z0-9]+/gi, '-') + '.png') }).catch(() => {});
-    } finally { await context.close(); }
+    } finally {
+      if (captureDir) await context.tracing.stop(results.at(-1)?.pass === false ? { path: path.join(captureDir, name.replace(/[^a-z0-9]+/gi, '-') + '.zip') } : {}).catch(() => {});
+      await context.close();
+    }
   }
 
   async function seed(page, site, database = false) {
@@ -320,10 +324,15 @@ try {
     const errors = [];
     page.on('pageerror', error => errors.push(error.message));
     for (const route of routes) {
-      const response = await page.goto(site.origin + route, { waitUntil: 'load' });
-      assert.equal(response.status(), 200, route);
-      await page.waitForLoadState('networkidle');
-      assert.ok((await page.locator('body').innerText()).trim().length > 30, route);
+      console.log(`Checking FMP route ${route}`);
+      try {
+        const response = await page.goto(site.origin + route, { waitUntil: 'load' });
+        assert.equal(response.status(), 200, route);
+        await page.waitForLoadState('networkidle');
+        assert.ok((await page.locator('body').innerText()).trim().length > 30, route);
+      } catch (error) {
+        throw new Error(`${route} at ${page.url()}: ${error.message}`, { cause: error });
+      }
     }
     await page.goto(site.origin + '/fmp/house/');
     assert.match(await page.locator('meta[http-equiv="Content-Security-Policy"]').getAttribute('content'), /connect-src 'none'/);
