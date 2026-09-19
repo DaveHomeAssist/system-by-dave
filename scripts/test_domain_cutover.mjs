@@ -77,7 +77,11 @@ try {
       results.push({ name, pass: true, ...(details ? { details } : {}) });
       console.log(`PASS ${name}`);
     } catch (error) {
-      results.push({ name, pass: false, error: error.message, url: page.url() });
+      const state = await page.evaluate(async () => ({
+        visibility: document.visibilityState, controlled: Boolean(navigator.serviceWorker?.controller),
+        workers: navigator.serviceWorker ? (await navigator.serviceWorker.getRegistrations()).map(reg => ({ scope: reg.scope, active: reg.active?.state, installing: reg.installing?.state })) : []
+      })).catch(() => null);
+      results.push({ name, pass: false, error: error.message, url: page.url(), state });
       console.error(`FAIL ${name}: ${error.message}`);
       if (captureDir && !page.isClosed()) await page.screenshot({ path: path.join(captureDir, name.replace(/[^a-z0-9]+/gi, '-') + '.png') }).catch(() => {});
     } finally {
@@ -155,11 +159,12 @@ try {
       await original.goto(source + '/index.html');
       assert.equal(await original.evaluate(key => JSON.parse(localStorage.getItem(key)).text, site.key), 'Preserve this draft ✓');
       assert.equal(await original.evaluate(id => JSON.parse(localStorage.getItem('sbd.domainMove.' + id + '.v1')).state, site.id), 'moved');
+      await page.bringToFront();
       await page.goto(source + site.route);
       await page.waitForURL(site.origin + site.route);
       assert.equal(await page.evaluate(key => localStorage.getItem(key), site.key), 'new destination edit');
       if (site.id === 'avbydave') {
-        await page.waitForFunction(() => navigator.serviceWorker.controller, null, { timeout: 30000 });
+        await page.waitForFunction(() => navigator.serviceWorker.controller, null, { timeout: 30000, polling: 100 });
         await context.setOffline(true);
         await page.reload();
         assert.equal(await page.evaluate(key => localStorage.getItem(key), site.key), 'new destination edit');
@@ -298,7 +303,7 @@ try {
   await test('AV offline manifest and every supported page', async (page, context) => {
     const site = sites[1];
     await page.goto(site.origin + '/av-suite.html');
-    await page.waitForFunction(() => navigator.serviceWorker.controller, null, { timeout: 30000 });
+    await page.waitForFunction(() => navigator.serviceWorker.controller, null, { timeout: 30000, polling: 100 });
     const manifest = await page.evaluate(async () => {
       const expected = SBD_REGISTRY.offlineAssets().map(asset => new URL(asset, location.href).pathname);
       const names = (await caches.keys()).filter(name => name.startsWith('sbd-av-suite-'));
@@ -329,7 +334,9 @@ try {
         const response = await page.goto(site.origin + route, { waitUntil: 'load' });
         assert.equal(response.status(), 200, route);
         await page.waitForLoadState('networkidle');
-        assert.ok((await page.locator('body').innerText()).trim().length > 30, route);
+        // Software WebGL initialization can exceed the short control timeout.
+        if (route === '/fmp/rig/') await page.locator('main[data-render-ready="true"]').waitFor({ state: 'attached', timeout: 30000 });
+        assert.ok((await page.locator('body').innerText({ timeout: route === '/fmp/rig/' ? 30000 : 7000 })).trim().length > 30, route);
       } catch (error) {
         throw new Error(`${route} at ${page.url()}: ${error.message}`, { cause: error });
       }
