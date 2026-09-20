@@ -1,0 +1,35 @@
+{
+  "correction_id": "example-correction",
+  "scope": {
+    "guide_id": null,
+    "rig_ids": [],
+    "component_ids": [],
+    "view_ids": []
+  },
+  "old_claim": null,
+  "replacement_claim": null,
+  "source_ids": [],
+  "attribution": null,
+  "recorded_at": null,
+  "conflicts": [],
+  "id_migrations": [],
+  "surfaces": [
+    {
+      "surface": "example local guide",
+      "locator": null,
+      "state": "pending",
+      "revision_before": null,
+      "revision_after": null,
+      "evidence": null
+    }
+  ],
+  "checks": [
+    {
+      "check": "Confirm corrected identity and neighboring component",
+      "state": "not_run",
+      "evidence": null
+    }
+  ],
+  "historical_references_retained": [],
+  "remaining_gaps": []
+}

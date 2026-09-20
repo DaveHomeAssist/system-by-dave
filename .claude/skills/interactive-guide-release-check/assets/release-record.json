@@ -1,0 +1,37 @@
+{
+  "guide_id": null,
+  "revision": null,
+  "source_revision": null,
+  "artifact": null,
+  "offline_delivery_mode": null,
+  "deployment_url": null,
+  "authorization_context": null,
+  "required_tasks": [],
+  "checks": [
+    {
+      "task": "Select an articulated part after moving it",
+      "layer": "rendered_browser",
+      "environment": {
+        "browser": null,
+        "version": null,
+        "os": null,
+        "viewport_css": null,
+        "input_mode": null,
+        "device_evidence": "unknown"
+      },
+      "revision": null,
+      "state": "not_run",
+      "observed_at": null,
+      "evidence": null,
+      "gap": null
+    }
+  ],
+  "parity": {
+    "manifest": null,
+    "deployed_revision": null,
+    "payload_match": null,
+    "behavior_checked": false
+  },
+  "remaining_gaps": [],
+  "rollback_target": null
+}

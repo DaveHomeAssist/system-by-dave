@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "guide_id": "example-training-rig",
+  "revision": "example-1",
+  "sources": [{"source_id": "brief-1", "kind": "illustrative", "locator": "Synthetic example; replace with actual evidence"}],
+  "components": [
+    {"component_id": "assembly-a", "label": "Example assembly", "kind": "assembly", "parent_id": null, "confidence": "Unknown", "source_ids": ["brief-1"], "geometry_status": "illustrative", "aliases": [], "view_ids": ["overview"]},
+    {"component_id": "control-a", "label": "Example control", "kind": "control", "parent_id": "assembly-a", "confidence": "Unknown", "source_ids": ["brief-1"], "geometry_status": "illustrative", "aliases": [], "view_ids": ["overview"], "purpose": "Unresolved until evidence is supplied", "action": "Locate the control in the illustration", "expected_result": "The control highlights and its name is shown", "limits": "No physical operating instruction supplied"}
+  ],
+  "views": [{"view_id": "overview", "component_ids": ["assembly-a", "control-a"]}],
+  "lessons": [{"lesson_id": "find-control-a", "component_ids": ["control-a"]}]
+}

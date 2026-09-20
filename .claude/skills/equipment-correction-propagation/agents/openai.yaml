@@ -1,0 +1,14 @@
+interface:
+  display_name: Equipment Correction Propagation
+  short_description: Carry corrections through guides and published copies
+  default_prompt: Use $equipment-correction-propagation to carry this equipment correction
+    through the guide and its authorized copies.
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true

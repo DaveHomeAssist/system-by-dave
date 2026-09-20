@@ -1,0 +1,14 @@
+interface:
+  display_name: Interactive Equipment Explorer
+  short_description: Build selectable equipment diagrams and 3D trainers
+  default_prompt: Use $interactive-equipment-explorer to build a clickable equipment
+    guide with stable IDs and whole-part highlights.
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true

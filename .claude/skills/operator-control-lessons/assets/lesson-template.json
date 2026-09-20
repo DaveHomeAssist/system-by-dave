@@ -1,0 +1,15 @@
+{
+  "lesson_id": "example-find-control",
+  "revision": "example-1",
+  "equipment_scope": "Illustrative assembly; no installed model asserted",
+  "objective": "Find the named control and explain its purpose",
+  "component_ids": ["control-a"],
+  "source_ids": [],
+  "starting_condition": "Use the training illustration",
+  "action": "Select the control matching the task",
+  "expected_result": "The selected ID matches the target and feedback explains the function",
+  "limits": "Supply model-specific evidence before teaching physical operation",
+  "hints": ["Identify the assembly first", "Read the relevant function description"],
+  "attempt": {"wrong_component_ids": [], "hint_count": 0, "revealed": false, "first_attempt_correct": null, "outcome": "incomplete", "elapsed_seconds": null},
+  "physical_transfer": {"state": "Not checked", "rig_id": null, "observer": null, "checked_at": null, "evidence": null}
+}

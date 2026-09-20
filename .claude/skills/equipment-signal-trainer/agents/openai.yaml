@@ -1,0 +1,14 @@
+interface:
+  display_name: Equipment Signal Trainer
+  short_description: Trace individual signal functions and diagnose faults
+  default_prompt: Use $equipment-signal-trainer to trace this signal function and
+    build checks that distinguish the possible faults.
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true

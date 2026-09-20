@@ -1,0 +1,14 @@
+interface:
+  display_name: Interactive Guide Release Check
+  short_description: Verify guide usability, offline use, and releases
+  default_prompt: Use $interactive-guide-release-check to verify this guide on its
+    supported devices, offline, and at its authorized live URL.
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true
