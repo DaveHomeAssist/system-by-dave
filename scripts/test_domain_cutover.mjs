@@ -41,7 +41,10 @@ async function serve(directory) {
 let source = 'https://systembydave.com';
 const sites = [
   { id: 'housevideo', origin: 'https://housevideo.app', route: '/fmp/', key: 'fmp.cutover.acceptance', database: 'fmpPhotosV1' },
-  { id: 'avbydave', origin: 'https://avbydave.com', route: '/av-suite.html', key: 'sbd.showboard.cutover-acceptance', database: 'PixelForge' }
+  { id: 'avbydave', origin: 'https://avbydave.com', route: '/av-suite.html', key: 'sbd.showboard.cutover-acceptance', database: 'PixelForge' },
+  // The preshow walk is its own origin. It claims the same fmp prefix and photo
+  // database as the hub, so its acceptance key is distinct to keep the two apart.
+  { id: 'fmpwalk-site', origin: 'https://walk.housevideo.app', route: '/fmpwalk/', key: 'fmp.walk-cutover.acceptance', database: 'fmpPhotosV1' }
 ];
 function ownedPages(directory = root) {
   return fs.readdirSync(directory, { withFileTypes: true }).flatMap(entry => {
