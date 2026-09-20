@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-09-20 — Camera control panel and P240 model detail
+
+- Rebuild the ATEM Camera Control Panel model from manufacturer photos: sloped
+  deck and LCD riser, and every strip control seated where the real panel has it
+  (readouts, ring-lit WHITE and BLACK/FLARE knobs, iris ladder, joystick track,
+  rear power and network connectors). Controls that were buried inside the
+  chassis are now visible and selectable. Catalog IDs are unchanged.
+- Rebuild the BirdDog P240 model: domed head in an arch-topped yoke, mohawk
+  tally, hex ID badge, front OLED, and rear connectors in two rows on the base.
+- Open the rig, P240 and control panel on the whole device with nothing
+  preselected; part links still restore their part. Hidden route graphics no
+  longer intercept clicks.
+- Regenerate the managed FMP release from fmp-suite d19b286.
+
 ## 2026-09-20 — Equipment controls and reference links
 
 - Keep ATEM orbit and zoom controls visible within desktop workspaces; verify

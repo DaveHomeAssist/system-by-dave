@@ -1,7 +1,7 @@
 {
   "schema": "fmp.public.release.v2",
   "sourceRepository": "DaveHomeAssist/fmp-suite",
-  "sourceCommit": "9a27c3267759ffc5b96ab9ed7e03f6b16b1109b9",
+  "sourceCommit": "d19b286a278474d73ad85237520c1b8215de7b0d",
   "mode": "commissioning",
   "files": {
     "build/index.html": "aad1f75ac7e82dc426a1c20770fbcab19c06404bb35d4520ddd03a8e7748c44f",
@@ -32,17 +32,17 @@
     "models/assets/atem-hd8-iso-2.js": "d3ec47c4ede2eacfa4868e0221994002f23e66cd338bc0c670e8d1a2a0b1953e",
     "models/assets/atem-hd8-iso-3.js": "0fd1da62473542fcff3bbc178eb69a535417cb6bed22a7fa3c516d17c2195292",
     "models/assets/atem-hd8-iso.css": "4b0b5e3a59684bf01cb4d65f814825b7aec43ba2e3125b173d832c17e7c85743",
-    "models/assets/bench-core.js": "0b3892950b08920cb0138f6baff7b7146f9355052fd630a5e49bf564f1517b93",
+    "models/assets/bench-core.js": "1867f379372571f721f7d99bc773f974a211ccd14e9d65787f2d63a3bac10303",
     "models/assets/bench.css": "4cd070722501ba646c9baac35eae8073b56c99e52e887efb29407c650c1732de",
-    "models/assets/ccu4-0.js": "e4fbd2a2039822baee874eb2d26c4dcc44a1e0cab6cc6edac37ded43af2de17e",
+    "models/assets/ccu4-0.js": "ae7150841b80dfe32d0a27c1b99a6286f1908fd82cfad1d625921a3ea93cbf6c",
     "models/assets/ccu4-catalog.json": "f18b3b8a2e7fbe513147527b597d50dee52b6c2dc337aea23398a38b30695f73",
     "models/assets/model-shell.css": "2b38424ef894341f43efd11fe7d26f3c9d50c8bc2b53cd3b88619c19ec6791f2",
     "models/assets/model-shell.js": "74b43475c2654acbe70dfd9c386ae3dc627df32c73aa4259d100f5079cf1a15f",
-    "models/assets/p240-0.js": "2e53ab362e4cd1096861887c425f9acbdc701bdc33247649bad07d7c6a099a77",
+    "models/assets/p240-0.js": "57387a25b604955f0f20ba821e0d76d1f0f741a77f72aaad650a793d802ff512",
     "models/assets/p240-catalog.json": "a3750f5a79825d2dd231c1c97cf9d9220418b8095610e1b13b4681b473c43411",
     "models/atem-hd8-iso.html": "a70d609296d271ade4215748fd8b9e19346e1fb748205faf6472422fd851c5a0",
-    "models/ccu4.html": "832f8000e9a117e7b8e51769d325ed8bb411611747dd4cc79fbe76160dcd7d0a",
-    "models/p240.html": "b41dd762f7d46ed40aa820a9edaec3464c6f49e4dabd10a94306838e103cc12d",
+    "models/ccu4.html": "4c9750025c2b74286b85da320734fc88e6d8a2b23abc1d9d69e5c53da192d8f9",
+    "models/p240.html": "231031acb7c4e59c4052992a665b7c8491ab500e00c097b6d1854878e5ab248e",
     "models/vendor/LICENSE": "852e0e8699169bf9f6fdc6bda3e682d078dcbc738b5d33e74df594721bff271d",
     "models/vendor/three.min.js": "7687c4e7cc48b735e25ccf9d838a190d88d58509764f222148345bf24cc4fdc8",
     "notion-config.js": "b675c734abe301f46f50f05a65ae58b9d25bd07c57fa8b01ef07e456e32271fc",
@@ -71,12 +71,12 @@
     "rig/assets/v2-vf-back.webp": "78d8670c544e5d872c853ffca7e73854add93e3bb71eac63767189c0641773b4",
     "rig/assets/v2-vf-front.webp": "3b93068f203cda45fa387e2a55f2d4a286a50dcdec44e01c0949bf190f17aa08",
     "rig/fmp-guide-data.js": "1352090a47dfda154646fae0e7548ccf39b78d4d2ff378ac56f6bcbbf382c704",
-    "rig/index.html": "23e95430b2dc5e16e21f5ab796280414a0e3e76c03441f6bc1fe6267dbf8c5e3",
-    "rig/rig-model.js": "c55b374117a09d3063c5f9a43a8fff55101efb6e98fed5b806babbec7f98f989",
+    "rig/index.html": "6f18163c3c34d344542c0d22dfc5f63401e035a3e9d176b079ebe600be40ce91",
+    "rig/rig-model.js": "dac0f4e4773af83a7f2878d557053efbcbffd2a0bb553957d8c908ffc08bd54a",
     "rig/vendor/three/addons/controls/OrbitControls.js": "97170e1b59a71a5d1395d227a6be626a0aefa4e349f263e0539171d8c4840d51",
     "rig/vendor/three/three.core.js": "66e03b5d8f633bb9501c9668609b99a9eaca105f764d5c780a45bf96b6888357",
     "rig/vendor/three/three.module.js": "a476b88d0df406dca0e30c65b4cdf0180c7337110accec828c103655b56a361c",
     "theme.js": "34276e275d44d4380407b996455291bfcca9cc4a9a4ef81b632534b00fc1747a"
   },
-  "artifactSha256": "b800afb5d15e7a8d3fb04ceaaae04af7573ed00ee3c90c179342b58ba5910c8a"
+  "artifactSha256": "71bf20ec5ab6066cd846573f0dbd12ebccc9463c89e7df12ee14121edb038f1b"
 }

@@ -76,7 +76,7 @@ function restoreSelection(){
   const hasSelection=url.searchParams.has('equipment')||url.searchParams.has('part');
   const next=item?.equipment||(requested==='studio'?'studio':'rig');
   switchEquipment(next);
-  const target=item?id:hasSelection?'':'nd-filter';
+  const target=item?id:'';
   selectPart(target,true);
   setPose(target?catalog[target].pose:next==='rig'?'beauty':'studio-beauty',true);
   showPanel('component');$('[data-detail]').scrollTop=0;
@@ -810,7 +810,7 @@ function selectPart(id,focus=false){
   $('[data-nd-guide]').hidden=id!=='nd-filter';
   $('[data-fit-part]').disabled=!item;
   $('[data-locate-hint]').hidden=Boolean(item);
-  $('[data-locate-status]').textContent=item?'Tap a part to explore.':'Select a component to locate it.';
+  $('[data-locate-status]').textContent=item?'Tap a part to explore.':'Select a component.';
   if(item){
     for(const key of ['title','direction','purpose','use','check','tip'])$(`[data-${key}]`).textContent=item[key];
     $('[data-photo-reference]').hidden=!photos[item.photo];
@@ -823,7 +823,7 @@ function selectPart(id,focus=false){
   }else{
     $('[data-title]').textContent=equipment==='rig'?'Explore the camera rig':'Explore the studio converter';
     $('[data-direction]').textContent=equipment==='rig'?'URSA G2 · Fujinon LA16 · Vinten support · zoom and twist-focus handles':'Separate control-room unit · front controls and rear connections';
-    $('[data-purpose]').textContent='Click the physical part to highlight its full shape, or choose it from the component menu.';
+    $('[data-purpose]').textContent='Tap a part on the model, or choose one from the menu.';
   }
   root.dataset.selected=id;
   $('[data-announcement]').textContent=item?`${item.title}. ${item.purpose}`:`${equipment==='rig'?'Camera rig':'Studio converter'} selected. Choose a component for instructions.`;
