@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-20 — One selection highlight across the FMP models
+
+- Replace the wireframe box that the P240 and camera control panel drew around
+  a selected part with the camera rig's treatment: the accent blended into the
+  part's own surfaces, a lighter tint on hover, light and dark themes followed.
+- Regenerate the managed FMP release from fmp-suite d307278.
+
 ## 2026-09-20 — Camera control panel and P240 model detail
 
 - Rebuild the ATEM Camera Control Panel model from manufacturer photos: sloped

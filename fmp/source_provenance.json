@@ -1,7 +1,7 @@
 {
   "schema": "fmp.public.release.v2",
   "sourceRepository": "DaveHomeAssist/fmp-suite",
-  "sourceCommit": "d19b286a278474d73ad85237520c1b8215de7b0d",
+  "sourceCommit": "d307278ed788bbbe63aaa4d7229a78393a154073",
   "mode": "commissioning",
   "files": {
     "build/index.html": "aad1f75ac7e82dc426a1c20770fbcab19c06404bb35d4520ddd03a8e7748c44f",
@@ -32,17 +32,17 @@
     "models/assets/atem-hd8-iso-2.js": "d3ec47c4ede2eacfa4868e0221994002f23e66cd338bc0c670e8d1a2a0b1953e",
     "models/assets/atem-hd8-iso-3.js": "0fd1da62473542fcff3bbc178eb69a535417cb6bed22a7fa3c516d17c2195292",
     "models/assets/atem-hd8-iso.css": "4b0b5e3a59684bf01cb4d65f814825b7aec43ba2e3125b173d832c17e7c85743",
-    "models/assets/bench-core.js": "1867f379372571f721f7d99bc773f974a211ccd14e9d65787f2d63a3bac10303",
+    "models/assets/bench-core.js": "a3b50cb98e4d87dae1d7803f06551386a6e6f8d4906cc72f9d796be62d617185",
     "models/assets/bench.css": "4cd070722501ba646c9baac35eae8073b56c99e52e887efb29407c650c1732de",
     "models/assets/ccu4-0.js": "ae7150841b80dfe32d0a27c1b99a6286f1908fd82cfad1d625921a3ea93cbf6c",
     "models/assets/ccu4-catalog.json": "f18b3b8a2e7fbe513147527b597d50dee52b6c2dc337aea23398a38b30695f73",
-    "models/assets/model-shell.css": "2b38424ef894341f43efd11fe7d26f3c9d50c8bc2b53cd3b88619c19ec6791f2",
+    "models/assets/model-shell.css": "39867f17582ca32d4aa49d1aa14835ba6890be73811471a03d546eafcb063a7c",
     "models/assets/model-shell.js": "74b43475c2654acbe70dfd9c386ae3dc627df32c73aa4259d100f5079cf1a15f",
     "models/assets/p240-0.js": "57387a25b604955f0f20ba821e0d76d1f0f741a77f72aaad650a793d802ff512",
     "models/assets/p240-catalog.json": "a3750f5a79825d2dd231c1c97cf9d9220418b8095610e1b13b4681b473c43411",
-    "models/atem-hd8-iso.html": "a70d609296d271ade4215748fd8b9e19346e1fb748205faf6472422fd851c5a0",
-    "models/ccu4.html": "4c9750025c2b74286b85da320734fc88e6d8a2b23abc1d9d69e5c53da192d8f9",
-    "models/p240.html": "231031acb7c4e59c4052992a665b7c8491ab500e00c097b6d1854878e5ab248e",
+    "models/atem-hd8-iso.html": "543faa3577910e06541041baa044fa58ca70f1b016d7ebc274e9f0782f86ff6f",
+    "models/ccu4.html": "c44b0cea5a269f68dbe7b29e311e2a1c01b6740d4f303158bb65816acd088fe4",
+    "models/p240.html": "4fb20365b92f1cd4125a211947b700f8bad6d656b8c54a888c4d900568b413b6",
     "models/vendor/LICENSE": "852e0e8699169bf9f6fdc6bda3e682d078dcbc738b5d33e74df594721bff271d",
     "models/vendor/three.min.js": "7687c4e7cc48b735e25ccf9d838a190d88d58509764f222148345bf24cc4fdc8",
     "notion-config.js": "b675c734abe301f46f50f05a65ae58b9d25bd07c57fa8b01ef07e456e32271fc",
@@ -78,5 +78,5 @@
     "rig/vendor/three/three.module.js": "a476b88d0df406dca0e30c65b4cdf0180c7337110accec828c103655b56a361c",
     "theme.js": "34276e275d44d4380407b996455291bfcca9cc4a9a4ef81b632534b00fc1747a"
   },
-  "artifactSha256": "71bf20ec5ab6066cd846573f0dbd12ebccc9463c89e7df12ee14121edb038f1b"
+  "artifactSha256": "eeb51ce1091447c9737b009ee3983f0913ae638aaa4845329e9991cbc0d21366"
 }
