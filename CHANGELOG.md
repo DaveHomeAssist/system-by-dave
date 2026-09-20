@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-09-20 — Offline control after a domain return
+
+- Recover an AV destination page that finishes navigating after the offline
+  worker's activation claim. Ask the active worker to claim the loaded page and
+  show Worker Ready only after browser control is confirmed.
+- Add a deterministic cutover regression that holds navigation across worker
+  activation, then verifies control, saved data and offline reload. Preserve all
+  existing acceptance assertions and timeouts.
+- Await actual source-cache and worker-registration retirement; an unresolved
+  polling Promise must not count as completed retirement.
+
 ## 2026-09-20 — Operator workspace and equipment practice
 
 - Separate Operators, searchable Reference, 3D Models and House in the FMP hub.
