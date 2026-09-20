@@ -186,6 +186,7 @@ async function main() {
     check('snap mid lands in the conservative band', mid.projection === 'safe', mid);
 
     // 3. Field errors are visible and actionable before a valid stamp is accepted.
+    await evaluate(`document.getElementById('workflowTabDeliver').click()`);
     await evaluate(`document.getElementById('stampVerification').click()`);
     await delay(120);
     const invalidFieldStamp = await evaluate(`(() => { const error=document.getElementById('fieldVerificationError'); return { hidden:error.hidden, text:error.textContent.trim(), role:error.getAttribute('role'), focus:document.activeElement?.id, invalid:['measuredDistance','measuredWidth','verifiedBy'].map(id=>document.getElementById(id).getAttribute('aria-invalid')) }; })()`);
@@ -415,6 +416,8 @@ async function main() {
       if (viewport.width === 390) {
         await evaluate(`document.querySelector('[data-mobile-panel-button="adjust"]').click()`);
         await delay(120);
+        await evaluate(`document.getElementById('workflowTabDeliver').click()`);
+        await delay(120);
         await evaluate(`document.getElementById('stampVerification').scrollIntoView({ block:'center' })`);
         await delay(120);
         await evaluate(`document.getElementById('stampVerification').click()`);
@@ -424,7 +427,7 @@ async function main() {
       }
     }
 
-    // 17. Sidebar clarity and responsive menu contract. The full width matrix keeps the workspace
+    // 17. Workflow deck and responsive menu contract. The full width matrix keeps the workspace
     // viewport-locked, the header controls visible at full touch height, the HUD and Facts overlays
     // separated, the sheets exclusive and bounded, and every baseline control route present.
     const pressEscape = async () => {
@@ -439,28 +442,32 @@ async function main() {
       const rect=el=>{ if(!el)return null; const r=el.getBoundingClientRect(); return {left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height}; };
       const visible=el=>{ if(!el)return false; const s=getComputedStyle(el); if(s.display==='none'||s.visibility==='hidden')return false; const r=el.getBoundingClientRect(); return r.width>0&&r.height>0; };
       const header=['themeToggle','unitToggle','fieldVerifyToggle','quickStartToggle'].map(id=>{ const el=document.getElementById(id); return {id,visible:visible(el),rect:rect(el)}; });
-      const hud=document.querySelector('.hud'), facts=document.querySelector('.facts'), trigger=document.getElementById('factsTrigger'), toolbar=document.querySelector('.scene-toolbar'), dock=document.querySelector('.mobile-dock');
+      const hud=document.querySelector('.hud'), facts=document.querySelector('.facts'), trigger=document.getElementById('factsTrigger'), toolbar=document.querySelector('.scene-toolbar'), dock=document.querySelector('.mobile-dock'), aside=document.querySelector('aside'), workflowFooter=document.querySelector('.workflow-footer');
       const layer=el=>Number(getComputedStyle(el).zIndex)||0;
       return { clientWidth:doc.clientWidth, clientHeight:doc.clientHeight, header,
         hud:{visible:visible(hud),rect:rect(hud),layer:layer(hud)}, facts:{visible:visible(facts),rect:rect(facts),layer:layer(facts)},
         trigger:{visible:visible(trigger),rect:rect(trigger),tag:trigger?trigger.tagName:'',expanded:trigger?trigger.getAttribute('aria-expanded'):''},
-        toolbar:{visible:visible(toolbar),rect:rect(toolbar)}, dock:{visible:visible(dock),rect:rect(dock)} };
+        toolbar:{visible:visible(toolbar),rect:rect(toolbar)}, dock:{visible:visible(dock),rect:rect(dock)}, aside:{visible:visible(aside),rect:rect(aside)}, workflowFooter:{visible:visible(workflowFooter),rect:rect(workflowFooter)} };
     })()`;
-    const CONTROL_IDS = ['adjustPanel','sectionScreen','sectionProjector','sectionRoom','sectionVerify','adjustSummary','unitStrip','addUnit','removeUnit','stackUnits','blendUnits','sw','st','ar','lens','lh','d','px','targetX','bw','bm','bt','bodyW','bodyH','bodyD','bodyLp','clearBody','roomW','roomD','roomH','roomC','addObstacle','clearObstacles','obstacleX','obstacleY','obstacleZ','obstacleWidth','obstacleHeight','obstacleDepth','removeObstacle','measuredDistance','measuredWidth','verifiedBy','stampVerification','saveScene','restoreScene','importScene','downloadScene','resetScene','jobSheetOpen','sceneFile','tcone','troom','tgrid','tenvelope','tshift','tdimensions','resetView','mobileObj','mobileGlb','mobileJobSheet','factsTrigger','themeToggle','unitToggle','fieldVerifyToggle','quickStartToggle'];
+    const CONTROL_IDS = ['adjustPanel','sectionScreen','sectionProjector','sectionPlacement','sectionRoom','sectionVerify','adjustSummary','flightUnit','flightProvenance','flightScreen','flightSet','workflowTabSetup','workflowTabPlace','workflowTabRoom','workflowTabDeliver','workflowPanelSetup','workflowPanelPlace','workflowPanelRoom','workflowPanelDeliver','workflowBack','workflowNext','workflowPosition','unitStrip','addUnit','removeUnit','stackUnits','blendUnits','sw','st','ar','lens','lh','d','px','targetX','bw','bm','bt','bodyW','bodyH','bodyD','bodyLp','clearBody','roomW','roomD','roomH','roomC','addObstacle','clearObstacles','obstacleX','obstacleY','obstacleZ','obstacleWidth','obstacleHeight','obstacleDepth','removeObstacle','measuredDistance','measuredWidth','verifiedBy','stampVerification','saveScene','restoreScene','importScene','downloadScene','resetScene','jobSheetOpen','sceneFile','tcone','troom','tgrid','tenvelope','tshift','tdimensions','resetView','mobileObj','mobileGlb','mobileJobSheet','factsTrigger','themeToggle','unitToggle','fieldVerifyToggle','quickStartToggle'];
 
     await cdp('Emulation.setDeviceMetricsOverride', { width: 1280, height: 900, deviceScaleFactor: 1, mobile: false });
     await open(AUDIT_QUERY);
-    const inventory = await evaluate(`(() => { const missing=${JSON.stringify(CONTROL_IDS)}.filter(id=>!document.getElementById(id)); const cams=[...document.querySelectorAll('[data-cam]')].map(button=>button.dataset.cam); const sections=[...document.querySelectorAll('.adjust-section')].map(section=>section.querySelector('summary').textContent.trim()); return { missing, cams, sections, clearDisabled:document.getElementById('clearObstacles').disabled }; })()`);
+    const inventory = await evaluate(`(() => { const missing=${JSON.stringify(CONTROL_IDS)}.filter(id=>!document.getElementById(id)); const cams=[...document.querySelectorAll('[data-cam]')].map(button=>button.dataset.cam); const tabs=[...document.querySelectorAll('[data-workflow-tab]')].map(tab=>({name:tab.dataset.workflowTab,selected:tab.getAttribute('aria-selected'),controls:tab.getAttribute('aria-controls')})); const panels=[...document.querySelectorAll('[data-workflow-panel]')].map(panel=>({name:panel.dataset.workflowPanel,hidden:panel.hidden,labelledby:panel.getAttribute('aria-labelledby')})); return { missing, cams, tabs, panels, clearDisabled:document.getElementById('clearObstacles').disabled }; })()`);
     check('every baseline control, camera, and export route is present', inventory.missing.length === 0 && inventory.cams.join(',') === 'three,side,front,top,op', inventory);
-    check('the Adjust rail groups its controls under the four workflow disclosures', inventory.sections.length === 4 && inventory.sections[0] === 'Screen' && inventory.sections[1] === 'Projector' && inventory.sections[2] === 'Room & Obstructions' && inventory.sections[3] === 'Verify & Deliver', inventory);
+    check('the Adjust rail exposes one of four labelled workflow panels', inventory.tabs.map(item=>item.name).join(',') === 'setup,place,room,deliver' && inventory.panels.map(item=>item.name).join(',') === 'setup,place,room,deliver' && inventory.tabs.filter(item=>item.selected==='true').length === 1 && inventory.panels.filter(item=>!item.hidden).length === 1, inventory);
+    await evaluate(`(() => { const tab=document.getElementById('workflowTabSetup'); tab.focus(); tab.dispatchEvent(new KeyboardEvent('keydown',{key:'End',bubbles:true})); })()`);
+    const workflowKeyboard = await evaluate(`(() => ({ focus:document.activeElement?.id||'', selected:[...document.querySelectorAll('[data-workflow-tab]')].find(tab=>tab.getAttribute('aria-selected')==='true')?.dataset.workflowTab||'', visible:[...document.querySelectorAll('[data-workflow-panel]')].filter(panel=>!panel.hidden).map(panel=>panel.dataset.workflowPanel) }))()`);
+    check('workflow tabs support keyboard selection and expose exactly one panel', workflowKeyboard.focus === 'workflowTabDeliver' && workflowKeyboard.selected === 'deliver' && workflowKeyboard.visible.join(',') === 'deliver', workflowKeyboard);
+    await evaluate(`document.getElementById('workflowTabSetup').click()`);
     check('Clear obstructions is disabled while no obstruction exists', inventory.clearDisabled === true, inventory);
     await click('addObstacle');
     const clearEnabled = await evaluate(`document.getElementById('clearObstacles').disabled`);
     await click('clearObstacles');
     const clearReDisabled = await evaluate(`document.getElementById('clearObstacles').disabled`);
     check('Clear obstructions enables with an obstruction and disables again when cleared', clearEnabled === false && clearReDisabled === true, { clearEnabled, clearReDisabled });
-    const sticky = await evaluate(`(() => { const aside=document.querySelector('aside'); aside.scrollTop=aside.scrollHeight; const summary=document.querySelector('.adjust-panel>summary'); const s=summary.getBoundingClientRect(); const a=aside.getBoundingClientRect(); return { summaryTop:s.top, asideTop:a.top, scrolled:aside.scrollTop>0, value:document.getElementById('adjustSummary').textContent.trim() }; })()`);
-    check('the compact Adjust summary stays pinned while the rail scrolls', sticky.scrolled && Math.abs(sticky.summaryTop - sticky.asideTop) <= 1 && /screen/.test(sticky.value) && /set/.test(sticky.value), sticky);
+    const sticky = await evaluate(`(() => { const advanced=document.querySelector('.advanced-block'); advanced.open=true; const panel=document.getElementById('workflowPanelSetup'); const flight=document.querySelector('.workflow-flight-strip'); panel.style.maxHeight='180px'; const before=flight.getBoundingClientRect(); panel.scrollTop=panel.scrollHeight; const after=flight.getBoundingClientRect(); const result={ flightTop:after.top, beforeTop:before.top, scrolled:panel.scrollTop>0, overflow:getComputedStyle(panel).overflowY, screen:document.getElementById('flightScreen').textContent.trim(), set:document.getElementById('flightSet').textContent.trim(), provenance:document.getElementById('flightProvenance').textContent.trim() }; panel.style.maxHeight=''; return result; })()`);
+    check('the scene flight strip stays visible while only the active workflow panel scrolls', sticky.scrolled && Math.abs(sticky.flightTop-sticky.beforeTop)<=1 && /screen/.test(sticky.screen) && /set/.test(sticky.set) && sticky.provenance.length>0, sticky);
     let offlineCompact = null;
     for (let attempt = 0; attempt < 160; attempt += 1) {
       offlineCompact = await evaluate(`(() => { const detail=document.getElementById('offlineStatusDetail'); return { state:document.documentElement.dataset.offline||'', detailDisplay:getComputedStyle(detail).display, title:document.getElementById('offlineStatusTitle').textContent.trim() }; })()`);
@@ -479,12 +486,14 @@ async function main() {
       check(`${width}px keeps every visible header control inside the viewport at full height`, layout.header.filter(control => control.visible).length === 4 && layout.header.every(control => !control.visible || (contained(control.rect, layout) && control.rect.height >= minControl - 0.5)), layout.header);
       const scrollProbe = await evaluate(`(() => { window.scrollTo(0,120); const y=window.pageYOffset; window.scrollTo(120,0); const x=window.pageXOffset; window.scrollTo(0,0); return { x, y, overflowX:document.documentElement.scrollWidth-document.documentElement.clientWidth }; })()`);
       check(`${width}px document does not page-scroll`, scrollProbe.x === 0 && scrollProbe.y === 0 && scrollProbe.overflowX <= 1, scrollProbe);
+      if (width > 820) check(`${width}px anchors workflow navigation inside the desktop rail`, layout.workflowFooter.visible && layout.aside.visible && layout.workflowFooter.rect.top >= layout.aside.rect.top - 1 && Math.abs(layout.workflowFooter.rect.bottom-layout.aside.rect.bottom) <= 1, layout);
       if (width <= 820) {
         check(`${width}px keeps the four-button dock with the Facts overlay and trigger hidden`, layout.dock.visible && !layout.facts.visible && !layout.trigger.visible, layout);
         await evaluate(`document.getElementById('fieldVerifyToggle').click()`);
         await delay(280);
-        const reveal = await evaluate(`(() => { const aside=document.querySelector('aside'); const a=aside.getBoundingClientRect(); const field=document.getElementById('measuredDistance'); const f=field.getBoundingClientRect(); return { panel:document.body.dataset.mobilePanel||'', sectionOpen:document.getElementById('sectionVerify').open, adjustOpen:document.getElementById('adjustPanel').open, focus:document.activeElement?document.activeElement.id:'', asideDisplay:getComputedStyle(aside).display, aside:{left:a.left,top:a.top,right:a.right,bottom:a.bottom}, field:{top:f.top,bottom:f.bottom,height:f.height}, clientWidth:document.documentElement.clientWidth, clientHeight:document.documentElement.clientHeight }; })()`);
-        check(`${width}px Field Verify reveals the verification fields in the open Adjust sheet`, reveal.panel === 'adjust' && reveal.sectionOpen === true && reveal.adjustOpen === true && reveal.asideDisplay !== 'none' && reveal.focus === 'measuredDistance' && reveal.field.height >= 44 && reveal.field.top >= reveal.aside.top - 1 && reveal.field.bottom <= reveal.aside.bottom + 1, reveal);
+        const reveal = await evaluate(`(() => { const aside=document.querySelector('aside'); const a=aside.getBoundingClientRect(); const field=document.getElementById('measuredDistance'); const f=field.getBoundingClientRect(); const footer=document.querySelector('.workflow-footer').getBoundingClientRect(); return { panel:document.body.dataset.mobilePanel||'', workflow:document.querySelector('[data-workflow-tab][aria-selected="true"]')?.dataset.workflowTab||'', deliverHidden:document.getElementById('workflowPanelDeliver').hidden, adjustOpen:document.getElementById('adjustPanel').open, focus:document.activeElement?document.activeElement.id:'', asideDisplay:getComputedStyle(aside).display, aside:{left:a.left,top:a.top,right:a.right,bottom:a.bottom}, field:{top:f.top,bottom:f.bottom,height:f.height}, footer:{top:footer.top,bottom:footer.bottom,height:footer.height}, clientWidth:document.documentElement.clientWidth, clientHeight:document.documentElement.clientHeight }; })()`);
+        check(`${width}px Field Verify reveals the verification fields in the open Adjust sheet`, reveal.panel === 'adjust' && reveal.workflow === 'deliver' && reveal.deliverHidden === false && reveal.adjustOpen === true && reveal.asideDisplay !== 'none' && reveal.focus === 'measuredDistance' && reveal.field.height >= 44 && reveal.field.top >= reveal.aside.top - 1 && reveal.field.bottom <= reveal.aside.bottom + 1, reveal);
+        check(`${width}px keeps workflow navigation inside the Adjust sheet`, reveal.footer.height >= 44 && reveal.footer.top >= reveal.aside.top - 1 && reveal.footer.bottom <= reveal.aside.bottom + 1, reveal);
         check(`${width}px active Adjust sheet stays inside the viewport`, reveal.aside.left >= -0.5 && reveal.aside.top >= -0.5 && reveal.aside.right <= reveal.clientWidth + 0.5 && reveal.aside.bottom <= reveal.clientHeight + 0.5, reveal);
       } else if (width <= 1299) {
         check(`${width}px replaces the permanent Facts overlay with a visible keyboard-operable trigger`, layout.trigger.visible && layout.trigger.tag === 'BUTTON' && !layout.facts.visible && !layout.dock.visible && contained(layout.trigger.rect, layout), layout);
@@ -510,8 +519,10 @@ async function main() {
         check('390px mobile sheets stay mutually exclusive', exclusivity.panel === 'view' && exclusivity.view && !exclusivity.adjust && !exclusivity.facts && !exclusivity.exports, exclusivity);
         await evaluate(`document.querySelector('[data-mobile-panel-button="adjust"]').click()`);
         await delay(140);
+        await evaluate(`document.getElementById('workflowTabDeliver').click()`);
+        await delay(140);
         const touch = await evaluate(`(() => { const h=id=>document.getElementById(id).getBoundingClientRect().height; return { sw:h('sw'), ar:h('ar'), md:h('measuredDistance'), vb:h('verifiedBy'), stamp:h('stampVerification'), dock:[...document.querySelectorAll('.mobile-dock button')].map(button=>button.getBoundingClientRect().height) }; })()`);
-        check('390px mobile inputs meet the 44px touch target', touch.sw >= 44 && touch.ar >= 44 && touch.md >= 44 && touch.vb >= 44 && touch.stamp >= 44 && touch.dock.every(value => value >= 44), touch);
+        check('390px mobile inputs meet the 44px touch target', touch.md >= 44 && touch.vb >= 44 && touch.stamp >= 44 && touch.dock.every(value => value >= 44), touch);
         await evaluate(`document.getElementById('themeToggle').click()`);
         await delay(160);
         const dark = await evaluate(`(() => { window.scrollTo(0,120); const y=window.pageYOffset; window.scrollTo(0,0); return { theme:document.documentElement.dataset.theme||'', y }; })()`);
