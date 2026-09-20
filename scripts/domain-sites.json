@@ -19,8 +19,8 @@
         "backfocus/"
       ],
       "movedTo": {
-        "fmpwalk/": "fmpwalk-site",
-        "fmp-walk/": "fmpwalk-site"
+        "fmpwalk/": "housevideo-walk",
+        "fmp-walk/": "housevideo-walk"
       },
       "assets": [],
       "robotsDisallow": [
@@ -41,7 +41,7 @@
       }
     },
     {
-      "id": "fmpwalk-site",
+      "id": "housevideo-walk",
       "name": "FMP Preshow Walk",
       "domain": "walk.housevideo.app",
       "repository": "DaveHomeAssist/housevideo-walk",

@@ -13,7 +13,7 @@ test('missing deploy key or auth evidence blocks publication', () => {
 
 test('release verifies the destination before publishing either source redirect', () => {
   const workflow = fs.readFileSync(new URL('../.github/workflows/deploy-pages.yml', import.meta.url), 'utf8');
-  const ordered = ['--preflight', 'scripts/publish_domain_site.sh fmpwalk-site', '--live _sites/fmpwalk-site',
+  const ordered = ['--preflight', 'scripts/publish_domain_site.sh housevideo-walk', '--live _sites/housevideo-walk',
     '- name: Deploy to GitHub Pages', 'scripts/publish_domain_site.sh housevideo '];
   let previous = -1;
   for (const step of ordered) {

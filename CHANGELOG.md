@@ -21,7 +21,7 @@
 - Prepare the preshow venue walk move from `housevideo.app/fmpwalk/` to
   **walk.housevideo.app**. Infrastructure, authentication and live acceptance
   remain pending; the hub retains explicit walk links. `scripts/domain-sites.json`
-  gains the `fmpwalk-site` entry; the walk and its `/fmp-walk/` typed alias leave
+  gains the `housevideo-walk` entry; the walk and its `/fmp-walk/` typed alias leave
   housevideo.app, and the Pages workflow publishes the new site with its own
   deploy key.
 - `housevideo.app/fmpwalk/` and `/fmp-walk/` are not dead ends. A site may now

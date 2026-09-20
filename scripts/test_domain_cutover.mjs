@@ -44,7 +44,7 @@ const sites = [
   { id: 'avbydave', origin: 'https://avbydave.com', route: '/av-suite.html', key: 'sbd.showboard.cutover-acceptance', database: 'PixelForge' },
   // The preshow walk is its own origin. It claims the same fmp prefix and photo
   // database as the hub, so its acceptance key is distinct to keep the two apart.
-  { id: 'fmpwalk-site', origin: 'https://walk.housevideo.app', route: '/fmpwalk/', key: 'fmp.walk-cutover.acceptance', database: 'fmpPhotosV1' }
+  { id: 'housevideo-walk', origin: 'https://walk.housevideo.app', route: '/fmpwalk/', key: 'fmp.walk-cutover.acceptance', database: 'fmpPhotosV1' }
 ];
 function ownedPages(directory = root) {
   return fs.readdirSync(directory, { withFileTypes: true }).flatMap(entry => {
@@ -289,7 +289,7 @@ try {
 
   for (const mismatch of [false, true]) {
     await test(`walk transfer rejects ${mismatch ? 'forged payload source' : 'unconfigured opener origin'}`, async (page, context) => {
-      const walk = sites.find(site => site.id === 'fmpwalk-site');
+      const walk = sites.find(site => site.id === 'housevideo-walk');
       const opener = sites.find(site => site.id === (mismatch ? 'housevideo' : 'avbydave'));
       await page.goto(opener.origin + '/transfer.html');
       const opened = context.waitForEvent('page');

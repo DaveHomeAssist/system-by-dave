@@ -8,7 +8,7 @@ GitHub Pages repository.
 | Site id | Domain | Repository | Pages | Cutover |
 | --- | --- | --- | --- | --- |
 | `housevideo` | housevideo.app | `DaveHomeAssist/housevideo` | `/fmp/` and its routes, the `/fmp-index/` redirect, `/switcher/` and its routes, `/shader/`, `/backfocus/` | 2026-09-18 |
-| `fmpwalk-site` | walk.housevideo.app | `DaveHomeAssist/housevideo-walk` | `/fmpwalk/` and the `/fmp-walk/` redirect | Pending infrastructure, auth and live acceptance |
+| `housevideo-walk` | walk.housevideo.app | `DaveHomeAssist/housevideo-walk` | `/fmpwalk/` and the `/fmp-walk/` redirect | Pending infrastructure, auth and live acceptance |
 | `avbydave` | avbydave.com | `DaveHomeAssist/avbydave` | `av-suite.html`, every registry tool and offline page (including `plotforge.html`), `av-workbook.html`, `av-tool-suite/` | 2026-09-18 |
 
 `scripts/domain-sites.json` owns this list, each site's home route, robots rules
@@ -172,7 +172,7 @@ browser data and the destination copy.
 node scripts/stage_domain_sites.mjs --out /tmp/sites --site-root /tmp/sbd-site --simulate \
   --source-origin http://localhost:8801 \
   --site-origin housevideo=http://localhost:8802 --site-origin avbydave=http://localhost:8803 \
-  --site-origin fmpwalk-site=http://localhost:8804
+  --site-origin housevideo-walk=http://localhost:8804
 ```
 
 `/tmp/sbd-site` must first hold a copy of the repository webroot (the same

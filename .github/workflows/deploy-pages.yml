@@ -54,7 +54,7 @@ jobs:
         env:
           DEPLOY_KEY: ${{ secrets.HOUSEVIDEO_WALK_DEPLOY_KEY }}
           CUTOVER_AUTH_VERIFIED: ${{ vars.HOUSEVIDEO_WALK_AUTH_VERIFIED }}
-        run: node scripts/check_domain_cutover_ready.mjs fmpwalk-site --preflight
+        run: node scripts/check_domain_cutover_ready.mjs housevideo-walk --preflight
 
       - name: Verify public site contracts
         run: |
@@ -102,10 +102,10 @@ jobs:
         env:
           DEPLOY_KEY: ${{ secrets.HOUSEVIDEO_WALK_DEPLOY_KEY }}
           GITHUB_TOKEN: ${{ github.token }}
-        run: scripts/publish_domain_site.sh fmpwalk-site _sites/fmpwalk-site DaveHomeAssist/housevideo-walk "$GITHUB_SHA"
+        run: scripts/publish_domain_site.sh housevideo-walk _sites/housevideo-walk DaveHomeAssist/housevideo-walk "$GITHUB_SHA"
 
       - name: Verify walk destination before publishing redirects
-        run: node scripts/check_domain_cutover_ready.mjs fmpwalk-site --live _sites/fmpwalk-site
+        run: node scripts/check_domain_cutover_ready.mjs housevideo-walk --live _sites/housevideo-walk
 
       - name: Configure Pages
         uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
