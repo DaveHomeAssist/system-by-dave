@@ -8,6 +8,8 @@ on:
       - 'scripts/*domain*'
       - 'js/sbd-registry.js'
       - 'av-suite-worker.js'
+      - 'av-suite.html'
+      - 'ProjectorThrow/Stage3D.html'
       - 'package*.json'
       - '.github/workflows/domain-cutover.yml'
       - '.github/workflows/deploy-pages.yml'
@@ -26,6 +28,10 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
+      - name: Verify shared offline contracts
+        run: |
+          npm run verify:av
+          npm run verify:throwline
       - run: npx playwright install --with-deps chromium
       - run: npm run verify:domain-sites
       - run: node --test scripts/check_domain_cutover_ready.test.mjs
