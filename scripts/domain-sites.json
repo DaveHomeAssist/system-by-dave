@@ -16,6 +16,7 @@
         "fmp-index/",
         "switcher/",
         "shader/",
+        "ursa-broadcast-g2/",
         "backfocus/"
       ],
       "movedTo": {

@@ -40,3 +40,7 @@ html[data-av-theme] button[aria-pressed="true"] {
 /* In house references, ink means body text. AV tools use the root ink alias
    for text on primary buttons; keep that alias from reaching this content. */
 html[data-av-theme] body { --ink: var(--av-text); }
+
+/* av-theme paints every .panel as a card. In the house shell a .panel is a
+   full-width tab section with no side padding; the sheets inside are the cards. */
+html[data-av-theme] main > .panel { background: transparent; box-shadow: none; }

@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-20 — Walk cutover reconciled with current camera references
+
+- Preserve the URSA Broadcast G2 field guide, camera-body corrections and flat
+  house tab panels when integrating the walk domain cutover with current main.
+- Regenerate both managed FMP releases from merged canonical source `115c8e3`.
+  Keep the new walk origin and the existing camera-reference routes together.
+
 ## 2026-09-20 — Canonical FMP source named for the suite
 
 - `DaveHomeAssist/fmpwalk` is the canonical source for the whole FMP video
@@ -56,6 +63,32 @@
 - Require the walk deploy key and recorded auth configuration evidence, then
   publish and read back the destination before either source deploys redirects.
   Failures leave the existing source deployment in place.
+
+## 2026-09-20 — FMP camera bodies stated as URSA Broadcast G2
+
+- The house camera body model was settled on 2026-09-18: all three bodies are
+  Blackmagic URSA Broadcast G2. `fmp/gear/` still presented that as an open
+  question. The Body tab lede and Identity facts now state the model plainly,
+  the recorded-alternative row is gone, and the Chain and Checks tabs no longer
+  list a side-plate model read. Serial numbers remain listed as unread.
+- `fmp/house/` issue 03 now reads as a dashboard source error rather than an
+  open identity question.
+- Correction, same day: the first export (fmpwalk `50c7d95`) carried the 4K
+  BROADCAST badge into the Body lede and a new IDENTIFIERS row as evidence for
+  the model. That badge sits ahead of the lens mount, not on the body, and never
+  identified the camera. Both mentions are removed; the model stands on the
+  2026-09-18 settlement. The Lens tab still cites the badge for the mount.
+- Exported from fmpwalk `88d34e5`. Provenance for `fmp/` and `fmpwalk/` is
+  pinned to that export; no other managed file changed.
+
+## 2026-09-20 — FMP house tab panels stay flat
+
+- `css/av-theme.css` styles every `.panel` as a card. On the FMP house, gear,
+  build and PTZ pages a `.panel` is a full-width tab section with no side
+  padding, so headings and ledes sat flush against a white edge and the sheets
+  read white-on-white. `fmp/house/house-tokens.css` now clears the background
+  and shadow for `main > .panel` (fmpwalk `580a862`). Provenance for `fmp/` and
+  `fmpwalk/` is pinned to that export; no other managed file changed.
 
 ## 2026-09-20 — ATEM HD8 ISO interactive guide
 

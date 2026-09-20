@@ -101,8 +101,9 @@ references, with unchanged paths (`docs/domain-sites.md`). It was cut over on
 stubs that offer to move saved walk and camera data (browser storage and walk
 photos) before redirecting.
 
-The proposed preshow walk move to **walk.housevideo.app** remains pending
-infrastructure, auth configuration and live acceptance. After cutover,
+The preshow walk is configured to publish at **walk.housevideo.app**. The release
+requires configured infrastructure and auth, then verifies the live destination
+before publishing old-origin redirects. After cutover,
 `housevideo.app/fmpwalk/` and `/fmp-walk/` offer saved-data migration before
 redirecting there. Links crossing the two origins are absolute and the exporter
 enforces it. Hub links to the walk remain available.
