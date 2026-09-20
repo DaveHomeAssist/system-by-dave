@@ -32,6 +32,7 @@ const CORE_HEADERS = new Map([
 ]);
 const STANDALONE_RETURNS = [
   'switcher/index.html',
+  'switcher/guide/index.html',
   'shader/index.html',
   'resume/av/index.html',
   'av-workbook/index.html',
@@ -44,6 +45,7 @@ const STANDALONE_RETURNS = [
 ];
 const REQUIRED_SKIP_LINKS = new Map([
   ['switcher/index.html', 'reference-main'],
+  ['switcher/guide/index.html', 'atem-explorer'],
   ['shader/index.html', 'reference-main'],
   ['depotops/index.html', 'depotops-workspace'],
   ['av-workbook/index.html', 'root'],
