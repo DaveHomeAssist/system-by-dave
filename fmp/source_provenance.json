@@ -1,7 +1,7 @@
 {
   "schema": "fmp.public.release.v2",
   "sourceRepository": "DaveHomeAssist/fmp-suite",
-  "sourceCommit": "5a06fdd9daf25c8a473a5fcd20947879e178e936",
+  "sourceCommit": "1a1e4d17a0077bc96727f54d8843d6a394087dc1",
   "mode": "commissioning",
   "files": {
     "build/index.html": "aad1f75ac7e82dc426a1c20770fbcab19c06404bb35d4520ddd03a8e7748c44f",
@@ -17,7 +17,7 @@
     "chrome.css": "232f9d3427adec529686583996541d12c2b8d39704b30b88a3abdef6b94cdb78",
     "chrome.js": "daf16109ad8ea40aaa6a40146730991f7b0cd924a017f0ae5fc207cdb1dd4a77",
     "gear/index.html": "19fb970cc1a5ed752b2303ab616067c6fc014c5b5f103903df154f9d7e3d2d1a",
-    "guide/index.html": "92df6ec2aa4d485aa360891d770f7e8933081f798b675c541a6f314bff9339aa",
+    "guide/index.html": "e820939a98c3d1a888e14da65d5074c44607cd1ed2605b483b1f169f004a92d2",
     "house/display-estate.csv": "e8217a9d329cb67a8678d2475952628d27830442b341bfd699a8fd548643d4fa",
     "house/house-data.js": "b6ceac4caaf6ca7e8b15ac6eb982cb200c866639f74dbabd27fa98e51e9dab19",
     "house/house-tokens.css": "2a09b50d41cb919ec6557fb20243374977395ec0b5acc36080f1d3556cec06e0",
@@ -31,7 +31,7 @@
     "models/assets/atem-hd8-iso-1.js": "152ccb1f1b8b677638da9b2d91615ba0f1aebc01183fa3c6da5011d559f78eb6",
     "models/assets/atem-hd8-iso-2.js": "d3ec47c4ede2eacfa4868e0221994002f23e66cd338bc0c670e8d1a2a0b1953e",
     "models/assets/atem-hd8-iso-3.js": "0fd1da62473542fcff3bbc178eb69a535417cb6bed22a7fa3c516d17c2195292",
-    "models/assets/atem-hd8-iso.css": "fdb413bad38cd44d075b10feef15a38066f0ae296ddf0358d2a397411dba1bf8",
+    "models/assets/atem-hd8-iso.css": "4b0b5e3a59684bf01cb4d65f814825b7aec43ba2e3125b173d832c17e7c85743",
     "models/assets/bench-core.js": "0b3892950b08920cb0138f6baff7b7146f9355052fd630a5e49bf564f1517b93",
     "models/assets/bench.css": "4cd070722501ba646c9baac35eae8073b56c99e52e887efb29407c650c1732de",
     "models/assets/ccu4-0.js": "e4fbd2a2039822baee874eb2d26c4dcc44a1e0cab6cc6edac37ded43af2de17e",
@@ -40,7 +40,7 @@
     "models/assets/model-shell.js": "74b43475c2654acbe70dfd9c386ae3dc627df32c73aa4259d100f5079cf1a15f",
     "models/assets/p240-0.js": "2e53ab362e4cd1096861887c425f9acbdc701bdc33247649bad07d7c6a099a77",
     "models/assets/p240-catalog.json": "a3750f5a79825d2dd231c1c97cf9d9220418b8095610e1b13b4681b473c43411",
-    "models/atem-hd8-iso.html": "c6167327882bfad96214d84dac558a3f233edd21f05693b6e98a409f4ca23fa9",
+    "models/atem-hd8-iso.html": "a70d609296d271ade4215748fd8b9e19346e1fb748205faf6472422fd851c5a0",
     "models/ccu4.html": "832f8000e9a117e7b8e51769d325ed8bb411611747dd4cc79fbe76160dcd7d0a",
     "models/p240.html": "b41dd762f7d46ed40aa820a9edaec3464c6f49e4dabd10a94306838e103cc12d",
     "models/vendor/LICENSE": "852e0e8699169bf9f6fdc6bda3e682d078dcbc738b5d33e74df594721bff271d",
@@ -48,7 +48,7 @@
     "notion-config.js": "b675c734abe301f46f50f05a65ae58b9d25bd07c57fa8b01ef07e456e32271fc",
     "photos.js": "cd1feeb0fd50c5df4df81fa55b3fb37ca708127d793d438a62e98e596fbec3ff",
     "ptz/SuperJoy-G1-Interactive-Guide.html": "f71c18cfd738fe6ea1a4a23ac86dbd0fb6795c6de48fa7fb8ea156af494aae73",
-    "ptz/index.html": "8bfa22760919f0908736cdcfc1097823e218fbdf38d0e9eb1681763736293280",
+    "ptz/index.html": "45cc52c47cc1877e0636251e9f12cf910ed553073b5527d61ba7f428184fa434",
     "public.css": "b10277cd6a77d9f27e7344d8037ba62ff50326c81bbccbdd3d4c811406dcba79",
     "public.js": "5ec85cac457d89ffddd5a2e550cfff8c213529d00152240314bf9eac2679d7d7",
     "ref.css": "2d9b441dad74f85912a631b7620af7fe67c859cba972ab799ef92b94c9e91bc5",
@@ -78,5 +78,5 @@
     "rig/vendor/three/three.module.js": "a476b88d0df406dca0e30c65b4cdf0180c7337110accec828c103655b56a361c",
     "theme.js": "34276e275d44d4380407b996455291bfcca9cc4a9a4ef81b632534b00fc1747a"
   },
-  "artifactSha256": "37932f884df068f76ac5cf28d5f36ebaeaa2de8f82254651a94528175de43aab"
+  "artifactSha256": "b800afb5d15e7a8d3fb04ceaaae04af7573ed00ee3c90c179342b58ba5910c8a"
 }

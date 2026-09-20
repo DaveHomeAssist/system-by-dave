@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-09-20 — Equipment controls and reference links
+
+- Keep ATEM orbit and zoom controls visible within desktop workspaces; verify
+  controls are reachable before browser automation can scroll them into view.
+- Refresh the SuperJoy manual link and give the FMP guide the shared site icon.
+- Regenerate the managed FMP releases from the canonical source, with unchanged
+  walk content and backend code.
+
 ## 2026-09-20 — Shared offline version compatibility
 
 - Align Throwline Stage 3D with the current AV offline cache version so its
