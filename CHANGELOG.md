@@ -9,7 +9,12 @@
   list a side-plate model read. Serial numbers remain listed as unread.
 - `fmp/house/` issue 03 now reads as a dashboard source error rather than an
   open identity question.
-- Exported from fmpwalk `50c7d95`. Provenance for `fmp/` and `fmpwalk/` is
+- Correction, same day: the first export (fmpwalk `50c7d95`) carried the 4K
+  BROADCAST badge into the Body lede and a new IDENTIFIERS row as evidence for
+  the model. That badge sits ahead of the lens mount, not on the body, and never
+  identified the camera. Both mentions are removed; the model stands on the
+  2026-09-18 settlement. The Lens tab still cites the badge for the mount.
+- Exported from fmpwalk `88d34e5`. Provenance for `fmp/` and `fmpwalk/` is
   pinned to that export; no other managed file changed.
 
 ## 2026-09-20 — FMP house tab panels stay flat
