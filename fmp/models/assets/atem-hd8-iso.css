@@ -17,3 +17,6 @@ html{background:#d8d4cc}body{margin:0;padding:18px} @media(max-width:680px){body
 
 #atem-explorer .lesson-actions button,#atem-explorer summary,#atem-explorer input[type=search],#atem-explorer input[type=number]{min-height:44px}
 #atem-explorer .gesture-label{min-height:44px;min-width:44px}
+
+/* Keep the model inside the desktop workspace without clipping its controls. */
+@media(min-width:1000px){#atem-explorer .visual-column{min-height:0}#atem-explorer .stage{height:auto;min-height:180px;max-height:none}}
