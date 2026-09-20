@@ -429,7 +429,7 @@ function transferPage(site, origin) {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
 <title>Move saved data | ${title}</title>
-<meta name="description" content="Move ${title} data saved in this browser on systembydave.com to ${domain}.">
+<meta name="description" content="Move ${title} data saved in this browser on its previous website to ${domain}.">
 <link rel="canonical" href="${origin}/transfer.html">
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#FFFFFF">
@@ -442,47 +442,17 @@ function transferPage(site, origin) {
 <a class="sbd-move-skip" href="#transfer">Skip to data transfer</a>
 <main id="transfer" class="sbd-move" tabindex="-1">
 <h1>Move saved ${title} data</h1>
-<p id="transferStatus" class="sbd-move-status" role="status" aria-live="polite">Open this page from a systembydave.com ${title} page to move data automatically, or import a backup file below.</p>
+<p id="transferStatus" class="sbd-move-status" role="status" aria-live="polite">Open this page from the previous ${title} website to move data, or import a backup file below.</p>
 <section id="transferResult" class="sbd-move-panel" hidden></section>
 <section class="sbd-move-panel" aria-labelledby="backupHeading">
 <h2 id="backupHeading">Import a backup file</h2>
-<p>Choose a backup downloaded from systembydave.com. Anything already saved on ${domain} is kept unless you choose to replace it.</p>
+<p>Choose a backup downloaded from the previous website. Anything already saved on ${domain} is kept unless you choose to replace it.</p>
 <label class="sbd-move-file" for="backupFile">Backup file</label>
 <input id="backupFile" type="file" accept="application/json,.json">
 </section>
 <p class="sbd-move-links"><a href="${site.home}">Open ${title}</a> · <a href="https://systembydave.com/">System by Dave home</a></p>
 </main>
 <noscript><p class="sbd-move">Moving saved data requires JavaScript.</p></noscript>
-</body>
-</html>
-`;
-}
-
-// A route this site used to serve that now lives on another site. Bookmarks and typed
-// addresses still resolve: the page is noindex, canonicalises to the new origin, and
-// carries a real link for visitors without JavaScript or meta refresh.
-function movedPage(target, name) {
-  const title = escapeHtml(`${name} has moved`);
-  return `<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
-<title>${title}</title>
-<meta name="description" content="${escapeHtml(`${name} now lives at ${target}.`)}">
-<link rel="canonical" href="${escapeHtml(target)}">
-<meta name="robots" content="noindex,follow">
-<meta name="theme-color" content="#FFFFFF">
-<meta http-equiv="refresh" content="0; url=${escapeHtml(target)}">
-<style>:root{color-scheme:light dark}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;margin:0;display:grid;place-items:center;min-height:100vh;padding:24px;text-align:center}a{color:inherit}</style>
-</head>
-<body>
-<main>
-<h1>${title}</h1>
-<p><a href="${escapeHtml(target)}">Open ${escapeHtml(name)}</a></p>
-<p>Saved walk data stays in the browser it was entered on. Open the new address on that device to move it.</p>
-</main>
 </body>
 </html>
 `;
@@ -581,13 +551,26 @@ function stageSite(site, closed, policy, options) {
   for (const [route, targetId] of Object.entries(site.movedTo || {})) {
     const moved = options.config.sites.find((entry) => entry.id === targetId);
     if (!moved) throw new Error(`${site.id} movedTo names unknown site ${targetId}.`);
+    if (!route.endsWith('/') || route.startsWith('/') || route.includes('..') || !moved.pages.includes(route)) {
+      throw new Error(`${site.id} movedTo route ${route} is not owned by ${targetId}.`);
+    }
     const movedOrigin = options.siteOrigins[moved.id] || `https://${moved.domain}`;
-    writeFile(dir, `${route}index.html`, movedPage(`${movedOrigin}/${route}`, moved.name));
+    writeFile(dir, `${route}index.html`, stubPage(moved, movedOrigin, `${route}index.html`));
+  }
+  if (Object.keys(site.movedTo || {}).length) {
+    for (const asset of ['js/domain-move.js', 'js/domain-storage.js', 'css/domain-move.css']) {
+      writeFile(dir, asset, read(asset));
+    }
+    writeFile(dir, 'js/domain-move-sites.js', moveSitesScript(options.config, options.policies, options));
   }
   writeFile(dir, '404.html', notFoundPage(site));
   writeFile(dir, 'transfer.html', transferPage(site, origin));
   writeFile(dir, 'js/domain-transfer-config.js', `window.SBD_DOMAIN_TRANSFER=${JSON.stringify({
-    site: site.id, name: site.name, domain: site.domain, home: site.home, sourceOrigin, ...policy
+    site: site.id, name: site.name, domain: site.domain, home: site.home, sourceOrigin,
+    sourceOrigins: [sourceOrigin, ...options.config.sites
+      .filter((entry) => Object.values(entry.movedTo || {}).includes(site.id))
+      .map((entry) => options.siteOrigins[entry.id] || `https://${entry.domain}`)],
+    ...policy
   })};\n`);
   let hasSitemap = false;
   if (options.cutover) {
@@ -737,7 +720,7 @@ function main() {
       closed.problems.forEach((problem) => console.error(`FAIL ${site.id}: ${problem}`));
       continue;
     }
-    const result = stageSite(site, closed, policies[site.id], { ...options, cutover });
+    const result = stageSite(site, closed, policies[site.id], { ...options, policies, cutover });
     staged.push({ site, entries, cutover, result });
     console.log(`${site.id}: staged ${result.files} files for ${site.domain} (${entries.pages.size} moving pages/files, ${closed.files.size - entries.pages.size} shared assets, cutover ${cutover ? 'on' : 'off'})`);
   }

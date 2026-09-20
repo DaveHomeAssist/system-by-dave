@@ -30,7 +30,7 @@ const option = (name, fallback) => {
 };
 const flag = name => args.includes(`--${name}`);
 const BASE = option('base', originFor('fmp/')).replace(/\/$/, '');
-// The preshow walk moved to its own origin so camera operators are not one click from it.
+// The preshow walk has a separate configured origin from camera operations.
 // Routes are probed against whichever site scripts/domain-sites.json says now serves them.
 const WALK_BASE = option('walk-base', originFor('fmpwalk/')).replace(/\/$/, '');
 const baseFor = route => /^\/(?:fmpwalk|fmp-walk)(?:[\/?#]|$)/.test(route) ? WALK_BASE : BASE;

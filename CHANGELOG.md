@@ -2,16 +2,17 @@
 
 ## 2026-09-20 — Preshow walk on its own origin
 
-- The preshow venue walk moved from `housevideo.app/fmpwalk/` to
-  **walk.housevideo.app**, so a camera operator on the video operations hub is no
-  longer one click from a walk they have no reason to open. `scripts/domain-sites.json`
+- Prepare the preshow venue walk move from `housevideo.app/fmpwalk/` to
+  **walk.housevideo.app**. Infrastructure, authentication and live acceptance
+  remain pending; the hub retains explicit walk links. `scripts/domain-sites.json`
   gains the `fmpwalk-site` entry; the walk and its `/fmp-walk/` typed alias leave
   housevideo.app, and the Pages workflow publishes the new site with its own
   deploy key.
 - `housevideo.app/fmpwalk/` and `/fmp-walk/` are not dead ends. A site may now
   declare `movedTo`, naming each route it used to serve and the site that serves
-  it now, and `scripts/stage_domain_sites.mjs` writes a scriptless noindex
-  redirect at each one.
+  it now, and `scripts/stage_domain_sites.mjs` writes a noindex migration page at
+  each one. Saved drafts and photos are offered for transfer before redirecting;
+  query strings and fragments survive both aliases.
 - Every link that now crosses the two origins is absolute, in both directions.
   The walk's camera launch and its legacy `?camera=N` and `?position=` redirect
   name `https://housevideo.app/fmp/camera/`; the hub, the camera reference list,
@@ -33,6 +34,12 @@
   `https://walk.housevideo.app`, or walk Gmail send and Notion save fail there.
   DNS for the subdomain and the `HOUSEVIDEO_WALK_DEPLOY_KEY` secret are also
   prerequisites. Rendered acceptance on the new origin remains outstanding.
+- Review repair: accept transfers from both earlier origins with exact opener,
+  origin and payload checks. Exercise all eight migration scenarios from both
+  housevideo.app aliases, including users who already migrated from the portfolio.
+- Require the walk deploy key and recorded auth configuration evidence, then
+  publish and read back the destination before either source deploys redirects.
+  Failures leave the existing source deployment in place.
 
 ## 2026-09-20 — ATEM HD8 ISO interactive guide
 

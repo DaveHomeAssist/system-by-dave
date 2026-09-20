@@ -41,7 +41,7 @@ use the tooling selected for that surface.
 | `widgets.html` | Widget gallery |
 | `fmp-index/index.html` | Retired FMP working index: noindex redirect to the `/fmp/` hub, keeping query and hash |
 | `fmp/` | Managed FMP video operations hub, camera commissioning, bowl training, and rig reference; authenticated camera API remains SETUP TEST only; [release and sync contract](docs/fmp-public-release.md) |
-| `fmpwalk/` | Managed local-first preshow venue walk, published on its own origin (walk.housevideo.app); explicit download, Gmail, and Notion actions; no silent writes |
+| `fmpwalk/` | Managed local-first preshow venue walk; move to walk.housevideo.app pending release prerequisites; explicit download, Gmail, and Notion actions; no silent writes |
 | `afterbreak/index.html` | Pier 68 run of show: private crew timeline, bar, promo, gear, crew, and open items; noindex |
 | `av-suite.html?entry=show` | Show Console for show-attached AV operations |
 | `av-suite.html?entry=toolbox` | Show-independent AV Toolbox directory |
@@ -61,12 +61,14 @@ domain is set in `CNAME`. After changing an indexable page or route, run
 `python3 scripts/gen_sitemap.py`; do not edit the generated `sitemap.xml`
 directly.
 
-### housevideo.app and avbydave.com
+### housevideo.app, walk.housevideo.app and avbydave.com
 
 The FMP suite and AV by Dave are also published on their own domains. The
 Pages workflow stages them with `scripts/stage_domain_sites.mjs` and pushes each
-to its repository (`DaveHomeAssist/housevideo`, `DaveHomeAssist/avbydave`)
-with that repository's deploy key. Check the staged sites locally with:
+to its repository (`DaveHomeAssist/housevideo`, `DaveHomeAssist/housevideo-walk`,
+`DaveHomeAssist/avbydave`) with that repository's deploy key. The walk destination
+must pass the infrastructure and auth gates in `docs/domain-sites.md` before any
+old-origin redirects deploy. Check the staged sites locally with:
 
 ```bash
 npm run verify:domain-sites

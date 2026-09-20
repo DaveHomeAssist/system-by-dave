@@ -101,10 +101,11 @@ references, with unchanged paths (`docs/domain-sites.md`). It was cut over on
 stubs that offer to move saved walk and camera data (browser storage and walk
 photos) before redirecting.
 
-The preshow walk moved to **walk.housevideo.app** on 2026-09-20, so camera
-operators are not one click from it. `housevideo.app/fmpwalk/` and `/fmp-walk/`
-redirect there. Links crossing the two origins are absolute and the exporter
-enforces it.
+The proposed preshow walk move to **walk.housevideo.app** remains pending
+infrastructure, auth configuration and live acceptance. After cutover,
+`housevideo.app/fmpwalk/` and `/fmp-walk/` offer saved-data migration before
+redirecting there. Links crossing the two origins are absolute and the exporter
+enforces it. Hub links to the walk remain available.
 
 The Google client and the `fmp-walk-notion` backend (`FMP_ALLOWED_ORIGINS`) allow
 `https://housevideo.app`; keep `https://systembydave.com` in both while old drafts
@@ -132,8 +133,9 @@ Run gates 3 and 4 on housevideo.app, and gate 4 on walk.housevideo.app.
 
 ## Theme
 
-The FMP suite has one theme preference, `fmpTheme` (`light`, `dark`, or `auto`),
-shared with the preshow walk. The managed `fmp/theme.js` applies it in the head of
+The FMP suite uses `fmpTheme` (`light`, `dark`, or `auto`). After the walk cutover,
+each origin keeps its own preference; migration copies the existing value once.
+The managed `fmp/theme.js` applies it in the head of
 the hub, camera, house, guide, gear, build, ptz and rig pages. A
 first visit is light regardless of the system setting (WEB-1); `auto` follows the
 system. Earlier rig (`fmpRigTheme`) and guide (`fmpcam-theme`) choices move into

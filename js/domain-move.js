@@ -1,4 +1,4 @@
-/* Redirect stub behavior for pages that moved off systembydave.com.
+/* Redirect stub behavior for pages that moved to another configured origin.
    scripts/stage_domain_sites.mjs writes a stub in place of each moved page at
    cutover. With no saved data for the site in this browser, the stub goes
    straight to the same path on the new domain. Otherwise it offers to move the
@@ -52,7 +52,7 @@
   function move(data, buttons){
     var popup = window.open(site.origin + '/transfer.html', 'sbd-domain-transfer', 'popup=yes,width=560,height=720');
     if(!popup){
-      say('Your browser blocked the transfer window. Allow pop-ups for systembydave.com and try again, or download a backup.');
+      say('Your browser blocked the transfer window. Allow pop-ups for ' + location.host + ' and try again, or download a backup.');
       return;
     }
     buttons.forEach(function(button){ button.disabled = true; });
@@ -112,9 +112,9 @@
     var panel = document.getElementById('movePanel');
     if(!panel){ go(); return; }
     panel.textContent = '';
-    panel.appendChild(el('h2', '', 'Your saved data is still on systembydave.com'));
+    panel.appendChild(el('h2', '', 'Your saved data is still on ' + location.host));
     panel.appendChild(el('p', '', 'This browser has ' + plural(data.count, 'saved item') + ' from ' + site.name
-      + ' on systembydave.com. Browsers keep saved data per website, so move it to ' + site.domain
+      + ' on ' + location.host + '. Browsers keep saved data per website, so move it to ' + site.domain
       + ' to see it there. Nothing is deleted here.'));
     var actions = el('div', 'sbd-move-actions');
     var moveButton = el('button', 'sbd-move-button primary', 'Move my data and continue');
