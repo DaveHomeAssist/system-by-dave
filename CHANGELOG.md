@@ -1,5 +1,27 @@
 # Changelog
 
+## 2026-09-20 — Interactive equipment guide skills
+
+- Added five agent skills under `.claude/skills/` covering one workflow for
+  interactive equipment guides: `interactive-equipment-explorer` builds
+  clickable diagrams and 3D trainers on a stable component catalog,
+  `equipment-signal-trainer` traces one signal function at a time and diagnoses
+  from observations, `operator-control-lessons` turns observed control confusion
+  into guided practice with physical-transfer checks,
+  `equipment-correction-propagation` carries a corrected fact through every
+  dependent surface, and `interactive-guide-release-check` verifies a guide
+  across devices, accessible alternatives, offline delivery, and its deployed
+  copy. Each bundle keeps its references, record templates, and Codex interface
+  metadata so the same skill works across agent platforms.
+- The two bundled Python validators check structure only and make no network
+  requests, browser calls, or deployments. `validate_catalog.py` checks catalog
+  references, evidence fields, and parent cycles; `artifact_manifest.py` records
+  and re-verifies SHA-256 file parity for a portable bundle.
+- `.claude/skills/README.md` indexes the set and states that `AGENTS.md` release
+  authority, verification commands, and product contracts still govern any
+  change made while following a skill. No public route, registry entry, sitemap
+  membership, or product behavior changed.
+
 ## 2026-09-19 — Recoverable domain transfers
 
 - A full destination storage quota or incompatible IndexedDB layout no longer

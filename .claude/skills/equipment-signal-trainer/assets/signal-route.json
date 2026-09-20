@@ -1,0 +1,13 @@
+{
+  "guide_id": "example-training-rig",
+  "revision": "example-1",
+  "configuration_scope": "Illustrative only",
+  "selected_function": "picture",
+  "components": [],
+  "endpoints": [],
+  "connections": [],
+  "sources": [],
+  "diagnostics": [],
+  "field_checks": [],
+  "unknowns": ["Supply actual endpoints, direction, configuration evidence, and expected observations"]
+}

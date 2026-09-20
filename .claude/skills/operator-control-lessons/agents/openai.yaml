@@ -1,0 +1,14 @@
+interface:
+  display_name: Operator Control Lessons
+  short_description: Teach control identification and physical operation
+  default_prompt: Use $operator-control-lessons to teach these commonly confused controls
+    with guided and independent practice.
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true
