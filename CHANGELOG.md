@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-09-20 — Throwline Stage 3D workflow deck
+
+- Replace the long, always-open adjustment rail with Setup, Place, Room and
+  Deliver stages. Keep one stage visible and internally scrollable while a
+  persistent flight strip holds the active unit, evidence state, screen and set
+  mark in view.
+- Add keyboard-operable workflow tabs and fixed Back/Next controls; route Quick
+  Start and Field Verify to the exact stage and live control they promise.
+- Preserve the locked scene viewport, mobile sheet model, optical calculations,
+  saved-scene schema, imports, exports, offline behavior and renderer fallback.
+- Record the next multi-model practice direction: deterministic camera shading
+  exercises with a simulated image, waveform and vectorscope, plus shared-state
+  equipment demonstrations that never control real devices.
+
 ## 2026-09-20 — One selection highlight across the FMP models
 
 - Replace the wireframe box that the P240 and camera control panel drew around

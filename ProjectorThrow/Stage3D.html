@@ -81,17 +81,38 @@ header{grid-area:header;display:flex;align-items:center;gap:14px;flex-wrap:wrap;
 .theme-icon-sun{display:none}
 html[data-theme=dark] .theme-icon-moon{display:none}
 html[data-theme=dark] .theme-icon-sun{display:block}
-aside{grid-area:controls;background:var(--case);border-right:1px solid var(--line);overflow:auto;padding:0;min-height:0}
-.adjust-panel{padding:0;border:0}
-.adjust-panel>summary{position:sticky;top:0;z-index:6;display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:44px;padding:10px 16px;background:var(--case);border-bottom:1px solid var(--line-lo);font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;list-style:none}
+aside{grid-area:controls;background:var(--case);border-right:1px solid var(--line);overflow:hidden;padding:0;min-height:0}
+.adjust-panel{position:relative;height:100%;padding:0;border:0}
+.adjust-panel[open]{display:block}
+.adjust-panel>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:44px;padding:10px 16px;background:var(--case);border-bottom:1px solid var(--line-lo);font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;list-style:none}
 .adjust-panel>summary::-webkit-details-marker{display:none}
-.adjust-content{display:flex;flex-direction:column;gap:14px;padding:14px 16px 16px}
-.adjust-section{border:1px solid var(--line-lo);border-radius:var(--r)}
-.adjust-section>summary{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:40px;padding:9px 12px;font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--chalk);cursor:pointer;list-style:none}
-.adjust-section>summary::-webkit-details-marker{display:none}
-.adjust-section>summary::after{content:"+";font-size:15px;color:var(--hazard)}
-.adjust-section[open]>summary::after{content:"−"}
-.adjust-section>.section-content{display:flex;flex-direction:column;gap:16px;padding:12px 12px 14px;border-top:1px solid var(--line-lo)}
+.adjust-content{position:absolute;inset:44px 0 0;display:grid;grid-template-rows:auto auto minmax(0,1fr) auto;height:auto;min-height:0;overflow:hidden}
+.workflow-flight-strip{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 12px;padding:12px 16px;border-bottom:1px solid var(--line-lo);background:linear-gradient(135deg,var(--case) 0 72%,var(--hazard-lo) 100%)}
+.flight-kicker{margin:0;color:var(--dimmer);font:700 8.5px/1.2 var(--mono);letter-spacing:.13em;text-transform:uppercase}
+.flight-unit{margin:3px 0 0;overflow:hidden;color:var(--chalk);font:700 12px/1.3 var(--mono);text-overflow:ellipsis;white-space:nowrap}
+.flight-provenance{align-self:center;min-height:24px;padding:4px 7px;border:1px solid currentColor;border-radius:999px;color:var(--hazard);font:700 8px/1.7 var(--mono);letter-spacing:.1em;text-transform:uppercase}
+html[data-calculation-mode=verified_image_width] .flight-provenance,html[data-calculation-mode=field_verified] .flight-provenance{color:var(--go)}
+html[data-calculation-mode=blocked] .flight-provenance,html[data-calculation-mode=conflicting] .flight-provenance,html[data-calculation-mode=partial] .flight-provenance,html[data-calculation-mode=legacy_unverified] .flight-provenance{color:var(--safety)}
+.flight-numbers{grid-column:1/-1;display:flex;gap:7px;flex-wrap:wrap;color:var(--dim);font:10px/1.4 var(--mono);font-variant-numeric:tabular-nums}
+.flight-numbers span+span::before{content:"/";margin-right:7px;color:var(--line)}
+.workflow-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;border-bottom:1px solid var(--line-lo);background:var(--case-hi)}
+.workflow-tab{min-width:0;min-height:48px;padding:6px 3px;border:0;border-right:1px solid var(--line-lo);border-radius:0;background:transparent;color:var(--dimmer);letter-spacing:.04em}
+.workflow-tab:last-child{border-right:0}
+.workflow-tab span{display:block;margin-bottom:2px;color:var(--dimmer);font-size:8px}
+.workflow-tab[aria-selected=true]{background:var(--case);box-shadow:inset 0 -3px 0 var(--hazard);color:var(--chalk)}
+.workflow-panel{min-height:0;overflow:auto;padding:14px 16px 18px;scrollbar-gutter:stable}
+.workflow-panel[hidden]{display:none}
+.workflow-panel-title{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:0 0 14px;font:700 13px var(--mono);letter-spacing:.11em;text-transform:uppercase}
+.workflow-panel-title span{color:var(--dimmer);font:9px/1.4 var(--mono);letter-spacing:.04em;text-align:right;text-transform:none}
+.control-block{display:flex;flex-direction:column;gap:14px;padding:0 0 16px;margin:0 0 16px;border-bottom:1px solid var(--line-lo)}
+.control-block:last-child{padding-bottom:0;margin-bottom:0;border-bottom:0}
+.advanced-block{border:1px solid var(--line-lo);border-radius:var(--r)}
+.advanced-block>summary{display:flex;align-items:center;justify-content:space-between;min-height:42px;padding:8px 10px;cursor:pointer;color:var(--dimmer);font:700 9px var(--mono);letter-spacing:.1em;text-transform:uppercase}
+.advanced-block>summary::after{content:"+";color:var(--hazard);font-size:14px}.advanced-block[open]>summary::after{content:"−"}
+.advanced-block>.grp{padding:4px 10px 12px;border-top:1px solid var(--line-lo)}
+.workflow-footer{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:8px;padding:9px 12px;border-top:1px solid var(--line);background:var(--case)}
+.workflow-footer button{min-height:40px}
+.workflow-position{text-align:center;color:var(--dimmer);font:700 9px/1.3 var(--mono);letter-spacing:.09em;text-transform:uppercase}
 .slider-scale{display:flex;justify-content:space-between;margin-top:2px;font-family:var(--mono);font-size:8.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--dimmer)}
 button.danger{color:var(--safety);border-color:color-mix(in srgb,var(--safety) 45%,var(--line));background:var(--case-hi)}
 button.danger:hover:not(:disabled){background:var(--safety-lo);border-color:var(--safety)}
@@ -246,7 +267,7 @@ html[data-calculation-mode="manufacturer_unspecified"] .calculation-gate,html[da
 
 /* Stage 3D live workspace: the scene never leaves the viewport. */
 html,body{overflow:hidden}
-.app{grid-template-columns:320px minmax(0,1fr)}
+.app{grid-template-columns:clamp(304px,24vw,352px) minmax(0,1fr)}
 .companion{font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase}
 .unit-strip{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:thin}
 .unit-strip button{flex:0 0 auto}
@@ -276,6 +297,7 @@ html[data-calculation-mode=blocked] .provenance-badge,html[data-calculation-mode
    Facts overlay for an on-demand dismissible sheet behind a visible, keyboard-operable trigger.
    The 820px four-button mobile dock below is unchanged. */
 @media (min-width:821px) and (max-width:1299px){
+  .app{grid-template-columns:304px minmax(0,1fr)}
   .facts-trigger{display:inline-flex}
   .facts{display:none}
   body[data-facts-open=true] .facts{display:block;z-index:4;top:60px;max-height:calc(100% - 76px);overflow:auto;pointer-events:auto;box-shadow:0 14px 40px rgba(0,0,0,.18)}
@@ -296,7 +318,12 @@ html[data-calculation-mode=blocked] .provenance-badge,html[data-calculation-mode
   .collision-alert{font-size:8.5px;padding:5px 7px}
   aside,.scene-toolbar,.facts,.mobile-exports{position:fixed;z-index:20;left:8px;right:8px;bottom:calc(66px + env(safe-area-inset-bottom));top:auto;width:auto;max-height:min(66dvh,560px);margin:0;padding:0;border:1px solid var(--line);border-radius:8px;background:var(--case);box-shadow:0 18px 56px rgba(0,0,0,.32);overflow:auto;display:none}
   body[data-mobile-panel=adjust] aside,body[data-mobile-panel=view] .scene-toolbar,body[data-mobile-panel=facts] .facts,body[data-mobile-panel=export] .mobile-exports{display:block}
-  aside{grid-area:auto}.adjust-panel{border:0}.adjust-panel>summary{display:none}.adjust-content{padding:14px;gap:14px;border:0}
+  body[data-mobile-panel=adjust] aside{height:min(66dvh,560px);overflow:hidden}
+  aside{grid-area:auto}.adjust-panel{position:relative;height:100%;border:0}.adjust-panel>summary{display:none}.adjust-content{position:absolute;inset:0;height:auto;padding:0;gap:0;border:0}
+  .workflow-flight-strip{padding:9px 12px}.flight-numbers{font-size:9px}
+  .workflow-tab{min-height:44px}
+  .workflow-panel{padding:12px 14px 16px}
+  .workflow-footer{padding:7px 10px}.workflow-footer button{min-height:44px}
   .field-grid input,input[type=text]{min-height:44px}
   .scene-toolbar{padding:14px}.scene-toolbar .row{justify-content:stretch}.scene-toolbar .row button{flex:1 1 82px}
   .facts{font-size:11px}.facts div{padding:9px 12px}
@@ -371,125 +398,149 @@ html[data-calculation-mode=blocked] .provenance-badge,html[data-calculation-mode
     <details class="adjust-panel" id="adjustPanel" open>
       <summary>Adjust <span class="adjust-summary-value" id="adjustSummary">20' screen · 22' set</span></summary>
       <div class="adjust-content">
-    <p class="online-note"><strong id="offlineStatusTitle">Offline after this first successful load.</strong> <span id="offlineStatusDetail">The pinned 3D engine is local and Throwline is preparing its cache.</span> <span class="online-note-fallback">If WebGL is unavailable, calculation data remains safe in the <a href="index.html?workspace=planner">Throwline planner</a>.</span></p>
+        <section class="workflow-flight-strip" aria-label="Active scene summary">
+          <div><p class="flight-kicker">Active scene</p><p class="flight-unit" id="flightUnit">Unit A · Manual</p></div>
+          <span class="flight-provenance" id="flightProvenance">Manual</span>
+          <div class="flight-numbers"><span id="flightScreen">20' screen</span><span id="flightSet">22' set</span></div>
+        </section>
 
-    <details class="adjust-section" id="sectionScreen" open>
-      <summary>Screen</summary>
-      <div class="section-content">
-    <div class="grp">
-      <div><label class="lab" for="sw">Width <span class="val" id="swv">20' 0"</span></label><input id="sw" type="range" min="8" max="40" step="0.5" value="20"></div>
-      <div><label class="lab" for="st">Bottom edge height <span class="val" id="stv">4' 0"</span></label><input id="st" type="range" min="0" max="10" step="0.25" value="4"></div>
-      <div><label class="lab" for="ar">Aspect</label><select id="ar"><option value="1.7778">16:9 · HD / UHD</option><option value="1.6">16:10 · WUXGA</option><option value="2.39">2.39:1 · scope</option><option value="1.3333">4:3 · legacy</option></select></div>
-    </div>
-      </div>
-    </details>
-
-    <details class="adjust-section" id="sectionProjector" open>
-      <summary>Projector</summary>
-      <div class="section-content">
-    <div class="grp">
-      <h3>Projector units</h3>
-      <div class="unit-strip" id="unitStrip" role="group" aria-label="Projector units"></div>
-      <div class="scene-actions">
-        <button id="addUnit" type="button">Duplicate unit</button>
-        <button id="removeUnit" class="danger" type="button">Remove unit</button>
-        <button id="stackUnits" type="button">Stack units</button>
-        <button id="blendUnits" type="button">Blend spread</button>
-      </div>
-    </div>
-    <div class="grp">
-      <h3>Lens &amp; calculation</h3>
-      <p class="calculation-gate" id="stageCalculationGate" role="status">MANUAL SIMULATION · using the throw ratio you supplied · not verified yet.</p>
-      <div><label class="lab" for="lens">Throw-ratio range</label><select id="lens">
-        <option value="0.978,1.320" selected>Manual preset A · 0.978–1.320:1</option>
-        <option value="1.300,1.740">Manual preset B · 1.300–1.740:1</option>
-        <option value="1.700,2.400">Manual preset C · 1.700–2.400:1</option>
-        <option value="2.400,4.700">Manual preset D · 2.400–4.700:1</option>
-        <option value="0.650,0.650">Manual fixed preset · 0.650:1</option>
-      </select></div>
-      <div><label class="lab" for="lh">Lens center height <span class="val" id="lhv">6' 0"</span></label><input id="lh" type="range" min="1" max="16" step="0.25" value="6"></div>
-    </div>
-
-    <div class="grp">
-      <h3>Placement</h3>
-      <div><label class="lab" for="d">Screen-to-lens distance <span class="val" id="dv">22' 0"</span></label><input id="d" type="range" min="6" max="60" step="0.25" value="22"></div>
-      <div><label class="lab" for="px">Projector left / right <span class="val" id="pxv">centred</span></label><input id="px" type="range" min="-30" max="30" step="0.25" value="0"><div class="slider-scale" aria-hidden="true"><span>Left</span><span>Centre</span><span>Right</span></div></div>
-      <div><label class="lab" for="targetX">Image center left / right <span class="val" id="targetXv">centred</span></label><input id="targetX" type="range" min="-30" max="30" step="0.25" value="0"><div class="slider-scale" aria-hidden="true"><span>Left</span><span>Centre</span><span>Right</span></div></div>
-      <div class="row" role="group" aria-label="Distance snap controls">
-        <button id="bw" type="button">closest</button>
-        <button id="bm" class="pri" type="button">Recommended</button>
-        <button id="bt" type="button">farthest</button>
-      </div>
-    </div>
-
-    <div class="grp" id="bodyGroup">
-      <h3>Projector dimensions</h3>
-      <div class="lab" id="bodySource">Not set. The room check uses the lens position only.</div>
-      <div class="field-grid">
-        <label><span class="lab">Width · ft</span><input id="bodyW" type="number" min="0.1" max="20" step="0.05" inputmode="decimal"></label>
-        <label><span class="lab">Height · ft</span><input id="bodyH" type="number" min="0.1" max="20" step="0.05" inputmode="decimal"></label>
-        <label><span class="lab">Depth · ft</span><input id="bodyD" type="number" min="0.1" max="20" step="0.05" inputmode="decimal"></label>
-        <label><span class="lab">Lens extension · ft</span><input id="bodyLp" type="number" min="0" max="5" step="0.05" inputmode="decimal"></label>
-      </div>
-      <button id="clearBody" class="danger" type="button">Clear body</button>
-    </div>
-      </div>
-    </details>
-
-    <details class="adjust-section" id="sectionRoom" open>
-      <summary>Room &amp; Obstructions</summary>
-      <div class="section-content">
-    <div class="grp">
-      <div><label class="lab" for="roomW">Width <span class="val" id="roomWv">40' 0"</span></label><input id="roomW" type="range" min="12" max="120" step="0.5" value="40"></div>
-      <div><label class="lab" for="roomD">Depth <span class="val" id="roomDv">40' 0"</span></label><input id="roomD" type="range" min="12" max="180" step="0.5" value="40"></div>
-      <div><label class="lab" for="roomH">Ceiling <span class="val" id="roomHv">20' 0"</span></label><input id="roomH" type="range" min="8" max="60" step="0.5" value="20"></div>
-      <div><label class="lab" for="roomC">Keep clear around projector <span class="val" id="roomCv">1' 0"</span></label><input id="roomC" type="range" min="0" max="6" step="0.25" value="1"></div>
-      <div class="scene-actions"><button id="addObstacle" type="button">Add obstruction</button><button id="clearObstacles" class="danger" type="button" disabled>Clear obstructions</button></div>
-      <div id="obstacleEditor" hidden>
-        <div class="unit-strip" id="obstacleStrip" role="group" aria-label="Room obstructions"></div>
-        <div><label class="lab" for="obstacleX">Obstruction left / right <span class="val" id="obstacleXv">centred</span></label><input id="obstacleX" type="range" min="-30" max="30" step="0.25" value="0"><div class="slider-scale" aria-hidden="true"><span>Left</span><span>Centre</span><span>Right</span></div></div>
-        <div><label class="lab" for="obstacleY">Center height <span class="val" id="obstacleYv">3' 0"</span></label><input id="obstacleY" type="range" min="0" max="30" step="0.25" value="3"></div>
-        <div><label class="lab" for="obstacleZ">Distance from screen <span class="val" id="obstacleZv">10' 0"</span></label><input id="obstacleZ" type="range" min="0" max="120" step="0.25" value="10"></div>
-        <div class="field-grid">
-          <label><span class="lab">Width · ft</span><input id="obstacleWidth" type="number" min="0.25" max="100" step="0.25" inputmode="decimal"></label>
-          <label><span class="lab">Height · ft</span><input id="obstacleHeight" type="number" min="0.25" max="100" step="0.25" inputmode="decimal"></label>
-          <label><span class="lab">Depth · ft</span><input id="obstacleDepth" type="number" min="0.25" max="100" step="0.25" inputmode="decimal"></label>
+        <div class="workflow-tabs" role="tablist" aria-label="Projection workflow">
+          <button class="workflow-tab" id="workflowTabSetup" type="button" role="tab" aria-selected="true" aria-controls="workflowPanelSetup" data-workflow-tab="setup"><span>01</span>Setup</button>
+          <button class="workflow-tab" id="workflowTabPlace" type="button" role="tab" aria-selected="false" aria-controls="workflowPanelPlace" data-workflow-tab="place" tabindex="-1"><span>02</span>Place</button>
+          <button class="workflow-tab" id="workflowTabRoom" type="button" role="tab" aria-selected="false" aria-controls="workflowPanelRoom" data-workflow-tab="room" tabindex="-1"><span>03</span>Room</button>
+          <button class="workflow-tab" id="workflowTabDeliver" type="button" role="tab" aria-selected="false" aria-controls="workflowPanelDeliver" data-workflow-tab="deliver" tabindex="-1"><span>04</span>Deliver</button>
         </div>
-        <button id="removeObstacle" class="danger" type="button">Remove selected</button>
-      </div>
-    </div>
-      </div>
-    </details>
 
-    <details class="adjust-section" id="sectionVerify" open>
-      <summary>Verify &amp; Deliver</summary>
-      <div class="section-content">
-    <div class="grp" id="fieldVerificationPanel">
-      <h3>Verify on site</h3>
-      <div class="field-grid">
-        <label><span class="lab">Measured throw · ft</span><input id="measuredDistance" type="number" min="0.01" max="300" step="0.01" inputmode="decimal" required aria-describedby="fieldVerificationError"></label>
-        <label><span class="lab">Measured image · ft</span><input id="measuredWidth" type="number" min="0.01" max="200" step="0.01" inputmode="decimal" required aria-describedby="fieldVerificationError"></label>
-        <label class="wide"><span class="lab">Verified by</span><input id="verifiedBy" type="text" maxlength="120" autocomplete="name" required aria-describedby="fieldVerificationError"></label>
-      </div>
-      <p class="field-error" id="fieldVerificationError" role="alert" hidden></p>
-      <button id="stampVerification" class="pri" type="button">Confirm site measurement</button>
-    </div>
+        <section class="workflow-panel" id="workflowPanelSetup" role="tabpanel" aria-labelledby="workflowTabSetup" data-workflow-panel="setup">
+          <h3 class="workflow-panel-title">Build the system <span>Target and units</span></h3>
+          <p class="online-note"><strong id="offlineStatusTitle">Offline after this first successful load.</strong> <span id="offlineStatusDetail">The pinned 3D engine is local and Throwline is preparing its cache.</span> <span class="online-note-fallback">If WebGL is unavailable, calculation data remains safe in the <a href="index.html?workspace=planner">Throwline planner</a>.</span></p>
+          <section class="control-block" id="sectionScreen" aria-labelledby="screenControlsTitle">
+            <div class="grp">
+              <h3 id="screenControlsTitle">Screen</h3>
+              <div><label class="lab" for="sw">Width <span class="val" id="swv">20' 0"</span></label><input id="sw" type="range" min="8" max="40" step="0.5" value="20"></div>
+              <div><label class="lab" for="st">Bottom edge height <span class="val" id="stv">4' 0"</span></label><input id="st" type="range" min="0" max="10" step="0.25" value="4"></div>
+              <div><label class="lab" for="ar">Aspect</label><select id="ar"><option value="1.7778">16:9 · HD / UHD</option><option value="1.6">16:10 · WUXGA</option><option value="2.39">2.39:1 · scope</option><option value="1.3333">4:3 · legacy</option></select></div>
+            </div>
+          </section>
+          <section class="control-block" id="sectionProjector" aria-labelledby="projectorControlsTitle">
+            <div class="grp">
+              <h3 id="projectorControlsTitle">Projector units</h3>
+              <div class="unit-strip" id="unitStrip" role="group" aria-label="Projector units"></div>
+              <div class="scene-actions">
+                <button id="addUnit" type="button">Duplicate unit</button>
+                <button id="removeUnit" class="danger" type="button">Remove unit</button>
+                <button id="stackUnits" type="button">Stack units</button>
+                <button id="blendUnits" type="button">Blend spread</button>
+              </div>
+            </div>
+          </section>
+          <details class="advanced-block">
+            <summary>Projector dimensions · advanced</summary>
+            <div class="grp" id="bodyGroup">
+              <div class="lab" id="bodySource">Not set. The room check uses the lens position only.</div>
+              <div class="field-grid">
+                <label><span class="lab">Width · ft</span><input id="bodyW" type="number" min="0.1" max="20" step="0.05" inputmode="decimal"></label>
+                <label><span class="lab">Height · ft</span><input id="bodyH" type="number" min="0.1" max="20" step="0.05" inputmode="decimal"></label>
+                <label><span class="lab">Depth · ft</span><input id="bodyD" type="number" min="0.1" max="20" step="0.05" inputmode="decimal"></label>
+                <label><span class="lab">Lens extension · ft</span><input id="bodyLp" type="number" min="0" max="5" step="0.05" inputmode="decimal"></label>
+              </div>
+              <button id="clearBody" class="danger" type="button">Clear body</button>
+            </div>
+          </details>
+        </section>
 
-    <div class="grp">
-      <h3>Save &amp; share</h3>
-      <div class="scene-actions">
-        <button id="saveScene" type="button">Save scene</button><button id="restoreScene" type="button">Restore scene</button>
-        <button id="importScene" type="button">Import JSON</button><button id="downloadScene" type="button">Export scene file</button>
-        <button id="resetScene" class="danger" type="button">Reset scene</button>
-        <button id="jobSheetOpen" class="pri" type="button">Job sheet</button>
-      </div>
-      <input id="sceneFile" type="file" accept="application/json,.json" hidden>
-    </div>
-      </div>
-    </details>
+        <section class="workflow-panel" id="workflowPanelPlace" role="tabpanel" aria-labelledby="workflowTabPlace" data-workflow-panel="place" hidden>
+          <h3 class="workflow-panel-title">Set the projector <span>Optics and position</span></h3>
+          <section class="control-block" id="sectionPlacement" aria-labelledby="placementControlsTitle">
+            <div class="grp">
+              <h3 id="placementControlsTitle">Lens &amp; calculation</h3>
+              <p class="calculation-gate" id="stageCalculationGate" role="status">MANUAL SIMULATION · using the throw ratio you supplied · not verified yet.</p>
+              <div><label class="lab" for="lens">Throw-ratio range</label><select id="lens">
+                <option value="0.978,1.320" selected>Manual preset A · 0.978–1.320:1</option>
+                <option value="1.300,1.740">Manual preset B · 1.300–1.740:1</option>
+                <option value="1.700,2.400">Manual preset C · 1.700–2.400:1</option>
+                <option value="2.400,4.700">Manual preset D · 2.400–4.700:1</option>
+                <option value="0.650,0.650">Manual fixed preset · 0.650:1</option>
+              </select></div>
+              <div><label class="lab" for="lh">Lens center height <span class="val" id="lhv">6' 0"</span></label><input id="lh" type="range" min="1" max="16" step="0.25" value="6"></div>
+            </div>
+          </section>
+          <section class="control-block" aria-labelledby="setMarkControlsTitle">
+            <div class="grp">
+              <h3 id="setMarkControlsTitle">Placement</h3>
+              <div><label class="lab" for="d">Screen-to-lens distance <span class="val" id="dv">22' 0"</span></label><input id="d" type="range" min="6" max="60" step="0.25" value="22"></div>
+              <div><label class="lab" for="px">Projector left / right <span class="val" id="pxv">centred</span></label><input id="px" type="range" min="-30" max="30" step="0.25" value="0"><div class="slider-scale" aria-hidden="true"><span>Left</span><span>Centre</span><span>Right</span></div></div>
+              <div><label class="lab" for="targetX">Image center left / right <span class="val" id="targetXv">centred</span></label><input id="targetX" type="range" min="-30" max="30" step="0.25" value="0"><div class="slider-scale" aria-hidden="true"><span>Left</span><span>Centre</span><span>Right</span></div></div>
+              <div class="row" role="group" aria-label="Distance snap controls">
+                <button id="bw" type="button">closest</button>
+                <button id="bm" class="pri" type="button">Recommended</button>
+                <button id="bt" type="button">farthest</button>
+              </div>
+            </div>
+          </section>
+        </section>
 
-    <p class="model-note">Every part is a named mesh, so the OBJ and GLB open in Blender with <em>screen</em>, <em>projector_body</em>, <em>lens_barrel</em> and <em>cart</em> as separate objects.</p>
-    <p class="kbd-help"><strong>Keyboard:</strong> focus the stage, then use 1–5 for cameras, arrow keys to orbit, +/− to zoom, and 0 or Home to reset.</p>
+        <section class="workflow-panel" id="workflowPanelRoom" role="tabpanel" aria-labelledby="workflowTabRoom" data-workflow-panel="room" hidden>
+          <h3 class="workflow-panel-title">Clear the room <span>Bounds and obstructions</span></h3>
+          <section class="control-block" id="sectionRoom" aria-labelledby="roomControlsTitle">
+            <div class="grp">
+              <h3 id="roomControlsTitle">Room &amp; obstructions</h3>
+              <div><label class="lab" for="roomW">Width <span class="val" id="roomWv">40' 0"</span></label><input id="roomW" type="range" min="12" max="120" step="0.5" value="40"></div>
+              <div><label class="lab" for="roomD">Depth <span class="val" id="roomDv">40' 0"</span></label><input id="roomD" type="range" min="12" max="180" step="0.5" value="40"></div>
+              <div><label class="lab" for="roomH">Ceiling <span class="val" id="roomHv">20' 0"</span></label><input id="roomH" type="range" min="8" max="60" step="0.5" value="20"></div>
+              <div><label class="lab" for="roomC">Keep clear around projector <span class="val" id="roomCv">1' 0"</span></label><input id="roomC" type="range" min="0" max="6" step="0.25" value="1"></div>
+              <div class="scene-actions"><button id="addObstacle" type="button">Add obstruction</button><button id="clearObstacles" class="danger" type="button" disabled>Clear obstructions</button></div>
+              <div id="obstacleEditor" hidden>
+                <div class="unit-strip" id="obstacleStrip" role="group" aria-label="Room obstructions"></div>
+                <div><label class="lab" for="obstacleX">Obstruction left / right <span class="val" id="obstacleXv">centred</span></label><input id="obstacleX" type="range" min="-30" max="30" step="0.25" value="0"><div class="slider-scale" aria-hidden="true"><span>Left</span><span>Centre</span><span>Right</span></div></div>
+                <div><label class="lab" for="obstacleY">Center height <span class="val" id="obstacleYv">3' 0"</span></label><input id="obstacleY" type="range" min="0" max="30" step="0.25" value="3"></div>
+                <div><label class="lab" for="obstacleZ">Distance from screen <span class="val" id="obstacleZv">10' 0"</span></label><input id="obstacleZ" type="range" min="0" max="120" step="0.25" value="10"></div>
+                <div class="field-grid">
+                  <label><span class="lab">Width · ft</span><input id="obstacleWidth" type="number" min="0.25" max="100" step="0.25" inputmode="decimal"></label>
+                  <label><span class="lab">Height · ft</span><input id="obstacleHeight" type="number" min="0.25" max="100" step="0.25" inputmode="decimal"></label>
+                  <label><span class="lab">Depth · ft</span><input id="obstacleDepth" type="number" min="0.25" max="100" step="0.25" inputmode="decimal"></label>
+                </div>
+                <button id="removeObstacle" class="danger" type="button">Remove selected</button>
+              </div>
+            </div>
+          </section>
+        </section>
+
+        <section class="workflow-panel" id="workflowPanelDeliver" role="tabpanel" aria-labelledby="workflowTabDeliver" data-workflow-panel="deliver" hidden>
+          <h3 class="workflow-panel-title">Verify and hand off <span>Evidence and files</span></h3>
+          <section class="control-block" id="sectionVerify" aria-labelledby="verifyControlsTitle">
+            <div class="grp" id="fieldVerificationPanel">
+              <h3 id="verifyControlsTitle">Verify on site</h3>
+              <div class="field-grid">
+                <label><span class="lab">Measured throw · ft</span><input id="measuredDistance" type="number" min="0.01" max="300" step="0.01" inputmode="decimal" required aria-describedby="fieldVerificationError"></label>
+                <label><span class="lab">Measured image · ft</span><input id="measuredWidth" type="number" min="0.01" max="200" step="0.01" inputmode="decimal" required aria-describedby="fieldVerificationError"></label>
+                <label class="wide"><span class="lab">Verified by</span><input id="verifiedBy" type="text" maxlength="120" autocomplete="name" required aria-describedby="fieldVerificationError"></label>
+              </div>
+              <p class="field-error" id="fieldVerificationError" role="alert" hidden></p>
+              <button id="stampVerification" class="pri" type="button">Confirm site measurement</button>
+            </div>
+          </section>
+          <section class="control-block" aria-labelledby="deliveryControlsTitle">
+            <div class="grp">
+              <h3 id="deliveryControlsTitle">Save &amp; share</h3>
+              <div class="scene-actions">
+                <button id="saveScene" type="button">Save scene</button><button id="restoreScene" type="button">Restore scene</button>
+                <button id="importScene" type="button">Import JSON</button><button id="downloadScene" type="button">Export scene file</button>
+                <button id="resetScene" class="danger" type="button">Reset scene</button>
+                <button id="jobSheetOpen" class="pri" type="button">Job sheet</button>
+              </div>
+              <input id="sceneFile" type="file" accept="application/json,.json" hidden>
+            </div>
+          </section>
+          <p class="model-note">Every part is a named mesh, so the OBJ and GLB open in Blender with <em>screen</em>, <em>projector_body</em>, <em>lens_barrel</em> and <em>cart</em> as separate objects.</p>
+          <p class="kbd-help"><strong>Keyboard:</strong> focus the stage, then use 1–5 for cameras, arrow keys to orbit, +/− to zoom, and 0 or Home to reset.</p>
+        </section>
+
+        <footer class="workflow-footer">
+          <button id="workflowBack" type="button" disabled>Back</button>
+          <span class="workflow-position" id="workflowPosition">1 of 4 · Setup</span>
+          <button class="pri" id="workflowNext" type="button">Next · Place</button>
+        </footer>
       </div>
     </details>
   </aside>
@@ -644,6 +695,13 @@ const offlineStatusTitle = document.getElementById('offlineStatusTitle');
 const offlineStatusDetail = document.getElementById('offlineStatusDetail');
 const ONBOARDING_STORAGE_KEY = 'throwline:stage-onboarding:v1';
 const OFFLINE_CACHE_VERSION = 'v20260920-worker-control';
+const WORKFLOW_STAGES = ['setup','place','room','deliver'];
+const workflowTabs = [...document.querySelectorAll('[data-workflow-tab]')];
+const workflowPanels = [...document.querySelectorAll('[data-workflow-panel]')];
+const workflowBack = document.getElementById('workflowBack');
+const workflowNext = document.getElementById('workflowNext');
+const workflowPosition = document.getElementById('workflowPosition');
+let activeWorkflowStage = 'setup';
 let fallbackShown = false;
 
 function activateStageFallback(){
@@ -729,6 +787,42 @@ factsTrigger.addEventListener('click',()=>setFactsSheet(document.body.dataset.fa
 document.addEventListener('keydown',event=>{ if(event.key==='Escape'&&document.body.dataset.factsOpen==='true')setFactsSheet(false,{focusTrigger:true}); });
 setFactsSheet(false);
 
+function selectWorkflowPanel(stageName,{focusTab=false,announceChange=false}={}){
+  const index=WORKFLOW_STAGES.indexOf(stageName);
+  if(index<0)return;
+  activeWorkflowStage=stageName;
+  workflowTabs.forEach(tab=>{
+    const selected=tab.dataset.workflowTab===stageName;
+    tab.setAttribute('aria-selected',String(selected));
+    tab.tabIndex=selected?0:-1;
+    if(selected&&focusTab)tab.focus();
+  });
+  workflowPanels.forEach(panel=>{panel.hidden=panel.dataset.workflowPanel!==stageName;});
+  workflowBack.disabled=index===0;
+  workflowNext.disabled=index===WORKFLOW_STAGES.length-1;
+  const label=stageName[0].toUpperCase()+stageName.slice(1);
+  const nextLabel=WORKFLOW_STAGES[index+1];
+  workflowPosition.textContent=`${index+1} of ${WORKFLOW_STAGES.length} · ${label}`;
+  workflowNext.textContent=nextLabel?`Next · ${nextLabel}`:'Complete';
+  if(announceChange)announce(`${label} controls`);
+}
+workflowTabs.forEach((tab,index)=>{
+  tab.addEventListener('click',()=>selectWorkflowPanel(tab.dataset.workflowTab,{announceChange:true}));
+  tab.addEventListener('keydown',event=>{
+    let next=index;
+    if(event.key==='ArrowRight'||event.key==='ArrowDown')next=(index+1)%workflowTabs.length;
+    else if(event.key==='ArrowLeft'||event.key==='ArrowUp')next=(index-1+workflowTabs.length)%workflowTabs.length;
+    else if(event.key==='Home')next=0;
+    else if(event.key==='End')next=workflowTabs.length-1;
+    else return;
+    event.preventDefault();
+    selectWorkflowPanel(WORKFLOW_STAGES[next],{focusTab:true,announceChange:true});
+  });
+});
+workflowBack.addEventListener('click',()=>selectWorkflowPanel(WORKFLOW_STAGES[Math.max(0,WORKFLOW_STAGES.indexOf(activeWorkflowStage)-1)],{focusTab:true,announceChange:true}));
+workflowNext.addEventListener('click',()=>selectWorkflowPanel(WORKFLOW_STAGES[Math.min(WORKFLOW_STAGES.length-1,WORKFLOW_STAGES.indexOf(activeWorkflowStage)+1)],{focusTab:true,announceChange:true}));
+selectWorkflowPanel('setup');
+
 let onboardingTrigger = null;
 let onboardingMotion = null;
 let workflowMotion = null;
@@ -775,18 +869,17 @@ function highlightWorkflowTarget(target){
 }
 function beginWorkflowStep(step){
   const config={
-    screen:{control:'sw',message:'Start by sizing the screen.'},
-    projector:{control:document.getElementById('lens').disabled?'lh':'lens',message:'Next, place the projector and set its optical height.'},
-    verify:{control:'measuredDistance',message:'Inspect the room, then record the field measurement.'}
+    screen:{panel:'setup',control:'sw',message:'Start by sizing the screen.'},
+    projector:{panel:'place',control:document.getElementById('lens').disabled?'lh':'lens',message:'Next, place the projector and set its optical height.'},
+    verify:{panel:'deliver',control:'measuredDistance',message:'Inspect the room, then record the field measurement.'}
   }[step];
   if(!config)return;
   closeOnboarding({restoreFocus:false});
   if(window.innerWidth<=820&&document.body.dataset.mobilePanel!=='adjust')setMobilePanel('adjust');
   adjustPanel.open=true;
+  selectWorkflowPanel(config.panel);
   requestAnimationFrame(()=>requestAnimationFrame(()=>{
     const control=document.getElementById(config.control);
-    const section=control?.closest('.adjust-section');
-    if(section)section.open=true;
     const target=control?.closest('.grp')||control;
     target?.scrollIntoView({block:'center',behavior:'auto'});
     control?.focus({preventScroll:true});
@@ -921,7 +1014,7 @@ applyTheme(currentTheme());
 function revealFieldVerification(){
   if (window.innerWidth <= 820 && document.body.dataset.mobilePanel !== 'adjust') setMobilePanel('adjust');
   adjustPanel.open = true;
-  document.getElementById('sectionVerify').open = true;
+  selectWorkflowPanel('deliver');
   requestAnimationFrame(()=>{
     document.getElementById('fieldVerificationPanel').scrollIntoView({block:'nearest',behavior:'auto'});
     if (window.innerWidth <= 820) document.getElementById('measuredDistance').focus({preventScroll:true});
@@ -1015,6 +1108,11 @@ function syncFlatState(){
   });
   document.documentElement.dataset.calculationMode=state.mode;
   stageCalculationGate.textContent=state.gateReason;
+  const provenanceShort={manual:'Manual',verified_image_width:'Maker',field_verified:'Field'}[state.mode]||'Blocked';
+  document.getElementById('flightUnit').textContent=`${projector.label} · ${provenanceShort}`;
+  document.getElementById('flightProvenance').textContent=provenanceShort;
+  document.getElementById('flightScreen').textContent=`${fmt(state.w)} screen`;
+  document.getElementById('flightSet').textContent=`${fmt(state.dist)} set`;
 }
 syncFlatState();
 
