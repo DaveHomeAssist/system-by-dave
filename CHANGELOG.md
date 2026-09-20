@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-09-20 — Operator workspace and equipment practice
+
+- Separate Operators, searchable Reference, 3D Models and House in the FMP hub.
+  Remove the walk from main-site navigation while preserving its separate origin
+  and existing migration routes.
+- Publish five equipment explorers through the canonical FMP release, with shared
+  navigation and theme, explicit local practice and non-3D recovery.
+- Harden camera draft ownership and submission recovery, and extend generated-site
+  verification and live hygiene to the new model routes and their own catalogs.
+  Backend deployment and authenticated commissioning remain separate proof stages.
+- Upgrade Vitest to 4.1.11 to resolve the development mock-server file-read advisory
+  GHSA-82fw-gwwq-j7x9; verify workbook tests and unchanged generated assets.
+
 ## 2026-09-20 — Walk cutover reconciled with current camera references
 
 - Preserve the URSA Broadcast G2 field guide, camera-body corrections and flat

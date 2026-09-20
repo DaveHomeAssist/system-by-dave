@@ -1,0 +1,2447 @@
+{
+  "schema_version": "1.1",
+  "guide_id": "fmp-ccu4",
+  "revision": "1.0.0",
+  "model": "Blackmagic ATEM Camera Control Panel",
+  "part_number": "SWPANELCCU4",
+  "units": "mm",
+  "dimensions_mm": [
+    430,
+    141.7,
+    389
+  ],
+  "sources": [
+    {
+      "source_id": "blackmagic-tech",
+      "label": "Blackmagic ATEM Camera Control Panel technical specifications",
+      "locator": "https://www.blackmagicdesign.com/products/atemcameracontrolpanel/techspecs",
+      "scope": "Product identity, four LCDs/joysticks/preview buttons, Ethernet/USB-C and power."
+    },
+    {
+      "source_id": "blackmagic-manual",
+      "label": "Blackmagic ATEM manual \u00b7 Camera Control Panel",
+      "locator": "https://documents.blackmagicdesign.com/UserManuals/ATEM_Television_Studio_Switchers_Manual.pdf",
+      "scope": "CCU strip functions, scene files, camera settings, color balance, joystick iris/master black, panel setup."
+    },
+    {
+      "source_id": "blackmagic-physical",
+      "label": "Blackmagic physical specification drawing",
+      "locator": "manufacturer physical-spec image",
+      "scope": "430 \u00d7 389 \u00d7 141.7 mm external envelope and chassis profile."
+    },
+    {
+      "source_id": "fmp-ccu",
+      "label": "DB | FMP | AV Gear \u00b7 ATEM Camera Control Panel",
+      "locator": "FMP equipment record, 20 September 2026",
+      "scope": "FMP hardware identity, labels, ownership, use and Camera 1 control-loss history."
+    },
+    {
+      "source_id": "fmp-signal",
+      "label": "REF | FMP | Signal Flow",
+      "locator": "FMP equipment record, 20 September 2026",
+      "scope": "Panel \u2192 ATEM Ethernet control, then camera control rides the return path to Cameras 1\u20133; P240 is separate."
+    }
+  ],
+  "components": [
+    {
+      "component_id": "ccu4.chassis",
+      "label": "ATEM Camera Control Panel chassis",
+      "category": "Enclosure",
+      "kind": "chassis",
+      "purpose": "Desktop four-strip camera shading/control panel.",
+      "confidence": "Documented",
+      "geometry_status": "documented_geometry",
+      "source_ids": [
+        "blackmagic-physical",
+        "blackmagic-tech"
+      ],
+      "limits": "Envelope follows manufacturer physical drawing; bevels and radii are approximate.",
+      "action": null,
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.io.ac",
+      "label": "IEC AC input",
+      "category": "Rear connections",
+      "kind": "connector",
+      "purpose": "Internal 100\u2013240 V AC input",
+      "confidence": "Documented",
+      "geometry_status": "documented_type_photo_grounded",
+      "source_ids": [
+        "blackmagic-tech",
+        "blackmagic-physical"
+      ],
+      "limits": "Manufacturer rear drawing establishes connector type and relative placement.",
+      "action": null,
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.io.dc",
+      "label": "4-pin XLR DC input",
+      "category": "Rear connections",
+      "kind": "connector",
+      "purpose": "12\u201330 V DC redundant input",
+      "confidence": "Documented",
+      "geometry_status": "documented_type_photo_grounded",
+      "source_ids": [
+        "blackmagic-tech",
+        "blackmagic-physical"
+      ],
+      "limits": "Manufacturer rear drawing establishes connector type and relative placement.",
+      "action": null,
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.io.eth1",
+      "label": "Ethernet 1",
+      "category": "Rear connections",
+      "kind": "connector",
+      "purpose": "10/100/1000 BaseT network/control",
+      "confidence": "Documented",
+      "geometry_status": "documented_type_photo_grounded",
+      "source_ids": [
+        "blackmagic-tech",
+        "blackmagic-physical"
+      ],
+      "limits": "Manufacturer rear drawing establishes connector type and relative placement.",
+      "action": null,
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.io.eth2",
+      "label": "Ethernet loop",
+      "category": "Rear connections",
+      "kind": "connector",
+      "purpose": "Second GigE port for loop output",
+      "confidence": "Documented",
+      "geometry_status": "documented_type_photo_grounded",
+      "source_ids": [
+        "blackmagic-tech",
+        "blackmagic-physical"
+      ],
+      "limits": "Manufacturer rear drawing establishes connector type and relative placement.",
+      "action": null,
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.io.usb",
+      "label": "USB-C service",
+      "category": "Rear connections",
+      "kind": "connector",
+      "purpose": "Firmware updates",
+      "confidence": "Documented",
+      "geometry_status": "documented_type_photo_grounded",
+      "source_ids": [
+        "blackmagic-tech",
+        "blackmagic-physical"
+      ],
+      "limits": "Manufacturer rear drawing establishes connector type and relative placement.",
+      "action": null,
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.path.atem",
+      "label": "Panel \u2192 ATEM control network",
+      "category": "FMP signal path",
+      "kind": "virtual",
+      "purpose": "Camera-control commands leave the panel over Ethernet and reach the ATEM.",
+      "confidence": "Documented",
+      "geometry_status": "virtual_route",
+      "source_ids": [
+        "fmp-signal",
+        "fmp-ccu"
+      ],
+      "limits": "Exact switch port and live addressing are not embedded.",
+      "action": "pathAtem",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.path.return",
+      "label": "ATEM \u2192 URSA SDI return/control",
+      "category": "FMP signal path",
+      "kind": "virtual",
+      "purpose": "ATEM embeds camera-control data in the return path to Blackmagic cameras.",
+      "confidence": "Documented",
+      "geometry_status": "virtual_route",
+      "source_ids": [
+        "fmp-signal",
+        "fmp-ccu"
+      ],
+      "limits": "At FMP this path applies to the URSA camera chains. The BirdDog P240 uses its separate SuperJoy/VISCA path.",
+      "action": "pathReturn",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch1.lcd",
+      "label": "CH1 \u00b7 LCD / soft controls",
+      "category": "CCU strip 1",
+      "kind": "display",
+      "purpose": "Displays selected camera and menu settings",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "lcd",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch1.scene1",
+      "label": "CH1 \u00b7 Scene 1",
+      "category": "CCU strip 1",
+      "kind": "button",
+      "purpose": "Recall scene file 1",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "scene",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch1.scene2",
+      "label": "CH1 \u00b7 Scene 2",
+      "category": "CCU strip 1",
+      "kind": "button",
+      "purpose": "Recall scene file 2",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "scene",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch1.scene3",
+      "label": "CH1 \u00b7 Scene 3",
+      "category": "CCU strip 1",
+      "kind": "button",
+      "purpose": "Recall scene file 3",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "scene",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch1.scene4",
+      "label": "CH1 \u00b7 Scene 4",
+      "category": "CCU strip 1",
+      "kind": "button",
+      "purpose": "Recall scene file 4",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "scene",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch1.scene5",
+      "label": "CH1 \u00b7 Scene 5",
+      "category": "CCU strip 1",
+      "kind": "button",
+      "purpose": "Recall scene file 5",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "scene",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch1.store",
+      "label": "CH1 \u00b7 Store scene",
+      "category": "CCU strip 1",
+      "kind": "button",
+      "purpose": "Store current camera parameters to a scene slot",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "store",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch1.nd",
+      "label": "CH1 \u00b7 ND filter",
+      "category": "CCU strip 1",
+      "kind": "control",
+      "purpose": "Select electronic ND on compatible cameras",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "nd",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch1.cc",
+      "label": "CH1 \u00b7 Color correction",
+      "category": "CCU strip 1",
+      "kind": "control",
+      "purpose": "Access color correction controls",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "cc",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch1.gain",
+      "label": "CH1 \u00b7 Master gain",
+      "category": "CCU strip 1",
+      "kind": "control",
+      "purpose": "Adjust camera sensor gain",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "gain",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch1.shutter",
+      "label": "CH1 \u00b7 Shutter",
+      "category": "CCU strip 1",
+      "kind": "control",
+      "purpose": "Adjust shutter setting",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "shutter",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch1.wb",
+      "label": "CH1 \u00b7 White balance",
+      "category": "CCU strip 1",
+      "kind": "control",
+      "purpose": "Adjust / trigger white balance",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "wb",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch1.bars",
+      "label": "CH1 \u00b7 Color bars",
+      "category": "CCU strip 1",
+      "kind": "button",
+      "purpose": "Enable or disable color bars",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "bars",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch1.rel",
+      "label": "CH1 \u00b7 Relative iris mode",
+      "category": "CCU strip 1",
+      "kind": "button",
+      "purpose": "Use relative iris control behavior",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "rel",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch1.abs",
+      "label": "CH1 \u00b7 Absolute iris mode",
+      "category": "CCU strip 1",
+      "kind": "button",
+      "purpose": "Use absolute iris control behavior",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "abs",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch1.white-r",
+      "label": "CH1 \u00b7 White R",
+      "category": "CCU strip 1",
+      "kind": "knob",
+      "purpose": "Adjust red in the white balance/color correction region",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "color",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch1.white-g",
+      "label": "CH1 \u00b7 White G",
+      "category": "CCU strip 1",
+      "kind": "knob",
+      "purpose": "Adjust green in the white balance/color correction region",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "color",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch1.white-b",
+      "label": "CH1 \u00b7 White B",
+      "category": "CCU strip 1",
+      "kind": "knob",
+      "purpose": "Adjust blue in the white balance/color correction region",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "color",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch1.black-r",
+      "label": "CH1 \u00b7 Black R",
+      "category": "CCU strip 1",
+      "kind": "knob",
+      "purpose": "Adjust red in the black balance region",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "color",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch1.black-g",
+      "label": "CH1 \u00b7 Black G",
+      "category": "CCU strip 1",
+      "kind": "knob",
+      "purpose": "Adjust green in the black balance region",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "color",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch1.black-b",
+      "label": "CH1 \u00b7 Black B",
+      "category": "CCU strip 1",
+      "kind": "knob",
+      "purpose": "Adjust blue in the black balance region",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "color",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch1.flare",
+      "label": "CH1 \u00b7 Black / flare",
+      "category": "CCU strip 1",
+      "kind": "knob",
+      "purpose": "Adjust black/flare or gamma-related control",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "flare",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch1.custom",
+      "label": "CH1 \u00b7 Custom / Y gain",
+      "category": "CCU strip 1",
+      "kind": "knob",
+      "purpose": "Custom control; manual documents Y gain in current implementation",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "custom",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch1.camera",
+      "label": "CH1 \u00b7 Camera number",
+      "category": "CCU strip 1",
+      "kind": "display",
+      "purpose": "Shows the assigned camera; green off air and red on air",
+      "confidence": "Confirmed",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech",
+        "fmp-ccu"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "camera",
+      "aliases": [
+        "Camera 1"
+      ],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch1.joystick",
+      "label": "CH1 \u00b7 Iris / master black joystick",
+      "category": "CCU strip 1",
+      "kind": "joystick",
+      "purpose": "Move vertically for iris; rotate ring for master black/pedestal",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "iris",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch1.preview",
+      "label": "CH1 \u00b7 Preview",
+      "category": "CCU strip 1",
+      "kind": "button",
+      "purpose": "Switch this camera to the configured auxiliary preview for camera control",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "preview",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch1.sensitivity",
+      "label": "CH1 \u00b7 Sensitivity",
+      "category": "CCU strip 1",
+      "kind": "knob",
+      "purpose": "Defines the fine iris/gain range across joystick travel",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "sensitivity",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch1.coarse",
+      "label": "CH1 \u00b7 Coarse",
+      "category": "CCU strip 1",
+      "kind": "knob",
+      "purpose": "Defines the maximum iris/gain limit used with joystick travel",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "coarse",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch1.iris-mb-active",
+      "label": "CH1 \u00b7 Iris / MB active",
+      "category": "CCU strip 1",
+      "kind": "button",
+      "purpose": "Locks or unlocks joystick iris and master-black changes",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "irisMb",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch1.auto-iris",
+      "label": "CH1 \u00b7 Auto iris",
+      "category": "CCU strip 1",
+      "kind": "button",
+      "purpose": "Triggers automatic exposure on a compatible electronic-iris lens",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "autoIris",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch1.call",
+      "label": "CH1 \u00b7 Call",
+      "category": "CCU strip 1",
+      "kind": "button",
+      "purpose": "Flashes tally / calls camera operator where supported",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "call",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch1.panel-active",
+      "label": "CH1 \u00b7 Panel active",
+      "category": "CCU strip 1",
+      "kind": "button",
+      "purpose": "Locks the CCU controls against accidental adjustment",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "lock",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch1.status",
+      "label": "CH1 \u00b7 Status indicators",
+      "category": "CCU strip 1",
+      "kind": "light",
+      "purpose": "Network/error/active indications",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "status",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch2.lcd",
+      "label": "CH2 \u00b7 LCD / soft controls",
+      "category": "CCU strip 2",
+      "kind": "display",
+      "purpose": "Displays selected camera and menu settings",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "lcd",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch2.scene1",
+      "label": "CH2 \u00b7 Scene 1",
+      "category": "CCU strip 2",
+      "kind": "button",
+      "purpose": "Recall scene file 1",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "scene",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch2.scene2",
+      "label": "CH2 \u00b7 Scene 2",
+      "category": "CCU strip 2",
+      "kind": "button",
+      "purpose": "Recall scene file 2",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "scene",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch2.scene3",
+      "label": "CH2 \u00b7 Scene 3",
+      "category": "CCU strip 2",
+      "kind": "button",
+      "purpose": "Recall scene file 3",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "scene",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch2.scene4",
+      "label": "CH2 \u00b7 Scene 4",
+      "category": "CCU strip 2",
+      "kind": "button",
+      "purpose": "Recall scene file 4",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "scene",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch2.scene5",
+      "label": "CH2 \u00b7 Scene 5",
+      "category": "CCU strip 2",
+      "kind": "button",
+      "purpose": "Recall scene file 5",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "scene",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch2.store",
+      "label": "CH2 \u00b7 Store scene",
+      "category": "CCU strip 2",
+      "kind": "button",
+      "purpose": "Store current camera parameters to a scene slot",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "store",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch2.nd",
+      "label": "CH2 \u00b7 ND filter",
+      "category": "CCU strip 2",
+      "kind": "control",
+      "purpose": "Select electronic ND on compatible cameras",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "nd",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch2.cc",
+      "label": "CH2 \u00b7 Color correction",
+      "category": "CCU strip 2",
+      "kind": "control",
+      "purpose": "Access color correction controls",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "cc",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch2.gain",
+      "label": "CH2 \u00b7 Master gain",
+      "category": "CCU strip 2",
+      "kind": "control",
+      "purpose": "Adjust camera sensor gain",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "gain",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch2.shutter",
+      "label": "CH2 \u00b7 Shutter",
+      "category": "CCU strip 2",
+      "kind": "control",
+      "purpose": "Adjust shutter setting",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "shutter",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch2.wb",
+      "label": "CH2 \u00b7 White balance",
+      "category": "CCU strip 2",
+      "kind": "control",
+      "purpose": "Adjust / trigger white balance",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "wb",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch2.bars",
+      "label": "CH2 \u00b7 Color bars",
+      "category": "CCU strip 2",
+      "kind": "button",
+      "purpose": "Enable or disable color bars",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "bars",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch2.rel",
+      "label": "CH2 \u00b7 Relative iris mode",
+      "category": "CCU strip 2",
+      "kind": "button",
+      "purpose": "Use relative iris control behavior",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "rel",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch2.abs",
+      "label": "CH2 \u00b7 Absolute iris mode",
+      "category": "CCU strip 2",
+      "kind": "button",
+      "purpose": "Use absolute iris control behavior",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "abs",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch2.white-r",
+      "label": "CH2 \u00b7 White R",
+      "category": "CCU strip 2",
+      "kind": "knob",
+      "purpose": "Adjust red in the white balance/color correction region",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "color",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch2.white-g",
+      "label": "CH2 \u00b7 White G",
+      "category": "CCU strip 2",
+      "kind": "knob",
+      "purpose": "Adjust green in the white balance/color correction region",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "color",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch2.white-b",
+      "label": "CH2 \u00b7 White B",
+      "category": "CCU strip 2",
+      "kind": "knob",
+      "purpose": "Adjust blue in the white balance/color correction region",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "color",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch2.black-r",
+      "label": "CH2 \u00b7 Black R",
+      "category": "CCU strip 2",
+      "kind": "knob",
+      "purpose": "Adjust red in the black balance region",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "color",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch2.black-g",
+      "label": "CH2 \u00b7 Black G",
+      "category": "CCU strip 2",
+      "kind": "knob",
+      "purpose": "Adjust green in the black balance region",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "color",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch2.black-b",
+      "label": "CH2 \u00b7 Black B",
+      "category": "CCU strip 2",
+      "kind": "knob",
+      "purpose": "Adjust blue in the black balance region",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "color",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch2.flare",
+      "label": "CH2 \u00b7 Black / flare",
+      "category": "CCU strip 2",
+      "kind": "knob",
+      "purpose": "Adjust black/flare or gamma-related control",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "flare",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch2.custom",
+      "label": "CH2 \u00b7 Custom / Y gain",
+      "category": "CCU strip 2",
+      "kind": "knob",
+      "purpose": "Custom control; manual documents Y gain in current implementation",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "custom",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch2.camera",
+      "label": "CH2 \u00b7 Camera number",
+      "category": "CCU strip 2",
+      "kind": "display",
+      "purpose": "Shows the assigned camera; green off air and red on air",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech",
+        "fmp-ccu"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "camera",
+      "aliases": [
+        "Camera 2 label unread in 2026-09-01 photo"
+      ],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch2.joystick",
+      "label": "CH2 \u00b7 Iris / master black joystick",
+      "category": "CCU strip 2",
+      "kind": "joystick",
+      "purpose": "Move vertically for iris; rotate ring for master black/pedestal",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "iris",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch2.preview",
+      "label": "CH2 \u00b7 Preview",
+      "category": "CCU strip 2",
+      "kind": "button",
+      "purpose": "Switch this camera to the configured auxiliary preview for camera control",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "preview",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch2.sensitivity",
+      "label": "CH2 \u00b7 Sensitivity",
+      "category": "CCU strip 2",
+      "kind": "knob",
+      "purpose": "Defines the fine iris/gain range across joystick travel",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "sensitivity",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch2.coarse",
+      "label": "CH2 \u00b7 Coarse",
+      "category": "CCU strip 2",
+      "kind": "knob",
+      "purpose": "Defines the maximum iris/gain limit used with joystick travel",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "coarse",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch2.iris-mb-active",
+      "label": "CH2 \u00b7 Iris / MB active",
+      "category": "CCU strip 2",
+      "kind": "button",
+      "purpose": "Locks or unlocks joystick iris and master-black changes",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "irisMb",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch2.auto-iris",
+      "label": "CH2 \u00b7 Auto iris",
+      "category": "CCU strip 2",
+      "kind": "button",
+      "purpose": "Triggers automatic exposure on a compatible electronic-iris lens",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "autoIris",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch2.call",
+      "label": "CH2 \u00b7 Call",
+      "category": "CCU strip 2",
+      "kind": "button",
+      "purpose": "Flashes tally / calls camera operator where supported",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "call",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch2.panel-active",
+      "label": "CH2 \u00b7 Panel active",
+      "category": "CCU strip 2",
+      "kind": "button",
+      "purpose": "Locks the CCU controls against accidental adjustment",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "lock",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch2.status",
+      "label": "CH2 \u00b7 Status indicators",
+      "category": "CCU strip 2",
+      "kind": "light",
+      "purpose": "Network/error/active indications",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "status",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch3.lcd",
+      "label": "CH3 \u00b7 LCD / soft controls",
+      "category": "CCU strip 3",
+      "kind": "display",
+      "purpose": "Displays selected camera and menu settings",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "lcd",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch3.scene1",
+      "label": "CH3 \u00b7 Scene 1",
+      "category": "CCU strip 3",
+      "kind": "button",
+      "purpose": "Recall scene file 1",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "scene",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch3.scene2",
+      "label": "CH3 \u00b7 Scene 2",
+      "category": "CCU strip 3",
+      "kind": "button",
+      "purpose": "Recall scene file 2",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "scene",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch3.scene3",
+      "label": "CH3 \u00b7 Scene 3",
+      "category": "CCU strip 3",
+      "kind": "button",
+      "purpose": "Recall scene file 3",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "scene",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch3.scene4",
+      "label": "CH3 \u00b7 Scene 4",
+      "category": "CCU strip 3",
+      "kind": "button",
+      "purpose": "Recall scene file 4",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "scene",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch3.scene5",
+      "label": "CH3 \u00b7 Scene 5",
+      "category": "CCU strip 3",
+      "kind": "button",
+      "purpose": "Recall scene file 5",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "scene",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch3.store",
+      "label": "CH3 \u00b7 Store scene",
+      "category": "CCU strip 3",
+      "kind": "button",
+      "purpose": "Store current camera parameters to a scene slot",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "store",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch3.nd",
+      "label": "CH3 \u00b7 ND filter",
+      "category": "CCU strip 3",
+      "kind": "control",
+      "purpose": "Select electronic ND on compatible cameras",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "nd",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch3.cc",
+      "label": "CH3 \u00b7 Color correction",
+      "category": "CCU strip 3",
+      "kind": "control",
+      "purpose": "Access color correction controls",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "cc",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch3.gain",
+      "label": "CH3 \u00b7 Master gain",
+      "category": "CCU strip 3",
+      "kind": "control",
+      "purpose": "Adjust camera sensor gain",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "gain",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch3.shutter",
+      "label": "CH3 \u00b7 Shutter",
+      "category": "CCU strip 3",
+      "kind": "control",
+      "purpose": "Adjust shutter setting",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "shutter",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch3.wb",
+      "label": "CH3 \u00b7 White balance",
+      "category": "CCU strip 3",
+      "kind": "control",
+      "purpose": "Adjust / trigger white balance",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "wb",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch3.bars",
+      "label": "CH3 \u00b7 Color bars",
+      "category": "CCU strip 3",
+      "kind": "button",
+      "purpose": "Enable or disable color bars",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "bars",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch3.rel",
+      "label": "CH3 \u00b7 Relative iris mode",
+      "category": "CCU strip 3",
+      "kind": "button",
+      "purpose": "Use relative iris control behavior",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "rel",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch3.abs",
+      "label": "CH3 \u00b7 Absolute iris mode",
+      "category": "CCU strip 3",
+      "kind": "button",
+      "purpose": "Use absolute iris control behavior",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "abs",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch3.white-r",
+      "label": "CH3 \u00b7 White R",
+      "category": "CCU strip 3",
+      "kind": "knob",
+      "purpose": "Adjust red in the white balance/color correction region",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "color",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch3.white-g",
+      "label": "CH3 \u00b7 White G",
+      "category": "CCU strip 3",
+      "kind": "knob",
+      "purpose": "Adjust green in the white balance/color correction region",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "color",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch3.white-b",
+      "label": "CH3 \u00b7 White B",
+      "category": "CCU strip 3",
+      "kind": "knob",
+      "purpose": "Adjust blue in the white balance/color correction region",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "color",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch3.black-r",
+      "label": "CH3 \u00b7 Black R",
+      "category": "CCU strip 3",
+      "kind": "knob",
+      "purpose": "Adjust red in the black balance region",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "color",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch3.black-g",
+      "label": "CH3 \u00b7 Black G",
+      "category": "CCU strip 3",
+      "kind": "knob",
+      "purpose": "Adjust green in the black balance region",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "color",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch3.black-b",
+      "label": "CH3 \u00b7 Black B",
+      "category": "CCU strip 3",
+      "kind": "knob",
+      "purpose": "Adjust blue in the black balance region",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "color",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch3.flare",
+      "label": "CH3 \u00b7 Black / flare",
+      "category": "CCU strip 3",
+      "kind": "knob",
+      "purpose": "Adjust black/flare or gamma-related control",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "flare",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch3.custom",
+      "label": "CH3 \u00b7 Custom / Y gain",
+      "category": "CCU strip 3",
+      "kind": "knob",
+      "purpose": "Custom control; manual documents Y gain in current implementation",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "custom",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch3.camera",
+      "label": "CH3 \u00b7 Camera number",
+      "category": "CCU strip 3",
+      "kind": "display",
+      "purpose": "Shows the assigned camera; green off air and red on air",
+      "confidence": "Confirmed",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech",
+        "fmp-ccu"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "camera",
+      "aliases": [
+        "Camera 3"
+      ],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch3.joystick",
+      "label": "CH3 \u00b7 Iris / master black joystick",
+      "category": "CCU strip 3",
+      "kind": "joystick",
+      "purpose": "Move vertically for iris; rotate ring for master black/pedestal",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "iris",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch3.preview",
+      "label": "CH3 \u00b7 Preview",
+      "category": "CCU strip 3",
+      "kind": "button",
+      "purpose": "Switch this camera to the configured auxiliary preview for camera control",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "preview",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch3.sensitivity",
+      "label": "CH3 \u00b7 Sensitivity",
+      "category": "CCU strip 3",
+      "kind": "knob",
+      "purpose": "Defines the fine iris/gain range across joystick travel",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "sensitivity",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch3.coarse",
+      "label": "CH3 \u00b7 Coarse",
+      "category": "CCU strip 3",
+      "kind": "knob",
+      "purpose": "Defines the maximum iris/gain limit used with joystick travel",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "coarse",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch3.iris-mb-active",
+      "label": "CH3 \u00b7 Iris / MB active",
+      "category": "CCU strip 3",
+      "kind": "button",
+      "purpose": "Locks or unlocks joystick iris and master-black changes",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "irisMb",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch3.auto-iris",
+      "label": "CH3 \u00b7 Auto iris",
+      "category": "CCU strip 3",
+      "kind": "button",
+      "purpose": "Triggers automatic exposure on a compatible electronic-iris lens",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "autoIris",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch3.call",
+      "label": "CH3 \u00b7 Call",
+      "category": "CCU strip 3",
+      "kind": "button",
+      "purpose": "Flashes tally / calls camera operator where supported",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "call",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch3.panel-active",
+      "label": "CH3 \u00b7 Panel active",
+      "category": "CCU strip 3",
+      "kind": "button",
+      "purpose": "Locks the CCU controls against accidental adjustment",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "lock",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch3.status",
+      "label": "CH3 \u00b7 Status indicators",
+      "category": "CCU strip 3",
+      "kind": "light",
+      "purpose": "Network/error/active indications",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "status",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch4.lcd",
+      "label": "CH4 \u00b7 LCD / soft controls",
+      "category": "CCU strip 4",
+      "kind": "display",
+      "purpose": "Displays selected camera and menu settings",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "lcd",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch4.scene1",
+      "label": "CH4 \u00b7 Scene 1",
+      "category": "CCU strip 4",
+      "kind": "button",
+      "purpose": "Recall scene file 1",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "scene",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch4.scene2",
+      "label": "CH4 \u00b7 Scene 2",
+      "category": "CCU strip 4",
+      "kind": "button",
+      "purpose": "Recall scene file 2",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "scene",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch4.scene3",
+      "label": "CH4 \u00b7 Scene 3",
+      "category": "CCU strip 4",
+      "kind": "button",
+      "purpose": "Recall scene file 3",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "scene",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch4.scene4",
+      "label": "CH4 \u00b7 Scene 4",
+      "category": "CCU strip 4",
+      "kind": "button",
+      "purpose": "Recall scene file 4",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "scene",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch4.scene5",
+      "label": "CH4 \u00b7 Scene 5",
+      "category": "CCU strip 4",
+      "kind": "button",
+      "purpose": "Recall scene file 5",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "scene",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch4.store",
+      "label": "CH4 \u00b7 Store scene",
+      "category": "CCU strip 4",
+      "kind": "button",
+      "purpose": "Store current camera parameters to a scene slot",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "store",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch4.nd",
+      "label": "CH4 \u00b7 ND filter",
+      "category": "CCU strip 4",
+      "kind": "control",
+      "purpose": "Select electronic ND on compatible cameras",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "nd",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch4.cc",
+      "label": "CH4 \u00b7 Color correction",
+      "category": "CCU strip 4",
+      "kind": "control",
+      "purpose": "Access color correction controls",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "cc",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch4.gain",
+      "label": "CH4 \u00b7 Master gain",
+      "category": "CCU strip 4",
+      "kind": "control",
+      "purpose": "Adjust camera sensor gain",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "gain",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch4.shutter",
+      "label": "CH4 \u00b7 Shutter",
+      "category": "CCU strip 4",
+      "kind": "control",
+      "purpose": "Adjust shutter setting",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "shutter",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch4.wb",
+      "label": "CH4 \u00b7 White balance",
+      "category": "CCU strip 4",
+      "kind": "control",
+      "purpose": "Adjust / trigger white balance",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "wb",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch4.bars",
+      "label": "CH4 \u00b7 Color bars",
+      "category": "CCU strip 4",
+      "kind": "button",
+      "purpose": "Enable or disable color bars",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "bars",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch4.rel",
+      "label": "CH4 \u00b7 Relative iris mode",
+      "category": "CCU strip 4",
+      "kind": "button",
+      "purpose": "Use relative iris control behavior",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "rel",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch4.abs",
+      "label": "CH4 \u00b7 Absolute iris mode",
+      "category": "CCU strip 4",
+      "kind": "button",
+      "purpose": "Use absolute iris control behavior",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "abs",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch4.white-r",
+      "label": "CH4 \u00b7 White R",
+      "category": "CCU strip 4",
+      "kind": "knob",
+      "purpose": "Adjust red in the white balance/color correction region",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "color",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch4.white-g",
+      "label": "CH4 \u00b7 White G",
+      "category": "CCU strip 4",
+      "kind": "knob",
+      "purpose": "Adjust green in the white balance/color correction region",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "color",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch4.white-b",
+      "label": "CH4 \u00b7 White B",
+      "category": "CCU strip 4",
+      "kind": "knob",
+      "purpose": "Adjust blue in the white balance/color correction region",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "color",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch4.black-r",
+      "label": "CH4 \u00b7 Black R",
+      "category": "CCU strip 4",
+      "kind": "knob",
+      "purpose": "Adjust red in the black balance region",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "color",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch4.black-g",
+      "label": "CH4 \u00b7 Black G",
+      "category": "CCU strip 4",
+      "kind": "knob",
+      "purpose": "Adjust green in the black balance region",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "color",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch4.black-b",
+      "label": "CH4 \u00b7 Black B",
+      "category": "CCU strip 4",
+      "kind": "knob",
+      "purpose": "Adjust blue in the black balance region",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "color",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch4.flare",
+      "label": "CH4 \u00b7 Black / flare",
+      "category": "CCU strip 4",
+      "kind": "knob",
+      "purpose": "Adjust black/flare or gamma-related control",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "flare",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch4.custom",
+      "label": "CH4 \u00b7 Custom / Y gain",
+      "category": "CCU strip 4",
+      "kind": "knob",
+      "purpose": "Custom control; manual documents Y gain in current implementation",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "custom",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch4.camera",
+      "label": "CH4 \u00b7 Camera number",
+      "category": "CCU strip 4",
+      "kind": "display",
+      "purpose": "Shows the assigned camera; green off air and red on air",
+      "confidence": "Confirmed",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech",
+        "fmp-ccu"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views. FMP channel 4 is labelled 4 PTZ but does not control the BirdDog P240; treat its URSA_G2 type readout as a configuration artifact pending switcher check.",
+      "action": "camera",
+      "aliases": [
+        "4 PTZ slot / configuration artifact"
+      ],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch4.joystick",
+      "label": "CH4 \u00b7 Iris / master black joystick",
+      "category": "CCU strip 4",
+      "kind": "joystick",
+      "purpose": "Move vertically for iris; rotate ring for master black/pedestal",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views. FMP channel 4 is labelled 4 PTZ but does not control the BirdDog P240; treat its URSA_G2 type readout as a configuration artifact pending switcher check.",
+      "action": "iris",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch4.preview",
+      "label": "CH4 \u00b7 Preview",
+      "category": "CCU strip 4",
+      "kind": "button",
+      "purpose": "Switch this camera to the configured auxiliary preview for camera control",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views. FMP channel 4 is labelled 4 PTZ but does not control the BirdDog P240; treat its URSA_G2 type readout as a configuration artifact pending switcher check.",
+      "action": "preview",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch4.sensitivity",
+      "label": "CH4 \u00b7 Sensitivity",
+      "category": "CCU strip 4",
+      "kind": "knob",
+      "purpose": "Defines the fine iris/gain range across joystick travel",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "sensitivity",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch4.coarse",
+      "label": "CH4 \u00b7 Coarse",
+      "category": "CCU strip 4",
+      "kind": "knob",
+      "purpose": "Defines the maximum iris/gain limit used with joystick travel",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views. FMP channel 4 is labelled 4 PTZ but does not control the BirdDog P240; treat its URSA_G2 type readout as a configuration artifact pending switcher check.",
+      "action": "coarse",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch4.iris-mb-active",
+      "label": "CH4 \u00b7 Iris / MB active",
+      "category": "CCU strip 4",
+      "kind": "button",
+      "purpose": "Locks or unlocks joystick iris and master-black changes",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "irisMb",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch4.auto-iris",
+      "label": "CH4 \u00b7 Auto iris",
+      "category": "CCU strip 4",
+      "kind": "button",
+      "purpose": "Triggers automatic exposure on a compatible electronic-iris lens",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "autoIris",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch4.call",
+      "label": "CH4 \u00b7 Call",
+      "category": "CCU strip 4",
+      "kind": "button",
+      "purpose": "Flashes tally / calls camera operator where supported",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views. FMP channel 4 is labelled 4 PTZ but does not control the BirdDog P240; treat its URSA_G2 type readout as a configuration artifact pending switcher check.",
+      "action": "call",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch4.panel-active",
+      "label": "CH4 \u00b7 Panel active",
+      "category": "CCU strip 4",
+      "kind": "button",
+      "purpose": "Locks the CCU controls against accidental adjustment",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views. FMP channel 4 is labelled 4 PTZ but does not control the BirdDog P240; treat its URSA_G2 type readout as a configuration artifact pending switcher check.",
+      "action": "lock",
+      "aliases": [],
+      "shape": {}
+    },
+    {
+      "component_id": "ccu4.ch4.status",
+      "label": "CH4 \u00b7 Status indicators",
+      "category": "CCU strip 4",
+      "kind": "light",
+      "purpose": "Network/error/active indications",
+      "confidence": "Documented",
+      "geometry_status": "photo_approximation",
+      "source_ids": [
+        "blackmagic-manual",
+        "blackmagic-tech"
+      ],
+      "limits": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+      "action": "status",
+      "aliases": [],
+      "shape": {}
+    }
+  ],
+  "fmp": {
+    "ch1": "Camera 1",
+    "ch2": "Label unread in source photo",
+    "ch3": "Camera 3",
+    "ch4": "4 PTZ slot / configuration artifact",
+    "p240_control": "Separate SuperJoy/VISCA path",
+    "live_ips": "Unknown"
+  }
+}

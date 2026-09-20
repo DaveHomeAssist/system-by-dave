@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const crypto = require('node:crypto');
 const assert = require('node:assert/strict');
-const vm = require('node:vm');
+const { modelFiles, modelContract } = require('./fmp_model_contract');
 const { originFor } = require('./domain_sites_lib');
 
 const site = path.resolve(__dirname, '..');
@@ -19,6 +19,7 @@ const releases = [
       'index.html', 'public.css', 'public.js', 'theme.js', 'chrome.js', 'chrome.css', 'camera.js', 'camera-core.js', 'camera-view.js', 'camera.css', 'photos.js', 'mail.js', 'notion-config.js',
       ...cameraRoutes.map(route => `${route}index.html`),
       'house/index.html', 'house/house.css', 'house/house.js', 'house/house-data.js', 'house/house-tokens.css', 'house/site-plan.png', 'house/display-estate.csv',
+      ...modelFiles,
       'guide/index.html', 'gear/index.html', 'build/index.html', 'ptz/index.html', 'ref.css', 'ref.js',
       'rig/index.html', 'rig/rig-model.js', 'rig/fmp-guide-data.js',
       ...rigPhotos.map(name => `rig/assets/${name}.webp`),
@@ -89,7 +90,7 @@ for (const release of releases) {
     }
     if (!name.endsWith('.html')) continue;
     for (const marker of ['noindex', 'Content-Security-Policy', 'name="description"', 'rel="canonical"', 'property="og:title"', 'name="twitter:']) assert.ok(source.includes(marker), `${release.directory}/${name}: ${marker}`);
-    assert.match(source, /class="skip(?:-link)?"/);
+    assert.match(source, /class="(?:[^"\n]*\s)?skip(?:-link)?(?:\s[^"\n]*)?"/);
     // A <base> element resolves #fragment links against another document, so skip links leave the page.
     assert.doesNotMatch(source, /<base\b/i, `${release.directory}/${name}: <base> breaks in-page skip links`);
     for (const [, target] of source.matchAll(/href="#([^"]+)"/g)) assert.ok(source.includes(`id="${target}"`), `${release.directory}/${name}: missing skip target #${target}`);
@@ -99,7 +100,14 @@ for (const release of releases) {
     assert.ok(!sitemap.includes(`<loc>${canonical}</loc>`));
     if (release.directory === 'fmp') {
       // WEB-1: every FMP page takes the light-first fmpTheme preference before first paint, never the AV Suite key.
-      assert.match(source.slice(0, source.indexOf('</head>')), /<script src="(?:\.\.\/)*theme\.js\?v=[a-f0-9]{16}"><\/script>/, `${release.directory}/${name}: load theme.js in <head>`);
+      const head = source.slice(0, source.indexOf('</head>'));
+      if (name === 'ptz/SuperJoy-G1-Interactive-Guide.html') {
+        // The portable one-file guide embeds the exact shared preference before paint.
+        const theme = fs.readFileSync(path.join(root, 'theme.js'), 'utf8').split('// Keep the published chrome')[0];
+        assert.ok(head.includes(`<script>${theme}</script>`), `${name}: embed the exact shared theme in <head>`);
+      } else {
+        assert.match(head, /<script src="(?:\.\.\/)*theme\.js\?v=[a-f0-9]{16}"><\/script>/, `${release.directory}/${name}: load theme.js in <head>`);
+      }
       assert.doesNotMatch(source, /av-theme-mode/, `${release.directory}/${name}: FMP pages must not read or write av-theme-mode.v1`);
     }
     if (release.directory === 'fmp' && name.startsWith('camera/')) {
@@ -115,7 +123,14 @@ for (const release of releases) {
 
 const entry = fs.readFileSync(path.join(site, 'fmp/index.html'), 'utf8');
 assert.match(entry, /class="startup-guidance"/);
-assert.ok(entry.includes(`href="${originFor('fmpwalk/')}/fmpwalk/"`), 'The hub must link the preshow walk at its canonical origin.');
+// The separate walk keeps its migration routes but is no longer a hub destination.
+for (const name of ['index.html', 'camera.js', 'house/index.html', 'guide/index.html']) {
+  assert.doesNotMatch(fs.readFileSync(path.join(site, 'fmp', name), 'utf8'), /(?:href=["'](?:https:\/\/walk\.housevideo\.app)?\/fmpwalk\/|['"]https:\/\/walk\.housevideo\.app\/fmpwalk\/['"])/, `${name}: walk launch remains in the operator/reference site`);
+}
+for (const target of ['rig/', 'models/atem-hd8-iso.html', 'ptz/SuperJoy-G1-Interactive-Guide.html', 'models/p240.html', 'models/ccu4.html']) {
+  assert.ok(entry.includes(`href="${target}"`), `The 3D Models tab must reach ${target}`);
+}
+assert.match(entry, /id="models"/);
 assert.equal(releases[0].provenance.sourceCommit, releases[1].provenance.sourceCommit, 'fmp and fmpwalk must ship from one export');
 const cameraView = fs.readFileSync(path.join(site, 'fmp/camera-view.js'), 'utf8');
 assert.match(cameraView, /href="#screenTitle"/);
@@ -162,14 +177,13 @@ for (const name of ['fmp-index/index.html', 'fmp-walk/index.html', 'switcher/ind
   assert.doesNotMatch(page, OLD_VERSION_URL, `${name}: links an old version of the suite`);
   assert.equal(privateAddresses(page), 0, `${name}: publishes a private network address`);
 }
-// Every rig count claim, including the one the camera card renders, must match the catalog.
-// The data module holds only object literals; evaluate it in an empty context rather than importing ESM from CommonJS.
-const guideData = fs.readFileSync(path.join(site, 'fmp/rig/fmp-guide-data.js'), 'utf8');
-const components = Object.keys(vm.runInNewContext(`${guideData.replace(/^export const /gm, 'var ')}\n;catalog`, {}, { timeout: 1000 })).length;
+// Validate every claim against the catalog belonging to that model.
+const { counts: modelCounts, componentsFor } = modelContract(site);
+const components = modelCounts.rig;
 for (const release of releases) {
   for (const name of release.expected.filter(file => /\.(?:html|js)$/.test(file) && !file.includes('/vendor/'))) {
     const source = fs.readFileSync(path.join(site, release.directory, name), 'utf8');
-    for (const [claim, number] of source.matchAll(COUNT_CLAIM)) assert.equal(Number(number), components, `${release.directory}/${name}: "${claim}" disagrees with ${components} catalog components`);
+    for (const [claim, number] of source.matchAll(COUNT_CLAIM)) assert.equal(Number(number), componentsFor(name), `${release.directory}/${name}: "${claim}" disagrees with its owning model catalog`);
     for (const [, stamped] of source.matchAll(/data-rig-components="(\d+)"/g)) assert.equal(Number(stamped), components, `${release.directory}/${name}: data-rig-components`);
   }
 }

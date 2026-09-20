@@ -215,7 +215,7 @@ pre{font-family:var(--font-m);font-size:13px;background:var(--umd);color:#dfe4ea
     <!-- 01 SHOW MODES -->
     <section class="panel" role="tabpanel" id="p-modes" aria-labelledby="t-modes">
       <div class="inner">
-        <div class="guide-boundary"><strong>Training reference</strong><span>Tonight's director, stage plot, restrictions, and verified assignments control. This guide stores local notes only and does not submit operational records.</span><a href="https://walk.housevideo.app/fmpwalk/">Open preshow walk</a></div>
+        <div class="guide-boundary"><strong>Training reference</strong><span>Tonight's director, stage plot, restrictions, and verified assignments control. This guide stores local notes only and does not submit operational records.</span><a href="/fmp/#cameras">Open operator workflows</a></div>
         <div class="kicker">Start here</div>
         <h2>The operators stay. The caller changes.</h2>
         <p class="lede">FMP camera positions are worked by Local operators on house nights and on most tour nights. Tours occasionally pay to bring their own operators and have ours shadow, but they usually defer to the house crew. This guide is built so a Local operator can walk in on any night, ask seven questions, fill one card, and cut clean for a director they met an hour ago.</p>
@@ -586,29 +586,38 @@ End frame: ______________________</pre>
 
   // tabs
   var tabs = Array.prototype.slice.call(document.querySelectorAll('[role="tab"]'));
-  function select(tab, focus){
+  function select(tab, focus, updateUrl){
+    if (!tabs.includes(tab)) tab = tabs[0];
     tabs.forEach(function(t){
       var on = t === tab;
       t.setAttribute('aria-selected', on ? 'true' : 'false');
       t.tabIndex = on ? 0 : -1;
       document.getElementById(t.getAttribute('aria-controls')).hidden = !on;
     });
-    if (focus) tab.focus();
+    if (focus) { tab.focus(); tab.scrollIntoView({ block: 'nearest', inline: 'nearest' }); }
+    if (updateUrl && location.hash !== '#' + tab.getAttribute('aria-controls')) {
+      history.pushState(null, '', '#' + tab.getAttribute('aria-controls'));
+    }
     store.set('fmpcam-tab', tab.id);
   }
   tabs.forEach(function(t, i){
-    t.addEventListener('click', function(){ select(t, false); });
+    t.addEventListener('click', function(){ select(t, false, true); });
     t.addEventListener('keydown', function(e){
       var n = null;
       if (e.key === 'ArrowRight') n = tabs[(i + 1) % tabs.length];
       if (e.key === 'ArrowLeft') n = tabs[(i - 1 + tabs.length) % tabs.length];
       if (e.key === 'Home') n = tabs[0];
       if (e.key === 'End') n = tabs[tabs.length - 1];
-      if (n){ e.preventDefault(); select(n, true); }
+      if (n){ e.preventDefault(); select(n, true, true); }
     });
   });
-  var lastTab = document.getElementById(store.get('fmpcam-tab') || '');
-  if (lastTab) select(lastTab, false);
+  function tabFromHash() {
+    return tabs.find(function(tab) { return '#' + tab.getAttribute('aria-controls') === location.hash || '#' + tab.id === location.hash; });
+  }
+  var lastTab = tabs.find(function(tab) { return tab.id === store.get('fmpcam-tab'); });
+  select(tabFromHash() || lastTab || tabs[0], false);
+  window.addEventListener('hashchange', function(){ select(tabFromHash() || tabs[0], false); });
+  window.addEventListener('popstate', function(){ select(tabFromHash() || tabs[0], false); });
 
   // operator card
   var fields = document.querySelectorAll('#cardGrid [data-k]');

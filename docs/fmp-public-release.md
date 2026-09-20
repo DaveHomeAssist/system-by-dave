@@ -1,8 +1,8 @@
 # FMP public suite release
 
 `/fmp/` is the FMP video operations hub. It contains the publicly reachable
-camera commissioning frontend, bowl camera training, and a source-backed camera
-rig explorer. `/fmpwalk/` is the separate local-first preshow venue walk.
+camera commissioning frontend, bowl camera training, and five source-backed
+equipment explorers. The local-first preshow walk lives at walk.housevideo.app.
 
 Public page access does not grant crew roles. Camera API access still requires a
 Google ID token and server-side authorization. Noindex is discovery policy, not
@@ -10,20 +10,23 @@ access control.
 
 ## Product boundaries
 
-- `/fmp/`: choose a camera position or open House, Walk, Learn, and Setup. Each
-  tab is addressable as `/fmp/#cameras`, `#house`, `#walk`, `#learn`, or `#setup`.
+- `/fmp/`: choose Operators, Reference, 3D Models or House at `#cameras`, `#learn`,
+  `#models` or `#house`. A separate access/setup link remains at `#setup`.
 - `/fmp/house/`: dated house-video reference, display inventory, bowl schematic,
   rack views and visitor map. Source conflicts stay visible; there is no live
   monitoring connection or operational write action.
 - `/fmp/camera/...`: owner-bound drafts and explicit authenticated operational
   actions. SETUP TEST remains mandatory until live acceptance is complete.
-- `/fmpwalk/`: venue route, readings, faults, photos, and report preparation.
+- `https://walk.housevideo.app/fmpwalk/`: venue route, readings, faults, photos, and report preparation.
   Browser storage is local-first; download, Gmail, and Notion actions each require
   a separate explicit confirmation.
 - `/fmp/guide/`: training only. Tonight's director, stage plot, restrictions, and
   verified assignments control.
 - `/fmp/rig/`: read-only 3D/photo equipment reference. It does not report live
   status or establish serial numbers, fitted state, signal health, or access.
+- `/fmp/models/atem-hd8-iso.html`, `/fmp/models/p240.html`, `/fmp/models/ccu4.html`
+  and `/fmp/ptz/SuperJoy-G1-Interactive-Guide.html`: equipment references and local
+  practice, loaded only when opened. No simulator sends commands to equipment.
 - `/fmp/gear/`, `/fmp/build/`, `/fmp/ptz/`: camera equipment, camera build and
   strike, and catwalk PTZ references translated from Notion records. Dated
   evidence stays visible; roles replace names; no network addresses.
@@ -81,8 +84,8 @@ canonical `tests/public-release.test.js` enforce the same rules before export:
   `?camera=N` and `?position=` redirect use `/fmp/camera/`.
 - **Content-hash tokens.** Every `?v=` token is the first 16 hex digits of the
   SHA-256 of the released file it loads.
-- **Counts come from the catalog.** Camera pages carry `data-rig-components`, and
-  every "N components" or "N parts" claim must equal the rig catalog size.
+- **Counts come from each model's catalog.** Camera pages carry `data-rig-components`;
+  each "N components" or "N parts" claim must match its owning equipment catalog.
 - **One export.** `fmp` and `fmpwalk` pin the same source commit.
 
 The FMP release includes only client modules, shells, local Three.js runtime,
@@ -106,7 +109,7 @@ requires configured infrastructure and auth, then verifies the live destination
 before publishing old-origin redirects. After cutover,
 `housevideo.app/fmpwalk/` and `/fmp-walk/` offer saved-data migration before
 redirecting there. Links crossing the two origins are absolute and the exporter
-enforces it. Hub links to the walk remain available.
+enforces it. The operator/reference hub no longer launches the walk.
 
 The Google client and the `fmp-walk-notion` backend (`FMP_ALLOWED_ORIGINS`) allow
 `https://housevideo.app`; keep `https://systembydave.com` in both while old drafts

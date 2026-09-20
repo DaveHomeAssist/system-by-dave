@@ -1,12 +1,12 @@
 import {
-  FALLBACK_REGISTRY, checkInPayload, checkoutPayload, createDraft,
-  positionFor, positionKeyFromLocation, resumeAccountDraft, setCheck, setPosition, visibleDrafts
-} from './camera-core.js?v=0442961e13762458';
+  FALLBACK_REGISTRY, createDraft, inspectCameraStore, prepareSubmission, safeCameraRegistry,
+  positionFor, positionKeyFromLocation, resumeAccountDraft, setCheck, setPosition, visibleDrafts, submissionMayHaveReachedServer
+} from './camera-core.js?v=90d8a9324a19f3ff';
 import { CLIENT_ID } from './mail.js?v=4a521185a33c8463';
 import { loadPhotoBlob, loadPhotoFiles, storePhoto } from './photos.js?v=cd1feeb0fd50c5df';
 import { NOTION_API_URL } from './notion-config.js?v=b675c734abe301f4';
 
-import { CAMERA_STAGES, cameraPages, cameraShell } from './camera-view.js?v=25cab35ca01eced2';
+import { CAMERA_STAGES, cameraPages, cameraShell } from './camera-view.js?v=cc64e68df8d41505';
 
 const view = { stage: 'setup', page: 0 };
 let activePages;
@@ -28,8 +28,8 @@ const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, character =>
 let storageOk = true;
 let localOwner = '';
 try {
-  localOwner = localStorage.getItem(OWNER_KEY) || crypto.randomUUID();
-  localStorage.setItem(OWNER_KEY, localOwner);
+  localOwner = localStorage.getItem(OWNER_KEY);
+  if (!localOwner) { localOwner = crypto.randomUUID(); localStorage.setItem(OWNER_KEY, localOwner); }
 } catch {
   storageOk = false;
   localOwner = crypto.randomUUID();
@@ -44,31 +44,64 @@ let notice = '';
 let noticeError = false;
 let googlePromise;
 let photoUrls = [];
+let editingGranted = false;
+let releaseEditing;
+let storageHeld = false;
+let storageMessage = '';
+let storedValue = null;
+let refreshScheduled = false;
+
+function storageFailure(message) {
+  storageOk = false;
+  storageMessage = message;
+  view.stage = 'status';
+  view.page = 0;
+  if (announcements) announcements.textContent = message;
+  if (!refreshScheduled) {
+    refreshScheduled = true;
+    queueMicrotask(() => { refreshScheduled = false; render(); });
+  }
+}
 
 function loadStore() {
   try {
-    const value = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-    if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error();
-    return {
-      drafts: value.drafts && typeof value.drafts === 'object' ? value.drafts : {},
-      activeDraftId: typeof value.activeDraftId === 'string' ? value.activeDraftId : '',
-      events: Array.isArray(value.events) ? value.events : [],
-      registry: value.registry?.schema === 'FMP_CAMERA_POSITION_REGISTRY_V1' ? value.registry : FALLBACK_REGISTRY
-    };
+    storedValue = localStorage.getItem(STORAGE_KEY);
+    const value = inspectCameraStore(JSON.parse(storedValue || '{}'));
+    if (value.invalidDrafts) {
+      storageHeld = true;
+      storageOk = false;
+      storageMessage = 'Some saved drafts are unreadable. Editing is paused to preserve the original data. Download saved drafts from Setup and ask the lead to recover them.';
+    }
+    return value;
   } catch {
+    storageHeld = true;
     storageOk = false;
+    storageMessage = 'Saved camera data cannot be read. Editing is paused; existing storage has not been replaced. Download saved drafts from Setup for recovery.';
     return { drafts: {}, activeDraftId: '', events: [], registry: FALLBACK_REGISTRY };
   }
 }
 const store = loadStore();
+if (!storageOk && !storageMessage) {
+  storageHeld = true;
+  storageMessage = 'This browser could not save the local operator identity. Editing is paused to keep drafts recoverable. Enable browser storage, then reload.';
+}
 
 function saveStore() {
+  if (!editingGranted || storageHeld) return false;
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
+    if (localStorage.getItem(STORAGE_KEY) !== storedValue) {
+      storageHeld = true;
+      storageFailure('Another tab changed the saved camera data. Editing is paused. Download this tab’s recovery copy before reloading; nothing was overwritten.');
+      return false;
+    }
+    const next = JSON.stringify(store);
+    localStorage.setItem(STORAGE_KEY, next);
+    storedValue = next;
     storageOk = true;
+    storageMessage = '';
     return true;
   } catch {
-    storageOk = false;
+    storageFailure('This draft could not be saved on this device. Keep this tab open and download its recovery copy from Setup. No submission will start without a saved recovery snapshot.');
     return false;
   }
 }
@@ -97,7 +130,7 @@ function currentDraft() {
 function updateDraft(draft) {
   draft.updatedAt = new Date().toISOString();
   store.drafts[draft.draftId] = draft;
-  saveStore();
+  return saveStore();
 }
 
 function setNotice(message, error = false) {
@@ -131,7 +164,6 @@ function referenceCards(position) {
   }
   const items = [
     ...(PUBLIC_RELEASE ? [
-      ['WALK', 'Preshow venue walk', 'Route checks, fault photos and report export', 'https://walk.housevideo.app/fmpwalk/', false],
       ['CALL', 'Bowl camera guide', 'Tour modes, meeting, song flow and directing', '/fmp/guide/', false],
       ['3D', 'Camera rig explorer', `${RIG_COMPONENTS ? `${RIG_COMPONENTS} components` : 'Components'}, photo evidence and operating notes`, '/fmp/rig/', false]
     ] : []),
@@ -169,7 +201,7 @@ function render(preferredFocus = '') {
   const restoreFocus = preferredFocus || focusSelectorFor(document.activeElement);
   photoUrls.splice(0).forEach(url => URL.revokeObjectURL(url));
   const draft = currentDraft();
-  if (SETUP_TEST_ONLY && !draft.checkedInReceipt && !draft.setupTest) {
+  if (SETUP_TEST_ONLY && !draft.checkedInReceipt && !draft.pendingAction && !draft.setupTest) {
     draft.setupTest = true;
     updateDraft(draft);
   }
@@ -178,16 +210,18 @@ function render(preferredFocus = '') {
   const draftOptions = savedDrafts.map(item => `<option value="${escapeHtml(item.draftId)}" ${item.draftId === draft.draftId ? 'selected' : ''}>${escapeHtml(item.eventName || 'Show not selected')} · ${item.checkedOutReceipt ? 'Checked out' : item.pendingAction ? 'Pending' : item.checkedInReceipt ? 'Checked in' : 'Draft'} · ${escapeHtml(item.updatedAt)}</option>`).join('');
   const [dotClass, connectionText] = backendState(draft);
   const messages = [
-    ...(!storageOk ? ['Browser storage is unavailable. Keep this page open. This draft may not survive a reload.'] : []),
+    ...(storageMessage ? [storageMessage] : []),
     ...(!navigator.onLine ? ['Offline. Work stays on this device. Submission needs an explicit retry after reconnecting.'] : []),
     ...(notice ? [notice] : []),
-    `Connection: ${connectionText}. ${draft.pendingAction ? 'Submission is pending on this device.' : 'No automatic submissions.'}`,
+    ...(draft.pendingAction ? [draft.pendingSubmission ? 'Submission evidence is locked. Retry uses the original saved values and capture time. A missing receipt does not prove the server rejected it.' : 'This older pending draft has no original submission snapshot. Download saved drafts from Setup and ask the lead to reconcile its server record.'] : []),
+    `Connection: ${connectionText}. ${draft.pendingAction ? 'Server confirmation is pending.' : 'No automatic submissions.'}`,
     ...(SETUP_TEST_ONLY ? [`${PUBLIC_RELEASE ? 'Commissioning build' : 'Private test build'} · not venue accepted. Use synthetic observations only. Every new record is marked SETUP TEST; signed-in saving still needs verification.`] : [])
   ];
   activePages = cameraPages({ draft, position, identity, eventOptions: eventOptions(draft),
-    references: referenceCards(position), draftOptions, testOnly: SETUP_TEST_ONLY, publicRelease: PUBLIC_RELEASE, busy, messages });
+    references: referenceCards(position), draftOptions, testOnly: SETUP_TEST_ONLY, publicRelease: PUBLIC_RELEASE, busy, messages, readOnly: !editingGranted || storageHeld, canReclaim: !editingGranted && !storageHeld && Boolean(navigator.locks?.request) });
   app.innerHTML = cameraShell({ draft, position, registry: store.registry, pages: activePages, view,
-    testOnly: SETUP_TEST_ONLY, publicRelease: PUBLIC_RELEASE, appHome: APP_HOME, connectionText, dotClass, hasAlert: noticeError || !storageOk });
+    testOnly: SETUP_TEST_ONLY, publicRelease: PUBLIC_RELEASE, appHome: APP_HOME, connectionText, dotClass, hasAlert: noticeError || !storageOk,
+    busy, readOnly: !editingGranted || storageHeld });
   bind(draft);
   paintPhotos(draft);
   mountGoogle();
@@ -198,6 +232,7 @@ function render(preferredFocus = '') {
 }
 
 function bind(draft) {
+  const canEdit = () => !busy && editingGranted && !storageHeld && !draft.pendingAction;
   const go = (stage, page = 0) => { view.stage = stage; view.page = page; render('#screenTitle'); };
   app.querySelectorAll('[data-stage]').forEach(button => button.addEventListener('click', () => go(button.dataset.stage)));
   document.getElementById('previousPage').addEventListener('click', () => go(view.stage, view.page - 1));
@@ -211,13 +246,13 @@ function bind(draft) {
   });
   document.getElementById('draftPicker')?.addEventListener('change', event => {
     const selected = store.drafts[event.target.value];
-    if (!selected || selected.ownerKey !== ownerKey || selected.positionKey !== draft.positionKey || busy) return;
+    if (!selected || selected.ownerKey !== ownerKey || selected.positionKey !== draft.positionKey || busy || !editingGranted || storageHeld) return;
     store.activeDraftId = selected.draftId;
     saveStore();
     go('setup');
   });
   app.querySelectorAll('[data-correction], [data-correction-reason]').forEach(field => field.addEventListener('input', () => {
-    if (busy || draft.leadCorrection?.pending) return;
+    if (!canEdit() || draft.leadCorrection?.pending) return;
     draft.leadCorrection ||= { overrideId: crypto.randomUUID(), changes: { ...draft.assignment }, reason: '' };
     if (field.hasAttribute('data-correction-reason')) draft.leadCorrection.reason = field.value;
     else draft.leadCorrection.changes[field.dataset.correction] = field.value;
@@ -225,7 +260,7 @@ function bind(draft) {
   }));
   for (const id of ['showStatus', 'statusDetails']) document.getElementById(id).addEventListener('click', () => go('status'));
   document.getElementById('positionPicker').addEventListener('change', event => {
-    if (draft.checkedInReceipt) return;
+    if (!canEdit() || draft.checkedInReceipt) return;
     if (!confirm('Change the physical position? Current build and stow selections will reset.')) {
       event.target.value = draft.positionKey;
       return;
@@ -239,12 +274,14 @@ function bind(draft) {
     go('setup');
   });
   app.querySelectorAll('[data-field]').forEach(field => field.addEventListener('input', () => {
+    if (!canEdit() || (draft.checkedInReceipt && field.dataset.field !== 'headsetReturned') || draft.checkedOutReceipt) return;
     const name = field.dataset.field;
     draft[name] = field.type === 'checkbox' ? field.checked : field.value;
     if (name === 'eventId') draft.eventName = store.events.find(event => event.id === field.value)?.name || '';
     updateDraft(draft);
   }));
   app.querySelectorAll('[data-assignment]').forEach(field => field.addEventListener('input', () => {
+    if (!canEdit() || draft.checkedInReceipt) return;
     draft.assignment[field.dataset.assignment] = field.value;
     draft.assignmentConfirmed = false;
     const checkbox = app.querySelector('[data-field="assignmentConfirmed"]');
@@ -252,16 +289,19 @@ function bind(draft) {
     updateDraft(draft);
   }));
   app.querySelectorAll('[data-check]').forEach(button => button.addEventListener('click', () => {
+    if (!canEdit() || draft.checkedOutReceipt || (button.dataset.checkStage === 'build' && draft.checkedInReceipt)) return;
     const checks = button.dataset.checkStage === 'build' ? draft.buildChecks : draft.stowChecks;
     setCheck(checks, button.dataset.check, button.dataset.state);
     updateDraft(draft);
     render();
   }));
   app.querySelectorAll('[data-fault-field]').forEach(field => field.addEventListener('input', () => {
+    if (!canEdit() || draft.checkedOutReceipt) return;
     draft.faults[Number(field.dataset.faultIndex)][field.dataset.faultField] = field.value;
     updateDraft(draft);
   }));
   app.querySelectorAll('[data-remove-fault]').forEach(button => button.addEventListener('click', () => {
+    if (!canEdit() || draft.checkedOutReceipt) return;
     if (!confirm('Remove this unsent fault from the checkout draft?')) return;
     draft.faults.splice(Number(button.dataset.removeFault), 1);
     updateDraft(draft);
@@ -269,6 +309,7 @@ function bind(draft) {
     render('#addFault');
   }));
   app.querySelectorAll('[data-fault-photo]').forEach(input => input.addEventListener('change', async () => {
+    if (!canEdit() || draft.checkedOutReceipt) return;
     const file = input.files?.[0];
     if (!file) return;
     busy = true;
@@ -277,7 +318,7 @@ function bind(draft) {
     try {
       const ref = await storePhoto(file);
       draft.faults[Number(input.dataset.faultPhoto)].photos = [ref];
-      updateDraft(draft);
+      if (!updateDraft(draft)) throw new Error('The photo is stored, but its draft reference could not be saved. Keep this page open and download a recovery copy.');
       setNotice('Photo saved in this browser. It is not in Notion until checkout is server-confirmed.');
     } catch (error) {
       setNotice(error.message, true);
@@ -287,12 +328,14 @@ function bind(draft) {
     }
   }));
   app.querySelectorAll('[data-remove-photo]').forEach(button => button.addEventListener('click', () => {
+    if (!canEdit() || draft.checkedOutReceipt) return;
     draft.faults[Number(button.dataset.removePhoto)].photos = [];
     updateDraft(draft);
     setNotice('Photo removed from this draft. The local blob is retained for recovery.');
     render();
   }));
   document.getElementById('addFault')?.addEventListener('click', () => {
+    if (!canEdit() || draft.checkedOutReceipt || draft.faults.length >= 6) return;
     draft.faults.push({ id: crypto.randomUUID(), severity: 'Degraded', description: '', photos: [] });
     updateDraft(draft);
     view.stage = 'faults';
@@ -305,6 +348,8 @@ function bind(draft) {
   document.getElementById('disconnect')?.addEventListener('click', disconnect);
   document.getElementById('override')?.addEventListener('click', () => submitOverride(draft));
   document.getElementById('changeLocalOwner')?.addEventListener('click', changeLocalOwner);
+  document.getElementById('downloadRecovery')?.addEventListener('click', downloadRecovery);
+  document.getElementById('retryEditing')?.addEventListener('click', () => acquireEditing());
 }
 
 async function paintPhotos(draft) {
@@ -340,7 +385,8 @@ async function api(path, options = {}) {
   if (!response.ok) {
     const error = new Error(body.error || 'The server rejected the submission.');
     error.status = response.status;
-    error.uncertain = response.status === 409 || response.status === 429 || response.status >= 500;
+    error.submissionNotStarted = body.submissionState === 'not_started';
+    error.uncertain = !error.submissionNotStarted && (response.status === 409 || response.status === 429 || response.status >= 500);
     throw error;
   }
   return body;
@@ -350,66 +396,63 @@ function uncertainSubmission(error) {
   return error.uncertain || error.name === 'TimeoutError' || error.name === 'AbortError' || error instanceof TypeError;
 }
 
-async function submitCheckIn(draft) {
-  try {
-    if (SETUP_TEST_ONLY && !draft.setupTest) throw new Error('Only SETUP TEST records can be submitted from this test build.');
-    const payload = checkInPayload(draft);
-    if (!navigator.onLine || !credential || !API_BASE) {
-      if (!confirm('Save this check-in as pending on this device? It will not be described as complete.')) return;
-      draft.pendingAction = 'check-in';
-      updateDraft(draft);
-      setNotice('Check-in is pending locally. Sign in while online, then tap Retry pending check-in.');
-      render();
-      return;
-    }
-    if (!confirm(`Submit check-in for ${draft.operatorName} at ${positionFor(store.registry, draft.positionKey).displayName}?\n\nThis creates one Crew Call in Notion. No email is sent.`)) return;
-    busy = true; setNotice('Submitting check-in. Keep this tab open.'); render();
-    const result = await api('/api/camera/check-in', { method: 'POST', body: JSON.stringify(payload) });
-    draft.checkedInReceipt = result;
-    view.stage = 'build';
-    view.page = activePages.build.length;
-    draft.pendingAction = '';
-    updateDraft(draft);
-    setNotice('Check-in confirmed by the server and read back from Notion.');
-  } catch (error) {
-    draft.pendingAction = uncertainSubmission(error) ? 'check-in' : '';
-    updateDraft(draft);
-    setNotice(uncertainSubmission(error) ?
-      'Check-in outcome is uncertain. Keep this draft and inspect Notion before retrying the same submission.' : error.message, true);
-  } finally {
-    busy = false;
-    render();
-  }
-}
+async function submitCheckIn(draft) { return submitCamera(draft, 'check-in'); }
+async function submitCheckout(draft) { return submitCamera(draft, 'check-out'); }
 
-async function submitCheckout(draft) {
+async function submitCamera(draft, action) {
+  if (busy || !editingGranted || storageHeld || draft.ownerKey !== ownerKey) return;
+  if ((action === 'check-in' && draft.checkedInReceipt) || (action === 'check-out' && draft.checkedOutReceipt)) return;
+  const offline = !navigator.onLine || !credential || !API_BASE;
+  const label = action === 'check-in' ? 'Check-in' : 'Checkout';
+  const priorAttempt = submissionMayHaveReachedServer(draft);
+  let requestStarted = false;
   try {
     if (SETUP_TEST_ONLY && !draft.setupTest) throw new Error('Only SETUP TEST records can be submitted from this test build.');
-    const faults = [];
-    for (const fault of draft.faults) faults.push({ ...fault, photos: await loadPhotoFiles(fault.photos || []) });
-    const payload = checkoutPayload(draft, faults);
-    if (!navigator.onLine || !credential || !API_BASE) {
-      if (!confirm('Save this checkout as pending on this device? The Crew Call will remain open in Notion.')) return;
-      draft.pendingAction = 'check-out';
-      updateDraft(draft);
-      setNotice('Checkout is pending locally. The server record remains open until you retry explicitly.');
-      render();
+    const prompt = offline ? `Save this ${label.toLowerCase()} as pending on this device? It will require an explicit retry after signing in online.` :
+      action === 'check-in' ? `Submit check-in for ${draft.operatorName} at ${positionFor(store.registry, draft.positionKey).displayName}?\n\nThis creates one Crew Call in Notion. No email is sent.` :
+      `Submit checkout with ${draft.faults.length} fault record(s)?\n\nNot checked stays explicit. Faults remain open until separately resolved. No email is sent.`;
+    if (!confirm(prompt)) return;
+    busy = true;
+    const payload = prepareSubmission(draft, action);
+    if (SETUP_TEST_ONLY && !payload.setupTest) throw new Error('This saved submission is not a SETUP TEST. Keep its recovery copy and ask the lead to reconcile it before using this commissioning build.');
+    if (!updateDraft(draft)) throw new Error('The recovery snapshot could not be saved. Nothing was submitted. Keep this tab open and download saved drafts from Setup.');
+    if (offline) {
+      setNotice(`${label} recovery snapshot is saved on this device. Sign in online, then retry explicitly. Evidence stays locked until confirmed.`);
       return;
     }
-    if (!confirm(`Submit checkout with ${faults.length} fault record(s)?\n\nStow states marked Not checked remain visible. Faults stay open until separately resolved. No email is sent.`)) return;
-    busy = true; setNotice('Submitting checkout and fault evidence. Keep this tab open.'); render();
-    const result = await api('/api/camera/check-out', { method: 'POST', body: JSON.stringify(payload) });
-    draft.checkedOutReceipt = result;
-    view.stage = 'stow';
-    view.page = activePages.stow.length;
+    setNotice(`Submitting ${label.toLowerCase()} using its saved recovery snapshot. Keep this tab open.`);
+    render();
+    if (action === 'check-out') {
+      for (const fault of payload.faults) fault.photos = await loadPhotoFiles(fault.photos || []);
+    }
+    // Persist the possibility of a server write before sending, including when
+    // retrying an offline draft. Reload cannot erase an uncertain earlier attempt.
+    draft.pendingSubmission.networkAttempted = true;
+    if (!updateDraft(draft)) throw new Error('The submission attempt could not be saved. Nothing was submitted. Keep this tab open and download saved drafts from Setup.');
+    requestStarted = true;
+    const result = await api(`/api/camera/${action}`, { method: 'POST', body: JSON.stringify(payload) });
+    if (!/^[a-f0-9]{64}$/.test(result.sessionId || '') || !/^[a-f0-9-]{36}$/.test(result.pageId || '') ||
+      !(action === 'check-in' ? result.state === 'active' : ['done', 'waiting', 'blocked'].includes(result.state)) ||
+      (action === 'check-out' && result.sessionId !== payload.sessionId)) throw new TypeError('The server receipt could not be verified.');
+    draft[action === 'check-in' ? 'checkedInReceipt' : 'checkedOutReceipt'] = result;
     draft.pendingAction = '';
-    updateDraft(draft);
-    setNotice('Checkout confirmed by the server and read back from Notion.');
+    delete draft.pendingSubmission;
+    const saved = updateDraft(draft);
+    view.stage = action === 'check-in' ? 'build' : 'stow';
+    view.page = activePages[view.stage].length;
+    setNotice(`${label} confirmed by the server and read back from Notion.${saved ? '' : ' The receipt could not be saved locally. Download a recovery copy before closing this tab.'}`, !saved);
   } catch (error) {
-    draft.pendingAction = uncertainSubmission(error) ? 'check-out' : '';
-    updateDraft(draft);
-    setNotice(uncertainSubmission(error) ?
-      'Checkout outcome is uncertain. Keep the evidence and inspect the Crew Call and Faults before retrying.' : error.message, true);
+    const canEdit = !priorAttempt && (!requestStarted || error.submissionNotStarted === true);
+    if (canEdit && draft.pendingSubmission?.action === action) {
+      draft.pendingAction = '';
+      delete draft.pendingSubmission;
+      updateDraft(draft);
+    }
+    const unconfirmed = !canEdit && draft.pendingAction && (requestStarted || priorAttempt);
+    setNotice(canEdit && error.submissionNotStarted ?
+      `${error.message} The server did not start this submission. Review the draft, correct it and submit again.` :
+      unconfirmed ?
+        `${label} outcome is uncertain. The original evidence stays locked. Retry this saved submission explicitly to reconcile it; do not start a replacement record. Latest response: ${error.message}` : error.message, true);
   } finally {
     busy = false;
     render();
@@ -417,6 +460,7 @@ async function submitCheckout(draft) {
 }
 
 function startHandoff(draft) {
+  if (busy || !editingGranted || storageHeld || draft.pendingAction || !draft.checkedInReceipt) return;
   if (!confirm('Start a new operator record for this position? The previous Crew Call will stay intact and open until its checkout is submitted.')) return;
   const next = createDraft(draft.positionKey, ownerKey);
   next.eventId = draft.eventId;
@@ -434,6 +478,7 @@ function startHandoff(draft) {
 }
 
 async function submitOverride(draft) {
+  if (busy || !editingGranted || storageHeld || draft.pendingAction) return;
   const correction = draft.leadCorrection;
   const reason = correction?.reason.trim();
   if (!reason) { setNotice('Enter the reason for the lead correction.', true); render(); return; }
@@ -442,7 +487,7 @@ async function submitOverride(draft) {
   }
   if (!confirm('Apply these assignment values as an attributed lead correction?')) return;
   correction.pending = true;
-  updateDraft(draft);
+  if (!updateDraft(draft)) { setNotice('The lead correction recovery copy could not be saved. Nothing was submitted.', true); render(); return; }
   busy = true; setNotice('Applying the lead correction.'); render();
   try {
     await api('/api/camera/override', { method: 'POST', body: JSON.stringify({
@@ -477,9 +522,12 @@ function disconnect(repaint = true) {
 }
 
 function changeLocalOwner() {
+  if (busy || !editingGranted || storageHeld || currentDraft().pendingAction) return;
   if (!confirm('Switch local operator profile? Existing local drafts remain stored but will be hidden from the new profile.')) return;
-  localOwner = crypto.randomUUID();
-  try { localStorage.setItem(OWNER_KEY, localOwner); } catch { storageOk = false; }
+  const nextOwner = crypto.randomUUID();
+  try { localStorage.setItem(OWNER_KEY, nextOwner); }
+  catch { storageFailure('The new operator profile could not be saved. Your current profile and drafts remain active.'); return; }
+  localOwner = nextOwner;
   disconnect(false);
   ownerKey = `local:${localOwner}`;
   store.activeDraftId = '';
@@ -493,6 +541,10 @@ async function accountOwnerKey(subject) {
 }
 
 async function handleCredential(result) {
+  if (busy || !editingGranted || storageHeld) return;
+  busy = true;
+  setNotice('Checking the signed-in account. Draft edits will resume when the connection is verified.');
+  render();
   try {
     const claims = JSON.parse(atob(result.credential.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
     if (!claims.sub || !claims.email || !Number.isFinite(claims.exp) || claims.exp * 1000 <= Date.now() + 60000) throw new Error('Google sign-in is incomplete or expired.');
@@ -505,15 +557,24 @@ async function handleCredential(result) {
     const { draft, resumed } = resumeAccountDraft(store, accountOwner, priorOwner, routePosition());
     identity = { email: claims.email, roles: context.roles || [] };
     store.events = context.events || [];
-    if (context.registry?.schema === 'FMP_CAMERA_POSITION_REGISTRY_V1') store.registry = context.registry;
+    store.registry = safeCameraRegistry(context.registry);
     if (draft) updateDraft(draft); else saveStore();
     clearTimeout(credentialTimer);
-    credentialTimer = setTimeout(() => { disconnect(false); setNotice('Google sign-in expired. Sign in again before submitting.'); render(); }, credentialExpires - Date.now());
+    credentialTimer = setTimeout(() => {
+      credential = null;
+      credentialExpires = 0;
+      identity = null;
+      // An expiring token must not switch the draft underneath an in-flight
+      // submission. Explicit sign-out still hides account-bound local drafts.
+      setNotice('Google sign-in expired. This draft is preserved. Sign in again before submitting.');
+      render();
+    }, credentialExpires - Date.now());
     setNotice(resumed ? 'Resumed your saved account draft. Any separate local draft is preserved. Nothing was submitted.' : 'Connected to the FMP backend. No data is submitted until you confirm an action.');
   } catch (error) {
     disconnect(false);
     setNotice(error.message, true);
   }
+  busy = false;
   render();
 }
 
@@ -529,13 +590,14 @@ function loadGoogle() {
     document.head.appendChild(script);
     setTimeout(() => reject(new Error('Google sign-in timed out.')), 15000);
   });
+  googlePromise = googlePromise.catch(error => { googlePromise = null; throw error; });
   return googlePromise;
 }
 
 async function mountGoogle() {
   const target = document.getElementById('cameraGoogle');
-  if (!target || identity || !API_BASE || !navigator.onLine) {
-    if (target && !identity) target.innerHTML = '<span class="tiny">Google sign-in becomes available after the secure backend is deployed and this device is online.</span>';
+  if (!target || identity || !API_BASE || !navigator.onLine || !editingGranted || storageHeld) {
+    if (target && !identity) target.textContent = !editingGranted || storageHeld ? 'This tab is read-only. Open Status for editing and recovery options.' : 'Google sign-in needs the secure backend and an online connection.';
     return;
   }
   try {
@@ -554,10 +616,72 @@ window.addEventListener('pagehide', () => {
   credential = null;
   identity = null;
   clearTimeout(credentialTimer);
+  editingGranted = false;
+  releaseEditing?.();
+  releaseEditing = null;
   photoUrls.splice(0).forEach(url => URL.revokeObjectURL(url));
 });
 window.addEventListener('beforeunload', event => {
-  if (busy) { event.preventDefault(); event.returnValue = ''; }
+  if (busy || !storageOk) { event.preventDefault(); event.returnValue = ''; }
 });
 
-render();
+// One editor owns the whole legacy store. Other tabs can read references but
+// cannot overwrite camera evidence. Unsupported browsers fail closed for edits.
+async function acquireEditing() {
+  if (editingGranted) return;
+  if (!navigator.locks?.request) {
+    storageMessage ||= 'This browser cannot safely coordinate saved camera drafts. Use a current browser with Web Locks support to edit; references remain available.';
+    storageOk = false;
+    view.stage = 'status'; view.page = 0;
+    render();
+    return;
+  }
+  try {
+    await navigator.locks.request(STORAGE_KEY, { ifAvailable: true }, async lock => {
+      if (!lock) {
+        storageMessage = 'Camera drafts are open for editing in another tab. Close that camera tab, then choose Try editing here. References remain available.';
+        storageOk = false;
+        view.stage = 'status'; view.page = 0;
+        render();
+        return;
+      }
+      editingGranted = true;
+      if (!storageHeld) {
+        Object.assign(store, loadStore());
+        if (!storageHeld) { storageOk = true; storageMessage = ''; view.stage = 'setup'; view.page = 0; }
+      }
+      if (storageHeld) { view.stage = 'status'; view.page = 0; }
+      render();
+      await new Promise(resolve => { releaseEditing = resolve; });
+    });
+  } catch {
+    editingGranted = false;
+    storageMessage = 'The browser could not secure the camera editing lock. Reload before editing; saved data has not been replaced.';
+    storageOk = false;
+    render();
+  }
+}
+
+function downloadRecovery() {
+  const saved = storedValue;
+  const blob = new Blob([JSON.stringify({ schema: 'FMP_CAMERA_RECOVERY_V1', capturedAt: new Date().toISOString(), savedStorage: saved, currentDrafts: store }, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `fmp-camera-recovery-${new Date().toISOString().slice(0, 10)}.json`;
+  link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  setNotice('Recovery copy downloaded. It contains operator details and photo references; photo blobs remain in this browser. Keep it private and ask the lead to reconcile pending records.');
+  render();
+}
+
+window.addEventListener('storage', event => {
+  if (editingGranted && event.key === STORAGE_KEY && event.newValue !== storedValue) {
+    storageHeld = true;
+    storageFailure('Another tab changed saved camera data. Editing is paused. Download this tab’s recovery copy before reloading.');
+  }
+});
+window.addEventListener('pageshow', event => {
+  if (event.persisted) location.reload();
+});
+acquireEditing();
