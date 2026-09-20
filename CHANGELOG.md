@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-20 — Shared offline version compatibility
+
+- Align Throwline Stage 3D with the current AV offline cache version so its
+  readiness check recognizes the repaired worker.
+- Check AV and Throwline offline contracts in pull-request cutover acceptance,
+  including changes to their registration pages, before publication can begin.
+
 ## 2026-09-20 — Offline control after a domain return
 
 - Recover an AV destination page that finishes navigating after the offline
