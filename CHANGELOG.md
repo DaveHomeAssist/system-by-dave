@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-09-20 — FMP camera bodies stated as URSA Broadcast G2
+
+- The house camera body model was settled on 2026-09-18: all three bodies are
+  Blackmagic URSA Broadcast G2. `fmp/gear/` still presented that as an open
+  question. The Body tab lede and Identity facts now state the model plainly,
+  the recorded-alternative row is gone, and the Chain and Checks tabs no longer
+  list a side-plate model read. Serial numbers remain listed as unread.
+- `fmp/house/` issue 03 now reads as a dashboard source error rather than an
+  open identity question.
+- Exported from fmpwalk `50c7d95`. Provenance for `fmp/` and `fmpwalk/` is
+  pinned to that export; no other managed file changed.
+
 ## 2026-09-20 — FMP house tab panels stay flat
 
 - `css/av-theme.css` styles every `.panel` as a card. On the FMP house, gear,

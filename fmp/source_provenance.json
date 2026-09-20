@@ -1,7 +1,7 @@
 {
   "schema": "fmp.public.release.v2",
   "sourceRepository": "DaveHomeAssist/fmpwalk",
-  "sourceCommit": "580a862c0f010bceb2a730d7077909d3bd7cad93",
+  "sourceCommit": "50c7d95242c862884000a2c03ed9443e339b7a44",
   "mode": "commissioning",
   "files": {
     "build/index.html": "aad1f75ac7e82dc426a1c20770fbcab19c06404bb35d4520ddd03a8e7748c44f",
@@ -16,14 +16,14 @@
     "camera/pit-stage-left/index.html": "4a9565735cfe5b9c0f1ae6b47bb82470a201df238a1869cd02d83011ce704255",
     "chrome.css": "f747a2fc4c52ef95cae50bf47a80a656b62d09897da16eb082807757f0f18c5e",
     "chrome.js": "73b19e1c45f3de4c4885978e89118e311e6770a2f08a84b34ec2ac4ad7024f11",
-    "gear/index.html": "0c8dcd924c8378195d8e52e017ea55b651c45054829c3d8fc3c56099c9875054",
+    "gear/index.html": "fa087f16c22d2eae5178728c029b868e33306f186bb5363332cc396ae40f90a5",
     "guide/index.html": "597dc7f6d0d9d99e03cd055e0ef4580d95b21da858d582471a5cf15234244fe5",
     "house/display-estate.csv": "e8217a9d329cb67a8678d2475952628d27830442b341bfd699a8fd548643d4fa",
     "house/house-data.js": "b6ceac4caaf6ca7e8b15ac6eb982cb200c866639f74dbabd27fa98e51e9dab19",
     "house/house-tokens.css": "2a09b50d41cb919ec6557fb20243374977395ec0b5acc36080f1d3556cec06e0",
     "house/house.css": "f429823db69552aeacd7942e92bd8b34fb34d06ac31842b4820544e1bf5ee9ad",
     "house/house.js": "6ed856fa8aafddfabdb3af07d9bca1ab2cadfb72f143df67cbd671d7247d91a6",
-    "house/index.html": "01b50ffc8935955a618b595079200d0b0d430701368452931fcc43675f191242",
+    "house/index.html": "383ead8d8348d554537988c4f48dabc48068c6dd3f56ba1be9b76759233e3c52",
     "house/site-plan.png": "655d27449a2f686ad17b74bed39b11edc69af9d342d46d079b98c042e4876f2e",
     "index.html": "dad1aa2f22dff32e4413c0eaa9a81efd458d9076fb8809b297fd73a07479fd67",
     "mail.js": "4a521185a33c8463a3b34493771e381d7982bb59f0f8d9b5096d074727e32a91",
@@ -59,5 +59,5 @@
     "rig/vendor/three/three.module.js": "a476b88d0df406dca0e30c65b4cdf0180c7337110accec828c103655b56a361c",
     "theme.js": "34276e275d44d4380407b996455291bfcca9cc4a9a4ef81b632534b00fc1747a"
   },
-  "artifactSha256": "26110d9612525bbd3809c6b6c68f06896f7b3611869ad7b77914e9ef822acd23"
+  "artifactSha256": "a88bcd5b29ecc166339a14c8aef05b44091ab119e1916c83db9e8b0ac2d65554"
 }
