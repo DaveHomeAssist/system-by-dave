@@ -30,7 +30,7 @@ Links that now cross between the two origins are absolute, in both directions. T
 walk's camera launch and its legacy `?camera=N` and `?position=` redirect name
 `https://housevideo.app/fmp/camera/`; the hub, camera reference list, house board
 and bowl camera guide name `https://walk.housevideo.app/fmpwalk/`. Those live in
-the managed export, so `DaveHomeAssist/fmpwalk` owns them: `PUBLIC_CAMERA_ROOT` and
+the managed export, so `DaveHomeAssist/fmp-suite` owns them: `PUBLIC_CAMERA_ROOT` and
 `PUBLIC_WALK_ROOT` in its exporter, which fails the export if a same-origin walk
 link survives.
 

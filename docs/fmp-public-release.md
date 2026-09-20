@@ -48,7 +48,7 @@ the address.
 
 ## Managed source
 
-Canonical app: `DaveHomeAssist/fmpwalk`. Do not hand-edit generated `fmp/` or
+Canonical app: `DaveHomeAssist/fmp-suite`. Do not hand-edit generated `fmp/` or
 `fmpwalk/` files. From a clean, committed canonical checkout run:
 
 ```sh

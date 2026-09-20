@@ -58,7 +58,7 @@ const ALLOWED_EMAILS = ['avbydave@gmail.com'];
 const NOTION_URL = /https?:\/\/(?:[\w-]+\.)*notion\.(?:so|site|com)\b/gi;
 const NOTION_RECEIPT = 'fmpwalk/notion.js';
 const HAND_MAINTAINED = ['/fmp-index/', '/fmp-walk/', '/switcher/', '/shader/', '/backfocus/'];
-const CANONICAL_REPO = 'DaveHomeAssist/fmpwalk';
+const CANONICAL_REPO = 'DaveHomeAssist/fmp-suite';
 
 const findings = [];
 const record = (id, lane, status, title, detail = '') => findings.push({ id, lane, status, title, detail });

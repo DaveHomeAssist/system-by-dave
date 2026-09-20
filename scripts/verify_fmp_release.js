@@ -63,7 +63,7 @@ for (const release of releases) {
   const root = path.join(site, release.directory);
   const provenance = JSON.parse(fs.readFileSync(path.join(root, 'source_provenance.json')));
   assert.equal(provenance.schema, 'fmp.public.release.v2');
-  assert.equal(provenance.sourceRepository, 'DaveHomeAssist/fmpwalk');
+  assert.equal(provenance.sourceRepository, 'DaveHomeAssist/fmp-suite');
   assert.match(provenance.sourceCommit, /^[0-9a-f]{40}$/);
   assert.equal(provenance.mode, release.mode);
   assert.deepEqual(walk(root).sort(), [...release.expected, 'source_provenance.json'].sort());

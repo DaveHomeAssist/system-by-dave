@@ -1,5 +1,21 @@
 # Changelog
 
+## 2026-09-20 — Canonical FMP source named for the suite
+
+- `DaveHomeAssist/fmpwalk` is the canonical source for the whole FMP video
+  operations suite — the hub, four camera positions, house, guide, gear, build,
+  ptz, rig and the preshow walk — but it was named after one of those eight.
+  It is now `DaveHomeAssist/fmp-suite`, and the provenance both managed releases
+  carry records that name.
+- `npm run verify:fmp`, the hygiene probe's canonical-source constant and the
+  public-navigation shell notes follow the new name. Renaming on GitHub leaves a
+  permanent redirect, so existing clones, remotes and pull request links keep
+  working; historical pull request URLs in `docs/` and `reports/` keep their old
+  paths as dated records.
+- The released bytes are unchanged: both artifact digests match the previous
+  export, and two fresh exports reproduce the tree exactly. Only the provenance
+  `sourceRepository` and `sourceCommit` differ.
+
 ## 2026-09-20 — Preshow walk on its own origin
 
 - Prepare the preshow venue walk move from `housevideo.app/fmpwalk/` to
