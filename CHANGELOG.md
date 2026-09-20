@@ -1,5 +1,33 @@
 # Changelog
 
+## 2026-09-20 — ATEM HD8 ISO interactive guide
+
+- Published the ATEM Television Studio HD8 ISO interactive guide, revision
+  `1.0.1`, at `switcher/guide/` alongside the existing model field reference at
+  `switcher/`. The reference keeps its sourced vendor claims and now links the
+  guide; the guide is a self-contained study model of 227 catalogued components
+  with local switching practice.
+- The published revision carries correction `tbar-tally-2026-09-20`: a single
+  `tally(state)` rule now drives the 3D lamps, the training display and the
+  diagram indicators, so Preview reads red for the whole of a MIX instead of
+  staying green mid-transition. Program and Preview can no longer disagree
+  between surfaces because each one derived its own colour.
+- Public shell: absolute System by Dave home link for housevideo.app, AV Toolbox
+  and ATEM HD8 ISO parents, `aria-current` on the current page, and a
+  first-focus skip link to the `#atem-explorer` workspace. Indexed at
+  `https://housevideo.app/switcher/guide/`. `scripts/domain-sites.json` already
+  owned `switcher/` as a directory entry, so the new route publishes with no
+  site-list change.
+- The page's Content Security Policy allows inline script and style and `data:`
+  images because the artifact is self-contained. It loads no external script,
+  style or image origin; only `css/sbd-public-nav.css` is shared with the site.
+- Known gap carried from the artifact: a wrong action still restarts the
+  practice from step one. Revision `1.0.1` counts incorrect actions, explains
+  each one, and no longer treats moving the transition lever as a mistake, but
+  it does not yet recover in place.
+- Rendered device, keyboard and reduced-motion verification on the deployed page
+  remains outstanding; source checks cannot establish it.
+
 ## 2026-09-20 — Interactive equipment guide skills
 
 - Added six agent skills under `.claude/skills/` covering one workflow for
