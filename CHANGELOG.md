@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-09-20 — FMP house tab panels stay flat
+
+- `css/av-theme.css` styles every `.panel` as a card. On the FMP house, gear,
+  build and PTZ pages a `.panel` is a full-width tab section with no side
+  padding, so headings and ledes sat flush against a white edge and the sheets
+  read white-on-white. `fmp/house/house-tokens.css` now clears the background
+  and shadow for `main > .panel` (fmpwalk `580a862`). Provenance for `fmp/` and
+  `fmpwalk/` is pinned to that export; no other managed file changed.
+
 ## 2026-09-20 — ATEM HD8 ISO interactive guide
 
 - Published the ATEM Television Studio HD8 ISO interactive guide, revision

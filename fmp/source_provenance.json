@@ -1,7 +1,7 @@
 {
   "schema": "fmp.public.release.v2",
   "sourceRepository": "DaveHomeAssist/fmpwalk",
-  "sourceCommit": "087a1640ce6a5fcf392761b8851a9514c1e9f86b",
+  "sourceCommit": "580a862c0f010bceb2a730d7077909d3bd7cad93",
   "mode": "commissioning",
   "files": {
     "build/index.html": "aad1f75ac7e82dc426a1c20770fbcab19c06404bb35d4520ddd03a8e7748c44f",
@@ -20,7 +20,7 @@
     "guide/index.html": "597dc7f6d0d9d99e03cd055e0ef4580d95b21da858d582471a5cf15234244fe5",
     "house/display-estate.csv": "e8217a9d329cb67a8678d2475952628d27830442b341bfd699a8fd548643d4fa",
     "house/house-data.js": "b6ceac4caaf6ca7e8b15ac6eb982cb200c866639f74dbabd27fa98e51e9dab19",
-    "house/house-tokens.css": "6f111e30c253f7fdb0f9b00ad168dc415822c2957d4435f6b24a44f17440cd68",
+    "house/house-tokens.css": "2a09b50d41cb919ec6557fb20243374977395ec0b5acc36080f1d3556cec06e0",
     "house/house.css": "f429823db69552aeacd7942e92bd8b34fb34d06ac31842b4820544e1bf5ee9ad",
     "house/house.js": "6ed856fa8aafddfabdb3af07d9bca1ab2cadfb72f143df67cbd671d7247d91a6",
     "house/index.html": "01b50ffc8935955a618b595079200d0b0d430701368452931fcc43675f191242",
@@ -59,5 +59,5 @@
     "rig/vendor/three/three.module.js": "a476b88d0df406dca0e30c65b4cdf0180c7337110accec828c103655b56a361c",
     "theme.js": "34276e275d44d4380407b996455291bfcca9cc4a9a4ef81b632534b00fc1747a"
   },
-  "artifactSha256": "20cd2908ddc6394442d8585896964d8e99e99eb2192dcd706e9bdeddd81fd5f2"
+  "artifactSha256": "26110d9612525bbd3809c6b6c68f06896f7b3611869ad7b77914e9ef822acd23"
 }
