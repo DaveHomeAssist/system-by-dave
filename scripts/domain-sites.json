@@ -11,7 +11,7 @@
       "deployKeySecret": "HOUSEVIDEO_DEPLOY_KEY",
       "cutover": true,
       "home": "/fmp/",
-      "pages": ["fmp/", "fmpwalk/", "fmp-index/", "fmp-walk/", "switcher/", "shader/", "backfocus/"],
+      "pages": ["fmp/", "fmpwalk/", "fmp-index/", "fmp-walk/", "switcher/", "shader/", "ursa-broadcast-g2/", "backfocus/"],
       "assets": [],
       "robotsDisallow": ["/404.html", "/transfer.html", "/fmp-index/", "/fmp/", "/fmp-walk/", "/fmpwalk/"],
       "storage": {

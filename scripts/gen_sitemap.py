@@ -38,6 +38,7 @@ STATIC_PAGES = [
     ("switcher/", "monthly", "0.7"),
     ("switcher/guide/", "monthly", "0.6"),
     ("shader/", "monthly", "0.7"),
+    ("ursa-broadcast-g2/", "monthly", "0.7"),
     ("pixelforge/", "weekly", "0.8"),
     ("ProjectorThrow/", "weekly", "0.8"),
     ("ProjectorThrow/Stage3D.html", "weekly", "0.6"),
