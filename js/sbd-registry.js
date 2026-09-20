@@ -220,7 +220,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool change — rolls the service-worker cache. */
-    version:'v20260919-cutover-recovery',
+    version:'v20260920-worker-control',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,

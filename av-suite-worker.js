@@ -56,6 +56,12 @@ self.addEventListener('activate',function(event){
 
 self.addEventListener('message',function(event){
   if(event.data&&event.data.type==='SKIP_WAITING') self.skipWaiting();
+  if(event.data&&event.data.type==='SBD_CLAIM_CLIENTS'&&event.origin===self.location.origin
+    &&event.source&&event.source.type==='window'&&event.source.url.indexOf(self.registration.scope)===0){
+    // A navigation that was not execution-ready during activation was skipped
+    // by clients.claim(). The loaded page can now safely request control.
+    event.waitUntil(self.clients.claim());
+  }
   if(event.data&&event.data.type==='SBD_OFFLINE_VERSION'&&event.ports&&event.ports[0]){
     event.ports[0].postMessage({version:self.SBD_REGISTRY.version,cache:CACHE_NAME});
   }

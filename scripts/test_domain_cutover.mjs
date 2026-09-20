@@ -18,6 +18,7 @@ if (captureDir) fs.mkdirSync(captureDir, { recursive: true });
 const temporary = fs.mkdtempSync(path.join(os.tmpdir(), 'sbd-cutover-'));
 const servers = [];
 const results = [];
+const responseHooks = new Map();
 const mime = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png', '.webp': 'image/webp', '.jpg': 'image/jpeg', '.wasm': 'application/wasm' };
 
 async function serve(directory) {
@@ -30,8 +31,11 @@ async function serve(directory) {
       file = path.join(file, 'index.html');
     }
     if (!fs.existsSync(file)) { response.writeHead(404).end('Not found'); return; }
-    response.writeHead(200, { 'Content-Type': mime[path.extname(file)] || 'application/octet-stream', 'Cache-Control': 'no-store' });
-    fs.createReadStream(file).pipe(response);
+    const send = () => {
+      response.writeHead(200, { 'Content-Type': mime[path.extname(file)] || 'application/octet-stream', 'Cache-Control': 'no-store' });
+      fs.createReadStream(file).pipe(response);
+    };
+    if (!responseHooks.get(directory)?.({ request, pathname, send })) send();
   });
   await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
   servers.push(server);
@@ -321,7 +325,22 @@ try {
       localStorage.setItem('sbd.showboard.retirement-acceptance', 'keep draft');
       await navigator.serviceWorker.register('/av-suite-worker.js', { scope: '/' });
     });
-    await page.waitForFunction(async () => !(await caches.keys()).some(name => name.startsWith('sbd-av-suite-')) && !(await navigator.serviceWorker.getRegistrations()).length);
+    // waitForFunction polls synchronous values; an async predicate's Promise
+    // is truthy even before retirement has completed.
+    await page.evaluate(async () => {
+      let stopped = false, timer;
+      try {
+        await Promise.race([
+          (async () => {
+            while (!stopped) {
+              if (!(await caches.keys()).some(name => name.startsWith('sbd-av-suite-')) && !(await navigator.serviceWorker.getRegistrations()).length) return;
+              await new Promise(resolve => setTimeout(resolve, 100));
+            }
+          })(),
+          new Promise((_, reject) => { timer = setTimeout(() => reject(new Error('Source worker did not retire its caches and registration within 7000ms')), 7000); })
+        ]);
+      } finally { stopped = true; clearTimeout(timer); }
+    });
     assert.ok(await page.evaluate(async () => (await caches.keys()).includes('unrelated-acceptance-cache')));
     assert.equal(await page.evaluate(() => localStorage.getItem('sbd.showboard.retirement-acceptance')), 'keep draft');
   });
@@ -366,6 +385,66 @@ try {
       assert.ok((await page.locator('body').innerText()).trim().length > 20, route);
     }
     return { assets: manifest.expected.length, offlinePages: pages.length };
+  });
+
+  if (!live) await test('AV claims a destination navigation missed during activation', async (page, context) => {
+    const site = sites[1];
+    const directory = path.join(temporary, site.id);
+    const observer = await context.newPage();
+    let holdReturn = false, releaseCache, releaseNavigation;
+    function heldResponse() {
+      let capture;
+      const response = new Promise(resolve => { capture = resolve; });
+      return { capture, async wait() {
+        let timer;
+        try {
+          return await Promise.race([response, new Promise((_, reject) => {
+            timer = setTimeout(() => reject(new Error('Expected lifecycle response was not requested')), 7000);
+          })]);
+        } finally { clearTimeout(timer); }
+      } };
+    }
+    const precache = heldResponse(), navigation = heldResponse();
+    responseHooks.set(directory, ({ request, pathname, send }) => {
+      if (pathname === '/plotforge.html' && request.headers['sec-fetch-mode'] !== 'navigate') {
+        releaseCache = send; precache.capture(send); return true;
+      }
+      if (pathname === site.route && holdReturn) { releaseNavigation = send; navigation.capture(send); return true; }
+      return false;
+    });
+    try {
+      await page.addInitScript(() => { window.acceptanceInitiallyControlled = Boolean(navigator.serviceWorker.controller); });
+      await page.goto(site.origin + site.route);
+      await precache.wait();
+      await page.evaluate(key => localStorage.setItem(key, 'keep during activation'), site.key);
+      await observer.goto(site.origin + '/transfer.html');
+      await page.goto(source + '/index.html');
+      holdReturn = true;
+      const returning = page.goto(source + site.route).then(() => page.waitForURL(site.origin + site.route));
+      returning.catch(() => {});
+      await navigation.wait();
+      // Commit the navigation only after activation's claim has already run.
+      // The W3C claim algorithm skips clients that are not execution-ready.
+      await observer.evaluate(async () => {
+        const registration = await navigator.serviceWorker.getRegistration();
+        window.acceptanceWorker = registration.installing || registration.waiting || registration.active;
+      });
+      releaseCache(); releaseCache = null;
+      await observer.waitForFunction(() => window.acceptanceWorker.state === 'activated', null, { timeout: 30000, polling: 100 });
+      releaseNavigation(); releaseNavigation = null;
+      await returning;
+      assert.equal(await page.evaluate(() => window.acceptanceInitiallyControlled), false, 'The regression must actually start without a controller');
+      await page.waitForFunction(() => navigator.serviceWorker.controller, null, { timeout: 30000, polling: 100 });
+      await page.locator('#offlineSummary .offline-pill').filter({ hasText: 'Worker' }).getByText('Ready', { exact: true }).waitFor({ state: 'attached' });
+      await context.setOffline(true);
+      await page.reload();
+      assert.equal(await page.evaluate(key => localStorage.getItem(key), site.key), 'keep during activation');
+      assert.ok((await page.locator('body').innerText()).includes('AV SUITE'));
+    } finally {
+      responseHooks.delete(directory);
+      releaseCache?.(); releaseNavigation?.();
+      await observer.close();
+    }
   });
 
   await test('FMP published pages and intentional CSP', async page => {

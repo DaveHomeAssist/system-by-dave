@@ -89,6 +89,23 @@ When `cutover` is `true`:
 
 ### Saved browser data
 
+AV offline readiness requires both a complete cache and control of the current
+document. An active registration alone is insufficient: a navigation can begin
+before installation finishes and become execution-ready after activation's
+claim has already skipped it. The loaded AV page sends `SBD_CLAIM_CLIENTS` to its
+active worker and waits for `controllerchange` before reporting Worker Ready.
+The worker accepts this message only from a same-origin window client within its
+existing registration scope. It performs only the existing `clients.claim()`
+operation; the message cannot change cache contents, scope, routes or saved data.
+
+This follows the [Service Workers claim algorithm](https://w3c.github.io/ServiceWorker/#clients-claim),
+which skips clients that are not execution-ready, and the
+[ready property contract](https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerContainer/ready),
+which guarantees an active registration rather than a controlled document.
+The simulated cutover suite holds the destination response across activation to
+exercise this ordering deterministically, then checks actual offline reload.
+Existing live migration and offline cases continue to exercise deployed pages.
+
 Browsers keep saved data per origin, so tool data saved on a previous origin is
 not visible on the new domain. A stub checks for the site's keys and IndexedDB
 databases (`storage` in the config; AV by Dave also includes every registry

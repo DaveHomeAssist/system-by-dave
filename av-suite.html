@@ -1428,8 +1428,9 @@ function renderOfflineStatus(){
   ['cacheToolsBtn','refreshCacheBtn'].forEach(function(id){if($(id)) $(id).disabled=!offlineState.supported||offlineState.busy;});
   if($('clearCacheBtn')) $('clearCacheBtn').disabled=!offlineState.supported||offlineState.busy||offlineState.cached===0;
   var badge=$('cacheBadge');var label=$('cacheBadgeLabel');
-  if(badge){badge.setAttribute('data-ready',String(offlineState.cache==='Ready'));badge.setAttribute('data-online',String(offlineState.online));}
-  if(label) label.textContent=offlineState.online?(offlineState.cache==='Ready'?'Cached · Offline ready':(offlineState.cache==='Partial'?'Cache partial':(offlineState.supported?'Not cached':'Cache unavailable'))):'Offline';
+  var offlineReady=offlineState.cache==='Ready'&&Boolean(navigator.serviceWorker&&navigator.serviceWorker.controller);
+  if(badge){badge.setAttribute('data-ready',String(offlineReady));badge.setAttribute('data-online',String(offlineState.online));}
+  if(label) label.textContent=offlineState.online?(offlineReady?'Cached · Offline ready':(offlineState.cache==='Ready'?'Cached · Preparing offline':(offlineState.cache==='Partial'?'Cache partial':(offlineState.supported?'Not cached':'Cache unavailable')))):'Offline';
 }
 function setOfflineMessage(cache,message){offlineState.cache=cache;offlineState.message=message;renderOfflineStatus();}
 function refreshOfflineStatus(){
@@ -1442,11 +1443,23 @@ function refreshOfflineStatus(){
     offlineState.busy=false;renderOfflineStatus();return offlineState.cache==='Ready';
   }).catch(function(){offlineState.cache='Error';offlineState.message='Could not read the AV by Dave cache status.';offlineState.busy=false;renderOfflineStatus();return false;});
 }
+function waitForOfflineControl(registration){
+  if(navigator.serviceWorker.controller) return Promise.resolve();
+  // Activation can finish while this document is still navigating. ready only
+  // promises an active registration; ask it to claim this now-loaded client.
+  return new Promise(function(resolve,reject){
+    var timer=setTimeout(function(){finish(new Error('Offline worker did not take control.'));},30000);
+    function finish(error){clearTimeout(timer);navigator.serviceWorker.removeEventListener('controllerchange',controlled);if(error) reject(error);else resolve();}
+    function controlled(){if(navigator.serviceWorker.controller) finish();}
+    navigator.serviceWorker.addEventListener('controllerchange',controlled);
+    try {registration.active.postMessage({type:'SBD_CLAIM_CLIENTS'});controlled();} catch(error){finish(error);}
+  });
+}
 function registerOfflineWorker(){
   offlineState.supported=offlineAvailable();offlineState.online=navigator.onLine!==false;
   if(!offlineState.supported){renderOfflineStatus();return refreshOfflineStatus();}
   offlineState.worker='Registering';offlineState.message='Registering offline cache worker.';renderOfflineStatus();
-  return navigator.serviceWorker.register('av-suite-worker.js',{scope:'./'}).then(function(registration){if(registration.waiting) registration.waiting.postMessage({type:'SKIP_WAITING'});return navigator.serviceWorker.ready;}).then(function(){offlineState.worker='Ready';return refreshOfflineStatus();}).catch(function(){offlineState.worker='Unavailable';offlineState.cache='Unavailable';offlineState.message='Offline cache worker could not be registered.';offlineState.busy=false;renderOfflineStatus();return false;});
+  return navigator.serviceWorker.register('av-suite-worker.js',{scope:'./'}).then(function(registration){if(registration.waiting) registration.waiting.postMessage({type:'SKIP_WAITING'});return navigator.serviceWorker.ready;}).then(waitForOfflineControl).then(function(){offlineState.worker='Ready';return refreshOfflineStatus();}).catch(function(){offlineState.worker='Unavailable';offlineState.cache='Unavailable';offlineState.message='Offline cache worker could not take control. Reconnect and reload before relying on offline loading.';offlineState.busy=false;renderOfflineStatus();return false;});
 }
 function fetchAndCacheAsset(cache,asset){return fetch(asset,{cache:'reload'}).then(function(response){if(!response||!response.ok) throw new Error('cache failed');return cache.put(asset,response.clone());});}
 function cacheAvTools(refresh,button){
