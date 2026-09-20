@@ -458,6 +458,36 @@ function transferPage(site, origin) {
 `;
 }
 
+// A route this site used to serve that now lives on another site. Bookmarks and typed
+// addresses still resolve: the page is noindex, canonicalises to the new origin, and
+// carries a real link for visitors without JavaScript or meta refresh.
+function movedPage(target, name) {
+  const title = escapeHtml(`${name} has moved`);
+  return `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
+<title>${title}</title>
+<meta name="description" content="${escapeHtml(`${name} now lives at ${target}.`)}">
+<link rel="canonical" href="${escapeHtml(target)}">
+<meta name="robots" content="noindex,follow">
+<meta name="theme-color" content="#FFFFFF">
+<meta http-equiv="refresh" content="0; url=${escapeHtml(target)}">
+<style>:root{color-scheme:light dark}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;margin:0;display:grid;place-items:center;min-height:100vh;padding:24px;text-align:center}a{color:inherit}</style>
+</head>
+<body>
+<main>
+<h1>${title}</h1>
+<p><a href="${escapeHtml(target)}">Open ${escapeHtml(name)}</a></p>
+<p>Saved walk data stays in the browser it was entered on. Open the new address on that device to move it.</p>
+</main>
+</body>
+</html>
+`;
+}
+
 function stubPage(site, origin, file) {
   const route = routeFor(file);
   const target = `${origin}/${route}`;
@@ -548,6 +578,12 @@ function stageSite(site, closed, policy, options) {
   const origin = options.siteOrigins[site.id] || `https://${site.domain}`;
   const sourceOrigin = options.sourceOrigin || options.config.origin;
   writeFile(dir, 'index.html', homePage(site, origin));
+  for (const [route, targetId] of Object.entries(site.movedTo || {})) {
+    const moved = options.config.sites.find((entry) => entry.id === targetId);
+    if (!moved) throw new Error(`${site.id} movedTo names unknown site ${targetId}.`);
+    const movedOrigin = options.siteOrigins[moved.id] || `https://${moved.domain}`;
+    writeFile(dir, `${route}index.html`, movedPage(`${movedOrigin}/${route}`, moved.name));
+  }
   writeFile(dir, '404.html', notFoundPage(site));
   writeFile(dir, 'transfer.html', transferPage(site, origin));
   writeFile(dir, 'js/domain-transfer-config.js', `window.SBD_DOMAIN_TRANSFER=${JSON.stringify({

@@ -41,7 +41,7 @@ use the tooling selected for that surface.
 | `widgets.html` | Widget gallery |
 | `fmp-index/index.html` | Retired FMP working index: noindex redirect to the `/fmp/` hub, keeping query and hash |
 | `fmp/` | Managed FMP video operations hub, camera commissioning, bowl training, and rig reference; authenticated camera API remains SETUP TEST only; [release and sync contract](docs/fmp-public-release.md) |
-| `fmpwalk/` | Managed local-first preshow venue walk; explicit download, Gmail, and Notion actions; no silent writes |
+| `fmpwalk/` | Managed local-first preshow venue walk, published on its own origin (walk.housevideo.app); explicit download, Gmail, and Notion actions; no silent writes |
 | `afterbreak/index.html` | Pier 68 run of show: private crew timeline, bar, promo, gear, crew, and open items; noindex |
 | `av-suite.html?entry=show` | Show Console for show-attached AV operations |
 | `av-suite.html?entry=toolbox` | Show-independent AV Toolbox directory |

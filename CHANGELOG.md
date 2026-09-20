@@ -1,5 +1,39 @@
 # Changelog
 
+## 2026-09-20 — Preshow walk on its own origin
+
+- The preshow venue walk moved from `housevideo.app/fmpwalk/` to
+  **walk.housevideo.app**, so a camera operator on the video operations hub is no
+  longer one click from a walk they have no reason to open. `scripts/domain-sites.json`
+  gains the `fmpwalk-site` entry; the walk and its `/fmp-walk/` typed alias leave
+  housevideo.app, and the Pages workflow publishes the new site with its own
+  deploy key.
+- `housevideo.app/fmpwalk/` and `/fmp-walk/` are not dead ends. A site may now
+  declare `movedTo`, naming each route it used to serve and the site that serves
+  it now, and `scripts/stage_domain_sites.mjs` writes a scriptless noindex
+  redirect at each one.
+- Every link that now crosses the two origins is absolute, in both directions.
+  The walk's camera launch and its legacy `?camera=N` and `?position=` redirect
+  name `https://housevideo.app/fmp/camera/`; the hub, the camera reference list,
+  the house board and the bowl camera guide name
+  `https://walk.housevideo.app/fmpwalk/`. Those are managed files, so
+  `DaveHomeAssist/fmpwalk` owns the change: `PUBLIC_CAMERA_ROOT` and the new
+  `PUBLIC_WALK_ROOT` drive the rewrite, and the export fails if a same-origin
+  walk link survives. Rewrites run before content hashes are stamped, so `?v=`
+  tokens still describe the released bytes.
+- `fmpPhotosV1` holds walk photos and camera fault photos in one object store
+  keyed by random UUID, with no field distinguishing them, so the whole database
+  moves with the walk rather than being split (Dave, 2026-09-20). The walk site's
+  own `transfer.html` performs the move.
+- `verify:fmp` and `verify:public-navigation` now take the walk's and the hub's
+  origins from the site config instead of assuming one origin, and the hygiene
+  probe reaches each route at whichever site serves it.
+- Exported from fmpwalk `ab8c434`. Before cutover the FMP Google client and the
+  `fmp-walk-notion` backend (`FMP_ALLOWED_ORIGINS`) must both allow
+  `https://walk.housevideo.app`, or walk Gmail send and Notion save fail there.
+  DNS for the subdomain and the `HOUSEVIDEO_WALK_DEPLOY_KEY` secret are also
+  prerequisites. Rendered acceptance on the new origin remains outstanding.
+
 ## 2026-09-20 — ATEM HD8 ISO interactive guide
 
 - Published the ATEM Television Studio HD8 ISO interactive guide, revision

@@ -103,13 +103,20 @@ jobs:
         uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5.0.0
 
       # Each target repository deploys its own Pages site when this push lands.
-      # The two publishes are independent: one failing does not skip the other.
+      # The three publishes are independent: one failing does not skip the others.
       - name: Publish housevideo.app
         if: ${{ !cancelled() && steps.deployment.outcome == 'success' && github.ref == 'refs/heads/main' }}
         env:
           DEPLOY_KEY: ${{ secrets.HOUSEVIDEO_DEPLOY_KEY }}
           GITHUB_TOKEN: ${{ github.token }}
         run: scripts/publish_domain_site.sh housevideo _sites/housevideo DaveHomeAssist/housevideo "$GITHUB_SHA"
+
+      - name: Publish walk.housevideo.app
+        if: ${{ !cancelled() && steps.deployment.outcome == 'success' && github.ref == 'refs/heads/main' }}
+        env:
+          DEPLOY_KEY: ${{ secrets.HOUSEVIDEO_WALK_DEPLOY_KEY }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: scripts/publish_domain_site.sh fmpwalk-site _sites/fmpwalk-site DaveHomeAssist/housevideo-walk "$GITHUB_SHA"
 
       - name: Publish avbydave.com
         if: ${{ !cancelled() && steps.deployment.outcome == 'success' && github.ref == 'refs/heads/main' }}

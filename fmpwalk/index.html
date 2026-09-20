@@ -12,12 +12,12 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>FMP Preshow Walk | System by Dave</title>
 <meta name="description" content="Local-first FMP preshow display walk, fault capture, evidence export, and optional reviewed delivery.">
-<link rel="canonical" href="https://housevideo.app/fmpwalk/">
+<link rel="canonical" href="https://walk.housevideo.app/fmpwalk/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="System by Dave">
 <meta property="og:title" content="FMP Preshow Walk | System by Dave">
 <meta property="og:description" content="Walk the venue, capture faults, and explicitly export or send a reviewed report.">
-<meta property="og:url" content="https://housevideo.app/fmpwalk/">
+<meta property="og:url" content="https://walk.housevideo.app/fmpwalk/">
 <meta name="twitter:card" content="summary">
 <style>
 /* ============================================================
@@ -595,7 +595,7 @@ kbd{
   <div class="card">
     <div class="card-hd"><h4>Camera operators</h4></div>
     <p class="mini">Open a position-specific check-in, build, fault, and checkout record. No Notion write happens without an explicit confirmation.</p>
-    <a class="launch-link" id="cameraLaunch" href="/fmp/camera/">Open camera operations</a>
+    <a class="launch-link" id="cameraLaunch" href="https://housevideo.app/fmp/camera/">Open camera operations</a>
   </div>
 
   <div class="card">
@@ -879,7 +879,7 @@ kbd{
   var allowed = ["pit-center", "front-of-house", "pit-stage-left", "catwalk"];
   var target = legacy[params.get("camera")] || (allowed.indexOf(position) > -1 ? position : "");
   // The public export rewrites this camera root to /fmp/camera/.
-  var cameraRoot = "/fmp/camera/";
+  var cameraRoot = "https://housevideo.app/fmp/camera/";
   if(target) location.replace(new URL(cameraRoot + target + "/", location.href).href);
 })();
 

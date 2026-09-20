@@ -94,15 +94,23 @@ responses are never bundled for offline use.
 
 ## housevideo.app
 
-housevideo.app is the canonical home of the exported suite, the `/fmp-index/`
-and `/fmp-walk/` redirects, and the `/switcher/`, `/shader/` and `/backfocus/` references, with
-unchanged paths (`docs/domain-sites.md`). It was cut over on 2026-09-18 from
-fmpwalk `a5d262c`. The systembydave.com addresses are redirect stubs that offer
-to move saved walk and camera data (browser storage and walk photos) before
-redirecting. The Google client and the `fmp-walk-notion` backend
-(`FMP_ALLOWED_ORIGINS`) allow `https://housevideo.app`; keep
-`https://systembydave.com` in both while old drafts may still be moved. Run gates 3 and 4
-below on housevideo.app.
+housevideo.app is the canonical home of the exported `/fmp/` suite, the
+`/fmp-index/` redirect, and the `/switcher/`, `/shader/` and `/backfocus/`
+references, with unchanged paths (`docs/domain-sites.md`). It was cut over on
+2026-09-18 from fmpwalk `a5d262c`. The systembydave.com addresses are redirect
+stubs that offer to move saved walk and camera data (browser storage and walk
+photos) before redirecting.
+
+The preshow walk moved to **walk.housevideo.app** on 2026-09-20, so camera
+operators are not one click from it. `housevideo.app/fmpwalk/` and `/fmp-walk/`
+redirect there. Links crossing the two origins are absolute and the exporter
+enforces it.
+
+The Google client and the `fmp-walk-notion` backend (`FMP_ALLOWED_ORIGINS`) allow
+`https://housevideo.app`; keep `https://systembydave.com` in both while old drafts
+may still be moved. **Both must also allow `https://walk.housevideo.app` before the
+walk's cutover, or walk Gmail send and Notion save fail there** — see gates 1 and 2.
+Run gates 3 and 4 on housevideo.app, and gate 4 on walk.housevideo.app.
 
 ## Commissioning gates
 

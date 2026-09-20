@@ -30,7 +30,13 @@ const option = (name, fallback) => {
 };
 const flag = name => args.includes(`--${name}`);
 const BASE = option('base', originFor('fmp/')).replace(/\/$/, '');
-const ORIGIN_PATTERN = `(?:${[new URL(BASE).origin, 'https://systembydave.com'].map(value => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})`;
+// The preshow walk moved to its own origin so camera operators are not one click from it.
+// Routes are probed against whichever site scripts/domain-sites.json says now serves them.
+const WALK_BASE = option('walk-base', originFor('fmpwalk/')).replace(/\/$/, '');
+const baseFor = route => /^\/(?:fmpwalk|fmp-walk)(?:[\/?#]|$)/.test(route) ? WALK_BASE : BASE;
+const releaseBase = dir => (dir === 'fmpwalk' ? WALK_BASE : BASE);
+const ORIGINS = [...new Set([BASE, WALK_BASE])];
+const ORIGIN_PATTERN = `(?:${[...ORIGINS.map(value => new URL(value).origin), 'https://systembydave.com'].map(value => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})`;
 const CHROME = option('chrome', '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome');
 const DEBUG_PORT = 9347;
 const TIMEOUT_MS = 15000;
@@ -82,14 +88,14 @@ function statusOf(url) {
 async function checkRoutes() {
   const broken = [];
   for (const route of ROUTES) {
-    const res = await statusOf(BASE + route);
+    const res = await statusOf(baseFor(route) + route);
     if (res.status !== 200) broken.push(`${route} → ${res.status || res.error}`);
   }
   record('R1', 'routes', broken.length ? 'fail' : 'pass', 'Published FMP routes return 200', broken.join('; ') || `${ROUTES.length} routes`);
 
   const dead = [];
   for (const alias of ALIASES) {
-    const res = await statusOf(BASE + alias);
+    const res = await statusOf(baseFor(alias) + alias);
     if (res.status !== 200) dead.push(`${alias} → ${res.status || res.error}`);
   }
   record('R2', 'routes', dead.length ? 'warn' : 'pass', 'Typed and legacy FMP addresses resolve', dead.join('; ') || `${ALIASES.length} aliases resolve`);
@@ -117,7 +123,7 @@ async function checkRelease() {
   for (const dir of RELEASES) {
     const local = JSON.parse(fs.readFileSync(path.join(site, dir, 'source_provenance.json'), 'utf8'));
     provenance[dir] = local;
-    const res = await get(`${BASE}/${dir}/source_provenance.json`);
+    const res = await get(`${releaseBase(dir)}/${dir}/source_provenance.json`);
     let live = null;
     try { live = JSON.parse(res.body.toString('utf8')); } catch {}
     const same = live && live.sourceCommit === local.sourceCommit && live.artifactSha256 === local.artifactSha256;
@@ -125,7 +131,7 @@ async function checkRelease() {
 
     const drift = [];
     for (const [name, expected] of Object.entries(local.files)) {
-      const file = await get(`${BASE}/${dir}/${name}`);
+      const file = await get(`${releaseBase(dir)}/${dir}/${name}`);
       if (file.status !== 200 || sha256(file.body) !== expected) drift.push(`${name} (${file.status})`);
     }
     record(`P2-${dir}`, 'release', drift.length ? 'fail' : 'pass', `Live /${dir}/ files match provenance hashes`, drift.join('; ') || `${Object.keys(local.files).length} files`);
@@ -165,17 +171,26 @@ async function checkIndexing() {
   }), ...NOINDEX_PAGES]);
   const indexable = [];
   for (const page of pages) {
-    const res = await statusOf(BASE + page);
+    const res = await statusOf(baseFor(page) + page);
     if (!/<meta[^>]+name=["']robots["'][^>]+noindex/i.test(res.body.toString('utf8'))) indexable.push(page);
   }
   record('I1', 'indexing', indexable.length ? 'fail' : 'pass', 'Every FMP page carries noindex', indexable.join('; ') || `${pages.length} pages`);
 
-  const robots = (await get(`${BASE}/robots.txt`)).body.toString('utf8');
-  const missing = ['/fmp/', '/fmpwalk/', '/fmp-index/'].filter(route => !robots.includes(`Disallow: ${route}`));
+  // Each origin disallows the FMP routes it actually serves: the walk and its typed
+  // alias moved, so they are the walk origin's rules, not the hub's.
+  const missing = [];
+  for (const route of ['/fmp/', '/fmpwalk/', '/fmp-index/', '/fmp-walk/']) {
+    const origin = baseFor(route);
+    const robots = (await get(`${origin}/robots.txt`)).body.toString('utf8');
+    if (!robots.includes(`Disallow: ${route}`)) missing.push(`${origin}${route}`);
+  }
   record('I2', 'indexing', missing.length ? 'fail' : 'pass', 'Live robots.txt disallows FMP routes', missing.join('; ') || 'all present');
 
-  const sitemap = (await get(`${BASE}/sitemap.xml`)).body.toString('utf8');
-  const listed = (sitemap.match(/<loc>[^<]*\/(?:fmp|fmpwalk|fmp-index)\/[^<]*<\/loc>/g) || []);
+  const listed = [];
+  for (const origin of ORIGINS) {
+    const sitemap = (await get(`${origin}/sitemap.xml`)).body.toString('utf8');
+    listed.push(...(sitemap.match(/<loc>[^<]*\/(?:fmp|fmpwalk|fmp-index|fmp-walk)\/[^<]*<\/loc>/g) || []));
+  }
   record('I3', 'indexing', listed.length ? 'fail' : 'pass', 'Live sitemap excludes FMP routes', listed.join('; ') || 'none listed');
 }
 
@@ -186,22 +201,22 @@ async function checkLinks() {
   const legacy = [];
   const baseFragments = [];
   for (const page of pages) {
-    const res = await statusOf(BASE + page);
+    const res = await statusOf(baseFor(page) + page);
     if (res.status !== 200) continue;
     const html = res.body.toString('utf8');
     const baseHref = (html.match(/<base href="([^"]+)"/) || [])[1];
-    const baseUrl = new URL(baseHref || '.', BASE + page).href;
-    if (baseHref && /href=["']#[^"']+["']/.test(html)) baseFragments.push(`${page} (<base href="${baseHref}"> sends #fragment links to ${new URL(baseHref, BASE + page).pathname})`);
+    const baseUrl = new URL(baseHref || '.', baseFor(page) + page).href;
+    if (baseHref && /href=["']#[^"']+["']/.test(html)) baseFragments.push(`${page} (<base href="${baseHref}"> sends #fragment links to ${new URL(baseHref, baseFor(page) + page).pathname})`);
     const refs = [...html.matchAll(/\s(?:href|src)=["']([^"']+)["']/g)].map(match => match[1]);
     // Relative route literals built by page scripts (for example "./camera/" + target + "/").
     const literals = [...html.matchAll(/["'](\.{1,2}\/[a-z0-9-]+\/)["']/g)].map(match => match[1]);
     for (const ref of [...refs, ...literals]) {
       if (/^(?:#|mailto:|tel:|javascript:|data:|blob:)/i.test(ref) || ref.includes('${')) continue;
       let url;
-      try { url = new URL(ref, literals.includes(ref) ? BASE + page : baseUrl); } catch { continue; }
+      try { url = new URL(ref, literals.includes(ref) ? baseFor(page) + page : baseUrl); } catch { continue; }
       url.hash = '';
       if (LEGACY_ORIGINS.some(pattern => pattern.test(url.host))) legacy.push(`${page} → ${url.href}`);
-      const bucket = url.origin === new URL(BASE).origin ? internal : external;
+      const bucket = ORIGINS.some(value => url.origin === new URL(value).origin) ? internal : external;
       if (!bucket.has(url.href)) bucket.set(url.href, new Set());
       bucket.get(url.href).add(page);
     }
@@ -232,7 +247,7 @@ async function checkLinks() {
 async function checkContent() {
   const shellGaps = [];
   for (const page of SHELL_PAGES) {
-    const html = (await statusOf(BASE + page)).body.toString('utf8');
+    const html = (await statusOf(baseFor(page) + page)).body.toString('utf8');
     const gaps = [];
     // Links may be relative or name the probed origin or systembydave.com absolutely.
     if (!new RegExp(`href=["']${ORIGIN_PATTERN}?/["']`).test(html)) gaps.push('no home link');
@@ -248,7 +263,7 @@ async function checkContent() {
   for (const dir of RELEASES) {
     const files = Object.keys(JSON.parse(fs.readFileSync(path.join(site, dir, 'source_provenance.json'), 'utf8')).files).filter(name => /\.(?:html|js)$/.test(name));
     for (const name of files) {
-      const text = (await get(`${BASE}/${dir}/${name}`)).body.toString('utf8');
+      const text = (await get(`${releaseBase(dir)}/${dir}/${name}`)).body.toString('utf8');
       const emails = (text.match(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[a-z]{2,}/g) || []).filter(email => !ALLOWED_EMAILS.includes(email.toLowerCase()) && !/\.(?:png|webp|jpg|svg|js)$/i.test(email));
       const phones = text.match(/\(?\b\d{3}\)?[-. ]\d{3}[-. ]\d{4}\b/g) || [];
       if (emails.length || phones.length) exposed.push(`${dir}/${name}: ${unique(emails).length} email(s), ${unique(phones).length} phone number(s)`);
@@ -260,7 +275,7 @@ async function checkContent() {
   record('C1', 'content', counts.size > 1 ? 'warn' : 'pass', 'Rig part and component counts agree', [...counts].map(([number, files]) => `${number} in ${unique(files).join(', ')}`).join('; ') || 'no count claims');
 
   for (const page of HAND_MAINTAINED) {
-    const text = (await statusOf(BASE + page)).body.toString('utf8');
+    const text = (await statusOf(baseFor(page) + page)).body.toString('utf8');
     if ((text.match(NOTION_URL) || []).length) notion.push(`${page}: ${(text.match(NOTION_URL) || []).length}`);
   }
   record('S3', 'privacy', notion.length ? 'fail' : 'pass', 'Public FMP pages link no Notion pages', notion.join('; ') || 'none found');
@@ -362,11 +377,11 @@ async function auditPage(route, scheme) {
   cdp.on('Network.loadingFailed', event => { if (!event.canceled) failedRequests.push(`${event.errorText} ${event.requestId}`); });
   await Promise.all(['Page.enable', 'Runtime.enable', 'Network.enable', 'Log.enable'].map(method => cdp.send(method)));
   await cdp.send('Network.setCacheDisabled', { cacheDisabled: true });
-  await cdp.send('Storage.clearDataForOrigin', { origin: BASE, storageTypes: 'all' });
+  await cdp.send('Storage.clearDataForOrigin', { origin: baseFor(route), storageTypes: 'all' });
   await cdp.send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-color-scheme', value: scheme }, { name: 'prefers-reduced-motion', value: 'reduce' }] });
   await cdp.send('Emulation.setDeviceMetricsOverride', { width: 1440, height: 900, deviceScaleFactor: 1, mobile: false });
   const started = Date.now();
-  await cdp.send('Page.navigate', { url: BASE + route });
+  await cdp.send('Page.navigate', { url: baseFor(route) + route });
   for (let i = 0; i < 60 && (await evaluate(cdp, 'document.readyState')) !== 'complete'; i += 1) await wait(250);
   const loadMs = Date.now() - started;
   await wait(2500);
@@ -471,7 +486,7 @@ async function main() {
   const counts = { fail: 0, warn: 0, grey: 0, pass: 0 };
   findings.forEach(item => { counts[item.status] += 1; });
   const trafficLight = counts.fail ? 'Red' : counts.warn ? 'Yellow' : counts.grey ? 'Grey' : 'Green';
-  const report = { schema: 'fmp.hygiene.probe.v1', generatedAt: new Date().toISOString(), base: BASE, trafficLight, counts, findings, pages };
+  const report = { schema: 'fmp.hygiene.probe.v1', generatedAt: new Date().toISOString(), base: BASE, walkBase: WALK_BASE, trafficLight, counts, findings, pages };
   const markdown = render(report);
   if (option('output')) fs.writeFileSync(path.resolve(option('output')), `${JSON.stringify(report, null, 2)}\n`);
   if (option('markdown')) fs.writeFileSync(path.resolve(option('markdown')), markdown);

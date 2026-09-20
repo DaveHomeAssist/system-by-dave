@@ -7,7 +7,8 @@ GitHub Pages repository.
 
 | Site id | Domain | Repository | Pages | Cutover |
 | --- | --- | --- | --- | --- |
-| `housevideo` | housevideo.app | `DaveHomeAssist/housevideo` | `/fmp/` and its routes, `/fmpwalk/`, the `/fmp-index/` and `/fmp-walk/` redirects, `/switcher/` and its routes, `/shader/`, `/backfocus/` | 2026-09-18 |
+| `housevideo` | housevideo.app | `DaveHomeAssist/housevideo` | `/fmp/` and its routes, the `/fmp-index/` redirect, `/switcher/` and its routes, `/shader/`, `/backfocus/` | 2026-09-18 |
+| `fmpwalk-site` | walk.housevideo.app | `DaveHomeAssist/housevideo-walk` | `/fmpwalk/` and the `/fmp-walk/` redirect | 2026-09-20 |
 | `avbydave` | avbydave.com | `DaveHomeAssist/avbydave` | `av-suite.html`, every registry tool and offline page (including `plotforge.html`), `av-workbook.html`, `av-tool-suite/` | 2026-09-18 |
 
 `scripts/domain-sites.json` owns this list, each site's home route, robots rules
@@ -15,7 +16,26 @@ and the browser storage its tools own. AV by Dave pages come from
 `js/sbd-registry.js`, so a tool added to the registry is published on
 avbydave.com without editing the config. Paths are unchanged on the new domains:
 `systembydave.com/fmp/house/` is `housevideo.app/fmp/house/`. The bare domain
-redirects to the site's home (`/fmp/` or `/av-suite.html`).
+redirects to the site's home (`/fmp/`, `/fmpwalk/` or `/av-suite.html`).
+
+The preshow walk has its own origin so a camera operator on housevideo.app is not
+one click from a venue walk they have no reason to open. `housevideo.app/fmpwalk/`
+and `/fmp-walk/` stay reachable as redirects to the new address: a site's
+`movedTo` entry names each route it used to serve and the site that serves it now,
+and the stager writes a scriptless noindex redirect at each one.
+
+Links that now cross between the two origins are absolute, in both directions. The
+walk's camera launch and its legacy `?camera=N` and `?position=` redirect name
+`https://housevideo.app/fmp/camera/`; the hub, camera reference list, house board
+and bowl camera guide name `https://walk.housevideo.app/fmpwalk/`. Those live in
+the managed export, so `DaveHomeAssist/fmpwalk` owns them: `PUBLIC_CAMERA_ROOT` and
+`PUBLIC_WALK_ROOT` in its exporter, which fails the export if a same-origin walk
+link survives.
+
+The walk's saved data moves with it. `fmpPhotosV1` holds walk photos and camera
+fault photos in one store keyed by random UUID, with no field distinguishing them,
+so the whole database is offered to the new origin rather than split (Dave,
+2026-09-20). The walk's own `transfer.html` performs the move.
 
 ## Pipeline
 
