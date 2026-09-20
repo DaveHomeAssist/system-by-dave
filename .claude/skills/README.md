@@ -10,21 +10,24 @@ Slash commands live in `.claude/commands/` and are separate from these.
 
 ## Interactive equipment guides
 
-Five skills covering one workflow: build an equipment explorer, teach from it,
-correct it, and verify its release. They are written for interactive equipment
-guides and instructional rig models generally; they assert nothing about the
-rigs, catalogs, or configurations already in this repository.
+Six skills covering one workflow: ground equipment identity in photo evidence,
+build an explorer from it, teach from that, correct it, and verify its release.
+They are written for interactive equipment guides and instructional rig models
+generally; they assert nothing about the rigs, catalogs, or configurations
+already in this repository.
 
 | Skill | Use it for |
 | --- | --- |
+| `equipment-photo-grounding` | Identifying equipment, connectors, and controls from photos, and reconciling annotations with model-specific evidence before anything downstream consumes them |
 | `interactive-equipment-explorer` | Clickable diagrams and rotatable 3D trainers with stable component IDs, whole-part highlighting, articulated controls, and text/photo fallbacks |
 | `equipment-signal-trainer` | Sourced signal-path lessons and observation-based troubleshooting, keeping picture, return, control, tally, intercom, reference, and power separate |
 | `operator-control-lessons` | Guided practice, find-the-control exercises, and physical-rig transfer checks built from observed operator confusion |
 | `equipment-correction-propagation` | Carrying one corrected fact through source data, diagrams, lessons, search, exports, and authorized published copies |
 | `interactive-guide-release-check` | Verifying a guide across desktop, tablet, phone, accessible alternatives, offline delivery, and the deployed version |
 
-`interactive-equipment-explorer` owns the component catalog the other four
-consume. Reuse its `component_id` values rather than minting parallel ones.
+`equipment-photo-grounding` establishes the sourced claims;
+`interactive-equipment-explorer` owns the component catalog the rest consume.
+Reuse its `component_id` values rather than minting parallel ones.
 
 ## Local validators
 

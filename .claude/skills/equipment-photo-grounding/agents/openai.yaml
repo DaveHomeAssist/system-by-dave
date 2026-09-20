@@ -1,0 +1,14 @@
+interface:
+  display_name: Equipment Photo Grounding
+  short_description: Identify equipment and controls from sourced photos
+  default_prompt: Use $equipment-photo-grounding to identify and label these equipment
+    photos with sources and unresolved details.
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true

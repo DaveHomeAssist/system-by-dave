@@ -2,8 +2,10 @@
 
 ## 2026-09-20 — Interactive equipment guide skills
 
-- Added five agent skills under `.claude/skills/` covering one workflow for
-  interactive equipment guides: `interactive-equipment-explorer` builds
+- Added six agent skills under `.claude/skills/` covering one workflow for
+  interactive equipment guides: `equipment-photo-grounding` identifies equipment,
+  connectors, and controls from photos and keeps image, documentation, and field
+  evidence separate, `interactive-equipment-explorer` builds
   clickable diagrams and 3D trainers on a stable component catalog,
   `equipment-signal-trainer` traces one signal function at a time and diagnoses
   from observations, `operator-control-lessons` turns observed control confusion
