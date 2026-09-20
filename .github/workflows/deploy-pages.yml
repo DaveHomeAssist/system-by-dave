@@ -29,6 +29,7 @@ jobs:
 
   deploy:
     needs: domain-cutover
+    if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     environment:
       name: github-pages
@@ -48,6 +49,12 @@ jobs:
 
       - name: Install verification dependencies
         run: npm ci
+
+      - name: Verify walk cutover prerequisites
+        env:
+          DEPLOY_KEY: ${{ secrets.HOUSEVIDEO_WALK_DEPLOY_KEY }}
+          CUTOVER_AUTH_VERIFIED: ${{ vars.HOUSEVIDEO_WALK_AUTH_VERIFIED }}
+        run: node scripts/check_domain_cutover_ready.mjs housevideo-walk --preflight
 
       - name: Verify public site contracts
         run: |
@@ -87,8 +94,18 @@ jobs:
           rsync -a --exclude='.git' --exclude='.github' --exclude='_site' --exclude='_sites' ./ _site/
           echo "Staged $(find _site -type f | wc -l) files."
 
-      - name: Stage domain sites (housevideo.app, avbydave.com)
+      - name: Stage domain sites
         run: node scripts/stage_domain_sites.mjs --out _sites --site-root _site
+
+      # Publish and read back the destination before any old origin redirects.
+      - name: Publish walk.housevideo.app
+        env:
+          DEPLOY_KEY: ${{ secrets.HOUSEVIDEO_WALK_DEPLOY_KEY }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: scripts/publish_domain_site.sh housevideo-walk _sites/housevideo-walk DaveHomeAssist/housevideo-walk "$GITHUB_SHA"
+
+      - name: Verify walk destination before publishing redirects
+        run: node scripts/check_domain_cutover_ready.mjs housevideo-walk --live _sites/housevideo-walk
 
       - name: Configure Pages
         uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
@@ -103,7 +120,7 @@ jobs:
         uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5.0.0
 
       # Each target repository deploys its own Pages site when this push lands.
-      # The two publishes are independent: one failing does not skip the other.
+      # These remaining publishes are independent; the walk is already verified.
       - name: Publish housevideo.app
         if: ${{ !cancelled() && steps.deployment.outcome == 'success' && github.ref == 'refs/heads/main' }}
         env:

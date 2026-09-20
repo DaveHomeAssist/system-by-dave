@@ -11,14 +11,64 @@
       "deployKeySecret": "HOUSEVIDEO_DEPLOY_KEY",
       "cutover": true,
       "home": "/fmp/",
-      "pages": ["fmp/", "fmpwalk/", "fmp-index/", "fmp-walk/", "switcher/", "shader/", "ursa-broadcast-g2/", "backfocus/"],
+      "pages": [
+        "fmp/",
+        "fmp-index/",
+        "switcher/",
+        "shader/",
+        "ursa-broadcast-g2/",
+        "backfocus/"
+      ],
+      "movedTo": {
+        "fmpwalk/": "housevideo-walk",
+        "fmp-walk/": "housevideo-walk"
+      },
       "assets": [],
-      "robotsDisallow": ["/404.html", "/transfer.html", "/fmp-index/", "/fmp/", "/fmp-walk/", "/fmpwalk/"],
+      "robotsDisallow": [
+        "/404.html",
+        "/transfer.html",
+        "/fmp-index/",
+        "/fmp/"
+      ],
       "storage": {
         "registryKeys": false,
         "keys": [],
-        "prefixes": ["fmp"],
-        "indexedDB": ["fmpPhotosV1"]
+        "prefixes": [
+          "fmp"
+        ],
+        "indexedDB": [
+          "fmpPhotosV1"
+        ]
+      }
+    },
+    {
+      "id": "housevideo-walk",
+      "name": "FMP Preshow Walk",
+      "domain": "walk.housevideo.app",
+      "repository": "DaveHomeAssist/housevideo-walk",
+      "deployKeySecret": "HOUSEVIDEO_WALK_DEPLOY_KEY",
+      "cutover": true,
+      "home": "/fmpwalk/",
+      "pages": [
+        "fmpwalk/",
+        "fmp-walk/"
+      ],
+      "assets": [],
+      "robotsDisallow": [
+        "/404.html",
+        "/transfer.html",
+        "/fmpwalk/",
+        "/fmp-walk/"
+      ],
+      "storage": {
+        "registryKeys": false,
+        "keys": [],
+        "prefixes": [
+          "fmp"
+        ],
+        "indexedDB": [
+          "fmpPhotosV1"
+        ]
       }
     },
     {
@@ -30,14 +80,32 @@
       "cutover": true,
       "home": "/av-suite.html",
       "registry": true,
-      "pages": ["av-suite.html", "av-workbook.html", "av-tool-suite/"],
+      "pages": [
+        "av-suite.html",
+        "av-workbook.html",
+        "av-tool-suite/"
+      ],
       "assets": [],
-      "robotsDisallow": ["/404.html", "/transfer.html"],
+      "robotsDisallow": [
+        "/404.html",
+        "/transfer.html"
+      ],
       "storage": {
         "registryKeys": true,
-        "keys": ["av-suite-dashboard.v1", "av-suite-ui.v1", "av-suite-dock-compact.v1", "av-theme-mode.v1", "sbd.handoff.v1"],
-        "prefixes": ["sbd.handoff.", "sbd.showboard."],
-        "indexedDB": ["PixelForge"]
+        "keys": [
+          "av-suite-dashboard.v1",
+          "av-suite-ui.v1",
+          "av-suite-dock-compact.v1",
+          "av-theme-mode.v1",
+          "sbd.handoff.v1"
+        ],
+        "prefixes": [
+          "sbd.handoff.",
+          "sbd.showboard."
+        ],
+        "indexedDB": [
+          "PixelForge"
+        ]
       }
     }
   ]

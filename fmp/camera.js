@@ -131,7 +131,7 @@ function referenceCards(position) {
   }
   const items = [
     ...(PUBLIC_RELEASE ? [
-      ['WALK', 'Preshow venue walk', 'Route checks, fault photos and report export', '/fmpwalk/', false],
+      ['WALK', 'Preshow venue walk', 'Route checks, fault photos and report export', 'https://walk.housevideo.app/fmpwalk/', false],
       ['CALL', 'Bowl camera guide', 'Tour modes, meeting, song flow and directing', '/fmp/guide/', false],
       ['3D', 'Camera rig explorer', `${RIG_COMPONENTS ? `${RIG_COMPONENTS} components` : 'Components'}, photo evidence and operating notes`, '/fmp/rig/', false]
     ] : []),

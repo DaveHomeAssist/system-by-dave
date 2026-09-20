@@ -1,5 +1,69 @@
 # Changelog
 
+## 2026-09-20 — Walk cutover reconciled with current camera references
+
+- Preserve the URSA Broadcast G2 field guide, camera-body corrections and flat
+  house tab panels when integrating the walk domain cutover with current main.
+- Regenerate both managed FMP releases from merged canonical source `115c8e3`.
+  Keep the new walk origin and the existing camera-reference routes together.
+
+## 2026-09-20 — Canonical FMP source named for the suite
+
+- `DaveHomeAssist/fmpwalk` is the canonical source for the whole FMP video
+  operations suite — the hub, four camera positions, house, guide, gear, build,
+  ptz, rig and the preshow walk — but it was named after one of those eight.
+  It is now `DaveHomeAssist/fmp-suite`, and the provenance both managed releases
+  carry records that name.
+- `npm run verify:fmp`, the hygiene probe's canonical-source constant and the
+  public-navigation shell notes follow the new name. Renaming on GitHub leaves a
+  permanent redirect, so existing clones, remotes and pull request links keep
+  working; historical pull request URLs in `docs/` and `reports/` keep their old
+  paths as dated records.
+- The released bytes are unchanged: both artifact digests match the previous
+  export, and two fresh exports reproduce the tree exactly. Only the provenance
+  `sourceRepository` and `sourceCommit` differ.
+
+## 2026-09-20 — Preshow walk on its own origin
+
+- Prepare the preshow venue walk move from `housevideo.app/fmpwalk/` to
+  **walk.housevideo.app**. Infrastructure, authentication and live acceptance
+  remain pending; the hub retains explicit walk links. `scripts/domain-sites.json`
+  gains the `housevideo-walk` entry; the walk and its `/fmp-walk/` typed alias leave
+  housevideo.app, and the Pages workflow publishes the new site with its own
+  deploy key.
+- `housevideo.app/fmpwalk/` and `/fmp-walk/` are not dead ends. A site may now
+  declare `movedTo`, naming each route it used to serve and the site that serves
+  it now, and `scripts/stage_domain_sites.mjs` writes a noindex migration page at
+  each one. Saved drafts and photos are offered for transfer before redirecting;
+  query strings and fragments survive both aliases.
+- Every link that now crosses the two origins is absolute, in both directions.
+  The walk's camera launch and its legacy `?camera=N` and `?position=` redirect
+  name `https://housevideo.app/fmp/camera/`; the hub, the camera reference list,
+  the house board and the bowl camera guide name
+  `https://walk.housevideo.app/fmpwalk/`. Those are managed files, so
+  `DaveHomeAssist/fmpwalk` owns the change: `PUBLIC_CAMERA_ROOT` and the new
+  `PUBLIC_WALK_ROOT` drive the rewrite, and the export fails if a same-origin
+  walk link survives. Rewrites run before content hashes are stamped, so `?v=`
+  tokens still describe the released bytes.
+- `fmpPhotosV1` holds walk photos and camera fault photos in one object store
+  keyed by random UUID, with no field distinguishing them, so the whole database
+  moves with the walk rather than being split (Dave, 2026-09-20). The walk site's
+  own `transfer.html` performs the move.
+- `verify:fmp` and `verify:public-navigation` now take the walk's and the hub's
+  origins from the site config instead of assuming one origin, and the hygiene
+  probe reaches each route at whichever site serves it.
+- Exported from fmpwalk `ab8c434`. Before cutover the FMP Google client and the
+  `fmp-walk-notion` backend (`FMP_ALLOWED_ORIGINS`) must both allow
+  `https://walk.housevideo.app`, or walk Gmail send and Notion save fail there.
+  DNS for the subdomain and the `HOUSEVIDEO_WALK_DEPLOY_KEY` secret are also
+  prerequisites. Rendered acceptance on the new origin remains outstanding.
+- Review repair: accept transfers from both earlier origins with exact opener,
+  origin and payload checks. Exercise all eight migration scenarios from both
+  housevideo.app aliases, including users who already migrated from the portfolio.
+- Require the walk deploy key and recorded auth configuration evidence, then
+  publish and read back the destination before either source deploys redirects.
+  Failures leave the existing source deployment in place.
+
 ## 2026-09-20 — FMP camera bodies stated as URSA Broadcast G2
 
 - The house camera body model was settled on 2026-09-18: all three bodies are

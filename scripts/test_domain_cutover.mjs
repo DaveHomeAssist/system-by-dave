@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Real browser acceptance for the source origin and both destination origins.
+// Real browser acceptance for every source and destination origin.
 // Every scenario owns a disposable context; no operator profile or data is used.
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -41,7 +41,10 @@ async function serve(directory) {
 let source = 'https://systembydave.com';
 const sites = [
   { id: 'housevideo', origin: 'https://housevideo.app', route: '/fmp/', key: 'fmp.cutover.acceptance', database: 'fmpPhotosV1' },
-  { id: 'avbydave', origin: 'https://avbydave.com', route: '/av-suite.html', key: 'sbd.showboard.cutover-acceptance', database: 'PixelForge' }
+  { id: 'avbydave', origin: 'https://avbydave.com', route: '/av-suite.html', key: 'sbd.showboard.cutover-acceptance', database: 'PixelForge' },
+  // The preshow walk is its own origin. It claims the same fmp prefix and photo
+  // database as the hub, so its acceptance key is distinct to keep the two apart.
+  { id: 'housevideo-walk', origin: 'https://walk.housevideo.app', route: '/fmpwalk/', key: 'fmp.walk-cutover.acceptance', database: 'fmpPhotosV1' }
 ];
 function ownedPages(directory = root) {
   return fs.readdirSync(directory, { withFileTypes: true }).flatMap(entry => {
@@ -91,10 +94,13 @@ try {
   }
 
   async function seed(page, site, database = false) {
-    await page.goto(source + '/index.html');
-    await page.evaluate(async ({ key, database, includeDatabase }) => {
+    const sourceOrigin = site.sourceOrigin || source;
+    await page.goto(sourceOrigin + (site.sourceOrigin ? '/transfer.html' : '/index.html'));
+    await page.evaluate(async ({ key, database, includeDatabase, sourceOrigin }) => {
       localStorage.setItem(key, JSON.stringify({ text: 'Preserve this draft ✓', order: [3, 1, 2] }));
       localStorage.setItem('unrelated-private-fixture', 'must stay here');
+      // A prior portfolio-to-hub migration must not skip the hub-to-walk move.
+      if (sourceOrigin) localStorage.setItem('sbd.domainMove.housevideo.v1', JSON.stringify({ state: 'moved' }));
       if (!includeDatabase) return;
       await new Promise((resolve, reject) => {
         const request = indexedDB.open(database, 1);
@@ -109,7 +115,7 @@ try {
         };
       });
     }, { ...site, includeDatabase: database });
-    await page.goto(source + site.route + '?cutover=acceptance#preserved');
+    await page.goto(sourceOrigin + (site.fromRoute || site.route) + '?cutover=acceptance#preserved');
     await page.getByRole('button', { name: 'Move my data and continue' }).waitFor();
   }
 
@@ -121,10 +127,23 @@ try {
     return popup;
   }
 
-  for (const site of sites) {
-    await test(`${site.id} clean redirect and history`, async page => {
+  const config = JSON.parse(fs.readFileSync(path.join(root, 'scripts/domain-sites.json'), 'utf8'));
+  assert.deepEqual(sites.map(site => site.id).sort(), config.sites.map(site => site.id).sort(), 'Every configured origin needs acceptance coverage');
+  const migrations = sites.map(site => ({ ...site, label: site.id }));
+  for (const from of config.sites) {
+    for (const [route, targetId] of Object.entries(from.movedTo || {})) {
+      const target = sites.find(site => site.id === targetId);
+      assert.ok(target, `Missing acceptance target ${targetId}`);
+      migrations.push({ ...target, sourceOrigin: sites.find(site => site.id === from.id).origin,
+        fromRoute: '/' + route, label: `${from.id} ${route} to ${targetId}` });
+    }
+  }
+  const portfolioSource = source;
+  for (const site of migrations) {
+    const source = site.sourceOrigin || portfolioSource;
+    await test(`${site.label} clean redirect and history`, async page => {
       await page.goto(source + '/index.html');
-      await page.goto(source + site.route + '?cutover=clean#preserved');
+      await page.goto(source + (site.fromRoute || site.route) + '?cutover=clean#preserved');
       await page.waitForURL(site.origin + site.route + '?cutover=clean#preserved');
       assert.ok((await page.locator('body').innerText()).length > 100);
       await page.goBack();
@@ -133,7 +152,7 @@ try {
       assert.equal(new URL(page.url()).origin, site.origin);
     });
 
-    await test(`${site.id} lossless migration and repeated visit`, async (page, context) => {
+    await test(`${site.label} lossless migration and repeated visit`, async (page, context) => {
       await seed(page, site, true);
       await move(page, context);
       await page.waitForURL(site.origin + site.route + '?cutover=acceptance#preserved');
@@ -160,7 +179,7 @@ try {
       assert.equal(await original.evaluate(key => JSON.parse(localStorage.getItem(key)).text, site.key), 'Preserve this draft ✓');
       assert.equal(await original.evaluate(id => JSON.parse(localStorage.getItem('sbd.domainMove.' + id + '.v1')).state, site.id), 'moved');
       await page.bringToFront();
-      await page.goto(source + site.route);
+      await page.goto(source + (site.fromRoute || site.route));
       await page.waitForURL(site.origin + site.route);
       assert.equal(await page.evaluate(key => localStorage.getItem(key), site.key), 'new destination edit');
       if (site.id === 'avbydave') {
@@ -172,7 +191,7 @@ try {
       }
     });
 
-    await test(`${site.id} interrupted popup retries`, async (page, context) => {
+    await test(`${site.label} interrupted popup retries`, async (page, context) => {
       await context.route(site.origin + '/js/domain-transfer.js', route => route.fulfill({ contentType: 'text/javascript', body: '' }));
       await seed(page, site);
       await page.clock.install();
@@ -186,7 +205,7 @@ try {
       await page.waitForURL(site.origin + site.route + '?cutover=acceptance#preserved');
     });
 
-    await test(`${site.id} quota failure remains retryable`, async (page, context) => {
+    await test(`${site.label} quota failure remains retryable`, async (page, context) => {
       await context.addInitScript(({ origin, key }) => {
         if (location.origin !== origin) return;
         if (localStorage.getItem('cutover-quota-recovered')) return;
@@ -206,7 +225,7 @@ try {
       assert.equal(await page.evaluate(key => JSON.parse(localStorage.getItem(key)).text, site.key), 'Preserve this draft ✓');
     });
 
-    await test(`${site.id} invalid backup rejected`, async page => {
+    await test(`${site.label} invalid backup rejected`, async page => {
       await page.goto(site.origin + '/transfer.html');
       for (const contents of ['not json', JSON.stringify({ schema: 'system-by-dave.domain-transfer.v0', site: site.id }), JSON.stringify({ schema: 'system-by-dave.domain-transfer.v1', site: 'wrong-site' })]) {
         await page.locator('#backupFile').setInputFiles({ name: 'invalid.json', mimeType: 'application/json', buffer: Buffer.from(contents) });
@@ -215,7 +234,7 @@ try {
       }
     });
 
-    await test(`${site.id} backup roundtrip and duplicate imports`, async page => {
+    await test(`${site.label} backup roundtrip and duplicate imports`, async page => {
       await seed(page, site, true);
       const downloaded = page.waitForEvent('download');
       await page.getByRole('button', { name: 'Download a backup' }).click();
@@ -229,7 +248,7 @@ try {
       assert.equal(await page.evaluate(key => JSON.parse(localStorage.getItem(key)).text, site.key), 'Preserve this draft ✓');
     });
 
-    await test(`${site.id} incompatible database does not acknowledge success`, async (page, context) => {
+    await test(`${site.label} incompatible database does not acknowledge success`, async (page, context) => {
       const destination = await context.newPage();
       await destination.goto(site.origin + '/transfer.html');
       await destination.evaluate(name => new Promise(resolve => {
@@ -244,7 +263,7 @@ try {
       assert.equal(await page.evaluate(id => localStorage.getItem('sbd.domainMove.' + id + '.v1'), site.id), null);
     });
 
-    await test(`${site.id} unreadable source stays recoverable`, async (page, context) => {
+    await test(`${site.label} unreadable source stays recoverable`, async (page, context) => {
       await seed(page, site, true);
       await context.addInitScript(origin => {
         if (location.origin !== origin) return;
@@ -265,6 +284,32 @@ try {
       await page.getByRole('button', { name: 'Move my data and continue' }).waitFor();
       await move(page, context);
       await page.waitForURL(site.origin + site.route + '?cutover=acceptance#preserved');
+    });
+  }
+
+  for (const mismatch of [false, true]) {
+    await test(`walk transfer rejects ${mismatch ? 'forged payload source' : 'unconfigured opener origin'}`, async (page, context) => {
+      const walk = sites.find(site => site.id === 'housevideo-walk');
+      const opener = sites.find(site => site.id === (mismatch ? 'housevideo' : 'avbydave'));
+      await page.goto(opener.origin + '/transfer.html');
+      const opened = context.waitForEvent('page');
+      await page.evaluate(origin => { window.acceptancePopup = window.open(origin + '/transfer.html'); }, walk.origin);
+      const popup = await opened;
+      await popup.waitForLoadState();
+      await popup.evaluate(() => {
+        window.addEventListener('message', event => {
+          if (event.data?.type === 'sbd-domain-transfer-payload') window.receivedAcceptancePayload = true;
+        });
+      });
+      await page.evaluate(({ walk, claimedSource }) => {
+        window.acceptancePopup.postMessage({ type: 'sbd-domain-transfer-payload', payload: {
+          schema: 'system-by-dave.domain-transfer.v1', site: walk.id, source: claimedSource,
+          localStorage: { [walk.key]: 'must not import' }, indexedDB: []
+        } }, walk.origin);
+      }, { walk, claimedSource: mismatch ? source : opener.origin });
+      await popup.waitForFunction(() => window.receivedAcceptancePayload);
+      assert.equal(await popup.evaluate(key => localStorage.getItem(key), walk.key), null);
+      assert.equal(await popup.getByRole('heading', { name: 'Transfer complete', exact: true }).count(), 0);
     });
   }
 

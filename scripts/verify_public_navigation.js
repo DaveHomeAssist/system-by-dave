@@ -72,7 +72,7 @@ const CUSTOM_SHELLS = new Map([
 ]);
 const SITE_ORIGIN = 'https://systembydave.com';
 // FMP video operations shell. fmp/ and fmpwalk/ are managed exports from
-// DaveHomeAssist/fmpwalk, so every page is listed explicitly and checked for a
+// DaveHomeAssist/fmp-suite, so every page is listed explicitly and checked for a
 // home link, a /fmp/ hub link (except the hub), and a first-focus skip link whose
 // target is on the same document after <base> resolution.
 const FMP_HUB = 'fmp/index.html';
@@ -92,7 +92,7 @@ const FMP_SHELL_PAGES = [
   'fmp/rig/index.html',
   'fmpwalk/index.html'
 ];
-// Known FMP shell gaps, each to be fixed in DaveHomeAssist/fmpwalk. The export
+// Known FMP shell gaps, each to be fixed in DaveHomeAssist/fmp-suite. The export
 // that fixes a gap removes its entry in the same commit: an entry that no longer
 // fails is itself a failure, and any gap not listed here fails immediately.
 // Hygiene Batch B (fmpwalk dac4906) fixed the baseline H2 camera skip links and
@@ -177,7 +177,7 @@ function fmpShellGaps(file, source) {
   const isPath = (url, paths, origins = [origin]) => origins.includes(url.origin) && paths.includes(url.pathname);
   const gaps = [];
   if (!links.some((url) => isPath(url, ['/', '/index.html'], [origin, SITE_ORIGIN]))) gaps.push('no home link');
-  if (file !== FMP_HUB && !links.some((url) => isPath(url, ['/fmp/', '/fmp/index.html']))) gaps.push('no /fmp/ parent link');
+  if (file !== FMP_HUB && !links.some((url) => isPath(url, ['/fmp/', '/fmp/index.html'], [origin, originFor(FMP_HUB)]))) gaps.push('no /fmp/ parent link');
 
   const firstFocusable = body.match(/<(?:a\s[^>]*\bhref=[^>]*|button\b[^>]*|select\b[^>]*|textarea\b[^>]*|summary\b[^>]*|input\b(?![^>]*\btype=["']?hidden)[^>]*|[a-z][a-z0-9-]*\s[^>]*\btabindex=["']?(?:0|[1-9])[^>]*)>/i)?.[0] || '';
   const skipHref = /^<a\s/i.test(firstFocusable) ? attribute(firstFocusable, 'href') : undefined;
@@ -323,7 +323,7 @@ function verifyFmpShells() {
     gaps.forEach((gap) => {
       if (allowed.includes(gap)) {
         known += 1;
-        console.warn(`Known FMP shell gap (fix in DaveHomeAssist/fmpwalk): ${file}: ${gap}`);
+        console.warn(`Known FMP shell gap (fix in DaveHomeAssist/fmp-suite): ${file}: ${gap}`);
       } else {
         fail(`${file}: ${gap}.`);
       }

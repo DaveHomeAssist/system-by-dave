@@ -22,7 +22,7 @@ the contract still holds after releases, edits, and time.
    Notion records during a hygiene pass. Signed-in SETUP TEST acceptance is a
    separate commissioning task, run only with explicit approval.
 2. **Fix at the owner.** `fmp/` and `fmpwalk/` are managed artifacts from
-   `DaveHomeAssist/fmpwalk`. Fix that repository, then re-export with
+   `DaveHomeAssist/fmp-suite`. Fix that repository, then re-export with
    `scripts/export-public-camera.mjs`. Never hand-edit a managed file here, even
    for a one-character link fix.
 3. **Evidence, not proxies.** HTTP 200, a matching hash, or a healthy backend
@@ -37,7 +37,7 @@ the contract still holds after releases, edits, and time.
 
 | Problem location | Owner | How to fix |
 | --- | --- | --- |
-| Anything under `/fmp/` or `/fmpwalk/` | `DaveHomeAssist/fmpwalk` | Fix the source, pass `npm run check`, re-export, run `npm run verify:fmp` here |
+| Anything under `/fmp/` or `/fmpwalk/` | `DaveHomeAssist/fmp-suite` | Fix the source, pass `npm run check`, re-export, run `npm run verify:fmp` here |
 | Aliases (including the `/fmp-index/` redirect), `404.html`, `robots.txt`, sitemap, `/backfocus/`, this probe | `DaveHomeAssist/system-by-dave` | Normal repository change and Pages release |
 | Notion hub, docs, schemas, records | Notion workspace | Targeted edit with readback (`NOTION-1` to `NOTION-5`) |
 | Notion API, Google client origins, Firestore | Google Cloud project for FMP Walk | Follow the canonical `docs/notion-setup.md` |
@@ -163,7 +163,7 @@ Run after releases (A1–A4) and in the weekly pass (all).
 The Notion half of this routine is the review contract **REV | FMP Suite
 Hygiene | Weekly** in REG | Review Contracts. It holds the exact page, data
 source, and query targets for the checks below, which stay out of this public
-repository. The private canonical `DaveHomeAssist/fmpwalk` `docs/notion-setup.md`
+repository. The private canonical `DaveHomeAssist/fmp-suite` `docs/notion-setup.md`
 remains the schema source. Use the connector read-only (search, fetch, query)
 during the pass.
 

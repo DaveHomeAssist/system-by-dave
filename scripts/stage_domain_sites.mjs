@@ -429,7 +429,7 @@ function transferPage(site, origin) {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; base-uri 'none'; form-action 'none'">
 <title>Move saved data | ${title}</title>
-<meta name="description" content="Move ${title} data saved in this browser on systembydave.com to ${domain}.">
+<meta name="description" content="Move ${title} data saved in this browser on its previous website to ${domain}.">
 <link rel="canonical" href="${origin}/transfer.html">
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#FFFFFF">
@@ -442,11 +442,11 @@ function transferPage(site, origin) {
 <a class="sbd-move-skip" href="#transfer">Skip to data transfer</a>
 <main id="transfer" class="sbd-move" tabindex="-1">
 <h1>Move saved ${title} data</h1>
-<p id="transferStatus" class="sbd-move-status" role="status" aria-live="polite">Open this page from a systembydave.com ${title} page to move data automatically, or import a backup file below.</p>
+<p id="transferStatus" class="sbd-move-status" role="status" aria-live="polite">Open this page from the previous ${title} website to move data, or import a backup file below.</p>
 <section id="transferResult" class="sbd-move-panel" hidden></section>
 <section class="sbd-move-panel" aria-labelledby="backupHeading">
 <h2 id="backupHeading">Import a backup file</h2>
-<p>Choose a backup downloaded from systembydave.com. Anything already saved on ${domain} is kept unless you choose to replace it.</p>
+<p>Choose a backup downloaded from the previous website. Anything already saved on ${domain} is kept unless you choose to replace it.</p>
 <label class="sbd-move-file" for="backupFile">Backup file</label>
 <input id="backupFile" type="file" accept="application/json,.json">
 </section>
@@ -548,10 +548,29 @@ function stageSite(site, closed, policy, options) {
   const origin = options.siteOrigins[site.id] || `https://${site.domain}`;
   const sourceOrigin = options.sourceOrigin || options.config.origin;
   writeFile(dir, 'index.html', homePage(site, origin));
+  for (const [route, targetId] of Object.entries(site.movedTo || {})) {
+    const moved = options.config.sites.find((entry) => entry.id === targetId);
+    if (!moved) throw new Error(`${site.id} movedTo names unknown site ${targetId}.`);
+    if (!route.endsWith('/') || route.startsWith('/') || route.includes('..') || !moved.pages.includes(route)) {
+      throw new Error(`${site.id} movedTo route ${route} is not owned by ${targetId}.`);
+    }
+    const movedOrigin = options.siteOrigins[moved.id] || `https://${moved.domain}`;
+    writeFile(dir, `${route}index.html`, stubPage(moved, movedOrigin, `${route}index.html`));
+  }
+  if (Object.keys(site.movedTo || {}).length) {
+    for (const asset of ['js/domain-move.js', 'js/domain-storage.js', 'css/domain-move.css']) {
+      writeFile(dir, asset, read(asset));
+    }
+    writeFile(dir, 'js/domain-move-sites.js', moveSitesScript(options.config, options.policies, options));
+  }
   writeFile(dir, '404.html', notFoundPage(site));
   writeFile(dir, 'transfer.html', transferPage(site, origin));
   writeFile(dir, 'js/domain-transfer-config.js', `window.SBD_DOMAIN_TRANSFER=${JSON.stringify({
-    site: site.id, name: site.name, domain: site.domain, home: site.home, sourceOrigin, ...policy
+    site: site.id, name: site.name, domain: site.domain, home: site.home, sourceOrigin,
+    sourceOrigins: [sourceOrigin, ...options.config.sites
+      .filter((entry) => Object.values(entry.movedTo || {}).includes(site.id))
+      .map((entry) => options.siteOrigins[entry.id] || `https://${entry.domain}`)],
+    ...policy
   })};\n`);
   let hasSitemap = false;
   if (options.cutover) {
@@ -701,7 +720,7 @@ function main() {
       closed.problems.forEach((problem) => console.error(`FAIL ${site.id}: ${problem}`));
       continue;
     }
-    const result = stageSite(site, closed, policies[site.id], { ...options, cutover });
+    const result = stageSite(site, closed, policies[site.id], { ...options, policies, cutover });
     staged.push({ site, entries, cutover, result });
     console.log(`${site.id}: staged ${result.files} files for ${site.domain} (${entries.pages.size} moving pages/files, ${closed.files.size - entries.pages.size} shared assets, cutover ${cutover ? 'on' : 'off'})`);
   }

@@ -63,7 +63,7 @@ for (const release of releases) {
   const root = path.join(site, release.directory);
   const provenance = JSON.parse(fs.readFileSync(path.join(root, 'source_provenance.json')));
   assert.equal(provenance.schema, 'fmp.public.release.v2');
-  assert.equal(provenance.sourceRepository, 'DaveHomeAssist/fmpwalk');
+  assert.equal(provenance.sourceRepository, 'DaveHomeAssist/fmp-suite');
   assert.match(provenance.sourceCommit, /^[0-9a-f]{40}$/);
   assert.equal(provenance.mode, release.mode);
   assert.deepEqual(walk(root).sort(), [...release.expected, 'source_provenance.json'].sort());
@@ -115,7 +115,7 @@ for (const release of releases) {
 
 const entry = fs.readFileSync(path.join(site, 'fmp/index.html'), 'utf8');
 assert.match(entry, /class="startup-guidance"/);
-assert.match(entry, /href="\/fmpwalk\/"/);
+assert.ok(entry.includes(`href="${originFor('fmpwalk/')}/fmpwalk/"`), 'The hub must link the preshow walk at its canonical origin.');
 assert.equal(releases[0].provenance.sourceCommit, releases[1].provenance.sourceCommit, 'fmp and fmpwalk must ship from one export');
 const cameraView = fs.readFileSync(path.join(site, 'fmp/camera-view.js'), 'utf8');
 assert.match(cameraView, /href="#screenTitle"/);
@@ -127,9 +127,12 @@ assert.match(theme, /const KEY = 'fmpTheme';/);
 assert.match(theme, /preference = legacy \|\| 'light';/);
 assert.match(walkEntry, /var THEME_KEY = "fmpTheme";/);
 assert.match(walkEntry, /No silent writes/);
-// /fmpwalk/camera/ does not exist; the walk's camera link and legacy redirect must use /fmp/camera/.
-assert.match(walkEntry, /id="cameraLaunch" href="\/fmp\/camera\/"/);
-assert.match(walkEntry, /var cameraRoot = "\/fmp\/camera\/";/);
+// /fmpwalk/camera/ does not exist, and the walk is its own origin, so its camera link and
+// legacy ?camera=N / ?position= redirect name the operations hub absolutely. A same-origin
+// /fmp/camera/ would resolve against the walk's domain, where nothing serves it.
+const walkCameraRoot = `${originFor('fmp/camera/')}/fmp/camera/`;
+assert.ok(walkEntry.includes(`id="cameraLaunch" href="${walkCameraRoot}"`), 'walk camera launch is absolute');
+assert.ok(walkEntry.includes(`var cameraRoot = "${walkCameraRoot}";`), 'walk legacy camera redirect is absolute');
 assert.doesNotMatch(walkEntry, /["']\.{1,2}\/camera\//);
 assert.match(walkEntry, /href="https:\/\/systembydave\.com\/"/);
 assert.equal((walkEntry.match(/<h1\b/g) || []).length, 1);
