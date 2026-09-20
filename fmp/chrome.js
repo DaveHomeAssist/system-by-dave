@@ -81,10 +81,59 @@
     document.documentElement.dataset.fmpGuideFonts = '1';
   }
 
+  // A small, keyboard-native workspace menu connects the long-form references.
+  // It uses ordinary links so Back, new tabs and no client router all keep working.
+  const mountWorkspaceMenu = () => {
+    if (!inFmp || document.body.classList.contains('portal') || document.querySelector('.workspace-menu')) return;
+    const host = document.querySelector('header.top, .shell > header .header-actions');
+    if (!host) return;
+    const menu = document.createElement('details');
+    menu.className = 'workspace-menu';
+    const summary = document.createElement('summary');
+    summary.textContent = 'Workspace';
+    menu.appendChild(summary);
+    const nav = document.createElement('nav');
+    nav.setAttribute('aria-label', 'FMP workspace');
+    const active = /\/house\//.test(path) ? '#house' : '#learn';
+    for (const [hash, label] of [['#cameras', 'Operators'], ['#learn', 'Reference'], ['#models', '3D Models'], ['#house', 'House']]) {
+      const link = document.createElement('a');
+      link.href = `/fmp/${hash}`;
+      link.textContent = label;
+      if (hash === active) link.setAttribute('aria-current', 'location');
+      nav.appendChild(link);
+    }
+    menu.appendChild(nav);
+    host.appendChild(menu);
+    menu.addEventListener('keydown', event => {
+      if (event.key === 'Escape') { menu.open = false; summary.focus(); }
+    });
+    document.addEventListener('click', event => {
+      if (menu.open && !menu.contains(event.target)) menu.open = false;
+    });
+  };
+
   const mount = () => {
     upgradeToggle();
     document.querySelectorAll('select#theme, select[data-fmp-theme]').forEach(bindSelect);
     fixBackfocusNav();
+    mountWorkspaceMenu();
+    if (document.documentElement.dataset.fmpGuideFonts) {
+      document.querySelectorAll('.tbl-wrap table').forEach(table => {
+        const headings = [...table.querySelectorAll('thead th')].map(cell => cell.textContent.trim());
+        if (!headings.length) return;
+        table.classList.add('guide-responsive-table');
+        // Explicit roles retain table semantics when narrow layouts use block rows.
+        table.setAttribute('role', 'table');
+        table.querySelectorAll('thead, tbody').forEach(group => group.setAttribute('role', 'rowgroup'));
+        table.querySelectorAll('tr').forEach(row => row.setAttribute('role', 'row'));
+        table.querySelectorAll('th').forEach(cell => cell.setAttribute('role', 'columnheader'));
+        table.querySelectorAll('td').forEach(cell => cell.setAttribute('role', 'cell'));
+        table.querySelectorAll('tbody tr').forEach(row => {
+          [...row.children].forEach((cell, index) => { cell.dataset.columnLabel = headings[index] || ''; });
+        });
+      });
+    }
+    if (document.querySelector('main > .mast + .tabs')) document.documentElement.dataset.fmpReference = '1';
   };
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', mount);

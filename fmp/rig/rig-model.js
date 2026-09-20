@@ -25,7 +25,9 @@ const canvas=$('[data-scene]'), stage=$('[data-stage]');
 const partSelect=$('[data-part-select]');
 const models={}, parts=new Map(), pickables=[], surfaceStates=[];
 let equipment='rig', selected='', hovered='', renderer, scene, camera, frame=0;
-let destroyed=false, suspended=false, animation;
+let destroyed=false, suspended=false, contextLost=false, animation, environmentTarget;
+// Keep ultrawide/high-DPI buffers bounded without changing the CSS viewport or camera framing.
+const maxRenderPixels=1920*1080;
 let touchRotation=false, viewScale=1;
 let fiberPivot, fiberCable, fiberAngle=15;
 let lcdHinge, lcdScreen, lcdOpening=90;
@@ -764,7 +766,8 @@ function updateCamera(){
   camera.lookAt(state.target);camera.updateMatrixWorld();
 }
 function draw(time){
-  frame=0;if(destroyed||suspended||!renderer) return;
+  // Finish one frame even below the fold, then suspend subsequent offscreen work.
+  frame=0;if(destroyed||(suspended&&root.dataset.renderReady==='true')||contextLost||!renderer) return;
   if(animation){
     const fraction=Math.min(1,(time-animation.start)/animation.duration),p=1-Math.pow(1-fraction,3);
     state.az=animation.from.az+(animation.to.az-animation.from.az)*p;
@@ -773,9 +776,13 @@ function draw(time){
     state.target.copy(animation.from.target).lerp(animation.to.target,p);
     if(fraction===1) animation=undefined;
   }
-  updateCamera();renderer.render(scene,camera);if(animation) requestDraw();
+  updateCamera();renderer.render(scene,camera);
+  if(!renderer.getContext().isContextLost()){
+    root.dataset.renderReady='true';$('[data-failure]').hidden=true;
+  }
+  if(animation) requestDraw();
 }
-function requestDraw(){if(!frame&&!destroyed&&!suspended&&renderer)frame=requestAnimationFrame(draw);}
+function requestDraw(){if(!frame&&!destroyed&&(!suspended||root.dataset.renderReady!=='true')&&!contextLost&&renderer)frame=requestAnimationFrame(draw);}
 function setPose(key,instant=false){
   const p=poses[key]||poses.beauty;let az=p.az;
   while(az-state.az>Math.PI)az-=Math.PI*2;while(az-state.az<-Math.PI)az+=Math.PI*2;
@@ -918,6 +925,15 @@ function switchEquipment(next){
   canvas.setAttribute('aria-label',`Interactive 3D ${equipment==='rig'?'camera rig':'studio converter'}. Use the Component menu to select any part.`);
   populateParts();selectPart('');setPose(equipment==='rig'?'beauty':'studio-beauty');
 }
+function setupEnvironment(){
+  environmentTarget?.dispose();
+  const envScene=new T.Scene();envScene.background=new T.Color(0x555b66);
+  for(const [pos,size,intensity] of [[[0,5,0],[8,5],4],[[5,0,1],[5,7],2.5],[[-5,2,0],[4,8],3.0]]){
+    const card=new T.Mesh(new T.PlaneGeometry(...size),new T.MeshBasicMaterial({color:new T.Color(intensity,intensity,intensity),side:T.DoubleSide}));card.position.set(...pos);card.lookAt(0,0,0);envScene.add(card);
+  }
+  const pmrem=new T.PMREMGenerator(renderer);environmentTarget=pmrem.fromScene(envScene,.05);scene.environment=environmentTarget.texture;pmrem.dispose();
+  envScene.traverse(object=>{object.geometry?.dispose();object.material?.dispose();});
+}
 function setupScene(){
   scene=new T.Scene();camera=new T.PerspectiveCamera(37,1,.05,70);
   renderer=new T.WebGLRenderer({canvas,antialias:true,alpha:true,powerPreference:'high-performance'});
@@ -928,18 +944,13 @@ function setupScene(){
   const key=new T.DirectionalLight(0xfff2dc,4.2);key.position.set(-3,8,6);key.castShadow=true;key.shadow.mapSize.set(1536,1536);key.shadow.camera.left=-7;key.shadow.camera.right=7;key.shadow.camera.top=6;key.shadow.camera.bottom=-13;key.shadow.normalBias=.025;key.shadow.bias=-.0001;scene.add(key);
   const fill=new T.DirectionalLight(0xd6e8ff,2.15);fill.position.set(1,4,-6);scene.add(fill);
   const rim=new T.DirectionalLight(0xffffff,2.8);rim.position.set(5,6,2);scene.add(rim);
-  const envScene=new T.Scene();envScene.background=new T.Color(0x555b66);
-  for(const [pos,size,intensity] of [[[0,5,0],[8,5],4],[[5,0,1],[5,7],2.5],[[-5,2,0],[4,8],3.0]]){
-    const card=new T.Mesh(new T.PlaneGeometry(...size),new T.MeshBasicMaterial({color:new T.Color(intensity,intensity,intensity),side:T.DoubleSide}));card.position.set(...pos);card.lookAt(0,0,0);envScene.add(card);
-  }
-  const pmrem=new T.PMREMGenerator(renderer);const env=pmrem.fromScene(envScene,.05);scene.environment=env.texture;pmrem.dispose();
+  setupEnvironment();
   makeRig();makeStudio();registerSurfaces();models.studio.visible=false;
   const contactTex=canvasTexture(256,256,(ctx,w,h)=>{const grad=ctx.createRadialGradient(w/2,h/2,10,w/2,h/2,w/2);grad.addColorStop(0,'rgba(0,0,0,.25)');grad.addColorStop(.5,'rgba(0,0,0,.12)');grad.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=grad;ctx.fillRect(0,0,w,h);});
   for(const [id,y,w,d] of [['rig',-9.40,9,8],['studio',-.11,6,3.4]]){
     const floor=new T.Mesh(new T.PlaneGeometry(30,30),new T.ShadowMaterial({opacity:.17}));floor.rotation.x=-Math.PI/2;floor.position.y=y;floor.receiveShadow=true;models[id].add(floor);
     const contact=new T.Mesh(new T.PlaneGeometry(w,id==='studio'?9.6:d),new T.MeshBasicMaterial({map:contactTex,transparent:true,depthWrite:false}));contact.rotation.x=-Math.PI/2;contact.position.set(.2,y+.006,id==='studio'?-3:0);models[id].add(contact);
   }
-  root.dataset.renderReady='true';
 }
 let resizeObserver,themeObserver,visibilityObserver;
 try{setupScene();}catch(error){
@@ -951,7 +962,10 @@ function resize(){
   if(!renderer)return;const width=stage.clientWidth,height=stage.clientHeight;if(!width||!height)return;
   const nextScale=viewportScale(),ratio=nextScale/viewScale;
   state.radius*=ratio;if(animation){animation.from.radius*=ratio;animation.to.radius*=ratio;}viewScale=nextScale;
-  camera.aspect=width/height;camera.updateProjectionMatrix();renderer.setSize(width,height,false);requestDraw();
+  const pixelRatio=Math.min(window.devicePixelRatio||1,1.7,Math.sqrt(maxRenderPixels/(width*height)));
+  // Apply size and pixel ratio together to avoid allocating with the previous viewport.
+  renderer.setDrawingBufferSize(width,height,pixelRatio);
+  camera.aspect=width/height;camera.updateProjectionMatrix();requestDraw();
 }
 function zoomView(multiplier){animation=undefined;state.radius=T.MathUtils.clamp(state.radius*multiplier,2,80);requestDraw();}
 function rotateView(horizontal=0,vertical=0){animation=undefined;state.az+=horizontal;state.el=T.MathUtils.clamp(state.el+vertical,-1.15,1.30);requestDraw();}
@@ -1065,17 +1079,22 @@ canvas.addEventListener('keydown',event=>{
   if(actions[event.key]){event.preventDefault();actions[event.key]();}
 });
 canvas.addEventListener('dblclick',fitSelected);
-canvas.addEventListener('webglcontextlost',event=>{event.preventDefault();suspended=true;$('[data-failure]').hidden=false;root.dataset.renderReady='false';});
-canvas.addEventListener('webglcontextrestored',()=>{suspended=false;$('[data-failure]').hidden=true;root.dataset.renderReady='true';requestDraw();});
+canvas.addEventListener('webglcontextlost',event=>{
+  if(destroyed)return;
+  event.preventDefault();contextLost=true;cancelAnimationFrame(frame);frame=0;
+  $('[data-failure]').hidden=false;root.dataset.renderReady='false';
+});
+canvas.addEventListener('webglcontextrestored',()=>{if(!destroyed){contextLost=false;setupEnvironment();resize();requestDraw();}});
 function dispose(){
+  if(destroyed)return;
   destroyed=true;cancelAnimationFrame(frame);resizeObserver?.disconnect();themeObserver?.disconnect();visibilityObserver?.disconnect();
-  const geometries=new Set(),materials=new Set(),textures=new Set();scene?.traverse(o=>{if(o.geometry)geometries.add(o.geometry);if(o.material)materials.add(o.material);});
+  const geometries=new Set(),materials=new Set(),textures=new Set();scene?.traverse(o=>{if(o.geometry)geometries.add(o.geometry);if(o.material)materials.add(o.material);o.shadow?.dispose();});
   for(const m of materials){for(const v of Object.values(m))if(v?.isTexture)textures.add(v);m.dispose();}
-  geometries.forEach(g=>g.dispose());textures.forEach(t=>t.dispose());scene?.environment?.dispose();renderer?.dispose();
+  geometries.forEach(g=>g.dispose());textures.forEach(t=>t.dispose());environmentTarget?.dispose();renderer?.dispose();renderer?.forceContextLoss();
 }
-window.addEventListener('pagehide',event=>{if(!event.persisted)dispose();},{once:true});
+window.addEventListener('pagehide',event=>{if(!event.persisted)dispose();});
 // Read-only diagnostics support checks of the actual rendered model and ray picking.
 root.rigDiagnostics={
-  snapshot:()=>({equipment,selected,activePanel,readingExpanded,lcdOpening,fiberAngle,azimuth:state.az,elevation:state.el,radius:state.radius,parts:parts.size,meshes:pickables.length,renderer:!!renderer,drawCalls:renderer?.info.render.calls}),
+  snapshot:()=>({equipment,selected,activePanel,readingExpanded,lcdOpening,fiberAngle,azimuth:state.az,elevation:state.el,radius:state.radius,parts:parts.size,meshes:pickables.length,renderer:!!renderer,drawCalls:renderer?.info.render.calls,contextLost,destroyed,suspended,bufferWidth:canvas.width,bufferHeight:canvas.height,maxRenderPixels}),
   project:(id)=>{const g=parts.get(id);if(!g||!camera)return null;scene.updateMatrixWorld(true);const p=new T.Box3().setFromObject(g).getCenter(new T.Vector3());p.project(camera);return {x:(p.x+1)/2*canvas.clientWidth,y:(1-p.y)/2*canvas.clientHeight};}
 };

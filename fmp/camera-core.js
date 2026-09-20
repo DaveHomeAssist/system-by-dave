@@ -159,7 +159,100 @@ export function checkoutIssues(draft) {
 }
 
 export function visibleDrafts(drafts, ownerKey) {
-  return Object.values(drafts || {}).filter(draft => draft.ownerKey === ownerKey);
+  return Object.values(drafts || {}).filter(draft => draft?.ownerKey === ownerKey);
+}
+
+const plainObject = value => Boolean(value) && typeof value === 'object' && !Array.isArray(value);
+const strings = value => plainObject(value) && Object.values(value).every(item => typeof item === 'string');
+const validPhotoRef = ref => plainObject(ref) && typeof ref.id === 'string' && typeof ref.name === 'string';
+const validFault = fault => plainObject(fault) && typeof fault.id === 'string' && typeof fault.description === 'string' &&
+  ['Critical', 'Degraded', 'Cosmetic'].includes(fault.severity) && Array.isArray(fault.photos) && fault.photos.every(validPhotoRef);
+const validReceipt = value => value == null || (plainObject(value) && typeof value.sessionId === 'string');
+
+export function safeCameraRegistry(value) {
+  if (value?.schema !== FALLBACK_REGISTRY.schema || !Array.isArray(value.positions) || value.positions.length !== 4) return FALLBACK_REGISTRY;
+  const seen = new Set();
+  for (const item of value.positions) {
+    const expected = FALLBACK_REGISTRY.positions.find(position => position.key === item?.key);
+    if (!expected || seen.has(item.key) || item.ptz !== expected.ptz || item.legacyCamera !== expected.legacyCamera ||
+      typeof item.displayName !== 'string' || !item.displayName.trim() || typeof item.notionPosition !== 'string') return FALLBACK_REGISTRY;
+    seen.add(item.key);
+  }
+  const references = { ...FALLBACK_REGISTRY.references };
+  for (const [key, url] of Object.entries(value.references || {})) {
+    if (!(key in references) || typeof url !== 'string') continue;
+    try {
+      const parsed = new URL(url);
+      if (parsed.protocol === 'https:' && ['housevideo.app', 'app.notion.com'].includes(parsed.hostname) && !parsed.username && !parsed.password) references[key] = url;
+    } catch { /* Keep the bundled reference when a cached URL is invalid. */ }
+  }
+  return { ...value, positions: value.positions.map(item => ({ ...item })), references };
+}
+
+function validDraft(draft, id) {
+  if (!plainObject(draft) || draft.draftId !== id || typeof draft.ownerKey !== 'string' || !POSITION_KEYS.has(draft.positionKey) ||
+    !['eventId', 'eventName', 'operatorName', 'updatedAt'].every(key => typeof draft[key] === 'string') ||
+    typeof draft.assignmentConfirmed !== 'boolean' || typeof draft.setupTest !== 'boolean' ||
+    !strings(draft.assignment) || !['cameraNumber', 'bodyIdentifier', 'bodyModel', 'lens', 'switcherInput', 'controlChannel'].every(key => typeof draft.assignment[key] === 'string') ||
+    !Array.isArray(draft.faults) || !draft.faults.every(validFault) ||
+    !validReceipt(draft.checkedInReceipt) || !validReceipt(draft.checkedOutReceipt) ||
+    !['', 'check-in', 'check-out'].includes(draft.pendingAction || '')) return false;
+  const position = positionFor(FALLBACK_REGISTRY, draft.positionKey);
+  if (!['build', 'stow'].every(stage => plainObject(draft[`${stage}Checks`]) &&
+    checksFor(position, stage).every(([key]) => STATES.has(draft[`${stage}Checks`][key])))) return false;
+  const correction = draft.leadCorrection;
+  if (correction && (!plainObject(correction) || !strings(correction.changes) || typeof correction.reason !== 'string' || typeof correction.overrideId !== 'string')) return false;
+  const pending = draft.pendingSubmission;
+  if (pending) {
+    const payload = pending.payload;
+    if (!plainObject(pending) || pending.action !== draft.pendingAction || !plainObject(payload) ||
+      typeof payload.capturedAt !== 'string' || !Number.isFinite(Date.parse(payload.capturedAt)) || payload.positionKey !== draft.positionKey ||
+      !strings(payload.checks)) return false;
+    if (pending.action === 'check-in' && (payload.draftId !== id || typeof payload.operatorName !== 'string' ||
+      typeof payload.eventId !== 'string' || !strings(payload.assignment))) return false;
+    if (pending.action === 'check-out' && (payload.sessionId !== draft.checkedInReceipt?.sessionId ||
+      !Array.isArray(payload.faults) || !payload.faults.every(validFault))) return false;
+  }
+  return true;
+}
+
+// Invalid drafts are never rewritten or discarded. The caller holds the original
+// storage value for download and disables writes until it can be recovered.
+export function inspectCameraStore(value) {
+  if (!plainObject(value) || (value.drafts != null && !plainObject(value.drafts))) throw new Error('Saved camera drafts have an invalid format.');
+  const drafts = {};
+  let invalidDrafts = 0;
+  for (const [id, draft] of Object.entries(value.drafts || {})) {
+    if (validDraft(draft, id)) drafts[id] = draft;
+    else invalidDrafts++;
+  }
+  return { ...value, drafts, invalidDrafts,
+    activeDraftId: typeof value.activeDraftId === 'string' ? value.activeDraftId : '',
+    events: (Array.isArray(value.events) ? value.events : []).filter(event => plainObject(event) &&
+      ['id', 'name', 'date'].every(key => typeof event[key] === 'string')).map(event => ({ ...event, status: typeof event.status === 'string' ? event.status : '' })),
+    registry: safeCameraRegistry(value.registry) };
+}
+
+// Capture time, observations and photo references once, before sending anything.
+// Photo blobs remain in IndexedDB under their immutable reference IDs.
+export function prepareSubmission(draft, action, capturedAt = new Date().toISOString()) {
+  if (draft.pendingAction) {
+    if (draft.pendingAction !== action || draft.pendingSubmission?.action !== action) {
+      throw new Error('This older pending draft has no original submission snapshot. Download its recovery copy and ask the lead to reconcile the server record before making a new submission.');
+    }
+    return structuredClone(draft.pendingSubmission.payload);
+  }
+  const payload = action === 'check-in' ? checkInPayload(draft, capturedAt) :
+    action === 'check-out' ? checkoutPayload(draft, structuredClone(draft.faults), capturedAt) : null;
+  if (!payload) throw new Error('Unknown camera submission.');
+  draft.pendingAction = action;
+  draft.pendingSubmission = { action, payload: structuredClone(payload), networkAttempted: false };
+  return payload;
+}
+
+export function submissionMayHaveReachedServer(draft) {
+  // Older snapshots have no attempt marker, so their outcome remains unknown.
+  return Boolean(draft.pendingAction && draft.pendingSubmission?.networkAttempted !== false);
 }
 
 // Run only after backend identity verification. Preserve local work when an
@@ -210,8 +303,8 @@ export function checkoutPayload(draft, faults, capturedAt = new Date().toISOStri
 }
 
 export function pendingLabel(draft) {
-  if (draft.pendingAction === 'check-in') return 'Check-in is saved only on this device. Sign in and retry explicitly.';
-  if (draft.pendingAction === 'check-out') return 'Check-out is saved only on this device. Sign in and retry explicitly.';
+  if (draft.pendingAction === 'check-in') return 'Check-in is pending. Its recovery snapshot stays only on this device until confirmed.';
+  if (draft.pendingAction === 'check-out') return 'Check-out is pending. Its recovery snapshot stays only on this device until confirmed.';
   if (draft.checkedOutReceipt) return `Checked out · ${draft.checkedOutReceipt.state}`;
   if (draft.checkedInReceipt) return 'Checked in · open';
   return 'Draft · not submitted';

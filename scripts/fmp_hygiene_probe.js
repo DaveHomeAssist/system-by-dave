@@ -21,6 +21,7 @@ const path = require('node:path');
 const crypto = require('node:crypto');
 const { spawn, execFileSync } = require('node:child_process');
 const { originFor } = require('./domain_sites_lib');
+const { modelContract } = require('./fmp_model_contract');
 
 const site = path.resolve(__dirname, '..');
 const args = process.argv.slice(2);
@@ -42,17 +43,18 @@ const DEBUG_PORT = 9347;
 const TIMEOUT_MS = 15000;
 
 const RELEASES = ['fmp', 'fmpwalk'];
-const ROUTES = ['/fmp/', '/fmp/camera/', '/fmp/camera/pit-center/', '/fmp/camera/front-of-house/', '/fmp/camera/pit-stage-left/', '/fmp/camera/catwalk/', '/fmp/guide/', '/fmp/house/', '/fmp/gear/', '/fmp/build/', '/fmp/ptz/', '/fmp/rig/', '/fmpwalk/', '/backfocus/'];
+const MODEL_ROUTES = ['/fmp/models/atem-hd8-iso.html', '/fmp/models/p240.html', '/fmp/models/ccu4.html', '/fmp/ptz/SuperJoy-G1-Interactive-Guide.html'];
+const ROUTES = [...MODEL_ROUTES, '/fmp/', '/fmp/camera/', '/fmp/camera/pit-center/', '/fmp/camera/front-of-house/', '/fmp/camera/pit-stage-left/', '/fmp/camera/catwalk/', '/fmp/guide/', '/fmp/house/', '/fmp/gear/', '/fmp/build/', '/fmp/ptz/', '/fmp/rig/', '/fmpwalk/', '/backfocus/'];
 // Addresses operators plausibly type or were given; each should resolve or be deliberately retired.
 // /fmp-index/ was retired to a redirect to the /fmp/ hub on 2026-09-18.
 const ALIASES = ['/fmp-walk', '/fmp-walk/', '/fmp/walk/', '/fmp-index/'];
 // /backfocus/ is an indexable public field guide; only FMP operational pages must stay noindex.
 const NOINDEX_PAGES = ['/fmp-index/'];
-const BROWSER_PAGES = ['/fmp/', '/fmpwalk/', '/fmp/rig/', '/fmp/guide/', '/fmp/camera/pit-center/', '/fmp/gear/', '/fmp/build/', '/fmp/ptz/'];
+const BROWSER_PAGES = [...MODEL_ROUTES, '/fmp/', '/fmpwalk/', '/fmp/rig/', '/fmp/guide/', '/fmp/camera/pit-center/', '/fmp/gear/', '/fmp/build/', '/fmp/ptz/'];
 const LEGACY_ORIGINS = [/davehomeassist\.github\.io/i, /\.chatgpt\.site/i];
 const LEGACY_APP_URLS = ['https://davehomeassist.github.io/fmpwalk/', 'https://davehomeassist.github.io/fmpwalk/camera/pit-center/'];
 // Pages that must offer both a home link and a return to the FMP hub.
-const SHELL_PAGES = ['/fmp/', '/fmp/camera/pit-center/', '/fmp/guide/', '/fmp/gear/', '/fmp/build/', '/fmp/ptz/', '/fmp/rig/', '/fmpwalk/'];
+const SHELL_PAGES = [...MODEL_ROUTES, '/fmp/', '/fmp/camera/pit-center/', '/fmp/guide/', '/fmp/gear/', '/fmp/build/', '/fmp/ptz/', '/fmp/rig/', '/fmpwalk/'];
 const ALLOWED_EMAILS = ['avbydave@gmail.com'];
 // No public FMP page links a Notion page; the walk's own Save to Notion receipt is the exception.
 const NOTION_URL = /https?:\/\/(?:[\w-]+\.)*notion\.(?:so|site|com)\b/gi;
@@ -260,6 +262,8 @@ async function checkContent() {
   const exposed = [];
   const notion = [];
   const counts = new Map();
+  const countMismatches = [];
+  const { componentsFor } = modelContract(site);
   for (const dir of RELEASES) {
     const files = Object.keys(JSON.parse(fs.readFileSync(path.join(site, dir, 'source_provenance.json'), 'utf8')).files).filter(name => /\.(?:html|js)$/.test(name));
     for (const name of files) {
@@ -268,11 +272,14 @@ async function checkContent() {
       const phones = text.match(/\(?\b\d{3}\)?[-. ]\d{3}[-. ]\d{4}\b/g) || [];
       if (emails.length || phones.length) exposed.push(`${dir}/${name}: ${unique(emails).length} email(s), ${unique(phones).length} phone number(s)`);
       if (`${dir}/${name}` !== NOTION_RECEIPT && (text.match(NOTION_URL) || []).length) notion.push(`${dir}/${name}: ${(text.match(NOTION_URL) || []).length}`);
-      for (const [, number] of text.matchAll(/\b(\d{2,4})[- ](?:part|component)s?\b/g)) counts.set(number, [...(counts.get(number) || []), `${dir}/${name}`]);
+      if (!name.includes('/vendor/')) for (const [, number] of text.matchAll(/\b(\d{2,4})[- ](?:part|component)s?\b/g)) {
+        counts.set(number, [...(counts.get(number) || []), `${dir}/${name}`]);
+        if (Number(number) !== componentsFor(name)) countMismatches.push(`${dir}/${name}: ${number} differs from its model catalog`);
+      }
     }
   }
   record('S2', 'privacy', exposed.length ? 'fail' : 'pass', 'Public FMP files carry no personal contact details', exposed.join('; ') || 'none found');
-  record('C1', 'content', counts.size > 1 ? 'warn' : 'pass', 'Rig part and component counts agree', [...counts].map(([number, files]) => `${number} in ${unique(files).join(', ')}`).join('; ') || 'no count claims');
+  record('C1', 'content', countMismatches.length ? 'fail' : 'pass', 'Equipment component counts match their owning catalogs', countMismatches.join('; ') || [...counts].map(([number, files]) => `${number} in ${unique(files).join(', ')}`).join('; ') || 'no count claims');
 
   for (const page of HAND_MAINTAINED) {
     const text = (await statusOf(baseFor(page) + page)).body.toString('utf8');
@@ -343,7 +350,8 @@ async function evaluate(cdp, expression) {
 const PAGE_STATE = `(() => {
   const visible = el => { const s = getComputedStyle(el); const r = el.getBoundingClientRect(); return s.display !== 'none' && s.visibility !== 'hidden' && r.width > 0 && r.height > 0; };
   const controls = [...document.querySelectorAll('button,input:not([type=hidden]),select,textarea,[role=button]')].filter(visible);
-  const small = controls.filter(el => { const r = el.getBoundingClientRect(); return r.width < 44 || r.height < 44; });
+  // A native checkbox/radio label is part of its actual clickable target.
+  const small = controls.filter(el => ![el, ...(el.matches('[type=checkbox],[type=radio]') ? [...(el.labels || [])] : [])].some(target => { const r = target.getBoundingClientRect(); return visible(target) && r.width >= 44 && r.height >= 44; }));
   const skip = document.querySelector('a[href^="#"][class*="skip"]');
   const target = skip && document.getElementById(skip.getAttribute('href').slice(1));
   const paint = [document.body, document.documentElement].map(el => (getComputedStyle(el).backgroundColor.match(/\\d+(\\.\\d+)?/g) || []).map(Number)).find(rgba => rgba.length >= 3 && (rgba.length < 4 || rgba[3] > 0)) || [255, 255, 255];
