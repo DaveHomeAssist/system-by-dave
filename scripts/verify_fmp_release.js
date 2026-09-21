@@ -21,6 +21,8 @@ const releases = [
       'house/index.html', 'house/house.css', 'house/house.js', 'house/house-data.js', 'house/house-tokens.css', 'house/site-plan.png', 'house/display-estate.csv',
       ...modelFiles,
       'guide/index.html', 'gear/index.html', 'build/index.html', 'ptz/index.html', 'ref.css', 'ref.js',
+      // Link-preview card for every FMP page; a reviewed raster, like the house site plan.
+      'fmp-social-card.png',
       'rig/index.html', 'rig/rig-model.js', 'rig/fmp-guide-data.js',
       ...rigPhotos.map(name => `rig/assets/${name}.webp`),
       'rig/vendor/three/three.module.js', 'rig/vendor/three/three.core.js', 'rig/vendor/three/addons/controls/OrbitControls.js'

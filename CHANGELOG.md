@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-09-20 — FMP link-preview card
+
+- Give every FMP page its own 1200 x 630 link-preview card (FMP Video Operations,
+  with the 3D camera rig) served from housevideo.app, replacing the System by Dave
+  banner that was loaded from systembydave.com.
+- Allow the card as a second reviewed raster in the managed release check.
+- Regenerate the managed FMP release from fmp-suite bdd0cfe.
+
 ## 2026-09-20 — Throwline Stage 3D workflow deck
 
 - Replace the long, always-open adjustment rail with Setup, Place, Room and
