@@ -1,14 +1,14 @@
 {
   "schema": "fmp.public.release.v2",
   "sourceRepository": "DaveHomeAssist/fmp-suite",
-  "sourceCommit": "bdd0cfe5591be3de51406f3125b584c668984bcd",
+  "sourceCommit": "5d67a92713787554151dad089f65f6b08144bc9e",
   "mode": "commissioning",
   "files": {
-    "build/index.html": "47e7b13b4813d32109cdfba8a813a5401d32734fda0cd93a50260b2c5a2d53da",
+    "build/index.html": "b502cefc1597dd5ba97d6fba7ecc7199ae96aa622059cf207412af08e5f541ef",
     "camera-core.js": "90d8a9324a19f3ff06db5f387edf2040815762c28b3ea1bb7817efb74a305dd9",
     "camera-view.js": "cc64e68df8d415053e142efe4ef91b5c74e1fd5036a71ed8a69808d707f7b920",
     "camera.css": "b8377944e416535e1997988c8ba94541a40b225b11d9d6ea994d3a8a3640673d",
-    "camera.js": "961a6f08d40d650ea1c700925240fade6178715f59b92b6be876c6a61741a8db",
+    "camera.js": "0e004642271a073a1eed08d490ed1d3e4183907a8a5e74ca6d97a7bcb4dd0df0",
     "camera/catwalk/index.html": "95ae79e4f1783a8db32dbcf63fe0540e703bcae300f0d663290ead1c5da76329",
     "camera/front-of-house/index.html": "27ad56d2d7a7d65b4a445f141f3d721ca4639a5b50066a7d2f9477094233b19a",
     "camera/index.html": "d40df878221a87ba1d585ad9bd654435b81d0509c75e6e49920b0b34a3d1698f",
@@ -26,7 +26,7 @@
     "house/house.js": "6ed856fa8aafddfabdb3af07d9bca1ab2cadfb72f143df67cbd671d7247d91a6",
     "house/index.html": "0f731b117caaac8b92897664e28ffe9cbb5005a796a4ac4e8bd0eef585f5359b",
     "house/site-plan.png": "655d27449a2f686ad17b74bed39b11edc69af9d342d46d079b98c042e4876f2e",
-    "index.html": "364fb97400f1030843c02bd3d6dfef038bb74d1f1272ad2334cfc164eb5df2ff",
+    "index.html": "ad0240c9f97ccb72fb8becb9643829b2ad924343af624652d972b578233641c8",
     "mail.js": "4a521185a33c8463a3b34493771e381d7982bb59f0f8d9b5096d074727e32a91",
     "models/assets/atem-hd8-iso-0.js": "346a625627cbc1583f74faa58a7205832493ea02175215337a53633647e8a8d1",
     "models/assets/atem-hd8-iso-1.js": "152ccb1f1b8b677638da9b2d91615ba0f1aebc01183fa3c6da5011d559f78eb6",
@@ -43,13 +43,13 @@
     "models/assets/p240-catalog.json": "a3750f5a79825d2dd231c1c97cf9d9220418b8095610e1b13b4681b473c43411",
     "models/atem-hd8-iso.html": "bdb0201739f2194c3cfc5f7a63c47fd8bb9dd5a165891650c46fcb2b083ca0a2",
     "models/ccu4.html": "2f08a64e6e3dd6bacc76434ed22773f75e36ca98bbef2ef35fe2a130981ef132",
-    "models/p240.html": "30efb0d9bcce69b76087cfc9aeb010d0b1b667f992b557568e0a18e3b4cca5f1",
+    "models/p240.html": "18d00263ff48ccc9e9f78d599cea7eb7750d391b145dfa39899384d0f0cbd095",
     "models/vendor/LICENSE": "852e0e8699169bf9f6fdc6bda3e682d078dcbc738b5d33e74df594721bff271d",
     "models/vendor/three.min.js": "7687c4e7cc48b735e25ccf9d838a190d88d58509764f222148345bf24cc4fdc8",
     "notion-config.js": "b675c734abe301f46f50f05a65ae58b9d25bd07c57fa8b01ef07e456e32271fc",
     "photos.js": "cd1feeb0fd50c5df4df81fa55b3fb37ca708127d793d438a62e98e596fbec3ff",
     "ptz/SuperJoy-G1-Interactive-Guide.html": "d456696a90c15b12beb460b9bbcf51b960a6d805fc9d2540ff135d74a0aaa665",
-    "ptz/index.html": "3efa043864aaacd9f745168a459a2e68d360981170eb585a1be6550d2cbdd9eb",
+    "ptz/index.html": "560dffa870c275762ef0c25c994300c1906ad0481a2ec5d20fead6a44d3cedc7",
     "public.css": "b10277cd6a77d9f27e7344d8037ba62ff50326c81bbccbdd3d4c811406dcba79",
     "public.js": "5ec85cac457d89ffddd5a2e550cfff8c213529d00152240314bf9eac2679d7d7",
     "ref.css": "2d9b441dad74f85912a631b7620af7fe67c859cba972ab799ef92b94c9e91bc5",
@@ -79,5 +79,5 @@
     "rig/vendor/three/three.module.js": "a476b88d0df406dca0e30c65b4cdf0180c7337110accec828c103655b56a361c",
     "theme.js": "34276e275d44d4380407b996455291bfcca9cc4a9a4ef81b632534b00fc1747a"
   },
-  "artifactSha256": "08c754d5aaf5c2e995adb82bc42d8100b83bee55f5540b99d9ec5908d2a5376d"
+  "artifactSha256": "e6d74880cdedb2c5349bb1b0a76210a1140f3c7b33ebd8a5111d03dfdca39b20"
 }
