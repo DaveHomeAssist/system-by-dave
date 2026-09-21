@@ -1,129 +1,122 @@
 <!doctype html>
 <html lang="en" data-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
-<title>Catwalk PTZ | FMP | System by Dave</title><meta name="description" content="Operating the FMP catwalk PTZ, Camera 4: the BirdDog P240 head and PTZOptics SuperJoy controller, pre-doors checks, speeds, presets, operator modes, the FMP-8 follow fault and focus."><meta name="theme-color" content="#f4f6f8"><meta name="robots" content="noindex, nofollow">
+<title>Catwalk PTZ | FMP | System by Dave</title><meta name="description" content="Operating Camera 4 at FMP: the BirdDog P240 catwalk PTZ, pre-show checks, presets, show operation and the known joystick fault."><meta name="theme-color" content="#f4f6f8"><meta name="robots" content="noindex, nofollow">
 <link rel="canonical" href="https://housevideo.app/fmp/ptz/"><meta property="og:type" content="website"><meta property="og:site_name" content="System by Dave"><meta property="og:title" content="Catwalk PTZ | FMP | System by Dave"><meta property="og:description" content="Operate Camera 4, the FMP catwalk PTZ, from the SuperJoy at the video position."><meta property="og:url" content="https://housevideo.app/fmp/ptz/"><meta property="og:image" content="https://housevideo.app/fmp/fmp-social-card.png"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Catwalk PTZ | FMP | System by Dave"><meta name="twitter:description" content="Operate Camera 4, the FMP catwalk PTZ, from the SuperJoy at the video position."><meta name="twitter:image" content="https://housevideo.app/fmp/fmp-social-card.png">
 <script src="../theme.js?v=34276e275d44d438"></script><link rel="stylesheet" href="../house/house.css?v=f429823db69552ae"><link rel="stylesheet" href="../ref.css?v=2d9b441dad74f859"><script src="../ref.js?v=f898b12a8c9ffea4" type="module"></script></head>
 <body>
 <a class="skip" href="#main">Skip to catwalk PTZ</a>
 <header class="top"><nav aria-label="Breadcrumb"><a href="https://systembydave.com/">System by Dave</a><span>/</span><a href="/fmp/">FMP Video Operations</a><span>/</span><span aria-current="page">Catwalk PTZ</span></nav><button id="theme" data-theme-toggle type="button" aria-pressed="false">Dark mode</button></header>
 <main id="main" tabindex="-1">
-<header class="mast"><div><p class="eyebrow">Freedom Mortgage Pavilion · Camera 4</p><h1>Catwalk PTZ<span>.</span></h1><p class="intro">A BirdDog P240 on the catwalk, driven from a PTZOptics SuperJoy at the video position. A preset that landed last night is not proof it lands tonight.</p></div><div class="record"><strong>OPERATING REFERENCE</strong><span>Drafted September 12 · updated September 17</span><span>Compiled · September 18, 2026</span><b>Field checks open</b></div></header>
+<header class="mast"><div><p class="eyebrow">Freedom Mortgage Pavilion · Camera 4</p><h1>Catwalk PTZ<span>.</span></h1><p class="intro">The BirdDog P240 on the catwalk is Camera 4. Run it from the SuperJoy at the video position. This page is for operating the shot; camera engineering stays with the video office.</p></div><div class="record"><strong>OPERATING REFERENCE</strong><span>Operator copy revised September 20, 2026</span><span>Camera engineering stays with video</span><b>FMP-8 still open</b></div></header>
 <nav class="tabs" aria-label="Catwalk PTZ sections"><a href="#rules" aria-current="page">01 <span>Rules</span></a><a href="#doors">02 <span>Before doors</span></a><a href="#show">03 <span>Show</span></a><a href="#fmp-8">04 <span>Follow fault</span></a><a href="#focus">05 <span>Focus</span></a><a href="#troubleshoot">06 <span>Troubleshoot</span></a></nav>
 
 <section id="rules" class="panel" aria-labelledby="rules-title"><div class="section-head"><div><p class="eyebrow">01 / Rules</p><h2 id="rules-title">Two controllers, two camera families.</h2></div><a class="action" href="../camera/catwalk/">Open catwalk check-in →</a></div>
-<p class="lede">On every call, confirm which CAM button on the SuperJoy is the house head, the operator mode for the night, the safe wide preset, and who shades the PTZ picture with the Head of Video.</p>
+<p class="lede">Before doors, confirm which CAM button selects the house PTZ, which preset is the safe wide, and what Camera 4 is expected to cover. Once the show starts, operate the camera and leave picture engineering to the video office.</p>
 <div class="split"><div class="stack">
-<article class="sheet caution"><span class="label warn">Not the camera control panel</span><p>The SuperJoy drives this head. The switcher's camera control panel shades the three URSA bodies over the SDI return and does not drive the PTZ. Its channel 4 reads <code>4 PTZ</code> with type <code>URSA_G2</code>; that is a configuration artifact, not control of this head.</p><p>The switcher is an ATEM Television Studio HD8 ISO on software 9.0. The chassis has a remote-camera capability, but it is not driving this head, and nothing should be re-pointed at it without the Head of Video.</p></article>
-<article class="sheet"><div class="sheet-head"><h3>Position map</h3><span class="stamp">Reconciled September 17, 2026</span></div><div class="table-scroll"><table><caption class="sr-only">Camera 4 parts, locations and evidence</caption><thead><tr><th scope="col">Item</th><th scope="col">Where and what</th><th scope="col">Evidence</th></tr></thead><tbody>
-<tr><td>Head</td><td>Catwalk. BirdDog P240: 8.5 MP, 4.4–88.4 mm, about 20× optical, and about 40× HD reach with Tele Convert, which is a sensor crop</td><td><span class="status good">Confirmed</span></td></tr>
-<tr><td>Controller</td><td>PTZOptics SuperJoy <code>PT-SUPERJOY-G1</code> at the video position, upstage right. CAM 1–6 bank; the house head's button is unrecorded</td><td><span class="status good">Confirmed</span></td></tr>
-<tr><td>Video</td><td>Switcher input 4, labeled <code>4 PTZ</code>. Fed by the head's SDI tail or a network decoder; untraced</td><td><span class="status warn">Partial</span></td></tr>
-<tr><td>Control link</td><td>The venue's isolated production network. A building internet outage should not touch it</td><td><span class="status good">Confirmed</span></td></tr>
-<tr><td>Return</td><td>None at the catwalk. The operator works from the multiview at the video position</td><td><span class="status warn">Reported</span></td></tr>
-<tr><td>Comms</td><td>Wall patch shared with the office, near the PTZ station. Clear-Com beltpack and headset</td><td><span class="status warn">Reported</span></td></tr>
-<tr><td>Tally</td><td>Follows program on the switcher. Whether the head's own tally light is wired is unrecorded</td><td><span class="status">Unknown</span></td></tr>
-<tr><td>Picture</td><td>Exposure, white balance, iris, shutter, gain, backlight, red and blue gain, and focus all live on the SuperJoy's left block</td><td><span class="status good">Confirmed</span></td></tr>
+<article class="sheet caution"><span class="label warn">Who does what</span><p>The SuperJoy drives Camera 4. The video office handles camera engineering.</p><p>Operate framing, pan, tilt, zoom, focus and approved presets. Do not change video format, exposure, white balance, gain, color, network settings or camera-control configuration unless the Head of Video specifically asks you to.</p><p>If the picture looks wrong, call video. Do not try to engineer around it from the camera menus.</p></article>
+<article class="sheet"><div class="sheet-head"><h3>What you're operating</h3><span class="stamp">Reconciled September 20, 2026</span></div><div class="table-scroll"><table><caption class="sr-only">Camera 4 operating position</caption><thead><tr><th scope="col">Item</th><th scope="col">What matters on the call</th></tr></thead><tbody>
+<tr><td>Camera</td><td>BirdDog P240 on the catwalk</td></tr>
+<tr><td>Controller</td><td>PTZOptics SuperJoy at the video position</td></tr>
+<tr><td>Switcher</td><td>Camera 4 / input 4, labeled <code>4 PTZ</code></td></tr>
+<tr><td>Picture</td><td>Watch <code>4 PTZ</code> on the multiview</td></tr>
+<tr><td>Comms</td><td>Clear-Com at the video position</td></tr>
+<tr><td>CAM button</td><td>Still needs to be labeled on the controller</td></tr>
+<tr><td>Safe wide</td><td>Confirm the preset before doors; do not assume yesterday's preset is still safe</td></tr>
 </tbody></table></div></article>
 </div><div class="stack">
-<article class="sheet stop"><span class="label bad">Stop conditions</span><ul>
-<li>Do not overwrite a stored preset, or SET a new one over an existing number, without the Head of Video.</li>
-<li>Do not open the OSD while the camera is on program. The menu draws on the picture.</li>
-<li>Do not change the head's address, control port, protocol or CAM ID, and do not factory reset it. A wrong address hides the camera on the isolated network.</li>
-<li>Do not touch the camera control panel channel labeled <code>4 PTZ</code>. It does not control this head.</li>
-<li>Do not use the SuperJoy's HDMI OUTPUT as a confidence monitor. It only sees cameras.</li>
-<li>Use P240 procedures only. There is no P200 in this building, so ignore P200 menu paths, DIP switch tables and reset sequences.</li>
-<li>Do not go up to the catwalk head during a show unless the Head of Video releases you to it.</li>
+<article class="sheet stop"><span class="label bad">Don't do this during the show</span><ul>
+<li>Do not overwrite or build presets unless the Head of Video tells you to.</li>
+<li>Do not open the camera's OSD while Camera 4 is on program.</li>
+<li>Do not change camera engineering, network settings, control protocol or CAM ID.</li>
+<li>Do not factory reset the camera or controller.</li>
+<li>Do not use the SuperJoy HDMI output as your program monitor. Watch <code>4 PTZ</code> on the multiview.</li>
+<li>Do not go to the catwalk head during the show unless the Head of Video releases you to it.</li>
 </ul></article>
-<article class="sheet"><h3>What is still open</h3><ul>
-<li>Which CAM button selects the house head.</li>
-<li>Whether input 4 is fed by the head's SDI tail or a network decoder.</li>
-<li>PoE+ or 12 V DC power, and the exact mount position.</li>
-<li>Which presets are stored, what they point at, and whether recall is reliable on this cross-vendor pairing.</li>
-</ul><p>The SuperJoy documents BirdDog as a supported brand, so the pairing is designed, not improvised.</p></article>
+<article class="sheet"><h3>Still needs checking</h3><ul>
+<li>Label the SuperJoy CAM button that selects the house P240.</li>
+<li>Document the safe-wide preset and the presets actually used for shows.</li>
+<li>Finish tracing the Camera 4 video path.</li>
+<li>Finish the FMP-8 joystick tests.</li>
+</ul><p>The first two are operator-facing. The video-path and control investigation belong to the video office.</p></article>
 </div></div>
 </section>
 
 <section id="doors" class="panel" aria-labelledby="doors-title"><div class="section-head"><div><p class="eyebrow">02 / Before doors</p><h2 id="doors-title">Select, prove, set.</h2></div><a class="action" href="https://docs.ptzoptics.com/docs/controllers/superjoy/" target="_blank" rel="noopener noreferrer">SuperJoy manual ↗</a></div>
 <div class="trio">
-<article class="sheet"><span class="label">01 · Check in</span><h3>Identify the assignment</h3><ul class="checks">
-<li>The head is Camera 4 on switcher input 4. Record which CAM button selects it the first time you find out.</li>
-<li>Operator mode for the night, agreed with the Head of Video.</li>
-<li>Who shades the PTZ picture. The SuperJoy's left block is the only shading surface for this camera.</li>
-<li>Default shot and any restricted angles from the catwalk.</li>
-<li>Open faults: FMP-8, the follow fault.</li>
-<li>Did the tour bring its own PTZ heads? A tour on September 12 placed two, downstage right and at front of house.</li>
+<article class="sheet"><span class="label">01 · Check in</span><h3>Know the assignment</h3><ul class="checks">
+<li>Camera 4 is the house P240 on switcher input 4.</li>
+<li>Confirm which SuperJoy CAM button selects it.</li>
+<li>Confirm the safe-wide preset and the shots the director expects from Camera 4.</li>
+<li>Confirm any restricted angles or movement limits.</li>
+<li>Known issue: FMP-8. For now, treat Camera 4 as preset-first and do not live-track performers unless the Head of Video clears it.</li>
+<li>If the tour adds PTZ cameras, make sure you know which controller buttons belong to the house camera before the show.</li>
 </ul></article>
-<article class="sheet"><span class="label">02 · Select</span><h3>Power up and select the camera</h3><ol class="steps">
-<li>SuperJoy powered, LCD showing controller status.</li>
-<li>Press the CAM button for the house head. If the wrong camera answers, or none does, stop and check with the Head of Video before pressing CAM ID or SETUP.</li>
-<li>Confirm <code>4 PTZ</code> shows a picture on the multiview. It is your only picture; there is no return at the catwalk.</li>
-<li>Press HOME. The head moves. If it does not, go to troubleshooting before touching any settings.</li>
-<li>Note the current PAN SPEED and TILT SPEED on the LCD before changing anything.</li>
+<article class="sheet"><span class="label">02 · Select</span><h3>Select Camera 4</h3><ol class="steps">
+<li>Power up the SuperJoy and confirm the controller is responsive.</li>
+<li>Select the CAM button assigned to the house P240. If the wrong camera moves, stop and call video.</li>
+<li>Confirm <code>4 PTZ</code> has picture on the multiview.</li>
+<li>With Camera 4 off program, make a small pan, tilt and zoom move to prove control.</li>
+<li>Do not press HOME as a substitute for the safe-wide preset. HOME is a camera function; the FMP safe wide is a show preset.</li>
 </ol></article>
-<article class="sheet"><span class="label">03 · Prove</span><h3>One axis at a time</h3><ul class="checks">
-<li>Pan left and right with the joystick. Smooth start and stop, no stall.</li>
+<article class="sheet"><span class="label">03 · Prove</span><h3>Prove the moves you need</h3><ul class="checks">
+<li>Pan left and right. It should start and stop cleanly.</li>
 <li>Tilt up and down. Same.</li>
-<li>Zoom with the joystick twist, then with the WIDE/TELE dial.</li>
-<li>Focus: AUTO FOCUS, then AUTO FOCUS LOCK and UNLOCK, then the NEAR/FAR dial in manual.</li>
-<li>Drive a slow diagonal. If it reads as almost pure pan or pure tilt, that is FMP-8; run the speed test first.</li>
-<li>Tally follows when the switcher takes input 4 to program.</li>
+<li>Zoom in and out and check focus at the useful show distances.</li>
+<li>Recall the verified safe-wide preset while Camera 4 is off program.</li>
+<li>Recall the presets you expect to use and make sure they land where expected.</li>
+<li>Try one slow diagonal. If the move collapses into mostly pan or mostly tilt, stop there and report FMP-8.</li>
 </ul></article>
 </div>
 <div class="split"><div class="stack">
 <article class="sheet"><span class="label">04 · Speeds</span><ol class="steps">
-<li>Level PAN SPEED against TILT SPEED with their buttons left of the LCD. A large mismatch reproduces the follow fault with no hardware fault present.</li>
-<li>Set ZOOM SPEED and FOCUS SPEED for the shot: slow for a live wide, faster for a move off program.</li>
-<li>Set PRESET SPEED so a recalled preset arrives without a visible lurch. Test it off program.</li>
-<li>Record the four values you land on so the next operator starts from the same place.</li>
+<li>Use conservative pan, tilt and zoom speeds. Camera 4 is not a whip-pan camera.</li>
+<li>Keep pan and tilt speeds reasonably close. A large mismatch can make a diagonal look like a single-axis move.</li>
+<li>Set preset speed so recalls arrive cleanly. Test every change off program.</li>
+<li>If a speed change does not behave the way you expect, stop changing settings and call video.</li>
 </ol></article>
 <article class="sheet"><span class="label">05 · Presets</span><ol class="steps">
-<li>Recall the safe wide or home preset first with CALL and its number. Confirm it lands on the multiview.</li>
-<li>Recall each preset the show needs and confirm each lands. Presets are absolute positions; a bumped or power-cycled head can land elsewhere. Verify at doors, every show.</li>
-<li>To store: frame the shot, then SET and the number, only on a number the Head of Video has released to you.</li>
-<li>Hit AUTO FOCUS to save before you retake control. Skipping it leaves the head in the wrong state when you take the joystick back.</li>
-<li>Preset recall on this cross-vendor pairing is unproven. Do not build a library on it until recall is tested on a load-in day.</li>
-</ol><p class="see">The panel holds up to 255 presets, 9 quick presets and 4 super presets. <a href="#focus">Candidate preset list</a></p></article>
+<li>Recall the verified safe-wide preset first and confirm it lands correctly on the multiview.</li>
+<li>Recall each preset the show needs while Camera 4 is off program.</li>
+<li>If a preset lands wrong, do not keep calling it on air. Park the camera somewhere usable and tell video.</li>
+<li>Only SET or overwrite a preset when the Head of Video has released that preset number.</li>
+<li>If focus was changed manually, return the camera to the agreed focus mode before handing the shot back.</li>
+</ol><p class="see"><a href="#focus">Candidate preset list</a></p></article>
 </div><div class="stack">
-<article class="sheet"><span class="label">06 · Operator mode</span><div class="table-scroll"><table><caption class="sr-only">SuperJoy operator modes</caption><thead><tr><th scope="col">Mode</th><th scope="col">What the operator can do</th><th scope="col">Use when</th></tr></thead><tbody>
-<tr><td>Matrix</td><td>Presets 1–3 on cameras 1–3 from the keypad only</td><td>New operator, zero-risk night</td></tr>
-<tr><td>Basic</td><td>Joystick and preset recall; everything else locked</td><td>Standard show</td></tr>
-<tr><td>Basic, second press</td><td>Preset recall only, no joystick</td><td>Absolute floor</td></tr>
-<tr><td>Full</td><td>Everything</td><td>Head of Video or a trained operator</td></tr>
-</tbody></table></div><p class="note">BASIC MODE cycles joystick and presets → presets only → limit off. One of those states disables the joystick entirely, which looks like a dead head. Check the mode before reporting a control fault.</p></article>
-<article class="sheet"><span class="label">07 · Picture</span><ol class="steps">
-<li>Coordinate with the Head of Video before changing exposure or white balance. The URSAs are shaded at the control panel; this camera is shaded here, so matching it to Cameras 1–3 is a manual job.</li>
-<li>White balance: WHITE BALANCE CYCLE to the agreed mode, ONEPUSH TRIGGER on a neutral target under show light, then RED GAIN and BLUE GAIN only if told to.</li>
-<li>Exposure: EXPOSURE CYCLE to the agreed mode, then the IRIS/SHUTTER/GAIN knob within the agreed plan. BACKLIGHT only when the stage wash is behind the subject.</li>
-<li>Do not re-balance after the Head of Video has matched the cameras.</li>
-</ol></article>
+<article class="sheet"><span class="label">06 · Camera engineering</span><h3>Leave the picture setup with video</h3><p>The SuperJoy exposes camera controls that an operator does not normally need during the show.</p><ul>
+<li><strong>You operate:</strong> framing, pan, tilt, zoom, focus and approved presets.</li>
+<li><strong>Video handles:</strong> exposure, white balance, gain, color, video format and camera/control configuration.</li>
+<li>If the image looks dark, bright, off-color or otherwise wrong, call video and describe what you see.</li>
+<li>Do not start changing engineering controls because the picture looks different from Cameras 1–3.</li>
+</ul></article>
+<article class="sheet"><span class="label">07 · Handoff</span><h3>Say what the camera is doing</h3><p>Keep the report simple: camera number, symptom, and whether you still have a usable shot.</p><p><em>“Camera 4, joystick stopped. Presets still work and I have the wide.”</em></p><p><em>“Camera 4, picture is up but it looks dark compared with the other cameras.”</em></p></article>
 </div></div>
 </section>
 
 <section id="show" class="panel" aria-labelledby="show-title"><div class="section-head"><div><p class="eyebrow">03 / Show</p><h2 id="show-title">Park wide. Move off program.</h2></div><a class="action" href="../camera/catwalk/">Open catwalk check-out →</a></div>
-<p class="lede">Park on the safe wide preset before doors. If control drops, CALL it first, then troubleshoot. A parked wide is a usable shot; a stalled diagonal is not.</p>
+<p class="lede">For now, Camera 4 is preset-first. Have a usable wide ready before doors and make normal repositioning moves off program. Do not live-track performers until FMP-8 is cleared or the Head of Video specifically directs it.</p>
 <div class="split"><div class="stack">
 <article class="sheet"><h3>Show operation</h3><ol class="steps">
-<li>Park on the safe wide preset before doors.</li>
-<li>Reposition only when off program unless directed. On program, moves are slow, deliberate and single-axis until FMP-8 is cleared.</li>
-<li>Keep the OSD closed on program.</li>
-<li>Watch the multiview tile for <code>4 PTZ</code>, not the HDMI OUTPUT.</li>
-<li>Comms format: camera first, then symptom and impact. <em>“Camera 4, lost joystick, presets still recall.”</em></li>
-<li>If control drops, CALL the safe wide preset first, then troubleshoot.</li>
+<li>Start from the verified safe wide.</li>
+<li>Use presets for normal show coverage and reposition while Camera 4 is off program.</li>
+<li>Until FMP-8 is cleared, do not follow performers live with the joystick unless the Head of Video directs it.</li>
+<li>Keep the OSD closed while the camera is on program.</li>
+<li>Watch <code>4 PTZ</code> on the multiview.</li>
+<li>If control drops and the safe-wide preset was verified that day, recall it off program. If it was not verified, keep Camera 4 off air and establish a usable frame manually if control still works.</li>
 </ol></article>
 </div><div class="stack">
 <article class="sheet good"><span class="label good">End of night</span><ol class="steps">
 <li>Wait for the Head of Video to release the position.</li>
-<li>CALL the safe wide or home preset and leave the head parked there.</li>
-<li>Leave the speeds, mode and CAM button as found unless told otherwise, and record what you leave.</li>
+<li>Park on the verified safe-wide preset if one was established for the show.</li>
+<li>Do not change engineering or controller configuration on the way out.</li>
 <li>Return the beltpack and headset.</li>
-<li>Report faults with the time, what was on program, the panel's mode, the speed values, and whether the fault reproduced.</li>
+<li>Report anything that behaved differently: what happened, roughly when, and whether the problem repeated.</li>
 </ol></article>
 </div></div>
 </section>
 
 <section id="fmp-8" class="panel" aria-labelledby="fmp-8-title"><div class="section-head"><div><p class="eyebrow">04 / Known fault FMP-8</p><h2 id="fmp-8-title">Two symptoms. Do not merge them.</h2></div></div>
-<p class="lede">Run these on a load-in day or before doors and record which step changed the behavior. Steps that touch the head's configuration need the Head of Video.</p>
+<p class="lede">FMP-8 is an engineering problem, not something the camera operator should solve during the show. If Camera 4 will not make a clean diagonal or a held move speeds up on its own, stop live joystick work and report the symptom. The tests below are for the video office on a load-in day or before doors.</p>
 <div class="split"><div class="stack">
 <article class="sheet caution"><span class="label warn">Symptom A · reported September 11</span><h3>A diagonal becomes pure pan or pure tilt</h3><div class="table-scroll"><table><caption class="sr-only">Symptom A test order</caption><thead><tr><th scope="col">#</th><th scope="col">Test</th><th scope="col">What it separates</th></tr></thead><tbody>
 <tr><td>1</td><td>Level PAN SPEED against TILT SPEED, then drive a diagonal</td><td>Axis speed mismatch</td></tr>
@@ -133,7 +126,7 @@
 <tr><td>5</td><td>Compare firmware at both ends</td><td>Version gap</td></tr>
 <tr><td>6</td><td>Check whether it follows preset recall or only joystick drive</td><td>Recall path from drive path</td></tr>
 </tbody></table></div><p class="note">Step 1 changes maximum velocity only. No SuperJoy response curve, acceleration, exponent or deadband setting has been identified, so it is not a curve adjustment and not a fix for symptom B.</p></article>
-<article class="sheet"><h3>The switcher is not in this path</h3><p>VISCA over IP arrived in ATEM software 9.7, and this switcher runs 9.0. That does not bear on FMP-8 as it stands: the SuperJoy talks to the head directly. It matters only if someone proposes moving PTZ control to the switcher, which is a Head of Video decision.</p></article>
+<article class="sheet"><h3>Operator response</h3><p>If the joystick move is not predictable, keep Camera 4 off program, return to a verified preset or usable parked frame, and call video. Do not change protocol, network, firmware or switcher settings during the show.</p></article>
 </div><div class="stack">
 <article class="sheet caution"><span class="label warn">Symptom B · reported September 17</span><h3>A held pan accelerates after several seconds</h3><p>Do not read this as “the maximum pan speed is too high.” The behavior could live in the joystick response, the speed command sent, the head's zoom-adaptive pan and tilt speed, or the head's own motor acceleration. Separate them before adjusting anything.</p><div class="table-scroll"><table><caption class="sr-only">Symptom B test order</caption><thead><tr><th scope="col">#</th><th scope="col">Test</th><th scope="col">What it separates</th></tr></thead><tbody>
 <tr><td>1</td><td>Hold the joystick at about 20 percent for 10 seconds without moving it</td><td>Speed rising with the stick still is time-based ramping. Run this first</td></tr>
@@ -143,7 +136,7 @@
 <tr><td>5</td><td>Drive the same move from the head's web interface</td><td>Camera from controller</td></tr>
 <tr><td>6</td><td>Compare the current control method against VISCA over IP</td><td>Controller or protocol</td></tr>
 </tbody></table></div></article>
-<article class="sheet good"><span class="label good">What good looks like</span><p>Position-dependent, not time-dependent. A small deflection crawls, more deflection goes faster, and a held deflection holds its speed. A fixed stick with rising speed is time-based ramping; disproportionate speed from more deflection is an aggressive response curve. They are different faults with different fixes.</p></article>
+<article class="sheet good"><span class="label good">What good looks like</span><p>A small joystick move stays slow, more stick gives more speed, and a held stick does not continue accelerating on its own. If the response is not predictable, Camera 4 stays preset-first until the video office clears it.</p></article>
 </div></div>
 </section>
 
@@ -152,9 +145,9 @@
 <article class="sheet"><h3>Focus workflow</h3><p>Set critical focus at maximum practical zoom on a high-contrast target, eyes or face where possible. Pull back to the intended composition, then recheck at long telephoto.</p><div class="split">
 <div><span class="label good">Do</span><ul><li>Punch in to set focus, then compose out. Never judge critical focus from a wide frame.</li><li>Prefer manual focus for fixed positions where the shot is predictable.</li><li>Use a slightly wider frame when it does the job, rather than sitting at maximum zoom.</li></ul></div>
 <div><span class="label bad">Watch for</span><ul><li>Continuous autofocus during concert IMAG.</li><li>Haze, strobes and LED backgrounds, which make autofocus hunt.</li><li>Backlight, darkness, mic stands and performers crossing frame.</li></ul></div>
-</div><p class="note">If focus is questionable, punch in and establish it. Do not guess from the wide. Tele Convert reach has not been checked under show lighting; verify it before relying on a 40× shot in a cue.</p></article>
+</div><p class="note">If focus is questionable, punch in and establish it. Do not guess from the wide. If the picture itself looks wrong rather than soft, call video instead of changing camera engineering.</p></article>
 </div><div class="stack">
-<article class="sheet caution"><span class="label warn">Candidate presets · proposed September 17, not built</span><div class="table-scroll"><table><caption class="sr-only">Proposed Camera 4 presets</caption><thead><tr><th scope="col">#</th><th scope="col">Preset</th><th scope="col">State</th></tr></thead><tbody>
+<article class="sheet caution"><span class="label warn">Candidate presets · proposed September 17, not yet verified as a show library</span><div class="table-scroll"><table><caption class="sr-only">Proposed Camera 4 presets</caption><thead><tr><th scope="col">#</th><th scope="col">Preset</th><th scope="col">State</th></tr></thead><tbody>
 <tr><td>1</td><td>Bass full</td><td>Not built</td></tr>
 <tr><td>2</td><td>Bass medium</td><td>Not built</td></tr>
 <tr><td>3</td><td>Bass tight</td><td>Not built</td></tr>
@@ -162,34 +155,32 @@
 <tr><td>5</td><td>Guitar</td><td>Not built</td></tr>
 <tr><td>6</td><td>Drummer</td><td>Not built</td></tr>
 <tr><td>7</td><td>Stage safety</td><td>Not built</td></tr>
-</tbody></table></div><p class="note">Presets stay a Head of Video decision, and cross-vendor recall is unproven. Verify each before doors for position, framing, focus, exposure and movement path.</p></article>
+</tbody></table></div><p class="note">Preset numbers and assignments stay a Head of Video decision. Verify any preset you plan to use before doors for framing, focus and movement path.</p></article>
 </div></div>
 </section>
 
 <section id="troubleshoot" class="panel" aria-labelledby="troubleshoot-title"><div class="section-head"><div><p class="eyebrow">06 / Troubleshoot</p><h2 id="troubleshoot-title">Check in this order.</h2></div><a class="action" href="../build/#troubleshoot">Cameras 1–3 →</a></div>
-<article class="sheet"><div class="table-scroll"><table><caption class="sr-only">Camera 4 symptoms, the order to check, and how to escalate</caption><thead><tr><th scope="col">Symptom</th><th scope="col">Check in order</th><th scope="col">Escalate as</th></tr></thead><tbody>
-<tr><td>No picture on <code>4 PTZ</code></td><td>Head power (PoE+ or DC; unrecorded) → network link on the isolated switch → input 4 selection → SDI tail or decoder ahead of input 4</td><td>Camera 4 video path. Say that the tail is untraced</td></tr>
-<tr><td>Picture, no control at all</td><td>Correct CAM button → BASIC MODE state → controller network link → head reachable on the isolated network</td><td>Camera 4 control fault, with the last point control worked</td></tr>
-<tr><td>Joystick dead, presets recall</td><td>BASIC MODE second-press state → joystick enable</td><td>Controller mode, not a head fault</td></tr>
-<tr><td>Diagonal reads as pure pan or tilt</td><td><a href="#fmp-8">FMP-8 test order</a></td><td>FMP-8, known</td></tr>
-<tr><td>Preset lands in the wrong place</td><td>Head bumped or power-cycled → recall again → re-SET with authorization</td><td>Presets are absolute positions; log it</td></tr>
-<tr><td>Menu on the picture</td><td>OSD ON/OFF → OSD BACK until clear</td><td>Clear it and move on</td></tr>
-<tr><td>Picture does not match Cameras 1–3</td><td>Exposure mode → white balance mode → the Head of Video's agreed values</td><td>Shading; coordinate before touching</td></tr>
-<tr><td>Wrong camera moves</td><td>CAM button → CAM GROUP → stop and report</td><td>Assignment fault; a tour head may share the controller</td></tr>
+<article class="sheet"><div class="table-scroll"><table><caption class="sr-only">Camera 4 operator troubleshooting</caption><thead><tr><th scope="col">What you see</th><th scope="col">What to do</th><th scope="col">Tell video</th></tr></thead><tbody>
+<tr><td>No picture on <code>4 PTZ</code></td><td>Keep Camera 4 off program. Do not start changing camera or switcher settings.</td><td>“Camera 4, no picture on the multiview.”</td></tr>
+<tr><td>Picture, no joystick control</td><td>Confirm the correct house CAM button is selected. If still dead, stop there.</td><td>Whether presets still recall.</td></tr>
+<tr><td>Joystick move is unpredictable</td><td>Stop live joystick work and use a verified preset or parked frame.</td><td><a href="#fmp-8">FMP-8</a> and exactly what the move did.</td></tr>
+<tr><td>Preset lands wrong</td><td>Do not use that preset on air and do not overwrite it without approval.</td><td>Preset number and where it landed.</td></tr>
+<tr><td>Menu appears on picture</td><td>Get Camera 4 off program and clear the OSD.</td><td>What opened the menu, if known.</td></tr>
+<tr><td>Picture looks dark, bright or off-color</td><td>Keep operating the shot. Do not change exposure or white balance.</td><td>Describe the mismatch to the video office.</td></tr>
+<tr><td>Wrong camera moves</td><td>Stop moving it immediately.</td><td>Which CAM button was selected and which camera responded.</td></tr>
 </tbody></table></div></article>
-<div class="split"><article class="sheet"><h3>Open field checks</h3><ul class="checks">
-<li class="done">Photograph the head's model badge. Done: the plate reads P240.</li>
-<li>Record which CAM button selects the house head.</li>
-<li>Trace input 4: SDI tail from the head, or a network decoder ahead of the switcher.</li>
-<li>Record head power, PoE+ or 12 V DC, and the mount position.</li>
-<li>List the stored presets and what each points at.</li>
-<li>Test preset recall on a load-in day before building the library.</li>
-<li>Run the FMP-8 test orders and record the result.</li>
-<li>Confirm whether a Camera 4 return has been run to the operator desk.</li>
-<li>Record whether the head's own tally light is wired and follows program.</li>
+<div class="split"><article class="sheet"><h3>Video office follow-up</h3><ul class="checks">
+<li class="done">Camera model confirmed: BirdDog P240.</li>
+<li>Label the SuperJoy CAM button for the house head.</li>
+<li>Document the approved show presets and safe wide.</li>
+<li>Trace input 4 and document the physical video path.</li>
+<li>Record head power and mount details.</li>
+<li>Run the FMP-8 engineering tests and record the result.</li>
+<li>Confirm the controller state used for normal shows.</li>
+<li>Record whether the P240 tally light is wired and follows program.</li>
 </ul></article>
 <article class="sheet"><h3>Manufacturer documents</h3><div class="link-list"><a href="https://docs.ptzoptics.com/docs/controllers/superjoy/" target="_blank" rel="noopener noreferrer">PTZOptics SuperJoy G1 user manual <span aria-hidden="true">↗</span></a></div><p class="note">P240 manual and vendor links are not yet on record.</p></article></div>
 </section>
 </main>
-<footer><span>FMP Video Operations · Catwalk PTZ</span><span>Draft operating reference · field checks open</span><a href="/fmp/#learn">Back to Learn</a></footer>
+<footer><span>FMP Video Operations · Catwalk PTZ</span><span>Operator reference · camera engineering stays with video</span><a href="/fmp/#learn">Back to Learn</a></footer>
 </body></html>
