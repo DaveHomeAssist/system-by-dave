@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-09-22 — One selection language, whole-device defaults, honest limits
+
+- SuperJoy now tints the selected part's own surfaces in the suite's rust instead
+  of drawing a box around it, so selection looks the same on all five models.
+  Printed legends stay untinted and legible.
+- The ATEM and SuperJoy were the last models opening on a preselected part. Both
+  now open on the whole device, with a real "Whole device · N parts" first option
+  so a 227-entry menu is not blank. Deep links still restore their part.
+- Stop repeating one identical limit on 126 of 140 CCU4 components and 13 of 24 on
+  the P240. Shared caveats move to a category level and the page resolves part,
+  then category, then model, so each part still shows a limit while the data
+  carries only real differences.
+- Regenerate the managed FMP release from fmp-suite 758f169.
+
 ## 2026-09-22 — FMP evidence fixes, publisher branding struck, walk retired
 
 - Fix the evidence diagrams: three stroked SVG curves had no fill, so the browser

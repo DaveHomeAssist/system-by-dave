@@ -14,8 +14,8 @@
   function message(text){$('sim-message').textContent=text;}
   function populate(){
     const q=$('search').value.trim().toLowerCase();const visible=components.filter(c=>[labelOf(c),c.component_id,c.category,...c.aliases].join(' ').toLowerCase().includes(q));
-    $('component').replaceChildren();for(const cat of data.categories){const items=visible.filter(c=>c.category===cat);if(!items.length)continue;const group=document.createElement('optgroup');group.label=cat;for(const c of items){const o=document.createElement('option');o.value=c.component_id;o.textContent=labelOf(c);group.append(o);}$('component').append(group);}
-    if(visible.some(c=>c.component_id===selected))$('component').value=selected;else $('component').selectedIndex=-1;
+    $('component').replaceChildren();{const whole=document.createElement('option');whole.value='';whole.textContent='Whole device \u00b7 '+components.length+' parts';$('component').append(whole);}for(const cat of data.categories){const items=visible.filter(c=>c.category===cat);if(!items.length)continue;const group=document.createElement('optgroup');group.label=cat;for(const c of items){const o=document.createElement('option');o.value=c.component_id;o.textContent=labelOf(c);group.append(o);}$('component').append(group);}
+    $('component').value=visible.some(c=>c.component_id===selected)?selected:'';
     $('count').textContent='('+visible.length+')';$('total').textContent=components.length+' parts';
   }
   function queueOptions(){const q=$('queue');q.replaceChildren();for(let i=1;i<=10;i++){const o=document.createElement('option');o.value=String(i);o.textContent=label(i);q.append(o);}q.value=String(state.preview);}
@@ -29,6 +29,16 @@
   function setView(name){currentView=name;diagramFocus=null;root.querySelectorAll('[data-view]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.view===name)));fitPreset();drawDiagram();}
   function boundsFor(id){const box=new THREE.Box3();for(const m of meshMap.get(id)||[])box.expandByObject(m);return box;}
   function focusPart(){const c=byId.get(selected);if(diagram){const s=c.shape;currentView=s.surface==='rear'?'rear':s.surface==='console'?'console':'switching';const p=diagramPosition(c);diagramFocus=c.kind==='chassis'?null:[p.x-3.3,p.y-2.6,6.6,5.2];drawDiagram();return;}if(!camera)return;const box=boundsFor(selected);if(box.isEmpty())return;const center=box.getCenter(new THREE.Vector3()),size=box.getSize(new THREE.Vector3());orbit.target.copy(center);orbit.distance=Math.max(4.8,Math.max(size.x/camera.aspect,size.y,size.z)*2.6);orbit.theta=c.shape.surface==='rear'?Math.PI:0;orbit.phi=c.shape.surface==='deck'?.35:1.22;updateCamera();}
+  function clearSelection(){
+    selected='';$('component').value='';
+    $('category').textContent='Overview';$('label').textContent='Whole device';
+    $('purpose').textContent='Click a part of the model, or choose one from the component menu.';
+    $('id').textContent='';$('hover').textContent='';
+    $('press').disabled=true;$('press').textContent='Identification only';
+    $('limit').textContent='';$('sources').replaceChildren();$('venue-note').hidden=true;
+    if(sceneKit){clearHighlight();requestRender();}drawDiagram();
+    try{history.replaceState(null,'','#');}catch(_){/* Some embedded surfaces do not permit URL changes. */}
+  }
   function select(id,options={}) {
     const c=byId.get(id);if(!c){message('That component link is not in this revision. Select a part from the list.');return;}
     selected=id;if(options.clearSearch){$('search').value='';populate();}
@@ -120,7 +130,7 @@
       showDiagram(false);
     }catch(error){renderer=null;sceneKit=null;showDiagram(true,'3D graphics are unavailable in this browser. Use this selectable diagram and the component menu.');}
   }
-  $('component').addEventListener('change',()=>select($('component').value));$('search').addEventListener('input',populate);$('focus').addEventListener('click',focusPart);
+  $('component').addEventListener('change',()=>$('component').value?select($('component').value):clearSelection());$('search').addEventListener('input',populate);$('focus').addEventListener('click',focusPart);
   $('press').addEventListener('click',()=>{const c=byId.get(selected);if(c.sim)act(c.sim,c.source_index);});
   root.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>setView(b.dataset.view)));
   root.querySelectorAll('[data-camera]').forEach(b=>b.addEventListener('click',()=>{switch(b.dataset.camera){case'left':orbit.theta-=.25;break;case'right':orbit.theta+=.25;break;case'up':orbit.phi=Math.max(.13,orbit.phi-.16);break;case'down':orbit.phi=Math.min(1.56,orbit.phi+.16);break;case'in':orbit.distance=Math.max(3,orbit.distance*.82);break;case'out':orbit.distance=Math.min(95,orbit.distance*1.22);break;case'reset':setView('overview');return;}updateCamera();}));
@@ -138,8 +148,8 @@
   $('export-catalog').addEventListener('click',()=>{const blob=new Blob([JSON.stringify(data.catalog,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='ATEM-HD8-ISO-component-catalog-v1.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);});
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)requestRender();});
   populate();queueOptions();init3D();refresh();
-  let initial='atem.transition.cut';try{const fragment=new URLSearchParams(location.hash.slice(1)),id=fragment.get('part');if(id&&byId.has(id))initial=id;else if(id)message('This component link is not in this revision. Showing CUT.');}catch(_){}
-  select(initial,{route:false});
+  let initial='';try{const fragment=new URLSearchParams(location.hash.slice(1)),id=fragment.get('part');if(id&&byId.has(id))initial=id;else if(id)message('This component link is not in this revision. Showing the whole device.');}catch(_){}
+  if(initial)select(initial,{route:false});else clearSelection();
   window.addEventListener('pagehide',event=>{if(event.persisted)return;cancelAnimationFrame(autoFrame);cancelAnimationFrame(blackFrame);clearHighlight();const geometry=new Set(),materials=new Set(),textures=new Set();scene?.traverse(object=>{if(object.geometry)geometry.add(object.geometry);for(const material of [].concat(object.material||[]))materials.add(material);});for(const material of materials){for(const value of Object.values(material))if(value?.isTexture)textures.add(value);material.dispose();}geometry.forEach(value=>value.dispose());textures.forEach(value=>value.dispose());renderer?.dispose();});
   window.addEventListener('hashchange',()=>{const id=new URLSearchParams(location.hash.slice(1)).get('part');if(id)select(id,{route:false,clearSearch:true});});
 })();
