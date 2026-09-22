@@ -1,5 +1,36 @@
 # Changelog
 
+## 2026-09-22 — The ATEM panel is grounded in the operator manual
+
+- The catalog cited three Blackmagic web pages — techspecs, gettingstarted and
+  the product page. None of them describes what a button *does*. The operator
+  manual was never cited, so 118 of 227 components shared a generic sentence
+  with at least one other component.
+- `bmd-manual` is now a declared source: the June 2026 *Installation and
+  Operation Manual*, whose cover names ATEM Television Studio HD8 ISO, English
+  pages 3–193. 123 components cite it.
+- **A correction, not an improvement.** The audio ON buttons claimed to
+  "control the audio channel's on/off state". Manual p.31: under LEVEL that
+  soft button cycles audio-follows-video, on and off — three states, not a mute
+  — and lights red while the input is on air. An operator reading the old text
+  expected a mute and got AFV.
+- Behaviour the manual supplies that the page was missing: blinking red on the
+  program row means the *shifted* source is live, not the one named on the
+  label; double-press shift-selects on the preview and select rows but is
+  deliberately not implemented on the program row; each keypad digit jumps to
+  that numbered page of the open LCD menu; the aux row is eight input shortcuts
+  plus PGM plus a multiview/preview toggle that lights white for multiview and
+  green for preview; camera control packets ride every non-downconverted SDI
+  output but never the multiview, and tally follows the camera's own ID rather
+  than the socket it is plugged into.
+- MSTR/ALT and `<BNK`/`BNK>` were four distinct buttons sharing two strings.
+  They now describe themselves.
+- `keypad.reset` is recorded as `Unknown`. The unit has a key labelled RESET,
+  but the manual's control panel chapters never mention one, so its behaviour
+  is marked unverified rather than guessed.
+- Shared purposes fall from 118 to 26. The four remaining groups are genuinely
+  identical hardware whose only difference is already carried by the label.
+
 ## 2026-09-22 — HD8 ISO photos load as photos
 
 - The ATEM HD8 ISO model shipped 4.36 MB of base64 PNG inside
