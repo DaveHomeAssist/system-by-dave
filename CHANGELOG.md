@@ -1,5 +1,24 @@
 # Changelog
 
+## 2026-09-22 — FMP evidence fixes, publisher branding struck, walk retired
+
+- Fix the evidence diagrams: three stroked SVG curves had no fill, so the browser
+  filled each curve against its chord and dropped a black wedge over the P240's
+  SDI route caption and the CCU4's "NO CCU control path".
+- Stop publishing the Camera 4 run as untraced. The route is traced — catwalk
+  head, across the ceiling, down to the video office — and Zack installed it,
+  replacing it in 2025. It is off the unresolved list, and the high ceiling span
+  is recorded as a closed point needing fall-arrest access, not a gap.
+- Correct `p240.path.video` confidence, which carried a route state rather than
+  one of the six contract states.
+- Give the component menus a "Whole device" option so they are not blank before a
+  part is chosen.
+- Strike System by Dave from the FMP pages: titles, `og:site_name`, navigation
+  and the tab icon. The release check now fails if publisher branding returns.
+- Retire the /fmpwalk/ release. The suite no longer builds it and the verifier no
+  longer expects it; the already-deployed files stay in place.
+- Regenerate the managed FMP release from fmp-suite 338cf27.
+
 ## 2026-09-20 — FMP link-preview card
 
 - Give every FMP page its own 1200 x 630 link-preview card (FMP Video Operations,

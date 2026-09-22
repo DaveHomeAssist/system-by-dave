@@ -914,7 +914,7 @@ function switchEquipment(next){
   $('[data-stage-label]').textContent=equipment==='rig'?'URSA G2 · Fujinon LA16 · Vinten support':'Studio Fiber Converter · front and rear';
   $('[data-guide-title]').textContent=equipment==='rig'?'Camera rig · 3D explorer':'Studio converter · 3D explorer';
   $('[data-guide-caption]').textContent=equipment==='rig'?'Camera body & ND · tripod controls · complete rig':'Control room · front controls · rear connections';
-  document.title=`FMP ${equipment==='rig'?'Camera Rig':'Studio Converter'} | System by Dave`;
+  document.title=`FMP ${equipment==='rig'?'Camera Rig':'Studio Converter'}`;
   $('[data-fit]').textContent=equipment==='rig'?'Fit rig':'Fit converter';
   $('[data-pose="operator"]').textContent=equipment==='rig'?'Operator side':'Rear panel';
   $('[data-pose="connections"]').textContent=equipment==='rig'?'Connections':'Front panel';

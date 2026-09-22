@@ -43,7 +43,7 @@
       "source_id": "fmp-signal",
       "label": "REF | FMP | Signal Flow",
       "locator": "FMP equipment record, 20 September 2026",
-      "scope": "VISCA/IP control path is separate from the physically untraced SDI tail to ATEM Input 4."
+      "scope": "VISCA/IP control reaches the camera separately from the SDI run to ATEM Input 4."
     }
   ],
   "components": [
@@ -438,17 +438,17 @@
     },
     {
       "component_id": "p240.path.video",
-      "label": "FMP SDI tail to ATEM Input 4",
+      "label": "FMP SDI run to ATEM Input 4",
       "category": "FMP signal path",
       "kind": "virtual",
-      "purpose": "Camera 4 video endpoint is ATEM Input 4, but the physical SDI route remains untraced.",
-      "confidence": "Partial",
+      "purpose": "Camera 4 reaches ATEM Input 4 over a traced run: catwalk head, across the ceiling, down to the video office.",
+      "confidence": "Confirmed",
       "geometry_status": "virtual_route",
       "source_ids": [
         "fmp-gear",
         "fmp-signal"
       ],
-      "limits": "Do not convert this dashed relationship into a confirmed cable route.",
+      "limits": "Route traced on site and installed by Zack, who replaced it in 2025. The high ceiling span is documented rather than hand-followed because reaching it needs fall-arrest access; that is a closed point, not an open item.",
       "action": "pathVideo",
       "aliases": [],
       "shape": {}
@@ -458,6 +458,6 @@
     "fmp_ip": "Unknown",
     "installed_firmware": "Unknown",
     "power_source": "Unknown",
-    "sdi_physical_route": "Untraced"
+    "sdi_physical_route": "Traced: catwalk to ceiling to video office (Zack, 2025)"
   }
 }

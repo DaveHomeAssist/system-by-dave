@@ -11,6 +11,8 @@ const site = path.resolve(__dirname, '..');
 const hash = data => crypto.createHash('sha256').update(data).digest('hex');
 const cameraRoutes = ['camera/', ...['pit-center', 'front-of-house', 'pit-stage-left', 'catwalk'].map(key => `camera/${key}/`)];
 const rigPhotos = ['rig-camera', 'rig-front', 'rig-grip', 'rig-lens', 'rig-panel', 'rig-rear', 'rig-rings', 'rig-underside', 'v2-fiber-operator', 'v2-fiber-rear', 'v2-fiber-side', 'v2-fiber', 'v2-lcd-closed', 'v2-studio-front', 'v2-vf-back', 'v2-vf-front', 'body-controls'];
+// /fmpwalk/ is retired: the suite no longer builds that release. The already-deployed files
+// stay in place, so walk.housevideo.app keeps serving what is there.
 const releases = [
   {
     directory: 'fmp',
@@ -27,8 +29,7 @@ const releases = [
       ...rigPhotos.map(name => `rig/assets/${name}.webp`),
       'rig/vendor/three/three.module.js', 'rig/vendor/three/three.core.js', 'rig/vendor/three/addons/controls/OrbitControls.js'
     ]
-  },
-  { directory: 'fmpwalk', mode: 'local-first', expected: ['index.html', 'email.js', 'mail.js', 'photos.js', 'notion.js', 'notion-config.js'] }
+  }
 ];
 // The report sender is the only address the public FMP releases may carry.
 const ALLOWED_EMAILS = ['avbydave@gmail.com'];
@@ -133,35 +134,29 @@ for (const target of ['rig/', 'models/atem-hd8-iso.html', 'ptz/SuperJoy-G1-Inter
   assert.ok(entry.includes(`href="${target}"`), `The 3D Models tab must reach ${target}`);
 }
 assert.match(entry, /id="models"/);
-assert.equal(releases[0].provenance.sourceCommit, releases[1].provenance.sourceCommit, 'fmp and fmpwalk must ship from one export');
 const cameraView = fs.readFileSync(path.join(site, 'fmp/camera-view.js'), 'utf8');
 assert.match(cameraView, /href="#screenTitle"/);
 assert.match(cameraView, /id="screenTitle"/);
-const walkEntry = fs.readFileSync(path.join(site, 'fmpwalk/index.html'), 'utf8');
 // One suite theme preference: theme.js and the walk share fmpTheme, a first visit is light, and the index uses it too.
 const theme = fs.readFileSync(path.join(site, 'fmp/theme.js'), 'utf8');
 assert.match(theme, /const KEY = 'fmpTheme';/);
 assert.match(theme, /preference = legacy \|\| 'light';/);
-assert.match(walkEntry, /var THEME_KEY = "fmpTheme";/);
-assert.match(walkEntry, /No silent writes/);
-// /fmpwalk/camera/ does not exist, and the walk is its own origin, so its camera link and
-// legacy ?camera=N / ?position= redirect name the operations hub absolutely. A same-origin
-// /fmp/camera/ would resolve against the walk's domain, where nothing serves it.
-const walkCameraRoot = `${originFor('fmp/camera/')}/fmp/camera/`;
-assert.ok(walkEntry.includes(`id="cameraLaunch" href="${walkCameraRoot}"`), 'walk camera launch is absolute');
-assert.ok(walkEntry.includes(`var cameraRoot = "${walkCameraRoot}";`), 'walk legacy camera redirect is absolute');
-assert.doesNotMatch(walkEntry, /["']\.{1,2}\/camera\//);
-assert.match(walkEntry, /href="https:\/\/systembydave\.com\/"/);
-assert.equal((walkEntry.match(/<h1\b/g) || []).length, 1);
-assert.ok(walkEntry.includes(`href="${originFor('fmp/')}/fmp/"`), 'The walk must link its operations hub at the suite\'s canonical origin.');
-assert.doesNotMatch(walkEntry, /davehomeassist\.github\.io/);
 const rigEntry = fs.readFileSync(path.join(site, 'fmp/rig/index.html'), 'utf8');
 assert.doesNotMatch(rigEntry, /unpkg|https:\/\/cdn/i);
 assert.match(rigEntry, /\.\/vendor\/three\/three\.module\.js/);
 const guideEntry = fs.readFileSync(path.join(site, 'fmp/guide/index.html'), 'utf8');
 assert.match(guideEntry, /Tonight's director, stage plot, restrictions, and verified assignments control/);
-// The guide is also served from housevideo.app, so its System by Dave link is absolute.
-assert.match(guideEntry, /href="https:\/\/systembydave\.com\/"/);
+// The guide links the operations hub. Publisher branding was struck from the FMP pages.
+assert.match(guideEntry, /href="\/fmp\/"/);
+// These pages are the venue's operational site: the publisher's name, home link and logo
+// belong on systembydave.com, not in FMP titles, link previews, navigation or tab icons.
+for (const name of releases[0].expected) {
+  if (!/\.(?:html|js|css)$/.test(name)) continue;
+  const payload = fs.readFileSync(path.join(site, 'fmp', name), 'utf8');
+  assert.doesNotMatch(payload, /System by Dave/i, `${name} names the publisher`);
+  assert.doesNotMatch(payload, /systembydave\.com/i, `${name} links the publisher`);
+  assert.doesNotMatch(payload, /system_by_dave/i, `${name} uses the publisher logo`);
+}
 const robots = fs.readFileSync(path.join(site, 'robots.txt'), 'utf8');
 assert.ok(robots.includes('Disallow: /fmp/'));
 assert.ok(robots.includes('Disallow: /fmpwalk/'));
