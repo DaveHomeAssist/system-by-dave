@@ -25,7 +25,7 @@ The pilot arrays are frozen: the verifier fails if their counts change, if an ID
 is missing or duplicated, or if a row differs from the frozen pilot. Any catalog
 edit has to be re-pinned deliberately.
 
-## `confidence` — not gate-enforced
+## `confidence`
 
 Every projector, lens, compatibility and optical-profile row carries
 `confidence`. Three values are in use:
@@ -36,10 +36,16 @@ Every projector, lens, compatibility and optical-profile row carries
 | `needs_verification` | Recorded, but no primary source has confirmed it |
 | `conflicting` | Primary sources disagree, and the disagreement has not been resolved |
 
-**The verifier requires the field to be present but does not constrain its
-value.** A typo, or a fourth value introduced by accident, passes today. Treat
-this list as the intended vocabulary and keep to it; if the values are ever
-gated, gate them against this table.
+`scripts/verify_throwline_release.js` enforces this list. A row carrying a
+value outside it fails the release and is named by its own ID, so a typo such
+as `offical_primary` cannot ship silently.
+
+The allowlist constrains the verifier, not the pinned arrays below. Adding a
+value here changes no SHA-256 and needs no re-pin — correct the table and the
+`ALLOWED_CONFIDENCE` set in the same change.
+
+A row that omits `confidence` entirely is not caught by this check; the field's
+presence is governed by the record schema.
 
 ## `calculationState` — gate-enforced
 
@@ -101,7 +107,6 @@ See `docs/fmp-model-catalog-contract.md` and `docs/gear-reference-contract.md`.
 
 ## Changing a vocabulary
 
-Add the value to the table above in the same change that introduces it in the
-data, so this document and the catalog never disagree. If `confidence` is ever
-gated, add the allowlist to `scripts/verify_throwline_release.js` and note here
-that it is enforced.
+Add the value to the table above and to `ALLOWED_CONFIDENCE` in
+`scripts/verify_throwline_release.js` in the same change that introduces it in
+the data, so this document, the gate and the catalog never disagree.

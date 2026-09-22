@@ -40,6 +40,11 @@ const APPENDIX_ROW_KEYS = [
 ];
 const APPENDIX_OVERLAP_POLICY = 'PRJ-001 through PRJ-004 retain the audited canonical records; appendix rows are raw evidence only.';
 const APPENDIX_REVIEW_DISPOSITION = 'Do not use lifecycle, brightness, resolution, contrast, lens-system, or confidence claims as planning inputs until field-level provenance is normalized.';
+// Evidence vocabulary for every catalog row that carries confidence; the meanings live in
+// docs/throwline-catalog-contract.md. This constrains the verifier, not the pinned data below,
+// so adding a value here needs no re-pin.
+const ALLOWED_CONFIDENCE = new Set(['official_primary', 'needs_verification', 'conflicting']);
+const CONFIDENCE_ROW_ID = { projectors: 'projector_id', lenses: 'lens_id', compatibility: 'compatibility_id', opticalProfiles: 'optical_profile_id' };
 // Frozen after the 2026-09-04 verification pass; any catalog edit must re-pin these deliberately.
 const PILOT_ARRAY_SHA256 = {
   projectors: '34599a9db73725c42c7afae5d83919a31db8596178c86189bb34d334392dc7da',
@@ -330,6 +335,17 @@ if (catalog) {
   Object.entries(PILOT_ARRAY_SHA256).forEach(([name, expectedSha256]) => {
     const rows = Array.isArray(catalog[name]) ? catalog[name] : [];
     if (hashJson(rows) !== expectedSha256) fail(`Throwline pilot catalog ${name} changed from the frozen pilot array.`);
+  });
+
+  // confidence was a required field whose value nothing checked, so a typo shipped silently.
+  Object.entries(CONFIDENCE_ROW_ID).forEach(([name, idField]) => {
+    const rows = Array.isArray(catalog[name]) ? catalog[name] : [];
+    rows.forEach((row, index) => {
+      if (!row || row.confidence === undefined) return;
+      if (!ALLOWED_CONFIDENCE.has(row.confidence)) {
+        fail(`Throwline ${name} ${row[idField] || `row ${index + 1}`} has confidence ${JSON.stringify(row.confidence)} outside the documented vocabulary.`);
+      }
+    });
   });
 
   validateProjectorReferenceAppendix(

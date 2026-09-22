@@ -1,5 +1,22 @@
 # Changelog
 
+## 2026-09-22 — Throwline confidence values are now gate-enforced
+
+- `confidence` was a required field on 42 catalog rows whose value nothing
+  checked. A typo such as `offical_primary` shipped silently.
+- `scripts/verify_throwline_release.js` now holds `ALLOWED_CONFIDENCE`
+  (`official_primary`, `needs_verification`, `conflicting`) and fails the
+  release on anything outside it, naming the offending row by its own ID.
+- The allowlist constrains the verifier, **not** the pinned pilot arrays. It
+  changes no SHA-256 and needs no re-pin — the freeze covers the data, not the
+  rules.
+- Tested against a typo, a capitalised value borrowed from the FMP catalog
+  vocabulary, an empty string, an undocumented new value and `null`. All five
+  are caught; the real catalog passes clean.
+- `docs/throwline-catalog-contract.md` drops the "not gate-enforced" caveat and
+  records what the gate does, including that an omitted field is the record
+  schema's business rather than this check's.
+
 ## 2026-09-22 — The Throwline catalog vocabularies are written down
 
 - `ProjectorThrow/data/throwline-pilot-catalog.v1.json` uses two evidence
