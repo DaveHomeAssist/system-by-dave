@@ -1,4 +1,4 @@
-import { CHECK_STATES, checksFor, pendingLabel } from './camera-core.js?v=90d8a9324a19f3ff';
+import { CHECK_STATES, checksFor, pendingLabel } from './camera-core.js?v=e86efb45e21466bc';
 
 const esc = value => String(value ?? '').replace(/[&<>"']/g, character =>
   ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]);
@@ -15,8 +15,8 @@ export function cameraPages({ draft, position, identity, eventOptions, reference
   const retryBlocked = Boolean(draft.pendingAction && !draft.pendingSubmission);
   const page = (title, detail, body) => ({ title, detail, body });
   const assignment = (key, label, max = 120) => `<label>${label}<input data-assignment="${key}" maxlength="${max}" value="${esc(draft.assignment[key])}" ${locked ? 'disabled' : ''}></label>`;
-  const checkPages = stage => checksFor(position, stage).map(([key, label], index, rows) => page(
-    label, `${stage === 'build' ? 'Build' : 'Stow'} check ${index + 1} of ${rows.length} · choose the observed state`,
+  const checkPages = stage => checksFor(position, stage).map(([key, label, hint], index, rows) => page(
+    label, `${hint ? `${hint} ` : ''}${stage === 'build' ? 'Build' : 'Stow'} check ${index + 1} of ${rows.length} · choose the observed state`,
     `<div class="check-question"><span class="check-number" aria-hidden="true">${String(index + 1).padStart(2, '0')}</span><div class="segmented" role="group" aria-label="${esc(label)} status">${CHECK_STATES.map(state => `<button type="button" data-check-stage="${stage}" data-check="${key}" data-state="${state.value}" aria-pressed="${draft[stage === 'build' ? 'buildChecks' : 'stowChecks'][key] === state.value}" ${(stage === 'build' ? locked : stowLocked) ? 'disabled' : ''}>${esc(state.label)}</button>`).join('')}</div></div>`));
   const summary = stage => {
     const values = Object.values(draft[stage === 'build' ? 'buildChecks' : 'stowChecks']);

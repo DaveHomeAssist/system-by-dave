@@ -1,12 +1,12 @@
 import {
   FALLBACK_REGISTRY, createDraft, inspectCameraStore, prepareSubmission, safeCameraRegistry,
   positionFor, positionKeyFromLocation, resumeAccountDraft, setCheck, setPosition, visibleDrafts, submissionMayHaveReachedServer
-} from './camera-core.js?v=90d8a9324a19f3ff';
+} from './camera-core.js?v=e86efb45e21466bc';
 import { CLIENT_ID } from './mail.js?v=4a521185a33c8463';
 import { loadPhotoBlob, loadPhotoFiles, storePhoto } from './photos.js?v=cd1feeb0fd50c5df';
 import { NOTION_API_URL } from './notion-config.js?v=b675c734abe301f4';
 
-import { CAMERA_STAGES, cameraPages, cameraShell } from './camera-view.js?v=dd4d86325bb3c596';
+import { CAMERA_STAGES, cameraPages, cameraShell } from './camera-view.js?v=0933ebb8bbd48498';
 
 const view = { stage: 'setup', page: 0 };
 let activePages;

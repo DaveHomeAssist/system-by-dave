@@ -25,32 +25,32 @@ export const FALLBACK_REGISTRY = Object.freeze({
 });
 
 export const HUMAN_BUILD_CHECKS = Object.freeze([
-  ['power', 'Power and body start'],
-  ['viewfinder', 'Viewfinder image'],
-  ['signal', 'Signal at switcher'],
-  ['tally', 'Tally'],
-  ['comms', 'Comms'],
-  ['backFocus', 'Back focus']
+  ['power', 'Power and body start', 'Camera reaches its normal running state and the status LCD lights. If it is on battery, check the indicator is not already down to its last bar.'],
+  ['viewfinder', 'Viewfinder image', 'A live picture in the viewfinder, not bars and not black. Bars mean someone left the camera on colour bars.'],
+  ['signal', 'Signal at switcher', 'The switcher shows this camera on its own input, in the house format. A frame that rolls or tears points at format or reference, not at the camera.'],
+  ['tally', 'Tally', 'Put this camera on Program and confirm the light comes up on THIS camera. Tally follows the camera\u2019s own ID number rather than the socket it is plugged into, so a mismatched ID lights the wrong operator.'],
+  ['comms', 'Comms', 'Two way: the operator hears the director and the director hears them. Test both directions; one working direction is a common way to find out too late.'],
+  ['backFocus', 'Back focus', 'Zoom fully in on a distant detail and focus, then zoom fully out and check it is still sharp. If it drifts, back focus needs setting before the show, not during it.']
 ]);
 export const PTZ_BUILD_CHECKS = Object.freeze([
-  ['power', 'Power'],
-  ['network', 'Network and control link'],
-  ['video', 'Video at switcher'],
-  ['controller', 'Correct controller camera'],
-  ['preset', 'Preset recall'],
-  ['simultaneousPanTilt', 'Pan and tilt together']
+  ['power', 'Power', 'Head powered and finished starting. It draws power either from PoE+ on the network run or from its 12 V input, so confirm which one is feeding it before assuming a dead port.'],
+  ['network', 'Network and control link', 'The controller reaches the head and the head answers. Control travels over the production LAN, separately from the SDI run, so video can be perfect while control is dead.'],
+  ['video', 'Video at switcher', 'A picture on the switcher input this head is patched to. Video and control are independent paths; confirm both rather than inferring one from the other.'],
+  ['controller', 'Correct controller camera', 'Move the head and watch that THIS head moves. Selecting the wrong camera on the panel is the fastest way to move a shot that is on air.'],
+  ['preset', 'Preset recall', 'Recall a known preset and confirm the framing is what it should be. Take care near the keypad: on the hardware, holding a number overwrites that preset with the current shot.'],
+  ['simultaneousPanTilt', 'Pan and tilt together', 'Drive the joystick diagonally. Both axes should move at once and stop together; one axis lagging or sticking is a fault to report now rather than during a show.']
 ]);
 export const HUMAN_STOW_CHECKS = Object.freeze([
-  ['viewfinder', 'Viewfinder stowed'],
-  ['cables', 'Cables coiled and inside case'],
-  ['lensCap', 'Lens capped'],
-  ['bodyCase', 'Body seated in case']
+  ['viewfinder', 'Viewfinder stowed', 'Viewfinder folded back to its travel position and not left bearing weight or proud of the body.'],
+  ['cables', 'Cables coiled and inside case', 'Coiled the way they were, inside the case, with nothing trapped in the lid or trailing where it can be stepped on.'],
+  ['lensCap', 'Lens capped', 'Cap on the lens. It protects the front element and it is the visible sign to the next person that the camera was put away properly.'],
+  ['bodyCase', 'Body seated in case', 'Body sitting properly in its foam, not resting on a cable or a strap, and the case able to close without being forced.']
 ]);
 export const PTZ_STOW_CHECKS = Object.freeze([
-  ['parked', 'PTZ parked'],
-  ['powerState', 'Approved power state'],
-  ['controller', 'Controller left ready'],
-  ['areaClear', 'Catwalk area clear']
+  ['parked', 'PTZ parked', 'Head returned to its parked position using the controller. Never move the head by hand to park it — the manufacturer warns that turning a powered head can damage it.'],
+  ['powerState', 'Approved power state', 'Left in whatever power state the venue has agreed for this head, not simply switched off. Someone else may expect it reachable.'],
+  ['controller', 'Controller left ready', 'Panel left on a safe camera selection and out of any menu, so the next operator does not start inside a menu wondering why nothing moves.'],
+  ['areaClear', 'Catwalk area clear', 'Nothing left on the catwalk: no tools, no coffee, no loose cable. Anything up there can fall into the bowl.']
 ]);
 
 const POSITION_KEYS = new Set(FALLBACK_REGISTRY.positions.map(position => position.key));

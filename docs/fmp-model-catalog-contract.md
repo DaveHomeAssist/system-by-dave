@@ -24,6 +24,30 @@ catalogs rather than pinning a number here.
 `p240` and `ccu4` additionally publish their catalog inline in the page; the
 contract already asserts the inline copy and the release JSON are identical.
 
+## What this contract does not cover
+
+The vocabulary below governs the four equipment catalogs above. It is not the
+only `confidence` field on the FMP site, and the other one is deliberately
+different.
+
+`fmp/house/house-data.js` (`fmp.house-reference.v1`, 151 display positions)
+carries its own `Confidence` column with two values, `Paper only` and
+`Unidentified`. Neither is in the vocabulary below, and neither should be
+changed to fit it: `Paper only` says specifically that a position appears on a
+paper list and has not been found in the building, which is more than
+`Documented` conveys. Forcing it into this vocabulary would lose that.
+
+For a reader moving between the two, the rough mapping is:
+
+| House reference | Nearest catalog value | What is lost in translation |
+| --- | --- | --- |
+| `Paper only` | `Documented` | Which record, and that nobody has confirmed it on site |
+| `Unidentified` | `Unknown` | That a position is expected to exist but has not been matched to a device |
+
+`scripts/fmp_model_contract.js` reads only the four equipment catalogs, so the
+house reference is out of its reach by design. If that ever changes, translate
+deliberately rather than letting a gate rewrite the house vocabulary.
+
 ## Required catalog fields
 
 Each catalog declares `schema_version`, `guide_id`, `revision`, and `model`.
