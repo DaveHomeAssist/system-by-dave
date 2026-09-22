@@ -77,6 +77,11 @@ const SITE_ORIGIN = 'https://systembydave.com';
 // target is on the same document after <base> resolution.
 const FMP_HUB = 'fmp/index.html';
 const FMP_MANAGED_DIRS = ['fmp', 'fmpwalk'];
+// These pages are hand-maintained FMP references on the venue's domain. Publisher branding was
+// struck from them as well (Dave, 2026-09-22), so their return path is the FMP hub or the walk rather
+// than the publisher home. Exempting them from the home link is not a pass: each must carry that return.
+const FMP_SIBLING_PAGES = ['switcher/index.html', 'switcher/guide/index.html', 'shader/index.html', 'backfocus/index.html', 'ursa-broadcast-g2/index.html', 'fmp-index/index.html', 'fmp-walk/index.html'];
+const FMP_RETURN_LINK = /href=["'](?:\/fmp\/|https:\/\/housevideo\.app\/fmp\/|\/fmpwalk\/|https:\/\/walk\.housevideo\.app\/fmpwalk\/)["']/i;
 const FMP_SHELL_PAGES = [
   FMP_HUB,
   'fmp/camera/index.html',
@@ -237,8 +242,11 @@ function verifyPublicHtml() {
     const source = read(file);
     if (!isDocument(source)) return;
     pages += 1;
-    const fmpShell = FMP_SHELL_PAGES.includes(file.split(path.sep).join('/'));
-    if (!isHomeFile(file) && !fmpShell && !hasReturnPath(source)) fail(`${file} has no verified return path.`);
+    const posix = file.split(path.sep).join('/');
+    const fmpShell = FMP_SHELL_PAGES.includes(posix);
+    const fmpSibling = FMP_SIBLING_PAGES.includes(posix);
+    if (fmpSibling && !FMP_RETURN_LINK.test(source)) fail(`${file} has no FMP return path.`);
+    if (!isHomeFile(file) && !fmpShell && !fmpSibling && !hasReturnPath(source)) fail(`${file} has no verified return path.`);
     if (!isNoIndex(source) && hasPublicCommand53Exposure(source)) fail(`${file} exposes private Command53 routing on a public page.`);
     if (/sbd-public-nav\.js/i.test(source)) {
       const prefix = prefixFor(file);

@@ -150,12 +150,14 @@ assert.match(guideEntry, /Tonight's director, stage plot, restrictions, and veri
 assert.match(guideEntry, /href="\/fmp\/"/);
 // These pages are the venue's operational site: the publisher's name, home link and logo
 // belong on systembydave.com, not in FMP titles, link previews, navigation or tab icons.
-for (const name of releases[0].expected) {
-  if (!/\.(?:html|js|css)$/.test(name)) continue;
-  const payload = fs.readFileSync(path.join(site, 'fmp', name), 'utf8');
+const assertUnbranded = (payload, name) => {
   assert.doesNotMatch(payload, /System by Dave/i, `${name} names the publisher`);
   assert.doesNotMatch(payload, /systembydave\.com/i, `${name} links the publisher`);
   assert.doesNotMatch(payload, /system_by_dave/i, `${name} uses the publisher logo`);
+};
+for (const name of releases[0].expected) {
+  if (!/\.(?:html|js|css)$/.test(name)) continue;
+  assertUnbranded(fs.readFileSync(path.join(site, 'fmp', name), 'utf8'), name);
 }
 const robots = fs.readFileSync(path.join(site, 'robots.txt'), 'utf8');
 assert.ok(robots.includes('Disallow: /fmp/'));
@@ -167,12 +169,14 @@ assert.ok(index.includes('location.replace("/fmp/" + location.search + location.
 assert.ok(index.includes(`<link rel="canonical" href="${originFor('fmp/')}/fmp/">`), 'fmp-index/index.html: canonical is the hub');
 assert.match(index, /<meta name="robots" content="noindex,follow">/);
 assert.doesNotMatch(entry, /href="\/fmp-index\/"/, 'fmp/index.html: the hub must not link the retired index');
-// The hand-maintained pages published beside the suite follow the same rule.
-for (const name of ['fmp-index/index.html', 'fmp-walk/index.html', 'switcher/index.html', 'shader/index.html', 'backfocus/index.html']) {
+// The hand-maintained pages published beside the suite follow the same rules, branding included:
+// they are FMP references on the venue's domain, so the publisher belongs in neither (Dave, 2026-09-22).
+for (const name of ['fmp-index/index.html', 'fmp-walk/index.html', 'switcher/index.html', 'switcher/guide/index.html', 'shader/index.html', 'backfocus/index.html', 'ursa-broadcast-g2/index.html']) {
   const page = fs.readFileSync(path.join(site, name), 'utf8');
   assert.doesNotMatch(page, NOTION_URL, `${name}: links a Notion page`);
   assert.doesNotMatch(page, OLD_VERSION_URL, `${name}: links an old version of the suite`);
   assert.equal(privateAddresses(page), 0, `${name}: publishes a private network address`);
+  assertUnbranded(page, name);
 }
 // Validate every claim against the catalog belonging to that model.
 const { counts: modelCounts, componentsFor } = modelContract(site);
