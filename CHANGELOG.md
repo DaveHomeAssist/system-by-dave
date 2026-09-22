@@ -1,28 +1,37 @@
 # Changelog
 
-## 2026-09-22 — Home is the site you are on
+## 2026-09-22 — One selection language, whole-device defaults, honest limits
 
-- A public page's home cue is now its own site's home. On systembydave.com that
-  is still `/`. On a site in `scripts/domain-sites.json` that has cut over it is
-  that site's declared `home`, because the reader on housevideo.app is inside
-  that operating surface, not the publisher's. A page that is its site's home
-  satisfies the cue by being it.
-- `homePathsFor` in `scripts/domain_sites_lib.js` derives those paths from the
-  declared home, so the navigation gate reads the canonical site list instead of
-  assuming every site's home is `/`. A System by Dave link still counts as home
-  and is still absolute where it appears; it is no longer required.
-- This unblocks the FMP suite, which deliberately struck its publisher branding
-  in fmp-suite `338cf27`. That branding carried the only link the old rule
-  accepted, so every FMP page failed the navigation gate and two consecutive
-  Pages deploys published nothing. FMP pages now satisfy home through `/fmp/`,
-  which is both their parent and housevideo.app's declared home.
-- The gate is not looser elsewhere: a page that links neither its site home nor
-  System by Dave still fails, and systembydave.com pages are unchanged.
-- Documented the FMP equipment catalog evidence vocabulary and enforced it in
-  `scripts/fmp_model_contract.js`, which already runs inside `verify:fmp`. A
-  release now fails when a catalog omits its identity fields, repeats a
-  `component_id`, uses a confidence or geometry value outside the documented
-  set, cites an undeclared source, or states evidence without citing one.
+- SuperJoy now tints the selected part's own surfaces in the suite's rust instead
+  of drawing a box around it, so selection looks the same on all five models.
+  Printed legends stay untinted and legible.
+- The ATEM and SuperJoy were the last models opening on a preselected part. Both
+  now open on the whole device, with a real "Whole device · N parts" first option
+  so a 227-entry menu is not blank. Deep links still restore their part.
+- Stop repeating one identical limit on 126 of 140 CCU4 components and 13 of 24 on
+  the P240. Shared caveats move to a category level and the page resolves part,
+  then category, then model, so each part still shows a limit while the data
+  carries only real differences.
+- Regenerate the managed FMP release from fmp-suite 758f169.
+
+## 2026-09-22 — FMP catalog evidence vocabulary is enforced
+
+- The four FMP equipment catalogs carry `confidence`, `geometry_status` and
+  `source_ids` on all 458 components, but nothing declared which values were
+  legal, so drift was invisible. `docs/fmp-model-catalog-contract.md` documents
+  the vocabulary and `scripts/fmp_model_contract.js`, already inside
+  `verify:fmp`, enforces it. A release now fails when a catalog omits its
+  identity fields, repeats a `component_id`, uses a confidence or geometry value
+  outside the documented set, cites an undeclared source, or states evidence
+  without citing one.
+- Two known gaps are exempted by name rather than tolerated silently: SuperJoy's
+  geometry phrase sitting in its confidence field, and the identity field each
+  JS-built catalog omits. Each exemption asserts that it still applies, so it
+  fails once the artifact is fixed instead of rotting into permanent tolerance.
+- `docs/public-shell-contract.md` catches up with the shipped home cue: the FMP
+  suite is exempt from the System by Dave home link because its publisher
+  branding was struck and `/fmp/` is its home. The contract previously still
+  required that link.
 
 ## 2026-09-22 — FMP evidence fixes, publisher branding struck, walk retired
 
