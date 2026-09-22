@@ -13,33 +13,18 @@ const modelFiles = [
 ];
 
 // Evidence vocabulary for every FMP equipment catalog; docs/fmp-model-catalog-contract.md
-// carries each value's meaning. The two deprecated confidence values still ship in the
-// current export: they are corrected in fmp-suite and drop out of this allowlist once a
-// release carries the fix.
+// carries each value's meaning.
 const CONFIDENCE = new Set(['Confirmed', 'Documented', 'Reported', 'Inferred', 'Unknown', 'Contradicted']);
-const DEPRECATED_CONFIDENCE = new Map([
-  ['Published envelope / Photo approximation', 'SuperJoy: geometry wording belongs in geometry_status']
-]);
 const GEOMETRY = new Set(['documented_geometry', 'documented_motion', 'documented_type_photo_grounded',
   'documented_type_approximate_position', 'documented_type_unverified_position', 'photo_grounded',
   'photo_approximation', 'illustrative', 'virtual_route']);
-// Every catalog declares these. guide_id and model are each missing from one catalog in the
-// current export; the exemption names the gap so it stays visible and is removed with the fix.
+// Every catalog declares these.
 const CATALOG_FIELDS = ['schema_version', 'guide_id', 'revision', 'model'];
-const MISSING_FIELDS = new Map([
-  ['atem-hd8-iso', new Set(['model'])],
-  ['superjoy', new Set(['guide_id'])]
-]);
 
 // Structure and internal consistency only: never equipment truth, geometry accuracy or rendered behaviour.
 function catalogContract(catalogs) {
   for (const [name, catalog] of Object.entries(catalogs)) {
-    const exempt = MISSING_FIELDS.get(name) || new Set();
     for (const field of CATALOG_FIELDS) {
-      if (exempt.has(field)) {
-        assert.ok(catalog[field] === undefined, `${name}: ${field} is present now, so drop its exemption`);
-        continue;
-      }
       assert.ok(typeof catalog[field] === 'string' && catalog[field].trim(), `${name}: catalog must declare ${field}`);
     }
     const sources = new Set((catalog.sources || []).map(source => source.source_id));
@@ -52,8 +37,7 @@ function catalogContract(catalogs) {
       }
       assert.ok(!seen.has(id), `${name}: duplicate component_id ${id}`);
       seen.add(id);
-      const deprecated = DEPRECATED_CONFIDENCE.get(component.confidence);
-      assert.ok(CONFIDENCE.has(component.confidence) || deprecated !== undefined,
+      assert.ok(CONFIDENCE.has(component.confidence),
         `${name}: ${id} confidence ${JSON.stringify(component.confidence)} is outside the documented vocabulary`);
       assert.ok(GEOMETRY.has(component.geometry_status),
         `${name}: ${id} geometry_status ${JSON.stringify(component.geometry_status)} is outside the documented vocabulary`);

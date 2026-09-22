@@ -1,5 +1,24 @@
 # Changelog
 
+## 2026-09-22 — Every catalog identifies itself; no vocabulary exemptions left
+
+- The ATEM catalog never declared a `model` and the SuperJoy catalog never
+  declared a `guide_id`, so two of the four equipment catalogs could not be
+  identified from their own data. Both now declare the full set.
+- SuperJoy's chassis carried `Published envelope / Photo approximation` in its
+  confidence field, which describes geometry rather than an evidence tier. That
+  component already stated its geometry correctly — `geometry_status` is
+  `photo_approximation` and `limits` records that the envelope comes from
+  published dimensions rather than an FMP measurement — so the confidence field
+  now says what kind of evidence backs the claim: `Documented`.
+- With both gaps closed upstream (fmp-suite `5931c51`), the gate drops all three
+  exemptions. `scripts/fmp_model_contract.js` no longer carries a deprecated
+  confidence value or a missing-field allowance, and
+  `docs/fmp-model-catalog-contract.md` no longer documents any. The exemptions
+  did what they were built to do: each asserted it still applied, so the export
+  failed verification the moment the artifact was fixed rather than leaving the
+  tolerance behind.
+
 ## 2026-09-22 — One selection language, whole-device defaults, honest limits
 
 - SuperJoy now tints the selected part's own surfaces in the suite's rust instead
