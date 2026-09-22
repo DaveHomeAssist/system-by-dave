@@ -13,3 +13,13 @@ _hat-in-ring-src/
 # files and break the filesystem walks in scripts/verify_*.js.
 * 2.*
 * 3.*
+
+# Secrets — never commit. The hat-in-ring pipeline reads a Notion token from
+# _hat-in-ring-src/.env (see .env.example); RUN-20260628-0056 left these rules
+# unwritten.
+.env
+.env.*
+!.env.example
+*.token
+*secret*.json
+credentials.json
