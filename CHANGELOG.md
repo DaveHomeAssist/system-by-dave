@@ -1,5 +1,28 @@
 # Changelog
 
+## 2026-09-22 — Camera checks say what they are looking for
+
+- The check-in and check-out flow asked twenty questions and explained none of
+  them. Each check rendered with its label as the title — "Tally", "Back focus",
+  "Approved power state" — and a **position counter** as the subtitle: *"Build
+  check 4 of 6 · choose the observed state"*. The slot meant for what the
+  operator should be looking at held a number.
+- Every check now carries what a pass looks like, and the renderer leads with it.
+  **Tally**: put the camera on Program and confirm the light comes up on *that*
+  camera, because tally follows the camera's own ID, not the socket. **Comms**:
+  test both directions. **Back focus**: zoom in, focus, zoom out, check it held.
+  **PTZ network**: control runs over the production LAN separately from the SDI,
+  so video can be perfect while control is dead. **Preset recall**: careful near
+  the keypad — holding a number overwrites the preset. **Parked**: return the
+  head with the controller, never by hand.
+- The check tuple gains a third element; every existing consumer destructures
+  `[key]` or `[key, label]`, so nothing else changes.
+- `docs/fmp-model-catalog-contract.md` now states what it does **not** cover.
+  `fmp/house/house-data.js` has its own `Confidence` column using `Paper only`
+  and `Unidentified` — outside this vocabulary, and deliberately so, since
+  "Paper only" says more than "Documented" does. The doc gives the mapping and
+  warns against letting a gate rewrite the house vocabulary.
+
 ## 2026-09-22 — 26 rig controls get a real tip
 
 - 26 of the 112 rig components carried the same sentence in their `tip` slot:
