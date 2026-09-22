@@ -44,9 +44,20 @@ For a reader moving between the two, the rough mapping is:
 | `Paper only` | `Documented` | Which record, and that nobody has confirmed it on site |
 | `Unidentified` | `Unknown` | That a position is expected to exist but has not been matched to a device |
 
-`scripts/fmp_model_contract.js` reads only the four equipment catalogs, so the
-house reference is out of its reach by design. If that ever changes, translate
-deliberately rather than letting a gate rewrite the house vocabulary.
+There is a third. The Gear Reference (`data/gear/`) records `accuracy[].status`
+with four lowercase values — `confirmed`, `corrected`, `unverified`, `estimate` —
+enforced by `scripts/verify_gear_reference.js` and documented in
+`docs/gear-reference-contract.md`. It answers a different question again: not
+what kind of evidence supports a claim, but how well checked a given line on a
+sheet is. That is why it has `corrected`, which these catalogs do not.
+
+Note `confirmed` there and `Confirmed` here are close but not identical, and the
+case is the quickest signal of which document you are reading.
+
+`scripts/fmp_model_contract.js` reads only the four equipment catalogs, so both
+the house reference and the Gear Reference are out of its reach by design. If
+that ever changes, translate deliberately rather than letting one gate rewrite
+another vocabulary.
 
 ## Required catalog fields
 
