@@ -1,5 +1,27 @@
 # Changelog
 
+## 2026-09-22 — Every SuperJoy control describes itself
+
+- 26 of 67 components shared a sentence with another. The keypad was the worst:
+  twelve keys, **including ESC and ENTER**, all carried the same line about
+  numeric entry, so selecting ESC told you about camera selection.
+- Each digit now says what it does after CAM ID, CALL and SET, and carries the
+  shortcut the published button layout documents and this trainer deliberately
+  does not reproduce: **a quick press calls that preset outright, and holding
+  the key about three seconds overwrites it with the current shot.** That is how
+  a preset gets lost by accident, and it was written down nowhere on the page.
+- ESC now says plainly that the published layout does not document its behaviour
+  in every menu, rather than implying it is understood.
+- The five speed pairs were ten buttons sharing five sentences, with up and down
+  indistinguishable. Both now carry the fact that matters operationally: **speed
+  is stored per camera, not globally**, so turning pan speed up on one camera
+  leaves it up next time that camera is selected.
+- The four custom keys now warn that nothing on the key tells you what it will
+  send — the real hazard with a programmable button during a show.
+- 67 of 67 purposes are now unique; average length 87 → 189 characters. The
+  inline JSON block is regenerated from the built catalog and the CSP
+  inline-script hash re-pinned.
+
 ## 2026-09-22 — The CCU panel is written from its manual
 
 - The CCU4 catalog described 140 controls in fragments: "Recall scene file 1",
