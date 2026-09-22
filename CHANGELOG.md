@@ -14,6 +14,25 @@
   carries only real differences.
 - Regenerate the managed FMP release from fmp-suite 758f169.
 
+## 2026-09-22 — FMP catalog evidence vocabulary is enforced
+
+- The four FMP equipment catalogs carry `confidence`, `geometry_status` and
+  `source_ids` on all 458 components, but nothing declared which values were
+  legal, so drift was invisible. `docs/fmp-model-catalog-contract.md` documents
+  the vocabulary and `scripts/fmp_model_contract.js`, already inside
+  `verify:fmp`, enforces it. A release now fails when a catalog omits its
+  identity fields, repeats a `component_id`, uses a confidence or geometry value
+  outside the documented set, cites an undeclared source, or states evidence
+  without citing one.
+- Two known gaps are exempted by name rather than tolerated silently: SuperJoy's
+  geometry phrase sitting in its confidence field, and the identity field each
+  JS-built catalog omits. Each exemption asserts that it still applies, so it
+  fails once the artifact is fixed instead of rotting into permanent tolerance.
+- `docs/public-shell-contract.md` catches up with the shipped home cue: the FMP
+  suite is exempt from the System by Dave home link because its publisher
+  branding was struck and `/fmp/` is its home. The contract previously still
+  required that link.
+
 ## 2026-09-22 — FMP evidence fixes, publisher branding struck, walk retired
 
 - Fix the evidence diagrams: three stroked SVG curves had no fill, so the browser
