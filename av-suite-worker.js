@@ -37,6 +37,10 @@ function cachedResponse(cache,request){
 
 var CRITICAL_ASSETS=[
   './av-suite.html',
+  './css/av-suite.css',
+  './js/av-suite/theme-bootstrap.js',
+  './js/av-suite/modal-controller.js',
+  './js/av-suite/app.js',
   './js/sbd-registry.js',
   './css/sbd-public-nav.css',
   './css/av-theme.css',
