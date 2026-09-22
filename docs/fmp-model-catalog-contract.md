@@ -58,8 +58,7 @@ There is a fourth. The Throwline pilot catalog
 (`ProjectorThrow/data/throwline-pilot-catalog.v1.json`) records `confidence` as
 `official_primary`, `needs_verification` or `conflicting`, documented in
 `docs/throwline-catalog-contract.md`. Its `conflicting` is the same idea as
-`Contradicted` here. Note that unlike this contract, Throwline's `confidence`
-values are not currently checked by any gate.
+`Contradicted` here, and like this contract its values are gate-enforced.
 
 `scripts/fmp_model_contract.js` reads only the four equipment catalogs, so the
 house reference, the Gear Reference and the Throwline catalog are all out of its
