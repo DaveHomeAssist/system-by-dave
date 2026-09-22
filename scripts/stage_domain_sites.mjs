@@ -385,7 +385,7 @@ function homePage(site, origin) {
 </head>
 <body>
 <main>
-<p><a href="${home}">Open ${title}</a>. Redirecting.<br><a href="https://systembydave.com/">System by Dave home</a></p>
+<p><a href="${home}">Open ${title}</a>. Redirecting.</p>
 </main>
 </body>
 </html>
@@ -412,7 +412,7 @@ function notFoundPage(site) {
 <main id="main" tabindex="-1">
 <h1>Page not found</h1>
 <p>That address is not part of ${title} on ${escapeHtml(site.domain)}.</p>
-<p><a href="${site.home}">Open ${title}</a> · <a href="/">${escapeHtml(site.domain)} home</a> · <a href="https://systembydave.com/">System by Dave home</a></p>
+<p><a href="${site.home}">Open ${title}</a> · <a href="/">${escapeHtml(site.domain)} home</a></p>
 </main>
 </body>
 </html>
@@ -450,7 +450,7 @@ function transferPage(site, origin) {
 <label class="sbd-move-file" for="backupFile">Backup file</label>
 <input id="backupFile" type="file" accept="application/json,.json">
 </section>
-<p class="sbd-move-links"><a href="${site.home}">Open ${title}</a> · <a href="https://systembydave.com/">System by Dave home</a></p>
+<p class="sbd-move-links"><a href="${site.home}">Open ${title}</a></p>
 </main>
 <noscript><p class="sbd-move">Moving saved data requires JavaScript.</p></noscript>
 </body>
@@ -458,9 +458,10 @@ function transferPage(site, origin) {
 `;
 }
 
-function stubPage(site, origin, file) {
+function stubPage(site, origin, file, host) {
   const route = routeFor(file);
   const target = `${origin}/${route}`;
+  const publisher = host ? { name: host.name, home: host.home } : { name: 'System by Dave', home: 'https://systembydave.com/' };
   const title = escapeHtml(`${site.name} has moved to ${site.domain}`);
   const description = escapeHtml(`${site.name} now lives at ${site.domain}.`);
   return `<!doctype html>
@@ -475,7 +476,7 @@ function stubPage(site, origin, file) {
 <meta name="robots" content="noindex,follow">
 <meta name="theme-color" content="#FFFFFF">
 <meta property="og:type" content="website">
-<meta property="og:site_name" content="System by Dave">
+<meta property="og:site_name" content="${escapeHtml(publisher.name)}">
 <meta property="og:title" content="${title}">
 <meta property="og:description" content="${description}">
 <meta property="og:url" content="${escapeHtml(target)}">
@@ -495,7 +496,7 @@ function stubPage(site, origin, file) {
 <p>This page now lives at <a id="moveTarget" href="${escapeHtml(target)}">${escapeHtml(`${site.domain}/${route}`)}</a>.</p>
 <p id="moveStatus" class="sbd-move-status" role="status" aria-live="polite"></p>
 <section id="movePanel" class="sbd-move-panel" hidden></section>
-<p class="sbd-move-links"><a href="https://systembydave.com/">System by Dave home</a></p>
+<p class="sbd-move-links"><a href="${escapeHtml(publisher.home)}">${escapeHtml(publisher.name)} home</a></p>
 </main>
 </body>
 </html>
@@ -555,7 +556,7 @@ function stageSite(site, closed, policy, options) {
       throw new Error(`${site.id} movedTo route ${route} is not owned by ${targetId}.`);
     }
     const movedOrigin = options.siteOrigins[moved.id] || `https://${moved.domain}`;
-    writeFile(dir, `${route}index.html`, stubPage(moved, movedOrigin, `${route}index.html`));
+    writeFile(dir, `${route}index.html`, stubPage(moved, movedOrigin, `${route}index.html`, site));
   }
   if (Object.keys(site.movedTo || {}).length) {
     for (const asset of ['js/domain-move.js', 'js/domain-storage.js', 'css/domain-move.css']) {
@@ -590,6 +591,20 @@ function stageSite(site, closed, policy, options) {
     }
   };
   walk(dir, '');
+  // The FMP domains carry no publisher branding, the generated pages included (Dave, 2026-09-22).
+  // Only this function's own output is checked: copied repo pages are guarded by verify:fmp, and the
+  // retired walk under fmpwalk/ stays frozen. Source comments and the data-transfer origin constant
+  // are not branding, so the rule is titles, link previews and navigation, which is what these are.
+  if (site.home.startsWith('/fmp')) {
+    const generated = ['index.html', '404.html', 'transfer.html',
+      ...Object.keys(site.movedTo || {}).map((route) => `${route}index.html`)];
+    for (const rel of generated) {
+      const page = fs.readFileSync(path.join(dir, rel), 'utf8');
+      if (/System by Dave|systembydave\.com/i.test(page)) {
+        throw new Error(`${site.id}: generated ${rel} names the publisher; the FMP domains carry ${site.name}.`);
+      }
+    }
+  }
   for (const rel of listing.sort()) hashes[rel] = sha256(fs.readFileSync(path.join(dir, rel)));
   writeFile(dir, 'source.json', `${JSON.stringify({
     schema: 'system-by-dave.domain-site.v1',
