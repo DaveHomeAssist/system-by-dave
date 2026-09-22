@@ -1,5 +1,5 @@
 import * as T from './vendor/three/three.module.js';
-import { photos, catalog } from './fmp-guide-data.js?v=1352090a47dfda15';
+import { photos, catalog } from './fmp-guide-data.js?v=b93d19fe3eb3fce8';
 const root=document.getElementById('fmp-rig-3d');
 root.dataset.ready='true';
 const themeButton=document.getElementById('themeBtn');
@@ -812,7 +812,7 @@ function selectPart(id,focus=false){
   $('[data-locate-hint]').hidden=Boolean(item);
   $('[data-locate-status]').textContent=item?'Tap a part to explore.':'Select a component.';
   if(item){
-    for(const key of ['title','direction','purpose','use','check','tip'])$(`[data-${key}]`).textContent=item[key];
+    for(const key of ['title','direction','purpose','use','check','tip'])$(`[data-${key}]`).textContent=item[key]||'';
     $('[data-photo-reference]').hidden=!photos[item.photo];
     if(photos[item.photo])$('[data-photo]').src=photos[item.photo];$('[data-photo]').alt=`Reference photograph for ${item.title}`;
     $('[data-photo-note]').textContent=item.photoNote||'Supplied photo · model proportions and cable curves are approximate.';
