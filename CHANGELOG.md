@@ -1,5 +1,31 @@
 # Changelog
 
+## 2026-09-22 — The P240 is written from its user guide
+
+- The thinnest catalog on the site: 24 components averaging 45 characters, 18 of
+  them under 60. "USB service / firmware". "DC power input". "Serial PTZ
+  control", twice, on two different connectors.
+- The BirdDog user guide was already cited. Writing from it rather than from the
+  connector labels turns the rear panel into something an operator can act on.
+- **Do not move the camera head by hand while it is powered.** The guide warns
+  this can damage the camera; nothing on the page said so.
+- **The video format rotary switch and the on-screen menu override each other**,
+  and whichever was changed last wins at boot — a real way to lose a format
+  between shows.
+- **The line/mic selector switches 48 V phantom power** onto the 3.5 mm input.
+  Set it before plugging anything in.
+- The balanced audio port needs a breakout cable BirdDog does not supply; the
+  guide names two compatible Atomos parts by number.
+- 12 V DC runs cooler than PoE+, which is the reason to choose it for a camera in
+  a hot position.
+- RS-422 is the one for long runs; RS-232 daisy-chains up to seven cameras; both
+  take baud rate and address from the base DIP switch and need a power cycle.
+- **Tele Convert changes what "40x" means.** Off is 20x true optical zoom; on
+  crops the sensor to reach 40x in HD. The crop is not extra lens.
+- The rear ID number is a hand-fitted silicone plug, so it can disagree with the
+  input the camera is patched to.
+- 21 of 24 purposes rewritten, all 24 now unique; average length 45 → 184.
+
 ## 2026-09-22 — Every SuperJoy control describes itself
 
 - 26 of 67 components shared a sentence with another. The keypad was the worst:
