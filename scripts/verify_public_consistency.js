@@ -114,7 +114,6 @@ function verifyCounts() {
   const contracts = new Map([
     ['index.html', [`>${count}</div>`, `${count} tools · offline`]],
     ['tools.html', [`bundles ${count} operator tools`, `all ${count} registered AV tools`]],
-    ['av-suite.html', [`id="railAllCount">${count}</span> tools`, `placeholder="Search all ${count} tools`]],
     ['README.md', [`contains **${count} browser tools**`]]
   ]);
   contracts.forEach((snippets, file) => {
@@ -123,6 +122,14 @@ function verifyCounts() {
       if (!source.includes(snippet)) fail(`${file} is missing canonical AV count marker: ${snippet}.`);
     });
   });
+  const avSuite = read('av-suite.html');
+  const avSuiteApp = read('js/av-suite/app.js');
+  if (!avSuite.includes('id="railAllCount"></span> tools') || !avSuiteApp.includes("$('railAllCount').textContent=TOOLS.length;")) {
+    fail('av-suite.html must render the navigation tool count from TOOLS.length.');
+  }
+  if (!avSuite.includes('aria-label="Search all tools"') || !avSuiteApp.includes("placeholder='Search all '+TOOLS.length+' tools…';")) {
+    fail('AV Suite search count must be registry-derived instead of hard-coded in HTML.');
+  }
   if (/groups\s+43\s+browser-based AV show tools/i.test(read('tools.html'))) fail('tools.html retains the stale 43-tool card count.');
   notes.push(`avTools=${count}`);
 }
