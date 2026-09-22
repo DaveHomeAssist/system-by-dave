@@ -45,7 +45,7 @@
     if([...$('component').options].some(o=>o.value===id))$('component').value=id;
     $('category').textContent=c.category;$('label').textContent=labelOf(c);$('purpose').textContent=c.purpose;$('id').textContent=id;$('hover').textContent=labelOf(c);
     $('press').disabled=!c.sim;$('press').textContent=c.sim==='tbar'?'Use the lever below':c.sim?'Press in simulator':'Identification only';
-    $('limit').textContent=c.limits;$('sources').replaceChildren();
+    $('limit').textContent=c.limits||data.catalog.category_limits?.[c.category]||data.catalog.model_limits||'';$('sources').replaceChildren();
     for(const sid of c.source_ids){const src=data.catalog.sources.find(x=>x.source_id===sid);const li=document.createElement('li');if(src.locator.startsWith('https://')){const a=document.createElement('a');a.href=src.locator;a.target='_blank';a.rel='noopener noreferrer';a.textContent=src.source_id==='bmd-spec'?'Blackmagic HD8 ISO specifications':src.source_id==='bmd-start'?'Blackmagic getting started':'Blackmagic product guide';li.append(a);}else li.textContent=src.locator;$('sources').append(li);}
     const hasVenue=venue&&c.source_index;$('venue-note').hidden=!hasVenue;if(hasVenue)$('venue-note').textContent=data.venueNotes[c.source_index-1]+' Source: draft FMP SOP, September 2026. Current patch unverified.';
     if(sceneKit){clearHighlight();highlight();requestRender();}drawDiagram();

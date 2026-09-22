@@ -1,5 +1,25 @@
 # Changelog
 
+## 2026-09-22 — The ATEM states its invariant copy once
+
+- Three strings were stamped onto all 227 ATEM components: one `limits`
+  caveat, one `action` line and one `expected_result` line. Only two
+  components ever overrode the caveat, and `action`/`expected_result` had two
+  distinct values between them, chosen by whether a component is simulatable.
+- None of that is a per-part fact. `limits` becomes `model_limits`, and the
+  `action`/`expected_result` pair becomes `interaction_modes.inspect` and
+  `interaction_modes.simulate`. The two genuine per-part overrides still win
+  the chain.
+- `atem-hd8-iso-3.js` resolved limits as `c.limits` with no fallback and no
+  empty-string guard, so it would have rendered the literal word `undefined`
+  once the field moved. It now resolves part, then category, then model,
+  matching `bench-core.js`, which CCU4 and P240 already use.
+- Rendered text per component is unchanged — all 227 resolve to the same
+  string as before. The downloadable catalog drops from 228,700 to 170,545
+  characters. The page's own JavaScript grows 47 bytes, because the factory
+  already stated these strings once; the duplication only ever existed in the
+  built catalog, not in what the browser downloads.
+
 ## 2026-09-22 — The release contract stops promising a second provenance file
 
 - `docs/fmp-public-release.md` still said the exporter writes two allowlists and
