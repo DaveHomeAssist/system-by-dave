@@ -108,28 +108,41 @@ function assertPageContracts(registry) {
   }
 
   const avSuite = read('av-suite.html');
+  const avSuiteCss = read('css/av-suite.css');
+  const avSuiteApp = read('js/av-suite/app.js');
+  const avSuiteModal = read('js/av-suite/modal-controller.js');
+  const avSuiteRuntime = [avSuite, avSuiteCss, avSuiteApp, avSuiteModal].join('\n');
   if (!/data-av-theme="system" data-av-tool="av-suite"/.test(avSuite) || !/href="css\/av-theme\.css"/.test(avSuite) || !/prefers-color-scheme: dark/.test(avSuite)) {
     fail('AV Suite does not declare the shared system-adaptive theme contract.');
   }
-  if (/oklch\(0\.68 0\.13 158|#30B27B|--bg:#0A0D14/.test(avSuite)) {
+  if (!/href="css\/av-suite\.css"/.test(avSuite) || !/type="module" src="js\/av-suite\/app\.js"/.test(avSuite)) {
+    fail('AV Suite does not load its extracted stylesheet and application module.');
+  }
+  if (/script-src[^;]*'unsafe-inline'/.test(avSuite) || /<script>([\s\S]*?)<\/script>/.test(avSuite)) {
+    fail('AV Suite still requires inline JavaScript after the architecture extraction.');
+  }
+  if (!/import \{ setModalBackgroundInert \} from '\.\/modal-controller\.js';/.test(avSuiteApp)) {
+    fail('AV Suite application module does not import the shared modal controller.');
+  }
+  if (/oklch\(0\.68 0\.13 158|#30B27B|--bg:#0A0D14/.test(avSuiteRuntime)) {
     fail('AV Suite still contains the retired green-led dark palette.');
   }
-  if (!/SENSITIVE_PACKAGE_KEYS=\{'PixelForge\.ai\.v1':true\}/.test(avSuite)) {
+  if (!/SENSITIVE_PACKAGE_KEYS=\{'PixelForge\.ai\.v1':true\}/.test(avSuiteApp)) {
     fail('AV Suite is missing the defense-in-depth show-package secret denylist.');
   }
-  if (!/!SENSITIVE_PACKAGE_KEYS\[key\]/.test(avSuite)) {
+  if (!/!SENSITIVE_PACKAGE_KEYS\[key\]/.test(avSuiteApp)) {
     fail('AV Suite imports do not reject sensitive package keys.');
   }
   if (!/id="settingsDrawer"[^>]*\binert\b/i.test(avSuite)) {
     fail('Settings drawer is not inert in its closed HTML state.');
   }
-  if (!/removeAttribute\('inert'\)/.test(avSuite) || !/setAttribute\('inert',''\)/.test(avSuite)) {
+  if (!/removeAttribute\('inert'\)/.test(avSuiteRuntime) || !/setAttribute\('inert',''\)/.test(avSuiteRuntime)) {
     fail('Settings drawer inert state is not toggled by the drawer controller.');
   }
-  if (!/id="clearFiltersBtn"/.test(avSuite) || !/function clearToolFilters\(/.test(avSuite)) {
+  if (!/id="clearFiltersBtn"/.test(avSuiteRuntime) || !/function clearToolFilters\(/.test(avSuiteApp)) {
     fail('AV Suite filtered empty state does not provide a recovery action.');
   }
-  if (!avSuite.includes("<h3>'+d+'</h3>")) {
+  if (!avSuiteApp.includes("<h3>'+d+'</h3>")) {
     fail('AV Suite tool groups do not preserve the page heading hierarchy.');
   }
   // The canonical origin follows the AV by Dave cutover (scripts/domain-sites.json).
@@ -139,19 +152,19 @@ function assertPageContracts(registry) {
   if (!/id="entryChooser"[\s\S]*data-entry-choice="show"[\s\S]*data-entry-choice="toolbox"/.test(avSuite) || !/id="doorwayBtn"/.test(avSuite)) {
     fail('AV Suite is missing the keyboard-addressable two-door chooser or its reopen control.');
   }
-  if (!/SHOW_CONTEXT_PARAMS=\['sbdShow','sbdVenue','sbdDate','sbdOperator','sbdPhase'\]/.test(avSuite) || !/if\(hasShowContext\(params\)\) return 'show'/.test(avSuite)) {
+  if (!/SHOW_CONTEXT_PARAMS=\['sbdShow','sbdVenue','sbdDate','sbdOperator','sbdPhase'\]/.test(avSuiteApp) || !/if\(hasShowContext\(params\)\) return 'show'/.test(avSuiteApp)) {
     fail('Explicit sbd* context does not source-authoritatively force Show Console.');
   }
-  if (!/function toolHref\(tool\)[\s\S]*entryState\.mode==='toolbox'[\s\S]*url\.searchParams\.delete\(name\)/.test(avSuite)) {
+  if (!/function toolHref\(tool\)[\s\S]*entryState\.mode==='toolbox'[\s\S]*url\.searchParams\.delete\(name\)/.test(avSuiteApp)) {
     fail('Toolbox toolHref does not strip every show-context parameter.');
   }
   ['toolboxPinned', 'toolboxRecent', 'toolboxSearch', 'toolboxFilter', 'toolboxFamily', 'preferredEntry'].forEach((field) => {
-    if (!avSuite.includes(field)) fail(`AV Suite UI preferences are missing ${field}.`);
+    if (!avSuiteApp.includes(field)) fail(`AV Suite UI preferences are missing ${field}.`);
   });
-  if (!/TOOLBOX_FEATURED=TOOLS\.filter\(function\(tool\)\{return tool\.toolboxFeatured===true;\}\)/.test(avSuite)) {
+  if (!/TOOLBOX_FEATURED=TOOLS\.filter\(function\(tool\)\{return tool\.toolboxFeatured===true;\}\)/.test(avSuiteApp)) {
     fail('AV Toolbox Use anytime inventory is not derived from registry.toolboxFeatured.');
   }
-  if (!/src="js\/vendor\/gsap\.min\.js"/.test(avSuite) || !/gsap\.killTweensOf\(regions\)/.test(avSuite) || !/prefers-reduced-motion: reduce/.test(avSuite)) {
+  if (!/src="js\/vendor\/gsap\.min\.js"/.test(avSuite) || !/gsap\.killTweensOf\(regions\)/.test(avSuiteApp) || !/prefers-reduced-motion:reduce/.test(avSuiteCss)) {
     fail('AV Suite doorway motion is missing local GSAP, tween cleanup, or reduced-motion bypass.');
   }
 

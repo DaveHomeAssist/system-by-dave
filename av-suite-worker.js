@@ -35,9 +35,36 @@ function cachedResponse(cache,request){
   });
 }
 
+var CRITICAL_ASSETS=[
+  './av-suite.html',
+  './css/av-suite.css',
+  './js/av-suite/theme-bootstrap.js',
+  './js/av-suite/modal-controller.js',
+  './js/av-suite/app.js',
+  './js/sbd-registry.js',
+  './css/sbd-public-nav.css',
+  './css/av-theme.css',
+  './js/vendor/gsap.min.js',
+  './svg/system_by_dave_logo_rust.svg',
+  './manifest.json',
+  './fonts/dm-sans.woff2',
+  './fonts/dm-serif-display.woff2',
+  './fonts/dm-serif-display-italic.woff2',
+  './fonts/jetbrains-mono.woff2'
+];
+var OPTIONAL_ASSETS=OFFLINE_ASSETS.filter(function(asset){return CRITICAL_ASSETS.indexOf(asset)<0;});
+
+function cacheOptionalAssets(cache){
+  return Promise.all(OPTIONAL_ASSETS.map(function(asset){
+    return cache.add(asset).then(function(){return {asset:asset,ok:true};}).catch(function(){return {asset:asset,ok:false};});
+  }));
+}
+
 self.addEventListener('install',function(event){
   event.waitUntil(caches.open(CACHE_NAME).then(function(cache){
-    return cache.addAll(OFFLINE_ASSETS);
+    return cache.addAll(CRITICAL_ASSETS).then(function(){
+      return cacheOptionalAssets(cache);
+    });
   }).then(function(){
     return self.skipWaiting();
   }));
