@@ -5,3 +5,21 @@ node_modules/
 dist/
 Agent Images/
 Prompt Lab Extension Pictures (v1.7)/
+
+# Local pipeline source for the generated hat-in-ring/ site; never published.
+_hat-in-ring-src/
+
+# iCloud Drive sync conflict duplicates ("file 2.html"), which shadow real
+# files and break the filesystem walks in scripts/verify_*.js.
+* 2.*
+* 3.*
+
+# Secrets — never commit. The hat-in-ring pipeline reads a Notion token from
+# _hat-in-ring-src/.env (see .env.example); RUN-20260628-0056 left these rules
+# unwritten.
+.env
+.env.*
+!.env.example
+*.token
+*secret*.json
+credentials.json

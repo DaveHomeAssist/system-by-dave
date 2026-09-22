@@ -7,7 +7,7 @@ const vm = require('node:vm');
 const { originFor } = require('./domain_sites_lib');
 
 const ROOT = path.resolve(__dirname, '..');
-const SKIP_DIRS = new Set(['.git', 'node_modules']);
+const SKIP_DIRS = new Set(['.git', 'node_modules', '_hat-in-ring-src']);
 const SKIP_FILES = new Set([
   'cross-project-actions.html',
   'html/sbd-brand.html'
