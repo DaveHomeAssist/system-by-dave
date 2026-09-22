@@ -138,7 +138,7 @@ img,svg{display:block}
   --w-semi:600;--w-bold:700;
   --c-bg:#f2f4f6;--c-surface:#ffffff;--c-surface-2:#f7f8fa;--c-surface-3:#eef1f4;--c-raised:#e4e8ec;
   --c-neutral-100:#f7f8fa;--c-neutral-200:#eef1f4;--c-neutral-300:#dde2e7;--c-neutral-400:#c3cad1;
-  --c-neutral-500:#8b96a3;--c-neutral-600:#5b6672;--c-neutral-700:#3d4753;--c-neutral-800:#232931;--c-neutral-900:#14181c;
+  --c-neutral-500:#66727e;--c-neutral-600:#5b6672;--c-neutral-700:#3d4753;--c-neutral-800:#232931;--c-neutral-900:#14181c;
   --c-text:#14181c;
   --c-accent:#2f658d;--c-accent-100:#e7eef4;--c-accent-200:#d3e0ea;--c-accent-300:#5487ac;--c-accent-400:#3d75a0;
   --c-accent-600:#255a80;--c-accent-700:#1d4a6a;--c-accent-800:#163a54;--c-accent-900:#102a3d;
@@ -162,7 +162,7 @@ img,svg{display:block}
   --w-semi:600;--w-bold:700;
   --c-bg:#14181c;--c-text:#e6e9ec;
   --c-neutral-100:#1b2026;--c-neutral-200:#232931;--c-neutral-300:#2c333c;--c-neutral-400:#3d4753;
-  --c-neutral-500:#6b7683;--c-neutral-600:#94a0ad;--c-neutral-700:#b9c3cd;--c-neutral-800:#d4dae0;--c-neutral-900:#eef1f4;
+  --c-neutral-500:#8794a2;--c-neutral-600:#94a0ad;--c-neutral-700:#b9c3cd;--c-neutral-800:#d4dae0;--c-neutral-900:#eef1f4;
   --c-surface:#1b2026;--c-surface-2:#232931;--c-surface-3:#2c333c;--c-raised:#3d4753;
   --c-accent:#7ba3cc;--c-accent-100:#1c2733;--c-accent-200:#243547;--c-accent-300:#9dbfe0;--c-accent-400:#8db4d9;--c-accent-600:#8fb6de;--c-accent-700:#a8c6e4;--c-accent-800:#c0d7ee;--c-accent-900:#d8e7f6;
   --c-accent-line:rgba(123,163,204,.46);
@@ -247,6 +247,7 @@ img,svg{display:block}
    etc.) — without this, several toggled elements (phase strip, help
    badges, the toast's Undo button) would stay visually visible. */
 #avApp [hidden]{display:none!important}
+#avApp .visually-hidden{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
 #avApp .kbd{font-family:var(--f-label);font-size:10px;border:1px solid var(--c-neutral-400);padding:1px 5px;color:var(--c-neutral-600)}
 
 /* blueprint corner registration marks */
@@ -279,7 +280,7 @@ img,svg{display:block}
 #avApp .hb{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border:1px solid var(--c-accent);color:var(--c-accent);font-family:var(--f-label);font-size:9px;font-weight:700}
 
 /* pin toggle button (used in rail rows, tool rows, all-tools cards, recs) */
-#avApp .pinbtn{display:grid;place-items:center;width:26px;height:26px;border:1px solid var(--c-neutral-400);background:transparent;color:var(--c-neutral-600);padding:0;flex:none}
+#avApp .pinbtn{display:grid;place-items:center;width:44px;height:44px;border:1px solid var(--c-neutral-400);background:transparent;color:var(--c-neutral-600);padding:0;flex:none}
 #avApp .pinbtn[aria-pressed="true"]{border-color:var(--st-pin-line);background:var(--st-pin-tint);color:var(--st-pin)}
 
 [data-mob]{display:none}
@@ -337,7 +338,7 @@ img,svg{display:block}
 #avApp .pin-list{display:grid;gap:5px}
 #avApp .pin-row{display:flex;align-items:center;gap:8px;padding:6px 8px;border:1px solid var(--c-neutral-300);background:var(--c-surface)}
 #avApp .pin-row a{flex:1;min-width:0;font-size:12.5px;font-weight:var(--w-semi);color:var(--c-text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#avApp .pin-row button{width:20px;height:20px;padding:0;border:0;background:transparent;color:var(--c-neutral-600)}
+#avApp .pin-row button{width:44px;height:44px;padding:0;border:0;background:transparent;color:var(--c-neutral-600)}
 #avApp .pin-empty{border:1px dashed var(--c-neutral-400);padding:12px;font-size:11.5px;color:var(--c-neutral-600);text-align:center}
 #avApp .fam-list{display:grid;gap:1px}
 #avApp .fam-row{position:relative}
@@ -349,7 +350,7 @@ img,svg{display:block}
 #avApp .fam-btn svg{color:var(--c-accent-700,var(--c-accent));flex:none}
 #avApp .fam-btn .fam-label{flex:1;font-size:13px;font-weight:var(--w-semi)}
 #avApp .fam-btn .fam-n{font-family:var(--f-label);font-size:10.5px;color:var(--c-neutral-600)}
-#avApp .fam-toggle{width:26px;border:0;background:transparent;color:var(--c-neutral-600);padding:0}
+#avApp .fam-toggle{width:44px;min-height:44px;border:0;background:transparent;color:var(--c-neutral-600);padding:0}
 #avApp .fam-spacer{width:26px;flex:none}
 #avApp .fam-subs{padding:2px 12px 8px 34px;border-left:1px solid var(--c-neutral-300);margin-left:20px;display:grid;gap:2px}
 #avApp .fam-sub-row{display:flex;align-items:center;gap:7px;padding:5px 7px;font-size:12px}
@@ -426,7 +427,7 @@ img,svg{display:block}
 #avApp .tr-status{display:flex}
 #avApp .tr-actions{display:flex;gap:5px;align-items:center}
 #avApp .tr-actions select{width:auto;min-width:98px;padding:5px 22px 5px 7px;font-size:10.5px;font-family:var(--f-label)}
-#avApp .tr-open{width:28px;height:28px;padding:0;border:1px solid var(--c-neutral-300);background:transparent;color:var(--c-neutral-600)}
+#avApp .tr-open{width:44px;height:44px;padding:0;border:1px solid var(--c-neutral-300);background:transparent;color:var(--c-neutral-600)}
 #avApp .tr-subs-panel{border-top:1px dashed var(--c-neutral-400);background:var(--c-neutral-100);padding:9px 12px 11px 44px}
 #avApp .tr-subs-panel .tsp-label{font-family:var(--f-label);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--c-neutral-600);margin-bottom:7px}
 #avApp .tr-subs-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:7px}
@@ -767,6 +768,7 @@ img,svg{display:block}
 </noscript>
 
 <div id="avApp" data-r="shell">
+<h1 class="visually-hidden">AV by Dave</h1>
 <script>document.getElementById('avApp').setAttribute('data-theme', window.__avResolveInitialTheme().theme);</script>
 
 <header data-r="head">
@@ -827,7 +829,7 @@ img,svg{display:block}
     </div>
     <div class="rail-foot">
       <button type="button" class="rail-foot-link" id="railRecentBtn">Recent</button>
-      <button type="button" class="rail-foot-link" id="railAllBtn">All <span id="railAllCount">44</span> tools</button>
+      <button type="button" class="rail-foot-link" id="railAllBtn">All <span id="railAllCount"></span> tools</button>
       <button type="button" class="rail-foot-link" id="railShopBtn">Toolbox</button>
       <button type="button" class="rail-foot-link" id="railOfficeBtn">Front Office</button>
     </div>
@@ -862,7 +864,7 @@ img,svg{display:block}
 
       <section id="allViewSection" hidden>
         <div class="fam-view-head"><h2>All tools</h2><span class="fam-view-count" id="allViewCount"></span><span class="fam-view-depts" id="allViewVersion"></span></div>
-        <input type="search" id="allSearchInput" class="allgrid-search" placeholder="Search all 44 tools…">
+        <input type="search" id="allSearchInput" class="allgrid-search" aria-label="Search all tools" placeholder="Search all tools…">
         <div id="allGroups"></div>
       </section>
     </div>
@@ -964,7 +966,7 @@ img,svg{display:block}
       <div><h2 id="commandTitle">Quick Switcher</h2><p id="commandStatus">Current phase tools and next actions</p></div>
       <button type="button" id="closeCommandBtn">Close</button>
     </div>
-    <input id="commandInput" class="cmdk-search" type="search" autocomplete="off" placeholder="Search tools, phases, actions, status…" role="combobox" aria-expanded="true" aria-controls="commandList" aria-autocomplete="list">
+    <input id="commandInput" class="cmdk-search" type="search" autocomplete="off" placeholder="Search tools, phases, actions, status…" role="combobox" aria-label="Quick Switcher search" aria-expanded="true" aria-controls="commandList" aria-autocomplete="list">
     <div id="commandList" class="cmdk-list" role="listbox" aria-label="Quick switcher results"></div>
   </section>
 </div>
@@ -1021,7 +1023,7 @@ img,svg{display:block}
 </div>
 
 <!-- ============ DOS STATUS BAR (decorative) ============ -->
-<div data-dosbar>
+<div data-dosbar aria-hidden="true">
   <span class="dos-key"><span class="k">F1</span><span class="l">Help</span></span>
   <span class="dos-key"><span class="k">F2</span><span class="l">Save Show</span></span>
   <span class="dos-key"><span class="k">F3</span><span class="l">Open Tool</span></span>
@@ -1234,15 +1236,15 @@ function hasShowContext(params){return SHOW_CONTEXT_PARAMS.some(function(name){r
 function explicitEntryFromLocation(){var params=new URLSearchParams(window.location.search);if(hasShowContext(params)) return 'show';var entry=params.get('entry');return entry==='show'||entry==='toolbox'?entry:'';}
 function resolvedEntryFromLocation(){var explicit=explicitEntryFromLocation();if(explicit) return explicit;if(window.history.state&&window.history.state.avEntry==='chooser') return '';return uiState.preferredEntry;}
 function entryUrl(mode){var url=new URL(window.location.href);url.searchParams.set('entry',mode);if(mode==='toolbox') SHOW_CONTEXT_PARAMS.forEach(function(name){url.searchParams.delete(name);});return url.pathname+url.search+url.hash;}
-function setChooserBackgroundInert(inert){['[data-r="head"]','[data-r="body"]','[data-dosbar]'].forEach(function(selector){var el=$('avApp').querySelector(selector);if(!el) return;if(inert) el.setAttribute('inert','');else el.removeAttribute('inert');});var siteHeader=document.querySelector('.sbd-site-header');if(siteHeader){if(inert) siteHeader.setAttribute('inert','');else siteHeader.removeAttribute('inert');}}
+function setModalBackgroundInert(inert){['[data-r="head"]','[data-r="body"]','[data-dosbar]'].forEach(function(selector){var el=$('avApp').querySelector(selector);if(!el) return;if(inert) el.setAttribute('inert','');else el.removeAttribute('inert');});var siteHeader=document.querySelector('.sbd-site-header');if(siteHeader){if(inert) siteHeader.setAttribute('inert','');else siteHeader.removeAttribute('inert');}}
 function updateEntryDefaultNote(){var note=$('entryDefaultNote');if(!note) return;note.textContent=uiState.preferredEntry?(uiState.preferredEntry==='toolbox'?'Default doorway: AV Toolbox.':'Default doorway: Show Console.'):'No default doorway selected yet.';}
-function openEntryChooser(){entryState.lastFocus=document.activeElement;entryState.chooserOpen=true;updateEntryDefaultNote();$('entryCloseBtn').hidden=!entryState.mode;$('entryChooser').hidden=false;setChooserBackgroundInert(true);window.setTimeout(function(){var first=$('entryChooser').querySelector('[data-entry-choice]');if(first) first.focus();},0);}
-function closeEntryChooser(restoreFocus){if(!entryState.chooserOpen||!entryState.mode) return;entryState.chooserOpen=false;$('entryChooser').hidden=true;setChooserBackgroundInert(false);if(restoreFocus!==false&&entryState.lastFocus&&entryState.lastFocus.focus) entryState.lastFocus.focus();entryState.lastFocus=null;}
+function openEntryChooser(){entryState.lastFocus=document.activeElement;entryState.chooserOpen=true;updateEntryDefaultNote();$('entryCloseBtn').hidden=!entryState.mode;$('entryChooser').hidden=false;setModalBackgroundInert(true);window.setTimeout(function(){var first=$('entryChooser').querySelector('[data-entry-choice]');if(first) first.focus();},0);}
+function closeEntryChooser(restoreFocus){if(!entryState.chooserOpen||!entryState.mode) return;entryState.chooserOpen=false;$('entryChooser').hidden=true;setModalBackgroundInert(false);if(restoreFocus!==false&&entryState.lastFocus&&entryState.lastFocus.focus) entryState.lastFocus.focus();entryState.lastFocus=null;}
 function animateWorkspace(){var regions=Array.prototype.filter.call($('avApp').querySelectorAll('[data-workspace-region]'),function(el){return !el.hidden&&getComputedStyle(el).display!=='none';});var reduced=Boolean(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches);if(window.gsap&&typeof window.gsap.killTweensOf==='function'){window.gsap.killTweensOf(regions);if(reduced){window.gsap.set(regions,{clearProps:'transform,opacity'});return;}window.gsap.fromTo(regions,{opacity:0,y:12},{opacity:1,y:0,duration:.28,stagger:.04,ease:'power2.out',clearProps:'transform,opacity',overwrite:true});return;}regions.forEach(function(el){el.style.removeProperty('opacity');el.style.removeProperty('transform');});}
-function applyEntryMode(mode,options){if(mode!=='show'&&mode!=='toolbox') return;options=options||{};entryState.mode=mode;viewState.context=mode==='toolbox'?'shop':'show';$('avApp').setAttribute('data-entry',mode);if(mode==='show'&&!viewState.fam) viewState.fam=defaultFamilyForPhase();if(mode==='toolbox'&&!$('onboardOverlay').hidden){$('onboardOverlay').hidden=true;obState.step=0;}renderAll();animateWorkspace();if(options.focusMain){window.setTimeout(function(){$('main-content').focus();},0);}if(mode==='show'&&options.allowOnboarding&&!uiState.onboardingSeen) window.setTimeout(openOnboarding,0);}
-function chooseEntry(mode){uiState.preferredEntry=mode;writeUi({preferredEntry:mode});entryState.chooserOpen=false;$('entryChooser').hidden=true;setChooserBackgroundInert(false);window.history.pushState({avEntry:mode},'',entryUrl(mode));applyEntryMode(mode,{focusMain:true,allowOnboarding:true});entryState.lastFocus=null;}
+function applyEntryMode(mode,options){if(mode!=='show'&&mode!=='toolbox') return;options=options||{};entryState.mode=mode;viewState.context=mode==='toolbox'?'shop':'show';$('avApp').setAttribute('data-entry',mode);if(mode==='show'&&!viewState.fam) viewState.fam=defaultFamilyForPhase();if(mode==='toolbox'&&!$('onboardOverlay').hidden){$('onboardOverlay').hidden=true;setModalBackgroundInert(false);obState.step=0;}renderAll();animateWorkspace();if(options.focusMain){window.setTimeout(function(){$('main-content').focus();},0);}if(mode==='show'&&options.allowOnboarding&&!uiState.onboardingSeen) window.setTimeout(openOnboarding,0);}
+function chooseEntry(mode){uiState.preferredEntry=mode;writeUi({preferredEntry:mode});entryState.chooserOpen=false;$('entryChooser').hidden=true;setModalBackgroundInert(false);window.history.pushState({avEntry:mode},'',entryUrl(mode));applyEntryMode(mode,{focusMain:true,allowOnboarding:true});entryState.lastFocus=null;}
 function navigateEntry(mode){if(mode!=='show'&&mode!=='toolbox') return;uiState.preferredEntry=mode;writeUi({preferredEntry:mode});window.history.pushState({avEntry:mode},'',entryUrl(mode));applyEntryMode(mode,{focusMain:true,allowOnboarding:mode==='show'});}
-function handleEntryPopstate(){var mode=resolvedEntryFromLocation();if(!mode){openEntryChooser();return;}if(entryState.chooserOpen){entryState.chooserOpen=false;$('entryChooser').hidden=true;setChooserBackgroundInert(false);}if(mode==='show') applyUrlContext();applyEntryMode(mode,{focusMain:true,allowOnboarding:false});}
+function handleEntryPopstate(){var mode=resolvedEntryFromLocation();if(!mode){openEntryChooser();return;}if(entryState.chooserOpen){entryState.chooserOpen=false;$('entryChooser').hidden=true;setModalBackgroundInert(false);}if(mode==='show') applyUrlContext();applyEntryMode(mode,{focusMain:true,allowOnboarding:false});}
 
 /* ============================================================
    CORE ACTIONS — data model mutations (identical semantics to the
@@ -1346,10 +1348,11 @@ function scanSavedToolData(){
   showHint(scanned?('Scanned '+scanned+' saved tools. '+ready+' ready, '+issue+' with issue language, '+kept+' existing exceptions kept.'):'No saved AV tool data found to scan.');
 }
 function markRecommendedReady(){
-  var changed=0;
+  var before=Object.assign({},state.readiness);var changed=0;
   recommendedTools().forEach(function(tool){var current=toolReadiness(tool.id);if(current!=='issue'&&current!=='skipped'&&current!=='ready'){state.readiness[tool.id]='ready';changed++;}});
   saveState();renderAll();
-  showHint(changed?changed+' recommended tools marked ready. Existing issues and skips kept.':'Recommended tools already ready, marked with issues, or skipped.');
+  var undo=changed?function(){state.readiness=before;saveState();renderAll();showHint('Recommended readiness restored.');}:null;
+  showHint(changed?changed+' recommended tools marked ready. Existing issues and skips kept.':'Recommended tools already ready, marked with issues, or skipped.',null,undo);
 }
 function pinRecommended(){var ids=recommendedTools().map(function(t){return t.id;});ids.reverse().forEach(function(id){if(state.favorites.indexOf(id)<0) state.favorites.unshift(id);});saveState();renderAll();showHint('Recommended set pinned.');}
 function resetReadiness(){if(!window.confirm('Reset readiness for all AV by Dave tools?')) return;state.readiness={};saveState();renderAll();showHint('Suite readiness reset.');}
@@ -1622,6 +1625,7 @@ function matchesPinFilter(tool){var ready=toolReadiness(tool.id);switch(state.fi
 function allToolsFiltered(){var q=state.filters.search.trim().toLowerCase();return TOOLS.filter(function(t){if(q&&haystackFor(t).indexOf(q)===-1) return false;return matchesPinFilter(t);});}
 function renderAllView(){
   $('allSearchInput').value=state.filters.search;
+  $('allSearchInput').placeholder='Search all '+TOOLS.length+' tools…';
   var visible=allToolsFiltered();
   var visibleIds={};visible.forEach(function(t){visibleIds[t.id]=true;});
   $('allViewCount').textContent=visible.length+' of '+TOOLS.length+' tools across '+FAMILIES.length+' families';
@@ -1729,17 +1733,16 @@ function renderAsideNoShow(){
   if(viewState.context==='shop'){
     var recent=toolboxState.recent.map(toolById).filter(Boolean).slice(0,5);
     var recentHtml=recent.length?recent.map(function(tool){return '<div class="recent-row"><a href="'+escapeAttr(toolHref(tool))+'" data-tool="'+tool.id+'">'+escapeHtml(tool.name)+'</a><button type="button" data-open="'+tool.id+'">Open</button></div>';}).join(''):'<div class="aside-empty">No recent Toolbox launches yet.</div>';
-    $('asideNoShow').innerHTML='<div class="aside-title">Toolbox state</div><p class="aside-p"><strong>No show attached.</strong> These controls use <code>av-suite-ui.v1</code>, separate from the saved show.</p><div class="aside-card accent"><strong>'+TOOLS.length+' registered tools</strong><span>'+TOOLBOX_FEATURED.length+' marked Use anytime · '+toolboxState.pinned.length+' pinned · '+toolboxState.recent.length+' recent.</span></div><div class="aside-sub">Recent</div>'+recentHtml+'<button type="button" id="backToShowBtn" class="primary" style="width:100%;margin-top:8px">Work a show</button>';
-    $('backToShowBtn').addEventListener('click',function(){navigateEntry('show');});
+    $('asideNoShow').innerHTML='<div class="aside-title">Toolbox state</div><p class="aside-p"><strong>No show attached.</strong> These controls use <code>av-suite-ui.v1</code>, separate from the saved show.</p><div class="aside-card accent"><strong>'+TOOLS.length+' registered tools</strong><span>'+TOOLBOX_FEATURED.length+' marked Use anytime · '+toolboxState.pinned.length+' pinned · '+toolboxState.recent.length+' recent.</span></div><div class="aside-sub">Recent</div>'+recentHtml+'<button type="button" data-action="back-to-show" class="primary" style="width:100%;margin-top:8px">Work a show</button>';
     return;
   }
   var copy=CTX_COPY[viewState.context];if(!copy) return;
   var cards=realAsideCards().map(function(c){return '<div class="aside-card'+(c.accent?' accent':'')+'"><strong>'+escapeHtml(c.title)+'</strong><span>'+escapeHtml(c.body)+'</span></div>';}).join('');
-  $('asideNoShow').innerHTML='<div class="aside-title">'+escapeHtml(copy.asideTitle)+'</div><p class="aside-p">'+escapeHtml(copy.asideBody)+'</p>'+cards+'<button type="button" id="backToShowBtn" class="primary" style="width:100%;margin-top:6px">Back to the show</button>';
-  var back=$('backToShowBtn');if(back) back.addEventListener('click',function(){navigateEntry('show');});
+  $('asideNoShow').innerHTML='<div class="aside-title">'+escapeHtml(copy.asideTitle)+'</div><p class="aside-p">'+escapeHtml(copy.asideBody)+'</p>'+cards+'<button type="button" data-action="back-to-show" class="primary" style="width:100%;margin-top:6px">Back to the show</button>';
+
 }
 var HELP_LEGEND=[
-  {n:1,title:'Families',body:'Fourteen families replace the flat '+TOOLS.length+'-tool list. Tools with modes nest underneath — expand the chevron.'},
+  {n:1,title:'Families',body:'Fourteen families organize the '+TOOLS.length+'-tool registry. Tools with modes nest underneath — expand the chevron.'},
   {n:2,title:'Show profile',body:'Set once. Every tool link carries this context in the URL and prefills on open.'},
   {n:3,title:'Workbook',body:'The show file every other tool reads and writes. It sits above the families, not inside one.'},
   {n:4,title:'Recommendations',body:'Driven by the current phase. Each card cites the rule or saved-data key that produced it, so the suggestion is auditable.'},
@@ -1855,8 +1858,8 @@ function renderOnboardStep(){
     $('obExportBtn').addEventListener('click',function(){exportPackage(this);});
   }
 }
-function openOnboarding(){obState.step=1;obState.lastFocus=document.activeElement;$('onboardOverlay').hidden=false;renderOnboardStep();setTimeout(function(){var first=$('obShowName')||$('obCloseBtn');if(first) first.focus();},0);}
-function closeOnboarding(){var restoreTo=obState.lastFocus;obState.step=0;obState.lastFocus=null;$('onboardOverlay').hidden=true;uiState.onboardingSeen=true;writeUi({onboardingSeen:true});renderAll();if(restoreTo&&restoreTo.focus) restoreTo.focus();}
+function openOnboarding(){obState.step=1;obState.lastFocus=document.activeElement;setModalBackgroundInert(true);$('onboardOverlay').hidden=false;renderOnboardStep();setTimeout(function(){var first=$('obShowName')||$('obCloseBtn');if(first) first.focus();},0);}
+function closeOnboarding(){var restoreTo=obState.lastFocus;obState.step=0;obState.lastFocus=null;$('onboardOverlay').hidden=true;setModalBackgroundInert(false);uiState.onboardingSeen=true;writeUi({onboardingSeen:true});renderAll();if(restoreTo&&restoreTo.focus) restoreTo.focus();}
 function obNext(){if(obState.step>=4){closeOnboarding();return;}obState.step++;renderOnboardStep();}
 function obPrev(){obState.step=Math.max(1,obState.step-1);renderOnboardStep();}
 
@@ -1931,8 +1934,8 @@ function renderCommandPalette(){
   }).join('');
   input.setAttribute('aria-activedescendant','command-option-'+commandState.activeIndex);
 }
-function openCommandPalette(){commandState.open=true;commandState.query='';commandState.activeIndex=0;commandState.lastFocus=document.activeElement;$('commandBackdrop').hidden=false;renderCommandPalette();setTimeout(function(){$('commandInput').focus();},0);}
-function closeCommandPalette(){commandState.open=false;commandState.query='';$('commandBackdrop').hidden=true;if(commandState.lastFocus&&commandState.lastFocus.focus) commandState.lastFocus.focus();}
+function openCommandPalette(){commandState.open=true;commandState.query='';commandState.activeIndex=0;commandState.lastFocus=document.activeElement;setModalBackgroundInert(true);$('commandBackdrop').hidden=false;renderCommandPalette();setTimeout(function(){$('commandInput').focus();},0);}
+function closeCommandPalette(){commandState.open=false;commandState.query='';$('commandBackdrop').hidden=true;setModalBackgroundInert(false);if(commandState.lastFocus&&commandState.lastFocus.focus) commandState.lastFocus.focus();}
 function moveCommandSelection(delta){if(!commandState.items.length) return;commandState.activeIndex=(commandState.activeIndex+delta+commandState.items.length)%commandState.items.length;renderCommandPalette();}
 function runCommand(command){if(!command) return;recordCommand(command.id);closeCommandPalette();command.run();}
 
@@ -1955,8 +1958,9 @@ function setDrawerInteractive(active){var drawer=$('settingsDrawer');if(active) 
 function openDrawer(){
   drawerLastFocus=document.activeElement;
   setDrawerInteractive(true);
+  setModalBackgroundInert(true);
   var scrim=$('drawerScrim'),drawer=$('settingsDrawer');
-  scrim.hidden=false;void drawer.offsetWidth;scrim.classList.add('open');drawer.classList.add('open');
+  scrim.hidden=false;window.requestAnimationFrame(function(){scrim.classList.add('open');drawer.classList.add('open');});
   drawer.setAttribute('aria-hidden','false');$('settingsBtn').setAttribute('aria-expanded','true');
   renderPhaseHandoffSummary();renderOfflineStatus();
   var f=drawer.querySelector('button, [href], input, select, textarea');if(f) f.focus();
@@ -1973,6 +1977,7 @@ function closeDrawer(){
   drawer.setAttribute('aria-hidden','true');$('settingsBtn').setAttribute('aria-expanded','false');
   window.setTimeout(function(){scrim.hidden=true;},220);
   setDrawerInteractive(false);
+  setModalBackgroundInert(false);
   if(restoreTo&&restoreTo.focus) restoreTo.focus();
 }
 function renderPhaseHandoffSummary(){var target=$('phaseHandoffSummary');if(!target) return;var counts=readinessCounts();target.innerHTML='<strong>'+phaseLabel(state.phase)+' handoff:</strong> '+counts.ready+' ready, '+counts.issue+' issue, '+counts.skipped+' skipped, '+reviewQueueItems().length+' next actions.';}
@@ -2018,6 +2023,7 @@ function wireEvents(){
     var famTog=e.target.closest('[data-fam-toggle]');if(famTog){toggleFamOpen(famTog.getAttribute('data-fam-toggle'));return;}
     var subTog=e.target.closest('[data-sub-toggle]');if(subTog){toggleSubsOpen(subTog.getAttribute('data-sub-toggle'));return;}
     var clearBtn=e.target.closest('#clearFiltersBtn');if(clearBtn){clearToolFilters();return;}
+    var backToShow=e.target.closest('[data-action="back-to-show"]');if(backToShow){navigateEntry('show');return;}
     var toolboxClear=e.target.closest('#toolboxClearBtn');if(toolboxClear){toolboxState.search='';toolboxState.filter='all';toolboxState.family='all';saveToolboxState();renderRail();renderToolbox();return;}
   });
   document.addEventListener('change',function(e){var sel=e.target.closest('[data-readiness]');if(sel){setToolReadiness(sel.getAttribute('data-readiness'),sel.value);return;}var note=e.target.closest('[data-note]');if(note) setToolNote(note.getAttribute('data-note'),note.value,true);});
