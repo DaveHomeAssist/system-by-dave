@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-09-22 — The release contract stops promising a second provenance file
+
+- `docs/fmp-public-release.md` still said the exporter writes two allowlists and
+  that `fmp/source_provenance.json` and `fmpwalk/source_provenance.json` pin the
+  same canonical source commit. The walk was retired in fmp-suite `0946989`, so
+  `scripts/export-public-camera.mjs` writes one provenance file. Today's export
+  of fmp-suite `5931c51` confirmed it: 74 files under `fmp/`, nothing under
+  `fmpwalk/`.
+- The "One export" release rule said `fmp` and `fmpwalk` pin the same source
+  commit. It now states that every released file under `fmp/` pins the same
+  source commit, which is the rule the exporter actually enforces.
+- Documentation only. No managed artifact, gate or catalog changed.
+
 ## 2026-09-22 — Every catalog identifies itself; no vocabulary exemptions left
 
 - The ATEM catalog never declared a `model` and the SuperJoy catalog never

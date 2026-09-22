@@ -58,10 +58,12 @@ Canonical app: `DaveHomeAssist/fmp-suite`. Do not hand-edit generated `fmp/` or
 node scripts/export-public-camera.mjs /absolute/path/to/system-by-dave
 ```
 
-The exporter checks destination identity and writes two exact allowlists.
-`fmp/source_provenance.json` and `fmpwalk/source_provenance.json` pin the same
-canonical source commit, individual SHA-256 values, release mode, and a combined
-artifact digest. Repeated generation must be byte-identical. `npm run verify:fmp`
+The exporter checks destination identity and writes one exact allowlist.
+`fmp/source_provenance.json` pins the canonical source commit, individual
+SHA-256 values, release mode, and a combined artifact digest. It is the only
+provenance file the exporter writes: the walk was retired in fmp-suite
+`0946989`, so `fmpwalk/` is no longer exported and its deployed files are
+frozen. Repeated generation must be byte-identical. `npm run verify:fmp`
 rejects drift, extras, missing physical routes, changed release modes, remote rig
 runtime dependencies, or missing public metadata. It runs in the Pages pipeline.
 
@@ -86,7 +88,7 @@ canonical `tests/public-release.test.js` enforce the same rules before export:
   SHA-256 of the released file it loads.
 - **Counts come from each model's catalog.** Camera pages carry `data-rig-components`;
   each "N components" or "N parts" claim must match its owning equipment catalog.
-- **One export.** `fmp` and `fmpwalk` pin the same source commit.
+- **One export.** Every released file under `fmp/` pins the same source commit.
 
 The FMP release includes only client modules, shells, local Three.js runtime,
 allowlisted rig reference photos, and route metadata. It excludes backend code,
