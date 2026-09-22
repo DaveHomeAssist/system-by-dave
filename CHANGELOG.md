@@ -1,5 +1,25 @@
 # Changelog
 
+## 2026-09-22 — The Throwline catalog vocabularies are written down
+
+- `ProjectorThrow/data/throwline-pilot-catalog.v1.json` uses two evidence
+  vocabularies and neither was documented. The pilot catalog design spec
+  mentions "confidence wording" but never says what the values mean.
+- `docs/throwline-catalog-contract.md` now documents both: `confidence`
+  (`official_primary`, `needs_verification`, `conflicting`) and
+  `calculationState` (`manufacturer_unspecified`, `conflicting`, `partial`).
+- **A gap worth knowing:** `confidence` is a required field whose value nothing
+  checks. A typo or an accidental fourth value passes today. The doc says so
+  rather than implying the vocabulary is enforced.
+- `calculationState` *is* enforced, and the doc explains the point of it:
+  Throwline refuses to compute a throw rather than computing one from a number
+  nobody stands behind.
+- The appendix rules are documented too — `PRJ-001`–`PRJ-004` keep their audited
+  canonical records, and no compatibility row or optical profile may reference an
+  appendix-only projector.
+- **The site has four evidence vocabularies.** All three contracts now
+  cross-reference each other and say what each would lose if they were unified.
+
 ## 2026-09-22 — The Gear Reference vocabulary is written down
 
 - `scripts/verify_gear_reference.js` has enforced an `ALLOWED_STATUSES` set —

@@ -54,10 +54,17 @@ sheet is. That is why it has `corrected`, which these catalogs do not.
 Note `confirmed` there and `Confirmed` here are close but not identical, and the
 case is the quickest signal of which document you are reading.
 
-`scripts/fmp_model_contract.js` reads only the four equipment catalogs, so both
-the house reference and the Gear Reference are out of its reach by design. If
-that ever changes, translate deliberately rather than letting one gate rewrite
-another vocabulary.
+There is a fourth. The Throwline pilot catalog
+(`ProjectorThrow/data/throwline-pilot-catalog.v1.json`) records `confidence` as
+`official_primary`, `needs_verification` or `conflicting`, documented in
+`docs/throwline-catalog-contract.md`. Its `conflicting` is the same idea as
+`Contradicted` here. Note that unlike this contract, Throwline's `confidence`
+values are not currently checked by any gate.
+
+`scripts/fmp_model_contract.js` reads only the four equipment catalogs, so the
+house reference, the Gear Reference and the Throwline catalog are all out of its
+reach by design. If that ever changes, translate deliberately rather than
+letting one gate rewrite another vocabulary.
 
 ## Required catalog fields
 
