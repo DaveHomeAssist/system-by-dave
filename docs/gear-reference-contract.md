@@ -69,7 +69,7 @@ specifically so a photograph cannot be passed off as a measured drawing.
 The Epson PowerLite X39 sheet additionally has its twelve sections pinned by id,
 so a section cannot be dropped silently.
 
-## Three vocabularies, deliberately
+## Four vocabularies, deliberately
 
 This is not the only evidence field on the site, and the others are different on
 purpose. Do not unify them without deciding what each would lose.
@@ -78,6 +78,7 @@ purpose. Do not unify them without deciding what each would lose.
 | --- | --- | --- |
 | FMP equipment catalogs | `confidence` | `Confirmed` `Documented` `Reported` `Inferred` `Unknown` `Contradicted` |
 | Gear Reference | `accuracy[].status` | `confirmed` `corrected` `unverified` `estimate` |
+| Throwline catalog | `confidence` | `official_primary` `needs_verification` `conflicting` |
 | FMP house reference | `Confidence` | `Paper only` `Unidentified` |
 
 They answer different questions. The catalog vocabulary asks *what kind of
@@ -91,7 +92,7 @@ while this one means a named source states it directly. Case is the quickest
 signal of which document you are reading.
 
 See `docs/fmp-model-catalog-contract.md` for the catalog vocabulary and the
-house reference mapping.
+house reference mapping, and `docs/throwline-catalog-contract.md` for Throwline's.
 
 ## Changing the vocabulary
 
