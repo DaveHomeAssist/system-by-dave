@@ -49,21 +49,16 @@ readiness, which no catalog asserts.
 | `Unknown` | Insufficient evidence |
 | `Contradicted` | Credible sources disagree; both locators and the needed resolution are retained |
 
-### Deprecated values, still present in the current export
+The table above is the whole vocabulary. No value is grandfathered and no
+catalog is exempt.
 
-These two are accepted so the gate does not fail the shipped artifact. They are
-fixed in `fmp-suite` and removed from the allowlist once a release carries the
-correction.
-
-| Value | Where | Why it is wrong |
-| --- | --- | --- |
-| `Published envelope / Photo approximation` | one SuperJoy component | A geometry description placed in the confidence field. The geometry belongs in `geometry_status`; the confidence field takes one vocabulary token. |
-
-`Partial` was removed from this list once fmp-suite `338cf27` resolved it. That
-component, `p240.path.video`, is now `Confirmed`: the SDI run was traced on site
-rather than relabelled, and `evidence_policy.sdi_physical_route` records the
-trace and who installed it. Getting the evidence is the better fix whenever it
-is available.
+Two earlier exports needed exemptions, and both were resolved by correcting the
+artifact rather than widening the gate. `Partial` left the list when fmp-suite
+`a374f7a` traced the `p240.path.video` SDI run on site and made it `Confirmed`.
+`Published envelope / Photo approximation` left it when fmp-suite `5931c51`
+moved that SuperJoy chassis wording to `geometry_status` and `limits`, where
+geometry belongs, leaving `Documented` in the confidence field. Getting the
+evidence, or putting the claim in the right field, beats tolerating the value.
 
 ## Geometry vocabulary
 
@@ -94,7 +89,7 @@ these. It runs inside `npm run verify:fmp` and the live hygiene probe.
 
 1. Required top-level and per-component fields are present and non-empty.
 2. `component_id` is unique within its catalog.
-3. `confidence` is a value from the table above, including the deprecated pair.
+3. `confidence` is a value from the table above.
 4. `geometry_status` is a value from the table above.
 5. Every `source_ids` entry resolves to a source declared by that catalog.
 6. A component stating evidence — any confidence other than `Unknown` — cites at
@@ -107,6 +102,9 @@ geometry accuracy, or anything about the physical rig.
 ## Changing the vocabulary
 
 Add the value here with its meaning in the same change that introduces it
-upstream, so the gate and the artifact stay in step. Removing a deprecated value
-is a two-step: land the correction in `fmp-suite` and export it, then drop the
-row and its allowlist entry here.
+upstream, so the gate and the artifact stay in step.
+
+Retiring a value is a two-step, because the gate and the artifact land in
+different repositories: correct it in `fmp-suite` and export, then drop the row
+here. Do both in one change to this repository — the export and the gate travel
+together, so `verify:fmp` never sees a half-applied correction.
