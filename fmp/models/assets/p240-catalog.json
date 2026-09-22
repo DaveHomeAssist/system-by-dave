@@ -14,7 +14,9 @@
     "y": "up",
     "z": "front"
   },
-  "category_limits": {"Connections": "Connector type/function are documented; exact millimetric placement in this reconstruction is approximate."},
+  "category_limits": {
+    "Connections": "Connector type/function are documented; exact millimetric placement in this reconstruction is approximate."
+  },
   "sources": [
     {
       "source_id": "birddog-techspec",
@@ -36,7 +38,7 @@
     },
     {
       "source_id": "fmp-gear",
-      "label": "DB | FMP | AV Gear \u00b7 BirdDog P240",
+      "label": "DB | FMP | AV Gear · BirdDog P240",
       "locator": "FMP equipment record, 20 September 2026",
       "scope": "FMP identity, location, Input 4 endpoint, service/fault record and open cable traces."
     },
@@ -53,14 +55,14 @@
       "label": "Base / pan chassis",
       "category": "Enclosure",
       "kind": "chassis",
-      "purpose": "Fixed lower body, connector platform and pan-axis base.",
+      "purpose": "Fixed lower body and connector platform, and the base the pan axis turns on. Everything that plugs into the camera lands here, so it is the part that never moves while the head above it does.",
       "confidence": "Documented",
       "geometry_status": "documented_geometry",
       "source_ids": [
         "birddog-techspec",
         "birddog-overview"
       ],
-      "limits": "Overall 163 \u00d7 199 \u00d7 231 mm envelope is published; curves and seam placement are approximate.",
+      "limits": "Overall 163 × 199 × 231 mm envelope is published; curves and seam placement are approximate.",
       "action": null,
       "aliases": [],
       "shape": {}
@@ -70,13 +72,13 @@
       "label": "Pan axis",
       "category": "Motion",
       "kind": "axis",
-      "purpose": "Rotates the upper camera assembly horizontally.",
+      "purpose": "Rotates the upper assembly horizontally, ±350 degrees of continuous travel at up to 150 degrees per second. Never turn the head by hand while the camera is powered — the guide warns this can damage the drive.",
       "confidence": "Documented",
       "geometry_status": "documented_motion",
       "source_ids": [
         "birddog-techspec"
       ],
-      "limits": "Published travel \u00b1175\u00b0. Training slider is bounded to that range.",
+      "limits": "Published travel ±175°. Training slider is bounded to that range.",
       "action": "pan",
       "aliases": [],
       "shape": {}
@@ -86,30 +88,30 @@
       "label": "Tilt axis / camera head",
       "category": "Motion",
       "kind": "axis",
-      "purpose": "Tilts the lens head independently of the pan base.",
+      "purpose": "Tilts the lens head through ±120 degrees, independently of the pan base. On a ceiling or rail mount, E-Flip inverts the image so the picture stays the right way up and the controls still push the way you expect.",
       "confidence": "Documented",
       "geometry_status": "documented_motion",
       "source_ids": [
         "birddog-techspec"
       ],
-      "limits": "Published tilt travel +90\u00b0 to -30\u00b0. Geometry is reconstructed from product imagery.",
+      "limits": "Published tilt travel +90° to -30°. Geometry is reconstructed from product imagery.",
       "action": "tilt",
       "aliases": [],
       "shape": {}
     },
     {
       "component_id": "p240.lens",
-      "label": "20\u00d7 optical lens",
+      "label": "20× optical lens",
       "category": "Imaging",
       "kind": "lens",
-      "purpose": "4.4\u201388.4 mm zoom lens. Tele Convert can extend equivalent HD framing using sensor crop.",
+      "purpose": "4.4-88.4 mm zoom. Field of view runs 70.2 degrees wide to 4.1 degrees tight, at f/2.0 wide and f/3.8 tight, so long shots lose almost two stops. Tele Convert changes what \"40x\" means: off gives 20x true optical zoom, on crops the sensor to reach 40x in HD. The crop is not extra lens.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
         "birddog-techspec",
         "birddog-guide"
       ],
-      "limits": "Do not describe Tele Convert as a 40\u00d7 optical lens; native optical zoom is about 20\u00d7.",
+      "limits": "Do not describe Tele Convert as a 40× optical lens; native optical zoom is about 20×.",
       "action": "zoom",
       "aliases": [
         "tele convert",
@@ -119,17 +121,17 @@
     },
     {
       "component_id": "p240.tally.mohawk",
-      "label": "360\u00b0 mohawk tally",
+      "label": "360° mohawk tally",
       "category": "Tally",
       "kind": "light",
-      "purpose": "Bi-colour overhead tally visible around the camera head.",
+      "purpose": "Bi-colour mohawk tally, readable overhead and from behind, so talent and floor crew can see the state of the camera from any angle. Tally has to be enabled on the camera before it lights at all.",
       "confidence": "Documented",
       "geometry_status": "photo_grounded",
       "source_ids": [
         "birddog-overview",
         "birddog-techspec"
       ],
-      "limits": "Illumination is simulated and is not the venue\u2019s current tally state.",
+      "limits": "Illumination is simulated and is not the venue’s current tally state.",
       "action": "tally",
       "aliases": [],
       "shape": {}
@@ -139,7 +141,7 @@
       "label": "Rear illuminated camera ID",
       "category": "Tally",
       "kind": "display",
-      "purpose": "Removable illuminated number provides rear camera identification.",
+      "purpose": "Illuminated rear number built from the supplied 0-9 silicone plugs. It is changed by hand, which means it can disagree with the input the camera is patched to — worth checking whenever cameras are re-patched.",
       "confidence": "Documented",
       "geometry_status": "photo_grounded",
       "source_ids": [
@@ -156,7 +158,7 @@
       "label": "5-line RGB OLED",
       "category": "System",
       "kind": "display",
-      "purpose": "Displays device/network/video information locally on the base.",
+      "purpose": "Five-line colour OLED on the base showing device, network and video state. It is how you read the camera’s IP address without a computer, which is the quickest way to find a camera that has moved to a different address.",
       "confidence": "Documented",
       "geometry_status": "photo_grounded",
       "source_ids": [
@@ -173,7 +175,7 @@
       "label": "IR sensor",
       "category": "Front controls",
       "kind": "sensor",
-      "purpose": "Receives commands from the supported IR remote.",
+      "purpose": "Infrared sensor for the handheld remote. It answers to whichever ID the rear selector is set to, so two cameras sharing an ID will both respond to the same handset.",
       "confidence": "Documented",
       "geometry_status": "photo_grounded",
       "source_ids": [
@@ -189,7 +191,7 @@
       "label": "USB 2.0 service",
       "category": "Connections",
       "kind": "connector",
-      "purpose": "USB service / firmware",
+      "purpose": "USB 2.0, used for firmware upgrade only. It carries no video and no control, so nothing here will help during a show.",
       "confidence": "Documented",
       "geometry_status": "documented_type_approximate_position",
       "source_ids": [
@@ -206,7 +208,7 @@
       "label": "Video format selector",
       "category": "Connections",
       "kind": "connector",
-      "purpose": "Rotary selector for SDI/HDMI video format",
+      "purpose": "Rotary switch setting the SDI and HDMI video format. The guide warns that this switch and the on-screen menu override each other: whichever was changed last is what the camera uses at boot. Set it to the format you normally run, then make changes in the BirdUI rather than here.",
       "confidence": "Documented",
       "geometry_status": "documented_type_approximate_position",
       "source_ids": [
@@ -223,7 +225,7 @@
       "label": "IR remote ID selector",
       "category": "Connections",
       "kind": "connector",
-      "purpose": "Physical remote ID selector",
+      "purpose": "Sets which ID this camera answers to on the infrared remote. Give each camera in a room its own ID or one handset will drive several heads at once.",
       "confidence": "Documented",
       "geometry_status": "documented_type_approximate_position",
       "source_ids": [
@@ -240,7 +242,7 @@
       "label": "3.5 mm audio input",
       "category": "Connections",
       "kind": "connector",
-      "purpose": "Unbalanced stereo audio input",
+      "purpose": "3.5 mm analogue input, stereo and unbalanced, at line level unless the adjacent selector is switched to microphone. Unbalanced means it will pick up hum over a long cable run.",
       "confidence": "Documented",
       "geometry_status": "documented_type_approximate_position",
       "source_ids": [
@@ -257,7 +259,7 @@
       "label": "3.5 mm audio output",
       "category": "Connections",
       "kind": "connector",
-      "purpose": "Unbalanced stereo audio output",
+      "purpose": "3.5 mm analogue output, stereo and unbalanced. Useful for a local monitor feed; for anything travelling a distance use the balanced breakout instead.",
       "confidence": "Documented",
       "geometry_status": "documented_type_approximate_position",
       "source_ids": [
@@ -274,7 +276,7 @@
       "label": "Line / mic selector",
       "category": "Connections",
       "kind": "connector",
-      "purpose": "Selects analog input mode",
+      "purpose": "Switches the 3.5 mm input between line level and microphone with 48 V phantom power. Get this wrong in the phantom direction and you can damage a source that is not expecting voltage on its pins, so set it before plugging anything in.",
       "confidence": "Documented",
       "geometry_status": "documented_type_approximate_position",
       "source_ids": [
@@ -291,7 +293,7 @@
       "label": "Balanced audio breakout",
       "category": "Connections",
       "kind": "connector",
-      "purpose": "Locking breakout connection for balanced XLR audio",
+      "purpose": "LEMO connector carrying balanced XLR audio in and out through a breakout cable, which BirdDog does not supply. The guide names two compatible Atomos cables: ATOMCAM016 for input and output, ATOMCAM017 for input only.",
       "confidence": "Documented",
       "geometry_status": "documented_type_approximate_position",
       "source_ids": [
@@ -308,7 +310,7 @@
       "label": "12 V DC",
       "category": "Connections",
       "kind": "connector",
-      "purpose": "DC power input",
+      "purpose": "12 V DC input. The guide specifies the supplied JEITA type 4 adaptor and no other. It also notes that DC runs cooler than PoE, which is the reason to choose it for a camera in a hot position.",
       "confidence": "Documented",
       "geometry_status": "documented_type_approximate_position",
       "source_ids": [
@@ -325,7 +327,7 @@
       "label": "RS-232 RJ45",
       "category": "Connections",
       "kind": "connector",
-      "purpose": "Serial PTZ control",
+      "purpose": "RJ45 carrying RS-232 serial control, VISCA or Pelco D. The base DIP switch chooses RS-232 over RS-422 and sets the baud rate and address, and the camera has to be power cycled before a change takes effect. RS-232 daisy-chains up to seven cameras.",
       "confidence": "Documented",
       "geometry_status": "documented_type_approximate_position",
       "source_ids": [
@@ -342,7 +344,7 @@
       "label": "RS-422/485 RJ45",
       "category": "Connections",
       "kind": "connector",
-      "purpose": "Serial PTZ control",
+      "purpose": "RJ45 carrying RS-422 / RS-485 serial control. Same DIP switch, baud rate and address rules as RS-232, and the same reboot after changing them. RS-422 is the one to use over long cable runs, where RS-232 becomes unreliable.",
       "confidence": "Documented",
       "geometry_status": "documented_type_approximate_position",
       "source_ids": [
@@ -359,7 +361,7 @@
       "label": "Ethernet / PoE+",
       "category": "Connections",
       "kind": "connector",
-      "purpose": "Network video/control and optional PoE+ power",
+      "purpose": "Network port for NDI video and VISCA over IP control, and the camera’s power inlet when running PoE+ (802.3at). One Cat5e or Cat6 run therefore carries picture, control and power. PoE runs warmer than DC.",
       "confidence": "Documented",
       "geometry_status": "documented_type_approximate_position",
       "source_ids": [
@@ -376,7 +378,7 @@
       "label": "HDMI output",
       "category": "Connections",
       "kind": "connector",
-      "purpose": "HDMI video output",
+      "purpose": "HDMI output, 4:2:2 12-bit, running at the same time as SDI and NDI rather than instead of them. If it feeds a DVI converter, DIP switch B4 has to be set accordingly.",
       "confidence": "Documented",
       "geometry_status": "documented_type_approximate_position",
       "source_ids": [
@@ -393,7 +395,7 @@
       "label": "3G-SDI output",
       "category": "Connections",
       "kind": "connector",
-      "purpose": "3G-SDI video output",
+      "purpose": "3G-SDI output, 4:2:2 10-bit, running simultaneously with HDMI and NDI. This is the FMP house connection and the one the switcher sees.",
       "confidence": "Documented",
       "geometry_status": "documented_type_approximate_position",
       "source_ids": [
