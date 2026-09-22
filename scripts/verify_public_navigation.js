@@ -180,7 +180,10 @@ function fmpShellGaps(file, source) {
     .map((href) => new URL(href, baseUrl));
   const isPath = (url, paths, origins = [origin]) => origins.includes(url.origin) && paths.includes(url.pathname);
   const gaps = [];
-  if (!links.some((url) => isPath(url, ['/', '/index.html'], [origin, SITE_ORIGIN]))) gaps.push('no home link');
+  // The FMP pages are the venue's own operational site and /fmp/ is their home: publisher
+  // branding was struck from them, so they no longer carry a systembydave.com home link.
+  const isFmpManaged = FMP_MANAGED_DIRS.some((dir) => file === `${dir}/index.html` || file.startsWith(`${dir}/`));
+  if (!isFmpManaged && !links.some((url) => isPath(url, ['/', '/index.html'], [origin, SITE_ORIGIN]))) gaps.push('no home link');
   if (file !== FMP_HUB && !links.some((url) => isPath(url, ['/fmp/', '/fmp/index.html'], [origin, originFor(FMP_HUB)]))) gaps.push('no /fmp/ parent link');
 
   const firstFocusable = body.match(/<(?:a\s[^>]*\bhref=[^>]*|button\b[^>]*|select\b[^>]*|textarea\b[^>]*|summary\b[^>]*|input\b(?![^>]*\btype=["']?hidden)[^>]*|[a-z][a-z0-9-]*\s[^>]*\btabindex=["']?(?:0|[1-9])[^>]*)>/i)?.[0] || '';
