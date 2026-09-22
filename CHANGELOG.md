@@ -1,5 +1,27 @@
 # Changelog
 
+## 2026-09-22 — No equipment description is thin any more
+
+- 42 components were still under sixty characters after the manual passes —
+  mostly connectors and mode buttons given a name rather than a use.
+- **ATEM.** The eight audio mode buttons now say what their processor is *for*:
+  GATE explains why you gate an open microphone, LIM what a limiter protects.
+  DSK TIE says the tie makes the key travel at the *main* transition rate, not
+  the DSK rate, and leaves clean feed 1 alone; DSK AUTO says it runs at its own
+  rate. Reference and timecode explain genlock and free-run time-of-day. Control
+  out and studio out name the talkback buttons that route audio to them. The
+  balanced XLR and unbalanced RCA inputs say when to choose one over the other.
+  STOP carries the constraint that an interlaced standard allows recording *or*
+  streaming, not both.
+- **SuperJoy.** White balance cycle names all five modes and says why one-push
+  beats auto under stage light. Focus lock explains why you lock before air. The
+  OSD keys explain that **menu mode is what a camera that has apparently stopped
+  responding usually turns out to be.** The rear connectors state plainly that
+  the published button layout covers the front panel only, so their detail comes
+  from the supplied FMP reference sheets rather than the manufacturer page.
+- **No component on any of the four models is now under sixty characters.**
+  ATEM averages 228 and SuperJoy 232, up from 211 and 189.
+
 ## 2026-09-22 — The P240 is written from its user guide
 
 - The thinnest catalog on the site: 24 components averaging 45 characters, 18 of
