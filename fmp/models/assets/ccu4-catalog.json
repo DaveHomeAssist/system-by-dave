@@ -10,7 +10,13 @@
     141.7,
     389
   ],
-  "category_limits": {"CCU strip 1": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.", "CCU strip 2": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.", "CCU strip 3": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.", "CCU strip 4": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.", "Rear connections": "Manufacturer rear drawing establishes connector type and relative placement."},
+  "category_limits": {
+    "CCU strip 1": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+    "CCU strip 2": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+    "CCU strip 3": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+    "CCU strip 4": "FMP physical strip is hardware-verified. Individual geometry is reconstructed from manufacturer product views.",
+    "Rear connections": "Manufacturer rear drawing establishes connector type and relative placement."
+  },
   "sources": [
     {
       "source_id": "blackmagic-tech",
@@ -20,19 +26,19 @@
     },
     {
       "source_id": "blackmagic-manual",
-      "label": "Blackmagic ATEM manual \u00b7 Camera Control Panel",
+      "label": "Blackmagic ATEM manual · Camera Control Panel",
       "locator": "https://documents.blackmagicdesign.com/UserManuals/ATEM_Television_Studio_Switchers_Manual.pdf",
-      "scope": "CCU strip functions, scene files, camera settings, color balance, joystick iris/master black, panel setup."
+      "scope": "ATEM Television Studio Switchers Installation and Operation Manual, June 2020, \"Using ATEM Camera Control Panel\" pp. 178-190 (accessed 2026-09-22). This edition is cited because the June 2026 Television Studio manual no longer contains the hardware camera control panel chapter. Behaviour marked in it as \"enabled in a future update\" is therefore six years old and unverified against current panel firmware."
     },
     {
       "source_id": "blackmagic-physical",
       "label": "Blackmagic physical specification drawing",
       "locator": "manufacturer physical-spec image",
-      "scope": "430 \u00d7 389 \u00d7 141.7 mm external envelope and chassis profile."
+      "scope": "430 × 389 × 141.7 mm external envelope and chassis profile."
     },
     {
       "source_id": "fmp-ccu",
-      "label": "DB | FMP | AV Gear \u00b7 ATEM Camera Control Panel",
+      "label": "DB | FMP | AV Gear · ATEM Camera Control Panel",
       "locator": "FMP equipment record, 20 September 2026",
       "scope": "FMP hardware identity, labels, ownership, use and Camera 1 control-loss history."
     },
@@ -40,7 +46,7 @@
       "source_id": "fmp-signal",
       "label": "REF | FMP | Signal Flow",
       "locator": "FMP equipment record, 20 September 2026",
-      "scope": "Panel \u2192 ATEM Ethernet control, then camera control rides the return path to Cameras 1\u20133; P240 is separate."
+      "scope": "Panel → ATEM Ethernet control, then camera control rides the return path to Cameras 1–3; P240 is separate."
     }
   ],
   "components": [
@@ -66,7 +72,7 @@
       "label": "IEC AC input",
       "category": "Rear connections",
       "kind": "connector",
-      "purpose": "Internal 100\u2013240 V AC input",
+      "purpose": "Internal 100–240 V AC input",
       "confidence": "Documented",
       "geometry_status": "documented_type_photo_grounded",
       "source_ids": [
@@ -83,7 +89,7 @@
       "label": "4-pin XLR DC input",
       "category": "Rear connections",
       "kind": "connector",
-      "purpose": "12\u201330 V DC redundant input",
+      "purpose": "12–30 V DC redundant input",
       "confidence": "Documented",
       "geometry_status": "documented_type_photo_grounded",
       "source_ids": [
@@ -148,7 +154,7 @@
     },
     {
       "component_id": "ccu4.path.atem",
-      "label": "Panel \u2192 ATEM control network",
+      "label": "Panel → ATEM control network",
       "category": "FMP signal path",
       "kind": "virtual",
       "purpose": "Camera-control commands leave the panel over Ethernet and reach the ATEM.",
@@ -165,7 +171,7 @@
     },
     {
       "component_id": "ccu4.path.return",
-      "label": "ATEM \u2192 URSA SDI return/control",
+      "label": "ATEM → URSA SDI return/control",
       "category": "FMP signal path",
       "kind": "virtual",
       "purpose": "ATEM embeds camera-control data in the return path to Blackmagic cameras.",
@@ -182,10 +188,10 @@
     },
     {
       "component_id": "ccu4.ch1.lcd",
-      "label": "CH1 \u00b7 LCD / soft controls",
+      "label": "CH1 · LCD / soft controls",
       "category": "CCU strip 1",
       "kind": "display",
-      "purpose": "Displays selected camera and menu settings",
+      "purpose": "Home screen for this CCU. It names the camera assigned to the strip and turns red when that camera is live. From here you reach the camera bank A/B switch, the recall-all toggle, the auxiliary output used for camera control, the master black enable, and the panel brightness.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -199,10 +205,10 @@
     },
     {
       "component_id": "ccu4.ch1.scene1",
-      "label": "CH1 \u00b7 Scene 1",
+      "label": "CH1 · Scene 1",
       "category": "CCU strip 1",
       "kind": "button",
-      "purpose": "Recall scene file 1",
+      "purpose": "Recalls scene file 1 for this camera — every stored setting at once: shutter, master gain, white balance, colour balance and bars. To write the slot instead, press STORE first, then this button. If recall-all is enabled on the LCD home screen, pressing this recalls each CCU’s own scene 1 on every camera at once, including the camera currently on air, so the manual advises enabling recall-all only for a planned setup and turning it straight off again.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -216,10 +222,10 @@
     },
     {
       "component_id": "ccu4.ch1.scene2",
-      "label": "CH1 \u00b7 Scene 2",
+      "label": "CH1 · Scene 2",
       "category": "CCU strip 1",
       "kind": "button",
-      "purpose": "Recall scene file 2",
+      "purpose": "Recalls scene file 2 for this camera — every stored setting at once: shutter, master gain, white balance, colour balance and bars. To write the slot instead, press STORE first, then this button. If recall-all is enabled on the LCD home screen, pressing this recalls each CCU’s own scene 2 on every camera at once, including the camera currently on air, so the manual advises enabling recall-all only for a planned setup and turning it straight off again.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -233,10 +239,10 @@
     },
     {
       "component_id": "ccu4.ch1.scene3",
-      "label": "CH1 \u00b7 Scene 3",
+      "label": "CH1 · Scene 3",
       "category": "CCU strip 1",
       "kind": "button",
-      "purpose": "Recall scene file 3",
+      "purpose": "Recalls scene file 3 for this camera — every stored setting at once: shutter, master gain, white balance, colour balance and bars. To write the slot instead, press STORE first, then this button. If recall-all is enabled on the LCD home screen, pressing this recalls each CCU’s own scene 3 on every camera at once, including the camera currently on air, so the manual advises enabling recall-all only for a planned setup and turning it straight off again.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -250,10 +256,10 @@
     },
     {
       "component_id": "ccu4.ch1.scene4",
-      "label": "CH1 \u00b7 Scene 4",
+      "label": "CH1 · Scene 4",
       "category": "CCU strip 1",
       "kind": "button",
-      "purpose": "Recall scene file 4",
+      "purpose": "Recalls scene file 4 for this camera — every stored setting at once: shutter, master gain, white balance, colour balance and bars. To write the slot instead, press STORE first, then this button. If recall-all is enabled on the LCD home screen, pressing this recalls each CCU’s own scene 4 on every camera at once, including the camera currently on air, so the manual advises enabling recall-all only for a planned setup and turning it straight off again.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -267,10 +273,10 @@
     },
     {
       "component_id": "ccu4.ch1.scene5",
-      "label": "CH1 \u00b7 Scene 5",
+      "label": "CH1 · Scene 5",
       "category": "CCU strip 1",
       "kind": "button",
-      "purpose": "Recall scene file 5",
+      "purpose": "Recalls scene file 5 for this camera — every stored setting at once: shutter, master gain, white balance, colour balance and bars. To write the slot instead, press STORE first, then this button. If recall-all is enabled on the LCD home screen, pressing this recalls each CCU’s own scene 5 on every camera at once, including the camera currently on air, so the manual advises enabling recall-all only for a planned setup and turning it straight off again.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -284,10 +290,10 @@
     },
     {
       "component_id": "ccu4.ch1.store",
-      "label": "CH1 \u00b7 Store scene",
+      "label": "CH1 · Store scene",
       "category": "CCU strip 1",
       "kind": "button",
-      "purpose": "Store current camera parameters to a scene slot",
+      "purpose": "Arms a scene-file save. Press STORE and it lights red to show the panel is waiting, then press one of the five numbered buttons to write every current setting for this camera into that slot.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -301,11 +307,11 @@
     },
     {
       "component_id": "ccu4.ch1.nd",
-      "label": "CH1 \u00b7 ND filter",
+      "label": "CH1 · ND filter",
       "category": "CCU strip 1",
       "kind": "control",
-      "purpose": "Select electronic ND on compatible cameras",
-      "confidence": "Documented",
+      "purpose": "Marked on the panel, but the cited manual states the ND setting \"will be enabled in a future update\". Whether current panel firmware implements it has not been verified here, so treat the control as unproven rather than assuming it drives the camera.",
+      "confidence": "Unknown",
       "geometry_status": "photo_approximation",
       "source_ids": [
         "blackmagic-manual",
@@ -318,11 +324,11 @@
     },
     {
       "component_id": "ccu4.ch1.cc",
-      "label": "CH1 \u00b7 Color correction",
+      "label": "CH1 · Color correction",
       "category": "CCU strip 1",
       "kind": "control",
-      "purpose": "Access color correction controls",
-      "confidence": "Documented",
+      "purpose": "Marked on the panel, but the cited manual states the CC setting \"will be enabled in a future update\". Whether current panel firmware implements it has not been verified here.",
+      "confidence": "Unknown",
       "geometry_status": "photo_approximation",
       "source_ids": [
         "blackmagic-manual",
@@ -335,10 +341,10 @@
     },
     {
       "component_id": "ccu4.ch1.gain",
-      "label": "CH1 \u00b7 Master gain",
+      "label": "CH1 · Master gain",
       "category": "CCU strip 1",
       "kind": "control",
-      "purpose": "Adjust camera sensor gain",
+      "purpose": "Master gain for this camera, stepped by the up and down arrows. Raising it buys exposure in dim light at the cost of electronic noise, which becomes obvious at the top of the range. The down arrow lights when gain is negative and the up arrow lights when it is positive, so the lit arrow tells you which side of zero you are on at a glance.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -352,10 +358,10 @@
     },
     {
       "component_id": "ccu4.ch1.shutter",
-      "label": "CH1 \u00b7 Shutter",
+      "label": "CH1 · Shutter",
       "category": "CCU strip 1",
       "kind": "control",
-      "purpose": "Adjust shutter setting",
+      "purpose": "Shutter speed for this camera. Slower shutter brightens the picture by exposing the sensor for longer, which is usually a better first move than adding gain because it adds no noise, and it is also how you kill flicker under mains-frequency lighting. Faster shutter cuts motion blur for sharp action, at the cost of light.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -369,10 +375,10 @@
     },
     {
       "component_id": "ccu4.ch1.wb",
-      "label": "CH1 \u00b7 White balance",
+      "label": "CH1 · White balance",
       "category": "CCU strip 1",
       "kind": "control",
-      "purpose": "Adjust / trigger white balance",
+      "purpose": "White balance for this camera. Light sources are warm or cool, and this shifts colour temperature to compensate so that whites stay white rather than drifting orange under tungsten or blue under daylight.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -386,10 +392,10 @@
     },
     {
       "component_id": "ccu4.ch1.bars",
-      "label": "CH1 \u00b7 Color bars",
+      "label": "CH1 · Color bars",
       "category": "CCU strip 1",
       "kind": "button",
-      "purpose": "Enable or disable color bars",
+      "purpose": "Enables or disables colour bars on this camera’s output. Bars are a line-up reference; anything sending bars is not sending a picture, so check what is on air before pressing it.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -403,10 +409,10 @@
     },
     {
       "component_id": "ccu4.ch1.rel",
-      "label": "CH1 \u00b7 Relative iris mode",
+      "label": "CH1 · Relative iris mode",
       "category": "CCU strip 1",
       "kind": "button",
-      "purpose": "Use relative iris control behavior",
+      "purpose": "Relative and absolute describe how the panel resyncs when a setting is changed somewhere else, such as in ATEM Software Control. In relative mode the panel eases back into sync as you make your next adjustment, so the change is almost invisible. In absolute mode the value snaps to wherever the physical control is sitting the moment you touch it, which is abrupt and can be ugly on air. Decide which mode you are in before the show rather than during it. The cited manual describes the ON button as cycling between the two modes.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -420,10 +426,10 @@
     },
     {
       "component_id": "ccu4.ch1.abs",
-      "label": "CH1 \u00b7 Absolute iris mode",
+      "label": "CH1 · Absolute iris mode",
       "category": "CCU strip 1",
       "kind": "button",
-      "purpose": "Use absolute iris control behavior",
+      "purpose": "Relative and absolute describe how the panel resyncs when a setting is changed somewhere else, such as in ATEM Software Control. In relative mode the panel eases back into sync as you make your next adjustment, so the change is almost invisible. In absolute mode the value snaps to wherever the physical control is sitting the moment you touch it, which is abrupt and can be ugly on air. Decide which mode you are in before the show rather than during it. The cited manual describes the ON button as cycling between the two modes.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -437,10 +443,10 @@
     },
     {
       "component_id": "ccu4.ch1.white-r",
-      "label": "CH1 \u00b7 White R",
+      "label": "CH1 · White R",
       "category": "CCU strip 1",
       "kind": "knob",
-      "purpose": "Adjust red in the white balance/color correction region",
+      "purpose": "Red content of the gain, meaning the highlights. Despite sitting near the white balance controls this is not white balance — it trims the red channel at the bright end of the picture.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -454,10 +460,10 @@
     },
     {
       "component_id": "ccu4.ch1.white-g",
-      "label": "CH1 \u00b7 White G",
+      "label": "CH1 · White G",
       "category": "CCU strip 1",
       "kind": "knob",
-      "purpose": "Adjust green in the white balance/color correction region",
+      "purpose": "Green content of the gain, meaning the highlights. This trims the green channel at the bright end of the picture, separately from white balance.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -471,10 +477,10 @@
     },
     {
       "component_id": "ccu4.ch1.white-b",
-      "label": "CH1 \u00b7 White B",
+      "label": "CH1 · White B",
       "category": "CCU strip 1",
       "kind": "knob",
-      "purpose": "Adjust blue in the white balance/color correction region",
+      "purpose": "Blue content of the gain, meaning the highlights. This trims the blue channel at the bright end of the picture, separately from white balance.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -488,10 +494,10 @@
     },
     {
       "component_id": "ccu4.ch1.black-r",
-      "label": "CH1 \u00b7 Black R",
+      "label": "CH1 · Black R",
       "category": "CCU strip 1",
       "kind": "knob",
-      "purpose": "Adjust red in the black balance region",
+      "purpose": "Red content of the lift, meaning the shadows. Use it to remove a colour cast from the darkest part of the picture without disturbing the highlights.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -505,10 +511,10 @@
     },
     {
       "component_id": "ccu4.ch1.black-g",
-      "label": "CH1 \u00b7 Black G",
+      "label": "CH1 · Black G",
       "category": "CCU strip 1",
       "kind": "knob",
-      "purpose": "Adjust green in the black balance region",
+      "purpose": "Green content of the lift, meaning the shadows. Use it to remove a colour cast from the darkest part of the picture without disturbing the highlights.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -522,10 +528,10 @@
     },
     {
       "component_id": "ccu4.ch1.black-b",
-      "label": "CH1 \u00b7 Black B",
+      "label": "CH1 · Black B",
       "category": "CCU strip 1",
       "kind": "knob",
-      "purpose": "Adjust blue in the black balance region",
+      "purpose": "Blue content of the lift, meaning the shadows. Use it to remove a colour cast from the darkest part of the picture without disturbing the highlights.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -539,10 +545,10 @@
     },
     {
       "component_id": "ccu4.ch1.flare",
-      "label": "CH1 \u00b7 Black / flare",
+      "label": "CH1 · Black / flare",
       "category": "CCU strip 1",
       "kind": "knob",
-      "purpose": "Adjust black/flare or gamma-related control",
+      "purpose": "Reaches the gamma, meaning the mid tones. Hold this button down and turn the black RGB knobs, and they trim the mid tones instead of the shadows — so the same three knobs cover two tonal regions depending on whether this button is held.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -556,10 +562,10 @@
     },
     {
       "component_id": "ccu4.ch1.custom",
-      "label": "CH1 \u00b7 Custom / Y gain",
+      "label": "CH1 · Custom / Y gain",
       "category": "CCU strip 1",
       "kind": "knob",
-      "purpose": "Custom control; manual documents Y gain in current implementation",
+      "purpose": "Currently assigned to Y gain, which raises or lowers overall luminance without moving the individual colour channels. The cited manual describes the knob as freely assignable in a future update, so its function may differ on current firmware.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -573,10 +579,10 @@
     },
     {
       "component_id": "ccu4.ch1.camera",
-      "label": "CH1 \u00b7 Camera number",
+      "label": "CH1 · Camera number",
       "category": "CCU strip 1",
       "kind": "display",
-      "purpose": "Shows the assigned camera; green off air and red on air",
+      "purpose": "The large camera number for this strip, readable across a gallery. It illuminates red when this camera is live on the program output — the fastest way to check you are not about to shade a camera that is on air.",
       "confidence": "Confirmed",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -593,10 +599,10 @@
     },
     {
       "component_id": "ccu4.ch1.joystick",
-      "label": "CH1 \u00b7 Iris / master black joystick",
+      "label": "CH1 · Iris / master black joystick",
       "category": "CCU strip 1",
       "kind": "joystick",
-      "purpose": "Move vertically for iris; rotate ring for master black/pedestal",
+      "purpose": "The main shading control. Lean it forward or back to open and close the iris, and turn the ring wheel beneath the knob to raise or lower master black, the pedestal. Pressing the joystick down switches this camera to the auxiliary output assigned to camera control, so you can look at it full screen before adjusting.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -610,10 +616,10 @@
     },
     {
       "component_id": "ccu4.ch1.preview",
-      "label": "CH1 \u00b7 Preview",
+      "label": "CH1 · Preview",
       "category": "CCU strip 1",
       "kind": "button",
-      "purpose": "Switch this camera to the configured auxiliary preview for camera control",
+      "purpose": "Sends this camera to the auxiliary output assigned to camera control, so the shot you are shading is the one you are looking at. Which aux that is depends on the switcher and is set on the panel’s LCD.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -627,10 +633,10 @@
     },
     {
       "component_id": "ccu4.ch1.sensitivity",
-      "label": "CH1 \u00b7 Sensitivity",
+      "label": "CH1 · Sensitivity",
       "category": "CCU strip 1",
       "kind": "knob",
-      "purpose": "Defines the fine iris/gain range across joystick travel",
+      "purpose": "Sets how much of the iris range the joystick’s full travel covers. Tighten it when you want fine control around one exposure, widen it when you need to move a long way quickly.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -644,10 +650,10 @@
     },
     {
       "component_id": "ccu4.ch1.coarse",
-      "label": "CH1 \u00b7 Coarse",
+      "label": "CH1 · Coarse",
       "category": "CCU strip 1",
       "kind": "knob",
-      "purpose": "Defines the maximum iris/gain limit used with joystick travel",
+      "purpose": "Caps how far the iris can open, so an over-exposed picture cannot reach air. Set it by opening the iris fully, then bringing coarse down until exposure is right — from then on the joystick cannot go past that ceiling.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -661,10 +667,10 @@
     },
     {
       "component_id": "ccu4.ch1.iris-mb-active",
-      "label": "CH1 \u00b7 Iris / MB active",
+      "label": "CH1 · Iris / MB active",
       "category": "CCU strip 1",
       "kind": "button",
-      "purpose": "Locks or unlocks joystick iris and master-black changes",
+      "purpose": "Locks the joystick’s iris and master black so neither can be nudged by accident during a show. Master black can also be disabled globally from the panel’s LCD settings.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -678,10 +684,10 @@
     },
     {
       "component_id": "ccu4.ch1.auto-iris",
-      "label": "CH1 \u00b7 Auto iris",
+      "label": "CH1 · Auto iris",
       "category": "CCU strip 1",
       "kind": "button",
-      "purpose": "Triggers automatic exposure on a compatible electronic-iris lens",
+      "purpose": "Runs an automatic exposure on a lens with electronic iris control. It is a starting point rather than a set-and-forget — it responds to whatever is in frame at the moment you press it.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -695,10 +701,10 @@
     },
     {
       "component_id": "ccu4.ch1.call",
-      "label": "CH1 \u00b7 Call",
+      "label": "CH1 · Call",
       "category": "CCU strip 1",
       "kind": "button",
-      "purpose": "Flashes tally / calls camera operator where supported",
+      "purpose": "Flashes the tally on this camera to get the operator’s attention, on cameras that support it. Useful for signalling before going live.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -712,10 +718,10 @@
     },
     {
       "component_id": "ccu4.ch1.panel-active",
-      "label": "CH1 \u00b7 Panel active",
+      "label": "CH1 · Panel active",
       "category": "CCU strip 1",
       "kind": "button",
-      "purpose": "Locks the CCU controls against accidental adjustment",
+      "purpose": "Locks this CCU’s controls so nothing can be changed by a knock or a sleeve. Worth using on any camera that is parked and correct.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -729,10 +735,10 @@
     },
     {
       "component_id": "ccu4.ch1.status",
-      "label": "CH1 \u00b7 Status indicators",
+      "label": "CH1 · Status indicators",
       "category": "CCU strip 1",
       "kind": "light",
-      "purpose": "Network/error/active indications",
+      "purpose": "Indicator for this strip, showing network, error and active states rather than anything about the picture.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -746,10 +752,10 @@
     },
     {
       "component_id": "ccu4.ch2.lcd",
-      "label": "CH2 \u00b7 LCD / soft controls",
+      "label": "CH2 · LCD / soft controls",
       "category": "CCU strip 2",
       "kind": "display",
-      "purpose": "Displays selected camera and menu settings",
+      "purpose": "Home screen for this CCU. It names the camera assigned to the strip and turns red when that camera is live. From here you reach the camera bank A/B switch, the recall-all toggle, the auxiliary output used for camera control, the master black enable, and the panel brightness.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -763,10 +769,10 @@
     },
     {
       "component_id": "ccu4.ch2.scene1",
-      "label": "CH2 \u00b7 Scene 1",
+      "label": "CH2 · Scene 1",
       "category": "CCU strip 2",
       "kind": "button",
-      "purpose": "Recall scene file 1",
+      "purpose": "Recalls scene file 1 for this camera — every stored setting at once: shutter, master gain, white balance, colour balance and bars. To write the slot instead, press STORE first, then this button. If recall-all is enabled on the LCD home screen, pressing this recalls each CCU’s own scene 1 on every camera at once, including the camera currently on air, so the manual advises enabling recall-all only for a planned setup and turning it straight off again.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -780,10 +786,10 @@
     },
     {
       "component_id": "ccu4.ch2.scene2",
-      "label": "CH2 \u00b7 Scene 2",
+      "label": "CH2 · Scene 2",
       "category": "CCU strip 2",
       "kind": "button",
-      "purpose": "Recall scene file 2",
+      "purpose": "Recalls scene file 2 for this camera — every stored setting at once: shutter, master gain, white balance, colour balance and bars. To write the slot instead, press STORE first, then this button. If recall-all is enabled on the LCD home screen, pressing this recalls each CCU’s own scene 2 on every camera at once, including the camera currently on air, so the manual advises enabling recall-all only for a planned setup and turning it straight off again.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -797,10 +803,10 @@
     },
     {
       "component_id": "ccu4.ch2.scene3",
-      "label": "CH2 \u00b7 Scene 3",
+      "label": "CH2 · Scene 3",
       "category": "CCU strip 2",
       "kind": "button",
-      "purpose": "Recall scene file 3",
+      "purpose": "Recalls scene file 3 for this camera — every stored setting at once: shutter, master gain, white balance, colour balance and bars. To write the slot instead, press STORE first, then this button. If recall-all is enabled on the LCD home screen, pressing this recalls each CCU’s own scene 3 on every camera at once, including the camera currently on air, so the manual advises enabling recall-all only for a planned setup and turning it straight off again.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -814,10 +820,10 @@
     },
     {
       "component_id": "ccu4.ch2.scene4",
-      "label": "CH2 \u00b7 Scene 4",
+      "label": "CH2 · Scene 4",
       "category": "CCU strip 2",
       "kind": "button",
-      "purpose": "Recall scene file 4",
+      "purpose": "Recalls scene file 4 for this camera — every stored setting at once: shutter, master gain, white balance, colour balance and bars. To write the slot instead, press STORE first, then this button. If recall-all is enabled on the LCD home screen, pressing this recalls each CCU’s own scene 4 on every camera at once, including the camera currently on air, so the manual advises enabling recall-all only for a planned setup and turning it straight off again.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -831,10 +837,10 @@
     },
     {
       "component_id": "ccu4.ch2.scene5",
-      "label": "CH2 \u00b7 Scene 5",
+      "label": "CH2 · Scene 5",
       "category": "CCU strip 2",
       "kind": "button",
-      "purpose": "Recall scene file 5",
+      "purpose": "Recalls scene file 5 for this camera — every stored setting at once: shutter, master gain, white balance, colour balance and bars. To write the slot instead, press STORE first, then this button. If recall-all is enabled on the LCD home screen, pressing this recalls each CCU’s own scene 5 on every camera at once, including the camera currently on air, so the manual advises enabling recall-all only for a planned setup and turning it straight off again.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -848,10 +854,10 @@
     },
     {
       "component_id": "ccu4.ch2.store",
-      "label": "CH2 \u00b7 Store scene",
+      "label": "CH2 · Store scene",
       "category": "CCU strip 2",
       "kind": "button",
-      "purpose": "Store current camera parameters to a scene slot",
+      "purpose": "Arms a scene-file save. Press STORE and it lights red to show the panel is waiting, then press one of the five numbered buttons to write every current setting for this camera into that slot.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -865,11 +871,11 @@
     },
     {
       "component_id": "ccu4.ch2.nd",
-      "label": "CH2 \u00b7 ND filter",
+      "label": "CH2 · ND filter",
       "category": "CCU strip 2",
       "kind": "control",
-      "purpose": "Select electronic ND on compatible cameras",
-      "confidence": "Documented",
+      "purpose": "Marked on the panel, but the cited manual states the ND setting \"will be enabled in a future update\". Whether current panel firmware implements it has not been verified here, so treat the control as unproven rather than assuming it drives the camera.",
+      "confidence": "Unknown",
       "geometry_status": "photo_approximation",
       "source_ids": [
         "blackmagic-manual",
@@ -882,11 +888,11 @@
     },
     {
       "component_id": "ccu4.ch2.cc",
-      "label": "CH2 \u00b7 Color correction",
+      "label": "CH2 · Color correction",
       "category": "CCU strip 2",
       "kind": "control",
-      "purpose": "Access color correction controls",
-      "confidence": "Documented",
+      "purpose": "Marked on the panel, but the cited manual states the CC setting \"will be enabled in a future update\". Whether current panel firmware implements it has not been verified here.",
+      "confidence": "Unknown",
       "geometry_status": "photo_approximation",
       "source_ids": [
         "blackmagic-manual",
@@ -899,10 +905,10 @@
     },
     {
       "component_id": "ccu4.ch2.gain",
-      "label": "CH2 \u00b7 Master gain",
+      "label": "CH2 · Master gain",
       "category": "CCU strip 2",
       "kind": "control",
-      "purpose": "Adjust camera sensor gain",
+      "purpose": "Master gain for this camera, stepped by the up and down arrows. Raising it buys exposure in dim light at the cost of electronic noise, which becomes obvious at the top of the range. The down arrow lights when gain is negative and the up arrow lights when it is positive, so the lit arrow tells you which side of zero you are on at a glance.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -916,10 +922,10 @@
     },
     {
       "component_id": "ccu4.ch2.shutter",
-      "label": "CH2 \u00b7 Shutter",
+      "label": "CH2 · Shutter",
       "category": "CCU strip 2",
       "kind": "control",
-      "purpose": "Adjust shutter setting",
+      "purpose": "Shutter speed for this camera. Slower shutter brightens the picture by exposing the sensor for longer, which is usually a better first move than adding gain because it adds no noise, and it is also how you kill flicker under mains-frequency lighting. Faster shutter cuts motion blur for sharp action, at the cost of light.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -933,10 +939,10 @@
     },
     {
       "component_id": "ccu4.ch2.wb",
-      "label": "CH2 \u00b7 White balance",
+      "label": "CH2 · White balance",
       "category": "CCU strip 2",
       "kind": "control",
-      "purpose": "Adjust / trigger white balance",
+      "purpose": "White balance for this camera. Light sources are warm or cool, and this shifts colour temperature to compensate so that whites stay white rather than drifting orange under tungsten or blue under daylight.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -950,10 +956,10 @@
     },
     {
       "component_id": "ccu4.ch2.bars",
-      "label": "CH2 \u00b7 Color bars",
+      "label": "CH2 · Color bars",
       "category": "CCU strip 2",
       "kind": "button",
-      "purpose": "Enable or disable color bars",
+      "purpose": "Enables or disables colour bars on this camera’s output. Bars are a line-up reference; anything sending bars is not sending a picture, so check what is on air before pressing it.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -967,10 +973,10 @@
     },
     {
       "component_id": "ccu4.ch2.rel",
-      "label": "CH2 \u00b7 Relative iris mode",
+      "label": "CH2 · Relative iris mode",
       "category": "CCU strip 2",
       "kind": "button",
-      "purpose": "Use relative iris control behavior",
+      "purpose": "Relative and absolute describe how the panel resyncs when a setting is changed somewhere else, such as in ATEM Software Control. In relative mode the panel eases back into sync as you make your next adjustment, so the change is almost invisible. In absolute mode the value snaps to wherever the physical control is sitting the moment you touch it, which is abrupt and can be ugly on air. Decide which mode you are in before the show rather than during it. The cited manual describes the ON button as cycling between the two modes.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -984,10 +990,10 @@
     },
     {
       "component_id": "ccu4.ch2.abs",
-      "label": "CH2 \u00b7 Absolute iris mode",
+      "label": "CH2 · Absolute iris mode",
       "category": "CCU strip 2",
       "kind": "button",
-      "purpose": "Use absolute iris control behavior",
+      "purpose": "Relative and absolute describe how the panel resyncs when a setting is changed somewhere else, such as in ATEM Software Control. In relative mode the panel eases back into sync as you make your next adjustment, so the change is almost invisible. In absolute mode the value snaps to wherever the physical control is sitting the moment you touch it, which is abrupt and can be ugly on air. Decide which mode you are in before the show rather than during it. The cited manual describes the ON button as cycling between the two modes.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -1001,10 +1007,10 @@
     },
     {
       "component_id": "ccu4.ch2.white-r",
-      "label": "CH2 \u00b7 White R",
+      "label": "CH2 · White R",
       "category": "CCU strip 2",
       "kind": "knob",
-      "purpose": "Adjust red in the white balance/color correction region",
+      "purpose": "Red content of the gain, meaning the highlights. Despite sitting near the white balance controls this is not white balance — it trims the red channel at the bright end of the picture.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -1018,10 +1024,10 @@
     },
     {
       "component_id": "ccu4.ch2.white-g",
-      "label": "CH2 \u00b7 White G",
+      "label": "CH2 · White G",
       "category": "CCU strip 2",
       "kind": "knob",
-      "purpose": "Adjust green in the white balance/color correction region",
+      "purpose": "Green content of the gain, meaning the highlights. This trims the green channel at the bright end of the picture, separately from white balance.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -1035,10 +1041,10 @@
     },
     {
       "component_id": "ccu4.ch2.white-b",
-      "label": "CH2 \u00b7 White B",
+      "label": "CH2 · White B",
       "category": "CCU strip 2",
       "kind": "knob",
-      "purpose": "Adjust blue in the white balance/color correction region",
+      "purpose": "Blue content of the gain, meaning the highlights. This trims the blue channel at the bright end of the picture, separately from white balance.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -1052,10 +1058,10 @@
     },
     {
       "component_id": "ccu4.ch2.black-r",
-      "label": "CH2 \u00b7 Black R",
+      "label": "CH2 · Black R",
       "category": "CCU strip 2",
       "kind": "knob",
-      "purpose": "Adjust red in the black balance region",
+      "purpose": "Red content of the lift, meaning the shadows. Use it to remove a colour cast from the darkest part of the picture without disturbing the highlights.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -1069,10 +1075,10 @@
     },
     {
       "component_id": "ccu4.ch2.black-g",
-      "label": "CH2 \u00b7 Black G",
+      "label": "CH2 · Black G",
       "category": "CCU strip 2",
       "kind": "knob",
-      "purpose": "Adjust green in the black balance region",
+      "purpose": "Green content of the lift, meaning the shadows. Use it to remove a colour cast from the darkest part of the picture without disturbing the highlights.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -1086,10 +1092,10 @@
     },
     {
       "component_id": "ccu4.ch2.black-b",
-      "label": "CH2 \u00b7 Black B",
+      "label": "CH2 · Black B",
       "category": "CCU strip 2",
       "kind": "knob",
-      "purpose": "Adjust blue in the black balance region",
+      "purpose": "Blue content of the lift, meaning the shadows. Use it to remove a colour cast from the darkest part of the picture without disturbing the highlights.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -1103,10 +1109,10 @@
     },
     {
       "component_id": "ccu4.ch2.flare",
-      "label": "CH2 \u00b7 Black / flare",
+      "label": "CH2 · Black / flare",
       "category": "CCU strip 2",
       "kind": "knob",
-      "purpose": "Adjust black/flare or gamma-related control",
+      "purpose": "Reaches the gamma, meaning the mid tones. Hold this button down and turn the black RGB knobs, and they trim the mid tones instead of the shadows — so the same three knobs cover two tonal regions depending on whether this button is held.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -1120,10 +1126,10 @@
     },
     {
       "component_id": "ccu4.ch2.custom",
-      "label": "CH2 \u00b7 Custom / Y gain",
+      "label": "CH2 · Custom / Y gain",
       "category": "CCU strip 2",
       "kind": "knob",
-      "purpose": "Custom control; manual documents Y gain in current implementation",
+      "purpose": "Currently assigned to Y gain, which raises or lowers overall luminance without moving the individual colour channels. The cited manual describes the knob as freely assignable in a future update, so its function may differ on current firmware.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -1137,10 +1143,10 @@
     },
     {
       "component_id": "ccu4.ch2.camera",
-      "label": "CH2 \u00b7 Camera number",
+      "label": "CH2 · Camera number",
       "category": "CCU strip 2",
       "kind": "display",
-      "purpose": "Shows the assigned camera; green off air and red on air",
+      "purpose": "The large camera number for this strip, readable across a gallery. It illuminates red when this camera is live on the program output — the fastest way to check you are not about to shade a camera that is on air.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -1157,10 +1163,10 @@
     },
     {
       "component_id": "ccu4.ch2.joystick",
-      "label": "CH2 \u00b7 Iris / master black joystick",
+      "label": "CH2 · Iris / master black joystick",
       "category": "CCU strip 2",
       "kind": "joystick",
-      "purpose": "Move vertically for iris; rotate ring for master black/pedestal",
+      "purpose": "The main shading control. Lean it forward or back to open and close the iris, and turn the ring wheel beneath the knob to raise or lower master black, the pedestal. Pressing the joystick down switches this camera to the auxiliary output assigned to camera control, so you can look at it full screen before adjusting.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -1174,10 +1180,10 @@
     },
     {
       "component_id": "ccu4.ch2.preview",
-      "label": "CH2 \u00b7 Preview",
+      "label": "CH2 · Preview",
       "category": "CCU strip 2",
       "kind": "button",
-      "purpose": "Switch this camera to the configured auxiliary preview for camera control",
+      "purpose": "Sends this camera to the auxiliary output assigned to camera control, so the shot you are shading is the one you are looking at. Which aux that is depends on the switcher and is set on the panel’s LCD.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -1191,10 +1197,10 @@
     },
     {
       "component_id": "ccu4.ch2.sensitivity",
-      "label": "CH2 \u00b7 Sensitivity",
+      "label": "CH2 · Sensitivity",
       "category": "CCU strip 2",
       "kind": "knob",
-      "purpose": "Defines the fine iris/gain range across joystick travel",
+      "purpose": "Sets how much of the iris range the joystick’s full travel covers. Tighten it when you want fine control around one exposure, widen it when you need to move a long way quickly.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -1208,10 +1214,10 @@
     },
     {
       "component_id": "ccu4.ch2.coarse",
-      "label": "CH2 \u00b7 Coarse",
+      "label": "CH2 · Coarse",
       "category": "CCU strip 2",
       "kind": "knob",
-      "purpose": "Defines the maximum iris/gain limit used with joystick travel",
+      "purpose": "Caps how far the iris can open, so an over-exposed picture cannot reach air. Set it by opening the iris fully, then bringing coarse down until exposure is right — from then on the joystick cannot go past that ceiling.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -1225,10 +1231,10 @@
     },
     {
       "component_id": "ccu4.ch2.iris-mb-active",
-      "label": "CH2 \u00b7 Iris / MB active",
+      "label": "CH2 · Iris / MB active",
       "category": "CCU strip 2",
       "kind": "button",
-      "purpose": "Locks or unlocks joystick iris and master-black changes",
+      "purpose": "Locks the joystick’s iris and master black so neither can be nudged by accident during a show. Master black can also be disabled globally from the panel’s LCD settings.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -1242,10 +1248,10 @@
     },
     {
       "component_id": "ccu4.ch2.auto-iris",
-      "label": "CH2 \u00b7 Auto iris",
+      "label": "CH2 · Auto iris",
       "category": "CCU strip 2",
       "kind": "button",
-      "purpose": "Triggers automatic exposure on a compatible electronic-iris lens",
+      "purpose": "Runs an automatic exposure on a lens with electronic iris control. It is a starting point rather than a set-and-forget — it responds to whatever is in frame at the moment you press it.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -1259,10 +1265,10 @@
     },
     {
       "component_id": "ccu4.ch2.call",
-      "label": "CH2 \u00b7 Call",
+      "label": "CH2 · Call",
       "category": "CCU strip 2",
       "kind": "button",
-      "purpose": "Flashes tally / calls camera operator where supported",
+      "purpose": "Flashes the tally on this camera to get the operator’s attention, on cameras that support it. Useful for signalling before going live.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -1276,10 +1282,10 @@
     },
     {
       "component_id": "ccu4.ch2.panel-active",
-      "label": "CH2 \u00b7 Panel active",
+      "label": "CH2 · Panel active",
       "category": "CCU strip 2",
       "kind": "button",
-      "purpose": "Locks the CCU controls against accidental adjustment",
+      "purpose": "Locks this CCU’s controls so nothing can be changed by a knock or a sleeve. Worth using on any camera that is parked and correct.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -1293,10 +1299,10 @@
     },
     {
       "component_id": "ccu4.ch2.status",
-      "label": "CH2 \u00b7 Status indicators",
+      "label": "CH2 · Status indicators",
       "category": "CCU strip 2",
       "kind": "light",
-      "purpose": "Network/error/active indications",
+      "purpose": "Indicator for this strip, showing network, error and active states rather than anything about the picture.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -1310,10 +1316,10 @@
     },
     {
       "component_id": "ccu4.ch3.lcd",
-      "label": "CH3 \u00b7 LCD / soft controls",
+      "label": "CH3 · LCD / soft controls",
       "category": "CCU strip 3",
       "kind": "display",
-      "purpose": "Displays selected camera and menu settings",
+      "purpose": "Home screen for this CCU. It names the camera assigned to the strip and turns red when that camera is live. From here you reach the camera bank A/B switch, the recall-all toggle, the auxiliary output used for camera control, the master black enable, and the panel brightness.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -1327,10 +1333,10 @@
     },
     {
       "component_id": "ccu4.ch3.scene1",
-      "label": "CH3 \u00b7 Scene 1",
+      "label": "CH3 · Scene 1",
       "category": "CCU strip 3",
       "kind": "button",
-      "purpose": "Recall scene file 1",
+      "purpose": "Recalls scene file 1 for this camera — every stored setting at once: shutter, master gain, white balance, colour balance and bars. To write the slot instead, press STORE first, then this button. If recall-all is enabled on the LCD home screen, pressing this recalls each CCU’s own scene 1 on every camera at once, including the camera currently on air, so the manual advises enabling recall-all only for a planned setup and turning it straight off again.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -1344,10 +1350,10 @@
     },
     {
       "component_id": "ccu4.ch3.scene2",
-      "label": "CH3 \u00b7 Scene 2",
+      "label": "CH3 · Scene 2",
       "category": "CCU strip 3",
       "kind": "button",
-      "purpose": "Recall scene file 2",
+      "purpose": "Recalls scene file 2 for this camera — every stored setting at once: shutter, master gain, white balance, colour balance and bars. To write the slot instead, press STORE first, then this button. If recall-all is enabled on the LCD home screen, pressing this recalls each CCU’s own scene 2 on every camera at once, including the camera currently on air, so the manual advises enabling recall-all only for a planned setup and turning it straight off again.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -1361,10 +1367,10 @@
     },
     {
       "component_id": "ccu4.ch3.scene3",
-      "label": "CH3 \u00b7 Scene 3",
+      "label": "CH3 · Scene 3",
       "category": "CCU strip 3",
       "kind": "button",
-      "purpose": "Recall scene file 3",
+      "purpose": "Recalls scene file 3 for this camera — every stored setting at once: shutter, master gain, white balance, colour balance and bars. To write the slot instead, press STORE first, then this button. If recall-all is enabled on the LCD home screen, pressing this recalls each CCU’s own scene 3 on every camera at once, including the camera currently on air, so the manual advises enabling recall-all only for a planned setup and turning it straight off again.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -1378,10 +1384,10 @@
     },
     {
       "component_id": "ccu4.ch3.scene4",
-      "label": "CH3 \u00b7 Scene 4",
+      "label": "CH3 · Scene 4",
       "category": "CCU strip 3",
       "kind": "button",
-      "purpose": "Recall scene file 4",
+      "purpose": "Recalls scene file 4 for this camera — every stored setting at once: shutter, master gain, white balance, colour balance and bars. To write the slot instead, press STORE first, then this button. If recall-all is enabled on the LCD home screen, pressing this recalls each CCU’s own scene 4 on every camera at once, including the camera currently on air, so the manual advises enabling recall-all only for a planned setup and turning it straight off again.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -1395,10 +1401,10 @@
     },
     {
       "component_id": "ccu4.ch3.scene5",
-      "label": "CH3 \u00b7 Scene 5",
+      "label": "CH3 · Scene 5",
       "category": "CCU strip 3",
       "kind": "button",
-      "purpose": "Recall scene file 5",
+      "purpose": "Recalls scene file 5 for this camera — every stored setting at once: shutter, master gain, white balance, colour balance and bars. To write the slot instead, press STORE first, then this button. If recall-all is enabled on the LCD home screen, pressing this recalls each CCU’s own scene 5 on every camera at once, including the camera currently on air, so the manual advises enabling recall-all only for a planned setup and turning it straight off again.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -1412,10 +1418,10 @@
     },
     {
       "component_id": "ccu4.ch3.store",
-      "label": "CH3 \u00b7 Store scene",
+      "label": "CH3 · Store scene",
       "category": "CCU strip 3",
       "kind": "button",
-      "purpose": "Store current camera parameters to a scene slot",
+      "purpose": "Arms a scene-file save. Press STORE and it lights red to show the panel is waiting, then press one of the five numbered buttons to write every current setting for this camera into that slot.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -1429,11 +1435,11 @@
     },
     {
       "component_id": "ccu4.ch3.nd",
-      "label": "CH3 \u00b7 ND filter",
+      "label": "CH3 · ND filter",
       "category": "CCU strip 3",
       "kind": "control",
-      "purpose": "Select electronic ND on compatible cameras",
-      "confidence": "Documented",
+      "purpose": "Marked on the panel, but the cited manual states the ND setting \"will be enabled in a future update\". Whether current panel firmware implements it has not been verified here, so treat the control as unproven rather than assuming it drives the camera.",
+      "confidence": "Unknown",
       "geometry_status": "photo_approximation",
       "source_ids": [
         "blackmagic-manual",
@@ -1446,11 +1452,11 @@
     },
     {
       "component_id": "ccu4.ch3.cc",
-      "label": "CH3 \u00b7 Color correction",
+      "label": "CH3 · Color correction",
       "category": "CCU strip 3",
       "kind": "control",
-      "purpose": "Access color correction controls",
-      "confidence": "Documented",
+      "purpose": "Marked on the panel, but the cited manual states the CC setting \"will be enabled in a future update\". Whether current panel firmware implements it has not been verified here.",
+      "confidence": "Unknown",
       "geometry_status": "photo_approximation",
       "source_ids": [
         "blackmagic-manual",
@@ -1463,10 +1469,10 @@
     },
     {
       "component_id": "ccu4.ch3.gain",
-      "label": "CH3 \u00b7 Master gain",
+      "label": "CH3 · Master gain",
       "category": "CCU strip 3",
       "kind": "control",
-      "purpose": "Adjust camera sensor gain",
+      "purpose": "Master gain for this camera, stepped by the up and down arrows. Raising it buys exposure in dim light at the cost of electronic noise, which becomes obvious at the top of the range. The down arrow lights when gain is negative and the up arrow lights when it is positive, so the lit arrow tells you which side of zero you are on at a glance.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -1480,10 +1486,10 @@
     },
     {
       "component_id": "ccu4.ch3.shutter",
-      "label": "CH3 \u00b7 Shutter",
+      "label": "CH3 · Shutter",
       "category": "CCU strip 3",
       "kind": "control",
-      "purpose": "Adjust shutter setting",
+      "purpose": "Shutter speed for this camera. Slower shutter brightens the picture by exposing the sensor for longer, which is usually a better first move than adding gain because it adds no noise, and it is also how you kill flicker under mains-frequency lighting. Faster shutter cuts motion blur for sharp action, at the cost of light.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -1497,10 +1503,10 @@
     },
     {
       "component_id": "ccu4.ch3.wb",
-      "label": "CH3 \u00b7 White balance",
+      "label": "CH3 · White balance",
       "category": "CCU strip 3",
       "kind": "control",
-      "purpose": "Adjust / trigger white balance",
+      "purpose": "White balance for this camera. Light sources are warm or cool, and this shifts colour temperature to compensate so that whites stay white rather than drifting orange under tungsten or blue under daylight.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -1514,10 +1520,10 @@
     },
     {
       "component_id": "ccu4.ch3.bars",
-      "label": "CH3 \u00b7 Color bars",
+      "label": "CH3 · Color bars",
       "category": "CCU strip 3",
       "kind": "button",
-      "purpose": "Enable or disable color bars",
+      "purpose": "Enables or disables colour bars on this camera’s output. Bars are a line-up reference; anything sending bars is not sending a picture, so check what is on air before pressing it.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -1531,10 +1537,10 @@
     },
     {
       "component_id": "ccu4.ch3.rel",
-      "label": "CH3 \u00b7 Relative iris mode",
+      "label": "CH3 · Relative iris mode",
       "category": "CCU strip 3",
       "kind": "button",
-      "purpose": "Use relative iris control behavior",
+      "purpose": "Relative and absolute describe how the panel resyncs when a setting is changed somewhere else, such as in ATEM Software Control. In relative mode the panel eases back into sync as you make your next adjustment, so the change is almost invisible. In absolute mode the value snaps to wherever the physical control is sitting the moment you touch it, which is abrupt and can be ugly on air. Decide which mode you are in before the show rather than during it. The cited manual describes the ON button as cycling between the two modes.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -1548,10 +1554,10 @@
     },
     {
       "component_id": "ccu4.ch3.abs",
-      "label": "CH3 \u00b7 Absolute iris mode",
+      "label": "CH3 · Absolute iris mode",
       "category": "CCU strip 3",
       "kind": "button",
-      "purpose": "Use absolute iris control behavior",
+      "purpose": "Relative and absolute describe how the panel resyncs when a setting is changed somewhere else, such as in ATEM Software Control. In relative mode the panel eases back into sync as you make your next adjustment, so the change is almost invisible. In absolute mode the value snaps to wherever the physical control is sitting the moment you touch it, which is abrupt and can be ugly on air. Decide which mode you are in before the show rather than during it. The cited manual describes the ON button as cycling between the two modes.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -1565,10 +1571,10 @@
     },
     {
       "component_id": "ccu4.ch3.white-r",
-      "label": "CH3 \u00b7 White R",
+      "label": "CH3 · White R",
       "category": "CCU strip 3",
       "kind": "knob",
-      "purpose": "Adjust red in the white balance/color correction region",
+      "purpose": "Red content of the gain, meaning the highlights. Despite sitting near the white balance controls this is not white balance — it trims the red channel at the bright end of the picture.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -1582,10 +1588,10 @@
     },
     {
       "component_id": "ccu4.ch3.white-g",
-      "label": "CH3 \u00b7 White G",
+      "label": "CH3 · White G",
       "category": "CCU strip 3",
       "kind": "knob",
-      "purpose": "Adjust green in the white balance/color correction region",
+      "purpose": "Green content of the gain, meaning the highlights. This trims the green channel at the bright end of the picture, separately from white balance.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -1599,10 +1605,10 @@
     },
     {
       "component_id": "ccu4.ch3.white-b",
-      "label": "CH3 \u00b7 White B",
+      "label": "CH3 · White B",
       "category": "CCU strip 3",
       "kind": "knob",
-      "purpose": "Adjust blue in the white balance/color correction region",
+      "purpose": "Blue content of the gain, meaning the highlights. This trims the blue channel at the bright end of the picture, separately from white balance.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -1616,10 +1622,10 @@
     },
     {
       "component_id": "ccu4.ch3.black-r",
-      "label": "CH3 \u00b7 Black R",
+      "label": "CH3 · Black R",
       "category": "CCU strip 3",
       "kind": "knob",
-      "purpose": "Adjust red in the black balance region",
+      "purpose": "Red content of the lift, meaning the shadows. Use it to remove a colour cast from the darkest part of the picture without disturbing the highlights.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -1633,10 +1639,10 @@
     },
     {
       "component_id": "ccu4.ch3.black-g",
-      "label": "CH3 \u00b7 Black G",
+      "label": "CH3 · Black G",
       "category": "CCU strip 3",
       "kind": "knob",
-      "purpose": "Adjust green in the black balance region",
+      "purpose": "Green content of the lift, meaning the shadows. Use it to remove a colour cast from the darkest part of the picture without disturbing the highlights.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -1650,10 +1656,10 @@
     },
     {
       "component_id": "ccu4.ch3.black-b",
-      "label": "CH3 \u00b7 Black B",
+      "label": "CH3 · Black B",
       "category": "CCU strip 3",
       "kind": "knob",
-      "purpose": "Adjust blue in the black balance region",
+      "purpose": "Blue content of the lift, meaning the shadows. Use it to remove a colour cast from the darkest part of the picture without disturbing the highlights.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -1667,10 +1673,10 @@
     },
     {
       "component_id": "ccu4.ch3.flare",
-      "label": "CH3 \u00b7 Black / flare",
+      "label": "CH3 · Black / flare",
       "category": "CCU strip 3",
       "kind": "knob",
-      "purpose": "Adjust black/flare or gamma-related control",
+      "purpose": "Reaches the gamma, meaning the mid tones. Hold this button down and turn the black RGB knobs, and they trim the mid tones instead of the shadows — so the same three knobs cover two tonal regions depending on whether this button is held.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -1684,10 +1690,10 @@
     },
     {
       "component_id": "ccu4.ch3.custom",
-      "label": "CH3 \u00b7 Custom / Y gain",
+      "label": "CH3 · Custom / Y gain",
       "category": "CCU strip 3",
       "kind": "knob",
-      "purpose": "Custom control; manual documents Y gain in current implementation",
+      "purpose": "Currently assigned to Y gain, which raises or lowers overall luminance without moving the individual colour channels. The cited manual describes the knob as freely assignable in a future update, so its function may differ on current firmware.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -1701,10 +1707,10 @@
     },
     {
       "component_id": "ccu4.ch3.camera",
-      "label": "CH3 \u00b7 Camera number",
+      "label": "CH3 · Camera number",
       "category": "CCU strip 3",
       "kind": "display",
-      "purpose": "Shows the assigned camera; green off air and red on air",
+      "purpose": "The large camera number for this strip, readable across a gallery. It illuminates red when this camera is live on the program output — the fastest way to check you are not about to shade a camera that is on air.",
       "confidence": "Confirmed",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -1721,10 +1727,10 @@
     },
     {
       "component_id": "ccu4.ch3.joystick",
-      "label": "CH3 \u00b7 Iris / master black joystick",
+      "label": "CH3 · Iris / master black joystick",
       "category": "CCU strip 3",
       "kind": "joystick",
-      "purpose": "Move vertically for iris; rotate ring for master black/pedestal",
+      "purpose": "The main shading control. Lean it forward or back to open and close the iris, and turn the ring wheel beneath the knob to raise or lower master black, the pedestal. Pressing the joystick down switches this camera to the auxiliary output assigned to camera control, so you can look at it full screen before adjusting.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -1738,10 +1744,10 @@
     },
     {
       "component_id": "ccu4.ch3.preview",
-      "label": "CH3 \u00b7 Preview",
+      "label": "CH3 · Preview",
       "category": "CCU strip 3",
       "kind": "button",
-      "purpose": "Switch this camera to the configured auxiliary preview for camera control",
+      "purpose": "Sends this camera to the auxiliary output assigned to camera control, so the shot you are shading is the one you are looking at. Which aux that is depends on the switcher and is set on the panel’s LCD.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -1755,10 +1761,10 @@
     },
     {
       "component_id": "ccu4.ch3.sensitivity",
-      "label": "CH3 \u00b7 Sensitivity",
+      "label": "CH3 · Sensitivity",
       "category": "CCU strip 3",
       "kind": "knob",
-      "purpose": "Defines the fine iris/gain range across joystick travel",
+      "purpose": "Sets how much of the iris range the joystick’s full travel covers. Tighten it when you want fine control around one exposure, widen it when you need to move a long way quickly.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -1772,10 +1778,10 @@
     },
     {
       "component_id": "ccu4.ch3.coarse",
-      "label": "CH3 \u00b7 Coarse",
+      "label": "CH3 · Coarse",
       "category": "CCU strip 3",
       "kind": "knob",
-      "purpose": "Defines the maximum iris/gain limit used with joystick travel",
+      "purpose": "Caps how far the iris can open, so an over-exposed picture cannot reach air. Set it by opening the iris fully, then bringing coarse down until exposure is right — from then on the joystick cannot go past that ceiling.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -1789,10 +1795,10 @@
     },
     {
       "component_id": "ccu4.ch3.iris-mb-active",
-      "label": "CH3 \u00b7 Iris / MB active",
+      "label": "CH3 · Iris / MB active",
       "category": "CCU strip 3",
       "kind": "button",
-      "purpose": "Locks or unlocks joystick iris and master-black changes",
+      "purpose": "Locks the joystick’s iris and master black so neither can be nudged by accident during a show. Master black can also be disabled globally from the panel’s LCD settings.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -1806,10 +1812,10 @@
     },
     {
       "component_id": "ccu4.ch3.auto-iris",
-      "label": "CH3 \u00b7 Auto iris",
+      "label": "CH3 · Auto iris",
       "category": "CCU strip 3",
       "kind": "button",
-      "purpose": "Triggers automatic exposure on a compatible electronic-iris lens",
+      "purpose": "Runs an automatic exposure on a lens with electronic iris control. It is a starting point rather than a set-and-forget — it responds to whatever is in frame at the moment you press it.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -1823,10 +1829,10 @@
     },
     {
       "component_id": "ccu4.ch3.call",
-      "label": "CH3 \u00b7 Call",
+      "label": "CH3 · Call",
       "category": "CCU strip 3",
       "kind": "button",
-      "purpose": "Flashes tally / calls camera operator where supported",
+      "purpose": "Flashes the tally on this camera to get the operator’s attention, on cameras that support it. Useful for signalling before going live.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -1840,10 +1846,10 @@
     },
     {
       "component_id": "ccu4.ch3.panel-active",
-      "label": "CH3 \u00b7 Panel active",
+      "label": "CH3 · Panel active",
       "category": "CCU strip 3",
       "kind": "button",
-      "purpose": "Locks the CCU controls against accidental adjustment",
+      "purpose": "Locks this CCU’s controls so nothing can be changed by a knock or a sleeve. Worth using on any camera that is parked and correct.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -1857,10 +1863,10 @@
     },
     {
       "component_id": "ccu4.ch3.status",
-      "label": "CH3 \u00b7 Status indicators",
+      "label": "CH3 · Status indicators",
       "category": "CCU strip 3",
       "kind": "light",
-      "purpose": "Network/error/active indications",
+      "purpose": "Indicator for this strip, showing network, error and active states rather than anything about the picture.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -1874,10 +1880,10 @@
     },
     {
       "component_id": "ccu4.ch4.lcd",
-      "label": "CH4 \u00b7 LCD / soft controls",
+      "label": "CH4 · LCD / soft controls",
       "category": "CCU strip 4",
       "kind": "display",
-      "purpose": "Displays selected camera and menu settings",
+      "purpose": "Home screen for this CCU. It names the camera assigned to the strip and turns red when that camera is live. From here you reach the camera bank A/B switch, the recall-all toggle, the auxiliary output used for camera control, the master black enable, and the panel brightness.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -1891,10 +1897,10 @@
     },
     {
       "component_id": "ccu4.ch4.scene1",
-      "label": "CH4 \u00b7 Scene 1",
+      "label": "CH4 · Scene 1",
       "category": "CCU strip 4",
       "kind": "button",
-      "purpose": "Recall scene file 1",
+      "purpose": "Recalls scene file 1 for this camera — every stored setting at once: shutter, master gain, white balance, colour balance and bars. To write the slot instead, press STORE first, then this button. If recall-all is enabled on the LCD home screen, pressing this recalls each CCU’s own scene 1 on every camera at once, including the camera currently on air, so the manual advises enabling recall-all only for a planned setup and turning it straight off again.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -1908,10 +1914,10 @@
     },
     {
       "component_id": "ccu4.ch4.scene2",
-      "label": "CH4 \u00b7 Scene 2",
+      "label": "CH4 · Scene 2",
       "category": "CCU strip 4",
       "kind": "button",
-      "purpose": "Recall scene file 2",
+      "purpose": "Recalls scene file 2 for this camera — every stored setting at once: shutter, master gain, white balance, colour balance and bars. To write the slot instead, press STORE first, then this button. If recall-all is enabled on the LCD home screen, pressing this recalls each CCU’s own scene 2 on every camera at once, including the camera currently on air, so the manual advises enabling recall-all only for a planned setup and turning it straight off again.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -1925,10 +1931,10 @@
     },
     {
       "component_id": "ccu4.ch4.scene3",
-      "label": "CH4 \u00b7 Scene 3",
+      "label": "CH4 · Scene 3",
       "category": "CCU strip 4",
       "kind": "button",
-      "purpose": "Recall scene file 3",
+      "purpose": "Recalls scene file 3 for this camera — every stored setting at once: shutter, master gain, white balance, colour balance and bars. To write the slot instead, press STORE first, then this button. If recall-all is enabled on the LCD home screen, pressing this recalls each CCU’s own scene 3 on every camera at once, including the camera currently on air, so the manual advises enabling recall-all only for a planned setup and turning it straight off again.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -1942,10 +1948,10 @@
     },
     {
       "component_id": "ccu4.ch4.scene4",
-      "label": "CH4 \u00b7 Scene 4",
+      "label": "CH4 · Scene 4",
       "category": "CCU strip 4",
       "kind": "button",
-      "purpose": "Recall scene file 4",
+      "purpose": "Recalls scene file 4 for this camera — every stored setting at once: shutter, master gain, white balance, colour balance and bars. To write the slot instead, press STORE first, then this button. If recall-all is enabled on the LCD home screen, pressing this recalls each CCU’s own scene 4 on every camera at once, including the camera currently on air, so the manual advises enabling recall-all only for a planned setup and turning it straight off again.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -1959,10 +1965,10 @@
     },
     {
       "component_id": "ccu4.ch4.scene5",
-      "label": "CH4 \u00b7 Scene 5",
+      "label": "CH4 · Scene 5",
       "category": "CCU strip 4",
       "kind": "button",
-      "purpose": "Recall scene file 5",
+      "purpose": "Recalls scene file 5 for this camera — every stored setting at once: shutter, master gain, white balance, colour balance and bars. To write the slot instead, press STORE first, then this button. If recall-all is enabled on the LCD home screen, pressing this recalls each CCU’s own scene 5 on every camera at once, including the camera currently on air, so the manual advises enabling recall-all only for a planned setup and turning it straight off again.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -1976,10 +1982,10 @@
     },
     {
       "component_id": "ccu4.ch4.store",
-      "label": "CH4 \u00b7 Store scene",
+      "label": "CH4 · Store scene",
       "category": "CCU strip 4",
       "kind": "button",
-      "purpose": "Store current camera parameters to a scene slot",
+      "purpose": "Arms a scene-file save. Press STORE and it lights red to show the panel is waiting, then press one of the five numbered buttons to write every current setting for this camera into that slot.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -1993,11 +1999,11 @@
     },
     {
       "component_id": "ccu4.ch4.nd",
-      "label": "CH4 \u00b7 ND filter",
+      "label": "CH4 · ND filter",
       "category": "CCU strip 4",
       "kind": "control",
-      "purpose": "Select electronic ND on compatible cameras",
-      "confidence": "Documented",
+      "purpose": "Marked on the panel, but the cited manual states the ND setting \"will be enabled in a future update\". Whether current panel firmware implements it has not been verified here, so treat the control as unproven rather than assuming it drives the camera.",
+      "confidence": "Unknown",
       "geometry_status": "photo_approximation",
       "source_ids": [
         "blackmagic-manual",
@@ -2010,11 +2016,11 @@
     },
     {
       "component_id": "ccu4.ch4.cc",
-      "label": "CH4 \u00b7 Color correction",
+      "label": "CH4 · Color correction",
       "category": "CCU strip 4",
       "kind": "control",
-      "purpose": "Access color correction controls",
-      "confidence": "Documented",
+      "purpose": "Marked on the panel, but the cited manual states the CC setting \"will be enabled in a future update\". Whether current panel firmware implements it has not been verified here.",
+      "confidence": "Unknown",
       "geometry_status": "photo_approximation",
       "source_ids": [
         "blackmagic-manual",
@@ -2027,10 +2033,10 @@
     },
     {
       "component_id": "ccu4.ch4.gain",
-      "label": "CH4 \u00b7 Master gain",
+      "label": "CH4 · Master gain",
       "category": "CCU strip 4",
       "kind": "control",
-      "purpose": "Adjust camera sensor gain",
+      "purpose": "Master gain for this camera, stepped by the up and down arrows. Raising it buys exposure in dim light at the cost of electronic noise, which becomes obvious at the top of the range. The down arrow lights when gain is negative and the up arrow lights when it is positive, so the lit arrow tells you which side of zero you are on at a glance.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -2044,10 +2050,10 @@
     },
     {
       "component_id": "ccu4.ch4.shutter",
-      "label": "CH4 \u00b7 Shutter",
+      "label": "CH4 · Shutter",
       "category": "CCU strip 4",
       "kind": "control",
-      "purpose": "Adjust shutter setting",
+      "purpose": "Shutter speed for this camera. Slower shutter brightens the picture by exposing the sensor for longer, which is usually a better first move than adding gain because it adds no noise, and it is also how you kill flicker under mains-frequency lighting. Faster shutter cuts motion blur for sharp action, at the cost of light.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -2061,10 +2067,10 @@
     },
     {
       "component_id": "ccu4.ch4.wb",
-      "label": "CH4 \u00b7 White balance",
+      "label": "CH4 · White balance",
       "category": "CCU strip 4",
       "kind": "control",
-      "purpose": "Adjust / trigger white balance",
+      "purpose": "White balance for this camera. Light sources are warm or cool, and this shifts colour temperature to compensate so that whites stay white rather than drifting orange under tungsten or blue under daylight.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -2078,10 +2084,10 @@
     },
     {
       "component_id": "ccu4.ch4.bars",
-      "label": "CH4 \u00b7 Color bars",
+      "label": "CH4 · Color bars",
       "category": "CCU strip 4",
       "kind": "button",
-      "purpose": "Enable or disable color bars",
+      "purpose": "Enables or disables colour bars on this camera’s output. Bars are a line-up reference; anything sending bars is not sending a picture, so check what is on air before pressing it.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -2095,10 +2101,10 @@
     },
     {
       "component_id": "ccu4.ch4.rel",
-      "label": "CH4 \u00b7 Relative iris mode",
+      "label": "CH4 · Relative iris mode",
       "category": "CCU strip 4",
       "kind": "button",
-      "purpose": "Use relative iris control behavior",
+      "purpose": "Relative and absolute describe how the panel resyncs when a setting is changed somewhere else, such as in ATEM Software Control. In relative mode the panel eases back into sync as you make your next adjustment, so the change is almost invisible. In absolute mode the value snaps to wherever the physical control is sitting the moment you touch it, which is abrupt and can be ugly on air. Decide which mode you are in before the show rather than during it. The cited manual describes the ON button as cycling between the two modes.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -2112,10 +2118,10 @@
     },
     {
       "component_id": "ccu4.ch4.abs",
-      "label": "CH4 \u00b7 Absolute iris mode",
+      "label": "CH4 · Absolute iris mode",
       "category": "CCU strip 4",
       "kind": "button",
-      "purpose": "Use absolute iris control behavior",
+      "purpose": "Relative and absolute describe how the panel resyncs when a setting is changed somewhere else, such as in ATEM Software Control. In relative mode the panel eases back into sync as you make your next adjustment, so the change is almost invisible. In absolute mode the value snaps to wherever the physical control is sitting the moment you touch it, which is abrupt and can be ugly on air. Decide which mode you are in before the show rather than during it. The cited manual describes the ON button as cycling between the two modes.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -2129,10 +2135,10 @@
     },
     {
       "component_id": "ccu4.ch4.white-r",
-      "label": "CH4 \u00b7 White R",
+      "label": "CH4 · White R",
       "category": "CCU strip 4",
       "kind": "knob",
-      "purpose": "Adjust red in the white balance/color correction region",
+      "purpose": "Red content of the gain, meaning the highlights. Despite sitting near the white balance controls this is not white balance — it trims the red channel at the bright end of the picture.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -2146,10 +2152,10 @@
     },
     {
       "component_id": "ccu4.ch4.white-g",
-      "label": "CH4 \u00b7 White G",
+      "label": "CH4 · White G",
       "category": "CCU strip 4",
       "kind": "knob",
-      "purpose": "Adjust green in the white balance/color correction region",
+      "purpose": "Green content of the gain, meaning the highlights. This trims the green channel at the bright end of the picture, separately from white balance.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -2163,10 +2169,10 @@
     },
     {
       "component_id": "ccu4.ch4.white-b",
-      "label": "CH4 \u00b7 White B",
+      "label": "CH4 · White B",
       "category": "CCU strip 4",
       "kind": "knob",
-      "purpose": "Adjust blue in the white balance/color correction region",
+      "purpose": "Blue content of the gain, meaning the highlights. This trims the blue channel at the bright end of the picture, separately from white balance.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -2180,10 +2186,10 @@
     },
     {
       "component_id": "ccu4.ch4.black-r",
-      "label": "CH4 \u00b7 Black R",
+      "label": "CH4 · Black R",
       "category": "CCU strip 4",
       "kind": "knob",
-      "purpose": "Adjust red in the black balance region",
+      "purpose": "Red content of the lift, meaning the shadows. Use it to remove a colour cast from the darkest part of the picture without disturbing the highlights.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -2197,10 +2203,10 @@
     },
     {
       "component_id": "ccu4.ch4.black-g",
-      "label": "CH4 \u00b7 Black G",
+      "label": "CH4 · Black G",
       "category": "CCU strip 4",
       "kind": "knob",
-      "purpose": "Adjust green in the black balance region",
+      "purpose": "Green content of the lift, meaning the shadows. Use it to remove a colour cast from the darkest part of the picture without disturbing the highlights.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -2214,10 +2220,10 @@
     },
     {
       "component_id": "ccu4.ch4.black-b",
-      "label": "CH4 \u00b7 Black B",
+      "label": "CH4 · Black B",
       "category": "CCU strip 4",
       "kind": "knob",
-      "purpose": "Adjust blue in the black balance region",
+      "purpose": "Blue content of the lift, meaning the shadows. Use it to remove a colour cast from the darkest part of the picture without disturbing the highlights.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -2231,10 +2237,10 @@
     },
     {
       "component_id": "ccu4.ch4.flare",
-      "label": "CH4 \u00b7 Black / flare",
+      "label": "CH4 · Black / flare",
       "category": "CCU strip 4",
       "kind": "knob",
-      "purpose": "Adjust black/flare or gamma-related control",
+      "purpose": "Reaches the gamma, meaning the mid tones. Hold this button down and turn the black RGB knobs, and they trim the mid tones instead of the shadows — so the same three knobs cover two tonal regions depending on whether this button is held.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -2248,10 +2254,10 @@
     },
     {
       "component_id": "ccu4.ch4.custom",
-      "label": "CH4 \u00b7 Custom / Y gain",
+      "label": "CH4 · Custom / Y gain",
       "category": "CCU strip 4",
       "kind": "knob",
-      "purpose": "Custom control; manual documents Y gain in current implementation",
+      "purpose": "Currently assigned to Y gain, which raises or lowers overall luminance without moving the individual colour channels. The cited manual describes the knob as freely assignable in a future update, so its function may differ on current firmware.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -2265,10 +2271,10 @@
     },
     {
       "component_id": "ccu4.ch4.camera",
-      "label": "CH4 \u00b7 Camera number",
+      "label": "CH4 · Camera number",
       "category": "CCU strip 4",
       "kind": "display",
-      "purpose": "Shows the assigned camera; green off air and red on air",
+      "purpose": "The large camera number for this strip, readable across a gallery. It illuminates red when this camera is live on the program output — the fastest way to check you are not about to shade a camera that is on air.",
       "confidence": "Confirmed",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -2285,10 +2291,10 @@
     },
     {
       "component_id": "ccu4.ch4.joystick",
-      "label": "CH4 \u00b7 Iris / master black joystick",
+      "label": "CH4 · Iris / master black joystick",
       "category": "CCU strip 4",
       "kind": "joystick",
-      "purpose": "Move vertically for iris; rotate ring for master black/pedestal",
+      "purpose": "The main shading control. Lean it forward or back to open and close the iris, and turn the ring wheel beneath the knob to raise or lower master black, the pedestal. Pressing the joystick down switches this camera to the auxiliary output assigned to camera control, so you can look at it full screen before adjusting.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -2302,10 +2308,10 @@
     },
     {
       "component_id": "ccu4.ch4.preview",
-      "label": "CH4 \u00b7 Preview",
+      "label": "CH4 · Preview",
       "category": "CCU strip 4",
       "kind": "button",
-      "purpose": "Switch this camera to the configured auxiliary preview for camera control",
+      "purpose": "Sends this camera to the auxiliary output assigned to camera control, so the shot you are shading is the one you are looking at. Which aux that is depends on the switcher and is set on the panel’s LCD.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -2319,10 +2325,10 @@
     },
     {
       "component_id": "ccu4.ch4.sensitivity",
-      "label": "CH4 \u00b7 Sensitivity",
+      "label": "CH4 · Sensitivity",
       "category": "CCU strip 4",
       "kind": "knob",
-      "purpose": "Defines the fine iris/gain range across joystick travel",
+      "purpose": "Sets how much of the iris range the joystick’s full travel covers. Tighten it when you want fine control around one exposure, widen it when you need to move a long way quickly.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -2336,10 +2342,10 @@
     },
     {
       "component_id": "ccu4.ch4.coarse",
-      "label": "CH4 \u00b7 Coarse",
+      "label": "CH4 · Coarse",
       "category": "CCU strip 4",
       "kind": "knob",
-      "purpose": "Defines the maximum iris/gain limit used with joystick travel",
+      "purpose": "Caps how far the iris can open, so an over-exposed picture cannot reach air. Set it by opening the iris fully, then bringing coarse down until exposure is right — from then on the joystick cannot go past that ceiling.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -2353,10 +2359,10 @@
     },
     {
       "component_id": "ccu4.ch4.iris-mb-active",
-      "label": "CH4 \u00b7 Iris / MB active",
+      "label": "CH4 · Iris / MB active",
       "category": "CCU strip 4",
       "kind": "button",
-      "purpose": "Locks or unlocks joystick iris and master-black changes",
+      "purpose": "Locks the joystick’s iris and master black so neither can be nudged by accident during a show. Master black can also be disabled globally from the panel’s LCD settings.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -2370,10 +2376,10 @@
     },
     {
       "component_id": "ccu4.ch4.auto-iris",
-      "label": "CH4 \u00b7 Auto iris",
+      "label": "CH4 · Auto iris",
       "category": "CCU strip 4",
       "kind": "button",
-      "purpose": "Triggers automatic exposure on a compatible electronic-iris lens",
+      "purpose": "Runs an automatic exposure on a lens with electronic iris control. It is a starting point rather than a set-and-forget — it responds to whatever is in frame at the moment you press it.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -2387,10 +2393,10 @@
     },
     {
       "component_id": "ccu4.ch4.call",
-      "label": "CH4 \u00b7 Call",
+      "label": "CH4 · Call",
       "category": "CCU strip 4",
       "kind": "button",
-      "purpose": "Flashes tally / calls camera operator where supported",
+      "purpose": "Flashes the tally on this camera to get the operator’s attention, on cameras that support it. Useful for signalling before going live.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -2404,10 +2410,10 @@
     },
     {
       "component_id": "ccu4.ch4.panel-active",
-      "label": "CH4 \u00b7 Panel active",
+      "label": "CH4 · Panel active",
       "category": "CCU strip 4",
       "kind": "button",
-      "purpose": "Locks the CCU controls against accidental adjustment",
+      "purpose": "Locks this CCU’s controls so nothing can be changed by a knock or a sleeve. Worth using on any camera that is parked and correct.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
@@ -2421,10 +2427,10 @@
     },
     {
       "component_id": "ccu4.ch4.status",
-      "label": "CH4 \u00b7 Status indicators",
+      "label": "CH4 · Status indicators",
       "category": "CCU strip 4",
       "kind": "light",
-      "purpose": "Network/error/active indications",
+      "purpose": "Indicator for this strip, showing network, error and active states rather than anything about the picture.",
       "confidence": "Documented",
       "geometry_status": "photo_approximation",
       "source_ids": [
