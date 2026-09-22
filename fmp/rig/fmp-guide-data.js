@@ -1318,7 +1318,7 @@ export const catalog = {
     "direction": "Upper chassis rail",
     "use": "Locate the ON/OFF toggle on the upper chassis rail.",
     "check": "Coordinate a shutdown or restart with video control.",
-    "tip": "This guide identifies controls; it does not read or change the physical camera.",
+    "tip": "Coordinate with video control before switching a camera off: the switcher keeps showing that input, so the output goes to black rather than to another source.",
     "title": "Body ON / OFF switch",
     "purpose": "Switches camera power."
   },
@@ -1334,7 +1334,7 @@ export const catalog = {
     "direction": "Forward control panel",
     "use": "Choose the required function, then use the wheel immediately to its right.",
     "check": "MONITOR here means speaker volume, not screen brightness.",
-    "tip": "This guide identifies controls; it does not read or change the physical camera.",
+    "tip": "This three-position switch decides what the settings wheel next to it does — headphone level, monitor speaker level, or iris. Check it before turning the wheel, or you will change the wrong thing.",
     "title": "H PHONE / MONITOR / IRIS selector",
     "purpose": "Assigns the adjacent wheel to headphone audio, speaker audio or iris."
   },
@@ -1366,7 +1366,7 @@ export const catalog = {
     "direction": "Forward control panel",
     "use": "Press to select; turn to navigate.",
     "check": "Confirm which feed your monitor receives.",
-    "tip": "This guide identifies controls; it does not read or change the physical camera.",
+    "tip": "Press the wheel to open the head-up display on a connected monitor or viewfinder, turn to choose, press to confirm. The menu closes itself after a minute of inactivity.",
     "title": "MENU push/turn wheel",
     "purpose": "Navigates camera HUD settings on front SDI when status text is enabled."
   },
@@ -1382,7 +1382,7 @@ export const catalog = {
     "direction": "Forward control panel",
     "use": "Use beside MENU to back out of a selection.",
     "check": "Locate it beside MENU.",
-    "tip": "This guide identifies controls; it does not read or change the physical camera.",
+    "tip": "Steps up one menu level, and from the top level exits the menu entirely. It is also the cancel key while the menu wheel is active.",
     "title": "BACK button",
     "purpose": "Cancels a menu choice or returns one level."
   },
@@ -1414,7 +1414,7 @@ export const catalog = {
     "direction": "Forward control panel",
     "use": "Use the left switch of the three exposure toggles; watch the gain readout.",
     "check": "Confirm the agreed gain with the shader.",
-    "tip": "This guide identifies controls; it does not read or change the physical camera.",
+    "tip": "Spring loaded: one push is one third of a stop, and the range runs —12 to 36 dB. Gain buys exposure and costs noise, so try shutter or iris first.",
     "title": "ISO / GAIN switch",
     "purpose": "Adjusts camera gain."
   },
@@ -1430,7 +1430,7 @@ export const catalog = {
     "direction": "Forward control panel",
     "use": "Use the center exposure toggle; watch the shutter readout.",
     "check": "Check the agreed setting before changing it.",
-    "tip": "This guide identifies controls; it does not read or change the physical camera.",
+    "tip": "Twelve presets between 1/24 and 1/2000; hold the switch to run through them quickly. The camera can also suggest flicker-free speeds for the local mains frequency, but only from the touchscreen menu.",
     "title": "SHUTTER switch",
     "purpose": "Steps through shutter presets."
   },
@@ -1446,7 +1446,7 @@ export const catalog = {
     "direction": "Forward control panel",
     "use": "Use the right exposure toggle; watch the white-balance readout.",
     "check": "Coordinate camera matching with the shader.",
-    "tip": "This guide identifies controls; it does not read or change the physical camera.",
+    "tip": "One push is 50K; hold to move faster. Warmer light needs a higher number. For a real match use the auto white balance button with a grey card rather than trimming by eye.",
     "title": "WHITE BAL switch",
     "purpose": "Adjusts white-balance color temperature."
   },
@@ -1478,7 +1478,7 @@ export const catalog = {
     "direction": "Forward control panel",
     "use": "Confirm its assignment before using the left F-key.",
     "check": "Read the actual assignment in Setup.",
-    "tip": "This guide identifies controls; it does not read or change the physical camera.",
+    "tip": "A function key, set from the camera setup menu. Out of the box F1 toggles focus zoom on the LCD and the front SDI output — so if it does something else, someone has reprogrammed it.",
     "title": "Body F1 button",
     "purpose": "Assignable function key."
   },
@@ -1494,7 +1494,7 @@ export const catalog = {
     "direction": "Forward control panel",
     "use": "Confirm its assignment before using the center F-key.",
     "check": "Read the actual assignment in Setup.",
-    "tip": "This guide identifies controls; it does not read or change the physical camera.",
+    "tip": "A function key, set from the camera setup menu. Out of the box F2 toggles false colour on the LCD, which is the quickest way to judge exposure on faces.",
     "title": "Body F2 button",
     "purpose": "Assignable function key."
   },
@@ -1510,7 +1510,7 @@ export const catalog = {
     "direction": "Forward control panel",
     "use": "Confirm the HFR assignment before using this button beside F2.",
     "check": "Confirm assignment and frame-rate plan before pressing.",
-    "tip": "This guide identifies controls; it does not read or change the physical camera.",
+    "tip": "Toggles between the project frame rate and the off-speed rate set in the frame rate menu. It cannot be changed while recording, and it can be reprogrammed as another function key or disabled entirely.",
     "title": "HFR button",
     "purpose": "Normally toggles off-speed recording; may be reassigned or disabled."
   },
@@ -1526,7 +1526,7 @@ export const catalog = {
     "direction": "Forward control panel",
     "use": "Use the red REC button at the bottom of the forward panel.",
     "check": "Confirm media and actual recording indication.",
-    "tip": "This guide identifies controls; it does not read or change the physical camera.",
+    "tip": "Starts and stops recording on the camera itself, independently of anything the switcher is doing. A camera can be live on Program and not recording, or recording and not live.",
     "title": "Body REC button",
     "purpose": "Starts or stops recording."
   },
@@ -1542,7 +1542,7 @@ export const catalog = {
     "direction": "Outside of the hinged LCD door",
     "use": "Use the forward settings wheel in MONITOR mode.",
     "check": "Distinguish this speaker from the intercom headset.",
-    "tip": "This guide identifies controls; it does not read or change the physical camera.",
+    "tip": "Sits where your ear goes when the camera is on the shoulder. It is for checking playback; it mutes itself while recording from the internal microphone so it cannot feed back.",
     "title": "Onboard monitor speaker",
     "purpose": "Plays monitored audio."
   },
@@ -1574,7 +1574,7 @@ export const catalog = {
     "direction": "Outside of the hinged LCD door",
     "use": "Locate the separate LOCK switch above the status LCD.",
     "check": "Check this separately from the forward-panel lock.",
-    "tip": "This guide identifies controls; it does not read or change the physical camera.",
+    "tip": "Locks the controls on this outer panel. The monitor channel select switches stay live even when it is locked, so you can still change what you are listening to.",
     "title": "LCD-door LOCK switch",
     "purpose": "Locks the outer panel, except channel selection."
   },
@@ -1590,7 +1590,7 @@ export const catalog = {
     "direction": "Outside of the hinged LCD door",
     "use": "Read the outer display with the LCD door closed.",
     "check": "Read actual camera values; this modeled display is illustrative.",
-    "tip": "This guide identifies controls; it does not read or change the physical camera.",
+    "tip": "Readable in daylight without opening the touchscreen: timecode, battery in 25% steps, frame rate, shutter angle, white balance, ISO, iris, audio meters and card state.",
     "title": "External status LCD",
     "purpose": "Displays camera settings, timecode, recording status and audio meters."
   },
@@ -1606,7 +1606,7 @@ export const catalog = {
     "direction": "Outside of the hinged LCD door",
     "use": "Identify the control before touching it on the working camera.",
     "check": "Use only when capture is required.",
-    "tip": "This guide identifies controls; it does not read or change the physical camera.",
+    "tip": "Captures a single uncompressed DNG into a stills folder on the recording media. The record indicator flashes three times to confirm, so you know it landed without opening the screen.",
     "title": "STILL button",
     "purpose": "Captures one DNG still to media."
   },
@@ -1622,7 +1622,7 @@ export const catalog = {
     "direction": "Outside of the hinged LCD door",
     "use": "Identify the control before touching it on the working camera.",
     "check": "Do not mistake the held display for stopped recording.",
-    "tip": "This guide identifies controls; it does not read or change the physical camera.",
+    "tip": "Freezes the displayed timecode while the clock keeps running underneath, so you can write down the moment something happened without stopping anything. Release and the display catches up.",
     "title": "HOLD button",
     "purpose": "Temporarily freezes the displayed free-running timecode, not its generator."
   },
@@ -1638,7 +1638,7 @@ export const catalog = {
     "direction": "Outside of the hinged LCD door",
     "use": "Identify the control before touching it on the working camera.",
     "check": "Confirm the timecode plan before using.",
-    "tip": "This guide identifies controls; it does not read or change the physical camera.",
+    "tip": "Zeroes the timecode while you are setting a preset. It only does something once the camera is in preset-timecode editing, which is a press and hold of the timecode button.",
     "title": "RESET button",
     "purpose": "Zeros timecode during preset-timecode editing."
   },
@@ -1654,7 +1654,7 @@ export const catalog = {
     "direction": "Outside of the hinged LCD door",
     "use": "Identify the control before touching it on the working camera.",
     "check": "Avoid long-press setup changes during the show.",
-    "tip": "This guide identifies controls; it does not read or change the physical camera.",
+    "tip": "A press switches the big display between clip duration and timecode. Hold it five seconds and the camera moves to record-run timecode for editing a preset; press timecode and hold together for three seconds to go back to free-running time of day.",
     "title": "TIMECODE button",
     "purpose": "Switches the main readout between timecode and clip duration."
   },
@@ -1670,7 +1670,7 @@ export const catalog = {
     "direction": "Outside of the hinged LCD door",
     "use": "Use BRIGHT at the right end of the row below the status LCD.",
     "check": "This does not change the camera’s exposure.",
-    "tip": "This guide identifies controls; it does not read or change the physical camera.",
+    "tip": "Cycles the status LCD through off, low, medium and high. Off is genuinely off, which is what you want on a camera sitting in a dark house.",
     "title": "BRIGHT button",
     "purpose": "Cycles status-LCD backlight: off, low, medium, high."
   },
@@ -1686,7 +1686,7 @@ export const catalog = {
     "direction": "Outside of the hinged LCD door",
     "use": "Identify the control before touching it on the working camera.",
     "check": "Coordinate with the shader before using.",
-    "tip": "This guide identifies controls; it does not read or change the physical camera.",
+    "tip": "One press sets an automatic exposure on a compatible lens. In video dynamic range it averages across highlights and shadows; in film dynamic range it exposes for the brightest highlight instead, which is a different picture.",
     "title": "IRIS button",
     "purpose": "Requests automatic iris on compatible lenses."
   },
@@ -1702,7 +1702,7 @@ export const catalog = {
     "direction": "Outside of the hinged LCD door",
     "use": "Identify the control before touching it on the working camera.",
     "check": "The modeled mechanical twist-focus arrangement does not establish autofocus capability.",
-    "tip": "This guide identifies controls; it does not read or change the physical camera.",
+    "tip": "One press runs autofocus on a B4 or EF lens that supports it, and a white square shows what it focused on. A B4 lens needs its servo focus switched on first, or the button does nothing.",
     "title": "FOCUS button",
     "purpose": "Requests autofocus with a compatible lens and active focus servo."
   },
@@ -1734,7 +1734,7 @@ export const catalog = {
     "direction": "Outside of the hinged LCD door",
     "use": "Identify the control before touching it on the working camera.",
     "check": "Confirm operating mode before touching transport controls.",
-    "tip": "This guide identifies controls; it does not read or change the physical camera.",
+    "tip": "Skips back a clip in playback. With the iris button, the skip buttons also set aperture manually on a compatible lens.",
     "title": "Previous clip button",
     "purpose": "Playback: previous clip."
   },
@@ -1750,7 +1750,7 @@ export const catalog = {
     "direction": "Outside of the hinged LCD door",
     "use": "Identify the control before touching it on the working camera.",
     "check": "Coordinate playback with video control.",
-    "tip": "This guide identifies controls; it does not read or change the physical camera.",
+    "tip": "Plays and pauses the recorded clip on the camera, for checking a take without pulling the media. It does not affect what the switcher is sending to air.",
     "title": "Play / pause button",
     "purpose": "Starts or pauses clip playback."
   },
@@ -1766,7 +1766,7 @@ export const catalog = {
     "direction": "Outside of the hinged LCD door",
     "use": "Identify the control before touching it on the working camera.",
     "check": "Confirm operating mode before touching transport controls.",
-    "tip": "This guide identifies controls; it does not read or change the physical camera.",
+    "tip": "Skips forward a clip in playback. With the iris button, the skip buttons also set aperture manually on a compatible lens.",
     "title": "Next clip button",
     "purpose": "Playback: next clip."
   },
@@ -1782,7 +1782,7 @@ export const catalog = {
     "direction": "Outside of the hinged LCD door",
     "use": "Identify the control before touching it on the working camera.",
     "check": "Watch the matching meter; verify the source.",
-    "tip": "This guide identifies controls; it does not read or change the physical camera.",
+    "tip": "Sets the level for audio channel 1. The CH1/3 marking is the channel pairing, not a range — check which pair the panel is showing before you trim.",
     "title": "Audio channel 1 level · CH1/3 marking",
     "purpose": "Adjusts channel 1 recording level."
   },
@@ -1798,7 +1798,7 @@ export const catalog = {
     "direction": "Outside of the hinged LCD door",
     "use": "Identify the control before touching it on the working camera.",
     "check": "Watch the matching meter; verify the source.",
-    "tip": "This guide identifies controls; it does not read or change the physical camera.",
+    "tip": "Sets the level for audio channel 2. The CH2/4 marking is the channel pairing, not a range — check which pair the panel is showing before you trim.",
     "title": "Audio channel 2 level · CH2/4 marking",
     "purpose": "Adjusts channel 2 recording level."
   }

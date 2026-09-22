@@ -1,5 +1,31 @@
 # Changelog
 
+## 2026-09-22 — 26 rig controls get a real tip
+
+- 26 of the 112 rig components carried the same sentence in their `tip` slot:
+  *"This guide identifies controls; it does not read or change the physical
+  camera."* True, but a page-level caveat occupying the one field meant to teach
+  something — on all eleven forward-panel controls and all fifteen LCD-door
+  controls.
+- Those components **already cited the right document**: the URSA Broadcast G2
+  manual at pages 60–68. The citation was correct; only the text was missing.
+  Every new tip comes from those pages.
+- What an operator now gets: the settings wheel does nothing predictable until
+  you check the three-position selector beside it; the ISO switch moves in
+  thirds of a stop across −12 to 36 dB; F1 and F2 default to focus zoom and
+  false colour, so if they do something else somebody reprogrammed them; HFR
+  cannot be changed while recording; the LCD-door lock leaves the monitor
+  channel switches live; HOLD freezes the displayed timecode while the clock
+  keeps running underneath; IRIS exposes for average in video dynamic range but
+  for the brightest highlight in film; FOCUS does nothing on a B4 lens whose
+  servo is off.
+- The caveat those tips carried **now appears once**, as a standing note in the
+  detail panel — it was stated nowhere else on the page.
+- `rig-model.js` wrote `item[key]` straight into `textContent` for six fields
+  with no fallback, so a missing field would have rendered the word
+  `undefined`. Guarded, the same way the ATEM renderer was.
+- Unique tips rise from 80 to 105 of 112; average length 92 → 113 characters.
+
 ## 2026-09-22 — No equipment description is thin any more
 
 - 42 components were still under sixty characters after the manual passes —
