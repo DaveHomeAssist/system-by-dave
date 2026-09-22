@@ -51,6 +51,20 @@ function originFor(file) {
   return site && site.cutover ? `https://${site.domain}` : SOURCE_ORIGIN;
 }
 
+// The paths that count as a page's own site home. On systembydave.com that is the
+// origin root; on a cut-over site it is also that site's declared home, because the
+// reader is inside that site, not the publisher's. Gates read this instead of
+// hard-coding a domain or assuming every site's home is /.
+function homePathsFor(file) {
+  const site = siteFor(file);
+  const paths = ['/', '/index.html'];
+  if (site && site.cutover && site.home) {
+    paths.push(site.home);
+    if (site.home.endsWith('/')) paths.push(`${site.home}index.html`);
+  }
+  return paths;
+}
+
 const sitemaps = new Map();
 
 function siteSitemap(siteId) {
@@ -77,4 +91,4 @@ function cutoverSites() {
   return config.sites.filter((site) => site.cutover);
 }
 
-module.exports = { SOURCE_ORIGIN, siteFor, originFor, sitemapFor, siteSitemap, cutoverSites };
+module.exports = { SOURCE_ORIGIN, siteFor, originFor, homePathsFor, sitemapFor, siteSitemap, cutoverSites };

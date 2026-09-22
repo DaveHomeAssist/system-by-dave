@@ -1,5 +1,29 @@
 # Changelog
 
+## 2026-09-22 — Home is the site you are on
+
+- A public page's home cue is now its own site's home. On systembydave.com that
+  is still `/`. On a site in `scripts/domain-sites.json` that has cut over it is
+  that site's declared `home`, because the reader on housevideo.app is inside
+  that operating surface, not the publisher's. A page that is its site's home
+  satisfies the cue by being it.
+- `homePathsFor` in `scripts/domain_sites_lib.js` derives those paths from the
+  declared home, so the navigation gate reads the canonical site list instead of
+  assuming every site's home is `/`. A System by Dave link still counts as home
+  and is still absolute where it appears; it is no longer required.
+- This unblocks the FMP suite, which deliberately struck its publisher branding
+  in fmp-suite `338cf27`. That branding carried the only link the old rule
+  accepted, so every FMP page failed the navigation gate and two consecutive
+  Pages deploys published nothing. FMP pages now satisfy home through `/fmp/`,
+  which is both their parent and housevideo.app's declared home.
+- The gate is not looser elsewhere: a page that links neither its site home nor
+  System by Dave still fails, and systembydave.com pages are unchanged.
+- Documented the FMP equipment catalog evidence vocabulary and enforced it in
+  `scripts/fmp_model_contract.js`, which already runs inside `verify:fmp`. A
+  release now fails when a catalog omits its identity fields, repeats a
+  `component_id`, uses a confidence or geometry value outside the documented
+  set, cites an undeclared source, or states evidence without citing one.
+
 ## 2026-09-22 — FMP evidence fixes, publisher branding struck, walk retired
 
 - Fix the evidence diagrams: three stroked SVG curves had no fill, so the browser

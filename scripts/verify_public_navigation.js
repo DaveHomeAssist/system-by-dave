@@ -4,7 +4,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
-const { originFor } = require('./domain_sites_lib');
+const { originFor, homePathsFor } = require('./domain_sites_lib');
 
 const ROOT = path.resolve(__dirname, '..');
 const SKIP_DIRS = new Set(['.git', 'node_modules']);
@@ -169,7 +169,8 @@ function attribute(tag, name) {
 
 function fmpShellGaps(file, source) {
   // Resolve links from the page's own origin: housevideo.app once that site has
-  // cut over (scripts/domain-sites.json). Home may be that site's / or System by Dave.
+  // cut over (scripts/domain-sites.json). Home is that site's declared home, which
+  // for housevideo.app is /fmp/; a System by Dave link still counts but is not required.
   const origin = originFor(file.split(path.sep).join('/'));
   const pageUrl = new URL(routeFor(file), origin);
   const baseTag = source.match(/<base\s[^>]*>/i)?.[0];
@@ -180,7 +181,12 @@ function fmpShellGaps(file, source) {
     .map((href) => new URL(href, baseUrl));
   const isPath = (url, paths, origins = [origin]) => origins.includes(url.origin) && paths.includes(url.pathname);
   const gaps = [];
-  if (!links.some((url) => isPath(url, ['/', '/index.html'], [origin, SITE_ORIGIN]))) gaps.push('no home link');
+  const homePaths = homePathsFor(file.split(path.sep).join('/'));
+  // The site's own home page is home; it does not link to itself to prove it.
+  const atSiteHome = homePaths.includes(pageUrl.pathname);
+  const linksHome = links.some((url) => isPath(url, homePaths))
+    || links.some((url) => isPath(url, ['/', '/index.html'], [SITE_ORIGIN]));
+  if (!atSiteHome && !linksHome) gaps.push('no home link');
   if (file !== FMP_HUB && !links.some((url) => isPath(url, ['/fmp/', '/fmp/index.html'], [origin, originFor(FMP_HUB)]))) gaps.push('no /fmp/ parent link');
 
   const firstFocusable = body.match(/<(?:a\s[^>]*\bhref=[^>]*|button\b[^>]*|select\b[^>]*|textarea\b[^>]*|summary\b[^>]*|input\b(?![^>]*\btype=["']?hidden)[^>]*|[a-z][a-z0-9-]*\s[^>]*\btabindex=["']?(?:0|[1-9])[^>]*)>/i)?.[0] || '';
