@@ -109,6 +109,10 @@
   var BASE_ASSETS=[
     './av-suite.html',
     './av-suite-worker.js',
+    './css/av-suite.css',
+    './js/av-suite/theme-bootstrap.js',
+    './js/av-suite/modal-controller.js',
+    './js/av-suite/app.js',
     './js/sbd-registry.js',
     './js/av-suite-context.js',
     './js/sbd-nav.js',
