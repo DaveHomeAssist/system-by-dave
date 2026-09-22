@@ -1,7 +1,7 @@
 {
   "schema": "fmp.public.release.v2",
   "sourceRepository": "DaveHomeAssist/fmp-suite",
-  "sourceCommit": "e4f42fa3dde05b55dc93450e2d52603b5b161d59",
+  "sourceCommit": "8b2660cee7f7a24a83b7fd2e4cbc987a62b09e39",
   "mode": "commissioning",
   "files": {
     "build/index.html": "35f8767687a1d26a8c10e9fc02188e73b4cf5fb08d03cc990096b93424aa7f42",
@@ -40,13 +40,13 @@
     "models/assets/bench-core.js": "e7238715e7d9e01001e66fe8be39da225215d1d2507ea91adc608a9b0059a051",
     "models/assets/bench.css": "4cd070722501ba646c9baac35eae8073b56c99e52e887efb29407c650c1732de",
     "models/assets/ccu4-0.js": "ae7150841b80dfe32d0a27c1b99a6286f1908fd82cfad1d625921a3ea93cbf6c",
-    "models/assets/ccu4-catalog.json": "2543446df230f0cb17d86c2b4959ae2324daf1624ac124dfcd53bc7b904b8743",
+    "models/assets/ccu4-catalog.json": "473ae898a06575db8d57c0dedb57e60a6fc4810dad63a3a6efb6d6a3e4bde851",
     "models/assets/model-shell.css": "39867f17582ca32d4aa49d1aa14835ba6890be73811471a03d546eafcb063a7c",
     "models/assets/model-shell.js": "74b43475c2654acbe70dfd9c386ae3dc627df32c73aa4259d100f5079cf1a15f",
     "models/assets/p240-0.js": "81f389c0cdce6ded049ad60bc504babe823505414fdbbf3b7c747c75c0d4bd59",
     "models/assets/p240-catalog.json": "5cc8320de83df6e1e41e1746c1e3bc659b11d04e642ffd4e62c8e04c602711a4",
     "models/atem-hd8-iso.html": "b0e88e0f6817c8f80d5880b42223a5af76f2885af423ced07c22a847ff328168",
-    "models/ccu4.html": "128c9c7d3de08b5433acc86d7f59615604378d5dcd5d0aacae9bc1e1a23db7bc",
+    "models/ccu4.html": "26aff06a2f4fbc808b20104c476fe03e14086109cb62821eb4f591a4df9222a9",
     "models/p240.html": "85354cd4b56bd4d07a182348c4646a9ed377fd56fa136dc1571487754bb0eead",
     "models/vendor/LICENSE": "852e0e8699169bf9f6fdc6bda3e682d078dcbc738b5d33e74df594721bff271d",
     "models/vendor/three.min.js": "7687c4e7cc48b735e25ccf9d838a190d88d58509764f222148345bf24cc4fdc8",
@@ -83,5 +83,5 @@
     "rig/vendor/three/three.module.js": "a476b88d0df406dca0e30c65b4cdf0180c7337110accec828c103655b56a361c",
     "theme.js": "34276e275d44d4380407b996455291bfcca9cc4a9a4ef81b632534b00fc1747a"
   },
-  "artifactSha256": "78152e866365af4a89ca1b5577d1d839be64b39238c460ccc9affbb3e5bb7196"
+  "artifactSha256": "42e0638cebb2ccd55f3728e3a1143f16bd8ad21994d849cd3f132e7a84fb3391"
 }

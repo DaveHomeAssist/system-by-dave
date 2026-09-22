@@ -1,5 +1,37 @@
 # Changelog
 
+## 2026-09-22 — The CCU panel is written from its manual
+
+- The CCU4 catalog described 140 controls in fragments: "Recall scene file 1",
+  "Adjust shutter setting", "Access color correction controls". They name the
+  control without teaching anything.
+- It already cited a Blackmagic manual, but the locator recorded no edition.
+  The June 2026 Television Studio manual has **dropped the hardware camera
+  control panel chapter**; the June 2020 Switchers manual still carries it at
+  pp. 178–190. The source now records that, and why it matters: anything that
+  edition marks "enabled in a future update" is six years old.
+- **ND and CC are exactly that.** The manual states both "will be enabled in a
+  future update", while the catalog asserted they select electronic ND and open
+  colour correction. Both drop to `Unknown` on all four strips.
+- **Two descriptions were misleading, not merely thin.** The white RGB knobs
+  were called "white balance/color correction" when they trim red, green and
+  blue in the *gain* — the highlights — and have nothing to do with white
+  balance. The black RGB knobs trim the *lift*, the shadows. The flare button
+  reaches the *gamma*, the mid tones, by being held while those same black knobs
+  are turned, which the old text never explained.
+- Scene files now carry the store-then-number workflow and the recall-all
+  warning: it fires every CCU's own scene on every camera at once, including the
+  camera on air.
+- Relative and absolute control now explain what they protect against — a value
+  snapping harshly when it was changed elsewhere — rather than restating their
+  own names.
+- Shutter, gain, coarse and the joystick now say what an operator needs: slower
+  shutter brightens without adding noise and kills mains flicker, faster shutter
+  cuts motion blur; gain buys exposure and costs noise; coarse caps the iris so
+  an over-exposed picture cannot reach air.
+- 132 of 140 purposes rewritten; average length 35 → 245 characters. The unique
+  string count stays at 40 because the four strips are identical hardware.
+
 ## 2026-09-22 — The ATEM panel is grounded in the operator manual
 
 - The catalog cited three Blackmagic web pages — techspecs, gettingstarted and
