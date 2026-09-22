@@ -18,7 +18,7 @@ function read(rel) {
 
 function walk(dir, out = []) {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-    if (entry.name === '.git' || entry.name === 'node_modules') continue;
+    if (entry.name === '.git' || entry.name === 'node_modules' || entry.name === '_hat-in-ring-src') continue;
     const absolute = path.join(dir, entry.name);
     if (entry.isDirectory()) walk(absolute, out);
     else if (entry.isFile() && entry.name.endsWith('.html')) {
