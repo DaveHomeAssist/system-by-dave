@@ -1,0 +1,680 @@
+
+/* ============================================================
+   AV BY DAVE — SHOW OPERATIONS CONSOLE (app-shell rebuild)
+   Plan it. Patch it. Run the show.
+   Blueprint/registration-mark industrial console. Five palettes on one
+   shell: SBD Paper/Stage Slate (mapped onto the shared --av-* tokens from
+   css/av-theme.css so they stay pixel-consistent with the other 40+ AV
+   tool pages), Industry/Industry Dark (page-local skins, system sans —
+   no external fonts), and Borland DOS (page-local retro TUI skin).
+   Tool data comes from js/sbd-registry.js (single source of truth) at
+   runtime — nothing about a tool is hardcoded here.
+   ============================================================ */
+
+/* ---- Fonts (self-embedded, offline-safe — required by CSP font-src 'self') ---- */
+@font-face{font-family:'DM Serif Display';font-style:normal;font-weight:400;font-display:swap;src:url(../fonts/dm-serif-display.woff2) format('woff2')}
+@font-face{font-family:'DM Serif Display';font-style:italic;font-weight:400;font-display:swap;src:url(../fonts/dm-serif-display-italic.woff2) format('woff2')}
+@font-face{font-family:'DM Sans';font-style:normal;font-weight:300;font-display:swap;src:url(../fonts/dm-sans.woff2) format('woff2')}
+@font-face{font-family:'DM Sans';font-style:normal;font-weight:400;font-display:swap;src:url(../fonts/dm-sans.woff2) format('woff2')}
+@font-face{font-family:'DM Sans';font-style:normal;font-weight:500;font-display:swap;src:url(../fonts/dm-sans.woff2) format('woff2')}
+@font-face{font-family:'DM Sans';font-style:normal;font-weight:700;font-display:swap;src:url(../fonts/dm-sans.woff2) format('woff2')}
+@font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:400;font-display:swap;src:url(../fonts/jetbrains-mono.woff2) format('woff2')}
+@font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:500;font-display:swap;src:url(../fonts/jetbrains-mono.woff2) format('woff2')}
+@font-face{font-family:'JetBrains Mono';font-style:normal;font-weight:700;font-display:swap;src:url(../fonts/jetbrains-mono.woff2) format('woff2')}
+
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;overflow:hidden}
+body{background:#0c1016;display:flex;flex-direction:column}
+noscript{display:block}
+
+/* ---- shared global site header (css/sbd-public-nav.css), compacted for
+   the console app shell and re-skinned onto the shared --av-* tokens so
+   it follows the site-wide Paper / Stage Slate mode ---- */
+.sbd-site-header{flex:none;position:static;background:var(--av-surface,rgba(10,13,20,.88));color:var(--av-text,#f3f4f7);border-bottom:1px solid var(--av-line,rgba(255,255,255,.09));-webkit-backdrop-filter:none;backdrop-filter:none}
+.sbd-site-header__inner{width:100%;min-height:40px;padding:0 16px}
+.sbd-site-brand{min-height:36px}
+.sbd-site-brand__mark{width:24px;height:24px;border-color:var(--av-line-strong,rgba(255,255,255,.34));color:var(--av-accent,#e08a4f)}
+.sbd-site-links a{color:var(--av-muted,inherit)}
+.sbd-site-links a:hover,.sbd-site-links a[aria-current="page"]{background:var(--av-accent-soft,rgba(224,138,79,.16));color:var(--av-accent-strong,#e08a4f)}
+.sbd-site-brand:focus-visible,.sbd-site-links a:focus-visible{outline-color:var(--av-accent,#e08a4f)}
+img,svg{display:block}
+::selection{background:var(--c-accent-line,rgba(158,67,43,.3))}
+
+/* ============================================================
+   THEME TOKENS — five palettes, one variable surface
+   ============================================================ */
+#avApp{
+  --f-label:'JetBrains Mono',ui-monospace,'SFMono-Regular',Menlo,monospace;
+  --w-semi:600;--w-bold:700;
+}
+/* Paper (light) + Stage Slate (dark): consume the SHARED --av-* tokens
+   from css/av-theme.css directly (no duplicated hex values) so this
+   console stays pixel-consistent with the other 40+ AV tool pages. Those
+   tokens already resolve per html[data-av-theme], so one mapping block
+   covers both palettes correctly. */
+#avApp[data-theme="paper"],#avApp[data-theme="slate"]{
+  --font-body:'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
+  --f-head:'DM Serif Display',Georgia,'Times New Roman',serif;
+  --w-semi:400;--w-bold:400; /* DM Serif Display ships weight 400 only — never synthesize bold */
+  --c-bg:var(--av-bg);--c-surface:var(--av-surface);--c-surface-2:var(--av-surface-2);--c-surface-3:var(--av-surface-3);--c-raised:var(--av-raised);
+  --c-neutral-100:var(--av-surface-2);--c-neutral-200:var(--av-surface-3);--c-neutral-300:var(--av-line);--c-neutral-400:var(--av-line-strong);
+  --c-neutral-500:var(--av-dim);--c-neutral-600:var(--av-muted);--c-neutral-700:var(--av-text-2);--c-neutral-800:var(--av-text);--c-neutral-900:var(--av-text);
+  --c-text:var(--av-text);
+  --c-accent:var(--av-accent);--c-accent-100:var(--av-accent-soft);--c-accent-200:var(--av-accent-soft);--c-accent-300:var(--av-accent-strong);
+  --c-accent-400:var(--av-accent-strong);--c-accent-600:var(--av-accent-strong);--c-accent-700:var(--av-accent-strong);--c-accent-800:var(--av-accent-strong);--c-accent-900:var(--av-accent-strong);
+  --c-accent-line:var(--av-accent-line);
+  --st-ready:var(--av-success);--st-ready-tint:var(--av-success-soft);--st-ready-line:var(--av-success-line);
+  --st-issue:var(--av-danger);--st-issue-tint:var(--av-danger-soft);--st-issue-line:var(--av-danger-line);
+  --st-skip:var(--av-dim);--st-skip-tint:var(--av-surface-2);--st-skip-line:var(--av-line-strong);
+  --st-pin:var(--av-warning);--st-pin-tint:var(--av-warning-soft);--st-pin-line:var(--av-warning-line);
+  --st-ink:var(--av-primary-ink);
+  --c-shadow:var(--av-shadow);--c-shadow-pop:var(--av-shadow-pop);--c-overlay:var(--av-overlay);--c-grid:var(--av-grid);
+  --c-corner:var(--c-neutral-400);
+  color-scheme:var(--color-scheme,light);
+}
+/* Industry (light): the mockup's Industry theme lived in an external,
+   unrecoverable design-system stylesheet — this is a fresh, original
+   token set in the same shape, using a system sans stack (no Google
+   Fonts / external CDN allowed by this site's CSP). */
+#avApp[data-theme="ind"]{
+  --font-body:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  --f-head:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  --w-semi:600;--w-bold:700;
+  --c-bg:#f2f4f6;--c-surface:#ffffff;--c-surface-2:#f7f8fa;--c-surface-3:#eef1f4;--c-raised:#e4e8ec;
+  --c-neutral-100:#f7f8fa;--c-neutral-200:#eef1f4;--c-neutral-300:#dde2e7;--c-neutral-400:#c3cad1;
+  --c-neutral-500:#66727e;--c-neutral-600:#5b6672;--c-neutral-700:#3d4753;--c-neutral-800:#232931;--c-neutral-900:#14181c;
+  --c-text:#14181c;
+  --c-accent:#2f658d;--c-accent-100:#e7eef4;--c-accent-200:#d3e0ea;--c-accent-300:#5487ac;--c-accent-400:#3d75a0;
+  --c-accent-600:#255a80;--c-accent-700:#1d4a6a;--c-accent-800:#163a54;--c-accent-900:#102a3d;
+  --c-accent-line:rgba(47,101,141,.42);
+  --st-ready:#2e704e;--st-ready-tint:rgba(46,112,78,.10);--st-ready-line:rgba(46,112,78,.40);
+  --st-issue:#9a392d;--st-issue-tint:rgba(154,57,45,.10);--st-issue-line:rgba(154,57,45,.42);
+  --st-skip:#5b6672;--st-skip-tint:rgba(47,101,141,.08);--st-skip-line:#c3cad1;
+  --st-pin:#8a5a12;--st-pin-tint:rgba(138,90,18,.10);--st-pin-line:rgba(138,90,18,.40);
+  --st-ink:#ffffff;
+  --c-shadow:0 16px 50px -28px rgba(20,24,28,.28);--c-shadow-pop:0 28px 80px -26px rgba(20,24,28,.34);--c-overlay:rgba(20,24,28,.42);--c-grid:rgba(20,24,28,.045);
+  --c-corner:var(--c-neutral-400);
+  color-scheme:light;
+}
+/* Industry Dark: --color-* shape matches the design mockup's own tokens
+   for this theme verbatim; --st-* status colors were never specified by
+   the mockup (it silently fell back to a mono-accent default there) so
+   real semantic red/amber values are added here for usable contrast. */
+#avApp[data-theme="ind-dark"]{
+  --font-body:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  --f-head:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  --w-semi:600;--w-bold:700;
+  --c-bg:#14181c;--c-text:#e6e9ec;
+  --c-neutral-100:#1b2026;--c-neutral-200:#232931;--c-neutral-300:#2c333c;--c-neutral-400:#3d4753;
+  --c-neutral-500:#8794a2;--c-neutral-600:#94a0ad;--c-neutral-700:#b9c3cd;--c-neutral-800:#d4dae0;--c-neutral-900:#eef1f4;
+  --c-surface:#1b2026;--c-surface-2:#232931;--c-surface-3:#2c333c;--c-raised:#3d4753;
+  --c-accent:#7ba3cc;--c-accent-100:#1c2733;--c-accent-200:#243547;--c-accent-300:#9dbfe0;--c-accent-400:#8db4d9;--c-accent-600:#8fb6de;--c-accent-700:#a8c6e4;--c-accent-800:#c0d7ee;--c-accent-900:#d8e7f6;
+  --c-accent-line:rgba(123,163,204,.46);
+  --st-ready:#7ba3cc;--st-ready-tint:#1c2733;--st-ready-line:rgba(123,163,204,.46);
+  --st-issue:#e0a06f;--st-issue-tint:rgba(224,160,111,.14);--st-issue-line:rgba(224,160,111,.46);
+  --st-skip:#94a0ad;--st-skip-tint:transparent;--st-skip-line:#3d4753;
+  --st-pin:#e0c26f;--st-pin-tint:rgba(224,194,111,.13);--st-pin-line:rgba(224,194,111,.44);
+  --st-ink:#0c1016;
+  --c-shadow:0 18px 58px -30px rgba(0,0,0,.7);--c-shadow-pop:0 30px 88px -24px rgba(0,0,0,.78);--c-overlay:rgba(3,5,8,.6);--c-grid:rgba(255,255,255,.03);
+  --c-corner:#3d4753;
+  color-scheme:dark;
+}
+/* Borland DOS: original retro-TUI palette, verbatim shape from the design
+   mockup. System monospace fallback stack only — no font files added. */
+#avApp[data-theme="dos"]{
+  --font-body:"Fixedsys Excelsior 3.01","Perfect DOS VGA 437","Courier New",monospace;
+  --f-head:"Fixedsys Excelsior 3.01","Perfect DOS VGA 437","Courier New",monospace;
+  --f-label:"Fixedsys Excelsior 3.01","Perfect DOS VGA 437","Courier New",monospace;
+  --w-semi:700;--w-bold:700;
+  --c-bg:#0000A8;--c-text:#FFFFFF;
+  --c-neutral-100:#000080;--c-neutral-200:#000080;--c-neutral-300:#00AAAA;--c-neutral-400:#00AAAA;
+  --c-neutral-500:#A8A8A8;--c-neutral-600:#55FFFF;--c-neutral-700:#FFFFFF;--c-neutral-800:#FFFFFF;--c-neutral-900:#FFFFFF;
+  --c-surface:#000080;--c-surface-2:#000080;--c-surface-3:#00AAAA;--c-raised:#00AAAA;
+  --c-accent:#00AAAA;--c-accent-100:#000080;--c-accent-200:#00AAAA;--c-accent-300:#FFFF55;--c-accent-400:#00FFFF;--c-accent-600:#00FFFF;--c-accent-700:#FFFF55;--c-accent-800:#55FF55;--c-accent-900:#FF55FF;
+  --c-accent-line:#00AAAA;
+  --st-ready:#55FF55;--st-ready-tint:#000080;--st-ready-line:#55FF55;
+  --st-issue:#FF55FF;--st-issue-tint:#000080;--st-issue-line:#FF55FF;
+  --st-skip:#A8A8A8;--st-skip-tint:transparent;--st-skip-line:#A8A8A8;
+  --st-pin:#FFFF55;--st-pin-tint:#000080;--st-pin-line:#FFFF55;
+  --st-ink:#000000;
+  --border-tui:#00AAAA;--border-hi:#FFFFFF;--border-sh:#000000;--selection-bg:#00AAAA;--selection-text:#000000;
+  --c-shadow:none;--c-shadow-pop:none;--c-overlay:rgba(0,0,60,.7);--c-grid:transparent;
+  --c-corner:transparent;
+  color-scheme:dark;
+}
+
+/* ============================================================
+   APP SHELL
+   ============================================================ */
+#avApp{
+  flex:1 1 auto;min-width:0;width:100%;min-height:0;display:grid;grid-template-rows:auto 1fr;overflow:hidden;position:relative;
+  font-family:var(--font-body);color:var(--c-text);background:var(--c-bg);
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+}
+#avApp[data-theme="dos"]{-webkit-font-smoothing:none;text-rendering:optimizeSpeed}
+#avApp *{scrollbar-width:thin;scrollbar-color:var(--c-neutral-400) transparent}
+#avApp *::-webkit-scrollbar{width:9px;height:9px}
+#avApp *::-webkit-scrollbar-thumb{background:var(--c-neutral-400);border-radius:0}
+#avApp *::-webkit-scrollbar-track{background:transparent}
+#avApp a{color:var(--c-accent-700,var(--c-accent));text-decoration:none}
+#avApp a:hover{color:var(--c-accent-900,var(--c-accent))}
+#avApp h1,#avApp h2,#avApp h3{margin:0;font-weight:400}
+#avApp button,#avApp input,#avApp select,#avApp textarea{font:inherit;color:inherit}
+#avApp :where(button,a,input,select,textarea,[tabindex]):focus-visible{outline:2px solid var(--c-accent);outline-offset:2px}
+#avApp input,#avApp select,#avApp textarea{
+  width:100%;border:1px solid var(--c-neutral-400);border-radius:0;background:var(--c-surface);color:var(--c-text);
+  min-height:44px;padding:8px 10px;outline:none;font-weight:400;
+}
+#avApp input::placeholder,#avApp textarea::placeholder{color:var(--c-neutral-500)}
+#avApp input:focus,#avApp select:focus,#avApp textarea:focus{border-color:var(--c-accent);box-shadow:0 0 0 2px var(--c-accent-line)}
+#avApp select{appearance:none;cursor:pointer;
+  background-image:linear-gradient(45deg,transparent 50%,var(--c-neutral-600) 50%),linear-gradient(135deg,var(--c-neutral-600) 50%,transparent 50%);
+  background-position:calc(100% - 14px) 52%,calc(100% - 9px) 52%;background-size:5px 5px,5px 5px;background-repeat:no-repeat;padding-right:28px}
+#avApp textarea{resize:vertical;line-height:1.4}
+#avApp button{
+  border:1px solid var(--c-neutral-400);border-radius:0;background:var(--c-surface-2);color:var(--c-neutral-800,var(--c-text));
+  padding:8px 12px;cursor:pointer;font-weight:var(--w-semi);font-size:12.5px;letter-spacing:.01em;
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+}
+#avApp button:hover{background:var(--c-raised);border-color:var(--c-accent)}
+#avApp button:active{transform:translateY(1px)}
+#avApp button:disabled{opacity:.45;cursor:not-allowed;transform:none}
+#avApp button.primary{min-width:44px;min-height:44px;background:var(--c-accent);border-color:var(--c-accent);color:var(--st-ink);font-weight:var(--w-bold)}
+#avApp button.primary:hover{filter:brightness(1.08)}
+#avApp button.ghost{background:transparent}
+#avApp button.danger{border-color:var(--st-issue-line);color:var(--st-issue);background:var(--st-issue-tint)}
+#avApp button.small{padding:5px 9px;font-size:11px}
+#avApp svg.ic{width:15px;height:15px;flex:none;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+#avApp svg.ic.fill{fill:currentColor;stroke:none}
+/* the [hidden] attribute must always win over any explicit display value
+   this stylesheet sets on the same element (buttons, flex/grid containers,
+   etc.) — without this, several toggled elements (phase strip, help
+   badges, the toast's Undo button) would stay visually visible. */
+#avApp [hidden]{display:none!important}
+#avApp .visually-hidden{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+#avApp .kbd{font-family:var(--f-label);font-size:10px;border:1px solid var(--c-neutral-400);padding:1px 5px;color:var(--c-neutral-600)}
+
+/* blueprint corner registration marks */
+#avApp .bp{position:relative}
+#avApp .corner{position:absolute;width:8px;height:8px;pointer-events:none;color:var(--c-corner)}
+#avApp .corner.tl{top:-1px;left:-1px;border-top:1.5px solid currentColor;border-left:1.5px solid currentColor}
+#avApp .corner.tr{top:-1px;right:-1px;border-top:1.5px solid currentColor;border-right:1.5px solid currentColor}
+#avApp .corner.bl{bottom:-1px;left:-1px;border-bottom:1.5px solid currentColor;border-left:1.5px solid currentColor}
+#avApp .corner.br{bottom:-1px;right:-1px;border-bottom:1.5px solid currentColor;border-right:1.5px solid currentColor}
+#avApp[data-theme="dos"] .corner{display:none}
+
+/* status pill glyphs shared across cards */
+#avApp .stpill{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--c-neutral-300);padding:2px 7px;font-family:var(--f-label);font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--c-neutral-600)}
+#avApp .stpill.st-ready{border-color:var(--st-ready-line);color:var(--st-ready);background:var(--st-ready-tint)}
+#avApp .stpill.st-issue{border-color:var(--st-issue-line);color:var(--st-issue);background:var(--st-issue-tint)}
+#avApp .stpill.st-skipped{border-color:var(--st-skip-line);color:var(--st-skip);background:var(--st-skip-tint)}
+#avApp .stdot{width:7px;height:7px;flex:none;background:var(--c-neutral-400)}
+#avApp .stdot.st-ready{background:var(--st-ready)}
+#avApp .stdot.st-issue{background:var(--st-issue)}
+#avApp .stdot.st-skipped{background:var(--st-skip)}
+
+/* segmented controls */
+#avApp .seg{display:inline-flex;gap:0;border:1px solid var(--c-neutral-400)}
+#avApp .seg button{min-height:44px;border:0;border-radius:0;background:transparent;padding:6px 11px;font-family:var(--f-label);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--c-text)}
+#avApp .seg button+button{border-left:1px solid var(--c-neutral-400)}
+#avApp .seg button[aria-pressed="true"]{background:var(--c-accent);color:var(--st-ink)}
+#avApp[data-theme="dos"] .seg button[data-on="1"]{background:var(--selection-bg);color:var(--selection-text)}
+
+/* help-mode numbered legend badge */
+#avApp .hb{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border:1px solid var(--c-accent);color:var(--c-accent);font-family:var(--f-label);font-size:9px;font-weight:700}
+
+/* pin toggle button (used in rail rows, tool rows, all-tools cards, recs) */
+#avApp .pinbtn{display:grid;place-items:center;width:44px;height:44px;border:1px solid var(--c-neutral-400);background:transparent;color:var(--c-neutral-600);padding:0;flex:none}
+#avApp .pinbtn[aria-pressed="true"]{border-color:var(--st-pin-line);background:var(--st-pin-tint);color:var(--st-pin)}
+
+[data-mob]{display:none}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+#avApp [data-r="head"]{
+  display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:18px;height:54px;min-height:54px;
+  padding:0 16px;border-bottom:1.5px solid var(--c-text);position:relative;z-index:40;
+}
+#avApp .hd-left{display:flex;align-items:center;gap:12px;min-width:0}
+#avApp .hd-mark{flex:none;width:26px;height:26px;border:1.5px solid var(--c-text);display:grid;place-items:center;font-family:var(--f-head);font-weight:var(--w-bold);font-size:12px;color:var(--c-text)}
+#avApp .hd-word{font-family:var(--f-head);font-weight:var(--w-bold);font-size:16px;letter-spacing:.02em;text-transform:uppercase;color:var(--c-text);white-space:nowrap}
+#avApp .hd-ctx{display:flex;gap:0;border:1px solid var(--c-neutral-400);flex:none}
+#avApp .hd-ctx button{border:0;border-radius:0;background:transparent;padding:0 11px;min-width:44px;height:44px;display:flex;align-items:center;gap:6px;font-family:var(--f-label);font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--c-text)}
+#avApp .hd-ctx button+button{border-left:1px solid var(--c-neutral-400)}
+#avApp .hd-ctx button[aria-pressed="true"]{background:var(--c-accent);color:var(--st-ink)}
+#avApp [data-r="phases"]{display:flex;align-items:center;gap:10px;justify-self:center;min-width:0}
+#avApp .hd-phase-label{font-family:var(--f-label);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--c-neutral-600);flex:none}
+#avApp .hd-phase-strip{display:flex;gap:0;border:1px solid var(--c-neutral-400);flex:none}
+#avApp .hd-phase-strip button{border:0;border-radius:0;background:transparent;height:44px;min-width:44px;padding:0 11px;font-family:var(--f-label);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--c-text);white-space:nowrap}
+#avApp .hd-phase-strip button+button{border-left:1px solid var(--c-neutral-400)}
+#avApp .hd-phase-strip button[aria-pressed="true"]{background:var(--c-accent);color:var(--st-ink)}
+#avApp .hd-ctx-note{font-family:var(--f-label);font-size:11px;letter-spacing:.04em;color:var(--c-neutral-600);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#avApp .hd-right{display:flex;align-items:center;gap:8px;justify-self:end}
+#avApp .hd-icon-btn{min-width:44px;width:44px;height:44px;padding:0;border:1px solid var(--c-neutral-400);background:transparent}
+#avApp .hd-icon-btn.labeled{width:auto;padding:0 10px;gap:6px;font-family:var(--f-label);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase}
+#avApp .hd-cache{display:flex;align-items:center;gap:6px;padding-left:10px;margin-left:2px;border-left:1px solid var(--c-neutral-400);font-family:var(--f-label);font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--c-neutral-600);white-space:nowrap}
+#avApp .hd-cache i{width:7px;height:7px;background:var(--c-neutral-400);flex:none}
+#avApp .hd-cache[data-ready="true"] i{background:var(--st-ready)}
+#avApp .hd-cache[data-online="false"] i{background:var(--st-issue)}
+
+/* mobile family strip */
+#avApp [data-mob]{gap:6px;overflow-x:auto;padding:10px 12px;border-bottom:1px solid var(--c-neutral-300);background:var(--c-surface-2)}
+#avApp .mob-fam-btn{flex:none;height:28px;padding:0 12px;border:1px solid var(--c-neutral-400);background:transparent;font-family:var(--f-label);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
+#avApp .mob-fam-btn[aria-pressed="true"]{background:var(--c-accent);color:var(--st-ink)}
+
+/* ============================================================
+   BODY GRID — rail / main / aside
+   ============================================================ */
+#avApp [data-r="body"]{display:grid;grid-template-columns:238px minmax(0,1fr) 316px;min-width:0;min-height:0}
+#avApp [data-r="rail"],#avApp [data-r="main"],#avApp [data-r="aside"]{overflow-y:auto;min-width:0;min-height:0}
+#avApp [data-r="rail"]{background:var(--c-neutral-100);border-right:1px solid var(--c-neutral-300);padding:14px 0 24px}
+#avApp [data-r="aside"]{border-left:1px solid var(--c-neutral-300);padding:16px 14px 28px;background:var(--c-surface)}
+#avApp [data-r="main"]{padding:18px 20px 40px}
+
+/* ---- rail ---- */
+#avApp .rail-block{padding:0 12px 16px}
+#avApp .rail-head{display:flex;align-items:center;gap:7px;padding:2px 0 8px;font-family:var(--f-label);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--c-neutral-600)}
+#avApp .rail-file-link{display:flex;align-items:center;gap:9px;border:1.5px solid var(--c-accent);background:var(--c-accent-100);padding:9px 10px;color:var(--c-text)}
+#avApp .rail-file-link:hover{background:var(--c-accent-200,var(--c-accent-100))}
+#avApp .rail-file-link .rf-name{flex:1;font-family:var(--f-head);font-weight:var(--w-semi);font-size:13.5px}
+#avApp .rail-file-link .rf-tag{font-family:var(--f-label);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--c-accent-700,var(--c-accent))}
+#avApp .pin-list{display:grid;gap:5px}
+#avApp .pin-row{display:flex;align-items:center;gap:8px;padding:6px 8px;border:1px solid var(--c-neutral-300);background:var(--c-surface)}
+#avApp .pin-row a{flex:1;min-width:0;font-size:12.5px;font-weight:var(--w-semi);color:var(--c-text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#avApp .pin-row button{width:44px;height:44px;padding:0;border:0;background:transparent;color:var(--c-neutral-600)}
+#avApp .pin-empty{border:1px dashed var(--c-neutral-400);padding:12px;font-size:11.5px;color:var(--c-neutral-600);text-align:center}
+#avApp .fam-list{display:grid;gap:1px}
+#avApp .fam-row{position:relative}
+#avApp .fam-row-accent{position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--c-accent);z-index:2;display:none}
+#avApp .fam-row-tint{position:absolute;inset:0;background:var(--c-accent-100);z-index:0;display:none}
+#avApp .fam-row.is-active .fam-row-accent,#avApp .fam-row.is-active .fam-row-tint{display:block}
+#avApp .fam-row-flex{position:relative;z-index:1;display:flex;align-items:stretch}
+#avApp .fam-btn{flex:1;display:flex;align-items:center;gap:9px;padding:8px 4px 8px 13px;border:0;background:transparent;text-align:left;color:var(--c-text)}
+#avApp .fam-btn svg{color:var(--c-accent-700,var(--c-accent));flex:none}
+#avApp .fam-btn .fam-label{flex:1;font-size:13px;font-weight:var(--w-semi)}
+#avApp .fam-btn .fam-n{font-family:var(--f-label);font-size:10.5px;color:var(--c-neutral-600)}
+#avApp .fam-toggle{width:44px;min-height:44px;border:0;background:transparent;color:var(--c-neutral-600);padding:0}
+#avApp .fam-spacer{width:26px;flex:none}
+#avApp .fam-subs{padding:2px 12px 8px 34px;border-left:1px solid var(--c-neutral-300);margin-left:20px;display:grid;gap:2px}
+#avApp .fam-sub-row{display:flex;align-items:center;gap:7px;padding:5px 7px;font-size:12px}
+#avApp .fam-sub-dot{width:4px;height:4px;background:var(--c-accent);flex:none}
+#avApp .fam-sub-label{flex:1;color:var(--c-text)}
+#avApp .fam-sub-kind{font-family:var(--f-label);font-size:8.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--c-neutral-600)}
+#avApp .rail-foot{border-top:1px solid var(--c-neutral-300);margin-top:6px;padding:10px 12px 0;display:grid;gap:2px}
+#avApp .rail-foot-link{display:block;padding:7px 8px;font-size:12px;font-weight:var(--w-semi);color:var(--c-text);background:transparent;border:0;text-align:left;width:100%}
+#avApp .rail-foot-link:hover{background:var(--c-surface)}
+#avApp .rail-foot-link.is-active{background:var(--c-accent-100);color:var(--c-accent-700,var(--c-accent))}
+
+/* ---- main: show profile ---- */
+#avApp .card{border:1px solid var(--c-neutral-300);background:var(--c-surface);margin-bottom:16px}
+#avApp .card-head{display:flex;align-items:center;gap:8px;padding:10px 13px;border-bottom:1px solid var(--c-neutral-300);font-family:var(--f-label);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--c-neutral-600)}
+#avApp [data-r="profile"]{display:grid;grid-template-columns:1.9fr 1.6fr .75fr 1.5fr;gap:1px;background:var(--c-neutral-300)}
+#avApp .profile-cell{background:var(--c-surface);padding:11px 13px}
+#avApp .profile-cell label{display:block;margin:0 0 5px;font-family:var(--f-label);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--c-neutral-600)}
+#avApp .profile-cell input{border:0;padding:0;background:transparent;font-family:var(--f-head);font-size:17px;font-weight:var(--w-semi)}
+#avApp .profile-cell input#pfDate{font-family:var(--f-label);font-variant-numeric:tabular-nums;font-size:15px}
+#avApp .profile-cell input:focus{box-shadow:none;outline:none;border-bottom:1.5px solid var(--c-accent)}
+
+/* ---- tiles ---- */
+#avApp [data-r="tiles"]{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:18px}
+#avApp .tile{border:1px solid var(--c-neutral-400);padding:11px 12px 10px;min-width:0}
+#avApp .tile-label{font-family:var(--f-label);font-size:9px;letter-spacing:.07em;text-transform:uppercase;color:var(--c-neutral-600);margin-bottom:4px}
+#avApp .tile-num-row{display:flex;align-items:baseline;gap:6px}
+#avApp .tile-num{font-family:var(--f-label);font-weight:700;font-size:30px;line-height:1;color:var(--c-text)}
+#avApp .tile-unit{font-size:11px;color:var(--c-neutral-600)}
+#avApp .tile-bar-track{height:4px;background:var(--c-neutral-200);margin-top:8px}
+#avApp .tile-bar-fill{height:100%}
+#avApp .tile.tile-gate{border-color:var(--c-accent);background:var(--c-accent-100)}
+#avApp .tile.tile-ready .tile-num{color:var(--st-ready)}
+#avApp .tile.tile-issue .tile-num{color:var(--st-issue)}
+#avApp .tile.tile-skipped .tile-num{color:var(--st-skip)}
+#avApp .tile.tile-pinned .tile-num{color:var(--st-pin)}
+
+/* ---- recommended next ---- */
+#avApp .section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+#avApp .section-head-left{display:flex;align-items:center;gap:9px;min-width:0}
+#avApp .section-head h2{font-family:var(--f-head);font-weight:var(--w-bold);font-size:16.5px;color:var(--c-text)}
+#avApp .phase-chip{font-family:var(--f-label);font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--c-accent-700,var(--c-accent));border:1px solid var(--c-accent-line);padding:2px 8px;background:var(--c-accent-100)}
+#avApp [data-r="recs"]{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:22px}
+#avApp .rec-card{border:1px solid var(--c-neutral-400);padding:12px 13px;display:flex;flex-direction:column;gap:7px}
+#avApp .rec-card-top{display:flex;justify-content:space-between;gap:8px}
+#avApp .rec-card-top strong{font-family:var(--f-head);font-size:16px;font-weight:var(--w-semi);color:var(--c-text)}
+#avApp .rec-card p{margin:0;font-size:12.5px;line-height:1.45;color:var(--c-neutral-700)}
+#avApp .rec-cite{border-top:1px dotted var(--c-neutral-400);padding-top:6px;display:flex;align-items:center;gap:6px;font-size:9.5px;color:var(--c-neutral-600)}
+#avApp .rec-actions{display:flex;gap:6px;align-items:center;margin-top:auto}
+#avApp .rec-actions button{flex:none}
+#avApp .rec-actions select{flex:1;padding:6px 24px 6px 8px;font-size:11px;font-family:var(--f-label)}
+
+/* ---- family tool rows ---- */
+#avApp .fam-view-head{display:flex;align-items:baseline;gap:10px;margin-bottom:10px}
+#avApp .fam-view-tick{width:5px;height:16px;background:var(--c-accent);flex:none}
+#avApp .fam-view-head h2{font-family:var(--f-head);font-weight:var(--w-bold);font-size:17px}
+#avApp .fam-view-count{font-family:var(--f-label);font-size:10.5px;color:var(--c-neutral-600)}
+#avApp .fam-view-depts{margin-left:auto;font-family:var(--f-label);font-size:10px;letter-spacing:.06em;color:var(--c-neutral-500)}
+#avApp .toolrow-list{display:grid;gap:8px;margin-bottom:22px}
+#avApp .toolrow-card{border:1px solid var(--c-neutral-300)}
+#avApp [data-r="toolrow"]{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;align-items:center;gap:12px;padding:10px 12px}
+#avApp .tr-stripe{width:3px;align-self:stretch;background:var(--c-neutral-300)}
+#avApp .tr-stripe.st-ready{background:var(--st-ready)}
+#avApp .tr-stripe.st-issue{background:var(--st-issue)}
+#avApp .tr-stripe.st-skipped{background:var(--st-skip)}
+#avApp .tr-body{min-width:0}
+#avApp .tr-title-row{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+#avApp .tr-title-row strong{font-family:var(--f-head);font-size:15px;font-weight:var(--w-semi)}
+#avApp .tr-tag{font-family:var(--f-label);font-size:9px;border:1px solid var(--c-neutral-300);padding:1px 6px;color:var(--c-neutral-600)}
+#avApp .tr-subs-toggle{border:0;background:transparent;padding:0 0 0 2px;font-family:var(--f-label);font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--c-accent-700,var(--c-accent))}
+#avApp .tr-desc{font-size:12px;color:var(--c-neutral-600);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+#avApp .tr-note{margin-top:5px;border:0;border-bottom:1px dashed var(--c-neutral-400);background:transparent;padding:2px 0;font-size:11.5px;color:var(--c-text);width:100%;max-width:420px}
+#avApp .tr-note:focus{border-bottom-style:solid;border-color:var(--c-accent);box-shadow:none}
+#avApp .tr-note::placeholder{color:var(--c-neutral-500)}
+#avApp .tr-status{display:flex}
+#avApp .tr-actions{display:flex;gap:5px;align-items:center}
+#avApp .tr-actions select{width:auto;min-width:98px;padding:5px 22px 5px 7px;font-size:10.5px;font-family:var(--f-label)}
+#avApp .tr-open{width:44px;height:44px;padding:0;border:1px solid var(--c-neutral-300);background:transparent;color:var(--c-neutral-600)}
+#avApp .tr-subs-panel{border-top:1px dashed var(--c-neutral-400);background:var(--c-neutral-100);padding:9px 12px 11px 44px}
+#avApp .tr-subs-panel .tsp-label{font-family:var(--f-label);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--c-neutral-600);margin-bottom:7px}
+#avApp .tr-subs-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:7px}
+#avApp .tr-sub-card{border:1px solid var(--c-neutral-300);padding:8px 10px;background:var(--c-surface)}
+#avApp .tr-sub-card-top{display:flex;justify-content:space-between;gap:6px}
+#avApp .tr-sub-card-top strong{font-family:var(--f-head);font-size:13px;font-weight:var(--w-semi)}
+#avApp .tr-sub-card-top span{font-family:var(--f-label);font-size:9px;color:var(--c-neutral-500)}
+#avApp .tr-sub-cite{display:flex;align-items:center;gap:5px;margin-top:4px;font-size:10.5px;color:var(--c-neutral-600)}
+
+/* ---- all tools grid ---- */
+#avApp .allgroup{margin-bottom:16px}
+#avApp .allgroup-head{display:flex;align-items:baseline;gap:8px;padding:6px 2px;border-bottom:1px solid var(--c-neutral-300);margin-bottom:7px}
+#avApp .allgroup-head strong,#avApp .allgroup-head h3{font-family:var(--f-head);font-size:13.5px;font-weight:var(--w-semi)}
+#avApp .allgroup-head span.n{font-family:var(--f-label);font-size:10px;color:var(--c-neutral-600)}
+#avApp .allgroup-head span.d{margin-left:auto;font-family:var(--f-label);font-size:9.5px;color:var(--c-neutral-500)}
+#avApp [data-r="allgrid"]{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+#avApp .allcard{display:flex;align-items:center;gap:9px;padding:8px 10px;border:1px solid var(--c-neutral-300)}
+#avApp .allcard a{flex:1;min-width:0;font-family:var(--f-head);font-size:13.5px;font-weight:var(--w-semi);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#avApp .allcard .ac-tag{font-size:9px;color:var(--c-neutral-500);flex:none}
+#avApp .allgrid-search{margin-bottom:14px;max-width:320px}
+
+/* Compact density (Operator Settings > Display Density) overrides live
+   at the end of the sheet, grouped with the other #avApp.compact rules,
+   so they stay after every base component rule they need to win against. */
+
+/* ---- shop / front office context ---- */
+#avApp .ctx-prop-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-bottom:18px}
+#avApp .ctx-hero{border:1px solid var(--c-accent);background:var(--c-accent-100);padding:16px 18px;margin-bottom:18px}
+#avApp .ctx-hero .eyebrow{font-family:var(--f-label);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--c-accent-700,var(--c-accent));margin-bottom:6px}
+#avApp .ctx-hero h2{font-family:var(--f-head);font-size:22px;font-weight:var(--w-bold);margin-bottom:10px}
+#avApp .ctx-hero p{margin:0 0 10px;font-size:13px;line-height:1.55;color:var(--c-neutral-700)}
+#avApp .ctx-hero p:last-of-type{margin-bottom:0}
+#avApp .ctx-keys{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}
+#avApp .ctx-key-pill{font-family:var(--f-label);font-size:10px;letter-spacing:.06em;border:1px solid var(--c-accent-line);padding:4px 10px;background:var(--c-surface);color:var(--c-accent-700,var(--c-accent))}
+#avApp .ctx-list{display:grid;gap:7px;margin-bottom:18px}
+#avApp .ctx-list-item{display:flex;align-items:center;gap:12px;border:1px solid var(--c-neutral-300);padding:10px 12px}
+#avApp .ctx-list-item .cli-body{flex:1;min-width:0}
+#avApp .ctx-list-item strong{font-family:var(--f-head);font-size:14px;font-weight:var(--w-semi)}
+#avApp .ctx-list-item .cli-kind{font-family:var(--f-label);font-size:9px;color:var(--c-neutral-500);margin-left:8px}
+#avApp .ctx-list-item p{margin:2px 0 0;font-size:12px;color:var(--c-neutral-600)}
+#avApp .ctx-state{font-family:var(--f-label);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;padding:3px 8px;border:1px solid var(--c-neutral-400);color:var(--c-neutral-600);flex:none}
+#avApp .ctx-state.shipped{border-color:var(--c-accent);color:var(--c-accent-700,var(--c-accent))}
+#avApp .ctx-state.rekey{border-color:var(--c-accent-700,var(--c-accent));color:var(--c-accent-900,var(--c-accent));background:var(--c-accent-100)}
+#avApp .ctx-proposed-card{border:1px dashed var(--c-neutral-400);padding:11px 12px}
+#avApp .ctx-proposed-card strong{font-family:var(--f-head);font-size:13.5px;font-weight:var(--w-semi)}
+#avApp .ctx-proposed-card .cpc-key{font-family:var(--f-label);font-size:9px;color:var(--c-neutral-500);margin-left:6px}
+#avApp .ctx-proposed-card p{margin:4px 0 0;font-size:11.5px;color:var(--c-neutral-600);line-height:1.4}
+#avApp .ctx-close{font-size:12.5px;line-height:1.55;color:var(--c-neutral-700);margin:18px 0 0;max-width:74ch}
+
+/* ---- live Toolbox workspace ---- */
+#avApp[data-entry="toolbox"] #showFileRailBlock,#avApp[data-entry="toolbox"] [data-show-only]{display:none!important}
+#avApp .toolbox-hero{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px;align-items:center}
+#avApp .toolbox-status{display:inline-flex;align-items:center;gap:8px;font-family:var(--f-label);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--st-ready);margin-bottom:8px}
+#avApp .toolbox-status::before{content:'';width:8px;height:8px;background:var(--st-ready)}
+#avApp .toolbox-hero-actions{display:grid;gap:8px;min-width:154px}
+#avApp .toolbox-toolbar{display:grid;grid-template-columns:minmax(220px,1fr) minmax(150px,.45fr);gap:10px;margin:0 0 12px}
+#avApp .toolbox-filter-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+#avApp .toolbox-filter-row button{min-height:44px}
+#avApp .toolbox-filter-row button[aria-pressed="true"]{background:var(--c-accent);border-color:var(--c-accent);color:var(--st-ink)}
+#avApp .toolbox-group{margin-bottom:18px}
+#avApp .toolbox-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+#avApp .toolbox-card{border:1px solid var(--c-neutral-300);background:var(--c-surface);padding:12px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;min-width:0}
+#avApp .toolbox-card-main{min-width:0}
+#avApp .toolbox-card-head{display:flex;align-items:baseline;gap:8px;min-width:0}
+#avApp .toolbox-card-head a{font-family:var(--f-head);font-size:15px;font-weight:var(--w-semi);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#avApp .toolbox-card-head .ac-tag{font-family:var(--f-label);font-size:9px;color:var(--c-neutral-500);flex:none}
+#avApp .toolbox-card p{margin:5px 0 0;font-size:11.5px;line-height:1.45;color:var(--c-neutral-600)}
+#avApp .toolbox-card-actions{display:flex;align-items:flex-start;gap:5px}
+#avApp .toolbox-card-actions button{width:44px;height:44px;padding:0}
+#avApp .toolbox-card-actions .toolbox-open{background:var(--c-accent);border-color:var(--c-accent);color:var(--st-ink)}
+#avApp .toolbox-empty{border:1px dashed var(--c-neutral-400);padding:22px;text-align:center;color:var(--c-neutral-600)}
+#avApp .roadmap-badge{display:inline-flex;border:1px solid var(--st-pin-line);background:var(--st-pin-tint);color:var(--st-pin);font-family:var(--f-label);font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;margin-bottom:8px}
+
+/* ---- aside panels ---- */
+#avApp .aside-title{font-family:var(--f-head);font-size:17px;font-weight:var(--w-bold);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+#avApp .aside-p{font-size:12px;line-height:1.5;color:var(--c-neutral-600);margin:0 0 12px}
+#avApp .aside-card{border-left:3px solid var(--c-neutral-500);border-top:1px solid var(--c-neutral-300);border-right:1px solid var(--c-neutral-300);border-bottom:1px solid var(--c-neutral-300);background:var(--c-bg);padding:9px 11px;margin-bottom:8px}
+#avApp .aside-card.accent{border-left-color:var(--c-accent)}
+#avApp .aside-card strong{display:block;font-size:11.5px;font-weight:var(--w-bold);margin-bottom:3px}
+#avApp .aside-card span{display:block;font-size:11.5px;color:var(--c-neutral-600);line-height:1.4}
+#avApp .aside-sub{font-family:var(--f-label);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--c-neutral-600);margin:16px 0 8px}
+#avApp .help-row{display:flex;gap:10px;margin-bottom:14px}
+#avApp .help-row .hb{flex:none;margin-top:1px}
+#avApp .help-row div strong{display:block;font-size:12.5px;font-weight:var(--w-bold);margin-bottom:2px}
+#avApp .help-row div span{font-size:11.5px;color:var(--c-neutral-600);line-height:1.4}
+#avApp .help-links{display:grid;gap:2px;margin-top:12px}
+#avApp .help-links button{width:100%;justify-content:flex-start;border:0;background:transparent;padding:5px 0;font-size:11.5px;color:var(--c-accent-700,var(--c-accent));text-decoration:underline}
+#avApp .help-detail{border:1px solid var(--c-neutral-300);padding:10px 11px;margin-top:6px;font-size:11.5px;line-height:1.5;color:var(--c-neutral-700)}
+#avApp .help-detail ul{margin:0;padding-left:16px}
+#avApp .help-detail li{margin-bottom:4px}
+#avApp .gate-line{font-size:12px;color:var(--c-neutral-700);margin-bottom:8px;line-height:1.5}
+#avApp .queue-list{display:grid;gap:6px;margin-bottom:10px}
+#avApp #asideQueue,#avApp .queue-list{min-width:0;width:100%;max-width:100%}
+#avApp .queue-card{display:flex;gap:8px;align-items:center;width:100%;min-width:0;max-width:100%;border:1px solid var(--c-neutral-300);padding:8px 9px}
+#avApp .queue-card.priority-issue{border-color:var(--st-issue-line);background:var(--st-issue-tint)}
+#avApp .queue-rank{width:20px;height:20px;flex:none;display:grid;place-items:center;background:var(--c-accent-100);color:var(--c-accent-700,var(--c-accent));font-family:var(--f-label);font-size:10.5px;font-weight:700}
+#avApp .queue-card.priority-issue .queue-rank{background:var(--st-issue);color:var(--st-ink)}
+#avApp .queue-body{flex:1;min-width:0}
+#avApp .queue-body strong{display:block;font-size:11.5px;font-weight:var(--w-bold)}
+#avApp .queue-body span{display:block;font-size:11px;color:var(--c-neutral-600);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#avApp .queue-card button{flex:none;padding:5px 9px;font-size:10.5px}
+#avApp .aside-actions{display:grid;gap:6px;margin-bottom:14px}
+#avApp .recent-row{display:flex;align-items:center;gap:8px;border:1px solid var(--c-neutral-300);padding:7px 9px;margin-bottom:5px}
+#avApp .recent-row a{flex:1;min-width:0;font-size:12px;font-weight:var(--w-semi);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#avApp .recent-row button{flex:none;padding:5px 9px;font-size:10.5px}
+#avApp .aside-empty{border:1px dashed var(--c-neutral-400);padding:12px;text-align:center;font-size:11.5px;color:var(--c-neutral-600)}
+
+/* ---- operator settings drawer ---- */
+#avApp .drawer-scrim{position:fixed;inset:0;z-index:70;background:var(--c-overlay);opacity:0;transition:opacity .18s ease}
+#avApp .drawer-scrim.open{opacity:1}
+#avApp .drawer-scrim[hidden]{display:none}
+#avApp .drawer{position:fixed;top:0;right:0;bottom:0;z-index:71;width:min(420px,94vw);background:var(--c-surface);border-left:1px solid var(--c-neutral-400);box-shadow:var(--c-shadow-pop);display:grid;grid-template-rows:auto 1fr;transform:translateX(102%);transition:transform .2s ease-out}
+#avApp .drawer[aria-hidden="true"]{pointer-events:none}
+#avApp .drawer.open{transform:translateX(0)}
+#avApp .drawer-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:16px 16px 14px;border-bottom:1px solid var(--c-neutral-300)}
+#avApp .drawer-head h2{font-family:var(--f-head);font-size:21px;font-weight:var(--w-bold)}
+#avApp .drawer-body{overflow-y:auto;padding:4px 16px 24px;display:grid;gap:16px;align-content:start}
+#avApp .drawer-group{display:grid;gap:8px;padding:13px 0 0;border-top:1px solid var(--c-neutral-300)}
+#avApp .drawer-group:first-child{border-top:0;padding-top:12px}
+#avApp .drawer-group h3{font-family:var(--f-label);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--c-accent-700,var(--c-accent))}
+#avApp .drawer-row{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+#avApp .drawer-row button{width:100%}
+#avApp .drawer-row .span-2{grid-column:1/-1}
+#avApp .drawer-hint{margin:0;font-size:11px;color:var(--c-neutral-600);line-height:1.45}
+#avApp .drawer-summary{border:1px solid var(--c-neutral-300);border-left:2px solid var(--c-accent);padding:8px 10px;font-size:11.5px;color:var(--c-neutral-700)}
+#avApp .offline-pills{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}
+#avApp .offline-pill{border:1px solid var(--c-neutral-300);padding:7px 9px}
+#avApp .offline-pill span{display:block;font-family:var(--f-label);font-size:9px;letter-spacing:.07em;text-transform:uppercase;color:var(--c-neutral-600)}
+#avApp .offline-pill strong{display:block;font-family:var(--f-label);font-size:13px;font-weight:700}
+#avApp .offline-pill.is-ready{border-color:var(--st-ready-line)}
+#avApp .offline-pill.is-ready strong{color:var(--st-ready)}
+#avApp .offline-pill.is-error{border-color:var(--st-issue-line)}
+#avApp .offline-pill.is-error strong{color:var(--st-issue)}
+#avApp .danger-zone h3{color:var(--st-issue)}
+#avApp .danger-zone{border-top-color:var(--st-issue-line)}
+#avApp .file-input{display:none}
+
+/* ---- quick switcher ---- */
+#avApp .cmdk-backdrop{position:fixed;inset:0;z-index:80;display:grid;place-items:start center;padding:70px 16px 16px;background:var(--c-overlay)}
+#avApp .cmdk-backdrop[hidden]{display:none}
+#avApp .cmdk{width:min(720px,100%);border:1px solid var(--c-neutral-400);background:var(--c-raised);box-shadow:var(--c-shadow-pop)}
+#avApp .cmdk-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:13px 15px;border-bottom:1px solid var(--c-neutral-300)}
+#avApp .cmdk-head h2{font-family:var(--f-head);font-size:19px;font-weight:var(--w-bold)}
+#avApp .cmdk-head p{margin:3px 0 0;font-family:var(--f-label);font-size:10.5px;color:var(--c-neutral-600)}
+#avApp .cmdk-search{border:0;border-bottom:1px solid var(--c-neutral-300);border-radius:0;background:var(--c-surface);padding:13px 16px;font-size:15px}
+#avApp .cmdk-search:focus{box-shadow:none;border-bottom-color:var(--c-accent)}
+#avApp .cmdk-list{display:grid;gap:5px;max-height:min(56vh,500px);overflow:auto;padding:9px}
+#avApp .cmdk-row{display:grid;grid-template-columns:78px minmax(0,1fr) auto;gap:10px;align-items:center;border:1px solid var(--c-neutral-300);padding:8px 10px;cursor:pointer;background:var(--c-surface)}
+#avApp .cmdk-row.is-active,#avApp .cmdk-row:hover{border-color:var(--c-accent-line);background:var(--c-surface-2)}
+#avApp .cmdk-kind{font-family:var(--f-label);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--c-accent-700,var(--c-accent))}
+#avApp .cmdk-row strong{display:block;font-size:12.5px;font-weight:var(--w-bold)}
+#avApp .cmdk-row span{display:block;font-size:11px;color:var(--c-neutral-600);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#avApp .cmdk-badge{justify-self:end;font-family:var(--f-label);font-size:9.5px;color:var(--c-neutral-600)}
+
+/* ---- onboarding modal ---- */
+#avApp .ob-overlay{position:fixed;inset:0;z-index:90;background:var(--c-overlay);display:grid;place-items:center;padding:18px}
+#avApp .ob-overlay[hidden]{display:none}
+#avApp .ob-dialog{width:min(720px,100%);max-height:86vh;display:flex;flex-direction:column;background:var(--c-surface);border:1px solid var(--c-neutral-400);box-shadow:var(--c-shadow-pop)}
+#avApp .ob-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:16px 18px 12px}
+#avApp .ob-head .eyebrow{font-family:var(--f-label);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--c-accent-700,var(--c-accent))}
+#avApp .ob-head h2{font-family:var(--f-head);font-size:20px;font-weight:var(--w-bold);margin-top:4px}
+#avApp .ob-progress{display:flex;gap:3px;padding:0 18px}
+#avApp .ob-progress i{flex:1;height:3px;background:var(--c-neutral-300)}
+#avApp .ob-progress i.done{background:var(--c-accent)}
+#avApp .ob-body{padding:18px;overflow-y:auto;min-height:220px;flex:1}
+#avApp .ob-body p.lead{margin:0 0 16px;font-size:13px;line-height:1.55;color:var(--c-neutral-700)}
+#avApp .ob-grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+#avApp .ob-field label{display:block;margin:0 0 5px;font-family:var(--f-label);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--c-neutral-600)}
+#avApp .ob-phase-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+#avApp .ob-phase-card{display:flex;flex-direction:column;gap:5px;align-items:flex-start;padding:12px 13px;border:1px solid var(--c-neutral-400);background:transparent;text-align:left}
+#avApp .ob-phase-card strong{font-size:14.5px;font-weight:var(--w-bold);text-transform:uppercase}
+#avApp .ob-phase-card span{font-size:11px;color:var(--c-neutral-600)}
+#avApp .ob-phase-card.is-active{border-color:var(--c-accent);background:var(--c-accent-100)}
+#avApp .ob-pin-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+#avApp .ob-pin-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border:1px solid var(--c-neutral-400);background:transparent}
+#avApp .ob-pin-row.is-pinned{border-color:var(--c-accent);background:var(--c-accent-100)}
+#avApp .ob-pin-dot{width:11px;height:11px;border:1px solid var(--c-neutral-400);flex:none}
+#avApp .ob-pin-row.is-pinned .ob-pin-dot{border-color:var(--st-pin-line);background:var(--st-pin)}
+#avApp .ob-cache-row{display:flex;align-items:flex-start;gap:12px;border:1px solid var(--c-neutral-400);padding:12px 13px;margin-bottom:10px;text-align:left;width:100%;background:transparent}
+#avApp .ob-cache-row.accent{border-color:var(--c-accent);background:var(--c-accent-100)}
+#avApp .ob-cache-row strong{display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:var(--w-bold)}
+#avApp .ob-cache-row .obbadge{font-family:var(--f-label);font-size:8.5px;letter-spacing:.08em;text-transform:uppercase;border:1px solid currentColor;padding:1px 6px}
+#avApp .ob-cache-row p{margin:4px 0 0;font-size:11.5px;color:var(--c-neutral-600)}
+#avApp .ob-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 18px;border-top:1px solid var(--c-neutral-300)}
+#avApp .ob-foot-right{display:flex;gap:8px}
+#avApp .ob-skip{border:0;background:transparent;color:var(--c-neutral-600);text-decoration:underline;padding:0}
+
+/* ---- neutral two-door entry chooser ---- */
+#avApp .entry-overlay{position:fixed;inset:0;z-index:100;background:var(--c-overlay);display:grid;place-items:center;padding:18px}
+#avApp .entry-dialog{width:min(780px,100%);max-height:90vh;overflow:auto;background:var(--c-surface);border:1px solid var(--c-neutral-400);box-shadow:var(--c-shadow-pop);padding:20px}
+#avApp .entry-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:8px}
+#avApp .entry-head .eyebrow{font-family:var(--f-label);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--c-accent-700,var(--c-accent))}
+#avApp .entry-head h2{font-family:var(--f-head);font-size:clamp(24px,4vw,36px);font-weight:var(--w-bold);margin-top:4px}
+#avApp .entry-intro{margin:0 0 18px;max-width:66ch;color:var(--c-neutral-700);line-height:1.55}
+#avApp .entry-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+#avApp .entry-door{min-height:190px;padding:20px;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;text-align:left;border:1px solid var(--c-neutral-400);background:var(--c-surface-2)}
+#avApp .entry-door:hover,#avApp .entry-door:focus-visible{border-color:var(--c-accent);background:var(--c-accent-100)}
+#avApp .entry-door .entry-kicker{font-family:var(--f-label);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--c-accent-700,var(--c-accent));margin-bottom:18px}
+#avApp .entry-door strong{font-family:var(--f-head);font-size:23px;font-weight:var(--w-semi);margin-bottom:8px}
+#avApp .entry-door span:last-child{font-size:12.5px;line-height:1.55;color:var(--c-neutral-600)}
+#avApp .entry-foot{margin:14px 0 0;font-family:var(--f-label);font-size:10px;color:var(--c-neutral-600)}
+
+/* ---- toast ---- */
+#avApp .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:95;display:flex;align-items:center;gap:10px;border:1px solid var(--c-neutral-400);background:var(--c-raised);box-shadow:var(--c-shadow-pop);padding:9px 14px;font-size:12.5px}
+#avApp .toast[hidden]{display:none}
+#avApp .toast button{padding:4px 9px;font-size:10.5px}
+
+/* ---- DOS status bar ---- */
+#avApp [data-dosbar]{display:none;position:fixed;left:0;right:0;bottom:0;z-index:60;align-items:center;height:24px;padding:0 8px;gap:0;font-family:var(--f-label);font-size:11px}
+#avApp[data-theme="dos"] [data-dosbar]{display:flex;background:var(--selection-bg)}
+#avApp .dos-key{display:flex;align-items:center;height:18px}
+#avApp .dos-key .k{background:#000;color:#fff;padding:0 4px}
+#avApp .dos-key .l{background:var(--selection-bg);color:#000;padding:0 6px 0 4px}
+#avApp .dos-num{margin-left:auto;color:#000;padding:0 6px}
+
+/* ---- DOS full theme override (bevel buttons, square everything) ---- */
+#avApp[data-theme="dos"] *{border-radius:0!important;box-shadow:none!important;letter-spacing:0!important;text-shadow:none!important}
+#avApp[data-theme="dos"] input,#avApp[data-theme="dos"] select,#avApp[data-theme="dos"] textarea{border-width:2px;border-style:solid;border-color:var(--border-tui);background:#000080;color:#FFFF55}
+#avApp[data-theme="dos"] a{color:#00FFFF}
+#avApp[data-theme="dos"] a:hover{color:#000;background:var(--selection-bg)}
+#avApp[data-theme="dos"] ::selection{background:var(--selection-bg);color:var(--selection-text)}
+#avApp[data-theme="dos"] button{background:#C0C0C0;color:#000;border-width:2px;border-style:solid;border-top-color:var(--border-hi);border-left-color:var(--border-hi);border-right-color:var(--border-sh);border-bottom-color:var(--border-sh)}
+#avApp[data-theme="dos"] button:active{border-top-color:var(--border-sh);border-left-color:var(--border-sh);border-right-color:var(--border-hi);border-bottom-color:var(--border-hi)}
+#avApp[data-theme="dos"] button[aria-pressed="true"]{background:var(--selection-bg);color:var(--selection-text)}
+#avApp[data-theme="dos"] [data-r="head"]{background:#C0C0C0;color:#000;border-bottom:2px solid #000}
+#avApp[data-theme="dos"] [data-r="head"] *{color:#000}
+#avApp[data-theme="dos"] [data-r="head"] button[aria-pressed="true"]{background:var(--selection-bg);color:#000}
+#avApp[data-theme="dos"] [data-r="main"]{padding-bottom:48px}
+#avApp[data-theme="dos"] [data-r="aside"]{padding-bottom:40px}
+#avApp[data-theme="dos"] .card,#avApp[data-theme="dos"] .tile,#avApp[data-theme="dos"] .rec-card,#avApp[data-theme="dos"] .toolrow-card,#avApp[data-theme="dos"] .ctx-hero,#avApp[data-theme="dos"] .queue-card,#avApp[data-theme="dos"] .allcard,#avApp[data-theme="dos"] .ob-dialog,#avApp[data-theme="dos"] .cmdk,#avApp[data-theme="dos"] .drawer{border-width:2px;border-style:solid;border-color:var(--border-tui)}
+
+/* ---- compact density (Operator Settings > Display Density) ---- */
+#avApp.compact [data-r="main"]{padding:12px 14px 30px}
+#avApp.compact [data-r="rail"]{padding:10px 0 18px}
+#avApp.compact [data-r="aside"]{padding:12px 12px 20px}
+#avApp.compact .card{margin-bottom:12px}
+#avApp.compact [data-r="profile"] .profile-cell{padding:8px 10px}
+#avApp.compact [data-r="tiles"]{gap:7px;margin-bottom:12px}
+#avApp.compact .tile{padding:8px 9px 7px}
+#avApp.compact .tile-num{font-size:24px}
+#avApp.compact [data-r="recs"]{gap:7px;margin-bottom:16px}
+#avApp.compact .rec-card{padding:9px 10px;gap:5px}
+#avApp.compact .card-head{padding:8px 10px}
+#avApp.compact .toolrow-list{gap:5px;margin-bottom:16px}
+#avApp.compact [data-r="toolrow"]{padding:7px 10px;gap:9px}
+#avApp.compact .tr-desc{display:none}
+#avApp.compact .allgroup{margin-bottom:10px}
+#avApp.compact .rail-block{padding:0 12px 10px}
+
+/* ============================================================
+   RESPONSIVE — anchors match the design source's data-r map. Kept
+   last in the sheet on purpose: several rules here share exact
+   selector specificity with earlier component rules (e.g.
+   [data-r="tiles"]'s grid-template-columns), and same-specificity
+   ties resolve by source order — these must stay last to win.
+   ============================================================ */
+@media (max-width:1320px){
+  #avApp [data-r="head"]{display:flex;flex-wrap:wrap;height:auto;min-height:54px;row-gap:8px;padding-top:10px;padding-bottom:10px}
+  #avApp [data-r="phases"]{order:3;flex:0 0 100%;overflow-x:auto;justify-content:flex-start}
+  #avApp .hd-right{margin-left:auto}
+}
+@media (max-width:1180px){
+  #avApp [data-r="aside"]{display:none}
+  #avApp [data-r="body"]{grid-template-columns:238px minmax(0,1fr)}
+}
+@media (max-width:680px){
+  #avApp .hd-right .lbl,#avApp .hd-right .kbd{display:none}
+  /* the brand chip's label IS its content — keep it, or the button goes blank */
+  #avApp #brandCycleBtn .lbl{display:inline}
+  #avApp .hd-cache{display:none}
+  #avApp .hd-right{gap:6px}
+  #avApp .hd-icon-btn.labeled{padding:0;width:44px}
+  #avApp #brandCycleBtn.labeled{width:auto;padding:0 8px}
+  #avApp .hd-left{max-width:100%;overflow-x:auto}
+  #avApp .hd-ctx button{padding:0 8px;white-space:nowrap}
+  #avApp .toolbox-hero{grid-template-columns:1fr}
+  #avApp .toolbox-hero-actions{grid-template-columns:1fr 1fr;min-width:0}
+  #avApp .toolbox-toolbar{grid-template-columns:1fr}
+  #avApp .toolbox-grid{grid-template-columns:1fr}
+  #avApp .entry-grid{grid-template-columns:1fr}
+  #avApp .entry-door{min-height:156px}
+}
+@media (max-width:900px){
+  html,body{overflow:auto}
+  body{display:block}
+  #avApp{height:auto;min-height:100vh;display:block;overflow:visible}
+  #avApp [data-r="body"]{display:block;overflow:visible}
+  #avApp [data-r="rail"]{display:none}
+  #avApp [data-r="aside"]{display:block;border-left:0;border-top:1px solid var(--c-neutral-300)}
+  #avApp [data-mob]{display:flex!important}
+  #avApp [data-r="tiles"]{grid-template-columns:repeat(2,1fr)}
+  #avApp [data-r="recs"]{grid-template-columns:1fr}
+  #avApp [data-r="profile"]{grid-template-columns:repeat(2,1fr)}
+  #avApp [data-r="allgrid"]{grid-template-columns:1fr}
+  #avApp [data-r="toolrow"]{grid-template-columns:auto minmax(0,1fr);row-gap:8px}
+  #avApp [data-r="toolrow"] .tr-status{grid-column:2}
+  #avApp [data-r="toolrow"] .tr-actions{grid-column:2}
+}
+@media (max-width:560px){
+  #avApp [data-r="tiles"]{grid-template-columns:1fr}
+  #avApp [data-r="profile"]{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){
+  #avApp *{transition-duration:.001ms!important;animation-duration:.001ms!important}
+}
+
