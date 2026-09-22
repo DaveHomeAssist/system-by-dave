@@ -1469,10 +1469,24 @@ function cacheAvTools(refresh,button){
   if(!offlineAvailable()){setOfflineMessage('Unavailable','This browser cannot prepare the AV by Dave offline cache.');showHint('Offline cache is unavailable in this browser.','error');return Promise.resolve(false);}
   offlineState.supported=true;offlineState.online=navigator.onLine!==false;offlineState.busy=true;
   offlineState.cache=refresh?'Refreshing':'Caching';offlineState.message=(refresh?'Refreshing':'Caching')+' AV by Dave files for offline loading.';renderOfflineStatus();
+  var failed=[];
   return caches.open(AV_CACHE_NAME).then(function(cache){
     var start=refresh?caches.delete(AV_CACHE_NAME).then(function(){return caches.open(AV_CACHE_NAME);}):Promise.resolve(cache);
-    return start.then(function(nextCache){return Promise.all(OFFLINE_ASSETS.map(function(asset){return fetchAndCacheAsset(nextCache,asset);}));});
-  }).then(function(){return refreshOfflineStatus();}).then(function(){showHint('AV tools cached for offline loading.');if(button) signal(button);return true;}).catch(function(){offlineState.busy=false;offlineState.cache='Error';offlineState.message='Could not cache every AV by Dave file. Check the connection, then try Refresh Cache.';renderOfflineStatus();showHint('Could not cache every AV by Dave file.','error');return false;});
+    return start.then(function(nextCache){
+      return Promise.all(OFFLINE_ASSETS.map(function(asset){
+        return fetchAndCacheAsset(nextCache,asset).then(function(){return true;}).catch(function(){failed.push(asset);return false;});
+      }));
+    });
+  }).then(function(){return refreshOfflineStatus();}).then(function(ready){
+    if(failed.length){
+      offlineState.cache=offlineState.cached?'Partial':'Error';
+      offlineState.message='Cached '+offlineState.cached+' of '+offlineState.total+' files. '+failed.length+' optional or unavailable file'+(failed.length===1?'':'s')+' could not be refreshed.';
+      renderOfflineStatus();
+      showHint('Offline cache is partial: '+failed.length+' file'+(failed.length===1?'':'s')+' unavailable.','error');
+      return false;
+    }
+    showHint('AV tools cached for offline loading.');if(button) signal(button);return ready;
+  }).catch(function(){offlineState.busy=false;offlineState.cache='Error';offlineState.message='Could not prepare the AV by Dave cache. Check the connection, then try Refresh Cache.';renderOfflineStatus();showHint('Could not prepare offline cache.','error');return false;});
 }
 function clearOfflineCache(button){
   if(!offlineAvailable()){setOfflineMessage('Unavailable','This browser cannot prepare the AV by Dave offline cache.');showHint('Offline cache is unavailable in this browser.','error');return Promise.resolve(false);}
