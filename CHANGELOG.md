@@ -1,5 +1,23 @@
 # Changelog
 
+## 2026-09-22 — HD8 ISO photos load as photos
+
+- The ATEM HD8 ISO model shipped 4.36 MB of base64 PNG inside
+  `models/assets/atem-hd8-iso-0.js`, loaded with no `defer`, so it parsed before
+  the page rendered. The four reference views are now files. That script is 433
+  bytes, the `<img>` already carried `loading="lazy"`, so only the front view is
+  fetched on open and the browser caches them as images. The bytes are the
+  decoded originals, so the photographs are unchanged.
+- The model no longer describes all 227 components with one `geometry_status`.
+  Its 46 rear connectors read `documented_type_photo_grounded`: connector type
+  from the Blackmagic specification, position from the rear photograph. The deck
+  and console keep `photo_approximation`, because those positions were
+  reconstructed rather than read.
+- Regenerated the managed FMP release from fmp-suite `e643c91`, which also
+  repairs `tests/public-hub-browser.mjs`. That file had not parsed since the walk
+  release was retired and left an `else` with no `if`, so its step failed before
+  any assertion and skipped the three after it.
+
 ## 2026-09-22 — The ATEM states its invariant copy once
 
 - Three strings were stamped onto all 227 ATEM components: one `limits`

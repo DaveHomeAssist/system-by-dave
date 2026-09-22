@@ -92,7 +92,10 @@
   }
   [1,2,3,4,5,6,7,8,9,'ENTER',0,'RESET'].forEach((n,i)=>add('keypad.'+String(n).toLowerCase(),'Keypad '+n,'System & talkback',{type:'small',surface:'console',x:3.7+(i%3)*.96,y:.86-Math.floor(i/3)*.57,w:.73,h:.39,text:String(n)},'Numeric entry / confirmation for the active menu. This keypad is not a camera-source row.'));
   function rear(id,label,type,x,y,purpose,extra={}) {
-    return add('rear.'+id,label,'Rear connections',{type,surface:'rear',x,y,w:.65,h:.55,r:.28},purpose,{source_ids:['photo-rear','bmd-spec'],...extra});
+    // Connector type comes from the Blackmagic specification and the rear photograph
+    // shows where each one sits, so these are stronger than the photo_approximation
+    // floor add() applies to parts whose position was estimated.
+    return add('rear.'+id,label,'Rear connections',{type,surface:'rear',x,y,w:.65,h:.55,r:.28},purpose,{source_ids:['photo-rear','bmd-spec'],geometry_status:'documented_type_photo_grounded',...extra});
   }
   rear('ac','AC power input','iec',-12,.0,'IEC mains power input. Power connections are identification-only in this guide.');
   rear('dc','12 V DC power input','xlr',-10.7,0,'4-pin XLR 12 V DC input. Pinouts and power procedures are outside this trainer.');
