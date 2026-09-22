@@ -8,7 +8,21 @@ importScripts('./js/sbd-registry.js');
 var CACHE_PREFIX='sbd-av-suite-';
 var CACHE_NAME=CACHE_PREFIX+self.SBD_REGISTRY.version;
 var OFFLINE_ASSETS=self.SBD_REGISTRY.offlineAssets();
-var SHELL_ASSETS=(self.SBD_REGISTRY.baseAssets||[]).slice();
+var SHELL_ASSETS=[
+  './av-suite.html',
+  './av-suite-worker.js',
+  './js/sbd-registry.js',
+  './js/av-suite-context.js',
+  './js/sbd-nav.js',
+  './js/sbd-public-nav.js',
+  './js/av-theme.js',
+  './js/av-theme-mode.js',
+  './css/sbd-public-nav.css',
+  './css/av-theme.css',
+  './css/fonts.css',
+  './manifest.json',
+  './svg/system_by_dave_logo_rust.svg'
+];
 var OFFLINE_URLS=OFFLINE_ASSETS.map(function(asset){return new URL(asset,self.registration.scope).href;});
 var SUITE_URL=new URL('./av-suite.html',self.registration.scope).href;
 
@@ -86,8 +100,6 @@ self.addEventListener('message',function(event){
   if(event.data&&event.data.type==='SKIP_WAITING') self.skipWaiting();
   if(event.data&&event.data.type==='SBD_CLAIM_CLIENTS'&&event.origin===self.location.origin
     &&event.source&&event.source.type==='window'&&event.source.url.indexOf(self.registration.scope)===0){
-    // A navigation that was not execution-ready during activation was skipped
-    // by clients.claim(). The loaded page can now safely request control.
     event.waitUntil(self.clients.claim());
   }
   if(event.data&&event.data.type==='SBD_OFFLINE_VERSION'&&event.ports&&event.ports[0]){
