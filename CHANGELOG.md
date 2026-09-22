@@ -1,5 +1,23 @@
 # Changelog
 
+## 2026-09-22 — The Gear Reference vocabulary is written down
+
+- `scripts/verify_gear_reference.js` has enforced an `ALLOWED_STATUSES` set —
+  `confirmed`, `corrected`, `unverified`, `estimate` — with **no document
+  explaining what those values claim**. A reader meeting `unverified` on a sheet
+  had no way to learn what it meant; an author adding a sheet had to read the
+  verifier to find out which values it would accept. The same situation the
+  equipment catalogs were in before their contract was written.
+- `docs/gear-reference-contract.md` now documents the accuracy vocabulary, the
+  eight section types, the rule that figures must be SVG schematics rather than
+  embedded photography, and all seven enforced invariants.
+- `corrected` is called out as the value worth keeping: it records that a sheet
+  was wrong and what fixed it, instead of quietly overwriting the mistake.
+- **The site has three evidence vocabularies and they are different on purpose.**
+  Both contracts now say so and cross-reference each other, with a note that
+  `confirmed` and `Confirmed` are close but not identical — case is the quickest
+  signal of which document you are reading.
+
 ## 2026-09-22 — Camera checks say what they are looking for
 
 - The check-in and check-out flow asked twenty questions and explained none of
