@@ -1,4 +1,4 @@
-import { houseData } from './house-data.js?v=b6ceac4caaf6ca7e';
+import { houseData } from './house-data.js?v=c7d13e26c2b674d5';
 
 const $ = selector => document.querySelector(selector);
 const escape = value => String(value ?? '').replace(/[&<>"']/g, character => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[character]));

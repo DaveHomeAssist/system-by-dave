@@ -1,3 +1,8 @@
+## 2026-09-23 — FMP source reconciliation
+
+- Corrected the URSA Broadcast G2 back-focus shortcut to select the fitted lens method before adjustment.
+- Reconciled the exported FMP operator references with FMP-8 status and documented house-video evidence while retaining unresolved physical paths as Unknown.
+
 # Changelog
 
 ## 2026-09-23 — Camera Shading Practice console

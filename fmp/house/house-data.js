@@ -3590,17 +3590,17 @@ export const houseData = {
     },
     "e102": {
       "title": "AMX NMX-ENC-N3312D · ENC-102",
-      "sub": "1 RU · program encode",
+      "sub": "1 RU · LIVE FEED encoder",
       "state": "caution",
       "facts": [],
-      "open": "Source conflict: the front record calls this an encoder, while a blurry rear-panel reading suggests HDMI OUT. Confirm the exact model and rear panel before using a direction-of-signal claim."
+      "open": "NMX-ENC-N3312D is an encoder with HDMI loop-out. ENC-102 is documented as LIVE FEED; its loop-out to Input 8 gives upstream confidence, not TV acceptance. Confirm current patch, receiver mapping and selected source at a physical display."
     },
     "e101": {
       "title": "AMX NMX-ENC-N3312D · ENC-101",
-      "sub": "1 RU · advertising encode",
+      "sub": "1 RU · role Unknown",
       "state": "caution",
       "facts": [],
-      "open": "Source conflict: the front record calls this an encoder, while a blurry rear-panel reading suggests HDMI OUT. Confirm the exact model and rear panel before using a direction-of-signal claim."
+      "open": "NMX-ENC-N3312D is an encoder with HDMI loop-out. ENC-101 role and endpoints remain Unknown; do not infer an advertising assignment."
     },
     "bnc": {
       "title": "Unidentified connector panel",
@@ -3888,12 +3888,12 @@ export const houseData = {
       "WALL-WART DC"
     ],
     "e102": [
-      "SIGNAL DIRECTION UNVERIFIED",
-      "READ REAR PANEL"
+      "ENCODER · HDMI LOOP-OUT",
+      "LIVE FEED · INPUT 8 UPSTREAM"
     ],
     "e101": [
-      "SIGNAL DIRECTION UNVERIFIED",
-      "READ REAR PANEL"
+      "ENCODER · HDMI LOOP-OUT",
+      "ROLE UNKNOWN"
     ],
     "m1": [
       "FIBER 1",
@@ -4021,11 +4021,6 @@ export const houseData = {
       ]
     ],
     "e101": [
-      [
-        "atem",
-        "e101",
-        "inf"
-      ],
       [
         "e101",
         "T:prog",
