@@ -6,6 +6,11 @@
 - Venue v3 preserves v1/v2 geometry and legacy claims, rejects malformed provenance atomically, and resets confidence after manual value edits.
 - Added manufacturer body, mass, sensor, aperture and power references to Camera settings without changing simulated optical behaviour.
 
+## 2026-09-23 — ShowConsole brand direction on the alternative AV landing
+
+- Adapted the supplied ShowConsole brand book into the noindex alternative landing: neutral light and charcoal dark surfaces, amber actions, compact status treatment, and schematic multiview illustrations. Kept example values explicitly labeled, direct Show Console and Toolbox routes, and the current main landing at `/`.
+- Retained the visible light/dark toggle and AV theme preference, refreshed the offline cache version, and left the live Show Console and shared AV palette unchanged.
+
 ## 2026-09-23 — FMP venue profile foundation
 
 - Revised new-session stage estimates to 113 × 61 ft, with a selectable 113 × 75 ft working-depth alternative. Both remain provisional.
