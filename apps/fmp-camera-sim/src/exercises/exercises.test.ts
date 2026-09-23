@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { defaultCameraProfile, lensForHfov, MONITOR_ASPECT } from "../domain/camera";
 import { defaultExerciseSettings, type PerformerConfig, type Preset } from "../domain/session";
-import { DEG } from "../domain/units";
+import { DEG, ftToM } from "../domain/units";
 import { defaultVenueProfile, deriveVenueGeometry, type VenueGeometry } from "../domain/venue";
 import { aimAt, cameraFrame, stageToWorld } from "../sim/framing";
 import { CHEST_FRACTION, pathStateAt, performerState, planPath, type PerformerState } from "../sim/performer";
@@ -14,7 +14,11 @@ import { WideShotExercise } from "./wide";
 const profile = defaultCameraProfile();
 const settings = defaultExerciseSettings();
 const geometry: VenueGeometry = (() => {
-  const result = deriveVenueGeometry(defaultVenueProfile());
+  // Keep the original narrow-stage exercise fixture to cover legacy projects.
+  const venue = defaultVenueProfile();
+  venue.dimensions.stageWidth.value = ftToM(61);
+  venue.dimensions.stageDepth.value = ftToM(75);
+  const result = deriveVenueGeometry(venue);
   if (!result.ok) throw new Error("bad geometry");
   return result.geometry;
 })();
@@ -34,6 +38,18 @@ function widePose(hfovDeg: number): PtzPose {
 }
 
 describe("wide shot exercise", () => {
+  it("can frame the revised broad stage with the existing lens", () => {
+    const result = deriveVenueGeometry(defaultVenueProfile());
+    if (!result.ok) throw new Error("invalid default");
+    const g = result.geometry;
+    const aim = aimAt(g, stageToWorld({ right: 0, upstage: g.stageDepth * 0.3, height: 1 }));
+    const pose = { ...aim, lens: 0 };
+    const exercise = new WideShotExercise();
+    for (let t = 0; t < 2; t += 1 / 30) {
+      exercise.sample({ ...sample(t, 1 / 30, pose), geometry: g, frame: cameraFrame(g, pose, profile) });
+    }
+    expect(exercise.progress().result?.passed).toBe(true);
+  });
   it("completes once the stage is framed and held still", () => {
     const exercise = new WideShotExercise();
     const pose = widePose(40);

@@ -290,8 +290,13 @@ export function buildVenue(g: VenueGeometry): VenueObjects {
     hanger.position.set(camera.x + x, deckY + 3.3, camera.z + 0.6);
     catwalk.add(hanger);
   }
-  const bracket = new Mesh(track(new BoxGeometry(0.12, Math.abs(deckY - camera.y), 0.12)), railMat);
-  bracket.position.set(camera.x, (deckY + camera.y) / 2 + (inverted ? 0.2 : -0.2), camera.z + 0.25);
+  // The mount plate meets the physical base; drop length remains a schematic assumption.
+  const baseY = camera.y + (inverted ? 0.18 : -0.18);
+  const bracket = new Mesh(track(new BoxGeometry(0.05, Math.abs(deckY - baseY), 0.05)), railMat);
+  bracket.position.set(camera.x, (deckY + baseY) / 2, camera.z);
+  const plate = new Mesh(track(new BoxGeometry(0.2, 0.025, 0.22)), railMat);
+  plate.position.set(camera.x, baseY, camera.z);
+  catwalk.add(plate);
   catwalk.add(bracket);
   root.add(catwalk);
   const catwalkLabel = onOverviewLayer(makeLabel("Catwalk", { height: 1 }));

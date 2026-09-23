@@ -56,7 +56,7 @@ export function VenuePanel({ state, canvasRef, shown, quality, onToggle, onView 
             <span className="swatch swatch-cone" aria-hidden="true" /> What Camera 4 sees
           </li>
           <li>
-            <span className="swatch swatch-cam" aria-hidden="true" /> P240, drawn 3× size
+            <span className="swatch swatch-cam" aria-hidden="true" /> P240, physical scale
           </li>
           <li>
             <span className="swatch swatch-schematic" aria-hidden="true" /> Bowl, house and backline are schematic

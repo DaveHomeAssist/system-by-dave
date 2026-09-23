@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-23 — FMP venue profile foundation
+
+- Revised new-session stage estimates to 113 × 61 ft, with a selectable 113 × 75 ft working-depth alternative. Both remain provisional.
+- Defaulted the photographed installation to inverted mounting and physical camera scale; pan-zero, support dimensions and firmware flip settings remain unverified.
+- Added an explicit profile-update preview with Apply/Cancel. Venue v1 imports preserve saved geometry, mount and presets during the v2 provenance migration.
+- Added legacy round-trip and revised-stage framing coverage; preserved the existing narrow-stage exercise fixtures.
+
 ## 2026-09-23 — FMP Camera Simulator v1
 
 - Added `/camera-sim/` on housevideo.app (noindex): a virtual BirdDog P240 at the FMP catwalk position with a live 16:9 monitor, an orbiting venue view with the camera's viewing cone, and SuperJoy-style joystick, zoom, speed, Home and preset controls for keyboard, mouse and touch.

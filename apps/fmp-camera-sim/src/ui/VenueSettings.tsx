@@ -3,7 +3,7 @@ import { type SimulatorStore, type StoreState } from "../app/store";
 import { EVIDENCE_LABELS, type EvidenceStatus, VENUE_STATUS_OPTIONS } from "../domain/evidence";
 import { fromDisplayLength, toDisplayLength, formatLength, type LengthUnit } from "../domain/units";
 import { type Issue } from "../domain/validate";
-import { DIMENSION_SPECS, type DistanceBasis, type MountOrientation, type VenueProfile } from "../domain/venue";
+import { applyFmpStageProfile, type FmpStageProfile, DIMENSION_SPECS, type DistanceBasis, type MountOrientation, type VenueProfile } from "../domain/venue";
 import { EvidenceBadge, NoteField, NumberField, RadioGroup, SelectField, withFieldIssue } from "./fields";
 
 const STATUS_OPTIONS = VENUE_STATUS_OPTIONS.map((status) => ({ value: status, label: EVIDENCE_LABELS[status] }));
@@ -17,6 +17,9 @@ export function VenueSettings({ store, state }: Props) {
   const venue = state.project.venue;
   const unit = state.project.session.preferences.unit;
   const g = state.geometry;
+  const [profile, setProfile] = useState<FmpStageProfile>("plan");
+  const [preview, setPreview] = useState(false);
+  const proposed = applyFmpStageProfile(venue, profile);
   const [issues, setIssues] = useState<Issue[]>([]);
 
   const apply = (mutate: (draft: VenueProfile) => void, fieldPath?: string) => {
@@ -39,6 +42,27 @@ export function VenueSettings({ store, state }: Props) {
         Every dimension keeps its value, its evidence status and a source note. The simulator works in metres and shows {unit === "ft" ? "feet" : "metres"}.
         Anything not measured or confirmed keeps the <strong>Approximate venue</strong> flag on.
       </p>
+      <fieldset className="dimension">
+        <legend>Photo reference profile</legend>
+        <p>Current geometry: {venue.reference.geometryRevision === "legacy-v1" ? "preserved legacy settings" : "photo review baseline (editable)"}.</p>
+        <p>Stage dimensions are provisional. P100 establishes the inverted mount, but not camera height, pan-zero heading or firmware flip settings.</p>
+        <SelectField<FmpStageProfile> label="Stage interpretation" value={profile}
+          options={[{ value: "plan", label: "Plan interpretation · 113 × 61 ft" }, { value: "working-depth", label: "Working depth · 113 × 75 ft" }]}
+          onChange={(value) => { setProfile(value); setPreview(false); }} />
+        <button type="button" className="secondary-button" onClick={() => setPreview(true)}>Preview profile update</button>
+        {preview && <div className="notice" role="status">
+          <p>Width: {formatLength(venue.dimensions.stageWidth.value, unit)} → {formatLength(proposed.dimensions.stageWidth.value, unit)}<br />
+          Depth: {formatLength(venue.dimensions.stageDepth.value, unit)} → {formatLength(proposed.dimensions.stageDepth.value, unit)}<br />
+          Mount: {venue.mount.orientation} → inverted</p>
+          <p>Camera coordinates, heading and stored presets stay unchanged. Framing changes with the stage footprint. Current tilt may clamp to the inverted travel limits.</p>
+          <button type="button" className="secondary-button" onClick={() => {
+            const result = store.updateVenue(proposed);
+            setIssues(result.ok ? [] : result.issues);
+            if (result.ok) setPreview(false);
+          }}>Apply profile update</button>
+          <button type="button" className="secondary-button" onClick={() => setPreview(false)}>Cancel profile update</button>
+        </div>}
+      </fieldset>
       <RadioGroup<LengthUnit>
         legend="Units"
         value={unit}
@@ -171,7 +195,7 @@ export function VenueSettings({ store, state }: Props) {
           value={venue.mount.orientation}
           options={[
             { value: "upright", label: "Upright", hint: "Tilt travel +90° to −30°" },
-            { value: "inverted", label: "Inverted with E-Flip", hint: "Tilt travel +30° to −90°" },
+            { value: "inverted", label: "Inverted", hint: "Upright simulated video; tilt +30° to −90°. Real flip settings unknown." },
           ]}
           onChange={(orientation) =>
             apply((draft) => {
