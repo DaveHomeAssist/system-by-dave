@@ -597,6 +597,63 @@ h3 {
     var(--wb-panel);
 }
 
+.review-panel {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) minmax(240px, 1.4fr);
+  gap: 16px 24px;
+  margin: 12px 0;
+  padding: 22px;
+  border: 1px solid var(--wb-signal);
+  background: var(--wb-panel);
+  box-shadow: var(--wb-shadow);
+}
+
+.review-panel h2 {
+  margin: 7px 0;
+  font-family: var(--font-display);
+  font-size: clamp(24px, 2.6vw, 34px);
+  font-weight: 400;
+}
+
+.review-panel p:not(.kicker) {
+  max-width: 58ch;
+  color: var(--wb-muted);
+  line-height: 1.5;
+}
+
+.review-panel ul {
+  align-self: center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.review-panel li {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--wb-line);
+  overflow-wrap: anywhere;
+}
+
+.review-panel li strong { color: var(--wb-accent); }
+
+.review-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.review-actions button:first-child {
+  border-color: var(--wb-accent);
+  background: var(--wb-accent);
+  color: var(--wb-accent-ink);
+}
+
+.review-actions button:disabled { opacity: .55; cursor: wait; }
+
 .section-heading {
   grid-column: 1 / -1;
   display: grid;
@@ -1382,6 +1439,7 @@ label select {
   }
 
   .profile-grid,
+  .review-panel,
   .tool-list,
   .rf-lane,
   .zone-grid,

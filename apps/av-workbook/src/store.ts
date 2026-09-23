@@ -71,7 +71,23 @@ export function exportWorkbook(workbook: AvWorkbook): string {
 }
 
 export function importWorkbook(text: string): AvWorkbook {
-  return validateWorkbook(JSON.parse(text));
+  const source: unknown = JSON.parse(text);
+  const validated = validateWorkbook(source);
+  const unsupported: string[] = [];
+  function findUnsupported(input: unknown, parsed: unknown, location: string): void {
+    if (Array.isArray(input) && Array.isArray(parsed)) {
+      input.forEach((item, index) => findUnsupported(item, parsed[index], `${location}[${index}]`));
+    } else if (input && typeof input === "object" && parsed && typeof parsed === "object") {
+      for (const [key, value] of Object.entries(input)) {
+        const next = location ? `${location}.${key}` : key;
+        if (!(key in parsed)) unsupported.push(next);
+        else findUnsupported(value, (parsed as Record<string, unknown>)[key], next);
+      }
+    }
+  }
+  findUnsupported(source, validated, "");
+  if (unsupported.length) throw new Error(`Unsupported workbook fields: ${unsupported.slice(0, 8).join(", ")}${unsupported.length > 8 ? "…" : ""}. Export from a compatible version before importing.`);
+  return validated;
 }
 
 export function downloadText(filename: string, text: string, type = "application/json;charset=utf-8"): void {

@@ -6,6 +6,7 @@ import { DataGrid } from "./DataGrid";
 import { EngineDashboard } from "./EngineDashboard";
 import { downloadText, exportWorkbook, importWorkbook, loadActiveWorkbook, saveWorkbook } from "./store";
 import { mergeLegacyAudioIntoWorkbook, readLegacyAudioBundle } from "./legacyAudioImport";
+import { launchContextChanges, readLaunchContext, withLaunchContext } from "./launchContext";
 import { readRegistry } from "./registry";
 import type { AvWorkbook, RegistryTool } from "./types";
 import { validateWorkbookIssues } from "./validators";
@@ -41,34 +42,6 @@ function groupedWorkflowTools(tools: RegistryTool[]) {
     .filter((group) => group.tools.length);
 }
 
-function cleanParam(params: URLSearchParams, key: string, limit: number): string {
-  return String(params.get(key) || "").replace(/\s+/g, " ").trim().slice(0, limit);
-}
-
-function applyUrlContext(workbook: AvWorkbook): AvWorkbook {
-  if (typeof window === "undefined") return workbook;
-  const params = new URLSearchParams(window.location.search);
-  const showName = cleanParam(params, "sbdShow", 120);
-  const venue = cleanParam(params, "sbdVenue", 120);
-  const targetDate = cleanParam(params, "sbdDate", 20);
-  if (!showName && !venue && !targetDate) return workbook;
-  const show = { ...workbook.show };
-  let changed = false;
-  if (showName && show.showName !== showName) {
-    show.showName = showName;
-    changed = true;
-  }
-  if (venue && show.venue !== venue) {
-    show.venue = venue;
-    changed = true;
-  }
-  if (targetDate && show.targetDate !== targetDate) {
-    show.targetDate = targetDate;
-    changed = true;
-  }
-  return changed ? { ...workbook, show } : workbook;
-}
-
 function workbookCounts(workbook: AvWorkbook) {
   return {
     rooms: workbook.rooms.length,
@@ -81,11 +54,30 @@ function workbookCounts(workbook: AvWorkbook) {
   };
 }
 
+interface PendingImport {
+  kind: "json" | "legacy";
+  proposed: AvWorkbook;
+  description: string;
+  details: string[];
+  baseWorkbookId: string;
+  baseSavedAt: string;
+}
+
+function backupWorkbook(workbook: AvWorkbook): void {
+  const safeName = workbook.show.showName.replace(/[^a-z0-9]+/gi, "-").toLowerCase() || "show";
+  downloadText(`${safeName}-${workbook.workbookId}-backup.json`, exportWorkbook(workbook));
+}
+
 export default function App() {
   const shellRef = useRef<HTMLElement>(null);
   const [workbook, setWorkbook] = useState<AvWorkbook | null>(null);
   const [message, setMessage] = useState("Loading workbook...");
   const [activeTab, setActiveTab] = useState<"overview" | "crew" | "rooms" | "engines">("overview");
+  const [contextDismissed, setContextDismissed] = useState(false);
+  const [pendingImport, setPendingImport] = useState<PendingImport | null>(null);
+  const [importBusy, setImportBusy] = useState(false);
+  const launchContext = useMemo(() => readLaunchContext(typeof window === "undefined" ? "" : window.location.search), []);
+  const contextChanges = workbook && !contextDismissed ? launchContextChanges(workbook, launchContext) : [];
   const registry = useMemo(readRegistry, []);
   const counts = workbook ? workbookCounts(workbook) : null;
   const workflowGroups = useMemo(() => groupedWorkflowTools(registry.tools), [registry.tools]);
@@ -145,13 +137,10 @@ export default function App() {
   useEffect(() => {
     let cancelled = false;
     loadActiveWorkbook()
-      .then(async (loaded) => {
+      .then((loaded) => {
         if (cancelled) return;
-        const withContext = applyUrlContext(loaded);
-        const saved = withContext === loaded ? loaded : await saveWorkbook(withContext);
-        if (cancelled) return;
-        setWorkbook(saved);
-        setMessage(withContext === loaded ? "Workbook loaded from local storage." : "Workbook loaded with suite context.");
+        setWorkbook(loaded);
+        setMessage("Workbook loaded from local storage.");
       })
       .catch((error: unknown) => {
         if (cancelled) return;
@@ -181,13 +170,38 @@ export default function App() {
     setMessage("Workbook JSON exported.");
   }
 
+  async function applyLaunchContext() {
+    if (!workbook || !contextChanges.length) return;
+    try {
+      const latest = await loadActiveWorkbook();
+      if (latest.workbookId !== workbook.workbookId || latest.savedAt !== workbook.savedAt) {
+        setMessage("Workbook changed in another tab. Reload and review the link again.");
+        return;
+      }
+      const saved = await saveWorkbook(withLaunchContext(latest, contextChanges));
+      setWorkbook(saved);
+      setContextDismissed(true);
+      setMessage("Suite link details applied to this workbook.");
+    } catch (error: unknown) {
+      setMessage(error instanceof Error ? error.message : "Suite link details could not be saved.");
+    }
+  }
+
   async function handleImport(file: File | null) {
-    if (!file) return;
-    const text = await file.text();
-    const parsed = importWorkbook(text);
-    const saved = await saveWorkbook(parsed);
-    setWorkbook(saved);
-    setMessage("Workbook JSON imported.");
+    if (!file || !workbook) return;
+    try {
+      const parsed = importWorkbook(await file.text());
+      setPendingImport({
+        kind: "json", proposed: parsed, description: `Import ${file.name} as a separate workbook copy.`,
+        baseWorkbookId: workbook.workbookId, baseSavedAt: workbook.savedAt,
+        details: [`Show: ${parsed.show.showName}`, `Venue: ${parsed.show.venue || "—"}`, `Date: ${parsed.show.targetDate}`,
+          ...Object.entries(workbookCounts(parsed)).map(([label, count]) => `${label}: ${count}`)]
+      });
+      setMessage("JSON validated. Review the import before saving.");
+    } catch (error: unknown) {
+      setPendingImport(null);
+      setMessage(error instanceof Error ? `Import rejected: ${error.message}` : "Import rejected: invalid workbook JSON.");
+    }
   }
 
   async function handleLegacyAudioImport() {
@@ -206,12 +220,51 @@ export default function App() {
         setMessage("No Input List, Audio Patch, or Line Check data found in this browser.");
         return;
       }
-      const saved = await saveWorkbook(result.workbook);
-      setWorkbook(saved);
-      setActiveTab("engines");
-      setMessage(`Legacy audio imported: ${result.summary.signalSources} sources, ${result.summary.patchRecords} patches, ${result.summary.lineChecks} line checks.`);
+      const existingLegacy = [workbook.signalSources, workbook.patchRecords, workbook.lineChecks]
+        .map((rows) => rows.filter((row) => row.id.startsWith("legacy-")).length);
+      setPendingImport({
+        kind: "legacy", proposed: result.workbook, description: "Merge legacy audio into the active workbook.",
+        baseWorkbookId: workbook.workbookId, baseSavedAt: workbook.savedAt,
+        details: [
+          `Sources: ${result.summary.signalSources}; patches: ${result.summary.patchRecords}; line checks: ${result.summary.lineChecks}`,
+          `Existing legacy rows replaced: ${existingLegacy.join(" / ")} (sources / patches / line checks)`,
+          `Read: ${result.summary.importedKeys.join(", ")}`,
+          `Missing or empty: ${result.summary.skippedKeys.join(", ") || "none"}`,
+          `Unmapped structured fields: ${result.summary.unmappedFields.join(", ") || "none detected"}. Keep legacy pages and their exports for these details.`,
+          ...(workbook.show.showName !== result.workbook.show.showName ? [`Show: ${workbook.show.showName} → ${result.workbook.show.showName}`] : []),
+          ...(workbook.show.venue !== result.workbook.show.venue ? [`Venue: ${workbook.show.venue || "—"} → ${result.workbook.show.venue || "—"}`] : []),
+          ...(workbook.show.targetDate !== result.workbook.show.targetDate ? [`Date: ${workbook.show.targetDate} → ${result.workbook.show.targetDate}`] : [])
+        ]
+      });
+      setMessage("Legacy audio mapped. Review the changes before saving.");
     } catch (error: unknown) {
       setMessage(error instanceof Error ? error.message : "Legacy audio import failed.");
+    }
+  }
+
+  async function applyPendingImport() {
+    if (!workbook || !pendingImport || importBusy) return;
+    setImportBusy(true);
+    try {
+      const latest = await loadActiveWorkbook();
+      if (latest.workbookId !== pendingImport.baseWorkbookId || latest.savedAt !== pendingImport.baseSavedAt) {
+        setPendingImport(null);
+        setMessage("Workbook changed since this preview. Review the import again before saving.");
+        return;
+      }
+      backupWorkbook(latest);
+      const next = pendingImport.kind === "json"
+        ? { ...pendingImport.proposed, workbookId: `wb-import-${crypto.randomUUID()}` }
+        : pendingImport.proposed;
+      const saved = await saveWorkbook(next);
+      setWorkbook(saved);
+      setPendingImport(null);
+      setActiveTab(pendingImport.kind === "legacy" ? "engines" : "overview");
+      setMessage(`${pendingImport.kind === "json" ? "Workbook copy imported" : "Legacy audio merged"}. Previous workbook backup downloaded.`);
+    } catch (error: unknown) {
+      setMessage(error instanceof Error ? error.message : "Import could not be saved.");
+    } finally {
+      setImportBusy(false);
     }
   }
 
@@ -254,10 +307,30 @@ export default function App() {
           <button type="button" onClick={() => void handleLegacyAudioImport()}>Import Legacy Audio</button>
           <label className="file-button primary primary-action">
             Import JSON
-            <input type="file" accept="application/json" onChange={(event) => void handleImport(event.target.files?.[0] ?? null)} />
+            <input type="file" accept="application/json" onChange={(event) => { void handleImport(event.target.files?.[0] ?? null); event.target.value = ""; }} />
           </label>
         </nav>
       </header>
+
+      {contextChanges.length ? (
+        <section className="review-panel" aria-labelledby="launch-context-title">
+          <div><p className="kicker">Suite link offer</p><h2 id="launch-context-title">Apply show details from this link?</h2>
+            <p>Opening a link does not change saved show data. Review each difference first.</p></div>
+          <ul>{contextChanges.map((change) => <li key={change.field}><strong>{change.label}</strong><span>{change.current || "—"} → {change.incoming}</span></li>)}</ul>
+          <div className="review-actions"><button type="button" onClick={() => void applyLaunchContext()}>Apply to current workbook</button>
+            <button type="button" onClick={() => setContextDismissed(true)}>Dismiss</button></div>
+        </section>
+      ) : null}
+
+      {pendingImport ? (
+        <section className="review-panel" aria-labelledby="import-review-title">
+          <div><p className="kicker">Import review</p><h2 id="import-review-title">{pendingImport.description}</h2>
+            <p>The current workbook will be downloaded as a JSON backup before saving. A JSON import gets a new workbook ID, so existing records remain available.</p></div>
+          <ul>{pendingImport.details.map((detail) => <li key={detail}>{detail}</li>)}</ul>
+          <div className="review-actions"><button type="button" disabled={importBusy} onClick={() => void applyPendingImport()}>{importBusy ? "Saving…" : "Download backup and apply"}</button>
+            <button type="button" disabled={importBusy} onClick={() => setPendingImport(null)}>Cancel import</button></div>
+        </section>
+      ) : null}
 
       <section className="hero-panel" aria-labelledby="workbook-title">
         <div className="hero-copy">
