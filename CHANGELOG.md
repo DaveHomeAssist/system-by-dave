@@ -1,9 +1,3 @@
-## 2026-09-23 — FMP source reconciliation
-
-- Corrected the URSA Broadcast G2 back-focus shortcut to select the fitted lens method before adjustment.
-- Reconciled the exported FMP operator references with FMP-8 status and documented house-video evidence while retaining unresolved physical paths as Unknown.
-- Kept the active reference panel visible when the mobile House Video shell places tabs below its separately scrolling content.
-
 # Changelog
 
 ## 2026-09-23 — Camera Shading Practice console
@@ -18,6 +12,12 @@
 - Kept every exercise score identical to the previous engine. Version-1 Shader exports and legacy Throwline exports still import; new optional state fields are bounded and ignored by older readers.
 - Supersedes the interim console published by #108 and #110, which a parallel Codex review built from an early snapshot of this work. Kept its reference lock (Camera A is inspection-only, with its settings hidden), its per-exercise attempt numbering, its edge viewports, and its CSP hardening (no frames, media or referrer), which the source gate now checks directive by directive; bumped the shared build identifier so cached interim files update cleanly.
 - Expanded the engine tests and the browser probe and added offline-worker tests; see `docs/shader-practice.md`.
+
+## 2026-09-23 — FMP source reconciliation
+
+- Corrected the URSA Broadcast G2 back-focus shortcut to select the fitted lens method before adjustment.
+- Reconciled the exported FMP operator references with FMP-8 status and documented house-video evidence while retaining unresolved physical paths as Unknown.
+- Kept the active reference panel visible when the mobile House Video shell places tabs below its separately scrolling content.
 
 ## 2026-09-23 — AV by Dave landing and show entry repair
 
