@@ -67,7 +67,6 @@
 
   const fields = Array.from(document.querySelectorAll('[data-key]'));
   const isLedPage = document.documentElement.dataset.avTool === 'led-wall-calculator';
-  if (isLedPage) document.documentElement.classList.add('led-workspace-ready');
   const activeKeys = new Set(fields.map(field => field.dataset.key));
   const els = {
     delayMs: document.getElementById('delayMs'),
