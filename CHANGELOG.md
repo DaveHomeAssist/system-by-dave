@@ -12,6 +12,19 @@
 - Kept every exercise score identical to the previous engine. Version-1 Shader exports and legacy Throwline exports still import; new optional state fields are bounded and ignored by older readers. Attempt numbers now restart for each exercise (from the parallel Codex review).
 - Expanded the engine tests and the browser probe; see `docs/shader-practice.md`.
 
+## 2026-09-23 — AV by Dave landing and show entry repair
+
+- Added an AV domain home page with direct Show Console, Toolbox, quick-tool, resume, help, and Front Office roadmap paths. The landing follows the shared AV palette with light and dark modes.
+- Reduced first-run Show Console setup to a name field, removed the old product-name show default, and kept empty show names out of tool links. Existing show profile, readiness, and saved work remain under their current keys.
+- Made Front Office addressable, added deterministic returns to the AV home, replaced a broken tool-bar directory link with AV Toolbox, and cached the landing for offline root visits after service-worker preparation.
+
+## 2026-09-23 — LED wall calculator and quick-calculator cleanup
+
+- Moved the cabinet-aware LED wall planner to its own `led-wall-calculator.html` route on AV by Dave. Kept existing cabinet profiles and calculator values in their original browser storage keys.
+- Kept the six quick calculations on `av-calculator.html`, added direct jumps and an LED planner link, and preserved the LED-to-Power Load handoff across pages. Power-factor input remains required for current estimates.
+- Added visible light/dark controls, shared calculator CSS and JavaScript, offline assets, route registration, sitemap generation, Stage 3D offline-cache pin alignment, and focused browser regression coverage for both pages.
+- Made the Gear Reference public-count release check derive its expected value from the AV registry, allowing the new tool to pass the Pages gate.
+
 ## 2026-09-23 — Camera practice moved to Shader
 
 - Moved the simulated camera-shading exercises, scopes, state engine, offline cache, and release gates to the existing Camera Control & Shading reference at `housevideo.app/shader/`.

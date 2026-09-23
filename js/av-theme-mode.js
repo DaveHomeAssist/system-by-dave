@@ -6,7 +6,7 @@
 
   var locked = root.getAttribute('data-av-theme-lock');
   var hasLock = locked === 'dark' || locked === 'light';
-  var mode = hasLock ? locked : 'dark';
+  var mode = hasLock ? locked : 'light';
   if(!hasLock){
     try{
       var stored = localStorage.getItem('av-theme-mode.v1');

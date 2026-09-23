@@ -65,7 +65,8 @@
     {id:'truck-pack',name:'Truck Pack Plan',href:'truck-pack.html',dept:'Logistics',phases:['prep','loadin','strike'],tag:'Truck',desc:'Cases, truck zones, load order, unload order, weights, owners, pack status, and issues.',storageKeys:[{key:'truck-pack.v1',label:'Truck Pack Plan'}]},
     {id:'load-in-plan',name:'Load In Plan',href:'load-in-plan.html',dept:'Logistics',phases:['loadin'],tag:'Load In',desc:'Trucks, docks, destinations, departments, items, owners, due times, build status, blockers, and gaps.',storageKeys:[{key:'load-in-plan.v1',label:'Load In Plan'}]},
     {id:'strike-plan',name:'Strike Plan',href:'strike-plan.html',dept:'Logistics',phases:['strike'],tag:'Strike',desc:'Departments, strike items, locations, owners, case IDs, destinations, load out status, missing gear, and issues.',storageKeys:[{key:'strike-plan.v1',label:'Strike Plan'}]},
-    {id:'av-calculator',name:'AV Calculator',href:'av-calculator.html',dept:'Utility',phases:['advance','prep','loadin','show'],tag:'Math',desc:'Audio delay, projection throw, record storage, and power load checks with copyable summaries.',storageKeys:[{key:'avCalculator.v1',label:'AV Calculator'}],toolboxFeatured:true},
+    {id:'av-calculator',name:'AV Calculator',href:'av-calculator.html',dept:'Utility',phases:['advance','prep','loadin','show'],tag:'Math',desc:'Audio delay, projection throw, record storage, power load, voltage drop, and SPL distance with a copyable field summary.',storageKeys:[{key:'avCalculator.v1',label:'AV Calculator'}],toolboxFeatured:true},
+    {id:'led-wall-calculator',name:'LED Wall Calculator',href:'led-wall-calculator.html',dept:'Utility',phases:['advance','prep','loadin','show'],tag:'LED',desc:'Cabinet-aware wall geometry, native raster, content fit, processor port, viewing, and power planning.',storageKeys:[{key:'avCalculator.ledProfiles.v1',label:'LED wall cabinet profiles'}]},
     {id:'ontrack',name:'OnTrack',href:'ontrack.html',dept:'Music',phases:['prep','show','closeout'],tag:'DJ',desc:'DJ set intelligence — rekordbox library import, planned vs played sets, tags, and per-track debrief notes.',storageKeys:[{key:'ontrack_v1',label:'OnTrack library, sets, and notes'}]}
   ];
 
@@ -93,7 +94,7 @@
     {label:'Logistics',toolIds:['gear-prep','gear-reference','truck-pack','load-in-plan','strike-plan','show-advance']},
     {label:'Crew',toolIds:['crew-call','crew-time-log']},
     {label:'Show docs & client',toolIds:['show-handoff','show-report','show-task-board','change-order','client-signoff']},
-    {label:'Calculators',toolIds:['av-calculator']},
+    {label:'Calculators',toolIds:['av-calculator','led-wall-calculator']},
     {label:'Music',toolIds:['ontrack']}
   ];
 
@@ -107,6 +108,9 @@
 
   /* Shared shell assets every offline session needs. */
   var BASE_ASSETS=[
+    './av-suite-landing.html',
+    './css/av-landing.css',
+    './js/av-landing.js',
     './av-suite.html',
     './av-suite-worker.js',
     './css/av-suite.css',
@@ -122,7 +126,9 @@
     './js/sbd-handoff.js',
     './js/responsive-tables.js',
     './js/av-domain-views.js',
+    './js/av-calculator.js',
     './js/vendor/gsap.min.js',
+    './css/av-calculator.css',
     './ProjectorThrow/index.html',
     './ProjectorThrow/Stage3D.html',
     './ProjectorThrow/throwline-scene-state.js',
@@ -198,7 +204,7 @@
     {id:'crew',label:'Crew',depts:'Labor',icon:['M16 20v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2','M9 10a4 4 0 1 0 0-8 4 4 0 0 0 0 8z','M22 20v-2a4 4 0 0 0-3-3.9','M16 3.1a4 4 0 0 1 0 7.8'],toolIds:['crew-call','crew-time-log']},
     {id:'docs',label:'Docs & client',depts:'Closeout · Client · Rooms',icon:['M15 2H6a1 1 0 0 0-1 1v18a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V6z','M14 2v5h5','m9 14 2 2 4-4'],toolIds:['show-task-board','show-handoff','show-report','change-order','client-signoff']},
     {id:'graphics',label:'Graphics',depts:'Graphics',icon:['M3 4h18v16H3z','M8.5 10a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z','m21 15-5-5L3 20'],toolIds:['pixelforge']},
-    {id:'calc',label:'Calculators',depts:'Utility',icon:['M5 2h14v20H5z','M8 6h8','M8 11h.01','M12 11h.01','M16 11h.01','M8 15h.01','M12 15h.01','M16 15v4'],toolIds:['av-calculator'],subs:{'av-calculator':[{label:'Audio delay',kind:'Calc',source:'343 m/s at 20°C, dry air'},{label:'Projection throw',kind:'Calc',source:'Manufacturer lens ratio'},{label:'Record storage',kind:'Calc',source:'Codec bitrate tables'},{label:'Power load',kind:'Calc',source:'NEC 210.20(A) 80% rule'}]}},
+    {id:'calc',label:'Calculators',depts:'Utility',icon:['M5 2h14v20H5z','M8 6h8','M8 11h.01','M12 11h.01','M16 11h.01','M8 15h.01','M12 15h.01','M16 15v4'],toolIds:['av-calculator','led-wall-calculator'],subs:{'av-calculator':[{label:'Audio delay',kind:'Calc',source:'343 m/s at 20°C, dry air'},{label:'Projection throw',kind:'Calc',source:'Manufacturer lens ratio'},{label:'Record storage',kind:'Calc',source:'Codec bitrate tables'},{label:'Power load',kind:'Calc',source:'Nameplate or manufacturer PF'}],'led-wall-calculator':[{label:'Cabinet layout',kind:'Calc',source:'Manufacturer cabinet dimensions and raster'},{label:'Port planning',kind:'Estimate',source:'Processor and receiver specifications'},{label:'Power',kind:'Estimate',source:'Manufacturer and venue specifications'}]}},
     {id:'music',label:'Music',depts:'Music · outside AV scope',icon:['M9 18V5l12-2v13','M6 21a3 3 0 1 0 0-6 3 3 0 0 0 0 6z','M18 19a3 3 0 1 0 0-6 3 3 0 0 0 0 6z'],toolIds:['ontrack']}
   ];
 
@@ -228,7 +234,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool change — rolls the service-worker cache. */
-    version:'v20260923-shader-practice-relocation',
+    version:'v20260923-led-wall-av-landing',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,
