@@ -42,11 +42,21 @@ export function MonitorPanel({ state, store, canvasRef, overlayRef, expanded, on
         <div className="panel-tools" role="group" aria-label="Monitor guides">
           {GUIDE_BUTTONS.map(({ key, label }) => (
             <button key={key} {...keepFocus} type="button" className="tool-button" aria-pressed={guides[key]} onClick={() => onGuides({ [key]: !guides[key] })}>
-              {label}
+              <span className="tool-label">{label}</span>
             </button>
           ))}
-          <button {...keepFocus} type="button" className="tool-button" aria-pressed={expanded} onClick={onToggleExpanded} title="F">
-            {expanded ? "Restore layout" : "Expand monitor"}
+          {/* Phones show the short label; the accessible name stays the full one. */}
+          <button
+            {...keepFocus}
+            type="button"
+            className="tool-button"
+            aria-pressed={expanded}
+            aria-label={expanded ? "Restore layout" : "Expand monitor"}
+            onClick={onToggleExpanded}
+            title="F"
+          >
+            <span className="tool-label label-long">{expanded ? "Restore layout" : "Expand monitor"}</span>
+            <span className="tool-label label-short">{expanded ? "Restore" : "Expand"}</span>
           </button>
         </div>
       </div>
