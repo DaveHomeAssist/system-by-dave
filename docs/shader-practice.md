@@ -117,7 +117,9 @@ npm run verify:shader-practice        # engine tests and source release gate
 npm run test:shader-practice-browser  # CDP browser probe
 ```
 
-The browser probe covers the six reference viewports in both themes,
-keyboard-only use with visible focus, contrast, 44 px targets, reduced motion,
-offline reload, exact handoff, legacy and invalid imports, and the storage,
-clipboard, canvas, service-worker and no-JavaScript failure paths.
+The browser probe covers ten viewports in both themes (320×568, 390×844,
+820×900, 821×900, 876×900, 1024×768, 1024×600, 1440×900, 2560×1440 and
+2560×1080), keyboard-only use with visible focus, contrast, 44 px targets,
+Score and control reachability, the reference lock, reduced motion, offline
+reload, exact handoff, legacy and invalid imports, and the storage, clipboard,
+canvas, service-worker and no-JavaScript failure paths.
