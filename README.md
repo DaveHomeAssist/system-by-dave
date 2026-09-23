@@ -47,6 +47,7 @@ use the tooling selected for that surface.
 | `av-suite.html?entry=toolbox` | Show-independent AV Toolbox directory |
 | `av-calculator.html` | Six quick AV calculations and a copyable field summary on avbydave.com |
 | `led-wall-calculator.html` | Cabinet-aware LED wall planning on avbydave.com; shares calculator values with Power Load |
+| `av-suite-landing.html` | Source for the avbydave.com home page, staged as `/` on that domain |
 | `depotops/index.html` | Local-first project shopping, inventory, and tool tracking |
 | `pixelforge/` | PixelForge editor |
 | `resume/index.html` | Public resume |
@@ -75,6 +76,10 @@ old-origin redirects deploy. Check the staged sites locally with:
 ```bash
 npm run verify:domain-sites
 ```
+
+The AV domain root is the Show Console and Toolbox landing page. Its source is
+`av-suite-landing.html`; the staging script publishes it as `/`, while
+`av-suite.html` remains the stable operator doorway.
 
 `docs/domain-sites.md` covers the page lists, saved-data transfer, and the
 cutover checklist.

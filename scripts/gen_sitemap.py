@@ -160,6 +160,8 @@ def main():
 
     dirty = dirty_paths()
     entries = []
+    if site and site.get('home') == '/' and site.get('landingPage'):
+        entries.append(('', lastmod_for(site['landingPage'], dirty), 'weekly', '1.0'))
     for path, freq, prio in STATIC_PAGES:
         if not belongs(path):
             continue

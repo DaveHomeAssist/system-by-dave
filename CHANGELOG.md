@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-23 — AV by Dave landing and show entry repair
+
+- Added an AV domain home page with direct Show Console, Toolbox, quick-tool, resume, help, and Front Office roadmap paths. The landing follows the shared AV palette with light and dark modes.
+- Reduced first-run Show Console setup to a name field, removed the old product-name show default, and kept empty show names out of tool links. Existing show profile, readiness, and saved work remain under their current keys.
+- Made Front Office addressable, added deterministic returns to the AV home, replaced a broken tool-bar directory link with AV Toolbox, and cached the landing for offline root visits after service-worker preparation.
+
 ## 2026-09-23 — LED wall calculator and quick-calculator cleanup
 
 - Moved the cabinet-aware LED wall planner to its own `led-wall-calculator.html` route on AV by Dave. Kept existing cabinet profiles and calculator values in their original browser storage keys.

@@ -37,8 +37,12 @@ function link(source, rel) {
 }
 
 function routeFile(url) {
-  const route = new URL(url).pathname;
-  if (route === '/') return 'index.html';
+  const parsed = new URL(url);
+  const route = parsed.pathname;
+  if (route === '/') {
+    const site = cutoverSites().find((entry) => entry.domain === parsed.hostname && entry.landingPage);
+    return site ? site.landingPage : 'index.html';
+  }
   if (route.endsWith('/')) return `${route.slice(1)}index.html`;
   return route.slice(1);
 }
