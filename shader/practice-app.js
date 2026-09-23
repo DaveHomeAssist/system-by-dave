@@ -875,9 +875,12 @@
   }
 
   function renderStatus(scenario, evaluation, alerts) {
+    // During a demonstration the practice is parked; the DEMO badge replaces
+    // its status word so a matched baseline never reads as a completed exercise.
     const status = Practice.exerciseStatus(state);
     els.exerciseStatus.dataset.level = status;
     setText(els.exerciseStatus, status);
+    setHidden(els.exerciseStatus, Boolean(state.demo));
     const index = Practice.scenarioList().findIndex(item => item.id === scenario.id) + 1;
     setText(els.exerciseName, `${String(index).padStart(2, '0')} · ${scenario.title.toUpperCase()}`);
     const current = Practice.workflowSteps(state).find(step => step.current);

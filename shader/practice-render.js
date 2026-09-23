@@ -239,14 +239,14 @@
     if (options.clipText) text(ctx, options.clipText, area.x + 6 * ratio, levelY(area, 1) + 10 * ratio, ratio, { color: GLASS.clip, weight: 700, box: true });
   }
 
-  // Plot every generated sample at its column. Additive blending lets dense
-  // levels glow brighter, the way a phosphor trace accumulates.
-  function plotLevels(ctx, area, analysis, rgb, alpha, ratio, valueOf, additive) {
+  // Plot every generated sample at its column. Overlapping samples build up
+  // toward the trace colour, so dense levels read brighter without washing
+  // out, and a matched target covers the grey reference ghost.
+  function plotLevels(ctx, area, analysis, rgb, alpha, ratio, valueOf) {
     const columns = analysis.width;
     const columnWidth = area.w / columns;
     const dot = Math.max(1.5 * ratio, Math.min(5 * ratio, area.h / 150));
     ctx.save();
-    ctx.globalCompositeOperation = additive ? 'lighter' : 'source-over';
     ctx.fillStyle = rgba(rgb, alpha);
     const samples = analysis.samples;
     for (let index = 0; index < samples.length; index += 1) {
@@ -263,8 +263,7 @@
     const { ctx, width, height, ratio } = surface;
     const area = box(width, height, ratio, [12, 10, 12, 34]);
     levelGraticule(ctx, area, ratio, true);
-    // The grey ghost is laid down plainly; the target glows on top of it.
-    data.series.forEach(series => plotLevels(ctx, area, series.analysis, SERIES[series.slot], series.slot ? 0.3 : 0.22, ratio, luma, Boolean(series.slot)));
+    data.series.forEach(series => plotLevels(ctx, area, series.analysis, SERIES[series.slot], series.slot ? 0.42 : 0.34, ratio, luma));
     levelMarkers(ctx, area, ratio, data);
   }
 
@@ -278,7 +277,7 @@
       levelGraticule(ctx, area, ratio, channelIndex === 0);
       data.series.forEach(series => {
         const color = series.slot ? CHANNELS[channel] : SERIES[0];
-        plotLevels(ctx, area, series.analysis, color, series.slot ? 0.34 : 0.22, ratio, rgb => rgb[channelIndex], Boolean(series.slot));
+        plotLevels(ctx, area, series.analysis, color, series.slot ? 0.45 : 0.34, ratio, rgb => rgb[channelIndex]);
       });
       hLine(ctx, area.x, levelY(area, 1), area.w, ratio, GLASS.clip, [5, 4]);
       text(ctx, channel.toUpperCase(), area.x + 4 * ratio, area.y - 8 * ratio, ratio, { color: rgba(CHANNELS[channel], 1), weight: 700 });
@@ -323,9 +322,8 @@
     });
     ctx.restore();
     ctx.save();
-    ctx.globalCompositeOperation = 'lighter';
     data.series.forEach(series => {
-      ctx.fillStyle = rgba(SERIES[series.slot], series.slot ? 0.55 : 0.35);
+      ctx.fillStyle = rgba(SERIES[series.slot], series.slot ? 0.6 : 0.45);
       const dot = 2 * ratio;
       series.analysis.vectorscope.forEach(point => ctx.fillRect(cx + point.u * scale - dot / 2, cy - point.v * scale - dot / 2, dot, dot));
     });
