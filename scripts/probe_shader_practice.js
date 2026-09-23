@@ -110,15 +110,20 @@ class Page {
     if (result.exceptionDetails) throw new Error(`${this.label}: ${result.exceptionDetails.exception?.description || result.exceptionDetails.text}`);
     return result.result.value;
   }
+  // Every open is a fresh document. A URL that differs from the current one
+  // only by its fragment would otherwise be a same-document navigation that
+  // never reloads, so the old document is marked and must be replaced.
   async open(url) {
+    try { await this.eval(() => { window.__shaderProbeStale = true; }); } catch {}
+    await this.send('Page.navigate', { url: 'about:blank' });
     await this.send('Page.navigate', { url });
     for (let count = 0; count < 160; count += 1) {
       try {
-        if (await this.eval(() => Boolean(window.ShaderPracticeApp && document.readyState === 'complete'))) { await this.settle(); return; }
+        if (await this.eval(() => Boolean(!window.__shaderProbeStale && window.ShaderPracticeApp && document.readyState === 'complete'))) { await this.settle(); return; }
       } catch {}
       await delay(75);
     }
-    throw new Error(`${this.label}: Shader Practice did not become ready at ${url}`);
+    throw new Error(`${this.label}: Shader Practice did not become ready at ${url.slice(0, 200)}`);
   }
   async settle() {
     await this.eval(() => new Promise(resolve => {
@@ -313,6 +318,17 @@ async function mainSession(page, baseUrl) {
   const undone = await pedestal();
   await page.key('z', MODIFIER.ctrl | MODIFIER.shift);
   check('Ctrl+Z undoes one adjustment gesture and Ctrl+Shift+Z redoes it', undone === 4.5 && await pedestal() === 2.5, { undone });
+  // A pause longer than one gesture starts a new change, and the last-change
+  // note starts from exactly what one undo restores.
+  await page.key('ArrowRight');
+  await delay(1400);
+  await page.key('ArrowRight');
+  const noteText = await page.eval(() => { ShaderPracticeApp.renderNow(); return document.getElementById('causeEffect').textContent; });
+  const [, noteFrom, noteTo] = noteText.match(/PEDESTAL (\S+) → (\S+)/) || [];
+  await page.key('z', MODIFIER.ctrl);
+  const oneUndo = await pedestal();
+  await page.key('z', MODIFIER.ctrl);
+  check('the last-change note describes exactly what one undo reverts', parseFloat(noteFrom) === 2.6 && parseFloat(noteTo) === 2.7 && oneUndo === 2.6 && await pedestal() === 2.5, { noteText, oneUndo });
 
   await page.eval(() => { const input = document.getElementById('value-gain'); input.focus(); input.select(); });
   await page.send('Input.insertText', { text: '-1.2' });
@@ -508,6 +524,31 @@ async function mainSession(page, baseUrl) {
   await page.open(`${baseUrl}shader/practice.html`);
   const persisted = await page.eval(() => ShaderPracticeApp.getState());
   check('a plain reload continues the saved session on this device', JSON.stringify(persisted) === JSON.stringify(handoff.state));
+
+  // A damaged or oversized link never replaces the saved session.
+  const linkOutcome = () => page.eval(() => ({ state: ShaderPracticeApp.getState(), toast: document.getElementById('toast').textContent, hash: location.hash }));
+  await page.open(handoff.url.slice(0, Math.floor(handoff.url.length * 0.6)));
+  const damaged = await linkOutcome();
+  check('a damaged link keeps the saved session, says so, and is dropped', JSON.stringify(damaged.state) === JSON.stringify(handoff.state) && /incomplete or damaged/.test(damaged.toast) && /saved practice session is open instead/.test(damaged.toast) && damaged.hash === '', { toast: damaged.toast, hash: damaged.hash.slice(0, 40) });
+  await page.open(`${baseUrl}shader/practice.html#state=${'A'.repeat(560000)}`);
+  const oversized = await linkOutcome();
+  check('an oversized link is refused before it is decoded', JSON.stringify(oversized.state) === JSON.stringify(handoff.state) && /too long/.test(oversized.toast) && oversized.hash === '', { toast: oversized.toast });
+  await page.open(`${baseUrl}shader/practice.html`);
+  check('the saved session survives both refused links', JSON.stringify(await page.eval(() => ShaderPracticeApp.getState())) === JSON.stringify(handoff.state));
+
+  // Pasting a link into an open tab changes only the fragment: no reload.
+  const pastedState = await page.eval(() => ShaderPracticeState.createPracticeState({ scenarioId: 'recover-highlights', seed: 'pasted-link' }));
+  const pastedHash = Buffer.from(JSON.stringify({ kind: 'shader-camera-practice-session', schema: 'shader.camera-practice.v1', schemaVersion: 1, exportedAt: null, state: pastedState })).toString('base64url');
+  await page.eval(() => { window.__shaderPasteMarker = true; });
+  await page.send('Page.navigate', { url: `${baseUrl}shader/practice.html#state=${pastedHash}` });
+  let pasted = null;
+  for (let count = 0; count < 40 && !(pasted && pasted.seed === 'pasted-link'); count += 1) {
+    await delay(75);
+    pasted = await page.eval(() => ({ seed: ShaderPracticeApp.getState().seed, scenario: ShaderPracticeApp.getState().scenarioId, sameDocument: window.__shaderPasteMarker === true, toast: document.getElementById('toast').textContent, hash: location.hash }));
+  }
+  check('a link pasted into the open tab loads without a reload and is saved', pasted.seed === 'pasted-link' && pasted.scenario === 'recover-highlights' && pasted.sameDocument && /Opened the practice session from the link/.test(pasted.toast) && pasted.hash === '', pasted);
+  await page.open(`${baseUrl}shader/practice.html`);
+  check('the pasted session is what a later visit continues', await page.eval(() => ShaderPracticeApp.getState().seed) === 'pasted-link');
 
   // Imports through the visible file control: legacy Throwline, then invalid.
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'shader-import-'));

@@ -27,7 +27,10 @@ redirect to the Shader route, and old Throwline practice exports still import.
 | `shader/practice-worker.js` | Dedicated offline cache for the console, the parent reference, and its stylesheets. |
 
 The page loads only these same-origin files. Its CSP allows no inline script or
-style, no network connections (`connect-src 'none'`), and no plugins.
+style, no network connections (`connect-src 'none'`), no plugins, frames or
+media, and the page sends no referrer. The source gate compares every CSP
+directive against its expected value, so none can be loosened or dropped
+unnoticed.
 
 ## Workflow and layouts
 
@@ -81,6 +84,11 @@ golden scores for every exercise.
   any demonstration.
 - Link parameters are one-time inputs: after loading, the session is saved and
   the address returns to the plain route, so a reload continues the work.
+- A `#state=` link pasted into a tab that already shows the console opens
+  without a reload.
+- A damaged link, or one longer than an import could be (checked before it is
+  decoded), never replaces the saved session: the console says why, opens the
+  saved session (or the default exercise), and drops the link.
 - `localStorage`: `shader.practice.theme.v1` (the legacy
   `throwline.practice.theme.v1` is still read) and `shader.practice.session.v1`.
   `sessionStorage`: `shader.practice.reloaded`, used once during a cache update.
@@ -105,15 +113,17 @@ golden scores for every exercise.
 ## Offline behavior
 
 The worker fetches every listed file from the network first and saves it, and
-serves saved copies when the network is unavailable or slower than four
-seconds. The engine, renderer, controller and worker share one release
+serves saved copies when the network is unavailable, slower than four seconds,
+or answers with a server error. Redirects and removals still pass through.
+`scripts/shader_practice_worker.test.js` covers these rules. The engine,
+renderer, controller and worker share one release
 identifier (`BUILD`); if an older cache serves a mismatched file, the page waits
 for the updated worker and reloads once.
 
 ## Verification
 
 ```bash
-npm run verify:shader-practice        # engine tests and source release gate
+npm run verify:shader-practice        # engine and worker tests, source release gate
 npm run test:shader-practice-browser  # CDP browser probe
 ```
 
@@ -121,5 +131,7 @@ The browser probe covers ten viewports in both themes (320×568, 390×844,
 820×900, 821×900, 876×900, 1024×768, 1024×600, 1440×900, 2560×1440 and
 2560×1080), keyboard-only use with visible focus, contrast, 44 px targets,
 Score and control reachability, the reference lock, reduced motion, offline
-reload, exact handoff, legacy and invalid imports, and the storage, clipboard,
-canvas, service-worker and no-JavaScript failure paths.
+reload, exact handoff, damaged, oversized and pasted links, legacy and invalid
+imports, and the storage, clipboard, canvas, service-worker and no-JavaScript
+failure paths. Every probe navigation loads a fresh document, so a link that
+differs only by its fragment is really reloaded rather than left in place.

@@ -75,10 +75,12 @@ self.addEventListener('fetch', event => {
         return Response.error();
       }
     }
-    // A slow network falls back to the saved copy; the fetch still refreshes it.
+    // A slow network or a server error falls back to the saved copy; a good
+    // response still refreshes it. Redirects and removals pass through.
     const timeout = new Promise(resolve => setTimeout(() => resolve(null), NETWORK_TIMEOUT));
     try {
-      return (await Promise.race([network, timeout])) || cached;
+      const response = await Promise.race([network, timeout]);
+      return response && response.status < 500 ? response : cached;
     } catch {
       return cached;
     }

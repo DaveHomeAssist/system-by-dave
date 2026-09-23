@@ -40,13 +40,37 @@ requireMatch(page, /href="index\.html" aria-label="Return to Camera control and 
 requireMatch(page, /href="\/fmp\/"/, 'Shader Practice must keep FMP Video Operations one link away.');
 requireMatch(page, /<body[^>]*>\s*<a class="sbd-skip-link" href="#practiceWorkspace">/, 'Shader Practice must start with a skip link to the console.');
 
-// A sealed page: external files only, no network, no equipment APIs.
+// A sealed page: external files only, no network, no equipment APIs. The
+// policy must match this list exactly, so no directive can be loosened or
+// dropped without failing here.
+const EXPECTED_CSP = {
+  'default-src': "'self'",
+  'script-src': "'self'",
+  'style-src': "'self'",
+  'img-src': "'self' data:",
+  'font-src': "'self'",
+  'object-src': "'none'",
+  'base-uri': "'self'",
+  'form-action': "'self'",
+  'connect-src': "'none'",
+  'worker-src': "'self'",
+  'frame-src': "'none'",
+  'media-src': "'none'"
+};
 const csp = page.match(/http-equiv="Content-Security-Policy" content="([^"]+)"/)?.[1] || '';
 if (!csp) fail('Shader Practice must declare a Content Security Policy.');
 if (/unsafe-inline|unsafe-eval/.test(csp)) fail('Shader Practice CSP must not allow inline or evaluated code.');
-['connect-src \'none\'', 'object-src \'none\'', 'script-src \'self\'', 'style-src \'self\''].forEach(rule => {
-  if (!csp.includes(rule)) fail(`Shader Practice CSP must include ${rule}.`);
+const directives = new Map();
+csp.split(';').map(part => part.trim()).filter(Boolean).forEach(part => {
+  const [name, ...values] = part.split(/\s+/);
+  if (directives.has(name)) fail(`Shader Practice CSP repeats ${name}.`);
+  directives.set(name, values.join(' '));
 });
+Object.entries(EXPECTED_CSP).forEach(([name, value]) => {
+  if (directives.get(name) !== value) fail(`Shader Practice CSP must set ${name} ${value} (found ${directives.has(name) ? directives.get(name) : 'nothing'}).`);
+});
+[...directives.keys()].filter(name => !(name in EXPECTED_CSP)).forEach(name => fail(`Shader Practice CSP has an unreviewed directive: ${name}.`));
+requireMatch(page, /<meta name="referrer" content="no-referrer">/, 'Shader Practice must send no referrer.');
 if (/<script(?![^>]*\bsrc=)[^>]*>/i.test(page)) fail('Shader Practice must not contain inline scripts.');
 if (/<style[\s>]/i.test(page) || /\sstyle="/i.test(page)) fail('Shader Practice must not contain inline styles.');
 if (/\son[a-z]+="/i.test(page)) fail('Shader Practice must not use inline event handlers.');

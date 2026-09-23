@@ -137,7 +137,7 @@
   function decodeBase64Url(value) {
     const normalized = String(value).replace(/-/g, '+').replace(/_/g, '/');
     const binary = atob(normalized + '='.repeat((4 - normalized.length % 4) % 4));
-    return new TextDecoder().decode(Uint8Array.from(binary, character => character.charCodeAt(0)));
+    return new TextDecoder('utf-8', { fatal: true }).decode(Uint8Array.from(binary, character => character.charCodeAt(0)));
   }
 
   function sessionJSON(current) {
@@ -146,15 +146,39 @@
 
   // ---------- initial state: link, then saved session, then default ----------
 
+  // A full-state link carries the session as base64url JSON in #state=. The
+  // encoded text is bounded before it is decoded, like an imported file.
+  const MAX_LINK_STATE = Math.ceil(MAX_IMPORT_BYTES / 3) * 4;
+
+  function linkStateParam() {
+    const hash = new URLSearchParams(location.hash.slice(1));
+    return hash.has('state') ? hash.get('state') : null;
+  }
+
+  function readLinkState(encoded) {
+    if (encoded.length > MAX_LINK_STATE) throw new Error('That link is too long to be a practice session.');
+    let parsed;
+    try {
+      parsed = JSON.parse(decodeBase64Url(encoded));
+    } catch (error) {
+      throw new Error('That link is incomplete or damaged.');
+    }
+    try {
+      return Practice.importPracticeJSON(parsed);
+    } catch (error) {
+      throw new Error(`That link could not be opened. ${error.message}`);
+    }
+  }
+
   function readUrlState() {
     const result = { state: null, explicit: false, error: '' };
-    const hash = new URLSearchParams(location.hash.slice(1));
-    if (hash.has('state')) {
+    const encoded = linkStateParam();
+    if (encoded !== null) {
       result.explicit = true;
       try {
-        result.state = Practice.importPracticeJSON(decodeBase64Url(hash.get('state')));
+        result.state = readLinkState(encoded);
       } catch (error) {
-        result.error = error.message || 'The link state could not be read.';
+        result.error = error.message;
       }
       return result;
     }
@@ -181,7 +205,8 @@
   }
 
   const urlState = readUrlState();
-  const savedSession = urlState.explicit ? null : readSession();
+  // A link that cannot be read never replaces the work saved on this device.
+  const savedSession = urlState.state ? null : readSession();
   let state = urlState.state || savedSession || Practice.createPracticeState();
   ui.restored = Boolean(savedSession);
 
@@ -216,16 +241,19 @@
   }
   const cameraSignature = current => JSON.stringify([current.cameras.map(camera => camera.controls), current.injections, current.injectionRecords]);
 
+  // Returns true when the change joins the current adjustment gesture, which
+  // one undo reverts as a whole.
   function pushHistory(previous, coalesceKey) {
     const now = Date.now();
     if (coalesceKey && ui.gesture && ui.gesture.key === coalesceKey && now - ui.gesture.at < 1200) {
       ui.gesture.at = now;
-      return;
+      return true;
     }
     ui.gesture = coalesceKey ? { key: coalesceKey, at: now } : null;
     ui.history.push(cameraSnapshot(previous));
     if (ui.history.length > HISTORY_LIMIT) ui.history.shift();
     ui.future = [];
+    return false;
   }
 
   function restoreSnapshot(snapshot, verb) {
@@ -254,18 +282,22 @@
   function commit(next, options = {}) {
     const previous = state;
     state = next;
+    const changed = cameraSignature(previous) !== cameraSignature(next);
+    let joined = false;
     if (options.resetHistory) {
       ui.history = [];
       ui.future = [];
       ui.gesture = null;
       ui.lastChange = null;
-    } else if (options.history !== false && cameraSignature(previous) !== cameraSignature(next)) {
-      pushHistory(previous, options.coalesce);
+    } else if (options.history !== false && changed) {
+      joined = pushHistory(previous, options.coalesce);
     }
     if (options.change) {
       const key = `${options.change.cameraId}:${options.change.control}`;
-      const continuing = ui.lastChange && ui.lastChange.key === key && Date.now() - ui.lastChange.at < 1500;
-      ui.lastChange = { key, cameraId: options.change.cameraId, control: options.change.control, before: continuing ? ui.lastChange.before : previous, at: Date.now() };
+      // "Before" is what one undo would restore: it carries over only while
+      // this change joins the same gesture, or when nothing moved at all.
+      const continuing = ui.lastChange && ui.lastChange.key === key && (joined || !changed);
+      ui.lastChange = { key, cameraId: options.change.cameraId, control: options.change.control, before: continuing ? ui.lastChange.before : previous };
       ui.activeControl = options.change.control;
     }
     scheduleSave();
@@ -1422,15 +1454,36 @@
     }
     if (!Render.canvasAvailable()) ui.canvasOk = false;
     renderNow();
-    if (urlState.error) toast(`The link's saved state could not be read (${urlState.error}). The default exercise is open instead.`, true);
+    if (urlState.error) toast(`${urlState.error} ${ui.restored ? 'Your saved practice session is open instead.' : 'The default exercise is open instead.'}`, true);
     else if (ui.restored) toast('Restored your last practice session from this device.');
     // Links are one-time inputs: once the session is saved locally, a reload
-    // continues the work instead of rewinding to the link.
-    if (urlState.explicit && !urlState.error) {
+    // continues the work instead of rewinding to the link. A link that could
+    // not be read is dropped so a reload does not repeat the error.
+    if (urlState.error) history.replaceState(null, '', location.pathname);
+    else if (urlState.explicit) {
       saveSession();
       if (ui.storageOk) history.replaceState(null, '', location.pathname);
     }
+    window.addEventListener('hashchange', openPastedLink);
     prepareOfflineUse();
+  }
+
+  // Pasting a full-state link into this tab changes only the fragment, so the
+  // page does not reload; open the link the way a fresh visit would.
+  function openPastedLink() {
+    const encoded = linkStateParam();
+    if (encoded === null) return;
+    let next;
+    try {
+      next = readLinkState(encoded);
+    } catch (error) {
+      toast(`${error.message} Your current session is unchanged.`, true);
+      history.replaceState(null, '', location.pathname);
+      return;
+    }
+    importState(next, 'Opened the practice session from the link.');
+    saveSession();
+    if (ui.storageOk) history.replaceState(null, '', location.pathname);
   }
 
   window.ShaderPracticeApp = Object.freeze({
