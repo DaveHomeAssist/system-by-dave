@@ -10,4 +10,7 @@
     theme = 'light';
   }
   document.documentElement.setAttribute('data-theme', theme);
+  // The console only renders when scripts run; without them the page shows
+  // its simulation notice and escape links instead of an empty console.
+  document.documentElement.setAttribute('data-js', '');
 })();

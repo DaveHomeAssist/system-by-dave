@@ -34,6 +34,7 @@ const STANDALONE_RETURNS = [
   'switcher/index.html',
   'switcher/guide/index.html',
   'shader/index.html',
+  'shader/practice.html',
   'ursa-broadcast-g2/index.html',
   'camera-sim/index.html',
   'camera-sim/fmp-camera-simulator-offline.html',
@@ -50,6 +51,7 @@ const REQUIRED_SKIP_LINKS = new Map([
   ['switcher/index.html', 'reference-main'],
   ['switcher/guide/index.html', 'atem-explorer'],
   ['shader/index.html', 'reference-main'],
+  ['shader/practice.html', 'practiceWorkspace'],
   ['ursa-broadcast-g2/index.html', 'reference-main'],
   ['camera-sim/index.html', 'sim-workspace'],
   ['camera-sim/fmp-camera-simulator-offline.html', 'sim-workspace'],
@@ -84,7 +86,7 @@ const FMP_MANAGED_DIRS = ['fmp', 'fmpwalk'];
 // These pages are hand-maintained FMP references on the venue's domain. Publisher branding was
 // struck from them as well (Dave, 2026-09-22), so their return path is the FMP hub or the walk rather
 // than the publisher home. Exempting them from the home link is not a pass: each must carry that return.
-const FMP_SIBLING_PAGES = ['switcher/index.html', 'switcher/guide/index.html', 'shader/index.html', 'backfocus/index.html', 'ursa-broadcast-g2/index.html', 'fmp-index/index.html', 'fmp-walk/index.html', 'camera-sim/index.html', 'camera-sim/fmp-camera-simulator-offline.html'];
+const FMP_SIBLING_PAGES = ['switcher/index.html', 'switcher/guide/index.html', 'shader/index.html', 'shader/practice.html', 'backfocus/index.html', 'ursa-broadcast-g2/index.html', 'fmp-index/index.html', 'fmp-walk/index.html', 'camera-sim/index.html', 'camera-sim/fmp-camera-simulator-offline.html'];
 const FMP_RETURN_LINK = /href=["'](?:\/fmp\/|https:\/\/housevideo\.app\/fmp\/|\/fmpwalk\/|https:\/\/walk\.housevideo\.app\/fmpwalk\/)["']/i;
 const FMP_SHELL_PAGES = [
   FMP_HUB,

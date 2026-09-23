@@ -1,8 +1,3 @@
-## 2026-09-23 — FMP source reconciliation
-
-- Corrected the URSA Broadcast G2 back-focus shortcut to select the fitted lens method before adjustment.
-- Reconciled the exported FMP operator references with FMP-8 status and documented house-video evidence while retaining unresolved physical paths as Unknown.
-
 # Changelog
 
 ## 2026-09-23 — FMP Camera Simulator v1
@@ -12,6 +7,25 @@
 - Venue geometry is editable and evidence-tagged: 110 ft estimated camera distance (horizontal or line of sight), 75 ft inferred stage depth, 61 ft stage width from a scale reading of Live Nation's Stage & Pit plan, and demo camera height, offset and mount. The Approximate venue and Uncalibrated camera flags stay visible until measurements replace them.
 - Added three guided exercises (wide shot, follow a performer, save and recall), versioned JSON export/import with field-level validation, browser autosave with an export fallback, and a standalone offline HTML build.
 - Source is `apps/fmp-camera-sim/`; `npm run build:camera-sim` regenerates `camera-sim/`. Unit tests, a Playwright acceptance probe and a pull-request workflow cover the release gates in `docs/fmp-camera-simulator.md`.
+
+## 2026-09-23 — Camera Shading Practice console
+
+- Rebuilt `shader/practice.html` as a ShowConsole operator console: Prep Light and Show Dark themes, a status bar with the exercise status word, simulated signal alerts, and a breadcrumb to Camera Control & Shading and FMP Video Operations. Layouts fit desktop, laptop side tabs, a phone task rail with pinned pictures, tablets, and ultrawide.
+- Replaced stretched pictures with a letterboxed 16:9 multiviewer that shows reference and target roles and simulated PGM/PVW tally, with side-by-side, wipe, reference-only, target-only, A/B blink (a manual flip under reduced motion) and frozen-reference views.
+- Redrew the waveform, RGB parade, vectorscope (75% targets and hue vectors) and histogram with labelled 0–100 generated scales, clip and crush indicators and reference targets, in single or quad layouts.
+- Added numeric entry, fine and coarse steps, per-control reset, undo/redo, camera reset and control notes that state their limits.
+- Added the objective and pass rule before adjustment, live progress words, scored checks, a debrief that explains what each change helped or hurt, and a next correction that names a direction without revealing values. Faults can now be reverted.
+- Added guided one-control demonstrations and instructor sequences with before/after pictures, reproducible by link or JSON.
+- Added a share dialog with a selectable link, local session autosave, and fallbacks when canvas, storage, clipboard or the service worker are unavailable. A link pasted into an open console now opens without a reload, and a damaged or oversized link (bounded before decoding) never replaces the saved session. Scripts and styles moved to files so the CSP no longer allows inline code, and the offline worker is now network-first with a single release identifier, serving saved copies through outages and server errors.
+- Kept every exercise score identical to the previous engine. Version-1 Shader exports and legacy Throwline exports still import; new optional state fields are bounded and ignored by older readers.
+- Supersedes the interim console published by #108 and #110, which a parallel Codex review built from an early snapshot of this work. Kept its reference lock (Camera A is inspection-only, with its settings hidden), its per-exercise attempt numbering, its edge viewports, and its CSP hardening (no frames, media or referrer), which the source gate now checks directive by directive; bumped the shared build identifier so cached interim files update cleanly.
+- Expanded the engine tests and the browser probe and added offline-worker tests; see `docs/shader-practice.md`.
+
+## 2026-09-23 — FMP source reconciliation
+
+- Corrected the URSA Broadcast G2 back-focus shortcut to select the fitted lens method before adjustment.
+- Reconciled the exported FMP operator references with FMP-8 status and documented house-video evidence while retaining unresolved physical paths as Unknown.
+- Kept the active reference panel visible when the mobile House Video shell places tabs below its separately scrolling content.
 
 ## 2026-09-23 — AV by Dave landing and show entry repair
 

@@ -536,17 +536,33 @@ async function closePanel(page) {
     await focusWorkspace(page);
     await page.keyboard.press('KeyH');
     await waitStill(page);
+    const checks = async () => (await s.state()).exercise.checks.map((c) => c.done);
+    // Full-speed moves (Shift) keep every step well clear of the distinct/away thresholds even if
+    // a slow renderer delays key events.
+    const move = async (key, ms) => {
+      await page.keyboard.down('Shift');
+      await hold(page, key, ms);
+      await page.keyboard.up('Shift');
+      await waitStill(page);
+    };
     await page.keyboard.press('Shift+Digit3');
-    await hold(page, 'ArrowRight', 1500);
-    await waitStill(page);
+    await page.waitForFunction(() => window.__fmpCameraSim.state().exercise?.checks[0]?.done === true, null, { timeout: 5000 });
+    await move('ArrowRight', 1200);
     await page.keyboard.press('Shift+Digit4');
-    await hold(page, 'ArrowLeft', 3000);
-    await waitStill(page);
+    await page.waitForFunction(() => window.__fmpCameraSim.state().exercise?.checks[1]?.done === true, null, { timeout: 5000 }).catch(async () => {
+      throw new Error(`shot B not accepted: ${(await s.state()).exercise.note}`);
+    });
+    await move('ArrowLeft', 2000);
+    await page.waitForFunction(() => window.__fmpCameraSim.state().exercise?.checks[2]?.done === true, null, { timeout: 5000 }).catch(async () => {
+      throw new Error(`did not register moving away: ${JSON.stringify(await checks())}`);
+    });
     await page.keyboard.press('Digit3');
     await waitStill(page);
     await page.keyboard.press('Digit4');
     await waitStill(page);
-    await page.waitForFunction(() => window.__fmpCameraSim.state().exercise?.status === 'complete', null, { timeout: 5000 });
+    await page.waitForFunction(() => window.__fmpCameraSim.state().exercise?.status === 'complete', null, { timeout: 5000 }).catch(async () => {
+      throw new Error(`not complete: ${JSON.stringify(await checks())} ${(await s.state()).exercise.note}`);
+    });
     const result = (await s.state()).exercise.result;
     assert(result.passed && result.metrics.maxPanTiltDeviationDeg <= 0.1, JSON.stringify(result.metrics));
     await page.getByRole('button', { name: 'Reset', exact: true }).click();

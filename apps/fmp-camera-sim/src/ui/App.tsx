@@ -147,7 +147,15 @@ export function App() {
           storage: s.storage,
           unsettled: s.unsettled,
           calibrated: s.calibrated,
-          exercise: s.exercise ? { id: s.exercise.id, status: s.exercise.progress.status, result: s.exercise.progress.result } : null,
+          exercise: s.exercise
+            ? {
+                id: s.exercise.id,
+                status: s.exercise.progress.status,
+                result: s.exercise.progress.result,
+                checks: s.exercise.progress.checks,
+                note: s.exercise.progress.note,
+              }
+            : null,
           presets: s.project.session.presets,
           geometry: { camera: s.geometry.camera, stageWidth: s.geometry.stageWidth, stageDepth: s.geometry.stageDepth },
           hidden: s.hidden,
