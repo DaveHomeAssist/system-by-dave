@@ -334,6 +334,13 @@
     ui.announceTimer = setTimeout(() => { els.liveStatus.textContent = message; }, 60);
   }
 
+  // Errors also go to the always-present live region: the toast is revealed
+  // together with its text, which screen readers do not reliably announce.
+  function reportError(message) {
+    toast(message, true);
+    announce(message);
+  }
+
   // ---------- static DOM ----------
 
   function unitLabel(info) {
@@ -408,7 +415,7 @@
     const number = parseEntry(input.value);
     if (!Number.isFinite(number)) {
       input.setAttribute('aria-invalid', 'true');
-      toast(`Enter a number for ${label}, from ${formatValue(control, min)} to ${formatValue(control, max)}.`, true);
+      reportError(`Enter a number for ${label}, from ${formatValue(control, min)} to ${formatValue(control, max)}.`);
       input.value = formatValue(control, selectedCamera().controls[control], { unit: false });
       return;
     }
@@ -841,7 +848,7 @@
       setTimeout(() => URL.revokeObjectURL(url), 1500);
       toast('Practice JSON exported. It can be imported here or replayed from its link.');
     } catch (error) {
-      toast('Export is unavailable in this browser. Use the full-state link instead.', true);
+      reportError('Export is unavailable in this browser. Use the full-state link instead.');
     }
   }
 
@@ -1454,7 +1461,7 @@
     }
     if (!Render.canvasAvailable()) ui.canvasOk = false;
     renderNow();
-    if (urlState.error) toast(`${urlState.error} ${ui.restored ? 'Your saved practice session is open instead.' : 'The default exercise is open instead.'}`, true);
+    if (urlState.error) reportError(`${urlState.error} ${ui.restored ? 'Your saved practice session is open instead.' : 'The default exercise is open instead.'}`);
     else if (ui.restored) toast('Restored your last practice session from this device.');
     // Links are one-time inputs: once the session is saved locally, a reload
     // continues the work instead of rewinding to the link. A link that could
@@ -1477,7 +1484,7 @@
     try {
       next = readLinkState(encoded);
     } catch (error) {
-      toast(`${error.message} Your current session is unchanged.`, true);
+      reportError(`${error.message} Your current session is unchanged.`);
       history.replaceState(null, '', location.pathname);
       return;
     }

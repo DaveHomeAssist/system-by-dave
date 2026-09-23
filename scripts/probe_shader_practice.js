@@ -526,13 +526,13 @@ async function mainSession(page, baseUrl) {
   check('a plain reload continues the saved session on this device', JSON.stringify(persisted) === JSON.stringify(handoff.state));
 
   // A damaged or oversized link never replaces the saved session.
-  const linkOutcome = () => page.eval(() => ({ state: ShaderPracticeApp.getState(), toast: document.getElementById('toast').textContent, hash: location.hash }));
+  const linkOutcome = () => page.eval(() => new Promise(resolve => setTimeout(() => resolve({ state: ShaderPracticeApp.getState(), toast: document.getElementById('toast').textContent, live: document.getElementById('liveStatus').textContent, hash: location.hash }), 150)));
   await page.open(handoff.url.slice(0, Math.floor(handoff.url.length * 0.6)));
   const damaged = await linkOutcome();
-  check('a damaged link keeps the saved session, says so, and is dropped', JSON.stringify(damaged.state) === JSON.stringify(handoff.state) && /incomplete or damaged/.test(damaged.toast) && /saved practice session is open instead/.test(damaged.toast) && damaged.hash === '', { toast: damaged.toast, hash: damaged.hash.slice(0, 40) });
+  check('a damaged link keeps the saved session, announces why, and is dropped', JSON.stringify(damaged.state) === JSON.stringify(handoff.state) && /incomplete or damaged/.test(damaged.toast) && /saved practice session is open instead/.test(damaged.toast) && damaged.live === damaged.toast && damaged.hash === '', { toast: damaged.toast, live: damaged.live, hash: damaged.hash.slice(0, 40) });
   await page.open(`${baseUrl}shader/practice.html#state=${'A'.repeat(560000)}`);
   const oversized = await linkOutcome();
-  check('an oversized link is refused before it is decoded', JSON.stringify(oversized.state) === JSON.stringify(handoff.state) && /too long/.test(oversized.toast) && oversized.hash === '', { toast: oversized.toast });
+  check('an oversized link is refused before it is decoded', JSON.stringify(oversized.state) === JSON.stringify(handoff.state) && /too long/.test(oversized.toast) && oversized.live === oversized.toast && oversized.hash === '', { toast: oversized.toast, live: oversized.live });
   await page.open(`${baseUrl}shader/practice.html`);
   check('the saved session survives both refused links', JSON.stringify(await page.eval(() => ShaderPracticeApp.getState())) === JSON.stringify(handoff.state));
 
