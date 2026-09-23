@@ -1,12 +1,13 @@
 import { type RefObject } from "react";
-import { type StoreState, type Telemetry } from "../app/store";
+import { useTelemetry } from "../app/hooks";
+import { type SimulatorStore, type StoreState } from "../app/store";
 import { formatSigned } from "../domain/units";
 import { type GuidePreferences } from "../domain/session";
 import { GraphicsFallback } from "./GraphicsFallback";
 
 interface Props {
   state: StoreState;
-  telemetry: Telemetry;
+  store: SimulatorStore;
   canvasRef: RefObject<HTMLCanvasElement | null>;
   overlayRef: RefObject<SVGSVGElement | null>;
   expanded: boolean;
@@ -20,8 +21,9 @@ const GUIDE_BUTTONS: Array<{ key: keyof GuidePreferences; label: string }> = [
   { key: "thirds", label: "Thirds" },
 ];
 
-export function MonitorPanel({ state, telemetry, canvasRef, overlayRef, expanded, onToggleExpanded, onGuides }: Props) {
-  const { snapshot, lens } = telemetry;
+export function MonitorPanel({ state, store, canvasRef, overlayRef, expanded, onToggleExpanded, onGuides }: Props) {
+  // Live figures refresh this panel alone, not the whole interface.
+  const { snapshot, lens } = useTelemetry(store);
   const { pose, recall, atLimit, speeds } = snapshot;
   const guides = state.project.session.preferences.guides;
   const approximate = state.unsettled.length > 0;

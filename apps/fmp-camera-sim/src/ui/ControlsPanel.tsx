@@ -1,4 +1,5 @@
-import { type SimulatorStore, type StoreState, type Telemetry } from "../app/store";
+import { useTelemetry } from "../app/hooks";
+import { type SimulatorStore, type StoreState } from "../app/store";
 import { type InputController, nowSeconds } from "../input/controller";
 import { Joystick } from "./Joystick";
 import { PresetPad } from "./PresetPad";
@@ -9,11 +10,11 @@ interface Props {
   store: SimulatorStore;
   input: InputController;
   state: StoreState;
-  telemetry: Telemetry;
 }
 
 /** Compact SuperJoy-style surface: joystick, zoom, speeds, presets, Home and Stop. */
-export function ControlsPanel({ store, input, state, telemetry }: Props) {
+export function ControlsPanel({ store, input, state }: Props) {
+  const telemetry = useTelemetry(store);
   const { session } = state.project;
   const announcement = state.announcement;
   return (

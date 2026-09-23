@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { downloadText, sessionFilename } from "../app/download";
 import { Engine } from "../app/engine";
-import { type LayoutClass, useLayoutClass, useStoreState, useTelemetry } from "../app/hooks";
+import { type LayoutClass, useLayoutClass, useStoreState } from "../app/hooks";
 import { SimulatorStore } from "../app/store";
 import { useTheme } from "../app/theme";
 import { InputController, nowSeconds } from "../input/controller";
@@ -36,7 +36,6 @@ export function App() {
   });
   const { store, input } = runtime;
   const state = useStoreState(store);
-  const telemetry = useTelemetry(store);
   const { theme, toggle: toggleTheme } = useTheme();
   const layout = useLayoutClass();
   const phone = layout === "phone";
@@ -225,7 +224,7 @@ export function App() {
       <div className="sim-workspace">
         <MonitorPanel
           state={state}
-          telemetry={telemetry}
+          store={store}
           canvasRef={monitorRef}
           overlayRef={overlayRef}
           expanded={expanded}
@@ -243,7 +242,7 @@ export function App() {
           }}
           onView={(view: OverviewPreset) => rendererRef.current?.setOverviewView(view, state.geometry)}
         />
-        <ControlsPanel store={store} input={input} state={state} telemetry={telemetry} />
+        <ControlsPanel store={store} input={input} state={state} />
         <SidePanel
           store={store}
           state={state}
