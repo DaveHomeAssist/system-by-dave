@@ -85,6 +85,7 @@
       "registry": true,
       "pages": [
         "av-suite-landing.html",
+        "av-suite-landing2.html",
         "av-suite.html",
         "av-workbook.html",
         "av-tool-suite/"
