@@ -61,10 +61,10 @@ const files = walk(ROOT);
 const unlisted = files.filter((file) => !sitemapRoutes.has(routeFor(file)));
 const robots = read('robots.txt');
 
-// 141 includes the Shader Practice relocation redirect, the /fmp-walk/ and /fmp-index/ redirects, the managed /fmp/house/ reference, and the
+// 142 includes the AV by Dave landing source, Shader Practice relocation redirect, the /fmp-walk/ and /fmp-index/ redirects, the managed /fmp/house/ reference, and the
 // /fmp/gear/, /fmp/build/ and /fmp/ptz/ pages that replaced Notion links on 2026-09-18,
 // plus the four additional equipment explorers published on 2026-09-20.
-if (unlisted.length !== 141) fail(`Expected 141 tracked routes outside the sitemap; found ${unlisted.length}.`);
+if (unlisted.length !== 142) fail(`Expected 142 tracked routes outside the sitemap; found ${unlisted.length}.`);
 
 [
   '/apps/av-workbook/',

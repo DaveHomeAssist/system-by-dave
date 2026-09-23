@@ -4,7 +4,7 @@
 // scripts/domain-sites.json names each site, the pages that move to it, and the
 // browser storage its tools own. For every site this script copies those pages
 // plus every asset they reference into <out>/<site-id>/, adds the site's own
-// home redirect, 404 page, robots.txt, CNAME, provenance and data-transfer page,
+// home page or redirect, 404 page, robots.txt, CNAME, provenance and data-transfer page,
 // then checks that every local reference resolves inside the staged site.
 //
 // With --site-root <dir> (the staged systembydave.com webroot), a site whose
@@ -548,7 +548,15 @@ function stageSite(site, closed, policy, options) {
   }
   const origin = options.siteOrigins[site.id] || `https://${site.domain}`;
   const sourceOrigin = options.sourceOrigin || options.config.origin;
-  writeFile(dir, 'index.html', homePage(site, origin));
+  if (site.landingPage) {
+    const landing = read(site.landingPage);
+    if (!landing.includes('content="noindex,follow"') || !landing.includes(`href="https://${site.domain}/"`)) {
+      throw new Error(`${site.id} landingPage must be noindex at its source path and canonical to the domain root.`);
+    }
+    writeFile(dir, 'index.html', landing.replace('content="noindex,follow"', 'content="index,follow"'));
+  } else {
+    writeFile(dir, 'index.html', homePage(site, origin));
+  }
   for (const [route, targetId] of Object.entries(site.movedTo || {})) {
     const moved = options.config.sites.find((entry) => entry.id === targetId);
     if (!moved) throw new Error(`${site.id} movedTo names unknown site ${targetId}.`);
@@ -719,7 +727,8 @@ function main() {
       movedIndex.set(file, { site, cutover });
       if (file.endsWith('/index.html')) movedIndex.set(routeFor(file), { site, cutover });
     }
-    if (!entries.pages.has(site.home.replace(/^\//, '').replace(/\/$/, '/index.html'))) {
+    if (!(site.landingPage && site.home === '/' && entries.pages.has(site.landingPage))
+      && !entries.pages.has(site.home.replace(/^\//, '').replace(/\/$/, '/index.html'))) {
       throw new Error(`${site.id} home ${site.home} is not one of its pages.`);
     }
     policies[site.id] = storagePolicy(site, registry);

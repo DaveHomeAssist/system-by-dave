@@ -21,7 +21,7 @@
 <meta property="og:image:alt" content="System by Dave preview banner">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="AV by Dave">
-<meta name="twitter:description" content="Work a show with readiness and handoff context, or browse every registered AV tool with no show attached.">
+<meta name="twitter:description" content="Open the Show Console for readiness and handoff context, or browse every registered AV tool with no show attached.">
 <meta name="twitter:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
 <link rel="icon" href="svg/system_by_dave_logo_rust.svg" type="image/svg+xml">
 <link rel="manifest" href="manifest.json">
@@ -41,6 +41,7 @@
     </a>
     <div class="sbd-site-links">
       <a href="https://systembydave.com/tools.html">Tools</a>
+      <a href="/">AV by Dave home</a>
       <a href="/av-suite.html" aria-current="page">AV Suite</a>
       <a href="https://systembydave.com/notion.html">Notion</a>
       <a href="https://systembydave.com/prompt-lab.html">Prompt Lab</a>
@@ -61,14 +62,14 @@
   </div>
 </noscript>
 
-<div id="avApp" data-r="shell" data-theme="slate">
+<div id="avApp" data-r="shell" data-theme="paper">
 <h1 class="visually-hidden">AV by Dave</h1>
 
 
 <header data-r="head">
   <div class="hd-left">
-    <a class="hd-mark" id="brandLink" href="https://systembydave.com/" aria-label="System by Dave home" title="System by Dave home">SD</a>
-    <span class="hd-word">AV Suite</span>
+    <a class="hd-mark" id="brandLink" href="/" aria-label="AV by Dave home" title="AV by Dave home">AV</a>
+    <a class="hd-word" href="/" aria-label="AV by Dave home">AV by Dave</a>
     <div class="hd-ctx" role="group" aria-label="Workspace">
       <button type="button" id="ctxShowBtn" aria-pressed="true"><svg class="ic" viewBox="0 0 24 24"><path d="M2 5h20v12H2z"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>Show Console</button>
       <button type="button" id="ctxShopBtn" aria-pressed="false"><svg class="ic" viewBox="0 0 24 24"><path d="M3 10h18"/><path d="M3 10V7a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v3"/><path d="M6 10v9"/><path d="M18 10v9"/><path d="M10 14h4"/></svg>Toolbox</button>
@@ -269,16 +270,14 @@
 <div id="onboardOverlay" class="ob-overlay" hidden>
   <section class="ob-dialog bp" role="dialog" aria-modal="true" aria-labelledby="obTitle">
     <div class="ob-head">
-      <div><div class="eyebrow">Guided setup</div><h2 id="obTitle" tabindex="-1">Name the show</h2></div>
+      <div><div class="eyebrow">Show Console setup</div><h2 id="obTitle" tabindex="-1">Name the show</h2></div>
       <button type="button" id="obCloseBtn">Close</button>
     </div>
-    <div class="ob-progress" id="obProgress"><i></i><i></i><i></i><i></i></div>
     <div class="ob-body" id="obBody"></div>
     <div class="ob-foot">
-      <button type="button" id="obSkipBtn" class="ob-skip">Skip setup</button>
+      <button type="button" id="obSkipBtn" class="ob-skip">Skip for now</button>
       <div class="ob-foot-right">
-        <button type="button" id="obBackBtn">Back</button>
-        <button type="button" id="obNextBtn" class="primary">Continue</button>
+        <button type="button" id="obNextBtn" class="primary">Open Show Console</button>
       </div>
     </div>
   </section>
@@ -296,12 +295,12 @@
     <div class="entry-grid">
       <button type="button" class="entry-door" data-entry-choice="show">
         <span class="entry-kicker">Show attached</span>
-        <strong>Work a show</strong>
+        <strong>Open Show Console</strong>
         <span>Open the Show Console with profile, phase, readiness, recommendations, notes, imports, exports, and contextual tool links.</span>
       </button>
       <button type="button" class="entry-door" data-entry-choice="toolbox">
         <span class="entry-kicker">No show attached</span>
-        <strong>Open the toolbox</strong>
+        <strong>Open AV Toolbox</strong>
         <span>Search, filter, pin, and launch every registered AV tool from its plain URL without adding show parameters.</span>
       </button>
     </div>

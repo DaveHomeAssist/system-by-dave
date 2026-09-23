@@ -1,13 +1,13 @@
 (function(){
   /* Suite-wide theme: AV pages follow the operator's stored choice from the
-     AV by Dave console (Stage Slate dark by default). Specialist canvases
+     AV by Dave console (Warm Paper light by default). Specialist canvases
      (Throwline, PixelForge) keep their own theme handling. */
   (function(){
     var root = document.documentElement;
     if(!root.hasAttribute('data-av-theme')) return;
     var tool = root.getAttribute('data-av-tool');
     if(tool === 'throwline' || tool === 'pixelforge') return;
-    var mode = 'dark';
+    var mode = 'light';
     try{
       var stored = localStorage.getItem('av-theme-mode.v1');
       if(stored === 'dark' || stored === 'light' || stored === 'system') mode = stored;
@@ -16,8 +16,9 @@
   })();
 
   var params = new URLSearchParams(window.location.search);
+  var urlShowName = clean(params.get('sbdShow'), 120);
   var context = {
-    showName: clean(params.get('sbdShow'), 120),
+    showName: urlShowName === 'AV by Dave' ? '' : urlShowName,
     venue: clean(params.get('sbdVenue'), 120),
     showDate: clean(params.get('sbdDate'), 20),
     operator: clean(params.get('sbdOperator'), 80),
@@ -280,7 +281,7 @@
     return {
       schema:'system-by-dave.av-suite.v1',
       savedAt:new Date().toISOString(),
-      showName:context.showName || 'AV by Dave',
+      showName:context.showName || '',
       venue:context.venue || '',
       showDate:context.showDate || new Date().toISOString().slice(0, 10),
       operator:context.operator || '',
@@ -309,7 +310,7 @@
     }
     if(!parsed || typeof parsed !== 'object') parsed = {};
     state.schema = 'system-by-dave.av-suite.v1';
-    state.showName = clean(parsed.showName || state.showName, 120);
+    state.showName = clean(parsed.showName === 'AV by Dave' ? '' : parsed.showName, 120);
     state.venue = clean(parsed.venue || state.venue, 120);
     state.showDate = clean(parsed.showDate || state.showDate, 20);
     state.operator = clean(parsed.operator || state.operator, 80);

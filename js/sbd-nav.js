@@ -118,8 +118,9 @@
     nav.setAttribute('data-sbd-nav', 'true');
     nav.setAttribute('aria-label', 'Tool navigation');
 
+    nav.appendChild(link('', '/', 'Home', 'Return to this site home'));
     nav.appendChild(link('', withContext('av-suite.html'), 'AV Suite', 'Open the AV Suite hub'));
-    nav.appendChild(link('', 'tools.html', 'All Tools', 'Browse all tools'));
+    nav.appendChild(link('', 'av-suite.html?entry=toolbox', 'AV Toolbox', 'Browse AV Toolbox'));
 
     var here = locate(route);
     if(here && here.dept.tools.length > 1){

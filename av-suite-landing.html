@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en" data-av-theme="light" data-av-tool="landing">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; worker-src 'self'; connect-src 'self'; img-src 'self' data:; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'">
+<title>AV by Dave | Show Console and AV Toolbox</title>
+<meta name="description" content="Work a named show in the Show Console, or open AV tools directly from the Toolbox. AV by Dave keeps field work clear and close at hand.">
+<link rel="canonical" href="https://avbydave.com/">
+<meta name="robots" content="noindex,follow">
+<meta name="theme-color" content="#eee8df" media="all" data-av-theme-color="light">
+<meta name="theme-color" content="#0c1016" media="not all" data-av-theme-color="dark">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AV by Dave">
+<meta property="og:title" content="AV by Dave | Show Console and AV Toolbox">
+<meta property="og:description" content="Show-attached operations and show-independent AV tools, one clear entrance.">
+<meta property="og:url" content="https://avbydave.com/">
+<meta property="og:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AV by Dave | Show Console and AV Toolbox">
+<meta name="twitter:description" content="Show-attached operations and show-independent AV tools, one clear entrance.">
+<meta name="twitter:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<link rel="icon" href="svg/system_by_dave_logo_rust.svg" type="image/svg+xml">
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="css/av-theme.css">
+<link rel="stylesheet" href="css/av-landing.css">
+<script src="js/av-landing.js" defer></script>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to main content</a>
+<div class="page-shell">
+  <header class="site-header">
+    <a class="brand" href="/" aria-label="AV by Dave home" aria-current="page"><span class="brand-mark" aria-hidden="true">AV</span><span>AV by Dave</span></a>
+    <nav class="top-nav" aria-label="Primary">
+      <a href="av-suite.html?entry=show">Show Console</a>
+      <a href="av-suite.html?entry=toolbox">AV Toolbox</a>
+      <a href="#guide">How it works</a>
+    </nav>
+    <button class="theme-toggle" id="themeToggle" type="button" aria-label="Use dark mode" aria-pressed="false">Dark mode</button>
+  </header>
+
+  <main id="main" tabindex="-1">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <p class="eyebrow">Built for the next cue and the next call</p>
+        <h1 id="hero-title">One place to start.<br><em>Two ways to work.</em></h1>
+        <p class="lead">Run a named show with its phase, readiness and handoff in view. Or reach a tool directly when you do not need a show file.</p>
+        <div class="hero-actions">
+          <a class="button primary" href="av-suite.html?entry=show">Open Show Console <span aria-hidden="true">→</span></a>
+          <a class="button secondary" href="av-suite.html?entry=toolbox">Open AV Toolbox <span aria-hidden="true">→</span></a>
+        </div>
+        <div class="path-explain"><p><strong>Show Console</strong> works with a named show, phase and saved readiness.</p><p><strong>AV Toolbox</strong> opens any tool with no show attached.</p></div>
+        <a class="resume" id="resumeLink" href="av-suite.html?entry=show" hidden><span class="resume-dot" aria-hidden="true"></span><span id="resumeText">Resume show</span><span aria-hidden="true">→</span></a>
+      </div>
+      <div class="hero-panel" aria-label="AV by Dave workspace overview">
+        <div class="panel-top"><span class="panel-kicker">AV BY DAVE / WORKSPACES</span><span class="panel-light" aria-hidden="true"></span></div>
+        <div class="panel-intro">Choose the context that fits the job.</div>
+        <div class="workspace-preview"><span class="preview-index">01 / SHOW</span><div><strong>Show Console</strong><p>One show, current phase, issues and next actions.</p></div><span class="preview-arrow" aria-hidden="true">↗</span></div>
+        <div class="workspace-preview"><span class="preview-index">02 / ANYTIME</span><div><strong>AV Toolbox</strong><p>Search, pin and launch tools on their own.</p></div><span class="preview-arrow" aria-hidden="true">↗</span></div>
+        <div class="panel-bottom"><span>Field-first. Browser-based.</span><span id="offlineStatus" role="status">Offline access prepares after your first visit.</span></div>
+      </div>
+    </section>
+
+    <section class="quick-section" aria-labelledby="quick-title">
+      <div class="section-heading"><div><p class="eyebrow">Straight to the task</p><h2 id="quick-title">Use anytime</h2></div><a class="text-link" href="av-suite.html?entry=toolbox">Browse the full Toolbox <span aria-hidden="true">→</span></a></div>
+      <div class="quick-grid">
+        <a class="quick-card" href="av-calculator.html"><span class="card-type">Calculate</span><h3>AV Calculator</h3><p>Audio delay, projection throw, storage and power checks.</p><span class="card-arrow" aria-hidden="true">↗</span></a>
+        <a class="quick-card" href="ProjectorThrow/index.html?workspace=planner"><span class="card-type">Plan projection</span><h3>Throwline planner</h3><p>Throw, fit, brightness and room planning. Stage 3D is available inside.</p><span class="card-arrow" aria-hidden="true">↗</span></a>
+        <a class="quick-card" href="gear-reference.html"><span class="card-type">Look up gear</span><h3>Gear Reference</h3><p>Authored field sheets for the Epson X39 and Blackmagic camera chain.</p><span class="card-arrow" aria-hidden="true">↗</span></a>
+        <a class="quick-card" href="plotforge.html"><span class="card-type">External beta ↗</span><h3>PlotForge</h3><p>Open the separate PlotForge lighting-plot app through its handoff page.</p><span class="card-arrow" aria-hidden="true">↗</span></a>
+      </div>
+    </section>
+
+    <section class="guide-section" id="guide" aria-labelledby="guide-title">
+      <div><p class="eyebrow">Know where to go</p><h2 id="guide-title">Start with the work in front of you.</h2></div>
+      <div class="guide-grid"><p><strong>Have a show?</strong> Open Show Console. Name it once, then set its phase and optional details on the dashboard. Tool links carry only the context you have entered.</p><p><strong>Need a single answer?</strong> Open AV Toolbox or a quick link. No show name or setup is required.</p><p><strong>Looking ahead?</strong> <a href="av-suite.html?entry=frontoffice">See the Front Office roadmap</a>. It describes a planned workspace; it does not store client or venue work yet.</p></div>
+    </section>
+  </main>
+
+  <footer class="site-footer"><span>© 2026 AV by Dave</span><div><a href="#guide">Help</a><a href="https://systembydave.com/" rel="noopener noreferrer">System by Dave ↗</a></div></footer>
+</div>
+</body>
+</html>

@@ -20,7 +20,8 @@ function canonicalUrl(requestUrl){
 function isKnownRequest(request){
   var url=new URL(request.url);
   if(request.method!=='GET'||url.origin!==self.location.origin) return false;
-  return OFFLINE_URLS.indexOf(canonicalUrl(request.url))>=0;
+  return url.pathname===new URL('./',self.registration.scope).pathname
+    || OFFLINE_URLS.indexOf(canonicalUrl(request.url))>=0;
 }
 
 function putClean(cache,request,response){
@@ -36,6 +37,9 @@ function cachedResponse(cache,request){
 }
 
 var CRITICAL_ASSETS=[
+  './av-suite-landing.html',
+  './css/av-landing.css',
+  './js/av-landing.js',
   './av-suite.html',
   './css/av-suite.css',
   './js/av-suite/theme-bootstrap.js',
@@ -103,7 +107,9 @@ self.addEventListener('fetch',function(event){
         return putClean(cache,request,response);
       }).catch(function(){
         return cachedResponse(cache,request).then(function(found){
-          return found||cache.match(new URL('./av-suite.html',self.registration.scope).href);
+          if(found) return found;
+          var fallback=new URL(request.url).pathname===new URL('./',self.registration.scope).pathname?'./av-suite-landing.html':'./av-suite.html';
+          return cache.match(new URL(fallback,self.registration.scope).href);
         });
       });
     }
