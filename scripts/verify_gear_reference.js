@@ -8,7 +8,7 @@ const { originFor, sitemapFor } = require('./domain_sites_lib');
 
 const ROOT = path.resolve(__dirname, '..');
 const failures = [];
-const ALLOWED_TYPES = new Set(['specTable', 'table', 'figure', 'figure+table', 'procedure', 'checklist', 'cards', 'accuracyLog']);
+const ALLOWED_TYPES = new Set(['specTable', 'table', 'figure', 'figure+table', 'procedure', 'checklist', 'cards', 'accuracyLog', 'model']);
 const ALLOWED_STATUSES = new Set(['confirmed', 'corrected', 'unverified', 'estimate']);
 
 function fail(message) {
@@ -86,6 +86,12 @@ function verifyEntry(indexEntry) {
     (section.sourceRefs || []).forEach((ref) => {
       if (!sourceIds.has(ref)) fail(`${entry.id} section ${section.id} references unknown source ${ref}.`);
     });
+    if (section.type === 'model') {
+      const model = section.model || {};
+      if (!/^https:\/\/housevideo\.app\/fmp\/rig\/\?equipment=(rig|studio)&part=[a-z0-9-]+$/.test(model.url || '') || !model.title) {
+        fail(`${entry.id} section ${section.id} has an invalid FMP model link.`);
+      }
+    }
     if (section.figure) {
       if (!exists(section.figure.src)) fail(`${entry.id} figure is missing: ${section.figure.src}.`);
       else {
