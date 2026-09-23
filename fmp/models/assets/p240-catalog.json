@@ -395,14 +395,14 @@
       "label": "3G-SDI output",
       "category": "Connections",
       "kind": "connector",
-      "purpose": "3G-SDI output, 4:2:2 10-bit, running simultaneously with HDMI and NDI. This is the FMP house connection and the one the switcher sees.",
+      "purpose": "3G-SDI output, 4:2:2 10-bit, available simultaneously with HDMI and NDI. The camera-side SDI run is documented, but the final route into ATEM Input 4 (direct SDI versus an NDI decoder) remains Unknown.",
       "confidence": "Documented",
       "geometry_status": "documented_type_approximate_position",
       "source_ids": [
         "birddog-guide",
         "birddog-techspec"
       ],
-      "limits": "",
+      "limits": "Manufacturer output capability does not establish the current venue endpoint patch.",
       "action": "output",
       "aliases": [],
       "shape": {}
@@ -441,17 +441,17 @@
     },
     {
       "component_id": "p240.path.video",
-      "label": "FMP SDI run to ATEM Input 4",
+      "label": "FMP Camera 4 video path · endpoint Unknown",
       "category": "FMP signal path",
       "kind": "virtual",
-      "purpose": "Camera 4 reaches ATEM Input 4 over a traced run: catwalk head, across the ceiling, down to the video office.",
-      "confidence": "Confirmed",
+      "purpose": "A visible camera-side run was traced toward the video office to the safe-access limit. The final physical patch into ATEM Input 4, including direct SDI versus NDI decoder, is Unknown.",
+      "confidence": "Documented",
       "geometry_status": "virtual_route",
       "source_ids": [
         "fmp-gear",
         "fmp-signal"
       ],
-      "limits": "Route traced on site and installed by Zack, who replaced it in 2025. The high ceiling span is documented rather than hand-followed because reaching it needs fall-arrest access; that is a closed point, not an open item.",
+      "limits": "Do not infer the inaccessible span, endpoint patch or direct SDI connection from the observed camera-side cable.",
       "action": "pathVideo",
       "aliases": [],
       "shape": {}
@@ -461,6 +461,6 @@
     "fmp_ip": "Unknown",
     "installed_firmware": "Unknown",
     "power_source": "Unknown",
-    "sdi_physical_route": "Traced: catwalk to ceiling to video office (Zack, 2025)"
+    "sdi_physical_route": "Camera-side run traced to safe-access limit; final Input 4 path Unknown"
   }
 }

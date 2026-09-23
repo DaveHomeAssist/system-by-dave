@@ -173,7 +173,7 @@ function referenceCards(position) {
     // Operators open these mid-task, so they keep the camera workspace open behind them, as before.
     ['OPS', 'Camera build & strike', 'Assignment, safe build, signal path, comms and strike', refs.cameraOps, true],
     ['GEAR', 'Camera equipment', 'Body, lens and fiber converters, with open reads', refs.fieldGuide, true],
-    ['CAM4', 'Catwalk PTZ', 'SuperJoy, presets, show operation and cleared FMP-8 history', refs.ptzOps, true],
+    ['CAM4', 'Catwalk PTZ', 'SuperJoy, presets, show operation and FMP-8: C closed, A/B open', refs.ptzOps, true],
     ...(SETUP_TEST_ONLY && !PUBLIC_RELEASE ? [
       ['PDF', 'Printable G2 reference', 'Existing house reference PDF', '/resources/ursa-broadcast-g2-reference.pdf', true],
       ['MAP', 'Venue and signal maps', 'Select a zone or device, then read its evidence', '/#maps', true]
