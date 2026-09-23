@@ -1,9 +1,17 @@
 'use strict';
 
-const VERSION = 'v20260923-shader-practice-relocation';
+const VERSION = 'v20260923-shader-practice-console';
 const CACHE_PREFIX = 'sbd-shader-practice-';
 const CACHE_NAME = CACHE_PREFIX + VERSION;
-const ASSETS = ['./practice.html', './shading-practice-state.js', './index.html'];
+const ASSETS = [
+  './practice.html',
+  './practice.css',
+  './practice-theme.js',
+  './practice-render.js',
+  './practice-app.js',
+  './shading-practice-state.js',
+  './index.html'
+];
 const URLS = ASSETS.map(asset => new URL(asset, self.registration.scope).href);
 
 function canonical(value) {
