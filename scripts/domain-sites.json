@@ -81,7 +81,7 @@
       "deployKeySecret": "AVBYDAVE_DEPLOY_KEY",
       "cutover": true,
       "home": "/",
-      "landingPage": "av-suite-landing.html",
+      "landingPage": "av-suite-landing2.html",
       "registry": true,
       "pages": [
         "av-suite-landing.html",
