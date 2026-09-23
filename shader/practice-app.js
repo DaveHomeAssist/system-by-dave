@@ -36,9 +36,34 @@
     toastTimer: null, saveTimer: null, announceTimer: null
   };
 
-  if (!Practice || !Render) {
-    const status = byId('offlineStatus');
-    if (status) status.textContent = 'The practice engine did not load. Reload this page; nothing here reads or controls real equipment.';
+  const RELOAD_FLAG = 'shader.practice.reloaded';
+
+  // An older offline cache can serve a stale engine or renderer next to a new
+  // page. Let the updated worker take over, then reload once.
+  function recoverFromMixedFiles() {
+    const say = message => {
+      ['offlineStatus', 'exerciseName'].forEach(id => { const node = byId(id); if (node) node.textContent = message; });
+    };
+    let reloaded = false;
+    try { reloaded = window.sessionStorage.getItem(RELOAD_FLAG) === OFFLINE_CACHE_VERSION; } catch (error) { reloaded = false; }
+    if (reloaded || !Practice) {
+      say('Practice files did not finish loading. Reload this page; nothing here reads or controls real equipment.');
+      return;
+    }
+    say('UPDATING PRACTICE FILES…');
+    const reload = () => {
+      try { window.sessionStorage.setItem(RELOAD_FLAG, OFFLINE_CACHE_VERSION); } catch (error) { /* reload once regardless */ }
+      window.location.reload();
+    };
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.addEventListener('controllerchange', reload, { once: true });
+      navigator.serviceWorker.register('./practice-worker.js').then(registration => registration.update()).catch(() => {});
+    }
+    setTimeout(reload, 3000);
+  }
+
+  if (!Practice || !Render || Practice.BUILD !== OFFLINE_CACHE_VERSION || Render.BUILD !== OFFLINE_CACHE_VERSION) {
+    recoverFromMixedFiles();
     return;
   }
 
@@ -1313,6 +1338,7 @@
   }
 
   function start() {
+    try { window.sessionStorage.removeItem(RELOAD_FLAG); } catch (error) { /* storage may be blocked */ }
     buildStaticDom();
     setTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light', false);
     bindControls();

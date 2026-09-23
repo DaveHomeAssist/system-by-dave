@@ -120,7 +120,7 @@ a:hover { color: var(--ink-muted); }
   background: var(--surface-100); border: 1px solid var(--hairline-strong); border-radius: var(--radius-lg);
   min-width: 0;
 }
-.crumbs { display: flex; align-items: center; gap: var(--space-1); min-width: 0; flex: 0 1 auto; }
+.sbd-site-return { display: flex; align-items: center; gap: var(--space-1); min-width: 0; flex: 0 1 auto; }
 .crumb {
   display: inline-flex; align-items: center; justify-content: center; min-height: var(--target); min-width: var(--target); padding: 0 var(--space-1);
   font-size: 13px; font-weight: 500; color: var(--ink-muted); white-space: nowrap;
@@ -616,7 +616,7 @@ input[type="range"]:focus-visible { outline-offset: 0; }
 
 @media (max-width: 380px) {
   .console { padding: var(--space-1); padding-left: max(var(--space-1), env(safe-area-inset-left)); padding-right: max(var(--space-1), env(safe-area-inset-right)); gap: var(--space-1); }
-  .crumbs { gap: 0; }
+  .sbd-site-return { gap: 0; }
   .crumb-sep { display: none; }
   .rail-btn { font-size: 11px; letter-spacing: 0; }
   .status-exercise { font-size: 12px; }
