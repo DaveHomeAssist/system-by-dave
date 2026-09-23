@@ -508,3 +508,171 @@ test('a scene turns back into a Stage 3D link that carries the unit, catalog ide
   assert.equal(Scene.calculateProjectorGeometry(restored).envelope.wideDistance, Scene.calculateProjectorGeometry(stamped).envelope.wideDistance);
   assert.equal(Scene.activeProjector(Scene.createSceneState({ catalog: { projector: '', lens: 'LNS-004' } })).provenance.catalog, undefined);
 });
+
+test('blend layout reports exact per-unit coverage, adjacent overlap, and configured adequacy', () => {
+  let scene = auditScene({ dist: 22, rasterAr: 16 / 9 });
+  scene = Scene.applyIntent(scene, { type: 'add-projector' });
+  scene = Scene.applyIntent(scene, { type: 'arrange-projectors', mode: 'blend' });
+  let layout = Scene.calculateMultiProjectorLayout(scene);
+  assert.equal(layout.mode, 'blend');
+  assert.equal(layout.calculated, true);
+  assert.equal(layout.units.length, 2);
+  layout.units.forEach(unit => near(unit.screenCoverage.percent, 82.5, 1e-9));
+  near(layout.coverage.percent, 100, 1e-9);
+  near(layout.overlapRegions[0].width, 13, 1e-9);
+  near(layout.overlapRegions[0].overlapPercent, 65, 1e-9);
+  assert.equal(layout.overlapRegions[0].adequacy.status, 'unconfigured');
+  assert.ok(layout.warnings.some(warning => warning.kind === 'blend-unconfigured'));
+  assert.equal(layout.brightness.calculated, false);
+  assert.match(layout.brightness.reason, /measure aligned output on site/i);
+
+  scene = Scene.applyIntent(scene, { type: 'set-layout-config', layout: 'blend', key: 'minimumOverlapPercent', value: 60 });
+  scene = Scene.applyIntent(scene, { type: 'set-layout-config', layout: 'blend', key: 'maximumOverlapPercent', value: 70 });
+  scene = Scene.applyIntent(scene, { type: 'arrange-projectors', mode: 'blend' });
+  assert.deepEqual(scene.layoutConfig.blend, { minimumOverlapPercent: 60, maximumOverlapPercent: 70 });
+  layout = Scene.calculateMultiProjectorLayout(scene);
+  assert.equal(layout.overlapRegions[0].adequacy.status, 'adequate');
+  assert.equal(layout.overlapRegions[0].adequacy.tone, 'go');
+  assert.equal(layout.tone, 'go');
+  scene = Scene.applyIntent(scene, { type: 'set-layout-config', layout: 'blend', key: 'maximumOverlapPercent', value: null });
+  assert.deepEqual(scene.layoutConfig.blend, { minimumOverlapPercent: 60, maximumOverlapPercent: undefined });
+  assert.equal(Scene.calculateMultiProjectorLayout(scene).overlapRegions[0].adequacy.status, 'unconfigured');
+});
+
+test('blend calculation detects gaps and never treats incomplete optical data as coverage', () => {
+  const base = auditScene({ dist: 22, rasterAr: 16 / 9 });
+  const first = Scene.activeProjector(base);
+  const scene = Scene.normalizeSceneState({
+    ...base,
+    layoutMode: 'blend',
+    projectors: [
+      { ...first, id: 'left', label: 'Left', position: { ...first.position, targetX: -12 } },
+      { ...first, id: 'right', label: 'Right', position: { ...first.position, targetX: 12 } },
+      { ...first, id: 'blocked', label: 'Blocked', allowed: false, provenance: { mode: 'partial' } }
+    ]
+  });
+  const layout = Scene.calculateMultiProjectorLayout(scene);
+  assert.equal(layout.calculated, false);
+  assert.ok(layout.warnings.some(warning => warning.kind === 'unit-blocked' && warning.projectorId === 'blocked'));
+  assert.ok(layout.warnings.some(warning => warning.kind === 'blend-missing'));
+  assert.equal(layout.tone, 'bad');
+  assert.ok(layout.coverage.percent < 100);
+});
+
+test('stack layout reports picture mismatch against explicit alignment tolerances', () => {
+  let scene = auditScene({ dist: 22, rasterAr: 16 / 9 });
+  scene = Scene.applyIntent(scene, { type: 'add-projector' });
+  scene = Scene.applyIntent(scene, { type: 'arrange-projectors', mode: 'stack' });
+  let layout = Scene.calculateMultiProjectorLayout(scene);
+  assert.equal(layout.tone, 'go');
+  near(layout.mismatch.imageWidthPercent, 0);
+  near(layout.mismatch.centerX, 0);
+  const second = scene.projectors[1];
+  scene = Scene.normalizeSceneState({ ...scene, layoutMode: 'stack', projectors: [scene.projectors[0], { ...second, position: { ...second.position, distance: 18 } }] });
+  layout = Scene.calculateMultiProjectorLayout(scene);
+  assert.ok(layout.mismatch.imageWidthPercent > 4);
+  assert.ok(layout.warnings.some(warning => warning.kind === 'stack-size-mismatch'));
+  assert.equal(layout.tone, 'bad');
+});
+
+test('multi-projector layouts cannot pass while an individual unit is outside its lens placement', () => {
+  let scene = auditScene({ dist: 40, wide: 1, tele: 1, rasterAr: 16 / 9 });
+  scene = Scene.applyIntent(scene, { type: 'add-projector' });
+  scene = Scene.applyIntent(scene, { type: 'arrange-projectors', mode: 'stack' });
+  const stack = Scene.calculateMultiProjectorLayout(scene);
+  assert.equal(stack.coverage.percent, 100);
+  assert.equal(stack.tone, 'bad');
+  assert.equal(stack.warnings.filter(warning => warning.kind === 'unit-placement-overshoot').length, 2);
+  stack.units.forEach(unit => assert.equal(unit.placement.tone, 'bad'));
+});
+
+test('commissioning records capture planned versus measured geometry with verifier evidence', () => {
+  const scene = Scene.stampCommissioningRecord(auditScene({ dist: 22, rasterAr: 16 / 9 }), {
+    measured: { throwDistance: 22.25, imageWidth: 20.1, lensHeight: 6.125, horizontalOffset: 0.25, targetOffset: -0.25 },
+    notes: { shift: 'Centred after lens shift reset.', focus: 'Checked centre and corners.', alignment: 'Grid converged.' },
+    verifiedBy: 'Dave',
+    verifiedAt: '2026-09-23T12:00:00.000Z'
+  });
+  const record = Scene.commissioningRecordFor(scene);
+  assert.equal(record.schemaVersion, 1);
+  assert.equal(record.status, 'current');
+  assert.deepEqual(record.planned, { throwDistance: 22, imageWidth: 20, lensHeight: 6, horizontalOffset: 0, targetOffset: 0 });
+  near(record.delta.throwDistance, 0.25);
+  near(record.delta.imageWidth, 0.1);
+  assert.equal(record.notes.focus, 'Checked centre and corners.');
+  assert.equal(record.verifiedBy, 'Dave');
+  assert.equal(record.verifiedAt, '2026-09-23T12:00:00.000Z');
+  assert.ok(Scene.COMMISSIONING_FIELDS.every(field => record.validity[field].status === 'current'));
+  assert.deepEqual(Scene.commissioningRecordFor(Scene.normalizeSceneState(JSON.parse(JSON.stringify(scene)))), record, 'commissioning survives a schema-v1 JSON round trip');
+});
+
+test('commissioning invalidation is selective and non-geometric edits preserve evidence', () => {
+  let scene = Scene.stampCommissioningRecord(auditScene({ dist: 22, rasterAr: 16 / 9 }), {
+    measured: { throwDistance: 22, imageWidth: 20, lensHeight: 6, horizontalOffset: 0, targetOffset: 0 },
+    verifiedBy: 'Dave', verifiedAt: '2026-09-23T12:00:00.000Z'
+  });
+  scene = Scene.applyIntent(scene, { type: 'set-room', key: 'depth', value: 60 });
+  assert.equal(Scene.commissioningRecordFor(scene).status, 'current');
+  scene = Scene.applyIntent(scene, { type: 'set-distance', value: 22 });
+  assert.equal(Scene.commissioningRecordFor(scene).status, 'current', 're-entering the planned value does not stale evidence');
+  scene = Scene.applyIntent(scene, { type: 'set-lens-height', value: 7 });
+  let record = Scene.commissioningRecordFor(scene);
+  assert.equal(record.status, 'partially_stale');
+  assert.equal(record.validity.lensHeight.status, 'stale');
+  assert.equal(record.validity.shift.status, 'stale');
+  assert.equal(record.validity.alignment.status, 'stale');
+  assert.equal(record.validity.throwDistance.status, 'current');
+  assert.equal(record.validity.imageWidth.status, 'current');
+  assert.equal(record.validity.focus.status, 'current');
+  scene = Scene.applyIntent(scene, { type: 'set-distance', value: 24 });
+  record = Scene.commissioningRecordFor(scene);
+  assert.equal(record.validity.throwDistance.status, 'stale');
+  assert.equal(record.validity.imageWidth.status, 'stale');
+  assert.equal(record.validity.focus.status, 'stale');
+  assert.equal(record.validity.horizontalOffset.status, 'current');
+  assert.equal(record.validity.targetOffset.status, 'current');
+});
+
+test('new commissioning records supersede old evidence while schema-v1 scenes still import', () => {
+  const legacy = Scene.normalizeSceneState({ schemaVersion: 1, screen: { width: 12 }, projectors: [{ id: 'legacy-unit' }] });
+  assert.equal(legacy.schemaVersion, 1);
+  assert.deepEqual(legacy.projectors[0].commissioningRecords, []);
+  const unverifiedImport = Scene.normalizeSceneState({ projectors: [{ commissioningRecords: [{ planned: {}, measured: {}, verifiedBy: '', verifiedAt: 'not-a-date' }] }] });
+  assert.deepEqual(unverifiedImport.projectors[0].commissioningRecords, [], 'imports never invent missing commissioning evidence');
+  let scene = auditScene({ dist: 22, rasterAr: 16 / 9 });
+  const measurements = { throwDistance: 22, imageWidth: 20, lensHeight: 6, horizontalOffset: 0, targetOffset: 0 };
+  scene = Scene.stampCommissioningRecord(scene, { measured: measurements, verifiedBy: 'Dave', verifiedAt: '2026-09-23T12:00:00.000Z' });
+  scene = Scene.stampCommissioningRecord(scene, { measured: measurements, verifiedBy: 'Alex', verifiedAt: '2026-09-23T13:00:00.000Z' });
+  const records = Scene.activeProjector(scene).commissioningRecords;
+  assert.equal(records.length, 2);
+  assert.equal(records[0].status, 'superseded');
+  assert.equal(records[0].supersededAt, '2026-09-23T13:00:00.000Z');
+  assert.equal(records[1].status, 'current');
+  assert.equal(Scene.commissioningRecordFor(scene).verifiedBy, 'Alex');
+  const duplicated = Scene.applyIntent(scene, { type: 'add-projector' });
+  assert.deepEqual(Scene.activeProjector(duplicated).commissioningRecords, [], 'a copied unit needs its own commissioning record');
+  assert.throws(() => Scene.stampCommissioningRecord(scene, { measured: measurements, verifiedBy: '' }), /Name the person/);
+});
+
+test('named scenario snapshots compare state and provide bounded undo and redo', () => {
+  const base = auditScene({ dist: 22 });
+  const wider = Scene.applyIntent(base, { type: 'set-screen-width', value: 24 });
+  const first = Scene.createScenarioSnapshot(base, 'Original', { id: 'original', createdAt: '2026-09-23T12:00:00.000Z' });
+  const second = Scene.createScenarioSnapshot(wider, 'Wider screen', { id: 'wider', createdAt: '2026-09-23T12:01:00.000Z' });
+  const comparison = Scene.compareScenarioSnapshots(first, second);
+  assert.equal(comparison.hasChanges, true);
+  assert.ok(comparison.changes.some(change => change.path === 'screen.width' && change.before === 20 && change.after === 24));
+  assert.deepEqual(comparison.changedProjectorIds, ['projector-a']);
+  assert.equal(Scene.compareScenarioSnapshots(first, first).hasChanges, false);
+
+  let history = Scene.createScenarioHistory(base, { name: 'Original', id: 'original', createdAt: '2026-09-23T12:00:00.000Z', limit: 2 });
+  history = Scene.commitScenario(history, wider, 'Wider screen', { id: 'wider', createdAt: '2026-09-23T12:01:00.000Z' });
+  history = Scene.commitScenario(history, Scene.applyIntent(wider, { type: 'set-screen-bottom', value: 6 }), 'Raised screen', { id: 'raised', createdAt: '2026-09-23T12:02:00.000Z' });
+  assert.equal(history.past.length, 2);
+  history = Scene.undoScenario(history);
+  assert.equal(history.present.name, 'Wider screen');
+  assert.equal(history.future[0].name, 'Raised screen');
+  history = Scene.redoScenario(history);
+  assert.equal(history.present.name, 'Raised screen');
+  assert.equal(history.future.length, 0);
+});

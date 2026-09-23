@@ -53,6 +53,18 @@
  * 0.3–0.4 and carry a metal look with a brighter base color. The copied
  * file is yours: adjust the lights, shadow, or background in _boot()
  * when the object needs a different look.
+ *
+ * Additive editor API:
+ *   setManipulationTargets(targets), getManipulationTargets()
+ *   selectManipulationTarget(id), clearManipulationSelection()
+ *   setDimensionAnnotations(items), setDimensionView(view)
+ *   capturePng(options) / captureImage(options) -> Promise<Blob>
+ *
+ * Additive composed events:
+ *   stage-manipulation       { version, id, type, projectorId, obstacleId,
+ *                              key, value, phase, source, snapStep, delta }
+ *   stage-selection-change  { version, target, source }
+ *   stage-dimension-view-change { version, view, resolvedView, source }
  */
 /* END USAGE */
 
@@ -80,6 +92,7 @@
       outline: none;
       touch-action: none;
     }
+    canvas[data-selectable="true"] { cursor: grab; }
     canvas[data-manipulating="true"] { cursor: grabbing; }
     canvas:focus-visible {
       outline: 3px solid var(--hazard, #8a6400);
@@ -204,6 +217,45 @@
       pointer-events: none;
     }
     .drag-readout[hidden] { display: none; }
+    .dimension-layer {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      overflow: hidden;
+      pointer-events: none;
+      contain: layout paint;
+    }
+    .dimension-layer[hidden] { display: none; }
+    .dimension-badge {
+      --leader: 10px;
+      position: absolute;
+      translate: -50% calc(-100% - var(--leader));
+      max-width: min(210px, calc(100% - 24px));
+      padding: 5px 7px;
+      border: 1px solid var(--hazard, #8a6400);
+      border-radius: var(--r, 4px);
+      background: var(--overlay, var(--case, #fff));
+      color: var(--chalk, #1a1915);
+      font: 700 9px/1.35 var(--mono, ui-monospace, monospace);
+      letter-spacing: .045em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      box-shadow: 0 4px 14px rgba(0,0,0,.12);
+    }
+    .dimension-badge::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      width: 1px;
+      height: var(--leader);
+      background: var(--hazard, #8a6400);
+      opacity: .65;
+    }
+    .dimension-badge[data-kind="obstruction"] {
+      border-color: var(--safety, #8a2f20);
+    }
+    .dimension-badge[data-kind="obstruction"]::after { background: var(--safety, #8a2f20); }
     .err {
       position: absolute;
       inset: 0;
@@ -268,6 +320,15 @@
       }
       .toolbar button { min-height: 44px; }
       .drag-readout { bottom: 14px; }
+      .dimension-badge {
+        max-width: min(172px, calc(100% - 20px));
+        padding: 4px 6px;
+        font-size: 8px;
+      }
+      .dimension-badge:nth-child(n + 6) { display: none; }
+    }
+    @media (max-width: 560px) {
+      .dimension-badge:nth-child(n + 5) { display: none; }
     }
   `;
 
@@ -326,7 +387,7 @@
       this._note.id = 'stage-instructions';
       this._note.className = 'controls-panel';
       this._note.hidden = true;
-      this._note.textContent = 'Drag or touch to orbit. Wheel or pinch to zoom. Right-drag to pan. Focus the stage for keys 1–5, arrows, plus, minus, 0, or Home.';
+      this._note.textContent = 'Drag or touch to orbit. Wheel or pinch to zoom. Right-drag to pan. Select a gold handle, then use arrow keys to adjust it; Shift makes a fine adjustment. Brackets choose the previous or next handle, Escape clears it. Use keys 1 through 5 for cameras; plus and minus zoom; 0 or Home resets.';
       this._helpBtn.addEventListener('click', () => {
         const expanded = this._helpBtn.getAttribute('aria-expanded') === 'true';
         this._helpBtn.setAttribute('aria-expanded', String(!expanded));
@@ -359,7 +420,15 @@
       this._dragReadout.className = 'drag-readout';
       this._dragReadout.hidden = true;
       root.appendChild(this._dragReadout);
+      this._dimensionLayer = document.createElement('div');
+      this._dimensionLayer.className = 'dimension-layer';
+      this._dimensionLayer.hidden = true;
+      this._dimensionLayer.setAttribute('aria-hidden', 'true');
+      root.appendChild(this._dimensionLayer);
       this._manipulationTargets = [];
+      this._dimensionAnnotations = [];
+      this._dimensionView = 'auto';
+      this._cameraDimensionView = 'perspective';
       this._setButtonsEnabled(false);
       /** Resolves with { THREE } once the scene is live — build the model
        *  in `await stage.ready` so nothing races the library load. */
@@ -477,12 +546,12 @@
       renderer.domElement.setAttribute('role', 'application');
       renderer.domElement.setAttribute(
         'aria-label',
-        'Interactive Throwline stage. Use keys 1 through 5 for cameras, arrow keys to orbit, plus and minus to zoom, and 0 to reset.'
+        'Interactive Throwline stage. Select a visible handle or use bracket keys to choose one, then use arrow keys to adjust it. Shift makes a fine adjustment. Keys 1 through 5 select cameras, plus and minus zoom, and 0 resets.'
       );
       renderer.domElement.setAttribute('aria-describedby', 'stage-instructions');
       renderer.domElement.setAttribute(
         'aria-keyshortcuts',
-        '1 2 3 4 5 ArrowLeft ArrowRight ArrowUp ArrowDown + - 0 Home'
+        '1 2 3 4 5 [ ] ArrowLeft ArrowRight ArrowUp ArrowDown PageUp PageDown + - Escape 0 Home'
       );
       this._keyHandler = (event) => this._handleKey(event);
       renderer.domElement.addEventListener('keydown', this._keyHandler);
@@ -564,6 +633,7 @@
         renderer.setSize(w, h, false);
         camera.aspect = w / h;
         camera.updateProjectionMatrix();
+        this._renderDimensionAnnotations();
         this.requestRender();
       };
       this._ro = new ResizeObserver(fit);
@@ -572,6 +642,7 @@
         if (this._destroyed || this._contextLost || document.hidden || !this.isConnected) return;
         const changed = controls.update();
         renderer.render(scene, camera);
+        this._renderDimensionAnnotations();
         if (this._interacting || controls.autoRotate || changed) this.requestRender();
       };
       this._visibilityHandler = () => {
@@ -605,6 +676,7 @@
     setObject(object) {
       const THREE = this._THREE;
       if (!THREE) throw new Error('three-d-stage: not ready — await stage.ready first');
+      this._clearSelectionGizmo();
       if (this._object) {
         this._scene.remove(this._object);
         this._disposeObject(this._object);
@@ -640,6 +712,7 @@
         this._key.shadow.camera.updateProjectionMatrix();
       }
       this._scene.add(object);
+      if (this._registeredManipulationTargets) this.setManipulationTargets(this._registeredManipulationTargets);
       this._setButtonsEnabled(!this._contextLost);
       this.requestRender();
     }
@@ -657,6 +730,21 @@
       this._camera.position.set(position[0], position[1], position[2]);
       this._controls.target.set(target[0], target[1], target[2]);
       this._controls.update();
+      const previousDimensionView = this._cameraDimensionView;
+      const normalizedLabel = String(label || '').toLowerCase();
+      this._cameraDimensionView = normalizedLabel.includes('top')
+        ? 'plan'
+        : (normalizedLabel.includes('side') || normalizedLabel.includes('front') || normalizedLabel.includes('operator'))
+          ? 'elevation'
+          : 'perspective';
+      if (this._dimensionView === 'auto' && previousDimensionView !== this._cameraDimensionView) {
+        this.dispatchEvent(new CustomEvent('stage-dimension-view-change', {
+          bubbles: true,
+          composed: true,
+          detail: { version: 1, view: 'auto', resolvedView: this._cameraDimensionView, source: 'camera' }
+        }));
+      }
+      this._renderDimensionAnnotations();
       this.requestRender();
       if (options.saveDefault) {
         this._defaultView = {
@@ -668,22 +756,239 @@
       if (options.announce !== false) this.announce((label || 'Stage') + ' camera selected.');
     }
 
-    /** Register host-owned meshes as direct-manipulation handles. The stage
-     * emits preview/commit intents and never owns Throwline calculations. */
-    setManipulationTargets(targets) {
-      this._manipulationTargets = Array.isArray(targets)
-        ? targets.filter(target => target && target.object && target.id && Array.isArray(target.axis))
-        : [];
+    /** Frame the current scene from a requested direction. Unlike setView,
+     * this derives distance and target from the live object bounds so visible
+     * manipulation handles stay inside the canvas as the room and rig change. */
+    frameObject(direction, label, options = {}) {
+      if (!this._THREE || !this._object || !this._camera || !this._controls) return false;
+      const THREE = this._THREE;
+      const box = new THREE.Box3().setFromObject(this._object);
+      if (box.isEmpty()) return false;
+      const sphere = box.getBoundingSphere(new THREE.Sphere());
+      const view = new THREE.Vector3(
+        Number(direction?.[0]) || 0,
+        Number(direction?.[1]) || 0,
+        Number(direction?.[2]) || 0
+      );
+      if (view.lengthSq() < 0.000001) view.set(1, 0.55, 1.25);
+      view.normalize();
+      const verticalFov = THREE.MathUtils.degToRad(this._camera.fov);
+      const horizontalFov = 2 * Math.atan(Math.tan(verticalFov / 2) * Math.max(this._camera.aspect, 0.01));
+      const limitingFov = Math.max(THREE.MathUtils.degToRad(5), Math.min(verticalFov, horizontalFov));
+      const padding = Number.isFinite(Number(options.padding)) ? Math.max(1, Number(options.padding)) : 1.25;
+      const distance = Math.max(0.5, (sphere.radius / Math.sin(limitingFov / 2)) * padding);
+      const position = sphere.center.clone().add(view.multiplyScalar(distance));
+      this._camera.near = Math.max(distance / 500, 0.01);
+      this._camera.far = Math.max(distance * 20, 500);
+      this._camera.updateProjectionMatrix();
+      this.setView(position.toArray(), sphere.center.toArray(), label, options);
+      return true;
     }
 
-    _targetForObject(object) {
+    /** Browser-space centre and projected adjustment axis for a visible handle.
+     * Useful to external automation and future guided-training overlays without
+     * exposing Three.js objects across the component boundary. */
+    getManipulationTargetScreenPoint(id) {
+      if (!this._renderer || !this._camera || !this._THREE) return undefined;
+      const target = this._manipulationTargets.find(candidate => candidate.id === id);
+      if (!target || !this._objectVisible(target.object)) return undefined;
+      const rect = this._renderer.domElement.getBoundingClientRect();
+      const world = target.object.getWorldPosition(new this._THREE.Vector3());
+      const projected = world.clone().project(this._camera);
+      const axis = this._screenAxis(target, rect);
+      return {
+        x: rect.left + ((projected.x + 1) * rect.width / 2),
+        y: rect.top + ((1 - projected.y) * rect.height / 2),
+        ndcX: projected.x,
+        ndcY: projected.y,
+        ndcZ: projected.z,
+        axisX: axis.x,
+        axisY: axis.y,
+        canvas: { left: rect.left, top: rect.top, right: rect.right, bottom: rect.bottom, width: rect.width, height: rect.height }
+      };
+    }
+
+    /** Register host-owned meshes as direct-manipulation handles. The stage
+     * emits preview/commit intents and never owns Throwline calculations.
+     *
+     * A target is { id, type, label, value, min, max, step, fineStep, axis,
+     * metersPerUnit, object, projectorId?, obstacleId?, key? }. `object` and
+     * the axis stay renderer-only; every emitted event carries serializable
+     * values. Room obstruction meshes are also discovered by their existing
+     * `userData.obstacleId` marker and gain x/y/z targets automatically. */
+    setManipulationTargets(targets) {
+      const registered = Array.isArray(targets)
+        ? targets.filter(target => target && target.object && target.id && Array.isArray(target.axis))
+            .map(target => this._normalizeManipulationTarget(target))
+        : [];
+      this._registeredManipulationTargets = registered;
+      this._manipulationTargets = registered.concat(this._obstructionTargets(registered));
+      if (this._selectedTargetId && !this._manipulationTargets.some(target => target.id === this._selectedTargetId)) {
+        this.clearManipulationSelection({ source: 'scene' });
+      } else {
+        this._updateSelectionGizmo();
+      }
+      this._renderDimensionAnnotations();
+    }
+
+    _normalizeManipulationTarget(target) {
+      const value = Number(target.value);
+      const step = Number(target.step);
+      const fineStep = Number(target.fineStep);
+      return {
+        ...target,
+        value: Number.isFinite(value) ? value : 0,
+        min: Number.isFinite(Number(target.min)) ? Number(target.min) : -Infinity,
+        max: Number.isFinite(Number(target.max)) ? Number(target.max) : Infinity,
+        step: Number.isFinite(step) && step > 0 ? step : 0.25,
+        fineStep: Number.isFinite(fineStep) && fineStep > 0 ? fineStep : 0.05,
+        metersPerUnit: Number.isFinite(Number(target.metersPerUnit)) && Number(target.metersPerUnit) > 0
+          ? Number(target.metersPerUnit)
+          : 1,
+        axis: target.axis.slice(0, 3).map(value => Number(value) || 0),
+        label: String(target.label || target.id),
+      };
+    }
+
+    _obstructionTargets(registered) {
+      if (!this._object || !this._THREE) return [];
+      const targets = [];
+      const unitScale = registered.find(target => target.metersPerUnit)?.metersPerUnit || 0.3048;
+      const seen = new Set();
+      this._object.traverse(object => {
+        const obstacleId = object.userData && object.userData.obstacleId;
+        if (!obstacleId || seen.has(obstacleId)) return;
+        seen.add(obstacleId);
+        const label = String(object.userData.label || object.name || obstacleId).replace(/[-_]+/g, ' ');
+        const axes = [
+          { key: 'x', axis: [1, 0, 0], min: -100, max: 100, suffix: 'left / right' },
+          { key: 'y', axis: [0, 1, 0], min: 0, max: 100, suffix: 'height' },
+          { key: 'z', axis: [0, 0, 1], min: 0, max: 300, suffix: 'depth' },
+        ];
+        axes.forEach(({ key, axis, min, max, suffix }) => {
+          targets.push(this._normalizeManipulationTarget({
+            id: `obstacle:${obstacleId}:${key}`,
+            type: 'set-obstacle',
+            label: `${label} ${suffix}`,
+            value: Number(object.position[key]) / unitScale,
+            min,
+            max,
+            step: 0.25,
+            fineStep: 0.05,
+            axis,
+            metersPerUnit: unitScale,
+            object,
+            obstacleId,
+            key,
+            implicit: true,
+          }));
+        });
+      });
+      return targets;
+    }
+
+    /** Return a deterministic, serializable description of every handle. */
+    getManipulationTargets() {
+      return this._manipulationTargets.map(target => ({
+        id: target.id,
+        type: target.type,
+        label: target.label,
+        value: target.value,
+        min: Number.isFinite(target.min) ? target.min : null,
+        max: Number.isFinite(target.max) ? target.max : null,
+        step: target.step,
+        fineStep: target.fineStep,
+        axis: [...target.axis],
+        metersPerUnit: target.metersPerUnit,
+        projectorId: target.projectorId,
+        obstacleId: target.obstacleId,
+        key: target.key,
+      }));
+    }
+
+    selectManipulationTarget(id, options = {}) {
+      const target = this._manipulationTargets.find(candidate => candidate.id === id);
+      if (!target) return false;
+      const changed = this._selectedTargetId !== target.id;
+      this._selectedTargetId = target.id;
+      this._updateSelectionGizmo();
+      this._updateCanvasAccessibleName(target);
+      if (changed || options.force) {
+        this._emitSelectionChange(target, options.source || 'api');
+        this.announce(`${target.label} selected. Use arrow keys to adjust; hold Shift for fine steps.`);
+      }
+      this.requestRender();
+      return true;
+    }
+
+    clearManipulationSelection(options = {}) {
+      if (!this._selectedTargetId) return false;
+      this._selectedTargetId = undefined;
+      this._clearSelectionGizmo();
+      this._updateCanvasAccessibleName();
+      this._emitSelectionChange(null, options.source || 'api');
+      this.requestRender();
+      return true;
+    }
+
+    _selectedTarget() {
+      return this._manipulationTargets.find(target => target.id === this._selectedTargetId);
+    }
+
+    _serializableTarget(target) {
+      if (!target) return null;
+      return {
+        id: target.id,
+        type: target.type,
+        label: target.label,
+        value: target.value,
+        axis: [...target.axis],
+        projectorId: target.projectorId,
+        obstacleId: target.obstacleId,
+        key: target.key,
+      };
+    }
+
+    _emitSelectionChange(target, source) {
+      this.dispatchEvent(new CustomEvent('stage-selection-change', {
+        bubbles: true,
+        composed: true,
+        detail: { version: 1, target: this._serializableTarget(target), source }
+      }));
+    }
+
+    _updateCanvasAccessibleName(target) {
+      if (!this._renderer) return;
+      const suffix = target ? ` Selected handle: ${target.label}, ${this._formatDimensionValue(target.value, 'ft')}.` : '';
+      this._renderer.domElement.setAttribute(
+        'aria-label',
+        `Interactive Throwline stage.${suffix} Select a visible handle or use bracket keys to choose one, then use arrow keys to adjust it. Shift makes a fine adjustment. Keys 1 through 5 select cameras, plus and minus zoom, and 0 resets.`
+      );
+    }
+
+    _targetForObject(object, event) {
       let current = object;
       while (current) {
-        const match = this._manipulationTargets.find(target => target.object === current);
-        if (match) return match;
+        const matches = this._manipulationTargets.filter(target => target.object === current);
+        if (matches.length) {
+          const selected = matches.find(target => target.id === this._selectedTargetId);
+          if (selected && !(event && (event.altKey || event.ctrlKey || event.metaKey))) return selected;
+          if (event && event.altKey) return matches.find(target => target.key === 'y') || matches[0];
+          if (event && (event.ctrlKey || event.metaKey)) return matches.find(target => target.key === 'z') || matches[0];
+          return matches.find(target => target.key === 'x') || matches[0];
+        }
         current = current.parent;
       }
       return undefined;
+    }
+
+    _objectVisible(object) {
+      let current = object;
+      while (current) {
+        if (current.visible === false) return false;
+        current = current.parent;
+      }
+      return true;
     }
 
     _pointerPosition(event) {
@@ -706,14 +1011,18 @@
       const pointer = this._pointerPosition(event);
       this._pointer.set(pointer.ndcX, pointer.ndcY);
       this._raycaster.setFromCamera(this._pointer, this._camera);
-      const hit = this._raycaster.intersectObjects(this._manipulationTargets.map(target => target.object), true)[0];
-      const target = hit && this._targetForObject(hit.object);
+      const hit = this._raycaster.intersectObjects(
+        [...new Set(this._manipulationTargets.map(target => target.object).filter(object => this._objectVisible(object)))],
+        true
+      )[0];
+      const target = hit && this._targetForObject(hit.object, event);
       if (!target) return;
       event.preventDefault(); event.stopImmediatePropagation();
+      this.selectManipulationTarget(target.id, { source: 'pointer' });
       this._controls.enabled = false;
       this._renderer.domElement.setPointerCapture(event.pointerId);
       this._renderer.domElement.dataset.manipulating = 'true';
-      this._manipulation = { pointerId: event.pointerId, target, startX: pointer.x, startY: pointer.y, startValue: Number(target.value), axis: this._screenAxis(target, pointer.rect), value: Number(target.value) };
+      this._manipulation = { pointerId: event.pointerId, target, startX: pointer.x, startY: pointer.y, startValue: Number(target.value), axis: this._screenAxis(target, pointer.rect), value: Number(target.value), snapStep: Number(target.step) || 0.25 };
       this._dragReadout.hidden = false;
       this._dragReadout.textContent = `${target.label} · ${Number(target.value).toFixed(2)} ft`;
       this._completeFirstInteraction();
@@ -721,7 +1030,20 @@
 
     _handleManipulationMove(event) {
       const active = this._manipulation;
-      if (!active || event.pointerId !== active.pointerId) return;
+      if (!active) {
+        if (!this._renderer || !this._raycaster || !this._manipulationTargets.length) return;
+        const pointer = this._pointerPosition(event);
+        this._pointer.set(pointer.ndcX, pointer.ndcY);
+        this._raycaster.setFromCamera(this._pointer, this._camera);
+        const hit = this._raycaster.intersectObjects(
+          [...new Set(this._manipulationTargets.map(target => target.object).filter(object => this._objectVisible(object)))],
+          true
+        )[0];
+        if (hit && this._targetForObject(hit.object, event)) this._renderer.domElement.dataset.selectable = 'true';
+        else delete this._renderer.domElement.dataset.selectable;
+        return;
+      }
+      if (event.pointerId !== active.pointerId) return;
       event.preventDefault(); event.stopImmediatePropagation();
       const pointer = this._pointerPosition(event);
       const axisLength = Math.max(1, active.axis.x * active.axis.x + active.axis.y * active.axis.y);
@@ -731,8 +1053,9 @@
       const value = Math.min(Number(active.target.max), Math.max(Number(active.target.min), Math.round(raw / step) * step));
       if (!Number.isFinite(value) || value === active.value) return;
       active.value = value;
+      active.snapStep = step;
       this._dragReadout.textContent = `${active.target.label} · ${value.toFixed(2)} ft`;
-      this.dispatchEvent(new CustomEvent('stage-manipulation', { bubbles: true, detail: { id: active.target.id, type: active.target.type, projectorId: active.target.projectorId, value, phase: 'preview' } }));
+      this._emitManipulation(active.target, value, 'preview', 'pointer', step, value - active.startValue);
     }
 
     _handleManipulationEnd(event) {
@@ -742,9 +1065,256 @@
       this._manipulation = undefined;
       this._controls.enabled = true;
       delete this._renderer.domElement.dataset.manipulating;
+      delete this._renderer.domElement.dataset.selectable;
       this._dragReadout.hidden = true;
-      this.dispatchEvent(new CustomEvent('stage-manipulation', { bubbles: true, detail: { id: active.target.id, type: active.target.type, projectorId: active.target.projectorId, value: active.value, phase: 'commit' } }));
+      this._emitManipulation(active.target, active.value, 'commit', 'pointer', active.snapStep, active.value - active.startValue);
       this.requestRender();
+    }
+
+    _emitManipulation(target, value, phase, source, snapStep, delta) {
+      this.dispatchEvent(new CustomEvent('stage-manipulation', {
+        bubbles: true,
+        composed: true,
+        detail: {
+          version: 1,
+          id: target.id,
+          type: target.type,
+          projectorId: target.projectorId,
+          obstacleId: target.obstacleId,
+          key: target.key,
+          value,
+          phase,
+          source,
+          snapStep,
+          delta,
+        }
+      }));
+    }
+
+    _cycleManipulationTarget(direction) {
+      const available = this._manipulationTargets.filter(target => this._objectVisible(target.object));
+      if (!available.length) {
+        this.announce('No direct manipulation handles are available in this scene.');
+        return;
+      }
+      const current = available.findIndex(target => target.id === this._selectedTargetId);
+      const index = current < 0
+        ? (direction > 0 ? 0 : available.length - 1)
+        : (current + direction + available.length) % available.length;
+      this.selectManipulationTarget(available[index].id, { source: 'keyboard' });
+    }
+
+    _adjustSelectedTarget(direction, event) {
+      const target = this._selectedTarget();
+      if (!target) return false;
+      const step = event && event.shiftKey ? target.fineStep : target.step;
+      const value = Math.min(target.max, Math.max(target.min, Math.round((target.value + direction * step) / step) * step));
+      if (!Number.isFinite(value) || value === target.value) {
+        this.announce(`${target.label} is at its limit.`);
+        return true;
+      }
+      const startValue = target.value;
+      target.value = value;
+      this._emitManipulation(target, value, 'commit', 'keyboard', step, value - startValue);
+      this._dragReadout.hidden = false;
+      this._dragReadout.textContent = `${target.label} · ${value.toFixed(2)} ft`;
+      clearTimeout(this._keyboardReadoutTimer);
+      this._keyboardReadoutTimer = setTimeout(() => { this._dragReadout.hidden = true; }, 1200);
+      this.announce(`${target.label} set to ${this._formatDimensionValue(value, 'ft')}.`);
+      this._updateCanvasAccessibleName(target);
+      this._renderDimensionAnnotations();
+      return true;
+    }
+
+    _clearSelectionGizmo() {
+      if (!this._selectionGizmo || !this._scene) return;
+      this._scene.remove(this._selectionGizmo);
+      this._disposeObject(this._selectionGizmo);
+      this._selectionGizmo = undefined;
+    }
+
+    _updateSelectionGizmo() {
+      this._clearSelectionGizmo();
+      const target = this._selectedTarget();
+      if (!target || !this._THREE || !this._scene || !target.object || !target.object.parent) return;
+      const THREE = this._THREE;
+      const box = new THREE.Box3().setFromObject(target.object);
+      if (box.isEmpty()) return;
+      const group = new THREE.Group();
+      group.name = 'stage_selection_gizmo';
+      const bounds = new THREE.Box3Helper(box, 0xd59600);
+      bounds.name = 'selected_handle_bounds';
+      group.add(bounds);
+      const origin = new THREE.Vector3();
+      target.object.getWorldPosition(origin);
+      const direction = new THREE.Vector3(target.axis[0], target.axis[1], target.axis[2]).normalize();
+      const size = box.getSize(new THREE.Vector3());
+      const length = Math.max(0.22, Math.min(1.2, size.length() * 1.8));
+      const arrow = new THREE.ArrowHelper(direction, origin, length, 0xd59600, Math.min(0.16, length * 0.28), Math.min(0.09, length * 0.16));
+      arrow.name = 'selected_handle_axis';
+      group.add(arrow);
+      this._selectionGizmo = group;
+      this._scene.add(group);
+    }
+
+    /** Supply additional callouts without coupling the renderer to the scene
+     * model. Each item is { id, label, value?, unit?, anchor:[x,y,z] or
+     * object, kind?, views?:[] }. Coordinates are real-world metres. */
+    setDimensionAnnotations(items) {
+      this._dimensionAnnotations = Array.isArray(items)
+        ? items.filter(item => item && item.id && item.label && (item.object || (Array.isArray(item.anchor) && item.anchor.length >= 3)))
+            .map(item => ({ ...item, id: String(item.id), label: String(item.label), views: Array.isArray(item.views) ? [...item.views] : undefined }))
+        : [];
+      this._renderDimensionAnnotations();
+      this.requestRender();
+    }
+
+    setDimensionView(view, options = {}) {
+      const normalized = ['auto', 'plan', 'elevation', 'perspective'].includes(view) ? view : 'auto';
+      if (this._dimensionView === normalized && !options.force) return;
+      this._dimensionView = normalized;
+      this._renderDimensionAnnotations();
+      this.dispatchEvent(new CustomEvent('stage-dimension-view-change', {
+        bubbles: true,
+        composed: true,
+        detail: { version: 1, view: normalized, resolvedView: normalized === 'auto' ? this._cameraDimensionView : normalized, source: options.source || 'api' }
+      }));
+      this.requestRender();
+    }
+
+    _dimensionOverlayEnabled() {
+      return Boolean(
+        this._dimensionAnnotations.length ||
+        this.hasAttribute('dimensions') ||
+        (this._object && this._object.getObjectByName && this._object.getObjectByName('screen_width_dimension'))
+      );
+    }
+
+    _formatDimensionValue(value, unit = '') {
+      const number = Number(value);
+      if (!Number.isFinite(number)) return String(value ?? '');
+      if (unit === 'ft') {
+        let feet = Math.floor(Math.abs(number));
+        let inches = Math.round((Math.abs(number) - feet) * 12);
+        if (inches === 12) { feet += 1; inches = 0; }
+        return `${number < 0 ? '−' : ''}${feet}′${inches ? ` ${inches}″` : ''}`;
+      }
+      if (unit === 'm') return `${number.toFixed(2)} m`;
+      return `${number.toFixed(2)}${unit ? ` ${unit}` : ''}`;
+    }
+
+    _worldAnchor(item) {
+      if (!this._THREE) return undefined;
+      if (item.object && item.object.getWorldPosition) return item.object.getWorldPosition(new this._THREE.Vector3());
+      if (Array.isArray(item.anchor)) return new this._THREE.Vector3(Number(item.anchor[0]) || 0, Number(item.anchor[1]) || 0, Number(item.anchor[2]) || 0);
+      return undefined;
+    }
+
+    _derivedDimensionAnnotations() {
+      if (!this._THREE || !this._object) return [];
+      const THREE = this._THREE;
+      const items = [];
+      const known = [
+        { id: 'distance', label: 'Throw', kind: 'throw', views: ['auto', 'plan', 'perspective'] },
+        { id: 'lens-height', label: 'Lens height', kind: 'height', views: ['auto', 'elevation', 'perspective'] },
+        { id: 'projector-x', label: 'Horizontal offset', kind: 'offset', views: ['auto', 'plan', 'perspective'] },
+        { id: 'screen-width', label: 'Screen width', kind: 'screen', views: ['auto', 'plan', 'elevation', 'perspective'] },
+      ];
+      known.forEach(meta => {
+        const target = this._manipulationTargets.find(candidate => candidate.id === meta.id);
+        if (target) items.push({ ...meta, value: target.value, unit: 'ft', object: target.object });
+      });
+
+      const screen = this._object.getObjectByName('screen');
+      if (screen) {
+        const screenBox = new THREE.Box3().setFromObject(screen);
+        const size = screenBox.getSize(new THREE.Vector3());
+        const center = screenBox.getCenter(new THREE.Vector3());
+        const scale = this._manipulationTargets.find(target => target.metersPerUnit)?.metersPerUnit || 0.3048;
+        items.push({
+          id: 'screen-size',
+          label: `Screen ${this._formatDimensionValue(size.x / scale, 'ft')} × ${this._formatDimensionValue(size.y / scale, 'ft')}`,
+          kind: 'screen',
+          anchor: [center.x, screenBox.max.y, center.z],
+          views: ['auto', 'elevation', 'perspective'],
+        });
+      }
+
+      const body = this._object.getObjectByName('projector_body');
+      const obstacleObjects = [];
+      this._object.traverse(object => {
+        if (object.userData && object.userData.obstacleId && this._objectVisible(object) && !obstacleObjects.includes(object)) obstacleObjects.push(object);
+      });
+      if (body && obstacleObjects.length) {
+        const bodyBox = new THREE.Box3().setFromObject(body);
+        let nearest;
+        obstacleObjects.forEach(object => {
+          const obstacleBox = new THREE.Box3().setFromObject(object);
+          const dx = Math.max(obstacleBox.min.x - bodyBox.max.x, bodyBox.min.x - obstacleBox.max.x, 0);
+          const dy = Math.max(obstacleBox.min.y - bodyBox.max.y, bodyBox.min.y - obstacleBox.max.y, 0);
+          const dz = Math.max(obstacleBox.min.z - bodyBox.max.z, bodyBox.min.z - obstacleBox.max.z, 0);
+          const distance = Math.hypot(dx, dy, dz);
+          if (!nearest || distance < nearest.distance) nearest = { distance, obstacleBox };
+        });
+        if (nearest) {
+          const scale = this._manipulationTargets.find(target => target.metersPerUnit)?.metersPerUnit || 0.3048;
+          const anchor = bodyBox.getCenter(new THREE.Vector3());
+          anchor.y = bodyBox.max.y;
+          items.push({ id: 'body-clearance', label: 'Nearest body clearance', value: nearest.distance / scale, unit: 'ft', kind: 'clearance', anchor: [anchor.x, anchor.y, anchor.z], views: ['auto', 'plan', 'elevation', 'perspective'] });
+        }
+      }
+
+      obstacleObjects.forEach(object => {
+        const box = new THREE.Box3().setFromObject(object);
+        const size = box.getSize(new THREE.Vector3());
+        const center = box.getCenter(new THREE.Vector3());
+        const scale = this._manipulationTargets.find(target => target.metersPerUnit)?.metersPerUnit || 0.3048;
+        const label = String(object.userData.label || object.name || object.userData.obstacleId).replace(/[-_]+/g, ' ');
+        items.push({
+          id: `obstacle-callout:${object.userData.obstacleId}`,
+          label: `${label} · ${this._formatDimensionValue(size.x / scale, 'ft')} × ${this._formatDimensionValue(size.y / scale, 'ft')} × ${this._formatDimensionValue(size.z / scale, 'ft')}`,
+          kind: 'obstruction',
+          anchor: [center.x, box.max.y, center.z],
+          views: ['auto', 'plan', 'elevation', 'perspective'],
+        });
+      });
+      return items;
+    }
+
+    _renderDimensionAnnotations() {
+      if (!this._dimensionLayer || !this._renderer || !this._camera || !this._THREE) return;
+      if (!this._dimensionOverlayEnabled()) {
+        this._dimensionLayer.hidden = true;
+        this._dimensionLayer.replaceChildren();
+        return;
+      }
+      const rect = this._renderer.domElement.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+      const view = this._dimensionView === 'auto' ? this._cameraDimensionView : this._dimensionView;
+      const explicit = this._dimensionAnnotations;
+      const seen = new Set(explicit.map(item => item.id));
+      const items = explicit.concat(this._derivedDimensionAnnotations().filter(item => !seen.has(item.id)));
+      const nodes = [];
+      items.forEach(item => {
+        if (item.views && !item.views.includes(view)) return;
+        const anchor = this._worldAnchor(item);
+        if (!anchor) return;
+        const projected = anchor.clone().project(this._camera);
+        if (!Number.isFinite(projected.x) || !Number.isFinite(projected.y) || projected.z < -1 || projected.z > 1) return;
+        const x = Math.max(12, Math.min(rect.width - 12, (projected.x + 1) * rect.width / 2));
+        const y = Math.max(20, Math.min(rect.height - 12, (-projected.y + 1) * rect.height / 2));
+        const badge = document.createElement('div');
+        badge.className = 'dimension-badge';
+        badge.dataset.dimensionId = item.id;
+        badge.dataset.kind = item.kind || 'measurement';
+        const value = item.value === undefined ? '' : ` · ${this._formatDimensionValue(item.value, item.unit)}`;
+        badge.textContent = `${item.label}${value}`;
+        badge.style.left = `${x}px`;
+        badge.style.top = `${y}px`;
+        nodes.push(badge);
+      });
+      this._dimensionLayer.replaceChildren(...nodes);
+      this._dimensionLayer.hidden = nodes.length === 0;
     }
 
     _completeFirstInteraction() {
@@ -823,6 +1393,29 @@
       return this._renderer.domElement;
     }
 
+    /** Capture the current WebGL view for a handoff package. The returned
+     * Blob contains the rendered scene; HTML dimension badges intentionally
+     * remain separate so exported evidence never depends on DOM rasterizers. */
+    capturePng(options = {}) {
+      const canvas = this.captureCanvas();
+      if (!canvas) return Promise.reject(new Error('three-d-stage: capture unavailable while the renderer is paused'));
+      const type = typeof options.type === 'string' && /^image\/(png|jpeg|webp)$/.test(options.type)
+        ? options.type
+        : 'image/png';
+      const quality = Number.isFinite(Number(options.quality)) ? Math.max(0, Math.min(1, Number(options.quality))) : undefined;
+      return new Promise((resolve, reject) => {
+        try {
+          canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('three-d-stage: the browser returned an empty image capture')), type, quality);
+        } catch (error) {
+          reject(error);
+        }
+      });
+    }
+
+    captureImage(options = {}) {
+      return this.capturePng(options);
+    }
+
     _disposeObject(object) {
       if (!object) return;
       const geometries = new Set();
@@ -846,6 +1439,7 @@
     destroy() {
       if (this._destroyed) return;
       this._destroyed = true;
+      clearTimeout(this._keyboardReadoutTimer);
       if (this._frameId !== undefined) cancelAnimationFrame(this._frameId);
       this._frameId = undefined;
       if (this._ro) this._ro.disconnect();
@@ -862,6 +1456,7 @@
         this._renderer.domElement.removeEventListener('pointercancel', this._pointerUpHandler, true);
       }
       if (this._controls) this._controls.dispose();
+      this._clearSelectionGizmo();
       this._disposeObject(this._object);
       this._object = undefined;
       this._disposeObject(this._ground);
@@ -874,6 +1469,24 @@
 
     _handleKey(event) {
       const key = event.key;
+      if (key === '[' || key === ']') {
+        event.preventDefault();
+        this._completeFirstInteraction();
+        this._cycleManipulationTarget(key === ']' ? 1 : -1);
+        return;
+      }
+      if (key === 'Escape' && this._selectedTargetId) {
+        event.preventDefault();
+        this.clearManipulationSelection({ source: 'keyboard' });
+        this.announce('Direct manipulation handle cleared. Arrow keys orbit the stage.');
+        return;
+      }
+      if (this._selectedTargetId && ['ArrowLeft', 'ArrowDown', 'ArrowRight', 'ArrowUp', 'PageDown', 'PageUp'].includes(key)) {
+        event.preventDefault();
+        this._completeFirstInteraction();
+        this._adjustSelectedTarget(['ArrowRight', 'ArrowUp', 'PageUp'].includes(key) ? 1 : -1, event);
+        return;
+      }
       if (/^[1-5]$/.test(key)) {
         event.preventDefault();
         this._completeFirstInteraction();

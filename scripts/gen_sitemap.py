@@ -42,6 +42,7 @@ STATIC_PAGES = [
     ("pixelforge/", "weekly", "0.8"),
     ("ProjectorThrow/", "weekly", "0.8"),
     ("ProjectorThrow/Stage3D.html", "weekly", "0.6"),
+    ("ProjectorThrow/practice.html", "weekly", "0.6"),
     ("notion.html", "weekly", "0.8"),
     ("prompt-lab.html", "weekly", "0.8"),
     ("skills.html", "weekly", "0.7"),

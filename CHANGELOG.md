@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-09-23 — Throwline spatial commissioning and scope-practice suite
+
+- Added direct pointer and keyboard manipulation for projector placement and room obstructions, selected-object feedback, snapping, fine steps, and dimensioned plan/elevation callouts without moving optical calculations into the renderer.
+- Replaced illustrative stack/blend copy with exact per-unit and union screen coverage, adjacent blend-overlap geometry and configured adequacy, plus stack alignment mismatch. Brightness stays explicitly uncalculated until measured on site.
+- Added versioned commissioning records with planned/measured geometry, deltas, focus/alignment notes, verifier evidence, selective stale-field tracking, supersession, CSV export, and a standalone HTML handoff containing the exact scene and demonstration history.
+- Added named demonstration versions with save, compare, undo, and redo while preserving schema-v1 scene imports and the existing scene JSON route.
+- Added an offline two-camera shading practice console with seven controls, generated pictures, waveform, RGB parade, vectorscope, histogram, four scored exercises, troubleshooting injections, deterministic replay, and exact URL/JSON handoff. The page labels every signal and score as simulation rather than measurement or device control.
+
 ## 2026-09-23 — AV Suite spec navigation correction
 
 - Made Video a visible primary workspace covering camera, switching, signal flow, playback, displays, projection, streaming, and recording; separated Audio and Infrastructure as named workspaces.
