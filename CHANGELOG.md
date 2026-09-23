@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-09-23 — Show-first AV landing promoted to home
+
+- Published the reviewed show-first landing as `avbydave.com/`, keeping the previous landing at its noindex direct route and the Show Console/Toolbox doorway unchanged.
+- Updated navigation, page metadata, and the offline home fallback to match the new root; refreshed the shared AV offline cache version.
+
 ## 2026-09-23 — FMP Camera 4 SDI transport correction
 
 - Published Dave's direct confirmation that the Camera 4 PTZ feeds ATEM Input 4 by SDI. The P240 reference no longer presents an NDI decoder as an unresolved alternative; intermediate cable landings, final patch and current signal format remain field checks.

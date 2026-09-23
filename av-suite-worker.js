@@ -111,7 +111,7 @@ self.addEventListener('fetch',function(event){
       }).catch(function(){
         return cachedResponse(cache,request).then(function(found){
           if(found) return found;
-          var fallback=new URL(request.url).pathname===new URL('./',self.registration.scope).pathname?'./av-suite-landing.html':'./av-suite.html';
+          var fallback=new URL(request.url).pathname===new URL('./',self.registration.scope).pathname?'./av-suite-landing2.html':'./av-suite.html';
           return cache.match(new URL(fallback,self.registration.scope).href);
         });
       });
