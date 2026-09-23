@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-09-23 — Camera Shading Practice console
+
+- Rebuilt `shader/practice.html` as a ShowConsole operator console: Prep Light and Show Dark themes, a status bar with the exercise status word, simulated signal alerts, and a breadcrumb to Camera Control & Shading and FMP Video Operations. Layouts fit desktop, laptop side tabs, a phone task rail with pinned pictures, tablets, and ultrawide.
+- Replaced stretched pictures with a letterboxed 16:9 multiviewer that shows reference and target roles and simulated PGM/PVW tally, with side-by-side, wipe, reference-only, target-only, A/B blink (a manual flip under reduced motion) and frozen-reference views.
+- Redrew the waveform, RGB parade, vectorscope (75% targets and hue vectors) and histogram with labelled 0–100 generated scales, clip and crush indicators and reference targets, in single or quad layouts.
+- Added numeric entry, fine and coarse steps, per-control reset, undo/redo, camera reset and control notes that state their limits.
+- Added the objective and pass rule before adjustment, live progress words, scored checks, a debrief that explains what each change helped or hurt, and a next correction that names a direction without revealing values. Faults can now be reverted.
+- Added guided one-control demonstrations and instructor sequences with before/after pictures, reproducible by link or JSON.
+- Added a share dialog with a selectable link, local session autosave, and fallbacks when canvas, storage, clipboard or the service worker are unavailable. Scripts and styles moved to files so the CSP no longer allows inline code, and the offline worker is now network-first with a single release identifier.
+- Kept every exercise score identical to the previous engine. Version-1 Shader exports and legacy Throwline exports still import; new optional state fields are bounded and ignored by older readers. Attempt numbers now restart for each exercise (from the parallel Codex review).
+- Expanded the engine tests and the browser probe; see `docs/shader-practice.md`.
+
 ## 2026-09-23 — Camera practice moved to Shader
 
 - Moved the simulated camera-shading exercises, scopes, state engine, offline cache, and release gates to the existing Camera Control & Shading reference at `housevideo.app/shader/`.

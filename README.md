@@ -77,6 +77,19 @@ npm run verify:domain-sites
 `docs/domain-sites.md` covers the page lists, saved-data transfer, and the
 cutover checklist.
 
+### Camera Shading Practice
+
+`shader/practice.html` is an offline, deterministic camera-shading simulation
+published on housevideo.app with the Shader reference. Its engine, renderer,
+controller, offline worker, state compatibility and coaching model are
+described in [`docs/shader-practice.md`](docs/shader-practice.md). Check it
+with:
+
+```bash
+npm run verify:shader-practice
+npm run test:shader-practice-browser
+```
+
 ### NoteForge canonical release
 
 NoteForge is built in its own repository and committed here as the canonical
