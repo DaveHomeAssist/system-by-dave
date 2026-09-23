@@ -5,7 +5,7 @@
 // It drives the shipped page over the Chrome DevTools Protocol, without a test
 // framework, and checks the operator workflow, every comparison and scope
 // control, keyboard-only use, coaching, demonstrations, exact handoff,
-// imports, offline reload, responsive containment at six viewports in both
+// imports, offline reload, responsive containment at ten viewports in both
 // themes, reduced motion, and the failure paths for storage, clipboard,
 // canvas, the service worker and JavaScript. The page generates practice data
 // only; nothing here talks to equipment.
@@ -683,19 +683,28 @@ async function main() {
   let baseUrl = baseArg ? baseArg.slice('--base='.length).replace(/\/?$/, '/') : '';
   let staticServer;
   if (!baseUrl) { staticServer = await startServer(); baseUrl = staticServer.baseUrl; }
-  const port = 9800 + Math.floor(Math.random() * 300);
   const profile = fs.mkdtempSync(path.join(os.tmpdir(), 'shader-practice-probe-'));
+  // Port 0 lets Chrome pick a free port and print its DevTools address, so
+  // parallel CI jobs and busy runners cannot collide on a guessed port.
   const chrome = spawn(chromeBin, [
     ...(args.includes('--no-sandbox') || (typeof process.getuid === 'function' && process.getuid() === 0) ? ['--no-sandbox'] : []),
     '--headless=new', '--disable-gpu', '--disable-background-networking', '--disable-component-update', '--no-first-run',
-    '--hide-scrollbars', `--remote-debugging-port=${port}`, `--user-data-dir=${profile}`, 'about:blank'
+    '--hide-scrollbars', '--remote-debugging-port=0', `--user-data-dir=${profile}`, 'about:blank'
   ], { stdio: ['ignore', 'ignore', 'pipe'] });
+  let chromeLog = '';
+  const devtools = new Promise((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error(`Chrome did not report a DevTools address within 30 s.\n${chromeLog.slice(-2000)}`)), 30000);
+    chrome.stderr.on('data', chunk => {
+      chromeLog = (chromeLog + chunk).slice(-10000);
+      const match = chromeLog.match(/DevTools listening on (ws:\/\/\S+)/);
+      if (match) { clearTimeout(timer); resolve(match[1]); }
+    });
+    chrome.once('exit', code => { clearTimeout(timer); reject(new Error(`Chrome exited early (${code}).\n${chromeLog.slice(-2000)}`)); });
+  });
   let socket;
   const pages = [];
   try {
-    await waitForHttp(`http://127.0.0.1:${port}/json/version`);
-    const version = await fetch(`http://127.0.0.1:${port}/json/version`).then(response => response.json());
-    socket = new WebSocket(version.webSocketDebuggerUrl);
+    socket = new WebSocket(await devtools);
     await new Promise((resolve, reject) => { socket.onopen = resolve; socket.onerror = reject; });
     const connection = new Connection(socket);
     const main = await newPage(connection, 'main');
