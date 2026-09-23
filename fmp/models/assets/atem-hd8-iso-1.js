@@ -37,8 +37,8 @@
     'SOP: remote camera on the catwalk rail above section 202.',
     'SOP: tour tie line. A picture depends on what is patched for this show.',
     'SOP: second tour tie line. A picture depends on what is patched for this show.',
-    'SOP: house ad loop from a Dell computer through an HDMI-to-SDI converter. Fallback approval remains a draft item.',
-    'SOP: variable landing point. May be a return or a tour feed. Ask what is patched tonight before using it.',
+    'SOP: house ad loop from a Dell computer through an HDMI-to-SDI converter. This guide uses 7 Ads as its fallback; formal policy approval remains pending.',
+    'Documented ENC-102 loop-out return, upstream confidence only. Check the current Input 8 patch and a downstream TV separately; do not use it as an unapproved fallback.',
     'Still or clip loaded into Media Player 1; this is an internal source, not SDI input 9.',
     'Still or clip loaded into Media Player 2; this is an internal source, not SDI input 10.'
   ];
