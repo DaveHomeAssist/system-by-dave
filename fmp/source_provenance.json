@@ -1,7 +1,7 @@
 {
   "schema": "fmp.public.release.v2",
   "sourceRepository": "DaveHomeAssist/fmp-suite",
-  "sourceCommit": "0b65c703f7487a74c667f2c39385cfc4db41f896",
+  "sourceCommit": "5562a3c86d9fec29c209ceda2815495de726b871",
   "mode": "commissioning",
   "files": {
     "build/index.html": "7bddcf5be2c5ae2d0832ba9e73baf04b7cca7201785a5f248824b64bbb3b48f3",
@@ -53,7 +53,7 @@
     "notion-config.js": "b675c734abe301f46f50f05a65ae58b9d25bd07c57fa8b01ef07e456e32271fc",
     "photos.js": "cd1feeb0fd50c5df4df81fa55b3fb37ca708127d793d438a62e98e596fbec3ff",
     "ptz/SuperJoy-G1-Interactive-Guide.html": "b24684201ac8d71d135a7adc7091e590f7bb0a4bddde0a969229787ddafe9065",
-    "ptz/index.html": "430433566e7b081154e723f25854e3ce0eb7047ec90a823b61011028e62b3f44",
+    "ptz/index.html": "e1086ea6a275fca11dc0129909067ffdbb7ae58bad8cf369c56ac6841b8a13c9",
     "public.css": "aca2a0cc10a822a1d3ea54427595fb99964671be9e8fb4b1b01fc9a2ea06514c",
     "public.js": "5ec85cac457d89ffddd5a2e550cfff8c213529d00152240314bf9eac2679d7d7",
     "ref.css": "06116202f4e535153c538bf4c8495fc404f13df39f32c0c41f1b8db6574562a6",
@@ -84,5 +84,5 @@
     "rig/vendor/three/three.module.js": "a476b88d0df406dca0e30c65b4cdf0180c7337110accec828c103655b56a361c",
     "theme.js": "34276e275d44d4380407b996455291bfcca9cc4a9a4ef81b632534b00fc1747a"
   },
-  "artifactSha256": "f84bd273066a556253657afab347092d75f64a8b9d972b65673f696e513500cd"
+  "artifactSha256": "832a89bfbd9a9b712b7b62c700673a65bd3fbbc57b18eb719b5e9c601cc5e38e"
 }
