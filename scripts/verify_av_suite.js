@@ -181,16 +181,17 @@ function assertPageContracts(registry) {
   }
 
   const calculator = read('av-calculator.html');
+  const calculatorLogic = read('js/av-calculator.js');
   if (!/id="powerMethod"[\s\S]*value="amps"[\s\S]*value="watts"/.test(calculator)) {
     fail('AV Calculator power load does not offer nameplate-amps and watts-plus-PF methods.');
   }
-  if (!/totalWatts \/ \(voltage \* powerFactor\)/.test(calculator)) {
+  if (!/totalWatts \/ \(voltage \* powerFactor\)/.test(calculatorLogic)) {
     fail('AV Calculator watts mode does not calculate single-phase current with power factor.');
   }
-  if (!/calculator will not silently assume PF 1/.test(calculator)) {
+  if (!/calculator will not silently assume PF 1/.test(calculatorLogic)) {
     fail('AV Calculator does not require an explicit manufacturer power factor in watts mode.');
   }
-  if (!/hasOwnProperty\.call\(parsed, 'powerMethod'\)[\s\S]*powerMethod: 'watts', powerFactor: 0/.test(calculator)) {
+  if (!/hasOwnProperty\.call\(parsed, 'powerMethod'\)[\s\S]*powerMethod: 'watts', powerFactor: 0/.test(calculatorLogic)) {
     fail('AV Calculator does not migrate saved watt inputs without assuming a power factor.');
   }
 

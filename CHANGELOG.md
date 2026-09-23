@@ -1,3 +1,8 @@
+## 2026-09-23 — FMP source reconciliation
+
+- Corrected the URSA Broadcast G2 back-focus shortcut to select the fitted lens method before adjustment.
+- Reconciled the exported FMP operator references with FMP-8 status and documented house-video evidence while retaining unresolved physical paths as Unknown.
+
 # Changelog
 
 ## 2026-09-23 — FMP Camera Simulator v1
@@ -7,6 +12,19 @@
 - Venue geometry is editable and evidence-tagged: 110 ft estimated camera distance (horizontal or line of sight), 75 ft inferred stage depth, 61 ft stage width from a scale reading of Live Nation's Stage & Pit plan, and demo camera height, offset and mount. The Approximate venue and Uncalibrated camera flags stay visible until measurements replace them.
 - Added three guided exercises (wide shot, follow a performer, save and recall), versioned JSON export/import with field-level validation, browser autosave with an export fallback, and a standalone offline HTML build.
 - Source is `apps/fmp-camera-sim/`; `npm run build:camera-sim` regenerates `camera-sim/`. Unit tests, a Playwright acceptance probe and a pull-request workflow cover the release gates in `docs/fmp-camera-simulator.md`.
+
+## 2026-09-23 — AV by Dave landing and show entry repair
+
+- Added an AV domain home page with direct Show Console, Toolbox, quick-tool, resume, help, and Front Office roadmap paths. The landing follows the shared AV palette with light and dark modes.
+- Reduced first-run Show Console setup to a name field, removed the old product-name show default, and kept empty show names out of tool links. Existing show profile, readiness, and saved work remain under their current keys.
+- Made Front Office addressable, added deterministic returns to the AV home, replaced a broken tool-bar directory link with AV Toolbox, and cached the landing for offline root visits after service-worker preparation.
+
+## 2026-09-23 — LED wall calculator and quick-calculator cleanup
+
+- Moved the cabinet-aware LED wall planner to its own `led-wall-calculator.html` route on AV by Dave. Kept existing cabinet profiles and calculator values in their original browser storage keys.
+- Kept the six quick calculations on `av-calculator.html`, added direct jumps and an LED planner link, and preserved the LED-to-Power Load handoff across pages. Power-factor input remains required for current estimates.
+- Added visible light/dark controls, shared calculator CSS and JavaScript, offline assets, route registration, sitemap generation, Stage 3D offline-cache pin alignment, and focused browser regression coverage for both pages.
+- Made the Gear Reference public-count release check derive its expected value from the AV registry, allowing the new tool to pass the Pages gate.
 
 ## 2026-09-23 — Camera practice moved to Shader
 

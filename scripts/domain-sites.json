@@ -80,9 +80,11 @@
       "repository": "DaveHomeAssist/avbydave",
       "deployKeySecret": "AVBYDAVE_DEPLOY_KEY",
       "cutover": true,
-      "home": "/av-suite.html",
+      "home": "/",
+      "landingPage": "av-suite-landing.html",
       "registry": true,
       "pages": [
+        "av-suite-landing.html",
         "av-suite.html",
         "av-workbook.html",
         "av-tool-suite/"

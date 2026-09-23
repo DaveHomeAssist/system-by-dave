@@ -4,13 +4,14 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <title>Camera Shading Practice | FMP Video Operations</title>
-  <meta name="description" content="A deterministic offline camera-shading practice simulation with two virtual cameras, generated pictures, scopes, exercises, scoring, and replay.">
-  <meta name="theme-color" content="#ebe8df">
+  <meta name="description" content="A deterministic, offline camera-shading practice console: two simulated cameras, a multiviewer, waveform, RGB parade, vectorscope and histogram, scored exercises with coaching, and instructor demonstrations.">
+  <meta name="theme-color" content="#f4f6f8">
+  <meta name="referrer" content="no-referrer">
   <meta name="robots" content="index,follow">
   <link rel="canonical" href="https://housevideo.app/shader/practice.html">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Camera Shading Practice | FMP Video Operations">
-  <meta property="og:description" content="Practice matching two simulated cameras with waveform, parade, vectorscope, and histogram feedback.">
+  <meta property="og:description" content="Practice matching two simulated cameras with waveform, parade, vectorscope and histogram feedback, coaching and replayable demonstrations.">
   <meta property="og:url" content="https://housevideo.app/shader/practice.html">
   <meta property="og:image" content="https://housevideo.app/fmp/fmp-social-card.png">
   <meta property="og:image:alt" content="Camera shading practice controls with simulated camera pictures and scopes">
@@ -19,315 +20,380 @@
   <meta name="twitter:description" content="A deterministic offline camera-shading practice simulation.">
   <meta name="twitter:image" content="https://housevideo.app/fmp/fmp-social-card.png">
   <meta name="twitter:image:alt" content="Camera shading practice controls with simulated camera pictures and scopes">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'self'; connect-src 'none'">
-  <style>
-    :root{
-      color-scheme:light;
-      --deck:#ebe8df;--case:#f7f5ee;--case-hi:#fffdf7;--line:#c8c3b6;--line-strong:#878174;
-      --ink:#1a1916;--dim:#625e55;--dimmer:#6b655b;--amber:#8f5f00;--amber-hi:#cc8a00;--amber-lo:rgba(143,95,0,.1);
-      --cyan:#006e78;--cyan-hi:#0493a0;--cyan-lo:rgba(0,110,120,.1);--red:#a33e35;--red-lo:rgba(163,62,53,.09);
-      --green:#226d49;--green-lo:rgba(34,109,73,.1);--blue:#315caa;--shadow:rgba(44,38,27,.12);
-      --mono:ui-monospace,"SFMono-Regular","SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
-      --sans:"Arial Narrow","Roboto Condensed","Segoe UI",Arial,sans-serif;--radius:4px;
-    }
-    html[data-theme=dark]{
-      color-scheme:dark;--deck:#101216;--case:#191c21;--case-hi:#21252c;--line:#343a44;--line-strong:#6e7784;
-      --ink:#efede6;--dim:#b4b3ae;--dimmer:#92979f;--amber:#f0b838;--amber-hi:#ffd56b;--amber-lo:rgba(240,184,56,.12);
-      --cyan:#62ccd1;--cyan-hi:#91e7eb;--cyan-lo:rgba(98,204,209,.11);--red:#ed7165;--red-lo:rgba(237,113,101,.11);
-      --green:#70c69a;--green-lo:rgba(112,198,154,.12);--blue:#80a9ee;--shadow:rgba(0,0,0,.3)
-    }
-    *{box-sizing:border-box}
-    html,body{height:100%;margin:0;background:var(--deck);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased}
-    body{overflow:hidden}
-    button,input,select{font:inherit}
-    button,select,input[type=text]{min-height:44px;border:1px solid var(--line);border-radius:var(--radius);background:var(--case-hi);color:var(--ink)}
-    button{padding:8px 11px;cursor:pointer;font:700 10px/1.2 var(--mono);letter-spacing:.065em;text-transform:uppercase}
-    button:hover{border-color:var(--amber);background:var(--amber-lo)}
-    button[aria-pressed=true],button[data-active=true]{border-color:var(--amber);background:var(--amber);color:#18140b}
-    :focus-visible{outline:3px solid var(--cyan);outline-offset:2px}
-    ::selection{background:var(--amber);color:#17130a}
-    .skip-link{position:fixed;z-index:99;top:8px;left:8px;transform:translateY(-150%);padding:10px;background:var(--ink);color:var(--case)}
-    .skip-link:focus{transform:none}
-    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-    .app{display:grid;grid-template:56px minmax(0,1fr)/240px minmax(420px,1fr) 326px;grid-template-areas:"header header header" "scenarios workspace controls";height:100dvh;min-height:0}
-    .topbar{grid-area:header;display:flex;align-items:center;gap:13px;padding:8px 14px;border-bottom:1px solid var(--line);background:var(--case)}
-    .brand{display:flex;align-items:center;gap:10px;min-width:0;color:inherit;text-decoration:none}.brand-mark{display:grid;place-items:center;width:34px;height:34px;border:1px solid var(--line-strong);background:repeating-linear-gradient(135deg,var(--amber-lo) 0 6px,transparent 6px 12px);font:800 10px var(--mono)}
-    .brand-copy{min-width:0}.brand-copy h1{margin:0;font:800 13px/1.1 var(--mono);letter-spacing:.13em;text-transform:uppercase}.brand-copy p{margin:3px 0 0;color:var(--dimmer);font:9px var(--mono);letter-spacing:.08em;text-transform:uppercase}
-    .simulation-label{display:inline-flex;align-items:center;gap:7px;margin-left:8px;padding:6px 9px;border:1px solid var(--red);background:var(--red-lo);color:var(--red);font:800 10px var(--mono);letter-spacing:.1em;text-transform:uppercase}
-    .simulation-label::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
-    .offline-status{margin:0 0 12px;color:var(--dimmer);font:700 9px/1.4 var(--mono);letter-spacing:.04em;text-transform:uppercase}
-    .top-actions{display:flex;align-items:center;gap:7px;margin-left:auto}.top-actions button{white-space:nowrap}.compact-label{display:none}
-    .scenario-rail{grid-area:scenarios;min-height:0;overflow:auto;padding:14px 12px 18px;border-right:1px solid var(--line);background:var(--case)}
-    .rail-kicker,.panel-kicker{margin:0 0 6px;color:var(--amber);font:800 9px/1.3 var(--mono);letter-spacing:.14em;text-transform:uppercase}
-    .scenario-rail h2,.control-panel h2{margin:0;font:800 17px/1.05 var(--sans);letter-spacing:-.015em;text-transform:uppercase}
-    .rail-intro{margin:7px 0 14px;color:var(--dim);font-size:12px;line-height:1.4}
-    .scenario-list{display:grid;gap:7px}.scenario-card{position:relative;width:100%;min-height:72px;padding:11px 10px 10px 38px;text-align:left;text-transform:none;letter-spacing:0;background:var(--case-hi)}
-    .scenario-card::before{content:attr(data-index);position:absolute;left:10px;top:11px;color:var(--amber);font:800 11px var(--mono)}
-    .scenario-card strong{display:block;font:800 11px/1.25 var(--mono);letter-spacing:.035em;text-transform:uppercase}.scenario-card span{display:block;margin-top:4px;color:var(--dim);font:11px/1.3 var(--sans)}
-    .scenario-card[aria-current=true]{border-color:var(--amber);box-shadow:inset 3px 0 var(--amber);background:var(--amber-lo)}
-    .rail-section{margin-top:17px;padding-top:15px;border-top:1px solid var(--line)}
-    .rail-section label{display:block;margin-bottom:6px;color:var(--dimmer);font:700 9px var(--mono);letter-spacing:.08em;text-transform:uppercase}.rail-section input,.rail-section select{width:100%;padding:8px 9px;font:12px var(--mono)}
-    .rail-home{display:flex;align-items:center;justify-content:center;min-height:44px;margin-top:17px;border:1px solid var(--line);border-radius:var(--radius);background:var(--case-hi);color:var(--ink);font:700 10px/1.2 var(--mono);letter-spacing:.065em;text-align:center;text-decoration:none;text-transform:uppercase}.rail-home:hover{border-color:var(--amber);background:var(--amber-lo)}
-    .rail-row{display:flex;gap:6px;margin-top:7px}.rail-row>*{flex:1}
-    .workspace{grid-area:workspace;display:grid;grid-template-rows:auto minmax(0,1fr) minmax(212px,31%);gap:10px;min-width:0;min-height:0;padding:10px;overflow:hidden}
-    .signal-chain{display:grid;grid-template-columns:minmax(100px,1fr) 28px minmax(110px,1fr) 28px minmax(120px,1.2fr);align-items:center;min-height:52px;border:1px solid var(--line);background:var(--case);box-shadow:0 3px 12px var(--shadow)}
-    .chain-node{min-width:0;padding:8px 10px}.chain-node strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:800 10px var(--mono);letter-spacing:.08em;text-transform:uppercase}.chain-node span{display:block;margin-top:2px;color:var(--dimmer);font:9px var(--mono)}
-    .chain-cameras{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);min-width:0;padding:0}.chain-cameras .chain-node+.chain-node{border-left:1px solid var(--line)}
-    .chain-arrow{height:1px;background:var(--amber);position:relative}.chain-arrow::after{content:"";position:absolute;right:0;top:-4px;border:4px solid transparent;border-left-color:var(--amber)}
-    .shared-state{border-left:3px solid var(--cyan);background:var(--cyan-lo)}
-    .monitor-bank{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;min-height:0}
-    .monitor-card,.scope-card,.debrief-card{display:flex;flex-direction:column;min-height:0;border:1px solid var(--line);background:var(--case);box-shadow:0 5px 18px var(--shadow)}
-    .panel-head{display:flex;align-items:center;gap:9px;min-height:40px;padding:7px 10px;border-bottom:1px solid var(--line)}.panel-head h2{margin:0;font:800 10px var(--mono);letter-spacing:.09em;text-transform:uppercase}.panel-head span{margin-left:auto;color:var(--dimmer);font:9px var(--mono)}
-    .tally{width:9px;height:9px;border:1px solid var(--line-strong);border-radius:50%;background:transparent}.monitor-card[data-selected=true] .tally{border-color:var(--red);background:var(--red);box-shadow:0 0 0 3px var(--red-lo)}
-    .picture-wrap{position:relative;flex:1;min-height:0;background:#08090a;overflow:hidden}.picture-wrap canvas{display:block;width:100%;height:100%;image-rendering:auto}.picture-overlay{position:absolute;inset:auto 8px 8px;display:flex;justify-content:space-between;gap:8px;color:#fff;font:800 9px var(--mono);text-shadow:0 1px 4px #000}.picture-overlay span{padding:4px 6px;background:rgba(0,0,0,.62)}
-    .scope-card{display:grid;grid-template-rows:40px minmax(0,1fr)}.scope-head{display:flex;align-items:center;gap:7px;min-width:0;padding:5px 8px;border-bottom:1px solid var(--line)}.scope-tabs{display:flex;gap:5px;min-width:0;overflow-x:auto}.scope-tabs button{min-height:30px;padding:5px 7px;font-size:8.5px}.scope-legend{display:flex;gap:10px;margin-left:auto;color:var(--dimmer);font:8px var(--mono);white-space:nowrap}.scope-legend i{display:inline-block;width:8px;height:2px;margin-right:3px;vertical-align:middle}.scope-legend .a{background:var(--cyan)}.scope-legend .b{background:var(--amber)}
-    .scope-wrap{position:relative;min-height:0;background:#050708}.scope-wrap canvas{display:block;width:100%;height:100%}.scope-caption{position:absolute;right:7px;bottom:5px;color:#9da6aa;font:8px var(--mono);letter-spacing:.05em;text-transform:uppercase}
-    .control-panel{grid-area:controls;display:grid;grid-template-rows:auto auto minmax(0,1fr) auto;min-height:0;border-left:1px solid var(--line);background:var(--case)}
-    .control-summary{padding:13px 14px 11px;border-bottom:1px solid var(--line)}.camera-switch{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:11px}.camera-switch button{min-width:0}
-    .control-scroll{min-height:0;overflow:auto;padding:12px 14px}.control{margin-bottom:13px}.control-label{display:flex;justify-content:space-between;gap:10px;margin-bottom:3px;font:700 9px var(--mono);letter-spacing:.07em;text-transform:uppercase}.control-output{color:var(--amber);font-variant-numeric:tabular-nums}.control input{width:100%;height:30px;accent-color:var(--amber)}.control-scale{display:flex;justify-content:space-between;color:var(--dimmer);font:8px var(--mono)}
-    .control-footer{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:10px 12px;border-top:1px solid var(--line)}
-    .debrief-card{position:fixed;z-index:30;inset:56px 0 0 auto;display:none;width:326px;overflow:auto;border-left:1px solid var(--line);box-shadow:-14px 0 34px var(--shadow)}body[data-debrief=open] .debrief-card{display:flex}.score-plate{display:grid;grid-template-columns:72px 1fr;gap:12px;padding:12px}.score-number{display:grid;place-items:center;width:68px;height:68px;border:2px solid var(--amber);border-radius:50%;font:800 23px var(--mono)}.score-copy strong{font:800 11px var(--mono);letter-spacing:.05em;text-transform:uppercase}.score-copy p{margin:5px 0 0;color:var(--dim);font-size:12px;line-height:1.4}.objective-list{display:grid;gap:6px;padding:0 12px 12px}.objective{display:grid;grid-template-columns:minmax(82px,1fr) 44px;gap:8px;align-items:center}.objective span{font:9px var(--mono)}.objective output{text-align:right;font:800 9px var(--mono)}.meter{grid-column:1/-1;height:5px;background:var(--deck);overflow:hidden}.meter i{display:block;height:100%;background:var(--amber)}.debrief-close{margin-left:auto;min-height:30px;padding:4px 8px}
-    .mobile-nav,.mobile-transfer-actions{display:none}
-    .toast{position:fixed;z-index:50;right:14px;bottom:14px;max-width:min(360px,calc(100vw - 28px));padding:11px 13px;border:1px solid var(--cyan);background:var(--case-hi);box-shadow:0 12px 34px var(--shadow);font:11px/1.4 var(--mono)}.toast[hidden]{display:none}
-    .error{border-color:var(--red);color:var(--red)}
-    @media (min-width:1600px){.app{grid-template-columns:270px minmax(650px,1fr) 380px}.debrief-card{width:380px}.workspace{grid-template-rows:auto minmax(0,1fr) minmax(260px,34%);padding:14px;gap:14px}.control-scroll{display:grid;grid-template-columns:1fr 1fr;align-content:start;gap:0 14px}.signal-chain{min-height:62px}}
-    @media (max-width:1080px){.app{grid-template-columns:210px minmax(380px,1fr) 286px}.debrief-card{width:286px}.workspace{grid-template-rows:auto minmax(0,1fr) minmax(190px,30%)}.simulation-label{margin-left:0}.top-actions .text-label{display:none}.compact-label{display:inline}}
-    @media (max-width:820px){
-      body{padding-bottom:calc(58px + env(safe-area-inset-bottom))}.app{display:block;height:calc(100dvh - 58px - env(safe-area-inset-bottom));overflow:hidden}.topbar{height:56px}.simulation-label{font-size:8px;padding:5px 6px}.brand-copy p{display:none}.top-actions button:nth-child(-n+3){display:none}
-      .scenario-rail,.workspace,.control-panel,.debrief-card{position:absolute;inset:56px 0 calc(58px + env(safe-area-inset-bottom));width:auto;border:0;overflow:auto}
-      .scenario-rail{display:none;padding:18px}.workspace{display:none;padding:10px;grid-template-rows:auto minmax(290px,1fr) minmax(240px,.75fr)}.control-panel{display:none}.debrief-card{display:none;padding-bottom:20px;background:var(--case)}.mobile-transfer-actions{display:grid;grid-template-columns:1fr 1fr;gap:6px}.mobile-transfer-actions button:last-child{grid-column:1/-1}
-      body[data-mobile-tab=scenarios] .scenario-rail{display:block}body[data-mobile-tab=monitor] .workspace{display:grid}body[data-mobile-tab=controls] .control-panel{display:grid}body[data-mobile-tab=debrief] .debrief-card{display:flex}body[data-debrief=open]:not([data-mobile-tab=debrief]) .debrief-card{display:none}
-      .signal-chain{grid-template-columns:1.2fr 20px 1fr 20px 1.2fr}.chain-node{padding:7px}.chain-node span{display:none}.monitor-bank{min-height:290px}.control-scroll{overflow:visible}.control-panel{grid-template-rows:auto auto auto auto}.scope-card{min-height:240px;grid-template-rows:54px minmax(0,1fr)}.scope-tabs button{min-height:44px}.scope-head{min-height:54px}
-      .mobile-nav{position:fixed;z-index:20;left:0;right:0;bottom:0;display:grid;grid-template-columns:repeat(4,1fr);height:calc(58px + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);border-top:1px solid var(--line);background:var(--case)}.mobile-nav button{min-height:58px;border:0;border-right:1px solid var(--line);border-radius:0;padding:5px 3px;font-size:8px}.mobile-nav button:last-child{border-right:0}
-    }
-    @media (max-width:520px){.brand-copy h1{font-size:10px}.brand-mark{display:none}.simulation-label{max-width:118px}.monitor-bank{grid-template-columns:1fr;grid-template-rows:1fr 1fr}.workspace{grid-template-rows:auto minmax(360px,1fr) minmax(230px,.72fr)}.signal-chain{grid-template-columns:minmax(0,1.15fr) 8px minmax(0,.9fr) 8px minmax(0,1fr);overflow:hidden}.chain-node{padding-inline:5px}.chain-node strong{font-size:8px}.monitor-card .panel-head>span{display:none}.scope-legend{display:none}.scope-caption{left:7px;right:auto;max-width:calc(100% - 14px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}}
-    @media (prefers-reduced-motion:no-preference){button,.scenario-card{transition:border-color .16s ease,background-color .16s ease,color .16s ease}.toast{animation:toast-in .18s ease-out}@keyframes toast-in{from{transform:translateY(8px);opacity:0}}}
-  </style>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; connect-src 'none'; worker-src 'self'; frame-src 'none'; media-src 'none'">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2304080c'/%3E%3Cpath d='M6 22h4l3-9 3 6 3-4 3 7h4' fill='none' stroke='%23b8e6b4' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="practice.css">
+  <script src="practice-theme.js"></script>
 </head>
-<body data-mobile-tab="monitor">
-  <a class="skip-link" href="#practiceWorkspace">Skip to practice monitor</a>
-  <div class="app">
+<body data-layout="desktop" data-view="shade">
+  <a class="sbd-skip-link" href="#practiceWorkspace">Skip to the practice console</a>
+  <noscript>
+    <div class="noscript">
+      <p><strong>SIMULATION FOR PRACTICE.</strong> Camera Shading Practice needs JavaScript to generate its practice pictures, scopes and scores. Nothing here reads or controls real equipment.</p>
+      <p><a href="index.html">Camera control &amp; shading reference</a> · <a href="/fmp/">FMP Video Operations</a></p>
+    </div>
+  </noscript>
+  <div class="console" id="console">
     <header class="topbar">
-      <a class="brand" href="index.html" aria-label="Open Camera control and shading reference"><div class="brand-mark" aria-hidden="true">SH</div><div class="brand-copy"><h1>Camera Shading Practice</h1><p>FMP video training lab</p></div></a>
-      <div class="simulation-label">SIMULATION FOR PRACTICE</div>
+      <nav class="sbd-site-return crumbs" aria-label="Site navigation">
+        <a class="crumb" href="/fmp/"><span class="long">FMP Video Operations</span><span class="short" aria-hidden="true">FMP</span></a>
+        <span class="crumb-sep" aria-hidden="true">/</span>
+        <a href="index.html" aria-label="Return to Camera control and shading reference" class="crumb"><span class="long">Camera control &amp; shading</span><span class="short" aria-hidden="true">Shading ref</span></a>
+        <span class="crumb-sep" aria-hidden="true">/</span>
+        <span class="crumb crumb-current" aria-current="page">Practice</span>
+      </nav>
+      <h1 class="show-title">CAMERA SHADING PRACTICE</h1>
       <div class="top-actions">
-        <button type="button" id="exportButton"><span class="text-label">Export scenario JSON</span><span class="compact-label">Export</span></button>
-        <button type="button" id="importButton"><span class="text-label">Import scenario JSON</span><span class="compact-label">Import</span></button>
-        <button type="button" id="copyLinkButton"><span class="text-label">Copy reproducible link</span><span class="compact-label">Link</span></button>
-        <button type="button" id="themeButton" aria-pressed="false" aria-label="Use dark theme">Dark</button>
+        <button type="button" class="btn" id="shareButton" aria-haspopup="dialog" aria-controls="shareDialog">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V4m0 0-4 4m4-4 4 4M5 13v6h14v-6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <span class="btn-label">Share &amp; files</span>
+        </button>
+        <button type="button" class="btn" id="themeButton" aria-pressed="false">
+          <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+          <span class="btn-label" id="themeLabel">Show dark</span>
+        </button>
       </div>
     </header>
 
-    <aside class="scenario-rail" aria-labelledby="scenarioHeading">
-      <p class="rail-kicker">Exercise deck</p><h2 id="scenarioHeading">Choose a call</h2>
-      <p class="rail-intro">Every run uses generated pictures and deterministic scope data. Nothing here reads or controls real equipment.</p>
-      <p class="offline-status" id="offlineStatus" role="status" aria-live="polite">Preparing offline use.</p>
-      <div class="scenario-list" id="scenarioList"></div>
-      <div class="rail-section">
-        <label for="seedInput">Reproducible seed</label><input type="text" id="seedInput" maxlength="80" autocomplete="off" spellcheck="false">
-        <div class="rail-row"><button type="button" id="applySeedButton">Apply seed</button><button type="button" id="replayButton">Replay</button></div>
-      </div>
-      <div class="rail-section">
-        <label for="injectionSelect">Troubleshooting injection</label><select id="injectionSelect"></select>
-        <div class="rail-row"><button type="button" id="injectButton">Inject on B</button></div>
-      </div>
-      <div class="rail-section mobile-transfer-actions" aria-label="Scenario transfer">
-        <button type="button" id="mobileExportButton">Export JSON</button><button type="button" id="mobileImportButton">Import JSON</button><button type="button" id="mobileCopyLinkButton">Copy full-state link</button>
-      </div>
-      <a class="rail-home" href="index.html" aria-label="Return to Camera control and shading reference">Camera control reference</a>
-    </aside>
+    <section class="statusbar" aria-label="Exercise status and simulated signal alerts">
+      <p class="sim-flag" id="simFlag"><span class="sim-dot" aria-hidden="true"></span>SIMULATION FOR PRACTICE</p>
+      <p class="status-exercise"><span class="pill" id="exerciseStatus" data-level="IDLE">IDLE</span><span class="status-name" id="exerciseName">MATCH TWO CAMERAS</span><span class="status-next" id="statusNext"></span></p>
+      <p class="status-demo" id="statusDemo" hidden><span class="pill" data-level="RUN">DEMO</span><span id="statusDemoText"></span></p>
+      <ul class="status-alerts" id="statusAlerts" aria-label="Simulated signal alerts"></ul>
+    </section>
 
-    <main class="workspace" id="practiceWorkspace" tabindex="-1">
-      <section class="signal-chain" aria-label="Shared simulation signal chain">
-        <div class="chain-cameras"><div class="chain-node"><strong>Camera A</strong><span>Generated picture source</span></div><div class="chain-node"><strong>Camera B</strong><span>Generated picture source</span></div></div>
-        <div class="chain-arrow" aria-hidden="true"></div>
-        <div class="chain-node"><strong>Control panel</strong><span>Seven simulated shading controls</span></div>
-        <div class="chain-arrow" aria-hidden="true"></div>
-        <div class="chain-node shared-state"><strong>Monitor + scopes</strong><span id="stateIdentity">Shared state v1</span></div>
-      </section>
-      <section class="monitor-bank" aria-label="Virtual camera monitor wall">
-        <article class="monitor-card" id="cameraCardA" data-camera-id="camera-a"><div class="panel-head"><i class="tally" aria-hidden="true"></i><h2>Camera A</h2><span id="cameraMetricA">Reference</span></div><div class="picture-wrap"><canvas id="cameraCanvasA" width="640" height="360" role="img" aria-label="Generated simulated picture for Camera A">Generated simulated Camera A preview.</canvas><div class="picture-overlay"><span>CAM A</span><span id="cameraReadoutA"></span></div></div></article>
-        <article class="monitor-card" id="cameraCardB" data-camera-id="camera-b"><div class="panel-head"><i class="tally" aria-hidden="true"></i><h2>Camera B</h2><span id="cameraMetricB">Target</span></div><div class="picture-wrap"><canvas id="cameraCanvasB" width="640" height="360" role="img" aria-label="Generated simulated picture for Camera B">Generated simulated Camera B preview.</canvas><div class="picture-overlay"><span>CAM B</span><span id="cameraReadoutB"></span></div></div></article>
-      </section>
-      <section class="scope-card" aria-labelledby="scopeHeading"><div class="scope-head"><div class="scope-tabs" id="scopeTabs" role="tablist" aria-label="Scope type"></div><div class="scope-legend" aria-hidden="true"><span><i class="a"></i>A</span><span><i class="b"></i>B</span></div></div><div class="scope-wrap"><h2 class="sr-only" id="scopeHeading">Simulated scope display</h2><canvas id="scopeCanvas" width="960" height="300" role="img" aria-label="Simulated waveform comparison for Camera A and Camera B">Simulated scope display.</canvas><div class="scope-caption">Generated practice signal · not a measurement</div></div></section>
+    <main class="workspace" id="practiceWorkspace" tabindex="-1" aria-label="Practice console">
+      <div class="col-side" id="sideColumn">
+        <div class="side-tabs" role="tablist" aria-label="Console panels" id="sideTabs">
+          <button type="button" role="tab" class="tab" id="tab-control" data-side-tab="control" aria-controls="controlPanel" aria-selected="false" tabindex="-1">CONTROL</button>
+          <button type="button" role="tab" class="tab" id="tab-exercise" data-side-tab="exercise" aria-controls="panel-exercise" aria-selected="true">EXERCISE</button>
+          <button type="button" role="tab" class="tab" id="tab-score" data-side-tab="score" aria-controls="panel-score" aria-selected="false" tabindex="-1">SCORE</button>
+          <button type="button" role="tab" class="tab" id="tab-demo" data-side-tab="demo" aria-controls="panel-demo" aria-selected="false" tabindex="-1">DEMO</button>
+        </div>
+
+        <section class="panel side-panel" id="panel-exercise" role="tabpanel" aria-labelledby="tab-exercise" data-side-panel="exercise">
+          <div class="panel-scroll">
+            <h2 class="panel-heading" id="exerciseHeading">CHOOSE AN EXERCISE</h2>
+            <ol class="exercise-list" id="exerciseList" aria-labelledby="exerciseHeading"></ol>
+
+            <section class="block" aria-labelledby="objectiveHeading">
+              <h3 class="block-heading" id="objectiveHeading">OBJECTIVE AND PASS RULE</h3>
+              <p class="objective-text" id="objectiveText"></p>
+              <p class="pass-rule" id="passRule"></p>
+              <ul class="objective-list" id="objectiveList" aria-label="Live progress by objective"></ul>
+              <p class="hint">Progress shows how close each objective is without giving the answer: CRIT far, WARN close, OK inside its window.</p>
+            </section>
+
+            <section class="block" aria-labelledby="workflowHeading">
+              <h3 class="block-heading" id="workflowHeading">WORKFLOW</h3>
+              <ol class="workflow" id="workflowList"></ol>
+            </section>
+
+            <section class="block" aria-labelledby="alertHeading">
+              <h3 class="block-heading" id="alertHeading">SIMULATED SIGNAL ALERTS</h3>
+              <ul class="alert-list" id="alertList"></ul>
+            </section>
+
+            <section class="block" aria-labelledby="seedHeading">
+              <h3 class="block-heading" id="seedHeading">SEED AND REPLAY</h3>
+              <label class="field-label" for="seedInput">Reproducible seed</label>
+              <div class="field-row">
+                <input type="text" id="seedInput" maxlength="80" autocomplete="off" spellcheck="false">
+                <button type="button" class="btn" id="applySeedButton">Apply seed</button>
+              </div>
+              <button type="button" class="btn btn-wide" id="replayButton">Replay exercise from its start</button>
+              <p class="mono-note" id="stateIdentity">shader.camera-practice.v1</p>
+            </section>
+
+            <section class="block" aria-labelledby="faultHeading">
+              <h3 class="block-heading" id="faultHeading">TROUBLESHOOTING INJECTION</h3>
+              <p class="hint">Adds a named fault to Camera B. Each fault is listed and can be reverted without losing other work.</p>
+              <label class="field-label" for="injectionSelect">Fault</label>
+              <div class="field-row">
+                <select id="injectionSelect"></select>
+                <button type="button" class="btn" id="injectButton">Inject on Camera B</button>
+              </div>
+              <ul class="fault-list" id="faultList" aria-label="Injected faults"></ul>
+              <button type="button" class="btn btn-wide" id="revertFaultButton">Revert last fault</button>
+            </section>
+
+            <nav class="block panel-links" aria-label="Related references">
+              <a class="link-row" href="index.html">Camera control &amp; shading reference</a>
+              <a class="link-row" href="/fmp/">FMP Video Operations</a>
+            </nav>
+            <p class="disclaimer">Generated pictures and scopes only. Nothing here reads or controls real equipment.</p>
+            <p class="mono-note" id="offlineStatus" role="status">Preparing offline use.</p>
+          </div>
+        </section>
+
+        <section class="panel side-panel" id="panel-score" role="tabpanel" aria-labelledby="tab-score" data-side-panel="score" hidden>
+          <div class="panel-scroll">
+            <h2 class="panel-heading" id="scoreHeading" tabindex="-1">DEBRIEF</h2>
+            <div id="scoreEmpty">
+              <p class="empty-state">No attempt scored yet. Adjust the target camera, then press <strong>Score attempt</strong>. The debrief compares each check with the one before it.</p>
+            </div>
+            <div id="scoreContent" hidden>
+              <div class="score-plate">
+                <p class="readout-xl" id="scoreNumber">0</p>
+                <div class="score-copy">
+                  <p><span class="pill" id="scoreBand" data-level="IDLE">IDLE</span> <span class="score-status" id="scoreStatusText"></span></p>
+                  <p class="mono-note" id="scoreDelta"></p>
+                </div>
+              </div>
+              <section class="block next-correction" aria-labelledby="nextHeading">
+                <h3 class="block-heading" id="nextHeading">NEXT CORRECTION</h3>
+                <p id="nextCorrection" aria-live="polite"></p>
+              </section>
+              <section class="block" aria-labelledby="objectiveTableHeading">
+                <h3 class="block-heading" id="objectiveTableHeading">OBJECTIVES AT THIS CHECK</h3>
+                <div class="table-wrap">
+                  <table class="objective-table">
+                    <thead><tr><th scope="col">Objective</th><th scope="col">Before</th><th scope="col">Now</th><th scope="col">Status</th></tr></thead>
+                    <tbody id="objectiveTableBody"></tbody>
+                  </table>
+                </div>
+              </section>
+              <section class="block" aria-labelledby="changesHeading">
+                <h3 class="block-heading" id="changesHeading">WHAT CHANGED</h3>
+                <ul class="change-list" id="changeList"></ul>
+                <p class="hint" id="interactionNote" hidden>These changes interact: together they moved the score differently than each did alone.</p>
+              </section>
+              <section class="block" aria-labelledby="coachHeading">
+                <h3 class="block-heading" id="coachHeading">COACH NOTES</h3>
+                <ul class="coach-list" id="coachList"></ul>
+              </section>
+              <section class="block" aria-labelledby="historyHeading">
+                <h3 class="block-heading" id="historyHeading">CHECKS THIS ATTEMPT</h3>
+                <ol class="check-history" id="checkHistory"></ol>
+              </section>
+            </div>
+            <p class="disclaimer">Scores compare generated practice signals. They are not measurements.</p>
+          </div>
+        </section>
+
+        <section class="panel side-panel" id="panel-demo" role="tabpanel" aria-labelledby="tab-demo" data-side-panel="demo" hidden>
+          <div class="panel-scroll">
+            <h2 class="panel-heading" id="demoHeading" tabindex="-1">DEMONSTRATION</h2>
+            <p class="hint">Step through saved states to show how a control changes the picture and scopes. Every value is generated on this page from its state.</p>
+            <div id="demoIdle">
+              <label class="field-label" for="demoControlSelect">Guided sweep of one control</label>
+              <div class="field-row">
+                <select id="demoControlSelect"></select>
+                <button type="button" class="btn" id="startDemoButton">Start sweep</button>
+              </div>
+              <button type="button" class="btn btn-wide" id="captureFirstButton">Start a sequence from the current state</button>
+            </div>
+            <div id="demoActive" hidden>
+              <p class="demo-title" id="demoTitle"></p>
+              <p class="mono-note" id="demoPosition"></p>
+              <div class="field-row">
+                <button type="button" class="btn" id="demoPrevButton">Previous step</button>
+                <button type="button" class="btn" id="demoNextButton">Next step</button>
+              </div>
+              <ol class="demo-steps" id="demoStepList" aria-label="Demonstration steps"></ol>
+              <section class="block" aria-labelledby="demoStepLabel">
+                <h3 class="block-heading" id="demoStepLabel"></h3>
+                <p class="pre-line" id="demoStepNote"></p>
+                <p class="pill-row" id="demoModified" hidden><span class="pill" data-level="WARN">WARN</span> Controls changed since this step was saved.</p>
+              </section>
+              <div class="segmented" role="group" aria-label="Before picture">
+                <button type="button" class="seg" data-demo-compare="first" aria-pressed="true">Before: first step</button>
+                <button type="button" class="seg" data-demo-compare="previous" aria-pressed="false">Before: previous step</button>
+              </div>
+              <details class="instructor">
+                <summary>Instructor tools</summary>
+                <label class="field-label" for="demoLabelInput">Step label</label>
+                <input type="text" id="demoLabelInput" maxlength="60" autocomplete="off">
+                <label class="field-label" for="demoNoteInput">Step note</label>
+                <textarea id="demoNoteInput" maxlength="280" rows="3"></textarea>
+                <div class="field-row">
+                  <button type="button" class="btn" id="demoCaptureButton">Capture new step</button>
+                  <button type="button" class="btn" id="demoUpdateButton">Update this step</button>
+                </div>
+                <button type="button" class="btn btn-wide" id="demoRemoveButton">Remove this step</button>
+              </details>
+              <div class="field-row">
+                <button type="button" class="btn" id="demoLinkButton">Copy demo link</button>
+                <button type="button" class="btn" id="demoExportButton">Export demo JSON</button>
+              </div>
+              <button type="button" class="btn btn-wide" id="exitDemoButton">Exit demonstration</button>
+            </div>
+            <p class="disclaimer">Demonstrations replay generated practice states. Nothing here reads or controls real equipment.</p>
+          </div>
+        </section>
+      </div>
+
+      <div class="col-center">
+        <section class="panel monitor-panel" id="monitorPanel" aria-labelledby="monitorHeading">
+          <div class="panel-bar">
+            <h2 class="panel-label" id="monitorHeading">MULTIVIEWER</h2>
+            <div class="segmented" role="group" aria-label="Comparison view" id="compareGroup">
+              <button type="button" class="seg" data-compare="side" aria-pressed="true">Side by side</button>
+              <button type="button" class="seg" data-compare="wipe" aria-pressed="false">Wipe</button>
+              <button type="button" class="seg" data-compare="reference" aria-pressed="false"><span class="long">Reference only</span><span class="short" aria-hidden="true">Ref</span></button>
+              <button type="button" class="seg" data-compare="target" aria-pressed="false"><span class="long">Target only</span><span class="short" aria-hidden="true">Tgt</span></button>
+            </div>
+            <div class="bar-actions">
+              <button type="button" class="btn" id="blinkButton" aria-pressed="false">Blink A/B</button>
+              <button type="button" class="btn" id="freezeButton" aria-pressed="false">Freeze ref</button>
+            </div>
+          </div>
+          <div class="monitor-wall" id="monitorWall" data-compare="side" data-arrangement="row">
+            <figure class="monitor" id="monitorLeft" data-role="reference">
+              <div class="monitor-screen">
+                <canvas id="cameraCanvasA" role="img" aria-label="Generated simulated picture for Camera A">Generated simulated Camera A picture.</canvas>
+                <div class="monitor-tags">
+                  <span class="tag tag-role" id="roleTagA">REF · CAM A</span>
+                  <span class="tag tag-mode" id="tallyTagA">LOCKED</span>
+                  <span class="tag tag-control" id="controlTagA" hidden>CONTROL</span>
+                </div>
+                <button type="button" class="monitor-select" id="monitorSelectA" aria-label="Control Camera A"></button>
+              </div>
+              <figcaption class="monitor-readout" id="readoutA"></figcaption>
+            </figure>
+            <figure class="monitor" id="monitorRight" data-role="target">
+              <div class="monitor-screen">
+                <canvas id="cameraCanvasB" role="img" aria-label="Generated simulated picture for Camera B">Generated simulated Camera B picture.</canvas>
+                <div class="monitor-tags">
+                  <span class="tag tag-role" id="roleTagB">TGT · CAM B</span>
+                  <span class="tag tag-mode" id="tallyTagB">ADJUST</span>
+                  <span class="tag tag-control" id="controlTagB" hidden>CONTROL</span>
+                </div>
+                <button type="button" class="monitor-select" id="monitorSelectB" aria-label="Control Camera B"></button>
+              </div>
+              <figcaption class="monitor-readout" id="readoutB"></figcaption>
+            </figure>
+            <figure class="monitor monitor-wipe" id="monitorWipe" hidden>
+              <div class="monitor-screen">
+                <canvas id="wipeCanvas" role="img" aria-label="Wipe comparison of the reference and target pictures">Wipe comparison.</canvas>
+                <div class="monitor-tags">
+                  <span class="tag tag-role" id="wipeTagLeft">REF · CAM A</span>
+                  <span class="tag tag-role tag-end" id="wipeTagRight">TGT · CAM B</span>
+                </div>
+              </div>
+              <figcaption class="wipe-control">
+                <label class="field-label" for="wipeInput">Wipe position</label>
+                <input type="range" id="wipeInput" min="5" max="95" step="1" value="50">
+              </figcaption>
+            </figure>
+          </div>
+          <p class="panel-foot"><span id="compareCaption"></span> <span class="foot-disclaimer">Nothing here reads or controls real equipment.</span></p>
+        </section>
+
+        <section class="panel scope-panel" id="scopePanel" aria-labelledby="scopeHeading">
+          <div class="panel-bar">
+            <h2 class="panel-label" id="scopeHeading">SCOPES</h2>
+            <div class="scope-tabs" role="tablist" aria-label="Scope type" id="scopeTabs">
+              <button type="button" role="tab" class="tab" id="scopeTab-waveform" data-scope="waveform" aria-controls="scopeFigure-waveform" aria-selected="true">WAVEFORM</button>
+              <button type="button" role="tab" class="tab" id="scopeTab-parade" data-scope="parade" aria-controls="scopeFigure-parade" aria-selected="false" tabindex="-1">RGB PARADE</button>
+              <button type="button" role="tab" class="tab" id="scopeTab-vectorscope" data-scope="vectorscope" aria-controls="scopeFigure-vectorscope" aria-selected="false" tabindex="-1">VECTOR</button>
+              <button type="button" role="tab" class="tab" id="scopeTab-histogram" data-scope="histogram" aria-controls="scopeFigure-histogram" aria-selected="false" tabindex="-1">HISTOGRAM</button>
+            </div>
+            <div class="segmented" role="group" aria-label="Scope layout">
+              <button type="button" class="seg" data-layout="single" aria-pressed="true">Single</button>
+              <button type="button" class="seg" data-layout="quad" aria-pressed="false">Quad</button>
+            </div>
+          </div>
+          <div class="scope-grid" id="scopeGrid" data-layout="single" data-arrangement="grid">
+            <figure class="scope" id="scopeFigure-waveform" data-scope="waveform" role="tabpanel" aria-labelledby="scopeTab-waveform">
+              <figcaption class="scope-title"><span>WAVEFORM · LUMA</span><button type="button" class="scope-focus" data-focus-scope="waveform">Focus</button></figcaption>
+              <div class="scope-glass"><canvas id="scopeCanvas-waveform" role="img" aria-label="Simulated waveform">Simulated waveform.</canvas></div>
+              <p class="scope-caption"><span class="legend" id="legend-waveform"></span><span class="scope-disclaimer">Generated practice signal · not a measurement</span></p>
+            </figure>
+            <figure class="scope" id="scopeFigure-parade" data-scope="parade" role="tabpanel" aria-labelledby="scopeTab-parade" hidden>
+              <figcaption class="scope-title"><span>RGB PARADE</span><button type="button" class="scope-focus" data-focus-scope="parade">Focus</button></figcaption>
+              <div class="scope-glass"><canvas id="scopeCanvas-parade" role="img" aria-label="Simulated RGB parade">Simulated RGB parade.</canvas></div>
+              <p class="scope-caption"><span class="legend" id="legend-parade"></span><span class="scope-disclaimer">Generated practice signal · not a measurement</span></p>
+            </figure>
+            <figure class="scope" id="scopeFigure-vectorscope" data-scope="vectorscope" role="tabpanel" aria-labelledby="scopeTab-vectorscope" hidden>
+              <figcaption class="scope-title"><span>VECTORSCOPE</span><button type="button" class="scope-focus" data-focus-scope="vectorscope">Focus</button></figcaption>
+              <div class="scope-glass"><canvas id="scopeCanvas-vectorscope" role="img" aria-label="Simulated vectorscope">Simulated vectorscope.</canvas></div>
+              <p class="scope-caption"><span class="legend" id="legend-vectorscope"></span><span class="scope-disclaimer">Generated practice signal · not a measurement</span></p>
+            </figure>
+            <figure class="scope" id="scopeFigure-histogram" data-scope="histogram" role="tabpanel" aria-labelledby="scopeTab-histogram" hidden>
+              <figcaption class="scope-title"><span>HISTOGRAM · LUMA</span><button type="button" class="scope-focus" data-focus-scope="histogram">Focus</button></figcaption>
+              <div class="scope-glass"><canvas id="scopeCanvas-histogram" role="img" aria-label="Simulated histogram">Simulated histogram.</canvas></div>
+              <p class="scope-caption"><span class="legend" id="legend-histogram"></span><span class="scope-disclaimer">Generated practice signal · not a measurement</span></p>
+            </figure>
+          </div>
+          <section class="control-notes" id="controlNotes" aria-labelledby="controlNotesTitle">
+            <p class="notes-title"><span id="controlNotesTitle">IRIS</span> <span class="notes-summary" id="controlNotesSummary"></span></p>
+            <p class="cause-effect" id="causeEffect" aria-live="polite"></p>
+            <details class="notes-more">
+              <summary>How this simulation models it</summary>
+              <p id="controlNotesSimulation"></p>
+              <p id="controlNotesCaveat"></p>
+              <p class="mono-note" id="controlNotesKeys"></p>
+            </details>
+          </section>
+        </section>
+      </div>
+
+      <aside class="panel control-panel" id="controlPanel" aria-labelledby="controlHeading" data-side-panel="control">
+        <div class="control-head">
+          <h2 class="panel-label" id="controlHeading">CAMERA CONTROL</h2>
+          <p class="control-target" id="controlTarget"></p>
+        </div>
+        <div class="camera-select" role="group" aria-label="Camera under control">
+          <button type="button" class="cam-btn" data-camera-switch="camera-a" aria-pressed="false"><span class="role-mark" id="camDotA" aria-hidden="true">R</span><span class="cam-name">CAM A</span><span class="cam-role" id="camRoleA">REF · LOCKED</span></button>
+          <button type="button" class="cam-btn" data-camera-switch="camera-b" aria-pressed="true"><span class="role-mark" id="camDotB" aria-hidden="true">T</span><span class="cam-name">CAM B</span><span class="cam-role" id="camRoleB">TGT · ADJUST</span></button>
+        </div>
+        <div class="control-tools">
+          <button type="button" class="btn" id="undoButton" aria-keyshortcuts="Control+Z Meta+Z">Undo</button>
+          <button type="button" class="btn" id="redoButton" aria-keyshortcuts="Control+Shift+Z Meta+Shift+Z">Redo</button>
+          <button type="button" class="btn" id="resetCameraButton">Reset cam</button>
+          <div class="segmented" role="group" aria-label="Step size for plus, minus and arrow keys">
+            <button type="button" class="seg" data-step-size="fine" aria-pressed="true">Fine</button>
+            <button type="button" class="seg" data-step-size="coarse" aria-pressed="false">Coarse</button>
+          </div>
+        </div>
+        <div class="control-list" id="controlList"></div>
+        <div class="score-strip">
+          <button type="button" class="btn btn-primary" id="scoreButton">Score attempt</button>
+          <div class="score-summary">
+            <p id="scoreSummary">Not scored yet.</p>
+            <button type="button" class="link-btn" id="openDebriefButton">Open debrief</button>
+          </div>
+        </div>
+      </aside>
     </main>
 
-    <aside class="control-panel" aria-labelledby="controlHeading">
-      <div class="control-summary"><p class="panel-kicker">Control panel</p><h2 id="controlHeading">Camera B</h2><div class="camera-switch"><button type="button" data-camera-switch="camera-a">Camera A</button><button type="button" data-camera-switch="camera-b">Camera B</button></div></div>
-      <div class="control-scroll" id="controlList"></div>
-      <div class="control-footer"><button type="button" id="splitViewButton" aria-pressed="true">Split view</button><button type="button" id="scoreButton">Score now</button></div>
-    </aside>
-
-    <section class="debrief-card" aria-labelledby="debriefHeading">
-      <div class="panel-head"><h2 id="debriefHeading">Practice debrief</h2><span id="attemptLabel">Attempt 1</span><button type="button" class="debrief-close" id="closeDebriefButton" aria-label="Close debrief">Close</button></div>
-      <div class="score-plate"><div class="score-number" id="scoreNumber">0</div><div class="score-copy"><strong id="scoreStatus">Make an adjustment</strong><p id="scoreExplanation"></p></div></div>
-      <div class="objective-list" id="objectiveList"></div>
-      <div class="score-copy" style="padding:0 12px 16px"><strong>Coach notes</strong><p id="coachNotes"></p></div>
-    </section>
+    <nav class="view-rail" id="viewRail" aria-label="Practice views">
+      <button type="button" class="rail-btn" data-view="shade" aria-pressed="true"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8M14 5v4M8 15v4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>SHADE</button>
+      <button type="button" class="rail-btn" data-view="scopes" aria-pressed="false"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 19h18M4 16l4-7 4 5 4-9 4 11" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>SCOPES</button>
+      <button type="button" class="rail-btn" data-view="exercise" aria-pressed="false"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>EXERCISE</button>
+      <button type="button" class="rail-btn" data-view="score" aria-pressed="false"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l4 4L19 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>SCORE</button>
+      <button type="button" class="rail-btn" data-view="demo" aria-pressed="false"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5v14l6-7-6-7Zm8 0v14l6-7-6-7Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>DEMO</button>
+    </nav>
   </div>
 
-  <nav class="mobile-nav" aria-label="Practice areas">
-    <button type="button" data-mobile-target="scenarios">Exercises</button><button type="button" data-mobile-target="monitor" data-active="true">Monitor</button><button type="button" data-mobile-target="controls">Control</button><button type="button" data-mobile-target="debrief">Debrief</button>
-  </nav>
+  <dialog class="share-dialog" id="shareDialog" aria-labelledby="shareHeading">
+    <div class="dialog-body">
+      <h2 class="panel-heading" id="shareHeading">REPLAY OR SHARE THIS EXACT STATE</h2>
+      <p class="hint">The link carries generated practice settings only: exercise, seed, both simulated cameras, view, scored checks and any demonstration. It never carries equipment data.</p>
+      <label class="field-label" for="shareLinkField">Full-state link</label>
+      <textarea id="shareLinkField" rows="4" readonly spellcheck="false"></textarea>
+      <div class="field-row">
+        <button type="button" class="btn" id="copyLinkButton">Copy full-state link</button>
+        <button type="button" class="btn" id="copyShortLinkButton">Copy exercise link</button>
+      </div>
+      <p class="hint">An exercise link reopens the same exercise, seed and view from its start.</p>
+      <p class="share-status" id="shareStatus" role="status"></p>
+      <h3 class="block-heading">FILES</h3>
+      <div class="field-row">
+        <button type="button" class="btn" id="exportButton">Export JSON</button>
+        <button type="button" class="btn" id="importButton">Import JSON</button>
+      </div>
+      <p class="hint">Imports accept Shader practice files and older Throwline practice exports.</p>
+      <p class="import-error" id="importError" role="alert" hidden></p>
+      <button type="button" class="btn btn-wide" id="closeShareButton">Close</button>
+    </div>
+  </dialog>
   <input type="file" id="fileInput" accept="application/json,.json" hidden>
   <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+  <p class="sr-only" id="liveStatus" aria-live="polite"></p>
   <script src="shading-practice-state.js"></script>
-  <script>
-  (() => {
-    'use strict';
-    const Practice = window.ShaderPracticeState;
-    const THEME_KEY = 'shader.practice.theme.v1';
-    const LEGACY_THEME_KEY = 'throwline.practice.theme.v1';
-    const OFFLINE_CACHE_VERSION = 'v20260923-shader-practice-relocation';
-    const SCOPES = [['waveform','Waveform'],['parade','RGB parade'],['vectorscope','Vectorscope'],['histogram','Histogram']];
-    const CONTROL_UNITS = { iris:' stops',pedestal:'',gain:' dB',gamma:'',whiteBalance:' K',saturation:'×',colorPhase:'°' };
-    const CONTROL_FORMAT = { iris:2,pedestal:1,gain:1,gamma:2,whiteBalance:0,saturation:2,colorPhase:0 };
-    const els = Object.fromEntries([...document.querySelectorAll('[id]')].map(element => [element.id, element]));
-    let state = stateFromLocation();
-    let analyses = {};
-    let toastTimer;
-
-    function stateFromLocation() {
-      try {
-        const hash = new URLSearchParams(location.hash.slice(1));
-        if (hash.has('state')) return Practice.importPracticeJSON(decodeBase64Url(hash.get('state')));
-      } catch (error) { setTimeout(() => showToast(error.message, true), 0); }
-      const params = new URLSearchParams(location.search);
-      return Practice.createPracticeState({
-        scenarioId: params.get('scenario'), seed: params.get('seed'), selectedCameraId: params.get('camera'),
-        scope: params.get('scope'), splitView: params.get('split') !== '0'
-      });
-    }
-
-    function encodeBase64Url(text) {
-      const bytes = new TextEncoder().encode(text);
-      let binary = '';
-      bytes.forEach(byte => { binary += String.fromCharCode(byte); });
-      return btoa(binary).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
-    }
-
-    function decodeBase64Url(value) {
-      const normalized = value.replace(/-/g,'+').replace(/_/g,'/');
-      const binary = atob(normalized + '='.repeat((4 - normalized.length % 4) % 4));
-      return new TextDecoder().decode(Uint8Array.from(binary, character => character.charCodeAt(0)));
-    }
-
-    function handoffUrl(fullState = false) {
-      const url = new URL(location.pathname, location.origin);
-      if (fullState) url.hash = `state=${encodeBase64Url(Practice.exportPracticeJSON(state))}`;
-      else {
-        url.searchParams.set('scenario', state.scenarioId);url.searchParams.set('seed', state.seed);
-        url.searchParams.set('camera', state.selectedCameraId);url.searchParams.set('scope', state.scope);url.searchParams.set('split', state.splitView ? '1' : '0');
-      }
-      return url.href;
-    }
-
-    function showToast(message, isError = false) {
-      clearTimeout(toastTimer);els.toast.textContent = message;els.toast.classList.toggle('error',isError);els.toast.hidden = false;
-      toastTimer = setTimeout(() => { els.toast.hidden = true; }, 3600);
-    }
-
-    function initialize() {
-      let savedTheme = null;try{savedTheme=localStorage.getItem(THEME_KEY)||localStorage.getItem(LEGACY_THEME_KEY);}catch{}
-      setTheme(savedTheme === 'dark' ? 'dark' : 'light');
-      els.scenarioList.innerHTML = Practice.scenarioList().map((scenario,index) => `<button type="button" class="scenario-card" data-scenario="${scenario.id}" data-index="0${index+1}"><strong>${scenario.title}</strong><span>${scenario.brief}</span></button>`).join('');
-      els.injectionSelect.innerHTML = Practice.troubleshootingList().map(item => `<option value="${item.id}">${item.label}</option>`).join('');
-      els.scopeTabs.innerHTML = SCOPES.map(([id,label]) => `<button type="button" role="tab" data-scope="${id}" aria-controls="scopeCanvas">${label}</button>`).join('');
-      els.controlList.innerHTML = Object.entries(Practice.CONTROL_LIMITS).map(([name,[min,max,step]]) => `<div class="control"><label class="control-label" for="control-${name}"><span>${Practice.CONTROL_LABELS[name]}</span><output class="control-output" id="output-${name}" for="control-${name}"></output></label><input type="range" id="control-${name}" data-control="${name}" min="${min}" max="${max}" step="${step}"><div class="control-scale"><span>${formatControl(name,min)}</span><span>${formatControl(name,max)}</span></div></div>`).join('');
-      bindEvents();render();prepareOfflineUse();
-    }
-
-    async function controllingWorkerVersion(){
-      const controller=navigator.serviceWorker?.controller;if(!controller)return '';
-      return new Promise(resolve=>{const channel=new MessageChannel();const timer=setTimeout(()=>resolve(''),1200);channel.port1.onmessage=event=>{clearTimeout(timer);resolve(String(event.data?.version||''));};controller.postMessage({type:'SBD_OFFLINE_VERSION'},[channel.port2]);});
-    }
-
-    async function markOfflineReady(){
-      const version=await controllingWorkerVersion();
-      if(version!==OFFLINE_CACHE_VERSION)return false;
-      document.documentElement.dataset.offline='ready';els.offlineStatus.textContent='Offline ready · practice files saved on this device.';return true;
-    }
-
-    async function prepareOfflineUse(){
-      if(location.protocol==='file:'||!('serviceWorker' in navigator)){document.documentElement.dataset.offline='unavailable';els.offlineStatus.textContent='Offline cache unavailable in this browser.';return;}
-      try{
-        document.documentElement.dataset.offline='installing';els.offlineStatus.textContent='Preparing offline use.';
-        const registration=await navigator.serviceWorker.register('./practice-worker.js');await navigator.serviceWorker.ready;
-        if(await markOfflineReady())return;
-        navigator.serviceWorker.addEventListener('controllerchange',()=>markOfflineReady(),{once:true});
-        registration.active?.postMessage({type:'SBD_CLAIM_CLIENTS'});registration.update().catch(()=>{});
-      }catch(error){console.warn('Shader practice offline cache unavailable',error);document.documentElement.dataset.offline='error';els.offlineStatus.textContent='Offline cache could not be prepared; stay online to reopen this practice.';}
-    }
-
-    function setTheme(theme) {
-      document.documentElement.dataset.theme = theme;try{localStorage.setItem(THEME_KEY,theme);}catch{}
-      els.themeButton.textContent = theme === 'dark' ? 'Light' : 'Dark';els.themeButton.setAttribute('aria-pressed',String(theme === 'dark'));els.themeButton.setAttribute('aria-label',`Use ${theme === 'dark' ? 'light' : 'dark'} theme`);
-      if (analyses['camera-a']) drawScopes();
-    }
-
-    function bindEvents() {
-      els.scenarioList.addEventListener('click', event => { const button=event.target.closest('[data-scenario]');if(!button)return;state=Practice.applyIntent(state,{type:'load-scenario',scenarioId:button.dataset.scenario});render(); });
-      document.querySelectorAll('[data-camera-switch]').forEach(button => button.addEventListener('click',() => {state=Practice.applyIntent(state,{type:'select-camera',cameraId:button.dataset.cameraSwitch});render();}));
-      document.querySelectorAll('.monitor-card').forEach(card => card.addEventListener('click',() => {state=Practice.applyIntent(state,{type:'select-camera',cameraId:card.dataset.cameraId});render();}));
-      els.controlList.addEventListener('input',event => {if(!event.target.dataset.control)return;state=Practice.applyIntent(state,{type:'set-control',cameraId:state.selectedCameraId,control:event.target.dataset.control,value:event.target.value});render(false);});
-      els.scopeTabs.addEventListener('click',event => {const button=event.target.closest('[data-scope]');if(!button)return;state=Practice.applyIntent(state,{type:'set-scope',scope:button.dataset.scope});render();});
-      els.scopeTabs.addEventListener('keydown',event => {if(!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;event.preventDefault();const tabs=[...els.scopeTabs.querySelectorAll('[data-scope]')];const current=tabs.indexOf(document.activeElement);const next=event.key==='Home'?0:event.key==='End'?tabs.length-1:(current+(event.key==='ArrowRight'?1:-1)+tabs.length)%tabs.length;tabs[next].click();tabs[next].focus();});
-      els.applySeedButton.addEventListener('click',() => {state=Practice.applyIntent(state,{type:'set-seed',seed:els.seedInput.value});render();showToast(`Seed applied: ${state.seed}`);});
-      els.seedInput.addEventListener('keydown',event => {if(event.key==='Enter')els.applySeedButton.click();});
-      els.replayButton.addEventListener('click',() => {state=Practice.applyIntent(state,{type:'replay'});render();showToast('Scenario replayed from the same seed.');});
-      els.injectButton.addEventListener('click',() => {state=Practice.applyIntent(state,{type:'inject-trouble',injectionId:els.injectionSelect.value,cameraId:'camera-b'});render();showToast(state.lastAction);});
-      els.splitViewButton.addEventListener('click',() => {state=Practice.applyIntent(state,{type:'set-split-view',value:!state.splitView});render();});
-      els.scoreButton.addEventListener('click',() => {render();if(matchMedia('(max-width:820px)').matches)setMobileTab('debrief');else document.body.dataset.debrief='open';});
-      els.closeDebriefButton.addEventListener('click',() => {document.body.dataset.debrief='closed';if(matchMedia('(max-width:820px)').matches)setMobileTab('monitor');});
-      els.themeButton.addEventListener('click',() => setTheme(document.documentElement.dataset.theme==='dark'?'light':'dark'));
-      els.exportButton.addEventListener('click',exportJSON);els.mobileExportButton.addEventListener('click',exportJSON);els.importButton.addEventListener('click',() => els.fileInput.click());els.mobileImportButton.addEventListener('click',() => els.fileInput.click());els.fileInput.addEventListener('change',importJSON);
-      const copyFullStateLink=async() => {const link=handoffUrl(true);try{await navigator.clipboard.writeText(link);showToast('Reproducible full-state link copied.');}catch(error){showToast(`Copy unavailable. Link: ${link}`,true);}};
-      els.copyLinkButton.addEventListener('click',copyFullStateLink);els.mobileCopyLinkButton.addEventListener('click',copyFullStateLink);
-      document.querySelectorAll('[data-mobile-target]').forEach(button => button.addEventListener('click',() => setMobileTab(button.dataset.mobileTarget)));
-      window.addEventListener('resize',() => {drawPictures();drawScopes();});
-    }
-
-    function setMobileTab(tab) { document.body.dataset.mobileTab=tab;document.querySelectorAll('[data-mobile-target]').forEach(button=>button.dataset.active=String(button.dataset.mobileTarget===tab)); }
-    function formatControl(name,value) { return `${Number(value).toFixed(CONTROL_FORMAT[name])}${CONTROL_UNITS[name]}`; }
-
-    function render(updateInputs = true) {
-      analyses = {'camera-a':Practice.analyzeCamera(state,'camera-a'),'camera-b':Practice.analyzeCamera(state,'camera-b')};
-      const scenario=Practice.SCENARIOS[state.scenarioId];const selected=Practice.getCamera(state,state.selectedCameraId);const evaluation=Practice.evaluatePractice(state);
-      document.querySelectorAll('[data-scenario]').forEach(button=>button.setAttribute('aria-current',String(button.dataset.scenario===state.scenarioId)));
-      document.querySelectorAll('[data-camera-switch]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.cameraSwitch===state.selectedCameraId)));
-      document.querySelectorAll('.monitor-card').forEach(card=>card.dataset.selected=String(card.dataset.cameraId===state.selectedCameraId));
-      document.querySelectorAll('[data-scope]').forEach(button=>{const active=button.dataset.scope===state.scope;button.setAttribute('aria-selected',String(active));button.dataset.active=String(active);button.tabIndex=active?0:-1;});
-      els.controlHeading.textContent=selected.label;els.seedInput.value=state.seed;els.splitViewButton.setAttribute('aria-pressed',String(state.splitView));
-      els.cameraCardA.hidden=!state.splitView&&state.selectedCameraId!=='camera-a';els.cameraCardB.hidden=!state.splitView&&state.selectedCameraId!=='camera-b';
-      els.stateIdentity.textContent=`${Practice.SCHEMA} · ${state.seed}`;
-      els.attemptLabel.textContent=`Attempt ${state.attempt}`;els.scoreNumber.textContent=evaluation.score;els.scoreNumber.setAttribute('aria-label',`Score ${evaluation.score} out of 100`);
-      els.scoreStatus.textContent=evaluation.status==='complete'?'Exercise complete':evaluation.status==='close'?'Close. Refine the signal':'Make an adjustment';els.scoreExplanation.textContent=evaluation.explanation;
-      els.objectiveList.innerHTML=evaluation.objectives.map(item=>`<div class="objective" data-passed="${item.passed}"><span>${item.label}</span><output>${Math.round(item.score)}</output><div class="meter" aria-label="${item.label} ${Math.round(item.score)} out of 100"><i style="width:${item.score}%"></i></div></div>`).join('');
-      els.coachNotes.textContent=scenario.coach.join(' ');
-      if(updateInputs) Object.keys(Practice.CONTROL_LIMITS).forEach(name=>{const input=document.getElementById(`control-${name}`);input.value=selected.controls[name];document.getElementById(`output-${name}`).textContent=formatControl(name,selected.controls[name]);});
-      else {const name=document.activeElement?.dataset?.control;if(name)document.getElementById(`output-${name}`).textContent=formatControl(name,selected.controls[name]);}
-      updateReadouts();drawPictures();drawScopes();
-    }
-
-    function updateReadouts() {
-      ['camera-a','camera-b'].forEach((id,index)=>{const metric=analyses[id].metrics;const suffix=index?'B':'A';els[`cameraMetric${suffix}`].textContent=`Peak ${Math.round(metric.peak*100)} · Black ${Math.round(metric.black*100)}`;els[`cameraReadout${suffix}`].textContent=`MID ${Math.round(metric.mid*100)} · CLIP ${metric.clippedPercent.toFixed(1)}%`;});
-    }
-
-    function fitCanvas(canvas) {const rect=canvas.getBoundingClientRect();const ratio=Math.min(2,window.devicePixelRatio||1);const width=Math.max(1,Math.round(rect.width*ratio));const height=Math.max(1,Math.round(rect.height*ratio));if(canvas.width!==width||canvas.height!==height){canvas.width=width;canvas.height=height;}return {ctx:canvas.getContext('2d'),width,height,ratio};}
-    function drawPictures() {drawPicture(els.cameraCanvasA,analyses['camera-a']);drawPicture(els.cameraCanvasB,analyses['camera-b']);}
-    function drawPicture(canvas,analysis) {if(!analysis||canvas.closest('[hidden]'))return;const {ctx,width,height}=fitCanvas(canvas);const off=document.createElement('canvas');off.width=analysis.width;off.height=analysis.height;const octx=off.getContext('2d');const image=octx.createImageData(analysis.width,analysis.height);analysis.samples.forEach((rgb,index)=>{image.data[index*4]=Math.round(rgb[0]*255);image.data[index*4+1]=Math.round(rgb[1]*255);image.data[index*4+2]=Math.round(rgb[2]*255);image.data[index*4+3]=255;});octx.putImageData(image,0,0);ctx.imageSmoothingEnabled=true;ctx.drawImage(off,0,0,width,height);ctx.strokeStyle='rgba(255,255,255,.38)';ctx.lineWidth=1;ctx.strokeRect(width*.05,height*.07,width*.9,height*.86);ctx.beginPath();ctx.moveTo(width*.5-10,height*.5);ctx.lineTo(width*.5+10,height*.5);ctx.moveTo(width*.5,height*.5-10);ctx.lineTo(width*.5,height*.5+10);ctx.stroke();}
-    function drawScopes(){if(!analyses['camera-a'])return;const {ctx,width,height}=fitCanvas(els.scopeCanvas);ctx.fillStyle='#050708';ctx.fillRect(0,0,width,height);drawGrid(ctx,width,height);if(state.scope==='parade')drawParade(ctx,width,height);else if(state.scope==='vectorscope')drawVectorscope(ctx,width,height);else if(state.scope==='histogram')drawHistogram(ctx,width,height);else drawWaveform(ctx,width,height);}
-    function drawGrid(ctx,width,height){ctx.strokeStyle='rgba(170,185,190,.16)';ctx.fillStyle='rgba(190,201,205,.62)';ctx.font=`${Math.max(9,width/100)}px ui-monospace,monospace`;ctx.lineWidth=1;[0,.25,.5,.75,1].forEach(value=>{const y=height-(value*height);ctx.beginPath();ctx.moveTo(0,y+.5);ctx.lineTo(width,y+.5);ctx.stroke();if(value<1)ctx.fillText(String(Math.round(value*100)),4,Math.max(10,y-3));});}
-    function scopeColor(id,alpha=.72){return id==='camera-a'?`rgba(98,204,209,${alpha})`:`rgba(240,184,56,${alpha})`;}
-    function drawWaveform(ctx,width,height){Object.entries(analyses).forEach(([id,data])=>{ctx.strokeStyle=scopeColor(id,.64);ctx.lineWidth=1;data.waveform.forEach((column,index)=>{const x=index/(data.waveform.length-1)*width;ctx.beginPath();ctx.moveTo(x,height-column.min*height);ctx.lineTo(x,height-column.max*height);ctx.stroke();});ctx.strokeStyle=scopeColor(id,.95);ctx.beginPath();data.waveform.forEach((column,index)=>{const x=index/(data.waveform.length-1)*width;const y=height-column.mean*height;index?ctx.lineTo(x,y):ctx.moveTo(x,y);});ctx.stroke();});}
-    function drawParade(ctx,width,height){const channels=[['r','#ef625c'],['g','#65d589'],['b','#6397ff']];Object.entries(analyses).forEach(([id,data],cameraIndex)=>channels.forEach(([channel,color],channelIndex)=>{const section=width/3;const offset=channelIndex*section;ctx.strokeStyle=color;ctx.globalAlpha=cameraIndex?1:.48;ctx.lineWidth=1;data.parade[channel].forEach((column,index)=>{const x=offset+index/Math.max(1,data.parade[channel].length-1)*section;ctx.beginPath();ctx.moveTo(x,height-column.min*height);ctx.lineTo(x,height-column.max*height);ctx.stroke();});ctx.beginPath();data.parade[channel].forEach((column,index)=>{const x=offset+index/Math.max(1,data.parade[channel].length-1)*section;const y=height-column.mean*height;index?ctx.lineTo(x,y):ctx.moveTo(x,y);});ctx.stroke();ctx.globalAlpha=1;}));}
-    function drawVectorscope(ctx,width,height){const cx=width/2,cy=height/2,radius=Math.min(width,height)*.39;ctx.strokeStyle='rgba(170,185,190,.24)';ctx.beginPath();ctx.arc(cx,cy,radius,0,Math.PI*2);ctx.moveTo(cx-radius,cy);ctx.lineTo(cx+radius,cy);ctx.moveTo(cx,cy-radius);ctx.lineTo(cx,cy+radius);ctx.stroke();Object.entries(analyses).forEach(([id,data])=>{ctx.fillStyle=scopeColor(id,.32);data.vectorscope.forEach(point=>ctx.fillRect(cx+point.u*radius*1.8,cy-point.v*radius*1.8,2,2));});}
-    function drawHistogram(ctx,width,height){Object.entries(analyses).forEach(([id,data])=>{ctx.fillStyle=scopeColor(id,.38);const bar=width/data.histogram.length;data.histogram.forEach((value,index)=>ctx.fillRect(index*bar,height-value*height*.9,Math.max(1,bar-1),value*height*.9));});}
-    function exportJSON(){const blob=new Blob([Practice.exportPracticeJSON(state)],{type:'application/json'});const url=URL.createObjectURL(blob);const link=document.createElement('a');link.href=url;link.download=`shader-practice-${state.scenarioId}-${state.seed.replace(/[^a-z0-9_-]+/gi,'-')}.json`;link.click();URL.revokeObjectURL(url);showToast('Scenario JSON exported.');}
-    async function importJSON(){const file=els.fileInput.files[0];if(!file)return;try{state=Practice.importPracticeJSON(await file.text());history.replaceState(null,'',handoffUrl(false));render();showToast('Scenario JSON imported.');}catch(error){showToast(error.message,true);}finally{els.fileInput.value='';}}
-    window.ShaderPracticeApp=Object.freeze({getState:()=>JSON.parse(JSON.stringify(state)),setState:value=>{state=Practice.normalizeState(value);render();return JSON.parse(JSON.stringify(state));},importJSON:value=>{state=Practice.importPracticeJSON(value);render();return JSON.parse(JSON.stringify(state));},queryLink:()=>handoffUrl(false),fullStateLink:()=>handoffUrl(true)});
-    initialize();
-  })();
-  </script>
+  <script src="practice-render.js"></script>
+  <script src="practice-app.js"></script>
 </body>
 </html>
