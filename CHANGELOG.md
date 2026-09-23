@@ -5,6 +5,11 @@
 - Moved the live cabinet preview ahead of settings, enlarged its isometric depth, and kept the planner within the browser viewport. Settings and detailed results scroll within their panels; the compact mobile navigation remains visible.
 - Refreshed the AV offline cache so the new layout reaches existing installs without changing calculator values or saved profiles.
 
+## 2026-09-23 — Show-first AV landing promoted to home
+
+- Published the reviewed show-first landing as `avbydave.com/`, keeping the previous landing at its noindex direct route and the Show Console/Toolbox doorway unchanged.
+- Updated navigation, page metadata, and the offline home fallback to match the new root; refreshed the shared AV offline cache version.
+
 ## 2026-09-23 — FMP Camera 4 SDI transport correction
 
 - Published Dave's direct confirmation that the Camera 4 PTZ feeds ATEM Input 4 by SDI. The P240 reference no longer presents an NDI decoder as an unresolved alternative; intermediate cable landings, final patch and current signal format remain field checks.
