@@ -22,48 +22,56 @@
 <link rel="icon" href="svg/system_by_dave_logo_rust.svg" type="image/svg+xml">
 <link rel="stylesheet" href="css/fonts.css">
 <style>
-  :root{--bg:#0A0D14;--ink:#F3F4F7;--rust:oklch(0.65 0.19 33);
+  :root{--bg:#0d1217;--ink:#f3f5f8;--rust:oklch(0.65 0.19 33);
+    --card:#192027;--card-border:#303943;--muted:#a3aeba;
     --ff-display:'Space Grotesk','DM Sans',-apple-system,sans-serif;--ff-body:'DM Sans',-apple-system,sans-serif;--ff-mono:'JetBrains Mono','IBM Plex Mono',ui-monospace,monospace;}
   *{margin:0;padding:0;box-sizing:border-box;}
-  html{background:#0A0D14;}
+  html{background:var(--bg);}
   body{font-family:var(--ff-body);background:var(--bg);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased;}
   ::selection{background:oklch(0.65 0.19 33 / 0.32);color:#fff;}
   a{color:inherit;}
-  .container{max-width:1200px;margin:0 auto;padding:0 40px;}
+  .container{width:min(100% - 32px,1480px);margin:0 auto;}
   .nav-link{color:rgba(243,244,247,0.6);transition:color .2s ease;text-decoration:none;font-family:var(--ff-mono);font-size:12px;letter-spacing:0.06em;text-transform:uppercase;}
   .nav-link:hover{color:#F3F4F7;}
   .nav-link.active{color:oklch(0.72 0.19 33);}
   .gh-btn{font-family:var(--ff-mono);font-size:12px;letter-spacing:0.06em;text-transform:uppercase;text-decoration:none;color:#0A0D14;background:#F3F4F7;padding:9px 18px;transition:background .2s ease,color .2s ease;}
   .gh-btn:hover{background:oklch(0.65 0.19 33);color:#fff;}
-  .tools-hero{padding:88px 0 28px;}
+  .tools-hero{padding:46px 0 15px;}
   .tools-hero .eyebrow{font-family:var(--ff-mono);font-size:12px;letter-spacing:0.14em;text-transform:uppercase;color:oklch(0.72 0.19 33);}
-  .tools-hero h1{font-family:var(--ff-display);font-weight:600;font-size:clamp(40px,5.4vw,68px);line-height:1.0;letter-spacing:-0.03em;margin:14px 0 16px;}
+  .tools-hero h1{font-family:var(--ff-display);font-weight:600;font-size:clamp(36px,4.8vw,60px);line-height:1.02;letter-spacing:-0.03em;margin:10px 0 12px;}
   .tools-hero p{max-width:62ch;color:rgba(243,244,247,0.62);font-size:17px;font-weight:300;line-height:1.7;}
-  .tools-controls{position:sticky;top:70px;z-index:40;background:rgba(10,13,20,0.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,0.09);padding:14px 0;margin:28px 0;}
+  .tools-controls{position:sticky;top:70px;z-index:40;background:rgba(13,18,23,0.9);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-block:1px solid rgba(255,255,255,0.09);padding:12px 0;margin:18px 0;}
   .chips{display:flex;flex-wrap:wrap;gap:8px;align-items:center;}
-  .chip-filter{font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;padding:8px 14px;min-height:36px;display:inline-flex;align-items:center;border:1px solid rgba(255,255,255,0.14);background:transparent;color:rgba(243,244,247,0.6);cursor:pointer;transition:all .18s;}
+  .chip-filter{font-family:var(--ff-mono);font-size:11px;letter-spacing:0.06em;text-transform:uppercase;padding:9px 16px;min-height:44px;border-radius:999px;display:inline-flex;align-items:center;border:1px solid rgba(255,255,255,0.16);background:#171e25;color:#c5cbd3;cursor:pointer;transition:background .18s,border-color .18s,color .18s;}
   .chip-filter:hover{border-color:rgba(255,255,255,0.3);color:#F3F4F7;}
-  .chip-filter[aria-pressed="true"]{background:oklch(0.65 0.19 33);border-color:oklch(0.65 0.19 33);color:#fff;}
+  .chip-filter[aria-pressed="true"]{background:#473163;border-color:#9e73d8;color:#fff;}
+  .chip-filter:focus-visible{outline:2px solid #a77de3;outline-offset:3px;}
   .chips .count{margin-left:auto;font-family:var(--ff-mono);font-size:11px;color:rgba(243,244,247,0.45);white-space:nowrap;}
-  .tools-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:18px;padding-bottom:80px;}
-  .tool-card{display:flex;flex-direction:column;gap:10px;padding:24px;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.09);text-decoration:none;color:inherit;transition:transform .25s,border-color .25s;position:relative;overflow:hidden;}
-  .tool-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:oklch(0.65 0.19 33);transform:scaleX(0);transform-origin:left;transition:transform .25s;}
-  .tool-card:hover{transform:translateY(-4px);border-color:oklch(0.65 0.19 33);}
-  .tool-card:hover::before{transform:scaleX(1);}
-  .tool-card:focus-visible{outline:2px solid oklch(0.65 0.19 33);outline-offset:3px;}
-  .tool-card .tc-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;}
-  .tool-card h3{font-family:var(--ff-display);font-weight:600;font-size:21px;line-height:1.1;}
-  .tool-card .tc-ext{font-family:var(--ff-mono);font-size:11px;color:oklch(0.72 0.19 33);white-space:nowrap;}
-  .tool-card p{font-size:14px;font-weight:300;line-height:1.55;color:rgba(243,244,247,0.6);flex:1;}
-  .tool-card .tc-host{font-family:var(--ff-mono);font-size:11px;color:rgba(243,244,247,0.4);word-break:break-all;}
-  .tool-card .tc-chips{display:flex;flex-wrap:wrap;gap:6px;}
-  .tc-chip{font-family:var(--ff-mono);font-size:10px;letter-spacing:0.06em;text-transform:uppercase;padding:3px 8px;background:rgba(255,255,255,0.06);color:rgba(243,244,247,0.6);}
+  .tools-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;padding-bottom:80px;}
+  .tool-card{--accent:#a47ce7;--badge:#30243f;display:flex;flex-direction:column;align-items:center;justify-content:space-between;min-width:0;min-height:214px;padding:9px 10px 12px;border:1px solid var(--card-border);border-radius:12px;background:linear-gradient(145deg,#202630 0%,var(--card) 58%,#172027 100%);box-shadow:0 5px 13px rgba(0,0,0,.22),inset 0 1px rgba(255,255,255,.04);text-align:center;text-decoration:none;color:inherit;position:relative;overflow:hidden;transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease;}
+  .tool-card[data-tone="blue"]{--accent:#87baff;--badge:#203750;}
+  .tool-card[data-tone="teal"]{--accent:#6fe0dc;--badge:#173e42;}
+  .tool-card[data-tone="green"]{--accent:#89dc86;--badge:#233d2c;}
+  .tool-card[data-tone="orange"]{--accent:#ffaa69;--badge:#4a3022;}
+  .tool-card[data-tone="red"]{--accent:#f18a83;--badge:#482b2d;}
+  .tool-card:hover{transform:translateY(-5px);border-color:var(--accent);box-shadow:0 15px 30px rgba(0,0,0,.34),0 0 0 1px color-mix(in srgb,var(--accent) 25%,transparent);}
+  .tool-card:focus-visible{outline:3px solid var(--accent);outline-offset:3px;}
+  .tc-art{display:block;width:min(100%,178px);aspect-ratio:251/179;flex:none;background-image:url('img/tools-card-atlas.png');background-size:500% 700%;background-position:var(--atlas-x) var(--atlas-y);background-repeat:no-repeat;mix-blend-mode:lighten;}
+  .tc-art--fallback{display:grid;place-items:center;background-image:none;background:#24313d;border-radius:12px;color:var(--accent);font:700 42px var(--ff-display);}
+  .tool-card h3{display:grid;place-items:center;min-height:2.5em;font-family:var(--ff-display);font-weight:700;font-size:clamp(14px,1.3vw,18px);line-height:1.2;letter-spacing:-.025em;text-wrap:balance;}
+  .tc-badge{display:inline-flex;align-items:center;justify-content:center;gap:8px;max-width:100%;min-height:26px;padding:3px 12px;border:1px solid color-mix(in srgb,var(--accent) 28%,transparent);border-radius:999px;background:var(--badge);color:color-mix(in srgb,var(--accent) 75%,white);font:700 11px/1.15 var(--ff-mono);letter-spacing:.035em;text-transform:uppercase;white-space:nowrap;}
+  .tc-badge::before{content:'';width:10px;height:10px;flex:none;border-radius:50%;background:var(--accent);box-shadow:0 0 11px color-mix(in srgb,var(--accent) 45%,transparent);}
+  .tool-card .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
   .tools-empty{grid-column:1/-1;text-align:center;color:rgba(243,244,247,0.45);padding:60px 0;font-family:var(--ff-mono);font-size:13px;}
-  .tools-note{color:rgba(243,244,247,0.5);font-size:13px;margin:0 0 24px;font-family:var(--ff-mono);}
+  .tools-note{color:var(--muted);font-size:13px;margin:0 0 18px;font-family:var(--ff-mono);}
   .tools-note a{color:oklch(0.72 0.19 33);text-underline-offset:3px;}
   footer{border-top:1px solid rgba(255,255,255,0.07);margin-top:40px;}
   .foot{display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;padding:48px 0 36px;}
-  @media (max-width:680px){.container{padding:0 20px;}.tools-controls{top:0;}.tools-grid{grid-template-columns:1fr;}.chips .count{width:100%;margin:4px 0 0;}}
+  @media (max-width:1180px){.tools-grid{grid-template-columns:repeat(4,minmax(0,1fr));}}
+  @media (max-width:900px){.tools-grid{grid-template-columns:repeat(3,minmax(0,1fr));}}
+  @media (max-width:680px){.container{width:min(100% - 28px,1480px);}.tools-hero{padding-top:30px;}.tools-controls{top:0;}.tools-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}.tool-card{min-height:208px;padding-inline:7px;}.tool-card h3{font-size:14px;}.tc-art{width:min(100%,150px);}.tc-badge{font-size:9px;padding-inline:8px;gap:5px;}.tc-badge::before{width:7px;height:7px;}.chips .count{width:100%;margin:4px 0 0;}}
+  @media (max-width:360px){.tools-grid{grid-template-columns:1fr;}.tool-card{min-height:220px;}.tool-card h3{font-size:17px;}}
+  @media (prefers-reduced-motion:reduce){.tool-card,.chip-filter{transition:none;}.tool-card:hover{transform:none;}}
 </style>
 <link rel="stylesheet" href="css/sbd-public-nav.css">
 </head>
@@ -104,7 +112,9 @@
 
     <div class="container">
       <p class="tools-note">The AV Suite bundles 45 operator tools. <a href="av-suite.html?entry=toolbox">Open the AV Toolbox</a> to browse the complete live registry without attaching a show.</p>
-      <div class="tools-grid" id="toolsGrid"></div>
+      <div class="tools-grid" id="toolsGrid" aria-label="Project cards">
+        <noscript><p class="tools-empty">This illustrated directory needs JavaScript. The primary product links remain available in the navigation above.</p></noscript>
+      </div>
     </div>
   </main>
 
@@ -126,6 +136,7 @@
 
   <!-- the full project inventory is available for enrichment / future-proofing -->
   <script src="project-registry-public.js"></script>
+  <script src="js/vendor/gsap.min.js"></script>
   <script>
   /* Curated overlay: the public-facing set, each with a verified live URL + filter chips.
      Adding a tool = add one entry here (kept in sync with project-registry-public.js).
@@ -140,6 +151,7 @@
     { name: 'DeckForge',           url: 'https://davehomeassist.github.io/deckforge/',     chips: ['AV'],                    blurb: 'Design Elgato Stream Deck & Logitech MX Creative Console layouts for your OBS / vMix show workflow.' },
     { name: 'OnTrack',             url: 'ontrack.html',                                    chips: ['AV','Apps'],             blurb: 'DJ set intelligence — import a rekordbox library, plan sets, log played history, and debrief gigs with per-track notes.' },
     { name: 'Back Focus',          url: 'backfocus/',                                      chips: ['AV'],                    blurb: 'Preshow camera field guide — diagnose flange back focus, step through the electronic or mechanical Fujinon procedure, verify it, and hand the camera back.' },
+    { name: 'PixelForge',          url: 'pixelforge/',                                     chips: ['AV','Apps'],             blurb: 'Browser raster, vector, text, and image editing for show graphics, signage fixes, simple overlays, and PNG export.' },
     // ── Notion ──
     { name: 'Notion Skills',       url: 'skills.html',                                     chips: ['Notion'],                blurb: 'AI skills that run natively inside Notion AI — no external apps or plugins to break.' },
     { name: 'Notion Agents',       url: 'agents.html',                                     chips: ['Notion'],                blurb: 'Agents that triage your inbox, assemble briefings and keep your prompts organized — inside Notion.' },
@@ -151,7 +163,6 @@
     { name: 'MLB Ballparks Quest', url: 'https://davehomeassist.github.io/mlb-ballparks-quest/', chips: ['Apps','Games','Sports'], blurb: 'Track ballpark visits, plan stadium road trips, and scorekeep live games. Phillies-themed PWA.' },
     { name: 'Ballpark Scorecard',  url: 'scorecard/',                                      chips: ['Apps','Sports'],         blurb: 'A focused, installable baseball scorecard for tracking an entire game from the stands.' },
     { name: 'FIFA Pitch Crew',     url: '/fifa-pitch-crew/',                               chips: ['Games','Sports'],        blurb: 'Arcade halftime-cover game — deploy the stage cloth across six lanes, dodge the sprinklers, run the show, then strike it before kickoff.' },
-    { name: 'PixelForge',          url: 'pixelforge/',                                     chips: ['AV','Apps'],             blurb: 'Browser raster, vector, text, and image editing for show graphics, signage fixes, simple overlays, and PNG export.' },
     { name: 'NoteForge',           url: 'noteforge/',                                      chips: ['Apps'],                  blurb: 'A local-first writing workspace for structured notes, reusable documents, and focused drafting.' },
     { name: 'Trailkeeper',         url: 'https://davehomeassist.github.io/trailkeeper/',   chips: ['Apps','Trackers'],       blurb: 'Plan, shortlist and log hiking trails with live weather and nearby-trail discovery.' },
     { name: 'Festival Atlas',      url: 'https://davehomeassist.github.io/festival-atlas/',chips: ['Apps','Trackers'],       blurb: 'Browse, route and journal music festivals — 43 USA festivals seeded with 2026 dates. (Prototype.)' },
@@ -176,6 +187,29 @@
   var chipsBar = document.getElementById('filterChips');
   var active = 'All';
 
+  // Artwork is keyed by name so changing the directory order cannot swap icons.
+  var CARD_ART_ORDER = [
+    'Show Console','AV Toolbox','Gear Reference','AV Workbook','Teleprompter',
+    'DeckForge','OnTrack','Back Focus','PixelForge','Notion Skills',
+    'Notion Agents','Notion Widgets','Prompts','NotionWidgets (gallery)','Garden OS',
+    'MLB Ballparks Quest','Ballpark Scorecard','FIFA Pitch Crew','NoteForge','Trailkeeper',
+    'Festival Atlas','Hat-in-Ring Radar','World Cup Predictor','Phillies Wire','Frontier Signals',
+    'Graph Explorer','SDLC Tool Stack Map','Prompt Lab','Project Registry','Davai — System by Dave Memory Architecture',
+    'Tailscale Manual','Dave Robertson Profile','Remote Desktop'
+  ];
+
+  function cardVisual(tool){
+    var i = CARD_ART_ORDER.indexOf(tool.name);
+    var family = i < 0 ? (tool.chips[0] || 'Tools') : i < 2 ? 'AV Suite' : i < 6 ? 'AV references' : i < 9 ? 'AV apps' : i < 14 ? 'Notion' : i < 25 ? 'Apps/Games/Trackers' : 'Labs';
+    var tone = i < 0 ? 'blue' : i < 2 ? 'violet' : i < 6 ? 'blue' : i < 8 ? 'teal' : i === 8 ? 'blue' : i < 14 ? 'violet' : i < 25 ? 'green' : 'blue';
+    if ([5,9,11,15,29].indexOf(i) >= 0) tone = 'violet';
+    if ([10,16,21].indexOf(i) >= 0) tone = 'teal';
+    if (i === 18) tone = 'orange';
+    if (i === 23) tone = 'red';
+    var rows = [2.2,17.7,33.9,48.8,65.1,81.0,95.8];
+    return {family:family,tone:tone,art:i >= 0,x:(Math.max(i,0) % 5) * 25 + '%',y:rows[Math.floor(Math.max(i,0) / 5)] + '%'};
+  }
+
   function isExternal(url){ return /^https?:\/\//i.test(url); }
   function hostLabel(url){
     if (isExternal(url)) { try { return new URL(url).host + new URL(url).pathname.replace(/\/$/,''); } catch(e){ return url; } }
@@ -187,21 +221,25 @@
     var shown = TOOLS.filter(function(t){ return active === 'All' || t.chips.indexOf(active) >= 0; });
     grid.innerHTML = shown.length ? shown.map(function(t){
       var ext = isExternal(t.url);
+      var visual = cardVisual(t);
       var attrs = ext ? ' target="_blank" rel="noopener noreferrer"' : '';
-      return '<a class="tool-card" data-track-cta="tools:' + esc(t.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')) + '" href="' + esc(t.url) + '"' + attrs + '>'
-        + '<div class="tc-head"><h3>' + esc(t.name) + '</h3>' + (ext ? '<span class="tc-ext">↗</span>' : '') + '</div>'
-        + '<p>' + esc(t.blurb) + '</p>'
-        + '<div class="tc-host">' + esc(hostLabel(t.url)) + '</div>'
-        + '<div class="tc-chips">' + t.chips.map(function(c){ return '<span class="tc-chip">' + esc(c) + '</span>'; }).join('') + '</div>'
+      return '<a class="tool-card" data-tone="' + visual.tone + '" data-track-cta="tools:' + esc(t.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')) + '" href="' + esc(t.url) + '"' + attrs + ' style="--atlas-x:' + visual.x + ';--atlas-y:' + visual.y + '">'
+        + '<span class="tc-art' + (visual.art ? '' : ' tc-art--fallback') + '" aria-hidden="true">' + (visual.art ? '' : 'SD') + '</span>'
+        + '<h3>' + esc(visual.family + ': ' + t.name) + '</h3>'
+        + '<span class="tc-badge">' + esc(visual.family) + '</span>'
+        + '<span class="sr-only">' + esc(t.blurb) + (ext ? ' Opens ' + esc(hostLabel(t.url)) + ' in a new tab.' : '') + '</span>'
         + '</a>';
     }).join('') : '<div class="tools-empty">No tools in this category yet.</div>';
+    if (window.gsap && !window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+      window.gsap.fromTo(grid.querySelectorAll('.tool-card'), {opacity:0,y:14,scale:0.97}, {opacity:1,y:0,scale:1,duration:0.38,stagger:{amount:0.48,grid:'auto'},ease:'power2.out',clearProps:'transform,opacity'});
+    }
   }
 
   function renderChips(){
     var cats = ['All'].concat(CHIP_ORDER);
     chipsBar.innerHTML = cats.map(function(c){
       return '<button type="button" class="chip-filter" data-chip="' + c + '" aria-pressed="' + (c === active) + '">' + c + '</button>';
-    }).join('') + '<span class="count" id="toolCount"></span>';
+    }).join('') + '<span class="count" id="toolCount" aria-live="polite"></span>';
     chipsBar.querySelectorAll('.chip-filter').forEach(function(b){
       b.addEventListener('click', function(){ setActive(b.getAttribute('data-chip')); });
     });

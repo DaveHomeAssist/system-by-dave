@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-09-23 — Illustrated Tools directory preview
+
+- Reworked the Tools directory into a five-column illustrated card grid based on the supplied visual reference, with responsive two-column phone layout, category badges, visible keyboard focus, and preserved category filters and destinations.
+- Added a locally hosted illustration atlas and a reduced-motion-aware GSAP card entrance; no new runtime package or external image host is required.
+
 ## 2026-09-23 — FMP Camera Simulator v1
 
 - Added `/camera-sim/` on housevideo.app (noindex): a virtual BirdDog P240 at the FMP catwalk position with a live 16:9 monitor, an orbiting venue view with the camera's viewing cone, and SuperJoy-style joystick, zoom, speed, Home and preset controls for keyboard, mouse and touch.
