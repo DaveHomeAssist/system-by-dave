@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-23 — Revised AV Suite specification
+
+- Defined five primary workspaces and mapped all 44 current AV tools to one target home.
+- Documented source-owned equipment content, saved-data migration gates, and the staged rollout without changing live tool behavior.
+- Corrected the AV Suite doorway documentation to name the current avbydave.com canonical route.
+
 ## 2026-09-22 — Focused equipment model view
 
 - Matched the embedded FMP rig viewer to the Gear Reference theme and removed duplicate FMP navigation inside the model panel.

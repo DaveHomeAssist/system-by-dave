@@ -16,8 +16,9 @@ registry.
 - Doorway navigation uses `history.pushState`; Back and Forward restore the
   entry represented by the URL.
 
-The canonical URL remains `https://systembydave.com/av-suite.html`; query
-parameters select application state and do not create separate indexable pages.
+The canonical URL is `https://avbydave.com/av-suite.html` after the domain cutover.
+The former systembydave.com route redirects there. Query parameters select
+application state and do not create separate indexable pages.
 
 ## Show Console
 
@@ -66,3 +67,11 @@ The first-visit chooser uses native buttons, moves focus into the dialog, traps
 Tab while open, restores the background inert state, and supports native Enter
 activation. The doorway and Toolbox are release-probed at 390, 680, and 1280
 pixels for page overflow and unreachable clipped controls.
+
+## Consolidation direction
+
+The current doorway behavior above remains the shipped contract.
+[Revised AV Suite: consolidation specification](av-suite-consolidation-spec.md)
+defines the proposed five-workspace destination, the full 44-tool disposition,
+and the migration gates. It is a target specification, not a claim that those
+workspaces are already live.
