@@ -43,7 +43,8 @@ body[data-public-release] .attention { background: var(--av-danger-soft); color:
   body[data-public-release] .workflow { grid-template-rows: auto minmax(0, 1fr) 60px; }
   body[data-public-release] .screen-head { padding: 8px 18px; }
   body[data-public-release] .screen-meta { margin-bottom: 4px; }
-  body[data-public-release] .screen-body { padding: 8px 18px; }
+  body[data-public-release] .screen-body { padding: 4px 18px; }
+  body[data-public-release] .check-number { display: none; }
   body[data-public-release] .screen-body p { font-size: 13px; }
   body[data-public-release] .screen-body:has(.check-confirm) { display: grid; grid-template-columns: 1fr 1fr; align-content: center; gap: 12px; }
   body[data-public-release] .segmented { grid-template-columns: repeat(4, 1fr); gap: 8px; }

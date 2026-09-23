@@ -7,7 +7,8 @@
   context without copying or submitting camera records.
 - Added four authored FMP camera, lens, and fiber field sheets to Gear Reference,
   its offline asset list, and the AV by Dave domain publication. The Epson sheet
-  remains in the library.
+  remains in the library. Stage 3D's offline readiness pin follows the new AV
+  cache version.
 - Reconciled the URSA G2 sheet with the current FMP house record: the G2 stamp is
   confirmed, while individual serial numbers remain unread.
 - Kept all four camera check choices within the workspace at 720×450 by
