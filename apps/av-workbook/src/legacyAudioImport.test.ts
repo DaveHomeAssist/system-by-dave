@@ -97,6 +97,9 @@ describe("legacy audio import", () => {
 
     expect(result.summary.importedKeys).toEqual([LEGACY_AUDIO_KEYS.inputList, LEGACY_AUDIO_KEYS.audioPatch, LEGACY_AUDIO_KEYS.lineCheck]);
     expect(result.summary).toMatchObject({ signalSources: 1, patchRecords: 1, lineChecks: 1 });
+    expect(result.summary.unmappedFields).toEqual(expect.arrayContaining([
+      "Input List: stand", "Input List: connector", "Input List: notes", "Audio Patch: gain", "Audio Patch: monitor send", "Audio Patch: notes"
+    ]));
     expect(result.workbook.show).toMatchObject({
       showName: "Legacy Gala",
       venue: "Ballroom B",

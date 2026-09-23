@@ -105,6 +105,7 @@ export interface LegacyAudioImportSummary {
   signalSources: number;
   patchRecords: number;
   lineChecks: number;
+  unmappedFields: string[];
 }
 
 export interface LegacyAudioImportResult {
@@ -261,6 +262,27 @@ function importedKeys(bundle: LegacyAudioBundle): LegacyAudioKey[] {
 function skippedKeys(bundle: LegacyAudioBundle): LegacyAudioKey[] {
   const imported = new Set(importedKeys(bundle));
   return Object.values(LEGACY_AUDIO_KEYS).filter((key) => !imported.has(key));
+}
+
+function unmappedFields(bundle: LegacyAudioBundle): string[] {
+  const fields = new Set<string>();
+  // These values have no dedicated Workbook field. Keep the legacy stores and
+  // expose the gap before an operator accepts an import.
+  for (const row of bundle.inputList?.rows ?? []) {
+    if (row.stand) fields.add('Input List: stand');
+    if (row.conn) fields.add('Input List: connector');
+    if (row.notes) fields.add('Input List: notes');
+  }
+  for (const row of bundle.audioPatch?.items ?? []) {
+    if (row.gain) fields.add('Audio Patch: gain');
+    if (row.monitor) fields.add('Audio Patch: monitor send');
+    if (row.notes) fields.add('Audio Patch: notes');
+  }
+  for (const state of [bundle.inputList, bundle.audioPatch, bundle.lineCheck]) {
+    if (state?.meta.client) fields.add('Show metadata: client');
+    if (state?.meta.handoffTo) fields.add('Show metadata: handoff recipient');
+  }
+  return [...fields];
 }
 
 function slug(value: string, fallback: string): string {
@@ -442,7 +464,8 @@ export function mergeLegacyAudioIntoWorkbook(workbook: AvWorkbook, bundle: Legac
     skippedKeys: skippedKeys(bundle),
     signalSources: 0,
     patchRecords: 0,
-    lineChecks: 0
+    lineChecks: 0,
+    unmappedFields: unmappedFields(bundle)
   };
   if (!hasLegacyData(bundle)) return { workbook, summary: emptySummary };
 
@@ -687,7 +710,8 @@ export function mergeLegacyAudioIntoWorkbook(workbook: AvWorkbook, bundle: Legac
       skippedKeys: skippedKeys(bundle),
       signalSources: importedSourceCount,
       patchRecords: importedPatchCount,
-      lineChecks: importedLineCheckCount
+      lineChecks: importedLineCheckCount,
+      unmappedFields: unmappedFields(bundle)
     }
   };
 }
