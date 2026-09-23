@@ -92,7 +92,7 @@ export class MonitorOverlay {
         if (!visible) return;
         slot.group.setAttribute("transform", `translate(${toX(marker.projection.x).toFixed(1)} ${toY(marker.projection.y).toFixed(1)})`);
         slot.group.setAttribute("class", `ov-marker ${marker.inside ? "is-in" : "is-out"}`);
-        slot.text.textContent = marker.label;
+        slot.text.textContent = marker.short;
       });
       show(this.wide, true);
     } else {

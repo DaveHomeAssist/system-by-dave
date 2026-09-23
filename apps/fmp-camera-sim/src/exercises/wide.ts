@@ -9,6 +9,8 @@ export const WIDE_HEAD_HEIGHT_M = 2;
 export interface WideMarker {
   id: string;
   label: string;
+  /** Compact label drawn on the monitor, where markers can sit close together. */
+  short: string;
   point: StagePoint;
 }
 
@@ -16,11 +18,11 @@ export function wideShotMarkers(geometry: VenueGeometry): WideMarker[] {
   const half = geometry.stageWidth / 2;
   const mark = (id: string) => geometry.marks.find((m) => m.id === id)?.point ?? { right: 0, upstage: 0, height: 0 };
   return [
-    { id: "dsr-corner", label: "DSR corner", point: { right: half, upstage: 0, height: 0 } },
-    { id: "dsl-corner", label: "DSL corner", point: { right: -half, upstage: 0, height: 0 } },
-    { id: "usr-head", label: "USR head height", point: { ...mark("USR"), height: WIDE_HEAD_HEIGHT_M } },
-    { id: "usc-head", label: "USC head height", point: { ...mark("USC"), height: WIDE_HEAD_HEIGHT_M } },
-    { id: "usl-head", label: "USL head height", point: { ...mark("USL"), height: WIDE_HEAD_HEIGHT_M } },
+    { id: "dsr-corner", label: "DSR corner", short: "DSR", point: { right: half, upstage: 0, height: 0 } },
+    { id: "dsl-corner", label: "DSL corner", short: "DSL", point: { right: -half, upstage: 0, height: 0 } },
+    { id: "usr-head", label: "USR head height", short: "USR", point: { ...mark("USR"), height: WIDE_HEAD_HEIGHT_M } },
+    { id: "usc-head", label: "USC head height", short: "USC", point: { ...mark("USC"), height: WIDE_HEAD_HEIGHT_M } },
+    { id: "usl-head", label: "USL head height", short: "USL", point: { ...mark("USL"), height: WIDE_HEAD_HEIGHT_M } },
   ];
 }
 
