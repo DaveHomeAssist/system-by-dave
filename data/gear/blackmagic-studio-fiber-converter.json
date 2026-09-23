@@ -41,6 +41,19 @@
       ]
     },
     {
+      "id": "interactive-model",
+      "title": "Inspect the equipment",
+      "type": "model",
+      "lede": "Select parts in the existing FMP 3D explorer to inspect operating notes, photographs, and supporting evidence.",
+      "model": {
+        "url": "https://housevideo.app/fmp/rig/?equipment=studio&part=studio-body",
+        "title": "FMP interactive model: Studio fiber converter"
+      },
+      "sourceRefs": [
+        "hv-fmp-gear"
+      ]
+    },
+    {
       "id": "signal",
       "title": "As found",
       "type": "cards",
@@ -110,7 +123,9 @@
       "id": "accuracy",
       "title": "Accuracy log",
       "type": "accuracyLog",
-      "sourceRefs": ["hv-fmp-gear"],
+      "sourceRefs": [
+        "hv-fmp-gear"
+      ],
       "entries": [
         {
           "item": "Three live / zero spare",

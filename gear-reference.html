@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self' data:; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'self'; frame-src https://housevideo.app; img-src 'self' data:; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'none'">
 <title>Gear Reference</title>
 <meta name="robots" content="index,follow">
 <meta name="description" content="Offline field reference sheets for AV equipment, including specifications, diagrams, procedures, consumables, intake checks, and source confidence.">
@@ -303,6 +303,8 @@
   svg.fig .badge{fill:var(--accent-tint);stroke:var(--accent);stroke-width:1.3}
   svg.fig .badge-t{font-family:var(--font-mono);font-size:13px;font-weight:750;fill:var(--accent);text-anchor:middle;dominant-baseline:central}
   figcaption{margin-top:11px;padding-top:10px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px}
+  .model-frame{width:100%;height:min(68vh,720px);min-height:420px;border:1px solid var(--line);border-radius:9px;background:var(--surface)}
+  .model-note{margin:10px 0;color:var(--muted)}
   .figure-error{padding:20px;border:1px dashed var(--danger-line);border-radius:6px;color:var(--danger);text-align:center}
   .source-strip{margin-top:26px;padding-top:12px;border-top:1px solid var(--line);color:var(--faint);font:600 10.5px/1.45 var(--font-mono)}
   .sources{margin-top:28px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}
@@ -436,7 +438,7 @@
   'use strict';
 
   var INDEX_URL='data/gear/index.json';
-  var ALLOWED_TYPES=['specTable','table','figure','figure+table','procedure','checklist','cards','accuracyLog'];
+  var ALLOWED_TYPES=['specTable','table','figure','figure+table','procedure','checklist','cards','accuracyLog','model'];
   var ACCURACY_STATUSES=['confirmed','corrected','unverified','estimate'];
   var indexData=null;
   var currentEntry=null;
@@ -486,6 +488,7 @@
       if(!cleanId(section.id)||ids[section.id]) throw new Error('A gear section has a missing or duplicate id.');
       if(ALLOWED_TYPES.indexOf(section.type)<0) throw new Error('Unsupported section type: '+section.type+'.');
       if(!Array.isArray(section.sourceRefs)||!section.sourceRefs.length) throw new Error('Section '+section.id+' has no source references.');
+      if(section.type==='model'&&(!section.model||!/^https:\/\/housevideo\.app\/fmp\/rig\/\?equipment=(rig|studio)&part=[a-z0-9-]+$/.test(section.model.url)||!section.model.title)) throw new Error('Invalid FMP model link.');
       ids[section.id]=true;
     });
     entry.accuracy.forEach(function(item){
@@ -732,6 +735,25 @@
     container.appendChild(element('aside','source-strip','Sources for this section: '+labels.join(' · ')));
   }
 
+  function renderModel(container,section){
+    var model=section.model;
+    var url=new URL(model.url);
+    var note=element('p','model-note','Interactive FMP model, component notes, photos, and source evidence. Requires a connection to House Video. The written sheet remains available offline.');
+    container.appendChild(note);
+    var frame=document.createElement('iframe');
+    frame.className='model-frame';
+    frame.title=model.title;
+    frame.src=url.href;
+    frame.loading='lazy';
+    frame.referrerPolicy='strict-origin-when-cross-origin';
+    container.appendChild(frame);
+    var link=element('a','','Open model in a full window');
+    link.href=url.href;
+    link.target='_blank';
+    link.rel='noopener noreferrer';
+    container.appendChild(link);
+  }
+
   function renderPanel(section,index,entry,map){
     var panel=element('section','panel');
     panel.id=section.id;
@@ -754,6 +776,7 @@
       if(section.columns&&section.rows) renderTable(inner,section.columns,section.rows,section.caption,'');
     }
     if(section.type==='accuracyLog') renderAccuracy(inner,entry,map);
+    if(section.type==='model') renderModel(inner,section);
     if(section.type==='figure'){
       if(section.subheading) inner.appendChild(element('h3','',section.subheading));
     }

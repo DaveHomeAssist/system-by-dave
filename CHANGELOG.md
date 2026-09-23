@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-09-22 — Equipment models and Show Console context
+
+- Embedded the existing FMP rig explorer in four Gear Reference sheets, with written field sheets available offline.
+- Corrected the FMP Show Console bridge so camera positions no longer fill the operator name.
+
 ## 2026-09-22 — FMP Night Profile and Gear Reference bridge
 
 - Exposed the role-specific Show Console link in each interactive camera

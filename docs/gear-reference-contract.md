@@ -46,7 +46,7 @@ resolve to an entry in that sheet's `sources` array.
 ## Section types
 
 `sections[].type` is one of: `specTable`, `table`, `figure`, `figure+table`,
-`procedure`, `checklist`, `cards`, `accuracyLog`.
+`procedure`, `checklist`, `cards`, `accuracyLog`, `model`.
 
 Section ids are unique within a sheet, and every section cites at least one
 source that resolves.
@@ -104,3 +104,7 @@ house reference mapping, and `docs/throwline-catalog-contract.md` for Throwline'
 Add a value here with its meaning in the same change that adds it to
 `ALLOWED_STATUSES` in `scripts/verify_gear_reference.js`, so the gate and this
 document never disagree.
+
+## Interactive FMP models
+
+A `model` section embeds the existing House Video rig explorer for the four FMP camera-chain sheets. Its `model.url` is restricted to the public rig route with a known equipment and component selection. The rig, component notes, photos, and source evidence remain owned and published by `fmp-suite`; Gear Reference does not duplicate or rewrite them. The iframe needs a connection to housevideo.app, while the authored sheet stays available offline. Gear Reference keeps its own accuracy vocabulary; the embedded explorer displays the FMP evidence in its original context.
