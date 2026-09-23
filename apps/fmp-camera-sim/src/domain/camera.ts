@@ -368,3 +368,15 @@ export function parseCameraProfile(
 export function isCameraCalibrated(profile: CameraProfile): boolean {
   return profile.calibration.status === "calibrated" && profile.behaviour.status === "measured";
 }
+
+/** Reference metadata only: mass and sensor size do not imply calibrated optics or rigging capacity. */
+export const P240_HARDWARE = Object.freeze({
+  envelopeMm: Object.freeze([163, 199, 231] as const),
+  massKg: 2.395,
+  sensor: "1/2.5-inch CMOS, 8.5 MP",
+  apertureWide: 2.0,
+  apertureTele: 3.8,
+  power: "12 VDC or PoE+ (IEEE 802.3at)",
+  simultaneousPtzWatts: 22.5,
+  source: P240_PUBLISHED.source,
+});

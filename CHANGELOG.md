@@ -4,6 +4,12 @@
 
 - Added a static, cool-blue drafting field and wide signal rings behind the alternative landing in both themes. Kept the content and console preview on solid surfaces for legibility, and refreshed the offline cache version.
 
+## 2026-09-23 — FMP per-property venue evidence
+
+- Added evidence methods and source identifiers for venue dimensions, distance basis, mount orientation and pan-zero heading. Photo-confirmed orientation no longer implies a verified heading.
+- Venue v3 preserves v1/v2 geometry and legacy claims, rejects malformed provenance atomically, and resets confidence after manual value edits.
+- Added manufacturer body, mass, sensor, aperture and power references to Camera settings without changing simulated optical behaviour.
+
 ## 2026-09-23 — ShowConsole brand direction on the alternative AV landing
 
 - Adapted the supplied ShowConsole brand book into the noindex alternative landing: neutral light and charcoal dark surfaces, amber actions, compact status treatment, and schematic multiview illustrations. Kept example values explicitly labeled, direct Show Console and Toolbox routes, and the current main landing at `/`.
