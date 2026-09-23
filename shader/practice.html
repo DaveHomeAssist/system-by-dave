@@ -45,11 +45,11 @@
       <div class="top-actions">
         <button type="button" class="btn" id="shareButton" aria-haspopup="dialog" aria-controls="shareDialog">
           <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V4m0 0-4 4m4-4 4 4M5 13v6h14v-6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          <span class="btn-label">Share &amp; files</span>
+          <span class="btn-label">SHARE &amp; FILES</span>
         </button>
         <button type="button" class="btn" id="themeButton" aria-pressed="false">
           <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
-          <span class="btn-label" id="themeLabel">Show dark</span>
+          <span class="btn-label" id="themeLabel">SHOW DARK</span>
         </button>
       </div>
     </header>
@@ -98,9 +98,9 @@
               <label class="field-label" for="seedInput">Reproducible seed</label>
               <div class="field-row">
                 <input type="text" id="seedInput" maxlength="80" autocomplete="off" spellcheck="false">
-                <button type="button" class="btn" id="applySeedButton">Apply seed</button>
+                <button type="button" class="btn" id="applySeedButton">APPLY SEED</button>
               </div>
-              <button type="button" class="btn btn-wide" id="replayButton">Replay exercise from its start</button>
+              <button type="button" class="btn btn-wide" id="replayButton">REPLAY EXERCISE FROM ITS START</button>
               <p class="mono-note" id="stateIdentity">shader.camera-practice.v1</p>
             </section>
 
@@ -110,10 +110,10 @@
               <label class="field-label" for="injectionSelect">Fault</label>
               <div class="field-row">
                 <select id="injectionSelect"></select>
-                <button type="button" class="btn" id="injectButton">Inject on Camera B</button>
+                <button type="button" class="btn" id="injectButton">INJECT ON CAMERA B</button>
               </div>
               <ul class="fault-list" id="faultList" aria-label="Injected faults"></ul>
-              <button type="button" class="btn btn-wide" id="revertFaultButton">Revert last fault</button>
+              <button type="button" class="btn btn-wide" id="revertFaultButton">REVERT LAST FAULT</button>
             </section>
 
             <nav class="block panel-links" aria-label="Related references">
@@ -129,13 +129,14 @@
           <div class="panel-scroll">
             <h2 class="panel-heading" id="scoreHeading" tabindex="-1">DEBRIEF</h2>
             <div id="scoreEmpty">
-              <p class="empty-state">No attempt scored yet. Adjust the target camera, then press <strong>Score attempt</strong>. The debrief compares each check with the one before it.</p>
+              <p class="empty-state">No attempt scored yet. Adjust the target camera, then press <strong>SCORE ATTEMPT</strong>. The debrief compares each check with the one before it.</p>
             </div>
             <div id="scoreContent" hidden>
               <div class="score-plate">
                 <p class="readout-xl" id="scoreNumber">0</p>
                 <div class="score-copy">
-                  <p><span class="pill" id="scoreBand" data-level="IDLE">IDLE</span> <span class="score-status" id="scoreStatusText"></span></p>
+                  <p><span class="pill" id="scoreBand" data-level="IDLE">IDLE</span></p>
+                  <p class="score-status" id="scoreStatusText"></p>
                   <p class="mono-note" id="scoreDelta"></p>
                 </div>
               </div>
@@ -178,16 +179,16 @@
               <label class="field-label" for="demoControlSelect">Guided sweep of one control</label>
               <div class="field-row">
                 <select id="demoControlSelect"></select>
-                <button type="button" class="btn" id="startDemoButton">Start sweep</button>
+                <button type="button" class="btn" id="startDemoButton">START SWEEP</button>
               </div>
-              <button type="button" class="btn btn-wide" id="captureFirstButton">Start a sequence from the current state</button>
+              <button type="button" class="btn btn-wide" id="captureFirstButton">START A SEQUENCE FROM THE CURRENT STATE</button>
             </div>
             <div id="demoActive" hidden>
               <p class="demo-title" id="demoTitle"></p>
               <p class="mono-note" id="demoPosition"></p>
               <div class="field-row">
-                <button type="button" class="btn" id="demoPrevButton">Previous step</button>
-                <button type="button" class="btn" id="demoNextButton">Next step</button>
+                <button type="button" class="btn" id="demoPrevButton">PREVIOUS STEP</button>
+                <button type="button" class="btn" id="demoNextButton">NEXT STEP</button>
               </div>
               <ol class="demo-steps" id="demoStepList" aria-label="Demonstration steps"></ol>
               <section class="block" aria-labelledby="demoStepLabel">
@@ -195,9 +196,10 @@
                 <p class="pre-line" id="demoStepNote"></p>
                 <p class="pill-row" id="demoModified" hidden><span class="pill" data-level="WARN">WARN</span> Controls changed since this step was saved.</p>
               </section>
-              <div class="segmented" role="group" aria-label="Before picture">
-                <button type="button" class="seg" data-demo-compare="first" aria-pressed="true">Before: first step</button>
-                <button type="button" class="seg" data-demo-compare="previous" aria-pressed="false">Before: previous step</button>
+              <p class="field-label" id="demoCompareLabel">Before picture</p>
+              <div class="segmented segmented-wide" role="group" aria-labelledby="demoCompareLabel">
+                <button type="button" class="seg" data-demo-compare="first" aria-pressed="true">FIRST STEP</button>
+                <button type="button" class="seg" data-demo-compare="previous" aria-pressed="false">PREVIOUS STEP</button>
               </div>
               <details class="instructor">
                 <summary>Instructor tools</summary>
@@ -206,16 +208,16 @@
                 <label class="field-label" for="demoNoteInput">Step note</label>
                 <textarea id="demoNoteInput" maxlength="280" rows="3"></textarea>
                 <div class="field-row">
-                  <button type="button" class="btn" id="demoCaptureButton">Capture new step</button>
-                  <button type="button" class="btn" id="demoUpdateButton">Update this step</button>
+                  <button type="button" class="btn" id="demoCaptureButton">CAPTURE NEW STEP</button>
+                  <button type="button" class="btn" id="demoUpdateButton">UPDATE THIS STEP</button>
                 </div>
-                <button type="button" class="btn btn-wide" id="demoRemoveButton">Remove this step</button>
+                <button type="button" class="btn btn-wide" id="demoRemoveButton">REMOVE THIS STEP</button>
               </details>
               <div class="field-row">
-                <button type="button" class="btn" id="demoLinkButton">Copy demo link</button>
-                <button type="button" class="btn" id="demoExportButton">Export demo JSON</button>
+                <button type="button" class="btn" id="demoLinkButton">COPY DEMO LINK</button>
+                <button type="button" class="btn" id="demoExportButton">EXPORT DEMO JSON</button>
               </div>
-              <button type="button" class="btn btn-wide" id="exitDemoButton">Exit demonstration</button>
+              <button type="button" class="btn btn-wide" id="exitDemoButton">EXIT DEMONSTRATION</button>
             </div>
             <p class="disclaimer">Demonstrations replay generated practice states. Nothing here reads or controls real equipment.</p>
           </div>
@@ -227,14 +229,14 @@
           <div class="panel-bar">
             <h2 class="panel-label" id="monitorHeading">MULTIVIEWER</h2>
             <div class="segmented" role="group" aria-label="Comparison view" id="compareGroup">
-              <button type="button" class="seg" data-compare="side" aria-pressed="true">Side by side</button>
-              <button type="button" class="seg" data-compare="wipe" aria-pressed="false">Wipe</button>
-              <button type="button" class="seg" data-compare="reference" aria-pressed="false"><span class="long">Reference only</span><span class="short" aria-hidden="true">Ref</span></button>
-              <button type="button" class="seg" data-compare="target" aria-pressed="false"><span class="long">Target only</span><span class="short" aria-hidden="true">Tgt</span></button>
+              <button type="button" class="seg" data-compare="side" aria-pressed="true">SIDE BY SIDE</button>
+              <button type="button" class="seg" data-compare="wipe" aria-pressed="false">WIPE</button>
+              <button type="button" class="seg" data-compare="reference" aria-pressed="false"><span class="long">REFERENCE ONLY</span><span class="short" aria-hidden="true">REF</span></button>
+              <button type="button" class="seg" data-compare="target" aria-pressed="false"><span class="long">TARGET ONLY</span><span class="short" aria-hidden="true">TGT</span></button>
             </div>
             <div class="bar-actions">
-              <button type="button" class="btn" id="blinkButton" aria-pressed="false">Blink A/B</button>
-              <button type="button" class="btn" id="freezeButton" aria-pressed="false">Freeze ref</button>
+              <button type="button" class="btn" id="blinkButton" aria-pressed="false">BLINK A/B</button>
+              <button type="button" class="btn" id="freezeButton" aria-pressed="false">FREEZE REF</button>
             </div>
           </div>
           <div class="monitor-wall" id="monitorWall" data-compare="side" data-arrangement="row">
@@ -245,6 +247,7 @@
                   <span class="tag tag-role" id="roleTagA">REF · CAM A</span>
                   <span class="tag tag-tally" id="tallyTagA" data-tally="pgm">PGM</span>
                   <span class="tag tag-control" id="controlTagA" hidden>CONTROL</span>
+                  <span class="tag tag-alert" id="alertTagA" hidden></span>
                 </div>
                 <button type="button" class="monitor-select" id="monitorSelectA" aria-label="Control Camera A"></button>
               </div>
@@ -257,6 +260,7 @@
                   <span class="tag tag-role" id="roleTagB">TGT · CAM B</span>
                   <span class="tag tag-tally" id="tallyTagB" data-tally="pvw">PVW</span>
                   <span class="tag tag-control" id="controlTagB" hidden>CONTROL</span>
+                  <span class="tag tag-alert" id="alertTagB" hidden></span>
                 </div>
                 <button type="button" class="monitor-select" id="monitorSelectB" aria-label="Control Camera B"></button>
               </div>
@@ -289,28 +293,28 @@
               <button type="button" role="tab" class="tab" id="scopeTab-histogram" data-scope="histogram" aria-controls="scopeFigure-histogram" aria-selected="false" tabindex="-1">HISTOGRAM</button>
             </div>
             <div class="segmented" role="group" aria-label="Scope layout">
-              <button type="button" class="seg" data-layout="single" aria-pressed="true">Single</button>
-              <button type="button" class="seg" data-layout="quad" aria-pressed="false">Quad</button>
+              <button type="button" class="seg" data-layout="single" aria-pressed="true">SINGLE</button>
+              <button type="button" class="seg" data-layout="quad" aria-pressed="false">QUAD</button>
             </div>
           </div>
           <div class="scope-grid" id="scopeGrid" data-layout="single" data-arrangement="grid">
             <figure class="scope" id="scopeFigure-waveform" data-scope="waveform" role="tabpanel" aria-labelledby="scopeTab-waveform">
-              <figcaption class="scope-title"><span>WAVEFORM · LUMA</span><button type="button" class="scope-focus" data-focus-scope="waveform">Focus</button></figcaption>
+              <figcaption class="scope-title"><span>WAVEFORM · LUMA</span><button type="button" class="scope-focus" data-focus-scope="waveform">FOCUS</button></figcaption>
               <div class="scope-glass"><canvas id="scopeCanvas-waveform" role="img" aria-label="Simulated waveform">Simulated waveform.</canvas></div>
               <p class="scope-caption"><span class="legend" id="legend-waveform"></span><span class="scope-disclaimer">Generated practice signal · not a measurement</span></p>
             </figure>
             <figure class="scope" id="scopeFigure-parade" data-scope="parade" role="tabpanel" aria-labelledby="scopeTab-parade" hidden>
-              <figcaption class="scope-title"><span>RGB PARADE</span><button type="button" class="scope-focus" data-focus-scope="parade">Focus</button></figcaption>
+              <figcaption class="scope-title"><span>RGB PARADE</span><button type="button" class="scope-focus" data-focus-scope="parade">FOCUS</button></figcaption>
               <div class="scope-glass"><canvas id="scopeCanvas-parade" role="img" aria-label="Simulated RGB parade">Simulated RGB parade.</canvas></div>
               <p class="scope-caption"><span class="legend" id="legend-parade"></span><span class="scope-disclaimer">Generated practice signal · not a measurement</span></p>
             </figure>
             <figure class="scope" id="scopeFigure-vectorscope" data-scope="vectorscope" role="tabpanel" aria-labelledby="scopeTab-vectorscope" hidden>
-              <figcaption class="scope-title"><span>VECTORSCOPE</span><button type="button" class="scope-focus" data-focus-scope="vectorscope">Focus</button></figcaption>
+              <figcaption class="scope-title"><span>VECTORSCOPE</span><button type="button" class="scope-focus" data-focus-scope="vectorscope">FOCUS</button></figcaption>
               <div class="scope-glass"><canvas id="scopeCanvas-vectorscope" role="img" aria-label="Simulated vectorscope">Simulated vectorscope.</canvas></div>
               <p class="scope-caption"><span class="legend" id="legend-vectorscope"></span><span class="scope-disclaimer">Generated practice signal · not a measurement</span></p>
             </figure>
             <figure class="scope" id="scopeFigure-histogram" data-scope="histogram" role="tabpanel" aria-labelledby="scopeTab-histogram" hidden>
-              <figcaption class="scope-title"><span>HISTOGRAM · LUMA</span><button type="button" class="scope-focus" data-focus-scope="histogram">Focus</button></figcaption>
+              <figcaption class="scope-title"><span>HISTOGRAM · LUMA</span><button type="button" class="scope-focus" data-focus-scope="histogram">FOCUS</button></figcaption>
               <div class="scope-glass"><canvas id="scopeCanvas-histogram" role="img" aria-label="Simulated histogram">Simulated histogram.</canvas></div>
               <p class="scope-caption"><span class="legend" id="legend-histogram"></span><span class="scope-disclaimer">Generated practice signal · not a measurement</span></p>
             </figure>
@@ -338,20 +342,20 @@
           <button type="button" class="cam-btn" data-camera-switch="camera-b" aria-pressed="true"><span class="tally-dot" id="camDotB" aria-hidden="true"></span><span class="cam-name">CAM B</span><span class="cam-role" id="camRoleB">TGT · PVW</span></button>
         </div>
         <div class="control-tools">
-          <button type="button" class="btn" id="undoButton" aria-keyshortcuts="Control+Z Meta+Z">Undo</button>
-          <button type="button" class="btn" id="redoButton" aria-keyshortcuts="Control+Shift+Z Meta+Shift+Z">Redo</button>
-          <button type="button" class="btn" id="resetCameraButton">Reset cam</button>
+          <button type="button" class="btn btn-tool" id="undoButton" aria-keyshortcuts="Control+Z Meta+Z" title="Undo the last camera change (Ctrl+Z or ⌘Z)"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 7 4 12l5 5M4 12h11a5 5 0 0 1 0 10h-2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="tool-text">UNDO</span></button>
+          <button type="button" class="btn btn-tool" id="redoButton" aria-keyshortcuts="Control+Shift+Z Meta+Shift+Z" title="Redo (Ctrl+Shift+Z or ⌘⇧Z)"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 7 5 5-5 5M20 12H9a5 5 0 0 0 0 10h2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="tool-text">REDO</span></button>
+          <button type="button" class="btn" id="resetCameraButton">RESET CAM</button>
           <div class="segmented" role="group" aria-label="Step size for plus, minus and arrow keys">
-            <button type="button" class="seg" data-step-size="fine" aria-pressed="true">Fine</button>
-            <button type="button" class="seg" data-step-size="coarse" aria-pressed="false">Coarse</button>
+            <button type="button" class="seg" data-step-size="fine" aria-pressed="true">FINE</button>
+            <button type="button" class="seg" data-step-size="coarse" aria-pressed="false">COARSE</button>
           </div>
         </div>
         <div class="control-list" id="controlList"></div>
         <div class="score-strip">
-          <button type="button" class="btn btn-primary" id="scoreButton">Score attempt</button>
+          <button type="button" class="btn btn-primary" id="scoreButton">SCORE ATTEMPT</button>
           <div class="score-summary">
-            <p id="scoreSummary">Not scored yet.</p>
-            <button type="button" class="link-btn" id="openDebriefButton">Open debrief</button>
+            <p id="scoreSummary" aria-live="polite">Not scored yet.</p>
+            <button type="button" class="link-btn" id="openDebriefButton">OPEN DEBRIEF</button>
           </div>
         </div>
       </aside>
@@ -373,19 +377,19 @@
       <label class="field-label" for="shareLinkField">Full-state link</label>
       <textarea id="shareLinkField" rows="4" readonly spellcheck="false"></textarea>
       <div class="field-row">
-        <button type="button" class="btn" id="copyLinkButton">Copy full-state link</button>
-        <button type="button" class="btn" id="copyShortLinkButton">Copy exercise link</button>
+        <button type="button" class="btn" id="copyLinkButton">COPY FULL-STATE LINK</button>
+        <button type="button" class="btn" id="copyShortLinkButton">COPY EXERCISE LINK</button>
       </div>
       <p class="hint">An exercise link reopens the same exercise, seed and view from its start.</p>
       <p class="share-status" id="shareStatus" role="status"></p>
       <h3 class="block-heading">FILES</h3>
       <div class="field-row">
-        <button type="button" class="btn" id="exportButton">Export JSON</button>
-        <button type="button" class="btn" id="importButton">Import JSON</button>
+        <button type="button" class="btn" id="exportButton">EXPORT JSON</button>
+        <button type="button" class="btn" id="importButton">IMPORT JSON</button>
       </div>
       <p class="hint">Imports accept Shader practice files and older Throwline practice exports.</p>
       <p class="import-error" id="importError" role="alert" hidden></p>
-      <button type="button" class="btn btn-wide" id="closeShareButton">Close</button>
+      <button type="button" class="btn btn-wide" id="closeShareButton">CLOSE</button>
     </div>
   </dialog>
   <input type="file" id="fileInput" accept="application/json,.json" hidden>

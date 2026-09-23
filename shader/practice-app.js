@@ -77,6 +77,9 @@
     return svg;
   }
 
+  // Interleave spaces so adjacent inline parts never run together when read
+  // aloud or copied ("CRIT Camera B…", not "CRITCamera B…").
+  const spaced = (...parts) => parts.filter(part => part != null && part !== '').flatMap((part, index) => (index ? [' ', part] : [part]));
   const clone = value => JSON.parse(JSON.stringify(value));
   const pct = value => Math.round(value * 100);
   const setText = (node, value) => { if (node && node.textContent !== value) node.textContent = value; };
@@ -281,8 +284,8 @@
       els.exerciseList.append(h('li', {},
         h('button', { type: 'button', className: 'exercise', dataset: { scenario: scenario.id }, 'aria-current': 'false' },
           h('span', { className: 'exercise-index', 'aria-hidden': 'true', text: String(index + 1).padStart(2, '0') }),
-          h('span', { className: 'exercise-title', text: scenario.title.toUpperCase() }),
-          h('span', { className: 'exercise-brief', text: scenario.brief }))));
+          ...spaced(h('span', { className: 'exercise-title', text: scenario.title.toUpperCase() }),
+            h('span', { className: 'exercise-brief', text: scenario.brief })))));
     });
     Practice.troubleshootingList().forEach(item => els.injectionSelect.append(h('option', { value: item.id, text: item.label })));
     Object.keys(Practice.CONTROL_LIMITS).forEach(name => els.demoControlSelect.append(h('option', { value: name, text: Practice.CONTROL_LABELS[name] })));
@@ -339,9 +342,11 @@
       return;
     }
     input.removeAttribute('aria-invalid');
-    if (number < min || number > max) toast(`${label} is limited to ${formatValue(control, min)} … ${formatValue(control, max)}.`);
     setControl(control, number);
-    input.value = formatValue(control, selectedCamera().controls[control], { unit: false });
+    const applied = selectedCamera().controls[control];
+    input.value = formatValue(control, applied, { unit: false });
+    if (number < min || number > max) toast(`${label} is limited to ${formatValue(control, min)} … ${formatValue(control, max)}; set to ${formatValue(control, applied)}.`);
+    else if (Math.abs(applied - number) > 1e-9) toast(`${label} moves in steps of ${formatValue(control, Practice.CONTROL_LIMITS[control][2], { sign: false })}; set to ${formatValue(control, applied)}.`);
   }
 
   function bindControls() {
@@ -456,6 +461,7 @@
     if (layout === 'medium') setRole(els.controlPanel, 'tabpanel', 'tab-control');
     else { setRole(els.controlPanel, null); els.controlPanel.setAttribute('aria-labelledby', 'controlHeading'); }
     const showsVisual = !tabbed ? ui.view === 'shade' || ui.view === 'scopes' : true;
+    setHidden(els.sideColumn, !tabbed && showsVisual);
     setHidden(els.monitorPanel, !showsVisual);
     setHidden(els.scopePanel, !showsVisual);
     setHidden(els.controlPanel, layout === 'compact' ? ui.view !== 'shade' : layout === 'medium' && ui.sideTab !== 'control');
@@ -628,6 +634,7 @@
     els.startDemoButton.addEventListener('click', () => {
       stopBlink();
       intent({ type: 'start-demo', control: els.demoControlSelect.value }, { resetHistory: true });
+      ui.activeControl = els.demoControlSelect.value;
       announce(`${state.demo.title}. ${state.lastAction}`);
     });
     els.captureFirstButton.addEventListener('click', () => {
@@ -847,10 +854,10 @@
     setHidden(els.statusDemo, !state.demo);
     if (state.demo) setText(els.statusDemoText, `Step ${state.demo.index + 1} of ${state.demo.steps.length} · ${state.demo.steps[state.demo.index].label}`);
     const shown = alerts.length ? alerts.slice(0, 2) : [{ level: 'OK', title: 'No simulated signal alerts', detail: '' }];
-    els.statusAlerts.replaceChildren(...shown.map(alert => h('li', {},
+    els.statusAlerts.replaceChildren(...shown.map(alert => h('li', {}, ...spaced(
       h('span', { className: 'pill', dataset: { level: alert.level }, text: alert.level }),
       h('span', { text: alert.title }),
-      alert.detail ? h('span', { className: 'alert-detail', text: alert.detail }) : null)));
+      alert.detail ? h('span', { className: 'alert-detail', text: alert.detail }) : null))));
     if (alerts.length > 2) els.statusAlerts.append(h('li', { text: `+${alerts.length - 2} more in Exercise` }));
     els.undoButton.disabled = !ui.history.length;
     els.redoButton.disabled = !ui.future.length;
@@ -863,21 +870,21 @@
     setText(els.objectiveText, `${scenario.brief} ${scenario.objective}`);
     setText(els.passRule, `PASS: SCORE ≥ ${Practice.PASS_RULE.score} AND EVERY OBJECTIVE OK (≥ ${Practice.PASS_RULE.objective})`);
     const bands = Practice.progressBands(evaluation);
-    els.objectiveList.replaceChildren(...bands.map(item => h('li', {},
+    els.objectiveList.replaceChildren(...bands.map(item => h('li', {}, ...spaced(
       h('span', { className: 'objective-name', text: item.label }),
       h('span', { className: 'pill', dataset: { level: item.band }, text: item.band }),
-      h('span', { className: 'objective-help', text: item.explanation }))));
-    els.workflowList.replaceChildren(...Practice.workflowSteps(state).map(step => h('li', { dataset: { state: step.current ? 'current' : step.done ? 'done' : 'todo' }, 'aria-current': step.current ? 'step' : null },
+      h('span', { className: 'objective-help', text: item.explanation })))));
+    els.workflowList.replaceChildren(...Practice.workflowSteps(state).map(step => h('li', { dataset: { state: step.current ? 'current' : step.done ? 'done' : 'todo' }, 'aria-current': step.current ? 'step' : null }, ...spaced(
       h('span', { text: step.label }),
-      h('span', { className: 'flow-mark', text: step.current ? 'NOW' : step.done ? 'DONE' : '' }))));
-    els.alertList.replaceChildren(...(alerts.length ? alerts : [{ level: 'OK', title: 'No simulated signal alerts.', detail: 'Clipping, crushed blacks, high gain and a moved reference would be listed here.' }]).map(alert => h('li', {},
+      h('span', { className: 'flow-mark', text: step.current ? 'NOW' : step.done ? 'DONE' : '' })))));
+    els.alertList.replaceChildren(...(alerts.length ? alerts : [{ level: 'OK', title: 'No simulated signal alerts.', detail: 'Clipping, crushed blacks, high gain and a moved reference would be listed here.' }]).map(alert => h('li', {}, ...spaced(
       h('span', { className: 'pill', dataset: { level: alert.level }, text: alert.level }),
       h('span', { text: alert.title }),
-      alert.detail ? h('span', { className: 'alert-detail', text: alert.detail }) : null)));
+      alert.detail ? h('span', { className: 'alert-detail', text: alert.detail }) : null))));
     if (document.activeElement !== els.seedInput) els.seedInput.value = state.seed;
     setText(els.stateIdentity, `${Practice.SCHEMA} · seed ${state.seed} · attempt ${state.attempt}`);
     const faults = state.injections.map(id => Practice.TROUBLESHOOTING[id].label);
-    els.faultList.replaceChildren(...(faults.length ? faults.map(label => h('li', {}, h('span', { className: 'pill', dataset: { level: 'WARN' }, text: 'FAULT' }), h('span', { text: `${label} on Camera B` }))) : [h('li', { className: 'hint', text: 'No faults injected.' })]));
+    els.faultList.replaceChildren(...(faults.length ? faults.map(label => h('li', {}, ...spaced(h('span', { className: 'pill', dataset: { level: 'WARN' }, text: 'FAULT' }), h('span', { text: `${label} on Camera B` })))) : [h('li', { className: 'hint', text: 'No faults injected.' })]));
   }
 
   function renderControls(scenario) {
@@ -967,6 +974,10 @@
     const select = byId(`monitorSelect${suffix}`);
     setHidden(select, ui.blinking || source.frozen);
     select.setAttribute('aria-label', `Control ${cameraLabel(source.cameraId)}`);
+    const alertTag = byId(`alertTag${suffix}`);
+    const warning = metrics.clippedPercent >= 0.5 ? `CLIP ${metrics.clippedPercent.toFixed(1)}%` : metrics.crushedPercent >= 0.5 ? `CRUSH ${metrics.crushedPercent.toFixed(1)}%` : '';
+    setHidden(alertTag, !warning);
+    setText(alertTag, warning);
     setText(byId(`readout${suffix}`), metricsLine(metrics));
     canvas.setAttribute('aria-label', `${labels.spoken}: generated picture. Black ${pct(metrics.black)}, midtone ${pct(metrics.mid)}, peak ${pct(metrics.peak)} on the generated 0 to 100 scale, ${metrics.clippedPercent.toFixed(1)} percent clipped.`);
     const drawn = Render.drawPicture(canvas, analysis);
@@ -1113,7 +1124,8 @@
     setHidden(els.scopeTabs, layout === 'quad');
     if (layout === 'quad') grid.dataset.arrangement = arrangeQuad(grid);
     const series = scopeSeries(sources);
-    Practice.SCOPES.forEach(kind => {
+    // Settle every figure's visibility before measuring any canvas.
+    const visibleKinds = Practice.SCOPES.filter(kind => {
       const tab = byId(`scopeTab-${kind}`);
       const selected = state.scope === kind;
       tab.setAttribute('aria-selected', String(selected));
@@ -1123,7 +1135,9 @@
       setHidden(figure, !visible);
       if (layout === 'quad') { figure.removeAttribute('role'); figure.removeAttribute('aria-labelledby'); }
       else { figure.setAttribute('role', 'tabpanel'); figure.setAttribute('aria-labelledby', `scopeTab-${kind}`); }
-      if (!visible) return;
+      return visible;
+    });
+    visibleKinds.forEach(kind => {
       const canvas = byId(`scopeCanvas-${kind}`);
       canvas.setAttribute('aria-label', scopeSummary(kind, series, sources));
       renderLegend(kind, series, sources);
@@ -1197,20 +1211,20 @@
     els.objectiveTableBody.replaceChildren(...debrief.objectives.map(item => h('tr', {},
       h('th', { scope: 'row', text: item.label }),
       h('td', { className: 'num', text: String(Math.round(item.before)) }),
-      h('td', { className: 'num', text: `${Math.round(item.after)} (${item.delta >= 0 ? '+' : '−'}${Math.abs(Math.round(item.delta))})` }),
+      h('td', { className: 'num' }, ...spaced(String(Math.round(item.after)), h('span', { className: 'delta', text: `${item.delta >= 0 ? '+' : '−'}${Math.abs(Math.round(item.delta))}` }))),
       h('td', {}, h('span', { className: 'pill', dataset: { level: item.band }, text: item.band })))));
-    els.changeList.replaceChildren(...(debrief.changes.length ? debrief.changes.map(change => h('li', {},
-      h('span', { className: 'change-head' },
+    els.changeList.replaceChildren(...(debrief.changes.length ? debrief.changes.map(change => h('li', {}, ...spaced(
+      h('span', { className: 'change-head' }, ...spaced(
         h('span', { className: 'pill', dataset: { level: change.verdict === 'helped' ? 'OK' : change.verdict === 'hurt' ? 'CRIT' : 'IDLE' }, text: change.verdict === 'helped' ? 'OK' : change.verdict === 'hurt' ? 'CRIT' : 'IDLE' }),
-        h('span', { text: `${change.cameraLabel} ${change.label} ${change.verdict}` }),
-        h('span', { className: 'change-values', text: `${change.fromText} → ${change.toText}` })),
-      change.effects.length ? h('span', { className: 'change-effects', text: change.effects.map(effect => `${effect.label} ${Math.abs(effect.closer)}% ${effect.closer > 0 ? 'closer' : 'farther'}`).join(' · ') }) : null,
-      h('span', { className: 'change-why', text: `${change.explanation}${change.referenceMoved ? ' This moved the reference camera, so the target you are matching changed.' : ''}` }))) : [h('li', { text: `No control changes since ${debrief.baseline}.` })]));
+        h('span', { text: `${change.cameraLabel} ${change.label} ${change.verdict}:` }),
+        h('span', { className: 'change-values', text: `${change.fromText} → ${change.toText}.` }))),
+      change.effects.length ? h('span', { className: 'change-effects', text: `${change.effects.map(effect => `${effect.label} ${Math.abs(effect.closer)}% ${effect.closer > 0 ? 'closer' : 'farther'}`).join(' · ')}.` }) : null,
+      h('span', { className: 'change-why', text: `${change.explanation}${change.referenceMoved ? ' This moved the reference camera, so the target you are matching changed.' : ''}` })))) : [h('li', { text: `No control changes since ${debrief.baseline}.` })]));
     setHidden(els.interactionNote, !debrief.interacting);
     els.coachList.replaceChildren(...debrief.coach.map(note => h('li', { text: note })));
     els.checkHistory.replaceChildren(...state.checks.slice().reverse().map(check => {
       const result = check.n === debrief.check ? debrief.score : Practice.evaluatePractice(Practice.withControls(state, check.controls)).score;
-      return h('li', {}, h('span', { text: `CHECK ${check.n}` }), h('span', { text: `${result} / 100` }));
+      return h('li', {}, ...spaced(h('span', { text: `CHECK ${check.n}` }), h('span', { text: `${result} / 100` })));
     }));
   }
 
@@ -1224,9 +1238,9 @@
     els.demoPrevButton.disabled = demo.index === 0;
     els.demoNextButton.disabled = demo.index >= demo.steps.length - 1;
     els.demoStepList.replaceChildren(...demo.steps.map((step, index) => h('li', {},
-      h('button', { type: 'button', className: 'demo-step', dataset: { demoStep: String(index) }, 'aria-current': index === demo.index ? 'step' : null },
+      h('button', { type: 'button', className: 'demo-step', dataset: { demoStep: String(index) }, 'aria-current': index === demo.index ? 'step' : null }, ...spaced(
         h('span', { className: 'step-index', text: String(index + 1).padStart(2, '0') }),
-        h('span', { text: step.label })))));
+        h('span', { text: step.label }))))));
     const step = demo.steps[demo.index];
     setText(els.demoStepLabel, step.label.toUpperCase());
     setText(els.demoStepNote, step.note || 'No note for this step.');
@@ -1309,6 +1323,10 @@
     bindGlobal();
     ui.layout = detectLayout();
     if (ui.layout === 'medium') ui.sideTab = 'control';
+    // A first visit on an ultrawide screen opens with all four scopes.
+    if (!urlState.explicit && !ui.restored && window.matchMedia('(min-width: 1920px)').matches) {
+      state = Practice.applyIntent(state, { type: 'set-scope-layout', layout: 'quad' });
+    }
     if (!Render.canvasAvailable()) ui.canvasOk = false;
     renderNow();
     if (urlState.error) toast(`The link's saved state could not be read (${urlState.error}). The default exercise is open instead.`, true);

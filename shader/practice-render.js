@@ -168,9 +168,17 @@
 
   function text(ctx, value, x, y, ratio, options = {}) {
     ctx.font = `${options.weight || 500} ${(options.size || 12) * ratio}px ${MONO}`;
-    ctx.fillStyle = options.color || GLASS.label;
     ctx.textAlign = options.align || 'left';
     ctx.textBaseline = options.baseline || 'middle';
+    if (options.box) {
+      // A backing plate keeps labels legible where they cross a trace.
+      const width = ctx.measureText(value).width;
+      const pad = 3 * ratio;
+      const left = ctx.textAlign === 'right' ? x - width : ctx.textAlign === 'center' ? x - width / 2 : x;
+      ctx.fillStyle = 'rgba(4, 8, 12, 0.82)';
+      ctx.fillRect(left - pad, y - 8 * ratio, width + pad * 2, 16 * ratio);
+    }
+    ctx.fillStyle = options.color || GLASS.label;
     ctx.fillText(value, x, y);
   }
 
@@ -224,24 +232,29 @@
       hLine(ctx, area.x, y, area.w, ratio, 'rgba(226, 228, 231, 0.7)', [2, 3]);
       const labelY = marker.value > 0.9 ? y + 9 * ratio : y - 9 * ratio;
       if (Math.abs(labelY - lastY) > 14 * ratio) {
-        text(ctx, marker.label, area.x + area.w - 4 * ratio, labelY, ratio, { align: 'right', color: GLASS.strong });
+        text(ctx, marker.label, area.x + area.w - 6 * ratio, labelY, ratio, { align: 'right', color: GLASS.strong, box: true });
         lastY = labelY;
       }
     });
-    if (options.clipText) text(ctx, options.clipText, area.x + 4 * ratio, levelY(area, 1) + 9 * ratio, ratio, { color: GLASS.clip, weight: 700 });
+    if (options.clipText) text(ctx, options.clipText, area.x + 6 * ratio, levelY(area, 1) + 10 * ratio, ratio, { color: GLASS.clip, weight: 700, box: true });
   }
 
-  function plotLevels(ctx, area, analysis, rgb, alpha, ratio, valueOf) {
+  // Plot every generated sample at its column. Additive blending lets dense
+  // levels glow brighter, the way a phosphor trace accumulates.
+  function plotLevels(ctx, area, analysis, rgb, alpha, ratio, valueOf, additive) {
     const columns = analysis.width;
     const columnWidth = area.w / columns;
-    const dot = Math.max(ratio, Math.min(2.4 * ratio, area.h / 110));
+    const dot = Math.max(1.5 * ratio, Math.min(5 * ratio, area.h / 150));
+    ctx.save();
+    ctx.globalCompositeOperation = additive ? 'lighter' : 'source-over';
     ctx.fillStyle = rgba(rgb, alpha);
     const samples = analysis.samples;
     for (let index = 0; index < samples.length; index += 1) {
       const column = index % columns;
       const y = levelY(area, valueOf(samples[index]));
-      ctx.fillRect(area.x + column * columnWidth, y - dot / 2, Math.max(dot, columnWidth), dot);
+      ctx.fillRect(area.x + column * columnWidth, y - dot / 2, Math.max(dot, columnWidth + 0.5), dot);
     }
+    ctx.restore();
   }
 
   // ---------- the four scopes ----------
@@ -250,7 +263,8 @@
     const { ctx, width, height, ratio } = surface;
     const area = box(width, height, ratio, [12, 10, 12, 34]);
     levelGraticule(ctx, area, ratio, true);
-    data.series.forEach((series, index) => plotLevels(ctx, area, series.analysis, SERIES[index] || SERIES[1], index ? 0.5 : 0.32, ratio, luma));
+    // The grey ghost is laid down plainly; the target glows on top of it.
+    data.series.forEach(series => plotLevels(ctx, area, series.analysis, SERIES[series.slot], series.slot ? 0.3 : 0.22, ratio, luma, Boolean(series.slot)));
     levelMarkers(ctx, area, ratio, data);
   }
 
@@ -262,9 +276,9 @@
     ['r', 'g', 'b'].forEach((channel, channelIndex) => {
       const area = { x: outer.x + channelIndex * (sectionWidth + gap), y: outer.y, w: sectionWidth, h: outer.h };
       levelGraticule(ctx, area, ratio, channelIndex === 0);
-      data.series.forEach((series, index) => {
-        const color = index ? CHANNELS[channel] : SERIES[0];
-        plotLevels(ctx, area, series.analysis, color, index ? 0.55 : 0.3, ratio, rgb => rgb[channelIndex]);
+      data.series.forEach(series => {
+        const color = series.slot ? CHANNELS[channel] : SERIES[0];
+        plotLevels(ctx, area, series.analysis, color, series.slot ? 0.34 : 0.22, ratio, rgb => rgb[channelIndex], Boolean(series.slot));
       });
       hLine(ctx, area.x, levelY(area, 1), area.w, ratio, GLASS.clip, [5, 4]);
       text(ctx, channel.toUpperCase(), area.x + 4 * ratio, area.y - 8 * ratio, ratio, { color: rgba(CHANNELS[channel], 1), weight: 700 });
@@ -308,29 +322,32 @@
       text(ctx, target.name, x + Math.cos(angle) * 18 * ratio, y - Math.sin(angle) * 18 * ratio, ratio, { align: 'center', color: GLASS.label, weight: 600 });
     });
     ctx.restore();
-    data.series.forEach((series, index) => {
-      ctx.fillStyle = rgba(SERIES[index] || SERIES[1], index ? 0.55 : 0.35);
+    ctx.save();
+    ctx.globalCompositeOperation = 'lighter';
+    data.series.forEach(series => {
+      ctx.fillStyle = rgba(SERIES[series.slot], series.slot ? 0.55 : 0.35);
       const dot = 2 * ratio;
       series.analysis.vectorscope.forEach(point => ctx.fillRect(cx + point.u * scale - dot / 2, cy - point.v * scale - dot / 2, dot, dot));
     });
+    ctx.restore();
     // Average hue direction: the quantity the phase objective compares.
-    data.series.forEach((series, index) => {
+    data.series.forEach(series => {
       const angle = hueVector(series.metrics);
       if (angle === null) return;
       const length = radius * 0.88;
       const x = cx + Math.cos(angle) * length;
       const y = cy - Math.sin(angle) * length;
       ctx.save();
-      ctx.strokeStyle = rgba(SERIES[index] || SERIES[1], 0.95);
+      ctx.strokeStyle = rgba(SERIES[series.slot], 0.95);
       ctx.lineWidth = 2 * ratio;
-      if (!index) ctx.setLineDash([5 * ratio, 4 * ratio]);
+      if (!series.slot) ctx.setLineDash([5 * ratio, 4 * ratio]);
       ctx.beginPath();
       ctx.moveTo(cx, cy);
       ctx.lineTo(x, y);
       ctx.stroke();
       ctx.restore();
     });
-    if (data.hueText) text(ctx, data.hueText, 8 * ratio, 12 * ratio, ratio, { color: GLASS.strong, weight: 600 });
+    if (data.hueText) text(ctx, data.hueText, 8 * ratio, 12 * ratio, ratio, { color: GLASS.strong, weight: 600, box: true });
     text(ctx, '75% TARGETS', width - 8 * ratio, 12 * ratio, ratio, { align: 'right' });
   }
 
@@ -351,8 +368,8 @@
     });
     hLine(ctx, area.x, area.y + area.h, area.w, ratio, GLASS.major);
     const binWidth = area.w / 64;
-    data.series.forEach((series, index) => {
-      const rgb = SERIES[index] || SERIES[1];
+    data.series.forEach(series => {
+      const rgb = SERIES[series.slot];
       ctx.beginPath();
       ctx.moveTo(area.x, area.y + area.h);
       series.analysis.histogram.forEach((value, bin) => {
@@ -362,7 +379,7 @@
       });
       ctx.lineTo(area.x + area.w, area.y + area.h);
       ctx.closePath();
-      ctx.fillStyle = rgba(rgb, index ? 0.34 : 0.2);
+      ctx.fillStyle = rgba(rgb, series.slot ? 0.34 : 0.2);
       ctx.fill();
       ctx.strokeStyle = rgba(rgb, 0.9);
       ctx.lineWidth = Math.max(1, ratio);
