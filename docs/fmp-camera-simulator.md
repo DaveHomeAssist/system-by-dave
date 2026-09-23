@@ -115,11 +115,11 @@ The session autosaves to browser storage under `fmpCameraSim.v1` (the `fmp` pref
 through the housevideo.app saved-data transfer). Export/import uses one JSON file:
 
 - `fmp-camera-simulator.project` v1, containing
-- `fmp-camera-simulator.venue` v4 (versioned bowl plus per-property methods/source identifiers and separate mount-orientation/heading evidence),
+- `fmp-camera-simulator.venue` v5 (versioned structures and bowl plus per-property methods/source identifiers and separate mount-orientation/heading evidence),
 - `fmp-camera-simulator.camera` v1 (published figures, operating limits, uncalibrated behaviour), and
-- `fmp-camera-simulator.session` v1 (speeds, pose, presets, performer, exercise settings and results).
+- `fmp-camera-simulator.session` v2 (show package, speeds, pose, presets, performer, exercise settings and results).
 
-Version-1 venue imports migrate to v4 with `reference.geometryRevision: "legacy-v1"`; all existing dimensions, heading, orientation and presets remain unchanged. New profiles use `photo-review-2026-09`. Venue settings offer a before/after preview and explicit Apply/Cancel for the two provisional stage profiles. Applying updates only stage width/depth and mount orientation, retaining camera coordinates and stored presets. Current tilt can clamp to changed mount limits. Versions 1 and 2 keep their numeric settings and copy the former combined mount evidence into the new independent heading record, without inventing photo evidence. Older simulator versions reject newly exported venue v4 files, preventing silent loss of bowl configuration. Version-3 records retain their independent heading evidence.
+Version-1 venue imports migrate to v5 with `reference.geometryRevision: "legacy-v1"`; all existing dimensions, heading, orientation and presets remain unchanged. New profiles use `photo-review-2026-09`. Venue settings offer a before/after preview and explicit Apply/Cancel for the two provisional stage profiles. Applying updates only stage width/depth and mount orientation, retaining camera coordinates and stored presets. Current tilt can clamp to changed mount limits. Versions 1 and 2 keep their numeric settings and copy the former combined mount evidence into the new independent heading record, without inventing photo evidence. Older simulator versions reject newly exported venue v5 files, preventing silent loss of structures and bowl configuration. Version-3 records retain their independent heading evidence.
 
 The overview camera model uses physical scale. Its label identifies the small camera; monitor output never contains the overview model. Support geometry is schematic. Upright operator video does not claim the real camera has E-Flip enabled.
 
@@ -181,12 +181,11 @@ orientation and physical model scale. It does not yet supply surveyed venue geom
 
 Remaining implementation packages, in order:
 
-1. Add configurable structures and the pavilion shell/major obstructions (Phase 2B).
+1. Configurable pavilion structures, obstructions, FOH and physical LED walls are implemented in Phase 2B.
 2. Add terrain records, irregular lawn geometry and the lawn reference view (Phase 2C).
 3. The sectional bowl and pitch inspector are implemented in Phase 2A; their dimensions and
    initial 9.46°/25.02° slopes remain unverified. Per-property evidence is retained throughout.
-4. Add independent flanking displays, optional show wall, feed routing, bounded delay and
-   portable offline media handling. Confirm physical screen inventory before adding lawn screens.
+4. Add feed routing, bounded delay and portable offline media handling to the independent physical displays.
 5. Add measured camera calibration where evidence exists, occlusion-aware exercises and shot feedback.
 6. Finish lighting, materials and crowd detail, then measure performance on physical devices.
 
@@ -196,10 +195,10 @@ actual bowl pitch, lawn contours, display dimensions and pan-zero require field 
 
 ### Evidence editing and published hardware
 
-Venue v4 accepts optional provenance on each dimension, distance basis, mount orientation and
+Venue v5 accepts optional provenance on each dimension, distance basis, mount orientation and
 pan-zero heading: `method` plus up to 16 `sourceIds` of at most 160 characters each. Source notes
 retain the observation/measurement description; source identifiers refer to the operator's
-reference log. Unknown methods, malformed references and missing v3/v4 heading records reject the
+reference log. Unknown methods, malformed references and missing v3/v4/v5 heading records reject the
 whole import before it replaces the active session. Methods never promote evidence status.
 Changing a value in Venue settings resets its evidence to Demo/operator entry and clears source
 identifiers; the previous note remains available for reference. A verified operator can then
@@ -239,4 +238,35 @@ to the upper level; these are provisional architectural assumptions. Section lab
 restricted to overview layer 1. The Side elevation overview preset does not move the PTZ.
 
 This increment adds the bowl only. Pavilion shell, obstructions and lawn terrain follow in
-separate Phase 2B/2C releases. Screens, calibration and later phases are outside Phase 2 scope.
+separate Phase 2B/2C releases. The subsequent operator request adds physical LED walls and FOH to Phase 2B; media routing and calibration remain later work.
+
+
+## Phase 2B: pavilion, fixtures, FOH and LED walls
+
+Venue v5 adds `structures` v1 and session v2 adds `showPackage` v1. Older venue/session
+files receive defaults without changing existing dimensions, pose or presets. Shell parameters
+and fixture enablement, position, size and yaw have independent evidence records. Missing yaw
+in early structure records defaults to a provisional zero. Invalid fields reject atomically by path.
+
+| Element | Evidence | Geometry status |
+| --- | --- | --- |
+| Roof envelope, curved rear bays, primary steel, stage opening and catwalk | P002, P064, P079 silhouettes | Demo dimensions, not surveyed |
+| Ceiling fans, rails and display supports | Photo presence and relationships | Demo position and size |
+| FOH mix platform | Seating plan locates Mix at the front of section 202 behind the box band | Demo footprint and position; seat clearance follows that footprint |
+| Stage Right / Stage Left and D3, D1, D2, D4 lawn walls | House reference inventory, operator inclusion request | Independent Demo width, height, location and rotation |
+| LED pixel space | Operator: 1600 × 900 | Confirmed pixel space; canvas versus native resolution unresolved |
+| LED pitch | Operator correction: sides 10 mm, delays 8 mm | Confirmed; supersedes earlier 7 mm delay reference |
+| Touring PA, legs, truss, backline and optional touring wall | Demo concert package | Replaceable session equipment, not permanent venue geometry |
+
+Pixel space and pitch never imply physical wall dimensions. Rendered colour bars are a demo
+pattern, not an active house feed. Physical widths/heights remain configurable in metres.
+FOH height is clearance above the highest local seating tread; its deck and consoles face the
+stage. Seats leave a clearance around its rotated footprint. Delay supports and rear-floor join
+remain provisional until the terrain increment.
+
+`buildStructures` owns separate shell, house-fixture and show groups. Physical meshes are tagged
+as occluders and batched by material. The roof remains an independent ray target. Shell cutaway
+changes overview layer 2 only: the monitor always sees the physical shell. Fixture labels stay on
+overview layer 1. Clearing or replacing a show package changes neither venue records nor PTZ
+pose, geometry, dimensions or stored presets. Exercise scoring is unchanged; geometric occlusion
+feedback, media inputs, calibration and detailed visual finish are not delivered by this increment.

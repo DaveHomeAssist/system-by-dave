@@ -41,6 +41,7 @@ export function App() {
   const phone = layout === "phone";
   const docked = layout === "ultrawide";
 
+  const [cutaway, setCutaway] = useState(true);
   const [venueShown, setVenueShown] = useState(() => venueDefault(layout));
   const [expanded, setExpanded] = useState(false);
   const [drawer, setDrawer] = useState<{ open: boolean; tab: PanelTab }>({ open: false, tab: "exercises" });
@@ -78,7 +79,7 @@ export function App() {
           onContextRestored: () => store.setRenderStatus("ok"),
           onQualityChange: setQuality,
         });
-        renderer.setGeometry(store.getState().geometry);
+        renderer.setGeometry(store.getState().geometry, store.getState().project.session.showPackage);
         renderer.setTheme(themeRef.current);
         store.setRenderStatus("ok");
       } catch (error) {
@@ -104,8 +105,10 @@ export function App() {
   }, [store, input]);
 
   useEffect(() => {
-    rendererRef.current?.setGeometry(state.geometry);
-  }, [state.geometry]);
+    rendererRef.current?.setGeometry(state.geometry, state.project.session.showPackage);
+  }, [state.geometry, state.project.session.showPackage]);
+
+  useEffect(() => { rendererRef.current?.setCutaway(cutaway); }, [cutaway]);
 
   useEffect(() => {
     rendererRef.current?.setTheme(theme);
@@ -259,6 +262,8 @@ export function App() {
             if (expanded) setExpanded(false);
             setVenueShown((value) => !value);
           }}
+          cutaway={cutaway}
+          onCutaway={() => setCutaway(value => !value)}
           onView={(view: OverviewPreset) => rendererRef.current?.setOverviewView(view, state.geometry)}
         />
         <ControlsPanel store={store} input={input} state={state} />

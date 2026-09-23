@@ -593,7 +593,7 @@ async function closePanel(page) {
     await sources.fill('laser-survey-01, deck-datum');
     await sources.press('Tab');
     const exported = await exportProject(page);
-    assert(exported.venue.version === 4, 'wrong venue version');
+    assert(exported.venue.version === 5, 'wrong venue version');
     assert(exported.venue.mount.status === 'confirmed' && exported.venue.mount.headingEvidence.status === 'demo', 'mount observation settled heading');
     assert(exported.venue.dimensions.cameraHeight.provenance.method === 'field-measurement', 'method not stored');
     assert(exported.venue.dimensions.cameraHeight.provenance.sourceIds.join(',') === 'laser-survey-01,deck-datum', 'references not stored');
@@ -711,6 +711,35 @@ await check('bowl inspector edits rendered treads and pitch together; side view 
   assert(render.monitorHelperCount === 0, 'overview label leaked into monitor');
   assert(render.monitorFrames > 0 && render.overviewFrames > 0, 'missing rendered view');
   await context.close();
+});
+
+await check('shell cutaway preserves monitor obstructions; show package clears independently of FOH and house LEDs', async () => {
+  const { context, page, problems } = await open();
+  try {
+  const before = await sim(page).render(), pose = (await sim(page).snapshot()).pose;
+  assert(before.monitorShellCount > 0 && before.overviewShellCount === 0, 'default physical shell/cutaway mismatch');
+  await page.getByRole('button', {name:'Shell cutaway', exact:true}).click();
+  await page.waitForFunction(() => window.__fmpCameraSim.render().overviewShellCount > 0);
+  const closed = await sim(page).render();
+  assert(closed.monitorShellCount === before.monitorShellCount, 'cutaway changed monitor shell');
+  await page.getByRole('button', {name:'Shell cutaway', exact:true}).click();
+  await showTab(page, 'Venue');
+  const settings = page.getByTestId('structure-settings');
+  await settings.getByLabel('Fixture', {exact:true}).selectOption('Stage Right LED');
+  assert(await settings.getByLabel('LED pitch', {exact:true}).inputValue() === '10.0', 'side pitch');
+  await settings.getByLabel('Fixture', {exact:true}).selectOption('D1 lawn delay');
+  assert(await settings.getByLabel('LED pitch', {exact:true}).inputValue() === '8.0', 'delay pitch');
+  assert(await settings.getByLabel('Pixel space width', {exact:true}).inputValue() === '1600', 'pixel space');
+  await settings.getByRole('button', {name:'Clear show package'}).click();
+  await page.waitForFunction(() => window.__fmpCameraSim.render().showMeshCount === 0);
+  await settings.getByLabel('Fixture', {exact:true}).selectOption('Front of House');
+  assert(await settings.getByLabel('Fixture enabled').isChecked(), 'FOH lost on show clear');
+  assert(JSON.stringify((await sim(page).snapshot()).pose) === JSON.stringify(pose), 'equipment change moved PTZ');
+  assert((await sim(page).render()).monitorHelperCount === 0, 'fixture labels leaked into monitor');
+  await settings.getByRole('button', {name:'Load demo concert'}).click();
+  await page.waitForFunction(() => window.__fmpCameraSim.render().showMeshCount > 0);
+  assert(problems.length === 0, problems.join(' | '));
+  } finally { await context.close(); }
 });
 
 // ------------------------------------------------------------------------------------------

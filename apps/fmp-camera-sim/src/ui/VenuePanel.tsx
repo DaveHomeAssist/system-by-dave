@@ -9,6 +9,8 @@ interface Props {
   canvasRef: RefObject<HTMLCanvasElement | null>;
   shown: boolean;
   quality: number;
+  cutaway: boolean;
+  onCutaway(): void;
   onToggle(): void;
   onView(view: OverviewPreset): void;
 }
@@ -20,7 +22,7 @@ const VIEWS: Array<{ view: OverviewPreset; label: string }> = [
   { view: "behind", label: "Behind camera" },
 ];
 
-export function VenuePanel({ state, canvasRef, shown, quality, onToggle, onView }: Props) {
+export function VenuePanel({ state, canvasRef, shown, quality, cutaway, onCutaway, onToggle, onView }: Props) {
   return (
     <section className="panel venue-panel" aria-labelledby="venue-title" data-shown={shown}>
       <div className="panel-head">
@@ -31,6 +33,7 @@ export function VenuePanel({ state, canvasRef, shown, quality, onToggle, onView 
           </span>
         )}
         <div className="panel-tools">
+          {shown && <button {...keepFocus} type="button" className="tool-button" aria-pressed={cutaway} onClick={onCutaway}>Shell cutaway</button>}
           {shown &&
             VIEWS.map(({ view, label }) => (
               <button key={view} {...keepFocus} type="button" className="tool-button" onClick={() => onView(view)}>
@@ -60,7 +63,7 @@ export function VenuePanel({ state, canvasRef, shown, quality, onToggle, onView 
             <span className="swatch swatch-cam" aria-hidden="true" /> P240, physical scale
           </li>
           <li>
-            <span className="swatch swatch-schematic" aria-hidden="true" /> Bowl, house and backline are schematic
+            <span className="swatch swatch-schematic" aria-hidden="true" /> Venue and show geometry are provisional
           </li>
         </ul>
         {state.renderStatus !== "ok" && state.renderStatus !== "starting" && <GraphicsFallback status={state.renderStatus} note={state.renderNote} />}

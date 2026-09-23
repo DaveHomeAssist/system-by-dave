@@ -1,3 +1,5 @@
+import { type ShowPackage, defaultShowPackage } from "../domain/structures";
+import { SHELL_LAYER, setShellCutaway } from "./structureBuilder";
 import {
   type Mesh,
   ACESFilmicToneMapping,
@@ -39,6 +41,9 @@ type Triple = [number, number, number];
 export interface RenderDiagnostics {
   bowlMaxTreadY?: number;
   monitorHelperCount?: number;
+  monitorShellCount?: number;
+  overviewShellCount?: number;
+  showMeshCount?: number;
   frames: number;
   monitorFrames: number;
   overviewFrames: number;
@@ -146,6 +151,7 @@ export class SceneRenderer {
     }
     this.applyClearColors();
     this.monitorCamera.layers.set(0);
+    this.monitorCamera.layers.enable(SHELL_LAYER);
     this.overviewCamera.layers.enable(OVERVIEW_LAYER);
 
     // A dim house and a lit stage. Intensities are physical units (Lambert divides by pi).
@@ -218,7 +224,9 @@ export class SceneRenderer {
   }
 
   /** Rebuilds the static venue when its dimensions change. */
-  setGeometry(geometry: VenueGeometry): void {
+  setCutaway(cutaway: boolean): void { setShellCutaway(this.overviewCamera, cutaway); }
+
+  setGeometry(geometry: VenueGeometry, show: ShowPackage = defaultShowPackage()): void {
     const key = JSON.stringify([
       geometry.stageWidth,
       geometry.stageDepth,
@@ -228,6 +236,8 @@ export class SceneRenderer {
       geometry.mountOrientation,
       geometry.marks.length,
       geometry.bowl,
+      geometry.structures,
+      show,
     ]);
     if (key === this.venueKey) return;
     const first = this.venue === null;
@@ -235,7 +245,7 @@ export class SceneRenderer {
       this.scene.remove(this.venue.root);
       this.venue.dispose();
     }
-    this.venue = buildVenue(geometry);
+    this.venue = buildVenue(geometry, show);
     this.venueKey = key;
     this.scene.add(this.venue.root);
     if (first) this.setOverviewView("house", geometry);
@@ -393,6 +403,9 @@ export class SceneRenderer {
     for (const helper of [this.p240.root, this.cone.root]) helper.traverseVisible(child => { if (child.layers.test(this.monitorCamera.layers)) monitorHelperCount++; });
     this.diagnostics = {
       bowlMaxTreadY, monitorHelperCount,
+      monitorShellCount: this.layerMeshCount("venue-shell", this.monitorCamera),
+      overviewShellCount: this.layerMeshCount("venue-shell", this.overviewCamera),
+      showMeshCount: this.layerMeshCount("show-package", this.monitorCamera),
       frames: this.frameCount,
       monitorFrames: this.monitorFrames,
       overviewFrames: this.overviewFrames,
@@ -406,6 +419,14 @@ export class SceneRenderer {
       coneApex: [apex.x, apex.y, apex.z],
     };
     return this.diagnostics;
+  }
+
+  private layerMeshCount(name: string, camera: PerspectiveCamera): number {
+    let count = 0;
+    this.venue?.root.getObjectByName(name)?.traverseVisible(child => {
+      if ((child as Mesh).isMesh && child.layers.test(camera.layers)) count++;
+    });
+    return count;
   }
 
   get qualityLevel(): number {
