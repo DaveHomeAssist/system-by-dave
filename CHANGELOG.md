@@ -4,7 +4,7 @@
 
 - Moved the cabinet-aware LED wall planner to its own `led-wall-calculator.html` route on AV by Dave. Kept existing cabinet profiles and calculator values in their original browser storage keys.
 - Kept the six quick calculations on `av-calculator.html`, added direct jumps and an LED planner link, and preserved the LED-to-Power Load handoff across pages. Power-factor input remains required for current estimates.
-- Added visible light/dark controls, shared calculator CSS and JavaScript, offline assets, route registration, sitemap generation, and focused browser regression coverage for both pages.
+- Added visible light/dark controls, shared calculator CSS and JavaScript, offline assets, route registration, sitemap generation, Stage 3D offline-cache pin alignment, and focused browser regression coverage for both pages.
 
 ## 2026-09-23 — Camera practice moved to Shader
 
