@@ -72,6 +72,6 @@ pixels for page overflow and unreachable clipped controls.
 
 The current doorway behavior above remains the shipped contract.
 [Revised AV Suite: consolidation specification](av-suite-consolidation-spec.md)
-defines the proposed five-workspace destination, the full 44-tool disposition,
+defines the proposed seven-workspace destination with Video in primary navigation, the full 44-tool disposition,
 and the migration gates. It is a target specification, not a claim that those
 workspaces are already live.
