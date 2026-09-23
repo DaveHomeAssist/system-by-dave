@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-09-23 — Alternative AV landing background
+
+- Added a static, cool-blue drafting field and wide signal rings behind the alternative landing in both themes. Kept the content and console preview on solid surfaces for legibility, and refreshed the offline cache version.
+
 ## 2026-09-23 — FMP per-property venue evidence
 
 - Added evidence methods and source identifiers for venue dimensions, distance basis, mount orientation and pan-zero heading. Photo-confirmed orientation no longer implies a verified heading.
