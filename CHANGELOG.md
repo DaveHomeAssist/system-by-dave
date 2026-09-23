@@ -4,6 +4,7 @@
 
 - Moved the live cabinet preview ahead of settings, enlarged its isometric depth, and kept the planner within the browser viewport. Settings and detailed results scroll within their panels; the compact mobile navigation remains visible.
 - Refreshed the AV offline cache so the new layout reaches existing installs without changing calculator values or saved profiles.
+- Kept the page layout bootstrap in the navigation response so an existing service worker client gets the viewport layout on reload even when its shared CSS and JavaScript are still cached.
 
 ## 2026-09-23 — Show-first AV landing promoted to home
 
