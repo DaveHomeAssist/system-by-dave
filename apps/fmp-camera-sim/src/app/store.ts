@@ -1,3 +1,4 @@
+import { type ShowPackage } from "../domain/structures";
 import { type CameraProfile, isCameraCalibrated, type LensState, lensState, parseCameraProfile, defaultCameraProfile, SPEED_LEVEL_MAX, SPEED_LEVEL_MIN } from "../domain/camera";
 import { defaultProject, type Project, parseProjectText, serializeProject } from "../domain/project";
 import {
@@ -472,6 +473,15 @@ export class SimulatorStore {
     if (!parsed.ok) return { ok: false, issues: parsed.issues };
     this.project = { ...this.project, camera: parsed.camera };
     this.sim.configure(parsed.camera, this.geometry.mountOrientation);
+    this.scheduleSave();
+    this.emit();
+    return { ok: true };
+  }
+
+  updateShowPackage(showPackage: ShowPackage): UpdateResult {
+    const parsed = parseSession({ ...this.project.session, showPackage });
+    if (!parsed.ok) return { ok: false, issues: parsed.issues };
+    this.project = { ...this.project, session: { ...this.project.session, showPackage: parsed.session.showPackage } };
     this.scheduleSave();
     this.emit();
     return { ok: true };

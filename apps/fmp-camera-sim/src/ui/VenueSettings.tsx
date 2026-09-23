@@ -1,3 +1,4 @@
+import { StructureSettings } from "./StructureSettings";
 import { BowlInspector } from "./BowlInspector";
 import { ProvenanceFields } from "./ProvenanceFields";
 import { useState } from "react";
@@ -262,6 +263,8 @@ export function VenueSettings({ store, state }: Props) {
         <NoteField label="Source note" value={venue.mount.headingEvidence.note}
           onCommit={(note) => apply((draft) => { draft.mount.headingEvidence.note = note; })} />
       </fieldset>
+
+      <StructureSettings store={store} state={state} />
 
       <BowlInspector bowl={venue.bowl} geometry={g} onChange={bowl => apply(draft => { draft.bowl = bowl; })} />
 

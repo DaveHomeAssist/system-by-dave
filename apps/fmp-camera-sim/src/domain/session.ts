@@ -1,3 +1,4 @@
+import { type ShowPackage, defaultShowPackage, parseShowPackage } from "./structures";
 import { SPEED_LEVEL_MAX, SPEED_LEVEL_MIN } from "./camera";
 import { type LengthUnit } from "./units";
 import { type MarkId } from "./venue";
@@ -13,7 +14,7 @@ import {
 } from "./validate";
 
 export const SESSION_SCHEMA = "fmp-camera-simulator.session";
-export const SESSION_VERSION = 1;
+export const SESSION_VERSION = 2;
 
 export const PRESET_SLOTS = 9;
 export const MAX_EXERCISE_RESULTS = 60;
@@ -104,6 +105,7 @@ export interface Session {
   speeds: SpeedLevels;
   pose: { pan: number; tilt: number; lens: number };
   presets: Preset[];
+  showPackage: ShowPackage;
   performer: PerformerConfig;
   exerciseSettings: ExerciseSettings;
   exerciseResults: ExerciseResult[];
@@ -140,6 +142,7 @@ export function defaultSession(venueId: string, cameraId: string): Session {
     speeds: { pan: 4, tilt: 4, zoom: 4, preset: 4 },
     pose: { pan: 0, tilt: 0, lens: 0 },
     presets: [],
+    showPackage: defaultShowPackage(),
     performer: { mode: "mark", markId: "CS", pathId: "tour", walkSpeed: 1.2, height: 1.75, pauseS: 2 },
     exerciseSettings: defaultExerciseSettings(),
     exerciseResults: [],
@@ -241,7 +244,7 @@ export function parseSession(
   const root = readObject(issues, value, path);
   if (!root) return { ok: false, issues: issues.issues };
   if (root.schema !== SESSION_SCHEMA) issues.add(`${path}.schema`, `Expected "${SESSION_SCHEMA}".`);
-  if (root.version !== SESSION_VERSION) {
+  if (root.version !== 1 && root.version !== SESSION_VERSION) {
     issues.add(
       `${path}.version`,
       typeof root.version === "number"
@@ -249,6 +252,7 @@ export function parseSession(
         : "Missing session version.",
     );
   }
+  const showPackage = parseShowPackage(root.showPackage, issues, `${path}.showPackage`);
   const venueId = readString(issues, root.venueId, `${path}.venueId`, { maxLength: 80, allowEmpty: false });
   const cameraId = readString(issues, root.cameraId, `${path}.cameraId`, { maxLength: 80, allowEmpty: false });
 
@@ -353,6 +357,7 @@ export function parseSession(
       speeds: speeds as SpeedLevels,
       pose: { pan: pose.pan, tilt: pose.tilt, lens: pose.lens },
       presets: presets.sort((a, b) => a.slot - b.slot),
+      showPackage,
       performer: performer as PerformerConfig,
       exerciseSettings,
       exerciseResults,

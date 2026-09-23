@@ -6,6 +6,11 @@
 - Required an explicitly entered manufacturer power factor before the LED planner shows current or circuit estimates in either phase mode. Previously stored assumed factors are cleared; watts remain visible, and balanced three-phase voltage is identified as line-to-line.
 - Marked the processor port count as a generic minimum and the default cabinet watts and port capacity as sample planning values. Moved results ahead of the long input stack on mobile, added section jumps, and rolled the AV offline cache.
 - Expanded the LED browser probe for numeric drafts, PF migration and reload, single- and three-phase estimates, mobile result order, and section navigation.
+## 2026-09-23 — FMP pavilion, FOH and LED walls
+
+- Added evidence-tagged shell, house fixtures and independently replaceable touring equipment; overview cutaway preserves physical monitor obstructions.
+- Added the FOH mix platform with seat clearance, six house LED walls and a separate touring wall. Operator pixel space (1600 × 900), 10 mm side pitch and corrected 8 mm delay pitch remain separate from provisional physical dimensions.
+- Added venue v5/session v2 migration and validation without changing saved camera dimensions, pose or presets. Roof, facade, fixture positions and sizes remain unmeasured.
 
 ## 2026-09-23 — FMP hub keeps in-page anchors and survives a missing filter control
 

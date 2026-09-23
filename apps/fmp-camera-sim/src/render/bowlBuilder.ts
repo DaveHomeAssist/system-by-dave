@@ -1,9 +1,10 @@
 import { BoxGeometry, BufferGeometry, Color, Float32BufferAttribute, CylinderGeometry, DoubleSide, FrontSide, Group, InstancedMesh, Mesh, MeshLambertMaterial, Object3D, PlaneGeometry, RingGeometry } from "three";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { type BowlRecord, solveBowl, elevationAt } from "../domain/bowl";
+import { fixtureContains, type SceneFixture } from "../domain/structures";
 import { makeLabel } from "./labels";
 
-export function buildBowl(record: BowlRecord, pitDepth: number, deckHeight: number, labels = true) {
+export function buildBowl(record: BowlRecord, pitDepth: number, deckHeight: number, labels = true, fixtures: SceneFixture[] = []) {
   const solved = solveBowl(record, pitDepth, deckHeight);
   const root = new Group(); root.name = "seating-bowl";
   const geometries: BufferGeometry[] = [];
@@ -35,7 +36,8 @@ export function buildBowl(record: BowlRecord, pitDepth: number, deckHeight: numb
     const count = Math.max(1, Math.floor(length / row.seatPitch));
     for (let i = 0; i < count; i++) {
       const angle = (row.fromDeg + (i + 0.5) / count * (row.toDeg - row.fromDeg)) * Math.PI / 180;
-      placements.push({ sectorId: row.sectorId, x: r * Math.sin(angle), y: row.y, z: -focus + r * Math.cos(angle), angle });
+      const x = r * Math.sin(angle), z = -focus + r * Math.cos(angle);
+      if (!fixtures.some(f => f.enabled.value && f.kind === "foh" && fixtureContains(f, -x, -z, 0.6))) placements.push({ sectorId: row.sectorId, x, y: row.y, z, angle });
     }
   }
   const addMerged = (parts: BufferGeometry[], name: string) => { const mesh = new Mesh(geometry(mergeGeometries(parts)), concrete); mesh.name = name; root.add(mesh); parts.forEach(g => g.dispose()); };
