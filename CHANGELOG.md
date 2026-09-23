@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-09-23 — FMP Camera Simulator v1
+
+- Added `/camera-sim/` on housevideo.app (noindex): a virtual BirdDog P240 at the FMP catwalk position with a live 16:9 monitor, an orbiting venue view with the camera's viewing cone, and SuperJoy-style joystick, zoom, speed, Home and preset controls for keyboard, mouse and touch.
+- The PTZ simulation runs on a fixed 240 Hz step independent of rendering: response curve, deadband, acceleration and stopping time, zoom-adaptive speed, published P240 travel limits, eased preset recall that manual input interrupts, and stops on release, focus loss, cancelled touch or a hidden page.
+- Venue geometry is editable and evidence-tagged: 110 ft estimated camera distance (horizontal or line of sight), 75 ft inferred stage depth, 61 ft stage width from a scale reading of Live Nation's Stage & Pit plan, and demo camera height, offset and mount. The Approximate venue and Uncalibrated camera flags stay visible until measurements replace them.
+- Added three guided exercises (wide shot, follow a performer, save and recall), versioned JSON export/import with field-level validation, browser autosave with an export fallback, and a standalone offline HTML build.
+- Source is `apps/fmp-camera-sim/`; `npm run build:camera-sim` regenerates `camera-sim/`. Unit tests, a Playwright acceptance probe and a pull-request workflow cover the release gates in `docs/fmp-camera-simulator.md`.
+
 ## 2026-09-23 — Camera practice moved to Shader
 
 - Moved the simulated camera-shading exercises, scopes, state engine, offline cache, and release gates to the existing Camera Control & Shading reference at `housevideo.app/shader/`.

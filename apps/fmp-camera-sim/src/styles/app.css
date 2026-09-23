@@ -203,8 +203,8 @@ textarea {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  min-height: 36px;
-  padding: 4px 12px;
+  min-height: 44px;
+  padding: 4px 14px;
   border-radius: 999px;
   border: 1px solid var(--line);
   background: var(--surface-2);
@@ -409,7 +409,6 @@ button:disabled {
 }
 
 .panel-tools .tool-button {
-  min-height: 36px;
   padding: 4px 10px;
   font-size: 13px;
 }

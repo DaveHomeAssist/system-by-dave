@@ -55,6 +55,8 @@ handoffs.
   navigation, show context, and cross-tool handoff behavior
 - `apps/av-workbook/`: React/TypeScript source for AV Workbook
 - `av-workbook/`: generated AV Workbook Pages artifact
+- `apps/fmp-camera-sim/`: React/TypeScript/Three.js source for the FMP Camera
+  Simulator; `camera-sim/` is its generated artifact (published on housevideo.app)
 - `ProjectorThrow/`: Throwline planner and Stage 3D companion
 - `depotops/`, `pixelforge/`, `noteforge/`: product-specific public surfaces;
   NoteForge is a managed release artifact synchronized from its own repository
@@ -95,6 +97,9 @@ changes require compatibility and migration coverage.
 ### Built and managed products
 
 AV Workbook is edited in `apps/av-workbook/` and built into `av-workbook/`.
+The FMP Camera Simulator is edited in `apps/fmp-camera-sim/` and built into
+`camera-sim/` (plus its standalone offline HTML) with `npm run build:camera-sim`;
+it sits beside `/shader/` rather than in the managed `fmp/` export.
 NoteForge is built in its own repository and synchronized through
 `scripts/sync_noteforge_release.js`; do not hand-edit its managed artifact.
 Throwline's catalog is synchronized and verified through its dedicated scripts.
@@ -132,6 +137,7 @@ Throwline's catalog is synchronized and verified through its dedicated scripts.
 - Public navigation behavior: `docs/public-shell-contract.md`
 - Public naming and metadata: `docs/public-content-contract.md`
 - Cue Sheet media and native NDI boundary: `docs/cue-sheet-media-io.md`
+- FMP Camera Simulator architecture, evidence and gates: `docs/fmp-camera-simulator.md`
 - AV inventory and storage keys: `js/sbd-registry.js`
 - Sitemap membership: `scripts/gen_sitemap.py`
 - AV Suite doorway and storage: `docs/av-suite-doorway.md`

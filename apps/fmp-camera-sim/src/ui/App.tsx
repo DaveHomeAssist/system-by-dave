@@ -128,10 +128,16 @@ export function App() {
   // Read-only diagnostics for browser verification (?diagnostics=1).
   useEffect(() => {
     if (!new URLSearchParams(window.location.search).has("diagnostics")) return undefined;
+    // Readings advance the simulation to "now" first, exactly as the next frame would, so a slow
+    // renderer cannot make a probe read a state up to one frame old.
+    const current = () => {
+      store.advanceTo(Math.max(nowSeconds(), store.wall));
+      return store.getTelemetry();
+    };
     const api = {
-      snapshot: () => store.getTelemetry().snapshot,
+      snapshot: () => current().snapshot,
       frame: () => {
-        const { frame } = store.getTelemetry();
+        const { frame } = current();
         return { forward: frame.forward, position: frame.position, hfovDeg: frame.hfovDeg };
       },
       render: () => rendererRef.current?.getDiagnostics() ?? null,

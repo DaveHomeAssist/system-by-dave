@@ -77,6 +77,22 @@ npm run verify:domain-sites
 `docs/domain-sites.md` covers the page lists, saved-data transfer, and the
 cutover checklist.
 
+### FMP Camera Simulator
+
+The catwalk PTZ trainer at `housevideo.app/camera-sim/` is edited in
+`apps/fmp-camera-sim/` and built into the committed `camera-sim/` folder,
+including its standalone offline HTML. Rebuild and check it with:
+
+```bash
+npm run typecheck:camera-sim
+npm run test:camera-sim
+npm run build:camera-sim
+npm run test:camera-sim-browser
+```
+
+CI fails if `camera-sim/` does not match a fresh build. See
+`docs/fmp-camera-simulator.md`.
+
 ### NoteForge canonical release
 
 NoteForge is built in its own repository and committed here as the canonical

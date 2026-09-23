@@ -14,6 +14,7 @@
     "build:camera-sim": "vite build --config apps/fmp-camera-sim/vite.config.ts && node scripts/build_camera_sim_offline.mjs",
     "dev:camera-sim": "vite --config apps/fmp-camera-sim/vite.config.ts",
     "test:camera-sim": "vitest run --config apps/fmp-camera-sim/vitest.config.ts",
+    "test:camera-sim-browser": "node scripts/probe_camera_sim.mjs",
     "typecheck:camera-sim": "tsc -p apps/fmp-camera-sim/tsconfig.json --noEmit",
     "verify:av": "node scripts/verify_av_suite.js && node scripts/verify_av_themes.js",
     "verify:av-themes": "node scripts/verify_av_themes.js",
