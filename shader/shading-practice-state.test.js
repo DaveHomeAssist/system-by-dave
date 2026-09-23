@@ -450,7 +450,7 @@ test('guided demonstrations sweep one control with before and after pictures', (
 
 test('instructor sequences capture, bound, remove, and replay exact states', () => {
   let state = Practice.createPracticeState({ scenarioId: 'neutralize-cast', seed: 'instructor-01' });
-  state = Practice.applyIntent(state, { type: 'demo-capture', label: 'Start‮', note: 'Warm cast', title: 'White balance lesson' });
+  state = Practice.applyIntent(state, { type: 'demo-capture', label: 'Start\u202e', note: 'Warm cast', title: 'White balance lesson' });
   assert.equal(state.demo.title, 'White balance lesson');
   assert.equal(state.demo.steps[0].label, 'Start');
   for (let index = 0; index < 30; index += 1) {
@@ -478,7 +478,7 @@ test('imports stay bounded, reject prototype keys, and strip unsafe text', () =>
     view: { compare: 'constructor', wipe: 'Infinity', scopeLayout: '__proto__', freeze: { cameraId: 'camera-z' } },
     checks: Array.from({ length: 50 }, (_, index) => ({ n: index + 1, controls: {} })),
     demo: { title: '<img src=x onerror=alert(1)>\u0007', steps: Array.from({ length: 40 }, () => ({ label: 'x'.repeat(200), note: 'n'.repeat(900), scope: 'bogus' })), index: 999 },
-    lastAction: 'Loaded\u0000‮'
+    lastAction: 'Loaded\u0000\u202e'
   });
   assert.equal(hostile.scenarioId, 'match-cameras');
   assert.equal(hostile.seed.length, 80);

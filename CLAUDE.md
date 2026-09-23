@@ -132,6 +132,7 @@ Throwline's catalog is synchronized and verified through its dedicated scripts.
 - Public navigation behavior: `docs/public-shell-contract.md`
 - Public naming and metadata: `docs/public-content-contract.md`
 - Cue Sheet media and native NDI boundary: `docs/cue-sheet-media-io.md`
+- Camera Shading Practice console and its state contract: `docs/shader-practice.md`
 - AV inventory and storage keys: `js/sbd-registry.js`
 - Sitemap membership: `scripts/gen_sitemap.py`
 - AV Suite doorway and storage: `docs/av-suite-doorway.md`

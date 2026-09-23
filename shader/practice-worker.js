@@ -1,18 +1,25 @@
 'use strict';
 
-const VERSION = 'v20260923-shader-practice-console';
+// Offline cache for Camera Shading Practice. Every listed file is fetched from
+// the network first and saved, so an online visit always gets one consistent
+// release; the saved copies serve the page when the network is unavailable.
+const VERSION = 'v20260923-shader-practice-console-2';
 const CACHE_PREFIX = 'sbd-shader-practice-';
 const CACHE_NAME = CACHE_PREFIX + VERSION;
 const ASSETS = [
   './practice.html',
   './practice.css',
   './practice-theme.js',
+  './shading-practice-state.js',
   './practice-render.js',
   './practice-app.js',
-  './shading-practice-state.js',
-  './index.html'
+  './index.html',
+  '../css/fonts.css',
+  '../css/style.css',
+  '../css/sbd-public-nav.css'
 ];
 const URLS = ASSETS.map(asset => new URL(asset, self.registration.scope).href);
+const NETWORK_TIMEOUT = 4000;
 
 function canonical(value) {
   const url = new URL(value);
@@ -39,23 +46,43 @@ self.addEventListener('message', event => {
   }
 });
 
+function fromNetwork(request, cache, key) {
+  return fetch(request).then(response => {
+    if (response.ok) cache.put(key, response.clone()).catch(() => {});
+    return response;
+  });
+}
+
 self.addEventListener('fetch', event => {
   if (event.request.method !== 'GET' || new URL(event.request.url).origin !== self.location.origin) return;
   const key = canonical(event.request.url);
   if (!URLS.includes(key)) return;
-  event.respondWith(caches.open(CACHE_NAME).then(async cache => {
-    if (event.request.mode === 'navigate') {
+  const opened = caches.open(CACHE_NAME);
+  const network = opened.then(cache => fromNetwork(event.request, cache, key));
+  // Keep the worker alive until the saved copy is refreshed.
+  event.waitUntil(network.then(() => undefined, () => undefined));
+  event.respondWith((async () => {
+    const cache = await opened;
+    const cached = await cache.match(key);
+    if (!cached) {
       try {
-        const response = await fetch(event.request);
-        if (response.ok) await cache.put(key, response.clone());
-        return response;
+        return await network;
       } catch {
-        return (await cache.match(key)) || cache.match(new URL('./practice.html', self.registration.scope).href);
+        if (event.request.mode === 'navigate') {
+          const page = await cache.match(new URL('./practice.html', self.registration.scope).href);
+          if (page) return page;
+        }
+        return Response.error();
       }
     }
-    return (await cache.match(key)) || fetch(event.request).then(response => {
-      if (response.ok) cache.put(key, response.clone()).catch(() => {});
-      return response;
-    });
-  }));
+    // A slow network or a server error falls back to the saved copy; a good
+    // response still refreshes it. Redirects and removals pass through.
+    const timeout = new Promise(resolve => setTimeout(() => resolve(null), NETWORK_TIMEOUT));
+    try {
+      const response = await Promise.race([network, timeout]);
+      return response && response.status < 500 ? response : cached;
+    } catch {
+      return cached;
+    }
+  })());
 });

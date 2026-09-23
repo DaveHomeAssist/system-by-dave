@@ -10,6 +10,9 @@
   // score and coaching line is a pure function of this state: nothing here
   // reads, measures or controls real equipment.
 
+  // Release identifier shared by the engine, renderer, page and offline worker;
+  // the page reloads once if an older cached copy of any of them was served.
+  const BUILD = 'v20260923-shader-practice-console-2';
   const SCHEMA = 'shader.camera-practice.v1';
   const LEGACY_SCHEMA = 'throwline.camera-practice.v1';
   const SCHEMA_VERSION = 1;
@@ -229,7 +232,7 @@
   const cameraKey = cameraId => cameraId === 'camera-a' ? 'a' : 'b';
   // Imported text is display-only plain text: control and bidi-override
   // characters are removed and length is bounded.
-  const UNSAFE_TEXT = /[\u0000-\u0008\u000b-\u001f\u007f‪-‮⁦-⁩]/g;
+  const UNSAFE_TEXT = /[\u0000-\u0008\u000b-\u001f\u007f\u202a-\u202e\u2066-\u2069]/g;
   function cleanText(value, max, fallback = '') {
     const text = String(value == null ? '' : value).replace(UNSAFE_TEXT, ' ').replace(/\s+/g, ' ').trim().slice(0, max).trim();
     return text || fallback;
@@ -761,7 +764,7 @@
   // Analyses are pure functions of seed, camera and resolution, so identical
   // requests share one read-only result. Callers must not mutate it.
   const analysisCache = new Map();
-  const ANALYSIS_CACHE_LIMIT = 48;
+  const ANALYSIS_CACHE_LIMIT = 32;
   function analyzeCamera(input, cameraId, options = {}) {
     const state = normalizeState(input);
     const camera = getCamera(state, cameraId);
@@ -778,6 +781,24 @@
     analysisCache.set(key, result);
     if (analysisCache.size > ANALYSIS_CACHE_LIMIT) analysisCache.delete(analysisCache.keys().next().value);
     return result;
+  }
+
+  // Picture-only frames at display resolution, cached like analyses. Scopes
+  // and scores use analyzeCamera, so every trace matches the scored values.
+  const frameCache = new Map();
+  const FRAME_CACHE_LIMIT = 12;
+  function pictureFrame(input, cameraId, options = {}) {
+    const state = normalizeState(input);
+    const camera = getCamera(state, cameraId);
+    const width = Math.round(clamp(options.width || 64, 16, 160));
+    const height = Math.round(clamp(options.height || 36, 9, 90));
+    const key = [state.seed, camera.id, width, height, JSON.stringify(camera.controls), JSON.stringify(camera.source)].join('\u0000');
+    const cached = frameCache.get(key);
+    if (cached) return cached;
+    const frame = generateFrame(state, camera.id, { width, height });
+    frameCache.set(key, frame);
+    if (frameCache.size > FRAME_CACHE_LIMIT) frameCache.delete(frameCache.keys().next().value);
+    return frame;
   }
 
   function difference(a, b) {
@@ -1312,11 +1333,11 @@
   }
 
   return Object.freeze({
-    SCHEMA, LEGACY_SCHEMA, SCHEMA_VERSION, CAMERA_IDS: [...CAMERA_IDS], SCOPES: [...SCOPES], COMPARE_MODES: [...COMPARE_MODES],
+    BUILD, SCHEMA, LEGACY_SCHEMA, SCHEMA_VERSION, CAMERA_IDS: [...CAMERA_IDS], SCOPES: [...SCOPES], COMPARE_MODES: [...COMPARE_MODES],
     SCOPE_LAYOUTS: [...SCOPE_LAYOUTS], LIMITS, PASS_RULE, CONTROL_LIMITS, DEFAULT_CONTROLS, CONTROL_LABELS, CONTROL_INFO,
     OBJECTIVE_CONTROLS, SCENARIOS, TROUBLESHOOTING, DEMO_SWEEPS, WORKFLOW,
     createPracticeState, normalizeState, normalizeControls, getCamera, applyIntent, injectTrouble, revertInjection,
-    generateFrame, analyzeCamera, evaluatePractice, exportPracticeJSON, importPracticeJSON, scenarioList, troubleshootingList,
+    generateFrame, pictureFrame, analyzeCamera, evaluatePractice, exportPracticeJSON, importPracticeJSON, scenarioList, troubleshootingList,
     hashSeed, seededUnit, lumaOf, formatControl, controlsPair, withControls, startControls, bandFor, progressBands,
     exerciseStatus, nextCorrection, debriefPractice, signalAlerts, workflowSteps, comparisonSources, demoStepModified
   });

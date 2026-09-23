@@ -30,9 +30,9 @@
     "verify:portfolio-schemas": "node scripts/verify_portfolio_schemas.js",
     "verify:public-navigation": "node scripts/verify_public_navigation.js",
     "verify:public-consistency": "node scripts/verify_public_consistency.js",
-    "test:shader-practice": "node --test shader/shading-practice-state.test.js",
+    "test:shader-practice": "node --test shader/shading-practice-state.test.js scripts/shader_practice_worker.test.js",
     "probe:shader-practice": "node scripts/probe_shader_practice.js",
-    "verify:shader-practice": "node --test shader/shading-practice-state.test.js && node scripts/verify_shader_practice.js",
+    "verify:shader-practice": "node --test shader/shading-practice-state.test.js scripts/shader_practice_worker.test.js && node scripts/verify_shader_practice.js",
     "test:shader-practice-browser": "node scripts/probe_shader_practice.js --no-sandbox"
   },
   "devDependencies": {
