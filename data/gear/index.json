@@ -2,7 +2,7 @@
   "schema": "system-by-dave.gear-reference-index.v1",
   "displayName": "Gear Reference",
   "status": "Beta",
-  "updated": "2026-08-12",
+  "updated": "2026-09-22",
   "entries": [
     {
       "id": "epson-powerlite-x39",
@@ -25,6 +25,90 @@
         "XGA",
         "3,500 lm",
         "ELPLP96"
+      ]
+    },
+    {
+      "id": "blackmagic-ursa-broadcast-g2",
+      "displayName": "Blackmagic URSA Broadcast G2",
+      "aka": [
+        "URSA Broadcast G2",
+        "URSA G2",
+        "Blackmagic URSA Broadcast"
+      ],
+      "brand": "Blackmagic Design",
+      "category": "Video",
+      "subcategory": "Cameras",
+      "status": "active",
+      "sheetStatus": "authored",
+      "updated": "2026-09-22",
+      "file": "data/gear/blackmagic-ursa-broadcast-g2.json",
+      "tags": [
+        "B4",
+        "4K",
+        "fiber",
+        "FMP"
+      ]
+    },
+    {
+      "id": "fujinon-4k-broadcast-zoom",
+      "displayName": "Fujinon 4K Broadcast Zooms",
+      "aka": [
+        "Fujinon 16x",
+        "Fujinon 22x",
+        "Fujinon B4 4K"
+      ],
+      "brand": "Fujifilm",
+      "category": "Video",
+      "subcategory": "Lenses",
+      "status": "active",
+      "sheetStatus": "authored",
+      "updated": "2026-09-22",
+      "file": "data/gear/fujinon-4k-broadcast-zoom.json",
+      "tags": [
+        "B4",
+        "16x",
+        "22x",
+        "FMP"
+      ]
+    },
+    {
+      "id": "blackmagic-camera-fiber-converter",
+      "displayName": "Blackmagic Camera Fiber Converter",
+      "aka": [
+        "Camera-end fiber converter",
+        "URSA fiber converter"
+      ],
+      "brand": "Blackmagic Design",
+      "category": "Video",
+      "subcategory": "Fiber",
+      "status": "active",
+      "sheetStatus": "authored",
+      "updated": "2026-09-22",
+      "file": "data/gear/blackmagic-camera-fiber-converter.json",
+      "tags": [
+        "SMPTE",
+        "fiber",
+        "FMP"
+      ]
+    },
+    {
+      "id": "blackmagic-studio-fiber-converter",
+      "displayName": "Blackmagic Studio Fiber Converter",
+      "aka": [
+        "Rack fiber converter",
+        "Studio Fiber Converter"
+      ],
+      "brand": "Blackmagic Design",
+      "category": "Video",
+      "subcategory": "Fiber",
+      "status": "active",
+      "sheetStatus": "authored",
+      "updated": "2026-09-22",
+      "file": "data/gear/blackmagic-studio-fiber-converter.json",
+      "tags": [
+        "SMPTE",
+        "rack",
+        "FMP"
       ]
     }
   ]

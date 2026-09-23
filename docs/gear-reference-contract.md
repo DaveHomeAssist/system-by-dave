@@ -19,6 +19,11 @@ out which values it would accept.
 
 Unlike the FMP equipment catalogs, these are **not** managed artifacts. They are
 authored in this repository and may be edited here directly.
+The library currently contains the Epson X39 sheet and four FMP camera-chain
+sheets: URSA Broadcast G2, Fujinon 4K zooms, camera fiber converter, and studio
+fiber converter. All five JSON files are part of the AV Suite offline manifest.
+The FMP sheets distinguish house observations from manufacturer specifications;
+an unread serial, lens plate, or converter plate remains an open field check.
 
 ## Accuracy vocabulary
 

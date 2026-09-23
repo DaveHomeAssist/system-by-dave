@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-09-22 — FMP Night Profile and Gear Reference bridge
+
+- Added FMP Show Console deep links to the managed hub, build guide, gear page,
+  and camera startup fallbacks. Links fill venue, phase, and optional position
+  context without copying or submitting camera records.
+- Added four authored FMP camera, lens, and fiber field sheets to Gear Reference,
+  its offline asset list, and the AV by Dave domain publication. The Epson sheet
+  remains in the library. Stage 3D's offline readiness pin follows the new AV
+  cache version.
+- Reconciled the URSA G2 sheet with the current FMP house record: the G2 stamp is
+  confirmed, while individual serial numbers remain unread.
+- Kept all four camera check choices within the workspace at 720×450 by
+  compacting the short-screen header in the managed FMP source.
+
 ## 2026-09-22 — Throwline confidence values are now gate-enforced
 
 - `confidence` was a required field on 42 catalog rows whose value nothing

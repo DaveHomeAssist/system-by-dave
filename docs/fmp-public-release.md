@@ -30,6 +30,10 @@ access control.
 - `/fmp/gear/`, `/fmp/build/`, `/fmp/ptz/`: camera equipment, camera build and
   strike, and catwalk PTZ references translated from Notion records. Dated
   evidence stays visible; roles replace names; no network addresses.
+- The FMP hub, build guide, gear page, and camera startup shells open AV by
+  Dave's Show Console with venue, phase, and optional operator context only.
+  The gear page also links to four authored Gear Reference sheets. These links
+  do not transfer camera drafts or submit operational records.
 - `/fmp-index/`: retired. It redirects to `/fmp/`, keeping query and hash.
 
 No public FMP page links a Notion page. Crews and tour engineers have no Notion

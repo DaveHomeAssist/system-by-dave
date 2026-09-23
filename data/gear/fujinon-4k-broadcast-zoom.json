@@ -1,0 +1,156 @@
+{
+  "schema": "system-by-dave.gear-reference-entry.v1",
+  "id": "fujinon-4k-broadcast-zoom",
+  "displayName": "Fujinon 4K Broadcast Zooms",
+  "aka": [
+    "Fujinon 16x",
+    "Fujinon 22x",
+    "Fujinon B4 4K"
+  ],
+  "brand": "Fujifilm",
+  "category": "Video",
+  "subcategory": "Lenses",
+  "status": "active",
+  "updated": "2026-09-22",
+  "summary": "FMP house zoom set on B4: two 16× on pit bodies and one 22× at FOH. Only one barrel has been fully read — keep SKUs soft until plates are photographed.",
+  "tags": [
+    "B4",
+    "16x",
+    "22x",
+    "FMP"
+  ],
+  "sections": [
+    {
+      "id": "id",
+      "title": "Identification",
+      "type": "specTable",
+      "lede": "House lens set as recorded September 2026.",
+      "rows": [
+        [
+          "Pit",
+          "2 × 16×"
+        ],
+        [
+          "FOH",
+          "1 × 22×"
+        ],
+        [
+          "Mount",
+          "B4"
+        ],
+        [
+          "Plate reads",
+          "One barrel photographed; body assignment not recorded"
+        ]
+      ],
+      "sourceRefs": [
+        "hv-fmp-gear"
+      ]
+    },
+    {
+      "id": "procedure",
+      "title": "Focus through zoom",
+      "type": "procedure",
+      "lede": "Critical focus workflow for broadcast zooms.",
+      "steps": [
+        "Focus wide. Set critical focus at the wide end.",
+        "Zoom in. Confirm focus holds at the long end.",
+        "Re-check after ND/iris. ND or iris changes can move the plane — verify again.",
+        "Back focus. Use the house back-focus guide before doors."
+      ],
+      "sourceRefs": [
+        "hv-fmp-gear"
+      ]
+    },
+    {
+      "id": "intake",
+      "title": "Intake checklist",
+      "type": "checklist",
+      "items": [
+        {
+          "title": "Photograph remaining plates",
+          "detail": "Second 16× and the 22×."
+        },
+        {
+          "title": "Tag barrel to position",
+          "detail": "Record which body wore each lens."
+        },
+        {
+          "title": "B4 lock",
+          "detail": "Mount seated and locked."
+        },
+        {
+          "title": "Extender state",
+          "detail": "Know whether extender is in or out."
+        }
+      ],
+      "sourceRefs": [
+        "hv-fmp-gear"
+      ]
+    },
+    {
+      "id": "notes",
+      "title": "House links",
+      "type": "cards",
+      "cards": [
+        {
+          "label": "FMP house notes",
+          "text": "https://housevideo.app/fmp/gear/#lens"
+        },
+        {
+          "label": "Lens barrel 3D",
+          "text": "https://housevideo.app/fmp/rig/?equipment=rig&part=lens-barrel"
+        },
+        {
+          "label": "Back focus",
+          "text": "https://housevideo.app/backfocus/"
+        }
+      ],
+      "sourceRefs": [
+        "hv-fmp-gear"
+      ]
+    },
+    {
+      "id": "accuracy",
+      "title": "Accuracy log",
+      "type": "accuracyLog",
+      "sourceRefs": ["hv-fmp-gear"],
+      "entries": [
+        {
+          "item": "Exact Fujinon SKUs",
+          "status": "unverified",
+          "detail": "House notes identify 16×/22× classes; full plate reads still open.",
+          "sourceRefs": [
+            "hv-fmp-gear"
+          ]
+        }
+      ]
+    }
+  ],
+  "accuracy": [
+    {
+      "item": "Exact SKUs",
+      "status": "unverified",
+      "detail": "Awaiting plate photography.",
+      "sourceRefs": [
+        "hv-fmp-gear"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "hv-fmp-gear",
+      "label": "housevideo.app · FMP Camera equipment",
+      "url": "https://housevideo.app/fmp/gear/",
+      "kind": "house-record",
+      "accessed": "2026-09-22"
+    },
+    {
+      "id": "fujifilm-4k-portable",
+      "label": "Fujifilm 4K portable lens family",
+      "url": "https://www.fujifilm.com/us/en/business/cine-and-broadcast/portable-lens/4k-portable-lens",
+      "kind": "manufacturer",
+      "accessed": "2026-09-22"
+    }
+  ]
+}

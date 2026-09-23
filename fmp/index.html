@@ -24,7 +24,7 @@
   <link rel="stylesheet" href="/css/fonts.css">
   <link rel="stylesheet" href="/css/av-theme.css">
   <link rel="stylesheet" href="chrome.css?v=232f9d3427adec52">
-  <link rel="stylesheet" href="public.css?v=b10277cd6a77d9f2">
+  <link rel="stylesheet" href="public.css?v=aca2a0cc10a822a1">
   <script src="theme.js?v=34276e275d44d438"></script>
   <script src="public.js?v=5ec85cac457d89ff" defer></script>
 </head>
@@ -51,6 +51,16 @@
           <a href="camera/pit-stage-left/"><span class="position-code">SL</span><span><strong>Pit · Stage Left</strong><small>Stage left is the performer’s left</small><span class="card-action">Open camera workflow <span aria-hidden="true">→</span></span></span></a>
           <a href="camera/catwalk/"><span class="position-code">PTZ</span><span><strong>Catwalk</strong><small>PTZ · spotlight area, elevated over the audience</small><span class="card-action">Open camera workflow <span aria-hidden="true">→</span></span></span></a>
         </div>
+        <aside class="night-profile" aria-label="FMP Night Profile">
+          <div><strong>FMP Night Profile</strong><p>Open Show Console with the venue and load-in phase filled. Confirm tonight’s show and assignment before working.</p></div>
+          <div class="night-profile-links">
+            <a href="https://avbydave.com/av-suite.html?entry=show&amp;sbdVenue=Freedom%20Mortgage%20Pavilion&amp;sbdPhase=loadin" rel="noopener noreferrer">Open Show Console</a>
+            <a href="https://avbydave.com/av-suite.html?entry=show&amp;sbdVenue=Freedom%20Mortgage%20Pavilion&amp;sbdOperator=PC&amp;sbdPhase=loadin" rel="noopener noreferrer">Pit Center</a>
+            <a href="https://avbydave.com/av-suite.html?entry=show&amp;sbdVenue=Freedom%20Mortgage%20Pavilion&amp;sbdOperator=FOH&amp;sbdPhase=loadin" rel="noopener noreferrer">FOH</a>
+            <a href="https://avbydave.com/av-suite.html?entry=show&amp;sbdVenue=Freedom%20Mortgage%20Pavilion&amp;sbdOperator=SL&amp;sbdPhase=loadin" rel="noopener noreferrer">Stage Left</a>
+            <a href="https://avbydave.com/av-suite.html?entry=show&amp;sbdVenue=Freedom%20Mortgage%20Pavilion&amp;sbdOperator=PTZ&amp;sbdPhase=loadin" rel="noopener noreferrer">Catwalk</a>
+          </div>
+        </aside>
         <p class="panel-note">Location context only. Mounts, access and exact sightlines require venue verification.</p>
         <aside class="commissioning-note"><strong>Protected records · commissioning open</strong><p>Use synthetic <b>SETUP TEST</b> observations until signed-in saves and attachments are verified.</p><a href="#setup">Access and commissioning details <span aria-hidden="true">→</span></a></aside>
       </div><aside class="task-list" aria-labelledby="task-title"><div class="list-heading"><p class="eyebrow">At the position</p><h3 id="task-title">Get to the next step.</h3></div>
@@ -65,7 +75,7 @@
     <section id="learn" class="portal-panel" hidden aria-labelledby="reference-title" tabindex="0">
       <div class="section-intro"><p class="eyebrow">Written field references</p><h2 id="reference-title">Find the answer, then verify it.</h2><p>Search by task or equipment. Each reference keeps source evidence and open field checks visible.</p></div>
       <div class="reference-tools"><label class="search-label" for="reference-search">Search references<input id="reference-search" type="search" autocomplete="off" placeholder="Try comms, back focus, PTZ…" aria-controls="reference-list"></label><label for="reference-category">Focus<select id="reference-category" aria-controls="reference-list"><option value="all">All references</option><option value="operate">Operating a show</option><option value="equipment">Equipment &amp; setup</option><option value="fault">Faults &amp; recovery</option></select></label><button id="reference-clear" type="button">Clear filters</button></div>
-      <p class="result-count" id="reference-count" role="status" aria-live="polite" aria-atomic="true">8 references</p>
+      <p class="result-count" id="reference-count" role="status" aria-live="polite" aria-atomic="true">10 references</p>
       <div class="reference-links" id="reference-list">
         <a href="guide/" data-category="operate fault" data-search="caller director camera meeting song flow failure recovery"><span class="reference-code">CALL</span><span><strong>Bowl camera guide</strong><small>House and tour modes, camera meeting, song flow, directing and failure recovery</small></span><span aria-hidden="true">→</span></a>
         <a href="build/" data-category="operate equipment fault" data-search="setup mount fiber headset comms tally return strike safe ready"><span class="reference-code">OPS</span><span><strong>Camera build &amp; strike</strong><small>Assignment, safe build, signal path, Clear-Com comms, show-ready gate and strike</small></span><span aria-hidden="true">→</span></a>
@@ -75,6 +85,8 @@
         <a href="/switcher/" data-category="operate equipment" data-search="atem hd8 iso recording program preview aux routing audio"><span class="reference-code">ATEM</span><span><strong>Switcher field reference</strong><small>HD8 ISO outputs, routing, recording limits and source evidence</small></span><span aria-hidden="true">→</span></a>
         <a href="/shader/" data-category="operate equipment" data-search="ccu4 camera control panel shading nd iris white balance"><span class="reference-code">CCU</span><span><strong>Shader field reference</strong><small>Four control channels, camera selection and the G2 ND wheel</small></span><span aria-hidden="true">→</span></a>
         <a href="house/#sources" data-category="equipment" data-search="bowl display inventory rack source evidence venue"><span class="reference-code">HOUSE</span><span><strong>House evidence &amp; sources</strong><small>Display inventory, rack records, manufacturer documents and unresolved counts</small></span><span aria-hidden="true">→</span></a>
+        <a href="https://avbydave.com/av-suite.html?entry=show&amp;sbdVenue=Freedom%20Mortgage%20Pavilion&amp;sbdPhase=loadin" rel="noopener noreferrer" data-category="operate" data-search="show console fmp night profile load in phase"><span class="reference-code">SHOW</span><span><strong>Show Console · FMP Night Profile</strong><small>Venue and load-in phase filled on AV by Dave</small></span><span aria-hidden="true">→</span></a>
+        <a href="https://avbydave.com/gear-reference.html?gear=blackmagic-ursa-broadcast-g2" rel="noopener noreferrer" data-category="equipment" data-search="gear reference ursa broadcast g2 field sheet"><span class="reference-code">SHEET</span><span><strong>Gear Reference · URSA G2</strong><small>Authored field sheet on AV by Dave</small></span><span aria-hidden="true">→</span></a>
       </div>
       <div class="empty-state" id="reference-empty" hidden><h3>No matching references</h3><p>Try another equipment name or choose All references.</p><button id="reference-reset" type="button">Show all references</button></div>
       <p class="panel-note">References do not certify tonight’s assignment, installed model, access or framing. Verify against the physical rig and the current show plan.</p>

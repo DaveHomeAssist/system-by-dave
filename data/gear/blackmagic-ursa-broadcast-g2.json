@@ -1,0 +1,223 @@
+{
+  "schema": "system-by-dave.gear-reference-entry.v1",
+  "id": "blackmagic-ursa-broadcast-g2",
+  "displayName": "Blackmagic URSA Broadcast G2",
+  "aka": [
+    "URSA Broadcast G2",
+    "URSA G2",
+    "Blackmagic URSA Broadcast"
+  ],
+  "brand": "Blackmagic Design",
+  "category": "Video",
+  "subcategory": "Cameras",
+  "status": "active",
+  "updated": "2026-09-22",
+  "summary": "FMP house camera body sheet. Three staffed positions. The G2 stamp is legible on the house bodies; read serial numbers on all three before treating individual units as identified.",
+  "tags": [
+    "B4",
+    "4K",
+    "fiber",
+    "FMP"
+  ],
+  "sections": [
+    {
+      "id": "id",
+      "title": "Identification",
+      "type": "specTable",
+      "lede": "House identity for the three staffed URSA bodies.",
+      "rows": [
+        [
+          "House count",
+          "3 bodies — Pit Center, FOH, Pit Stage Left"
+        ],
+        [
+          "Catwalk",
+          "PTZ (not URSA)"
+        ],
+        [
+          "Mount",
+          "4K B4 (observed installed)"
+        ],
+        [
+          "Model cue",
+          "G2 stamp legible on the house hardware"
+        ],
+        [
+          "Model confidence",
+          "Broadcast G2 confirmed; serial numbers still unread"
+        ]
+      ],
+      "sourceRefs": [
+        "hv-fmp-gear",
+        "bmd-ursa-g2-manual"
+      ]
+    },
+    {
+      "id": "signal",
+      "title": "Signal path",
+      "type": "cards",
+      "cards": [
+        {
+          "label": "Expected fiber chain",
+          "text": "Body → camera-end fiber converter → SMPTE → rack Studio Fiber Converter → switcher."
+        },
+        {
+          "label": "Do not generalize",
+          "text": "A body photographed on single coax does not define the other two. Inspect the body you are building."
+        },
+        {
+          "label": "Camera ID",
+          "text": "Switcher Camera ID must match the physical body and multiview tile. Prove Camera 1 first."
+        }
+      ],
+      "sourceRefs": [
+        "hv-fmp-gear"
+      ]
+    },
+    {
+      "id": "power",
+      "title": "Power",
+      "type": "cards",
+      "cards": [
+        {
+          "label": "Per position",
+          "text": "Record fiber, battery, or mains for the body you are on. Lit rack converters do not prove fiber power at the camera."
+        }
+      ],
+      "sourceRefs": [
+        "hv-fmp-gear"
+      ]
+    },
+    {
+      "id": "procedure",
+      "title": "Pre-show procedure",
+      "type": "procedure",
+      "lede": "Before doors on an FMP URSA position.",
+      "steps": [
+        "Identity photo. Photograph the side-plate model name with Head of Video clearance.",
+        "Serials. Read and record serial numbers on all three bodies.",
+        "Camera ID. Confirm each body’s switcher Camera ID matches its input.",
+        "Power mode. Note fiber / battery / mains per position.",
+        "Back focus. Run the house back-focus guide before the show."
+      ],
+      "sourceRefs": [
+        "hv-fmp-gear"
+      ]
+    },
+    {
+      "id": "intake",
+      "title": "Intake checklist",
+      "type": "checklist",
+      "lede": "Bring-up checks for one URSA body.",
+      "items": [
+        {
+          "title": "Body powers",
+          "detail": "No unexpected warning state."
+        },
+        {
+          "title": "B4 seated",
+          "detail": "Lens locked; extender state known."
+        },
+        {
+          "title": "ND reachable",
+          "detail": "Shader can reach the ND wheel."
+        },
+        {
+          "title": "Path matches plan",
+          "detail": "Fiber or coax matches tonight’s show plan."
+        },
+        {
+          "title": "Return / tally",
+          "detail": "Agreed with TD before rolling."
+        }
+      ],
+      "sourceRefs": [
+        "hv-fmp-gear"
+      ]
+    },
+    {
+      "id": "notes",
+      "title": "House links",
+      "type": "cards",
+      "cards": [
+        {
+          "label": "FMP house notes",
+          "text": "https://housevideo.app/fmp/gear/#g2"
+        },
+        {
+          "label": "Camera rig 3D",
+          "text": "https://housevideo.app/fmp/rig/?equipment=rig&part=body"
+        },
+        {
+          "label": "Back focus practice",
+          "text": "https://housevideo.app/backfocus/"
+        },
+        {
+          "label": "Show Console · FMP load-in",
+          "text": "https://avbydave.com/av-suite.html?entry=show&sbdVenue=Freedom%20Mortgage%20Pavilion&sbdPhase=loadin"
+        }
+      ],
+      "sourceRefs": [
+        "hv-fmp-gear"
+      ]
+    },
+    {
+      "id": "accuracy",
+      "title": "Accuracy log",
+      "type": "accuracyLog",
+      "sourceRefs": ["hv-fmp-gear"],
+      "entries": [
+        {
+          "item": "Broadcast G2 identity",
+          "status": "confirmed",
+          "detail": "The G2 stamp is legible on the house hardware; serial numbers remain unread.",
+          "sourceRefs": [
+            "hv-fmp-gear"
+          ]
+        },
+        {
+          "item": "Three-body staffed count",
+          "status": "confirmed",
+          "detail": "House record states three staffed URSA bodies.",
+          "sourceRefs": [
+            "hv-fmp-gear"
+          ]
+        }
+      ]
+    }
+  ],
+  "accuracy": [
+    {
+      "item": "Broadcast G2 identity",
+      "status": "confirmed",
+      "detail": "The G2 stamp is legible on the house hardware; serial numbers remain unread.",
+      "sourceRefs": [
+        "hv-fmp-gear"
+      ]
+    },
+    {
+      "item": "Body count",
+      "status": "confirmed",
+      "detail": "Three staffed URSA bodies.",
+      "sourceRefs": [
+        "hv-fmp-gear"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "hv-fmp-gear",
+      "label": "housevideo.app · FMP Camera equipment",
+      "url": "https://housevideo.app/fmp/gear/",
+      "kind": "house-record",
+      "accessed": "2026-09-22"
+    },
+    {
+      "id": "bmd-ursa-g2-manual",
+      "label": "Blackmagic URSA Broadcast G2 Manual",
+      "url": "https://documents.blackmagicdesign.com/UserManuals/BlackmagicURSABroadcastG2Manual.pdf",
+      "kind": "manufacturer",
+      "accessed": "2026-09-22"
+    }
+  ]
+}
