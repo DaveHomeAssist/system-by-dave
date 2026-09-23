@@ -10,7 +10,7 @@
   const Render = window.ShaderPracticeRender;
   const THEME_KEY = 'shader.practice.theme.v1';
   const SESSION_KEY = 'shader.practice.session.v1';
-  const OFFLINE_CACHE_VERSION = 'v20260923-shader-practice-console';
+  const OFFLINE_CACHE_VERSION = 'v20260923-shader-practice-console-2';
   const DISPLAY = Object.freeze({ width: 96, height: 54 });
   const HISTORY_LIMIT = 100;
   const BLINK_INTERVAL = 700;
@@ -340,12 +340,22 @@
     return Practice.getCamera(state, state.selectedCameraId);
   }
 
+  // Only the target camera is adjustable (the demonstrated camera during a
+  // demonstration). The reference stays fixed so moving it can never score
+  // an exercise; it can still be selected for inspection.
+  function adjustableCameraId() {
+    return state.demo ? state.demo.cameraId : scenarioOf(state).targetCameraId;
+  }
+  const canAdjustSelected = () => state.selectedCameraId === adjustableCameraId();
+
   function setControl(control, value) {
+    if (!canAdjustSelected()) return;
     const cameraId = state.selectedCameraId;
     intent({ type: 'set-control', cameraId, control, value }, { coalesce: `${cameraId}:${control}`, change: { cameraId, control } });
   }
 
   function stepControl(control, direction, size) {
+    if (!canAdjustSelected()) return;
     const cameraId = state.selectedCameraId;
     intent({ type: 'step-control', cameraId, control, direction, size }, { coalesce: `${cameraId}:${control}`, change: { cameraId, control } });
   }
@@ -426,6 +436,7 @@
       });
     });
     els.controlList.querySelectorAll('.reset-btn').forEach(button => button.addEventListener('click', () => {
+      if (!canAdjustSelected()) return;
       const cameraId = state.selectedCameraId;
       intent({ type: 'reset-control', cameraId, control: button.dataset.reset }, { change: { cameraId, control: button.dataset.reset } });
       announce(state.lastAction);
@@ -643,7 +654,12 @@
       intent({ type: 'revert-injection' });
       announce(state.lastAction);
     });
+    els.lockTargetButton.addEventListener('click', () => {
+      intent({ type: 'select-camera', cameraId: adjustableCameraId() }, { history: false });
+      announce(`${cameraLabel(adjustableCameraId())} selected for control.`);
+    });
     els.resetCameraButton.addEventListener('click', () => {
+      if (!canAdjustSelected()) return;
       intent({ type: 'reset-camera', cameraId: state.selectedCameraId });
       announce(state.lastAction);
     });
@@ -927,13 +943,25 @@
     document.querySelectorAll('[data-camera-switch]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.cameraSwitch === camera.id)));
     els.camDotA.dataset.tally = scenario.referenceCameraId === 'camera-a' ? 'pgm' : 'pvw';
     els.camDotB.dataset.tally = scenario.referenceCameraId === 'camera-b' ? 'pgm' : 'pvw';
-    setText(els.camRoleA, scenario.referenceCameraId === 'camera-a' ? 'REF · SIM PGM' : 'TGT · SIM PVW');
-    setText(els.camRoleB, scenario.referenceCameraId === 'camera-b' ? 'REF · SIM PGM' : 'TGT · SIM PVW');
-    const target = state.demo
-      ? `→ ${cameraShort(camera.id)} · DEMO STEP ${state.demo.index + 1}`
-      : isReference ? `→ ${cameraShort(camera.id)} · REFERENCE ON SIM PGM` : `→ ${cameraShort(camera.id)} · TARGET`;
+    const roleText = id => (id === scenario.referenceCameraId ? 'REF · LOCKED · SIM PGM' : `${state.demo ? 'DEMO' : 'TGT'} · ADJUST · SIM PVW`);
+    setText(els.camRoleA, roleText('camera-a'));
+    setText(els.camRoleB, roleText('camera-b'));
+    const locked = !canAdjustSelected();
+    const adjustable = adjustableCameraId();
+    const target = locked
+      ? `→ ${cameraShort(camera.id)} · INSPECT ONLY`
+      : state.demo ? `→ ${cameraShort(camera.id)} · DEMO STEP ${state.demo.index + 1}` : `→ ${cameraShort(camera.id)} · TARGET`;
     setText(els.controlTarget, target);
-    els.controlTarget.style.color = isReference && !state.demo ? 'var(--state-warn)' : '';
+    setHidden(els.lockNotice, !locked);
+    setHidden(els.controlList, locked);
+    els.resetCameraButton.disabled = locked;
+    if (locked) {
+      setText(els.lockTitle, `${cameraShort(camera.id)} · ${isReference ? 'REFERENCE ON SIM PGM' : 'NOT IN THIS DEMONSTRATION'}`);
+      setText(els.lockText, isReference
+        ? `The exercise scores ${cameraLabel(adjustable)} against this picture, so the reference stays fixed and its settings stay hidden. Match it by picture and scopes.`
+        : `This demonstration steps ${cameraLabel(adjustable)}; other cameras stay fixed.`);
+      setText(els.lockTargetButton, `CONTROL ${cameraShort(adjustable)}`);
+    }
     document.querySelectorAll('[data-step-size]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.stepSize === ui.stepSize)));
     Object.keys(Practice.CONTROL_LIMITS).forEach(name => {
       const value = camera.controls[name];
@@ -1004,7 +1032,7 @@
     setHidden(tallyTag, !tally);
     tallyTag.dataset.tally = tally;
     setText(tallyTag, tally === 'pgm' ? 'SIM PGM' : 'SIM PVW');
-    setHidden(byId(`controlTag${suffix}`), source.cameraId !== state.selectedCameraId || source.frozen || (sources.mode === 'demo' && source.role === 'before'));
+    setHidden(byId(`controlTag${suffix}`), source.cameraId !== state.selectedCameraId || source.cameraId !== adjustableCameraId() || source.frozen || (sources.mode === 'demo' && source.role === 'before'));
     const select = byId(`monitorSelect${suffix}`);
     setHidden(select, ui.blinking || source.frozen);
     select.setAttribute('aria-label', `Control ${cameraLabel(source.cameraId)}`);
@@ -1196,6 +1224,12 @@
   }
 
   function renderNotes(sources) {
+    if (!canAdjustSelected()) {
+      setText(els.controlNotesTitle, 'REFERENCE');
+      setText(els.controlNotesSummary, 'Inspection only.');
+      setText(els.causeEffect, `${cameraLabel(state.selectedCameraId)} stays fixed so scoring cannot move the picture you are matching. Control ${cameraLabel(adjustableCameraId())} to adjust.`);
+      return;
+    }
     const control = ui.activeControl;
     const info = Practice.CONTROL_INFO[control];
     const label = Practice.CONTROL_LABELS[control];

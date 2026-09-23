@@ -30,7 +30,9 @@ const chromeCandidates = [
 const chromeBin = chromeCandidates.find(candidate => fs.existsSync(candidate));
 const failures = [];
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
-const VIEWPORTS = [[320, 568], [390, 844], [820, 900], [1024, 768], [1440, 900], [2560, 1440]];
+// The six reference sizes plus edge cases around the layout breakpoints, a
+// short laptop, and a wide short monitor.
+const VIEWPORTS = [[320, 568], [390, 844], [820, 900], [821, 900], [876, 900], [1024, 768], [1024, 600], [1440, 900], [2560, 1440], [2560, 1080]];
 const STATEMENTS = ['SIMULATION FOR PRACTICE', 'Generated practice signal · not a measurement', 'Nothing here reads or controls real equipment.'];
 
 function check(name, condition, detail = '') {
@@ -196,9 +198,24 @@ function inspectLayout(statements) {
     const large = size >= 24 || (size >= 18.66 && Number(style.fontWeight) >= 700);
     if (ratio < (large ? 3 : 4.5)) lowContrast.push(`${el.id || el.className || el.tagName} ${ratio.toFixed(2)}`);
   });
+  // The scoring action and the first camera control must be on screen (or,
+  // on phones, reachable by scrolling the console) in the Shade view.
+  const onScreen = el => { if (!visible(el)) return false; const rect = el.getBoundingClientRect(); return rect.left >= -1 && rect.right <= innerWidth + 1 && rect.top >= -1 && rect.bottom <= innerHeight + 1; };
+  const reachable = el => {
+    if (!el || el.closest('[hidden]') || getComputedStyle(el).display === 'none') return false;
+    if (onScreen(el)) return true;
+    const scroller = document.querySelector('.workspace');
+    const before = scroller.scrollTop;
+    el.scrollIntoView({ block: 'nearest' });
+    const ok = onScreen(el);
+    scroller.scrollTop = before;
+    return ok;
+  };
   return {
     layout: document.body.dataset.layout,
     view: document.body.dataset.view,
+    scoreReachable: document.getElementById('controlPanel').hidden || reachable(document.getElementById('scoreButton')),
+    controlReachable: document.getElementById('controlPanel').hidden || reachable(document.getElementById('control-iris')),
     overflowX: document.documentElement.scrollWidth > document.documentElement.clientWidth,
     overflowY: document.documentElement.scrollHeight > document.documentElement.clientHeight + 1,
     statements: statements.map(text => ({ text, visible: textVisible(text) })),
@@ -380,6 +397,28 @@ async function mainSession(page, baseUrl) {
     return { frozen: Boolean(frozen), tag, released: ShaderPracticeApp.getState().view.freeze === null };
   });
   check('freezing the reference stores a labelled still and releases on demand', freeze.frozen && /STILL/.test(freeze.tag) && freeze.released, freeze);
+  const lock = await page.eval(() => {
+    const before = JSON.stringify(ShaderPracticeApp.getState().cameras[0].controls);
+    document.querySelector('[data-camera-switch="camera-a"]').click();
+    ShaderPracticeApp.renderNow();
+    const input = document.getElementById('control-iris');
+    input.value = 3;
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    document.querySelector('[data-step="1"][data-control="gain"]').click();
+    document.getElementById('resetCameraButton').click();
+    ShaderPracticeApp.renderNow();
+    const result = {
+      unchanged: JSON.stringify(ShaderPracticeApp.getState().cameras[0].controls) === before,
+      notice: !document.getElementById('lockNotice').hidden && document.getElementById('lockTitle').textContent,
+      listHidden: document.getElementById('controlList').hidden,
+      resetDisabled: document.getElementById('resetCameraButton').disabled
+    };
+    document.getElementById('lockTargetButton').click();
+    ShaderPracticeApp.renderNow();
+    result.back = ShaderPracticeApp.getState().selectedCameraId;
+    return result;
+  });
+  check('the reference camera can be inspected but never adjusted, and one tap returns to the target', lock.unchanged && /REFERENCE ON SIM PGM/.test(lock.notice || '') && lock.listHidden && lock.resetDisabled && lock.back === 'camera-b', lock);
 
   // Scopes: single tabs and the quad layout all draw.
   const scopes = await page.eval(() => {
@@ -531,6 +570,8 @@ async function viewportMatrix(page, baseUrl) {
   check('visible controls keep 44 px touch targets at every size', small.length === 0, small.slice(0, 4).map(item => `${item.width}x${item.height} ${item.view || ''}: ${item.small.join(', ')}`));
   const contrast = results.filter(item => item.lowContrast.length);
   check('visible text meets WCAG contrast in light and dark themes', contrast.length === 0, contrast.slice(0, 4).map(item => `${item.width} ${item.theme} ${item.view || ''}: ${item.lowContrast.join(', ')}`));
+  const unreachable = results.filter(item => (!item.view || item.view === 'shade') && (!item.scoreReachable || !item.controlReachable));
+  check('Score attempt and the camera controls stay reachable at every size', unreachable.length === 0, unreachable.map(item => `${item.width}x${item.height}: score ${item.scoreReachable} control ${item.controlReachable}`));
   const undrawn = results.filter(item => !item.canvasDrawn);
   check('every visible monitor and scope canvas draws a picture', undrawn.length === 0, undrawn.map(item => `${item.width}x${item.height} ${item.theme} ${item.view || ''}`));
 }

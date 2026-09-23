@@ -350,6 +350,11 @@
             <button type="button" class="seg" data-step-size="coarse" aria-pressed="false">COARSE</button>
           </div>
         </div>
+        <div class="lock-notice" id="lockNotice" role="status" hidden>
+          <p class="lock-title"><span class="pill" data-level="IDLE">LOCKED</span> <span id="lockTitle">CAM A · REFERENCE ON SIM PGM</span></p>
+          <p class="hint" id="lockText">The exercise scores Camera B against this picture, so the reference stays fixed and its settings stay hidden. Match it by picture and scopes.</p>
+          <button type="button" class="btn btn-wide" id="lockTargetButton">CONTROL CAM B</button>
+        </div>
         <div class="control-list" id="controlList"></div>
         <div class="score-strip">
           <button type="button" class="btn btn-primary" id="scoreButton">SCORE ATTEMPT</button>

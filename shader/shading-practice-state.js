@@ -12,7 +12,7 @@
 
   // Release identifier shared by the engine, renderer, page and offline worker;
   // the page reloads once if an older cached copy of any of them was served.
-  const BUILD = 'v20260923-shader-practice-console';
+  const BUILD = 'v20260923-shader-practice-console-2';
   const SCHEMA = 'shader.camera-practice.v1';
   const LEGACY_SCHEMA = 'throwline.camera-practice.v1';
   const SCHEMA_VERSION = 1;

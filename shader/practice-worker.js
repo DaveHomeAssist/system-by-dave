@@ -3,7 +3,7 @@
 // Offline cache for Camera Shading Practice. Every listed file is fetched from
 // the network first and saved, so an online visit always gets one consistent
 // release; the saved copies serve the page when the network is unavailable.
-const VERSION = 'v20260923-shader-practice-console';
+const VERSION = 'v20260923-shader-practice-console-2';
 const CACHE_PREFIX = 'sbd-shader-practice-';
 const CACHE_NAME = CACHE_PREFIX + VERSION;
 const ASSETS = [
