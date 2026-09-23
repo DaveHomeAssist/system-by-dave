@@ -764,7 +764,7 @@
   // Analyses are pure functions of seed, camera and resolution, so identical
   // requests share one read-only result. Callers must not mutate it.
   const analysisCache = new Map();
-  const ANALYSIS_CACHE_LIMIT = 48;
+  const ANALYSIS_CACHE_LIMIT = 32;
   function analyzeCamera(input, cameraId, options = {}) {
     const state = normalizeState(input);
     const camera = getCamera(state, cameraId);

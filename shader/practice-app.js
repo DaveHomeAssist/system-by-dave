@@ -712,10 +712,15 @@
     if (ui.layout === 'compact') ui.view = 'score';
     applyVisibility();
     clearTimeout(ui.debriefTimer);
+    // Let the button state paint before the heavier debrief runs.
     ui.debriefTimer = setTimeout(() => {
-      computeDebrief();
-      els.scoreButton.disabled = false;
-      renderNow();
+      ui.debriefTimer = null;
+      try {
+        computeDebrief();
+      } finally {
+        els.scoreButton.disabled = false;
+        renderNow();
+      }
       if (ui.layout === 'compact') els.scoreHeading.focus();
       announce(`Check ${check.n} scored ${evaluation.score} of 100. ${ui.debrief && ui.debrief.next ? ui.debrief.next.message : ''}`);
     }, 30);

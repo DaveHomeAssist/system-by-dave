@@ -326,6 +326,14 @@ async function mainSession(page, baseUrl) {
   await page.settle();
   const debrief = await page.eval(() => ({ tab: ShaderPracticeApp.ui().sideTab, number: document.getElementById('scoreNumber').textContent, band: document.getElementById('scoreBand').textContent, next: document.getElementById('nextCorrection').textContent, changes: document.getElementById('changeList').children.length, visible: !document.getElementById('scoreContent').hidden }));
   check('scoring opens the debrief with the score, status word, and change review', debrief.visible && debrief.tab === 'score' && Number(debrief.number) >= 95 && debrief.band === 'OK' && debrief.changes >= 1, debrief);
+  const reimport = await page.eval(async () => {
+    const other = ShaderPracticeState.applyIntent(ShaderPracticeState.createPracticeState({ scenarioId: 'set-black-level', seed: 'reimport' }), { type: 'score-check' });
+    ShaderPracticeApp.importJSON(ShaderPracticeState.exportPracticeJSON(other));
+    await new Promise(resolve => setTimeout(resolve, 500));
+    ShaderPracticeApp.renderNow();
+    return { next: document.getElementById('nextCorrection').textContent, number: document.getElementById('scoreNumber').textContent };
+  });
+  check('the debrief recomputes after importing a session that carries its own checks', /Pedestal/.test(reimport.next) && !/Working out/.test(reimport.next) && Number(reimport.number) < 50, reimport);
 
   // Coaching on a fresh exercise names a direction and never a value.
   await page.open(`${baseUrl}shader/practice.html?scenario=set-black-level&seed=browser-proof`);
