@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-09-23 — AV consolidation Stage 0 transfer safety
+
+- Added AV Workbook's IndexedDB database to the confirmed domain transfer policy, alongside its existing registry-declared active and fallback keys. Versioned the transfer decision so older completed or skipped moves can offer the newly inventoried data.
+- Added synthetic browser coverage for workbook fields, source retention, backup recovery, repeat imports, and a newer destination edit. Recorded the current 45-tool registry baseline and remaining Stage 0 gates without retiring routes.
+
 ## 2026-09-23 — LED wall viewport workspace
 
 - Moved the live cabinet preview ahead of settings, enlarged its isometric depth, and kept the planner within the browser viewport. Settings and detailed results scroll within their panels; the compact mobile navigation remains visible.

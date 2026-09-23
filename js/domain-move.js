@@ -17,6 +17,7 @@
   var target = site.origin + location.pathname + location.search + location.hash;
   var FLAG = 'sbd.domainMove.' + siteId + '.v1';
   var policy = { site: siteId, keys: site.keys, prefixes: site.prefixes, indexedDB: site.indexedDB };
+  var revision = site.revision || 1;
 
   function go(){ location.replace(target); }
 
@@ -25,7 +26,7 @@
   }
 
   function writeFlag(state, detail){
-    try{ localStorage.setItem(FLAG, JSON.stringify({ state: state, at: new Date().toISOString(), detail: detail || null })); }catch(e){
+    try{ localStorage.setItem(FLAG, JSON.stringify({ state: state, revision: revision, at: new Date().toISOString(), detail: detail || null })); }catch(e){
       // Without storage the choice cannot be remembered; the stub asks again next time.
     }
   }
@@ -136,7 +137,8 @@
     moveButton.focus();
   }
 
-  if(readFlag()){
+  var previous = readFlag();
+  if(previous && (previous.revision || 1) >= revision){
     go();
     return;
   }

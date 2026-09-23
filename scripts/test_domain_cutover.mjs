@@ -123,6 +123,50 @@ try {
     await page.getByRole('button', { name: 'Move my data and continue' }).waitFor();
   }
 
+  const workbookFixture = {
+    schema: 'system-by-dave.av-workbook.v1', workbookId: 'wb-cutover-audio', savedAt: '2026-09-23T08:00:00.000Z',
+    show: { showId: 'show-cutover-audio', showName: 'Synthetic Audio Check', targetDate: '2026-10-01', venue: 'Test Room', globalStatus: 'issue', masterTimecodeFormat: '29.97_NDF' },
+    operators: [], rooms: [], hardware: [],
+    signalSources: [{ id: 'src-lectern', label: 'Lectern mic', sourceType: 'mic', status: 'issue' }],
+    patchRecords: [{ id: 'patch-lectern', signalSourceId: 'src-lectern', console: 'QL5', channel: '2', stagebox: 'A2', target: 'FOH Ch 2', status: 'issue' }],
+    lineChecks: [{ id: 'check-lectern', patchRecordId: 'patch-lectern', result: 'issue', notes: 'No signal at stagebox' }],
+    videoRoutes: [], powerCircuits: [], rfChannels: [], gearManifest: [], tasks: [], auditEvents: []
+  };
+
+  async function seedWorkbook(page) {
+    await page.goto(source + '/index.html');
+    await page.evaluate(workbook => new Promise((resolve, reject) => {
+      const request = indexedDB.open('system-by-dave-av-workbook', 1);
+      request.onupgradeneeded = () => {
+        const store = request.result.createObjectStore('workbooks', { keyPath: 'workbookId' });
+        for (const name of ['savedAt', 'show.showName', 'show.targetDate']) store.createIndex(name, name);
+      };
+      request.onerror = () => reject(request.error);
+      request.onsuccess = () => {
+        const db = request.result;
+        const tx = db.transaction('workbooks', 'readwrite');
+        tx.objectStore('workbooks').put(workbook);
+        tx.oncomplete = () => { db.close(); localStorage.setItem('system-by-dave.av-workbook.active.v1', workbook.workbookId); resolve(); };
+        tx.onerror = () => reject(tx.error);
+      };
+    }), workbookFixture);
+  }
+
+  async function readWorkbook(page) {
+    return page.evaluate(() => new Promise((resolve, reject) => {
+      const request = indexedDB.open('system-by-dave-av-workbook');
+      request.onerror = () => reject(request.error);
+      request.onsuccess = () => {
+        const db = request.result;
+        const tx = db.transaction('workbooks', 'readonly');
+        const read = tx.objectStore('workbooks').get('wb-cutover-audio');
+        read.onsuccess = () => resolve({ active: localStorage.getItem('system-by-dave.av-workbook.active.v1'), workbook: read.result });
+        read.onerror = () => reject(read.error);
+        tx.oncomplete = () => db.close();
+      };
+    }));
+  }
+
   async function move(page, context) {
     const popupReady = context.waitForEvent('page');
     await page.getByRole('button', { name: 'Move my data and continue' }).click();
@@ -290,6 +334,57 @@ try {
       await page.waitForURL(site.origin + site.route + '?cutover=acceptance#preserved');
     });
   }
+
+  for (const priorState of ['moved', 'skipped']) {
+    await test(`AV Workbook IndexedDB transfer after an older ${priorState} decision`, async (page, context) => {
+      const site = sites.find(entry => entry.id === 'avbydave');
+      await seedWorkbook(page);
+      await page.evaluate(state => localStorage.setItem('sbd.domainMove.avbydave.v1', JSON.stringify({ state, at: '2026-09-18T00:00:00.000Z' })), priorState);
+      await page.goto(source + site.route + '?cutover=workbook');
+      await page.getByRole('button', { name: 'Move my data and continue' }).waitFor();
+      await move(page, context);
+      await page.waitForURL(site.origin + site.route + '?cutover=workbook');
+      assert.deepEqual(await readWorkbook(page), { active: workbookFixture.workbookId, workbook: workbookFixture });
+      const original = await context.newPage();
+      await original.goto(source + '/index.html');
+      assert.deepEqual(await readWorkbook(original), { active: workbookFixture.workbookId, workbook: workbookFixture });
+      assert.equal(await original.evaluate(() => JSON.parse(localStorage.getItem('sbd.domainMove.avbydave.v1')).revision), 2);
+    });
+  }
+
+  await test('AV Workbook backup restores data and keeps newer destination edits', async page => {
+    const site = sites.find(entry => entry.id === 'avbydave');
+    await seedWorkbook(page);
+    await page.goto(source + site.route + '?cutover=workbook-backup');
+    const downloaded = page.waitForEvent('download');
+    await page.getByRole('button', { name: 'Download a backup' }).click();
+    const file = await (await downloaded).path();
+    await page.goto(site.origin + '/transfer.html');
+    await page.locator('#backupFile').setInputFiles(file);
+    await page.getByRole('heading', { name: 'Transfer complete', exact: true }).waitFor();
+    assert.deepEqual(await readWorkbook(page), { active: workbookFixture.workbookId, workbook: workbookFixture });
+    await page.evaluate(() => new Promise((resolve, reject) => {
+      const request = indexedDB.open('system-by-dave-av-workbook');
+      request.onerror = () => reject(request.error);
+      request.onsuccess = () => {
+        const db = request.result;
+        const tx = db.transaction('workbooks', 'readwrite');
+        const read = tx.objectStore('workbooks').get('wb-cutover-audio');
+        read.onsuccess = () => {
+          const edited = { ...read.result, savedAt: '2026-09-23T09:00:00.000Z', lineChecks: [{ ...read.result.lineChecks[0], notes: 'Destination edit' }] };
+          tx.objectStore('workbooks').put(edited);
+        };
+        tx.oncomplete = () => { db.close(); resolve(); };
+        tx.onerror = () => reject(tx.error);
+      };
+    }));
+    await page.locator('#backupFile').setInputFiles([]);
+    await page.locator('#backupFile').setInputFiles(file);
+    await page.locator('#transferStatus').filter({ hasText: 'Moved 0 items' }).waitFor();
+    const saved = await readWorkbook(page);
+    assert.equal(saved.workbook.lineChecks[0].notes, 'Destination edit');
+    assert.equal(saved.workbook.savedAt, '2026-09-23T09:00:00.000Z');
+  });
 
   for (const mismatch of [false, true]) {
     await test(`walk transfer rejects ${mismatch ? 'forged payload source' : 'unconfigured opener origin'}`, async (page, context) => {

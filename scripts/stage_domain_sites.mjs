@@ -136,6 +136,8 @@ function checkOffline(site, registry, files) {
 }
 
 function storagePolicy(site, registry) {
+  const revision = site.storage.revision ?? 1;
+  if (!Number.isSafeInteger(revision) || revision < 1) throw new Error(`${site.id} storage revision must be a positive integer.`);
   const keys = new Set(site.storage.keys || []);
   if (site.storage.registryKeys) {
     for (const tool of registry.tools) for (const item of tool.storageKeys || []) keys.add(item.key);
@@ -143,7 +145,8 @@ function storagePolicy(site, registry) {
   return {
     keys: [...keys].sort(),
     prefixes: [...(site.storage.prefixes || [])].sort(),
-    indexedDB: [...(site.storage.indexedDB || [])].sort()
+    indexedDB: [...(site.storage.indexedDB || [])].sort(),
+    revision
   };
 }
 
