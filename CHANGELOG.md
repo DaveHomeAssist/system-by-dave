@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-09-23 — AV Suite spec navigation correction
+
+- Made Video a visible primary workspace covering camera, switching, signal flow, playback, displays, projection, streaming, and recording; separated Audio and Infrastructure as named workspaces.
+- Moved Video ahead of the other consolidation builds in the proposed release sequence. No live navigation changed.
+
 ## 2026-09-23 — Revised AV Suite specification
 
 - Defined five primary workspaces and mapped all 44 current AV tools to one target home.

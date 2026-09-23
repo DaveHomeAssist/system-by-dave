@@ -12,7 +12,7 @@ The first change in this direction is live: four Gear Reference sheets display t
 
 ### Goals
 
-1. Replace a directory of thin, overlapping tools with five useful primary workspaces: **Show Operations**, **Systems**, **Logistics**, **Equipment Reference**, and **Live Control**.
+1. Replace a directory of thin, overlapping tools with seven useful primary workspaces: **Show Operations**, **Video**, **Audio**, **Logistics**, **Equipment Reference**, **Infrastructure**, and **Live Control**. Video is a named, immediately visible destination, not a tab inside a generic systems area.
 2. Keep specialized editors and planners available in context without making them top-level competitors for the same job.
 3. Let a person start with an equipment question or calculation without creating a show or selecting a venue.
 4. Reuse FMP models, component notes, photographs, and source evidence inside the general reference, with clear FMP labeling where a fact is house-specific.
@@ -30,6 +30,7 @@ The first change in this direction is live: four Gear Reference sheets display t
 
 - **Equipment question:** An operator searches for the URSA G2, opens its sheet, selects a camera-body component in the model, reads the cited evidence, then returns to the procedure. No show or FMP profile is required. House-specific observations are labeled as such.
 - **Audio build:** An A1 enters an input once, assigns its patch, marks a failed line check with a problem note, and exports a usable channel view. The same source identity remains visible through each step.
+- **Video build:** A video operator opens Video directly, follows a camera or playback source through signal flow and patching to a switcher, screen, stream, or recorder, checks format and backup paths, and reaches the related equipment model from the same task. Camera, switching, display/projection, streaming, and recording remain findable within Video.
 - **Truck handoff:** A technician finds a case, sees its test and pack state, places it in a truck zone, confirms its load-in destination, then accounts for it during strike. Missing or blocked gear remains visible.
 - **Live show:** A show operator reaches the next cue, clock, and script from one entrance while the full-screen Cue Sheet, Timer, and Prompter controls remain dependable and directly reachable.
 
@@ -50,16 +51,18 @@ The first change in this direction is live: four Gear Reference sheets display t
 
 The stable `av-suite.html` doorway continues to offer **Show Console** and **Toolbox**. A show context is optional. Toolbox is the entrance for equipment lookup, calculations, and specialist tools without show data; the neutral first-visit choice and saved entry preference remain as documented in the current doorway contract. The Show Console presents the current phase, open issues, and workspace entry points for show-attached work. It must not imply that launching a tool or following a venue link has merged records.
 
-Primary navigation contains five workspaces. On desktop, the selected workspace has a bounded main area, local task tabs, and an optional detail or evidence inspector. On mobile, the five destinations remain visible in a compact rail; local tabs scroll within the active workspace. A capability search finds tasks such as “check a line,” “find converter source,” or “pack a case,” not just page names. A result opens the relevant workspace and task view directly.
+Primary navigation contains seven plainly named workspaces, with **Video** visible without opening a generic category or search. On desktop, the selected workspace has a bounded main area, local task tabs, and an optional detail or evidence inspector. On mobile, primary destinations remain visible as labeled controls in a wrapped grid or compact list, without a hidden-only menu; local tabs scroll within the active workspace. A capability search finds tasks such as “trace a camera,” “check a line,” “find converter source,” or “pack a case,” not just page names. A result opens the relevant workspace and task view directly.
 
 Each task view must have a shareable URL, with Back and Forward restoring the selected workspace and task. URL state may select a view or offer show context, but may not silently save or replace user data. The exact new route names belong to the implementation stage; existing public routes remain valid throughout migration.
 
 | Primary workspace | Job completed there | Local views |
 | --- | --- | --- |
 | **Show Operations** | Prepare and run a show, rooms, crew, issues, and handoff | Advance, Rooms, Crew, Tasks, Closeout |
-| **Systems** | Design and verify signal and technical systems | Audio, Video, Infrastructure; each with plan, patch, test, issue views as needed |
+| **Video** | Plan, connect, test, and operate the complete video chain | Cameras, Playback, Switching & Routes, Displays & Projection, Stream & Record, Issues |
+| **Audio** | Carry sources through patching, line check, PA, wireless, and comms | Inputs, Patch, Line Check, Speakers, RF & Comms |
 | **Logistics** | Track gear and cases from prep through strike | Prep, Pack, Load In, Cable, Strike |
 | **Equipment Reference** | Identify, inspect, and troubleshoot a device | Search, Sheet, Model, Components, Evidence, Procedures |
+| **Infrastructure** | Plan and verify power, network, and lighting distribution | Power, Network, Lighting |
 | **Live Control** | Reach cue, timer, and script controls quickly during a show | Run view plus dedicated full-screen controls where needed |
 
 A contextual **Specialist tools** launcher remains available from Toolbox and the relevant workspace. It is not another grid of empty wrappers. A specialist tool opens with a return path to the originating task and only receives supported context; its own data stays under its existing contract.
@@ -71,9 +74,9 @@ Every current registry ID has one primary home below. A home is a navigation and
 | Home | Current registry IDs | Count | Target treatment |
 | --- | --- | ---: | --- |
 | Show Operations | `av-workbook`, `show-advance`, `site-survey`, `crew-call`, `crew-time-log`, `room-check`, `breakout-room-matrix`, `show-board`, `show-task-board`, `show-handoff`, `show-report`, `change-order`, `client-signoff` | 13 | Consolidate planning, rooms, crew, tasks, and closeout in editable show views. Preserve Show Board's live timeline until parity is proven. |
-| Systems: Audio | `input-list`, `audio-patch`, `line-check`, `speaker-plan`, `rf-coordination`, `comms-check` | 6 | One source/channel flow through patch and check, with PA and wireless/comms views. |
-| Systems: Video | `signal-flow`, `video-patch`, `display-plan`, `projection-plan`, `stream-plan`, `record-log`, `camera-shot-list`, `playback-check` | 8 | Shared route identity with display, projection, broadcast, media, record, and camera task views. |
-| Systems: Infrastructure | `power-plan`, `network-plan`, `lighting-patch` | 3 | Power and network share location/context; lighting remains a substantial specialist view inside Systems. |
+| Video | `signal-flow`, `video-patch`, `display-plan`, `projection-plan`, `stream-plan`, `record-log`, `camera-shot-list`, `playback-check` | 8 | Direct primary destination for the full camera, switching, routing, playback, display, projection, stream, and record chain. |
+| Audio | `input-list`, `audio-patch`, `line-check`, `speaker-plan`, `rf-coordination`, `comms-check` | 6 | One source/channel flow through patch and check, with PA and wireless/comms views. |
+| Infrastructure | `power-plan`, `network-plan`, `lighting-patch` | 3 | Power and network share location/context; lighting remains a substantial specialist view. |
 | Logistics | `gear-prep`, `truck-pack`, `load-in-plan`, `strike-plan`, `cable-plan` | 5 | Shared item/case identity and phase views; show-specific state. |
 | Equipment Reference | `gear-reference` | 1 | Show-independent authored reference with managed model/evidence adapters. |
 | Live Control | `teleprompter`, `show-timer`, `cue-sheet` | 3 | Fast common launch/run context; keep full specialist controls until timing, keyboard, export, and remote behavior match. |
@@ -93,11 +96,17 @@ Every current registry ID has one primary home below. A home is a navigation and
 - The authored text, tables, and schematics remain usable offline. A model needs an explicit offline packaging decision and provenance check before the UI promises offline 3D.
 - Gear Prep may link an item to a sheet but does not become the owner of general device knowledge.
 
-### Systems
+### Video
 
-- **Audio:** A source can be followed from input list to patch to line check without retyping identity. The view preserves all existing fields, check results, problem notes, print/export, and operator attribution. RF and comms keep their distinct frequency and assignment safety checks; they are local views, not squeezed into an audio channel row.
-- **Video:** A route connects source, processor, patch point, destination, format, backup, and test result. Display/projection/stream/record views use the route where relevant without treating an illustrative diagram as a verified cable run. Throwline launches with the projector and screen context that it actually supports.
-- **Infrastructure:** Power and network have room and device references, capacity or addressing checks, backup path, owner, issue, and verification status. Lighting Patch keeps fixture/universe/address workflows as a real view, with no forced power or network field mapping.
+Video opens directly from the primary navigation, from Toolbox without a show, and from Show Console with an optional show context. Its local views cover cameras and shots, playback, switching and signal routes, displays and projection, streaming, recording, and faults. A route connects source, processor or switcher, patch point, destination, format, backup, and test result. A source may fan out to screens, stream, and record destinations; those branches retain their own verification states. A diagram must not imply that an untested physical path is verified. Throwline launches from projection with the projector and screen context it actually supports. A camera, lens, or converter opens its Equipment Reference sheet and component model in context without making Video a venue-specific app.
+
+### Audio
+
+A source can be followed from input list to patch to line check without retyping identity. The view preserves all existing fields, check results, problem notes, print/export, and operator attribution. RF and comms keep their distinct frequency and assignment safety checks; they are local views, not squeezed into an audio channel row.
+
+### Infrastructure
+
+Power and network have room and device references, capacity or addressing checks, backup path, owner, issue, and verification status. Lighting Patch keeps fixture/universe/address workflows as a real view, with no forced power or network field mapping. Infrastructure is a labeled primary destination; relevant power/network details may also appear as context in Video, Audio, and Show Operations without creating duplicate records.
 
 ### Logistics
 
@@ -139,27 +148,29 @@ The Audio importer is the pilot for this contract. Its current repeat-safe mappi
 | --- | --- | --- |
 | 0. Inventory | Feature, route, storage, origin, export, and offline matrix for all 44 entries; fix inventory gaps. | Every saved store has a tested backup/recovery path; unresolved mappings are listed. |
 | 1. Equipment pilot | Four FMP camera-chain sheets use the existing model and evidence; Show Console bridge uses valid context. **Shipped as an interim bridge.** | Live component selection, source provenance, no-network fallback, responsive/keyboard checks. |
-| 2. Audio | Editable sources, patches, line checks, PA, RF/comms task views and safe imports. | Field/status/export parity for the first three audio pages; repeat import and rollback pass. |
-| 3. Logistics | One case/item flow across prep, pack, load in, cable, and strike. | Counts and status transitions reconcile with each legacy page; lost-item and partial-pack scenarios pass. |
-| 4. Systems | Video route views, then infrastructure and lighting views. | Route and technical checks preserve existing specialist details and exports. |
-| 5. Show Operations | Advance, rooms, crew, tasks, and closeout views with explicit show attachment. | Show Board timeline/snapshot recovery and client outputs meet parity before route retirement. |
-| 6. Navigation cutover | Five primary workspaces, capability search, contextual specialists, compatibility URLs. | All 44 capabilities have a tested reachable home; operator trial and live-domain verification pass. |
+| 2. Video | Direct Video entry and editable camera, playback, route/switching, display/projection, stream, and record views. | All eight Video registry capabilities stay directly reachable; representative camera-to-screen, camera-to-stream/record, and playback-to-display paths retain status, backup, and export details. |
+| 3. Audio | Editable sources, patches, line checks, PA, RF/comms task views and safe imports. | Field/status/export parity for the first three audio pages; repeat import and rollback pass. |
+| 4. Logistics | One case/item flow across prep, pack, load in, cable, and strike. | Counts and status transitions reconcile with each legacy page; lost-item and partial-pack scenarios pass. |
+| 5. Infrastructure | Power, network, and lighting views with explicit technical checks. | Each specialist's distinct fields, checks, and exports remain usable. |
+| 6. Show Operations | Advance, rooms, crew, tasks, and closeout views with explicit show attachment. | Show Board timeline/snapshot recovery and client outputs meet parity before route retirement. |
+| 7. Navigation cutover | Seven primary workspaces, capability search, contextual specialists, compatibility URLs. | All 44 capabilities have a tested reachable home; operator trial and live-domain verification pass. |
 
 A stage is shipped independently, behind a reversible navigation change. Do not wait for all 44 tools to be rewritten before making the completed workspace useful. Do not replace a functional page with a shell of links and call that consolidation.
 
 ## Acceptance criteria
 
 - A new visitor can open Equipment Reference, inspect an authored sheet, and reach its source evidence without choosing a venue or show. The written reference works when House Video is unavailable.
+- A new visitor can identify and open **Video** from the primary navigation without using search, opening Systems, or selecting a venue. The Video workspace covers camera, switching/routing, playback, display/projection, stream, and record work in one coherent flow.
 - A show operator can complete input → patch → line check and prep → pack → load in → strike from their respective workspace without re-entering the same item identity. Saved status survives reload and import retry.
 - Each migrated workflow preserves its original meaningful fields, problem states, exports, print behavior, and deep links or documents an explicit operator-approved replacement.
 - No URL hint, import, legacy migration, or cross-origin transfer silently overwrites an active show, changes a person's name to a position code, or reports a partial write as complete.
-- All 44 current capabilities remain discoverable by task search and reachable from no more than two navigation actions on desktop and mobile. Primary navigation exposes five workspaces, with contextual specialist launchers.
+- All 44 current capabilities remain discoverable by task search and reachable from no more than two navigation actions on desktop and mobile. Primary navigation exposes seven labeled workspaces, including Video, with contextual specialist launchers.
 - At 390, 680, 1280, and a representative 32:9 viewport, primary destinations remain visible, local panes scroll independently where practical, focus is visible, and there is no unintended horizontal overflow. Light, dark, reduced-motion, keyboard, and no-network paths are verified.
 - Registry, sitemap, offline manifest, domain staging, public shell, generated Workbook artifact, CI, Pages deployment, and actual rendered `avbydave.com` and `housevideo.app` surfaces agree before release is called complete. Human operator acceptance remains a separate gate.
 
 ## Decisions to validate during implementation
 
-- **Recommended:** retain the two doorway modes and five primary workspaces. Revisit only after an operator trial, not because a new route is easier to code.
+- **Recommended:** retain the two doorway modes and seven primary workspaces, with Video immediately visible. Revisit the grouping after an operator trial, not because a new route is easier to code.
 - **Recommended:** use AV Workbook's existing typed store for show-attached entities once field parity is established. Keep show-independent reference content outside it.
 - **Recommended:** retain the current online FMP model bridge with offline sheet fallback until a versioned, source-owned same-origin content package can be built and maintained. Do not promise offline model access before that release gate.
 - **Open:** whether Show Console readiness should remain manually maintained or become derived per workspace. Define one authority and conflict behavior before changing it.
