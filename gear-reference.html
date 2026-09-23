@@ -743,7 +743,12 @@
     var frame=document.createElement('iframe');
     frame.className='model-frame';
     frame.title=model.title;
-    frame.src=url.href;
+    var embedded=new URL(url.href);
+    embedded.searchParams.set('embed','gear-reference');
+    var mode=document.documentElement.getAttribute('data-av-theme');
+    var dark=mode==='dark'||(mode==='system'&&window.matchMedia('(prefers-color-scheme: dark)').matches);
+    embedded.searchParams.set('theme',dark?'dark':'light');
+    frame.src=embedded.href;
     frame.loading='lazy';
     frame.referrerPolicy='strict-origin-when-cross-origin';
     container.appendChild(frame);

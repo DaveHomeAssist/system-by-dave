@@ -4,6 +4,7 @@ const root=document.getElementById('fmp-rig-3d');
 root.dataset.ready='true';
 const themeButton=document.getElementById('themeBtn');
 function applyTheme(theme) {
+  if (document.documentElement.dataset.embed === 'gear-reference') theme = new URLSearchParams(location.search).get('theme') === 'dark' ? 'dark' : 'light';
   document.documentElement.dataset.theme=theme;
   if(themeButton){
     themeButton.textContent=theme==='dark'?'Light theme':'Dark theme';

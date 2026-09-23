@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-09-22 — Focused equipment model view
+
+- Matched the embedded FMP rig viewer to the Gear Reference theme and removed duplicate FMP navigation inside the model panel.
+
 ## 2026-09-22 — Equipment models and Show Console context
 
 - Embedded the existing FMP rig explorer in four Gear Reference sheets, with written field sheets available offline.
