@@ -46,18 +46,6 @@
     </div>
   </header>
   <main id="main-content">
-    <section class="hero" aria-label="LED wall planner overview">
-      <div class="hero-copy">
-        <p class="eyebrow">Video engineering · field planning</p>
-        <h1>LED wall calculator</h1>
-        <p>Plan a build from actual cabinet dimensions and pixel counts. Compare wall raster with content, estimate processor ports and electrical demand, and carry the result into Power Load.</p>
-        <ul class="hero-signals" aria-label="Planner capabilities"><li>Cabinet aware</li><li>Live build map</li><li>Saved profiles</li></ul>
-      </div>
-      <div class="hero-actions">
-        <a class="button-link" href="av-calculator.html">Quick calculators</a>
-        <button type="button" id="resetBtn">Reset LED plan</button>
-      </div>
-    </section>
     <section class="led-page-status" aria-label="Planner status">
       <span id="saveStatus">Saved</span>
       <div id="actionStatus" role="status" aria-live="polite" aria-atomic="true"></div>
@@ -67,13 +55,37 @@
       <div class="led-suite-head">
         <div class="led-suite-title">
           <p class="led-suite-kicker">Advanced planning suite · cabinet aware</p>
-          <h2 id="ledWallTitle">LED Wall Configurator</h2>
+          <h1 id="ledWallTitle">LED Wall Configurator</h1>
           <p>Turn an LED cabinet profile and deployment goal into buildable geometry, native raster, content-fit guidance, NovaStar port estimates, viewing distance, and separated typical and maximum power plans.</p>
         </div>
         <div class="led-suite-actions" aria-label="LED wall configuration actions">
+          <button type="button" id="resetBtn">Reset LED plan</button>
           <button type="button" id="saveLedPresetBtn">Save Preset</button>
           <button type="button" class="primary" id="copyLedSummaryBtn">Copy LED Summary</button>
           <button type="button" id="downloadLedSummaryBtn">Download TXT</button>
+        </div>
+      </div>
+
+      <div class="led-stage" aria-label="Live LED cabinet map">
+        <div class="led-stage-view">
+          <span class="led-stage-axis vertical" id="ledPreviewRows">5 cabinets high</span>
+          <div class="led-wall-preview" id="ledWallPreview" role="img" aria-label="Preview of an 8 by 5 cabinet LED wall"></div>
+          <span class="led-stage-axis horizontal" id="ledPreviewColumns">8 cabinets wide</span>
+        </div>
+        <div class="led-stage-data">
+          <div>
+            <p class="led-stage-kicker">Live cabinet map</p>
+            <strong id="ledPreviewArray">8 × 5</strong>
+            <p id="ledPreviewCanvas">1,376 × 860 native canvas<br>4.00 × 2.50 m build</p>
+          </div>
+          <div class="led-view-toggle" aria-label="Cabinet map view">
+            <button type="button" id="ledPreviewIsoBtn" aria-pressed="true">Isometric</button>
+            <button type="button" id="ledPreviewFrontBtn" aria-pressed="false">Front</button>
+          </div>
+          <div class="led-stage-rails" aria-label="LED wall planning indicators">
+            <div class="led-stage-rail"><span>Port load</span><i id="ledPreviewPortRail"></i><b id="ledPreviewPort">61%</b></div>
+            <div class="led-stage-rail"><span>Viewer</span><i id="ledPreviewViewerRail"></i><b id="ledPreviewViewer">Review</b></div>
+          </div>
         </div>
       </div>
 
@@ -291,29 +303,6 @@
             </div>
           </div>
         </fieldset>
-      </div>
-
-      <div class="led-stage" aria-label="Live LED cabinet map">
-        <div class="led-stage-view">
-          <span class="led-stage-axis vertical" id="ledPreviewRows">5 cabinets high</span>
-          <div class="led-wall-preview" id="ledWallPreview" role="img" aria-label="Preview of an 8 by 5 cabinet LED wall"></div>
-          <span class="led-stage-axis horizontal" id="ledPreviewColumns">8 cabinets wide</span>
-        </div>
-        <div class="led-stage-data">
-          <div>
-            <p class="led-stage-kicker">Live cabinet map</p>
-            <strong id="ledPreviewArray">8 × 5</strong>
-            <p id="ledPreviewCanvas">1,376 × 860 native canvas<br>4.00 × 2.50 m build</p>
-          </div>
-          <div class="led-view-toggle" aria-label="Cabinet map view">
-            <button type="button" id="ledPreviewIsoBtn" aria-pressed="true">Isometric</button>
-            <button type="button" id="ledPreviewFrontBtn" aria-pressed="false">Front</button>
-          </div>
-          <div class="led-stage-rails" aria-label="LED wall planning indicators">
-            <div class="led-stage-rail"><span>Port load</span><i id="ledPreviewPortRail"></i><b id="ledPreviewPort">61%</b></div>
-            <div class="led-stage-rail"><span>Viewer</span><i id="ledPreviewViewerRail"></i><b id="ledPreviewViewer">Review</b></div>
-          </div>
-        </div>
       </div>
 
       <div class="led-result-strip" aria-label="LED wall primary results">

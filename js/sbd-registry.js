@@ -237,7 +237,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool change — rolls the service-worker cache. */
-    version:'v20260923-av-landing-background',
+    version:'v20260923-led-viewport-workspace',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,

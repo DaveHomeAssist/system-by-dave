@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-09-23 — LED wall viewport workspace
+
+- Moved the live cabinet preview ahead of settings, enlarged its isometric depth, and kept the planner within the browser viewport. Settings and detailed results scroll within their panels; the compact mobile navigation remains visible.
+- Refreshed the AV offline cache so the new layout reaches existing installs without changing calculator values or saved profiles.
+
 ## 2026-09-23 — FMP Camera 4 SDI transport correction
 
 - Published Dave's direct confirmation that the Camera 4 PTZ feeds ATEM Input 4 by SDI. The P240 reference no longer presents an NDI decoder as an unresolved alternative; intermediate cable landings, final patch and current signal format remain field checks.

@@ -582,7 +582,7 @@
     letter-spacing:.12em;
     text-transform:uppercase;
   }
-  .led-suite-title h2{
+  .led-suite-title h1{
     margin:0;
     font-family:var(--mono);
     font-size:clamp(22px,3vw,34px);
@@ -1109,3 +1109,82 @@ html[data-av-tool="led-wall-calculator"] .hero{margin-bottom:18px}
 .theme-toggle{min-height:44px;white-space:nowrap;font-family:var(--mono);font-size:11px;font-weight:700}
 .calc-card{scroll-margin-top:92px}
 @media (max-width:680px){.top-actions{align-items:center}.theme-toggle{flex:1 1 auto}}
+
+/* The LED planner is a viewport workspace; its settings and reports scroll locally. */
+html[data-av-tool="led-wall-calculator"].led-workspace-ready,
+html[data-av-tool="led-wall-calculator"].led-workspace-ready body{height:100%;overflow:hidden}
+html[data-av-tool="led-wall-calculator"].led-workspace-ready .app{height:calc(100dvh - 76px);min-height:0;display:flex;flex-direction:column}
+html[data-av-tool="led-wall-calculator"].led-workspace-ready body.has-sbd-nav{padding-bottom:0}
+html[data-av-tool="led-wall-calculator"].led-workspace-ready .topbar{position:relative;flex:none;padding:8px 16px}
+html[data-av-tool="led-wall-calculator"].led-workspace-ready main{display:flex;flex:1;flex-direction:column;min-height:0;max-width:2160px;padding:10px 14px 12px}
+html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-suite-title > p:not(.led-suite-kicker){display:none}
+html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-page-status{flex:none;min-height:32px;margin-bottom:8px;padding:5px 12px}
+html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-suite{
+  display:grid;flex:1;min-height:0;
+  grid-template-columns:minmax(0,1.65fr) minmax(340px,.85fr);
+  grid-template-rows:auto minmax(0,1fr) auto minmax(0,.25fr) auto;
+}
+html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-suite-head{grid-column:1/-1;grid-row:1;align-items:center;padding:12px 16px 10px}
+html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-suite-title{gap:2px}
+html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-suite-title h1{font-size:18px;line-height:1.1;color:var(--av-text);letter-spacing:-.035em}
+html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-suite-actions button{min-height:44px;padding:6px 10px;font-size:11px}
+html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-stage{
+  grid-column:1;grid-row:2;min-height:0;margin:10px 10px 10px 12px;padding:12px;
+  grid-template-columns:minmax(0,1fr) minmax(190px,.3fr);gap:36px;
+}
+html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-stage-view{height:100%;min-height:0;padding:4px 18px 4px 6px}
+html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-wall-preview{
+  width:min(100%,720px);max-height:min(100%,370px);
+  transform:rotateX(5deg) rotateY(-16deg) rotateZ(.4deg);
+  box-shadow:2px 0 0 #52617a,6px 3px 0 #303d52,12px 8px 0 #202c3f,20px 15px 0 #101826,32px 34px 52px rgba(0,0,0,.54),0 0 38px rgba(155,128,255,.24);
+}
+html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-input-grid{
+  grid-column:2;grid-row:2/5;display:grid;grid-template-columns:1fr;align-content:start;
+  gap:12px;min-height:0;padding:12px;overflow-y:auto;overscroll-behavior:contain;
+  border-left:1px solid var(--av-line);
+}
+html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-result-strip{grid-column:1;grid-row:3;grid-template-columns:repeat(5,minmax(0,1fr))}
+html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-result{min-height:0;padding:10px 12px}
+html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-result span{margin-bottom:4px;font-size:9px}
+html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-result strong{font-size:clamp(14px,1.5vw,19px)}
+html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-result small{margin-top:3px}
+html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-detail-grid{
+  grid-column:1;grid-row:4;min-height:0;align-content:start;overflow-y:auto;
+  overscroll-behavior:contain;padding:8px 12px;
+}
+html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-disclaimer{grid-column:1/-1;grid-row:5;padding:7px 12px;font-size:10px}
+@media (max-width:900px){
+  html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-suite{display:block;overflow-y:auto;overscroll-behavior:contain}
+  html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-suite-head{position:sticky;top:0;z-index:4;background:var(--av-surface)}
+  html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-stage{min-height:260px;margin:10px 12px}
+  html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-stage-view{min-height:220px}
+  html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-result-strip{grid-template-columns:repeat(5,minmax(145px,1fr));overflow-x:auto}
+  html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-input-grid{overflow:visible;border-left:0;border-bottom:1px solid var(--av-line)}
+  html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-detail-grid{overflow:visible}
+}
+@media (max-width:680px){
+  html[data-av-tool="led-wall-calculator"].led-workspace-ready .app{height:calc(100dvh - 112px)}
+  html[data-av-tool="led-wall-calculator"].led-workspace-ready .sbd-nav{grid-template-columns:repeat(3,minmax(0,1fr));max-height:none;gap:4px;padding:4px}
+  html[data-av-tool="led-wall-calculator"].led-workspace-ready .sbd-nav .sbd-nav-dept{display:none}
+  html[data-av-tool="led-wall-calculator"].led-workspace-ready .sbd-nav a{font-size:10px;padding:5px 4px}
+  html[data-av-tool="led-wall-calculator"].led-workspace-ready .topbar{gap:5px;padding:6px 12px}
+  html[data-av-tool="led-wall-calculator"].led-workspace-ready .top-actions{gap:8px}
+  html[data-av-tool="led-wall-calculator"].led-workspace-ready main{padding:8px}
+  html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-page-status{margin-bottom:6px;flex-direction:row;align-items:center}
+  html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-suite-head{gap:8px;padding:10px 12px}
+  html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-suite-actions{width:auto}
+  html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-suite-actions button{flex:1 1 100px}
+  html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-stage{grid-template-columns:1fr;min-height:0}
+  html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-stage-view{min-height:200px}
+  html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-stage-data{grid-template-columns:minmax(0,1fr) minmax(150px,.7fr)}
+}
+@media (max-width:500px){
+  html[data-av-tool="led-wall-calculator"].led-workspace-ready .topbar{flex-direction:row;align-items:center}
+  html[data-av-tool="led-wall-calculator"].led-workspace-ready .top-actions{width:auto}
+  html[data-av-tool="led-wall-calculator"].led-workspace-ready .top-actions .top-link{display:none}
+  html[data-av-tool="led-wall-calculator"].led-workspace-ready .brand-text span,
+  html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-suite-kicker{display:none}
+  html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-suite-head{flex-wrap:wrap}
+  html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-suite-title h1{font-size:15px}
+  html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-stage-data{grid-template-columns:1fr}
+}
