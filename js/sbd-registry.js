@@ -237,7 +237,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool change — rolls the service-worker cache. */
-    version:'v20260923-av-landing-alt',
+    version:'v20260923-av-landing-showconsole-brand',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,
