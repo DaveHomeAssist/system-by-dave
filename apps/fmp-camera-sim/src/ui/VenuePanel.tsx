@@ -16,6 +16,7 @@ interface Props {
 const VIEWS: Array<{ view: OverviewPreset; label: string }> = [
   { view: "house", label: "House" },
   { view: "top", label: "Top" },
+  { view: "side", label: "Side elevation" },
   { view: "behind", label: "Behind camera" },
 ];
 

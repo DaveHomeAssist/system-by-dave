@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-23 — FMP sectional bowl and pitch inspector
+
+- Added versioned, evidence-tagged sectors and elevation control points with legacy defaults that preserve saved dimensions and presets.
+- Replaced seating strips with instanced teal seats, concrete treads, aisles and a box band; filled level transitions remain provisional.
+- Added a side-elevation inspector driven by the same solver as the scene, plus an overview-only Side elevation preset. Bowl uncertainty keeps the venue approximate.
+
 ## 2026-09-23 — AV consolidation Stage 0 transfer safety
 
 - Added AV Workbook's IndexedDB database to the confirmed domain transfer policy, alongside its existing registry-declared active and fallback keys. Versioned the transfer decision so older completed or skipped moves can offer the newly inventoried data.

@@ -51,6 +51,7 @@ stage right is house left and appears on the left of the Camera 4 picture.
 | Camera height above stage | 35 ft | Demo value | Unknown until measured |
 | Camera lateral offset | 0 ft | Demo value | Centred placement is an assumption |
 | Mount | Inverted, pan 0° on centreline | Mixed evidence | P100 shows the installed camera hanging inverted. Heading, support dimensions and firmware flip settings remain unknown; the orientation is photo-confirmed, while heading evidence stays Demo |
+| Bowl | 28 lower / 22 upper rows; 0.9 m run | Demo | P096 informs unequal topology only; pitch, row counts and all elevations unmeasured |
 | Deck height, pit depth | 5 ft, 12 ft | Demo value | Drawing only; the pit and barricade change per show |
 
 The cable route (catwalk to ceiling to video office, SDI to ATEM Input 4) is reference text and is
@@ -114,11 +115,11 @@ The session autosaves to browser storage under `fmpCameraSim.v1` (the `fmp` pref
 through the housevideo.app saved-data transfer). Export/import uses one JSON file:
 
 - `fmp-camera-simulator.project` v1, containing
-- `fmp-camera-simulator.venue` v3 (per-property methods/source identifiers and separate mount-orientation/heading evidence),
+- `fmp-camera-simulator.venue` v4 (versioned bowl plus per-property methods/source identifiers and separate mount-orientation/heading evidence),
 - `fmp-camera-simulator.camera` v1 (published figures, operating limits, uncalibrated behaviour), and
 - `fmp-camera-simulator.session` v1 (speeds, pose, presets, performer, exercise settings and results).
 
-Version-1 venue imports migrate to v3 with `reference.geometryRevision: "legacy-v1"`; all existing dimensions, heading, orientation and presets remain unchanged. New profiles use `photo-review-2026-09`. Venue settings offer a before/after preview and explicit Apply/Cancel for the two provisional stage profiles. Applying updates only stage width/depth and mount orientation, retaining camera coordinates and stored presets. Current tilt can clamp to changed mount limits. Versions 1 and 2 keep their numeric settings and copy the former combined mount evidence into the new independent heading record, without inventing photo evidence. Old simulator versions cannot read newly exported venue v3 files.
+Version-1 venue imports migrate to v4 with `reference.geometryRevision: "legacy-v1"`; all existing dimensions, heading, orientation and presets remain unchanged. New profiles use `photo-review-2026-09`. Venue settings offer a before/after preview and explicit Apply/Cancel for the two provisional stage profiles. Applying updates only stage width/depth and mount orientation, retaining camera coordinates and stored presets. Current tilt can clamp to changed mount limits. Versions 1 and 2 keep their numeric settings and copy the former combined mount evidence into the new independent heading record, without inventing photo evidence. Older simulator versions reject newly exported venue v4 files, preventing silent loss of bowl configuration. Version-3 records retain their independent heading evidence.
 
 The overview camera model uses physical scale. Its label identifies the small camera; monitor output never contains the overview model. Support geometry is schematic. Upright operator video does not claim the real camera has E-Flip enabled.
 
@@ -180,11 +181,10 @@ orientation and physical model scale. It does not yet supply surveyed venue geom
 
 Remaining implementation packages, in order:
 
-1. Extend the venue schema with configurable sectors, terrain, structures and display records.
-   Per-property evidence references and separate orientation/heading records are now delivered.
-2. Replace schematic bowl strips with individual teal seats, aisles and box bands; add a
-   side-elevation pitch inspector. Current 9.46°/25.02° row slopes remain unverified.
-3. Add the pavilion shell, major obstructions, irregular lawn terrain and lawn reference view.
+1. Add configurable structures and the pavilion shell/major obstructions (Phase 2B).
+2. Add terrain records, irregular lawn geometry and the lawn reference view (Phase 2C).
+3. The sectional bowl and pitch inspector are implemented in Phase 2A; their dimensions and
+   initial 9.46°/25.02° slopes remain unverified. Per-property evidence is retained throughout.
 4. Add independent flanking displays, optional show wall, feed routing, bounded delay and
    portable offline media handling. Confirm physical screen inventory before adding lawn screens.
 5. Add measured camera calibration where evidence exists, occlusion-aware exercises and shot feedback.
@@ -196,10 +196,10 @@ actual bowl pitch, lawn contours, display dimensions and pan-zero require field 
 
 ### Evidence editing and published hardware
 
-Venue v3 accepts optional provenance on each dimension, distance basis, mount orientation and
+Venue v4 accepts optional provenance on each dimension, distance basis, mount orientation and
 pan-zero heading: `method` plus up to 16 `sourceIds` of at most 160 characters each. Source notes
 retain the observation/measurement description; source identifiers refer to the operator's
-reference log. Unknown methods, malformed references and missing v3 heading records reject the
+reference log. Unknown methods, malformed references and missing v3/v4 heading records reject the
 whole import before it replaces the active session. Methods never promote evidence status.
 Changing a value in Venue settings resets its evidence to Demo/operator entry and clears source
 identifiers; the previous note remains available for reference. A verified operator can then
@@ -215,3 +215,28 @@ mass (2.395 kg), sensor (1/2.5-inch CMOS, 8.5 MP), aperture (f/2.0–f/3.8), and
 power reference (22.5 W during simultaneous PTZ). These immutable catalog facts use the existing
 BirdDog technical-spec source. They do not change calibrated optics, locate the lens pivot, or
 constitute rigging capacity. The camera export schema remains v1.
+
+
+## Phase 2A: sectional bowl and pitch
+
+Venue v4 contains an independently versioned `bowl` v1 record. Missing records in legacy
+imports receive the documented demo bowl; saved dimensions, camera settings and presets are
+not changed. Sectors store evidence-wrapped level, arc bounds, row count, row run, aisle gap,
+seat pitch and piecewise row/elevation control points. The cross aisle stores insertion row,
+width, elevation step and railing height. Invalid records report their exact field path and
+are rejected before replacing the active project.
+
+P096 supplies unequal-sector and box-band topology, not metric measurements. All starting
+angles, row counts, runs, elevations and furniture dimensions remain Demo. The starting
+lower/upper runs and rises reproduce 28 × 0.15 m and 22 × 0.42 m over 0.9 m rows: approximately
+9.46° and 25.02°, expressly unverified. Bowl evidence also keeps Approximate venue visible.
+
+`solveBowl` is the shared metre-space source for treads, instanced teal seats and the Venue
+settings side-elevation inspector. Changing row run or elevation points updates both geometry
+and the displayed run/rise/grade/angle. Cross-aisle width and elevation are reported separately
+from seating slope. Filled fascia and landing geometry join independently configured sectors
+to the upper level; these are provisional architectural assumptions. Section labels are
+restricted to overview layer 1. The Side elevation overview preset does not move the PTZ.
+
+This increment adds the bowl only. Pavilion shell, obstructions and lawn terrain follow in
+separate Phase 2B/2C releases. Screens, calibration and later phases are outside Phase 2 scope.
