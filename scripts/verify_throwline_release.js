@@ -235,6 +235,8 @@ const main = read('ProjectorThrow/index.html');
 const stage = read('ProjectorThrow/Stage3D.html');
 const sidecar = read('ProjectorThrow/three-d-stage.js');
 const avWorker = read('av-suite-worker.js');
+const practice = read('ProjectorThrow/practice.html');
+const practiceState = read('ProjectorThrow/throwline-practice-state.js');
 const sceneState = read('ProjectorThrow/throwline-scene-state.js');
 const browserProbe = read('scripts/probe_throwline_stage3d.js');
 const sitemap = read('sitemap.xml');
@@ -573,7 +575,7 @@ requireMatch(main, /put\(["']md["'][\s\S]*?put\(["']mw["'][\s\S]*?put\(["']vb["'
 });
 if (!fs.existsSync(path.join(ROOT, 'scripts/probe_throwline_stage3d.js'))) fail('The Stage 3D browser regression probe is missing.');
 requireMatch(browserProbe, /no-WebGL mode visibly replaces the failed canvas with a populated 2D plan[\s\S]*?2D fallback redraws from the same live scene state/, 'The browser probe must hard-fail unless the no-WebGL 2D fallback is visible, populated, and live.');
-if (packageJson?.scripts?.['test:throwline-browser'] !== 'node scripts/probe_throwline_stage3d.js --no-sandbox && node scripts/probe_throwline_stage3d.js --no-sandbox --no-webgl') fail('Throwline browser verification must hard-fail both WebGL and degraded-renderer probe runs.');
+if (packageJson?.scripts?.['test:throwline-browser'] !== 'node scripts/probe_throwline_stage3d.js --no-sandbox && node scripts/probe_throwline_stage3d.js --no-sandbox --no-webgl && node scripts/probe_throwline_practice.js --no-sandbox') fail('Throwline browser verification must hard-fail WebGL, degraded-renderer, and Scope Practice probe runs.');
 requireMatch(pagesWorkflow, /Verify Throwline browser runtime[\s\S]*?run:\s*npm run test:throwline-browser/, 'The Pages release gate must run the hard-fail Throwline browser regression suite.');
 const stageTryIndex = stage.indexOf('const { THREE } = await stage.ready');
 ['function rebuildFacts(', 'function readout(', 'function updateWorkspaceFacts(', 'function applySceneIntent(', 'SceneState.createSceneState('].forEach((token) => {
@@ -603,6 +605,7 @@ requireMatch(main, /put\(["']tolPct["']/, 'The planner must transfer its plannin
 });
 if (/id=["']hState["'][^>]*>FITS SUPPLIED RANGE</.test(stage)) fail('Stage 3D must not ship a hard-coded verdict in its markup.');
 requireMatch(main, /id=["']stage3dLink["']/, 'The planner Stage 3D link must be state-aware.');
+requireMatch(main, /id=["']scopePracticeLink["'][^>]*href=["']practice\.html["']/, 'The planner must expose a direct Scope Practice destination.');
 requireMatch(main, /function\s+stage3dUrlFor\s*\(/, 'The planner must serialize validated Stage 3D transfer state.');
 requireMatch(main, /ThrowlineSceneState[\s\S]*?createSceneState/, 'The planner must normalize Stage 3D transfer values through the shared scene-state contract.');
 requireMatch(sidecar, /Use keys 1 through 5 for cameras/, 'Stage 3D canvas instructions must expose all five camera shortcuts.');
@@ -682,6 +685,45 @@ requireMatch(stage, /length\(['"]rw['"][\s\S]*?boundedLength\(['"]px['"][\s\S]*?
 requireMatch(sceneState, /const STORAGE_KEY = 'throwline:stage-scene:v1'/, 'Stage 3D scene storage must use the registered versioned key.');
 requireMatch(stage, /min-height:\s*44px/, 'Stage 3D must retain 44-pixel touch targets on phone.');
 
+// Multi-projector, commissioning, handoff, direct manipulation, and demonstration history contract (2026-09-23).
+['calculateMultiProjectorLayout','stampCommissioningRecord','commissioningRecordFor','createScenarioSnapshot','compareScenarioSnapshots','createScenarioHistory','commitScenario','undoScenario','redoScenario'].forEach((api) => {
+  if (!sceneState.includes(api)) fail(`Throwline scene-state contract is missing ${api}.`);
+});
+['blendOverlapMin','blendOverlapMax','layoutMetrics','measuredLensHeight','measuredProjectorX','measuredTargetX','commissioningSummary','downloadHandoff','downloadCommissioning','scenarioName','saveScenario','undoScenario','redoScenario','jsCommissioning','jsDiagram'].forEach((id) => {
+  requireMatch(stage, new RegExp(`id=["']${id}["']`), `Stage 3D expanded workflow is missing ${id}.`);
+});
+requireMatch(stage, /SceneState\.calculateMultiProjectorLayout\(sceneState\)/, 'Stage 3D must render the shared multi-projector calculation.');
+requireMatch(stage, /SceneState\.stampCommissioningRecord\(sceneState/, 'Stage 3D must persist the expanded commissioning record before field calibration.');
+requireMatch(stage, /function\s+exportHandoff\s*\([\s\S]*?throwline-scene[\s\S]*?throwline-scenario-history/, 'Stage 3D handoff HTML must embed the exact scene and demonstration history.');
+requireMatch(stage, /function\s+exportCommissioningCsv\s*\([\s\S]*?planned_throw_ft[\s\S]*?measured_image_offset_ft/, 'Stage 3D must export planned, measured, and delta commissioning evidence.');
+requireMatch(stage, /setDimensionAnnotations\([\s\S]*?image-aim[\s\S]*?screen-bottom/, 'Stage 3D must supply dimensioned image-aim and screen-bottom callouts.');
+['setManipulationTargets','getManipulationTargets','selectManipulationTarget','clearManipulationSelection','setDimensionAnnotations','setDimensionView','capturePng'].forEach((api) => {
+  if (!sidecar.includes(api)) fail(`Stage 3D renderer is missing ${api}.`);
+});
+requireMatch(sidecar, /stage-manipulation[\s\S]*?obstacleId[\s\S]*?snapStep[\s\S]*?delta/, 'Stage 3D manipulation events must carry object identity and snap evidence.');
+requireMatch(sidecar, /_derivedDimensionAnnotations\([\s\S]*?Nearest body clearance[\s\S]*?obstacle-callout:/, 'Stage 3D dimension views must derive clearance and obstruction callouts.');
+
+// Scope-practice simulation contract. These are generated training values, never device measurements or controls.
+requireMatch(practice, /SIMULATION FOR PRACTICE/, 'Scope Practice must identify itself as a simulation.');
+requireMatch(practice, /Generated practice signal · not a measurement/, 'Scope Practice must disclaim measurement claims beside the scopes.');
+requireMatch(practice, /throwline-practice-state\.js/, 'Scope Practice must load the pure deterministic state engine.');
+requireMatch(practice, /id=["']cameraCardA["'][\s\S]*?id=["']cameraCardB["']/, 'Scope Practice must expose two virtual camera monitors.');
+['stateIdentity','cameraCanvasA','cameraCanvasB','controlList','scopeCanvas','exportButton','importButton','copyLinkButton','themeButton'].forEach((id) => {
+  requireMatch(practice, new RegExp(`id=["']${id}["']`), `Scope Practice is missing ${id}.`);
+});
+requireMatch(practiceState, /const SCHEMA = 'throwline\.camera-practice\.v1'/, 'Scope Practice state must use its versioned schema.');
+['iris','pedestal','gain','gamma','whiteBalance','saturation','colorPhase'].forEach((control) => {
+  requireMatch(practiceState, new RegExp(`\\b${control}:\\s*\\[`), `Scope Practice state is missing the ${control} control range.`);
+});
+['match-cameras','recover-highlights','set-black-level','neutralize-cast'].forEach((scenario) => {
+  if (!practiceState.includes(`'${scenario}'`)) fail(`Scope Practice is missing the ${scenario} exercise.`);
+});
+['waveform','parade','vectorscope','histogram'].forEach((scope) => {
+  if (!practiceState.includes(`'${scope}'`)) fail(`Scope Practice is missing the ${scope} scope.`);
+});
+requireMatch(practice, /url\.hash\s*=\s*`state=/, 'Scope Practice must expose an exact full-state handoff link.');
+requireMatch(practice, /connect-src 'none'/, 'Scope Practice must not connect to equipment or network APIs.');
+
 // Workflow deck and responsive menu contract (2026-09-20).
 ['setup', 'place', 'room', 'deliver'].forEach((name) => {
   const title = name[0].toUpperCase() + name.slice(1);
@@ -746,7 +788,8 @@ requireMatch(sidecar, /renderer\.dispose\s*\(/, 'Stage 3D must dispose its rende
 requireMatch(stage, /@media\s*\(prefers-reduced-motion:\s*reduce\)/, 'Stage 3D must respect reduced-motion preferences.');
 requireMatch(stage, /\.band::before/, 'Stage 3D range bars must include a non-color tick treatment.');
 requireMatch(stage, /if\s*\(objectMounted\)\s*setCamera\(activeCamera/, 'Stage 3D must reframe the active camera after geometry changes.');
-requireMatch(stage, /front:\s*\[0,\s*cy,\s*d\*0\.22\]/, 'Stage 3D front camera must inspect image fit from the projector side of the screen.');
+requireMatch(stage, /front:\s*\[0,0,-1\]/, 'Stage 3D front camera must inspect image fit from the projector side of the screen.');
+requireMatch(stage, /stage\.frameObject\(views\[camera\]/, 'Stage 3D camera presets must frame the live scene so direct-manipulation handles remain reachable.');
 requireMatch(main, /\.zoom-track::before/, 'Throwline main range bars must include a non-color tick treatment.');
 const changelog = read('CHANGELOG.md');
 requireMatch(changelog, /Throwline Stage 3D audit/i, 'CHANGELOG must describe the Throwline Stage 3D audit release.');
@@ -769,7 +812,13 @@ if (!throwlineTools[0]?.storageKeys?.some((item) => item.key === 'throwline:stag
 if (!throwlineTools[0]?.storageKeys?.some((item) => item.key === 'throwline:stage-units:v1')) {
   fail('Registry must include the versioned Throwline Stage measurement-units key.');
 }
-['ProjectorThrow/', 'ProjectorThrow/Stage3D.html'].forEach((route) => {
+if (!throwlineTools[0]?.storageKeys?.some((item) => item.key === 'throwline.practice.theme.v1')) {
+  fail('Registry must include the Scope Practice theme key.');
+}
+if (!avRegistry.offlineAssets?.().includes('./ProjectorThrow/practice.html') || !avRegistry.offlineAssets?.().includes('./ProjectorThrow/throwline-practice-state.js')) {
+  fail('AV offline assets must include Scope Practice and its deterministic engine.');
+}
+['ProjectorThrow/', 'ProjectorThrow/Stage3D.html', 'ProjectorThrow/practice.html'].forEach((route) => {
   const url = `${originFor(route)}/${route}`;
   if (!sitemapFor(route).includes(`<loc>${url}</loc>`)) fail(`Sitemap is missing ${url}.`);
 });

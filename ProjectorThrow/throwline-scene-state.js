@@ -15,6 +15,7 @@
   const copy = value => JSON.parse(JSON.stringify(value));
   const cleanId = (value, fallback) => String(value || fallback).replace(/[^a-z0-9_-]/gi, '-').slice(0, 64);
   const nextId = (items, prefix) => { let index = items.length + 1; while (items.some(item => item.id === `${prefix}-${index}`)) index += 1; return `${prefix}-${index}`; };
+  const validTimestamp = value => typeof value === 'string' && value.length <= 80 && Number.isFinite(Date.parse(value)) ? value : '';
   function uniqueIds(items, prefix) {
     const seen = new Set();
     items.forEach((item, index) => {
@@ -52,6 +53,87 @@
     const catalog = catalogInput && typeof catalogInput.projector === 'string' && catalogInput.projector && typeof catalogInput.lens === 'string' && catalogInput.lens
       ? { projector: catalogInput.projector.slice(0, 40), lens: catalogInput.lens.slice(0, 40), profile: String(catalogInput.profile || '').slice(0, 40) } : undefined;
     return { mode, label, reason: String(input.reason || fallbackReason).slice(0, 500), tone, verification, ...(catalog ? { catalog } : {}) };
+  }
+
+  const COMMISSIONING_VERSION = 1;
+  const COMMISSIONING_FIELDS = Object.freeze(['throwDistance', 'imageWidth', 'lensHeight', 'horizontalOffset', 'targetOffset', 'shift', 'focus', 'alignment']);
+  const COMMISSIONING_IMPACTS = Object.freeze({
+    'set-distance': Object.freeze(['throwDistance', 'imageWidth', 'shift', 'focus', 'alignment']),
+    'snap-distance': Object.freeze(['throwDistance', 'imageWidth', 'shift', 'focus', 'alignment']),
+    'set-lens-height': Object.freeze(['lensHeight', 'shift', 'alignment']),
+    'set-projector-x': Object.freeze(['horizontalOffset', 'shift', 'alignment']),
+    'set-projector-target-x': Object.freeze(['targetOffset', 'shift', 'alignment']),
+    'set-screen-width': Object.freeze(['imageWidth', 'shift', 'focus', 'alignment']),
+    'set-screen-bottom': Object.freeze(['shift', 'alignment']),
+    'set-screen-aspect': Object.freeze(['shift', 'alignment']),
+    'set-optical-range': Object.freeze(['imageWidth', 'shift', 'focus', 'alignment']),
+    'arrange-projectors': Object.freeze(['throwDistance', 'imageWidth', 'lensHeight', 'horizontalOffset', 'targetOffset', 'shift', 'focus', 'alignment'])
+  });
+
+  function normalizeCommissioningValues(input = {}) {
+    const limits = {
+      throwDistance: [0.01, 300], imageWidth: [0.01, 300], lensHeight: [0, 100],
+      horizontalOffset: [-100, 100], targetOffset: [-100, 100]
+    };
+    return Object.fromEntries(Object.entries(limits).map(([key, [min, max]]) => [key, finite(input[key]) ? clamp(input[key], min, max) : undefined]));
+  }
+
+  function normalizeCommissioningRecord(input = {}, index = 0) {
+    if (!input || typeof input !== 'object') return undefined;
+    const planned = normalizeCommissioningValues(input.planned);
+    const measured = normalizeCommissioningValues(input.measured);
+    if ([...Object.values(planned), ...Object.values(measured)].some(value => value === undefined)) return undefined;
+    const verifiedAt = validTimestamp(input.verifiedAt);
+    const verifiedBy = String(input.verifiedBy || '').trim().slice(0, 120);
+    if (!verifiedAt || !verifiedBy) return undefined;
+    const validity = {};
+    COMMISSIONING_FIELDS.forEach(field => {
+      const source = input.validity?.[field];
+      const stale = source?.status === 'stale';
+      validity[field] = stale
+        ? { status: 'stale', invalidatedAt: validTimestamp(source.invalidatedAt) || undefined, reason: String(source.reason || 'The planned geometry changed after this record was made.').slice(0, 240) }
+        : { status: 'current' };
+    });
+    const staleCount = Object.values(validity).filter(item => item.status === 'stale').length;
+    const supersededAt = validTimestamp(input.supersededAt);
+    const status = supersededAt ? 'superseded' : staleCount === 0 ? 'current' : staleCount === COMMISSIONING_FIELDS.length ? 'stale' : 'partially_stale';
+    return {
+      schemaVersion: COMMISSIONING_VERSION,
+      id: cleanId(input.id, `commissioning-${index + 1}`),
+      status,
+      planned,
+      measured,
+      delta: Object.fromEntries(Object.keys(planned).map(key => [key, measured[key] - planned[key]])),
+      notes: {
+        shift: String(input.notes?.shift || '').slice(0, 1000),
+        focus: String(input.notes?.focus || '').slice(0, 1000),
+        alignment: String(input.notes?.alignment || '').slice(0, 1000)
+      },
+      verifiedBy,
+      verifiedAt,
+      validity,
+      ...(supersededAt ? { supersededAt } : {})
+    };
+  }
+
+  function normalizeCommissioningRecords(input) {
+    if (!Array.isArray(input)) return [];
+    return uniqueIds(input.slice(-50).map(normalizeCommissioningRecord).filter(Boolean), 'commissioning');
+  }
+
+  function invalidateCommissioning(projector, intentType, invalidatedAt = new Date().toISOString()) {
+    const fields = COMMISSIONING_IMPACTS[intentType];
+    if (!fields || !projector.commissioningRecords?.length) return projector;
+    const reason = `The ${String(intentType).replace(/^set-/, '').replace(/-/g, ' ')} changed after commissioning.`;
+    return {
+      ...projector,
+      commissioningRecords: projector.commissioningRecords.map(record => {
+        if (record.status === 'superseded') return record;
+        const validity = copy(record.validity);
+        fields.forEach(field => { validity[field] = { status: 'stale', invalidatedAt, reason }; });
+        return normalizeCommissioningRecord({ ...record, validity });
+      })
+    };
   }
 
   // The scene as a Stage 3D link: every value the transfer reader understands, in feet, for the chosen (default active) unit.
@@ -108,7 +190,8 @@
       },
       body: normalizeBody(input.body),
       allowed,
-      provenance
+      provenance,
+      commissioningRecords: normalizeCommissioningRecords(input.commissioningRecords)
     };
   }
 
@@ -198,6 +281,16 @@
       obstacles,
       activeObstacleId: obstacles.some(obstacle => obstacle.id === input.activeObstacleId) ? cleanId(input.activeObstacleId, '') : obstacles[0]?.id,
       layoutMode: ['independent', 'stack', 'blend'].includes(input.layoutMode) ? input.layoutMode : 'independent',
+      layoutConfig: {
+        blend: {
+          minimumOverlapPercent: finite(input.layoutConfig?.blend?.minimumOverlapPercent) ? clamp(input.layoutConfig.blend.minimumOverlapPercent, 0, 100) : undefined,
+          maximumOverlapPercent: finite(input.layoutConfig?.blend?.maximumOverlapPercent) ? clamp(input.layoutConfig.blend.maximumOverlapPercent, 0, 100) : undefined
+        },
+        stack: {
+          centerTolerance: finite(input.layoutConfig?.stack?.centerTolerance) ? clamp(input.layoutConfig.stack.centerTolerance, 0, 10) : PLACEMENT_TOLERANCE,
+          sizeTolerancePercent: finite(input.layoutConfig?.stack?.sizeTolerancePercent) ? clamp(input.layoutConfig.stack.sizeTolerancePercent, 0, 25) : 0.5
+        }
+      },
       overlays: {
         beam: input.overlays?.beam !== false,
         room: input.overlays?.room !== false,
@@ -394,6 +487,157 @@
     return { ...base, placement: { kind, label, tone }, reason: collisions.length ? `${collisions.length} obstruction${collisions.length === 1 ? '' : 's'} block${collisions.length === 1 ? 's' : ''} the light path.` : '', envelope: { wideDistance, teleDistance, safeLow, safeHigh, tolerance, fixed, nominal }, image, shift, shiftEnvelope: optical.shift, coverage, collisions };
   }
 
+  function rectangleIntersection(first, second) {
+    const left = Math.max(first.left, second.left), right = Math.min(first.right, second.right);
+    const bottom = Math.max(first.bottom, second.bottom), top = Math.min(first.top, second.top);
+    if (right <= left || top <= bottom) return undefined;
+    return { left, right, bottom, top, width: right - left, height: top - bottom, area: (right - left) * (top - bottom) };
+  }
+
+  // Exact union area for axis-aligned rectangles. Stage 3D currently has no vertical target offset, so the projected
+  // pictures are rectangular on the screen plane and this sweep remains deterministic for every supported layout.
+  function rectangleUnionArea(rectangles) {
+    const valid = rectangles.filter(Boolean);
+    const edges = [...new Set(valid.flatMap(rectangle => [rectangle.left, rectangle.right]))].sort((a, b) => a - b);
+    let area = 0;
+    for (let index = 0; index < edges.length - 1; index += 1) {
+      const left = edges[index], right = edges[index + 1];
+      if (right <= left) continue;
+      const spans = valid.filter(rectangle => rectangle.left < right && rectangle.right > left).map(rectangle => [rectangle.bottom, rectangle.top]).sort((a, b) => a[0] - b[0]);
+      let covered = 0, low, high;
+      spans.forEach(([nextLow, nextHigh]) => {
+        if (low === undefined) { low = nextLow; high = nextHigh; }
+        else if (nextLow <= high) high = Math.max(high, nextHigh);
+        else { covered += high - low; low = nextLow; high = nextHigh; }
+      });
+      if (low !== undefined) covered += high - low;
+      area += (right - left) * covered;
+    }
+    return area;
+  }
+
+  function calculateMultiProjectorLayout(input) {
+    const scene = normalizeSceneState(input);
+    const screenHeight = scene.screen.width / scene.screen.aspect;
+    const screenRect = { left: -scene.screen.width / 2, right: scene.screen.width / 2, bottom: scene.screen.bottom, top: scene.screen.bottom + screenHeight };
+    const screenArea = scene.screen.width * screenHeight;
+    const warnings = [];
+    const units = scene.projectors.map(projector => {
+      const geometry = calculateProjectorGeometry(scene, projector.id);
+      if (!geometry.image) {
+        warnings.push({ tone: 'bad', kind: 'unit-blocked', projectorId: projector.id, label: `${projector.label} cannot calculate coverage until its optical data is usable.` });
+        return { projectorId: projector.id, label: projector.label, calculated: false, provenance: projector.provenance };
+      }
+      const imageRect = {
+        left: geometry.image.centerX - geometry.image.width / 2,
+        right: geometry.image.centerX + geometry.image.width / 2,
+        bottom: geometry.screen.centerY - geometry.image.height / 2,
+        top: geometry.screen.centerY + geometry.image.height / 2
+      };
+      const onScreen = rectangleIntersection(imageRect, screenRect);
+      return {
+        projectorId: projector.id,
+        label: projector.label,
+        calculated: true,
+        image: { ...imageRect, width: geometry.image.width, height: geometry.image.height, centerX: geometry.image.centerX, centerY: geometry.screen.centerY },
+        screenCoverage: {
+          ...(onScreen || { left: undefined, right: undefined, bottom: undefined, top: undefined, width: 0, height: 0, area: 0 }),
+          percent: onScreen ? onScreen.area / screenArea * 100 : 0
+        },
+        placement: geometry.placement,
+        provenance: projector.provenance,
+        position: copy(projector.position),
+        rasterAspect: projector.optical.rasterAspect
+      };
+    });
+    const calculated = units.filter(unit => unit.calculated);
+    calculated.forEach(unit => {
+      if (!['bad','warn'].includes(unit.placement?.tone)) return;
+      warnings.push({ tone: unit.placement.tone, kind: `unit-placement-${unit.placement.kind}`, projectorId: unit.projectorId, label: `${unit.label}: ${unit.placement.label}.` });
+    });
+    const values = (key, nested) => calculated.map(unit => nested ? unit[nested][key] : unit[key]);
+    const spread = numbers => numbers.length > 1 ? Math.max(...numbers) - Math.min(...numbers) : 0;
+    const percentSpread = numbers => {
+      if (numbers.length < 2) return 0;
+      const average = numbers.reduce((sum, value) => sum + value, 0) / numbers.length;
+      return average > 0 ? spread(numbers) / average * 100 : 0;
+    };
+    const mismatch = {
+      imageWidthPercent: percentSpread(values('width', 'image')),
+      imageHeightPercent: percentSpread(values('height', 'image')),
+      centerX: spread(values('centerX', 'image')),
+      centerY: spread(values('centerY', 'image')),
+      throwDistance: spread(values('distance', 'position')),
+      lensHeight: spread(values('lensHeight', 'position')),
+      rasterAspectPercent: percentSpread(calculated.map(unit => unit.rasterAspect))
+    };
+    const overlapRegions = [];
+    if (scene.layoutMode === 'blend' && calculated.length >= 2) {
+      const sorted = [...calculated].sort((a, b) => a.image.left - b.image.left || a.projectorId.localeCompare(b.projectorId));
+      const minimum = scene.layoutConfig.blend.minimumOverlapPercent, maximum = scene.layoutConfig.blend.maximumOverlapPercent;
+      const configured = finite(minimum) && finite(maximum) && Number(maximum) >= Number(minimum);
+      for (let index = 0; index < sorted.length - 1; index += 1) {
+        const left = sorted[index], right = sorted[index + 1];
+        const overlap = rectangleIntersection(left.image, right.image);
+        const onScreen = overlap && rectangleIntersection(overlap, screenRect);
+        const width = overlap?.width || 0;
+        const percentOfLeft = width / left.image.width * 100;
+        const percentOfRight = width / right.image.width * 100;
+        const overlapPercent = Math.min(percentOfLeft, percentOfRight);
+        let status = 'unconfigured', tone = 'warn', label = 'Set the processor’s required overlap range before calling this blend region adequate.';
+        if (width <= PLACEMENT_TOLERANCE) { status = 'missing'; tone = 'bad'; label = 'The adjacent pictures do not overlap.'; }
+        else if (configured && overlapPercent < minimum) { status = 'below-minimum'; label = `Overlap is below the configured ${minimum}% minimum.`; }
+        else if (configured && overlapPercent > maximum) { status = 'above-maximum'; label = `Overlap is above the configured ${maximum}% maximum.`; }
+        else if (configured) { status = 'adequate'; tone = 'go'; label = 'Overlap is inside the configured processor range.'; }
+        overlapRegions.push({
+          leftProjectorId: left.projectorId,
+          rightProjectorId: right.projectorId,
+          width,
+          percentOfLeft,
+          percentOfRight,
+          overlapPercent,
+          screenWidth: onScreen?.width || 0,
+          screenArea: onScreen?.area || 0,
+          adequacy: { status, tone, label, configuredRange: configured ? { minimumPercent: minimum, maximumPercent: maximum } : undefined }
+        });
+        if (tone !== 'go') warnings.push({ tone, kind: `blend-${status}`, projectorIds: [left.projectorId, right.projectorId], label });
+      }
+    } else if (scene.layoutMode === 'blend') warnings.push({ tone: 'bad', kind: 'blend-unit-count', label: 'A blend needs at least two calculable projector units.' });
+
+    if (scene.layoutMode === 'stack' && calculated.length >= 2) {
+      const centerTolerance = scene.layoutConfig.stack.centerTolerance;
+      const sizeTolerancePercent = scene.layoutConfig.stack.sizeTolerancePercent;
+      if (mismatch.centerX > centerTolerance || mismatch.centerY > centerTolerance) warnings.push({ tone: 'bad', kind: 'stack-center-mismatch', label: 'The stacked pictures do not share the same center within the configured tolerance.' });
+      if (mismatch.imageWidthPercent > sizeTolerancePercent || mismatch.imageHeightPercent > sizeTolerancePercent) warnings.push({ tone: 'bad', kind: 'stack-size-mismatch', label: 'The stacked pictures are not the same size within the configured tolerance.' });
+      if (mismatch.rasterAspectPercent > 0.01) warnings.push({ tone: 'warn', kind: 'stack-aspect-mismatch', label: 'The stacked units use different raster shapes.' });
+    } else if (scene.layoutMode === 'stack') warnings.push({ tone: 'bad', kind: 'stack-unit-count', label: 'A stack needs at least two calculable projector units.' });
+
+    if (scene.layoutMode === 'blend' && calculated.length >= 2) {
+      if (mismatch.imageHeightPercent > 0.01) warnings.push({ tone: 'warn', kind: 'blend-height-mismatch', label: 'Adjacent blend pictures have different heights; align their raster geometry before commissioning.' });
+      if (mismatch.rasterAspectPercent > 0.01) warnings.push({ tone: 'warn', kind: 'blend-aspect-mismatch', label: 'The blend uses different raster shapes.' });
+    }
+
+    const clippedRectangles = calculated.map(unit => rectangleIntersection(unit.image, screenRect)).filter(Boolean);
+    const coveredArea = rectangleUnionArea(clippedRectangles);
+    const coverage = { coveredArea, screenArea, percent: screenArea > 0 ? coveredArea / screenArea * 100 : 0, missingArea: Math.max(0, screenArea - coveredArea) };
+    if (scene.layoutMode !== 'independent' && coverage.missingArea > COVERAGE_TOLERANCE * screenArea) warnings.push({ tone: 'bad', kind: 'layout-coverage-gap', label: 'The combined pictures leave part of the screen uncovered.' });
+    const tone = warnings.some(warning => warning.tone === 'bad') ? 'bad' : warnings.some(warning => warning.tone === 'warn') ? 'warn' : 'go';
+    return {
+      mode: scene.layoutMode,
+      calculated: calculated.length === scene.projectors.length,
+      units,
+      coverage,
+      overlapRegions,
+      mismatch,
+      warnings,
+      tone,
+      brightness: {
+        calculated: false,
+        reason: 'Geometry does not establish combined brightness. Measure aligned output on site using the actual projectors, optics, processor, screen, and operating modes.'
+      }
+    };
+  }
+
   const COVERAGE_TOLERANCE = 0.02;
   const ASPECT_TOLERANCE = 0.02;
 
@@ -471,11 +715,16 @@
   function applyIntent(input, intent = {}) {
     const scene = normalizeSceneState(input);
     const type = String(intent.type || '');
+    const changedAt = new Date().toISOString();
     const index = scene.projectors.findIndex(projector => projector.id === (intent.projectorId || scene.activeProjectorId));
     const projector = scene.projectors[index >= 0 ? index : 0];
     // Driving edits drop the on-site stamp (FIELD_VERIFICATION.drivingIntents); anything else keeps it.
     const keepOrDrop = invalidatesFieldVerification(type) ? invalidateFieldVerification : projectorState => projectorState;
-    const updateProjector = next => { scene.projectors[index >= 0 ? index : 0] = keepOrDrop(next); };
+    const updateProjector = next => {
+      const changed = JSON.stringify(next) !== JSON.stringify(projector);
+      const updated = keepOrDrop(next);
+      scene.projectors[index >= 0 ? index : 0] = changed ? invalidateCommissioning(updated, type, changedAt) : updated;
+    };
     if (type === 'set-distance') updateProjector({ ...projector, position: { ...projector.position, distance: clamp(stepped(intent.value, 0.25), 1, 300) } });
     else if (type === 'snap-distance' && projector.allowed && finite(projector.optical.min) && finite(projector.optical.max)) {
       // Optical stops are exact ratios times the basis width; quarter-foot rounding would push a stop outside its own envelope.
@@ -490,13 +739,13 @@
       const previousWidth = scene.screen.width;
       scene.screen.width = clamp(stepped(intent.value, 0.5), 2, 200);
       scene.projectors = scene.projectors.map(item => {
-        const next = invalidateFieldVerification(item);
+        const next = scene.screen.width === previousWidth ? item : invalidateCommissioning(invalidateFieldVerification(item), type, changedAt);
         if (next.provenance.mode === 'manual') next.optical.basisWidth = scene.screen.width * (item.optical.basisWidth / previousWidth);
         return next;
       });
     }
-    else if (type === 'set-screen-bottom') { scene.screen.bottom = clamp(stepped(intent.value, 0.25), 0, 100); scene.projectors = scene.projectors.map(invalidateFieldVerification); }
-    else if (type === 'set-screen-aspect') { scene.screen.aspect = clamp(Number(intent.value), 0.2, 10); scene.projectors = scene.projectors.map(invalidateFieldVerification); }
+    else if (type === 'set-screen-bottom') { const previous = scene.screen.bottom; scene.screen.bottom = clamp(stepped(intent.value, 0.25), 0, 100); if (scene.screen.bottom !== previous) scene.projectors = scene.projectors.map(item => invalidateCommissioning(invalidateFieldVerification(item), type, changedAt)); }
+    else if (type === 'set-screen-aspect') { const previous = scene.screen.aspect; scene.screen.aspect = clamp(Number(intent.value), 0.2, 10); if (scene.screen.aspect !== previous) scene.projectors = scene.projectors.map(item => invalidateCommissioning(invalidateFieldVerification(item), type, changedAt)); }
     else if (type === 'set-optical-range' && finite(intent.min) && Number(intent.min) > 0 && finite(intent.max) && Number(intent.max) >= Number(intent.min)) updateProjector({ ...projector, allowed: true, optical: { ...projector.optical, min: Number(intent.min), max: Number(intent.max) }, provenance: normalizeProvenance({ mode: 'manual', reason: 'MANUAL ESTIMATE · throw ratio entered by hand.' }) });
     else if (type === 'set-tolerance' && finite(intent.value)) scene.tolerance = clamp(intent.value, 0, 15);
     else if (type === 'set-room' && intent.key === 'clearance' && finite(intent.value)) scene.room.clearance = clamp(stepped(intent.value, 0.25), 0, 10);
@@ -507,18 +756,161 @@
     }
     else if (type === 'clear-body') updateProjector({ ...projector, body: undefined });
     else if (type === 'select-projector' && scene.projectors.some(item => item.id === intent.projectorId)) scene.activeProjectorId = intent.projectorId;
-    else if (type === 'add-projector' && scene.projectors.length < 8) { const source = copy(projector); const nextIndex = scene.projectors.length; source.id = nextId(scene.projectors, 'projector'); source.label = `Unit ${String.fromCharCode(65 + nextIndex)}`; source.position.x = clamp(projector.position.x + 2, -100, 100); source.provenance = normalizeProvenance({ mode: projector.provenance.mode === 'field_verified' ? 'manual' : projector.provenance.mode, reason: projector.provenance.mode === 'field_verified' ? 'MANUAL ESTIMATE · copied from a unit that was measured on site; measure this one too.' : projector.provenance.reason }); scene.projectors.push(normalizeProjector(source, nextIndex)); scene.activeProjectorId = source.id; scene.layoutMode = 'independent'; }
+    else if (type === 'add-projector' && scene.projectors.length < 8) { const source = copy(projector); const nextIndex = scene.projectors.length; source.id = nextId(scene.projectors, 'projector'); source.label = `Unit ${String.fromCharCode(65 + nextIndex)}`; source.position.x = clamp(projector.position.x + 2, -100, 100); source.provenance = normalizeProvenance({ mode: projector.provenance.mode === 'field_verified' ? 'manual' : projector.provenance.mode, reason: projector.provenance.mode === 'field_verified' ? 'MANUAL ESTIMATE · copied from a unit that was measured on site; measure this one too.' : projector.provenance.reason }); source.commissioningRecords = []; scene.projectors.push(normalizeProjector(source, nextIndex)); scene.activeProjectorId = source.id; scene.layoutMode = 'independent'; }
     else if (type === 'remove-projector' && scene.projectors.length > 1) { scene.projectors = scene.projectors.filter(item => item.id !== projector.id); scene.activeProjectorId = scene.projectors[0].id; }
     else if (type === 'add-obstacle' && scene.obstacles.length < 24) { const obstacle = normalizeObstacle({ id: nextId(scene.obstacles, 'obstacle'), label: `Obstruction ${scene.obstacles.length + 1}`, position: { x: projector.position.x, y: Math.max(3, scene.screen.bottom), z: projector.position.distance / 2 } }, scene.obstacles.length); scene.obstacles.push(obstacle); scene.activeObstacleId = obstacle.id; }
     else if (type === 'select-obstacle' && scene.obstacles.some(item => item.id === intent.obstacleId)) scene.activeObstacleId = intent.obstacleId;
     else if (type === 'set-obstacle') { const obstacleIndex = scene.obstacles.findIndex(item => item.id === (intent.obstacleId || scene.activeObstacleId)); if (obstacleIndex >= 0) { const obstacle = scene.obstacles[obstacleIndex]; if (['x', 'y', 'z'].includes(intent.key)) obstacle.position[intent.key] = stepped(intent.value, 0.25); else if (['width', 'height', 'depth'].includes(intent.key)) obstacle.size[intent.key] = Math.max(0.1, stepped(intent.value, 0.25)); scene.obstacles[obstacleIndex] = normalizeObstacle(obstacle, obstacleIndex); } }
     else if (type === 'remove-obstacle' && intent.obstacleId) { scene.obstacles = scene.obstacles.filter(item => item.id !== intent.obstacleId); scene.activeObstacleId = scene.obstacles[0]?.id; }
     else if (type === 'clear-obstacles') { scene.obstacles = []; scene.activeObstacleId = undefined; }
-    else if (type === 'arrange-projectors' && ['stack', 'blend'].includes(intent.mode)) { const center = (scene.projectors.length - 1) / 2; scene.projectors = scene.projectors.map((item, itemIndex) => { const offset = itemIndex - center; return invalidateFieldVerification({ ...item, position: { ...item.position, x: intent.mode === 'stack' ? 0 : stepped(offset * Math.max(2, scene.screen.width * 0.18), 0.25), lensHeight: intent.mode === 'stack' ? stepped(projector.position.lensHeight + offset * 0.75, 0.25) : item.position.lensHeight, distance: projector.position.distance, targetX: intent.mode === 'stack' ? 0 : stepped(offset * scene.screen.width * 0.34, 0.25) } }); }); scene.layoutMode = intent.mode; }
+    else if (type === 'arrange-projectors' && ['stack', 'blend'].includes(intent.mode)) { const center = (scene.projectors.length - 1) / 2; scene.projectors = scene.projectors.map((item, itemIndex) => { const offset = itemIndex - center; const arranged = { ...item, position: { ...item.position, x: intent.mode === 'stack' ? 0 : stepped(offset * Math.max(2, scene.screen.width * 0.18), 0.25), lensHeight: intent.mode === 'stack' ? stepped(projector.position.lensHeight + offset * 0.75, 0.25) : item.position.lensHeight, distance: projector.position.distance, targetX: intent.mode === 'stack' ? 0 : stepped(offset * scene.screen.width * 0.34, 0.25) } }; return JSON.stringify(arranged) === JSON.stringify(item) ? item : invalidateCommissioning(invalidateFieldVerification(arranged), type, changedAt); }); scene.layoutMode = intent.mode; }
+    else if (type === 'set-blend-overlap-range' && finite(intent.minimumPercent) && finite(intent.maximumPercent) && Number(intent.maximumPercent) >= Number(intent.minimumPercent)) scene.layoutConfig.blend = { minimumOverlapPercent: clamp(intent.minimumPercent, 0, 100), maximumOverlapPercent: clamp(intent.maximumPercent, 0, 100) };
+    else if (type === 'clear-blend-overlap-range') scene.layoutConfig.blend = { minimumOverlapPercent: undefined, maximumOverlapPercent: undefined };
+    else if (type === 'set-layout-config' && intent.layout === 'blend' && ['minimumOverlapPercent', 'maximumOverlapPercent'].includes(intent.key)) {
+      if (intent.value === undefined || intent.value === null || intent.value === '') scene.layoutConfig.blend[intent.key] = undefined;
+      else if (finite(intent.value)) scene.layoutConfig.blend[intent.key] = clamp(intent.value, 0, 100);
+    }
+    else if (type === 'set-layout-config' && intent.layout === 'stack' && ['centerTolerance', 'sizeTolerancePercent'].includes(intent.key) && finite(intent.value)) scene.layoutConfig.stack[intent.key] = clamp(intent.value, 0, intent.key === 'centerTolerance' ? 10 : 25);
+    else if (type === 'set-stack-tolerance') {
+      if (finite(intent.centerTolerance)) scene.layoutConfig.stack.centerTolerance = clamp(intent.centerTolerance, 0, 10);
+      if (finite(intent.sizeTolerancePercent)) scene.layoutConfig.stack.sizeTolerancePercent = clamp(intent.sizeTolerancePercent, 0, 25);
+    }
     else if (type === 'toggle-overlay' && Object.prototype.hasOwnProperty.call(scene.overlays, intent.key)) scene.overlays[intent.key] = intent.value === undefined ? !scene.overlays[intent.key] : Boolean(intent.value);
     else if (type === 'set-camera' && ['three', 'side', 'front', 'top', 'op'].includes(intent.camera)) scene.view.camera = intent.camera;
-    scene.updatedAt = new Date().toISOString();
+    scene.updatedAt = changedAt;
     return normalizeSceneState(scene);
+  }
+
+  function commissioningRecordFor(input, projectorId) {
+    const scene = normalizeSceneState(input);
+    const projector = scene.projectors.find(item => item.id === projectorId) || activeProjector(scene);
+    return [...projector.commissioningRecords].reverse().find(record => record.status !== 'superseded') || projector.commissioningRecords.at(-1);
+  }
+
+  function stampCommissioningRecord(input, values = {}) {
+    const scene = normalizeSceneState(input);
+    const projectorId = values.projectorId || scene.activeProjectorId;
+    const index = scene.projectors.findIndex(projector => projector.id === projectorId);
+    if (index < 0) throw new RangeError('Choose a projector unit before recording commissioning measurements.');
+    const projector = scene.projectors[index];
+    const geometry = calculateProjectorGeometry(scene, projector.id);
+    if (!geometry.image) throw new TypeError('This projector needs usable optical data before planned-versus-measured commissioning can be recorded.');
+    const measuredInput = values.measured && typeof values.measured === 'object' ? values.measured : {
+      throwDistance: values.measuredThrowDistance ?? values.measuredDistance,
+      imageWidth: values.measuredImageWidth ?? values.measuredWidth,
+      lensHeight: values.measuredLensHeight,
+      horizontalOffset: values.measuredHorizontalOffset,
+      targetOffset: values.measuredTargetOffset
+    };
+    const measured = normalizeCommissioningValues(measuredInput);
+    if (Object.values(measured).some(value => value === undefined)) throw new TypeError('Enter measured throw, image width, lens height, projector offset, and target offset before recording commissioning.');
+    const verifiedBy = String(values.verifiedBy || '').trim().slice(0, 120);
+    if (!verifiedBy) throw new TypeError('Name the person who verified these commissioning measurements.');
+    const verifiedAt = values.verifiedAt === undefined ? new Date().toISOString() : validTimestamp(values.verifiedAt);
+    if (!verifiedAt) throw new TypeError('Use a valid commissioning timestamp.');
+    const planned = {
+      throwDistance: projector.position.distance,
+      imageWidth: geometry.image.width,
+      lensHeight: projector.position.lensHeight,
+      horizontalOffset: projector.position.x,
+      targetOffset: projector.position.targetX
+    };
+    const notesInput = values.notes && typeof values.notes === 'object' ? values.notes : {};
+    const records = projector.commissioningRecords.map(record => record.status === 'superseded' ? record : normalizeCommissioningRecord({ ...record, supersededAt: verifiedAt }));
+    const record = normalizeCommissioningRecord({
+      id: values.id || nextId(records, 'commissioning'),
+      planned,
+      measured,
+      notes: {
+        shift: notesInput.shift ?? values.shiftNotes,
+        focus: notesInput.focus ?? values.focusNotes,
+        alignment: notesInput.alignment ?? values.alignmentNotes
+      },
+      verifiedBy,
+      verifiedAt
+    }, records.length);
+    records.push(record);
+    scene.projectors[index] = normalizeProjector({ ...projector, commissioningRecords: records }, index);
+    scene.updatedAt = verifiedAt;
+    return normalizeSceneState(scene);
+  }
+
+  const SCENARIO_SNAPSHOT_VERSION = 1;
+  const SCENARIO_HISTORY_VERSION = 1;
+
+  function createScenarioSnapshot(input, name, options = {}) {
+    const scene = normalizeSceneState(input);
+    const createdAt = validTimestamp(options.createdAt) || new Date().toISOString();
+    const cleanName = String(name || '').trim().slice(0, 120);
+    if (!cleanName) throw new TypeError('Give the scenario snapshot a name.');
+    return {
+      schemaVersion: SCENARIO_SNAPSHOT_VERSION,
+      id: cleanId(options.id, `scenario-${createdAt}`),
+      name: cleanName,
+      createdAt,
+      scene
+    };
+  }
+
+  function scenarioScene(input) {
+    return normalizeSceneState(input?.scene && typeof input.scene === 'object' ? input.scene : input);
+  }
+
+  function compareScenarioSnapshots(beforeInput, afterInput) {
+    const before = scenarioScene(beforeInput), after = scenarioScene(afterInput);
+    const changes = [];
+    const walk = (left, right, path) => {
+      if (path === 'updatedAt') return;
+      if (Object.is(left, right)) return;
+      const leftObject = left && typeof left === 'object', rightObject = right && typeof right === 'object';
+      if (leftObject && rightObject && Array.isArray(left) === Array.isArray(right)) {
+        const keys = Array.isArray(left) ? Array.from({ length: Math.max(left.length, right.length) }, (_, index) => index) : [...new Set([...Object.keys(left), ...Object.keys(right)])].sort();
+        keys.forEach(key => walk(left[key], right[key], path ? `${path}.${key}` : String(key)));
+        return;
+      }
+      changes.push({ path, before: left === undefined ? undefined : copy(left), after: right === undefined ? undefined : copy(right) });
+    };
+    walk(before, after, '');
+    const beforeProjectors = new Map(before.projectors.map(projector => [projector.id, projector]));
+    const afterProjectors = new Map(after.projectors.map(projector => [projector.id, projector]));
+    const changedProjectorIds = [...new Set([...beforeProjectors.keys(), ...afterProjectors.keys()])].filter(id => JSON.stringify(beforeProjectors.get(id)) !== JSON.stringify(afterProjectors.get(id)));
+    return { hasChanges: changes.length > 0, changes, changedProjectorIds };
+  }
+
+  function normalizeScenarioHistory(input) {
+    if (!input || typeof input !== 'object' || !input.present) throw new TypeError('A scenario history needs a present snapshot.');
+    const normalizeSnapshot = snapshot => createScenarioSnapshot(snapshot.scene || snapshot, snapshot.name || 'Scenario', { id: snapshot.id, createdAt: snapshot.createdAt });
+    const limit = finite(input.limit) ? Math.round(clamp(input.limit, 1, 100)) : 30;
+    return {
+      schemaVersion: SCENARIO_HISTORY_VERSION,
+      limit,
+      past: (Array.isArray(input.past) ? input.past : []).slice(-limit).map(normalizeSnapshot),
+      present: normalizeSnapshot(input.present),
+      future: (Array.isArray(input.future) ? input.future : []).slice(0, limit).map(normalizeSnapshot)
+    };
+  }
+
+  function createScenarioHistory(input, options = {}) {
+    const limit = finite(options.limit) ? Math.round(clamp(options.limit, 1, 100)) : 30;
+    return normalizeScenarioHistory({ schemaVersion: SCENARIO_HISTORY_VERSION, limit, past: [], present: createScenarioSnapshot(input, options.name || 'Initial scene', options), future: [] });
+  }
+
+  function commitScenario(historyInput, nextScene, name, options = {}) {
+    const history = normalizeScenarioHistory(historyInput);
+    const present = createScenarioSnapshot(nextScene, name, options);
+    return normalizeScenarioHistory({ ...history, past: [...history.past, history.present].slice(-history.limit), present, future: [] });
+  }
+
+  function undoScenario(historyInput) {
+    const history = normalizeScenarioHistory(historyInput);
+    if (!history.past.length) return history;
+    return normalizeScenarioHistory({ ...history, past: history.past.slice(0, -1), present: history.past.at(-1), future: [history.present, ...history.future].slice(0, history.limit) });
+  }
+
+  function redoScenario(historyInput) {
+    const history = normalizeScenarioHistory(historyInput);
+    if (!history.future.length) return history;
+    return normalizeScenarioHistory({ ...history, past: [...history.past, history.present].slice(-history.limit), present: history.future[0], future: history.future.slice(1) });
   }
 
   function stampFieldVerification(input, values = {}) {
@@ -536,5 +928,5 @@
     return normalizeSceneState(scene);
   }
 
-  return Object.freeze({ SCHEMA_VERSION, STORAGE_KEY, PLACEMENT_TOLERANCE, COVERAGE_TOLERANCE, ASPECT_TOLERANCE, normalizeProvenance, normalizeSceneState, createSceneState, activeProjector, calculateProjectorGeometry, roomConflicts, bodyExtents, assessInstallation, assessCombinedShift, resolveProfileRatio, transferParamsFor, FIELD_VERIFICATION, invalidatesFieldVerification, lengthToFeet, LENGTH_UNITS, obstacleIntersectsBeam, applyIntent, stampFieldVerification });
+  return Object.freeze({ SCHEMA_VERSION, STORAGE_KEY, PLACEMENT_TOLERANCE, COVERAGE_TOLERANCE, ASPECT_TOLERANCE, COMMISSIONING_VERSION, COMMISSIONING_FIELDS, COMMISSIONING_IMPACTS, SCENARIO_SNAPSHOT_VERSION, SCENARIO_HISTORY_VERSION, normalizeProvenance, normalizeSceneState, createSceneState, activeProjector, calculateProjectorGeometry, calculateMultiProjectorLayout, roomConflicts, bodyExtents, assessInstallation, assessCombinedShift, resolveProfileRatio, transferParamsFor, FIELD_VERIFICATION, invalidatesFieldVerification, lengthToFeet, LENGTH_UNITS, obstacleIntersectsBeam, applyIntent, commissioningRecordFor, stampCommissioningRecord, createScenarioSnapshot, compareScenarioSnapshots, createScenarioHistory, commitScenario, undoScenario, redoScenario, stampFieldVerification });
 });

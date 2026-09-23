@@ -4,9 +4,10 @@ Throwline is the offline-capable projector planning surface at `/ProjectorThrow/
 
 ## Stage 3D architecture
 
-- `throwline-scene-state.js` is the shared scene contract and pure geometry boundary. It normalizes imported data, applies named user intents, calculates projector geometry, detects beam obstructions, and owns provenance transitions.
+- `throwline-scene-state.js` is the shared scene contract and pure geometry boundary. It normalizes imported data, applies named user intents, calculates projector and multi-projector geometry, detects beam obstructions, owns commissioning evidence, and provides named scenario history with undo and redo.
 - `Stage3D.html` owns the no-scroll workspace, controls, readouts, room model, placement and shift guides, persistence, and the mapping from UI events to scene intents.
-- `three-d-stage.js` owns WebGL rendering, runtime context-loss recovery, camera and export plumbing, and pointer hit-testing. Direct manipulation emits `stage-manipulation` intents; it does not calculate throw geometry.
+- `three-d-stage.js` owns WebGL rendering, runtime context-loss recovery, camera and export plumbing, pointer and keyboard hit-testing, dimension callouts, and PNG capture. Direct manipulation emits `stage-manipulation` intents; it does not calculate throw geometry.
+- `throwline-practice-state.js` is the pure deterministic state, picture, scope, and scoring engine for `practice.html`. The practice page never connects to or controls equipment.
 - `vendor/three/` contains the exact local Three.js `0.184.0` modules needed by the scene and exporters. Refresh them with `npm run vendor:throwline-three` after an intentional version change.
 
 The scene JSON uses schema version 1 and stores locally under `throwline:stage-scene:v1`. Import always normalizes and caps the scene to eight projector units and 24 obstructions.
@@ -26,7 +27,9 @@ The scene JSON uses schema version 1 and stores locally under `throwline:stage-s
 - Obstruction collision solves the beam boundaries as linear functions of depth across the obstacle's whole z extent, so a deep object that only clips the wide end of the beam is still a collision.
 - Transfer bounds equal the scene-state limits (2–200 ft screens, 1–300 ft throws); the range controls stretch to hold a transferred value instead of clamping it. Null, blank, or boolean optical values and inverted ratio ranges block calculation.
 - The numerical model, readouts, verdicts, and controls hydrate before the WebGL renderer starts. Startup first retries with lower graphics demand. If WebGL 2 is still unavailable, a visible live 2D plan takes over using the same scene state: room, screen, beams, projector units, and obstructions keep redrawing; placement and layer controls remain live while controls that only affect the 3D view and OBJ/GLB exports are disabled. If WebGL is lost after startup, a visible recovery panel preserves those facts, suspends exports, and restores the existing scene and controls when the browser reports `webglcontextrestored`.
-- The stack and blend arrangements are illustrative layouts. Overlap percentage, per-unit crop, and edge-blend geometry are not solved.
+- `calculateMultiProjectorLayout()` clips each calculable image to the screen, calculates exact rectangle-union coverage, reports per-unit coverage, and measures every adjacent blend overlap. A blend can be judged only after the operator enters the processor's allowed minimum and maximum overlap. Stack checks compare image size, centre, throw, lens height, and raster shape against explicit tolerances. The model deliberately does not infer combined brightness; the handoff tells the crew to measure the aligned system on site.
+- Every projector can hold up to 50 versioned commissioning records. A record captures planned and measured throw, image width, lens height, projector offset, image offset, focus, alignment, notes, verifier, timestamp, and deltas. Geometry edits selectively mark only affected checks stale; a replacement record supersedes the earlier one without deleting it. `Commissioning CSV` exports the audit trail. `Handoff HTML` is a standalone printable package containing the job sheet, plan view, optional 3D capture, every commissioning record, exact scene JSON, and named demonstration history.
+- `Save version`, `Undo version`, and `Redo version` expose the bounded scenario history used for demonstrations. Ordinary edits remain visibly unsaved until a named version is created; scene JSON and the standalone handoff are the transfer formats.
 
 ## Workspace layout
 
@@ -37,6 +40,12 @@ The scene JSON uses schema version 1 and stores locally under `throwline:stage-s
 - Between 821px and 1299px the desktop rail is kept but the permanent Facts overlay leaves the canvas: a visible, keyboard-operable Facts button opens it as an on-demand, Escape-dismissible sheet. The 820px four-button mobile dock is unchanged. At 360px and below, the header keeps Theme, Units, Field Verify, and Start fully inside the viewport without reducing their touch height, and phone number and text inputs are at least 44px tall.
 
 The first Stage 3D visit opens a three-pass Quick Start route through screen sizing, projector placement, and inspection/field verification. Choosing a step closes the dialog, opens the live adjustment surface, focuses the corresponding control, and briefly marks its control group. Completion is remembered under `throwline:stage-onboarding:v1`; the header Quick Start control always reopens the route.
+
+## Camera shading practice
+
+`practice.html` is a deterministic training lab built around one shared signal state: two virtual cameras feed one seven-control shading panel and the same generated frames feed waveform, RGB parade, vectorscope, and histogram views. Four exercises cover camera matching, highlight recovery, black-level placement, and color-cast correction; seven troubleshooting injections create bounded faults that replay from a seed. The page is labelled `SIMULATION FOR PRACTICE` and `Generated practice signal · not a measurement` because its scores are coaching feedback, not calibration evidence.
+
+The compact query link carries scenario, seed, selected camera, scope, and split state. The full-state `#state=` handoff carries the exact versioned JSON session. Import/export and `ThrowlinePracticeApp` reproduce the same state without network access. Only the light/dark preference persists locally under `throwline.practice.theme.v1`.
 
 ## Lens catalog
 
@@ -52,8 +61,8 @@ The first Stage 3D visit opens a three-pass Quick Start route through screen siz
 
 ## Verification
 
-Run `npm run verify:throwline`. This checks the embedded catalog, scene-state unit tests, locally vendored Three.js assets, offline registry, Stage 3D workspace contract, metadata, and release documentation.
+Run `npm run verify:throwline`. This checks the embedded catalog, the complete scene-state and deterministic practice-state suites, locally vendored Three.js assets, offline registry, Stage 3D workspace contract, Scope Practice contract, metadata, and release documentation. The current suite contains 59 state tests.
 
-Run `npm run test:throwline-browser` for the hard-fail browser release gate. It serves the repository and drives `Stage3D.html` in headless Chrome twice: the WebGL run checks visible Field Verify errors, a real `WEBGL_lose_context` loss and restoration, promised OBJ/GLB object names (`screen`, `projector_body`, `lens_barrel`, and `cart`), and a service-worker-controlled offline reload; the second run disables WebGL and proves the 2D fallback is visible, populated, redraws from live scene state, and reports identical facts. `npm run probe:throwline-stage` remains available for a single browser run; pass `--chrome=`, `--base=`, or `--no-webgl` as needed. The probe also covers catalog shift limits with the maker's combined up-and-sideways rule.
+Run `npm run test:throwline-browser` for the hard-fail browser release gate. It serves the repository and drives `Stage3D.html` in headless Chrome twice: the WebGL run checks visible Field Verify errors, real blend and stack reporting, a real pointer drag plus keyboard manipulation, dimensioned views, commissioning and handoff downloads, named demonstration undo/redo, a real `WEBGL_lose_context` loss and restoration, promised OBJ/GLB object names (`screen`, `projector_body`, `lens_barrel`, and `cart`), and a service-worker-controlled offline reload; the second run disables WebGL and proves the 2D fallback is visible, populated, redraws from live scene state, and reports identical facts. It then drives `practice.html`, proves the camera-match score improves through visible controls, renders all four scopes, reproduces the exact handoff, and sweeps phone through ultrawide containment. `npm run probe:throwline-stage` and `npm run probe:throwline-practice` remain available separately; pass `--chrome=`, `--base=`, or `--no-webgl` as needed.
 
 Browser release checks cover desktop and phone no-scroll containment, first-run onboarding and its remembered/reopen flows, WebGL readiness, exclusive mobile sheets, direct manipulation, scene save and restore, obstruction collision alerts, multi-projector layouts, and field-stamp invalidation.

@@ -189,17 +189,44 @@ async function main() {
     await evaluate(`document.getElementById('workflowTabDeliver').click()`);
     await evaluate(`document.getElementById('stampVerification').click()`);
     await delay(120);
-    const invalidFieldStamp = await evaluate(`(() => { const error=document.getElementById('fieldVerificationError'); return { hidden:error.hidden, text:error.textContent.trim(), role:error.getAttribute('role'), focus:document.activeElement?.id, invalid:['measuredDistance','measuredWidth','verifiedBy'].map(id=>document.getElementById(id).getAttribute('aria-invalid')) }; })()`);
+    const invalidFieldStamp = await evaluate(`(() => { const error=document.getElementById('fieldVerificationError'); return { hidden:error.hidden, text:error.textContent.trim(), role:error.getAttribute('role'), focus:document.activeElement?.id, invalid:['measuredDistance','measuredWidth','measuredLensHeight','measuredProjectorX','measuredTargetX','verifiedBy'].map(id=>document.getElementById(id).getAttribute('aria-invalid')) }; })()`);
     check('blank Field Verify shows a visible alert', invalidFieldStamp.hidden === false && invalidFieldStamp.role === 'alert' && /measured throw/i.test(invalidFieldStamp.text), invalidFieldStamp);
     check('blank Field Verify marks every field invalid and focuses the first field', invalidFieldStamp.focus === 'measuredDistance' && invalidFieldStamp.invalid.every(value => value === 'true'), invalidFieldStamp);
+
+    await setInput('measuredDistance', 0.01);
+    await setInput('measuredWidth', 200);
+    await setInput('measuredLensHeight', 6);
+    await setInput('measuredProjectorX', 0);
+    await setInput('measuredTargetX', 0);
+    await setInput('verifiedBy', '=1+1');
+    await click('stampVerification');
+    await evaluate(`document.getElementById('downloadCommissioning').click()`);
+    const rejectedCsvPath = await waitForPath(path.join(downloadDir, 'throwline-commissioning-records.csv'));
+    const rejectedCsv = fs.readFileSync(rejectedCsvPath, 'utf8');
+    fs.unlinkSync(rejectedCsvPath);
+    const rejectedCommissioning = await evaluate(`({badge:document.getElementById('provenanceBadge').textContent.trim(),error:document.getElementById('fieldVerificationError').textContent.trim()})`);
+    check('an invalid field ratio leaves commissioning and verification state unchanged', rejectedCsv.trim().split(/\r?\n/).length === 1 && rejectedCommissioning.badge === 'MANUAL ESTIMATE' && /outside the 0.05/.test(rejectedCommissioning.error), { rejectedCommissioning, rejectedCsv });
 
     // 4. Field stamp keeps the planned basis: 12 ft throw / 10 ft image on a 20 ft raster corrects the mark to 24 ft.
     await setInput('measuredDistance', 12);
     await setInput('measuredWidth', 10);
-    await setInput('verifiedBy', 'Probe');
+    await setInput('measuredLensHeight', 6);
+    await setInput('measuredProjectorX', 0);
+    await setInput('measuredTargetX', 0);
+    await setInput('verifiedBy', '=1+1');
+    await setInput('commissioningNotes', '@SUM(1,1)');
     const stamped = await click('stampVerification');
     check('stamped unit is FIELD VERIFIED', stamped.badge === 'FIELD VERIFIED' && stamped.mode === 'field_verified', stamped);
     check('stamped unit at the old mark reads undershoot against the corrected 24 ft mark', stamped.projection === 'undershoot', stamped);
+    const commissioning = await evaluate(`(() => ({summary:document.getElementById('commissioningSummary').textContent.trim(),current:document.getElementById('scenarioStatus').textContent.trim()}))()`);
+    check('commissioning evidence is visible and the demonstration history records the checkpoint', /^Current · /.test(commissioning.summary) && /Commissioned /.test(commissioning.current), commissioning);
+    await evaluate(`document.getElementById('downloadCommissioning').click()`);
+    const commissioningCsv = fs.readFileSync(await waitForPath(path.join(downloadDir, 'throwline-commissioning-records.csv')), 'utf8');
+    check('commissioning CSV carries planned, measured, delta, verifier, and check evidence', /planned_throw_ft,measured_throw_ft,throw_delta_ft/.test(commissioningCsv) && /focus_check,alignment_check/.test(commissioningCsv));
+    check('commissioning CSV neutralizes formula-leading verifier and note cells', commissioningCsv.includes("'=1+1") && commissioningCsv.includes("'@SUM(1,1)"), commissioningCsv);
+    await evaluate(`document.getElementById('downloadHandoff').click()`);
+    const handoffHtml = fs.readFileSync(await waitForPath(path.join(downloadDir, 'throwline-handoff.html')), 'utf8');
+    check('standalone handoff embeds exact scene and demonstration history JSON', /id="throwline-scene"/.test(handoffHtml) && /id="throwline-scenario-history"/.test(handoffHtml) && /Commissioning records/.test(handoffHtml));
     const corrected = await click('bw');
     check('snapping the stamped unit moves it to exactly 24\' 0" as a nominal verify mark', corrected.distance === '24\' 0"' && corrected.projection === 'nominal' && /^Worth a look/.test(corrected.headline), corrected);
     check('driving edit after the stamp returns the unit to a manual estimate', corrected.badge === 'MANUAL ESTIMATE', corrected);
@@ -243,7 +270,7 @@ async function main() {
     check('a link marked in metres reads as the same 20 ft / 22 ft scene', metricLink.distance === '22\' 0"' && metricLink.ratio === '1.100:1' && /link values read as metres/.test(await measureFact()), metricLink);
     const metricView = await click('unitToggle');
     check('the unit toggle shows the set mark and image in metres', metricView.distance === '6.71 m' && /^6\.10 m × 3\.81 m$/.test(metricView.image) && /^metres/.test(await measureFact()), metricView);
-    await setInput('measuredDistance', 3.66); await setInput('measuredWidth', 3.05); await setInput('verifiedBy', 'Probe'); // 1.2:1 typed in metres, within the 0.01 step
+    await setInput('measuredDistance', 3.66); await setInput('measuredWidth', 3.05); await setInput('measuredLensHeight', 1.83); await setInput('measuredProjectorX', 0); await setInput('measuredTargetX', 0); await setInput('verifiedBy', 'Probe'); // 1.2:1 typed in metres, within the 0.01 step
     const metricStamp = await click('stampVerification');
     check('a stamp typed in metres is stored as the 1.2:1 ratio and marks 7.32 m', metricStamp.badge === 'FIELD VERIFIED' && metricStamp.wide === '7.32 m', metricStamp);
     const backToFeet = await click('unitToggle');
@@ -375,6 +402,11 @@ async function main() {
           set('dist', '30'); setTimeout(() => resolve({ before, kept, after: document.getElementById('verifyBadge').textContent.trim(), reset: document.getElementById('verifyReset').textContent.trim(), resetHidden: document.getElementById('verifyReset').hidden }), 400); }, 400); }, 400)); })()`);
     check('planner stamp reads field verified and its Stage 3D link carries the unit marker and measurement', plannerStamp.before.badge === 'field verified' && /u=ft/.test(plannerStamp.before.link) && /md=12/.test(plannerStamp.before.link) && /mw=10/.test(plannerStamp.before.link), plannerStamp);
     check('a non-driving edit keeps the planner stamp; a distance change drops it with the shared reason', plannerStamp.kept === 'field verified' && plannerStamp.after !== 'field verified' && plannerStamp.resetHidden === false && /measure again/.test(plannerStamp.reset), plannerStamp);
+    await cdp('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 1, mobile: true });
+    await delay(180);
+    const plannerNav = await evaluate(`(() => { const rail=document.querySelector('.rail').getBoundingClientRect(); const ids=['stage3dLink','scopePracticeLink','plannerFieldVerify']; const links=[...document.querySelectorAll('.rail-nav .nav-home,.rail-nav .nav-suite,.rail-nav .nav-stage,.rail-nav .nav-practice,#plannerFieldVerify')].map(node=>{const rect=node.getBoundingClientRect();return{id:node.id||node.className,text:node.textContent.trim(),left:rect.left,top:rect.top,right:rect.right,bottom:rect.bottom,height:rect.height};});return{clientWidth:document.documentElement.clientWidth,scrollWidth:document.documentElement.scrollWidth,rail:{left:rail.left,top:rail.top,right:rail.right,bottom:rail.bottom},links,ids:ids.map(id=>Boolean(document.getElementById(id)))};})()`);
+    check('390px planner keeps Home, AV Suite, Stage 3D, Practice, and Field Verify in its two-row rail', plannerNav.ids.every(Boolean) && plannerNav.links.length === 5 && plannerNav.links.every(item => item.left >= plannerNav.rail.left - 0.5 && item.right <= plannerNav.rail.right + 0.5 && item.top >= plannerNav.rail.top - 0.5 && item.bottom <= plannerNav.rail.bottom + 0.5 && item.height >= 44) && plannerNav.scrollWidth <= plannerNav.clientWidth + 1, plannerNav);
+    await cdp('Emulation.setDeviceMetricsOverride', { width: 1280, height: 900, deviceScaleFactor: 1, mobile: false });
 
     // 15. The service worker must earn the Offline ready label and serve a cold-network reload.
     await open(AUDIT_QUERY);
@@ -414,6 +446,9 @@ async function main() {
       check(`${viewport.width}px workspace has no horizontal overflow and keeps a visible stage`, layout.scrollWidth <= layout.clientWidth + 1 && layout.stage.width > 200 && layout.stage.height > 240 && layout.stage.top >= 0 && layout.stage.bottom <= layout.innerHeight, layout);
       check(`${viewport.width}px mobile dock stays visible with four touch targets`, layout.dock.width > 200 && layout.dock.height >= 44 && layout.dock.bottom <= layout.innerHeight + 1 && layout.buttons.length === 4 && layout.buttons.every(button => button.height >= 44), layout);
       if (viewport.width === 390) {
+        const onboarding = await evaluate(`(() => { const dialog=document.getElementById('onboardingDialog'); dialog.showModal(); const rect=dialog.getBoundingClientRect(); const shell=dialog.querySelector('.onboarding-shell').getBoundingClientRect(); const actions=[...dialog.querySelectorAll('.onboarding-actions button')].map(button=>button.getBoundingClientRect()); return {clientWidth:document.documentElement.clientWidth,clientHeight:document.documentElement.clientHeight,scrollWidth:dialog.scrollWidth,clientDialogWidth:dialog.clientWidth,rect:{left:rect.left,top:rect.top,right:rect.right,bottom:rect.bottom},shell:{left:shell.left,right:shell.right},actions:actions.map(rect=>({left:rect.left,right:rect.right,height:rect.height}))}; })()`);
+        check('390px Quick Start stays fully inside the viewport', onboarding.rect.left >= -0.5 && onboarding.rect.right <= onboarding.clientWidth + 0.5 && onboarding.rect.top >= -0.5 && onboarding.rect.bottom <= onboarding.clientHeight + 0.5 && onboarding.scrollWidth <= onboarding.clientDialogWidth + 1 && onboarding.shell.left >= onboarding.rect.left - 0.5 && onboarding.shell.right <= onboarding.rect.right + 0.5 && onboarding.actions.every(rect => rect.left >= onboarding.rect.left && rect.right <= onboarding.rect.right && rect.height >= 44), onboarding);
+        await evaluate(`document.getElementById('onboardingDialog').close()`);
         await evaluate(`document.querySelector('[data-mobile-panel-button="adjust"]').click()`);
         await delay(120);
         await evaluate(`document.getElementById('workflowTabDeliver').click()`);
@@ -449,7 +484,7 @@ async function main() {
         trigger:{visible:visible(trigger),rect:rect(trigger),tag:trigger?trigger.tagName:'',expanded:trigger?trigger.getAttribute('aria-expanded'):''},
         toolbar:{visible:visible(toolbar),rect:rect(toolbar)}, dock:{visible:visible(dock),rect:rect(dock)}, aside:{visible:visible(aside),rect:rect(aside)}, workflowFooter:{visible:visible(workflowFooter),rect:rect(workflowFooter)} };
     })()`;
-    const CONTROL_IDS = ['adjustPanel','sectionScreen','sectionProjector','sectionPlacement','sectionRoom','sectionVerify','adjustSummary','flightUnit','flightProvenance','flightScreen','flightSet','workflowTabSetup','workflowTabPlace','workflowTabRoom','workflowTabDeliver','workflowPanelSetup','workflowPanelPlace','workflowPanelRoom','workflowPanelDeliver','workflowBack','workflowNext','workflowPosition','unitStrip','addUnit','removeUnit','stackUnits','blendUnits','sw','st','ar','lens','lh','d','px','targetX','bw','bm','bt','bodyW','bodyH','bodyD','bodyLp','clearBody','roomW','roomD','roomH','roomC','addObstacle','clearObstacles','obstacleX','obstacleY','obstacleZ','obstacleWidth','obstacleHeight','obstacleDepth','removeObstacle','measuredDistance','measuredWidth','verifiedBy','stampVerification','saveScene','restoreScene','importScene','downloadScene','resetScene','jobSheetOpen','sceneFile','tcone','troom','tgrid','tenvelope','tshift','tdimensions','resetView','mobileObj','mobileGlb','mobileJobSheet','factsTrigger','themeToggle','unitToggle','fieldVerifyToggle','quickStartToggle'];
+    const CONTROL_IDS = ['adjustPanel','sectionScreen','sectionProjector','sectionPlacement','sectionLayout','sectionRoom','sectionVerify','adjustSummary','flightUnit','flightProvenance','flightScreen','flightSet','workflowTabSetup','workflowTabPlace','workflowTabRoom','workflowTabDeliver','workflowPanelSetup','workflowPanelPlace','workflowPanelRoom','workflowPanelDeliver','workflowBack','workflowNext','workflowPosition','unitStrip','addUnit','removeUnit','stackUnits','blendUnits','blendOverlapMin','blendOverlapMax','layoutSummary','layoutMetrics','sw','st','ar','lens','lh','d','px','targetX','bw','bm','bt','bodyW','bodyH','bodyD','bodyLp','clearBody','roomW','roomD','roomH','roomC','addObstacle','clearObstacles','obstacleX','obstacleY','obstacleZ','obstacleWidth','obstacleHeight','obstacleDepth','removeObstacle','measuredDistance','measuredWidth','measuredLensHeight','measuredProjectorX','measuredTargetX','focusCheck','alignmentCheck','verifiedBy','commissioningNotes','commissioningSummary','stampVerification','saveScene','restoreScene','importScene','downloadScene','downloadHandoff','downloadCommissioning','scenarioName','saveScenario','undoScenario','redoScenario','scenarioStatus','resetScene','jobSheetOpen','sceneFile','tcone','troom','tgrid','tenvelope','tshift','tdimensions','resetView','mobileObj','mobileGlb','mobileJobSheet','factsTrigger','themeToggle','unitToggle','fieldVerifyToggle','quickStartToggle'];
 
     await cdp('Emulation.setDeviceMetricsOverride', { width: 1280, height: 900, deviceScaleFactor: 1, mobile: false });
     await open(AUDIT_QUERY);
@@ -475,6 +510,45 @@ async function main() {
       await delay(125);
     }
     check('confirmed offline readiness collapses the explanation to a compact status row', offlineCompact?.state === 'ready' && offlineCompact.detailDisplay === 'none' && /^Offline ready/.test(offlineCompact.title), offlineCompact);
+
+    // 13. Multi-projector geometry, explicit demo history, dimension callouts, and keyboard manipulation.
+    await click('addUnit');
+    await click('blendUnits');
+    await setInput('blendOverlapMin', 10, 'change');
+    await setInput('blendOverlapMax', 40, 'change');
+    const blendAnalysis = await evaluate(`(() => ({summary:document.getElementById('layoutSummary').textContent.trim(),units:document.querySelectorAll('#layoutMetrics .layout-unit').length,tone:document.getElementById('layoutSummary').dataset.tone}))()`);
+    check('blend UI reports real per-unit coverage and adjacent overlap without brightness claims', blendAnalysis.units === 2 && /Blend/.test(blendAnalysis.summary) && /adjacent overlap/.test(blendAnalysis.summary) && !/lumen|brightness/i.test(blendAnalysis.summary), blendAnalysis);
+    await setInput('scenarioName', 'Browser demonstration', 'input');
+    await click('saveScenario');
+    const versionSaved = await evaluate(`(() => ({status:document.getElementById('scenarioStatus').textContent.trim(),undo:document.getElementById('undoScenario').disabled,redo:document.getElementById('redoScenario').disabled}))()`);
+    await click('undoScenario');
+    const versionUndone = await evaluate(`(() => ({status:document.getElementById('scenarioStatus').textContent.trim(),redo:document.getElementById('redoScenario').disabled,units:document.querySelectorAll('#unitStrip button').length}))()`);
+    await click('redoScenario');
+    const versionRedone = await evaluate(`(() => ({status:document.getElementById('scenarioStatus').textContent.trim(),units:document.querySelectorAll('#unitStrip button').length}))()`);
+    check('named demonstration versions support explicit save, undo, and redo', /Browser demonstration/.test(versionSaved.status) && versionSaved.undo === false && versionUndone.redo === false && versionUndone.units === 1 && versionRedone.units === 2, { versionSaved, versionUndone, versionRedone });
+    if (!noWebgl) {
+      await click('addObstacle');
+      const pointerSetup = await evaluate(`(async()=>{const stage=document.querySelector('three-d-stage');for(let i=0;i<80&&!stage.getManipulationTargets().length;i++)await new Promise(r=>setTimeout(r,50));document.querySelector('[data-cam="top"]').click();await new Promise(r=>setTimeout(r,240));window.__throwlinePointerEvent=null;stage.addEventListener('stage-manipulation',event=>{if(event.detail.source==='pointer')window.__throwlinePointerEvent=event.detail},{once:false});return{point:stage.getManipulationTargetScreenPoint('distance'),before:document.getElementById('dv').textContent.trim()};})()`);
+      const pointerPoint = pointerSetup.point;
+      const pointerAxisLength = Math.hypot(pointerPoint?.axisX || 0, pointerPoint?.axisY || 0);
+      const pointerInside = Boolean(pointerPoint && pointerPoint.ndcZ >= -1 && pointerPoint.ndcZ <= 1 && pointerPoint.x >= pointerPoint.canvas.left && pointerPoint.x <= pointerPoint.canvas.right && pointerPoint.y >= pointerPoint.canvas.top && pointerPoint.y <= pointerPoint.canvas.bottom && pointerAxisLength >= 1);
+      check('top camera keeps the set-distance handle inside the interactive canvas', pointerInside, pointerPoint);
+      if (pointerInside) {
+        const dragX = pointerPoint.x + (pointerPoint.axisX / pointerAxisLength) * 80;
+        const dragY = pointerPoint.y + (pointerPoint.axisY / pointerAxisLength) * 80;
+        await cdp('Input.dispatchMouseEvent', { type: 'mouseMoved', x: pointerPoint.x, y: pointerPoint.y, button: 'none', buttons: 0 });
+        await cdp('Input.dispatchMouseEvent', { type: 'mousePressed', x: pointerPoint.x, y: pointerPoint.y, button: 'left', buttons: 1, clickCount: 1 });
+        await cdp('Input.dispatchMouseEvent', { type: 'mouseMoved', x: dragX, y: dragY, button: 'left', buttons: 1 });
+        await cdp('Input.dispatchMouseEvent', { type: 'mouseReleased', x: dragX, y: dragY, button: 'left', buttons: 0, clickCount: 1 });
+        await delay(240);
+      }
+      const pointerResult = await evaluate(`({after:document.getElementById('dv').textContent.trim(),event:window.__throwlinePointerEvent})`);
+      check('real pointer dragging changes set distance through the public event contract', pointerInside && pointerSetup.before !== pointerResult.after && pointerResult.event?.phase === 'commit' && pointerResult.event?.source === 'pointer', { before:pointerSetup.before, ...pointerResult, point:pointerPoint });
+      const spatial = await evaluate(`(async()=>{const stage=document.querySelector('three-d-stage');const targets=stage.getManipulationTargets();const before=document.getElementById('dv').textContent.trim();stage.selectManipulationTarget('distance',{source:'probe'});const canvas=stage.shadowRoot.querySelector('canvas');canvas.focus();canvas.dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowUp',bubbles:true}));await new Promise(r=>setTimeout(r,180));return{ids:targets.map(item=>item.id),badges:[...stage.shadowRoot.querySelectorAll('.dimension-badge')].map(node=>node.textContent.trim()),before,after:document.getElementById('dv').textContent.trim()};})()`);
+      check('renderer exposes projector and obstruction manipulation targets', spatial.ids.includes('distance') && spatial.ids.some(id=>/^obstacle:.*:x$/.test(id)), spatial);
+      check('dimensioned plan view shows measurement badges', spatial.badges.some(label=>/Throw|Screen width|Image aim/.test(label)), spatial.badges);
+      check('keyboard manipulation changes the selected set distance through the public event contract', spatial.before !== spatial.after, spatial);
+    }
 
     const MATRIX_WIDTHS = [320, 360, 390, 560, 680, 820, 821, 1024, 1200, 1299, 1300, 1440, 2750];
     const MATRIX_HEIGHTS = { 320: 568, 360: 740, 390: 844, 560: 720, 680: 900, 820: 1080, 821: 900, 1024: 768, 1200: 800, 1299: 850, 1300: 850, 1440: 900, 2750: 1200 };
