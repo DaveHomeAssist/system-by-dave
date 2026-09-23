@@ -2,6 +2,7 @@
 
 - Corrected the URSA Broadcast G2 back-focus shortcut to select the fitted lens method before adjustment.
 - Reconciled the exported FMP operator references with FMP-8 status and documented house-video evidence while retaining unresolved physical paths as Unknown.
+- Kept the active reference panel visible when the mobile House Video shell places tabs below its separately scrolling content.
 
 # Changelog
 
