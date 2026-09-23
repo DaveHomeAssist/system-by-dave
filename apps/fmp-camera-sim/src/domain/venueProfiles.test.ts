@@ -14,11 +14,12 @@ describe("venue profile compatibility", () => {
     project.session.presets = [{ slot: 1, name: "Legacy", cameraId: project.camera.id, pan: 20, tilt: 65, lens: 0.5, savedAt: "2026-09-23T07:00:00.000Z" }];
     const file = JSON.parse(serializeProject(project));
     file.venue.version = 1;
+    delete file.venue.mount.headingEvidence;
     delete file.venue.reference.geometryRevision;
     const parsed = parseProjectText(JSON.stringify(file));
     expect(parsed.ok).toBe(true);
     if (!parsed.ok) throw new Error("migration failed");
-    expect(parsed.project).toEqual(project);
+    expect(parsed.project).toEqual({ ...project, venue: { ...project.venue, mount: { ...project.venue.mount, headingEvidence: { status: project.venue.mount.status, note: project.venue.mount.note } } } });
     expect(parseProjectText(serializeProject(parsed.project))).toEqual(parsed);
   });
 

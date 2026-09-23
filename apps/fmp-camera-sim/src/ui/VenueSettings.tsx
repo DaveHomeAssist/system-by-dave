@@ -1,6 +1,7 @@
+import { ProvenanceFields } from "./ProvenanceFields";
 import { useState } from "react";
 import { type SimulatorStore, type StoreState } from "../app/store";
-import { EVIDENCE_LABELS, type EvidenceStatus, VENUE_STATUS_OPTIONS } from "../domain/evidence";
+import { EVIDENCE_LABELS, editedEvidence, type EvidenceStatus, VENUE_STATUS_OPTIONS } from "../domain/evidence";
 import { fromDisplayLength, toDisplayLength, formatLength, type LengthUnit } from "../domain/units";
 import { type Issue } from "../domain/validate";
 import { applyFmpStageProfile, type FmpStageProfile, DIMENSION_SPECS, type DistanceBasis, type MountOrientation, type VenueProfile } from "../domain/venue";
@@ -32,6 +33,7 @@ export function VenueSettings({ store, state }: Props) {
   const digits = unit === "ft" ? 1 : 2;
   const unmatched = issues.filter(
     (issue) =>
+      issue.path.includes(".provenance") ||
       !DIMENSION_SPECS.some((spec) => issue.path.startsWith(`venue.dimensions.${spec.key}`)) &&
       !issue.path.startsWith("venue.mount.panZeroBearingDeg"),
   );
@@ -40,7 +42,7 @@ export function VenueSettings({ store, state }: Props) {
     <div className="settings">
       <p className="settings-intro">
         Every dimension keeps its value, its evidence status and a source note. The simulator works in metres and shows {unit === "ft" ? "feet" : "metres"}.
-        Anything not measured or confirmed keeps the <strong>Approximate venue</strong> flag on.
+        Anything not measured or confirmed keeps the <strong>Approximate venue</strong> flag on. Source identifiers refer to your reference or measurement log; recording a method does not verify a value. Editing a value resets its evidence to Demo; set its evidence again after verification.
       </p>
       <fieldset className="dimension">
         <legend>Photo reference profile</legend>
@@ -119,7 +121,10 @@ export function VenueSettings({ store, state }: Props) {
               error={errorFor(path)}
               onCommit={(value) =>
                 apply((draft) => {
-                  draft.dimensions[spec.key].value = fromDisplayLength(value, unit);
+                  const next = fromDisplayLength(value, unit);
+                  if (Math.abs(draft.dimensions[spec.key].value - next) > 1e-9) {
+                    draft.dimensions[spec.key] = { ...editedEvidence(draft.dimensions[spec.key]), value: next };
+                  }
                 }, `${path}.value`)
               }
             />
@@ -133,6 +138,8 @@ export function VenueSettings({ store, state }: Props) {
                 })
               }
             />
+            <ProvenanceFields value={dimension.provenance} onChange={(provenance) =>
+              apply((draft) => { draft.dimensions[spec.key].provenance = provenance; })} />
             <NoteField
               label="Source note"
               value={dimension.note}
@@ -160,7 +167,7 @@ export function VenueSettings({ store, state }: Props) {
           ]}
           onChange={(value) =>
             apply((draft) => {
-              draft.distanceBasis.value = value;
+              if (draft.distanceBasis.value !== value) draft.distanceBasis = { ...editedEvidence(draft.distanceBasis), value };
             })
           }
         />
@@ -174,6 +181,8 @@ export function VenueSettings({ store, state }: Props) {
             })
           }
         />
+        <ProvenanceFields value={venue.distanceBasis.provenance} onChange={(provenance) =>
+          apply((draft) => { draft.distanceBasis.provenance = provenance; })} />
         <NoteField
           label="Source note"
           value={venue.distanceBasis.note}
@@ -187,7 +196,7 @@ export function VenueSettings({ store, state }: Props) {
 
       <fieldset className="dimension">
         <legend>
-          Camera mounting <EvidenceBadge status={venue.mount.status} />
+          Mount orientation <EvidenceBadge status={venue.mount.status} />
           <span className="critical-tag">Critical</span>
         </legend>
         <RadioGroup<MountOrientation>
@@ -199,21 +208,8 @@ export function VenueSettings({ store, state }: Props) {
           ]}
           onChange={(orientation) =>
             apply((draft) => {
-              draft.mount.orientation = orientation;
+              if (draft.mount.orientation !== orientation) draft.mount = { ...editedEvidence(draft.mount), orientation };
             })
-          }
-        />
-        <NumberField
-          label="Pan 0° heading"
-          value={venue.mount.panZeroBearingDeg}
-          digits={1}
-          unit="°"
-          help="Where pan 0° points, clockwise from the stage centreline."
-          error={errorFor("venue.mount.panZeroBearingDeg")}
-          onCommit={(value) =>
-            apply((draft) => {
-              draft.mount.panZeroBearingDeg = value;
-            }, "venue.mount.panZeroBearingDeg")
           }
         />
         <SelectField<EvidenceStatus>
@@ -226,6 +222,8 @@ export function VenueSettings({ store, state }: Props) {
             })
           }
         />
+        <ProvenanceFields value={venue.mount.provenance} onChange={(provenance) =>
+          apply((draft) => { draft.mount.provenance = provenance; })} />
         <NoteField
           label="Source note"
           value={venue.mount.note}
@@ -235,6 +233,33 @@ export function VenueSettings({ store, state }: Props) {
             })
           }
         />
+      </fieldset>
+
+      <fieldset className="dimension">
+        <legend>Pan-zero heading <EvidenceBadge status={venue.mount.headingEvidence.status} /><span className="critical-tag">Critical</span></legend>
+        <p>Photo-observed mounting does not verify the real controller's zero heading.</p>
+        <NumberField
+          label="Pan 0° heading"
+          value={venue.mount.panZeroBearingDeg}
+          digits={1}
+          unit="°"
+          help="Where pan 0° points, clockwise from the stage centreline."
+          error={errorFor("venue.mount.panZeroBearingDeg")}
+          onCommit={(value) =>
+            apply((draft) => {
+              if (draft.mount.panZeroBearingDeg !== value) {
+                draft.mount.panZeroBearingDeg = value;
+                draft.mount.headingEvidence = editedEvidence(draft.mount.headingEvidence);
+              }
+            }, "venue.mount.panZeroBearingDeg")
+          }
+        />
+        <SelectField<EvidenceStatus> label="Evidence" value={venue.mount.headingEvidence.status} options={STATUS_OPTIONS}
+          onChange={(status) => apply((draft) => { draft.mount.headingEvidence.status = status; })} />
+        <ProvenanceFields value={venue.mount.headingEvidence.provenance} onChange={(provenance) =>
+          apply((draft) => { draft.mount.headingEvidence.provenance = provenance; })} />
+        <NoteField label="Source note" value={venue.mount.headingEvidence.note}
+          onCommit={(note) => apply((draft) => { draft.mount.headingEvidence.note = note; })} />
       </fieldset>
 
       <section className="reference-block" aria-labelledby="cable-route-title">
