@@ -115,6 +115,16 @@ not visible on the new domain. A stub checks for the site's keys and IndexedDB
 databases (`storage` in the config; AV by Dave also includes every registry
 storage key). With none, it redirects immediately. Otherwise it offers:
 
+AV by Dave's explicit database list includes `PixelForge` and AV Workbook's
+`system-by-dave-av-workbook` Dexie store. The Workbook active and fallback
+local-storage keys come from the registry. The transfer is a one-time,
+operator-confirmed copy, not a shared cross-origin show record; an existing
+destination record remains authoritative until the operator reviews it.
+The AV transfer decision is at revision 2 so browsers that completed or skipped
+the earlier policy are offered the newly inventoried Workbook store on a return
+visit. No source record is deleted; repeated imports keep existing destination
+records.
+
 - **Move my data and continue**: opens `transfer.html` on the new domain as a
   popup, which announces itself to its opener; the stub sends the data by
   `postMessage` (origin-checked both ways) and redirects once it is imported.
@@ -218,6 +228,9 @@ includes clean and upgrade visits, binary IndexedDB records, retained source
 copies, duplicate backup imports, interrupted transfers, storage read/write
 failures, incompatible databases, invalid backups, history, all published pages,
 absolute home links, and every registry-declared offline AV asset and HTML page.
+The AV Workbook scenario also checks its actual `workbooks` store schema,
+source/patch/line-check fields, problem note, backup import, and preservation
+of a newer destination edit using synthetic data.
 
 Offline acceptance applies to the AV registry's declared offline pages. The FMP
 suite remains online-only under `docs/fmp-public-release.md`; no protected API

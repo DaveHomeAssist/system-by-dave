@@ -2,6 +2,8 @@
 
 **Status:** Proposed product and migration specification, 2026-09-23. This document describes the target experience and delivery gates; it does not claim that the remaining workspaces are implemented. The equipment-model pilot described below is already live.
 
+**Implementation note, 2026-09-23:** This specification records a 44-tool baseline. The current registry has 45 tools and 60 declared storage keys because `led-wall-calculator` was added after that baseline. See [Stage 0 inventory and migration safety](av-suite-consolidation-stage0.md) for current findings and open gates; the new tool's eventual workspace treatment remains undecided.
+
 **Baseline:** `DaveHomeAssist/system-by-dave` main after the focused FMP viewer release. The registry currently lists 44 tools. The deployed AV origin is `avbydave.com`; `av-suite.html` remains the stable doorway. This spec updates the earlier [Tool Index v2](../av-tool-suite/index-v2/index.html), which mapped 25 named legacy tools as a conceptual directory. The revised scope covers all 44 current registry entries and requires working, substantial views before reducing the catalog.
 
 ## Product decision

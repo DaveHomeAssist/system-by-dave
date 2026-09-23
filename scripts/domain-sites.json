@@ -97,6 +97,7 @@
       ],
       "storage": {
         "registryKeys": true,
+        "revision": 2,
         "keys": [
           "av-suite-dashboard.v1",
           "av-suite-ui.v1",
@@ -109,7 +110,8 @@
           "sbd.showboard."
         ],
         "indexedDB": [
-          "PixelForge"
+          "PixelForge",
+          "system-by-dave-av-workbook"
         ]
       }
     }
