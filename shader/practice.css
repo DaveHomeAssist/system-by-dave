@@ -357,8 +357,8 @@ input[type="range"]::-moz-range-thumb { width: 18px; height: 18px; border-radius
 input[type="range"]:focus-visible { outline-offset: 0; }
 
 /* ---------- scopes ---------- */
-.scope-tabs { display: flex; gap: 2px; padding: 2px; background: var(--surface-300); border: 1px solid var(--hairline); border-radius: var(--radius-sm); min-width: 0; }
-.scope-tabs .tab { min-height: 40px; }
+.scope-tabs { display: flex; gap: 2px; width: 100%; max-width: 100%; padding: 2px; background: var(--surface-300); border: 1px solid var(--hairline); border-radius: var(--radius-sm); min-width: 0; }
+.scope-tabs .tab { flex: 1 1 0; min-width: 0; min-height: 40px; overflow: hidden; text-overflow: ellipsis; }
 .scope-grid { flex: 1 1 auto; display: grid; gap: var(--space-2); min-height: 0; grid-template: minmax(0, 1fr) / minmax(0, 1fr); }
 .scope-grid[data-layout="quad"][data-arrangement="grid"] { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); }
 .scope-grid[data-layout="quad"][data-arrangement="row"] { grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: minmax(0, 1fr); }

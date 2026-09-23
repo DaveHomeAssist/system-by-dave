@@ -380,6 +380,17 @@ async function main() {
           allStates: buttons.every(button => ['true', 'false'].includes(button.getAttribute('aria-pressed')))
         };
         const containment = [];
+        const overflowingElements = () => [...document.querySelectorAll('body *')]
+          .filter(element => {
+            if (!visible(element) || getComputedStyle(element).position === 'fixed') return false;
+            const rect = element.getBoundingClientRect();
+            return rect.left < -1 || rect.right > innerWidth + 1;
+          })
+          .slice(0, 12)
+          .map(element => {
+            const rect = element.getBoundingClientRect();
+            return { tag: element.tagName, id: element.id, className: typeof element.className === 'string' ? element.className : '', left: rect.left, right: rect.right, width: rect.width };
+          });
         if (mobile) {
           for (const button of buttons) {
             button.click();
@@ -387,7 +398,8 @@ async function main() {
             containment.push({
               view: button.dataset.view,
               overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
-              documentWidth: document.documentElement.scrollWidth
+              documentWidth: document.documentElement.scrollWidth,
+              elements: overflowingElements()
             });
           }
           shadeButton.click();
@@ -400,7 +412,8 @@ async function main() {
             containment.push({
               view: button.dataset.sideTab,
               overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth + 1,
-              documentWidth: document.documentElement.scrollWidth
+              documentWidth: document.documentElement.scrollWidth,
+              elements: overflowingElements()
             });
           }
           const controlTab = document.getElementById('tab-control');
