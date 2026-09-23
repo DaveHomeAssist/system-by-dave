@@ -3,7 +3,7 @@ import { ftToM, mToFt } from "./units";
 import { type Issue, IssueList, readEnum, readNumber, readObject, readString } from "./validate";
 
 export const VENUE_SCHEMA = "fmp-camera-simulator.venue";
-export const VENUE_VERSION = 1;
+export const VENUE_VERSION = 2;
 
 export type DistanceBasis = "horizontal" | "line-of-sight";
 export type MountOrientation = "upright" | "inverted";
@@ -49,7 +49,7 @@ export interface VenueProfile {
     note: string;
   };
   /** Reference only. Never used to calculate optical distance. */
-  reference: { cableRoute: string };
+  reference: { cableRoute: string; geometryRevision: "legacy-v1" | "photo-review-2026-09" };
 }
 
 export interface DimensionSpec {
@@ -152,14 +152,14 @@ export function defaultVenueProfile(): VenueProfile {
         note: "Centred on the stage centreline as a demo assumption.",
       },
       stageWidth: {
-        value: ftToM(61),
+        value: ftToM(113),
         status: "estimated",
-        note: "Scale reading of Live Nation's published Stage & Pit plan, about ±2–5 ft. The plan does not annotate the deck edge, so this is not a certified stage dimension.",
+        note: "Revised interpretation of Live Nation’s rotated Stage & Pit plan: approximately 113 ft across stage. Performance deck boundaries remain provisional.",
       },
       stageDepth: {
-        value: ftToM(75),
-        status: "inferred",
-        note: "Inferred from a video-office comment. The Stage & Pit plan reads about 113 ft for the whole stage rectangle, which likely includes upstage and backstage area, so it is not used as the performance depth.",
+        value: ftToM(61),
+        status: "estimated",
+        note: "Revised plan interpretation: approximately 61 ft from downstage to upstage. The 75 ft video-office inference remains an alternative, not a surveyed boundary.",
       },
       deckHeight: {
         value: ftToM(5),
@@ -178,14 +178,15 @@ export function defaultVenueProfile(): VenueProfile {
       note: "The reported 100–120 ft has not established whether it is horizontal or line of sight. Horizontal is a demo assumption.",
     },
     mount: {
-      orientation: "upright",
+      orientation: "inverted",
       panZeroBearingDeg: 0,
       status: "demo",
-      note: "Mount orientation and pan-zero heading are not established. Upright, with pan 0° on the stage centreline, is a demo assumption.",
+      note: "P100 shows the installed P240 hanging inverted. Pan-zero heading and firmware image-flip settings are unknown; centreline heading and upright operator video are simulation assumptions.",
     },
     reference: {
       cableRoute:
         "SDI from the catwalk head across the ceiling to the video office, reaching ATEM Input 4. Traced on site in 2025. Reference only: cable length is never used as optical distance.",
+      geometryRevision: "photo-review-2026-09",
     },
   };
 }
@@ -207,11 +208,11 @@ export function parseVenueProfile(
   if (root.schema !== VENUE_SCHEMA) {
     issues.add(`${path}.schema`, `Expected "${VENUE_SCHEMA}".`);
   }
-  if (root.version !== VENUE_VERSION) {
+  if (root.version !== 1 && root.version !== VENUE_VERSION) {
     issues.add(
       `${path}.version`,
       typeof root.version === "number"
-        ? `Unsupported venue profile version ${root.version}. This simulator reads version ${VENUE_VERSION}.`
+        ? `Unsupported venue profile version ${root.version}. This simulator reads versions 1 and ${VENUE_VERSION}.`
         : "Missing venue profile version.",
     );
   }
@@ -262,6 +263,9 @@ export function parseVenueProfile(
     : null;
 
   const referenceRoot = readObject(issues, root.reference, `${path}.reference`);
+  const geometryRevision = root.version === 1 ? "legacy-v1" : referenceRoot
+    ? readEnum(issues, referenceRoot.geometryRevision, `${path}.reference.geometryRevision`, ["legacy-v1", "photo-review-2026-09"] as const)
+    : null;
   const cableRoute = referenceRoot
     ? readString(issues, referenceRoot.cableRoute, `${path}.reference.cableRoute`)
     : null;
@@ -269,6 +273,7 @@ export function parseVenueProfile(
   if (!issues.ok || !id || !name || !basis || !mount || cableRoute === null) {
     return { ok: false, issues: issues.issues };
   }
+  // Version 1 migration changes only the schema version, never saved geometry or mount settings.
   const venue: VenueProfile = {
     schema: VENUE_SCHEMA,
     version: VENUE_VERSION,
@@ -286,7 +291,7 @@ export function parseVenueProfile(
       status: mount.status as EvidenceStatus,
       note: mount.note as string,
     },
-    reference: { cableRoute },
+    reference: { cableRoute, geometryRevision: geometryRevision as VenueProfile["reference"]["geometryRevision"] },
   };
   const geometry = deriveVenueGeometry(venue, path);
   if (!geometry.ok) return { ok: false, issues: geometry.issues };
@@ -423,4 +428,22 @@ export function unsettledVenueItems(venue: VenueProfile): string[] {
   if (!SETTLED_VENUE_STATUSES.has(venue.distanceBasis.status)) items.push("Distance basis");
   if (!SETTLED_VENUE_STATUSES.has(venue.mount.status)) items.push("Mount orientation");
   return items;
+}
+
+export type FmpStageProfile = "plan" | "working-depth";
+
+/** Explicit opt-in: replace only stage dimensions and mount orientation, preserving custom settings. */
+export function applyFmpStageProfile(current: VenueProfile, profile: FmpStageProfile): VenueProfile {
+  const next = structuredClone(current);
+  const defaults = defaultVenueProfile();
+  next.dimensions.stageWidth = defaults.dimensions.stageWidth;
+  next.dimensions.stageDepth = profile === "plan" ? defaults.dimensions.stageDepth : {
+    value: ftToM(75), status: "inferred",
+    note: "Working depth inferred from the video-office comment. Not a measured performance deck boundary.",
+  };
+  next.reference.geometryRevision = "photo-review-2026-09";
+  next.mount.orientation = "inverted";
+  next.mount.status = "demo";
+  next.mount.note = "P100 shows the installed P240 hanging inverted. Existing pan-zero heading is retained; its verification and actual firmware flip settings remain independent of this photo observation.";
+  return next;
 }

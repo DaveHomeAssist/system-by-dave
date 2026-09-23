@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-23 — FMP venue profile foundation
+
+- Revised new-session stage estimates to 113 × 61 ft, with a selectable 113 × 75 ft working-depth alternative. Both remain provisional.
+- Defaulted the photographed installation to inverted mounting and physical camera scale; pan-zero, support dimensions and firmware flip settings remain unverified.
+- Added an explicit profile-update preview with Apply/Cancel. Venue v1 imports preserve saved geometry, mount and presets during the v2 provenance migration.
+- Added legacy round-trip and revised-stage framing coverage; preserved the existing narrow-stage exercise fixtures.
+
 ## 2026-09-23 — AV by Dave show-first landing alternative
 
 - Published the supplied control-room concept at `/av-suite-landing2.html` as a noindex alternative while preserving the current `/` landing. Linked the two views in both directions and kept direct Show Console, AV Toolbox, docs, and quick-tool routes.

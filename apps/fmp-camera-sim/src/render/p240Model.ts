@@ -10,8 +10,8 @@ import {
 import { DEG } from "../domain/units";
 import { type MountOrientation } from "../domain/venue";
 
-/** The venue view draws the P240 enlarged so it can be found from across the bowl. */
-export const P240_DISPLAY_SCALE = 3;
+/** The physical P240 stays at real scale; its overview label identifies it across the bowl. */
+export const P240_DISPLAY_SCALE = 1;
 
 export interface P240Model {
   root: Group;

@@ -72,7 +72,7 @@ describe("camera framing", () => {
     const farther = defaultVenueProfile();
     farther.dimensions.cameraToDse.value = ftToM(120);
     const wider = defaultVenueProfile();
-    wider.dimensions.stageWidth.value = ftToM(80);
+    wider.dimensions.stageWidth.value = base.dimensions.stageWidth.value * 1.2;
     expect(fillAt(farther)).toBeLessThan(fillAt(base));
     expect(fillAt(wider)).toBeGreaterThan(fillAt(base));
 

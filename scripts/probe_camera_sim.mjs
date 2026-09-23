@@ -482,6 +482,10 @@ async function closePanel(page) {
   });
   await check('import round-trips settings, provenance and presets', async () => {
     const project = structuredClone(template);
+    // Explicit legacy geometry keeps the saved safe-wide exercise fixture meaningful.
+    project.venue.version = 2;
+    project.venue.dimensions.stageWidth.value = 61 * 0.3048;
+    project.venue.dimensions.stageDepth.value = 75 * 0.3048;
     project.venue.dimensions.cameraHeight = { value: 11.5824, status: 'measured', note: 'Probe: laser from catwalk rail to deck' };
     project.camera.behaviour.curveExponent = 2.4;
     project.session.presets = [
@@ -580,6 +584,28 @@ async function closePanel(page) {
     await field.press('Enter');
     await page.getByText('Must be between 20 ft and 400 ft.').waitFor();
     assert(Math.abs((await s.state()).geometry.camera.upstage + 39.624) < 1e-3, 'invalid distance was applied');
+  });
+  await check('profile preview cancels safely, applies explicitly and survives reload', async () => {
+    const before = await exportProject(page);
+    await page.getByRole('tab', { name: 'Venue' }).click();
+    await page.getByRole('button', { name: 'Preview profile update' }).click();
+    await page.getByRole('button', { name: 'Cancel profile update' }).click();
+    const cancelled = await exportProject(page);
+    assert(JSON.stringify(cancelled.venue) === JSON.stringify(before.venue), 'cancel changed venue');
+    await page.getByRole('tab', { name: 'Venue' }).click();
+    await page.getByRole('button', { name: 'Preview profile update' }).click();
+    await page.getByRole('button', { name: 'Apply profile update' }).click();
+    const applied = await exportProject(page);
+    assert(near(applied.venue.dimensions.stageWidth.value, 113 * 0.3048, 1e-9), 'width not applied');
+    assert(near(applied.venue.dimensions.stageDepth.value, 61 * 0.3048, 1e-9), 'depth not applied');
+    assert(applied.venue.mount.orientation === 'inverted', 'mount not applied');
+    assert(JSON.stringify(applied.session.presets) === JSON.stringify(before.session.presets), 'presets changed');
+    assert(JSON.stringify(applied.venue.dimensions.cameraHeight) === JSON.stringify(before.venue.dimensions.cameraHeight), 'measured height changed');
+    await sleep(800);
+    await page.reload();
+    await page.waitForFunction(() => window.__fmpCameraSim?.state().renderStatus === 'ok');
+    const restored = await exportProject(page);
+    assert(JSON.stringify(restored.venue) === JSON.stringify(applied.venue), 'profile not restored');
   });
   await context.close();
 }

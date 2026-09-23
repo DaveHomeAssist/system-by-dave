@@ -46,11 +46,11 @@ stage right is house left and appears on the left of the Camera 4 picture.
 | --- | --- | --- | --- |
 | Camera to downstage edge | 110 ft | Estimated | Reported as 100–120 ft; basis not established |
 | Distance basis | Horizontal | Demo value | Line of sight is supported; the camera height is removed to place the camera |
-| Stage depth | 75 ft | Inferred | Video-office comment. The Live Nation Stage & Pit plan reads about 113 ft for the whole stage rectangle, likely including upstage/backstage area, so it is not used as performance depth |
-| Stage width | 61 ft | Estimated | Scale reading of Live Nation's published Stage & Pit plan, about ±2–5 ft; the deck edge is not annotated |
+| Stage depth | 61 ft | Estimated | Revised rotated Stage & Pit plan interpretation; boundaries remain provisional. The 75 ft video-office inference is an explicit alternative |
+| Stage width | 113 ft | Estimated | Revised rotated Stage & Pit plan interpretation; performance deck boundaries are not certified |
 | Camera height above stage | 35 ft | Demo value | Unknown until measured |
 | Camera lateral offset | 0 ft | Demo value | Centred placement is an assumption |
-| Mount | Upright, pan 0° on centreline | Demo value | Mount make, orientation and approved travel are not established |
+| Mount | Inverted, pan 0° on centreline | Mixed evidence | P100 shows the installed camera hanging inverted. Heading, support dimensions and firmware flip settings remain unknown; the aggregate mount status stays Demo |
 | Deck height, pit depth | 5 ft, 12 ft | Demo value | Drawing only; the pit and barricade change per show |
 
 The cable route (catwalk to ceiling to video office, SDI to ATEM Input 4) is reference text and is
@@ -114,9 +114,13 @@ The session autosaves to browser storage under `fmpCameraSim.v1` (the `fmp` pref
 through the housevideo.app saved-data transfer). Export/import uses one JSON file:
 
 - `fmp-camera-simulator.project` v1, containing
-- `fmp-camera-simulator.venue` v1 (dimensions with value, evidence status and source note),
+- `fmp-camera-simulator.venue` v2 (dimensions with value, evidence status and source note, plus geometry revision provenance),
 - `fmp-camera-simulator.camera` v1 (published figures, operating limits, uncalibrated behaviour), and
 - `fmp-camera-simulator.session` v1 (speeds, pose, presets, performer, exercise settings and results).
+
+Version-1 venue imports migrate to v2 with `reference.geometryRevision: "legacy-v1"`; all existing dimensions, heading, orientation and presets remain unchanged. New profiles use `photo-review-2026-09`. Venue settings offer a before/after preview and explicit Apply/Cancel for the two provisional stage profiles. Applying updates only stage width/depth and mount orientation, retaining camera coordinates and stored presets. Current tilt can clamp to changed mount limits. Old simulator versions cannot read newly exported venue v2 files.
+
+The overview camera model uses physical scale. Its label identifies the small camera; monitor output never contains the overview model. Support geometry is schematic. Upright operator video does not claim the real camera has E-Flip enabled.
 
 Imports are validated completely before anything changes; unsupported versions, invalid
 dimensions, malformed presets and foreign camera identities are rejected with field paths, and the
@@ -167,3 +171,24 @@ SuperJoy and the optional 3D SuperJoy control surface are later work. Next steps
 simulator from the FMP hub and Catwalk PTZ guide in `fmp-suite`; measure the critical venue
 dimensions; calibrate speeds, stopping and preset travel against Camera 4; then prototype a local
 VISCA-to-WebSocket bridge for the physical SuperJoy.
+
+## Venue realism delivery sequence
+
+The profile foundation follows the merged v1 baseline (`d800c2c`, PR #116). This first increment
+covers provisional stage profiles, explicit upgrades, version-1 preservation, inverted mount
+orientation and physical model scale. It does not yet supply surveyed venue geometry.
+
+Remaining implementation packages, in order:
+
+1. Extend the venue schema with per-property evidence references and configurable sectors,
+   terrain, structures and display records; separate orientation evidence from heading evidence.
+2. Replace schematic bowl strips with individual teal seats, aisles and box bands; add a
+   side-elevation pitch inspector. Current 9.46°/25.02° row slopes remain unverified.
+3. Add the pavilion shell, major obstructions, irregular lawn terrain and lawn reference view.
+4. Add independent flanking displays, optional show wall, feed routing, bounded delay and
+   portable offline media handling. Confirm physical screen inventory before adding lawn screens.
+5. Add measured camera calibration where evidence exists, occlusion-aware exercises and shot feedback.
+6. Finish lighting, materials and crowd detail, then measure performance on physical devices.
+
+The private reference photographs remain outside the deployed application. Camera height,
+actual bowl pitch, lawn contours, display dimensions and pan-zero require field evidence.

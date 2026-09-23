@@ -81,8 +81,8 @@ describe("venue geometry", () => {
     expect(g.camera.right).toBe(0);
     expect(g.camera.height).toBeCloseTo(ftToM(35), 9);
     expect(g.horizontalDistance).toBeCloseTo(ftToM(110), 9);
-    expect(mToFt(g.stageWidth)).toBeCloseTo(61, 9);
-    expect(mToFt(g.stageDepth)).toBeCloseTo(75, 9);
+    expect(mToFt(g.stageWidth)).toBeCloseTo(113, 9);
+    expect(mToFt(g.stageDepth)).toBeCloseTo(61, 9);
   });
 
   it("derives horizontal separation from a line-of-sight distance", () => {
