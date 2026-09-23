@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-09-23 — LED wall viewport workspace
+
+- Moved the live cabinet preview ahead of settings, enlarged its isometric depth, and kept the planner within the browser viewport. Settings and detailed results scroll within their panels; the compact mobile navigation remains visible.
+- Refreshed the AV offline cache so the new layout reaches existing installs without changing calculator values or saved profiles.
+
 ## 2026-09-23 — Show-first AV landing promoted to home
 
 - Published the reviewed show-first landing as `avbydave.com/`, keeping the previous landing at its noindex direct route and the Show Console/Toolbox doorway unchanged.

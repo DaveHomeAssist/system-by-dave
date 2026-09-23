@@ -46,7 +46,7 @@ use the tooling selected for that surface.
 | `av-suite.html?entry=show` | Show Console for show-attached AV operations |
 | `av-suite.html?entry=toolbox` | Show-independent AV Toolbox directory |
 | `av-calculator.html` | Six quick AV calculations and a copyable field summary on avbydave.com |
-| `led-wall-calculator.html` | Cabinet-aware LED wall planning on avbydave.com; shares calculator values with Power Load |
+| `led-wall-calculator.html` | LED wall workspace that fits the viewport, leads with the cabinet preview, scrolls settings within the panel, and shares values with Power Load on avbydave.com |
 | `av-suite-landing2.html` | Source for the avbydave.com home page, staged as `/` on that domain |
 | `av-suite-landing.html` | Previous noindex landing, retained at its direct route for comparison |
 | `depotops/index.html` | Local-first project shopping, inventory, and tool tracking |
