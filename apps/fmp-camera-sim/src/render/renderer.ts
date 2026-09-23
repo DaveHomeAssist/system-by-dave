@@ -28,7 +28,7 @@ import { makeLabel } from "./labels";
 
 export class WebGLUnavailableError extends Error {}
 
-export type OverviewPreset = "house" | "top" | "behind" | "side";
+export type OverviewPreset = "house" | "top" | "behind" | "side" | "lawn";
 
 export interface RenderCallbacks {
   onContextLost(): void;
@@ -40,6 +40,7 @@ type Triple = [number, number, number];
 
 export interface RenderDiagnostics {
   bowlMaxTreadY?: number;
+  terrainMaxY?: number;
   monitorHelperCount?: number;
   monitorShellCount?: number;
   overviewShellCount?: number;
@@ -237,6 +238,7 @@ export class SceneRenderer {
       geometry.marks.length,
       geometry.bowl,
       geometry.structures,
+      geometry.terrain,
       show,
     ]);
     if (key === this.venueKey) return;
@@ -265,6 +267,10 @@ export class SceneRenderer {
     } else if (view === "side") {
       const distance = (Math.max(size.z / (2 * tanH), size.y / (2 * tanV)) + size.x / 2) * 1.15;
       this.overviewCamera.position.copy(target).add(new Vector3(distance, 0, 0));
+    } else if (view === "lawn") {
+      const t = geometry.terrain;
+      this.overviewCamera.position.set(0, t.frontElevation.value + 12, geometry.structures.shell.rearDownstage.value + t.boundary.value.at(-1)!.depth * 0.9);
+      target.set(0, geometry.structures.shell.rearFloor.value + 2, geometry.structures.shell.rearDownstage.value);
     } else if (view === "behind") {
       this.overviewCamera.position.set(camera.x + 4, camera.y + 5, camera.z + 12);
       target.set(0, 1, -geometry.stageDepth * 0.3);
@@ -403,6 +409,7 @@ export class SceneRenderer {
     for (const helper of [this.p240.root, this.cone.root]) helper.traverseVisible(child => { if (child.layers.test(this.monitorCamera.layers)) monitorHelperCount++; });
     this.diagnostics = {
       bowlMaxTreadY, monitorHelperCount,
+      terrainMaxY: (() => { const p=(this.venue?.root.getObjectByName("lawn-surface") as Mesh | undefined)?.geometry.getAttribute("position"); let y=-Infinity;if(p)for(let i=0;i<p.count;i++)y=Math.max(y,p.getY(i));return y; })(),
       monitorShellCount: this.layerMeshCount("venue-shell", this.monitorCamera),
       overviewShellCount: this.layerMeshCount("venue-shell", this.overviewCamera),
       showMeshCount: this.layerMeshCount("show-package", this.monitorCamera),

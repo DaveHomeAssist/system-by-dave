@@ -20,6 +20,7 @@ const VIEWS: Array<{ view: OverviewPreset; label: string }> = [
   { view: "top", label: "Top" },
   { view: "side", label: "Side elevation" },
   { view: "behind", label: "Behind camera" },
+  { view: "lawn", label: "Lawn" },
 ];
 
 export function VenuePanel({ state, canvasRef, shown, quality, cutaway, onCutaway, onToggle, onView }: Props) {

@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-23 — FMP lawn and exterior
+
+- Add editable provisional lawn terrain, a continuous pavilion/concourse join, surface-following paths, fence and poles, and a Lawn overview preset.
+- Preserve imported camera dimensions and presets with venue v6 migration; keep overview controls independent of PTZ.
+- Restore catwalk/stage-opening visibility during overview cutaway and isolate LED emissive materials.
+
 ## 2026-09-23 — LED wall calculator audit fixes
 
 - Preserved unfinished numeric edits until commit, so values such as `0.95` can be entered without an intermediate clamp changing the operator's input. Corrections now identify the affected field through the status region.

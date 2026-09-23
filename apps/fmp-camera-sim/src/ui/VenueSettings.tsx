@@ -1,3 +1,4 @@
+import { TerrainSettings } from "./TerrainSettings";
 import { StructureSettings } from "./StructureSettings";
 import { BowlInspector } from "./BowlInspector";
 import { ProvenanceFields } from "./ProvenanceFields";
@@ -265,6 +266,7 @@ export function VenueSettings({ store, state }: Props) {
       </fieldset>
 
       <StructureSettings store={store} state={state} />
+      <TerrainSettings store={store} state={state} />
 
       <BowlInspector bowl={venue.bowl} geometry={g} onChange={bowl => apply(draft => { draft.bowl = bowl; })} />
 

@@ -1,3 +1,4 @@
+import { buildTerrain } from "./terrainBuilder";
 import { buildStructures } from "./structureBuilder";
 import { type ShowPackage, defaultShowPackage } from "../domain/structures";
 import { buildBowl } from "./bowlBuilder";
@@ -109,6 +110,8 @@ export function buildVenue(g: VenueGeometry, show: ShowPackage = defaultShowPack
   const bowl = buildBowl(g.bowl, g.pitDepth, g.deckHeight, true, g.structures.fixtures);
   root.add(bowl.root);
 
+  const terrain = buildTerrain(g);
+  root.add(terrain.root);
   const structures = buildStructures(g, show);
   root.add(structures.root);
   const dseLabel = onOverviewLayer(makeLabel("DSE · stage origin", { height: 0.8 }));
@@ -122,6 +125,7 @@ export function buildVenue(g: VenueGeometry, show: ShowPackage = defaultShowPack
     dispose() {
       bowl.dispose();
       structures.dispose();
+      terrain.dispose();
       root.traverse((child) => {
         if ((child as Mesh).isMesh || (child as { isSprite?: boolean }).isSprite) {
           const material = (child as Mesh).material as Material & { map?: CanvasTexture | null };

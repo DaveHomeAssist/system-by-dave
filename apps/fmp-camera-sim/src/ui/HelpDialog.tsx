@@ -56,6 +56,9 @@ export function HelpDialog({ open, onClose }: Props) {
           ))}
         </tbody>
       </table>
+      <h3>Exploring the venue</h3>
+      <p>House, Top, Side elevation, Behind camera and Lawn move only the venue view. Shell cutaway hides the roof and facade in that view; the camera monitor still sees physical obstructions. The catwalk and stage opening remain visible.</p>
+      <p>Venue settings separate pavilion dimensions, house fixtures, the show package, bowl pitch and lawn terrain. Clearing the show package keeps the house equipment. Terrain and fixture coordinates remain provisional until checked on site.</p>
       <h3>Reading the picture</h3>
       <ul>
         <li>Stage directions are performer-facing. Stage right is house left, which is the left of the Camera 4 picture.</li>

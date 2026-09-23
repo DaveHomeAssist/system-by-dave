@@ -593,7 +593,7 @@ async function closePanel(page) {
     await sources.fill('laser-survey-01, deck-datum');
     await sources.press('Tab');
     const exported = await exportProject(page);
-    assert(exported.venue.version === 5, 'wrong venue version');
+    assert(exported.venue.version === 6, 'wrong venue version');
     assert(exported.venue.mount.status === 'confirmed' && exported.venue.mount.headingEvidence.status === 'demo', 'mount observation settled heading');
     assert(exported.venue.dimensions.cameraHeight.provenance.method === 'field-measurement', 'method not stored');
     assert(exported.venue.dimensions.cameraHeight.provenance.sourceIds.join(',') === 'laser-survey-01,deck-datum', 'references not stored');
@@ -740,6 +740,27 @@ await check('shell cutaway preserves monitor obstructions; show package clears i
   await page.waitForFunction(() => window.__fmpCameraSim.render().showMeshCount > 0);
   assert(problems.length === 0, problems.join(' | '));
   } finally { await context.close(); }
+});
+
+await check('lawn elevation updates the mesh; reference views preserve PTZ and terrain survives export', async () => {
+  const {context,page,problems}=await open();
+  try {
+    const pose=(await sim(page).snapshot()).pose;
+    for(const name of ['House','Top','Side elevation','Behind camera','Lawn']) {
+      await page.getByRole('button',{name,exact:true}).click();
+      assert(JSON.stringify((await sim(page).snapshot()).pose)===JSON.stringify(pose), `${name} moved PTZ`);
+    }
+    const before=await sim(page).render();
+    await showTab(page,'Venue');
+    const input=page.getByTestId('terrain-settings').getByLabel('Lawn front elevation',{exact:true});
+    await input.fill('15');await input.press('Enter');
+    await page.waitForFunction(y=>window.__fmpCameraSim.render().terrainMaxY>y+1,before.terrainMaxY);
+    const project=await exportProject(page);
+    assert(project.venue.terrain.frontElevation.value===15,'terrain edit not exported');
+    assert(project.venue.terrain.frontElevation.status==='demo','terrain edit became measured');
+    assert((await sim(page).render()).monitorHelperCount===0,'terrain label leaked');
+    assert(problems.length===0,problems.join(' | '));
+  } finally {await context.close();}
 });
 
 // ------------------------------------------------------------------------------------------

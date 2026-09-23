@@ -31,12 +31,17 @@ export function fohFloorHeight(g: VenueGeometry, f: SceneFixture): number {
 }
 export function buildStructures(g: VenueGeometry, show: ShowPackage, labels = true) {
   const record = g.structures, p = record.shell;
-  const root = new Group(), shell = new Group(), fixtures = new Group(), production = new Group();
+  const root = new Group(), shell = new Group(), fixtures = new Group(), production = new Group(), anchors = new Group();
   root.name = "structures"; shell.name = "venue-shell"; fixtures.name = "house-fixtures"; production.name = "show-package";
-  root.add(shell, fixtures, production);
+  anchors.name = "mount-and-stage-opening";
+  root.add(shell, anchors, fixtures, production);
   const labelDisposables: Array<() => void> = [];
-  const geometries: BufferGeometry[] = [], materials = new Map<number, MeshLambertMaterial>();
-  const mat = (color: number) => { if (!materials.has(color)) materials.set(color, new MeshLambertMaterial({ color, side: DoubleSide })); return materials.get(color)!; };
+  const geometries: BufferGeometry[] = [], materials = new Map<string, MeshLambertMaterial>();
+  const mat = (color: number, lit = false) => {
+    const key = `${color}:${lit}`;
+    if (!materials.has(key)) materials.set(key, new MeshLambertMaterial({color,side:DoubleSide,emissive:lit?color:0,emissiveIntensity:lit?0.7:0}));
+    return materials.get(key)!;
+  };
   const add = (parent: Group, geometry: BufferGeometry, color: number, name = "") => {
     geometries.push(geometry); const mesh = new Mesh(geometry, mat(color)); mesh.name = name; mesh.userData.occluder = true; parent.add(mesh); return mesh;
   };
@@ -84,19 +89,24 @@ export function buildStructures(g: VenueGeometry, show: ShowPackage, labels = tr
     beam(shell, new Vector3(x, shellRoofHeight(record, x) - 0.4, -p.frontUpstage.value), new Vector3(x, shellRoofHeight(record, x) - 0.4, shellRearDownstage(record, x)), 0.13, steel);
   }
   const W = g.stageWidth, D = g.stageDepth, opening = p.openingHeight.value, houseW = W + 10;
-  box(shell, 0, (opening - g.deckHeight) / 2, -D - 0.2, houseW, opening + g.deckHeight, 0.4, 0x131418);
-  for (const side of [-1, 1]) box(shell, side * (houseW / 2 + 0.2), (opening - g.deckHeight) / 2, -D / 2, 0.4, opening + g.deckHeight, D, 0x17181c);
-  box(shell, 0, opening - 0.7, 0.2, houseW, 1.4, 0.6, 0x1a1b20);
+  box(anchors, 0, (opening - g.deckHeight) / 2, -D - 0.2, houseW, opening + g.deckHeight, 0.4, 0x131418);
+  for (const side of [-1, 1]) box(anchors, side * (houseW / 2 + 0.2), (opening - g.deckHeight) / 2, -D / 2, 0.4, opening + g.deckHeight, D, 0x17181c);
+  box(anchors, 0, opening - 0.7, 0.2, houseW, 1.4, 0.6, 0x1a1b20);
   // The original support datum is retained; roof hangers now meet the provisional steel.
   const camera = stageToWorld(g.camera), inverted = g.mountOrientation === "inverted";
   const deckY = camera.y + (inverted ? 0.55 : -0.5), span = p.catwalkSpan.value;
-  const catwalk = new Group(); catwalk.name = "catwalk"; shell.add(catwalk);
+  const catwalk = new Group(); catwalk.name = "catwalk"; anchors.add(catwalk);
   box(catwalk, camera.x, deckY, camera.z + 0.6, span, 0.08, 0.9, steel);
   for (const dz of [0.17, 1.03]) {
     box(catwalk, camera.x, deckY + 1.05, camera.z + dz, span, 0.05, 0.05, steel);
     for (let x = -span / 2; x <= span / 2; x += 2.5) box(catwalk, camera.x + x, deckY + 0.52, camera.z + dz, 0.05, 1.05, 0.05, steel);
   }
   for (let x = -span / 2; x <= span / 2; x += 5) beam(catwalk, new Vector3(camera.x + x, deckY, camera.z + 0.6), new Vector3(camera.x + x, shellRoofHeight(record, camera.x + x) - 1, camera.z + 0.6), 0.04, steel);
+  if (labels) {
+    const label = makeLabel("Catwalk", {height:0.9}); label.layers.set(1);
+    label.position.set(camera.x + span / 2, deckY + 2, camera.z + 0.6); anchors.add(label);
+    labelDisposables.push(() => {label.material.map?.dispose();label.material.dispose();});
+  }
   const baseY = camera.y + (inverted ? 0.18 : -0.18);
   box(catwalk, camera.x, (deckY + baseY) / 2, camera.z, 0.05, Math.abs(deckY - baseY), 0.05, steel);
   box(catwalk, camera.x, baseY, camera.z, 0.2, 0.025, 0.22, steel);
@@ -124,7 +134,7 @@ export function buildStructures(g: VenueGeometry, show: ShowPackage, labels = tr
       const colors = [0xd9dbd7, 0xd8c641, 0x39a8b5, 0x42a370, 0xa44b9e, 0xc05345, 0x456bba];
       for (let i = 0; i < colors.length; i++) {
         const face = box(group, -size.right / 2 + (i + 0.5) * size.right / 7, 0, size.upstage / 2 + 0.006, size.right / 7, size.height, 0.01, colors[i]);
-        const material = face.material as MeshLambertMaterial; material.emissive.setHex(colors[i]); material.emissiveIntensity = 0.7;
+        face.material = mat(colors[i], true);
       }
     } else if (f.kind === "foh") {
       box(group, 0, -0.1, 0, size.right, 0.2, size.upstage, 0x343c40);
@@ -167,7 +177,7 @@ export function buildStructures(g: VenueGeometry, show: ShowPackage, labels = tr
   }
   record.fixtures.forEach(f=>buildFixture(f,fixtures)); show.fixtures.forEach(f=>buildFixture(f,production));
   // Batch static meshes by material and ownership group, retaining the roof as a ray target.
-  for (const owner of [shell,fixtures,production]) {
+  for (const owner of [shell,anchors,fixtures,production]) {
     owner.updateMatrixWorld(true);
     const batches = new Map<MeshLambertMaterial, BufferGeometry[]>();
     owner.traverse(child=>{if(child instanceof Mesh && child.name!=="pavilion-roof") {
