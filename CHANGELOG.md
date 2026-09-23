@@ -9,7 +9,8 @@
 - Added the objective and pass rule before adjustment, live progress words, scored checks, a debrief that explains what each change helped or hurt, and a next correction that names a direction without revealing values. Faults can now be reverted.
 - Added guided one-control demonstrations and instructor sequences with before/after pictures, reproducible by link or JSON.
 - Added a share dialog with a selectable link, local session autosave, and fallbacks when canvas, storage, clipboard or the service worker are unavailable. Scripts and styles moved to files so the CSP no longer allows inline code, and the offline worker is now network-first with a single release identifier.
-- Kept every exercise score identical to the previous engine. Version-1 Shader exports and legacy Throwline exports still import; new optional state fields are bounded and ignored by older readers. Attempt numbers now restart for each exercise (from the parallel Codex review).
+- Kept every exercise score identical to the previous engine. Version-1 Shader exports and legacy Throwline exports still import; new optional state fields are bounded and ignored by older readers.
+- Supersedes the interim console published by #108 and #110, which a parallel Codex review built from an early snapshot of this work. Kept its reference lock (Camera A is inspection-only, with its settings hidden), its per-exercise attempt numbering, and its edge viewports; bumped the shared build identifier so cached interim files update cleanly.
 - Expanded the engine tests and the browser probe; see `docs/shader-practice.md`.
 
 ## 2026-09-23 — AV by Dave landing and show entry repair

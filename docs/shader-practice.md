@@ -45,6 +45,11 @@ Simulated tally is fixed per exercise: the reference camera is on simulated
 program (SIM PGM, red) and the target on simulated preview (SIM PVW, green).
 Amber marks only the camera under control and keyboard focus.
 
+Only the target camera is adjustable (the demonstrated camera during a
+demonstration). The reference can be selected for inspection, but its
+controls are hidden and refused, so moving the reference can never score an
+exercise and its exact settings never give away the answer.
+
 ## State and compatibility
 
 Exports use `kind: shader-camera-practice-session`, schema
