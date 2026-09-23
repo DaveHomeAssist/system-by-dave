@@ -1,0 +1,145 @@
+{
+  "schema": "system-by-dave.gear-reference-entry.v1",
+  "id": "blackmagic-studio-fiber-converter",
+  "displayName": "Blackmagic Studio Fiber Converter",
+  "aka": [
+    "Rack fiber converter",
+    "Studio Fiber Converter"
+  ],
+  "brand": "Blackmagic Design",
+  "category": "Video",
+  "subcategory": "Fiber",
+  "status": "active",
+  "updated": "2026-09-22",
+  "summary": "Rack-end fiber converters for FMP. Three units live, one per body, no spare. A fourth unit is the only hot-spare path without dropping a camera to SDI.",
+  "tags": [
+    "SMPTE",
+    "rack",
+    "FMP"
+  ],
+  "sections": [
+    {
+      "id": "id",
+      "title": "Identification",
+      "type": "specTable",
+      "rows": [
+        [
+          "Live units",
+          "3"
+        ],
+        [
+          "Spare",
+          "0 in current house record"
+        ],
+        [
+          "Role",
+          "One rack converter per URSA body"
+        ]
+      ],
+      "sourceRefs": [
+        "hv-fmp-gear"
+      ]
+    },
+    {
+      "id": "signal",
+      "title": "As found",
+      "type": "cards",
+      "cards": [
+        {
+          "label": "Outputs",
+          "text": "Confirm which SDI feeds the switcher vs FOH loop."
+        },
+        {
+          "label": "Returns",
+          "text": "Confirm what Returns 2 and 3 carry."
+        },
+        {
+          "label": "Firmware",
+          "text": "Read version from each unit LCD."
+        }
+      ],
+      "sourceRefs": [
+        "hv-fmp-gear"
+      ]
+    },
+    {
+      "id": "intake",
+      "title": "Intake checklist",
+      "type": "checklist",
+      "items": [
+        {
+          "title": "Label camera number",
+          "detail": "On each rack unit."
+        },
+        {
+          "title": "Front-panel photo",
+          "detail": "With SMPTE 304 mated."
+        },
+        {
+          "title": "Firmware",
+          "detail": "From LCD."
+        },
+        {
+          "title": "Caps at strike",
+          "detail": "SMPTE caps fitted."
+        }
+      ],
+      "sourceRefs": [
+        "hv-fmp-gear"
+      ]
+    },
+    {
+      "id": "notes",
+      "title": "House links",
+      "type": "cards",
+      "cards": [
+        {
+          "label": "FMP house notes",
+          "text": "https://housevideo.app/fmp/gear/#studio-converter"
+        },
+        {
+          "label": "Studio converter 3D",
+          "text": "https://housevideo.app/fmp/rig/?equipment=studio&part=studio-body"
+        }
+      ],
+      "sourceRefs": [
+        "hv-fmp-gear"
+      ]
+    },
+    {
+      "id": "accuracy",
+      "title": "Accuracy log",
+      "type": "accuracyLog",
+      "sourceRefs": ["hv-fmp-gear"],
+      "entries": [
+        {
+          "item": "Three live / zero spare",
+          "status": "confirmed",
+          "detail": "Stated in FMP gear house record.",
+          "sourceRefs": [
+            "hv-fmp-gear"
+          ]
+        }
+      ]
+    }
+  ],
+  "accuracy": [
+    {
+      "item": "Rack count / spare",
+      "status": "confirmed",
+      "detail": "Three live, zero spare.",
+      "sourceRefs": [
+        "hv-fmp-gear"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "hv-fmp-gear",
+      "label": "housevideo.app · FMP Camera equipment",
+      "url": "https://housevideo.app/fmp/gear/",
+      "kind": "house-record",
+      "accessed": "2026-09-22"
+    }
+  ]
+}

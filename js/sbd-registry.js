@@ -140,6 +140,10 @@
     './css/fonts.css',
     './data/gear/index.json',
     './data/gear/epson-powerlite-x39.json',
+    './data/gear/blackmagic-ursa-broadcast-g2.json',
+    './data/gear/fujinon-4k-broadcast-zoom.json',
+    './data/gear/blackmagic-camera-fiber-converter.json',
+    './data/gear/blackmagic-studio-fiber-converter.json',
     './data/gear/figures/x39-chassis.svg',
     './data/gear/figures/x39-io.svg',
     './av-workbook.html',
@@ -224,7 +228,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool change — rolls the service-worker cache. */
-    version:'v20260922-av-suite-modular',
+    version:'v20260922-fmp-night-gear',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,

@@ -88,6 +88,12 @@ body[data-public-release] .attention { background: var(--av-danger-soft); color:
 .card-action { display: flex; align-items: center; justify-content: space-between; gap: 12px; color: var(--av-accent); font-size: 12px; font-weight: 700; margin-top: 20px; }
 .position-cards a:hover, .reference-links a:hover, .model-card:hover, .launch-card:hover { border-color: var(--av-accent); background: var(--av-surface-2); }
 .panel-note { color: var(--av-muted); font-size: 12px; line-height: 1.6; margin: 16px 0 0; max-width: 100ch; }
+.night-profile { margin-top: 14px; padding: 16px; border: 1px solid var(--av-line-strong); border-radius: 8px; background: var(--av-surface); }
+.night-profile strong { color: var(--av-text); font-size: 15px; }
+.night-profile p { margin: 5px 0 12px; color: var(--av-muted); font-size: 13px; line-height: 1.5; }
+.night-profile-links { display: flex; flex-wrap: wrap; gap: 8px; }
+.night-profile-links a { display: inline-flex; align-items: center; min-height: 44px; padding: 8px 12px; border: 1px solid var(--av-line-strong); border-radius: 6px; color: var(--av-accent); background: var(--av-control); font-size: 12px; font-weight: 700; text-decoration: none; }
+.night-profile-links a:hover, .night-profile-links a:focus-visible { border-color: var(--av-accent); }
 .commissioning-note { margin-top: 24px; border-left: 3px solid var(--av-warning); padding: 14px 18px; background: var(--av-warning-soft); color: var(--av-warning); font-size: 12px; line-height: 1.5; }
 .commissioning-note strong { font-size: 13px; }
 .commissioning-note p { margin: 6px 0 0; }

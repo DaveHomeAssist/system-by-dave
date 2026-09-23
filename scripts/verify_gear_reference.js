@@ -57,6 +57,10 @@ function verifyRegistry() {
     './gear-reference.html',
     './data/gear/index.json',
     './data/gear/epson-powerlite-x39.json',
+    './data/gear/blackmagic-ursa-broadcast-g2.json',
+    './data/gear/fujinon-4k-broadcast-zoom.json',
+    './data/gear/blackmagic-camera-fiber-converter.json',
+    './data/gear/blackmagic-studio-fiber-converter.json',
     './data/gear/figures/x39-chassis.svg',
     './data/gear/figures/x39-io.svg'
   ].forEach((asset) => {

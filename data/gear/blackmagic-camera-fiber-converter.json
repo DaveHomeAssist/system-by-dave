@@ -1,0 +1,141 @@
+{
+  "schema": "system-by-dave.gear-reference-entry.v1",
+  "id": "blackmagic-camera-fiber-converter",
+  "displayName": "Blackmagic Camera Fiber Converter",
+  "aka": [
+    "Camera-end fiber converter",
+    "URSA fiber converter"
+  ],
+  "brand": "Blackmagic Design",
+  "category": "Video",
+  "subcategory": "Fiber",
+  "status": "active",
+  "updated": "2026-09-22",
+  "summary": "Camera-end SMPTE fiber converter for the FMP URSA chain. Paired 1:1 with a Studio Fiber Converter. One unit confirmed fitted — do not generalize to all three bodies.",
+  "tags": [
+    "SMPTE",
+    "fiber",
+    "FMP"
+  ],
+  "sections": [
+    {
+      "id": "id",
+      "title": "Identification",
+      "type": "specTable",
+      "rows": [
+        [
+          "Role",
+          "Camera-end converter"
+        ],
+        [
+          "Pairing",
+          "1:1 with rack Studio Fiber Converter"
+        ],
+        [
+          "Expected count",
+          "3 (inferred from three live rack units)"
+        ],
+        [
+          "Seen on body",
+          "1 photographed"
+        ]
+      ],
+      "sourceRefs": [
+        "hv-fmp-gear"
+      ]
+    },
+    {
+      "id": "signal",
+      "title": "Field caution",
+      "type": "cards",
+      "cards": [
+        {
+          "label": "Inspect the body you build",
+          "text": "Rack converters lit does not prove a camera-end converter is on your body."
+        },
+        {
+          "label": "Coax still happens",
+          "text": "Another house frame shows a body on single coax — treat path as per-position."
+        }
+      ],
+      "sourceRefs": [
+        "hv-fmp-gear"
+      ]
+    },
+    {
+      "id": "intake",
+      "title": "Intake checklist",
+      "type": "checklist",
+      "items": [
+        {
+          "title": "Converter seated and powered",
+          "detail": "On the body you are bringing up."
+        },
+        {
+          "title": "SMPTE 304 mated",
+          "detail": "Cap when struck."
+        },
+        {
+          "title": "Return jumper",
+          "detail": "Know Camera 1 return expectations."
+        }
+      ],
+      "sourceRefs": [
+        "hv-fmp-gear"
+      ]
+    },
+    {
+      "id": "notes",
+      "title": "House links",
+      "type": "cards",
+      "cards": [
+        {
+          "label": "FMP house notes",
+          "text": "https://housevideo.app/fmp/gear/#camera-converter"
+        },
+        {
+          "label": "Camera fiber 3D",
+          "text": "https://housevideo.app/fmp/rig/?equipment=rig&part=camera-fiber"
+        }
+      ],
+      "sourceRefs": [
+        "hv-fmp-gear"
+      ]
+    },
+    {
+      "id": "accuracy",
+      "title": "Accuracy log",
+      "type": "accuracyLog",
+      "sourceRefs": ["hv-fmp-gear"],
+      "entries": [
+        {
+          "item": "Three camera-end units present",
+          "status": "estimate",
+          "detail": "Inferred from three live rack units; only one camera-end photographed.",
+          "sourceRefs": [
+            "hv-fmp-gear"
+          ]
+        }
+      ]
+    }
+  ],
+  "accuracy": [
+    {
+      "item": "Camera-end count",
+      "status": "estimate",
+      "detail": "Only one photographed.",
+      "sourceRefs": [
+        "hv-fmp-gear"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "id": "hv-fmp-gear",
+      "label": "housevideo.app · FMP Camera equipment",
+      "url": "https://housevideo.app/fmp/gear/",
+      "kind": "house-record",
+      "accessed": "2026-09-22"
+    }
+  ]
+}

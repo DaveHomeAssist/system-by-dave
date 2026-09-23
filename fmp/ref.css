@@ -34,6 +34,13 @@ code, kbd { font:12px/1.4 var(--mono); background:var(--soft); padding:1px 5px; 
 .status.bad { color:var(--bad) }
 .see { font-size:13px; color:var(--muted); margin-top:14px }
 .see a { font-weight:600 }
+.reference-bridge { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; margin:0 0 18px; padding:14px 16px; border:1px solid var(--line); background:var(--surface); }
+.reference-bridge p { margin:0; max-width:64ch; color:var(--muted); font-size:13px; line-height:1.5 }
+.reference-bridge strong { color:var(--ink); }
+.reference-bridge-links { display:flex; flex-wrap:wrap; gap:8px }
+.reference-bridge-links a, .phase-link a { display:inline-flex; align-items:center; min-height:44px; padding:8px 12px; border:1px solid var(--line); color:var(--accent); font-weight:700; text-decoration:none }
+.reference-bridge-links a:hover, .reference-bridge-links a:focus-visible, .phase-link a:hover, .phase-link a:focus-visible { border-color:var(--accent) }
+.phase-link { margin:0 0 18px; font-size:13px }
 @media(max-width:1200px) { .chain { grid-template-columns:repeat(3,minmax(0,1fr)) } }
 @media(max-width:900px) { .split, .trio { grid-template-columns:1fr } .chain { grid-template-columns:repeat(2,minmax(0,1fr)) } }
 @media(max-width:680px) { .chain { grid-template-columns:1fr } }
