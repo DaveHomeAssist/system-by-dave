@@ -4,7 +4,7 @@ import { nowSeconds } from "../input/controller";
 import { EXERCISE_IDS, EXERCISE_SETTING_RANGES, type ExerciseId, type ExerciseSettings } from "../domain/session";
 import { type Issue } from "../domain/validate";
 import { EXERCISE_BRIEFS, EXERCISE_TITLES } from "../exercises/types";
-import { NumberField } from "./fields";
+import { NumberField, withFieldIssue } from "./fields";
 
 interface Props {
   store: SimulatorStore;
@@ -46,7 +46,7 @@ export function ExercisesPanel({ store, state }: Props) {
     const next = structuredClone(settings) as unknown as Record<string, Record<string, number>>;
     next[group][key] = value;
     const result = store.updateExerciseSettings(next as unknown as ExerciseSettings);
-    setIssues(result.ok ? [] : result.issues);
+    setIssues(result.ok ? [] : withFieldIssue(result.issues, `session.exerciseSettings.${group}.${key}`));
   };
 
   return (

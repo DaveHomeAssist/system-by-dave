@@ -47,6 +47,8 @@ export interface StoreState {
   exercise: { id: ExerciseId; progress: ExerciseProgress } | null;
   storage: StorageStatus;
   storageNotice: string | null;
+  /** Another tab saved a different copy; autosave is paused until the operator chooses. */
+  storageConflict: boolean;
   announcement: Announcement | null;
   storeArmed: boolean;
   renderStatus: RenderStatus;
@@ -89,6 +91,9 @@ export class SimulatorStore {
   private announcementCount = 0;
   private storeArmed = false;
   private overwrite: { slot: number; until: number } | null = null;
+  private promptArmed = false;
+  private promptTimer: ReturnType<typeof setTimeout> | null = null;
+  private storageConflict = false;
   private renderStatus: RenderStatus = "starting";
   private renderNote = "";
   private hidden = false;
@@ -144,6 +149,7 @@ export class SimulatorStore {
       exercise: this.exercise && this.exerciseId ? { id: this.exerciseId, progress: this.exercise.progress() } : null,
       storage: this.storageStatus,
       storageNotice: this.storageNotice,
+      storageConflict: this.storageConflict,
       announcement: this.announcement,
       storeArmed: this.storeArmed,
       renderStatus: this.renderStatus,
@@ -330,10 +336,17 @@ export class SimulatorStore {
   }
 
   armStore(armed: boolean): void {
+    this.clearReplacePrompt();
     this.storeArmed = armed;
-    this.overwrite = null;
     if (armed) this.announce("Store armed. Choose a preset number for the current shot.");
     this.emit();
+  }
+
+  private clearReplacePrompt(): void {
+    if (this.promptTimer !== null) clearTimeout(this.promptTimer);
+    this.promptTimer = null;
+    this.promptArmed = false;
+    this.overwrite = null;
   }
 
   /** Stores the live pose. Replacing a stored preset needs a second press within three seconds. */
@@ -343,8 +356,24 @@ export class SimulatorStore {
     const session = this.project.session;
     const existing = session.presets.find((p) => p.slot === slot);
     if (existing && !(this.overwrite && this.overwrite.slot === slot && wallSeconds <= this.overwrite.until)) {
+      // A replace prompt that armed Store by itself disarms when its window closes; an operator
+      // who pressed Store first keeps it armed.
+      const armedByOperator = this.storeArmed && !this.promptArmed;
+      this.clearReplacePrompt();
       this.overwrite = { slot, until: wallSeconds + OVERWRITE_WINDOW_S };
       this.storeArmed = true;
+      if (!armedByOperator) {
+        this.promptArmed = true;
+        this.promptTimer = setTimeout(() => {
+          this.promptTimer = null;
+          if (!this.promptArmed) return;
+          this.promptArmed = false;
+          this.overwrite = null;
+          this.storeArmed = false;
+          this.announce(`Preset ${slot} was kept. Number keys recall presets again.`);
+          this.emit();
+        }, OVERWRITE_WINDOW_S * 1000);
+      }
       this.announce(`${describePreset(existing)} is already stored. Press ${slot} again within 3 s to replace it.`, "warn");
       this.emit();
       return;
@@ -363,7 +392,7 @@ export class SimulatorStore {
       ...this.project,
       session: { ...session, presets: [...session.presets.filter((p) => p.slot !== slot), preset].sort((a, b) => a.slot - b.slot) },
     };
-    this.overwrite = null;
+    this.clearReplacePrompt();
     this.storeArmed = false;
     this.announce(`${existing ? "Replaced" : "Stored"} ${describePreset(preset)}.`, "success");
     const event: ExerciseEvent = { type: "preset-stored", preset, tick: this.sim.tick };
@@ -416,7 +445,15 @@ export class SimulatorStore {
   // Settings
   // ------------------------------------------------------------------------------------------
 
+  private followRunning(): boolean {
+    return this.exerciseId === "follow" && this.exercise?.progress().status === "running";
+  }
+
   updateVenue(next: VenueProfile): UpdateResult {
+    // Stage dimensions place the marks the follow run is walking; changing them mid-run skews it.
+    if (this.followRunning()) {
+      return { ok: false, issues: [{ path: "venue", message: "The follow exercise is running on this stage. Finish or reset it first." }] };
+    }
     const parsed = parseVenueProfile(next);
     if (!parsed.ok) return { ok: false, issues: parsed.issues };
     const geometry = deriveVenueGeometry(parsed.venue);
@@ -442,7 +479,7 @@ export class SimulatorStore {
 
   updatePerformer(patch: Partial<PerformerConfig>): UpdateResult {
     // The follow exercise timed its run from the performer's path; changing it mid-run would skew the result.
-    if (this.exerciseId === "follow" && this.exercise?.progress().status === "running") {
+    if (this.followRunning()) {
       return { ok: false, issues: [{ path: "session.performer", message: "The follow exercise is using the performer. Finish or reset it first." }] };
     }
     const session = this.project.session;
@@ -487,16 +524,19 @@ export class SimulatorStore {
     this.emit();
   }
 
-  resetVenue(): void {
-    this.updateVenue(defaultVenueProfile());
-    this.announce("Venue reset to the default FMP estimates.");
+  // Resets keep the profile's identity: the session and every stored preset refer to it by id.
+  resetVenue(): UpdateResult {
+    const result = this.updateVenue({ ...defaultVenueProfile(), id: this.project.venue.id });
+    this.announce(result.ok ? "Venue reset to the default FMP estimates." : result.issues[0].message, result.ok ? "info" : "warn");
     this.emit();
+    return result;
   }
 
-  resetCamera(): void {
-    this.updateCamera(defaultCameraProfile());
-    this.announce("Camera profile reset to the P240 defaults.");
+  resetCamera(): UpdateResult {
+    const result = this.updateCamera({ ...defaultCameraProfile(), id: this.project.camera.id });
+    this.announce(result.ok ? "Camera profile reset to the P240 defaults." : result.issues[0].message, result.ok ? "info" : "warn");
     this.emit();
+    return result;
   }
 
   /** Clears presets, results and preferences but keeps the venue and camera profiles. */
@@ -589,25 +629,75 @@ export class SimulatorStore {
       this.emit();
       return { ok: false, issues: parsed.issues };
     }
-    const geometry = deriveVenueGeometry(parsed.project.venue);
-    if (!geometry.ok) return { ok: false, issues: geometry.issues };
-    this.advanceTo(wallSeconds);
-    this.project = parsed.project;
-    this.geometry = geometry.geometry;
-    this.exercise = null;
-    this.exerciseId = null;
-    this.sim.configure(this.project.camera, this.geometry.mountOrientation);
-    this.sim.setSpeeds(this.project.session.speeds);
-    this.sim.place(this.project.session.pose);
-    this.performerEpoch = this.sim.time;
+    const result = this.replaceProject(parsed.project, wallSeconds);
+    if (!result.ok) return result;
+    // An explicit import defines this session, so it is saved even over another tab's copy.
+    this.storageConflict = false;
     this.announce(`Imported ${this.project.session.presets.length} presets, the venue profile and the camera profile.`, "success");
     this.scheduleSave();
     this.emit();
     return { ok: true };
   }
 
+  /** Swaps in a complete, already-validated project: camera, speeds, pose and performer clock. */
+  private replaceProject(project: Project, wallSeconds: number): UpdateResult {
+    const geometry = deriveVenueGeometry(project.venue);
+    if (!geometry.ok) return { ok: false, issues: geometry.issues };
+    this.advanceTo(wallSeconds);
+    this.project = project;
+    this.geometry = geometry.geometry;
+    this.exercise = null;
+    this.exerciseId = null;
+    this.clearReplacePrompt();
+    this.storeArmed = false;
+    this.sim.configure(this.project.camera, this.geometry.mountOrientation);
+    this.sim.setSpeeds(this.project.session.speeds);
+    this.sim.place(this.project.session.pose);
+    this.performerEpoch = this.sim.time;
+    return { ok: true };
+  }
+
+  /**
+   * Another tab saved over this session. Autosave pauses so neither copy is silently lost until
+   * the operator chooses one.
+   */
+  noteExternalSave(): void {
+    if (this.storageConflict) return;
+    this.storageConflict = true;
+    if (this.saveTimer !== null) clearTimeout(this.saveTimer);
+    this.saveTimer = null;
+    this.announce("Another tab saved a different copy of this session. Choose which one to keep.", "warn");
+    this.emit();
+  }
+
+  /** Loads the copy the other tab saved, replacing this tab's session. */
+  useSavedCopy(wallSeconds: number): UpdateResult {
+    const loaded = loadProject(this.storage);
+    if (loaded.status.state !== "ok" || loaded.notice) {
+      const message = loaded.notice ?? "The saved copy could not be read.";
+      this.announce(message, "warn");
+      this.emit();
+      return { ok: false, issues: [{ path: "storage", message }] };
+    }
+    const result = this.replaceProject(loaded.project, wallSeconds);
+    if (!result.ok) return result;
+    this.storageConflict = false;
+    this.announce("Loaded the session saved by the other tab.", "success");
+    this.emit();
+    return { ok: true };
+  }
+
+  /** Keeps this tab's session and saves it over the other tab's copy. */
+  keepThisCopy(): void {
+    this.storageConflict = false;
+    this.flushSave();
+    this.announce("Kept this tab's session. It is saved again.");
+    this.emit();
+  }
+
   private scheduleSave(): void {
     if (this.saveTimer !== null) clearTimeout(this.saveTimer);
+    if (this.storageConflict) return;
     this.saveTimer = setTimeout(() => {
       this.saveTimer = null;
       this.flushSave();
@@ -619,6 +709,7 @@ export class SimulatorStore {
       clearTimeout(this.saveTimer);
       this.saveTimer = null;
     }
+    if (this.storageConflict) return;
     const before = this.storageStatus.state;
     this.storageStatus = saveProject(this.storage, this.projectForSave());
     if (this.storageStatus.state !== before) {

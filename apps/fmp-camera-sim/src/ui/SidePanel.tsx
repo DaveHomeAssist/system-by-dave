@@ -5,6 +5,7 @@ import { ExercisesPanel } from "./ExercisesPanel";
 import { PerformerSettings } from "./PerformerSettings";
 import { SessionPanel } from "./SessionPanel";
 import { VenueSettings } from "./VenueSettings";
+import { keepFocus } from "./keepFocus";
 
 export type PanelTab = "exercises" | "venue" | "camera" | "performer" | "session";
 
@@ -79,6 +80,7 @@ export function SidePanel({ store, state, open, docked, tab, tabs, onTab, onClos
         {available.map((t, index) => (
           <button
             key={t.id}
+            {...keepFocus}
             type="button"
             role="tab"
             id={`tab-${t.id}`}

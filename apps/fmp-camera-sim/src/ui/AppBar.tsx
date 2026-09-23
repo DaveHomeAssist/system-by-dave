@@ -1,6 +1,7 @@
 import { type StoreState } from "../app/store";
 import { type Theme } from "../app/theme";
 import { type PanelTab } from "./SidePanel";
+import { keepFocus } from "./keepFocus";
 
 interface Props {
   state: StoreState;
@@ -73,7 +74,7 @@ export function AppBar({ state, theme, drawerOpen, drawerTab, showPanelButtons, 
         <button type="button" className="tool-button" onClick={onHelp} aria-label="Help and keyboard shortcuts">
           Help
         </button>
-        <button type="button" className="tool-button theme-button" aria-pressed={theme === "dark"} onClick={onToggleTheme}>
+        <button {...keepFocus} type="button" className="tool-button theme-button" aria-pressed={theme === "dark"} onClick={onToggleTheme}>
           Dark mode
         </button>
       </nav>

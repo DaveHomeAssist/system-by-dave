@@ -49,6 +49,15 @@ export function Joystick({ input, commanded }: Props) {
 
   useEffect(() => () => input.release("joystick", nowSeconds()), [input]);
 
+  // Leaving the window ends the drag: the engine releases the input, this resets the pad.
+  useEffect(() => {
+    const onBlur = () => {
+      if (pointer.current !== null) release();
+    };
+    window.addEventListener("blur", onBlur);
+    return () => window.removeEventListener("blur", onBlur);
+  });
+
   // Mirror keyboard deflection on the knob when the pad is not being dragged.
   useEffect(() => {
     if (pointer.current === null) place(commanded.pan, commanded.tilt);

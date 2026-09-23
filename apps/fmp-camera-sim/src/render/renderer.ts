@@ -60,6 +60,10 @@ const QUALITY = [
 ];
 const SLOW_FRAME_MS = 26;
 const FAST_FRAME_MS = 18;
+// A steady 30 Hz (33 ms) stays below the slow ceiling and recovers under the fast ceiling.
+const SLOW_CEILING_MS = 55;
+const FAST_CEILING_MS = 40;
+const INTERVAL_WINDOW = 120;
 
 function createRenderer(canvas: HTMLCanvasElement, exposure: number): WebGLRenderer {
   try {
@@ -103,6 +107,10 @@ export class SceneRenderer {
   private fastSince: number | null = null;
   private lastFrameTime: number | null = null;
   private frameEma = 16.7;
+  /** Recent frame intervals (about 2 s at 60 Hz); their minimum is the display's pacing baseline. */
+  private readonly recentIntervals: number[] = [];
+  private intervalIndex = 0;
+  private theme: "light" | "dark" = "light";
   private lost = false;
   private diagnostics: RenderDiagnostics = {
     frames: 0,
@@ -132,7 +140,7 @@ export class SceneRenderer {
       this.monitor.dispose();
       throw error;
     }
-    this.monitor.setClearColor(new Color(0x07090c));
+    this.applyClearColors();
     this.monitorCamera.layers.set(0);
     this.overviewCamera.layers.enable(OVERVIEW_LAYER);
 
@@ -177,6 +185,8 @@ export class SceneRenderer {
       };
       const restored = () => {
         canvas.dataset.context = "ok";
+        // A restored context starts from default GL state; put the background colours back.
+        this.applyClearColors();
         if (this.monitorCanvas.dataset.context !== "lost" && this.overviewCanvas.dataset.context !== "lost") {
           this.lost = false;
           this.callbacks.onContextRestored();
@@ -194,7 +204,13 @@ export class SceneRenderer {
   }
 
   setTheme(theme: "light" | "dark"): void {
-    this.overview.setClearColor(new Color(theme === "dark" ? 0x0e141c : 0xdcd4c7));
+    this.theme = theme;
+    this.applyClearColors();
+  }
+
+  private applyClearColors(): void {
+    this.monitor.setClearColor(new Color(0x07090c));
+    this.overview.setClearColor(new Color(this.theme === "dark" ? 0x0e141c : 0xdcd4c7));
   }
 
   /** Rebuilds the static venue when its dimensions change. */
@@ -250,11 +266,31 @@ export class SceneRenderer {
     return true;
   }
 
+  /**
+   * Frame pacing is judged against the display's own rate: the shortest recent frame interval.
+   * A steady 30 Hz (low-power mode, a 30 Hz display) is normal there, not a slow device; only
+   * frames well beyond that baseline step the venue view down.
+   */
   private trackPerformance(time: number): void {
     if (this.lastFrameTime !== null) {
       const delta = Math.min(250, time - this.lastFrameTime);
       this.frameEma += (delta - this.frameEma) * 0.08;
-      if (this.frameEma > SLOW_FRAME_MS) {
+      if (this.recentIntervals.length < INTERVAL_WINDOW) this.recentIntervals.push(delta);
+      else {
+        this.recentIntervals[this.intervalIndex] = delta;
+        this.intervalIndex = (this.intervalIndex + 1) % INTERVAL_WINDOW;
+      }
+      // Judge nothing until the baseline has settled.
+      if (this.recentIntervals.length < 30) {
+        this.lastFrameTime = time;
+        return;
+      }
+      // The baseline only relaxes the thresholds as far as a 30 Hz display. A device that can
+      // never draw faster than that is genuinely slow and still sheds venue-view detail.
+      const baseline = Math.min(...this.recentIntervals);
+      const slow = Math.max(SLOW_FRAME_MS, Math.min(baseline * 1.6, SLOW_CEILING_MS));
+      const fast = Math.max(FAST_FRAME_MS, Math.min(baseline * 1.15, FAST_CEILING_MS));
+      if (this.frameEma > slow) {
         this.fastSince = null;
         this.slowSince ??= time;
         if (time - this.slowSince > 1500 && this.quality < QUALITY.length - 1) {
@@ -262,7 +298,7 @@ export class SceneRenderer {
           this.slowSince = time;
           this.callbacks.onQualityChange(this.quality);
         }
-      } else if (this.frameEma < FAST_FRAME_MS) {
+      } else if (this.frameEma < fast) {
         this.slowSince = null;
         this.fastSince ??= time;
         if (time - this.fastSince > 6000 && this.quality > 0) {

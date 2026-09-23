@@ -1,6 +1,7 @@
 import { type KeyboardEvent, type PointerEvent, useEffect, useRef } from "react";
 import { type LensState } from "../domain/camera";
 import { eventSeconds, type InputController, nowSeconds } from "../input/controller";
+import { keepFocus } from "./keepFocus";
 
 interface Props {
   input: InputController;
@@ -66,7 +67,18 @@ export function ZoomControl({ input, lens, commandedZoom }: Props) {
     if (pointer.current === null) place(commandedZoom);
   }, [commandedZoom]);
 
+  // Leaving the window ends any drag or hold on this control.
+  useEffect(() => {
+    const onBlur = () => {
+      if (pointer.current !== null) releaseRocker();
+      endHold(nowSeconds());
+    };
+    window.addEventListener("blur", onBlur);
+    return () => window.removeEventListener("blur", onBlur);
+  });
+
   const holdProps = (direction: "tele" | "wide") => ({
+    ...keepFocus,
     onPointerDown: (event: PointerEvent<HTMLButtonElement>) => {
       if (event.pointerType === "mouse" && event.button !== 0) return;
       event.currentTarget.setPointerCapture(event.pointerId);

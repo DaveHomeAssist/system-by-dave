@@ -4,7 +4,7 @@ import { MARK_IDS, PATH_IDS, PATH_LABELS, type PathId, type PerformerConfig, typ
 import { mToFt } from "../domain/units";
 import { type MarkId } from "../domain/venue";
 import { type Issue } from "../domain/validate";
-import { NumberField, RadioGroup, SelectField } from "./fields";
+import { NumberField, RadioGroup, SelectField, withFieldIssue } from "./fields";
 
 interface Props {
   store: SimulatorStore;
@@ -19,7 +19,8 @@ export function PerformerSettings({ store, state }: Props) {
 
   const update = (patch: Partial<PerformerConfig>) => {
     const result = store.updatePerformer(patch);
-    setIssues(result.ok ? [] : result.issues);
+    const field = Object.keys(patch)[0];
+    setIssues(result.ok ? [] : field ? withFieldIssue(result.issues, `session.performer.${field}`) : result.issues);
   };
   const errorFor = (field: string) => issues.find((issue) => issue.path === `session.performer.${field}`)?.message;
 

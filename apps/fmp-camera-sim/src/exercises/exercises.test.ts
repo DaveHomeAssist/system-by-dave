@@ -47,6 +47,19 @@ describe("wide shot exercise", () => {
     expect(progress.result?.metrics.stageFillPct).toBeGreaterThanOrEqual(55);
   });
 
+  it("still needs a framed, still shot when the hold time is zero", () => {
+    const exercise = new WideShotExercise();
+    const zeroHold = { ...settings, wide: { ...settings.wide, holdS: 0 } };
+    const at = (t: number, pose: PtzPose, moving: boolean) => ({ ...sample(t, 1 / 30, pose, moving), settings: zeroHold });
+    exercise.sample(at(0, { pan: 0, tilt: 0, lens: 0 }, true));
+    exercise.sample(at(1 / 30, { pan: 0, tilt: 0, lens: 0 }, false));
+    expect(exercise.progress().status).toBe("running");
+    exercise.sample(at(2 / 30, widePose(40), true));
+    expect(exercise.progress().status).toBe("running");
+    exercise.sample(at(3 / 30, widePose(40), false));
+    expect(exercise.progress().status).toBe("complete");
+  });
+
   it("does not complete while too wide or too tight", () => {
     const wide = new WideShotExercise();
     const tight = new WideShotExercise();

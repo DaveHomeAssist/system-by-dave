@@ -4,6 +4,7 @@ import { type SimulatorStore, type StoreState } from "../app/store";
 import { formatSigned } from "../domain/units";
 import { type GuidePreferences } from "../domain/session";
 import { GraphicsFallback } from "./GraphicsFallback";
+import { focusWorkspace, keepFocus } from "./keepFocus";
 
 interface Props {
   state: StoreState;
@@ -40,17 +41,17 @@ export function MonitorPanel({ state, store, canvasRef, overlayRef, expanded, on
         <h2 id="monitor-title">Camera monitor</h2>
         <div className="panel-tools" role="group" aria-label="Monitor guides">
           {GUIDE_BUTTONS.map(({ key, label }) => (
-            <button key={key} type="button" className="tool-button" aria-pressed={guides[key]} onClick={() => onGuides({ [key]: !guides[key] })}>
+            <button key={key} {...keepFocus} type="button" className="tool-button" aria-pressed={guides[key]} onClick={() => onGuides({ [key]: !guides[key] })}>
               {label}
             </button>
           ))}
-          <button type="button" className="tool-button" aria-pressed={expanded} onClick={onToggleExpanded} title="F">
+          <button {...keepFocus} type="button" className="tool-button" aria-pressed={expanded} onClick={onToggleExpanded} title="F">
             {expanded ? "Restore layout" : "Expand monitor"}
           </button>
         </div>
       </div>
       <div className="monitor-stage">
-        <div className="monitor-frame" data-render={state.renderStatus}>
+        <div className="monitor-frame" data-render={state.renderStatus} onPointerDown={focusWorkspace}>
           <canvas ref={canvasRef} className="monitor-canvas" role="img" aria-label="Live picture from the simulated P240" data-testid="monitor-canvas" />
           <svg ref={overlayRef} className="monitor-overlay" viewBox="0 0 1600 900" preserveAspectRatio="none" aria-hidden="true" />
           <div className="monitor-osd" aria-hidden="true">

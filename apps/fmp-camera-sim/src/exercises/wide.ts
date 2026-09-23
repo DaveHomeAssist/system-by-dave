@@ -70,8 +70,10 @@ export class WideShotExercise implements Exercise {
     this.last = evaluation;
     this.lastMoving = s.moving;
     const framed = evaluation.allInside && evaluation.stageFillPct >= this.minFill;
-    this.steadyS = framed && !s.moving ? this.steadyS + s.dt : 0;
-    if (this.steadyS + 1e-9 >= this.holdS) {
+    const steady = framed && !s.moving;
+    this.steadyS = steady ? this.steadyS + s.dt : 0;
+    // Completion needs the shot framed and still on this sample, even with a zero hold time.
+    if (steady && this.steadyS + 1e-9 >= this.holdS) {
       const elapsed = s.time - this.startTime;
       this.done = {
         exercise: "wide",

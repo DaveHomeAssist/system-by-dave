@@ -205,7 +205,9 @@ async function closePanel(page) {
     await hold(page, 'ArrowDown', 400);
     await page.keyboard.up('Shift');
     await waitStill(page);
-    await sleep(200);
+    // Compare against a frame drawn after the camera settled, however slowly this renderer runs.
+    const settledAt = (await s.render()).monitorFrames;
+    await page.waitForFunction((n) => window.__fmpCameraSim.render().monitorFrames >= n + 2, settledAt, { timeout: 15000 });
     const frame = await s.frame();
     const render = await s.render();
     const forward = [frame.forward.x, frame.forward.y, frame.forward.z];
@@ -365,6 +367,43 @@ async function closePanel(page) {
     await page.getByRole('button', { name: /^Recall preset 2/ }).click();
     await waitStill(page);
     assert(near((await s.snapshot()).pose.lens, zoomed.lens, 0.001), 'preset 2 did not restore the lens');
+  });
+  await check('mouse: a clicked control keeps Space as Stop, and Esc stops from a text field', async () => {
+    await page.getByRole('button', { name: 'Home', exact: true }).click();
+    await sleep(80);
+    assert((await s.snapshot()).recall !== null || (await s.snapshot()).pose.lens === 0, 'Home did not start');
+    const focused = await page.evaluate(() => document.activeElement?.textContent?.trim());
+    assert(focused !== 'Home', 'the Home button took keyboard focus from a mouse click');
+    await page.getByRole('button', { name: /^Recall preset 2/ }).click();
+    await sleep(120);
+    assert((await s.snapshot()).recall !== null, 'recall did not start');
+    await page.keyboard.press('Space');
+    assert((await s.snapshot()).recall === null, 'Space did not stop the recall after a mouse click');
+    await page.keyboard.press('KeyH');
+    await waitStill(page);
+    await showTab(page, 'Venue');
+    await focusWorkspace(page);
+    await page.keyboard.press('Digit2');
+    await sleep(120);
+    assert((await s.snapshot()).recall !== null, 'recall did not start from the keyboard');
+    await page.getByRole('group', { name: /Camera to downstage edge/ }).getByLabel('Value').focus();
+    await page.keyboard.press('Escape');
+    assert((await s.snapshot()).recall === null, 'Esc in a text field did not stop the camera');
+  });
+  await check('mouse: leaving the window releases a joystick drag', async () => {
+    const box = await page.getByRole('application', { name: 'Pan and tilt joystick' }).boundingBox();
+    const cx = box.x + box.width / 2;
+    const cy = box.y + box.height / 2;
+    await page.mouse.move(cx, cy);
+    await page.mouse.down();
+    await page.mouse.move(cx + box.width * 0.4, cy, { steps: 3 });
+    await sleep(300);
+    assert((await s.snapshot()).input.pan > 0.4, 'drag did not drive');
+    await page.evaluate(() => window.dispatchEvent(new Event('blur')));
+    await sleep(350);
+    const snap = await s.snapshot();
+    await page.mouse.up();
+    assert(snap.input.pan === 0 && !snap.moving, `joystick still driving after blur: ${JSON.stringify(snap.input)}`);
   });
   await check('mouse: orbiting the venue view never moves the camera', async () => {
     const before = await s.snapshot();

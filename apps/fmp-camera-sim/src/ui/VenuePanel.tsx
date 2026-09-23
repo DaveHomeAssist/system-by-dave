@@ -2,6 +2,7 @@ import { type RefObject } from "react";
 import { type StoreState } from "../app/store";
 import { type OverviewPreset } from "../render/renderer";
 import { GraphicsFallback } from "./GraphicsFallback";
+import { focusWorkspace, keepFocus } from "./keepFocus";
 
 interface Props {
   state: StoreState;
@@ -31,11 +32,11 @@ export function VenuePanel({ state, canvasRef, shown, quality, onToggle, onView 
         <div className="panel-tools">
           {shown &&
             VIEWS.map(({ view, label }) => (
-              <button key={view} type="button" className="tool-button" onClick={() => onView(view)}>
+              <button key={view} {...keepFocus} type="button" className="tool-button" onClick={() => onView(view)}>
                 {label}
               </button>
             ))}
-          <button type="button" className="tool-button" aria-expanded={shown} aria-controls="venue-stage" onClick={onToggle}>
+          <button {...keepFocus} type="button" className="tool-button" aria-expanded={shown} aria-controls="venue-stage" onClick={onToggle}>
             {shown ? "Collapse" : "Show venue view"}
           </button>
         </div>
@@ -43,6 +44,7 @@ export function VenuePanel({ state, canvasRef, shown, quality, onToggle, onView 
       <div className="venue-stage" id="venue-stage" hidden={!shown}>
         <canvas
           ref={canvasRef}
+          onPointerDown={focusWorkspace}
           className="venue-canvas"
           role="img"
           aria-label="Venue overview showing the stage, pit, seating bowl, catwalk, Camera 4 and its viewing cone"

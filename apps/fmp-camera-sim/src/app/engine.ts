@@ -1,6 +1,7 @@
 import { type InputController, nowSeconds } from "../input/controller";
 import { type MonitorOverlay } from "../render/monitorOverlay";
 import { type SceneRenderer } from "../render/renderer";
+import { STORAGE_KEY } from "../storage/persist";
 import { type SimulatorStore } from "./store";
 
 // The frame loop. The simulation advances on its own fixed step; rendering only reads its state,
@@ -25,6 +26,8 @@ export class Engine {
     this.running = true;
     document.addEventListener("visibilitychange", this.onVisibility);
     window.addEventListener("pagehide", this.onPageHide);
+    window.addEventListener("blur", this.onBlur);
+    window.addEventListener("storage", this.onStorage);
     if (document.visibilityState === "hidden") this.onVisibility();
     this.raf = requestAnimationFrame(this.frame);
   }
@@ -34,6 +37,8 @@ export class Engine {
     cancelAnimationFrame(this.raf);
     document.removeEventListener("visibilitychange", this.onVisibility);
     window.removeEventListener("pagehide", this.onPageHide);
+    window.removeEventListener("blur", this.onBlur);
+    window.removeEventListener("storage", this.onStorage);
   }
 
   private frame = (time: number): void => {
@@ -62,5 +67,15 @@ export class Engine {
 
   private onPageHide = (): void => {
     this.parts.store.flushSave();
+  };
+
+  /** Losing window focus stops every commanded move, including a joystick or rocker drag. */
+  private onBlur = (): void => {
+    this.parts.input.releaseAll(nowSeconds());
+  };
+
+  /** Another tab wrote the saved session (storage events never fire in the writing tab). */
+  private onStorage = (event: StorageEvent): void => {
+    if (event.key === STORAGE_KEY || event.key === null) this.parts.store.noteExternalSave();
   };
 }

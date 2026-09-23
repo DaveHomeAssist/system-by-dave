@@ -4,7 +4,7 @@ import { EVIDENCE_LABELS, type EvidenceStatus, VENUE_STATUS_OPTIONS } from "../d
 import { fromDisplayLength, toDisplayLength, formatLength, type LengthUnit } from "../domain/units";
 import { type Issue } from "../domain/validate";
 import { DIMENSION_SPECS, type DistanceBasis, type MountOrientation, type VenueProfile } from "../domain/venue";
-import { EvidenceBadge, NoteField, NumberField, RadioGroup, SelectField } from "./fields";
+import { EvidenceBadge, NoteField, NumberField, RadioGroup, SelectField, withFieldIssue } from "./fields";
 
 const STATUS_OPTIONS = VENUE_STATUS_OPTIONS.map((status) => ({ value: status, label: EVIDENCE_LABELS[status] }));
 
@@ -19,15 +19,19 @@ export function VenueSettings({ store, state }: Props) {
   const g = state.geometry;
   const [issues, setIssues] = useState<Issue[]>([]);
 
-  const apply = (mutate: (draft: VenueProfile) => void) => {
+  const apply = (mutate: (draft: VenueProfile) => void, fieldPath?: string) => {
     const draft = structuredClone(venue);
     mutate(draft);
     const result = store.updateVenue(draft);
-    setIssues(result.ok ? [] : result.issues);
+    setIssues(result.ok ? [] : fieldPath ? withFieldIssue(result.issues, fieldPath) : result.issues);
   };
   const errorFor = (prefix: string) => issues.find((issue) => issue.path.startsWith(prefix))?.message;
   const digits = unit === "ft" ? 1 : 2;
-  const unmatched = issues.filter((issue) => !DIMENSION_SPECS.some((spec) => issue.path.startsWith(`venue.dimensions.${spec.key}`)));
+  const unmatched = issues.filter(
+    (issue) =>
+      !DIMENSION_SPECS.some((spec) => issue.path.startsWith(`venue.dimensions.${spec.key}`)) &&
+      !issue.path.startsWith("venue.mount.panZeroBearingDeg"),
+  );
 
   return (
     <div className="settings">
@@ -92,7 +96,7 @@ export function VenueSettings({ store, state }: Props) {
               onCommit={(value) =>
                 apply((draft) => {
                   draft.dimensions[spec.key].value = fromDisplayLength(value, unit);
-                })
+                }, `${path}.value`)
               }
             />
             <SelectField<EvidenceStatus>
@@ -185,7 +189,7 @@ export function VenueSettings({ store, state }: Props) {
           onCommit={(value) =>
             apply((draft) => {
               draft.mount.panZeroBearingDeg = value;
-            })
+            }, "venue.mount.panZeroBearingDeg")
           }
         />
         <SelectField<EvidenceStatus>
@@ -217,7 +221,14 @@ export function VenueSettings({ store, state }: Props) {
       <p className="settings-foot">
         Stage directions are performer-facing: stage right is the performer's right, which is house left and the left side of the Camera 4 picture.
       </p>
-      <button type="button" className="secondary-button" onClick={() => { store.resetVenue(); setIssues([]); }}>
+      <button
+        type="button"
+        className="secondary-button"
+        onClick={() => {
+          const result = store.resetVenue();
+          setIssues(result.ok ? [] : result.issues);
+        }}
+      >
         Reset venue to the FMP estimates
       </button>
     </div>

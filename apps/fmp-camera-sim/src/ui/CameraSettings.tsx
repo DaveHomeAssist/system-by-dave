@@ -13,7 +13,7 @@ import {
 } from "../domain/camera";
 import { EVIDENCE_LABELS, type EvidenceStatus } from "../domain/evidence";
 import { type Issue } from "../domain/validate";
-import { EvidenceBadge, NoteField, NumberField, SelectField } from "./fields";
+import { EvidenceBadge, NoteField, NumberField, SelectField, withFieldIssue } from "./fields";
 
 interface Props {
   store: SimulatorStore;
@@ -34,11 +34,11 @@ export function CameraSettings({ store, state }: Props) {
   const [issues, setIssues] = useState<Issue[]>([]);
   const teleId = useId();
 
-  const apply = (mutate: (draft: CameraProfile) => void) => {
+  const apply = (mutate: (draft: CameraProfile) => void, fieldPath?: string) => {
     const draft = structuredClone(camera);
     mutate(draft);
     const result = store.updateCamera(draft);
-    setIssues(result.ok ? [] : result.issues);
+    setIssues(result.ok ? [] : fieldPath ? withFieldIssue(result.issues, fieldPath) : result.issues);
   };
   const errorFor = (path: string) => issues.find((issue) => issue.path === path)?.message;
 
@@ -110,10 +110,10 @@ export function CameraSettings({ store, state }: Props) {
           Operating limits <EvidenceBadge status={camera.limits.status} />
         </legend>
         <div className="field-pair">
-          <NumberField label="Pan left" value={camera.limits.panMinDeg} digits={1} unit="°" error={errorFor("camera.limits.panMinDeg")} onCommit={(v) => apply((d) => void (d.limits.panMinDeg = v))} />
-          <NumberField label="Pan right" value={camera.limits.panMaxDeg} digits={1} unit="°" error={errorFor("camera.limits.panMaxDeg")} onCommit={(v) => apply((d) => void (d.limits.panMaxDeg = v))} />
-          <NumberField label="Tilt down" value={camera.limits.tiltMinDeg} digits={1} unit="°" error={errorFor("camera.limits.tiltMinDeg")} onCommit={(v) => apply((d) => void (d.limits.tiltMinDeg = v))} />
-          <NumberField label="Tilt up" value={camera.limits.tiltMaxDeg} digits={1} unit="°" error={errorFor("camera.limits.tiltMaxDeg")} onCommit={(v) => apply((d) => void (d.limits.tiltMaxDeg = v))} />
+          <NumberField label="Pan left" value={camera.limits.panMinDeg} digits={1} unit="°" error={errorFor("camera.limits.panMinDeg")} onCommit={(v) => apply((d) => void (d.limits.panMinDeg = v), "camera.limits.panMinDeg")} />
+          <NumberField label="Pan right" value={camera.limits.panMaxDeg} digits={1} unit="°" error={errorFor("camera.limits.panMaxDeg")} onCommit={(v) => apply((d) => void (d.limits.panMaxDeg = v), "camera.limits.panMaxDeg")} />
+          <NumberField label="Tilt down" value={camera.limits.tiltMinDeg} digits={1} unit="°" error={errorFor("camera.limits.tiltMinDeg")} onCommit={(v) => apply((d) => void (d.limits.tiltMinDeg = v), "camera.limits.tiltMinDeg")} />
+          <NumberField label="Tilt up" value={camera.limits.tiltMaxDeg} digits={1} unit="°" error={errorFor("camera.limits.tiltMaxDeg")} onCommit={(v) => apply((d) => void (d.limits.tiltMaxDeg = v), "camera.limits.tiltMaxDeg")} />
         </div>
         <p className="field-help">Limits stay inside the published travel. An inverted mount mirrors the tilt range.</p>
         <SelectField<EvidenceStatus>
@@ -139,7 +139,7 @@ export function CameraSettings({ store, state }: Props) {
             unit={spec.unit}
             help={`${spec.help} Range ${spec.min}–${spec.max}.`}
             error={errorFor(`camera.behaviour.${spec.key}`)}
-            onCommit={(value) => apply((d) => void (d.behaviour[spec.key] = value))}
+            onCommit={(value) => apply((d) => void (d.behaviour[spec.key] = value), `camera.behaviour.${spec.key}`)}
           />
         ))}
         <SelectField<PresetEasing>
@@ -186,7 +186,14 @@ export function CameraSettings({ store, state }: Props) {
         <p className="field-help">The 1–8 scale is the trainer's teaching scale, not the SuperJoy's hardware range. Pan and tilt speeds fall with zoom when zoom-adaptive sensitivity is on.</p>
       </section>
 
-      <button type="button" className="secondary-button" onClick={() => { store.resetCamera(); setIssues([]); }}>
+      <button
+        type="button"
+        className="secondary-button"
+        onClick={() => {
+          const result = store.resetCamera();
+          setIssues(result.ok ? [] : result.issues);
+        }}
+      >
         Reset camera profile
       </button>
     </div>

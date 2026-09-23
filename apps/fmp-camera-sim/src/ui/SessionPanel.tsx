@@ -3,6 +3,7 @@ import { downloadText, sessionFilename } from "../app/download";
 import { isOfflineBuild, OFFLINE_FILE, SUITE_LINKS, suiteHref } from "../app/links";
 import { type SimulatorStore, type StoreState } from "../app/store";
 import { lensState } from "../domain/camera";
+import { MAX_IMPORT_BYTES } from "../domain/project";
 import { formatSigned } from "../domain/units";
 import { type Issue } from "../domain/validate";
 import { nowSeconds } from "../input/controller";
@@ -25,6 +26,11 @@ export function SessionPanel({ store, state }: Props) {
     if (!file) return;
     setImportIssues([]);
     setImportMessage("");
+    if (fileRef.current) fileRef.current.value = "";
+    if (file.size > MAX_IMPORT_BYTES) {
+      setImportMessage(`${file.name} is larger than 2 MB, which is too large for a simulator session. Nothing changed.`);
+      return;
+    }
     let text: string;
     try {
       text = await file.text();
@@ -38,7 +44,6 @@ export function SessionPanel({ store, state }: Props) {
       setImportIssues(result.issues);
       setImportMessage(`${file.name} was not imported. Nothing in the open session changed.`);
     }
-    if (fileRef.current) fileRef.current.value = "";
   };
 
   return (
@@ -101,19 +106,23 @@ export function SessionPanel({ store, state }: Props) {
           >
             Export session (.json)
           </button>
-          <label className="secondary-button file-button" htmlFor={fileId}>
+          <button type="button" className="secondary-button" aria-describedby={fileId} onClick={() => fileRef.current?.click()}>
             Import session…
-          </label>
+          </button>
           <input
-            id={fileId}
             ref={fileRef}
             className="visually-hidden"
             type="file"
+            tabIndex={-1}
+            aria-hidden="true"
             accept="application/json,.json"
             onChange={(event) => void onImport(event.target.files?.[0])}
           />
         </div>
-        <p className="field-help">Exports carry the venue profile with its evidence notes, the camera profile, presets, performer and results.</p>
+        <p className="field-help" id={fileId}>
+          Exports carry the venue profile with its evidence notes, the camera profile, presets, performer and results. Imports are checked in full
+          before anything changes.
+        </p>
         {importMessage && (
           <div className={`notice ${importIssues.length ? "notice-error" : "notice-ok"}`} role={importIssues.length ? "alert" : "status"}>
             <p>{importMessage}</p>

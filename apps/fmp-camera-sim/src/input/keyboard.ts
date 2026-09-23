@@ -32,15 +32,36 @@ export interface KeyboardActions {
   openHelp(): void;
 }
 
-/** Targets that use the keyboard themselves: typing fields, sliders, tabs and radio groups. */
-export function usesOwnKeys(target: EventTarget | null): boolean {
-  if (!(target instanceof HTMLElement)) return false;
-  if (target.isContentEditable || target.closest("dialog")) return true;
-  if (target.tagName === "TEXTAREA" || target.tagName === "SELECT") return true;
-  if (target.tagName === "INPUT") return !["button", "submit", "reset", "checkbox"].includes((target as HTMLInputElement).type);
+const ARROWS = ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"];
+const TAB_KEYS: ReadonlySet<string> = new Set([...ARROWS, "Home", "End"]);
+const RANGE_KEYS: ReadonlySet<string> = new Set([...ARROWS, "Home", "End", "PageUp", "PageDown"]);
+const RADIO_KEYS: ReadonlySet<string> = new Set([...ARROWS, "Space"]);
+
+/**
+ * Keys a focused element handles itself: every key for typing targets and anything inside a
+ * dialog, just its navigation keys for tabs, sliders and radio groups, otherwise none. Only
+ * those keys are left alone, so the other shortcuts keep working wherever focus was left.
+ */
+export function ownKeys(target: EventTarget | null): "all" | ReadonlySet<string> | null {
+  if (!(target instanceof HTMLElement)) return null;
+  if (target.isContentEditable || target.closest("dialog")) return "all";
+  const tag = target.tagName;
+  if (tag === "TEXTAREA" || tag === "SELECT") return "all";
+  if (tag === "INPUT") {
+    const type = (target as HTMLInputElement).type;
+    if (type === "range") return RANGE_KEYS;
+    if (type === "radio") return RADIO_KEYS;
+    return ["button", "submit", "reset", "checkbox", "file"].includes(type) ? null : "all";
+  }
   const role = target.getAttribute("role");
-  return role !== null && ["tab", "slider", "listbox", "option", "menuitem", "radio", "spinbutton", "textbox"].includes(role);
+  if (role === "tab") return TAB_KEYS;
+  if (role === "slider" || role === "spinbutton") return RANGE_KEYS;
+  if (role === "radio") return RADIO_KEYS;
+  if (role !== null && ["listbox", "option", "menuitem", "textbox", "combobox"].includes(role)) return "all";
+  return null;
 }
+
+const consumes = (own: ReturnType<typeof ownKeys>, code: string): boolean => own === "all" || (own !== null && own.has(code));
 
 /** Targets that Space or Enter activate. Space must not also stop the camera there. */
 function isActivatable(target: EventTarget | null): boolean {
@@ -83,6 +104,19 @@ export function attachKeyboard(store: SimulatorStore, input: InputController, ac
 
   const onKeyDown = (event: KeyboardEvent) => {
     const wall = eventSeconds(event);
+    // macOS delivers no keyup for keys released while Command is down, so a held move could
+    // stick. Command releases every held key.
+    if (event.key === "Meta") {
+      releaseAll(wall);
+      return;
+    }
+    // Esc always stops, wherever focus is and whatever else handles the key.
+    if (event.code === "Escape") {
+      releaseAll(wall);
+      store.stop(wall);
+      if (store.getState().storeArmed) store.armStore(false);
+      return;
+    }
     if (event.key === "Shift" || event.key === "Alt") {
       shift = event.shiftKey;
       alt = event.altKey;
@@ -90,7 +124,7 @@ export function attachKeyboard(store: SimulatorStore, input: InputController, ac
       return;
     }
     if (event.defaultPrevented || event.ctrlKey || event.metaKey) return;
-    if (usesOwnKeys(event.target)) return;
+    if (consumes(ownKeys(event.target), event.code)) return;
     shift = event.shiftKey;
     alt = event.altKey;
 
@@ -118,15 +152,13 @@ export function attachKeyboard(store: SimulatorStore, input: InputController, ac
         store.home(wall);
         return;
       case "Space":
+        // A control the operator tabbed to keeps Space as its own activation key. Pointer
+        // presses on the operating controls do not take focus (ui/keepFocus.ts), so after a
+        // click Space still stops.
         if (isActivatable(event.target)) return;
         event.preventDefault();
         releaseAll(wall);
         store.stop(wall);
-        return;
-      case "Escape":
-        releaseAll(wall);
-        store.stop(wall);
-        if (store.getState().storeArmed) store.armStore(false);
         return;
       case "BracketLeft":
       case "BracketRight": {
@@ -157,6 +189,10 @@ export function attachKeyboard(store: SimulatorStore, input: InputController, ac
 
   const onKeyUp = (event: KeyboardEvent) => {
     const wall = eventSeconds(event);
+    if (event.key === "Meta") {
+      releaseAll(wall);
+      return;
+    }
     if (event.key === "Shift" || event.key === "Alt") {
       shift = event.shiftKey;
       alt = event.altKey;

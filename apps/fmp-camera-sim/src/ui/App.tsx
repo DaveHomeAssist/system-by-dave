@@ -221,6 +221,17 @@ export function App() {
           </button>
         </div>
       )}
+      {state.storageConflict && (
+        <div className="banner banner-warn" role="alert">
+          <p>Another tab saved a different copy of this session. Autosave is paused here until you choose which copy to keep.</p>
+          <button type="button" className="tool-button" onClick={() => store.useSavedCopy(nowSeconds())}>
+            Load the other copy
+          </button>
+          <button type="button" className="tool-button" onClick={() => store.keepThisCopy()}>
+            Keep this tab's copy
+          </button>
+        </div>
+      )}
       <div className="sim-workspace">
         <MonitorPanel
           state={state}

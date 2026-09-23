@@ -50,16 +50,22 @@ export function loadProject(storage: Storage | null): LoadResult {
   if (text === null) return { project: defaultProject(), status: { state: "ok", savedAt: null }, notice: null };
   const parsed = parseProjectText(text);
   if (parsed.ok) return { project: parsed.project, status: { state: "ok", savedAt: null }, notice: null };
-  // Keep the unreadable copy so nothing is silently destroyed, then start fresh.
+  // Keep the unreadable copy under its own timestamped key, so a later failure cannot overwrite
+  // an earlier one, then start fresh.
+  const backupKey = `${UNREADABLE_KEY}.${Date.now()}`;
+  let kept = false;
   try {
-    storage.setItem(UNREADABLE_KEY, text);
+    storage.setItem(backupKey, text);
+    kept = true;
   } catch {
-    /* The fresh session still works; the notice explains what happened. */
+    /* The fresh session still works; the notice says the copy could not be kept. */
   }
   return {
     project: defaultProject(),
     status: { state: "ok", savedAt: null },
-    notice: `The saved session could not be restored (${formatIssues(parsed.issues, 2)}). A fresh session was started and the old copy was kept under ${UNREADABLE_KEY}.`,
+    notice: `The saved session could not be restored (${formatIssues(parsed.issues, 2)}). A fresh session was started. ${
+      kept ? `The old copy was kept in browser storage under ${backupKey}.` : "Browser storage was too full to keep a copy of the old session."
+    }`,
   };
 }
 

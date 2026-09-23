@@ -31,7 +31,9 @@ export function makeLabel(text: string, options: LabelOptions): Sprite {
     ctx.fillStyle = options.background ?? "rgba(12, 16, 22, 0.78)";
     const r = canvas.height / 2.6;
     ctx.beginPath();
-    ctx.roundRect(0, 0, canvas.width, canvas.height, r);
+    // roundRect needs Safari 16 / Firefox 112; a square label is fine elsewhere.
+    if (typeof ctx.roundRect === "function") ctx.roundRect(0, 0, canvas.width, canvas.height, r);
+    else ctx.rect(0, 0, canvas.width, canvas.height);
     ctx.fill();
     ctx.fillStyle = options.color ?? "#f4f0e8";
     ctx.textBaseline = "middle";

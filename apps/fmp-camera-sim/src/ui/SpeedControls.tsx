@@ -8,6 +8,7 @@ import {
   zoomRateForLevel,
 } from "../domain/camera";
 import { type SpeedLevels } from "../domain/session";
+import { keepFocus } from "./keepFocus";
 
 interface Props {
   speeds: SpeedLevels;
@@ -44,6 +45,7 @@ export function SpeedControls({ speeds, profile, onChange }: Props) {
               {label}
             </span>
             <button
+              {...keepFocus}
               type="button"
               className="step-button"
               aria-label={`${label} speed down`}
@@ -57,6 +59,7 @@ export function SpeedControls({ speeds, profile, onChange }: Props) {
               <span className="speed-of">/{SPEED_LEVEL_MAX}</span>
             </output>
             <button
+              {...keepFocus}
               type="button"
               className="step-button"
               aria-label={`${label} speed up`}

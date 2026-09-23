@@ -1,5 +1,16 @@
 import { type ReactNode, useEffect, useId, useState } from "react";
 import { EVIDENCE_HINTS, EVIDENCE_LABELS, type EvidenceStatus } from "../domain/evidence";
+import { type Issue } from "../domain/validate";
+
+/**
+ * A change can be refused because of a different field (pan left against pan right, distance
+ * against height). Report the refusal on the edited field as well, so it shows why and its text
+ * resets to the live value once the refusal clears.
+ */
+export function withFieldIssue(issues: Issue[], fieldPath: string): Issue[] {
+  if (issues.length === 0 || issues.some((issue) => issue.path.startsWith(fieldPath))) return issues;
+  return [...issues, { path: fieldPath, message: `Not applied: ${issues[0].message}` }];
+}
 
 export function EvidenceBadge({ status }: { status: EvidenceStatus }) {
   return (

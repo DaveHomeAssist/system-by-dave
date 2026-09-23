@@ -1,4 +1,5 @@
 import { type Preset, PRESET_SLOTS } from "../domain/session";
+import { keepFocus } from "./keepFocus";
 
 interface Props {
   presets: Preset[];
@@ -27,6 +28,7 @@ export function PresetPad({ presets, armed, onArm, onPress, onHome, onStop }: Pr
           const action = armed ? `Store current shot in preset ${slot}` : preset ? `Recall preset ${slot}, ${name}` : `Preset ${slot} is empty`;
           return (
             <button
+              {...keepFocus}
               type="button"
               key={slot}
               className={`preset-key ${preset ? "has-preset" : ""}`}
@@ -40,13 +42,13 @@ export function PresetPad({ presets, armed, onArm, onPress, onHome, onStop }: Pr
         })}
       </div>
       <div className="preset-actions">
-        <button type="button" className={`action-button ${armed ? "is-armed" : ""}`} aria-pressed={armed} onClick={() => onArm(!armed)}>
+        <button {...keepFocus} type="button" className={`action-button ${armed ? "is-armed" : ""}`} aria-pressed={armed} onClick={() => onArm(!armed)}>
           {armed ? "Cancel store" : "Store"}
         </button>
-        <button type="button" className="action-button" onClick={onHome} title="Camera home: pan 0°, tilt 0°, full wide. Not the FMP safe-wide preset.">
+        <button {...keepFocus} type="button" className="action-button" onClick={onHome} title="Camera home: pan 0°, tilt 0°, full wide. Not the FMP safe-wide preset.">
           Home
         </button>
-        <button type="button" className="action-button action-stop" onClick={onStop}>
+        <button {...keepFocus} type="button" className="action-button action-stop" onClick={onStop}>
           Stop
         </button>
       </div>
