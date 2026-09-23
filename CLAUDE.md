@@ -99,7 +99,9 @@ changes require compatibility and migration coverage.
 AV Workbook is edited in `apps/av-workbook/` and built into `av-workbook/`.
 The FMP Camera Simulator is edited in `apps/fmp-camera-sim/` and built into
 `camera-sim/` (plus its standalone offline HTML) with `npm run build:camera-sim`;
-it sits beside `/shader/` rather than in the managed `fmp/` export.
+it sits beside `/shader/` rather than in the managed `fmp/` export. Its release log,
+`apps/fmp-camera-sim/CHANGELOG.md`, supplies the version the build embeds, and every
+change to `camera-sim/` needs a new entry there.
 NoteForge is built in its own repository and synchronized through
 `scripts/sync_noteforge_release.js`; do not hand-edit its managed artifact.
 Throwline's catalog is synchronized and verified through its dedicated scripts.

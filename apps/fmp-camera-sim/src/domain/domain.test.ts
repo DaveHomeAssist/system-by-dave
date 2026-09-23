@@ -8,6 +8,7 @@ import {
   presetSpeedForLevel,
   zoomRateForLevel,
 } from "./camera";
+import { APP_LABEL } from "../release";
 import { defaultProject, parseProject, parseProjectText, serializeProject } from "./project";
 import { ftToM, mToFt } from "./units";
 import { defaultVenueProfile, deriveVenueGeometry, parseVenueProfile, unsettledVenueItems, type VenueProfile } from "./venue";
@@ -181,6 +182,14 @@ describe("project files", () => {
     const parsed = parseProjectText(text);
     expect(parsed.ok).toBe(true);
     if (parsed.ok) expect(parsed.project).toEqual(project);
+  });
+
+  it("records the build that wrote the file", () => {
+    const file = JSON.parse(serializeProject(defaultProject()));
+    expect(file.app).toBe(APP_LABEL);
+    expect(file.app).toMatch(/^FMP Camera Simulator \d+\.\d+\.\d+ \(build [0-9a-f]{8}\)$/);
+    // The label is informational: a file from another build imports the same way.
+    expect(parseProject({ ...file, app: "FMP Camera Simulator v1" }).ok).toBe(true);
   });
 
   it("rejects malformed input without guessing", () => {

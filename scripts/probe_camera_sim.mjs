@@ -763,6 +763,31 @@ await check('lawn elevation updates the mesh; reference views preserve PTZ and t
   } finally {await context.close();}
 });
 
+// One release stamp (apps/fmp-camera-sim/CHANGELOG.md plus the source fingerprint) everywhere an
+// operator or a file can show which build it came from.
+await check('release stamp: Help, page metadata, offline file and exports agree', async () => {
+  const { context, page, problems } = await open();
+  try {
+    const release = await page.evaluate(() => window.__fmpCameraSim.release());
+    assert(/^\d+\.\d+\.\d+$/.test(release.version) && /^[0-9a-f]{8}$/.test(release.build), `release ${JSON.stringify(release)}`);
+    const stamp = `${release.version}+${release.build}`;
+    const meta = await page.locator('meta[name="fmp-camera-sim-version"]').getAttribute('content');
+    assert(meta === stamp, `page stamp ${meta}, expected ${stamp}`);
+    const offline = await readFile(join(ROOT, 'camera-sim/fmp-camera-simulator-offline.html'), 'utf8');
+    assert(offline.includes(`<meta name="fmp-camera-sim-version" content="${stamp}"`), 'the offline file carries a different stamp');
+    await page.getByRole('button', { name: 'Help and keyboard shortcuts' }).click();
+    const help = (await page.getByTestId('help-release').textContent()) ?? '';
+    assert(help.includes(release.version) && help.includes(release.build), `Help shows "${help}"`);
+    await page.locator('.help-dialog').getByRole('button', { name: 'Close' }).click();
+    const exported = await exportProject(page);
+    assert(exported.app === `FMP Camera Simulator ${release.version} (build ${release.build})`, `export app "${exported.app}"`);
+    assert(problems.length === 0, problems.join(' | '));
+    return stamp;
+  } finally {
+    await context.close();
+  }
+});
+
 // ------------------------------------------------------------------------------------------
 // 7. Layouts
 // ------------------------------------------------------------------------------------------

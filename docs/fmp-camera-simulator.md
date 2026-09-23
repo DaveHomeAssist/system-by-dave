@@ -132,6 +132,10 @@ through the housevideo.app saved-data transfer). Export/import uses one JSON fil
 - `fmp-camera-simulator.camera` v1 (published figures, operating limits, uncalibrated behaviour), and
 - `fmp-camera-simulator.session` v2 (show package, speeds, pose, presets, performer, exercise settings and results).
 
+The file's `app` field names the build that wrote it, for example
+`FMP Camera Simulator 1.6.0 (build 1a2b3c4d)`; imports ignore it. Builds before 1.6.0 always
+wrote `FMP Camera Simulator v1`.
+
 Version-1 venue imports migrate to v6 with `reference.geometryRevision: "legacy-v1"`; all existing dimensions, heading, orientation and presets remain unchanged. New profiles use `photo-review-2026-09`. Venue settings offer a before/after preview and explicit Apply/Cancel for the two provisional stage profiles. Applying updates only stage width/depth and mount orientation, retaining camera coordinates and stored presets. Current tilt can clamp to changed mount limits. Versions 1 and 2 keep their numeric settings and copy the former combined mount evidence into the new independent heading record, without inventing photo evidence. Older simulator versions reject newly exported venue v6 files, preventing silent loss of structures and bowl configuration. Version-3 records retain their independent heading evidence.
 
 The overview camera model uses physical scale. Its label identifies the small camera; monitor output never contains the overview model. Support geometry is schematic. Upright operator video does not claim the real camera has E-Flip enabled.
@@ -157,11 +161,34 @@ npm run typecheck:camera-sim
 npm run test:camera-sim
 npm run build:camera-sim          # Vite build + scripts/build_camera_sim_offline.mjs
 npm run test:camera-sim-browser   # Playwright acceptance probe (CHROME_CHANNEL=chrome to use Chrome)
+npm run verify:camera-sim-release -- --base origin/main   # release log, version stamp, new-entry rule
 npm run dev:camera-sim            # local dev server
 ```
 
 The build is deterministic; CI rebuilds and fails if `camera-sim/` differs from the source
 (`.github/workflows/camera-sim.yml` on pull requests, `deploy-pages.yml` on main).
+
+### Releases and the version stamp
+
+`apps/fmp-camera-sim/CHANGELOG.md` is the simulator's release log, newest entry first. Its top
+entry is the running version. `scripts/camera_sim_release.mjs` reads it and adds an 8-character
+fingerprint of the shipped source (the app's `src/` without tests, `index.html`, `public/`, the
+Vite config and the offline builder). The build embeds the pair as `<version>+<build>` in a
+`fmp-camera-sim-version` meta tag on the page and in the offline file, shows it at the foot of
+Help, and writes it into exported projects' `app` field. To tell whether an offline copy is
+current, compare its Help line with the live page's.
+
+Any change that alters `camera-sim/` needs a new entry above the last one: a minor version for a
+feature or a new saved-file format, a patch version for a fix or polish. The pull-request
+workflow runs `npm run verify:camera-sim-release -- --base <base commit>`, which fails when
+`camera-sim/` changed but the log's top version is not newer than the base's. It also checks the
+log's format and that both built pages carry the current stamp; the Pages deploy repeats those
+two checks.
+
+The stamp names a source fingerprint rather than a git commit. The build is committed with its
+source, so it cannot contain the hash of the commit it lands in, and CI's rebuild-and-compare
+check would reject a build that did. Each log entry names its pull request and merge commit
+instead.
 
 The page's social card (`og:image`, `camera-sim/og.png`, 1200 × 630) is a real frame from the
 simulator: `node scripts/make_camera_sim_og.mjs` serves the committed build, drives the virtual

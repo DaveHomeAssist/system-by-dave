@@ -8,6 +8,7 @@ import { InputController, nowSeconds } from "../input/controller";
 import { attachKeyboard } from "../input/keyboard";
 import { MonitorOverlay } from "../render/monitorOverlay";
 import { type OverviewPreset, SceneRenderer } from "../render/renderer";
+import { RELEASE } from "../release";
 import { browserStorage } from "../storage/persist";
 import { AppBar } from "./AppBar";
 import { ControlsPanel } from "./ControlsPanel";
@@ -144,6 +145,7 @@ export function App() {
         return { forward: frame.forward, position: frame.position, hfovDeg: frame.hfovDeg };
       },
       render: () => rendererRef.current?.getDiagnostics() ?? null,
+      release: () => ({ ...RELEASE }),
       state: () => {
         const s = store.getState();
         return {

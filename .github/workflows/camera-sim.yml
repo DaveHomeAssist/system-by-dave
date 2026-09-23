@@ -1,14 +1,18 @@
 name: Verify FMP Camera Simulator
 
 # Checks the simulator on pull requests before it reaches main: types, unit tests, a fresh build
-# that must match the committed camera-sim/ output, the route's public-shell gates, and the
-# browser acceptance probe (docs/fmp-camera-simulator.md). deploy-pages.yml repeats these on main.
+# that must match the committed camera-sim/ output, the release log and version stamp (a change
+# to camera-sim/ needs a new apps/fmp-camera-sim/CHANGELOG.md entry), the route's public-shell
+# gates, and the browser acceptance probe (docs/fmp-camera-simulator.md). deploy-pages.yml
+# repeats these on main, apart from the new-entry rule.
 on:
   pull_request:
     paths:
       - 'apps/fmp-camera-sim/**'
       - 'camera-sim/**'
       - 'scripts/build_camera_sim_offline.mjs'
+      - 'scripts/camera_sim_release*.mjs'
+      - 'scripts/verify_camera_sim_release.mjs'
       - 'scripts/probe_camera_sim.mjs'
       - 'package*.json'
       - '.github/workflows/camera-sim.yml'
@@ -37,6 +41,16 @@ jobs:
         run: |
           git diff --exit-code -- camera-sim
           test -z "$(git status --porcelain -- camera-sim)"
+      - name: Release log and version stamp
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          if [ -n "$BASE_SHA" ]; then
+            git fetch --no-tags --depth=1 origin "$BASE_SHA"
+            npm run verify:camera-sim-release -- --base "$BASE_SHA"
+          else
+            npm run verify:camera-sim-release
+          fi
       - name: Route gates
         run: |
           npm run verify:public-navigation
