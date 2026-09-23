@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en" data-av-theme="light" data-av-tool="landing-alt">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'" />
+<title>AV by Dave — Run the show from one console</title>
+<meta name="description" content="A show-first view of AV by Dave: enter the Show Console with a named show, or open the AV Toolbox for a standalone task." />
+<meta name="robots" content="noindex,follow" />
+<link rel="canonical" href="https://avbydave.com/" />
+<meta name="theme-color" content="#eee8df" id="altThemeColor" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="AV by Dave" />
+<meta property="og:title" content="AV by Dave — Run the show from one console" />
+<meta property="og:description" content="A show-first view of the Show Console and AV Toolbox for live event operators." />
+<meta property="og:url" content="https://avbydave.com/av-suite-landing2.html" />
+<meta property="og:image" content="https://systembydave.com/img/card-cover-banner-wide.png" />
+<meta property="og:image:width" content="1024" />
+<meta property="og:image:height" content="412" />
+<meta property="og:image:alt" content="System by Dave preview banner" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="AV by Dave — Run the show from one console" />
+<meta name="twitter:description" content="A show-first view of the Show Console and AV Toolbox for live event operators." />
+<meta name="twitter:image" content="https://systembydave.com/img/card-cover-banner-wide.png" />
+<link rel="icon" href="svg/system_by_dave_logo_rust.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="profile/assets/apple-touch-icon.png" />
+<link rel="stylesheet" href="css/av-theme.css" />
+<link rel="stylesheet" href="css/av-landing-alt.css" />
+<script src="js/av-landing-alt.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to main content</a>
+  <div class="page-bg" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <div class="inner">
+      <a class="brand" href="https://avbydave.com/" aria-label="AV by Dave home">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-text">
+          <strong>AV by Dave</strong>
+          <span>Show-first view</span>
+        </span>
+      </a>
+      <nav class="nav" aria-label="Primary">
+        <a href="https://avbydave.com/">Home</a>
+        <a href="https://avbydave.com/av-suite.html?entry=show">Show Console</a>
+        <a href="https://avbydave.com/av-suite.html?entry=toolbox">AV Toolbox</a>
+        <a href="https://github.com/DaveHomeAssist/system-by-dave/blob/main/docs/av-suite-doorway.md" rel="noopener noreferrer">Docs <span aria-hidden="true">↗</span><span class="sr-only">(opens GitHub)</span></a>
+      </nav>
+      <div class="header-actions">
+        <button class="btn btn-ghost theme-toggle" id="themeToggle" type="button" aria-label="Use dark mode" aria-pressed="false" hidden>Dark mode</button>
+        <a class="btn btn-primary" href="https://avbydave.com/av-suite.html?entry=show">Open Show Console</a>
+      </div>
+    </div>
+  </header>
+
+  <main id="main" tabindex="-1">
+    <div class="wrap">
+      <section class="hero" aria-labelledby="hero-title">
+        <div>
+          <p class="eyebrow">Show-first landing · Live event ops</p>
+          <h1 id="hero-title">Run the show from one console</h1>
+          <p class="hero-lead">
+            Start in the Show Console with a named show, phase, readiness and next actions in view.
+            Open supported tools with that context, or use the AV Toolbox for one task with no show attached.
+          </p>
+          <div class="hero-ctas">
+            <a class="btn btn-primary btn-lg" href="https://avbydave.com/av-suite.html?entry=show">Open Show Console</a>
+            <a class="btn btn-ghost btn-lg" href="https://avbydave.com/av-suite.html?entry=toolbox">Browse the AV Toolbox</a>
+          </div>
+          <p class="hero-tertiary">Front Office <span class="soon">coming soon</span> <span aria-hidden="true">·</span> <a href="https://avbydave.com/">See the main landing</a></p>
+        </div>
+
+        <aside class="product-card" aria-label="Example show multiview (illustration, not live status)">
+          <div class="product-chrome">
+            <span class="title">SHOW MULTIVIEW · ILLUSTRATION</span>
+            <div class="pips">
+              <span class="pip live"><i></i> DEMO</span>
+              <span class="pip phase"><i></i> PHASE · SHOW</span>
+            </div>
+          </div>
+
+          <p class="demo-note">Example show display. These indicators are illustrative, not live status.</p>
+          <div class="mv-grid">
+            <div class="tile pvw">
+              <div class="tile-body" aria-hidden="true">☰</div>
+              <div class="umd"><span>CUE SHEET</span><span class="status"><span aria-hidden="true">[ ● </span>OK<span aria-hidden="true"> ]</span></span></div>
+            </div>
+            <div class="tile pvw">
+              <div class="tile-body" aria-hidden="true">≡</div>
+              <div class="umd"><span>TELEPROMPTER</span><span class="status"><span aria-hidden="true">[ ● </span>OK<span aria-hidden="true"> ]</span></span></div>
+            </div>
+            <div class="tile warn">
+              <div class="tile-body" aria-hidden="true">⊿</div>
+              <div class="umd"><span>THROWLINE</span><span class="status"><span aria-hidden="true">[ ▲ </span>WARN<span aria-hidden="true"> ]</span></span></div>
+            </div>
+            <div class="tile timer pvw">
+              <div class="tile-body"><span>00:14:22</span><span class="run">RUN</span></div>
+              <div class="umd"><span>SHOW TIMER</span><span class="status"><span aria-hidden="true">[ ● </span>OK<span aria-hidden="true"> ]</span></span></div>
+            </div>
+            <div class="tile idle">
+              <div class="tile-body" aria-hidden="true">▷</div>
+              <div class="umd"><span>PLAYBACK CHECK</span><span class="status"><span aria-hidden="true">[ ■ </span>IDLE<span aria-hidden="true"> ]</span></span></div>
+            </div>
+            <div class="tile pvw">
+              <div class="tile-body" aria-hidden="true">⧉</div>
+              <div class="umd"><span>SIGNAL FLOW</span><span class="status"><span aria-hidden="true">[ ● </span>OK<span aria-hidden="true"> ]</span></span></div>
+            </div>
+          </div>
+
+          <div class="triage" aria-label="Example triage strip">
+            <div class="triage-cell crit">
+              <div class="label">CRIT</div>
+              <div class="value">2 BLOCKERS</div>
+            </div>
+            <div class="triage-cell warn">
+              <div class="label">WARN</div>
+              <div class="value">4 ATTENTION</div>
+            </div>
+            <div class="triage-cell tc">
+              <div class="label">TIMECODE</div>
+              <div class="value">14:27:36:12</div>
+            </div>
+            <div class="triage-cell">
+              <div class="label">SHOW FILE</div>
+              <div class="value">Example_Show</div>
+            </div>
+          </div>
+        </aside>
+      </section>
+
+
+      <section class="quick-tools" aria-label="Top tools">
+        <div class="quick-tools-head">
+          <h2>Use anytime</h2>
+          <a href="https://avbydave.com/av-suite.html?entry=toolbox">Explore the full AV Toolbox →</a>
+        </div>
+        <div class="quick-tools-grid">
+          <a class="quick-tool" href="https://avbydave.com/plotforge.html">
+            <img class="icon" src="data:image/webp;base64,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" width="56" height="56" alt="" />
+            <span class="tag">Lighting</span>
+            <span class="name">PlotForge</span>
+            <span class="blurb">Full lighting-plot app · opens PlotForge</span>
+          </a>
+          <a class="quick-tool" href="https://avbydave.com/ProjectorThrow/">
+            <img class="icon" src="data:image/webp;base64,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" width="56" height="56" alt="" />
+            <span class="tag">Projection</span>
+            <span class="name">Throwline</span>
+            <span class="blurb">Throw, fit, brightness, room plan</span>
+          </a>
+          <a class="quick-tool" href="https://avbydave.com/gear-reference.html">
+            <img class="icon" src="data:image/webp;base64,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" width="56" height="56" alt="" />
+            <span class="tag">Reference</span>
+            <span class="name">Gear Reference</span>
+            <span class="blurb">Device sheets, specs, procedures</span>
+          </a>
+          <a class="quick-tool" href="https://avbydave.com/av-calculator.html">
+            <img class="icon" src="data:image/webp;base64,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" width="56" height="56" alt="" />
+            <span class="tag">Math</span>
+            <span class="name">AV Calculator</span>
+            <span class="blurb">Delay, throw, storage, power</span>
+          </a>
+        </div>
+      </section>
+
+      <section class="features" aria-labelledby="principles-title">
+        <h2 id="principles-title" class="sr-only">How AV by Dave works</h2>
+        <article class="feature">
+          <div class="feature-viz" aria-hidden="true">
+            <span class="viz-chip crit"><i></i>CRIT 2</span>
+            <span class="viz-chip warn"><i></i>WARN 4</span>
+            <span class="viz-chip hold"><i></i>HOLD 1</span>
+            <span class="viz-chip clear"><i></i>CLEAR</span>
+          </div>
+          <h3>Triage first</h3>
+          <p>
+            Blockers surface before the catalog. See what stops the show, clear it,
+            then open the tool that matters.
+          </p>
+        </article>
+
+        <article class="feature">
+          <div class="feature-viz" aria-hidden="true">
+            <div class="viz-tally">
+              <div class="pgm">PGM</div>
+              <div class="pvw">PVW</div>
+              <div class="pip-end"><i></i></div>
+            </div>
+          </div>
+          <h3>Hardware language</h3>
+          <p>
+            Red for program, green for preview, and every status spelled out in
+            words: the tally language operators already read on switchers.
+          </p>
+        </article>
+
+        <article class="feature">
+          <div class="feature-viz" aria-hidden="true">
+            <div class="viz-graph">
+              <div class="viz-node">P</div>
+              <div class="viz-line"></div>
+              <div class="viz-node">G</div>
+              <div class="viz-line"></div>
+              <div class="viz-node">S</div>
+              <div class="viz-line"></div>
+              <div class="viz-node">◎</div>
+            </div>
+          </div>
+          <h3>One show, carried everywhere</h3>
+          <p>
+            Keep the show name, venue, date, phase and operator close at hand.
+            Supported tool links can carry that context; confirmed handoffs move data where available.
+          </p>
+        </article>
+      </section>
+    </div>
+
+    <div class="trust">
+      <div class="inner">
+        <span class="accent" aria-hidden="true"></span>
+        <span>Show data stays on your device · Free in the browser</span>
+        <span id="offlineStatus" role="status">Offline access prepares after your first visit.</span>
+        <span class="accent" aria-hidden="true"></span>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="wrap inner">
+      <span>© <span id="y"></span> System by Dave · AV by Dave</span>
+      <span id="docs"><a href="https://avbydave.com/">Main landing</a> · <a href="https://avbydave.com/av-suite.html?entry=show">Open Show Console</a> · <a href="https://github.com/DaveHomeAssist/system-by-dave/blob/main/docs/av-suite-doorway.md" rel="noopener noreferrer">Docs ↗</a> · <a href="https://systembydave.com/" rel="noopener noreferrer">System by Dave ↗</a></span>
+    </div>
+  </footer>
+
+</body>
+</html>

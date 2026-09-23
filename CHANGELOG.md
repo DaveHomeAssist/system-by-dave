@@ -7,6 +7,12 @@
 - Added an explicit profile-update preview with Apply/Cancel. Venue v1 imports preserve saved geometry, mount and presets during the v2 provenance migration.
 - Added legacy round-trip and revised-stage framing coverage; preserved the existing narrow-stage exercise fixtures.
 
+## 2026-09-23 — AV by Dave show-first landing alternative
+
+- Published the supplied control-room concept at `/av-suite-landing2.html` as a noindex alternative while preserving the current `/` landing. Linked the two views in both directions and kept direct Show Console, AV Toolbox, docs, and quick-tool routes.
+- Refined the alternative for desktop and phone, added a visible light/dark control sharing the AV theme preference, and marked the multiview's sample statuses as illustrative. Removed stale tool-count and all-tools-share-context claims.
+- Added the alternative page and its assets to the AV offline cache and domain-site staging contract.
+
 ## 2026-09-23 — FMP Camera Simulator v1
 
 - Added `/camera-sim/` on housevideo.app (noindex): a virtual BirdDog P240 at the FMP catwalk position with a live 16:9 monitor, an orbiting venue view with the camera's viewing cone, and SuperJoy-style joystick, zoom, speed, Home and preset controls for keyboard, mouse and touch.
