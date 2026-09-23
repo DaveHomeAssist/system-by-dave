@@ -1694,6 +1694,15 @@ button:disabled {
   white-space: nowrap;
 }
 
+/* Which build this is: compare it with the live page to spot a stale offline copy. */
+.help-release {
+  margin: 16px 0 0;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font: 500 12px/1.4 var(--mono);
+}
+
 /* ---------- Mobile rail ---------- */
 
 .mobile-rail {

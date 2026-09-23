@@ -93,6 +93,7 @@ jobs:
           npm run typecheck:camera-sim
           npm run test:camera-sim
           npm run build:camera-sim
+          npm run verify:camera-sim-release
 
       - name: Verify FMP Camera Simulator browser runtime
         env:

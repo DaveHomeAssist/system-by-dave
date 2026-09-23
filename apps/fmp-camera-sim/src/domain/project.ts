@@ -1,3 +1,4 @@
+import { APP_LABEL } from "../release";
 import { type CameraProfile, defaultCameraProfile, parseCameraProfile } from "./camera";
 import { defaultSession, parseSession, type Session } from "./session";
 import { type Issue, IssueList, isPlainObject } from "./validate";
@@ -20,6 +21,7 @@ export interface ProjectFile extends Project {
   schema: typeof PROJECT_SCHEMA;
   version: typeof PROJECT_VERSION;
   exportedAt: string;
+  /** The build that wrote the file. Informational; imports ignore it. */
   app: string;
 }
 
@@ -34,7 +36,7 @@ export function toProjectFile(project: Project, exportedAt = new Date().toISOStr
     schema: PROJECT_SCHEMA,
     version: PROJECT_VERSION,
     exportedAt,
-    app: "FMP Camera Simulator v1",
+    app: APP_LABEL,
     venue: structuredClone(project.venue),
     camera: structuredClone(project.camera),
     session: structuredClone(project.session),

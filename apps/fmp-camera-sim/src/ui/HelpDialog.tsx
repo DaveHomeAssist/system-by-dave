@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { RELEASE, releaseDateLabel } from "../release";
 
 interface Props {
   open: boolean;
@@ -66,6 +67,9 @@ export function HelpDialog({ open, onClose }: Props) {
         <li>The venue is approximate until its critical dimensions are measured, and camera behaviour is uncalibrated. Both flags stay visible.</li>
         <li>Nothing here connects to a real camera or controller.</li>
       </ul>
+      <p className="help-release" data-testid="help-release">
+        FMP Camera Simulator {RELEASE.version} · build {RELEASE.build} · released {releaseDateLabel()}
+      </p>
     </dialog>
   );
 }

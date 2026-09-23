@@ -168,6 +168,11 @@ Pages workflow before a production claim.
 - **AV Workbook:** `npm run typecheck:av-workbook`,
   `npm run test:av-workbook`, and `npm run build:av-workbook`.
 - **Throwline:** `npm run verify:throwline`.
+- **FMP Camera Simulator:** `npm run typecheck:camera-sim`, `npm run test:camera-sim`,
+  `npm run build:camera-sim`, `npm run test:camera-sim-browser`, and
+  `npm run verify:camera-sim-release -- --base origin/main`. Any change to `camera-sim/`
+  needs a new entry at the top of `apps/fmp-camera-sim/CHANGELOG.md`; the build embeds its
+  version, and the pull-request check fails without it.
 - **NoteForge artifact:** `npm run verify:noteforge`.
 - **Pages published on another domain, `scripts/domain-sites.json`, or the
   publishing scripts:** `npm run verify:domain-sites`.
