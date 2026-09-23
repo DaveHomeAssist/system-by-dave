@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-09-23 — FMP Camera 4 SDI transport correction
+
+- Published Dave's direct confirmation that the Camera 4 PTZ feeds ATEM Input 4 by SDI. The P240 reference no longer presents an NDI decoder as an unresolved alternative; intermediate cable landings, final patch and current signal format remain field checks.
+
 ## 2026-09-23 — Alternative AV landing background
 
 - Added a static, cool-blue drafting field and wide signal rings behind the alternative landing in both themes. Kept the content and console preview on solid surfaces for legibility, and refreshed the offline cache version.
