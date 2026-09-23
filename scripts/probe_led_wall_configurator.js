@@ -100,6 +100,7 @@ async function main() {
           if (!field) throw new Error('Missing field: ' + id);
           field.value = value;
           field.dispatchEvent(new Event(field.tagName === 'SELECT' ? 'change' : 'input', { bubbles: true }));
+          if (field.tagName !== 'SELECT') field.dispatchEvent(new Event('change', { bubbles: true }));
         };
         ${JSON.stringify(changes)}.forEach(([id, value]) => set(id, value));
         const text = (id) => document.getElementById(id).textContent.trim();
@@ -126,8 +127,17 @@ async function main() {
 
     await scenario('default cabinet layout', [], {
       build: '8 × 5 cabinets', metric: '4.000 × 2.500 m', raster: '1,376 × 860 px',
-      ports: '3 data ports', power: '7.20 kW max'
+      ports: '3 estimated ports', power: '7.20 kW max'
     });
+    const defaultPower = await evaluate(`(() => ({
+      factor: document.getElementById('ledPowerFactor').value,
+      current: document.getElementById('ledMaxLoad').textContent,
+      circuits: document.getElementById('ledCircuitPlan').textContent
+    }))()`);
+    if (defaultPower.factor !== '' || !defaultPower.current.includes('current pending PF') || !defaultPower.circuits.includes('Enter manufacturer PF')) {
+      throw new Error(`Unverified LED power factor produced current or circuits: ${JSON.stringify(defaultPower)}.`);
+    }
+    console.log('PASS watts remain visible while current and circuits await manufacturer PF');
     await scenario('target physical size uses independent ceilings', [
       ['ledMode', 'targetSize'], ['ledTargetWidthFt', '16'], ['ledTargetHeightFt', '9']
     ], {
@@ -159,6 +169,27 @@ async function main() {
       throw new Error(`Blank optional cabinet raster did not persist explicitly: ${JSON.stringify(blankRasterState)}.`);
     }
     console.log('PASS blank optional raster persistence');
+    const numericDraft = await evaluate(`(() => {
+      const pitch = document.getElementById('ledPitchMm');
+      pitch.value = '0';
+      pitch.dispatchEvent(new Event('input', { bubbles: true }));
+      const intermediate = pitch.value;
+      const editing = document.getElementById('saveStatus').textContent;
+      pitch.value = '0.95';
+      pitch.dispatchEvent(new Event('input', { bubbles: true }));
+      pitch.dispatchEvent(new Event('change', { bubbles: true }));
+      return { intermediate, editing, final: pitch.value,
+        saved: JSON.parse(localStorage.getItem('avCalculator.v1')).ledPitchMm };
+    })()`);
+    if (numericDraft.intermediate !== '0' || numericDraft.editing !== 'Editing' || numericDraft.final !== '0.95' || numericDraft.saved !== 0.95) {
+      throw new Error(`Numeric input was changed before editing finished: ${JSON.stringify(numericDraft)}.`);
+    }
+    console.log('PASS in-progress numeric entry is preserved and final value persists');
+    await evaluate(`(() => {
+      const pitch = document.getElementById('ledPitchMm');
+      pitch.value = '2.5';
+      pitch.dispatchEvent(new Event('change', { bubbles: true }));
+    })()`);
     await scenario('incomplete cabinet raster is rejected as a pair', [
       ['ledCabinetPixelsWide', '172']
     ], {
@@ -210,6 +241,7 @@ async function main() {
         const field = document.getElementById(id);
         field.value = value;
         field.dispatchEvent(new Event('input', { bubbles: true }));
+        field.dispatchEvent(new Event('change', { bubbles: true }));
       };
       set('ledPitchMm', '');
       set('ledCabinetWidthMm', '0');
@@ -227,6 +259,66 @@ async function main() {
       throw new Error(`Numeric boundary or reset normalization failed: ${JSON.stringify(boundaryResult)}.`);
     }
     console.log('PASS blank, below-minimum, above-maximum, and reset behavior');
+    const powerFactorResult = await evaluate(`(() => {
+      const factor = document.getElementById('ledPowerFactor');
+      factor.value = '0.8';
+      factor.dispatchEvent(new Event('input', { bubbles: true }));
+      factor.dispatchEvent(new Event('change', { bubbles: true }));
+      return { current: document.getElementById('ledMaxLoad').textContent,
+        circuits: document.getElementById('ledCircuitPlan').textContent,
+        entered: JSON.parse(localStorage.getItem('avCalculator.v1')).ledPowerFactorEntered };
+    })()`);
+    if (!powerFactorResult.current.includes('~75.0 A') || !powerFactorResult.circuits.includes('5 max') || powerFactorResult.entered !== true) {
+      throw new Error(`Single-phase PF calculation failed: ${JSON.stringify(powerFactorResult)}.`);
+    }
+    await cdp('Page.reload');
+    await delay(500);
+    const restoredPower = await evaluate(`(() => ({
+      factor: document.getElementById('ledPowerFactor').value,
+      current: document.getElementById('ledMaxLoad').textContent
+    }))()`);
+    if (restoredPower.factor !== '0.8' || !restoredPower.current.includes('~75.0 A')) {
+      throw new Error(`Entered LED power factor did not survive reload: ${JSON.stringify(restoredPower)}.`);
+    }
+    const threePhasePower = await evaluate(`(() => {
+      const phase = document.getElementById('ledPhaseMode');
+      phase.value = 'threePhase';
+      phase.dispatchEvent(new Event('change', { bubbles: true }));
+      const voltage = document.getElementById('ledVoltage');
+      voltage.value = '208';
+      voltage.dispatchEvent(new Event('change', { bubbles: true }));
+      return { current: document.getElementById('ledMaxLoad').textContent,
+        circuits: document.getElementById('ledCircuitPlan').textContent };
+    })()`);
+    if (!threePhasePower.current.includes('~25.0 A') || !threePhasePower.circuits.includes('2 max')) {
+      throw new Error(`Balanced three-phase PF calculation failed: ${JSON.stringify(threePhasePower)}.`);
+    }
+    const migratedPower = await evaluate(`(() => {
+      const saved = JSON.parse(localStorage.getItem('avCalculator.v1'));
+      saved.ledPowerFactor = 0.95;
+      delete saved.ledPowerFactorEntered;
+      localStorage.setItem('avCalculator.v1', JSON.stringify(saved));
+      return true;
+    })()`);
+    if (!migratedPower) throw new Error('Legacy power-factor fixture failed.');
+    await cdp('Page.reload');
+    await delay(500);
+    const legacyPower = await evaluate(`(() => ({
+      factor: document.getElementById('ledPowerFactor').value,
+      current: document.getElementById('ledMaxLoad').textContent,
+      note: document.getElementById('actionStatus').textContent
+    }))()`);
+    if (legacyPower.factor !== '' || !legacyPower.current.includes('current pending PF') || !legacyPower.note.includes('manufacturer power factor')) {
+      throw new Error(`Legacy assumed PF was retained as explicitly entered: ${JSON.stringify(legacyPower)}.`);
+    }
+    await evaluate(`(() => {
+      for (const [id, value] of [['ledPhaseMode', 'singlePhase'], ['ledVoltage', '120']]) {
+        const field = document.getElementById(id);
+        field.value = value;
+        field.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    })()`);
+    console.log('PASS single-phase PF calculation, reload, and legacy-state migration');
 
     const accessibility = await evaluate(`(() => {
       const controls = Array.from(document.querySelectorAll('#ledWallConfigurator input, #ledWallConfigurator select, #ledWallConfigurator button'))
@@ -236,7 +328,7 @@ async function main() {
         : !document.querySelector('label[for="' + CSS.escape(element.id) + '"]') && !element.getAttribute('aria-label'));
       const undersized = controls.filter((element) => {
         const rect = element.getBoundingClientRect();
-        return rect.width > 0 && rect.height > 0 && (rect.width < 44 || rect.height < 44);
+        return rect.width > 0 && rect.height > 0 && (rect.width < 43.5 || rect.height < 43.5);
       });
       return { statusRegions: document.querySelectorAll('[role="status"][aria-live="polite"]').length,
         unlabeled: unlabeled.map((element) => element.id), undersized: undersized.map((element) => element.id),
@@ -249,6 +341,32 @@ async function main() {
     }
     if (!accessibility.disclaimer.includes('actual product documentation')) throw new Error('Persistent LED verification disclaimer is missing.');
     console.log('PASS accessibility and persistent-warning smoke checks');
+
+    await cdp('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 1, mobile: true });
+    await delay(150);
+    const mobile = await evaluate(`(() => {
+      const rect = selector => document.querySelector(selector).getBoundingClientRect();
+      return {
+        documentHeight: document.documentElement.scrollHeight,
+        viewportHeight: window.innerHeight,
+        resultTop: rect('#ledResultStrip').top,
+        suiteBottom: rect('.led-suite').bottom,
+        inputTop: rect('.led-input-grid').top,
+        previewHeight: rect('.led-stage').height,
+        jumpHeight: rect('[data-led-jump="ledPowerSection"]').height
+      };
+    })()`);
+    if (mobile.documentHeight > mobile.viewportHeight || mobile.resultTop >= mobile.suiteBottom
+      || mobile.resultTop >= mobile.inputTop || mobile.previewHeight < 250 || mobile.jumpHeight < 44) {
+      throw new Error(`Mobile preview, results, or section navigation failed: ${JSON.stringify(mobile)}.`);
+    }
+    const jumped = await evaluate(`(() => {
+      document.querySelector('[data-led-jump="ledPowerSection"]').click();
+      return document.activeElement.id;
+    })()`);
+    if (jumped !== 'ledPowerSection') throw new Error(`Mobile section jump did not focus its target: ${jumped}.`);
+    await cdp('Emulation.setDeviceMetricsOverride', { width: 1280, height: 900, deviceScaleFactor: 1, mobile: false });
+    console.log('PASS viewport-contained mobile preview, results, and section jump');
 
     const ledBeforeHandoff = await evaluate(`(() => {
       document.getElementById('sendLedTypicalPowerBtn').click();

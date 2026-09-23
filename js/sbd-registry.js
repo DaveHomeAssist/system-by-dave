@@ -236,8 +236,8 @@
   }
 
   root.SBD_REGISTRY={
-    /* Bump on any registry/tool change — rolls the service-worker cache. */
-    version:'v20260923-led-viewport-workspace',
+    /* Bump on any registry/tool asset change — rolls the service-worker cache. */
+    version:'v20260923-led-audit-fixes',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,

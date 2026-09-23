@@ -59,7 +59,8 @@
     ledCircuitAmps: 20,
     ledContinuousPercent: 80,
     ledPhaseMode: 'singlePhase',
-    ledPowerFactor: 0.95,
+    ledPowerFactor: null,
+    ledPowerFactorEntered: false,
     ledCabinetsPerHomeRun: null,
     ledClosestViewer: 15,
     ledClosestViewerUnit: 'ft'
@@ -68,6 +69,7 @@
   const fields = Array.from(document.querySelectorAll('[data-key]'));
   const isLedPage = document.documentElement.dataset.avTool === 'led-wall-calculator';
   const activeKeys = new Set(fields.map(field => field.dataset.key));
+  if (isLedPage) activeKeys.add('ledPowerFactorEntered');
   const els = {
     delayMs: document.getElementById('delayMs'),
     delayFrames: document.getElementById('delayFrames'),
@@ -109,7 +111,6 @@
     ledTargetSizeFields: document.getElementById('ledTargetSizeFields'),
     ledTargetRasterFields: document.getElementById('ledTargetRasterFields'),
     ledModeNote: document.getElementById('ledModeNote'),
-    ledPowerFactorField: document.getElementById('ledPowerFactorField'),
     ledPowerFactor: document.getElementById('ledPowerFactor'),
     ledWallResult: document.getElementById('ledWallResult'),
     ledRasterResult: document.getElementById('ledRasterResult'),
@@ -184,6 +185,7 @@
   let latestLedSummary = '';
   let latestLedPower = null;
   let previewMotion = null;
+  let ledPowerFactorReset = false;
   const LED_PROFILE_STORE = 'avCalculator.ledProfiles.v1';
   const LED_PROFILE_KEYS = [
     'ledProductName', 'ledPitchMm', 'ledCabinetWidthMm', 'ledCabinetHeightMm',
@@ -266,14 +268,24 @@
       }
       if (!Object.prototype.hasOwnProperty.call(parsed, 'powerMethod')) {
         storageLoadState = 'migrated';
-        return { ...DEFAULTS, ...parsed, powerMethod: 'watts', powerFactor: 0 };
+        return restoreLedPowerFactor({ ...DEFAULTS, ...parsed, powerMethod: 'watts', powerFactor: 0 });
       }
       storageLoadState = 'loaded';
-      return { ...DEFAULTS, ...parsed };
+      return restoreLedPowerFactor({ ...DEFAULTS, ...parsed });
     } catch (error) {
       storageLoadState = 'invalid';
       return { ...DEFAULTS };
     }
+  }
+
+  function restoreLedPowerFactor(restored) {
+    const savedFactor = Number(restored.ledPowerFactor);
+    if (restored.ledPowerFactorEntered !== true || !Number.isFinite(savedFactor) || savedFactor < 0.1 || savedFactor > 1) {
+      ledPowerFactorReset = restored.ledPowerFactor !== null && restored.ledPowerFactor !== undefined;
+      restored.ledPowerFactor = null;
+      restored.ledPowerFactorEntered = false;
+    }
+    return restored;
   }
 
   function loadLedProfiles() {
@@ -327,7 +339,6 @@
     });
     setFieldValues();
     syncLedModeUI();
-    syncLedPowerModeUI();
     const normalizationMessages = normalizeFields();
     const saved = saveState();
     calculate();
@@ -378,11 +389,19 @@
     return dot === -1 ? 0 : text.length - dot - 1;
   }
 
+  function associateCorrection(field, corrected) {
+    const ids = (field.getAttribute('aria-describedby') || '').split(/\s+/).filter(id => id && id !== 'actionStatus');
+    if (corrected) ids.push('actionStatus');
+    if (ids.length) field.setAttribute('aria-describedby', ids.join(' '));
+    else field.removeAttribute('aria-describedby');
+  }
+
   function normalizeNumericField(field) {
     const key = field.dataset.key;
     const raw = field.value.trim();
     if (field.dataset.optional === 'true' && raw === '') {
       field.removeAttribute('aria-invalid');
+      associateCorrection(field, false);
       return { value: null, message: '' };
     }
     const fallback = Number(DEFAULTS[key]);
@@ -392,6 +411,13 @@
     const label = fieldLabel(field);
     let value = Number(raw);
     let normalization = '';
+
+    if (key === 'ledPowerFactor' && (raw === '' || !Number.isFinite(value) || value < min || value > max)) {
+      field.value = '';
+      field.removeAttribute('aria-invalid');
+      associateCorrection(field, true);
+      return { value: null, message: 'Manufacturer Power Factor was invalid and cleared. Enter the equipment specification before using current or circuit estimates.' };
+    }
 
     if (raw === '' || !Number.isFinite(value)) {
       value = fallback;
@@ -422,6 +448,7 @@
     const displayValue = String(value);
     field.value = displayValue;
     field.removeAttribute('aria-invalid');
+    associateCorrection(field, Boolean(normalization));
 
     if (normalization === 'fallback') return { value, message: `${label} was blank or invalid and reset to ${displayValue}.` };
     if (normalization === 'minimum') return { value, message: `${label} was below ${min} and clamped to ${displayValue}.` };
@@ -460,6 +487,28 @@
       if (normalized.message) messages.push(normalized.message);
     });
     return messages;
+  }
+
+  function readDraftFields() {
+    let complete = true;
+    fields.forEach(field => {
+      if (field.disabled) return;
+      const key = field.dataset.key;
+      if (field.dataset.kind === 'text') {
+        state[key] = field.value.replace(/\s+/g, ' ').trim() || DEFAULTS[key];
+      } else if (field.tagName === 'SELECT') {
+        state[key] = field.value;
+      } else if (field.dataset.optional === 'true' && field.value === '') {
+        state[key] = null;
+        associateCorrection(field, false);
+      } else if (field.value !== '' && field.validity.valid && Number.isFinite(Number(field.value))) {
+        state[key] = Number(field.value);
+        associateCorrection(field, false);
+      } else {
+        complete = false;
+      }
+    });
+    return complete;
   }
 
   function setFieldValues() {
@@ -510,17 +559,33 @@
     }
   }
 
-  function syncLedPowerModeUI() {
-    const threePhase = state.ledPhaseMode === 'threePhase';
-    els.ledPowerFactorField.hidden = !threePhase;
-    els.ledPowerFactor.disabled = !threePhase;
-  }
-
-  function readFields() {
+  function readFields(event) {
+    if (event.type === 'input') {
+      if (isLedPage && event.target === els.ledPowerFactor) {
+        state.ledPowerFactorEntered = event.target.value !== '' && event.target.validity.valid;
+      }
+      if (!readDraftFields()) {
+        els.saveStatus.textContent = 'Editing';
+        return;
+      }
+      if (isLedPage) {
+        syncLedModeUI();
+      } else {
+        syncPowerMethodUI();
+      }
+      const saved = saveState();
+      calculate();
+      if (!saved) updateStatus('Calculations updated. Browser storage is unavailable, so values were not saved.', 'error');
+      return;
+    }
     const normalizationMessages = normalizeFields();
+    if (isLedPage && event.target === els.ledPowerFactor) {
+      state.ledPowerFactorEntered = state.ledPowerFactor !== null;
+    } else if (isLedPage && state.ledPowerFactor === null) {
+      state.ledPowerFactorEntered = false;
+    }
     if (isLedPage) {
       syncLedModeUI();
-      syncLedPowerModeUI();
     } else {
       syncPowerMethodUI();
     }
@@ -894,18 +959,18 @@
     const breakerAmps = numberValue('ledCircuitAmps');
     const continuousFactor = numberValue('ledContinuousPercent') / 100;
     const phaseMode = state.ledPhaseMode === 'threePhase' ? 'threePhase' : 'singlePhase';
-    const powerFactor = numberValue('ledPowerFactor');
+    const powerFactor = state.ledPowerFactorEntered ? optionalNumberValue('ledPowerFactor') : null;
     const cabinetsPerHomeRun = optionalNumberValue('ledCabinetsPerHomeRun');
     const maxWatts = ledWall.cabinetsTotal * maxWattsEach;
     const typicalWatts = ledWall.cabinetsTotal * typicalWattsEach;
     const usableCircuitAmps = breakerAmps * continuousFactor;
-    const ampsFor = watts => phaseMode === 'threePhase'
+    const ampsFor = watts => powerFactor === null ? null : phaseMode === 'threePhase'
       ? watts / (Math.sqrt(3) * voltage * powerFactor)
-      : watts / voltage;
+      : watts / (voltage * powerFactor);
     const maxAmps = ampsFor(maxWatts);
     const typicalAmps = ampsFor(typicalWatts);
-    const maxCircuits = maxWatts > 0 ? Math.max(1, Math.ceil(maxAmps / usableCircuitAmps)) : 0;
-    const typicalCircuits = typicalWatts > 0 ? Math.max(1, Math.ceil(typicalAmps / usableCircuitAmps)) : 0;
+    const maxCircuits = maxAmps === null ? null : maxWatts > 0 ? Math.max(1, Math.ceil(maxAmps / usableCircuitAmps)) : 0;
+    const typicalCircuits = typicalAmps === null ? null : typicalWatts > 0 ? Math.max(1, Math.ceil(typicalAmps / usableCircuitAmps)) : 0;
     const homeRunsRequired = cabinetsPerHomeRun ? Math.ceil(ledWall.cabinetsTotal / cabinetsPerHomeRun) : null;
     return {
       maxWattsEach, typicalWattsEach, voltage, breakerAmps, continuousFactor,
@@ -959,10 +1024,12 @@
     els.ledNativeMeta.textContent = `${format(led.totalPixels / 1e6, 2)} MP · ${format(led.aspectRatio, 3)}:1`;
     els.ledContentFit.textContent = led.content.fitLabel;
     els.ledContentMeta.textContent = `${format(led.content.sourceWidthPx, 0)} × ${format(led.content.sourceHeightPx, 0)} source`;
-    els.ledProcessing.textContent = `${led.processing.portsRequired} data port${led.processing.portsRequired === 1 ? '' : 's'}`;
-    els.ledProcessingMeta.textContent = `${format(led.processing.safePixelsPerPort, 0)} safe px / port estimate`;
+    els.ledProcessing.textContent = `${led.processing.portsRequired} estimated port${led.processing.portsRequired === 1 ? '' : 's'}`;
+    els.ledProcessingMeta.textContent = 'Generic minimum · verify cabinet chains';
     els.ledPower.textContent = `${format(led.power.maxWatts / 1000, 2)} kW max`;
-    els.ledPowerMeta.textContent = `${format(led.power.typicalWatts / 1000, 2)} kW typical · ~${format(led.power.typicalAmps, 1)} A est.`;
+    els.ledPowerMeta.textContent = led.power.powerFactor === null
+      ? `${format(led.power.typicalWatts / 1000, 2)} kW typical · PF needed for current`
+      : `${format(led.power.typicalWatts / 1000, 2)} kW typical · ~${format(led.power.typicalAmps, 1)} A est.`;
 
     els.ledBuildArray.textContent = `${led.cabinetsWide} × ${led.cabinetsHigh} cabinets${led.rotated ? ' · rotated' : ''}`;
     els.ledCabinetCount.textContent = format(led.cabinetsTotal, 0);
@@ -989,14 +1056,20 @@
     els.ledAveragePortLoad.textContent = format(led.processing.averagePixelsPerPort, 0);
     els.ledPortUtilization.textContent = `${format(led.processing.portUtilization, 1)}%`;
     els.ledWallPayload.textContent = `${format(led.processing.plannedPayloadGbps, 2)} Gbps planned payload`;
-    els.ledProcessorGuidance.textContent = `${led.processing.portsRequired} generic 1 GbE output port(s) at ${format(led.processing.refreshHz, 2)} Hz / ${format(led.processing.bitDepth, 0)} bit. Do not turn this even pixel split into a cable map; allocate complete cabinets and verify the heaviest chain in the actual processor software.`;
+    els.ledProcessorGuidance.textContent = `${led.processing.portsRequired} generic minimum 1 GbE output port(s) at ${format(led.processing.refreshHz, 2)} Hz / ${format(led.processing.bitDepth, 0)} bit. This even pixel split is not a cable map; allocate complete cabinets and verify the heaviest chain in the actual processor software.`;
 
     const phaseLabel = led.power.phaseMode === 'threePhase'
-      ? `balanced 3-phase, PF ${format(led.power.powerFactor, 2)}`
-      : 'single-phase watts ÷ volts estimate';
-    els.ledMaxLoad.textContent = `${format(led.power.maxWatts / 1000, 2)} kW · ~${format(led.power.maxAmps, 1)} A estimate`;
-    els.ledTypicalLoad.textContent = `${format(led.power.typicalWatts / 1000, 2)} kW · ~${format(led.power.typicalAmps, 1)} A estimate`;
-    els.ledCircuitPlan.textContent = `${led.power.maxCircuits} max · ${led.power.typicalCircuits} typical (${format(led.power.breakerAmps, 0)} A)`;
+      ? `balanced 3-phase line-to-line voltage${led.power.powerFactor === null ? '' : `, PF ${format(led.power.powerFactor, 2)}`}`
+      : `single-phase supply voltage${led.power.powerFactor === null ? '' : `, PF ${format(led.power.powerFactor, 2)}`}`;
+    els.ledMaxLoad.textContent = led.power.maxAmps === null
+      ? `${format(led.power.maxWatts / 1000, 2)} kW · current pending PF`
+      : `${format(led.power.maxWatts / 1000, 2)} kW · ~${format(led.power.maxAmps, 1)} A estimate`;
+    els.ledTypicalLoad.textContent = led.power.typicalAmps === null
+      ? `${format(led.power.typicalWatts / 1000, 2)} kW · current pending PF`
+      : `${format(led.power.typicalWatts / 1000, 2)} kW · ~${format(led.power.typicalAmps, 1)} A estimate`;
+    els.ledCircuitPlan.textContent = led.power.maxCircuits === null
+      ? 'Enter manufacturer PF for circuit estimate'
+      : `${led.power.maxCircuits} max · ${led.power.typicalCircuits} typical (${format(led.power.breakerAmps, 0)} A)`;
     els.ledHomeRuns.textContent = led.power.homeRunsRequired
       ? `${led.power.homeRunsRequired} product run${led.power.homeRunsRequired === 1 ? '' : 's'} · ${format(led.power.cabinetsPerHomeRun, 0)} cabinets each`
       : 'Not specified';
@@ -1056,14 +1129,17 @@
 
   function buildLedSummary(led) {
     const phaseLabel = led.power.phaseMode === 'threePhase'
-      ? `balanced three-phase at PF ${format(led.power.powerFactor, 2)}`
-      : 'single-phase watts-divided-by-volts estimate';
+      ? 'balanced three-phase at line-to-line voltage'
+      : 'single-phase at supply voltage';
+    const currentPlan = led.power.powerFactor === null
+      ? 'current and circuit estimates pending manufacturer power factor'
+      : `PF ${format(led.power.powerFactor, 2)}; ${format(led.power.maxAmps, 1)} A maximum and ${format(led.power.typicalAmps, 1)} A typical estimate; ${led.power.maxCircuits} maximum-load and ${led.power.typicalCircuits} typical-load ${format(led.power.breakerAmps, 0)} A circuit(s) at a ${format(led.power.continuousFactor * 100, 0)} percent planning target`;
     return [
       `LED profile: ${led.productName}; P${format(led.pitchMm, 2)}, ${format(led.cabinetWidthMm, 0)} × ${format(led.cabinetHeightMm, 0)} mm effective cabinet, ${format(led.cabinetPixelsWide, 0)} × ${format(led.cabinetPixelsHigh, 0)} px${led.rotated ? ', rotated 90 degrees' : ''}.`,
       `LED wall: ${led.cabinetsWide} × ${led.cabinetsHigh} cabinets (${led.cabinetsTotal} total), ${format(led.wallWidthM, 2)} × ${format(led.wallHeightM, 2)} m / ${format(led.wallWidthFt, 2)} × ${format(led.wallHeightFt, 2)} ft, ${format(led.wallWidthPx, 0)} × ${format(led.wallHeightPx, 0)} px native raster (${format(led.totalPixels / 1e6, 2)} MP).`,
       `LED content: ${format(led.content.sourceWidthPx, 0)} × ${format(led.content.sourceHeightPx, 0)} source to ${format(led.wallWidthPx, 0)} × ${format(led.wallHeightPx, 0)} native is ${led.content.fitLabel.toLowerCase()}; ${format(led.content.aspectMismatchPercent, 2)} percent aspect difference.`,
-      `NovaStar planning estimate: ${led.processing.portsRequired} generic 1 GbE data port(s) at ${format(led.processing.safePixelsPerPort, 0)} safe pixels per port; average adjusted-capacity loading ${format(led.processing.portUtilization, 1)} percent.`,
-      `LED power planning estimate: ${format(led.power.maxWatts / 1000, 2)} kW maximum / ${format(led.power.maxAmps, 1)} A and ${format(led.power.typicalWatts / 1000, 2)} kW typical / ${format(led.power.typicalAmps, 1)} A at ${format(led.power.voltage, 0)} V ${phaseLabel}; ${led.power.maxCircuits} maximum-load and ${led.power.typicalCircuits} typical-load ${format(led.power.breakerAmps, 0)} A circuit(s) at a ${format(led.power.continuousFactor * 100, 0)} percent planning target.`,
+      `NovaStar planning estimate: ${led.processing.portsRequired} generic minimum 1 GbE data port(s) at ${format(led.processing.safePixelsPerPort, 0)} planning pixels per port; average adjusted-capacity loading ${format(led.processing.portUtilization, 1)} percent. Verify complete-cabinet chains.`,
+      `LED power planning estimate: ${format(led.power.maxWatts / 1000, 2)} kW maximum and ${format(led.power.typicalWatts / 1000, 2)} kW typical at ${format(led.power.voltage, 0)} V ${phaseLabel}; ${currentPlan}.`,
       `LED viewing estimate: P${format(led.pitchMm, 2)} gives ${format(led.viewing.minimumFt, 1)} ft minimum and ${format(led.viewing.optimalFt, 1)} ft optimal rule-of-thumb distances; closest audience is ${format(led.viewing.closestDistance, 1)} ${led.viewing.closestUnit} (${led.viewing.label.toLowerCase()}).`,
       'LED verification required: confirm cabinet, receiver-card, processor, signal, power, daisy-chain, and venue distribution specifications against actual product documentation.'
     ].join('\n');
@@ -1130,7 +1206,7 @@
   }
 
   function downloadLedSummary() {
-    downloadText(latestLedSummary, 'led-wall-configuration.txt', 'LED wall summary downloaded.');
+    downloadText(latestLedSummary, 'led-wall-configuration.txt', 'LED wall summary download started.');
   }
 
   function downloadText(text, filename, successMessage) {
@@ -1172,7 +1248,6 @@
     setFieldValues();
     if (isLedPage) {
       syncLedModeUI();
-      syncLedPowerModeUI();
       refreshLedProfileOptions();
     } else {
       syncPowerMethodUI();
@@ -1201,11 +1276,16 @@
   function queueCalculationStatus(normalizationMessages, saved) {
     window.clearTimeout(calculationStatusTimer);
     const normalization = normalizationMessages.length ? `${normalizationMessages.join(' ')} ` : '';
+    const resultMessage = isLedPage
+      ? `LED plan updated: ${els.ledPreviewArray.textContent} cabinets, ${els.ledNativeRaster.textContent} native raster. `
+      : 'Calculations updated. ';
+    const criticalWarning = isLedPage ? els.ledWarnings.querySelector('[data-severity="bad"]') : null;
+    const warningMessage = criticalWarning ? `Planning warning: ${criticalWarning.textContent} ` : '';
     const storageMessage = saved
-      ? 'Calculations updated and values saved in this browser.'
-      : 'Calculations updated. Browser storage is unavailable, so values were not saved.';
+      ? 'Values saved in this browser.'
+      : 'Browser storage is unavailable, so values were not saved.';
     calculationStatusTimer = window.setTimeout(() => {
-      updateStatus(`${normalization}${storageMessage}`, saved ? 'success' : 'error');
+      updateStatus(`${normalization}${resultMessage}${warningMessage}${storageMessage}`, saved ? 'success' : 'error');
     }, 250);
   }
 
@@ -1239,6 +1319,16 @@
     els.sendLedMaxPowerBtn.addEventListener('click', () => sendLedPowerToPowerLoad('maximum'));
     els.ledPreviewIsoBtn.addEventListener('click', () => setLedPreviewView('isometric'));
     els.ledPreviewFrontBtn.addEventListener('click', () => setLedPreviewView('front'));
+    document.querySelectorAll('[data-led-jump]').forEach(button => {
+      button.addEventListener('click', () => {
+        const target = document.getElementById(button.dataset.ledJump);
+        const suite = els.ledWallPreview.closest('.led-suite');
+        const header = suite.querySelector('.led-suite-head');
+        const top = target.getBoundingClientRect().top - suite.getBoundingClientRect().top + suite.scrollTop - header.offsetHeight - 8;
+        suite.scrollTo({ top, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+        target.focus({ preventScroll: true });
+      });
+    });
     window.addEventListener('pagehide', () => { if (previewMotion) previewMotion.kill(); }, { once: true });
   } else {
     els.copyButtons.forEach(button => button.addEventListener('click', () => copySummary(button)));
@@ -1246,14 +1336,13 @@
   }
   Array.from(document.querySelectorAll('button')).forEach(attachPressFeedback);
 
-  if (!storage.available) {
+    if (!storage.available) {
     els.saveStatus.textContent = 'Storage blocked';
   }
   if (isLedPage) refreshLedProfileOptions();
   setFieldValues();
   if (isLedPage) {
     syncLedModeUI();
-    syncLedPowerModeUI();
   } else {
     syncPowerMethodUI();
   }
@@ -1266,7 +1355,8 @@
     updateStatus('Saved calculator data was invalid. Default values were restored, calculated, and saved.', 'error');
   } else if (storageLoadState === 'loaded') {
     const normalization = initialNormalizations.length ? `${initialNormalizations.join(' ')} ` : '';
-    updateStatus(`${normalization}Saved calculator values loaded and calculations updated.`, initialNormalizations.length ? 'error' : 'success');
+    const powerFactorNote = isLedPage && ledPowerFactorReset ? ' Enter manufacturer power factor before using current or circuit estimates.' : '';
+    updateStatus(`${normalization}Saved calculator values loaded and calculations updated.${powerFactorNote}`, initialNormalizations.length ? 'error' : 'success');
   } else if (storageLoadState === 'migrated') {
     updateStatus('Saved watts were migrated to Watts + Power Factor mode. Enter the manufacturer power factor to calculate current.', 'success');
   } else {

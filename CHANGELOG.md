@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-23 — LED wall calculator audit fixes
+
+- Preserved unfinished numeric edits until commit, so values such as `0.95` can be entered without an intermediate clamp changing the operator's input. Corrections now identify the affected field through the status region.
+- Required an explicitly entered manufacturer power factor before the LED planner shows current or circuit estimates in either phase mode. Previously stored assumed factors are cleared; watts remain visible, and balanced three-phase voltage is identified as line-to-line.
+- Marked the processor port count as a generic minimum and the default cabinet watts and port capacity as sample planning values. Moved results ahead of the long input stack on mobile, added section jumps, and rolled the AV offline cache with Stage 3D's version pin.
+- Expanded the LED browser probe for numeric drafts, PF migration and reload, single- and three-phase estimates, mobile result order, and section navigation.
 ## 2026-09-23 — FMP pavilion, FOH and LED walls
 
 - Added evidence-tagged shell, house fixtures and independently replaceable touring equipment; overview cutaway preserves physical monitor obstructions.
