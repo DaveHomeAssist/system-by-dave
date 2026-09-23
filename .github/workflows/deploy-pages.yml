@@ -67,6 +67,11 @@ jobs:
           npm run verify:fmp
           npm run verify:domain-sites
 
+      - name: Verify AV suite import safety
+        env:
+          CHROME_CHANNEL: chrome
+        run: npm run test:av-suite-import-browser
+
       - name: Verify Throwline release contract
         run: npm run verify:throwline
 

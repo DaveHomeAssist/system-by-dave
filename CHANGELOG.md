@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-09-23 — AV by Dave suite import no longer wipes a show
+
+- Import Suite JSON accepted any JSON object: a file of the wrong shape cleared the saved show name, venue, readiness, notes and pins, then reported "Suite JSON imported." It now accepts only the AV suite schema (or a legacy export without a schema field), rejects anything else with a message, asks before replacing a show that has work in it, and offers Undo after a successful import. Show packages check their suite block the same way and also ask first.
+- Added `npm run test:av-suite-import-browser`, a Playwright probe run in the Pages workflow, covering wrong-schema, foreign-schema, malformed, cancelled, accepted-with-undo, legacy and package imports. Storage keys and export shapes are unchanged. The offline cache version moves to `v20260923-suite-import-safety` so installed clients pick up the fix.
+
 ## 2026-09-23 — FMP Camera Simulator release log and version stamp
 
 - Added `apps/fmp-camera-sim/CHANGELOG.md`, the simulator's own release log, backfilled as 1.0.0–1.5.3 from its nine merged pull requests; this change is 1.6.0.

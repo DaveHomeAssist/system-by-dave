@@ -39,7 +39,8 @@
     "test:shader-practice": "node --test shader/shading-practice-state.test.js scripts/shader_practice_worker.test.js",
     "probe:shader-practice": "node scripts/probe_shader_practice.js",
     "verify:shader-practice": "node --test shader/shading-practice-state.test.js scripts/shader_practice_worker.test.js && node scripts/verify_shader_practice.js",
-    "test:shader-practice-browser": "node scripts/probe_shader_practice.js --no-sandbox"
+    "test:shader-practice-browser": "node scripts/probe_shader_practice.js --no-sandbox",
+    "test:av-suite-import-browser": "node scripts/probe_av_suite_import.mjs --no-sandbox"
   },
   "devDependencies": {
     "@types/react": "^19.2.17",
