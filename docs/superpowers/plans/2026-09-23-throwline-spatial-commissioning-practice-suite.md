@@ -7,6 +7,11 @@ commissioning, handoff, and demonstration surface. Add scope practice as a
 separate deterministic training page that shares one synthetic camera state and
 never presents generated data as measurement or device control.
 
+
+## Product boundary correction
+
+Camera shading practice belongs to the existing Camera Control & Shading reference at `housevideo.app/shader/`. Throwline retains work packages 1 through 4 for projector planning and commissioning. The practice engine, UI, offline worker, tests, and browser gate are owned and released by Shader; Throwline contains no practice navigation, registry entry, or offline asset. The former Throwline URL is a noindex compatibility redirect only.
+
 ## Work packages
 
 1. Add pointer and keyboard manipulation for projector marks and room
@@ -61,7 +66,7 @@ never presents generated data as measurement or device control.
 
 ## Execution record
 
-- Implemented the six work packages in an isolated worktree.
+- Implemented the six work packages in an isolated worktree; the shading package was subsequently moved to Shader to correct product ownership.
 - Added 47 scene-state tests and 12 deterministic practice-state tests to the
   release gate, 59 state tests in total.
 - Added browser acceptance for commissioning/handoff downloads, layout math,

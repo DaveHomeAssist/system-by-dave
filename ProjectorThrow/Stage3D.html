@@ -290,8 +290,6 @@ html,body{overflow:hidden}
 .scenario-history{display:grid;gap:8px;padding-top:2px}
 .scenario-history .field-grid{align-items:end}
 .scenario-status{margin:0;color:var(--dim);font:10.5px/1.45 var(--mono)}
-.practice-cta{display:grid;gap:7px;padding:11px;border:1px solid var(--info);border-radius:var(--r);background:var(--info-lo)}
-.practice-cta p{margin:0;color:var(--dim);font-size:11.5px;line-height:1.45}.practice-cta .suite-link{justify-content:center;border:1px solid var(--info);border-radius:var(--r);color:var(--info);background:var(--case)}
 .field-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .field-grid label{display:block}
 .field-grid input{width:100%;min-height:38px;padding:8px;border:1px solid var(--line);border-radius:var(--r);background:var(--deck);color:var(--chalk);font:12px var(--mono)}
@@ -407,7 +405,6 @@ html[data-calculation-mode=blocked] .provenance-badge,html[data-calculation-mode
       <button class="field-verify-toggle" id="fieldVerifyToggle" type="button" aria-pressed="false">Field Verify</button>
       <button class="quick-start-toggle" id="quickStartToggle" type="button" aria-label="Open Quick Start"><span class="quick-label-wide">Quick Start</span><span class="quick-label-short">Start</span></button>
       <a class="suite-link" href="index.html?workspace=planner">Planner</a>
-      <a class="suite-link practice-link" href="practice.html">Scope Practice</a>
       <a class="suite-link av-suite-link" href="../av-suite.html">AV Suite</a>
       <details class="header-more"><summary>More</summary><a class="suite-link" href="../av-suite.html">AV Suite</a></details>
     </nav>
@@ -580,11 +577,6 @@ html[data-calculation-mode=blocked] .provenance-badge,html[data-calculation-mode
               <input id="sceneFile" type="file" accept="application/json,.json" hidden>
             </div>
           </section>
-          <section class="practice-cta" aria-labelledby="practiceTitle">
-            <h3 id="practiceTitle" class="sr-only">Camera shading practice</h3>
-            <p><strong>Scope Practice</strong> links two virtual cameras, a control panel, image monitors, waveform, parade, vectorscope, and histogram through one deterministic simulation.</p>
-            <a class="suite-link" href="practice.html">Open camera shading practice</a>
-          </section>
           <p class="model-note">Every part is a named mesh, so the OBJ and GLB open in Blender with <em>screen</em>, <em>projector_body</em>, <em>lens_barrel</em> and <em>cart</em> as separate objects.</p>
           <p class="kbd-help"><strong>Keyboard:</strong> focus the stage, then use 1–5 for cameras, arrow keys to orbit, +/− to zoom, and 0 or Home to reset.</p>
         </section>
@@ -750,7 +742,7 @@ const offlineBadge = document.getElementById('offlineBadge');
 const offlineStatusTitle = document.getElementById('offlineStatusTitle');
 const offlineStatusDetail = document.getElementById('offlineStatusDetail');
 const ONBOARDING_STORAGE_KEY = 'throwline:stage-onboarding:v1';
-const OFFLINE_CACHE_VERSION = 'v20260923-throwline-practice-suite';
+const OFFLINE_CACHE_VERSION = 'v20260923-shader-practice-relocation';
 const WORKFLOW_STAGES = ['setup','place','room','deliver'];
 const workflowTabs = [...document.querySelectorAll('[data-workflow-tab]')];
 const workflowPanels = [...document.querySelectorAll('[data-workflow-panel]')];

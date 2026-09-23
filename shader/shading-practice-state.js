@@ -2,11 +2,12 @@
   'use strict';
   const api = factory();
   if (typeof module === 'object' && module.exports) module.exports = api;
-  if (root) root.ThrowlinePracticeState = api;
+  if (root) root.ShaderPracticeState = api;
 })(typeof window !== 'undefined' ? window : undefined, function () {
   'use strict';
 
-  const SCHEMA = 'throwline.camera-practice.v1';
+  const SCHEMA = 'shader.camera-practice.v1';
+  const LEGACY_SCHEMA = 'throwline.camera-practice.v1';
   const SCHEMA_VERSION = 1;
   const CAMERA_IDS = ['camera-a', 'camera-b'];
   const CONTROL_LIMITS = Object.freeze({
@@ -121,7 +122,7 @@
   const clamp = (value, min, max) => Math.min(max, Math.max(min, Number(value)));
   const round = (value, digits = 4) => Number(Number(value).toFixed(digits));
   const finite = value => Number.isFinite(Number(value));
-  const cleanSeed = value => String(value == null ? 'throwline-demo-01' : value).trim().slice(0, 80) || 'throwline-demo-01';
+  const cleanSeed = value => String(value == null ? 'shader-demo-01' : value).trim().slice(0, 80) || 'shader-demo-01';
   const cameraKey = cameraId => cameraId === 'camera-a' ? 'a' : 'b';
 
   function hashSeed(value) {
@@ -462,7 +463,7 @@
   function exportPracticeJSON(input) {
     const state = normalizeState(input);
     return JSON.stringify({
-      kind: 'throwline-camera-practice-session',
+      kind: 'shader-camera-practice-session',
       schema: SCHEMA,
       schemaVersion: SCHEMA_VERSION,
       exportedAt: null,
@@ -477,7 +478,9 @@
     } catch (error) {
       throw new Error('Practice JSON is not valid JSON.');
     }
-    if (!parsed || parsed.kind !== 'throwline-camera-practice-session' || parsed.schema !== SCHEMA || parsed.schemaVersion !== SCHEMA_VERSION || !parsed.state) {
+    const current = parsed && parsed.kind === 'shader-camera-practice-session' && parsed.schema === SCHEMA;
+    const legacy = parsed && parsed.kind === 'throwline-camera-practice-session' && parsed.schema === LEGACY_SCHEMA;
+    if ((!current && !legacy) || parsed.schemaVersion !== SCHEMA_VERSION || !parsed.state) {
       throw new Error(`Practice JSON must use ${SCHEMA}.`);
     }
     return normalizeState(parsed.state);

@@ -2,7 +2,7 @@
 
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const Practice = require('./throwline-practice-state.js');
+const Practice = require('./shading-practice-state.js');
 
 function setControls(state, cameraId, controls) {
   return Object.entries(controls).reduce((next, [control, value]) => Practice.applyIntent(next, { type: 'set-control', cameraId, control, value }), state);
@@ -11,7 +11,7 @@ function setControls(state, cameraId, controls) {
 test('practice state is versioned, deterministic, and contains two isolated virtual cameras', () => {
   const one = Practice.createPracticeState({ scenarioId: 'match-cameras', seed: 'show-42' });
   const two = Practice.createPracticeState({ scenarioId: 'match-cameras', seed: 'show-42' });
-  assert.equal(one.schema, 'throwline.camera-practice.v1');
+  assert.equal(one.schema, 'shader.camera-practice.v1');
   assert.equal(one.schemaVersion, 1);
   assert.deepEqual(one, two);
   assert.deepEqual(one.cameras.map(camera => camera.id), ['camera-a', 'camera-b']);
@@ -131,6 +131,19 @@ test('JSON export and import reproduce the full practice state', () => {
   assert.equal(JSON.parse(encoded).exportedAt, null);
   assert.throws(() => Practice.importPracticeJSON('{bad json'), /not valid JSON/);
   assert.throws(() => Practice.importPracticeJSON(JSON.stringify({ schema: 'other' })), /must use/);
+});
+
+test('legacy Throwline exports import once into the Shader schema', () => {
+  const state = Practice.createPracticeState({ seed: 'legacy-proof' });
+  const legacy = JSON.stringify({
+    kind: 'throwline-camera-practice-session',
+    schema: 'throwline.camera-practice.v1',
+    schemaVersion: 1,
+    state: { ...state, schema: 'throwline.camera-practice.v1' }
+  });
+  const restored = Practice.importPracticeJSON(legacy);
+  assert.equal(restored.schema, 'shader.camera-practice.v1');
+  assert.equal(restored.seed, 'legacy-proof');
 });
 
 test('import normalization rejects unknown scenarios and unsafe numeric values', () => {
