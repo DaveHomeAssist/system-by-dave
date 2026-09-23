@@ -28,7 +28,8 @@ export function PerformerSettings({ store, state }: Props) {
       <p className="settings-intro">
         One human-scale performer on the stage. Marks are spike positions laid out across the deck; stage right is the performer's right.
       </p>
-      {following && <div className="notice notice-warn">The follow exercise is driving the performer until it finishes or is reset.</div>}
+      {following && <div className="notice notice-warn">The follow exercise is driving the performer. These settings unlock when it finishes or is reset.</div>}
+      <fieldset className="plain-fieldset" disabled={following}>
       <RadioGroup<PerformerMode>
         legend="Performer"
         value={performer.mode}
@@ -60,6 +61,12 @@ export function PerformerSettings({ store, state }: Props) {
       <button type="button" className="secondary-button" onClick={() => store.restartPerformer()} disabled={performer.mode !== "path"}>
         Restart the path from the beginning
       </button>
+      </fieldset>
+      {issues.some((issue) => issue.path === "session.performer") && (
+        <p className="field-error" role="alert">
+          {issues.find((issue) => issue.path === "session.performer")?.message}
+        </p>
+      )}
     </div>
   );
 }

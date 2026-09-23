@@ -441,6 +441,10 @@ export class SimulatorStore {
   }
 
   updatePerformer(patch: Partial<PerformerConfig>): UpdateResult {
+    // The follow exercise timed its run from the performer's path; changing it mid-run would skew the result.
+    if (this.exerciseId === "follow" && this.exercise?.progress().status === "running") {
+      return { ok: false, issues: [{ path: "session.performer", message: "The follow exercise is using the performer. Finish or reset it first." }] };
+    }
     const session = this.project.session;
     const candidate = { ...session, performer: { ...session.performer, ...patch } };
     const parsed = parseSession(candidate);
