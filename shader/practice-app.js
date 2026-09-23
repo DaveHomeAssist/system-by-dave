@@ -1127,7 +1127,9 @@
     const tileWidth = (width - (count - 1) * 8) / count;
     const ideal = tileWidth * 9 / 16 + 4 + 20 + (layout.wipe ? 48 : 0);
     const bar = els.monitorPanel.querySelector('.panel-bar').offsetHeight + 60;
-    const limit = Math.max(140, center.clientHeight * 0.56 - bar);
+    // Short screens give the scopes (and their disclaimer) a larger share.
+    const share = center.clientHeight < 560 ? 0.5 : 0.56;
+    const limit = Math.max(center.clientHeight < 420 ? 90 : 110, center.clientHeight * share - bar);
     wall.style.setProperty('--wall-height', `${Math.round(Math.min(ideal, limit))}px`);
   }
 
@@ -1171,13 +1173,21 @@
     return `${SCOPE_NAMES[kind]}. ${series.map(part).join('. ')}. Generated practice signal, not a measurement.`;
   }
 
+  // Each legend entry carries a full and a short label; narrow panels show
+  // the short one and keep the full one for screen readers.
+  function shortSeriesName(entry, sources) {
+    if (sources.mode === 'demo') return entry.source.role === 'before' ? 'BEFORE' : 'AFTER';
+    return `${entry.source.role === 'reference' ? 'REF' : 'TGT'} ${entry.source.cameraId === 'camera-a' ? 'A' : 'B'}`;
+  }
+
   function renderLegend(kind, series, sources) {
     const legend = byId(`legend-${kind}`);
     const items = series.map(entry => {
       const swatch = h('span', { className: 'swatch', 'aria-hidden': 'true' });
       const rgb = Render.SERIES[entry.slot];
       swatch.style.background = `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
-      return h('span', {}, swatch, kind === 'parade' && entry.slot === 1 ? `${seriesName(entry, sources)} IN R G B` : `${seriesName(entry, sources)}${entry.slot === 0 && series.length > 1 ? ' (GHOST)' : ''}`);
+      const full = kind === 'parade' && entry.slot === 1 ? `${seriesName(entry, sources)} IN R G B` : `${seriesName(entry, sources)}${entry.slot === 0 && series.length > 1 ? ' (GHOST)' : ''}`;
+      return h('span', {}, swatch, h('span', { className: 'long', text: full }), h('span', { className: 'short', 'aria-hidden': 'true', text: shortSeriesName(entry, sources) }));
     });
     legend.replaceChildren(...items);
   }

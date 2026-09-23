@@ -161,7 +161,20 @@ function inspectLayout(statements) {
     const style = getComputedStyle(el);
     return rect.width > 0 && rect.height > 0 && style.visibility !== 'hidden' && style.display !== 'none' && rect.bottom > 0 && rect.right > 0 && rect.top < innerHeight && rect.left < innerWidth;
   };
-  const textVisible = text => [...document.querySelectorAll('body *')].some(el => [...el.childNodes].some(node => node.nodeType === 3 && node.textContent.includes(text)) && visible(el));
+  // Visible means on screen and not cut off by any clipping ancestor
+  // (overflow hidden, scroll containers, or an ellipsis line).
+  const unclipped = el => {
+    const rect = el.getBoundingClientRect();
+    if (rect.top < -1 || rect.left < -1 || rect.bottom > innerHeight + 1 || rect.right > innerWidth + 1) return false;
+    for (let node = el.parentElement; node && node !== document.body; node = node.parentElement) {
+      const style = getComputedStyle(node);
+      if (style.overflowX === 'visible' && style.overflowY === 'visible') continue;
+      const box = node.getBoundingClientRect();
+      if (rect.top < box.top - 1 || rect.bottom > box.bottom + 1 || rect.left < box.left - 1 || rect.right > box.right + 1) return false;
+    }
+    return true;
+  };
+  const textVisible = text => [...document.querySelectorAll('body *')].some(el => [...el.childNodes].some(node => node.nodeType === 3 && node.textContent.includes(text)) && visible(el) && unclipped(el));
   const interactive = [...document.querySelectorAll('a[href], button, input:not([type="hidden"]), select, textarea, summary, [tabindex="0"]')]
     .filter(el => !el.closest('[hidden], dialog:not([open])') && visible(el) && !el.classList.contains('sbd-skip-link'));
   const small = interactive.map(el => ({ el, rect: el.getBoundingClientRect() }))
