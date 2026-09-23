@@ -1794,48 +1794,36 @@ button:disabled {
   box-shadow: var(--shadow);
 }
 
-/* Phone: one section at a time, chosen from the bottom rail. The bar keeps exactly two rows
-   however wide the text renders (iOS draws it wider than desktop browsers): the title shares
-   its row with Help and the theme toggle, and both flags share the row below it. */
+/* Phone: one section at a time, chosen from the bottom rail. A phone in Safari has roughly
+   613 pt of page height, so the Operate tab spends it on the picture and the joystick: the bar
+   is the two accuracy flags alone (the breadcrumb already names the page; Help, the theme
+   toggle and the monitor guides live on the Settings tab), the monitor has no head and a
+   one-line readout, and the joystick keeps its 150 px pad without keyboard hints. iOS draws
+   text about a tenth wider than desktop browsers, so every row keeps that much slack. */
 .sim-app[data-layout="phone"] .sim-bar {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  grid-template-areas:
-    "title actions"
-    "flags flags";
-  align-items: center;
+  display: block;
   padding: 6px 10px;
-  gap: 6px 10px;
 }
 
 .sim-app[data-layout="phone"] .sim-title {
-  grid-area: title;
-  min-width: 0;
-}
-
-.sim-app[data-layout="phone"] .sim-title h1 {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
   overflow: hidden;
-  text-overflow: ellipsis;
+  clip: rect(0 0 0 0);
   white-space: nowrap;
-}
-
-.sim-app[data-layout="phone"] .sim-title p {
-  display: none;
+  border: 0;
 }
 
 .sim-app[data-layout="phone"] .sim-actions {
-  grid-area: actions;
-  margin-left: 0;
-  flex-wrap: nowrap;
-}
-
-.sim-app[data-layout="phone"] .sim-actions .tool-button {
-  padding: 6px 10px;
-  font-size: 13px;
+  display: none;
 }
 
 .sim-app[data-layout="phone"] .sim-flags {
-  grid-area: flags;
+  display: flex;
+  gap: 8px;
   min-width: 0;
 }
 
@@ -1858,9 +1846,7 @@ button:disabled {
   padding: 0 5px;
 }
 
-/* Panel tools tighten up on phones. The monitor's guides and Expand never wrap: the buttons share
-   the row, Expand uses its short label, and a label only shortens with an ellipsis as the last
-   resort. Fonts on iOS and Linux both draw this text wider than desktop Chromium does. */
+/* Panel tools tighten up on phones (the venue view's presets wrap as needed). */
 .sim-app[data-layout="phone"] .panel-tools {
   gap: 4px;
 }
@@ -1870,41 +1856,64 @@ button:disabled {
   font-size: 12px;
 }
 
-.sim-app[data-layout="phone"] .monitor-panel .panel-tools {
+/* The monitor head (title, guides, Expand) is a desktop surface; on phones the guides move to
+   the Settings tab and the picture is already full width. The heading stays for aria-labelledby. */
+.sim-app[data-layout="phone"] .monitor-panel .panel-head {
+  display: none;
+}
+
+.sim-app[data-layout="phone"] .readout {
   flex-wrap: nowrap;
-  width: 100%;
-}
-
-.sim-app[data-layout="phone"] .monitor-panel .panel-tools .tool-button {
-  flex: 1 1 auto;
-  min-width: 44px;
-  padding: 4px 6px;
-}
-
-.sim-app[data-layout="phone"] .monitor-panel .tool-label {
-  min-width: 0;
+  gap: 0 10px;
+  padding: 5px 10px;
+  font-size: 11px;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+}
+
+.sim-app[data-layout="phone"] .readout-hfov,
+.sim-app[data-layout="phone"] .readout-speed,
+.sim-app[data-layout="phone"] .readout small,
+.sim-app[data-layout="phone"] .control-hint {
+  display: none;
+}
+
+.sim-app[data-layout="phone"] .controls-panel {
+  padding: 8px 10px 6px;
+}
+
+.sim-app[data-layout="phone"] .control-label {
+  margin-top: 4px;
+  font-size: 12px;
 }
 
 .label-short {
   display: none;
 }
 
-.sim-app[data-layout="phone"] .label-long {
-  display: none;
+/* Help, theme and monitor guides on the phone Settings tab. */
+.phone-utilities {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
 }
 
-.sim-app[data-layout="phone"] .label-short {
-  display: inline;
+.phone-utilities-label {
+  margin-left: 4px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
 }
 
 .sim-app[data-layout="phone"] .sim-workspace {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 8px;
+  gap: 6px;
+  padding: 6px;
   overflow-y: auto;
 }
 

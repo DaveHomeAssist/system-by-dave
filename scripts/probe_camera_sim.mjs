@@ -795,40 +795,63 @@ for (const [label, viewport, expectation] of [
   });
 }
 
-// iOS Safari renders the same CSS pixels about a tenth wider than desktop browsers. The phone
-// header must keep its shape with that slack: two bar rows, one row of flags, one row of monitor
-// tools, an uncut breadcrumb, and the joystick inside the first screen.
-await check('phone 390: the bar, breadcrumb and monitor tools survive wider text', async () => {
-  const { context, page } = await open({ context: { viewport: { width: 390, height: 844 } } });
-  const measure = () =>
-    page.evaluate(() => {
-      const rect = (selector) => document.querySelector(selector).getBoundingClientRect();
-      const flags = [...document.querySelectorAll('.sim-flags .flag')].map((flag) => flag.getBoundingClientRect());
-      const nav = document.querySelector('.sbd-site-return');
-      return {
-        overflow: document.documentElement.scrollWidth - window.innerWidth,
-        navOverflow: nav.scrollWidth - nav.clientWidth,
-        flagRows: new Set(flags.map((r) => Math.round(r.top))).size,
-        barHeight: rect('.sim-bar').height,
-        toolsHeight: rect('.monitor-panel .panel-tools').height,
-        joystickTop: rect('.joystick').top,
-      };
+// A phone in Safari shows about 613 pt of page (390 × 844 minus the URL bar and toolbar), and iOS
+// draws the same CSS pixels about a tenth wider than desktop browsers. The Operate tab must keep
+// the picture and the whole joystick pad on that first screen, with that slack, and the phone
+// Settings tab must still offer Help, the theme toggle and the monitor guides.
+for (const [label, viewport] of [
+  ['phone 390 × 844', { width: 390, height: 844 }],
+  ['phone in Safari 390 × 613', { width: 390, height: 613 }],
+]) {
+  await check(`${label}: picture and joystick share the first screen, even with wider text`, async () => {
+    const { context, page } = await open({ context: { viewport } });
+    const measure = () =>
+      page.evaluate(() => {
+        const rect = (selector) => document.querySelector(selector).getBoundingClientRect();
+        const flags = [...document.querySelectorAll('.sim-flags .flag')].map((flag) => flag.getBoundingClientRect());
+        const nav = document.querySelector('.sbd-site-return');
+        const head = document.querySelector('.monitor-panel .panel-head');
+        return {
+          overflow: document.documentElement.scrollWidth - window.innerWidth,
+          navOverflow: nav.scrollWidth - nav.clientWidth,
+          flagRows: new Set(flags.map((r) => Math.round(r.top))).size,
+          barHeight: rect('.sim-bar').height,
+          headHidden: head.offsetParent === null,
+          readoutHeight: rect('.readout').height,
+          padBottom: rect('.joystick-pad').bottom,
+          zoomBottom: rect('.zoom-buttons').bottom,
+          railTop: rect('.mobile-rail').top,
+        };
+      });
+    const normal = await measure();
+    // The page's CSP blocks injected stylesheets; CSSOM edits are the honest way to widen text.
+    await page.evaluate(() => {
+      for (const el of document.querySelectorAll('.sim-app, .sim-app *, .sbd-site-return, .sbd-site-return *')) el.style.letterSpacing = '0.08em';
     });
-  const normal = await measure();
-  // The page's CSP blocks injected stylesheets; CSSOM edits are the honest way to widen text.
-  await page.evaluate(() => {
-    for (const el of document.querySelectorAll('.sim-app, .sim-app *, .sbd-site-return, .sbd-site-return *')) el.style.letterSpacing = '0.08em';
+    const wide = await measure();
+    for (const [name, m] of [['normal text', normal], ['wide text', wide]]) {
+      assert(m.overflow <= 1 && m.navOverflow <= 1, `${name}: horizontal overflow (page ${m.overflow}px, breadcrumb ${m.navOverflow}px)`);
+      assert(m.flagRows === 1, `${name}: flags wrapped onto ${m.flagRows} rows`);
+      assert(m.barHeight <= 60, `${name}: app bar is ${Math.round(m.barHeight)}px tall`);
+      assert(m.headHidden, `${name}: monitor head shown on a phone`);
+      assert(m.readoutHeight <= 30, `${name}: readout wrapped (${Math.round(m.readoutHeight)}px)`);
+      assert(m.padBottom <= m.railTop, `${name}: joystick pad ends at ${Math.round(m.padBottom)}px, below the rail at ${Math.round(m.railTop)}px`);
+      assert(m.zoomBottom <= m.railTop, `${name}: zoom buttons end at ${Math.round(m.zoomBottom)}px, below the rail at ${Math.round(m.railTop)}px`);
+    }
+    await page.evaluate(() => {
+      for (const el of document.querySelectorAll('.sim-app, .sim-app *, .sbd-site-return, .sbd-site-return *')) el.style.letterSpacing = '';
+    });
+    await page.getByRole('navigation', { name: 'Simulator sections' }).getByRole('button', { name: 'Settings' }).click();
+    const utilities = page.getByRole('group', { name: 'Help, appearance and monitor guides' });
+    assert(await utilities.isVisible(), 'phone Settings tab has no help/theme/guide controls');
+    for (const name of ['Help and keyboard shortcuts', 'Dark mode', 'Safe area', 'Centre', 'Thirds']) {
+      assert(await utilities.getByRole('button', { name, exact: true }).isVisible(), `phone utilities missing ${name}`);
+    }
+    await utilities.getByRole('button', { name: 'Thirds', exact: true }).click();
+    assert((await exportProject(page)).session.preferences.guides.thirds === true, 'guide toggle on the Settings tab did not change the session');
+    await context.close();
   });
-  const wide = await measure();
-  for (const [name, m] of [['normal text', normal], ['wide text', wide]]) {
-    assert(m.overflow <= 1 && m.navOverflow <= 1, `${name}: horizontal overflow (page ${m.overflow}px, breadcrumb ${m.navOverflow}px)`);
-    assert(m.flagRows === 1, `${name}: flags wrapped onto ${m.flagRows} rows`);
-    assert(m.barHeight <= 112, `${name}: app bar is ${Math.round(m.barHeight)}px tall`);
-    assert(m.toolsHeight <= 48, `${name}: monitor tools wrapped (${Math.round(m.toolsHeight)}px)`);
-    assert(m.joystickTop < 844, `${name}: joystick starts below the first screen (${Math.round(m.joystickTop)}px)`);
-  }
-  await context.close();
-});
+}
 
 await browser.close();
 server.close();

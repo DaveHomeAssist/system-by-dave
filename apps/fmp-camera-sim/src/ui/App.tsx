@@ -12,7 +12,8 @@ import { browserStorage } from "../storage/persist";
 import { AppBar } from "./AppBar";
 import { ControlsPanel } from "./ControlsPanel";
 import { HelpDialog } from "./HelpDialog";
-import { MonitorPanel } from "./MonitorPanel";
+import { keepFocus } from "./keepFocus";
+import { GUIDE_BUTTONS, MonitorPanel } from "./MonitorPanel";
 import { type PanelTab, SidePanel } from "./SidePanel";
 import { VenuePanel } from "./VenuePanel";
 
@@ -267,6 +268,29 @@ export function App() {
           onView={(view: OverviewPreset) => rendererRef.current?.setOverviewView(view, state.geometry)}
         />
         <ControlsPanel store={store} input={input} state={state} />
+        {phone && mobileTab === "settings" && (
+          <div className="phone-utilities" role="group" aria-label="Help, appearance and monitor guides">
+            <button type="button" className="tool-button" onClick={() => setHelpOpen(true)} aria-label="Help and keyboard shortcuts">
+              Help
+            </button>
+            <button {...keepFocus} type="button" className="tool-button theme-button" aria-pressed={theme === "dark"} onClick={toggleTheme}>
+              Dark mode
+            </button>
+            <span className="phone-utilities-label">Guides</span>
+            {GUIDE_BUTTONS.map(({ key, label }) => (
+              <button
+                key={key}
+                {...keepFocus}
+                type="button"
+                className="tool-button"
+                aria-pressed={state.project.session.preferences.guides[key]}
+                onClick={() => store.setGuides({ [key]: !state.project.session.preferences.guides[key] })}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        )}
         <SidePanel
           store={store}
           state={state}
