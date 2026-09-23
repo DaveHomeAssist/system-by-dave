@@ -1,0 +1,48 @@
+name: Verify FMP Camera Simulator
+
+# Checks the simulator on pull requests before it reaches main: types, unit tests, a fresh build
+# that must match the committed camera-sim/ output, the route's public-shell gates, and the
+# browser acceptance probe (docs/fmp-camera-simulator.md). deploy-pages.yml repeats these on main.
+on:
+  pull_request:
+    paths:
+      - 'apps/fmp-camera-sim/**'
+      - 'camera-sim/**'
+      - 'scripts/build_camera_sim_offline.mjs'
+      - 'scripts/probe_camera_sim.mjs'
+      - 'package*.json'
+      - '.github/workflows/camera-sim.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  simulator:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Typecheck, unit tests and build
+        run: |
+          npm run typecheck:camera-sim
+          npm run test:camera-sim
+          npm run build:camera-sim
+      - name: Committed build matches the source
+        run: |
+          git diff --exit-code -- camera-sim
+          test -z "$(git status --porcelain -- camera-sim)"
+      - name: Route gates
+        run: |
+          npm run verify:public-navigation
+          npm run verify:indexing
+          npm run verify:domain-sites
+      - name: Browser acceptance
+        env:
+          CHROME_CHANNEL: chrome
+        run: npm run test:camera-sim-browser -- --no-sandbox

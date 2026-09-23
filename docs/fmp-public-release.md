@@ -106,7 +106,10 @@ responses are never bundled for offline use.
 
 housevideo.app is the canonical home of the exported `/fmp/` suite, the
 `/fmp-index/` redirect, and the `/switcher/`, `/shader/` and `/backfocus/`
-references, with unchanged paths (`docs/domain-sites.md`). It was cut over on
+references, with unchanged paths (`docs/domain-sites.md`). The noindex
+`/camera-sim/` catwalk PTZ trainer is built in this repository from
+`apps/fmp-camera-sim/` rather than exported from fmp-suite; it links into the
+suite (`docs/fmp-camera-simulator.md`). The suite was cut over on
 2026-09-18 from fmpwalk `a5d262c`. The systembydave.com addresses are redirect
 stubs that offer to move saved walk and camera data (browser storage and walk
 photos) before redirecting.

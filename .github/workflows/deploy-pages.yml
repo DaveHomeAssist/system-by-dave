@@ -88,11 +88,23 @@ jobs:
           npm run test:av-workbook
           npm run build:av-workbook
 
+      - name: Verify FMP Camera Simulator
+        run: |
+          npm run typecheck:camera-sim
+          npm run test:camera-sim
+          npm run build:camera-sim
+
+      - name: Verify FMP Camera Simulator browser runtime
+        env:
+          CHROME_CHANNEL: chrome
+        run: npm run test:camera-sim-browser -- --no-sandbox
+
       - name: Verify dependency security and generated files
         run: |
           npm audit --audit-level=high
           python3 scripts/gen_sitemap.py
-          git diff --exit-code -- av-workbook sitemap.xml
+          git diff --exit-code -- av-workbook camera-sim sitemap.xml
+          test -z "$(git status --porcelain -- av-workbook camera-sim sitemap.xml)"
 
       - name: Stage site (everything except VCS + CI tooling)
         run: |

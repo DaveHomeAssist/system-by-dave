@@ -17,7 +17,8 @@
         "switcher/",
         "shader/",
         "ursa-broadcast-g2/",
-        "backfocus/"
+        "backfocus/",
+        "camera-sim/"
       ],
       "movedTo": {
         "fmpwalk/": "housevideo-walk",
@@ -28,7 +29,8 @@
         "/404.html",
         "/transfer.html",
         "/fmp-index/",
-        "/fmp/"
+        "/fmp/",
+        "/camera-sim/"
       ],
       "storage": {
         "registryKeys": false,

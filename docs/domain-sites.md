@@ -7,7 +7,7 @@ GitHub Pages repository.
 
 | Site id | Domain | Repository | Pages | Cutover |
 | --- | --- | --- | --- | --- |
-| `housevideo` | housevideo.app | `DaveHomeAssist/housevideo` | `/fmp/` and its routes, the `/fmp-index/` redirect, `/switcher/` and its routes, `/shader/`, `/ursa-broadcast-g2/`, `/backfocus/` | 2026-09-18 |
+| `housevideo` | housevideo.app | `DaveHomeAssist/housevideo` | `/fmp/` and its routes, the `/fmp-index/` redirect, `/switcher/` and its routes, `/shader/`, `/ursa-broadcast-g2/`, `/backfocus/`, `/camera-sim/` | 2026-09-18 |
 | `housevideo-walk` | walk.housevideo.app | `DaveHomeAssist/housevideo-walk` | `/fmpwalk/` and the `/fmp-walk/` redirect | Gated release; see cutover checklist |
 | `avbydave` | avbydave.com | `DaveHomeAssist/avbydave` | Landing at `/`, `av-suite.html`, every registry tool and offline page (including `plotforge.html`), `av-workbook.html`, `av-tool-suite/` | 2026-09-18 |
 
