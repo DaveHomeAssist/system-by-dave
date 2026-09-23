@@ -91,6 +91,7 @@ function focusInstructions(){
 }
 async function copySelectionLink(){
   const url=selectionURL();url.hash='';
+  url.searchParams.delete('embed');url.searchParams.delete('theme');
   try{
     await navigator.clipboard.writeText(url.href);
     $('[data-link-fallback]').hidden=true;
