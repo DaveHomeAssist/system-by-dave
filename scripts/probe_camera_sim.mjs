@@ -81,7 +81,8 @@ async function open(options = {}) {
     if (message.type() === 'error') problems.push(`console: ${message.text()}`);
   });
   await page.goto(options.url || PAGE);
-  await page.waitForFunction(() => window.__fmpCameraSim && window.__fmpCameraSim.state().renderStatus !== 'starting', null, { timeout: 15000 });
+  await page.waitForFunction(() => window.__fmpCameraSim && window.__fmpCameraSim.state().renderStatus !== 'starting', null, { timeout: 30000 });
+  // New software-rendered contexts compile the instanced seating shaders; motion deadlines stay unchanged.
   await page.waitForTimeout(options.settle ?? 600);
   return { context, page, problems };
 }
@@ -592,7 +593,7 @@ async function closePanel(page) {
     await sources.fill('laser-survey-01, deck-datum');
     await sources.press('Tab');
     const exported = await exportProject(page);
-    assert(exported.venue.version === 3, 'wrong venue version');
+    assert(exported.venue.version === 4, 'wrong venue version');
     assert(exported.venue.mount.status === 'confirmed' && exported.venue.mount.headingEvidence.status === 'demo', 'mount observation settled heading');
     assert(exported.venue.dimensions.cameraHeight.provenance.method === 'field-measurement', 'method not stored');
     assert(exported.venue.dimensions.cameraHeight.provenance.sourceIds.join(',') === 'laser-survey-01,deck-datum', 'references not stored');
@@ -691,11 +692,33 @@ await check('the standalone offline file runs from disk with networking disabled
   await context.close();
 });
 
+await check('bowl inspector edits rendered treads and pitch together; side view preserves PTZ and helpers stay out of monitor', async () => {
+  const { context, page } = await open();
+  const before = await sim(page).snapshot();
+  await page.getByRole('button', { name: 'Side elevation', exact: true }).click();
+  const after = await sim(page).snapshot();
+  assert(JSON.stringify(before.pose) === JSON.stringify(after.pose), 'overview preset moved PTZ');
+  await showTab(page, 'Venue');
+  const inspector = page.getByTestId('bowl-inspector');
+  await inspector.scrollIntoViewIfNeeded();
+  assert(await inspector.isVisible(), 'missing inspector');
+  const initial = await sim(page).render();
+  const elevation = inspector.getByLabel('Rise per row, segment 1', { exact: true });
+  await elevation.fill('0.2'); await elevation.press('Enter');
+  await page.waitForFunction(y => window.__fmpCameraSim.render().bowlMaxTreadY > y + 1, initial.bowlMaxTreadY);
+  assert((await inspector.getByTestId('bowl-pitch-table').innerText()).includes('12.53°'), 'pitch failed to track new rise');
+  const render = await sim(page).render();
+  assert(render.monitorHelperCount === 0, 'overview label leaked into monitor');
+  assert(render.monitorFrames > 0 && render.overviewFrames > 0, 'missing rendered view');
+  await context.close();
+});
+
 // ------------------------------------------------------------------------------------------
 // 7. Layouts
 // ------------------------------------------------------------------------------------------
 for (const [label, viewport, expectation] of [
   ['desktop 1440', { width: 1440, height: 900 }, 'venue'],
+  ['tablet 1024', { width: 1024, height: 768 }, 'tablet'],
   ['680 px breakpoint', { width: 680, height: 900 }, 'rail'],
   ['phone 390', { width: 390, height: 844 }, 'rail'],
   ['ultrawide 32:9', { width: 3840, height: 1080 }, 'docked'],
@@ -705,6 +728,7 @@ for (const [label, viewport, expectation] of [
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
     assert(overflow <= 1, `horizontal overflow of ${overflow}px`);
     if (expectation === 'venue') assert(await page.getByTestId('venue-canvas').isVisible(), 'venue view hidden on desktop');
+    if (expectation === 'tablet') assert(await page.getByRole('button', { name: 'Settings', exact: true }).isVisible() && !(await page.getByTestId('venue-canvas').isVisible()), 'tablet header controls or collapsed overview missing');
     if (expectation === 'rail') assert(await page.getByRole('navigation', { name: 'Simulator sections' }).isVisible(), 'no bottom rail');
     if (expectation === 'docked') assert(await page.getByRole('tablist', { name: 'Simulator settings' }).isVisible(), 'side panel not docked');
     const small = await page.evaluate(() =>

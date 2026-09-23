@@ -1,3 +1,4 @@
+import { BowlInspector } from "./BowlInspector";
 import { ProvenanceFields } from "./ProvenanceFields";
 import { useState } from "react";
 import { type SimulatorStore, type StoreState } from "../app/store";
@@ -261,6 +262,8 @@ export function VenueSettings({ store, state }: Props) {
         <NoteField label="Source note" value={venue.mount.headingEvidence.note}
           onCommit={(note) => apply((draft) => { draft.mount.headingEvidence.note = note; })} />
       </fieldset>
+
+      <BowlInspector bowl={venue.bowl} geometry={g} onChange={bowl => apply(draft => { draft.bowl = bowl; })} />
 
       <section className="reference-block" aria-labelledby="cable-route-title">
         <h3 id="cable-route-title">Cable route (reference only)</h3>

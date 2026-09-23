@@ -1,3 +1,4 @@
+import { buildBowl } from "./bowlBuilder";
 import {
   BoxGeometry,
   BufferGeometry,
@@ -10,10 +11,8 @@ import {
   MeshLambertMaterial,
   type Object3D,
   PlaneGeometry,
-  RingGeometry,
   SRGBColorSpace,
 } from "three";
-import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import { type VenueGeometry } from "../domain/venue";
 import { stageToWorld } from "../sim/framing";
 import { makeLabel } from "./labels";
@@ -25,24 +24,8 @@ import { makeLabel } from "./labels";
 /** Layer 1 holds venue-view-only helpers (labels, the enlarged P240, the cone). */
 export const OVERVIEW_LAYER = 1;
 
-const ROW_DEPTH = 0.9;
 const WING_WIDTH = 5;
 const HOUSE_HEIGHT = 13;
-/** Seating arcs curve around a point this far upstage of the downstage edge. */
-const BOWL_FOCUS_UPSTAGE = 8;
-
-interface SeatLevel {
-  name: string;
-  sections: string[];
-  rows: number;
-  rise: number;
-  spanDeg: number;
-}
-
-const LEVELS: SeatLevel[] = [
-  { name: "100 level", sections: ["100", "101", "102", "103", "104"], rows: 28, rise: 0.15, spanDeg: 108 },
-  { name: "200 level", sections: ["200", "201", "202", "203", "204"], rows: 22, rise: 0.42, spanDeg: 116 },
-];
 
 export interface VenueObjects {
   root: Group;
@@ -81,27 +64,6 @@ function screenTexture(): CanvasTexture {
   const texture = new CanvasTexture(canvas);
   texture.colorSpace = SRGBColorSpace;
   return texture;
-}
-
-/** Horizontal ring segment around the bowl focus, centred on the house axis. */
-function tread(inner: number, outer: number, fromDeg: number, toDeg: number, y: number): BufferGeometry {
-  const from = (fromDeg * Math.PI) / 180;
-  const to = (toDeg * Math.PI) / 180;
-  const segments = Math.max(4, Math.round((toDeg - fromDeg) / 2));
-  const geometry = new RingGeometry(inner, outer, segments, 1, from - Math.PI / 2, to - from);
-  geometry.rotateX(-Math.PI / 2);
-  geometry.translate(0, y, -BOWL_FOCUS_UPSTAGE);
-  return geometry;
-}
-
-/** Vertical arc strip (riser or seat back) around the bowl focus. */
-function strip(radius: number, fromDeg: number, toDeg: number, bottom: number, height: number): BufferGeometry {
-  const from = (fromDeg * Math.PI) / 180;
-  const to = (toDeg * Math.PI) / 180;
-  const segments = Math.max(4, Math.round((toDeg - fromDeg) / 2));
-  const geometry = new CylinderGeometry(radius, radius, height, segments, 1, true, from, to - from);
-  geometry.translate(0, bottom + height / 2, -BOWL_FOCUS_UPSTAGE);
-  return geometry;
 }
 
 export function buildVenue(g: VenueGeometry): VenueObjects {
@@ -220,48 +182,8 @@ export function buildVenue(g: VenueGeometry): VenueObjects {
   pitLabel.position.set(0, pitFloor + 1.4, Math.max(2.5, g.pitDepth * 0.6));
   root.add(pitLabel);
 
-  // Seating bowl: two raked levels of five sections each, schematic.
-  const treads: BufferGeometry[] = [];
-  const risers: BufferGeometry[] = [];
-  const backs: BufferGeometry[] = [];
-  let radius = BOWL_FOCUS_UPSTAGE + firstRow;
-  let y = pitFloor + 0.25;
-  const aisleDeg = 1.6;
-  LEVELS.forEach((level, levelIndex) => {
-    const sectionSpan = (level.spanDeg - aisleDeg * (level.sections.length - 1)) / level.sections.length;
-    const levelStart = radius;
-    for (let row = 0; row < level.rows; row += 1) {
-      const inner = radius + row * ROW_DEPTH;
-      const outer = inner + ROW_DEPTH;
-      const rowY = y + row * level.rise;
-      level.sections.forEach((_, s) => {
-        const from = -level.spanDeg / 2 + s * (sectionSpan + aisleDeg);
-        const to = from + sectionSpan;
-        treads.push(tread(inner, outer, from, to, rowY));
-        risers.push(strip(inner, from, to, rowY - level.rise, level.rise));
-        backs.push(strip(outer - 0.12, from, to, rowY, 0.42));
-      });
-    }
-    // Section labels at mid-depth of each section.
-    level.sections.forEach((name, s) => {
-      const mid = -level.spanDeg / 2 + s * (sectionSpan + aisleDeg) + sectionSpan / 2;
-      const r = levelStart + (level.rows * ROW_DEPTH) / 2;
-      const angle = (mid * Math.PI) / 180;
-      const label = onOverviewLayer(makeLabel(name, { height: 1.4 }));
-      label.position.set(r * Math.sin(angle), y + (level.rows / 2) * level.rise + 1.6, -BOWL_FOCUS_UPSTAGE + r * Math.cos(angle));
-      root.add(label);
-    });
-    radius += level.rows * ROW_DEPTH + (levelIndex === 0 ? 2.4 : 0);
-    y += level.rows * level.rise + (levelIndex === 0 ? 0.9 : 0);
-  });
-  const treadMesh = new Mesh(track(mergeGeometries(treads)), mat(0x3a3d45));
-  const riserMesh = new Mesh(track(mergeGeometries(risers)), mat(0x2d3037));
-  const backMesh = new Mesh(track(mergeGeometries(backs)), mat(0x5a2c2c));
-  treads.forEach((geometry) => geometry.dispose());
-  risers.forEach((geometry) => geometry.dispose());
-  backs.forEach((geometry) => geometry.dispose());
-  treadMesh.name = "bowl-treads";
-  root.add(treadMesh, riserMesh, backMesh);
+  const bowl = buildBowl(g.bowl, g.pitDepth, g.deckHeight);
+  root.add(bowl.root);
 
   // Catwalk at the camera position: walkway, rails and hangers. The camera sits on the stage-side
   // edge; an inverted mount hangs below the walkway instead.
@@ -306,11 +228,12 @@ export function buildVenue(g: VenueGeometry): VenueObjects {
   dseLabel.position.set(W / 2 + 2.2, 0.8, 0.4);
   root.add(dseLabel);
 
-  const extent = radius + BOWL_FOCUS_UPSTAGE;
+  const extent = bowl.extent;
   return {
     root,
     extent,
     dispose() {
+      bowl.dispose();
       root.traverse((child) => {
         if ((child as Mesh).isMesh || (child as { isSprite?: boolean }).isSprite) {
           const material = (child as Mesh).material as Material & { map?: CanvasTexture | null };

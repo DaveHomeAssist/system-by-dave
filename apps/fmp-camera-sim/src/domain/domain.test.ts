@@ -141,6 +141,7 @@ describe("venue geometry", () => {
       "Stage depth",
       "Distance basis",
       "Pan-zero heading",
+      "Bowl geometry",
     ]);
     for (const key of ["cameraToDse", "cameraHeight", "cameraLateral", "stageWidth", "stageDepth"] as const) {
       venue.dimensions[key].status = "measured";
@@ -148,7 +149,7 @@ describe("venue geometry", () => {
     venue.distanceBasis.status = "confirmed";
     venue.mount.status = "confirmed";
     venue.mount.headingEvidence.status = "confirmed";
-    expect(unsettledVenueItems(venue)).toEqual([]);
+    expect(unsettledVenueItems(venue)).toEqual(["Bowl geometry"]);
   });
 
   it("lays out nine stage marks in performer-facing directions", () => {

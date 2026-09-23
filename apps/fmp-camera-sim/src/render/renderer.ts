@@ -1,6 +1,8 @@
 import {
+  type Mesh,
   ACESFilmicToneMapping,
   AmbientLight,
+  Box3,
   Color,
   DirectionalLight,
   HemisphereLight,
@@ -24,7 +26,7 @@ import { makeLabel } from "./labels";
 
 export class WebGLUnavailableError extends Error {}
 
-export type OverviewPreset = "house" | "top" | "behind";
+export type OverviewPreset = "house" | "top" | "behind" | "side";
 
 export interface RenderCallbacks {
   onContextLost(): void;
@@ -35,6 +37,8 @@ export interface RenderCallbacks {
 type Triple = [number, number, number];
 
 export interface RenderDiagnostics {
+  bowlMaxTreadY?: number;
+  monitorHelperCount?: number;
   frames: number;
   monitorFrames: number;
   overviewFrames: number;
@@ -223,6 +227,7 @@ export class SceneRenderer {
       geometry.camera,
       geometry.mountOrientation,
       geometry.marks.length,
+      geometry.bowl,
     ]);
     if (key === this.venueKey) return;
     const first = this.venue === null;
@@ -238,15 +243,24 @@ export class SceneRenderer {
 
   setOverviewView(view: OverviewPreset, geometry: VenueGeometry): void {
     const camera = stageToWorld(geometry.camera);
-    const target = new Vector3(0, 0, -geometry.stageDepth * 0.35);
+    const bounds = this.venue ? new Box3().setFromObject(this.venue.root) : new Box3(new Vector3(-40, -2, -20), new Vector3(40, 20, 60));
+    const target = bounds.getCenter(new Vector3()), size = bounds.getSize(new Vector3());
+    this.controls.maxDistance = Math.max(400, size.length() * 3);
+    this.controls.maxPolarAngle = view === "side" ? Math.PI / 2 : Math.PI * 0.49;
+    const aspect = this.overviewCanvas.clientWidth / Math.max(1, this.overviewCanvas.clientHeight) || 1.6;
+    const tanV = Math.tan(this.overviewCamera.fov * Math.PI / 360), tanH = tanV * aspect;
     if (view === "top") {
-      this.overviewCamera.position.set(0.01, Math.max(70, (this.venue?.extent ?? 60) * 1.4), -geometry.stageDepth * 0.2 + 0.01);
-      target.set(0, 0, camera.z * 0.3 - geometry.stageDepth * 0.25);
+      const distance = (Math.max(size.x / (2 * tanH), size.z / (2 * tanV)) + size.y / 2) * 1.15;
+      this.overviewCamera.position.copy(target).add(new Vector3(0, distance, 0.001));
+    } else if (view === "side") {
+      const distance = (Math.max(size.z / (2 * tanH), size.y / (2 * tanV)) + size.x / 2) * 1.15;
+      this.overviewCamera.position.copy(target).add(new Vector3(distance, 0, 0));
     } else if (view === "behind") {
       this.overviewCamera.position.set(camera.x + 4, camera.y + 5, camera.z + 12);
       target.set(0, 1, -geometry.stageDepth * 0.3);
     } else {
-      this.overviewCamera.position.set(-38, 32, camera.z + 26);
+      const distance = size.length() / (2 * Math.sin(Math.atan(Math.min(tanV, tanH)))) * 1.1;
+      this.overviewCamera.position.copy(target).add(new Vector3(-0.7, 0.65, 1).normalize().multiplyScalar(distance));
     }
     this.controls.target.copy(target);
     this.controls.update();
@@ -280,7 +294,13 @@ export class SceneRenderer {
         this.recentIntervals[this.intervalIndex] = delta;
         this.intervalIndex = (this.intervalIndex + 1) % INTERVAL_WINDOW;
       }
-      // Judge nothing until the baseline has settled.
+      // Dense new venues can exceed the simulation catch-up guard before 30 frames arrive.
+      // Shed decorative detail promptly; keep timing and physical treads unchanged.
+      if (this.frameEma > 100 && this.quality < QUALITY.length - 1) {
+        this.quality = QUALITY.length - 1;
+        this.callbacks.onQualityChange(this.quality);
+      }
+      // Normal display-rate adaptation waits until the baseline has settled.
       if (this.recentIntervals.length < 30) {
         this.lastFrameTime = time;
         return;
@@ -320,6 +340,10 @@ export class SceneRenderer {
     this.trackPerformance(frameTimeMs);
     this.frameCount += 1;
     const q = QUALITY[this.quality];
+    this.venue?.root.getObjectByName("seating-bowl")?.traverse(child => {
+      if (child.name.startsWith("seat-detail")) child.visible = this.quality < 2;
+      if (child.name.startsWith("seat-reduced")) child.visible = this.quality >= 2;
+    });
 
     // One camera state drives the monitor, the modelled head and the cone.
     const { frame } = t;
@@ -361,7 +385,14 @@ export class SceneRenderer {
     );
     const axisLength = Math.hypot(...axis) || 1;
     this.p240.root.getWorldPosition(this.scratch);
+    const tread = this.venue?.root.getObjectByName("bowl-treads") as Mesh | undefined;
+    const positions = tread?.geometry.getAttribute("position");
+    let bowlMaxTreadY = -Infinity, monitorHelperCount = 0;
+    if (positions) for (let i = 0; i < positions.count; i++) bowlMaxTreadY = Math.max(bowlMaxTreadY, positions.getY(i));
+    this.scene.traverseVisible(child => { if (child.name.startsWith("label:") && child.layers.test(this.monitorCamera.layers)) monitorHelperCount++; });
+    for (const helper of [this.p240.root, this.cone.root]) helper.traverseVisible(child => { if (child.layers.test(this.monitorCamera.layers)) monitorHelperCount++; });
     this.diagnostics = {
+      bowlMaxTreadY, monitorHelperCount,
       frames: this.frameCount,
       monitorFrames: this.monitorFrames,
       overviewFrames: this.overviewFrames,

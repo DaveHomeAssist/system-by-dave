@@ -35,9 +35,9 @@ describe("per-property evidence", () => {
     const venue = defaultVenueProfile();
     Object.values(venue.dimensions).forEach((d) => { d.status = "measured"; });
     venue.distanceBasis.status = "confirmed";
-    expect(unsettledVenueItems(venue)).toEqual(["Pan-zero heading"]);
+    expect(unsettledVenueItems(venue)).toEqual(["Pan-zero heading", "Bowl geometry"]);
     venue.mount.headingEvidence.status = "measured";
-    expect(unsettledVenueItems(venue)).toEqual([]);
+    expect(unsettledVenueItems(venue)).toEqual(["Bowl geometry"]);
   });
 
   it("round-trips independent methods, source IDs and notes without upgrading confidence", () => {

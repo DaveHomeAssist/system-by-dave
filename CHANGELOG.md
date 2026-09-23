@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-23 — FMP sectional bowl and pitch inspector
+
+- Added versioned, evidence-tagged sectors and elevation control points with legacy defaults that preserve saved dimensions and presets.
+- Replaced seating strips with instanced teal seats, concrete treads, aisles and a box band; filled level transitions remain provisional.
+- Added a side-elevation inspector driven by the same solver as the scene, plus an overview-only Side elevation preset. Bowl uncertainty keeps the venue approximate.
+
 ## 2026-09-23 — FMP Camera 4 SDI transport correction
 
 - Published Dave's direct confirmation that the Camera 4 PTZ feeds ATEM Input 4 by SDI. The P240 reference no longer presents an NDI decoder as an unresolved alternative; intermediate cable landings, final patch and current signal format remain field checks.
