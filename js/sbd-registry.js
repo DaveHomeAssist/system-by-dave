@@ -108,6 +108,9 @@
 
   /* Shared shell assets every offline session needs. */
   var BASE_ASSETS=[
+    './av-suite-landing.html',
+    './css/av-landing.css',
+    './js/av-landing.js',
     './av-suite.html',
     './av-suite-worker.js',
     './css/av-suite.css',
@@ -231,7 +234,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool change — rolls the service-worker cache. */
-    version:'v20260923-led-wall-calculator',
+    version:'v20260923-led-wall-av-landing',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,

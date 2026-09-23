@@ -2,13 +2,15 @@
 
 `av-suite.html` is the stable AV by Dave route. It exposes two distinct,
 addressable workspaces without duplicating the route or the canonical tool
-registry.
+registry. The AV domain root `/` is a landing page with direct links to both.
 
 ## Entries
 
 - `av-suite.html?entry=show` opens **Show Console** for show-attached work.
 - `av-suite.html?entry=toolbox` opens **AV Toolbox** for show-independent tool
   discovery and launch.
+- `av-suite.html?entry=frontoffice` opens the addressable **Front Office**
+  roadmap panel. It does not save client or venue work.
 - A URL containing any supported `sbd*` show parameter always opens Show
   Console, even when `entry=toolbox` is also present.
 - A neutral URL uses the saved entry preference when one exists. A true first
@@ -25,7 +27,11 @@ application state and do not create separate indexable pages.
 Show Console retains the existing show profile, phase flow, readiness, Guided
 Setup, queue, and context-aware tool links. Its persistent show state remains in
 `av-suite-dashboard.v1`. Links launched from this workspace carry the current
-supported show parameters.
+supported show parameters. New profiles start without a show name. Guided Setup
+asks only for a name; the dashboard owns optional venue, date, operator, phase,
+pins and offline controls. Skipping setup is allowed, but unnamed profiles do
+not pass `sbdShow` to tools. The previous product-name default is treated as an
+empty legacy name on read; all other saved show data remains intact.
 
 ## AV Toolbox
 
