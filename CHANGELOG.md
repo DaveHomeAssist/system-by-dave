@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-09-23 — FMP Camera Simulator links
+
+- Publish the Camera Simulator reference on the FMP hub and Catwalk PTZ guide from canonical FMP-suite PR #23. Both links open the approximate venue trainer without controlling installed equipment.
+
 ## 2026-09-23 — FMP lawn and exterior
 
 - Add editable provisional lawn terrain, a continuous pavilion/concourse join, surface-following paths, fence and poles, and a Lawn overview preset.
