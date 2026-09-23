@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-09-23 — FMP LED wall presence evidence and phone header
+
+- Record the operator's report as evidence for the house LED walls: the two flanking walls are Confirmed present, the four lawn delay walls are Inferred (delay walls confirmed; count and positions unverified). Size and position stay Demo, saved sessions are untouched, and the pixel space and pitch records are unchanged.
+- Keep the phone header to two rows however wide the text renders: the title shares a row with Help and the theme toggle, both flags share one row, the monitor guides stay on one row, the breadcrumb's current page shortens with an ellipsis instead of clipping, and iOS text inflation is switched off. On an iPhone the flags had stacked, the crumb was cut and the joystick sat below the first screen. The browser probe now checks the phone header with wider text.
+
 ## 2026-09-23 — FMP Camera Simulator links
 
 - Publish the Camera Simulator reference on the FMP hub and Catwalk PTZ guide from canonical FMP-suite PR #23. Both links open the approximate venue trainer without controlling installed equipment.

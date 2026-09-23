@@ -63,6 +63,9 @@ body {
   height: 100%;
   background: var(--bg);
   color: var(--text);
+  /* Sizes below are tuned in px; stop iOS Safari inflating text on its own. */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
@@ -136,12 +139,18 @@ textarea {
 .sbd-site-return a {
   display: inline-flex;
   align-items: center;
+  flex: 0 0 auto;
   min-height: 44px;
   color: var(--text);
   font-weight: 600;
 }
 
+/* The current page is the only crumb allowed to give way: it shortens with an ellipsis before
+   the links do, so a narrow phone or wide-rendering text never clips the breadcrumb. */
 .sbd-site-return [aria-current="page"] {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
   color: var(--muted);
 }
 
@@ -1785,14 +1794,110 @@ button:disabled {
   box-shadow: var(--shadow);
 }
 
-/* Phone: one section at a time, chosen from the bottom rail. */
+/* Phone: one section at a time, chosen from the bottom rail. The bar keeps exactly two rows
+   however wide the text renders (iOS draws it wider than desktop browsers): the title shares
+   its row with Help and the theme toggle, and both flags share the row below it. */
 .sim-app[data-layout="phone"] .sim-bar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "title actions"
+    "flags flags";
+  align-items: center;
   padding: 6px 10px;
   gap: 6px 10px;
 }
 
+.sim-app[data-layout="phone"] .sim-title {
+  grid-area: title;
+  min-width: 0;
+}
+
+.sim-app[data-layout="phone"] .sim-title h1 {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .sim-app[data-layout="phone"] .sim-title p {
   display: none;
+}
+
+.sim-app[data-layout="phone"] .sim-actions {
+  grid-area: actions;
+  margin-left: 0;
+  flex-wrap: nowrap;
+}
+
+.sim-app[data-layout="phone"] .sim-actions .tool-button {
+  padding: 6px 10px;
+  font-size: 13px;
+}
+
+.sim-app[data-layout="phone"] .sim-flags {
+  grid-area: flags;
+  min-width: 0;
+}
+
+/* Two flags fill one row; a third (exercise running) takes the next row on its own. */
+.sim-app[data-layout="phone"] .flag {
+  flex: 1 1 calc(50% - 4px);
+  min-width: 0;
+  justify-content: center;
+  padding: 4px 6px;
+  font-size: 12px;
+}
+
+.sim-app[data-layout="phone"] .flag-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sim-app[data-layout="phone"] .flag-count {
+  padding: 0 5px;
+}
+
+/* Panel tools tighten up on phones. The monitor's guides and Expand never wrap: the buttons share
+   the row, Expand uses its short label, and a label only shortens with an ellipsis as the last
+   resort. Fonts on iOS and Linux both draw this text wider than desktop Chromium does. */
+.sim-app[data-layout="phone"] .panel-tools {
+  gap: 4px;
+}
+
+.sim-app[data-layout="phone"] .panel-tools .tool-button {
+  padding: 4px 8px;
+  font-size: 12px;
+}
+
+.sim-app[data-layout="phone"] .monitor-panel .panel-tools {
+  flex-wrap: nowrap;
+  width: 100%;
+}
+
+.sim-app[data-layout="phone"] .monitor-panel .panel-tools .tool-button {
+  flex: 1 1 auto;
+  min-width: 44px;
+  padding: 4px 6px;
+}
+
+.sim-app[data-layout="phone"] .monitor-panel .tool-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.label-short {
+  display: none;
+}
+
+.sim-app[data-layout="phone"] .label-long {
+  display: none;
+}
+
+.sim-app[data-layout="phone"] .label-short {
+  display: inline;
 }
 
 .sim-app[data-layout="phone"] .sim-workspace {
