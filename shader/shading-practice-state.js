@@ -783,6 +783,24 @@
     return result;
   }
 
+  // Picture-only frames at display resolution, cached like analyses. Scopes
+  // and scores use analyzeCamera, so every trace matches the scored values.
+  const frameCache = new Map();
+  const FRAME_CACHE_LIMIT = 12;
+  function pictureFrame(input, cameraId, options = {}) {
+    const state = normalizeState(input);
+    const camera = getCamera(state, cameraId);
+    const width = Math.round(clamp(options.width || 64, 16, 160));
+    const height = Math.round(clamp(options.height || 36, 9, 90));
+    const key = [state.seed, camera.id, width, height, JSON.stringify(camera.controls), JSON.stringify(camera.source)].join('\u0000');
+    const cached = frameCache.get(key);
+    if (cached) return cached;
+    const frame = generateFrame(state, camera.id, { width, height });
+    frameCache.set(key, frame);
+    if (frameCache.size > FRAME_CACHE_LIMIT) frameCache.delete(frameCache.keys().next().value);
+    return frame;
+  }
+
   function difference(a, b) {
     return Math.abs(a - b);
   }
@@ -1319,7 +1337,7 @@
     SCOPE_LAYOUTS: [...SCOPE_LAYOUTS], LIMITS, PASS_RULE, CONTROL_LIMITS, DEFAULT_CONTROLS, CONTROL_LABELS, CONTROL_INFO,
     OBJECTIVE_CONTROLS, SCENARIOS, TROUBLESHOOTING, DEMO_SWEEPS, WORKFLOW,
     createPracticeState, normalizeState, normalizeControls, getCamera, applyIntent, injectTrouble, revertInjection,
-    generateFrame, analyzeCamera, evaluatePractice, exportPracticeJSON, importPracticeJSON, scenarioList, troubleshootingList,
+    generateFrame, pictureFrame, analyzeCamera, evaluatePractice, exportPracticeJSON, importPracticeJSON, scenarioList, troubleshootingList,
     hashSeed, seededUnit, lumaOf, formatControl, controlsPair, withControls, startControls, bandFor, progressBands,
     exerciseStatus, nextCorrection, debriefPractice, signalAlerts, workflowSteps, comparisonSources, demoStepModified
   });

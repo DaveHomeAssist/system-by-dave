@@ -113,7 +113,10 @@
   const cameraLabel = id => (id === 'camera-a' ? 'Camera A' : 'Camera B');
   const cameraShort = id => (id === 'camera-a' ? 'CAM A' : 'CAM B');
   const formatValue = (name, value, options) => Practice.formatControl(name, value, options);
-  const displayAnalysis = (sourceState, cameraId) => Practice.analyzeCamera(sourceState, cameraId, DISPLAY);
+  // Pictures render from a sharper display frame; scopes draw the scoring
+  // analysis itself, so traces and readouts always agree.
+  const pictureOf = (sourceState, cameraId) => Practice.pictureFrame(sourceState, cameraId, DISPLAY);
+  const scopeAnalysis = (sourceState, cameraId) => Practice.analyzeCamera(sourceState, cameraId);
   const scoringMetrics = (sourceState, cameraId) => Practice.analyzeCamera(sourceState, cameraId).metrics;
   const isTyping = target => Boolean(target && target.matches && target.matches('input[type="text"], textarea, select'));
 
@@ -943,9 +946,12 @@
     document.querySelectorAll('[data-camera-switch]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.cameraSwitch === camera.id)));
     els.camDotA.dataset.tally = scenario.referenceCameraId === 'camera-a' ? 'pgm' : 'pvw';
     els.camDotB.dataset.tally = scenario.referenceCameraId === 'camera-b' ? 'pgm' : 'pvw';
-    const roleText = id => (id === scenario.referenceCameraId ? 'REF · LOCKED · SIM PGM' : `${state.demo ? 'DEMO' : 'TGT'} · ADJUST · SIM PVW`);
+    const roleText = id => (id === scenario.referenceCameraId ? 'REF · LOCKED' : `${state.demo ? 'DEMO' : 'TGT'} · ADJUST`);
+    const tallyText = id => (id === scenario.referenceCameraId ? ', on simulated program' : ', on simulated preview');
     setText(els.camRoleA, roleText('camera-a'));
     setText(els.camRoleB, roleText('camera-b'));
+    setText(els.camTallyA, tallyText('camera-a'));
+    setText(els.camTallyB, tallyText('camera-b'));
     const locked = !canAdjustSelected();
     const adjustable = adjustableCameraId();
     const target = locked
@@ -1020,7 +1026,7 @@
     const suffix = slot === 'left' ? 'A' : 'B';
     const figure = slot === 'left' ? els.monitorLeft : els.monitorRight;
     const canvas = byId(`cameraCanvas${suffix}`);
-    const analysis = displayAnalysis(source.state, source.cameraId);
+    const analysis = pictureOf(source.state, source.cameraId);
     const metrics = scoringMetrics(source.state, source.cameraId);
     const labels = roleLabels(source, sources);
     const scenario = scenarioOf(state);
@@ -1071,7 +1077,7 @@
       if (document.activeElement !== els.wipeInput) els.wipeInput.value = String(Math.round(state.view.wipe * 100));
       els.wipeInput.setAttribute('aria-valuetext', `${Math.round(state.view.wipe * 100)} percent reference on the left`);
       els.wipeCanvas.setAttribute('aria-label', `Wipe comparison: ${left.spoken} on the left, ${right.spoken} on the right.`);
-      const drawn = Render.drawWipe(els.wipeCanvas, displayAnalysis(sources.left.state, sources.left.cameraId), displayAnalysis(sources.right.state, sources.right.cameraId), state.view.wipe);
+      const drawn = Render.drawWipe(els.wipeCanvas, pictureOf(sources.left.state, sources.left.cameraId), pictureOf(sources.right.state, sources.right.cameraId), state.view.wipe);
       if (!drawn && !Render.canvasAvailable()) { ui.canvasOk = false; showCanvasFallback(els.wipeCanvas, 'The wipe needs canvas, which this browser blocked.'); }
     }
     layout.slots.forEach(([slot, source]) => renderMonitor(slot, source, sources));
@@ -1128,8 +1134,8 @@
   function scopeSeries(sources) {
     const series = [];
     const compare = ui.blinking ? 'side' : state.view.compare;
-    if (compare !== 'target') series.push({ slot: 0, source: sources.left, analysis: displayAnalysis(sources.left.state, sources.left.cameraId), metrics: scoringMetrics(sources.left.state, sources.left.cameraId) });
-    if (compare !== 'reference') series.push({ slot: 1, source: sources.right, analysis: displayAnalysis(sources.right.state, sources.right.cameraId), metrics: scoringMetrics(sources.right.state, sources.right.cameraId) });
+    if (compare !== 'target') series.push({ slot: 0, source: sources.left, analysis: scopeAnalysis(sources.left.state, sources.left.cameraId), metrics: scoringMetrics(sources.left.state, sources.left.cameraId) });
+    if (compare !== 'reference') series.push({ slot: 1, source: sources.right, analysis: scopeAnalysis(sources.right.state, sources.right.cameraId), metrics: scoringMetrics(sources.right.state, sources.right.cameraId) });
     return series;
   }
 
