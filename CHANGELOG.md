@@ -6,6 +6,11 @@
 - Added a locally hosted illustration atlas and a reduced-motion-aware GSAP card entrance; no new runtime package or external image host is required.
 - Prioritized daily AV operation, then references, Notion, labs, and games/trackers; titles now show only the product name, the filter count shows visible projects out of 33, and the full AV Toolbox link sits below the grid.
 - Added distinct artwork for NoteForge, Ballpark Scorecard, Festival Atlas, Phillies Wire, Davai, and Tailscale Manual; only the first 12 visible cards animate on entry.
+## 2026-09-23 — AV by Dave show-first landing alternative
+
+- Published the supplied control-room concept at `/av-suite-landing2.html` as a noindex alternative while preserving the current `/` landing. Linked the two views in both directions and kept direct Show Console, AV Toolbox, docs, and quick-tool routes.
+- Refined the alternative for desktop and phone, added a visible light/dark control sharing the AV theme preference, and marked the multiview's sample statuses as illustrative. Removed stale tool-count and all-tools-share-context claims.
+- Added the alternative page and its assets to the AV offline cache and domain-site staging contract.
 
 ## 2026-09-23 — FMP Camera Simulator v1
 

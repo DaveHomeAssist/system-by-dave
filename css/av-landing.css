@@ -34,6 +34,8 @@ h1 em{font-weight:400;color:var(--av-accent)}
 .button.secondary{color:var(--av-accent);background:var(--av-surface)}
 .button:hover{filter:brightness(.94)}
 .button:active,.quick-card:active,.text-link:active,.resume:active{transform:translateY(1px)}
+.alternate-link{min-height:44px;display:inline-flex;align-items:center;gap:8px;margin-top:13px;color:var(--av-accent);font-size:14px;font-weight:800;text-underline-offset:4px}
+.alternate-link:hover{color:var(--av-accent-strong)}
 .path-explain{display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:620px;margin-top:24px;color:var(--av-muted);font-size:14px}
 .path-explain p{border-left:2px solid var(--av-line-strong);padding-left:12px;margin:0}
 .path-explain strong{display:block;color:var(--av-text);margin-bottom:3px}

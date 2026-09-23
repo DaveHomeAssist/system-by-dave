@@ -111,6 +111,9 @@
     './av-suite-landing.html',
     './css/av-landing.css',
     './js/av-landing.js',
+    './av-suite-landing2.html',
+    './css/av-landing-alt.css',
+    './js/av-landing-alt.js',
     './av-suite.html',
     './av-suite-worker.js',
     './css/av-suite.css',
@@ -234,7 +237,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool change — rolls the service-worker cache. */
-    version:'v20260923-led-wall-av-landing',
+    version:'v20260923-av-landing-alt',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,
