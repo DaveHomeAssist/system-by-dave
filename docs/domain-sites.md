@@ -9,7 +9,7 @@ GitHub Pages repository.
 | --- | --- | --- | --- | --- |
 | `housevideo` | housevideo.app | `DaveHomeAssist/housevideo` | `/fmp/` and its routes, the `/fmp-index/` redirect, `/switcher/` and its routes, `/shader/`, `/ursa-broadcast-g2/`, `/backfocus/`, `/camera-sim/` | 2026-09-18 |
 | `housevideo-walk` | walk.housevideo.app | `DaveHomeAssist/housevideo-walk` | `/fmpwalk/` and the `/fmp-walk/` redirect | Gated release; see cutover checklist |
-| `avbydave` | avbydave.com | `DaveHomeAssist/avbydave` | Landing at `/`, noindex show-first alternative at `/av-suite-landing2.html`, `av-suite.html`, every registry tool and offline page (including `plotforge.html`), `av-workbook.html`, `av-tool-suite/` | 2026-09-18 |
+| `avbydave` | avbydave.com | `DaveHomeAssist/avbydave` | Show-first landing at `/`, previous noindex landing at `/av-suite-landing.html`, `av-suite.html`, every registry tool and offline page (including `plotforge.html`), `av-workbook.html`, `av-tool-suite/` | 2026-09-18 |
 
 `scripts/domain-sites.json` owns this list, each site's home route, robots rules
 and the browser storage its tools own. AV by Dave pages come from
@@ -17,10 +17,10 @@ and the browser storage its tools own. AV by Dave pages come from
 avbydave.com without editing the config. Paths are unchanged on the new domains:
 `systembydave.com/fmp/house/` is `housevideo.app/fmp/house/`. The bare domain
 redirects to the site's home (`/fmp/` or `/fmpwalk/`). AV by Dave serves the
-source-controlled `av-suite-landing.html` at `/`; the direct source path is
-noindex and canonical to `/`. The linked `av-suite-landing2.html` alternative is
-also noindex and canonical to `/`; it retains direct Show Console and Toolbox
-routes and is cached with the AV shell for offline return visits.
+source-controlled `av-suite-landing2.html` at `/`; the direct source path is
+noindex and canonical to `/`. The previous `av-suite-landing.html` is also
+noindex and canonical to `/`. Both retain direct Show Console and Toolbox
+routes and are cached with the AV shell for offline return visits.
 
 The proposed cutover gives the preshow walk its own origin. Existing hub links
 still open the walk explicitly. `housevideo.app/fmpwalk/`
@@ -114,6 +114,16 @@ Browsers keep saved data per origin, so tool data saved on a previous origin is
 not visible on the new domain. A stub checks for the site's keys and IndexedDB
 databases (`storage` in the config; AV by Dave also includes every registry
 storage key). With none, it redirects immediately. Otherwise it offers:
+
+AV by Dave's explicit database list includes `PixelForge` and AV Workbook's
+`system-by-dave-av-workbook` Dexie store. The Workbook active and fallback
+local-storage keys come from the registry. The transfer is a one-time,
+operator-confirmed copy, not a shared cross-origin show record; an existing
+destination record remains authoritative until the operator reviews it.
+The AV transfer decision is at revision 2 so browsers that completed or skipped
+the earlier policy are offered the newly inventoried Workbook store on a return
+visit. No source record is deleted; repeated imports keep existing destination
+records.
 
 - **Move my data and continue**: opens `transfer.html` on the new domain as a
   popup, which announces itself to its opener; the stub sends the data by
@@ -218,6 +228,9 @@ includes clean and upgrade visits, binary IndexedDB records, retained source
 copies, duplicate backup imports, interrupted transfers, storage read/write
 failures, incompatible databases, invalid backups, history, all published pages,
 absolute home links, and every registry-declared offline AV asset and HTML page.
+The AV Workbook scenario also checks its actual `workbooks` store schema,
+source/patch/line-check fields, problem note, backup import, and preservation
+of a newer destination edit using synthetic data.
 
 Offline acceptance applies to the AV registry's declared offline pages. The FMP
 suite remains online-only under `docs/fmp-public-release.md`; no protected API

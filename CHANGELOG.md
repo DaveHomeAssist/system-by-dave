@@ -6,6 +6,22 @@
 - Replaced seating strips with instanced teal seats, concrete treads, aisles and a box band; filled level transitions remain provisional.
 - Added a side-elevation inspector driven by the same solver as the scene, plus an overview-only Side elevation preset. Bowl uncertainty keeps the venue approximate.
 
+## 2026-09-23 — AV consolidation Stage 0 transfer safety
+
+- Added AV Workbook's IndexedDB database to the confirmed domain transfer policy, alongside its existing registry-declared active and fallback keys. Versioned the transfer decision so older completed or skipped moves can offer the newly inventoried data.
+- Added synthetic browser coverage for workbook fields, source retention, backup recovery, repeat imports, and a newer destination edit. Recorded the current 45-tool registry baseline and remaining Stage 0 gates without retiring routes.
+
+## 2026-09-23 — LED wall viewport workspace
+
+- Moved the live cabinet preview ahead of settings, enlarged its isometric depth, and kept the planner within the browser viewport. Settings and detailed results scroll within their panels; the compact mobile navigation remains visible.
+- Refreshed the AV offline cache so the new layout reaches existing installs without changing calculator values or saved profiles.
+- Kept the page layout bootstrap in the navigation response so an existing service worker client gets the viewport layout on reload even when its shared CSS and JavaScript are still cached.
+
+## 2026-09-23 — Show-first AV landing promoted to home
+
+- Published the reviewed show-first landing as `avbydave.com/`, keeping the previous landing at its noindex direct route and the Show Console/Toolbox doorway unchanged.
+- Updated navigation, page metadata, and the offline home fallback to match the new root; refreshed the shared AV offline cache version.
+
 ## 2026-09-23 — FMP Camera 4 SDI transport correction
 
 - Published Dave's direct confirmation that the Camera 4 PTZ feeds ATEM Input 4 by SDI. The P240 reference no longer presents an NDI decoder as an unresolved alternative; intermediate cable landings, final patch and current signal format remain field checks.
