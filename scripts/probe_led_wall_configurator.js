@@ -121,7 +121,7 @@ async function main() {
     await cdp('Page.enable');
     await cdp('Runtime.enable');
     await cdp('Emulation.setDeviceMetricsOverride', { width: 1280, height: 900, deviceScaleFactor: 1, mobile: false });
-    await cdp('Page.navigate', { url: new URL('av-calculator.html', baseUrl).href });
+    await cdp('Page.navigate', { url: new URL('led-wall-calculator.html', baseUrl).href });
     await delay(1000);
 
     await scenario('default cabinet layout', [], {
@@ -223,23 +223,10 @@ async function main() {
       result.resetStatus = document.getElementById('actionStatus').textContent;
       return result;
     })()`);
-    if (boundaryResult.pitch !== '2.9' || boundaryResult.width !== '1' || boundaryResult.height !== '10000' || !boundaryResult.resetStatus.includes('Calculator reset')) {
+    if (boundaryResult.pitch !== '2.9' || boundaryResult.width !== '1' || boundaryResult.height !== '10000' || !boundaryResult.resetStatus.includes('LED planner reset')) {
       throw new Error(`Numeric boundary or reset normalization failed: ${JSON.stringify(boundaryResult)}.`);
     }
     console.log('PASS blank, below-minimum, above-maximum, and reset behavior');
-
-    const handoffResult = await evaluate(`(() => {
-      document.getElementById('sendLedTypicalPowerBtn').click();
-      const state = JSON.parse(localStorage.getItem('avCalculator.v1'));
-      return { method: state.powerMethod, count: state.deviceCount, powerFactor: state.powerFactor,
-        totalAmps: document.getElementById('totalAmps').textContent.trim(),
-        warning: document.getElementById('verificationWarning').textContent.trim() };
-    })()`);
-    if (handoffResult.method !== 'watts' || handoffResult.count !== 1 || handoffResult.powerFactor !== 0 || handoffResult.totalAmps !== '—') {
-      throw new Error(`Power Load handoff failed safe: ${JSON.stringify(handoffResult)}.`);
-    }
-    if (!handoffResult.warning.includes('Field verification required')) throw new Error('Persistent verification warning was overwritten.');
-    console.log('PASS Power Load handoff requires manufacturer power factor');
 
     const accessibility = await evaluate(`(() => {
       const controls = Array.from(document.querySelectorAll('#ledWallConfigurator input, #ledWallConfigurator select, #ledWallConfigurator button'))
@@ -262,6 +249,93 @@ async function main() {
     }
     if (!accessibility.disclaimer.includes('actual product documentation')) throw new Error('Persistent LED verification disclaimer is missing.');
     console.log('PASS accessibility and persistent-warning smoke checks');
+
+    const ledBeforeHandoff = await evaluate(`(() => {
+      document.getElementById('sendLedTypicalPowerBtn').click();
+      const state = JSON.parse(localStorage.getItem('avCalculator.v1'));
+      return { method: state.powerMethod, count: state.deviceCount, powerFactor: state.powerFactor,
+        watts: state.deviceWatts, ledPitch: state.ledPitchMm };
+    })()`);
+    if (ledBeforeHandoff.method !== 'watts' || ledBeforeHandoff.count !== 1 || ledBeforeHandoff.powerFactor !== 0 || ledBeforeHandoff.watts !== 2600) {
+      throw new Error(`Power Load handoff storage failed safe: ${JSON.stringify(ledBeforeHandoff)}.`);
+    }
+    let reachedPowerLoad = false;
+    for (let attempt = 0; attempt < 20; attempt += 1) {
+      try {
+        reachedPowerLoad = await evaluate("location.pathname.endsWith('/av-calculator.html') && !!document.getElementById('powerMethod')");
+      } catch (error) {
+        // The previous page's execution context is being replaced.
+      }
+      if (reachedPowerLoad) break;
+      await delay(150);
+    }
+    if (!reachedPowerLoad) throw new Error('Power Load handoff did not navigate to the quick calculator.');
+    const handoffResult = await evaluate(`(() => {
+      const state = JSON.parse(localStorage.getItem('avCalculator.v1'));
+      return { path: location.pathname, hash: location.hash, method: document.getElementById('powerMethod').value,
+        watts: document.getElementById('deviceWatts').value, totalAmps: document.getElementById('totalAmps').textContent.trim(),
+        warning: document.getElementById('verificationWarning').textContent.trim(), ledPitch: state.ledPitchMm };
+    })()`);
+    if (!handoffResult.path.endsWith('/av-calculator.html') || handoffResult.hash !== '#powerCard' || handoffResult.method !== 'watts' || handoffResult.watts !== '2600' || handoffResult.totalAmps !== '—' || handoffResult.ledPitch !== ledBeforeHandoff.ledPitch) {
+      throw new Error(`Cross-page Power Load handoff failed safe: ${JSON.stringify(handoffResult)}.`);
+    }
+    if (!handoffResult.warning.includes('Field verification required')) throw new Error('Persistent verification warning was overwritten.');
+    console.log('PASS cross-page Power Load handoff requires manufacturer power factor');
+
+    const quick = await evaluate(`(() => {
+      const text = (id) => document.getElementById(id).textContent.trim();
+      const initial = {
+        delay: text('delayMs'), projection: text('idealThrow'), storage: text('totalStorage'),
+        watts: text('totalWatts'), current: text('totalAmps'), drop: text('voltageDrop'),
+        spl: text('splOut'), summary: text('summaryOutput')
+      };
+      const set = (id, value) => {
+        const field = document.getElementById(id);
+        field.value = value;
+        field.dispatchEvent(new Event(field.tagName === 'SELECT' ? 'change' : 'input', { bubbles: true }));
+      };
+      set('delayDistance', '100');
+      set('screenWidth', '20');
+      set('bitrate', '100');
+      set('powerFactor', '0.8');
+      set('dropLength', '200');
+      set('splTargetDist', '6');
+      const changed = {
+        delay: text('delayMs'), projection: text('idealThrow'), storage: text('totalStorage'),
+        current: text('totalAmps'), drop: text('voltageDrop'), spl: text('splOut')
+      };
+      const state = JSON.parse(localStorage.getItem('avCalculator.v1'));
+      return { initial, changed, ledPitch: state.ledPitchMm };
+    })()`);
+    if (quick.initial.delay !== '63.9 ms' || quick.initial.projection !== '24.0 ft' || quick.initial.storage !== '162.0 GB'
+      || quick.initial.watts !== '—' || quick.initial.current !== '—' || quick.initial.drop !== '2.40 V'
+      || quick.initial.spl !== '75.6 dB' || quick.initial.summary.includes('LED wall:')
+      || quick.changed.delay !== '88.8 ms' || quick.changed.projection !== '30.0 ft'
+      || quick.changed.storage !== '324.0 GB' || quick.changed.current !== '~27.08 A'
+      || quick.changed.drop !== '4.80 V' || quick.changed.spl !== '94.0 dB' || quick.ledPitch !== ledBeforeHandoff.ledPitch) {
+      throw new Error(`Quick calculator regression failed: ${JSON.stringify(quick)}.`);
+    }
+    console.log('PASS all six quick calculators and separate operator summary');
+
+    await cdp('Page.reload');
+    await delay(500);
+    const persisted = await evaluate(`(() => ({
+      delay: document.getElementById('delayDistance').value,
+      current: document.getElementById('totalAmps').textContent.trim(),
+      ledPitch: JSON.parse(localStorage.getItem('avCalculator.v1')).ledPitchMm
+    }))()`);
+    if (persisted.delay !== '100' || persisted.current !== '~27.08 A' || persisted.ledPitch !== ledBeforeHandoff.ledPitch) {
+      throw new Error(`Quick calculator reload lost saved values: ${JSON.stringify(persisted)}.`);
+    }
+    const reset = await evaluate(`(() => {
+      document.getElementById('resetBtn').click();
+      const state = JSON.parse(localStorage.getItem('avCalculator.v1'));
+      return { delay: document.getElementById('delayDistance').value, ledPitch: state.ledPitchMm };
+    })()`);
+    if (reset.delay !== '72' || reset.ledPitch !== ledBeforeHandoff.ledPitch) {
+      throw new Error(`Quick reset erased LED state: ${JSON.stringify(reset)}.`);
+    }
+    console.log('PASS reload and reset preserve independent calculator values');
 
     if (exceptions.length) throw new Error(`Runtime exceptions: ${exceptions.join('; ')}`);
     socket.close();

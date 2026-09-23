@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en" data-av-theme="system" data-av-tool="led-wall-calculator">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'none'">
+<title>LED Wall Calculator | AV by Dave</title>
+<meta name="robots" content="index,follow">
+<meta name="description" content="A cabinet-aware LED wall planner for geometry, native raster, content fit, data ports, power, and viewing distance.">
+<link rel="canonical" href="https://avbydave.com/led-wall-calculator.html">
+<meta name="theme-color" content="#EEE8DF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0C1016" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="AV by Dave">
+<meta property="og:title" content="LED Wall Calculator">
+<meta property="og:description" content="A cabinet-aware LED wall planner for geometry, native raster, content fit, data ports, power, and viewing distance.">
+<meta property="og:url" content="https://avbydave.com/led-wall-calculator.html">
+<meta property="og:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<meta property="og:image:width" content="1024">
+<meta property="og:image:height" content="412">
+<meta property="og:image:alt" content="System by Dave preview banner">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="LED Wall Calculator">
+<meta name="twitter:description" content="A cabinet-aware LED wall planner for geometry, native raster, content fit, data ports, power, and viewing distance.">
+<meta name="twitter:image" content="https://systembydave.com/img/card-cover-banner-wide.png">
+<link rel="icon" href="svg/system_by_dave_logo_rust.svg" type="image/svg+xml">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="profile/assets/apple-touch-icon.png">
+<link rel="stylesheet" href="css/av-calculator.css">
+<link rel="stylesheet" href="css/sbd-public-nav.css">
+<link rel="stylesheet" href="css/av-theme.css">
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to LED wall planner</a>
+<noscript><div class="noscript">JavaScript is off, so calculations are unavailable.</div></noscript>
+<div class="app">
+  <header class="topbar">
+    <a class="brand" href="av-suite.html" aria-label="AV Suite home">
+      <span class="brand-mark">S</span>
+      <span class="brand-text"><strong>LED Wall Calculator</strong><span>AV by Dave planning tools</span></span>
+    </a>
+    <div class="top-actions" aria-label="Related tools">
+      <a class="top-link" href="av-calculator.html">Quick Calculators</a>
+      <a class="top-link" href="av-suite.html">AV Suite</a>
+      <button type="button" class="theme-toggle" id="themeToggle">Dark mode</button>
+    </div>
+  </header>
+  <main id="main-content">
+    <section class="hero" aria-label="LED wall planner overview">
+      <div class="hero-copy">
+        <p class="eyebrow">Video engineering · field planning</p>
+        <h1>LED wall calculator</h1>
+        <p>Plan a build from actual cabinet dimensions and pixel counts. Compare wall raster with content, estimate processor ports and electrical demand, and carry the result into Power Load.</p>
+        <ul class="hero-signals" aria-label="Planner capabilities"><li>Cabinet aware</li><li>Live build map</li><li>Saved profiles</li></ul>
+      </div>
+      <div class="hero-actions">
+        <a class="button-link" href="av-calculator.html">Quick calculators</a>
+        <button type="button" id="resetBtn">Reset LED plan</button>
+      </div>
+    </section>
+    <section class="led-page-status" aria-label="Planner status">
+      <span id="saveStatus">Saved</span>
+      <div id="actionStatus" role="status" aria-live="polite" aria-atomic="true"></div>
+    </section>
+
+    <section class="led-suite" id="ledWallConfigurator" aria-labelledby="ledWallTitle">
+      <div class="led-suite-head">
+        <div class="led-suite-title">
+          <p class="led-suite-kicker">Advanced planning suite · cabinet aware</p>
+          <h2 id="ledWallTitle">LED Wall Configurator</h2>
+          <p>Turn an LED cabinet profile and deployment goal into buildable geometry, native raster, content-fit guidance, NovaStar port estimates, viewing distance, and separated typical and maximum power plans.</p>
+        </div>
+        <div class="led-suite-actions" aria-label="LED wall configuration actions">
+          <button type="button" id="saveLedPresetBtn">Save Preset</button>
+          <button type="button" class="primary" id="copyLedSummaryBtn">Copy LED Summary</button>
+          <button type="button" id="downloadLedSummaryBtn">Download TXT</button>
+        </div>
+      </div>
+
+      <div class="led-input-grid">
+        <fieldset class="led-module">
+          <legend>Product / Cabinet Profile</legend>
+          <div class="led-module-fields">
+            <div class="field full">
+              <label for="ledProfileSelect">Saved Profile</label>
+              <select id="ledProfileSelect">
+                <option value="">Current custom profile</option>
+              </select>
+            </div>
+            <div class="field full">
+              <label for="ledProductName">Product / Profile Name</label>
+              <input id="ledProductName" data-key="ledProductName" data-kind="text" type="text" maxlength="80" value="Custom P2.9 500 mm" autocomplete="off">
+            </div>
+            <div class="field">
+              <label for="ledPitchMm">Pixel Pitch Mm</label>
+              <input id="ledPitchMm" data-key="ledPitchMm" type="number" min="0.1" max="50" step="0.01" value="2.9" inputmode="decimal" aria-describedby="ledAssumption">
+            </div>
+            <div class="field">
+              <label for="ledCabinetRotation">Cabinet Rotation</label>
+              <select id="ledCabinetRotation" data-key="ledCabinetRotation">
+                <option value="0" selected>0 degrees</option>
+                <option value="90">90 degrees</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="ledCabinetWidthMm">Cabinet Width Mm</label>
+              <input id="ledCabinetWidthMm" data-key="ledCabinetWidthMm" type="number" min="1" max="10000" step="0.1" value="500" inputmode="decimal">
+            </div>
+            <div class="field">
+              <label for="ledCabinetHeightMm">Cabinet Height Mm</label>
+              <input id="ledCabinetHeightMm" data-key="ledCabinetHeightMm" type="number" min="1" max="10000" step="0.1" value="500" inputmode="decimal">
+            </div>
+            <div class="field">
+              <label for="ledCabinetPixelsWide">Cabinet Width Px</label>
+              <input id="ledCabinetPixelsWide" data-key="ledCabinetPixelsWide" data-optional="true" type="number" min="1" max="10000" step="1" value="172" placeholder="Derive from pitch" inputmode="numeric">
+            </div>
+            <div class="field">
+              <label for="ledCabinetPixelsHigh">Cabinet Height Px</label>
+              <input id="ledCabinetPixelsHigh" data-key="ledCabinetPixelsHigh" data-optional="true" type="number" min="1" max="10000" step="1" value="172" placeholder="Derive from pitch" inputmode="numeric">
+            </div>
+            <p class="field-note full">When both raster fields are entered, they are authoritative and pitch is a validation check. Leave both blank to derive cabinet pixels from dimensions ÷ pitch.</p>
+          </div>
+        </fieldset>
+
+        <fieldset class="led-module">
+          <legend>Layout</legend>
+          <div class="led-module-fields">
+            <div class="field full">
+              <label for="ledMode">Planning Mode</label>
+              <select id="ledMode" data-key="ledMode">
+                <option value="layout" selected>Cabinet Layout</option>
+                <option value="targetSize">Target Physical Size</option>
+                <option value="targetRaster">Target Raster</option>
+                <option value="custom">Custom Panel Layout</option>
+              </select>
+            </div>
+            <div class="led-mode-fields led-module-fields full" id="ledLayoutFields">
+              <div class="field">
+                <label for="ledCabinetsWide">Cabinets Wide</label>
+                <input id="ledCabinetsWide" data-key="ledCabinetsWide" type="number" min="1" max="1000" step="1" value="8" inputmode="numeric">
+              </div>
+              <div class="field">
+                <label for="ledCabinetsHigh">Cabinets High</label>
+                <input id="ledCabinetsHigh" data-key="ledCabinetsHigh" type="number" min="1" max="1000" step="1" value="5" inputmode="numeric">
+              </div>
+            </div>
+            <div class="led-mode-fields led-module-fields full" id="ledTargetSizeFields" hidden>
+              <div class="field">
+                <label for="ledTargetWidthFt">Target Width Ft</label>
+                <input id="ledTargetWidthFt" data-key="ledTargetWidthFt" type="number" min="0.1" max="10000" step="0.1" value="16" inputmode="decimal" disabled>
+              </div>
+              <div class="field">
+                <label for="ledTargetHeightFt">Target Height Ft</label>
+                <input id="ledTargetHeightFt" data-key="ledTargetHeightFt" type="number" min="0.1" max="10000" step="0.1" value="9" inputmode="decimal" disabled>
+              </div>
+            </div>
+            <div class="led-mode-fields led-module-fields full" id="ledTargetRasterFields" hidden>
+              <div class="field">
+                <label for="ledTargetWidthPx">Target Width Px</label>
+                <input id="ledTargetWidthPx" data-key="ledTargetWidthPx" type="number" min="1" max="1000000" step="1" value="1920" inputmode="numeric" disabled>
+              </div>
+              <div class="field">
+                <label for="ledTargetHeightPx">Target Height Px</label>
+                <input id="ledTargetHeightPx" data-key="ledTargetHeightPx" type="number" min="1" max="1000000" step="1" value="1080" inputmode="numeric" disabled>
+              </div>
+            </div>
+            <p class="field-note full" id="ledModeNote">Cabinet layout uses the entered whole-cabinet array directly.</p>
+          </div>
+        </fieldset>
+
+        <fieldset class="led-module">
+          <legend>Video / NovaStar Port Planner</legend>
+          <div class="led-module-fields">
+            <div class="field">
+              <label for="ledContentWidthPx">Content Width Px</label>
+              <input id="ledContentWidthPx" data-key="ledContentWidthPx" type="number" min="1" max="1000000" step="1" value="1920" inputmode="numeric">
+            </div>
+            <div class="field">
+              <label for="ledContentHeightPx">Content Height Px</label>
+              <input id="ledContentHeightPx" data-key="ledContentHeightPx" type="number" min="1" max="1000000" step="1" value="1080" inputmode="numeric">
+            </div>
+            <div class="field">
+              <label for="ledFitPolicy">Fit Policy</label>
+              <select id="ledFitPolicy" data-key="ledFitPolicy">
+                <option value="contain" selected>Contain / Letterbox</option>
+                <option value="cover">Cover / Crop</option>
+                <option value="stretch">Non-uniform Scale</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="ledRefreshHz">Target Refresh Hz</label>
+              <select id="ledRefreshHz" data-key="ledRefreshHz">
+                <option value="23.976">23.976</option>
+                <option value="24">24</option>
+                <option value="25">25</option>
+                <option value="29.97">29.97</option>
+                <option value="30">30</option>
+                <option value="50">50</option>
+                <option value="59.94">59.94</option>
+                <option value="60" selected>60</option>
+                <option value="120">120</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="ledBitDepth">Bit Depth / Color</label>
+              <select id="ledBitDepth" data-key="ledBitDepth">
+                <option value="8" selected>8 bit</option>
+                <option value="10">10 bit</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="ledPortBasePixels">Nominal Pixels / Port</label>
+              <input id="ledPortBasePixels" data-key="ledPortBasePixels" type="number" min="1000" max="10000000" step="1000" value="650000" inputmode="numeric" aria-describedby="ledAssumption">
+            </div>
+            <div class="field">
+              <label for="ledPortSafetyPercent">Planning Utilization %</label>
+              <input id="ledPortSafetyPercent" data-key="ledPortSafetyPercent" type="number" min="10" max="100" step="1" value="80" inputmode="decimal" aria-describedby="ledAssumption">
+            </div>
+            <div class="field">
+              <label for="ledProcessorPortCount">Processor Ports (optional)</label>
+              <input id="ledProcessorPortCount" data-key="ledProcessorPortCount" data-optional="true" type="number" min="1" max="1000" step="1" value="" placeholder="Not specified" inputmode="numeric">
+            </div>
+            <div class="field">
+              <label for="ledReceiverPixelsWide">Receiver Max Width Px</label>
+              <input id="ledReceiverPixelsWide" data-key="ledReceiverPixelsWide" data-optional="true" type="number" min="1" max="10000" step="1" value="" placeholder="Optional" inputmode="numeric">
+            </div>
+            <div class="field">
+              <label for="ledReceiverPixelsHigh">Receiver Max Height Px</label>
+              <input id="ledReceiverPixelsHigh" data-key="ledReceiverPixelsHigh" data-optional="true" type="number" min="1" max="10000" step="1" value="" placeholder="Optional" inputmode="numeric">
+            </div>
+          </div>
+        </fieldset>
+
+        <fieldset class="led-module">
+          <legend>LED Power Planner / Viewing Distance</legend>
+          <div class="led-module-fields">
+            <div class="field">
+              <label for="ledMaxWattsEach">Maximum Watts / Cabinet</label>
+              <input id="ledMaxWattsEach" data-key="ledMaxWattsEach" type="number" min="0" max="100000" step="1" value="180" inputmode="decimal" aria-describedby="ledAssumption">
+            </div>
+            <div class="field">
+              <label for="ledTypicalWattsEach">Typical Watts / Cabinet</label>
+              <input id="ledTypicalWattsEach" data-key="ledTypicalWattsEach" type="number" min="0" max="100000" step="1" value="65" inputmode="decimal" aria-describedby="ledAssumption">
+            </div>
+            <div class="field">
+              <label for="ledVoltage">Supply Voltage</label>
+              <select id="ledVoltage" data-key="ledVoltage">
+                <option value="120" selected>120 V</option>
+                <option value="208">208 V</option>
+                <option value="230">230 V</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="ledCircuitAmps">Circuit Rating</label>
+              <select id="ledCircuitAmps" data-key="ledCircuitAmps">
+                <option value="15">15 A</option>
+                <option value="20" selected>20 A</option>
+                <option value="30">30 A</option>
+                <option value="60">60 A</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="ledContinuousPercent">Continuous Target %</label>
+              <input id="ledContinuousPercent" data-key="ledContinuousPercent" type="number" min="10" max="100" step="1" value="80" inputmode="decimal">
+            </div>
+            <div class="field">
+              <label for="ledPhaseMode">Power Model</label>
+              <select id="ledPhaseMode" data-key="ledPhaseMode">
+                <option value="singlePhase" selected>Single Phase</option>
+                <option value="threePhase">Three Phase Balanced</option>
+              </select>
+            </div>
+            <div class="field" id="ledPowerFactorField" hidden>
+              <label for="ledPowerFactor">Power Factor</label>
+              <input id="ledPowerFactor" data-key="ledPowerFactor" type="number" min="0.1" max="1" step="0.01" value="0.95" inputmode="decimal" aria-describedby="ledAssumption" disabled>
+            </div>
+            <div class="field">
+              <label for="ledCabinetsPerHomeRun">Cabinets / Home Run</label>
+              <input id="ledCabinetsPerHomeRun" data-key="ledCabinetsPerHomeRun" data-optional="true" type="number" min="1" max="1000" step="1" value="" placeholder="Product specific" inputmode="numeric">
+            </div>
+            <div class="field">
+              <label for="ledClosestViewer">Closest Audience Distance</label>
+              <input id="ledClosestViewer" data-key="ledClosestViewer" type="number" min="0" max="100000" step="0.1" value="15" inputmode="decimal">
+            </div>
+            <div class="field">
+              <label for="ledClosestViewerUnit">Distance Unit</label>
+              <select id="ledClosestViewerUnit" data-key="ledClosestViewerUnit">
+                <option value="ft" selected>Feet</option>
+                <option value="m">Meters</option>
+              </select>
+            </div>
+          </div>
+        </fieldset>
+      </div>
+
+      <div class="led-stage" aria-label="Live LED cabinet map">
+        <div class="led-stage-view">
+          <span class="led-stage-axis vertical" id="ledPreviewRows">5 cabinets high</span>
+          <div class="led-wall-preview" id="ledWallPreview" role="img" aria-label="Preview of an 8 by 5 cabinet LED wall"></div>
+          <span class="led-stage-axis horizontal" id="ledPreviewColumns">8 cabinets wide</span>
+        </div>
+        <div class="led-stage-data">
+          <div>
+            <p class="led-stage-kicker">Live cabinet map</p>
+            <strong id="ledPreviewArray">8 × 5</strong>
+            <p id="ledPreviewCanvas">1,376 × 860 native canvas<br>4.00 × 2.50 m build</p>
+          </div>
+          <div class="led-view-toggle" aria-label="Cabinet map view">
+            <button type="button" id="ledPreviewIsoBtn" aria-pressed="true">Isometric</button>
+            <button type="button" id="ledPreviewFrontBtn" aria-pressed="false">Front</button>
+          </div>
+          <div class="led-stage-rails" aria-label="LED wall planning indicators">
+            <div class="led-stage-rail"><span>Port load</span><i id="ledPreviewPortRail"></i><b id="ledPreviewPort">61%</b></div>
+            <div class="led-stage-rail"><span>Viewer</span><i id="ledPreviewViewerRail"></i><b id="ledPreviewViewer">Review</b></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="led-result-strip" aria-label="LED wall primary results">
+        <div class="led-result" id="ledWallResult">
+          <span>Wall</span>
+          <strong id="ledWallDimensions">0 × 0 ft</strong>
+          <small id="ledWallDimensionsMetric">0 × 0 m</small>
+        </div>
+        <div class="led-result" id="ledRasterResult">
+          <span>Native Raster</span>
+          <strong id="ledNativeRaster">0 × 0 px</strong>
+          <small id="ledNativeMeta">0 MP · 0:1</small>
+        </div>
+        <div class="led-result" id="ledContentResult">
+          <span>Content Fit</span>
+          <strong id="ledContentFit">Review</strong>
+          <small id="ledContentMeta">1920 × 1080 source</small>
+        </div>
+        <div class="led-result" id="ledProcessingResult">
+          <span>NovaStar Planning</span>
+          <strong id="ledProcessing">0 data ports</strong>
+          <small id="ledProcessingMeta">Planning estimate</small>
+        </div>
+        <div class="led-result" id="ledPowerResult">
+          <span>Power</span>
+          <strong id="ledPower">0 kW max</strong>
+          <small id="ledPowerMeta">0 kW typical</small>
+        </div>
+      </div>
+
+      <div class="led-detail-grid">
+        <details class="led-detail">
+          <summary>Geometry Details</summary>
+          <div class="led-detail-body">
+            <div class="led-detail-stat"><span>Build Array</span><strong id="ledBuildArray">0 × 0 cabinets</strong></div>
+            <div class="led-detail-stat"><span>Cabinet Count</span><strong id="ledCabinetCount">0</strong></div>
+            <div class="led-detail-stat"><span>Metric Size</span><strong id="ledMetricSize">0 × 0 m</strong></div>
+            <div class="led-detail-stat"><span>Imperial Size</span><strong id="ledImperialSize">0 × 0</strong></div>
+            <div class="led-detail-stat"><span>Screen Area</span><strong id="ledArea">0 m² · 0 ft²</strong></div>
+            <div class="led-detail-stat"><span>Diagonal</span><strong id="ledDiagonal">0 m · 0 ft</strong></div>
+            <div class="led-detail-stat"><span>Effective Cabinet Raster</span><strong id="ledCabinetRaster">0 × 0 px</strong></div>
+            <div class="led-detail-stat"><span>Pitch-Derived Check</span><strong id="ledPitchDerivedRaster">0 × 0 px</strong></div>
+            <div class="led-detail-stat"><span>Implied Pitch W / H</span><strong id="ledImpliedPitch">0 × 0 mm</strong></div>
+            <p class="led-detail-copy" id="ledTargetOutcome">The entered cabinet layout is used directly.</p>
+          </div>
+        </details>
+
+        <details class="led-detail">
+          <summary>Content Fit</summary>
+          <div class="led-detail-body">
+            <div class="led-detail-stat"><span>Source → Wall</span><strong id="ledSourceToWall">0 × 0 → 0 × 0</strong></div>
+            <div class="led-detail-stat"><span>Scale X / Y</span><strong id="ledScaleFactors">0 × / 0 ×</strong></div>
+            <div class="led-detail-stat"><span>Active Wall Use</span><strong id="ledPixelUtilization">0%</strong></div>
+            <div class="led-detail-stat"><span>Aspect Difference</span><strong id="ledAspectMismatch">0%</strong></div>
+            <div class="led-detail-stat"><span>Suggested Canvas</span><strong id="ledSuggestedCanvas">0 × 0 px</strong></div>
+            <div class="led-detail-stat"><span>Source Bandwidth</span><strong id="ledSourceBandwidth">0 Gbps</strong></div>
+            <p class="led-detail-copy" id="ledContentGuidance">Native wall raster is the first-choice content canvas.</p>
+          </div>
+        </details>
+
+        <details class="led-detail">
+          <summary>Processing / Data</summary>
+          <div class="led-detail-body">
+            <div class="led-detail-stat"><span>Safe Pixels / Port</span><strong id="ledSafePixelsPerPort">0</strong></div>
+            <div class="led-detail-stat"><span>Average Port Load</span><strong id="ledAveragePortLoad">0</strong></div>
+            <div class="led-detail-stat"><span>Port Utilization</span><strong id="ledPortUtilization">0%</strong></div>
+            <div class="led-detail-stat"><span>Wall Payload</span><strong id="ledWallPayload">0 Gbps</strong></div>
+            <p class="led-detail-copy" id="ledProcessorGuidance">Processor output capacity is separate from production-network bandwidth and must be confirmed against the selected processor and receiver cards.</p>
+          </div>
+        </details>
+
+        <details class="led-detail">
+          <summary>Power / Viewing / Assumptions</summary>
+          <div class="led-detail-body">
+            <div class="led-detail-stat"><span>Maximum Load</span><strong id="ledMaxLoad">0 kW · 0 A</strong></div>
+            <div class="led-detail-stat"><span>Typical Load</span><strong id="ledTypicalLoad">0 kW · 0 A</strong></div>
+            <div class="led-detail-stat"><span>Planning Circuits</span><strong id="ledCircuitPlan">0 max · 0 typical</strong></div>
+            <div class="led-detail-stat"><span>Product Home Runs</span><strong id="ledHomeRuns">Not specified</strong></div>
+            <div class="led-detail-stat"><span>Viewing Range</span><strong id="ledViewingRange">0–0 ft</strong></div>
+            <div class="led-detail-stat"><span>Audience Check</span><strong id="ledAudienceCheck">Review</strong></div>
+            <div class="led-inline-actions">
+              <button type="button" id="sendLedTypicalPowerBtn">Send Typical Watts to Power Load</button>
+              <button type="button" id="sendLedMaxPowerBtn">Send Maximum Watts to Power Load</button>
+            </div>
+            <ul class="led-warning-list" id="ledWarnings" aria-label="LED wall planning checks">
+              <li data-severity="info" data-label="CHECK">Enter a cabinet profile to review planning assumptions.</li>
+            </ul>
+          </div>
+        </details>
+      </div>
+
+      <p class="led-disclaimer" id="ledAssumption"><strong>Planning estimates only:</strong> Verify final cabinet, receiver-card, processor, signal, and power specifications against the actual product documentation. Confirm electrical distribution with the venue and a qualified person; the calculator does not establish code compliance or a verified safe load.</p>
+    </section>
+
+  </main>
+</div>
+<script src="js/vendor/gsap.min.js"></script>
+<script src="js/sbd-registry.js"></script>
+<script src="js/av-suite-context.js"></script>
+<script src="js/av-calculator.js"></script>
+<script src="js/sbd-nav.js" defer></script>
+<script src="js/sbd-public-nav.js" defer></script>
+</body>
+</html>

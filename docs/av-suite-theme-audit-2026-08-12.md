@@ -89,3 +89,11 @@ Rules:
 ## Verification contract
 
 `scripts/verify_av_themes.js` treats the registry as the route source of truth and fails when a shared-theme canonical tool omits theme metadata, the shared opt-in, or the shared stylesheet/import. `scripts/verify_throwline_release.js` protects Throwline's intentional standalone exception. `scripts/probe_av_themes.js` exercises both emulated `light` and `dark` preferences on every route, checks the shared tokens and specialist adapters, scans visible rendered text against WCAG contrast thresholds, and rejects horizontal overflow at phone and desktop widths.
+
+## 2026-09-23 extension
+
+The LED Wall Calculator split from AV Calculator after this historical 44-tool baseline. It uses the shared Warm Paper / Stage Slate tokens with a dark live planning stage.
+
+| Surface | Canonical route | Current color scheme | Planning surface | Treatment |
+|---|---|---|---|---|
+| LED Wall Calculator | `/led-wall-calculator.html` | Warm Paper / Stage Slate with dark planning stage | Cabinet inputs, live build map, estimates, and saved profiles | Specialist Translation |
