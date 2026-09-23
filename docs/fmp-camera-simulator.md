@@ -163,6 +163,12 @@ npm run dev:camera-sim            # local dev server
 The build is deterministic; CI rebuilds and fails if `camera-sim/` differs from the source
 (`.github/workflows/camera-sim.yml` on pull requests, `deploy-pages.yml` on main).
 
+The page's social card (`og:image`, `camera-sim/og.png`, 1200 × 630) is a real frame from the
+simulator: `node scripts/make_camera_sim_og.mjs` serves the committed build, drives the virtual
+P240 to a repeatable pose with the app's keyboard controls, captures the monitor and composes
+the title band with the site's DM Sans into `apps/fmp-camera-sim/public/og.png`. Regenerate it
+after venue or rendering changes, then rebuild so the published copy follows.
+
 ## Acceptance evidence
 
 | Gate | Evidence |
