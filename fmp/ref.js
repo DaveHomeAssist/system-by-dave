@@ -9,7 +9,8 @@ function showPanel(hash, scroll = false) {
   const tab = tabs.find(item => item.hash === hash) || tabs[0];
   for (const item of tabs) item.setAttribute('aria-current', item === tab ? 'page' : 'false');
   for (const panel of panels) panel.hidden = `#${panel.id}` !== tab.hash;
-  if (scroll) document.querySelector('.tabs').scrollIntoView({ block: 'start' });
+  const tabBar = document.querySelector('.tabs');
+  if (scroll && getComputedStyle(tabBar).position === 'sticky') tabBar.scrollIntoView({ block: 'start' });
 }
 
 document.addEventListener('click', event => {
