@@ -1,5 +1,8 @@
 *.pdf binary
 noteforge/assets/*.js -whitespace
+# Generated FMP Camera Simulator build: three.js shader chunks carry trailing spaces.
+camera-sim/assets/*.js -whitespace
+camera-sim/fmp-camera-simulator-offline.html -whitespace
 
 # Preserve the supplied CSV byte for byte, including its CRLF record endings.
 fmp/house/display-estate.csv -text whitespace=cr-at-eol

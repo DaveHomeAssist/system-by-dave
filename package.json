@@ -11,6 +11,8 @@
     "dev:av-workbook": "vite --config apps/av-workbook/vite.config.ts",
     "test:av-workbook": "vitest run --config apps/av-workbook/vitest.config.ts",
     "typecheck:av-workbook": "tsc -p apps/av-workbook/tsconfig.json --noEmit",
+    "build:camera-sim": "vite build --config apps/fmp-camera-sim/vite.config.ts && node scripts/build_camera_sim_offline.mjs",
+    "dev:camera-sim": "vite --config apps/fmp-camera-sim/vite.config.ts",
     "test:camera-sim": "vitest run --config apps/fmp-camera-sim/vitest.config.ts",
     "typecheck:camera-sim": "tsc -p apps/fmp-camera-sim/tsconfig.json --noEmit",
     "verify:av": "node scripts/verify_av_suite.js && node scripts/verify_av_themes.js",

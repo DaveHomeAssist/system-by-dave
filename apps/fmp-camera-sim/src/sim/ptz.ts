@@ -126,6 +126,7 @@ export class PtzSimulator {
   private recall: ActiveRecall | null = null;
   private atLimit: PtzSnapshot["atLimit"] = { pan: null, tilt: null, lens: null };
   private events: SimEvent[] = [];
+  private tickListener: ((tick: number) => void) | null = null;
 
   constructor(profile: CameraProfile, mount: MountOrientation, speeds: SpeedLevels, pose: PtzPose = { pan: 0, tilt: 0, lens: 0 }) {
     this.profile = profile;
@@ -348,6 +349,12 @@ export class PtzSimulator {
     if (this.recall) this.stepRecall(tick);
     else this.stepManual();
     this.tickCount = tick;
+    this.tickListener?.(tick);
+  }
+
+  /** Called after every fixed step, so evaluators sample at exact simulation times. */
+  setTickListener(listener: ((tick: number) => void) | null): void {
+    this.tickListener = listener;
   }
 
   private stepRecall(tick: number): void {

@@ -61,13 +61,16 @@ const files = walk(ROOT);
 const unlisted = files.filter((file) => !sitemapRoutes.has(routeFor(file)));
 const robots = read('robots.txt');
 
-// 141 includes the Shader Practice relocation redirect, the /fmp-walk/ and /fmp-index/ redirects, the managed /fmp/house/ reference, and the
+// 144 includes the Shader Practice relocation redirect, the /fmp-walk/ and /fmp-index/ redirects, the managed /fmp/house/ reference, and the
 // /fmp/gear/, /fmp/build/ and /fmp/ptz/ pages that replaced Notion links on 2026-09-18,
-// plus the four additional equipment explorers published on 2026-09-20.
-if (unlisted.length !== 141) fail(`Expected 141 tracked routes outside the sitemap; found ${unlisted.length}.`);
+// plus the four additional equipment explorers published on 2026-09-20, and the noindex
+// FMP Camera Simulator (its page, standalone offline copy and app source) from 2026-09-23.
+if (unlisted.length !== 144) fail(`Expected 144 tracked routes outside the sitemap; found ${unlisted.length}.`);
 
 [
   '/apps/av-workbook/',
+  '/apps/fmp-camera-sim/',
+  '/camera-sim/',
   '/cross-project-actions.html',
   '/fmp-index/',
   '/fmp/',

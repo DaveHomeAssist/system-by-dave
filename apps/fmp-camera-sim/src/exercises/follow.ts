@@ -1,5 +1,6 @@
-import { insideArea, project, stageToWorld } from "../sim/framing";
-import { CHEST_FRACTION } from "../sim/performer";
+import { type ExerciseSettings } from "../domain/session";
+import { type CameraFrame, insideArea, project, stageToWorld } from "../sim/framing";
+import { CHEST_FRACTION, type PerformerState } from "../sim/performer";
 import { type Exercise, type ExerciseProgress, type ExerciseSample } from "./types";
 
 /** Framing error recorded for a performer who is off frame or behind the lens. */
@@ -19,8 +20,7 @@ export interface FollowEvaluation {
   error: number;
 }
 
-export function evaluateFollow(s: ExerciseSample): FollowEvaluation {
-  const { performer, frame, settings } = s;
+export function evaluateFollow(frame: CameraFrame, performer: PerformerState, settings: ExerciseSettings): FollowEvaluation {
   const base = performer.position;
   const chest = project(frame, stageToWorld({ ...base, height: performer.height * CHEST_FRACTION }));
   const head = project(frame, stageToWorld({ ...base, height: performer.height }));
@@ -71,7 +71,7 @@ export class FollowExercise implements Exercise {
       this.finish();
       return;
     }
-    const evaluation = evaluateFollow(s);
+    const evaluation = evaluateFollow(s.frame, s.performer, s.settings);
     this.last = evaluation;
     this.trackedS += s.dt;
     if (evaluation.onTarget) this.onTargetS += s.dt;
