@@ -1,3 +1,4 @@
+import { type TerrainRecord, defaultTerrain, parseTerrain, terrainIsSettled } from "./terrain";
 import { type StructuresRecord, defaultStructures, parseStructures, structuresAreSettled } from "./structures";
 import { type BowlRecord, defaultBowl, parseBowl, bowlIsSettled } from "./bowl";
 import { type Dimension, type Evidence, type EvidenceStatus, readProvenance, SETTLED_VENUE_STATUSES, VENUE_STATUS_OPTIONS } from "./evidence";
@@ -5,7 +6,7 @@ import { ftToM, mToFt } from "./units";
 import { type Issue, IssueList, readEnum, readNumber, readObject, readString } from "./validate";
 
 export const VENUE_SCHEMA = "fmp-camera-simulator.venue";
-export const VENUE_VERSION = 5;
+export const VENUE_VERSION = 6;
 
 export type DistanceBasis = "horizontal" | "line-of-sight";
 export type MountOrientation = "upright" | "inverted";
@@ -43,6 +44,7 @@ export interface VenueProfile {
   dimensions: Record<DimensionKey, Dimension>;
   bowl: BowlRecord;
   structures: StructuresRecord;
+  terrain: TerrainRecord;
   /** Which distance the camera-to-DSE figure describes. */
   distanceBasis: { value: DistanceBasis } & Evidence;
   mount: {
@@ -143,6 +145,7 @@ export function defaultVenueProfile(): VenueProfile {
     name: "Freedom Mortgage Pavilion",
     bowl: defaultBowl(),
     structures: defaultStructures(),
+    terrain: defaultTerrain(),
     dimensions: {
       cameraToDse: {
         value: ftToM(110),
@@ -224,7 +227,7 @@ export function parseVenueProfile(
   if (root.schema !== VENUE_SCHEMA) {
     issues.add(`${path}.schema`, `Expected "${VENUE_SCHEMA}".`);
   }
-  if (root.version !== 1 && root.version !== 2 && root.version !== 3 && root.version !== 4 && root.version !== VENUE_VERSION) {
+  if (root.version !== 1 && root.version !== 2 && root.version !== 3 && root.version !== 4 && root.version !== 5 && root.version !== VENUE_VERSION) {
     issues.add(
       `${path}.version`,
       typeof root.version === "number"
@@ -282,14 +285,15 @@ export function parseVenueProfile(
   const basisProvenance = basisRoot ? readProvenance(issues, basisRoot.provenance, `${path}.distanceBasis.provenance`) : undefined;
   const mountProvenance = mountRoot ? readProvenance(issues, mountRoot.provenance, `${path}.mount.provenance`) : undefined;
   // Before v3, mount evidence covered both orientation and heading. Preserve its exact claims.
-  const headingRoot = (root.version === 3 || root.version === 4 || root.version === 5)
+  const headingRoot = (root.version === 3 || root.version === 4 || root.version === 5 || root.version === 6)
     ? readObject(issues, mountRoot?.headingEvidence, `${path}.mount.headingEvidence`)
     : mountRoot;
   const headingStatus = headingRoot ? readEnum(issues, headingRoot.status, `${path}.mount.headingEvidence.status`, VENUE_STATUS_OPTIONS) : null;
   const headingNote = headingRoot ? readString(issues, headingRoot.note, `${path}.mount.headingEvidence.note`) : null;
-  const headingProvenance = (root.version === 3 || root.version === 4 || root.version === 5) && headingRoot
+  const headingProvenance = (root.version === 3 || root.version === 4 || root.version === 5 || root.version === 6) && headingRoot
     ? readProvenance(issues, headingRoot.provenance, `${path}.mount.headingEvidence.provenance`) : undefined;
 
+  const terrain = parseTerrain(root.terrain, issues, `${path}.terrain`);
   const structures = parseStructures(root.structures, issues, `${path}.structures`);
   const bowl = parseBowl(root.bowl, issues, `${path}.bowl`);
   const referenceRoot = readObject(issues, root.reference, `${path}.reference`);
@@ -311,6 +315,7 @@ export function parseVenueProfile(
     name,
     bowl,
     structures,
+    terrain,
     dimensions,
     distanceBasis: {
       value: basis.value as DistanceBasis,
@@ -352,6 +357,7 @@ export interface StageMark {
 export interface VenueGeometry {
   bowl: BowlRecord;
   structures: StructuresRecord;
+  terrain: TerrainRecord;
   /** P240 lens position. */
   camera: StagePoint;
   /** Plan (horizontal) distance from the lens to the stage origin. */
@@ -447,6 +453,7 @@ export function deriveVenueGeometry(
     geometry: {
       bowl: venue.bowl,
       structures: venue.structures,
+      terrain: venue.terrain,
       camera,
       horizontalDistance: plan,
       lineOfSight,
@@ -473,6 +480,7 @@ export function unsettledVenueItems(venue: VenueProfile): string[] {
   if (!SETTLED_VENUE_STATUSES.has(venue.mount.headingEvidence.status)) items.push("Pan-zero heading");
   if (!bowlIsSettled(venue.bowl)) items.push("Bowl geometry");
   if (!structuresAreSettled(venue.structures)) items.push("Venue structures");
+  if (!terrainIsSettled(venue.terrain)) items.push("Lawn terrain");
   return items;
 }
 

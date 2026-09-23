@@ -115,11 +115,11 @@ The session autosaves to browser storage under `fmpCameraSim.v1` (the `fmp` pref
 through the housevideo.app saved-data transfer). Export/import uses one JSON file:
 
 - `fmp-camera-simulator.project` v1, containing
-- `fmp-camera-simulator.venue` v5 (versioned structures and bowl plus per-property methods/source identifiers and separate mount-orientation/heading evidence),
+- `fmp-camera-simulator.venue` v6 (terrain, versioned structures and bowl plus per-property methods/source identifiers and separate mount-orientation/heading evidence),
 - `fmp-camera-simulator.camera` v1 (published figures, operating limits, uncalibrated behaviour), and
 - `fmp-camera-simulator.session` v2 (show package, speeds, pose, presets, performer, exercise settings and results).
 
-Version-1 venue imports migrate to v5 with `reference.geometryRevision: "legacy-v1"`; all existing dimensions, heading, orientation and presets remain unchanged. New profiles use `photo-review-2026-09`. Venue settings offer a before/after preview and explicit Apply/Cancel for the two provisional stage profiles. Applying updates only stage width/depth and mount orientation, retaining camera coordinates and stored presets. Current tilt can clamp to changed mount limits. Versions 1 and 2 keep their numeric settings and copy the former combined mount evidence into the new independent heading record, without inventing photo evidence. Older simulator versions reject newly exported venue v5 files, preventing silent loss of structures and bowl configuration. Version-3 records retain their independent heading evidence.
+Version-1 venue imports migrate to v6 with `reference.geometryRevision: "legacy-v1"`; all existing dimensions, heading, orientation and presets remain unchanged. New profiles use `photo-review-2026-09`. Venue settings offer a before/after preview and explicit Apply/Cancel for the two provisional stage profiles. Applying updates only stage width/depth and mount orientation, retaining camera coordinates and stored presets. Current tilt can clamp to changed mount limits. Versions 1 and 2 keep their numeric settings and copy the former combined mount evidence into the new independent heading record, without inventing photo evidence. Older simulator versions reject newly exported venue v6 files, preventing silent loss of structures and bowl configuration. Version-3 records retain their independent heading evidence.
 
 The overview camera model uses physical scale. Its label identifies the small camera; monitor output never contains the overview model. Support geometry is schematic. Upright operator video does not claim the real camera has E-Flip enabled.
 
@@ -182,7 +182,7 @@ orientation and physical model scale. It does not yet supply surveyed venue geom
 Remaining implementation packages, in order:
 
 1. Configurable pavilion structures, obstructions, FOH and physical LED walls are implemented in Phase 2B.
-2. Add terrain records, irregular lawn geometry and the lawn reference view (Phase 2C).
+2. Phase 2C adds terrain records, irregular lawn geometry and the Lawn reference view.
 3. The sectional bowl and pitch inspector are implemented in Phase 2A; their dimensions and
    initial 9.46°/25.02° slopes remain unverified. Per-property evidence is retained throughout.
 4. Add feed routing, bounded delay and portable offline media handling to the independent physical displays.
@@ -195,10 +195,10 @@ actual bowl pitch, lawn contours, display dimensions and pan-zero require field 
 
 ### Evidence editing and published hardware
 
-Venue v5 accepts optional provenance on each dimension, distance basis, mount orientation and
+Venue v6 accepts optional provenance on each dimension, distance basis, mount orientation and
 pan-zero heading: `method` plus up to 16 `sourceIds` of at most 160 characters each. Source notes
 retain the observation/measurement description; source identifiers refer to the operator's
-reference log. Unknown methods, malformed references and missing v3/v4/v5 heading records reject the
+reference log. Unknown methods, malformed references and missing v3/v4/v5/v6 heading records reject the
 whole import before it replaces the active session. Methods never promote evidence status.
 Changing a value in Venue settings resets its evidence to Demo/operator entry and clears source
 identifiers; the previous note remains available for reference. A verified operator can then
@@ -270,3 +270,16 @@ changes overview layer 2 only: the monitor always sees the physical shell. Fixtu
 overview layer 1. Clearing or replacing a show package changes neither venue records nor PTZ
 pose, geometry, dimensions or stored presets. Exercise scoring is unchanged; geometric occlusion
 feedback, media inputs, calibration and detailed visual finish are not delivered by this increment.
+
+
+## Phase 2C: lawn and exterior
+
+Venue v6 adds an independent terrain v1 record. Older files receive Demo defaults while keeping saved dimensions, camera pose and presets. Boundary depth stations define irregular left/right edges; longitudinal and cross-lawn samples shape the height field. Front elevation, concourse width, paths, fence and pole coordinates retain separate evidence wrappers. All defaults remain unmeasured assumptions informed by P093/P095. Site-scale embankment context is not used as lawn rise.
+
+`solveTerrain` supplies the exact triangles and barycentric `surfaceHeightAt` query used by the builder. Its first strip joins the pavilion rear floor to the lawn front, including differing datums. Paths sample the surface; fence posts and poles follow it. Out-of-bound objects are omitted. Distant trees are generic context, not surveyed inventory. The five overview presets never alter PTZ pose.
+
+The terrain editor uses metres and normalized sample positions (0–1). Sample depths must increase; invalid imports retain the current project. Mesh-derived terrain diagnostics and browser tests verify that edits actually change the rendered surface. Grass, concrete circulation and fixtures remain separate from camera mechanics.
+
+Review follow-ups: catwalk and stage opening now remain visible in default overview cutaway, with a restored Catwalk label. LED emissive materials have a separate cache identity from ordinary materials. Delay-wall enabled evidence remains Demo pending inventory confirmation; this release does not silently promote its confidence or disable saved fixtures. Pixel-space metadata remains independent of physical wall size.
+
+Phase 3 media routing and field calibration remain separate work. Physical wall placement, terrain contours and every exterior dimension remain provisional.
