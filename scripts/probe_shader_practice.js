@@ -595,11 +595,12 @@ async function failurePaths(connection, baseUrl) {
   await noScript.send('Page.navigate', { url: `${baseUrl}shader/practice.html` });
   await delay(800);
   await noScript.send('Emulation.setScriptExecutionDisabled', { value: false });
-  const noscriptText = await noScript.eval(() => {
-    const block = document.querySelector('noscript');
-    return { text: document.body.innerText, links: [...document.querySelectorAll('a[href]')].map(link => link.getAttribute('href')) };
-  });
-  check('without JavaScript the page states it is a simulation and keeps its escape links', /SIMULATION FOR PRACTICE/.test(noscriptText.text) && noscriptText.links.includes('index.html') && noscriptText.links.includes('/fmp/'), { links: noscriptText.links });
+  const noscriptText = await noScript.eval(() => ({
+    text: document.body.innerText,
+    links: [...document.querySelectorAll('a[href]')].filter(link => link.getBoundingClientRect().width > 0).map(link => link.getAttribute('href')),
+    consoleHidden: getComputedStyle(document.querySelector('.console')).display === 'none'
+  }));
+  check('without JavaScript the page states it is a simulation, hides the inert console, and keeps its escape links', /SIMULATION FOR PRACTICE/.test(noscriptText.text) && /Nothing here reads or controls real equipment/.test(noscriptText.text) && noscriptText.consoleHidden && noscriptText.links.includes('index.html') && noscriptText.links.includes('/fmp/'), noscriptText);
   return pages;
 }
 

@@ -98,6 +98,7 @@ a:hover { color: var(--ink-muted); }
   transform: translateY(-160%);
 }
 .sbd-skip-link:focus { transform: none; color: var(--on-ink); }
+html:not([data-js]) .console { display: none; }
 .noscript { max-width: 44rem; margin: var(--space-3); padding: var(--space-4); border: 1px solid var(--hairline); border-radius: var(--radius-md); background: var(--surface-100); }
 .noscript p + p { margin-top: var(--space-2); }
 

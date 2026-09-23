@@ -178,8 +178,9 @@
   }
 
   const urlState = readUrlState();
-  let state = urlState.state || (!urlState.explicit && readSession()) || Practice.createPracticeState();
-  ui.restored = !urlState.explicit && Boolean(storageGet(SESSION_KEY)) && Boolean(urlState.state === null);
+  const savedSession = urlState.explicit ? null : readSession();
+  let state = urlState.state || savedSession || Practice.createPracticeState();
+  ui.restored = Boolean(savedSession);
 
   // ---------- links ----------
 
