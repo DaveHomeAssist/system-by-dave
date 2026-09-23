@@ -2,6 +2,8 @@
 
 ## 2026-09-22 — FMP Night Profile and Gear Reference bridge
 
+- Exposed the role-specific Show Console link in each interactive camera
+  References stage, so it remains available after the startup shell renders.
 - Added FMP Show Console deep links to the managed hub, build guide, gear page,
   and camera startup fallbacks. Links fill venue, phase, and optional position
   context without copying or submitting camera records.

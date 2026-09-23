@@ -30,7 +30,8 @@ access control.
 - `/fmp/gear/`, `/fmp/build/`, `/fmp/ptz/`: camera equipment, camera build and
   strike, and catwalk PTZ references translated from Notion records. Dated
   evidence stays visible; roles replace names; no network addresses.
-- The FMP hub, build guide, gear page, and camera startup shells open AV by
+- The FMP hub, build guide, gear page, camera startup shells, and interactive
+  camera References stage open AV by
   Dave's Show Console with venue, phase, and optional operator context only.
   The gear page also links to four authored Gear Reference sheets. These links
   do not transfer camera drafts or submit operational records.

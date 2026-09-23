@@ -156,6 +156,8 @@ function eventOptions(draft) {
 
 function referenceCards(position) {
   const refs = { ...FALLBACK_REGISTRY.references, ...(store.registry.references || {}) };
+  const operator = { 'pit-center': 'PC', 'front-of-house': 'FOH', 'pit-stage-left': 'SL', catwalk: 'PTZ' }[position.key];
+  const showConsole = `https://avbydave.com/av-suite.html?entry=show&sbdVenue=Freedom%20Mortgage%20Pavilion${operator ? `&sbdOperator=${operator}` : ''}&sbdPhase=loadin`;
   // The signed-in registry still names Notion pages. The public release always opens its own HTML pages.
   if (PUBLIC_RELEASE) Object.assign(refs, PUBLIC_REFERENCES);
   if (SETUP_TEST_ONLY && !PUBLIC_RELEASE) {
@@ -164,6 +166,7 @@ function referenceCards(position) {
   }
   const items = [
     ...(PUBLIC_RELEASE ? [
+      ['SHOW', 'FMP Night Profile', 'Show Console with venue, position and load-in phase filled', showConsole, true],
       ['CALL', 'Bowl camera guide', 'Tour modes, meeting, song flow and directing', '/fmp/guide/', false],
       ['3D', 'Camera rig explorer', `${RIG_COMPONENTS ? `${RIG_COMPONENTS} components` : 'Components'}, photo evidence and operating notes`, '/fmp/rig/', false]
     ] : []),
