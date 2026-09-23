@@ -2,6 +2,7 @@ import { useId, useState } from "react";
 import { type SimulatorStore, type StoreState } from "../app/store";
 import {
   BEHAVIOUR_SPECS,
+  P240_HARDWARE,
   type CameraProfile,
   panSpeedForLevel,
   PRESET_EASINGS,
@@ -56,6 +57,11 @@ export function CameraSettings({ store, state }: Props) {
         </h3>
         <table className="spec-table">
           <tbody>
+            <tr><th scope="row">Body envelope (published order)</th><td>{P240_HARDWARE.envelopeMm.join(" × ")} mm</td></tr>
+            <tr><th scope="row">Mass</th><td>{P240_HARDWARE.massKg} kg</td></tr>
+            <tr><th scope="row">Sensor</th><td>{P240_HARDWARE.sensor}</td></tr>
+            <tr><th scope="row">Aperture</th><td>f/{P240_HARDWARE.apertureWide.toFixed(1)} wide · f/{P240_HARDWARE.apertureTele} tele</td></tr>
+            <tr><th scope="row">Power reference</th><td>{P240_HARDWARE.power}; {P240_HARDWARE.simultaneousPtzWatts} W with simultaneous PTZ</td></tr>
             <tr>
               <th scope="row">Pan travel</th>
               <td>

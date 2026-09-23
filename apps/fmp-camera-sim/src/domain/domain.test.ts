@@ -140,13 +140,14 @@ describe("venue geometry", () => {
       "Stage width",
       "Stage depth",
       "Distance basis",
-      "Mount orientation",
+      "Pan-zero heading",
     ]);
     for (const key of ["cameraToDse", "cameraHeight", "cameraLateral", "stageWidth", "stageDepth"] as const) {
       venue.dimensions[key].status = "measured";
     }
     venue.distanceBasis.status = "confirmed";
     venue.mount.status = "confirmed";
+    venue.mount.headingEvidence.status = "confirmed";
     expect(unsettledVenueItems(venue)).toEqual([]);
   });
 

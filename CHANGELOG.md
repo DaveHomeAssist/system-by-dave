@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-23 — FMP per-property venue evidence
+
+- Added evidence methods and source identifiers for venue dimensions, distance basis, mount orientation and pan-zero heading. Photo-confirmed orientation no longer implies a verified heading.
+- Venue v3 preserves v1/v2 geometry and legacy claims, rejects malformed provenance atomically, and resets confidence after manual value edits.
+- Added manufacturer body, mass, sensor, aperture and power references to Camera settings without changing simulated optical behaviour.
+
 ## 2026-09-23 — FMP venue profile foundation
 
 - Revised new-session stage estimates to 113 × 61 ft, with a selectable 113 × 75 ft working-depth alternative. Both remain provisional.

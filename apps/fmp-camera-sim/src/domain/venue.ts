@@ -1,9 +1,9 @@
-import { type Dimension, type EvidenceStatus, SETTLED_VENUE_STATUSES, VENUE_STATUS_OPTIONS } from "./evidence";
+import { type Dimension, type Evidence, type EvidenceStatus, readProvenance, SETTLED_VENUE_STATUSES, VENUE_STATUS_OPTIONS } from "./evidence";
 import { ftToM, mToFt } from "./units";
 import { type Issue, IssueList, readEnum, readNumber, readObject, readString } from "./validate";
 
 export const VENUE_SCHEMA = "fmp-camera-simulator.venue";
-export const VENUE_VERSION = 2;
+export const VENUE_VERSION = 3;
 
 export type DistanceBasis = "horizontal" | "line-of-sight";
 export type MountOrientation = "upright" | "inverted";
@@ -40,13 +40,15 @@ export interface VenueProfile {
   name: string;
   dimensions: Record<DimensionKey, Dimension>;
   /** Which distance the camera-to-DSE figure describes. */
-  distanceBasis: { value: DistanceBasis; status: EvidenceStatus; note: string };
+  distanceBasis: { value: DistanceBasis } & Evidence;
   mount: {
     orientation: MountOrientation;
     /** Direction pan 0° points, measured clockwise from the stage centreline (toward upstage). */
     panZeroBearingDeg: number;
     status: EvidenceStatus;
     note: string;
+    provenance?: Evidence["provenance"];
+    headingEvidence: Evidence;
   };
   /** Reference only. Never used to calculate optical distance. */
   reference: { cableRoute: string; geometryRevision: "legacy-v1" | "photo-review-2026-09" };
@@ -140,6 +142,7 @@ export function defaultVenueProfile(): VenueProfile {
         value: ftToM(110),
         status: "estimated",
         note: "Reported as 100–120 ft from the catwalk camera to the downstage edge. Not yet measured, and the report does not say whether it is horizontal or line of sight.",
+        provenance: { method: "staff-report", sourceIds: ["camera-distance-report"] },
       },
       cameraHeight: {
         value: ftToM(35),
@@ -155,11 +158,13 @@ export function defaultVenueProfile(): VenueProfile {
         value: ftToM(113),
         status: "estimated",
         note: "Revised interpretation of Live Nation’s rotated Stage & Pit plan: approximately 113 ft across stage. Performance deck boundaries remain provisional.",
+        provenance: { method: "scaled-plan", sourceIds: ["live-nation-stage-pit-plan"] },
       },
       stageDepth: {
         value: ftToM(61),
         status: "estimated",
         note: "Revised plan interpretation: approximately 61 ft from downstage to upstage. The 75 ft video-office inference remains an alternative, not a surveyed boundary.",
+        provenance: { method: "scaled-plan", sourceIds: ["live-nation-stage-pit-plan"] },
       },
       deckHeight: {
         value: ftToM(5),
@@ -180,8 +185,13 @@ export function defaultVenueProfile(): VenueProfile {
     mount: {
       orientation: "inverted",
       panZeroBearingDeg: 0,
-      status: "demo",
-      note: "P100 shows the installed P240 hanging inverted. Pan-zero heading and firmware image-flip settings are unknown; centreline heading and upright operator video are simulation assumptions.",
+      status: "confirmed",
+      note: "P100 shows the installed P240 hanging inverted. This observation does not establish lens position, heading or firmware image settings.",
+      provenance: { method: "photo", sourceIds: ["P100"] },
+      headingEvidence: {
+        status: "demo", note: "Pan 0° is assumed to point at stage centre. The real heading has not been checked.",
+        provenance: { method: "assumption", sourceIds: [] },
+      },
     },
     reference: {
       cableRoute:
@@ -208,11 +218,11 @@ export function parseVenueProfile(
   if (root.schema !== VENUE_SCHEMA) {
     issues.add(`${path}.schema`, `Expected "${VENUE_SCHEMA}".`);
   }
-  if (root.version !== 1 && root.version !== VENUE_VERSION) {
+  if (root.version !== 1 && root.version !== 2 && root.version !== VENUE_VERSION) {
     issues.add(
       `${path}.version`,
       typeof root.version === "number"
-        ? `Unsupported venue profile version ${root.version}. This simulator reads versions 1 and ${VENUE_VERSION}.`
+        ? `Unsupported venue profile version ${root.version}. This simulator reads versions 1–${VENUE_VERSION}.`
         : "Missing venue profile version.",
     );
   }
@@ -233,8 +243,9 @@ export function parseVenueProfile(
       });
       const status = readEnum(issues, raw.status, `${dimPath}.status`, VENUE_STATUS_OPTIONS);
       const note = readString(issues, raw.note, `${dimPath}.note`);
+      const provenance = readProvenance(issues, raw.provenance, `${dimPath}.provenance`);
       if (dimValue !== null && status && note !== null) {
-        dimensions[spec.key] = { value: dimValue, status, note };
+        dimensions[spec.key] = { value: dimValue, status, note, ...(provenance ? { provenance } : {}) };
       }
     }
   }
@@ -262,6 +273,17 @@ export function parseVenueProfile(
       }
     : null;
 
+  const basisProvenance = basisRoot ? readProvenance(issues, basisRoot.provenance, `${path}.distanceBasis.provenance`) : undefined;
+  const mountProvenance = mountRoot ? readProvenance(issues, mountRoot.provenance, `${path}.mount.provenance`) : undefined;
+  // Before v3, mount evidence covered both orientation and heading. Preserve its exact claims.
+  const headingRoot = root.version === 3
+    ? readObject(issues, mountRoot?.headingEvidence, `${path}.mount.headingEvidence`)
+    : mountRoot;
+  const headingStatus = headingRoot ? readEnum(issues, headingRoot.status, `${path}.mount.headingEvidence.status`, VENUE_STATUS_OPTIONS) : null;
+  const headingNote = headingRoot ? readString(issues, headingRoot.note, `${path}.mount.headingEvidence.note`) : null;
+  const headingProvenance = root.version === 3 && headingRoot
+    ? readProvenance(issues, headingRoot.provenance, `${path}.mount.headingEvidence.provenance`) : undefined;
+
   const referenceRoot = readObject(issues, root.reference, `${path}.reference`);
   const geometryRevision = root.version === 1 ? "legacy-v1" : referenceRoot
     ? readEnum(issues, referenceRoot.geometryRevision, `${path}.reference.geometryRevision`, ["legacy-v1", "photo-review-2026-09"] as const)
@@ -273,7 +295,7 @@ export function parseVenueProfile(
   if (!issues.ok || !id || !name || !basis || !mount || cableRoute === null) {
     return { ok: false, issues: issues.issues };
   }
-  // Version 1 migration changes only the schema version, never saved geometry or mount settings.
+  // Migration adds provenance structure without changing saved geometry or mount settings.
   const venue: VenueProfile = {
     schema: VENUE_SCHEMA,
     version: VENUE_VERSION,
@@ -284,12 +306,19 @@ export function parseVenueProfile(
       value: basis.value as DistanceBasis,
       status: basis.status as EvidenceStatus,
       note: basis.note as string,
+      ...(basisProvenance ? { provenance: basisProvenance } : {}),
     },
     mount: {
       orientation: mount.orientation as MountOrientation,
       panZeroBearingDeg: mount.panZeroBearingDeg as number,
       status: mount.status as EvidenceStatus,
       note: mount.note as string,
+      ...(mountProvenance ? { provenance: mountProvenance } : {}),
+      headingEvidence: {
+        status: headingStatus as EvidenceStatus,
+        note: headingNote as string,
+        ...(headingProvenance ? { provenance: headingProvenance } : {}),
+      },
     },
     reference: { cableRoute, geometryRevision: geometryRevision as VenueProfile["reference"]["geometryRevision"] },
   };
@@ -427,6 +456,7 @@ export function unsettledVenueItems(venue: VenueProfile): string[] {
   }
   if (!SETTLED_VENUE_STATUSES.has(venue.distanceBasis.status)) items.push("Distance basis");
   if (!SETTLED_VENUE_STATUSES.has(venue.mount.status)) items.push("Mount orientation");
+  if (!SETTLED_VENUE_STATUSES.has(venue.mount.headingEvidence.status)) items.push("Pan-zero heading");
   return items;
 }
 
@@ -440,10 +470,12 @@ export function applyFmpStageProfile(current: VenueProfile, profile: FmpStagePro
   next.dimensions.stageDepth = profile === "plan" ? defaults.dimensions.stageDepth : {
     value: ftToM(75), status: "inferred",
     note: "Working depth inferred from the video-office comment. Not a measured performance deck boundary.",
+    provenance: { method: "staff-report", sourceIds: ["video-office-depth-inference"] },
   };
   next.reference.geometryRevision = "photo-review-2026-09";
   next.mount.orientation = "inverted";
-  next.mount.status = "demo";
+  next.mount.status = "confirmed";
+  next.mount.provenance = { method: "photo", sourceIds: ["P100"] };
   next.mount.note = "P100 shows the installed P240 hanging inverted. Existing pan-zero heading is retained; its verification and actual firmware flip settings remain independent of this photo observation.";
   return next;
 }

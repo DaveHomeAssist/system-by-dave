@@ -483,7 +483,6 @@ async function closePanel(page) {
   await check('import round-trips settings, provenance and presets', async () => {
     const project = structuredClone(template);
     // Explicit legacy geometry keeps the saved safe-wide exercise fixture meaningful.
-    project.venue.version = 2;
     project.venue.dimensions.stageWidth.value = 61 * 0.3048;
     project.venue.dimensions.stageDepth.value = 75 * 0.3048;
     project.venue.dimensions.cameraHeight = { value: 11.5824, status: 'measured', note: 'Probe: laser from catwalk rail to deck' };
@@ -584,6 +583,36 @@ async function closePanel(page) {
     await field.press('Enter');
     await page.getByText('Must be between 20 ft and 400 ft.').waitFor();
     assert(Math.abs((await s.state()).geometry.camera.upstage + 39.624) < 1e-3, 'invalid distance was applied');
+  });
+  await check('mount and heading evidence stay independent; source references survive reload', async () => {
+    await showTab(page, 'Venue');
+    const height = page.getByRole('group', { name: /Camera height above stage/ });
+    await height.getByLabel('Evidence method', { exact: true }).selectOption('field-measurement');
+    const sources = height.getByLabel('Source identifiers (comma separated)', { exact: true });
+    await sources.fill('laser-survey-01, deck-datum');
+    await sources.press('Tab');
+    const exported = await exportProject(page);
+    assert(exported.venue.version === 3, 'wrong venue version');
+    assert(exported.venue.mount.status === 'confirmed' && exported.venue.mount.headingEvidence.status === 'demo', 'mount observation settled heading');
+    assert(exported.venue.dimensions.cameraHeight.provenance.method === 'field-measurement', 'method not stored');
+    assert(exported.venue.dimensions.cameraHeight.provenance.sourceIds.join(',') === 'laser-survey-01,deck-datum', 'references not stored');
+    await sleep(800);
+    await page.reload();
+    await page.waitForFunction(() => window.__fmpCameraSim?.state().renderStatus === 'ok');
+    const reloaded = await exportProject(page);
+    assert(JSON.stringify(reloaded.venue) === JSON.stringify(exported.venue), 'provenance lost on reload');
+    const invalid = structuredClone(reloaded);
+    invalid.venue.mount.headingEvidence.provenance = { method: 'photo', sourceIds: [42] };
+    await importProject(page, invalid);
+    const retained = await exportProject(page);
+    assert(JSON.stringify(retained.venue) === JSON.stringify(reloaded.venue), 'invalid provenance replaced venue');
+    await showTab(page, 'Venue');
+    const editedHeight = page.getByRole('group', { name: /Camera height above stage/ }).getByLabel('Value', { exact: true });
+    await editedHeight.fill('39');
+    await editedHeight.press('Enter');
+    const edited = await exportProject(page);
+    assert(edited.venue.dimensions.cameraHeight.status === 'demo', 'editing retained stale measured confidence');
+    assert(edited.venue.dimensions.cameraHeight.provenance.method === 'operator' && edited.venue.dimensions.cameraHeight.provenance.sourceIds.length === 0, 'editing retained stale references');
   });
   await check('profile preview cancels safely, applies explicitly and survives reload', async () => {
     const before = await exportProject(page);

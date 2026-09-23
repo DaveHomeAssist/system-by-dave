@@ -50,7 +50,7 @@ stage right is house left and appears on the left of the Camera 4 picture.
 | Stage width | 113 ft | Estimated | Revised rotated Stage & Pit plan interpretation; performance deck boundaries are not certified |
 | Camera height above stage | 35 ft | Demo value | Unknown until measured |
 | Camera lateral offset | 0 ft | Demo value | Centred placement is an assumption |
-| Mount | Inverted, pan 0° on centreline | Mixed evidence | P100 shows the installed camera hanging inverted. Heading, support dimensions and firmware flip settings remain unknown; the aggregate mount status stays Demo |
+| Mount | Inverted, pan 0° on centreline | Mixed evidence | P100 shows the installed camera hanging inverted. Heading, support dimensions and firmware flip settings remain unknown; the orientation is photo-confirmed, while heading evidence stays Demo |
 | Deck height, pit depth | 5 ft, 12 ft | Demo value | Drawing only; the pit and barricade change per show |
 
 The cable route (catwalk to ceiling to video office, SDI to ATEM Input 4) is reference text and is
@@ -59,7 +59,7 @@ never used as optical distance. The seating bowl follows public seating guides: 
 backline and pit rail are schematic, not venue CAD.
 
 The **Approximate venue** flag stays visible until every critical item (distance, basis, height,
-lateral offset, width, depth and mount) is measured or confirmed. Invalid geometry is rejected
+lateral offset, width, depth, mount orientation and pan-zero heading) is measured or confirmed. Invalid geometry is rejected
 with the offending field named, and the last valid venue stays in use.
 
 ## Camera model
@@ -114,11 +114,11 @@ The session autosaves to browser storage under `fmpCameraSim.v1` (the `fmp` pref
 through the housevideo.app saved-data transfer). Export/import uses one JSON file:
 
 - `fmp-camera-simulator.project` v1, containing
-- `fmp-camera-simulator.venue` v2 (dimensions with value, evidence status and source note, plus geometry revision provenance),
+- `fmp-camera-simulator.venue` v3 (per-property methods/source identifiers and separate mount-orientation/heading evidence),
 - `fmp-camera-simulator.camera` v1 (published figures, operating limits, uncalibrated behaviour), and
 - `fmp-camera-simulator.session` v1 (speeds, pose, presets, performer, exercise settings and results).
 
-Version-1 venue imports migrate to v2 with `reference.geometryRevision: "legacy-v1"`; all existing dimensions, heading, orientation and presets remain unchanged. New profiles use `photo-review-2026-09`. Venue settings offer a before/after preview and explicit Apply/Cancel for the two provisional stage profiles. Applying updates only stage width/depth and mount orientation, retaining camera coordinates and stored presets. Current tilt can clamp to changed mount limits. Old simulator versions cannot read newly exported venue v2 files.
+Version-1 venue imports migrate to v3 with `reference.geometryRevision: "legacy-v1"`; all existing dimensions, heading, orientation and presets remain unchanged. New profiles use `photo-review-2026-09`. Venue settings offer a before/after preview and explicit Apply/Cancel for the two provisional stage profiles. Applying updates only stage width/depth and mount orientation, retaining camera coordinates and stored presets. Current tilt can clamp to changed mount limits. Versions 1 and 2 keep their numeric settings and copy the former combined mount evidence into the new independent heading record, without inventing photo evidence. Old simulator versions cannot read newly exported venue v3 files.
 
 The overview camera model uses physical scale. Its label identifies the small camera; monitor output never contains the overview model. Support geometry is schematic. Upright operator video does not claim the real camera has E-Flip enabled.
 
@@ -180,8 +180,8 @@ orientation and physical model scale. It does not yet supply surveyed venue geom
 
 Remaining implementation packages, in order:
 
-1. Extend the venue schema with per-property evidence references and configurable sectors,
-   terrain, structures and display records; separate orientation evidence from heading evidence.
+1. Extend the venue schema with configurable sectors, terrain, structures and display records.
+   Per-property evidence references and separate orientation/heading records are now delivered.
 2. Replace schematic bowl strips with individual teal seats, aisles and box bands; add a
    side-elevation pitch inspector. Current 9.46°/25.02° row slopes remain unverified.
 3. Add the pavilion shell, major obstructions, irregular lawn terrain and lawn reference view.
@@ -192,3 +192,26 @@ Remaining implementation packages, in order:
 
 The private reference photographs remain outside the deployed application. Camera height,
 actual bowl pitch, lawn contours, display dimensions and pan-zero require field evidence.
+
+
+### Evidence editing and published hardware
+
+Venue v3 accepts optional provenance on each dimension, distance basis, mount orientation and
+pan-zero heading: `method` plus up to 16 `sourceIds` of at most 160 characters each. Source notes
+retain the observation/measurement description; source identifiers refer to the operator's
+reference log. Unknown methods, malformed references and missing v3 heading records reject the
+whole import before it replaces the active session. Methods never promote evidence status.
+Changing a value in Venue settings resets its evidence to Demo/operator entry and clears source
+identifiers; the previous note remains available for reference. A verified operator can then
+assign the new evidence and sources. Numeric unit conversions within floating-point tolerance
+do not withdraw the claim.
+
+The new default records P100 as evidence of inverted physical mounting only. Lens height,
+pan-zero heading, firmware Flip/Mirror and camera behaviour remain independent and unverified.
+The explicit photo-profile upgrade preserves existing heading evidence and camera coordinates.
+
+Camera settings display manufacturer body envelope (163 × 199 × 231 mm in published order),
+mass (2.395 kg), sensor (1/2.5-inch CMOS, 8.5 MP), aperture (f/2.0–f/3.8), and 12 VDC/PoE+
+power reference (22.5 W during simultaneous PTZ). These immutable catalog facts use the existing
+BirdDog technical-spec source. They do not change calibrated optics, locate the lens pivot, or
+constitute rigging capacity. The camera export schema remains v1.
