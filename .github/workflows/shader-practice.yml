@@ -1,0 +1,31 @@
+name: Verify Shader practice
+
+# The Pages workflow runs these gates again on main before deploying. Running
+# them on pull requests catches a broken console before it merges.
+on:
+  pull_request:
+    paths:
+      - 'shader/**'
+      - 'scripts/*shader*'
+      - 'scripts/verify_public_*.js'
+      - '.github/workflows/shader-practice.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  practice:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Engine tests and source release gate
+        run: npm run verify:shader-practice
+      - name: Browser probe
+        run: npm run test:shader-practice-browser
