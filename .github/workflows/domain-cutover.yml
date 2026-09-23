@@ -32,6 +32,7 @@ jobs:
         run: |
           npm run verify:av
           npm run verify:throwline
+          npm run verify:shader-practice
       - run: npx playwright install --with-deps chromium
       - run: npm run verify:domain-sites
       - run: node --test scripts/check_domain_cutover_ready.test.mjs

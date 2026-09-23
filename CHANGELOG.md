@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-23 — Camera practice moved to Shader
+
+- Moved the simulated camera-shading exercises, scopes, state engine, offline cache, and release gates to the existing Camera Control & Shading reference at `housevideo.app/shader/`.
+- Removed camera-practice navigation, storage, sitemap, and offline ownership from Throwline while retaining its projector planning, spatial, commissioning, and demonstration work.
+- Kept the former Throwline practice URL as a noindex compatibility redirect and retained import support for existing exported practice sessions.
+
 ## 2026-09-23 — Throwline spatial commissioning and scope-practice suite
 
 - Added direct pointer and keyboard manipulation for projector placement and room obstructions, selected-object feedback, snapping, fine steps, and dimensioned plan/elevation callouts without moving optical calculations into the renderer.

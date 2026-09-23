@@ -235,8 +235,6 @@ const main = read('ProjectorThrow/index.html');
 const stage = read('ProjectorThrow/Stage3D.html');
 const sidecar = read('ProjectorThrow/three-d-stage.js');
 const avWorker = read('av-suite-worker.js');
-const practice = read('ProjectorThrow/practice.html');
-const practiceState = read('ProjectorThrow/throwline-practice-state.js');
 const sceneState = read('ProjectorThrow/throwline-scene-state.js');
 const browserProbe = read('scripts/probe_throwline_stage3d.js');
 const sitemap = read('sitemap.xml');
@@ -575,7 +573,7 @@ requireMatch(main, /put\(["']md["'][\s\S]*?put\(["']mw["'][\s\S]*?put\(["']vb["'
 });
 if (!fs.existsSync(path.join(ROOT, 'scripts/probe_throwline_stage3d.js'))) fail('The Stage 3D browser regression probe is missing.');
 requireMatch(browserProbe, /no-WebGL mode visibly replaces the failed canvas with a populated 2D plan[\s\S]*?2D fallback redraws from the same live scene state/, 'The browser probe must hard-fail unless the no-WebGL 2D fallback is visible, populated, and live.');
-if (packageJson?.scripts?.['test:throwline-browser'] !== 'node scripts/probe_throwline_stage3d.js --no-sandbox && node scripts/probe_throwline_stage3d.js --no-sandbox --no-webgl && node scripts/probe_throwline_practice.js --no-sandbox') fail('Throwline browser verification must hard-fail WebGL, degraded-renderer, and Scope Practice probe runs.');
+if (packageJson?.scripts?.['test:throwline-browser'] !== 'node scripts/probe_throwline_stage3d.js --no-sandbox && node scripts/probe_throwline_stage3d.js --no-sandbox --no-webgl') fail('Throwline browser verification must hard-fail WebGL and degraded-renderer probe runs.');
 requireMatch(pagesWorkflow, /Verify Throwline browser runtime[\s\S]*?run:\s*npm run test:throwline-browser/, 'The Pages release gate must run the hard-fail Throwline browser regression suite.');
 const stageTryIndex = stage.indexOf('const { THREE } = await stage.ready');
 ['function rebuildFacts(', 'function readout(', 'function updateWorkspaceFacts(', 'function applySceneIntent(', 'SceneState.createSceneState('].forEach((token) => {
@@ -605,7 +603,6 @@ requireMatch(main, /put\(["']tolPct["']/, 'The planner must transfer its plannin
 });
 if (/id=["']hState["'][^>]*>FITS SUPPLIED RANGE</.test(stage)) fail('Stage 3D must not ship a hard-coded verdict in its markup.');
 requireMatch(main, /id=["']stage3dLink["']/, 'The planner Stage 3D link must be state-aware.');
-requireMatch(main, /id=["']scopePracticeLink["'][^>]*href=["']practice\.html["']/, 'The planner must expose a direct Scope Practice destination.');
 requireMatch(main, /function\s+stage3dUrlFor\s*\(/, 'The planner must serialize validated Stage 3D transfer state.');
 requireMatch(main, /ThrowlineSceneState[\s\S]*?createSceneState/, 'The planner must normalize Stage 3D transfer values through the shared scene-state contract.');
 requireMatch(sidecar, /Use keys 1 through 5 for cameras/, 'Stage 3D canvas instructions must expose all five camera shortcuts.');
@@ -703,27 +700,6 @@ requireMatch(stage, /setDimensionAnnotations\([\s\S]*?image-aim[\s\S]*?screen-bo
 requireMatch(sidecar, /stage-manipulation[\s\S]*?obstacleId[\s\S]*?snapStep[\s\S]*?delta/, 'Stage 3D manipulation events must carry object identity and snap evidence.');
 requireMatch(sidecar, /_derivedDimensionAnnotations\([\s\S]*?Nearest body clearance[\s\S]*?obstacle-callout:/, 'Stage 3D dimension views must derive clearance and obstruction callouts.');
 
-// Scope-practice simulation contract. These are generated training values, never device measurements or controls.
-requireMatch(practice, /SIMULATION FOR PRACTICE/, 'Scope Practice must identify itself as a simulation.');
-requireMatch(practice, /Generated practice signal · not a measurement/, 'Scope Practice must disclaim measurement claims beside the scopes.');
-requireMatch(practice, /throwline-practice-state\.js/, 'Scope Practice must load the pure deterministic state engine.');
-requireMatch(practice, /id=["']cameraCardA["'][\s\S]*?id=["']cameraCardB["']/, 'Scope Practice must expose two virtual camera monitors.');
-['stateIdentity','cameraCanvasA','cameraCanvasB','controlList','scopeCanvas','exportButton','importButton','copyLinkButton','themeButton'].forEach((id) => {
-  requireMatch(practice, new RegExp(`id=["']${id}["']`), `Scope Practice is missing ${id}.`);
-});
-requireMatch(practiceState, /const SCHEMA = 'throwline\.camera-practice\.v1'/, 'Scope Practice state must use its versioned schema.');
-['iris','pedestal','gain','gamma','whiteBalance','saturation','colorPhase'].forEach((control) => {
-  requireMatch(practiceState, new RegExp(`\\b${control}:\\s*\\[`), `Scope Practice state is missing the ${control} control range.`);
-});
-['match-cameras','recover-highlights','set-black-level','neutralize-cast'].forEach((scenario) => {
-  if (!practiceState.includes(`'${scenario}'`)) fail(`Scope Practice is missing the ${scenario} exercise.`);
-});
-['waveform','parade','vectorscope','histogram'].forEach((scope) => {
-  if (!practiceState.includes(`'${scope}'`)) fail(`Scope Practice is missing the ${scope} scope.`);
-});
-requireMatch(practice, /url\.hash\s*=\s*`state=/, 'Scope Practice must expose an exact full-state handoff link.');
-requireMatch(practice, /connect-src 'none'/, 'Scope Practice must not connect to equipment or network APIs.');
-
 // Workflow deck and responsive menu contract (2026-09-20).
 ['setup', 'place', 'room', 'deliver'].forEach((name) => {
   const title = name[0].toUpperCase() + name.slice(1);
@@ -812,13 +788,7 @@ if (!throwlineTools[0]?.storageKeys?.some((item) => item.key === 'throwline:stag
 if (!throwlineTools[0]?.storageKeys?.some((item) => item.key === 'throwline:stage-units:v1')) {
   fail('Registry must include the versioned Throwline Stage measurement-units key.');
 }
-if (!throwlineTools[0]?.storageKeys?.some((item) => item.key === 'throwline.practice.theme.v1')) {
-  fail('Registry must include the Scope Practice theme key.');
-}
-if (!avRegistry.offlineAssets?.().includes('./ProjectorThrow/practice.html') || !avRegistry.offlineAssets?.().includes('./ProjectorThrow/throwline-practice-state.js')) {
-  fail('AV offline assets must include Scope Practice and its deterministic engine.');
-}
-['ProjectorThrow/', 'ProjectorThrow/Stage3D.html', 'ProjectorThrow/practice.html'].forEach((route) => {
+['ProjectorThrow/', 'ProjectorThrow/Stage3D.html'].forEach((route) => {
   const url = `${originFor(route)}/${route}`;
   if (!sitemapFor(route).includes(`<loc>${url}</loc>`)) fail(`Sitemap is missing ${url}.`);
 });

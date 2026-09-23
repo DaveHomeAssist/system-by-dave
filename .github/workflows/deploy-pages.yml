@@ -73,6 +73,12 @@ jobs:
       - name: Verify Throwline browser runtime
         run: npm run test:throwline-browser
 
+      - name: Verify Shader practice release
+        run: npm run verify:shader-practice
+
+      - name: Verify Shader practice browser runtime
+        run: npm run test:shader-practice-browser
+
       - name: Verify NoteForge release contract
         run: npm run verify:noteforge
 

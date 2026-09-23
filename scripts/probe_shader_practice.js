@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 'use strict';
 
-// Browser acceptance probe for the deterministic Throwline camera-shading lab.
+// Browser acceptance probe for the deterministic Shader camera-shading lab.
 // It drives the shipped page without a framework dependency and verifies the
 // operator path, scope switching, exact handoff, responsive containment, and
 // the boundary that this page generates practice data rather than device I/O.
@@ -41,7 +41,7 @@ async function startServer() {
   const port = 8800 + Math.floor(Math.random() * 300);
   const server = spawn('python3', ['-m', 'http.server', String(port), '--bind', '127.0.0.1'], { cwd: root, stdio: 'ignore' });
   const baseUrl = `http://127.0.0.1:${port}/`;
-  await waitForHttp(`${baseUrl}ProjectorThrow/practice.html`);
+  await waitForHttp(`${baseUrl}shader/practice.html`);
   return { server, baseUrl };
 }
 
@@ -51,7 +51,7 @@ async function main() {
   let staticServer;
   if (!baseUrl) { staticServer = await startServer(); baseUrl = staticServer.baseUrl; }
   const port = 9800 + Math.floor(Math.random() * 300);
-  const profile = fs.mkdtempSync(path.join(os.tmpdir(), 'throwline-practice-probe-'));
+  const profile = fs.mkdtempSync(path.join(os.tmpdir(), 'shader-practice-probe-'));
   const chrome = spawn(chromeBin, [
     ...(args.includes('--no-sandbox') || (typeof process.getuid === 'function' && process.getuid() === 0) ? ['--no-sandbox'] : []),
     '--headless=new', '--disable-gpu', '--disable-background-networking', '--disable-component-update', '--no-first-run',
@@ -83,16 +83,16 @@ async function main() {
     const open = async url => {
       await cdp('Page.navigate', { url });
       for (let count = 0; count < 120; count += 1) {
-        try { if (await evaluate('Boolean(window.ThrowlinePracticeApp && document.getElementById("scopeCanvas"))')) { await delay(120); return; } } catch {}
+        try { if (await evaluate('Boolean(window.ShaderPracticeApp && document.getElementById("scopeCanvas"))')) { await delay(120); return; } } catch {}
         await delay(100);
       }
-      throw new Error(`Scope Practice did not become ready: ${url}`);
+      throw new Error(`Shader Practice did not become ready: ${url}`);
     };
-    const url = `${baseUrl}ProjectorThrow/practice.html?scenario=match-cameras&seed=browser-proof`;
+    const url = `${baseUrl}shader/practice.html?scenario=match-cameras&seed=browser-proof`;
     await cdp('Emulation.setDeviceMetricsOverride', { width: 1440, height: 900, deviceScaleFactor: 1, mobile: false });
     await open(url);
-    const baseline = await evaluate(`(() => { const state=ThrowlinePracticeApp.getState(); return {schema:state.schema, cameras:state.cameras.length, controls:Object.keys(state.cameras[0].controls).length, score:ThrowlinePracticeState.evaluatePractice(state).score, label:document.querySelector('.simulation-label')?.textContent.trim(), disclaimer:document.querySelector('.scope-caption')?.textContent.trim(), chain:document.getElementById('stateIdentity')?.textContent.trim()}; })()`);
-    check('practice page exposes two cameras, seven controls, and the versioned shared state', baseline.schema === 'throwline.camera-practice.v1' && baseline.cameras === 2 && baseline.controls === 7 && /throwline\.camera-practice\.v1/.test(baseline.chain), baseline);
+    const baseline = await evaluate(`(() => { const state=ShaderPracticeApp.getState(); return {schema:state.schema, cameras:state.cameras.length, controls:Object.keys(state.cameras[0].controls).length, score:ShaderPracticeState.evaluatePractice(state).score, label:document.querySelector('.simulation-label')?.textContent.trim(), disclaimer:document.querySelector('.scope-caption')?.textContent.trim(), chain:document.getElementById('stateIdentity')?.textContent.trim()}; })()`);
+    check('practice page exposes two cameras, seven controls, and the versioned shared state', baseline.schema === 'shader.camera-practice.v1' && baseline.cameras === 2 && baseline.controls === 7 && /shader\.camera-practice\.v1/.test(baseline.chain), baseline);
     check('practice page visibly labels generated simulation data', baseline.label === 'SIMULATION FOR PRACTICE' && baseline.disclaimer === 'Generated practice signal · not a measurement', baseline);
 
     let offlineReady = false;
@@ -103,24 +103,24 @@ async function main() {
     check('a fresh direct visit prepares its own offline cache', offlineReady, await evaluate(`({state:document.documentElement.dataset.offline||'',status:document.getElementById('offlineStatus')?.textContent.trim(),controlled:Boolean(navigator.serviceWorker?.controller)})`));
     await cdp('Network.emulateNetworkConditions', { offline: true, latency: 0, downloadThroughput: -1, uploadThroughput: -1 });
     await open(url);
-    const offlineReload = await evaluate(`({schema:ThrowlinePracticeApp.getState().schema,state:document.documentElement.dataset.offline||'',controlled:Boolean(navigator.serviceWorker?.controller)})`);
-    check('scope practice reloads from a fresh-profile cache while offline', offlineReload.schema === 'throwline.camera-practice.v1' && offlineReload.controlled, offlineReload);
+    const offlineReload = await evaluate(`({schema:ShaderPracticeApp.getState().schema,state:document.documentElement.dataset.offline||'',controlled:Boolean(navigator.serviceWorker?.controller)})`);
+    check('scope practice reloads from a fresh-profile cache while offline', offlineReload.schema === 'shader.camera-practice.v1' && offlineReload.controlled, offlineReload);
     await cdp('Network.emulateNetworkConditions', { offline: false, latency: 0, downloadThroughput: -1, uploadThroughput: -1 });
 
     const match = await evaluate(`(() => {
       document.querySelector('[data-camera-switch="camera-b"]').click();
-      const state=ThrowlinePracticeApp.getState(), reference=state.cameras.find(camera=>camera.id==='camera-a').controls;
+      const state=ShaderPracticeApp.getState(), reference=state.cameras.find(camera=>camera.id==='camera-a').controls;
       for (const [name,value] of Object.entries(reference)) { const input=document.querySelector('[data-control="'+name+'"]'); input.value=value; input.dispatchEvent(new Event('input',{bubbles:true})); }
-      const next=ThrowlinePracticeApp.getState(); return {score:ThrowlinePracticeState.evaluatePractice(next).score,selected:next.selectedCameraId};
+      const next=ShaderPracticeApp.getState(); return {score:ShaderPracticeState.evaluatePractice(next).score,selected:next.selectedCameraId};
     })()`);
     check('matching Camera B through the visible control panel improves the exercise to a passing score', match.selected === 'camera-b' && match.score > baseline.score && match.score >= 95, { baseline: baseline.score, match });
 
-    const scopes = await evaluate(`(() => { const result={}; for(const name of ['waveform','parade','vectorscope','histogram']){document.querySelector('[data-scope="'+name+'"]').click();const state=ThrowlinePracticeApp.getState();const canvas=document.getElementById('scopeCanvas');const pixels=canvas.getContext('2d').getImageData(0,0,canvas.width,canvas.height).data;result[name]={selected:state.scope,drawn:pixels.some(value=>value!==0)};}return result; })()`);
+    const scopes = await evaluate(`(() => { const result={}; for(const name of ['waveform','parade','vectorscope','histogram']){document.querySelector('[data-scope="'+name+'"]').click();const state=ShaderPracticeApp.getState();const canvas=document.getElementById('scopeCanvas');const pixels=canvas.getContext('2d').getImageData(0,0,canvas.width,canvas.height).data;result[name]={selected:state.scope,drawn:pixels.some(value=>value!==0)};}return result; })()`);
     check('all four visible scope tabs select and render', Object.entries(scopes).every(([name,result]) => result.selected === name && result.drawn), scopes);
 
-    const handoff = await evaluate(`(() => ({state:ThrowlinePracticeApp.getState(),url:ThrowlinePracticeApp.fullStateLink()}))()`);
+    const handoff = await evaluate(`(() => ({state:ShaderPracticeApp.getState(),url:ShaderPracticeApp.fullStateLink()}))()`);
     await open(handoff.url);
-    const reproduced = await evaluate('ThrowlinePracticeApp.getState()');
+    const reproduced = await evaluate('ShaderPracticeApp.getState()');
     check('full-state handoff reproduces the exact practice session', JSON.stringify(reproduced) === JSON.stringify(handoff.state));
 
     const responsive = [];
@@ -140,8 +140,8 @@ async function main() {
     try { await fs.promises.rm(profile, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 }); }
     catch (error) { console.warn(`Could not remove temporary Chrome profile ${profile}: ${error.message}`); }
   }
-  if (failures.length) { console.error(`Scope Practice browser probe failed (${failures.length}).`); process.exit(1); }
-  console.log('Scope Practice browser probe passed.');
+  if (failures.length) { console.error(`Shader Practice browser probe failed (${failures.length}).`); process.exit(1); }
+  console.log('Shader Practice browser probe passed.');
 }
 
 main().catch(error => { console.error(error.stack || error.message); process.exit(1); });
