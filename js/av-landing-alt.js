@@ -19,7 +19,7 @@
     toggle.textContent = mode === 'dark' ? 'Light mode' : 'Dark mode';
     toggle.setAttribute('aria-label', 'Use ' + (mode === 'dark' ? 'light' : 'dark') + ' mode');
     toggle.setAttribute('aria-pressed', String(mode === 'dark'));
-    themeColor.setAttribute('content', mode === 'dark' ? '#04080c' : '#f4f6f8');
+    themeColor.setAttribute('content', mode === 'dark' ? '#06101a' : '#edf3f8');
   }
 
   function save() {

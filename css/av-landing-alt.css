@@ -3,7 +3,11 @@
    and the live AV tools keep their shared palette in av-theme.css. */
 html[data-av-tool="landing-alt"] {
   color-scheme: light;
-  --landing-canvas: #f4f6f8;
+  --landing-canvas: #edf3f8;
+  --landing-canvas-deep: #dce9f1;
+  --landing-grid: #416b8914;
+  --landing-ring: #416b891c;
+  --landing-glow: #7baecc55;
   --landing-surface: #ffffff;
   --landing-surface-2: #eef1f4;
   --landing-console: #101820;
@@ -34,7 +38,11 @@ html[data-av-tool="landing-alt"] {
 }
 html[data-av-tool="landing-alt"][data-av-theme="dark"] {
   color-scheme: dark;
-  --landing-canvas: #04080c;
+  --landing-canvas: #06101a;
+  --landing-canvas-deep: #02070d;
+  --landing-grid: #87afcb12;
+  --landing-ring: #8ab8d225;
+  --landing-glow: #2e769b66;
   --landing-surface: #090e14;
   --landing-surface-2: #101820;
   --landing-console: #0b1219;
@@ -88,7 +96,18 @@ main:focus { outline: none; }
   position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
   overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
 }
-.page-bg { display: none; }
+/* A static drafting field leads the eye toward the console without implying live data. */
+.page-bg {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    radial-gradient(circle at 77% 26%, transparent 0 198px, var(--landing-ring) 199px 200px, transparent 201px 359px, var(--landing-ring) 360px 361px, transparent 362px),
+    radial-gradient(ellipse 50% 45% at 78% 23%, var(--landing-glow), transparent 74%),
+    linear-gradient(90deg, var(--landing-grid) 1px, transparent 1px),
+    linear-gradient(var(--landing-grid) 1px, transparent 1px),
+    linear-gradient(135deg, var(--landing-canvas), var(--landing-canvas-deep));
+  background-size: auto, auto, 80px 80px, 80px 80px, auto;
+}
+main, footer { position: relative; z-index: 1; }
 .wrap { width: min(100% - 48px, var(--landing-max)); margin-inline: auto; }
 
 /* Navigation */
