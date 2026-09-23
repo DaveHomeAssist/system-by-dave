@@ -152,3 +152,20 @@ describe("store exercise guards", () => {
     expect(store.updateVenue(venue).ok).toBe(true);
   });
 });
+
+
+describe("show package isolation", () => {
+  it("swaps touring equipment without changing venue records, geometry, presets or camera pose", () => {
+    const { store } = makeStore();
+    const before = store.getState();
+    const venue = JSON.stringify(before.project.venue), geometry = JSON.stringify(before.geometry);
+    const presets = JSON.stringify(before.project.session.presets), pose = store.getTelemetry().snapshot.pose;
+    expect(store.updateShowPackage({version:1,name:"Empty stage",fixtures:[]}).ok).toBe(true);
+    const after = store.getState();
+    expect(JSON.stringify(after.project.venue)).toBe(venue);
+    expect(JSON.stringify(after.geometry)).toBe(geometry);
+    expect(JSON.stringify(after.project.session.presets)).toBe(presets);
+    expect(store.getTelemetry().snapshot.pose).toEqual(pose);
+    expect(after.project.session.showPackage.fixtures).toEqual([]);
+  });
+});

@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-23 — FMP pavilion, FOH and LED walls
+
+- Added evidence-tagged shell, house fixtures and independently replaceable touring equipment; overview cutaway preserves physical monitor obstructions.
+- Added the FOH mix platform with seat clearance, six house LED walls and a separate touring wall. Operator pixel space (1600 × 900), 10 mm side pitch and corrected 8 mm delay pitch remain separate from provisional physical dimensions.
+- Added venue v5/session v2 migration and validation without changing saved camera dimensions, pose or presets. Roof, facade, fixture positions and sizes remain unmeasured.
+
 ## 2026-09-23 — FMP hub keeps in-page anchors and survives a missing filter control
 
 - `fmp/public.js`: the hub intercepted every in-page anchor and turned it into a jump
