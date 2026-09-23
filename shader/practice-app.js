@@ -1075,6 +1075,14 @@
     const count = layout.single ? 1 : 2;
     if (sideBySide) {
       wall.style.removeProperty('--wall-height');
+      // Very wide, short screens: size the monitor column to two stacked 16:9
+      // tiles and give the remaining width to the scopes instead of letterbox.
+      const chrome = Math.max(0, els.monitorPanel.offsetHeight - wall.offsetHeight);
+      const wallRoom = center.clientHeight - chrome;
+      const stackedWidth = ((wallRoom - 8) / 2 - 24) * 16 / 9 + 28;
+      const half = (center.clientWidth - 12) / 2;
+      const column = Math.round(Math.max(360, Math.min(half, stackedWidth)));
+      if (center.style.getPropertyValue('--monitor-column') !== `${column}px`) center.style.setProperty('--monitor-column', `${column}px`);
       const height = wall.clientHeight || center.clientHeight;
       const rowWidth = Math.min((width - 8) / count, (height - 24) * 16 / 9);
       const columnWidth = Math.min(width, ((height - 8) / count - 24) * 16 / 9);

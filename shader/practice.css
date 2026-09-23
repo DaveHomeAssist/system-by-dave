@@ -490,7 +490,7 @@ input[type="range"]:focus-visible { outline-offset: 0; }
 /* ---------- ultrawide: monitors and scopes side by side ---------- */
 @media (min-width: 1920px) {
   .workspace { grid-template-columns: 320px minmax(0, 1fr) 396px; }
-  .col-center { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--space-3); }
+  .col-center { display: grid; grid-template-columns: var(--monitor-column, minmax(0, 1fr)) minmax(0, 1fr); gap: var(--space-3); }
   .monitor-panel { min-height: 0; }
   .monitor-wall { flex: 1 1 auto; }
   body { font-size: 15px; }
