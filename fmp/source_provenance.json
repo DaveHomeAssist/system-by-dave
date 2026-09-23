@@ -1,7 +1,7 @@
 {
   "schema": "fmp.public.release.v2",
   "sourceRepository": "DaveHomeAssist/fmp-suite",
-  "sourceCommit": "8c4105328d02fcf1cea70ac68976970d145158cc",
+  "sourceCommit": "2c519b369d8f5df51d43e6794de9900f2bb68b81",
   "mode": "commissioning",
   "files": {
     "build/index.html": "6795496306a0487f7d68f5eec8bc324d9783f312e0bad30587f77171d8d86cb0",
@@ -26,7 +26,7 @@
     "house/house.js": "8f2e076733f4e3e26da7d63d39d377076dd88b0af9e8ab308a397992e337e0dd",
     "house/index.html": "f8fc79d04826ca26c469a3bd9f6a379b000d65c42b0e9127a8d5985561ad0684",
     "house/site-plan.png": "655d27449a2f686ad17b74bed39b11edc69af9d342d46d079b98c042e4876f2e",
-    "index.html": "084a7ccfa35c053500a61af7953a9705dd0d2a0b7488e05fb1139b47477db05e",
+    "index.html": "013413701eac4ec87adc8a817c250262e8c5899965e6015e8df83d3df62a4285",
     "mail.js": "4a521185a33c8463a3b34493771e381d7982bb59f0f8d9b5096d074727e32a91",
     "models/assets/atem-hd8-iso-0.js": "994da759b9c08666687f604efec7ca474e82d6949ef04cae5a0a5a76dea27fd4",
     "models/assets/atem-hd8-iso-1.js": "c8e396eb457048488a10e71169fe4b9ebdcbda72e48007a52438285d46fe836d",
@@ -55,7 +55,7 @@
     "ptz/SuperJoy-G1-Interactive-Guide.html": "b24684201ac8d71d135a7adc7091e590f7bb0a4bddde0a969229787ddafe9065",
     "ptz/index.html": "f7f157b0302f08427e5d6b0b403ff1e890188dafb432004fe0af751d88d39e8b",
     "public.css": "aca2a0cc10a822a1d3ea54427595fb99964671be9e8fb4b1b01fc9a2ea06514c",
-    "public.js": "5ec85cac457d89ffddd5a2e550cfff8c213529d00152240314bf9eac2679d7d7",
+    "public.js": "39e3d8a142c230a1294984a3f4aa0eb2fef4d568614cb4c1fadee038e6592b6a",
     "ref.css": "06116202f4e535153c538bf4c8495fc404f13df39f32c0c41f1b8db6574562a6",
     "ref.js": "2dbb9a82f204bb5173360b7c52ffe4296afb6ae1618a69825398138508dd9fc5",
     "rig/assets/body-controls.webp": "b1a7619b8749b8f1baf34ae5c0f19075e5dbf82e2a958246749bcabddd7d4d57",
@@ -84,5 +84,5 @@
     "rig/vendor/three/three.module.js": "a476b88d0df406dca0e30c65b4cdf0180c7337110accec828c103655b56a361c",
     "theme.js": "34276e275d44d4380407b996455291bfcca9cc4a9a4ef81b632534b00fc1747a"
   },
-  "artifactSha256": "d5f8064eb0b6649a03994bca3ebe6ffb8a794034ebb51da495e5f56abbc5c70d"
+  "artifactSha256": "6840dba534db739b1b803183ebcaee623638e5aae549319c8d0f28e1900ac2c0"
 }

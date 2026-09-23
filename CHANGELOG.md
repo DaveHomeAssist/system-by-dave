@@ -1,5 +1,24 @@
 # Changelog
 
+## 2026-09-23 — FMP hub keeps in-page anchors and survives a missing filter control
+
+- `fmp/public.js`: the hub intercepted every in-page anchor and turned it into a jump
+  to Operators, because the click guard compared against `panelHash`, which always
+  returns a panel. `hashchange` did the same from the other direction. A new
+  `panelFor` returns null for a hash that names no panel, so ordinary anchors are left
+  to the browser; first paint still defaults an unknown hash to Operators.
+- `fmp/public.js`: the reference filter dereferenced its controls unguarded. Every
+  panel but one ships hidden and only `show()` reveals them, so one renamed control
+  could leave the page with no visible panel and dead tabs. The filter is now treated
+  as the enhancement it is.
+- `fmp/index.html` changes only the `public.js?v=` content hash, so browsers fetch the
+  new script.
+- Exported from fmp-suite `2c519b3` (PR #22). Nothing else rides along: the Camera 4
+  SDI correction was already published in `3185388`, and the prior pin was `8c41053`.
+- PR #22's backend changes — the bounded `listEvents` and the removed duplicate fault
+  readback — are Cloud Run code and are **not** published by this site deploy. They go
+  live only when `backend/deploy.sh` runs. The camera pages keep `data-setup-test-only`.
+
 ## 2026-09-23 — FMP sectional bowl and pitch inspector
 
 - Added versioned, evidence-tagged sectors and elevation control points with legacy defaults that preserve saved dimensions and presets.
