@@ -795,6 +795,41 @@ for (const [label, viewport, expectation] of [
   });
 }
 
+// iOS Safari renders the same CSS pixels about a tenth wider than desktop browsers. The phone
+// header must keep its shape with that slack: two bar rows, one row of flags, one row of monitor
+// tools, an uncut breadcrumb, and the joystick inside the first screen.
+await check('phone 390: the bar, breadcrumb and monitor tools survive wider text', async () => {
+  const { context, page } = await open({ context: { viewport: { width: 390, height: 844 } } });
+  const measure = () =>
+    page.evaluate(() => {
+      const rect = (selector) => document.querySelector(selector).getBoundingClientRect();
+      const flags = [...document.querySelectorAll('.sim-flags .flag')].map((flag) => flag.getBoundingClientRect());
+      const nav = document.querySelector('.sbd-site-return');
+      return {
+        overflow: document.documentElement.scrollWidth - window.innerWidth,
+        navOverflow: nav.scrollWidth - nav.clientWidth,
+        flagRows: new Set(flags.map((r) => Math.round(r.top))).size,
+        barHeight: rect('.sim-bar').height,
+        toolsHeight: rect('.monitor-panel .panel-tools').height,
+        joystickTop: rect('.joystick').top,
+      };
+    });
+  const normal = await measure();
+  // The page's CSP blocks injected stylesheets; CSSOM edits are the honest way to widen text.
+  await page.evaluate(() => {
+    for (const el of document.querySelectorAll('.sim-app, .sim-app *, .sbd-site-return, .sbd-site-return *')) el.style.letterSpacing = '0.08em';
+  });
+  const wide = await measure();
+  for (const [name, m] of [['normal text', normal], ['wide text', wide]]) {
+    assert(m.overflow <= 1 && m.navOverflow <= 1, `${name}: horizontal overflow (page ${m.overflow}px, breadcrumb ${m.navOverflow}px)`);
+    assert(m.flagRows === 1, `${name}: flags wrapped onto ${m.flagRows} rows`);
+    assert(m.barHeight <= 112, `${name}: app bar is ${Math.round(m.barHeight)}px tall`);
+    assert(m.toolsHeight <= 48, `${name}: monitor tools wrapped (${Math.round(m.toolsHeight)}px)`);
+    assert(m.joystickTop < 844, `${name}: joystick starts below the first screen (${Math.round(m.joystickTop)}px)`);
+  }
+  await context.close();
+});
+
 await browser.close();
 server.close();
 const failed = results.filter((result) => !result.ok);

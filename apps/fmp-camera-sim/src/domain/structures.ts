@@ -22,14 +22,24 @@ export interface ShowPackage { version: 1; name: string; fixtures: SceneFixture[
 export const sceneDemo = <T>(value: T, note = "Unmeasured procedural assumption. Photos establish presence and relationships only."): SceneValue<T> => ({ value, status: "demo", note, provenance: { method: "assumption", sourceIds: [] } });
 const fixture = (id: string, kind: FixtureKind, right: number, height: number, upstage: number, width: number, tall: number, depth: number): SceneFixture => ({ id, kind, enabled: sceneDemo(true), position: sceneDemo({ right, height, upstage }), size: sceneDemo({ right: width, height: tall, upstage: depth }), yaw: sceneDemo(0) });
 const operatorConfirmed = (value: number, note: string): SceneValue<number> => ({ value, status: "confirmed", note, provenance: { method: "operator", sourceIds: ["operator-display-spec-20260923"] } });
-function led(id: string, x: number, y: number, upstage: number, pitch: number, yaw = 0): SceneFixture {
+/** Whether a wall exists, as the operator reported it. Presence confidence never covers size or position. */
+const operatorPresence = (status: "confirmed" | "inferred", note: string): SceneValue<boolean> => ({ value: true, status, note, provenance: { method: "operator", sourceIds: ["operator-display-spec-20260923"] } });
+// The operator reported side walls at 10 mm and delay walls at 8 mm. That confirms the two flanking
+// walls (also seen in P034 and P064/P079); the number of delay walls and where they hang came from
+// the house reference inventory, so each delay wall is inferred until the inventory is checked.
+const WALL_ROLES = {
+  side: { pitch: 10, presence: () => operatorPresence("confirmed", "Operator confirmed the flanking house walls (10 mm pitch); P034 and P064/P079 show them. Size and mounting position remain unmeasured.") },
+  delay: { pitch: 8, presence: () => operatorPresence("inferred", "Operator confirmed delay walls with 8 mm pitch. The count of four and each position come from the house reference inventory and are unverified; disable any wall that does not exist.") },
+} as const;
+function led(id: string, role: keyof typeof WALL_ROLES, x: number, y: number, upstage: number, yaw = 0): SceneFixture {
   const f = fixture(id, "led", x, y, upstage, 7.2, 4.05, 0.25);
   f.yaw.value = yaw;
+  f.enabled = WALL_ROLES[role].presence();
   f.size.note = "Demo physical size. The 1600 × 900 pixel space is not verified as native LED resolution and does not establish wall dimensions.";
   f.display = {
     pixelWidth: operatorConfirmed(1600, "Operator supplied pixel space; processor canvas versus native wall resolution unresolved."),
     pixelHeight: operatorConfirmed(900, "Operator supplied pixel space; does not determine physical height."),
-    pitchMm: operatorConfirmed(pitch, "Operator correction: 10 mm side walls, 8 mm delay walls."),
+    pitchMm: operatorConfirmed(WALL_ROLES[role].pitch, "Operator correction: 10 mm side walls, 8 mm delay walls."),
   };
   return f;
 }
@@ -41,9 +51,9 @@ export function defaultStructures(): StructuresRecord {
     fixture("fan-left", "fan", -13, 16, -12, 5, 0.4, 5), fixture("fan-right", "fan", 13, 16, -12, 5, 0.4, 5),
     fixture("fan-rear", "fan", 0, 18, -30, 5, 0.4, 5),
     fixture("rail-left", "railing", -26, 7, -25, 8, 1.05, 0.08), fixture("rail-right", "railing", 26, 7, -25, 8, 1.05, 0.08),
-    led("Stage Right LED", 23, 8, 0, 10), led("Stage Left LED", -23, 8, 0, 10),
-    led("D3 lawn delay", 40, 17, -47, 8, -30), led("D1 lawn delay", 15, 19, -57, 8, -12),
-    led("D2 lawn delay", -15, 19, -57, 8, 12), led("D4 lawn delay", -40, 17, -47, 8, 30),
+    led("Stage Right LED", "side", 23, 8, 0), led("Stage Left LED", "side", -23, 8, 0),
+    led("D3 lawn delay", "delay", 40, 17, -47, -30), led("D1 lawn delay", "delay", 15, 19, -57, -12),
+    led("D2 lawn delay", "delay", -15, 19, -57, 12), led("D4 lawn delay", "delay", -40, 17, -47, 30),
     { ...fixture("Front of House", "foh", 0, 0.15, -36.5, 7, 1.1, 6), position: sceneDemo({right: 0, height: 0.15, upstage: -36.5}, "Mix position at the front of section 202 in the seating plan. Horizontal position and footprint unmeasured. Height is clearance above the highest local bowl tread.") },
     fixture("display-support-left", "display-support", -23, 5, 0, 0.3, 10, 0.3), fixture("display-support-right", "display-support", 23, 5, 0, 0.3, 10, 0.3),
   ] };

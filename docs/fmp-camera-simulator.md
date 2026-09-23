@@ -99,6 +99,15 @@ Releasing a control, losing window focus or a cancelled touch stops commanded mo
 page halts all motion at once and stops the simulation clock. HOME is the camera function (pan 0°,
 tilt 0°, full wide), not the FMP safe-wide show preset.
 
+Layouts follow the viewport: phone below 720 px (one section at a time from the bottom rail),
+tablet below 1100 px, desktop, and ultrawide from 1800 px with the settings panel docked. The
+phone header is built to keep its shape when a browser draws text wider than desktop Chromium
+does (iOS Safari renders the same CSS pixels about a tenth wider): the title shares its row with
+Help and the theme toggle, both accuracy flags share the next row and shorten with an ellipsis
+rather than wrapping, the monitor guides stay on one row, the breadcrumb's current page shortens
+before any link does, and iOS text inflation is disabled. The browser probe measures the phone
+header with widened text so the joystick always starts inside the first screen at 390 × 844.
+
 ## Exercises
 
 Thresholds are training settings in the Exercises panel, not professional standards.
@@ -253,7 +262,8 @@ in early structure records defaults to a provisional zero. Invalid fields reject
 | Roof envelope, curved rear bays, primary steel, stage opening and catwalk | P002, P064, P079 silhouettes | Demo dimensions, not surveyed |
 | Ceiling fans, rails and display supports | Photo presence and relationships | Demo position and size |
 | FOH mix platform | Seating plan locates Mix at the front of section 202 behind the box band | Demo footprint and position; seat clearance follows that footprint |
-| Stage Right / Stage Left and D3, D1, D2, D4 lawn walls | House reference inventory, operator inclusion request | Independent Demo width, height, location and rotation |
+| Stage Right / Stage Left walls | Operator confirmed the 10 mm flanking walls; P034 and P064/P079 show them | Presence Confirmed; independent Demo width, height, location and rotation |
+| D1, D2, D3, D4 lawn delay walls | Operator confirmed delay walls at 8 mm; the count of four and each position come from the house reference inventory | Presence Inferred; independent Demo width, height, location and rotation. Confirm the physical delay-wall count and positions before adding display inventory or media routing |
 | LED pixel space | Operator: 1600 × 900 | Confirmed pixel space; canvas versus native resolution unresolved |
 | LED pitch | Operator correction: sides 10 mm, delays 8 mm | Confirmed; supersedes earlier 7 mm delay reference |
 | Touring PA, legs, truss, backline and optional touring wall | Demo concert package | Replaceable session equipment, not permanent venue geometry |
@@ -280,6 +290,6 @@ Venue v6 adds an independent terrain v1 record. Older files receive Demo default
 
 The terrain editor uses metres and normalized sample positions (0–1). Sample depths must increase; invalid imports retain the current project. Mesh-derived terrain diagnostics and browser tests verify that edits actually change the rendered surface. Grass, concrete circulation and fixtures remain separate from camera mechanics.
 
-Review follow-ups: catwalk and stage opening now remain visible in default overview cutaway, with a restored Catwalk label. LED emissive materials have a separate cache identity from ordinary materials. Delay-wall enabled evidence remains Demo pending inventory confirmation; this release does not silently promote its confidence or disable saved fixtures. Pixel-space metadata remains independent of physical wall size.
+Review follow-ups: catwalk and stage opening now remain visible in default overview cutaway, with a restored Catwalk label. LED emissive materials have a separate cache identity from ordinary materials. Wall presence now carries the operator's report as evidence: the two flanking walls are Confirmed, the four delay walls are Inferred (the operator confirmed delay walls exist; their count and positions are unverified), and the new defaults apply only to new sessions and to imports without a structures record — saved fixtures keep their own evidence and are never promoted or disabled. Pixel-space metadata remains independent of physical wall size.
 
 Phase 3 media routing and field calibration remain separate work. Physical wall placement, terrain contours and every exterior dimension remain provisional.

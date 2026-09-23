@@ -32,7 +32,7 @@ export function AppBar({ state, theme, drawerOpen, drawerTab, showPanelButtons, 
           title={approximate ? `Not yet measured: ${state.unsettled.join(", ")}` : "All critical venue dimensions are measured or confirmed"}
           data-testid="flag-venue"
         >
-          {approximate ? "Approximate venue" : "Measured venue"}
+          <span className="flag-label">{approximate ? "Approximate venue" : "Measured venue"}</span>
           {approximate && <span className="flag-count">{state.unsettled.length}</span>}
         </button>
         <button
@@ -42,11 +42,11 @@ export function AppBar({ state, theme, drawerOpen, drawerTab, showPanelButtons, 
           title={state.calibrated ? "Camera behaviour calibrated" : "Response, stopping and preset travel are training assumptions"}
           data-testid="flag-camera"
         >
-          {state.calibrated ? "Calibrated camera" : "Uncalibrated camera"}
+          <span className="flag-label">{state.calibrated ? "Calibrated camera" : "Uncalibrated camera"}</span>
         </button>
         {exercise && exercise.progress.status === "running" && (
           <button type="button" className="flag flag-live" onClick={(event) => onOpen("exercises", event.currentTarget)}>
-            Exercise running
+            <span className="flag-label">Exercise running</span>
           </button>
         )}
       </div>

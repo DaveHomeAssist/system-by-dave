@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { Matrix4, InstancedMesh, Mesh, PerspectiveCamera, Raycaster, Vector3 } from "three";
-import { defaultStructures, defaultShowPackage, fixtureContains } from "./structures";
+import { defaultStructures, defaultShowPackage, fixtureContains, structuresAreSettled } from "./structures";
 import { defaultProject, serializeProject, parseProjectText } from "./project";
 import { deriveVenueGeometry } from "./venue";
 import { buildStructures, fohFloorHeight, SHELL_LAYER, setShellCutaway } from "../render/structureBuilder";
@@ -19,6 +19,16 @@ describe("venue structures and production", () => {
       expect(wall.size.status).toBe("demo");
       expect(wall.size.value.right).not.toBe(wall.display!.pixelWidth.value * wall.display!.pitchMm.value / 1000);
     }
+  });
+  it("records wall presence as the operator reported it without settling size or position", () => {
+    const walls = defaultStructures().fixtures.filter(f => f.kind === "led");
+    const presence = (id: string) => walls.find(f => f.id === id)!.enabled;
+    for (const id of ["Stage Right LED", "Stage Left LED"]) expect(presence(id)).toMatchObject({ value: true, status: "confirmed", provenance: { method: "operator", sourceIds: ["operator-display-spec-20260923"] } });
+    for (const id of ["D1 lawn delay", "D2 lawn delay", "D3 lawn delay", "D4 lawn delay"]) expect(presence(id)).toMatchObject({ value: true, status: "inferred", provenance: { method: "operator" } });
+    // Each wall owns its evidence object, so editing one delay wall cannot change another.
+    expect(presence("D1 lawn delay")).not.toBe(presence("D2 lawn delay"));
+    for (const wall of walls) { expect(wall.position.status).toBe("demo"); expect(wall.size.status).toBe("demo"); }
+    expect(structuresAreSettled(defaultStructures())).toBe(false);
   });
   it("migrates legacy scene-free exports without changing dimensions, pose or presets", () => {
     const old = JSON.parse(serializeProject(defaultProject())); old.venue.version = 2; old.session.version = 1;
