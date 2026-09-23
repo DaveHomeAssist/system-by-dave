@@ -100,13 +100,17 @@ page halts all motion at once and stops the simulation clock. HOME is the camera
 tilt 0°, full wide), not the FMP safe-wide show preset.
 
 Layouts follow the viewport: phone below 720 px (one section at a time from the bottom rail),
-tablet below 1100 px, desktop, and ultrawide from 1800 px with the settings panel docked. The
-phone header is built to keep its shape when a browser draws text wider than desktop Chromium
-does (iOS Safari renders the same CSS pixels about a tenth wider): the title shares its row with
-Help and the theme toggle, both accuracy flags share the next row and shorten with an ellipsis
-rather than wrapping, the monitor guides stay on one row, the breadcrumb's current page shortens
-before any link does, and iOS text inflation is disabled. The browser probe measures the phone
-header with widened text so the joystick always starts inside the first screen at 390 × 844.
+tablet below 1100 px, desktop, and ultrawide from 1800 px with the settings panel docked. A phone
+in Safari has about 613 pt of page height, so the phone Operate tab spends it on the picture and
+the joystick: the bar holds the two accuracy flags alone (the breadcrumb already names the page,
+and Help, the theme toggle and the monitor guides sit on the Settings tab), the monitor has no
+head and a one-line readout (pan, tilt, zoom, state), and the joystick keeps its 150 px pad
+without keyboard hints. iOS Safari draws the same CSS pixels about a tenth wider than desktop
+Chromium, so every phone row keeps that much slack, the breadcrumb's current page shortens with
+an ellipsis before any link does, and iOS text inflation is disabled. The browser probe measures
+the phone Operate tab at 390 × 844 and 390 × 613 with widened text: the whole joystick pad and
+the zoom buttons must sit above the bottom rail, and the Settings tab must expose the help, theme
+and guide controls.
 
 ## Exercises
 

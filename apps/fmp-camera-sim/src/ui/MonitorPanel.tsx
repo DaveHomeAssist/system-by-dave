@@ -16,7 +16,8 @@ interface Props {
   onGuides(patch: Partial<GuidePreferences>): void;
 }
 
-const GUIDE_BUTTONS: Array<{ key: keyof GuidePreferences; label: string }> = [
+/** Guide toggles, shown in the monitor head and, on phones, on the Settings tab. */
+export const GUIDE_BUTTONS: Array<{ key: keyof GuidePreferences; label: string }> = [
   { key: "safeArea", label: "Safe area" },
   { key: "centre", label: "Centre" },
   { key: "thirds", label: "Thirds" },
@@ -97,11 +98,11 @@ export function MonitorPanel({ state, store, canvasRef, overlayRef, expanded, on
             {lens.zoomRatio.toFixed(1)}× <small>{lens.focalMm.toFixed(1)} mm</small>
           </dd>
         </div>
-        <div>
+        <div className="readout-hfov">
           <dt>HFOV</dt>
           <dd data-testid="readout-hfov">{lens.hfovDeg.toFixed(1)}°</dd>
         </div>
-        <div>
+        <div className="readout-speed">
           <dt>Speed</dt>
           <dd>
             P{speeds.pan} T{speeds.tilt} Z{speeds.zoom} R{speeds.preset}

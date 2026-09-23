@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-09-23 — FMP phone Operate tab fits a Safari screen
+
+- On an iPhone the joystick still sat below the first screen: Safari leaves about 613 pt of page, and the nav, two-row bar, monitor head and two-line readout used most of it. The phone Operate tab now shows the two accuracy flags alone in the bar, no monitor head, a one-line readout and the joystick without keyboard hints, so the picture and the whole joystick pad share the first screen. Help, the theme toggle and the monitor guides moved to the phone Settings tab. The browser probe checks 390 × 844 and 390 × 613 with widened text.
+
 ## 2026-09-23 — FMP LED wall presence evidence and phone header
 
 - Record the operator's report as evidence for the house LED walls: the two flanking walls are Confirmed present, the four lawn delay walls are Inferred (delay walls confirmed; count and positions unverified). Size and position stay Demo, saved sessions are untouched, and the pixel space and pitch records are unchanged.
