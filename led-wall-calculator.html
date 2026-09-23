@@ -37,6 +37,7 @@ html[data-av-tool="led-wall-calculator"].led-workspace-ready body.has-sbd-nav{pa
 html[data-av-tool="led-wall-calculator"].led-workspace-ready .topbar{position:relative;flex:none;padding:8px 16px}
 html[data-av-tool="led-wall-calculator"].led-workspace-ready main{display:flex;flex:1;flex-direction:column;min-height:0;max-width:2160px;padding:10px 14px 12px}
 html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-suite-title > p:not(.led-suite-kicker){display:none}
+html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-section-nav{display:none}
 html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-page-status{flex:none;min-height:32px;margin-bottom:8px;padding:5px 12px}
 html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-suite{
   display:grid;flex:1;min-height:0;
@@ -73,11 +74,17 @@ html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-detail-grid{
 }
 html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-disclaimer{grid-column:1/-1;grid-row:5;padding:7px 12px;font-size:10px}
 @media (max-width:900px){
-  html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-suite{display:block;overflow-y:auto;overscroll-behavior:contain}
+  html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-suite{display:flex;flex-direction:column;overflow-y:auto;overscroll-behavior:contain}
+  html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-suite > *{flex:none}
   html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-suite-head{position:sticky;top:0;z-index:4;background:var(--av-surface)}
   html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-stage{min-height:260px;margin:10px 12px}
-  html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-stage-view{min-height:220px}
-  html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-result-strip{grid-template-columns:repeat(5,minmax(145px,1fr));overflow-x:auto}
+  html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-stage-view{height:auto;min-height:220px}
+  html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-result-strip{flex:none;grid-template-columns:repeat(5,minmax(145px,1fr));overflow-x:auto;scroll-snap-type:x proximity}
+  html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-result{scroll-snap-align:start}
+  html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-section-nav{display:flex;flex:none;gap:8px;overflow-x:auto;padding:8px 12px;border-block:1px solid var(--av-line)}
+  html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-section-nav button{flex:none;min-height:44px;white-space:nowrap}
+  html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-section-nav button:focus-visible,
+  html[data-av-tool="led-wall-calculator"].led-workspace-ready [data-led-section]:focus-visible{outline:2px solid var(--av-focus);outline-offset:2px}
   html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-input-grid{overflow:visible;border-left:0;border-bottom:1px solid var(--av-line)}
   html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-detail-grid{overflow:visible}
 }
@@ -93,9 +100,10 @@ html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-disclaimer{gri
   html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-suite-head{gap:8px;padding:10px 12px}
   html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-suite-actions{width:auto}
   html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-suite-actions button{flex:1 1 100px}
-  html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-stage{grid-template-columns:1fr;min-height:0}
-  html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-stage-view{min-height:200px}
-  html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-stage-data{grid-template-columns:minmax(0,1fr) minmax(150px,.7fr)}
+  html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-stage{grid-template-columns:minmax(0,1.3fr) minmax(180px,.7fr);gap:12px;min-height:0}
+  html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-stage-view{min-height:180px}
+  html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-wall-preview{width:min(100%,400px)}
+  html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-stage-data{grid-template-columns:1fr}
 }
 @media (max-width:500px){
   html[data-av-tool="led-wall-calculator"].led-workspace-ready .topbar{flex-direction:row;align-items:center}
@@ -105,7 +113,10 @@ html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-disclaimer{gri
   html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-suite-kicker{display:none}
   html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-suite-head{flex-wrap:wrap}
   html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-suite-title h1{font-size:15px}
-  html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-stage-data{grid-template-columns:1fr}
+  html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-stage{grid-template-columns:1fr;gap:10px;padding:10px}
+  html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-stage-view{min-height:160px}
+  html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-stage-data{grid-template-columns:minmax(0,1fr) minmax(120px,.7fr);gap:8px}
+  html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-stage-rails{grid-column:1/-1}
 }
 </style>
 <link rel="stylesheet" href="css/av-theme.css">
@@ -170,8 +181,44 @@ html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-disclaimer{gri
         </div>
       </div>
 
+      <div class="led-result-strip" id="ledResultStrip" data-led-section role="region" aria-label="LED wall primary results" tabindex="-1">
+        <div class="led-result" id="ledWallResult">
+          <span>Wall</span>
+          <strong id="ledWallDimensions">0 × 0 ft</strong>
+          <small id="ledWallDimensionsMetric">0 × 0 m</small>
+        </div>
+        <div class="led-result" id="ledRasterResult">
+          <span>Native Raster</span>
+          <strong id="ledNativeRaster">0 × 0 px</strong>
+          <small id="ledNativeMeta">0 MP · 0:1</small>
+        </div>
+        <div class="led-result" id="ledContentResult">
+          <span>Content Fit</span>
+          <strong id="ledContentFit">Review</strong>
+          <small id="ledContentMeta">1920 × 1080 source</small>
+        </div>
+        <div class="led-result" id="ledProcessingResult">
+          <span>NovaStar Planning</span>
+          <strong id="ledProcessing">0 estimated ports</strong>
+          <small id="ledProcessingMeta">Planning estimate</small>
+        </div>
+        <div class="led-result" id="ledPowerResult">
+          <span>Power</span>
+          <strong id="ledPower">0 kW max</strong>
+          <small id="ledPowerMeta">0 kW typical</small>
+        </div>
+      </div>
+
+      <nav class="led-section-nav" aria-label="LED planner sections">
+        <button type="button" data-led-jump="ledProfileSection">Profile</button>
+        <button type="button" data-led-jump="ledLayoutSection">Layout</button>
+        <button type="button" data-led-jump="ledProcessingSection">Video / Data</button>
+        <button type="button" data-led-jump="ledPowerSection">Power / Viewer</button>
+        <button type="button" data-led-jump="ledResultStrip">Results</button>
+      </nav>
+
       <div class="led-input-grid">
-        <fieldset class="led-module">
+        <fieldset class="led-module" id="ledProfileSection" data-led-section tabindex="-1">
           <legend>Product / Cabinet Profile</legend>
           <div class="led-module-fields">
             <div class="field full">
@@ -215,7 +262,7 @@ html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-disclaimer{gri
           </div>
         </fieldset>
 
-        <fieldset class="led-module">
+        <fieldset class="led-module" id="ledLayoutSection" data-led-section tabindex="-1">
           <legend>Layout</legend>
           <div class="led-module-fields">
             <div class="field full">
@@ -261,7 +308,7 @@ html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-disclaimer{gri
           </div>
         </fieldset>
 
-        <fieldset class="led-module">
+        <fieldset class="led-module" id="ledProcessingSection" data-led-section tabindex="-1">
           <legend>Video / NovaStar Port Planner</legend>
           <div class="led-module-fields">
             <div class="field">
@@ -309,6 +356,7 @@ html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-disclaimer{gri
               <label for="ledPortSafetyPercent">Planning Utilization %</label>
               <input id="ledPortSafetyPercent" data-key="ledPortSafetyPercent" type="number" min="10" max="100" step="1" value="80" inputmode="decimal" aria-describedby="ledAssumption">
             </div>
+            <p class="field-note full">The default 650,000 pixels per port is a generic baseline. Confirm the selected processor's output and receiver limits before allocating cabinet chains.</p>
             <div class="field">
               <label for="ledProcessorPortCount">Processor Ports (optional)</label>
               <input id="ledProcessorPortCount" data-key="ledProcessorPortCount" data-optional="true" type="number" min="1" max="1000" step="1" value="" placeholder="Not specified" inputmode="numeric">
@@ -324,7 +372,7 @@ html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-disclaimer{gri
           </div>
         </fieldset>
 
-        <fieldset class="led-module">
+        <fieldset class="led-module" id="ledPowerSection" data-led-section tabindex="-1">
           <legend>LED Power Planner / Viewing Distance</legend>
           <div class="led-module-fields">
             <div class="field">
@@ -335,6 +383,7 @@ html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-disclaimer{gri
               <label for="ledTypicalWattsEach">Typical Watts / Cabinet</label>
               <input id="ledTypicalWattsEach" data-key="ledTypicalWattsEach" type="number" min="0" max="100000" step="1" value="65" inputmode="decimal" aria-describedby="ledAssumption">
             </div>
+            <p class="field-note full">The default 180 W maximum and 65 W typical are sample cabinet values. Replace them with the actual product specifications.</p>
             <div class="field">
               <label for="ledVoltage">Supply Voltage</label>
               <select id="ledVoltage" data-key="ledVoltage">
@@ -363,10 +412,11 @@ html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-disclaimer{gri
                 <option value="threePhase">Three Phase Balanced</option>
               </select>
             </div>
-            <div class="field" id="ledPowerFactorField" hidden>
-              <label for="ledPowerFactor">Power Factor</label>
-              <input id="ledPowerFactor" data-key="ledPowerFactor" type="number" min="0.1" max="1" step="0.01" value="0.95" inputmode="decimal" aria-describedby="ledAssumption" disabled>
+            <div class="field" id="ledPowerFactorField">
+              <label for="ledPowerFactor">Manufacturer Power Factor</label>
+              <input id="ledPowerFactor" data-key="ledPowerFactor" data-optional="true" type="number" min="0.1" max="1" step="0.0001" value="" placeholder="Required for current" inputmode="decimal" aria-describedby="ledPowerFactorNote ledAssumption">
             </div>
+            <p class="field-note full" id="ledPowerFactorNote">Current and circuit estimates require the actual equipment power factor. Use supply voltage for single phase and line-to-line voltage for balanced three phase.</p>
             <div class="field">
               <label for="ledCabinetsPerHomeRun">Cabinets / Home Run</label>
               <input id="ledCabinetsPerHomeRun" data-key="ledCabinetsPerHomeRun" data-optional="true" type="number" min="1" max="1000" step="1" value="" placeholder="Product specific" inputmode="numeric">
@@ -384,34 +434,6 @@ html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-disclaimer{gri
             </div>
           </div>
         </fieldset>
-      </div>
-
-      <div class="led-result-strip" aria-label="LED wall primary results">
-        <div class="led-result" id="ledWallResult">
-          <span>Wall</span>
-          <strong id="ledWallDimensions">0 × 0 ft</strong>
-          <small id="ledWallDimensionsMetric">0 × 0 m</small>
-        </div>
-        <div class="led-result" id="ledRasterResult">
-          <span>Native Raster</span>
-          <strong id="ledNativeRaster">0 × 0 px</strong>
-          <small id="ledNativeMeta">0 MP · 0:1</small>
-        </div>
-        <div class="led-result" id="ledContentResult">
-          <span>Content Fit</span>
-          <strong id="ledContentFit">Review</strong>
-          <small id="ledContentMeta">1920 × 1080 source</small>
-        </div>
-        <div class="led-result" id="ledProcessingResult">
-          <span>NovaStar Planning</span>
-          <strong id="ledProcessing">0 data ports</strong>
-          <small id="ledProcessingMeta">Planning estimate</small>
-        </div>
-        <div class="led-result" id="ledPowerResult">
-          <span>Power</span>
-          <strong id="ledPower">0 kW max</strong>
-          <small id="ledPowerMeta">0 kW typical</small>
-        </div>
       </div>
 
       <div class="led-detail-grid">
