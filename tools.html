@@ -47,7 +47,7 @@
   .chip-filter[aria-pressed="true"]{background:#473163;border-color:#9e73d8;color:#fff;}
   .chip-filter:focus-visible{outline:2px solid #a77de3;outline-offset:3px;}
   .chips .count{margin-left:auto;font-family:var(--ff-mono);font-size:11px;color:rgba(243,244,247,0.45);white-space:nowrap;}
-  .tools-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;padding-bottom:80px;}
+  .tools-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;padding-bottom:24px;}
   .tool-card{--accent:#a47ce7;--badge:#30243f;display:flex;flex-direction:column;align-items:center;justify-content:space-between;min-width:0;min-height:214px;padding:9px 10px 12px;border:1px solid var(--card-border);border-radius:12px;background:linear-gradient(145deg,#202630 0%,var(--card) 58%,#172027 100%);box-shadow:0 5px 13px rgba(0,0,0,.22),inset 0 1px rgba(255,255,255,.04);text-align:center;text-decoration:none;color:inherit;position:relative;overflow:hidden;transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease;}
   .tool-card[data-tone="blue"]{--accent:#87baff;--badge:#203750;}
   .tool-card[data-tone="teal"]{--accent:#6fe0dc;--badge:#173e42;}
@@ -57,6 +57,7 @@
   .tool-card:hover{transform:translateY(-5px);border-color:var(--accent);box-shadow:0 15px 30px rgba(0,0,0,.34),0 0 0 1px color-mix(in srgb,var(--accent) 25%,transparent);}
   .tool-card:focus-visible{outline:3px solid var(--accent);outline-offset:3px;}
   .tc-art{display:block;width:min(100%,178px);aspect-ratio:251/179;flex:none;background-image:url('img/tools-card-atlas.png');background-size:500% 700%;background-position:var(--atlas-x) var(--atlas-y);background-repeat:no-repeat;mix-blend-mode:lighten;}
+  .tc-art--unique{background-image:url('img/tools-card-unique-atlas.png');background-size:200% 300%;background-position:var(--unique-x) var(--unique-y);}
   .tc-art--fallback{display:grid;place-items:center;background-image:none;background:#24313d;border-radius:12px;color:var(--accent);font:700 42px var(--ff-display);}
   .tool-card h3{display:grid;place-items:center;min-height:2.5em;font-family:var(--ff-display);font-weight:700;font-size:clamp(14px,1.3vw,18px);line-height:1.2;letter-spacing:-.025em;text-wrap:balance;}
   .tc-badge{display:inline-flex;align-items:center;justify-content:center;gap:8px;max-width:100%;min-height:26px;padding:3px 12px;border:1px solid color-mix(in srgb,var(--accent) 28%,transparent);border-radius:999px;background:var(--badge);color:color-mix(in srgb,var(--accent) 75%,white);font:700 11px/1.15 var(--ff-mono);letter-spacing:.035em;text-transform:uppercase;white-space:nowrap;}
@@ -64,6 +65,7 @@
   .tool-card .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
   .tools-empty{grid-column:1/-1;text-align:center;color:rgba(243,244,247,0.45);padding:60px 0;font-family:var(--ff-mono);font-size:13px;}
   .tools-note{color:var(--muted);font-size:13px;margin:0 0 18px;font-family:var(--ff-mono);}
+  .tools-note--after{margin:0 0 44px;text-align:right;font-size:12px;}
   .tools-note a{color:oklch(0.72 0.19 33);text-underline-offset:3px;}
   footer{border-top:1px solid rgba(255,255,255,0.07);margin-top:40px;}
   .foot{display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;padding:48px 0 36px;}
@@ -111,10 +113,10 @@
     </div>
 
     <div class="container">
-      <p class="tools-note">The AV Suite bundles 45 operator tools. <a href="av-suite.html?entry=toolbox">Open the AV Toolbox</a> to browse the complete live registry without attaching a show.</p>
       <div class="tools-grid" id="toolsGrid" aria-label="Project cards">
         <noscript><p class="tools-empty">This illustrated directory needs JavaScript. The primary product links remain available in the navigation above.</p></noscript>
       </div>
+      <p class="tools-note tools-note--after">The AV Suite bundles 45 operator tools. <a href="av-suite.html?entry=toolbox">Browse the complete AV Toolbox</a>.</p>
     </div>
   </main>
 
@@ -182,10 +184,26 @@
     { name: 'Remote Desktop',      url: 'remote-desktop.html',                             chips: ['Labs'],                  blurb: 'Serverless WebRTC screen share, file transfer, and remote view — locator-not-password session codes, verbal peer authentication, and capability-scoped consent.' }
   ];
 
+  // Put the tools an operator reaches for first, then references, Notion,
+  // labs, and finally games and trackers. Keep the catalog records intact.
+  var DAILY_ORDER = ['Show Console','AV Toolbox','OnTrack','Back Focus','Teleprompter'];
+  var REFERENCE_ORDER = ['Gear Reference','AV Workbook','DeckForge','PixelForge'];
+  function displayRank(tool){
+    var i = DAILY_ORDER.indexOf(tool.name);
+    if (i >= 0) return i;
+    i = REFERENCE_ORDER.indexOf(tool.name);
+    if (i >= 0) return 100 + i;
+    if (tool.chips[0] === 'Notion' && tool.name !== 'Davai — System by Dave Memory Architecture') return 200 + TOOLS.indexOf(tool);
+    if (tool.chips.indexOf('Labs') >= 0) return 300 + TOOLS.indexOf(tool);
+    return 400 + TOOLS.indexOf(tool);
+  }
+  var DISPLAY_TOOLS = TOOLS.slice().sort(function(a,b){ return displayRank(a) - displayRank(b); });
+
   var CHIP_ORDER = ['AV','Notion','Apps','Games','Trackers','Sports','Labs'];
   var grid = document.getElementById('toolsGrid');
   var chipsBar = document.getElementById('filterChips');
   var active = 'All';
+  var cardTween = null;
 
   // Artwork is keyed by name so changing the directory order cannot swap icons.
   var CARD_ART_ORDER = [
@@ -197,6 +215,14 @@
     'Graph Explorer','SDLC Tool Stack Map','Prompt Lab','Project Registry','Davai — System by Dave Memory Architecture',
     'Tailscale Manual','Dave Robertson Profile','Remote Desktop'
   ];
+  var UNIQUE_ART = {
+    'NoteForge':[0,0],
+    'Ballpark Scorecard':[100,0],
+    'Festival Atlas':[0,50],
+    'Phillies Wire':[100,50],
+    'Davai — System by Dave Memory Architecture':[0,100],
+    'Tailscale Manual':[100,100]
+  };
 
   function cardVisual(tool){
     var i = CARD_ART_ORDER.indexOf(tool.name);
@@ -206,8 +232,9 @@
     if ([10,16,21].indexOf(i) >= 0) tone = 'teal';
     if (i === 18) tone = 'orange';
     if (i === 23) tone = 'red';
-    var rows = [2.2,17.7,33.9,48.8,65.1,81.0,95.8];
-    return {family:family,tone:tone,art:i >= 0,x:(Math.max(i,0) % 5) * 25 + '%',y:rows[Math.floor(Math.max(i,0) / 5)] + '%'};
+    var rows = [2.2,17.7,33.9,48.8,63.3,79.1,95.8];
+    var unique = UNIQUE_ART[tool.name];
+    return {family:family,tone:tone,art:i >= 0,unique:unique,x:(Math.max(i,0) % 5) * 25 + '%',y:rows[Math.floor(Math.max(i,0) / 5)] + '%'};
   }
 
   function isExternal(url){ return /^https?:\/\//i.test(url); }
@@ -218,20 +245,24 @@
   function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
 
   function render(){
-    var shown = TOOLS.filter(function(t){ return active === 'All' || t.chips.indexOf(active) >= 0; });
+    if (cardTween){ cardTween.kill(); cardTween = null; }
+    var shown = DISPLAY_TOOLS.filter(function(t){ return active === 'All' || t.chips.indexOf(active) >= 0; });
     grid.innerHTML = shown.length ? shown.map(function(t){
       var ext = isExternal(t.url);
       var visual = cardVisual(t);
       var attrs = ext ? ' target="_blank" rel="noopener noreferrer"' : '';
-      return '<a class="tool-card" data-tone="' + visual.tone + '" data-track-cta="tools:' + esc(t.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')) + '" href="' + esc(t.url) + '"' + attrs + ' style="--atlas-x:' + visual.x + ';--atlas-y:' + visual.y + '">'
-        + '<span class="tc-art' + (visual.art ? '' : ' tc-art--fallback') + '" aria-hidden="true">' + (visual.art ? '' : 'SD') + '</span>'
-        + '<h3>' + esc(visual.family + ': ' + t.name) + '</h3>'
+      var artStyle = '--atlas-x:' + visual.x + ';--atlas-y:' + visual.y + ';';
+      if (visual.unique) artStyle += '--unique-x:' + visual.unique[0] + '%;--unique-y:' + visual.unique[1] + '%;';
+      return '<a class="tool-card" data-tone="' + visual.tone + '" data-track-cta="tools:' + esc(t.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')) + '" href="' + esc(t.url) + '"' + attrs + ' style="' + artStyle + '">'
+        + '<span class="tc-art' + (visual.unique ? ' tc-art--unique' : visual.art ? '' : ' tc-art--fallback') + '" aria-hidden="true">' + (visual.art ? '' : 'SD') + '</span>'
+        + '<h3>' + esc(t.name) + '</h3>'
         + '<span class="tc-badge">' + esc(visual.family) + '</span>'
         + '<span class="sr-only">' + esc(t.blurb) + (ext ? ' Opens ' + esc(hostLabel(t.url)) + ' in a new tab.' : '') + '</span>'
         + '</a>';
     }).join('') : '<div class="tools-empty">No tools in this category yet.</div>';
     if (window.gsap && !window.matchMedia('(prefers-reduced-motion: reduce)').matches){
-      window.gsap.fromTo(grid.querySelectorAll('.tool-card'), {opacity:0,y:14,scale:0.97}, {opacity:1,y:0,scale:1,duration:0.38,stagger:{amount:0.48,grid:'auto'},ease:'power2.out',clearProps:'transform,opacity'});
+      var leadCards = Array.prototype.slice.call(grid.querySelectorAll('.tool-card'),0,12);
+      cardTween = window.gsap.fromTo(leadCards, {opacity:0}, {opacity:1,duration:0.38,stagger:{amount:0.3,grid:'auto'},ease:'power2.out',clearProps:'opacity',onComplete:function(){cardTween=null;}});
     }
   }
 
@@ -254,7 +285,7 @@
     render();
     var count = document.getElementById('toolCount');
     var n = TOOLS.filter(function(t){ return active === 'All' || t.chips.indexOf(active) >= 0; }).length;
-    if (count) count.textContent = n + (n === 1 ? ' tool' : ' tools');
+    if (count) count.textContent = n + ' / ' + TOOLS.length + ' projects';
   }
 
   function chipFromHash(){

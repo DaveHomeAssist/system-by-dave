@@ -4,6 +4,8 @@
 
 - Reworked the Tools directory into a five-column illustrated card grid based on the supplied visual reference, with responsive two-column phone layout, category badges, visible keyboard focus, and preserved category filters and destinations.
 - Added a locally hosted illustration atlas and a reduced-motion-aware GSAP card entrance; no new runtime package or external image host is required.
+- Prioritized daily AV operation, then references, Notion, labs, and games/trackers; titles now show only the product name, the filter count shows visible projects out of 33, and the full AV Toolbox link sits below the grid.
+- Added distinct artwork for NoteForge, Ballpark Scorecard, Festival Atlas, Phillies Wire, Davai, and Tailscale Manual; only the first 12 visible cards animate on entry.
 
 ## 2026-09-23 — FMP Camera Simulator v1
 
