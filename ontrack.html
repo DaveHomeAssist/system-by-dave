@@ -577,6 +577,20 @@ wireFile("btnPlayed","filePlayed",txtHandler("played"));
 wireFile("btnImportJson","fileJson",(text)=>{
   const data=JSON.parse(text);
   if(!data.tracks||!data.notes)throw new Error("Not an OnTrack backup");
+  // Imported records are untrusted: keep only well-formed ids and enum/date values so
+  // nothing hostile is persisted (render sites also escape, this is defence in depth).
+  const okId=v=>typeof v==="string"&&/^[\w-]+$/.test(v);
+  const okDate=v=>typeof v==="string"&&/^\d{4}-\d{2}-\d{2}$/.test(v);
+  const cleanTracks={};
+  Object.keys(data.tracks).forEach(k=>{const t=data.tracks[k];if(t&&typeof t==="object"&&okId(t.id))cleanTracks[t.id]=t;});
+  data.tracks=cleanTracks;
+  data.sets=(Array.isArray(data.sets)?data.sets:[]).filter(st=>st&&okId(st.id)&&Array.isArray(st.trackIds)).map(st=>{
+    st.kind=st.kind==="played"?"played":"planned";
+    st.date=okDate(st.date)?st.date:"";
+    st.trackIds=st.trackIds.filter(okId);
+    return st;
+  });
+  data.notes=(Array.isArray(data.notes)?data.notes:[]).filter(n=>n&&okId(n.id)&&(n.trackId==null||okId(n.trackId)));
   // merge
   let nt=0;
   Object.values(data.tracks).forEach(t=>{
@@ -675,7 +689,7 @@ function renderLibrary(){
     `<th data-s="${k}">${l}${sortBy===k?`<span class="arr">${sortDir>0?"▲":"▼"}</span>`:""}</th>`).join("")}</tr></thead>
     <tbody>${rows.map(t=>{
       const nc=notesFor(t.id).length;
-      return `<tr data-id="${t.id}">
+      return `<tr data-id="${esc(t.id)}">
         <td>${esc(t.artist)}</td><td>${esc(t.title)}</td>
         <td class="mono">${esc(t.bpm)||"—"}</td><td class="mono">${esc(t.key)||"—"}</td>
         <td class="mono">${esc(t.genre)||"—"}</td>
@@ -773,10 +787,10 @@ function renderSets(){
   }
   html+=`<div class="sethead">Sets</div>`;
   html+=S.sets.length?S.sets.map(st=>`
-    <button class="setitem ${st.id===selSetId?"sel":""}" data-id="${st.id}">
+    <button class="setitem ${st.id===selSetId?"sel":""}" data-id="${esc(st.id)}">
       <div class="sn">${esc(st.name)}</div>
-      <div class="sm"><span class="kind ${st.kind}">${st.kind.toUpperCase()}</span>
-      <span>${st.trackIds.length} tracks</span><span>${st.date}</span>
+      <div class="sm"><span class="kind ${esc(st.kind)}">${esc(String(st.kind).toUpperCase())}</span>
+      <span>${st.trackIds.length} tracks</span><span>${esc(st.date)}</span>
       ${st.debriefedAt?'<span style="color:var(--ok)">debriefed</span>':""}</div>
     </button>`).join(""):`<div class="dbempty" style="padding:20px">No sets yet.</div>`;
   list.innerHTML=html;
@@ -809,10 +823,10 @@ function selectSet(id){
 
   box.innerHTML=`
     <div class="stitle"><h3>${esc(st.name)}</h3>
-      <span class="kind ${st.kind}">${st.kind.toUpperCase()}</span>
+      <span class="kind ${esc(st.kind)}">${esc(String(st.kind).toUpperCase())}</span>
       <button class="btn ghost" id="delSet" style="margin-left:auto">Delete set</button></div>
     <div class="srow">
-      <span>${st.trackIds.length} TRACKS · ${st.date}</span>
+      <span>${st.trackIds.length} TRACKS · ${esc(st.date)}</span>
       ${st.kind==="played"?`<span>· PLAN:</span>
         <select id="linkSel" aria-label="Linked planned set"><option value="">none</option>
         ${plans.map(p=>`<option value="${p.id}" ${st.linkedPlanId===p.id?"selected":""}>${esc(p.name)}</option>`).join("")}</select>`:""}

@@ -5038,7 +5038,9 @@ Format as you type: **bold**, *italic*, ==highlight==, ~~strike~~, [[camera cue]
   // inline tags the formatter emits plus a few editor primitives survive, and
   // <span>s may carry only color / background / weight / size. A pasted or
   // migrated document can never smuggle script, layout CSS, urls, or remote
-  // resources. Built on detached DOM nodes so nothing fetches or executes.
+  // resources. Untrusted markup is parsed inside an inert document (no browsing
+  // context) so nothing fetches or executes while it is inspected; a detached
+  // node in the live document is NOT inert, because <img onerror> still fires.
   var RICH_ALLOWED_TAGS = {STRONG:1, EM:1, S:1, MARK:1, BR:1, SPAN:1, B:1, I:1, U:1};
   // Tags whose entire subtree is discarded (text included) rather than unwrapped.
   var RICH_DROP_SUBTREE = {SCRIPT:1, STYLE:1, TITLE:1, NOSCRIPT:1, IFRAME:1, OBJECT:1, EMBED:1, TEMPLATE:1, HEAD:1, LINK:1, META:1};
@@ -5079,9 +5081,13 @@ Format as you type: **bold**, *italic*, ==highlight==, ~~strike~~, [[camera cue]
       sanitizeRichInto(child, clean);
     }
   }
+  function parseInertHtml(html){
+    var box = document.implementation.createHTMLDocument('').createElement('div');
+    box.innerHTML = String(html == null ? '' : html);
+    return box;
+  }
   function sanitizeRichHtml(html){
-    var src = document.createElement('div');
-    src.innerHTML = String(html == null ? '' : html);
+    var src = parseInertHtml(html);
     var dest = document.createElement('div');
     sanitizeRichInto(src, dest);
     return dest.innerHTML;
@@ -5094,20 +5100,17 @@ Format as you type: **bold**, *italic*, ==highlight==, ~~strike~~, [[camera cue]
   // uses (white-space:pre-wrap). Browsers and pasted HTML emit <div>/<p>/<br>; the
   // whitelist drops those tags, so turn their boundaries into newlines first.
   function canonicalizeRichHtml(html){
-    var d = document.createElement('div');
-    d.innerHTML = String(html == null ? '' : html);
+    var d = parseInertHtml(html);
     Array.prototype.forEach.call(d.querySelectorAll('br'), function(br){
       if(br.parentNode) br.parentNode.replaceChild(document.createTextNode('\n'), br);
     });
     Array.prototype.forEach.call(d.querySelectorAll('div,p,li,h1,h2,h3,h4,h5,h6'), function(b){
-      b.appendChild(document.createTextNode('\n'));
+      b.appendChild(d.ownerDocument.createTextNode('\n'));
     });
     return sanitizeRichHtml(d.innerHTML).replace(/\n{3,}/g, '\n\n');
   }
   function htmlToPlain(html){
-    var d = document.createElement('div');
-    d.innerHTML = String(html == null ? '' : html);
-    return d.textContent || '';
+    return parseInertHtml(html).textContent || '';
   }
 
   function escapeHtml(text){

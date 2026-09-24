@@ -25,6 +25,7 @@
     "check:throwline-catalog": "node scripts/sync_throwline_catalog.js --check",
     "verify:throwline": "node scripts/sync_throwline_catalog.js --check && node --test ProjectorThrow/throwline-scene-state.test.js && node scripts/verify_throwline_release.js",
     "probe:av-themes": "node scripts/probe_av_themes.js",
+    "probe:import-xss": "node scripts/probe_import_xss.mjs",
     "probe:led-configurator": "node scripts/probe_led_wall_configurator.js",
     "probe:throwline-stage": "node scripts/probe_throwline_stage3d.js",
     "test:throwline-browser": "node scripts/probe_throwline_stage3d.js --no-sandbox && node scripts/probe_throwline_stage3d.js --no-sandbox --no-webgl",
