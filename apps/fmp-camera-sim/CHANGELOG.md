@@ -13,6 +13,10 @@ Minor versions add features or change a saved-file format; patch versions fix or
 
 Versions 1.0.0 to 1.5.3 were numbered after the fact from their merged pull requests.
 
+## 1.7.2 — 2026-09-24 — Defer venue WebGL until shown
+
+- The venue overview no longer creates a second `WebGLRenderer` at startup. The monitor still starts immediately; the overview GPU context is created on the first frame where the venue panel is visible (desktop shown, or phone Venue tab). Collapsed venue / Operate-only phone sessions keep one WebGL context.
+
 ## 1.7.1 — 2026-09-24 — Control-border contrast and store split
 
 - Added `--control-border*` theme tokens (≥3:1 vs adjacent surfaces for WCAG 1.4.11) and wired them to buttons, flags, fields, joystick, zoom track, side panel, dimension editors and Help.
