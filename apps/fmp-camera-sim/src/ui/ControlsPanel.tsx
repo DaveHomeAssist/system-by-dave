@@ -36,6 +36,8 @@ export function ControlsPanel({ store, input, state }: Props) {
             input.releaseAll(nowSeconds());
             store.stop(nowSeconds());
           }}
+          onRename={(slot, name) => store.renamePreset(slot, name)}
+          onClear={(slot) => store.deletePreset(slot)}
         />
       </div>
       <p className={`status-line ${announcement ? `tone-${announcement.tone}` : ""}`} role="status" aria-live="polite" data-testid="status-line">

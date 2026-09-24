@@ -13,6 +13,14 @@ Minor versions add features or change a saved-file format; patch versions fix or
 
 Versions 1.0.0 to 1.5.3 were numbered after the fact from their merged pull requests.
 
+## 1.7.0 — 2026-09-24 — First-run tip and Operate-pad preset actions
+
+- First visit opens a three-step quick-start tip (move, zoom, store). Skip or finish writes `fmpCameraSim.onboarding.v1` so it stays dismissed.
+- Operate preset pad: right-click or long-press a filled slot to rename or clear it (uses the existing session rename/delete APIs).
+- Header scope line: framing, zoom, and presets only — not SuperJoy or focus.
+- Page referrer meta set to `strict-origin-when-cross-origin` for parity with `/fmp/`.
+- Documented how to add HSTS, CSP (with `frame-ancestors`), and related headers at the hosting edge (GitHub Pages cannot emit them).
+
 ## 1.6.0 — 2026-09-23 — Release log and version stamp
 
 - Added this release log. Each build carries its version and a source fingerprint: Help shows them, the page and the offline file carry them in a `fmp-camera-sim-version` meta tag, and exported projects record them in `app`, which previously always read "FMP Camera Simulator v1".
