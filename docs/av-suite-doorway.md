@@ -62,6 +62,14 @@ Toolbox interactions must not read from or write to
 `av-suite-dashboard.v1`. This boundary is release-gated with a byte-for-byte
 dashboard sentinel in `scripts/probe_av_suite_responsive.js`.
 
+Import Suite JSON accepts only a `system-by-dave.av-suite.v1` payload, or a
+legacy payload without a `schema` field that carries recognised show keys. Any
+other file is rejected with a message and leaves the saved show untouched. Show
+packages apply the same check to their `suite` block. When the current show has
+a name, venue, operator, readiness or notes, both imports ask before replacing
+it, and a successful suite import offers Undo, which restores the previous show.
+`scripts/probe_av_suite_import.mjs` release-gates this behaviour.
+
 ## Motion and accessibility
 
 Workspace changes use the vendored local GSAP build for short opacity and

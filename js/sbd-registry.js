@@ -237,7 +237,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool asset change — rolls the service-worker cache. */
-    version:'v20260923-led-audit-fixes',
+    version:'v20260923-suite-import-safety',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,
