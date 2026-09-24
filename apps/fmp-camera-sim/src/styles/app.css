@@ -1,5 +1,16 @@
 /* FMP Camera Simulator. Warm Paper (light, default) and Stage Slate (dark) follow the AV palette. */
 
+/* DM Sans, the FMP suite's face: the same latin subset the hub pages self-host. One variable
+   file covers every weight; characters outside the range fall back to the system face. */
+@font-face {
+  font-family: "DM Sans";
+  font-style: normal;
+  font-weight: 100 1000;
+  font-display: swap;
+  src: url("./fonts/dm-sans-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
 :root {
   color-scheme: light;
   --bg: #eee8df;
@@ -8,6 +19,16 @@
   --surface-3: #efe7db;
   --line: #d6cabc;
   --line-strong: #b9aa98;
+  /* Control chrome borders: ≥3:1 vs --surface / --surface-2 (WCAG 1.4.11). */
+  --control-border: #8f7f6c;
+  --control-border-hover: #7a6a58;
+  --control-border-active: #6e5f4e;
+  --control-border-disabled: #c4b5a5;
+  /* The zoom rocker knob, ≥3:1 against the track in each theme (WCAG 1.4.11). */
+  --knob: #3a3e45;
+  /* Framing marks drawn over the monitor, which is a dark video picture in both themes. */
+  --overlay-in: #78c997;
+  --overlay-out: #f08d7d;
   --text: #211d1a;
   --muted: #62594f;
   --accent: #9e432b;
@@ -36,6 +57,12 @@
   --surface-3: #202a37;
   --line: #2d3948;
   --line-strong: #435468;
+  /* Control chrome borders: ≥3:1 vs --surface / --surface-2 (WCAG 1.4.11). */
+  --control-border: #6a7d94;
+  --control-border-hover: #7b90a8;
+  --control-border-active: #8aa0b8;
+  --control-border-disabled: #3d4a5c;
+  --knob: #aeb9c6;
   --text: #f4f0e8;
   --muted: #b4ac9f;
   --accent: #e08a4f;
@@ -134,6 +161,9 @@ textarea {
   font-size: 14px;
   white-space: nowrap;
   overflow-x: auto;
+  /* overflow-x alone makes overflow-y auto too; the 44 px links exceed the 43 px row inside
+     the border, which drew a vertical scrollbar wherever scrollbars are always shown. */
+  overflow-y: hidden;
 }
 
 .sbd-site-return a {
@@ -168,6 +198,41 @@ textarea {
   max-width: 640px;
   margin: 48px auto;
   padding: 0 16px;
+}
+
+/* The root error boundary's screen. It scrolls on its own: the page body never does. */
+.sim-crash {
+  box-sizing: border-box;
+  height: 100%;
+  overflow-y: auto;
+  padding: 48px 16px;
+}
+
+.sim-crash > * {
+  max-width: 640px;
+  margin-inline: auto;
+}
+
+.sim-crash h1 {
+  margin-block: 0 12px;
+  font-size: 22px;
+}
+
+.sim-crash-detail {
+  color: var(--muted);
+  font: 13px/1.5 var(--mono);
+  overflow-wrap: anywhere;
+}
+
+.sim-crash-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-block: 16px;
+}
+
+.sim-crash-note {
+  color: var(--warning);
 }
 
 /* ---------- App frame ---------- */
@@ -215,7 +280,7 @@ textarea {
   min-height: 44px;
   padding: 4px 14px;
   border-radius: 999px;
-  border: 1px solid var(--line);
+  border: 1px solid var(--control-border);
   background: var(--surface-2);
   font-size: 13px;
   font-weight: 700;
@@ -292,7 +357,7 @@ textarea {
   min-height: 44px;
   min-width: 44px;
   padding: 6px 12px;
-  border: 1px solid var(--line);
+  border: 1px solid var(--control-border);
   border-radius: 8px;
   background: var(--surface-2);
   color: var(--text);
@@ -312,7 +377,7 @@ textarea {
 .secondary-button:hover,
 .preset-key:hover,
 .hold-button:hover {
-  border-color: var(--line-strong);
+  border-color: var(--control-border-hover);
   background: var(--surface-3);
 }
 
@@ -340,6 +405,7 @@ textarea {
 }
 
 button:disabled {
+  border-color: var(--control-border-disabled);
   opacity: 0.45;
   cursor: not-allowed;
 }
@@ -613,12 +679,16 @@ button:disabled {
   stroke-width: 5px;
 }
 
+/* Pass and fail differ in shape as well as colour (WCAG 1.4.1): inside is a solid, filled
+   mark, outside a dashed, hollow one. */
 .ov-marker.is-in circle {
-  stroke: #78c997;
+  stroke: var(--overlay-in);
+  fill: rgba(120, 201, 151, 0.45);
 }
 
 .ov-marker.is-out circle {
-  stroke: #f08d7d;
+  stroke: var(--overlay-out);
+  stroke-dasharray: 9 7;
 }
 
 .ov-target {
@@ -629,7 +699,8 @@ button:disabled {
 }
 
 .ov-target.is-in {
-  stroke: #78c997;
+  stroke: var(--overlay-in);
+  stroke-dasharray: none;
 }
 
 .ov-chest {
@@ -638,11 +709,12 @@ button:disabled {
 }
 
 .ov-chest.is-in {
-  stroke: #78c997;
+  stroke: var(--overlay-in);
 }
 
 .ov-chest.is-out {
-  stroke: #f08d7d;
+  stroke: var(--overlay-out);
+  stroke-dasharray: 10 8;
 }
 
 .ov-size {
@@ -656,6 +728,7 @@ button:disabled {
 
 .ov-size.is-out {
   stroke: rgba(240, 141, 125, 0.8);
+  stroke-dasharray: 12 10;
 }
 
 /* Readout */
@@ -826,7 +899,7 @@ button:disabled {
   width: 150px;
   height: 150px;
   border-radius: 50%;
-  border: 1px solid var(--line-strong);
+  border: 1px solid var(--control-border);
   background: radial-gradient(circle at 50% 45%, var(--surface) 0%, var(--surface-3) 70%);
   touch-action: none;
   cursor: grab;
@@ -834,6 +907,7 @@ button:disabled {
 
 .joystick-pad.is-active {
   cursor: grabbing;
+  border-color: var(--control-border-active);
 }
 
 .joystick-ring {
@@ -898,14 +972,21 @@ button:disabled {
   width: 34px;
   height: 58px;
   border-radius: 17px;
-  border: 1px solid var(--line-strong);
+  border: 1px solid var(--control-border);
   background: var(--surface-3);
   touch-action: none;
   cursor: ns-resize;
 }
 
 .zoom-track.is-active {
-  border-color: var(--accent);
+  border-color: var(--control-border-active);
+}
+
+/* A 44 px wide touch target without changing the rocker's look (WCAG 2.5.5). */
+.zoom-track::before {
+  content: "";
+  position: absolute;
+  inset: 0 -5px;
 }
 
 .zoom-knob {
@@ -915,7 +996,7 @@ button:disabled {
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: #3a3e45;
+  background: var(--knob);
   pointer-events: none;
 }
 
@@ -1080,7 +1161,7 @@ button:disabled {
   display: flex;
   flex-direction: column;
   width: min(460px, calc(100% - 20px));
-  border: 1px solid var(--line);
+  border: 1px solid var(--control-border);
   border-radius: var(--radius);
   background: var(--surface);
   box-shadow: 0 18px 48px rgba(0, 0, 0, 0.28);
@@ -1211,7 +1292,7 @@ button:disabled {
 .dimension {
   margin: 0;
   padding: 10px 12px 12px;
-  border: 1px solid var(--line);
+  border: 1px solid var(--control-border);
   border-radius: 8px;
   display: flex;
   flex-direction: column;
@@ -1290,9 +1371,30 @@ button:disabled {
   width: 100%;
   min-height: 44px;
   padding: 8px 10px;
-  border: 1px solid var(--line-strong);
+  border: 1px solid var(--control-border);
   border-radius: 8px;
   background: var(--surface);
+}
+
+.field input[type="number"]:hover,
+.field select:hover,
+.field textarea:hover,
+.preset-name-input:hover {
+  border-color: var(--control-border-hover);
+}
+
+.field input[type="number"]:focus,
+.field select:focus,
+.field textarea:focus,
+.preset-name-input:focus {
+  border-color: var(--control-border-active);
+}
+
+.field input[type="number"]:disabled,
+.field select:disabled,
+.field textarea:disabled,
+.preset-name-input:disabled {
+  border-color: var(--control-border-disabled);
 }
 
 .field textarea {
@@ -1667,7 +1769,7 @@ button:disabled {
   width: min(640px, calc(100vw - 32px));
   max-height: calc(100dvh - 48px);
   padding: 18px 20px;
-  border: 1px solid var(--line);
+  border: 1px solid var(--control-border);
   border-radius: 12px;
   background: var(--surface);
   color: var(--text);
@@ -1770,12 +1872,64 @@ button:disabled {
   }
 }
 
-.sim-app[data-layout="tablet"] .controls-grid {
-  grid-template-columns: auto auto minmax(0, 1fr);
+/* Portrait (and narrow landscape) tablets stack the presets under the joystick and speeds.
+   Landscape tablets from 960 px keep the desktop's single row of controls, which saves height. */
+@media (orientation: portrait), (max-width: 959px) {
+  .sim-app[data-layout="tablet"] .controls-grid {
+    grid-template-columns: auto auto minmax(0, 1fr);
+  }
+
+  .sim-app[data-layout="tablet"] .preset-pad {
+    grid-column: 1 / -1;
+  }
 }
 
-.sim-app[data-layout="tablet"] .preset-pad {
-  grid-column: 1 / -1;
+/* Short screens. A laptop browser (1366 × 650) or an iPad in landscape (1024 × 700) cannot stack
+   the header, the monitor and the whole controls panel: the controls used to take the height
+   and leave the monitor a thumbnail, or 2 px on a landscape tablet. The monitor now keeps at
+   least 45% of the workspace (280 px when there is room), and the controls scroll inside their
+   own panel only when the rest cannot fit. */
+.sim-app[data-layout="desktop"] .sim-workspace {
+  grid-template-rows: minmax(min(280px, 45%), 1fr) minmax(0, auto);
+}
+
+.sim-app[data-layout="desktop"][data-venue="collapsed"] .sim-workspace,
+.sim-app[data-layout="desktop"][data-expanded="true"] .sim-workspace {
+  grid-template-rows: minmax(min(280px, 45%), 1fr) auto minmax(0, auto);
+}
+
+.sim-app[data-layout="desktop"] .controls-panel {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+@media (orientation: landscape) {
+  .sim-app[data-layout="tablet"] .sim-workspace {
+    grid-template-rows: minmax(min(280px, 45%), 1fr) auto minmax(0, auto);
+  }
+
+  .sim-app[data-layout="tablet"][data-venue="shown"]:not([data-expanded="true"]) .sim-workspace {
+    grid-template-rows: minmax(min(240px, 40%), 1.3fr) minmax(0, 1fr) minmax(0, auto);
+  }
+
+  .sim-app[data-layout="tablet"] .controls-panel {
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  /* One header row: the heading stays; the subtitle and scope line stay for screen readers, as
+     on phones (the first-run tip and Help carry the scope too). */
+  .sim-app[data-layout="tablet"] .sim-title p {
+    position: absolute !important;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+  }
 }
 
 /* Ultrawide: the side panel docks as a third column. */

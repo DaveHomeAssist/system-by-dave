@@ -4,6 +4,7 @@ import { type BowlRecord, defaultBowl, parseBowl, bowlIsSettled } from "./bowl";
 import { type Dimension, type Evidence, type EvidenceStatus, readProvenance, SETTLED_VENUE_STATUSES, VENUE_STATUS_OPTIONS } from "./evidence";
 import { ftToM, mToFt } from "./units";
 import { type Issue, IssueList, readEnum, readNumber, readObject, readString } from "./validate";
+import { migrateVenueRootTowardCurrent } from "./migrations";
 
 export const VENUE_SCHEMA = "fmp-camera-simulator.venue";
 export const VENUE_VERSION = 6;
@@ -222,18 +223,11 @@ export function parseVenueProfile(
   path = "venue",
 ): { ok: true; venue: VenueProfile } | { ok: false; issues: Issue[] } {
   const issues = new IssueList();
-  const root = readObject(issues, value, path);
-  if (!root) return { ok: false, issues: issues.issues };
+  const migrated = migrateVenueRootTowardCurrent(value, path, issues);
+  if (!migrated.ok) return { ok: false, issues: migrated.issues };
+  const root = migrated.root;
   if (root.schema !== VENUE_SCHEMA) {
     issues.add(`${path}.schema`, `Expected "${VENUE_SCHEMA}".`);
-  }
-  if (root.version !== 1 && root.version !== 2 && root.version !== 3 && root.version !== 4 && root.version !== 5 && root.version !== VENUE_VERSION) {
-    issues.add(
-      `${path}.version`,
-      typeof root.version === "number"
-        ? `Unsupported venue profile version ${root.version}. This simulator reads versions 1–${VENUE_VERSION}.`
-        : "Missing venue profile version.",
-    );
   }
   const id = readString(issues, root.id, `${path}.id`, { maxLength: 80, allowEmpty: false });
   const name = readString(issues, root.name, `${path}.name`, { maxLength: 160, allowEmpty: false });
@@ -284,20 +278,19 @@ export function parseVenueProfile(
 
   const basisProvenance = basisRoot ? readProvenance(issues, basisRoot.provenance, `${path}.distanceBasis.provenance`) : undefined;
   const mountProvenance = mountRoot ? readProvenance(issues, mountRoot.provenance, `${path}.mount.provenance`) : undefined;
-  // Before v3, mount evidence covered both orientation and heading. Preserve its exact claims.
-  const headingRoot = (root.version === 3 || root.version === 4 || root.version === 5 || root.version === 6)
-    ? readObject(issues, mountRoot?.headingEvidence, `${path}.mount.headingEvidence`)
-    : mountRoot;
+  // Migrators promote pre-v3 mount evidence into headingEvidence; read the current shape only.
+  const headingRoot = readObject(issues, mountRoot?.headingEvidence, `${path}.mount.headingEvidence`);
   const headingStatus = headingRoot ? readEnum(issues, headingRoot.status, `${path}.mount.headingEvidence.status`, VENUE_STATUS_OPTIONS) : null;
   const headingNote = headingRoot ? readString(issues, headingRoot.note, `${path}.mount.headingEvidence.note`) : null;
-  const headingProvenance = (root.version === 3 || root.version === 4 || root.version === 5 || root.version === 6) && headingRoot
-    ? readProvenance(issues, headingRoot.provenance, `${path}.mount.headingEvidence.provenance`) : undefined;
+  const headingProvenance = headingRoot
+    ? readProvenance(issues, headingRoot.provenance, `${path}.mount.headingEvidence.provenance`)
+    : undefined;
 
   const terrain = parseTerrain(root.terrain, issues, `${path}.terrain`);
   const structures = parseStructures(root.structures, issues, `${path}.structures`);
   const bowl = parseBowl(root.bowl, issues, `${path}.bowl`);
   const referenceRoot = readObject(issues, root.reference, `${path}.reference`);
-  const geometryRevision = root.version === 1 ? "legacy-v1" : referenceRoot
+  const geometryRevision = referenceRoot
     ? readEnum(issues, referenceRoot.geometryRevision, `${path}.reference.geometryRevision`, ["legacy-v1", "photo-review-2026-09"] as const)
     : null;
   const cableRoute = referenceRoot

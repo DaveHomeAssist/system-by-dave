@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-09-24 — FMP Camera Simulator 1.8.0: audit fixes
+
+- Worked through the ten camera-simulator audits of 23–24 September (accessibility, code quality, data, delivery, performance, product, QA, reliability, security, web health), stacked on #141 (1.7.1) and #142 (1.7.2). `docs/fmp-camera-simulator-audit-2026-09.md` records every finding's outcome: fixed here, fixed earlier, not worth doing, deferred with a reason, or not a defect. Edge security headers, asset caching and a staging site are not worth doing: `.app` is HSTS-preloaded, the page holds nothing to attack, and hashed assets already revalidate with a `304`.
+- Fixed a layout failure no audit reported, found by re-shooting their 1024 × 720 view in its default state: on a landscape iPad the monitor was 2 px tall, and on a 1366 × 650 laptop browser a thumbnail. Also fixed the stray breadcrumb scrollbar visible in the audits' screenshots, on platforms that always show scrollbars.
+- Reliability: a root error boundary with export and start-fresh recovery; unreadable saves are set aside once and capped at three copies; restored sessions show their save time; the multi-tab conflict ignores identical saves and removed copies.
+- The page loads the suite's DM Sans itself (inlined in the offline file, whose CSP now allows `font-src data:`).
+- Probe: 44 → 52 checks, including the recovery screen, a graphics-context loss and restore, short-screen picture size, preset rename and clear, and the font and breadcrumb. Unit tests: 93 → 104.
+
 ## 2026-09-23 — AV by Dave suite import no longer wipes a show
 
 - Import Suite JSON accepted any JSON object: a file of the wrong shape cleared the saved show name, venue, readiness, notes and pins, then reported "Suite JSON imported." It now accepts only the AV suite schema (or a legacy export without a schema field), rejects anything else with a message, asks before replacing a show that has work in it, and offers Undo after a successful import. Show packages check their suite block the same way and also ask first.

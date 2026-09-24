@@ -1,10 +1,13 @@
-import { defaultProject, type Project, parseProjectText, serializeProject } from "../domain/project";
+import { defaultProject, exportedAtOf, type Project, parseProjectText, serializeProject } from "../domain/project";
 import { formatIssues } from "../domain/validate";
+import { deriveVenueGeometry } from "../domain/venue";
 
 // Browser storage keeps the session between visits. The key starts with "fmp" so the
 // housevideo.app saved-data transfer carries it (scripts/domain-sites.json storage prefixes).
 export const STORAGE_KEY = "fmpCameraSim.v1";
 export const UNREADABLE_KEY = "fmpCameraSim.v1.unreadable";
+/** Unreadable copies kept at most. Older ones are removed so repeated failures cannot fill storage. */
+export const MAX_UNREADABLE_COPIES = 3;
 
 export type StorageStatus =
   | { state: "ok"; savedAt: string | null }
@@ -29,6 +32,66 @@ export function browserStorage(): Storage | null {
   }
 }
 
+/** Keys of the kept unreadable copies, newest first (the suffix is the time they were kept). */
+export function unreadableCopies(storage: Storage): string[] {
+  const keys: string[] = [];
+  try {
+    for (let index = 0; index < storage.length; index += 1) {
+      const key = storage.key(index);
+      if (key?.startsWith(`${UNREADABLE_KEY}.`)) keys.push(key);
+    }
+  } catch {
+    return [];
+  }
+  const kept = (key: string) => Number(key.slice(UNREADABLE_KEY.length + 1)) || 0;
+  return keys.sort((a, b) => kept(b) - kept(a));
+}
+
+/**
+ * Keeps `text` under a new timestamped key, after removing the oldest copies so at most
+ * MAX_UNREADABLE_COPIES remain. Returns the new key, or null when storage refused the copy.
+ */
+function keepUnreadableCopy(storage: Storage, text: string, now = Date.now()): string | null {
+  for (const key of unreadableCopies(storage).slice(MAX_UNREADABLE_COPIES - 1)) {
+    try {
+      storage.removeItem(key);
+    } catch {
+      /* Best effort: a copy that cannot be removed only costs space. */
+    }
+  }
+  const backupKey = `${UNREADABLE_KEY}.${now}`;
+  try {
+    storage.setItem(backupKey, text);
+    return backupKey;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Moves the saved session aside: keeps it as an unreadable copy, then removes it so the next
+ * visit starts fresh. Returns the copy's key, or null (and leaves the session in place) when
+ * storage has no room for the copy.
+ */
+export function setAsideSavedSession(storage: Storage | null): string | null {
+  if (!storage) return null;
+  let text: string | null;
+  try {
+    text = storage.getItem(STORAGE_KEY);
+  } catch {
+    return null;
+  }
+  if (text === null) return null;
+  const backupKey = keepUnreadableCopy(storage, text);
+  if (backupKey === null) return null;
+  try {
+    storage.removeItem(STORAGE_KEY);
+  } catch {
+    /* The copy is kept; the next save replaces the old session anyway. */
+  }
+  return backupKey;
+}
+
 export function loadProject(storage: Storage | null): LoadResult {
   if (!storage) {
     return {
@@ -49,22 +112,30 @@ export function loadProject(storage: Storage | null): LoadResult {
   }
   if (text === null) return { project: defaultProject(), status: { state: "ok", savedAt: null }, notice: null };
   const parsed = parseProjectText(text);
-  if (parsed.ok) return { project: parsed.project, status: { state: "ok", savedAt: null }, notice: null };
-  // Keep the unreadable copy under its own timestamped key, so a later failure cannot overwrite
-  // an earlier one, then start fresh.
-  const backupKey = `${UNREADABLE_KEY}.${Date.now()}`;
-  let kept = false;
-  try {
-    storage.setItem(backupKey, text);
-    kept = true;
-  } catch {
-    /* The fresh session still works; the notice says the copy could not be kept. */
+  // A file that parses but whose venue cannot be built is as unusable as one that does not parse.
+  const geometry = parsed.ok ? deriveVenueGeometry(parsed.project.venue) : null;
+  if (parsed.ok && geometry?.ok) {
+    return { project: parsed.project, status: { state: "ok", savedAt: exportedAtOf(text) }, notice: null };
+  }
+  const issues = !parsed.ok ? parsed.issues : geometry && !geometry.ok ? geometry.issues : [];
+  // Keep the unreadable copy under its own timestamped key, then clear the saved session so the
+  // next visit does not trip over it again. Without room for the copy it stays where it is,
+  // until this session is saved over it.
+  const backupKey = keepUnreadableCopy(storage, text);
+  if (backupKey !== null) {
+    try {
+      storage.removeItem(STORAGE_KEY);
+    } catch {
+      /* The next save replaces it. */
+    }
   }
   return {
     project: defaultProject(),
     status: { state: "ok", savedAt: null },
-    notice: `The saved session could not be restored (${formatIssues(parsed.issues, 2)}). A fresh session was started. ${
-      kept ? `The old copy was kept in browser storage under ${backupKey}.` : "Browser storage was too full to keep a copy of the old session."
+    notice: `The saved session could not be restored (${formatIssues(issues, 2)}). A fresh session was started. ${
+      backupKey !== null
+        ? `The old copy was kept in browser storage under ${backupKey}.`
+        : "Browser storage was too full to keep a copy of the old session."
     }`,
   };
 }

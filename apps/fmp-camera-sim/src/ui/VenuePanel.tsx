@@ -9,6 +9,8 @@ interface Props {
   canvasRef: RefObject<HTMLCanvasElement | null>;
   shown: boolean;
   quality: number;
+  /** The venue view's own WebGL context could not start; the monitor may still be fine. */
+  overviewFailed: boolean;
   cutaway: boolean;
   onCutaway(): void;
   onToggle(): void;
@@ -23,7 +25,7 @@ const VIEWS: Array<{ view: OverviewPreset; label: string }> = [
   { view: "lawn", label: "Lawn" },
 ];
 
-export function VenuePanel({ state, canvasRef, shown, quality, cutaway, onCutaway, onToggle, onView }: Props) {
+export function VenuePanel({ state, canvasRef, shown, quality, overviewFailed, cutaway, onCutaway, onToggle, onView }: Props) {
   return (
     <section className="panel venue-panel" aria-labelledby="venue-title" data-shown={shown}>
       <div className="panel-head">
@@ -31,6 +33,7 @@ export function VenuePanel({ state, canvasRef, shown, quality, cutaway, onCutawa
         {shown && quality > 0 && (
           <span className="quality-chip" title="The venue view is drawn with less detail on this device so the camera controls stay responsive.">
             Reduced detail
+            <span className="visually-hidden">: the venue view is drawn with less detail on this device so the camera controls stay responsive</span>
           </span>
         )}
         <div className="panel-tools">
@@ -53,8 +56,13 @@ export function VenuePanel({ state, canvasRef, shown, quality, cutaway, onCutawa
           className="venue-canvas"
           role="img"
           aria-label="Venue overview showing the stage, pit, seating bowl, catwalk, Camera 4 and its viewing cone"
+          aria-describedby="venue-keyboard-note"
           data-testid="venue-canvas"
         />
+        {/* Orbiting is a pointer convenience; the view buttons are the keyboard route to each angle. */}
+        <p id="venue-keyboard-note" className="visually-hidden">
+          The House, Top, Side elevation, Behind camera and Lawn buttons set each view from the keyboard. Orbiting never moves the camera.
+        </p>
         <p className="venue-hint">Drag to orbit · scroll or pinch to zoom · orbiting never moves the camera</p>
         <ul className="venue-legend" aria-label="Legend">
           <li>
@@ -68,6 +76,12 @@ export function VenuePanel({ state, canvasRef, shown, quality, cutaway, onCutawa
           </li>
         </ul>
         {state.renderStatus !== "ok" && state.renderStatus !== "starting" && <GraphicsFallback status={state.renderStatus} note={state.renderNote} />}
+        {state.renderStatus === "ok" && overviewFailed && (
+          <div className="graphics-fallback" role="status" data-testid="venue-unavailable">
+            <strong>Venue view unavailable.</strong>
+            <p>This browser could not start a second 3D view. The camera monitor and controls still work.</p>
+          </div>
+        )}
       </div>
     </section>
   );

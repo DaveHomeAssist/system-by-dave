@@ -7,16 +7,20 @@ interface Props {
   input: InputController;
   lens: LensState;
   commandedZoom: number;
+  /** A T or W press too short to zoom visibly: say that these buttons are held. */
+  onShortPress(): void;
 }
 
 const BUTTON_RATE = 0.6;
+/** Presses shorter than this barely move the lens (0.6 × speed), so they read as a tap. */
+const TAP_S = 0.25;
 
 /** Spring-loaded zoom rocker (drag up for tele) plus hold-to-zoom T and W buttons. */
-export function ZoomControl({ input, lens, commandedZoom }: Props) {
+export function ZoomControl({ input, lens, commandedZoom, onShortPress }: Props) {
   const trackRef = useRef<HTMLDivElement>(null);
   const knobRef = useRef<HTMLDivElement>(null);
   const pointer = useRef<number | null>(null);
-  const held = useRef<"tele" | "wide" | null>(null);
+  const held = useRef<{ direction: "tele" | "wide"; since: number } | null>(null);
 
   const place = (value: number) => {
     const track = trackRef.current;
@@ -46,13 +50,15 @@ export function ZoomControl({ input, lens, commandedZoom }: Props) {
   };
 
   const startHold = (direction: "tele" | "wide", wall: number) => {
-    held.current = direction;
+    held.current = { direction, since: wall };
     input.set("zoomButton", { zoom: direction === "tele" ? BUTTON_RATE : -BUTTON_RATE }, wall);
   };
-  const endHold = (wall: number) => {
+  const endHold = (wall: number, tapHint = true) => {
     if (held.current === null) return;
+    const heldFor = wall - held.current.since;
     held.current = null;
     input.release("zoomButton", wall);
+    if (tapHint && heldFor < TAP_S) onShortPress();
   };
 
   useEffect(
@@ -71,7 +77,7 @@ export function ZoomControl({ input, lens, commandedZoom }: Props) {
   useEffect(() => {
     const onBlur = () => {
       if (pointer.current !== null) releaseRocker();
-      endHold(nowSeconds());
+      endHold(nowSeconds(), false);
     };
     window.addEventListener("blur", onBlur);
     return () => window.removeEventListener("blur", onBlur);
@@ -85,7 +91,7 @@ export function ZoomControl({ input, lens, commandedZoom }: Props) {
       startHold(direction, eventSeconds(event.nativeEvent));
     },
     onPointerUp: (event: PointerEvent<HTMLButtonElement>) => endHold(eventSeconds(event.nativeEvent)),
-    onPointerCancel: (event: PointerEvent<HTMLButtonElement>) => endHold(eventSeconds(event.nativeEvent)),
+    onPointerCancel: (event: PointerEvent<HTMLButtonElement>) => endHold(eventSeconds(event.nativeEvent), false),
     onLostPointerCapture: (event: PointerEvent<HTMLButtonElement>) => endHold(eventSeconds(event.nativeEvent)),
     onKeyDown: (event: KeyboardEvent<HTMLButtonElement>) => {
       if ((event.key === " " || event.key === "Enter") && !event.repeat) {
@@ -96,7 +102,7 @@ export function ZoomControl({ input, lens, commandedZoom }: Props) {
     onKeyUp: (event: KeyboardEvent<HTMLButtonElement>) => {
       if (event.key === " " || event.key === "Enter") endHold(eventSeconds(event.nativeEvent));
     },
-    onBlur: () => endHold(nowSeconds()),
+    onBlur: () => endHold(nowSeconds(), false),
     onContextMenu: (event: { preventDefault(): void }) => event.preventDefault(),
   });
 
@@ -107,13 +113,13 @@ export function ZoomControl({ input, lens, commandedZoom }: Props) {
           <button type="button" className="hold-button" aria-label="Zoom in (tele), hold" {...holdProps("tele")}>
             T
           </button>
+          {/* A pointer-only duplicate of T and W, hidden from assistive technology: the held T/W
+              buttons, E and Q, and the lens meter are the accessible path. */}
           <div
             ref={trackRef}
             className="zoom-track"
-            role="application"
-            aria-roledescription="zoom rocker"
-            aria-label="Zoom rocker. Drag up for tele, down for wide."
-            tabIndex={-1}
+            aria-hidden="true"
+            title="Zoom rocker: drag up for tele, down for wide"
             onPointerDown={(event) => {
               if (pointer.current !== null || (event.pointerType === "mouse" && event.button !== 0)) return;
               pointer.current = event.pointerId;

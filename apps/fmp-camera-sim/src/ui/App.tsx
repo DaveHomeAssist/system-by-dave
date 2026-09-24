@@ -53,6 +53,7 @@ export function App() {
   const [helpOpen, setHelpOpen] = useState(false);
   const [onboardingOpen, setOnboardingOpen] = useState(() => shouldShowOnboarding());
   const [quality, setQuality] = useState(0);
+  const [overviewFailed, setOverviewFailed] = useState(false);
 
   const monitorRef = useRef<HTMLCanvasElement>(null);
   const overviewRef = useRef<HTMLCanvasElement>(null);
@@ -82,6 +83,7 @@ export function App() {
           onContextLost: () => store.setRenderStatus("lost"),
           onContextRestored: () => store.setRenderStatus("ok"),
           onQualityChange: setQuality,
+          onOverviewUnavailable: () => setOverviewFailed(true),
         });
         renderer.setGeometry(store.getState().geometry, store.getState().project.session.showPackage);
         renderer.setTheme(themeRef.current);
@@ -263,6 +265,7 @@ export function App() {
           canvasRef={overviewRef}
           shown={phone ? mobileTab === "venue" : venueShown && !expanded}
           quality={quality}
+          overviewFailed={overviewFailed}
           onToggle={() => {
             if (expanded) setExpanded(false);
             setVenueShown((value) => !value);
