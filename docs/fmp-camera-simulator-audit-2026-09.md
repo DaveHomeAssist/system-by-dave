@@ -26,7 +26,8 @@ need nothing and are not listed.
 
 ## Found outside the audit text
 
-The audits' own evidence screenshots showed two of these.
+N2 is visible in the audits' own evidence screenshots. N1 turned up when their 1024 × 720 view
+was shot again in its default state: their screenshot had the venue view open, which hides it.
 
 | ID | Finding | Outcome |
 | --- | --- | --- |
