@@ -73,6 +73,12 @@ const sleep = (ms) => new Promise((done) => setTimeout(done, ms));
 
 async function open(options = {}) {
   const context = await (options.browser || browser).newContext({ viewport: { width: 1440, height: 900 }, acceptDownloads: true, ...options.context });
+  // First-run tip blocks pointer events until dismissed; seed done unless a test opts in.
+  if (!options.keepOnboarding) {
+    await context.addInitScript(() => {
+      try { localStorage.setItem('fmpCameraSim.onboarding.v1', 'done'); } catch {}
+    });
+  }
   if (options.init) await context.addInitScript(options.init);
   const page = await context.newPage();
   const problems = [];
@@ -108,6 +114,12 @@ async function hold(page, key, ms) {
 }
 
 async function focusWorkspace(page) {
+  // If the first-run tip is still open (e.g. offline file without init seed), dismiss it.
+  const tip = page.locator('dialog.onboarding-dialog[open]');
+  if (await tip.count()) {
+    await tip.getByRole('button', { name: 'Skip' }).click();
+    await tip.waitFor({ state: 'hidden', timeout: 5000 }).catch(() => {});
+  }
   // Clicking the monitor heading gives the page focus without activating a control.
   await page.locator('#monitor-title').click();
 }
@@ -161,6 +173,22 @@ async function importProject(page, project, name = 'probe-session.json') {
 async function closePanel(page) {
   const close = page.getByRole('button', { name: 'Close', exact: true });
   if (await close.isVisible()) await close.click();
+}
+
+// ------------------------------------------------------------------------------------------
+// 0. First-run tip
+// ------------------------------------------------------------------------------------------
+{
+  const { context, page } = await open({ keepOnboarding: true });
+  await check('first-run tip opens and Skip dismisses it', async () => {
+    const tip = page.locator('dialog.onboarding-dialog[open]');
+    await tip.waitFor({ state: 'visible', timeout: 10000 });
+    assert((await tip.getByRole('heading', { level: 2 }).textContent() || '').includes('Quick start'), 'tip title');
+    await tip.getByRole('button', { name: 'Skip' }).click();
+    await tip.waitFor({ state: 'hidden', timeout: 5000 });
+    assert((await page.evaluate(() => localStorage.getItem('fmpCameraSim.onboarding.v1'))) === 'done', 'tip not persisted');
+  });
+  await context.close();
 }
 
 // ------------------------------------------------------------------------------------------
@@ -675,6 +703,9 @@ await check('storage failure keeps the session usable and offers export', async 
 
 await check('the standalone offline file runs from disk with networking disabled', async () => {
   const context = await browser.newContext({ viewport: { width: 1280, height: 800 } });
+  await context.addInitScript(() => {
+    try { localStorage.setItem('fmpCameraSim.onboarding.v1', 'done'); } catch {}
+  });
   await context.setOffline(true);
   const page = await context.newPage();
   const requests = [];
