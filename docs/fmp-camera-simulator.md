@@ -242,8 +242,9 @@ push), let `deploy-pages.yml` publish, then confirm `source.json` and the versio
 revert. The housevideo.app publish uses the `HOUSEVIDEO_DEPLOY_KEY` deploy key
 (`docs/domain-sites.md`); if it is lost or rotated, replace the key on
 `DaveHomeAssist/housevideo` and the secret here before the next deploy. HTTP security headers
-(HSTS, `frame-ancestors`, `nosniff`) and long caching for hashed assets need an edge in front of
-GitHub Pages; `apps/fmp-camera-sim/EDGE-HEADERS.md` holds that plan.
+(HSTS, `frame-ancestors`, `nosniff`) and long caching for hashed assets would need an edge in
+front of GitHub Pages, and are not adopted: `.app` domains are HSTS-preloaded, the page holds
+nothing to attack, and hashed assets revalidate with a `304` (audit ledger, O1 and O6).
 
 ### Releases and the version stamp
 

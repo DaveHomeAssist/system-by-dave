@@ -1,6 +1,8 @@
 # Camera Simulator — hosting edge security headers
 
-**Status:** Plan + operator checklist (2026-09-24). GitHub Pages + Fastly currently serve `housevideo.app` **without** custom security headers. The simulator already sets a strong **meta** CSP (`connect-src 'none'`, no `'unsafe-inline'` / `'unsafe-eval'`), but meta CSP **cannot** set `frame-ancestors` or HSTS.
+**Status:** Not adopted (decided 2026-09-24). `.app` is HSTS-preloaded, the page has no login or server data to protect, and hashed assets already revalidate with a `304`, so an edge would add setup and risk for close to no gain. Reasons: `docs/fmp-camera-simulator-audit-2026-09.md`, O1 and O6. The plan below is kept in case the site ever gets accounts or a server.
+
+**Original plan:** operator checklist (2026-09-24). GitHub Pages + Fastly currently serve `housevideo.app` **without** custom security headers. The simulator already sets a strong **meta** CSP (`connect-src 'none'`, no `'unsafe-inline'` / `'unsafe-eval'`), but meta CSP **cannot** set `frame-ancestors` or HSTS.
 
 ## Why this is not an app-only fix
 
