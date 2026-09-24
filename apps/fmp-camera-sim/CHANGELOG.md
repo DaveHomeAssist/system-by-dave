@@ -13,6 +13,17 @@ Minor versions add features or change a saved-file format; patch versions fix or
 
 Versions 1.0.0 to 1.5.3 were numbered after the fact from their merged pull requests.
 
+## 1.8.0 — 2026-09-24 — Audit fixes: recovery, short screens, access
+
+- Short screens keep a picture. On an iPad in landscape (1024 × 768) the stacked layout left the monitor 2 px tall, and a 1366 × 650 laptop browser showed a 158 × 89 thumbnail. On desktop and landscape tablets the monitor now keeps at least 45% of the workspace, the controls scroll inside their panel only when needed, and landscape tablets from 960 px use one row of controls and a one-row header.
+- A failure while starting or drawing the interface shows a recovery screen instead of a blank page: reload, export the saved session as stored, or set it aside and start fresh.
+- A saved session that cannot be restored is kept as a copy and then cleared, so reloads stop warning; at most three copies are kept. Session shows when a restored session was last saved.
+- Another tab clearing the saved session, or saving an identical one, no longer raises a conflict, and loading the other tab's copy after it has gone keeps this session instead of a blank one.
+- The page loads DM Sans, the FMP suite's face, from its own copy (inlined in the offline file), so every device measures the same text. The breadcrumb no longer draws a stray vertical scrollbar where scrollbars always show.
+- Accessibility: framing marks show pass and fail by shape (solid or dashed) as well as colour; the dark-theme zoom knob has 7:1 contrast; the pointer-only zoom rocker is hidden from assistive technology and has a 44 px target; the joystick's description reads the current pan and tilt; the venue view names its keyboard route; the accuracy flag says what its count means; the preset menu takes keyboard focus; orbit inertia stops with reduced motion; a dark visit starts with a dark browser bar.
+- Guidance: a quick tap on T or W says they are held; the first Home of a visit says Home is not the FMP safe-wide shot; a refused import names its first problem in the status line.
+- If the venue view's own graphics context cannot start, its panel says so while the monitor carries on.
+
 ## 1.7.2 — 2026-09-24 — Defer venue WebGL until shown
 
 - The venue overview no longer creates a second `WebGLRenderer` at startup. The monitor still starts immediately; the overview GPU context is created on the first frame where the venue panel is visible (desktop shown, or phone Venue tab). Collapsed venue / Operate-only phone sessions keep one WebGL context.

@@ -193,8 +193,8 @@ export class SimulatorStore {
     return this.persistence.importText(text, wallSeconds, (wall) => this.advanceTo(wall));
   }
 
-  noteExternalSave(): void {
-    this.persistence.noteExternalSave();
+  noteExternalSave(newValue?: string | null): void {
+    this.persistence.noteExternalSave(newValue);
   }
 
   useSavedCopy(wallSeconds: number): UpdateResult {
@@ -211,6 +211,12 @@ export class SimulatorStore {
 
   dismissStorageNotice(): void {
     this.persistence.dismissStorageNotice();
+  }
+
+  /** A one-line hint in the status line, for a control used in a way that does nothing. */
+  hint(text: string): void {
+    this.core.announce(text);
+    this.core.emit();
   }
 
   /** Wall clock of the last processed input or frame, seconds. */

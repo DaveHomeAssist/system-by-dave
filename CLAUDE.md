@@ -139,7 +139,8 @@ Throwline's catalog is synchronized and verified through its dedicated scripts.
 - Public navigation behavior: `docs/public-shell-contract.md`
 - Public naming and metadata: `docs/public-content-contract.md`
 - Cue Sheet media and native NDI boundary: `docs/cue-sheet-media-io.md`
-- FMP Camera Simulator architecture, evidence and gates: `docs/fmp-camera-simulator.md`
+- FMP Camera Simulator architecture, evidence and gates: `docs/fmp-camera-simulator.md`; what
+  happened to each finding of the September 2026 audits: `docs/fmp-camera-simulator-audit-2026-09.md`
 - Camera Shading Practice console and its state contract: `docs/shader-practice.md`
 - AV inventory and storage keys: `js/sbd-registry.js`
 - Sitemap membership: `scripts/gen_sitemap.py`

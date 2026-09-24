@@ -128,6 +128,48 @@ describe("store other-tab saves", () => {
     expect(store.getState().storageConflict).toBe(false);
   });
 
+  it("ignores another tab's save when it holds this same session", () => {
+    const { store, storage } = makeStore();
+    const same = serializeProject(defaultProject(), "2026-09-24T01:00:00.000Z");
+    storage.setItem(STORAGE_KEY, same);
+    store.noteExternalSave(same);
+    expect(store.getState().storageConflict).toBe(false);
+  });
+
+  it("saves this tab's session again when another tab removes the saved copy", () => {
+    vi.useFakeTimers();
+    try {
+      const { store, storage, now } = makeStore();
+      store.storePreset(6, now());
+      store.noteExternalSave(serializeProject(defaultProject()));
+      expect(store.getState().storageConflict).toBe(true);
+      storage.removeItem(STORAGE_KEY);
+      store.noteExternalSave(null);
+      expect(store.getState().storageConflict).toBe(false);
+      vi.advanceTimersByTime(1000);
+      const saved = parseProjectText(storage.getItem(STORAGE_KEY) as string);
+      expect(saved.ok && saved.project.session.presets.map((p) => p.slot)).toEqual([6]);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("keeps this tab's session when the other copy is gone before it is loaded", () => {
+    const { store, storage, now } = makeStore();
+    store.storePreset(2, now());
+    const other = defaultProject();
+    other.session.presets = [{ slot: 8, name: "", cameraId: other.camera.id, pan: 3, tilt: -4, lens: 0.1, savedAt: "2026-09-23T08:00:00.000Z" }];
+    storage.setItem(STORAGE_KEY, serializeProject(other));
+    store.noteExternalSave(storage.getItem(STORAGE_KEY));
+    expect(store.getState().storageConflict).toBe(true);
+    storage.removeItem(STORAGE_KEY);
+    expect(store.useSavedCopy(now()).ok).toBe(false);
+    expect(store.getState().project.session.presets.map((p) => p.slot)).toEqual([2]);
+    expect(store.getState().storageConflict).toBe(false);
+    const saved = parseProjectText(storage.getItem(STORAGE_KEY) as string);
+    expect(saved.ok && saved.project.session.presets.map((p) => p.slot)).toEqual([2]);
+  });
+
   it("can keep this tab's copy instead", () => {
     const { store, storage, now } = makeStore();
     store.storePreset(5, now());
@@ -167,5 +209,43 @@ describe("show package isolation", () => {
     expect(JSON.stringify(after.project.session.presets)).toBe(presets);
     expect(store.getTelemetry().snapshot.pose).toEqual(pose);
     expect(after.project.session.showPackage.fixtures).toEqual([]);
+  });
+});
+
+describe("preset names and clearing", () => {
+  it("names a stored preset, caps the name at 40 characters and clears the slot", () => {
+    const { store, now } = makeStore();
+    store.storePreset(4, now());
+    store.renamePreset(4, "Safe wide");
+    expect(store.getState().project.session.presets[0]).toMatchObject({ slot: 4, name: "Safe wide" });
+    store.renamePreset(4, "x".repeat(60));
+    expect(store.getState().project.session.presets[0].name).toHaveLength(40);
+    store.deletePreset(4);
+    expect(store.getState().project.session.presets).toEqual([]);
+    expect(store.getState().announcement?.text).toBe("Preset 4 deleted.");
+  });
+});
+
+describe("operator guidance", () => {
+  it("says once that Home is not the FMP safe-wide shot", () => {
+    const { store, run, now } = makeStore();
+    const panAwayThenHome = () => {
+      store.setDrive({ pan: 1, tilt: 0, zoom: 0 }, now());
+      run(1);
+      store.setDrive({ pan: 0, tilt: 0, zoom: 0 }, now());
+      run(2);
+      expect(store.getTelemetry().snapshot.pose.pan).not.toBe(0);
+      store.home(now());
+      run(20);
+      return store.getState().announcement?.text;
+    };
+    expect(panAwayThenHome()).toMatch(/^Home reached\. Home is not the FMP safe-wide shot/);
+    expect(panAwayThenHome()).toBe("Home reached.");
+  });
+
+  it("names the first problem when an import is rejected", () => {
+    const { store, now } = makeStore();
+    expect(store.importText("{", now()).ok).toBe(false);
+    expect(store.getState().announcement?.text).toBe("Import rejected (project: The file is not valid JSON.). The open session was kept.");
   });
 });

@@ -30,8 +30,14 @@ if (!scriptTag || !styleTag || !bootTag) fail('camera-sim/index.html does not ha
 // HTML comment opener inside script data can swallow the end tag, so refuse rather than guess.
 const bundle = readFileSync(join(OUT_DIR, scriptTag[1]), 'utf8').replace(/<\/script/gi, '<\\/script');
 if (bundle.includes('<!--')) fail('the bundle contains "<!--", which is unsafe inside an inline script.');
-const css = readFileSync(join(OUT_DIR, styleTag[1]), 'utf8');
+// The page loads no files offline, so each font the stylesheet names becomes a data: URL.
+let fonts = 0;
+const css = readFileSync(join(OUT_DIR, styleTag[1]), 'utf8').replace(/url\((["']?)\.\/([\w.-]+\.woff2)\1\)/g, (_, _quote, name) => {
+  fonts += 1;
+  return `url(data:font/woff2;base64,${readFileSync(join(OUT_DIR, 'assets', name)).toString('base64')})`;
+});
 if (/<\/style/i.test(css)) fail('the stylesheet contains "</style".');
+if (/url\((?!["']?data:)/.test(css)) fail('the stylesheet still loads a file, which the offline page cannot reach.');
 const boot = readFileSync(join(OUT_DIR, 'theme-boot.js'), 'utf8');
 
 const bootBlock = `<script>${boot}</script>`;
@@ -47,6 +53,7 @@ const csp = [
   "default-src 'none'",
   `script-src ${sha256(boot)} ${sha256(bundle)}`,
   `style-src ${sha256(css)}`,
+  ...(fonts ? ["font-src data:"] : []),
   "img-src 'self' data: blob:",
   "connect-src 'none'",
   "worker-src 'none'",
@@ -73,4 +80,4 @@ const remoteLoads = [
 if (remoteLoads.length) fail(`the offline page still loads files: ${remoteLoads.join(' ')}`);
 
 writeFileSync(join(OUT_DIR, OFFLINE_FILE), html);
-console.log(`camera-sim/${OFFLINE_FILE}: ${(Buffer.byteLength(html) / 1024).toFixed(0)} KB, CSP pinned to ${bundle.length} + ${css.length} + ${boot.length} inline bytes`);
+console.log(`camera-sim/${OFFLINE_FILE}: ${(Buffer.byteLength(html) / 1024).toFixed(0)} KB, CSP pinned to ${bundle.length} + ${css.length} + ${boot.length} inline bytes, ${fonts} font(s) inlined`);

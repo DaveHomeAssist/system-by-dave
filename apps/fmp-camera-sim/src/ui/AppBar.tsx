@@ -34,7 +34,12 @@ export function AppBar({ state, theme, drawerOpen, drawerTab, showPanelButtons, 
           data-testid="flag-venue"
         >
           <span className="flag-label">{approximate ? "Approximate venue" : "Measured venue"}</span>
-          {approximate && <span className="flag-count">{state.unsettled.length}</span>}
+          {approximate && (
+            <span className="flag-count">
+              {state.unsettled.length}
+              <span className="visually-hidden"> {state.unsettled.length === 1 ? "dimension" : "dimensions"} not yet measured</span>
+            </span>
+          )}
         </button>
         <button
           type="button"

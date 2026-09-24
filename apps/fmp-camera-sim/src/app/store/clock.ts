@@ -99,13 +99,21 @@ export class ClockController {
 
   private reactToSimEvent(event: SimEvent): boolean {
     switch (event.type) {
-      case "recall-complete":
+      case "recall-complete": {
+        // Home is the camera's mechanical centre, easily mistaken for the show's safe-wide shot.
+        const firstHome = event.target.kind === "home" && !this.core.homeExplained;
+        if (event.target.kind === "home") this.core.homeExplained = true;
         this.core.announce(
-          event.target.kind === "home" ? "Home reached." : `Preset ${event.target.slot} reached.`,
+          event.target.kind === "home"
+            ? firstHome
+              ? "Home reached. Home is not the FMP safe-wide shot: frame that shot and store it as a preset."
+              : "Home reached."
+            : `Preset ${event.target.slot} reached.`,
           "success",
         );
         this.persistence.scheduleSave();
         return true;
+      }
       case "recall-interrupted":
         if (event.reason === "manual") {
           this.core.announce(

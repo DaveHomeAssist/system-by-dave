@@ -1,9 +1,13 @@
 import { type Project, parseProjectText, serializeProject } from "../../domain/project";
+import { formatIssues } from "../../domain/validate";
 import { deriveVenueGeometry } from "../../domain/venue";
-import { loadProject, saveProject } from "../../storage/persist";
+import { loadProject, saveProject, STORAGE_KEY } from "../../storage/persist";
 import { type StoreCore } from "./core";
 import { SAVE_DEBOUNCE_MS } from "./helpers";
 import { type UpdateResult } from "./types";
+
+/** Two copies are compared with the same save time, so only their content can differ. */
+const SAME_TIME = "1970-01-01T00:00:00.000Z";
 
 /** Debounced autosave, import/export, and multi-tab conflict handling. */
 export class PersistenceController {
@@ -53,7 +57,8 @@ export class PersistenceController {
   ): UpdateResult {
     const parsed = parseProjectText(text);
     if (!parsed.ok) {
-      this.core.announce("Import rejected. The open session was kept.", "warn");
+      // The first problem goes into the announcement too, so it is heard, not only listed.
+      this.core.announce(`Import rejected (${formatIssues(parsed.issues, 1)}). The open session was kept.`, "warn");
       this.core.emit();
       return { ok: false, issues: parsed.issues };
     }
@@ -71,10 +76,23 @@ export class PersistenceController {
   }
 
   /**
-   * Another tab saved over this session. Autosave pauses so neither copy is silently lost until
-   * the operator chooses one.
+   * Another tab changed the saved session (`newValue` is what it wrote, null when it removed it,
+   * undefined when unknown). A removed copy leaves nothing to choose between, so this tab saves
+   * its session again; an identical copy needs no choice. Otherwise autosave pauses so neither
+   * copy is silently lost until the operator chooses one.
    */
-  noteExternalSave(): void {
+  noteExternalSave(newValue?: string | null): void {
+    if (newValue === null) {
+      this.core.storageConflict = false;
+      this.core.announce("The saved session was cleared in another tab. This tab's session is saved again.");
+      this.scheduleSave();
+      this.core.emit();
+      return;
+    }
+    if (typeof newValue === "string") {
+      const parsed = parseProjectText(newValue);
+      if (parsed.ok && serializeProject(parsed.project, SAME_TIME) === serializeProject(this.projectForSave(), SAME_TIME)) return;
+    }
     if (this.core.storageConflict) return;
     this.core.storageConflict = true;
     if (this.core.saveTimer !== null) clearTimeout(this.core.saveTimer);
@@ -85,6 +103,14 @@ export class PersistenceController {
 
   /** Loads the copy the other tab saved, replacing this tab's session. */
   useSavedCopy(wallSeconds: number, advanceTo: (wall: number) => void): UpdateResult {
+    if (!this.savedCopyExists()) {
+      // Nothing to load: the other tab's copy is gone. Keep this session rather than a blank one.
+      this.core.storageConflict = false;
+      this.flushSave();
+      this.core.announce("The other tab's copy is no longer saved. This tab's session was kept and saved.", "warn");
+      this.core.emit();
+      return { ok: false, issues: [{ path: "storage", message: "The other tab's copy is no longer saved." }] };
+    }
     const loaded = loadProject(this.core.storage);
     if (loaded.status.state !== "ok" || loaded.notice) {
       const message = loaded.notice ?? "The saved copy could not be read.";
@@ -98,6 +124,14 @@ export class PersistenceController {
     this.core.announce("Loaded the session saved by the other tab.", "success");
     this.core.emit();
     return { ok: true };
+  }
+
+  private savedCopyExists(): boolean {
+    try {
+      return this.core.storage?.getItem(STORAGE_KEY) != null;
+    } catch {
+      return false;
+    }
   }
 
   /** Keeps this tab's session and saves it over the other tab's copy. */
