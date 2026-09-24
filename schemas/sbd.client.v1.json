@@ -1,0 +1,117 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://systembydave.com/schemas/sbd.client.v1.json",
+  "title": "System by Dave client edition manifest",
+  "description": "One client edition: brand, surfaces, visibility, products with expected version ranges, and profile selections. A client configures products; it never modifies product source. See docs/client-framework.md. Descriptive only in v1: the build does not read this file yet.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "id", "name", "storagePrefix", "brand", "surfaces", "products"],
+  "properties": {
+    "schema": { "const": "sbd.client.v1" },
+    "id": {
+      "description": "Stable client ID. Used as the storage namespace root and in profile paths. Resolved at build time from the served surface; never read from a URL.",
+      "$ref": "#/$defs/slug"
+    },
+    "name": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "storagePrefix": {
+      "description": "Root of every browser-storage key this client's products own: <storagePrefix>.<product>.v<N>. Existing legacy keys are listed per product in storage.legacyKeys.",
+      "$ref": "#/$defs/slug"
+    },
+    "brand": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title", "publisherCredit"],
+      "properties": {
+        "title": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "titleSeparator": { "type": "string", "maxLength": 8, "default": " | " },
+        "accent": { "type": "string", "pattern": "^#[0-9a-fA-F]{6}$" },
+        "themeColorLight": { "type": "string", "pattern": "^#[0-9a-fA-F]{6}$" },
+        "themeColorDark": { "type": "string", "pattern": "^#[0-9a-fA-F]{6}$" },
+        "logo": { "type": "string", "description": "Path relative to clients/<id>/." },
+        "publisherCredit": {
+          "description": "Whether System by Dave branding appears in the shell. 'none' is a white-label edition (FMP struck publisher branding deliberately; see docs/public-shell-contract.md).",
+          "enum": ["full", "footer", "none"]
+        }
+      }
+    },
+    "surfaces": {
+      "description": "Where the edition is served. A surface is a domain plus its visibility tier; one client can have several.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "domain", "tier", "home"],
+        "properties": {
+          "id": { "$ref": "#/$defs/slug" },
+          "domain": { "type": "string", "pattern": "^[a-z0-9.-]+\\.[a-z]{2,}$" },
+          "tier": {
+            "description": "public: indexed. public-unlisted: served openly, noindex and robots-disallowed. private: behind the edge access gate. Tier is per surface; v1 has no per-user or per-page permissions.",
+            "enum": ["public", "public-unlisted", "private"]
+          },
+          "home": { "type": "string", "pattern": "^/" },
+          "domainSiteId": {
+            "description": "The matching site id in scripts/domain-sites.json while that file remains the build's source of truth.",
+            "$ref": "#/$defs/slug"
+          },
+          "status": { "enum": ["live", "planned"], "default": "live" }
+        }
+      }
+    },
+    "products": {
+      "description": "Products enabled for this edition, keyed by product id (products/<id>/product.json).",
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": { "$ref": "#/$defs/slug" },
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["expectedVersionRange", "surface"],
+        "properties": {
+          "expectedVersionRange": {
+            "description": "A CI validation gate, not a build instruction. The pipeline builds exactly one version of each product; the build fails when that version falls outside this range. v1 never serves different versions of a product to different clients.",
+            "type": "string",
+            "pattern": "^(\\^|~)?\\d+(\\.(\\d+|x))?(\\.(\\d+|x))?$"
+          },
+          "surface": { "$ref": "#/$defs/slug" },
+          "route": { "type": "string", "pattern": "^/" },
+          "config": {
+            "description": "Validated against the product's configSchema. Anything the schema does not accept is rejected; a client cannot add behaviour the product does not already support.",
+            "type": "object"
+          },
+          "profiles": {
+            "description": "Profile references by role, e.g. { \"camera\": \"camera/birddog-p240@1\", \"position\": \"fmp:position/cam4-catwalk@1\" }.",
+            "type": "object",
+            "propertyNames": { "$ref": "#/$defs/slug" },
+            "additionalProperties": { "$ref": "#/$defs/profileRef" }
+          }
+        }
+      }
+    },
+    "external": {
+      "description": "Sources owned by another repository and delivered as a managed export. The client edition references them; this repository never hand-edits their output.",
+      "type": "object",
+      "propertyNames": { "$ref": "#/$defs/slug" },
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["repository", "paths", "surface"],
+        "properties": {
+          "repository": { "type": "string", "pattern": "^[A-Za-z0-9-]+/[A-Za-z0-9._-]+$" },
+          "paths": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+          "surface": { "$ref": "#/$defs/slug" },
+          "contract": { "type": "string", "description": "Repository doc that governs the export." }
+        }
+      }
+    },
+    "notes": { "type": "string", "maxLength": 2000 }
+  },
+  "$defs": {
+    "slug": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,62}$" },
+    "profileRef": {
+      "description": "Shared: <kind>/<id>@<major>. Client-owned: <client>:<kind>/<id>@<major>.",
+      "type": "string",
+      "pattern": "^([a-z0-9][a-z0-9-]*:)?[a-z0-9][a-z0-9-]*/[a-z0-9][a-z0-9-]*@\\d+$"
+    }
+  }
+}

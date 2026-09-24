@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://systembydave.com/schemas/sbd.profile.v1.json",
+  "title": "System by Dave profile",
+  "description": "A description of real equipment, a venue, a position or a workflow. Shared equipment profiles live in profiles/<kind>/<id>.json; client-owned venue, position and workflow profiles live in clients/<client>/profiles/<kind>/<id>.json. Client profiles reference shared profiles by ID and never copy their values. Every value carries evidence. See docs/client-framework.md.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "kind", "id", "version", "owner", "title", "values"],
+  "properties": {
+    "schema": { "const": "sbd.profile.v1" },
+    "kind": {
+      "description": "Profile kind. Shared kinds describe equipment; client kinds describe a place or a practice.",
+      "enum": ["camera", "lens", "controller", "switcher", "display", "venue", "position", "workflow"]
+    },
+    "id": { "$ref": "#/$defs/slug" },
+    "version": {
+      "description": "Profile major version. References pin the major (@1). Bump it when a value's meaning or unit changes; correcting a value or its evidence is not a bump.",
+      "type": "integer",
+      "minimum": 1
+    },
+    "owner": {
+      "description": "'shared' for top-level profiles/, otherwise the owning client id. A shared profile may not reference a client profile.",
+      "type": "string",
+      "pattern": "^(shared|[a-z0-9][a-z0-9-]{0,62})$"
+    },
+    "title": { "type": "string", "minLength": 1, "maxLength": 160 },
+    "extends": {
+      "description": "Profiles this one composes, by role, e.g. { \"camera\": \"camera/birddog-p240@1\" } in a position profile. Resolution is by reference only; values are never copied.",
+      "type": "object",
+      "propertyNames": { "$ref": "#/$defs/slug" },
+      "additionalProperties": { "$ref": "#/$defs/profileRef" }
+    },
+    "values": {
+      "description": "Every leaf value is wrapped with its evidence. Units are explicit and SI unless the key says otherwise.",
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": { "type": "string", "pattern": "^[a-zA-Z][a-zA-Z0-9]*$" },
+      "additionalProperties": { "$ref": "#/$defs/evidenced" }
+    },
+    "sources": {
+      "description": "Source identifiers referenced by evidence.sourceIds.",
+      "type": "object",
+      "propertyNames": { "type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$" },
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["label"],
+        "properties": {
+          "label": { "type": "string", "maxLength": 200 },
+          "url": { "type": "string", "pattern": "^https://" },
+          "checked": { "type": "string", "format": "date" },
+          "private": {
+            "description": "True when the source (e.g. a venue photo) must not be published. Only its identifier appears in the profile.",
+            "type": "boolean"
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "slug": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,62}$" },
+    "profileRef": {
+      "type": "string",
+      "pattern": "^([a-z0-9][a-z0-9-]*:)?[a-z0-9][a-z0-9-]*/[a-z0-9][a-z0-9-]*@\\d+$"
+    },
+    "evidenced": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["value", "unit", "evidence"],
+      "properties": {
+        "value": {},
+        "unit": {
+          "description": "Unit of value, or 'none' for dimensionless or categorical values.",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 24
+        },
+        "evidence": {
+          "description": "Same vocabulary as the FMP Camera Simulator (apps/fmp-camera-sim/src/domain/evidence.ts), so its records migrate without translation.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "method"],
+          "properties": {
+            "status": { "enum": ["measured", "confirmed", "published", "estimated", "inferred", "demo", "uncalibrated"] },
+            "method": { "enum": ["unknown", "assumption", "photo", "scaled-plan", "staff-report", "field-measurement", "manufacturer", "operator"] },
+            "sourceIds": {
+              "type": "array",
+              "maxItems": 16,
+              "items": { "type": "string", "maxLength": 160 }
+            },
+            "note": { "type": "string", "maxLength": 1000 }
+          }
+        }
+      }
+    }
+  }
+}

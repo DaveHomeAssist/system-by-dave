@@ -1,0 +1,63 @@
+{
+  "schema": "sbd.client.v1",
+  "id": "fmp",
+  "name": "Freedom Mortgage Pavilion",
+  "storagePrefix": "fmp",
+  "brand": {
+    "title": "FMP Video Operations",
+    "titleSeparator": " | ",
+    "accent": "#e08a4f",
+    "themeColorLight": "#eee8df",
+    "publisherCredit": "none"
+  },
+  "surfaces": [
+    {
+      "id": "operations",
+      "domain": "housevideo.app",
+      "tier": "public-unlisted",
+      "home": "/fmp/",
+      "domainSiteId": "housevideo",
+      "status": "live"
+    },
+    {
+      "id": "walk",
+      "domain": "walk.housevideo.app",
+      "tier": "public-unlisted",
+      "home": "/fmpwalk/",
+      "domainSiteId": "housevideo-walk",
+      "status": "live"
+    }
+  ],
+  "products": {
+    "camera-sim": {
+      "expectedVersionRange": "~1.7",
+      "surface": "operations",
+      "route": "/camera-sim/",
+      "config": {},
+      "profiles": {
+        "camera": "camera/birddog-p240@1",
+        "position": "fmp:position/cam4-catwalk@1",
+        "venue": "fmp:venue/pavilion@1"
+      }
+    }
+  },
+  "external": {
+    "fmp-suite-operations": {
+      "repository": "DaveHomeAssist/fmp-suite",
+      "paths": [
+        "fmp/"
+      ],
+      "surface": "operations",
+      "contract": "docs/fmp-public-release.md"
+    },
+    "fmp-suite-walk": {
+      "repository": "DaveHomeAssist/fmp-suite",
+      "paths": [
+        "fmpwalk/"
+      ],
+      "surface": "walk",
+      "contract": "docs/fmp-public-release.md"
+    }
+  },
+  "notes": "Descriptive only: no build step reads this file in framework v1 (see docs/client-framework.md). It mirrors the housevideo and housevideo-walk entries in scripts/domain-sites.json, which remains the build's source of truth. Only camera-sim is listed under products because it is the only FMP product with a version source (apps/fmp-camera-sim/CHANGELOG.md); /switcher/, /shader/, /ursa-broadcast-g2/ and /backfocus/ join when they gain product manifests and release logs. The referenced profiles are planned, not yet written. The private FMP House Video reference (DaveHomeAssist/fmp-house-video, Cloudflare Worker with Basic auth) is a third, private surface to add once its domain is recorded."
+}
