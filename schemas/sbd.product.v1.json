@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://systembydave.com/schemas/sbd.product.v1.json",
+  "title": "System by Dave product manifest",
+  "description": "products/<id>/product.json. The canonical declaration of a product: identity, version source, configuration surface, profile roles, storage and continuity capabilities. js/sbd-registry.js becomes generated, non-authoritative output of these manifests. See docs/client-framework.md.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "id", "name", "version", "source", "configSchema", "storage", "supports"],
+  "properties": {
+    "schema": { "const": "sbd.product.v1" },
+    "id": { "$ref": "#/$defs/slug" },
+    "name": { "type": "string", "minLength": 1, "maxLength": 120 },
+    "summary": { "type": "string", "maxLength": 400 },
+    "version": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["changelog"],
+      "properties": {
+        "changelog": {
+          "description": "Release log whose top entry is the running version (the camera-sim model). The version is read from here, never duplicated in the manifest.",
+          "type": "string"
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "path"],
+      "properties": {
+        "kind": {
+          "description": "native: page in this repository. app: built from apps/<id> with its own build. external: managed export from another repository (not editable here).",
+          "enum": ["native", "app", "external"]
+        },
+        "path": { "type": "string" },
+        "repository": { "type": "string", "pattern": "^[A-Za-z0-9-]+/[A-Za-z0-9._-]+$" }
+      }
+    },
+    "registry": {
+      "description": "Fields copied into the generated js/sbd-registry.js entry for AV Suite products.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "dept": { "type": "string" },
+        "phases": {
+          "type": "array",
+          "items": { "enum": ["advance", "prep", "loadin", "show", "strike", "closeout"] },
+          "uniqueItems": true
+        },
+        "tag": { "type": "string" },
+        "toolboxFeatured": { "type": "boolean" }
+      }
+    },
+    "configSchema": {
+      "description": "Path to a JSON Schema for the client 'config' object. The product's entire client-configurable surface. Use {} semantics via a schema that accepts only an empty object when the product takes no configuration.",
+      "type": "string"
+    },
+    "profileRoles": {
+      "description": "Roles the product accepts profiles for, and the profile kind each role requires.",
+      "type": "object",
+      "propertyNames": { "$ref": "#/$defs/slug" },
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "required"],
+        "properties": {
+          "kind": { "$ref": "#/$defs/slug" },
+          "required": { "type": "boolean" }
+        }
+      }
+    },
+    "storage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["keys"],
+      "properties": {
+        "keys": {
+          "description": "Namespaced keys this product owns, as templates: '{client}.camera-sim.v1'.",
+          "type": "array",
+          "items": { "type": "string", "pattern": "^\\{client\\}\\.[a-z0-9-]+\\.[a-z0-9.-]*v\\d+$" }
+        },
+        "legacyKeys": {
+          "description": "Pre-framework keys still read or written (e.g. 'fmpCameraSim.v1'). Listed so transfer and migration tooling can find them; new products must not add any.",
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "indexedDB": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "supports": {
+      "description": "Capabilities the continuity gate verifies.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["shell", "context", "handoffReceive", "offline"],
+      "properties": {
+        "shell": { "type": "boolean" },
+        "context": { "type": "boolean" },
+        "handoffReceive": {
+          "description": "Envelope payload schemas this product imports, e.g. 'system-by-dave.crew-time-log.v1'.",
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "offline": { "type": "boolean" }
+      }
+    },
+    "shellVersion": {
+      "description": "Version range of packages/sbd-shell this product's build integrates.",
+      "type": "string"
+    }
+  },
+  "$defs": {
+    "slug": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,62}$" }
+  }
+}

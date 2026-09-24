@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://systembydave.com/schemas/sbd.context.v1.json",
+  "title": "System by Dave runtime context, envelope and storage contract",
+  "description": "Three separate contracts in one file: $defs/context says what the shared context means; $defs/envelope says how it moves; $defs/storageRecord says where it rests. Products adopt them independently. The top level validates a context object. See docs/client-framework.md.",
+  "$ref": "#/$defs/context",
+  "$defs": {
+    "slug": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,62}$" },
+    "context": {
+      "description": "SBDContext. client is always injected from the build of the serving surface; a product must ignore any client value that arrives from a URL, envelope or storage record.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema", "client", "session"],
+      "properties": {
+        "schema": { "const": "sbd.context.v1" },
+        "client": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "surface"],
+          "properties": {
+            "id": { "$ref": "#/$defs/slug" },
+            "surface": { "$ref": "#/$defs/slug" }
+          }
+        },
+        "session": { "$ref": "#/$defs/session" },
+        "navigation": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "returnTo": {
+              "description": "Absolute https URL of the parent destination. Must be on a surface listed in the active client manifest; anything else is dropped (no open redirects).",
+              "type": "string",
+              "pattern": "^https://"
+            },
+            "previousProduct": { "$ref": "#/$defs/slug" }
+          }
+        }
+      }
+    },
+    "session": {
+      "description": "Show context. Mirrors the existing sbd* URL parameters (sbdShow, sbdVenue, sbdDate, sbdOperator, sbdPhase) so today's links keep working.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "show": { "type": "string", "maxLength": 120 },
+        "venue": { "type": "string", "maxLength": 120 },
+        "date": { "type": "string", "format": "date" },
+        "operator": {
+          "description": "Sensitive: a person's name. Allowed in same-origin storage; never in a cross-origin envelope.",
+          "type": "string",
+          "maxLength": 80
+        },
+        "phase": { "enum": ["advance", "prep", "loadin", "show", "strike", "closeout"] },
+        "department": { "type": "string", "maxLength": 40 }
+      }
+    },
+    "envelope": {
+      "description": "How context and a handoff move. Transport priority: same origin -> storage record; cross origin -> URL fragment #sbd=<base64url(JSON)>; larger or sensitive payloads -> transfer.html or a file handoff. The fragment form is bounded: encoded length <= 2048 bytes, no operator field, no payload containing personal data. Receivers decode with the same validation as a file import and discard on any failure.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema", "transport", "createdAt", "from", "to"],
+      "properties": {
+        "schema": { "const": "sbd.envelope.v1" },
+        "transport": { "enum": ["storage", "fragment", "file"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "from": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["product"],
+          "properties": {
+            "product": { "$ref": "#/$defs/slug" },
+            "label": { "type": "string", "maxLength": 80 }
+          }
+        },
+        "to": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["product"],
+          "properties": {
+            "product": { "$ref": "#/$defs/slug" }
+          }
+        },
+        "session": {
+          "description": "Session subset. For transport 'fragment', operator must be absent (enforced by the conditional below).",
+          "$ref": "#/$defs/session"
+        },
+        "payload": {
+          "description": "The target product's own import shape: { schema: 'system-by-dave.<target>.v1', meta, items } (the sbd.handoff.v1 contract in js/sbd-handoff.js). For transport 'fragment' it must be small and free of personal data.",
+          "type": "object",
+          "required": ["schema"],
+          "properties": {
+            "schema": { "type": "string", "pattern": "^system-by-dave\\.[a-z0-9-]+\\.v\\d+$" }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "transport": { "const": "fragment" } } },
+          "then": {
+            "properties": {
+              "session": { "type": "object", "properties": { "operator": false } }
+            }
+          }
+        }
+      ]
+    },
+    "storageRecord": {
+      "description": "Where context and handoffs rest. Keys: '<client>.<product>.v<N>' for product state, '<client>.context.v1' for context, '<client>.handoff.<targetProduct>.v1' for a staged handoff. Staged handoffs expire after expiresAt and are always consumed on read. A migration from a legacy key is copy-then-verify-then-remove, never destructive first.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "schema", "writtenAt"],
+      "properties": {
+        "key": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*\\.[a-z0-9.-]+$" },
+        "schema": { "type": "string" },
+        "writtenAt": { "type": "string", "format": "date-time" },
+        "expiresAt": { "type": "string", "format": "date-time" },
+        "migratedFrom": { "type": "string" }
+      }
+    }
+  }
+}
