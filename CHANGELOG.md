@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-24 — FMP Camera Simulator 1.9.0: controls beside the monitor
+
+- On an 11-inch iPad in Chrome (1180 × 685) the camera monitor showed a 232 × 130 picture, about 4% of the screen: stacked over the controls, the 16:9 picture is height-bound on landscape screens. With the venue view collapsed, landscape screens from 960 px wide and at least 4:3 now put the controls in a column beside the monitor, so the picture takes the width: 558 × 314 on that iPad, 402 × 226 at 1024 × 690 and 608 × 342 in a 1366 × 650 laptop browser. This is the "next layout step" `docs/fmp-camera-simulator.md` named in 1.8.0.
+- Desktop windows under 900 px tall start with the venue view collapsed, as tablets do; Expand monitor (F) now enlarges the picture on desktops (602 → 818 px wide at 1440 × 900). Storage keys, exports and phone and portrait layouts are unchanged.
+- Probe: 52 → 54 checks; the short-screen checks add 1180 × 685 and require the controls beside the monitor, a picture at least 390–590 px wide, and the whole controls column on screen with wider text.
+
 ## 2026-09-24 — FMP Camera Simulator 1.8.0: audit fixes
 
 - Worked through the ten camera-simulator audits of 23–24 September (accessibility, code quality, data, delivery, performance, product, QA, reliability, security, web health), stacked on #141 (1.7.1) and #142 (1.7.2). `docs/fmp-camera-simulator-audit-2026-09.md` records every finding's outcome: fixed here, fixed earlier, not worth doing, deferred with a reason, or not a defect. Edge security headers, asset caching and a staging site are not worth doing: `.app` is HSTS-preloaded, the page holds nothing to attack, and hashed assets already revalidate with a `304`.

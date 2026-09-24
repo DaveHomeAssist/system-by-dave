@@ -30,7 +30,19 @@ const MOBILE_TABS: Array<{ id: MobileTab; label: string }> = [
 
 const SETTINGS_TABS: PanelTab[] = ["venue", "camera", "performer", "session"];
 
-const venueDefault = (layout: LayoutClass) => layout === "desktop" || layout === "ultrawide";
+/** Where app.css moves the controls beside the monitor once the venue view is collapsed. */
+const CONTROLS_BESIDE_MONITOR = "(orientation: landscape) and (min-width: 960px) and (min-aspect-ratio: 4/3)";
+
+/** Below this height a desktop window starts with the venue view collapsed where the controls can
+ *  sit beside the monitor: sharing the monitor's row, the venue view left the picture a thumbnail
+ *  (232 × 130 px on an iPad in Chrome, 1180 × 685). */
+const VENUE_SHOWN_MIN_HEIGHT = 900;
+
+function venueDefault(layout: LayoutClass): boolean {
+  if (layout === "ultrawide") return true;
+  if (layout !== "desktop") return false;
+  return window.innerHeight >= VENUE_SHOWN_MIN_HEIGHT || !window.matchMedia(CONTROLS_BESIDE_MONITOR).matches;
+}
 
 export function App() {
   const [runtime] = useState(() => {

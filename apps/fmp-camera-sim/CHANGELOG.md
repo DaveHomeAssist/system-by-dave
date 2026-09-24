@@ -13,6 +13,13 @@ Minor versions add features or change a saved-file format; patch versions fix or
 
 Versions 1.0.0 to 1.5.3 were numbered after the fact from their merged pull requests.
 
+## 1.9.0 — 2026-09-24 — Controls beside the monitor
+
+- A larger picture on landscape screens. Stacked over the controls, the 16:9 picture was height-bound: an 11-inch iPad in Chrome (1180 × 685) showed it at 232 × 130 in a 779 px wide panel. With the venue view collapsed, landscape screens from 960 px wide and at least 4:3 now put the controls in a column beside the monitor, and the picture takes the width left of them: 558 × 314 on that iPad, 402 × 226 on a 1024 px iPad in Safari (was 248 × 139) and 608 × 342 in a 1366 × 650 laptop browser (was 204 × 115).
+- Desktop windows under 900 px tall start with the venue view collapsed, as tablets do. Showing it puts it back beside the monitor, with the controls below.
+- Expand monitor (F) now enlarges the picture on desktops: at 1440 × 900 it goes from 602 to 818 px wide, where stacking had left it the same size.
+- Beside the monitor, the keyboard hints and speed figures wrap to keep the controls column narrow, the presets' hint shares their heading's line, and the readout drops its copy of the speed levels to stay on one line. Desktop windows up to 800 px tall use the one-row header that landscape tablets already had.
+
 ## 1.8.0 — 2026-09-24 — Audit fixes: recovery, short screens, access
 
 - Short screens keep a picture. On an iPad in landscape (1024 × 768) the stacked layout left the monitor 2 px tall, and a 1366 × 650 laptop browser showed a 158 × 89 thumbnail. On desktop and landscape tablets the monitor now keeps at least 45% of the workspace, the controls scroll inside their panel only when needed, and landscape tablets from 960 px use one row of controls and a one-row header.
