@@ -990,26 +990,61 @@ for (const [label, viewport, expectation] of [
   });
 }
 
-// Short screens: an iPad in landscape (1024 × 768, or about 1024 × 690 inside Safari) and a
-// 1366 × 768 laptop with browser chrome (about 1366 × 650). The stacked layout used to hand the
-// height to the controls and leave the monitor 2 px tall on the iPad. The picture must stay
-// usable, with the venue view shown too, and every control must stay reachable by scrolling
-// the controls panel.
-for (const [label, viewport, minWidth] of [
-  ['iPad landscape 1024 × 768', { width: 1024, height: 768 }, 280],
-  ['iPad Safari landscape 1024 × 690', { width: 1024, height: 690 }, 230],
-  ['laptop browser 1366 × 650', { width: 1366, height: 650 }, 190],
+// Short screens: an iPad in landscape (1024 × 768, or about 1024 × 690 inside Safari, 1180 × 685
+// for an 11-inch iPad in Chrome) and a 1366 × 768 laptop with browser chrome (about 1366 × 650).
+// Stacked over the controls the 16:9 picture is height-bound: 1.8.0 kept it from collapsing to
+// 2 px, but an iPad in Chrome still showed 232 × 130. With the venue view collapsed, the default
+// on these screens, the controls sit beside the monitor, the whole column (Stop included) fits
+// without scrolling even with wider text, and the readout keeps to one line where there is room.
+// Showing the venue view puts it beside the monitor again, with a smaller but usable picture and
+// every control reachable by scrolling the controls panel.
+for (const [label, viewport, minWidth, minShownWidth] of [
+  ['iPad landscape 1024 × 768', { width: 1024, height: 768 }, 390, 210],
+  ['iPad Safari landscape 1024 × 690', { width: 1024, height: 690 }, 390, 172],
+  ['iPad Chrome landscape 1180 × 685', { width: 1180, height: 685 }, 540, 172],
+  ['laptop browser 1366 × 650', { width: 1366, height: 650 }, 590, 142],
 ]) {
-  await check(`${label}: the monitor keeps a usable picture and every control stays reachable`, async () => {
+  await check(`${label}: the controls sit beside a large picture and every control stays reachable`, async () => {
     const { context, page } = await open({ context: { viewport } });
     try {
       const picture = async () => page.locator('.monitor-frame').boundingBox();
+      const measure = () =>
+        page.evaluate(() => {
+          const rect = (selector) => document.querySelector(selector).getBoundingClientRect();
+          const controls = document.querySelector('.controls-panel');
+          const stop = [...document.querySelectorAll('.preset-actions button')].find((b) => b.textContent.trim() === 'Stop').getBoundingClientRect();
+          return {
+            monitor: rect('.monitor-panel'),
+            controls: rect('.controls-panel'),
+            controlsScroll: controls.scrollHeight - controls.clientHeight,
+            controlsOverflow: controls.scrollWidth - controls.clientWidth,
+            stopBottom: stop.bottom,
+            readoutHeight: rect('.readout').height,
+            readoutWidth: rect('.readout').width,
+          };
+        });
+      assert(!(await page.getByTestId('venue-canvas').isVisible()), 'the venue view does not start collapsed');
       const collapsed = await picture();
       assert(collapsed && collapsed.width >= minWidth, `monitor picture ${Math.round(collapsed?.width ?? 0)} px wide, expected at least ${minWidth}`);
+      const normal = await measure();
+      // The page's CSP blocks injected stylesheets; CSSOM edits widen the text as iOS draws it.
+      await page.evaluate(() => {
+        for (const el of document.querySelectorAll('.sim-app, .sim-app *')) el.style.letterSpacing = '0.08em';
+      });
+      const wide = await measure();
+      await page.evaluate(() => {
+        for (const el of document.querySelectorAll('.sim-app, .sim-app *')) el.style.letterSpacing = '';
+      });
+      for (const [name, m] of [['normal text', normal], ['wide text', wide]]) {
+        assert(m.controls.left >= m.monitor.right && Math.abs(m.controls.top - m.monitor.top) <= 1, `${name}: the controls are not beside the monitor`);
+        assert(m.controlsScroll <= 1 && m.controlsOverflow <= 1, `${name}: the controls column scrolls (${m.controlsScroll}px down, ${m.controlsOverflow}px across)`);
+        assert(m.stopBottom <= viewport.height, `${name}: Stop ends at ${Math.round(m.stopBottom)}px, below the screen`);
+        if (m.readoutWidth >= 520) assert(m.readoutHeight <= 40, `${name}: the readout wrapped (${Math.round(m.readoutHeight)}px)`);
+      }
       const show = page.getByRole('button', { name: 'Show venue view', exact: true });
-      if (await show.isVisible()) await show.click();
+      await show.click();
       const shown = await picture();
-      assert(shown && shown.width >= minWidth * 0.75, `with the venue view shown the picture is ${Math.round(shown?.width ?? 0)} px wide`);
+      assert(shown && shown.width >= minShownWidth, `with the venue view shown the picture is ${Math.round(shown?.width ?? 0)} px wide, expected at least ${minShownWidth}`);
       const stop = page.getByRole('button', { name: 'Stop', exact: true });
       await stop.scrollIntoViewIfNeeded();
       const box = await stop.boundingBox();
@@ -1021,6 +1056,31 @@ for (const [label, viewport, minWidth] of [
     }
   });
 }
+
+// A desktop tall enough to start with the venue view beside the monitor: Expand monitor (F) moves
+// the controls beside the monitor, which enlarges the picture (stacked, it was height-bound and
+// Expand barely changed it), and Restore brings the venue view back.
+await check('desktop 1440 × 900: Expand monitor enlarges the picture and Restore brings back the venue view', async () => {
+  const { context, page } = await open();
+  try {
+    const width = async () => (await page.locator('.monitor-frame').boundingBox()).width;
+    assert(await page.getByTestId('venue-canvas').isVisible(), 'venue view hidden on a 900 px desktop');
+    const before = await width();
+    await focusWorkspace(page);
+    await page.keyboard.press('f');
+    await page.waitForFunction(() => document.querySelector('.sim-app').dataset.expanded === 'true');
+    const expanded = await width();
+    assert(expanded >= before * 1.25, `Expand took the picture from ${Math.round(before)} to ${Math.round(expanded)} px wide`);
+    const [monitor, controls] = await Promise.all(['.monitor-panel', '.controls-panel'].map((s) => page.locator(s).boundingBox()));
+    assert(controls.x >= monitor.x + monitor.width, 'expanded, the controls are not beside the monitor');
+    await page.getByRole('button', { name: 'Restore layout', exact: true }).click();
+    assert(await page.getByTestId('venue-canvas').isVisible(), 'Restore did not bring the venue view back');
+    assert(Math.abs((await width()) - before) <= 1, 'Restore did not return the picture to its size');
+    return `${Math.round(before)} → ${Math.round(expanded)} px wide`;
+  } finally {
+    await context.close();
+  }
+});
 
 // A phone in Safari shows about 613 pt of page (390 × 844 minus the URL bar and toolbar), and iOS
 // draws the same CSS pixels about a tenth wider than desktop browsers. The Operate tab must keep

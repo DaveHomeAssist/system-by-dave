@@ -117,11 +117,26 @@ landscape (1024 × 768, about 1024 × 690 inside Safari) or a 1366 × 768 laptop
 (about 1366 × 650). Before 1.8.0 the controls took the height and the monitor was a thumbnail, or
 2 px tall on the iPad. On desktop and landscape tablets the monitor now keeps at least 45% of the
 workspace (280 px when there is room) and the controls panel scrolls inside itself only when the
-rest cannot fit; landscape tablets from 960 px use the desktop's single row of controls and a
-one-row header (the subtitle and scope line stay for screen readers). The probe requires a
-picture at least 280, 230 and 190 px wide at those three sizes, with Stop reachable and no page
-scroll. Placing the monitor and controls side by side on short screens would use the width
-better and is the next layout step.
+rest cannot fit; landscape tablets from 960 px use the desktop's single row of controls, and they
+and desktop windows up to 800 px tall use a one-row header (the subtitle and scope line stay for
+screen readers).
+
+Stacked, the 16:9 picture is still height-bound on every landscape screen: an 11-inch iPad in
+Chrome (1180 × 685) showed it at 232 × 130 in a 779 px wide panel. Since 1.9.0, when the venue
+view is collapsed or the monitor expanded, landscape screens from 960 px wide and at least 4:3 put
+the controls in a column beside the monitor (joystick, zoom and speeds over the presets, the
+collapsed venue bar under the monitor), and the picture takes the width left of them. Keyboard
+hints and speed figures wrap to keep that column narrow, and the readout drops its copy of the
+speed levels to stay on one line. Desktop windows under 900 px tall start with the venue view
+collapsed, as tablets do (`CONTROLS_BESIDE_MONITOR` in `src/ui/App.tsx` matches the media query in
+`app.css`); showing it puts it back beside the monitor with the controls below, and Expand
+monitor (F) moves the controls beside the monitor on any such screen. The probe requires, with
+the venue view collapsed, a picture at least 390, 390, 540 and 590 px wide at 1024 × 768,
+1024 × 690, 1180 × 685 and 1366 × 650, with the controls beside the monitor and the whole column,
+Stop included, on screen without scrolling even with wider text; with the venue view shown, a
+picture at least 210, 172, 172 and 142 px wide with Stop reachable and no page scroll; and at
+1440 × 900 that Expand widens the picture by at least a quarter and Restore brings the venue view
+back.
 
 The page draws in DM Sans, the FMP suite's face, from its own hashed copy of the suite's latin
 subset (`src/styles/fonts/`), so a laptop, an iPhone and the CI browser all measure the same
@@ -233,7 +248,7 @@ Before telling operators a release is live, beyond the automated gates:
    names the merge commit.
 2. On an iPhone in Safari: the picture and the whole joystick share the Operate tab; drag, hold
    T, store and recall a preset.
-3. On an iPad in landscape (or a 1024 × 700 window): the monitor shows a picture.
+3. On an iPad in landscape (or a 1024 × 700 window): the controls sit beside a large picture.
 4. Download the offline copy and open it from disk with networking off.
 5. Import a deliberately broken JSON file: it is refused by field path and the session is kept.
 
@@ -291,7 +306,7 @@ after venue or rendering changes, then rebuild so the published copy follows.
 | Unreadable saves, backups, other-tab saves | `storage/persist.test.ts`, `app/store.test.ts` |
 | Recovery screen keeps the saved session | Probe breaks a browser API mid-render, exports the session and sets it aside |
 | Graphics context restore | Probe loses and restores the monitor context and reads the picture back |
-| Short screens keep a picture | Probe at 1024 × 768, 1024 × 690 and 1366 × 650, venue view collapsed and shown |
+| Short screens keep a large picture | Probe at 1024 × 768, 1024 × 690, 1180 × 685 and 1366 × 650, venue view collapsed (controls beside the monitor) and shown; Expand at 1440 × 900 |
 | Pass and fail marks do not rely on colour | Probe reads the wide-shot marks' dash and fill |
 | Page face and breadcrumb | Probe: DM Sans loaded (hosted and offline), breadcrumb never a vertical scroller |
 
