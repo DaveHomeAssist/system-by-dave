@@ -23,6 +23,7 @@ export function AppBar({ state, theme, drawerOpen, drawerTab, showPanelButtons, 
       <div className="sim-title">
         <h1>Camera Simulator</h1>
         <p>Virtual BirdDog P240 · Camera 4 · catwalk position</p>
+        <p className="sim-scope">Framing, zoom, and presets only — not SuperJoy or focus</p>
       </div>
       <div className="sim-flags" role="group" aria-label="Accuracy">
         <button
