@@ -66,7 +66,7 @@ The audits' own evidence screenshots showed two of these.
 | C2 | One 886 KB bundle, no code splitting | Deferred by design: the offline file inlines one entry under a hash-pinned CSP; splitting needs a multi-chunk inliner. 1.7.2 already removed the second GPU context at start |
 | C3 | Six venue versions parsed inline | **1.7.1**: `src/domain/migrations/venue.ts`. Checked here: v1–v2 heading promotion equals the old parse, missing provenance still reads as none |
 | C4 | Unreadable backups never pruned | **1.8.0**: at most three, oldest first |
-| C5 | No source maps | Deferred: the stamp identifies the source, and a deterministic rebuild of that commit with `vite build --sourcemap --outDir <scratch>` gives maps for debugging without publishing them |
+| C5 | No source maps | Deferred: the stamp identifies the source, and a deterministic rebuild of that commit with `npx vite build --config apps/fmp-camera-sim/vite.config.ts --sourcemap --outDir <scratch dir>` gives the same bundle with maps, without publishing them |
 | C6 | 2,000-line stylesheet, OSD hex colours | Deferred (split); tokens in part (A11) |
 | C7 | `App.tsx` owns too much | Deferred; the recovery screen sits outside it |
 | C8 | Two `WebGLRenderer`s at start | **1.7.2** |
