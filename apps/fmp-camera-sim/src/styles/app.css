@@ -8,6 +8,11 @@
   --surface-3: #efe7db;
   --line: #d6cabc;
   --line-strong: #b9aa98;
+  /* Control chrome borders: ≥3:1 vs --surface / --surface-2 (WCAG 1.4.11). */
+  --control-border: #8f7f6c;
+  --control-border-hover: #7a6a58;
+  --control-border-active: #6e5f4e;
+  --control-border-disabled: #c4b5a5;
   --text: #211d1a;
   --muted: #62594f;
   --accent: #9e432b;
@@ -36,6 +41,11 @@
   --surface-3: #202a37;
   --line: #2d3948;
   --line-strong: #435468;
+  /* Control chrome borders: ≥3:1 vs --surface / --surface-2 (WCAG 1.4.11). */
+  --control-border: #6a7d94;
+  --control-border-hover: #7b90a8;
+  --control-border-active: #8aa0b8;
+  --control-border-disabled: #3d4a5c;
   --text: #f4f0e8;
   --muted: #b4ac9f;
   --accent: #e08a4f;
@@ -215,7 +225,7 @@ textarea {
   min-height: 44px;
   padding: 4px 14px;
   border-radius: 999px;
-  border: 1px solid var(--line);
+  border: 1px solid var(--control-border);
   background: var(--surface-2);
   font-size: 13px;
   font-weight: 700;
@@ -292,7 +302,7 @@ textarea {
   min-height: 44px;
   min-width: 44px;
   padding: 6px 12px;
-  border: 1px solid var(--line);
+  border: 1px solid var(--control-border);
   border-radius: 8px;
   background: var(--surface-2);
   color: var(--text);
@@ -312,7 +322,7 @@ textarea {
 .secondary-button:hover,
 .preset-key:hover,
 .hold-button:hover {
-  border-color: var(--line-strong);
+  border-color: var(--control-border-hover);
   background: var(--surface-3);
 }
 
@@ -340,6 +350,7 @@ textarea {
 }
 
 button:disabled {
+  border-color: var(--control-border-disabled);
   opacity: 0.45;
   cursor: not-allowed;
 }
@@ -826,7 +837,7 @@ button:disabled {
   width: 150px;
   height: 150px;
   border-radius: 50%;
-  border: 1px solid var(--line-strong);
+  border: 1px solid var(--control-border);
   background: radial-gradient(circle at 50% 45%, var(--surface) 0%, var(--surface-3) 70%);
   touch-action: none;
   cursor: grab;
@@ -834,6 +845,7 @@ button:disabled {
 
 .joystick-pad.is-active {
   cursor: grabbing;
+  border-color: var(--control-border-active);
 }
 
 .joystick-ring {
@@ -898,14 +910,14 @@ button:disabled {
   width: 34px;
   height: 58px;
   border-radius: 17px;
-  border: 1px solid var(--line-strong);
+  border: 1px solid var(--control-border);
   background: var(--surface-3);
   touch-action: none;
   cursor: ns-resize;
 }
 
 .zoom-track.is-active {
-  border-color: var(--accent);
+  border-color: var(--control-border-active);
 }
 
 .zoom-knob {
@@ -1080,7 +1092,7 @@ button:disabled {
   display: flex;
   flex-direction: column;
   width: min(460px, calc(100% - 20px));
-  border: 1px solid var(--line);
+  border: 1px solid var(--control-border);
   border-radius: var(--radius);
   background: var(--surface);
   box-shadow: 0 18px 48px rgba(0, 0, 0, 0.28);
@@ -1211,7 +1223,7 @@ button:disabled {
 .dimension {
   margin: 0;
   padding: 10px 12px 12px;
-  border: 1px solid var(--line);
+  border: 1px solid var(--control-border);
   border-radius: 8px;
   display: flex;
   flex-direction: column;
@@ -1290,9 +1302,30 @@ button:disabled {
   width: 100%;
   min-height: 44px;
   padding: 8px 10px;
-  border: 1px solid var(--line-strong);
+  border: 1px solid var(--control-border);
   border-radius: 8px;
   background: var(--surface);
+}
+
+.field input[type="number"]:hover,
+.field select:hover,
+.field textarea:hover,
+.preset-name-input:hover {
+  border-color: var(--control-border-hover);
+}
+
+.field input[type="number"]:focus,
+.field select:focus,
+.field textarea:focus,
+.preset-name-input:focus {
+  border-color: var(--control-border-active);
+}
+
+.field input[type="number"]:disabled,
+.field select:disabled,
+.field textarea:disabled,
+.preset-name-input:disabled {
+  border-color: var(--control-border-disabled);
 }
 
 .field textarea {
@@ -1667,7 +1700,7 @@ button:disabled {
   width: min(640px, calc(100vw - 32px));
   max-height: calc(100dvh - 48px);
   padding: 18px 20px;
-  border: 1px solid var(--line);
+  border: 1px solid var(--control-border);
   border-radius: 12px;
   background: var(--surface);
   color: var(--text);
