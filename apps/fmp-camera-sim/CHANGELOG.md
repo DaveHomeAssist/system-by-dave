@@ -13,6 +13,12 @@ Minor versions add features or change a saved-file format; patch versions fix or
 
 Versions 1.0.0 to 1.5.3 were numbered after the fact from their merged pull requests.
 
+## 1.7.1 — 2026-09-24 — Control-border contrast and store split
+
+- Added `--control-border*` theme tokens (≥3:1 vs adjacent surfaces for WCAG 1.4.11) and wired them to buttons, flags, fields, joystick, zoom track, side panel, dimension editors and Help.
+- Extracted venue schema migrators (`src/domain/migrations/`) and split SimulatorStore into focused controllers under `src/app/store/` (persistence, operating, settings, exercises, clock) behind the same public façade.
+- Left edge-header/onboarding work and the Three.js venue renderer alone (other remediation lanes). Offline build still ships one JS module: multi-chunk splitting waits on an offline inliner that can hash-pin dynamic imports.
+
 ## 1.7.0 — 2026-09-24 — First-run tip and Operate-pad preset actions
 
 - First visit opens a three-step quick-start tip (move, zoom, store). Skip or finish writes `fmpCameraSim.onboarding.v1` so it stays dismissed.

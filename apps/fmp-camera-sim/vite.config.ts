@@ -44,6 +44,9 @@ export default defineConfig({
     modulePreload: { polyfill: false },
     chunkSizeWarningLimit: 1400,
     rollupOptions: {
+    // Multi-chunk output is intentionally off: scripts/build_camera_sim_offline.mjs inlines the
+    // single entry module into a hash-pinned offline HTML. Dynamic import() chunks would be
+    // unreachable under connect-src 'none' / file:// until that inliner learns multi-chunk pins.
       output: {
         entryFileNames: "assets/camera-sim-[hash].js",
         chunkFileNames: "assets/camera-sim-[name]-[hash].js",
