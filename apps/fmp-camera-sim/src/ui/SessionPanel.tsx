@@ -13,6 +13,15 @@ interface Props {
   state: StoreState;
 }
 
+/** "at 14:05:09" today; "on 23 Sep, 14:05:09" for a session restored from an earlier day. */
+function savedWhen(iso: string, now = new Date()): string {
+  const saved = new Date(iso);
+  const time = saved.toLocaleTimeString();
+  return saved.toDateString() === now.toDateString()
+    ? `at ${time}`
+    : `on ${saved.toLocaleDateString(undefined, { day: "numeric", month: "short" })}, ${time}`;
+}
+
 export function SessionPanel({ store, state }: Props) {
   const fileId = useId();
   const fileRef = useRef<HTMLInputElement>(null);
@@ -94,7 +103,7 @@ export function SessionPanel({ store, state }: Props) {
         <p className={`storage-status ${state.storage.state === "ok" ? "" : "is-warn"}`} role="status">
           {state.storage.state === "ok"
             ? state.storage.savedAt
-              ? `Saved in this browser at ${new Date(state.storage.savedAt).toLocaleTimeString()}.`
+              ? `Saved in this browser ${savedWhen(state.storage.savedAt)}.`
               : "Saved in this browser as you work."
             : `${state.storage.reason} The session still works; export it to keep it.`}
         </p>

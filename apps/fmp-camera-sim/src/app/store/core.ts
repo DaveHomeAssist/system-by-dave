@@ -28,6 +28,8 @@ export class StoreCore {
   promptArmed = false;
   promptTimer: ReturnType<typeof setTimeout> | null = null;
   storageConflict = false;
+  /** The first Home of a visit also says Home is not the FMP safe-wide shot. */
+  homeExplained = false;
   renderStatus: RenderStatus = "starting";
   renderNote = "";
   hidden = false;
@@ -44,12 +46,14 @@ export class StoreCore {
     this.project = loaded.project;
     this.storageStatus = loaded.status;
     this.storageNotice = loaded.notice;
-    // A loaded project has already passed geometry validation; the fallback guards hand edits.
+    // loadProject only returns a project whose venue derives; this guard must never hide a swap.
     let derived = deriveVenueGeometry(this.project.venue);
     if (!derived.ok) {
       this.project = defaultProject();
+      this.storageNotice = "The saved venue could not be built, so a fresh session was started.";
       derived = deriveVenueGeometry(this.project.venue);
     }
+    // A broken default is a build defect; the root error boundary reports it.
     if (!derived.ok) throw new Error("The default venue geometry is invalid.");
     this.geometry = derived.geometry;
     const { session, camera } = this.project;

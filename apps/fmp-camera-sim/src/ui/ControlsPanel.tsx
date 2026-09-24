@@ -24,7 +24,12 @@ export function ControlsPanel({ store, input, state }: Props) {
       </h2>
       <div className="controls-grid">
         <Joystick input={input} commanded={telemetry.snapshot.input} />
-        <ZoomControl input={input} lens={telemetry.lens} commandedZoom={telemetry.snapshot.input.zoom} />
+        <ZoomControl
+          input={input}
+          lens={telemetry.lens}
+          commandedZoom={telemetry.snapshot.input.zoom}
+          onShortPress={() => store.hint("Hold T or W to keep zooming; a tap barely moves the lens.")}
+        />
         <SpeedControls speeds={session.speeds} profile={state.project.camera} onChange={(axis, level) => store.setSpeed(axis, level)} />
         <PresetPad
           presets={session.presets}

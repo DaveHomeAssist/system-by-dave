@@ -151,6 +151,22 @@ async function monitorPixels(page) {
   );
 }
 
+/** Whether the page drew with its own DM Sans face (not a locally installed copy or a fallback). */
+async function dmSansLoaded(page) {
+  return page.evaluate(async () => {
+    await document.fonts.ready;
+    return [...document.fonts].some((face) => face.family.replace(/["']/g, '') === 'DM Sans' && face.status === 'loaded');
+  });
+}
+
+/** A vertical scroll container on the breadcrumb draws a scrollbar wherever scrollbars always show. */
+async function breadcrumbScrollsVertically(page) {
+  return page.evaluate(() => {
+    const nav = document.querySelector('.sbd-site-return');
+    return ['auto', 'scroll'].includes(getComputedStyle(nav).overflowY) && nav.scrollHeight > nav.clientHeight;
+  });
+}
+
 /** Shows a side-panel tab, opening the panel only if it is closed (the Settings button toggles). */
 async function showTab(page, name) {
   const tab = page.getByRole('tab', { name, exact: true });
@@ -203,6 +219,12 @@ async function closePanel(page) {
     assert((await page.locator('link[rel="canonical"]').getAttribute('href')) === 'https://housevideo.app/camera-sim/', 'canonical');
     assert((await page.locator('h1').count()) === 1, 'expected exactly one h1');
     assert(problems.length === 0, problems.join(' | '));
+  });
+  await check('the FMP suite face (DM Sans) loads from the page itself, and the breadcrumb never scrolls vertically', async () => {
+    assert(await dmSansLoaded(page), 'DM Sans did not load; the page is drawn in a fallback face');
+    assert(!(await breadcrumbScrollsVertically(page)), 'the breadcrumb is a vertical scroll container with overflow (stray scrollbar)');
+    const theme = await page.locator('meta[name="theme-color"]').getAttribute('content');
+    assert(theme === '#eee8df', `light visit theme-color ${theme}`);
   });
   await check('first Tab reaches the skip link, which targets the workspace', async () => {
     await page.keyboard.press('Tab');
@@ -434,6 +456,43 @@ async function closePanel(page) {
     await page.mouse.up();
     assert(snap.input.pan === 0 && !snap.moving, `joystick still driving after blur: ${JSON.stringify(snap.input)}`);
   });
+  await check('mouse: a quick tap on T says T and W are held; the rocker is a pointer-only duplicate', async () => {
+    const tele = page.getByRole('button', { name: 'Zoom in (tele), hold' });
+    await tele.click();
+    await page.getByTestId('status-line').getByText('Hold T or W to keep zooming').waitFor({ timeout: 5000 });
+    assert((await page.getByRole('application', { name: /zoom rocker/i }).count()) === 0, 'the pointer-only rocker is exposed to assistive technology');
+    assert((await page.locator('.zoom-track').getAttribute('aria-hidden')) === 'true', 'rocker is not aria-hidden');
+    const width = await page.locator('.zoom-track').evaluate((track) => {
+      const before = getComputedStyle(track, '::before');
+      return track.getBoundingClientRect().width - parseFloat(before.left) - parseFloat(before.right);
+    });
+    assert(width >= 44, `rocker touch target ${width}px wide`);
+    const described = await page.getByRole('application', { name: 'Pan and tilt joystick' }).evaluate((pad) =>
+      (pad.getAttribute('aria-describedby') || '').split(' ').map((id) => document.getElementById(id)?.textContent?.replace(/\s+/g, ' ').trim() ?? `missing #${id}`),
+    );
+    assert(described.length === 3 && described[1].startsWith('Pan') && described[2].startsWith('Tilt'), `joystick description ${JSON.stringify(described)}`);
+    return described.slice(1).join(' · ');
+  });
+  await check('mouse: right-click a stored preset key to rename it, then clear it', async () => {
+    await focusWorkspace(page);
+    await page.keyboard.press('Shift+Digit5');
+    await page.waitForFunction(() => window.__fmpCameraSim.state().presets.some((p) => p.slot === 5));
+    const key = page.locator('.preset-key').nth(4);
+    const menu = page.getByRole('menu', { name: 'Preset 5 actions' });
+    await key.click({ button: 'right' });
+    await menu.waitFor();
+    assert(await menu.getByRole('menuitem', { name: 'Rename' }).evaluate((item) => item === document.activeElement), 'the menu did not take focus');
+    await menu.getByRole('menuitem', { name: 'Rename' }).click();
+    const field = page.getByLabel('Name for preset 5');
+    await field.fill('Safe wide');
+    await field.press('Enter');
+    await page.waitForFunction(() => window.__fmpCameraSim.state().presets.find((p) => p.slot === 5)?.name === 'Safe wide');
+    assert(((await key.textContent()) || '').includes('Safe wide'), 'the key does not show the new name');
+    await key.click({ button: 'right' });
+    await menu.getByRole('menuitem', { name: 'Clear' }).click();
+    await page.waitForFunction(() => !window.__fmpCameraSim.state().presets.some((p) => p.slot === 5));
+    assert(((await key.textContent()) || '').includes('Empty'), 'the cleared key does not read Empty');
+  });
   await check('mouse: orbiting the venue view never moves the camera', async () => {
     const before = await s.snapshot();
     const box = await page.getByTestId('venue-canvas').boundingBox();
@@ -532,7 +591,9 @@ async function closePanel(page) {
   });
   await check('an unsupported or malformed import is rejected and the session is kept', async () => {
     await importProject(page, { ...template, version: 2 }, 'future.json');
-    await page.getByText('Unsupported project version 2').waitFor();
+    // The Session panel lists the problem and the status line names it too.
+    await page.getByText('Unsupported project version 2').first().waitFor();
+    assert(((await page.getByTestId('status-line').textContent()) || '').includes('project.version'), 'the announcement does not name the problem');
     const bad = structuredClone(template);
     bad.venue.dimensions.stageWidth.value = -4;
     bad.session.presets = [{ slot: 12, name: 'x', cameraId: 'y', pan: 0, tilt: 0, lens: 0, savedAt: 'now' }];
@@ -548,6 +609,19 @@ async function closePanel(page) {
     const home = (await s.snapshot()).pose;
     assert(home.pan === 0 && home.tilt === 0 && home.lens === 0, 'exercise did not start from home');
     assert((await s.state()).exercise.status === 'running', 'wide shot completed from home');
+    // Inside and outside marks differ in shape as well as colour: outside is dashed and hollow.
+    const marks = await page.evaluate(() =>
+      [...document.querySelectorAll('.ov-marker')]
+        .filter((group) => group.style.display !== 'none' && group.getAttribute('transform'))
+        .map((group) => {
+          const circle = getComputedStyle(group.querySelector('circle'));
+          return { out: group.classList.contains('is-out'), dash: circle.strokeDasharray, fill: circle.fill };
+        }),
+    );
+    assert(marks.length > 0, 'no framing marks drawn');
+    for (const mark of marks) {
+      assert(mark.out ? mark.dash !== 'none' : mark.dash === 'none' && mark.fill !== 'rgba(0, 0, 0, 0.35)', `mark ${JSON.stringify(mark)} relies on colour alone`);
+    }
     await focusWorkspace(page);
     await page.keyboard.press('Digit1');
     await page.waitForFunction(() => window.__fmpCameraSim.state().exercise?.status === 'complete', null, { timeout: 15000 });
@@ -701,6 +775,69 @@ await check('storage failure keeps the session usable and offers export', async 
   await noWebgl.close();
 }
 
+await check('a failure while drawing the interface shows a recovery screen that keeps the saved session', async () => {
+  const { context, page } = await open();
+  try {
+    await focusWorkspace(page);
+    await page.keyboard.press('Shift+Digit3');
+    await page.waitForFunction(() => (localStorage.getItem('fmpCameraSim.v1') || '').includes('"slot": 3'), null, { timeout: 5000 });
+    // Break one browser API only after the theme boot script has run, so React throws while rendering.
+    await context.addInitScript(() => {
+      const real = window.matchMedia.bind(window);
+      window.matchMedia = (query) => {
+        if (document.readyState !== 'loading') throw new Error('probe: matchMedia is broken');
+        return real(query);
+      };
+    });
+    await page.reload();
+    const crash = page.getByTestId('sim-crash');
+    await crash.waitFor({ timeout: 15000 });
+    assert(((await crash.getByRole('heading', { level: 1 }).textContent()) || '').includes('The simulator stopped'), 'no crash heading');
+    assert(((await crash.textContent()) || '').includes('probe: matchMedia is broken'), 'the error is not named');
+    // Leaving the page saved the session once more, so compare with what is stored now.
+    const saved = await page.evaluate(() => localStorage.getItem('fmpCameraSim.v1'));
+    assert(saved?.includes('"slot": 3'), 'the saved session was lost in the crash');
+    const [download] = await Promise.all([page.waitForEvent('download'), crash.getByRole('button', { name: 'Export the saved session' }).click()]);
+    assert((await readFile(await download.path(), 'utf8')) === saved, 'the export is not the saved session');
+    await crash.getByRole('button', { name: 'Set the saved session aside and start fresh' }).click();
+    await page.getByTestId('sim-crash').waitFor({ timeout: 15000 });
+    const storage = await page.evaluate(() => ({
+      session: localStorage.getItem('fmpCameraSim.v1'),
+      copies: Object.keys(localStorage).filter((key) => key.startsWith('fmpCameraSim.v1.unreadable.')),
+    }));
+    assert(storage.session === null && storage.copies.length === 1, `after setting aside: ${JSON.stringify(storage)}`);
+    assert((await page.getByRole('button', { name: 'Export the saved session' }).count()) === 0, 'still offers a session that was set aside');
+  } finally {
+    await context.close();
+  }
+});
+
+await check('a lost graphics context pauses the picture and a restored one brings it back', async () => {
+  const { context, page } = await open();
+  try {
+    const lost = await page.evaluate(() => {
+      const canvas = document.querySelector('[data-testid="monitor-canvas"]');
+      const gl = canvas.getContext('webgl2');
+      window.__probeContext = gl?.getExtension('WEBGL_lose_context') ?? null;
+      window.__probeContext?.loseContext();
+      return Boolean(window.__probeContext);
+    });
+    assert(lost, 'WEBGL_lose_context is not available');
+    await page.getByText('Picture paused: the browser reset its graphics.').first().waitFor({ timeout: 5000 });
+    assert((await sim(page).state()).renderStatus === 'lost', 'render status is not lost');
+    await page.evaluate(() => window.__probeContext.restoreContext());
+    await page.waitForFunction(() => window.__fmpCameraSim.state().renderStatus === 'ok', null, { timeout: 10000 });
+    const frames = (await sim(page).render()).monitorFrames;
+    await page.waitForFunction((n) => window.__fmpCameraSim.render().monitorFrames > n + 3, frames, { timeout: 15000 });
+    const pixels = await monitorPixels(page);
+    assert(pixels.variance > 20, `the picture did not come back (variance ${pixels.variance.toFixed(1)})`);
+    assert((await page.getByText('Picture paused').count()) === 0, 'the pause notice stayed up');
+    return `luma variance ${pixels.variance.toFixed(0)} after restore`;
+  } finally {
+    await context.close();
+  }
+});
+
 await check('the standalone offline file runs from disk with networking disabled', async () => {
   const context = await browser.newContext({ viewport: { width: 1280, height: 800 } });
   await context.addInitScript(() => {
@@ -720,6 +857,7 @@ await check('the standalone offline file runs from disk with networking disabled
   assert(requests.every((url) => url.startsWith('file:') || url.startsWith('data:')), `network requests: ${requests.filter((u) => !u.startsWith('file:')).join(', ')}`);
   assert(problems.length === 0, problems.join(' | '));
   assert((await page.locator('a[href="https://housevideo.app/fmp/"]').count()) > 0, 'suite link is not absolute');
+  assert(await dmSansLoaded(page), 'the offline copy did not load its inlined DM Sans');
   await context.close();
 });
 
@@ -833,6 +971,7 @@ for (const [label, viewport, expectation] of [
     const { context, page } = await open({ context: { viewport } });
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
     assert(overflow <= 1, `horizontal overflow of ${overflow}px`);
+    assert(!(await breadcrumbScrollsVertically(page)), 'the breadcrumb scrolls vertically (stray scrollbar)');
     if (expectation === 'venue') assert(await page.getByTestId('venue-canvas').isVisible(), 'venue view hidden on desktop');
     if (expectation === 'tablet') assert(await page.getByRole('button', { name: 'Settings', exact: true }).isVisible() && !(await page.getByTestId('venue-canvas').isVisible()), 'tablet header controls or collapsed overview missing');
     if (expectation === 'rail') assert(await page.getByRole('navigation', { name: 'Simulator sections' }).isVisible(), 'no bottom rail');
@@ -848,6 +987,38 @@ for (const [label, viewport, expectation] of [
     );
     assert(small.length === 0, `under 44 px: ${small.join(', ')}`);
     await context.close();
+  });
+}
+
+// Short screens: an iPad in landscape (1024 × 768, or about 1024 × 690 inside Safari) and a
+// 1366 × 768 laptop with browser chrome (about 1366 × 650). The stacked layout used to hand the
+// height to the controls and leave the monitor 2 px tall on the iPad. The picture must stay
+// usable, with the venue view shown too, and every control must stay reachable by scrolling
+// the controls panel.
+for (const [label, viewport, minWidth] of [
+  ['iPad landscape 1024 × 768', { width: 1024, height: 768 }, 280],
+  ['iPad Safari landscape 1024 × 690', { width: 1024, height: 690 }, 230],
+  ['laptop browser 1366 × 650', { width: 1366, height: 650 }, 190],
+]) {
+  await check(`${label}: the monitor keeps a usable picture and every control stays reachable`, async () => {
+    const { context, page } = await open({ context: { viewport } });
+    try {
+      const picture = async () => page.locator('.monitor-frame').boundingBox();
+      const collapsed = await picture();
+      assert(collapsed && collapsed.width >= minWidth, `monitor picture ${Math.round(collapsed?.width ?? 0)} px wide, expected at least ${minWidth}`);
+      const show = page.getByRole('button', { name: 'Show venue view', exact: true });
+      if (await show.isVisible()) await show.click();
+      const shown = await picture();
+      assert(shown && shown.width >= minWidth * 0.75, `with the venue view shown the picture is ${Math.round(shown?.width ?? 0)} px wide`);
+      const stop = page.getByRole('button', { name: 'Stop', exact: true });
+      await stop.scrollIntoViewIfNeeded();
+      const box = await stop.boundingBox();
+      assert(box && box.y >= 0 && box.y + box.height <= viewport.height, 'Stop cannot be scrolled into view');
+      assert((await page.evaluate(() => document.documentElement.scrollHeight - window.innerHeight)) <= 1, 'the page itself scrolls');
+      return `${Math.round(collapsed.width)} × ${Math.round(collapsed.height)}, ${Math.round(shown.width)} × ${Math.round(shown.height)} with the venue view`;
+    } finally {
+      await context.close();
+    }
   });
 }
 

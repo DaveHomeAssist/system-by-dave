@@ -24,10 +24,10 @@ does not connect to a real camera or controller.
 | Framing | `src/sim/framing.ts` | Stage coordinates, camera frame and projection shared by the evaluator, overlay and renderer |
 | Performer | `src/sim/performer.ts` | Mark or repeatable path as a pure function of simulation time |
 | Exercises | `src/exercises/*.ts` | Wide shot, follow and save/recall evaluators, sampled 30 times per simulated second |
-| Store | `src/app/store.ts` | Ties simulation, performer, exercises, presets and autosave together; React subscribes to discrete state |
+| Store | `src/app/store/` | `SimulatorStore` is a thin façade over one shared `StoreCore` and focused controllers (persistence, operating, settings, exercises, clock); React subscribes to discrete state |
 | Input adapter | `src/input/*.ts` | Keyboard, joystick, zoom rocker and hold buttons become one commanded deflection |
-| Renderer | `src/render/*.ts` | One Three.js scene drawn by two renderers: the monitor (the simulated P240) and the orbiting venue view |
-| Interface | `src/ui/*.tsx` | Panels, controls, settings, exercises, session import/export |
+| Renderer | `src/render/*.ts` | One Three.js scene drawn by two renderers: the monitor (the simulated P240), created at start, and the orbiting venue view, created the first time the venue panel is shown |
+| Interface | `src/ui/*.tsx` | Panels, controls, settings, exercises, session import/export; `ErrorBoundary.tsx` wraps the whole interface |
 
 The simulation owns camera state and Three.js only reads it. Inputs are applied at their event
 timestamps, so identical input over identical elapsed time produces identical motion at any
@@ -112,6 +112,21 @@ the phone Operate tab at 390 × 844 and 390 × 613 with widened text: the whole 
 the zoom buttons must sit above the bottom rail, and the Settings tab must expose the help, theme
 and guide controls.
 
+Short screens stack the header, the monitor and the controls, which do not all fit on an iPad in
+landscape (1024 × 768, about 1024 × 690 inside Safari) or a 1366 × 768 laptop with browser chrome
+(about 1366 × 650). Before 1.8.0 the controls took the height and the monitor was a thumbnail, or
+2 px tall on the iPad. On desktop and landscape tablets the monitor now keeps at least 45% of the
+workspace (280 px when there is room) and the controls panel scrolls inside itself only when the
+rest cannot fit; landscape tablets from 960 px use the desktop's single row of controls and a
+one-row header (the subtitle and scope line stay for screen readers). The probe requires a
+picture at least 280, 230 and 190 px wide at those three sizes, with Stop reachable and no page
+scroll. Placing the monitor and controls side by side on short screens would use the width
+better and is the next layout step.
+
+The page draws in DM Sans, the FMP suite's face, from its own hashed copy of the suite's latin
+subset (`src/styles/fonts/`), so a laptop, an iPhone and the CI browser all measure the same
+text; the offline file inlines it.
+
 ## Exercises
 
 Thresholds are training settings in the Exercises panel, not professional standards.
@@ -142,13 +157,41 @@ The overview camera model uses physical scale. Its label identifies the small ca
 
 Imports are validated completely before anything changes; unsupported versions, invalid
 dimensions, malformed presets and foreign camera identities are rejected with field paths, and the
-open session is kept. An unreadable saved session is kept under `fmpCameraSim.v1.unreadable`.
-If storage fails, the session keeps working and a banner offers JSON export.
+open session is kept. The status line names the first problem as well, so it is announced.
+
+A saved session that cannot be restored is copied to `fmpCameraSim.v1.unreadable.<time>` and then
+removed, so the next visit starts cleanly instead of warning again; at most three such copies are
+kept (the oldest goes first), and without room for a copy the session stays where it is until
+this session is saved over it. After a restore, Session shows when the session was last saved
+(with the date when it was not today). If storage fails, the session keeps working and a banner,
+which stays until saving works again, offers JSON export; every later change retries the save.
+
+Two tabs share one saved session. A save from the other tab that differs from this tab's session
+pauses autosave until the operator keeps one copy; an identical save is ignored; a removed copy
+(another tab or cleared site data) is not a conflict, and this tab saves
+its session again. Loading "the other copy" after it has gone keeps this tab's session.
+
+Saved-file compatibility policy:
+
+| Record | Opens | When the format changes |
+| --- | --- | --- |
+| Project | v1 only | Keep v1 while only nested records change. A new project version needs a project migrator in `src/domain/migrations/`, or older builds reject the file by design |
+| Venue | v1–v6 | `src/domain/migrations/venue.ts` normalises each older version to the current shape before parsing; add a step and a fixture test per version |
+| Session | v1–v2 | Missing newer fields take defaults; a structural change gets a migrator like the venue's |
+| Camera | v1 only | Add fields with defaults inside v1; a breaking change needs a camera migrator before the version moves |
+
+A newer file opened in an older build is rejected with its version, never partly read.
 
 ## Failure behaviour
 
 - No WebGL: the monitor and venue view explain the failure instead of drawing; controls and
-  readouts keep working. A lost graphics context stops motion and says the picture is paused.
+  readouts keep working. A lost graphics context stops motion and says the picture is paused;
+  when the browser restores it, Three.js rebuilds its GPU resources and the picture returns (the
+  probe loses and restores the context and reads the pixels back). If only the venue view's own
+  context cannot start, the venue panel says so and the monitor carries on.
+- A failure while starting or drawing the interface shows a recovery screen instead of a blank
+  page: reload, export the saved session exactly as stored, or set it aside (kept as an
+  unreadable copy) and start fresh, since a session that breaks the page would break every reload.
 - Slow devices lose venue-view detail first (lower resolution, then fewer frames) before the
   monitor, and the simulation speed never depends on frame rate.
 - The standalone offline file inlines everything behind a hash-locked CSP and runs from disk with
@@ -167,6 +210,40 @@ npm run dev:camera-sim            # local dev server
 
 The build is deterministic; CI rebuilds and fails if `camera-sim/` differs from the source
 (`.github/workflows/camera-sim.yml` on pull requests, `deploy-pages.yml` on main).
+
+Any new `<dialog>` or overlay that opens on load must be dismissable in the probe's `open()` and
+`focusWorkspace()` helpers (the first-run tip is seeded as done), or it blocks every later click.
+
+### Observability
+
+The page cannot report anything: its CSP sets `connect-src 'none'`, and there is no analytics,
+error reporting or telemetry by design. Failures surface on the page (status line, banners, the
+graphics fallback, the recovery screen) and in the browser console. Operations rely on the
+committed-build checks, the Playwright probe on every pull request and deploy, the live
+`source.json` and version meta, and `?diagnostics=1`, a read-only `window.__fmpCameraSim` that
+the probe and the release checks use against the production build. It exposes nothing the page
+does not already show and sends nothing, so it stays in production. Adding telemetry would need
+an explicit CSP change and Dave's approval.
+
+### Release QA and rollback
+
+Before telling operators a release is live, beyond the automated gates:
+
+1. Help shows the new `<version> · build <fingerprint>`, and `https://housevideo.app/source.json`
+   names the merge commit.
+2. On an iPhone in Safari: the picture and the whole joystick share the Operate tab; drag, hold
+   T, store and recall a preset.
+3. On an iPad in landscape (or a 1024 × 700 window): the monitor shows a picture.
+4. Download the offline copy and open it from disk with networking off.
+5. Import a deliberately broken JSON file: it is refused by field path and the session is kept.
+
+To roll back, revert the release's merge commit on `main` with a pull request (never a force
+push), let `deploy-pages.yml` publish, then confirm `source.json` and the version meta show the
+revert. The housevideo.app publish uses the `HOUSEVIDEO_DEPLOY_KEY` deploy key
+(`docs/domain-sites.md`); if it is lost or rotated, replace the key on
+`DaveHomeAssist/housevideo` and the secret here before the next deploy. HTTP security headers
+(HSTS, `frame-ancestors`, `nosniff`) and long caching for hashed assets need an edge in front of
+GitHub Pages; `apps/fmp-camera-sim/EDGE-HEADERS.md` holds that plan.
 
 ### Releases and the version stamp
 
@@ -210,6 +287,12 @@ after venue or rendering changes, then rebuild so the published copy follows.
 | Export/import round trip | `domain/domain.test.ts`; probe export, edit, import, re-export |
 | Offline artifact with networking off | Probe opens the file with the context offline |
 | Estimates and uncalibrated behaviour stay visible | Header flags and monitor chips in every layout and in expanded view |
+| Unreadable saves, backups, other-tab saves | `storage/persist.test.ts`, `app/store.test.ts` |
+| Recovery screen keeps the saved session | Probe breaks a browser API mid-render, exports the session and sets it aside |
+| Graphics context restore | Probe loses and restores the monitor context and reads the picture back |
+| Short screens keep a picture | Probe at 1024 × 768, 1024 × 690 and 1366 × 650, venue view collapsed and shown |
+| Pass and fail marks do not rely on colour | Probe reads the wide-shot marks' dash and fill |
+| Page face and breadcrumb | Probe: DM Sans loaded (hosted and offline), breadcrumb never a vertical scroller |
 
 ## Not in v1
 

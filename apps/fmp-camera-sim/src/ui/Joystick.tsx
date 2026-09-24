@@ -71,7 +71,7 @@ export function Joystick({ input, commanded }: Props) {
         role="application"
         aria-roledescription="joystick"
         aria-label="Pan and tilt joystick"
-        aria-describedby="joystick-help"
+        aria-describedby="joystick-help sim-readout-pan sim-readout-tilt"
         tabIndex={0}
         onPointerDown={(event) => {
           if (pointer.current !== null || (event.pointerType === "mouse" && event.button !== 0)) return;

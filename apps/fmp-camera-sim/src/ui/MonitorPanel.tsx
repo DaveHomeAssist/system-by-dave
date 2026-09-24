@@ -84,11 +84,12 @@ export function MonitorPanel({ state, store, canvasRef, overlayRef, expanded, on
         </div>
       </div>
       <dl className="readout" aria-label="Camera position">
-        <div>
+        {/* The joystick names these rows as its description, so focusing it reads the position. */}
+        <div id="sim-readout-pan">
           <dt>Pan</dt>
           <dd data-testid="readout-pan">{formatSigned(pose.pan, 1)}°</dd>
         </div>
-        <div>
+        <div id="sim-readout-tilt">
           <dt>Tilt</dt>
           <dd data-testid="readout-tilt">{formatSigned(pose.tilt, 1)}°</dd>
         </div>

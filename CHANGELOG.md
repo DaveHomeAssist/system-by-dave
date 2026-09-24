@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-09-24 — FMP Camera Simulator 1.8.0: audit fixes
+
+- Worked through the ten camera-simulator audits of 23–24 September (accessibility, code quality, data, delivery, performance, product, QA, reliability, security, web health), stacked on #141 (1.7.1) and #142 (1.7.2). `docs/fmp-camera-simulator-audit-2026-09.md` records every finding's outcome: fixed here, fixed earlier, needing Dave's hosting access, deferred with a reason, or not a defect.
+- Fixed a layout failure the audits' own screenshots contained: on a landscape iPad the monitor was 2 px tall, and on a 1366 × 650 laptop browser a thumbnail. Also fixed a stray breadcrumb scrollbar on platforms that always show scrollbars.
+- Reliability: a root error boundary with export and start-fresh recovery; unreadable saves are set aside once and capped at three copies; restored sessions show their save time; the multi-tab conflict ignores identical saves and removed copies.
+- The page loads the suite's DM Sans itself (inlined in the offline file, whose CSP now allows `font-src data:`).
+- Probe: 44 → 52 checks, including the recovery screen, a graphics-context loss and restore, short-screen picture size, preset rename and clear, and the font and breadcrumb. Unit tests: 93 → 104.
+
 ## 2026-09-23 — Publish hygiene and import-XSS regression guard
 
 - The Pages staging step no longer publishes `node_modules/`, `package.json` or `package-lock.json` (audit SEC-005 / OPS-001); before this, `/node_modules/three/package.json` and `/package.json` returned 200 on systembydave.com.

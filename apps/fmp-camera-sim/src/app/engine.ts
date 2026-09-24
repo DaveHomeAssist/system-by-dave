@@ -74,8 +74,10 @@ export class Engine {
     this.parts.input.releaseAll(nowSeconds());
   };
 
-  /** Another tab wrote the saved session (storage events never fire in the writing tab). */
+  /** Another tab wrote or removed the saved session (storage events never fire in the writing tab). */
   private onStorage = (event: StorageEvent): void => {
-    if (event.key === STORAGE_KEY || event.key === null) this.parts.store.noteExternalSave();
+    // A null key is storage.clear(): the saved session is gone along with everything else.
+    if (event.key === null) this.parts.store.noteExternalSave(null);
+    else if (event.key === STORAGE_KEY) this.parts.store.noteExternalSave(event.newValue);
   };
 }

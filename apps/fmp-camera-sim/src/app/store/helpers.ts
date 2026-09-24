@@ -6,8 +6,9 @@ export const SAVE_DEBOUNCE_MS = 400;
 export const OVERWRITE_WINDOW_S = 3;
 export const PROGRESS_EMIT_INTERVAL_S = 0.2;
 
+/** A result id. randomUUID needs a secure context, which an offline copy opened from disk may lack. */
 export function newId(): string {
-  const random = Math.random().toString(36).slice(2, 10);
+  const random = globalThis.crypto?.randomUUID?.() ?? `${Math.random().toString(36).slice(2, 10)}${Math.random().toString(36).slice(2, 10)}`;
   return `r-${Date.now().toString(36)}-${random}`;
 }
 

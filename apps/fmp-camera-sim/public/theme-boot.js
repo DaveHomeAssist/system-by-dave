@@ -10,4 +10,8 @@
   }
   var dark = preference === "dark" || (preference === "auto" && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
   document.documentElement.setAttribute("data-theme", dark ? "dark" : "light");
+  // The browser chrome colour follows too, so a dark visit never opens with a light bar
+  // (values match THEME_COLOR in src/app/theme.ts).
+  var chrome = document.querySelector('meta[name="theme-color"]');
+  if (chrome) chrome.setAttribute("content", dark ? "#0c1016" : "#eee8df");
 })();

@@ -34,6 +34,8 @@ export interface RenderCallbacks {
   onContextLost(): void;
   onContextRestored(): void;
   onQualityChange(level: number): void;
+  /** The deferred venue-view context could not start. The monitor keeps drawing. */
+  onOverviewUnavailable?(): void;
 }
 
 type Triple = [number, number, number];
@@ -175,7 +177,15 @@ export class SceneRenderer {
     this.scene.add(this.p240.root, this.cone.root, this.cameraLabel, this.performer.root);
 
     this.controls = new OrbitControls(this.overviewCamera, overviewCanvas);
-    this.controls.enableDamping = true;
+    // Orbit inertia is decorative motion: it stops with the drag when the operator asks for
+    // reduced motion. Camera moves are the simulation itself and keep their real timing.
+    const reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)");
+    const applyMotion = () => {
+      this.controls.enableDamping = !reduceMotion?.matches;
+    };
+    applyMotion();
+    reduceMotion?.addEventListener?.("change", applyMotion);
+    this.cleanups.push(() => reduceMotion?.removeEventListener?.("change", applyMotion));
     this.controls.dampingFactor = 0.12;
     this.controls.maxPolarAngle = Math.PI * 0.49;
     this.controls.minDistance = 4;
@@ -231,6 +241,7 @@ export class SceneRenderer {
       return this.overview;
     } catch {
       this.overviewInitFailed = true;
+      this.callbacks.onOverviewUnavailable?.();
       return null;
     }
   }

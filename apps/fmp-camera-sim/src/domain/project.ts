@@ -111,6 +111,19 @@ export function parseProjectText(text: string): ParseResult {
   return parseProject(value);
 }
 
+/**
+ * When a project file says it was written, if it holds a valid time. Informational, like `app`:
+ * it never decides whether a file is accepted.
+ */
+export function exportedAtOf(text: string): string | null {
+  try {
+    const value: unknown = (JSON.parse(text) as { exportedAt?: unknown } | null)?.exportedAt;
+    return typeof value === "string" && value.length <= 40 && !Number.isNaN(Date.parse(value)) ? value : null;
+  } catch {
+    return null;
+  }
+}
+
 export function serializeProject(project: Project, exportedAt?: string): string {
   return `${JSON.stringify(toProjectFile(project, exportedAt), null, 2)}\n`;
 }
