@@ -99,7 +99,9 @@ export function webglAvailable(): boolean {
 export class SceneRenderer {
   readonly scene = new Scene();
   private readonly monitor: WebGLRenderer;
-  private readonly overview: WebGLRenderer;
+  /** Created on first visible venue frame so collapsed/mobile Operate skips a second GPU context. */
+  private overview: WebGLRenderer | null = null;
+  private overviewInitFailed = false;
   private readonly monitorCamera = new PerspectiveCamera(40, 16 / 9, 0.25, 900);
   private readonly overviewCamera = new PerspectiveCamera(45, 1.6, 0.5, 2500);
   private readonly controls: OrbitControls;
@@ -144,13 +146,8 @@ export class SceneRenderer {
     private readonly callbacks: RenderCallbacks,
   ) {
     this.monitor = createRenderer(monitorCanvas, 1.05);
-    try {
-      this.overview = createRenderer(overviewCanvas, 1.5);
-    } catch (error) {
-      this.monitor.dispose();
-      throw error;
-    }
     this.applyClearColors();
+    // Overview WebGL is deferred until the venue panel is actually shown (see ensureOverview).
     this.monitorCamera.layers.set(0);
     this.monitorCamera.layers.enable(SHELL_LAYER);
     this.overviewCamera.layers.enable(OVERVIEW_LAYER);
@@ -221,7 +218,21 @@ export class SceneRenderer {
 
   private applyClearColors(): void {
     this.monitor.setClearColor(new Color(0x07090c));
-    this.overview.setClearColor(new Color(this.theme === "dark" ? 0x0e141c : 0xdcd4c7));
+    this.overview?.setClearColor(new Color(this.theme === "dark" ? 0x0e141c : 0xdcd4c7));
+  }
+
+  /** Lazily start the venue-view WebGL context the first time the panel is wide enough to draw. */
+  private ensureOverview(): WebGLRenderer | null {
+    if (this.overview) return this.overview;
+    if (this.overviewInitFailed) return null;
+    try {
+      this.overview = createRenderer(this.overviewCanvas, 1.5);
+      this.applyClearColors();
+      return this.overview;
+    } catch {
+      this.overviewInitFailed = true;
+      return null;
+    }
   }
 
   /** Rebuilds the static venue when its dimensions change. */
@@ -374,12 +385,15 @@ export class SceneRenderer {
       this.monitor.render(this.scene, this.monitorCamera);
       this.monitorFrames += 1;
     }
-    if (overviewVisible && this.frameCount % q.overviewEvery === 0 && this.resize(this.overview, this.overviewCanvas, q.overviewRatio)) {
-      this.overviewCamera.aspect = this.overviewCanvas.clientWidth / Math.max(1, this.overviewCanvas.clientHeight);
-      this.overviewCamera.updateProjectionMatrix();
-      this.controls.update();
-      this.overview.render(this.scene, this.overviewCamera);
-      this.overviewFrames += 1;
+    if (overviewVisible && this.frameCount % q.overviewEvery === 0) {
+      const overview = this.ensureOverview();
+      if (overview && this.resize(overview, this.overviewCanvas, q.overviewRatio)) {
+        this.overviewCamera.aspect = this.overviewCanvas.clientWidth / Math.max(1, this.overviewCanvas.clientHeight);
+        this.overviewCamera.updateProjectionMatrix();
+        this.controls.update();
+        overview.render(this.scene, this.overviewCamera);
+        this.overviewFrames += 1;
+      }
     }
   }
 
@@ -445,6 +459,6 @@ export class SceneRenderer {
     this.controls.dispose();
     this.venue?.dispose();
     this.monitor.dispose();
-    this.overview.dispose();
+    this.overview?.dispose();
   }
 }
