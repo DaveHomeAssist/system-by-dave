@@ -7,17 +7,17 @@ finding, so the next audit starts from here. The reports themselves are kept out
 repository.
 
 Outcomes: **1.8.0** fixed in this release; **1.7.x** fixed earlier (1.7.0 is #140, 1.7.1 is
-#141, 1.7.2 is #142); **Dave** needs hosting or account access; **Deferred** with the reason;
-**Not a defect**, with the evidence.
+#141, 1.7.2 is #142); **Not doing** when the cost outweighs the benefit, with the reason;
+**Deferred** with the reason; **Not a defect**, with the evidence.
 
 | Outcome | Findings |
 | --- | --- |
 | Fixed in 1.8.0 | 43 |
 | Fixed in 1.7.0–1.7.2 | 9 |
 | Resolves when the open releases merge | 2 |
-| Needs Dave (edge, hosting, a measurement on a real phone) | 8 |
+| Not doing: benefit too small for the cost (edge headers, asset caching, staging) | 7 |
 | Deferred, with a reason | 22 |
-| Not a defect or no change needed, with the evidence | 19 |
+| Not a defect or no change needed, with the evidence | 20 |
 
 That is all 103 rows below: 98 audit findings and 5 found outside the audit text. Several audits
 raised the same issue (the edge headers four times, the font three times); each row cross-refers.
@@ -101,12 +101,12 @@ was shot again in its default state: their screenshot had the venue view open, w
 
 | ID | Finding | Outcome |
 | --- | --- | --- |
-| O1 | No HSTS, HTTP CSP, `frame-ancestors` or `nosniff` | **Dave**: an edge (Cloudflare or similar) in front of GitHub Pages; plan in `apps/fmp-camera-sim/EDGE-HEADERS.md` |
-| O2 | No staging or preview | **Dave** to decide; the pull-request probe already runs the branch build |
+| O1 | No HSTS, HTTP CSP, `frame-ancestors` or `nosniff` | Not doing. `.app` is HSTS-preloaded, so browsers use HTTPS for housevideo.app before any request (hstspreload.org lists `app` as preloaded; plain HTTP already 301s). The page has no login, no server and nothing private: every action changes only the viewer's own browser storage, so framing or MIME sniffing has nothing to attack, and the meta CSP already blocks foreign scripts and all connections. An edge would mean moving DNS, another account to keep, and a new way to break HTTPS or serve stale pages, for close to no gain. Revisit if the site ever gets accounts or a server |
+| O2 | No staging or preview | Not doing: every pull request already runs the full browser probe on its own build, so a staging site would add a deploy target for little extra coverage |
 | O3 | No rollback runbook | **1.8.0**: "Release QA and rollback" in `docs/fmp-camera-simulator.md` |
 | O4 | No CODEOWNERS | Not adopted: one owner, and the bots push as that account. GitHub cannot request review from a pull request's author, so it would add noise, or block self-merges if enforced |
 | O5 | Forgotten rebuilds fail pull requests | Kept: the gate is the point. `apps/fmp-camera-sim/README.md` states the rule |
-| O6 | Hashed assets cached for 10 minutes | **Dave** (edge, O1) |
+| O6 | Hashed assets cached for 10 minutes | Not doing: after the 10 minutes the browser asks whether the file changed and gets a `304` with no body (checked on the live bundle), so a repeat visit costs a few small requests, not a re-download |
 | O7 | The deploy runs the whole site's checks | Deferred: one Pages root; revisit if it blocks releases |
 | O10 | No README in the app folder | **1.8.0** |
 
@@ -116,8 +116,8 @@ was shot again in its default state: their screenshot had the venue view open, w
 | --- | --- | --- |
 | P1 | Two WebGL contexts at start | **1.7.2** |
 | P2 | Bundle size | Deferred (C2) |
-| P3 | Cache lifetime of hashed assets | **Dave** (O1) |
-| P4 | Lab TBT and TTI | **Dave**: re-measure on a real phone after 1.7.2 is live; headless software GL distorts these |
+| P3 | Cache lifetime of hashed assets | Not doing (O6) |
+| P4 | Lab TBT and TTI | No action: the audit flagged its own numbers as distorted by software rendering in a headless browser; 1.7.2 removed the second GPU context at start |
 | P5 | Offline file size | Deferred (C2). 1.8.0 adds 84 KB for the inlined font (993 KB) |
 | P6 | LCP is the first-run tip | Not a defect: first visits only; returning visitors never see it |
 | P7 | `og.png` is 311 KB | Deferred: fetched only by link previews |
@@ -165,14 +165,14 @@ was shot again in its default state: their screenshot had the venue view open, w
 | R7 | Catch-up truncation not mentioned | Not a defect: a hidden page halts motion before the clock pauses, so resume starts at rest |
 | R8 | Unbuildable venue swapped silently | **1.8.0**: set aside like an unreadable save; the store's guard now says so |
 | R9 | One hashed script | Not a defect: the offline copy is the fallback |
-| R10 | Edge headers | **Dave** (O1) |
+| R10 | Edge headers | Not doing (O1) |
 
 ## Security and privacy
 
 | ID | Finding | Outcome |
 | --- | --- | --- |
-| S1 | No HTTP security headers | **Dave** (O1) |
-| S2 | No `frame-ancestors` | **Dave**: a response header only |
+| S1 | No HTTP security headers | Not doing (O1) |
+| S2 | No `frame-ancestors` | Not doing: framing the page exposes nothing, since every action changes only the viewer's own browser storage (O1) |
 | S3 | No referrer policy | **1.7.0** |
 | S4 | Diagnostics hook | Not a defect (C15) |
 | S5 | `/favicon.ico` 404 | Deferred (U11) |
