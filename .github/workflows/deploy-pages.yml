@@ -110,7 +110,7 @@ jobs:
       - name: Stage site (everything except VCS + CI tooling)
         run: |
           mkdir -p _site
-          rsync -a --exclude='.git' --exclude='.github' --exclude='_site' --exclude='_sites' ./ _site/
+          rsync -a --exclude='.git' --exclude='.github' --exclude='_site' --exclude='_sites' --exclude='node_modules' --exclude='package.json' --exclude='package-lock.json' ./ _site/
           echo "Staged $(find _site -type f | wc -l) files."
 
       - name: Stage domain sites

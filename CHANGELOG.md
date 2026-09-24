@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-23 — Publish hygiene and import-XSS regression guard
+
+- The Pages staging step no longer publishes `node_modules/`, `package.json` or `package-lock.json` (audit SEC-005 / OPS-001); before this, `/node_modules/three/package.json` and `/package.json` returned 200 on systembydave.com.
+- DepotOps loads GSAP 3.12.5 with a Subresource Integrity hash and `crossorigin="anonymous"` (SEC-006); the hash matches cdnjs's published digest for the file.
+- Added `npm run probe:import-xss` (`scripts/probe_import_xss.mjs`), which proves hostile stored teleprompter HTML and a hostile OnTrack backup cannot execute or persist unnormalised; it fails against the pre-fix pages (SEC-001 / SEC-002, fixed in ada10b4).
+
 ## 2026-09-23 — FMP Camera Simulator release log and version stamp
 
 - Added `apps/fmp-camera-sim/CHANGELOG.md`, the simulator's own release log, backfilled as 1.0.0–1.5.3 from its nine merged pull requests; this change is 1.6.0.
