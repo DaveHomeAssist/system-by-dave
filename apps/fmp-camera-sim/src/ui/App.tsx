@@ -13,6 +13,7 @@ import { browserStorage } from "../storage/persist";
 import { AppBar } from "./AppBar";
 import { ControlsPanel } from "./ControlsPanel";
 import { HelpDialog } from "./HelpDialog";
+import { OnboardingTip, shouldShowOnboarding } from "./OnboardingTip";
 import { keepFocus } from "./keepFocus";
 import { GUIDE_BUTTONS, MonitorPanel } from "./MonitorPanel";
 import { type PanelTab, SidePanel } from "./SidePanel";
@@ -50,6 +51,7 @@ export function App() {
   const [mobileTab, setMobileTab] = useState<MobileTab>("operate");
   const [settingsTab, setSettingsTab] = useState<PanelTab>("venue");
   const [helpOpen, setHelpOpen] = useState(false);
+  const [onboardingOpen, setOnboardingOpen] = useState(() => shouldShowOnboarding());
   const [quality, setQuality] = useState(0);
 
   const monitorRef = useRef<HTMLCanvasElement>(null);
@@ -322,6 +324,7 @@ export function App() {
         </nav>
       )}
       <HelpDialog open={helpOpen} onClose={() => setHelpOpen(false)} />
+      <OnboardingTip open={onboardingOpen && !helpOpen} onClose={() => setOnboardingOpen(false)} />
     </div>
   );
 }
