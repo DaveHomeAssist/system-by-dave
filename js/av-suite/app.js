@@ -60,9 +60,13 @@ function cleanNote(value){return String(value||'').replace(/\s+/g,' ').trim().sl
 function cleanNotes(map){var next={};if(!map||typeof map!=='object') return next;Object.keys(map).forEach(function(id){var tool=toolById(id);var value=cleanNote(map[id]);if(tool&&value) next[tool.id]=value;});return next;}
 
 function suitePayload(){return {schema:'system-by-dave.av-suite.v1',savedAt:new Date().toISOString(),showName:state.showName,venue:state.venue,showDate:state.showDate,operator:state.operator,phase:state.phase,favorites:state.favorites,recent:state.recent,readiness:state.readiness,toolNotes:state.toolNotes,commandRecent:state.commandRecent,filters:state.filters};}
-function saveState(){if(!storageAvailable()) return false;try{localStorage.setItem(STORAGE_KEY,JSON.stringify(suitePayload()));return true;}catch(e){showHint('Suite preferences could not be saved in this browser.','error');return false;}}
+function saveState(){if(!storageAvailable()){showStorageNotice('This browser is not saving AV by Dave work (storage is blocked or private). Export Suite JSON before you close this tab.');return false;}try{localStorage.setItem(STORAGE_KEY,JSON.stringify(suitePayload()));return true;}catch(e){showStorageNotice('Your last change was not saved: this browser\'s storage is full. Export Suite JSON now, then clear saved tool data you no longer need.');return false;}}
 function applySuitePayload(parsed){if(!parsed||typeof parsed!=='object') throw new Error('Invalid payload');var savedName=String(parsed.showName||'').trim();state.showName=(savedName==='AV by Dave'?'':savedName).slice(0,120);state.venue=String(parsed.venue||'').slice(0,120);state.showDate=String(parsed.showDate||state.showDate).slice(0,20);state.operator=String(parsed.operator||'').slice(0,80);state.phase=phaseExists(parsed.phase)?parsed.phase:state.phase;state.favorites=cleanIds(parsed.favorites).slice(0,60);state.recent=cleanIds(parsed.recent).slice(0,12);state.readiness=cleanReadiness(parsed.readiness);state.toolNotes=cleanNotes(parsed.toolNotes);state.commandRecent=cleanCommandRecent(parsed.commandRecent);state.filters=cleanFilters(parsed.filters);}
-function loadState(){if(!storageAvailable()) return;try{var raw=localStorage.getItem(STORAGE_KEY);if(!raw) return;applySuitePayload(JSON.parse(raw));}catch(e){}}
+var CORRUPT_KEY=STORAGE_KEY+'.unreadable';
+var loadProblem='';
+function loadState(){if(!storageAvailable()){loadProblem='blocked';return;}var raw=null;try{raw=localStorage.getItem(STORAGE_KEY);if(!raw) return;var parsed=JSON.parse(raw);if(!parsed||typeof parsed!=='object'||Array.isArray(parsed)) throw new Error('Invalid payload');applySuitePayload(parsed);}catch(e){state=defaultState();loadProblem='unreadable';try{if(raw&&localStorage.getItem(CORRUPT_KEY)===null) localStorage.setItem(CORRUPT_KEY,raw);}catch(err){}}}
+function showStorageNotice(message){var box=$('storageNotice');var text=$('storageNoticeMsg');if(!box||!text) return;text.textContent=message;box.hidden=false;}
+function reportLoadProblem(){if(loadProblem==='blocked') showStorageNotice('This browser is not saving AV by Dave work (storage is blocked or private). Export Suite JSON before you close this tab.');else if(loadProblem==='unreadable') showStorageNotice('The saved show could not be read, so the console started empty. A copy of the unreadable data is kept in this browser under '+CORRUPT_KEY+'.');}
 function applyUrlContext(){var params=new URLSearchParams(window.location.search);var changed=false;function cleanParam(name,limit){return String(params.get(name)||'').replace(/\s+/g,' ').trim().slice(0,limit);}function assign(key,name,limit){var value=cleanParam(name,limit);if(name==='sbdShow'&&value==='AV by Dave') return;if(value&&state[key]!==value){state[key]=value;changed=true;}}assign('showName','sbdShow',120);assign('venue','sbdVenue',120);assign('showDate','sbdDate',20);assign('operator','sbdOperator',80);var phase=cleanParam('sbdPhase',30);if(phase&&phaseExists(phase)&&phase!=='all'&&state.phase!==phase){state.phase=phase;state.filters.phase=phase;changed=true;}if(changed) saveState();}
 
 function toolReadiness(id){return state.readiness[id]||'pending';}
@@ -141,6 +145,7 @@ function iconSvg(paths,size){size=size||16;return '<svg width="'+size+'" height=
    Undo button even when nothing was wired to it; fixed here).
    ============================================================ */
 function showHint(message,kind,undoFn){clearTimeout(toastTimer);toastUndo=undoFn||null;var toast=$('toast');var msg=$('toastMsg');var undoBtn=$('toastUndoBtn');msg.textContent=message;toast.hidden=false;undoBtn.hidden=!toastUndo;toast.style.borderColor=kind==='error'?'var(--st-issue-line)':'var(--c-neutral-400)';toastTimer=setTimeout(function(){toast.hidden=true;toastUndo=null;},2600);}
+$('storageNoticeDismiss').addEventListener('click',function(){$('storageNotice').hidden=true;});
 $('toastUndoBtn').addEventListener('click',function(){if(toastUndo) toastUndo();$('toast').hidden=true;clearTimeout(toastTimer);toastUndo=null;});
 
 /* ============================================================
@@ -1066,6 +1071,7 @@ function init(){
   wireEvents();
   if(initialEntry) applyEntryMode(initialEntry,{allowOnboarding:initialEntry==='show'});else {renderAll();openEntryChooser();}
   if(!TOOLS.length) showHint('Tool registry failed to load — refresh this page.','error');
+  reportLoadProblem();
   registerOfflineWorker().then(function(){renderAll();});
 }
 init();

@@ -101,9 +101,34 @@ self.addEventListener('message',function(event){
   }
 });
 
+function inScope(url){
+  return url.origin===self.location.origin&&url.href.indexOf(self.registration.scope)===0;
+}
+
+/* A page that was never saved for offline use gets this instead of the
+   browser's own error page (REL-007). */
+function offlinePage(){
+  var html='<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
+    +'<meta name="robots" content="noindex"><title>Offline \u00b7 AV by Dave</title>'
+    +'<style>body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px;box-sizing:border-box;background:#f6f1e7;color:#221c16;font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}'
+    +'@media (prefers-color-scheme:dark){body{background:#15181d;color:#e9eef5}a{color:#f0b35a}}'
+    +'main{max-width:34rem}h1{font-size:1.5rem;margin:0 0 .5rem}a{color:#9c4a1c;font-weight:700}'
+    +'ul{padding-left:1.2rem}li{margin:.35rem 0}</style></head><body><main>'
+    +'<h1>You\u2019re offline</h1><p>This page isn\u2019t saved on this device, so it can\u2019t open without a connection. Your saved AV by Dave work is still here.</p>'
+    +'<ul><li><a href="'+new URL('./av-suite.html?entry=show',self.registration.scope).href+'">Open the Show Console</a></li>'
+    +'<li><a href="'+new URL('./av-suite.html?entry=toolbox',self.registration.scope).href+'">Open the AV Toolbox</a></li></ul>'
+    +'<p>Reconnect and reload to open this page.</p></main></body></html>';
+  return new Response(html,{status:503,headers:{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-store'}});
+}
+
 self.addEventListener('fetch',function(event){
   var request=event.request;
-  if(!isKnownRequest(request)) return;
+  if(!isKnownRequest(request)){
+    if(request.method==='GET'&&request.mode==='navigate'&&inScope(new URL(request.url))){
+      event.respondWith(fetch(request).catch(offlinePage));
+    }
+    return;
+  }
   event.respondWith(caches.open(CACHE_NAME).then(function(cache){
     if(request.mode==='navigate'){
       return fetch(request).then(function(response){
@@ -112,7 +137,7 @@ self.addEventListener('fetch',function(event){
         return cachedResponse(cache,request).then(function(found){
           if(found) return found;
           var fallback=new URL(request.url).pathname===new URL('./',self.registration.scope).pathname?'./av-suite-landing2.html':'./av-suite.html';
-          return cache.match(new URL(fallback,self.registration.scope).href);
+          return cache.match(new URL(fallback,self.registration.scope).href).then(function(page){return page||offlinePage();});
         });
       });
     }

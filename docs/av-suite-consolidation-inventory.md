@@ -1,6 +1,6 @@
 # AV Suite consolidation source inventory
 
-Generated from `js/sbd-registry.js` version `v20260923-suite-import-safety`. Regenerate with `node scripts/report_av_consolidation_inventory.mjs`; check drift with `--check`.
+Generated from `js/sbd-registry.js` version `v20260925-save-guard`. Regenerate with `node scripts/report_av_consolidation_inventory.mjs`; check drift with `--check`.
 
 The feature text and declared keys come from the registry. Export, print, and keyboard columns identify only source-code signals in the route file. “Not found” does not prove absence; “Source signal” does not prove working behavior. Offline means the route is named by the registry manifest, not that every dependency is cached. Each behavior still needs browser and field-parity verification before a legacy route can be retired.
 

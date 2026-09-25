@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-09-25 — AV by Dave tools protect saved work
+
+- **Keep / Switch.** A tool opened from the console with a different show than the one it has saved now keeps its saved show and asks whether to keep it or switch. Before, the console's show name, venue, date and operator silently replaced the tool's saved values. Fresh tools, "Untitled" defaults and matching names still fill in straight away.
+- **Another tab.** A tool open in two tabs now warns the older tab when the other one saves, with Reload or Keep editing here. Before, the stale tab's next save overwrote the other one without warning.
+- **Storage full or blocked.** Tools and the console now say when a save was refused or the browser is not saving at all, and tell the operator to export.
+- **Unreadable saved show.** The console now reports it and keeps the unreadable value under `av-suite-dashboard.v1.unreadable` instead of silently starting empty.
+- **Offline.** Pages that were never saved for offline use open a "You're offline" page with links to the Show Console and Toolbox, instead of the browser's error page.
+- New release gate: `npm run test:av-save-safety-browser` (`scripts/probe_av_save_safety.mjs`, 9 checks) in the Pages workflow. Offline cache version `v20260925-save-guard`.
+
 ## 2026-09-25 — FMP pages link the camera training tools
 
 - FMP export from fmp-suite PR #24:

@@ -5,8 +5,6 @@
    dock is bottom-left and only appears with ?sbdShow= context; this sits
    bottom-right and always shows). Opt out with <html data-sbd-nav="off">. */
 (function(){
-  if(document.documentElement.getAttribute('data-sbd-nav') === 'off') return;
-
   // Tool data comes from js/sbd-registry.js (single source of truth).
   // Pages must include the registry before this script.
   var REG = window.SBD_REGISTRY;
@@ -93,8 +91,97 @@
     return a;
   }
 
+  /* Save guard (REL-002/003/004). Tools save straight to localStorage, so
+     tell the operator when a save cannot land, and when another tab changes
+     this tool's saved data behind the copy open here. Runs even where the
+     nav bar is switched off. */
+  var GUARD_STYLE = [
+    '.sbd-save-guard{position:fixed;left:50%;top:12px;transform:translateX(-50%);z-index:10001;display:flex;flex-wrap:wrap;align-items:center;gap:8px;width:min(620px,calc(100vw - 24px));padding:12px;border:1px solid #f0b35a;border-radius:10px;background:rgba(13,16,21,.97);box-shadow:0 10px 30px rgba(0,0,0,.42);color:#e9eef5;font:600 13px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}',
+    '.sbd-save-guard p{flex:1 1 260px;margin:0}',
+    '.sbd-save-guard button{appearance:none;min-height:44px;border:1px solid rgba(120,132,148,.55);border-radius:8px;padding:8px 12px;color:#e9eef5;background:rgba(30,37,47,.9);font:700 12px -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;cursor:pointer}',
+    '.sbd-save-guard button:hover{border-color:#e08a4f}',
+    '.sbd-save-guard button:focus-visible{outline:2px solid #e08a4f;outline-offset:2px}',
+    '@media print{.sbd-save-guard{display:none!important}}'
+  ].join('');
+
+  function toolForRoute(route){
+    var tools = REG.tools || [];
+    for(var i = 0; i < tools.length; i++){
+      if(normalizeRoute(tools[i].href) === route) return tools[i];
+    }
+    return null;
+  }
+
+  function guardNotice(kind, message, actions){
+    var box = document.querySelector('[data-sbd-save-guard="' + kind + '"]');
+    var text;
+    if(!document.getElementById('sbdSaveGuardStyle')){
+      var style = el('style');
+      style.id = 'sbdSaveGuardStyle';
+      style.textContent = GUARD_STYLE;
+      document.head.appendChild(style);
+    }
+    if(box){
+      box.querySelector('p').textContent = message;
+      return box;
+    }
+    box = el('div', 'sbd-save-guard');
+    box.setAttribute('data-sbd-save-guard', kind);
+    box.setAttribute('role', 'alert');
+    text = el('p', '', message);
+    box.appendChild(text);
+    (actions || [{label:'Dismiss'}]).forEach(function(action){
+      var button = el('button', '', action.label);
+      button.type = 'button';
+      button.addEventListener('click', function(){
+        box.remove();
+        if(action.run) action.run();
+      });
+      box.appendChild(button);
+    });
+    document.body.appendChild(box);
+    return box;
+  }
+
+  function guardSaves(){
+    var tool = toolForRoute(currentRoute());
+    var keys = {};
+    var storage = null;
+    if(!tool) return;
+    (tool.storageKeys || []).forEach(function(item){keys[item.key] = true;});
+    try{
+      storage = window.localStorage;
+      storage.setItem('sbd-save-guard-probe', '1');
+      storage.removeItem('sbd-save-guard-probe');
+    }catch(err){
+      guardNotice('blocked', 'This browser is not saving ' + tool.name + ' (storage is blocked or private). Export your work before you close this tab.');
+      return;
+    }
+    var setItem = Storage.prototype.setItem;
+    if(!setItem.sbdSaveGuard){
+      var guarded = function(key, value){
+        try{
+          return setItem.apply(this, arguments);
+        }catch(err){
+          if(this === storage) guardNotice('full', 'Your last change to ' + tool.name + ' was not saved: this browser\'s storage is full. Export your work now, then clear saved tool data you no longer need from AV by Dave.');
+          throw err;
+        }
+      };
+      guarded.sbdSaveGuard = true;
+      Storage.prototype.setItem = guarded;
+    }
+    window.addEventListener('storage', function(event){
+      if(event.storageArea !== storage || !event.key || !keys[event.key]) return;
+      guardNotice('other-tab', tool.name + ' was changed in another tab. Reload to see that version, or keep editing here and your next save replaces it.', [
+        {label:'Reload', run:function(){window.location.reload();}},
+        {label:'Keep editing here'}
+      ]);
+    });
+  }
+
   function render(){
     var route = currentRoute();
+    if(document.documentElement.getAttribute('data-sbd-nav') === 'off') return;
     if(SKIP[route]) return;
     if(document.querySelector('nav.sbd-nav')) return;
 
@@ -138,9 +225,14 @@
     document.body.classList.add('has-sbd-nav');
   }
 
-  if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', render);
-  }else{
+  function start(){
     render();
+    guardSaves();
+  }
+
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', start);
+  }else{
+    start();
   }
 })();

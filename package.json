@@ -42,6 +42,7 @@
     "verify:shader-practice": "node --test shader/shading-practice-state.test.js shader/fmp-training.test.js scripts/shader_practice_worker.test.js && node scripts/verify_shader_practice.js",
     "test:shader-practice-browser": "node scripts/probe_shader_practice.js --no-sandbox",
     "test:camera-training-links": "node --test scripts/camera_training_links.test.mjs",
+    "test:av-save-safety-browser": "node scripts/probe_av_save_safety.mjs --no-sandbox",
     "test:av-suite-import-browser": "node scripts/probe_av_suite_import.mjs --no-sandbox"
   },
   "devDependencies": {

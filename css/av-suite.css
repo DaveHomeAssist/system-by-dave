@@ -577,6 +577,10 @@ img,svg{display:block}
 /* ---- toast ---- */
 #avApp .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:95;display:flex;align-items:center;gap:10px;border:1px solid var(--c-neutral-400);background:var(--c-raised);box-shadow:var(--c-shadow-pop);padding:9px 14px;font-size:12.5px}
 #avApp .toast[hidden]{display:none}
+#avApp .storage-notice{position:fixed;left:50%;top:14px;transform:translateX(-50%);z-index:96;display:flex;align-items:center;gap:12px;width:min(640px,calc(100vw - 32px));border:1px solid var(--st-issue-line);background:var(--c-raised);box-shadow:var(--c-shadow-pop);padding:10px 14px;font-size:13px;line-height:1.45}
+#avApp .storage-notice[hidden]{display:none}
+#avApp .storage-notice span{flex:1 1 auto;min-width:0}
+#avApp .storage-notice button{flex:none;min-height:44px;padding:6px 12px}
 #avApp .toast button{padding:4px 9px;font-size:10.5px}
 
 /* ---- DOS status bar ---- */
