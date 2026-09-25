@@ -9,9 +9,10 @@ const modelFiles = [
   ...['bench-core.js', 'bench.css', 'model-shell.js', 'model-shell.css', 'atem-hd8-iso.css',
     'atem-hd8-iso-0.js', 'atem-hd8-iso-1.js', 'atem-hd8-iso-2.js', 'atem-hd8-iso-3.js',
     'p240-0.js', 'p240-catalog.json', 'ccu4-0.js', 'ccu4-catalog.json',
-    // Supplied HD8 ISO reference views; served as files since fmp-suite e643c91.
-    'atem-photo-front.png', 'atem-photo-perspective.png', 'atem-photo-rear.png',
-    'atem-photo-side.png'].map(name => `models/assets/${name}`),
+    // Supplied HD8 ISO reference views; served as files since fmp-suite e643c91,
+    // as WebP (quality 90) since fmp-suite 6890c9a.
+    'atem-photo-front.webp', 'atem-photo-perspective.webp', 'atem-photo-rear.webp',
+    'atem-photo-side.webp'].map(name => `models/assets/${name}`),
   'models/vendor/three.min.js', 'models/vendor/LICENSE', 'ptz/SuperJoy-G1-Interactive-Guide.html'
 ];
 

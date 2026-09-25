@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-09-25 — ATEM reference photos ship as WebP
+
+- Re-exported `fmp/` from fmp-suite `6890c9a` (fmp-suite PR #27). The four ATEM HD8 ISO reference photos are WebP at quality 90 instead of PNG: 3.43 MB down to 180 KB (the front view 2.51 MB to 99 KB). At 2x zoom the button legends read the same; the front view measures 43.5 dB PSNR against the original. Dave chose lossy WebP on 2026-09-25.
+- The switcher guide's offline download drops from 5.35 MB to 1.02 MB. `scripts/build_switcher_guide.mjs` now embeds each photo with the data type of its file, and the switcher probe counts WebP as well as PNG photo requests. `scripts/fmp_model_contract.js` lists the WebP files.
+
 ## 2026-09-25 — AV by Dave keeps one landing page
 
 - Dave retired the previous AV by Dave landing (UX-005). `av-suite-landing.html` is now a small noindex page that redirects to `av-suite-landing2.html`, the page avbydave.com already serves at `/`, so old links and bookmarks still land. Its stylesheet and script (`css/av-landing.css`, `js/av-landing.js`) are removed.

@@ -12,7 +12,7 @@
 //        node scripts/build_switcher_guide.mjs --check  (fail if the committed files are stale)
 import { createHash } from 'node:crypto';
 import { readFileSync, writeFileSync } from 'node:fs';
-import { dirname, join, resolve } from 'node:path';
+import { dirname, extname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -133,7 +133,8 @@ function offlinePage() {
   const { styles, scripts } = modelAssets();
   const file = url => url.split('?')[0].replace(/^\//, '');
   const css = ['/css/sbd-public-nav.css', ...styles].map(href => read(file(href))).join('\n');
-  const photos = photoPaths().map(photo => `data:image/png;base64,${read(`fmp/models/${photo}`, null).toString('base64')}`);
+  const mime = { '.png': 'image/png', '.webp': 'image/webp', '.jpg': 'image/jpeg' };
+  const photos = photoPaths().map(photo => `data:${mime[extname(photo)]};base64,${read(`fmp/models/${photo}`, null).toString('base64')}`);
   // theme.js runs in the head for the first paint; it also loads chrome.js beside itself, which has
   // no meaning in a file opened from disk, so that part is left out. model-shell.js is deferred on
   // the web and runs last here.
