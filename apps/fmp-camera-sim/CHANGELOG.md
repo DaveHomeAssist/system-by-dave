@@ -13,6 +13,14 @@ Minor versions add features or change a saved-file format; patch versions fix or
 
 Versions 1.0.0 to 1.5.3 were numbered after the fact from their merged pull requests.
 
+## 1.12.0 — 2026-09-25 — Draw only what changed; venue view needs room
+
+- The monitor and the venue view are drawn only when their picture would change: the camera or the performer moves, the venue view is orbited or still easing, a canvas resizes, or the theme, cutaway, venue or view preset changes. A still camera used to redraw every frame (44 draws in 1.5 s on a 1024 × 768 screen), which costs battery and heat on a tablet for no visible change. `?render=always` draws every frame again, for comparison.
+- On screens under 900 px tall, showing the venue view keeps the controls in their column beside the picture and puts the venue view under it. At 1024 × 768 the venue view was a 1002 × 10 px strip and the picture 223 × 125; it is now 422 × 144 and the picture 330 × 186, and the controls no longer scroll. Where the venue view is still smaller than 200 × 120 px (1024 × 690, 1180 × 685), it says so and starts no second 3D view until there is room.
+- If the browser resets only the venue view's graphics, that view shows "Venue view paused" and comes back on its own; the monitor and the camera keep running. A reset used to stop both.
+- The quality ladder judges only frames that drew something, so an idle camera neither sheds nor restores venue detail. Seat detail changes with the quality level instead of being set every frame, and closing the simulator frees every model and both graphics contexts.
+- Diagnostics (`?diagnostics=1`) add each view's draws and skipped frames, draw calls, triangles, geometries, textures and shader programs, the number of graphics contexts, when the venue view started, whether it has room, and the last quality-ladder steps.
+
 ## 1.11.2 — 2026-09-25 — Readable scope line
 
 - The header's scope line ("Framing, zoom, and presets only — not SuperJoy or focus") drops its 0.78 opacity and uses the full muted ink: it measured 3.97:1 on the light surface, and is now 6.7:1.

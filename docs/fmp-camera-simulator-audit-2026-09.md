@@ -35,7 +35,7 @@ was shot again in its default state: their screenshot had the venue view open, w
 | N2 | The breadcrumb drew a vertical scrollbar wherever scrollbars always show (Windows, Linux, the audit box): `overflow-x: auto` made `overflow-y` auto too, and its 44 px links overflow the 43 px row by 1 px | **1.8.0**: `overflow-y: hidden`; the probe checks every layout |
 | N3 | After #142, a venue-view WebGL context that fails to start left a silent blank panel | **1.8.0**: the panel says so; the monitor carries on |
 | N4 | The 1.7.0 preset menu took no keyboard focus, and a keyboard-opened menu had no position | **1.8.0**: first action focused, Escape returns to the key, anchored under the key |
-| N5 | At 1366 × 650 the venue view is too short: its hint runs under the legend | Deferred: part of the side-by-side short-screen layout recommended in `docs/fmp-camera-simulator.md` |
+| N5 | At 1366 × 650 the venue view is too short: its hint runs under the legend | **1.12.0**: on screens under 900 px tall the controls stay beside the picture and the venue view sits under it (764 × 170 at 1366 × 650); a venue view under 200 × 120 px says so and hides its overlays (X2) |
 
 ## Accessibility (1.6.0)
 
@@ -106,7 +106,7 @@ was shot again in its default state: their screenshot had the venue view open, w
 | O3 | No rollback runbook | **1.8.0**: "Release QA and rollback" in `docs/fmp-camera-simulator.md` |
 | O4 | No CODEOWNERS | Not adopted: one owner, and the bots push as that account. GitHub cannot request review from a pull request's author, so it would add noise, or block self-merges if enforced |
 | O5 | Forgotten rebuilds fail pull requests | Kept: the gate is the point. `apps/fmp-camera-sim/README.md` states the rule |
-| O6 | Hashed assets cached for 10 minutes | Not doing: after the 10 minutes the browser asks whether the file changed and gets a `304` with no body (checked on the live bundle), so a repeat visit costs a few small requests, not a re-download |
+| O6 | Hashed assets cached for 10 minutes | Not doing, with the reason corrected on 25 September (X4): the `304` only holds until the next site deploy, because GitHub Pages stamps every file's ETag with the deploy time. After any deploy a returning visitor downloads the bundle again (about 254 KB compressed) |
 | O7 | The deploy runs the whole site's checks | Deferred: one Pages root; revisit if it blocks releases |
 | O10 | No README in the app folder | **1.8.0** |
 
@@ -192,3 +192,26 @@ was shot again in its default state: their screenshot had the venue view open, w
 - #142 (1.7.2): correct; its description still says "Changelog 1.6.1" where the commit adds
   1.7.2, and a failed venue-view context was silent (N3, fixed here).
 - Merge order: #141, #142, then this release, which is stacked on both.
+
+## Three.js production-excellence plan (1.11.2, 25 September)
+
+A renderer-lifecycle and delivery review of 1.11.2 (live = main, `d276305`), with a headless
+Chrome probe of context counts and draws per view. Its findings were re-checked against the
+source and the live page before any change: the idle redraw (44 monitor draws in 1.5 s with the
+camera still, 1024 × 768), the 1002 × 10 px venue view with a 223 × 125 picture and two contexts,
+and the deploy-time ETags (`og.png`, unchanged since 23 September, carried the 25 September
+deploy's stamp) all reproduced. Both earlier P0s (two contexts at start, release lag) were
+already closed.
+
+| ID | Finding | Outcome |
+| --- | --- | --- |
+| X1 | Both views redraw every frame while nothing changes | **1.12.0**: each view draws only when its picture changes; the probe checks that a still camera draws nothing for 2 s and that moving, theme and view presets draw again. `?render=always` keeps the old behaviour for comparison |
+| X2 | Showing the venue view on a short landscape screen starts a second context for a 10 px strip | **1.12.0**: no context under 200 × 120 px, with a note in the panel; the layout change in N5 gives 1024 × 768 and 1366 × 650 a drawable venue view. 1024 × 690 and 1180 × 685 stay too short and start one context only; the probe checks all four |
+| X3 | No renderer counters and no device baseline | **1.12.0**: diagnostics report draws, skips, draw calls, uploads, programs, contexts and quality steps. The device baseline needs a session on real hardware; its protocol is in `docs/fmp-camera-simulator.md` (Observability) |
+| X4 | ETags change on every site deploy, so the O6 `304` rarely happens | Not doing, decided: Pages cannot set cache headers, an edge was declined (O1), and a service worker would loosen the CSP (`worker-src`) and add update and stale-page handling to save one bundle download per returning visit after a deploy, on a tool whose offline need the standalone file already meets. Revisit if the site moves behind an edge or field use on cellular becomes common. The previous release's hashed bundle 404s after a deploy; a page cached with its old bundle keeps working, so no failure has been seen |
+| X5 | Split three.js and React into their own chunks | Deferred: the offline inliner accepts one module, and under X4 a stable vendor chunk would still re-download after every deploy, so the split saves almost nothing today |
+| X6 | Losing the venue view's context froze the monitor and stopped motion | **1.12.0**: the venue view pauses on its own; the probe loses and restores only that context |
+| X7 | Seat detail set by walking the bowl every frame; `dispose()` skipped helper models and kept contexts | **1.12.0**: set on quality changes and rebuilds; dispose frees every model and calls `forceContextLoss()` |
+| X8 | One renderer for both views (scissor), to avoid a second upload of the scene | Deferred until the device baseline (X3) shows memory or compile pressure |
+| X9 | Tune the quality ladder (remembered start level, monitor antialiasing at 2× DPR) | Deferred until the device baseline; the ladder now ignores idle frames |
+| X10 | Architecture guide lacks a lifecycle table and render policy | **1.12.0**: "Rendering policy" in `docs/fmp-camera-simulator.md` |

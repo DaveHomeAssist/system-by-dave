@@ -15,6 +15,20 @@ export function useTelemetry(store: SimulatorStore, hz = 12): Telemetry {
   return telemetry;
 }
 
+/** Whether a media query matches, following changes (rotation, window resize). */
+export function useMediaQuery(query: string): boolean {
+  const [matches, setMatches] = useState(() => window.matchMedia?.(query).matches ?? false);
+  useEffect(() => {
+    const list = window.matchMedia?.(query);
+    if (!list) return undefined;
+    const onChange = () => setMatches(list.matches);
+    onChange();
+    list.addEventListener?.("change", onChange);
+    return () => list.removeEventListener?.("change", onChange);
+  }, [query]);
+  return matches;
+}
+
 export type LayoutClass = "phone" | "tablet" | "desktop" | "ultrawide";
 
 export function layoutFor(width: number): LayoutClass {
