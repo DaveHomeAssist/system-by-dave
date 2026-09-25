@@ -26,12 +26,38 @@ does not connect to a real camera or controller.
 | Exercises | `src/exercises/*.ts` | Wide shot, follow and save/recall evaluators, sampled 30 times per simulated second |
 | Store | `src/app/store/` | `SimulatorStore` is a thin façade over one shared `StoreCore` and focused controllers (persistence, operating, settings, exercises, clock); React subscribes to discrete state |
 | Input adapter | `src/input/*.ts` | Keyboard, joystick, zoom rocker and hold buttons become one commanded deflection |
-| Renderer | `src/render/*.ts` | One Three.js scene drawn by two renderers: the monitor (the simulated P240), created at start, and the orbiting venue view, created the first time the venue panel is shown |
+| Renderer | `src/render/*.ts` | One Three.js scene drawn by two renderers: the monitor (the simulated P240), created at start, and the orbiting venue view, created the first time the venue panel is shown with room to draw. Each view draws only when its picture changes (`drawSignature.ts`) |
 | Interface | `src/ui/*.tsx` | Panels, controls, settings, exercises, session import/export; `ErrorBoundary.tsx` wraps the whole interface |
 
 The simulation owns camera state and Three.js only reads it. Inputs are applied at their event
 timestamps, so identical input over identical elapsed time produces identical motion at any
 render rate; `src/sim/ptz.test.ts` proves exact equality at 24, 30, 60, 144 Hz and jittered frames.
+
+### Rendering policy
+
+One `requestAnimationFrame` loop (`src/app/engine.ts`) advances the simulation clock, then asks
+`SceneRenderer.render()` (`src/render/renderer.ts`) to draw. The renderer draws a view only when
+its picture would change: the scene signature (camera frame, performer pose, mount, quality
+level and an invalidation epoch, `src/render/drawSignature.ts`) differs from the one it last
+drew, the canvas resized, or, for the venue view, OrbitControls moved its camera (a drag, a zoom
+or the damping tail). Theme, cutaway, venue geometry, view presets, quality steps and context
+restores call `invalidate()`. A still camera costs no GPU work; the last picture stays on screen.
+`?render=always` draws every frame again, for comparison or as a fallback.
+
+| Renderer | Created | Draws | Collapsed or hidden | Context lost |
+| --- | --- | --- | --- | --- |
+| Monitor | At start | When its picture changes | Skipped while its canvas is under 2 px (phone Venue tab, expanded panels); context kept | Motion stops and the picture says it is paused until the browser restores it |
+| Venue view | The first frame the panel is shown and at least 200 × 120 CSS px | When its picture changes or the venue camera moves; every Nth frame on the lower quality levels | Stops drawing; context and uploads kept, since operators reopen it within a session | Only the venue view pauses ("Venue view paused"); the monitor and motion carry on |
+
+A panel shown smaller than 200 × 120 px says there is not enough room and starts no context. On
+screens under 900 px tall (landscape, at least 960 px wide and 4:3) the controls stay beside
+the picture when the venue view is shown, and the venue view sits under the monitor.
+
+The quality ladder only judges frames that followed a draw, so an idle camera neither sheds nor
+restores detail. It lowers the venue view's resolution and cadence before the monitor's, and
+seat detail changes with the level rather than every frame. The renderer stays on WebGL2: the
+trainer has no GPU-compute work, so WebGPU would only be considered for a concrete effect, with a
+WebGL fallback. Closing the simulator disposes every model and releases both contexts.
 
 ## Coordinates
 
@@ -230,7 +256,8 @@ A newer file opened in an older build is rejected with its version, never partly
   readouts keep working. A lost graphics context stops motion and says the picture is paused;
   when the browser restores it, Three.js rebuilds its GPU resources and the picture returns (the
   probe loses and restores the context and reads the pixels back). If only the venue view's own
-  context cannot start, the venue panel says so and the monitor carries on.
+  context cannot start, the venue panel says so and the monitor carries on; if only the venue
+  view's context is lost, that view says it is paused and the monitor and motion carry on.
 - A failure while starting or drawing the interface shows a recovery screen instead of a blank
   page: reload, export the saved session exactly as stored, or set it aside (kept as an
   unreadable copy) and start fresh, since a session that breaks the page would break every reload.
@@ -266,6 +293,22 @@ committed-build checks, the Playwright probe on every pull request and deploy, t
 the probe and the release checks use against the production build. It exposes nothing the page
 does not already show and sends nothing, so it stays in production. Adding telemetry would need
 an explicit CSP change and Dave's approval.
+
+`__fmpCameraSim.render()` reports, per view, draws and skipped frames, the last draw's calls and
+triangles, uploaded geometries, textures and shader programs; the number of live contexts, when
+the venue view started and whether it has room; and the last 20 quality-ladder steps (time, from,
+to, frame-time average and display baseline). `__fmpCameraSim.invalidate()` asks for one draw of
+both views, which a pixel readback needs, since the drawing buffer is not preserved.
+
+**Device baseline.** Every performance figure so far comes from headless Chrome drawing in
+software, which says nothing about frame rate, heat or memory on a tablet. To take a baseline, open
+`/camera-sim/?diagnostics=1` on the device and, from the browser's developer tools (Safari Web
+Inspector for iPad and iPhone, Chrome remote debugging for Android), record
+`__fmpCameraSim.render()` and a timeline after each step: 60 s with the camera still, 60 s
+operating, the venue view shown then collapsed, and 30 s in a background tab. Note the device, OS,
+browser, device pixel ratio, refresh rate, the quality level reached, draws per second still and
+moving, draw calls and JavaScript heap. Repeat with `&render=always` to measure what drawing on
+demand saves. Record the table in the audit-outcomes page.
 
 ### Release QA and rollback
 

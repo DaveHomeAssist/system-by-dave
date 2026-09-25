@@ -124,10 +124,13 @@ async function focusWorkspace(page) {
   await page.locator('#monitor-title').click();
 }
 
+// The renderer draws only when the picture changes, and its buffer is not preserved between
+// frames: ask for a draw, then read back in the same frame, after the engine's callback.
 async function monitorPixels(page) {
   return page.evaluate(
     () =>
       new Promise((done) => {
+        window.__fmpCameraSim?.invalidate?.();
         requestAnimationFrame(() => {
           const source = document.querySelector('[data-testid="monitor-canvas"]');
           const canvas = document.createElement('canvas');
@@ -266,10 +269,34 @@ async function closePanel(page) {
     assert((await s.state()).renderStatus === 'ok', 'renderStatus is not ok');
     const pixels = await monitorPixels(page);
     assert(pixels.variance > 20, `monitor looks uniform (variance ${pixels.variance.toFixed(1)})`);
-    const before = (await s.render()).monitorFrames;
-    await sleep(500);
-    assert((await s.render()).monitorFrames > before, 'monitor frames are not advancing');
     return `luma mean ${pixels.mean.toFixed(0)}, variance ${pixels.variance.toFixed(0)}`;
+  });
+  await check('a still picture is not redrawn; any change draws it again', async () => {
+    await sleep(1000);
+    const idleFrom = await s.render();
+    await sleep(2000);
+    const idle = await s.render();
+    assert(idle.monitorFrames === idleFrom.monitorFrames && idle.overviewFrames === idleFrom.overviewFrames,
+      `idle draws: monitor ${idle.monitorFrames - idleFrom.monitorFrames}, venue ${idle.overviewFrames - idleFrom.overviewFrames}`);
+    assert(idle.monitorSkipped > idleFrom.monitorSkipped && idle.overviewSkipped > idleFrom.overviewSkipped, 'no frames were skipped');
+    assert(idle.contexts === 2 && idle.overviewRoom === true, `contexts ${idle.contexts}, room ${idle.overviewRoom}`);
+    assert(idle.monitorInfo.calls > 0 && idle.overviewInfo?.calls > 0 && idle.monitorInfo.programs > 0, 'renderer counters are empty');
+    // Moving the camera draws both views; changing only the theme or the venue camera redraws too.
+    await focusWorkspace(page);
+    await hold(page, 'ArrowLeft', 300);
+    await waitStill(page);
+    const moved = await s.render();
+    assert(moved.monitorFrames > idle.monitorFrames && moved.overviewFrames > idle.overviewFrames, 'moving the camera did not draw');
+    await page.getByRole('button', { name: 'Dark mode' }).click();
+    await page.waitForFunction((n) => window.__fmpCameraSim.render().overviewFrames > n, moved.overviewFrames);
+    await page.getByRole('button', { name: 'Dark mode' }).click();
+    const viewed = (await s.render()).overviewFrames;
+    await page.getByRole('button', { name: 'Top', exact: true }).click();
+    await page.waitForFunction((n) => window.__fmpCameraSim.render().overviewFrames > n, viewed);
+    await page.getByRole('button', { name: 'House', exact: true }).click();
+    await hold(page, 'ArrowRight', 300);
+    await waitStill(page);
+    return `${idle.monitorSkipped - idleFrom.monitorSkipped} still frames skipped in 2 s; ${idle.monitorInfo.calls} + ${idle.overviewInfo.calls} draw calls`;
   });
   await check('one camera state drives the monitor, the P240 model and the cone', async () => {
     await focusWorkspace(page);
@@ -280,7 +307,8 @@ async function closePanel(page) {
     await waitStill(page);
     // Compare against a frame drawn after the camera settled, however slowly this renderer runs.
     const settledAt = (await s.render()).monitorFrames;
-    await page.waitForFunction((n) => window.__fmpCameraSim.render().monitorFrames >= n + 2, settledAt, { timeout: 15000 });
+    await page.evaluate(() => window.__fmpCameraSim.invalidate());
+    await page.waitForFunction((n) => window.__fmpCameraSim.render().monitorFrames >= n + 1, settledAt, { timeout: 15000 });
     const frame = await s.frame();
     const render = await s.render();
     const forward = [frame.forward.x, frame.forward.y, frame.forward.z];
@@ -927,12 +955,58 @@ await check('a lost graphics context pauses the picture and a restored one bring
     assert((await sim(page).state()).renderStatus === 'lost', 'render status is not lost');
     await page.evaluate(() => window.__probeContext.restoreContext());
     await page.waitForFunction(() => window.__fmpCameraSim.state().renderStatus === 'ok', null, { timeout: 10000 });
+    // The restore itself draws once; a still picture then draws only when asked.
     const frames = (await sim(page).render()).monitorFrames;
-    await page.waitForFunction((n) => window.__fmpCameraSim.render().monitorFrames > n + 3, frames, { timeout: 15000 });
+    await page.evaluate(() => window.__fmpCameraSim.invalidate());
+    await page.waitForFunction((n) => window.__fmpCameraSim.render().monitorFrames > n, frames, { timeout: 15000 });
     const pixels = await monitorPixels(page);
     assert(pixels.variance > 20, `the picture did not come back (variance ${pixels.variance.toFixed(1)})`);
     assert((await page.getByText('Picture paused').count()) === 0, 'the pause notice stayed up');
     return `luma variance ${pixels.variance.toFixed(0)} after restore`;
+  } finally {
+    await context.close();
+  }
+});
+
+await check('losing only the venue view\'s context pauses that view; the monitor and motion carry on', async () => {
+  const { context, page } = await open();
+  try {
+    await page.waitForFunction(() => window.__fmpCameraSim.render().contexts === 2, null, { timeout: 15000 });
+    const lost = await page.evaluate(() => {
+      const gl = document.querySelector('[data-testid="venue-canvas"]').getContext('webgl2');
+      window.__probeVenueContext = gl?.getExtension('WEBGL_lose_context') ?? null;
+      window.__probeVenueContext?.loseContext();
+      return Boolean(window.__probeVenueContext);
+    });
+    assert(lost, 'WEBGL_lose_context is not available');
+    await page.getByTestId('venue-paused').waitFor({ timeout: 5000 });
+    assert((await sim(page).state()).renderStatus === 'ok', 'a venue-view loss halted the simulator');
+    assert((await page.getByText('Picture paused').count()) === 0, 'the monitor shows the pause notice');
+    const before = await sim(page).render();
+    await focusWorkspace(page);
+    await hold(page, 'ArrowRight', 400);
+    const after = await sim(page).render();
+    assert((await sim(page).snapshot()).pose.pan > 0, 'the camera did not move');
+    assert(after.monitorFrames > before.monitorFrames && after.overviewFrames === before.overviewFrames, 'the monitor stopped, or the lost view drew');
+    await page.evaluate(() => window.__probeVenueContext.restoreContext());
+    await page.getByTestId('venue-paused').waitFor({ state: 'detached', timeout: 10000 });
+    await page.waitForFunction((n) => window.__fmpCameraSim.render().overviewFrames > n, after.overviewFrames, { timeout: 15000 });
+    return 'monitor kept drawing through a venue-view reset';
+  } finally {
+    await context.close();
+  }
+});
+
+await check('phone: Operate starts one graphics context; the Venue tab adds the second', async () => {
+  const { context, page } = await open({ context: { viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true } });
+  try {
+    await sleep(800);
+    assert((await sim(page).render()).contexts === 1, 'Operate started a second context');
+    await page.locator('.mobile-rail').getByRole('button', { name: 'Venue', exact: true }).click();
+    await page.waitForFunction(() => window.__fmpCameraSim.render().contexts === 2, null, { timeout: 15000 });
+    const render = await sim(page).render();
+    assert(render.overviewRoom === true && render.overviewFrames > 0, `venue tab room ${render.overviewRoom}, draws ${render.overviewFrames}`);
+    return `venue context started at frame ${render.overviewCreatedAtFrame}`;
   } finally {
     await context.close();
   }
@@ -1146,13 +1220,14 @@ for (const [label, viewport, expectation] of [
 // 2 px, but an iPad in Chrome still showed 232 × 130. With the venue view collapsed, the default
 // on these screens, the controls sit beside the monitor, the whole column (Stop included) fits
 // without scrolling even with wider text, and the readout keeps to one line where there is room.
-// Showing the venue view puts it beside the monitor again, with a smaller but usable picture and
-// every control reachable by scrolling the controls panel.
-for (const [label, viewport, minWidth, minShownWidth] of [
-  ['iPad landscape 1024 × 768', { width: 1024, height: 768 }, 390, 210],
-  ['iPad Safari landscape 1024 × 690', { width: 1024, height: 690 }, 390, 172],
-  ['iPad Chrome landscape 1180 × 685', { width: 1180, height: 685 }, 540, 172],
-  ['laptop browser 1366 × 650', { width: 1366, height: 650 }, 590, 142],
+// Showing the venue view keeps the controls in their column and puts the venue view under the
+// picture (in the monitor's row it was 1002 × 10 px at 1024 × 768). Where even that is too short
+// to draw, the venue view says so and starts no second graphics context.
+for (const [label, viewport, minWidth, minShownWidth, venueDraws] of [
+  ['iPad landscape 1024 × 768', { width: 1024, height: 768 }, 390, 300, true],
+  ['iPad Safari landscape 1024 × 690', { width: 1024, height: 690 }, 390, 230, false],
+  ['iPad Chrome landscape 1180 × 685', { width: 1180, height: 685 }, 540, 310, false],
+  ['laptop browser 1366 × 650', { width: 1366, height: 650 }, 590, 280, true],
 ]) {
   await check(`${label}: the controls sit beside a large picture and every control stays reachable`, async () => {
     const { context, page } = await open({ context: { viewport } });
@@ -1193,14 +1268,22 @@ for (const [label, viewport, minWidth, minShownWidth] of [
       }
       const show = page.getByRole('button', { name: 'Show venue view', exact: true });
       await show.click();
+      await sleep(600);
       const shown = await picture();
       assert(shown && shown.width >= minShownWidth, `with the venue view shown the picture is ${Math.round(shown?.width ?? 0)} px wide, expected at least ${minShownWidth}`);
-      const stop = page.getByRole('button', { name: 'Stop', exact: true });
-      await stop.scrollIntoViewIfNeeded();
-      const box = await stop.boundingBox();
-      assert(box && box.y >= 0 && box.y + box.height <= viewport.height, 'Stop cannot be scrolled into view');
+      const beside = await measure();
+      assert(beside.controls.left >= beside.monitor.right && beside.controlsScroll <= 1, 'with the venue view shown the controls left their column or scroll');
+      assert(beside.stopBottom <= viewport.height, `with the venue view shown Stop ends at ${Math.round(beside.stopBottom)}px`);
+      const venue = await page.getByTestId('venue-canvas').boundingBox();
+      const render = await sim(page).render();
+      const cramped = await page.getByTestId('venue-cramped').isVisible();
+      if (venueDraws) {
+        assert(render.overviewRoom === true && render.contexts === 2 && !cramped, `venue view ${Math.round(venue.width)} × ${Math.round(venue.height)} did not draw`);
+      } else {
+        assert(render.overviewRoom === false && render.contexts === 1 && cramped, `a ${Math.round(venue.height)} px venue view started a context (${render.contexts}) or hid its note`);
+      }
       assert((await page.evaluate(() => document.documentElement.scrollHeight - window.innerHeight)) <= 1, 'the page itself scrolls');
-      return `${Math.round(collapsed.width)} × ${Math.round(collapsed.height)}, ${Math.round(shown.width)} × ${Math.round(shown.height)} with the venue view`;
+      return `${Math.round(collapsed.width)} × ${Math.round(collapsed.height)}, ${Math.round(shown.width)} × ${Math.round(shown.height)} with the venue view (${Math.round(venue.width)} × ${Math.round(venue.height)}${venueDraws ? '' : ', too small to draw'})`;
     } finally {
       await context.close();
     }

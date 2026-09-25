@@ -785,6 +785,19 @@ button:disabled {
   display: none;
 }
 
+.venue-cramped {
+  margin: 0;
+  padding: 6px 14px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* The stage keeps its (small) size so the view starts once there is room; its overlays would
+   only spill over the note. */
+.venue-panel[data-cramped="true"] :is(.venue-hint, .venue-legend) {
+  visibility: hidden;
+}
+
 .venue-canvas {
   display: block;
   width: 100%;
@@ -1980,9 +1993,10 @@ button:disabled {
    232 × 130 picture in a 779 px wide panel. When the venue view is collapsed or the monitor is
    expanded, landscape screens from 960 px wide and at least 4:3 move the controls into a column
    beside the monitor, so the picture takes the width left of them. Showing the venue view puts
-   it back beside the monitor, with the controls below. */
+   it back beside the monitor, with the controls below, on screens 900 px and taller; shorter
+   ones keep the column and put the venue view under the picture. */
 @media (orientation: landscape) and (min-width: 960px) and (min-aspect-ratio: 4/3) {
-  .sim-app:is([data-layout="desktop"], [data-layout="tablet"]):is([data-venue="collapsed"], [data-expanded="true"]) .sim-workspace {
+  .sim-app:is([data-layout="desktop"], [data-layout="tablet"]):is([data-venue="collapsed"], [data-expanded="true"], [data-short="true"]) .sim-workspace {
     grid-template-columns: minmax(0, 1fr) auto;
     grid-template-rows: minmax(0, 1fr) auto;
     grid-template-areas:
@@ -1990,58 +2004,65 @@ button:disabled {
       "venue controls";
   }
 
-  .sim-app:is([data-layout="desktop"], [data-layout="tablet"]):is([data-venue="collapsed"], [data-expanded="true"]) .controls-panel {
+  /* On a short screen (under 900 px, where the venue view starts collapsed) the controls stay in
+     their column when the venue view is shown, and the venue view takes the space under the
+     picture: 1024 × 768 used to leave it 10 px tall and the picture 223 × 125. */
+  .sim-app:is([data-layout="desktop"], [data-layout="tablet"])[data-short="true"][data-venue="shown"]:not([data-expanded="true"]) .sim-workspace {
+    grid-template-rows: minmax(0, 1.25fr) minmax(0, 1fr);
+  }
+
+  .sim-app:is([data-layout="desktop"], [data-layout="tablet"]):is([data-venue="collapsed"], [data-expanded="true"], [data-short="true"]) .controls-panel {
     display: flex;
     flex-direction: column;
     overflow-y: auto;
     overscroll-behavior: contain;
   }
 
-  .sim-app:is([data-layout="desktop"], [data-layout="tablet"]):is([data-venue="collapsed"], [data-expanded="true"]) .controls-grid {
+  .sim-app:is([data-layout="desktop"], [data-layout="tablet"]):is([data-venue="collapsed"], [data-expanded="true"], [data-short="true"]) .controls-grid {
     grid-template-columns: auto auto minmax(0, auto);
     gap: 12px 14px;
     margin-bottom: 8px;
   }
 
-  .sim-app:is([data-layout="desktop"], [data-layout="tablet"]):is([data-venue="collapsed"], [data-expanded="true"]) .preset-pad {
+  .sim-app:is([data-layout="desktop"], [data-layout="tablet"]):is([data-venue="collapsed"], [data-expanded="true"], [data-short="true"]) .preset-pad {
     grid-column: 1 / -1;
   }
 
   /* Every pixel this column saves widens the picture: the pad and the rocker set their columns'
      widths, and their hints and the speed figures wrap beneath or beside them. */
-  .sim-app:is([data-layout="desktop"], [data-layout="tablet"]):is([data-venue="collapsed"], [data-expanded="true"]) .joystick .control-label {
+  .sim-app:is([data-layout="desktop"], [data-layout="tablet"]):is([data-venue="collapsed"], [data-expanded="true"], [data-short="true"]) .joystick .control-label {
     max-width: 150px;
   }
 
-  .sim-app:is([data-layout="desktop"], [data-layout="tablet"]):is([data-venue="collapsed"], [data-expanded="true"]) .zoom-control .control-label {
+  .sim-app:is([data-layout="desktop"], [data-layout="tablet"]):is([data-venue="collapsed"], [data-expanded="true"], [data-short="true"]) .zoom-control .control-label {
     max-width: 88px;
   }
 
-  .sim-app:is([data-layout="desktop"], [data-layout="tablet"]):is([data-venue="collapsed"], [data-expanded="true"]) .speed-controls legend {
+  .sim-app:is([data-layout="desktop"], [data-layout="tablet"]):is([data-venue="collapsed"], [data-expanded="true"], [data-short="true"]) .speed-controls legend {
     max-width: 250px;
   }
 
-  .sim-app:is([data-layout="desktop"], [data-layout="tablet"]):is([data-venue="collapsed"], [data-expanded="true"]) .speed-detail {
+  .sim-app:is([data-layout="desktop"], [data-layout="tablet"]):is([data-venue="collapsed"], [data-expanded="true"], [data-short="true"]) .speed-detail {
     max-width: 64px;
     font-size: 11px;
     line-height: 1.25;
   }
 
   /* The column is short on height too: the presets' hint shares their heading's line. */
-  .sim-app:is([data-layout="desktop"], [data-layout="tablet"]):is([data-venue="collapsed"], [data-expanded="true"]) .preset-head .control-label {
+  .sim-app:is([data-layout="desktop"], [data-layout="tablet"]):is([data-venue="collapsed"], [data-expanded="true"], [data-short="true"]) .preset-head .control-label {
     flex-direction: row;
     flex-wrap: wrap;
     align-items: baseline;
     column-gap: 10px;
   }
 
-  .sim-app:is([data-layout="desktop"], [data-layout="tablet"]):is([data-venue="collapsed"], [data-expanded="true"]) .status-line {
+  .sim-app:is([data-layout="desktop"], [data-layout="tablet"]):is([data-venue="collapsed"], [data-expanded="true"], [data-short="true"]) .status-line {
     margin-top: auto;
   }
 
   /* The speed levels sit beside the picture, so the readout drops its copy of them and keeps to
      one line. */
-  .sim-app:is([data-layout="desktop"], [data-layout="tablet"]):is([data-venue="collapsed"], [data-expanded="true"]) .readout-speed {
+  .sim-app:is([data-layout="desktop"], [data-layout="tablet"]):is([data-venue="collapsed"], [data-expanded="true"], [data-short="true"]) .readout-speed {
     display: none;
   }
 }

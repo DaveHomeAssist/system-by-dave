@@ -11,6 +11,10 @@ interface Props {
   quality: number;
   /** The venue view's own WebGL context could not start; the monitor may still be fine. */
   overviewFailed: boolean;
+  /** The shown panel is too small to draw in, so the venue view has not started. */
+  overviewCramped: boolean;
+  /** The venue view's context was lost on its own; the monitor keeps running. */
+  overviewPaused: boolean;
   cutaway: boolean;
   onCutaway(): void;
   onToggle(): void;
@@ -25,9 +29,9 @@ const VIEWS: Array<{ view: OverviewPreset; label: string }> = [
   { view: "lawn", label: "Lawn" },
 ];
 
-export function VenuePanel({ state, canvasRef, shown, quality, overviewFailed, cutaway, onCutaway, onToggle, onView }: Props) {
+export function VenuePanel({ state, canvasRef, shown, quality, overviewFailed, overviewCramped, overviewPaused, cutaway, onCutaway, onToggle, onView }: Props) {
   return (
-    <section className="panel venue-panel" aria-labelledby="venue-title" data-shown={shown}>
+    <section className="panel venue-panel" aria-labelledby="venue-title" data-shown={shown} data-cramped={shown && overviewCramped}>
       <div className="panel-head">
         <h2 id="venue-title">Venue view</h2>
         {shown && quality > 0 && (
@@ -49,6 +53,12 @@ export function VenuePanel({ state, canvasRef, shown, quality, overviewFailed, c
           </button>
         </div>
       </div>
+      {/* Beside the header, not in the stage: a stage too small to draw in is too small to read. */}
+      {shown && overviewCramped && !overviewFailed && state.renderStatus === "ok" && (
+        <p className="venue-cramped" role="status" data-testid="venue-cramped">
+          Not enough room to draw the venue view here. Collapse it, expand the window, or turn the device.
+        </p>
+      )}
       <div className="venue-stage" id="venue-stage" hidden={!shown}>
         <canvas
           ref={canvasRef}
@@ -76,6 +86,12 @@ export function VenuePanel({ state, canvasRef, shown, quality, overviewFailed, c
           </li>
         </ul>
         {state.renderStatus !== "ok" && state.renderStatus !== "starting" && <GraphicsFallback status={state.renderStatus} note={state.renderNote} />}
+        {state.renderStatus === "ok" && overviewPaused && !overviewFailed && (
+          <div className="graphics-fallback" role="status" data-testid="venue-paused">
+            <strong>Venue view paused.</strong>
+            <p>The browser reset this view&rsquo;s graphics. It comes back on its own; the camera monitor and controls still work.</p>
+          </div>
+        )}
         {state.renderStatus === "ok" && overviewFailed && (
           <div className="graphics-fallback" role="status" data-testid="venue-unavailable">
             <strong>Venue view unavailable.</strong>

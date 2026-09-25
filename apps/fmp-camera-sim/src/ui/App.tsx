@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { downloadText, sessionFilename } from "../app/download";
 import { Engine } from "../app/engine";
-import { type LayoutClass, useLayoutClass, useStoreState } from "../app/hooks";
+import { type LayoutClass, useLayoutClass, useMediaQuery, useStoreState } from "../app/hooks";
 import { readExerciseLink } from "../app/links";
 import { SimulatorStore } from "../app/store";
 import { useTheme } from "../app/theme";
@@ -38,6 +38,9 @@ const CONTROLS_BESIDE_MONITOR = "(orientation: landscape) and (min-width: 960px)
  *  sit beside the monitor: sharing the monitor's row, the venue view left the picture a thumbnail
  *  (232 × 130 px on an iPad in Chrome, 1180 × 685). */
 const VENUE_SHOWN_MIN_HEIGHT = 900;
+/** The same screens keep the controls beside the monitor when the venue view is shown, with the
+ *  venue view under the picture: in the monitor's row it got 1002 × 10 px on a 1024 × 768 iPad. */
+const SHORT_SCREEN = `(max-height: ${VENUE_SHOWN_MIN_HEIGHT - 1}px)`;
 
 function venueDefault(layout: LayoutClass): boolean {
   if (layout === "ultrawide") return true;
@@ -56,6 +59,7 @@ export function App() {
   const layout = useLayoutClass();
   const phone = layout === "phone";
   const docked = layout === "ultrawide";
+  const short = useMediaQuery(SHORT_SCREEN);
 
   const [cutaway, setCutaway] = useState(true);
   const [venueShown, setVenueShown] = useState(() => venueDefault(layout));
@@ -67,6 +71,8 @@ export function App() {
   const [onboardingOpen, setOnboardingOpen] = useState(() => shouldShowOnboarding());
   const [quality, setQuality] = useState(0);
   const [overviewFailed, setOverviewFailed] = useState(false);
+  const [overviewCramped, setOverviewCramped] = useState(false);
+  const [overviewPaused, setOverviewPaused] = useState(false);
 
   const monitorRef = useRef<HTMLCanvasElement>(null);
   const overviewRef = useRef<HTMLCanvasElement>(null);
@@ -97,7 +103,9 @@ export function App() {
           onContextRestored: () => store.setRenderStatus("ok"),
           onQualityChange: setQuality,
           onOverviewUnavailable: () => setOverviewFailed(true),
-        });
+          onOverviewRoom: (room) => setOverviewCramped(!room),
+          onOverviewPaused: setOverviewPaused,
+        }, { continuous: new URLSearchParams(window.location.search).get("render") === "always" });
         renderer.setGeometry(store.getState().geometry, store.getState().project.session.showPackage);
         renderer.setTheme(themeRef.current);
         store.setRenderStatus("ok");
@@ -176,6 +184,8 @@ export function App() {
         return { forward: frame.forward, position: frame.position, hfovDeg: frame.hfovDeg };
       },
       render: () => rendererRef.current?.getDiagnostics() ?? null,
+      /** Draws both views on the next frame, so a probe can read back pixels of a still picture. */
+      invalidate: () => rendererRef.current?.invalidate(),
       release: () => ({ ...RELEASE }),
       state: () => {
         const s = store.getState();
@@ -231,6 +241,7 @@ export function App() {
     <div
       className="sim-app"
       data-layout={layout}
+      data-short={short}
       data-expanded={expanded}
       data-venue={venueShown ? "shown" : "collapsed"}
       data-panel={panelOpen ? "open" : "closed"}
@@ -293,6 +304,8 @@ export function App() {
           shown={phone ? mobileTab === "venue" : venueShown && !expanded}
           quality={quality}
           overviewFailed={overviewFailed}
+          overviewCramped={overviewCramped}
+          overviewPaused={overviewPaused}
           onToggle={() => {
             if (expanded) setExpanded(false);
             setVenueShown((value) => !value);
