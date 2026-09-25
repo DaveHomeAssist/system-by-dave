@@ -13,6 +13,10 @@ Minor versions add features or change a saved-file format; patch versions fix or
 
 Versions 1.0.0 to 1.5.3 were numbered after the fact from their merged pull requests.
 
+## 1.11.2 — 2026-09-25 — Readable scope line
+
+- The header's scope line ("Framing, zoom, and presets only — not SuperJoy or focus") drops its 0.78 opacity and uses the full muted ink: it measured 3.97:1 on the light surface, and is now 6.7:1.
+
 ## 1.11.1 — 2026-09-25 — Wide shot starts tight; Clear results asks first
 
 - "Establish a wide shot" now starts on a tight shot of downstage right (6° field of view on the downstage-right mark) instead of the camera's home pose. On the provisional 113 ft stage, home already framed the whole downstage edge (73% fill, every marker inside), so the exercise completed after its one-second hold with no input. Tests check that the starting shot fails on every stage profile and that the exercise waits for the operator.

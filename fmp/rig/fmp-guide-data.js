@@ -149,7 +149,9 @@ export const catalog = {
     "source": "https://documents.blackmagicdesign.com/UserManuals/BlackmagicURSABroadcastG2Manual.pdf#page=13",
     "sourceLabel": "Lens control reference",
     "equipmentSource": "/fmp/gear/#lens",
-    "equipmentSourceLabel": "Camera equipment · lens"
+    "equipmentSourceLabel": "Camera equipment · lens",
+    "practice": "/shader/practice.html?demo=iris",
+    "practiceLabel": "Practise iris on simulated scopes: Shading practice"
   },
   "focus-module": {
     "title": "Fujinon FMM-X1 manual focus module",
@@ -214,7 +216,9 @@ export const catalog = {
     "source": "https://documents.blackmagicdesign.com/UserManuals/BlackmagicURSABroadcastG2Manual.pdf#page=13",
     "sourceLabel": "Lens controls · manual pp. 13–17",
     "equipmentSource": "/fmp/gear/#lens",
-    "equipmentSourceLabel": "Camera equipment · lens"
+    "equipmentSourceLabel": "Camera equipment · lens",
+    "practice": "/shader/practice.html?demo=iris",
+    "practiceLabel": "Practise iris on simulated scopes: Shading practice"
   },
   "push-auto": {
     "title": "PUSH AUTO",
@@ -230,7 +234,9 @@ export const catalog = {
     "source": "https://documents.blackmagicdesign.com/UserManuals/BlackmagicURSABroadcastG2Manual.pdf#page=13",
     "sourceLabel": "Lens controls · manual pp. 13–17",
     "equipmentSource": "/fmp/gear/#lens",
-    "equipmentSourceLabel": "Camera equipment · lens"
+    "equipmentSourceLabel": "Camera equipment · lens",
+    "practice": "/shader/practice.html?demo=iris",
+    "practiceLabel": "Practise iris on simulated scopes: Shading practice"
   },
   "ret": {
     "title": "RET button",
@@ -801,7 +807,9 @@ export const catalog = {
     "purpose": "Provides local camera and panel-light controls at the back of the rig.",
     "use": "Use LIGHT for the panel light and REC for camera recording. FOCUS and IRIS require a compatible camera and electronically controllable lens.",
     "check": "Confirm lens compatibility and camera response before relying on remote adjustment.",
-    "tip": "The FOCUS button does not establish that this lens has autofocus. The rig’s twist-focus grip drives the separate FMM-X1 manual mechanism."
+    "tip": "The FOCUS button does not establish that this lens has autofocus. The rig’s twist-focus grip drives the separate FMM-X1 manual mechanism.",
+    "practice": "/shader/practice.html?demo=iris",
+    "practiceLabel": "Practise iris on simulated scopes: Shading practice"
   },
   "fiber-intercom": {
     "equipment": "rig",
@@ -1304,7 +1312,9 @@ export const catalog = {
     "check": "For an unexpectedly dark image, include ND in the exposure check. Coordinate any change with the shader.",
     "tip": "ND changes light reaching the sensor. It does not change viewfinder brightness. The four-position explainer below is a teaching example.",
     "title": "ND filter wheel",
-    "purpose": "Internal optical filter: Clear, 2, 4 or 6 stops of light reduction."
+    "purpose": "Internal optical filter: Clear, 2, 4 or 6 stops of light reduction.",
+    "practice": "/shader/#nd",
+    "practiceLabel": "ND on this body: Camera control & shading reference"
   },
   "body-power": {
     "equipment": "rig",
@@ -1416,7 +1426,9 @@ export const catalog = {
     "check": "Confirm the agreed gain with the shader.",
     "tip": "Spring loaded: one push is one third of a stop, and the range runs —12 to 36 dB. Gain buys exposure and costs noise, so try shutter or iris first.",
     "title": "ISO / GAIN switch",
-    "purpose": "Adjusts camera gain."
+    "purpose": "Adjusts camera gain.",
+    "practice": "/shader/practice.html?demo=gain",
+    "practiceLabel": "Practise gain on simulated scopes: Shading practice"
   },
   "body-shutter": {
     "equipment": "rig",
@@ -1448,7 +1460,9 @@ export const catalog = {
     "check": "Coordinate camera matching with the shader.",
     "tip": "One push is 50K; hold to move faster. Warmer light needs a higher number. For a real match use the auto white balance button with a grey card rather than trimming by eye.",
     "title": "WHITE BAL switch",
-    "purpose": "Adjusts white-balance color temperature."
+    "purpose": "Adjusts white-balance color temperature.",
+    "practice": "/shader/practice.html?demo=whiteBalance",
+    "practiceLabel": "Practise white balance on simulated scopes: Shading practice"
   },
   "body-auto-wb": {
     "equipment": "rig",
@@ -1464,7 +1478,9 @@ export const catalog = {
     "check": "Use the specified target and coordinate with the shader.",
     "tip": "The manual identifies this front-edge button; the supplied side photo does not show its label clearly.",
     "title": "AUTO W/B button",
-    "purpose": "Starts an automatic white-balance measurement."
+    "purpose": "Starts an automatic white-balance measurement.",
+    "practice": "/shader/practice.html?demo=whiteBalance",
+    "practiceLabel": "Practise white balance on simulated scopes: Shading practice"
   },
   "body-f1": {
     "equipment": "rig",
@@ -1688,7 +1704,9 @@ export const catalog = {
     "check": "Coordinate with the shader before using.",
     "tip": "One press sets an automatic exposure on a compatible lens. In video dynamic range it averages across highlights and shadows; in film dynamic range it exposes for the brightest highlight instead, which is a different picture.",
     "title": "IRIS button",
-    "purpose": "Requests automatic iris on compatible lenses."
+    "purpose": "Requests automatic iris on compatible lenses.",
+    "practice": "/shader/practice.html?demo=iris",
+    "practiceLabel": "Practise iris on simulated scopes: Shading practice"
   },
   "door-focus": {
     "equipment": "rig",

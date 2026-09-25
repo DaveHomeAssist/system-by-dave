@@ -50,6 +50,13 @@ function checkTarget(path) {
   const hashPart = new URLSearchParams(path.split('#')[1] ?? '').get('part');
   if (hashPart && path.startsWith('/fmp/models/ccu4.html')) assert.ok(ccu4Parts.has(hashPart), `${path}: the shader panel explorer has no part "${hashPart}"`);
   if (hashPart && path.startsWith('/fmp/models/p240.html')) assert.ok(p240Parts.has(hashPart), `${path}: the P240 explorer has no part "${hashPart}"`);
+  if (path.startsWith('/shader/practice.html')) {
+    const params = new URLSearchParams(path.split(/[?#]/)[1] ?? '');
+    if (params.has('demo')) assert.ok(Practice.DEMO_SWEEPS[params.get('demo')], `${path}: Shading practice has no ?demo=${params.get('demo')} sweep`);
+    if (params.has('scenario')) assert.ok(Practice.SCENARIOS[params.get('scenario')], `${path}: Shading practice has no ?scenario=${params.get('scenario')}`);
+  }
+  const anchor = path.startsWith('/shader/#') ? path.slice('/shader/#'.length) : null;
+  if (anchor) assert.ok(shaderIndex.includes(`id="${anchor}"`), `${path}: the shading reference has no #${anchor}`);
 }
 
 test('every link the simulator renders exists and is listed in the contract', () => {
@@ -92,15 +99,52 @@ test('the static links on the shading pages exist', () => {
 
 test('the incoming links other tools may use resolve', () => {
   for (const control of ['iris', 'pedestal', 'gain', 'whiteBalance']) {
-    assert.ok(Practice.DEMO_SWEEPS[control], `Shading practice has no ?demo=${control} sweep, which PR B links to`);
+    assert.ok(Practice.DEMO_SWEEPS[control], `Shading practice has no ?demo=${control} sweep`);
     assert.ok(doc.includes(`?demo=${control}`), `docs/camera-training-links.md does not list ?demo=${control}`);
   }
   const scenarios = Practice.scenarioList().map((scenario) => scenario.id);
   assert.ok(scenarios.includes('match-cameras'), 'the match-cameras scenario the preshow checklist names is gone');
   assert.ok(doc.includes('?scenario=match-cameras'), 'docs/camera-training-links.md does not list ?scenario=match-cameras');
-  for (const id of ['iris', 'push-auto', 'door-iris', 'fiber-camera-controls', 'body-gain', 'body-wb', 'body-auto-wb', 'nd-filter']) {
-    assert.ok(rigCatalog[id], `the rig explorer has no part "${id}", which PR B links to Shading practice`);
+});
+
+// The FMP pages are a managed export from fmp-suite; these read the exported bytes.
+test('the rig explorer links each practised control to a target that exists', () => {
+  const linked = Object.entries(rigCatalog).filter(([, item]) => item.practice);
+  assert.deepEqual(linked.map(([id]) => id).sort(), ['body-auto-wb', 'body-gain', 'body-wb', 'door-iris', 'fiber-camera-controls', 'iris', 'iris-mode', 'nd-filter', 'push-auto']);
+  for (const [id, item] of linked) {
+    checkTarget(item.practice);
+    assert.ok(item.practiceLabel, `rig part ${id} links ${item.practice} without a label`);
+    assert.ok(doc.includes(`\`${id}\``), `docs/camera-training-links.md does not list rig part ${id}`);
   }
+  assert.ok(read('fmp/rig/index.html').includes('data-practice-row'), 'the rig explorer lost its practice link');
+});
+
+test('the shader panel and P240 explorers link their practised controls', () => {
+  const ccu4 = read('fmp/models/assets/ccu4-0.js');
+  const table = ccu4.match(/const PRACTICE=\{([^}]*)\};/)?.[1];
+  assert.ok(table, 'fmp/models/assets/ccu4-0.js has no PRACTICE table');
+  const entries = [...table.matchAll(/([\w-]+):\['(\w+)'/g)].map(([, part, demo]) => ({ part, demo }));
+  assert.deepEqual(entries.map(({ part }) => part).sort(), ['flare', 'gain', 'joystick', 'wb']);
+  for (const { part, demo } of entries) {
+    for (const channel of [1, 2, 3]) assert.ok(ccu4Parts.has(`ccu4.ch${channel}.${part}`), `the shader panel explorer has no ccu4.ch${channel}.${part}`);
+    checkTarget(`/shader/practice.html?demo=${demo}`);
+    assert.ok(doc.includes(`?demo=${demo}`), `docs/camera-training-links.md does not list ?demo=${demo}`);
+  }
+  // Channel 4 is labelled 4 PTZ but drives the P240, so the pattern must stop at channel 3.
+  assert.ok(ccu4.includes('/^ccu4\\.ch[123]\\.([\\w-]+)$/'), 'the shader panel explorer may link channel 4 to Shading practice');
+  assert.ok(ccu4.includes("/shader/practice.html?scenario=match-cameras"), 'the shader panel overview no longer links the match-cameras exercise');
+  const p240 = read('fmp/models/assets/p240-0.js');
+  const parts = JSON.parse((p240.match(/practice\(E,c\)\{return !c\|\|(\[[^\]]*\])/)?.[1] ?? 'null').replaceAll("'", '"'));
+  assert.deepEqual(parts, ['p240.lens', 'p240.pan-axis', 'p240.tilt-axis']);
+  for (const part of parts) assert.ok(p240Parts.has(part), `the P240 explorer has no part ${part}`);
+  assert.ok(p240.includes("href:'/camera-sim/'"), 'the P240 explorer no longer links the Camera Simulator');
+  for (const page of ['fmp/models/ccu4.html', 'fmp/models/p240.html']) assert.ok(read(page).includes('data-practice'), `${page} lost its practice link`);
+});
+
+test('the FMP hub and bowl camera guide link Shading practice', () => {
+  const hrefs = [...`${read('fmp/index.html')}\n${read('fmp/guide/index.html')}`.matchAll(/href="(\/(?:shader|camera-sim)[^"]*)"/g)].map(([, href]) => href.replaceAll('&amp;', '&'));
+  for (const required of ['/shader/practice.html', '/shader/practice.html?scenario=match-cameras', '/shader/']) assert.ok(hrefs.includes(required), `the FMP pages no longer link ${required}`);
+  for (const href of hrefs) checkTarget(href);
 });
 
 // Suggestions link each tool to the other's next step by the ids in the shared

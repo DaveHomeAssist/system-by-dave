@@ -12,6 +12,11 @@ Public System by Dave copy uses canonical names, title families, and registry-ba
   private Electron desktop application and must not be used as a name, route
   alias, registry id, export schema, or description for Cue Sheet.
 - **PlotForge**, **PixelForge**, **NoteForge**, and **Ballpark Scorecard** retain their product spellings.
+- **Shader panel** — the FMP camera pages' name for the Blackmagic ATEM Camera Control Panel
+  (SWPANELCCU4). Use "shader panel (ATEM Camera Control Panel)" on first mention on a page and
+  "shader panel" after that. `/shader/` is **Camera control & shading**, its page title,
+  wherever it is linked. The shader panel shades Cameras 1–3 only
+  (`docs/camera-training-links.md`).
 
 ## Title families
 

@@ -1,5 +1,5 @@
 import * as T from './vendor/three/three.module.js';
-import { photos, catalog } from './fmp-guide-data.js?v=b93d19fe3eb3fce8';
+import { photos, catalog } from './fmp-guide-data.js?v=7e81179c304197c0';
 const root=document.getElementById('fmp-rig-3d');
 root.dataset.ready='true';
 const themeButton=document.getElementById('themeBtn');
@@ -820,9 +820,12 @@ function selectPart(id,focus=false){
     $('[data-photo-note]').textContent=item.photoNote||'Supplied photo · model proportions and cable curves are approximate.';
     $('[data-source]').href=item.source||'';$('[data-source]').textContent=item.sourceLabel||'';$('[data-source]').hidden=!item.source;
     $('[data-equipment-source]').href=item.equipmentSource||'';$('[data-equipment-source]').textContent=item.equipmentSourceLabel||'Camera equipment record';$('[data-equipment-source]').hidden=!item.equipmentSource;
+    // Controls that change the picture link the matching Shading practice sweep (same tab: it is a suite page).
+    $('[data-practice]').href=item.practice||'';$('[data-practice]').textContent=item.practice?`${item.practiceLabel} →`:'';$('[data-practice-row]').hidden=!item.practice;
     $('[data-evidence]').textContent=item.evidence||'';$('[data-evidence]').hidden=!item.evidence;
     if(focus){if(item.lcdOpening!==undefined)setLcdOpening(item.lcdOpening);setPose(item.pose);}
   }else{
+    $('[data-practice-row]').hidden=true;
     $('[data-title]').textContent=equipment==='rig'?'Explore the camera rig':'Explore the studio converter';
     $('[data-direction]').textContent=equipment==='rig'?'URSA G2 · Fujinon LA16 · Vinten support · zoom and twist-focus handles':'Separate control-room unit · front controls and rear connections';
     $('[data-purpose]').textContent='Tap a part on the model, or choose one from the menu.';
