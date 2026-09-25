@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-25 — FMP rig: no layout jump, shadow map drawn once
+
+- Re-exported `fmp/` from fmp-suite `c337798` (fmp-suite PR #25). The rig page carries `data-ready="true"` in its HTML, so the desktop workspace layout applies from the first paint instead of shifting when three.js finishes loading (lab layout shift 0.601 to 0.004 with the engine delayed 1.5 s).
+- `rig-model.js` draws the key-light shadow map once and redraws it only after an LCD, fiber or equipment change, cutting GL draws per orbit frame from 2,167 to 1,143. It uses `PCFShadowMap` (the r184 soft filter) and a PMREM sigma inside the sample limit, so the page logs no `THREE.*` warnings, and asks for the low-power GPU.
+- From the three.js apps audit. The switcher guide rebuild found no change.
+
 ## 2026-09-25 — The ATEM switcher guide loads in kilobytes, with an offline download
 
 - `/switcher/guide/` was a 5.3 MB single file (3.65 MB transfer): an older copy of the ATEM HD8 ISO explorer with the four reference photos and three.js pasted in. It is now a 13 KB page generated from the exported model page `fmp/models/atem-hd8-iso.html` by `npm run build:switcher-guide`. It loads the shared `/fmp/models/` scripts, styles and three.js, and the photos only when one is opened. It picks up the model page's later fixes (hidden-tab guard, pagehide disposal, whole-device selection, newer catalog text).
