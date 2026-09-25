@@ -98,6 +98,29 @@ When `cutover` is `true`:
   (`python3 scripts/gen_sitemap.py --site <id> --out <path>`), and its
   `robots.txt` allows crawling with the configured disallow rules.
 
+### Crawl policy for blocked routes
+
+A crawler that obeys `robots.txt` never fetches a blocked page, so it never reads
+that page's noindex tag. When an indexed page links to it, as the five FMP
+reference pages link to `/fmp/`, the bare address can still be listed. A site's
+`robotsAllow` reopens the HTML under a blocked route so the tag is read. On
+housevideo.app that is every page under `/fmp/` and `/camera-sim/`
+(`/fmp/$`, `/fmp/*/$`, `/fmp/*.html$` and the same for `/camera-sim/`).
+
+Everything else under those routes stays blocked: GitHub Pages cannot send an
+`X-Robots-Tag` header, so the display CSV, catalogs, scripts and photos could
+not otherwise be kept out of search. The one exception is written by the stager
+itself: every `og:image` or `twitter:image` a staged page names on its own
+domain gets an exact `Allow: <path>$` line, because link-preview crawlers obey
+`robots.txt` too.
+
+`npm run verify:domain-sites` walks every staged file under a reopened route and
+fails unless each page is fetchable and declares noindex, each link-preview
+image is fetchable, and every other file is blocked. Matching follows Google's
+rules (`*`, a trailing `$`, longest pattern wins, Allow wins a tie);
+`scripts/domain_robots.test.mjs` covers it. A crawler without wildcard support
+reads the Allow patterns literally, matches nothing, and stays blocked.
+
 ### Saved browser data
 
 AV offline readiness requires both a complete cache and control of the current
