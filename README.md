@@ -48,7 +48,7 @@ use the tooling selected for that surface.
 | `av-calculator.html` | Six quick AV calculations and a copyable field summary on avbydave.com |
 | `led-wall-calculator.html` | Viewport LED wall planner with cabinet preview, mobile results and section jumps, manufacturer-PF-gated current estimates, and a Power Load handoff on avbydave.com; [operator and verification notes](docs/led-wall-calculator.md) |
 | `av-suite-landing2.html` | Source for the avbydave.com home page, staged as `/` on that domain |
-| `av-suite-landing.html` | Previous noindex landing, retained at its direct route for comparison |
+| `av-suite-landing.html` | Retired previous landing; a noindex redirect to the current AV by Dave home (UX-005) |
 | `depotops/index.html` | Local-first project shopping, inventory, and tool tracking |
 | `pixelforge/` | PixelForge editor |
 | `resume/index.html` | Public resume |
@@ -80,8 +80,8 @@ npm run verify:domain-sites
 
 The AV domain root is the show-first Show Console and Toolbox landing page. Its
 source is `av-suite-landing2.html`; the staging script publishes it as `/`, while
-`av-suite.html` remains the stable operator doorway. The previous landing stays
-available at `/av-suite-landing.html` as a noindex comparison route.
+`av-suite.html` remains the stable operator doorway. The previous landing was
+retired (UX-005); `/av-suite-landing.html` now redirects to the current home.
 
 `docs/domain-sites.md` covers the page lists, saved-data transfer, and the
 cutover checklist.

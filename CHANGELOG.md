@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-09-25 — AV by Dave keeps one landing page
+
+- Dave retired the previous AV by Dave landing (UX-005). `av-suite-landing.html` is now a small noindex page that redirects to `av-suite-landing2.html`, the page avbydave.com already serves at `/`, so old links and bookmarks still land. Its stylesheet and script (`css/av-landing.css`, `js/av-landing.js`) are removed.
+- The AV offline shell no longer caches the retired page or its assets. Offline cache version `v20260925-landing-retire`, so installed copies drop them.
+
 ## 2026-09-25 — FMP is the parent of the switcher and URSA references
 
 - `/switcher/`, its interactive guide (and offline copy), and `/ursa-broadcast-g2/` now name FMP Video Operations as their parent in the site bar, as `/shader/` already does; AV Toolbox stays as a secondary link (Dave, 2026-09-25). The guide's bar comes from `scripts/build_switcher_guide.mjs`, rebuilt with `npm run build:switcher-guide`.
