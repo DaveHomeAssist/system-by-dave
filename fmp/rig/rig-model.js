@@ -1,7 +1,6 @@
 import * as T from './vendor/three/three.module.js';
 import { photos, catalog } from './fmp-guide-data.js?v=7e81179c304197c0';
 const root=document.getElementById('fmp-rig-3d');
-root.dataset.ready='true';
 const themeButton=document.getElementById('themeBtn');
 function applyTheme(theme) {
   if (document.documentElement.dataset.embed === 'gear-reference') theme = new URLSearchParams(location.search).get('theme') === 'dark' ? 'dark' : 'light';
@@ -384,7 +383,7 @@ function setLcdOpening(degrees){
   $('[data-lcd-opening-value]').textContent=lcdOpening===0?'Closed':lcdOpening+'°';
   $('[data-lcd-opening]').setAttribute('aria-valuetext',lcdOpening===0?'Closed':`${lcdOpening} degrees open`);
   if(lcdHinge)lcdHinge.rotation.y=-T.MathUtils.degToRad(lcdOpening);
-  requestDraw();
+  invalidateShadows();requestDraw();
 }
 function makeStudioViewfinder(rig){
   // Operator face points rearward (+X); its V-lock foot sits on the fiber converter.
@@ -553,7 +552,7 @@ function setFiberAngle(degrees){
   const curve=new T.CatmullRomCurve3(points);
   fiberCable.geometry.dispose();
   fiberCable.geometry=new T.TubeGeometry(curve,96,.068,10,false);
-  requestDraw();
+  invalidateShadows();requestDraw();
 }
 function makeSupport(rig){
   // Vinten-style support; exact head, legs and demand models were not identified.
@@ -784,6 +783,9 @@ function draw(time){
   }
   if(animation) requestDraw();
 }
+// The scene and key light only move when an articulation or the equipment changes, so the
+// shadow map is rendered once and redrawn only after those edits (not on every orbit frame).
+function invalidateShadows(){if(renderer)renderer.shadowMap.needsUpdate=true;}
 function requestDraw(){if(!frame&&!destroyed&&(!suspended||root.dataset.renderReady!=='true')&&!contextLost&&renderer)frame=requestAnimationFrame(draw);}
 function setPose(key,instant=false){
   const p=poses[key]||poses.beauty;let az=p.az;
@@ -915,6 +917,7 @@ function switchEquipment(next){
   if(lesson)closeLesson();
   equipment=next;hovered='';$('[data-hover]').textContent='';
   for(const [id,model] of Object.entries(models))model.visible=id===equipment;
+  invalidateShadows();
   root.querySelectorAll('[data-equipment]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.equipment===equipment)));
   $('[data-stage-label]').textContent=equipment==='rig'?'URSA G2 · Fujinon LA16 · Vinten support':'Studio Fiber Converter · front and rear';
   $('[data-guide-title]').textContent=equipment==='rig'?'Camera rig · 3D explorer':'Studio converter · 3D explorer';
@@ -936,15 +939,15 @@ function setupEnvironment(){
   for(const [pos,size,intensity] of [[[0,5,0],[8,5],4],[[5,0,1],[5,7],2.5],[[-5,2,0],[4,8],3.0]]){
     const card=new T.Mesh(new T.PlaneGeometry(...size),new T.MeshBasicMaterial({color:new T.Color(intensity,intensity,intensity),side:T.DoubleSide}));card.position.set(...pos);card.lookAt(0,0,0);envScene.add(card);
   }
-  const pmrem=new T.PMREMGenerator(renderer);environmentTarget=pmrem.fromScene(envScene,.05);scene.environment=environmentTarget.texture;pmrem.dispose();
+  const pmrem=new T.PMREMGenerator(renderer);environmentTarget=pmrem.fromScene(envScene,.04);scene.environment=environmentTarget.texture;pmrem.dispose();
   envScene.traverse(object=>{object.geometry?.dispose();object.material?.dispose();});
 }
 function setupScene(){
   scene=new T.Scene();camera=new T.PerspectiveCamera(37,1,.05,70);
-  renderer=new T.WebGLRenderer({canvas,antialias:true,alpha:true,powerPreference:'high-performance'});
+  renderer=new T.WebGLRenderer({canvas,antialias:true,alpha:true,powerPreference:'low-power'});
   renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.7));renderer.setClearColor(0,0);
   renderer.outputColorSpace=T.SRGBColorSpace;renderer.toneMapping=T.ACESFilmicToneMapping;renderer.toneMappingExposure=1.2;
-  renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFSoftShadowMap;
+  renderer.shadowMap.enabled=true;renderer.shadowMap.type=T.PCFShadowMap;renderer.shadowMap.autoUpdate=false;renderer.shadowMap.needsUpdate=true;
   const hemi=new T.HemisphereLight(0xdbe7f3,0x72767b,2.05);scene.add(hemi);
   const key=new T.DirectionalLight(0xfff2dc,4.2);key.position.set(-3,8,6);key.castShadow=true;key.shadow.mapSize.set(1536,1536);key.shadow.camera.left=-7;key.shadow.camera.right=7;key.shadow.camera.top=6;key.shadow.camera.bottom=-13;key.shadow.normalBias=.025;key.shadow.bias=-.0001;scene.add(key);
   const fill=new T.DirectionalLight(0xd6e8ff,2.15);fill.position.set(1,4,-6);scene.add(fill);
@@ -1089,7 +1092,7 @@ canvas.addEventListener('webglcontextlost',event=>{
   event.preventDefault();contextLost=true;cancelAnimationFrame(frame);frame=0;
   $('[data-failure]').hidden=false;root.dataset.renderReady='false';
 });
-canvas.addEventListener('webglcontextrestored',()=>{if(!destroyed){contextLost=false;setupEnvironment();resize();requestDraw();}});
+canvas.addEventListener('webglcontextrestored',()=>{if(!destroyed){contextLost=false;setupEnvironment();invalidateShadows();resize();requestDraw();}});
 function dispose(){
   if(destroyed)return;
   destroyed=true;cancelAnimationFrame(frame);resizeObserver?.disconnect();themeObserver?.disconnect();visibilityObserver?.disconnect();
