@@ -73,6 +73,11 @@ jobs:
           CHROME_CHANNEL: chrome
         run: npm run test:av-suite-import-browser
 
+      - name: Verify AV save safety
+        env:
+          CHROME_CHANNEL: chrome
+        run: npm run test:av-save-safety-browser
+
       - name: Verify Throwline release contract
         run: npm run verify:throwline
 

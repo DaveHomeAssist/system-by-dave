@@ -70,6 +70,32 @@ a name, venue, operator, readiness or notes, both imports ask before replacing
 it, and a successful suite import offers Undo, which restores the previous show.
 `scripts/probe_av_suite_import.mjs` release-gates this behaviour.
 
+## Save safety
+
+- **Show details from the console.** When a tool opens with `sbd*` show
+  parameters but already holds saved work for a different show, it keeps its
+  saved show and asks: **Keep** it, or **Switch** to the console's show. Nothing
+  is written until the operator chooses. Keep is remembered for that tool and
+  pair of show names for the rest of the browser session
+  (`sessionStorage` key `sbd-context-choice.v1`). A tool with no saved data, an
+  "Untitled" default or the same show name takes the console's details
+  straight away, as before.
+- **Another tab.** If another tab changes a tool's registry storage keys, the
+  open copy says so and offers **Reload** or **Keep editing here** (the next
+  save from this tab replaces the other tab's change).
+- **Storage full or blocked.** Tool pages (through `js/sbd-nav.js`) and the
+  console show a notice when a save is refused because storage is full, or when
+  the browser is not saving at all, and tell the operator to export.
+- **Unreadable saved show.** If `av-suite-dashboard.v1` cannot be read, the
+  console starts empty, says so, and keeps the unreadable value under
+  `av-suite-dashboard.v1.unreadable` (written once, never overwritten) so it can
+  be recovered by hand.
+- **Offline.** A page inside the worker's scope that was never saved for
+  offline use opens a small "You're offline" page linking to the Show Console
+  and Toolbox instead of the browser's error page.
+
+`scripts/probe_av_save_safety.mjs` release-gates this behaviour.
+
 ## Motion and accessibility
 
 Workspace changes use the vendored local GSAP build for short opacity and

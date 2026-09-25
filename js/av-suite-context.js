@@ -162,7 +162,108 @@
     }
   }
 
+  /* UX-001: a tool that already holds a different saved show keeps it until
+     the operator chooses. Fresh tools, "Untitled" defaults and matching
+     names still take the console's show details straight away. */
+  var CHOICE_KEY = 'sbd-context-choice.v1';
+
+  function showNameInput(){
+    return byId('showName') || byId('showTitle');
+  }
+
+  function toolHasSavedData(){
+    var REG = window.SBD_REGISTRY;
+    var tool = REG && REG.toolById ? REG.toolById(currentToolId()) : null;
+    if(!tool || !tool.storageKeys || !storageAvailable()) return false;
+    return tool.storageKeys.some(function(item){
+      var value = localStorage.getItem(item.key);
+      return value !== null && String(value).trim() !== '';
+    });
+  }
+
+  function savedShowConflict(){
+    var input = showNameInput();
+    var saved = input ? clean(input.value, 120) : '';
+    if(!context.showName || !saved || saved === context.showName) return '';
+    if(/^untitled\b/i.test(saved) || saved === clean(input.defaultValue, 120)) return '';
+    return toolHasSavedData() ? saved : '';
+  }
+
+  function choiceId(saved){
+    return currentToolId() + '|' + saved + '|' + context.showName;
+  }
+
+  function rememberedKeep(saved){
+    try{
+      return JSON.parse(sessionStorage.getItem(CHOICE_KEY) || '{}')[choiceId(saved)] === 'keep';
+    }catch(e){
+      return false;
+    }
+  }
+
+  function rememberKeep(saved){
+    try{
+      var choices = JSON.parse(sessionStorage.getItem(CHOICE_KEY) || '{}');
+      if(!choices || typeof choices !== 'object') choices = {};
+      choices[choiceId(saved)] = 'keep';
+      sessionStorage.setItem(CHOICE_KEY, JSON.stringify(choices));
+    }catch(e){}
+  }
+
+  function showChoicePrompt(saved){
+    var tool = toolNameFromId(currentToolId());
+    var box = document.createElement('div');
+    var text = document.createElement('p');
+    var keep = document.createElement('button');
+    var change = document.createElement('button');
+    var style = document.createElement('style');
+    style.textContent = [
+      '.sbd-context-choice{position:fixed;left:14px;bottom:78px;z-index:10000;display:flex;flex-wrap:wrap;align-items:center;gap:8px;width:min(460px,calc(100vw - 28px));padding:12px;border:1px solid #f0b35a;border-radius:10px;background:rgba(8,13,20,.96);box-shadow:0 10px 28px rgba(0,0,0,.34);color:#f4f8ff;font:600 13px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}',
+      '.sbd-context-choice p{flex:1 1 100%;margin:0}',
+      '.sbd-context-choice button{appearance:none;flex:1 1 180px;min-height:44px;border:1px solid rgba(114,244,233,.6);border-radius:8px;padding:8px 12px;color:#f4f8ff;background:rgba(22,34,49,.92);font:700 12px -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;cursor:pointer;overflow-wrap:anywhere}',
+      '.sbd-context-choice button:hover{border-color:#72f4e9;background:rgba(27,43,60,.98)}',
+      '.sbd-context-choice button:focus-visible{outline:2px solid #72f4e9;outline-offset:2px}',
+      '@media (max-width:680px){.sbd-context-choice{left:10px;right:10px;bottom:auto;top:10px;width:auto}}',
+      '@media print{.sbd-context-choice{display:none!important}}'
+    ].join('');
+    box.className = 'sbd-context-choice';
+    box.setAttribute('role', 'region');
+    box.setAttribute('aria-label', 'Choose which show this tool uses');
+    box.setAttribute('data-sbd-context-choice', 'true');
+    text.setAttribute('aria-live', 'polite');
+    text.textContent = 'This ' + tool + ' is saved for \u201c' + saved + '\u201d. The console is on \u201c' + context.showName + '\u201d.';
+    keep.type = 'button';
+    keep.textContent = 'Keep \u201c' + saved + '\u201d';
+    keep.setAttribute('data-sbd-context-keep', 'true');
+    change.type = 'button';
+    change.textContent = 'Switch to \u201c' + context.showName + '\u201d';
+    change.setAttribute('data-sbd-context-switch', 'true');
+    keep.addEventListener('click', function(){
+      rememberKeep(saved);
+      box.remove();
+    });
+    change.addEventListener('click', function(){
+      box.remove();
+      applyContextFields();
+    });
+    box.appendChild(text);
+    box.appendChild(keep);
+    box.appendChild(change);
+    document.head.appendChild(style);
+    document.body.appendChild(box);
+  }
+
   function hydrate(){
+    var saved = savedShowConflict();
+    if(saved){
+      if(!rememberedKeep(saved)) showChoicePrompt(saved);
+    }else{
+      applyContextFields();
+    }
+    addSuiteDock();
+  }
+
+  function applyContextFields(){
     var applied = false;
     applied = firstExisting(['showName', 'showTitle'], context.showName) || applied;
     applied = firstExisting(['venue', 'venueName'], context.venue) || applied;
@@ -183,7 +284,6 @@
       'producer'
     ], context.operator) || applied;
     if(applied) document.documentElement.dataset.sbdContextApplied = 'true';
-    addSuiteDock();
   }
 
   function routeFromUrl(url){
@@ -303,10 +403,15 @@
     var state = defaultSuiteState();
     var parsed;
     if(!storageAvailable()) return state;
+    var raw = localStorage.getItem(STORAGE_KEY);
     try{
-      parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+      parsed = JSON.parse(raw || '{}');
     }catch(e){
       parsed = {};
+      /* Keep the unreadable save aside before a dock write replaces it (REL-005). */
+      try{
+        if(localStorage.getItem(STORAGE_KEY + '.unreadable') === null) localStorage.setItem(STORAGE_KEY + '.unreadable', raw);
+      }catch(err){}
     }
     if(!parsed || typeof parsed !== 'object') parsed = {};
     state.schema = 'system-by-dave.av-suite.v1';
