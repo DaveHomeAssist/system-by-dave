@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "verify:fmp": "node scripts/verify_fmp_release.js",
+    "verify:fmp": "node scripts/verify_fmp_release.js && node scripts/build_switcher_guide.mjs --check",
+    "build:switcher-guide": "node scripts/build_switcher_guide.mjs",
     "verify:domain-sites": "node scripts/stage_domain_sites.mjs --check",
     "test:domain-cutover": "node --test scripts/domain_keep_previous_assets.test.mjs && node scripts/test_domain_cutover.mjs",
     "hygiene:fmp": "node scripts/fmp_hygiene_probe.js",
@@ -43,6 +44,7 @@
     "verify:shader-practice": "node --test shader/shading-practice-state.test.js shader/fmp-training.test.js scripts/shader_practice_worker.test.js && node scripts/verify_shader_practice.js",
     "test:shader-practice-browser": "node scripts/probe_shader_practice.js --no-sandbox",
     "test:camera-training-links": "node --test scripts/camera_training_links.test.mjs",
+    "test:switcher-guide-browser": "node scripts/probe_switcher_guide.mjs --no-sandbox",
     "test:av-save-safety-browser": "node scripts/probe_av_save_safety.mjs --no-sandbox",
     "test:av-suite-import-browser": "node scripts/probe_av_suite_import.mjs --no-sandbox"
   },

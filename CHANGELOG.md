@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-25 — The ATEM switcher guide loads in kilobytes, with an offline download
+
+- `/switcher/guide/` was a 5.3 MB single file (3.65 MB transfer): an older copy of the ATEM HD8 ISO explorer with the four reference photos and three.js pasted in. It is now a 13 KB page generated from the exported model page `fmp/models/atem-hd8-iso.html` by `npm run build:switcher-guide`. It loads the shared `/fmp/models/` scripts, styles and three.js, and the photos only when one is opened. It picks up the model page's later fixes (hidden-tab guard, pagehide disposal, whole-device selection, newer catalog text).
+- The same build writes `switcher/guide/atem-hd8-iso-guide-offline.html`, one noindex file with everything inlined and hashed in its Content Security Policy, for opening without a connection. The guide links it as "Download for offline use".
+- `npm run verify:fmp` fails when the guide is out of date with the exported model page, and `npm run test:switcher-guide-browser` (`scripts/probe_switcher_guide.mjs`, 4 checks, in the Pages workflow) checks the explorer matches the model page, no photo loads at first paint, the offline file opens from disk with no network, and both fall back to the diagram without WebGL.
+- From the three.js apps audit; Dave chose a thin page plus a download on 2026-09-25.
+
 ## 2026-09-25 — Throwline ships minified three.js
 
 - Throwline Stage 3D now loads the upstream minified three.js r184 builds (`three.module.min.js` and `three.core.min.js`, 187 KB gzip) instead of the unminified ones (about 420 KB gzip). Both files are preloaded, so the engine starts downloading with the page instead of after `three-d-stage.js` runs. The addons, the exporters and the scene are unchanged.
