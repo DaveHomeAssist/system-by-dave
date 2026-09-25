@@ -51,7 +51,7 @@ async function open(browser, url, options = {}) {
   try {
     return await visit(browser, url, options);
   } catch (error) {
-    return { status: '', parts: 0, diagram: false, skip: null, inlineImages: 0, errors: [error.message.split('\n')[0]], requests: [] };
+    return { status: '', parts: 0, diagram: false, skip: null, parent: '', inlineImages: 0, errors: [error.message.split('\n')[0]], requests: [] };
   }
 }
 async function visit(browser, url, options) {
@@ -71,6 +71,7 @@ async function visit(browser, url, options) {
     parts: document.getElementById('atem-select')?.options.length ?? [...document.querySelectorAll('select')].map((select) => select.options.length).sort((a, b) => b - a)[0],
     diagram: !document.getElementById('atem-diagram')?.hidden,
     skip: document.querySelector('body > a.sbd-skip-link')?.getAttribute('href'),
+    parent: document.querySelector('.sbd-site-return a')?.getAttribute('href') || '',
     inlineImages: [...document.querySelectorAll('img[src^="data:"]')].length
   }));
   await context.close();
@@ -89,6 +90,7 @@ await check('the guide renders the same explorer as the model page', () => {
   assert(guide.status === model.status && /MODEL/.test(guide.status), `status ${guide.status} vs ${model.status}`);
   assert(guide.parts === model.parts && guide.parts > 200, `components ${guide.parts} vs ${model.parts}`);
   assert(guide.skip === '#atem-explorer', `skip link ${guide.skip}`);
+  assert(guide.parent === '/fmp/', `site bar parent ${guide.parent}`);
   return `${guide.parts} menu entries`;
 });
 
@@ -106,6 +108,7 @@ await check('the offline copy opens from disk with no network', () => {
   assert(offline.requests.every((url) => url.startsWith('file:') || url.startsWith('data:')), `network requests: ${offline.requests.filter((url) => !url.startsWith('file:') && !url.startsWith('data:')).join(', ')}`);
   assert(offline.status === model.status && offline.parts === model.parts, `offline ${offline.status} ${offline.parts}`);
   assert(offline.skip === '#atem-explorer', `skip link ${offline.skip}`);
+  assert(offline.parent === 'https://housevideo.app/fmp/', `site bar parent ${offline.parent}`);
 });
 
 const noWebgl = await launch(['--disable-webgl', '--disable-3d-apis']);
