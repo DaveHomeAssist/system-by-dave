@@ -56,7 +56,7 @@ export const EXERCISE_TITLES: Record<ExerciseId, string> = {
 };
 
 export const EXERCISE_BRIEFS: Record<ExerciseId, string> = {
-  wide: "The camera starts from home. Frame the whole performance area: both downstage corners and a standing performer's head height at the upstage marks, inside the safe area, and hold it steady.",
+  wide: "The camera starts on a tight shot of downstage right. Open out and frame the whole performance area: both downstage corners and a standing performer's head height at the upstage marks, inside the safe area, and hold it steady.",
   follow: "The performer walks a fixed tour of the stage. Keep their chest inside the target box at a usable size for the whole walk.",
   recall: "Store two clearly different shots in two preset slots, move away from both, then recall each one. Both must land within tolerance.",
 };

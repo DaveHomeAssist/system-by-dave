@@ -2,14 +2,14 @@ import { describe, expect, it } from "vitest";
 import { defaultCameraProfile, lensForHfov, MONITOR_ASPECT } from "../domain/camera";
 import { defaultExerciseSettings, type PerformerConfig, type Preset } from "../domain/session";
 import { DEG, ftToM } from "../domain/units";
-import { defaultVenueProfile, deriveVenueGeometry, type VenueGeometry } from "../domain/venue";
+import { applyFmpStageProfile, defaultVenueProfile, deriveVenueGeometry, type VenueGeometry } from "../domain/venue";
 import { aimAt, cameraFrame, stageToWorld } from "../sim/framing";
 import { CHEST_FRACTION, pathStateAt, performerState, planPath, type PerformerState } from "../sim/performer";
 import { PtzSimulator, type PtzPose } from "../sim/ptz";
 import { FollowExercise } from "./follow";
 import { RecallExercise } from "./recall";
 import { type ExerciseSample } from "./types";
-import { WideShotExercise } from "./wide";
+import { evaluateWide, WideShotExercise, wideStartPose } from "./wide";
 
 const profile = defaultCameraProfile();
 const settings = defaultExerciseSettings();
@@ -35,6 +35,47 @@ function sample(time: number, dt: number, pose: PtzPose, moving = false, perform
 function widePose(hfovDeg: number): PtzPose {
   const aim = aimAt(geometry, stageToWorld({ right: 0, upstage: geometry.stageDepth * 0.3, height: 1 }));
   return { ...aim, lens: lensForHfov(profile, hfovDeg) };
+}
+
+describe("wide shot starting pose", () => {
+  // The exercise once started from home, which frames the whole default 113 ft stage by itself,
+  // so it completed with no input. The starting shot must fail on every stage profile.
+  const stages: Array<[string, VenueGeometry]> = [
+    ["default 113 × 61 ft", deriveGeometryOrThrow(defaultVenueProfile())],
+    ["working depth 113 × 75 ft", deriveGeometryOrThrow(applyFmpStageProfile(defaultVenueProfile(), "working-depth"))],
+    ["legacy 61 × 75 ft", geometry],
+  ];
+  for (const [name, stage] of stages) {
+    it(`is not a wide shot on the ${name} stage`, () => {
+      const start = wideStartPose(stage, profile);
+      const evaluation = evaluateWide(cameraFrame(stage, start, profile), stage, settings.wide);
+      expect(evaluation.allInside && evaluation.stageFillPct >= settings.wide.minStageFillPct).toBe(false);
+      expect(evaluation.insideCount).toBeLessThan(evaluation.markers.length);
+    });
+  }
+
+  it("fails the exercise however long it is held, until the camera is opened out", () => {
+    const stage = deriveGeometryOrThrow(defaultVenueProfile());
+    const start = wideStartPose(stage, profile);
+    const run = (pose: PtzPose, from: number, seconds: number, exercise: WideShotExercise) => {
+      for (let t = from; t <= from + seconds; t += 1 / 30) {
+        exercise.sample({ time: t, dt: 1 / 30, pose, moving: false, frame: cameraFrame(stage, pose, profile), geometry: stage, profile, performer: standing, settings });
+      }
+    };
+    const exercise = new WideShotExercise();
+    run(start, 0, 5, exercise);
+    expect(exercise.progress().status).toBe("running");
+    const wide = { ...aimAt(stage, stageToWorld({ right: 0, upstage: stage.stageDepth * 0.3, height: 1 })), lens: 0 };
+    run(wide, 5, 2, exercise);
+    expect(exercise.progress().status).toBe("complete");
+    expect(exercise.progress().result?.passed).toBe(true);
+  });
+});
+
+function deriveGeometryOrThrow(venue: ReturnType<typeof defaultVenueProfile>): VenueGeometry {
+  const result = deriveVenueGeometry(venue);
+  if (!result.ok) throw new Error("bad geometry");
+  return result.geometry;
 }
 
 describe("wide shot exercise", () => {

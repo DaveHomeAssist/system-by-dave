@@ -60,7 +60,9 @@ export function SidePanel({ store, state, open, docked, tab, tabs, onTab, onClos
       aria-labelledby="side-panel-title"
       hidden={!open}
       onKeyDown={(event) => {
-        if (event.key === "Escape" && !docked) {
+        // A control inside that already used Escape (cancelling a confirmation) keeps the panel
+        // open. The camera still stops: that listener is on the window and always runs.
+        if (event.key === "Escape" && !docked && !event.defaultPrevented) {
           event.preventDefault();
           onClose();
         }

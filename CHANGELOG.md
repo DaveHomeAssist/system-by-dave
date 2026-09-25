@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-25 — Audit fixes: readable reference site bar, honest wide-shot exercise
+
+- The field references (`/shader/`, `/switcher/`, `/ursa-broadcast-g2/`) drew the shared site bar's light text on a white background (1.08:1), so their home and return links were effectively invisible. `css/style.css` no longer overrides the bar's dark surface. The Shading practice browser probe now checks the bar's contrast on all three pages, and its pull-request check runs when their CSS or markup changes.
+- The shading reference names FMP Video Operations as its parent; AV Toolbox stays as a secondary link.
+- FMP Camera Simulator 1.11.1: "Establish a wide shot" starts on a tight shot, because the home pose already framed the default stage and the exercise completed with no input; Clear results asks first.
+
 ## 2026-09-25 — Next-step suggestions in Shading practice and the Camera Simulator
 
 - The two FMP camera training tools share a small training record on the device, `fmpTraining.v1` (`shader/fmp-training.js`: exercise ids, pass, best score or tries, minute timestamps; at most 4 KB; nothing leaves the device; the housevideo.app transfer carries it). Each tool's own session stays the source of truth.

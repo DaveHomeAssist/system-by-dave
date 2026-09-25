@@ -1,6 +1,8 @@
+import { type CameraProfile, lensForHfov } from "../domain/camera";
 import { type ExerciseSettings } from "../domain/session";
 import { type StagePoint, type VenueGeometry } from "../domain/venue";
-import { type CameraFrame, insideArea, project, type Projection, stageToWorld } from "../sim/framing";
+import { aimAt, type CameraFrame, insideArea, project, type Projection, stageToWorld } from "../sim/framing";
+import { type PtzPose } from "../sim/ptz";
 import { type Exercise, type ExerciseProgress, type ExerciseSample } from "./types";
 
 /** Height checked above the upstage marks: a standing performer's head. */
@@ -24,6 +26,22 @@ export function wideShotMarkers(geometry: VenueGeometry): WideMarker[] {
     { id: "usc-head", label: "USC head height", short: "USC", point: { ...mark("USC"), height: WIDE_HEAD_HEIGHT_M } },
     { id: "usl-head", label: "USL head height", short: "USL", point: { ...mark("USL"), height: WIDE_HEAD_HEIGHT_M } },
   ];
+}
+
+/** Field of view of the exercise's starting shot: tight enough that no stage fits in it. */
+export const WIDE_START_HFOV_DEG = 6;
+/** Chest height above the deck, where the starting shot is aimed. */
+const WIDE_START_AIM_HEIGHT_M = 1.5;
+
+/**
+ * Where every attempt starts: a tight shot on the downstage-right mark. It used to be the camera's
+ * home pose, but on the provisional 113 ft stage home already frames the whole downstage edge, so
+ * the exercise completed with no input. A tight shot has to be opened out and re-aimed.
+ */
+export function wideStartPose(geometry: VenueGeometry, profile: CameraProfile): PtzPose {
+  const mark = geometry.marks.find((m) => m.id === "DSR")?.point ?? { right: geometry.stageWidth * 0.3, upstage: 0, height: 0 };
+  const aim = aimAt(geometry, stageToWorld({ ...mark, height: mark.height + WIDE_START_AIM_HEIGHT_M }));
+  return { ...aim, lens: lensForHfov(profile, WIDE_START_HFOV_DEG) };
 }
 
 export interface WideEvaluation {

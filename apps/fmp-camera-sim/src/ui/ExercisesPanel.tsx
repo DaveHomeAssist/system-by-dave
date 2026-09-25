@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { SUITE_LINKS, suiteHref } from "../app/links";
 import { type SimulatorStore, type StoreState } from "../app/store";
 import { training, useTraining } from "../app/training";
@@ -40,9 +40,26 @@ const SETTING_LABELS: { [G in Group]: { [K in keyof ExerciseSettings[G]]: { labe
 
 export function ExercisesPanel({ store, state }: Props) {
   const [issues, setIssues] = useState<Issue[]>([]);
+  // Clearing results cannot be undone, so it takes a second, explicit press, as Reset session does.
+  const [confirmClear, setConfirmClear] = useState(false);
+  const focusNext = useRef<"clear" | "keep" | "history" | null>(null);
+  const clearRef = useRef<HTMLButtonElement>(null);
+  const keepRef = useRef<HTMLButtonElement>(null);
+  const historyRef = useRef<HTMLHeadingElement>(null);
   const active = state.exercise;
   const settings = state.project.session.exerciseSettings;
   const results = state.project.session.exerciseResults;
+  useEffect(() => {
+    const target = focusNext.current;
+    focusNext.current = null;
+    if (target === "clear") clearRef.current?.focus();
+    else if (target === "keep") keepRef.current?.focus();
+    else if (target === "history") historyRef.current?.focus();
+  }, [confirmClear, results.length]);
+  const cancelClear = () => {
+    focusNext.current = "clear";
+    setConfirmClear(false);
+  };
   const record = useTraining();
   const suggestions = training.level(record);
   // The first exercise this session has not passed, marked Next (or Try again after a miss).
@@ -173,7 +190,9 @@ export function ExercisesPanel({ store, state }: Props) {
       </details>
 
       <section aria-labelledby="history-title" className="history">
-        <h3 id="history-title">Results</h3>
+        <h3 id="history-title" ref={historyRef} tabIndex={-1}>
+          Results
+        </h3>
         {results.length === 0 ? (
           <p className="field-help">No exercises completed yet.</p>
         ) : (
@@ -189,9 +208,51 @@ export function ExercisesPanel({ store, state }: Props) {
                   </li>
                 ))}
             </ol>
-            <button type="button" className="secondary-button" onClick={() => store.clearResults()}>
-              Clear results
-            </button>
+            {confirmClear ? (
+              <div
+                className="confirm-clear"
+                role="group"
+                aria-labelledby="clear-results-question"
+                onKeyDown={(event) => {
+                  if (event.key === "Escape") {
+                    event.preventDefault();
+                    cancelClear();
+                  }
+                }}
+              >
+                <p id="clear-results-question" className="field-help">
+                  Clear all {results.length} {results.length === 1 ? "result" : "results"} from this session? This cannot be undone. Export the session first to keep them.
+                </p>
+                <div className="button-row">
+                  <button
+                    type="button"
+                    className="danger-button"
+                    onClick={() => {
+                      focusNext.current = "history";
+                      setConfirmClear(false);
+                      store.clearResults();
+                    }}
+                  >
+                    Clear all results
+                  </button>
+                  <button ref={keepRef} type="button" className="secondary-button" onClick={cancelClear}>
+                    Keep them
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button
+                ref={clearRef}
+                type="button"
+                className="secondary-button"
+                onClick={() => {
+                  focusNext.current = "keep";
+                  setConfirmClear(true);
+                }}
+              >
+                Clear results…
+              </button>
+            )}
           </>
         )}
       </section>

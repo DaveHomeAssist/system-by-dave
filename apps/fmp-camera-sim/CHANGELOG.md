@@ -13,6 +13,11 @@ Minor versions add features or change a saved-file format; patch versions fix or
 
 Versions 1.0.0 to 1.5.3 were numbered after the fact from their merged pull requests.
 
+## 1.11.1 — 2026-09-25 — Wide shot starts tight; Clear results asks first
+
+- "Establish a wide shot" now starts on a tight shot of downstage right (6° field of view on the downstage-right mark) instead of the camera's home pose. On the provisional 113 ft stage, home already framed the whole downstage edge (73% fill, every marker inside), so the exercise completed after its one-second hold with no input. Tests check that the starting shot fails on every stage profile and that the exercise waits for the operator.
+- Clear results in Exercises now asks first, as Reset session does: Clear all results or Keep them (focused; Escape also keeps them and leaves the panel open, and the camera still stops), with the count and "cannot be undone". Keeping returns focus to the button; clearing moves it to the Results heading.
+
 ## 1.11.0 — 2026-09-25 — Next steps from this device's training record
 
 - Exercises marks the first exercise this session has not passed: Next, or Try again after a miss. Once all three have passed, it suggests the next Shading practice exercise this device has not passed, with a dismiss button that holds for two weeks.

@@ -6,6 +6,11 @@ on:
   pull_request:
     paths:
       - 'shader/**'
+      # The browser probe also checks the site bar on the field references.
+      - 'switcher/index.html'
+      - 'ursa-broadcast-g2/index.html'
+      - 'css/style.css'
+      - 'css/sbd-public-nav.css'
       - 'fmp/rig/**'
       - 'fmp/models/**'
       - 'scripts/*shader*'

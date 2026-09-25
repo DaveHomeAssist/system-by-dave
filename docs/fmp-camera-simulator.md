@@ -151,7 +151,7 @@ Thresholds are training settings in the Exercises panel, not professional standa
 
 | Exercise | Completion |
 | --- | --- |
-| Establish a wide shot | Starts from home. Both DSE corners and head height (2 m) above USR, USC and USL inside the safe area (90%), downstage edge at least 55% of frame width, held still for 1 s |
+| Establish a wide shot | Starts on a tight shot of downstage right (6° on the DSR mark; since 1.11.1, because home already frames the default stage). Both DSE corners and head height (2 m) above USR, USC and USL inside the safe area (90%), downstage edge at least 55% of frame width, held still for 1 s |
 | Follow a performer | One loop of the performer's path after a countdown. Reports time on target (chest inside the target box at 25–90% of frame height), mean and RMS framing error and time out of frame; passes at 70% on target |
 | Save and recall two shots | Two distinct shots in two slots, move away, then recall both within 0.1° pan/tilt and 0.005 lens travel. Interrupted recalls earn no credit |
 
@@ -335,6 +335,7 @@ after venue or rendering changes, then rebuild so the published copy follows.
 | Graphics context restore | Probe loses and restores the monitor context and reads the picture back |
 | Short screens keep a large picture | Probe at 1024 × 768, 1024 × 690, 1180 × 685 and 1366 × 650, venue view collapsed (controls beside the monitor) and shown; Expand at 1440 × 900 |
 | Links in and out resolve | Probe: an exercise link starts once and leaves the address, a bad one is refused, Session links hosted and offline; `test:camera-training-links` checks every target id |
+| Exercises wait for the operator | Probe: the wide shot starts tight and is still running 2.5 s later with no input, then completes once Home opens it out; `exercises.test.ts` checks the starting shot fails on the default, working-depth and legacy stages, and `store.test.ts` runs the exercise with no input. Clear results asks first: Keep them and Escape change nothing and return focus, Clear all results empties the list |
 | Suggestions follow this device's record | Probe: finished exercises reach `fmpTraining.v1` with known fields only; Next or Try again marks the first unpassed exercise; an unnamed preset shows a name read from the shot and Rename starts from it, selected; Continue in Shading practice; Off clears the record and hides the marks and names; Forget keeps Off. `sim/presetName.test.ts` covers Wide, Mid, Tight and Off stage |
 | Pass and fail marks do not rely on colour | Probe reads the wide-shot marks' dash and fill |
 | Page face and breadcrumb | Probe: DM Sans loaded (hosted and offline), breadcrumb never a vertical scroller |

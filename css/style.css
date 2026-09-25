@@ -662,7 +662,7 @@ body { transition: background-color .3s ease, color .3s ease; }
 .field-reference a { color:var(--rust); text-underline-offset:4px; }
 .field-reference :focus-visible { outline:3px solid var(--rust); outline-offset:4px; }
 .field-reference .sbd-skip-link { color:#fff; }
-.field-reference .sbd-site-return { position:relative; flex-wrap:wrap; background:#fff; border-bottom:1px solid #ccd5dd; }
+.field-reference .sbd-site-return { position:relative; flex-wrap:wrap; }
 .field-reference .sbd-site-return a { display:inline-flex; align-items:center; min-height:44px; }
 .field-reference .fr-kicker { font:11px/1.6 var(--font-mono); text-transform:uppercase; letter-spacing:.09em; color:var(--rust); margin:0 0 12px; }
 .field-reference h1 { font:600 clamp(34px,5vw,62px)/1.12 var(--font-body); letter-spacing:-.045em; margin:0 0 16px; }
