@@ -26,6 +26,7 @@ jobs:
         run: |
           git diff --check
           npm run verify:fmp
+          npm run test:fmp-hygiene
           npm run verify:public-navigation
           npm run verify:public-consistency
           npm run verify:indexing

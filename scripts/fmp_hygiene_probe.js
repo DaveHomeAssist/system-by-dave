@@ -43,6 +43,10 @@ const DEBUG_PORT = 9347;
 const TIMEOUT_MS = 15000;
 
 const RELEASES = ['fmp', 'fmpwalk'];
+// fmp/ is rebuilt by every fmp-suite export. fmpwalk/ was retired in fmp-suite 0946989: it is no
+// longer exported, and its deployed files stay frozen at this source commit (docs/fmp-public-release.md).
+const ACTIVE_RELEASES = ['fmp'];
+const FROZEN_RELEASES = { fmpwalk: '5d67a92713787554151dad089f65f6b08144bc9e' };
 const MODEL_ROUTES = ['/fmp/models/atem-hd8-iso.html', '/fmp/models/p240.html', '/fmp/models/ccu4.html', '/fmp/ptz/SuperJoy-G1-Interactive-Guide.html'];
 const ROUTES = [...MODEL_ROUTES, '/fmp/', '/fmp/camera/', '/fmp/camera/pit-center/', '/fmp/camera/front-of-house/', '/fmp/camera/pit-stage-left/', '/fmp/camera/catwalk/', '/fmp/guide/', '/fmp/house/', '/fmp/gear/', '/fmp/build/', '/fmp/ptz/', '/fmp/rig/', '/fmpwalk/', '/backfocus/'];
 // Addresses operators plausibly type or were given; each should resolve or be deliberately retired.
@@ -155,8 +159,8 @@ async function checkRelease() {
   }
 
   const commit = provenance.fmp.sourceCommit;
-  const pinned = unique(RELEASES.map(dir => provenance[dir].sourceCommit));
-  record('P5', 'release', pinned.length === 1 ? 'pass' : 'fail', 'Both releases pin the same source commit', pinned.map(sha => sha.slice(0, 12)).join(' vs '));
+  const pins = releasePins(provenance);
+  record('P5', 'release', pins.status, 'Active releases share one export; frozen releases stay at their pin', pins.detail);
   try {
     const compare = JSON.parse(execFileSync('gh', ['api', `repos/${CANONICAL_REPO}/compare/${commit}...main`, '--jq', '{ahead_by,behind_by,status}'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }));
     const ahead = compare.ahead_by || 0;
@@ -164,6 +168,19 @@ async function checkRelease() {
   } catch {
     record('P4', 'release', 'grey', 'Released source commit is current with canonical main', `gh could not compare ${CANONICAL_REPO}; check access`);
   }
+}
+
+/** P5: active releases ship from one export; a frozen release must not move off its pin. */
+function releasePins(provenance, active = ACTIVE_RELEASES, frozen = FROZEN_RELEASES) {
+  const short = sha => String(sha).slice(0, 12);
+  const pinned = unique(active.map(dir => provenance[dir].sourceCommit));
+  const moved = Object.entries(frozen).filter(([dir, sha]) => provenance[dir].sourceCommit !== sha);
+  const problems = [
+    ...(pinned.length > 1 ? [`active releases pin ${active.map(dir => `${dir} ${short(provenance[dir].sourceCommit)}`).join(' vs ')}`] : []),
+    ...moved.map(([dir, sha]) => `${dir} moved to ${short(provenance[dir].sourceCommit)}; it is frozen at ${short(sha)}`)
+  ];
+  if (problems.length) return { status: 'fail', detail: problems.join('; ') };
+  return { status: 'pass', detail: [...active.map(dir => `${dir} ${short(provenance[dir].sourceCommit)}`), ...Object.entries(frozen).map(([dir, sha]) => `${dir} frozen at ${short(sha)}`)].join('; ') };
 }
 
 async function checkIndexing() {
@@ -502,7 +519,11 @@ async function main() {
   if (flag('strict') && counts.fail) process.exitCode = 1;
 }
 
-main().catch(error => {
-  console.error(error);
-  process.exitCode = 2;
-});
+if (require.main === module) {
+  main().catch(error => {
+    console.error(error);
+    process.exitCode = 2;
+  });
+}
+
+module.exports = { releasePins, ACTIVE_RELEASES, FROZEN_RELEASES };

@@ -88,8 +88,8 @@ check. Add `--strict` to exit non-zero on any failure.
 | P1 | Live `source_provenance.json` matches `main` | Pages deploy completed and nothing stale is served |
 | P2 | Every live managed file matches its provenance SHA-256 | No partial deploy or cache poisoning |
 | P3 | `?v=` cache-bust tokens match the files they load | A stale token lets a phone keep an old module after a release |
-| P4 | The released commit is current with canonical `fmpwalk` `main` | Shows unreleased fixes waiting on export |
-| P5 | Both releases pin the same source commit | `fmp/` and `fmpwalk/` must ship from one export |
+| P4 | The released `fmp/` commit is current with canonical `fmp-suite` `main` | Shows unreleased fixes waiting on export |
+| P5 | Active releases share one export, and frozen releases stay at their pin | `fmp/` moves with every export. `fmpwalk/` was retired in fmp-suite `0946989` and stays frozen at `5d67a92`, so a change there means an unplanned re-release (`FROZEN_RELEASES` in the probe; `npm run test:fmp-hygiene`) |
 | I1–I3 | Noindex on every FMP page, robots disallow, sitemap exclusion | Discovery policy (not access control) |
 | L1 | Same-origin links, assets, and script-built routes resolve | Catches broken links, including ones built at runtime from `./camera/` |
 | L2 | No links to legacy or private origins | Fails since 2026-09-18: no FMP page links an old version (Dave) |
@@ -132,8 +132,8 @@ Run after releases (A1–A4) and in the weekly pass (all).
   verify:public-navigation` enforces home, parent, and skip target for each FMP
   page and prints the known gaps that are still open.
 - **A3 Release integrity.** `npm run verify:fmp` passes. `git log --format='%h %s'
-  -- fmp fmpwalk` shows only export commits (no hand edits). The provenance of both
-  releases pins the same source commit.
+  -- fmp fmpwalk` shows only export commits (no hand edits). `fmp/` pins the latest
+  export; the retired `fmpwalk/` keeps its frozen source commit.
 - **A4 Counts and names.** Rig component counts, route names (Catwalk and
   Spotlight area, Walk and Preshow walk), and titles agree across the hub, the
   rig data, `CHANGELOG.md`, and this repository's docs.
