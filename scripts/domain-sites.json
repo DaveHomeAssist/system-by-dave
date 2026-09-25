@@ -9,6 +9,9 @@
       "domain": "housevideo.app",
       "repository": "DaveHomeAssist/housevideo",
       "deployKeySecret": "HOUSEVIDEO_DEPLOY_KEY",
+      "keepPreviousAssets": [
+        "camera-sim"
+      ],
       "cutover": true,
       "home": "/fmp/",
       "pages": [
