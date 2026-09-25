@@ -44,6 +44,9 @@ handoffs.
   installable and offline AV field use.
 - GSAP is available through the package dependencies and the vendored browser
   build. Its use is governed by the motion policy in `AGENTS.md`.
+- three.js is pinned to one release (r184) across Throwline and the FMP pages;
+  the version and viewer-lifecycle policy lives in fmp-suite
+  `docs/three-policy.md` and is summarized in `AGENTS.md`.
 
 ## Repository map
 

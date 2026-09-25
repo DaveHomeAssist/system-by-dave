@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-09-25 — Throwline Stage 3D gates its rendering budget; the three.js policy is linked
+
+- `scripts/probe_throwline_stage3d.js` now fails on any `THREE.*` console message (the two context-loss and context-restore messages from its own recovery test excepted), layout shift of 0.05 or more at 1440×900, any GL draw over 2 s idle, and a redraw above 210 GL draws (139 measured). Each gate was checked against an injected regression. The FMP pages have the same gates in fmp-suite.
+- `AGENTS.md` and `CLAUDE.md` point to fmp-suite `docs/three-policy.md`, the three.js version and viewer-lifecycle policy from the September 2026 three.js audit.
+
 ## 2026-09-25 — The page manifest falls back to the installed Chrome
 
 - With Playwright's browser download missing (`~/Library/Caches/ms-playwright` had been cleared), `npm run manifest:housevideo` stalled instead of reporting. It now tries Playwright's browser, then the installed Chrome, and otherwise records the runtime-links column as not measured with the reason. The file server also lists the staged site once instead of on every request.

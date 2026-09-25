@@ -129,6 +129,14 @@ to make stale documentation true.
   possible, clean up timelines/listeners, and do not let motion delay
   navigation, capture focus, or compete with CSS transitions on the same
   property.
+- 3D viewers (Throwline Stage 3D here, the FMP pages exported from fmp-suite)
+  follow the three.js policy in fmp-suite `docs/three-policy.md`: one pinned
+  three.js release (r184) per site, render on demand, `pagehide` disposal,
+  context-loss and no-WebGL fallbacks, `PCFShadowMap`, and zero `THREE.*`
+  console messages. Upgrade Throwline (`scripts/vendor_throwline_three.js`)
+  and fmp-suite to the same release in the same cycle.
+  `npm run test:throwline-browser` enforces no layout shift, no idle draws, a
+  draw budget and no `THREE.*` messages on Stage 3D.
 
 ## JavaScript, applications, and persistence
 
