@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-09-25 — Merge when green
+
+- `AGENTS.md` golden rule 6 and `CLAUDE.md`: agents merge their own pull requests without asking once the current head is green (every check passed, no merge conflict, no review thread waiting), unless Dave says otherwise. The Definition of Done now names that merge.
+
 ## 2026-09-25 — Camera training links: simulator, Shading practice and the FMP explorers
 
 - Shading practice now says where each control lives on the real equipment. Under the control list, "On the kit" links the selected control to the shader panel explorer at that exact control (joystick for iris and pedestal, master gain, Black/Flare for gamma, W/B, and the channel LCD menu for saturation and hue), and to the matching part in the URSA rig explorer where the body has one (the iris A/M switch, ISO/GAIN, WHITE BAL). Related references and the `/shader/` reference link the Camera Simulator. Build `v20260925-shader-practice-kit-links`.

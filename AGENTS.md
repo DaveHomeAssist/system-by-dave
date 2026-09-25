@@ -38,6 +38,13 @@ to make stale documentation true.
    affects architecture, public behavior or claims, operator workflow,
    verification commands, or release history. Do not create documentation
    churn for implementation details already captured by code and tests.
+6. **Merge when green.** Merge a pull request you opened, or were asked to
+   drive, without waiting to be asked, once its current head is green: every
+   check has passed, there is no merge conflict, and no review thread is
+   waiting on you. Mark a draft ready, merge with a merge commit, then read
+   back the live surface. This is the default until Dave says otherwise, for
+   one pull request or in general. It never covers red, conflicted or
+   unverified work, or a skipped gate.
 
 ## Product boundaries
 
@@ -197,5 +204,6 @@ Pages workflow before a production claim.
 - [ ] Relevant documentation and `CHANGELOG.md` are current without duplicated
       inventories or history.
 - [ ] The diff contains no accidental edits, secrets, or unexplained churn.
-- [ ] The change is committed and pushed; required CI passes; the authorized
-      merge/deploy completes; the exact live surface is read back.
+- [ ] The change is committed and pushed; required CI passes; the pull request
+      is merged when green (golden rule 6) and the deploy completes; the exact
+      live surface is read back.

@@ -157,4 +157,8 @@ Throwline's catalog is synchronized and verified through its dedicated scripts.
 Startup sequence:
 
 `CLAUDE.md` → `AGENTS.md` → task-relevant contract/source/tests → implement →
-verify → update relevant documentation → release and read back
+verify → update relevant documentation → merge when green → release and read back
+
+Merging is automatic: once a pull request's checks pass with no conflict and no
+review thread waiting, merge it without asking, unless Dave says otherwise
+(`AGENTS.md` golden rule 6).
