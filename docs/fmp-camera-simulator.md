@@ -335,10 +335,11 @@ after venue or rendering changes, then rebuild so the published copy follows.
 | Graphics context restore | Probe loses and restores the monitor context and reads the picture back |
 | Short screens keep a large picture | Probe at 1024 × 768, 1024 × 690, 1180 × 685 and 1366 × 650, venue view collapsed (controls beside the monitor) and shown; Expand at 1440 × 900 |
 | Links in and out resolve | Probe: an exercise link starts once and leaves the address, a bad one is refused, Session links hosted and offline; `test:camera-training-links` checks every target id |
-| Exercises wait for the operator | Probe: the wide shot starts tight and is still running 2.5 s later with no input, then completes once Home opens it out; `exercises.test.ts` checks the starting shot fails on the default, working-depth and legacy stages, and `store.test.ts` runs the exercise with no input. Clear results asks first: Keep them and Escape change nothing and return focus, Clear all results empties the list |
+| Exercises wait for the operator | Probe: the wide shot starts tight and is still running 2.5 s later with no input, then completes when a stored wide preset is recalled; `exercises.test.ts` checks the starting shot fails on the default, working-depth and legacy stages, and `store.test.ts` runs the exercise with no input. Clear results asks first: Keep them and Escape change nothing and return focus, Clear all results empties the list |
 | Suggestions follow this device's record | Probe: finished exercises reach `fmpTraining.v1` with known fields only; Next or Try again marks the first unpassed exercise; an unnamed preset shows a name read from the shot and Rename starts from it, selected; Continue in Shading practice; Off clears the record and hides the marks and names; Forget keeps Off. `sim/presetName.test.ts` covers Wide, Mid, Tight and Off stage |
 | Pass and fail marks do not rely on colour | Probe reads the wide-shot marks' dash and fill |
 | Page face and breadcrumb | Probe: DM Sans loaded (hosted and offline), breadcrumb never a vertical scroller |
+| Header text is readable | Probe: the subtitle and scope line keep 4.5:1 in both themes, opacity blended in (the scope line was 3.97:1 at 0.78 opacity) |
 
 ## Not in v1
 

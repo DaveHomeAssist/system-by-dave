@@ -110,17 +110,25 @@ starts with `fmp`, so the housevideo.app saved-data transfer carries it (`docs/d
 `npm run test:camera-training-links` checks that `STEPS` matches both tools' ids and titles and
 that every `?scenario=` it can build exists.
 
-## Planned in fmp-suite (PR B)
+## Links out of the FMP pages
 
-These go in `DaveHomeAssist/fmp-suite` and reach this repository through its exporter. The test
-already checks that their targets exist.
+These are made in `DaveHomeAssist/fmp-suite` and reach this repository through its exporter
+(`fmp/` is managed; do not hand-edit it). The test reads the exported bytes. Links are
+root-relative, since the FMP pages and both tools are published together on housevideo.app.
 
-| From | Parts | To |
+| From | Parts or place | To |
 | --- | --- | --- |
-| Rig explorer | `iris`, `iris-mode`, `push-auto`, `door-iris`, `fiber-camera-controls` | `/shader/practice.html?demo=iris` |
+| Rig explorer (`practice` in `fmp/rig/fmp-guide-data.js`) | `iris`, `iris-mode`, `push-auto`, `door-iris`, `fiber-camera-controls` | `/shader/practice.html?demo=iris` |
 | Rig explorer | `body-gain` | `/shader/practice.html?demo=gain` |
 | Rig explorer | `body-wb`, `body-auto-wb` | `/shader/practice.html?demo=whiteBalance` |
 | Rig explorer | `nd-filter` | `/shader/#nd` (Shading practice has no ND) |
-| Shader panel explorer | joystick, gain, flare, wb | the matching `?demo=` |
-| Bowl camera guide | preshow k3 "Match the cameras" | `/shader/practice.html?scenario=match-cameras` |
-| FMP hub, Learn tab | — | `/shader/practice.html` (root-relative: the hub's absolute-link allowlist refuses new absolute links) |
+| Shader panel explorer (`PRACTICE` in `fmp/models/assets/ccu4-0.js`) | Whole device | `/shader/practice.html?scenario=match-cameras` |
+| Shader panel explorer | `joystick`, `gain`, `flare`, `wb` on channels 1–3 | `?demo=iris`, `?demo=gain`, `?demo=gamma`, `?demo=whiteBalance` |
+| P240 explorer (`fmp/models/assets/p240-0.js`) | Whole device, `p240.lens`, `p240.pan-axis`, `p240.tilt-axis` | `/camera-sim/` |
+| Bowl camera guide | Preshow k3 "Match the cameras" | `/shader/practice.html?scenario=match-cameras` |
+| FMP hub, Learn tab | `SHADE` | `/shader/practice.html` (root-relative: the hub's absolute-link allowlist refuses new absolute links) |
+| FMP hub, Learn tab | `CCU`, "Camera control & shading" | `/shader/` |
+
+Channel 4 of the shader panel has no link: it is labelled 4 PTZ but drives the P240. The LCD
+has none either: its soft knobs reach two practice controls (saturation and colour phase), so
+no single sweep fits. Shading practice's own "On the kit" list still points at it for both.

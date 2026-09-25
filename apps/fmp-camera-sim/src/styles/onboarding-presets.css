@@ -2,7 +2,7 @@
 .sim-scope {
   margin: 2px 0 0;
   font-size: 12px;
-  opacity: 0.78;
+  /* Full --muted ink: at 0.78 opacity the line measured 3.97:1 on the light surface. */
 }
 
 .onboarding-dialog .onboarding-scope {

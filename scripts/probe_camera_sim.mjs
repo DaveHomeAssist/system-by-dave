@@ -240,6 +240,28 @@ async function closePanel(page) {
     assert((await page.evaluate(() => localStorage.getItem('fmpTheme'))) === 'dark', 'fmpTheme not saved');
     await page.getByRole('button', { name: 'Dark mode' }).click();
   });
+  await check('the header subtitle and scope line keep 4.5:1 in both themes', async () => {
+    // Blends each line's ink with the surface behind it, opacity included (the scope line was 3.97:1 at 0.78).
+    const measure = () => page.evaluate(() => {
+      const rgb = (c) => (c.match(/[\d.]+/g) || []).map(Number);
+      const lum = ([r, g, b]) => [r, g, b].map((v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; }).reduce((sum, v, i) => sum + v * [0.2126, 0.7152, 0.0722][i], 0);
+      const behind = (el) => { for (let n = el; n; n = n.parentElement) { const c = rgb(getComputedStyle(n).backgroundColor); if (c.length === 3 || c[3] > 0.5) return c.slice(0, 3); } return [255, 255, 255]; };
+      return [...document.querySelectorAll('.sim-title p')].filter((el) => el.offsetWidth > 1 && el.offsetHeight > 1).map((el) => {
+        let alpha = 1; for (let n = el; n; n = n.parentElement) alpha *= Number(getComputedStyle(n).opacity);
+        const bg = behind(el), ink = rgb(getComputedStyle(el).color).slice(0, 3).map((v, i) => v * alpha + bg[i] * (1 - alpha));
+        const [a, b] = [lum(ink), lum(bg)].sort((x, y) => y - x);
+        return { text: el.textContent.trim().slice(0, 24), ratio: (a + 0.05) / (b + 0.05) };
+      });
+    });
+    for (const theme of ['light', 'dark']) {
+      if ((await page.evaluate(() => document.documentElement.dataset.theme)) !== theme) await page.getByRole('button', { name: 'Dark mode' }).click();
+      const lines = await measure();
+      assert(lines.length >= 1, `${theme}: no visible header lines to measure`);
+      for (const line of lines) assert(line.ratio >= 4.5, `${theme}: "${line.text}" is ${line.ratio.toFixed(2)}:1`);
+    }
+    await page.getByRole('button', { name: 'Dark mode' }).click();
+    assert((await page.evaluate(() => document.documentElement.dataset.theme)) === 'light', 'theme did not return to light');
+  });
   await check('the monitor draws a live picture', async () => {
     assert((await s.state()).renderStatus === 'ok', 'renderStatus is not ok');
     const pixels = await monitorPixels(page);

@@ -78,6 +78,8 @@ header.top > nav { margin-right: auto; }
 :root[data-fmp-guide-fonts] .header-actions > a.theme-btn { display: inline-flex; align-items: center; min-height: 44px; padding: 8px 12px; color: var(--av-text); background: var(--av-control); border-color: var(--av-line-strong); text-decoration: none; }
 :root[data-fmp-guide-fonts] .guide-boundary a { color: var(--av-accent); background: transparent; min-height: 44px; display: inline-flex; align-items: center; text-decoration: underline; }
 :root[data-fmp-guide-fonts] { --ink3: var(--av-muted); --tally: var(--av-accent); --amber: var(--av-warning); }
+/* The live card band takes the accent, so its words take the accent ink (white on #e08a4f was 2.65:1). */
+:root[data-fmp-guide-fonts] .card.live .umd { color: var(--av-primary-ink); }
 :root[data-fmp-guide-fonts] .shell { height: 100dvh; }
 :root[data-fmp-guide-fonts] .tab { min-height: 44px; }
 :root[data-fmp-guide-fonts] .tallylight { animation: none; box-shadow: none; }

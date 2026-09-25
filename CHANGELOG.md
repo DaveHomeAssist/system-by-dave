@@ -1,5 +1,21 @@
 # Changelog
 
+## 2026-09-25 — FMP pages link the camera training tools
+
+- FMP export from fmp-suite PR #24:
+  - Links in: the hub's Learn tab lists Shading practice (`SHADE`), and the bowl camera guide's "Match the cameras" check links the match-two-cameras exercise.
+  - Rig explorer: its iris, gain and white-balance controls open the matching Shading practice sweep, and the ND wheel opens `/shader/#nd`.
+  - Shader panel explorer: its channel 1–3 joystick, gain, black / flare and white-balance controls open iris, gain, gamma and white-balance sweeps. Channel 4 drives the P240, so it has none.
+  - P240 explorer: its lens and axes open the Camera Simulator.
+- The same export fixes the audit's FMP findings:
+  - One name: "shader panel (ATEM Camera Control Panel)" on first mention, then "shader panel". `/shader/` is "Camera control & shading" wherever it is linked.
+  - A part with no simulator action says "Inspection only." as text instead of showing a disabled button.
+  - Explorer text is at least 12 px, and the explorer header links are 44 px targets.
+  - Explorer badges and links, lesson text and the guide's "Mode B" band now meet 4.5:1 in dark.
+- FMP Camera Simulator 1.11.2: the header scope line drops its 0.78 opacity (3.97:1 → 6.7:1). The probe now measures both header lines in both themes.
+- Docs:
+  - `docs/camera-training-links.md` lists the FMP links as implemented, and `test:camera-training-links` checks them in the exported rig catalog, explorer configs, guide and hub.
+  - `docs/public-content-contract.md` records the shader panel naming rule.
 ## 2026-09-25 — Private pages no longer published
 
 - The Pages staging step now excludes `flooring-contract-review.html` and `house/56-harding/` from `_site` and fails the step if either is present; both stay in the repository but are no longer served on systembydave.com (audit SEC-003).
