@@ -102,3 +102,22 @@ test('the incoming links other tools may use resolve', () => {
     assert.ok(rigCatalog[id], `the rig explorer has no part "${id}", which PR B links to Shading practice`);
   }
 });
+
+// Suggestions link each tool to the other's next step by the ids in the shared
+// training record (shader/fmp-training.js), so those ids must be the tools' own.
+test('the training record names each tool\'s exercises by its own ids and titles', () => {
+  const Training = require(join(ROOT, 'shader/fmp-training.js'));
+  const session = read('apps/fmp-camera-sim/src/domain/session.ts');
+  const types = read('apps/fmp-camera-sim/src/exercises/types.ts');
+  const simIds = JSON.parse(session.match(/EXERCISE_IDS: readonly ExerciseId\[\] = (\[[^\]]*\])/)?.[1] ?? 'null');
+  const titles = Object.fromEntries([...(types.match(/EXERCISE_TITLES[^{]*\{([^}]*)\}/)?.[1] ?? '').matchAll(/(\w+):\s*"([^"]+)"/g)].map((match) => [match[1], match[2]]));
+  assert.deepEqual(Training.STEPS.sim.map((step) => step.id), simIds);
+  for (const step of Training.STEPS.sim) assert.equal(step.title, titles[step.id], `the simulator calls ${step.id} "${titles[step.id]}"`);
+  assert.deepEqual(Training.STEPS.practice.map(({ id, title }) => ({ id, title })), Practice.scenarioList().map(({ id, title }) => ({ id, title })));
+  assert.ok(Training.KEY.startsWith('fmp'), 'the housevideo.app transfer only carries fmp-prefixed keys');
+  assert.ok(doc.includes(`\`${Training.KEY}\``), `docs/camera-training-links.md does not describe ${Training.KEY}`);
+  // The suggestion links are built from these ids: the simulator's exercise links and Shading practice's scenario links.
+  for (const id of Training.STEPS.practice.map((step) => step.id)) assert.ok(Practice.SCENARIOS[id], `Shading practice has no ?scenario=${id}`);
+  assert.ok(doc.includes('/shader/practice.html?scenario=<id>'), 'docs/camera-training-links.md does not list the Next: Shading practice link');
+  assert.ok(simLinks.includes('shadingPractice: "/shader/practice.html"'), 'the simulator builds its Shading practice links from SUITE_LINKS.shadingPractice');
+});

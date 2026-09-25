@@ -1,5 +1,7 @@
 import { useState } from "react";
+import { SUITE_LINKS, suiteHref } from "../app/links";
 import { type SimulatorStore, type StoreState } from "../app/store";
+import { training, useTraining } from "../app/training";
 import { nowSeconds } from "../input/controller";
 import { EXERCISE_IDS, EXERCISE_SETTING_RANGES, type ExerciseId, type ExerciseSettings } from "../domain/session";
 import { type Issue } from "../domain/validate";
@@ -41,6 +43,13 @@ export function ExercisesPanel({ store, state }: Props) {
   const active = state.exercise;
   const settings = state.project.session.exerciseSettings;
   const results = state.project.session.exerciseResults;
+  const record = useTraining();
+  const suggestions = training.level(record);
+  // The first exercise this session has not passed, marked Next (or Try again after a miss).
+  const nextId = suggestions === "off" ? null : (EXERCISE_IDS.find((id) => !results.some((result) => result.exercise === id && result.passed)) ?? null);
+  // With all three passed, the next Shading practice exercise this device has not passed.
+  const practiceNext = suggestions === "on" && nextId === null ? training.nextStep(record, "practice") : null;
+  const practiceSuggestion = practiceNext ? `sim.next.practice-${practiceNext}` : null;
 
   const updateSetting = (group: Group, key: string, value: number) => {
     const next = structuredClone(settings) as unknown as Record<string, Record<string, number>>;
@@ -55,14 +64,31 @@ export function ExercisesPanel({ store, state }: Props) {
         Three guided exercises. Thresholds are training settings for practice, not professional camera-operation standards. Each exercise can be
         reset and replayed.
       </p>
+      {practiceNext && practiceSuggestion && !training.isDismissed(record, practiceSuggestion) && (
+        <div className="next-step" data-testid="next-step">
+          <a className="primary-button" href={suiteHref(`${SUITE_LINKS.shadingPractice}?scenario=${practiceNext}`)}>
+            Next: Shading practice · {training.title("practice", practiceNext)}
+          </a>
+          <button type="button" className="secondary-button next-step-dismiss" aria-label="Dismiss this suggestion" title="Dismiss for two weeks" onClick={() => training.dismiss(undefined, practiceSuggestion)}>
+            ×
+          </button>
+          <p className="field-help">All three simulator exercises have passed in this session. Shading practice covers exposure and colour for Cameras 1–3.</p>
+        </div>
+      )}
       {EXERCISE_IDS.map((id: ExerciseId) => {
         const isActive = active?.id === id;
         const progress = isActive ? active.progress : null;
         const last = [...results].reverse().find((result) => result.exercise === id);
+        const marked = id === nextId && !isActive;
         return (
           <article key={id} className={`exercise-card ${isActive ? "is-active" : ""}`} aria-labelledby={`exercise-${id}`}>
             <header>
               <h3 id={`exercise-${id}`}>{EXERCISE_TITLES[id]}</h3>
+              {marked && (
+                <span className={`status-pill ${last && !last.passed ? "status-retry" : "status-next"}`} data-testid={`exercise-${id}-next`}>
+                  {last && !last.passed ? "Try again" : "Next"}
+                </span>
+              )}
               {progress && <span className={`status-pill status-${progress.status}`}>{progress.status === "complete" ? (progress.result?.passed ? "Complete" : "Finished") : "Running"}</span>}
             </header>
             <p className="exercise-brief">{EXERCISE_BRIEFS[id]}</p>

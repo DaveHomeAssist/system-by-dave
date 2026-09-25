@@ -3,7 +3,7 @@
 // Offline cache for Camera Shading Practice. Every listed file is fetched from
 // the network first and saved, so an online visit always gets one consistent
 // release; the saved copies serve the page when the network is unavailable.
-const VERSION = 'v20260925-shader-practice-kit-links';
+const VERSION = 'v20260925-shader-practice-suggestions';
 const CACHE_PREFIX = 'sbd-shader-practice-';
 const CACHE_NAME = CACHE_PREFIX + VERSION;
 const ASSETS = [
@@ -12,6 +12,7 @@ const ASSETS = [
   './practice-theme.js',
   './shading-practice-state.js',
   './practice-render.js',
+  './fmp-training.js',
   './practice-app.js',
   './index.html',
   '../css/fonts.css',

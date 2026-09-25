@@ -389,6 +389,86 @@ async function mainSession(page, baseUrl) {
   const coaching = await page.eval(() => document.getElementById('nextCorrection').textContent);
   check('the next correction names the objective and control without revealing a value', /Black floor/.test(coaching) && /lower Pedestal/.test(coaching) && !/\d/.test(coaching), coaching);
 
+  // Suggestions (shader/fmp-training.js, docs/camera-training-links.md): the checked
+  // correction marks its control until anything moves; this device's results badge
+  // the exercises and suggest the next one.
+  const likely = await page.eval(() => {
+    const row = name => {
+      const node = document.querySelector(`.control-row[data-control="${name}"]`);
+      const tag = document.getElementById(`next-${name}`);
+      return { likely: node.dataset.likely, tag: tag.hidden ? null : tag.textContent, height: Math.round(node.getBoundingClientRect().height) };
+    };
+    const marked = Object.keys(ShaderPracticeState.CONTROL_LIMITS).filter(name => row(name).likely === 'true');
+    const before = row('pedestal');
+    const label = document.querySelector('label[for="control-pedestal"]').textContent;
+    document.querySelector('.step-btn[data-control="gain"][data-step="1"]').click();
+    ShaderPracticeApp.renderNow();
+    return { marked, before, label, after: row('pedestal'), markedAfter: Object.keys(ShaderPracticeState.CONTROL_LIMITS).filter(name => row(name).likely === 'true') };
+  });
+  check('after a check the suggested control is marked, named for screen readers, and cleared by the next move', likely.marked.join() === 'pedestal' && /^NEXT −/.test(likely.before.tag) && /suggested next: decrease/.test(likely.label) && likely.after.likely === 'false' && likely.after.tag === null && likely.markedAfter.length === 0, likely);
+
+  const training = await page.eval(() => {
+    const record = JSON.parse(localStorage.getItem('fmpTraining.v1'));
+    const badge = id => { const node = document.querySelector(`[data-badge-for="${id}"]`); return node.hidden ? null : node.textContent; };
+    return { record, badges: { match: badge('match-cameras'), black: badge('set-black-level'), highlights: badge('recover-highlights') } };
+  });
+  const allowed = (object, keys) => Object.keys(object).every(key => keys.includes(key));
+  check('checks are remembered on this device by exercise id and badge the exercise list', training.record.practice['match-cameras'].passed && training.record.practice['set-black-level'].passed === false
+    && training.record.practice['set-black-level'].checks >= 1 && training.badges.match === 'PASSED' && /^BEST \d+$/.test(training.badges.black) && training.badges.highlights === null
+    && allowed(training.record, ['schema', 'prefs', 'last', 'practice', 'sim']) && Object.values(training.record.practice).every(entry => allowed(entry, ['passed', 'best', 'checks', 'at'])), training);
+
+  await page.open(`${baseUrl}shader/practice.html?scenario=match-cameras&seed=browser-next`);
+  await page.settle();
+  const suggestion = await page.eval(() => {
+    const read = () => ({ hidden: document.getElementById('nextStep').hidden, text: document.getElementById('nextStepButton').textContent, why: document.getElementById('nextStepWhy').textContent, height: Math.round(document.getElementById('nextStepButton').getBoundingClientRect().height) });
+    const offered = read();
+    document.getElementById('nextStepButton').click();
+    ShaderPracticeApp.renderNow();
+    return { offered, loaded: ShaderPracticeApp.getState().scenarioId, focus: document.activeElement.dataset.scenario, after: read() };
+  });
+  check('a passed exercise suggests the next one not yet passed, and choosing it loads that exercise', !suggestion.offered.hidden && suggestion.offered.text === 'NEXT: RECOVER CLIPPED HIGHLIGHTS' && /Match two cameras passed/.test(suggestion.offered.why)
+    && suggestion.offered.height >= 44 && suggestion.loaded === 'recover-highlights' && suggestion.focus === 'recover-highlights' && suggestion.after.hidden, suggestion);
+
+  const dismissal = await page.eval(() => {
+    document.querySelector('[data-scenario="match-cameras"]').click();
+    ShaderPracticeApp.renderNow();
+    const shown = !document.getElementById('nextStep').hidden;
+    document.getElementById('nextStepDismiss').click();
+    ShaderPracticeApp.renderNow();
+    return { shown, hidden: document.getElementById('nextStep').hidden, dismissed: Object.keys(JSON.parse(localStorage.getItem('fmpTraining.v1')).prefs.dismissed) };
+  });
+  check('a dismissed suggestion stays away and is remembered', dismissal.shown && dismissal.hidden && dismissal.dismissed.includes('practice.next.recover-highlights'), dismissal);
+
+  const levels = await page.eval(() => {
+    const select = document.getElementById('suggestionsSelect');
+    const choose = value => { select.value = value; select.dispatchEvent(new Event('change', { bubbles: true })); ShaderPracticeApp.renderNow(); };
+    const badges = () => [...document.querySelectorAll('[data-badge-for]')].filter(node => !node.hidden).length;
+    FmpTraining.recordStep(undefined, 'sim', 'follow', { passed: false });
+    ShaderPracticeApp.renderNow();
+    const continueLink = { hidden: document.getElementById('simContinue').hidden, href: document.getElementById('simContinue').getAttribute('href'), text: document.getElementById('simContinue').textContent };
+    choose('quiet');
+    const quiet = { badges: badges(), continueHidden: document.getElementById('simContinue').hidden, level: ShaderPracticeApp.training().prefs.suggestions };
+    choose('off');
+    const off = { badges: badges(), record: JSON.parse(localStorage.getItem('fmpTraining.v1')) };
+    document.getElementById('forgetTrainingButton').click();
+    const forgotten = JSON.parse(localStorage.getItem('fmpTraining.v1'));
+    choose('on');
+    return { continueLink, quiet, off, forgotten, on: ShaderPracticeApp.training().prefs.suggestions };
+  });
+  check('Continue offers the simulator exercise not yet passed; Quiet keeps badges only; Off forgets and Forget keeps the choice', !levels.continueLink.hidden && levels.continueLink.href === '/camera-sim/?exercise=wide'
+    && /Establish a wide shot/.test(levels.continueLink.text) && levels.quiet.badges >= 1 && levels.quiet.continueHidden && levels.quiet.level === 'quiet'
+    && levels.off.badges === 0 && Object.keys(levels.off.record.practice).length === 0 && levels.off.record.prefs.suggestions === 'off'
+    && levels.forgotten.prefs.suggestions === 'off' && levels.on === 'on', levels);
+
+  // A first visit follows the FMP suite's shared theme until the console saves its own.
+  await page.eval(() => { localStorage.removeItem('shader.practice.theme.v1'); localStorage.setItem('fmpTheme', 'dark'); });
+  await page.open(url);
+  const suiteTheme = await page.eval(() => document.documentElement.getAttribute('data-theme'));
+  await page.eval(() => localStorage.removeItem('fmpTheme'));
+  await page.open(url);
+  const defaultTheme = await page.eval(() => document.documentElement.getAttribute('data-theme'));
+  check('with no saved practice theme, the FMP suite theme decides the first paint', suiteTheme === 'dark' && defaultTheme === 'light', { suiteTheme, defaultTheme });
+
   // Comparison modes, wipe, blink, and freeze.
   await page.open(url);
   const compare = {};
@@ -628,7 +708,11 @@ async function viewportMatrix(page, baseUrl) {
   for (const theme of ['light', 'dark']) {
     // The saved theme applies before first paint, as it does for a returning operator.
     if (themeScript) await page.send('Page.removeScriptToEvaluateOnNewDocument', { identifier: themeScript });
-    ({ identifier: themeScript } = await page.send('Page.addScriptToEvaluateOnNewDocument', { source: `try { localStorage.setItem('shader.practice.theme.v1', '${theme}'); } catch {}` }));
+    // Two passed exercises and a tried one, so every layout also shows the next-step
+    // suggestion and the exercise badges.
+    const training = `{ const at = new Date().toISOString().slice(0, 16) + 'Z'; localStorage.setItem('fmpTraining.v1', JSON.stringify({ schema: 'fmp.training.v1', prefs: { suggestions: 'on', dismissed: {} }, last: null, sim: {},
+      practice: { 'match-cameras': { passed: true, best: 94, checks: 2, at }, 'recover-highlights': { passed: true, best: 92, checks: 3, at }, 'set-black-level': { passed: false, best: 61, checks: 1, at } } })); }`;
+    ({ identifier: themeScript } = await page.send('Page.addScriptToEvaluateOnNewDocument', { source: `try { localStorage.setItem('shader.practice.theme.v1', '${theme}'); ${training} } catch {}` }));
     for (const [width, height] of VIEWPORTS) {
       await page.viewport(width, height);
       await page.open(`${baseUrl}shader/practice.html?scenario=recover-highlights&seed=layout-proof`);
@@ -636,6 +720,7 @@ async function viewportMatrix(page, baseUrl) {
       await page.settle();
       const report = await page.eval(inspectLayout, STATEMENTS);
       report.themeApplied = await page.eval(() => document.documentElement.dataset.theme);
+      report.suggested = await page.eval(() => !document.getElementById('nextStep').hidden && document.querySelectorAll('[data-badge-for]:not([hidden])').length === 3);
       results.push({ width, height, theme, ...report });
       if (report.layout === 'compact') {
         for (const view of ['scopes', 'exercise', 'score', 'demo', 'shade']) {
@@ -649,6 +734,7 @@ async function viewportMatrix(page, baseUrl) {
       }
     }
   }
+  check('the next-step suggestion and exercise badges are present in every layout', results.filter(item => !item.view).every(item => item.suggested), results.filter(item => !item.view && !item.suggested).map(item => `${item.width}x${item.height}`));
   check('the saved theme applies in every layout', results.filter(item => !item.view).every(item => item.themeApplied === item.theme), results.filter(item => !item.view).map(item => `${item.width}:${item.themeApplied}`));
   const expectedLayout = width => (width < 900 ? 'compact' : width < 1280 ? 'medium' : 'desktop');
   const bad = results.filter(item => item.overflowX || item.overflowY);

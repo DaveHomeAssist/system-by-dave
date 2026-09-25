@@ -13,6 +13,12 @@ Minor versions add features or change a saved-file format; patch versions fix or
 
 Versions 1.0.0 to 1.5.3 were numbered after the fact from their merged pull requests.
 
+## 1.11.0 — 2026-09-25 — Next steps from this device's training record
+
+- Exercises marks the first exercise this session has not passed: Next, or Try again after a miss. Once all three have passed, it suggests the next Shading practice exercise this device has not passed, with a dismiss button that holds for two weeks.
+- An unnamed preset shows a name read from the shot: Wide when the whole downstage edge is in frame; otherwise Mid or Tight with the stage mark nearest the middle of the frame (for example "Tight · DSL"), or Off stage with its pan. Rename starts from that name, selected, and Session shows it as the name field's hint. Nothing is stored until the operator keeps it.
+- Finished exercises are also recorded in the training record shared with Shading practice (`fmpTraining.v1`, exercise ids and minute timestamps only, on this device), so each tool can suggest the other's next step. Session gains Continue in Shading practice and a Suggestions setting: On, Quiet (the Next marks only) or Off (records nothing and clears the record), with Forget training history. The session and its results are unchanged by any of these.
+
 ## 1.10.0 — 2026-09-25 — Links to the other cameras and into exercises
 
 - `?exercise=wide`, `?exercise=follow` or `?exercise=recall` starts that exercise when the page opens, so the FMP guides can link straight to one. The link is used once: the address then drops it (other parameters stay) and a reload continues the session. A value that names no exercise is refused in the status line.

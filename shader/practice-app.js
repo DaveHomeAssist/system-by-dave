@@ -8,9 +8,12 @@
 
   const Practice = window.ShaderPracticeState;
   const Render = window.ShaderPracticeRender;
+  // Training memory shared with the Camera Simulator (fmp-training.js). The
+  // console works without it; suggestions simply stay off.
+  const Training = window.FmpTraining || null;
   const THEME_KEY = 'shader.practice.theme.v1';
   const SESSION_KEY = 'shader.practice.session.v1';
-  const OFFLINE_CACHE_VERSION = 'v20260925-shader-practice-kit-links';
+  const OFFLINE_CACHE_VERSION = 'v20260925-shader-practice-suggestions';
   const DISPLAY = Object.freeze({ width: 96, height: 54 });
   const HISTORY_LIMIT = 100;
   const BLINK_INTERVAL = 700;
@@ -33,6 +36,7 @@
     history: [], future: [],
     debrief: null, debriefKey: '', debriefTimer: null,
     renderQueued: false, canvasOk: true, storageOk: true, restored: false,
+    training: Training ? Training.read() : null,
     toastTimer: null, saveTimer: null, announceTimer: null
   };
 
@@ -352,7 +356,8 @@
       els.exerciseList.append(h('li', {},
         h('button', { type: 'button', className: 'exercise', dataset: { scenario: scenario.id }, 'aria-current': 'false' },
           h('span', { className: 'exercise-index', 'aria-hidden': 'true', text: String(index + 1).padStart(2, '0') }),
-          ...spaced(h('span', { className: 'exercise-title', text: scenario.title.toUpperCase() }),
+          ...spaced(h('span', { className: 'exercise-title' }, ...spaced(scenario.title.toUpperCase(),
+            h('span', { className: 'pill exercise-badge', dataset: { badgeFor: scenario.id }, hidden: true }))),
             h('span', { className: 'exercise-brief', text: scenario.brief })))));
     });
     Practice.troubleshootingList().forEach(item => els.injectionSelect.append(h('option', { value: item.id, text: item.label })));
@@ -365,7 +370,10 @@
       const reset = h('button', { type: 'button', className: 'reset-btn', dataset: { reset: name }, 'aria-label': `Reset ${label} to the exercise start`, title: `Reset ${label} to the exercise start` });
       reset.append(svgIcon(resetPath));
       els.controlList.append(h('div', { className: 'control-row', dataset: { control: name } },
-        h('label', { className: 'control-name', for: `control-${name}`, text: label.toUpperCase() }),
+        h('label', { className: 'control-name', for: `control-${name}` }, label.toUpperCase(),
+          h('span', { className: 'next-tag', id: `next-${name}`, hidden: true },
+            h('span', { className: 'next-tag-mark', 'aria-hidden': 'true' }),
+            h('span', { className: 'sr-only' }))),
         h('span', { className: 'control-unit', 'aria-hidden': 'true', text: unitLabel(info) }),
         h('input', { type: 'text', className: 'control-value', id: `value-${name}`, inputmode: 'decimal', autocomplete: 'off', spellcheck: 'false', 'aria-label': `${label} value${unitWord ? ` in ${unitWord}` : ''}`, dataset: { valueFor: name } }),
         h('button', { type: 'button', className: 'step-btn', dataset: { step: '-1', control: name }, 'aria-label': `Decrease ${label}`, text: '−' }),
@@ -764,6 +772,7 @@
     intent({ type: 'score-check' }, { history: false });
     const check = state.checks[state.checks.length - 1];
     const evaluation = Practice.evaluatePractice(state);
+    if (Training && !state.demo) Training.recordStep(undefined, 'practice', state.scenarioId, { passed: evaluation.status === 'complete', score: evaluation.score });
     els.scoreButton.disabled = true;
     setText(els.scoreSummary, `Scoring check ${check.n}…`);
     if (ui.layout === 'desktop') ui.sideTab = 'score';
@@ -920,7 +929,8 @@
     applyVisibility();
     renderStatus(scenario, evaluation, alerts);
     renderExercise(scenario, evaluation, alerts);
-    renderControls(scenario);
+    renderControls(scenario, likelyCorrection());
+    renderTraining();
     renderMonitors(sources);
     renderScopes(sources);
     renderNotes(sources);
@@ -980,7 +990,7 @@
     els.faultList.replaceChildren(...(faults.length ? faults.map(label => h('li', {}, ...spaced(h('span', { className: 'pill', dataset: { level: 'WARN' }, text: 'FAULT' }), h('span', { text: `${label} on Camera B` })))) : [h('li', { className: 'hint', text: 'No faults injected.' })]));
   }
 
-  function renderControls(scenario) {
+  function renderControls(scenario, likely) {
     const camera = selectedCamera();
     const isReference = camera.id === scenario.referenceCameraId;
     document.querySelectorAll('[data-camera-switch]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.cameraSwitch === camera.id)));
@@ -1023,7 +1033,14 @@
       els.controlList.querySelectorAll(`[data-control="${name}"].step-btn`).forEach(button => {
         button.disabled = Number(button.dataset.step) < 0 ? value <= min : value >= max;
       });
-      range.closest('.control-row').dataset.active = String(name === ui.activeControl);
+      const row = range.closest('.control-row');
+      row.dataset.active = String(name === ui.activeControl);
+      const next = likely && likely.cameraId === camera.id && likely.control === name ? likely : null;
+      row.dataset.likely = String(Boolean(next));
+      const tag = byId(`next-${name}`);
+      setHidden(tag, !next);
+      setText(tag.firstChild, next ? `NEXT ${next.direction > 0 ? '+' : '−'}` : '');
+      setText(tag.lastChild, next ? `, suggested next: ${next.direction > 0 ? 'increase' : 'decrease'}` : '');
     });
   }
 
@@ -1311,6 +1328,109 @@
     setText(els.kitCameraText, kit.cameraText);
   }
 
+  // ---------- suggestions (fmp-training.js) ----------
+
+  const suggestionLevel = () => (Training && ui.training ? Training.level(ui.training) : 'off');
+
+  // The engine's next correction for the last check, while the controls still
+  // match that check. Moving anything retires it until the next check.
+  function likelyCorrection() {
+    if (suggestionLevel() === 'off' || !state.checks.length || state.demo) return null;
+    const debrief = debriefKey(state) === ui.debriefKey ? ui.debrief : null;
+    if (!debrief || debrief.next.complete || !debrief.next.control) return null;
+    const last = state.checks[state.checks.length - 1];
+    if (JSON.stringify(last.controls) !== JSON.stringify(Practice.controlsPair(state))) return null;
+    return { control: debrief.next.control, direction: debrief.next.direction, cameraId: debrief.next.cameraId };
+  }
+
+  // Once this exercise has passed on this device: the next exercise not yet
+  // passed, then the simulator's, in teaching order. Never while one is open.
+  function nextSuggestion() {
+    if (suggestionLevel() !== 'on' || state.demo) return null;
+    const record = ui.training;
+    const current = record.practice[state.scenarioId];
+    if (!current || !current.passed) return null;
+    const why = `${Training.title('practice', state.scenarioId)} passed on this device.`;
+    const practice = Training.nextStep(record, 'practice');
+    if (practice) return { id: `practice.next.${practice}`, scenarioId: practice, label: `NEXT: ${Training.title('practice', practice).toUpperCase()}`, why };
+    const sim = Training.nextStep(record, 'sim');
+    if (sim) return { id: `practice.next.sim-${sim}`, href: `/camera-sim/?exercise=${sim}`, label: `NEXT: CAMERA SIMULATOR · ${Training.title('sim', sim).toUpperCase()}`, why: 'Every shading exercise has passed on this device.' };
+    return null;
+  }
+
+  function renderTraining() {
+    const level = suggestionLevel();
+    const record = ui.training;
+    els.exerciseList.querySelectorAll('[data-badge-for]').forEach(badge => {
+      const entry = level === 'off' ? null : record.practice[badge.dataset.badgeFor];
+      setHidden(badge, !entry);
+      badge.dataset.level = entry && entry.passed ? 'OK' : 'IDLE';
+      setText(badge, entry ? (entry.passed ? 'PASSED' : `BEST ${entry.best}`) : '');
+    });
+    const next = nextSuggestion();
+    const shown = next && !Training.isDismissed(record, next.id) ? next : null;
+    setHidden(els.nextStep, !shown);
+    if (shown) {
+      els.nextStep.dataset.suggestion = shown.id;
+      setHidden(els.nextStepButton, Boolean(shown.href));
+      setHidden(els.nextStepLink, !shown.href);
+      if (shown.href) {
+        if (els.nextStepLink.getAttribute('href') !== shown.href) els.nextStepLink.setAttribute('href', shown.href);
+        setText(els.nextStepLink, shown.label);
+      } else {
+        els.nextStepButton.dataset.scenario = shown.scenarioId;
+        setText(els.nextStepButton, shown.label);
+      }
+      setText(els.nextStepWhy, shown.why);
+    }
+    // Continue in the simulator once it has been used here and has a step left.
+    const sim = level === 'on' && Object.keys(record.sim).length ? Training.nextStep(record, 'sim') : null;
+    setHidden(els.simContinue, !sim);
+    if (sim) {
+      const entry = record.sim[sim];
+      const href = `/camera-sim/?exercise=${sim}`;
+      if (els.simContinue.getAttribute('href') !== href) els.simContinue.setAttribute('href', href);
+      setText(els.simContinue, `Continue in the Camera Simulator · ${Training.title('sim', sim)}${entry ? ' · not passed yet' : ''}`);
+    }
+    if (els.suggestionsSelect.value !== level) els.suggestionsSelect.value = level;
+  }
+
+  function bindSuggestions() {
+    if (!Training) {
+      els.suggestionsSelect.disabled = true;
+      els.forgetTrainingButton.disabled = true;
+      return;
+    }
+    Training.subscribe(record => {
+      ui.training = record;
+      scheduleRender();
+    });
+    els.suggestionsSelect.addEventListener('change', () => {
+      const level = els.suggestionsSelect.value;
+      ui.training = Training.setLevel(undefined, level);
+      toast(level === 'on' ? 'Suggestions on.' : level === 'quiet' ? 'Suggestions quiet: the next control and exercise badges only.' : 'Suggestions off. Training history on this device is cleared and nothing more is recorded.');
+    });
+    els.forgetTrainingButton.addEventListener('click', () => {
+      ui.training = Training.forget();
+      toast('Training history forgotten on this device. Your practice session is kept.');
+    });
+    els.nextStepDismiss.addEventListener('click', () => {
+      const id = els.nextStep.dataset.suggestion;
+      if (id) ui.training = Training.dismiss(undefined, id);
+      announce('Suggestion dismissed for two weeks.');
+      els.exerciseList.querySelector('[data-scenario]').focus();
+    });
+    els.nextStepButton.addEventListener('click', () => {
+      const scenarioId = els.nextStepButton.dataset.scenario;
+      if (!Practice.SCENARIOS[scenarioId]) return;
+      stopBlink();
+      intent({ type: 'load-scenario', scenarioId }, { resetHistory: true });
+      const scenario = scenarioOf(state);
+      announce(`${scenario.title} loaded. ${scenario.objective}`);
+      els.exerciseList.querySelector(`[data-scenario="${scenarioId}"]`).focus();
+    });
+  }
+
   function renderNotes(sources) {
     if (!canAdjustSelected()) {
       setText(els.controlNotesTitle, 'REFERENCE');
@@ -1485,6 +1605,7 @@
     bindComparison();
     bindTraining();
     bindShare();
+    bindSuggestions();
     bindGlobal();
     ui.layout = detectLayout();
     if (ui.layout === 'medium') ui.sideTab = 'control';
@@ -1537,6 +1658,7 @@
     score: () => { scoreAttempt(); return clone(state); },
     renderNow,
     debrief: () => clone(computeDebrief()),
+    training: () => clone(ui.training),
     ui: () => ({ layout: ui.layout, sideTab: ui.sideTab, view: ui.view, stepSize: ui.stepSize, blinking: ui.blinking, blinkShowing: ui.blinkShowing, activeControl: ui.activeControl, history: ui.history.length, future: ui.future.length, canvas: ui.canvasOk, storage: ui.storageOk, offline: document.documentElement.dataset.offline || '' })
   });
 

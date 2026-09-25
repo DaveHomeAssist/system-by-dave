@@ -10,6 +10,7 @@ import { type ExerciseEvent, type ExerciseSample } from "../../exercises/types";
 import { WideShotExercise } from "../../exercises/wide";
 import { cameraFrame } from "../../sim/framing";
 import { performerState, planPath } from "../../sim/performer";
+import { recordSimResult } from "../training";
 import { type StoreCore } from "./core";
 import { newId } from "./helpers";
 import { type PersistenceController } from "./persistence";
@@ -87,6 +88,7 @@ export class ExerciseController {
     const session = this.core.project.session;
     const results = [...session.exerciseResults, result].slice(-MAX_EXERCISE_RESULTS);
     this.core.project = { ...this.core.project, session: { ...session, exerciseResults: results } };
+    recordSimResult(result.exercise, result.passed);
     this.core.announce(result.summary, result.passed ? "success" : "warn");
     this.persistence.scheduleSave();
     return true;

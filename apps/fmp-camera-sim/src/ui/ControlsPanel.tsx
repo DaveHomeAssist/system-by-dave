@@ -1,4 +1,6 @@
 import { useTelemetry } from "../app/hooks";
+import { training, useTraining } from "../app/training";
+import { suggestPresetName } from "../sim/presetName";
 import { type SimulatorStore, type StoreState } from "../app/store";
 import { type InputController, nowSeconds } from "../input/controller";
 import { Joystick } from "./Joystick";
@@ -17,6 +19,7 @@ export function ControlsPanel({ store, input, state }: Props) {
   const telemetry = useTelemetry(store);
   const { session } = state.project;
   const announcement = state.announcement;
+  const suggestions = training.level(useTraining());
   return (
     <section className="panel controls-panel" aria-labelledby="controls-title">
       <h2 id="controls-title" className="visually-hidden">
@@ -43,6 +46,7 @@ export function ControlsPanel({ store, input, state }: Props) {
           }}
           onRename={(slot, name) => store.renamePreset(slot, name)}
           onClear={(slot) => store.deletePreset(slot)}
+          suggestName={suggestions === "off" ? undefined : (preset) => suggestPresetName(state.geometry, state.project.camera, preset)}
         />
       </div>
       <p className={`status-line ${announcement ? `tone-${announcement.tone}` : ""}`} role="status" aria-live="polite" data-testid="status-line">

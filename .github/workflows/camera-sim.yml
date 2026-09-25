@@ -10,6 +10,7 @@ on:
     paths:
       - 'apps/fmp-camera-sim/**'
       - 'camera-sim/**'
+      - 'shader/fmp-training.js'
       - 'scripts/build_camera_sim_offline.mjs'
       - 'scripts/camera_sim_release*.mjs'
       - 'scripts/verify_camera_sim_release.mjs'
