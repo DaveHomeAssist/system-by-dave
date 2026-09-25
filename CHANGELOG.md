@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-09-25 — Throwline pins the retired-landing cache version
+
+- The AV offline cache moved to `v20260925-landing-retire` when the previous landing was retired, but Throwline Stage 3D still pinned `v20260925-throwline-min` for its offline-readiness check. `verify:throwline` failed the Pages deploy for that change and for the WebP photo re-export, so neither reached the live sites. Stage 3D now pins the current version, and the whole deploy gate list passes locally.
+
 ## 2026-09-25 — ATEM reference photos ship as WebP
 
 - Re-exported `fmp/` from fmp-suite `6890c9a` (fmp-suite PR #27). The four ATEM HD8 ISO reference photos are WebP at quality 90 instead of PNG: 3.43 MB down to 180 KB (the front view 2.51 MB to 99 KB). At 2x zoom the button legends read the same; the front view measures 43.5 dB PSNR against the original. Dave chose lossy WebP on 2026-09-25.
