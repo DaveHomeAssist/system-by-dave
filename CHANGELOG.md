@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-09-25 — Stage 3D pins the current AV cache version
+
+- `42822ec` moved the AV offline cache to `v20260925-landing-retire` but left Stage 3D's offline readiness pinned to `v20260925-throwline-min`, so `verify_throwline_release.js` failed and every Pages deploy from main since 14:58 failed with it. Stage 3D now pins `v20260925-landing-retire`.
+
 ## 2026-09-25 — ATEM reference photos ship as WebP
 
 - Re-exported `fmp/` from fmp-suite `6890c9a` (fmp-suite PR #27). The four ATEM HD8 ISO reference photos are WebP at quality 90 instead of PNG: 3.43 MB down to 180 KB (the front view 2.51 MB to 99 KB). At 2x zoom the button legends read the same; the front view measures 43.5 dB PSNR against the original. Dave chose lossy WebP on 2026-09-25.
