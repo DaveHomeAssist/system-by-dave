@@ -1,7 +1,7 @@
 {
   "schema": "fmp.public.release.v2",
   "sourceRepository": "DaveHomeAssist/fmp-suite",
-  "sourceCommit": "c3377985cecbed9a344daa3dcbd027016bd386aa",
+  "sourceCommit": "6890c9a664422f7a45687c32cecb58cf3bbdb337",
   "mode": "commissioning",
   "files": {
     "build/index.html": "51e9a2c6690ebf3b5728769251d6afccda38b269210f6fa5657bd849c1a4e933",
@@ -28,15 +28,15 @@
     "house/site-plan.png": "655d27449a2f686ad17b74bed39b11edc69af9d342d46d079b98c042e4876f2e",
     "index.html": "5b43543e241df69e93d6457420a7da9620f173aa92cd5e9bce9f2121245a8a59",
     "mail.js": "4a521185a33c8463a3b34493771e381d7982bb59f0f8d9b5096d074727e32a91",
-    "models/assets/atem-hd8-iso-0.js": "994da759b9c08666687f604efec7ca474e82d6949ef04cae5a0a5a76dea27fd4",
+    "models/assets/atem-hd8-iso-0.js": "a7b138d09313c7b7ae5d846ec9dd63bbcbf12d624b46ef5124797dd04c569a15",
     "models/assets/atem-hd8-iso-1.js": "c8e396eb457048488a10e71169fe4b9ebdcbda72e48007a52438285d46fe836d",
     "models/assets/atem-hd8-iso-2.js": "d3ec47c4ede2eacfa4868e0221994002f23e66cd338bc0c670e8d1a2a0b1953e",
     "models/assets/atem-hd8-iso-3.js": "4bb84a78c4f6ab650f4a01147ba85aec16c129d5b2fd38ffd71f5ceb35c287f6",
     "models/assets/atem-hd8-iso.css": "4b0b5e3a59684bf01cb4d65f814825b7aec43ba2e3125b173d832c17e7c85743",
-    "models/assets/atem-photo-front.png": "2068332d714a8a02cc1951bd5ab6afbb36e35a0b602487cc3be2d78522d64e50",
-    "models/assets/atem-photo-perspective.png": "aa696c11f7a133ac7b9b16296ffd7780656ca1b09fc3650e6ba3568adf6e2406",
-    "models/assets/atem-photo-rear.png": "0bb58a5fe5e59fef12e840d4da4055b31a0eed444912a6cd0af46be9edf35c19",
-    "models/assets/atem-photo-side.png": "dd1de0d902d52d172c324843546dce423070582dce15cad64a9d4e0caf2caa0a",
+    "models/assets/atem-photo-front.webp": "91763cff641f73860c97a8761f5bc9f460c0b6327d90cecc64480f95fd6338ee",
+    "models/assets/atem-photo-perspective.webp": "2fee46033fb4461814a9589557e694a333a7e3d1c4b46050101a3ae4b7e0ad95",
+    "models/assets/atem-photo-rear.webp": "66d1ec6cf9eb3b0397bf7fdc494a6ee7e082257a3d45d0d4fc0eb435837e8751",
+    "models/assets/atem-photo-side.webp": "cce05bbe49b47184dd8318a7e748e80be25730cee6ef352699c60ec3cccc708a",
     "models/assets/bench-core.js": "8e5a693e2db16c18ccbede697be98e726c358e6b1007a8342409cf8d50a8d516",
     "models/assets/bench.css": "65a67e8b7fe645e32cb87fd601e0bc3fafc63a5f97198a3a64673cb02f64372b",
     "models/assets/ccu4-0.js": "7005192118347731f670b3e860e9ce5ab74e32e724ffa9c5c715c8266123121b",
@@ -45,7 +45,7 @@
     "models/assets/model-shell.js": "74b43475c2654acbe70dfd9c386ae3dc627df32c73aa4259d100f5079cf1a15f",
     "models/assets/p240-0.js": "4e07d4b2e0877535129aa6a604a44f17a4083330b62dbc53bbbff033e69bc742",
     "models/assets/p240-catalog.json": "ac9b1dde8a9f9f548daf58d69e39bb0df4a0aabcdc55b396001d4c293466497e",
-    "models/atem-hd8-iso.html": "eb88af9c28664063b9188bb001b98c13780b6dbe7c2e58c3a2c749dd8f14e879",
+    "models/atem-hd8-iso.html": "81abd8c6f5068f0d7090e5743a4d9e65cbb4658e6276c21f931190dc2bef8af9",
     "models/ccu4.html": "7b08fff7d7f82bdc8dceb2eaa95382fc4b9e1d8f35069176323ff681110bbd7c",
     "models/p240.html": "df153f6e6fb26b37c368aae947e6b2c5c83b8259b3c4f07c09efde146ab48dd4",
     "models/vendor/LICENSE": "852e0e8699169bf9f6fdc6bda3e682d078dcbc738b5d33e74df594721bff271d",
@@ -84,5 +84,5 @@
     "rig/vendor/three/three.module.js": "a476b88d0df406dca0e30c65b4cdf0180c7337110accec828c103655b56a361c",
     "theme.js": "34276e275d44d4380407b996455291bfcca9cc4a9a4ef81b632534b00fc1747a"
   },
-  "artifactSha256": "5f8b3c8450cb4ea7843a4dd34ec4822abf898c38df726d46a7454caba90b88de"
+  "artifactSha256": "bea0a96066f339c846019311edc0b8345f2275065c1f8ac468527d2e12047e32"
 }
