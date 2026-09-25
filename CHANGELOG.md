@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-25 — A source-controlled page manifest for the domain sites
+
+- `npm run manifest:housevideo` (`scripts/build_housevideo_manifest.mjs`) lists every page housevideo.app publishes with its head title, description, first heading, canonical, robots tag, `robots.txt` status, sitemap membership, size, where it is edited and when it last changed. The page manifest had been generated outside the repository; its generator is now here.
+- Titles come from the document head only. The earlier manifest read the house page's inline SVG `<title>` ("Six bowl walls around the pavilion") as the page title; `scripts/housevideo_manifest.test.mjs` covers it and runs in `verify:domain-sites`.
+- Static links (in the HTML) and runtime links (counted in a headless browser after load, other domains blocked) are separate columns, so pages that build their navigation in script no longer look like dead ends.
+
 ## 2026-09-25 — housevideo.app pages are crawlable for their noindex; references link their explorers
 
 - robots.txt blocked `/fmp/` and `/camera-sim/` while five indexed reference pages link to `/fmp/`, so a search engine could list the bare hub address without ever reading its noindex tag. The new `robotsAllow` in `scripts/domain-sites.json` reopens the HTML under both routes; data files, scripts and photos stay blocked, and the stager allows exactly the link-preview images the pages name (`/fmp/fmp-social-card.png`, `/camera-sim/og.png`), which were blocked before.
