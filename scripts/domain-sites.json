@@ -35,6 +35,13 @@
         "/fmp/",
         "/camera-sim/"
       ],
+      "robotsAllow": [
+        "/fmp/$",
+        "/fmp/*/$",
+        "/fmp/*.html$",
+        "/camera-sim/$",
+        "/camera-sim/*.html$"
+      ],
       "storage": {
         "registryKeys": false,
         "revision": 2,

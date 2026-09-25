@@ -526,12 +526,114 @@ self.addEventListener('activate', function(event){
 });
 `;
 
-function robots(site, origin, cutover, hasSitemap) {
+function robots(site, origin, cutover, hasSitemap, imageAllows = []) {
   // Until cutover the new domain mirrors pages whose canonical URLs still name
   // systembydave.com; keep crawlers out so the mirror never competes with them.
   if (!cutover) return 'User-agent: *\nDisallow: /\n';
   const disallow = (site.robotsDisallow || []).map((route) => `Disallow: ${route}\n`).join('');
-  return `User-agent: *\nAllow: /\n${disallow}${hasSitemap ? `Sitemap: ${origin}/sitemap.xml\n` : ''}`;
+  const allow = [...(site.robotsAllow || []), ...imageAllows.map((image) => `${image}$`)]
+    .map((route) => `Allow: ${route}\n`).join('');
+  return `User-agent: *\nAllow: /\n${disallow}${allow}${hasSitemap ? `Sitemap: ${origin}/sitemap.xml\n` : ''}`;
+}
+
+// A crawler that obeys robots.txt never fetches a blocked page, so it never reads that page's
+// noindex tag, and an indexed page linking to it can still get the bare address listed. A site's
+// robotsAllow reopens the HTML under a blocked route so the tag is read. Everything else there
+// stays blocked, because GitHub Pages cannot send an X-Robots-Tag header for data files and
+// images, except the link-preview images the pages name, which preview crawlers must fetch.
+//
+// Matching follows Google's rules for the single "User-agent: *" group this script writes:
+// "*" matches any run of characters, a trailing "$" anchors the end, the longest matching
+// pattern wins, and Allow wins a tie.
+function robotsRules(text) {
+  const rules = [];
+  for (const line of text.split('\n')) {
+    const match = /^(Allow|Disallow):\s*(\S*)/i.exec(line.trim());
+    if (match && match[2]) rules.push({ allow: match[1].toLowerCase() === 'allow', pattern: match[2] });
+  }
+  return rules;
+}
+
+function robotsPatternMatches(pattern, urlPath) {
+  const anchored = pattern.endsWith('$');
+  const body = anchored ? pattern.slice(0, -1) : pattern;
+  const source = body.split('*').map((part) => part.replace(/[.+?^${}()|[\]\\]/g, '\\$&')).join('.*');
+  return new RegExp(`^${source}${anchored ? '$' : ''}`).test(urlPath);
+}
+
+function robotsAllows(rules, urlPath) {
+  let best = null;
+  for (const rule of rules) {
+    if (!robotsPatternMatches(rule.pattern, urlPath)) continue;
+    const longer = !best || rule.pattern.length > best.pattern.length;
+    if (longer || (rule.pattern.length === best.pattern.length && rule.allow)) best = rule;
+  }
+  return !best || best.allow;
+}
+
+const metaTags = (text) => text.match(/<meta\b[^>]*>/gi) || [];
+
+function declaresNoindex(text) {
+  return metaTags(text).some((tag) => /\bname\s*=\s*["']robots["']/i.test(tag)
+    && /\bcontent\s*=\s*["'][^"']*\bnoindex\b/i.test(tag));
+}
+
+function listStaged(dir, prefix = '') {
+  const files = [];
+  for (const entry of fs.readdirSync(path.join(dir, prefix), { withFileTypes: true })) {
+    const rel = `${prefix}${entry.name}`;
+    if (entry.isDirectory()) files.push(...listStaged(dir, `${rel}/`));
+    else files.push(rel);
+  }
+  return files.sort();
+}
+
+// Paths on this site that a staged page names as its og:image or twitter:image.
+function previewImagePaths(site, dir, files) {
+  const origin = `https://${site.domain}`;
+  const paths = new Set();
+  for (const rel of files.filter((file) => /\.html?$/i.test(file))) {
+    for (const tag of metaTags(fs.readFileSync(path.join(dir, rel), 'utf8'))) {
+      if (!/\b(?:property|name)\s*=\s*["'](?:og:image|twitter:image)["']/i.test(tag)) continue;
+      const content = /\bcontent\s*=\s*["']([^"']+)["']/i.exec(tag);
+      if (!content) continue;
+      let url;
+      try { url = new URL(content[1], `${origin}/${rel}`); } catch { continue; }
+      if (url.origin === origin) paths.add(url.pathname);
+    }
+  }
+  return [...paths].sort();
+}
+
+// Every staged file under a blocked route that robotsAllow reopens: HTML must be fetchable and
+// declare noindex, link-preview images must be fetchable, and every other file must stay blocked.
+function crawlPolicyProblems(site, dir) {
+  const reopened = (site.robotsDisallow || [])
+    .filter((route) => (site.robotsAllow || []).some((allow) => allow.startsWith(route)));
+  if (!reopened.length) return [];
+  const rules = robotsRules(fs.readFileSync(path.join(dir, 'robots.txt'), 'utf8'));
+  const files = listStaged(dir);
+  const images = new Set(previewImagePaths(site, dir, files));
+  const problems = [];
+  for (const rel of files) {
+    const urlPath = `/${rel}`;
+    if (!reopened.some((route) => urlPath.startsWith(route))) continue;
+    if (/\.html?$/i.test(rel)) {
+      const addresses = rel.endsWith('/index.html') || rel === 'index.html'
+        ? [urlPath, urlPath.slice(0, -'index.html'.length)] : [urlPath];
+      for (const address of addresses) {
+        if (!robotsAllows(rules, address)) problems.push(`${address} is a page under a reopened route, but robots.txt blocks it, so its noindex tag is never read.`);
+      }
+      if (!declaresNoindex(fs.readFileSync(path.join(dir, rel), 'utf8'))) {
+        problems.push(`${urlPath} can be crawled under robotsAllow but has no noindex robots meta tag.`);
+      }
+    } else if (images.has(urlPath)) {
+      if (!robotsAllows(rules, urlPath)) problems.push(`${urlPath} is a link-preview image, but robots.txt blocks it.`);
+    } else if (robotsAllows(rules, urlPath)) {
+      problems.push(`${urlPath} is neither a page nor a link-preview image, but robots.txt lets crawlers fetch it.`);
+    }
+  }
+  return problems;
 }
 
 function writeFile(dir, rel, data) {
@@ -589,7 +691,11 @@ function stageSite(site, closed, policy, options) {
     execFileSync('python3', [path.join(ROOT, 'scripts/gen_sitemap.py'), '--site', site.id, '--out', path.join(dir, 'sitemap.xml')], { cwd: ROOT, stdio: ['ignore', 'ignore', 'inherit'] });
     hasSitemap = fs.existsSync(path.join(dir, 'sitemap.xml'));
   }
-  writeFile(dir, 'robots.txt', robots(site, origin, options.cutover, hasSitemap));
+  const baseRules = robotsRules(robots(site, origin, options.cutover, hasSitemap));
+  const blockedImages = options.cutover
+    ? previewImagePaths(site, dir, listStaged(dir)).filter((image) => !robotsAllows(baseRules, image))
+    : [];
+  writeFile(dir, 'robots.txt', robots(site, origin, options.cutover, hasSitemap, blockedImages));
   writeFile(dir, 'CNAME', `${site.domain}\n`);
   writeFile(dir, '.nojekyll', '');
   const hashes = {};
@@ -748,6 +854,12 @@ function main() {
       continue;
     }
     const result = stageSite(site, closed, policies[site.id], { ...options, policies, cutover });
+    const crawlProblems = cutover ? crawlPolicyProblems(site, result.dir) : [];
+    if (crawlProblems.length) {
+      failed = true;
+      crawlProblems.forEach((problem) => console.error(`FAIL ${site.id} crawl policy: ${problem}`));
+      continue;
+    }
     staged.push({ site, entries, cutover, result });
     console.log(`${site.id}: staged ${result.files} files for ${site.domain} (${entries.pages.size} moving pages/files, ${closed.files.size - entries.pages.size} shared assets, cutover ${cutover ? 'on' : 'off'})`);
   }
@@ -781,6 +893,9 @@ function main() {
   }
 }
 
-export { CONFIG_FILE, read, loadRegistry, siteEntries, routeFor };
+export {
+  CONFIG_FILE, read, loadRegistry, siteEntries, routeFor,
+  robots, robotsRules, robotsAllows, declaresNoindex, previewImagePaths, crawlPolicyProblems
+};
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) main();

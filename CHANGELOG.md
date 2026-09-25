@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-09-25 — housevideo.app pages are crawlable for their noindex; references link their explorers
+
+- robots.txt blocked `/fmp/` and `/camera-sim/` while five indexed reference pages link to `/fmp/`, so a search engine could list the bare hub address without ever reading its noindex tag. The new `robotsAllow` in `scripts/domain-sites.json` reopens the HTML under both routes; data files, scripts and photos stay blocked, and the stager allows exactly the link-preview images the pages name (`/fmp/fmp-social-card.png`, `/camera-sim/og.png`), which were blocked before.
+- `npm run verify:domain-sites` now runs `scripts/domain_robots.test.mjs` and walks every staged file under a reopened route: each page must be fetchable and declare noindex, each preview image fetchable, every other file blocked. See "Crawl policy for blocked routes" in `docs/domain-sites.md`.
+- Back Focus names FMP Video Operations as its parent with AV Toolbox as the secondary link, like the other FMP references; it had AV Suite as the parent.
+- The switcher reference links the ATEM HD8 ISO explorer, the shader reference the ATEM Camera Control Panel explorer, and the URSA Broadcast G2 reference the camera rig explorer.
+- From the housevideo.app navigation review (2026-09-25).
+
 ## 2026-09-25 — Throwline pins the retired-landing cache version
 
 - The AV offline cache moved to `v20260925-landing-retire` when the previous landing was retired, but Throwline Stage 3D still pinned `v20260925-throwline-min` for its offline-readiness check. `verify:throwline` failed the Pages deploy for that change and for the WebP photo re-export, so neither reached the live sites. Stage 3D now pins the current version, and the whole deploy gate list passes locally.
