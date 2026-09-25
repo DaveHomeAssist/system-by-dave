@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-09-25 — FMP hygiene probe: P5 follows the retired walk
+
+- The live FMP hygiene probe (`npm run hygiene:fmp`) reported Red on every run because check P5 required `fmp/` and `fmpwalk/` to pin the same fmp-suite commit. The walk was retired in fmp-suite `0946989` and is no longer exported, so the two could not match again. P5 now checks that active releases (`fmp/`) share one export and that the frozen `fmpwalk/` release stays at `5d67a92`, so an unplanned re-release still fails.
+- `npm run test:fmp-hygiene` covers the rule offline and runs in the FMP release check and the Pages workflow. `docs/fmp-hygiene-routine.md` describes P4 and P5 as they now work.
+
 ## 2026-09-25 — AV by Dave tools protect saved work
 
 - **Keep / Switch.** A tool opened from the console with a different show than the one it has saved now keeps its saved show and asks whether to keep it or switch. Before, the console's show name, venue, date and operator silently replaced the tool's saved values. Fresh tools, "Untitled" defaults and matching names still fill in straight away.
