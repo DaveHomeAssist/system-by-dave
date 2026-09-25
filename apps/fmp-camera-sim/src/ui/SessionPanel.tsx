@@ -177,6 +177,19 @@ export function SessionPanel({ store, state }: Props) {
         </ul>
       </section>
 
+      <section aria-labelledby="other-cameras-title">
+        <h3 id="other-cameras-title">Other cameras</h3>
+        <p className="field-help">Cameras 1–3 are manned URSA Broadcast G2 bodies, shaded from the shader panel. Camera 4 is set from its own menus, not the shader panel.</p>
+        <ul className="link-list">
+          <li>
+            <a href={suiteHref(SUITE_LINKS.shadingPractice)}>Exposure and colour: Shading practice</a>
+          </li>
+          <li>
+            <a href={suiteHref(SUITE_LINKS.ursaRig)}>URSA camera rig explorer</a>
+          </li>
+        </ul>
+      </section>
+
       <section aria-labelledby="reset-title">
         <h3 id="reset-title">Reset</h3>
         {confirmReset ? (

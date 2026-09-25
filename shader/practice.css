@@ -277,6 +277,13 @@ input[type="text"]:hover, select:hover, textarea:hover { border-color: var(--ink
 .panel-links { gap: var(--space-1); }
 .link-row { display: flex; align-items: center; min-height: var(--target); padding: 0 var(--space-3); border: 1px solid var(--hairline); border-radius: var(--radius-sm); background: var(--surface-200); font-size: 13px; font-weight: 600; text-decoration: none; }
 .link-row::after { content: "→"; margin-left: auto; color: var(--ink-muted); }
+.kit-links { flex: none; display: grid; gap: var(--space-1); padding-top: var(--space-2); border-top: 1px solid var(--hairline); }
+.kit-title { margin: 0; font: 600 11px/14px var(--sans); letter-spacing: 0.1em; color: var(--ink-muted); }
+.kit-row { gap: var(--space-2); font-weight: 500; }
+.kit-where { flex: none; font: 700 11px/14px var(--mono); letter-spacing: 0.06em; color: var(--ink-muted); }
+.kit-what { min-width: 0; overflow-wrap: anywhere; }
+.kit-kind { flex: none; margin-left: auto; font: 700 11px/14px var(--mono); letter-spacing: 0.06em; color: var(--ink-muted); }
+.kit-note { margin: 0; font-size: 12px; line-height: 16px; color: var(--ink-muted); }
 
 /* ---------- score panel ---------- */
 .score-plate { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--space-4); align-items: center; padding: var(--space-4); background: var(--surface-200); border: 1px solid var(--hairline); border-radius: var(--radius-md); }
@@ -494,7 +501,8 @@ input[type="range"]:focus-visible { outline-offset: 0; }
 /* Short desktop and laptop screens: the scopes and their measurement
    disclaimer keep priority over the secondary control notes. */
 @media (min-width: 900px) and (max-height: 700px) {
-  .control-notes, .status-next, .status-alerts .alert-detail { display: none; }
+  /* Short laptops give every spare line to the control list: the notes and the kit links go. */
+  .control-notes, .kit-links, .status-next, .status-alerts .alert-detail { display: none; }
   .scope-glass { min-height: 72px; }
   .monitor-panel .panel-foot { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 }

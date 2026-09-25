@@ -120,6 +120,7 @@
             <nav class="block panel-links" aria-label="Related references">
               <a class="link-row" href="index.html">Camera control &amp; shading reference</a>
               <a class="link-row" href="/fmp/">FMP Video Operations</a>
+              <a class="link-row" href="/camera-sim/">Camera Simulator · Camera 4 framing</a>
             </nav>
             <p class="disclaimer">Generated pictures and scopes only. Nothing here reads or controls real equipment.</p>
             <p class="mono-note" id="offlineStatus" role="status">Preparing offline use.</p>
@@ -357,6 +358,12 @@
           <button type="button" class="btn btn-wide" id="lockTargetButton">CONTROL CAM B</button>
         </div>
         <div class="control-list" id="controlList"></div>
+        <section class="kit-links" id="kitLinks" aria-labelledby="kitHeading">
+          <h3 class="kit-title" id="kitHeading">ON THE KIT · <span id="kitControl">IRIS</span></h3>
+          <a class="link-row kit-row" id="kitPanelLink" href="/fmp/models/ccu4.html#part=ccu4.ch1.joystick"><span class="kit-where">SHADER PANEL</span> <span class="kit-what" id="kitPanelText">Joystick, lean for iris</span> <span class="kit-kind" id="kitPanelKind">PHYSICAL</span></a>
+          <a class="link-row kit-row" id="kitCameraLink" href="/fmp/rig/?equipment=rig&amp;part=iris-mode"><span class="kit-where">CAMERA</span> <span class="kit-what" id="kitCameraText">Iris A/M switch · must be on A</span></a>
+          <p class="kit-note" id="kitCameraNone" hidden>No matching control on the camera body.</p>
+        </section>
         <div class="score-strip">
           <button type="button" class="btn btn-primary" id="scoreButton">SCORE ATTEMPT</button>
           <div class="score-summary">

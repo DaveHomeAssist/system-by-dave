@@ -13,6 +13,12 @@ Minor versions add features or change a saved-file format; patch versions fix or
 
 Versions 1.0.0 to 1.5.3 were numbered after the fact from their merged pull requests.
 
+## 1.10.0 — 2026-09-25 — Links to the other cameras and into exercises
+
+- `?exercise=wide`, `?exercise=follow` or `?exercise=recall` starts that exercise when the page opens, so the FMP guides can link straight to one. The link is used once: the address then drops it (other parameters stay) and a reload continues the session. A value that names no exercise is refused in the status line.
+- Session has an Other cameras section: Shading practice for exposure and colour, and the URSA camera rig explorer, for Cameras 1–3. It says Camera 4 is set from its own menus, not the shader panel. The BirdDog P240 model link now opens at the lens.
+- Every link is listed in `docs/camera-training-links.md`, and `npm run test:camera-training-links` checks each target against the catalog that owns it.
+
 ## 1.9.0 — 2026-09-24 — Controls beside the monitor
 
 - A larger picture on landscape screens. Stacked over the controls, the 16:9 picture was height-bound: an 11-inch iPad in Chrome (1180 × 685) showed it at 232 × 130 in a 779 px wide panel. With the venue view collapsed, landscape screens from 960 px wide and at least 4:3 now put the controls in a column beside the monitor, and the picture takes the width left of them: 558 × 314 on that iPad, 402 × 226 on a 1024 px iPad in Safari (was 248 × 139) and 608 × 342 in a 1366 × 650 laptop browser (was 204 × 115).

@@ -142,6 +142,7 @@ Throwline's catalog is synchronized and verified through its dedicated scripts.
 - FMP Camera Simulator architecture, evidence and gates: `docs/fmp-camera-simulator.md`; what
   happened to each finding of the September 2026 audits: `docs/fmp-camera-simulator-audit-2026-09.md`
 - Camera Shading Practice console and its state contract: `docs/shader-practice.md`
+- Links between the camera training tools and the FMP explorers: `docs/camera-training-links.md`
 - AV inventory and storage keys: `js/sbd-registry.js`
 - Sitemap membership: `scripts/gen_sitemap.py`
 - AV Suite doorway and storage: `docs/av-suite-doorway.md`

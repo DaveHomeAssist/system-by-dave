@@ -66,6 +66,7 @@ jobs:
           npm run verify:public-consistency
           npm run verify:fmp
           npm run verify:domain-sites
+          npm run test:camera-training-links
 
       - name: Verify AV suite import safety
         env:
