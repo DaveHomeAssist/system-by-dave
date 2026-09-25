@@ -13,6 +13,10 @@ Minor versions add features or change a saved-file format; patch versions fix or
 
 Versions 1.0.0 to 1.5.3 were numbered after the fact from their merged pull requests.
 
+## 1.12.1 — 2026-09-25 — Reload hint when the simulator does not load
+
+- The page shown before the simulator starts now says first that reloading usually fixes a simulator that does not load, for example just after an update, then that it needs JavaScript and WebGL, with the Catwalk PTZ operating guide link as before. A tab opened just before a release can ask for the previous release's script, which is gone; the page used to blame JavaScript and WebGL even though a reload fixes it.
+
 ## 1.12.0 — 2026-09-25 — Draw only what changed; venue view needs room
 
 - The monitor and the venue view are drawn only when their picture would change: the camera or the performer moves, the venue view is orbited or still easing, a canvas resizes, or the theme, cutaway, venue or view preset changes. A still camera used to redraw every frame (44 draws in 1.5 s on a 1024 × 768 screen), which costs battery and heat on a tablet for no visible change. `?render=always` draws every frame again, for comparison.
