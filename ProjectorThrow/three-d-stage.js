@@ -17,7 +17,7 @@
  *   <script type="importmap">
  *   {
  *     "imports": {
- *       "three": "./vendor/three/three.module.js",
+ *       "three": "./vendor/three/three.module.min.js",
  *       "three/addons/controls/OrbitControls.js": "./vendor/three/addons/controls/OrbitControls.js",
  *       "three/addons/exporters/OBJExporter.js": "./vendor/three/addons/exporters/OBJExporter.js",
  *       "three/addons/exporters/GLTFExporter.js": "./vendor/three/addons/exporters/GLTFExporter.js"

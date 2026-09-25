@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-25 — Throwline ships minified three.js
+
+- Throwline Stage 3D now loads the upstream minified three.js r184 builds (`three.module.min.js` and `three.core.min.js`, 187 KB gzip) instead of the unminified ones (about 420 KB gzip). Both files are preloaded, so the engine starts downloading with the page instead of after `three-d-stage.js` runs. The addons, the exporters and the scene are unchanged.
+- `scripts/vendor_throwline_three.js`, the Stage 3D import map, `verify_throwline_release.js` and the AV offline manifest use the new file names. Offline cache version `v20260925-throwline-min`, so installed copies drop the old engine files.
+- From the three.js apps audit. The `ProjectorThrow/` link is unchanged: the registry route drives the sitemap, navigation and saved tool identity.
+
 ## 2026-09-25 — AV by Dave tools protect saved work
 
 - **Keep / Switch.** A tool opened from the console with a different show than the one it has saved now keeps its saved show and asks whether to keep it or switch. Before, the console's show name, venue, date and operator silently replaced the tool's saved values. Fresh tools, "Untitled" defaults and matching names still fill in straight away.

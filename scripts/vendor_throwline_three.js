@@ -6,8 +6,8 @@ const path = require('node:path');
 
 const root = path.resolve(__dirname, '..');
 const files = [
-  ['node_modules/three/build/three.module.js', 'ProjectorThrow/vendor/three/three.module.js'],
-  ['node_modules/three/build/three.core.js', 'ProjectorThrow/vendor/three/three.core.js'],
+  ['node_modules/three/build/three.module.min.js', 'ProjectorThrow/vendor/three/three.module.min.js'],
+  ['node_modules/three/build/three.core.min.js', 'ProjectorThrow/vendor/three/three.core.min.js'],
   ['node_modules/three/examples/jsm/controls/OrbitControls.js', 'ProjectorThrow/vendor/three/addons/controls/OrbitControls.js'],
   ['node_modules/three/examples/jsm/exporters/OBJExporter.js', 'ProjectorThrow/vendor/three/addons/exporters/OBJExporter.js'],
   ['node_modules/three/examples/jsm/exporters/GLTFExporter.js', 'ProjectorThrow/vendor/three/addons/exporters/GLTFExporter.js']

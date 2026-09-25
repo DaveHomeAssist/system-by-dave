@@ -136,8 +136,8 @@
     './ProjectorThrow/Stage3D.html',
     './ProjectorThrow/throwline-scene-state.js',
     './ProjectorThrow/three-d-stage.js',
-    './ProjectorThrow/vendor/three/three.module.js',
-    './ProjectorThrow/vendor/three/three.core.js',
+    './ProjectorThrow/vendor/three/three.module.min.js',
+    './ProjectorThrow/vendor/three/three.core.min.js',
     './ProjectorThrow/vendor/three/addons/controls/OrbitControls.js',
     './ProjectorThrow/vendor/three/addons/exporters/OBJExporter.js',
     './ProjectorThrow/vendor/three/addons/exporters/GLTFExporter.js',
@@ -237,7 +237,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool asset change — rolls the service-worker cache. */
-    version:'v20260925-save-guard',
+    version:'v20260925-throwline-min',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,

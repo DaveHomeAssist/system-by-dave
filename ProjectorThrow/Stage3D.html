@@ -32,13 +32,15 @@
 <script type="importmap">
 {
   "imports": {
-    "three": "./vendor/three/three.module.js",
+    "three": "./vendor/three/three.module.min.js",
     "three/addons/controls/OrbitControls.js": "./vendor/three/addons/controls/OrbitControls.js",
     "three/addons/exporters/OBJExporter.js": "./vendor/three/addons/exporters/OBJExporter.js",
     "three/addons/exporters/GLTFExporter.js": "./vendor/three/addons/exporters/GLTFExporter.js"
   }
 }
 </script>
+<link rel="modulepreload" href="./vendor/three/three.module.min.js">
+<link rel="modulepreload" href="./vendor/three/three.core.min.js">
 <style>
 :root{
   color-scheme:light;
@@ -742,7 +744,7 @@ const offlineBadge = document.getElementById('offlineBadge');
 const offlineStatusTitle = document.getElementById('offlineStatusTitle');
 const offlineStatusDetail = document.getElementById('offlineStatusDetail');
 const ONBOARDING_STORAGE_KEY = 'throwline:stage-onboarding:v1';
-const OFFLINE_CACHE_VERSION = 'v20260925-save-guard';
+const OFFLINE_CACHE_VERSION = 'v20260925-throwline-min';
 const WORKFLOW_STAGES = ['setup','place','room','deliver'];
 const workflowTabs = [...document.querySelectorAll('[data-workflow-tab]')];
 const workflowPanels = [...document.querySelectorAll('[data-workflow-panel]')];
