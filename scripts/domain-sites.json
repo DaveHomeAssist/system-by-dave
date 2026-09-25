@@ -34,7 +34,11 @@
       ],
       "storage": {
         "registryKeys": false,
-        "keys": [],
+        "revision": 2,
+        "keys": [
+          "shader.practice.session.v1",
+          "shader.practice.theme.v1"
+        ],
         "prefixes": [
           "fmp"
         ],

@@ -101,7 +101,9 @@ golden scores for every exercise.
 - `localStorage`: `shader.practice.theme.v1` (the legacy
   `throwline.practice.theme.v1` is still read) and `shader.practice.session.v1`.
   `sessionStorage`: `shader.practice.reloaded`, used once during a cache update.
-  Every access tolerates blocked storage.
+  Every access tolerates blocked storage. The two `localStorage` keys are in the
+  housevideo.app saved-data transfer (`docs/domain-sites.md`), so a session saved
+  on systembydave.com moves with the operator.
 
 ## Coaching
 

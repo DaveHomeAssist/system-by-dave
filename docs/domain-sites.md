@@ -43,6 +43,12 @@ fault photos in one store keyed by random UUID, with no field distinguishing the
 so the whole database is offered to the new origin rather than split (Dave,
 2026-09-20). The walk's own `transfer.html` performs the move.
 
+The FMP hub's transfer carries every `fmp`-prefixed key plus Camera Shading
+Practice's `shader.practice.session.v1` and `shader.practice.theme.v1`, which were
+left behind until 2026-09-25. Its decision is at revision 2 for the same reason as
+AV's: browsers that moved or skipped before those keys were listed are offered the
+move again.
+
 ## Pipeline
 
 1. `npm run verify:domain-sites` runs with the other release gates. It stages

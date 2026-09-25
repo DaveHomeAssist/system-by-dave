@@ -379,6 +379,32 @@ try {
     });
   }
 
+  // Shading practice saves outside the fmp prefix; revision 2 offers the move
+  // again to browsers that moved or skipped before its keys were listed.
+  await test('Shading practice session and theme reach housevideo.app after an older moved decision', async (page, context) => {
+    const site = sites.find(entry => entry.id === 'housevideo');
+    const expected = {
+      'shader.practice.session.v1': JSON.stringify({ fixture: 'shading-session', attempt: 3 }),
+      'shader.practice.theme.v1': 'light'
+    };
+    await page.goto(source + '/index.html');
+    await page.evaluate(values => {
+      Object.entries(values).forEach(([key, value]) => localStorage.setItem(key, value));
+      localStorage.setItem('sbd.domainMove.housevideo.v1', JSON.stringify({ state: 'moved', at: '2026-09-20T00:00:00.000Z' }));
+    }, expected);
+    // The reference page runs no script, so nothing rewrites the keys on arrival.
+    await page.goto(source + '/shader/?cutover=shading');
+    await page.getByRole('button', { name: 'Move my data and continue' }).waitFor();
+    await move(page, context);
+    await page.waitForURL(site.origin + '/shader/?cutover=shading');
+    const readValues = current => current.evaluate(keys => Object.fromEntries(keys.map(key => [key, localStorage.getItem(key)])), Object.keys(expected));
+    assert.deepEqual(await readValues(page), expected);
+    const original = await context.newPage();
+    await original.goto(source + '/index.html');
+    assert.deepEqual(await readValues(original), expected);
+    assert.equal(await original.evaluate(() => JSON.parse(localStorage.getItem('sbd.domainMove.housevideo.v1')).revision), 2);
+  });
+
   await test('AV registry storage keys survive transfer and backup restore', async (page, context) => {
     const site = sites.find(entry => entry.id === 'avbydave');
     const expected = Object.fromEntries(avStorageKeys.map((key, index) => [key, JSON.stringify({ fixture: 'stage0', index })]));
