@@ -7,12 +7,18 @@
 #
 # The target keeps its own .github/ (its Pages workflow) and README.md; every
 # other file mirrors the staged site. A push only happens when content changed.
+# For each directory in the site's keepPreviousAssets (scripts/domain-sites.json;
+# KEEP_PREVIOUS_ASSETS overrides it), the hashed assets the previous
+# release's index.html used stay published for one more deploy, so a tab opened
+# just before the deploy can still load them (scripts/domain_keep_previous_assets.mjs).
 set -euo pipefail
 
 SITE="${1:?site id}"
 STAGED="${2:?staged site directory}"
 REPO="${3:?target repository}"
 SHA="${4:?source commit}"
+KEEP_HELPER="$(cd "$(dirname "$0")" && pwd)/domain_keep_previous_assets.mjs"
+KEEP_PREVIOUS_ASSETS="${KEEP_PREVIOUS_ASSETS-$(node "$KEEP_HELPER" --apps "$SITE")}"
 : "${DEPLOY_KEY:?DEPLOY_KEY is not set; add the repository secret named in scripts/domain-sites.json}"
 
 [ -f "$STAGED/source.json" ] || { echo "FATAL: $STAGED is not a staged domain site (no source.json)"; exit 1; }
@@ -33,7 +39,18 @@ curl -fsSL --retry 3 --retry-delay 5 ${AUTH[@]+"${AUTH[@]}"} https://api.github.
 export GIT_SSH_COMMAND="ssh -i $WORK/key -o IdentitiesOnly=yes -o UserKnownHostsFile=$WORK/known_hosts -o StrictHostKeyChecking=yes"
 
 git clone --quiet --depth 1 "git@github.com:${REPO}.git" "$WORK/site"
+# Snapshot what the previous release served before the mirror deletes it.
+for app in ${KEEP_PREVIOUS_ASSETS:-}; do
+  if [ -f "$WORK/site/$app/index.html" ]; then
+    mkdir -p "$WORK/previous/$app"
+    cp -R "$WORK/site/$app/index.html" "$WORK/site/$app/assets" "$WORK/previous/$app/" 2>/dev/null || true
+  fi
+done
 rsync -a --delete --exclude='/.git/' --exclude='/.github/' --exclude='/README.md' "$STAGED"/ "$WORK/site"/
+if [ -n "${KEEP_PREVIOUS_ASSETS:-}" ] && [ -d "$WORK/previous" ]; then
+  # shellcheck disable=SC2086 # KEEP_PREVIOUS_ASSETS is a space-separated list
+  node "$KEEP_HELPER" "$WORK/previous" "$WORK/site" $KEEP_PREVIOUS_ASSETS
+fi
 
 cd "$WORK/site"
 git add -A
