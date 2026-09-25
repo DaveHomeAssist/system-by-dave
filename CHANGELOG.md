@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-25 — FMP equipment on three.js r184; the rig draws a third as often
+
+- Re-exported `fmp/` from fmp-suite `36870f6` (fmp-suite PRs #28 and #29).
+- The ATEM HD8 ISO, P240 and CCU4 models and the SuperJoy guide load three.js r184, the release the rig already used, instead of r160 (the last release with a classic-script build, which logged a deprecation warning on every page). `models/vendor/three.global.min.js` is the rig's r184 bundled into one classic script; `scripts/fmp_model_contract.js` lists it. Screenshots match r160 within 58–70 dB PSNR and the pages log no warnings. The switcher guide's offline copy is 1.08 MB with the newer engine.
+- The rig merges static meshes that share a material within each component (`batchStaticMeshes`), so an orbit frame issues 378 GL draws instead of 1,143 and an LCD edit 637 instead of 2,167. Highlighting, picking and the LCD and fiber controls still work per component.
+
 ## 2026-09-25 — Throwline pins the retired-landing cache version
 
 - The AV offline cache moved to `v20260925-landing-retire` when the previous landing was retired, but Throwline Stage 3D still pinned `v20260925-throwline-min` for its offline-readiness check. `verify:throwline` failed the Pages deploy for that change and for the WebP photo re-export, so neither reached the live sites. Stage 3D now pins the current version, and the whole deploy gate list passes locally.

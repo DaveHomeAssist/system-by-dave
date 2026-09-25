@@ -13,7 +13,7 @@ const modelFiles = [
     // as WebP (quality 90) since fmp-suite 6890c9a.
     'atem-photo-front.webp', 'atem-photo-perspective.webp', 'atem-photo-rear.webp',
     'atem-photo-side.webp'].map(name => `models/assets/${name}`),
-  'models/vendor/three.min.js', 'models/vendor/LICENSE', 'ptz/SuperJoy-G1-Interactive-Guide.html'
+  'models/vendor/three.global.min.js', 'models/vendor/LICENSE', 'ptz/SuperJoy-G1-Interactive-Guide.html'
 ];
 
 // Evidence vocabulary for every FMP equipment catalog; docs/fmp-model-catalog-contract.md
