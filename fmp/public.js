@@ -9,7 +9,7 @@ if (window.fmpTheme) {
 
 const tabs = [...document.querySelectorAll('.portal-tabs [data-panel]')];
 const panels = [...document.querySelectorAll('.portal-panel')];
-const aliases = new Map([['#operators', '#cameras'], ['#reference', '#learn'], ['#3d', '#models'], ['#walk', '#cameras']]);
+const aliases = new Map([['#operators', '#cameras'], ['#reference', '#learn'], ['#3d', '#models'], ['#practice', '#models'], ['#walk', '#cameras']]);
 // panelFor answers whether a hash addresses a panel at all; panelHash picks the
 // panel to show for an address bar that may hold anything. Keeping them separate
 // is what lets an ordinary in-page anchor fall through to the browser.
@@ -46,6 +46,36 @@ addEventListener('popstate', followHash);
 
 const search = document.getElementById('reference-search');
 const category = document.getElementById('reference-category');
+const referenceList = document.getElementById('reference-list');
+// Practice tools live in the Practice panel, and the reference search finds them too. Their
+// result rows are built from the Practice cards, so each tool is written once, and they stay
+// hidden until the search has words, so browsing Reference lists written references only.
+function practiceRow(card) {
+  const row = document.createElement('a');
+  row.href = card.getAttribute('href');
+  if (card.rel) row.rel = card.rel;
+  row.dataset.scope = 'practice';
+  row.dataset.category = card.dataset.category || '';
+  row.dataset.search = `practice ${card.dataset.search || ''}`;
+  row.hidden = true;
+  const code = document.createElement('span');
+  code.className = 'reference-code';
+  code.textContent = card.dataset.code || '';
+  const title = document.createElement('strong');
+  title.textContent = card.querySelector('h3')?.textContent || '';
+  const detail = document.createElement('small');
+  detail.textContent = `Practice · ${card.querySelector('.model-copy > p:not(.eyebrow)')?.textContent || ''}`;
+  const body = document.createElement('span');
+  body.append(title, detail);
+  const arrow = document.createElement('span');
+  arrow.setAttribute('aria-hidden', 'true');
+  arrow.textContent = '→';
+  row.append(code, body, arrow);
+  return row;
+}
+// A practice row that cannot be built leaves the written references searchable.
+try { referenceList?.append(...[...document.querySelectorAll('#models .model-card')].map(practiceRow)); }
+catch { /* search still covers the written references */ }
 const references = [...document.querySelectorAll('#reference-list > a')];
 const normalize = text => text.toLocaleLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g, '');
 function filterReferences() {
@@ -53,13 +83,15 @@ function filterReferences() {
   let shown = 0;
   for (const reference of references) {
     const text = normalize(`${reference.textContent} ${reference.dataset.search || ''}`);
-    const included = (category.value === 'all' || (reference.dataset.category || '').split(' ').includes(category.value)) &&
+    const included = (words.length > 0 || reference.dataset.scope !== 'practice') &&
+      (category.value === 'all' || (reference.dataset.category || '').split(' ').includes(category.value)) &&
       words.every(word => text.includes(word));
     reference.hidden = !included;
     shown += Number(included);
   }
   const count = document.getElementById('reference-count');
-  if (count) count.textContent = `${shown} of ${references.length} references`;
+  const eligible = references.filter(reference => words.length > 0 || reference.dataset.scope !== 'practice').length;
+  if (count) count.textContent = `${shown} of ${eligible} ${words.length ? 'tools & references' : 'references'}`;
   const empty = document.getElementById('reference-empty');
   if (empty) empty.hidden = shown !== 0;
 }

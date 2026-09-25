@@ -43,10 +43,11 @@ const DEBUG_PORT = 9347;
 const TIMEOUT_MS = 15000;
 
 const RELEASES = ['fmp', 'fmpwalk'];
-// fmp/ is rebuilt by every fmp-suite export. fmpwalk/ was retired in fmp-suite 0946989: it is no
-// longer exported, and its deployed files stay frozen at this source commit (docs/fmp-public-release.md).
-const ACTIVE_RELEASES = ['fmp'];
-const FROZEN_RELEASES = { fmpwalk: '5d67a92713787554151dad089f65f6b08144bc9e' };
+// fmp/ and fmpwalk/ are rebuilt by every fmp-suite export and must pin the same source commit.
+// A release listed in FROZEN_RELEASES would stay at its pin instead; none is frozen since the walk
+// was restored to the export on 2026-09-25 (docs/fmp-public-release.md).
+const ACTIVE_RELEASES = ['fmp', 'fmpwalk'];
+const FROZEN_RELEASES = {};
 const MODEL_ROUTES = ['/fmp/models/atem-hd8-iso.html', '/fmp/models/p240.html', '/fmp/models/ccu4.html', '/fmp/ptz/SuperJoy-G1-Interactive-Guide.html'];
 const ROUTES = [...MODEL_ROUTES, '/fmp/', '/fmp/camera/', '/fmp/camera/pit-center/', '/fmp/camera/front-of-house/', '/fmp/camera/pit-stage-left/', '/fmp/camera/catwalk/', '/fmp/guide/', '/fmp/house/', '/fmp/gear/', '/fmp/build/', '/fmp/ptz/', '/fmp/rig/', '/fmpwalk/', '/backfocus/'];
 // Addresses operators plausibly type or were given; each should resolve or be deliberately retired.

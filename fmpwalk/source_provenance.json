@@ -1,15 +1,15 @@
 {
   "schema": "fmp.public.release.v2",
   "sourceRepository": "DaveHomeAssist/fmp-suite",
-  "sourceCommit": "5d67a92713787554151dad089f65f6b08144bc9e",
+  "sourceCommit": "b727aea13cd9b2ca60e7ee8b7aa5b96cdfa575af",
   "mode": "local-first",
   "files": {
     "email.js": "81495faf250100aada24317d2894d0d158c75b4c1faa59f8979a7b7244249488",
-    "index.html": "83d16aa351659683735334cd329c8eb1d08aaa222f5c6c9c077e1a8fa3ebdd4a",
+    "index.html": "793735ee359c0028b72046611ee110b862e213387b91f3cdfc76dcea3ca03ebc",
     "mail.js": "4a521185a33c8463a3b34493771e381d7982bb59f0f8d9b5096d074727e32a91",
     "notion-config.js": "b675c734abe301f46f50f05a65ae58b9d25bd07c57fa8b01ef07e456e32271fc",
     "notion.js": "6c7a642be575c64baea0c3d16496c506cb71d912708086a7aa8e8f1f150ca2c5",
     "photos.js": "cd1feeb0fd50c5df4df81fa55b3fb37ca708127d793d438a62e98e596fbec3ff"
   },
-  "artifactSha256": "1127f328c8762638ce66ae026b4fab2e2947e815a6f327a29968c4d58a2e106b"
+  "artifactSha256": "a67f0c13f241576448514b85705e459ef42239cbc56e02bae53b53e8309314d5"
 }

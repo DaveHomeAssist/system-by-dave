@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-09-25 — FMP Practice tab, practice search, the preshow walk released again
+
+- Re-exported `fmp/` and `fmpwalk/` from fmp-suite `b727aea` (PR #30). The export also carries PR #28 (three.js r184 for the equipment models and the SuperJoy guide) and PR #29 (the rig's static meshes batched, about two thirds fewer draw calls).
+- The hub's third tab is **Practice** instead of 3D Models: the Camera Simulator and Shading practice move there from the Reference list, beside the five explorers. The panel id stays `models`, so `/fmp/#models` links keep working, and `#practice` is an alias. The reference search also finds the practice tools while a search has words; browsing Reference lists written references only.
+- The preshow walk is back in the release. fmp-suite `0946989` had dropped it on 2026-09-22 while repairing an overwritten landing page, which froze walk.housevideo.app at its last export, still branded System by Dave. Nothing recorded a decision to retire it; Dave asked for it back (2026-09-25). The walk now names FMP Video Operations, Operators launches it beside Show Console, and `npm run verify:fmp` checks it again. The hygiene probe treats it as an active release that must share the export's source commit.
+- Camera Build & Strike, Camera Equipment, Catwalk PTZ and House Video take the `| FMP Video Operations` title family. Each camera position route names its position in its first heading and description before the workspace loads.
+- The switcher guide is rebuilt against the r184 global build (`/fmp/models/vendor/three.global.min.js`), and `scripts/fmp_model_contract.js` lists it in place of `three.min.js`.
+
 ## 2026-09-25 — A source-controlled page manifest for the domain sites
 
 - `npm run manifest:housevideo` (`scripts/build_housevideo_manifest.mjs`) lists every page housevideo.app publishes with its head title, description, first heading, canonical, robots tag, `robots.txt` status, sitemap membership, size, where it is edited and when it last changed. The page manifest had been generated outside the repository; its generator is now here.

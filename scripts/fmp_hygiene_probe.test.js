@@ -13,28 +13,32 @@ const root = path.resolve(__dirname, '..');
 const provenanceOf = dir => JSON.parse(fs.readFileSync(path.join(root, dir, 'source_provenance.json'), 'utf8'));
 const committed = { fmp: provenanceOf('fmp'), fmpwalk: provenanceOf('fmpwalk') };
 
-test('the committed releases pass: fmp from its latest export, fmpwalk at its frozen pin', () => {
-  assert.deepEqual(ACTIVE_RELEASES, ['fmp']);
-  assert.equal(committed.fmpwalk.sourceCommit, FROZEN_RELEASES.fmpwalk, 'fmpwalk/ moved off its frozen pin; update FROZEN_RELEASES only if the walk was deliberately re-released');
+test('the committed releases pass: fmp and fmpwalk from one export', () => {
+  assert.deepEqual(ACTIVE_RELEASES, ['fmp', 'fmpwalk']);
+  assert.deepEqual(FROZEN_RELEASES, {});
+  assert.equal(committed.fmp.sourceCommit, committed.fmpwalk.sourceCommit, 'fmp and fmpwalk must ship from one export');
   const result = releasePins(committed);
   assert.equal(result.status, 'pass', result.detail);
-  assert.match(result.detail, /fmpwalk frozen at 5d67a9271378/);
+  assert.match(result.detail, new RegExp(`fmp ${committed.fmp.sourceCommit.slice(0, 12)}; fmpwalk ${committed.fmp.sourceCommit.slice(0, 12)}`));
 });
 
-test('a new fmp export does not fail the check, although fmpwalk stays behind', () => {
+test('an export that updates one release but not the other fails', () => {
   const result = releasePins({ ...committed, fmp: { sourceCommit: 'f'.repeat(40) } });
-  assert.equal(result.status, 'pass', result.detail);
+  assert.equal(result.status, 'fail');
+  assert.match(result.detail, /active releases pin fmp ffffffffffff vs fmpwalk/);
 });
 
-test('a frozen release that moves fails', () => {
-  const result = releasePins({ ...committed, fmpwalk: { sourceCommit: 'a'.repeat(40) } });
+test('a frozen release stays at its pin and fails when it moves', () => {
+  const frozen = { fmpwalk: 'e'.repeat(40) };
+  assert.equal(releasePins({ fmp: committed.fmp, fmpwalk: { sourceCommit: 'e'.repeat(40) } }, ['fmp'], frozen).status, 'pass');
+  const result = releasePins({ fmp: committed.fmp, fmpwalk: { sourceCommit: 'a'.repeat(40) } }, ['fmp'], frozen);
   assert.equal(result.status, 'fail');
-  assert.match(result.detail, /fmpwalk moved to aaaaaaaaaaaa; it is frozen at 5d67a9271378/);
+  assert.match(result.detail, /fmpwalk moved to aaaaaaaaaaaa; it is frozen at eeeeeeeeeeee/);
 });
 
 test('active releases that disagree fail', () => {
-  const provenance = { fmp: { sourceCommit: 'b'.repeat(40) }, extra: { sourceCommit: 'c'.repeat(40) }, fmpwalk: committed.fmpwalk };
-  const result = releasePins(provenance, ['fmp', 'extra']);
+  const provenance = { fmp: { sourceCommit: 'b'.repeat(40) }, extra: { sourceCommit: 'c'.repeat(40) } };
+  const result = releasePins(provenance, ['fmp', 'extra'], {});
   assert.equal(result.status, 'fail');
   assert.match(result.detail, /active releases pin fmp bbbbbbbbbbbb vs extra cccccccccccc/);
 });
