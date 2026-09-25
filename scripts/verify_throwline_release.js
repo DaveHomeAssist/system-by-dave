@@ -500,7 +500,7 @@ if (duplicatedIds.length) fail(`Throwline has duplicate IDs: ${duplicatedIds.joi
 
 requireMatch(stage, /<meta\s+http-equiv=["']Content-Security-Policy["'][^>]*script-src 'self' 'unsafe-inline'[^>]*connect-src 'self'/i, 'Stage 3D CSP must keep the runtime local and offline-ready.');
 if (/unpkg\.com|cdn\.jsdelivr\.net/.test(stage) || /unpkg\.com|cdn\.jsdelivr\.net/.test(sidecar)) fail('Stage 3D must not depend on a remote module CDN.');
-requireMatch(stage, /"three":\s*"\.\/vendor\/three\/three\.module\.js"/, 'Stage 3D import map must use the locally vendored Three.js engine.');
+requireMatch(stage, /"three":\s*"\.\/vendor\/three\/three\.module\.min\.js"/, 'Stage 3D import map must use the locally vendored Three.js engine.');
 requireMatch(stage, /<script\s+src=["']\.\/throwline-scene-state\.js["']><\/script>[\s\S]*?<script\s+src=["']\.\.\/js\/vendor\/gsap\.min\.js["']><\/script>[\s\S]*?<script\s+src=["']\.\/three-d-stage\.js["']><\/script>/, 'Stage 3D must load the scene contract, local GSAP runtime, and sidecar in order.');
 requireMatch(stage, /<script\s+src=["']\.\/three-d-stage\.js["']><\/script>/, 'Stage 3D must load its colocated sidecar.');
 requireMatch(stage, /href=["']index\.html\?workspace=planner["']/, 'Stage 3D must expose the detailed Throwline planner.');
@@ -519,8 +519,8 @@ if (!stage.includes(`const OFFLINE_CACHE_VERSION = '${avRegistry?.version}';`)) 
 requireMatch(avWorker, /SBD_OFFLINE_VERSION[\s\S]*?SBD_REGISTRY\.version/, 'The AV service worker must report its active offline cache version.');
 requireMatch(stage, /id=["']offlineBadge["'][^>]*role=["']status["'][^>]*aria-live=["']polite["']/, 'Stage 3D must expose its offline state visibly and accessibly.');
 const localThreeAssets = [
-  'ProjectorThrow/vendor/three/three.module.js',
-  'ProjectorThrow/vendor/three/three.core.js',
+  'ProjectorThrow/vendor/three/three.module.min.js',
+  'ProjectorThrow/vendor/three/three.core.min.js',
   'ProjectorThrow/vendor/three/addons/controls/OrbitControls.js',
   'ProjectorThrow/vendor/three/addons/exporters/OBJExporter.js',
   'ProjectorThrow/vendor/three/addons/exporters/GLTFExporter.js',

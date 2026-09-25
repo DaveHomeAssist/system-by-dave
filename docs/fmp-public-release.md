@@ -114,6 +114,19 @@ suite (`docs/fmp-camera-simulator.md`). The suite was cut over on
 stubs that offer to move saved walk and camera data (browser storage and walk
 photos) before redirecting.
 
+### ATEM HD8 ISO interactive guide
+
+`/switcher/guide/` is generated from the exported model page
+`fmp/models/atem-hd8-iso.html` by `npm run build:switcher-guide`
+(`scripts/build_switcher_guide.mjs`). It is the same explorer with the switcher
+breadcrumb and skip link, loading the shared `/fmp/models/` scripts, styles,
+three.js and reference photos (photos load only when opened). The same run writes
+`switcher/guide/atem-hd8-iso-guide-offline.html`, one noindex file with every
+script, style and photo inlined and hashed in its Content Security Policy, for
+saving and opening without a connection; the guide links it as "Download for
+offline use". Re-run the build after every FMP export: `npm run verify:fmp`
+fails when the guide is out of date with the exported model page.
+
 The preshow walk is configured to publish at **walk.housevideo.app**. The release
 requires configured infrastructure and auth, then verifies the live destination
 before publishing old-origin redirects. After cutover,
