@@ -173,6 +173,9 @@ Pages workflow before a production claim.
   `npm run verify:camera-sim-release -- --base origin/main`. Any change to `camera-sim/`
   needs a new entry at the top of `apps/fmp-camera-sim/CHANGELOG.md`; the build embeds its
   version, and the pull-request check fails without it.
+- **Camera training links** (Camera Simulator, Shading practice, `shader/index.html`, or an FMP
+  export that renames a rig, shader panel or P240 part): `npm run test:camera-training-links`
+  (`docs/camera-training-links.md`).
 - **NoteForge artifact:** `npm run verify:noteforge`.
 - **Pages published on another domain, `scripts/domain-sites.json`, or the
   publishing scripts:** `npm run verify:domain-sites`.

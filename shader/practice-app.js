@@ -10,7 +10,7 @@
   const Render = window.ShaderPracticeRender;
   const THEME_KEY = 'shader.practice.theme.v1';
   const SESSION_KEY = 'shader.practice.session.v1';
-  const OFFLINE_CACHE_VERSION = 'v20260923-shader-practice-console-2';
+  const OFFLINE_CACHE_VERSION = 'v20260925-shader-practice-kit-links';
   const DISPLAY = Object.freeze({ width: 96, height: 54 });
   const HISTORY_LIMIT = 100;
   const BLINK_INTERVAL = 700;
@@ -924,6 +924,7 @@
     renderMonitors(sources);
     renderScopes(sources);
     renderNotes(sources);
+    renderKit();
     renderScore(evaluation);
     renderDemo();
   }
@@ -1276,6 +1277,38 @@
     if (control === 'saturation') return `CHROMA ${pct(before.saturation)} → ${pct(after.saturation)} (REF ${pct(reference.saturation)})`;
     if (control === 'colorPhase') return `HUE ${Math.round(before.hue)}° → ${Math.round(after.hue)}° (REF ${Math.round(reference.hue)}°)`;
     return `BLACK ${pct(before.black)} → ${pct(after.black)} · MID ${pct(before.mid)} → ${pct(after.mid)} · PEAK ${pct(before.peak)} → ${pct(after.peak)} · CLIP ${after.clippedPercent.toFixed(1)}% (REF ${pct(reference.black)}/${pct(reference.mid)}/${pct(reference.peak)})`;
+  }
+
+  // Where each control lives on the real equipment (docs/camera-training-links.md, checked by
+  // scripts/camera_training_links.test.mjs). The shader panel is the ATEM Camera Control Panel
+  // that shades Cameras 1-3; its explorer opens at one control of channel 1. A camera link opens
+  // the URSA rig explorer at the matching body or lens part, where the camera has one.
+  const KIT_PANEL_URL = '/fmp/models/ccu4.html#part=ccu4.ch1.';
+  const KIT_CAMERA_URL = '/fmp/rig/?equipment=rig&part=';
+  const KIT = Object.freeze({
+    iris: Object.freeze({ panel: 'joystick', panelText: 'Joystick, lean for iris', physical: true, camera: 'iris-mode', cameraText: 'Iris A/M switch · must be on A' }),
+    pedestal: Object.freeze({ panel: 'joystick', panelText: 'Joystick ring · master black', physical: true, camera: null }),
+    gain: Object.freeze({ panel: 'gain', panelText: 'Master gain up / down', physical: true, camera: 'body-gain', cameraText: 'ISO / GAIN switch on the body' }),
+    gamma: Object.freeze({ panel: 'flare', panelText: 'Hold BLACK/FLARE, turn the black knobs', physical: true, camera: null }),
+    whiteBalance: Object.freeze({ panel: 'wb', panelText: 'W/B key with the shutter arrows', physical: true, camera: 'body-wb', cameraText: 'WHITE BAL switch on the body' }),
+    saturation: Object.freeze({ panel: 'lcd', panelText: 'Channel LCD · saturation knob', physical: false, camera: null }),
+    colorPhase: Object.freeze({ panel: 'lcd', panelText: 'Channel LCD · hue knob', physical: false, camera: null })
+  });
+
+  function renderKit() {
+    const kit = KIT[ui.activeControl];
+    const shown = Boolean(kit) && canAdjustSelected();
+    setHidden(els.kitLinks, !shown);
+    if (!shown) return;
+    setText(els.kitControl, Practice.CONTROL_LABELS[ui.activeControl].toUpperCase());
+    els.kitPanelLink.setAttribute('href', KIT_PANEL_URL + kit.panel);
+    setText(els.kitPanelText, kit.panelText);
+    setText(els.kitPanelKind, kit.physical ? 'PHYSICAL' : 'LCD MENU');
+    setHidden(els.kitCameraLink, !kit.camera);
+    setHidden(els.kitCameraNone, Boolean(kit.camera));
+    if (!kit.camera) return;
+    els.kitCameraLink.setAttribute('href', KIT_CAMERA_URL + kit.camera);
+    setText(els.kitCameraText, kit.cameraText);
   }
 
   function renderNotes(sources) {

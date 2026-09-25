@@ -858,6 +858,10 @@ await check('the standalone offline file runs from disk with networking disabled
   assert(problems.length === 0, problems.join(' | '));
   assert((await page.locator('a[href="https://housevideo.app/fmp/"]').count()) > 0, 'suite link is not absolute');
   assert(await dmSansLoaded(page), 'the offline copy did not load its inlined DM Sans');
+  await showTab(page, 'Session');
+  for (const href of ['https://housevideo.app/shader/practice.html', 'https://housevideo.app/fmp/rig/?equipment=rig&part=body']) {
+    assert((await page.locator(`a[href="${href}"]`).count()) > 0, `the offline copy does not link ${href}`);
+  }
   await context.close();
 });
 
@@ -952,6 +956,52 @@ await check('release stamp: Help, page metadata, offline file and exports agree'
     assert(exported.app === `FMP Camera Simulator ${release.version} (build ${release.build})`, `export app "${exported.app}"`);
     assert(problems.length === 0, problems.join(' | '));
     return stamp;
+  } finally {
+    await context.close();
+  }
+});
+
+// ------------------------------------------------------------------------------------------
+// 6b. Links in and out (docs/camera-training-links.md)
+// ------------------------------------------------------------------------------------------
+await check('an exercise link starts that exercise once and leaves the rest of the address', async () => {
+  const { context, page } = await open({ url: `${PAGE}&exercise=recall` });
+  try {
+    await page.waitForFunction(() => window.__fmpCameraSim.state().exercise?.id === 'recall', null, { timeout: 5000 });
+    const address = new URL(page.url());
+    assert(!address.searchParams.has('exercise') && address.searchParams.has('diagnostics'), `the address after the link is ${address.search}`);
+    await page.reload();
+    await page.waitForFunction(() => window.__fmpCameraSim && window.__fmpCameraSim.state().renderStatus !== 'starting', null, { timeout: 30000 });
+    await page.waitForTimeout(300);
+    assert((await sim(page).state()).exercise === null, 'a reload started the exercise again');
+    return address.search;
+  } finally {
+    await context.close();
+  }
+});
+
+await check('an exercise link that names no exercise is refused in the status line', async () => {
+  const { context, page } = await open({ url: `${PAGE}&exercise=nope` });
+  try {
+    const status = await page.getByTestId('status-line').textContent();
+    assert(/no exercise called “nope”/.test(status), `the status line reads: ${status}`);
+    assert((await sim(page).state()).exercise === null, 'an exercise started');
+    assert(!new URL(page.url()).searchParams.has('exercise'), 'the refused link stayed in the address');
+  } finally {
+    await context.close();
+  }
+});
+
+await check('the Session panel links the other cameras and opens the P240 model at its lens', async () => {
+  const { context, page } = await open();
+  try {
+    await showTab(page, 'Session');
+    const hrefs = await page.locator('a').evaluateAll((links) => links.map((link) => link.getAttribute('href')));
+    for (const href of ['/shader/practice.html', '/fmp/rig/?equipment=rig&part=body', '/fmp/models/p240.html#part=p240.lens']) {
+      assert(hrefs.includes(href), `the Session panel does not link ${href}`);
+    }
+    const section = await page.locator('section[aria-labelledby="other-cameras-title"]').textContent();
+    assert(/Camera 4 is set from its own menus, not the shader panel/.test(section), 'the Other cameras section does not say how Camera 4 is set');
   } finally {
     await context.close();
   }

@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-25 — Camera training links: simulator, Shading practice and the FMP explorers
+
+- Shading practice now says where each control lives on the real equipment. Under the control list, "On the kit" links the selected control to the shader panel explorer at that exact control (joystick for iris and pedestal, master gain, Black/Flare for gamma, W/B, and the channel LCD menu for saturation and hue), and to the matching part in the URSA rig explorer where the body has one (the iris A/M switch, ISO/GAIN, WHITE BAL). Related references and the `/shader/` reference link the Camera Simulator. Build `v20260925-shader-practice-kit-links`.
+- FMP Camera Simulator 1.10.0: `?exercise=wide|follow|recall` starts an exercise from a link, used once; Session links Shading practice and the rig explorer for Cameras 1–3 and opens the P240 model at its lens.
+- `docs/camera-training-links.md` is the contract for these links; `npm run test:camera-training-links` checks every rig part, shader panel control, P240 part, demo, scenario and exercise it names, and runs in the Pages workflow and both tools' pull-request checks (the shading check now also runs when the exported `fmp/rig/` or `fmp/models/` change).
+- Corrected the simulator doc: the accuracy flag counts the bowl, structures and lawn but not mount orientation (confirmed), and the hub and PTZ guide already link the simulator.
+
 ## 2026-09-24 — FMP Camera Simulator 1.9.0: controls beside the monitor
 
 - On an 11-inch iPad in Chrome (1180 × 685) the camera monitor showed a 232 × 130 picture, about 4% of the screen: stacked over the controls, the 16:9 picture is height-bound on landscape screens. With the venue view collapsed, landscape screens from 960 px wide and at least 4:3 now put the controls in a column beside the monitor, so the picture takes the width: 558 × 314 on that iPad, 402 × 226 at 1024 × 690 and 608 × 342 in a 1366 × 650 laptop browser. This is the "next layout step" `docs/fmp-camera-simulator.md` named in 1.8.0.

@@ -59,9 +59,12 @@ never used as optical distance. The seating bowl follows public seating guides: 
 100–104 and 200-level sections 200–204, with the pit in front of 101–103. The bowl, stage house,
 backline and pit rail are schematic, not venue CAD.
 
-The **Approximate venue** flag stays visible until every critical item (distance, basis, height,
-lateral offset, width, depth, mount orientation and pan-zero heading) is measured or confirmed. Invalid geometry is rejected
-with the offending field named, and the last valid venue stays in use.
+The **Approximate venue** flag stays visible until every critical item is measured or confirmed.
+Its count covers ten: camera distance, distance basis, camera height, lateral offset, stage width,
+stage depth, pan-zero heading, the bowl, the venue structures and the lawn terrain
+(`unsettledVenueItems` in `src/domain/venue.ts`). Mount orientation is already confirmed (photo
+P100), so it is not counted. Invalid geometry is rejected with the offending field named, and the
+last valid venue stays in use.
 
 ## Camera model
 
@@ -151,6 +154,15 @@ Thresholds are training settings in the Exercises panel, not professional standa
 | Establish a wide shot | Starts from home. Both DSE corners and head height (2 m) above USR, USC and USL inside the safe area (90%), downstage edge at least 55% of frame width, held still for 1 s |
 | Follow a performer | One loop of the performer's path after a countdown. Reports time on target (chest inside the target box at 25–90% of frame height), mean and RMS framing error and time out of frame; passes at 70% on target |
 | Save and recall two shots | Two distinct shots in two slots, move away, then recall both within 0.1° pan/tilt and 0.005 lens travel. Interrupted recalls earn no credit |
+
+A link can start an exercise: `/camera-sim/?exercise=wide`, `?exercise=follow` or
+`?exercise=recall` (since 1.10.0). The link is used once: the page starts the exercise, then
+replaces the address without `exercise` (other parameters stay), so a reload continues the session
+rather than restarting the exercise. A value that names no exercise is refused in the status line.
+The running exercise is never saved, as before. Session's Other cameras section links Shading
+practice and the URSA rig explorer for Cameras 1–3, and says Camera 4 is set from its own menus,
+not the shader panel. `docs/camera-training-links.md` lists every link in and out, and
+`npm run test:camera-training-links` checks each target.
 
 ## Persistence
 
@@ -307,15 +319,16 @@ after venue or rendering changes, then rebuild so the published copy follows.
 | Recovery screen keeps the saved session | Probe breaks a browser API mid-render, exports the session and sets it aside |
 | Graphics context restore | Probe loses and restores the monitor context and reads the picture back |
 | Short screens keep a large picture | Probe at 1024 × 768, 1024 × 690, 1180 × 685 and 1366 × 650, venue view collapsed (controls beside the monitor) and shown; Expand at 1440 × 900 |
+| Links in and out resolve | Probe: an exercise link starts once and leaves the address, a bad one is refused, Session links hosted and offline; `test:camera-training-links` checks every target id |
 | Pass and fail marks do not rely on colour | Probe reads the wide-shot marks' dash and fill |
 | Page face and breadcrumb | Probe: DM Sans loaded (hosted and offline), breadcrumb never a vertical scroller |
 
 ## Not in v1
 
 Photorealistic scenery, camera menus, exposure/focus emulation, multiple cameras, a physical
-SuperJoy and the optional 3D SuperJoy control surface are later work. Next steps: link the
-simulator from the FMP hub and Catwalk PTZ guide in `fmp-suite`; measure the critical venue
-dimensions; calibrate speeds, stopping and preset travel against Camera 4; then prototype a local
+SuperJoy and the optional 3D SuperJoy control surface are later work. The FMP hub and the
+Catwalk PTZ guide already link the simulator. Next steps: measure the critical venue dimensions;
+calibrate speeds, stopping and preset travel against Camera 4; then prototype a local
 VISCA-to-WebSocket bridge for the physical SuperJoy.
 
 ## Venue realism delivery sequence

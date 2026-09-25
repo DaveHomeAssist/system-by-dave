@@ -78,6 +78,15 @@ golden scores for every exercise.
 
 ## Links and storage
 
+- "On the kit", under the control list, follows the selected control: a link to that control on
+  the shader panel explorer (`/fmp/models/ccu4.html#part=ccu4.ch1.…`), marked physical or LCD
+  menu, and a link to the matching camera part in the rig explorer where the body has one (iris:
+  the lens iris switch, which must be on A; gain; white balance). Saturation and colour phase are
+  soft knobs under the channel's LCD. The reference camera shows no kit links. Short laptop
+  screens (900 px wide or more, 700 px tall or less) hide it along with the control notes.
+  Related references also link the Camera Simulator. `docs/camera-training-links.md` lists every
+  link and `npm run test:camera-training-links` checks each target.
+
 - `?scenario=&seed=&camera=&scope=&split=&compare=&layout=` opens an exercise
   from its start. `?demo=<control>&step=<n>` opens a guided sweep.
 - `#state=<base64url JSON>` reproduces an exact session, including checks and
@@ -125,6 +134,7 @@ for the updated worker and reloads once.
 ```bash
 npm run verify:shader-practice        # engine and worker tests, source release gate
 npm run test:shader-practice-browser  # CDP browser probe
+npm run test:camera-training-links    # every kit and cross-tool link target exists
 ```
 
 The browser probe covers ten viewports in both themes (320×568, 390×844,

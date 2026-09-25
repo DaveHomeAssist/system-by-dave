@@ -14,6 +14,8 @@ on:
       - 'scripts/camera_sim_release*.mjs'
       - 'scripts/verify_camera_sim_release.mjs'
       - 'scripts/probe_camera_sim.mjs'
+      - 'scripts/camera_training_links.test.mjs'
+      - 'docs/camera-training-links.md'
       - 'package*.json'
       - '.github/workflows/camera-sim.yml'
   workflow_dispatch:
@@ -56,6 +58,7 @@ jobs:
           npm run verify:public-navigation
           npm run verify:indexing
           npm run verify:domain-sites
+          npm run test:camera-training-links
       - name: Browser acceptance
         env:
           CHROME_CHANNEL: chrome

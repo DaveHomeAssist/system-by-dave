@@ -449,6 +449,46 @@ async function mainSession(page, baseUrl) {
   });
   check('the reference camera can be inspected but never adjusted, and one tap returns to the target', lock.unchanged && /REFERENCE ON SIM PGM/.test(lock.notice || '') && lock.listHidden && lock.resetDisabled && lock.back === 'camera-b', lock);
 
+  // Each control says where it lives on the real kit: its shader panel control, and the camera
+  // part where the body has one (docs/camera-training-links.md). The reference camera, which
+  // cannot be adjusted, shows none.
+  const kit = await page.eval(() => {
+    const byId = id => document.getElementById(id);
+    const read = () => {
+      const box = byId('kitPanelLink').getBoundingClientRect();
+      return {
+        hidden: byId('kitLinks').hidden,
+        title: byId('kitControl').textContent,
+        panel: byId('kitPanelLink').getAttribute('href'),
+        kind: byId('kitPanelKind').textContent,
+        camera: byId('kitCameraLink').hidden ? null : byId('kitCameraLink').getAttribute('href'),
+        none: !byId('kitCameraNone').hidden,
+        height: Math.round(box.height)
+      };
+    };
+    const rows = {};
+    for (const name of Object.keys(ShaderPracticeState.CONTROL_LIMITS)) {
+      byId(`control-${name}`).focus();
+      ShaderPracticeApp.renderNow();
+      rows[name] = read();
+    }
+    document.querySelector('[data-camera-switch="camera-a"]').click();
+    ShaderPracticeApp.renderNow();
+    const reference = read().hidden;
+    byId('lockTargetButton').click();
+    ShaderPracticeApp.renderNow();
+    const related = Boolean(document.querySelector('nav[aria-label="Related references"] a[href="/camera-sim/"]'));
+    return { rows, reference, related };
+  });
+  const expectKit = { iris: ['joystick', 'iris-mode'], pedestal: ['joystick', null], gain: ['gain', 'body-gain'], gamma: ['flare', null], whiteBalance: ['wb', 'body-wb'], saturation: ['lcd', null], colorPhase: ['lcd', null] };
+  const kitOk = Object.entries(expectKit).every(([name, [panel, camera]]) => {
+    const row = kit.rows[name];
+    return Boolean(row) && !row.hidden && row.panel === `/fmp/models/ccu4.html#part=ccu4.ch1.${panel}`
+      && row.camera === (camera ? `/fmp/rig/?equipment=rig&part=${camera}` : null) && row.none === !camera
+      && row.kind === (panel === 'lcd' ? 'LCD MENU' : 'PHYSICAL') && row.height >= 44;
+  });
+  check('each control links its shader panel control and camera part; the reference camera shows none; the simulator is a related reference', kitOk && kit.reference && kit.related, kit);
+
   // Scopes: single tabs and the quad layout all draw.
   const scopes = await page.eval(() => {
     const lit = kind => { const canvas = document.getElementById(`scopeCanvas-${kind}`); const data = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height).data; let count = 0; for (let index = 0; index < data.length; index += 4) if (data[index] + data[index + 1] + data[index + 2] > 150) count += 1; return { count, height: canvas.height, label: canvas.getAttribute('aria-label') }; };

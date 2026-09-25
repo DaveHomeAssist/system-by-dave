@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { downloadText, sessionFilename } from "../app/download";
 import { Engine } from "../app/engine";
 import { type LayoutClass, useLayoutClass, useStoreState } from "../app/hooks";
+import { readExerciseLink } from "../app/links";
 import { SimulatorStore } from "../app/store";
 import { useTheme } from "../app/theme";
 import { InputController, nowSeconds } from "../input/controller";
@@ -121,6 +122,20 @@ export function App() {
       rendererRef.current = null;
     };
   }, [store, input]);
+
+  // A one-time exercise link (?exercise=wide): start it, then drop the parameter so a reload
+  // continues the session instead of restarting the exercise.
+  useEffect(() => {
+    const link = readExerciseLink(window.location.search);
+    if (!link) return;
+    if (link.exercise) store.startExercise(link.exercise, nowSeconds());
+    else store.hint(link.unknown ? `This link names no exercise called “${link.unknown}”. Open Exercises to choose one.` : "This link names no exercise. Open Exercises to choose one.");
+    try {
+      window.history.replaceState(window.history.state, "", `${window.location.pathname}${link.search}${window.location.hash}`);
+    } catch {
+      // Some browsers refuse to rewrite a file:// address; the link then stays until the next visit.
+    }
+  }, [store]);
 
   useEffect(() => {
     rendererRef.current?.setGeometry(state.geometry, state.project.session.showPackage);
