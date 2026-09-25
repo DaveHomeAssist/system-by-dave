@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-09-25 — Shading practice data moves to housevideo.app
+
+- The housevideo.app saved-data transfer copied only `fmp`-prefixed keys, so a Camera Shading Practice session and theme saved on systembydave.com stayed behind when `/shader/` moved. `shader.practice.session.v1` and `shader.practice.theme.v1` are now in its policy, at revision 2, so browsers that already moved or skipped are offered the move again. Nothing is overwritten on arrival, as before. A new cutover acceptance scenario covers it.
+
 ## 2026-09-25 — Merge when green
 
 - `AGENTS.md` golden rule 6 and `CLAUDE.md`: agents merge their own pull requests without asking once the current head is green (every check passed, no merge conflict, no review thread waiting), unless Dave says otherwise. The Definition of Done now names that merge.
