@@ -15,7 +15,7 @@ import { chromium } from 'playwright';
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
 const results = [];
-const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.png': 'image/png', '.svg': 'image/svg+xml', '.woff2': 'font/woff2' };
+const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.png': 'image/png', '.webp': 'image/webp', '.svg': 'image/svg+xml', '.woff2': 'font/woff2' };
 
 const server = createServer(async (request, response) => {
   let file = join(ROOT, decodeURIComponent(new URL(request.url, 'http://probe').pathname));
@@ -96,7 +96,7 @@ await check('the guide renders the same explorer as the model page', () => {
 
 await check('the guide loads shared files and no photos until one is opened', () => {
   const html = guide.requests.filter((url) => url.endsWith('/switcher/guide/'));
-  const photos = guide.requests.filter((url) => /\.png(\?|$)/.test(url));
+  const photos = guide.requests.filter((url) => /\.(png|webp)(\?|$)/.test(url));
   const shared = guide.requests.filter((url) => url.includes('/fmp/models/'));
   assert(html.length === 1 && photos.length === 0, `photos at load: ${photos.join(', ')}`);
   assert(shared.length >= 6, `expected the shared /fmp/models/ assets, got ${shared.length}`);
