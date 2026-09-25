@@ -95,7 +95,7 @@
     const nav = document.createElement('nav');
     nav.setAttribute('aria-label', 'FMP workspace');
     const active = /\/house\//.test(path) ? '#house' : '#learn';
-    for (const [hash, label] of [['#cameras', 'Operators'], ['#learn', 'Reference'], ['#models', '3D Models'], ['#house', 'House']]) {
+    for (const [hash, label] of [['#cameras', 'Operators'], ['#learn', 'Reference'], ['#models', 'Practice'], ['#house', 'House']]) {
       const link = document.createElement('a');
       link.href = `/fmp/${hash}`;
       link.textContent = label;

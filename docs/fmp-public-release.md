@@ -65,10 +65,13 @@ node scripts/export-public-camera.mjs /absolute/path/to/system-by-dave
 
 The exporter checks destination identity and writes one exact allowlist.
 `fmp/source_provenance.json` pins the canonical source commit, individual
-SHA-256 values, release mode, and a combined artifact digest. It is the only
-provenance file the exporter writes: the walk was retired in fmp-suite
-`0946989`, so `fmpwalk/` is no longer exported and its deployed files are
-frozen. Repeated generation must be byte-identical. `npm run verify:fmp`
+SHA-256 values, release mode, and a combined artifact digest, and
+`fmpwalk/source_provenance.json` does the same for the preshow walk, which the
+same export writes (release mode `local-first`) and walk.housevideo.app
+serves. Both must pin one source commit. The walk was dropped from the export in
+fmp-suite `0946989` while an overwritten landing page was repaired, which froze
+walk.housevideo.app at its last export; it was restored on 2026-09-25 (Dave).
+Repeated generation must be byte-identical. `npm run verify:fmp`
 rejects drift, extras, missing physical routes, changed release modes, remote rig
 runtime dependencies, or missing public metadata. It runs in the Pages pipeline.
 

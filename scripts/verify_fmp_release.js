@@ -11,8 +11,9 @@ const site = path.resolve(__dirname, '..');
 const hash = data => crypto.createHash('sha256').update(data).digest('hex');
 const cameraRoutes = ['camera/', ...['pit-center', 'front-of-house', 'pit-stage-left', 'catwalk'].map(key => `camera/${key}/`)];
 const rigPhotos = ['rig-camera', 'rig-front', 'rig-grip', 'rig-lens', 'rig-panel', 'rig-rear', 'rig-rings', 'rig-underside', 'v2-fiber-operator', 'v2-fiber-rear', 'v2-fiber-side', 'v2-fiber', 'v2-lcd-closed', 'v2-studio-front', 'v2-vf-back', 'v2-vf-front', 'body-controls'];
-// /fmpwalk/ is retired: the suite no longer builds that release. The already-deployed files
-// stay in place, so walk.housevideo.app keeps serving what is there.
+// One export writes both releases: the operations suite under fmp/ and the preshow walk under
+// fmpwalk/, which is published on its own origin. The walk was dropped from the export on
+// 2026-09-22 while an overwritten landing page was repaired, and restored on 2026-09-25 (Dave).
 const releases = [
   {
     directory: 'fmp',
@@ -29,7 +30,8 @@ const releases = [
       ...rigPhotos.map(name => `rig/assets/${name}.webp`),
       'rig/vendor/three/three.module.js', 'rig/vendor/three/three.core.js', 'rig/vendor/three/addons/controls/OrbitControls.js'
     ]
-  }
+  },
+  { directory: 'fmpwalk', mode: 'local-first', expected: ['index.html', 'email.js', 'mail.js', 'photos.js', 'notion.js', 'notion-config.js'] }
 ];
 // The report sender is the only address the public FMP releases may carry.
 const ALLOWED_EMAILS = ['avbydave@gmail.com'];
@@ -126,13 +128,18 @@ for (const release of releases) {
 
 const entry = fs.readFileSync(path.join(site, 'fmp/index.html'), 'utf8');
 assert.match(entry, /class="startup-guidance"/);
-// The separate walk keeps its migration routes but is no longer a hub destination.
-for (const name of ['index.html', 'camera.js', 'house/index.html', 'guide/index.html']) {
+// The walk is an operator task on its own origin: the hub's Operators panel launches it by its
+// absolute address. The camera workspace, house board and bowl guide do not link it.
+const walkRoot = `${originFor('fmpwalk/')}/fmpwalk/`;
+assert.ok(entry.includes(`href="${walkRoot}"`), 'fmp/index.html: Operators must launch the walk on its own origin');
+assert.doesNotMatch(entry, /href=["']\/fmpwalk\//, 'fmp/index.html: links the walk at a same-origin path');
+for (const name of ['camera.js', 'house/index.html', 'guide/index.html']) {
   assert.doesNotMatch(fs.readFileSync(path.join(site, 'fmp', name), 'utf8'), /(?:href=["'](?:https:\/\/walk\.housevideo\.app)?\/fmpwalk\/|['"]https:\/\/walk\.housevideo\.app\/fmpwalk\/['"])/, `${name}: walk launch remains in the operator/reference site`);
 }
-for (const target of ['rig/', 'models/atem-hd8-iso.html', 'ptz/SuperJoy-G1-Interactive-Guide.html', 'models/p240.html', 'models/ccu4.html']) {
-  assert.ok(entry.includes(`href="${target}"`), `The 3D Models tab must reach ${target}`);
+for (const target of ['https://housevideo.app/camera-sim/', '/shader/practice.html', 'rig/', 'models/atem-hd8-iso.html', 'ptz/SuperJoy-G1-Interactive-Guide.html', 'models/p240.html', 'models/ccu4.html']) {
+  assert.ok(entry.includes(`<a class="model-card" href="${target}"`), `The Practice tab must reach ${target}`);
 }
+assert.match(entry, /<span>Practice<\/span>/, 'fmp/index.html: the models panel is labelled Practice');
 assert.match(entry, /id="models"/);
 const cameraView = fs.readFileSync(path.join(site, 'fmp/camera-view.js'), 'utf8');
 assert.match(cameraView, /href="#screenTitle"/);
@@ -141,6 +148,20 @@ assert.match(cameraView, /id="screenTitle"/);
 const theme = fs.readFileSync(path.join(site, 'fmp/theme.js'), 'utf8');
 assert.match(theme, /const KEY = 'fmpTheme';/);
 assert.match(theme, /preference = legacy \|\| 'light';/);
+assert.equal(releases[0].provenance.sourceCommit, releases[1].provenance.sourceCommit, 'fmp and fmpwalk must ship from one export');
+const walkEntry = fs.readFileSync(path.join(site, 'fmpwalk/index.html'), 'utf8');
+assert.match(walkEntry, /var THEME_KEY = "fmpTheme";/);
+assert.match(walkEntry, /No silent writes/);
+// /fmpwalk/camera/ does not exist, and the walk is its own origin, so its camera link and
+// legacy ?camera=N / ?position= redirect name the operations hub absolutely. A same-origin
+// /fmp/camera/ would resolve against the walk's domain, where nothing serves it.
+const walkCameraRoot = `${originFor('fmp/camera/')}/fmp/camera/`;
+assert.ok(walkEntry.includes(`id="cameraLaunch" href="${walkCameraRoot}"`), 'walk camera launch is absolute');
+assert.ok(walkEntry.includes(`var cameraRoot = "${walkCameraRoot}";`), 'walk legacy camera redirect is absolute');
+assert.doesNotMatch(walkEntry, /["']\.{1,2}\/camera\//);
+assert.equal((walkEntry.match(/<h1\b/g) || []).length, 1);
+assert.ok(walkEntry.includes(`href="${originFor('fmp/')}/fmp/"`), 'The walk must link its operations hub at the suite\'s canonical origin.');
+assert.doesNotMatch(walkEntry, /davehomeassist\.github\.io/);
 const rigEntry = fs.readFileSync(path.join(site, 'fmp/rig/index.html'), 'utf8');
 assert.doesNotMatch(rigEntry, /unpkg|https:\/\/cdn/i);
 assert.match(rigEntry, /\.\/vendor\/three\/three\.module\.js/);
@@ -155,9 +176,11 @@ const assertUnbranded = (payload, name) => {
   assert.doesNotMatch(payload, /systembydave\.com/i, `${name} links the publisher`);
   assert.doesNotMatch(payload, /system_by_dave/i, `${name} uses the publisher logo`);
 };
-for (const name of releases[0].expected) {
-  if (!/\.(?:html|js|css)$/.test(name)) continue;
-  assertUnbranded(fs.readFileSync(path.join(site, 'fmp', name), 'utf8'), name);
+for (const release of releases) {
+  for (const name of release.expected) {
+    if (!/\.(?:html|js|css)$/.test(name)) continue;
+    assertUnbranded(fs.readFileSync(path.join(site, release.directory, name), 'utf8'), `${release.directory}/${name}`);
+  }
 }
 const robots = fs.readFileSync(path.join(site, 'robots.txt'), 'utf8');
 assert.ok(robots.includes('Disallow: /fmp/'));

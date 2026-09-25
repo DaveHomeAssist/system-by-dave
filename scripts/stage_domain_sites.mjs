@@ -709,8 +709,8 @@ function stageSite(site, closed, policy, options) {
   };
   walk(dir, '');
   // The FMP domains carry no publisher branding, the generated pages included (Dave, 2026-09-22).
-  // Only this function's own output is checked: copied repo pages are guarded by verify:fmp, and the
-  // retired walk under fmpwalk/ stays frozen. Source comments and the data-transfer origin constant
+  // Only this function's own output is checked: copied repo pages, the walk under fmpwalk/ included,
+  // are guarded by verify:fmp. Source comments and the data-transfer origin constant
   // are not branding, so the rule is titles, link previews and navigation, which is what these are.
   if (site.home.startsWith('/fmp')) {
     const generated = ['index.html', '404.html', 'transfer.html',

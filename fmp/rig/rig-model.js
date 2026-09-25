@@ -305,7 +305,7 @@ function makeRig(){
     box(lcdAssembly,.17,.19,.17,[-.18,y,.698],mats.body,.024);
     cyl(lcdAssembly,.075,.23,[-.15,y,.770],mats.edge,'y');
   }
-  lcdHinge=subgroup(lcdAssembly,[-.15,2.04,.770]);
+  lcdHinge=subgroup(lcdAssembly,[-.15,2.04,.770]);lcdHinge.userData.batchAnchor=true;
   cyl(lcdHinge,.071,.61,[0,0,0],mats.dark,'y');
   // Preserve the closed-door coordinates; all faces and buttons share one hinge.
   const lcd=subgroup(lcdHinge,[.15,-2.04,-.770]);
@@ -525,7 +525,7 @@ function makeCameraFiber(rig){
   for(let i=0;i<3;i++){const y=1.95-i*.32;bnc(links,[1.98,y,-.775],[0,Math.PI,0],true);textPlane(links,['SDI IN','SDI OUT','REF OUT'][i],.29,.047,[1.98,y+.132,-.778],[0,Math.PI,0]);}
   const hybrid=part('fiber-hybrid',rig);
   cyl(hybrid,.265,.12,[2.66,2.90,-.785],mats.edge,'z');
-  fiberPivot=subgroup(hybrid,[2.66,2.90,-.96]);
+  fiberPivot=subgroup(hybrid,[2.66,2.90,-.96]);fiberPivot.userData.batchAnchor=true;
   const port=subgroup(fiberPivot,[0,-.19,0]);
   box(port,.51,.54,.41,[0,.015,0],mats.dark,.105);cyl(port,.255,.36,[0,.19,0],mats.body,'z');
   torus(port,.206,.019,[0,.19,-.195],mats.edge,'z');
@@ -535,7 +535,7 @@ function makeCameraFiber(rig){
   cyl(port,.123,.19,[0,-.95,0],mats.rubber,'y');
   for(let i=0;i<4;i++)torus(port,.122-i*.010,.015,[0,-.89-i*.039,0],mats.dark,'y');
   for(const x of [-.225,.225])cyl(port,.024,.07,[x,-.215,-.10],mats.silver,'y',12);
-  fiberCable=tube(hybrid,[[2.66,1.67,-.96],[2.8,.80,-1.36],[3.85,-1.5,-2.20],[3.78,-4.8,-2.28],[3.88,-8.98,-2.38],[4.45,-9.28,-2.50]],.068);
+  fiberCable=tube(hybrid,[[2.66,1.67,-.96],[2.8,.80,-1.36],[3.85,-1.5,-2.20],[3.78,-4.8,-2.28],[3.88,-8.98,-2.38],[4.45,-9.28,-2.50]],.068);fiberCable.userData.noBatch=true;
   setFiberAngle(fiberAngle);
 }
 function setFiberAngle(degrees){
@@ -742,6 +742,53 @@ function makeStudio(){
   cyl(cap,.32,.30,[0,0,0],mats.rubber,'z');cyl(cap,.25,.013,[0,0,.156],mats.dark,'z');torus(cap,.27,.042,[0,0,.16],mats.edge,'z');
   tube(socket,[[.28,-.26,.02],[.46,-.78,.12],[.14,-1.00,.19],[-.37,-.92,.21]],.025);
   return studio;
+}
+// Draw-call batching. Meshes that share a material and shadow flags under the same component
+// (or under a part that moves after build: the LCD hinge and fiber pivot) are merged into one
+// mesh, so one draw call covers what was many. Highlighting, picking and articulation work per
+// component, so they are unchanged. Textured labels, instances, the re-shaped fiber cable,
+// multi-material and mirrored meshes stay separate.
+function batchStaticMeshes(){
+  const isAnchor=node=>node.userData.cid||node.userData.batchAnchor||Object.values(models).includes(node)||node.parent===scene;
+  const buckets=new Map(),inverse=new T.Matrix4(),relative=new T.Matrix4();
+  scene.updateMatrixWorld(true);
+  scene.traverse(mesh=>{
+    if(!mesh.isMesh||mesh.isInstancedMesh||mesh.userData.noBatch||Array.isArray(mesh.material)||mesh.material.map) return;
+    if(mesh.matrixWorld.determinant()<=0) return;
+    let anchor=mesh.parent;while(anchor&&!isAnchor(anchor))anchor=anchor.parent;
+    if(!anchor) return;
+    const g=mesh.geometry,attrs=Object.keys(g.attributes).sort().join(',');
+    const key=[anchor.uuid,mesh.material.uuid,mesh.castShadow,mesh.receiveShadow,!!mesh.userData.noHighlight,attrs].join('|');
+    if(!buckets.has(key))buckets.set(key,{anchor,meshes:[]});
+    buckets.get(key).meshes.push(mesh);
+  });
+  let merged=0;
+  for(const {anchor,meshes} of buckets.values()){
+    if(meshes.length<2) continue;
+    inverse.copy(anchor.matrixWorld).invert();
+    const parts=meshes.map(mesh=>{
+      const geo=mesh.geometry.clone();
+      if(!geo.index){const count=geo.attributes.position.count,index=new Uint32Array(count);for(let i=0;i<count;i++)index[i]=i;geo.setIndex(new T.BufferAttribute(index,1));}
+      geo.applyMatrix4(relative.multiplyMatrices(inverse,mesh.matrixWorld));return geo;
+    });
+    const out=new T.BufferGeometry();
+    for(const name of Object.keys(parts[0].attributes)){
+      const first=parts[0].attributes[name],size=first.itemSize;
+      const total=parts.reduce((n,geo)=>n+geo.attributes[name].count,0),array=new Float32Array(total*size);
+      let offset=0;for(const geo of parts){const src=geo.attributes[name];for(let i=0;i<src.count;i++)for(let c=0;c<size;c++)array[(offset+i)*size+c]=src.getComponent(i,c);offset+=src.count;}
+      out.setAttribute(name,new T.BufferAttribute(array,size,first.normalized));
+    }
+    const indexTotal=parts.reduce((n,geo)=>n+geo.index.count,0),index=new Uint32Array(indexTotal);
+    let base=0,at=0;for(const geo of parts){for(let i=0;i<geo.index.count;i++)index[at++]=geo.index.getX(i)+base;base+=geo.attributes.position.count;}
+    out.setIndex(new T.BufferAttribute(index,1));out.computeBoundingBox();out.computeBoundingSphere();
+    const mesh=new T.Mesh(out,meshes[0].material);
+    mesh.castShadow=meshes[0].castShadow;mesh.receiveShadow=meshes[0].receiveShadow;mesh.userData.noHighlight=meshes[0].userData.noHighlight;mesh.userData.batched=meshes.length;
+    anchor.add(mesh);
+    for(const old of meshes)old.removeFromParent();
+    for(const geo of parts)geo.dispose();
+    merged+=meshes.length-1;
+  }
+  root.dataset.batchedMeshes=String(merged);
 }
 function registerSurfaces(){
   scene.traverse(object=>{
@@ -953,7 +1000,7 @@ function setupScene(){
   const fill=new T.DirectionalLight(0xd6e8ff,2.15);fill.position.set(1,4,-6);scene.add(fill);
   const rim=new T.DirectionalLight(0xffffff,2.8);rim.position.set(5,6,2);scene.add(rim);
   setupEnvironment();
-  makeRig();makeStudio();registerSurfaces();models.studio.visible=false;
+  makeRig();makeStudio();batchStaticMeshes();registerSurfaces();models.studio.visible=false;
   const contactTex=canvasTexture(256,256,(ctx,w,h)=>{const grad=ctx.createRadialGradient(w/2,h/2,10,w/2,h/2,w/2);grad.addColorStop(0,'rgba(0,0,0,.25)');grad.addColorStop(.5,'rgba(0,0,0,.12)');grad.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=grad;ctx.fillRect(0,0,w,h);});
   for(const [id,y,w,d] of [['rig',-9.40,9,8],['studio',-.11,6,3.4]]){
     const floor=new T.Mesh(new T.PlaneGeometry(30,30),new T.ShadowMaterial({opacity:.17}));floor.rotation.x=-Math.PI/2;floor.position.y=y;floor.receiveShadow=true;models[id].add(floor);
