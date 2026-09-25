@@ -39,6 +39,7 @@ const chromeCandidates = [
 ].filter(Boolean);
 const chromeBin = chromeCandidates.find((candidate) => fs.existsSync(candidate));
 
+const DRAW_BUDGET = 210;
 const AUDIT_QUERY = 'mode=manual&w=20&bottom=4&ar=1.777778&basisW=20&rasterAr=1.6&lh=6&dist=7.3229&min=0.978&max=1.32';
 const failures = [];
 function check(name, condition, detail = '') {
@@ -122,9 +123,11 @@ async function main() {
 
     let sequence = 0;
     const exceptions = [];
+    const threeMessages = [];
     const pending = new Map();
     socket.onmessage = (event) => {
       const message = JSON.parse(event.data);
+      if (message.method === 'Runtime.consoleAPICalled') { const text = message.params.args?.[0]?.value; if (typeof text === 'string' && text.startsWith('THREE.')) threeMessages.push(text); return; }
       if (message.method === 'Runtime.exceptionThrown') { exceptions.push(message.params.exceptionDetails.exception?.description || message.params.exceptionDetails.text || 'Runtime exception'); return; }
       if (!message.id || !pending.has(message.id)) return;
       const callbacks = pending.get(message.id);
@@ -137,6 +140,19 @@ async function main() {
     await cdp('Network.enable');
     await cdp('Browser.setDownloadBehavior', { behavior: 'allow', downloadPath: downloadDir, eventsEnabled: true });
     await cdp('Emulation.setDeviceMetricsOverride', { width: 1280, height: 900, deviceScaleFactor: 1, mobile: false });
+    // Rendering-budget instrumentation (fmp-suite docs/three-policy.md): count every GL draw,
+    // shadow passes included, and sum layout shifts that no input caused.
+    await cdp('Page.addScriptToEvaluateOnNewDocument', { source: `
+      window.__glDraws = 0;
+      for (const proto of [window.WebGLRenderingContext?.prototype, window.WebGL2RenderingContext?.prototype].filter(Boolean)) {
+        for (const name of ['drawElements', 'drawArrays', 'drawElementsInstanced', 'drawArraysInstanced']) {
+          const original = proto[name];
+          if (original) proto[name] = function (...args) { window.__glDraws += 1; return original.apply(this, args); };
+        }
+      }
+      window.__layoutShift = 0;
+      try { new PerformanceObserver((list) => { for (const entry of list.getEntries()) if (!entry.hadRecentInput) window.__layoutShift += entry.value; }).observe({ type: 'layout-shift', buffered: true }); } catch {}
+    ` });
 
     async function evaluate(expression) {
       const result = await cdp('Runtime.evaluate', { expression, returnByValue: true, awaitPromise: true });
@@ -301,6 +317,26 @@ async function main() {
     if (noWebgl) {
       const fallbackAfter = await evaluate(`(() => { const fallback=document.getElementById('stageFallback'); const active=fallback.querySelector('[data-fallback-projector][data-active="true"]'); return { setMark:fallback.dataset.activeSetMark, transform:active?.getAttribute('transform')||'', description:document.getElementById('stageFallbackSvgDescription').textContent.trim() }; })()`);
       check('2D fallback redraws from the same live scene state', fallbackAfter.setMark === '10' && fallbackAfter.transform !== fallbackBefore.transform && /Active set mark 10\' 0"/.test(fallbackAfter.description), { before:fallbackBefore, after:fallbackAfter });
+    }
+
+    // 8b. Rendering budget at 1440x900: no layout shift while loading, nothing drawn while idle,
+    // and one full redraw within budget (DRAW_BUDGET is about 1.5x the 139 draws measured on 2026-09-25).
+    if (!noWebgl) {
+      await cdp('Emulation.setDeviceMetricsOverride', { width: 1440, height: 900, deviceScaleFactor: 1, mobile: false });
+      await open(AUDIT_QUERY);
+      await delay(1000);
+      const layoutShift = await evaluate('window.__layoutShift');
+      check('Stage 3D loads without layout shift', layoutShift < 0.05, { layoutShift });
+      await evaluate('window.__glDraws = 0');
+      await delay(2000);
+      const idleDraws = await evaluate('window.__glDraws');
+      check('Stage 3D draws nothing while idle', idleDraws === 0, { idleDraws });
+      await evaluate('window.__glDraws = 0');
+      await cdp('Emulation.setDeviceMetricsOverride', { width: 1439, height: 900, deviceScaleFactor: 1, mobile: false });
+      await delay(500);
+      const redrawDraws = await evaluate('window.__glDraws');
+      check('one Stage 3D redraw stays within its draw budget', redrawDraws > 0 && redrawDraws <= DRAW_BUDGET, { redrawDraws, budget: DRAW_BUDGET });
+      await cdp('Emulation.setDeviceMetricsOverride', { width: 1280, height: 900, deviceScaleFactor: 1, mobile: false });
     }
 
     // 9. A real WebGL loss must visibly pause and then recover the existing scene.
@@ -631,6 +667,9 @@ async function main() {
       ? exceptions.filter((exception) => !/Error creating WebGL context\.|three-d-stage: WebGL 2 unavailable after standard and low-power startup attempts/.test(exception))
       : exceptions;
     check(noWebgl ? 'no unexpected browser exceptions in the intentional no-WebGL run' : 'no uncaught browser exceptions', unexpectedExceptions.length === 0, unexpectedExceptions);
+    // Section 9 loses and restores the context on purpose, and three.js logs both events.
+    const unexpectedThreeMessages = threeMessages.filter((text) => !/^THREE\.WebGLRenderer: Context (Lost|Restored)\.$/.test(text) && !(noWebgl && /^THREE\.WebGLRenderer: .*WebGL context/.test(text)));
+    check('no THREE.* console messages', unexpectedThreeMessages.length === 0, unexpectedThreeMessages);
   } finally {
     chrome.kill('SIGKILL');
     if (staticServer) staticServer.server.kill('SIGKILL');
