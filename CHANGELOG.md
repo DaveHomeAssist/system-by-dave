@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-09-25 — The page manifest falls back to the installed Chrome
+
+- With Playwright's browser download missing (`~/Library/Caches/ms-playwright` had been cleared), `npm run manifest:housevideo` stalled instead of reporting. It now tries Playwright's browser, then the installed Chrome, and otherwise records the runtime-links column as not measured with the reason. The file server also lists the staged site once instead of on every request.
+
 ## 2026-09-25 — FMP Practice tab, practice search, the preshow walk released again
 
 - Re-exported `fmp/` and `fmpwalk/` from fmp-suite `b727aea` (PR #30). The export also carries PR #28 (three.js r184 for the equipment models and the SuperJoy guide) and PR #29 (the rig's static meshes batched, about two thirds fewer draw calls).

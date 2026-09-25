@@ -116,11 +116,30 @@ function editedIn(rel, bytes) {
   return { where, changed };
 }
 
+// Playwright's own browser first, then the installed Chrome when that download is missing (a
+// cleared ~/Library/Caches/ms-playwright). CHROME_CHANNEL or CHROME_BIN picks one explicitly.
+async function launchBrowser(chromium) {
+  const chosen = process.env.CHROME_CHANNEL ? { channel: process.env.CHROME_CHANNEL }
+    : process.env.CHROME_BIN ? { executablePath: process.env.CHROME_BIN } : null;
+  let failure;
+  for (const options of chosen ? [chosen] : [{}, { channel: 'chrome' }]) {
+    try { return await chromium.launch({ headless: true, ...options }); } catch (error) { failure = error; }
+  }
+  throw failure;
+}
+
+// Returns { results } per page, or { reason } when no browser could run, so a missing browser
+// leaves the runtime column unmeasured instead of failing or stalling the manifest.
 async function runtimeLinks(dir, pages, origin) {
   let chromium;
-  try { ({ chromium } = await import('playwright')); } catch { return null; }
+  try { ({ chromium } = await import('playwright')); } catch { return { reason: 'Playwright is not installed' }; }
+  let browser;
+  try { browser = await launchBrowser(chromium); } catch (error) {
+    return { reason: `no browser could start (${String(error.message || error).split('\n')[0]})` };
+  }
+  const staged = new Set(listFiles(dir));
   const server = http.createServer((request, response) => {
-    const rel = pageFor(new URL(request.url, 'http://local').pathname, new Set(listFiles(dir)))
+    const rel = pageFor(new URL(request.url, 'http://local').pathname, staged)
       || decodeURIComponent(new URL(request.url, 'http://local').pathname).replace(/^\/+/, '');
     const file = path.join(dir, rel);
     if (!file.startsWith(dir) || !fs.existsSync(file) || fs.statSync(file).isDirectory()) { response.writeHead(404).end(); return; }
@@ -129,9 +148,6 @@ async function runtimeLinks(dir, pages, origin) {
   });
   await new Promise((ready) => server.listen(0, '127.0.0.1', ready));
   const base = `http://127.0.0.1:${server.address().port}`;
-  const channel = process.env.CHROME_CHANNEL ? { channel: process.env.CHROME_CHANNEL }
-    : process.env.CHROME_BIN ? { executablePath: process.env.CHROME_BIN } : {};
-  const browser = await chromium.launch({ headless: true, ...channel });
   const results = {};
   try {
     const context = await browser.newContext({ serviceWorkers: 'block' });
@@ -162,7 +178,7 @@ async function runtimeLinks(dir, pages, origin) {
     await browser.close();
     server.close();
   }
-  return results;
+  return { results };
 }
 
 function stage(siteId) {
@@ -187,7 +203,7 @@ async function buildManifest({ siteId = 'housevideo', browser = true } = {}) {
     const sitemapFile = path.join(dir, 'sitemap.xml');
     const sitemap = fs.existsSync(sitemapFile)
       ? [...fs.readFileSync(sitemapFile, 'utf8').matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => new URL(match[1]).pathname) : [];
-    const runtime = browser ? await runtimeLinks(dir, pages, origin) : null;
+    const runtime = browser ? await runtimeLinks(dir, pages, origin) : { reason: '--no-browser' };
     const records = [];
     for (const rel of pages) {
       const bytes = fs.readFileSync(path.join(dir, rel));
@@ -214,7 +230,7 @@ async function buildManifest({ siteId = 'housevideo', browser = true } = {}) {
     }
     for (const record of records) {
       record.staticLinksIn = records.filter((other) => other.staticLinksOut.includes(record.file)).map((other) => other.file).sort();
-      const found = runtime?.[record.file];
+      const found = runtime.results?.[record.file];
       record.runtimeLinksOut = found?.links ?? null;
       if (found?.error) record.runtimeError = found.error;
       if (found?.landed && found.landed !== record.route) record.runtimeLandedOn = found.landed;
@@ -232,7 +248,7 @@ async function buildManifest({ siteId = 'housevideo', browser = true } = {}) {
       supportingFiles: { count: supporting.length, bytes: supporting.reduce((sum, file) => sum + fs.statSync(path.join(dir, file)).size, 0) },
       robotsTxt: robotsText,
       sitemap,
-      runtimeLinks: runtime ? 'counted in a headless browser after load; other domains blocked' : 'not measured (--no-browser or Playwright unavailable)'
+      runtimeLinks: runtime.results ? 'counted in a headless browser after load; other domains blocked' : `not measured: ${runtime.reason}`
     };
   } finally {
     fs.rmSync(out, { recursive: true, force: true });
