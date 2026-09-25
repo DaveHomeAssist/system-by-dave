@@ -11,12 +11,14 @@ interface Props {
   onStop(): void;
   onRename(slot: number, name: string): void;
   onClear(slot: number): void;
+  /** A name read from the shot, shown for unnamed presets and offered when renaming. Absent while suggestions are off. */
+  suggestName?(preset: Preset): string;
 }
 
 type MenuState = { slot: number; x: number; y: number } | null;
 
 /** Nine preset keys laid out like a keypad, with Store, Home and Stop. */
-export function PresetPad({ presets, armed, onArm, onPress, onHome, onStop, onRename, onClear }: Props) {
+export function PresetPad({ presets, armed, onArm, onPress, onHome, onStop, onRename, onClear, suggestName }: Props) {
   const bySlot = new Map(presets.map((p) => [p.slot, p]));
   const [menu, setMenu] = useState<MenuState>(null);
   const [editing, setEditing] = useState<number | null>(null);
@@ -27,7 +29,10 @@ export function PresetPad({ presets, armed, onArm, onPress, onHome, onStop, onRe
   const editRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (editing !== null) editRef.current?.focus();
+    if (editing === null) return;
+    editRef.current?.focus();
+    // A suggested name is selected, so typing replaces it and Enter keeps it.
+    editRef.current?.select();
   }, [editing]);
 
   useEffect(() => {
@@ -67,7 +72,7 @@ export function PresetPad({ presets, armed, onArm, onPress, onHome, onStop, onRe
     const preset = bySlot.get(slot);
     setMenu(null);
     setEditing(slot);
-    setDraft(preset?.name ?? "");
+    setDraft(preset?.name || (preset && suggestName ? suggestName(preset) : ""));
   };
 
   const commitRename = (slot: number) => {
@@ -94,7 +99,8 @@ export function PresetPad({ presets, armed, onArm, onPress, onHome, onStop, onRe
       <div className={`preset-grid ${armed ? "is-armed" : ""}`} role="group" aria-labelledby="preset-label">
         {Array.from({ length: PRESET_SLOTS }, (_, i) => i + 1).map((slot) => {
           const preset = bySlot.get(slot);
-          const name = preset?.name || (preset ? "Stored" : "Empty");
+          const suggested = preset && !preset.name && suggestName ? suggestName(preset) : "";
+          const name = preset?.name || suggested || (preset ? "Stored" : "Empty");
           const action = armed
             ? `Store current shot in preset ${slot}`
             : preset
@@ -164,7 +170,7 @@ export function PresetPad({ presets, armed, onArm, onPress, onHome, onStop, onRe
               onPointerLeave={clearLongPress}
             >
               <span className="preset-number">{slot}</span>
-              <span className="preset-name">{name}</span>
+              <span className={`preset-name ${suggested ? "is-suggested" : ""}`}>{name}</span>
             </button>
           );
         })}

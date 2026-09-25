@@ -74,6 +74,12 @@
         <section class="panel side-panel" id="panel-exercise" role="tabpanel" aria-labelledby="tab-exercise" data-side-panel="exercise">
           <div class="panel-scroll">
             <h2 class="panel-heading" id="exerciseHeading">CHOOSE AN EXERCISE</h2>
+            <div class="next-step" id="nextStep" hidden>
+              <button type="button" class="next-step-action" id="nextStepButton"></button>
+              <a class="next-step-action" id="nextStepLink" href="/camera-sim/" hidden></a>
+              <button type="button" class="next-step-dismiss" id="nextStepDismiss" aria-label="Dismiss this suggestion" title="Dismiss for two weeks">×</button>
+              <p class="next-step-why" id="nextStepWhy"></p>
+            </div>
             <ol class="exercise-list" id="exerciseList" aria-labelledby="exerciseHeading"></ol>
 
             <section class="block" aria-labelledby="objectiveHeading">
@@ -121,7 +127,21 @@
               <a class="link-row" href="index.html">Camera control &amp; shading reference</a>
               <a class="link-row" href="/fmp/">FMP Video Operations</a>
               <a class="link-row" href="/camera-sim/">Camera Simulator · Camera 4 framing</a>
+              <a class="link-row" id="simContinue" href="/camera-sim/" hidden></a>
             </nav>
+            <section class="block training-prefs" aria-labelledby="suggestionsHeading">
+              <h3 class="block-heading" id="suggestionsHeading">SUGGESTIONS</h3>
+              <label class="field-label" for="suggestionsSelect">Suggest next steps</label>
+              <div class="field-row">
+                <select id="suggestionsSelect">
+                  <option value="on">On</option>
+                  <option value="quiet">Quiet: highlights only</option>
+                  <option value="off">Off: remember nothing</option>
+                </select>
+                <button type="button" class="btn" id="forgetTrainingButton">FORGET HISTORY</button>
+              </div>
+              <p class="hint">This device remembers which exercises you tried and passed here and in the Camera Simulator, to mark the next one. Nothing leaves this device, and your practice session is kept either way.</p>
+            </section>
             <p class="disclaimer">Generated pictures and scopes only. Nothing here reads or controls real equipment.</p>
             <p class="mono-note" id="offlineStatus" role="status">Preparing offline use.</p>
           </div>
@@ -410,6 +430,7 @@
   <p class="sr-only" id="liveStatus" aria-live="polite"></p>
   <script src="shading-practice-state.js"></script>
   <script src="practice-render.js"></script>
+  <script src="fmp-training.js"></script>
   <script src="practice-app.js"></script>
 </body>
 </html>

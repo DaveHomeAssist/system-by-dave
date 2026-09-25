@@ -164,6 +164,21 @@ practice and the URSA rig explorer for Cameras 1–3, and says Camera 4 is set f
 not the shader panel. `docs/camera-training-links.md` lists every link in and out, and
 `npm run test:camera-training-links` checks each target.
 
+Suggestions (since 1.11.0) come from this session and from the training record shared with
+Shading practice (`fmpTraining.v1`, `shader/fmp-training.js`, bundled here and in the release
+fingerprint). Exercises marks the first exercise this session has not passed: Next, or Try again
+after a miss. Once all three have passed, it suggests the next Shading practice exercise this
+device has not passed, with a dismiss that holds for two weeks. An unnamed preset shows a name
+read from the shot (`src/sim/presetName.ts`): Wide when the whole downstage edge is in frame,
+otherwise Mid (the frame takes in at least 30% of the stage width) or Tight with the stage mark
+nearest the middle of the frame, or Off stage with its pan. The names are as provisional as the
+stage dimensions. Rename starts from the name, selected, and Session shows it as the name hint;
+it is stored only if the operator keeps it. Finished exercises are recorded in the shared record
+(ids, pass, tries and minute timestamps), and Session offers Continue in Shading practice once it
+has been used there, plus the Suggestions setting (On, Quiet: marks and names only, Off: records
+nothing and clears the record) and Forget training history. The session, its results and its
+exports are unchanged by any of this. The offline file keeps its own record, as it does its session.
+
 ## Persistence
 
 The session autosaves to browser storage under `fmpCameraSim.v1` (the `fmp` prefix carries it
@@ -320,6 +335,7 @@ after venue or rendering changes, then rebuild so the published copy follows.
 | Graphics context restore | Probe loses and restores the monitor context and reads the picture back |
 | Short screens keep a large picture | Probe at 1024 × 768, 1024 × 690, 1180 × 685 and 1366 × 650, venue view collapsed (controls beside the monitor) and shown; Expand at 1440 × 900 |
 | Links in and out resolve | Probe: an exercise link starts once and leaves the address, a bad one is refused, Session links hosted and offline; `test:camera-training-links` checks every target id |
+| Suggestions follow this device's record | Probe: finished exercises reach `fmpTraining.v1` with known fields only; Next or Try again marks the first unpassed exercise; an unnamed preset shows a name read from the shot and Rename starts from it, selected; Continue in Shading practice; Off clears the record and hides the marks and names; Forget keeps Off. `sim/presetName.test.ts` covers Wide, Mid, Tight and Off stage |
 | Pass and fail marks do not rely on colour | Probe reads the wide-shot marks' dash and fill |
 | Page face and breadcrumb | Probe: DM Sans loaded (hosted and offline), breadcrumb never a vertical scroller |
 

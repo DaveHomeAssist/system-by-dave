@@ -673,6 +673,60 @@ async function closePanel(page) {
     assert(result.passed && result.metrics.maxPanTiltDeviationDeg <= 0.1, JSON.stringify(result.metrics));
     await page.getByRole('button', { name: 'Reset', exact: true }).click();
   });
+  // Suggestions (src/app/training.ts, shader/fmp-training.js, docs/camera-training-links.md).
+  const MARK = '(DS[RCL]|CS[RL]?|US[RCL])';
+  const SUGGESTED = new RegExp(`^(Wide|(Mid|Tight) · ${MARK}|Off stage · pan [+−]\\d+°)$`);
+  await check('suggestions: results reach the shared record and the exercise list marks the next one', async () => {
+    const record = await page.evaluate(() => JSON.parse(localStorage.getItem('fmpTraining.v1')));
+    assert(record && record.sim.wide?.passed === true && record.sim.recall?.passed === true && record.sim.follow?.tries === 1, JSON.stringify(record));
+    assert(Object.keys(record).every((key) => ['schema', 'prefs', 'last', 'practice', 'sim'].includes(key)), `unexpected fields: ${Object.keys(record)}`);
+    assert(Object.values(record.sim).every((entry) => Object.keys(entry).every((key) => ['passed', 'tries', 'at'].includes(key))), 'unexpected entry fields');
+    assert((await page.getByTestId('exercise-wide-next').count()) === 0 && (await page.getByTestId('exercise-recall-next').count()) === 0, 'a passed exercise is still marked');
+    if (record.sim.follow.passed) {
+      await page.getByTestId('next-step').getByRole('link', { name: 'Next: Shading practice · Match two cameras' }).waitFor({ timeout: 3000 });
+      return 'all three passed: Shading practice suggested';
+    }
+    const pill = (await page.getByTestId('exercise-follow-next').textContent()) || '';
+    assert(pill === 'Try again', `follow reads ${pill}`);
+    return 'follow marked Try again';
+  });
+  await check('suggestions: an unnamed preset shows a name read from the shot, and Rename starts from it', async () => {
+    const key = page.getByRole('button', { name: /^Recall preset 3, / });
+    const label = await key.locator('.preset-name').textContent();
+    assert(SUGGESTED.test(label || ''), `preset 3 reads ${label}`);
+    assert(await key.locator('.preset-name.is-suggested').count() === 1, 'the suggested name is not marked as such');
+    await closePanel(page);
+    await key.click({ button: 'right' });
+    await page.getByRole('menuitem', { name: 'Rename' }).click();
+    const field = page.locator('.preset-rename');
+    const draft = await field.evaluate((input) => ({ value: input.value, start: input.selectionStart, end: input.selectionEnd }));
+    assert(draft.value === label && draft.start === 0 && draft.end === label.length, `rename draft ${JSON.stringify(draft)}`);
+    await field.press('Escape');
+    assert((await s.state()).presets.find((p) => p.slot === 3).name === '', 'cancelling Rename stored the suggestion');
+    return label;
+  });
+  await check('suggestions: Session continues in Shading practice; Off hides the marks and forgets; Forget keeps the choice', async () => {
+    await page.evaluate(() => window.FmpTraining.recordStep(undefined, 'practice', 'match-cameras', { passed: false, score: 64 }));
+    await showTab(page, 'Session');
+    const link = page.getByTestId('practice-continue');
+    assert(/Continue in Shading practice · next: Match two cameras, best 64/.test((await link.textContent()) || ''), await link.textContent());
+    assert((await link.getAttribute('href')) === '/shader/practice.html', await link.getAttribute('href'));
+    const label = await page.locator('.preset-key.has-preset').filter({ hasText: /^3/ }).locator('.preset-name').textContent();
+    assert((await page.locator('#preset-name-3').getAttribute('placeholder')) === label, 'the Session name hint differs from the pad');
+    await page.getByLabel('Suggest next steps').selectOption('off');
+    const off = await page.evaluate(() => JSON.parse(localStorage.getItem('fmpTraining.v1')));
+    assert(off.prefs.suggestions === 'off' && Object.keys(off.sim).length === 0 && Object.keys(off.practice).length === 0, JSON.stringify(off));
+    assert((await page.getByTestId('practice-continue').count()) === 0, 'Continue still shown with suggestions off');
+    assert(((await page.getByRole('button', { name: /^Recall preset 3, / }).textContent()) || '').includes('Stored'), 'preset 3 still suggests a name');
+    await page.getByRole('button', { name: 'Forget training history' }).click();
+    const forgotten = await page.evaluate(() => JSON.parse(localStorage.getItem('fmpTraining.v1')));
+    assert(forgotten.prefs.suggestions === 'off', 'Forget turned suggestions back on');
+    await showTab(page, 'Exercises');
+    assert((await page.locator('[data-testid$="-next"]').count()) === 0, 'exercise marks shown with suggestions off');
+    await showTab(page, 'Session');
+    await page.getByLabel('Suggest next steps').selectOption('on');
+    await showTab(page, 'Exercises');
+  });
   await check('changing venue dimensions changes the framing; invalid geometry is refused', async () => {
     await page.getByRole('tab', { name: 'Venue' }).click();
     const before = await s.frame();

@@ -23,8 +23,9 @@ redirect to the Shader route, and old Throwline practice exports still import.
 | `shader/practice-render.js` | Canvas drawing of letterboxed 16:9 pictures, the wipe, and the four scopes. It only draws engine analyses. |
 | `shader/practice-app.js` | Controller: DOM, layouts, input, undo/redo, share and files, autosave, offline registration. |
 | `shader/practice.css` | ShowConsole styling. Prep Light is the default theme and Show Dark the working theme; scope glass is dark in both. |
-| `shader/practice-theme.js` | Applies the saved theme before first paint. |
+| `shader/practice-theme.js` | Applies the saved theme before first paint; with none saved, the FMP suite's `fmpTheme` decides. |
 | `shader/practice-worker.js` | Dedicated offline cache for the console, the parent reference, and its stylesheets. |
+| `shader/fmp-training.js` | Training memory shared with the Camera Simulator (`fmpTraining.v1`): which exercises this device tried and passed, for the suggestions below. The simulator bundles the same file. |
 
 The page loads only these same-origin files. Its CSP allows no inline script or
 style, no network connections (`connect-src 'none'`), no plugins, frames or
@@ -86,6 +87,14 @@ golden scores for every exercise.
   screens (900 px wide or more, 700 px tall or less) hide it along with the control notes.
   Related references also link the Camera Simulator. `docs/camera-training-links.md` lists every
   link and `npm run test:camera-training-links` checks each target.
+- Suggestions, from the training record shared with the Camera Simulator
+  (`docs/camera-training-links.md`): after a check, NEXT + or NEXT − marks the control the
+  next correction names until any control moves (screen readers hear it in the control's
+  name); each exercise shows PASSED or its best score on this device; once the open exercise
+  has passed, a dismissible Next suggests the first one not passed, then the simulator's; and
+  Continue in the Camera Simulator appears once it has been used. The Suggestions setting
+  (On, Quiet: marks only, Off: records nothing and clears the record) and Forget history sit
+  under Related references. None of this changes the practice session or its exports.
 
 - `?scenario=&seed=&camera=&scope=&split=&compare=&layout=` opens an exercise
   from its start. `?demo=<control>&step=<n>` opens a guided sweep.
@@ -134,7 +143,7 @@ for the updated worker and reloads once.
 ## Verification
 
 ```bash
-npm run verify:shader-practice        # engine and worker tests, source release gate
+npm run verify:shader-practice        # engine, training-memory and worker tests, source release gate
 npm run test:shader-practice-browser  # CDP browser probe
 npm run test:camera-training-links    # every kit and cross-tool link target exists
 ```
@@ -144,6 +153,8 @@ The browser probe covers ten viewports in both themes (320×568, 390×844,
 2560×1080), keyboard-only use with visible focus, contrast, 44 px targets,
 Score and control reachability, the reference lock, reduced motion, offline
 reload, exact handoff, damaged, oversized and pasted links, legacy and invalid
-imports, and the storage, clipboard, canvas, service-worker and no-JavaScript
+imports, the suggestions (the marked control, exercise badges, Next, dismissal, Continue,
+Quiet, Off and Forget, and the FMP theme on a first visit, with the suggestion and badges
+present in every viewport), and the storage, clipboard, canvas, service-worker and no-JavaScript
 failure paths. Every probe navigation loads a fresh document, so a link that
 differs only by its fragment is really reloaded rather than left in place.

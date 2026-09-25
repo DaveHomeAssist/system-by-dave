@@ -92,7 +92,10 @@ operator's Warm Paper, Stage Slate, or System choice.
 `js/av-suite-context.js` carries the show profile and readiness context.
 `js/sbd-handoff.js` stages confirmed, target-native import data under
 `sbd.handoff.v1`. Persistent storage and exported schemas are public interfaces;
-changes require compatibility and migration coverage.
+changes require compatibility and migration coverage. On housevideo.app,
+`shader/fmp-training.js` keeps FMP camera-training progress shared by Shading
+practice and the Camera Simulator under `fmpTraining.v1`
+(`docs/camera-training-links.md`).
 
 ### Built and managed products
 

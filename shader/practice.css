@@ -256,6 +256,24 @@ input[type="text"]:hover, select:hover, textarea:hover { border-color: var(--ink
 .exercise-brief { font-size: 13px; line-height: 18px; color: var(--ink-muted); }
 .exercise[aria-current="true"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
 .exercise[aria-current="true"] .exercise-index { color: var(--ink); }
+.exercise-title .exercise-badge { min-width: 0; margin-left: var(--space-1); padding: 0 var(--space-1); font-size: 11px; line-height: 14px; vertical-align: 1px; }
+/* One suggested next step, dismissible, never started for the operator. */
+.next-step {
+  display: grid; grid-template-columns: minmax(0, 1fr) var(--target); gap: var(--space-1) var(--space-2); align-items: center;
+  margin-bottom: var(--space-2); padding: var(--space-2); border: 1px solid var(--ink); border-radius: var(--radius-md); background: var(--surface-100);
+}
+.next-step-action {
+  display: flex; align-items: center; min-height: var(--target); padding: 0 var(--space-3); border: 1px solid var(--hairline-strong); border-radius: var(--radius-sm);
+  background: var(--surface-200); color: var(--ink); font: 600 13px/16px var(--sans); letter-spacing: 0.06em; text-align: left; text-decoration: none; cursor: pointer; overflow-wrap: anywhere;
+}
+.next-step-action::before { content: "▶"; margin-right: var(--space-2); font-size: 10px; color: var(--ink-muted); }
+.next-step-action:hover { border-color: var(--ink-dim); background: var(--surface-300); }
+.next-step-dismiss {
+  width: var(--target); height: var(--target); padding: 0; border: 1px solid var(--hairline); border-radius: var(--radius-sm);
+  background: transparent; color: var(--ink-muted); font: 400 20px/1 var(--sans); cursor: pointer;
+}
+.next-step-dismiss:hover { border-color: var(--hairline-strong); color: var(--ink); }
+.next-step-why { grid-column: 1 / -1; margin: 0; font-size: 12px; line-height: 16px; color: var(--ink-muted); }
 .objective-text { font-size: 14px; line-height: 20px; }
 .pass-rule { font: 500 12px/16px var(--mono); color: var(--ink); padding: var(--space-2) var(--space-3); background: var(--surface-300); border-radius: var(--radius-sm); }
 .objective-list { display: grid; gap: var(--space-2); }
@@ -429,6 +447,13 @@ input[type="range"]:focus-visible { outline-offset: 0; }
 .control-row:last-child { border-bottom: 0; }
 .control-row[data-active="true"] .control-name { color: var(--ink); }
 .control-name { grid-area: name; font-size: 11px; line-height: 14px; font-weight: 600; letter-spacing: 0.1em; color: var(--ink-muted); }
+/* The engine's next correction after a check: a bar and a tag on one line, so the row keeps its height. */
+.control-row[data-likely="true"] { box-shadow: inset 3px 0 0 var(--ink); padding-left: var(--space-2); }
+.control-row[data-likely="true"] .control-name { color: var(--ink); }
+.next-tag-mark {
+  display: inline-block; margin-left: var(--space-2); padding: 0 4px; border: 1px solid var(--ink); border-radius: var(--radius-sm);
+  font: 700 10px/12px var(--mono); letter-spacing: 0.06em; color: var(--ink); vertical-align: 1px;
+}
 .control-unit { grid-area: unit; justify-self: end; font: 500 11px/14px var(--mono); color: var(--ink-dim); }
 .control-value { grid-area: value; }
 .control-row input.control-value { min-height: var(--target); padding: 0 6px; text-align: right; font: 600 15px/20px var(--mono); color: var(--readout-ink); background: var(--surface-200); }
@@ -502,7 +527,7 @@ input[type="range"]:focus-visible { outline-offset: 0; }
    disclaimer keep priority over the secondary control notes. */
 @media (min-width: 900px) and (max-height: 700px) {
   /* Short laptops give every spare line to the control list: the notes and the kit links go. */
-  .control-notes, .kit-links, .status-next, .status-alerts .alert-detail { display: none; }
+  .control-notes, .kit-links, .status-next, .status-alerts .alert-detail, .next-step-why { display: none; }
   .scope-glass { min-height: 72px; }
   .monitor-panel .panel-foot { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 }
@@ -658,6 +683,7 @@ input[type="range"]:focus-visible { outline-offset: 0; }
   *, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
 }
 @media (forced-colors: active) {
-  .pill, .tag, .btn, .seg, .tab, .cam-btn, .monitor-screen, .scope-glass { border: 1px solid CanvasText; }
+  .pill, .tag, .btn, .seg, .tab, .cam-btn, .monitor-screen, .scope-glass, .next-tag-mark { border: 1px solid CanvasText; }
+  .control-row[data-likely="true"] { outline: 2px solid Highlight; outline-offset: -2px; }
   .btn[aria-pressed="true"], .seg[aria-pressed="true"], .tab[aria-selected="true"], .cam-btn[aria-pressed="true"], .rail-btn[aria-pressed="true"] { outline: 2px solid Highlight; }
 }

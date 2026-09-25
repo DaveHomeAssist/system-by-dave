@@ -23,6 +23,8 @@ const FINGERPRINT_INPUTS = [
   'apps/fmp-camera-sim/vite.config.ts',
   'apps/fmp-camera-sim/public',
   'apps/fmp-camera-sim/src',
+  // Training memory shared with Shading practice, bundled into the page.
+  'shader/fmp-training.js',
   'scripts/build_camera_sim_offline.mjs',
   'scripts/camera_sim_release.mjs',
 ];

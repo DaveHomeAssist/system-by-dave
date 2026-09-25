@@ -1107,6 +1107,12 @@ button:disabled {
   color: var(--text);
 }
 
+/* A name read from the shot, until the operator names the preset. */
+.preset-key.has-preset .preset-name.is-suggested {
+  color: var(--muted);
+  font-style: italic;
+}
+
 .preset-grid.is-armed .preset-key {
   border-style: dashed;
   border-color: var(--accent);
@@ -1591,6 +1597,40 @@ button:disabled {
 .status-pill.status-complete {
   background: var(--ok-bg);
   color: var(--success);
+}
+
+/* Suggestions from this device's training record (src/app/training.ts). */
+.status-pill.status-retry {
+  background: var(--warn-bg);
+  color: var(--warning);
+}
+
+.next-step {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 6px 8px;
+  align-items: center;
+  margin: 0 0 12px;
+  padding: 10px;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  background: var(--surface-2);
+}
+
+.next-step .primary-button {
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.next-step-dismiss {
+  min-width: 44px;
+  font-size: 20px;
+  line-height: 1;
+}
+
+.next-step .field-help {
+  grid-column: 1 / -1;
+  margin: 0;
 }
 
 .exercise-progress {

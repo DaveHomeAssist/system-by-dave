@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-25 — Next-step suggestions in Shading practice and the Camera Simulator
+
+- The two FMP camera training tools share a small training record on the device, `fmpTraining.v1` (`shader/fmp-training.js`: exercise ids, pass, best score or tries, minute timestamps; at most 4 KB; nothing leaves the device; the housevideo.app transfer carries it). Each tool's own session stays the source of truth.
+- Shading practice: after a check, NEXT + or NEXT − marks the control the next correction names until anything moves; exercises show PASSED or their best score; once the open exercise passes, a dismissible Next suggests the first one not passed, then the simulator's; Continue in the Camera Simulator appears once it has been used; a first visit follows the FMP theme. Build `v20260925-shader-practice-suggestions`.
+- FMP Camera Simulator 1.11.0: Next or Try again on the first exercise not passed, then Next: Shading practice; unnamed presets show a name read from the shot ("Tight · DSL"), which Rename starts from; Continue in Shading practice.
+- Both tools have a Suggestions setting (On, Quiet: marks only, Off: records nothing and clears the record) and Forget training history. `docs/camera-training-links.md` documents the record and every suggestion link, and `test:camera-training-links` checks the shared step ids and titles against both tools.
+
 ## 2026-09-25 — Shading practice data moves to housevideo.app
 
 - The housevideo.app saved-data transfer copied only `fmp`-prefixed keys, so a Camera Shading Practice session and theme saved on systembydave.com stayed behind when `/shader/` moved. `shader.practice.session.v1` and `shader.practice.theme.v1` are now in its policy, at revision 2, so browsers that already moved or skipped are offered the move again. Nothing is overwritten on arrival, as before. A new cutover acceptance scenario covers it.

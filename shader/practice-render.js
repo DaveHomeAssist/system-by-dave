@@ -5,7 +5,7 @@
   // deterministic engine produced; it never samples real video. Scope glass is
   // dark in every theme, so these colors are fixed.
 
-  const BUILD = 'v20260925-shader-practice-kit-links';
+  const BUILD = 'v20260925-shader-practice-suggestions';
   const GLASS = Object.freeze({
     background: '#04080c',
     minor: 'rgba(157, 162, 167, 0.12)',

@@ -2,11 +2,20 @@ import { useId, useRef, useState } from "react";
 import { downloadText, sessionFilename } from "../app/download";
 import { isOfflineBuild, OFFLINE_FILE, SUITE_LINKS, suiteHref } from "../app/links";
 import { type SimulatorStore, type StoreState } from "../app/store";
+import { type SuggestionLevel, training, useTraining } from "../app/training";
 import { lensState } from "../domain/camera";
 import { MAX_IMPORT_BYTES } from "../domain/project";
 import { formatSigned } from "../domain/units";
 import { type Issue } from "../domain/validate";
 import { nowSeconds } from "../input/controller";
+import { suggestPresetName } from "../sim/presetName";
+import { SelectField } from "./fields";
+
+const SUGGESTION_OPTIONS: ReadonlyArray<{ value: SuggestionLevel; label: string }> = [
+  { value: "on", label: "On" },
+  { value: "quiet", label: "Quiet: highlights only" },
+  { value: "off", label: "Off: remember nothing" },
+];
 
 interface Props {
   store: SimulatorStore;
@@ -30,6 +39,10 @@ export function SessionPanel({ store, state }: Props) {
   const [confirmReset, setConfirmReset] = useState(false);
   const { presets } = state.project.session;
   const camera = state.project.camera;
+  const record = useTraining();
+  const suggestions = training.level(record);
+  // Once Shading practice has been used on this device, the exercise it has left.
+  const practiceLeft = suggestions === "on" && Object.keys(record.practice).length > 0 ? training.nextStep(record, "practice") : null;
 
   const onImport = async (file: File | undefined) => {
     if (!file) return;
@@ -77,7 +90,7 @@ export function SessionPanel({ store, state }: Props) {
                     className="preset-name-input"
                     defaultValue={preset.name}
                     maxLength={40}
-                    placeholder="Name"
+                    placeholder={suggestions === "off" ? "Name" : suggestPresetName(state.geometry, camera, preset)}
                     onBlur={(event) => {
                       if (event.target.value !== preset.name) store.renamePreset(preset.slot, event.target.value);
                     }}
@@ -187,7 +200,35 @@ export function SessionPanel({ store, state }: Props) {
           <li>
             <a href={suiteHref(SUITE_LINKS.ursaRig)}>URSA camera rig explorer</a>
           </li>
+          {practiceLeft && (
+            <li>
+              <a href={suiteHref(SUITE_LINKS.shadingPractice)} data-testid="practice-continue">
+                Continue in Shading practice · next: {training.title("practice", practiceLeft)}
+                {record.practice[practiceLeft] ? `, best ${record.practice[practiceLeft].best}` : ""}
+              </a>
+            </li>
+          )}
         </ul>
+      </section>
+
+      <section aria-labelledby="suggestions-title">
+        <h3 id="suggestions-title">Suggestions</h3>
+        <SelectField label="Suggest next steps" value={suggestions} options={SUGGESTION_OPTIONS} onChange={(level) => training.setLevel(undefined, level)} />
+        <button
+          type="button"
+          className="secondary-button"
+          onClick={() => {
+            training.forget();
+            store.hint("Training history forgotten on this device. The session and its results are kept.");
+          }}
+        >
+          Forget training history
+        </button>
+        <p className="field-help">
+          This device remembers which exercises you tried and passed here and in Shading practice, to mark the next one, and names unnamed presets
+          from the shot. Nothing leaves this device, and the session and its results are kept either way.
+          {isOfflineBuild() ? " This offline copy keeps its own record, apart from housevideo.app." : ""}
+        </p>
       </section>
 
       <section aria-labelledby="reset-title">

@@ -20,6 +20,7 @@ const themeBoot = read('shader/practice-theme.js');
 const engine = read('shader/shading-practice-state.js');
 const renderer = read('shader/practice-render.js');
 const app = read('shader/practice-app.js');
+const training = read('shader/fmp-training.js');
 const worker = read('shader/practice-worker.js');
 const reference = read('shader/index.html');
 const redirect = read('ProjectorThrow/practice.html');
@@ -28,7 +29,7 @@ const throwline = read('ProjectorThrow/index.html') + read('ProjectorThrow/Stage
 const packageJson = JSON.parse(read('package.json'));
 const route = 'shader/practice.html';
 const canonical = `${originFor(route)}/${route}`;
-const scripts = { 'shader/practice-theme.js': themeBoot, 'shader/shading-practice-state.js': engine, 'shader/practice-render.js': renderer, 'shader/practice-app.js': app };
+const scripts = { 'shader/practice-theme.js': themeBoot, 'shader/shading-practice-state.js': engine, 'shader/practice-render.js': renderer, 'shader/fmp-training.js': training, 'shader/practice-app.js': app };
 
 // Identity, statements, and navigation.
 requireMatch(page, /<link rel="canonical" href="https:\/\/housevideo\.app\/shader\/practice\.html">/, 'Shader Practice must declare the housevideo canonical route.');
@@ -82,9 +83,10 @@ for (const [file, source] of Object.entries(scripts)) {
 if (/@import|url\((?!data:)/.test(styles)) fail('shader/practice.css must not load further resources.');
 
 const loaded = [...page.matchAll(/<(?:script|link)[^>]+(?:src|href)="([^"]+\.(?:js|css))"/g)].map(match => match[1]);
-['practice.css', 'practice-theme.js', 'shading-practice-state.js', 'practice-render.js', 'practice-app.js'].forEach(file => {
+['practice.css', 'practice-theme.js', 'shading-practice-state.js', 'practice-render.js', 'fmp-training.js', 'practice-app.js'].forEach(file => {
   if (!loaded.includes(file)) fail(`Shader Practice must load ${file}.`);
 });
+if (loaded.indexOf('fmp-training.js') > loaded.indexOf('practice-app.js')) fail('Shader Practice must load fmp-training.js before its controller.');
 if (loaded.indexOf('shading-practice-state.js') > loaded.indexOf('practice-app.js') || loaded.indexOf('practice-render.js') > loaded.indexOf('practice-app.js')) fail('Shader Practice must load its engine and renderer before the controller.');
 requireMatch(app, /window\.ShaderPracticeApp = Object\.freeze/, 'Shader Practice must expose its review and handoff API under Shader ownership.');
 requireMatch(app, /practice-worker\.js/, 'Shader Practice must register its dedicated offline worker.');
@@ -106,6 +108,11 @@ requireMatch(engine, /const LEGACY_SCHEMA = 'throwline\.camera-practice\.v1'/, '
   if (!engine.includes(`'${scope}'`)) fail(`Shader Practice is missing the ${scope} scope.`);
 });
 if (/Math\.random|Date\.now|performance\.now/.test(engine)) fail('Shader Practice engine must stay deterministic (no random or clock input).');
+
+// Training memory stays on this device in one fmp-prefixed key, which the
+// housevideo.app saved-data transfer carries.
+requireMatch(training, /const KEY = 'fmpTraining\.v1'/, 'Training memory must keep its fmpTraining.v1 key.');
+if (/sessionStorage|indexedDB|document\.cookie/.test(training)) fail('Training memory must keep to its one localStorage key.');
 
 // One release identifier across engine, renderer, controller, and worker.
 const build = engine.match(/const BUILD = '([^']+)'/)?.[1];
