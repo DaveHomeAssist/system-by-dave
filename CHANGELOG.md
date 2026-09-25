@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-09-25 — Private pages no longer published
+
+- The Pages staging step now excludes `flooring-contract-review.html` and `house/56-harding/` from `_site` and fails the step if either is present; both stay in the repository but are no longer served on systembydave.com (audit SEC-003).
+- Removed their `Disallow` lines from `robots.txt` so it no longer advertises the paths (SEC-004). `career-market.html` and `youtube-pipeline.html` remain public.
+
 ## 2026-09-25 — Audit fixes: readable reference site bar, honest wide-shot exercise
 
 - The field references (`/shader/`, `/switcher/`, `/ursa-broadcast-g2/`) drew the shared site bar's light text on a white background (1.08:1), so their home and return links were effectively invisible. `css/style.css` no longer overrides the bar's dark surface. The Shading practice browser probe now checks the bar's contrast on all three pages, and its pull-request check runs when their CSS or markup changes.

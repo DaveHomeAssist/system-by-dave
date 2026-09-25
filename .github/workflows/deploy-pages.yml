@@ -116,7 +116,9 @@ jobs:
       - name: Stage site (everything except VCS + CI tooling)
         run: |
           mkdir -p _site
-          rsync -a --exclude='.git' --exclude='.github' --exclude='_site' --exclude='_sites' --exclude='node_modules' --exclude='package.json' --exclude='package-lock.json' ./ _site/
+          rsync -a --exclude='.git' --exclude='.github' --exclude='_site' --exclude='_sites' --exclude='node_modules' --exclude='package.json' --exclude='package-lock.json' --exclude='/flooring-contract-review.html' --exclude='/house/56-harding' ./ _site/
+          # Private pages stay in the repo but are never published.
+          test ! -e _site/flooring-contract-review.html && test ! -e _site/house/56-harding
           echo "Staged $(find _site -type f | wc -l) files."
 
       - name: Stage domain sites
