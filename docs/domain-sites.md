@@ -134,7 +134,9 @@ separate columns, because a page that builds its navigation in script has few
 static links and is not a dead end. The title comes from the document head
 only; an inline SVG's `<title>` names its figure, not the page
 (`scripts/housevideo_manifest.test.mjs`). `--site <id>` reads another domain
-site and `--no-browser` skips the runtime count.
+site and `--no-browser` skips the runtime count. The runtime count uses
+Playwright's own browser, falls back to the installed Chrome when that download
+is missing, and reports the column as not measured when neither starts.
 
 ### Saved browser data
 
