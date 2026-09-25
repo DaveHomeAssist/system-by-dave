@@ -108,9 +108,6 @@
 
   /* Shared shell assets every offline session needs. */
   var BASE_ASSETS=[
-    './av-suite-landing.html',
-    './css/av-landing.css',
-    './js/av-landing.js',
     './av-suite-landing2.html',
     './css/av-landing-alt.css',
     './js/av-landing-alt.js',
@@ -237,7 +234,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool asset change — rolls the service-worker cache. */
-    version:'v20260925-throwline-min',
+    version:'v20260925-landing-retire',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,

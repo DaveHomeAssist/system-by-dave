@@ -37,9 +37,6 @@ function cachedResponse(cache,request){
 }
 
 var CRITICAL_ASSETS=[
-  './av-suite-landing.html',
-  './css/av-landing.css',
-  './js/av-landing.js',
   './av-suite-landing2.html',
   './css/av-landing-alt.css',
   './js/av-landing-alt.js',
