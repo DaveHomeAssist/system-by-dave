@@ -606,9 +606,16 @@ async function closePanel(page) {
     await page.getByRole('button', { name: 'Exercises' }).click();
     await page.getByRole('button', { name: 'Start' }).first().click();
     await waitStill(page);
-    const home = (await s.snapshot()).pose;
-    assert(home.pan === 0 && home.tilt === 0 && home.lens === 0, 'exercise did not start from home');
-    assert((await s.state()).exercise.status === 'running', 'wide shot completed from home');
+    // Every attempt starts on a tight shot; home already frames the default stage, so it
+    // used to complete with no input. Wait well past the 1 s hold without touching anything.
+    const start = (await s.snapshot()).pose;
+    assert(start.lens > 0.5, `exercise did not start on a tight shot: ${JSON.stringify(start)}`);
+    await page.waitForTimeout(2500);
+    assert((await s.state()).exercise.status === 'running', 'the wide shot completed without operator input');
+    // Preset 1, stored by the earlier checks, is a wide shot of this session's venue.
+    await focusWorkspace(page);
+    await page.keyboard.press('Digit1');
+    await page.waitForFunction(() => window.__fmpCameraSim.state().exercise?.status === 'complete', null, { timeout: 15000 });
     // Inside and outside marks differ in shape as well as colour: outside is dashed and hollow.
     const marks = await page.evaluate(() =>
       [...document.querySelectorAll('.ov-marker')]
@@ -622,9 +629,6 @@ async function closePanel(page) {
     for (const mark of marks) {
       assert(mark.out ? mark.dash !== 'none' : mark.dash === 'none' && mark.fill !== 'rgba(0, 0, 0, 0.35)', `mark ${JSON.stringify(mark)} relies on colour alone`);
     }
-    await focusWorkspace(page);
-    await page.keyboard.press('Digit1');
-    await page.waitForFunction(() => window.__fmpCameraSim.state().exercise?.status === 'complete', null, { timeout: 15000 });
     await page.getByTestId('exercise-wide-progress').getByText('Complete. The wide shot is established.').waitFor();
     await page.getByRole('button', { name: 'Reset', exact: true }).click();
     assert((await s.state()).exercise === null, 'reset left the exercise active');
@@ -726,6 +730,26 @@ async function closePanel(page) {
     await showTab(page, 'Session');
     await page.getByLabel('Suggest next steps').selectOption('on');
     await showTab(page, 'Exercises');
+  });
+  await check('Clear results asks first: Keep them changes nothing, Clear all results empties the list', async () => {
+    const count = () => page.locator('.history-list li').count();
+    const before = await count();
+    assert(before > 0, 'no results to clear');
+    await page.getByRole('button', { name: 'Clear results…' }).click();
+    assert((await page.evaluate(() => document.activeElement?.textContent)) === 'Keep them', 'the safe choice is not focused');
+    assert(/cannot be undone/.test((await page.locator('#clear-results-question').textContent()) || ''), 'the consequence is not stated');
+    await page.getByRole('button', { name: 'Keep them' }).click();
+    assert((await count()) === before, 'Keep them cleared results');
+    assert((await page.evaluate(() => document.activeElement?.textContent)) === 'Clear results…', 'focus did not return to Clear results');
+    await page.getByRole('button', { name: 'Clear results…' }).click();
+    await page.keyboard.press('Escape');
+    assert((await count()) === before, 'Escape cleared results');
+    assert(await page.getByRole('button', { name: 'Clear results…' }).isVisible(), 'Escape closed the panel instead of only cancelling');
+    await page.getByRole('button', { name: 'Clear results…' }).click();
+    await page.getByRole('button', { name: 'Clear all results' }).click();
+    await page.getByText('No exercises completed yet.').waitFor();
+    assert((await page.evaluate(() => document.activeElement?.id)) === 'history-title', 'focus was lost after clearing');
+    return `${before} results cleared after confirmation`;
   });
   await check('changing venue dimensions changes the framing; invalid geometry is refused', async () => {
     await page.getByRole('tab', { name: 'Venue' }).click();

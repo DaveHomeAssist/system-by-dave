@@ -181,6 +181,21 @@ describe("store other-tab saves", () => {
   });
 });
 
+describe("wide shot exercise start", () => {
+  it("does not complete without operator input, and completes once the shot is opened out", () => {
+    const { store, run, now } = makeStore();
+    store.startExercise("wide", now());
+    const start = store.getTelemetry().snapshot.pose;
+    expect(start.lens).toBeGreaterThan(0.5);
+    run(4);
+    expect(store.getState().exercise?.progress.status).toBe("running");
+    store.home(now());
+    run(12);
+    expect(store.getState().exercise?.progress.status).toBe("complete");
+    expect(store.getState().exercise?.progress.result?.passed).toBe(true);
+  });
+});
+
 describe("store exercise guards", () => {
   it("refuses venue and performer edits while the follow exercise runs", () => {
     const { store, now } = makeStore();

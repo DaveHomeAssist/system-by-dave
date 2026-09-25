@@ -100,7 +100,9 @@ class Page {
       const { method, params } = message;
       if (method === 'Runtime.exceptionThrown') this.exceptions.push(params.exceptionDetails.exception?.description || params.exceptionDetails.text);
       if (method === 'Runtime.consoleAPICalled' && ['error', 'assert', 'warning'].includes(params.type)) this.consoleErrors.push(`${params.type}: ${params.args.map(arg => arg.value || arg.description).join(' ')}`);
-      if (method === 'Log.entryAdded' && params.entry.level === 'error' && !this.expectOffline) this.networkErrors.push(params.entry.text + (params.entry.url ? ` ${params.entry.url}` : ''));
+      // The browser asks for /favicon.ico by itself on pages that declare no icon (the field
+      // references visited for the site-bar check); that request is not the page's own.
+      if (method === 'Log.entryAdded' && params.entry.level === 'error' && !this.expectOffline && !/\/favicon\.ico$/.test(params.entry.url || '')) this.networkErrors.push(params.entry.text + (params.entry.url ? ` ${params.entry.url}` : ''));
     });
   }
   send(method, params) { return this.connection.send(method, params, this.sessionId); }
@@ -124,6 +126,19 @@ class Page {
       await delay(75);
     }
     throw new Error(`${this.label}: Shader Practice did not become ready at ${url.slice(0, 200)}`);
+  }
+  // A plain page: fresh document, loaded, no console to wait for.
+  async openStatic(url) {
+    try { await this.eval(() => { window.__shaderProbeStale = true; }); } catch {}
+    await this.send('Page.navigate', { url: 'about:blank' });
+    await this.send('Page.navigate', { url });
+    for (let count = 0; count < 160; count += 1) {
+      try {
+        if (await this.eval(() => Boolean(!window.__shaderProbeStale && document.readyState === 'complete'))) return;
+      } catch {}
+      await delay(75);
+    }
+    throw new Error(`${this.label}: ${url.slice(0, 200)} did not load`);
   }
   async settle() {
     await this.eval(() => new Promise(resolve => {
@@ -468,6 +483,35 @@ async function mainSession(page, baseUrl) {
   await page.open(url);
   const defaultTheme = await page.eval(() => document.documentElement.getAttribute('data-theme'));
   check('with no saved practice theme, the FMP suite theme decides the first paint', suiteTheme === 'dark' && defaultTheme === 'light', { suiteTheme, defaultTheme });
+
+  // The field references share the dark site bar. A light override once left its light text
+  // on white (1.08:1) on all three, and the shading reference named AV Toolbox as its parent.
+  const bars = {};
+  for (const route of ['shader/', 'switcher/', 'ursa-broadcast-g2/']) {
+    await page.openStatic(`${baseUrl}${route}`);
+    bars[route] = await page.eval(() => {
+      const parse = value => { const parts = value.match(/[\d.]+/g).map(Number); return { r: parts[0], g: parts[1], b: parts[2], a: parts.length > 3 ? parts[3] : 1 }; };
+      const over = (top, bottom) => ({ r: top.r * top.a + bottom.r * (1 - top.a), g: top.g * top.a + bottom.g * (1 - top.a), b: top.b * top.a + bottom.b * (1 - top.a), a: 1 });
+      const lum = c => [c.r, c.g, c.b].map(v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }).reduce((sum, v, i) => sum + v * [0.2126, 0.7152, 0.0722][i], 0);
+      const background = node => {
+        const layers = [];
+        for (let el = node; el; el = el.parentElement) { const c = parse(getComputedStyle(el).backgroundColor); if (c.a > 0) { layers.push(c); if (c.a >= 1) break; } }
+        return layers.reverse().reduce((below, layer) => over(layer, below), { r: 255, g: 255, b: 255, a: 1 });
+      };
+      const bar = document.querySelector('.sbd-site-return');
+      const items = [...bar.querySelectorAll('a, span')].filter(el => el.textContent.trim() && !el.querySelector('a, span'));
+      const ratios = items.map(el => {
+        const bg = background(el);
+        const fg = over(parse(getComputedStyle(el).color), bg);
+        const [hi, lo] = [lum(fg), lum(bg)].sort((a, b) => b - a);
+        return { text: el.textContent.trim(), ratio: Math.round(((hi + 0.05) / (lo + 0.05)) * 100) / 100 };
+      });
+      const first = bar.querySelector('a');
+      return { ratios, parent: first && first.getAttribute('href'), current: (bar.querySelector('[aria-current="page"]') || {}).textContent || '' };
+    });
+  }
+  const barOk = Object.values(bars).every(bar => bar.ratios.length >= 3 && bar.ratios.every(item => item.ratio >= 4.5));
+  check('the field references keep a readable site bar (4.5:1 or better), and the shading reference\'s parent is FMP', barOk && bars['shader/'].parent === '/fmp/' && /Camera control/.test(bars['shader/'].current), bars);
 
   // Comparison modes, wipe, blink, and freeze.
   await page.open(url);

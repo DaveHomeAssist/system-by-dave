@@ -7,7 +7,7 @@ import {
 import { FollowExercise } from "../../exercises/follow";
 import { RecallExercise } from "../../exercises/recall";
 import { type ExerciseEvent, type ExerciseSample } from "../../exercises/types";
-import { WideShotExercise } from "../../exercises/wide";
+import { WideShotExercise, wideStartPose } from "../../exercises/wide";
 import { cameraFrame } from "../../sim/framing";
 import { performerState, planPath } from "../../sim/performer";
 import { recordSimResult } from "../training";
@@ -55,8 +55,8 @@ export class ExerciseController {
     this.core.exerciseRecorded = false;
     this.core.lastProgressKey = "";
     if (id === "wide") {
-      // Every attempt starts from the same place: the camera's home pose, which is not a usable wide.
-      this.core.sim.home();
+      // Every attempt starts from the same tight shot on downstage right, which is not a wide.
+      this.core.sim.place(wideStartPose(this.core.geometry, this.core.project.camera));
       this.core.exercise = new WideShotExercise();
     } else if (id === "recall") this.core.exercise = new RecallExercise();
     else {
@@ -66,7 +66,7 @@ export class ExerciseController {
     this.core.exercise.sample(this.exerciseSample(0));
     this.core.announce(
       id === "wide"
-        ? "Exercise started: the camera is returning home. Establish a wide shot of the whole performance area."
+        ? "Exercise started: the camera is on a tight shot of downstage right. Open out to a wide shot of the whole performance area."
         : `Exercise started: ${id === "follow" ? "follow a performer" : "save and recall two shots"}.`,
     );
     this.core.emit();
