@@ -121,6 +121,21 @@ rules (`*`, a trailing `$`, longest pattern wins, Allow wins a tie);
 `scripts/domain_robots.test.mjs` covers it. A crawler without wildcard support
 reads the Allow patterns literally, matches nothing, and stays blocked.
 
+### Page manifest
+
+`npm run manifest:housevideo -- --out <dir>` writes `housevideo-manifest.json` and
+`.md`: every page the site publishes, with its head title, description, first
+heading, canonical, robots tag, `robots.txt` status, sitemap membership, size,
+where it is edited and when it last changed. It stages the site with
+`--out` into a temporary directory (never `--site-root`) and reads each page
+twice: static links from the published HTML, and runtime links counted in a
+headless browser after load, with every other domain blocked. The two stay
+separate columns, because a page that builds its navigation in script has few
+static links and is not a dead end. The title comes from the document head
+only; an inline SVG's `<title>` names its figure, not the page
+(`scripts/housevideo_manifest.test.mjs`). `--site <id>` reads another domain
+site and `--no-browser` skips the runtime count.
+
 ### Saved browser data
 
 AV offline readiness requires both a complete cache and control of the current
