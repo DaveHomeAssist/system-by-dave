@@ -89,7 +89,7 @@ ${extra}
 
 function shell(prefix, offlineLink) {
   return `<a class="sbd-skip-link" href="#atem-explorer">Skip to the ATEM HD8 ISO interactive guide</a>
-<nav class="sbd-site-return" aria-label="Site navigation"><a href="https://avbydave.com/av-suite.html?entry=toolbox">AV Toolbox</a><span>/</span><a href="${prefix}/switcher/">ATEM HD8 ISO</a><span>/</span><span aria-current="page">Interactive Guide</span><a href="${prefix}/fmp/">FMP Video Operations →</a></nav>
+<nav class="sbd-site-return" aria-label="Site navigation"><a href="${prefix}/fmp/">FMP Video Operations</a><span>/</span><a href="${prefix}/switcher/">ATEM HD8 ISO</a><span>/</span><span aria-current="page">Interactive Guide</span><a href="https://avbydave.com/av-suite.html?entry=toolbox">AV Toolbox →</a></nav>
 <div class="model-site-nav switcher-guide-tools">${offlineLink}${themeSelect()}</div>`;
 }
 

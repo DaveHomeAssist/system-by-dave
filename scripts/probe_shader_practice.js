@@ -485,7 +485,8 @@ async function mainSession(page, baseUrl) {
   check('with no saved practice theme, the FMP suite theme decides the first paint', suiteTheme === 'dark' && defaultTheme === 'light', { suiteTheme, defaultTheme });
 
   // The field references share the dark site bar. A light override once left its light text
-  // on white (1.08:1) on all three, and the shading reference named AV Toolbox as its parent.
+  // on white (1.08:1) on all three. All three name FMP Video Operations as their parent (Dave, 2026-09-25),
+  // with AV Toolbox as a secondary link.
   const bars = {};
   for (const route of ['shader/', 'switcher/', 'ursa-broadcast-g2/']) {
     await page.openStatic(`${baseUrl}${route}`);
@@ -511,7 +512,8 @@ async function mainSession(page, baseUrl) {
     });
   }
   const barOk = Object.values(bars).every(bar => bar.ratios.length >= 3 && bar.ratios.every(item => item.ratio >= 4.5));
-  check('the field references keep a readable site bar (4.5:1 or better), and the shading reference\'s parent is FMP', barOk && bars['shader/'].parent === '/fmp/' && /Camera control/.test(bars['shader/'].current), bars);
+  const parentsOk = Object.values(bars).every(bar => bar.parent === '/fmp/');
+  check('the field references keep a readable site bar (4.5:1 or better), and each names FMP as its parent', barOk && parentsOk && /Camera control/.test(bars['shader/'].current), bars);
 
   // Comparison modes, wipe, blink, and freeze.
   await page.open(url);

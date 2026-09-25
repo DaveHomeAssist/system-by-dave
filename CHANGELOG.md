@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-09-25 — FMP is the parent of the switcher and URSA references
+
+- `/switcher/`, its interactive guide (and offline copy), and `/ursa-broadcast-g2/` now name FMP Video Operations as their parent in the site bar, as `/shader/` already does; AV Toolbox stays as a secondary link (Dave, 2026-09-25). The guide's bar comes from `scripts/build_switcher_guide.mjs`, rebuilt with `npm run build:switcher-guide`.
+- The Shading practice probe now requires FMP as the parent on all three field references, and the switcher guide probe checks it on the guide and its offline copy.
+- Decided at the same time: pressing Home stays a non-pass for the simulator's "Establish a wide shot" exercise (Dave, 2026-09-25). No change.
+
 ## 2026-09-25 — FMP rig: no layout jump, shadow map drawn once
 
 - Re-exported `fmp/` from fmp-suite `c337798` (fmp-suite PR #25). The rig page carries `data-ready="true"` in its HTML, so the desktop workspace layout applies from the first paint instead of shifting when three.js finishes loading (lab layout shift 0.601 to 0.004 with the engine delayed 1.5 s).
