@@ -16,6 +16,10 @@
 - Docs:
   - `docs/camera-training-links.md` lists the FMP links as implemented, and `test:camera-training-links` checks them in the exported rig catalog, explorer configs, guide and hub.
   - `docs/public-content-contract.md` records the shader panel naming rule.
+## 2026-09-25 — Private pages no longer published
+
+- The Pages staging step now excludes `flooring-contract-review.html` and `house/56-harding/` from `_site` and fails the step if either is present; both stay in the repository but are no longer served on systembydave.com (audit SEC-003).
+- Removed their `Disallow` lines from `robots.txt` so it no longer advertises the paths (SEC-004). `career-market.html` and `youtube-pipeline.html` remain public.
 
 ## 2026-09-25 — Audit fixes: readable reference site bar, honest wide-shot exercise
 
