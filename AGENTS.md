@@ -79,6 +79,10 @@ to make stale documentation true.
   package build.
 - **NoteForge:** synchronize the verified external build with
   `npm run sync:noteforge`; do not hand-edit managed artifact files.
+  `.github/workflows/noteforge-sync.yml` does this on NoteForge's release
+  dispatch (or `gh workflow run noteforge-sync.yml -f sha=<sha>`), and
+  `noteforge-drift.yml` fails nightly when the canonical copy lags NoteForge
+  `main`.
 - **Throwline catalog:** use `npm run sync:throwline-catalog` and
   `npm run verify:throwline`.
 - **Domain sites:** `scripts/domain-sites.json` owns which pages are also

@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-25 — NoteForge canonical resync and an automated release sync
+
+- Canonical `noteforge/` is synced to NoteForge `392ed92` and then to the merge of NoteForge PR #7. It had served `becbffa` (2026-08-26) while the github.io mirror moved eight commits ahead, two of them changing alias resolution and folder-export reconciliation (NoteForge audit 2026-09-25, C.4).
+- `.github/workflows/noteforge-sync.yml` builds an exact NoteForge commit under Node 22, runs `sync:noteforge` and `verify:noteforge` under Node 24 (a second sync pass must be a no-op), commits `noteforge: sync to <sha>` straight to main and dispatches the Pages deploy. NoteForge's deploy workflow sends the `noteforge-release` `repository_dispatch` after each mirror deploy (its secret `SYSTEM_BY_DAVE_DISPATCH_TOKEN`); `workflow_dispatch` with the SHA runs the same job by hand. The job refuses a commit that is not on NoteForge `main` with a green `verify` job.
+- `.github/workflows/noteforge-drift.yml` runs nightly (02:17 ET) and fails when `noteforge/source_provenance.json` lags NoteForge `main` or the live page's `noteforge-build` stamp differs from provenance.
+- NoteForge now stamps its shell with `<meta name=noteforge-build content=<12-char sha>>`; `sync:noteforge` refuses a dist whose stamp is not the declared source commit, `verify:noteforge` requires the stamp to match provenance, and `curl -s https://systembydave.com/noteforge/ | grep -o 'noteforge-build content=[0-9a-f]*'` shows what is live.
+
 ## 2026-09-25 — Throwline Stage 3D gates its rendering budget; the three.js policy is linked
 
 - `scripts/probe_throwline_stage3d.js` now fails on any `THREE.*` console message (the two context-loss and context-restore messages from its own recovery test excepted), layout shift of 0.05 or more at 1440×900, any GL draw over 2 s idle, and a redraw above 210 GL draws (139 measured). Each gate was checked against an injected regression. The FMP pages have the same gates in fmp-suite.

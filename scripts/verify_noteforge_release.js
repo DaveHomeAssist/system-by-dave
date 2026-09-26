@@ -84,10 +84,10 @@ if (!fs.existsSync(TARGET) || !fs.statSync(TARGET).isDirectory() || fs.lstatSync
   fail('noteforge target is missing or is not a real directory');
 } else {
   const provenancePath = path.join(TARGET, PROVENANCE_FILE);
+  let provenance;
   if (!fs.existsSync(provenancePath)) {
     fail(`${PROVENANCE_FILE} is missing`);
   } else {
-    let provenance;
     try {
       provenance = JSON.parse(fs.readFileSync(provenancePath, 'utf8'));
     } catch (error) {
@@ -119,6 +119,18 @@ if (!fs.existsSync(TARGET) || !fs.statSync(TARGET).isDirectory() || fs.lstatSync
     const index = fs.readFileSync(indexPath, 'utf8');
     if (!hasCanonicalLink(index)) fail('canonical URL is missing or incorrect');
     if (!/Content-Security-Policy/i.test(index)) fail('production CSP is missing');
+    // NoteForge stamps the built shell with its source commit (vite.config.js,
+    // noteforge-build-stamp) so live drift is inspectable with curl; the stamp
+    // must be the commit provenance claims.
+    const stamps = htmlTags(index, 'meta').filter((tag) => htmlAttribute(tag, 'name') === 'noteforge-build');
+    if (stamps.length !== 1) {
+      fail('exactly one noteforge-build meta stamp is required');
+    } else {
+      const stamp = htmlAttribute(stamps[0], 'content') || '';
+      if (!/^[0-9a-f]{12,40}$/.test(stamp)) fail(`noteforge-build stamp is not an abbreviated commit SHA: ${stamp || '(empty)'}`);
+      else if (provenance?.sourceCommit && !provenance.sourceCommit.startsWith(stamp)) fail(`noteforge-build stamp ${stamp} does not match provenance sourceCommit ${provenance.sourceCommit}`);
+      else notes.push(`buildStamp=${stamp}`);
+    }
     if ((index.match(/class="sbd-skip-link"/g) || []).length !== 1) fail('exactly one skip link is required');
     if (!/<body[^>]*>\s*<a class="sbd-skip-link" href="#app">/i.test(index)) fail('skip link must be the first body content');
     if (!/<div\s+class=app\s+id=app\s+tabindex=-1>/i.test(index)) fail('NoteForge workspace is not programmatically focusable');

@@ -158,6 +158,12 @@ function validateSource(source, sourceCommit) {
   const index = fs.readFileSync(path.join(source, 'index.html'), 'utf8');
   if (!hasCanonicalLink(index)) fail('Source index does not preserve the canonical System by Dave URL');
   if (!/Content-Security-Policy/i.test(index)) fail('Source index is missing its production CSP');
+  const stamps = htmlTags(index, 'meta').filter((tag) => htmlAttribute(tag, 'name') === 'noteforge-build');
+  if (stamps.length !== 1) fail('Source index must carry exactly one noteforge-build meta stamp (NoteForge vite.config.js emits it)');
+  const stamp = htmlAttribute(stamps[0], 'content') || '';
+  if (!/^[0-9a-f]{12,40}$/.test(stamp) || !sourceCommit.startsWith(stamp)) {
+    fail(`Source index build stamp ${stamp || '(empty)'} is not --source-commit ${sourceCommit}; the dist was built from another commit`);
+  }
   if (/sbd-site-return|sbd-public-nav/i.test(index)) fail('Source index is already modified with System by Dave navigation');
   const assetRefs = assetReferences(index);
   if (!assetRefs.some((file) => file.endsWith('.js')) || !assetRefs.some((file) => file.endsWith('.css'))) {

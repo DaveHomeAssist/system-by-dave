@@ -67,6 +67,9 @@ handoffs.
 - `docs/`: public contracts, product boundaries, audits, and focused plans
 - `scripts/`: generators, release syncs, source verifiers, and browser probes
 - `.github/workflows/deploy-pages.yml`: full verification and Pages deployment
+- `.github/workflows/noteforge-sync.yml` and `noteforge-drift.yml`: NoteForge
+  canonical release sync (on NoteForge's `noteforge-release` dispatch) and the
+  nightly drift check against NoteForge `main`
 - `CHANGELOG.md`: implementation and release history
 
 ## Major systems
