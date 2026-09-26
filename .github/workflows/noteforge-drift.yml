@@ -1,0 +1,57 @@
+name: NoteForge drift check
+
+# Nightly proof that the canonical https://systembydave.com/noteforge/ copy is
+# the current NoteForge release. Fails when noteforge/source_provenance.json
+# records a sourceCommit other than DaveHomeAssist/noteforge main, or when the
+# live page's noteforge-build stamp is not that commit. A failure means the
+# release sync did not run (noteforge-sync.yml, normally dispatched by
+# NoteForge's deploy workflow) or the deploy did not reach the site. Remedy:
+#   gh workflow run noteforge-sync.yml --repo DaveHomeAssist/system-by-dave -f sha=<main sha>
+on:
+  schedule:
+    - cron: '17 6 * * *' # 06:17 UTC, 02:17 ET
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  drift:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out main
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+
+      - name: Compare provenance with NoteForge main
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          expected="$(gh api repos/DaveHomeAssist/noteforge/branches/main --jq .commit.sha)"
+          recorded="$(jq -r .sourceCommit noteforge/source_provenance.json)"
+          echo "NoteForge main:       $expected"
+          echo "Canonical provenance: $recorded"
+          if [ "$expected" != "$recorded" ]; then
+            echo "::error::canonical noteforge/ is at $recorded but DaveHomeAssist/noteforge main is at $expected. Remedy: gh workflow run noteforge-sync.yml --repo $GITHUB_REPOSITORY -f sha=$expected"
+            exit 1
+          fi
+          echo "EXPECTED_SHA=$expected" >> "$GITHUB_ENV"
+
+      - name: Compare the live canonical page with provenance
+        run: |
+          page="$(curl -fsSL "https://systembydave.com/noteforge/?drift=$(date +%s)")"
+          stamp="$(printf '%s' "$page" | grep -oE '<meta name="?noteforge-build"? content="?[0-9a-f]+' | grep -oE '[0-9a-f]+$' | head -n 1)"
+          echo "Live noteforge-build stamp: ${stamp:-(none)}"
+          if [ -z "$stamp" ]; then
+            echo "::error::the live page carries no noteforge-build stamp"
+            exit 1
+          fi
+          case "$EXPECTED_SHA" in
+            "$stamp"*) echo "Live page is built from $EXPECTED_SHA" ;;
+            *)
+              echo "::error::live page is built from $stamp but provenance says $EXPECTED_SHA (deploy not published, or a stale cache)"
+              exit 1
+              ;;
+          esac

@@ -1,0 +1,208 @@
+name: Sync NoteForge release
+
+# Keeps the canonical https://systembydave.com/noteforge/ copy at an exact
+# NoteForge commit. Until 2026-09-25 the trigger was a person reading
+# docs/implementation/release_checklist.md in the NoteForge repository, and the
+# canonical copy fell 36 days and eight commits behind the github.io mirror
+# (NoteForge audit 2026-09-25, appendix C.4).
+#
+# Triggers
+# - repository_dispatch `noteforge-release`: sent by NoteForge's deploy workflow
+#   after each successful mirror deploy, with client_payload.sha and run_id.
+# - workflow_dispatch: the same job by hand, for a re-sync or a rollback:
+#     gh workflow run noteforge-sync.yml --repo DaveHomeAssist/system-by-dave -f sha=<40-char sha>
+#
+# The job refuses a commit that is not on NoteForge main with a green `verify`
+# job, builds that commit under Node 22 (NoteForge's contract), runs
+# sync:noteforge + verify:noteforge under Node 24 (this repository's contract),
+# commits `noteforge: sync to <sha>` straight to main and dispatches
+# deploy-pages.yml. It pushes instead of opening a pull request because the
+# protect-default-branch ruleset only forbids deletion and force-push, and
+# this repository does not let Actions create pull requests. The explicit
+# deploy dispatch is needed because pushes made with GITHUB_TOKEN never start
+# `push` workflows; deploy-pages.yml still runs every public-site gate before
+# publishing. The nightly noteforge-drift.yml reports when this did not happen.
+on:
+  repository_dispatch:
+    types: [noteforge-release]
+  workflow_dispatch:
+    inputs:
+      sha:
+        description: NoteForge commit to sync (40-character SHA on main)
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  actions: write
+
+# One sync at a time; a later release waits rather than racing the push.
+concurrency:
+  group: noteforge-sync
+  cancel-in-progress: false
+
+env:
+  SOURCE_REPO: DaveHomeAssist/noteforge
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Resolve the source commit
+        id: source
+        env:
+          DISPATCH_SHA: ${{ github.event.client_payload.sha }}
+          DISPATCH_RUN_ID: ${{ github.event.client_payload.run_id }}
+          INPUT_SHA: ${{ inputs.sha }}
+          EVENT: ${{ github.event_name }}
+        run: |
+          sha="${DISPATCH_SHA:-$INPUT_SHA}"
+          if ! printf '%s' "$sha" | grep -Eq '^[0-9a-f]{40}$'; then
+            echo "::error::the source commit must be a lowercase 40-character SHA (got '$sha')"
+            exit 1
+          fi
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+          echo "run_id=$DISPATCH_RUN_ID" >> "$GITHUB_OUTPUT"
+          echo "Source: $SOURCE_REPO@$sha ($EVENT)"
+
+      - name: Check out system-by-dave
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+          path: site
+          fetch-depth: 0 # scripts/gen_sitemap.py reads git commit dates
+
+      - name: Check out NoteForge at the exact commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: DaveHomeAssist/noteforge
+          ref: ${{ steps.source.outputs.sha }}
+          path: source
+          fetch-depth: 0 # the ancestry check below needs main's history
+
+      - name: Require a commit on NoteForge main with a green verify job
+        working-directory: source
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SHA: ${{ steps.source.outputs.sha }}
+          RUN_ID: ${{ steps.source.outputs.run_id }}
+        run: |
+          git fetch --no-tags origin '+refs/heads/main:refs/remotes/origin/main'
+          if ! git merge-base --is-ancestor "$SHA" refs/remotes/origin/main; then
+            echo "::error::$SHA is not on $SOURCE_REPO main; only main is released"
+            exit 1
+          fi
+          if [ -z "$RUN_ID" ]; then
+            RUN_ID="$(gh api "repos/$SOURCE_REPO/actions/workflows/deploy.yml/runs?head_sha=$SHA&branch=main&per_page=1" --jq '.workflow_runs[0].id // empty')"
+          fi
+          if [ -z "$RUN_ID" ]; then
+            echo "::error::no deploy.yml run exists for $SHA on $SOURCE_REPO main"
+            exit 1
+          fi
+          run_sha="$(gh api "repos/$SOURCE_REPO/actions/runs/$RUN_ID" --jq .head_sha)"
+          if [ "$run_sha" != "$SHA" ]; then
+            echo "::error::NoteForge run $RUN_ID is for $run_sha, not $SHA"
+            exit 1
+          fi
+          verify="$(gh api "repos/$SOURCE_REPO/actions/runs/$RUN_ID/jobs" --jq '.jobs[] | select(.name == "verify") | .conclusion')"
+          if [ "$verify" != "success" ]; then
+            echo "::error::the verify job of https://github.com/$SOURCE_REPO/actions/runs/$RUN_ID concluded '${verify:-unknown}'"
+            exit 1
+          fi
+          echo "NOTEFORGE_RUN_URL=https://github.com/$SOURCE_REPO/actions/runs/$RUN_ID" >> "$GITHUB_ENV"
+          echo "NoteForge verify job green: https://github.com/$SOURCE_REPO/actions/runs/$RUN_ID"
+
+      - name: Set up Node 22 (NoteForge build contract)
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: source/package-lock.json
+
+      - name: Build NoteForge
+        working-directory: source
+        run: |
+          npm ci
+          npm run build
+          npm run test:budget
+
+      - name: Set up Node 24 (system-by-dave contract)
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+
+      - name: Sync and verify the canonical artifact
+        id: sync
+        working-directory: site
+        env:
+          SHA: ${{ steps.source.outputs.sha }}
+        run: |
+          npm run sync:noteforge -- --source "$GITHUB_WORKSPACE/source/dist" --source-commit "$SHA"
+          npm run verify:noteforge
+          # A second pass must be a no-op; otherwise the sync is not idempotent.
+          npm run sync:noteforge -- --source "$GITHUB_WORKSPACE/source/dist" --source-commit "$SHA" | tee "$RUNNER_TEMP/second-pass.log"
+          grep -q 'changed=0 deleted=0' "$RUNNER_TEMP/second-pass.log"
+          npm run verify:public-navigation
+          npm run verify:indexing
+          python3 scripts/gen_sitemap.py
+          git diff --check
+          git add noteforge sitemap.xml
+          if git diff --cached --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "Canonical noteforge/ is already at $SHA; nothing to commit."
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            git --no-pager diff --cached --stat | tail -n 3
+          fi
+
+      - name: Commit and push to main
+        id: push
+        if: steps.sync.outputs.changed == 'true'
+        working-directory: site
+        env:
+          SHA: ${{ steps.source.outputs.sha }}
+          EVENT: ${{ github.event_name }}
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -q -m "noteforge: sync to $SHA" \
+            -m "Built from https://github.com/$SOURCE_REPO/commit/$SHA under Node 22 by $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID ($EVENT). NoteForge verify: $NOTEFORGE_RUN_URL"
+          for attempt in 1 2 3; do
+            if git push origin HEAD:main; then
+              break
+            fi
+            if [ "$attempt" = 3 ]; then
+              echo "::error::push to main failed three times"
+              exit 1
+            fi
+            git fetch origin main
+            git rebase origin/main
+          done
+          echo "commit=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy the site (GITHUB_TOKEN pushes do not start push workflows)
+        if: steps.sync.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          COMMIT: ${{ steps.push.outputs.commit }}
+        run: |
+          gh workflow run deploy-pages.yml --repo "$GITHUB_REPOSITORY" --ref main
+          echo "Dispatched deploy-pages.yml for $COMMIT"
+
+      - name: Summary
+        env:
+          SHA: ${{ steps.source.outputs.sha }}
+          CHANGED: ${{ steps.sync.outputs.changed }}
+          COMMIT: ${{ steps.push.outputs.commit }}
+        run: |
+          {
+            echo "## NoteForge sync"
+            echo "- Source: https://github.com/$SOURCE_REPO/commit/$SHA"
+            echo "- NoteForge verify run: $NOTEFORGE_RUN_URL"
+            if [ "$CHANGED" = true ]; then
+              echo "- Committed $COMMIT to main and dispatched deploy-pages.yml"
+            else
+              echo "- Canonical noteforge/ was already at this commit: no commit, no deploy"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
