@@ -456,8 +456,12 @@
   }
 
   function readDockCompact(){
-    if(!storageAvailable()) return false;
-    return localStorage.getItem(DOCK_COMPACT_KEY) === 'true';
+    if(storageAvailable()){
+      var saved = localStorage.getItem(DOCK_COMPACT_KEY);
+      if(saved !== null) return saved === 'true';
+    }
+    return document.documentElement.getAttribute('data-av-tool') === 'led-wall-calculator'
+      && window.innerWidth <= 680;
   }
 
   function saveDockCompact(value){

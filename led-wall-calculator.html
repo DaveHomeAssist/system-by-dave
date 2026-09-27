@@ -32,7 +32,7 @@
 /* The LED planner is a viewport workspace; its settings and reports scroll locally. */
 html[data-av-tool="led-wall-calculator"].led-workspace-ready,
 html[data-av-tool="led-wall-calculator"].led-workspace-ready body{height:100%;overflow:hidden}
-html[data-av-tool="led-wall-calculator"].led-workspace-ready .app{height:calc(100dvh - 76px);min-height:0;display:flex;flex-direction:column}
+html[data-av-tool="led-wall-calculator"].led-workspace-ready .app{height:calc(100dvh - max(76px,var(--sbd-nav-stack-clearance,0px)));min-height:0;display:flex;flex-direction:column}
 html[data-av-tool="led-wall-calculator"].led-workspace-ready body.has-sbd-nav{padding-bottom:0}
 html[data-av-tool="led-wall-calculator"].led-workspace-ready .topbar{position:relative;flex:none;padding:8px 16px}
 html[data-av-tool="led-wall-calculator"].led-workspace-ready main{display:flex;flex:1;flex-direction:column;min-height:0;max-width:2160px;padding:10px 14px 12px}
@@ -89,7 +89,7 @@ html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-disclaimer{gri
   html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-detail-grid{overflow:visible}
 }
 @media (max-width:680px){
-  html[data-av-tool="led-wall-calculator"].led-workspace-ready .app{height:calc(100dvh - 112px)}
+  html[data-av-tool="led-wall-calculator"].led-workspace-ready .app{height:calc(100dvh - max(112px,var(--sbd-nav-stack-clearance,0px)))}
   html[data-av-tool="led-wall-calculator"].led-workspace-ready .sbd-nav{grid-template-columns:repeat(3,minmax(0,1fr));max-height:none;gap:4px;padding:4px}
   html[data-av-tool="led-wall-calculator"].led-workspace-ready .sbd-nav .sbd-nav-dept{display:none}
   html[data-av-tool="led-wall-calculator"].led-workspace-ready .sbd-nav a{font-size:10px;padding:5px 4px}

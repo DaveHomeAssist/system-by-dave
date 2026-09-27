@@ -56,15 +56,47 @@ try {
       });
       const shortestLink = Math.min(...Array.from(nav.querySelectorAll('a'),
         (link) => link.getBoundingClientRect().height));
+      const fixedWorkspace = document.documentElement.classList.contains('led-workspace-ready');
+      const appBottom = fixedWorkspace ? document.querySelector('.app').getBoundingClientRect().bottom : null;
       return { overlap, navTop: a.top, navBottom: a.bottom, blockedLink: blockedLink?.textContent,
-        shortestLink, clearance: parseFloat(getComputedStyle(document.body).paddingBottom) };
+        shortestLink, fixedWorkspace, appBottom,
+        clearance: parseFloat(getComputedStyle(document.body).paddingBottom) };
     });
     if (result.missing || result.overlap > 0.5 || result.navTop < -1
         || result.navBottom > page.viewportSize().height + 1 || result.blockedLink || result.shortestLink < 44
-        || result.clearance < page.viewportSize().height - result.navTop - 1) {
+        || (result.fixedWorkspace ? result.appBottom > result.navTop - 8
+          : result.clearance < page.viewportSize().height - result.navTop - 1)) {
       throw new Error(`${label}: ${JSON.stringify(result)}`);
     }
     console.log(`ok - ${label}`);
+  }
+
+  for (const [width, height] of [[390, 844], [390, 667], [768, 844], [1200, 900]]) {
+    const page = await browser.newPage({ viewport: { width, height } });
+    const errors = [];
+    page.on('pageerror', (error) => errors.push(error.message));
+    await page.goto(show.replace('cable-plan.html', 'led-wall-calculator.html'), { waitUntil: 'networkidle' });
+    await checkLayout(page, `LED workspace ${width}x${height}`);
+    const compact = await page.locator('[data-sbd-suite-dock]').getAttribute('data-sbd-suite-compact');
+    if (compact !== String(width <= 680)) throw new Error(`LED default dock state: ${width} ${compact}`);
+    const scroll = await page.locator('.led-suite').evaluate((suite) => {
+      suite.scrollTop = suite.scrollHeight;
+      return { viewport: suite.clientHeight, overflow: suite.scrollHeight - suite.clientHeight,
+        reachedEnd: suite.scrollTop > 0 };
+    });
+    if (scroll.viewport < 120 || (scroll.overflow > 1 && !scroll.reachedEnd)) {
+      throw new Error(`LED workspace cannot scroll: ${width}x${height} ${JSON.stringify(scroll)}`);
+    }
+    if (width === 390) {
+      await page.locator('[data-sbd-suite-compact-toggle]').click();
+      await checkLayout(page, `LED workspace ${width}x${height} expanded dock`);
+      await page.reload({ waitUntil: 'networkidle' });
+      const saved = await page.locator('[data-sbd-suite-dock]').getAttribute('data-sbd-suite-compact');
+      if (saved !== 'false') throw new Error('explicit expanded preference was not preserved');
+    }
+    if (errors.length) throw new Error(`LED page errors: ${errors.join('; ')}`);
+    console.log(`ok - LED workspace scroll ${width}x${height}`);
+    await page.close();
   }
 
   for (const [width, height] of [[390, 844], [390, 667], [680, 720], [768, 844], [1200, 900], [1440, 900]]) {
