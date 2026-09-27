@@ -1,5 +1,5 @@
-import { CLIENT_ID, snapshot } from './mail.js?v=4a521185a33c8463';
-import { ensurePhotosReady, photoFiles } from './photos.js?v=cd1feeb0fd50c5df';
+import { CLIENT_ID, snapshot } from './mail.js?v=66bf931f21c0eae1';
+import { ensurePhotosReady, photoFiles } from './photos.js?v=b212ddfae13e1efe';
 import { NOTION_API_URL } from './notion-config.js?v=b675c734abe301f4';
 
 const $ = id => document.getElementById(id);
@@ -9,7 +9,7 @@ let expires = 0, timer, busy = false, initialized = false, loading = false, gene
 function message(text) { $('notionStatus').textContent = text; }
 function controls() {
   $('notionSave').disabled = busy || !credential || expires <= Date.now() || !navigator.onLine;
-  $('notionSave').textContent = busy ? 'Saving snapshot…' : 'Save to Notion';
+  $('notionSave').textContent = busy ? 'Saving report…' : 'Save to Notion';
   $('notionDisconnect').hidden = !credential;
   $('notionDisconnect').disabled = busy;
   $('notionSetupTest').disabled = busy;
@@ -55,7 +55,7 @@ function initialize() {
       disconnect();
       const attempt = generation;
       try {
-        if (typeof result.credential !== 'string') throw new Error('Google did not return a sign-in credential.');
+        if (typeof result.credential !== 'string') throw new Error('Sign-in did not complete. Try again.');
         // Decoding controls local expiry only. The backend verifies signature, audience, issuer, expiry and account.
         const claims = JSON.parse(atob(result.credential.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
         if (!Number.isFinite(claims.exp) || claims.exp * 1000 <= Date.now() + 60000) throw new Error('Google sign-in has expired.');
@@ -77,7 +77,7 @@ $('notionSave').addEventListener('click', async () => {
   if (busy) return;
   busy = true; controls();
   try {
-    if (!navigator.locks) throw new Error('This browser cannot coordinate saves across tabs. Use a current browser.');
+    if (!navigator.locks) throw new Error('Update your browser before saving.');
     await navigator.locks.request('fmpNotionSaveV1', { ifAvailable: true }, async lock => {
       if (!lock) throw new Error('Another tab is saving. Wait for it to finish.');
       ensurePhotosReady();
@@ -86,20 +86,20 @@ $('notionSave').addEventListener('click', async () => {
       record.photos = await photoFiles(record.walk);
       const setupTest = $('notionSetupTest').checked;
       const warning = window.S.draft ? '\nUnsubmitted fault drafts are excluded.' : '';
-      if (!confirm(`Save this ${setupTest ? 'SETUP TEST' : 'walk report'} to your personal FMP Walk Notion databases?\n\nIncludes the report, JSON archive, ${record.photos.length} photos, and ${record.walk.faults.length} linked fault observations.\nNo email will be sent.${warning}`)) {
+      if (!confirm(`Save this ${setupTest ? 'SETUP TEST' : 'walk report'} to your personal Notion records?\n\nIncludes the report, walk backup, ${record.photos.length} photos, and ${record.walk.faults.length} faults.\nNo email will be sent.${warning}`)) {
         message('Notion save cancelled.'); return;
       }
-      message('Saving the reviewed snapshot. Keep this tab open.');
+      message('Saving report. Keep this tab open.');
       const result = await api('/api/reports', { method: 'POST', body: JSON.stringify({ record, route, setupTest }) });
-      if (!/^[a-f0-9-]{36}$/.test(result.pageId || '')) throw new Error('The Notion response could not be verified.');
+      if (!/^[a-f0-9-]{36}$/.test(result.pageId || '')) throw new Error('Save unconfirmed. Check Notion before retrying.');
       const link = $('notionReceipt');
       link.href = `https://www.notion.so/${result.pageId.replaceAll('-', '')}`;
       link.hidden = false;
-      message(`Saved to Notion: ${result.faults} linked faults, ${result.files} files. Report ID ${result.reportId}. Email status is separate.`);
+      message(`Saved to Notion with ${result.faults} faults.`);
     });
   } catch (error) {
     message(error.name === 'AbortError' || error.name === 'TimeoutError' || error instanceof TypeError ?
-      'Notion save outcome is unconfirmed. Preserve this walk and retry the same snapshot to check for an existing record.' : error.message);
+      'Save unconfirmed. Keep this walk and check Notion before retrying.' : error.message);
   } finally { busy = false; controls(); }
 });
 window.addEventListener('pagehide', disconnect);

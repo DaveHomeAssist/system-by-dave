@@ -1,5 +1,5 @@
-import { SENDER, CLIENT_ID, SEND_SCOPE, SCOPES, recipients, snapshot, subjectFor, fingerprint, buildMessage, sendFailure } from './mail.js?v=4a521185a33c8463';
-import { initializePhotos, ensurePhotosReady, photoFiles } from './photos.js?v=cd1feeb0fd50c5df';
+import { SENDER, CLIENT_ID, SEND_SCOPE, SCOPES, recipients, snapshot, subjectFor, fingerprint, buildMessage, sendFailure } from './mail.js?v=66bf931f21c0eae1';
+import { initializePhotos, ensurePhotosReady, photoFiles } from './photos.js?v=b212ddfae13e1efe';
 
 const $ = id => document.getElementById(id);
 const LIST_KEY = 'fmpEmailListsV1';
@@ -26,7 +26,7 @@ function controls() {
   $('emailConnect').disabled = sending || authenticating || googleLoading || !navigator.onLine;
   $('emailConnect').textContent = googleLoading ? 'Loading Google sign-in…' : authenticating ? 'Waiting for Google…' : connected ? 'Reconnect Gmail' : googleFailed ? 'Retry Google sign-in' : 'Connect Gmail';
   $('emailSend').disabled = sending || authenticating || !connected || !navigator.onLine;
-  $('emailSend').textContent = sending ? 'Sending snapshot…' : 'Send report';
+  $('emailSend').textContent = sending ? 'Sending report…' : 'Send report';
   $('emailDisconnect').hidden = !connected && !authenticating;
   $('emailDisconnect').textContent = authenticating ? 'Cancel sign-in' : 'Disconnect this tab';
   $('emailDisconnect').disabled = sending;
@@ -65,7 +65,7 @@ function receiptSummary() {
     const row = readReceipts().sort((a, b) => String(a.at).localeCompare(String(b.at))).at(-1);
     if (!row) { $('emailReceipt').textContent = 'No email submissions recorded in this browser.'; return; }
     const state = { submitted: 'Submitted to Gmail', sending: 'Outcome unconfirmed — check Gmail Sent', unknown: 'Outcome unknown — check Gmail Sent', failed: 'Rejected by Gmail', acknowledged: 'Resend explicitly allowed' }[row.state] || 'Unconfirmed';
-    $('emailReceipt').textContent = `Last attempt: ${state} · ${row.subject} · ${row.at}${row.messageId ? ` · Gmail ID ${row.messageId}` : ''}`;
+    $('emailReceipt').textContent = `Last attempt: ${state} · ${row.subject} · ${new Date(row.at).toLocaleString()}`;
   } catch { $('emailReceipt').textContent = 'Email history unavailable. Sending requires working browser storage to guard against duplicates.'; }
 }
 function formRecipients() {
@@ -154,7 +154,7 @@ $('emailConnect').addEventListener('click', () => {
   clearConnection();
   const attempt = ++authAttempt;
   authenticating = true;
-  status('Choose avbydave@gmail.com in Google and allow sending plus email identity access. If Google says “no registered origin”, see Google sign-in help below. No inbox reading is requested.');
+  status('Sign in as avbydave@gmail.com and allow Gmail access.');
   controls();
   const fail = message => {
     if (attempt !== authAttempt) return;
@@ -170,7 +170,7 @@ $('emailConnect').addEventListener('click', () => {
       callback: async response => {
         if (attempt !== authAttempt) return;
         if (response.error || !response.access_token || !window.google.accounts.oauth2.hasGrantedAllScopes(response, SEND_SCOPE)) {
-          fail('Google did not grant Gmail sending access. Check the FMP Walk test user and requested permissions, then reconnect.'); return;
+          fail('Gmail access was not granted. Reconnect and allow sending.'); return;
         }
         try {
           const lifetime = Number(response.expires_in);
@@ -209,7 +209,7 @@ $('emailSend').addEventListener('click', async () => {
   try {
     if (!navigator.onLine) throw new Error('You are offline. Download your report or reconnect before sending.');
     if (!token || expiresAt <= Date.now()) { clearConnection(); throw new Error('Connect Gmail before sending.'); }
-    if (!navigator.locks) throw new Error('Use an up-to-date Safari, Chrome, Edge, or Firefox browser to safely coordinate email sends.');
+    if (!navigator.locks) throw new Error('Update your browser before sending email.');
     window.flush();
     ensurePhotosReady();
     const target = formRecipients();
@@ -228,7 +228,7 @@ $('emailSend').addEventListener('click', async () => {
         throw new Error('This exact report and recipient list already has a submitted or unconfirmed send. Check Gmail Sent first. Use “Allow another send” only if a second copy is needed.');
       }
       const details = ['From: ' + SENDER, 'To: ' + target.to.join(', '), ...(target.cc.length ? ['CC: ' + target.cc.join(', ')] : []), ...(target.bcc.length ? ['BCC: ' + target.bcc.join(', ')] : [])].join('\n');
-      if (!confirm(`Send this report snapshot now?\n\n${details}\n\n${subjectFor(record)}\n\nIncludes Markdown and JSON attachments plus ${attached.length} photo${attached.length === 1 ? '' : 's'}. The report includes any skipped or unwalked positions.`)) {
+      if (!confirm(`Send this report now?\n\n${details}\n\n${subjectFor(record)}\n\nIncludes the report and walk backup plus ${attached.length} photo${attached.length === 1 ? '' : 's'}. The report includes any skipped or unwalked positions.`)) {
         status('Send cancelled. No email sent.'); return;
       }
       if (!token || expiresAt <= Date.now()) { clearConnection(); throw new Error('Gmail authorization expired during review. Reconnect before sending.'); }
@@ -236,7 +236,7 @@ $('emailSend').addEventListener('click', async () => {
       records.push(row);
       saveReceipts(records); // Persist intent before the network write, including if this tab closes mid-send.
       retryKey = null;
-      status('Sending the reviewed snapshot to Gmail. Keep this tab open.');
+      status('Sending the reviewed report to Gmail. Keep this tab open.');
       let result;
       let body;
       try {
@@ -248,7 +248,7 @@ $('emailSend').addEventListener('click', async () => {
       if (result?.ok && typeof body?.id === 'string' && body.id) {
         row.state = 'submitted';
         row.messageId = body.id;
-        status(`Submitted to Gmail. The report, Markdown and JSON files, and ${attached.length} photo${attached.length === 1 ? '' : 's'} are in the email. Recipient delivery is not yet confirmed.`);
+        status(`Submitted to Gmail. The report, walk backup, and ${attached.length} photo${attached.length === 1 ? '' : 's'} are in the email. Recipient delivery is not yet confirmed.`);
       } else {
         const failure = sendFailure(result?.status);
         row.state = failure.state;

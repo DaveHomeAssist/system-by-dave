@@ -52,14 +52,14 @@ const CV = [
 
 /* Tier 2 zones. Counts are deliberately unknown: recording them is the point. */
 const TIER2 = [
-  {id:"BLK-WWL",name:"Walt Whitman Lobby",hint:"🔵 Count on foot. Concentration of unkeyed Videri positions."},
-  {id:"BLK-WWP",name:"Walt Whitman Plaza",hint:"🔵 Count on foot. Videri units here are indoor-rated hardware sitting outdoors."},
-  {id:"BLK-BFL",name:"Ben Franklin Lobby",hint:"🔵 Count on foot. Concentration of unkeyed Videri positions."},
-  {id:"BLK-BFP",name:"Ben Franklin Plaza",hint:"⚠️ Source sheet duplicated two rows here, 8 units. Recount settles it."},
-  {id:"BLK-LWN",name:"Lawn",hint:"🔴 Hard deadline Oct 15. After changeover the lawn is cut off until spring."},
+  {id:"BLK-WWL",name:"Walt Whitman Lobby",hint:"Count TVs and record any missing device labels."},
+  {id:"BLK-WWP",name:"Walt Whitman Plaza",hint:"Count TVs and check for weather damage."},
+  {id:"BLK-BFL",name:"Ben Franklin Lobby",hint:"Count TVs and record any missing device labels."},
+  {id:"BLK-BFP",name:"Ben Franklin Plaza",hint:"Recount TVs to confirm the plaza total."},
+  {id:"BLK-LWN",name:"Lawn",hint:"Complete the lawn count before the October 15 changeover."},
   {id:"BLK-VIP",name:"Black Box VIP · Patio · VIP Club",hint:"⛔ Three separate spaces. Record them separately, never merged."},
-  {id:"BLK-BST",name:"Backstage and admin",hint:"🔵 The dressing room and admin SDI branch. Documented, not yet walked end to end."},
-  {id:"BLK-CON",name:"Concessions · WALT CON recount",hint:"🚨 WALT CON states qty 16 against an ID range covering 14. This recount settles the site total."}
+  {id:"BLK-BST",name:"Backstage and admin",hint:"Check the dressing room and admin SDI branch."},
+  {id:"BLK-CON",name:"Concessions · WALT CON recount",hint:"Recount WALT CON TVs. The recorded total and device list differ."}
 ];
 
 /* Optional area requested by the operator. Room/device totals are not yet established. */
@@ -74,7 +74,7 @@ const EA_MENU = {id:"EA-WWP-MENU",env:"B",kind:"tv",tier:1,name:"EA Lounge VIP �
   hint:"4 bar menu TVs. The 2 seating-area ConcertVision TVs have their own check in this same stop (6 TVs total).",
   spec:[["Bar menus","4 TVs"],["EA Lounge total","6 TVs: 4 menus + 2 seating ConcertVision"]]};
 const BLACK_BOX = {id:"BBX-INDOOR",env:"B",kind:"tv",tier:2,name:"Black Box VIP",zone:"Walt Whitman Lobby",stop:"Black Box VIP",qty:5,
-  hint:"5 indoor TVs: 4 ConcertVision in the seating area and 1 menu TV behind the bar. No TVs on the Black Box patio. Count the indoor TVs checked; older combined VIP readings remain historical.",
+  hint:"5 indoor TVs: 4 ConcertVision in the seating area and 1 menu TV behind the bar. No TVs on the Black Box patio. Count the indoor TVs checked.",
   spec:[["Seating area","4 ConcertVision TVs"],["Behind the bar","1 menu TV"],["Patio","No TVs"]]};
 
 /* ══════════════════════ station builder ══════════════════════ */
@@ -118,7 +118,7 @@ function cvStation(c){
 }
 function tier2Station(item){
   return {id:item.id,env:"B",kind:"tv",tier:2,name:item.name,zone:item.name,hint:item.hint,
-    spec:[["Tier","2"],["Count","record on foot"]]};
+    spec:[["Check","Area count"],["Count","record on foot"]]};
 }
 function knownStation(id){
   return BOWL.concat(SPEC,CV,TIER2,[DRESSING,BLACK_BOX,EA_MENU]).some(function(item){ return item.id === id; });
