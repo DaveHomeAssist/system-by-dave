@@ -1,5 +1,5 @@
 // Pure report packaging. No Google credentials or browser storage in this module.
-import { photoRefs, validatePhoto, MAX_PHOTOS } from './photos.js?v=cd1feeb0fd50c5df';
+import { photoRefs, validatePhoto, MAX_PHOTOS } from './photos.js?v=b212ddfae13e1efe';
 export const SENDER = 'avbydave@gmail.com';
 export const CLIENT_ID = '1055607889332-6seksmcrl3n06euvf127514fp5qg6t66.apps.googleusercontent.com';
 export const SEND_SCOPE = 'https://www.googleapis.com/auth/gmail.send';
@@ -118,7 +118,7 @@ export function buildMessage(record, target) {
     const ref = refs.find(ref => ref.id === photo.id);
     if (!ref || ref.name !== photo.name || ref.size !== photo.size || ref.type !== photo.type) throw new Error('Photo attachments do not match this report.');
   }
-  const body = `FMP Walk report snapshot\nReport ID: ${record.reportId}\nCaptured: ${record.capturedAt}\n\n${record.markdown}\n\nAttached: Markdown report, JSON snapshot, and ${photos.length} photos. Unsubmitted fault drafts are not attached.\n`;
+  const body = `${record.markdown}\n\nAttached: report, walk backup, and ${photos.length} photos. Unsubmitted fault drafts are not attached.\n`;
   const headers = [
     `From: ${SENDER}`, `To: ${to.to.join(',\r\n ')}`,
     ...(to.cc.length ? [`Cc: ${to.cc.join(',\r\n ')}`] : []),
@@ -147,8 +147,8 @@ export function buildMessage(record, target) {
 
 export function sendFailure(status) {
   if (status === 401) return { state: 'failed', message: 'Gmail authorization expired. Connect Gmail again, then retry.' };
-  if (status === 403) return { state: 'failed', message: 'Google refused the send. Confirm Gmail API is enabled, avbydave@gmail.com is a test user, and Gmail send permission was granted. Quotas or account restrictions may also apply.' };
+  if (status === 403) return { state: 'failed', message: 'Gmail refused the send. Reconnect and allow sending. If it still fails, contact the app administrator.' };
   if (status === 429) return { state: 'failed', message: 'Gmail rate limit reached. Wait before trying again; nothing was retried automatically.' };
-  if (status >= 400 && status < 500 && status !== 408) return { state: 'failed', message: `Gmail rejected this request (HTTP ${status}). Download the report; nothing was retried automatically.` };
+  if (status >= 400 && status < 500 && status !== 408) return { state: 'failed', message: `Gmail rejected the send. Download the report or try again later.` };
   return { state: 'unknown', message: 'Send outcome unknown. Check Gmail Sent before allowing another send; retrying could create a duplicate.' };
 }

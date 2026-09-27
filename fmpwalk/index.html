@@ -337,6 +337,7 @@ select{appearance:none;background-image:linear-gradient(45deg,transparent 50%,va
 .rt .en{font-family:var(--mono);font-size:10px;color:var(--dim);flex:0 0 auto}
 .rt.here{background:var(--surface);border-color:var(--accent-line);color:var(--text);font-weight:620}
 .rt-hd{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;color:var(--dim);padding:0 11px 7px}
+.rt-stop{font-size:12px;font-weight:650;padding:8px 11px 2px;margin:0;color:var(--text)}
 .rt-zone{font-size:11.5px;font-weight:650;color:var(--muted);padding:15px 11px 6px;margin:0}
 
 /* ---------- tickets ---------- */
@@ -416,11 +417,12 @@ td.m{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
 }
 
 /* ---------- report ---------- */
-pre.out{
-  background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:13px;
-  font-family:var(--mono);font-size:11px;line-height:1.5;white-space:pre-wrap;word-break:break-word;
-  max-height:46vh;overflow-y:auto;color:var(--muted);margin:0 0 12px;
-}
+.report-preview{background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:16px;margin:0 0 16px;overflow-wrap:anywhere}
+.report-preview p{margin:8px 0;color:var(--muted)}
+.report-preview h3:first-child{margin-top:0}
+.report-preview ul{padding-left:22px}
+.report-table{overflow-x:auto;margin:12px 0}
+.report-table table{min-width:640px;margin:0}
 .btnrow{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:12px}
 .btnrow button{
   flex:1;min-width:120px;min-height:var(--tap);border-radius:8px;font-weight:620;
@@ -549,7 +551,6 @@ kbd{
   #p-cam.on{max-width:860px}
   #tkList{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start}
   #tkList .tk{margin-bottom:0}
-  pre.out{max-height:52vh;font-size:12px}
   .btnrow button{flex:0 1 auto;min-width:170px}
   .rd{grid-template-columns:1fr 1fr 1fr}
 }
@@ -578,8 +579,7 @@ kbd{
   <div class="rail" id="rail"></div>
   <div class="rail-lbl"><span id="railL">No walk started</span><span id="railR"></span></div>
   <div class="warnbar hide" id="storageWarn" role="alert">
-    🔴 <b>This copy cannot save.</b> The browser is blocking storage, so nothing survives a reload or a swipe away.
-    Export the report before you leave this screen. To fix it, open the file from Files, share it to Safari, then Add to Home Screen.
+    <b>Changes are not being saved.</b> Download a walk backup before closing this page. Try opening the walk in Safari or Chrome.
   </div>
 </header>
 
@@ -587,12 +587,12 @@ kbd{
 
 <!-- ══════════════ SETUP ══════════════ -->
 <section class="panel" id="p-setup">
-  <h2>Set up tonight's walk</h2>
-  <p class="lede">Takes about thirty seconds. Everything after this is one tap per position.</p>
+  <h2>Walk setup</h2>
+  <p class="lede">Enter the show details and select the areas to check.</p>
 
   <div class="card">
     <div class="card-hd"><h4>Camera operators</h4></div>
-    <p class="mini">Open a position-specific check-in, build, fault, and checkout record. No Notion write happens without an explicit confirmation.</p>
+    <p class="mini">Camera check-in, setup, faults and checkout.</p>
     <a class="launch-link" id="cameraLaunch" href="https://housevideo.app/fmp/camera/">Open camera operations</a>
   </div>
 
@@ -614,7 +614,7 @@ kbd{
         <option value="summer">Summer - Full Venue</option>
         <option value="winter">Winter - Indoor Seating Only</option>
       </select>
-      <div class="mini">🟢 Oct 15 2026 is the last night the summer rig exists. 🔴 What winter does to the 4 lawn delay walls and 14 lawn TVs is unverified. Ask the Head of Video before changeover.</div>
+      <div class="mini">Summer configuration ends October 15, 2026. Confirm winter lawn coverage with the Head of Video.</div>
     </div>
   </div>
 
@@ -625,15 +625,15 @@ kbd{
       <button type="button" class="chip" data-t="light" aria-pressed="false">☀️ Day</button>
       <button type="button" class="chip" data-t="dark" aria-pressed="false">🌙 Night</button>
     </div>
-    <div class="mini" style="margin-top:10px">🔵 <b>Day</b> for the plazas and the lot before doors, where a dark screen is unreadable in sun. <b>Night</b> for the position once house lights are down and you need to keep your eyes. <b>Auto</b> follows the tablet.</div>
+    <div class="mini" style="margin-top:10px">Auto follows the device setting.</div>
   </div>
 
   <h3 id="zoneHeading">Zones to walk</h3>
   <div class="card tight">
     <div class="route-total" id="zoneSummary" role="status"></div>
-    <p class="zone-instruction" id="zoneHelp">Tap an optional zone to turn it on or off. <b>On</b> adds it to the walk; <b>Off</b> leaves it out. Tier 2 checks are <b>Required</b> on every walk.</p>
+    <p class="zone-instruction" id="zoneHelp">Select optional areas. Required checks remain on every walk.</p>
     <div class="zone-chips" id="secChips" role="group" aria-labelledby="zoneHeading" aria-describedby="zoneHelp"></div>
-    <div class="mini zone-summary">Checks in each area stay together. Counts are checks, not screens; the 2 spectaculars have 4 controller checks. Saved readings stay here when a zone is turned off.</div>
+    <div class="mini zone-summary">Totals count checks, not individual screens. Turning off an area keeps its saved readings.</div>
   </div>
 
   <div class="stepnav"><button class="next" id="btnStart">Start walk</button></div>
@@ -656,23 +656,23 @@ kbd{
 <!-- ══════════════ REPORT ══════════════ -->
 <section class="panel" id="p-rep">
   <h2>Report</h2>
-  <p class="lede">Send a report snapshot by Gmail or download it for your personal records.</p>
+  <p class="lede">Review, download or send the report.</p>
   <div class="btnrow">
     <button class="pri" id="btnCopy">Copy report</button>
-    <button id="btnDl">Download .md</button>
-    <button id="btnJson">Export walk as JSON</button>
+    <button id="btnDl">Download report</button>
+    <button id="btnJson">Download walk backup</button>
   </div>
   <p class="note info hide" id="exportStatus" role="alert" aria-live="assertive" aria-atomic="true"></p>
   <section class="card" aria-labelledby="photosTitle">
     <h3 id="photosTitle">Report photos</h3>
-    <p class="mini">Add general photos here, or attach photos to a fault under Faults → Edit. Images stay in this browser until you download or send them. Confirm venue permission before photographing.</p>
+    <p class="mini">Add report photos here. Attach fault photos under Faults → Edit.</p>
     <div id="reportPhotos">Loading photo controls…</div>
     <p class="mini" id="faultPhotoSummary"></p>
-    <p class="mini">Export walk as JSON includes the actual images. Browser data can be cleared or evicted; download a copy before starting another walk.</p>
+    <p class="mini">Download a walk backup before starting a new walk. It includes saved photos.</p>
   </section>
   <section class="card email-card" aria-labelledby="emailTitle">
     <h3 id="emailTitle">Email this report</h3>
-    <p class="mini">From <b>avbydave@gmail.com</b>. Includes the report text, a Markdown file, a JSON snapshot, and saved photo attachments. Requires internet and your Google permission; nothing sends automatically.</p>
+    <p class="mini">From <b>avbydave@gmail.com</b>. Includes the report, a walk backup, and saved photos. Requires a connection to Gmail.</p>
     <fieldset id="emailFields" aria-label="Email recipients">
       <div class="fld"><label for="emailPreset">Saved recipient list</label><select id="emailPreset"></select></div>
       <div class="fld"><label for="emailTo">To</label><input id="emailTo" type="text" inputmode="email" autocomplete="off" spellcheck="false" aria-describedby="emailAddressHint"></div>
@@ -680,7 +680,7 @@ kbd{
         <div class="fld"><label for="emailCc">CC (optional)</label><input id="emailCc" type="text" inputmode="email" autocomplete="off" spellcheck="false"></div>
         <div class="fld"><label for="emailBcc">BCC (optional)</label><input id="emailBcc" type="text" inputmode="email" autocomplete="off" spellcheck="false"></div>
       </div>
-      <p class="mini" id="emailAddressHint">Separate addresses with commas or semicolons. Lists stay in this browser; they do not sync to Notion.</p>
+      <p class="mini" id="emailAddressHint">Separate addresses with commas or semicolons.</p>
       <details><summary>Save these recipients as a list</summary>
         <div class="fld"><label for="emailListName">List name</label><input id="emailListName" type="text" maxlength="60" value="Personal copy"></div>
         <div class="btnrow"><button type="button" id="emailSaveList">Save recipient list</button></div>
@@ -693,8 +693,7 @@ kbd{
     </div>
     <p class="note info" id="emailStatus" role="status" aria-live="polite" aria-atomic="true">Loading email controls. Downloads remain available if email is unavailable.</p>
     <details><summary>Google sign-in help</summary>
-      <p class="mini">If the Google popup says <b>401 invalid_client / no registered origin</b>, open the FMP Walk web client in Google Cloud and add <code>https://housevideo.app</code> under <b>Authorized JavaScript origins</b> (no /fmpwalk path), then Save. This is a client setting, not a billing issue.</p>
-      <p class="mini">If sign-in cannot load, retry once. If it still fails, open this site in Safari or Chrome and allow Google sign-in scripts and popups. Walks and photos are stored separately in each browser; export before switching. No email is sent by connecting.</p>
+      <p class="mini">Retry sign-in. If it still fails, use Safari or Chrome and allow popups. Download a walk backup before switching browsers. Contact the app administrator if the problem continues.</p>
     </details>
     <p class="mini" id="emailReceipt"></p>
     <div class="btnrow"><button type="button" id="emailRetry" hidden>Allow another send of this report</button></div>
@@ -702,7 +701,7 @@ kbd{
   </section>
   <section class="card" aria-labelledby="notionTitle">
     <h3 id="notionTitle">Personal Notion record</h3>
-    <p class="mini">Save a reviewed snapshot, its files, and linked fault observations to FMP Walk Records. This is your personal record, not a venue ticket submission. Email sending is separate.</p>
+    <p class="mini">Save the report, photos and faults to your personal records. This does not submit a venue ticket.</p>
     <div id="notionGoogle"></div>
     <label><input type="checkbox" id="notionSetupTest"> Mark as a setup test, not a field walk</label>
     <div class="btnrow">
@@ -713,13 +712,14 @@ kbd{
     <p class="note info" id="notionStatus" role="status" aria-live="polite">Notion setup is not complete. Downloads remain available.</p>
     <a id="notionReceipt" hidden target="_blank" rel="noopener noreferrer">Open saved Notion report</a>
   </section>
-  <pre class="out" id="repOut">Nothing to report yet.</pre>
-  <h3>Session data</h3>
+  <article class="report-preview" id="reportPreview" aria-label="Report preview"></article>
+  <pre id="repOut" hidden>Nothing to report yet.</pre>
+  <h3>Start a new walk</h3>
   <div class="btnrow">
     <button class="dgr" id="btnReset">Clear and start over</button>
   </div>
   <div id="undoRow"></div>
-  <div class="note info">🔵 <b>No silent writes.</b> Email and Notion saves each require their own confirmation. Download or copy your report whenever a connection is unavailable.</div>
+  <div class="note info">Email and Notion saves require confirmation.</div>
   <div class="note" id="saveNote"></div>
 </section>
 
@@ -793,7 +793,7 @@ kbd{
   <h2>Reference</h2>
 
   <h3>Notes versus faults</h3>
-  <div class="note info">🔵 <b>A note records something. A fault asks someone to do something.</b> Drift you want to watch next show is a note. Anything that needs a person, a ladder, or a part is a fault. Notes reach the report without becoming a ticket, so use them freely.</div>
+  <div class="note info">Use notes for observations. Log a fault when follow-up is needed.</div>
 
   <h3>What is saved, and when</h3>
   <table>
@@ -801,12 +801,12 @@ kbd{
     <tr><td>Pass, flag, skip</td><td>🟢 Immediately</td></tr>
     <tr><td>Typing a reading or a note</td><td>🟢 Within a second, and on leaving the field</td></tr>
     <tr><td>Half-finished fault sheet</td><td>🟢 Kept as a draft, offered back on return</td></tr>
-    <tr><td>App backgrounded or swiped away</td><td>🟢 Flushed before it suspends</td></tr>
+    <tr><td>Switching apps</td><td>Saved when leaving the page</td></tr>
     <tr><td>Clear and start over</td><td>🟢 One undo available</td></tr>
   </table>
 
   <h3>Who gets the ticket</h3>
-  <div class="note info">🔵 <b>Contact details are not published here.</b> Names, phone numbers and email addresses for these routes are kept in Notion, behind sign-in. Route the ticket by role.</div>
+  <div class="note info">Select the responsible team. Contact details are in Notion.</div>
   <table>
     <tr><th scope="col">Route</th><th scope="col">Scope</th></tr>
     <tr><td>Video</td><td>Locate and report. Bowl brightness. Switcher.</td></tr>
@@ -818,10 +818,10 @@ kbd{
     <tr><td>Venue steward</td><td>🟢 Contact details are in Notion.</td></tr>
     <tr><td>Videri console</td><td>🔴 Contact unknown. Ask the Head of Video.</td></tr>
     <tr><td>ConcertVision</td><td>🔴 Contact unknown. Ask the Head of Video.</td></tr>
-    <tr><td>Live Nation / 2024 integrator</td><td>🔴 Unidentified after two documented sessions. Highest-value open thread.</td></tr>
+    <tr><td>Live Nation / 2024 integrator</td><td>Contact unknown. Ask the Head of Video.</td></tr>
   </table>
 
-  <h3>Keyboard, with a Magic Keyboard attached</h3>
+  <h3>Keyboard shortcuts</h3>
   <table>
     <tr><td><kbd>P</kbd></td><td>Pass this position</td></tr>
     <tr><td><kbd>F</kbd></td><td>Flag it and open the fault sheet</td></tr>
@@ -834,17 +834,17 @@ kbd{
   </table>
 
   <h3>Naming</h3>
-  <div class="note">Four levels: <b>official venue space → operational AV zone → map key → device ID.</b> Canonical names, never legacy shorthand. 🟢 The Head of Video endorsed this scheme unprompted, so it is department convention now.
-  <br><br>🔴 <b>Do not expand</b> <span class="k">TC2</span> <span class="k">TC4</span> <span class="k">NBB</span> <span class="k">BB1</span> <span class="k">781</span> <span class="k">791</span>. They are location keys with no decodable scheme. Record them exactly as printed.
-  <br><br>⛔ <b>Black Box VIP, Black Box VIP Patio, and VIP Club are three separate spaces.</b> Never merge them on a ticket.</div>
+  <div class="note">Use venue names and equipment labels as printed on site.
+  <br><br><b>Copy these labels exactly:</b> <span class="k">TC2</span> <span class="k">TC4</span> <span class="k">NBB</span> <span class="k">BB1</span> <span class="k">781</span> <span class="k">791</span>.
+  <br><br><b>Black Box VIP:</b> 5 indoor TVs (4 seating-area ConcertVision and 1 menu behind the bar); no patio TVs. <b>EA Lounge VIP:</b> a Walt Plaza sub-stop with 6 TVs (4 bar menus and 2 seating-area ConcertVision).</div>
 
   <h3>Photography</h3>
-  <div class="note warn">🟡 <b>Unresolved conflict.</b> The venue record says no photos or video inside. The documentation need is not permission. Clear it with the Head of Video or the venue steward once, then the photo field on every ticket stops being a question.</div>
+  <div class="note warn">Confirm venue permission before taking photos.</div>
 
-  <h3>What this walk closes</h3>
-  <div class="note info">🔵 Every Tier 2 zone is on every route. One full pass produces the verified per-zone count that ramp-up step 9 is waiting on, including the <span class="k">WALT CON</span> recount and the duplicate Videri ID <span class="k">087</span>. Record counts as you go and the audit finishes itself.</div>
+  <h3>Required checks</h3>
+  <div class="note info">Record the TV count for each required area.</div>
 
-  <div class="note">🔵 <b>Environments A, B and C stay separate.</b> The bowl, the distributed TVs, and the advertising spectaculars share a room and nothing traced. Never draw a path between the MCTRL660 layer and the VX4S layer.</div>
+  <div class="note">Bowl LEDs, TVs and spectaculars are separate systems. Confirm the signal path before troubleshooting.</div>
 </section>
 
 </main>
@@ -867,6 +867,7 @@ kbd{
 
 <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
+<script src="./walk-core.js?v=2feb000f544df442"></script>
 <script>
 "use strict";
 
@@ -944,68 +945,11 @@ if(mqLight){
 }
 applyTheme();
 
-/* ══════════════════════ seed data ══════════════════════
-   Every value here is traceable to the FMP docs. Where the docs do not
-   establish a fact, the field is left blank and marked, never guessed.
-   ═══════════════════════════════════════════════════════ */
-
-var BOWL = [
-  {id:"FLK-SR",env:"A",kind:"led",name:"Stage right flanking wall",zone:"Pavilion",
-   spec:[["Ctrl","VX4S stage right"],["Pitch","10 mm"],["In2","DVI"]],base:"20%",level:false},
-  {id:"FLK-SL",env:"A",kind:"led",name:"Stage left flanking wall",zone:"Pavilion",
-   spec:[["Ctrl","VX4S stage left"],["Pitch","10 mm"],["In2","SDI"]],base:"20%",level:false},
-  {id:"DLY-1",env:"A",kind:"led",name:"Lawn delay wall 1",zone:"Lawn",
-   spec:[["Ctrl","VX4S lawn 1/2"],["Pitch","7 mm"],["In2","DVI"]],base:"20%",level:true},
-  {id:"DLY-2",env:"A",kind:"led",name:"Lawn delay wall 2",zone:"Lawn",
-   spec:[["Ctrl","VX4S lawn 1/2"],["Pitch","7 mm"],["In2","DVI"]],base:"20%",level:true},
-  {id:"DLY-3",env:"A",kind:"led",name:"Lawn delay wall 3",zone:"Lawn",
-   spec:[["Ctrl","VX4S lawn 3/4"],["Pitch","7 mm"],["In2","HDMI"]],base:"20%",level:true},
-  {id:"DLY-4",env:"A",kind:"led",name:"Lawn delay wall 4",zone:"Lawn",
-   spec:[["Ctrl","VX4S lawn 3/4"],["Pitch","7 mm"],["In2","HDMI"]],base:"20%",level:true}
-];
-
-/* IPs .20 to .23 are the documented range for the four MCTRL660 PRO units.
-   Which IP belongs to which unit is NOT established. Left blank on purpose. */
-var SPEC = [
-  {id:"SPC-TP",env:"C",kind:"spec",name:"Tower · primary",zone:"Building advertising LED",
-   spec:[["Plate","TOWER PRIMARY"],["Sticker","TOWER LEADER"]],base:"4%"},
-  {id:"SPC-TB",env:"C",kind:"spec",name:"Tower · backup",zone:"Building advertising LED",
-   spec:[["Plate","TOWER BACKUP"],["Sticker","TOWER FOLLOWER"]],base:"0% 🔴"},
-  {id:"SPC-WP",env:"C",kind:"spec",name:"Wall · primary",zone:"Building advertising LED",
-   spec:[["Plate","WALL PRIMARY"],["Sticker","WALL LEADER"]],base:"3%"},
-  {id:"SPC-WB",env:"C",kind:"spec",name:"Wall · backup",zone:"Building advertising LED",
-   spec:[["Plate","WALL BACKUP"],["Sticker","WALL FOLLOWER"]],base:"3%"}
-];
-
-/* The 21 enumerated ConcertVision positions, grouped as they are named.
-   Device IDs are not established for these positions, so they are captured, not assumed. */
-var CV = [
-  {id:"CV-WWL-ED",zone:"Walt Whitman Lobby",key:"ENTRANCE DOORS",qty:4},
-  {id:"CV-WWL-CA",zone:"Walt Whitman Lobby",key:"CAROUSEL",qty:3},
-  {id:"CV-WWL-MR",zone:"Walt Whitman Lobby",key:"MERCH",qty:2},
-  {id:"CV-BFL-CA",zone:"Ben Franklin Lobby",key:"CAROUSEL",qty:4,note:"🔵 Fourth unit not yet identified in the inventory."},
-  {id:"CV-BFL-MR",zone:"Ben Franklin Lobby",key:"MERCH",qty:2},
-  {id:"CV-WWP-EA",zone:"Walt Whitman Plaza",key:"EA BAR LOUNGE",qty:2},
-  {id:"CV-VIP-ST",zone:"VIP Club",key:"STREET SIDE",qty:2,note:"🟡 Legacy key reads VIP. Confirm on foot whether this is VIP Club or Black Box VIP. They are separate spaces."},
-  {id:"CV-VIP-LB",zone:"VIP Club",key:"LOBBY SIDE",qty:2,note:"🟡 Legacy key reads VIP. Confirm the space on foot."}
-];
-
-/* Tier 2 zones. Counts are deliberately unknown: recording them is the point. */
-var TIER2 = [
-  {id:"BLK-WWL",name:"Walt Whitman Lobby",hint:"🔵 Count on foot. Concentration of unkeyed Videri positions."},
-  {id:"BLK-WWP",name:"Walt Whitman Plaza",hint:"🔵 Count on foot. Videri units here are indoor-rated hardware sitting outdoors."},
-  {id:"BLK-BFL",name:"Ben Franklin Lobby",hint:"🔵 Count on foot. Concentration of unkeyed Videri positions."},
-  {id:"BLK-BFP",name:"Ben Franklin Plaza",hint:"⚠️ Source sheet duplicated two rows here, 8 units. Recount settles it."},
-  {id:"BLK-LWN",name:"Lawn",hint:"🔴 Hard deadline Oct 15. After changeover the lawn is cut off until spring."},
-  {id:"BLK-VIP",name:"Black Box VIP · Patio · VIP Club",hint:"⛔ Three separate spaces. Record them separately, never merged."},
-  {id:"BLK-BST",name:"Backstage and admin",hint:"🔵 The dressing room and admin SDI branch. Documented, not yet walked end to end."},
-  {id:"BLK-CON",name:"Concessions · WALT CON recount",hint:"🚨 WALT CON states qty 16 against an ID range covering 14. This recount settles the site total."}
-];
-
-/* Optional area requested by the operator. Room/device totals are not yet established. */
-var DRESSING = {id:"DR-ROOMS",env:"B",kind:"tv",name:"Dressing Rooms",zone:"Dressing Rooms",
-  hint:"Record room names and display counts on foot. No room or device count is assumed. The broader Backstage and admin check is separate; note any overlap rather than treating the two counts as additive.",
-  spec:[["Feed","Dressing room SDI branch"],["Count","record on foot"]]};
+var knownStation = FMPWalkCore.knownStation;
+var visualItems = FMPWalkCore.visualItems;
+var positionLabel = FMPWalkCore.positionLabel;
+var zoneLabel = FMPWalkCore.zoneLabel;
+var prepareMeta = FMPWalkCore.prepareMeta;
 
 var SYM = {
   led:["Wall dark","Dead cabinet","Dead module","Brightness mismatch","Colour shift","Scan or refresh artifact","Scaling wrong","No signal or wrong input","Not level","Flicker or power sag","Water ingress","Data run fault"],
@@ -1107,128 +1051,11 @@ function paintSaveState(){
   el.style.color = STORAGE_OK ? "" : "var(--red)";
 }
 
-/* ══════════════════════ station builder ══════════════════════ */
-var PRIMARY_ZONE_ORDER = ["Pavilion","Lawn","Building advertising LED","Walt Whitman Lobby","Walt Whitman Plaza","Ben Franklin Lobby","VIP Club"];
-var ZONE_ORDER = PRIMARY_ZONE_ORDER.concat(["Ben Franklin Plaza","Black Box VIP · Patio · VIP Club","Backstage and admin","Concessions · WALT CON recount","Dressing Rooms"]);
-function visualItems(s){
-  if(s.kind !== "led") return [];
-  var items = [
-    {key:"powered",label:"Powered and showing content"},
-    {key:"brightness",label:"Brightness matches the partner wall by eye"},
-    {key:"modules",label:"No dead cabinets or modules"},
-    {key:"colour",label:"No colour shift across the display"}
-  ];
-  if(s.level) items.push({key:"level",label:"Level against the fixed horizontal reference"});
-  return items;
-}
-function positionLabel(s){
-  return s.name + (s.key ? " · " + s.key : "");
-}
-function zoneLabel(zone){
-  return zone === "Building advertising LED" ? "Building spectaculars" : zone;
-}
-function cvStation(c){
-  return {id:c.id,env:"B",kind:"tv",tier:1,name:c.zone,zone:c.zone,key:c.key,qty:c.qty,note:c.note,
-    spec:[["Key",c.key],["Positions",String(c.qty)],["Tech","ConcertVision DMP, wired HDMI"]]};
-}
-function tier2Station(item){
-  return {id:item.id,env:"B",kind:"tv",tier:2,name:item.name,zone:item.name,hint:item.hint,
-    spec:[["Tier","2"],["Count","record on foot"]]};
-}
-function knownStation(id){
-  return BOWL.concat(SPEC,CV,TIER2,[DRESSING]).some(function(item){ return item.id === id; });
-}
-/* One-time compatibility only: find the operator's current station in saves made
-   before the all-zones route, then discard the old selector value. */
-function previousRoute(meta){
-  var m = meta || {}, checks = m.checks || null, sections = m.sections || {};
-  var out = [];
-  BOWL.forEach(function(s){ if(!(m.cfg === "winter" && s.zone === "Lawn")) out.push(s); });
-  SPEC.forEach(function(s){ out.push(s); });
-  CV.forEach(function(s){ out.push(cvStation(s)); });
-  out.push(DRESSING);
-  var selected = TIER2.find(function(item){ return item.id === m.block; });
-  if(selected && !(m.cfg === "winter" && selected.id === "BLK-LWN")) out.push(tier2Station(selected));
-  function enabled(s){
-    if(checks && typeof checks[s.id] === "boolean") return checks[s.id];
-    if(s.id === DRESSING.id) return false;
-    if(BOWL.some(function(item){ return item.id === s.id; })) return sections.bowl !== false;
-    if(SPEC.some(function(item){ return item.id === s.id; })) return sections.spec !== false;
-    if(CV.some(function(item){ return item.id === s.id; })) return sections.cv !== false;
-    return sections.tier2 !== false;
-  }
-  var filtered = out.filter(enabled);
-  if(!checks) return filtered;
-  var oldOrder = ["Pavilion","Lawn","Building advertising LED","Walt Whitman Lobby","Walt Whitman Plaza",
-    "Ben Franklin Lobby","Ben Franklin Plaza","VIP Club","Black Box VIP · Patio · VIP Club","Dressing Rooms","Backstage and admin","Concessions · WALT CON recount"];
-  return oldOrder.flatMap(function(zone){
-    return filtered.filter(function(s){ return s.zone === zone; });
-  });
-}
-function prepareMeta(meta){
-  var m = Object.assign({date:"",show:"",op:"",cfg:"summer"}, meta);
-  var legacy = m.sections || {};
-  // Keep exclusions at check level so a legacy mixed zone is not silently expanded.
-  m.checks = Object.assign({}, m.checks);
-  [[BOWL,"bowl"],[SPEC,"spec"],[CV,"cv"]].forEach(function(group){
-    group[0].forEach(function(s){
-      if(typeof m.checks[s.id] !== "boolean") m.checks[s.id] = legacy[group[1]] !== false;
-    });
-  });
-  TIER2.forEach(function(s){ delete m.checks[s.id]; });
-  // New optional coverage must not silently change a saved route or its completion.
-  if(typeof m.checks[DRESSING.id] !== "boolean") m.checks[DRESSING.id] = false;
-  delete m.sections;
-  delete m.block;
-  delete m.nextBlock;
-  delete m.rotationBlock;
-  return m;
-}
-function restoreWalk(o){
-  var oldPolicy = Object.prototype.hasOwnProperty.call(o.meta,"block") ||
-    TIER2.some(function(s){ return o.meta.checks && Object.prototype.hasOwnProperty.call(o.meta.checks,s.id); });
-  var oldRoute = oldPolicy ? previousRoute(o.meta) : [];
-  var oldCurrent = oldPolicy ? oldRoute[o.idx] : null;
-  var oldComplete = oldPolicy && oldRoute.length > 0 && o.idx >= oldRoute.length;
-  S.meta = prepareMeta(o.meta);
-  S.res = o.res || {}; S.faults = o.faults || []; S.draft = o.draft || null;
-  S.idx = Math.max(0, Number.isInteger(o.idx) ? o.idx : 0);
-  S.faults.forEach(function(fault){
-    if(fault.station && knownStation(fault.station) && !(S.res[fault.station] || {}).status){
-      var result = S.res[fault.station] || {};
-      result.status = "flag"; result.ts = fault.ts || new Date().toISOString();
-      S.res[fault.station] = result;
-    }
-  });
-  if(oldPolicy){
-    S.idx = oldCurrent ? stations().findIndex(function(s){ return s.id === oldCurrent.id; }) : oldComplete ? stations().length : 0;
-  }
-  S.idx = Math.min(S.idx, stations().length);
-}
-function availableStations(){
-  var out = [], m = S.meta;
-  for(var i=0;i<BOWL.length;i++){
-    var w = BOWL[i];
-    if(m.cfg === "winter" && w.zone === "Lawn") continue;
-    out.push(w);
-  }
-  for(var j=0;j<SPEC.length;j++) out.push(SPEC[j]);
-  for(var k=0;k<CV.length;k++) out.push(cvStation(CV[k]));
-  out.push(DRESSING);
-  for(var q=0;q<TIER2.length;q++) out.push(tier2Station(TIER2[q]));
-  return out;
-}
-function zoneGroups(){
-  var available = availableStations();
-  return ZONE_ORDER.map(function(zone){
-    return {zone:zone,checks:available.filter(function(s){ return s.zone === zone; })};
-  }).filter(function(group){ return group.checks.length; });
-}
-function stations(){
-  return zoneGroups().flatMap(function(group){
-    return group.checks.filter(function(s){ return s.tier === 2 || S.meta.checks[s.id]; });
-  });
-}
+/* Route adapters keep UI state out of the shared core. */
+function restoreWalk(saved){ FMPWalkCore.restoreWalk(S, saved); }
+function availableStations(){ return FMPWalkCore.availableStations(S.meta); }
+function zoneGroups(){ return FMPWalkCore.zoneGroups(S.meta); }
+function stations(){ return FMPWalkCore.stations(S.meta); }
 
 /* ══════════════════════ rendering ══════════════════════ */
 function esc(s){
@@ -1284,6 +1111,7 @@ function renderRoute(){
   for(var i=0;i<st.length;i++){
     var r = S.res[st[i].id] || {};
     if(i === 0 || st[i].zone !== st[i-1].zone) h += '<h3 class="rt-zone">' + esc(zoneLabel(st[i].zone)) + '</h3>';
+    if(st[i].stop && (i === 0 || st[i].stop !== st[i-1].stop)) h += '<h4 class="rt-stop">' + esc(st[i].stop) + '</h4>';
     h += '<button type="button" class="rt' + (i === S.idx ? " here" : "") + '"' +
       (i === S.idx ? ' aria-current="step"' : "") +
       (r.status ? ' data-s="' + r.status + '"' : "") + ' data-i="' + i + '">' +
@@ -1302,9 +1130,9 @@ function renderRoute(){
 }
 
 function envTag(e){
-  if(e === "A") return '<span class="tag a">ENV A · BOWL</span>';
-  if(e === "C") return '<span class="tag c">ENV C · ADS</span>';
-  return '<span class="tag b">ENV B · TVS</span>';
+  if(e === "A") return '<span class="tag a">Bowl LEDs</span>';
+  if(e === "C") return '<span class="tag c">Spectaculars</span>';
+  return '<span class="tag b">TVs</span>';
 }
 
 /* banner offering back a fault sheet that was interrupted */
@@ -1332,11 +1160,11 @@ function renderWalk(){
     var flagged = S.faults.length, noted = 0;
     for(var z=0;z<st.length;z++){ if(S.res[st[z].id] && S.res[st[z].id].note) noted++; }
     body.innerHTML = resumeBanner() +
-      '<div class="card"><div class="card-hd"><h4>Walk complete</h4></div>' +
+      '<div class="card"><div class="card-hd"><h4>End of route</h4></div>' +
       '<div class="spec"><b>Positions</b><i>' + st.length + '</i><b>Flagged</b><i>' + flagged + '</i><b>Noted</b><i>' + noted + "</i></div>" +
       (flagged
-        ? '<div class="note crit">🔴 ' + flagged + ' fault' + (flagged>1?'s':'') + ' logged. Open the Report tab, copy it into the FMP working page, and route anything critical before doors.</div>'
-        : '<div class="note">🟢 Nothing flagged. Log the clean walk anyway. A run of clean nights is what makes the first bad one legible.</div>') +
+        ? '<div class="note crit">🔴 ' + flagged + ' fault' + (flagged>1?'s':'') + ' logged. Review the report and route critical faults before doors.</div>'
+        : '<div class="note">No faults logged.</div>') +
       '<div class="stepnav"><button class="prev" id="wPrev">Back</button><button class="next" id="wRep">Go to report</button></div></div>';
     window.__grab = null;
     wireResume();
@@ -1348,7 +1176,7 @@ function renderWalk(){
   var s = st[S.idx], r = S.res[s.id] || {};
   var h = resumeBanner();
 
-  h += '<div class="card"><div class="walk-zone">' + esc(zoneLabel(s.zone)) + '</div><div class="card-hd"><h4>' + esc(s.name) + '</h4>' + envTag(s.env) + '</div>';
+  h += '<div class="card"><div class="walk-zone">' + esc(zoneLabel(s.zone)) + (s.stop ? " · " + esc(s.stop) : "") + '</div><div class="card-hd"><h4>' + esc(s.name) + '</h4>' + envTag(s.env) + '</div>';
 
   if(s.spec && s.spec.length){
     h += '<div class="spec">';
@@ -1368,9 +1196,9 @@ function renderWalk(){
     });
     h += '<p class="checklist-help" id="visualHelp">Tick what you confirm. Unchecked means not confirmed, not a fault. Pass and Flag record your overall result separately.</p></fieldset>';
   } else if(s.kind === "spec"){
-    h += '<div class="note info">🔵 <b>Read the number, then look at the display.</b> A pair that does not match is the finding, even when both are lit. These carry paid advertising.</div>';
+    h += '<div class="note info">Record brightness and compare the paired displays.</div>';
   } else if(s.tier === 1){
-    h += '<div class="note info">🔵 <b>Program-capable positions.</b> These are the ones that show the wrong thing on a missed restore. Check content as well as picture.</div>';
+    h += '<div class="note info">Check the picture and expected content.</div>';
   }
 
   if(s.kind === "led" || s.kind === "spec"){
@@ -1383,20 +1211,20 @@ function renderWalk(){
   if(s.level){
     h += '<div class="rd"><div style="grid-column:1/-1"><label>Level, against your fixed reference</label>' +
          '<input type="text" id="rL" value="' + esc(r.level||"") + '" placeholder="level / suspect / off"></div></div>' +
-         '<div class="mini">🟡 Stand at the same mark every night and sight against the same horizontal line. Precision is not the point. Change is.</div>';
+         '<div class="mini">Check from the same position against a fixed horizontal reference.</div>';
   }
   if(s.kind === "tv"){
     h += '<div class="rd">' +
-      '<div><label>Positions counted</label><input type="text" inputmode="numeric" id="rC" value="' + esc(r.count||"") + '" placeholder="' + (s.qty ? s.qty : "n") + '"></div>' +
+      '<div><label>TVs checked</label><input type="text" inputmode="numeric" id="rC" value="' + esc(r.count||"") + '" placeholder="' + (s.qty ? s.qty : "n") + '"></div>' +
       '<div><label>On expected content</label><input type="text" id="rM" value="' + esc(r.match||"") + '" placeholder="yes / no"></div>' +
       "</div>" +
-      '<div class="mini">🔵 The count is the point. One clean pass of every Tier 2 zone closes the estate audit.</div>';
+      '<div class="mini">Record the number of TVs checked.</div>';
   }
 
   /* per-position note. Not a fault, and it still reaches the report. */
   h += '<div class="notefld"><label for="rN">Note' + (r.note ? " &#9998;" : "") + "</label>" +
-    '<textarea id="rN" placeholder="Anything worth recording that does not need anyone to act">' + esc(r.note||"") + "</textarea>" +
-    '<div class="mini">🔵 Notes reach the report without becoming a ticket. Use it for drift you want to watch, or for what you tried.</div></div>';
+    '<textarea id="rN" placeholder="Observations">' + esc(r.note||"") + "</textarea>" +
+    '<div class="mini">Notes are included in the report.</div></div>';
 
   h += '<div class="pf" style="margin-top:14px">' +
     '<button class="p' + (r.status === "pass" ? " on" : "") + '" id="bP">✓ Pass</button>' +
@@ -1528,12 +1356,12 @@ function openSheet(station, existing){
   var list = SYM[f.kind] || SYM.tv;
   var h = "";
 
-  h += '<div class="fld"><label for="sPos">Position, canonical name</label>' +
+  h += '<div class="fld"><label for="sPos">Position</label>' +
     '<input type="text" id="sPos" value="' + esc(f.pos) + '" placeholder="e.g. Walt Whitman Plaza · beer garden 2"></div>';
 
   h += '<div class="fld"><label for="sDev">Vendor key or device ID, exactly as printed</label>' +
     '<input type="text" id="sDev" value="' + esc(f.dev) + '" placeholder="leave blank if unkeyed"></div>' +
-    '<div class="mini" style="margin:-6px 0 14px">🔴 Do not expand or interpret the code. 🔵 41 positions carry a zone label and nothing else. Blank is a valid, useful answer.</div>';
+    '<div class="mini" style="margin:-6px 0 14px">Copy the equipment label exactly. Leave blank if no label is visible.</div>';
 
   h += '<fieldset class="choice-group"><legend>What is wrong</legend><div class="chips" id="symChips">';
   for(var i=0;i<list.length;i++){
@@ -1546,24 +1374,24 @@ function openSheet(station, existing){
     h += '<button type="button" class="chip sev' + (f.sev === SEV[j].v ? " on" : "") + '" aria-pressed="' + (f.sev === SEV[j].v ? "true" : "false") + '" data-v="' + SEV[j].v + '">' + SEV[j].l + "</button>";
   }
   h += "</div>";
-  h += '<div class="mini" style="margin-top:8px">🟢 A dark display is uncounted advertising inventory. That is a revenue argument, not a cosmetic one, and it is the language that gets a unit replaced.</div></fieldset>';
+  h += '<div class="mini" style="margin-top:8px">Select the observed symptoms.</div></fieldset>';
 
   h += '<div class="fld"><label for="sRoute">Route to</label><select id="sRoute">';
   var routeOptions = f.route && ROUTES.indexOf(f.route) === -1 ? [f.route].concat(ROUTES) : ROUTES;
   for(var k=0;k<routeOptions.length;k++){
     h += '<option' + (f.route === routeOptions[k] ? " selected" : "") + ">" + esc(routeOptions[k]) + "</option>";
   }
-  h += "</select><div class=\"mini\" style=\"margin-top:6px\">🟢 Video locates and reports. IT services the players and owns the ladder.</div></div>";
+  h += "</select><div class=\"mini\" style=\"margin-top:6px\">Video reports faults. IT services the players.</div></div>";
 
   h += '<fieldset class="choice-group"><legend>Photographed</legend><div class="chips">' +
     '<button type="button" class="chip' + (f.photo ? " on" : "") + '" aria-pressed="' + (f.photo ? "true" : "false") + '" id="sPhoto">📷 Photo taken</button></div>' +
-    '<div class="mini" style="margin-top:8px">This checkbox records an observation only. Attach actual images below. 🟡 The venue record says no photos or video inside. Clear it with the Head of Video or the venue steward before you rely on this.</div></fieldset>';
+    '<div class="mini" style="margin-top:8px">Attach photos below. Confirm venue permission before taking photos.</div></fieldset>';
   h += '<fieldset class="choice-group"><legend>Photo attachments</legend><div id="faultPhotos">Loading photo controls…</div></fieldset>';
 
   h += '<div class="fld"><label for="sNotes">Notes</label><textarea id="sNotes" placeholder="What you saw, and anything you already tried">' + esc(f.notes) + "</textarea></div>";
 
   var rc = repeatCount(f.pos);
-  if(rc >= 2) h += '<div class="note crit">🚨 <b>This position has failed on ' + rc + ' previous walks.</b> Stop resetting it and escalate for replacement.</div>';
+  if(rc >= 2) h += '<div class="note crit">🚨 <b>This position has failed on ' + rc + ' previous walks.</b> Refer the repeated fault to the responsible team.</div>';
 
   h += '<div class="btnrow"><button class="pri" id="sSave">Save fault</button></div>';
 
@@ -1724,22 +1552,21 @@ function buildReport(){
   var health = crit ? "🔴" : (faults.length ? "🟡" : (unwalked === st.length ? "⬜" : "🟢"));
 
   var o = [];
-  o.push("# 📺 Preshow video walk · " + mdLine(m.show || "untitled") + " · " + mdLine(m.date || "no date"));
+  o.push("# Preshow video walk · " + mdLine(m.show || "untitled") + " · " + mdLine(m.date || "no date"));
   o.push("");
   o.push("> " + health + " **" + faults.length + " fault" + (faults.length === 1 ? "" : "s") +
     (crit ? ", " + crit + " critical" : "") + "**");
-  o.push("> " + pass + " pass · " + skip + " skipped · " + unwalked + " not walked · " + st.length + " positions on tonight's route");
+  o.push("> " + pass + " pass · " + skip + " skipped · " + unwalked + " not walked · " + st.length + " checks on this route");
   o.push("> Walked by " + mdLine(m.op || "walker required"));
   o.push("> Rig: " + (m.cfg === "winter" ? "Winter" : "Summer"));
-  o.push("> Route: all zones");
-  o.push("> Rotation Block: All zones");
   o.push("> Zones: " + (Array.from(new Set(st.map(function(s){ return zoneLabel(s.zone); }))).map(mdLine).join(" → ") || "none selected"));
+  o.push("> Special stops: " + Array.from(new Set(st.filter(function(s){ return s.stop; }).map(function(s){ return zoneLabel(s.zone) + " / " + s.stop; }))).map(mdLine).join(" → "));
   o.push("");
   o.push("---");
   o.push("");
-  o.push("## 📊 Readings");
+  o.push("## Readings");
   o.push("");
-  o.push("| Position | Env | Result | Reading | Baseline |");
+  o.push("| Position | System | Result | Reading | Baseline |");
   o.push("| --- | --- | --- | --- | --- |");
   for(var j=0;j<st.length;j++){
     var s = st[j], rr = S.res[s.id] || {};
@@ -1750,10 +1577,23 @@ function buildReport(){
     if(rr.match) read.push("match " + rr.match);
     if(rr.level) read.push("level " + rr.level);
     if(rr.count) read.push("count " + rr.count);
-    o.push("| " + mdCell(s.name) + (s.key ? " · " + String.fromCharCode(96) + mdCell(s.key).replace(/`/g, "'") + String.fromCharCode(96) : "") + " | " + mdCell(s.env) + " | " + mdCell(mk) + " | " +
+    o.push("| " + mdCell(s.name) + (s.key ? " · " + String.fromCharCode(96) + mdCell(s.key).replace(/`/g, "'") + String.fromCharCode(96) : "") + " | " + mdCell(s.env === "A" ? "Bowl LEDs" : s.env === "C" ? "Spectaculars" : "TVs") + " | " + mdCell(mk) + " | " +
       (read.length ? mdCell(read.join(", ")) : "n/a") + " | " + mdCell(s.base || "n/a") + " |");
   }
   o.push("");
+
+  var historical = FMPWalkCore.historicalReadings(S);
+  if(historical.length){
+    o.push("## Historical VIP readings", "", "> These records used older, uncertain or combined VIP scopes. They are retained as recorded and do not confirm the five indoor Black Box TVs or any patio inventory.", "");
+    historical.forEach(function(entry){
+      var old = entry.station, result = entry.result;
+      o.push("- **" + mdLine(positionLabel(old)) + "** (" + old.id + "): " + mdLine(result.status || "not checked") +
+        (result.count ? " · recorded count " + mdLine(result.count) : "") +
+        (result.match ? " · on expected content " + mdLine(result.match) : "") +
+        (result.note ? " · " + mdLine(result.note) : ""));
+    });
+    o.push("");
+  }
 
   var visualStations = st.filter(function(s){ return visualItems(s).length; });
   if(visualStations.length){
@@ -1784,7 +1624,7 @@ function buildReport(){
   }
 
   if(faults.length){
-    o.push("## 🎫 Faults");
+    o.push("## Faults");
     o.push("");
     o.push("| Position | Key | Symptom | Severity | Route | Photo |");
     o.push("| --- | --- | --- | --- | --- | --- |");
@@ -1812,7 +1652,7 @@ function buildReport(){
       o.push("");
     }
   } else {
-    o.push("## 🎫 Faults");
+    o.push("## Faults");
     o.push("");
     o.push("🟢 None logged.");
     o.push("");
@@ -1822,29 +1662,56 @@ function buildReport(){
   o.push("");
   var photoOwners = [{label:"General report",photos:S.meta.photos || []}].concat(faults.map(function(f){return {label:f.pos || "Unnamed fault",photos:f.photos || []};}));
   if(photoOwners.some(function(owner){return owner.photos.length;})){
-    o.push("## Photo attachments", "", "> Images are attached separately to email and embedded in the JSON export. This Markdown file lists them but does not embed image data.", "");
+    o.push("## Photo attachments", "", "> Photos are included in the walk backup and attached to emails. This report lists their filenames.", "");
     photoOwners.forEach(function(owner){ owner.photos.forEach(function(photo){ o.push("- " + mdLine(owner.label) + ": " + mdLine(photo.name)); }); });
     o.push("");
   }
-  o.push("## ❓ Still open after this walk");
-  o.push("");
-  o.push("| # | Item | Who answers |");
-  o.push("| --- | --- | --- |");
-  o.push("| 1 | 🔴 Which MCTRL660 IP maps to which unit, and are the four redundancy or canvas extension | Trace one follower's output |");
-  o.push("| 2 | 🔴 Which zones the ConcertVision button actually moves | Head of Video, or the 2024 as-builts |");
-  o.push("| 3 | 🔴 Who installed the 2024 IP system and where the commissioning package is | Head of Video, Live Nation facility, or the integrator |");
-  o.push("| 4 | 🔴 What the winter configuration does to the 4 lawn walls and 14 lawn TVs | Head of Video, before changeover |");
-  o.push("");
-  o.push("**Confidence: medium.** Field observation only. No controller logs pulled, no network state checked, no content source verified upstream of the display.");
-  o.push("");
-  o.push("_Generated by the FMP preshow walk tool. Paste into the FMP Technical Overview working page. Do not paste unresolved items into the venue deliverable._");
   return {markdown:o.join("\n"),faultCount:faults.length};
 }
 function report(){
   return buildReport().markdown;
 }
+// Render only the headings, tables and lists produced by buildReport. All content
+// enters through textContent, including operator notes and equipment labels.
+function updateReportPreview(){
+  var text = report();
+  $("repOut").textContent = text;
+  var root = $("reportPreview");
+  root.replaceChildren();
+  var table = null, list = null;
+  function plain(value){
+    return value.replace(/\*\*(.*?)\*\*/g, "$1").replace(/`([^`]+)`/g, "$1").replace(/\\\|/g, "|").replace(/<br>/g, " · ");
+  }
+  text.split("\n").forEach(function(line){
+    if(!line.trim() || line === "---"){ table = null; list = null; return; }
+    if(line.startsWith("| ")){
+      if(/^\|[ \-:|]+$/.test(line)) return;
+      var header = !table;
+      if(header){
+        var scroll = document.createElement("div"); scroll.className = "report-table";
+        table = document.createElement("table"); scroll.append(table); root.append(scroll);
+      }
+      var row = document.createElement("tr");
+      line.slice(1,-1).split(/(?<!\\)\|/).forEach(function(value){
+        var cell = document.createElement(header ? "th" : "td");
+        if(header) cell.scope = "col";
+        cell.textContent = plain(value.trim()); row.append(cell);
+      });
+      table.append(row); return;
+    }
+    table = null;
+    var heading = line.match(/^(#{1,3}) (.*)$/);
+    var bullet = line.startsWith("- ");
+    var element = document.createElement(heading ? (heading[1].length < 3 ? "h3" : "h4") : bullet ? "li" : "p");
+    element.textContent = plain(heading ? heading[2] : line.replace(/^> |^- /, "").replace(/^\[x\] /, "✓ ").replace(/^\[ \] /, "Not confirmed: "));
+    if(bullet){
+      if(!list){ list = document.createElement("ul"); root.append(list); }
+      list.append(element);
+    } else { list = null; root.append(element); }
+  });
+}
 function renderReport(){
-  $("repOut").textContent = report();
+  updateReportPreview();
   if(window.FMPPhotos) window.FMPPhotos.renderReport();
 
   var prev = store.get(PREV_KEY);
@@ -1857,14 +1724,14 @@ function renderReport(){
       window.__grab = null; window.__grabSheet = null;
       restoreWalk(o);
       store.del(PREV_KEY); save(); syncSetup(); go("walk"); toast("Walk restored");
-    }catch(e){ toast("That backup could not be read"); }
+    }catch(e){ toast("Backup could not be opened"); }
   };
 
   var n = $("saveNote");
   n.className = STORAGE_OK ? "note info" : "note crit";
   n.innerHTML = STORAGE_OK
-    ? "🟢 <b>Saving works on this copy.</b> Taps save instantly, typing saves within a second and on leaving the field, and everything is flushed when the app is backgrounded or closed. Last save " + (lastSaveAt ? hhmm(lastSaveAt) : "not yet") + "."
-    : "🔴 <b>Saving does not work on this copy.</b> The browser is blocking storage, so nothing survives a reload. Export the report or the JSON before you leave this screen.";
+    ? "Saved on this device. Last saved " + (lastSaveAt ? hhmm(lastSaveAt) : "not yet") + "."
+    : "Changes are not being saved. Download a walk backup before closing this page.";
 }
 
 function showExportStatus(message, error){
@@ -1984,7 +1851,7 @@ function renderZones(){
     if(!selectable.length) b.disabled = true;
     var detail = (count && !full ? count + " of " : "") + group.checks.length + " check" + (group.checks.length === 1 ? "" : "s");
     if(count && !full) detail += " · partial";
-    if(required.length) detail += " · Tier 2 required";
+    if(required.length) detail += " · required checks";
     b.innerHTML = '<span class="zone-state"><span class="zone-switch" aria-hidden="true"></span>' +
       (!selectable.length ? "Required" : full ? "On" : count ? "Partial" : "Off") + '</span><span>' + esc(zoneLabel(group.zone)) + '</span><small>' + esc(detail) + '</small>';
     b.title = !selectable.length ? zoneLabel(group.zone) + " is required on every walk" : (full ? "Turn off selectable checks in " : "Turn on ") + zoneLabel(group.zone);
@@ -2118,7 +1985,7 @@ go(S.meta.show ? (S.tab || "walk") : "setup");
     if(r && r.status) done++;
     if(r && r.note) noted++;
   }
-  if(!STORAGE_OK){ toast("Storage blocked. Nothing will be saved."); return; }
+  if(!STORAGE_OK){ toast("Changes are not being saved."); return; }
   if(done || S.faults.length){
     toast("Restored " + done + " of " + st.length +
       (S.faults.length ? ", " + S.faults.length + " flagged" : "") +
@@ -2126,7 +1993,7 @@ go(S.meta.show ? (S.tab || "walk") : "setup");
   }
 })();
 </script>
-<script type="module" src="./email.js?v=81495faf250100aa"></script>
-<script type="module" src="./notion.js?v=6c7a642be575c64b"></script>
+<script type="module" src="./email.js?v=fe26da41d9be3443"></script>
+<script type="module" src="./notion.js?v=1a06d2fd5b1e9c1e"></script>
 </body>
 </html>

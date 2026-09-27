@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-09-27 — FMP Walk route and operator interface cleanup
+
+- The walk follows Ben Lobby, Ben Plaza, Pavilion, Lawn, Walt Plaza and Walt Lobby. Tower, the two outboard LEDs, four delay LEDs, Wall, EA Lounge VIP and Black Box VIP appear as stops inside their parent zones.
+- EA Lounge VIP under Walt Plaza has four bar menu TVs and two seating ConcertVision TVs. Black Box VIP under Walt Lobby has five indoor TVs: four seating ConcertVision and one menu behind the bar, with none on its patio.
+- The interface uses neutral labels, brief instructions and readable report tables. Backup downloads remain available without JSON terminology; developer setup notes and research commentary are removed from the walk.
+- The canonical walk core owns inventory, routes and saved-route migration. Existing readings, faults and photos survive; older ambiguous VIP results remain explicitly historical instead of completing the corrected checks. The generated release includes the core with a content hash.
+
 ## 2026-09-27 — NoteForge mobile controls clear the host navigation
 
 - The managed release wrapper now offsets NoteForge's mobile toolbar even when its native editor skip link sits between the toolbar and the System by Dave breadcrumb. Theme clicks remain reachable without removing either skip link.

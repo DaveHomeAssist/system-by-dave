@@ -31,7 +31,7 @@ const releases = [
       'rig/vendor/three/three.module.js', 'rig/vendor/three/three.core.js', 'rig/vendor/three/addons/controls/OrbitControls.js'
     ]
   },
-  { directory: 'fmpwalk', mode: 'local-first', expected: ['index.html', 'email.js', 'mail.js', 'photos.js', 'notion.js', 'notion-config.js'] }
+  { directory: 'fmpwalk', mode: 'local-first', expected: ['index.html', 'walk-core.js', 'email.js', 'mail.js', 'photos.js', 'notion.js', 'notion-config.js'] }
 ];
 // The report sender is the only address the public FMP releases may carry.
 const ALLOWED_EMAILS = ['avbydave@gmail.com'];
@@ -151,7 +151,7 @@ assert.match(theme, /preference = legacy \|\| 'light';/);
 assert.equal(releases[0].provenance.sourceCommit, releases[1].provenance.sourceCommit, 'fmp and fmpwalk must ship from one export');
 const walkEntry = fs.readFileSync(path.join(site, 'fmpwalk/index.html'), 'utf8');
 assert.match(walkEntry, /var THEME_KEY = "fmpTheme";/);
-assert.match(walkEntry, /No silent writes/);
+assert.match(walkEntry, /Email and Notion saves require confirmation/);
 // /fmpwalk/camera/ does not exist, and the walk is its own origin, so its camera link and
 // legacy ?camera=N / ?position= redirect name the operations hub absolutely. A same-origin
 // /fmp/camera/ would resolve against the walk's domain, where nothing serves it.

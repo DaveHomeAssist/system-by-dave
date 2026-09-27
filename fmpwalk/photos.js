@@ -144,7 +144,7 @@ function mountEditor(root, owner, current) {
   const urls = [];
   const revoke = () => { urls.splice(0).forEach(url => URL.revokeObjectURL(url)); };
   root.innerHTML = '<label class="photo-label">Add photos<input type="file" accept="image/jpeg,image/png,image/webp" multiple></label>' +
-    '<p class="mini">Up to 12 photos per walk. JPEG, PNG or WebP, 20 MB each before resizing. Saved as JPEG copies up to 1600 px; embedded location metadata is removed. Keep your originals.</p>' +
+    '<p class="mini">Up to 12 photos per walk. Keep the originals.</p>' +
     '<p class="photo-status mini" role="status" aria-live="polite"></p><div class="photo-grid"></div>';
   const input = root.querySelector('input');
   const notice = root.querySelector('.photo-status');
@@ -153,14 +153,14 @@ function mountEditor(root, owner, current) {
   const show = (text, error = false) => { notice.textContent = text; notice.className = error ? 'photo-status note crit' : 'photo-status mini'; };
   const changed = () => {
     if (!window.save()) throw new Error('Walk storage failed; the attachment change was not saved. Keep your originals and export the walk.');
-    document.getElementById('repOut').textContent = window.report();
+    window.updateReportPreview();
   };
   const paint = async () => {
     const generation = ++version;
     revoke(); grid.replaceChildren();
     for (const [index, ref] of (owner.photos || []).entries()) {
       const card = document.createElement('div'); card.className = 'photo-card';
-      const label = document.createElement('p'); label.className = 'mini'; label.textContent = `Photo ${index + 1} · ${Math.ceil(ref.size / 1024)} KB`;
+      const label = document.createElement('p'); label.className = 'mini'; label.textContent = `Photo ${index + 1}`;
       card.append(label); grid.append(card);
       try {
         const row = await storedPhoto(ref.id);
@@ -204,7 +204,7 @@ function mountEditor(root, owner, current) {
         try { changed(); } catch (error) { if (before) owner.photos = before; else delete owner.photos; throw error; }
         count++;
       }
-      show(`${count} photo${count === 1 ? '' : 's'} saved in this browser. Download the walk JSON for a portable copy.`);
+      show(`${count} photo${count === 1 ? '' : 's'} saved in this browser. Download the walk backup to keep a copy.`);
     } catch (error) { if (live()) show(`${count ? `${count} saved. ` : ''}${error.message}`, true); }
     finally { busy--; input.disabled = false; if (live()) paint(); }
   };
