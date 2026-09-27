@@ -1592,6 +1592,7 @@ function buildReport(){
       var old = entry.station, result = entry.result;
       o.push("- **" + mdLine(positionLabel(old)) + "** (" + old.id + "): " + mdLine(result.status || "not checked") +
         (result.count ? " · recorded count " + mdLine(result.count) : "") +
+        (result.match ? " · on expected content " + mdLine(result.match) : "") +
         (result.note ? " · " + mdLine(result.note) : ""));
     });
     o.push("");
