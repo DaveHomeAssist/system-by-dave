@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-09-26 — AV show dock navigation clearance
+
+- Tool navigation now moves above the show-context dock only when their horizontal bounds collide, then reserves enough scroll space for both controls. The fixed-height LED Wall Calculator reserves the same space in its workspace viewport and starts with a compact dock on narrow screens when no preference is saved. An explicit saved choice still wins. Navigation updates when the dock changes size, including its compact and note-editor states, and disables link transitions for reduced motion.
+- A Chrome browser probe checks navigation visibility, hit targets, context links, and dock clearance at narrow phone, breakpoint, tablet, and desktop widths. The Pages workflow runs it with the other AV browser checks.
+
 ## 2026-09-25 — NoteForge canonical resync and an automated release sync
 
 - Canonical `noteforge/` is synced to NoteForge `392ed92` and then to the merge of NoteForge PR #7. It had served `becbffa` (2026-08-26) while the github.io mirror moved eight commits ahead, two of them changing alias resolution and folder-export reconciliation (NoteForge audit 2026-09-25, C.4).

@@ -79,6 +79,11 @@ jobs:
           CHROME_CHANNEL: chrome
         run: npm run test:av-save-safety-browser
 
+      - name: Verify AV navigation clearance
+        env:
+          CHROME_CHANNEL: chrome
+        run: npm run test:av-nav-browser
+
       - name: Verify ATEM switcher guide
         env:
           CHROME_CHANNEL: chrome
