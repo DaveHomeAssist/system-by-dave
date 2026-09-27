@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-09-27 — Camera work separated from FMP Walk
+
+- FMP Walk has five tabs: Setup, Walk, Faults, Report and Reference. The Camera tab and camera launch card are removed. Legacy camera links still forward to Camera Operator.
+- The ordered camera pack-down procedure and final equipment count now open Stow for manned camera positions. Existing saved stow checks and the separate PTZ procedure remain intact.
+
 ## 2026-09-27 — FMP Walk route and operator interface cleanup
 
 - The walk follows Ben Lobby, Ben Plaza, Pavilion, Lawn, Walt Plaza and Walt Lobby. Tower, the two outboard LEDs, four delay LEDs, Wall, EA Lounge VIP and Black Box VIP appear as stops inside their parent zones.
