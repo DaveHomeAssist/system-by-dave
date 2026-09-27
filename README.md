@@ -125,12 +125,19 @@ cross-repository deploy credential:
 ```bash
 npm run sync:noteforge -- --source /absolute/path/to/noteforge/dist --source-commit <40-character-commit>
 npm run verify:noteforge
+npm run test:noteforge-shell-browser
 ```
 
 The sync command accepts only a clean NoteForge checkout whose `HEAD` matches
 the supplied commit. It preserves the System by Dave breadcrumb and public
 navigation, removes only previously recorded build artifacts, and writes
 `noteforge/source_provenance.json` with deterministic artifact hashes.
+The host shell offsets the mobile toolbar below its breadcrumb even when
+NoteForge inserts a skip link between them. The browser probe checks real theme
+clicks and persistence, both skip links, focus and viewport clearance at 390px,
+680px and desktop in both themes and reduced-motion preferences. It runs on
+relevant pull requests and before Pages deployment. Set `CHROME_CHANNEL=chrome`
+to use installed Chrome and `NOTEFORGE_CAPTURE_DIR` to save screenshots and results.
 
 ## Portfolio governance
 

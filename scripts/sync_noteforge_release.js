@@ -31,7 +31,7 @@ const CANONICAL_SHELL_STYLE = `<style data-noteforge-sbd-shell>
   .sbd-site-return { box-sizing: border-box; height: 44px; }
   .sbd-site-return ~ .app { height: calc(100vh - 44px); }
   @media (max-width: 760px) {
-    .sbd-site-return + .mobile-bar { top: 44px; }
+    .sbd-site-return ~ .mobile-bar { top: 44px; }
     .sbd-site-return ~ .sidebar-backdrop { top: 44px; }
     .sbd-site-return ~ .app { height: calc(100vh - 92px); }
     .sbd-site-return ~ .app .sidebar { top: 44px; }

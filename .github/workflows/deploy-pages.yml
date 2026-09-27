@@ -104,6 +104,11 @@ jobs:
       - name: Verify NoteForge release contract
         run: npm run verify:noteforge
 
+      - name: Verify NoteForge host shell
+        env:
+          CHROME_CHANNEL: chrome
+        run: npm run test:noteforge-shell-browser
+
       - name: Verify AV Workbook
         run: |
           npm run typecheck:av-workbook
