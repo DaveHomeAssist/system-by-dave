@@ -1,0 +1,37 @@
+name: Verify NoteForge host shell
+
+on:
+  pull_request:
+    paths:
+      - 'noteforge/**'
+      - 'scripts/*noteforge*'
+      - 'css/sbd-public-nav.css'
+      - 'js/sbd-public-nav.js'
+      - 'package*.json'
+      - '.github/workflows/noteforge-shell.yml'
+      - '.github/workflows/deploy-pages.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  shell:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Verify release and public contracts
+        run: |
+          npm run verify:noteforge
+          npm run verify:public-navigation
+          npm run verify:public-consistency
+          npm run verify:indexing
+      - name: Verify mobile and desktop behavior
+        env:
+          CHROME_CHANNEL: chrome
+        run: npm run test:noteforge-shell-browser

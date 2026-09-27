@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-09-27 — NoteForge mobile controls clear the host navigation
+
+- The managed release wrapper now offsets NoteForge's mobile toolbar even when its native editor skip link sits between the toolbar and the System by Dave breadcrumb. Theme clicks remain reachable without removing either skip link.
+- A browser regression covers 390px, 680px and desktop, both themes with reload persistence, keyboard skips and focus, reduced motion and viewport clearance. Relevant pull requests and Pages deployment run this gate. The artifact is regenerated from the existing verified NoteForge source commit `8361ba30c671624c17ae10598aad6d66b98112f1`.
+
 ## 2026-09-26 — AV show dock navigation clearance
 
 - Tool navigation now moves above the show-context dock only when their horizontal bounds collide, then reserves enough scroll space for both controls. The fixed-height LED Wall Calculator reserves the same space in its workspace viewport and starts with a compact dock on narrow screens when no preference is saved. An explicit saved choice still wins. Navigation updates when the dock changes size, including its compact and note-editor states, and disables link transitions for reduced motion.
