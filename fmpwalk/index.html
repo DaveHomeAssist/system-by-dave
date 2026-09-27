@@ -337,6 +337,7 @@ select{appearance:none;background-image:linear-gradient(45deg,transparent 50%,va
 .rt .en{font-family:var(--mono);font-size:10px;color:var(--dim);flex:0 0 auto}
 .rt.here{background:var(--surface);border-color:var(--accent-line);color:var(--text);font-weight:620}
 .rt-hd{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;color:var(--dim);padding:0 11px 7px}
+.rt-stop{font-size:12px;font-weight:650;padding:8px 11px 2px;margin:0;color:var(--text)}
 .rt-zone{font-size:11.5px;font-weight:650;color:var(--muted);padding:15px 11px 6px;margin:0}
 
 /* ---------- tickets ---------- */
@@ -836,7 +837,7 @@ kbd{
   <h3>Naming</h3>
   <div class="note">Four levels: <b>official venue space → operational AV zone → map key → device ID.</b> Canonical names, never legacy shorthand. 🟢 The Head of Video endorsed this scheme unprompted, so it is department convention now.
   <br><br>🔴 <b>Do not expand</b> <span class="k">TC2</span> <span class="k">TC4</span> <span class="k">NBB</span> <span class="k">BB1</span> <span class="k">781</span> <span class="k">791</span>. They are location keys with no decodable scheme. Record them exactly as printed.
-  <br><br>⛔ <b>Black Box VIP, Black Box VIP Patio, and VIP Club are three separate spaces.</b> Never merge them on a ticket.</div>
+  <br><br><b>Black Box VIP:</b> 5 indoor TVs (4 seating-area ConcertVision and 1 menu behind the bar); no patio TVs. <b>EA Lounge VIP:</b> a Walt Plaza sub-stop with 6 TVs (4 bar menus and 2 seating-area ConcertVision).</div>
 
   <h3>Photography</h3>
   <div class="note warn">🟡 <b>Unresolved conflict.</b> The venue record says no photos or video inside. The documentation need is not permission. Clear it with the Head of Video or the venue steward once, then the photo field on every ticket stops being a question.</div>
@@ -867,6 +868,7 @@ kbd{
 
 <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
+<script src="./walk-core.js?v=6fbb136ba425a4d2"></script>
 <script>
 "use strict";
 
@@ -944,68 +946,11 @@ if(mqLight){
 }
 applyTheme();
 
-/* ══════════════════════ seed data ══════════════════════
-   Every value here is traceable to the FMP docs. Where the docs do not
-   establish a fact, the field is left blank and marked, never guessed.
-   ═══════════════════════════════════════════════════════ */
-
-var BOWL = [
-  {id:"FLK-SR",env:"A",kind:"led",name:"Stage right flanking wall",zone:"Pavilion",
-   spec:[["Ctrl","VX4S stage right"],["Pitch","10 mm"],["In2","DVI"]],base:"20%",level:false},
-  {id:"FLK-SL",env:"A",kind:"led",name:"Stage left flanking wall",zone:"Pavilion",
-   spec:[["Ctrl","VX4S stage left"],["Pitch","10 mm"],["In2","SDI"]],base:"20%",level:false},
-  {id:"DLY-1",env:"A",kind:"led",name:"Lawn delay wall 1",zone:"Lawn",
-   spec:[["Ctrl","VX4S lawn 1/2"],["Pitch","7 mm"],["In2","DVI"]],base:"20%",level:true},
-  {id:"DLY-2",env:"A",kind:"led",name:"Lawn delay wall 2",zone:"Lawn",
-   spec:[["Ctrl","VX4S lawn 1/2"],["Pitch","7 mm"],["In2","DVI"]],base:"20%",level:true},
-  {id:"DLY-3",env:"A",kind:"led",name:"Lawn delay wall 3",zone:"Lawn",
-   spec:[["Ctrl","VX4S lawn 3/4"],["Pitch","7 mm"],["In2","HDMI"]],base:"20%",level:true},
-  {id:"DLY-4",env:"A",kind:"led",name:"Lawn delay wall 4",zone:"Lawn",
-   spec:[["Ctrl","VX4S lawn 3/4"],["Pitch","7 mm"],["In2","HDMI"]],base:"20%",level:true}
-];
-
-/* IPs .20 to .23 are the documented range for the four MCTRL660 PRO units.
-   Which IP belongs to which unit is NOT established. Left blank on purpose. */
-var SPEC = [
-  {id:"SPC-TP",env:"C",kind:"spec",name:"Tower · primary",zone:"Building advertising LED",
-   spec:[["Plate","TOWER PRIMARY"],["Sticker","TOWER LEADER"]],base:"4%"},
-  {id:"SPC-TB",env:"C",kind:"spec",name:"Tower · backup",zone:"Building advertising LED",
-   spec:[["Plate","TOWER BACKUP"],["Sticker","TOWER FOLLOWER"]],base:"0% 🔴"},
-  {id:"SPC-WP",env:"C",kind:"spec",name:"Wall · primary",zone:"Building advertising LED",
-   spec:[["Plate","WALL PRIMARY"],["Sticker","WALL LEADER"]],base:"3%"},
-  {id:"SPC-WB",env:"C",kind:"spec",name:"Wall · backup",zone:"Building advertising LED",
-   spec:[["Plate","WALL BACKUP"],["Sticker","WALL FOLLOWER"]],base:"3%"}
-];
-
-/* The 21 enumerated ConcertVision positions, grouped as they are named.
-   Device IDs are not established for these positions, so they are captured, not assumed. */
-var CV = [
-  {id:"CV-WWL-ED",zone:"Walt Whitman Lobby",key:"ENTRANCE DOORS",qty:4},
-  {id:"CV-WWL-CA",zone:"Walt Whitman Lobby",key:"CAROUSEL",qty:3},
-  {id:"CV-WWL-MR",zone:"Walt Whitman Lobby",key:"MERCH",qty:2},
-  {id:"CV-BFL-CA",zone:"Ben Franklin Lobby",key:"CAROUSEL",qty:4,note:"🔵 Fourth unit not yet identified in the inventory."},
-  {id:"CV-BFL-MR",zone:"Ben Franklin Lobby",key:"MERCH",qty:2},
-  {id:"CV-WWP-EA",zone:"Walt Whitman Plaza",key:"EA BAR LOUNGE",qty:2},
-  {id:"CV-VIP-ST",zone:"VIP Club",key:"STREET SIDE",qty:2,note:"🟡 Legacy key reads VIP. Confirm on foot whether this is VIP Club or Black Box VIP. They are separate spaces."},
-  {id:"CV-VIP-LB",zone:"VIP Club",key:"LOBBY SIDE",qty:2,note:"🟡 Legacy key reads VIP. Confirm the space on foot."}
-];
-
-/* Tier 2 zones. Counts are deliberately unknown: recording them is the point. */
-var TIER2 = [
-  {id:"BLK-WWL",name:"Walt Whitman Lobby",hint:"🔵 Count on foot. Concentration of unkeyed Videri positions."},
-  {id:"BLK-WWP",name:"Walt Whitman Plaza",hint:"🔵 Count on foot. Videri units here are indoor-rated hardware sitting outdoors."},
-  {id:"BLK-BFL",name:"Ben Franklin Lobby",hint:"🔵 Count on foot. Concentration of unkeyed Videri positions."},
-  {id:"BLK-BFP",name:"Ben Franklin Plaza",hint:"⚠️ Source sheet duplicated two rows here, 8 units. Recount settles it."},
-  {id:"BLK-LWN",name:"Lawn",hint:"🔴 Hard deadline Oct 15. After changeover the lawn is cut off until spring."},
-  {id:"BLK-VIP",name:"Black Box VIP · Patio · VIP Club",hint:"⛔ Three separate spaces. Record them separately, never merged."},
-  {id:"BLK-BST",name:"Backstage and admin",hint:"🔵 The dressing room and admin SDI branch. Documented, not yet walked end to end."},
-  {id:"BLK-CON",name:"Concessions · WALT CON recount",hint:"🚨 WALT CON states qty 16 against an ID range covering 14. This recount settles the site total."}
-];
-
-/* Optional area requested by the operator. Room/device totals are not yet established. */
-var DRESSING = {id:"DR-ROOMS",env:"B",kind:"tv",name:"Dressing Rooms",zone:"Dressing Rooms",
-  hint:"Record room names and display counts on foot. No room or device count is assumed. The broader Backstage and admin check is separate; note any overlap rather than treating the two counts as additive.",
-  spec:[["Feed","Dressing room SDI branch"],["Count","record on foot"]]};
+var knownStation = FMPWalkCore.knownStation;
+var visualItems = FMPWalkCore.visualItems;
+var positionLabel = FMPWalkCore.positionLabel;
+var zoneLabel = FMPWalkCore.zoneLabel;
+var prepareMeta = FMPWalkCore.prepareMeta;
 
 var SYM = {
   led:["Wall dark","Dead cabinet","Dead module","Brightness mismatch","Colour shift","Scan or refresh artifact","Scaling wrong","No signal or wrong input","Not level","Flicker or power sag","Water ingress","Data run fault"],
@@ -1107,128 +1052,11 @@ function paintSaveState(){
   el.style.color = STORAGE_OK ? "" : "var(--red)";
 }
 
-/* ══════════════════════ station builder ══════════════════════ */
-var PRIMARY_ZONE_ORDER = ["Pavilion","Lawn","Building advertising LED","Walt Whitman Lobby","Walt Whitman Plaza","Ben Franklin Lobby","VIP Club"];
-var ZONE_ORDER = PRIMARY_ZONE_ORDER.concat(["Ben Franklin Plaza","Black Box VIP · Patio · VIP Club","Backstage and admin","Concessions · WALT CON recount","Dressing Rooms"]);
-function visualItems(s){
-  if(s.kind !== "led") return [];
-  var items = [
-    {key:"powered",label:"Powered and showing content"},
-    {key:"brightness",label:"Brightness matches the partner wall by eye"},
-    {key:"modules",label:"No dead cabinets or modules"},
-    {key:"colour",label:"No colour shift across the display"}
-  ];
-  if(s.level) items.push({key:"level",label:"Level against the fixed horizontal reference"});
-  return items;
-}
-function positionLabel(s){
-  return s.name + (s.key ? " · " + s.key : "");
-}
-function zoneLabel(zone){
-  return zone === "Building advertising LED" ? "Building spectaculars" : zone;
-}
-function cvStation(c){
-  return {id:c.id,env:"B",kind:"tv",tier:1,name:c.zone,zone:c.zone,key:c.key,qty:c.qty,note:c.note,
-    spec:[["Key",c.key],["Positions",String(c.qty)],["Tech","ConcertVision DMP, wired HDMI"]]};
-}
-function tier2Station(item){
-  return {id:item.id,env:"B",kind:"tv",tier:2,name:item.name,zone:item.name,hint:item.hint,
-    spec:[["Tier","2"],["Count","record on foot"]]};
-}
-function knownStation(id){
-  return BOWL.concat(SPEC,CV,TIER2,[DRESSING]).some(function(item){ return item.id === id; });
-}
-/* One-time compatibility only: find the operator's current station in saves made
-   before the all-zones route, then discard the old selector value. */
-function previousRoute(meta){
-  var m = meta || {}, checks = m.checks || null, sections = m.sections || {};
-  var out = [];
-  BOWL.forEach(function(s){ if(!(m.cfg === "winter" && s.zone === "Lawn")) out.push(s); });
-  SPEC.forEach(function(s){ out.push(s); });
-  CV.forEach(function(s){ out.push(cvStation(s)); });
-  out.push(DRESSING);
-  var selected = TIER2.find(function(item){ return item.id === m.block; });
-  if(selected && !(m.cfg === "winter" && selected.id === "BLK-LWN")) out.push(tier2Station(selected));
-  function enabled(s){
-    if(checks && typeof checks[s.id] === "boolean") return checks[s.id];
-    if(s.id === DRESSING.id) return false;
-    if(BOWL.some(function(item){ return item.id === s.id; })) return sections.bowl !== false;
-    if(SPEC.some(function(item){ return item.id === s.id; })) return sections.spec !== false;
-    if(CV.some(function(item){ return item.id === s.id; })) return sections.cv !== false;
-    return sections.tier2 !== false;
-  }
-  var filtered = out.filter(enabled);
-  if(!checks) return filtered;
-  var oldOrder = ["Pavilion","Lawn","Building advertising LED","Walt Whitman Lobby","Walt Whitman Plaza",
-    "Ben Franklin Lobby","Ben Franklin Plaza","VIP Club","Black Box VIP · Patio · VIP Club","Dressing Rooms","Backstage and admin","Concessions · WALT CON recount"];
-  return oldOrder.flatMap(function(zone){
-    return filtered.filter(function(s){ return s.zone === zone; });
-  });
-}
-function prepareMeta(meta){
-  var m = Object.assign({date:"",show:"",op:"",cfg:"summer"}, meta);
-  var legacy = m.sections || {};
-  // Keep exclusions at check level so a legacy mixed zone is not silently expanded.
-  m.checks = Object.assign({}, m.checks);
-  [[BOWL,"bowl"],[SPEC,"spec"],[CV,"cv"]].forEach(function(group){
-    group[0].forEach(function(s){
-      if(typeof m.checks[s.id] !== "boolean") m.checks[s.id] = legacy[group[1]] !== false;
-    });
-  });
-  TIER2.forEach(function(s){ delete m.checks[s.id]; });
-  // New optional coverage must not silently change a saved route or its completion.
-  if(typeof m.checks[DRESSING.id] !== "boolean") m.checks[DRESSING.id] = false;
-  delete m.sections;
-  delete m.block;
-  delete m.nextBlock;
-  delete m.rotationBlock;
-  return m;
-}
-function restoreWalk(o){
-  var oldPolicy = Object.prototype.hasOwnProperty.call(o.meta,"block") ||
-    TIER2.some(function(s){ return o.meta.checks && Object.prototype.hasOwnProperty.call(o.meta.checks,s.id); });
-  var oldRoute = oldPolicy ? previousRoute(o.meta) : [];
-  var oldCurrent = oldPolicy ? oldRoute[o.idx] : null;
-  var oldComplete = oldPolicy && oldRoute.length > 0 && o.idx >= oldRoute.length;
-  S.meta = prepareMeta(o.meta);
-  S.res = o.res || {}; S.faults = o.faults || []; S.draft = o.draft || null;
-  S.idx = Math.max(0, Number.isInteger(o.idx) ? o.idx : 0);
-  S.faults.forEach(function(fault){
-    if(fault.station && knownStation(fault.station) && !(S.res[fault.station] || {}).status){
-      var result = S.res[fault.station] || {};
-      result.status = "flag"; result.ts = fault.ts || new Date().toISOString();
-      S.res[fault.station] = result;
-    }
-  });
-  if(oldPolicy){
-    S.idx = oldCurrent ? stations().findIndex(function(s){ return s.id === oldCurrent.id; }) : oldComplete ? stations().length : 0;
-  }
-  S.idx = Math.min(S.idx, stations().length);
-}
-function availableStations(){
-  var out = [], m = S.meta;
-  for(var i=0;i<BOWL.length;i++){
-    var w = BOWL[i];
-    if(m.cfg === "winter" && w.zone === "Lawn") continue;
-    out.push(w);
-  }
-  for(var j=0;j<SPEC.length;j++) out.push(SPEC[j]);
-  for(var k=0;k<CV.length;k++) out.push(cvStation(CV[k]));
-  out.push(DRESSING);
-  for(var q=0;q<TIER2.length;q++) out.push(tier2Station(TIER2[q]));
-  return out;
-}
-function zoneGroups(){
-  var available = availableStations();
-  return ZONE_ORDER.map(function(zone){
-    return {zone:zone,checks:available.filter(function(s){ return s.zone === zone; })};
-  }).filter(function(group){ return group.checks.length; });
-}
-function stations(){
-  return zoneGroups().flatMap(function(group){
-    return group.checks.filter(function(s){ return s.tier === 2 || S.meta.checks[s.id]; });
-  });
-}
+/* Route adapters keep UI state out of the shared core. */
+function restoreWalk(saved){ FMPWalkCore.restoreWalk(S, saved); }
+function availableStations(){ return FMPWalkCore.availableStations(S.meta); }
+function zoneGroups(){ return FMPWalkCore.zoneGroups(S.meta); }
+function stations(){ return FMPWalkCore.stations(S.meta); }
 
 /* ══════════════════════ rendering ══════════════════════ */
 function esc(s){
@@ -1284,6 +1112,7 @@ function renderRoute(){
   for(var i=0;i<st.length;i++){
     var r = S.res[st[i].id] || {};
     if(i === 0 || st[i].zone !== st[i-1].zone) h += '<h3 class="rt-zone">' + esc(zoneLabel(st[i].zone)) + '</h3>';
+    if(st[i].stop && (i === 0 || st[i].stop !== st[i-1].stop)) h += '<h4 class="rt-stop">' + esc(st[i].stop) + '</h4>';
     h += '<button type="button" class="rt' + (i === S.idx ? " here" : "") + '"' +
       (i === S.idx ? ' aria-current="step"' : "") +
       (r.status ? ' data-s="' + r.status + '"' : "") + ' data-i="' + i + '">' +
@@ -1348,7 +1177,7 @@ function renderWalk(){
   var s = st[S.idx], r = S.res[s.id] || {};
   var h = resumeBanner();
 
-  h += '<div class="card"><div class="walk-zone">' + esc(zoneLabel(s.zone)) + '</div><div class="card-hd"><h4>' + esc(s.name) + '</h4>' + envTag(s.env) + '</div>';
+  h += '<div class="card"><div class="walk-zone">' + esc(zoneLabel(s.zone)) + (s.stop ? " · " + esc(s.stop) : "") + '</div><div class="card-hd"><h4>' + esc(s.name) + '</h4>' + envTag(s.env) + '</div>';
 
   if(s.spec && s.spec.length){
     h += '<div class="spec">';
@@ -1734,6 +1563,7 @@ function buildReport(){
   o.push("> Route: all zones");
   o.push("> Rotation Block: All zones");
   o.push("> Zones: " + (Array.from(new Set(st.map(function(s){ return zoneLabel(s.zone); }))).map(mdLine).join(" → ") || "none selected"));
+  o.push("> Special stops: " + Array.from(new Set(st.filter(function(s){ return s.stop; }).map(function(s){ return zoneLabel(s.zone) + " / " + s.stop; }))).map(mdLine).join(" → "));
   o.push("");
   o.push("---");
   o.push("");
@@ -1754,6 +1584,18 @@ function buildReport(){
       (read.length ? mdCell(read.join(", ")) : "n/a") + " | " + mdCell(s.base || "n/a") + " |");
   }
   o.push("");
+
+  var historical = FMPWalkCore.historicalReadings(S);
+  if(historical.length){
+    o.push("## Historical VIP readings", "", "> These records used older, uncertain or combined VIP scopes. They are retained as recorded and do not confirm the five indoor Black Box TVs or any patio inventory.", "");
+    historical.forEach(function(entry){
+      var old = entry.station, result = entry.result;
+      o.push("- **" + mdLine(positionLabel(old)) + "** (" + old.id + "): " + mdLine(result.status || "not checked") +
+        (result.count ? " · recorded count " + mdLine(result.count) : "") +
+        (result.note ? " · " + mdLine(result.note) : ""));
+    });
+    o.push("");
+  }
 
   var visualStations = st.filter(function(s){ return visualItems(s).length; });
   if(visualStations.length){

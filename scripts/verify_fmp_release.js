@@ -31,7 +31,7 @@ const releases = [
       'rig/vendor/three/three.module.js', 'rig/vendor/three/three.core.js', 'rig/vendor/three/addons/controls/OrbitControls.js'
     ]
   },
-  { directory: 'fmpwalk', mode: 'local-first', expected: ['index.html', 'email.js', 'mail.js', 'photos.js', 'notion.js', 'notion-config.js'] }
+  { directory: 'fmpwalk', mode: 'local-first', expected: ['index.html', 'walk-core.js', 'email.js', 'mail.js', 'photos.js', 'notion.js', 'notion-config.js'] }
 ];
 // The report sender is the only address the public FMP releases may carry.
 const ALLOWED_EMAILS = ['avbydave@gmail.com'];
