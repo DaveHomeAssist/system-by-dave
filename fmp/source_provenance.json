@@ -1,7 +1,7 @@
 {
   "schema": "fmp.public.release.v2",
   "sourceRepository": "DaveHomeAssist/fmp-suite",
-  "sourceCommit": "bac21c5aa4422056defc0a651f3808ce1705c6b8",
+  "sourceCommit": "7d99d010749461a175794266a50fa45eb8ac848d",
   "mode": "commissioning",
   "files": {
     "build/index.html": "86a7b9a77e82f0a8d7b15283e897d101849a8de15c841938296e2cc39c596951",
