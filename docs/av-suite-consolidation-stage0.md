@@ -2,9 +2,9 @@
 
 **State:** In progress, 2026-09-23. The release sequence and acceptance criteria remain in the [consolidation specification](av-suite-consolidation-spec.md). No legacy route or saved record has been retired.
 
-## Current source snapshot
+## Source snapshot as of 2026-09-23
 
-The canonical `js/sbd-registry.js` currently has 45 tools and 60 declared local-storage keys. The proposal's 44-tool/59-key table describes its earlier baseline. `led-wall-calculator` is the added tool; it remains directly reachable at `led-wall-calculator.html` while its eventual Video or contextual-specialist home is evaluated. The registry remains the inventory source; this document records audit exceptions and proof rather than copying its full tool list.
+The canonical `js/sbd-registry.js` had 45 tools and 60 declared local-storage keys at this snapshot. The proposal's 44-tool/59-key table describes its earlier baseline. `led-wall-calculator` is the added tool; it remains directly reachable at `led-wall-calculator.html` while its eventual Video or contextual-specialist home is evaluated. The registry and [generated inventory](av-suite-consolidation-inventory.md) remain the current-count sources; this document records audit exceptions and proof rather than copying their full tool list.
 
 All AV registry routes are published from `DaveHomeAssist/system-by-dave` to `avbydave.com` by `scripts/domain-sites.json` and `scripts/stage_domain_sites.mjs`. `av-suite.html` remains the stable Show Console and Toolbox doorway, and `av-suite-landing2.html` supplies the domain root. No workspace may treat URL show hints as permission to change a saved workbook.
 
