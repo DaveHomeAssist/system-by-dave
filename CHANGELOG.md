@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-09-28 — AV Suite development asset reconciliation
+
+- Indexed the canonical AV source, generated tool inventory, migration documents, gear and FMP source boundaries, release checks, and historical external candidates.
+- Clarified that the consolidation spec's 44-tool table is a dated baseline and Stage 0's 45-tool count is a snapshot; the registry and generated inventory own the current count.
+
 ## 2026-09-27 — FMP Walk route and operator interface cleanup
 
 - The walk follows Ben Lobby, Ben Plaza, Pavilion, Lawn, Walt Plaza and Walt Lobby. Tower, the two outboard LEDs, four delay LEDs, Wall, EA Lounge VIP and Black Box VIP appear as stops inside their parent zones.
