@@ -49,7 +49,7 @@ The feature text and declared keys come from the registry. Export, print, and ke
 | **Load In Plan** — Trucks, docks, destinations, departments, items, owners, due times, build status, blockers, and gaps. | `/load-in-plan.html` | https://avbydave.com | load-in-plan.v1 | Source signal | Source signal | Source signal | Named |
 | **Strike Plan** — Departments, strike items, locations, owners, case IDs, destinations, load out status, missing gear, and issues. | `/strike-plan.html` | https://avbydave.com | strike-plan.v1 | Source signal | Source signal | Source signal | Named |
 | **AV Calculator** — Audio delay, projection throw, record storage, power load, voltage drop, and SPL distance with a copyable field summary. | `/av-calculator.html` | https://avbydave.com | avCalculator.v1 | Source signal | Not found | Not found | Named |
-| **LED Wall Calculator** — Cabinet-aware wall geometry, native raster, content fit, processor port, viewing, and power planning. | `/led-wall-calculator.html` | https://avbydave.com | avCalculator.ledProfiles.v1 | Source signal | Not found | Not found | Named |
+| **LED Wall Calculator** — Cabinet-aware wall geometry, native raster, content fit, processor port, viewing, and power planning. | `/led-wall-calculator.html` | https://avbydave.com | avCalculator.ledProfiles.v1; working state in avCalculator.v1 (declared under av-calculator) | Source signal | Not found | Not found | Named |
 | **OnTrack** — DJ set intelligence — rekordbox library import, planned vs played sets, tags, and per-track debrief notes. | `/ontrack.html` | https://avbydave.com | ontrack_v1 | Source signal | Not found | Source signal | Named |
 
 **Count:** 45 registry tools; 60 declared local-storage keys.
@@ -57,6 +57,6 @@ The feature text and declared keys come from the registry. Export, print, and ke
 ## Unresolved mapping and proof
 
 - Inspect each source signal in its full script and perform keyboard, print, export, and offline browser checks. The table is a source inventory, not completion of those gates.
-- Audit undeclared storage keys and databases across every route. Show Board and Workbook are confirmed exceptions listed above; other exceptions remain to be determined.
+- Audit undeclared storage keys and databases across every route. Show Board, Workbook, and LED Wall Calculator are confirmed exceptions listed above; the Video-slice source audit is recorded in `docs/av-suite-consolidation-stage2-video.md`, and other exceptions remain to be determined.
 - Prove backup and restore for every saved store, including destination conflicts, before retiring any route.
-- Confirm the eventual workspace treatment of LED Wall Calculator and the operator-visible field mapping for each migration.
+- Confirm the operator-visible field mapping for each migration. LED Wall Calculator's recommended home is a contextual specialist launched from Video › Displays & Projection (Stage 2 plan, D6).

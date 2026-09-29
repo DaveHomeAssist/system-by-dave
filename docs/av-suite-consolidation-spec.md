@@ -2,7 +2,7 @@
 
 **Status:** Proposed product and migration specification, 2026-09-23. This document describes the target experience and delivery gates; it does not claim that the remaining workspaces are implemented. The equipment-model pilot described below is already live.
 
-**Implementation note, 2026-09-23:** This specification records a 44-tool baseline. At the Stage 0 snapshot the registry had 45 tools and 60 declared storage keys because `led-wall-calculator` was added after that baseline. See the [development assets index](av-suite-development-assets-index.md), [generated inventory](av-suite-consolidation-inventory.md), and [Stage 0 migration record](av-suite-consolidation-stage0.md) for current source and open gates; the new tool's eventual workspace treatment remains undecided.
+**Implementation note, 2026-09-23:** This specification records a 44-tool baseline. At the Stage 0 snapshot the registry had 45 tools and 60 declared storage keys because `led-wall-calculator` was added after that baseline. See the [development assets index](av-suite-development-assets-index.md), [generated inventory](av-suite-consolidation-inventory.md), and [Stage 0 migration record](av-suite-consolidation-stage0.md) for current source and open gates. The [Stage 2 Video plan](av-suite-consolidation-stage2-video.md) recommends a home for the new tool (decision D6) and orders the Video work.
 
 **Baseline:** `DaveHomeAssist/system-by-dave` main after the focused FMP viewer release. The registry listed 44 tools when this spec was drafted; see the [development assets index](av-suite-development-assets-index.md) and [generated inventory](av-suite-consolidation-inventory.md) for the current count. The deployed AV origin is `avbydave.com`; `av-suite.html` remains the stable doorway. This spec updates the earlier [Tool Index v2](../av-tool-suite/index-v2/index.html), which mapped 25 named legacy tools as a conceptual directory. The 44-tool disposition below is a dated baseline; newly registered tools need an explicit home before navigation cutover.
 
@@ -85,6 +85,8 @@ Every registry ID in the 44-tool baseline has one primary home below. Newer entr
 | Contextual specialists | `pixelforge`, `throwline`, `stageplotter`, `av-calculator`, `ontrack` | 5 | Retain focused applications and deep-link from relevant workspaces. |
 | **Total** |  | **44** | |
 
+**Added after the baseline:** `led-wall-calculator`, recommended home *Contextual specialists*. It is launched from Video › Displays & Projection and kept in Calculators, because it holds one scenario and no show data. This is a recommendation from the [Stage 2 Video plan](av-suite-consolidation-stage2-video.md), not yet confirmed by Dave.
+
 `av-tool-suite/index-v2/` remains a historical concept page until this specification is implemented. Do not present it as a second live operating suite.
 
 ## Workspace behavior contracts
@@ -150,7 +152,7 @@ The Audio importer is the pilot for this contract. Stage 0 added preview, backup
 | --- | --- | --- |
 | 0. Inventory | Feature, route, storage, origin, export, and offline matrix for every registered entry; fix inventory gaps. | Every saved store has a tested backup/recovery path; unresolved mappings are listed. |
 | 1. Equipment pilot | Four FMP camera-chain sheets use the existing model and evidence; Show Console bridge uses valid context. **Shipped as an interim bridge.** | Live component selection, source provenance, no-network fallback, responsive/keyboard checks. |
-| 2. Video | Direct Video entry and editable camera, playback, route/switching, display/projection, stream, and record views. | All eight Video registry capabilities stay directly reachable; representative camera-to-screen, camera-to-stream/record, and playback-to-display paths retain status, backup, and export details. |
+| 2. Video | Direct Video entry and editable camera, playback, route/switching, display/projection, stream, and record views. Increments, entry gate, and execution briefs: [Stage 2 Video plan](av-suite-consolidation-stage2-video.md). | All eight Video registry capabilities stay directly reachable; representative camera-to-screen, camera-to-stream/record, and playback-to-display paths retain status, backup, and export details. |
 | 3. Audio | Editable sources, patches, line checks, PA, RF/comms task views and safe imports. | Field/status/export parity for the first three audio pages; repeat import and rollback pass. |
 | 4. Logistics | One case/item flow across prep, pack, load in, cable, and strike. | Counts and status transitions reconcile with each legacy page; lost-item and partial-pack scenarios pass. |
 | 5. Infrastructure | Power, network, and lighting views with explicit technical checks. | Each specialist's distinct fields, checks, and exports remain usable. |
@@ -180,6 +182,7 @@ A stage is shipped independently, behind a reversible navigation change. Do not 
 ## Source map
 
 - Current routes and keys: `js/sbd-registry.js`; doorway behavior: [AV Suite Doorway](av-suite-doorway.md).
+- Stage 2 increments, Video-slice source audit, and field matrix: [Stage 2 Video plan](av-suite-consolidation-stage2-video.md).
 - Workbook entities, storage, and importer: `apps/av-workbook/src/types.ts`, `store.ts`, `App.tsx`, and `legacyAudioImport.ts`.
 - Equipment and evidence: [Gear Reference](gear-reference-contract.md), [FMP model catalog](fmp-model-catalog-contract.md), [FMP public release](fmp-public-release.md).
 - Domain transfer and publication: [Domain sites](domain-sites.md), `scripts/domain-sites.json`.

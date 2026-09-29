@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-09-29 — AV Suite Stage 2 (Video) phase prepared
+
+- Added `docs/av-suite-consolidation-stage2-video.md`. It covers the Video slice (the eight Video tools and LED Wall Calculator) with a source audit, a field matrix for a future Video import, eight recommended decisions, seven increments with exit gates, and execution briefs for the first two increments. No page behavior changed.
+- The audit found defects that later increments fix:
+  - the show-context operator hint spreads into other name fields on repeat visits;
+  - six tool pages seed samples in a way the existing CI rule misses;
+  - load-time normalization rewrites blanks and durations;
+  - single-key shortcuts intercept Cmd/Ctrl+P;
+  - legacy imports replace data without confirmation;
+  - the AV Workbook abandons a workbook it cannot load.
+- The generated inventory now lists LED Wall Calculator's working state in `avCalculator.v1` as a known exception. The specification, Stage 0 record and development assets index point to the plan and record the recommended contextual-specialist home for LED Wall Calculator.
+
 ## 2026-09-28 — AV Suite development asset reconciliation
 
 - Indexed the canonical AV source, generated tool inventory, migration documents, gear and FMP source boundaries, release checks, and historical external candidates.
