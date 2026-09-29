@@ -1028,11 +1028,13 @@ function fitSelected(){if(selected)selectPart(selected,true);}
 function setTouchRotation(active,announce=true){
   touchRotation=Boolean(active);root.dataset.gestures=String(touchRotation);
   const toggle=$('[data-gesture-toggle]');toggle.setAttribute('aria-pressed',String(touchRotation));toggle.textContent=`Touch rotation: ${touchRotation?'on':'off'}`;
-  $('[data-touch-help]').textContent=touchRotation?'Touch rotation is on. Drag or pinch the model. Turn it off to restore browser gestures over the model.':'Touch: tap a part. Turn on touch rotation in Views to drag or pinch the model. Browser gestures remain available while it is off.';
+  $('[data-touch-help]').textContent=touchRotation?'Touch rotation is on. Drag or pinch the model. Turn it off in Views to scroll the page by swiping over the model.':'Touch: tap a part. Turn on touch rotation in Views to drag or pinch the model. Browser gestures remain available while it is off.';
   if(announce)$('[data-announcement]').textContent=touchRotation?'Touch rotation on. Drag or pinch the model.':'Touch rotation off. Swipe to scroll the page.';
 }
 setNdPosition(1);restoreSelection();resize();
-setTouchRotation(false,false);
+// Phones and tablets start with touch rotation on (Dave, September 29); Views and Escape still
+// turn it off. iPadOS reports a desktop browser, so this checks the screen, not the browser name.
+setTouchRotation(navigator.maxTouchPoints>0||window.matchMedia('(pointer: coarse)').matches,false);
 resizeObserver=new ResizeObserver(resize);resizeObserver.observe(stage);
 themeObserver=new MutationObserver(()=>{highlight=themeColor('--blue');updateHighlight();});themeObserver.observe(document.documentElement,{attributes:true,attributeFilter:['class','style','data-theme']});
 visibilityObserver=new IntersectionObserver(entries=>{suspended=!entries[0].isIntersecting;if(!suspended)requestDraw();});visibilityObserver.observe(stage);
