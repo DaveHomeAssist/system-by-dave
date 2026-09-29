@@ -22,7 +22,8 @@ const routeFile = href => path.join(root, href.endsWith('/') ? href + 'index.htm
 const signal = (source, regex) => regex.test(source) ? 'Source signal' : 'Not found';
 const exceptionStores = {
   'av-workbook': 'IndexedDB system-by-dave-av-workbook / workbooks',
-  'show-board': 'localStorage prefix sbd.showboard. (index, show.*, snapshots.*)'
+  'show-board': 'localStorage prefix sbd.showboard. (index, show.*, snapshots.*)',
+  'led-wall-calculator': 'working state in avCalculator.v1 (declared under av-calculator)'
 };
 
 const lines = [
@@ -50,9 +51,9 @@ for (const tool of registry.tools) {
 lines.push('', `**Count:** ${registry.tools.length} registry tools; ${registry.tools.reduce((sum, tool) => sum + tool.storageKeys.length, 0)} declared local-storage keys.`, '',
   '## Unresolved mapping and proof', '',
   '- Inspect each source signal in its full script and perform keyboard, print, export, and offline browser checks. The table is a source inventory, not completion of those gates.',
-  '- Audit undeclared storage keys and databases across every route. Show Board and Workbook are confirmed exceptions listed above; other exceptions remain to be determined.',
+  '- Audit undeclared storage keys and databases across every route. Show Board, Workbook, and LED Wall Calculator are confirmed exceptions listed above; the Video-slice source audit is recorded in `docs/av-suite-consolidation-stage2-video.md`, and other exceptions remain to be determined.',
   '- Prove backup and restore for every saved store, including destination conflicts, before retiring any route.',
-  '- Confirm the eventual workspace treatment of LED Wall Calculator and the operator-visible field mapping for each migration.', '');
+  '- Confirm the operator-visible field mapping for each migration. LED Wall Calculator\'s recommended home is a contextual specialist launched from Video › Displays & Projection (Stage 2 plan, D6).', '');
 
 const output = lines.join('\n');
 if (process.argv.includes('--check')) {
