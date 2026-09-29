@@ -3,7 +3,7 @@
 ## 2026-09-29 — FMP rig touch rotation starts on for touch screens
 
 - The 3D rig explorer (`/fmp/rig/`) now starts with touch rotation on for phones and tablets (Dave, 2026-09-29). A one-finger drag rotates the model and a pinch zooms it without opening Views. Touch screens are detected by touch points or a coarse pointer because iPadOS reports a desktop browser. Mouse-only screens still start with it off. The Views toggle or Escape turns it off, which gives page scrolling back over the model.
-- Re-exported from fmp-suite `99215e6` (DaveHomeAssist/fmp-suite#34). fmp-suite's unit test and public browser suite cover the mouse-only, phone and iPad-as-Mac defaults, with a real one-finger touch drag. Not tested on a physical phone or iPad.
+- Re-exported from fmp-suite `7ac2ca7`, the merge of DaveHomeAssist/fmp-suite#34. fmp-suite's unit test and public browser suite cover the mouse-only, phone and iPad-as-Mac defaults, with a real one-finger touch drag. Not tested on a physical phone or iPad.
 
 ## 2026-09-28 — AV Suite development asset reconciliation
 
