@@ -23,9 +23,19 @@ Synthetic browser acceptance now covers a workbook with a show, signal source, p
 - A real-shape Show Board fixture now covers the index, show record, and snapshot record under `sbd.showboard.*`. Browser acceptance checks transfer, source retention, destination load, and downloadable backup restoration.
 - A registry-derived synthetic browser fixture now checks direct transfer and backup restoration for all 60 declared AV local-storage keys plus a dynamic handoff key. This proves policy coverage for those keys, not that every tool accepts a generic fixture as a valid saved document.
 
+## Video-slice source audit (2026-09-29)
+
+The nine Video-slice routes (the eight Video tools and LED Wall Calculator) were audited at source against `c21ce22`. The audit covered storage (including undeclared keys), persisted shape, normalization, export, print, import, show context, and keyboard. The [Stage 2 Video plan](av-suite-consolidation-stage2-video.md) records the results: twelve defects (V0-1 to V0-12) and the field matrix that a Video import must satisfy. Several defects extend beyond the Video pages:
+
+- the show-context operator hint cascades into other name fields;
+- six pages seed samples in a way the existing CI rule misses;
+- the Workbook abandons a workbook it cannot load.
+
+LED Wall Calculator's working state in `avCalculator.v1` is now listed as a known exception in the generated inventory. Source inspection for these nine routes is complete. The browser proof and the fixes are increments 2.0a and 2.0b of that plan.
+
 ## Open Stage 0 gates
 
-- Inspect route source signals and undeclared keys, prefixes, and databases for all 45 tools; prove exports, print, keyboard, and offline behavior in browsers. The generated matrix does not establish parity.
+- Inspect route source signals and undeclared keys, prefixes, and databases for all 45 tools; prove exports, print, keyboard, and offline behavior in browsers. The generated matrix does not establish parity. Source inspection is done for the nine Video-slice routes; their browser proof is Stage 2 increment 2.0b.
 - Audit every saved store's backup and recovery path, including cases where a destination already has a blank or edited Workbook. A record copied into IndexedDB is not proof that the active Workbook will switch to it.
 - Complete a field-by-field legacy Audio mapping and conflict review. The current preview reports known unmapped structured fields, but arbitrary unknown source fields and record-level conflicts need a complete audit before the old pages can be retired. Test repeat import and rollback through the UI.
 - Keep every old route and specialist state contract available until field and export parity, browser proof, and operator acceptance are recorded for its replacement.
