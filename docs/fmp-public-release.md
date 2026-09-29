@@ -198,9 +198,16 @@ ultrawide screens widen the model while instructions keep a readable measure.
 Selection links such as `?equipment=rig&part=nd-filter` open a component
 directly. The skip link focuses the Component panel, which carries
 `tabindex="0"` so keyboard users can reach and scroll it. Native component selection, visible keyboard focus,
-44px controls, non-drag rotation/tilt/zoom buttons, optional touch gestures and
+44px controls, non-drag rotation/tilt/zoom buttons, touch gestures and
 reduced-motion behavior provide alternate ways to operate the model. The rig
 uses the suite theme preference below and the local Three.js runtime.
+
+Since September 29, 2026 (Dave), touch rotation starts on for touch screens:
+phones and tablets, detected by touch points or a coarse pointer because iPadOS
+reports a desktop browser. One-finger drag rotates and pinch zooms the model
+without opening Views first. Mouse-only screens still start with it off. The
+Views toggle and Escape turn it off, which gives page scrolling back over the
+model.
 
 The new body-control photograph is an allowlisted WebP reference. No operational
 records, backend changes, new storage keys or service worker are part of this
