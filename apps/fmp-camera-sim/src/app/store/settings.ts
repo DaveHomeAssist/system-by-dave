@@ -1,6 +1,7 @@
 import { defaultCameraProfile, parseCameraProfile, type CameraProfile } from "../../domain/camera";
 import { type ShowPackage } from "../../domain/structures";
 import {
+  MONITOR_DELAY_LIMIT_MS,
   defaultSession,
   type ExerciseSettings,
   type GuidePreferences,
@@ -126,6 +127,19 @@ export class SettingsController {
     this.core.emit();
   }
 
+  /** Simulated head-to-monitor delay, milliseconds, clamped to what the delay line holds. */
+  setMonitorDelay(ms: number): void {
+    const session = this.core.project.session;
+    const monitorDelayMs = Math.round(Math.min(Math.max(Number.isFinite(ms) ? ms : 0, 0), MONITOR_DELAY_LIMIT_MS));
+    if (monitorDelayMs === session.preferences.monitorDelayMs) return;
+    this.core.project = {
+      ...this.core.project,
+      session: { ...session, preferences: { ...session.preferences, monitorDelayMs } },
+    };
+    this.persistence.scheduleSave();
+    this.core.emit();
+  }
+
   // Resets keep the profile's identity: the session and every stored preset refer to it by id.
   resetVenue(): UpdateResult {
     const result = this.updateVenue({ ...defaultVenueProfile(), id: this.core.project.venue.id });
@@ -154,6 +168,7 @@ export class SettingsController {
     this.core.project = { ...this.core.project, session };
     this.core.exercise = null;
     this.core.exerciseId = null;
+    this.core.onAir = false;
     this.core.sim.place(session.pose);
     this.core.sim.setSpeeds(session.speeds);
     this.core.performerEpoch = this.core.sim.time;

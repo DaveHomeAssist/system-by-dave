@@ -3,6 +3,8 @@ import { defaultProject, type Project } from "../../domain/project";
 import { type ExerciseId } from "../../domain/session";
 import { deriveVenueGeometry, unsettledVenueItems, type VenueGeometry } from "../../domain/venue";
 import { type Exercise } from "../../exercises/types";
+import { PoseDelayLine } from "../../sim/delayLine";
+import { OnAirTracker } from "../../sim/onAir";
 import { PtzSimulator } from "../../sim/ptz";
 import { loadProject, type StorageStatus } from "../../storage/persist";
 import { type Announcement, type RenderStatus, type StoreState } from "./types";
@@ -30,6 +32,11 @@ export class StoreCore {
   storageConflict = false;
   /** The first Home of a visit also says Home is not the FMP safe-wide shot. */
   homeExplained = false;
+  /** The camera is taken to program: tally lit, and every move is seen by the audience. */
+  onAir = false;
+  readonly onAirTracker = new OnAirTracker();
+  /** Recent true poses, so the monitor can trail the head by the simulated signal delay. */
+  readonly delayLine = new PoseDelayLine();
   renderStatus: RenderStatus = "starting";
   renderNote = "";
   hidden = false;
@@ -85,6 +92,7 @@ export class StoreCore {
       storageConflict: this.storageConflict,
       announcement: this.announcement,
       storeArmed: this.storeArmed,
+      onAir: { live: this.onAir, stats: this.onAirTracker.getStats() },
       renderStatus: this.renderStatus,
       renderNote: this.renderNote,
       hidden: this.hidden,

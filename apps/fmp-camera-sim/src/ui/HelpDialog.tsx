@@ -19,6 +19,7 @@ const SHORTCUTS: Array<[string, string]> = [
   ["Shift + [  ]", "Zoom speed down / up"],
   [",  .", "Preset speed down / up"],
   ["F", "Expand or restore the monitor"],
+  ["P", "Take the camera on air (tally lit) or off air; moves while live are counted"],
   ["?", "This help"],
 ];
 

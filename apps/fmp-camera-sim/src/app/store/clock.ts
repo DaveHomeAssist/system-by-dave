@@ -1,5 +1,6 @@
 import { lensState } from "../../domain/camera";
 import { cameraFrame } from "../../sim/framing";
+import { describeTake } from "../../sim/onAir";
 import { SIM_STEP, type SimEvent } from "../../sim/ptz";
 import { type StoreCore } from "./core";
 import { type ExerciseController } from "./exercises";
@@ -45,10 +46,17 @@ export class ClockController {
   getTelemetry(): Telemetry {
     const snapshot = this.core.sim.snapshot();
     const profile = this.core.project.camera;
+    const lens = lensState(profile, snapshot.pose.lens);
+    const frame = cameraFrame(this.core.geometry, snapshot.pose, profile);
+    const delayMs = this.core.project.session.preferences.monitorDelayMs;
+    const shown = delayMs > 0 ? this.core.delayLine.sample(snapshot.tick * SIM_STEP, delayMs, snapshot.pose) : null;
     return {
       snapshot,
-      lens: lensState(profile, snapshot.pose.lens),
-      frame: cameraFrame(this.core.geometry, snapshot.pose, profile),
+      lens,
+      frame,
+      monitorFrame: shown ? cameraFrame(this.core.geometry, shown, profile) : frame,
+      monitorLens: shown ? lensState(profile, shown.lens) : lens,
+      onAir: this.core.onAir,
       performer: this.exercises.performerNow(),
       geometry: this.core.geometry,
       profile,
@@ -67,10 +75,38 @@ export class ClockController {
     this.core.emit();
   }
 
+  /** Take the camera to program (tally on) or clear it. Clearing reports the take in the status line. */
+  setOnAir(live: boolean, wallSeconds: number): void {
+    if (live === this.core.onAir) return;
+    this.advanceTo(wallSeconds);
+    this.core.onAir = live;
+    if (live) {
+      this.core.onAirTracker.take();
+      this.core.announce("On air. Tally is lit: hold the shot, and reframe only once the camera is off air.", "warn");
+    } else {
+      const stats = this.core.onAirTracker.getStats();
+      this.core.announce(describeTake(stats), stats.moves === 0 ? "success" : "info");
+    }
+    this.core.emit();
+  }
+
   private onTick(tick: number): void {
+    this.core.delayLine.push(tick * SIM_STEP, this.core.sim.getPose());
     if (tick % SAMPLE_TICKS !== 0) return;
     const events = this.core.sim.drainEvents();
     const moving = this.core.sim.isMoving();
+    if (this.core.onAir) {
+      const airEvent = this.core.onAirTracker.sample(SAMPLE_TICKS * SIM_STEP, moving, this.core.sim.snapshot().velocity);
+      if (airEvent) {
+        this.core.announce(
+          airEvent.first
+            ? `Camera moved on air${airEvent.zoom ? " with a zoom" : ""}. The audience sees every move while the tally is lit.`
+            : `Another move on air${airEvent.zoom ? " with a zoom" : ""} (${this.core.onAirTracker.getStats().moves} this take).`,
+          "warn",
+        );
+        this.core.emit();
+      }
+    }
     if (events.length === 0 && !this.core.exercise && moving === this.core.wasMoving) return;
     const sample = this.exercises.exerciseSample(SAMPLE_TICKS * SIM_STEP);
     let changed = false;
