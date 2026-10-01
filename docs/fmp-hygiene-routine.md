@@ -95,7 +95,7 @@ check. Add `--strict` to exit non-zero on any failure.
 | L2 | No links to legacy or private origins | Fails since 2026-09-18: no FMP page links an old version (Dave) |
 | L3 | External references respond | Some sites block bots with 403. Confirm in a browser before filing |
 | L4 | In-page `#` links stay on pages that use `<base>` | With `<base>`, a skip link resolves to another document and leaves the page |
-| S1 | Pages link home and back to `/fmp/` | Shell contract: home, parent, and return |
+| S1 | Pages link back to `/fmp/` | Shell contract: parent and return (FMP pages are exempt from the system home link, rule 1) |
 | S2 | Public FMP files carry no personal contact details | Reports counts and file names only, never the values |
 | C1 | Rig part and component counts agree | Stale counts erode trust in the reference |
 | S3 | Public FMP pages link no Notion pages | Crews have no Notion account; the walk's own Save to Notion receipt is the one exception. Replaced C2, the index snapshot age, when `/fmp-index/` became a redirect on 2026-09-18 |
