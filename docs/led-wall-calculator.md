@@ -21,3 +21,4 @@ Calculator values share the `avCalculator.v1` key with the six quick calculators
 ## Verification
 
 Run `npm run probe:led-configurator -- --base=http://127.0.0.1:8000/` against a local static server, then repeat with `--no-webgl` to verify the fallback. The probe covers the 3D model, pointer and keyboard orbit, reduced-motion presets, geometry, mode changes, profile round trips, input commit behavior, PF gating and migration, mobile containment, accessibility smoke checks, and Power Load handoff. The release also requires `npm run verify:av`, `npm run verify:domain-sites`, the Pages workflow, and a live browser check on avbydave.com.
+The probe waits for the 3D module to report ready or fallback, so the same command can verify the public URL despite normal network loading time.
