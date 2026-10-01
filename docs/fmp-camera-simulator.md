@@ -123,6 +123,7 @@ Uncalibrated behaviour, editable under Camera and flagged **Uncalibrated camera*
 | Stop | Space or Esc | Stop |
 | Speeds | `[` `]` pan/tilt, Shift+`[` `]` zoom, `,` `.` preset | − / + |
 | Expand monitor | F | Expand monitor |
+| On air / off air | P | Take (monitor head) |
 
 Releasing a control, losing window focus or a cancelled touch stops commanded motion. A hidden
 page halts all motion at once and stops the simulation clock. HOME is the camera function (pan 0°,
@@ -171,6 +172,23 @@ The page draws in DM Sans, the FMP suite's face, from its own hashed copy of the
 subset (`src/styles/fonts/`), so a laptop, an iPhone and the CI browser all measure the same
 text; the offline file inlines it.
 
+## On air and monitor delay
+
+**On air (tally).** Take (or P) puts the camera on program: the modelled P240's tally lamp lights,
+the monitor gets a red border and an ON AIR chip. While live, `sim/onAir.ts` counts separate moves,
+moves that include a zoom, time moving and the fastest pan/tilt speed, from the simulation's own
+30 Hz samples, so the figures do not depend on frame rate. The first move on air warns in the
+status line; leaving air reports the take (a clean take when nothing moved). On-air state is not
+saved; a session reset, a project import or loading another tab's copy clears it and forgets
+the take. These are training figures, not a broadcast standard.
+
+**Monitor delay.** Camera → Signal path → Monitor delay (0–500 ms, **Uncalibrated**, default 0)
+makes the monitor show the pose from that long ago (`sim/delayLine.ts`, one pose per 240 Hz tick).
+The P240 model, the cone and the readouts stay on the live pose, exercises keep scoring the live
+camera, and the framing marks follow the delayed picture. The performer is not delayed, which
+overstates a moving performer's framing error by at most their walking speed times the delay
+(about 0.1 m at 1.2 m/s and 100 ms). Camera 4's real head-to-monitor delay is unmeasured.
+
 ## Exercises
 
 Thresholds are training settings in the Exercises panel, not professional standards.
@@ -213,7 +231,7 @@ through the housevideo.app saved-data transfer). Export/import uses one JSON fil
 - `fmp-camera-simulator.project` v1, containing
 - `fmp-camera-simulator.venue` v6 (terrain, versioned structures and bowl plus per-property methods/source identifiers and separate mount-orientation/heading evidence),
 - `fmp-camera-simulator.camera` v1 (published figures, operating limits, uncalibrated behaviour), and
-- `fmp-camera-simulator.session` v2 (show package, speeds, pose, presets, performer, exercise settings and results).
+- `fmp-camera-simulator.session` v2 (show package, speeds, pose, presets, performer, exercise settings and results; since 1.13.0 an optional `preferences.monitorDelayMs`, read as 0 when absent and ignored by earlier builds).
 
 The file's `app` field names the build that wrote it, for example
 `FMP Camera Simulator 1.6.0 (build 1a2b3c4d)`; imports ignore it. Builds before 1.6.0 always
@@ -366,6 +384,7 @@ after venue or rendering changes, then rebuild so the published copy follows.
 | One camera state drives the model, cone and monitor | Probe reads back the Three.js monitor camera, P240 head and cone axis; `render/p240Model.test.ts`, `sim/framing.test.ts` |
 | Equivalent motion at different render rates | `sim/ptz.test.ts` render-rate test |
 | Stop, interruption, limits, focus loss | `sim/ptz.test.ts`; probe keyboard, blur and hidden-page checks |
+| On-air counting and monitor delay | `sim/onAir.test.ts`, `sim/delayLine.test.ts`, `app/store.test.ts` |
 | Presets within tolerance | `sim/ptz.test.ts`, `exercises/exercises.test.ts`; probe keyboard, mouse and touch recalls |
 | Venue dimensions change framing | `sim/framing.test.ts`; probe venue edit and rejection |
 | Exercises complete and reset | `exercises/exercises.test.ts`; probe runs all three and resets |
@@ -391,6 +410,24 @@ SuperJoy and the optional 3D SuperJoy control surface are later work. The FMP hu
 Catwalk PTZ guide already link the simulator. Next steps: measure the critical venue dimensions;
 calibrate speeds, stopping and preset travel against Camera 4; then prototype a local
 VISCA-to-WebSocket bridge for the physical SuperJoy.
+
+## Training upgrade plan
+
+A 25-item review (2026-09-24, scored for viability on 2026-09-29) set the training work after
+v1. Scores are 1–5 for fit with this architecture and its CSP/offline gates, cost and training
+value; "field" means the item waits on measurements at the venue.
+
+| Release | Items | Status |
+| --- | --- | --- |
+| 1.13.0 On air | Tally and live/preview discipline (5); monitor delay (5) | Shipped |
+| 1.14.0 Honest scoring | Obstruction-aware scoring from the tagged occluders (5, also roadmap item 5); headroom, lead-room and 9:16 guides (4) | Next |
+| 1.15.0 Hands on | Gamepad input through the existing deflection adapter (5); large-controls mode (4) | Planned |
+| 1.16.0 Curriculum | Shot-size lessons (5) with glossary text (3); exercise tiers on the shared training record (4) | Planned |
+| 1.17.0 Debrief | Input-log replay with markers (4); jerky-stop flags (3); live error trace (4) | Planned |
+| Later | Varied and second performers (4); preset/seed share links (4); quality setting (4); screen-reader announcer and axe gate (3); stills, then clips (3); show-cue scripts (3, after on air); SuperJoy layout (3, after gamepad); motion blur (3) | Unscheduled |
+| Field | Trapezoid preset travel (3 → 5 once Camera 4 is timed); measured monitor delay | Needs a venue visit |
+| Deferred | Focus and depth of field (2); venue geometry in a worker (2, needs `worker-src`); VISCA bridge (2, needs a local helper and a CSP exception) | Not planned |
+| Dropped | Exposure and zebra (1): Shading practice already teaches it | — |
 
 ## Venue realism delivery sequence
 

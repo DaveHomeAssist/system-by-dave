@@ -73,6 +73,15 @@ export class SimulatorStore {
     this.clock.setRenderStatus(status, note);
   }
 
+  /** Take the camera to program (tally on) or clear it. */
+  setOnAir(live: boolean, wallSeconds: number): void {
+    this.clock.setOnAir(live, wallSeconds);
+  }
+
+  toggleOnAir(wallSeconds: number): void {
+    this.clock.setOnAir(!this.core.onAir, wallSeconds);
+  }
+
   // ------------------------------------------------------------------------------------------
   // Operating commands
   // ------------------------------------------------------------------------------------------
@@ -151,6 +160,10 @@ export class SimulatorStore {
 
   setGuides(patch: Partial<GuidePreferences>): void {
     this.settings.setGuides(patch);
+  }
+
+  setMonitorDelay(ms: number): void {
+    this.settings.setMonitorDelay(ms);
   }
 
   resetVenue(): UpdateResult {

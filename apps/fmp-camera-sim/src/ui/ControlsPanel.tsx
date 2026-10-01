@@ -44,6 +44,8 @@ export function ControlsPanel({ store, input, state }: Props) {
             input.releaseAll(nowSeconds());
             store.stop(nowSeconds());
           }}
+          onAir={state.onAir.live}
+          onToggleAir={() => store.toggleOnAir(nowSeconds())}
           onRename={(slot, name) => store.renamePreset(slot, name)}
           onClear={(slot) => store.deletePreset(slot)}
           suggestName={suggestions === "off" ? undefined : (preset) => suggestPresetName(state.geometry, state.project.camera, preset)}

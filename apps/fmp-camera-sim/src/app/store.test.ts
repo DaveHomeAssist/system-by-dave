@@ -264,3 +264,118 @@ describe("operator guidance", () => {
     expect(store.getState().announcement?.text).toBe("Import rejected (project: The file is not valid JSON.). The open session was kept.");
   });
 });
+
+describe("monitor delay and on air (1.13.0)", () => {
+  it("shows the head's pose at once when there is no delay", () => {
+    const { store, run, now } = makeStore();
+    store.setDrive({ pan: 1, tilt: 0, zoom: 0 }, now());
+    run(0.5);
+    const t = store.getTelemetry();
+    expect(t.monitorFrame).toBe(t.frame);
+    expect(t.onAir).toBe(false);
+  });
+
+  it("makes the monitor trail the head by the delay, then catch up when it stops", () => {
+    const { store, run, now } = makeStore();
+    store.setMonitorDelay(200);
+    expect(store.getState().project.session.preferences.monitorDelayMs).toBe(200);
+    store.setDrive({ pan: 1, tilt: 0, zoom: 0 }, now());
+    run(1);
+    let t = store.getTelemetry();
+    expect(t.frame.headingDeg).toBeGreaterThan(t.monitorFrame.headingDeg + 0.5);
+    store.setDrive({ pan: 0, tilt: 0, zoom: 0 }, now());
+    run(1.5);
+    t = store.getTelemetry();
+    expect(t.monitorFrame.headingDeg).toBeCloseTo(t.frame.headingDeg, 6);
+  });
+
+  it("clamps the delay and saves it with the session", () => {
+    const { store, storage } = makeStore();
+    store.setMonitorDelay(9000);
+    expect(store.getState().project.session.preferences.monitorDelayMs).toBe(500);
+    store.setMonitorDelay(-5);
+    expect(store.getState().project.session.preferences.monitorDelayMs).toBe(0);
+    store.setMonitorDelay(120);
+    store.flushSave();
+    const saved = parseProjectText(storage.getItem(STORAGE_KEY) as string);
+    expect(saved.ok && saved.project.session.preferences.monitorDelayMs).toBe(120);
+  });
+
+  it("reads files without a monitor delay as no delay, and rejects an out-of-range one", () => {
+    const project = defaultProject();
+    const raw = JSON.parse(serializeProject(project));
+    delete raw.session.preferences.monitorDelayMs;
+    const older = parseProjectText(JSON.stringify(raw));
+    expect(older.ok && older.project.session.preferences.monitorDelayMs).toBe(0);
+    raw.session.preferences.monitorDelayMs = 900;
+    expect(parseProjectText(JSON.stringify(raw)).ok).toBe(false);
+  });
+
+  it("counts moves while on air and reports a clean take when the camera holds", () => {
+    const { store, run, now } = makeStore();
+    store.setOnAir(true, now());
+    expect(store.getState().onAir.live).toBe(true);
+    expect(store.getTelemetry().onAir).toBe(true);
+    run(1);
+    store.setOnAir(false, now());
+    expect(store.getState().onAir.stats.moves).toBe(0);
+    expect(store.getState().announcement?.text).toContain("Clean take");
+
+    store.toggleOnAir(now());
+    store.setDrive({ pan: 1, tilt: 0, zoom: 0 }, now());
+    run(0.5);
+    store.setDrive({ pan: 0, tilt: 0, zoom: 0 }, now());
+    run(1);
+    store.setDrive({ pan: 0, tilt: 0, zoom: 1 }, now());
+    run(0.3);
+    store.setDrive({ pan: 0, tilt: 0, zoom: 0 }, now());
+    run(1);
+    const live = store.getState().onAir;
+    expect(live.stats.moves).toBe(2);
+    expect(live.stats.zoomMoves).toBe(1);
+    expect(live.stats.peakDegS).toBeGreaterThan(0);
+    store.toggleOnAir(now());
+    expect(store.getState().onAir.live).toBe(false);
+    expect(store.getState().announcement?.text).toMatch(/2 moves on air, 1 with zoom/);
+  });
+
+  it("leaves program on a session reset", () => {
+    const { store, now } = makeStore();
+    store.setOnAir(true, now());
+    store.resetSession(now());
+    expect(store.getState().onAir.live).toBe(false);
+  });
+
+  it("leaves program and forgets the take when a project replaces the session", () => {
+    const { store, storage, run, now } = makeStore();
+    const goLiveAndMove = () => {
+      store.setOnAir(true, now());
+      store.setDrive({ pan: 1, tilt: 0, zoom: 0 }, now());
+      run(0.5);
+      store.setDrive({ pan: 0, tilt: 0, zoom: 0 }, now());
+      run(0.2);
+      expect(store.getState().onAir).toMatchObject({ live: true, stats: { moves: 1 } });
+    };
+
+    // An import replaces the session: tally off, nothing carried into the next take.
+    goLiveAndMove();
+    expect(store.importText(serializeProject(defaultProject()), now()).ok).toBe(true);
+    expect(store.getState().onAir).toMatchObject({ live: false, stats: { moves: 0, liveS: 0 } });
+    expect(store.getTelemetry().onAir).toBe(false);
+    expect(store.getState().announcement?.text).toContain("Imported");
+
+    // So does loading the copy another tab saved.
+    goLiveAndMove();
+    const other = defaultProject();
+    other.session.presets = [{ slot: 2, name: "Other tab", cameraId: other.camera.id, pan: 3, tilt: -4, lens: 0.3, savedAt: "2026-09-30T08:00:00.000Z" }];
+    storage.setItem(STORAGE_KEY, serializeProject(other));
+    store.noteExternalSave();
+    expect(store.useSavedCopy(now()).ok).toBe(true);
+    expect(store.getState().onAir).toMatchObject({ live: false, stats: { moves: 0, liveS: 0 } });
+
+    // The next take starts clean.
+    store.setOnAir(true, now());
+    run(0.2);
+    expect(store.getState().onAir.stats.moves).toBe(0);
+  });
+});

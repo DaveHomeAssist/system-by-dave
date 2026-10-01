@@ -13,6 +13,12 @@ Minor versions add features or change a saved-file format; patch versions fix or
 
 Versions 1.0.0 to 1.5.3 were numbered after the fact from their merged pull requests.
 
+## 1.13.0 — 2026-09-29 — On air: tally and monitor delay
+
+- Take the camera on air with the monitor's Take button or P. The tally lamp on the modelled P240 lights, the monitor gets a red border and an ON AIR chip, and every move while live is counted: separate moves, moves with a zoom and the fastest pan/tilt speed. The first move on air warns in the status line; taking the camera off air reports the take ("Clean take" when it held still). Resetting the session, importing a project or loading another tab's saved copy takes it off air and forgets the take. Counting follows the simulation's own samples, so it is the same at any frame rate.
+- Camera → Signal path → Monitor delay (0–500 ms, uncalibrated, default 0 = off) makes the monitor picture trail the head, for practising leading a move. The head, the viewing cone and the readouts stay live; exercises keep scoring the camera, and the framing marks follow the delayed picture. A DELAY chip shows on the monitor while it is on. The performer is not delayed.
+- Saved files: sessions gain an optional `preferences.monitorDelayMs`. Files without it read as 0, and earlier builds ignore it, so the session format stays v2.
+
 ## 1.12.1 — 2026-09-25 — Reload hint when the simulator does not load
 
 - The page shown before the simulator starts now says first that reloading usually fixes a simulator that does not load, for example just after an update, then that it needs JavaScript and WebGL, with the Catwalk PTZ operating guide link as before. A tab opened just before a release can ask for the previous release's script, which is gone; the page used to blame JavaScript and WebGL even though a reload fixes it.

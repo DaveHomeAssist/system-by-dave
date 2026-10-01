@@ -83,7 +83,7 @@ export class MonitorOverlay {
     const running = exercise?.progress.status === "running";
 
     if (exercise?.id === "wide" && running) {
-      const evaluation = evaluateWide(t.frame, t.geometry, settings.wide);
+      const evaluation = evaluateWide(t.monitorFrame, t.geometry, settings.wide);
       evaluation.markers.forEach((marker, i) => {
         const slot = this.wideMarkers[i];
         if (!slot) return;
@@ -102,7 +102,7 @@ export class MonitorOverlay {
     if (exercise?.id === "follow" && running) {
       const f = settings.follow;
       rectFor(this.followBox, f.targetWidthPct / 100, f.targetHeightPct / 100);
-      const evaluation = evaluateFollow(t.frame, t.performer, settings);
+      const evaluation = evaluateFollow(t.monitorFrame, t.performer, settings);
       const inView = Math.abs(evaluation.x) < 1.2 && Math.abs(evaluation.y) < 1.2 && evaluation.error < 2;
       show(this.followDot, inView);
       show(this.followSize, inView);

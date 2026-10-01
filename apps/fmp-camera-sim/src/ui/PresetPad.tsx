@@ -9,6 +9,9 @@ interface Props {
   onPress(slot: number): void;
   onHome(): void;
   onStop(): void;
+  /** Program (tally) state and its toggle. */
+  onAir: boolean;
+  onToggleAir(): void;
   onRename(slot: number, name: string): void;
   onClear(slot: number): void;
   /** A name read from the shot, shown for unnamed presets and offered when renaming. Absent while suggestions are off. */
@@ -17,8 +20,8 @@ interface Props {
 
 type MenuState = { slot: number; x: number; y: number } | null;
 
-/** Nine preset keys laid out like a keypad, with Store, Home and Stop. */
-export function PresetPad({ presets, armed, onArm, onPress, onHome, onStop, onRename, onClear, suggestName }: Props) {
+/** Nine preset keys laid out like a keypad, with Store, Home, Stop and Take (on air). */
+export function PresetPad({ presets, armed, onArm, onPress, onHome, onStop, onAir, onToggleAir, onRename, onClear, suggestName }: Props) {
   const bySlot = new Map(presets.map((p) => [p.slot, p]));
   const [menu, setMenu] = useState<MenuState>(null);
   const [editing, setEditing] = useState<number | null>(null);
@@ -184,6 +187,18 @@ export function PresetPad({ presets, armed, onArm, onPress, onHome, onStop, onRe
         </button>
         <button {...keepFocus} type="button" className="action-button action-stop" onClick={onStop}>
           Stop
+        </button>
+        <button
+          {...keepFocus}
+          type="button"
+          className={`action-button action-onair ${onAir ? "is-live" : ""}`}
+          aria-pressed={onAir}
+          aria-label={onAir ? "On air: take the camera off air" : "Take the camera on air"}
+          onClick={onToggleAir}
+          title="P: take the camera on air (tally lit) or off air"
+          data-testid="onair-toggle"
+        >
+          {onAir ? "On air" : "Take"}
         </button>
       </div>
       {menu && (

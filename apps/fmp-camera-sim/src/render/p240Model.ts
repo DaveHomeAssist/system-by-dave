@@ -13,6 +13,10 @@ import { type MountOrientation } from "../domain/venue";
 /** The physical P240 stays at real scale; its overview label identifies it across the bowl. */
 export const P240_DISPLAY_SCALE = 1;
 
+/** Tally lamp colours: lit red on air, a dark unlit lamp otherwise. */
+export const TALLY_ON = 0xff453a;
+export const TALLY_OFF = 0x3a2a2a;
+
 export interface P240Model {
   root: Group;
   /** Rotates about the vertical axis with pan. */
@@ -20,6 +24,8 @@ export interface P240Model {
   /** Rotates about the pan-relative horizontal axis with tilt. */
   tilt: Group;
   setPose(headingDeg: number, tiltDeg: number, orientation: MountOrientation): void;
+  /** Lights the tally (on air) or dims it to an unlit lamp. */
+  setTally(onAir: boolean): void;
 }
 
 /**
@@ -31,7 +37,7 @@ export function buildP240(): P240Model {
   const body = new MeshLambertMaterial({ color: 0x2a2d33 });
   const trim = new MeshLambertMaterial({ color: 0x4a4f58 });
   const glass = new MeshLambertMaterial({ color: 0x0b0c0e });
-  const tally = new MeshBasicMaterial({ color: 0xff453a, toneMapped: false });
+  const tally = new MeshBasicMaterial({ color: TALLY_OFF, toneMapped: false });
 
   const root = new Group();
   root.name = "p240";
@@ -72,6 +78,9 @@ export function buildP240(): P240Model {
     root,
     pan,
     tilt,
+    setTally(onAir) {
+      tally.color.setHex(onAir ? TALLY_ON : TALLY_OFF);
+    },
     setPose(headingDeg, tiltDeg, orientation) {
       if (orientation === "inverted") {
         // Hanging under the catwalk: the model is upside down, so its local axes flip.

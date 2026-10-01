@@ -5,6 +5,7 @@ import { type Issue } from "../../domain/validate";
 import { type VenueGeometry } from "../../domain/venue";
 import { type Exercise, type ExerciseProgress } from "../../exercises/types";
 import { type CameraFrame } from "../../sim/framing";
+import { type OnAirStats } from "../../sim/onAir";
 import { type PerformerState } from "../../sim/performer";
 import { type PtzSnapshot } from "../../sim/ptz";
 import { type StorageStatus } from "../../storage/persist";
@@ -29,6 +30,8 @@ export interface StoreState {
   storageConflict: boolean;
   announcement: Announcement | null;
   storeArmed: boolean;
+  /** Program (tally) state and the discipline figures of the current or last take. */
+  onAir: { live: boolean; stats: OnAirStats };
   renderStatus: RenderStatus;
   renderNote: string;
   hidden: boolean;
@@ -38,6 +41,13 @@ export interface Telemetry {
   snapshot: PtzSnapshot;
   lens: LensState;
   frame: CameraFrame;
+  /**
+   * What the monitor shows: the pose from `monitorDelayMs` ago (the same object as `frame` when
+   * there is no delay). The head, cone and readouts follow `frame`; the picture follows this.
+   */
+  monitorFrame: CameraFrame;
+  monitorLens: LensState;
+  onAir: boolean;
   performer: PerformerState;
   geometry: VenueGeometry;
   profile: CameraProfile;

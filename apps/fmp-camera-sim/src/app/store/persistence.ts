@@ -34,6 +34,7 @@ export class PersistenceController {
     this.core.geometry = geometry.geometry;
     this.core.exercise = null;
     this.core.exerciseId = null;
+    this.core.leaveAir();
     this.clearReplacePrompt();
     this.core.storeArmed = false;
     this.core.sim.configure(this.core.project.camera, this.core.geometry.mountOrientation);
