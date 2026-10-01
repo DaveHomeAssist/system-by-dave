@@ -5,7 +5,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { DataGrid } from "./DataGrid";
 import { EngineDashboard } from "./EngineDashboard";
 import {
-  WorkbookChangedElsewhereError, downloadText, exportWorkbook, importWorkbook, loadActiveWorkbook, readActiveWorkbook, saveEditedWorkbook,
+  WorkbookChangedElsewhereError, WorkbookUncheckedError, downloadText, exportWorkbook, importWorkbook, loadActiveWorkbook, readActiveWorkbook, saveEditedWorkbook,
   startBlankWorkbook, storedWorkbookText, type WorkbookReadOnly
 } from "./store";
 import { mergeLegacyAudioIntoWorkbook, readLegacyAudioBundle } from "./legacyAudioImport";
@@ -203,6 +203,10 @@ export default function App() {
     try {
       return await saveEditedWorkbook(next);
     } catch (error: unknown) {
+      if (error instanceof WorkbookUncheckedError) {
+        setMessage(error.message);
+        return null;
+      }
       if (!(error instanceof WorkbookChangedElsewhereError)) throw error;
       // A newer version rewrote this workbook after this tab loaded it: stop rather than strip its fields.
       setReadOnly(error.readOnly);

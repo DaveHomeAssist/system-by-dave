@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { createBlankWorkbook } from "./sampleWorkbook";
 import {
-  ACTIVE_KEY, FALLBACK_KEY, WorkbookChangedElsewhereError, assessStoredWorkbook, importWorkbook, loadActiveWorkbook, saveEditedWorkbook,
+  ACTIVE_KEY, FALLBACK_KEY, WorkbookChangedElsewhereError, WorkbookUncheckedError, assessStoredWorkbook, importWorkbook, loadActiveWorkbook, saveEditedWorkbook,
   startBlankWorkbook, type WorkbookBackend
 } from "./store";
 import type { AvWorkbook } from "./types";
@@ -216,6 +216,21 @@ describe("saveEditedWorkbook", () => {
     const memory = memoryBackend({ failReads: true, failWrites: true, storage: { [ACTIVE_KEY]: "wb-active", [FALLBACK_KEY]: fallback } });
     await expect(saveEditedWorkbook(loaded, memory.backend)).rejects.toBeInstanceOf(WorkbookChangedElsewhereError);
     expect(memory.values.get(FALLBACK_KEY)).toBe(fallback);
+  });
+
+  it("refuses to save when IndexedDB cannot be read and no fallback copy covers the workbook", async () => {
+    const memory = memoryBackend({ failReads: true, storage: { [ACTIVE_KEY]: "wb-active" } });
+    await expect(saveEditedWorkbook(storedWorkbook("wb-active"), memory.backend)).rejects.toBeInstanceOf(WorkbookUncheckedError);
+    expect(memory.table.put).not.toHaveBeenCalled();
+    expect(memory.storage.setItem).not.toHaveBeenCalled();
+  });
+
+  it("still saves through the fallback copy when IndexedDB is unavailable but the fallback holds this workbook", async () => {
+    const loaded = storedWorkbook("wb-active");
+    const memory = memoryBackend({ failReads: true, failWrites: true, storage: { [ACTIVE_KEY]: "wb-active", [FALLBACK_KEY]: JSON.stringify(loaded) } });
+    const saved = await saveEditedWorkbook({ ...loaded, show: { ...loaded.show, venue: "Hall B" } }, memory.backend);
+    expect(JSON.parse(memory.values.get(FALLBACK_KEY) as string).show.venue).toBe("Hall B");
+    expect(saved.show.venue).toBe("Hall B");
   });
 
   it("saves a new workbook id that has no stored copy yet", async () => {

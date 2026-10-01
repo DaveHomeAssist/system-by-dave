@@ -230,6 +230,14 @@ export async function saveWorkbook(workbook: AvWorkbook, backend: WorkbookBacken
   return next;
 }
 
+/** A save refused because the stored copy could not be read, so it could not be checked before writing over it. */
+export class WorkbookUncheckedError extends Error {
+  constructor() {
+    super("This browser could not read the saved workbook to check it, so the change was not saved. Try again; reload if it keeps happening.");
+    this.name = "WorkbookUncheckedError";
+  }
+}
+
 /** A save refused because another tab or window running a newer or incompatible version rewrote the stored workbook. */
 export class WorkbookChangedElsewhereError extends Error {
   readonly readOnly: WorkbookReadOnly;
@@ -249,16 +257,21 @@ export class WorkbookChangedElsewhereError extends Error {
 export async function saveEditedWorkbook(workbook: AvWorkbook, backend: WorkbookBackend = browserBackend()): Promise<AvWorkbook> {
   let stored: unknown;
   let source: WorkbookSource = "indexeddb";
+  let readFailed = false;
   try {
     stored = await backend.table.get(workbook.workbookId);
   } catch {
     stored = undefined;
+    readFailed = true;
   }
   if (stored === undefined || stored === null) {
     const fallback = backend.storage?.getItem(FALLBACK_KEY) ?? null;
     if (fallback !== null && storedWorkbookId(fallback) === workbook.workbookId) {
       stored = fallback;
       source = "fallback";
+    } else if (readFailed) {
+      // Fail closed: an unread IndexedDB record might be one this version cannot represent.
+      throw new WorkbookUncheckedError();
     }
   }
   if (stored !== undefined && stored !== null) {
