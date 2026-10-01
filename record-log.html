@@ -792,7 +792,7 @@
       audio:AUDIO.indexOf(record.audio) >= 0 ? record.audio : 'embedded',
       media:String(record.media || ''),
       status:STATUS.indexOf(record.status) >= 0 ? record.status : 'armed',
-      duration:normalizeDurationInput(record.duration || ''),
+      duration:String(record.duration == null ? '' : record.duration),
       backup:String(record.backup || ''),
       notes:String(record.notes || '')
     };
@@ -803,15 +803,15 @@
     var meta = next.meta && typeof next.meta === 'object' ? next.meta : {};
     return {
       meta:{
-        showName:String(meta.showName || 'General Session Record Log').slice(0, 120),
-        venue:String(meta.venue || '').slice(0, 120),
-        showDate:String(meta.showDate || new Date().toISOString().slice(0, 10)).slice(0, 20),
-        recordOp:String(meta.recordOp || '').slice(0, 80),
-        producer:String(meta.producer || '').slice(0, 80),
-        audioLead:String(meta.audioLead || '').slice(0, 80),
-        handoffTo:String(meta.handoffTo || '').slice(0, 80)
+        showName:String(meta.showName == null ? 'General Session Record Log' : meta.showName),
+        venue:String(meta.venue == null ? '' : meta.venue),
+        showDate:String(meta.showDate == null ? new Date().toISOString().slice(0, 10) : meta.showDate),
+        recordOp:String(meta.recordOp == null ? '' : meta.recordOp),
+        producer:String(meta.producer == null ? '' : meta.producer),
+        audioLead:String(meta.audioLead == null ? '' : meta.audioLead),
+        handoffTo:String(meta.handoffTo == null ? '' : meta.handoffTo)
       },
-      records:Array.isArray(next.records) ? next.records.map(cloneRecord).slice(0, 250) : [],
+      records:Array.isArray(next.records) ? next.records.map(cloneRecord) : [],
       selectedId:typeof next.selectedId === 'string' ? next.selectedId : '',
       filters:{
         search:String(next.filters && next.filters.search || ''),
@@ -1038,7 +1038,14 @@
     updateInspector();
   }
 
+  function canAddRow(){
+    if(state.records.length < 250) return true;
+    showHint('Record limit is 250. Existing ' + state.records.length + ' rows are kept; remove rows before adding.', 'error');
+    return false;
+  }
+
   function addRecord(afterId){
+    if(!canAddRow()) return;
     var index = afterId ? state.records.findIndex(function(record){ return record.id === afterId; }) + 1 : state.records.length;
     if(index < 0) index = state.records.length;
     var nextNumber = state.records.length + 1;
@@ -1064,6 +1071,7 @@
   }
 
   function duplicateSelected(){
+    if(!canAddRow()) return;
     var record = selectedRecord();
     var index;
     var copy;
@@ -1517,6 +1525,7 @@
   loadState();
   render();
   bindEvents();
+  if(!loadProblem && state.records.length > 250) showHint('Existing ' + state.records.length + ' rows are kept. The record limit is 250; remove rows before adding.', 'error');
   if(loadProblem) showHint(loadProblem, 'error');
 })();
 </script>

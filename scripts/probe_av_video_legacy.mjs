@@ -162,6 +162,17 @@ const PAGES = [
   },
 ];
 
+const ROW_LIMITS = {
+  'signal-flow': [250, '#addRouteBtn', 'source'],
+  'video-patch': [180, '#addItemBtn', 'source'],
+  'display-plan': [300, '#addItemBtn', 'display'],
+  'projection-plan': [180, '#addItemBtn', 'screen'],
+  'stream-plan': [180, '#addItemBtn', 'encoder'],
+  'record-log': [250, '#addRecordBtn', 'record'],
+  'camera-shot-list': [300, '#addShotBtn', 'subject'],
+  'playback-check': [200, '#addCueBtn', 'file'],
+};
+
 function record(ok, name, detail = '') {
   results.push({ ok, name, detail });
   console.log(`${ok ? 'ok' : 'not ok'} - ${name}${detail ? `: ${detail}` : ''}`);
@@ -314,6 +325,39 @@ async function runPage(cfg) {
     const shown = await rowCount(page, cfg);
     await context.close();
     assert(shown === cfg.rows.length, `${shown} rows rendered`);
+    assert(errors.length === 0, errors.join('; '));
+  });
+
+  await check(`${cfg.id}: over-limit saved rows and long text survive reload; adding is blocked`, async () => {
+    const [limit, addButton, textField] = ROW_LIMITS[cfg.id];
+    const longText = `  ${'Untrimmed  video path   '.repeat(9)}`;
+    const venue = `  ${'Long venue   '.repeat(14)}`;
+    const rows = Array.from({ length: limit + 1 }, (_, index) => ({
+      ...rowsOf(cfg)[0], id: `${cfg.id}-overflow-${index}`, [textField]: index === 0 ? longText : `Row ${index + 1}`,
+    }));
+    const fixture = storedState(cfg, rows);
+    fixture.meta.venue = venue;
+    const context = await newContext();
+    await seed(context, { [cfg.key]: JSON.stringify(fixture) });
+    const { page, errors } = await open(context, cfg);
+    const shown = await rowCount(page, cfg);
+    const warning = await hint(page);
+    await page.click(addButton);
+    const afterAdd = await rowCount(page, cfg);
+    await touch(page);
+    const saved = JSON.parse(await read(page, cfg.key));
+    await page.reload({ waitUntil: 'networkidle' });
+    await touch(page);
+    const reloaded = JSON.parse(await read(page, cfg.key));
+    await context.close();
+    assert(shown === limit + 1 && afterAdd === limit + 1, `${shown}/${afterAdd} of ${limit + 1} rows rendered`);
+    assert(warning.includes(String(limit)), `missing over-limit warning: ${warning}`);
+    for (const [label, value] of [['saved', saved], ['reloaded', reloaded]]) {
+      assert(value[cfg.list].length === limit + 1, `${label}: ${value[cfg.list].length} rows`);
+      assert(value[cfg.list][0][textField] === longText, `${label}: long ${textField} changed`);
+      assert(value[cfg.list][limit].id === `${cfg.id}-overflow-${limit}`, `${label}: last row missing`);
+      assert(value.meta.venue === venue, `${label}: long venue changed`);
+    }
     assert(errors.length === 0, errors.join('; '));
   });
 

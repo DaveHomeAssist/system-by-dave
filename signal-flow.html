@@ -822,15 +822,15 @@
     var meta = next.meta && typeof next.meta === 'object' ? next.meta : {};
     return {
       meta:{
-        showName:String(meta.showName || 'General Session Signal Flow').slice(0, 120),
-        venue:String(meta.venue || '').slice(0, 120),
-        showDate:String(meta.showDate || new Date().toISOString().slice(0, 10)).slice(0, 20),
-        videoLead:String(meta.videoLead || '').slice(0, 80),
-        audioLead:String(meta.audioLead || '').slice(0, 80),
-        networkLead:String(meta.networkLead || '').slice(0, 80),
-        tdName:String(meta.tdName || '').slice(0, 80)
+        showName:String(meta.showName == null ? 'General Session Signal Flow' : meta.showName),
+        venue:String(meta.venue == null ? '' : meta.venue),
+        showDate:String(meta.showDate == null ? new Date().toISOString().slice(0, 10) : meta.showDate),
+        videoLead:String(meta.videoLead == null ? '' : meta.videoLead),
+        audioLead:String(meta.audioLead == null ? '' : meta.audioLead),
+        networkLead:String(meta.networkLead == null ? '' : meta.networkLead),
+        tdName:String(meta.tdName == null ? '' : meta.tdName)
       },
-      routes:Array.isArray(next.routes) ? next.routes.map(cloneRoute).slice(0, 250) : [],
+      routes:Array.isArray(next.routes) ? next.routes.map(cloneRoute) : [],
       selectedId:typeof next.selectedId === 'string' ? next.selectedId : '',
       filters:{
         search:String(next.filters && next.filters.search || ''),
@@ -1058,7 +1058,14 @@
     updateInspector();
   }
 
+  function canAddRow(){
+    if(state.routes.length < 250) return true;
+    showHint('Route limit is 250. Existing ' + state.routes.length + ' rows are kept; remove rows before adding.', 'error');
+    return false;
+  }
+
   function addRoute(afterId){
+    if(!canAddRow()) return;
     var index = afterId ? state.routes.findIndex(function(route){ return route.id === afterId; }) + 1 : state.routes.length;
     if(index < 0) index = state.routes.length;
     var nextNumber = state.routes.length + 1;
@@ -1083,6 +1090,7 @@
   }
 
   function duplicateSelected(){
+    if(!canAddRow()) return;
     var route = selectedRoute();
     var index;
     var copy;
@@ -1475,6 +1483,7 @@
   loadState();
   render();
   bindEvents();
+  if(!loadProblem && state.routes.length > 250) showHint('Existing ' + state.routes.length + ' rows are kept. The route limit is 250; remove rows before adding.', 'error');
   if(loadProblem) showHint(loadProblem, 'error');
 })();
 </script>
