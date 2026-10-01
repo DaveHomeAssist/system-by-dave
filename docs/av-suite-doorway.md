@@ -115,8 +115,16 @@ pixels for page overflow and unreachable clipped controls.
 
 ## Consolidation direction
 
-The current doorway behavior above remains the shipped contract.
-[Revised AV Suite: consolidation specification](av-suite-consolidation-spec.md)
-defines the proposed seven-workspace destination with Video in primary navigation, the full 44-tool disposition,
-and the migration gates. It is a target specification, not a claim that those
-workspaces are already live.
+The entries and persistence behavior above describe the current implementation.
+The [maintained consolidation plan](av-suite-consolidation-spec.md), revised by
+Dave on 2026-10-01, sets **Toolbox as the default entrance** to focused applications
+with a shared experience and optional modules. It supersedes the first-visit
+chooser and saved-entry fallback for neutral visits when implemented; explicit
+Show Console and supported legacy show-context routes retain compatibility.
+
+Video must be directly launchable without Workbook. Workbook is to be removed
+from public promotion, launch surfaces and the public editor artifact, with an
+agreed recovery treatment for existing saved work; its concept/source remains for
+a possible future redesign. These are settled target decisions. This document
+still describes the live chooser and Workbook grouping above so a plan revision
+is not mistaken for a shipped interface change.

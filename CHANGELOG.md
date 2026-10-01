@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-01 — AV Suite Toolbox and focused application plan
+
+- Revise the consolidation plan around default Toolbox entry, separate focused applications with a shared experience, and reversible optional modules that preserve saved data.
+- Carry forward directly visible, independent Unified Video and requested public Workbook withdrawal; retain the Workbook concept for possible redesign. Replace the Workbook-host recommendation and v2 execution brief without discarding delivered safety evidence.
+- Record consequential product choices and bounded release gates, distinguish them from routine engineering decisions, and reconcile the doorway, Stage 0 and development index. This is a planning revision; it does not change public runtime behavior or claim Workbook has already been removed.
+
 ## 2026-10-01 — Philly Cheesesteak Heatmap at /cheesesteaks
 
 - Publish the Philly Cheesesteak Heatmap as a managed static export at `/cheesesteaks/`: a map of 28 real Philadelphia cheesesteak shops from OpenStreetMap, with heat from a year of public Reddit posts. Pages are noindex, read-only (no corrections or refresh), and link back to the System by Dave home.

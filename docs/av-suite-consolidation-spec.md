@@ -1,189 +1,163 @@
-# Revised AV Suite: consolidation specification
+# AV Suite consolidation: Toolbox and focused applications
 
-**Status:** Proposed product and migration specification, 2026-09-23. This document describes the target experience and delivery gates; it does not claim that the remaining workspaces are implemented. The equipment-model pilot described below is already live.
+**Decision revision:** 2026-10-01, requested by Dave. This is the maintained product and migration plan. It supersedes the September 23 seven-workspace proposal and the September 29 recommendation to build Video inside Workbook. The [dated specification](av-suite-consolidation-spec-2026-09-23.md) remains historical evidence.
 
-**Implementation note, 2026-09-23:** This specification records a 44-tool baseline. At the Stage 0 snapshot the registry had 45 tools and 60 declared storage keys because `led-wall-calculator` was added after that baseline. See the [development assets index](av-suite-development-assets-index.md), [generated inventory](av-suite-consolidation-inventory.md), and [Stage 0 migration record](av-suite-consolidation-stage0.md) for current source and open gates. The [Stage 2 Video plan](av-suite-consolidation-stage2-video.md) recommends a home for the new tool (decision D6) and orders the Video work.
+**Delivery boundary:** This revision changes the plan. Toolbox as the default, optional modules, focused consolidated applications, and removal of Workbook from the public website are target behavior, not a claim of implementation. Current source at `238f2ed` still publishes Workbook and retains the doorway chooser. Use the [doorway contract](av-suite-doorway.md) for shipped behavior and the [development assets index](av-suite-development-assets-index.md) for evidence and source ownership.
 
-**Baseline:** `DaveHomeAssist/system-by-dave` main after the focused FMP viewer release. The registry listed 44 tools when this spec was drafted; see the [development assets index](av-suite-development-assets-index.md) and [generated inventory](av-suite-consolidation-inventory.md) for the current count. The deployed AV origin is `avbydave.com`; `av-suite.html` remains the stable doorway. This spec updates the earlier [Tool Index v2](../av-tool-suite/index-v2/index.html), which mapped 25 named legacy tools as a conceptual directory. The 44-tool disposition below is a dated baseline; newly registered tools need an explicit home before navigation cutover.
+## Settled product decisions
 
-## Product decision
+1. **Toolbox is the default entry point.** A person can find and open an application without creating a show, selecting a venue, or opening Workbook. Show Console remains an explicit, optional entrance for show operations.
+2. **Organize the suite as focused applications with a shared experience.** Adobe Suite is the product reference: recognizable applications for different jobs, with common conventions and useful handoffs. It is not a requirement to copy Adobe branding, licensing, cloud services, or its exact interface. Consolidation joins related workflows where that completes a job; it does not turn every application into a tab in one mandatory container.
+3. **Users can turn optional modules off.** This reduces navigation, panels, commands, and routine prompts for work they do not do. Preferences must be reversible and must not delete saved work or conceal active operations.
+4. **Video remains directly visible.** Unified Video covers cameras, playback, switching and signal flow, displays and projection, streaming, and recording. It launches as a focused application from Toolbox and works without Workbook. Its implementation does not inherit Workbook as its host or required data store.
+5. **Remove AV Workbook from the public website.** The public product and discovery surfaces must stop promoting or launching Workbook. Retain its concept, source history, and migration knowledge for a possible future redesign. A future return needs a new product brief; it is not a dependency of this consolidation program.
+6. **Carry these decisions forward.** Do not ask again whether Toolbox is the default, whether modules can be disabled, whether Video should be visible, or whether Workbook is required or should be withdrawn. Surface only consequential unresolved choices before the affected implementation; choose routine engineering details autonomously within these boundaries.
 
-AV by Dave should make the right capability available in the place an operator expects to work. A workspace earns its place by completing a job without sending the operator through several small forms. Equipment knowledge is reusable across shows and venues. A venue may supply a model, photo, or house observation, but it does not own the general AV workspace.
+## Application model
 
-The earlier FMP model bridge has been removed from public Gear Reference. The public library is equipment-only; FMP observations and models belong behind an explicit FMP workbook/workspace binding. The long-term reference contract is a source-owned model and evidence adapter that can render inside Gear Reference without relying on a full venue page or losing provenance.
+Toolbox owns discovery, launch, and personal visibility preferences. An application owns a coherent job, its documents, validation, and exports. A module is an optional capability inside that application. Shared experience means consistent navigation, theme, terminology, keyboard and recovery behavior, plus explicit compatible handoffs; it does not mean a shared writable document or mandatory show setup.
 
-### Goals
+```mermaid
+flowchart TD
+    Toolbox[Toolbox: default entrance] --> Video[Unified Video]
+    Toolbox --> Audio[Audio]
+    Toolbox --> Logistics[Logistics]
+    Toolbox --> Reference[Equipment Reference]
+    Toolbox --> Show[Show Operations]
+    Toolbox --> Other[Infrastructure and live applications]
+    Toolbox --> Specialists[Specialist applications and utilities]
+    Video --> Modules[Optional task modules]
+    Show --> Console[Optional Show Console]
+    Shared[Shared experience and confirmed handoffs] -.-> Video
+    Shared -.-> Audio
+    Shared -.-> Specialists
+```
 
-1. Replace a directory of thin, overlapping tools with seven useful primary workspaces: **Show Operations**, **Video**, **Audio**, **Logistics**, **Equipment Reference**, **Infrastructure**, and **Live Control**. Video is a named, immediately visible destination, not a tab inside a generic systems area.
-2. Keep specialized editors and planners available in context without making them top-level competitors for the same job.
-3. Let a person start with an equipment question or calculation without creating a show or selecting a venue.
-4. Reuse FMP models, component notes, photographs, and source evidence inside the general reference, with clear FMP labeling where a fact is house-specific.
-5. Preserve saved work, exports, links, offline fallback, and operator trust while the old pages are replaced in stages.
+The following map organizes current capabilities. Labels other than established product names are working application names, not a direction to rename existing public products. The exact split of Infrastructure and Live Control is a consequential choice below. Existing specialist applications stay independently launchable.
 
-### Non-goals
+| Application or application family | Job and proposed modules | Inputs and outputs | Ownership boundary |
+| --- | --- | --- | --- |
+| **Unified Video** (visible launch label includes **Video**) | Follow a source through Switching & Routes; optionally Cameras, Playback, Displays & Projection, Stream & Record, and their issue views | Sources, destinations, routes and legacy imports → tested planning records, issues, exports and specialist handoffs | Own Video documents; no Workbook dependency. A diagram never proves a physical path is verified. |
+| **Audio** | Inputs → Patch → Line Check; optional Speakers and RF & Comms | Source/channel identity and checks → patch, check and handoff outputs | Keep original fields, RF semantics and operator attribution; do not squeeze frequency or comms work into a channel row. |
+| **Logistics** | Prep → Pack → Load In → Strike; optional Cable | Item/case identity and locations → pack/load/strike records and exceptions | Keep missing, blocked and unaccounted gear visible; reading a reference sheet never changes prep status. |
+| **Equipment Reference** | Device search, sheets, components, evidence and procedures | Equipment question → cited product information and useful offline text | Equipment-only public content, independent of shows and venues. Venue models require an explicit source-owned workspace binding. |
+| **Show Operations** | Advance, Rooms, Crew, Tasks and Closeout; optional Show Console | Explicitly attached show, room and people records → operating views and handoffs | Workbook is not its shell or prerequisite. Preserve Show Board timeline/snapshot recovery and explicit client-output confirmation. |
+| **Infrastructure family** | Power, Network and Lighting | Distribution, capacity/address and fixture inputs → plans, checks and exports | Keep specialist semantics. Whether these become one focused app or separate applications remains open. |
+| **Live Control family** | Cue Sheet, Show Timer and Teleprompter | Rundown, clock and script → dedicated operating/display outputs | Retain the existing focused applications and reliable full-screen controls. A combined live runtime is not assumed. |
+| **Specialists and utilities** | Throwline, PixelForge, StagePlotter, AV Calculator and LED Wall Calculator | Each application's supported planning/editor inputs → its existing document or output | Direct Toolbox launch plus contextual links. Shared launch does not merge their data. OnTrack retains its separate music-product boundary. |
 
-- A single universal show record shared automatically with FMP, Throwline, PixelForge, and every browser tool.
-- Moving protected FMP camera check-in, signed-in event records, or house operating instructions into AV by Dave.
-- Renaming evidence statuses across FMP catalogs, Gear Reference, and Throwline to one generic value.
-- Replacing Cue Sheet, Teleprompter, PixelForge, Throwline, StagePlotter, or OnTrack before their specialist behavior has a proven replacement.
-- Adding a cloud account, synchronization service, or new framework solely to make the navigation look consolidated.
+### Capability disposition
 
-### Representative journeys
+This is the planning disposition of the **45 registered tools at the revision baseline**, not a replacement runtime registry. Generate current counts from [`js/sbd-registry.js`](../js/sbd-registry.js) and the [inventory](av-suite-consolidation-inventory.md). A navigation home never authorizes deletion of a route or saved data.
 
-- **Equipment question:** An operator searches for the URSA G2, opens its sheet, selects a camera-body component in the model, reads the cited evidence, then returns to the procedure. No show or FMP profile is required. House-specific observations are labeled as such.
-- **Audio build:** An A1 enters an input once, assigns its patch, marks a failed line check with a problem note, and exports a usable channel view. The same source identity remains visible through each step.
-- **Video build:** A video operator opens Video directly, follows a camera or playback source through signal flow and patching to a switcher, screen, stream, or recorder, checks format and backup paths, and reaches the related equipment model from the same task. Camera, switching, display/projection, streaming, and recording remain findable within Video.
-- **Truck handoff:** A technician finds a case, sees its test and pack state, places it in a truck zone, confirms its load-in destination, then accounts for it during strike. Missing or blocked gear remains visible.
-- **Live show:** A show operator reaches the next cue, clock, and script from one entrance while the full-screen Cue Sheet, Timer, and Prompter controls remain dependable and directly reachable.
+| Planning home | Registry IDs | Count |
+| --- | --- | ---: |
+| Show Operations | `show-advance`, `site-survey`, `crew-call`, `crew-time-log`, `room-check`, `breakout-room-matrix`, `show-board`, `show-task-board`, `show-handoff`, `show-report`, `change-order`, `client-signoff` | 12 |
+| Unified Video | `signal-flow`, `video-patch`, `display-plan`, `projection-plan`, `stream-plan`, `record-log`, `camera-shot-list`, `playback-check` | 8 |
+| Audio | `input-list`, `audio-patch`, `line-check`, `speaker-plan`, `rf-coordination`, `comms-check` | 6 |
+| Logistics | `gear-prep`, `truck-pack`, `load-in-plan`, `strike-plan`, `cable-plan` | 5 |
+| Equipment Reference | `gear-reference` | 1 |
+| Infrastructure family | `power-plan`, `network-plan`, `lighting-patch` | 3 |
+| Live Control family | `teleprompter`, `show-timer`, `cue-sheet` | 3 |
+| Independent specialists and external music product | `pixelforge`, `throwline`, `stageplotter`, `av-calculator`, `led-wall-calculator`, `ontrack` | 6 |
+| Withdraw from public product; retain for possible redesign | `av-workbook` | 1 |
+| **Baseline total** | | **45** |
 
-## Baseline findings and constraints
+LED Wall Calculator remains a directly launchable specialist, also reachable from Video's Displays & Projection. It is not automatically converted into a Video record type. The historical [Tool Index v2](../av-tool-suite/index-v2/index.html) is not a second operating suite.
 
-| Finding | Current source | Design consequence |
+## Toolbox and shared experience
+
+- A fresh or neutral visit to `av-suite.html` opens Toolbox without a mandatory doorway question. The AV home page's primary application action opens Toolbox. Explicit `?entry=show`, `?entry=toolbox`, and supported legacy show-context links retain their documented targets. An old saved Show Console preference must not silently defeat the new neutral default; preserve unrelated pins, recents and show data during preference migration.
+- Applications have a clear name, current task, direct URL and dependable return to Toolbox. Back/Forward restore the application/task. Show Console and optional show attachment remain available without becoming a launch gate.
+- Toolbox distinguishes substantial applications, quick utilities and legacy tools awaiting consolidation. A thin wrapper around old pages is not a completed application. Search finds tasks as well as names and opens the owning application/module.
+- Keep navigation, light/dark theme controls, focus, save feedback, import preview, export and recovery conventions consistent. Light is the first-use default. Specialist controls remain suited to their own work.
+- Desktop/laptop uses top or side task navigation; mobile uses a labeled bottom rail unless a documented product/accessibility need warrants a different arrangement. Video must be visible on the default Toolbox view without opening a generic Systems group or search.
+- Use a viewport-locked `100dvh` shell with no page-level vertical or horizontal scrolling. Distinct subjects use tabs or pages; inherently long tables, lists and logs scroll inside bounded panels. Use ultrawide space for useful context rather than a stretched narrow column.
+
+## Optional modules
+
+The capability is settled. Initial module presets and whether a project's module setup travels with its document remain choices to resolve before that implementation.
+
+1. **Control:** Provide a plainly labeled Manage modules control in Toolbox and each affected app. Show what each module does and allow enable, disable, and restore defaults. Toolbox may also hide unneeded applications from the user's personal launch view; Manage applications keeps them recoverable.
+2. **Reduced clutter:** A disabled module disappears from normal tabs, cards, contextual panels, commands and default search results. An explicit Show disabled option in management/search makes it findable again. Do not leave empty tabs or repeated upgrade-style prompts.
+3. **Data preservation:** Disabling changes visibility, not document contents, import coverage or data ownership. Full-document backup/export retains disabled-module data; a deliberately scoped report identifies exclusions. Re-enabling restores existing work. Module preference changes never write `av-suite-dashboard.v1` readiness or mutate legacy records.
+4. **Dependencies:** Declare core functionality and module dependencies. Explain a required dependency before enabling it. Do not silently re-enable modules, suppress unresolved cross-module faults, or show an all-ready result for unevaluated work. Readiness identifies its evaluated scope.
+5. **Deep links and recovery:** A link to a disabled module shows its name and an explicit enable/open action. It does not silently change preferences or discard the route. Cancel returns to the app or Toolbox. Unknown/removed module IDs have a useful fallback.
+6. **Active operations:** A visibility toggle must never stop, hide, or orphan a running cue, timer, recording/control session or unsaved edit. Keep that active surface reachable and defer the toggle until the operation is safely resolved by the user.
+7. **Persistence:** Recommended first release: device-local personal preferences separate from project data, with versioned normalization and safe defaults when storage fails. Account sync, team policy and per-project presets are not prerequisites. Changing those ownership semantics requires the product decision below.
+
+Example: a projection operator opens Video from Toolbox, keeps Switching & Routes and Displays & Projection, and turns Cameras, Playback and Stream & Record off. The interface stays focused; saved stream records remain in backups and return unchanged when that module is enabled.
+
+## Workbook public withdrawal and retained concept
+
+Withdrawal is requested and settled; it is not complete in this planning revision. The current Toolbox still labels Workbook as its “Spine,” and both the registry and public Tools directory expose it. Remove that product positioning and launch dependency as an early bounded release, without waiting for Unified Video or a Workbook replacement.
+
+The withdrawal implementation must cover the AV home and Toolbox, Show Console recommendations, shared navigation/search, the System by Dave Tools directory and other public promotion, registry visibility, sitemap/indexing, direct Workbook URLs, domain staging and service-worker/offline assets. Removing a card alone is not removal from the public website. Audit both `avbydave.com` and the former `systembydave.com` routes, including `/av-workbook.html`, `/av-workbook/` and `/av-workbook/index.html`.
+
+Retain the Workbook concept and source in the repository for possible redesign. Keep its useful schema/import/load-guard history as engineering evidence, not a mandate to reuse its store. Retained source and generated editor assets must not leak into the public artifact through the current whole-repository Pages staging. Audit app source, generated bundle paths, aliases and caches explicitly.
+
+Preserve existing Workbook IndexedDB, active-ID/fallback keys, backups and domain-transfer coverage even when its public registry entry is hidden or retired. Storage coverage may need an explicit retained-data entry once it is no longer derived from a public tool. Do not clear browser databases, silently migrate them into Video, or redirect a saved document into an incompatible app. The remaining consequential choice is the user-facing recovery treatment of former URLs, not whether to remove Workbook. The recommended recovery notice offers export/transfer without exposing the full editor or advertising Workbook as an available product; verify this before retiring the public runtime.
+
+## Data, interfaces and failure behavior
+
+| Connection | Contract | Failure behavior |
 | --- | --- | --- |
-| Show Console and Toolbox are two addressable modes of `av-suite.html`; their saved preferences and show dashboard are separate. | [Doorway contract](av-suite-doorway.md), `js/av-suite/app.js` | Keep the stable doorway and the show-independent Toolbox boundary. |
-| At the spec baseline, the registry listed 44 tools and 59 registered local-storage keys; the current generated inventory has 45 tools and 60 declared keys. | `js/sbd-registry.js`, [generated inventory](av-suite-consolidation-inventory.md) | Use the registry to drive navigation and cutover, but audit storage outside it. |
-| AV Workbook has typed show, people, room, gear, signal, patch, line-check, power, RF, video, task, and audit entities. Its editable tabs are currently Overview, Crew Call, Room Check, and Engines. | `apps/av-workbook/src/types.ts`, `App.tsx`, `EngineDashboard.tsx` | Reuse its validated show data where appropriate; build real editing and task views before replacing legacy pages. |
-| At the spec baseline, legacy Audio and Workbook JSON imports saved immediately. Stage 0 subsequently added previews, backup, confirmation, and stale-preview rejection; full field parity remains open. | `legacyAudioImport.ts`, `legacyAudioImport.test.ts`, `App.tsx`, [Stage 0](av-suite-consolidation-stage0.md) | Prove field parity and recoverability before inviting users to retire old pages. |
-| Show Board stores an index, show records, and snapshots under `sbd.showboard.*` despite an empty registry `storageKeys` entry. The domain-transfer policy does include that prefix. | `show-board.html`, `scripts/domain-sites.json` | Inventory and test it directly; do not treat an empty registry entry as no saved data. |
-| Workbook uses IndexedDB `system-by-dave-av-workbook`; the AV transfer policy omitted it at the spec baseline. Stage 0 added database coverage and synthetic transfer checks. | `apps/av-workbook/src/store.ts`, `scripts/domain-sites.json`, [Stage 0](av-suite-consolidation-stage0.md) | Complete behavior and conflict recovery proof before any claim of lossless migration. |
-| Gear Reference publishes nine equipment-only sheets, five authored and four generated; they remain available offline. Venue-specific content stays in its owning workspace. | [Gear contract](gear-reference-contract.md), `gear-reference.html` | Make the model and source relationship a first-class reference contract; retain a useful no-network view. |
-| FMP model catalogs and rig content are managed exports from `fmp-suite`, with stable component IDs and distinct evidence vocabularies. | [Model contract](fmp-model-catalog-contract.md), [release contract](fmp-public-release.md) | Publish from the owning source and map identifiers explicitly rather than copying or rewriting models in AV by Dave. |
+| Toolbox → app | Direct route plus validated optional launch context; preference state remains separate from documents | Missing/disabled capability explains how to return or enable it; no blank wrapper and no data write on navigation |
+| App → specialist | Existing supported deep link or confirmed target-native [`sbd.handoff.v1`](../js/sbd-handoff.js) payload | Unsupported fields are identified; cancel/error leaves both records intact |
+| Legacy data → app | Preview, field/status mapping, backup, explicit confirmation, provenance and stale-preview rejection | Reject incompatible/newer shapes without overwriting; preserve raw source and offer recovery |
+| App → shared experience | Common shell/theme/accessibility/recovery contracts, with app-owned document validation and persistence | Storage failure leaves edits exportable and visibly unsaved; a newer schema opens safely without destructive normalization |
+| AV by Dave ↔ other origin | Published reference assets or explicit confirmed transfer | No assumption of shared localStorage/IndexedDB or identity; retain source on partial failure |
 
-## Information architecture
+Each focused app owns its saved work. Extract reusable validation, import or UI code where useful, but do not add a required Workbook runtime or shared mutable Workbook database. No automatic universal show record is approved. `sbdShow`, `sbdVenue`, `sbdDate`, `sbdOperator` and `sbdPhase` are launch hints, not identity proof or overwrite permission; a camera assignment never belongs in `sbdOperator`.
 
-The stable `av-suite.html` doorway continues to offer **Show Console** and **Toolbox**. A show context is optional. Toolbox is the entrance for equipment lookup, calculations, and specialist tools without show data; the neutral first-visit choice and saved entry preference remain as documented in the current doorway contract. The Show Console presents the current phase, open issues, and workspace entry points for show-attached work. It must not imply that launching a tool or following a venue link has merged records.
+Keep `av-suite-dashboard.v1` as Show Console's existing authority until a separately resolved readiness contract changes it. App readiness may be derived locally but must not silently write the console's status. Keep original status vocabularies and show the distinction between manufacturer facts, venue observations, inference and unverified field checks.
 
-Primary navigation contains seven plainly named workspaces, with **Video** visible without opening a generic category or search. On desktop, the selected workspace has a bounded main area, local task tabs, and an optional detail or evidence inspector. On mobile, primary destinations remain visible as labeled controls in a wrapped grid or compact list, without a hidden-only menu; local tabs scroll within the active workspace. A capability search finds tasks such as “trace a camera,” “check a line,” “find converter source,” or “pack a case,” not just page names. A result opens the relevant workspace and task view directly.
+FMP source/models remain owned by `fmp-suite`; authored equipment sheets remain in System by Dave. Public Equipment Reference is equipment-only. House content requires an explicit authorized workspace binding independent of Workbook, and an unavailable venue model must leave a useful equipment sheet. Preserve the existing Cue Sheet/CueForge and StagePlotter/PlotForge product boundaries.
 
-Each task view must have a shareable URL, with Back and Forward restoring the selected workspace and task. URL state may select a view or offer show context, but may not silently save or replace user data. The exact new route names belong to the implementation stage; existing public routes remain valid throughout migration.
+## Migration and delivery sequence
 
-| Primary workspace | Job completed there | Local views |
-| --- | --- | --- |
-| **Show Operations** | Prepare and run a show, rooms, crew, issues, and handoff | Advance, Rooms, Crew, Tasks, Closeout |
-| **Video** | Plan, connect, test, and operate the complete video chain | Cameras, Playback, Switching & Routes, Displays & Projection, Stream & Record, Issues |
-| **Audio** | Carry sources through patching, line check, PA, wireless, and comms | Inputs, Patch, Line Check, Speakers, RF & Comms |
-| **Logistics** | Track gear and cases from prep through strike | Prep, Pack, Load In, Cable, Strike |
-| **Equipment Reference** | Identify, inspect, and troubleshoot a device | Search, Sheet, Model, Components, Evidence, Procedures |
-| **Infrastructure** | Plan and verify power, network, and lighting distribution | Power, Network, Lighting |
-| **Live Control** | Reach cue, timer, and script controls quickly during a show | Run view plus dedicated full-screen controls where needed |
-
-A contextual **Specialist tools** launcher remains available from Toolbox and the relevant workspace. It is not another grid of empty wrappers. A specialist tool opens with a return path to the originating task and only receives supported context; its own data stays under its existing contract.
-
-### Full registry disposition
-
-Every registry ID in the 44-tool baseline has one primary home below. Newer entries, including LED Wall Calculator, require an explicit home before navigation cutover. A home is a navigation and task ownership decision, not authorization to delete its present route or saved data.
-
-| Home | Current registry IDs | Count | Target treatment |
-| --- | --- | ---: | --- |
-| Show Operations | `av-workbook`, `show-advance`, `site-survey`, `crew-call`, `crew-time-log`, `room-check`, `breakout-room-matrix`, `show-board`, `show-task-board`, `show-handoff`, `show-report`, `change-order`, `client-signoff` | 13 | Consolidate planning, rooms, crew, tasks, and closeout in editable show views. Preserve Show Board's live timeline until parity is proven. |
-| Video | `signal-flow`, `video-patch`, `display-plan`, `projection-plan`, `stream-plan`, `record-log`, `camera-shot-list`, `playback-check` | 8 | Direct primary destination for the full camera, switching, routing, playback, display, projection, stream, and record chain. |
-| Audio | `input-list`, `audio-patch`, `line-check`, `speaker-plan`, `rf-coordination`, `comms-check` | 6 | One source/channel flow through patch and check, with PA and wireless/comms views. |
-| Infrastructure | `power-plan`, `network-plan`, `lighting-patch` | 3 | Power and network share location/context; lighting remains a substantial specialist view. |
-| Logistics | `gear-prep`, `truck-pack`, `load-in-plan`, `strike-plan`, `cable-plan` | 5 | Shared item/case identity and phase views; show-specific state. |
-| Equipment Reference | `gear-reference` | 1 | Show-independent authored reference with managed model/evidence adapters. |
-| Live Control | `teleprompter`, `show-timer`, `cue-sheet` | 3 | Fast common launch/run context; keep full specialist controls until timing, keyboard, export, and remote behavior match. |
-| Contextual specialists | `pixelforge`, `throwline`, `stageplotter`, `av-calculator`, `ontrack` | 5 | Retain focused applications and deep-link from relevant workspaces. |
-| **Total** |  | **44** | |
-
-**Added after the baseline:** `led-wall-calculator`, recommended home *Contextual specialists*. It is launched from Video › Displays & Projection and kept in Calculators, because it holds one scenario and no show data. This is a recommendation from the [Stage 2 Video plan](av-suite-consolidation-stage2-video.md), not yet confirmed by Dave.
-
-`av-tool-suite/index-v2/` remains a historical concept page until this specification is implemented. Do not present it as a second live operating suite.
-
-## Workspace behavior contracts
-
-### Equipment Reference
-
-- Search by device, model, part, connector, symptom, procedure, and source. An authored sheet opens without a show context.
-- A model panel selects the sheet's mapped component and exposes the model, part-specific notes, photos, and source locators in the same reading flow. The current focused FMP iframe satisfies the first pilot, but a later adapter must support more source-owned models without embedding venue navigation.
-- Distinguish **manufacturer specification**, **FMP house observation**, **inference**, and **open field check** in the content. Keep the original Gear Reference accuracy log and the source catalog's confidence/geometry terms visible in their own contexts.
-- Stable sheet ID, model ID, component ID, source ID, and source revision form the mapping. Missing component or unavailable model shows a useful sheet and explicit availability message, never an empty panel or a false identification.
-- The authored text, tables, and schematics remain usable offline. A model needs an explicit offline packaging decision and provenance check before the UI promises offline 3D.
-- Gear Prep may link an item to a sheet but does not become the owner of general device knowledge.
-
-### Video
-
-Video opens directly from the primary navigation, from Toolbox without a show, and from Show Console with an optional show context. Its local views cover cameras and shots, playback, switching and signal routes, displays and projection, streaming, recording, and faults. A route connects source, processor or switcher, patch point, destination, format, backup, and test result. A source may fan out to screens, stream, and record destinations; those branches retain their own verification states. A diagram must not imply that an untested physical path is verified. Throwline launches from projection with the projector and screen context it actually supports. A camera, lens, or converter opens its Equipment Reference sheet and component model in context without making Video a venue-specific app.
-
-### Audio
-
-A source can be followed from input list to patch to line check without retyping identity. The view preserves all existing fields, check results, problem notes, print/export, and operator attribution. RF and comms keep their distinct frequency and assignment safety checks; they are local views, not squeezed into an audio channel row.
-
-### Infrastructure
-
-Power and network have room and device references, capacity or addressing checks, backup path, owner, issue, and verification status. Lighting Patch keeps fixture/universe/address workflows as a real view, with no forced power or network field mapping. Infrastructure is a labeled primary destination; relevant power/network details may also appear as context in Video, Audio, and Show Operations without creating duplicate records.
-
-### Logistics
-
-An item or case can move through pull, test, pack, truck zone, unload, destination, and strike. Each step records only the fields it owns. The operator can see what is missing, blocked, or unaccounted for by case and destination. A general gear sheet can be opened from an item; reading the sheet never changes the show's prep status.
-
-### Show Operations
-
-Advance and site findings feed room, crew, task, and handoff views when the user explicitly attaches them to a show. Show Board's live room-turn timeline, snapshots, and recovery behavior remain available until a new view demonstrates parity. Client-facing signoff and change-order exports retain explicit confirmation and provenance.
-
-### Live Control
-
-The Show Console should offer one fast “run the show” entrance with next cue, clock, script access, and current issues. Cue Sheet, Show Timer, and Teleprompter keep their dedicated views while their time-sensitive controls remain distinct. Combining them into a single runtime is a separate acceptance gate covering keyboard control, focus, remote mode, timing, display outputs, print/export, and failure recovery.
-
-## Data and integration boundaries
-
-1. **Reference content:** Authored `data/gear/` sheets belong to System by Dave. FMP models and evidence belong to `fmp-suite` and enter AV by Dave through a versioned published adapter/export. Throwline catalogs retain their own owner and evidence terms.
-2. **Show work:** AV Workbook may become the local source for typed show entities in consolidated editable views. Its existing IndexedDB is a starting point, not proof that every old field or show draft is represented. No workspace may silently replace active workbook data from URL context or an import.
-3. **Console state:** `av-suite-dashboard.v1` remains a separate show profile/readiness store during migration; `av-suite-ui.v1` remains a preference store. A later change may derive readiness from workspace data only after its source, conflict rule, and rollback are specified. Avoid two silent writers for one status.
-4. **Handoffs:** Use the confirmed, target-native `sbd.handoff.v1` flow for cross-tool transfers. `sbdShow`, `sbdVenue`, `sbdDate`, `sbdOperator`, and `sbdPhase` are launch hints, not identity proof or permission to overwrite a saved show. A camera assignment never goes in `sbdOperator`.
-5. **Specialists:** PixelForge, Throwline, StagePlotter, OnTrack, and the full live controls continue to own their specialist state. A contextual launch can pass only fields the receiving tool documents and validates.
-6. **Origins:** `avbydave.com` and `housevideo.app` cannot share localStorage or IndexedDB. Cross-origin content must use published assets or an explicit read-only embed; saved user work moves only through a visible, confirmed transfer.
-
-## Migration contract for each legacy tool
-
-Before reducing a legacy tool's prominence or retiring its route:
-
-1. Inventory its route, deep links, schema, localStorage keys and prefixes, IndexedDB stores, exports, print output, offline assets, field labels, status semantics, and keyboard behavior. Include stores omitted from the registry. Use synthetic fixtures; do not copy personal user data into the repository.
-2. Provide a preflight showing source, target show, records and fields to import, unmapped values, conflicts, and expected result. Offer a downloadable backup before the first write.
-3. Require explicit confirmation for an import or replacement. Assign stable source IDs and record source key/schema/hash and importer version so a repeat import is predictable. Never silently delete or overwrite a newer target edit.
-4. Verify counts **and** meaningful fields/statuses after writing. Keep the old source intact, preserve the old URL, and make a failed or partial transfer recoverable.
-5. Offer an operator-visible comparison and rollback. A rollback may restore navigation and reopen the legacy page; it must not require deleting newly saved work.
-6. Only then move the primary navigation to the consolidated task. Keep compatibility routes and export/import paths until documented usage and operator acceptance justify retirement.
-
-The Audio importer is the pilot for this contract. Stage 0 added preview, backup, explicit confirmation, stale-preview rejection, and reports of known unmapped structured fields for Audio and Workbook JSON imports. Synthetic checks also cover Show Board prefix transfer and AV Workbook IndexedDB. Complete field-by-field Audio mapping, destination-conflict recovery, UI repeat-import/rollback, and editable input/patch/check views before any “all data moved” statement. See the [Stage 0 migration record](av-suite-consolidation-stage0.md) for the exact shipped safeguards and open gates.
-
-## Release sequence
+Completed safety work in [Stage 0](av-suite-consolidation-stage0.md) and the [Video phase plan](av-suite-consolidation-stage2-video.md) carries forward. It does not prove a focused app exists, complete field parity, or operator acceptance. Audit and close migration gates by application slice; unrelated tools need not block a coherent release.
 
 | Stage | Deliverable | Exit gate |
 | --- | --- | --- |
-| 0. Inventory | Feature, route, storage, origin, export, and offline matrix for every registered entry; fix inventory gaps. | Every saved store has a tested backup/recovery path; unresolved mappings are listed. |
-| 1. Equipment pilot | The earlier FMP bridge shipped, then was withdrawn from the generic library under the October 1 workspace-boundary correction. Future model integration requires explicit workspace ownership. | Live component selection, source provenance, no-network fallback, responsive/keyboard checks. |
-| 2. Video | Direct Video entry and editable camera, playback, route/switching, display/projection, stream, and record views. Increments, entry gate, and execution briefs: [Stage 2 Video plan](av-suite-consolidation-stage2-video.md). | All eight Video registry capabilities stay directly reachable; representative camera-to-screen, camera-to-stream/record, and playback-to-display paths retain status, backup, and export details. |
-| 3. Audio | Editable sources, patches, line checks, PA, RF/comms task views and safe imports. | Field/status/export parity for the first three audio pages; repeat import and rollback pass. |
-| 4. Logistics | One case/item flow across prep, pack, load in, cable, and strike. | Counts and status transitions reconcile with each legacy page; lost-item and partial-pack scenarios pass. |
-| 5. Infrastructure | Power, network, and lighting views with explicit technical checks. | Each specialist's distinct fields, checks, and exports remain usable. |
-| 6. Show Operations | Advance, rooms, crew, tasks, and closeout views with explicit show attachment. | Show Board timeline/snapshot recovery and client outputs meet parity before route retirement. |
-| 7. Navigation cutover | Seven primary workspaces, capability search, contextual specialists, compatibility URLs. | Every registered capability has a tested reachable home; operator trial and live-domain verification pass. |
+| 0. Retain evidence and close slice safety | Current registry/route/store inventory; preserve completed 2.0a/2.0b and delivered 2.0c fixes | Enumerate undeclared stores, meaningful fields, exports, offline and recovery behavior for the affected slice |
+| 1. Toolbox default and Workbook withdrawal | Default Toolbox, explicit Show Console, public Workbook removal with agreed recovery behavior | Fresh/returning/deep-link routing passes; no Workbook promotion/editor in staged public artifacts; existing data remains recoverable |
+| 2. Unified Video | Independent application and selected module preset; routes first, then the remaining Video workflows | Eight legacy capabilities preserve fields/statuses; camera→screen, camera→stream/record and playback→display journeys pass without Workbook |
+| 3. Audio | Coherent Inputs→Patch→Line Check app, with optional specialist modules | Import, edit, export, repeat import and rollback preserve identity and meaningful fields |
+| 4. Logistics | Coherent prep→pack→load→strike flow, with optional Cable | Counts, partial packs, missing items and destination status reconcile |
+| 5. Remaining application families | Infrastructure, Show Operations and live applications follow resolved boundaries | Specialist controls, timelines, timing, keyboard, remote/display, client output and failure behavior meet parity |
+| 6. Complete discovery and migration | Task search, optional-module management, direct launch and compatibility coverage | Every supported capability has a reachable home; disabled and withdrawn states are explicit; operator trial and deployment readback pass |
 
-A stage is shipped independently, behind a reversible navigation change. Do not wait for every tool to be rewritten before making the completed workspace useful. Do not replace a functional page with a shell of links and call that consolidation.
+For each migrated capability, inventory first; preview source/target, unmapped fields and conflicts; offer backup; apply only on confirmation; verify counts and meaningful values; retain original data and provenance; reject stale/repeated imports that would overwrite newer edits. Keep compatibility and rollback until operator acceptance justifies route retirement. The specific Workbook withdrawal has its own recovery gate above and does not wait for a replacement product.
 
-## Acceptance criteria
+## Consequential choices before affected implementation
 
-- A new visitor can open Equipment Reference, inspect an authored sheet, and reach its source evidence without choosing a venue or show. The written reference works when House Video is unavailable.
-- A new visitor can identify and open **Video** from the primary navigation without using search, opening Systems, or selecting a venue. The Video workspace covers camera, switching/routing, playback, display/projection, stream, and record work in one coherent flow.
-- A show operator can complete input → patch → line check and prep → pack → load in → strike from their respective workspace without re-entering the same item identity. Saved status survives reload and import retry.
-- Each migrated workflow preserves its original meaningful fields, problem states, exports, print behavior, and deep links or documents an explicit operator-approved replacement.
-- No URL hint, import, legacy migration, or cross-origin transfer silently overwrites an active show, changes a person's name to a position code, or reports a partial write as complete.
-- All registered capabilities, including tools added after the 44-tool baseline, remain discoverable by task search and reachable from no more than two navigation actions on desktop and mobile. Primary navigation exposes seven labeled workspaces, including Video, with contextual specialist launchers.
-- At 390, 680, 1280, and a representative 32:9 viewport, primary destinations remain visible, local panes scroll independently where practical, focus is visible, and there is no unintended horizontal overflow. Light, dark, reduced-motion, keyboard, and no-network paths are verified.
-- Registry, sitemap, offline manifest, domain staging, public shell, generated Workbook artifact, CI, Pages deployment, and actual rendered `avbydave.com` and `housevideo.app` surfaces agree before release is called complete. Human operator acceptance remains a separate gate.
+These are open product choices, not a request to reapprove settled direction. Record the ruling once with date/source and carry it forward. An unresolved row blocks only work that depends on it; documentation, source audits and independent safety fixes may continue.
 
-## Decisions to validate during implementation
+| Choice | Recommended path | Consequence and decision gate |
+| --- | --- | --- |
+| **Workbook former URLs and recovery** | Recovery-only notice/export path with no public editor or product launch | Determine whether recovery needs a time-limited legacy access path and where it lives before withdrawing runtime assets. Public withdrawal itself is settled. |
+| **Document identity across applications** | Each app owns documents; share only explicit supported context/imports at first | A shared project container changes identity, conflict handling and migration scope. Resolve before the Video persistence contract; Workbook is not the assumed answer. |
+| **First module presets and preference scope** | A compact Video core around Switching & Routes; optional task modules chosen by the user; preferences local to that user/device | Confirm which task views appear initially and whether presets travel with projects before the module UI/import behavior ships. The ability to turn modules off is settled. |
+| **Remaining application boundaries** | Keep existing live apps separate; evaluate Infrastructure as a family before combining it | Resolve Power/Network/Lighting and live-app mergers before implementing those mergers. It does not block independent Video or Toolbox work. |
+| **Show Console readiness authority** | Keep manual console status and display app-derived issues separately | Automated aggregation needs one writer, scoped status semantics and conflict/rollback rules. Resolve only before adding that aggregation. |
 
-- **Recommended:** retain the two doorway modes and seven primary workspaces, with Video immediately visible. Revisit the grouping after an operator trial, not because a new route is easier to code.
-- **Recommended:** use AV Workbook's existing typed store for show-attached entities once field parity is established. Keep show-independent reference content outside it.
-- **Current boundary:** keep public equipment sheets independent of FMP. Add venue-specific models only through a verified workbook/workspace binding; a generic show-context link is insufficient. Do not promise offline model access before that release gate.
-- **Open:** whether Show Console readiness should remain manually maintained or become derived per workspace. Define one authority and conflict behavior before changing it.
+Routine choices such as component boundaries, route spelling within compatibility requirements, validation-library reuse, dependency extraction, test fixtures, cache invalidation, build wiring and reversible preference migrations are engineering work. Select and document them without asking Dave, provided they preserve the settled product and data boundaries. Do not turn the old Workbook architecture, repository layout, or absence of a framework into a constraint on application quality.
+
+## Acceptance and release evidence
+
+- A neutral visitor lands in Toolbox; Video and other focused apps launch directly without show or Workbook setup. Explicit Show Console and supported legacy links still work.
+- Disable a module, reload, follow a deep link, export/import, and re-enable it: clutter is reduced and original data survives. Disabled dependencies, active operations, unknown preferences, storage failure and scoped readiness are handled explicitly.
+- Workbook is absent from public discovery and the public editor artifact; former URLs follow the agreed recovery treatment. Existing browser work and backups remain recoverable. Retained source/concept does not become a hidden runtime requirement.
+- Each app completes its representative job with coherent identity, explicit status and usable export; links to specialists return to the original task. No replacement is accepted merely because it groups old forms.
+- At 1440×900 and 375×812, verify `document.documentElement.scrollHeight <= document.documentElement.clientHeight` and the matching width check. Also cover 680px and representative 32:9, keyboard, visible focus, light/dark, reduced motion and offline/recovery behavior.
+- Validate canonical sources, registry/inventory, sitemap, cache consumers, domain staging and generated artifacts together when changed. Run the repository's relevant checks, review the complete diff, commit/push, merge only a green current PR head, then verify the remote and complete Pages workflow.
+- Read back the destination deployment's source revision and actual affected browser journeys on [AV by Dave](https://avbydave.com/). Check former System by Dave routes and [House Video](https://housevideo.app/) only when affected. File/HTTP parity is not interactive proof; technical proof is not human/operator acceptance.
 
 ## Source map
 
-- Current routes and keys: `js/sbd-registry.js`; doorway behavior: [AV Suite Doorway](av-suite-doorway.md).
-- Stage 2 increments, Video-slice source audit, and field matrix: [Stage 2 Video plan](av-suite-consolidation-stage2-video.md).
-- Workbook entities, storage, and importer: `apps/av-workbook/src/types.ts`, `store.ts`, `App.tsx`, and `legacyAudioImport.ts`.
-- Equipment and evidence: [Gear Reference](gear-reference-contract.md), [FMP model catalog](fmp-model-catalog-contract.md), [FMP public release](fmp-public-release.md).
-- Domain transfer and publication: [Domain sites](domain-sites.md), `scripts/domain-sites.json`.
-- Public naming and navigation: [Content contract](public-content-contract.md), [Shell contract](public-shell-contract.md).
+- [Development assets and observed state](av-suite-development-assets-index.md), [registry](../js/sbd-registry.js), [generated inventory](av-suite-consolidation-inventory.md).
+- [Doorway contract](av-suite-doorway.md), [Stage 0 evidence](av-suite-consolidation-stage0.md), [Video phase and field matrix](av-suite-consolidation-stage2-video.md).
+- [Gear Reference boundary](gear-reference-contract.md), [FMP model catalog](fmp-model-catalog-contract.md), [FMP release](fmp-public-release.md).
+- [Domain staging and transfer](domain-sites.md), [domain configuration](../scripts/domain-sites.json), [Pages workflow](../.github/workflows/deploy-pages.yml).
+- [Public content](public-content-contract.md), [public shell](public-shell-contract.md), [repository execution contract](../AGENTS.md).
