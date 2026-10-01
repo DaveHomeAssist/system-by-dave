@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-01 — FMP rig zooms on scroll and trackpad pinch again
+
+- Scrolling over the 3D rig explorer's model (`/fmp/rig/`) zooms it again, as in the ATEM, P240, CCU4 and SuperJoy viewers (Dave, 2026-10-01). The rest of the page scrolls normally. A trackpad pinch over the model zooms the model rather than the page (Ctrl+wheel in Chrome and Firefox, gesture events in Safari).
+- The September 16 accessibility release had required Shift+scroll. macOS reports that as a horizontal scroll, so on a Mac it zoomed by nothing while still blocking the event. Shift+scroll now reads that axis. A plain horizontal swipe stays with the browser's back/forward gesture, and one flick zooms at most about 35%.
+- Re-exported from fmp-suite `3812e05` (DaveHomeAssist/fmp-suite#37). fmp-suite's unit test covers scroll, line-mode wheels, pinch, the Mac Shift case and Safari gestures; its browser suite drives a real mouse wheel and Ctrl+wheel at 1440×900. Not tested with a physical Mac mouse, trackpad or Safari.
+
 ## 2026-10-01 — Camera work separated from FMP Walk
 
 - FMP Walk has five tabs: Setup, Walk, Faults, Report and Reference. The Camera tab and camera launch card are removed. Legacy camera links still forward to Camera Operator.
