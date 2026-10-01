@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-01 — Gear Reference keeps the embedded rig in its full layout
+
+- On a 900px-tall laptop screen the four FMP camera-chain sheets sized the rig frame at 612px, below the 640px where the rig switches to its short-screen layout. The model shrank to a 236px strip and the frame scrolled on its own, so the mouse wheel over the model scrolled the frame instead of the sheet. Above 680px wide the frame now stays 660–740px tall: the model and part panel sit side by side (canvas 527×431 at 1440×900) and the wheel scrolls the sheet.
+- Checked in Google Chrome 154 at 1440×900 and with iPhone 13 emulation on all four sheets: the rig renders, Component and pointer selection work, drag and Shift+wheel move the model, and there are no console errors. Phones keep the shorter frame. Not tested on a physical phone.
+
 ## 2026-10-01 — FMP reference pages, P240 manual links and hygiene probe alignment
 
 - The build, gear, house and PTZ reference pages had no icon link, so browsers requested `/favicon.ico`, which no domain serves; the live hygiene probe reported the 404 (W1, W2). They now carry the suite's inline icon, and their CSP `img-src` allows `data:` as the rig's already does.

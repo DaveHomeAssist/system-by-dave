@@ -304,6 +304,9 @@
   svg.fig .badge-t{font-family:var(--font-mono);font-size:13px;font-weight:750;fill:var(--accent);text-anchor:middle;dominant-baseline:central}
   figcaption{margin-top:11px;padding-top:10px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px}
   .model-frame{width:100%;height:min(68vh,720px);min-height:420px;border:1px solid var(--line);border-radius:9px;background:var(--surface)}
+  /* The FMP rig drops to its short-screen layout (an 18rem model strip with a scrolling page) when its
+     frame is under 640px tall. Keep wider frames above that so the model and part panel share the frame. */
+  @media (min-width:681px){.model-frame{height:clamp(660px,72vh,740px);min-height:660px}}
   .model-note{margin:10px 0;color:var(--muted)}
   .figure-error{padding:20px;border:1px dashed var(--danger-line);border-radius:6px;color:var(--danger);text-align:center}
   .source-strip{margin-top:26px;padding-top:12px;border-top:1px solid var(--line);color:var(--faint);font:600 10.5px/1.45 var(--font-mono)}
