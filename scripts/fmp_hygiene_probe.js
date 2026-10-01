@@ -57,6 +57,14 @@ const ALIASES = ['/fmp-walk', '/fmp-walk/', '/fmp/walk/', '/fmp-index/'];
 const NOINDEX_PAGES = ['/fmp-index/'];
 const BROWSER_PAGES = [...MODEL_ROUTES, '/fmp/', '/fmpwalk/', '/fmp/rig/', '/fmp/guide/', '/fmp/camera/pit-center/', '/fmp/gear/', '/fmp/build/', '/fmp/ptz/'];
 const LEGACY_ORIGINS = [/davehomeassist\.github\.io/i, /\.chatgpt\.site/i];
+// Hosts that answer automated requests with a bot challenge (403/429/503) but load in a real
+// browser. Each entry records that browser check; a 404 or other failure from them still warns.
+const BOT_PROTECTED = new Map([['aviewfrommyseat.com', 'loaded in a real browser on 2026-10-01; one photo page showed a Cloudflare check']]);
+function classifyExternal(url, status) {
+  const host = new URL(url).hostname.replace(/^www\./, '');
+  if ([403, 429, 503].includes(status) && BOT_PROTECTED.has(host)) return 'challenged';
+  return status >= 400 || !status ? 'broken' : 'ok';
+}
 const LEGACY_APP_URLS = ['https://davehomeassist.github.io/fmpwalk/', 'https://davehomeassist.github.io/fmpwalk/camera/pit-center/'];
 // Pages that must offer a return to the FMP hub. The FMP suite is exempt from the
 // system home link (docs/public-shell-contract.md rule 1): /fmp/ is its home.
@@ -256,13 +264,16 @@ async function checkLinks() {
     record('L3', 'links', 'grey', 'External references respond', 'skipped by --skip-external');
     return;
   }
-  const brokenExternal = [];
+  const brokenExternal = [], challenged = [];
   for (const [url, from] of external) {
     if (/accounts\.google\.com|googleapis\.com|mail\.google\.com|run\.app/.test(url) || LEGACY_ORIGINS.some(pattern => pattern.test(url))) continue;
     const res = await statusOf(url);
-    if (res.status >= 400 || res.status === 0) brokenExternal.push(`${[...from].join(', ')} → ${url} (${res.status || res.error})`);
+    const kind = classifyExternal(url, res.status);
+    if (kind === 'challenged') challenged.push(`${url} (${res.status}; ${BOT_PROTECTED.get(new URL(url).hostname.replace(/^www\./, ''))})`);
+    else if (kind === 'broken') brokenExternal.push(`${[...from].join(', ')} → ${url} (${res.status || res.error})`);
   }
-  record('L3', 'links', brokenExternal.length ? 'warn' : 'pass', 'External references respond (bot blocks need a manual look)', brokenExternal.join('; ') || `${external.size} targets`);
+  const reachable = `${external.size - challenged.length} targets` + (challenged.length ? `; ${challenged.length} behind a bot challenge: ${challenged.join('; ')}` : '');
+  record('L3', 'links', brokenExternal.length ? 'warn' : 'pass', 'External references respond (bot blocks need a manual look)', brokenExternal.join('; ') || reachable);
 }
 
 async function checkContent() {
@@ -527,4 +538,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { releasePins, ACTIVE_RELEASES, FROZEN_RELEASES };
+module.exports = { releasePins, classifyExternal, ACTIVE_RELEASES, FROZEN_RELEASES };

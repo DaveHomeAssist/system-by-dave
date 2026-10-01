@@ -8,6 +8,19 @@ Owners: **fmp-suite** means fix the canonical source and re-export; **sbd** mean
 this repository; **Dave** means a console, credential or hardware step that an
 agent cannot do.
 
+## Status, October 1
+
+| # | Status |
+| --- | --- |
+| A1 | In review: DaveHomeAssist/fmp-suite#39 keeps the current stop by id, with a walk browser scenario that fails on the old code |
+| A2 | Done in system-by-dave #181: S1 checks only the `/fmp/` return, as the public-shell contract exempts FMP pages from the home link |
+| A3 | Done: fmp-suite #36 gave the four reference pages an icon, and the Phase A system-by-dave PR gives `switcher/`, `shader/` and `ursa-broadcast-g2/` one. A root `/favicon.ico` is no longer needed; the two instant-redirect pages are left as they are |
+| A4 | In review: fmp-suite #39 exports `/fmp/walk/`; the system-by-dave re-export adds it to `verify_fmp_release.js` |
+| A5 | In review: fmp-suite #39 retires `davehomeassist.github.io` in the backend default and docs. It takes effect after a backend redeploy and removal from the Google client (Dave). The ChatGPT Site origin moved to C4 because that Site still answers |
+| A6 | Done in system-by-dave #181 |
+| A7 | Done in the Phase A system-by-dave PR: L3 treats a 403, 429 or 503 from a browser-checked host as a bot challenge, with a unit test; a 404 still warns |
+| A8 | Partly done: camera-sim audit rows D10 and W2 are marked resolved. Outcome tables for the walk UX audit and `operator-reference-review.md` remain (fmp-suite) |
+
 ## Phase A: small fixes, no hardware
 
 | # | Issue | Evidence | Verdict and fix | Owner | Size |
@@ -36,6 +49,7 @@ agent cannot do.
 | C1 | Commissioning gates 1 to 4 in `docs/fmp-public-release.md` are still pending: the Google client listing `walk.housevideo.app` (1), sharing the Events, Crew Calls, Faults, Walk Reports and Cameras reference page with the FMP Walk Notion connection (2), a signed-in synthetic SETUP TEST camera save with exact Notion readback (3), and a separate walk acceptance with Gmail Sent receipt and Notion readback (4) | **Dave**, in order: check the Google Console origin list (gate 1), share the five Notion pages with the connection (gate 2), then run gates 3 and 4 signed in, and record the date in `docs/fmp-public-release.md`. Agents cannot sign in |
 | C2 | Camera Simulator device baseline (X8/X9), monitor delay and Camera 4 timing | **Dave**, one iPad session with `?diagnostics=1`; the venue timing needs a site visit |
 | C3 | The rig changes of September 29 and October 1 (touch rotation default; scroll and pinch zoom) were tested by emulation only | **Dave**, two minutes: drag and pinch on an iPhone and an iPad; scroll, Shift+scroll and trackpad pinch on the Mac in Safari and Chrome |
+| C4 | The camera backend still accepts the old ChatGPT Site origin. That Site still answers behind its owner gate, and the release contract says pending work remains recoverable there | **Dave** confirms no pending work remains on the old Site; then remove the origin from the `backend/server.js` default, the Google client and `docs/notion-setup.md`, and redeploy the backend |
 
 ## Closed without work
 
