@@ -654,6 +654,36 @@ h3 {
 
 .review-actions button:disabled { opacity: .55; cursor: wait; }
 
+.read-only-panel {
+  border-color: var(--wb-accent);
+}
+
+.read-only-panel h1 {
+  max-width: 22ch;
+  margin: 7px 0;
+  font-size: clamp(28px, 3vw, 40px);
+  line-height: 1.05;
+  letter-spacing: -.025em;
+}
+
+.read-only-panel .review-actions button {
+  min-height: 44px;
+}
+
+.read-only-panel .review-actions button:disabled { cursor: not-allowed; }
+
+.read-only-panel .read-only-note,
+.read-only-panel small {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
+.read-only-panel small {
+  color: var(--wb-dim);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
 .section-heading {
   grid-column: 1 / -1;
   display: grid;

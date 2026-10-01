@@ -50,7 +50,8 @@
     "test:av-video-legacy-browser": "node scripts/probe_av_video_legacy.mjs --no-sandbox",
     "test:av-save-safety-browser": "node scripts/probe_av_save_safety.mjs --no-sandbox",
     "test:av-nav-browser": "node scripts/probe_av_nav_dock.mjs --no-sandbox",
-    "test:av-suite-import-browser": "node scripts/probe_av_suite_import.mjs --no-sandbox"
+    "test:av-suite-import-browser": "node scripts/probe_av_suite_import.mjs --no-sandbox",
+    "test:av-context-fill-browser": "node scripts/probe_av_context_fill.mjs --no-sandbox"
   },
   "devDependencies": {
     "@types/react": "^19.2.17",

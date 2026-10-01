@@ -340,3 +340,10 @@
     display: none;
   }
 }
+
+/* The card deck repeats the table on screen only; print keeps the table. */
+@media print {
+  .av-domain-view {
+    display: none !important;
+  }
+}
