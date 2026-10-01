@@ -21,13 +21,13 @@
 <meta name="twitter:card" content="summary">
 <style>
 /* ============================================================
-   FMP PRESHOW WALK. Offline walk capture; optional online Gmail delivery.
+   FMP PRESHOW WALK. Local walk capture; explicit Gmail compose handoff.
    Night: the position, house lights down.
    Day:   the plazas and the lot, before doors.
    Status vocabulary is Dave's own: green / amber / red / blue.
    ============================================================ */
 
-/* ---------- night tokens (default) ---------- */
+/* ---------- night tokens (Night display mode; the first visit is light, WEB-1) ---------- */
 :root{
   color-scheme:dark;
   --bg:#0E1216;
@@ -38,7 +38,7 @@
   --line-soft:#222A31;
   --text:#E6EDF3;
   --muted:#8A99A8;
-  --dim:#5E6C79;
+  --dim:#7F8D9C; /* 4.5:1 or better on bg, surface and surface-2 */
 
   --accent:#F0A72E;
   --accent-fill:#F0A72E;
@@ -81,7 +81,7 @@
   --line-soft:#E5EAEF;
   --text:#0F171E;
   --muted:#4A5866;
-  --dim:#71808D;
+  --dim:#616F7D; /* 4.5:1 or better on bg, surface and surface-2 */
 
   --accent:#8A5100;
   --accent-fill:#F0A72E;
@@ -146,8 +146,8 @@ header{
 .hdr-count{font-family:var(--mono);font-size:12px;color:var(--muted);text-align:right;line-height:1.25}
 .hdr-count b{display:block;font-size:17px;color:var(--text)}
 .theme-btn{
-  width:44px;height:44px;border-radius:9px;border:1px solid var(--line);background:var(--surface-2);
-  display:flex;align-items:center;justify-content:center;font-size:19px;flex:0 0 auto;
+  min-width:44px;height:44px;padding:0 8px;border-radius:9px;border:1px solid var(--line);background:var(--surface-2);
+  display:flex;align-items:center;justify-content:center;font-size:12px;font-family:var(--mono);letter-spacing:.06em;flex:0 0 auto;
 }
 @media (max-width:400px){ .hdr-mark{display:none} }
 @media (max-width:360px){ .hdr-nav .sep,.hdr-sub{display:none} }
@@ -190,7 +190,7 @@ p.lede{margin:0 0 16px;color:var(--muted);font-size:14px}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:12px}
 .card.tight{padding:11px 13px}
 .card-hd{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px}
-.card-hd h4{margin:0;font-size:17px;font-weight:650;flex:1;letter-spacing:-.01em}
+.card-hd h3,.card-hd h4{color:var(--text);margin:0;font-size:17px;font-weight:650;flex:1;letter-spacing:-.01em}
 .tag{
   font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;padding:3px 7px;
   border-radius:3px;background:var(--surface-3);color:var(--muted);white-space:nowrap;
@@ -204,7 +204,7 @@ p.lede{margin:0 0 16px;color:var(--muted);font-size:14px}
 .spec i{font-style:normal;color:var(--text)}
 
 /* ---------- pass / flag ---------- */
-.pf{display:flex;gap:9px}
+.pf{display:flex;gap:9px;position:sticky;bottom:-26px;z-index:5;background:var(--surface);padding:8px 0 calc(34px + var(--safe-b));margin-bottom:-34px}
 .pf button{
   flex:1;min-height:var(--tap);border-radius:8px;font-weight:650;font-size:15px;
   border:1.5px solid var(--line);background:var(--surface-2);color:var(--muted);
@@ -219,7 +219,9 @@ p.lede{margin:0 0 16px;color:var(--muted);font-size:14px}
 
 /* ---------- fields ---------- */
 .rd{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:12px 0 2px}
-.rd label{display:block;font-size:11px;color:var(--muted);margin-bottom:4px;font-weight:560}
+.rd label,.rd .lbl{display:block;font-size:11px;color:var(--muted);margin-bottom:4px;font-weight:560}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg .chip{flex:1;min-width:0}
 .rd input,.fld input,.fld select,.fld textarea{
   width:100%;min-height:46px;background:var(--surface-2);border:1px solid var(--line);
   border-radius:7px;padding:10px 11px;color:var(--text);
@@ -233,7 +235,7 @@ p.lede{margin:0 0 16px;color:var(--muted);font-size:14px}
 .fld textarea{min-height:76px;resize:vertical;line-height:1.4}
 .email-card fieldset{border:0;padding:0;margin:0;min-width:0}
 .email-card button{min-height:var(--tap)}
-.email-card button:disabled{opacity:.55;cursor:not-allowed}
+button:disabled{opacity:.55;cursor:not-allowed}
 .email-card button:not(:disabled):hover{border-color:var(--accent)}
 .email-card .email-pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .email-card .note,.email-card .mini{overflow-wrap:anywhere}
@@ -260,13 +262,16 @@ select{appearance:none;background-image:linear-gradient(45deg,transparent 50%,va
 /* ---------- chips ---------- */
 .chips{display:flex;flex-wrap:wrap;gap:7px}
 .chip{
-  min-height:40px;padding:8px 12px;border-radius:6px;font-size:13.5px;font-weight:550;
+  min-height:44px;padding:8px 12px;border-radius:6px;font-size:13.5px;font-weight:550;
   background:var(--surface-2);border:1px solid var(--line);color:var(--muted);
 }
+.sheet-hd button{min-height:44px;min-width:44px}
 .chip.on{background:var(--accent-fill);border-color:var(--accent-fill);color:var(--accent-on);font-weight:660}
 .zone-chips{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
 .zone-chip{min-height:66px;text-align:left;display:flex;flex-direction:column;justify-content:center;gap:4px;overflow-wrap:anywhere}
 .zone-chip small{font-size:11px;font-weight:450}
+.zone-chip.req{background:var(--surface);border-style:dashed;color:var(--muted)}
+.zone-chip.req .zone-switch{opacity:.5}
 .zone-chip[aria-pressed="mixed"]{border-color:var(--accent);border-style:dashed;color:var(--text)}
 .zone-state{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:650;margin-bottom:3px}
 .zone-switch{display:inline-block;position:relative;width:36px;height:20px;border:1.5px solid currentColor;border-radius:20px}
@@ -310,6 +315,7 @@ select{appearance:none;background-image:linear-gradient(45deg,transparent 50%,va
 
 /* ---------- step nav ---------- */
 .stepnav{display:flex;gap:9px;margin-top:16px}
+#p-setup .stepnav{position:sticky;bottom:-26px;z-index:5;background:var(--bg);padding:10px 0 calc(36px + var(--safe-b));margin-bottom:-26px}
 .stepnav button{
   min-height:var(--tap);border-radius:8px;font-weight:620;font-size:15px;
   background:var(--surface-2);border:1px solid var(--line);color:var(--text);
@@ -351,7 +357,7 @@ select{appearance:none;background-image:linear-gradient(45deg,transparent 50%,va
 .tk-sym{font-size:13px;color:var(--muted);margin-bottom:7px}
 .tk-ft{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-family:var(--mono);font-size:10.5px;color:var(--dim)}
 .tk-ft .route{background:var(--surface-3);padding:2px 6px;border-radius:3px;color:var(--muted)}
-.tk-del{margin-left:auto;color:var(--red);font-size:12px;padding:6px 8px;font-family:var(--sans)}
+.tk-del{margin-left:auto;color:var(--red);font-size:12px;padding:6px 10px;font-family:var(--sans);min-height:44px;min-width:44px}
 .repeat{background:var(--bad-bg);color:var(--bad-fg);padding:2px 6px;border-radius:3px;font-weight:600}
 
 /* ---------- tables ---------- */
@@ -462,7 +468,7 @@ kbd{
   .rail{padding:0 22px 11px;padding-left:calc(22px + var(--safe-l))}
   .rail-lbl{padding:0 22px 9px;padding-left:calc(22px + var(--safe-l))}
   .hdr-show b{font-size:16.5px}
-  .theme-btn{width:46px;height:46px}
+  .theme-btn{min-width:46px;height:46px}
   .toast{bottom:32px}
 
   .sheet{
@@ -502,6 +508,16 @@ kbd{
   #p-walk.on{grid-template-columns:320px minmax(0,1fr)}
   #tkList{grid-template-columns:1fr 1fr 1fr}
 }
+/* Reviewed design reference: warm surfaces, terracotta actions; no whole-page inversion. */
+:root[data-theme="light"]{--bg:#f4ede4;--surface:#fffcf7;--surface-2:#f1e6d8;--text:#211d1a;--muted:#62594f;--dim:#62594f;--line:#b5a391;--accent:#9e432b;--accent-fill:#9e432b;--accent-on:#fffaf4;--accent-line:#9e432b;--surface-3:#e5d8c8;--line-soft:#e5d8c8}
+:root[data-theme="dark"]{--bg:#1c1916;--surface:#29241f;--surface-2:#352d26;--text:#fffaf4;--muted:#d6cabc;--dim:#d6cabc;--line:#817263;--accent:#ffb69f;--accent-fill:#ffb69f;--accent-on:#211d1a;--accent-line:#ffb69f;--surface-3:#44382e;--line-soft:#44382e}
+button,input,select,textarea{font:inherit;max-width:100%;box-sizing:border-box}input[type="file"]{width:100%;min-width:0}main,.panel,.card,.report-preview,.hdr-show{min-width:0}nav button{min-width:0;overflow-wrap:anywhere}.hdr-top{flex-wrap:wrap}button{min-height:44px}button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.lifecycle p,#walkIdentity,.report-preview p,.note{overflow-wrap:anywhere}
+.field-gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px}.field-gallery button{background:var(--surface);color:var(--text);border:1px solid var(--line);padding:8px;border-radius:8px}.field-gallery img{width:100%;height:96px;object-fit:cover;filter:none}.field-gallery span{display:block;font-size:12px}
+img,[role="img"]{filter:none!important}
+#walkContext{margin-top:24px}#startupRecovery{padding:16px;background:#f6ead2;color:#5f3d0b}
+dialog{max-width:min(90vw,720px);max-height:85dvh;overflow:auto;background:var(--surface);color:var(--text);border:1px solid var(--line);border-radius:12px;padding:24px}dialog::backdrop{background:rgba(20,17,15,.8)}dialog img{max-width:100%;max-height:60dvh;object-fit:contain;filter:none}.known-fault{padding:12px 0;border-bottom:1px solid var(--line)}.known-fault label{display:block}.known-fault select{max-width:100%;min-height:44px}
+@media(max-height:500px){body{height:auto;min-height:100dvh;overflow:auto}main{overflow:visible}nav{position:sticky;bottom:0}.panel{max-height:none}.sheet.on{max-height:90dvh;overflow:auto}}
 </style>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23f4eee2'/%3E%3Ccircle cx='16' cy='16' r='9' fill='none' stroke='%239a4525' stroke-width='3'/%3E%3Ccircle cx='16' cy='16' r='3.2' fill='%239a4525'/%3E%3C/svg%3E" type="image/svg+xml">
 </head>
@@ -531,7 +547,10 @@ kbd{
 <!-- ══════════════ SETUP ══════════════ -->
 <section class="panel" id="p-setup">
   <h2>Walk setup</h2>
-  <p class="lede">Enter the show details and select the areas to check.</p>
+  <p class="lede">Enter the show details and select the areas to check. Correcting the event or date preserves this walk's observations.</p>
+  <div class="card lifecycle"><p id="walkIdentity" class="mini"></p><p id="lifecycleNote" class="mini">Resume keeps this walk and position. New Walk creates a fresh identity and resets observations.</p><div class="btnrow"><button type="button" id="btnNew">New Walk</button></div><div id="setupUndo"></div></div>
+  <div class="note info" id="legacyRecovery" hidden><p>A separate legacy design draft is still stored in this browser. Your current walk has not been replaced. Download its backup before reviewing replacement.</p><button type="button" id="reviewLegacy" disabled>Preview legacy draft recovery</button><button type="button" id="downloadLegacy">Download original legacy draft</button></div>
+  <div class="note crit" id="recoveryNotice" role="alert" hidden><p id="recoveryMessage"></p><button type="button" id="downloadOriginal">Download original draft</button><button type="button" onclick="location.reload()">Reload saved draft</button></div>
 
   <div class="card">
     <div class="fld"><label for="fDate">Show date</label><input type="date" id="fDate"></div>
@@ -555,6 +574,15 @@ kbd{
     </div>
   </div>
 
+  <div class="card"><label><input type="checkbox" id="rigVerified"> Rig configuration verified on foot for this walk</label><p class="mini">Selecting a season does not verify the physical rig.</p></div>
+  <h3 id="zoneHeading">Zones to walk</h3>
+  <div class="card tight">
+    <div class="route-total" id="zoneSummary" role="status"></div>
+    <p class="zone-instruction" id="zoneHelp">Select optional areas. Required checks remain on every walk.</p>
+    <div class="zone-chips" id="secChips" role="group" aria-labelledby="zoneHeading" aria-describedby="zoneHelp"></div>
+    <div class="mini zone-summary">Totals count checks, not individual screens. Turning off an area keeps its saved readings.</div>
+  </div>
+
   <h3>Display mode</h3>
   <div class="card tight">
     <div class="chips" id="themeChips">
@@ -565,19 +593,12 @@ kbd{
     <div class="mini" style="margin-top:10px">Auto follows the device setting.</div>
   </div>
 
-  <h3 id="zoneHeading">Zones to walk</h3>
-  <div class="card tight">
-    <div class="route-total" id="zoneSummary" role="status"></div>
-    <p class="zone-instruction" id="zoneHelp">Select optional areas. Required checks remain on every walk.</p>
-    <div class="zone-chips" id="secChips" role="group" aria-labelledby="zoneHeading" aria-describedby="zoneHelp"></div>
-    <div class="mini zone-summary">Totals count checks, not individual screens. Turning off an area keeps its saved readings.</div>
-  </div>
-
-  <div class="stepnav"><button class="next" id="btnStart">Start walk</button></div>
+  <div class="stepnav"><button class="next" id="btnStart">Resume Walk</button></div>
 </section>
 
 <!-- ══════════════ WALK ══════════════ -->
 <section class="panel" id="p-walk">
+  <h2 class="sr-only">Walk</h2>
   <div id="routeList"></div>
   <div id="walkBody"></div>
 </section>
@@ -593,12 +614,15 @@ kbd{
 <!-- ══════════════ REPORT ══════════════ -->
 <section class="panel" id="p-rep">
   <h2>Report</h2>
-  <p class="lede">Review, download or send the report.</p>
+<p class="lede">Review, download or open a Gmail draft.</p>
+  <article class="report-preview" id="reportPreview" aria-label="Report preview"></article>
+  <pre id="repOut" hidden>Nothing to report yet.</pre>
   <div class="btnrow">
-    <button class="pri" id="btnCopy">Copy report</button>
+    <button id="btnCopy">Copy report</button>
     <button id="btnDl">Download report</button>
     <button id="btnJson">Download walk backup</button>
   </div>
+  <section class="card" aria-labelledby="restoreTitle"><h3 id="restoreTitle">Restore walk backup</h3><p class="mini">A versioned walk backup restores observations and attached photos. The report is for reading and cannot be imported. Preview before replacing this browser's draft.</p><label for="backupFile">Choose walk backup</label><input type="file" id="backupFile" accept=".json,application/json"><p id="restoreStatus" role="status"></p><button type="button" id="previewRestore" disabled>Preview restore</button></section>
   <p class="note info hide" id="exportStatus" role="alert" aria-live="assertive" aria-atomic="true"></p>
   <section class="card" aria-labelledby="photosTitle">
     <h3 id="photosTitle">Report photos</h3>
@@ -608,33 +632,15 @@ kbd{
     <p class="mini">Download a walk backup before starting a new walk. It includes saved photos.</p>
   </section>
   <section class="card email-card" aria-labelledby="emailTitle">
-    <h3 id="emailTitle">Email this report</h3>
-    <p class="mini">From <b>avbydave@gmail.com</b>. Includes the report, a walk backup, and saved photos. Requires a connection to Gmail.</p>
+    <h3 id="emailTitle">Gmail handoff</h3>
+    <p class="mini">Open a compose window, then review and send in Gmail. Nothing is sent by this app. Attach photos and the backup manually; no sender or self-copy is assumed.</p>
     <fieldset id="emailFields" aria-label="Email recipients">
-      <div class="fld"><label for="emailPreset">Saved recipient list</label><select id="emailPreset"></select></div>
-      <div class="fld"><label for="emailTo">To</label><input id="emailTo" type="text" inputmode="email" autocomplete="off" spellcheck="false" aria-describedby="emailAddressHint"></div>
-      <div class="email-pair">
-        <div class="fld"><label for="emailCc">CC (optional)</label><input id="emailCc" type="text" inputmode="email" autocomplete="off" spellcheck="false"></div>
-        <div class="fld"><label for="emailBcc">BCC (optional)</label><input id="emailBcc" type="text" inputmode="email" autocomplete="off" spellcheck="false"></div>
-      </div>
-      <p class="mini" id="emailAddressHint">Separate addresses with commas or semicolons.</p>
-      <details><summary>Save these recipients as a list</summary>
-        <div class="fld"><label for="emailListName">List name</label><input id="emailListName" type="text" maxlength="60" value="Personal copy"></div>
-        <div class="btnrow"><button type="button" id="emailSaveList">Save recipient list</button></div>
-      </details>
+      <div class="fld"><label for="emailTo">To</label><input id="emailTo" type="text" inputmode="email" autocomplete="off" spellcheck="false"></div>
+      <div class="email-pair"><div class="fld"><label for="emailCc">CC (optional)</label><input id="emailCc" type="text" inputmode="email"></div><div class="fld"><label for="emailBcc">BCC (optional)</label><input id="emailBcc" type="text" inputmode="email"></div></div>
+      <p class="mini">Separate addresses with commas or semicolons. Add yourself explicitly if you want a copy.</p>
     </fieldset>
-    <div class="btnrow">
-      <button type="button" id="emailConnect">Connect Gmail</button>
-      <button type="button" class="pri" id="emailSend" disabled>Send report</button>
-      <button type="button" id="emailDisconnect" hidden>Disconnect this tab</button>
-    </div>
-    <p class="note info" id="emailStatus" role="status" aria-live="polite" aria-atomic="true">Loading email controls. Downloads remain available if email is unavailable.</p>
-    <details><summary>Google sign-in help</summary>
-      <p class="mini">Retry sign-in. If it still fails, use Safari or Chrome and allow popups. Download a walk backup before switching browsers. Contact the app administrator if the problem continues.</p>
-    </details>
-    <p class="mini" id="emailReceipt"></p>
-    <div class="btnrow"><button type="button" id="emailRetry" hidden>Allow another send of this report</button></div>
-    <p class="mini"><a href="https://mail.google.com/mail/u/?authuser=avbydave%40gmail.com#sent" target="_blank" rel="noopener noreferrer">Open Gmail Sent</a> to check a submission. Gmail acceptance is not proof of delivery to every recipient.</p>
+    <div class="btnrow"><button type="button" class="pri" id="emailSend">Open Gmail draft</button></div>
+    <p class="note info" id="emailStatus" role="status" aria-live="polite">Copy and downloads remain available.</p>
   </section>
   <section class="card" aria-labelledby="notionTitle">
     <h3 id="notionTitle">Personal Notion record</h3>
@@ -642,21 +648,19 @@ kbd{
     <div id="notionGoogle"></div>
     <label><input type="checkbox" id="notionSetupTest"> Mark as a setup test, not a field walk</label>
     <div class="btnrow">
-      <button type="button" id="notionRetry">Retry Notion sign-in</button>
-      <button type="button" class="pri" id="notionSave" disabled>Save to Notion</button>
+      <button type="button" id="notionRetry" hidden>Retry Notion sign-in</button>
+      <button type="button" id="notionSave" disabled>Save to Notion</button>
       <button type="button" id="notionDisconnect" hidden>Disconnect Notion</button>
     </div>
     <p class="note info" id="notionStatus" role="status" aria-live="polite">Notion setup is not complete. Downloads remain available.</p>
     <a id="notionReceipt" hidden target="_blank" rel="noopener noreferrer">Open saved Notion report</a>
   </section>
-  <article class="report-preview" id="reportPreview" aria-label="Report preview"></article>
-  <pre id="repOut" hidden>Nothing to report yet.</pre>
-  <h3>Start a new walk</h3>
+  <h3>Clear current observations</h3>
   <div class="btnrow">
-    <button class="dgr" id="btnReset">Clear and start over</button>
+    <button class="dgr" id="btnReset">Clear observations</button>
   </div>
   <div id="undoRow"></div>
-  <div class="note info">Email and Notion saves require confirmation.</div>
+  <div class="note info">Gmail opens a compose window; you decide whether to send. Notion saving remains separate.</div>
   <div class="note" id="saveNote"></div>
 </section>
 
@@ -674,7 +678,7 @@ kbd{
     <tr><td>Typing a reading or a note</td><td>🟢 Within a second, and on leaving the field</td></tr>
     <tr><td>Half-finished fault sheet</td><td>🟢 Kept as a draft, offered back on return</td></tr>
     <tr><td>Switching apps</td><td>Saved when leaving the page</td></tr>
-    <tr><td>Clear and start over</td><td>🟢 One undo available</td></tr>
+    <tr><td>Clear observations</td><td>🟢 One undo available</td></tr>
   </table>
 
   <h3>Who gets the ticket</h3>
@@ -688,8 +692,8 @@ kbd{
     <tr><td>House audio</td><td>Black Box VIP sync. Fix is delay at the house audio console.</td></tr>
     <tr><td>Head of Video</td><td>Anything undocumented.</td></tr>
     <tr><td>Venue steward</td><td>🟢 Contact details are in Notion.</td></tr>
-    <tr><td>Videri console</td><td>🔴 Contact unknown. Ask the Head of Video.</td></tr>
-    <tr><td>ConcertVision</td><td>🔴 Contact unknown. Ask the Head of Video.</td></tr>
+    <tr><td>Videri console</td><td><span aria-hidden="true">🔴</span> Contact unknown. Ask the Head of Video.</td></tr>
+    <tr><td>ConcertVision</td><td><span aria-hidden="true">🔴</span> Contact unknown. Ask the Head of Video.</td></tr>
     <tr><td>Live Nation / 2024 integrator</td><td>Contact unknown. Ask the Head of Video.</td></tr>
   </table>
 
@@ -697,10 +701,10 @@ kbd{
   <table>
     <tr><td><kbd>P</kbd></td><td>Pass this position</td></tr>
     <tr><td><kbd>F</kbd></td><td>Flag it and open the fault sheet</td></tr>
-    <tr><td><kbd>S</kbd></td><td>Skip</td></tr>
+    <tr><td><kbd>S</kbd></td><td>Not observed</td></tr>
     <tr><td><kbd>N</kbd></td><td>Jump into the note field</td></tr>
     <tr><td><kbd>&larr;</kbd> <kbd>&rarr;</kbd></td><td>Previous and next position</td></tr>
-    <tr><td><kbd>1</kbd> to <kbd>6</kbd></td><td>Jump to a tab</td></tr>
+    <tr><td><kbd>1</kbd> to <kbd>5</kbd></td><td>Jump to a tab</td></tr>
     <tr><td><kbd>D</kbd></td><td>Cycle auto, day, night</td></tr>
     <tr><td><kbd>esc</kbd></td><td>Close the fault sheet</td></tr>
   </table>
@@ -719,6 +723,7 @@ kbd{
   <div class="note">Bowl LEDs, TVs and spectaculars are separate systems. Confirm the signal path before troubleshooting.</div>
 </section>
 
+<section class="card" id="walkContext"><h2>Dated field reference</h2><p class="mini">Historical photos and known faults are context, not current evidence or rig verification.</p><p id="referenceStatus" role="status">Loading dated reference…</p><button type="button" id="retryReference" hidden>Retry reference loading</button><div id="knownFaults"></div><div class="field-gallery" id="fieldGallery"></div></section>
 </main>
 
 <nav aria-label="FMP walk sections">
@@ -738,7 +743,9 @@ kbd{
 
 <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
+<div id="startupRecovery" role="alert">Loading the walk. If loading fails, your saved draft stays untouched. <button type="button" onclick="location.reload()">Retry loading walk</button></div>
 <script src="./walk-core.js?v=2feb000f544df442"></script>
+<script src="./walk-reliability.js?v=638be3b05c00f2a4"></script>
 <script>
 "use strict";
 
@@ -844,9 +851,24 @@ var S = {
 
 var WALK_KEY = "fmpWalk", PREV_KEY = "fmpWalkPrev", HIST_KEY = "fmpWalkHistory";
 var saveTimer = null, lastSaveAt = null, sheetTrigger = null;
+var recoveryLocked = false, loadedRaw = null, undoSnapshot = null;
+var R = FMPWalkReliability;
+function recovery(message){
+  recoveryLocked = true;
+  $("recoveryMessage").textContent = message;
+  $("recoveryNotice").hidden = false;
+}
+function persistCandidate(candidate){
+  if(recoveryLocked) return false;
+  var latest = store.get(WALK_KEY);
+  if(latest !== loadedRaw){ recovery("Another tab changed this draft. Download this tab's backup before reloading to resume the saved draft. This tab will not overwrite it."); return false; }
+  var raw = JSON.stringify(candidate);
+  if(!store.set(WALK_KEY, raw)){ STORAGE_OK = false; $("storageWarn").classList.remove("hide"); paintSaveState(); return false; }
+  loadedRaw = raw; STORAGE_OK = true; $("storageWarn").classList.add("hide"); return true;
+}
 
 function save(){
-  var persisted = store.set(WALK_KEY, JSON.stringify(S));
+  var persisted = persistCandidate(S);
   if(persisted){
     lastSaveAt = new Date();
   } else {
@@ -860,6 +882,7 @@ function save(){
 /* Debounced for keystrokes. Writing on every character is wasteful and
    a lost second of typing is not a lost walk. */
 function saveSoon(){
+  $("railR").textContent = "Unsaved changes · saving…";
   if(saveTimer) clearTimeout(saveTimer);
   saveTimer = setTimeout(function(){ saveTimer = null; save(); }, 600);
 }
@@ -882,18 +905,32 @@ document.addEventListener("visibilitychange", function(){
 window.addEventListener("blur", flush);
 
 function load(){
-  var raw = store.get(WALK_KEY);
-  if(!raw) return;
+  loadedRaw = store.get(WALK_KEY);
   try{
-    var o = JSON.parse(raw);
-    if(o && o.meta){
-      restoreWalk(o);
+    if(loadedRaw){
+      var saved = JSON.parse(loadedRaw);
+      if(saved && saved.meta && saved.schemaVersion == null){
+        saved.meta = Object.assign({date:"",show:"",op:"",cfg:"summer"},saved.meta);
+        if(saved.draft) saved.draft = Object.assign({id:crypto.randomUUID(),sym:[],sev:"deg"},saved.draft);
+      }
+      saved = R.validateDraft(saved);
+      restoreWalk(saved); S = R.identity(S);
+    } else {
+      var legacy = store.get("fmp-walk-v2");
+      if(legacy){
+        S = R.migrateLegacy(JSON.parse(legacy), FMPWalkCore);
+        $("lifecycleNote").textContent = "Legacy draft recovered. Original evidence remains in the backup; historical photo/fault records are separate from current tickets. Resume preserves observations.";
+      } else S = R.identity(S);
     }
-  }catch(e){}
+  }catch(e){
+    recovery("Saved draft could not be read: " + e.message + " It has not been replaced. Download the original or restore a validated backup.");
+    S = R.identity(S);
+  }
 }
-
+window.addEventListener("storage", function(event){ if(event.key === WALK_KEY && event.newValue !== loadedRaw) recovery("Another tab changed this draft. Download this tab's backup, then reload to resume. This tab will not overwrite it."); });
+$("downloadOriginal").onclick = function(){ dl("fmp-original-draft.json", loadedRaw || store.get("fmp-walk-v2") || "", "application/json"); };
 // Not named history(): a global function of that name would hide the browser's window.history.
-function walkHistory(){ try{ return JSON.parse(store.get(HIST_KEY)||"[]"); }catch(e){ return []; } }
+function walkHistory(){ if(Array.isArray(S.history)) return S.history; try{ return JSON.parse(store.get(HIST_KEY)||"[]"); }catch(e){ return []; } }
 function repeatCount(posKey){
   if(!posKey) return 0;
   var h = walkHistory(), n = 0;
@@ -918,13 +955,17 @@ function paintSaveState(){
   var el = $("railR"); if(!el) return;
   var bits = [];
   if(S.faults.length) bits.push(S.faults.length + " flagged");
-  bits.push(STORAGE_OK ? (lastSaveAt ? "saved " + hhmm(lastSaveAt) : "saving") : "NOT SAVING");
+  bits.push(recoveryLocked ? "RECOVERY REQUIRED · not saving" : STORAGE_OK ? (lastSaveAt ? "saved " + hhmm(lastSaveAt) : "saving") : "NOT SAVING");
   el.textContent = bits.join(" · ");
   el.style.color = STORAGE_OK ? "" : "var(--red)";
 }
 
 /* Route adapters keep UI state out of the shared core. */
-function restoreWalk(saved){ FMPWalkCore.restoreWalk(S, saved); }
+function restoreWalk(saved){
+  FMPWalkCore.restoreWalk(S, saved);
+  ["walkId","reportId","schemaVersion","startedAt","fobs","legacyDraft","legacyEvidence","evidence","recipients","history"].forEach(function(key){ if(saved[key] !== undefined) S[key] = structuredClone(saved[key]); else delete S[key]; });
+  S.tab = ["setup","walk","tk","rep","ref"].includes(saved.tab) ? saved.tab : saved.meta.show ? "walk" : "setup";
+}
 function availableStations(){ return FMPWalkCore.availableStations(S.meta); }
 function zoneGroups(){ return FMPWalkCore.zoneGroups(S.meta); }
 function stations(){ return FMPWalkCore.stations(S.meta); }
@@ -1015,6 +1056,21 @@ function renderRoute(){
   };
 }
 
+// A reading with a fixed set of answers is a row of buttons over a hidden field that grab() reads, so
+// saved walks and the report keep the same values. An older typed value is kept and shown until replaced.
+function segField(id, label, value, options){
+  value = value || "";
+  var known = !value || options.some(function(o){ return o[0] === value; });
+  var h = '<span class="lbl" id="' + id + 'Label">' + esc(label) + '</span>' +
+    '<input type="hidden" id="' + id + '" value="' + esc(value) + '">' +
+    '<div class="seg" role="group" aria-labelledby="' + id + 'Label">';
+  options.forEach(function(o){
+    h += '<button type="button" class="chip' + (value === o[0] ? " on" : "") + '" data-seg="' + id + '" data-v="' + o[0] + '" aria-pressed="' + (value === o[0]) + '">' + esc(o[1]) + "</button>";
+  });
+  return h + "</div>" + (known ? "" : '<div class="mini" id="' + id + 'Earlier">Earlier entry: ' + esc(value) + "</div>");
+}
+var YES_NO = [["yes","Yes"],["no","No"]], LEVEL = [["level","Level"],["suspect","Suspect"],["off","Off"]];
+
 function envTag(e){
   if(e === "A") return '<span class="tag a">Bowl LEDs</span>';
   if(e === "C") return '<span class="tag c">Spectaculars</span>';
@@ -1046,10 +1102,10 @@ function renderWalk(){
     var flagged = S.faults.length, noted = 0;
     for(var z=0;z<st.length;z++){ if(S.res[st[z].id] && S.res[st[z].id].note) noted++; }
     body.innerHTML = resumeBanner() +
-      '<div class="card"><div class="card-hd"><h4>End of route</h4></div>' +
+      '<div class="card"><div class="card-hd"><h3>End of route</h3></div>' +
       '<div class="spec"><b>Positions</b><i>' + st.length + '</i><b>Flagged</b><i>' + flagged + '</i><b>Noted</b><i>' + noted + "</i></div>" +
       (flagged
-        ? '<div class="note crit">🔴 ' + flagged + ' fault' + (flagged>1?'s':'') + ' logged. Review the report and route critical faults before doors.</div>'
+        ? '<div class="note crit"><span aria-hidden="true">🔴</span> ' + flagged + ' fault' + (flagged>1?'s':'') + ' logged. Review the report and route critical faults before doors.</div>'
         : '<div class="note">No faults logged.</div>') +
       '<div class="stepnav"><button class="prev" id="wPrev">Back</button><button class="next" id="wRep">Go to report</button></div></div>';
     window.__grab = null;
@@ -1062,7 +1118,7 @@ function renderWalk(){
   var s = st[S.idx], r = S.res[s.id] || {};
   var h = resumeBanner();
 
-  h += '<div class="card"><div class="walk-zone">' + esc(zoneLabel(s.zone)) + (s.stop ? " · " + esc(s.stop) : "") + '</div><div class="card-hd"><h4>' + esc(s.name) + '</h4>' + envTag(s.env) + '</div>';
+  h += '<div class="card"><div class="walk-zone">' + esc(zoneLabel(s.zone)) + (s.stop ? " · " + esc(s.stop) : "") + '</div><div class="card-hd"><h3>' + esc(s.name) + '</h3>' + envTag(s.env) + '</div>';
 
   if(s.spec && s.spec.length){
     h += '<div class="spec">';
@@ -1089,20 +1145,19 @@ function renderWalk(){
 
   if(s.kind === "led" || s.kind === "spec"){
     h += '<div class="rd">' +
-      '<div><label>Brightness read</label><input type="text" inputmode="decimal" id="rB" value="' + esc(r.bright||"") + '" placeholder="%">' +
+      '<div><label for="rB">Brightness read</label><input type="text" inputmode="decimal" id="rB" value="' + esc(r.bright||"") + '" placeholder="%">' +
       '<span class="base">baseline ' + esc(s.base) + "</span></div>" +
-      '<div><label>Matches partner</label><input type="text" id="rM" value="' + esc(r.match||"") + '" placeholder="yes / no"></div>' +
+      "<div>" + segField("rM", "Matches partner", r.match, YES_NO) + "</div>" +
       "</div>";
   }
   if(s.level){
-    h += '<div class="rd"><div style="grid-column:1/-1"><label>Level, against your fixed reference</label>' +
-         '<input type="text" id="rL" value="' + esc(r.level||"") + '" placeholder="level / suspect / off"></div></div>' +
+    h += '<div class="rd"><div style="grid-column:1/-1">' + segField("rL", "Level, against your fixed reference", r.level, LEVEL) + "</div></div>" +
          '<div class="mini">Check from the same position against a fixed horizontal reference.</div>';
   }
   if(s.kind === "tv"){
     h += '<div class="rd">' +
-      '<div><label>TVs checked</label><input type="text" inputmode="numeric" id="rC" value="' + esc(r.count||"") + '" placeholder="' + (s.qty ? s.qty : "n") + '"></div>' +
-      '<div><label>On expected content</label><input type="text" id="rM" value="' + esc(r.match||"") + '" placeholder="yes / no"></div>' +
+      '<div><label for="rC">TVs checked</label><input type="text" inputmode="numeric" id="rC" value="' + esc(r.count||"") + '" placeholder="' + (s.qty ? s.qty : "n") + '"></div>' +
+      "<div>" + segField("rM", "On expected content", r.match, YES_NO) + "</div>" +
       "</div>" +
       '<div class="mini">Record the number of TVs checked.</div>';
   }
@@ -1115,7 +1170,7 @@ function renderWalk(){
   h += '<div class="pf" style="margin-top:14px">' +
     '<button class="p' + (r.status === "pass" ? " on" : "") + '" id="bP">✓ Pass</button>' +
     '<button class="f' + (r.status === "flag" ? " on" : "") + '" id="bF">⚑ Flag</button>' +
-    '<button class="s' + (r.status === "skip" ? " on" : "") + '" id="bS">Skip</button>' +
+    '<button class="s' + (r.status === "skip" ? " on" : "") + '" id="bS">Not observed</button>' +
     "</div>";
 
   h += '<div class="stepnav">' +
@@ -1173,6 +1228,19 @@ function renderWalk(){
     var el = $(k); if(!el) return;
     el.addEventListener("input", function(){ grab(); saveSoon(); });
     el.addEventListener("blur",  function(){ grab(); save(); });
+  });
+  // A tap sets the reading; tapping the chosen answer again clears it.
+  body.querySelectorAll("[data-seg]").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      var field = $(btn.getAttribute("data-seg")), on = btn.getAttribute("aria-pressed") === "true";
+      field.value = on ? "" : btn.getAttribute("data-v");
+      body.querySelectorAll('[data-seg="' + field.id + '"]').forEach(function(other){
+        var pressed = other === btn && !on;
+        other.setAttribute("aria-pressed", String(pressed)); other.classList.toggle("on", pressed);
+      });
+      var earlier = $(field.id + "Earlier"); if(earlier) earlier.remove();
+      grab(); save();
+    });
   });
 
   $("bP").onclick = function(){ grab(); mark(s,"pass"); };
@@ -1257,7 +1325,7 @@ function openSheet(station, existing){
 
   h += '<fieldset class="choice-group"><legend>Severity</legend><div class="chips" id="sevChips">';
   for(var j=0;j<SEV.length;j++){
-    h += '<button type="button" class="chip sev' + (f.sev === SEV[j].v ? " on" : "") + '" aria-pressed="' + (f.sev === SEV[j].v ? "true" : "false") + '" data-v="' + SEV[j].v + '">' + SEV[j].l + "</button>";
+    h += '<button type="button" class="chip sev' + (f.sev === SEV[j].v ? " on" : "") + '" aria-pressed="' + (f.sev === SEV[j].v ? "true" : "false") + '" data-v="' + SEV[j].v + '">' + SEV[j].l.replace(/^(\S+) /, '<span aria-hidden="true">$1</span> ') + "</button>";
   }
   h += "</div>";
   h += '<div class="mini" style="margin-top:8px">Select the observed symptoms.</div></fieldset>';
@@ -1445,7 +1513,8 @@ function buildReport(){
   o.push("");
   o.push("> " + health + " **" + faults.length + " fault" + (faults.length === 1 ? "" : "s") +
     (crit ? ", " + crit + " critical" : "") + "**");
-  o.push("> " + pass + " pass · " + skip + " skipped · " + unwalked + " not walked · " + st.length + " checks on this route");
+  o.push("> " + pass + " pass · " + skip + " not observed · " + unwalked + " not walked · " + st.length + " checks on this route");
+  o.push("> Report ID: " + S.walkId);
   o.push("> Walked by " + mdLine(m.op || "walker required"));
   o.push("> Rig: " + (m.cfg === "winter" ? "Winter" : "Summer"));
   o.push("> Zones: " + (Array.from(new Set(st.map(function(s){ return zoneLabel(s.zone); }))).map(mdLine).join(" → ") || "none selected"));
@@ -1459,7 +1528,7 @@ function buildReport(){
   o.push("| --- | --- | --- | --- | --- |");
   for(var j=0;j<st.length;j++){
     var s = st[j], rr = S.res[s.id] || {};
-    var mk = rr.status === "pass" ? "🟢 pass" : rr.status === "flag" ? "🔴 flag" : rr.status === "skip" ? "🟡 skip" : "⬜ not walked";
+    var mk = rr.status === "pass" ? "🟢 pass" : rr.status === "flag" ? "🔴 flag" : rr.status === "skip" ? "🟡 not observed" : "⬜ not walked";
     if(rr.note) mk += " ✎";
     var read = [];
     if(rr.bright) read.push("bright " + rr.bright);
@@ -1547,11 +1616,20 @@ function buildReport(){
     o.push("");
   }
 
+  if(S.fobs && Object.keys(S.fobs).length){
+    o.push("## Dated known-fault re-observations", "", "> Historical fault context is separate from this walk's tickets. Not seen does not resolve a fault.", "");
+    Object.keys(S.fobs).forEach(function(id){ o.push("- " + mdLine(id) + ": " + mdLine(S.fobs[id])); });
+  }
+  if(S.legacyEvidence){
+    o.push("## Preserved legacy evidence", "", "> Recovered from the reviewed design draft. Names and historical photo associations are retained in the backup; no missing image bytes or current verification are inferred.", "");
+    (S.legacyEvidence.faults || []).forEach(function(f){ o.push("- " + mdLine(f.station || f.pos || "Unnamed") + ": " + mdLine(f.notes || "") + " · " + mdLine(f.severity || f.sev || "")); });
+    o.push("- " + (S.legacyEvidence.photos || []).length + " legacy photo references retained in backup.");
+  }
   o.push("---");
   o.push("");
   var photoOwners = [{label:"General report",photos:S.meta.photos || []}].concat(faults.map(function(f){return {label:f.pos || "Unnamed fault",photos:f.photos || []};}));
   if(photoOwners.some(function(owner){return owner.photos.length;})){
-    o.push("## Photo attachments", "", "> Photos are included in the walk backup and attached to emails. This report lists their filenames.", "");
+    o.push("## Photo attachments", "", "> Photos are included in the walk backup. Attach them manually in Gmail; this report lists filenames.", "");
     photoOwners.forEach(function(owner){ owner.photos.forEach(function(photo){ o.push("- " + mdLine(owner.label) + ": " + mdLine(photo.name)); }); });
     o.push("");
   }
@@ -1603,22 +1681,11 @@ function renderReport(){
   updateReportPreview();
   if(window.FMPPhotos) window.FMPPhotos.renderReport();
 
-  var prev = store.get(PREV_KEY);
-  $("undoRow").innerHTML = prev
-    ? '<div class="btnrow"><button id="btnUndo">Undo the last clear</button></div>'
-    : "";
-  if($("btnUndo")) $("btnUndo").onclick = function(){
-    try{
-      var o = JSON.parse(prev);
-      window.__grab = null; window.__grabSheet = null;
-      restoreWalk(o);
-      store.del(PREV_KEY); save(); syncSetup(); go("walk"); toast("Walk restored");
-    }catch(e){ toast("Backup could not be opened"); }
-  };
+  paintLifecycle();
 
   var n = $("saveNote");
-  n.className = STORAGE_OK ? "note info" : "note crit";
-  n.innerHTML = STORAGE_OK
+  n.className = STORAGE_OK && !recoveryLocked ? "note info" : "note crit";
+  n.innerHTML = STORAGE_OK && !recoveryLocked
     ? "Saved on this device. Last saved " + (lastSaveAt ? hhmm(lastSaveAt) : "not yet") + "."
     : "Changes are not being saved. Download a walk backup before closing this page.";
 }
@@ -1691,24 +1758,43 @@ $("btnJson").onclick = async function(){
   }catch(e){ showExportStatus(e.message || "Export failed. Keep this tab open and try again.",true); }
   finally{ this.disabled = false; }
 };
-$("btnReset").onclick = function(){
-  if(!confirm("Save this walk to the repeat-offender history and start a new one? One undo is available afterwards.")) return;
-  pushHistory();
-  try{ store.set(PREV_KEY, JSON.stringify({meta:S.meta,res:S.res,faults:S.faults,draft:S.draft,idx:S.idx})); }catch(e){}
+function paintLifecycle(){
+  ["undoRow","setupUndo"].forEach(function(id){
+    var root = $(id); root.replaceChildren();
+    if(!undoSnapshot) return;
+    var button = document.createElement("button"); button.type = "button"; button.textContent = "Undo the last clear";
+    if(id === "undoRow") button.id = "btnUndo";
+    button.onclick = undoClear; root.append(button);
+    var note = document.createElement("p"); note.className = "mini"; note.textContent = "Undo is available in this tab until reload, restore, or the next Clear/New Walk. It replaces any observations made since Clear."; root.append(note);
+  });
+  $("walkIdentity").textContent = "Walk/report " + S.walkId;
+  $("rigVerified").checked = !!S.meta.rigVerified;
+}
+function undoClear(){
+  if(!undoSnapshot || recoveryLocked) return;
+  if(!confirm("Restore the complete previous walk? This replaces observations made since Clear.")) return;
+  var restored = structuredClone(undoSnapshot.walk);
+  if(!persistCandidate(restored)){ toast("Restore was not saved. Keep this tab open and download a backup."); return; }
+  S = restored; undoSnapshot = null; window.__grab = null; window.__grabSheet = null;
+  syncSetup(); go(S.tab || "walk"); paintLifecycle(); window.dispatchEvent(new Event("fmp-walk-change")); toast("Complete walk restored, including its original ID");
+}
+function startNew(clear){
+  flush();
+  if(recoveryLocked) { toast("Resolve draft recovery before replacing a walk."); return; }
+  if(!confirm(clear ? "Clear all current observations, re-observations, attachment associations and rig verification? Undo is available only in this tab until reload, restore or the next Clear/New Walk." : "Start a new walk? Download a backup first. All current observations, attachments and rig verification reset. Undo is available only in this tab until reload, restore or the next Clear/New Walk.")) return;
+  S.history = structuredClone(walkHistory());
+  var before = structuredClone(S), next = R.newWalk(S,{clear:clear});
+  next.history = S.history.concat(S.faults.map(function(f){return {pos:f.pos,date:S.meta.date,sym:f.sym.join(", ")};})).slice(-400);
+  if(!persistCandidate(next)){ toast("New walk could not be saved. Existing observations are still open."); return; }
+  undoSnapshot = {walk:before};
   window.__grab = null; window.__grabSheet = null;
   if(saveTimer){ clearTimeout(saveTimer); saveTimer = null; }
-  S.res = {}; S.faults = []; S.draft = null; S.idx = 0;
-  S.meta = Object.assign({}, S.meta);
-  S.meta.show = ""; S.meta.date = todayISO();
-  delete S.meta.photos;
-  save(); syncSetup(); go("setup"); toast("New walk started. Undo is on the Report tab.");
-};
-
-/* ══════════════════════ setup ══════════════════════ */
-function todayISO(){
-  var d = new Date(), p = function(n){ return (n<10?"0":"") + n; };
-  return d.getFullYear() + "-" + p(d.getMonth()+1) + "-" + p(d.getDate());
+  S = next; syncSetup(); go("setup"); paintLifecycle(); window.dispatchEvent(new Event("fmp-walk-change")); toast("New walk ID created. Undo is in Setup and Report.");
 }
+$("btnReset").onclick = function(){ startNew(true); };
+$("btnNew").onclick = function(){ startNew(false); };
+$("rigVerified").onchange = function(){ S.meta.rigVerified = this.checked; save(); };
+function todayISO(){ return R.venueDate(); }
 function syncSetup(){
   S.meta = prepareMeta(S.meta);
   $("fDate").value = S.meta.date || todayISO();
@@ -1720,6 +1806,7 @@ function syncSetup(){
   $("fCfg").value = S.meta.cfg;
   renderZones();
   applyTheme();
+  paintLifecycle();
 }
 function renderZones(){
   var groups = zoneGroups(), selectedZones = 0, total = 0;
@@ -1734,7 +1821,7 @@ function renderZones(){
     total += count;
     var b = document.createElement("button");
     b.type = "button";
-    b.className = "chip zone-chip" + (full ? " on" : "");
+    b.className = "chip zone-chip" + (!selectable.length ? " req" : full ? " on" : "");
     b.setAttribute("data-zone", group.zone);
     b.setAttribute("aria-pressed", full ? "true" : count ? "mixed" : "false");
     if(!selectable.length) b.disabled = true;
@@ -1779,7 +1866,7 @@ function grabSetup(){
     if(id === "fOp" && $("fOp").value === "custom") $("fOpCustom").focus();
   });
 });
-$("btnStart").onclick = function(){ grabSetup(); S.idx = 0; save(); go("walk"); };
+$("btnStart").onclick = function(){ grabSetup(); save(); go("walk"); };
 $("themeBtn").onclick = cycleTheme;
 $("themeChips").onclick = function(e){
   var b = e.target.closest("[data-t]"); if(!b) return;
@@ -1812,6 +1899,7 @@ document.querySelector("nav").onclick = function(e){
 
 /* ══════════════════════ keyboard ══════════════════════ */
 document.addEventListener("keydown", function(e){
+  if(document.querySelector("dialog[open]")) return;
   var t = e.target, tn = t && t.tagName;
   var typing = tn === "INPUT" || tn === "TEXTAREA" || tn === "SELECT" || (t && t.isContentEditable);
   var sheetOpen = $("sheet").classList.contains("on");
@@ -1919,7 +2007,8 @@ window.addEventListener("popstate", function(){
 /* ══════════════════════ boot ══════════════════════ */
 if(!STORAGE_OK) $("storageWarn").classList.remove("hide");
 load();
-if(!S.meta.date) S.meta.date = todayISO();
+$("startupRecovery").hidden = true;
+if(!S.meta.date && !Object.keys(S.res).length && !S.faults.length) S.meta.date = todayISO();
 syncSetup();
 // A reload with the fault sheet open leaves its history entry behind while the sheet starts closed
 // (its draft waits behind Resume); drop that entry so the first Back leaves the stop as expected.
@@ -1945,7 +2034,7 @@ syncRoute(true);
   }
 })();
 </script>
-<script type="module" src="./email.js?v=fe26da41d9be3443"></script>
-<script type="module" src="./notion.js?v=1a06d2fd5b1e9c1e"></script>
+<script type="module" src="./email.js?v=6743ac2f30366875"></script>
+<script type="module" src="./notion.js?v=760791e5db5cab8b"></script>
 </body>
 </html>

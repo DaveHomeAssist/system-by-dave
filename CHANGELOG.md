@@ -1,5 +1,10 @@
 # Changelog
 
+## FMP Preshow Walk reliability release preparation — 2026-10-01
+
+- Receive the managed canonical export with stable walk/report IDs, explicit New/Resume, complete session Undo, legacy-draft recovery, validated backup restore previews, and Gmail compose handoff.
+- Preserve dated photo colors and historical/current evidence boundaries. Update the authored FMP release verifier for the local recovery module/reference manifest and reviewed JPEG allowlist.
+- Publication and merge remain pending explicit release authorization for this task. No generated asset or provenance was hand-edited.
 ## 2026-10-01 — Gear Reference reads the FMP equipment catalogs
 
 - Gear Reference has sheets for the Blackmagic ATEM Television Studio HD8 ISO, the Blackmagic ATEM Camera Control Panel (SWPANELCCU4), the BirdDog P240 and the PTZOptics SuperJoy G1 (PT-SUPERJOY-G1). They are generated from the exported FMP model catalogs by `npm run build:gear-from-fmp`, so the interactive models and the sheets read one part list (Dave's decision, 2026-10-01). Each part keeps its catalog evidence level and sources and links into the interactive model at `#part=<id>`.
