@@ -84,6 +84,11 @@ jobs:
           CHROME_CHANNEL: chrome
         run: npm run test:av-nav-browser
 
+      - name: Verify AV show context fill
+        env:
+          CHROME_CHANNEL: chrome
+        run: npm run test:av-context-fill-browser
+
       - name: Verify ATEM switcher guide
         env:
           CHROME_CHANNEL: chrome

@@ -4,7 +4,10 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { DataGrid } from "./DataGrid";
 import { EngineDashboard } from "./EngineDashboard";
-import { downloadText, exportWorkbook, importWorkbook, loadActiveWorkbook, saveWorkbook } from "./store";
+import {
+  downloadText, exportWorkbook, importWorkbook, loadActiveWorkbook, readActiveWorkbook, saveWorkbook, startBlankWorkbook,
+  storedWorkbookText, type WorkbookReadOnly
+} from "./store";
 import { mergeLegacyAudioIntoWorkbook, readLegacyAudioBundle } from "./legacyAudioImport";
 import { launchContextChanges, readLaunchContext, withLaunchContext } from "./launchContext";
 import { readRegistry } from "./registry";
@@ -68,6 +71,37 @@ function backupWorkbook(workbook: AvWorkbook): void {
   downloadText(`${safeName}-${workbook.workbookId}-backup.json`, exportWorkbook(workbook));
 }
 
+function storedText(value: unknown, key: string): string {
+  const field = value && typeof value === "object" ? (value as Record<string, unknown>)[key] : undefined;
+  return typeof field === "string" ? field : "";
+}
+
+/** Readable facts about a stored record the app cannot open, without trusting its shape. */
+function readOnlyFacts(readOnly: WorkbookReadOnly): { label: string; value: string }[] {
+  let record: unknown = readOnly.raw;
+  if (typeof record === "string") {
+    try {
+      record = JSON.parse(record);
+    } catch {
+      record = null;
+    }
+  }
+  const show = record && typeof record === "object" ? (record as Record<string, unknown>).show : undefined;
+  return [
+    { label: "Show", value: storedText(show, "showName") },
+    { label: "Workbook ID", value: storedText(record, "workbookId") || readOnly.activeId },
+    { label: "Last saved", value: storedText(record, "savedAt") },
+    { label: "Format", value: storedText(record, "schema") },
+    { label: "Kept in", value: readOnly.source === "fallback" ? "This browser's fallback copy" : "This browser's workbook storage" }
+  ].filter((fact) => fact.value);
+}
+
+function downloadStoredWorkbook(readOnly: WorkbookReadOnly): void {
+  const facts = readOnlyFacts(readOnly);
+  const id = (facts.find((fact) => fact.label === "Workbook ID")?.value || "workbook").replace(/[^a-z0-9-]+/gi, "-");
+  downloadText(`${id}-read-only.json`, storedWorkbookText(readOnly.raw));
+}
+
 export default function App() {
   const shellRef = useRef<HTMLElement>(null);
   const [workbook, setWorkbook] = useState<AvWorkbook | null>(null);
@@ -76,6 +110,10 @@ export default function App() {
   const [contextDismissed, setContextDismissed] = useState(false);
   const [pendingImport, setPendingImport] = useState<PendingImport | null>(null);
   const [importBusy, setImportBusy] = useState(false);
+  const [readOnly, setReadOnly] = useState<WorkbookReadOnly | null>(null);
+  const [blankBusy, setBlankBusy] = useState(false);
+  const readOnlyRef = useRef(false);
+  readOnlyRef.current = readOnly !== null;
   const launchContext = useMemo(() => readLaunchContext(typeof window === "undefined" ? "" : window.location.search), []);
   const contextChanges = workbook && !contextDismissed ? launchContextChanges(workbook, launchContext) : [];
   const registry = useMemo(readRegistry, []);
@@ -139,7 +177,12 @@ export default function App() {
     loadActiveWorkbook()
       .then((loaded) => {
         if (cancelled) return;
-        setWorkbook(loaded);
+        if (loaded.status === "read-only") {
+          setReadOnly(loaded);
+          setMessage("Workbook opened read-only. Nothing was saved.");
+          return;
+        }
+        setWorkbook(loaded.workbook);
         setMessage("Workbook loaded from local storage.");
       })
       .catch((error: unknown) => {
@@ -151,17 +194,45 @@ export default function App() {
     };
   }, []);
 
+  // Every save goes through here, so a read-only workbook is never written from any path.
+  async function persist(next: AvWorkbook): Promise<AvWorkbook | null> {
+    if (readOnlyRef.current) {
+      setMessage("This workbook is open read-only. Nothing was saved.");
+      return null;
+    }
+    return saveWorkbook(next);
+  }
+
   async function updateShow<K extends keyof AvWorkbook["show"]>(key: K, value: AvWorkbook["show"][K]) {
     if (!workbook) return;
-    const next = await saveWorkbook({ ...workbook, show: { ...workbook.show, [key]: value } });
+    const next = await persist({ ...workbook, show: { ...workbook.show, [key]: value } });
+    if (!next) return;
     setWorkbook(next);
     setMessage("Show profile saved.");
   }
 
   async function updateWorkbook(nextWorkbook: AvWorkbook, savedMessage: string) {
-    const saved = await saveWorkbook(nextWorkbook);
+    const saved = await persist(nextWorkbook);
+    if (!saved) return;
     setWorkbook(saved);
     setMessage(savedMessage);
+  }
+
+  async function startBlankFromReadOnly() {
+    if (!readOnly || blankBusy) return;
+    if (readOnly.source === "fallback" && !window.confirm("This browser holds the unreadable workbook only in its fallback copy, which a new workbook can replace if storage fails again. Download it first if you need it. Start a new blank workbook?")) return;
+    setBlankBusy(true);
+    try {
+      const blank = await startBlankWorkbook();
+      setReadOnly(null);
+      setWorkbook(blank);
+      setActiveTab("overview");
+      setMessage("New blank workbook started. The previous workbook is still saved in this browser.");
+    } catch (error: unknown) {
+      setMessage(error instanceof Error ? error.message : "A new workbook could not be saved.");
+    } finally {
+      setBlankBusy(false);
+    }
   }
 
   function handleExport() {
@@ -173,12 +244,13 @@ export default function App() {
   async function applyLaunchContext() {
     if (!workbook || !contextChanges.length) return;
     try {
-      const latest = await loadActiveWorkbook();
-      if (latest.workbookId !== workbook.workbookId || latest.savedAt !== workbook.savedAt) {
+      const latest = await readActiveWorkbook();
+      if (latest.status !== "ok" || latest.workbook.workbookId !== workbook.workbookId || latest.workbook.savedAt !== workbook.savedAt) {
         setMessage("Workbook changed in another tab. Reload and review the link again.");
         return;
       }
-      const saved = await saveWorkbook(withLaunchContext(latest, contextChanges));
+      const saved = await persist(withLaunchContext(latest.workbook, contextChanges));
+      if (!saved) return;
       setWorkbook(saved);
       setContextDismissed(true);
       setMessage("Suite link details applied to this workbook.");
@@ -246,17 +318,18 @@ export default function App() {
     if (!workbook || !pendingImport || importBusy) return;
     setImportBusy(true);
     try {
-      const latest = await loadActiveWorkbook();
-      if (latest.workbookId !== pendingImport.baseWorkbookId || latest.savedAt !== pendingImport.baseSavedAt) {
+      const latest = await readActiveWorkbook();
+      if (latest.status !== "ok" || latest.workbook.workbookId !== pendingImport.baseWorkbookId || latest.workbook.savedAt !== pendingImport.baseSavedAt) {
         setPendingImport(null);
         setMessage("Workbook changed since this preview. Review the import again before saving.");
         return;
       }
-      backupWorkbook(latest);
+      backupWorkbook(latest.workbook);
       const next = pendingImport.kind === "json"
         ? { ...pendingImport.proposed, workbookId: `wb-import-${crypto.randomUUID()}` }
         : pendingImport.proposed;
-      const saved = await saveWorkbook(next);
+      const saved = await persist(next);
+      if (!saved) return;
       setWorkbook(saved);
       setPendingImport(null);
       setActiveTab(pendingImport.kind === "legacy" ? "engines" : "overview");
@@ -270,10 +343,50 @@ export default function App() {
 
   async function replaceWorkbook(next: AvWorkbook, label: string) {
     if (!window.confirm(`Replace the current workbook with ${label}? Export first if you need a backup.`)) return;
-    const saved = await saveWorkbook(next);
+    const saved = await persist(next);
+    if (!saved) return;
     setWorkbook(saved);
     setActiveTab("overview");
     setMessage(`${label[0].toUpperCase()}${label.slice(1)} loaded.`);
+  }
+
+  if (readOnly) {
+    const facts = readOnlyFacts(readOnly);
+    return (
+      <main className="shell" ref={shellRef}>
+        <header className="workbook-header">
+          <div className="brand-lockup">
+            <a className="brand" href="../av-suite.html" aria-label="Back to AV Suite">
+              <span>S</span>
+              <strong>System_by_Dave</strong>
+            </a>
+            <small>Show operations spine</small>
+          </div>
+          <nav aria-label="Workbook actions">
+            <a className="console-action" href="../av-suite.html">Suite Console</a>
+          </nav>
+        </header>
+        <section className="review-panel read-only-panel" role="alert" aria-labelledby="read-only-title" data-workbook-read-only={readOnly.reason.code}>
+          <div>
+            <p className="kicker">Read-only workbook</p>
+            <h1 id="read-only-title">This workbook was left untouched</h1>
+            <p>{readOnly.reason.code === "unreadable-storage"
+              ? "This browser could not read its saved workbook, so this version opened it read-only. Nothing has been saved, and the active workbook was not changed."
+              : "It was saved by a newer or incompatible version of AV Workbook, so this version opened it read-only. Nothing has been saved, and it is still the active workbook in this browser."}</p>
+            <p>{readOnly.reason.summary}{readOnly.reason.code === "newer-schema" ? " Reload this page to fetch the latest version." : ""}</p>
+          </div>
+          {facts.length ? (
+            <ul aria-label="Saved workbook details">{facts.map((fact) => <li key={fact.label}><strong>{fact.label}</strong><span>{fact.value}</span></li>)}</ul>
+          ) : null}
+          <div className="review-actions">
+            <button type="button" disabled={readOnly.raw === undefined} onClick={() => downloadStoredWorkbook(readOnly)}>Download this workbook</button>
+            <button type="button" disabled={blankBusy} onClick={() => void startBlankFromReadOnly()}>{blankBusy ? "Starting…" : "Start a new blank workbook"}</button>
+          </div>
+          <p className="read-only-note">Starting a new workbook makes it the active one. The saved workbook stays in this browser; it is not deleted.</p>
+          <small role="status" aria-live="polite">{message}</small>
+        </section>
+      </main>
+    );
   }
 
   if (!workbook) {
