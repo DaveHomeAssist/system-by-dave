@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-01 — FMP Preshow Walk: route button, tap readings, record-first and readable on phones
+
+- **Route:** the stop rail is one full-width Route button (it was 25 slivers about 13 px wide, the only way to jump on a phone). On phones it opens the route list as a bottom sheet with 44 px rows named by stop and key; Back, Escape and Close dismiss it. Wide screens keep the list beside the walk.
+- **Recording first:** Pass and Flag lead each stop and Next is outlined; logging a new fault for the current stop moves on, as Pass and Skip do; the end card counts positions not walked and jumps to the first.
+- **Readings:** Matches partner, On expected content and Level are Yes/No and Level/Suspect/Off buttons over the same stored values; an older typed entry is kept and shown until replaced. Every reading label names its field.
+- **Readable and reachable:** dim text reaches 4.5:1 on every card surface in Day and Night (Night was 2.84:1), chips and small buttons are 44 px, Pass/Flag/Skip and Start walk stay above the nav while the page scrolls, Setup leads with the route and marks Required zones apart, and the walk's headings are in order.
+- **Report:** the preview comes first, Send report is the one primary button, disabled buttons look disabled, and Retry Notion sign-in appears only after sign-in could not start.
+- Re-exported `fmpwalk/` from fmp-suite main (#43, #44, #45, #47, #48, #49 via #50); `fmp/` is unchanged apart from its pin. Checked with the domain cutover acceptance (58/58) and the walk browser suite (52 scenarios) before release. Not tested on a physical phone.
+
 ## 2026-10-01 — FMP rig scroll and pinch zoom; walk keeps its place, Back and deep links; /fmp/walk/
 
 - Scrolling over the 3D rig explorer's model (`/fmp/rig/`) zooms it again, as in the ATEM, P240, CCU4 and SuperJoy viewers (Dave, 2026-10-01). The rest of the page scrolls normally. A trackpad pinch over the model zooms the model rather than the page (Ctrl+wheel in Chrome and Firefox, gesture events in Safari). The September 16 accessibility release had required Shift+scroll, which macOS reports as a horizontal scroll, so on a Mac it zoomed by nothing while still blocking the event; Shift+scroll now reads that axis. A plain horizontal swipe stays with the browser's back/forward gesture, and one flick zooms at most about 35%.

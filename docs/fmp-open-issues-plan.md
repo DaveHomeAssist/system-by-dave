@@ -12,21 +12,23 @@ agent cannot do.
 
 | # | Status |
 | --- | --- |
-| A1 | Fixed in source: fmp-suite #39 (merged `5684a13`), shipped by the system-by-dave #179 release export. A follow-up fixed two cases Codex review found: a rig change (a select fires `input` before `change`) and a finished walk |
+| A1 | Done: fmp-suite #39. Live since the 2026-10-01 07:45 UTC deploy of the system-by-dave #179 release (after #191 fixed the cutover check). A follow-up fixed two cases Codex review found: a rig change (a select fires `input` before `change`) and a finished walk |
 | A2 | Done in system-by-dave #181: S1 checks only the `/fmp/` return, as the public-shell contract exempts FMP pages from the home link |
 | A3 | Done: fmp-suite #36 gave the four reference pages an icon, and system-by-dave #185 gives `switcher/`, `shader/` and `ursa-broadcast-g2/` one. A root `/favicon.ico` is no longer needed; the two instant-redirect pages are left as they are |
-| A4 | Fixed in source: fmp-suite #39 exports `/fmp/walk/`, and fmp-suite #42 adds its full head metadata. The system-by-dave #179 release export ships it and adds it to `verify_fmp_release.js` |
+| A4 | Done: fmp-suite #39 and #42; `/fmp/walk/` returns 200 and redirects to the walk. Live since the 2026-10-01 07:45 UTC deploy of the system-by-dave #179 release (after #191 fixed the cutover check). |
 | A5 | Code done in fmp-suite #39: `davehomeassist.github.io` left the backend default and docs. It goes live after a backend redeploy and removal from the Google client (Dave). The ChatGPT Site origin is C4 |
 | A6 | Done in system-by-dave #181 |
 | A7 | Done in system-by-dave #185: L3 reports a 403 or 429 from a browser-checked host as unverified (grey), never as a pass, and the overall light can then be Grey but not Green. A 404 or 5xx still warns. Unit-tested |
 | A8 | Done: system-by-dave #185 resolved camera-sim audit rows D10 and W2; fmp-suite #41 records an outcome for every walk UX audit recommendation (`docs/walk-ux-audit-outcomes.md`) and for the operator reference review |
-| B2 | Fixed in source: fmp-suite #40 (merged), shipped by the system-by-dave #179 release export. Hash routes for the walk (`#/walk/<stop>`, `#/faults`, `#/report`) with Back, reload and deep links; the first Back closes an open fault sheet |
+| B1 | Done: fmp-suite #49 (via #50), shipped by the walk UX release export. One full-width Route button; on phones the route list is a bottom sheet with 44px rows that Back, Escape and Close dismiss |
+| B2 | Done: fmp-suite #40. Live since the 2026-10-01 07:45 UTC deploy of the system-by-dave #179 release (after #191 fixed the cutover check). Hash routes for the walk (`#/walk/<stop>`, `#/faults`, `#/report`) with Back, reload and deep links; the first Back closes an open fault sheet |
 | B3 | Done: system-by-dave #187, a weekly WebKit smoke for the Camera Simulator. Its first CI run rendered with WebGL on iPhone 13 and iPad Pro 11 emulation (8/8) |
-| B4 | In review: fmp-suite #43, a sticky Pass/Flag/Skip bar above the nav |
-| B6 | Partly in review: fmp-suite #43 ties every reading label to its field. Segmented controls for yes/no and level readings remain |
-| B7 | In review: fmp-suite #44, Display mode after the zones, a sticky Start walk (it sat at y=1435 on a 390x844 phone) and a distinct Required style |
-| B8 | In review: fmp-suite #43, `--dim` at 4.5:1 on all card surfaces in both modes (Night measured 2.84:1), 44px targets, heading levels, status emoji hidden from screen readers |
-| B9 | In review: fmp-suite #45, preview first, Send as the one primary action, a global disabled style, Retry Notion only after a failure. Moving Clear and start over to Setup follows #44 |
+| B4 | Done: fmp-suite #43, with #47 fixing an overlap at the end of a stop; shipped by the walk UX release export |
+| B5 | Done: fmp-suite #47 (via #50), shipped by the walk UX release export. Next is outlined, Save fault advances, the end card counts positions not walked. The audit's optional confirm on Next is declined: it adds friction mid-walk and the end card catches skips |
+| B6 | Done: labels in fmp-suite #43, tap controls in #48 (via #50); shipped by the walk UX release export. Older typed entries are kept and shown until replaced |
+| B7 | Done: fmp-suite #44, shipped by the walk UX release export |
+| B8 | Done: fmp-suite #43, shipped by the walk UX release export. Night `--dim` measured 2.84:1 before, 4.5:1 or better after |
+| B9 | Done: fmp-suite #45, shipped by the walk UX release export. Clear and start over stays on Report by decision: it is the last step of send, back up, clear, and has a confirm and an undo |
 
 ## Phase A: small fixes, no hardware
 
