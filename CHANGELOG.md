@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-01 — Preserve legacy FMP walk confirmations
+
+- Regenerate the managed FMP release from canonical source `0f4de8ca282d0b115825802dd6bd7449e6ba574a` so legacy numeric-key and array checklists retain their confirmations, including Lawn readings excluded by a winter route.
+- Normalize a deselected legacy fault observation to Not re-observed without changing the original saved draft or relaxing validation for current records. Add source regression coverage for visible checks, reports, backups and reloads.
+
 ## 2026-10-01 — LED wall whole-cabinet data planning
 
 - Added an automatic row-serpentine whole-cabinet port plan and a color-coded 3D cabinet map. The primary port result now reports planned chains while retaining the even-pixel lower bound separately; oversized cabinets and insufficient entered processor ports are flagged.

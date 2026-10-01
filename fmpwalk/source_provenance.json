@@ -1,7 +1,7 @@
 {
   "schema": "fmp.public.release.v2",
   "sourceRepository": "DaveHomeAssist/fmp-suite",
-  "sourceCommit": "ba3d316d21cc980d26449aaca0e9c707878d4636",
+  "sourceCommit": "0f4de8ca282d0b115825802dd6bd7449e6ba574a",
   "mode": "local-first",
   "files": {
     "assets/walk-photos/2026-08-28-bacardi-concession-menu-displays-closeup.jpg": "8d503de7ddd3f8fd678edbf66c3b85882990b807d4cafd3feebcbe8d4059149b",
@@ -25,14 +25,14 @@
     "assets/walk-photos/2026-09-16-concession-menu-board-beer-seltzer-wine.jpg": "90575bfafbcd44034284b7efeebaedef1b7bbe3ae6532b37477fc38340a8afc4",
     "assets/walk-photos/2026-09-16-concession-menu-board-drinks.jpg": "f10d2074f7eb8bf1971a98d73ab94f394bf540fbdee7484ca1bb758018f34a70",
     "email.js": "6743ac2f30366875656baa60e3e8d107ff605d3b8d54a94d7138219a62d260c5",
-    "index.html": "a8c3122e22579a422339a8b33cce569801284f9132ce93854d2c966ba6e87811",
+    "index.html": "18c5cf585f56a675b60b20d00d40ded442937a3d931511e0fca94285b50dbf94",
     "mail.js": "fe07a45a7b6d11537a05f44f5349b4b1e4407f4891fb3a8037377a5ccba0022a",
     "notion-config.js": "b675c734abe301f46f50f05a65ae58b9d25bd07c57fa8b01ef07e456e32271fc",
     "notion.js": "760791e5db5cab8b6cd99921a75297d815600ebb6e1f08a530ac07e3bb72b1be",
     "photos.js": "56a96b43f5b35693ec72e0876fb30b8a989edb9197b469dcc9099d544da5164e",
     "walk-core.js": "2feb000f544df4428b8a96d60de78bcc9fb21dab11d7c28d3f1205495a400ec4",
     "walk-reference.json": "646f0c57001da5a52065690254646292af78dabeb4fe0e4c33f8683a8623df2a",
-    "walk-reliability.js": "638be3b05c00f2a43c9a8dce5d190f46d9295db749853ebe3c6fd7c44b82181a"
+    "walk-reliability.js": "69c42cc2f7ccc989584dcd8ba1a1264dd063aa3358a0590f7aac1785616391d0"
   },
-  "artifactSha256": "9f134f4000936966a633a996ee493bc8011d14f3f03638b5c07ff3c505398cb8"
+  "artifactSha256": "15697fa7c4226abdc151b5e6959459afbf4d45721e9ed5e2a6a0a8dba05073cd"
 }
