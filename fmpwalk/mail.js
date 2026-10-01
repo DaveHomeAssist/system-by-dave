@@ -1,5 +1,5 @@
 // Pure report packaging. No Google credentials or browser storage in this module.
-import { photoRefs, validatePhoto, MAX_PHOTOS } from './photos.js?v=b212ddfae13e1efe';
+import { photoRefs, validatePhoto, MAX_PHOTOS } from './photos.js?v=56a96b43f5b35693';
 export const SENDER = 'avbydave@gmail.com';
 export const CLIENT_ID = '1055607889332-6seksmcrl3n06euvf127514fp5qg6t66.apps.googleusercontent.com';
 export const SEND_SCOPE = 'https://www.googleapis.com/auth/gmail.send';
@@ -43,7 +43,7 @@ export function recipients(fields) {
   return result;
 }
 
-export function snapshot(state, markdown, now = new Date(), id = crypto.randomUUID()) {
+export function snapshot(state, markdown, now = new Date(), id = state.walkId || state.reportId || crypto.randomUUID()) {
   if (!markdown || markdown === 'Nothing to report yet.') throw new Error('Record a show or walk result before sending.');
   // Explicit allowlist prevents UI state, drafts, recipients, or future credentials leaking into attachments.
   const walk = JSON.parse(JSON.stringify({ meta: state.meta, res: state.res, faults: state.faults }));

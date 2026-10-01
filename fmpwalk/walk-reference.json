@@ -1,0 +1,199 @@
+{
+  "openFaults": [
+    {
+      "id": "F-BFL-CAROUSEL",
+      "zone": "Ben Franklin Lobby",
+      "station": "CV-BFL-CA",
+      "summary": "Carousel backlight clouding",
+      "state": "Degraded \u00b7 Waiting"
+    },
+    {
+      "id": "F-BFP-BEERALLEY",
+      "zone": "Ben Franklin Plaza",
+      "summary": "Beer Alley center menu display: no power or output",
+      "state": "Open"
+    },
+    {
+      "id": "F-BFP-VS025B",
+      "zone": "Ben Franklin Plaza",
+      "summary": "VS025B backlight clouding",
+      "state": "Open"
+    },
+    {
+      "id": "F-BFP-KOKOS",
+      "zone": "Ben Franklin Plaza",
+      "summary": "Bad screen reported in the KOKO'S wall",
+      "state": "Open \u00b7 asset identity incomplete"
+    },
+    {
+      "id": "F-BFP-TOWER",
+      "zone": "Ben Franklin Plaza",
+      "stop": "Tower spectacular",
+      "summary": "Ben-side Tower spectacular yellow contamination",
+      "state": "Degraded"
+    },
+    {
+      "id": "F-WWP-WALTCON",
+      "zone": "Walt Whitman Plaza",
+      "summary": "WALT CON discoloured patch. Re-read the device identity; the earlier VS120B link was contradicted",
+      "state": "Open"
+    },
+    {
+      "id": "F-WWP-EAOVERHEAD",
+      "zone": "Walt Whitman Plaza",
+      "stop": "EA Lounge VIP",
+      "summary": "Displaced overhead TV",
+      "state": "Degraded"
+    },
+    {
+      "id": "F-WWL-BBXSTREET",
+      "zone": "Walt Whitman Lobby",
+      "station": "BBX-INDOOR",
+      "stop": "Black Box VIP",
+      "summary": "Street Side washed-out display",
+      "state": "Degraded"
+    }
+  ],
+  "openFaultsAsOf": "DB | FMP | Faults \u00b7 Oct 1, 2026",
+  "baseline": {
+    "title": "WALK | FMP | Mt. Joy | 2026-09-25",
+    "event": "Mt. Joy",
+    "date": "2026-09-25",
+    "positions": 26,
+    "pass": 24,
+    "flag": 2,
+    "notWalked": 0,
+    "critical": 0,
+    "rig": "Summer",
+    "zones": "All zones",
+    "faults": [
+      "Beer Alley center display",
+      "Displaced EA Lounge overhead TV"
+    ]
+  },
+  "photos": [
+    {
+      "file": "2026-08-28-bacardi-concession-menu-displays-closeup.jpg",
+      "date": "2026-08-28",
+      "caption": "Bacardi concession menu displays \u00b7 close-up",
+      "folder": "05_Digital_Signage_and_Concessions"
+    },
+    {
+      "file": "2026-08-28-bacardi-concession-menu-displays-wide.jpg",
+      "date": "2026-08-28",
+      "caption": "Bacardi concession menu displays \u00b7 wide",
+      "folder": "05_Digital_Signage_and_Concessions"
+    },
+    {
+      "file": "2026-08-28-bar-counter-digital-menu-displays.jpg",
+      "date": "2026-08-28",
+      "caption": "Bar counter digital menu displays",
+      "folder": "05_Digital_Signage_and_Concessions"
+    },
+    {
+      "file": "2026-08-28-bens-bar-patio-displays.jpg",
+      "date": "2026-08-28",
+      "caption": "Ben's Bar patio displays",
+      "folder": "05_Digital_Signage_and_Concessions"
+    },
+    {
+      "file": "2026-08-28-cocktail-kiosk-and-display.jpg",
+      "date": "2026-08-28",
+      "caption": "Cocktail kiosk and display",
+      "folder": "05_Digital_Signage_and_Concessions"
+    },
+    {
+      "file": "2026-08-28-cocktail-kiosk-shaker-cup-menu-and-dark-display.jpg",
+      "date": "2026-08-28",
+      "caption": "Cocktail kiosk \u00b7 shaker-cup menu and dark display",
+      "folder": "05_Digital_Signage_and_Concessions"
+    },
+    {
+      "file": "2026-08-28-concession-row-digital-menu-displays.jpg",
+      "date": "2026-08-28",
+      "caption": "Concession row digital menu displays",
+      "folder": "05_Digital_Signage_and_Concessions"
+    },
+    {
+      "file": "2026-08-28-exterior-concession-wall-display-row.jpg",
+      "date": "2026-08-28",
+      "caption": "Exterior concession wall display row",
+      "folder": "05_Digital_Signage_and_Concessions"
+    },
+    {
+      "file": "2026-08-28-merchandise-counter-digital-displays.jpg",
+      "date": "2026-08-28",
+      "caption": "Merchandise counter digital displays",
+      "folder": "05_Digital_Signage_and_Concessions"
+    },
+    {
+      "file": "2026-08-28-merchandise-overhead-display-cluster.jpg",
+      "date": "2026-08-28",
+      "caption": "Merchandise overhead display cluster",
+      "folder": "05_Digital_Signage_and_Concessions"
+    },
+    {
+      "file": "2026-09-05-exterior-concession-wall-display-row-01.jpg",
+      "date": "2026-09-05",
+      "caption": "Exterior concession wall display row \u00b7 1",
+      "folder": "05_Digital_Signage_and_Concessions"
+    },
+    {
+      "file": "2026-09-05-exterior-concession-wall-display-row-02.jpg",
+      "date": "2026-09-05",
+      "caption": "Exterior concession wall display row \u00b7 2",
+      "folder": "05_Digital_Signage_and_Concessions"
+    },
+    {
+      "file": "2026-09-05-exterior-concession-wall-menu-display-kokos.jpg",
+      "date": "2026-09-05",
+      "caption": "Exterior concession wall \u00b7 KOKO'S menu display",
+      "folder": "05_Digital_Signage_and_Concessions",
+      "fault": "F-BFP-KOKOS"
+    },
+    {
+      "file": "2026-09-05-exterior-concession-wall-menu-display-rebel-hen.jpg",
+      "date": "2026-09-05",
+      "caption": "Exterior concession wall \u00b7 Rebel Hen menu display",
+      "folder": "05_Digital_Signage_and_Concessions"
+    },
+    {
+      "file": "2026-09-05-merchandise-overhead-display-cluster-01.jpg",
+      "date": "2026-09-05",
+      "caption": "Merchandise overhead display cluster \u00b7 1",
+      "folder": "05_Digital_Signage_and_Concessions"
+    },
+    {
+      "file": "2026-09-05-merchandise-overhead-display-cluster-02.jpg",
+      "date": "2026-09-05",
+      "caption": "Merchandise overhead display cluster \u00b7 2",
+      "folder": "05_Digital_Signage_and_Concessions"
+    },
+    {
+      "file": "2026-09-05-walt-exterior-wall-display-annotated-njcam01a-vs120b.jpg",
+      "date": "2026-09-05",
+      "caption": "WALT exterior wall display \u00b7 annotated NJCAM01A / VS120B",
+      "folder": "05_Digital_Signage_and_Concessions",
+      "fault": "F-WWP-WALTCON",
+      "note": "annotation shows the earlier VS120B link, since contradicted"
+    },
+    {
+      "file": "2026-09-16-bar-spirits-static-price-sign.jpg",
+      "date": "2026-09-16",
+      "caption": "Bar spirits static price sign (not a display)",
+      "folder": "05_Digital_Signage_and_Concessions"
+    },
+    {
+      "file": "2026-09-16-concession-menu-board-beer-seltzer-wine.jpg",
+      "date": "2026-09-16",
+      "caption": "Concession menu board \u00b7 beer, seltzer, wine",
+      "folder": "05_Digital_Signage_and_Concessions"
+    },
+    {
+      "file": "2026-09-16-concession-menu-board-drinks.jpg",
+      "date": "2026-09-16",
+      "caption": "Concession menu board \u00b7 drinks",
+      "folder": "05_Digital_Signage_and_Concessions"
+    }
+  ]
+}
