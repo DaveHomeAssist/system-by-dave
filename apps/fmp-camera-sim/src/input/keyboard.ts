@@ -176,6 +176,11 @@ export function attachKeyboard(store: SimulatorStore, input: InputController, ac
         event.preventDefault();
         actions.toggleExpanded();
         return;
+      case "KeyP":
+        // Take the camera to program, or clear it: the tally follows.
+        event.preventDefault();
+        store.toggleOnAir(wall);
+        return;
       case "Slash":
         if (event.shiftKey) {
           event.preventDefault();

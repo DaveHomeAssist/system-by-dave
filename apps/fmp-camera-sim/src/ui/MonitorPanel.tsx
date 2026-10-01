@@ -28,6 +28,7 @@ export function MonitorPanel({ state, store, canvasRef, overlayRef, expanded, on
   const { snapshot, lens } = useTelemetry(store);
   const { pose, recall, atLimit, speeds } = snapshot;
   const guides = state.project.session.preferences.guides;
+  const delayMs = state.project.session.preferences.monitorDelayMs;
   const approximate = state.unsettled.length > 0;
   const limitText = [
     atLimit.pan && `Pan ${atLimit.pan === "max" ? "right" : "left"} limit`,
@@ -62,11 +63,17 @@ export function MonitorPanel({ state, store, canvasRef, overlayRef, expanded, on
         </div>
       </div>
       <div className="monitor-stage">
-        <div className="monitor-frame" data-render={state.renderStatus} onPointerDown={focusWorkspace}>
+        <div className="monitor-frame" data-render={state.renderStatus} data-onair={state.onAir.live ? "true" : undefined} onPointerDown={focusWorkspace}>
           <canvas ref={canvasRef} className="monitor-canvas" role="img" aria-label="Live picture from the simulated P240" data-testid="monitor-canvas" />
           <svg ref={overlayRef} className="monitor-overlay" viewBox="0 0 1600 900" preserveAspectRatio="none" aria-hidden="true" />
           <div className="monitor-osd" aria-hidden="true">
             <span className="osd-chip">SIM · CAM 4 · P240</span>
+            {state.onAir.live && (
+              <span className="osd-chip osd-onair" data-testid="onair-chip">
+                ON AIR{state.onAir.stats.moves > 0 ? ` · ${state.onAir.stats.moves} MOVE${state.onAir.stats.moves === 1 ? "" : "S"}` : ""}
+              </span>
+            )}
+            {delayMs > 0 && <span className="osd-chip osd-warn">DELAY {delayMs} MS · UNCAL</span>}
             <span className="osd-chip osd-warn">
               {approximate ? "APPROX VENUE" : "MEASURED VENUE"} · {state.calibrated ? "CALIBRATED" : "UNCALIBRATED"}
             </span>

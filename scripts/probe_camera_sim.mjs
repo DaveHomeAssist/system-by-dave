@@ -1135,6 +1135,32 @@ await check('release stamp: Help, page metadata, offline file and exports agree'
   }
 });
 
+// On air (1.13.0): P and the Take button light the tally, and moves while live are counted.
+await check('on air: P lights the tally border, a move while live is counted, and leaving air reports the take', async () => {
+  const { context, page, problems } = await open();
+  try {
+    const frame = page.locator('.monitor-frame');
+    const status = page.getByTestId('status-line');
+    await focusWorkspace(page);
+    await page.keyboard.press('KeyP');
+    await frame.and(page.locator('[data-onair]')).waitFor();
+    assert((await page.getByTestId('onair-toggle').getAttribute('aria-pressed')) === 'true', 'Take is not pressed while on air');
+    assert(((await status.textContent()) ?? '').includes('On air'), `status "${await status.textContent()}"`);
+    await page.keyboard.down('ArrowRight');
+    await page.waitForTimeout(400);
+    await page.keyboard.up('ArrowRight');
+    await page.waitForFunction(() => /1 MOVE\b/.test(document.querySelector('[data-testid="onair-chip"]')?.textContent ?? ''));
+    await page.getByTestId('onair-toggle').click();
+    assert((await frame.getAttribute('data-onair')) === null, 'the tally border stayed after leaving air');
+    const report = (await status.textContent()) ?? '';
+    assert(/1 move on air/.test(report), `leaving air reported "${report}"`);
+    assert(problems.length === 0, problems.join(' | '));
+    return report;
+  } finally {
+    await context.close();
+  }
+});
+
 // ------------------------------------------------------------------------------------------
 // 6b. Links in and out (docs/camera-training-links.md)
 // ------------------------------------------------------------------------------------------

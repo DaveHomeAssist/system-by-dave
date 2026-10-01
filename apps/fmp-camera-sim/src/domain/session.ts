@@ -109,7 +109,21 @@ export interface Session {
   performer: PerformerConfig;
   exerciseSettings: ExerciseSettings;
   exerciseResults: ExerciseResult[];
-  preferences: { unit: LengthUnit; guides: GuidePreferences };
+  preferences: SessionPreferences;
+}
+
+/** Longest simulated monitor delay, milliseconds (matches sim/delayLine.ts). */
+export const MONITOR_DELAY_LIMIT_MS = 500;
+
+export interface SessionPreferences {
+  unit: LengthUnit;
+  guides: GuidePreferences;
+  /**
+   * Simulated delay between the head and the monitor picture, milliseconds. Uncalibrated training
+   * setting; 0 shows the head's pose at once. Optional in saved files: older files read as 0, and
+   * older builds ignore it.
+   */
+  monitorDelayMs: number;
 }
 
 export function defaultExerciseSettings(): ExerciseSettings {
@@ -146,7 +160,7 @@ export function defaultSession(venueId: string, cameraId: string): Session {
     performer: { mode: "mark", markId: "CS", pathId: "tour", walkSpeed: 1.2, height: 1.75, pauseS: 2 },
     exerciseSettings: defaultExerciseSettings(),
     exerciseResults: [],
-    preferences: { unit: "ft", guides: { safeArea: true, centre: true, thirds: false } },
+    preferences: { unit: "ft", guides: { safeArea: true, centre: true, thirds: false }, monitorDelayMs: 0 },
   };
 }
 
@@ -328,8 +342,17 @@ export function parseSession(
           thirds: readBoolean(issues, guidesRaw.thirds, `${path}.preferences.guides.thirds`),
         }
       : null;
-    if (unit && guides && guides.safeArea !== null && guides.centre !== null && guides.thirds !== null) {
-      preferences = { unit, guides: { safeArea: guides.safeArea, centre: guides.centre, thirds: guides.thirds } };
+    // Added in 1.13.0 and optional, so files from earlier builds still import.
+    const monitorDelayMs =
+      preferencesRaw.monitorDelayMs === undefined
+        ? 0
+        : readNumber(issues, preferencesRaw.monitorDelayMs, `${path}.preferences.monitorDelayMs`, { min: 0, max: MONITOR_DELAY_LIMIT_MS });
+    if (unit && guides && guides.safeArea !== null && guides.centre !== null && guides.thirds !== null && monitorDelayMs !== null) {
+      preferences = {
+        unit,
+        guides: { safeArea: guides.safeArea, centre: guides.centre, thirds: guides.thirds },
+        monitorDelayMs: Math.round(monitorDelayMs),
+      };
     }
   }
 

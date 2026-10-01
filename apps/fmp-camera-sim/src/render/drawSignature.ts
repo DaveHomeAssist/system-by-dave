@@ -9,7 +9,7 @@ export type DrawSignature = number[];
 
 /** The scene inputs of one telemetry snapshot, plus the renderer's invalidation epoch and quality level. */
 export function sceneSignature(t: Telemetry, epoch: number, quality: number): DrawSignature {
-  const { frame, performer } = t;
+  const { frame, monitorFrame, performer } = t;
   return [
     epoch,
     quality,
@@ -21,6 +21,13 @@ export function sceneSignature(t: Telemetry, epoch: number, quality: number): Dr
     frame.vfovDeg,
     frame.tanH,
     frame.tanV,
+    // The monitor may show an earlier pose (signal delay); the tally lamp is drawn in the venue view.
+    monitorFrame.headingDeg,
+    monitorFrame.tiltDeg,
+    monitorFrame.vfovDeg,
+    monitorFrame.tanH,
+    monitorFrame.tanV,
+    t.onAir ? 1 : 0,
     t.geometry.mountOrientation === "inverted" ? 1 : 0,
     performer.position.right,
     performer.position.upstage,

@@ -30,7 +30,7 @@
   ],
   "products": {
     "camera-sim": {
-      "expectedVersionRange": "~1.7",
+      "expectedVersionRange": "^1",
       "surface": "operations",
       "route": "/camera-sim/",
       "config": {},

@@ -550,7 +550,9 @@ export class SceneRenderer {
       this.sceneSig = sig;
       this.sceneVersion += 1;
       const { frame } = t;
-      applyFrameToCamera(this.monitorCamera, frame);
+      // The picture may trail the head by the simulated signal delay; the model and cone never do.
+      applyFrameToCamera(this.monitorCamera, t.monitorFrame);
+      this.p240.setTally(t.onAir);
       this.p240.root.position.set(frame.position.x, frame.position.y, frame.position.z);
       this.p240.setPose(frame.headingDeg, frame.tiltDeg, t.geometry.mountOrientation);
       this.cone.update(frame);

@@ -583,6 +583,27 @@ button:disabled {
   color: #f0c36f;
 }
 
+/* On air: a red tally border and chip. The border is drawn inside the frame so the layout never moves. */
+.osd-onair {
+  background: #c8231b;
+  color: #fff;
+}
+
+.monitor-frame[data-onair]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 4px solid #e0322a;
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+.action-onair.is-live {
+  background: #c8231b;
+  border-color: #c8231b;
+  color: #fff;
+}
+
 .monitor-recall {
   position: absolute;
   left: 50%;
@@ -1133,7 +1154,7 @@ button:disabled {
 
 .preset-actions {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 6px;
   margin-top: 6px;
 }

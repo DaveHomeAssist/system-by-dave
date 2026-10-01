@@ -13,6 +13,7 @@ import {
   zoomRateForLevel,
 } from "../domain/camera";
 import { EVIDENCE_LABELS, type EvidenceStatus } from "../domain/evidence";
+import { MONITOR_DELAY_LIMIT_MS } from "../domain/session";
 import { type Issue } from "../domain/validate";
 import { EvidenceBadge, NoteField, NumberField, SelectField, withFieldIssue } from "./fields";
 
@@ -190,6 +191,28 @@ export function CameraSettings({ store, state }: Props) {
           </table>
         </div>
         <p className="field-help">The 1–8 scale is the trainer's teaching scale, not the SuperJoy's hardware range. Pan and tilt speeds fall with zoom when zoom-adaptive sensitivity is on.</p>
+      </section>
+
+      <section aria-labelledby="signal-title">
+        <h3 id="signal-title">
+          Signal path <EvidenceBadge status="uncalibrated" />
+        </h3>
+        <NumberField
+          label="Monitor delay"
+          value={state.project.session.preferences.monitorDelayMs}
+          digits={0}
+          unit="ms"
+          step={10}
+          help={
+            <>
+              How far the monitor picture trails the head, for practising leading a move. A real picture arrives late after encoding,
+              the NDI or SDI path and the switcher; Camera 4's delay has not been measured, so 0 (off) is the default. 0–
+              {MONITOR_DELAY_LIMIT_MS} ms. The head, the viewing cone and the readouts stay live; exercises score the camera, not the
+              delayed picture.
+            </>
+          }
+          onCommit={(ms) => store.setMonitorDelay(ms)}
+        />
       </section>
 
       <button
