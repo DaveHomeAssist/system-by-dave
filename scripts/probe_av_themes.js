@@ -116,6 +116,8 @@ async function main() {
   const chrome = spawn(chromeBin, [
     '--headless=new',
     '--disable-gpu',
+    '--use-angle=swiftshader',
+    '--enable-unsafe-swiftshader',
     '--disable-background-networking',
     '--disable-component-update',
     '--no-default-browser-check',
