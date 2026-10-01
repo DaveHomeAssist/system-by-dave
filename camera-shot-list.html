@@ -528,7 +528,7 @@
     line-height:1.45;
   }
   .hint.success{color:#bdf8ce}
-  .hint.error{color:#ffd0d0}
+  .hint.error{color:var(--red)}
   .shortcut-list{
     display:grid;
     grid-template-columns:auto 1fr;
@@ -652,6 +652,7 @@
     .topbar,
     .toolbar,
     .side,
+    .av-domain-view,
     .hero-actions,
     .skip-link,
     .noscript{display:none !important}
@@ -870,6 +871,8 @@
   var $ = function(id){ return document.getElementById(id); };
   var state = defaultState();
   var selectedId = '';
+  var loadProblem = '';
+  var saveBlocked = false;
 
   function uid(){
     return 'shot-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
@@ -895,7 +898,7 @@
         camera:'all',
         status:'all'
       },
-      shots:sampleShots()
+      shots:[]
     };
   }
 
@@ -930,11 +933,11 @@
     item = item && typeof item === 'object' ? item : {};
     return {
       id:typeof item.id === 'string' && item.id ? item.id.slice(0, 80) : uid(),
-      number:cleanText(item.number || String(index + 1).padStart(3, '0'), 24),
+      number:item.number == null ? String(index + 1).padStart(3, '0') : cleanText(item.number, 24),
       cue:cleanText(item.cue, 40),
-      camera:cleanText(item.camera || 'Cam 1', 40),
-      type:cleanText(item.type || 'Medium', 50),
-      subject:cleanText(item.subject || 'Subject', 100),
+      camera:cleanText(item.camera, 40),
+      type:cleanText(item.type, 50),
+      subject:cleanText(item.subject, 100),
       framing:cleanText(item.framing, 120),
       movement:cleanText(item.movement, 80),
       preset:cleanText(item.preset, 40),
@@ -953,15 +956,41 @@
   }
 
   function loadState(){
+    var raw = null;
     try{
-      var raw = window.localStorage && window.localStorage.getItem(STORAGE_KEY);
-      if(!raw) return;
+      raw = window.localStorage && window.localStorage.getItem(STORAGE_KEY);
+    }catch(e){
+      raw = null;
+    }
+    if(!raw) return;
+    try{
       var parsed = JSON.parse(raw);
-      if(!parsed || typeof parsed !== 'object') return;
+      if(!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) throw new Error('Invalid payload');
       state = sanitizeState(parsed);
     }catch(e){
       state = defaultState();
+      keepUnreadable(raw);
     }
+  }
+
+  /* Unreadable saved data is copied to "<key>.unreadable" before anything can save over it.
+     An earlier copy is never replaced; if no copy can be kept, the page does not save. */
+  function keepUnreadable(raw){
+    var key = STORAGE_KEY + '.unreadable';
+    var kept = null;
+    try{
+      kept = window.localStorage.getItem(key);
+      if(kept === null || kept === ''){
+        window.localStorage.setItem(key, raw);
+        kept = window.localStorage.getItem(key);
+      }
+    }catch(e){}
+    if(kept === raw){
+      loadProblem = 'Saved Camera Shot List data could not be read, so the page started empty. A copy of the unreadable data is kept in this browser under ' + key + '.';
+      return;
+    }
+    saveBlocked = true;
+    loadProblem = 'Saved Camera Shot List data could not be read, and no copy could be kept because ' + key + ' already holds an earlier copy or storage is full. This page is not saving, so the original stays in place. Export JSON to keep new work.';
   }
 
   function sanitizeState(data){
@@ -977,11 +1006,14 @@
     if(Array.isArray(data.shots)){
       clean.shots = data.shots.map(sanitizeShot).slice(0, 300);
     }
-    if(!clean.shots.length) clean.shots = sampleShots();
     return clean;
   }
 
   function saveState(){
+    if(saveBlocked){
+      setHint(loadProblem, 'error');
+      return;
+    }
     try{
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
     }catch(e){
@@ -991,6 +1023,10 @@
 
   function setHint(message, kind){
     var hint = $('hint');
+    if(saveBlocked && message && message !== loadProblem){
+      message += ' Not saved; export JSON to keep it.';
+      kind = 'error';
+    }
     hint.className = 'hint' + (kind ? ' ' + kind : '');
     hint.textContent = message || '';
   }
@@ -1320,8 +1356,20 @@
     reader.onload = function(){
       try{
         var data = JSON.parse(String(reader.result || ''));
+        var next;
+        if(!data || typeof data !== 'object') throw new Error('Bad file');
+        if(isForeignSchema(data.schema)){
+          setHint('That file is from another tool (' + data.schema.slice(0, 80) + '). Nothing was imported.', 'error');
+          flash($('importJsonBtn'), 'feedback-error');
+          return;
+        }
         if(data.schema !== SCHEMA && !Array.isArray(data.shots)) throw new Error('Bad schema');
-        state = sanitizeState(data);
+        next = sanitizeState(data);
+        if(state.shots.length && !window.confirm('Replace ' + countLabel(state.shots.length) + ' with ' + next.shots.length + ' from the file?')){
+          setHint('Import cancelled. Nothing changed.');
+          return;
+        }
+        state = next;
         selectedId = state.shots[0] ? state.shots[0].id : '';
         syncMetaToUi();
         saveState();
@@ -1338,6 +1386,15 @@
       flash($('importJsonBtn'), 'feedback-error');
     };
     reader.readAsText(file);
+  }
+
+  /* A file whose schema names another System by Dave tool is never imported here. */
+  function isForeignSchema(schema){
+    return typeof schema === 'string' && schema.replace(/\.v\d+$/, '') !== SCHEMA.replace(/\.v\d+$/, '');
+  }
+
+  function countLabel(count){
+    return count + (count === 1 ? ' shot' : ' shots');
   }
 
   function packageData(){
@@ -1433,7 +1490,11 @@
   }
 
   function loadSample(){
+    if(state.shots.length && !window.confirm('Replace the current shot list with the sample shots?')) return;
+    var meta = state.meta;
     state = defaultState();
+    state.meta = meta;
+    state.shots = sampleShots();
     selectedId = state.shots[0].id;
     syncMetaToUi();
     saveState();
@@ -1486,6 +1547,7 @@
       if(rowNote && rowNote.value !== shot.notes) rowNote.value = shot.notes;
     });
     document.addEventListener('keydown', function(e){
+      if(e.metaKey || e.ctrlKey || e.altKey) return;
       var typing = /INPUT|TEXTAREA|SELECT/.test(document.activeElement && document.activeElement.tagName);
       if(typing) return;
       switch(e.key){
@@ -1510,6 +1572,7 @@
     wireEvents();
     installPressFeedback();
     renderTable();
+    if(loadProblem) setHint(loadProblem, 'error');
   }
 
   init();
