@@ -14,8 +14,10 @@
 
 At desktop widths the settings and details scroll inside their panels. At 900px and below the workspace scrolls internally; the preview precedes the primary results, then section-jump controls lead to Profile, Layout, Video / Data, Power / Viewer, and Results. The browser document remains viewport-sized. Reduced-motion users receive immediate section jumps.
 
+The preview renders a 3D wall with schematic cabinet depth using the same pinned three.js release as Throwline. Drag or touch to orbit, pinch or scroll to zoom, and use arrow keys after focusing the model. Front and Isometric restore known views; reduced-motion settings make those changes immediate. The renderer draws only when geometry, view, or size changes. If WebGL is unavailable or its context is lost, the cabinet grid remains visible and calculator results continue to work. Cabinet depth is illustrative and is not a rigging dimension.
+
 Calculator values share the `avCalculator.v1` key with the six quick calculators. Product profiles use `avCalculator.ledProfiles.v1`. The LED-to-Power-Load action sends watts into the quick calculator and leaves its manufacturer PF unset. Browser storage failure leaves calculation available but disables persistence and the cross-page handoff.
 
 ## Verification
 
-Run `npm run probe:led-configurator -- --base=http://127.0.0.1:8000/` against a local static server. The probe covers geometry, mode changes, profile round trips, input commit behavior, PF gating and migration, mobile containment, accessibility smoke checks, and Power Load handoff. The release also requires `npm run verify:av`, `npm run verify:domain-sites`, the Pages workflow, and a live browser check on avbydave.com.
+Run `npm run probe:led-configurator -- --base=http://127.0.0.1:8000/` against a local static server, then repeat with `--no-webgl` to verify the fallback. The probe covers the 3D model, pointer and keyboard orbit, reduced-motion presets, geometry, mode changes, profile round trips, input commit behavior, PF gating and migration, mobile containment, accessibility smoke checks, and Power Load handoff. The release also requires `npm run verify:av`, `npm run verify:domain-sites`, the Pages workflow, and a live browser check on avbydave.com.

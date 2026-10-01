@@ -1009,6 +1009,11 @@
     els.ledWallPreview.style.setProperty('--wall-rows', led.cabinetsHigh);
     els.ledWallPreview.style.setProperty('--wall-ratio', led.wallWidthMm / led.wallHeightMm);
     els.ledWallPreview.setAttribute('aria-label', `${led.cabinetsWide} by ${led.cabinetsHigh} cabinet LED wall preview; ${format(led.wallWidthPx, 0)} by ${format(led.wallHeightPx, 0)} pixel native canvas.`);
+    els.ledWallPreview.dataset.columns = String(led.cabinetsWide);
+    els.ledWallPreview.dataset.rows = String(led.cabinetsHigh);
+    els.ledWallPreview.dataset.cabinetWidthMm = String(led.cabinetWidthMm);
+    els.ledWallPreview.dataset.cabinetHeightMm = String(led.cabinetHeightMm);
+    els.ledWallPreview.dispatchEvent(new Event('led-wall:geometry'));
     els.ledPreviewRows.textContent = `${led.cabinetsHigh} cabinet${led.cabinetsHigh === 1 ? '' : 's'} high`;
     els.ledPreviewColumns.textContent = `${led.cabinetsWide} cabinet${led.cabinetsWide === 1 ? '' : 's'} wide`;
     els.ledPreviewArray.textContent = `${led.cabinetsWide} × ${led.cabinetsHigh}`;
@@ -1096,6 +1101,7 @@
     els.ledWallPreview.parentElement.classList.toggle('front-view', front);
     els.ledPreviewFrontBtn.setAttribute('aria-pressed', String(front));
     els.ledPreviewIsoBtn.setAttribute('aria-pressed', String(!front));
+    els.ledWallPreview.dispatchEvent(new CustomEvent('led-wall:view', { detail: view }));
     if (window.gsap && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       if (previewMotion) previewMotion.kill();
       const details = [els.ledPreviewRows, els.ledPreviewColumns, els.ledPreviewArray, els.ledPreviewCanvas];

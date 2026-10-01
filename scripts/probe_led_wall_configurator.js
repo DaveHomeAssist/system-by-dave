@@ -13,6 +13,7 @@ if (typeof WebSocket === 'undefined') {
 const args = process.argv.slice(2);
 const baseArg = args.find((arg) => arg.startsWith('--base='));
 const chromeArg = args.find((arg) => arg.startsWith('--chrome='));
+const noWebgl = args.includes('--no-webgl');
 const baseUrl = (baseArg ? baseArg.slice('--base='.length) : 'http://127.0.0.1:8000/').replace(/\/?$/, '/');
 const chromeBin = chromeArg ? chromeArg.slice('--chrome='.length) : (
   process.env.CHROME_BIN || '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
@@ -51,7 +52,7 @@ async function main() {
   const port = 9900 + Math.floor(Math.random() * 300);
   const profile = fs.mkdtempSync(`${os.tmpdir()}/sbd-led-configurator-probe-`);
   const chrome = spawn(chromeBin, [
-    '--headless=new', '--disable-gpu', '--disable-background-networking',
+    '--headless=new', '--enable-unsafe-swiftshader', ...(noWebgl ? ['--disable-webgl'] : []), '--disable-background-networking',
     '--disable-component-update', '--no-default-browser-check', '--no-first-run',
     `--remote-debugging-port=${port}`, `--user-data-dir=${profile}`, 'about:blank'
   ], { stdio: ['ignore', 'ignore', 'ignore'] });
@@ -124,6 +125,26 @@ async function main() {
     await cdp('Emulation.setDeviceMetricsOverride', { width: 1280, height: 900, deviceScaleFactor: 1, mobile: false });
     await cdp('Page.navigate', { url: new URL('led-wall-calculator.html', baseUrl).href });
     await delay(1000);
+
+    const initialViewer = await evaluate(`(() => {
+      const preview = document.getElementById('ledWallPreview');
+      const canvas = preview.querySelector('canvas');
+      return { state: preview.dataset.viewerState, columns: preview.dataset.viewerColumns,
+        rows: preview.dataset.viewerRows, width: canvas?.width || 0, height: canvas?.height || 0,
+        hint: document.getElementById('ledViewerHint').textContent };
+    })()`);
+    if (noWebgl) {
+      if (initialViewer.state !== 'fallback' || !initialViewer.hint.includes('unavailable')) {
+        throw new Error(`No-WebGL viewer fallback failed: ${JSON.stringify(initialViewer)}.`);
+      }
+      console.log('PASS no-WebGL cabinet grid fallback');
+    } else {
+      if (initialViewer.state !== 'ready' || initialViewer.columns !== '8' || initialViewer.rows !== '5'
+        || initialViewer.width < 100 || initialViewer.height < 100) {
+        throw new Error(`3D viewer initialization failed: ${JSON.stringify(initialViewer)}.`);
+      }
+      console.log('PASS 3D cabinet model matches the calculated array');
+    }
 
     await scenario('default cabinet layout', [], {
       build: '8 × 5 cabinets', metric: '4.000 × 2.500 m', raster: '1,376 × 860 px',
@@ -235,6 +256,42 @@ async function main() {
       throw new Error(`Cabinet map view toggle failed: ${JSON.stringify(previewResult)}.`);
     }
     console.log('PASS accessible front and isometric cabinet-map views');
+
+    if (!noWebgl) {
+      await cdp('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-motion', value: 'reduce' }] });
+      const frontPose = await evaluate(`(() => {
+        document.getElementById('ledPreviewFrontBtn').click();
+        const canvas = document.querySelector('#ledWallPreview canvas');
+        return { yaw: Number(canvas.dataset.yaw), pitch: Number(canvas.dataset.pitch),
+          rect: canvas.getBoundingClientRect().toJSON() };
+      })()`);
+      if (frontPose.yaw !== 0 || frontPose.pitch !== 0) {
+        throw new Error(`Reduced-motion front view did not settle immediately: ${JSON.stringify(frontPose)}.`);
+      }
+      const x = frontPose.rect.left + frontPose.rect.width / 2;
+      const y = frontPose.rect.top + frontPose.rect.height / 2;
+      await cdp('Input.dispatchMouseEvent', { type: 'mousePressed', x, y, button: 'left', clickCount: 1 });
+      await cdp('Input.dispatchMouseEvent', { type: 'mouseMoved', x: x + 65, y: y + 20, button: 'left', buttons: 1 });
+      await cdp('Input.dispatchMouseEvent', { type: 'mouseReleased', x: x + 65, y: y + 20, button: 'left', clickCount: 1 });
+      const orbit = await evaluate(`(() => {
+        const canvas = document.querySelector('#ledWallPreview canvas');
+        const dragged = Number(canvas.dataset.yaw);
+        canvas.focus();
+        canvas.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true, cancelable: true }));
+        return { dragged, keyed: Number(canvas.dataset.yaw), focused: document.activeElement === canvas,
+          frontPressed: document.getElementById('ledPreviewFrontBtn').getAttribute('aria-pressed') };
+      })()`);
+      if (!orbit.focused || Math.abs(orbit.dragged) < 0.1 || orbit.keyed === orbit.dragged || orbit.frontPressed !== 'false') {
+        throw new Error(`Pointer or keyboard 3D orbit failed: ${JSON.stringify(orbit)}.`);
+      }
+      const zoomBefore = await evaluate(`Number(document.querySelector('#ledWallPreview canvas').dataset.zoom)`);
+      await cdp('Input.dispatchMouseEvent', { type: 'mouseWheel', x, y, deltaX: 0, deltaY: -120 });
+      const zoomAfter = await evaluate(`Number(document.querySelector('#ledWallPreview canvas').dataset.zoom)`);
+      if (!(zoomAfter < zoomBefore)) throw new Error(`Wheel zoom did not move closer: ${zoomBefore} -> ${zoomAfter}.`);
+      await evaluate(`document.getElementById('ledPreviewIsoBtn').click()`);
+      await cdp('Emulation.setEmulatedMedia', { features: [] });
+      console.log('PASS pointer, keyboard, zoom, preset, and reduced-motion 3D views');
+    }
 
     const boundaryResult = await evaluate(`(() => {
       const set = (id, value) => {

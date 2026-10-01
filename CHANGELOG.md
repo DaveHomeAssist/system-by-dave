@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-10-01 — LED Wall Calculator 3D viewer
+
+- Made the cabinet preview a rotatable 3D wall with mouse, touch, keyboard, zoom, preset views, and a static fallback when 3D is unavailable.
+
 ## 2026-10-01 — Equipment reference and workspace boundary
 
 - Public Gear Reference now carries equipment-only data across all nine sheets.
