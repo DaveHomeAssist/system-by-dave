@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-01 — Preserve legacy FMP walk confirmations
+
+- Regenerate the managed FMP release from canonical source `0f4de8ca282d0b115825802dd6bd7449e6ba574a` so legacy numeric-key and array checklists retain their confirmations, including Lawn readings excluded by a winter route.
+- Normalize a deselected legacy fault observation to Not re-observed without changing the original saved draft or relaxing validation for current records. Add source regression coverage for visible checks, reports, backups and reloads.
+
 ## 2026-10-01 — LED wall browser release gate
 
 - The LED cabinet click probe now waits for the status-driven layout to settle and reacquires the canvas center before clicking. A dedicated pull-request browser check runs the 3D and no-WebGL probes so this failure is caught before the Pages deployment gate.
