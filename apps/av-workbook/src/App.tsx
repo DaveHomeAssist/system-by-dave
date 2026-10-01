@@ -236,7 +236,8 @@ export default function App() {
     if (readOnly.source === "fallback" && !window.confirm("This browser holds the unreadable workbook only in its fallback copy, which a new workbook can replace if storage fails again. Download it first if you need it. Start a new blank workbook?")) return;
     setBlankBusy(true);
     try {
-      const blank = await startBlankWorkbook();
+      // The operator confirmed above that a fallback-only workbook may be replaced.
+      const blank = await startBlankWorkbook(undefined, { replaceOtherFallback: readOnly.source === "fallback" });
       setReadOnly(null);
       setWorkbook(blank);
       setActiveTab("overview");

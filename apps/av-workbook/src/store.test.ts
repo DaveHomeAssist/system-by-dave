@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { createBlankWorkbook } from "./sampleWorkbook";
 import {
-  ACTIVE_KEY, FALLBACK_KEY, WorkbookChangedElsewhereError, WorkbookUncheckedError, assessStoredWorkbook, importWorkbook, loadActiveWorkbook, saveEditedWorkbook,
+  ACTIVE_KEY, FALLBACK_KEY, WorkbookChangedElsewhereError, WorkbookUncheckedError, assessStoredWorkbook, importWorkbook, loadActiveWorkbook, saveEditedWorkbook, saveWorkbook,
   startBlankWorkbook, type WorkbookBackend
 } from "./store";
 import type { AvWorkbook } from "./types";
@@ -241,6 +241,29 @@ describe("saveEditedWorkbook", () => {
     await saveEditedWorkbook(storedWorkbook("wb-active"), memory.backend);
     expect(memory.table.put).not.toHaveBeenCalled();
     expect(memory.values.get(FALLBACK_KEY)).toContain("wb-active");
+  });
+
+  it("refuses a fallback-only save when the fallback slot holds a different workbook", async () => {
+    const other = JSON.stringify(storedWorkbook("wb-only-copy"));
+    const memory = memoryBackend({ failReads: true, storage: { [ACTIVE_KEY]: "wb-active", [FALLBACK_KEY]: other } });
+    await expect(saveEditedWorkbook(storedWorkbook("wb-active"), memory.backend)).rejects.toBeInstanceOf(WorkbookUncheckedError);
+    expect(memory.values.get(FALLBACK_KEY)).toBe(other);
+    expect(memory.table.put).not.toHaveBeenCalled();
+  });
+
+  it("does not let a failed IndexedDB write replace another workbook's fallback copy", async () => {
+    const other = JSON.stringify(storedWorkbook("wb-only-copy"));
+    const memory = memoryBackend({ failWrites: true, storage: { [FALLBACK_KEY]: other } });
+    await expect(saveWorkbook(storedWorkbook("wb-new"), memory.backend)).rejects.toBeInstanceOf(WorkbookUncheckedError);
+    expect(memory.values.get(FALLBACK_KEY)).toBe(other);
+  });
+
+  it("replaces another workbook's fallback copy only for a confirmed new blank workbook", async () => {
+    const other = JSON.stringify(storedWorkbook("wb-only-copy"));
+    const memory = memoryBackend({ failWrites: true, storage: { [FALLBACK_KEY]: other } });
+    const blank = await startBlankWorkbook(memory.backend, { replaceOtherFallback: true });
+    expect(memory.values.get(FALLBACK_KEY)).toContain(blank.workbookId);
+    expect(memory.values.get(ACTIVE_KEY)).toBe(blank.workbookId);
   });
 
   it("refuses when IndexedDB cannot be read and there is no fallback storage at all", async () => {

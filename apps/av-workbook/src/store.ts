@@ -231,27 +231,49 @@ export async function loadActiveWorkbook(backend: WorkbookBackend = browserBacke
 }
 
 /** The explicit "Start a new blank workbook" action. The previous record stays where it is. */
-export async function startBlankWorkbook(backend: WorkbookBackend = browserBackend()): Promise<AvWorkbook> {
-  return saveWorkbook(createBlankWorkbook(), backend);
+export async function startBlankWorkbook(
+  backend: WorkbookBackend = browserBackend(),
+  options: { replaceOtherFallback?: boolean } = {}
+): Promise<AvWorkbook> {
+  return saveWorkbook(createBlankWorkbook(), backend, options);
 }
 
-export async function saveWorkbook(workbook: AvWorkbook, backend: WorkbookBackend = browserBackend()): Promise<AvWorkbook> {
+/**
+ * The fallback is one slot. It is written only when it is empty or already holds this workbook,
+ * because a different workbook there may have no other copy. The explicit "Start a new blank
+ * workbook" action may replace it after the operator confirms.
+ */
+function writeFallback(next: AvWorkbook, storage: WorkbookKeyValueStore | null, replaceOtherFallback = false): void {
+  if (!storage) throw new WorkbookUncheckedError();
+  const existing = storage.getItem(FALLBACK_KEY);
+  if (existing !== null && storedWorkbookId(existing) !== next.workbookId && !replaceOtherFallback) {
+    throw new WorkbookUncheckedError("This browser's workbook storage is unavailable, and its one fallback slot holds a different workbook, which may be that workbook's only copy. Nothing was saved. Export or reload, then try again.");
+  }
+  storage.setItem(FALLBACK_KEY, JSON.stringify(next));
+  storage.setItem(ACTIVE_KEY, next.workbookId);
+}
+
+export async function saveWorkbook(
+  workbook: AvWorkbook,
+  backend: WorkbookBackend = browserBackend(),
+  options: { replaceOtherFallback?: boolean } = {}
+): Promise<AvWorkbook> {
   const next = validateWorkbook({ ...workbook, savedAt: new Date().toISOString() });
   const storage = backend.storage;
   try {
     await backend.table.put(next);
-    storage?.setItem(ACTIVE_KEY, next.workbookId);
   } catch {
-    storage?.setItem(FALLBACK_KEY, JSON.stringify(next));
-    storage?.setItem(ACTIVE_KEY, next.workbookId);
+    writeFallback(next, storage, options.replaceOtherFallback);
+    return next;
   }
+  storage?.setItem(ACTIVE_KEY, next.workbookId);
   return next;
 }
 
 /** A save refused because the stored copy could not be read, so it could not be checked before writing over it. */
 export class WorkbookUncheckedError extends Error {
-  constructor() {
-    super("This browser could not read the saved workbook to check it and has no fallback storage, so the change was not saved. Reload and try again.");
+  constructor(message = "This browser could not read the saved workbook to check it and has no fallback storage, so the change was not saved. Reload and try again.") {
+    super(message);
     this.name = "WorkbookUncheckedError";
   }
 }
@@ -300,10 +322,8 @@ export async function saveEditedWorkbook(
   }
   if (readFailed) {
     // Fail closed for IndexedDB: the record could not be read, so it is never overwritten.
-    if (!backend.storage) throw new WorkbookUncheckedError();
     const next = validateWorkbook({ ...workbook, savedAt: new Date().toISOString() });
-    backend.storage.setItem(FALLBACK_KEY, JSON.stringify(next));
-    backend.storage.setItem(ACTIVE_KEY, next.workbookId);
+    writeFallback(next, backend.storage);
     return next;
   }
   return saveWorkbook(workbook, backend);
