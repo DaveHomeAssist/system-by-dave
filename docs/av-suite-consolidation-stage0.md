@@ -57,6 +57,7 @@ Stage 2 increment 2.0b closes the first gate above for the eight Video tools (Si
 - Cmd, Ctrl and Alt key combinations are not default-prevented and change no row, while the plain shortcut still works;
 - first launch writes nothing to the tool's key, and the first edit saves an empty list;
 - unreadable saved data is copied to `<key>.unreadable` and reported, an earlier copy is never replaced, and the page does not save over unreadable data that has no copy;
-- a file whose schema names another tool is rejected, a file without a schema is still accepted, and replacing existing rows asks with both counts, where Cancel leaves storage unchanged.
+- a file whose schema names another tool is rejected, a file without a schema is still accepted, and replacing existing rows asks with both counts, where Cancel leaves storage unchanged;
+- a note with line breaks and more than 260 characters, in the fixture and typed into a row, is kept exactly through save, reload, export and import.
 
-It also checks the unrecognized-duration marker and runtime total on Playback Check and Record Log, and the raw-key warning on Stream Plan. Against the previous pages, 40 of its 112 checks passed. The fixtures are synthetic: field-by-field import mapping, real saved shows and operator acceptance remain Stage 2 increments 2.2 and 2.5.
+It also checks the unrecognized-duration marker and runtime total on Playback Check and Record Log, and the raw-key warning on Stream Plan. It runs 120 checks. Against the previous pages, 40 of its first 112 checks passed; the note checks were added after an independent review found Video Patch, Projection Plan and Stream Plan flattening notes. The fixtures are synthetic: field-by-field import mapping, real saved shows and operator acceptance remain Stage 2 increments 2.2 and 2.5.

@@ -55,6 +55,10 @@ const channel = process.env.CHROME_CHANNEL ? { channel: process.env.CHROME_CHANN
   : process.env.CHROME_BIN ? { executablePath: process.env.CHROME_BIN } : {};
 const browser = await chromium.launch({ headless: true, ...channel, args: args.includes('--no-sandbox') ? ['--no-sandbox'] : [] });
 
+// A note with line breaks, doubled spaces and more than 260 characters. Notes are free text: load, import
+// and edits must keep them exactly as typed (Video Patch, Projection Plan and Stream Plan used to flatten and cut them).
+const LONG_NOTE = `Probe note 1\nSecond line  with two spaces\n\n  Indented after a blank line. ${'Long operator note. '.repeat(14)}`;
+
 // Fixtures fill every field-matrix field. Blank strings and odd durations are deliberate: they must
 // survive a reload exactly as stored. `expect` overrides a field whose stored value is derived on load.
 const PAGES = [
@@ -64,7 +68,7 @@ const PAGES = [
     fields: ['route', 'system', 'source', 'format', 'connector', 'processor', 'destination', 'status', 'backup', 'notes'],
     meta: { showName: 'Probe Gala', venue: 'Hall P', showDate: '2026-10-01', videoLead: 'Vic Video', audioLead: '', networkLead: 'Nia Net', tdName: 'Tess TD' },
     rows: [
-      { id: 'route-probe-1', route: 'SF 101', system: 'video', source: 'Cam 1', format: 'SDI', connector: 'BNC', processor: 'Fiber A', destination: 'Switcher In 1', status: 'verified', backup: 'Cam 3 wide', notes: 'Probe note 1' },
+      { id: 'route-probe-1', route: 'SF 101', system: 'video', source: 'Cam 1', format: 'SDI', connector: 'BNC', processor: 'Fiber A', destination: 'Switcher In 1', status: 'verified', backup: 'Cam 3 wide', notes: LONG_NOTE },
       { id: 'route-probe-2', route: '', system: 'record', source: '', format: 'NDI', connector: 'RJ45', processor: '', destination: 'Recorder B', status: 'issue', backup: '', notes: '' },
       { id: 'route-probe-3', route: 'SF 103', system: 'power', source: 'Distro A', format: 'AC', connector: 'PowerCON', processor: 'UPS', destination: 'Video rack', status: 'backup', backup: 'House quad', notes: 'Comma, and "quote"' },
     ],
@@ -75,7 +79,7 @@ const PAGES = [
     fields: ['source', 'type', 'format', 'connector', 'input', 'converter', 'destination', 'route', 'backup', 'status', 'notes'],
     meta: { showName: 'Probe Gala', client: 'Client P', venue: 'Hall P', showDate: '2026-10-01', v1: '', videoEngineer: 'Vee Engineer', handoffTo: 'Next Op' },
     rows: [
-      { id: 'video-probe-1', source: 'Camera 1', type: 'camera', format: '1080p59.94', connector: '3G SDI', input: 'Switcher In 1', converter: 'None', destination: 'Program switcher', route: 'ME 1 input 1', backup: 'Camera 3', status: 'ready', notes: 'Probe note 1' },
+      { id: 'video-probe-1', source: 'Camera 1', type: 'camera', format: '1080p59.94', connector: '3G SDI', input: 'Switcher In 1', converter: 'None', destination: 'Program switcher', route: 'ME 1 input 1', backup: 'Camera 3', status: 'ready', notes: LONG_NOTE },
       { id: 'video-probe-2', source: '', type: 'slides', format: '', connector: '', input: '', converter: '', destination: '', route: '', backup: '', status: 'issue', notes: '' },
       { id: 'video-probe-3', source: 'LED processor', type: 'display', format: '3840x1080p60', connector: 'DisplayPort', input: 'Processor In 1', converter: 'Fiber TX A', destination: 'LED wall', route: 'Media out 1', backup: 'Scaler feed', status: 'spare', notes: 'Comma, and "quote"' },
     ],
@@ -86,7 +90,7 @@ const PAGES = [
     fields: ['display', 'type', 'input', 'processor', 'resolution', 'aspect', 'refresh', 'route', 'backup', 'status', 'notes'],
     meta: { showName: 'Probe Gala', client: 'Client P', venue: 'Hall P', showDate: '2026-10-01', lead: '', processor: 'Barco E2', handoffTo: 'Video crew' },
     rows: [
-      { id: 'display-probe-1', display: 'Main LED wall', type: 'led-wall', input: 'Program', processor: 'E2', resolution: '3840x1080', aspect: '32:9', refresh: '59.94', route: 'PGM to E2 layer 1', backup: 'Backup laptop', status: 'ready', notes: 'Probe note 1' },
+      { id: 'display-probe-1', display: 'Main LED wall', type: 'led-wall', input: 'Program', processor: 'E2', resolution: '3840x1080', aspect: '32:9', refresh: '59.94', route: 'PGM to E2 layer 1', backup: 'Backup laptop', status: 'ready', notes: LONG_NOTE },
       { id: 'display-probe-2', display: '', type: 'confidence', input: '', processor: '', resolution: '', aspect: '', refresh: '', route: '', backup: '', status: 'issue', notes: '' },
       { id: 'display-probe-3', display: 'Lobby', type: 'lobby', input: 'Loop', processor: 'Laptop', resolution: '1920x1080', aspect: '16:9', refresh: '60', route: 'HDMI to scaler', backup: 'USB stick', status: 'backup', notes: 'Comma, and "quote"' },
     ],
@@ -97,7 +101,7 @@ const PAGES = [
     fields: ['screen', 'surface', 'size', 'aspect', 'projector', 'lens', 'throwDistance', 'position', 'input', 'route', 'blend', 'backup', 'status', 'notes'],
     meta: { showName: 'Probe Gala', client: 'Client P', venue: 'Hall P', showDate: '2026-10-01', v1: 'Vee One', projectionLead: '', handoffTo: 'Next Op' },
     rows: [
-      { id: 'projection-probe-1', screen: 'Main screen', surface: 'front', size: '16x9 ft', aspect: '16:9', projector: 'Panasonic 12K', lens: '1.4-2.0', throwDistance: '24 ft', position: 'FOH', input: 'SDI', route: 'Aux 1', blend: 'None', backup: 'Spare laser', status: 'ready', notes: 'Probe note 1' },
+      { id: 'projection-probe-1', screen: 'Main screen', surface: 'front', size: '16x9 ft', aspect: '16:9', projector: 'Panasonic 12K', lens: '1.4-2.0', throwDistance: '24 ft', position: 'FOH', input: 'SDI', route: 'Aux 1', blend: 'None', backup: 'Spare laser', status: 'ready', notes: LONG_NOTE },
       { id: 'projection-probe-2', screen: '', surface: 'rear', size: '', aspect: '', projector: '', lens: '', throwDistance: '', position: '', input: '', route: '', blend: '', backup: '', status: 'issue', notes: '' },
       { id: 'projection-probe-3', screen: 'Side screen', surface: 'blend', size: '12x7 ft', aspect: '3:1', projector: 'Pair B', lens: '0.8', throwDistance: '18 ft', position: 'House right', input: 'Fiber RX', route: 'Scaler B', blend: 'Two way', backup: 'Main carries', status: 'lined', notes: 'Comma, and "quote"' },
     ],
@@ -108,7 +112,7 @@ const PAGES = [
     fields: ['encoder', 'type', 'platform', 'destination', 'server', 'keyLabel', 'input', 'resolution', 'bitrate', 'audio', 'record', 'backup', 'status', 'notes'],
     meta: { showName: 'Probe Gala', client: 'Client P', venue: 'Hall P', showDate: '2026-10-01', streamTech: 'Sam Stream', producer: '', handoffTo: 'Next Op' },
     rows: [
-      { id: 'stream-probe-1', encoder: 'Pearl main', type: 'primary', platform: 'YouTube Live', destination: 'Event page', server: 'Primary RTMP', keyLabel: 'YT event key', input: 'Program SDI', resolution: '1080p59.94', bitrate: '8 Mbps', audio: 'Stereo', record: 'Internal MP4', backup: 'Pearl Mini', status: 'ready', notes: 'Probe note 1' },
+      { id: 'stream-probe-1', encoder: 'Pearl main', type: 'primary', platform: 'YouTube Live', destination: 'Event page', server: 'Primary RTMP', keyLabel: 'YT event key', input: 'Program SDI', resolution: '1080p59.94', bitrate: '8 Mbps', audio: 'Stereo', record: 'Internal MP4', backup: 'Pearl Mini', status: 'ready', notes: LONG_NOTE },
       { id: 'stream-probe-2', encoder: '', type: 'backup', platform: '', destination: '', server: '', keyLabel: '', input: '', resolution: '', bitrate: '', audio: '', record: '', backup: '', status: 'issue', notes: '' },
       { id: 'stream-probe-3', encoder: 'OBS laptop', type: 'simulcast', platform: 'Vimeo', destination: 'Client embed', server: 'Vimeo RTMP', keyLabel: 'live_abcdEFGH1234ijklMNOP', input: 'Capture 1', resolution: '1080p30', bitrate: '5 Mbps', audio: 'USB', record: 'Local MKV', backup: 'Archive', status: 'configured', notes: 'Comma, and "quote"' },
     ],
@@ -121,7 +125,7 @@ const PAGES = [
     fields: ['record', 'source', 'type', 'format', 'resolution', 'audio', 'media', 'status', 'duration', 'backup', 'notes'],
     meta: { showName: 'Probe Gala', venue: 'Hall P', showDate: '2026-10-01', recordOp: 'Rae Record', producer: '', audioLead: 'A1', handoffTo: 'Post' },
     rows: [
-      { id: 'record-probe-1', record: 'REC 101', source: 'Program clean', type: 'program', format: 'ProRes', resolution: '1080p', audio: 'embedded', media: 'SSD 1', status: 'armed', duration: '45:00', backup: 'Recorder B', notes: 'Probe note 1' },
+      { id: 'record-probe-1', record: 'REC 101', source: 'Program clean', type: 'program', format: 'ProRes', resolution: '1080p', audio: 'embedded', media: 'SSD 1', status: 'armed', duration: '45:00', backup: 'Recorder B', notes: LONG_NOTE },
       { id: 'record-probe-2', record: 'REC 102', source: 'Cam 1 ISO', type: 'iso', format: 'MOV', resolution: '4K', audio: 'none', media: 'ISO A', status: 'rolling', duration: '2m30s', backup: '', notes: '' },
       { id: 'record-probe-3', record: 'REC 103', source: 'Slides', type: 'slides', format: 'MP4', resolution: 'mixed', audio: 'separate', media: 'Capture Mac', status: 'issue', duration: '01:02:03:04', backup: 'PDF', notes: 'Comma, and "quote"' },
       { id: 'record-probe-4', record: '', source: '', type: 'audio', format: 'WAV', resolution: 'audio only', audio: 'multitrack', media: '', status: 'stopped', duration: 'TBD', backup: '', notes: '' },
@@ -137,7 +141,7 @@ const PAGES = [
     csvHeader: ['Shot', 'Time or cue', 'Camera', 'Type', 'Subject', 'Framing', 'Movement', 'Preset', 'Status', 'Notes'],
     meta: { showName: 'Probe Gala', venue: 'Hall P', date: '2026-10-01', director: 'Dee Director', td: '' },
     rows: [
-      { id: 'shot-probe-1', number: '101', cue: 'Cue 01', camera: 'Cam 2', type: 'Close', subject: 'Keynote', framing: 'Tight single', movement: 'Static', preset: '4', status: 'ready', notes: 'Probe note 1' },
+      { id: 'shot-probe-1', number: '101', cue: 'Cue 01', camera: 'Cam 2', type: 'Close', subject: 'Keynote', framing: 'Tight single', movement: 'Static', preset: '4', status: 'ready', notes: LONG_NOTE },
       { id: 'shot-probe-2', number: '', cue: '', camera: '', type: '', subject: '', framing: '', movement: '', preset: '', status: 'problem', notes: '' },
       { id: 'shot-probe-3', cue: 'Wrap', camera: 'Cam 1', type: 'Wide', subject: 'Stage', framing: 'Full stage', movement: 'Slow pull', preset: '1', status: 'hold', notes: 'Comma, and "quote"', expect: { number: '003' } },
     ],
@@ -148,7 +152,7 @@ const PAGES = [
     fields: ['cue', 'file', 'type', 'duration', 'aspect', 'audio', 'destination', 'status', 'backup', 'notes'],
     meta: { showName: 'Probe Gala', venue: 'Hall P', showDate: '2026-10-01', playbackOp: 'Pat Playback', tdName: '', audioLead: 'A1' },
     rows: [
-      { id: 'cue-probe-1', cue: 'PB 101', file: 'walk_in.mov', type: 'walk in', duration: '12:00', aspect: '16:9', audio: 'embedded', destination: 'Main screen', status: 'ready', backup: 'SSD A', notes: 'Probe note 1' },
+      { id: 'cue-probe-1', cue: 'PB 101', file: 'walk_in.mov', type: 'walk in', duration: '12:00', aspect: '16:9', audio: 'embedded', destination: 'Main screen', status: 'ready', backup: 'SSD A', notes: LONG_NOTE },
       { id: 'cue-probe-2', cue: 'PB 102', file: 'sting.mp4', type: 'sting', duration: '2m30s', aspect: '9:16', audio: 'click', destination: '', status: 'pending', backup: '', notes: '' },
       { id: 'cue-probe-3', cue: 'PB 103', file: 'product.mp4', type: 'video', duration: '01:02:03:04', aspect: '21:9', audio: 'separate', destination: 'Lobby', status: 'issue', backup: 'Laptop 2', notes: 'Comma, and "quote"' },
       { id: 'cue-probe-4', cue: '', file: '', type: 'audio', duration: 'TBD', aspect: 'audio only', audio: 'house music', destination: 'Audio console', status: 'played', backup: '', notes: '' },
@@ -310,6 +314,21 @@ async function runPage(cfg) {
     const shown = await rowCount(page, cfg);
     await context.close();
     assert(shown === cfg.rows.length, `${shown} rows rendered`);
+    assert(errors.length === 0, errors.join('; '));
+  });
+
+  await check(`${cfg.id}: a multi-line note typed in a row keeps its line breaks and length through reload`, async () => {
+    const { context, page, errors } = await seeded(cfg);
+    const typed = `Typed line one\nTyped line two  spaced\n${'More detail for the next operator. '.repeat(9)}`;
+    await page.locator(`${cfg.body} tr[data-id="${cfg.rows[0].id}"] textarea[data-field="notes"]`).fill(typed);
+    await page.waitForTimeout(80);
+    const saved = JSON.parse(await read(page, cfg.key))[cfg.list][0].notes;
+    await page.reload({ waitUntil: 'networkidle' });
+    await touch(page);
+    const reloaded = JSON.parse(await read(page, cfg.key))[cfg.list][0].notes;
+    await context.close();
+    assert(saved === typed, `saved as ${JSON.stringify(saved.slice(0, 60))} (${saved.length} of ${typed.length} characters)`);
+    assert(reloaded === typed, `after reload ${JSON.stringify(reloaded.slice(0, 60))} (${reloaded.length} of ${typed.length} characters)`);
     assert(errors.length === 0, errors.join('; '));
   });
 
