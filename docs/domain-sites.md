@@ -8,7 +8,7 @@ GitHub Pages repository.
 | Site id | Domain | Repository | Pages | Cutover |
 | --- | --- | --- | --- | --- |
 | `housevideo` | housevideo.app | `DaveHomeAssist/housevideo` | `/fmp/` and its routes, the `/fmp-index/` redirect, `/switcher/` and its routes, `/shader/`, `/ursa-broadcast-g2/`, `/backfocus/`, `/camera-sim/` | 2026-09-18 |
-| `housevideo-walk` | walk.housevideo.app | `DaveHomeAssist/housevideo-walk` | `/fmpwalk/` and the `/fmp-walk/` redirect | Gated release; see cutover checklist |
+| `housevideo-walk` | walk.housevideo.app | `DaveHomeAssist/housevideo-walk` | `/fmpwalk/` and the `/fmp-walk/` redirect | 2026-09-20; authenticated walk acceptance pending |
 | `avbydave` | avbydave.com | `DaveHomeAssist/avbydave` | Show-first landing at `/`, `/av-suite-landing.html` redirect for the retired previous landing, `av-suite.html`, every registry tool and offline page (including `plotforge.html`), `av-workbook.html`, `av-tool-suite/` | 2026-09-18 |
 
 `scripts/domain-sites.json` owns this list, each site's home route, robots rules
@@ -23,8 +23,8 @@ and is cached with the AV shell for offline return visits. The previous
 `av-suite-landing.html` was retired (UX-005): it is now a noindex redirect to
 the current home, kept so old links still land, and is no longer cached offline.
 
-The proposed cutover gives the preshow walk its own origin. Existing hub links
-still open the walk explicitly. `housevideo.app/fmpwalk/`
+Since its 2026-09-20 cutover the preshow walk has its own origin. The hub's
+Operators view links it there. `housevideo.app/fmpwalk/`
 and `/fmp-walk/` stay reachable as redirects to the new address: a site's
 `movedTo` entry names each route it used to serve and the site that serves it now,
 and the stager writes a noindex migration page at each one. It offers saved-data
@@ -202,12 +202,12 @@ previous portfolio-to-hub move from skipping the later hub-to-walk move.
 
 ### Cutover checklist
 
-For the walk split, provision the `DaveHomeAssist/housevideo-walk` Pages repository,
-its deploy key, and DNS/HTTPS for `walk.housevideo.app` first. Verify the exact new
-origin in Google OAuth and backend `FMP_ALLOWED_ORIGINS`, then record the auth
-variable described above. Keep both PRs draft until those prerequisites are met;
-merge fmpwalk #7 before system-by-dave #72. The workflow publishes the destination
-before redirects; authenticated walk acceptance remains a separate final gate.
+The walk split shipped on 2026-09-20: the `DaveHomeAssist/housevideo-walk` Pages
+repository, its deploy key and DNS/HTTPS for `walk.housevideo.app` came first, and
+the workflow publishes the destination before redirects. No record yet shows that
+Google OAuth and backend `FMP_ALLOWED_ORIGINS` accept `https://walk.housevideo.app`;
+verify both and record the auth variable described above. Authenticated walk
+acceptance remains a separate final gate.
 
 Do these per site, in order, and verify each before the next:
 
