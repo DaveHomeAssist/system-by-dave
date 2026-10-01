@@ -145,9 +145,14 @@ Run gates 3 and 4 on housevideo.app, and gate 4 on walk.housevideo.app.
 
 ## Commissioning gates
 
-1. Add the exact `https://systembydave.com` JavaScript origin to the existing FMP
-   Google client. No path, new client, or browser client secret is needed. This
-   origin is required independently for walk Gmail and camera Google sign-in.
+1. Confirm the existing FMP Google client lists these exact JavaScript origins:
+   `https://housevideo.app` (camera Google sign-in), `https://walk.housevideo.app`
+   (walk Gmail send and Notion save) and, while old drafts may still be moved,
+   `https://systembydave.com`. No path, new client, or browser client secret is
+   needed. Only the client's owner can read that list in Google Cloud Console; a
+   rendered sign-in button does not show that an origin is allowed. The backend
+   half is already in place: on 2026-10-01 `/health` returned a matching
+   `Access-Control-Allow-Origin` for all three origins and 403 for an unlisted one.
 2. Share the existing Events, Crew Calls, Faults, Walk Reports, and Cameras
    reference page with the dedicated FMP Walk internal Notion connection. The
    deployment token remains in Google Secret Manager. Codex connector access is
