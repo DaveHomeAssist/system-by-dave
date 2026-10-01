@@ -180,7 +180,9 @@ enforces the head script, the shared key, the light default, and the index toggl
 ## Release checks and recovery
 
 Run `npm run verify:fmp`, indexing/navigation/consistency checks, and the complete
-Pages workflow. Canonical `npm run check` plus the walk, camera, and public browser
+Pages workflow. When a re-export changes an equipment catalog, run
+`npm run build:gear-from-fmp` in the same pull request; `verify:fmp` fails until
+the Gear Reference sheets generated from those catalogs match them. Canonical `npm run check` plus the walk, camera, and public browser
 harnesses cover app behavior, routes, viewport containment, local guide assets,
 themes, and zero-write loading. Verify every live route and compare the published
 provenance commit/hashes after deployment.

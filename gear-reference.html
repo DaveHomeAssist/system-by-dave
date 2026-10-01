@@ -308,6 +308,29 @@
      frame is under 640px tall. Keep wider frames above that so the model and part panel share the frame. */
   @media (min-width:681px){.model-frame{height:clamp(660px,72vh,740px);min-height:660px}}
   .model-note{margin:10px 0;color:var(--muted)}
+  .parts-bar{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px;margin:0 0 14px}
+  .parts-open{display:inline-flex;align-items:center;min-height:44px;padding:8px 14px;border:1px solid var(--accent-line);border-radius:var(--radius);background:var(--accent-tint);color:var(--text);font-weight:700;text-decoration:none}
+  .parts-open:hover{border-color:var(--accent)}
+  .parts-availability{margin:0;color:var(--muted);font-size:13px;max-width:70ch}
+  .parts-availability[data-offline="true"]{color:var(--warn)}
+  .parts-filter-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin:0 0 16px}
+  .parts-filter{flex:1 1 240px;min-height:44px;max-width:420px;padding:8px 12px;border:1px solid var(--line-strong);border-radius:var(--radius);background:var(--surface);color:var(--text);font:inherit}
+  .parts-count{margin:0;color:var(--faint);font:600 11px/1.4 var(--font-mono)}
+  .parts-group{margin:0 0 22px}
+  .parts-group h3{display:flex;align-items:baseline;gap:8px;margin:0 0 10px;font-size:15px}
+  .parts-group h3 span{color:var(--faint);font:600 11px/1 var(--font-mono)}
+  .parts-list{display:grid;gap:8px;margin:0;padding:0;list-style:none}
+  .part{min-width:0;padding:12px 14px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface)}
+  .part-head{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px}
+  .part-name{margin-right:auto;font-weight:700;color:var(--text)}
+  .part p{margin:6px 0 0;color:var(--text-2);font-size:13.5px;max-width:80ch}
+  .part .part-missing{color:var(--faint);font-style:italic}
+  .part-meta{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;margin-top:8px;color:var(--faint);font:600 10.5px/1.45 var(--font-mono)}
+  .part-meta a{display:inline-flex;align-items:center;min-height:32px;color:var(--accent-strong)}
+  .evidence-documented,.evidence-confirmed{border-color:var(--good-line);background:var(--good-tint);color:var(--good)}
+  .evidence-reported,.evidence-inferred{border-color:var(--warn-line);background:var(--warn-tint);color:var(--warn)}
+  .evidence-unknown,.evidence-contradicted{border-color:var(--danger-line);background:var(--danger-tint);color:var(--danger)}
+  .chip.fmp-evidence{border-color:var(--warn-line);color:var(--warn)}
   .figure-error{padding:20px;border:1px dashed var(--danger-line);border-radius:6px;color:var(--danger);text-align:center}
   .source-strip{margin-top:26px;padding-top:12px;border-top:1px solid var(--line);color:var(--faint);font:600 10.5px/1.45 var(--font-mono)}
   .sources{margin-top:28px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}
@@ -441,7 +464,10 @@
   'use strict';
 
   var INDEX_URL='data/gear/index.json';
-  var ALLOWED_TYPES=['specTable','table','figure','figure+table','procedure','checklist','cards','accuracyLog','model'];
+  var ALLOWED_TYPES=['specTable','table','figure','figure+table','procedure','checklist','cards','accuracyLog','model','parts'];
+  // Interactive FMP equipment pages a generated parts section may open (deep links use #part=<catalog id>).
+  var PARTS_MODEL_URL=/^https:\/\/housevideo\.app\/fmp\/(models\/[a-z0-9-]+\.html|ptz\/SuperJoy-G1-Interactive-Guide\.html)$/;
+  var availabilityNodes=[];
   var ACCURACY_STATUSES=['confirmed','corrected','unverified','estimate'];
   var indexData=null;
   var currentEntry=null;
@@ -492,6 +518,7 @@
       if(ALLOWED_TYPES.indexOf(section.type)<0) throw new Error('Unsupported section type: '+section.type+'.');
       if(!Array.isArray(section.sourceRefs)||!section.sourceRefs.length) throw new Error('Section '+section.id+' has no source references.');
       if(section.type==='model'&&(!section.model||!/^https:\/\/housevideo\.app\/fmp\/rig\/\?equipment=(rig|studio)&part=[a-z0-9-]+$/.test(section.model.url)||!section.model.title)) throw new Error('Invalid FMP model link.');
+      if(section.type==='parts'&&(!section.parts||!Array.isArray(section.parts.groups)||!section.parts.interactive||!PARTS_MODEL_URL.test(section.parts.interactive.url))) throw new Error('Section '+section.id+' has an invalid parts list.');
       ids[section.id]=true;
     });
     entry.accuracy.forEach(function(item){
@@ -727,9 +754,12 @@
     var sources=element('section','sources');
     sources.appendChild(element('h3','','Primary sources'));
     var list=document.createElement('ol');
-    entry.sources.forEach(function(source){list.appendChild(element('li','',source.label+' ('+source.reference+')'));});
+    entry.sources.forEach(function(source){
+      var where=source.reference||source.url||'';
+      list.appendChild(element('li','',where?source.label+' ('+where+')':source.label));
+    });
     sources.appendChild(list);
-    sources.appendChild(element('p','','Compiled 12 August 2026. Figures are schematic line art, not photographs. Source conflicts and market estimates remain explicitly marked.'));
+    if(entry.sourcesNote) sources.appendChild(element('p','',entry.sourcesNote));
     container.appendChild(sources);
   }
 
@@ -762,6 +792,95 @@
     container.appendChild(link);
   }
 
+  // Filled when the node is created (its panel is not in the document yet) and again on online/offline.
+  function fillAvailability(node){
+    var offline=navigator.onLine===false;
+    node.dataset.offline=String(offline);
+    node.textContent=offline?'You are offline. The interactive model needs housevideo.app; the part list below is stored with this sheet.':'The interactive model opens on housevideo.app. The part list below works without it, including offline.';
+  }
+  function syncAvailability(){
+    availabilityNodes=availabilityNodes.filter(function(node){return node.isConnected;});
+    availabilityNodes.forEach(fillAvailability);
+  }
+  window.addEventListener('online',syncAvailability);
+  window.addEventListener('offline',syncAvailability);
+
+  function renderParts(container,section,map){
+    var data=section.parts;
+    var bar=element('div','parts-bar');
+    var open=element('a','parts-open','Open the interactive model');
+    open.href=data.interactive.url;open.target='_blank';open.rel='noopener noreferrer';
+    if(data.interactive.label) open.setAttribute('aria-label','Open the '+data.interactive.label+' in a new tab');
+    bar.appendChild(open);
+    var availability=element('p','parts-availability');
+    availability.setAttribute('role','status');
+    fillAvailability(availability);
+    availabilityNodes.push(availability);
+    bar.appendChild(availability);
+    container.appendChild(bar);
+    var groups=data.groups.filter(function(group){return group&&Array.isArray(group.parts);});
+    var totalParts=groups.reduce(function(sum,group){return sum+group.parts.length;},0);
+    if(!totalParts){
+      container.appendChild(element('p','parts-availability','The catalog lists no parts for this equipment yet. The interactive model may still show it.'));
+      return;
+    }
+    var row=element('div','parts-filter-row');
+    var filter=element('input','parts-filter');
+    filter.type='search';filter.id='parts-filter-'+section.id;filter.placeholder='Filter parts by name or description';
+    filter.setAttribute('aria-label','Filter parts');
+    var count=element('p','parts-count');
+    count.setAttribute('aria-live','polite');
+    row.appendChild(filter);row.appendChild(count);container.appendChild(row);
+    var items=[];
+    groups.forEach(function(group){
+      var block=element('section','parts-group');
+      var heading=element('h3','',group.category||'Other parts');
+      heading.appendChild(element('span','',String(group.parts.length)));
+      block.appendChild(heading);
+      var list=element('ul','parts-list');
+      group.parts.forEach(function(part){
+        var item=element('li','part');
+        var head=element('div','part-head');
+        head.appendChild(element('span','part-name',part.label||part.id));
+        if(part.kind) head.appendChild(element('span','chip',part.kind));
+        var evidence=String(part.evidence||'Unknown');
+        head.appendChild(element('span','chip evidence-'+evidence.toLowerCase(),evidence));
+        if(part.fmpEvidence) head.appendChild(element('span','chip fmp-evidence','Cites FMP evidence'));
+        item.appendChild(head);
+        item.appendChild(part.description?element('p','',part.description):element('p','part-missing','The catalog has no description for this part.'));
+        var meta=element('div','part-meta');
+        var refs=(part.sourceRefs||[]).map(function(ref){return sourceLabel(ref,map);});
+        meta.appendChild(element('span','',refs.length?'Sources: '+refs.join(' · '):'No source cited in the catalog'));
+        var inspect=element('a','','Inspect in 3D');
+        inspect.href=data.interactive.url+'#part='+encodeURIComponent(part.id);
+        inspect.target='_blank';inspect.rel='noopener noreferrer';
+        inspect.setAttribute('aria-label','Inspect '+(part.label||part.id)+' in the interactive model');
+        meta.appendChild(inspect);
+        item.appendChild(meta);
+        list.appendChild(item);
+        items.push({node:item,group:block,text:[part.label,part.id,part.kind,part.description,group.category].join(' ').toLowerCase()});
+      });
+      block.appendChild(list);
+      container.appendChild(block);
+    });
+    function applyFilter(){
+      var query=filter.value.trim().toLowerCase();
+      var shown=0;
+      items.forEach(function(entry){
+        var match=!query||entry.text.indexOf(query)>=0;
+        entry.node.hidden=!match;
+        if(match) shown++;
+      });
+      Array.prototype.slice.call(container.querySelectorAll('.parts-group')).forEach(function(block){
+        block.hidden=!block.querySelector('.part:not([hidden])');
+      });
+      count.textContent=query?'Showing '+shown+' of '+items.length+' parts':items.length+' parts'+(data.total&&data.total!==items.length?' of '+data.total+' catalog components':'');
+    }
+    filter.addEventListener('input',applyFilter);
+    filter.addEventListener('keydown',function(event){if(event.key==='Escape'&&filter.value){event.preventDefault();event.stopPropagation();filter.value='';applyFilter();}});
+    applyFilter();
+  }
+
   function renderPanel(section,index,entry,map){
     var panel=element('section','panel');
     panel.id=section.id;
@@ -785,6 +904,7 @@
     }
     if(section.type==='accuracyLog') renderAccuracy(inner,entry,map);
     if(section.type==='model') renderModel(inner,section);
+    if(section.type==='parts') renderParts(inner,section,map);
     if(section.type==='figure'){
       if(section.subheading) inner.appendChild(element('h3','',section.subheading));
     }

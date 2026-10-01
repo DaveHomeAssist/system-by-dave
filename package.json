@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "verify:fmp": "node scripts/verify_fmp_release.js && node scripts/build_switcher_guide.mjs --check",
+    "verify:fmp": "node scripts/verify_fmp_release.js && node scripts/build_switcher_guide.mjs --check && node scripts/build_gear_from_fmp.js --check",
     "build:switcher-guide": "node scripts/build_switcher_guide.mjs",
     "verify:domain-sites": "node --test scripts/domain_robots.test.mjs scripts/housevideo_manifest.test.mjs && node scripts/stage_domain_sites.mjs --check",
     "manifest:housevideo": "node scripts/build_housevideo_manifest.mjs",
@@ -33,7 +33,8 @@
     "probe:throwline-stage": "node scripts/probe_throwline_stage3d.js",
     "test:throwline-browser": "node scripts/probe_throwline_stage3d.js --no-sandbox && node scripts/probe_throwline_stage3d.js --no-sandbox --no-webgl",
     "probe:portfolio-browser": "node scripts/portfolio_browser_audit.js",
-    "verify:gear-reference": "node scripts/verify_gear_reference.js",
+    "verify:gear-reference": "node scripts/build_gear_from_fmp.js --check && node --test scripts/gear_equipment_adapter.test.js && node scripts/verify_gear_reference.js",
+    "build:gear-from-fmp": "node scripts/build_gear_from_fmp.js",
     "verify:indexing": "node scripts/verify_indexing_policy.js",
     "sync:noteforge": "node scripts/sync_noteforge_release.js",
     "verify:noteforge": "node scripts/verify_noteforge_release.js",

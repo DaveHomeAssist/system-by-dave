@@ -8,7 +8,10 @@ const { originFor, sitemapFor } = require('./domain_sites_lib');
 
 const ROOT = path.resolve(__dirname, '..');
 const failures = [];
-const ALLOWED_TYPES = new Set(['specTable', 'table', 'figure', 'figure+table', 'procedure', 'checklist', 'cards', 'accuracyLog', 'model']);
+const ALLOWED_TYPES = new Set(['specTable', 'table', 'figure', 'figure+table', 'procedure', 'checklist', 'cards', 'accuracyLog', 'model', 'parts']);
+// Sheets generated from FMP equipment catalogs (scripts/build_gear_from_fmp.js checks they are current).
+const { EQUIPMENT, INTERACTIVE_URL } = require('./gear_equipment_adapter');
+const GENERATED = new Set(EQUIPMENT.map((item) => item.id));
 const ALLOWED_STATUSES = new Set(['confirmed', 'corrected', 'unverified', 'estimate']);
 
 function fail(message) {
@@ -61,6 +64,7 @@ function verifyRegistry() {
     './data/gear/fujinon-4k-broadcast-zoom.json',
     './data/gear/blackmagic-camera-fiber-converter.json',
     './data/gear/blackmagic-studio-fiber-converter.json',
+    ...EQUIPMENT.map((item) => `./data/gear/${item.id}.json`),
     './data/gear/figures/x39-chassis.svg',
     './data/gear/figures/x39-io.svg'
   ].forEach((asset) => {
@@ -91,6 +95,21 @@ function verifyEntry(indexEntry) {
       if (!/^https:\/\/housevideo\.app\/fmp\/rig\/\?equipment=(rig|studio)&part=[a-z0-9-]+$/.test(model.url || '') || !model.title) {
         fail(`${entry.id} section ${section.id} has an invalid FMP model link.`);
       }
+    }
+    if (section.type === 'parts') {
+      const parts = section.parts || {};
+      if (!GENERATED.has(entry.id)) fail(`${entry.id} section ${section.id}: parts sections come only from FMP catalogs.`);
+      if (!INTERACTIVE_URL.test((parts.interactive || {}).url || '')) fail(`${entry.id} section ${section.id} has an invalid interactive model link.`);
+      const seen = new Set();
+      (parts.groups || []).forEach((group) => (group.parts || []).forEach((part) => {
+        if (!part.id || !part.label || !part.evidence) fail(`${entry.id} part ${part.id || '(unnamed)'} is missing id, label or evidence.`);
+        if (seen.has(part.id)) fail(`${entry.id} lists part ${part.id} twice.`);
+        seen.add(part.id);
+        (part.sourceRefs || []).forEach((ref) => {
+          if (!sourceIds.has(ref)) fail(`${entry.id} part ${part.id} references unknown source ${ref}.`);
+        });
+      }));
+      if (!seen.size) fail(`${entry.id} section ${section.id} lists no parts.`);
     }
     if (section.figure) {
       if (!exists(section.figure.src)) fail(`${entry.id} figure is missing: ${section.figure.src}.`);
@@ -140,6 +159,9 @@ function verifyRenderer(registry) {
     'name="twitter:title" content="Gear Reference"',
     "history.replaceState",
     "JSON.stringify(section).toLowerCase()",
+    "function renderParts(container,section,map)",
+    "'#part='+encodeURIComponent(part.id)",
+    "source.reference||source.url",
     "Math.abs(dx)>64",
     "event.key==='Home'",
     "event.key==='End'",

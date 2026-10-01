@@ -55,11 +55,9 @@ function catalogContract(catalogs) {
   }
 }
 
-function modelContract(site) {
-  // Every rig count claim, including the one the camera card renders, must match the catalog.
-  // The data module holds only object literals; evaluate it in an empty context rather than importing ESM from CommonJS.
-  const guideData = fs.readFileSync(path.join(site, 'fmp/rig/fmp-guide-data.js'), 'utf8');
-  const components = Object.keys(vm.runInNewContext(`${guideData.replace(/^export const /gm, 'var ')}\n;catalog`, {}, { timeout: 1000 })).length;
+// The four exported equipment catalogs, read the way their own pages read them. The release gate
+// below and the Gear Reference sheet generator (scripts/build_gear_from_fmp.js) share this one load.
+function loadEquipmentCatalogs(site) {
   const loadCatalog = (source, globalName) => {
     const sandbox = {};
     vm.runInNewContext(source, sandbox, { timeout: 1000 });
@@ -74,12 +72,20 @@ function modelContract(site) {
     assert.ok(inline, `${name} must carry a readable equipment catalog`);
     assert.deepEqual(JSON.parse(inline[1]), JSON.parse(fs.readFileSync(path.join(site, `fmp/models/assets/${name}-catalog.json`), 'utf8')), `${name} runtime catalog differs from its release catalog`);
   }
-  const catalogs = {
+  return {
     'atem-hd8-iso': loadCatalog(fs.readFileSync(path.join(site, 'fmp/models/assets/atem-hd8-iso-1.js'), 'utf8'), 'ATEM'),
     superjoy: loadCatalog(superjoyCatalog, 'SuperJoy'),
     p240: JSON.parse(fs.readFileSync(path.join(site, 'fmp/models/assets/p240-catalog.json'), 'utf8')),
     ccu4: JSON.parse(fs.readFileSync(path.join(site, 'fmp/models/assets/ccu4-catalog.json'), 'utf8'))
   };
+}
+
+function modelContract(site) {
+  // Every rig count claim, including the one the camera card renders, must match the catalog.
+  // The data module holds only object literals; evaluate it in an empty context rather than importing ESM from CommonJS.
+  const guideData = fs.readFileSync(path.join(site, 'fmp/rig/fmp-guide-data.js'), 'utf8');
+  const components = Object.keys(vm.runInNewContext(`${guideData.replace(/^export const /gm, 'var ')}\n;catalog`, {}, { timeout: 1000 })).length;
+  const catalogs = loadEquipmentCatalogs(site);
   catalogContract(catalogs);
   const modelCounts = {
     rig: components,
@@ -95,4 +101,4 @@ function modelContract(site) {
   };
   return { counts: modelCounts, componentsFor };
 }
-module.exports = { modelFiles, modelContract, catalogContract };
+module.exports = { modelFiles, modelContract, catalogContract, loadEquipmentCatalogs };

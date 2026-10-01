@@ -1,0 +1,1810 @@
+{
+  "schema": "system-by-dave.gear-reference-entry.v1",
+  "id": "blackmagic-atem-camera-control-panel",
+  "displayName": "Blackmagic ATEM Camera Control Panel",
+  "aka": [
+    "ATEM Camera Control Panel",
+    "SWPANELCCU4",
+    "CCU panel"
+  ],
+  "brand": "Blackmagic Design",
+  "category": "Video",
+  "subcategory": "Camera control",
+  "status": "catalog-derived",
+  "updated": "2026-10-01",
+  "generated": {
+    "by": "scripts/build_gear_from_fmp.js",
+    "catalog": "fmp-ccu4",
+    "revision": "1.0.0",
+    "note": "Generated file. Change the fmp-suite catalog or scripts/gear_equipment_adapter.js, then run npm run build:gear-from-fmp."
+  },
+  "summary": "Equipment reference generated from the FMP Blackmagic ATEM Camera Control Panel catalog. FMP wiring and installed facts stay with the FMP explorer.",
+  "tags": [
+    "ATEM",
+    "CCU",
+    "shading",
+    "FMP"
+  ],
+  "sources": [
+    {
+      "id": "blackmagic-tech",
+      "label": "Blackmagic ATEM Camera Control Panel technical specifications",
+      "kind": "manufacturer",
+      "url": "https://www.blackmagicdesign.com/products/atemcameracontrolpanel/techspecs",
+      "scope": "Product identity, four LCDs/joysticks/preview buttons, Ethernet/USB-C and power."
+    },
+    {
+      "id": "blackmagic-manual",
+      "label": "Blackmagic ATEM manual · Camera Control Panel",
+      "kind": "manufacturer",
+      "url": "https://documents.blackmagicdesign.com/UserManuals/ATEM_Television_Studio_Switchers_Manual.pdf",
+      "scope": "ATEM Television Studio Switchers Installation and Operation Manual, June 2020, \"Using ATEM Camera Control Panel\" pp. 178-190 (accessed 2026-09-22). This edition is cited because the June 2026 Television Studio manual no longer contains the hardware camera control panel chapter. Behaviour marked in it as \"enabled in a future update\" is therefore six years old and unverified against current panel firmware."
+    },
+    {
+      "id": "blackmagic-physical",
+      "label": "Blackmagic physical specification drawing",
+      "kind": "manufacturer",
+      "reference": "manufacturer physical-spec image",
+      "scope": "430 × 389 × 141.7 mm external envelope and chassis profile."
+    },
+    {
+      "id": "fmp-ccu",
+      "label": "DB | FMP | AV Gear · ATEM Camera Control Panel",
+      "kind": "house-record",
+      "reference": "FMP equipment record, 20 September 2026",
+      "scope": "FMP hardware identity, labels, ownership, use and Camera 1 control-loss history."
+    },
+    {
+      "id": "fmp-signal",
+      "label": "REF | FMP | Signal Flow",
+      "kind": "house-record",
+      "reference": "FMP equipment record, 20 September 2026",
+      "scope": "Panel → ATEM Ethernet control, then camera control rides the return path to Cameras 1–3; P240 is separate."
+    }
+  ],
+  "accuracy": [
+    {
+      "item": "Model identity",
+      "status": "confirmed",
+      "detail": "The catalog names the model Blackmagic ATEM Camera Control Panel (part SWPANELCCU4), and a manufacturer source names the product.",
+      "sourceRefs": [
+        "blackmagic-tech"
+      ]
+    },
+    {
+      "item": "Parts with a manufacturer source",
+      "status": "confirmed",
+      "detail": "138 of 138 listed parts cite a manufacturer source.",
+      "sourceRefs": [
+        "blackmagic-tech",
+        "blackmagic-manual",
+        "blackmagic-physical"
+      ]
+    },
+    {
+      "item": "Parts the catalog has not established",
+      "status": "unverified",
+      "detail": "8 parts are listed under Open facts.",
+      "sourceRefs": [
+        "blackmagic-manual",
+        "blackmagic-tech",
+        "fmp-ccu"
+      ]
+    }
+  ],
+  "sections": [
+    {
+      "id": "id",
+      "title": "Identification",
+      "type": "specTable",
+      "rows": [
+        [
+          "Manufacturer",
+          "Blackmagic Design"
+        ],
+        [
+          "Model (catalog)",
+          "Blackmagic ATEM Camera Control Panel"
+        ],
+        [
+          "Part number",
+          "SWPANELCCU4"
+        ],
+        [
+          "Catalog",
+          "fmp-ccu4 · revision 1.0.0 · schema 1.1"
+        ],
+        [
+          "Parts on this sheet",
+          "138 of 140 catalog components; 2 kept with FMP"
+        ],
+        [
+          "Interactive model",
+          "housevideo.app/fmp/models/ccu4.html"
+        ]
+      ],
+      "sourceRefs": [
+        "blackmagic-tech",
+        "blackmagic-manual",
+        "blackmagic-physical"
+      ]
+    },
+    {
+      "id": "parts",
+      "title": "Parts",
+      "type": "parts",
+      "lede": "Generated from the FMP equipment catalog. Each part keeps the catalog’s own evidence level, and Inspect opens it in the interactive model.",
+      "parts": {
+        "interactive": {
+          "url": "https://housevideo.app/fmp/models/ccu4.html",
+          "label": "Blackmagic ATEM Camera Control Panel interactive model"
+        },
+        "total": 140,
+        "groups": [
+          {
+            "category": "Enclosure",
+            "parts": [
+              {
+                "id": "ccu4.chassis",
+                "label": "ATEM Camera Control Panel chassis",
+                "kind": "chassis",
+                "description": "Desktop four-strip camera shading/control panel.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-physical",
+                  "blackmagic-tech"
+                ]
+              }
+            ]
+          },
+          {
+            "category": "Rear connections",
+            "parts": [
+              {
+                "id": "ccu4.io.ac",
+                "label": "IEC AC input",
+                "kind": "connector",
+                "description": "Internal 100–240 V AC input",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-tech",
+                  "blackmagic-physical"
+                ]
+              },
+              {
+                "id": "ccu4.io.dc",
+                "label": "4-pin XLR DC input",
+                "kind": "connector",
+                "description": "12–30 V DC redundant input",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-tech",
+                  "blackmagic-physical"
+                ]
+              },
+              {
+                "id": "ccu4.io.eth1",
+                "label": "Ethernet 1",
+                "kind": "connector",
+                "description": "10/100/1000 BaseT network/control",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-tech",
+                  "blackmagic-physical"
+                ]
+              },
+              {
+                "id": "ccu4.io.eth2",
+                "label": "Ethernet loop",
+                "kind": "connector",
+                "description": "Second GigE port for loop output",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-tech",
+                  "blackmagic-physical"
+                ]
+              },
+              {
+                "id": "ccu4.io.usb",
+                "label": "USB-C service",
+                "kind": "connector",
+                "description": "Firmware updates",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-tech",
+                  "blackmagic-physical"
+                ]
+              }
+            ]
+          },
+          {
+            "category": "CCU strip 1",
+            "parts": [
+              {
+                "id": "ccu4.ch1.lcd",
+                "label": "CH1 · LCD / soft controls",
+                "kind": "display",
+                "description": "Home screen for this CCU. It names the camera assigned to the strip and turns red when that camera is live. From here you reach the camera bank A/B switch, the recall-all toggle, the auxiliary output used for camera control, the master black enable, and the panel brightness.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch1.scene1",
+                "label": "CH1 · Scene 1",
+                "kind": "button",
+                "description": "Recalls scene file 1 for this camera — every stored setting at once: shutter, master gain, white balance, colour balance and bars. To write the slot instead, press STORE first, then this button. If recall-all is enabled on the LCD home screen, pressing this recalls each CCU’s own scene 1 on every camera at once, including the camera currently on air, so the manual advises enabling recall-all only for a planned setup and turning it straight off again.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch1.scene2",
+                "label": "CH1 · Scene 2",
+                "kind": "button",
+                "description": "Recalls scene file 2 for this camera — every stored setting at once: shutter, master gain, white balance, colour balance and bars. To write the slot instead, press STORE first, then this button. If recall-all is enabled on the LCD home screen, pressing this recalls each CCU’s own scene 2 on every camera at once, including the camera currently on air, so the manual advises enabling recall-all only for a planned setup and turning it straight off again.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch1.scene3",
+                "label": "CH1 · Scene 3",
+                "kind": "button",
+                "description": "Recalls scene file 3 for this camera — every stored setting at once: shutter, master gain, white balance, colour balance and bars. To write the slot instead, press STORE first, then this button. If recall-all is enabled on the LCD home screen, pressing this recalls each CCU’s own scene 3 on every camera at once, including the camera currently on air, so the manual advises enabling recall-all only for a planned setup and turning it straight off again.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch1.scene4",
+                "label": "CH1 · Scene 4",
+                "kind": "button",
+                "description": "Recalls scene file 4 for this camera — every stored setting at once: shutter, master gain, white balance, colour balance and bars. To write the slot instead, press STORE first, then this button. If recall-all is enabled on the LCD home screen, pressing this recalls each CCU’s own scene 4 on every camera at once, including the camera currently on air, so the manual advises enabling recall-all only for a planned setup and turning it straight off again.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch1.scene5",
+                "label": "CH1 · Scene 5",
+                "kind": "button",
+                "description": "Recalls scene file 5 for this camera — every stored setting at once: shutter, master gain, white balance, colour balance and bars. To write the slot instead, press STORE first, then this button. If recall-all is enabled on the LCD home screen, pressing this recalls each CCU’s own scene 5 on every camera at once, including the camera currently on air, so the manual advises enabling recall-all only for a planned setup and turning it straight off again.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch1.store",
+                "label": "CH1 · Store scene",
+                "kind": "button",
+                "description": "Arms a scene-file save. Press STORE and it lights red to show the panel is waiting, then press one of the five numbered buttons to write every current setting for this camera into that slot.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch1.nd",
+                "label": "CH1 · ND filter",
+                "kind": "control",
+                "description": "Marked on the panel, but the cited manual states the ND setting \"will be enabled in a future update\". Whether current panel firmware implements it has not been verified here, so treat the control as unproven rather than assuming it drives the camera.",
+                "evidence": "Unknown",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch1.cc",
+                "label": "CH1 · Color correction",
+                "kind": "control",
+                "description": "Marked on the panel, but the cited manual states the CC setting \"will be enabled in a future update\". Whether current panel firmware implements it has not been verified here.",
+                "evidence": "Unknown",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch1.gain",
+                "label": "CH1 · Master gain",
+                "kind": "control",
+                "description": "Master gain for this camera, stepped by the up and down arrows. Raising it buys exposure in dim light at the cost of electronic noise, which becomes obvious at the top of the range. The down arrow lights when gain is negative and the up arrow lights when it is positive, so the lit arrow tells you which side of zero you are on at a glance.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch1.shutter",
+                "label": "CH1 · Shutter",
+                "kind": "control",
+                "description": "Shutter speed for this camera. Slower shutter brightens the picture by exposing the sensor for longer, which is usually a better first move than adding gain because it adds no noise, and it is also how you kill flicker under mains-frequency lighting. Faster shutter cuts motion blur for sharp action, at the cost of light.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch1.wb",
+                "label": "CH1 · White balance",
+                "kind": "control",
+                "description": "White balance for this camera. Light sources are warm or cool, and this shifts colour temperature to compensate so that whites stay white rather than drifting orange under tungsten or blue under daylight.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch1.bars",
+                "label": "CH1 · Color bars",
+                "kind": "button",
+                "description": "Enables or disables colour bars on this camera’s output. Bars are a line-up reference; anything sending bars is not sending a picture, so check what is on air before pressing it.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch1.rel",
+                "label": "CH1 · Relative iris mode",
+                "kind": "button",
+                "description": "Relative and absolute describe how the panel resyncs when a setting is changed somewhere else, such as in ATEM Software Control. In relative mode the panel eases back into sync as you make your next adjustment, so the change is almost invisible. In absolute mode the value snaps to wherever the physical control is sitting the moment you touch it, which is abrupt and can be ugly on air. Decide which mode you are in before the show rather than during it. The cited manual describes the ON button as cycling between the two modes.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch1.abs",
+                "label": "CH1 · Absolute iris mode",
+                "kind": "button",
+                "description": "Relative and absolute describe how the panel resyncs when a setting is changed somewhere else, such as in ATEM Software Control. In relative mode the panel eases back into sync as you make your next adjustment, so the change is almost invisible. In absolute mode the value snaps to wherever the physical control is sitting the moment you touch it, which is abrupt and can be ugly on air. Decide which mode you are in before the show rather than during it. The cited manual describes the ON button as cycling between the two modes.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch1.white-r",
+                "label": "CH1 · White R",
+                "kind": "knob",
+                "description": "Red content of the gain, meaning the highlights. Despite sitting near the white balance controls this is not white balance — it trims the red channel at the bright end of the picture.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch1.white-g",
+                "label": "CH1 · White G",
+                "kind": "knob",
+                "description": "Green content of the gain, meaning the highlights. This trims the green channel at the bright end of the picture, separately from white balance.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch1.white-b",
+                "label": "CH1 · White B",
+                "kind": "knob",
+                "description": "Blue content of the gain, meaning the highlights. This trims the blue channel at the bright end of the picture, separately from white balance.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch1.black-r",
+                "label": "CH1 · Black R",
+                "kind": "knob",
+                "description": "Red content of the lift, meaning the shadows. Use it to remove a colour cast from the darkest part of the picture without disturbing the highlights.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch1.black-g",
+                "label": "CH1 · Black G",
+                "kind": "knob",
+                "description": "Green content of the lift, meaning the shadows. Use it to remove a colour cast from the darkest part of the picture without disturbing the highlights.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch1.black-b",
+                "label": "CH1 · Black B",
+                "kind": "knob",
+                "description": "Blue content of the lift, meaning the shadows. Use it to remove a colour cast from the darkest part of the picture without disturbing the highlights.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch1.flare",
+                "label": "CH1 · Black / flare",
+                "kind": "knob",
+                "description": "Reaches the gamma, meaning the mid tones. Hold this button down and turn the black RGB knobs, and they trim the mid tones instead of the shadows — so the same three knobs cover two tonal regions depending on whether this button is held.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch1.custom",
+                "label": "CH1 · Custom / Y gain",
+                "kind": "knob",
+                "description": "Currently assigned to Y gain, which raises or lowers overall luminance without moving the individual colour channels. The cited manual describes the knob as freely assignable in a future update, so its function may differ on current firmware.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch1.camera",
+                "label": "CH1 · Camera number",
+                "kind": "display",
+                "description": "The large camera number for this strip, readable across a gallery. It illuminates red when this camera is live on the program output — the fastest way to check you are not about to shade a camera that is on air.",
+                "evidence": "Confirmed",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech",
+                  "fmp-ccu"
+                ],
+                "fmpEvidence": true
+              },
+              {
+                "id": "ccu4.ch1.joystick",
+                "label": "CH1 · Iris / master black joystick",
+                "kind": "joystick",
+                "description": "The main shading control. Lean it forward or back to open and close the iris, and turn the ring wheel beneath the knob to raise or lower master black, the pedestal. Pressing the joystick down switches this camera to the auxiliary output assigned to camera control, so you can look at it full screen before adjusting.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch1.preview",
+                "label": "CH1 · Preview",
+                "kind": "button",
+                "description": "Sends this camera to the auxiliary output assigned to camera control, so the shot you are shading is the one you are looking at. Which aux that is depends on the switcher and is set on the panel’s LCD.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch1.sensitivity",
+                "label": "CH1 · Sensitivity",
+                "kind": "knob",
+                "description": "Sets how much of the iris range the joystick’s full travel covers. Tighten it when you want fine control around one exposure, widen it when you need to move a long way quickly.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch1.coarse",
+                "label": "CH1 · Coarse",
+                "kind": "knob",
+                "description": "Caps how far the iris can open, so an over-exposed picture cannot reach air. Set it by opening the iris fully, then bringing coarse down until exposure is right — from then on the joystick cannot go past that ceiling.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch1.iris-mb-active",
+                "label": "CH1 · Iris / MB active",
+                "kind": "button",
+                "description": "Locks the joystick’s iris and master black so neither can be nudged by accident during a show. Master black can also be disabled globally from the panel’s LCD settings.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch1.auto-iris",
+                "label": "CH1 · Auto iris",
+                "kind": "button",
+                "description": "Runs an automatic exposure on a lens with electronic iris control. It is a starting point rather than a set-and-forget — it responds to whatever is in frame at the moment you press it.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch1.call",
+                "label": "CH1 · Call",
+                "kind": "button",
+                "description": "Flashes the tally on this camera to get the operator’s attention, on cameras that support it. Useful for signalling before going live.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch1.panel-active",
+                "label": "CH1 · Panel active",
+                "kind": "button",
+                "description": "Locks this CCU’s controls so nothing can be changed by a knock or a sleeve. Worth using on any camera that is parked and correct.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch1.status",
+                "label": "CH1 · Status indicators",
+                "kind": "light",
+                "description": "Indicator for this strip, showing network, error and active states rather than anything about the picture.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              }
+            ]
+          },
+          {
+            "category": "CCU strip 2",
+            "parts": [
+              {
+                "id": "ccu4.ch2.lcd",
+                "label": "CH2 · LCD / soft controls",
+                "kind": "display",
+                "description": "Home screen for this CCU. It names the camera assigned to the strip and turns red when that camera is live. From here you reach the camera bank A/B switch, the recall-all toggle, the auxiliary output used for camera control, the master black enable, and the panel brightness.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch2.scene1",
+                "label": "CH2 · Scene 1",
+                "kind": "button",
+                "description": "Recalls scene file 1 for this camera — every stored setting at once: shutter, master gain, white balance, colour balance and bars. To write the slot instead, press STORE first, then this button. If recall-all is enabled on the LCD home screen, pressing this recalls each CCU’s own scene 1 on every camera at once, including the camera currently on air, so the manual advises enabling recall-all only for a planned setup and turning it straight off again.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch2.scene2",
+                "label": "CH2 · Scene 2",
+                "kind": "button",
+                "description": "Recalls scene file 2 for this camera — every stored setting at once: shutter, master gain, white balance, colour balance and bars. To write the slot instead, press STORE first, then this button. If recall-all is enabled on the LCD home screen, pressing this recalls each CCU’s own scene 2 on every camera at once, including the camera currently on air, so the manual advises enabling recall-all only for a planned setup and turning it straight off again.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch2.scene3",
+                "label": "CH2 · Scene 3",
+                "kind": "button",
+                "description": "Recalls scene file 3 for this camera — every stored setting at once: shutter, master gain, white balance, colour balance and bars. To write the slot instead, press STORE first, then this button. If recall-all is enabled on the LCD home screen, pressing this recalls each CCU’s own scene 3 on every camera at once, including the camera currently on air, so the manual advises enabling recall-all only for a planned setup and turning it straight off again.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch2.scene4",
+                "label": "CH2 · Scene 4",
+                "kind": "button",
+                "description": "Recalls scene file 4 for this camera — every stored setting at once: shutter, master gain, white balance, colour balance and bars. To write the slot instead, press STORE first, then this button. If recall-all is enabled on the LCD home screen, pressing this recalls each CCU’s own scene 4 on every camera at once, including the camera currently on air, so the manual advises enabling recall-all only for a planned setup and turning it straight off again.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch2.scene5",
+                "label": "CH2 · Scene 5",
+                "kind": "button",
+                "description": "Recalls scene file 5 for this camera — every stored setting at once: shutter, master gain, white balance, colour balance and bars. To write the slot instead, press STORE first, then this button. If recall-all is enabled on the LCD home screen, pressing this recalls each CCU’s own scene 5 on every camera at once, including the camera currently on air, so the manual advises enabling recall-all only for a planned setup and turning it straight off again.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch2.store",
+                "label": "CH2 · Store scene",
+                "kind": "button",
+                "description": "Arms a scene-file save. Press STORE and it lights red to show the panel is waiting, then press one of the five numbered buttons to write every current setting for this camera into that slot.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch2.nd",
+                "label": "CH2 · ND filter",
+                "kind": "control",
+                "description": "Marked on the panel, but the cited manual states the ND setting \"will be enabled in a future update\". Whether current panel firmware implements it has not been verified here, so treat the control as unproven rather than assuming it drives the camera.",
+                "evidence": "Unknown",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch2.cc",
+                "label": "CH2 · Color correction",
+                "kind": "control",
+                "description": "Marked on the panel, but the cited manual states the CC setting \"will be enabled in a future update\". Whether current panel firmware implements it has not been verified here.",
+                "evidence": "Unknown",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch2.gain",
+                "label": "CH2 · Master gain",
+                "kind": "control",
+                "description": "Master gain for this camera, stepped by the up and down arrows. Raising it buys exposure in dim light at the cost of electronic noise, which becomes obvious at the top of the range. The down arrow lights when gain is negative and the up arrow lights when it is positive, so the lit arrow tells you which side of zero you are on at a glance.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch2.shutter",
+                "label": "CH2 · Shutter",
+                "kind": "control",
+                "description": "Shutter speed for this camera. Slower shutter brightens the picture by exposing the sensor for longer, which is usually a better first move than adding gain because it adds no noise, and it is also how you kill flicker under mains-frequency lighting. Faster shutter cuts motion blur for sharp action, at the cost of light.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch2.wb",
+                "label": "CH2 · White balance",
+                "kind": "control",
+                "description": "White balance for this camera. Light sources are warm or cool, and this shifts colour temperature to compensate so that whites stay white rather than drifting orange under tungsten or blue under daylight.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch2.bars",
+                "label": "CH2 · Color bars",
+                "kind": "button",
+                "description": "Enables or disables colour bars on this camera’s output. Bars are a line-up reference; anything sending bars is not sending a picture, so check what is on air before pressing it.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch2.rel",
+                "label": "CH2 · Relative iris mode",
+                "kind": "button",
+                "description": "Relative and absolute describe how the panel resyncs when a setting is changed somewhere else, such as in ATEM Software Control. In relative mode the panel eases back into sync as you make your next adjustment, so the change is almost invisible. In absolute mode the value snaps to wherever the physical control is sitting the moment you touch it, which is abrupt and can be ugly on air. Decide which mode you are in before the show rather than during it. The cited manual describes the ON button as cycling between the two modes.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch2.abs",
+                "label": "CH2 · Absolute iris mode",
+                "kind": "button",
+                "description": "Relative and absolute describe how the panel resyncs when a setting is changed somewhere else, such as in ATEM Software Control. In relative mode the panel eases back into sync as you make your next adjustment, so the change is almost invisible. In absolute mode the value snaps to wherever the physical control is sitting the moment you touch it, which is abrupt and can be ugly on air. Decide which mode you are in before the show rather than during it. The cited manual describes the ON button as cycling between the two modes.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch2.white-r",
+                "label": "CH2 · White R",
+                "kind": "knob",
+                "description": "Red content of the gain, meaning the highlights. Despite sitting near the white balance controls this is not white balance — it trims the red channel at the bright end of the picture.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch2.white-g",
+                "label": "CH2 · White G",
+                "kind": "knob",
+                "description": "Green content of the gain, meaning the highlights. This trims the green channel at the bright end of the picture, separately from white balance.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch2.white-b",
+                "label": "CH2 · White B",
+                "kind": "knob",
+                "description": "Blue content of the gain, meaning the highlights. This trims the blue channel at the bright end of the picture, separately from white balance.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch2.black-r",
+                "label": "CH2 · Black R",
+                "kind": "knob",
+                "description": "Red content of the lift, meaning the shadows. Use it to remove a colour cast from the darkest part of the picture without disturbing the highlights.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch2.black-g",
+                "label": "CH2 · Black G",
+                "kind": "knob",
+                "description": "Green content of the lift, meaning the shadows. Use it to remove a colour cast from the darkest part of the picture without disturbing the highlights.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch2.black-b",
+                "label": "CH2 · Black B",
+                "kind": "knob",
+                "description": "Blue content of the lift, meaning the shadows. Use it to remove a colour cast from the darkest part of the picture without disturbing the highlights.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch2.flare",
+                "label": "CH2 · Black / flare",
+                "kind": "knob",
+                "description": "Reaches the gamma, meaning the mid tones. Hold this button down and turn the black RGB knobs, and they trim the mid tones instead of the shadows — so the same three knobs cover two tonal regions depending on whether this button is held.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch2.custom",
+                "label": "CH2 · Custom / Y gain",
+                "kind": "knob",
+                "description": "Currently assigned to Y gain, which raises or lowers overall luminance without moving the individual colour channels. The cited manual describes the knob as freely assignable in a future update, so its function may differ on current firmware.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch2.camera",
+                "label": "CH2 · Camera number",
+                "kind": "display",
+                "description": "The large camera number for this strip, readable across a gallery. It illuminates red when this camera is live on the program output — the fastest way to check you are not about to shade a camera that is on air.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech",
+                  "fmp-ccu"
+                ],
+                "fmpEvidence": true
+              },
+              {
+                "id": "ccu4.ch2.joystick",
+                "label": "CH2 · Iris / master black joystick",
+                "kind": "joystick",
+                "description": "The main shading control. Lean it forward or back to open and close the iris, and turn the ring wheel beneath the knob to raise or lower master black, the pedestal. Pressing the joystick down switches this camera to the auxiliary output assigned to camera control, so you can look at it full screen before adjusting.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch2.preview",
+                "label": "CH2 · Preview",
+                "kind": "button",
+                "description": "Sends this camera to the auxiliary output assigned to camera control, so the shot you are shading is the one you are looking at. Which aux that is depends on the switcher and is set on the panel’s LCD.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch2.sensitivity",
+                "label": "CH2 · Sensitivity",
+                "kind": "knob",
+                "description": "Sets how much of the iris range the joystick’s full travel covers. Tighten it when you want fine control around one exposure, widen it when you need to move a long way quickly.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch2.coarse",
+                "label": "CH2 · Coarse",
+                "kind": "knob",
+                "description": "Caps how far the iris can open, so an over-exposed picture cannot reach air. Set it by opening the iris fully, then bringing coarse down until exposure is right — from then on the joystick cannot go past that ceiling.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch2.iris-mb-active",
+                "label": "CH2 · Iris / MB active",
+                "kind": "button",
+                "description": "Locks the joystick’s iris and master black so neither can be nudged by accident during a show. Master black can also be disabled globally from the panel’s LCD settings.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch2.auto-iris",
+                "label": "CH2 · Auto iris",
+                "kind": "button",
+                "description": "Runs an automatic exposure on a lens with electronic iris control. It is a starting point rather than a set-and-forget — it responds to whatever is in frame at the moment you press it.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch2.call",
+                "label": "CH2 · Call",
+                "kind": "button",
+                "description": "Flashes the tally on this camera to get the operator’s attention, on cameras that support it. Useful for signalling before going live.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch2.panel-active",
+                "label": "CH2 · Panel active",
+                "kind": "button",
+                "description": "Locks this CCU’s controls so nothing can be changed by a knock or a sleeve. Worth using on any camera that is parked and correct.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch2.status",
+                "label": "CH2 · Status indicators",
+                "kind": "light",
+                "description": "Indicator for this strip, showing network, error and active states rather than anything about the picture.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              }
+            ]
+          },
+          {
+            "category": "CCU strip 3",
+            "parts": [
+              {
+                "id": "ccu4.ch3.lcd",
+                "label": "CH3 · LCD / soft controls",
+                "kind": "display",
+                "description": "Home screen for this CCU. It names the camera assigned to the strip and turns red when that camera is live. From here you reach the camera bank A/B switch, the recall-all toggle, the auxiliary output used for camera control, the master black enable, and the panel brightness.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch3.scene1",
+                "label": "CH3 · Scene 1",
+                "kind": "button",
+                "description": "Recalls scene file 1 for this camera — every stored setting at once: shutter, master gain, white balance, colour balance and bars. To write the slot instead, press STORE first, then this button. If recall-all is enabled on the LCD home screen, pressing this recalls each CCU’s own scene 1 on every camera at once, including the camera currently on air, so the manual advises enabling recall-all only for a planned setup and turning it straight off again.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch3.scene2",
+                "label": "CH3 · Scene 2",
+                "kind": "button",
+                "description": "Recalls scene file 2 for this camera — every stored setting at once: shutter, master gain, white balance, colour balance and bars. To write the slot instead, press STORE first, then this button. If recall-all is enabled on the LCD home screen, pressing this recalls each CCU’s own scene 2 on every camera at once, including the camera currently on air, so the manual advises enabling recall-all only for a planned setup and turning it straight off again.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch3.scene3",
+                "label": "CH3 · Scene 3",
+                "kind": "button",
+                "description": "Recalls scene file 3 for this camera — every stored setting at once: shutter, master gain, white balance, colour balance and bars. To write the slot instead, press STORE first, then this button. If recall-all is enabled on the LCD home screen, pressing this recalls each CCU’s own scene 3 on every camera at once, including the camera currently on air, so the manual advises enabling recall-all only for a planned setup and turning it straight off again.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch3.scene4",
+                "label": "CH3 · Scene 4",
+                "kind": "button",
+                "description": "Recalls scene file 4 for this camera — every stored setting at once: shutter, master gain, white balance, colour balance and bars. To write the slot instead, press STORE first, then this button. If recall-all is enabled on the LCD home screen, pressing this recalls each CCU’s own scene 4 on every camera at once, including the camera currently on air, so the manual advises enabling recall-all only for a planned setup and turning it straight off again.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch3.scene5",
+                "label": "CH3 · Scene 5",
+                "kind": "button",
+                "description": "Recalls scene file 5 for this camera — every stored setting at once: shutter, master gain, white balance, colour balance and bars. To write the slot instead, press STORE first, then this button. If recall-all is enabled on the LCD home screen, pressing this recalls each CCU’s own scene 5 on every camera at once, including the camera currently on air, so the manual advises enabling recall-all only for a planned setup and turning it straight off again.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch3.store",
+                "label": "CH3 · Store scene",
+                "kind": "button",
+                "description": "Arms a scene-file save. Press STORE and it lights red to show the panel is waiting, then press one of the five numbered buttons to write every current setting for this camera into that slot.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch3.nd",
+                "label": "CH3 · ND filter",
+                "kind": "control",
+                "description": "Marked on the panel, but the cited manual states the ND setting \"will be enabled in a future update\". Whether current panel firmware implements it has not been verified here, so treat the control as unproven rather than assuming it drives the camera.",
+                "evidence": "Unknown",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch3.cc",
+                "label": "CH3 · Color correction",
+                "kind": "control",
+                "description": "Marked on the panel, but the cited manual states the CC setting \"will be enabled in a future update\". Whether current panel firmware implements it has not been verified here.",
+                "evidence": "Unknown",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch3.gain",
+                "label": "CH3 · Master gain",
+                "kind": "control",
+                "description": "Master gain for this camera, stepped by the up and down arrows. Raising it buys exposure in dim light at the cost of electronic noise, which becomes obvious at the top of the range. The down arrow lights when gain is negative and the up arrow lights when it is positive, so the lit arrow tells you which side of zero you are on at a glance.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch3.shutter",
+                "label": "CH3 · Shutter",
+                "kind": "control",
+                "description": "Shutter speed for this camera. Slower shutter brightens the picture by exposing the sensor for longer, which is usually a better first move than adding gain because it adds no noise, and it is also how you kill flicker under mains-frequency lighting. Faster shutter cuts motion blur for sharp action, at the cost of light.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch3.wb",
+                "label": "CH3 · White balance",
+                "kind": "control",
+                "description": "White balance for this camera. Light sources are warm or cool, and this shifts colour temperature to compensate so that whites stay white rather than drifting orange under tungsten or blue under daylight.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch3.bars",
+                "label": "CH3 · Color bars",
+                "kind": "button",
+                "description": "Enables or disables colour bars on this camera’s output. Bars are a line-up reference; anything sending bars is not sending a picture, so check what is on air before pressing it.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch3.rel",
+                "label": "CH3 · Relative iris mode",
+                "kind": "button",
+                "description": "Relative and absolute describe how the panel resyncs when a setting is changed somewhere else, such as in ATEM Software Control. In relative mode the panel eases back into sync as you make your next adjustment, so the change is almost invisible. In absolute mode the value snaps to wherever the physical control is sitting the moment you touch it, which is abrupt and can be ugly on air. Decide which mode you are in before the show rather than during it. The cited manual describes the ON button as cycling between the two modes.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch3.abs",
+                "label": "CH3 · Absolute iris mode",
+                "kind": "button",
+                "description": "Relative and absolute describe how the panel resyncs when a setting is changed somewhere else, such as in ATEM Software Control. In relative mode the panel eases back into sync as you make your next adjustment, so the change is almost invisible. In absolute mode the value snaps to wherever the physical control is sitting the moment you touch it, which is abrupt and can be ugly on air. Decide which mode you are in before the show rather than during it. The cited manual describes the ON button as cycling between the two modes.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch3.white-r",
+                "label": "CH3 · White R",
+                "kind": "knob",
+                "description": "Red content of the gain, meaning the highlights. Despite sitting near the white balance controls this is not white balance — it trims the red channel at the bright end of the picture.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch3.white-g",
+                "label": "CH3 · White G",
+                "kind": "knob",
+                "description": "Green content of the gain, meaning the highlights. This trims the green channel at the bright end of the picture, separately from white balance.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch3.white-b",
+                "label": "CH3 · White B",
+                "kind": "knob",
+                "description": "Blue content of the gain, meaning the highlights. This trims the blue channel at the bright end of the picture, separately from white balance.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch3.black-r",
+                "label": "CH3 · Black R",
+                "kind": "knob",
+                "description": "Red content of the lift, meaning the shadows. Use it to remove a colour cast from the darkest part of the picture without disturbing the highlights.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch3.black-g",
+                "label": "CH3 · Black G",
+                "kind": "knob",
+                "description": "Green content of the lift, meaning the shadows. Use it to remove a colour cast from the darkest part of the picture without disturbing the highlights.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch3.black-b",
+                "label": "CH3 · Black B",
+                "kind": "knob",
+                "description": "Blue content of the lift, meaning the shadows. Use it to remove a colour cast from the darkest part of the picture without disturbing the highlights.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch3.flare",
+                "label": "CH3 · Black / flare",
+                "kind": "knob",
+                "description": "Reaches the gamma, meaning the mid tones. Hold this button down and turn the black RGB knobs, and they trim the mid tones instead of the shadows — so the same three knobs cover two tonal regions depending on whether this button is held.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch3.custom",
+                "label": "CH3 · Custom / Y gain",
+                "kind": "knob",
+                "description": "Currently assigned to Y gain, which raises or lowers overall luminance without moving the individual colour channels. The cited manual describes the knob as freely assignable in a future update, so its function may differ on current firmware.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch3.camera",
+                "label": "CH3 · Camera number",
+                "kind": "display",
+                "description": "The large camera number for this strip, readable across a gallery. It illuminates red when this camera is live on the program output — the fastest way to check you are not about to shade a camera that is on air.",
+                "evidence": "Confirmed",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech",
+                  "fmp-ccu"
+                ],
+                "fmpEvidence": true
+              },
+              {
+                "id": "ccu4.ch3.joystick",
+                "label": "CH3 · Iris / master black joystick",
+                "kind": "joystick",
+                "description": "The main shading control. Lean it forward or back to open and close the iris, and turn the ring wheel beneath the knob to raise or lower master black, the pedestal. Pressing the joystick down switches this camera to the auxiliary output assigned to camera control, so you can look at it full screen before adjusting.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch3.preview",
+                "label": "CH3 · Preview",
+                "kind": "button",
+                "description": "Sends this camera to the auxiliary output assigned to camera control, so the shot you are shading is the one you are looking at. Which aux that is depends on the switcher and is set on the panel’s LCD.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch3.sensitivity",
+                "label": "CH3 · Sensitivity",
+                "kind": "knob",
+                "description": "Sets how much of the iris range the joystick’s full travel covers. Tighten it when you want fine control around one exposure, widen it when you need to move a long way quickly.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch3.coarse",
+                "label": "CH3 · Coarse",
+                "kind": "knob",
+                "description": "Caps how far the iris can open, so an over-exposed picture cannot reach air. Set it by opening the iris fully, then bringing coarse down until exposure is right — from then on the joystick cannot go past that ceiling.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch3.iris-mb-active",
+                "label": "CH3 · Iris / MB active",
+                "kind": "button",
+                "description": "Locks the joystick’s iris and master black so neither can be nudged by accident during a show. Master black can also be disabled globally from the panel’s LCD settings.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch3.auto-iris",
+                "label": "CH3 · Auto iris",
+                "kind": "button",
+                "description": "Runs an automatic exposure on a lens with electronic iris control. It is a starting point rather than a set-and-forget — it responds to whatever is in frame at the moment you press it.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch3.call",
+                "label": "CH3 · Call",
+                "kind": "button",
+                "description": "Flashes the tally on this camera to get the operator’s attention, on cameras that support it. Useful for signalling before going live.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch3.panel-active",
+                "label": "CH3 · Panel active",
+                "kind": "button",
+                "description": "Locks this CCU’s controls so nothing can be changed by a knock or a sleeve. Worth using on any camera that is parked and correct.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch3.status",
+                "label": "CH3 · Status indicators",
+                "kind": "light",
+                "description": "Indicator for this strip, showing network, error and active states rather than anything about the picture.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              }
+            ]
+          },
+          {
+            "category": "CCU strip 4",
+            "parts": [
+              {
+                "id": "ccu4.ch4.lcd",
+                "label": "CH4 · LCD / soft controls",
+                "kind": "display",
+                "description": "Home screen for this CCU. It names the camera assigned to the strip and turns red when that camera is live. From here you reach the camera bank A/B switch, the recall-all toggle, the auxiliary output used for camera control, the master black enable, and the panel brightness.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch4.scene1",
+                "label": "CH4 · Scene 1",
+                "kind": "button",
+                "description": "Recalls scene file 1 for this camera — every stored setting at once: shutter, master gain, white balance, colour balance and bars. To write the slot instead, press STORE first, then this button. If recall-all is enabled on the LCD home screen, pressing this recalls each CCU’s own scene 1 on every camera at once, including the camera currently on air, so the manual advises enabling recall-all only for a planned setup and turning it straight off again.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch4.scene2",
+                "label": "CH4 · Scene 2",
+                "kind": "button",
+                "description": "Recalls scene file 2 for this camera — every stored setting at once: shutter, master gain, white balance, colour balance and bars. To write the slot instead, press STORE first, then this button. If recall-all is enabled on the LCD home screen, pressing this recalls each CCU’s own scene 2 on every camera at once, including the camera currently on air, so the manual advises enabling recall-all only for a planned setup and turning it straight off again.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch4.scene3",
+                "label": "CH4 · Scene 3",
+                "kind": "button",
+                "description": "Recalls scene file 3 for this camera — every stored setting at once: shutter, master gain, white balance, colour balance and bars. To write the slot instead, press STORE first, then this button. If recall-all is enabled on the LCD home screen, pressing this recalls each CCU’s own scene 3 on every camera at once, including the camera currently on air, so the manual advises enabling recall-all only for a planned setup and turning it straight off again.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch4.scene4",
+                "label": "CH4 · Scene 4",
+                "kind": "button",
+                "description": "Recalls scene file 4 for this camera — every stored setting at once: shutter, master gain, white balance, colour balance and bars. To write the slot instead, press STORE first, then this button. If recall-all is enabled on the LCD home screen, pressing this recalls each CCU’s own scene 4 on every camera at once, including the camera currently on air, so the manual advises enabling recall-all only for a planned setup and turning it straight off again.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch4.scene5",
+                "label": "CH4 · Scene 5",
+                "kind": "button",
+                "description": "Recalls scene file 5 for this camera — every stored setting at once: shutter, master gain, white balance, colour balance and bars. To write the slot instead, press STORE first, then this button. If recall-all is enabled on the LCD home screen, pressing this recalls each CCU’s own scene 5 on every camera at once, including the camera currently on air, so the manual advises enabling recall-all only for a planned setup and turning it straight off again.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch4.store",
+                "label": "CH4 · Store scene",
+                "kind": "button",
+                "description": "Arms a scene-file save. Press STORE and it lights red to show the panel is waiting, then press one of the five numbered buttons to write every current setting for this camera into that slot.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch4.nd",
+                "label": "CH4 · ND filter",
+                "kind": "control",
+                "description": "Marked on the panel, but the cited manual states the ND setting \"will be enabled in a future update\". Whether current panel firmware implements it has not been verified here, so treat the control as unproven rather than assuming it drives the camera.",
+                "evidence": "Unknown",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch4.cc",
+                "label": "CH4 · Color correction",
+                "kind": "control",
+                "description": "Marked on the panel, but the cited manual states the CC setting \"will be enabled in a future update\". Whether current panel firmware implements it has not been verified here.",
+                "evidence": "Unknown",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch4.gain",
+                "label": "CH4 · Master gain",
+                "kind": "control",
+                "description": "Master gain for this camera, stepped by the up and down arrows. Raising it buys exposure in dim light at the cost of electronic noise, which becomes obvious at the top of the range. The down arrow lights when gain is negative and the up arrow lights when it is positive, so the lit arrow tells you which side of zero you are on at a glance.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch4.shutter",
+                "label": "CH4 · Shutter",
+                "kind": "control",
+                "description": "Shutter speed for this camera. Slower shutter brightens the picture by exposing the sensor for longer, which is usually a better first move than adding gain because it adds no noise, and it is also how you kill flicker under mains-frequency lighting. Faster shutter cuts motion blur for sharp action, at the cost of light.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch4.wb",
+                "label": "CH4 · White balance",
+                "kind": "control",
+                "description": "White balance for this camera. Light sources are warm or cool, and this shifts colour temperature to compensate so that whites stay white rather than drifting orange under tungsten or blue under daylight.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch4.bars",
+                "label": "CH4 · Color bars",
+                "kind": "button",
+                "description": "Enables or disables colour bars on this camera’s output. Bars are a line-up reference; anything sending bars is not sending a picture, so check what is on air before pressing it.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch4.rel",
+                "label": "CH4 · Relative iris mode",
+                "kind": "button",
+                "description": "Relative and absolute describe how the panel resyncs when a setting is changed somewhere else, such as in ATEM Software Control. In relative mode the panel eases back into sync as you make your next adjustment, so the change is almost invisible. In absolute mode the value snaps to wherever the physical control is sitting the moment you touch it, which is abrupt and can be ugly on air. Decide which mode you are in before the show rather than during it. The cited manual describes the ON button as cycling between the two modes.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch4.abs",
+                "label": "CH4 · Absolute iris mode",
+                "kind": "button",
+                "description": "Relative and absolute describe how the panel resyncs when a setting is changed somewhere else, such as in ATEM Software Control. In relative mode the panel eases back into sync as you make your next adjustment, so the change is almost invisible. In absolute mode the value snaps to wherever the physical control is sitting the moment you touch it, which is abrupt and can be ugly on air. Decide which mode you are in before the show rather than during it. The cited manual describes the ON button as cycling between the two modes.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch4.white-r",
+                "label": "CH4 · White R",
+                "kind": "knob",
+                "description": "Red content of the gain, meaning the highlights. Despite sitting near the white balance controls this is not white balance — it trims the red channel at the bright end of the picture.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch4.white-g",
+                "label": "CH4 · White G",
+                "kind": "knob",
+                "description": "Green content of the gain, meaning the highlights. This trims the green channel at the bright end of the picture, separately from white balance.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch4.white-b",
+                "label": "CH4 · White B",
+                "kind": "knob",
+                "description": "Blue content of the gain, meaning the highlights. This trims the blue channel at the bright end of the picture, separately from white balance.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch4.black-r",
+                "label": "CH4 · Black R",
+                "kind": "knob",
+                "description": "Red content of the lift, meaning the shadows. Use it to remove a colour cast from the darkest part of the picture without disturbing the highlights.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch4.black-g",
+                "label": "CH4 · Black G",
+                "kind": "knob",
+                "description": "Green content of the lift, meaning the shadows. Use it to remove a colour cast from the darkest part of the picture without disturbing the highlights.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch4.black-b",
+                "label": "CH4 · Black B",
+                "kind": "knob",
+                "description": "Blue content of the lift, meaning the shadows. Use it to remove a colour cast from the darkest part of the picture without disturbing the highlights.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch4.flare",
+                "label": "CH4 · Black / flare",
+                "kind": "knob",
+                "description": "Reaches the gamma, meaning the mid tones. Hold this button down and turn the black RGB knobs, and they trim the mid tones instead of the shadows — so the same three knobs cover two tonal regions depending on whether this button is held.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch4.custom",
+                "label": "CH4 · Custom / Y gain",
+                "kind": "knob",
+                "description": "Currently assigned to Y gain, which raises or lowers overall luminance without moving the individual colour channels. The cited manual describes the knob as freely assignable in a future update, so its function may differ on current firmware.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch4.camera",
+                "label": "CH4 · Camera number",
+                "kind": "display",
+                "description": "The large camera number for this strip, readable across a gallery. It illuminates red when this camera is live on the program output — the fastest way to check you are not about to shade a camera that is on air.",
+                "evidence": "Confirmed",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech",
+                  "fmp-ccu"
+                ],
+                "fmpEvidence": true
+              },
+              {
+                "id": "ccu4.ch4.joystick",
+                "label": "CH4 · Iris / master black joystick",
+                "kind": "joystick",
+                "description": "The main shading control. Lean it forward or back to open and close the iris, and turn the ring wheel beneath the knob to raise or lower master black, the pedestal. Pressing the joystick down switches this camera to the auxiliary output assigned to camera control, so you can look at it full screen before adjusting.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch4.preview",
+                "label": "CH4 · Preview",
+                "kind": "button",
+                "description": "Sends this camera to the auxiliary output assigned to camera control, so the shot you are shading is the one you are looking at. Which aux that is depends on the switcher and is set on the panel’s LCD.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch4.sensitivity",
+                "label": "CH4 · Sensitivity",
+                "kind": "knob",
+                "description": "Sets how much of the iris range the joystick’s full travel covers. Tighten it when you want fine control around one exposure, widen it when you need to move a long way quickly.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch4.coarse",
+                "label": "CH4 · Coarse",
+                "kind": "knob",
+                "description": "Caps how far the iris can open, so an over-exposed picture cannot reach air. Set it by opening the iris fully, then bringing coarse down until exposure is right — from then on the joystick cannot go past that ceiling.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch4.iris-mb-active",
+                "label": "CH4 · Iris / MB active",
+                "kind": "button",
+                "description": "Locks the joystick’s iris and master black so neither can be nudged by accident during a show. Master black can also be disabled globally from the panel’s LCD settings.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch4.auto-iris",
+                "label": "CH4 · Auto iris",
+                "kind": "button",
+                "description": "Runs an automatic exposure on a lens with electronic iris control. It is a starting point rather than a set-and-forget — it responds to whatever is in frame at the moment you press it.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch4.call",
+                "label": "CH4 · Call",
+                "kind": "button",
+                "description": "Flashes the tally on this camera to get the operator’s attention, on cameras that support it. Useful for signalling before going live.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch4.panel-active",
+                "label": "CH4 · Panel active",
+                "kind": "button",
+                "description": "Locks this CCU’s controls so nothing can be changed by a knock or a sleeve. Worth using on any camera that is parked and correct.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              },
+              {
+                "id": "ccu4.ch4.status",
+                "label": "CH4 · Status indicators",
+                "kind": "light",
+                "description": "Indicator for this strip, showing network, error and active states rather than anything about the picture.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "blackmagic-manual",
+                  "blackmagic-tech"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "sourceRefs": [
+        "blackmagic-physical",
+        "blackmagic-tech",
+        "blackmagic-manual"
+      ]
+    },
+    {
+      "id": "kept-with-fmp",
+      "title": "Kept with FMP",
+      "type": "cards",
+      "cards": [
+        {
+          "label": "Panel → ATEM control network",
+          "value": "Signal route between FMP devices",
+          "text": "Catalog id ccu4.path.atem. Open it in the FMP interactive model."
+        },
+        {
+          "label": "ATEM → URSA SDI return/control",
+          "value": "Signal route between FMP devices",
+          "text": "Catalog id ccu4.path.return. Open it in the FMP interactive model."
+        }
+      ],
+      "paragraphs": [
+        "This sheet lists equipment facts. Catalog items that describe FMP wiring or installed facts, and the catalog’s venue fields, stay with the FMP explorer."
+      ],
+      "sourceRefs": [
+        "fmp-ccu",
+        "fmp-signal"
+      ]
+    },
+    {
+      "id": "open-facts",
+      "title": "Open facts",
+      "type": "table",
+      "columns": [
+        "Item",
+        "Gap",
+        "Detail"
+      ],
+      "rows": [
+        [
+          "CH1 · ND filter",
+          "Not established",
+          "Marked on the panel, but the cited manual states the ND setting \"will be enabled in a future update\". Whether current panel firmware implements it has not been verified here, so treat the control as unproven rather than assuming it drives the camera."
+        ],
+        [
+          "CH1 · Color correction",
+          "Not established",
+          "Marked on the panel, but the cited manual states the CC setting \"will be enabled in a future update\". Whether current panel firmware implements it has not been verified here."
+        ],
+        [
+          "CH2 · ND filter",
+          "Not established",
+          "Marked on the panel, but the cited manual states the ND setting \"will be enabled in a future update\". Whether current panel firmware implements it has not been verified here, so treat the control as unproven rather than assuming it drives the camera."
+        ],
+        [
+          "CH2 · Color correction",
+          "Not established",
+          "Marked on the panel, but the cited manual states the CC setting \"will be enabled in a future update\". Whether current panel firmware implements it has not been verified here."
+        ],
+        [
+          "CH3 · ND filter",
+          "Not established",
+          "Marked on the panel, but the cited manual states the ND setting \"will be enabled in a future update\". Whether current panel firmware implements it has not been verified here, so treat the control as unproven rather than assuming it drives the camera."
+        ],
+        [
+          "CH3 · Color correction",
+          "Not established",
+          "Marked on the panel, but the cited manual states the CC setting \"will be enabled in a future update\". Whether current panel firmware implements it has not been verified here."
+        ],
+        [
+          "CH4 · ND filter",
+          "Not established",
+          "Marked on the panel, but the cited manual states the ND setting \"will be enabled in a future update\". Whether current panel firmware implements it has not been verified here, so treat the control as unproven rather than assuming it drives the camera."
+        ],
+        [
+          "CH4 · Color correction",
+          "Not established",
+          "Marked on the panel, but the cited manual states the CC setting \"will be enabled in a future update\". Whether current panel firmware implements it has not been verified here."
+        ],
+        [
+          "Parts citing FMP evidence",
+          "4 parts",
+          "These parts cite an FMP record or operator report as well as equipment sources. Their descriptions may include behaviour observed on the FMP unit or an FMP-specific note, and each is flagged. Separating the two needs a distinct field in the fmp-suite catalog."
+        ],
+        [
+          "Connector specifications",
+          "Descriptive text only",
+          "The catalog records connectors as parts with descriptions. It has no structured connector fields (signal standard, format, pinout), so this sheet does not tabulate them."
+        ]
+      ],
+      "sourceRefs": [
+        "blackmagic-manual",
+        "blackmagic-tech",
+        "fmp-ccu"
+      ]
+    },
+    {
+      "id": "accuracy",
+      "title": "Accuracy log",
+      "type": "accuracyLog",
+      "sourceRefs": [
+        "blackmagic-tech",
+        "blackmagic-manual",
+        "blackmagic-physical"
+      ]
+    }
+  ]
+}

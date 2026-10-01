@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-01 — Gear Reference reads the FMP equipment catalogs
+
+- Gear Reference has sheets for the Blackmagic ATEM Television Studio HD8 ISO, the Blackmagic ATEM Camera Control Panel (SWPANELCCU4), the BirdDog P240 and the PTZOptics SuperJoy G1 (PT-SUPERJOY-G1). They are generated from the exported FMP model catalogs by `npm run build:gear-from-fmp`, so the interactive models and the sheets read one part list (Dave's decision, 2026-10-01). Each part keeps its catalog evidence level and sources and links into the interactive model at `#part=<id>`.
+- Equipment facts and FMP facts are separated by the evidence each catalog item cites. Signal routes between FMP devices, installed facts that rest only on FMP records, and venue fields stay with the FMP explorer; parts that also cite an FMP record are flagged. Parts the catalog has not established, and gaps such as the lack of structured connector fields, are listed under Open facts.
+- `scripts/fmp_model_contract.js` exports the catalog loader the release gate already used, and the generator uses it. `verify:gear-reference` and `verify:fmp` fail when a sheet no longer matches its catalog; `scripts/gear_equipment_adapter.test.js` checks that every catalog component is accounted for once and that venue values never reach a sheet.
+- The accuracy panel showed "(undefined)" for every source on the FMP camera-chain sheets, which carry a URL rather than a reference, and printed the Epson sheet's compile note on all sheets. It now shows each source's reference or URL, and the note lives in the Epson sheet. The offline manifest lists the four new sheets (registry `v20261001-gear-shared-equipment`).
+
 ## 2026-10-01 — Gear Reference keeps the embedded rig in its full layout
 
 - On a 900px-tall laptop screen the four FMP camera-chain sheets sized the rig frame at 612px, below the 640px where the rig switches to its short-screen layout. The model shrank to a 236px strip and the frame scrolled on its own, so the mouse wheel over the model scrolled the frame instead of the sheet. Above 680px wide the frame now stays 660–740px tall: the model and part panel sit side by side (canvas 527×431 at 1440×900) and the wheel scrolls the sheet.
