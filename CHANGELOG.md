@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-01 — AV Suite 2.0c keeps legacy Video data on load
+
+- The eight Video pages keep their declared text fields and every saved row when opening or importing a file. Long names, spacing, durations and notes no longer shrink during load. Existing records above the old row cap remain available; Add and Duplicate show the limit and wait until rows are removed.
+- The Video browser probe now loads one row beyond each page's old cap, checks a long spaced row field and venue through save and reload, and checks that Add does not remove or append rows. All 128 checks pass locally.
+- Offline cache version `v20261001-video-lossless-load` updates the registry and Throwline Stage 3D pin.
+
 ## 2026-10-01 — AV Workbook follows the Suite theme
 
 - AV Workbook opens in Warm Paper on a new browser, uses the saved light, dark or system Suite choice, and shows a Theme button in its regular and read-only headers. The choice persists across tabs without changing a workbook record.

@@ -867,7 +867,7 @@
       cue:String(cue.cue || ''),
       file:String(cue.file || ''),
       type:TYPES.indexOf(cue.type) >= 0 ? cue.type : 'video',
-      duration:normalizeDurationInput(cue.duration || ''),
+      duration:String(cue.duration == null ? '' : cue.duration),
       aspect:ASPECTS.indexOf(cue.aspect) >= 0 ? cue.aspect : '16:9',
       audio:AUDIO.indexOf(cue.audio) >= 0 ? cue.audio : 'embedded',
       destination:String(cue.destination || ''),
@@ -882,14 +882,14 @@
     var meta = next.meta && typeof next.meta === 'object' ? next.meta : {};
     return {
       meta:{
-        showName:String(meta.showName || 'Untitled Playback').slice(0, 120),
-        venue:String(meta.venue || '').slice(0, 120),
-        showDate:String(meta.showDate || new Date().toISOString().slice(0, 10)).slice(0, 20),
-        playbackOp:String(meta.playbackOp || '').slice(0, 80),
-        tdName:String(meta.tdName || '').slice(0, 80),
-        audioLead:String(meta.audioLead || '').slice(0, 80)
+        showName:String(meta.showName == null ? 'Untitled Playback' : meta.showName),
+        venue:String(meta.venue == null ? '' : meta.venue),
+        showDate:String(meta.showDate == null ? new Date().toISOString().slice(0, 10) : meta.showDate),
+        playbackOp:String(meta.playbackOp == null ? '' : meta.playbackOp),
+        tdName:String(meta.tdName == null ? '' : meta.tdName),
+        audioLead:String(meta.audioLead == null ? '' : meta.audioLead)
       },
-      cues:Array.isArray(next.cues) ? next.cues.map(cloneCue).slice(0, 200) : [],
+      cues:Array.isArray(next.cues) ? next.cues.map(cloneCue) : [],
       selectedId:typeof next.selectedId === 'string' ? next.selectedId : '',
       filters:{
         search:String(next.filters && next.filters.search || ''),
@@ -1118,7 +1118,14 @@
     updateInspector();
   }
 
+  function canAddRow(){
+    if(state.cues.length < 200) return true;
+    showHint('Cue limit is 200. Existing ' + state.cues.length + ' rows are kept; remove rows before adding.', 'error');
+    return false;
+  }
+
   function addCue(afterId){
+    if(!canAddRow()) return;
     var index = afterId ? state.cues.findIndex(function(cue){ return cue.id === afterId; }) + 1 : state.cues.length;
     if(index < 0) index = state.cues.length;
     var nextNumber = state.cues.length + 1;
@@ -1143,6 +1150,7 @@
   }
 
   function duplicateSelected(){
+    if(!canAddRow()) return;
     var cue = selectedCue();
     var index;
     var copy;
@@ -1601,6 +1609,7 @@
   loadState();
   render();
   bindEvents();
+  if(!loadProblem && state.cues.length > 200) showHint('Existing ' + state.cues.length + ' rows are kept. The cue limit is 200; remove rows before adding.', 'error');
   if(loadProblem) showHint(loadProblem, 'error');
 })();
 </script>
