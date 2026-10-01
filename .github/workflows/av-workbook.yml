@@ -1,0 +1,41 @@
+name: Verify AV Workbook
+
+# Checks AV Workbook on pull requests before it reaches main: types, unit tests, and a fresh build
+# that must match the committed av-workbook/ output, plus the AV source checks that read the
+# Workbook's HTML. deploy-pages.yml repeats these on main; before this workflow they ran only
+# there, so a Workbook change could pass its pull request and fail the release (Pages run
+# 36839062701, 2026-10-01).
+on:
+  pull_request:
+    paths:
+      - 'apps/av-workbook/**'
+      - 'av-workbook/**'
+      - 'package*.json'
+      - '.github/workflows/av-workbook.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  workbook:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Typecheck, unit tests and build
+        run: |
+          npm run typecheck:av-workbook
+          npm run test:av-workbook
+          npm run build:av-workbook
+      - name: Committed build matches the source
+        run: |
+          git diff --exit-code -- av-workbook
+          test -z "$(git status --porcelain -- av-workbook)"
+      - name: AV source checks
+        run: npm run verify:av
