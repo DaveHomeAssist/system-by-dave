@@ -165,6 +165,16 @@ describe("loadActiveWorkbook", () => {
     expect(result.status === "ok" && result.workbook.show.venue).toBe("Hall B");
   });
 
+  it("keeps an incompatible IndexedDB record read-only even when a compatible fallback copy is newer", async () => {
+    const newer = { ...storedWorkbook("wb-active"), schema: "system-by-dave.av-workbook.v2" };
+    const fallback = JSON.stringify({ ...storedWorkbook("wb-active"), savedAt: "2026-10-02T09:00:00.000Z" });
+    const memory = memoryBackend({ records: { "wb-active": newer }, storage: { [ACTIVE_KEY]: "wb-active", [FALLBACK_KEY]: fallback } });
+    const result = await loadActiveWorkbook(memory.backend);
+    expect(result.status).toBe("read-only");
+    expect(result.status === "read-only" && result.source).toBe("indexeddb");
+    expect(memory.table.put).not.toHaveBeenCalled();
+  });
+
   it("creates and saves a blank workbook on first run, without sample data", async () => {
     const memory = memoryBackend();
     const result = await loadActiveWorkbook(memory.backend);

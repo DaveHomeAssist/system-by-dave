@@ -210,12 +210,16 @@ export async function readActiveWorkbook(backend: WorkbookBackend = browserBacke
     if (fallback !== null && storedWorkbookId(fallback) === activeId) return located(assessStoredWorkbook(fallback), activeId, "fallback");
     return { status: "missing" };
   }
+  // The IndexedDB record is checked first: one this version cannot represent stays read-only even
+  // if a compatible fallback copy is newer, so an edit cannot later overwrite it.
+  const assessed = located(assessStoredWorkbook(record), activeId, "indexeddb");
+  if (assessed.status === "read-only") return assessed;
   // A fallback copy of the same workbook saved later (while IndexedDB could not be read) holds newer edits.
   const fallback = storage?.getItem(FALLBACK_KEY) ?? null;
   if (fallback !== null && storedWorkbookId(fallback) === activeId && storedSavedAt(fallback) > storedSavedAt(record)) {
     return located(assessStoredWorkbook(fallback), activeId, "fallback");
   }
-  return located(assessStoredWorkbook(record), activeId, "indexeddb");
+  return assessed;
 }
 
 /**
