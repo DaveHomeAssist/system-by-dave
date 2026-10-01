@@ -64,10 +64,14 @@ agent cannot do.
 | --- | --- | --- |
 | C1 | Commissioning gates 1 to 4 in `docs/fmp-public-release.md` are still pending: the Google client listing `walk.housevideo.app` (1), sharing the Events, Crew Calls, Faults, Walk Reports and Cameras reference page with the FMP Walk Notion connection (2), a signed-in synthetic SETUP TEST camera save with exact Notion readback (3), and a separate walk acceptance with Gmail Sent receipt and Notion readback (4) | **Dave**, in order: check the Google Console origin list (gate 1), share the five Notion pages with the connection (gate 2), then run gates 3 and 4 signed in, and record the date in `docs/fmp-public-release.md`. Agents cannot sign in |
 | C2 | Camera Simulator device baseline (X8/X9), monitor delay and Camera 4 timing | **Dave**, one iPad session with `?diagnostics=1`; the venue timing needs a site visit |
-| C3 | The rig changes of September 29 and October 1 (touch rotation default; scroll and pinch zoom) were tested by emulation only | **Dave**, two minutes: drag and pinch on an iPhone and an iPad; scroll, Shift+scroll and trackpad pinch on the Mac in Safari and Chrome |
+| C3 | The rig changes (touch rotation default on September 29; scroll and pinch zoom on October 1) and the walk changes of October 1 (Route sheet, tap readings, sticky Pass/Flag and Start walk, Back and deep links) were tested by emulation only | **Dave**, about ten minutes on a show-day phone and an iPad: drag and pinch the rig; scroll, Shift+scroll and trackpad pinch on the Mac in Safari and Chrome; on the walk, open the Route sheet, jump, use the phone's Back gesture, tap Yes/No and Level, and check Pass/Flag stay above the nav |
 | C4 | The camera backend still accepts the old ChatGPT Site origin. That Site still answers behind its owner gate, and the release contract says pending work remains recoverable there | **Dave** confirms no pending work remains on the old Site; then remove the origin from the `backend/server.js` default, the Google client and `docs/notion-setup.md`, and redeploy the backend |
 | C5 | fmp-suite's `Verify FMP suite` check runs on every pull request but is not required on `main`, so a red build can still merge | **Dave**: make it a required status check in the fmp-suite repository settings (operator reference review outcome) |
+| C6 | A5's retirement of `davehomeassist.github.io` is in code only; the running camera backend still uses its old default origins until it is redeployed, and the Google client still lists the origin | **Dave**: run `backend/deploy.sh` in fmp-suite (it updates env vars and secrets in place) and remove the origin from the Google client's authorized JavaScript origins; then a preflight from that origin should no longer return `Access-Control-Allow-Origin`. Do C4 in the same visit |
 
+
+Suggested order for one sitting: C5 (a repository setting, two minutes), C6 and C4 together
+(Google Cloud and Google Console), C1 gates in order, then C3 on devices; C2 needs a venue visit.
 
 ## Closed without work
 
