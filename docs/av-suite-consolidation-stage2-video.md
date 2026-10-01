@@ -331,12 +331,17 @@ CHANGE
    two tabs can both read revision N and both write N+1. (Both are harmless while only v1 exists.)
    Fix both:
    - IndexedDB: read, check and write in one Dexie read-write transaction.
-   - Fallback: compare-and-swap. Re-read the slot immediately before writing and write only if it
-     still holds the revision this tab loaded; otherwise raise WorkbookChangedElsewhereError.
-   - Across tabs: run each save inside navigator.locks.request on one workbook lock where the
-     browser supports Web Locks, so two tabs cannot interleave on either path.
-   Deterministic unit tests interleave two tabs on each path and expect the second save to be
-   refused with the first tab's write intact.
+   - Fallback: localStorage has no transactions, so a fallback save runs only while holding one
+     cross-tab workbook lock (navigator.locks.request). Inside the lock it compares the slot with
+     the value this tab last read or wrote there (its exact text, or "absent"), not with the
+     revision the tab loaded: the slot is normally stale or empty because it is written only when
+     IndexedDB fails. If the slot changed, raise WorkbookChangedElsewhereError; otherwise write and
+     record the new value as observed.
+   - No Web Locks: a fallback save fails closed with WorkbookUncheckedError and the edit stays on
+     screen for Export. The IndexedDB path still saves through its transaction.
+   Deterministic unit tests, with a fake lock, interleave two tabs on each path and expect the
+   second save to be refused with the first tab's write intact. They also cover a stale or absent
+   slot (the save succeeds) and a backend without Web Locks (the fallback save is refused).
 7. Guard: the 2.0a and #188 load and save guards treat v2 as the current schema and anything newer
    as read-only. A browser test loads a v2 workbook into the previous build (av-workbook/ from
    origin/main before this change) and proves it opens read-only and writes nothing.
