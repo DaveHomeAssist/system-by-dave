@@ -18,7 +18,7 @@ agent cannot do.
 | A4 | In review: fmp-suite #39 exports `/fmp/walk/`; the system-by-dave re-export adds it to `verify_fmp_release.js` |
 | A5 | In review: fmp-suite #39 retires `davehomeassist.github.io` in the backend default and docs. It takes effect after a backend redeploy and removal from the Google client (Dave). The ChatGPT Site origin moved to C4 because that Site still answers |
 | A6 | Done in system-by-dave #181 |
-| A7 | Done in the Phase A system-by-dave PR: L3 treats a 403, 429 or 503 from a browser-checked host as a bot challenge, with a unit test; a 404 still warns |
+| A7 | Done in the Phase A system-by-dave PR: L3 reports a 403 or 429 from a browser-checked host as unverified (grey), never as a pass, and the overall light can then be Grey but not Green. A 404 or 5xx still warns. Unit-tested |
 | A8 | Partly done: camera-sim audit rows D10 and W2 are marked resolved. Outcome tables for the walk UX audit and `operator-reference-review.md` remain (fmp-suite) |
 
 ## Phase A: small fixes, no hardware

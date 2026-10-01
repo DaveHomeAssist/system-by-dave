@@ -57,13 +57,17 @@ const ALIASES = ['/fmp-walk', '/fmp-walk/', '/fmp/walk/', '/fmp-index/'];
 const NOINDEX_PAGES = ['/fmp-index/'];
 const BROWSER_PAGES = [...MODEL_ROUTES, '/fmp/', '/fmpwalk/', '/fmp/rig/', '/fmp/guide/', '/fmp/camera/pit-center/', '/fmp/gear/', '/fmp/build/', '/fmp/ptz/'];
 const LEGACY_ORIGINS = [/davehomeassist\.github\.io/i, /\.chatgpt\.site/i];
-// Hosts that answer automated requests with a bot challenge (403/429/503) but load in a real
-// browser. Each entry records that browser check; a 404 or other failure from them still warns.
+// Hosts that answer automated requests with a bot challenge (403/429) but loaded in a real browser.
+// A challenged link is unverified by this run, so L3 reports grey rather than pass or warn; a 404,
+// a 5xx or any other failure from these hosts still warns.
 const BOT_PROTECTED = new Map([['aviewfrommyseat.com', 'loaded in a real browser on 2026-10-01; one photo page showed a Cloudflare check']]);
 function classifyExternal(url, status) {
   const host = new URL(url).hostname.replace(/^www\./, '');
-  if ([403, 429, 503].includes(status) && BOT_PROTECTED.has(host)) return 'challenged';
+  if ([403, 429].includes(status) && BOT_PROTECTED.has(host)) return 'challenged';
   return status >= 400 || !status ? 'broken' : 'ok';
+}
+function externalStatus(broken, challenged) {
+  return broken ? 'warn' : challenged ? 'grey' : 'pass';
 }
 const LEGACY_APP_URLS = ['https://davehomeassist.github.io/fmpwalk/', 'https://davehomeassist.github.io/fmpwalk/camera/pit-center/'];
 // Pages that must offer a return to the FMP hub. The FMP suite is exempt from the
@@ -272,8 +276,8 @@ async function checkLinks() {
     if (kind === 'challenged') challenged.push(`${url} (${res.status}; ${BOT_PROTECTED.get(new URL(url).hostname.replace(/^www\./, ''))})`);
     else if (kind === 'broken') brokenExternal.push(`${[...from].join(', ')} → ${url} (${res.status || res.error})`);
   }
-  const reachable = `${external.size - challenged.length} targets` + (challenged.length ? `; ${challenged.length} behind a bot challenge: ${challenged.join('; ')}` : '');
-  record('L3', 'links', brokenExternal.length ? 'warn' : 'pass', 'External references respond (bot blocks need a manual look)', brokenExternal.join('; ') || reachable);
+  const reachable = `${external.size - challenged.length} targets respond` + (challenged.length ? `; ${challenged.length} unverified behind a bot challenge: ${challenged.join('; ')}` : '');
+  record('L3', 'links', externalStatus(brokenExternal.length, challenged.length), 'External references respond (bot blocks need a manual look)', brokenExternal.join('; ') || reachable);
 }
 
 async function checkContent() {
@@ -538,4 +542,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { releasePins, classifyExternal, ACTIVE_RELEASES, FROZEN_RELEASES };
+module.exports = { releasePins, classifyExternal, externalStatus, ACTIVE_RELEASES, FROZEN_RELEASES };
