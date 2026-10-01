@@ -314,7 +314,10 @@ CHANGE
    or done. It is never stored. Unit tests cover every status value in the field matrix.
 4. Validators: validateVideo keeps its two current checks against migrated routes and runs on the
    new families without inventing statuses.
-5. Guard: the 2.0a and #188 load and save guards treat v2 as the current schema and anything newer
+5. Revision: v2 workbooks carry a revision number that every save increments. Loading prefers the
+   copy with the higher revision (IndexedDB or the fallback), and savedAt is display-only. v1 orders
+   the two copies by wall-clock savedAt, which ties or runs backwards under clock changes (#188).
+6. Guard: the 2.0a and #188 load and save guards treat v2 as the current schema and anything newer
    as read-only. A browser test loads a v2 workbook into the previous build (av-workbook/ from
    origin/main before this change) and proves it opens read-only and writes nothing.
 
