@@ -12,15 +12,16 @@ agent cannot do.
 
 | # | Status |
 | --- | --- |
-| A1 | In review: DaveHomeAssist/fmp-suite#39 keeps the current stop by id, with a walk browser scenario that fails on the old code |
+| A1 | Done: fmp-suite #39 (merged `5684a13`), released by system-by-dave #179. A follow-up fixed two cases Codex review found: a rig change (a select fires `input` before `change`) and a finished walk |
 | A2 | Done in system-by-dave #181: S1 checks only the `/fmp/` return, as the public-shell contract exempts FMP pages from the home link |
-| A3 | Done: fmp-suite #36 gave the four reference pages an icon, and the Phase A system-by-dave PR gives `switcher/`, `shader/` and `ursa-broadcast-g2/` one. A root `/favicon.ico` is no longer needed; the two instant-redirect pages are left as they are |
-| A4 | In review: fmp-suite #39 exports `/fmp/walk/`; the system-by-dave re-export adds it to `verify_fmp_release.js` |
-| A5 | In review: fmp-suite #39 retires `davehomeassist.github.io` in the backend default and docs. It takes effect after a backend redeploy and removal from the Google client (Dave). The ChatGPT Site origin moved to C4 because that Site still answers |
+| A3 | Done: fmp-suite #36 gave the four reference pages an icon, and system-by-dave #185 gives `switcher/`, `shader/` and `ursa-broadcast-g2/` one. A root `/favicon.ico` is no longer needed; the two instant-redirect pages are left as they are |
+| A4 | Done: fmp-suite #39 exports `/fmp/walk/` with the FMP page contract (theme, skip link, CSP); system-by-dave #179 verifies and releases it |
+| A5 | Code done in fmp-suite #39: `davehomeassist.github.io` left the backend default and docs. It goes live after a backend redeploy and removal from the Google client (Dave). The ChatGPT Site origin is C4 |
 | A6 | Done in system-by-dave #181 |
-| A7 | Done in the Phase A system-by-dave PR: L3 reports a 403 or 429 from a browser-checked host as unverified (grey), never as a pass, and the overall light can then be Grey but not Green. A 404 or 5xx still warns. Unit-tested |
-| A8 | Partly done: camera-sim audit rows D10 and W2 are marked resolved. Outcome tables for the walk UX audit and `operator-reference-review.md` remain (fmp-suite) |
-| B3 | In review: a weekly WebKit smoke job for the Camera Simulator (`camera-sim-webkit.yml`, iPhone 13 and iPad Pro 11 emulation) |
+| A7 | Done in system-by-dave #185: L3 reports a 403 or 429 from a browser-checked host as unverified (grey), never as a pass, and the overall light can then be Grey but not Green. A 404 or 5xx still warns. Unit-tested |
+| A8 | Done: system-by-dave #185 resolved camera-sim audit rows D10 and W2; fmp-suite #41 records an outcome for every walk UX audit recommendation (`docs/walk-ux-audit-outcomes.md`) and for the operator reference review |
+| B2 | In review: fmp-suite #40, hash routes for the walk (`#/walk/<stop>`, `#/faults`, `#/report`) with Back, reload and deep links; the first Back closes an open fault sheet |
+| B3 | Done: system-by-dave #187, a weekly WebKit smoke for the Camera Simulator. Its first CI run rendered with WebGL on iPhone 13 and iPad Pro 11 emulation (8/8) |
 
 ## Phase A: small fixes, no hardware
 
@@ -42,6 +43,13 @@ agent cannot do.
 | B1 | The walk's stop rail has 28 targets about 13 px wide. Below 1000 px it is the only way to jump to a stop | Probe W5; baseline H14 open | **Fix.** Make the rail a non-interactive progress graphic, and add a 44 px "Route (n/N)" sheet on phones listing stops by name | fmp-suite | M |
 | B2 | The walk has no history routing. Back leaves the app and a deep link opens at the start | No `pushState`, `popstate` or `hashchange` in the walk | **Fix.** Hash routes such as `#/walk/<stop>`, with `go()` on `popstate`. Keeps the walk's local-first storage unchanged | fmp-suite | M |
 | B3 | Camera Simulator CI is Chromium-only, but field devices are iPads and iPhones | Camera-sim audit Q1, "recommended next CI step" | **Do it.** A scheduled WebKit smoke job in `camera-sim.yml`, not a per-PR gate at first | sbd | M |
+| B4 | Pass, Flag and Skip scroll out of reach on phones and iPad landscape | Walk UX audit #1: `.pf` has no sticky rule | **Fix.** A sticky action bar inside the walk card | fmp-suite | S |
+| B5 | Recording a result is not the main path: Next is the filled button and advances without a result; the end card has no not-walked count; Save fault does not advance | Audit #2, partly done in #32 | **Fix.** Pass becomes primary, the end card shows a not-walked count with a jump, Save fault advances | fmp-suite | M |
+| B6 | Yes/no and level/suspect/off readings are free text, and their labels are not associated | Audit #6 | **Fix.** Segmented controls and `for` on every label | fmp-suite | M |
+| B7 | Setup hierarchy: Display mode precedes zones, Start walk is not sticky, Required chips look like On chips | Audit #8, partly done in #33 | **Fix.** Sticky Start, a distinct Required style, Display mode after zones | fmp-suite | S |
+| B8 | Contrast and targets: `--dim` is 4.06:1 (Day) and 3.19:1 (Night), nav labels use it, chips are 40 px, fault delete and sheet Cancel are small; heading levels skip | Audit #9 and its shorter list | **Fix.** Raise `--dim` to 4.5:1 in both modes, 44 px targets, correct heading levels, fix the night-default CSS comment | fmp-suite | M |
+| B9 | Report tab: the preview sits below the send actions, three primary buttons compete, Retry Notion always shows, Clear and start over lives on Report | Audit #10, partly done in #32 | **Fix.** Check, then send: preview first, one primary action, Retry only after a failure, Clear moves to Setup; check the Google Identity console noise while there | fmp-suite | M |
+
 
 ## Phase C: needs Dave or hardware
 
@@ -51,6 +59,8 @@ agent cannot do.
 | C2 | Camera Simulator device baseline (X8/X9), monitor delay and Camera 4 timing | **Dave**, one iPad session with `?diagnostics=1`; the venue timing needs a site visit |
 | C3 | The rig changes of September 29 and October 1 (touch rotation default; scroll and pinch zoom) were tested by emulation only | **Dave**, two minutes: drag and pinch on an iPhone and an iPad; scroll, Shift+scroll and trackpad pinch on the Mac in Safari and Chrome |
 | C4 | The camera backend still accepts the old ChatGPT Site origin. That Site still answers behind its owner gate, and the release contract says pending work remains recoverable there | **Dave** confirms no pending work remains on the old Site; then remove the origin from the `backend/server.js` default, the Google client and `docs/notion-setup.md`, and redeploy the backend |
+| C5 | fmp-suite's `Verify FMP suite` check runs on every pull request but is not required on `main`, so a red build can still merge | **Dave**: make it a required status check in the fmp-suite repository settings (operator reference review outcome) |
+
 
 ## Closed without work
 
