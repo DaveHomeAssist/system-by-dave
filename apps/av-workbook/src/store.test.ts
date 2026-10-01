@@ -323,6 +323,16 @@ describe("saveEditedWorkbook", () => {
     expect(await fallbackSlotFor("wb-current", memoryBackend().backend)).toBeNull();
   });
 
+  it("treats a fallback that differs from IndexedDB as the only copy even when its savedAt does not advance", async () => {
+    const record = storedWorkbook("wb-current");
+    const sameTime = JSON.stringify({ ...record, show: { ...record.show, showName: "Edited during the outage" } });
+    const clockBack = JSON.stringify({ ...record, savedAt: "2026-09-30T10:00:00.000Z", show: { ...record.show, venue: "Edited after the clock moved back" } });
+    const reordered = JSON.stringify(Object.fromEntries(Object.entries(record).reverse()));
+    expect(await fallbackSlotFor("wb-current", memoryBackend({ records: { "wb-current": record }, storage: { [FALLBACK_KEY]: sameTime } }).backend)).toEqual({ text: sameTime, onlyCopy: true });
+    expect(await fallbackSlotFor("wb-current", memoryBackend({ records: { "wb-current": record }, storage: { [FALLBACK_KEY]: clockBack } }).backend)).toEqual({ text: clockBack, onlyCopy: true });
+    expect(await fallbackSlotFor("wb-current", memoryBackend({ records: { "wb-current": record }, storage: { [FALLBACK_KEY]: reordered } }).backend)).toEqual({ text: reordered, onlyCopy: false });
+  });
+
   it("lets a confirmed new blank workbook replace only the fallback copy the operator saw", async () => {
     const seen = JSON.stringify({ ...storedWorkbook("wb-only-copy"), schema: "system-by-dave.av-workbook.v2" });
     const memory = memoryBackend({ failWrites: true, storage: { [FALLBACK_KEY]: seen } });

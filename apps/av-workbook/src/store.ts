@@ -168,6 +168,25 @@ function storedWorkbookId(text: string): string | null {
   }
 }
 
+/** JSON with object keys sorted, so two stored copies compare by content rather than key order. */
+function canonicalJson(value: unknown): string {
+  if (Array.isArray(value)) return `[${value.map(canonicalJson).join(",")}]`;
+  if (value && typeof value === "object") {
+    const record = value as Record<string, unknown>;
+    return `{${Object.keys(record).sort().filter((key) => record[key] !== undefined).map((key) => `${JSON.stringify(key)}:${canonicalJson(record[key])}`).join(",")}}`;
+  }
+  return JSON.stringify(value) ?? "null";
+}
+
+/** Whether fallback text holds exactly the same workbook as an IndexedDB record. */
+function sameStoredContent(text: string, record: unknown): boolean {
+  try {
+    return canonicalJson(JSON.parse(text)) === canonicalJson(record);
+  } catch {
+    return false;
+  }
+}
+
 function storedSavedAt(stored: unknown): string {
   let value: unknown = stored;
   if (typeof stored === "string") {
@@ -350,7 +369,8 @@ export async function saveEditedWorkbook(
 export interface FallbackSlot {
   /** The slot's exact stored text. */
   text: string;
-  /** True when this copy is not also in IndexedDB (unreadable, missing, or older there), so replacing it loses it. */
+  /** True unless IndexedDB holds exactly this content, so replacing the slot could lose edits found nowhere else.
+   * Content is compared rather than savedAt, because wall-clock timestamps can tie or run backwards. */
   onlyCopy: boolean;
 }
 
@@ -360,7 +380,7 @@ export async function fallbackSlotFor(workbookId: string, backend: WorkbookBacke
   if (text === null || storedWorkbookId(text) !== workbookId) return null;
   try {
     const record = await backend.table.get(workbookId);
-    return { text, onlyCopy: record === undefined || record === null || storedSavedAt(text) > storedSavedAt(record) };
+    return { text, onlyCopy: record === undefined || record === null || !sameStoredContent(text, record) };
   } catch {
     return { text, onlyCopy: true };
   }
