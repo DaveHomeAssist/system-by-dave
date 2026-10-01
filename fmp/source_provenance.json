@@ -1,7 +1,7 @@
 {
   "schema": "fmp.public.release.v2",
   "sourceRepository": "DaveHomeAssist/fmp-suite",
-  "sourceCommit": "5684a13dc459bcbe008a532792b609c353c0034c",
+  "sourceCommit": "4142b570ba9bf8d59ac66bb17c86539892f067b2",
   "mode": "commissioning",
   "files": {
     "build/index.html": "30c0bc602f56781c419917528171a624d5d63a9e5f8af2e07eb4f7eafbd1476d",
@@ -83,7 +83,7 @@
     "rig/vendor/three/three.core.js": "66e03b5d8f633bb9501c9668609b99a9eaca105f764d5c780a45bf96b6888357",
     "rig/vendor/three/three.module.js": "a476b88d0df406dca0e30c65b4cdf0180c7337110accec828c103655b56a361c",
     "theme.js": "34276e275d44d4380407b996455291bfcca9cc4a9a4ef81b632534b00fc1747a",
-    "walk/index.html": "c9dfd5166f8d0447c99a2dacb914850d4ac3f0c6c34db27ee66b789602ebfe71"
+    "walk/index.html": "156b0f0945696e9b7e63e266caca959c4f68d363454f2d663d52e6ec2db4a925"
   },
-  "artifactSha256": "f0678691b273296df75d9837f84536c2075c11c1122139cd993d8f05d97e13d0"
+  "artifactSha256": "aff058bb4435e2c8e9a0a2a33c6db999e8fa38d77ef9689d2ea46bf8004f90ac"
 }

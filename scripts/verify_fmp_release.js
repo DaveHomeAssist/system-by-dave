@@ -96,7 +96,7 @@ for (const release of releases) {
       assert.equal(token, hash(fs.readFileSync(path.join(root, resolved))).slice(0, 16), `${release.directory}/${name}: ${target}?v= must be the content hash`);
     }
     if (!name.endsWith('.html')) continue;
-    for (const marker of ['noindex', 'Content-Security-Policy', 'name="description"', 'rel="canonical"', 'property="og:title"', 'name="twitter:']) assert.ok(source.includes(marker), `${release.directory}/${name}: ${marker}`);
+    for (const marker of ['noindex', 'Content-Security-Policy', 'name="description"', 'name="theme-color"', 'rel="canonical"', 'property="og:title"', 'name="twitter:']) assert.ok(source.includes(marker), `${release.directory}/${name}: ${marker}`);
     assert.match(source, /class="(?:[^"\n]*\s)?skip(?:-link)?(?:\s[^"\n]*)?"/);
     // A <base> element resolves #fragment links against another document, so skip links leave the page.
     assert.doesNotMatch(source, /<base\b/i, `${release.directory}/${name}: <base> breaks in-page skip links`);
