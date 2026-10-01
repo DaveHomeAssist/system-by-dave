@@ -33,7 +33,7 @@ agent cannot do.
 
 | # | Issue | Verdict |
 | --- | --- | --- |
-| C1 | Commissioning gates 1 to 4 have never passed: the Google client listing `walk.housevideo.app`, a synthetic SETUP TEST camera save with Notion readback, and a walk Gmail send. No walk has ever been saved from the app | **Dave** checks the Google Console origin list (gate 1), then runs gates 3 and 4 signed in, and the date is recorded in `docs/fmp-public-release.md`. Agents cannot sign in |
+| C1 | Commissioning gates 1 to 4 in `docs/fmp-public-release.md` are still pending: the Google client listing `walk.housevideo.app` (1), sharing the Events, Crew Calls, Faults, Walk Reports and Cameras reference page with the FMP Walk Notion connection (2), a signed-in synthetic SETUP TEST camera save with exact Notion readback (3), and a separate walk acceptance with Gmail Sent receipt and Notion readback (4) | **Dave**, in order: check the Google Console origin list (gate 1), share the five Notion pages with the connection (gate 2), then run gates 3 and 4 signed in, and record the date in `docs/fmp-public-release.md`. Agents cannot sign in |
 | C2 | Camera Simulator device baseline (X8/X9), monitor delay and Camera 4 timing | **Dave**, one iPad session with `?diagnostics=1`; the venue timing needs a site visit |
 | C3 | The rig changes of September 29 and October 1 (touch rotation default; scroll and pinch zoom) were tested by emulation only | **Dave**, two minutes: drag and pinch on an iPhone and an iPad; scroll, Shift+scroll and trackpad pinch on the Mac in Safari and Chrome |
 
