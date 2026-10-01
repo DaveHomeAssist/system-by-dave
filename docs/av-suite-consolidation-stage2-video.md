@@ -220,7 +220,9 @@ when green, confirm the Pages run, read back two changed pages on avbydave.com.
 ```text
 EXECUTE — AV Suite Stage 2.0c: suite-wide legacy safety and CI coverage
 
-SOURCE: origin/main after PR #188 has merged. Read docs/av-suite-consolidation-stage2-video.md
+SOURCE: origin/main after PR #188 has merged. PR B also requires the 2.0b notes follow-up (Video
+Patch, Projection Plan and Stream Plan stop passing notes through cleanLong) to have merged; if it
+has not, PR B includes that fix. Read docs/av-suite-consolidation-stage2-video.md
 (V0-2 to V0-5, V0-9, V0-11 and the 2.0c row). Use an isolated worktree, branch
 <agent>/av-video-2-0c-suite-safety, and the .agent-claim protocol. Two pull requests: A (pages)
 and B (navigation, CI, Workbook theme, Video load). Either may merge first.
@@ -260,14 +262,16 @@ PR B — navigation, CI, Workbook theme and Video load
    probe's stale expectation first; never weaken an assertion to pass.
 9. Workbook theme (WEB-1): remove data-av-theme-lock="dark" so the Workbook follows the suite's
    Warm Paper, Stage Slate or System choice through js/av-theme-mode.js, light by default. Touch
-   only apps/av-workbook/index.html and styles.css, then rebuild. No store, schema or model
-   change (that is 2.1). probe_av_themes.js covers the Workbook in both themes.
+   apps/av-workbook/index.html and styles.css (then rebuild) and scripts/probe_av_themes.js only:
+   no store, schema or model change (that is 2.1). In the probe, remove av-workbook from
+   lockedDarkTargets so it asserts the Workbook's light and dark identities like every other tool.
 10. Video load (V0-4): the eight Video pages keep stored text and rows exactly as stored on load
-    (no trim, whitespace collapse or length cut; no row dropped past the cap). The 2.0b follow-up
-    already keeps notes intact on Video Patch, Projection Plan and Stream Plan; this item covers
-    every other field and the row caps. Caps apply while
+    (no trim, whitespace collapse or length cut; no row dropped past the cap). This includes notes:
+    the 2.0b notes follow-up fixes them on Video Patch, Projection Plan and Stream Plan, and PR B
+    does not merge until it has (see SOURCE). Caps apply while
     typing and when adding rows; a page holding more rows than its cap says so and blocks adding.
-    Add an over-cap fixture to test:av-video-legacy-browser.
+    Add an over-cap fixture to test:av-video-legacy-browser, with a multi-line note longer than
+    260 characters on all eight pages.
 
 MUST NOT (blocking)
 - Rename keys, export schema strings, CSV column names or order, routes or registry ids.
