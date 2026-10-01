@@ -247,14 +247,22 @@ export async function startBlankWorkbook(
  * because a different workbook there may have no other copy. The explicit "Start a new blank
  * workbook" action may replace it after the operator confirms.
  */
-function writeFallback(next: AvWorkbook, storage: WorkbookKeyValueStore | null, replaceOtherFallback = false): void {
+interface FallbackConsent {
+  /** The operator confirmed replacing whatever the slot holds (Start a new blank workbook from the read-only notice). */
+  replaceOtherFallback?: boolean;
+  /** The workbook this tab is deliberately replacing, already backed up; its fallback copy may be replaced. */
+  replaceFallbackOf?: string;
+}
+
+function writeFallback(next: AvWorkbook, storage: WorkbookKeyValueStore | null, consent: FallbackConsent = {}): void {
   if (!storage) throw new WorkbookUncheckedError();
   const existing = storage.getItem(FALLBACK_KEY);
-  if (existing !== null && !replaceOtherFallback) {
-    if (storedWorkbookId(existing) !== next.workbookId) {
+  if (existing !== null && !consent.replaceOtherFallback) {
+    const existingId = storedWorkbookId(existing);
+    if (existingId !== next.workbookId && !(consent.replaceFallbackOf && existingId === consent.replaceFallbackOf)) {
       throw new WorkbookUncheckedError("This browser's workbook storage is unavailable, and its one fallback slot holds a different workbook, which may be that workbook's only copy. Nothing was saved. Export or reload, then try again.");
     }
-    if (assessStoredWorkbook(existing).status === "read-only") {
+    if (existingId === next.workbookId && assessStoredWorkbook(existing).status === "read-only") {
       throw new WorkbookUncheckedError("This browser's workbook storage is unavailable, and its fallback copy of this workbook was saved by a version this one cannot read. Nothing was saved. Reload to fetch the latest version.");
     }
   }
@@ -265,14 +273,14 @@ function writeFallback(next: AvWorkbook, storage: WorkbookKeyValueStore | null, 
 export async function saveWorkbook(
   workbook: AvWorkbook,
   backend: WorkbookBackend = browserBackend(),
-  options: { replaceOtherFallback?: boolean } = {}
+  options: FallbackConsent = {}
 ): Promise<AvWorkbook> {
   const next = validateWorkbook({ ...workbook, savedAt: new Date().toISOString() });
   const storage = backend.storage;
   try {
     await backend.table.put(next);
   } catch {
-    writeFallback(next, storage, options.replaceOtherFallback);
+    writeFallback(next, storage, options);
     return next;
   }
   storage?.setItem(ACTIVE_KEY, next.workbookId);
@@ -309,9 +317,10 @@ export class WorkbookChangedElsewhereError extends Error {
 export async function saveEditedWorkbook(
   workbook: AvWorkbook,
   backend: WorkbookBackend = browserBackend(),
-  options: { newRecord?: boolean } = {}
+  options: { newRecord?: boolean; replaceFallbackOf?: string } = {}
 ): Promise<AvWorkbook> {
-  if (options.newRecord) return saveWorkbook(workbook, backend);
+  const consent: FallbackConsent = { replaceFallbackOf: options.replaceFallbackOf };
+  if (options.newRecord) return saveWorkbook(workbook, backend, consent);
   let record: unknown;
   let readFailed = false;
   try {
@@ -332,10 +341,22 @@ export async function saveEditedWorkbook(
   if (readFailed) {
     // Fail closed for IndexedDB: the record could not be read, so it is never overwritten.
     const next = validateWorkbook({ ...workbook, savedAt: new Date().toISOString() });
-    writeFallback(next, backend.storage);
+    writeFallback(next, backend.storage, consent);
     return next;
   }
-  return saveWorkbook(workbook, backend);
+  return saveWorkbook(workbook, backend, consent);
+}
+
+/** True when this workbook's only stored copy is the fallback slot, so replacing it would lose the workbook. */
+export async function onlyFallbackHolds(workbookId: string, backend: WorkbookBackend = browserBackend()): Promise<boolean> {
+  const fallback = backend.storage?.getItem(FALLBACK_KEY) ?? null;
+  if (fallback === null || storedWorkbookId(fallback) !== workbookId) return false;
+  try {
+    const record = await backend.table.get(workbookId);
+    return record === undefined || record === null;
+  } catch {
+    return true;
+  }
 }
 
 export function exportWorkbook(workbook: AvWorkbook): string {

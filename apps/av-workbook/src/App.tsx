@@ -5,7 +5,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { DataGrid } from "./DataGrid";
 import { EngineDashboard } from "./EngineDashboard";
 import {
-  WorkbookChangedElsewhereError, WorkbookUncheckedError, downloadText, exportWorkbook, importWorkbook, loadActiveWorkbook, readActiveWorkbook, saveEditedWorkbook,
+  WorkbookChangedElsewhereError, WorkbookUncheckedError, downloadText, exportWorkbook, importWorkbook, loadActiveWorkbook, onlyFallbackHolds, readActiveWorkbook, saveEditedWorkbook,
   startBlankWorkbook, storedWorkbookText, type WorkbookReadOnly
 } from "./store";
 import { mergeLegacyAudioIntoWorkbook, readLegacyAudioBundle } from "./legacyAudioImport";
@@ -196,13 +196,14 @@ export default function App() {
 
   // Every save goes through here, so a read-only workbook is never written from any path.
   // newRecord: only for an id minted for this save (a JSON import copy or a new blank), which cannot already exist.
-  async function persist(next: AvWorkbook, options: { newRecord?: boolean } = {}): Promise<AvWorkbook | null> {
+  // replaceFallbackOf: the workbook this save deliberately replaces, already backed up, whose fallback copy may go.
+  async function persist(next: AvWorkbook, options: { newRecord?: boolean; replaceFallbackOf?: string } = {}): Promise<AvWorkbook | null> {
     if (readOnlyRef.current) {
       setMessage("This workbook is open read-only. Nothing was saved.");
       return null;
     }
     try {
-      return await saveEditedWorkbook(next, undefined, { newRecord: options.newRecord === true });
+      return await saveEditedWorkbook(next, undefined, { newRecord: options.newRecord === true, replaceFallbackOf: options.replaceFallbackOf });
     } catch (error: unknown) {
       if (error instanceof WorkbookUncheckedError) {
         setMessage(error.message);
@@ -342,7 +343,7 @@ export default function App() {
       const next = pendingImport.kind === "json"
         ? { ...pendingImport.proposed, workbookId: `wb-import-${crypto.randomUUID()}` }
         : pendingImport.proposed;
-      const saved = await persist(next, { newRecord: pendingImport.kind === "json" });
+      const saved = await persist(next, { newRecord: pendingImport.kind === "json", replaceFallbackOf: latest.workbook.workbookId });
       if (!saved) return;
       setWorkbook(saved);
       setPendingImport(null);
@@ -358,7 +359,10 @@ export default function App() {
   // The sample keeps a fixed id that may already be stored, so only a new blank counts as a new record.
   async function replaceWorkbook(next: AvWorkbook, label: string, newRecord: boolean) {
     if (!window.confirm(`Replace the current workbook with ${label}? Export first if you need a backup.`)) return;
-    const saved = await persist(next, { newRecord });
+    // When the fallback slot is the current workbook's only copy, keep a download of it before it is replaced.
+    const onlyCopy = workbook ? await onlyFallbackHolds(workbook.workbookId) : false;
+    if (onlyCopy && workbook) backupWorkbook(workbook);
+    const saved = await persist(next, { newRecord, replaceFallbackOf: onlyCopy && workbook ? workbook.workbookId : undefined });
     if (!saved) return;
     setWorkbook(saved);
     setActiveTab("overview");
