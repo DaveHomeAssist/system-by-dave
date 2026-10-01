@@ -197,10 +197,11 @@ export async function readActiveWorkbook(backend: WorkbookBackend = browserBacke
     record = await backend.table.get(activeId);
   } catch {
     const fallback = storage?.getItem(FALLBACK_KEY) ?? null;
-    if (fallback === null) {
+    // A fallback that holds a different workbook is not this one; never open it in its place.
+    if (fallback === null || storedWorkbookId(fallback) !== activeId) {
       return {
         status: "read-only", activeId, source: "indexeddb", raw: undefined,
-        reason: { code: "unreadable-storage", summary: "Its storage could not be opened and there is no fallback copy. Reloading the page may help." }
+        reason: { code: "unreadable-storage", summary: "Its storage could not be opened and there is no fallback copy of it. Reloading the page may help." }
       };
     }
     return located(assessStoredWorkbook(fallback), activeId, "fallback");
@@ -237,19 +238,17 @@ export async function loadActiveWorkbook(backend: WorkbookBackend = browserBacke
 /** The explicit "Start a new blank workbook" action. The previous record stays where it is. */
 export async function startBlankWorkbook(
   backend: WorkbookBackend = browserBackend(),
-  options: { replaceOtherFallback?: boolean } = {}
+  options: { replaceFallbackIfUnchanged?: string } = {}
 ): Promise<AvWorkbook> {
   return saveWorkbook(createBlankWorkbook(), backend, options);
 }
 
 /**
  * The fallback is one slot. It is written only when it is empty or already holds this workbook,
- * because a different workbook there may have no other copy. The explicit "Start a new blank
- * workbook" action may replace it after the operator confirms.
+ * because a different workbook there may have no other copy. A deliberate replacement may take it
+ * only while it still holds exactly the text the operator saw and backed up.
  */
 interface FallbackConsent {
-  /** The operator confirmed replacing whatever the slot holds (Start a new blank workbook from the read-only notice). */
-  replaceOtherFallback?: boolean;
   /** The exact fallback text this tab backed up before deliberately replacing that workbook. The slot is
    * replaced only while it still holds exactly this text, so a newer copy written meanwhile is kept. */
   replaceFallbackIfUnchanged?: string;
@@ -258,9 +257,9 @@ interface FallbackConsent {
 function writeFallback(next: AvWorkbook, storage: WorkbookKeyValueStore | null, consent: FallbackConsent = {}): void {
   if (!storage) throw new WorkbookUncheckedError();
   const existing = storage.getItem(FALLBACK_KEY);
-  if (existing !== null && !consent.replaceOtherFallback) {
+  if (existing !== null && !(consent.replaceFallbackIfUnchanged !== undefined && existing === consent.replaceFallbackIfUnchanged)) {
     const existingId = storedWorkbookId(existing);
-    if (existingId !== next.workbookId && !(consent.replaceFallbackIfUnchanged !== undefined && existing === consent.replaceFallbackIfUnchanged)) {
+    if (existingId !== next.workbookId) {
       throw new WorkbookUncheckedError("This browser's workbook storage is unavailable, and its one fallback slot holds a different workbook, which may be that workbook's only copy. Nothing was saved. Export or reload, then try again.");
     }
     if (existingId === next.workbookId && assessStoredWorkbook(existing).status === "read-only") {

@@ -132,6 +132,15 @@ describe("loadActiveWorkbook", () => {
     expect(memory.values.get(FALLBACK_KEY)).toBe(fallback);
   });
 
+  it("never opens a fallback that holds a different workbook when IndexedDB cannot be read", async () => {
+    const other = JSON.stringify(storedWorkbook("wb-other"));
+    const memory = memoryBackend({ failReads: true, storage: { [ACTIVE_KEY]: "wb-active", [FALLBACK_KEY]: other } });
+    const result = await loadActiveWorkbook(memory.backend);
+    expect(result.status === "read-only" && result.reason.code).toBe("unreadable-storage");
+    expect(memory.table.put).not.toHaveBeenCalled();
+    expect(memory.values.get(ACTIVE_KEY)).toBe("wb-active");
+  });
+
   it("does not replace the active workbook when IndexedDB fails and there is no fallback copy", async () => {
     const memory = memoryBackend({ failReads: true, storage: { [ACTIVE_KEY]: "wb-active" } });
     const result = await loadActiveWorkbook(memory.backend);
@@ -314,12 +323,20 @@ describe("saveEditedWorkbook", () => {
     expect(await fallbackSlotFor("wb-current", memoryBackend().backend)).toBeNull();
   });
 
-  it("replaces another workbook's fallback copy only for a confirmed new blank workbook", async () => {
-    const other = JSON.stringify(storedWorkbook("wb-only-copy"));
-    const memory = memoryBackend({ failWrites: true, storage: { [FALLBACK_KEY]: other } });
-    const blank = await startBlankWorkbook(memory.backend, { replaceOtherFallback: true });
+  it("lets a confirmed new blank workbook replace only the fallback copy the operator saw", async () => {
+    const seen = JSON.stringify({ ...storedWorkbook("wb-only-copy"), schema: "system-by-dave.av-workbook.v2" });
+    const memory = memoryBackend({ failWrites: true, storage: { [FALLBACK_KEY]: seen } });
+    const blank = await startBlankWorkbook(memory.backend, { replaceFallbackIfUnchanged: seen });
     expect(memory.values.get(FALLBACK_KEY)).toContain(blank.workbookId);
     expect(memory.values.get(ACTIVE_KEY)).toBe(blank.workbookId);
+  });
+
+  it("keeps a fallback copy another tab rewrote after the read-only notice was shown", async () => {
+    const seen = JSON.stringify({ ...storedWorkbook("wb-only-copy"), schema: "system-by-dave.av-workbook.v2" });
+    const rewritten = JSON.stringify({ ...storedWorkbook("wb-only-copy"), schema: "system-by-dave.av-workbook.v2", savedAt: "2026-10-02T11:00:00.000Z" });
+    const memory = memoryBackend({ failWrites: true, storage: { [FALLBACK_KEY]: rewritten } });
+    await expect(startBlankWorkbook(memory.backend, { replaceFallbackIfUnchanged: seen })).rejects.toBeInstanceOf(WorkbookUncheckedError);
+    expect(memory.values.get(FALLBACK_KEY)).toBe(rewritten);
   });
 
   it("refuses when IndexedDB cannot be read and there is no fallback storage at all", async () => {
