@@ -103,6 +103,7 @@ const FMP_SHELL_PAGES = [
   'fmp/build/index.html',
   'fmp/ptz/index.html',
   'fmp/rig/index.html',
+  'fmp/walk/index.html',
   'fmp/models/atem-hd8-iso.html',
   'fmp/models/p240.html',
   'fmp/models/ccu4.html',

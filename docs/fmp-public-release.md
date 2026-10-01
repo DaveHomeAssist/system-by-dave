@@ -214,6 +214,13 @@ without opening Views first. Mouse-only screens still start with it off. The
 Views toggle and Escape turn it off, which gives page scrolling back over the
 model.
 
+Since October 1, 2026 (Dave), scrolling or a trackpad pinch over the model zooms
+it, as in the other equipment viewers, and the rest of the page scrolls normally.
+The September 16 release had required Shift+scroll, which macOS reports as a
+horizontal scroll, so it did not zoom on a Mac. Shift+scroll now zooms there too,
+while a plain horizontal swipe stays with the browser. Embedded in a Gear Reference
+sheet, a plain scroll keeps scrolling the sheet; Shift+scroll or a pinch zooms.
+
 The new body-control photograph is an allowlisted WebP reference. No operational
 records, backend changes, new storage keys or service worker are part of this
 release. Geometry/input tests and contrast checks are distinct from browser or

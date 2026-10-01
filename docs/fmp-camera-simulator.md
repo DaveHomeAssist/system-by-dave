@@ -291,6 +291,7 @@ npm run typecheck:camera-sim
 npm run test:camera-sim
 npm run build:camera-sim          # Vite build + scripts/build_camera_sim_offline.mjs
 npm run test:camera-sim-browser   # Playwright acceptance probe (CHROME_CHANNEL=chrome to use Chrome)
+npm run test:camera-sim-webkit    # WebKit smoke, iPhone and iPad emulation (weekly in CI; needs `npx playwright install webkit`)
 npm run verify:camera-sim-release -- --base origin/main   # release log, version stamp, new-entry rule
 npm run dev:camera-sim            # local dev server
 ```

@@ -1,7 +1,7 @@
 {
   "schema": "fmp.public.release.v2",
   "sourceRepository": "DaveHomeAssist/fmp-suite",
-  "sourceCommit": "3c5819c9b920a471e1fb9142fc9089da41b9f246",
+  "sourceCommit": "4142b570ba9bf8d59ac66bb17c86539892f067b2",
   "mode": "commissioning",
   "files": {
     "build/index.html": "30c0bc602f56781c419917528171a624d5d63a9e5f8af2e07eb4f7eafbd1476d",
@@ -77,12 +77,13 @@
     "rig/assets/v2-vf-front.webp": "3b93068f203cda45fa387e2a55f2d4a286a50dcdec44e01c0949bf190f17aa08",
     "rig/embed-mode.js": "b274366b5a28c3b7f4e24e4fbf33898e2c0b5e911844691d24d503864f38666e",
     "rig/fmp-guide-data.js": "7e81179c304197c0d86b7da8e6627d73ed0d4a55c91b70788e786c2bff48aada",
-    "rig/index.html": "586fa8080b723e593cd97f85a23236f17bacc06c3d5266622269e91779ee6eba",
-    "rig/rig-model.js": "8473490bfd04983eb6fba4afb1b5c1aefb2dfac92352baf37f006863b675c0aa",
+    "rig/index.html": "d51c0a6a0e4cc9cfa6306ce6f9845e5ca9d47c716a8d3b4885ce2f2799e6e41d",
+    "rig/rig-model.js": "dacd0b65fe3b65383857a8de04dc30d19bba11548fbadee562d5856e8bf4c4f0",
     "rig/vendor/three/addons/controls/OrbitControls.js": "97170e1b59a71a5d1395d227a6be626a0aefa4e349f263e0539171d8c4840d51",
     "rig/vendor/three/three.core.js": "66e03b5d8f633bb9501c9668609b99a9eaca105f764d5c780a45bf96b6888357",
     "rig/vendor/three/three.module.js": "a476b88d0df406dca0e30c65b4cdf0180c7337110accec828c103655b56a361c",
-    "theme.js": "34276e275d44d4380407b996455291bfcca9cc4a9a4ef81b632534b00fc1747a"
+    "theme.js": "34276e275d44d4380407b996455291bfcca9cc4a9a4ef81b632534b00fc1747a",
+    "walk/index.html": "156b0f0945696e9b7e63e266caca959c4f68d363454f2d663d52e6ec2db4a925"
   },
-  "artifactSha256": "a9db1194d00a47b53806ae95862dbb2bfc1f102c9885b87fb32f9c5cbf12fff0"
+  "artifactSha256": "aff058bb4435e2c8e9a0a2a33c6db999e8fa38d77ef9689d2ea46bf8004f90ac"
 }

@@ -94,7 +94,7 @@ was shot again in its default state: their screenshot had the venue view open, w
 | D7 | `exportedAt` unvalidated | **1.8.0**: read only when it is a valid time, and never decides acceptance |
 | D8 | `setUnit` and `setGuides` skip `parseSession` | Not a defect: both take typed values from fixed controls (a unit enum, booleans) |
 | D9 | Offline copy keeps separate storage | Not a defect: the Session panel says so; the release QA list includes the offline copy |
-| D10 | Live stamp behind the audited tree | Resolves when #141, #142 and this release merge |
+| D10 | Live stamp behind the audited tree | **Resolved:** #141 and #142 merged on 2026-09-24; on 2026-10-01 housevideo.app/camera-sim/ reports 1.13.0, the top of its changelog |
 | D14 | Transfer prefixes | Checked: `scripts/domain-sites.json` carries the `fmp` prefix for housevideo.app |
 
 ## Delivery and operations
@@ -144,7 +144,7 @@ was shot again in its default state: their screenshot had the venue view open, w
 
 | ID | Finding | Outcome |
 | --- | --- | --- |
-| Q1 | Chromium only | Deferred: a scheduled WebKit smoke job is the recommended next CI step |
+| Q1 | Chromium only | **Addressed 2026-10-01:** `.github/workflows/camera-sim-webkit.yml` runs `npm run test:camera-sim-webkit` weekly in Playwright's WebKit with iPhone 13 and iPad Pro 11 emulation (start, render status, fit, held-key pan, no page errors). The full acceptance probe stays Chromium; emulated WebKit is not physical Safari |
 | Q2 | Preset menu untested | **1.8.0**: right-click rename and clear in the probe |
 | Q3 | New dialogs can block the probe | **1.8.0**: rule in the doc |
 | Q4 | No component tests | Deferred (C9) |
@@ -182,7 +182,7 @@ was shot again in its default state: their screenshot had the venue view open, w
 | ID | Finding | Outcome |
 | --- | --- | --- |
 | W1 | Architecture table stale | **1.8.0** |
-| W2 | Live behind the tip | Resolves on merge (D10) |
+| W2 | Live behind the tip | **Resolved** with D10: the live build matches the changelog tip on 2026-10-01 |
 | W3 | `/favicon.ico` 404 | Deferred (U11) |
 
 ## Pull requests reviewed with this release
