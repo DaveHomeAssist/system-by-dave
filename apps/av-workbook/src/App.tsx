@@ -5,7 +5,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { DataGrid } from "./DataGrid";
 import { EngineDashboard } from "./EngineDashboard";
 import {
-  WorkbookChangedElsewhereError, WorkbookUncheckedError, downloadText, exportWorkbook, importWorkbook, loadActiveWorkbook, fallbackSlotFor, readActiveWorkbook, saveEditedWorkbook,
+  WorkbookChangedElsewhereError, WorkbookUncheckedError, downloadText, exportWorkbook, importWorkbook, loadActiveWorkbook, fallbackHolds, fallbackSlotFor, readActiveWorkbook, saveEditedWorkbook,
   startBlankWorkbook, storedWorkbookText, type FallbackSlot, type WorkbookReadOnly
 } from "./store";
 import { mergeLegacyAudioIntoWorkbook, readLegacyAudioBundle } from "./legacyAudioImport";
@@ -239,15 +239,21 @@ export default function App() {
 
   async function startBlankFromReadOnly() {
     if (!readOnly || blankBusy) return;
-    if (readOnly.source === "fallback" && !window.confirm("This browser holds the unreadable workbook only in its fallback copy, which a new workbook can replace if storage fails again. Download it first if you need it. Start a new blank workbook?")) return;
+    // A workbook kept only in the fallback slot can be replaced if storage fails again, so it is backed up first.
+    const fallbackText = readOnly.source === "fallback" && typeof readOnly.raw === "string" ? readOnly.raw : undefined;
+    if (fallbackText !== undefined && !window.confirm("This browser holds this workbook only in its fallback copy, which a new workbook can replace if storage fails again. A backup downloads first. Start a new blank workbook?")) return;
     setBlankBusy(true);
     try {
-      // The operator confirmed above; the slot is replaced only while it still holds the copy they saw.
-      const blank = await startBlankWorkbook(undefined, { replaceFallbackIfUnchanged: readOnly.source === "fallback" && typeof readOnly.raw === "string" ? readOnly.raw : undefined });
+      if (fallbackText !== undefined) downloadStoredWorkbook(readOnly);
+      // The slot is replaced only while it still holds the copy the operator saw and backed up.
+      const blank = await startBlankWorkbook(undefined, { replaceFallbackIfUnchanged: fallbackText });
+      const kept = fallbackText === undefined || fallbackHolds(fallbackText);
       setReadOnly(null);
       setWorkbook(blank);
       setActiveTab("overview");
-      setMessage("New blank workbook started. The previous workbook is still saved in this browser.");
+      setMessage(kept
+        ? "New blank workbook started. The previous workbook is still saved in this browser."
+        : "New blank workbook started. Storage failed again, so it took the previous workbook's fallback copy; the backup that downloaded holds that workbook.");
     } catch (error: unknown) {
       setMessage(error instanceof Error ? error.message : "A new workbook could not be saved.");
     } finally {
@@ -409,7 +415,9 @@ export default function App() {
             <button type="button" disabled={readOnly.raw === undefined} onClick={() => downloadStoredWorkbook(readOnly)}>Download this workbook</button>
             <button type="button" disabled={blankBusy} onClick={() => void startBlankFromReadOnly()}>{blankBusy ? "Starting…" : "Start a new blank workbook"}</button>
           </div>
-          <p className="read-only-note">Starting a new workbook makes it the active one. The saved workbook stays in this browser; it is not deleted.</p>
+          <p className="read-only-note">{readOnly.source === "fallback"
+            ? "Starting a new workbook makes it the active one. This workbook is kept only in the fallback copy, so a backup downloads first; if storage fails again, the new workbook takes that copy's place."
+            : "Starting a new workbook makes it the active one. The saved workbook stays in this browser; it is not deleted."}</p>
           <small role="status" aria-live="polite">{message}</small>
         </section>
       </main>

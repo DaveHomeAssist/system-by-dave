@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { createBlankWorkbook } from "./sampleWorkbook";
 import {
-  ACTIVE_KEY, FALLBACK_KEY, WorkbookChangedElsewhereError, WorkbookUncheckedError, assessStoredWorkbook, importWorkbook, loadActiveWorkbook, fallbackSlotFor, saveEditedWorkbook, saveWorkbook,
+  ACTIVE_KEY, FALLBACK_KEY, WorkbookChangedElsewhereError, WorkbookUncheckedError, assessStoredWorkbook, importWorkbook, loadActiveWorkbook, fallbackHolds, fallbackSlotFor, saveEditedWorkbook, saveWorkbook,
   startBlankWorkbook, type WorkbookBackend
 } from "./store";
 import type { AvWorkbook } from "./types";
@@ -329,6 +329,14 @@ describe("saveEditedWorkbook", () => {
     const blank = await startBlankWorkbook(memory.backend, { replaceFallbackIfUnchanged: seen });
     expect(memory.values.get(FALLBACK_KEY)).toContain(blank.workbookId);
     expect(memory.values.get(ACTIVE_KEY)).toBe(blank.workbookId);
+    expect(fallbackHolds(seen, memory.backend)).toBe(false);
+  });
+
+  it("leaves the fallback copy in place when the new blank workbook saves to IndexedDB", async () => {
+    const seen = JSON.stringify({ ...storedWorkbook("wb-only-copy"), schema: "system-by-dave.av-workbook.v2" });
+    const memory = memoryBackend({ storage: { [FALLBACK_KEY]: seen } });
+    await startBlankWorkbook(memory.backend, { replaceFallbackIfUnchanged: seen });
+    expect(fallbackHolds(seen, memory.backend)).toBe(true);
   });
 
   it("keeps a fallback copy another tab rewrote after the read-only notice was shown", async () => {

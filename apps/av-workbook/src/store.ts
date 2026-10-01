@@ -366,6 +366,11 @@ export async function fallbackSlotFor(workbookId: string, backend: WorkbookBacke
   }
 }
 
+/** Whether the fallback slot still holds exactly this text, e.g. a copy a save was allowed to replace. */
+export function fallbackHolds(text: string, backend: WorkbookBackend = browserBackend()): boolean {
+  return backend.storage?.getItem(FALLBACK_KEY) === text;
+}
+
 export function exportWorkbook(workbook: AvWorkbook): string {
   return JSON.stringify(validateWorkbook(workbook), null, 2);
 }
