@@ -325,8 +325,10 @@ CHANGE
 5. Revision: v2 workbooks carry a revision number that every save increments. Loading prefers the
    copy with the higher revision (IndexedDB or the fallback), and savedAt is display-only. v1 orders
    the two copies by wall-clock savedAt, which ties or runs backwards under clock changes (#188).
-6. Serialized saves. Rule: no save, on either path, commits unless the copy it replaces is the
-   copy this tab last observed in that store. Today the check and the write are separate steps on
+6. Serialized saves. Rule: no save, on either path, commits unless both stores (IndexedDB and the
+   fallback) are still as this tab last observed them. Checking only the destination store is not
+   enough: a tab that saved to IndexedDB and released the lock leaves the fallback unchanged, so a
+   stale tab could still write a tied revision there. Today the check and the write are separate steps on
    both paths: IndexedDB get() and put() are separate transactions, and the fallback is read and
    later written through localStorage, so two tabs can both start from revision N and both
    commit N+1. (Harmless while only v1 exists.)
@@ -369,8 +371,15 @@ Workbook on avbydave.com.
 
 ### 2.1 open questions
 
-None recorded yet. A design question raised in review of this brief is added here with its source
-and settled by the 2.1 pull request.
+A design question raised in review of this brief is added here with its source and settled by the
+2.1 pull request.
+
+1. How does a fallback save check IndexedDB's state when IndexedDB is the store that is failing?
+   (Codex review of #193, 2026-10-01.) Recommended: one generation counter that every save, on
+   either path, increments under the workbook lock and records in localStorage, which stays
+   readable when IndexedDB fails. A save proceeds only if the counter still equals the value this
+   tab last observed. A new localStorage key needs the domain transfer policy and its revision
+   updated (scripts/domain-sites.json).
 
 ## Risks carried into the phase
 
