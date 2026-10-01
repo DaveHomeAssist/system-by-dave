@@ -20,6 +20,7 @@ agent cannot do.
 | A6 | Done in system-by-dave #181 |
 | A7 | Done in the Phase A system-by-dave PR: L3 reports a 403 or 429 from a browser-checked host as unverified (grey), never as a pass, and the overall light can then be Grey but not Green. A 404 or 5xx still warns. Unit-tested |
 | A8 | Partly done: camera-sim audit rows D10 and W2 are marked resolved. Outcome tables for the walk UX audit and `operator-reference-review.md` remain (fmp-suite) |
+| B3 | In review: a weekly WebKit smoke job for the Camera Simulator (`camera-sim-webkit.yml`, iPhone 13 and iPad Pro 11 emulation) |
 
 ## Phase A: small fixes, no hardware
 
