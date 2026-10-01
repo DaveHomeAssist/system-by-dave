@@ -156,6 +156,15 @@ describe("loadActiveWorkbook", () => {
     expect(memory.storage.setItem).not.toHaveBeenCalled();
   });
 
+  it("loads the fallback copy when it holds newer edits of the same workbook than IndexedDB", async () => {
+    const older = storedWorkbook("wb-active");
+    const newer = { ...older, savedAt: "2026-10-01T09:00:00.000Z", show: { ...older.show, venue: "Hall B" } };
+    const memory = memoryBackend({ records: { "wb-active": older }, storage: { [ACTIVE_KEY]: "wb-active", [FALLBACK_KEY]: JSON.stringify(newer) } });
+    const result = await loadActiveWorkbook(memory.backend);
+    expect(result.status === "ok" && result.source).toBe("fallback");
+    expect(result.status === "ok" && result.workbook.show.venue).toBe("Hall B");
+  });
+
   it("creates and saves a blank workbook on first run, without sample data", async () => {
     const memory = memoryBackend();
     const result = await loadActiveWorkbook(memory.backend);
@@ -218,19 +227,41 @@ describe("saveEditedWorkbook", () => {
     expect(memory.values.get(FALLBACK_KEY)).toBe(fallback);
   });
 
-  it("refuses to save when IndexedDB cannot be read and no fallback copy covers the workbook", async () => {
-    const memory = memoryBackend({ failReads: true, storage: { [ACTIVE_KEY]: "wb-active" } });
-    await expect(saveEditedWorkbook(storedWorkbook("wb-active"), memory.backend)).rejects.toBeInstanceOf(WorkbookUncheckedError);
-    expect(memory.table.put).not.toHaveBeenCalled();
-    expect(memory.storage.setItem).not.toHaveBeenCalled();
-  });
-
-  it("still saves through the fallback copy when IndexedDB is unavailable but the fallback holds this workbook", async () => {
+  it("never writes IndexedDB after a failed read; the edit goes to the fallback copy only", async () => {
     const loaded = storedWorkbook("wb-active");
-    const memory = memoryBackend({ failReads: true, failWrites: true, storage: { [ACTIVE_KEY]: "wb-active", [FALLBACK_KEY]: JSON.stringify(loaded) } });
+    const memory = memoryBackend({ failReads: true, storage: { [ACTIVE_KEY]: "wb-active", [FALLBACK_KEY]: JSON.stringify(loaded) } });
     const saved = await saveEditedWorkbook({ ...loaded, show: { ...loaded.show, venue: "Hall B" } }, memory.backend);
+    expect(memory.table.put).not.toHaveBeenCalled();
     expect(JSON.parse(memory.values.get(FALLBACK_KEY) as string).show.venue).toBe("Hall B");
     expect(saved.show.venue).toBe("Hall B");
+  });
+
+  it("keeps the edit in the fallback copy even when no fallback existed, without touching IndexedDB", async () => {
+    const memory = memoryBackend({ failReads: true, storage: { [ACTIVE_KEY]: "wb-active" } });
+    await saveEditedWorkbook(storedWorkbook("wb-active"), memory.backend);
+    expect(memory.table.put).not.toHaveBeenCalled();
+    expect(memory.values.get(FALLBACK_KEY)).toContain("wb-active");
+  });
+
+  it("refuses when IndexedDB cannot be read and there is no fallback storage at all", async () => {
+    const memory = memoryBackend({ failReads: true });
+    const backend = { table: memory.table, storage: null };
+    await expect(saveEditedWorkbook(storedWorkbook("wb-active"), backend)).rejects.toBeInstanceOf(WorkbookUncheckedError);
+    expect(memory.table.put).not.toHaveBeenCalled();
+  });
+
+  it("saves a new record (an imported copy) even while IndexedDB reads fail", async () => {
+    const memory = memoryBackend({ failReads: true, failWrites: true, storage: { [ACTIVE_KEY]: "wb-active" } });
+    const saved = await saveEditedWorkbook(storedWorkbook("wb-import-2"), memory.backend, { newRecord: true });
+    expect(memory.values.get(ACTIVE_KEY)).toBe(saved.workbookId);
+  });
+
+  it("refuses when the fallback copy of this workbook was written by a newer version", async () => {
+    const loaded = storedWorkbook("wb-active");
+    const fallback = JSON.stringify({ ...loaded, schema: "system-by-dave.av-workbook.v2" });
+    const memory = memoryBackend({ records: { "wb-active": loaded }, storage: { [ACTIVE_KEY]: "wb-active", [FALLBACK_KEY]: fallback } });
+    await expect(saveEditedWorkbook(loaded, memory.backend)).rejects.toBeInstanceOf(WorkbookChangedElsewhereError);
+    expect(memory.table.put).not.toHaveBeenCalled();
   });
 
   it("saves a new workbook id that has no stored copy yet", async () => {

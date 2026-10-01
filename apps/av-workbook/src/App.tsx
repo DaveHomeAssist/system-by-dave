@@ -201,7 +201,8 @@ export default function App() {
       return null;
     }
     try {
-      return await saveEditedWorkbook(next);
+      // An id this tab did not load (an imported copy, a sample or a new blank) is a new record.
+      return await saveEditedWorkbook(next, undefined, { newRecord: next.workbookId !== workbook?.workbookId });
     } catch (error: unknown) {
       if (error instanceof WorkbookUncheckedError) {
         setMessage(error.message);
