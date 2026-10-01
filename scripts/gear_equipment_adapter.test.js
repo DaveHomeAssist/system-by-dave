@@ -4,60 +4,94 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const path = require('node:path');
 const { loadEquipmentCatalogs } = require('./fmp_model_contract');
-const { EQUIPMENT, HOUSE_KINDS, VENUE_KEYS, buildSheet } = require('./gear_equipment_adapter');
+const { EQUIPMENT, VENUE_KEYS, buildSheet } = require('./gear_equipment_adapter');
 
 const catalogs = loadEquipmentCatalogs(path.resolve(__dirname, '..'));
 const sheets = Object.fromEntries(EQUIPMENT.map((config) => [config.id, buildSheet(config, catalogs[config.catalog])]));
 const partsOf = (sheet) => sheet.sections.find((section) => section.type === 'parts').parts.groups.flatMap((group) => group.parts.map((part) => ({ ...part, category: group.category })));
-const keptOf = (sheet) => (sheet.sections.find((section) => section.id === 'kept-with-fmp') || { cards: [] }).cards;
-
-test('every catalog component is listed once or kept with FMP, never both and never dropped', () => {
+test('public sheets contain equipment evidence without venue sections, links or sources', () => {
   for (const config of EQUIPMENT) {
-    const catalog = catalogs[config.catalog];
-    const listed = partsOf(sheets[config.id]).map((part) => part.id);
-    const kept = keptOf(sheets[config.id]).map((card) => (card.text.match(/^Catalog id (\S+)\./) || [])[1]).filter(Boolean);
-    assert.equal(new Set(listed).size, listed.length, `${config.id} lists a part twice`);
-    // Catalogs read from a vm sandbox carry that realm's arrays; copy before a strict comparison.
-    assert.deepEqual([...listed, ...kept].sort(), Array.from(catalog.components, (c) => c.component_id).sort(), `${config.id} does not account for every catalog component`);
+    const sheet = sheets[config.id];
+    const content = { ...sheet };
+    delete content.generated;
+    assert.doesNotMatch(JSON.stringify(content), /\bfmp\b|housevideo|freedom mortgage|kept-with-fmp|fmpEvidence/i);
+    assert.ok(sheet.sources.every(source => ['manufacturer', 'product-photo'].includes(source.kind)));
+    assert.equal(sheet.sections.find(section => section.type === 'parts').parts.interactive, undefined);
+    const sourceIds = new Set(sheet.sources.map(source => source.id));
+    const ids = new Set();
+    for (const part of partsOf(sheet)) {
+      assert.ok(!ids.has(part.id)); ids.add(part.id);
+      assert.ok(part.sourceRefs.length && part.sourceRefs.every(ref => sourceIds.has(ref)));
+    }
   }
 });
 
-test('listed parts carry the catalog text unchanged and no signal routes', () => {
+test('equipment descriptions remain exact unless they mix in workspace evidence', () => {
   for (const config of EQUIPMENT) {
-    const byId = new Map(catalogs[config.catalog].components.map((c) => [c.component_id, c]));
+    const byId = new Map(catalogs[config.catalog].components.map(c => [c.component_id, c]));
     for (const part of partsOf(sheets[config.id])) {
       const source = byId.get(part.id);
       assert.equal(part.label, source.label);
-      assert.equal(part.description, String(source.purpose || '').trim());
-      assert.equal(part.evidence, source.confidence);
       assert.equal(part.category, source.category);
-      assert.deepEqual(part.sourceRefs, Array.from(source.source_ids || []));
-      assert.notEqual(source.geometry_status, 'virtual_route', `${part.id} is a signal route`);
-    }
-  }
-});
-
-test('parts that rest only on FMP records stay with FMP; mixed evidence is flagged', () => {
-  for (const config of EQUIPMENT) {
-    const kindOf = (id) => config.sources[id];
-    for (const part of partsOf(sheets[config.id])) {
-      const kinds = part.sourceRefs.map(kindOf);
-      assert.ok(!(kinds.length && kinds.every((kind) => HOUSE_KINDS.has(kind))), `${part.id} rests only on FMP records`);
-      assert.equal(Boolean(part.fmpEvidence), kinds.some((kind) => HOUSE_KINDS.has(kind)), `${part.id} FMP evidence flag`);
-    }
-  }
-});
-
-test('FMP venue values never reach an equipment sheet', () => {
-  for (const config of EQUIPMENT) {
-    const catalog = catalogs[config.catalog];
-    const text = JSON.stringify(sheets[config.id]);
-    for (const key of VENUE_KEYS) {
-      for (const value of Object.values(catalog[key] || {})) {
-        if (typeof value === 'string' && value.length > 12) assert.ok(!text.includes(value), `${config.id} copies ${key} value: ${value}`);
+      assert.notEqual(source.geometry_status, 'virtual_route');
+      if (part.descriptionPending) {
+        assert.equal(part.description, 'Equipment description awaiting source review.');
+        assert.equal(part.evidence, 'Unknown');
+      } else {
+        assert.equal(part.description, String(source.purpose || '').trim());
+        assert.equal(part.evidence, source.confidence);
       }
     }
-    assert.ok(!/notion\.so|notion\.site/i.test(text), `${config.id} links Notion`);
+  }
+});
+
+test('mixed descriptions cannot leak via Parts, Open facts, sources or the accuracy log', () => {
+  const config = EQUIPMENT.find(item => item.catalog === 'p240');
+  const catalog = structuredClone(catalogs.p240);
+  const part = catalog.components.find(item => item.component_id === 'p240.io.sdi');
+  part.purpose = 'Installed camera 4 routes through SECRET-VENUE-PATCH.';
+  part.confidence = 'Contradicted';
+  const before = JSON.stringify(catalog);
+  const sheet = buildSheet(config, catalog);
+  assert.doesNotMatch(JSON.stringify(sheet), /SECRET-VENUE-PATCH/);
+  const output = partsOf(sheet).find(item => item.id === part.component_id);
+  assert.ok(output.descriptionPending);
+  assert.equal(output.evidence, 'Unknown');
+  assert.ok(!output.sourceRefs.includes('dave-sdi-2026-09-23'));
+  assert.equal(JSON.stringify(catalog), before, 'the workspace source must remain intact');
+});
+
+test('removing supplied-reference or unit-photo evidence makes the description pending', () => {
+  for (const [catalogName, componentId, sourceId] of [
+    ['superjoy', 'superjoy.joystick', 'ptzoptics-reference'],
+    ['atem-hd8-iso', 'atem.program.1', 'photo-front']
+  ]) {
+    const config = EQUIPMENT.find(item => item.catalog === catalogName);
+    const catalog = structuredClone(catalogs[catalogName]);
+    const component = catalog.components.find(item => item.component_id === componentId);
+    component.source_ids = [Object.keys(config.sources).find(id => config.sources[id] === 'manufacturer'), sourceId];
+    component.purpose = 'Functional claim supported by an excluded source.';
+    const output = partsOf(buildSheet(config, catalog)).find(part => part.id === componentId);
+    assert.ok(output.descriptionPending);
+    assert.equal(output.evidence, 'Unknown');
+    assert.ok(!output.sourceRefs.includes(sourceId));
+    assert.notEqual(output.description, component.purpose);
+  }
+  assert.ok(partsOf(sheets['ptzoptics-superjoy-g1']).find(part => part.id === 'superjoy.joystick').descriptionPending);
+});
+
+test('venue routes and unit-only evidence stay out; descriptive venue text fails closed', () => {
+  const config = EQUIPMENT.find(item => item.catalog === 'p240');
+  const catalog = structuredClone(catalogs.p240);
+  const chassis = catalog.components.find(item => item.component_id === 'p240.chassis');
+  chassis.purpose = 'FMP mounted base with venue inventory details.';
+  const sheet = buildSheet(config, catalog);
+  assert.ok(partsOf(sheet).find(part => part.id === chassis.component_id).descriptionPending);
+  assert.ok(!partsOf(sheet).some(part => part.id === 'p240.path.video' || part.id === 'p240.mount'));
+  for (const key of VENUE_KEYS) {
+    for (const value of Object.values(catalog[key] || {})) {
+      if (typeof value === 'string' && value.length > 12) assert.ok(!JSON.stringify(sheet).includes(value));
+    }
   }
 });
 
@@ -78,7 +112,7 @@ test('representative part mappings', () => {
   const find = (sheet, id) => partsOf(sheets[sheet]).find((part) => part.id === id);
   assert.equal(find('blackmagic-atem-television-studio-hd8-iso', 'atem.program.1').category, 'Switching');
   assert.equal(find('blackmagic-atem-camera-control-panel', 'ccu4.ch1.nd').evidence, 'Unknown');
-  assert.ok(find('birddog-p240', 'p240.io.sdi').fmpEvidence);
+  assert.ok(find('birddog-p240', 'p240.io.sdi').descriptionPending);
   assert.ok(find('ptzoptics-superjoy-g1', 'superjoy.lcd'));
   assert.equal(find('blackmagic-atem-camera-control-panel', 'ccu4.path.atem'), undefined);
   assert.equal(find('birddog-p240', 'p240.mount'), undefined);

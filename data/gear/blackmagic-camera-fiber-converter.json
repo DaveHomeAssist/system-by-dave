@@ -10,12 +10,11 @@
   "category": "Video",
   "subcategory": "Fiber",
   "status": "active",
-  "updated": "2026-09-22",
-  "summary": "Camera-end SMPTE fiber converter for the FMP URSA chain. Paired 1:1 with a Studio Fiber Converter. One unit confirmed fitted — do not generalize to all three bodies.",
+  "updated": "2026-10-01",
+  "summary": "Camera-side fiber converter for compatible Blackmagic cameras. Product reference without venue assignments or inventory counts.",
   "tags": [
     "SMPTE",
-    "fiber",
-    "FMP"
+    "fiber"
   ],
   "sections": [
     {
@@ -24,95 +23,38 @@
       "type": "specTable",
       "rows": [
         [
+          "Manufacturer",
+          "Blackmagic Design"
+        ],
+        [
+          "Model",
+          "Camera Fiber Converter"
+        ],
+        [
           "Role",
-          "Camera-end converter"
+          "Camera-side connection to a Studio Fiber Converter"
         ],
         [
-          "Pairing",
-          "1:1 with rack Studio Fiber Converter"
-        ],
-        [
-          "Expected count",
-          "3 (inferred from three live rack units)"
-        ],
-        [
-          "Seen on body",
-          "1 photographed"
+          "Transport",
+          "SMPTE fiber carries video, audio, control and camera power"
         ]
       ],
       "sourceRefs": [
-        "hv-fmp-gear"
-      ]
-    },
-    {
-      "id": "interactive-model",
-      "title": "Inspect the equipment",
-      "type": "model",
-      "lede": "Select parts in the existing FMP 3D explorer to inspect operating notes, photographs, and supporting evidence.",
-      "model": {
-        "url": "https://housevideo.app/fmp/rig/?equipment=rig&part=camera-fiber",
-        "title": "FMP interactive model: Camera fiber converter"
-      },
-      "sourceRefs": [
-        "hv-fmp-gear"
-      ]
-    },
-    {
-      "id": "signal",
-      "title": "Field caution",
-      "type": "cards",
-      "cards": [
-        {
-          "label": "Inspect the body you build",
-          "text": "Rack converters lit does not prove a camera-end converter is on your body."
-        },
-        {
-          "label": "Coax still happens",
-          "text": "Another house frame shows a body on single coax — treat path as per-position."
-        }
-      ],
-      "sourceRefs": [
-        "hv-fmp-gear"
-      ]
-    },
-    {
-      "id": "intake",
-      "title": "Intake checklist",
-      "type": "checklist",
-      "items": [
-        {
-          "title": "Converter seated and powered",
-          "detail": "On the body you are bringing up."
-        },
-        {
-          "title": "SMPTE 304 mated",
-          "detail": "Cap when struck."
-        },
-        {
-          "title": "Return jumper",
-          "detail": "Know Camera 1 return expectations."
-        }
-      ],
-      "sourceRefs": [
-        "hv-fmp-gear"
+        "bmd-fiber-spec"
       ]
     },
     {
       "id": "notes",
-      "title": "House links",
+      "title": "Reference scope",
       "type": "cards",
       "cards": [
         {
-          "label": "FMP house notes",
-          "text": "https://housevideo.app/fmp/gear/#camera-converter"
-        },
-        {
-          "label": "Camera fiber 3D",
-          "text": "https://housevideo.app/fmp/rig/?equipment=rig&part=camera-fiber"
+          "label": "Product reference",
+          "text": "Use the manufacturer specification and manual to confirm compatible cameras and the required cable and power arrangement. Installed routing is part of the job configuration."
         }
       ],
       "sourceRefs": [
-        "hv-fmp-gear"
+        "bmd-fiber-spec"
       ]
     },
     {
@@ -120,37 +62,27 @@
       "title": "Accuracy log",
       "type": "accuracyLog",
       "sourceRefs": [
-        "hv-fmp-gear"
-      ],
-      "entries": [
-        {
-          "item": "Three camera-end units present",
-          "status": "estimate",
-          "detail": "Inferred from three live rack units; only one camera-end photographed.",
-          "sourceRefs": [
-            "hv-fmp-gear"
-          ]
-        }
+        "bmd-fiber-spec"
       ]
     }
   ],
   "accuracy": [
     {
-      "item": "Camera-end count",
-      "status": "estimate",
-      "detail": "Only one photographed.",
+      "item": "Reference scope",
+      "status": "confirmed",
+      "detail": "The manufacturer source describes this product or family. Individual units and installed configurations are not covered by this sheet.",
       "sourceRefs": [
-        "hv-fmp-gear"
+        "bmd-fiber-spec"
       ]
     }
   ],
   "sources": [
     {
-      "id": "hv-fmp-gear",
-      "label": "housevideo.app · FMP Camera equipment",
-      "url": "https://housevideo.app/fmp/gear/",
-      "kind": "house-record",
-      "accessed": "2026-09-22"
+      "id": "bmd-fiber-spec",
+      "label": "Blackmagic Fiber Converters technical specifications",
+      "url": "https://www.blackmagicdesign.com/products/blackmagicfiberconverters/techspecs",
+      "kind": "manufacturer",
+      "accessed": "2026-10-01"
     }
   ]
 }

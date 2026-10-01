@@ -465,10 +465,7 @@
   'use strict';
 
   var INDEX_URL='data/gear/index.json';
-  var ALLOWED_TYPES=['specTable','table','figure','figure+table','procedure','checklist','cards','accuracyLog','model','parts'];
-  // Interactive FMP equipment pages a generated parts section may open (deep links use #part=<catalog id>).
-  var PARTS_MODEL_URL=/^https:\/\/housevideo\.app\/fmp\/(models\/[a-z0-9-]+\.html|ptz\/SuperJoy-G1-Interactive-Guide\.html)$/;
-  var availabilityNodes=[];
+  var ALLOWED_TYPES=['specTable','table','figure','figure+table','procedure','checklist','cards','accuracyLog','parts'];
   var ACCURACY_STATUSES=['confirmed','corrected','unverified','estimate'];
   var indexData=null;
   var currentEntry=null;
@@ -513,13 +510,15 @@
     if(!Array.isArray(entry.sections)||!entry.sections.length) throw new Error('The selected gear sheet has no sections.');
     if(!Array.isArray(entry.sources)||!entry.sources.length) throw new Error('The selected gear sheet has no source record.');
     if(!Array.isArray(entry.accuracy)||!entry.accuracy.length) throw new Error('The selected gear sheet has no accuracy log.');
+    var publicData=Object.assign({},entry);
+    delete publicData.generated;
+    if(/\bfmp\b|housevideo\.app|freedom mortgage|kept-with-fmp|fmpEvidence|hv-fmp/i.test(JSON.stringify(publicData))) throw new Error('This cached sheet needs an equipment-only update. Reconnect and reload Gear Reference.');
     var ids={};
     entry.sections.forEach(function(section){
       if(!cleanId(section.id)||ids[section.id]) throw new Error('A gear section has a missing or duplicate id.');
       if(ALLOWED_TYPES.indexOf(section.type)<0) throw new Error('Unsupported section type: '+section.type+'.');
       if(!Array.isArray(section.sourceRefs)||!section.sourceRefs.length) throw new Error('Section '+section.id+' has no source references.');
-      if(section.type==='model'&&(!section.model||!/^https:\/\/housevideo\.app\/fmp\/rig\/\?equipment=(rig|studio)&part=[a-z0-9-]+$/.test(section.model.url)||!section.model.title)) throw new Error('Invalid FMP model link.');
-      if(section.type==='parts'&&(!section.parts||!Array.isArray(section.parts.groups)||!section.parts.interactive||!PARTS_MODEL_URL.test(section.parts.interactive.url))) throw new Error('Section '+section.id+' has an invalid parts list.');
+      if(section.type==='parts'&&(!section.parts||!Array.isArray(section.parts.groups)||section.parts.interactive)) throw new Error('Section '+section.id+' has an invalid public parts list.');
       ids[section.id]=true;
     });
     entry.accuracy.forEach(function(item){
@@ -769,60 +768,12 @@
     container.appendChild(element('aside','source-strip','Sources for this section: '+labels.join(' · ')));
   }
 
-  function renderModel(container,section){
-    var model=section.model;
-    var url=new URL(model.url);
-    var note=element('p','model-note','Interactive FMP model, component notes, photos, and source evidence. Requires a connection to House Video. The written sheet remains available offline.');
-    container.appendChild(note);
-    var frame=document.createElement('iframe');
-    frame.className='model-frame';
-    frame.title=model.title;
-    var embedded=new URL(url.href);
-    embedded.searchParams.set('embed','gear-reference');
-    var mode=document.documentElement.getAttribute('data-av-theme');
-    var dark=mode==='dark'||(mode==='system'&&window.matchMedia('(prefers-color-scheme: dark)').matches);
-    embedded.searchParams.set('theme',dark?'dark':'light');
-    frame.src=embedded.href;
-    frame.loading='lazy';
-    frame.referrerPolicy='strict-origin-when-cross-origin';
-    container.appendChild(frame);
-    var link=element('a','','Open model in a full window');
-    link.href=url.href;
-    link.target='_blank';
-    link.rel='noopener noreferrer';
-    container.appendChild(link);
-  }
-
-  // Filled when the node is created (its panel is not in the document yet) and again on online/offline.
-  function fillAvailability(node){
-    var offline=navigator.onLine===false;
-    node.dataset.offline=String(offline);
-    node.textContent=offline?'You are offline. The interactive model needs housevideo.app; the part list below is stored with this sheet.':'The interactive model opens on housevideo.app. The part list below works without it, including offline.';
-  }
-  function syncAvailability(){
-    availabilityNodes=availabilityNodes.filter(function(node){return node.isConnected;});
-    availabilityNodes.forEach(fillAvailability);
-  }
-  window.addEventListener('online',syncAvailability);
-  window.addEventListener('offline',syncAvailability);
-
   function renderParts(container,section,map){
     var data=section.parts;
-    var bar=element('div','parts-bar');
-    var open=element('a','parts-open','Open the interactive model');
-    open.href=data.interactive.url;open.target='_blank';open.rel='noopener noreferrer';
-    if(data.interactive.label) open.setAttribute('aria-label','Open the '+data.interactive.label+' in a new tab');
-    bar.appendChild(open);
-    var availability=element('p','parts-availability');
-    availability.setAttribute('role','status');
-    fillAvailability(availability);
-    availabilityNodes.push(availability);
-    bar.appendChild(availability);
-    container.appendChild(bar);
     var groups=data.groups.filter(function(group){return group&&Array.isArray(group.parts);});
     var totalParts=groups.reduce(function(sum,group){return sum+group.parts.length;},0);
     if(!totalParts){
-      container.appendChild(element('p','parts-availability','The catalog lists no parts for this equipment yet. The interactive model may still show it.'));
+      container.appendChild(element('p','parts-availability','No equipment parts are listed yet.'));
       return;
     }
     var row=element('div','parts-filter-row');
@@ -846,17 +797,11 @@
         if(part.kind) head.appendChild(element('span','chip',part.kind));
         var evidence=String(part.evidence||'Unknown');
         head.appendChild(element('span','chip evidence-'+evidence.toLowerCase(),evidence));
-        if(part.fmpEvidence) head.appendChild(element('span','chip fmp-evidence','Cites FMP evidence'));
         item.appendChild(head);
         item.appendChild(part.description?element('p','',part.description):element('p','part-missing','The catalog has no description for this part.'));
         var meta=element('div','part-meta');
         var refs=(part.sourceRefs||[]).map(function(ref){return sourceLabel(ref,map);});
         meta.appendChild(element('span','',refs.length?'Sources: '+refs.join(' · '):'No source cited in the catalog'));
-        var inspect=element('a','','Inspect in 3D');
-        inspect.href=data.interactive.url+'#part='+encodeURIComponent(part.id);
-        inspect.target='_blank';inspect.rel='noopener noreferrer';
-        inspect.setAttribute('aria-label','Inspect '+(part.label||part.id)+' in the interactive model');
-        meta.appendChild(inspect);
         item.appendChild(meta);
         list.appendChild(item);
         items.push({node:item,group:block,text:[part.label,part.id,part.kind,part.description,group.category].join(' ').toLowerCase()});
@@ -904,7 +849,6 @@
       if(section.columns&&section.rows) renderTable(inner,section.columns,section.rows,section.caption,'');
     }
     if(section.type==='accuracyLog') renderAccuracy(inner,entry,map);
-    if(section.type==='model') renderModel(inner,section);
     if(section.type==='parts') renderParts(inner,section,map);
     if(section.type==='figure'){
       if(section.subheading) inner.appendChild(element('h3','',section.subheading));

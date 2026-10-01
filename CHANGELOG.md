@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-10-01 — Equipment reference and workspace boundary
+
+- Public Gear Reference now carries equipment-only data across all nine sheets.
+  Removed FMP assignments, inventory counts, house procedures, evidence, model
+  links and the “Kept with FMP” section. Manufacturer references remain available.
+- Generated sheets publish only product evidence. Mixed venue descriptions stay
+  out of public parts and accuracy views pending separate equipment-source review;
+  the canonical FMP catalogs are preserved. Arbitrary show/workspace parameters
+  do not enable venue data; an explicit workspace binding remains required.
+- Added source and rendered boundary regressions and advanced the offline cache
+  version so existing installations acquire the revised public sheets.
+
 ## 2026-10-01 — AV Suite 2.0c keeps legacy Video data on load
 
 - The eight Video pages keep their declared text fields and every saved row when opening or importing a file. Long names, spacing, durations and notes no longer shrink during load. Existing records above the old row cap remain available; Add and Duplicate show the limit and wait until rows are removed.

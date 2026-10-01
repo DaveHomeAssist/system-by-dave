@@ -71,6 +71,60 @@ try {
     console.log(`ok - ${label}`);
   }
 
+  const gearIndex = JSON.parse(await readFile(join(ROOT, 'data/gear/index.json'), 'utf8'));
+  for (const [width, height] of [[375, 812], [680, 720], [1440, 900]]) {
+    const page = await browser.newPage({ viewport: { width, height } });
+    const errors = [];
+    const workspaceRequests = [];
+    page.on('pageerror', error => errors.push(error.message));
+    page.on('request', request => {
+      if (/housevideo\.app|\/fmp\//i.test(request.url())) workspaceRequests.push(request.url());
+    });
+    // An obsolete venue hash or unbound query must not re-enable workspace content.
+    await page.goto(base.replace('cable-plan.html', 'gear-reference.html') +
+      '?gear=birddog-p240&workspace=fmp&sbdVenue=FMP#kept-with-fmp', { waitUntil: 'networkidle' });
+    if (await page.getByRole('tab', { name: '01 Identification', exact: true }).getAttribute('aria-selected') !== 'true') throw new Error('Obsolete workspace hash did not fall back to Identification');
+    for (const entry of gearIndex.entries) {
+      await page.getByLabel('Choose gear reference', { exact: true }).selectOption(entry.id);
+      await page.waitForFunction(id => new URL(location.href).searchParams.get('gear') === id &&
+        document.querySelector('.panel.active'), entry.id);
+      const result = await page.evaluate(() => {
+        const main = document.querySelector('#reference-main');
+        const sheet = document.querySelector('.gear-app');
+        return {
+          text: main.textContent,
+          targets: Array.from(sheet.querySelectorAll('a[href],iframe[src]'), el => el.href || el.src),
+          overflow: document.documentElement.scrollHeight > document.documentElement.clientHeight ||
+            document.documentElement.scrollWidth > document.documentElement.clientWidth,
+          active: main.querySelectorAll('.panel.active').length
+        };
+      });
+      if (/\bfmp\b|housevideo|freedom mortgage|kept-with-fmp/i.test(result.text) ||
+          result.targets.some(url => /housevideo|\/fmp\//i.test(url)) || result.overflow || result.active !== 1) {
+        throw new Error(`Public gear boundary ${entry.id} ${width}: ${JSON.stringify(result)}`);
+      }
+    }
+    if (errors.length || workspaceRequests.length) throw new Error(JSON.stringify({ errors, workspaceRequests }));
+    await page.emulateMedia({ media: 'print' });
+    if (/\bfmp\b|housevideo/i.test(await page.locator('#reference-main').textContent())) {
+      throw new Error('Public gear print exposes workspace content');
+    }
+    console.log(`ok - nine public equipment sheets stay workspace-independent at ${width}x${height}`);
+    await page.close();
+  }
+
+  const stalePage = await browser.newPage();
+  const staleSheet = JSON.parse(await readFile(join(ROOT, 'data/gear/birddog-p240.json'), 'utf8'));
+  staleSheet.summary = 'FMP installed camera: stale workspace data';
+  await stalePage.route('**/data/gear/birddog-p240.json', route => route.fulfill({ json: staleSheet }));
+  await stalePage.goto(base.replace('cable-plan.html', 'gear-reference.html') + '?gear=birddog-p240', { waitUntil: 'networkidle' });
+  if (!(await stalePage.locator('#loadDetail').textContent()).includes('equipment-only update') ||
+      (await stalePage.locator('#reference-stage').textContent()).includes('stale workspace data')) {
+    throw new Error('Cached workspace sheet was not rejected');
+  }
+  console.log('ok - stale workspace sheet is rejected before rendering');
+  await stalePage.close();
+
   for (const [width, height] of [[390, 844], [390, 667], [768, 844], [1200, 900]]) {
     const page = await browser.newPage({ viewport: { width, height } });
     const errors = [];

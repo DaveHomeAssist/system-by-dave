@@ -10,7 +10,7 @@
 
 AV by Dave should make the right capability available in the place an operator expects to work. A workspace earns its place by completing a job without sending the operator through several small forms. Equipment knowledge is reusable across shows and venues. A venue may supply a model, photo, or house observation, but it does not own the general AV workspace.
 
-The first change in this direction is live: four Gear Reference sheets display the existing FMP 3D rig in a focused embedded view. That is an interim content bridge. The long-term reference contract is a source-owned model and evidence adapter that can render inside Gear Reference without relying on a full venue page or losing provenance.
+The earlier FMP model bridge has been removed from public Gear Reference. The public library is equipment-only; FMP observations and models belong behind an explicit FMP workbook/workspace binding. The long-term reference contract is a source-owned model and evidence adapter that can render inside Gear Reference without relying on a full venue page or losing provenance.
 
 ### Goals
 
@@ -46,7 +46,7 @@ The first change in this direction is live: four Gear Reference sheets display t
 | At the spec baseline, legacy Audio and Workbook JSON imports saved immediately. Stage 0 subsequently added previews, backup, confirmation, and stale-preview rejection; full field parity remains open. | `legacyAudioImport.ts`, `legacyAudioImport.test.ts`, `App.tsx`, [Stage 0](av-suite-consolidation-stage0.md) | Prove field parity and recoverability before inviting users to retire old pages. |
 | Show Board stores an index, show records, and snapshots under `sbd.showboard.*` despite an empty registry `storageKeys` entry. The domain-transfer policy does include that prefix. | `show-board.html`, `scripts/domain-sites.json` | Inventory and test it directly; do not treat an empty registry entry as no saved data. |
 | Workbook uses IndexedDB `system-by-dave-av-workbook`; the AV transfer policy omitted it at the spec baseline. Stage 0 added database coverage and synthetic transfer checks. | `apps/av-workbook/src/store.ts`, `scripts/domain-sites.json`, [Stage 0](av-suite-consolidation-stage0.md) | Complete behavior and conflict recovery proof before any claim of lossless migration. |
-| Gear Reference authors five JSON sheets and uses a focused FMP model iframe on four of them; the written sheets remain available offline. | [Gear contract](gear-reference-contract.md), `gear-reference.html` | Make the model and source relationship a first-class reference contract; retain a useful no-network view. |
+| Gear Reference publishes nine equipment-only sheets, five authored and four generated; they remain available offline. Venue-specific content stays in its owning workspace. | [Gear contract](gear-reference-contract.md), `gear-reference.html` | Make the model and source relationship a first-class reference contract; retain a useful no-network view. |
 | FMP model catalogs and rig content are managed exports from `fmp-suite`, with stable component IDs and distinct evidence vocabularies. | [Model contract](fmp-model-catalog-contract.md), [release contract](fmp-public-release.md) | Publish from the owning source and map identifiers explicitly rather than copying or rewriting models in AV by Dave. |
 
 ## Information architecture
@@ -151,7 +151,7 @@ The Audio importer is the pilot for this contract. Stage 0 added preview, backup
 | Stage | Deliverable | Exit gate |
 | --- | --- | --- |
 | 0. Inventory | Feature, route, storage, origin, export, and offline matrix for every registered entry; fix inventory gaps. | Every saved store has a tested backup/recovery path; unresolved mappings are listed. |
-| 1. Equipment pilot | Four FMP camera-chain sheets use the existing model and evidence; Show Console bridge uses valid context. **Shipped as an interim bridge.** | Live component selection, source provenance, no-network fallback, responsive/keyboard checks. |
+| 1. Equipment pilot | The earlier FMP bridge shipped, then was withdrawn from the generic library under the October 1 workspace-boundary correction. Future model integration requires explicit workspace ownership. | Live component selection, source provenance, no-network fallback, responsive/keyboard checks. |
 | 2. Video | Direct Video entry and editable camera, playback, route/switching, display/projection, stream, and record views. Increments, entry gate, and execution briefs: [Stage 2 Video plan](av-suite-consolidation-stage2-video.md). | All eight Video registry capabilities stay directly reachable; representative camera-to-screen, camera-to-stream/record, and playback-to-display paths retain status, backup, and export details. |
 | 3. Audio | Editable sources, patches, line checks, PA, RF/comms task views and safe imports. | Field/status/export parity for the first three audio pages; repeat import and rollback pass. |
 | 4. Logistics | One case/item flow across prep, pack, load in, cable, and strike. | Counts and status transitions reconcile with each legacy page; lost-item and partial-pack scenarios pass. |
@@ -176,7 +176,7 @@ A stage is shipped independently, behind a reversible navigation change. Do not 
 
 - **Recommended:** retain the two doorway modes and seven primary workspaces, with Video immediately visible. Revisit the grouping after an operator trial, not because a new route is easier to code.
 - **Recommended:** use AV Workbook's existing typed store for show-attached entities once field parity is established. Keep show-independent reference content outside it.
-- **Recommended:** retain the current online FMP model bridge with offline sheet fallback until a versioned, source-owned same-origin content package can be built and maintained. Do not promise offline model access before that release gate.
+- **Current boundary:** keep public equipment sheets independent of FMP. Add venue-specific models only through a verified workbook/workspace binding; a generic show-context link is insufficient. Do not promise offline model access before that release gate.
 - **Open:** whether Show Console readiness should remain manually maintained or become derived per workspace. Define one authority and conflict behavior before changing it.
 
 ## Source map

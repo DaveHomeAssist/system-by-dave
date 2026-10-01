@@ -238,7 +238,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool asset change — rolls the service-worker cache. */
-    version:'v20261001-video-lossless-load',
+    version:'v20261001-gear-public-boundary',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,
