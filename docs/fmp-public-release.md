@@ -130,12 +130,10 @@ saving and opening without a connection; the guide links it as "Download for
 offline use". Re-run the build after every FMP export: `npm run verify:fmp`
 fails when the guide is out of date with the exported model page.
 
-The preshow walk is configured to publish at **walk.housevideo.app**. The release
-requires configured infrastructure and auth, then verifies the live destination
-before publishing old-origin redirects. After cutover,
-`housevideo.app/fmpwalk/` and `/fmp-walk/` offer saved-data migration before
-redirecting there. Links crossing the two origins are absolute and the exporter
-enforces it. The operator/reference hub no longer launches the walk.
+The preshow walk has published at **walk.housevideo.app** since its 2026-09-20
+cutover. `housevideo.app/fmpwalk/` and `/fmp-walk/` offer saved-data migration
+before redirecting there. Links crossing the two origins are absolute and the
+exporter enforces it. The hub's Operators view links the walk at its own origin.
 
 The Google client and the `fmp-walk-notion` backend (`FMP_ALLOWED_ORIGINS`) allow
 `https://housevideo.app`; keep `https://systembydave.com` in both while old drafts
@@ -145,9 +143,14 @@ Run gates 3 and 4 on housevideo.app, and gate 4 on walk.housevideo.app.
 
 ## Commissioning gates
 
-1. Add the exact `https://systembydave.com` JavaScript origin to the existing FMP
-   Google client. No path, new client, or browser client secret is needed. This
-   origin is required independently for walk Gmail and camera Google sign-in.
+1. Confirm the existing FMP Google client lists these exact JavaScript origins:
+   `https://housevideo.app` (camera Google sign-in), `https://walk.housevideo.app`
+   (walk Gmail send and Notion save) and, while old drafts may still be moved,
+   `https://systembydave.com`. No path, new client, or browser client secret is
+   needed. Only the client's owner can read that list in Google Cloud Console; a
+   rendered sign-in button does not show that an origin is allowed. The backend
+   half is already in place: on 2026-10-01 `/health` returned a matching
+   `Access-Control-Allow-Origin` for all three origins and 403 for an unlisted one.
 2. Share the existing Events, Crew Calls, Faults, Walk Reports, and Cameras
    reference page with the dedicated FMP Walk internal Notion connection. The
    deployment token remains in Google Secret Manager. Codex connector access is

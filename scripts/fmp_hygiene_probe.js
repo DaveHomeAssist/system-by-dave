@@ -58,7 +58,8 @@ const NOINDEX_PAGES = ['/fmp-index/'];
 const BROWSER_PAGES = [...MODEL_ROUTES, '/fmp/', '/fmpwalk/', '/fmp/rig/', '/fmp/guide/', '/fmp/camera/pit-center/', '/fmp/gear/', '/fmp/build/', '/fmp/ptz/'];
 const LEGACY_ORIGINS = [/davehomeassist\.github\.io/i, /\.chatgpt\.site/i];
 const LEGACY_APP_URLS = ['https://davehomeassist.github.io/fmpwalk/', 'https://davehomeassist.github.io/fmpwalk/camera/pit-center/'];
-// Pages that must offer both a home link and a return to the FMP hub.
+// Pages that must offer a return to the FMP hub. The FMP suite is exempt from the
+// system home link (docs/public-shell-contract.md rule 1): /fmp/ is its home.
 const SHELL_PAGES = [...MODEL_ROUTES, '/fmp/', '/fmp/camera/pit-center/', '/fmp/guide/', '/fmp/gear/', '/fmp/build/', '/fmp/ptz/', '/fmp/rig/', '/fmpwalk/'];
 const ALLOWED_EMAILS = ['avbydave@gmail.com'];
 // No public FMP page links a Notion page; the walk's own Save to Notion receipt is the exception.
@@ -270,11 +271,10 @@ async function checkContent() {
     const html = (await statusOf(baseFor(page) + page)).body.toString('utf8');
     const gaps = [];
     // Links may be relative or name the probed origin or systembydave.com absolutely.
-    if (!new RegExp(`href=["']${ORIGIN_PATTERN}?/["']`).test(html)) gaps.push('no home link');
     if (page !== '/fmp/' && !new RegExp(`href=["']${ORIGIN_PATTERN}?/fmp/["']`).test(html)) gaps.push('no /fmp/ return');
     if (gaps.length) shellGaps.push(`${page}: ${gaps.join(', ')}`);
   }
-  record('S1', 'navigation', shellGaps.length ? 'warn' : 'pass', 'Pages link home and back to the FMP hub', shellGaps.join('; ') || `${SHELL_PAGES.length} pages`);
+  record('S1', 'navigation', shellGaps.length ? 'warn' : 'pass', 'Pages link back to the FMP hub', shellGaps.join('; ') || `${SHELL_PAGES.length} pages`);
 
   // Report counts and file names only; never print the matched values.
   const exposed = [];
