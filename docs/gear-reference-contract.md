@@ -16,12 +16,16 @@ out which values it would accept.
 | `data/gear/index.json` | `system-by-dave.gear-reference-index.v1` | The catalogue of sheets |
 | `data/gear/<id>.json` | `system-by-dave.gear-reference-entry.v1` | One equipment sheet |
 | `data/gear/figures/*.svg` | — | Schematic figures referenced by a sheet |
+| `scripts/gear_equipment_adapter.js` | — | Turns an FMP equipment catalog into a sheet |
 
 Unlike the FMP equipment catalogs, these are **not** managed artifacts. They are
-authored in this repository and may be edited here directly.
-The library currently contains the Epson X39 sheet and four FMP camera-chain
-sheets: URSA Broadcast G2, Fujinon 4K zooms, camera fiber converter, and studio
-fiber converter. All five JSON files are part of the AV Suite offline manifest.
+authored in this repository and may be edited here directly, except the four
+sheets generated from FMP catalogs (below), which are rewritten by a script.
+The library currently contains the Epson X39 sheet, four FMP camera-chain
+sheets (URSA Broadcast G2, Fujinon 4K zooms, camera fiber converter, studio
+fiber converter) and four catalog-derived sheets (ATEM Television Studio HD8 ISO,
+ATEM Camera Control Panel, BirdDog P240, PTZOptics SuperJoy G1). All nine JSON
+files are part of the AV Suite offline manifest.
 The FMP sheets distinguish house observations from manufacturer specifications;
 an unread serial, lens plate, or converter plate remains an open field check.
 
@@ -46,7 +50,8 @@ resolve to an entry in that sheet's `sources` array.
 ## Section types
 
 `sections[].type` is one of: `specTable`, `table`, `figure`, `figure+table`,
-`procedure`, `checklist`, `cards`, `accuracyLog`, `model`.
+`procedure`, `checklist`, `cards`, `accuracyLog`, `model`, `parts`. A `parts`
+section appears only on a sheet generated from an FMP catalog.
 
 Section ids are unique within a sheet, and every section cites at least one
 source that resolves.
@@ -70,9 +75,56 @@ specifically so a photograph cannot be passed off as a measured drawing.
 6. Names a figure that is missing, is not an SVG with image semantics, or
    embeds photography.
 7. Is listed in the index without an authored sheet behind it.
+8. Has a `parts` section on a sheet that is not generated from an FMP catalog, a
+   part without an id, label or evidence level, a part listed twice, a part
+   citing an undeclared source, or an interactive link that is not an FMP model
+   page.
 
 The Epson PowerLite X39 sheet additionally has its twelve sections pinned by id,
 so a section cannot be dropped silently.
+
+## Sheets generated from FMP catalogs
+
+The ATEM Television Studio HD8 ISO, ATEM Camera Control Panel, BirdDog P240 and
+PTZOptics SuperJoy G1 sheets are written by `npm run build:gear-from-fmp` from the
+exported FMP equipment catalogs (`fmp/models/assets/`, `fmp/ptz/`). The catalog is
+the only part list: the interactive model and the sheet read the same entries, and
+`scripts/fmp_model_contract.js` loads the catalogs for both the release gate and
+the generator. Do not edit these four JSON files by hand; change the fmp-suite
+catalog (and re-export) or `scripts/gear_equipment_adapter.js`, then regenerate.
+`npm run verify:gear-reference` and `npm run verify:fmp` both fail while a sheet
+differs from its catalog, so a re-export that changes a catalog must regenerate
+the sheets in the same pull request.
+
+Each catalog source has an evidence kind in the adapter (manufacturer, product
+photograph, photograph of the FMP unit, supplied reference, FMP record, operator
+report). A new catalog source stops the build until it is classified. The kinds
+decide what the sheet shows:
+
+- **Parts** lists every catalog component with its label, description, catalog
+  evidence level (the catalog vocabulary, not this sheet's accuracy vocabulary)
+  and sources, grouped by catalog category. Each part's *Inspect in 3D* link opens
+  the interactive model at `#part=<component_id>`. Geometry and placement notes
+  stay with the interactive model.
+- **Kept with FMP** holds what is not an equipment fact: `virtual_route`
+  components (signal routes between FMP devices), components whose only sources
+  are FMP records or operator reports, and a pointer to the catalog's venue fields
+  (`venue`, `evidence_policy`). Venue values such as addresses and firmware are
+  never copied onto a sheet.
+- A part that cites an FMP record or operator report alongside equipment sources
+  is listed and flagged *Cites FMP evidence*; its description may carry behaviour
+  observed on the FMP unit or an FMP-specific note.
+- **Open facts** lists parts the catalog marks `Unknown` or `Contradicted`, the
+  flagged parts, and gaps in the catalog itself: connectors are described in text,
+  with no structured connector fields, so the sheet does not tabulate connector
+  specifications.
+
+The accuracy log states which listed parts cite a manufacturer source
+(`confirmed`) and which rest on photographs or a supplied reference
+(`unverified`). The sheet does not depend on housevideo.app: the part list is in
+the sheet file and works offline, and only the interactive model needs a
+connection. These four model pages have no embed mode yet, so the sheet links to
+them rather than framing them as the rig sheets do.
 
 ## Four vocabularies, deliberately
 

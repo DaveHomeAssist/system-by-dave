@@ -19,8 +19,12 @@ describe("workbook JSON import", () => {
   });
 });
 
+// One blank built once: createBlankWorkbook stamps showId from Date.now(), and content comparisons
+// between two fixtures must not depend on whether a millisecond passed between the calls.
+const BLANK = createBlankWorkbook();
+
 function storedWorkbook(id = "wb-stored"): AvWorkbook {
-  return { ...createBlankWorkbook(), workbookId: id, savedAt: "2026-10-01T08:00:00.000Z" };
+  return { ...structuredClone(BLANK), workbookId: id, savedAt: "2026-10-01T08:00:00.000Z" };
 }
 
 describe("assessStoredWorkbook", () => {

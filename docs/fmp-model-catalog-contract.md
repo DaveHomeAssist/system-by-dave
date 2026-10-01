@@ -140,6 +140,16 @@ The gate checks structure and internal consistency. It does not check whether a
 claim about the equipment is true, and it does not check rendered behaviour,
 geometry accuracy, or anything about the physical rig.
 
+## Gear Reference reads these catalogs
+
+The Gear Reference sheets for the HD8 ISO, the Camera Control Panel, the P240 and
+the SuperJoy are generated from these catalogs (`npm run build:gear-from-fmp`;
+see `docs/gear-reference-contract.md`). `loadEquipmentCatalogs` in
+`scripts/fmp_model_contract.js` is the one loader for both this gate and that
+generator. `npm run verify:fmp` fails when a re-export changes a catalog without
+regenerating those sheets. Keep `component_id` stable: Gear Reference links each
+part to the interactive model at `#part=<component_id>`.
+
 ## Changing the vocabulary
 
 Add the value here with its meaning in the same change that introduces it

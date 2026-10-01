@@ -1,0 +1,2868 @@
+{
+  "schema": "system-by-dave.gear-reference-entry.v1",
+  "id": "blackmagic-atem-television-studio-hd8-iso",
+  "displayName": "Blackmagic ATEM Television Studio HD8 ISO",
+  "aka": [
+    "ATEM Television Studio HD8 ISO",
+    "ATEM HD8 ISO",
+    "TVS HD8 ISO"
+  ],
+  "brand": "Blackmagic Design",
+  "category": "Video",
+  "subcategory": "Switchers",
+  "status": "catalog-derived",
+  "updated": "2026-10-01",
+  "generated": {
+    "by": "scripts/build_gear_from_fmp.js",
+    "catalog": "atem-tvs-hd8-iso",
+    "revision": "1.0.1",
+    "note": "Generated file. Change the fmp-suite catalog or scripts/gear_equipment_adapter.js, then run npm run build:gear-from-fmp."
+  },
+  "summary": "Equipment reference generated from the FMP Blackmagic ATEM Television Studio HD8 ISO catalog. FMP wiring and installed facts stay with the FMP explorer.",
+  "tags": [
+    "ATEM",
+    "switcher",
+    "ISO",
+    "FMP"
+  ],
+  "sources": [
+    {
+      "id": "photo-front",
+      "label": "Photograph of the FMP unit · Supplied front close-up, 2026-09-20 02:45",
+      "kind": "unit-photo",
+      "reference": "Supplied front close-up, 2026-09-20 02:45",
+      "scope": "Visible control labels and relative placement"
+    },
+    {
+      "id": "photo-perspective",
+      "label": "Photograph of the FMP unit · Supplied front perspective, 2026-09-20 03:06:16",
+      "kind": "unit-photo",
+      "reference": "Supplied front perspective, 2026-09-20 03:06:16",
+      "scope": "Enclosure and control surface geometry"
+    },
+    {
+      "id": "photo-rear",
+      "label": "Photograph of the FMP unit · Supplied rear view, 2026-09-20 03:06:23",
+      "kind": "unit-photo",
+      "reference": "Supplied rear view, 2026-09-20 03:06:23",
+      "scope": "Connector positions and markings"
+    },
+    {
+      "id": "photo-side",
+      "label": "Photograph of the FMP unit · Supplied side view, 2026-09-20 03:06:31",
+      "kind": "unit-photo",
+      "reference": "Supplied side view, 2026-09-20 03:06:31",
+      "scope": "Profile, ventilation and transition lever"
+    },
+    {
+      "id": "bmd-spec",
+      "label": "Manufacturer · ATEM Television Studio HD8 ISO section; accessed 2026-09-20",
+      "kind": "manufacturer",
+      "url": "https://www.blackmagicdesign.com/products/atemtelevisionstudio/techspecs",
+      "scope": "ATEM Television Studio HD8 ISO section; accessed 2026-09-20"
+    },
+    {
+      "id": "bmd-start",
+      "label": "Manufacturer · Program, Preview and transitions; accessed 2026-09-20",
+      "kind": "manufacturer",
+      "url": "https://www.blackmagicdesign.com/products/atemtelevisionstudio/gettingstarted",
+      "scope": "Program, Preview and transitions; accessed 2026-09-20"
+    },
+    {
+      "id": "bmd-product",
+      "label": "Manufacturer · Control surface functions; accessed 2026-09-20",
+      "kind": "manufacturer",
+      "url": "https://www.blackmagicdesign.com/products/atemtelevisionstudio",
+      "scope": "Control surface functions; accessed 2026-09-20"
+    },
+    {
+      "id": "bmd-manual",
+      "label": "Manufacturer · ATEM Television Studio Switchers Installation and Operation Manual, June 2026 — https://documents.blackmagicdesign.com/UserManuals/ATEM_Television_Studio_HD_Manual.pdf (English pp. 3-193; accessed 2026-09-22)",
+      "kind": "manufacturer",
+      "reference": "ATEM Television Studio Switchers Installation and Operation Manual, June 2026 — https://documents.blackmagicdesign.com/UserManuals/ATEM_Television_Studio_HD_Manual.pdf (English pp. 3-193; accessed 2026-09-22)",
+      "scope": "Panel behaviour, lamp states, LCD menu navigation, transitions, keyers, talkback and the Fairlight audio mixer. Covers HD8, HD8 ISO and 4K8; 4K8-only controls are excluded here."
+    },
+    {
+      "id": "fmp-sop",
+      "label": "FMP record · Switcher SOP.pdf, SOP-FMP-01 Rev A, September 2026",
+      "kind": "house-record",
+      "reference": "Switcher SOP.pdf, SOP-FMP-01 Rev A, September 2026",
+      "scope": "Draft venue source labels and operator sequence; current patch unverified"
+    },
+    {
+      "id": "field-reference",
+      "label": "Supplied reference · atem-tvs-hd8-iso-reference.html",
+      "kind": "user-document",
+      "reference": "atem-tvs-hd8-iso-reference.html",
+      "scope": "Supplementary field reference; not firmware verification"
+    },
+    {
+      "id": "user-tbar-tally-2026-09-20",
+      "label": "Operator report · Dave’s correction in this discussion, 20 September 2026",
+      "kind": "user-report",
+      "reference": "Dave’s correction in this discussion, 20 September 2026",
+      "scope": "Both selected Program and Preview source buttons are red while the manual transition lever is between endpoints. Adopted for this background-MIX simulation."
+    }
+  ],
+  "accuracy": [
+    {
+      "item": "Model identity",
+      "status": "confirmed",
+      "detail": "The catalog names the model Blackmagic ATEM Television Studio HD8 ISO, and a manufacturer source names the product.",
+      "sourceRefs": [
+        "bmd-spec"
+      ]
+    },
+    {
+      "item": "Parts with a manufacturer source",
+      "status": "confirmed",
+      "detail": "225 of 227 listed parts cite a manufacturer source.",
+      "sourceRefs": [
+        "bmd-spec",
+        "bmd-start",
+        "bmd-product",
+        "bmd-manual"
+      ]
+    },
+    {
+      "item": "Parts identified from photographs or supplied references",
+      "status": "unverified",
+      "detail": "2 listed parts cite no manufacturer source. Their identity comes from photographs or a supplied reference.",
+      "sourceRefs": [
+        "photo-front",
+        "photo-perspective",
+        "photo-side"
+      ]
+    },
+    {
+      "item": "Parts the catalog has not established",
+      "status": "unverified",
+      "detail": "1 parts are listed under Open facts.",
+      "sourceRefs": [
+        "photo-front",
+        "bmd-start",
+        "bmd-manual",
+        "user-tbar-tally-2026-09-20"
+      ]
+    }
+  ],
+  "sections": [
+    {
+      "id": "id",
+      "title": "Identification",
+      "type": "specTable",
+      "rows": [
+        [
+          "Manufacturer",
+          "Blackmagic Design"
+        ],
+        [
+          "Model (catalog)",
+          "Blackmagic ATEM Television Studio HD8 ISO"
+        ],
+        [
+          "Catalog",
+          "atem-tvs-hd8-iso · revision 1.0.1 · schema 1.0"
+        ],
+        [
+          "Parts on this sheet",
+          "227 of 227 catalog components"
+        ],
+        [
+          "Interactive model",
+          "housevideo.app/fmp/models/atem-hd8-iso.html"
+        ]
+      ],
+      "sourceRefs": [
+        "bmd-spec",
+        "bmd-start",
+        "bmd-product",
+        "bmd-manual"
+      ]
+    },
+    {
+      "id": "parts",
+      "title": "Parts",
+      "type": "parts",
+      "lede": "Generated from the FMP equipment catalog. Each part keeps the catalog’s own evidence level, and Inspect opens it in the interactive model.",
+      "parts": {
+        "interactive": {
+          "url": "https://housevideo.app/fmp/models/atem-hd8-iso.html",
+          "label": "Blackmagic ATEM Television Studio HD8 ISO interactive model"
+        },
+        "total": 227,
+        "groups": [
+          {
+            "category": "Switching",
+            "parts": [
+              {
+                "id": "atem.source.1",
+                "label": "Source select 1",
+                "kind": "button",
+                "description": "Select bus position 1. Assigns a source to whatever the destination display names — an aux output or a keyer — not to Program or Preview. Lit means selected, blinking means the shifted source, green means a protected source: program, preview, clean feed 1 or clean feed 2. Press MACRO and this row turns blue and becomes macro slot 1 instead. Double-press to shift-select without holding SHIFT.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.program.1",
+                "label": "Program · Camera 1",
+                "kind": "button",
+                "description": "Hot-switches this source straight to Program — an immediate cut, with no transition and no undo. Lit red means it is on air; blinking red means the shifted source on this button is live, so what is live is not what the label says. Unlike the preview and select rows, double-press does not shift-select here: the manual states that would momentarily put the wrong source on the program output.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-start",
+                  "bmd-manual",
+                  "user-tbar-tally-2026-09-20"
+                ],
+                "fmpEvidence": true
+              },
+              {
+                "id": "atem.preview.1",
+                "label": "Preview · Camera 1",
+                "kind": "button",
+                "description": "Queues this source on Preview; it reaches Program on the next transition, so selecting it alone changes nothing on air. Lit green means selected, blinking green means a shifted source is on preview. Double-press is the same as shift-selecting, which is quicker than holding SHIFT. During the simulated MIX both selected source buttons are red; the idle Preview selection returns to green at an endpoint.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-start",
+                  "bmd-manual",
+                  "user-tbar-tally-2026-09-20"
+                ],
+                "fmpEvidence": true
+              },
+              {
+                "id": "atem.source.2",
+                "label": "Source select 2",
+                "kind": "button",
+                "description": "Select bus position 2. Assigns a source to whatever the destination display names — an aux output or a keyer — not to Program or Preview. Lit means selected, blinking means the shifted source, green means a protected source: program, preview, clean feed 1 or clean feed 2. Press MACRO and this row turns blue and becomes macro slot 2 instead. Double-press to shift-select without holding SHIFT.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.program.2",
+                "label": "Program · Camera 2",
+                "kind": "button",
+                "description": "Hot-switches this source straight to Program — an immediate cut, with no transition and no undo. Lit red means it is on air; blinking red means the shifted source on this button is live, so what is live is not what the label says. Unlike the preview and select rows, double-press does not shift-select here: the manual states that would momentarily put the wrong source on the program output.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-start",
+                  "bmd-manual",
+                  "user-tbar-tally-2026-09-20"
+                ],
+                "fmpEvidence": true
+              },
+              {
+                "id": "atem.preview.2",
+                "label": "Preview · Camera 2",
+                "kind": "button",
+                "description": "Queues this source on Preview; it reaches Program on the next transition, so selecting it alone changes nothing on air. Lit green means selected, blinking green means a shifted source is on preview. Double-press is the same as shift-selecting, which is quicker than holding SHIFT. During the simulated MIX both selected source buttons are red; the idle Preview selection returns to green at an endpoint.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-start",
+                  "bmd-manual",
+                  "user-tbar-tally-2026-09-20"
+                ],
+                "fmpEvidence": true
+              },
+              {
+                "id": "atem.source.3",
+                "label": "Source select 3",
+                "kind": "button",
+                "description": "Select bus position 3. Assigns a source to whatever the destination display names — an aux output or a keyer — not to Program or Preview. Lit means selected, blinking means the shifted source, green means a protected source: program, preview, clean feed 1 or clean feed 2. Press MACRO and this row turns blue and becomes macro slot 3 instead. Double-press to shift-select without holding SHIFT.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.program.3",
+                "label": "Program · Camera 3",
+                "kind": "button",
+                "description": "Hot-switches this source straight to Program — an immediate cut, with no transition and no undo. Lit red means it is on air; blinking red means the shifted source on this button is live, so what is live is not what the label says. Unlike the preview and select rows, double-press does not shift-select here: the manual states that would momentarily put the wrong source on the program output.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-start",
+                  "bmd-manual",
+                  "user-tbar-tally-2026-09-20"
+                ],
+                "fmpEvidence": true
+              },
+              {
+                "id": "atem.preview.3",
+                "label": "Preview · Camera 3",
+                "kind": "button",
+                "description": "Queues this source on Preview; it reaches Program on the next transition, so selecting it alone changes nothing on air. Lit green means selected, blinking green means a shifted source is on preview. Double-press is the same as shift-selecting, which is quicker than holding SHIFT. During the simulated MIX both selected source buttons are red; the idle Preview selection returns to green at an endpoint.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-start",
+                  "bmd-manual",
+                  "user-tbar-tally-2026-09-20"
+                ],
+                "fmpEvidence": true
+              },
+              {
+                "id": "atem.source.4",
+                "label": "Source select 4",
+                "kind": "button",
+                "description": "Select bus position 4. Assigns a source to whatever the destination display names — an aux output or a keyer — not to Program or Preview. Lit means selected, blinking means the shifted source, green means a protected source: program, preview, clean feed 1 or clean feed 2. Press MACRO and this row turns blue and becomes macro slot 4 instead. Double-press to shift-select without holding SHIFT.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.program.4",
+                "label": "Program · Camera 4",
+                "kind": "button",
+                "description": "Hot-switches this source straight to Program — an immediate cut, with no transition and no undo. Lit red means it is on air; blinking red means the shifted source on this button is live, so what is live is not what the label says. Unlike the preview and select rows, double-press does not shift-select here: the manual states that would momentarily put the wrong source on the program output.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-start",
+                  "bmd-manual",
+                  "user-tbar-tally-2026-09-20"
+                ],
+                "fmpEvidence": true
+              },
+              {
+                "id": "atem.preview.4",
+                "label": "Preview · Camera 4",
+                "kind": "button",
+                "description": "Queues this source on Preview; it reaches Program on the next transition, so selecting it alone changes nothing on air. Lit green means selected, blinking green means a shifted source is on preview. Double-press is the same as shift-selecting, which is quicker than holding SHIFT. During the simulated MIX both selected source buttons are red; the idle Preview selection returns to green at an endpoint.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-start",
+                  "bmd-manual",
+                  "user-tbar-tally-2026-09-20"
+                ],
+                "fmpEvidence": true
+              },
+              {
+                "id": "atem.source.5",
+                "label": "Source select 5",
+                "kind": "button",
+                "description": "Select bus position 5. Assigns a source to whatever the destination display names — an aux output or a keyer — not to Program or Preview. Lit means selected, blinking means the shifted source, green means a protected source: program, preview, clean feed 1 or clean feed 2. Press MACRO and this row turns blue and becomes macro slot 5 instead. Double-press to shift-select without holding SHIFT.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.program.5",
+                "label": "Program · Camera 5",
+                "kind": "button",
+                "description": "Hot-switches this source straight to Program — an immediate cut, with no transition and no undo. Lit red means it is on air; blinking red means the shifted source on this button is live, so what is live is not what the label says. Unlike the preview and select rows, double-press does not shift-select here: the manual states that would momentarily put the wrong source on the program output.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-start",
+                  "bmd-manual",
+                  "user-tbar-tally-2026-09-20"
+                ],
+                "fmpEvidence": true
+              },
+              {
+                "id": "atem.preview.5",
+                "label": "Preview · Camera 5",
+                "kind": "button",
+                "description": "Queues this source on Preview; it reaches Program on the next transition, so selecting it alone changes nothing on air. Lit green means selected, blinking green means a shifted source is on preview. Double-press is the same as shift-selecting, which is quicker than holding SHIFT. During the simulated MIX both selected source buttons are red; the idle Preview selection returns to green at an endpoint.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-start",
+                  "bmd-manual",
+                  "user-tbar-tally-2026-09-20"
+                ],
+                "fmpEvidence": true
+              },
+              {
+                "id": "atem.source.6",
+                "label": "Source select 6",
+                "kind": "button",
+                "description": "Select bus position 6. Assigns a source to whatever the destination display names — an aux output or a keyer — not to Program or Preview. Lit means selected, blinking means the shifted source, green means a protected source: program, preview, clean feed 1 or clean feed 2. Press MACRO and this row turns blue and becomes macro slot 6 instead. Double-press to shift-select without holding SHIFT.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.program.6",
+                "label": "Program · Camera 6",
+                "kind": "button",
+                "description": "Hot-switches this source straight to Program — an immediate cut, with no transition and no undo. Lit red means it is on air; blinking red means the shifted source on this button is live, so what is live is not what the label says. Unlike the preview and select rows, double-press does not shift-select here: the manual states that would momentarily put the wrong source on the program output.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-start",
+                  "bmd-manual",
+                  "user-tbar-tally-2026-09-20"
+                ],
+                "fmpEvidence": true
+              },
+              {
+                "id": "atem.preview.6",
+                "label": "Preview · Camera 6",
+                "kind": "button",
+                "description": "Queues this source on Preview; it reaches Program on the next transition, so selecting it alone changes nothing on air. Lit green means selected, blinking green means a shifted source is on preview. Double-press is the same as shift-selecting, which is quicker than holding SHIFT. During the simulated MIX both selected source buttons are red; the idle Preview selection returns to green at an endpoint.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-start",
+                  "bmd-manual",
+                  "user-tbar-tally-2026-09-20"
+                ],
+                "fmpEvidence": true
+              },
+              {
+                "id": "atem.source.7",
+                "label": "Source select 7",
+                "kind": "button",
+                "description": "Select bus position 7. Assigns a source to whatever the destination display names — an aux output or a keyer — not to Program or Preview. Lit means selected, blinking means the shifted source, green means a protected source: program, preview, clean feed 1 or clean feed 2. Press MACRO and this row turns blue and becomes macro slot 7 instead. Double-press to shift-select without holding SHIFT.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.program.7",
+                "label": "Program · Camera 7",
+                "kind": "button",
+                "description": "Hot-switches this source straight to Program — an immediate cut, with no transition and no undo. Lit red means it is on air; blinking red means the shifted source on this button is live, so what is live is not what the label says. Unlike the preview and select rows, double-press does not shift-select here: the manual states that would momentarily put the wrong source on the program output.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-start",
+                  "bmd-manual",
+                  "user-tbar-tally-2026-09-20"
+                ],
+                "fmpEvidence": true
+              },
+              {
+                "id": "atem.preview.7",
+                "label": "Preview · Camera 7",
+                "kind": "button",
+                "description": "Queues this source on Preview; it reaches Program on the next transition, so selecting it alone changes nothing on air. Lit green means selected, blinking green means a shifted source is on preview. Double-press is the same as shift-selecting, which is quicker than holding SHIFT. During the simulated MIX both selected source buttons are red; the idle Preview selection returns to green at an endpoint.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-start",
+                  "bmd-manual",
+                  "user-tbar-tally-2026-09-20"
+                ],
+                "fmpEvidence": true
+              },
+              {
+                "id": "atem.source.8",
+                "label": "Source select 8",
+                "kind": "button",
+                "description": "Select bus position 8. Assigns a source to whatever the destination display names — an aux output or a keyer — not to Program or Preview. Lit means selected, blinking means the shifted source, green means a protected source: program, preview, clean feed 1 or clean feed 2. Press MACRO and this row turns blue and becomes macro slot 8 instead. Double-press to shift-select without holding SHIFT.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.program.8",
+                "label": "Program · Camera 8",
+                "kind": "button",
+                "description": "Hot-switches this source straight to Program — an immediate cut, with no transition and no undo. Lit red means it is on air; blinking red means the shifted source on this button is live, so what is live is not what the label says. Unlike the preview and select rows, double-press does not shift-select here: the manual states that would momentarily put the wrong source on the program output.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-start",
+                  "bmd-manual",
+                  "user-tbar-tally-2026-09-20"
+                ],
+                "fmpEvidence": true
+              },
+              {
+                "id": "atem.preview.8",
+                "label": "Preview · Camera 8",
+                "kind": "button",
+                "description": "Queues this source on Preview; it reaches Program on the next transition, so selecting it alone changes nothing on air. Lit green means selected, blinking green means a shifted source is on preview. Double-press is the same as shift-selecting, which is quicker than holding SHIFT. During the simulated MIX both selected source buttons are red; the idle Preview selection returns to green at an endpoint.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-start",
+                  "bmd-manual",
+                  "user-tbar-tally-2026-09-20"
+                ],
+                "fmpEvidence": true
+              },
+              {
+                "id": "atem.source.9",
+                "label": "Source select 9",
+                "kind": "button",
+                "description": "Select bus position 9. Assigns a source to whatever the destination display names — an aux output or a keyer — not to Program or Preview. Lit means selected, blinking means the shifted source, green means a protected source: program, preview, clean feed 1 or clean feed 2. Press MACRO and this row turns blue and becomes macro slot 9 instead. Double-press to shift-select without holding SHIFT.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.program.9",
+                "label": "Program · Media Player 1",
+                "kind": "button",
+                "description": "Hot-switches this source straight to Program — an immediate cut, with no transition and no undo. Lit red means it is on air; blinking red means the shifted source on this button is live, so what is live is not what the label says. Unlike the preview and select rows, double-press does not shift-select here: the manual states that would momentarily put the wrong source on the program output.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-start",
+                  "bmd-manual",
+                  "user-tbar-tally-2026-09-20"
+                ],
+                "fmpEvidence": true
+              },
+              {
+                "id": "atem.preview.9",
+                "label": "Preview · Media Player 1",
+                "kind": "button",
+                "description": "Queues this source on Preview; it reaches Program on the next transition, so selecting it alone changes nothing on air. Lit green means selected, blinking green means a shifted source is on preview. Double-press is the same as shift-selecting, which is quicker than holding SHIFT. During the simulated MIX both selected source buttons are red; the idle Preview selection returns to green at an endpoint.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-start",
+                  "bmd-manual",
+                  "user-tbar-tally-2026-09-20"
+                ],
+                "fmpEvidence": true
+              },
+              {
+                "id": "atem.source.10",
+                "label": "Source select 10",
+                "kind": "button",
+                "description": "Select bus position 10. Assigns a source to whatever the destination display names — an aux output or a keyer — not to Program or Preview. Lit means selected, blinking means the shifted source, green means a protected source: program, preview, clean feed 1 or clean feed 2. Press MACRO and this row turns blue and becomes macro slot 10 instead. Double-press to shift-select without holding SHIFT.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.program.10",
+                "label": "Program · Media Player 2",
+                "kind": "button",
+                "description": "Hot-switches this source straight to Program — an immediate cut, with no transition and no undo. Lit red means it is on air; blinking red means the shifted source on this button is live, so what is live is not what the label says. Unlike the preview and select rows, double-press does not shift-select here: the manual states that would momentarily put the wrong source on the program output.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-start",
+                  "bmd-manual",
+                  "user-tbar-tally-2026-09-20"
+                ],
+                "fmpEvidence": true
+              },
+              {
+                "id": "atem.preview.10",
+                "label": "Preview · Media Player 2",
+                "kind": "button",
+                "description": "Queues this source on Preview; it reaches Program on the next transition, so selecting it alone changes nothing on air. Lit green means selected, blinking green means a shifted source is on preview. Double-press is the same as shift-selecting, which is quicker than holding SHIFT. During the simulated MIX both selected source buttons are red; the idle Preview selection returns to green at an endpoint.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-start",
+                  "bmd-manual",
+                  "user-tbar-tally-2026-09-20"
+                ],
+                "fmpEvidence": true
+              },
+              {
+                "id": "atem.source.labels",
+                "label": "Source label display",
+                "kind": "display",
+                "description": "Source-name strips align with the Program and Preview buttons. In this trainer they follow the standard or FMP label set.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.source.shift",
+                "label": "Source select SHIFT",
+                "kind": "button",
+                "description": "Accesses the alternate source bank for the source-select row. Shifted-source behavior is not simulated.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.program.shift",
+                "label": "Program / Preview SHIFT",
+                "kind": "button",
+                "description": "Accesses additional Program / Preview sources. Alternate banks are not simulated; read the actual displayed source names.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              }
+            ]
+          },
+          {
+            "category": "Audio",
+            "parts": [
+              {
+                "id": "atem.audio.encoder.1",
+                "label": "Audio strip 1 encoder",
+                "kind": "knob",
+                "description": "Encoder for channel strip 1 of the bank currently shown on the LCD. What it adjusts is set by the mode buttons: under LEVEL, turning right raises that input’s level, and pressing ALT turns the same knob into gain. EQ, COMP, GATE, EXP, LIM and PAN each remap all ten encoders to that processor’s parameters, left to right in the order they appear in the Dynamics window. BNK> and <BNK change which ten channels these encoders address, so read the LCD before turning one.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.audio.on.1",
+                "label": "Audio strip 1 ON",
+                "kind": "small",
+                "description": "Soft button for channel strip 1. Under LEVEL it cycles that input between audio-follows-video, on and off — three states, not a simple mute. Under LEVEL or PAN it lights red while that input is on air. Under the dynamics modes it becomes whatever the LCD shows above it; in the channel 1 position that is the on/off switch for the selected processor.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.audio.solo.1",
+                "label": "Audio strip 1 SOLO",
+                "kind": "small",
+                "description": "Solos channel 1 so you hear only that input in the monitor path, and a headset icon appears on that strip’s LCD while it is active. It is a tool for refining one adjustment; it does not change what the Program mix sends to air.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.audio.select.1",
+                "label": "Audio strip 1 SEL",
+                "kind": "small",
+                "description": "Selects or de-selects channel 1 for parameter work. Under GATE and EXP it chooses which track is in focus. Under PAN you rarely need it — turning that channel’s knob selects the strip and lights SEL for you.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.audio.encoder.2",
+                "label": "Audio strip 2 encoder",
+                "kind": "knob",
+                "description": "Encoder for channel strip 2 of the bank currently shown on the LCD. What it adjusts is set by the mode buttons: under LEVEL, turning right raises that input’s level, and pressing ALT turns the same knob into gain. EQ, COMP, GATE, EXP, LIM and PAN each remap all ten encoders to that processor’s parameters, left to right in the order they appear in the Dynamics window. BNK> and <BNK change which ten channels these encoders address, so read the LCD before turning one.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.audio.on.2",
+                "label": "Audio strip 2 ON",
+                "kind": "small",
+                "description": "Soft button for channel strip 2. Under LEVEL it cycles that input between audio-follows-video, on and off — three states, not a simple mute. Under LEVEL or PAN it lights red while that input is on air. Under the dynamics modes it becomes whatever the LCD shows above it; in the channel 1 position that is the on/off switch for the selected processor.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.audio.solo.2",
+                "label": "Audio strip 2 SOLO",
+                "kind": "small",
+                "description": "Solos channel 2 so you hear only that input in the monitor path, and a headset icon appears on that strip’s LCD while it is active. It is a tool for refining one adjustment; it does not change what the Program mix sends to air.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.audio.select.2",
+                "label": "Audio strip 2 SEL",
+                "kind": "small",
+                "description": "Selects or de-selects channel 2 for parameter work. Under GATE and EXP it chooses which track is in focus. Under PAN you rarely need it — turning that channel’s knob selects the strip and lights SEL for you.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.audio.encoder.3",
+                "label": "Audio strip 3 encoder",
+                "kind": "knob",
+                "description": "Encoder for channel strip 3 of the bank currently shown on the LCD. What it adjusts is set by the mode buttons: under LEVEL, turning right raises that input’s level, and pressing ALT turns the same knob into gain. EQ, COMP, GATE, EXP, LIM and PAN each remap all ten encoders to that processor’s parameters, left to right in the order they appear in the Dynamics window. BNK> and <BNK change which ten channels these encoders address, so read the LCD before turning one.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.audio.on.3",
+                "label": "Audio strip 3 ON",
+                "kind": "small",
+                "description": "Soft button for channel strip 3. Under LEVEL it cycles that input between audio-follows-video, on and off — three states, not a simple mute. Under LEVEL or PAN it lights red while that input is on air. Under the dynamics modes it becomes whatever the LCD shows above it; in the channel 1 position that is the on/off switch for the selected processor.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.audio.solo.3",
+                "label": "Audio strip 3 SOLO",
+                "kind": "small",
+                "description": "Solos channel 3 so you hear only that input in the monitor path, and a headset icon appears on that strip’s LCD while it is active. It is a tool for refining one adjustment; it does not change what the Program mix sends to air.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.audio.select.3",
+                "label": "Audio strip 3 SEL",
+                "kind": "small",
+                "description": "Selects or de-selects channel 3 for parameter work. Under GATE and EXP it chooses which track is in focus. Under PAN you rarely need it — turning that channel’s knob selects the strip and lights SEL for you.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.audio.encoder.4",
+                "label": "Audio strip 4 encoder",
+                "kind": "knob",
+                "description": "Encoder for channel strip 4 of the bank currently shown on the LCD. What it adjusts is set by the mode buttons: under LEVEL, turning right raises that input’s level, and pressing ALT turns the same knob into gain. EQ, COMP, GATE, EXP, LIM and PAN each remap all ten encoders to that processor’s parameters, left to right in the order they appear in the Dynamics window. BNK> and <BNK change which ten channels these encoders address, so read the LCD before turning one.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.audio.on.4",
+                "label": "Audio strip 4 ON",
+                "kind": "small",
+                "description": "Soft button for channel strip 4. Under LEVEL it cycles that input between audio-follows-video, on and off — three states, not a simple mute. Under LEVEL or PAN it lights red while that input is on air. Under the dynamics modes it becomes whatever the LCD shows above it; in the channel 1 position that is the on/off switch for the selected processor.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.audio.solo.4",
+                "label": "Audio strip 4 SOLO",
+                "kind": "small",
+                "description": "Solos channel 4 so you hear only that input in the monitor path, and a headset icon appears on that strip’s LCD while it is active. It is a tool for refining one adjustment; it does not change what the Program mix sends to air.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.audio.select.4",
+                "label": "Audio strip 4 SEL",
+                "kind": "small",
+                "description": "Selects or de-selects channel 4 for parameter work. Under GATE and EXP it chooses which track is in focus. Under PAN you rarely need it — turning that channel’s knob selects the strip and lights SEL for you.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.audio.encoder.5",
+                "label": "Audio strip 5 encoder",
+                "kind": "knob",
+                "description": "Encoder for channel strip 5 of the bank currently shown on the LCD. What it adjusts is set by the mode buttons: under LEVEL, turning right raises that input’s level, and pressing ALT turns the same knob into gain. EQ, COMP, GATE, EXP, LIM and PAN each remap all ten encoders to that processor’s parameters, left to right in the order they appear in the Dynamics window. BNK> and <BNK change which ten channels these encoders address, so read the LCD before turning one.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.audio.on.5",
+                "label": "Audio strip 5 ON",
+                "kind": "small",
+                "description": "Soft button for channel strip 5. Under LEVEL it cycles that input between audio-follows-video, on and off — three states, not a simple mute. Under LEVEL or PAN it lights red while that input is on air. Under the dynamics modes it becomes whatever the LCD shows above it; in the channel 1 position that is the on/off switch for the selected processor.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.audio.solo.5",
+                "label": "Audio strip 5 SOLO",
+                "kind": "small",
+                "description": "Solos channel 5 so you hear only that input in the monitor path, and a headset icon appears on that strip’s LCD while it is active. It is a tool for refining one adjustment; it does not change what the Program mix sends to air.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.audio.select.5",
+                "label": "Audio strip 5 SEL",
+                "kind": "small",
+                "description": "Selects or de-selects channel 5 for parameter work. Under GATE and EXP it chooses which track is in focus. Under PAN you rarely need it — turning that channel’s knob selects the strip and lights SEL for you.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.audio.encoder.6",
+                "label": "Audio strip 6 encoder",
+                "kind": "knob",
+                "description": "Encoder for channel strip 6 of the bank currently shown on the LCD. What it adjusts is set by the mode buttons: under LEVEL, turning right raises that input’s level, and pressing ALT turns the same knob into gain. EQ, COMP, GATE, EXP, LIM and PAN each remap all ten encoders to that processor’s parameters, left to right in the order they appear in the Dynamics window. BNK> and <BNK change which ten channels these encoders address, so read the LCD before turning one.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.audio.on.6",
+                "label": "Audio strip 6 ON",
+                "kind": "small",
+                "description": "Soft button for channel strip 6. Under LEVEL it cycles that input between audio-follows-video, on and off — three states, not a simple mute. Under LEVEL or PAN it lights red while that input is on air. Under the dynamics modes it becomes whatever the LCD shows above it; in the channel 1 position that is the on/off switch for the selected processor.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.audio.solo.6",
+                "label": "Audio strip 6 SOLO",
+                "kind": "small",
+                "description": "Solos channel 6 so you hear only that input in the monitor path, and a headset icon appears on that strip’s LCD while it is active. It is a tool for refining one adjustment; it does not change what the Program mix sends to air.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.audio.select.6",
+                "label": "Audio strip 6 SEL",
+                "kind": "small",
+                "description": "Selects or de-selects channel 6 for parameter work. Under GATE and EXP it chooses which track is in focus. Under PAN you rarely need it — turning that channel’s knob selects the strip and lights SEL for you.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.audio.encoder.7",
+                "label": "Audio strip 7 encoder",
+                "kind": "knob",
+                "description": "Encoder for channel strip 7 of the bank currently shown on the LCD. What it adjusts is set by the mode buttons: under LEVEL, turning right raises that input’s level, and pressing ALT turns the same knob into gain. EQ, COMP, GATE, EXP, LIM and PAN each remap all ten encoders to that processor’s parameters, left to right in the order they appear in the Dynamics window. BNK> and <BNK change which ten channels these encoders address, so read the LCD before turning one.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.audio.on.7",
+                "label": "Audio strip 7 ON",
+                "kind": "small",
+                "description": "Soft button for channel strip 7. Under LEVEL it cycles that input between audio-follows-video, on and off — three states, not a simple mute. Under LEVEL or PAN it lights red while that input is on air. Under the dynamics modes it becomes whatever the LCD shows above it; in the channel 1 position that is the on/off switch for the selected processor.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.audio.solo.7",
+                "label": "Audio strip 7 SOLO",
+                "kind": "small",
+                "description": "Solos channel 7 so you hear only that input in the monitor path, and a headset icon appears on that strip’s LCD while it is active. It is a tool for refining one adjustment; it does not change what the Program mix sends to air.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.audio.select.7",
+                "label": "Audio strip 7 SEL",
+                "kind": "small",
+                "description": "Selects or de-selects channel 7 for parameter work. Under GATE and EXP it chooses which track is in focus. Under PAN you rarely need it — turning that channel’s knob selects the strip and lights SEL for you.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.audio.encoder.8",
+                "label": "Audio strip 8 encoder",
+                "kind": "knob",
+                "description": "Encoder for channel strip 8 of the bank currently shown on the LCD. What it adjusts is set by the mode buttons: under LEVEL, turning right raises that input’s level, and pressing ALT turns the same knob into gain. EQ, COMP, GATE, EXP, LIM and PAN each remap all ten encoders to that processor’s parameters, left to right in the order they appear in the Dynamics window. BNK> and <BNK change which ten channels these encoders address, so read the LCD before turning one.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.audio.on.8",
+                "label": "Audio strip 8 ON",
+                "kind": "small",
+                "description": "Soft button for channel strip 8. Under LEVEL it cycles that input between audio-follows-video, on and off — three states, not a simple mute. Under LEVEL or PAN it lights red while that input is on air. Under the dynamics modes it becomes whatever the LCD shows above it; in the channel 1 position that is the on/off switch for the selected processor.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.audio.solo.8",
+                "label": "Audio strip 8 SOLO",
+                "kind": "small",
+                "description": "Solos channel 8 so you hear only that input in the monitor path, and a headset icon appears on that strip’s LCD while it is active. It is a tool for refining one adjustment; it does not change what the Program mix sends to air.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.audio.select.8",
+                "label": "Audio strip 8 SEL",
+                "kind": "small",
+                "description": "Selects or de-selects channel 8 for parameter work. Under GATE and EXP it chooses which track is in focus. Under PAN you rarely need it — turning that channel’s knob selects the strip and lights SEL for you.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.audio.encoder.9",
+                "label": "Audio strip 9 encoder",
+                "kind": "knob",
+                "description": "Encoder for channel strip 9 of the bank currently shown on the LCD. What it adjusts is set by the mode buttons: under LEVEL, turning right raises that input’s level, and pressing ALT turns the same knob into gain. EQ, COMP, GATE, EXP, LIM and PAN each remap all ten encoders to that processor’s parameters, left to right in the order they appear in the Dynamics window. BNK> and <BNK change which ten channels these encoders address, so read the LCD before turning one.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.audio.on.9",
+                "label": "Audio strip 9 ON",
+                "kind": "small",
+                "description": "Soft button for channel strip 9. Under LEVEL it cycles that input between audio-follows-video, on and off — three states, not a simple mute. Under LEVEL or PAN it lights red while that input is on air. Under the dynamics modes it becomes whatever the LCD shows above it; in the channel 1 position that is the on/off switch for the selected processor.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.audio.solo.9",
+                "label": "Audio strip 9 SOLO",
+                "kind": "small",
+                "description": "Solos channel 9 so you hear only that input in the monitor path, and a headset icon appears on that strip’s LCD while it is active. It is a tool for refining one adjustment; it does not change what the Program mix sends to air.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.audio.select.9",
+                "label": "Audio strip 9 SEL",
+                "kind": "small",
+                "description": "Selects or de-selects channel 9 for parameter work. Under GATE and EXP it chooses which track is in focus. Under PAN you rarely need it — turning that channel’s knob selects the strip and lights SEL for you.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.audio.encoder.10",
+                "label": "Audio strip 10 encoder",
+                "kind": "knob",
+                "description": "Encoder for channel strip 10 of the bank currently shown on the LCD. What it adjusts is set by the mode buttons: under LEVEL, turning right raises that input’s level, and pressing ALT turns the same knob into gain. EQ, COMP, GATE, EXP, LIM and PAN each remap all ten encoders to that processor’s parameters, left to right in the order they appear in the Dynamics window. BNK> and <BNK change which ten channels these encoders address, so read the LCD before turning one.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.audio.on.10",
+                "label": "Audio strip 10 ON",
+                "kind": "small",
+                "description": "Soft button for channel strip 10. Under LEVEL it cycles that input between audio-follows-video, on and off — three states, not a simple mute. Under LEVEL or PAN it lights red while that input is on air. Under the dynamics modes it becomes whatever the LCD shows above it; in the channel 1 position that is the on/off switch for the selected processor.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.audio.solo.10",
+                "label": "Audio strip 10 SOLO",
+                "kind": "small",
+                "description": "Solos channel 10 so you hear only that input in the monitor path, and a headset icon appears on that strip’s LCD while it is active. It is a tool for refining one adjustment; it does not change what the Program mix sends to air.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.audio.select.10",
+                "label": "Audio strip 10 SEL",
+                "kind": "small",
+                "description": "Selects or de-selects channel 10 for parameter work. Under GATE and EXP it chooses which track is in focus. Under PAN you rarely need it — turning that channel’s knob selects the strip and lights SEL for you.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.audio.meters",
+                "label": "Audio meter display",
+                "kind": "display",
+                "description": "Shows audio channel labels, meters and status. The meter marks in this reconstruction are illustrative, not incoming audio.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.audio.mode.level",
+                "label": "LEVEL audio mode",
+                "kind": "small",
+                "description": "Maps the ten encoders to input level. Turn right to raise a channel; press ALT and the same knobs become gain, which is what you set when normalising inputs before a show.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.audio.mode.pan",
+                "label": "PAN audio mode",
+                "kind": "small",
+                "description": "Maps the encoders to stereo pan. Turning a channel’s knob also selects that strip and lights its SEL button, so you do not need to press SEL first.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.audio.mode.eq",
+                "label": "EQ audio mode",
+                "kind": "small",
+                "description": "Maps the encoders to the 6-band parametric EQ. Press EQ a second time for page 2, which is the high pass and low pass filters on bands 1 and 6; the soft buttons there switch those filters on and off or change their shape. Press again to return to page 1.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.audio.mode.exp",
+                "label": "EXP audio mode",
+                "kind": "small",
+                "description": "Maps the encoders to the expander, which pushes quiet material further down. Use SEL to choose which track is in focus; the remaining strips hold that processor’s parameters in the order the Dynamics window shows them.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.audio.mode.comp",
+                "label": "COMP audio mode",
+                "kind": "small",
+                "description": "Maps the encoders to the compressor, which holds loud material back so a mix stays even. The channel 1 soft button is the on/off switch for the processor itself.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.audio.mode.lim",
+                "label": "LIM audio mode",
+                "kind": "small",
+                "description": "Maps the encoders to the limiter, the last line of defence against a peak reaching air. Parameters sit across the knobs in the order the Dynamics window shows them.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.audio.mode.gate",
+                "label": "GATE audio mode",
+                "kind": "small",
+                "description": "Maps the encoders to the gate, an exaggerated expander that quietens or silences anything below a threshold — used to stop an open microphone bringing room noise into the mix.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.audio.mode.cam",
+                "label": "CAM audio mode",
+                "kind": "small",
+                "description": "Switches the knobs and buttons from audio to camera control for Blackmagic cameras, including the URSA Broadcast G2. Settings run across three pages; press CAM again to move between them.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.audio.master",
+                "label": "MSTR audio control",
+                "kind": "small",
+                "description": "MSTR swaps the channel strips over to the switcher’s output side — headset, control out and studio out — and gives you the master fader for the final program mix.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.audio.alt",
+                "label": "ALT audio control",
+                "kind": "small",
+                "description": "ALT reveals the second function of whatever is currently mapped. The one you will use most: under LEVEL it turns the ten encoders into gain controls, which is what you set when normalising inputs before a show.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.audio.bank-prev",
+                "label": "<BNK audio control",
+                "kind": "small",
+                "description": "<BNK shifts the ten channel strips back to the previous group of ten inputs. The strip LCDs rename themselves to match.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.audio.bank-next",
+                "label": "BNK> audio control",
+                "kind": "small",
+                "description": "BNK> shifts the ten channel strips one bank to the right, to the next group of ten inputs. If an encoder is not doing what you expect, check which bank you are on.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              }
+            ]
+          },
+          {
+            "category": "Transitions & keys",
+            "parts": [
+              {
+                "id": "atem.preview.transition",
+                "label": "PREV TRANS",
+                "kind": "button",
+                "description": "Previews the next transition on the Preview output. It does not take that transition to Program.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.macro",
+                "label": "MACRO",
+                "kind": "button",
+                "description": "Changes the source-select row to macro operation. Stored routines are not included in this trainer.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.transition.background",
+                "label": "BKGD next transition",
+                "kind": "button",
+                "description": "Includes the background picture in the next transition. The basic practice keeps BKGD selected and all keys off.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-start",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.key.1.on",
+                "label": "Upstream key 1 ON",
+                "kind": "button",
+                "description": "Puts upstream key 1 on or off air. An illuminated key does not identify its content; inspect the actual output first.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.key.1.next",
+                "label": "KEY 1 next transition",
+                "kind": "button",
+                "description": "Includes upstream key 1 in the next transition. This differs from its ON button.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.key.2.on",
+                "label": "Upstream key 2 ON",
+                "kind": "button",
+                "description": "Puts upstream key 2 on or off air. An illuminated key does not identify its content; inspect the actual output first.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.key.2.next",
+                "label": "KEY 2 next transition",
+                "kind": "button",
+                "description": "Includes upstream key 2 in the next transition. This differs from its ON button.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.key.3.on",
+                "label": "Upstream key 3 ON",
+                "kind": "button",
+                "description": "Puts upstream key 3 on or off air. An illuminated key does not identify its content; inspect the actual output first.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.key.3.next",
+                "label": "KEY 3 next transition",
+                "kind": "button",
+                "description": "Includes upstream key 3 in the next transition. This differs from its ON button.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.key.4.on",
+                "label": "Upstream key 4 ON",
+                "kind": "button",
+                "description": "Puts upstream key 4 on or off air. An illuminated key does not identify its content; inspect the actual output first.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.key.4.next",
+                "label": "KEY 4 next transition",
+                "kind": "button",
+                "description": "Includes upstream key 4 in the next transition. This differs from its ON button.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.transition.dip",
+                "label": "DIP transition control",
+                "kind": "button",
+                "description": "Selects the dip transition style. This trainer simulates MIX only.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.transition.dve",
+                "label": "DVE transition control",
+                "kind": "button",
+                "description": "Selects the dve transition style. This trainer simulates MIX only.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.transition.sting",
+                "label": "STING transition control",
+                "kind": "button",
+                "description": "Selects the sting transition style. This trainer simulates MIX only.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.transition.mix",
+                "label": "MIX transition control",
+                "kind": "button",
+                "description": "Selects a mix (dissolve) for the next transition. AUTO follows the selected style and rate.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-start",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.transition.wipe",
+                "label": "WIPE transition control",
+                "kind": "button",
+                "description": "Selects the wipe transition style. This trainer simulates MIX only.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.transition.arm",
+                "label": "ARM transition control",
+                "kind": "button",
+                "description": "Arms a configured transition function. Its context is not simulated.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.transition.cut",
+                "label": "CUT",
+                "kind": "button",
+                "description": "Immediately completes the selected next transition. With BKGD selected and keys off, Program and Preview exchange sources.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-start",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.transition.auto",
+                "label": "AUTO",
+                "kind": "button",
+                "description": "Runs the selected transition at its configured rate. The practice uses a 1.2-second MIX, an illustrative training setting.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-start",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.transition.tbar",
+                "label": "Manual transition lever (T-bar)",
+                "kind": "tbar",
+                "description": "Controls transition progress by hand. Between endpoints, both selected Program and Preview source buttons are red. Complete the travel to exchange sources, or return to the starting end to cancel the partial MIX.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-start",
+                  "bmd-manual",
+                  "user-tbar-tally-2026-09-20"
+                ],
+                "fmpEvidence": true
+              },
+              {
+                "id": "atem.dsk.1.tie",
+                "label": "DSK 1 TIE",
+                "kind": "button",
+                "description": "Puts downstream key 1 onto the preview output and ties it to the main transition, so it goes to air with the next cut or auto rather than on its own. Because it is tied, it moves at the auto rate from the LCD home menu, not the DSK rate. Tying the key does not change what clean feed 1 carries.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.dsk.1.cut",
+                "label": "DSK 1 CUT",
+                "kind": "button",
+                "description": "Immediately toggles downstream key 1. Check whether the key is on before using it to remove a graphic.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.dsk.1.auto",
+                "label": "DSK 1 AUTO",
+                "kind": "button",
+                "description": "Mixes downstream key 1 on or off air by itself, at the DSK rate set in the LCD menu rather than the main transition rate. Use it when a lower third should come and go independently of the picture behind it.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.dsk.2.tie",
+                "label": "DSK 2 TIE",
+                "kind": "button",
+                "description": "Puts downstream key 2 onto the preview output and ties it to the main transition, so it goes to air with the next cut or auto rather than on its own. Because it is tied, it moves at the auto rate from the LCD home menu, not the DSK rate. Tying the key does not change what clean feed 1 carries.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.dsk.2.cut",
+                "label": "DSK 2 CUT",
+                "kind": "button",
+                "description": "Immediately toggles downstream key 2. Check whether the key is on before using it to remove a graphic.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.dsk.2.auto",
+                "label": "DSK 2 AUTO",
+                "kind": "button",
+                "description": "Mixes downstream key 2 on or off air by itself, at the DSK rate set in the LCD menu rather than the main transition rate. Use it when a lower third should come and go independently of the picture behind it.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.transition.ftb",
+                "label": "FTB · Fade to black",
+                "kind": "button",
+                "description": "Fades the Program output to black, including its layers. Press again to fade back. The practice models video only, not audio fade behavior.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-start",
+                  "bmd-manual"
+                ]
+              }
+            ]
+          },
+          {
+            "category": "Aux, record & stream",
+            "parts": [
+              {
+                "id": "atem.aux.source.1",
+                "label": "Aux source 1",
+                "kind": "button",
+                "description": "Shortcut that routes SDI input 1 to whichever aux output is armed. For sources without a shortcut — colour bars, media players, or a clean feed taken before the downstream keyers — press the aux button in system control and dial the source in on the knob under that output.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.aux.source.2",
+                "label": "Aux source 2",
+                "kind": "button",
+                "description": "Shortcut that routes SDI input 2 to whichever aux output is armed. For sources without a shortcut — colour bars, media players, or a clean feed taken before the downstream keyers — press the aux button in system control and dial the source in on the knob under that output.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.aux.source.3",
+                "label": "Aux source 3",
+                "kind": "button",
+                "description": "Shortcut that routes SDI input 3 to whichever aux output is armed. For sources without a shortcut — colour bars, media players, or a clean feed taken before the downstream keyers — press the aux button in system control and dial the source in on the knob under that output.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.aux.source.4",
+                "label": "Aux source 4",
+                "kind": "button",
+                "description": "Shortcut that routes SDI input 4 to whichever aux output is armed. For sources without a shortcut — colour bars, media players, or a clean feed taken before the downstream keyers — press the aux button in system control and dial the source in on the knob under that output.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.aux.source.5",
+                "label": "Aux source PGM",
+                "kind": "button",
+                "description": "Sends the program feed to whichever aux output is armed. A switch on an aux output is always clean, so you can cut on an aux without glitching it.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.aux.source.6",
+                "label": "Aux source 5",
+                "kind": "button",
+                "description": "Shortcut that routes SDI input 5 to whichever aux output is armed. For sources without a shortcut — colour bars, media players, or a clean feed taken before the downstream keyers — press the aux button in system control and dial the source in on the knob under that output.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.aux.source.7",
+                "label": "Aux source 6",
+                "kind": "button",
+                "description": "Shortcut that routes SDI input 6 to whichever aux output is armed. For sources without a shortcut — colour bars, media players, or a clean feed taken before the downstream keyers — press the aux button in system control and dial the source in on the knob under that output.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.aux.source.8",
+                "label": "Aux source 7",
+                "kind": "button",
+                "description": "Shortcut that routes SDI input 7 to whichever aux output is armed. For sources without a shortcut — colour bars, media players, or a clean feed taken before the downstream keyers — press the aux button in system control and dial the source in on the knob under that output.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.aux.source.9",
+                "label": "Aux source 8",
+                "kind": "button",
+                "description": "Shortcut that routes SDI input 8 to whichever aux output is armed. For sources without a shortcut — colour bars, media players, or a clean feed taken before the downstream keyers — press the aux button in system control and dial the source in on the knob under that output.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.aux.source.10",
+                "label": "Aux source M/V / PVW",
+                "kind": "button",
+                "description": "Toggles the armed aux output between multiview and preview. It lights white for multiview and green for preview, so the colour tells you which one is feeding that output.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.aux.target.1",
+                "label": "AUX 1 target",
+                "kind": "button",
+                "description": "Selects Aux 1 as the destination for the auxiliary source buttons.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-spec",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.aux.target.2",
+                "label": "AUX 2 target",
+                "kind": "button",
+                "description": "Selects Aux 2 as the destination for the auxiliary source buttons.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-spec",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.record.grab-still",
+                "label": "GRAB STILL",
+                "kind": "button",
+                "description": "Captures a still from the switcher. Recording and storage are not simulated.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.record.record",
+                "label": "REC",
+                "kind": "button",
+                "description": "Starts recording to configured storage. Recording and storage are not simulated.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.record.switch-disk",
+                "label": "SWITCH",
+                "kind": "button",
+                "description": "Switches recording storage where configured. Recording and storage are not simulated.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.record.record-stop",
+                "label": "STOP",
+                "kind": "button",
+                "description": "Ends the recording started with REC. Worth knowing before you plan a show: if the switcher is running an interlaced standard such as 1080i60 it can record or stream, but not both at once. Recording and storage are not simulated.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.stream.on",
+                "label": "Stream ON AIR",
+                "kind": "button",
+                "description": "Starts the configured stream. The stream ON AIR light is separate from Program-source selection. No streaming is performed by this trainer.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.stream.off",
+                "label": "Stream OFF",
+                "kind": "button",
+                "description": "Stops the configured stream. The stream ON AIR light is separate from Program-source selection. No streaming is performed by this trainer.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              }
+            ]
+          },
+          {
+            "category": "System & talkback",
+            "parts": [
+              {
+                "id": "atem.talk.call",
+                "label": "CALL talkback control",
+                "kind": "small",
+                "description": "Talkback / monitoring control labeled CALL. Monitor and talkback settings are not simulated.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.talk.pgm-mix",
+                "label": "PGM MIX talkback control",
+                "kind": "small",
+                "description": "Talkback / monitoring control labeled PGM MIX. Monitor and talkback settings are not simulated.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.talk.dim",
+                "label": "DIM talkback control",
+                "kind": "small",
+                "description": "Talkback / monitoring control labeled DIM. Monitor and talkback settings are not simulated.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.talk.mute",
+                "label": "MUTE talkback control",
+                "kind": "small",
+                "description": "Talkback / monitoring control labeled MUTE. Monitor and talkback settings are not simulated.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.talk.cans",
+                "label": "CANS talkback control",
+                "kind": "small",
+                "description": "Talkback / monitoring control labeled CANS. Monitor and talkback settings are not simulated.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.talk.spkr",
+                "label": "SPKR talkback control",
+                "kind": "small",
+                "description": "Talkback / monitoring control labeled SPKR. Monitor and talkback settings are not simulated.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.talk.talk",
+                "label": "TALK talkback control",
+                "kind": "small",
+                "description": "Talkback / monitoring control labeled TALK. Monitor and talkback settings are not simulated.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.talk.studio",
+                "label": "STUDIO talkback control",
+                "kind": "small",
+                "description": "Talkback / monitoring control labeled STUDIO. Monitor and talkback settings are not simulated.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.menu.home",
+                "label": "HOME menu",
+                "kind": "small",
+                "description": "Returns the LCD to its Home page. Preview and Program source names are visible here.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.menu.settings",
+                "label": "SETTINGS menu",
+                "kind": "small",
+                "description": "Opens or navigates the SETTINGS LCD menu. Menu settings are not emulated.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.menu.keyers",
+                "label": "KEYERS menu",
+                "kind": "small",
+                "description": "Opens or navigates the KEYERS LCD menu. Menu settings are not emulated.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.menu.previous",
+                "label": "◀ menu",
+                "kind": "small",
+                "description": "Opens or navigates the ◀ LCD menu. Menu settings are not emulated.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.menu.next",
+                "label": "▶ menu",
+                "kind": "small",
+                "description": "Opens or navigates the ▶ LCD menu. Menu settings are not emulated.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.menu.mix",
+                "label": "MIX menu",
+                "kind": "small",
+                "description": "Opens or navigates the MIX LCD menu. Menu settings are not emulated.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.menu.wipe",
+                "label": "WIPE menu",
+                "kind": "small",
+                "description": "Opens or navigates the WIPE LCD menu. Menu settings are not emulated.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.menu.dve",
+                "label": "DVE menu",
+                "kind": "small",
+                "description": "Opens or navigates the DVE LCD menu. Menu settings are not emulated.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.menu.stinger",
+                "label": "STINGER menu",
+                "kind": "small",
+                "description": "Opens or navigates the STINGER LCD menu. Menu settings are not emulated.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.menu.dip",
+                "label": "DIP menu",
+                "kind": "small",
+                "description": "Opens or navigates the DIP LCD menu. Menu settings are not emulated.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.menu.ftb",
+                "label": "FTB menu",
+                "kind": "small",
+                "description": "Opens or navigates the FTB LCD menu. Menu settings are not emulated.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.menu.media-players",
+                "label": "MEDIA PLAYERS menu",
+                "kind": "small",
+                "description": "Opens or navigates the MEDIA PLAYERS LCD menu. Menu settings are not emulated.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.menu.border",
+                "label": "BORDER menu",
+                "kind": "small",
+                "description": "Opens or navigates the BORDER LCD menu. Menu settings are not emulated.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.menu.color",
+                "label": "COLOR menu",
+                "kind": "small",
+                "description": "Opens or navigates the COLOR LCD menu. Menu settings are not emulated.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.menu.talk",
+                "label": "TALK menu",
+                "kind": "small",
+                "description": "Opens or navigates the TALK LCD menu. Menu settings are not emulated.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.menu.macro",
+                "label": "MACRO menu",
+                "kind": "small",
+                "description": "Opens or navigates the MACRO LCD menu. Menu settings are not emulated.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.menu.supersource",
+                "label": "SUPER SOURCE menu",
+                "kind": "small",
+                "description": "Opens or navigates the SUPER SOURCE LCD menu. Menu settings are not emulated.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.menu.camera-control",
+                "label": "CAMERA CONTROL menu",
+                "kind": "small",
+                "description": "Opens or navigates the CAMERA CONTROL LCD menu. Menu settings are not emulated.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.menu.audio",
+                "label": "AUDIO menu",
+                "kind": "small",
+                "description": "Opens or navigates the AUDIO LCD menu. Menu settings are not emulated.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.menu.aux",
+                "label": "AUX menu",
+                "kind": "small",
+                "description": "Opens or navigates the AUX LCD menu. Menu settings are not emulated.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.system.lcd",
+                "label": "System LCD",
+                "kind": "display",
+                "description": "Context-sensitive system display. The training Home page mirrors simulated Preview and Program names.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-product"
+                ]
+              },
+              {
+                "id": "atem.system.soft.1",
+                "label": "LCD soft key 1",
+                "kind": "small",
+                "description": "Soft key 1, above the LCD. It selects whatever option the LCD prints directly above it, so its meaning changes with every menu — on the settings menu these are how you reach button mapping and the HyperDeck setup.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.system.encoder.1",
+                "label": "LCD encoder 1",
+                "kind": "knob",
+                "description": "Knob 1, below the LCD. It adjusts the parameter printed above it on the current page. Pressing a knob can open its value for keypad entry — press the auto rate knob, for example, and the keypad lights so you can type a duration.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.system.soft.2",
+                "label": "LCD soft key 2",
+                "kind": "small",
+                "description": "Soft key 2, above the LCD. It selects whatever option the LCD prints directly above it, so its meaning changes with every menu — on the settings menu these are how you reach button mapping and the HyperDeck setup.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.system.encoder.2",
+                "label": "LCD encoder 2",
+                "kind": "knob",
+                "description": "Knob 2, below the LCD. It adjusts the parameter printed above it on the current page. Pressing a knob can open its value for keypad entry — press the auto rate knob, for example, and the keypad lights so you can type a duration.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.system.soft.3",
+                "label": "LCD soft key 3",
+                "kind": "small",
+                "description": "Soft key 3, above the LCD. It selects whatever option the LCD prints directly above it, so its meaning changes with every menu — on the settings menu these are how you reach button mapping and the HyperDeck setup.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.system.encoder.3",
+                "label": "LCD encoder 3",
+                "kind": "knob",
+                "description": "Knob 3, below the LCD. It adjusts the parameter printed above it on the current page. Pressing a knob can open its value for keypad entry — press the auto rate knob, for example, and the keypad lights so you can type a duration.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.system.soft.4",
+                "label": "LCD soft key 4",
+                "kind": "small",
+                "description": "Soft key 4, above the LCD. It selects whatever option the LCD prints directly above it, so its meaning changes with every menu — on the settings menu these are how you reach button mapping and the HyperDeck setup.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.system.encoder.4",
+                "label": "LCD encoder 4",
+                "kind": "knob",
+                "description": "Knob 4, below the LCD. It adjusts the parameter printed above it on the current page. Pressing a knob can open its value for keypad entry — press the auto rate knob, for example, and the keypad lights so you can type a duration.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.keypad.1",
+                "label": "Keypad 1",
+                "kind": "small",
+                "description": "Jumps straight to page 1 of the open LCD menu, skipping repeated presses of the arrow buttons. It lights whenever the open menu has more than one page. When a value is being edited — after pressing a knob such as auto rate — the same key types the digit 1 instead.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.keypad.2",
+                "label": "Keypad 2",
+                "kind": "small",
+                "description": "Jumps straight to page 2 of the open LCD menu, skipping repeated presses of the arrow buttons. It lights whenever the open menu has more than one page. When a value is being edited — after pressing a knob such as auto rate — the same key types the digit 2 instead.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.keypad.3",
+                "label": "Keypad 3",
+                "kind": "small",
+                "description": "Jumps straight to page 3 of the open LCD menu, skipping repeated presses of the arrow buttons. It lights whenever the open menu has more than one page. When a value is being edited — after pressing a knob such as auto rate — the same key types the digit 3 instead.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.keypad.4",
+                "label": "Keypad 4",
+                "kind": "small",
+                "description": "Jumps straight to page 4 of the open LCD menu, skipping repeated presses of the arrow buttons. It lights whenever the open menu has more than one page. When a value is being edited — after pressing a knob such as auto rate — the same key types the digit 4 instead. In the general settings menu, page 4 is the brightness controls.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.keypad.5",
+                "label": "Keypad 5",
+                "kind": "small",
+                "description": "Jumps straight to page 5 of the open LCD menu, skipping repeated presses of the arrow buttons. It lights whenever the open menu has more than one page. When a value is being edited — after pressing a knob such as auto rate — the same key types the digit 5 instead.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.keypad.6",
+                "label": "Keypad 6",
+                "kind": "small",
+                "description": "Jumps straight to page 6 of the open LCD menu, skipping repeated presses of the arrow buttons. It lights whenever the open menu has more than one page. When a value is being edited — after pressing a knob such as auto rate — the same key types the digit 6 instead. In the general settings menu, page 6 is the switching mode choice between program/preview and A/B direct.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.keypad.7",
+                "label": "Keypad 7",
+                "kind": "small",
+                "description": "Jumps straight to page 7 of the open LCD menu, skipping repeated presses of the arrow buttons. It lights whenever the open menu has more than one page. When a value is being edited — after pressing a knob such as auto rate — the same key types the digit 7 instead.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.keypad.8",
+                "label": "Keypad 8",
+                "kind": "small",
+                "description": "Jumps straight to page 8 of the open LCD menu, skipping repeated presses of the arrow buttons. It lights whenever the open menu has more than one page. When a value is being edited — after pressing a knob such as auto rate — the same key types the digit 8 instead.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.keypad.9",
+                "label": "Keypad 9",
+                "kind": "small",
+                "description": "Jumps straight to page 9 of the open LCD menu, skipping repeated presses of the arrow buttons. It lights whenever the open menu has more than one page. When a value is being edited — after pressing a knob such as auto rate — the same key types the digit 9 instead.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.keypad.enter",
+                "label": "Keypad ENTER",
+                "kind": "small",
+                "description": "Confirms a value typed on the keypad — a new auto-transition duration, for example, after pressing the auto rate knob. Until ENTER is pressed the previous value still stands.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.keypad.0",
+                "label": "Keypad 0",
+                "kind": "small",
+                "description": "Jumps straight to page 0 of the open LCD menu, skipping repeated presses of the arrow buttons. It lights whenever the open menu has more than one page. When a value is being edited — after pressing a knob such as auto rate — the same key types the digit 0 instead.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-front",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.keypad.reset",
+                "label": "Keypad RESET",
+                "kind": "small",
+                "description": "Labelled RESET on this unit, but the June 2026 operation manual does not describe a keypad reset key anywhere in its control panel chapters. Its exact behaviour is unverified here and is deliberately not guessed at. Do not press it mid-show on the assumption that it only clears a half-typed number.",
+                "evidence": "Unknown",
+                "sourceRefs": [
+                  "photo-front"
+                ]
+              }
+            ]
+          },
+          {
+            "category": "Rear connections",
+            "parts": [
+              {
+                "id": "atem.rear.ac",
+                "label": "AC power input",
+                "kind": "iec",
+                "description": "IEC mains power input. Power connections are identification-only in this guide.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-rear",
+                  "bmd-spec"
+                ]
+              },
+              {
+                "id": "atem.rear.dc",
+                "label": "12 V DC power input",
+                "kind": "xlr",
+                "description": "4-pin XLR 12 V DC input. Pinouts and power procedures are outside this trainer.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-rear",
+                  "bmd-spec"
+                ]
+              },
+              {
+                "id": "atem.rear.reference.out",
+                "label": "Reference OUT",
+                "kind": "bnc",
+                "description": "Reference output on BNC. Feeds a tri-sync or black burst signal on to other equipment so a whole facility can lock to one timing source.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-rear",
+                  "bmd-spec"
+                ]
+              },
+              {
+                "id": "atem.rear.reference.in",
+                "label": "Reference IN",
+                "kind": "bnc",
+                "description": "Reference input on BNC, accepting tri-sync or black burst. Genlocking the switcher to house reference is what keeps it in step with other kit; without it, equipment drifts and cuts can tear.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-rear",
+                  "bmd-spec"
+                ]
+              },
+              {
+                "id": "atem.rear.timecode.out",
+                "label": "Timecode OUT",
+                "kind": "bnc",
+                "description": "Timecode output on BNC, sending the switcher’s own timecode to recorders and editors so material lines up afterwards.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-rear",
+                  "bmd-spec"
+                ]
+              },
+              {
+                "id": "atem.rear.timecode.in",
+                "label": "Timecode IN",
+                "kind": "bnc",
+                "description": "Timecode input on BNC. The switcher free-runs time-of-day timecode from power-on, so feed it an external clock when a recording has to match another machine frame for frame.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-rear",
+                  "bmd-spec"
+                ]
+              },
+              {
+                "id": "atem.rear.madi.out",
+                "label": "MADI OUT",
+                "kind": "bnc",
+                "description": "MADI digital audio output carrying up to 32 channels on one BNC. It is a digital audio connector, not an SDI video output, despite the identical socket.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-rear",
+                  "bmd-spec"
+                ]
+              },
+              {
+                "id": "atem.rear.madi.in",
+                "label": "MADI IN",
+                "kind": "bnc",
+                "description": "MADI digital audio input, up to 32 channels on one BNC. It is a digital audio connector, not an SDI video input, despite the identical socket.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-rear",
+                  "bmd-spec"
+                ]
+              },
+              {
+                "id": "atem.rear.usb.1",
+                "label": "USB-C 1",
+                "kind": "usb",
+                "description": "One of two USB-C ports (USB 3.0). Record the program here to an external SSD or flash drive, or use the port as a webcam output or for software control. With two drives connected you can move recording between them with the SWITCH button without stopping. Format drives as HFS+ where you can — it journals, so a corrupted disk is more likely to be recoverable — or exFAT if the media has to be read on Windows too.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-rear",
+                  "bmd-spec",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.rear.usb.2",
+                "label": "USB-C 2",
+                "kind": "usb",
+                "description": "One of two USB-C ports (USB 3.0). Record the program here to an external SSD or flash drive, or use the port as a webcam output or for software control. With two drives connected you can move recording between them with the SWITCH button without stopping. Format drives as HFS+ where you can — it journals, so a corrupted disk is more likely to be recoverable — or exFAT if the media has to be read on Windows too.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-rear",
+                  "bmd-spec",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.rear.remote",
+                "label": "REMOTE · RJ12 RS-422",
+                "kind": "rj",
+                "description": "Remote RS-422 connector on RJ12. It is not an Ethernet port.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-rear",
+                  "bmd-spec"
+                ]
+              },
+              {
+                "id": "atem.rear.talkback",
+                "label": "TALKBACK · RJ45 expansion",
+                "kind": "rj",
+                "description": "Talkback expansion on an RJ45 connector. It is not one of the four Ethernet network ports.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-rear",
+                  "bmd-spec"
+                ]
+              },
+              {
+                "id": "atem.rear.ethernet.1",
+                "label": "Ethernet port 1",
+                "kind": "rj",
+                "description": "One port of the built-in four-port 10/100/1000 BASE-T switch, so the switcher can share a single network drop with other gear. The network carries ATEM Software Control, hardware panels such as the ATEM Camera Control Panel, and direct streaming. On an HD8 ISO it also carries video: streaming sources arriving over Ethernet, such as a Blackmagic Studio Camera 6K Pro, can be selected as switcher inputs.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-rear",
+                  "bmd-spec",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.rear.ethernet.2",
+                "label": "Ethernet port 2",
+                "kind": "rj",
+                "description": "One port of the built-in four-port 10/100/1000 BASE-T switch, so the switcher can share a single network drop with other gear. The network carries ATEM Software Control, hardware panels such as the ATEM Camera Control Panel, and direct streaming. On an HD8 ISO it also carries video: streaming sources arriving over Ethernet, such as a Blackmagic Studio Camera 6K Pro, can be selected as switcher inputs.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-rear",
+                  "bmd-spec",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.rear.ethernet.3",
+                "label": "Ethernet port 3",
+                "kind": "rj",
+                "description": "One port of the built-in four-port 10/100/1000 BASE-T switch, so the switcher can share a single network drop with other gear. The network carries ATEM Software Control, hardware panels such as the ATEM Camera Control Panel, and direct streaming. On an HD8 ISO it also carries video: streaming sources arriving over Ethernet, such as a Blackmagic Studio Camera 6K Pro, can be selected as switcher inputs.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-rear",
+                  "bmd-spec",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.rear.ethernet.4",
+                "label": "Ethernet port 4",
+                "kind": "rj",
+                "description": "One port of the built-in four-port 10/100/1000 BASE-T switch, so the switcher can share a single network drop with other gear. The network carries ATEM Software Control, hardware panels such as the ATEM Camera Control Panel, and direct streaming. On an HD8 ISO it also carries video: streaming sources arriving over Ethernet, such as a Blackmagic Studio Camera 6K Pro, can be selected as switcher inputs.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-rear",
+                  "bmd-spec",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.rear.sdi-out.1",
+                "label": "Camera return SDI OUT 1",
+                "kind": "bnc",
+                "description": "Return feed 1. Patch this to a camera’s program SDI input and it carries the return picture plus the camera control packets — the switcher broadcasts those on every non-downconverted SDI output, which is how shading and tally reach the camera down one cable. Tally follows the camera’s own ID number, not the socket, so a camera on input 1 must be set to 1 or the wrong operator gets the light. Camera control is never sent on the multiview outputs. This is a return feed, not an ISO record output.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-rear",
+                  "bmd-spec",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.rear.sdi-in.1",
+                "label": "SDI INPUT 1",
+                "kind": "bnc",
+                "description": "3G-SDI video input 1 with input re-synchronization and format conversion within supported standards.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-rear",
+                  "bmd-spec"
+                ]
+              },
+              {
+                "id": "atem.rear.sdi-out.2",
+                "label": "Camera return SDI OUT 2",
+                "kind": "bnc",
+                "description": "Return feed 2. Patch this to a camera’s program SDI input and it carries the return picture plus the camera control packets — the switcher broadcasts those on every non-downconverted SDI output, which is how shading and tally reach the camera down one cable. Tally follows the camera’s own ID number, not the socket, so a camera on input 2 must be set to 2 or the wrong operator gets the light. Camera control is never sent on the multiview outputs. This is a return feed, not an ISO record output.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-rear",
+                  "bmd-spec",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.rear.sdi-in.2",
+                "label": "SDI INPUT 2",
+                "kind": "bnc",
+                "description": "3G-SDI video input 2 with input re-synchronization and format conversion within supported standards.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-rear",
+                  "bmd-spec"
+                ]
+              },
+              {
+                "id": "atem.rear.sdi-out.3",
+                "label": "Camera return SDI OUT 3",
+                "kind": "bnc",
+                "description": "Return feed 3. Patch this to a camera’s program SDI input and it carries the return picture plus the camera control packets — the switcher broadcasts those on every non-downconverted SDI output, which is how shading and tally reach the camera down one cable. Tally follows the camera’s own ID number, not the socket, so a camera on input 3 must be set to 3 or the wrong operator gets the light. Camera control is never sent on the multiview outputs. This is a return feed, not an ISO record output.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-rear",
+                  "bmd-spec",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.rear.sdi-in.3",
+                "label": "SDI INPUT 3",
+                "kind": "bnc",
+                "description": "3G-SDI video input 3 with input re-synchronization and format conversion within supported standards.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-rear",
+                  "bmd-spec"
+                ]
+              },
+              {
+                "id": "atem.rear.sdi-out.4",
+                "label": "Camera return SDI OUT 4",
+                "kind": "bnc",
+                "description": "Return feed 4. Patch this to a camera’s program SDI input and it carries the return picture plus the camera control packets — the switcher broadcasts those on every non-downconverted SDI output, which is how shading and tally reach the camera down one cable. Tally follows the camera’s own ID number, not the socket, so a camera on input 4 must be set to 4 or the wrong operator gets the light. Camera control is never sent on the multiview outputs. This is a return feed, not an ISO record output.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-rear",
+                  "bmd-spec",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.rear.sdi-in.4",
+                "label": "SDI INPUT 4",
+                "kind": "bnc",
+                "description": "3G-SDI video input 4 with input re-synchronization and format conversion within supported standards.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-rear",
+                  "bmd-spec"
+                ]
+              },
+              {
+                "id": "atem.rear.sdi-out.5",
+                "label": "Camera return SDI OUT 5",
+                "kind": "bnc",
+                "description": "Return feed 5. Patch this to a camera’s program SDI input and it carries the return picture plus the camera control packets — the switcher broadcasts those on every non-downconverted SDI output, which is how shading and tally reach the camera down one cable. Tally follows the camera’s own ID number, not the socket, so a camera on input 5 must be set to 5 or the wrong operator gets the light. Camera control is never sent on the multiview outputs. This is a return feed, not an ISO record output.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-rear",
+                  "bmd-spec",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.rear.sdi-in.5",
+                "label": "SDI INPUT 5",
+                "kind": "bnc",
+                "description": "3G-SDI video input 5 with input re-synchronization and format conversion within supported standards.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-rear",
+                  "bmd-spec"
+                ]
+              },
+              {
+                "id": "atem.rear.sdi-out.6",
+                "label": "Camera return SDI OUT 6",
+                "kind": "bnc",
+                "description": "Return feed 6. Patch this to a camera’s program SDI input and it carries the return picture plus the camera control packets — the switcher broadcasts those on every non-downconverted SDI output, which is how shading and tally reach the camera down one cable. Tally follows the camera’s own ID number, not the socket, so a camera on input 6 must be set to 6 or the wrong operator gets the light. Camera control is never sent on the multiview outputs. This is a return feed, not an ISO record output.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-rear",
+                  "bmd-spec",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.rear.sdi-in.6",
+                "label": "SDI INPUT 6",
+                "kind": "bnc",
+                "description": "3G-SDI video input 6 with input re-synchronization and format conversion within supported standards.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-rear",
+                  "bmd-spec"
+                ]
+              },
+              {
+                "id": "atem.rear.sdi-out.7",
+                "label": "Camera return SDI OUT 7",
+                "kind": "bnc",
+                "description": "Return feed 7. Patch this to a camera’s program SDI input and it carries the return picture plus the camera control packets — the switcher broadcasts those on every non-downconverted SDI output, which is how shading and tally reach the camera down one cable. Tally follows the camera’s own ID number, not the socket, so a camera on input 7 must be set to 7 or the wrong operator gets the light. Camera control is never sent on the multiview outputs. This is a return feed, not an ISO record output.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-rear",
+                  "bmd-spec",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.rear.sdi-in.7",
+                "label": "SDI INPUT 7",
+                "kind": "bnc",
+                "description": "3G-SDI video input 7 with input re-synchronization and format conversion within supported standards.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-rear",
+                  "bmd-spec"
+                ]
+              },
+              {
+                "id": "atem.rear.sdi-out.8",
+                "label": "Camera return SDI OUT 8",
+                "kind": "bnc",
+                "description": "Return feed 8. Patch this to a camera’s program SDI input and it carries the return picture plus the camera control packets — the switcher broadcasts those on every non-downconverted SDI output, which is how shading and tally reach the camera down one cable. Tally follows the camera’s own ID number, not the socket, so a camera on input 8 must be set to 8 or the wrong operator gets the light. Camera control is never sent on the multiview outputs. This is a return feed, not an ISO record output.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-rear",
+                  "bmd-spec",
+                  "bmd-manual"
+                ]
+              },
+              {
+                "id": "atem.rear.sdi-in.8",
+                "label": "SDI INPUT 8",
+                "kind": "bnc",
+                "description": "3G-SDI video input 8 with input re-synchronization and format conversion within supported standards.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-rear",
+                  "bmd-spec"
+                ]
+              },
+              {
+                "id": "atem.rear.aux.2",
+                "label": "AUX 2 · SDI output",
+                "kind": "bnc",
+                "description": "Independently routed auxiliary SDI output 2. A venue destination cannot be inferred from this product photo.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-rear",
+                  "bmd-spec"
+                ]
+              },
+              {
+                "id": "atem.rear.aux.1",
+                "label": "AUX 1 · SDI output",
+                "kind": "bnc",
+                "description": "Independently routed auxiliary SDI output 1. A venue destination cannot be inferred from this product photo.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-rear",
+                  "bmd-spec"
+                ]
+              },
+              {
+                "id": "atem.rear.program",
+                "label": "PROGRAM · SDI output",
+                "kind": "bnc",
+                "description": "Main SDI Program output. Downstream venue routing is not established by this model.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-rear",
+                  "bmd-spec"
+                ]
+              },
+              {
+                "id": "atem.rear.multiview.sdi",
+                "label": "MULTIVIEW · SDI output",
+                "kind": "bnc",
+                "description": "SDI multiview output for monitoring multiple sources and switcher status.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-rear",
+                  "bmd-spec"
+                ]
+              },
+              {
+                "id": "atem.rear.multiview.hdmi",
+                "label": "MULTIVIEW · HDMI output",
+                "kind": "hdmi",
+                "description": "HDMI multiview output. This is an output, not an HDMI camera input.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-rear",
+                  "bmd-spec"
+                ]
+              },
+              {
+                "id": "atem.rear.control.l",
+                "label": "CONTROL OUT L",
+                "kind": "jack",
+                "description": "Quarter-inch analogue monitoring output, control out L. This is the pair you put on control-room speakers; pressing SPKR in the talkback block routes talkback here, and PGM MIX puts the programme mix on it.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-rear",
+                  "bmd-spec"
+                ]
+              },
+              {
+                "id": "atem.rear.control.r",
+                "label": "CONTROL OUT R",
+                "kind": "jack",
+                "description": "Quarter-inch analogue monitoring output, control out R. This is the pair you put on control-room speakers; pressing SPKR in the talkback block routes talkback here, and PGM MIX puts the programme mix on it.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-rear",
+                  "bmd-spec"
+                ]
+              },
+              {
+                "id": "atem.rear.studio.l",
+                "label": "STUDIO OUT L",
+                "kind": "jack",
+                "description": "Quarter-inch analogue monitoring output, studio out L. This pair feeds a speaker in the studio so talent can hear. Holding or double-pressing STUDIO while TALK is selected is what puts your microphone on it.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-rear",
+                  "bmd-spec"
+                ]
+              },
+              {
+                "id": "atem.rear.studio.r",
+                "label": "STUDIO OUT R",
+                "kind": "jack",
+                "description": "Quarter-inch analogue monitoring output, studio out R. This pair feeds a speaker in the studio so talent can hear. Holding or double-pressing STUDIO while TALK is selected is what puts your microphone on it.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-rear",
+                  "bmd-spec"
+                ]
+              },
+              {
+                "id": "atem.rear.rca.l",
+                "label": "STEREO IN L · RCA",
+                "kind": "rca",
+                "description": "Unbalanced stereo audio input L on RCA, for consumer-level sources such as a playback machine or a laptop feed. Unbalanced cable picks up hum over distance, so keep the run short or use the XLR inputs instead.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-rear",
+                  "bmd-spec"
+                ]
+              },
+              {
+                "id": "atem.rear.rca.r",
+                "label": "STEREO IN R · RCA",
+                "kind": "rca",
+                "description": "Unbalanced stereo audio input R on RCA, for consumer-level sources such as a playback machine or a laptop feed. Unbalanced cable picks up hum over distance, so keep the run short or use the XLR inputs instead.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-rear",
+                  "bmd-spec"
+                ]
+              },
+              {
+                "id": "atem.rear.analog.1",
+                "label": "ANALOG AUDIO IN CH 1",
+                "kind": "xlr",
+                "description": "Balanced analogue input 1 on 3-pin XLR. Balanced wiring rejects interference along the run, which is why this is the input to use for anything arriving from the far side of the building rather than the RCA pair.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-rear",
+                  "bmd-spec"
+                ]
+              },
+              {
+                "id": "atem.rear.analog.2",
+                "label": "ANALOG AUDIO IN CH 2",
+                "kind": "xlr",
+                "description": "Balanced analogue input 2 on 3-pin XLR. Balanced wiring rejects interference along the run, which is why this is the input to use for anything arriving from the far side of the building rather than the RCA pair.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-rear",
+                  "bmd-spec"
+                ]
+              },
+              {
+                "id": "atem.rear.headset",
+                "label": "TALKBACK · headset",
+                "kind": "xlr",
+                "description": "5-pin XLR talkback headset connection. This is distinct from the RJ45 talkback expansion port.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-rear",
+                  "bmd-spec"
+                ]
+              }
+            ]
+          },
+          {
+            "category": "Enclosure",
+            "parts": [
+              {
+                "id": "atem.chassis",
+                "label": "Enclosure",
+                "kind": "chassis",
+                "description": "Integrated desktop switcher enclosure with a raised system panel, sloping control deck and side ventilation.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "photo-perspective",
+                  "photo-side"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "sourceRefs": [
+        "photo-front",
+        "bmd-manual",
+        "bmd-start",
+        "bmd-product",
+        "bmd-spec",
+        "photo-rear",
+        "photo-perspective",
+        "photo-side"
+      ]
+    },
+    {
+      "id": "open-facts",
+      "title": "Open facts",
+      "type": "table",
+      "columns": [
+        "Item",
+        "Gap",
+        "Detail"
+      ],
+      "rows": [
+        [
+          "Keypad RESET",
+          "Not established",
+          "Labelled RESET on this unit, but the June 2026 operation manual does not describe a keypad reset key anywhere in its control panel chapters. Its exact behaviour is unverified here and is deliberately not guessed at. Do not press it mid-show on the assumption that it only clears a half-typed number."
+        ],
+        [
+          "Parts citing FMP evidence",
+          "21 parts",
+          "These parts cite an FMP record or operator report as well as equipment sources. Their descriptions may include behaviour observed on the FMP unit or an FMP-specific note, and each is flagged. Separating the two needs a distinct field in the fmp-suite catalog."
+        ],
+        [
+          "Connector specifications",
+          "Descriptive text only",
+          "The catalog records connectors as parts with descriptions. It has no structured connector fields (signal standard, format, pinout), so this sheet does not tabulate them."
+        ]
+      ],
+      "sourceRefs": [
+        "photo-front",
+        "bmd-start",
+        "bmd-manual",
+        "user-tbar-tally-2026-09-20"
+      ]
+    },
+    {
+      "id": "accuracy",
+      "title": "Accuracy log",
+      "type": "accuracyLog",
+      "sourceRefs": [
+        "bmd-spec",
+        "bmd-start",
+        "bmd-product",
+        "bmd-manual"
+      ]
+    }
+  ]
+}
