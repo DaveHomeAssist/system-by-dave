@@ -335,19 +335,28 @@ async function main() {
       const frontPose = await evaluate(`(() => {
         document.getElementById('ledPreviewFrontBtn').click();
         const canvas = document.querySelector('#ledWallPreview canvas');
-        return { yaw: Number(canvas.dataset.yaw), pitch: Number(canvas.dataset.pitch),
-          rect: canvas.getBoundingClientRect().toJSON() };
+        return { yaw: Number(canvas.dataset.yaw), pitch: Number(canvas.dataset.pitch) };
       })()`);
       if (frontPose.yaw !== 0 || frontPose.pitch !== 0) {
         throw new Error(`Reduced-motion front view did not settle immediately: ${JSON.stringify(frontPose)}.`);
       }
-      const x = frontPose.rect.left + frontPose.rect.width / 2;
-      const y = frontPose.rect.top + frontPose.rect.height / 2;
+      await delay(150);
+      const clickTarget = await evaluate(`(() => {
+        const canvas = document.querySelector('#ledWallPreview canvas');
+        const rect = canvas.getBoundingClientRect();
+        const x = rect.left + rect.width / 2;
+        const y = rect.top + rect.height / 2;
+        return { x, y, topElement: document.elementFromPoint(x, y)?.tagName || '' };
+      })()`);
+      if (clickTarget.topElement !== 'CANVAS') {
+        throw new Error(`3D canvas center is not clickable: ${JSON.stringify(clickTarget)}.`);
+      }
+      const { x, y } = clickTarget;
       await cdp('Input.dispatchMouseEvent', { type: 'mousePressed', x, y, button: 'left', clickCount: 1 });
       await cdp('Input.dispatchMouseEvent', { type: 'mouseReleased', x, y, button: 'left', clickCount: 1 });
       const clickedCabinet = await evaluate(`document.getElementById('ledCabinetInspection').textContent`);
       if (!clickedCabinet.includes('planned port') || clickedCabinet.includes('R1 C1 ·')) {
-        throw new Error(`3D cabinet click did not select a cabinet: ${clickedCabinet}.`);
+        throw new Error(`3D cabinet click did not select a cabinet: ${clickedCabinet}; target ${JSON.stringify(clickTarget)}.`);
       }
       console.log('PASS 3D cabinet click updates the inspector');
       await cdp('Input.dispatchMouseEvent', { type: 'mousePressed', x, y, button: 'left', clickCount: 1 });
