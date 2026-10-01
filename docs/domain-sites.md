@@ -204,10 +204,12 @@ previous portfolio-to-hub move from skipping the later hub-to-walk move.
 
 The walk split shipped on 2026-09-20: the `DaveHomeAssist/housevideo-walk` Pages
 repository, its deploy key and DNS/HTTPS for `walk.housevideo.app` came first, and
-the workflow publishes the destination before redirects. No record yet shows that
-Google OAuth and backend `FMP_ALLOWED_ORIGINS` accept `https://walk.housevideo.app`;
-verify both and record the auth variable described above. Authenticated walk
-acceptance remains a separate final gate.
+the workflow publishes the destination before redirects. The backend accepts
+`https://walk.housevideo.app`: on 2026-10-01 its `/health` CORS check matched the
+origin (commissioning gate 1 in `docs/fmp-public-release.md`). Only the Google
+client's owner can confirm the OAuth origin; record the auth variable described
+above once that is done. Authenticated walk acceptance remains a separate final
+gate.
 
 Do these per site, in order, and verify each before the next:
 

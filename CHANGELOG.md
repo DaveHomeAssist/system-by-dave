@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-10-01 — FMP reference pages, P240 manual links and hygiene probe alignment
+
+- The build, gear, house and PTZ reference pages had no icon link, so browsers requested `/favicon.ico`, which no domain serves; the live hygiene probe reported the 404 (W1, W2). They now carry the suite's inline icon, and their CSP `img-src` allows `data:` as the rig's already does.
+- The PTZ page's Manufacturer documents card links BirdDog's P240 user guide and tech specs, which the P240 model catalog already cites, instead of saying they were not on record.
+- Re-exported from fmp-suite `3c5819c`, the merge of DaveHomeAssist/fmp-suite#36, which also corrects stale status lines in that repository's README and Notion setup guide.
+- The hygiene probe's S1 check follows the public-shell contract: since 2026-09-22 FMP pages are exempt from the system home link (rule 1), so S1 now checks the return to `/fmp/` only. On 2026-10-01 it had warned on all twelve FMP pages while `verify:public-navigation` passed.
+- `docs/domain-sites.md` and `docs/fmp-public-release.md` describe the walk origin as live since its 2026-09-20 cutover rather than proposed, and say the hub's Operators view links it.
+
 ## 2026-10-01 — Camera work separated from FMP Walk
 
 - FMP Walk has five tabs: Setup, Walk, Faults, Report and Reference. The Camera tab and camera launch card are removed. Legacy camera links still forward to Camera Operator.
