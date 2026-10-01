@@ -1,0 +1,20 @@
+[
+  {
+    "file": "philadelphia.geojson",
+    "attribution": "City of Philadelphia",
+    "downloadUrl": "https://services.arcgis.com/fLeGjb7u4uXqeF9q/arcgis/rest/services/City_Limits/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=geojson",
+    "reference": "https://opendataphilly.org/datasets/city-limits/",
+    "license": "City of Philadelphia published open-data terms; supplied as-is",
+    "retrievedAt": "2026-09-28",
+    "sha256": "7cf4bb28468d048f2f775ae6f7a3f9d2db85f861e2b70839c18e097614dc69e2"
+  },
+  {
+    "file": "neighborhoods.geojson",
+    "attribution": "Robert Cheetham",
+    "downloadUrl": "https://raw.githubusercontent.com/opendataphilly/odp-data-storage/master/philadelphia-neighborhoods/philadelphia-neighborhoods.geojson",
+    "reference": "https://opendataphilly.org/datasets/philadelphia-neighborhoods/",
+    "license": "CC BY 4.0",
+    "retrievedAt": "2026-09-28",
+    "sha256": "69c189df692a95d21385e13515c514bebd9e2d3c32ef8a265159d3be7f3f6bab"
+  }
+]

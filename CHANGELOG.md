@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-01 — Philly Cheesesteak Heatmap at /cheesesteaks
+
+- Publish the Philly Cheesesteak Heatmap as a managed static export at `/cheesesteaks/`: a map of 28 real Philadelphia cheesesteak shops from OpenStreetMap, with heat from a year of public Reddit posts. Pages are noindex, read-only (no corrections or refresh), and link back to the System by Dave home.
+- The export is built in the private `DaveHomeAssist/philly-cheesesteak-heatmap` repository with `npm run build:static` and copied in with `npm run sync:cheesesteaks -- <checkout>`; do not hand-edit `cheesesteaks/`. The indexing gate now expects 153 tracked routes outside the sitemap.
+
 ## 2026-10-01 — Preserve legacy FMP walk confirmations
 
 - Regenerate the managed FMP release from canonical source `0f4de8ca282d0b115825802dd6bd7449e6ba574a` so legacy numeric-key and array checklists retain their confirmations, including Lawn readings excluded by a winter route.
