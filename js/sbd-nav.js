@@ -194,6 +194,11 @@
       }
 
       var navBox = nav.getBoundingClientRect();
+      if(!navBox.width || !navBox.height){
+        nav.style.removeProperty('bottom');
+        document.body.style.removeProperty('--sbd-nav-stack-clearance');
+        return;
+      }
       var dockBox = dock && dock.getBoundingClientRect();
       if(!dockBox || !dockBox.width || !dockBox.height
           || navBox.right <= dockBox.left || navBox.left >= dockBox.right){

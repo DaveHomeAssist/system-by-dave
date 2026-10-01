@@ -200,6 +200,22 @@ try {
     throw new Error(`no-show navigation changed: ${JSON.stringify(noShow)}`);
   }
   console.log('ok - tool navigation without show context');
+  await page.emulateMedia({ media: 'print' });
+  await page.waitForTimeout(100);
+  const printPadding = await page.evaluate(() => parseFloat(getComputedStyle(document.body).paddingBottom));
+  if (printPadding >= page.viewportSize().height / 2) {
+    throw new Error(`hidden navigation adds blank print space: ${printPadding}px`);
+  }
+  await page.emulateMedia({ media: 'screen' });
+  await page.waitForTimeout(100);
+  const restored = await page.evaluate(() => ({
+    clearance: parseFloat(getComputedStyle(document.body).paddingBottom),
+    required: innerHeight - document.querySelector('.sbd-nav').getBoundingClientRect().top,
+  }));
+  if (restored.clearance < restored.required) {
+    throw new Error(`screen clearance not restored after print: ${JSON.stringify(restored)}`);
+  }
+  console.log('ok - hidden print navigation and restored screen clearance');
   await page.close();
 } finally {
   if (browser) await browser.close();
