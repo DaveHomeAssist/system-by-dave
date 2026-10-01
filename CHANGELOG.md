@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-01 — Paged preshow walk workspace
+
+- Publish the FMP walk from canonical source `20d23c6c88c28d67c4a6381f688dbfe50728c727` with focused task selection and Back/Next instead of document or panel scrolling. Paginate long notes, reports, fault forms and dialogs while preserving saved observations and complete backup data.
+- Put dated photos and known faults in Reference and replace narrow route-strip buttons with a 44px station selector. Verify all contract viewport sizes, short/zoom-equivalent layouts, visual-viewport keyboard insets and existing walk workflows; extend the managed-release allowlist for the local paging assets.
+
 ## 2026-10-01 — Cheesesteak Heatmap photos and play
 
 - Sync `/cheesesteaks/` from philly-cheesesteak-heatmap `bf4d578`: a Pick for me button spins through the visible shops, lands on one (hotter shops are likelier) and flies the map there; an Order like a local builder shows and can speak the window order (for example "One Whiz wit"). Reduced motion skips the spin.
