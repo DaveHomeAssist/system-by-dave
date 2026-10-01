@@ -247,13 +247,16 @@ export default function App() {
       if (fallbackText !== undefined) downloadStoredWorkbook(readOnly);
       // The slot is replaced only while it still holds the copy the operator saw and backed up.
       const blank = await startBlankWorkbook(undefined, { replaceFallbackIfUnchanged: fallbackText });
-      const kept = fallbackText === undefined || fallbackHolds(fallbackText);
+      // Retention is claimed only for a copy this page actually read: an unreadable record was never seen.
+      const kept = fallbackText !== undefined ? fallbackHolds(fallbackText) : readOnly.raw !== undefined;
       setReadOnly(null);
       setWorkbook(blank);
       setActiveTab("overview");
       setMessage(kept
         ? "New blank workbook started. The previous workbook is still saved in this browser."
-        : "New blank workbook started. Storage failed again, so it took the previous workbook's fallback copy; the backup that downloaded holds that workbook.");
+        : fallbackText !== undefined
+          ? "New blank workbook started. Storage failed again, so it took the previous workbook's fallback copy; the backup that downloaded holds that workbook."
+          : "New blank workbook started. This browser could not read the previous workbook, so this page cannot confirm it is still saved.");
     } catch (error: unknown) {
       setMessage(error instanceof Error ? error.message : "A new workbook could not be saved.");
     } finally {
@@ -417,7 +420,9 @@ export default function App() {
           </div>
           <p className="read-only-note">{readOnly.source === "fallback"
             ? "Starting a new workbook makes it the active one. This workbook is kept only in the fallback copy, so a backup downloads first; if storage fails again, the new workbook takes that copy's place."
-            : "Starting a new workbook makes it the active one. The saved workbook stays in this browser; it is not deleted."}</p>
+            : readOnly.raw === undefined
+              ? "Starting a new workbook makes it the active one. This browser could not read the saved workbook, so this page cannot confirm it is still there."
+              : "Starting a new workbook makes it the active one. The saved workbook stays in this browser; it is not deleted."}</p>
           <small role="status" aria-live="polite">{message}</small>
         </section>
       </main>
