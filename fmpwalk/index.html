@@ -892,15 +892,16 @@ function load(){
   }catch(e){}
 }
 
-function history(){ try{ return JSON.parse(store.get(HIST_KEY)||"[]"); }catch(e){ return []; } }
+// Not named history(): a global function of that name would hide the browser's window.history.
+function walkHistory(){ try{ return JSON.parse(store.get(HIST_KEY)||"[]"); }catch(e){ return []; } }
 function repeatCount(posKey){
   if(!posKey) return 0;
-  var h = history(), n = 0;
+  var h = walkHistory(), n = 0;
   for(var i=0;i<h.length;i++){ if(h[i].pos === posKey) n++; }
   return n;
 }
 function pushHistory(){
-  var h = history();
+  var h = walkHistory();
   for(var i=0;i<S.faults.length;i++){
     h.push({pos:S.faults[i].pos, date:S.meta.date, sym:S.faults[i].sym.join(", ")});
   }
@@ -927,6 +928,20 @@ function restoreWalk(saved){ FMPWalkCore.restoreWalk(S, saved); }
 function availableStations(){ return FMPWalkCore.availableStations(S.meta); }
 function zoneGroups(){ return FMPWalkCore.zoneGroups(S.meta); }
 function stations(){ return FMPWalkCore.stations(S.meta); }
+// Setup and zone changes can reshape the route mid-walk. Stay on the same stop while it is still on the
+// route, otherwise go to the first stop not yet walked (walk UX audit #3). Only Start walk returns to stop 1.
+// A finished walk (S.idx past the last stop) stays finished unless the change adds a stop not yet walked.
+function keepStop(change){
+  var before = stations(), finished = S.idx >= before.length, id = !finished && before[S.idx] && before[S.idx].id;
+  var had = {}; before.forEach(function(s){ had[s.id] = true; });
+  change();
+  var after = stations(), at = -1, open = -1;
+  for(var i=0;i<after.length;i++){
+    if(after[i].id === id) at = i;
+    if(open < 0 && !(S.res[after[i].id] && S.res[after[i].id].status) && (!finished || !had[after[i].id])) open = i;
+  }
+  S.idx = at >= 0 ? at : open >= 0 ? open : finished ? after.length : Math.max(0, Math.min(S.idx, after.length - 1));
+}
 
 /* ══════════════════════ rendering ══════════════════════ */
 function esc(s){
@@ -1270,6 +1285,7 @@ function openSheet(station, existing){
   $("shBody").innerHTML = h;
   $("sheet").classList.add("on");
   $("sheetBg").classList.add("on");
+  if(!(history.state && history.state.fmpSheet)) history.pushState({fmpSheet:true}, "", location.href);
   $("sheet").setAttribute("aria-hidden","false");
   $("sheetBg").setAttribute("aria-hidden","false");
   setPageInert(true);
@@ -1346,6 +1362,8 @@ function openSheet(station, existing){
   };
 }
 function closeSheet(discardDraft, restoreFocus){
+  // Closed by Save, Cancel or Escape: drop the sheet's history entry without navigating.
+  if(history.state && history.state.fmpSheet){ skipSheetPop = true; history.back(); }
   if(window.FMPPhotos) window.FMPPhotos.closeFault();
   if(discardDraft) S.draft = null;
   window.__grabSheet = null;
@@ -1736,9 +1754,9 @@ function renderZones(){
     var selectable = group.checks.filter(function(s){ return s.tier !== 2; });
     if(!selectable.length) return;
     var enabled = selectable.some(function(s){ return !S.meta.checks[s.id]; });
-    selectable.forEach(function(s){ S.meta.checks[s.id] = enabled; });
+    keepStop(function(){ selectable.forEach(function(s){ S.meta.checks[s.id] = enabled; }); });
     var index = groups.indexOf(group);
-    S.idx = 0; save(); renderZones(); renderHeader(); renderRoute();
+    save(); renderZones(); renderHeader(); renderRoute();
     cw.children[index].focus({preventScroll:true});
   };
 }
@@ -1752,9 +1770,10 @@ function grabSetup(){
   S.meta.cfg   = $("fCfg").value;
 }
 ["fDate","fShow","fOp","fOpCustom","fCfg"].forEach(function(id){
-  $(id).addEventListener("input",  function(){ grabSetup(); syncOperator(); showExportStatus("",false); saveSoon(); renderHeader(); });
+  // A select fires input before change, and input already applies a new route, so both keep the stop.
+  $(id).addEventListener("input",  function(){ keepStop(grabSetup); syncOperator(); showExportStatus("",false); saveSoon(); renderHeader(); });
   $(id).addEventListener("change", function(){
-    grabSetup(); syncOperator(); showExportStatus("",false); S.idx = 0; save();
+    keepStop(grabSetup); syncOperator(); showExportStatus("",false); save();
     if(id === "fCfg") renderZones();
     renderHeader(); renderRoute();
     if(id === "fOp" && $("fOp").value === "custom") $("fOpCustom").focus();
@@ -1841,14 +1860,75 @@ function renderAll(){
   if(S.tab === "tk") renderTickets();
   if(S.tab === "rep") renderReport();
   save();
+  syncRoute();
 }
+
+/* ══════════════════════ routes ══════════════════════ */
+// The tab and the current stop live in the hash (#/walk/FLK-SR, #/faults, #/report), so Back,
+// reload and deep links work (walk UX audit #4). Station ids are the stable position key; a
+// finished walk is #/walk/end. Each tab or stop change adds one history entry.
+var ROUTE_SLUGS = {setup:"setup", walk:"walk", tk:"faults", rep:"report", ref:"ref"};
+var routeApplying = false, skipSheetPop = false, routeDeferred = false;
+function routeHash(){
+  var hash = "#/" + ROUTE_SLUGS[S.tab];
+  if(S.tab === "walk"){
+    var st = stations();
+    if(S.idx >= st.length) hash += "/end";
+    else if(st[S.idx]) hash += "/" + encodeURIComponent(st[S.idx].id);
+  }
+  return hash;
+}
+function readRoute(){
+  var m = /^#\/([a-z]+)(?:\/([^\/?#]+))?$/.exec(location.hash || "");
+  if(!m) return null;
+  var tab = null;
+  for(var key in ROUTE_SLUGS){ if(ROUTE_SLUGS[key] === m[1]) tab = key; }
+  if(!tab) return null;
+  var route = {tab: tab};
+  if(tab === "walk" && m[2]){
+    var st = stations(), id;
+    try { id = decodeURIComponent(m[2]); } catch(e){ return null; }
+    if(id === "end") route.idx = st.length;
+    for(var i=0;i<st.length;i++){ if(st[i].id === id) route.idx = i; }
+  }
+  return route;
+}
+function syncRoute(replace){
+  if(routeApplying) return;
+  // history.back() after closing the sheet is asynchronous; a push before it lands would be undone.
+  if(skipSheetPop){ routeDeferred = true; return; }
+  var hash = routeHash();
+  if(location.hash === hash) return;
+  var url = location.pathname + location.search + hash;
+  // Loading the page, or replacing an unknown hash, replaces the entry rather than adding one.
+  if(!replace && readRoute()) history.pushState(null, "", url);
+  else history.replaceState(history.state, "", url);
+}
+function applyRoute(route){
+  if(!route) return;
+  if(route.idx != null) S.idx = route.idx;
+  routeApplying = true;
+  try { go(route.tab); } finally { routeApplying = false; }
+}
+window.addEventListener("popstate", function(){
+  if(skipSheetPop){ skipSheetPop = false; if(routeDeferred){ routeDeferred = false; syncRoute(); } return; }
+  if($("sheet").classList.contains("on")){ closeSheet(true,false); save(); renderAll(); restoreSheetFocus(); return; }
+  applyRoute(readRoute());
+});
 
 /* ══════════════════════ boot ══════════════════════ */
 if(!STORAGE_OK) $("storageWarn").classList.remove("hide");
 load();
 if(!S.meta.date) S.meta.date = todayISO();
 syncSetup();
-go(S.meta.show ? (S.tab || "walk") : "setup");
+// A reload with the fault sheet open leaves its history entry behind while the sheet starts closed
+// (its draft waits behind Resume); drop that entry so the first Back leaves the stop as expected.
+if(history.state && history.state.fmpSheet && !$("sheet").classList.contains("on")){ skipSheetPop = true; history.back(); }
+// A deep link (#/report, #/walk/FLK-SR) opens there; otherwise resume the saved tab.
+var bootRoute = readRoute();
+if(bootRoute) applyRoute(bootRoute);
+else go(S.meta.show ? (S.tab || "walk") : "setup");
+syncRoute(true);
 
 (function announceRestore(){
   var st = stations(), done = 0, noted = 0;

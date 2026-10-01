@@ -11,7 +11,17 @@
 - Stream Plan warns in the row and in Copy Summary when a key label looks like a raw stream key. It does not block or change the label.
 - Status-line errors use the theme's danger color, so they are readable in Warm Paper. Signal Flow and Camera Shot List no longer print the card view beside the table.
 - Offline cache version `v20261001-video-pages`, so installed copies pick up the changed tool pages; Throwline Stage 3D's offline check follows it.
+- Each page's kept `<key>.unreadable` copy now travels with its key in the confirmed move to avbydave.com and in the downloadable backup, as does the AV Suite dashboard's existing one.
 - `scripts/probe_av_video_legacy.mjs` (`npm run test:av-video-legacy-browser`, in the Pages workflow) checks reload, JSON round trip, CSV header, print, Cmd/Ctrl keys, first launch, unreadable data, foreign files and the replace confirmation on all eight pages with a fixture that fills every field-matrix field; 40 of its 112 checks passed against the previous pages. `scripts/verify_av_suite.js` now catches the other ways pages seeded samples and checks the eight pages' shortcut guard, and `scripts/probe_av_domain_views.js` loads samples with Load Sample.
+
+## 2026-10-01 — FMP rig scroll and pinch zoom; walk keeps its place, Back and deep links; /fmp/walk/
+
+- Scrolling over the 3D rig explorer's model (`/fmp/rig/`) zooms it again, as in the ATEM, P240, CCU4 and SuperJoy viewers (Dave, 2026-10-01). The rest of the page scrolls normally. A trackpad pinch over the model zooms the model rather than the page (Ctrl+wheel in Chrome and Firefox, gesture events in Safari). The September 16 accessibility release had required Shift+scroll, which macOS reports as a horizontal scroll, so on a Mac it zoomed by nothing while still blocking the event; Shift+scroll now reads that axis. A plain horizontal swipe stays with the browser's back/forward gesture, and one flick zooms at most about 35%.
+- Embedded in a Gear Reference sheet, a plain scroll over the rig keeps scrolling the sheet (as the frame sizing above intends); Shift+scroll and pinch zoom, and the rig's Help text says so.
+- The preshow walk keeps its place when Setup or zones change mid-walk: it stays on the current stop by id, falls back to the first unwalked stop if that stop left the route, and a finished walk stays finished. Before, any Setup edit, such as fixing a typo in the show name, sent the walker back to stop 1.
+- The walk keeps its tab and stop in the address (`#/walk/<stop>`, `#/walk/end`, `#/faults`, `#/report`, `#/setup`, `#/ref`), so Back, reload and deep links work; the first Back on an open fault sheet closes it. Back previously left the app. The walk's global `history()` helper, which hid `window.history`, is renamed.
+- A typed `/fmp/walk/` (a hygiene-probe 404) is now a noindex redirect to `https://walk.housevideo.app/fmpwalk/` that keeps query and hash, with full head metadata. `verify_fmp_release.js` expects and checks it and now requires `theme-color` on every FMP page, the navigation verifier lists it as an FMP shell, and the indexing count is 148.
+- Re-exported from fmp-suite `4142b57` (#37, #38, #39, #40, #41, #42). That release also removes `https://davehomeassist.github.io` from the camera backend's default origins (its deployments return 404); it takes effect on the next backend deploy. fmp-suite's unit, backend, walk and public browser suites pass; the rig zoom was not tested with a physical Mac mouse, trackpad or Safari.
 
 ## 2026-10-01 — AV Suite 2.0a: show-context and Workbook load safety
 

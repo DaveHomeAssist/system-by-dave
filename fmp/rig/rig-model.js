@@ -1125,10 +1125,29 @@ canvas.addEventListener('pointerup',event=>{
 });
 canvas.addEventListener('pointercancel',event=>{touches.delete(event.pointerId);dragged=true;pointerStart=undefined;pinchDistance=undefined;});
 canvas.addEventListener('pointerleave',()=>{if(!touches.size)clearHover();});
+// Scrolling or pinching over the model zooms it, like the other equipment viewers (Dave, October 1);
+// the rest of the page scrolls normally. macOS turns Shift+wheel into horizontal scrolling, so Shift
+// reads the horizontal axis. A plain horizontal swipe stays with the browser (back/forward gestures).
+// Embedded in a Gear Reference sheet, the model is one part of a longer document, so a plain scroll
+// keeps scrolling the sheet and Shift+scroll or a pinch zooms.
+const embeddedInSheet=()=>document.documentElement.dataset.embed==='gear-reference';
+if(embeddedInSheet())$('[data-wheel-help]').textContent='Shift + scroll or pinch over the model to zoom';
 canvas.addEventListener('wheel',event=>{
-  if(!event.shiftKey||event.ctrlKey||event.metaKey)return;
-  event.preventDefault();zoomView(Math.exp(event.deltaY*.001));
+  if(embeddedInSheet()&&!event.shiftKey&&!event.ctrlKey)return;
+  const delta=event.shiftKey&&!event.deltaY?event.deltaX:event.deltaY;
+  if(!delta)return;
+  event.preventDefault();
+  // Trackpad pinch arrives as Ctrl+wheel with small deltas; line and page deltas come from some mice.
+  const pixels=delta*(event.deltaMode===1?40:event.deltaMode===2?800:1);
+  zoomView(Math.exp(T.MathUtils.clamp(pixels*(event.ctrlKey?.01:.001),-.3,.3)));
 },{passive:false});
+// Safari reports trackpad pinch as gesture events instead of Ctrl+wheel. Touch screens pinch through
+// pointer events above, so only pointer-only screens (a Mac) listen here.
+if(!navigator.maxTouchPoints){
+  let gestureScale=1;
+  canvas.addEventListener('gesturestart',event=>{event.preventDefault();gestureScale=event.scale||1;});
+  canvas.addEventListener('gesturechange',event=>{event.preventDefault();if(event.scale>0){zoomView(gestureScale/event.scale);gestureScale=event.scale;}});
+}
 canvas.addEventListener('keydown',event=>{
   if(event.altKey||event.ctrlKey||event.metaKey)return;
   const step=Math.PI/24;

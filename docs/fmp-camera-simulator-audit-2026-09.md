@@ -144,7 +144,7 @@ was shot again in its default state: their screenshot had the venue view open, w
 
 | ID | Finding | Outcome |
 | --- | --- | --- |
-| Q1 | Chromium only | Deferred: a scheduled WebKit smoke job is the recommended next CI step |
+| Q1 | Chromium only | **Addressed 2026-10-01:** `.github/workflows/camera-sim-webkit.yml` runs `npm run test:camera-sim-webkit` weekly in Playwright's WebKit with iPhone 13 and iPad Pro 11 emulation (start, render status, fit, held-key pan, no page errors). The full acceptance probe stays Chromium; emulated WebKit is not physical Safari |
 | Q2 | Preset menu untested | **1.8.0**: right-click rename and clear in the probe |
 | Q3 | New dialogs can block the probe | **1.8.0**: rule in the doc |
 | Q4 | No component tests | Deferred (C9) |
