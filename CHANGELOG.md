@@ -5,6 +5,12 @@
 - Regenerate the managed FMP release from canonical source `0f4de8ca282d0b115825802dd6bd7449e6ba574a` so legacy numeric-key and array checklists retain their confirmations, including Lawn readings excluded by a winter route.
 - Normalize a deselected legacy fault observation to Not re-observed without changing the original saved draft or relaxing validation for current records. Add source regression coverage for visible checks, reports, backups and reloads.
 
+## 2026-10-01 — LED wall whole-cabinet data planning
+
+- Added an automatic row-serpentine whole-cabinet port plan and a color-coded 3D cabinet map. The primary port result now reports planned chains while retaining the even-pixel lower bound separately; oversized cabinets and insufficient entered processor ports are flagged.
+- Tap a 3D cabinet or enter row and column to inspect its planned port and native pixel area. The inspector continues to work when WebGL is unavailable. Phone layout keeps the model and primary results visible within the viewport.
+- Saved cabinet profiles can carry an operator-supplied manufacturer specification URL and cabinet weight. The UI and summary explicitly say that a source link does not independently verify product values. Offline cache version `v20261001-led-chain-map` updates the AV registry and Throwline pin.
+
 ## 2026-10-01 — LED Wall Calculator 3D viewer
 
 - Made the cabinet preview a rotatable 3D wall with mouse, touch, keyboard, zoom, preset views, and a static fallback when 3D is unavailable.
