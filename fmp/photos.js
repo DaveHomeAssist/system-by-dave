@@ -231,13 +231,55 @@ export function initializePhotos() {
     },
     async exportWalk() {
       ensurePhotosReady();
-      const { walk } = window.prepareExport();
-      walk.photoFiles = await photoFiles(walk, true);
-      window.dl(`fmp-walk-${walk.meta.date || 'undated'}.json`, JSON.stringify(walk, null, 2), 'application/json');
+      window.flush();
+      const walk = structuredClone(window.S);
+      const files = await photoFiles(walk, true);
+      const backup = window.FMPWalkReliability.backup(walk, files);
+      window.dl(`fmp-walk-backup-${walk.meta.date || 'undated'}-${walk.walkId}.json`, JSON.stringify(backup, null, 2), 'application/json');
     }
   };
   window.FMPPhotos = api;
   api.renderReport();
   if (window.S.draft && document.getElementById('sheet').classList.contains('on')) api.mountFault(window.S.draft);
   window.addEventListener('beforeunload', event => { if (busy) { event.preventDefault(); event.returnValue = ''; } });
+}
+
+export function validateBackupPhotos(backup) {
+  const files = new Map();
+  for (const file of backup.photoFiles) {
+    validatePhoto(file);
+    if(files.has(file.id)) throw new Error('Duplicate backup photo ID.');
+    files.set(file.id,file);
+  }
+  for (const owner of [backup.walk.meta, ...backup.walk.faults, ...(backup.walk.draft ? [backup.walk.draft] : [])]) {
+    if(owner.photos != null && !Array.isArray(owner.photos)) throw new Error('Invalid photo associations.');
+    for (const ref of owner.photos || []) {
+      const file = files.get(ref.id);
+      if(!file || ref.name !== file.name || ref.size !== file.size || ref.type !== file.type) throw new Error('Backup is missing or mismatches an associated photo.');
+    }
+  }
+  const refs = photoRefs(backup.walk,true);
+  if(refs.length !== files.size) throw new Error('Backup has unassociated photos.');
+}
+export async function restoreBackupPhotos(backup) {
+  validateBackupPhotos(backup);
+  // Check collisions before writing. A restore must never overwrite existing evidence.
+  const pending = [];
+  for (const file of backup.photoFiles) {
+    const binary = atob(file.base64), bytes = Uint8Array.from(binary,c => c.charCodeAt(0));
+    const existing = await storedPhoto(file.id);
+    if(existing?.blob) {
+      if(await blobBase64(existing.blob) !== file.base64) throw new Error('Photo ID conflicts with existing evidence. Current photos were not changed.');
+    } else pending.push({id:file.id,blob:new Blob([bytes],{type:file.type})});
+  }
+  for(const row of pending) await storedPhoto(row.id,row);
+}
+
+export async function verifyBackupPhotoImages(backup) {
+  validateBackupPhotos(backup);
+  for(const file of backup.photoFiles) {
+    const image = await createImageBitmap(new Blob([Uint8Array.from(atob(file.base64), c => c.charCodeAt(0))], {type:'image/jpeg'}));
+    try { if(image.width > 1600 || image.height > 1600 || image.width < 1 || image.height < 1) throw new Error('Backup image dimensions are unsupported.'); }
+    finally { image.close(); }
+  }
 }

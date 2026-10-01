@@ -14,6 +14,12 @@ const rigPhotos = ['rig-camera', 'rig-front', 'rig-grip', 'rig-lens', 'rig-panel
 // One export writes both releases: the operations suite under fmp/ and the preshow walk under
 // fmpwalk/, which is published on its own origin. The walk was dropped from the export on
 // 2026-09-22 while an overwritten landing page was repaired, and restored on 2026-09-25 (Dave).
+const walkReference = JSON.parse(fs.readFileSync(path.join(site, 'fmpwalk/walk-reference.json'), 'utf8'));
+const walkPhotos = walkReference.photos.map(photo => {
+  assert.match(photo.file, /^[a-z0-9-]+\.jpg$/, 'Invalid walk reference photo filename');
+  return `assets/walk-photos/${photo.file}`;
+});
+assert.equal(new Set(walkPhotos).size, walkPhotos.length, 'Duplicate walk reference photos');
 const releases = [
   {
     directory: 'fmp',
@@ -33,7 +39,7 @@ const releases = [
       'rig/vendor/three/three.module.js', 'rig/vendor/three/three.core.js', 'rig/vendor/three/addons/controls/OrbitControls.js'
     ]
   },
-  { directory: 'fmpwalk', mode: 'local-first', expected: ['index.html', 'walk-core.js', 'email.js', 'mail.js', 'photos.js', 'notion.js', 'notion-config.js'] }
+  { directory: 'fmpwalk', mode: 'local-first', expected: ['index.html', 'walk-core.js', 'walk-reliability.js', 'walk-reference.json', 'email.js', 'mail.js', 'photos.js', 'notion.js', 'notion-config.js', ...walkPhotos] }
 ];
 // The report sender is the only address the public FMP releases may carry.
 const ALLOWED_EMAILS = ['avbydave@gmail.com'];
@@ -82,7 +88,7 @@ for (const release of releases) {
     const data = fs.readFileSync(path.join(root, name));
     hashes[name] = hash(data);
     assert.equal(hashes[name], provenance.files[name], `Managed artifact drift: ${release.directory}/${name}`);
-    if (/\.(?:webp|png)$/.test(name)) continue;
+    if (/\.(?:webp|png|jpg)$/.test(name)) continue;
     const source = data.toString('utf8');
     assert.doesNotMatch(source, /-----BEGIN .*PRIVATE KEY-----|\b(?:ntn_|secret_)[A-Za-z0-9]{30,}/);
     if (`${release.directory}/${name}` !== NOTION_RECEIPT) assert.doesNotMatch(source, NOTION_URL, `${release.directory}/${name}: links a Notion page; link the suite's HTML reference instead`);
@@ -153,7 +159,7 @@ assert.match(theme, /preference = legacy \|\| 'light';/);
 assert.equal(releases[0].provenance.sourceCommit, releases[1].provenance.sourceCommit, 'fmp and fmpwalk must ship from one export');
 const walkEntry = fs.readFileSync(path.join(site, 'fmpwalk/index.html'), 'utf8');
 assert.match(walkEntry, /var THEME_KEY = "fmpTheme";/);
-assert.match(walkEntry, /Email and Notion saves require confirmation/);
+assert.match(walkEntry, /Gmail opens a compose window; you decide whether to send/);
 // /fmpwalk/camera/ does not exist, and the walk is its own origin, so its camera link and
 // legacy ?camera=N / ?position= redirect name the operations hub absolutely. A same-origin
 // /fmp/camera/ would resolve against the walk's domain, where nothing serves it.
