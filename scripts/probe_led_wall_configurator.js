@@ -539,16 +539,19 @@ async function main() {
       throw new Error(`Power Load handoff storage failed safe: ${JSON.stringify(ledBeforeHandoff)}.`);
     }
     let reachedPowerLoad = false;
-    for (let attempt = 0; attempt < 20; attempt += 1) {
+    for (let attempt = 0; attempt < 40; attempt += 1) {
       try {
-        reachedPowerLoad = await evaluate("location.pathname.endsWith('/av-calculator.html') && !!document.getElementById('powerMethod')");
+        reachedPowerLoad = await evaluate(`(() => location.pathname.endsWith('/av-calculator.html')
+          && document.getElementById('powerMethod')?.value === 'watts'
+          && document.getElementById('deviceWatts')?.value === '2600'
+          && document.getElementById('totalAmps')?.textContent.trim() === '—')()`);
       } catch (error) {
         // The previous page's execution context is being replaced.
       }
       if (reachedPowerLoad) break;
       await delay(150);
     }
-    if (!reachedPowerLoad) throw new Error('Power Load handoff did not navigate to the quick calculator.');
+    if (!reachedPowerLoad) throw new Error('Power Load handoff did not finish restoring the quick calculator.');
     const handoffResult = await evaluate(`(() => {
       const state = JSON.parse(localStorage.getItem('avCalculator.v1'));
       return { path: location.pathname, hash: location.hash, method: document.getElementById('powerMethod').value,

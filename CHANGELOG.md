@@ -7,7 +7,7 @@
 
 ## 2026-10-01 — LED wall browser release gate
 
-- The LED cabinet click probe now waits for the status-driven layout to settle and reacquires the canvas center before clicking. A dedicated pull-request browser check runs the 3D and no-WebGL probes so this failure is caught before the Pages deployment gate.
+- The LED browser probe waits for the status-driven layout before clicking a cabinet and for the quick calculator to restore its saved Power Load fields after handoff. A dedicated pull-request browser check runs the 3D and no-WebGL probes so these timing failures are caught before the Pages deployment gate.
 
 ## 2026-10-01 — LED wall whole-cabinet data planning
 
