@@ -322,7 +322,9 @@ CHANGE
    a route whose source, processor and destination become endpoints; converter and backup are kept
    as text; nothing is dropped or guessed. Loading a v1 workbook writes nothing. The first save
    that upgrades a stored v1 record first offers a download of that record and keeps it in
-   IndexedDB beside the v2 copy until the operator removes it.
+   IndexedDB, under a key the v2 save cannot overwrite (the workbooks store is keyed by
+   workbookId), until the operator removes it. The active workbook moves to v2 only after both
+   records are stored; a first-save test reads both back. See 2.1 open question 2.
 3. Readiness: one pure function maps each family's verbatim statuses to open, ready, issue, spare
    or done. It is never stored. Unit tests cover every status value in the field matrix.
 4. Validators: validateVideo keeps its two current checks against migrated routes and runs on the
@@ -385,6 +387,10 @@ A design question raised in review of this brief is added here with its source a
    readable when IndexedDB fails. A save proceeds only if the counter still equals the value this
    tab last observed. A new localStorage key needs the domain transfer policy and its revision
    updated (scripts/domain-sites.json).
+2. Where is the retained v1 record kept? (Codex review of #193, 2026-10-01.) Saving v2 under the
+   same workbookId overwrites it. Recommended: a separate IndexedDB table keyed by workbookId and
+   schema, added in the same Dexie version bump, rather than minting a new workbookId, which would
+   break the active id and show-context links.
 
 ## Risks carried into the phase
 
