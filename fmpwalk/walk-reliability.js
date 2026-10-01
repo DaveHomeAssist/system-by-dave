@@ -61,22 +61,29 @@ globalThis.FMPWalkReliability = (() => {
     const original = clone(input), meta = core.prepareMeta({ ...input.meta, op: input.meta.op || '', show: input.meta.show || '', date: input.meta.date || '', rigVerified: false });
     const all = core.availableStations(meta);
     for (const station of all) if (station.tier !== 2) meta.checks[station.id] = station.id === core.DRESSING.id ? !!input.meta.dressing : !input.meta.zonesOff?.[station.zone];
+    // Resolve checklist definitions independently of this walk's season/exclusions.
+    // knownStation is a membership predicate, not a station lookup.
+    const definitions = new Map(core.availableStations({ ...meta, cfg: 'summer' }, true).map(station => [station.id, station]));
     const res = {};
     for (const [id, value] of Object.entries(input.res)) {
       if (!object(value)) throw new Error('Invalid legacy reading. The draft has been left untouched.');
       const reading = clone(value);
       if (reading.status === 'not_observed') reading.status = 'skip';
-      if (Array.isArray(reading.checks)) {
-        const station = core.knownStation(id);
-        reading.visual = Object.fromEntries(core.visualItems(station || {}).map((item, index) => [item.key, reading.checks[index] === true]));
+      if (Array.isArray(reading.checks) || object(reading.checks)) {
+        const items = core.visualItems(definitions.get(id) || {});
+        if (items.length) reading.visual = Object.fromEntries(items.map((item, index) => [item.key, reading.checks[index] === true]));
       }
       if (typeof reading.count === 'number') reading.count = String(reading.count);
       res[id] = reading;
     }
     // Prototype faults/photo names lack canonical evidence IDs. Retain them verbatim,
     // separately from current tickets, rather than inventing attachment associations.
+    const fobs = clone(input.fobs || {});
+    // The design export toggles a selected re-observation back to null.
+    // Normalize only that legacy sentinel; retain strict canonical validation.
+    if (object(fobs)) for (const id of Object.keys(fobs)) if (fobs[id] === null) fobs[id] = 'not_reobserved';
     const route = core.stations(meta);
-    return identity(validateDraft({ meta, res, faults: [], fobs: input.fobs || {}, draft: null, idx: Math.max(0, route.findIndex(station => station.id === input.curId)), tab: 'setup', legacyDraft: original,
+    return identity(validateDraft({ meta, res, faults: [], fobs, draft: null, idx: Math.max(0, route.findIndex(station => station.id === input.curId)), tab: 'setup', legacyDraft: original,
       legacyEvidence: { faults: clone(input.faults), photos: clone(input.photos || []), rigVerified: !!input.meta.rigVerified } }), makeId);
   }
   function backup(state, photoFiles = [], now = new Date()) {

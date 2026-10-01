@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-01 — Preserve legacy FMP walk confirmations
+
+- Regenerate the managed FMP release from canonical source `0f4de8ca282d0b115825802dd6bd7449e6ba574a` so legacy numeric-key and array checklists retain their confirmations, including Lawn readings excluded by a winter route.
+- Normalize a deselected legacy fault observation to Not re-observed without changing the original saved draft or relaxing validation for current records. Add source regression coverage for visible checks, reports, backups and reloads.
+
 ## 2026-10-01 — LED Wall Calculator 3D viewer
 
 - Made the cabinet preview a rotatable 3D wall with mouse, touch, keyboard, zoom, preset views, and a static fallback when 3D is unavailable.
