@@ -262,9 +262,11 @@ PR B — navigation, CI, Workbook theme and Video load
    probe's stale expectation first; never weaken an assertion to pass.
 9. Workbook theme (WEB-1): remove data-av-theme-lock="dark" so the Workbook follows the suite's
    Warm Paper, Stage Slate or System choice through js/av-theme-mode.js, light by default. Touch
-   apps/av-workbook/index.html and styles.css (then rebuild) and scripts/probe_av_themes.js only:
-   no store, schema or model change (that is 2.1). In the probe, remove av-workbook from
-   lockedDarkTargets so it asserts the Workbook's light and dark identities like every other tool.
+   apps/av-workbook/index.html and styles.css (then rebuild) and the two checks that encode the
+   lock: remove av-workbook from lockedDarkTargets in scripts/probe_av_themes.js and from
+   LOCKED_THEME_ROUTES in scripts/verify_av_themes.js (with its dark-lock assertion), so both
+   check the Workbook's light and dark identities like every other tool. No store, schema or
+   model change (that is 2.1).
 10. Video load (V0-4): the eight Video pages keep stored text and rows exactly as stored on load
     (no trim, whitespace collapse or length cut; no row dropped past the cap). This includes notes:
     the 2.0b notes follow-up fixes them on Video Patch, Projection Plan and Stream Plan, and PR B
@@ -323,10 +325,18 @@ CHANGE
 5. Revision: v2 workbooks carry a revision number that every save increments. Loading prefers the
    copy with the higher revision (IndexedDB or the fallback), and savedAt is display-only. v1 orders
    the two copies by wall-clock savedAt, which ties or runs backwards under clock changes (#188).
-6. One transaction: saveEditedWorkbook reads, checks and writes the IndexedDB record in one Dexie
-   read-write transaction. Today get() and put() are separate transactions, so a newer tab's put
-   that lands between them is overwritten (harmless while only v1 exists). A unit test interleaves
-   the two tabs deterministically.
+6. Serialized saves: today a check and its write are separate steps on both paths. IndexedDB
+   get() and put() are separate transactions, so a newer tab's put that lands between them is
+   overwritten. The fallback path reads FALLBACK_KEY and writes it later through localStorage, so
+   two tabs can both read revision N and both write N+1. (Both are harmless while only v1 exists.)
+   Fix both:
+   - IndexedDB: read, check and write in one Dexie read-write transaction.
+   - Fallback: compare-and-swap. Re-read the slot immediately before writing and write only if it
+     still holds the revision this tab loaded; otherwise raise WorkbookChangedElsewhereError.
+   - Across tabs: run each save inside navigator.locks.request on one workbook lock where the
+     browser supports Web Locks, so two tabs cannot interleave on either path.
+   Deterministic unit tests interleave two tabs on each path and expect the second save to be
+   refused with the first tab's write intact.
 7. Guard: the 2.0a and #188 load and save guards treat v2 as the current schema and anything newer
    as read-only. A browser test loads a v2 workbook into the previous build (av-workbook/ from
    origin/main before this change) and proves it opens read-only and writes nothing.
