@@ -5,8 +5,8 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { DataGrid } from "./DataGrid";
 import { EngineDashboard } from "./EngineDashboard";
 import {
-  WorkbookChangedElsewhereError, downloadText, exportWorkbook, importWorkbook, loadActiveWorkbook, readActiveWorkbook, saveEditedWorkbook,
-  startBlankWorkbook, storedWorkbookText, type WorkbookReadOnly
+  WorkbookChangedElsewhereError, WorkbookUncheckedError, downloadText, exportWorkbook, importWorkbook, loadActiveWorkbook, fallbackHolds, fallbackSlotFor, readActiveWorkbook, saveEditedWorkbook,
+  startBlankWorkbook, storedWorkbookText, type FallbackSlot, type WorkbookReadOnly
 } from "./store";
 import { mergeLegacyAudioIntoWorkbook, readLegacyAudioBundle } from "./legacyAudioImport";
 import { launchContextChanges, readLaunchContext, withLaunchContext } from "./launchContext";
@@ -64,6 +64,11 @@ interface PendingImport {
   details: string[];
   baseWorkbookId: string;
   baseSavedAt: string;
+}
+
+/** Downloads a fallback slot's exact stored text before it is deliberately replaced. */
+function backupFallbackSlot(slot: FallbackSlot, workbookId: string): void {
+  downloadText(`${workbookId}-fallback-backup.json`, slot.text);
 }
 
 function backupWorkbook(workbook: AvWorkbook): void {
@@ -195,14 +200,20 @@ export default function App() {
   }, []);
 
   // Every save goes through here, so a read-only workbook is never written from any path.
-  async function persist(next: AvWorkbook): Promise<AvWorkbook | null> {
+  // newRecord: only for an id minted for this save (a JSON import copy or a new blank), which cannot already exist.
+  // replaceFallbackIfUnchanged: the exact fallback text of the workbook this save deliberately replaces.
+  async function persist(next: AvWorkbook, options: { newRecord?: boolean; replaceFallbackIfUnchanged?: string } = {}): Promise<AvWorkbook | null> {
     if (readOnlyRef.current) {
       setMessage("This workbook is open read-only. Nothing was saved.");
       return null;
     }
     try {
-      return await saveEditedWorkbook(next);
+      return await saveEditedWorkbook(next, undefined, { newRecord: options.newRecord === true, replaceFallbackIfUnchanged: options.replaceFallbackIfUnchanged });
     } catch (error: unknown) {
+      if (error instanceof WorkbookUncheckedError) {
+        setMessage(error.message);
+        return null;
+      }
       if (!(error instanceof WorkbookChangedElsewhereError)) throw error;
       // A newer version rewrote this workbook after this tab loaded it: stop rather than strip its fields.
       setReadOnly(error.readOnly);
@@ -228,14 +239,24 @@ export default function App() {
 
   async function startBlankFromReadOnly() {
     if (!readOnly || blankBusy) return;
-    if (readOnly.source === "fallback" && !window.confirm("This browser holds the unreadable workbook only in its fallback copy, which a new workbook can replace if storage fails again. Download it first if you need it. Start a new blank workbook?")) return;
+    // A workbook kept only in the fallback slot can be replaced if storage fails again, so it is backed up first.
+    const fallbackText = readOnly.source === "fallback" && typeof readOnly.raw === "string" ? readOnly.raw : undefined;
+    if (fallbackText !== undefined && !window.confirm("This browser holds this workbook only in its fallback copy, which a new workbook can replace if storage fails again. A backup downloads first. Start a new blank workbook?")) return;
     setBlankBusy(true);
     try {
-      const blank = await startBlankWorkbook();
+      if (fallbackText !== undefined) downloadStoredWorkbook(readOnly);
+      // The slot is replaced only while it still holds the copy the operator saw and backed up.
+      const blank = await startBlankWorkbook(undefined, { replaceFallbackIfUnchanged: fallbackText });
+      // Retention is claimed only for a copy this page actually read: an unreadable record was never seen.
+      const kept = fallbackText !== undefined ? fallbackHolds(fallbackText) : readOnly.raw !== undefined;
       setReadOnly(null);
       setWorkbook(blank);
       setActiveTab("overview");
-      setMessage("New blank workbook started. The previous workbook is still saved in this browser.");
+      setMessage(kept
+        ? "New blank workbook started. The previous workbook is still saved in this browser."
+        : fallbackText !== undefined
+          ? "New blank workbook started. Storage failed again, so it took the previous workbook's fallback copy; the backup that downloaded holds that workbook."
+          : "New blank workbook started. This browser could not read the previous workbook, so this page cannot confirm it is still saved.");
     } catch (error: unknown) {
       setMessage(error instanceof Error ? error.message : "A new workbook could not be saved.");
     } finally {
@@ -336,7 +357,9 @@ export default function App() {
       const next = pendingImport.kind === "json"
         ? { ...pendingImport.proposed, workbookId: `wb-import-${crypto.randomUUID()}` }
         : pendingImport.proposed;
-      const saved = await persist(next);
+      const slot = await fallbackSlotFor(latest.workbook.workbookId);
+      if (slot && slot.onlyCopy) backupFallbackSlot(slot, latest.workbook.workbookId);
+      const saved = await persist(next, { newRecord: pendingImport.kind === "json", replaceFallbackIfUnchanged: slot?.text });
       if (!saved) return;
       setWorkbook(saved);
       setPendingImport(null);
@@ -349,9 +372,14 @@ export default function App() {
     }
   }
 
-  async function replaceWorkbook(next: AvWorkbook, label: string) {
+  // The sample keeps a fixed id that may already be stored, so only a new blank counts as a new record.
+  async function replaceWorkbook(next: AvWorkbook, label: string, newRecord: boolean) {
     if (!window.confirm(`Replace the current workbook with ${label}? Export first if you need a backup.`)) return;
-    const saved = await persist(next);
+    // The fallback slot may hold the current workbook. Keep a download of its exact text when it is the only
+    // copy, and let the save replace the slot only while it still holds that text.
+    const slot = workbook ? await fallbackSlotFor(workbook.workbookId) : null;
+    if (slot && slot.onlyCopy && workbook) backupFallbackSlot(slot, workbook.workbookId);
+    const saved = await persist(next, { newRecord, replaceFallbackIfUnchanged: slot?.text });
     if (!saved) return;
     setWorkbook(saved);
     setActiveTab("overview");
@@ -390,7 +418,11 @@ export default function App() {
             <button type="button" disabled={readOnly.raw === undefined} onClick={() => downloadStoredWorkbook(readOnly)}>Download this workbook</button>
             <button type="button" disabled={blankBusy} onClick={() => void startBlankFromReadOnly()}>{blankBusy ? "Starting…" : "Start a new blank workbook"}</button>
           </div>
-          <p className="read-only-note">Starting a new workbook makes it the active one. The saved workbook stays in this browser; it is not deleted.</p>
+          <p className="read-only-note">{readOnly.source === "fallback"
+            ? "Starting a new workbook makes it the active one. This workbook is kept only in the fallback copy, so a backup downloads first; if storage fails again, the new workbook takes that copy's place."
+            : readOnly.raw === undefined
+              ? "Starting a new workbook makes it the active one. This browser could not read the saved workbook, so this page cannot confirm it is still there."
+              : "Starting a new workbook makes it the active one. The saved workbook stays in this browser; it is not deleted."}</p>
           <small role="status" aria-live="polite">{message}</small>
         </section>
       </main>
@@ -422,8 +454,8 @@ export default function App() {
         </div>
         <nav aria-label="Workbook actions">
           <a className="console-action" href="../av-suite.html">Suite Console</a>
-          <button type="button" onClick={() => void replaceWorkbook(createBlankWorkbook(), "a blank workbook")}>New Blank</button>
-          <button type="button" onClick={() => void replaceWorkbook(createSampleWorkbook(), "the sample workbook")}>Load Sample</button>
+          <button type="button" onClick={() => void replaceWorkbook(createBlankWorkbook(), "a blank workbook", true)}>New Blank</button>
+          <button type="button" onClick={() => void replaceWorkbook(createSampleWorkbook(), "the sample workbook", false)}>Load Sample</button>
           <button type="button" onClick={handleExport}>Export JSON</button>
           <button type="button" onClick={() => void handleLegacyAudioImport()}>Import Legacy Audio</button>
           <label className="file-button primary primary-action">
