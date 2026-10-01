@@ -152,8 +152,37 @@ async function main() {
 
     await scenario('default cabinet layout', [], {
       build: '8 × 5 cabinets', metric: '4.000 × 2.500 m', raster: '1,376 × 860 px',
-      ports: '3 estimated ports', power: '7.20 kW max'
+      ports: '3 planned chains', power: '7.20 kW max'
     });
+    const defaultChains = await evaluate(`(() => {
+      const row = document.getElementById('ledInspectRow');
+      const column = document.getElementById('ledInspectColumn');
+      row.value = '5';
+      column.value = '8';
+      column.dispatchEvent(new Event('change', { bubbles: true }));
+      const selected = document.getElementById('ledCabinetInspection').textContent;
+      document.querySelector('#ledChainList button').click();
+      return { count: document.getElementById('ledChainCount').textContent,
+        peak: document.getElementById('ledChainPeak').textContent,
+        selected, first: document.getElementById('ledCabinetInspection').textContent,
+        capacity: document.getElementById('ledWallPreview').dataset.cabinetsPerChain };
+    })()`);
+    if (defaultChains.count !== '3 planned ports' || defaultChains.capacity !== '17'
+      || !defaultChains.peak.includes('502,928 px') || !defaultChains.selected.includes('R5 C8 · planned port 3')
+      || !defaultChains.first.includes('R1 C1 · planned port 1')) {
+      throw new Error(`Whole-cabinet chain map or inspector failed: ${JSON.stringify(defaultChains)}.`);
+    }
+    console.log('PASS whole-cabinet chain map and row/column inspector');
+    await scenario('whole-cabinet plan can exceed the even-pixel lower bound', [
+      ['ledCabinetPixelsWide', '900'], ['ledCabinetPixelsHigh', '100']
+    ], { ports: '8 planned chains', warnings: 'Whole-cabinet chains need 8 ports' });
+    await scenario('oversize cabinet has no valid chain', [
+      ['ledCabinetPixelsWide', '1000'], ['ledCabinetPixelsHigh', '1000']
+    ], { ports: 'No valid chain', warnings: 'One complete cabinet exceeds' });
+    await scenario('processor port shortage uses the chain count', [
+      ['ledCabinetPixelsWide', '172'], ['ledCabinetPixelsHigh', '172'], ['ledProcessorPortCount', '2']
+    ], { ports: '3 planned chains', warnings: '3 whole-cabinet planning chains exceed the 2 physical ports' });
+    await scenario('processor port limit cleared', [['ledProcessorPortCount', '']], { ports: '3 planned chains' });
     const defaultPower = await evaluate(`(() => ({
       factor: document.getElementById('ledPowerFactor').value,
       current: document.getElementById('ledMaxLoad').textContent,
@@ -234,19 +263,59 @@ async function main() {
       };
       set('ledProductName', 'Probe Profile 500');
       set('ledPitchMm', '2.6');
+      set('ledSpecSource', 'https://example.com/cabinet-spec.pdf');
+      set('ledWeightKg', '8.5');
       document.getElementById('saveLedPresetBtn').click();
       set('ledPitchMm', '3.9');
+      set('ledSpecSource', '');
+      set('ledWeightKg', '');
       const profile = document.getElementById('ledProfileSelect');
       profile.value = 'probe-profile-500';
       profile.dispatchEvent(new Event('change', { bubbles: true }));
       const savedProfiles = JSON.parse(localStorage.getItem('avCalculator.ledProfiles.v1'));
       return { name: document.getElementById('ledProductName').value,
-        pitch: document.getElementById('ledPitchMm').value, profiles: savedProfiles.length };
+        pitch: document.getElementById('ledPitchMm').value, profiles: savedProfiles.length,
+        source: document.getElementById('ledSpecSource').value,
+        weight: document.getElementById('ledWeightKg').value,
+        evidence: document.getElementById('ledProfileEvidence').textContent };
     })()`);
-    if (profileResult.name !== 'Probe Profile 500' || profileResult.pitch !== '2.6' || profileResult.profiles !== 1) {
+    if (profileResult.name !== 'Probe Profile 500' || profileResult.pitch !== '2.6' || profileResult.profiles !== 1
+      || profileResult.source !== 'https://example.com/cabinet-spec.pdf' || profileResult.weight !== '8.5'
+      || !profileResult.evidence.includes('does not verify')) {
       throw new Error(`Saved profile round trip failed: ${JSON.stringify(profileResult)}.`);
     }
     console.log('PASS saved profile round trip');
+    await evaluate(`(() => {
+      const profiles = JSON.parse(localStorage.getItem('avCalculator.ledProfiles.v1'));
+      const legacyValues = { ...profiles[0].values };
+      delete legacyValues.ledSpecSource;
+      delete legacyValues.ledWeightKg;
+      profiles.push({ id: 'legacy-cabinet', name: 'Legacy Cabinet', values: legacyValues });
+      localStorage.setItem('avCalculator.ledProfiles.v1', JSON.stringify(profiles));
+    })()`);
+    await cdp('Page.reload', { ignoreCache: true });
+    await delay(500);
+    const persistedProfile = await evaluate(`(() => {
+      const source = document.getElementById('ledSpecSource').value;
+      const weight = document.getElementById('ledWeightKg').value;
+      const profiles = document.getElementById('ledProfileSelect');
+      profiles.value = 'legacy-cabinet';
+      profiles.dispatchEvent(new Event('change', { bubbles: true }));
+      const legacy = [document.getElementById('ledSpecSource').value, document.getElementById('ledWeightKg').value];
+      profiles.value = 'probe-profile-500';
+      profiles.dispatchEvent(new Event('change', { bubbles: true }));
+      const invalid = document.getElementById('ledSpecSource');
+      invalid.value = 'javascript:alert(1)';
+      invalid.dispatchEvent(new Event('change', { bubbles: true }));
+      return { source, weight, legacy, invalid: invalid.value,
+        link: document.querySelector('#ledProfileEvidence a')?.href || '' };
+    })()`);
+    if (persistedProfile.source !== 'https://example.com/cabinet-spec.pdf' || persistedProfile.weight !== '8.5'
+      || JSON.stringify(persistedProfile.legacy) !== '["",""]'
+      || persistedProfile.invalid !== '' || persistedProfile.link !== '') {
+      throw new Error(`Profile reload, legacy migration, or source URL validation failed: ${JSON.stringify(persistedProfile)}.`);
+    }
+    console.log('PASS profile provenance reload, legacy profile, and unsafe URL rejection');
 
     const previewResult = await evaluate(`(() => {
       document.getElementById('ledPreviewFrontBtn').click();
@@ -274,6 +343,13 @@ async function main() {
       }
       const x = frontPose.rect.left + frontPose.rect.width / 2;
       const y = frontPose.rect.top + frontPose.rect.height / 2;
+      await cdp('Input.dispatchMouseEvent', { type: 'mousePressed', x, y, button: 'left', clickCount: 1 });
+      await cdp('Input.dispatchMouseEvent', { type: 'mouseReleased', x, y, button: 'left', clickCount: 1 });
+      const clickedCabinet = await evaluate(`document.getElementById('ledCabinetInspection').textContent`);
+      if (!clickedCabinet.includes('planned port') || clickedCabinet.includes('R1 C1 ·')) {
+        throw new Error(`3D cabinet click did not select a cabinet: ${clickedCabinet}.`);
+      }
+      console.log('PASS 3D cabinet click updates the inspector');
       await cdp('Input.dispatchMouseEvent', { type: 'mousePressed', x, y, button: 'left', clickCount: 1 });
       await cdp('Input.dispatchMouseEvent', { type: 'mouseMoved', x: x + 65, y: y + 20, button: 'left', buttons: 1 });
       await cdp('Input.dispatchMouseEvent', { type: 'mouseReleased', x: x + 65, y: y + 20, button: 'left', clickCount: 1 });
@@ -403,22 +479,30 @@ async function main() {
     if (!accessibility.disclaimer.includes('actual product documentation')) throw new Error('Persistent LED verification disclaimer is missing.');
     console.log('PASS accessibility and persistent-warning smoke checks');
 
-    await cdp('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 1, mobile: true });
+    await cdp('Emulation.setDeviceMetricsOverride', { width: 375, height: 812, deviceScaleFactor: 1, mobile: true });
     await delay(150);
     const mobile = await evaluate(`(() => {
       const rect = selector => document.querySelector(selector).getBoundingClientRect();
       return {
         documentHeight: document.documentElement.scrollHeight,
         viewportHeight: window.innerHeight,
+        documentWidth: document.documentElement.scrollWidth,
+        viewportWidth: window.innerWidth,
         resultTop: rect('#ledResultStrip').top,
         suiteBottom: rect('.led-suite').bottom,
         inputTop: rect('.led-input-grid').top,
         previewHeight: rect('.led-stage').height,
-        jumpHeight: rect('[data-led-jump="ledPowerSection"]').height
+        jumpHeight: rect('[data-led-jump="ledPowerSection"]').height,
+        stageRight: rect('.led-stage').right,
+        clippedControls: ['#ledPreviewIsoBtn', '#ledPreviewFrontBtn', '#ledInspectRow', '#ledInspectColumn']
+          .filter(selector => rect(selector).right > Math.min(window.innerWidth, rect('.led-stage').right) + 1
+            || rect(selector).left < rect('.led-stage').left - 1)
       };
     })()`);
-    if (mobile.documentHeight > mobile.viewportHeight || mobile.resultTop >= mobile.suiteBottom
-      || mobile.resultTop >= mobile.inputTop || mobile.previewHeight < 250 || mobile.jumpHeight < 44) {
+    if (mobile.documentHeight > mobile.viewportHeight || mobile.documentWidth > mobile.viewportWidth
+      || mobile.resultTop >= mobile.suiteBottom
+      || mobile.resultTop >= mobile.inputTop || mobile.previewHeight < 250 || mobile.jumpHeight < 44
+      || mobile.clippedControls.length) {
       throw new Error(`Mobile preview, results, or section navigation failed: ${JSON.stringify(mobile)}.`);
     }
     const jumped = await evaluate(`(() => {
@@ -426,7 +510,14 @@ async function main() {
       return document.activeElement.id;
     })()`);
     if (jumped !== 'ledPowerSection') throw new Error(`Mobile section jump did not focus its target: ${jumped}.`);
-    await cdp('Emulation.setDeviceMetricsOverride', { width: 1280, height: 900, deviceScaleFactor: 1, mobile: false });
+    await cdp('Emulation.setDeviceMetricsOverride', { width: 1440, height: 900, deviceScaleFactor: 1, mobile: false });
+    const desktopContainment = await evaluate(`(() => ({
+      height: document.documentElement.scrollHeight <= document.documentElement.clientHeight,
+      width: document.documentElement.scrollWidth <= document.documentElement.clientWidth
+    }))()`);
+    if (!desktopContainment.height || !desktopContainment.width) {
+      throw new Error(`Desktop page-level overflow: ${JSON.stringify(desktopContainment)}.`);
+    }
     console.log('PASS viewport-contained mobile preview, results, and section jump');
 
     const ledBeforeHandoff = await evaluate(`(() => {

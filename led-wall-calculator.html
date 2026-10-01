@@ -81,6 +81,16 @@ html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-wall-preview.h
 .led-wall-preview canvas:active{cursor:grabbing}
 .led-wall-preview canvas:focus-visible{outline:2px solid var(--av-focus);outline-offset:-3px}
 .led-viewer-hint{margin:0;color:var(--av-muted);font-size:11px;line-height:1.35}
+.led-cabinet-inspector{display:grid;gap:5px;padding:8px;border:1px solid #4b5870;border-radius:8px;background:#111b2a}
+.led-cabinet-coordinates{display:flex;flex-wrap:wrap;gap:6px}
+.led-cabinet-coordinates label{display:flex;align-items:center;gap:5px;color:#d5dde7;font-family:var(--mono);font-size:10px}
+.led-cabinet-coordinates input{width:58px;min-height:44px;padding:5px;border:1px solid #63718a;border-radius:5px;background:#1c2839;color:#fff}
+.led-cabinet-coordinates input:focus-visible{outline:2px solid var(--av-focus);outline-offset:2px}
+.led-cabinet-inspector p{margin:0;color:#e5e9f2;font-size:11px;line-height:1.35}
+.led-chain-list{grid-column:1/-1;display:grid;gap:5px;max-height:190px;margin:0;padding:0;overflow-y:auto;list-style:none}
+.led-chain-list button{width:100%;min-height:44px;text-align:left;font-family:var(--mono);font-size:11px}
+.led-chain-list button:focus-visible{outline:2px solid var(--av-focus);outline-offset:2px}
+.led-chain-list-note{grid-column:1/-1;margin:0;color:var(--av-muted);font-size:11px}
 @media (max-width:900px){
   html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-suite{display:flex;flex-direction:column;overflow-y:auto;overscroll-behavior:contain}
   html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-suite > *{flex:none}
@@ -121,11 +131,19 @@ html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-wall-preview.h
   html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-suite-kicker{display:none}
   html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-suite-head{flex-wrap:wrap}
   html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-suite-title h1{font-size:15px}
-  html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-stage{grid-template-columns:1fr;gap:10px;padding:10px}
-  html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-stage-view{min-height:160px}
-  html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-stage-data{grid-template-columns:minmax(0,1fr) minmax(120px,.7fr);gap:6px}
-  html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-viewer-hint{grid-column:1/-1;font-size:10px}
-  html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-stage-rails{grid-column:1/-1}
+  html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-stage{grid-template-columns:minmax(0,1fr) 140px;grid-template-rows:160px auto auto;gap:6px;padding:8px}
+  html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-stage-view{grid-column:1;grid-row:1;min-height:160px;padding:2px}
+  html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-stage-data{display:contents}
+  html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-stage-data > div:first-child{grid-column:2;grid-row:1;align-self:start}
+  html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-stage-data > div:first-child p:not(.led-stage-kicker){display:none}
+  html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-view-toggle{grid-column:2;grid-row:1;align-self:end;gap:3px}
+  html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-view-toggle button{padding:5px 2px;font-size:10px}
+  html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-viewer-hint{grid-column:1/-1;grid-row:2;font-size:10px}
+  html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-cabinet-inspector{grid-column:1/-1;grid-row:3;display:flex;align-items:center;gap:8px;padding:5px}
+  html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-cabinet-coordinates{flex:none;gap:3px}
+  html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-cabinet-coordinates input{width:43px}
+  html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-cabinet-inspector p{font-size:10px}
+  html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-stage-rails{display:none}
 }
 </style>
 <link rel="stylesheet" href="css/av-theme.css">
@@ -184,8 +202,15 @@ html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-wall-preview.h
             <button type="button" id="ledPreviewFrontBtn" aria-pressed="false">Front</button>
           </div>
           <p class="led-viewer-hint" id="ledViewerHint">Drag to orbit · pinch to zoom · arrows to rotate. Depth is schematic.</p>
+          <div class="led-cabinet-inspector" aria-label="Cabinet inspector">
+            <div class="led-cabinet-coordinates">
+              <label for="ledInspectRow">Row</label><input id="ledInspectRow" type="number" min="1" step="1" value="1" inputmode="numeric">
+              <label for="ledInspectColumn">Column</label><input id="ledInspectColumn" type="number" min="1" step="1" value="1" inputmode="numeric">
+            </div>
+            <p id="ledCabinetInspection" aria-live="polite">Select a cabinet to inspect its planning chain.</p>
+          </div>
           <div class="led-stage-rails" aria-label="LED wall planning indicators">
-            <div class="led-stage-rail"><span>Port load</span><i id="ledPreviewPortRail"></i><b id="ledPreviewPort">61%</b></div>
+            <div class="led-stage-rail"><span>Peak port load</span><i id="ledPreviewPortRail"></i><b id="ledPreviewPort">61%</b></div>
             <div class="led-stage-rail"><span>Viewer</span><i id="ledPreviewViewerRail"></i><b id="ledPreviewViewer">Review</b></div>
           </div>
         </div>
@@ -268,6 +293,15 @@ html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-wall-preview.h
               <label for="ledCabinetPixelsHigh">Cabinet Height Px</label>
               <input id="ledCabinetPixelsHigh" data-key="ledCabinetPixelsHigh" data-optional="true" type="number" min="1" max="10000" step="1" value="172" placeholder="Derive from pitch" inputmode="numeric">
             </div>
+            <div class="field full">
+              <label for="ledSpecSource">Manufacturer Specification URL (optional)</label>
+              <input id="ledSpecSource" data-key="ledSpecSource" data-kind="url" type="url" maxlength="500" value="" placeholder="https://manufacturer.example/specification" autocomplete="url" inputmode="url">
+            </div>
+            <div class="field">
+              <label for="ledWeightKg">Cabinet Weight Kg (optional)</label>
+              <input id="ledWeightKg" data-key="ledWeightKg" data-optional="true" type="number" min="0.01" max="1000" step="0.01" value="" inputmode="decimal">
+            </div>
+            <p class="field-note full" id="ledProfileEvidence">Product values are operator supplied until checked against a manufacturer specification. A source link does not verify them automatically.</p>
             <p class="field-note full">When both raster fields are entered, they are authoritative and pitch is a validation check. Leave both blank to derive cabinet pixels from dimensions ÷ pitch.</p>
           </div>
         </fieldset>
@@ -481,8 +515,11 @@ html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-wall-preview.h
           <div class="led-detail-body">
             <div class="led-detail-stat"><span>Safe Pixels / Port</span><strong id="ledSafePixelsPerPort">0</strong></div>
             <div class="led-detail-stat"><span>Average Port Load</span><strong id="ledAveragePortLoad">0</strong></div>
-            <div class="led-detail-stat"><span>Port Utilization</span><strong id="ledPortUtilization">0%</strong></div>
+            <div class="led-detail-stat"><span>Even-Split Utilization</span><strong id="ledPortUtilization">0%</strong></div>
             <div class="led-detail-stat"><span>Wall Payload</span><strong id="ledWallPayload">0 Gbps</strong></div>
+            <div class="led-detail-stat"><span>Whole Cabinet Chains</span><strong id="ledChainCount">Pending</strong></div>
+            <div class="led-detail-stat"><span>Heaviest Chain</span><strong id="ledChainPeak">Pending</strong></div>
+            <ol class="led-chain-list" id="ledChainList" aria-label="Planned data chains"></ol>
             <p class="led-detail-copy" id="ledProcessorGuidance">Processor output capacity is separate from production-network bandwidth and must be confirmed against the selected processor and receiver cards.</p>
           </div>
         </details>

@@ -30,6 +30,7 @@ if (!context) {
   let outline = null;
   let texture = null;
   let signature = '';
+  let planSignature = '';
   let fitRadius = 5;
   let zoom = 1;
   let yaw = -0.38;
@@ -38,7 +39,9 @@ if (!context) {
   let tweenFrame = 0;
   let disposed = false;
   const pointers = new Map();
+  const pointerOrigins = new Map();
   let pinchDistance = 0;
+  const raycaster = new THREE.Raycaster();
 
   function requestRender() {
     if (drawFrame || document.hidden || disposed || !preview.classList.contains('has-3d')) return;
@@ -113,6 +116,18 @@ if (!context) {
     glow.addColorStop(1, 'rgba(255,255,255,0)');
     ctx.fillStyle = glow;
     ctx.fillRect(0, 0, surface.width, surface.height);
+    const capacity = Number(preview.dataset.cabinetsPerChain);
+    if (capacity > 0 && columns * rows <= 2000) {
+      for (let row = 0; row < rows; row += 1) {
+        for (let column = 0; column < columns; column += 1) {
+          const sequence = row * columns + (row % 2 ? columns - column - 1 : column);
+          const port = Math.floor(sequence / capacity);
+          ctx.fillStyle = `hsla(${(218 + port * 47) % 360}, 65%, ${port % 2 ? 55 : 48}%, .68)`;
+          ctx.fillRect(column * surface.width / columns, row * surface.height / rows,
+            Math.ceil(surface.width / columns), Math.ceil(surface.height / rows));
+        }
+      }
+    }
     const columnStep = Math.max(1, Math.ceil(columns / 180));
     const rowStep = Math.max(1, Math.ceil(rows / 180));
     ctx.strokeStyle = 'rgba(9,15,29,.8)';
@@ -129,9 +144,34 @@ if (!context) {
       ctx.lineTo(surface.width, y);
     }
     ctx.stroke();
+    const selectedRow = Number(preview.dataset.selectedRow);
+    const selectedColumn = Number(preview.dataset.selectedColumn);
+    if (selectedRow >= 1 && selectedRow <= rows && selectedColumn >= 1 && selectedColumn <= columns) {
+      const cellWidth = surface.width / columns;
+      const cellHeight = surface.height / rows;
+      ctx.strokeStyle = '#fff3aa';
+      ctx.lineWidth = Math.max(2, Math.min(cellWidth, cellHeight) * 0.13);
+      ctx.strokeRect((selectedColumn - 1) * cellWidth + 1, (selectedRow - 1) * cellHeight + 1,
+        Math.max(1, cellWidth - 2), Math.max(1, cellHeight - 2));
+    }
     const map = new THREE.CanvasTexture(surface);
     map.colorSpace = THREE.SRGBColorSpace;
     return map;
+  }
+
+  function updatePlanTexture() {
+    if (!model) return;
+    const next = `${preview.dataset.cabinetsPerChain}:${preview.dataset.selectedRow}:${preview.dataset.selectedColumn}`;
+    if (planSignature === next) return;
+    planSignature = next;
+    const nextTexture = makeFrontTexture(Number(preview.dataset.columns), Number(preview.dataset.rows),
+      Number(preview.dataset.columns) * Number(preview.dataset.cabinetWidthMm) /
+      (Number(preview.dataset.rows) * Number(preview.dataset.cabinetHeightMm)));
+    model.material[4].map = nextTexture;
+    model.material[4].needsUpdate = true;
+    texture.dispose();
+    texture = nextTexture;
+    requestRender();
   }
 
   function resize() {
@@ -161,7 +201,10 @@ if (!context) {
       || columns < 1 || rows < 1 || cabinetWidth <= 0 || cabinetHeight <= 0) return;
     const nextSignature = `${columns}:${rows}:${cabinetWidth}:${cabinetHeight}`;
     canvas.setAttribute('aria-label', `${preview.getAttribute('aria-label')} Drag or use arrow keys to rotate; scroll or pinch to zoom.`);
-    if (signature === nextSignature) return;
+    if (signature === nextSignature) {
+      updatePlanTexture();
+      return;
+    }
     signature = nextSignature;
     if (model) {
       scene.remove(model, outline);
@@ -178,6 +221,7 @@ if (!context) {
     const height = fullHeight * scale;
     const depth = Math.min(0.28, Math.max(0.1, cabinetHeight * scale * 0.7));
     texture = makeFrontTexture(columns, rows, fullWidth / fullHeight);
+    planSignature = `${preview.dataset.cabinetsPerChain}:${preview.dataset.selectedRow}:${preview.dataset.selectedColumn}`;
     const steel = new THREE.MeshStandardMaterial({ color: 0x303b4b, metalness: 0.48, roughness: 0.58 });
     const side = new THREE.MeshStandardMaterial({ color: 0x222e3d, metalness: 0.48, roughness: 0.58 });
     const front = new THREE.MeshBasicMaterial({ map: texture });
@@ -210,6 +254,7 @@ if (!context) {
   const observer = new ResizeObserver(resize);
   observer.observe(preview);
   preview.addEventListener('led-wall:geometry', updateGeometry);
+  preview.addEventListener('led-wall:plan', updatePlanTexture);
   preview.addEventListener('led-wall:view', event => setView(event.detail));
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) stopTween();
@@ -219,6 +264,7 @@ if (!context) {
   canvas.addEventListener('pointerdown', event => {
     stopTween();
     pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
+    pointerOrigins.set(event.pointerId, { x: event.clientX, y: event.clientY });
     canvas.setPointerCapture(event.pointerId);
     if (pointers.size === 2) {
       const [first, second] = [...pointers.values()];
@@ -242,7 +288,26 @@ if (!context) {
     applyCamera();
   });
   const releasePointer = event => {
+    const origin = pointerOrigins.get(event.pointerId);
+    if (event.type === 'pointerup' && origin && pointers.size === 1
+      && Math.hypot(event.clientX - origin.x, event.clientY - origin.y) < 7 && model) {
+      const rect = canvas.getBoundingClientRect();
+      const pointer = new THREE.Vector2(
+        (event.clientX - rect.left) / rect.width * 2 - 1,
+        -((event.clientY - rect.top) / rect.height * 2 - 1)
+      );
+      raycaster.setFromCamera(pointer, camera);
+      const hit = raycaster.intersectObject(model)[0];
+      if (hit?.face?.materialIndex === 4 && hit.uv) {
+        const columns = Number(preview.dataset.columns);
+        const rows = Number(preview.dataset.rows);
+        const column = Math.min(columns, Math.max(1, Math.floor(hit.uv.x * columns) + 1));
+        const row = Math.min(rows, Math.max(1, Math.floor((1 - hit.uv.y) * rows) + 1));
+        preview.dispatchEvent(new CustomEvent('led-wall:select', { detail: { row, column } }));
+      }
+    }
     pointers.delete(event.pointerId);
+    pointerOrigins.delete(event.pointerId);
     pinchDistance = 0;
     if (canvas.hasPointerCapture(event.pointerId)) canvas.releasePointerCapture(event.pointerId);
   };
