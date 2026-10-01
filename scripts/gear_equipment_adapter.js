@@ -131,7 +131,7 @@ function buildSheet(config, catalog) {
     // Fail closed until the source catalog supplies a separately evidenced equipment description.
     if (!refs.length || component.geometry_status === 'virtual_route' ||
         workspaceText.test([component.label, component.category].join(' '))) continue;
-    const pending = originalRefs.some(id => HOUSE_KINDS.has(kindOf(id))) ||
+    const pending = originalRefs.some(id => !EQUIPMENT_KINDS.has(kindOf(id))) ||
       workspaceText.test(String(component.purpose || ''));
     listed.push({ component, refs, kinds: refs.map(kindOf), pending });
   }

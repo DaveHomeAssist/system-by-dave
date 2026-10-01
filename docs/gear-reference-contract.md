@@ -117,7 +117,8 @@ operator reports and house records are not published as product evidence.
 Virtual routes, venue-labelled items and items without public equipment evidence
 remain solely in the source catalog.
 
-For a shared part whose description mixes product evidence and venue evidence,
+For a shared part whose description relies on any excluded evidence (including
+unit photographs and supplied references),
 the public sheet retains its product identity and public sources, marks the
 description Unknown, and says it awaits equipment-only source review. It never
 copies the mixed description to Parts, Open facts, or an accuracy log. Separating

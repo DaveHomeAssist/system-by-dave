@@ -61,6 +61,25 @@ test('mixed descriptions cannot leak via Parts, Open facts, sources or the accur
   assert.equal(JSON.stringify(catalog), before, 'the workspace source must remain intact');
 });
 
+test('removing supplied-reference or unit-photo evidence makes the description pending', () => {
+  for (const [catalogName, componentId, sourceId] of [
+    ['superjoy', 'superjoy.joystick', 'ptzoptics-reference'],
+    ['atem-hd8-iso', 'atem.program.1', 'photo-front']
+  ]) {
+    const config = EQUIPMENT.find(item => item.catalog === catalogName);
+    const catalog = structuredClone(catalogs[catalogName]);
+    const component = catalog.components.find(item => item.component_id === componentId);
+    component.source_ids = [Object.keys(config.sources).find(id => config.sources[id] === 'manufacturer'), sourceId];
+    component.purpose = 'Functional claim supported by an excluded source.';
+    const output = partsOf(buildSheet(config, catalog)).find(part => part.id === componentId);
+    assert.ok(output.descriptionPending);
+    assert.equal(output.evidence, 'Unknown');
+    assert.ok(!output.sourceRefs.includes(sourceId));
+    assert.notEqual(output.description, component.purpose);
+  }
+  assert.ok(partsOf(sheets['ptzoptics-superjoy-g1']).find(part => part.id === 'superjoy.joystick').descriptionPending);
+});
+
 test('venue routes and unit-only evidence stay out; descriptive venue text fails closed', () => {
   const config = EQUIPMENT.find(item => item.catalog === 'p240');
   const catalog = structuredClone(catalogs.p240);

@@ -86,6 +86,17 @@
         "product-perspectives",
         "product-top"
       ]
+    },
+    {
+      "item": "Parts the catalog has not established",
+      "status": "unverified",
+      "detail": "60 parts are listed under Open facts.",
+      "sourceRefs": [
+        "product-front",
+        "product-side",
+        "product-perspectives",
+        "product-top"
+      ]
     }
   ],
   "sections": [
@@ -126,13 +137,14 @@
                 "id": "superjoy.chassis",
                 "label": "Console chassis",
                 "kind": "chassis",
-                "description": "Low console with a sloping operator surface and separate upper plate.",
-                "evidence": "Documented",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "product-front",
                   "product-side",
                   "product-perspectives"
-                ]
+                ],
+                "descriptionPending": true
               }
             ]
           },
@@ -143,41 +155,45 @@
                 "id": "superjoy.lcd",
                 "label": "LCD readout",
                 "kind": "display",
-                "description": "Displays controller and selected-camera status. It is not a touchscreen.",
-                "evidence": "Documented",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "product-top"
-                ]
+                ],
+                "descriptionPending": true
               },
               {
                 "id": "superjoy.hdmi.output",
                 "label": "HDMI OUTPUT",
                 "kind": "round",
-                "description": "Selects camera RTSP video for the controller HDMI output. No video is decoded here.",
-                "evidence": "Documented",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "product-top"
-                ]
+                ],
+                "descriptionPending": true
               },
               {
                 "id": "superjoy.system.inquire",
                 "label": "INQUIRE",
                 "kind": "button",
-                "description": "Opens the controller device list; the trainer shows synthetic entries.",
-                "evidence": "Documented",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "product-top"
-                ]
+                ],
+                "descriptionPending": true
               },
               {
                 "id": "superjoy.system.setup",
                 "label": "SETUP",
                 "kind": "button",
-                "description": "Opens controller settings. In this version it identifies menu functions; it does not emulate an admin portal.",
-                "evidence": "Documented",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "product-top"
-                ]
+                ],
+                "descriptionPending": true
               }
             ]
           },
@@ -188,21 +204,23 @@
                 "id": "superjoy.joystick",
                 "label": "Pan / tilt / twist joystick",
                 "kind": "joystick",
-                "description": "Move for pan and tilt; twist for zoom. In camera-menu mode it navigates the camera OSD.",
-                "evidence": "Documented",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "product-top"
-                ]
+                ],
+                "descriptionPending": true
               },
               {
                 "id": "superjoy.zoom.fine",
                 "label": "Fine zoom dial",
                 "kind": "dial",
-                "description": "Fine zoom toward WIDE or TELE; the documented fine dial uses the lowest speed.",
-                "evidence": "Documented",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "product-top"
-                ]
+                ],
+                "descriptionPending": true
               }
             ]
           },
@@ -213,71 +231,78 @@
                 "id": "superjoy.focus.fine",
                 "label": "Fine focus dial",
                 "kind": "dial",
-                "description": "Fine manual focus toward NEAR or FAR.",
-                "evidence": "Documented",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "product-top"
-                ]
+                ],
+                "descriptionPending": true
               },
               {
                 "id": "superjoy.exposure.backlight",
                 "label": "BACKLIGHT",
                 "kind": "button",
-                "description": "Toggles backlight compensation.",
-                "evidence": "Documented",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "product-top"
-                ]
+                ],
+                "descriptionPending": true
               },
               {
                 "id": "superjoy.exposure.cycle",
                 "label": "EXPOSURE CYCLE",
                 "kind": "button",
-                "description": "Cycles Auto, Manual, Shutter Priority, Iris Priority and Brightness Priority.",
-                "evidence": "Documented",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "product-top"
-                ]
+                ],
+                "descriptionPending": true
               },
               {
                 "id": "superjoy.exposure.encoder",
                 "label": "Iris / shutter / gain encoder",
                 "kind": "encoder",
-                "description": "Adjusts an exposure parameter appropriate to the current mode.",
-                "evidence": "Documented",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "product-top"
-                ]
+                ],
+                "descriptionPending": true
               },
               {
                 "id": "superjoy.focus.lock",
                 "label": "AUTO FOCUS LOCK",
                 "kind": "button",
-                "description": "Pauses autofocus at its present focus.",
-                "evidence": "Documented",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "product-top"
-                ]
+                ],
+                "descriptionPending": true
               },
               {
                 "id": "superjoy.focus.unlock",
                 "label": "AUTO FOCUS UNLOCK",
                 "kind": "button",
-                "description": "Releases focus lock.",
-                "evidence": "Documented",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "product-top"
-                ]
+                ],
+                "descriptionPending": true
               },
               {
                 "id": "superjoy.focus.auto",
                 "label": "AUTO FOCUS",
                 "kind": "button",
-                "description": "Enables automatic focus.",
-                "evidence": "Documented",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "product-top"
-                ]
+                ],
+                "descriptionPending": true
               }
             ]
           },
@@ -288,41 +313,45 @@
                 "id": "superjoy.wb.reset",
                 "label": "RESET R/B GAIN",
                 "kind": "button",
-                "description": "Resets red and blue gain in the training state.",
-                "evidence": "Documented",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "product-top"
-                ]
+                ],
+                "descriptionPending": true
               },
               {
                 "id": "superjoy.wb.onepush",
                 "label": "ONEPUSH TRIGGER",
                 "kind": "button",
-                "description": "Triggers a white-balance calibration when OnePush mode is selected.",
-                "evidence": "Documented",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "product-top"
-                ]
+                ],
+                "descriptionPending": true
               },
               {
                 "id": "superjoy.wb.cycle",
                 "label": "WHITE BALANCE CYCLE",
                 "kind": "button",
-                "description": "Cycles the white-balance mode.",
-                "evidence": "Documented",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "product-top"
-                ]
+                ],
+                "descriptionPending": true
               },
               {
                 "id": "superjoy.wb.gain",
                 "label": "Red / blue gain encoder",
                 "kind": "encoder",
-                "description": "Adjusts the selected red or blue gain in manual white balance.",
-                "evidence": "Documented",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "product-top"
-                ]
+                ],
+                "descriptionPending": true
               }
             ]
           },
@@ -333,101 +362,111 @@
                 "id": "superjoy.speed.tilt.down",
                 "label": "TILT SPEED DOWN",
                 "kind": "button",
-                "description": "Adjusts tilt speed for the selected simulated camera. Training scale 1–8; not a hardware range claim.",
-                "evidence": "Documented",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "product-top"
-                ]
+                ],
+                "descriptionPending": true
               },
               {
                 "id": "superjoy.speed.tilt.up",
                 "label": "TILT SPEED UP",
                 "kind": "button",
-                "description": "Adjusts tilt speed for the selected simulated camera. Training scale 1–8; not a hardware range claim.",
-                "evidence": "Documented",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "product-top"
-                ]
+                ],
+                "descriptionPending": true
               },
               {
                 "id": "superjoy.speed.pan.down",
                 "label": "PAN SPEED DOWN",
                 "kind": "button",
-                "description": "Adjusts pan speed for the selected simulated camera. Training scale 1–8; not a hardware range claim.",
-                "evidence": "Documented",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "product-top"
-                ]
+                ],
+                "descriptionPending": true
               },
               {
                 "id": "superjoy.speed.pan.up",
                 "label": "PAN SPEED UP",
                 "kind": "button",
-                "description": "Adjusts pan speed for the selected simulated camera. Training scale 1–8; not a hardware range claim.",
-                "evidence": "Documented",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "product-top"
-                ]
+                ],
+                "descriptionPending": true
               },
               {
                 "id": "superjoy.speed.zoom.down",
                 "label": "ZOOM SPEED DOWN",
                 "kind": "button",
-                "description": "Adjusts zoom speed for the selected simulated camera. Training scale 1–8; not a hardware range claim.",
-                "evidence": "Documented",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "product-top"
-                ]
+                ],
+                "descriptionPending": true
               },
               {
                 "id": "superjoy.speed.zoom.up",
                 "label": "ZOOM SPEED UP",
                 "kind": "button",
-                "description": "Adjusts zoom speed for the selected simulated camera. Training scale 1–8; not a hardware range claim.",
-                "evidence": "Documented",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "product-top"
-                ]
+                ],
+                "descriptionPending": true
               },
               {
                 "id": "superjoy.speed.focus.down",
                 "label": "FOCUS SPEED DOWN",
                 "kind": "button",
-                "description": "Adjusts focus speed for the selected simulated camera. Training scale 1–8; not a hardware range claim.",
-                "evidence": "Documented",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "product-top"
-                ]
+                ],
+                "descriptionPending": true
               },
               {
                 "id": "superjoy.speed.focus.up",
                 "label": "FOCUS SPEED UP",
                 "kind": "button",
-                "description": "Adjusts focus speed for the selected simulated camera. Training scale 1–8; not a hardware range claim.",
-                "evidence": "Documented",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "product-top"
-                ]
+                ],
+                "descriptionPending": true
               },
               {
                 "id": "superjoy.speed.preset.down",
                 "label": "PRESET SPEED DOWN",
                 "kind": "button",
-                "description": "Adjusts preset speed for the selected simulated camera. Training scale 1–8; not a hardware range claim.",
-                "evidence": "Documented",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "product-top"
-                ]
+                ],
+                "descriptionPending": true
               },
               {
                 "id": "superjoy.speed.preset.up",
                 "label": "PRESET SPEED UP",
                 "kind": "button",
-                "description": "Adjusts preset speed for the selected simulated camera. Training scale 1–8; not a hardware range claim.",
-                "evidence": "Documented",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "product-top"
-                ]
+                ],
+                "descriptionPending": true
               }
             ]
           },
@@ -438,31 +477,34 @@
                 "id": "superjoy.osd.toggle",
                 "label": "OSD ON OFF",
                 "kind": "button",
-                "description": "Opens or closes the camera on-screen menu.",
-                "evidence": "Documented",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "product-top"
-                ]
+                ],
+                "descriptionPending": true
               },
               {
                 "id": "superjoy.osd.enter",
                 "label": "OSD ENTER",
                 "kind": "button",
-                "description": "Selects the highlighted camera-menu item.",
-                "evidence": "Documented",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "product-top"
-                ]
+                ],
+                "descriptionPending": true
               },
               {
                 "id": "superjoy.osd.back",
                 "label": "OSD BACK",
                 "kind": "button",
-                "description": "Returns to the previous camera-menu level.",
-                "evidence": "Documented",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "product-top"
-                ]
+                ],
+                "descriptionPending": true
               }
             ]
           },
@@ -473,81 +515,89 @@
                 "id": "superjoy.camera.group",
                 "label": "CAM GROUP",
                 "kind": "button",
-                "description": "Cycles the five camera groups.",
-                "evidence": "Documented",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "product-top"
-                ]
+                ],
+                "descriptionPending": true
               },
               {
                 "id": "superjoy.camera.id",
                 "label": "CAM ID",
                 "kind": "button",
-                "description": "Choose a camera using a numeric ID.",
-                "evidence": "Documented",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "product-top"
-                ]
+                ],
+                "descriptionPending": true
               },
               {
                 "id": "superjoy.camera.1",
                 "label": "CAM 1",
                 "kind": "button",
-                "description": "Selects camera 1 in the current group without moving it. Training channel labels are not venue assignments.",
-                "evidence": "Documented",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "product-top"
-                ]
+                ],
+                "descriptionPending": true
               },
               {
                 "id": "superjoy.camera.2",
                 "label": "CAM 2",
                 "kind": "button",
-                "description": "Selects camera 2 in the current group without moving it. Training channel labels are not venue assignments.",
-                "evidence": "Documented",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "product-top"
-                ]
+                ],
+                "descriptionPending": true
               },
               {
                 "id": "superjoy.camera.3",
                 "label": "CAM 3",
                 "kind": "button",
-                "description": "Selects camera 3 in the current group without moving it. Training channel labels are not venue assignments.",
-                "evidence": "Documented",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "product-top"
-                ]
+                ],
+                "descriptionPending": true
               },
               {
                 "id": "superjoy.camera.4",
                 "label": "CAM 4",
                 "kind": "button",
-                "description": "Selects camera 4 in the current group without moving it. Training channel labels are not venue assignments.",
-                "evidence": "Documented",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "product-top"
-                ]
+                ],
+                "descriptionPending": true
               },
               {
                 "id": "superjoy.camera.5",
                 "label": "CAM 5",
                 "kind": "button",
-                "description": "Selects camera 5 in the current group without moving it. Training channel labels are not venue assignments.",
-                "evidence": "Documented",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "product-top"
-                ]
+                ],
+                "descriptionPending": true
               },
               {
                 "id": "superjoy.camera.6",
                 "label": "CAM 6",
                 "kind": "button",
-                "description": "Selects camera 6 in the current group without moving it. Training channel labels are not venue assignments.",
-                "evidence": "Documented",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "product-top"
-                ]
+                ],
+                "descriptionPending": true
               }
             ]
           },
@@ -558,41 +608,45 @@
                 "id": "superjoy.custom.1",
                 "label": "CUSTOM 1",
                 "kind": "round",
-                "description": "Configured custom commands can send HTTP, UART, TCP, UDP or Super Presets. This trainer records a press only.",
-                "evidence": "Documented",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "product-top"
-                ]
+                ],
+                "descriptionPending": true
               },
               {
                 "id": "superjoy.custom.2",
                 "label": "CUSTOM 2",
                 "kind": "round",
-                "description": "Configured custom commands can send HTTP, UART, TCP, UDP or Super Presets. This trainer records a press only.",
-                "evidence": "Documented",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "product-top"
-                ]
+                ],
+                "descriptionPending": true
               },
               {
                 "id": "superjoy.custom.3",
                 "label": "CUSTOM 3",
                 "kind": "round",
-                "description": "Configured custom commands can send HTTP, UART, TCP, UDP or Super Presets. This trainer records a press only.",
-                "evidence": "Documented",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "product-top"
-                ]
+                ],
+                "descriptionPending": true
               },
               {
                 "id": "superjoy.custom.4",
                 "label": "CUSTOM 4",
                 "kind": "round",
-                "description": "Configured custom commands can send HTTP, UART, TCP, UDP or Super Presets. This trainer records a press only.",
-                "evidence": "Documented",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "product-top"
-                ]
+                ],
+                "descriptionPending": true
               }
             ]
           },
@@ -603,31 +657,34 @@
                 "id": "superjoy.preset.home",
                 "label": "HOME",
                 "kind": "button",
-                "description": "Returns the selected camera to a home pose; this causes simulated movement.",
-                "evidence": "Documented",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "product-top"
-                ]
+                ],
+                "descriptionPending": true
               },
               {
                 "id": "superjoy.preset.set",
                 "label": "SET",
                 "kind": "button",
-                "description": "Stores the current simulated pose at the entered preset number.",
-                "evidence": "Documented",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "product-top"
-                ]
+                ],
+                "descriptionPending": true
               },
               {
                 "id": "superjoy.preset.call",
                 "label": "CALL",
                 "kind": "button",
-                "description": "Recalls the entered preset on the selected simulated camera.",
-                "evidence": "Documented",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "product-top"
-                ]
+                ],
+                "descriptionPending": true
               }
             ]
           },
@@ -638,21 +695,23 @@
                 "id": "superjoy.mode.basic",
                 "label": "BASIC MODE",
                 "kind": "button",
-                "description": "Limits the training controls to PTZ and presets.",
-                "evidence": "Documented",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "product-top"
-                ]
+                ],
+                "descriptionPending": true
               },
               {
                 "id": "superjoy.mode.matrix",
                 "label": "MATRIX MODE",
                 "kind": "button",
-                "description": "Restricts the training keypad to a 3 by 3 map of presets 1–3 on cameras 1–3.",
-                "evidence": "Documented",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "product-top"
-                ]
+                ],
+                "descriptionPending": true
               }
             ]
           },
@@ -663,121 +722,133 @@
                 "id": "superjoy.key.1",
                 "label": "1",
                 "kind": "button",
-                "description": "Numeric entry for camera selection or presets. This trainer uses an explicit number then CALL / SET sequence; quick press and hold shortcuts are not reproduced.",
-                "evidence": "Documented",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "product-top"
-                ]
+                ],
+                "descriptionPending": true
               },
               {
                 "id": "superjoy.key.2",
                 "label": "2 / ABC",
                 "kind": "button",
-                "description": "Numeric entry for camera selection or presets. This trainer uses an explicit number then CALL / SET sequence; quick press and hold shortcuts are not reproduced.",
-                "evidence": "Documented",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "product-top"
-                ]
+                ],
+                "descriptionPending": true
               },
               {
                 "id": "superjoy.key.3",
                 "label": "3 / DEF",
                 "kind": "button",
-                "description": "Numeric entry for camera selection or presets. This trainer uses an explicit number then CALL / SET sequence; quick press and hold shortcuts are not reproduced.",
-                "evidence": "Documented",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "product-top"
-                ]
+                ],
+                "descriptionPending": true
               },
               {
                 "id": "superjoy.key.escape",
                 "label": "ESCAPE",
                 "kind": "button",
-                "description": "Numeric entry for camera selection or presets. This trainer uses an explicit number then CALL / SET sequence; quick press and hold shortcuts are not reproduced.",
-                "evidence": "Documented",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "product-top"
-                ]
+                ],
+                "descriptionPending": true
               },
               {
                 "id": "superjoy.key.4",
                 "label": "4 / GHI",
                 "kind": "button",
-                "description": "Numeric entry for camera selection or presets. This trainer uses an explicit number then CALL / SET sequence; quick press and hold shortcuts are not reproduced.",
-                "evidence": "Documented",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "product-top"
-                ]
+                ],
+                "descriptionPending": true
               },
               {
                 "id": "superjoy.key.5",
                 "label": "5 / JKL",
                 "kind": "button",
-                "description": "Numeric entry for camera selection or presets. This trainer uses an explicit number then CALL / SET sequence; quick press and hold shortcuts are not reproduced.",
-                "evidence": "Documented",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "product-top"
-                ]
+                ],
+                "descriptionPending": true
               },
               {
                 "id": "superjoy.key.6",
                 "label": "6 / MNO",
                 "kind": "button",
-                "description": "Numeric entry for camera selection or presets. This trainer uses an explicit number then CALL / SET sequence; quick press and hold shortcuts are not reproduced.",
-                "evidence": "Documented",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "product-top"
-                ]
+                ],
+                "descriptionPending": true
               },
               {
                 "id": "superjoy.key.0",
                 "label": "0",
                 "kind": "button",
-                "description": "Numeric entry for camera selection or presets. This trainer uses an explicit number then CALL / SET sequence; quick press and hold shortcuts are not reproduced.",
-                "evidence": "Documented",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "product-top"
-                ]
+                ],
+                "descriptionPending": true
               },
               {
                 "id": "superjoy.key.7",
                 "label": "7 / PQRS",
                 "kind": "button",
-                "description": "Numeric entry for camera selection or presets. This trainer uses an explicit number then CALL / SET sequence; quick press and hold shortcuts are not reproduced.",
-                "evidence": "Documented",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "product-top"
-                ]
+                ],
+                "descriptionPending": true
               },
               {
                 "id": "superjoy.key.8",
                 "label": "8 / TUV",
                 "kind": "button",
-                "description": "Numeric entry for camera selection or presets. This trainer uses an explicit number then CALL / SET sequence; quick press and hold shortcuts are not reproduced.",
-                "evidence": "Documented",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "product-top"
-                ]
+                ],
+                "descriptionPending": true
               },
               {
                 "id": "superjoy.key.9",
                 "label": "9 / WXYZ",
                 "kind": "button",
-                "description": "Numeric entry for camera selection or presets. This trainer uses an explicit number then CALL / SET sequence; quick press and hold shortcuts are not reproduced.",
-                "evidence": "Documented",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "product-top"
-                ]
+                ],
+                "descriptionPending": true
               },
               {
                 "id": "superjoy.key.enter",
                 "label": "ENTER",
                 "kind": "button",
-                "description": "Numeric entry for camera selection or presets. This trainer uses an explicit number then CALL / SET sequence; quick press and hold shortcuts are not reproduced.",
-                "evidence": "Documented",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "product-top"
-                ]
+                ],
+                "descriptionPending": true
               }
             ]
           }
@@ -801,13 +872,316 @@
       ],
       "rows": [
         [
+          "Console chassis",
+          "Not established",
+          "Equipment description awaiting source review."
+        ],
+        [
+          "LCD readout",
+          "Not established",
+          "Equipment description awaiting source review."
+        ],
+        [
+          "Pan / tilt / twist joystick",
+          "Not established",
+          "Equipment description awaiting source review."
+        ],
+        [
+          "Fine focus dial",
+          "Not established",
+          "Equipment description awaiting source review."
+        ],
+        [
+          "Fine zoom dial",
+          "Not established",
+          "Equipment description awaiting source review."
+        ],
+        [
+          "RESET R/B GAIN",
+          "Not established",
+          "Equipment description awaiting source review."
+        ],
+        [
+          "ONEPUSH TRIGGER",
+          "Not established",
+          "Equipment description awaiting source review."
+        ],
+        [
+          "WHITE BALANCE CYCLE",
+          "Not established",
+          "Equipment description awaiting source review."
+        ],
+        [
+          "Red / blue gain encoder",
+          "Not established",
+          "Equipment description awaiting source review."
+        ],
+        [
+          "BACKLIGHT",
+          "Not established",
+          "Equipment description awaiting source review."
+        ],
+        [
+          "EXPOSURE CYCLE",
+          "Not established",
+          "Equipment description awaiting source review."
+        ],
+        [
+          "Iris / shutter / gain encoder",
+          "Not established",
+          "Equipment description awaiting source review."
+        ],
+        [
+          "AUTO FOCUS LOCK",
+          "Not established",
+          "Equipment description awaiting source review."
+        ],
+        [
+          "AUTO FOCUS UNLOCK",
+          "Not established",
+          "Equipment description awaiting source review."
+        ],
+        [
+          "AUTO FOCUS",
+          "Not established",
+          "Equipment description awaiting source review."
+        ],
+        [
+          "TILT SPEED DOWN",
+          "Not established",
+          "Equipment description awaiting source review."
+        ],
+        [
+          "TILT SPEED UP",
+          "Not established",
+          "Equipment description awaiting source review."
+        ],
+        [
+          "PAN SPEED DOWN",
+          "Not established",
+          "Equipment description awaiting source review."
+        ],
+        [
+          "PAN SPEED UP",
+          "Not established",
+          "Equipment description awaiting source review."
+        ],
+        [
+          "ZOOM SPEED DOWN",
+          "Not established",
+          "Equipment description awaiting source review."
+        ],
+        [
+          "ZOOM SPEED UP",
+          "Not established",
+          "Equipment description awaiting source review."
+        ],
+        [
+          "FOCUS SPEED DOWN",
+          "Not established",
+          "Equipment description awaiting source review."
+        ],
+        [
+          "FOCUS SPEED UP",
+          "Not established",
+          "Equipment description awaiting source review."
+        ],
+        [
+          "PRESET SPEED DOWN",
+          "Not established",
+          "Equipment description awaiting source review."
+        ],
+        [
+          "PRESET SPEED UP",
+          "Not established",
+          "Equipment description awaiting source review."
+        ],
+        [
+          "OSD ON OFF",
+          "Not established",
+          "Equipment description awaiting source review."
+        ],
+        [
+          "OSD ENTER",
+          "Not established",
+          "Equipment description awaiting source review."
+        ],
+        [
+          "OSD BACK",
+          "Not established",
+          "Equipment description awaiting source review."
+        ],
+        [
+          "CAM GROUP",
+          "Not established",
+          "Equipment description awaiting source review."
+        ],
+        [
+          "CUSTOM 1",
+          "Not established",
+          "Equipment description awaiting source review."
+        ],
+        [
+          "CUSTOM 2",
+          "Not established",
+          "Equipment description awaiting source review."
+        ],
+        [
+          "CUSTOM 3",
+          "Not established",
+          "Equipment description awaiting source review."
+        ],
+        [
+          "CUSTOM 4",
+          "Not established",
+          "Equipment description awaiting source review."
+        ],
+        [
+          "HDMI OUTPUT",
+          "Not established",
+          "Equipment description awaiting source review."
+        ],
+        [
+          "INQUIRE",
+          "Not established",
+          "Equipment description awaiting source review."
+        ],
+        [
+          "SETUP",
+          "Not established",
+          "Equipment description awaiting source review."
+        ],
+        [
+          "CAM ID",
+          "Not established",
+          "Equipment description awaiting source review."
+        ],
+        [
+          "HOME",
+          "Not established",
+          "Equipment description awaiting source review."
+        ],
+        [
+          "SET",
+          "Not established",
+          "Equipment description awaiting source review."
+        ],
+        [
+          "CALL",
+          "Not established",
+          "Equipment description awaiting source review."
+        ],
+        [
+          "BASIC MODE",
+          "Not established",
+          "Equipment description awaiting source review."
+        ],
+        [
+          "MATRIX MODE",
+          "Not established",
+          "Equipment description awaiting source review."
+        ],
+        [
+          "CAM 1",
+          "Not established",
+          "Equipment description awaiting source review."
+        ],
+        [
+          "CAM 2",
+          "Not established",
+          "Equipment description awaiting source review."
+        ],
+        [
+          "CAM 3",
+          "Not established",
+          "Equipment description awaiting source review."
+        ],
+        [
+          "CAM 4",
+          "Not established",
+          "Equipment description awaiting source review."
+        ],
+        [
+          "CAM 5",
+          "Not established",
+          "Equipment description awaiting source review."
+        ],
+        [
+          "CAM 6",
+          "Not established",
+          "Equipment description awaiting source review."
+        ],
+        [
+          "1",
+          "Not established",
+          "Equipment description awaiting source review."
+        ],
+        [
+          "2 / ABC",
+          "Not established",
+          "Equipment description awaiting source review."
+        ],
+        [
+          "3 / DEF",
+          "Not established",
+          "Equipment description awaiting source review."
+        ],
+        [
+          "ESCAPE",
+          "Not established",
+          "Equipment description awaiting source review."
+        ],
+        [
+          "4 / GHI",
+          "Not established",
+          "Equipment description awaiting source review."
+        ],
+        [
+          "5 / JKL",
+          "Not established",
+          "Equipment description awaiting source review."
+        ],
+        [
+          "6 / MNO",
+          "Not established",
+          "Equipment description awaiting source review."
+        ],
+        [
+          "0",
+          "Not established",
+          "Equipment description awaiting source review."
+        ],
+        [
+          "7 / PQRS",
+          "Not established",
+          "Equipment description awaiting source review."
+        ],
+        [
+          "8 / TUV",
+          "Not established",
+          "Equipment description awaiting source review."
+        ],
+        [
+          "9 / WXYZ",
+          "Not established",
+          "Equipment description awaiting source review."
+        ],
+        [
+          "ENTER",
+          "Not established",
+          "Equipment description awaiting source review."
+        ],
+        [
           "Connector specifications",
           "Descriptive text only",
           "The catalog records connectors as parts with descriptions. It has no structured connector fields (signal standard, format, pinout), so this sheet does not tabulate them."
         ]
       ],
       "sourceRefs": [
-        "manufacturer-buttons"
+        "product-front",
+        "product-side",
+        "product-perspectives",
+        "product-top"
       ]
     },
     {
