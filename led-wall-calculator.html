@@ -55,8 +55,6 @@ html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-stage{
 html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-stage-view{height:100%;min-height:0;padding:4px 18px 4px 6px}
 html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-wall-preview{
   width:min(100%,720px);max-height:min(100%,370px);
-  transform:rotateX(5deg) rotateY(-16deg) rotateZ(.4deg);
-  box-shadow:2px 0 0 #52617a,6px 3px 0 #303d52,12px 8px 0 #202c3f,20px 15px 0 #101826,32px 34px 52px rgba(0,0,0,.54),0 0 38px rgba(155,128,255,.24);
 }
 html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-input-grid{
   grid-column:2;grid-row:2/5;display:grid;grid-template-columns:1fr;align-content:start;
@@ -73,6 +71,16 @@ html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-detail-grid{
   overscroll-behavior:contain;padding:8px 12px;
 }
 html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-disclaimer{grid-column:1/-1;grid-row:5;padding:7px 12px;font-size:10px}
+html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-wall-preview.has-3d{
+  width:100%;height:100%;max-height:none;aspect-ratio:auto;transform:none;box-shadow:none;border:0;background:transparent;
+}
+html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-wall-preview.has-3d::before,
+html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-wall-preview.has-3d::after{display:none}
+.led-wall-preview canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}
+.led-wall-preview:not(.has-3d) canvas{display:none}
+.led-wall-preview canvas:active{cursor:grabbing}
+.led-wall-preview canvas:focus-visible{outline:2px solid var(--av-focus);outline-offset:-3px}
+.led-viewer-hint{margin:0;color:var(--av-muted);font-size:11px;line-height:1.35}
 @media (max-width:900px){
   html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-suite{display:flex;flex-direction:column;overflow-y:auto;overscroll-behavior:contain}
   html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-suite > *{flex:none}
@@ -115,7 +123,8 @@ html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-disclaimer{gri
   html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-suite-title h1{font-size:15px}
   html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-stage{grid-template-columns:1fr;gap:10px;padding:10px}
   html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-stage-view{min-height:160px}
-  html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-stage-data{grid-template-columns:minmax(0,1fr) minmax(120px,.7fr);gap:8px}
+  html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-stage-data{grid-template-columns:minmax(0,1fr) minmax(120px,.7fr);gap:6px}
+  html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-viewer-hint{grid-column:1/-1;font-size:10px}
   html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-stage-rails{grid-column:1/-1}
 }
 </style>
@@ -158,7 +167,7 @@ html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-disclaimer{gri
         </div>
       </div>
 
-      <div class="led-stage" aria-label="Live LED cabinet map">
+      <div class="led-stage" aria-label="Live 3D LED cabinet model">
         <div class="led-stage-view">
           <span class="led-stage-axis vertical" id="ledPreviewRows">5 cabinets high</span>
           <div class="led-wall-preview" id="ledWallPreview" role="img" aria-label="Preview of an 8 by 5 cabinet LED wall"></div>
@@ -166,7 +175,7 @@ html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-disclaimer{gri
         </div>
         <div class="led-stage-data">
           <div>
-            <p class="led-stage-kicker">Live cabinet map</p>
+            <p class="led-stage-kicker">3D cabinet model</p>
             <strong id="ledPreviewArray">8 × 5</strong>
             <p id="ledPreviewCanvas">1,376 × 860 native canvas<br>4.00 × 2.50 m build</p>
           </div>
@@ -174,6 +183,7 @@ html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-disclaimer{gri
             <button type="button" id="ledPreviewIsoBtn" aria-pressed="true">Isometric</button>
             <button type="button" id="ledPreviewFrontBtn" aria-pressed="false">Front</button>
           </div>
+          <p class="led-viewer-hint" id="ledViewerHint">Drag to orbit · pinch to zoom · arrows to rotate. Depth is schematic.</p>
           <div class="led-stage-rails" aria-label="LED wall planning indicators">
             <div class="led-stage-rail"><span>Port load</span><i id="ledPreviewPortRail"></i><b id="ledPreviewPort">61%</b></div>
             <div class="led-stage-rail"><span>Viewer</span><i id="ledPreviewViewerRail"></i><b id="ledPreviewViewer">Review</b></div>
@@ -506,6 +516,7 @@ html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-disclaimer{gri
 <script src="js/sbd-registry.js"></script>
 <script src="js/av-suite-context.js"></script>
 <script src="js/av-calculator.js"></script>
+<script type="module" src="js/led-wall-viewer.js"></script>
 <script src="js/sbd-nav.js" defer></script>
 <script src="js/sbd-public-nav.js" defer></script>
 </body>

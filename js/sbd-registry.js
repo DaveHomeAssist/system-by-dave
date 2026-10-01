@@ -127,6 +127,7 @@
     './js/responsive-tables.js',
     './js/av-domain-views.js',
     './js/av-calculator.js',
+    './js/led-wall-viewer.js',
     './js/vendor/gsap.min.js',
     './css/av-calculator.css',
     './ProjectorThrow/index.html',
@@ -238,7 +239,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool asset change — rolls the service-worker cache. */
-    version:'v20261001-gear-public-boundary',
+    version:'v20261001-led-wall-orbit',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,
