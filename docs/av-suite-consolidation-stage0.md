@@ -50,9 +50,8 @@ Stage 2 increment 2.0b closes the first gate above for the eight Video tools (Si
 
 `scripts/probe_av_video_legacy.mjs` (`npm run test:av-video-legacy-browser`, run by the Pages workflow) opens each page in Chromium with a synthetic fixture that fills every field in the [field matrix](av-suite-consolidation-stage2-video.md#field-matrix-for-the-video-import), including blank fields and the durations `2m30s`, `01:02:03:04`, `TBD` and `45 min`. For each page it proves that:
 
-- load, save and reload leave every stored field unchanged, for values within each page's limits
-  (loading still trims whitespace, cuts fields other than notes at 120 characters and drops rows
-  past each page's cap; Stage 2 increment 2.0c removes those limits and extends this probe);
+- load, save and reload leave every declared field unchanged; the 2.0c lossless-load slice also checks
+  long spaced text and one saved row beyond each page's former cap, and blocks Add at the cap;
 - JSON export carries the page's schema string and imports back into an empty page unchanged;
 - the CSV header equals the matrix column order (Camera Shot List exports its labels);
 - print hides the toolbar, side panel and card view and keeps the table;
@@ -66,4 +65,4 @@ The 2.0c Workbook theme slice removes the dark-only lock, supplies a visible mod
 
 The 2.0c navigation slice adds a phone-width browser check that Display Plan and Projection Plan have Video neighbors. The existing domain-view, responsive and LED configurator browser probes join the Pages workflow; the theme probe joins Pages CI in the second 2.0c slice after a software WebGL launch fix. These checks do not establish field parity or offline behavior for the other tools.
 
-It also checks the unrecognized-duration marker and runtime total on Playback Check and Record Log, and the raw-key warning on Stream Plan. It runs 120 checks. Against the previous pages, 40 of its first 112 checks passed; the note checks were added after an independent review found Video Patch, Projection Plan and Stream Plan flattening notes. The fixtures are synthetic: field-by-field import mapping, real saved shows and operator acceptance remain Stage 2 increments 2.2 and 2.5.
+It also checks the unrecognized-duration marker and runtime total on Playback Check and Record Log, and the raw-key warning on Stream Plan. It runs 128 checks after the 2.0c lossless-load fixture was added. Against the previous pages, 40 of its first 112 checks passed; the note checks were added after an independent review found Video Patch, Projection Plan and Stream Plan flattening notes. The fixtures are synthetic: field-by-field import mapping, real saved shows and operator acceptance remain Stage 2 increments 2.2 and 2.5.

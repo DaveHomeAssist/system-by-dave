@@ -932,19 +932,21 @@
   function sanitizeShot(item, index){
     item = item && typeof item === 'object' ? item : {};
     return {
-      id:typeof item.id === 'string' && item.id ? item.id.slice(0, 80) : uid(),
-      number:item.number == null ? String(index + 1).padStart(3, '0') : cleanText(item.number, 24),
-      cue:cleanText(item.cue, 40),
-      camera:cleanText(item.camera, 40),
-      type:cleanText(item.type, 50),
-      subject:cleanText(item.subject, 100),
-      framing:cleanText(item.framing, 120),
-      movement:cleanText(item.movement, 80),
-      preset:cleanText(item.preset, 40),
+      id:typeof item.id === 'string' && item.id ? item.id : uid(),
+      number:item.number == null ? String(index + 1).padStart(3, '0') : storedText(item.number),
+      cue:storedText(item.cue),
+      camera:storedText(item.camera),
+      type:storedText(item.type),
+      subject:storedText(item.subject),
+      framing:storedText(item.framing),
+      movement:storedText(item.movement),
+      preset:storedText(item.preset),
       status:sanitizeStatus(item.status),
-      notes:cleanText(item.notes, 500)
+      notes:storedText(item.notes)
     };
   }
+
+  function storedText(value){return value == null ? '' : String(value);}
 
   function cleanText(value, max){
     if(typeof value !== 'string') value = value == null ? '' : String(value);
@@ -995,16 +997,16 @@
 
   function sanitizeState(data){
     var clean = defaultState();
-    clean.meta.showName = cleanText(data.meta && data.meta.showName || clean.meta.showName, 120);
-    clean.meta.venue = cleanText(data.meta && data.meta.venue || '', 80);
-    clean.meta.date = cleanText(data.meta && data.meta.date || today(), 20);
-    clean.meta.director = cleanText(data.meta && data.meta.director || '', 80);
-    clean.meta.td = cleanText(data.meta && data.meta.td || '', 80);
-    clean.filters.search = cleanText(data.filters && data.filters.search || '', 100);
-    clean.filters.camera = cleanText(data.filters && data.filters.camera || 'all', 50);
-    clean.filters.status = cleanText(data.filters && data.filters.status || 'all', 20);
+    clean.meta.showName = storedText((data.meta && data.meta.showName != null) ? data.meta.showName : clean.meta.showName);
+    clean.meta.venue = storedText((data.meta && data.meta.venue != null) ? data.meta.venue : '');
+    clean.meta.date = storedText((data.meta && data.meta.date != null) ? data.meta.date : today());
+    clean.meta.director = storedText((data.meta && data.meta.director != null) ? data.meta.director : '');
+    clean.meta.td = storedText((data.meta && data.meta.td != null) ? data.meta.td : '');
+    clean.filters.search = storedText(data.filters && data.filters.search || '');
+    clean.filters.camera = storedText(data.filters && data.filters.camera || 'all');
+    clean.filters.status = storedText(data.filters && data.filters.status || 'all');
     if(Array.isArray(data.shots)){
-      clean.shots = data.shots.map(sanitizeShot).slice(0, 300);
+      clean.shots = data.shots.map(sanitizeShot);
     }
     return clean;
   }
@@ -1259,7 +1261,14 @@
     }
   }
 
+  function canAddRow(){
+    if(state.shots.length < 300) return true;
+    setHint('Shot limit is 300. Existing ' + state.shots.length + ' rows are kept; remove rows before adding.', 'error');
+    return false;
+  }
+
   function addShot(){
+    if(!canAddRow()) return;
     var nextNumber = String(state.shots.length + 1).padStart(3, '0');
     var shot = makeShot(nextNumber, '', 'Cam 1', 'Medium', 'New subject', '', '', '', 'hold', '');
     var index = selectedId ? state.shots.findIndex(function(item){ return item.id === selectedId; }) + 1 : state.shots.length;
@@ -1272,6 +1281,7 @@
   }
 
   function duplicateShot(){
+    if(!canAddRow()) return;
     var shot = selectedShot();
     if(!shot) return showSelectionError($('duplicateBtn'));
     var copy = sanitizeShot(JSON.parse(JSON.stringify(shot)), state.shots.length);
@@ -1572,6 +1582,7 @@
     wireEvents();
     installPressFeedback();
     renderTable();
+    if(!loadProblem && state.shots.length > 300) setHint('Existing ' + state.shots.length + ' rows are kept. The shot limit is 300; remove rows before adding.', 'error');
     if(loadProblem) setHint(loadProblem, 'error');
   }
 
