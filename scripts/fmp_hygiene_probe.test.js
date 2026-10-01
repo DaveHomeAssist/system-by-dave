@@ -7,7 +7,7 @@ const { test } = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
-const { releasePins, ACTIVE_RELEASES, FROZEN_RELEASES } = require('./fmp_hygiene_probe');
+const { releasePins, classifyExternal, externalStatus, ACTIVE_RELEASES, FROZEN_RELEASES } = require('./fmp_hygiene_probe');
 
 const root = path.resolve(__dirname, '..');
 const provenanceOf = dir => JSON.parse(fs.readFileSync(path.join(root, dir, 'source_provenance.json'), 'utf8'));
@@ -41,4 +41,18 @@ test('active releases that disagree fail', () => {
   const result = releasePins(provenance, ['fmp', 'extra'], {});
   assert.equal(result.status, 'fail');
   assert.match(result.detail, /active releases pin fmp bbbbbbbbbbbb vs extra cccccccccccc/);
+});
+
+test('L3 reports a bot challenge from a browser-checked host as unverified, never as a pass', () => {
+  const seat = 'https://aviewfrommyseat.com/venue/Freedom+Mortgage+Pavilion/seating-chart/concert/';
+  assert.equal(classifyExternal(seat, 403), 'challenged');
+  assert.equal(classifyExternal(seat.replace('https://', 'https://www.'), 429), 'challenged');
+  assert.equal(classifyExternal(seat, 404), 'broken', 'a missing page is still a broken link');
+  assert.equal(classifyExternal(seat, 503), 'broken', 'an outage is not a challenge');
+  assert.equal(externalStatus(0, 3), 'grey', 'challenged links are unverified by this run');
+  assert.equal(externalStatus(1, 3), 'warn');
+  assert.equal(externalStatus(0, 0), 'pass');
+  assert.equal(classifyExternal('https://example.com/', 403), 'broken', 'only browser-checked hosts get the exception');
+  assert.equal(classifyExternal('https://example.com/', 0), 'broken');
+  assert.equal(classifyExternal('https://example.com/', 200), 'ok');
 });
