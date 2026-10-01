@@ -131,6 +131,66 @@ try {
     await page.close();
   }
 
+  for (const [width, height] of [[375, 812], [390, 667], [680, 720], [1440, 900], [2560, 720]]) {
+    for (const withShow of [false, true]) {
+      const page = await browser.newPage({ viewport: { width, height } });
+      const errors = [];
+      page.on('pageerror', (error) => errors.push(error.message));
+      const gear = new URL(base.replace('cable-plan.html', 'gear-reference.html'));
+      gear.searchParams.set('gear', 'birddog-p240');
+      if (withShow) gear.searchParams.set('sbdShow', 'Clearance check');
+      await page.goto(gear.href, { waitUntil: 'networkidle' });
+      await page.locator('#nextSection:not(:disabled)').waitFor();
+      if (withShow) {
+        const compact = await page.locator('[data-sbd-suite-dock]').getAttribute('data-sbd-suite-compact');
+        if (compact !== String(width <= 680)) throw new Error(`Gear default dock state: ${width} ${compact}`);
+      }
+      async function checkGear(label) {
+        await page.waitForTimeout(100);
+        const result = await page.evaluate(() => {
+          const nav = document.querySelector('.sbd-nav').getBoundingClientRect();
+          const app = document.querySelector('.gear-app').getBoundingClientRect();
+          const root = document.documentElement;
+          const blocked = ['previousSection', 'nextSection'].filter((id) => {
+            const button = document.getElementById(id);
+            const box = button.getBoundingClientRect();
+            return box.height < 44 || box.width < 44
+              || !button.contains(document.elementFromPoint(box.x + box.width / 2, box.y + box.height / 2));
+          });
+          return { blocked, appBottom: app.bottom, navTop: nav.top,
+            panelHeight: document.getElementById('reference-stage').getBoundingClientRect().height,
+            overflowX: root.scrollWidth - root.clientWidth,
+            overflowY: root.scrollHeight - root.clientHeight };
+        });
+        if (result.blocked.length || result.appBottom > result.navTop - 8
+            || result.panelHeight < 64 || result.overflowX > 1 || result.overflowY > 1 || errors.length) {
+          throw new Error(`${label}: ${JSON.stringify(result)} errors=${errors.join('; ')}`);
+        }
+        console.log(`ok - ${label}`);
+      }
+      await checkGear(`Gear Reference ${width}x${height} show=${withShow}`);
+      const firstSection = await page.locator('[role="tab"][aria-selected="true"]').textContent();
+      await page.locator('#nextSection').click();
+      const nextSection = await page.locator('[role="tab"][aria-selected="true"]').textContent();
+      if (firstSection === nextSection) throw new Error('Gear Next did not change section');
+      await page.locator('#previousSection').click();
+      if (await page.locator('[role="tab"][aria-selected="true"]').textContent() !== firstSection) {
+        throw new Error('Gear Previous did not restore section');
+      }
+      if (withShow && width <= 680) {
+        await page.locator('[data-sbd-suite-compact-toggle]').click();
+        await checkGear(`Gear Reference ${width}x${height} expanded show dock`);
+        await page.locator('[data-sbd-suite-compact-toggle]').click();
+        await checkGear(`Gear Reference ${width}x${height} compact show dock`);
+      }
+      if (!withShow && width === 1440) {
+        await page.setViewportSize({ width: 375, height: 812 });
+        await checkGear('Gear Reference resized from desktop to phone');
+      }
+      await page.close();
+    }
+  }
+
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   await page.goto(base, { waitUntil: 'networkidle' });
   const noShow = await page.evaluate(() => ({ nav: !!document.querySelector('.sbd-nav'),
