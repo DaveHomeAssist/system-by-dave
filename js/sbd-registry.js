@@ -239,7 +239,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool asset change — rolls the service-worker cache. */
-    version:'v20261001-led-wall-orbit',
+    version:'v20261001-led-chain-map',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,

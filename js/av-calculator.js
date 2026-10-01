@@ -36,6 +36,8 @@
     ledCabinetHeightMm: 500,
     ledCabinetPixelsWide: 172,
     ledCabinetPixelsHigh: 172,
+    ledSpecSource: '',
+    ledWeightKg: null,
     ledCabinetRotation: '0',
     ledCabinetsWide: 8,
     ledCabinetsHigh: 5,
@@ -107,6 +109,7 @@
     splDoublings: document.getElementById('splDoublings'),
     splHint: document.getElementById('splHint'),
     ledProfileSelect: document.getElementById('ledProfileSelect'),
+    ledProfileEvidence: document.getElementById('ledProfileEvidence'),
     ledLayoutFields: document.getElementById('ledLayoutFields'),
     ledTargetSizeFields: document.getElementById('ledTargetSizeFields'),
     ledTargetRasterFields: document.getElementById('ledTargetRasterFields'),
@@ -128,6 +131,9 @@
     ledPreviewViewer: document.getElementById('ledPreviewViewer'),
     ledPreviewIsoBtn: document.getElementById('ledPreviewIsoBtn'),
     ledPreviewFrontBtn: document.getElementById('ledPreviewFrontBtn'),
+    ledInspectRow: document.getElementById('ledInspectRow'),
+    ledInspectColumn: document.getElementById('ledInspectColumn'),
+    ledCabinetInspection: document.getElementById('ledCabinetInspection'),
     ledWallDimensions: document.getElementById('ledWallDimensions'),
     ledWallDimensionsMetric: document.getElementById('ledWallDimensionsMetric'),
     ledNativeRaster: document.getElementById('ledNativeRaster'),
@@ -159,6 +165,9 @@
     ledAveragePortLoad: document.getElementById('ledAveragePortLoad'),
     ledPortUtilization: document.getElementById('ledPortUtilization'),
     ledWallPayload: document.getElementById('ledWallPayload'),
+    ledChainCount: document.getElementById('ledChainCount'),
+    ledChainPeak: document.getElementById('ledChainPeak'),
+    ledChainList: document.getElementById('ledChainList'),
     ledProcessorGuidance: document.getElementById('ledProcessorGuidance'),
     ledMaxLoad: document.getElementById('ledMaxLoad'),
     ledTypicalLoad: document.getElementById('ledTypicalLoad'),
@@ -184,6 +193,8 @@
   let calculationStatusTimer = 0;
   let latestLedSummary = '';
   let latestLedPower = null;
+  let latestLedWall = null;
+  let selectedCabinet = { row: 1, column: 1 };
   let previewMotion = null;
   let ledPowerFactorReset = false;
   const LED_PROFILE_STORE = 'avCalculator.ledProfiles.v1';
@@ -191,7 +202,8 @@
     'ledProductName', 'ledPitchMm', 'ledCabinetWidthMm', 'ledCabinetHeightMm',
     'ledCabinetPixelsWide', 'ledCabinetPixelsHigh', 'ledMaxWattsEach',
     'ledTypicalWattsEach', 'ledVoltage', 'ledPortBasePixels',
-    'ledReceiverPixelsWide', 'ledReceiverPixelsHigh', 'ledCabinetsPerHomeRun'
+    'ledReceiverPixelsWide', 'ledReceiverPixelsHigh', 'ledCabinetsPerHomeRun',
+    'ledSpecSource', 'ledWeightKg'
   ];
 
   const storage = (() => {
@@ -336,6 +348,7 @@
     if (!profile || !profile.values || typeof profile.values !== 'object') return;
     LED_PROFILE_KEYS.forEach(key => {
       if (Object.prototype.hasOwnProperty.call(profile.values, key)) state[key] = profile.values[key];
+      else if (key === 'ledSpecSource' || key === 'ledWeightKg') state[key] = DEFAULTS[key];
     });
     setFieldValues();
     syncLedModeUI();
@@ -394,6 +407,15 @@
     if (corrected) ids.push('actionStatus');
     if (ids.length) field.setAttribute('aria-describedby', ids.join(' '));
     else field.removeAttribute('aria-describedby');
+  }
+
+  function validSpecSource(value) {
+    if (!value) return true;
+    try {
+      return ['https:', 'http:'].includes(new URL(value).protocol);
+    } catch (error) {
+      return false;
+    }
   }
 
   function normalizeNumericField(field) {
@@ -462,6 +484,15 @@
     fields.forEach(field => {
       if (field.disabled) return;
       const key = field.dataset.key;
+      if (field.dataset.kind === 'url') {
+        const source = field.value.trim().slice(0, field.maxLength);
+        const valid = validSpecSource(source);
+        state[key] = valid ? source : '';
+        field.value = state[key];
+        field.removeAttribute('aria-invalid');
+        if (!valid) messages.push('Manufacturer Specification URL was invalid and cleared. Use a full http or https URL.');
+        return;
+      }
       if (field.dataset.kind === 'text') {
         const maximumLength = field.maxLength > 0 ? field.maxLength : 120;
         const fallback = String(DEFAULTS[key] || 'Custom LED profile');
@@ -494,7 +525,10 @@
     fields.forEach(field => {
       if (field.disabled) return;
       const key = field.dataset.key;
-      if (field.dataset.kind === 'text') {
+      if (field.dataset.kind === 'url') {
+        if (validSpecSource(field.value.trim())) state[key] = field.value.trim();
+        else complete = false;
+      } else if (field.dataset.kind === 'text') {
         state[key] = field.value.replace(/\s+/g, ' ').trim() || DEFAULTS[key];
       } else if (field.tagName === 'SELECT') {
         state[key] = field.value;
@@ -818,7 +852,7 @@
     );
 
     const content = calculateLedContentFit({ wallWidthPx, wallHeightPx, totalPixels, aspectRatio });
-    const processing = calculateLedProcessing({ wallWidthPx, wallHeightPx, totalPixels, cabinetPixelsWide, cabinetPixelsHigh });
+    const processing = calculateLedProcessing({ wallWidthPx, wallHeightPx, totalPixels, cabinetPixelsWide, cabinetPixelsHigh, cabinetsWide, cabinetsTotal });
     const power = calculateLedPower({ cabinetsTotal, areaM2 });
     const viewing = calculateLedViewing(pitchMm);
     const warnings = [];
@@ -844,12 +878,16 @@
     if (!content.standardNativeRaster) {
       warnings.push({ severity: 'info', label: 'CANVAS', text: 'Native wall raster is nonstandard. Confirm playback, switcher-scaling, graphics-canvas, and IMAG workflows at the exact native resolution.' });
     }
-    if (processing.processorPortCount && processing.portsRequired > processing.processorPortCount) {
-      warnings.push({ severity: 'bad', label: 'PORTS', text: `${processing.portsRequired} estimated data ports exceed the ${processing.processorPortCount} physical ports entered for the processor.` });
-    } else if (processing.portUtilization > 80) {
-      warnings.push({ severity: 'bad', label: 'PORTS', text: `Average estimated port loading is ${format(processing.portUtilization, 1)}% of adjusted capacity. Add a port or use a product-specific loading plan.` });
-    } else if (processing.portUtilization > 70) {
-      warnings.push({ severity: 'warn', label: 'PORTS', text: `Average estimated port loading is ${format(processing.portUtilization, 1)}%. Preserve practical cabinet-chain boundaries and verify the map in the manufacturer software.` });
+    if (processing.chainPortsRequired === null) {
+      warnings.push({ severity: 'bad', label: 'CHAINS', text: 'One complete cabinet exceeds the adjusted planning pixels per port. No whole-cabinet chain can be mapped with these inputs.' });
+    } else if (processing.processorPortCount && processing.chainPortsRequired > processing.processorPortCount) {
+      warnings.push({ severity: 'bad', label: 'CHAINS', text: `${processing.chainPortsRequired} whole-cabinet planning chains exceed the ${processing.processorPortCount} physical ports entered for the processor.` });
+    } else if (processing.chainPortsRequired > processing.portsRequired) {
+      warnings.push({ severity: 'warn', label: 'CHAINS', text: `Whole-cabinet chains need ${processing.chainPortsRequired} ports; the even-pixel lower bound is ${processing.portsRequired}. Verify the actual processor and cable topology.` });
+    } else if (processing.heaviestChainUtilization > 80) {
+      warnings.push({ severity: 'bad', label: 'PORTS', text: `Heaviest planned chain is ${format(processing.heaviestChainUtilization, 1)}% of nominal capacity. Review the processor and chain plan.` });
+    } else if (processing.heaviestChainUtilization > 70) {
+      warnings.push({ severity: 'warn', label: 'PORTS', text: `Heaviest planned chain is ${format(processing.heaviestChainUtilization, 1)}% of nominal capacity. Verify that output in manufacturer software.` });
     }
     if (processing.receiverIncomplete) {
       warnings.push({ severity: 'warn', label: 'RECEIVER', text: 'Enter both receiver-card width and height limits to validate cabinet loading.' });
@@ -937,6 +975,11 @@
     const portsRequired = Math.max(1, Math.ceil(ledWall.totalPixels / safePixelsPerPort));
     const averagePixelsPerPort = ledWall.totalPixels / portsRequired;
     const portUtilization = averagePixelsPerPort / cappedPixelsPerPort * 100;
+    const pixelsPerCabinet = ledWall.cabinetPixelsWide * ledWall.cabinetPixelsHigh;
+    const cabinetsPerChain = Math.floor(safePixelsPerPort / pixelsPerCabinet);
+    const chainPortsRequired = cabinetsPerChain > 0 ? Math.ceil(ledWall.cabinetsTotal / cabinetsPerChain) : null;
+    const heaviestChainPixels = cabinetsPerChain > 0 ? Math.min(cabinetsPerChain, ledWall.cabinetsTotal) * pixelsPerCabinet : null;
+    const heaviestChainUtilization = heaviestChainPixels === null ? null : heaviestChainPixels / cappedPixelsPerPort * 100;
     const rawPayloadGbps = ledWall.totalPixels * refreshHz * bitsPerPixel / 1e9;
     const plannedPayloadGbps = rawPayloadGbps / usablePayload;
     const receiverIncomplete = Boolean(receiverPixelsWide) !== Boolean(receiverPixelsHigh);
@@ -948,7 +991,8 @@
       receiverPixelsWide, receiverPixelsHigh, theoreticalPixelsPerPort,
       adjustedNominalPixelsPerPort, cappedPixelsPerPort, safePixelsPerPort,
       portsRequired, averagePixelsPerPort, portUtilization, rawPayloadGbps,
-      plannedPayloadGbps, receiverIncomplete, receiverExceeded
+      plannedPayloadGbps, receiverIncomplete, receiverExceeded, pixelsPerCabinet,
+      cabinetsPerChain, chainPortsRequired, heaviestChainPixels, heaviestChainUtilization
     };
   }
 
@@ -1004,6 +1048,7 @@
   }
 
   function renderLedWall(led) {
+    latestLedWall = led;
     const viewerFill = Math.max(4, Math.min(100, led.viewing.closestM / led.viewing.optimalM * 100));
     els.ledWallPreview.style.setProperty('--wall-cols', led.cabinetsWide);
     els.ledWallPreview.style.setProperty('--wall-rows', led.cabinetsHigh);
@@ -1013,13 +1058,16 @@
     els.ledWallPreview.dataset.rows = String(led.cabinetsHigh);
     els.ledWallPreview.dataset.cabinetWidthMm = String(led.cabinetWidthMm);
     els.ledWallPreview.dataset.cabinetHeightMm = String(led.cabinetHeightMm);
+    els.ledWallPreview.dataset.cabinetsPerChain = String(led.processing.cabinetsPerChain);
     els.ledWallPreview.dispatchEvent(new Event('led-wall:geometry'));
+    updateLedCabinetInspector();
     els.ledPreviewRows.textContent = `${led.cabinetsHigh} cabinet${led.cabinetsHigh === 1 ? '' : 's'} high`;
     els.ledPreviewColumns.textContent = `${led.cabinetsWide} cabinet${led.cabinetsWide === 1 ? '' : 's'} wide`;
     els.ledPreviewArray.textContent = `${led.cabinetsWide} × ${led.cabinetsHigh}`;
     els.ledPreviewCanvas.innerHTML = `${format(led.wallWidthPx, 0)} × ${format(led.wallHeightPx, 0)} native canvas<br>${format(led.wallWidthM, 2)} × ${format(led.wallHeightM, 2)} m build`;
-    els.ledPreviewPortRail.style.setProperty('--rail-fill', `${Math.min(100, led.processing.portUtilization)}%`);
-    els.ledPreviewPort.textContent = `${format(led.processing.portUtilization, 0)}%`;
+    const peakPortLoad = led.processing.heaviestChainUtilization ?? led.processing.portUtilization;
+    els.ledPreviewPortRail.style.setProperty('--rail-fill', `${Math.min(100, peakPortLoad)}%`);
+    els.ledPreviewPort.textContent = led.processing.chainPortsRequired === null ? 'No chain' : `${format(peakPortLoad, 0)}%`;
     els.ledPreviewViewerRail.style.setProperty('--rail-fill', `${viewerFill}%`);
     els.ledPreviewViewer.textContent = led.viewing.status === 'good' ? 'Optimal' : led.viewing.status === 'warn' ? 'Review' : 'Too close';
 
@@ -1029,8 +1077,9 @@
     els.ledNativeMeta.textContent = `${format(led.totalPixels / 1e6, 2)} MP · ${format(led.aspectRatio, 3)}:1`;
     els.ledContentFit.textContent = led.content.fitLabel;
     els.ledContentMeta.textContent = `${format(led.content.sourceWidthPx, 0)} × ${format(led.content.sourceHeightPx, 0)} source`;
-    els.ledProcessing.textContent = `${led.processing.portsRequired} estimated port${led.processing.portsRequired === 1 ? '' : 's'}`;
-    els.ledProcessingMeta.textContent = 'Generic minimum · verify cabinet chains';
+    els.ledProcessing.textContent = led.processing.chainPortsRequired === null
+      ? 'No valid chain' : `${led.processing.chainPortsRequired} planned chain${led.processing.chainPortsRequired === 1 ? '' : 's'}`;
+    els.ledProcessingMeta.textContent = `${led.processing.portsRequired} even-pixel lower bound · verify topology`;
     els.ledPower.textContent = `${format(led.power.maxWatts / 1000, 2)} kW max`;
     els.ledPowerMeta.textContent = led.power.powerFactor === null
       ? `${format(led.power.typicalWatts / 1000, 2)} kW typical · PF needed for current`
@@ -1061,7 +1110,21 @@
     els.ledAveragePortLoad.textContent = format(led.processing.averagePixelsPerPort, 0);
     els.ledPortUtilization.textContent = `${format(led.processing.portUtilization, 1)}%`;
     els.ledWallPayload.textContent = `${format(led.processing.plannedPayloadGbps, 2)} Gbps planned payload`;
-    els.ledProcessorGuidance.textContent = `${led.processing.portsRequired} generic minimum 1 GbE output port(s) at ${format(led.processing.refreshHz, 2)} Hz / ${format(led.processing.bitDepth, 0)} bit. This even pixel split is not a cable map; allocate complete cabinets and verify the heaviest chain in the actual processor software.`;
+    els.ledChainCount.textContent = led.processing.chainPortsRequired === null
+      ? 'No valid chain' : `${led.processing.chainPortsRequired} planned port${led.processing.chainPortsRequired === 1 ? '' : 's'}`;
+    els.ledChainPeak.textContent = led.processing.heaviestChainPixels === null
+      ? 'Cabinet exceeds limit' : `${format(led.processing.heaviestChainPixels, 0)} px · ${format(led.processing.heaviestChainUtilization, 1)}% nominal`;
+    renderLedChainList(led);
+    els.ledProcessorGuidance.textContent = `${led.processing.portsRequired} even-pixel lower-bound port(s) at ${format(led.processing.refreshHz, 2)} Hz / ${format(led.processing.bitDepth, 0)} bit. The color map assigns whole cabinets in an automatic row-serpentine order at ${format(led.processing.safePixelsPerPort, 0)} planning pixels per port. It is a planning sequence, not a verified cable route; confirm chain direction, receiver limits, and the heaviest output in manufacturer software.`;
+    els.ledProfileEvidence.replaceChildren(document.createTextNode('Operator-supplied values; a source link does not verify them automatically.'));
+    if (state.ledSpecSource && validSpecSource(state.ledSpecSource)) {
+      const link = document.createElement('a');
+      link.href = state.ledSpecSource;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.textContent = ' Open supplied specification';
+      els.ledProfileEvidence.append(link);
+    }
 
     const phaseLabel = led.power.phaseMode === 'threePhase'
       ? `balanced 3-phase line-to-line voltage${led.power.powerFactor === null ? '' : `, PF ${format(led.power.powerFactor, 2)}`}`
@@ -1083,12 +1146,71 @@
     els.ledPowerResult.title = `${phaseLabel}; ${format(led.power.maxPowerDensity, 0)} W/m² maximum density`;
 
     setLedResultState(els.ledContentResult, led.content.exactRaster ? 'good' : led.content.aspectMismatchPercent > 1 ? 'warn' : 'good');
-    const processingBad = led.processing.processorPortCount && led.processing.portsRequired > led.processing.processorPortCount;
-    setLedResultState(els.ledProcessingResult, processingBad ? 'bad' : led.processing.portUtilization > 70 ? 'warn' : 'good');
+    const processingBad = led.processing.chainPortsRequired === null || (led.processing.processorPortCount && led.processing.chainPortsRequired > led.processing.processorPortCount);
+    setLedResultState(els.ledProcessingResult, processingBad ? 'bad' : led.processing.heaviestChainUtilization > 70 ? 'warn' : 'good');
     setLedResultState(els.ledPowerResult, '');
     setLedResultState(els.ledWallResult, '');
     setLedResultState(els.ledRasterResult, '');
     renderLedWarnings(led.warnings);
+  }
+
+  function cabinetAtSequence(sequence, columns) {
+    const row = Math.floor(sequence / columns) + 1;
+    const offset = sequence % columns;
+    return { row, column: row % 2 ? offset + 1 : columns - offset };
+  }
+
+  function updateLedCabinetInspector() {
+    const led = latestLedWall;
+    if (!led) return;
+    selectedCabinet.row = Math.max(1, Math.min(led.cabinetsHigh, selectedCabinet.row));
+    selectedCabinet.column = Math.max(1, Math.min(led.cabinetsWide, selectedCabinet.column));
+    els.ledInspectRow.max = String(led.cabinetsHigh);
+    els.ledInspectColumn.max = String(led.cabinetsWide);
+    els.ledInspectRow.value = String(selectedCabinet.row);
+    els.ledInspectColumn.value = String(selectedCabinet.column);
+    const sequence = (selectedCabinet.row - 1) * led.cabinetsWide +
+      (selectedCabinet.row % 2 ? selectedCabinet.column - 1 : led.cabinetsWide - selectedCabinet.column);
+    const port = led.processing.cabinetsPerChain > 0 ? Math.floor(sequence / led.processing.cabinetsPerChain) + 1 : null;
+    const pixelLeft = (selectedCabinet.column - 1) * led.cabinetPixelsWide;
+    const pixelTop = (selectedCabinet.row - 1) * led.cabinetPixelsHigh;
+    els.ledCabinetInspection.textContent = `R${selectedCabinet.row} C${selectedCabinet.column} · ${port ? `planned port ${port}` : 'no valid port'} · x ${format(pixelLeft, 0)}–${format(pixelLeft + led.cabinetPixelsWide - 1, 0)}, y ${format(pixelTop, 0)}–${format(pixelTop + led.cabinetPixelsHigh - 1, 0)} px`;
+    els.ledWallPreview.dataset.selectedRow = String(selectedCabinet.row);
+    els.ledWallPreview.dataset.selectedColumn = String(selectedCabinet.column);
+    els.ledWallPreview.dispatchEvent(new Event('led-wall:plan'));
+  }
+
+  function renderLedChainList(led) {
+    const processing = led.processing;
+    if (processing.chainPortsRequired === null) {
+      els.ledChainList.replaceChildren();
+      return;
+    }
+    const entries = [];
+    for (let port = 1; port <= Math.min(processing.chainPortsRequired, 12); port += 1) {
+      const first = (port - 1) * processing.cabinetsPerChain;
+      const last = Math.min(led.cabinetsTotal, port * processing.cabinetsPerChain) - 1;
+      const start = cabinetAtSequence(first, led.cabinetsWide);
+      const end = cabinetAtSequence(last, led.cabinetsWide);
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.style.borderLeft = `6px solid hsl(${(218 + (port - 1) * 47) % 360} 65% ${(port - 1) % 2 ? 55 : 48}%)`;
+      button.textContent = `Port ${port} · ${last - first + 1} cabinets · R${start.row} C${start.column} → R${end.row} C${end.column}`;
+      button.addEventListener('click', () => {
+        selectedCabinet = start;
+        updateLedCabinetInspector();
+      });
+      const item = document.createElement('li');
+      item.append(button);
+      entries.push(item);
+    }
+    if (processing.chainPortsRequired > 12) {
+      const note = document.createElement('li');
+      note.className = 'led-chain-list-note';
+      note.textContent = `First 12 of ${format(processing.chainPortsRequired, 0)} planning chains shown. Use row and column above to inspect any cabinet.`;
+      entries.push(note);
+    }
+    els.ledChainList.replaceChildren(...entries);
   }
 
   function setLedResultState(element, status) {
@@ -1142,9 +1264,11 @@
       : `PF ${format(led.power.powerFactor, 2)}; ${format(led.power.maxAmps, 1)} A maximum and ${format(led.power.typicalAmps, 1)} A typical estimate; ${led.power.maxCircuits} maximum-load and ${led.power.typicalCircuits} typical-load ${format(led.power.breakerAmps, 0)} A circuit(s) at a ${format(led.power.continuousFactor * 100, 0)} percent planning target`;
     return [
       `LED profile: ${led.productName}; P${format(led.pitchMm, 2)}, ${format(led.cabinetWidthMm, 0)} × ${format(led.cabinetHeightMm, 0)} mm effective cabinet, ${format(led.cabinetPixelsWide, 0)} × ${format(led.cabinetPixelsHigh, 0)} px${led.rotated ? ', rotated 90 degrees' : ''}.`,
+      `Product evidence: ${state.ledSpecSource || 'manufacturer specification URL not supplied'}; ${state.ledWeightKg ? `${format(state.ledWeightKg, 2)} kg per cabinet, ${format(state.ledWeightKg * led.cabinetsTotal, 2)} kg cabinets only` : 'cabinet weight not supplied'}. All values are operator supplied and require confirmation.`,
       `LED wall: ${led.cabinetsWide} × ${led.cabinetsHigh} cabinets (${led.cabinetsTotal} total), ${format(led.wallWidthM, 2)} × ${format(led.wallHeightM, 2)} m / ${format(led.wallWidthFt, 2)} × ${format(led.wallHeightFt, 2)} ft, ${format(led.wallWidthPx, 0)} × ${format(led.wallHeightPx, 0)} px native raster (${format(led.totalPixels / 1e6, 2)} MP).`,
       `LED content: ${format(led.content.sourceWidthPx, 0)} × ${format(led.content.sourceHeightPx, 0)} source to ${format(led.wallWidthPx, 0)} × ${format(led.wallHeightPx, 0)} native is ${led.content.fitLabel.toLowerCase()}; ${format(led.content.aspectMismatchPercent, 2)} percent aspect difference.`,
       `NovaStar planning estimate: ${led.processing.portsRequired} generic minimum 1 GbE data port(s) at ${format(led.processing.safePixelsPerPort, 0)} planning pixels per port; average adjusted-capacity loading ${format(led.processing.portUtilization, 1)} percent. Verify complete-cabinet chains.`,
+      `Whole-cabinet data plan: ${led.processing.chainPortsRequired === null ? 'no valid chain because one cabinet exceeds the planning capacity' : `${led.processing.chainPortsRequired} automatic row-serpentine chain(s), up to ${led.processing.cabinetsPerChain} complete cabinet(s) each; heaviest chain ${format(led.processing.heaviestChainPixels, 0)} px`}. Confirm the actual cable order and processor output allocation.`,
       `LED power planning estimate: ${format(led.power.maxWatts / 1000, 2)} kW maximum and ${format(led.power.typicalWatts / 1000, 2)} kW typical at ${format(led.power.voltage, 0)} V ${phaseLabel}; ${currentPlan}.`,
       `LED viewing estimate: P${format(led.pitchMm, 2)} gives ${format(led.viewing.minimumFt, 1)} ft minimum and ${format(led.viewing.optimalFt, 1)} ft optimal rule-of-thumb distances; closest audience is ${format(led.viewing.closestDistance, 1)} ${led.viewing.closestUnit} (${led.viewing.label.toLowerCase()}).`,
       'LED verification required: confirm cabinet, receiver-card, processor, signal, power, daisy-chain, and venue distribution specifications against actual product documentation.'
@@ -1325,6 +1449,19 @@
     els.sendLedMaxPowerBtn.addEventListener('click', () => sendLedPowerToPowerLoad('maximum'));
     els.ledPreviewIsoBtn.addEventListener('click', () => setLedPreviewView('isometric'));
     els.ledPreviewFrontBtn.addEventListener('click', () => setLedPreviewView('front'));
+    const inspectCabinet = () => {
+      selectedCabinet = {
+        row: Number.isFinite(els.ledInspectRow.valueAsNumber) ? Math.round(els.ledInspectRow.valueAsNumber) : 1,
+        column: Number.isFinite(els.ledInspectColumn.valueAsNumber) ? Math.round(els.ledInspectColumn.valueAsNumber) : 1
+      };
+      updateLedCabinetInspector();
+    };
+    els.ledInspectRow.addEventListener('change', inspectCabinet);
+    els.ledInspectColumn.addEventListener('change', inspectCabinet);
+    els.ledWallPreview.addEventListener('led-wall:select', event => {
+      selectedCabinet = event.detail;
+      updateLedCabinetInspector();
+    });
     document.querySelectorAll('[data-led-jump]').forEach(button => {
       button.addEventListener('click', () => {
         const target = document.getElementById(button.dataset.ledJump);
