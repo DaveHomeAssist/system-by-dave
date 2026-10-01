@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-01 — AV Suite 2.0c navigation and browser gates
+
+- Display Plan and Projection Plan now use the Video group in the shared tool dock, matching their registry department and the primary Video destination. A browser regression checks their previous and next links at phone width.
+- Pages CI now runs the existing domain-view, responsive and LED configurator browser probes against a local checkout server. The theme probe is not yet a release gate: it reports an uncaught Throwline promise rejection in this checkout and needs a separate repair and rerun.
+- The AV offline cache version is `v20261001-video-nav-ci`; Throwline Stage 3D pins the same version.
+
 ## 2026-10-01 — Gear Reference phone section controls stay reachable
 
 - The shared tool navigation now measures its bottom clearance even without a show dock. On a 375px phone the navigation wraps to 175px, exceeding the old fixed 126px allowance and covering Gear Reference's Previous and Next section buttons.

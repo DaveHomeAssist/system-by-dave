@@ -89,6 +89,22 @@ jobs:
           CHROME_CHANNEL: chrome
         run: npm run test:av-nav-browser
 
+      - name: Verify AV domain views and responsive tools
+        run: |
+          export CHROME_BIN="$(command -v google-chrome)"
+          test -n "$CHROME_BIN"
+          python3 -m http.server 8000 --bind 127.0.0.1 >/tmp/av-probe-server.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid"' EXIT
+          for attempt in 1 2 3 4 5 6 7 8 9 10; do
+            if curl --silent --fail http://127.0.0.1:8000/av-suite.html >/dev/null; then break; fi
+            sleep 1
+          done
+          curl --silent --fail http://127.0.0.1:8000/av-suite.html >/dev/null
+          node scripts/probe_av_domain_views.js
+          node scripts/probe_av_suite_responsive.js
+          node scripts/probe_led_wall_configurator.js
+
       - name: Verify AV show context fill
         env:
           CHROME_CHANNEL: chrome
