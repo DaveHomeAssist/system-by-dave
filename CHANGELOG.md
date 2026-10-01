@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-10-01 — LED wall browser release gate
+
+- The LED cabinet click probe now waits for the status-driven layout to settle and reacquires the canvas center before clicking. A dedicated pull-request browser check runs the 3D and no-WebGL probes so this failure is caught before the Pages deployment gate.
+
 ## 2026-10-01 — LED wall whole-cabinet data planning
 
 - Added an automatic row-serpentine whole-cabinet port plan and a color-coded 3D cabinet map. The primary port result now reports planned chains while retaining the even-pixel lower bound separately; oversized cabinets and insufficient entered processor ports are flagged.
