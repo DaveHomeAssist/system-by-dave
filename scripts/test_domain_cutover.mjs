@@ -255,7 +255,9 @@ try {
       assert.equal(await original.evaluate(id => JSON.parse(localStorage.getItem('sbd.domainMove.' + id + '.v1')).state, site.id), 'moved');
       await page.bringToFront();
       await page.goto(source + (site.fromRoute || site.route));
-      await page.waitForURL(site.origin + site.route);
+      // The walk writes its own hash route on load (fmp-suite #40), so match the
+      // destination origin and path rather than the exact URL.
+      await page.waitForURL(url => url.origin + url.pathname === site.origin + site.route);
       assert.equal(await page.evaluate(key => localStorage.getItem(key), site.key), 'new destination edit');
       if (site.id === 'avbydave') {
         await page.waitForFunction(() => navigator.serviceWorker.controller, null, { timeout: 30000, polling: 100 });
