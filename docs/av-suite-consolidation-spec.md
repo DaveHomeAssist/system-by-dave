@@ -2,9 +2,9 @@
 
 **Status:** Proposed product and migration specification, 2026-09-23. This document describes the target experience and delivery gates; it does not claim that the remaining workspaces are implemented. The equipment-model pilot described below is already live.
 
-**Implementation note, 2026-09-23:** This specification records a 44-tool baseline. The current registry has 45 tools and 60 declared storage keys because `led-wall-calculator` was added after that baseline. See [Stage 0 inventory and migration safety](av-suite-consolidation-stage0.md) for current findings and open gates; the new tool's eventual workspace treatment remains undecided.
+**Implementation note, 2026-09-23:** This specification records a 44-tool baseline. At the Stage 0 snapshot the registry had 45 tools and 60 declared storage keys because `led-wall-calculator` was added after that baseline. See the [development assets index](av-suite-development-assets-index.md), [generated inventory](av-suite-consolidation-inventory.md), and [Stage 0 migration record](av-suite-consolidation-stage0.md) for current source and open gates. The [Stage 2 Video plan](av-suite-consolidation-stage2-video.md) recommends a home for the new tool (decision D6) and orders the Video work.
 
-**Baseline:** `DaveHomeAssist/system-by-dave` main after the focused FMP viewer release. The registry currently lists 44 tools. The deployed AV origin is `avbydave.com`; `av-suite.html` remains the stable doorway. This spec updates the earlier [Tool Index v2](../av-tool-suite/index-v2/index.html), which mapped 25 named legacy tools as a conceptual directory. The revised scope covers all 44 current registry entries and requires working, substantial views before reducing the catalog.
+**Baseline:** `DaveHomeAssist/system-by-dave` main after the focused FMP viewer release. The registry listed 44 tools when this spec was drafted; see the [development assets index](av-suite-development-assets-index.md) and [generated inventory](av-suite-consolidation-inventory.md) for the current count. The deployed AV origin is `avbydave.com`; `av-suite.html` remains the stable doorway. This spec updates the earlier [Tool Index v2](../av-tool-suite/index-v2/index.html), which mapped 25 named legacy tools as a conceptual directory. The 44-tool disposition below is a dated baseline; newly registered tools need an explicit home before navigation cutover.
 
 ## Product decision
 
@@ -36,16 +36,16 @@ The first change in this direction is live: four Gear Reference sheets display t
 - **Truck handoff:** A technician finds a case, sees its test and pack state, places it in a truck zone, confirms its load-in destination, then accounts for it during strike. Missing or blocked gear remains visible.
 - **Live show:** A show operator reaches the next cue, clock, and script from one entrance while the full-screen Cue Sheet, Timer, and Prompter controls remain dependable and directly reachable.
 
-## Current state and constraints
+## Baseline findings and constraints
 
 | Finding | Current source | Design consequence |
 | --- | --- | --- |
 | Show Console and Toolbox are two addressable modes of `av-suite.html`; their saved preferences and show dashboard are separate. | [Doorway contract](av-suite-doorway.md), `js/av-suite/app.js` | Keep the stable doorway and the show-independent Toolbox boundary. |
-| The registry lists 44 tools and 59 registered local-storage keys. | `js/sbd-registry.js` | Use the registry to drive navigation and cutover, but audit storage outside it. |
+| At the spec baseline, the registry listed 44 tools and 59 registered local-storage keys; the current generated inventory has 45 tools and 60 declared keys. | `js/sbd-registry.js`, [generated inventory](av-suite-consolidation-inventory.md) | Use the registry to drive navigation and cutover, but audit storage outside it. |
 | AV Workbook has typed show, people, room, gear, signal, patch, line-check, power, RF, video, task, and audit entities. Its editable tabs are currently Overview, Crew Call, Room Check, and Engines. | `apps/av-workbook/src/types.ts`, `App.tsx`, `EngineDashboard.tsx` | Reuse its validated show data where appropriate; build real editing and task views before replacing legacy pages. |
-| The legacy audio importer reads Input List, Audio Patch, and Line Check, and its mapping is repeat-safe. It writes immediately; workbook JSON import also saves immediately. | `legacyAudioImport.ts`, `legacyAudioImport.test.ts`, `App.tsx` | Add preview, backup, confirmation, and field-parity checks before inviting users to migrate. |
+| At the spec baseline, legacy Audio and Workbook JSON imports saved immediately. Stage 0 subsequently added previews, backup, confirmation, and stale-preview rejection; full field parity remains open. | `legacyAudioImport.ts`, `legacyAudioImport.test.ts`, `App.tsx`, [Stage 0](av-suite-consolidation-stage0.md) | Prove field parity and recoverability before inviting users to retire old pages. |
 | Show Board stores an index, show records, and snapshots under `sbd.showboard.*` despite an empty registry `storageKeys` entry. The domain-transfer policy does include that prefix. | `show-board.html`, `scripts/domain-sites.json` | Inventory and test it directly; do not treat an empty registry entry as no saved data. |
-| Workbook uses IndexedDB `system-by-dave-av-workbook`; the AV domain-transfer policy currently lists `PixelForge` but not that database. | `apps/av-workbook/src/store.ts`, `scripts/domain-sites.json` | Audit and repair transfer coverage before any route retirement or claim of lossless migration. |
+| Workbook uses IndexedDB `system-by-dave-av-workbook`; the AV transfer policy omitted it at the spec baseline. Stage 0 added database coverage and synthetic transfer checks. | `apps/av-workbook/src/store.ts`, `scripts/domain-sites.json`, [Stage 0](av-suite-consolidation-stage0.md) | Complete behavior and conflict recovery proof before any claim of lossless migration. |
 | Gear Reference authors five JSON sheets and uses a focused FMP model iframe on four of them; the written sheets remain available offline. | [Gear contract](gear-reference-contract.md), `gear-reference.html` | Make the model and source relationship a first-class reference contract; retain a useful no-network view. |
 | FMP model catalogs and rig content are managed exports from `fmp-suite`, with stable component IDs and distinct evidence vocabularies. | [Model contract](fmp-model-catalog-contract.md), [release contract](fmp-public-release.md) | Publish from the owning source and map identifiers explicitly rather than copying or rewriting models in AV by Dave. |
 
@@ -71,7 +71,7 @@ A contextual **Specialist tools** launcher remains available from Toolbox and th
 
 ### Full registry disposition
 
-Every current registry ID has one primary home below. A home is a navigation and task ownership decision, not authorization to delete its present route or saved data.
+Every registry ID in the 44-tool baseline has one primary home below. Newer entries, including LED Wall Calculator, require an explicit home before navigation cutover. A home is a navigation and task ownership decision, not authorization to delete its present route or saved data.
 
 | Home | Current registry IDs | Count | Target treatment |
 | --- | --- | ---: | --- |
@@ -84,6 +84,8 @@ Every current registry ID has one primary home below. A home is a navigation and
 | Live Control | `teleprompter`, `show-timer`, `cue-sheet` | 3 | Fast common launch/run context; keep full specialist controls until timing, keyboard, export, and remote behavior match. |
 | Contextual specialists | `pixelforge`, `throwline`, `stageplotter`, `av-calculator`, `ontrack` | 5 | Retain focused applications and deep-link from relevant workspaces. |
 | **Total** |  | **44** | |
+
+**Added after the baseline:** `led-wall-calculator`, recommended home *Contextual specialists*. It is launched from Video › Displays & Projection and kept in Calculators, because it holds one scenario and no show data. This is a recommendation from the [Stage 2 Video plan](av-suite-consolidation-stage2-video.md), not yet confirmed by Dave.
 
 `av-tool-suite/index-v2/` remains a historical concept page until this specification is implemented. Do not present it as a second live operating suite.
 
@@ -142,22 +144,22 @@ Before reducing a legacy tool's prominence or retiring its route:
 5. Offer an operator-visible comparison and rollback. A rollback may restore navigation and reopen the legacy page; it must not require deleting newly saved work.
 6. Only then move the primary navigation to the consolidated task. Keep compatibility routes and export/import paths until documented usage and operator acceptance justify retirement.
 
-The Audio importer is the pilot for this contract. Its current repeat-safe mapping is useful, but it still needs a preview, backup, explicit confirmation, unmapped-field report, and editable input/patch/check views. The AV Workbook JSON import also needs a pre-save review. Verify Show Board's existing prefix transfer against real schema fixtures and add AV Workbook IndexedDB coverage before any “all data moved” statement.
+The Audio importer is the pilot for this contract. Stage 0 added preview, backup, explicit confirmation, stale-preview rejection, and reports of known unmapped structured fields for Audio and Workbook JSON imports. Synthetic checks also cover Show Board prefix transfer and AV Workbook IndexedDB. Complete field-by-field Audio mapping, destination-conflict recovery, UI repeat-import/rollback, and editable input/patch/check views before any “all data moved” statement. See the [Stage 0 migration record](av-suite-consolidation-stage0.md) for the exact shipped safeguards and open gates.
 
 ## Release sequence
 
 | Stage | Deliverable | Exit gate |
 | --- | --- | --- |
-| 0. Inventory | Feature, route, storage, origin, export, and offline matrix for all 44 entries; fix inventory gaps. | Every saved store has a tested backup/recovery path; unresolved mappings are listed. |
+| 0. Inventory | Feature, route, storage, origin, export, and offline matrix for every registered entry; fix inventory gaps. | Every saved store has a tested backup/recovery path; unresolved mappings are listed. |
 | 1. Equipment pilot | Four FMP camera-chain sheets use the existing model and evidence; Show Console bridge uses valid context. **Shipped as an interim bridge.** | Live component selection, source provenance, no-network fallback, responsive/keyboard checks. |
-| 2. Video | Direct Video entry and editable camera, playback, route/switching, display/projection, stream, and record views. | All eight Video registry capabilities stay directly reachable; representative camera-to-screen, camera-to-stream/record, and playback-to-display paths retain status, backup, and export details. |
+| 2. Video | Direct Video entry and editable camera, playback, route/switching, display/projection, stream, and record views. Increments, entry gate, and execution briefs: [Stage 2 Video plan](av-suite-consolidation-stage2-video.md). | All eight Video registry capabilities stay directly reachable; representative camera-to-screen, camera-to-stream/record, and playback-to-display paths retain status, backup, and export details. |
 | 3. Audio | Editable sources, patches, line checks, PA, RF/comms task views and safe imports. | Field/status/export parity for the first three audio pages; repeat import and rollback pass. |
 | 4. Logistics | One case/item flow across prep, pack, load in, cable, and strike. | Counts and status transitions reconcile with each legacy page; lost-item and partial-pack scenarios pass. |
 | 5. Infrastructure | Power, network, and lighting views with explicit technical checks. | Each specialist's distinct fields, checks, and exports remain usable. |
 | 6. Show Operations | Advance, rooms, crew, tasks, and closeout views with explicit show attachment. | Show Board timeline/snapshot recovery and client outputs meet parity before route retirement. |
-| 7. Navigation cutover | Seven primary workspaces, capability search, contextual specialists, compatibility URLs. | All 44 capabilities have a tested reachable home; operator trial and live-domain verification pass. |
+| 7. Navigation cutover | Seven primary workspaces, capability search, contextual specialists, compatibility URLs. | Every registered capability has a tested reachable home; operator trial and live-domain verification pass. |
 
-A stage is shipped independently, behind a reversible navigation change. Do not wait for all 44 tools to be rewritten before making the completed workspace useful. Do not replace a functional page with a shell of links and call that consolidation.
+A stage is shipped independently, behind a reversible navigation change. Do not wait for every tool to be rewritten before making the completed workspace useful. Do not replace a functional page with a shell of links and call that consolidation.
 
 ## Acceptance criteria
 
@@ -166,7 +168,7 @@ A stage is shipped independently, behind a reversible navigation change. Do not 
 - A show operator can complete input → patch → line check and prep → pack → load in → strike from their respective workspace without re-entering the same item identity. Saved status survives reload and import retry.
 - Each migrated workflow preserves its original meaningful fields, problem states, exports, print behavior, and deep links or documents an explicit operator-approved replacement.
 - No URL hint, import, legacy migration, or cross-origin transfer silently overwrites an active show, changes a person's name to a position code, or reports a partial write as complete.
-- All 44 current capabilities remain discoverable by task search and reachable from no more than two navigation actions on desktop and mobile. Primary navigation exposes seven labeled workspaces, including Video, with contextual specialist launchers.
+- All registered capabilities, including tools added after the 44-tool baseline, remain discoverable by task search and reachable from no more than two navigation actions on desktop and mobile. Primary navigation exposes seven labeled workspaces, including Video, with contextual specialist launchers.
 - At 390, 680, 1280, and a representative 32:9 viewport, primary destinations remain visible, local panes scroll independently where practical, focus is visible, and there is no unintended horizontal overflow. Light, dark, reduced-motion, keyboard, and no-network paths are verified.
 - Registry, sitemap, offline manifest, domain staging, public shell, generated Workbook artifact, CI, Pages deployment, and actual rendered `avbydave.com` and `housevideo.app` surfaces agree before release is called complete. Human operator acceptance remains a separate gate.
 
@@ -180,6 +182,7 @@ A stage is shipped independently, behind a reversible navigation change. Do not 
 ## Source map
 
 - Current routes and keys: `js/sbd-registry.js`; doorway behavior: [AV Suite Doorway](av-suite-doorway.md).
+- Stage 2 increments, Video-slice source audit, and field matrix: [Stage 2 Video plan](av-suite-consolidation-stage2-video.md).
 - Workbook entities, storage, and importer: `apps/av-workbook/src/types.ts`, `store.ts`, `App.tsx`, and `legacyAudioImport.ts`.
 - Equipment and evidence: [Gear Reference](gear-reference-contract.md), [FMP model catalog](fmp-model-catalog-contract.md), [FMP public release](fmp-public-release.md).
 - Domain transfer and publication: [Domain sites](domain-sites.md), `scripts/domain-sites.json`.

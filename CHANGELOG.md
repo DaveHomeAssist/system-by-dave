@@ -1,9 +1,33 @@
 # Changelog
 
-## 2026-09-27 — Camera work separated from FMP Walk
+## 2026-10-01 — Camera work separated from FMP Walk
 
 - FMP Walk has five tabs: Setup, Walk, Faults, Report and Reference. The Camera tab and camera launch card are removed. Legacy camera links still forward to Camera Operator.
 - The ordered camera pack-down procedure and final equipment count now open Stow for manned camera positions. Existing saved stow checks and the separate PTZ procedure remain intact.
+- A walk saved while the Camera tab was open resumes on Walk (or Setup before a show is chosen) instead of a missing tab. The saved viewfinder stow check keeps its earlier meaning, secure stowage, so an older pass is not read as proof of the new removal step. Camera module cache keys are refreshed so open devices load the change.
+- Re-exported from fmp-suite `fb56cb7`, the merge of DaveHomeAssist/fmp-suite#33 (prepared 2026-09-27), which also carries the rig touch default from `7ac2ca7`. The first export of this change was cut from `03adb0d` and lacked the three follow-up fixes. The release check now rejects camera UI in Walk while keeping the legacy camera-link redirects.
+
+## 2026-09-29 — FMP rig touch rotation starts on for touch screens
+
+- The 3D rig explorer (`/fmp/rig/`) now starts with touch rotation on for phones and tablets (Dave, 2026-09-29). A one-finger drag rotates the model and a pinch zooms it without opening Views. Touch screens are detected by touch points or a coarse pointer because iPadOS reports a desktop browser. Mouse-only screens still start with it off. The Views toggle or Escape turns it off, which gives page scrolling back over the model.
+- Re-exported from fmp-suite `7ac2ca7`, the merge of DaveHomeAssist/fmp-suite#34. fmp-suite's unit test and public browser suite cover the mouse-only, phone and iPad-as-Mac defaults, with a real one-finger touch drag. Not tested on a physical phone or iPad.
+
+## 2026-09-29 — AV Suite Stage 2 (Video) phase prepared
+
+- Added `docs/av-suite-consolidation-stage2-video.md`. It covers the Video slice (the eight Video tools and LED Wall Calculator) with a source audit, a field matrix for a future Video import, eight recommended decisions, seven increments with exit gates, and execution briefs for the first two increments. No page behavior changed.
+- The audit found defects that later increments fix:
+  - the show-context operator hint spreads into other name fields on repeat visits;
+  - six tool pages seed samples in a way the existing CI rule misses;
+  - load-time normalization rewrites blanks and durations;
+  - single-key shortcuts intercept Cmd/Ctrl+P;
+  - legacy imports replace data without confirmation;
+  - the AV Workbook abandons a workbook it cannot load.
+- The generated inventory now lists LED Wall Calculator's working state in `avCalculator.v1` as a known exception. The specification, Stage 0 record and development assets index point to the plan and record the recommended contextual-specialist home for LED Wall Calculator.
+
+## 2026-09-28 — AV Suite development asset reconciliation
+
+- Indexed the canonical AV source, generated tool inventory, migration documents, gear and FMP source boundaries, release checks, and historical external candidates.
+- Clarified that the consolidation spec's 44-tool table is a dated baseline and Stage 0's 45-tool count is a snapshot; the registry and generated inventory own the current count.
 
 ## 2026-09-27 — FMP Walk route and operator interface cleanup
 

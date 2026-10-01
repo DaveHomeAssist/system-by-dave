@@ -1770,6 +1770,7 @@ $("themeChips").onclick = function(e){
 /* ══════════════════════ tabs ══════════════════════ */
 var TABS = ["setup","walk","tk","rep","ref"];
 function go(tab){
+  if(TABS.indexOf(tab) < 0) tab = S.meta.show ? "walk" : "setup";
   if(window.__grab) window.__grab();
   S.tab = tab; save();
   var panels = document.querySelectorAll(".panel");

@@ -45,6 +45,7 @@ use the tooling selected for that surface.
 | `afterbreak/index.html` | Pier 68 run of show: private crew timeline, bar, promo, gear, crew, and open items; noindex |
 | `av-suite.html?entry=show` | Show Console for show-attached AV operations |
 | `av-suite.html?entry=toolbox` | Show-independent AV Toolbox directory |
+| `docs/av-suite-development-assets-index.md` | AV Suite source, spec, migration, release, and historical-asset authority map |
 | `av-calculator.html` | Six quick AV calculations and a copyable field summary on avbydave.com |
 | `led-wall-calculator.html` | Viewport LED wall planner with cabinet preview, mobile results and section jumps, manufacturer-PF-gated current estimates, and a Power Load handoff on avbydave.com; [operator and verification notes](docs/led-wall-calculator.md) |
 | `av-suite-landing2.html` | Source for the avbydave.com home page, staged as `/` on that domain |

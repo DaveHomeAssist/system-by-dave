@@ -32,8 +32,8 @@ transfer before redirecting, preserving query and hash. A fresh browser redirect
 immediately; a no-JavaScript visitor gets a fallback link and meta redirect.
 
 Links that now cross between the two origins are absolute, in both directions. The
-walk's camera launch and its legacy `?camera=N` and `?position=` redirect name
-`https://housevideo.app/fmp/camera/`; the hub, camera reference list, house board
+walk has no camera launch since 2026-10-01; its legacy `?camera=N` and `?position=`
+redirect names `https://housevideo.app/fmp/camera/`; the hub, camera reference list, house board
 and bowl camera guide name `https://walk.housevideo.app/fmpwalk/`. Those live in
 the managed export, so `DaveHomeAssist/fmp-suite` owns them: `PUBLIC_CAMERA_ROOT` and
 `PUBLIC_WALK_ROOT` in its exporter, which fails the export if a same-origin walk
