@@ -86,8 +86,8 @@
     {label:'Workbook',toolIds:['av-workbook','show-advance','show-task-board','show-handoff','show-report']},
     {label:'Run of show',toolIds:['teleprompter','show-timer','cue-sheet','playback-check','comms-check']},
     {label:'Graphics',toolIds:['pixelforge','playback-check','display-plan','projection-plan']},
-    {label:'Audio',toolIds:['audio-patch','line-check','input-list','signal-flow','speaker-plan','rf-coordination']},
-    {label:'Video',toolIds:['video-patch','display-plan','projection-plan','throwline','stream-plan','record-log','camera-shot-list']},
+    {label:'Audio',toolIds:['audio-patch','line-check','input-list','speaker-plan','rf-coordination']},
+    {label:'Video',toolIds:['signal-flow','video-patch','display-plan','projection-plan','throwline','stream-plan','record-log','camera-shot-list']},
     {label:'Lighting',toolIds:['lighting-patch']},
     {label:'Power & data',toolIds:['power-plan','network-plan','cable-plan']},
     {label:'Spaces & staging',toolIds:['show-board','stageplotter','room-check','breakout-room-matrix','site-survey']},
@@ -234,7 +234,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool asset change — rolls the service-worker cache. */
-    version:'v20260925-landing-retire',
+    version:'v20261001-video-safety',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,
