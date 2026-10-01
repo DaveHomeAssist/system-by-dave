@@ -19,7 +19,7 @@ import { CONFIG_FILE, read, loadRegistry, siteEntries, routeFor } from './stage_
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SKIP_DIRS = new Set(['node_modules', '.git', '.github', '_site', '_sites', 'docs', 'scripts']);
 // Generated or managed: change the source and regenerate (sitemap.xml via gen_sitemap.py).
-const MANAGED = ['av-workbook/', 'fmp/', 'fmpwalk/', 'noteforge/', 'sitemap.xml'];
+const MANAGED = ['av-workbook/', 'cheesesteaks/', 'fmp/', 'fmpwalk/', 'noteforge/', 'sitemap.xml'];
 const TEXT = /\.(?:html?|js|mjs|json|xml|webmanifest|css|txt)$/i;
 const SOURCE_URL = /https:\/\/(?:www\.)?systembydave\.com\/([^"'\\\s<>)\]]*)/g;
 

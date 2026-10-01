@@ -116,6 +116,22 @@ npm run verify:shader-practice
 npm run test:shader-practice-browser
 ```
 
+### Philly Cheesesteak Heatmap
+
+The heatmap at `/cheesesteaks/` is a static export of the private
+`DaveHomeAssist/philly-cheesesteak-heatmap` repository. Build it there with
+`npm run build:static` (base path `/cheesesteaks`), then copy it in:
+
+```bash
+npm run sync:cheesesteaks -- /absolute/path/to/philly-cheesesteak-heatmap
+npm run verify:indexing
+npm run verify:public-navigation
+```
+
+The sync replaces `cheesesteaks/`, drops the export's own 404 pages (Pages serves
+only the root `404.html`), and records the source commit in
+`cheesesteaks/SOURCE.txt`. Do not hand-edit `cheesesteaks/`.
+
 ### NoteForge canonical release
 
 NoteForge is built in its own repository and committed here as the canonical

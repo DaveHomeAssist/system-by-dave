@@ -66,8 +66,9 @@ const robots = read('robots.txt');
 // plus the four additional equipment explorers published on 2026-09-20, and the noindex
 // FMP Camera Simulator (its page, standalone offline copy and app source) from 2026-09-23,
 // the noindex offline copy of the ATEM HD8 ISO interactive guide from 2026-09-25, and the noindex
-// /fmp/walk/ redirect to the walk's own origin from 2026-10-01.
-if (unlisted.length !== 148) fail(`Expected 148 tracked routes outside the sitemap; found ${unlisted.length}.`);
+// /fmp/walk/ redirect to the walk's own origin from 2026-10-01, and the five noindex pages of the
+// managed /cheesesteaks/ static export (map, rankings, neighborhoods, methodology, about) from 2026-10-01.
+if (unlisted.length !== 153) fail(`Expected 153 tracked routes outside the sitemap; found ${unlisted.length}.`);
 
 [
   '/apps/av-workbook/',
