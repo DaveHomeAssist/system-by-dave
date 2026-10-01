@@ -181,9 +181,11 @@
     else fn();
   }
 
+  // Pages are also served extensionless (/signal-flow), so match either form.
   function pageName() {
     var path = window.location.pathname.split('/').pop();
-    return path || 'index.html';
+    if (!path) return 'index.html';
+    return /\.html$/i.test(path) ? path : path + '.html';
   }
 
   function init() {

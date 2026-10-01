@@ -79,7 +79,12 @@ it, and a successful suite import offers Undo, which restores the previous show.
   pair of show names for the rest of the browser session
   (`sessionStorage` key `sbd-context-choice.v1`). A tool with no saved data, an
   "Untitled" default or the same show name takes the console's details
-  straight away, as before.
+  straight away, as before. Each detail fills exactly one field: the one the
+  page marks with `data-sbd-context` (`showName`, `venue`, `showDate` or
+  `operator`), otherwise the first matching field. A field that already holds
+  the value is left alone, so repeat visits never spread the operator's name
+  into other name fields. `scripts/probe_av_context_fill.mjs` release-gates
+  this.
 - **Another tab.** If another tab changes a tool's registry storage keys, the
   open copy says so and offers **Reload** or **Keep editing here** (the next
   save from this tab replaces the other tab's change).

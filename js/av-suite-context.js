@@ -137,18 +137,53 @@
     return document.getElementById(id);
   }
 
-  function setInput(id, value){
-    var input = byId(id);
-    if(!input || !value) return false;
-    if(input.value === value) return false;
+  var CONTEXT_FIELD_IDS = {
+    showName:['showName', 'showTitle'],
+    venue:['venue', 'venueName'],
+    showDate:['showDate'],
+    operator:[
+      'operator',
+      'preparedBy',
+      'lead',
+      'playbackOp',
+      'recordOp',
+      'streamOp',
+      'videoLead',
+      'audioLead',
+      'tdName',
+      'crewLead',
+      'techLead',
+      'designerName',
+      'producer'
+    ]
+  };
+
+  /* V0-1: each show detail has exactly one target on a page. A page names it
+     with data-sbd-context="<field>"; otherwise it is the first candidate id
+     that exists. A target that already holds the value is left alone, and the
+     value never falls through to another field. */
+  function contextTarget(field){
+    var marked = document.querySelector('[data-sbd-context="' + field + '"]');
+    var ids = CONTEXT_FIELD_IDS[field] || [];
+    var input;
+    var i;
+    if(marked) return marked;
+    for(i = 0; i < ids.length; i++){
+      input = byId(ids[i]);
+      if(input) return input;
+    }
+    return null;
+  }
+
+  function fillContextField(field, value){
+    var input;
+    if(!value) return false;
+    input = contextTarget(field);
+    if(!input || input.value === value) return false;
     input.value = value;
     input.dispatchEvent(new Event('input', {bubbles:true}));
     input.dispatchEvent(new Event('change', {bubbles:true}));
     return true;
-  }
-
-  function firstExisting(ids, value){
-    return ids.some(function(id){return setInput(id, value);});
   }
 
   function storageAvailable(){
@@ -265,24 +300,10 @@
 
   function applyContextFields(){
     var applied = false;
-    applied = firstExisting(['showName', 'showTitle'], context.showName) || applied;
-    applied = firstExisting(['venue', 'venueName'], context.venue) || applied;
-    applied = firstExisting(['showDate'], context.showDate) || applied;
-    applied = firstExisting([
-      'operator',
-      'preparedBy',
-      'lead',
-      'playbackOp',
-      'recordOp',
-      'streamOp',
-      'videoLead',
-      'audioLead',
-      'tdName',
-      'crewLead',
-      'techLead',
-      'designerName',
-      'producer'
-    ], context.operator) || applied;
+    applied = fillContextField('showName', context.showName) || applied;
+    applied = fillContextField('venue', context.venue) || applied;
+    applied = fillContextField('showDate', context.showDate) || applied;
+    applied = fillContextField('operator', context.operator) || applied;
     if(applied) document.documentElement.dataset.sbdContextApplied = 'true';
   }
 
