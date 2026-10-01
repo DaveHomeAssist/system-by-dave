@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-01 — AV Suite 2.0b follow-up: Video notes kept as typed
+
+- Video Patch, Projection Plan and Stream Plan keep notes exactly as typed. Before, a reload or an import turned line breaks and repeated spaces into single spaces and cut notes at 260 characters, and editing a note in its row flattened it the same way; the next save kept the damage. Notes on the other five Video pages were already kept as typed. Notes already flattened by an earlier reload cannot be recovered.
+- `scripts/probe_av_video_legacy.mjs` now gives every page's fixture a multi-line note over 260 characters and types one into a row, then checks it through save, reload, export and import (120 checks). Against the previous Video Patch it fails 4 of 15.
+- Offline cache version `v20261001-video-notes`, so installed copies pick up the three pages; Throwline Stage 3D's offline check follows it.
+
 ## 2026-10-01 — AV Workbook fails closed when browser storage fails
 
 - AV Workbook never overwrites a stored record it could not read first. Before, the 2.0a save check treated a failed IndexedDB read as "nothing stored" and saved anyway. Now, if that read fails, the edit is kept in the browser's fallback copy, and the next load opens whichever copy is newer; an incompatible stored record stays read-only even when a newer fallback exists. If IndexedDB cannot be read on load, the Workbook opens the fallback only when it holds the active workbook; otherwise it opens read-only. Imported copies and other new workbooks save normally.
