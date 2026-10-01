@@ -160,3 +160,18 @@ document never disagree.
 ## Interactive FMP models
 
 A `model` section embeds the existing House Video rig explorer for the four FMP camera-chain sheets. Its `model.url` is restricted to the public rig route with a known equipment and component selection. The rig, component notes, photos, and source evidence remain owned and published by `fmp-suite`; Gear Reference does not duplicate or rewrite them. The iframe uses the focused embed mode and matches the AV theme. It needs a connection to housevideo.app, while the authored sheet stays available offline. On screens wider than 680px the frame stays at least 660px tall, because the rig switches to its short-screen layout (an 18rem model strip above a scrolling page) when its frame is under 640px; phones keep the shorter frame and that layout. Gear Reference keeps its own accuracy vocabulary; the embedded explorer displays the FMP evidence in its original context.
+
+## Navigation clearance
+
+The page stays within the viewport, with long sheet content scrolling inside
+the selected panel. Previous and Next section controls remain above the shared
+tool navigation. The shared navigation measures its clearance with or without
+show context, including after resize; the sheet reserves that measured space
+instead of assuming a fixed mobile navigation height.
+
+On phones, an expanded show dock is bounded to 20% of the viewport and its
+controls scroll inside it. With no saved preference, Gear Reference starts with
+the compact show dock on phones; an existing saved preference still wins.
+`npm run test:av-nav-browser` checks section-button hit targets,
+minimum content space, page containment, actual section changes, resize, and both
+dock modes at representative phone, breakpoint, desktop and ultrawide sizes.

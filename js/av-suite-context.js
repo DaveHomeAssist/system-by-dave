@@ -481,7 +481,8 @@
       var saved = localStorage.getItem(DOCK_COMPACT_KEY);
       if(saved !== null) return saved === 'true';
     }
-    return document.documentElement.getAttribute('data-av-tool') === 'led-wall-calculator'
+    var tool = document.documentElement.getAttribute('data-av-tool');
+    return (tool === 'led-wall-calculator' || tool === 'gear-reference')
       && window.innerWidth <= 680;
   }
 

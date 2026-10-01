@@ -194,15 +194,20 @@
       }
 
       var navBox = nav.getBoundingClientRect();
-      var dockBox = dock && dock.getBoundingClientRect();
-      if(!dockBox || !dockBox.width || !dockBox.height
-          || navBox.right <= dockBox.left || navBox.left >= dockBox.right){
+      if(!navBox.width || !navBox.height){
         nav.style.removeProperty('bottom');
         document.body.style.removeProperty('--sbd-nav-stack-clearance');
         return;
       }
+      var dockBox = dock && dock.getBoundingClientRect();
+      if(!dockBox || !dockBox.width || !dockBox.height
+          || navBox.right <= dockBox.left || navBox.left >= dockBox.right){
+        nav.style.removeProperty('bottom');
+      }else{
+        nav.style.bottom = Math.ceil(window.innerHeight - dockBox.top + 10) + 'px';
+      }
 
-      nav.style.bottom = Math.ceil(window.innerHeight - dockBox.top + 10) + 'px';
+      // Wrapped navigation needs clearance even when no show dock is present.
       document.body.style.setProperty('--sbd-nav-stack-clearance',
         Math.ceil(window.innerHeight - nav.getBoundingClientRect().top + 10) + 'px');
     }
