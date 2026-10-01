@@ -40,35 +40,31 @@
       "subcategory": "Cameras",
       "status": "active",
       "sheetStatus": "authored",
-      "updated": "2026-09-22",
+      "updated": "2026-10-01",
       "file": "data/gear/blackmagic-ursa-broadcast-g2.json",
       "tags": [
         "B4",
         "4K",
-        "fiber",
-        "FMP"
+        "fiber"
       ]
     },
     {
       "id": "fujinon-4k-broadcast-zoom",
       "displayName": "Fujinon 4K Broadcast Zooms",
       "aka": [
-        "Fujinon 16x",
-        "Fujinon 22x",
-        "Fujinon B4 4K"
+        "Fujinon 4K portable lenses"
       ],
       "brand": "Fujifilm",
       "category": "Video",
       "subcategory": "Lenses",
       "status": "active",
       "sheetStatus": "authored",
-      "updated": "2026-09-22",
+      "updated": "2026-10-01",
       "file": "data/gear/fujinon-4k-broadcast-zoom.json",
       "tags": [
-        "B4",
-        "16x",
-        "22x",
-        "FMP"
+        "4K",
+        "broadcast",
+        "lenses"
       ]
     },
     {
@@ -83,12 +79,11 @@
       "subcategory": "Fiber",
       "status": "active",
       "sheetStatus": "authored",
-      "updated": "2026-09-22",
+      "updated": "2026-10-01",
       "file": "data/gear/blackmagic-camera-fiber-converter.json",
       "tags": [
         "SMPTE",
-        "fiber",
-        "FMP"
+        "fiber"
       ]
     },
     {
@@ -103,12 +98,11 @@
       "subcategory": "Fiber",
       "status": "active",
       "sheetStatus": "authored",
-      "updated": "2026-09-22",
+      "updated": "2026-10-01",
       "file": "data/gear/blackmagic-studio-fiber-converter.json",
       "tags": [
         "SMPTE",
-        "rack",
-        "FMP"
+        "rack"
       ]
     },
     {
@@ -129,8 +123,7 @@
       "tags": [
         "ATEM",
         "switcher",
-        "ISO",
-        "FMP"
+        "ISO"
       ]
     },
     {
@@ -151,8 +144,7 @@
       "tags": [
         "ATEM",
         "CCU",
-        "shading",
-        "FMP"
+        "shading"
       ]
     },
     {
@@ -172,8 +164,7 @@
       "tags": [
         "PTZ",
         "NDI",
-        "SDI",
-        "FMP"
+        "SDI"
       ]
     },
     {
@@ -194,8 +185,7 @@
       "tags": [
         "PTZ",
         "joystick",
-        "VISCA",
-        "FMP"
+        "VISCA"
       ]
     }
   ]

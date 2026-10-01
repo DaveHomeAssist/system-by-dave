@@ -14,25 +14,15 @@
   "updated": "2026-10-01",
   "generated": {
     "by": "scripts/build_gear_from_fmp.js",
-    "catalog": "fmp-superjoy-g1",
-    "revision": "1.0.0",
-    "note": "Generated file. Change the fmp-suite catalog or scripts/gear_equipment_adapter.js, then run npm run build:gear-from-fmp."
+    "revision": "1.0.0"
   },
-  "summary": "Equipment reference generated from the FMP PT-SUPERJOY-G1 catalog. FMP wiring and installed facts stay with the FMP explorer.",
+  "summary": "Equipment reference for PTZOptics SuperJoy G1. Product details and source confidence.",
   "tags": [
     "PTZ",
     "joystick",
-    "VISCA",
-    "FMP"
+    "VISCA"
   ],
   "sources": [
-    {
-      "id": "ptzoptics-reference",
-      "label": "Supplied SuperJoy equipment reference",
-      "kind": "user-document",
-      "reference": "FMP_Ref_PTZOptics_SuperJoy_G1.pdf, sheets 1–3, 19 September 2026",
-      "scope": "Published controller functions and envelope. Not an FMP measurement or current camera record."
-    },
     {
       "id": "product-top",
       "label": "Product top photograph",
@@ -62,25 +52,11 @@
       "scope": "Volume, dial and joystick construction; embedded photos 1 and 5."
     },
     {
-      "id": "fmp-photo-powered",
-      "label": "Supplied powered appearance",
-      "kind": "product-photo",
-      "reference": "ptzoptics-superjoy-controller-product-photo.png",
-      "scope": "Green legends and white LCD appearance only. Image and browser screenshot omitted from the portable artifact to avoid redistributing visible addresses."
-    },
-    {
       "id": "manufacturer-buttons",
       "label": "PTZOptics button reference",
       "kind": "manufacturer",
       "url": "https://docs.ptzoptics.com/docs/controllers/superjoy/button-layout/",
       "scope": "Function cross-check, accessed 20 September 2026."
-    },
-    {
-      "id": "user-correction",
-      "label": "Current task correction",
-      "kind": "house-record",
-      "reference": "User build brief, 20 September 2026",
-      "scope": "FMP camera is BirdDog P240. Camera assignments, addresses and installed firmware are unverified."
     }
   ],
   "accuracy": [
@@ -95,7 +71,7 @@
     {
       "item": "Parts with a manufacturer source",
       "status": "confirmed",
-      "detail": "0 of 67 listed parts cite a manufacturer source.",
+      "detail": "0 of 60 listed parts cite a manufacturer source.",
       "sourceRefs": [
         "manufacturer-buttons"
       ]
@@ -103,14 +79,12 @@
     {
       "item": "Parts identified from photographs or supplied references",
       "status": "unverified",
-      "detail": "67 listed parts cite no manufacturer source. Their identity comes from photographs or a supplied reference.",
+      "detail": "60 listed parts cite no manufacturer source. Their identity comes from photographs or a supplied reference.",
       "sourceRefs": [
         "product-front",
         "product-side",
         "product-perspectives",
-        "ptzoptics-reference",
-        "product-top",
-        "fmp-photo-powered"
+        "product-top"
       ]
     }
   ],
@@ -129,16 +103,8 @@
           "PT-SUPERJOY-G1"
         ],
         [
-          "Catalog",
-          "fmp-superjoy-g1 · revision 1.0.0 · schema 1.0"
-        ],
-        [
           "Parts on this sheet",
-          "67 of 67 catalog components"
-        ],
-        [
-          "Interactive model",
-          "housevideo.app/fmp/ptz/SuperJoy-G1-Interactive-Guide.html"
+          "60"
         ]
       ],
       "sourceRefs": [
@@ -149,13 +115,9 @@
       "id": "parts",
       "title": "Parts",
       "type": "parts",
-      "lede": "Generated from the FMP equipment catalog. Each part keeps the catalog’s own evidence level, and Inspect opens it in the interactive model.",
+      "lede": "Equipment parts and their supporting sources. Descriptions awaiting equipment-only review are marked Unknown.",
       "parts": {
-        "interactive": {
-          "url": "https://housevideo.app/fmp/ptz/SuperJoy-G1-Interactive-Guide.html",
-          "label": "PTZOptics SuperJoy G1 interactive model"
-        },
-        "total": 67,
+        "total": 60,
         "groups": [
           {
             "category": "Enclosure",
@@ -169,8 +131,7 @@
                 "sourceRefs": [
                   "product-front",
                   "product-side",
-                  "product-perspectives",
-                  "ptzoptics-reference"
+                  "product-perspectives"
                 ]
               }
             ]
@@ -185,9 +146,7 @@
                 "description": "Displays controller and selected-camera status. It is not a touchscreen.",
                 "evidence": "Documented",
                 "sourceRefs": [
-                  "product-top",
-                  "ptzoptics-reference",
-                  "fmp-photo-powered"
+                  "product-top"
                 ]
               },
               {
@@ -197,8 +156,7 @@
                 "description": "Selects camera RTSP video for the controller HDMI output. No video is decoded here.",
                 "evidence": "Documented",
                 "sourceRefs": [
-                  "product-top",
-                  "ptzoptics-reference"
+                  "product-top"
                 ]
               },
               {
@@ -208,8 +166,7 @@
                 "description": "Opens the controller device list; the trainer shows synthetic entries.",
                 "evidence": "Documented",
                 "sourceRefs": [
-                  "product-top",
-                  "ptzoptics-reference"
+                  "product-top"
                 ]
               },
               {
@@ -219,8 +176,7 @@
                 "description": "Opens controller settings. In this version it identifies menu functions; it does not emulate an admin portal.",
                 "evidence": "Documented",
                 "sourceRefs": [
-                  "product-top",
-                  "ptzoptics-reference"
+                  "product-top"
                 ]
               }
             ]
@@ -235,8 +191,7 @@
                 "description": "Move for pan and tilt; twist for zoom. In camera-menu mode it navigates the camera OSD.",
                 "evidence": "Documented",
                 "sourceRefs": [
-                  "product-top",
-                  "ptzoptics-reference"
+                  "product-top"
                 ]
               },
               {
@@ -246,8 +201,7 @@
                 "description": "Fine zoom toward WIDE or TELE; the documented fine dial uses the lowest speed.",
                 "evidence": "Documented",
                 "sourceRefs": [
-                  "product-top",
-                  "ptzoptics-reference"
+                  "product-top"
                 ]
               }
             ]
@@ -262,8 +216,7 @@
                 "description": "Fine manual focus toward NEAR or FAR.",
                 "evidence": "Documented",
                 "sourceRefs": [
-                  "product-top",
-                  "ptzoptics-reference"
+                  "product-top"
                 ]
               },
               {
@@ -273,8 +226,7 @@
                 "description": "Toggles backlight compensation.",
                 "evidence": "Documented",
                 "sourceRefs": [
-                  "product-top",
-                  "ptzoptics-reference"
+                  "product-top"
                 ]
               },
               {
@@ -284,8 +236,7 @@
                 "description": "Cycles Auto, Manual, Shutter Priority, Iris Priority and Brightness Priority.",
                 "evidence": "Documented",
                 "sourceRefs": [
-                  "product-top",
-                  "ptzoptics-reference"
+                  "product-top"
                 ]
               },
               {
@@ -295,8 +246,7 @@
                 "description": "Adjusts an exposure parameter appropriate to the current mode.",
                 "evidence": "Documented",
                 "sourceRefs": [
-                  "product-top",
-                  "ptzoptics-reference"
+                  "product-top"
                 ]
               },
               {
@@ -306,8 +256,7 @@
                 "description": "Pauses autofocus at its present focus.",
                 "evidence": "Documented",
                 "sourceRefs": [
-                  "product-top",
-                  "ptzoptics-reference"
+                  "product-top"
                 ]
               },
               {
@@ -317,8 +266,7 @@
                 "description": "Releases focus lock.",
                 "evidence": "Documented",
                 "sourceRefs": [
-                  "product-top",
-                  "ptzoptics-reference"
+                  "product-top"
                 ]
               },
               {
@@ -328,8 +276,7 @@
                 "description": "Enables automatic focus.",
                 "evidence": "Documented",
                 "sourceRefs": [
-                  "product-top",
-                  "ptzoptics-reference"
+                  "product-top"
                 ]
               }
             ]
@@ -344,8 +291,7 @@
                 "description": "Resets red and blue gain in the training state.",
                 "evidence": "Documented",
                 "sourceRefs": [
-                  "product-top",
-                  "ptzoptics-reference"
+                  "product-top"
                 ]
               },
               {
@@ -355,8 +301,7 @@
                 "description": "Triggers a white-balance calibration when OnePush mode is selected.",
                 "evidence": "Documented",
                 "sourceRefs": [
-                  "product-top",
-                  "ptzoptics-reference"
+                  "product-top"
                 ]
               },
               {
@@ -366,8 +311,7 @@
                 "description": "Cycles the white-balance mode.",
                 "evidence": "Documented",
                 "sourceRefs": [
-                  "product-top",
-                  "ptzoptics-reference"
+                  "product-top"
                 ]
               },
               {
@@ -377,8 +321,7 @@
                 "description": "Adjusts the selected red or blue gain in manual white balance.",
                 "evidence": "Documented",
                 "sourceRefs": [
-                  "product-top",
-                  "ptzoptics-reference"
+                  "product-top"
                 ]
               }
             ]
@@ -393,8 +336,7 @@
                 "description": "Adjusts tilt speed for the selected simulated camera. Training scale 1–8; not a hardware range claim.",
                 "evidence": "Documented",
                 "sourceRefs": [
-                  "product-top",
-                  "ptzoptics-reference"
+                  "product-top"
                 ]
               },
               {
@@ -404,8 +346,7 @@
                 "description": "Adjusts tilt speed for the selected simulated camera. Training scale 1–8; not a hardware range claim.",
                 "evidence": "Documented",
                 "sourceRefs": [
-                  "product-top",
-                  "ptzoptics-reference"
+                  "product-top"
                 ]
               },
               {
@@ -415,8 +356,7 @@
                 "description": "Adjusts pan speed for the selected simulated camera. Training scale 1–8; not a hardware range claim.",
                 "evidence": "Documented",
                 "sourceRefs": [
-                  "product-top",
-                  "ptzoptics-reference"
+                  "product-top"
                 ]
               },
               {
@@ -426,8 +366,7 @@
                 "description": "Adjusts pan speed for the selected simulated camera. Training scale 1–8; not a hardware range claim.",
                 "evidence": "Documented",
                 "sourceRefs": [
-                  "product-top",
-                  "ptzoptics-reference"
+                  "product-top"
                 ]
               },
               {
@@ -437,8 +376,7 @@
                 "description": "Adjusts zoom speed for the selected simulated camera. Training scale 1–8; not a hardware range claim.",
                 "evidence": "Documented",
                 "sourceRefs": [
-                  "product-top",
-                  "ptzoptics-reference"
+                  "product-top"
                 ]
               },
               {
@@ -448,8 +386,7 @@
                 "description": "Adjusts zoom speed for the selected simulated camera. Training scale 1–8; not a hardware range claim.",
                 "evidence": "Documented",
                 "sourceRefs": [
-                  "product-top",
-                  "ptzoptics-reference"
+                  "product-top"
                 ]
               },
               {
@@ -459,8 +396,7 @@
                 "description": "Adjusts focus speed for the selected simulated camera. Training scale 1–8; not a hardware range claim.",
                 "evidence": "Documented",
                 "sourceRefs": [
-                  "product-top",
-                  "ptzoptics-reference"
+                  "product-top"
                 ]
               },
               {
@@ -470,8 +406,7 @@
                 "description": "Adjusts focus speed for the selected simulated camera. Training scale 1–8; not a hardware range claim.",
                 "evidence": "Documented",
                 "sourceRefs": [
-                  "product-top",
-                  "ptzoptics-reference"
+                  "product-top"
                 ]
               },
               {
@@ -481,8 +416,7 @@
                 "description": "Adjusts preset speed for the selected simulated camera. Training scale 1–8; not a hardware range claim.",
                 "evidence": "Documented",
                 "sourceRefs": [
-                  "product-top",
-                  "ptzoptics-reference"
+                  "product-top"
                 ]
               },
               {
@@ -492,8 +426,7 @@
                 "description": "Adjusts preset speed for the selected simulated camera. Training scale 1–8; not a hardware range claim.",
                 "evidence": "Documented",
                 "sourceRefs": [
-                  "product-top",
-                  "ptzoptics-reference"
+                  "product-top"
                 ]
               }
             ]
@@ -508,8 +441,7 @@
                 "description": "Opens or closes the camera on-screen menu.",
                 "evidence": "Documented",
                 "sourceRefs": [
-                  "product-top",
-                  "ptzoptics-reference"
+                  "product-top"
                 ]
               },
               {
@@ -519,8 +451,7 @@
                 "description": "Selects the highlighted camera-menu item.",
                 "evidence": "Documented",
                 "sourceRefs": [
-                  "product-top",
-                  "ptzoptics-reference"
+                  "product-top"
                 ]
               },
               {
@@ -530,8 +461,7 @@
                 "description": "Returns to the previous camera-menu level.",
                 "evidence": "Documented",
                 "sourceRefs": [
-                  "product-top",
-                  "ptzoptics-reference"
+                  "product-top"
                 ]
               }
             ]
@@ -546,8 +476,7 @@
                 "description": "Cycles the five camera groups.",
                 "evidence": "Documented",
                 "sourceRefs": [
-                  "product-top",
-                  "ptzoptics-reference"
+                  "product-top"
                 ]
               },
               {
@@ -557,8 +486,7 @@
                 "description": "Choose a camera using a numeric ID.",
                 "evidence": "Documented",
                 "sourceRefs": [
-                  "product-top",
-                  "ptzoptics-reference"
+                  "product-top"
                 ]
               },
               {
@@ -568,8 +496,7 @@
                 "description": "Selects camera 1 in the current group without moving it. Training channel labels are not venue assignments.",
                 "evidence": "Documented",
                 "sourceRefs": [
-                  "product-top",
-                  "ptzoptics-reference"
+                  "product-top"
                 ]
               },
               {
@@ -579,8 +506,7 @@
                 "description": "Selects camera 2 in the current group without moving it. Training channel labels are not venue assignments.",
                 "evidence": "Documented",
                 "sourceRefs": [
-                  "product-top",
-                  "ptzoptics-reference"
+                  "product-top"
                 ]
               },
               {
@@ -590,8 +516,7 @@
                 "description": "Selects camera 3 in the current group without moving it. Training channel labels are not venue assignments.",
                 "evidence": "Documented",
                 "sourceRefs": [
-                  "product-top",
-                  "ptzoptics-reference"
+                  "product-top"
                 ]
               },
               {
@@ -601,8 +526,7 @@
                 "description": "Selects camera 4 in the current group without moving it. Training channel labels are not venue assignments.",
                 "evidence": "Documented",
                 "sourceRefs": [
-                  "product-top",
-                  "ptzoptics-reference"
+                  "product-top"
                 ]
               },
               {
@@ -612,8 +536,7 @@
                 "description": "Selects camera 5 in the current group without moving it. Training channel labels are not venue assignments.",
                 "evidence": "Documented",
                 "sourceRefs": [
-                  "product-top",
-                  "ptzoptics-reference"
+                  "product-top"
                 ]
               },
               {
@@ -623,8 +546,7 @@
                 "description": "Selects camera 6 in the current group without moving it. Training channel labels are not venue assignments.",
                 "evidence": "Documented",
                 "sourceRefs": [
-                  "product-top",
-                  "ptzoptics-reference"
+                  "product-top"
                 ]
               }
             ]
@@ -639,8 +561,7 @@
                 "description": "Configured custom commands can send HTTP, UART, TCP, UDP or Super Presets. This trainer records a press only.",
                 "evidence": "Documented",
                 "sourceRefs": [
-                  "product-top",
-                  "ptzoptics-reference"
+                  "product-top"
                 ]
               },
               {
@@ -650,8 +571,7 @@
                 "description": "Configured custom commands can send HTTP, UART, TCP, UDP or Super Presets. This trainer records a press only.",
                 "evidence": "Documented",
                 "sourceRefs": [
-                  "product-top",
-                  "ptzoptics-reference"
+                  "product-top"
                 ]
               },
               {
@@ -661,8 +581,7 @@
                 "description": "Configured custom commands can send HTTP, UART, TCP, UDP or Super Presets. This trainer records a press only.",
                 "evidence": "Documented",
                 "sourceRefs": [
-                  "product-top",
-                  "ptzoptics-reference"
+                  "product-top"
                 ]
               },
               {
@@ -672,8 +591,7 @@
                 "description": "Configured custom commands can send HTTP, UART, TCP, UDP or Super Presets. This trainer records a press only.",
                 "evidence": "Documented",
                 "sourceRefs": [
-                  "product-top",
-                  "ptzoptics-reference"
+                  "product-top"
                 ]
               }
             ]
@@ -688,8 +606,7 @@
                 "description": "Returns the selected camera to a home pose; this causes simulated movement.",
                 "evidence": "Documented",
                 "sourceRefs": [
-                  "product-top",
-                  "ptzoptics-reference"
+                  "product-top"
                 ]
               },
               {
@@ -699,8 +616,7 @@
                 "description": "Stores the current simulated pose at the entered preset number.",
                 "evidence": "Documented",
                 "sourceRefs": [
-                  "product-top",
-                  "ptzoptics-reference"
+                  "product-top"
                 ]
               },
               {
@@ -710,8 +626,7 @@
                 "description": "Recalls the entered preset on the selected simulated camera.",
                 "evidence": "Documented",
                 "sourceRefs": [
-                  "product-top",
-                  "ptzoptics-reference"
+                  "product-top"
                 ]
               }
             ]
@@ -726,8 +641,7 @@
                 "description": "Limits the training controls to PTZ and presets.",
                 "evidence": "Documented",
                 "sourceRefs": [
-                  "product-top",
-                  "ptzoptics-reference"
+                  "product-top"
                 ]
               },
               {
@@ -737,8 +651,7 @@
                 "description": "Restricts the training keypad to a 3 by 3 map of presets 1–3 on cameras 1–3.",
                 "evidence": "Documented",
                 "sourceRefs": [
-                  "product-top",
-                  "ptzoptics-reference"
+                  "product-top"
                 ]
               }
             ]
@@ -753,8 +666,7 @@
                 "description": "Numeric entry for camera selection or presets. This trainer uses an explicit number then CALL / SET sequence; quick press and hold shortcuts are not reproduced.",
                 "evidence": "Documented",
                 "sourceRefs": [
-                  "product-top",
-                  "ptzoptics-reference"
+                  "product-top"
                 ]
               },
               {
@@ -764,8 +676,7 @@
                 "description": "Numeric entry for camera selection or presets. This trainer uses an explicit number then CALL / SET sequence; quick press and hold shortcuts are not reproduced.",
                 "evidence": "Documented",
                 "sourceRefs": [
-                  "product-top",
-                  "ptzoptics-reference"
+                  "product-top"
                 ]
               },
               {
@@ -775,8 +686,7 @@
                 "description": "Numeric entry for camera selection or presets. This trainer uses an explicit number then CALL / SET sequence; quick press and hold shortcuts are not reproduced.",
                 "evidence": "Documented",
                 "sourceRefs": [
-                  "product-top",
-                  "ptzoptics-reference"
+                  "product-top"
                 ]
               },
               {
@@ -786,8 +696,7 @@
                 "description": "Numeric entry for camera selection or presets. This trainer uses an explicit number then CALL / SET sequence; quick press and hold shortcuts are not reproduced.",
                 "evidence": "Documented",
                 "sourceRefs": [
-                  "product-top",
-                  "ptzoptics-reference"
+                  "product-top"
                 ]
               },
               {
@@ -797,8 +706,7 @@
                 "description": "Numeric entry for camera selection or presets. This trainer uses an explicit number then CALL / SET sequence; quick press and hold shortcuts are not reproduced.",
                 "evidence": "Documented",
                 "sourceRefs": [
-                  "product-top",
-                  "ptzoptics-reference"
+                  "product-top"
                 ]
               },
               {
@@ -808,8 +716,7 @@
                 "description": "Numeric entry for camera selection or presets. This trainer uses an explicit number then CALL / SET sequence; quick press and hold shortcuts are not reproduced.",
                 "evidence": "Documented",
                 "sourceRefs": [
-                  "product-top",
-                  "ptzoptics-reference"
+                  "product-top"
                 ]
               },
               {
@@ -819,8 +726,7 @@
                 "description": "Numeric entry for camera selection or presets. This trainer uses an explicit number then CALL / SET sequence; quick press and hold shortcuts are not reproduced.",
                 "evidence": "Documented",
                 "sourceRefs": [
-                  "product-top",
-                  "ptzoptics-reference"
+                  "product-top"
                 ]
               },
               {
@@ -830,8 +736,7 @@
                 "description": "Numeric entry for camera selection or presets. This trainer uses an explicit number then CALL / SET sequence; quick press and hold shortcuts are not reproduced.",
                 "evidence": "Documented",
                 "sourceRefs": [
-                  "product-top",
-                  "ptzoptics-reference"
+                  "product-top"
                 ]
               },
               {
@@ -841,8 +746,7 @@
                 "description": "Numeric entry for camera selection or presets. This trainer uses an explicit number then CALL / SET sequence; quick press and hold shortcuts are not reproduced.",
                 "evidence": "Documented",
                 "sourceRefs": [
-                  "product-top",
-                  "ptzoptics-reference"
+                  "product-top"
                 ]
               },
               {
@@ -852,8 +756,7 @@
                 "description": "Numeric entry for camera selection or presets. This trainer uses an explicit number then CALL / SET sequence; quick press and hold shortcuts are not reproduced.",
                 "evidence": "Documented",
                 "sourceRefs": [
-                  "product-top",
-                  "ptzoptics-reference"
+                  "product-top"
                 ]
               },
               {
@@ -863,8 +766,7 @@
                 "description": "Numeric entry for camera selection or presets. This trainer uses an explicit number then CALL / SET sequence; quick press and hold shortcuts are not reproduced.",
                 "evidence": "Documented",
                 "sourceRefs": [
-                  "product-top",
-                  "ptzoptics-reference"
+                  "product-top"
                 ]
               },
               {
@@ -874,83 +776,7 @@
                 "description": "Numeric entry for camera selection or presets. This trainer uses an explicit number then CALL / SET sequence; quick press and hold shortcuts are not reproduced.",
                 "evidence": "Documented",
                 "sourceRefs": [
-                  "product-top",
-                  "ptzoptics-reference"
-                ]
-              }
-            ]
-          },
-          {
-            "category": "Rear connections",
-            "parts": [
-              {
-                "id": "superjoy.rear.rs232",
-                "label": "RS-232",
-                "kind": "connector",
-                "description": "Serial camera control.",
-                "evidence": "Documented",
-                "sourceRefs": [
-                  "ptzoptics-reference"
-                ]
-              },
-              {
-                "id": "superjoy.rear.rs485",
-                "label": "RS-422 / RS-485",
-                "kind": "connector",
-                "description": "Serial camera control interface.",
-                "evidence": "Documented",
-                "sourceRefs": [
-                  "ptzoptics-reference"
-                ]
-              },
-              {
-                "id": "superjoy.rear.lan",
-                "label": "Ethernet / PoE",
-                "kind": "connector",
-                "description": "Network control and 802.3af PoE.",
-                "evidence": "Documented",
-                "sourceRefs": [
-                  "ptzoptics-reference"
-                ]
-              },
-              {
-                "id": "superjoy.rear.hdmi",
-                "label": "HDMI output",
-                "kind": "connector",
-                "description": "Camera preview output, documented HDMI 1.3 up to 1080p.",
-                "evidence": "Documented",
-                "sourceRefs": [
-                  "ptzoptics-reference"
-                ]
-              },
-              {
-                "id": "superjoy.rear.usb",
-                "label": "USB service",
-                "kind": "connector",
-                "description": "Configuration transfer and firmware service.",
-                "evidence": "Documented",
-                "sourceRefs": [
-                  "ptzoptics-reference"
-                ]
-              },
-              {
-                "id": "superjoy.rear.dc",
-                "label": "12 V DC",
-                "kind": "connector",
-                "description": "Published external supply input: 12 V DC / 6 W.",
-                "evidence": "Documented",
-                "sourceRefs": [
-                  "ptzoptics-reference"
-                ]
-              },
-              {
-                "id": "superjoy.rear.power",
-                "label": "Power switch",
-                "kind": "connector",
-                "description": "Controller power switching.",
-                "evidence": "Documented",
-                "sourceRefs": [
-                  "ptzoptics-reference"
+                  "product-top"
                 ]
               }
             ]
@@ -961,27 +787,7 @@
         "product-front",
         "product-side",
         "product-perspectives",
-        "ptzoptics-reference",
-        "product-top",
-        "fmp-photo-powered"
-      ]
-    },
-    {
-      "id": "kept-with-fmp",
-      "title": "Kept with FMP",
-      "type": "cards",
-      "cards": [
-        {
-          "label": "FMP assignments",
-          "value": "Kept in FMP records",
-          "text": "Addresses, firmware, camera assignments and installed routes for the FMP unit are recorded with the FMP explorer and house records, not on this equipment sheet."
-        }
-      ],
-      "paragraphs": [
-        "This sheet lists equipment facts. Catalog items that describe FMP wiring or installed facts, and the catalog’s venue fields, stay with the FMP explorer."
-      ],
-      "sourceRefs": [
-        "user-correction"
+        "product-top"
       ]
     },
     {

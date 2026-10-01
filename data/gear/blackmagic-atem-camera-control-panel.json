@@ -14,16 +14,13 @@
   "updated": "2026-10-01",
   "generated": {
     "by": "scripts/build_gear_from_fmp.js",
-    "catalog": "fmp-ccu4",
-    "revision": "1.0.0",
-    "note": "Generated file. Change the fmp-suite catalog or scripts/gear_equipment_adapter.js, then run npm run build:gear-from-fmp."
+    "revision": "1.0.0"
   },
-  "summary": "Equipment reference generated from the FMP Blackmagic ATEM Camera Control Panel catalog. FMP wiring and installed facts stay with the FMP explorer.",
+  "summary": "Equipment reference for Blackmagic ATEM Camera Control Panel. Product details and source confidence.",
   "tags": [
     "ATEM",
     "CCU",
-    "shading",
-    "FMP"
+    "shading"
   ],
   "sources": [
     {
@@ -46,20 +43,6 @@
       "kind": "manufacturer",
       "reference": "manufacturer physical-spec image",
       "scope": "430 × 389 × 141.7 mm external envelope and chassis profile."
-    },
-    {
-      "id": "fmp-ccu",
-      "label": "DB | FMP | AV Gear · ATEM Camera Control Panel",
-      "kind": "house-record",
-      "reference": "FMP equipment record, 20 September 2026",
-      "scope": "FMP hardware identity, labels, ownership, use and Camera 1 control-loss history."
-    },
-    {
-      "id": "fmp-signal",
-      "label": "REF | FMP | Signal Flow",
-      "kind": "house-record",
-      "reference": "FMP equipment record, 20 September 2026",
-      "scope": "Panel → ATEM Ethernet control, then camera control rides the return path to Cameras 1–3; P240 is separate."
     }
   ],
   "accuracy": [
@@ -84,11 +67,10 @@
     {
       "item": "Parts the catalog has not established",
       "status": "unverified",
-      "detail": "8 parts are listed under Open facts.",
+      "detail": "12 parts are listed under Open facts.",
       "sourceRefs": [
         "blackmagic-manual",
-        "blackmagic-tech",
-        "fmp-ccu"
+        "blackmagic-tech"
       ]
     }
   ],
@@ -111,16 +93,8 @@
           "SWPANELCCU4"
         ],
         [
-          "Catalog",
-          "fmp-ccu4 · revision 1.0.0 · schema 1.1"
-        ],
-        [
           "Parts on this sheet",
-          "138 of 140 catalog components; 2 kept with FMP"
-        ],
-        [
-          "Interactive model",
-          "housevideo.app/fmp/models/ccu4.html"
+          "138"
         ]
       ],
       "sourceRefs": [
@@ -133,13 +107,9 @@
       "id": "parts",
       "title": "Parts",
       "type": "parts",
-      "lede": "Generated from the FMP equipment catalog. Each part keeps the catalog’s own evidence level, and Inspect opens it in the interactive model.",
+      "lede": "Equipment parts and their supporting sources. Descriptions awaiting equipment-only review are marked Unknown.",
       "parts": {
-        "interactive": {
-          "url": "https://housevideo.app/fmp/models/ccu4.html",
-          "label": "Blackmagic ATEM Camera Control Panel interactive model"
-        },
-        "total": 140,
+        "total": 138,
         "groups": [
           {
             "category": "Enclosure",
@@ -477,14 +447,13 @@
                 "id": "ccu4.ch1.camera",
                 "label": "CH1 · Camera number",
                 "kind": "display",
-                "description": "The large camera number for this strip, readable across a gallery. It illuminates red when this camera is live on the program output — the fastest way to check you are not about to shade a camera that is on air.",
-                "evidence": "Confirmed",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "blackmagic-manual",
-                  "blackmagic-tech",
-                  "fmp-ccu"
+                  "blackmagic-tech"
                 ],
-                "fmpEvidence": true
+                "descriptionPending": true
               },
               {
                 "id": "ccu4.ch1.joystick",
@@ -847,14 +816,13 @@
                 "id": "ccu4.ch2.camera",
                 "label": "CH2 · Camera number",
                 "kind": "display",
-                "description": "The large camera number for this strip, readable across a gallery. It illuminates red when this camera is live on the program output — the fastest way to check you are not about to shade a camera that is on air.",
-                "evidence": "Documented",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "blackmagic-manual",
-                  "blackmagic-tech",
-                  "fmp-ccu"
+                  "blackmagic-tech"
                 ],
-                "fmpEvidence": true
+                "descriptionPending": true
               },
               {
                 "id": "ccu4.ch2.joystick",
@@ -1217,14 +1185,13 @@
                 "id": "ccu4.ch3.camera",
                 "label": "CH3 · Camera number",
                 "kind": "display",
-                "description": "The large camera number for this strip, readable across a gallery. It illuminates red when this camera is live on the program output — the fastest way to check you are not about to shade a camera that is on air.",
-                "evidence": "Confirmed",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "blackmagic-manual",
-                  "blackmagic-tech",
-                  "fmp-ccu"
+                  "blackmagic-tech"
                 ],
-                "fmpEvidence": true
+                "descriptionPending": true
               },
               {
                 "id": "ccu4.ch3.joystick",
@@ -1587,14 +1554,13 @@
                 "id": "ccu4.ch4.camera",
                 "label": "CH4 · Camera number",
                 "kind": "display",
-                "description": "The large camera number for this strip, readable across a gallery. It illuminates red when this camera is live on the program output — the fastest way to check you are not about to shade a camera that is on air.",
-                "evidence": "Confirmed",
+                "description": "Equipment description awaiting source review.",
+                "evidence": "Unknown",
                 "sourceRefs": [
                   "blackmagic-manual",
-                  "blackmagic-tech",
-                  "fmp-ccu"
+                  "blackmagic-tech"
                 ],
-                "fmpEvidence": true
+                "descriptionPending": true
               },
               {
                 "id": "ccu4.ch4.joystick",
@@ -1706,30 +1672,6 @@
       ]
     },
     {
-      "id": "kept-with-fmp",
-      "title": "Kept with FMP",
-      "type": "cards",
-      "cards": [
-        {
-          "label": "Panel → ATEM control network",
-          "value": "Signal route between FMP devices",
-          "text": "Catalog id ccu4.path.atem. Open it in the FMP interactive model."
-        },
-        {
-          "label": "ATEM → URSA SDI return/control",
-          "value": "Signal route between FMP devices",
-          "text": "Catalog id ccu4.path.return. Open it in the FMP interactive model."
-        }
-      ],
-      "paragraphs": [
-        "This sheet lists equipment facts. Catalog items that describe FMP wiring or installed facts, and the catalog’s venue fields, stay with the FMP explorer."
-      ],
-      "sourceRefs": [
-        "fmp-ccu",
-        "fmp-signal"
-      ]
-    },
-    {
       "id": "open-facts",
       "title": "Open facts",
       "type": "table",
@@ -1750,6 +1692,11 @@
           "Marked on the panel, but the cited manual states the CC setting \"will be enabled in a future update\". Whether current panel firmware implements it has not been verified here."
         ],
         [
+          "CH1 · Camera number",
+          "Not established",
+          "Equipment description awaiting source review."
+        ],
+        [
           "CH2 · ND filter",
           "Not established",
           "Marked on the panel, but the cited manual states the ND setting \"will be enabled in a future update\". Whether current panel firmware implements it has not been verified here, so treat the control as unproven rather than assuming it drives the camera."
@@ -1758,6 +1705,11 @@
           "CH2 · Color correction",
           "Not established",
           "Marked on the panel, but the cited manual states the CC setting \"will be enabled in a future update\". Whether current panel firmware implements it has not been verified here."
+        ],
+        [
+          "CH2 · Camera number",
+          "Not established",
+          "Equipment description awaiting source review."
         ],
         [
           "CH3 · ND filter",
@@ -1770,6 +1722,11 @@
           "Marked on the panel, but the cited manual states the CC setting \"will be enabled in a future update\". Whether current panel firmware implements it has not been verified here."
         ],
         [
+          "CH3 · Camera number",
+          "Not established",
+          "Equipment description awaiting source review."
+        ],
+        [
           "CH4 · ND filter",
           "Not established",
           "Marked on the panel, but the cited manual states the ND setting \"will be enabled in a future update\". Whether current panel firmware implements it has not been verified here, so treat the control as unproven rather than assuming it drives the camera."
@@ -1780,9 +1737,9 @@
           "Marked on the panel, but the cited manual states the CC setting \"will be enabled in a future update\". Whether current panel firmware implements it has not been verified here."
         ],
         [
-          "Parts citing FMP evidence",
-          "4 parts",
-          "These parts cite an FMP record or operator report as well as equipment sources. Their descriptions may include behaviour observed on the FMP unit or an FMP-specific note, and each is flagged. Separating the two needs a distinct field in the fmp-suite catalog."
+          "CH4 · Camera number",
+          "Not established",
+          "Equipment description awaiting source review."
         ],
         [
           "Connector specifications",
@@ -1792,8 +1749,7 @@
       ],
       "sourceRefs": [
         "blackmagic-manual",
-        "blackmagic-tech",
-        "fmp-ccu"
+        "blackmagic-tech"
       ]
     },
     {

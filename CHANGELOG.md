@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-10-01 — Equipment reference and workspace boundary
+
+- Public Gear Reference now carries equipment-only data across all nine sheets.
+  Removed FMP assignments, inventory counts, house procedures, evidence, model
+  links and the “Kept with FMP” section. Manufacturer references remain available.
+- Generated sheets publish only product evidence. Mixed venue descriptions stay
+  out of public parts and accuracy views pending separate equipment-source review;
+  the canonical FMP catalogs are preserved. Arbitrary show/workspace parameters
+  do not enable venue data; an explicit workspace binding remains required.
+- Added source and rendered boundary regressions and advanced the offline cache
+  version so existing installations acquire the revised public sheets.
+
 ## 2026-10-01 — AV Workbook follows the Suite theme
 
 - AV Workbook opens in Warm Paper on a new browser, uses the saved light, dark or system Suite choice, and shows a Theme button in its regular and read-only headers. The choice persists across tabs without changing a workbook record.

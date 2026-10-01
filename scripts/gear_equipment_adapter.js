@@ -6,7 +6,6 @@
 
 const SCHEMA = 'system-by-dave.gear-reference-entry.v1';
 const GENERATOR = 'scripts/build_gear_from_fmp.js';
-const INTERACTIVE_URL = /^https:\/\/housevideo\.app\/fmp\/(models\/[a-z0-9-]+\.html|ptz\/SuperJoy-G1-Interactive-Guide\.html)$/;
 
 // What kind of evidence each catalog source is. Every source a catalog declares must be listed, so a
 // new source cannot change what the sheet shows without a decision here.
@@ -24,7 +23,7 @@ const SOURCE_KIND_LABEL = {
   'house-record': 'FMP record',
   'user-report': 'Operator report'
 };
-const EQUIPMENT_KINDS = new Set(['manufacturer', 'product-photo', 'unit-photo', 'user-document']);
+const EQUIPMENT_KINDS = new Set(['manufacturer', 'product-photo']);
 const HOUSE_KINDS = new Set(['house-record', 'user-report']);
 
 // Catalog-level keys that hold FMP assignments rather than equipment facts. Their values are never
@@ -41,7 +40,6 @@ const EQUIPMENT = [
     subcategory: 'Switchers',
     tags: ['ATEM', 'switcher', 'ISO', 'FMP'],
     aka: ['ATEM Television Studio HD8 ISO', 'ATEM HD8 ISO', 'TVS HD8 ISO'],
-    interactive: 'https://housevideo.app/fmp/models/atem-hd8-iso.html',
     sources: {
       'photo-front': 'unit-photo', 'photo-perspective': 'unit-photo', 'photo-rear': 'unit-photo', 'photo-side': 'unit-photo',
       'bmd-spec': 'manufacturer', 'bmd-start': 'manufacturer', 'bmd-product': 'manufacturer', 'bmd-manual': 'manufacturer',
@@ -57,7 +55,6 @@ const EQUIPMENT = [
     subcategory: 'Camera control',
     tags: ['ATEM', 'CCU', 'shading', 'FMP'],
     aka: ['ATEM Camera Control Panel', 'SWPANELCCU4', 'CCU panel'],
-    interactive: 'https://housevideo.app/fmp/models/ccu4.html',
     sources: {
       'blackmagic-tech': 'manufacturer', 'blackmagic-manual': 'manufacturer', 'blackmagic-physical': 'manufacturer',
       'fmp-ccu': 'house-record', 'fmp-signal': 'house-record'
@@ -72,7 +69,6 @@ const EQUIPMENT = [
     subcategory: 'PTZ cameras',
     tags: ['PTZ', 'NDI', 'SDI', 'FMP'],
     aka: ['P240', 'BirdDog P240 PTZ'],
-    interactive: 'https://housevideo.app/fmp/models/p240.html',
     sources: {
       'birddog-techspec': 'manufacturer', 'birddog-guide': 'manufacturer', 'birddog-overview': 'manufacturer',
       'fmp-gear': 'house-record', 'fmp-signal': 'house-record', 'dave-sdi-2026-09-23': 'user-report'
@@ -87,10 +83,9 @@ const EQUIPMENT = [
     subcategory: 'PTZ controllers',
     tags: ['PTZ', 'joystick', 'VISCA', 'FMP'],
     aka: ['SuperJoy G1', 'PT-SUPERJOY-G1', 'SuperJoy'],
-    interactive: 'https://housevideo.app/fmp/ptz/SuperJoy-G1-Interactive-Guide.html',
     sources: {
       'ptzoptics-reference': 'user-document', 'product-top': 'product-photo', 'product-front': 'product-photo',
-      'product-side': 'product-photo', 'product-perspectives': 'product-photo', 'fmp-photo-powered': 'product-photo',
+      'product-side': 'product-photo', 'product-perspectives': 'product-photo', 'fmp-photo-powered': 'unit-photo',
       'manufacturer-buttons': 'manufacturer', 'user-correction': 'house-record'
     }
   }
@@ -117,7 +112,6 @@ function unique(values) {
 }
 
 function buildSheet(config, catalog) {
-  if (!INTERACTIVE_URL.test(config.interactive)) throw new Error(`${config.id}: interactive URL is not an FMP model page`);
   const kindOf = id => {
     const kind = config.sources[id];
     if (!kind) throw new Error(`${config.id}: catalog source ${id} has no evidence kind in scripts/gear_equipment_adapter.js`);
@@ -128,25 +122,24 @@ function buildSheet(config, catalog) {
     if (!catalog.sources.some(source => source.source_id === id)) throw new Error(`${config.id}: classified source ${id} is not in the catalog`);
   }
 
+  const workspaceText = /\bFMP\b|housevideo|Freedom Mortgage|\bDave(?:'s)?\b|\bhouse\b|\bFOH\b|\bcatwalk\b|\bpit center\b|\bpit stage/i;
   const listed = [];
-  const kept = [];
   for (const component of catalog.components) {
-    const refs = Array.from(component.source_ids || []);
-    const kinds = refs.map(kindOf);
-    const houseOnly = refs.length > 0 && kinds.every(kind => HOUSE_KINDS.has(kind));
-    if (component.geometry_status === 'virtual_route') {
-      kept.push({ id: component.component_id, label: component.label, reason: 'Signal route between FMP devices' });
-    } else if (houseOnly) {
-      kept.push({ id: component.component_id, label: component.label, reason: 'Installed FMP fact with no equipment source' });
-    } else {
-      listed.push({ component, refs, kinds });
-    }
+    const originalRefs = Array.from(component.source_ids || []);
+    const refs = originalRefs.filter(id => EQUIPMENT_KINDS.has(kindOf(id)));
+    // A shared part identity is useful, but a mixed venue description is not a product fact.
+    // Fail closed until the source catalog supplies a separately evidenced equipment description.
+    if (!refs.length || component.geometry_status === 'virtual_route' ||
+        workspaceText.test([component.label, component.category].join(' '))) continue;
+    const pending = originalRefs.some(id => HOUSE_KINDS.has(kindOf(id))) ||
+      workspaceText.test(String(component.purpose || ''));
+    listed.push({ component, refs, kinds: refs.map(kindOf), pending });
   }
 
   // Parts keep catalog order inside each category; categories keep first-appearance order.
   const groups = [];
   const groupIndex = new Map();
-  for (const { component, refs, kinds } of listed) {
+  for (const { component, refs, pending } of listed) {
     if (!groupIndex.has(component.category)) {
       groupIndex.set(component.category, groups.length);
       groups.push({ category: component.category, parts: [] });
@@ -155,36 +148,29 @@ function buildSheet(config, catalog) {
       id: component.component_id,
       label: component.label,
       kind: component.kind || '',
-      description: String(component.purpose || '').trim(),
-      evidence: component.confidence,
+      description: pending ? 'Equipment description awaiting source review.' : String(component.purpose || '').trim(),
+      evidence: pending ? 'Unknown' : component.confidence,
       sourceRefs: refs
     };
-    if (kinds.some(kind => HOUSE_KINDS.has(kind))) part.fmpEvidence = true;
+    if (pending) part.descriptionPending = true;
     groups[groupIndex.get(component.category)].parts.push(part);
   }
 
   const manufacturerRefs = catalog.sources.map(s => s.source_id).filter(id => kindOf(id) === 'manufacturer');
   const equipmentRefs = unique(listed.flatMap(item => item.refs.filter(ref => EQUIPMENT_KINDS.has(kindOf(ref)))));
-  const houseRefs = catalog.sources.map(s => s.source_id).filter(id => HOUSE_KINDS.has(kindOf(id)));
   const withManufacturer = listed.filter(item => item.kinds.includes('manufacturer'));
   const withoutManufacturer = listed.filter(item => !item.kinds.includes('manufacturer'));
-  const unknown = listed.filter(item => item.component.confidence === 'Unknown');
-  const conflicting = listed.filter(item => item.component.confidence === 'Contradicted');
-  const mixed = listed.filter(item => item.kinds.some(kind => HOUSE_KINDS.has(kind)));
-  const venueKeys = VENUE_KEYS.filter(key => catalog[key] && typeof catalog[key] === 'object');
+  const unknown = listed.filter(item => item.pending || item.component.confidence === 'Unknown');
+  const conflicting = listed.filter(item => !item.pending && item.component.confidence === 'Contradicted');
   if (!manufacturerRefs.length) throw new Error(`${config.id}: catalog has no manufacturer source`);
 
-  const total = catalog.components.length;
+  const total = listed.length;
   const identification = [
     ['Manufacturer', config.brand],
     ['Model (catalog)', catalog.model]
   ];
   if (catalog.part_number) identification.push(['Part number', catalog.part_number]);
-  identification.push(
-    ['Catalog', `${catalog.guide_id} · revision ${catalog.revision} · schema ${catalog.schema_version}`],
-    ['Parts on this sheet', `${listed.length} of ${total} catalog components${kept.length ? `; ${kept.length} kept with FMP` : ''}`],
-    ['Interactive model', config.interactive.replace('https://', '')]
-  );
+  identification.push(['Parts on this sheet', String(total)]);
 
   const sections = [
     { id: 'id', title: 'Identification', type: 'specTable', rows: identification, sourceRefs: manufacturerRefs },
@@ -192,37 +178,18 @@ function buildSheet(config, catalog) {
       id: 'parts',
       title: 'Parts',
       type: 'parts',
-      lede: 'Generated from the FMP equipment catalog. Each part keeps the catalog’s own evidence level, and Inspect opens it in the interactive model.',
-      parts: { interactive: { url: config.interactive, label: `${config.displayName} interactive model` }, total, groups },
+      lede: 'Equipment parts and their supporting sources. Descriptions awaiting equipment-only review are marked Unknown.',
+      parts: { total, groups },
       sourceRefs: equipmentRefs.length ? equipmentRefs : manufacturerRefs
     }
   ];
 
-  if (kept.length || venueKeys.length) {
-    const cards = kept.map(item => ({ label: item.label, value: item.reason, text: `Catalog id ${item.id}. Open it in the FMP interactive model.` }));
-    if (venueKeys.length) {
-      cards.push({ label: 'FMP assignments', value: 'Kept in FMP records', text: 'Addresses, firmware, camera assignments and installed routes for the FMP unit are recorded with the FMP explorer and house records, not on this equipment sheet.' });
-    }
-    sections.push({
-      id: 'kept-with-fmp',
-      title: 'Kept with FMP',
-      type: 'cards',
-      cards,
-      paragraphs: ['This sheet lists equipment facts. Catalog items that describe FMP wiring or installed facts, and the catalog’s venue fields, stay with the FMP explorer.'],
-      sourceRefs: houseRefs.length ? houseRefs : manufacturerRefs
-    });
-  }
-
   const gaps = [];
-  unknown.forEach(item => gaps.push([item.component.label, 'Not established', item.component.purpose || 'The catalog marks this part Unknown.']));
-  conflicting.forEach(item => gaps.push([item.component.label, 'Sources disagree', item.component.purpose || 'The catalog marks this part Contradicted.']));
-  if (mixed.length) {
-    gaps.push(['Parts citing FMP evidence', `${mixed.length} part${mixed.length === 1 ? '' : 's'}`,
-      'These parts cite an FMP record or operator report as well as equipment sources. Their descriptions may include behaviour observed on the FMP unit or an FMP-specific note, and each is flagged. Separating the two needs a distinct field in the fmp-suite catalog.']);
-  }
+  unknown.forEach(item => gaps.push([item.component.label, 'Not established', item.pending ? 'Equipment description awaiting source review.' : (item.component.purpose || 'The catalog marks this part Unknown.')]));
+  conflicting.forEach(item => gaps.push([item.component.label, 'Sources disagree', item.pending ? 'Equipment description awaiting source review.' : (item.component.purpose || 'The catalog marks this part Contradicted.')]));
   gaps.push(['Connector specifications', 'Descriptive text only',
     'The catalog records connectors as parts with descriptions. It has no structured connector fields (signal standard, format, pinout), so this sheet does not tabulate them.']);
-  const gapRefs = unique([...unknown, ...conflicting, ...mixed].flatMap(item => item.refs));
+  const gapRefs = unique([...unknown, ...conflicting].flatMap(item => item.refs));
   sections.push({ id: 'open-facts', title: 'Open facts', type: 'table', columns: ['Item', 'Gap', 'Detail'], rows: gaps, sourceRefs: gapRefs.length ? gapRefs : manufacturerRefs });
   sections.push({ id: 'accuracy', title: 'Accuracy log', type: 'accuracyLog', sourceRefs: manufacturerRefs });
 
@@ -248,13 +215,13 @@ function buildSheet(config, catalog) {
     subcategory: config.subcategory,
     status: 'catalog-derived',
     updated: UPDATED,
-    generated: { by: GENERATOR, catalog: catalog.guide_id, revision: catalog.revision, note: 'Generated file. Change the fmp-suite catalog or scripts/gear_equipment_adapter.js, then run npm run build:gear-from-fmp.' },
-    summary: `Equipment reference generated from the FMP ${catalog.model} catalog. FMP wiring and installed facts stay with the FMP explorer.`,
-    tags: config.tags,
-    sources: catalog.sources.map(source => sheetSource(source, kindOf(source.source_id))),
+    generated: { by: GENERATOR, revision: catalog.revision },
+    summary: `Equipment reference for ${config.displayName}. Product details and source confidence.`,
+    tags: config.tags.filter(tag => tag !== 'FMP'),
+    sources: catalog.sources.filter(source => EQUIPMENT_KINDS.has(kindOf(source.source_id))).map(source => sheetSource(source, kindOf(source.source_id))),
     accuracy,
     sections
   };
 }
 
-module.exports = { EQUIPMENT, SOURCE_KIND_LABEL, EQUIPMENT_KINDS, HOUSE_KINDS, VENUE_KEYS, INTERACTIVE_URL, buildSheet };
+module.exports = { EQUIPMENT, SOURCE_KIND_LABEL, EQUIPMENT_KINDS, HOUSE_KINDS, VENUE_KEYS, buildSheet };

@@ -8,9 +8,9 @@ const { originFor, sitemapFor } = require('./domain_sites_lib');
 
 const ROOT = path.resolve(__dirname, '..');
 const failures = [];
-const ALLOWED_TYPES = new Set(['specTable', 'table', 'figure', 'figure+table', 'procedure', 'checklist', 'cards', 'accuracyLog', 'model', 'parts']);
+const ALLOWED_TYPES = new Set(['specTable', 'table', 'figure', 'figure+table', 'procedure', 'checklist', 'cards', 'accuracyLog', 'parts']);
 // Sheets generated from FMP equipment catalogs (scripts/build_gear_from_fmp.js checks they are current).
-const { EQUIPMENT, INTERACTIVE_URL } = require('./gear_equipment_adapter');
+const { EQUIPMENT } = require('./gear_equipment_adapter');
 const GENERATED = new Set(EQUIPMENT.map((item) => item.id));
 const ALLOWED_STATUSES = new Set(['confirmed', 'corrected', 'unverified', 'estimate']);
 
@@ -80,6 +80,14 @@ function verifyEntry(indexEntry) {
   if (!Array.isArray(entry.sections) || !entry.sections.length) fail(`${entry.id} has no sections.`);
   if (!Array.isArray(entry.sources) || !entry.sources.length) fail(`${entry.id} has no sources.`);
   if (!Array.isArray(entry.accuracy) || !entry.accuracy.length) fail(`${entry.id} has no accuracy log.`);
+  const publicData = { ...entry };
+  delete publicData.generated; // Build provenance is not user-facing equipment content.
+  if (/\bfmp\b|housevideo\.app|freedom mortgage|kept-with-fmp|fmpEvidence|hv-fmp/i.test(JSON.stringify(publicData))) {
+    fail(`${entry.id} exposes workspace-specific content in the public equipment library.`);
+  }
+  for (const source of entry.sources || []) {
+    if (['house-record', 'user-report', 'unit-photo'].includes(source.kind)) fail(`${entry.id} exposes workspace evidence.`);
+  }
   const sourceIds = new Set((entry.sources || []).map((source) => source.id));
   const sectionIds = new Set();
   (entry.sections || []).forEach((section) => {
@@ -90,16 +98,10 @@ function verifyEntry(indexEntry) {
     (section.sourceRefs || []).forEach((ref) => {
       if (!sourceIds.has(ref)) fail(`${entry.id} section ${section.id} references unknown source ${ref}.`);
     });
-    if (section.type === 'model') {
-      const model = section.model || {};
-      if (!/^https:\/\/housevideo\.app\/fmp\/rig\/\?equipment=(rig|studio)&part=[a-z0-9-]+$/.test(model.url || '') || !model.title) {
-        fail(`${entry.id} section ${section.id} has an invalid FMP model link.`);
-      }
-    }
     if (section.type === 'parts') {
       const parts = section.parts || {};
       if (!GENERATED.has(entry.id)) fail(`${entry.id} section ${section.id}: parts sections come only from FMP catalogs.`);
-      if (!INTERACTIVE_URL.test((parts.interactive || {}).url || '')) fail(`${entry.id} section ${section.id} has an invalid interactive model link.`);
+      if (parts.interactive) fail(`${entry.id}: public parts must not link workspace models.`);
       const seen = new Set();
       (parts.groups || []).forEach((group) => (group.parts || []).forEach((part) => {
         if (!part.id || !part.label || !part.evidence) fail(`${entry.id} part ${part.id || '(unnamed)'} is missing id, label or evidence.`);
@@ -138,6 +140,7 @@ function verifyEntry(indexEntry) {
 function verifyData() {
   const index = readJson('data/gear/index.json');
   if (!index || !Array.isArray(index.entries)) return fail('Gear Reference index has no entries array.');
+  if (/\bfmp\b|housevideo\.app|freedom mortgage/i.test(JSON.stringify(index))) fail('Public index exposes workspace content.');
   const ids = new Set();
   index.entries.forEach((entry) => {
     if (!entry.id || ids.has(entry.id)) fail('Gear Reference index has a missing or duplicate id.');
@@ -160,7 +163,6 @@ function verifyRenderer(registry) {
     "history.replaceState",
     "JSON.stringify(section).toLowerCase()",
     "function renderParts(container,section,map)",
-    "'#part='+encodeURIComponent(part.id)",
     "source.reference||source.url",
     "Math.abs(dx)>64",
     "event.key==='Home'",
