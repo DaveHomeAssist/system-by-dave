@@ -927,6 +927,20 @@ function restoreWalk(saved){ FMPWalkCore.restoreWalk(S, saved); }
 function availableStations(){ return FMPWalkCore.availableStations(S.meta); }
 function zoneGroups(){ return FMPWalkCore.zoneGroups(S.meta); }
 function stations(){ return FMPWalkCore.stations(S.meta); }
+// Setup and zone changes can reshape the route mid-walk. Stay on the same stop while it is still on the
+// route, otherwise go to the first stop not yet walked (walk UX audit #3). Only Start walk returns to stop 1.
+// A finished walk (S.idx past the last stop) stays finished unless the change adds a stop not yet walked.
+function keepStop(change){
+  var before = stations(), finished = S.idx >= before.length, id = !finished && before[S.idx] && before[S.idx].id;
+  var had = {}; before.forEach(function(s){ had[s.id] = true; });
+  change();
+  var after = stations(), at = -1, open = -1;
+  for(var i=0;i<after.length;i++){
+    if(after[i].id === id) at = i;
+    if(open < 0 && !(S.res[after[i].id] && S.res[after[i].id].status) && (!finished || !had[after[i].id])) open = i;
+  }
+  S.idx = at >= 0 ? at : open >= 0 ? open : finished ? after.length : Math.max(0, Math.min(S.idx, after.length - 1));
+}
 
 /* ══════════════════════ rendering ══════════════════════ */
 function esc(s){
@@ -1736,9 +1750,9 @@ function renderZones(){
     var selectable = group.checks.filter(function(s){ return s.tier !== 2; });
     if(!selectable.length) return;
     var enabled = selectable.some(function(s){ return !S.meta.checks[s.id]; });
-    selectable.forEach(function(s){ S.meta.checks[s.id] = enabled; });
+    keepStop(function(){ selectable.forEach(function(s){ S.meta.checks[s.id] = enabled; }); });
     var index = groups.indexOf(group);
-    S.idx = 0; save(); renderZones(); renderHeader(); renderRoute();
+    save(); renderZones(); renderHeader(); renderRoute();
     cw.children[index].focus({preventScroll:true});
   };
 }
@@ -1752,9 +1766,10 @@ function grabSetup(){
   S.meta.cfg   = $("fCfg").value;
 }
 ["fDate","fShow","fOp","fOpCustom","fCfg"].forEach(function(id){
-  $(id).addEventListener("input",  function(){ grabSetup(); syncOperator(); showExportStatus("",false); saveSoon(); renderHeader(); });
+  // A select fires input before change, and input already applies a new route, so both keep the stop.
+  $(id).addEventListener("input",  function(){ keepStop(grabSetup); syncOperator(); showExportStatus("",false); saveSoon(); renderHeader(); });
   $(id).addEventListener("change", function(){
-    grabSetup(); syncOperator(); showExportStatus("",false); S.idx = 0; save();
+    keepStop(grabSetup); syncOperator(); showExportStatus("",false); save();
     if(id === "fCfg") renderZones();
     renderHeader(); renderRoute();
     if(id === "fOp" && $("fOp").value === "custom") $("fOpCustom").focus();

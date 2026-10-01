@@ -24,6 +24,8 @@ const releases = [
       'house/index.html', 'house/house.css', 'house/house.js', 'house/house-data.js', 'house/house-tokens.css', 'house/site-plan.png', 'house/display-estate.csv',
       ...modelFiles,
       'guide/index.html', 'gear/index.html', 'build/index.html', 'ptz/index.html', 'ref.css', 'ref.js',
+      // A typed /fmp/walk/ redirects to the walk on its own origin (FMP open issues plan A4).
+      'walk/index.html',
       // Link-preview card for every FMP page; a reviewed raster, like the house site plan.
       'fmp-social-card.png',
       'rig/index.html', 'rig/embed-mode.js', 'rig/rig-model.js', 'rig/fmp-guide-data.js',
@@ -186,6 +188,9 @@ const robots = fs.readFileSync(path.join(site, 'robots.txt'), 'utf8');
 assert.ok(robots.includes('Disallow: /fmp/'));
 assert.ok(robots.includes('Disallow: /fmpwalk/'));
 // /fmp-index/ is retired: the /fmp/ hub is the one directory, so the old index redirects there like /fmp-walk/.
+const walkAlias = fs.readFileSync(path.join(site, 'fmp/walk/index.html'), 'utf8');
+assert.ok(walkAlias.includes(`location.replace("${walkRoot}" + location.search + location.hash)`), 'fmp/walk/index.html: redirect to the walk, keeping query and hash');
+assert.match(walkAlias, /<meta name="robots" content="noindex,follow">/, 'fmp/walk/index.html: noindex');
 const index = fs.readFileSync(path.join(site, 'fmp-index/index.html'), 'utf8');
 assert.match(index, /<meta http-equiv="refresh" content="0; url=\/fmp\/">/, 'fmp-index/index.html: redirect to /fmp/');
 assert.ok(index.includes('location.replace("/fmp/" + location.search + location.hash)'), 'fmp-index/index.html: keep query and hash');
