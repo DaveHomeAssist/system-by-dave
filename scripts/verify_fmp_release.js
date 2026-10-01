@@ -156,7 +156,7 @@ assert.match(walkEntry, /Email and Notion saves require confirmation/);
 // legacy ?camera=N / ?position= redirect name the operations hub absolutely. A same-origin
 // /fmp/camera/ would resolve against the walk's domain, where nothing serves it.
 const walkCameraRoot = `${originFor('fmp/camera/')}/fmp/camera/`;
-assert.ok(walkEntry.includes(`id="cameraLaunch" href="${walkCameraRoot}"`), 'walk camera launch is absolute');
+assert.doesNotMatch(walkEntry, /id="cameraLaunch"|id="p-cam"|data-tab="cam"/, 'camera work is absent from Walk');
 assert.ok(walkEntry.includes(`var cameraRoot = "${walkCameraRoot}";`), 'walk legacy camera redirect is absolute');
 assert.doesNotMatch(walkEntry, /["']\.{1,2}\/camera\//);
 assert.equal((walkEntry.match(/<h1\b/g) || []).length, 1);

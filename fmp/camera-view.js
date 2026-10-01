@@ -1,4 +1,4 @@
-import { CHECK_STATES, checksFor, pendingLabel } from './camera-core.js?v=e86efb45e21466bc';
+import { CHECK_STATES, checksFor, pendingLabel } from './camera-core.js?v=07debf3663cc8963';
 
 const esc = value => String(value ?? '').replace(/[&<>"']/g, character =>
   ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[character]);
@@ -52,7 +52,22 @@ export function cameraPages({ draft, position, identity, eventOptions, reference
     faults.push(page(`Fault ${index + 1} · evidence`, 'One optional photo. Removing a draft does not resolve a server fault.',
       `<label>Photo<input type="file" accept="image/jpeg,image/png,image/webp" data-fault-photo="${index}" ${stowLocked || fault.photos?.length ? 'disabled' : ''}></label><div class="photo-row"><div data-photo-preview="${index}">${fault.photos?.length ? 'Loading photo…' : 'No photo attached.'}</div><div class="photo-actions">${fault.photos?.length && !closed ? `<button class="secondary" type="button" data-remove-photo="${index}" ${stowLocked ? 'disabled' : ''}>Remove photo</button>` : ''}<button class="danger" type="button" data-remove-fault="${index}" ${stowLocked ? 'disabled' : ''}>Remove fault</button></div></div>`));
   });
-  const stow = [...checkPages('stow')];
+  const packDown = [
+    ['Leave the body and lens together', 'Keep the lens attached to the camera body.'],
+    ['Unplug the lens cable', 'Disconnect the cable marked LENS.'],
+    ['Remove the viewfinder', 'Remove and secure the viewfinder before handling the support.'],
+    ['Remove the zoom and focus handles', 'Detach both handle attachments from the camera.'],
+    ['Retract the handles', 'Return both handles to their retracted storage positions.'],
+    ['Remove the floor support', 'Loosen and remove the spreader or dolly.'],
+    ['Secure the legs', 'Replace the bungee, tie line, or tape used to hold the legs together.'],
+    ['Retract and release the legs', 'Retract the legs fully, then back each leg lock off one turn for storage.']
+  ];
+  const stow = position.ptz ? [] : packDown.map(([title, instruction], index) => page(
+    title, `Camera kit pack-down · ${index + 1} of ${packDown.length}`,
+    `<p>${instruction}</p><p class="note">${index < 5 ? 'Stay in position. Do not move the camera or tripod until step 5 is complete.' : 'Complete the camera body steps before moving the support.'}</p>`));
+  if (!position.ptz) stow.push(page('Before leaving the position', 'Equipment count',
+    '<ul><li>Viewfinder</li><li>Zoom and focus handles</li><li>Spreader or dolly</li></ul>'));
+  stow.push(...checkPages('stow'));
   if (!position.ptz) stow.push(page('Return the headset', 'Confirm only when a headset was issued and returned.',
     `<label class="check-confirm"><input type="checkbox" data-field="headsetReturned" ${draft.headsetReturned ? 'checked' : ''} ${stowLocked ? 'disabled' : ''}><span>Headset returned.</span></label>`));
   stow.push(page('Review & check out', `${draft.faults.length} fault observation(s). The Crew Call stays open until you submit.`,

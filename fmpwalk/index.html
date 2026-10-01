@@ -360,62 +360,6 @@ th{text-align:left;font-weight:600;color:var(--muted);font-size:11px;padding:6px
 td{padding:8px;border-bottom:1px solid var(--line-soft);vertical-align:top}
 td.m{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
 
-/* ---------- camera kit strike ---------- */
-.kit-hero{
-  position:relative;overflow:hidden;background:var(--surface);border:1px solid var(--line);
-  border-radius:12px;padding:18px;margin-bottom:14px;
-}
-.kit-hero::after{
-  content:"";position:absolute;right:-54px;top:-76px;width:180px;height:180px;border-radius:50%;
-  border:30px solid var(--accent-line);opacity:.2;pointer-events:none;
-}
-.kit-kicker{
-  position:relative;z-index:1;font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;
-  color:var(--accent);text-transform:uppercase;margin-bottom:8px;
-}
-.kit-hero h2{position:relative;z-index:1;font-size:clamp(25px,5vw,38px);line-height:1.08;margin-bottom:8px;max-width:620px}
-.kit-hero .lede{position:relative;z-index:1;max-width:680px;margin-bottom:0}
-.kit-rule{
-  display:flex;align-items:flex-start;gap:11px;background:var(--warn-bg);border:1px solid var(--yellow);
-  border-radius:10px;padding:12px 13px;margin-bottom:18px;color:var(--warn-fg);font-size:13.5px;
-}
-.kit-rule-mark{
-  flex:0 0 auto;font-family:var(--mono);font-weight:800;font-size:11px;letter-spacing:.08em;
-  border:1px solid currentColor;border-radius:4px;padding:3px 6px;margin-top:1px;
-}
-.kit-rule b{color:var(--text)}
-.kit-block{margin:0 0 20px}
-.kit-block-hd{display:flex;align-items:end;justify-content:space-between;gap:12px;margin-bottom:9px}
-.kit-block-hd h3{margin:0;color:var(--text);font-size:16px;letter-spacing:0}
-.kit-block-hd span{font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:.1em;text-transform:uppercase}
-.kit-steps{list-style:none;padding:0;margin:0;border:1px solid var(--line);border-radius:11px;overflow:hidden;background:var(--surface)}
-.kit-steps li{display:grid;grid-template-columns:45px minmax(0,1fr);border-bottom:1px solid var(--line-soft);min-width:0}
-.kit-steps li:last-child{border-bottom:0}
-.kit-num{
-  display:flex;align-items:flex-start;justify-content:center;padding-top:16px;background:var(--surface-2);
-  border-right:1px solid var(--line-soft);font-family:var(--mono);font-size:12px;font-weight:700;color:var(--accent);
-}
-.kit-step{padding:13px 14px 14px;min-width:0}
-.kit-step-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
-.kit-step h4{margin:0;font-size:15px;font-weight:680;line-height:1.35}
-.kit-step p{margin:5px 0 0;color:var(--muted);font-size:13px;line-height:1.5}
-.kit-tag{
-  flex:0 0 auto;font-family:var(--mono);font-size:9px;font-weight:700;letter-spacing:.06em;
-  text-transform:uppercase;color:var(--warn-fg);background:var(--warn-bg);border:1px solid var(--yellow);
-  border-radius:4px;padding:3px 6px;white-space:nowrap;
-}
-.kit-check{
-  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-top:10px;
-  font-family:var(--mono);font-size:10.5px;color:var(--muted);
-}
-.kit-check span{background:var(--surface-2);border:1px solid var(--line);border-radius:6px;padding:8px 9px}
-@media(max-width:520px){
-  .kit-hero{padding:16px}
-  .kit-step-top{display:block}
-  .kit-tag{display:inline-block;margin-top:7px}
-  .kit-check{grid-template-columns:1fr}
-}
-
 /* ---------- report ---------- */
 .report-preview{background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:16px;margin:0 0 16px;overflow-wrap:anywhere}
 .report-preview p{margin:8px 0;color:var(--muted)}
@@ -548,7 +492,6 @@ kbd{
   #p-setup.on>*,#p-ref.on>*{break-inside:avoid}
   #p-setup.on>h3{break-after:avoid}
   #p-setup.on>h2,#p-setup.on>p.lede,#p-ref.on>h2{column-span:all}
-  #p-cam.on{max-width:860px}
   #tkList{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start}
   #tkList .tk{margin-bottom:0}
   .btnrow button{flex:0 1 auto;min-width:170px}
@@ -589,12 +532,6 @@ kbd{
 <section class="panel" id="p-setup">
   <h2>Walk setup</h2>
   <p class="lede">Enter the show details and select the areas to check.</p>
-
-  <div class="card">
-    <div class="card-hd"><h4>Camera operators</h4></div>
-    <p class="mini">Camera check-in, setup, faults and checkout.</p>
-    <a class="launch-link" id="cameraLaunch" href="https://housevideo.app/fmp/camera/">Open camera operations</a>
-  </div>
 
   <div class="card">
     <div class="fld"><label for="fDate">Show date</label><input type="date" id="fDate"></div>
@@ -723,71 +660,6 @@ kbd{
   <div class="note" id="saveNote"></div>
 </section>
 
-<!-- ══════════════ CAMERA KIT ══════════════ -->
-<section class="panel" id="p-cam">
-  <div class="kit-hero">
-    <div class="kit-kicker">Strike order · camera position</div>
-    <h2>Camera kit pack-down</h2>
-    <p class="lede">Secure the camera body first, then break down the tripod and support hardware.</p>
-  </div>
-
-  <div class="kit-rule">
-    <span class="kit-rule-mark">HOLD</span>
-    <div><b>Stay in position for every camera-body step.</b> Do not move the camera or tripod until the camera section is complete.</div>
-  </div>
-
-  <section class="kit-block" aria-labelledby="cameraBodyTitle">
-    <div class="kit-block-hd"><h3 id="cameraBodyTitle">Camera body</h3><span>Complete in order</span></div>
-    <ol class="kit-steps">
-      <li>
-        <span class="kit-num" aria-hidden="true">01</span>
-        <div class="kit-step"><div class="kit-step-top"><h4>Leave the body and lens together</h4><span class="kit-tag">Stay in position</span></div><p>Keep the lens attached to the camera body.</p></div>
-      </li>
-      <li>
-        <span class="kit-num" aria-hidden="true">02</span>
-        <div class="kit-step"><div class="kit-step-top"><h4>Unplug the lens cable</h4><span class="kit-tag">Stay in position</span></div><p>Disconnect the cable marked <span class="k">LENS</span>.</p></div>
-      </li>
-      <li>
-        <span class="kit-num" aria-hidden="true">03</span>
-        <div class="kit-step"><div class="kit-step-top"><h4>Remove the viewfinder</h4><span class="kit-tag">Stay in position</span></div><p>Remove and secure the viewfinder before handling the support.</p></div>
-      </li>
-      <li>
-        <span class="kit-num" aria-hidden="true">04</span>
-        <div class="kit-step"><div class="kit-step-top"><h4>Remove the zoom and focus handles</h4><span class="kit-tag">Stay in position</span></div><p>Detach both handle attachments from the camera.</p></div>
-      </li>
-      <li>
-        <span class="kit-num" aria-hidden="true">05</span>
-        <div class="kit-step"><div class="kit-step-top"><h4>Retract the handles</h4><span class="kit-tag">Stay in position</span></div><p>Return both handles to their retracted storage positions.</p></div>
-      </li>
-    </ol>
-  </section>
-
-  <section class="kit-block" aria-labelledby="tripodTitle">
-    <div class="kit-block-hd"><h3 id="tripodTitle">Tripod and support</h3><span>Move only after step 05</span></div>
-    <ol class="kit-steps" start="6">
-      <li>
-        <span class="kit-num" aria-hidden="true">06</span>
-        <div class="kit-step"><div class="kit-step-top"><h4>Remove the floor support</h4></div><p>Loosen and remove the spreader or dolly.</p></div>
-      </li>
-      <li>
-        <span class="kit-num" aria-hidden="true">07</span>
-        <div class="kit-step"><div class="kit-step-top"><h4>Secure the legs</h4></div><p>Replace the bungee, tie line, or tape used to hold the legs together.</p></div>
-      </li>
-      <li>
-        <span class="kit-num" aria-hidden="true">08</span>
-        <div class="kit-step"><div class="kit-step-top"><h4>Retract and release the legs</h4></div><p>Retract the legs fully, then back each leg lock off one turn for storage.</p></div>
-      </li>
-    </ol>
-  </section>
-
-  <div class="card tight">
-    <div class="kit-block-hd"><h3>Before leaving the position</h3><span>Final count</span></div>
-    <div class="kit-check" aria-label="Equipment to account for">
-      <span>VIEWFINDER</span><span>ZOOM + FOCUS HANDLES</span><span>SPREADER / DOLLY</span>
-    </div>
-  </div>
-</section>
-
 <!-- ══════════════ REFERENCE ══════════════ -->
 <section class="panel" id="p-ref">
   <h2>Reference</h2>
@@ -854,7 +726,6 @@ kbd{
   <button type="button" data-tab="walk" class="on"><span class="ic">🚶</span>Walk</button>
   <button type="button" data-tab="tk"><span class="ic">🎫</span>Faults<span class="badge hide" id="tkBadge">0</span></button>
   <button type="button" data-tab="rep"><span class="ic">📤</span>Report</button>
-  <button type="button" data-tab="cam"><span class="ic">📷</span>Camera</button>
   <button type="button" data-tab="ref"><span class="ic">📖</span>Ref</button>
 </nav>
 
@@ -1897,8 +1768,9 @@ $("themeChips").onclick = function(e){
 };
 
 /* ══════════════════════ tabs ══════════════════════ */
-var TABS = ["setup","walk","tk","rep","cam","ref"];
+var TABS = ["setup","walk","tk","rep","ref"];
 function go(tab){
+  if(TABS.indexOf(tab) < 0) tab = S.meta.show ? "walk" : "setup";
   if(window.__grab) window.__grab();
   S.tab = tab; save();
   var panels = document.querySelectorAll(".panel");
@@ -1949,7 +1821,7 @@ document.addEventListener("keydown", function(e){
   if(typing || e.metaKey || e.ctrlKey || e.altKey) return;
 
   var k = (e.key || "").toLowerCase();
-  if(k.length === 1 && k >= "1" && k <= "6"){ go(TABS[parseInt(k,10) - 1]); e.preventDefault(); return; }
+  if(k.length === 1 && k >= "1" && k <= "5"){ go(TABS[parseInt(k,10) - 1]); e.preventDefault(); return; }
   if(k === "d"){ cycleTheme(); e.preventDefault(); return; }
   if(S.tab !== "walk") return;
 

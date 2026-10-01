@@ -1,19 +1,19 @@
 {
   "schema": "fmp.public.release.v2",
   "sourceRepository": "DaveHomeAssist/fmp-suite",
-  "sourceCommit": "7ac2ca737845b2f30a739282077579a04e17c5ed",
+  "sourceCommit": "fb56cb7a59e95c59dcff7a3cddf867fea17ec2bd",
   "mode": "commissioning",
   "files": {
     "build/index.html": "86a7b9a77e82f0a8d7b15283e897d101849a8de15c841938296e2cc39c596951",
-    "camera-core.js": "e86efb45e21466bc9f7247fb6bdd2c3517a510ae2f6dd20849732cea4918c5a8",
-    "camera-view.js": "0933ebb8bbd48498c90b2b2a9cb3b608520d8e829fbe87e1b1345c090407b993",
+    "camera-core.js": "07debf3663cc8963443cc29a55582fe59e60cb91b936bdaf8e5a42ccd739cfdc",
+    "camera-view.js": "794e85363e56d12aaad203d016e968dc0b7896ae5d6f22cea72b29590b89c4c7",
     "camera.css": "16d13c9cc14dfc61965b614eac072e0c10e45266a41557bdfb76acd0203d77ff",
-    "camera.js": "43e6d8dd46d4cbbf4d9f050ef8b91d6b142f95e93bbc59626a8f16dcd513957a",
-    "camera/catwalk/index.html": "a364a7a50ae682478772377a5b99e657d76f854c3b4a99e86ac881063dadd6a8",
-    "camera/front-of-house/index.html": "979e5a2efbc02f0bb53ee84da9dab1478ff3f7203ca0d0c5855775e8db94343d",
-    "camera/index.html": "f6a8087e91549bdd8f962ba5aefbb20fbc84ff576e94e2ad4aa7e3aa6027b5c4",
-    "camera/pit-center/index.html": "2ceff40dd3dfe5f3837b3064904df2b5cc8b6b543fcfceee354bea58fb8d5e56",
-    "camera/pit-stage-left/index.html": "32a6fdcef318ad871d7ffe17b41433cb81de937587b4a338528fa08af4c741c8",
+    "camera.js": "617062fc4e6308b3110da0750b929f184e265f5f35076d93bc91934e8d9a9784",
+    "camera/catwalk/index.html": "f01769486d68fe1e6d1226b05dbe94ed60bb29d8f4aaaaf322319cb3e744667e",
+    "camera/front-of-house/index.html": "1b7340e24c554a300fdb4af8c367ddfa6fc5075710c6e25ab73ce56a74a251cd",
+    "camera/index.html": "96f6f058933b912059c17d0ca15e1bcd058714e03e653971a53b0049674a34c3",
+    "camera/pit-center/index.html": "a0aba711c7d43df7cb23e842c25eee88cd39ce97f640348ed6dc42cf7f9b35d1",
+    "camera/pit-stage-left/index.html": "6f4e37936b7024ec05cc71358e15a859ff514868b3a85d92bae19e6b7faabbaa",
     "chrome.css": "a75daa612884c0543ab48697c9dc5b4f48cba65a7d2f392850c6cd18aa31198d",
     "chrome.js": "2a2dec4eaaef1ce17b46c25fdd3e206f9669b9d4bb28173e325edaaf36e4c989",
     "fmp-social-card.png": "651832f5377dc395b846be4da71d6211f227024ce51520b4e84fdaaebcf8a890",
@@ -84,5 +84,5 @@
     "rig/vendor/three/three.module.js": "a476b88d0df406dca0e30c65b4cdf0180c7337110accec828c103655b56a361c",
     "theme.js": "34276e275d44d4380407b996455291bfcca9cc4a9a4ef81b632534b00fc1747a"
   },
-  "artifactSha256": "4097ee8cf3b4d1cfd331f057bddb10c810a43700215392aadd180f80147ee05b"
+  "artifactSha256": "f8a5d7096ef76651e28493b77f8f597e4d33ceeac3374fc275718d9ab5c46514"
 }

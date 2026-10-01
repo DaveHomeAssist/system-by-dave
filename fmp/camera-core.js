@@ -41,7 +41,7 @@ export const PTZ_BUILD_CHECKS = Object.freeze([
   ['simultaneousPanTilt', 'Pan and tilt together', 'Drive the joystick diagonally. Both axes should move at once and stop together; one axis lagging or sticking is a fault to report now rather than during a show.']
 ]);
 export const HUMAN_STOW_CHECKS = Object.freeze([
-  ['viewfinder', 'Viewfinder stowed', 'Viewfinder folded back to its travel position and not left bearing weight or proud of the body.'],
+  ['viewfinder', 'Viewfinder stowed', 'Viewfinder secured in its travel position, with no weight resting on it.'],
   ['cables', 'Cables coiled and inside case', 'Coiled the way they were, inside the case, with nothing trapped in the lid or trailing where it can be stepped on.'],
   ['lensCap', 'Lens capped', 'Cap on the lens. It protects the front element and it is the visible sign to the next person that the camera was put away properly.'],
   ['bodyCase', 'Body seated in case', 'Body sitting properly in its foam, not resting on a cable or a strap, and the case able to close without being forced.']

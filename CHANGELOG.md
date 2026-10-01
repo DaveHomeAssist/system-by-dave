@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-01 — Camera work separated from FMP Walk
+
+- FMP Walk has five tabs: Setup, Walk, Faults, Report and Reference. The Camera tab and camera launch card are removed. Legacy camera links still forward to Camera Operator.
+- The ordered camera pack-down procedure and final equipment count now open Stow for manned camera positions. Existing saved stow checks and the separate PTZ procedure remain intact.
+- A walk saved while the Camera tab was open resumes on Walk (or Setup before a show is chosen) instead of a missing tab. The saved viewfinder stow check keeps its earlier meaning, secure stowage, so an older pass is not read as proof of the new removal step. Camera module cache keys are refreshed so open devices load the change.
+- Re-exported from fmp-suite `fb56cb7`, the merge of DaveHomeAssist/fmp-suite#33 (prepared 2026-09-27), which also carries the rig touch default from `7ac2ca7`. The first export of this change was cut from `03adb0d` and lacked the three follow-up fixes. The release check now rejects camera UI in Walk while keeping the legacy camera-link redirects.
+
 ## 2026-09-29 — FMP rig touch rotation starts on for touch screens
 
 - The 3D rig explorer (`/fmp/rig/`) now starts with touch rotation on for phones and tablets (Dave, 2026-09-29). A one-finger drag rotates the model and a pinch zooms it without opening Views. Touch screens are detected by touch points or a coarse pointer because iPadOS reports a desktop browser. Mouse-only screens still start with it off. The Views toggle or Escape turns it off, which gives page scrolling back over the model.
