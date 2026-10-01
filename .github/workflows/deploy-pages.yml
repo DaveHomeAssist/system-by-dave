@@ -74,6 +74,11 @@ jobs:
           CHROME_CHANNEL: chrome
         run: npm run test:av-suite-import-browser
 
+      - name: Verify AV Video legacy pages
+        env:
+          CHROME_CHANNEL: chrome
+        run: npm run test:av-video-legacy-browser
+
       - name: Verify AV save safety
         env:
           CHROME_CHANNEL: chrome

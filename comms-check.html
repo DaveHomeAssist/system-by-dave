@@ -877,7 +877,7 @@
         channel:'all',
         status:'all'
       },
-      assignments:sampleAssignments()
+      assignments:[]
     };
   }
 
@@ -953,7 +953,6 @@
     if(Array.isArray(data.assignments)){
       clean.assignments = data.assignments.map(sanitizeAssignment).slice(0, 300);
     }
-    if(!clean.assignments.length) clean.assignments = sampleAssignments();
     return clean;
   }
 
@@ -1303,7 +1302,9 @@
   }
 
   function loadSample(){
+    if(state.assignments.length && !window.confirm('Replace the current comms plan with the sample assignments?')) return;
     state = defaultState();
+    state.assignments = sampleAssignments();
     selectedId = state.assignments[0] ? state.assignments[0].id : '';
     saveState();
     syncMetaToUi();

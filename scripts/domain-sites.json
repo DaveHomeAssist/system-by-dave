@@ -111,7 +111,7 @@
       ],
       "storage": {
         "registryKeys": true,
-        "revision": 2,
+        "revision": 3,
         "keys": [
           "av-suite-dashboard.v1",
           "av-suite-ui.v1",
