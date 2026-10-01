@@ -316,6 +316,12 @@ select:focus {
   text-transform: uppercase;
 }
 
+.workbook-header .theme-cycle {
+  min-height: 44px;
+  border-color: var(--wb-line-hot);
+  white-space: nowrap;
+}
+
 .workbook-header .console-action {
   border-color: color-mix(in srgb, var(--wb-signal) 58%, var(--wb-line));
   color: var(--wb-signal);

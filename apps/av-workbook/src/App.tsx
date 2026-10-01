@@ -107,6 +107,46 @@ function downloadStoredWorkbook(readOnly: WorkbookReadOnly): void {
   downloadText(`${id}-read-only.json`, storedWorkbookText(readOnly.raw));
 }
 
+type ThemeMode = "light" | "dark" | "system";
+const themeModes: ThemeMode[] = ["light", "dark", "system"];
+
+function applyThemeMode(mode: ThemeMode) {
+  document.documentElement.setAttribute("data-av-theme", mode);
+  const lightColor = document.querySelector<HTMLMetaElement>('meta[name="theme-color"][data-av-theme-color="light"]');
+  const darkColor = document.querySelector<HTMLMetaElement>('meta[name="theme-color"][data-av-theme-color="dark"]');
+  lightColor?.setAttribute("media", mode === "system" ? "(prefers-color-scheme: light)" : mode === "light" ? "all" : "not all");
+  darkColor?.setAttribute("media", mode === "system" ? "(prefers-color-scheme: dark)" : mode === "dark" ? "all" : "not all");
+}
+
+function ThemeButton() {
+  const [mode, setMode] = useState<ThemeMode>(() => {
+    const initial = document.documentElement.getAttribute("data-av-theme");
+    return themeModes.includes(initial as ThemeMode) ? initial as ThemeMode : "light";
+  });
+
+  useEffect(() => {
+    const sync = (event: StorageEvent) => {
+      if (event.key !== "av-theme-mode.v1") return;
+      const next = themeModes.includes(event.newValue as ThemeMode) ? event.newValue as ThemeMode : "light";
+      applyThemeMode(next);
+      setMode(next);
+    };
+    window.addEventListener("storage", sync);
+    return () => window.removeEventListener("storage", sync);
+  }, []);
+
+  function cycleTheme() {
+    const next = themeModes[(themeModes.indexOf(mode) + 1) % themeModes.length];
+    applyThemeMode(next);
+    try { window.localStorage.setItem("av-theme-mode.v1", next); } catch { /* The current tab can still switch themes. */ }
+    setMode(next);
+  }
+
+  return <button className="theme-cycle" type="button" onClick={cycleTheme} aria-label={`Switch theme; current ${mode}`}>
+    Theme: {mode[0].toUpperCase() + mode.slice(1)}
+  </button>;
+}
+
 export default function App() {
   const shellRef = useRef<HTMLElement>(null);
   const [workbook, setWorkbook] = useState<AvWorkbook | null>(null);
@@ -400,6 +440,7 @@ export default function App() {
           </div>
           <nav aria-label="Workbook actions">
             <a className="console-action" href="../av-suite.html">Suite Console</a>
+            <ThemeButton />
           </nav>
         </header>
         <section className="review-panel read-only-panel" role="alert" aria-labelledby="read-only-title" data-workbook-read-only={readOnly.reason.code}>
@@ -454,6 +495,7 @@ export default function App() {
         </div>
         <nav aria-label="Workbook actions">
           <a className="console-action" href="../av-suite.html">Suite Console</a>
+          <ThemeButton />
           <button type="button" onClick={() => void replaceWorkbook(createBlankWorkbook(), "a blank workbook", true)}>New Blank</button>
           <button type="button" onClick={() => void replaceWorkbook(createSampleWorkbook(), "the sample workbook", false)}>Load Sample</button>
           <button type="button" onClick={handleExport}>Export JSON</button>

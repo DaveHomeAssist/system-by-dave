@@ -238,7 +238,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool asset change — rolls the service-worker cache. */
-    version:'v20261001-video-nav-ci',
+    version:'v20261001-workbook-theme',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,

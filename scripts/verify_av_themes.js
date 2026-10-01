@@ -29,7 +29,6 @@ function routeFile(href) {
 
 const avRegistry = registry();
 const SYSTEM_THEME_EXCEPTIONS = new Set(['throwline']);
-const LOCKED_THEME_ROUTES = new Map([['av-workbook', 'dark']]);
 const routes = [
   { id: 'av-suite', href: 'av-suite.html', file: 'av-suite.html' },
   ...avRegistry.tools
@@ -67,7 +66,7 @@ themeCss.split('\n').forEach((line, index) => {
 routes.forEach((route) => {
   const html = read(route.file);
   const escapedId = route.id.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const expectedTheme = LOCKED_THEME_ROUTES.get(route.id) || 'system';
+  const expectedTheme = 'system';
   if (!new RegExp(`<html[^>]+data-av-theme="${expectedTheme}"[^>]+data-av-tool="${escapedId}"`, 'i').test(html)) {
     fail(`${route.file} does not opt into the ${expectedTheme} AV theme as ${route.id}.`);
   }
@@ -92,14 +91,14 @@ routes.forEach((route) => {
     }
     const workbookSource = read('apps/av-workbook/index.html');
     if (!workbookSource.includes('src="../js/av-theme-mode.js"')) {
-      fail('AV Workbook does not apply its theme lock before the app bundle loads.');
+      fail('AV Workbook does not apply the shared theme before the app bundle loads.');
     }
-    if (!/data-av-theme="dark" data-av-theme-lock="dark"/.test(workbookSource)) {
-      fail('AV Workbook is not locked to its flagship dark theme.');
+    if (!/data-av-theme="system"/.test(workbookSource) || /data-av-theme-lock=/.test(workbookSource)) {
+      fail('AV Workbook must follow the shared light, dark and system theme choices.');
     }
-    if (!/content="#EEE8DF" media="not all" data-av-theme-color="light"/.test(workbookSource)
-      || !/content="#0C1016" media="all" data-av-theme-color="dark"/.test(workbookSource)) {
-      fail('AV Workbook browser chrome is not locked to Stage Slate.');
+    if (!/content="#EEE8DF" media="\(prefers-color-scheme: light\)" data-av-theme-color="light"/.test(workbookSource)
+      || !/content="#0C1016" media="\(prefers-color-scheme: dark\)" data-av-theme-color="dark"/.test(workbookSource)) {
+      fail('AV Workbook browser chrome is missing the light and dark colors.');
     }
   } else {
     const expectedHref = route.file.includes('/') ? '../css/av-theme.css' : 'css/av-theme.css';

@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-01 — AV Workbook follows the Suite theme
+
+- AV Workbook opens in Warm Paper on a new browser, uses the saved light, dark or system Suite choice, and shows a Theme button in its regular and read-only headers. The choice persists across tabs without changing a workbook record.
+- The source theme lock and its dark-only assertions were removed; the generated Workbook and browser chrome now use the selected theme. Offline cache version `v20261001-workbook-theme` also updates the Throwline Stage 3D pin.
+- The targeted Workbook theme browser probe checks both palettes. The full theme probe remains outside CI because Throwline reports an uncaught promise rejection. Workbook's pre-existing page scroll is still an open layout issue under workspace rule WEB-2.
+
 ## 2026-10-01 — AV Suite 2.0c navigation and browser gates
 
 - Display Plan and Projection Plan now use the Video group in the shared tool dock, matching their registry department and the primary Video destination. A browser regression checks their previous and next links at phone width.
