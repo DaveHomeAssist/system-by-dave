@@ -250,8 +250,9 @@ export async function startBlankWorkbook(
 interface FallbackConsent {
   /** The operator confirmed replacing whatever the slot holds (Start a new blank workbook from the read-only notice). */
   replaceOtherFallback?: boolean;
-  /** The workbook this tab is deliberately replacing, already backed up; its fallback copy may be replaced. */
-  replaceFallbackOf?: string;
+  /** The exact fallback text this tab backed up before deliberately replacing that workbook. The slot is
+   * replaced only while it still holds exactly this text, so a newer copy written meanwhile is kept. */
+  replaceFallbackIfUnchanged?: string;
 }
 
 function writeFallback(next: AvWorkbook, storage: WorkbookKeyValueStore | null, consent: FallbackConsent = {}): void {
@@ -259,7 +260,7 @@ function writeFallback(next: AvWorkbook, storage: WorkbookKeyValueStore | null, 
   const existing = storage.getItem(FALLBACK_KEY);
   if (existing !== null && !consent.replaceOtherFallback) {
     const existingId = storedWorkbookId(existing);
-    if (existingId !== next.workbookId && !(consent.replaceFallbackOf && existingId === consent.replaceFallbackOf)) {
+    if (existingId !== next.workbookId && !(consent.replaceFallbackIfUnchanged !== undefined && existing === consent.replaceFallbackIfUnchanged)) {
       throw new WorkbookUncheckedError("This browser's workbook storage is unavailable, and its one fallback slot holds a different workbook, which may be that workbook's only copy. Nothing was saved. Export or reload, then try again.");
     }
     if (existingId === next.workbookId && assessStoredWorkbook(existing).status === "read-only") {
@@ -317,9 +318,9 @@ export class WorkbookChangedElsewhereError extends Error {
 export async function saveEditedWorkbook(
   workbook: AvWorkbook,
   backend: WorkbookBackend = browserBackend(),
-  options: { newRecord?: boolean; replaceFallbackOf?: string } = {}
+  options: { newRecord?: boolean; replaceFallbackIfUnchanged?: string } = {}
 ): Promise<AvWorkbook> {
-  const consent: FallbackConsent = { replaceFallbackOf: options.replaceFallbackOf };
+  const consent: FallbackConsent = { replaceFallbackIfUnchanged: options.replaceFallbackIfUnchanged };
   if (options.newRecord) return saveWorkbook(workbook, backend, consent);
   let record: unknown;
   let readFailed = false;
@@ -347,15 +348,22 @@ export async function saveEditedWorkbook(
   return saveWorkbook(workbook, backend, consent);
 }
 
-/** True when this workbook's only stored copy is the fallback slot, so replacing it would lose the workbook. */
-export async function onlyFallbackHolds(workbookId: string, backend: WorkbookBackend = browserBackend()): Promise<boolean> {
-  const fallback = backend.storage?.getItem(FALLBACK_KEY) ?? null;
-  if (fallback === null || storedWorkbookId(fallback) !== workbookId) return false;
+export interface FallbackSlot {
+  /** The slot's exact stored text. */
+  text: string;
+  /** True when this copy is not also in IndexedDB (unreadable, missing, or older there), so replacing it loses it. */
+  onlyCopy: boolean;
+}
+
+/** The fallback slot when it holds this workbook: its exact text, and whether it is the only current copy. */
+export async function fallbackSlotFor(workbookId: string, backend: WorkbookBackend = browserBackend()): Promise<FallbackSlot | null> {
+  const text = backend.storage?.getItem(FALLBACK_KEY) ?? null;
+  if (text === null || storedWorkbookId(text) !== workbookId) return null;
   try {
     const record = await backend.table.get(workbookId);
-    return record === undefined || record === null;
+    return { text, onlyCopy: record === undefined || record === null || storedSavedAt(text) > storedSavedAt(record) };
   } catch {
-    return true;
+    return { text, onlyCopy: true };
   }
 }
 

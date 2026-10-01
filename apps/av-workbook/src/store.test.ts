@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { createBlankWorkbook } from "./sampleWorkbook";
 import {
-  ACTIVE_KEY, FALLBACK_KEY, WorkbookChangedElsewhereError, WorkbookUncheckedError, assessStoredWorkbook, importWorkbook, loadActiveWorkbook, onlyFallbackHolds, saveEditedWorkbook, saveWorkbook,
+  ACTIVE_KEY, FALLBACK_KEY, WorkbookChangedElsewhereError, WorkbookUncheckedError, assessStoredWorkbook, importWorkbook, loadActiveWorkbook, fallbackSlotFor, saveEditedWorkbook, saveWorkbook,
   startBlankWorkbook, type WorkbookBackend
 } from "./store";
 import type { AvWorkbook } from "./types";
@@ -282,26 +282,36 @@ describe("saveEditedWorkbook", () => {
     expect(memory.records.get("wb-demo-corporate-keynote")).toBe(newer);
   });
 
-  it("lets a new record replace the fallback copy of the workbook it deliberately replaces", async () => {
+  it("lets a new record replace the current workbook's fallback while it still holds the backed-up text", async () => {
     const current = JSON.stringify(storedWorkbook("wb-current"));
     const memory = memoryBackend({ failReads: true, failWrites: true, storage: { [ACTIVE_KEY]: "wb-current", [FALLBACK_KEY]: current } });
-    const saved = await saveEditedWorkbook(storedWorkbook("wb-import-3"), memory.backend, { newRecord: true, replaceFallbackOf: "wb-current" });
+    const saved = await saveEditedWorkbook(storedWorkbook("wb-import-3"), memory.backend, { newRecord: true, replaceFallbackIfUnchanged: current });
     expect(memory.values.get(FALLBACK_KEY)).toContain(saved.workbookId);
     expect(memory.values.get(ACTIVE_KEY)).toBe(saved.workbookId);
+  });
+
+  it("keeps a fallback another tab rewrote after the backup was taken", async () => {
+    const backedUp = JSON.stringify(storedWorkbook("wb-current"));
+    const rewritten = JSON.stringify({ ...storedWorkbook("wb-current"), savedAt: "2026-10-02T10:00:00.000Z" });
+    const memory = memoryBackend({ failReads: true, failWrites: true, storage: { [ACTIVE_KEY]: "wb-current", [FALLBACK_KEY]: rewritten } });
+    await expect(saveEditedWorkbook(storedWorkbook("wb-import-5"), memory.backend, { newRecord: true, replaceFallbackIfUnchanged: backedUp })).rejects.toBeInstanceOf(WorkbookUncheckedError);
+    expect(memory.values.get(FALLBACK_KEY)).toBe(rewritten);
   });
 
   it("still refuses when the fallback slot holds a third workbook", async () => {
     const third = JSON.stringify(storedWorkbook("wb-third"));
     const memory = memoryBackend({ failReads: true, failWrites: true, storage: { [ACTIVE_KEY]: "wb-current", [FALLBACK_KEY]: third } });
-    await expect(saveEditedWorkbook(storedWorkbook("wb-import-4"), memory.backend, { newRecord: true, replaceFallbackOf: "wb-current" })).rejects.toBeInstanceOf(WorkbookUncheckedError);
+    await expect(saveEditedWorkbook(storedWorkbook("wb-import-4"), memory.backend, { newRecord: true })).rejects.toBeInstanceOf(WorkbookUncheckedError);
     expect(memory.values.get(FALLBACK_KEY)).toBe(third);
   });
 
-  it("reports when the fallback slot is a workbook's only copy", async () => {
+  it("describes the fallback slot for a workbook, including whether it is the only current copy", async () => {
     const current = JSON.stringify(storedWorkbook("wb-current"));
-    expect(await onlyFallbackHolds("wb-current", memoryBackend({ failReads: true, storage: { [FALLBACK_KEY]: current } }).backend)).toBe(true);
-    expect(await onlyFallbackHolds("wb-current", memoryBackend({ records: { "wb-current": storedWorkbook("wb-current") }, storage: { [FALLBACK_KEY]: current } }).backend)).toBe(false);
-    expect(await onlyFallbackHolds("wb-current", memoryBackend().backend)).toBe(false);
+    const newer = JSON.stringify({ ...storedWorkbook("wb-current"), savedAt: "2026-10-02T10:00:00.000Z" });
+    expect(await fallbackSlotFor("wb-current", memoryBackend({ failReads: true, storage: { [FALLBACK_KEY]: current } }).backend)).toEqual({ text: current, onlyCopy: true });
+    expect(await fallbackSlotFor("wb-current", memoryBackend({ records: { "wb-current": storedWorkbook("wb-current") }, storage: { [FALLBACK_KEY]: current } }).backend)).toEqual({ text: current, onlyCopy: false });
+    expect(await fallbackSlotFor("wb-current", memoryBackend({ records: { "wb-current": storedWorkbook("wb-current") }, storage: { [FALLBACK_KEY]: newer } }).backend)).toEqual({ text: newer, onlyCopy: true });
+    expect(await fallbackSlotFor("wb-current", memoryBackend().backend)).toBeNull();
   });
 
   it("replaces another workbook's fallback copy only for a confirmed new blank workbook", async () => {
