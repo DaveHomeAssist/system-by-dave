@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-10-01 — Cheesesteak Heatmap photos
+
+- Sync `/cheesesteaks/` from philly-cheesesteak-heatmap `9353e76`: shop cards show a thumbnail and the detail panel shows photos for Jim's, Dalessandro's, Pat's, Geno's, John's Roast Pork, Sonny's and Steve's; the map page opens with a strip of three cheesesteak photos. All twelve are Wikimedia Commons photos stored in the export, credited in each caption and on the About page.
+
 ## 2026-10-01 — AV Suite Toolbox and focused application plan
 
 - Revise the consolidation plan around default Toolbox entry, separate focused applications with a shared experience, and reversible optional modules that preserve saved data.
