@@ -68,13 +68,18 @@
 
   function locate(route){
     route = normalizeRoute(route);
+    var tool = toolForRoute(route);
+    var fallback = null;
     for(var d = 0; d < DEPARTMENTS.length; d++){
       var tools = DEPARTMENTS[d].tools;
       for(var i = 0; i < tools.length; i++){
-        if(normalizeRoute(tools[i].href) === route) return {dept:DEPARTMENTS[d], index:i};
+        if(normalizeRoute(tools[i].href) !== route) continue;
+        var match = {dept:DEPARTMENTS[d], index:i};
+        if(tool && DEPARTMENTS[d].label === tool.dept) return match;
+        if(!fallback) fallback = match;
       }
     }
-    return null;
+    return fallback;
   }
 
   function el(tag, cls, text){

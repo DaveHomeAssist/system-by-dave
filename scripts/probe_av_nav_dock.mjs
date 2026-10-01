@@ -191,6 +191,21 @@ try {
     }
   }
 
+  for (const [route, previous, next] of [
+    ['display-plan.html', 'Video Patch', 'Projection Plan'],
+    ['projection-plan.html', 'Display Plan', 'Throwline'],
+  ]) {
+    const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
+    await page.goto(base.replace('cable-plan.html', route), { waitUntil: 'networkidle' });
+    const group = await page.locator('.sbd-nav-dept').textContent();
+    const steps = await page.locator('.sbd-nav-step').allTextContents();
+    if (group !== 'Video' || steps[0] !== `Previous: ${previous}` || steps[1] !== `Next: ${next}`) {
+      throw new Error(`${route} navigation: ${JSON.stringify({ group, steps })}`);
+    }
+    console.log(`ok - ${route} stays in Video navigation`);
+    await page.close();
+  }
+
   const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
   await page.goto(base, { waitUntil: 'networkidle' });
   const noShow = await page.evaluate(() => ({ nav: !!document.querySelector('.sbd-nav'),
