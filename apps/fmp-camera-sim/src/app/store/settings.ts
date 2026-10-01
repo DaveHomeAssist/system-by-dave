@@ -168,7 +168,7 @@ export class SettingsController {
     this.core.project = { ...this.core.project, session };
     this.core.exercise = null;
     this.core.exerciseId = null;
-    this.core.onAir = false;
+    this.core.leaveAir();
     this.core.sim.place(session.pose);
     this.core.sim.setSpeeds(session.speeds);
     this.core.performerEpoch = this.core.sim.time;

@@ -99,6 +99,16 @@ export class StoreCore {
     };
   }
 
+  /**
+   * Off air without a take report: the session the take belonged to is going away. On-air state
+   * is not part of a saved file, so a replacement session must never inherit a lit tally or the
+   * moves counted so far.
+   */
+  leaveAir(): void {
+    this.onAir = false;
+    this.onAirTracker.clear();
+  }
+
   announce(text: string, tone: Announcement["tone"] = "info"): void {
     this.announcementCount += 1;
     this.announcement = { id: this.announcementCount, text, tone };

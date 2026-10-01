@@ -33,6 +33,11 @@ export class OnAirTracker {
 
   /** Start a fresh take. A camera already moving at the take counts as a move on air. */
   take(): void {
+    this.clear();
+  }
+
+  /** Forget the current take, for example when the session it belonged to is replaced. */
+  clear(): void {
     this.stats = emptyOnAirStats();
     this.inMove = false;
     this.moveHasZoom = false;

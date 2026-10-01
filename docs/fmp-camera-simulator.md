@@ -179,7 +179,8 @@ the monitor gets a red border and an ON AIR chip. While live, `sim/onAir.ts` cou
 moves that include a zoom, time moving and the fastest pan/tilt speed, from the simulation's own
 30 Hz samples, so the figures do not depend on frame rate. The first move on air warns in the
 status line; leaving air reports the take (a clean take when nothing moved). On-air state is not
-saved and a session reset clears it. These are training figures, not a broadcast standard.
+saved; a session reset, a project import or loading another tab's copy clears it and forgets
+the take. These are training figures, not a broadcast standard.
 
 **Monitor delay.** Camera → Signal path → Monitor delay (0–500 ms, **Uncalibrated**, default 0)
 makes the monitor show the pose from that long ago (`sim/delayLine.ts`, one pose per 240 Hz tick).

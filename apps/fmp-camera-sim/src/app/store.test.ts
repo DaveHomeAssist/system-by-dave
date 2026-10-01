@@ -345,4 +345,37 @@ describe("monitor delay and on air (1.13.0)", () => {
     store.resetSession(now());
     expect(store.getState().onAir.live).toBe(false);
   });
+
+  it("leaves program and forgets the take when a project replaces the session", () => {
+    const { store, storage, run, now } = makeStore();
+    const goLiveAndMove = () => {
+      store.setOnAir(true, now());
+      store.setDrive({ pan: 1, tilt: 0, zoom: 0 }, now());
+      run(0.5);
+      store.setDrive({ pan: 0, tilt: 0, zoom: 0 }, now());
+      run(0.2);
+      expect(store.getState().onAir).toMatchObject({ live: true, stats: { moves: 1 } });
+    };
+
+    // An import replaces the session: tally off, nothing carried into the next take.
+    goLiveAndMove();
+    expect(store.importText(serializeProject(defaultProject()), now()).ok).toBe(true);
+    expect(store.getState().onAir).toMatchObject({ live: false, stats: { moves: 0, liveS: 0 } });
+    expect(store.getTelemetry().onAir).toBe(false);
+    expect(store.getState().announcement?.text).toContain("Imported");
+
+    // So does loading the copy another tab saved.
+    goLiveAndMove();
+    const other = defaultProject();
+    other.session.presets = [{ slot: 2, name: "Other tab", cameraId: other.camera.id, pan: 3, tilt: -4, lens: 0.3, savedAt: "2026-09-30T08:00:00.000Z" }];
+    storage.setItem(STORAGE_KEY, serializeProject(other));
+    store.noteExternalSave();
+    expect(store.useSavedCopy(now()).ok).toBe(true);
+    expect(store.getState().onAir).toMatchObject({ live: false, stats: { moves: 0, liveS: 0 } });
+
+    // The next take starts clean.
+    store.setOnAir(true, now());
+    run(0.2);
+    expect(store.getState().onAir.stats.moves).toBe(0);
+  });
 });
