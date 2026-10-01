@@ -168,6 +168,38 @@ function storedWorkbookId(text: string): string | null {
   }
 }
 
+/** JSON with object keys sorted, so two stored copies compare by content rather than key order. */
+function canonicalJson(value: unknown): string {
+  if (Array.isArray(value)) return `[${value.map(canonicalJson).join(",")}]`;
+  if (value && typeof value === "object") {
+    const record = value as Record<string, unknown>;
+    return `{${Object.keys(record).sort().filter((key) => record[key] !== undefined).map((key) => `${JSON.stringify(key)}:${canonicalJson(record[key])}`).join(",")}}`;
+  }
+  return JSON.stringify(value) ?? "null";
+}
+
+/** Whether fallback text holds exactly the same workbook as an IndexedDB record. */
+function sameStoredContent(text: string, record: unknown): boolean {
+  try {
+    return canonicalJson(JSON.parse(text)) === canonicalJson(record);
+  } catch {
+    return false;
+  }
+}
+
+function storedSavedAt(stored: unknown): string {
+  let value: unknown = stored;
+  if (typeof stored === "string") {
+    try {
+      value = JSON.parse(stored);
+    } catch {
+      return "";
+    }
+  }
+  const savedAt = value && typeof value === "object" ? (value as Record<string, unknown>).savedAt : null;
+  return typeof savedAt === "string" ? savedAt : "";
+}
+
 function located(assessment: WorkbookAssessment, activeId: string, source: WorkbookSource): WorkbookLoadResult {
   return assessment.status === "ok"
     ? { status: "ok", workbook: assessment.workbook, source }
@@ -184,10 +216,11 @@ export async function readActiveWorkbook(backend: WorkbookBackend = browserBacke
     record = await backend.table.get(activeId);
   } catch {
     const fallback = storage?.getItem(FALLBACK_KEY) ?? null;
-    if (fallback === null) {
+    // A fallback that holds a different workbook is not this one; never open it in its place.
+    if (fallback === null || storedWorkbookId(fallback) !== activeId) {
       return {
         status: "read-only", activeId, source: "indexeddb", raw: undefined,
-        reason: { code: "unreadable-storage", summary: "Its storage could not be opened and there is no fallback copy. Reloading the page may help." }
+        reason: { code: "unreadable-storage", summary: "Its storage could not be opened and there is no fallback copy of it. Reloading the page may help." }
       };
     }
     return located(assessStoredWorkbook(fallback), activeId, "fallback");
@@ -197,7 +230,16 @@ export async function readActiveWorkbook(backend: WorkbookBackend = browserBacke
     if (fallback !== null && storedWorkbookId(fallback) === activeId) return located(assessStoredWorkbook(fallback), activeId, "fallback");
     return { status: "missing" };
   }
-  return located(assessStoredWorkbook(record), activeId, "indexeddb");
+  // The IndexedDB record is checked first: one this version cannot represent stays read-only even
+  // if a compatible fallback copy is newer, so an edit cannot later overwrite it.
+  const assessed = located(assessStoredWorkbook(record), activeId, "indexeddb");
+  if (assessed.status === "read-only") return assessed;
+  // A fallback copy of the same workbook saved later (while IndexedDB could not be read) holds newer edits.
+  const fallback = storage?.getItem(FALLBACK_KEY) ?? null;
+  if (fallback !== null && storedWorkbookId(fallback) === activeId && storedSavedAt(fallback) > storedSavedAt(record)) {
+    return located(assessStoredWorkbook(fallback), activeId, "fallback");
+  }
+  return assessed;
 }
 
 /**
@@ -213,21 +255,63 @@ export async function loadActiveWorkbook(backend: WorkbookBackend = browserBacke
 }
 
 /** The explicit "Start a new blank workbook" action. The previous record stays where it is. */
-export async function startBlankWorkbook(backend: WorkbookBackend = browserBackend()): Promise<AvWorkbook> {
-  return saveWorkbook(createBlankWorkbook(), backend);
+export async function startBlankWorkbook(
+  backend: WorkbookBackend = browserBackend(),
+  options: { replaceFallbackIfUnchanged?: string } = {}
+): Promise<AvWorkbook> {
+  return saveWorkbook(createBlankWorkbook(), backend, options);
 }
 
-export async function saveWorkbook(workbook: AvWorkbook, backend: WorkbookBackend = browserBackend()): Promise<AvWorkbook> {
+/**
+ * The fallback is one slot. It is written only when it is empty or already holds this workbook,
+ * because a different workbook there may have no other copy. A deliberate replacement may take it
+ * only while it still holds exactly the text the operator saw and backed up.
+ */
+interface FallbackConsent {
+  /** The exact fallback text this tab backed up before deliberately replacing that workbook. The slot is
+   * replaced only while it still holds exactly this text, so a newer copy written meanwhile is kept. */
+  replaceFallbackIfUnchanged?: string;
+}
+
+function writeFallback(next: AvWorkbook, storage: WorkbookKeyValueStore | null, consent: FallbackConsent = {}): void {
+  if (!storage) throw new WorkbookUncheckedError();
+  const existing = storage.getItem(FALLBACK_KEY);
+  if (existing !== null && !(consent.replaceFallbackIfUnchanged !== undefined && existing === consent.replaceFallbackIfUnchanged)) {
+    const existingId = storedWorkbookId(existing);
+    if (existingId !== next.workbookId) {
+      throw new WorkbookUncheckedError("This browser's workbook storage is unavailable, and its one fallback slot holds a different workbook, which may be that workbook's only copy. Nothing was saved. Export or reload, then try again.");
+    }
+    if (existingId === next.workbookId && assessStoredWorkbook(existing).status === "read-only") {
+      throw new WorkbookUncheckedError("This browser's workbook storage is unavailable, and its fallback copy of this workbook was saved by a version this one cannot read. Nothing was saved. Reload to fetch the latest version.");
+    }
+  }
+  storage.setItem(FALLBACK_KEY, JSON.stringify(next));
+  storage.setItem(ACTIVE_KEY, next.workbookId);
+}
+
+export async function saveWorkbook(
+  workbook: AvWorkbook,
+  backend: WorkbookBackend = browserBackend(),
+  options: FallbackConsent = {}
+): Promise<AvWorkbook> {
   const next = validateWorkbook({ ...workbook, savedAt: new Date().toISOString() });
   const storage = backend.storage;
   try {
     await backend.table.put(next);
-    storage?.setItem(ACTIVE_KEY, next.workbookId);
   } catch {
-    storage?.setItem(FALLBACK_KEY, JSON.stringify(next));
-    storage?.setItem(ACTIVE_KEY, next.workbookId);
+    writeFallback(next, storage, options);
+    return next;
   }
+  storage?.setItem(ACTIVE_KEY, next.workbookId);
   return next;
+}
+
+/** A save refused because the stored copy could not be read, so it could not be checked before writing over it. */
+export class WorkbookUncheckedError extends Error {
+  constructor(message = "This browser could not read the saved workbook to check it and has no fallback storage, so the change was not saved. Reload and try again.") {
+    super(message);
+    this.name = "WorkbookUncheckedError";
+  }
 }
 
 /** A save refused because another tab or window running a newer or incompatible version rewrote the stored workbook. */
@@ -242,32 +326,69 @@ export class WorkbookChangedElsewhereError extends Error {
 }
 
 /**
- * Saves an edit to the open workbook, unless its stored copy is no longer one this version can
+ * Saves an edit to the open workbook, unless a stored copy of it is no longer one this version can
  * fully represent. A tab left open on an older release then stops instead of stripping fields
- * that a newer release wrote after this tab loaded.
+ * that a newer release wrote after this tab loaded. It never writes to IndexedDB without first
+ * reading the record it would replace: when that read fails, the edit goes to the fallback copy
+ * only. A new record (an id this tab did not load, such as an imported copy) has nothing stored
+ * to protect and is saved normally.
  */
-export async function saveEditedWorkbook(workbook: AvWorkbook, backend: WorkbookBackend = browserBackend()): Promise<AvWorkbook> {
-  let stored: unknown;
-  let source: WorkbookSource = "indexeddb";
+export async function saveEditedWorkbook(
+  workbook: AvWorkbook,
+  backend: WorkbookBackend = browserBackend(),
+  options: { newRecord?: boolean; replaceFallbackIfUnchanged?: string } = {}
+): Promise<AvWorkbook> {
+  const consent: FallbackConsent = { replaceFallbackIfUnchanged: options.replaceFallbackIfUnchanged };
+  if (options.newRecord) return saveWorkbook(workbook, backend, consent);
+  let record: unknown;
+  let readFailed = false;
   try {
-    stored = await backend.table.get(workbook.workbookId);
+    record = await backend.table.get(workbook.workbookId);
   } catch {
-    stored = undefined;
+    readFailed = true;
   }
-  if (stored === undefined || stored === null) {
-    const fallback = backend.storage?.getItem(FALLBACK_KEY) ?? null;
-    if (fallback !== null && storedWorkbookId(fallback) === workbook.workbookId) {
-      stored = fallback;
-      source = "fallback";
-    }
-  }
-  if (stored !== undefined && stored !== null) {
-    const assessment = assessStoredWorkbook(stored);
+  const fallback = backend.storage?.getItem(FALLBACK_KEY) ?? null;
+  const copies: [unknown, WorkbookSource][] = [[record, "indexeddb"]];
+  if (fallback !== null && storedWorkbookId(fallback) === workbook.workbookId) copies.push([fallback, "fallback"]);
+  for (const [copy, source] of copies) {
+    if (copy === undefined || copy === null) continue;
+    const assessment = assessStoredWorkbook(copy);
     if (assessment.status === "read-only") {
       throw new WorkbookChangedElsewhereError({ status: "read-only", activeId: workbook.workbookId, source, reason: assessment.reason, raw: assessment.raw });
     }
   }
-  return saveWorkbook(workbook, backend);
+  if (readFailed) {
+    // Fail closed for IndexedDB: the record could not be read, so it is never overwritten.
+    const next = validateWorkbook({ ...workbook, savedAt: new Date().toISOString() });
+    writeFallback(next, backend.storage, consent);
+    return next;
+  }
+  return saveWorkbook(workbook, backend, consent);
+}
+
+export interface FallbackSlot {
+  /** The slot's exact stored text. */
+  text: string;
+  /** True unless IndexedDB holds exactly this content, so replacing the slot could lose edits found nowhere else.
+   * Content is compared rather than savedAt, because wall-clock timestamps can tie or run backwards. */
+  onlyCopy: boolean;
+}
+
+/** The fallback slot when it holds this workbook: its exact text, and whether it is the only current copy. */
+export async function fallbackSlotFor(workbookId: string, backend: WorkbookBackend = browserBackend()): Promise<FallbackSlot | null> {
+  const text = backend.storage?.getItem(FALLBACK_KEY) ?? null;
+  if (text === null || storedWorkbookId(text) !== workbookId) return null;
+  try {
+    const record = await backend.table.get(workbookId);
+    return { text, onlyCopy: record === undefined || record === null || !sameStoredContent(text, record) };
+  } catch {
+    return { text, onlyCopy: true };
+  }
+}
+
+/** Whether the fallback slot still holds exactly this text, e.g. a copy a save was allowed to replace. */
+export function fallbackHolds(text: string, backend: WorkbookBackend = browserBackend()): boolean {
+  return backend.storage?.getItem(FALLBACK_KEY) === text;
 }
 
 export function exportWorkbook(workbook: AvWorkbook): string {

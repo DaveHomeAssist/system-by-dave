@@ -2,7 +2,7 @@
   "schema": "system-by-dave.gear-reference-index.v1",
   "displayName": "Gear Reference",
   "status": "Beta",
-  "updated": "2026-09-22",
+  "updated": "2026-10-01",
   "entries": [
     {
       "id": "epson-powerlite-x39",
@@ -108,6 +108,93 @@
       "tags": [
         "SMPTE",
         "rack",
+        "FMP"
+      ]
+    },
+    {
+      "id": "blackmagic-atem-television-studio-hd8-iso",
+      "displayName": "Blackmagic ATEM Television Studio HD8 ISO",
+      "aka": [
+        "ATEM Television Studio HD8 ISO",
+        "ATEM HD8 ISO",
+        "TVS HD8 ISO"
+      ],
+      "brand": "Blackmagic Design",
+      "category": "Video",
+      "subcategory": "Switchers",
+      "status": "catalog-derived",
+      "sheetStatus": "authored",
+      "updated": "2026-10-01",
+      "file": "data/gear/blackmagic-atem-television-studio-hd8-iso.json",
+      "tags": [
+        "ATEM",
+        "switcher",
+        "ISO",
+        "FMP"
+      ]
+    },
+    {
+      "id": "blackmagic-atem-camera-control-panel",
+      "displayName": "Blackmagic ATEM Camera Control Panel",
+      "aka": [
+        "ATEM Camera Control Panel",
+        "SWPANELCCU4",
+        "CCU panel"
+      ],
+      "brand": "Blackmagic Design",
+      "category": "Video",
+      "subcategory": "Camera control",
+      "status": "catalog-derived",
+      "sheetStatus": "authored",
+      "updated": "2026-10-01",
+      "file": "data/gear/blackmagic-atem-camera-control-panel.json",
+      "tags": [
+        "ATEM",
+        "CCU",
+        "shading",
+        "FMP"
+      ]
+    },
+    {
+      "id": "birddog-p240",
+      "displayName": "BirdDog P240",
+      "aka": [
+        "P240",
+        "BirdDog P240 PTZ"
+      ],
+      "brand": "BirdDog",
+      "category": "Video",
+      "subcategory": "PTZ cameras",
+      "status": "catalog-derived",
+      "sheetStatus": "authored",
+      "updated": "2026-10-01",
+      "file": "data/gear/birddog-p240.json",
+      "tags": [
+        "PTZ",
+        "NDI",
+        "SDI",
+        "FMP"
+      ]
+    },
+    {
+      "id": "ptzoptics-superjoy-g1",
+      "displayName": "PTZOptics SuperJoy G1",
+      "aka": [
+        "SuperJoy G1",
+        "PT-SUPERJOY-G1",
+        "SuperJoy"
+      ],
+      "brand": "PTZOptics",
+      "category": "Video",
+      "subcategory": "PTZ controllers",
+      "status": "catalog-derived",
+      "sheetStatus": "authored",
+      "updated": "2026-10-01",
+      "file": "data/gear/ptzoptics-superjoy-g1.json",
+      "tags": [
+        "PTZ",
+        "joystick",
+        "VISCA",
         "FMP"
       ]
     }

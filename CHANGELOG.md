@@ -1,5 +1,25 @@
 # Changelog
 
+## 2026-10-01 — Gear Reference reads the FMP equipment catalogs
+
+- Gear Reference has sheets for the Blackmagic ATEM Television Studio HD8 ISO, the Blackmagic ATEM Camera Control Panel (SWPANELCCU4), the BirdDog P240 and the PTZOptics SuperJoy G1 (PT-SUPERJOY-G1). They are generated from the exported FMP model catalogs by `npm run build:gear-from-fmp`, so the interactive models and the sheets read one part list (Dave's decision, 2026-10-01). Each part keeps its catalog evidence level and sources and links into the interactive model at `#part=<id>`.
+- Equipment facts and FMP facts are separated by the evidence each catalog item cites. Signal routes between FMP devices, installed facts that rest only on FMP records, and venue fields stay with the FMP explorer; parts that also cite an FMP record are flagged. Parts the catalog has not established, and gaps such as the lack of structured connector fields, are listed under Open facts.
+- `scripts/fmp_model_contract.js` exports the catalog loader the release gate already used, and the generator uses it. `verify:gear-reference` and `verify:fmp` fail when a sheet no longer matches its catalog; `scripts/gear_equipment_adapter.test.js` checks that every catalog component is accounted for once and that venue values never reach a sheet.
+- The accuracy panel showed "(undefined)" for every source on the FMP camera-chain sheets, which carry a URL rather than a reference, and printed the Epson sheet's compile note on all sheets. It now shows each source's reference or URL, and the note lives in the Epson sheet. The offline manifest lists the four new sheets (registry `v20261001-gear-shared-equipment`), and Throwline Stage 3D pins the same offline cache version.
+
+## 2026-10-01 — AV Suite 2.0b follow-up: Video notes kept as typed
+
+- Video Patch, Projection Plan and Stream Plan keep notes exactly as typed. Before, a reload or an import turned line breaks and repeated spaces into single spaces and cut notes at 260 characters, and editing a note in its row flattened it the same way; the next save kept the damage. Notes on the other five Video pages were already kept as typed. Notes already flattened by an earlier reload cannot be recovered.
+- `scripts/probe_av_video_legacy.mjs` now gives every page's fixture a multi-line note over 260 characters and types one into a row, then checks it through save, reload, export and import (120 checks). Against the previous Video Patch it fails 4 of 15.
+- Offline cache version `v20261001-video-notes`, so installed copies pick up the three pages; Throwline Stage 3D's offline check follows it.
+
+## 2026-10-01 — AV Workbook fails closed when browser storage fails
+
+- AV Workbook never overwrites a stored record it could not read first. Before, the 2.0a save check treated a failed IndexedDB read as "nothing stored" and saved anyway. Now, if that read fails, the edit is kept in the browser's fallback copy, and the next load opens whichever copy is newer; an incompatible stored record stays read-only even when a newer fallback exists. If IndexedDB cannot be read on load, the Workbook opens the fallback only when it holds the active workbook; otherwise it opens read-only. Imported copies and other new workbooks save normally.
+- While browser storage is unavailable the Workbook keeps a single fallback copy, and it will not overwrite a different workbook held there, which may be that workbook's only copy. Replacing the current workbook (an import, **New Blank** or **Load Sample**) downloads the fallback copy first when it is the only current one, and replaces it only while it still holds exactly the text that was backed up, so a newer copy written by another tab is kept. A confirmed **Start a new blank workbook** from the read-only notice works the same way, and its message says whether the old workbook is still in the browser or only in that backup. When the browser could not read the old workbook at all, the notice says it cannot confirm that workbook is still there instead of promising it.
+- Offline cache version `v20261001-workbook-guard`, so installed copies pick up the Workbook changes; Throwline Stage 3D's offline check follows it.
+- Workbook unit tests (59) cover read failures on load and save, fallback identity, compare-and-replace consent, and newer or incompatible copies in either store. Follow-up to increment 2.0a of the [Stage 2 Video plan](docs/av-suite-consolidation-stage2-video.md).
+
 ## 2026-10-01 — AV Suite 2.0b: Video page data safety
 
 - Signal Flow, Record Log and Camera Shot List open empty on a new device instead of filling in sample rows, so a show name from the console is no longer saved over samples. Breakout Room Matrix, Network Plan, Power Plan, RF Coordination and Comms Check get the same fix. Samples load only from Load Sample, which now also asks before replacing rows on Camera Shot List and Comms Check. Camera Shot List keeps an empty list empty, and its Load Sample keeps the show details.
