@@ -102,6 +102,7 @@ jobs:
           done
           curl --silent --fail http://127.0.0.1:8000/av-suite.html >/dev/null
           node scripts/probe_av_domain_views.js
+          node scripts/probe_av_themes.js
           node scripts/probe_av_suite_responsive.js
           node scripts/probe_led_wall_configurator.js
 
