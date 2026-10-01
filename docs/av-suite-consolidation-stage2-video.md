@@ -325,23 +325,26 @@ CHANGE
 5. Revision: v2 workbooks carry a revision number that every save increments. Loading prefers the
    copy with the higher revision (IndexedDB or the fallback), and savedAt is display-only. v1 orders
    the two copies by wall-clock savedAt, which ties or runs backwards under clock changes (#188).
-6. Serialized saves: today a check and its write are separate steps on both paths. IndexedDB
-   get() and put() are separate transactions, so a newer tab's put that lands between them is
-   overwritten. The fallback path reads FALLBACK_KEY and writes it later through localStorage, so
-   two tabs can both read revision N and both write N+1. (Both are harmless while only v1 exists.)
-   Fix both:
-   - IndexedDB: read, check and write in one Dexie read-write transaction.
-   - Fallback: localStorage has no transactions, so a fallback save runs only while holding one
-     cross-tab workbook lock (navigator.locks.request). Inside the lock it compares the slot with
-     the value this tab last read or wrote there (its exact text, or "absent"), not with the
-     revision the tab loaded: the slot is normally stale or empty because it is written only when
-     IndexedDB fails. If the slot changed, raise WorkbookChangedElsewhereError; otherwise write and
-     record the new value as observed.
-   - No Web Locks: a fallback save fails closed with WorkbookUncheckedError and the edit stays on
-     screen for Export. The IndexedDB path still saves through its transaction.
-   Deterministic unit tests, with a fake lock, interleave two tabs on each path and expect the
-   second save to be refused with the first tab's write intact. They also cover a stale or absent
-   slot (the save succeeds) and a backend without Web Locks (the fallback save is refused).
+6. Serialized saves. Rule: no save, on either path, commits unless the copy it replaces is the
+   copy this tab last observed in that store. Today the check and the write are separate steps on
+   both paths: IndexedDB get() and put() are separate transactions, and the fallback is read and
+   later written through localStorage, so two tabs can both start from revision N and both
+   commit N+1. (Harmless while only v1 exists.)
+   - One lock: every save, IndexedDB or fallback, runs inside the same cross-tab workbook lock
+     (navigator.locks.request), so a tab saving to IndexedDB and a tab falling back cannot overlap.
+     The IndexedDB read, check and write also stay in one Dexie read-write transaction inside it.
+   - Fallback comparison: inside the lock, a fallback save compares the slot with the value this
+     tab last read or wrote there (its exact text, or "absent"), not with the revision it loaded,
+     because the slot is normally stale or empty. If it changed, raise
+     WorkbookChangedElsewhereError; otherwise write and record the new value as observed.
+   - No Web Locks: fallback saves fail closed with WorkbookUncheckedError and the edit stays on
+     screen for Export. IndexedDB saves still use their transaction.
+   Deterministic unit tests, with a fake lock, interleave two tabs for IndexedDB/IndexedDB,
+   fallback/fallback and IndexedDB/fallback, and expect the second save to be refused with the
+   first tab's write intact. They also cover a stale or absent slot (the save succeeds) and a
+   backend without Web Locks (the fallback save is refused).
+   Open design questions found in review are listed under "2.1 open questions" below and settled
+   in the 2.1 pull request, not in this brief.
 7. Guard: the 2.0a and #188 load and save guards treat v2 as the current schema and anything newer
    as read-only. A browser test loads a v2 workbook into the previous build (av-workbook/ from
    origin/main before this change) and proves it opens read-only and writes nothing.
@@ -363,6 +366,11 @@ DELIVERY: CHANGELOG entry. Update this plan's 2.1 row and the draft model sectio
 Read the Codex review before merging; merge when green; confirm the Pages run; read back the
 Workbook on avbydave.com.
 ```
+
+### 2.1 open questions
+
+None recorded yet. A design question raised in review of this brief is added here with its source
+and settled by the 2.1 pull request.
 
 ## Risks carried into the phase
 
