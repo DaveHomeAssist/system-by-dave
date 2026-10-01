@@ -377,7 +377,7 @@ try {
       const original = await context.newPage();
       await original.goto(source + '/index.html');
       assert.deepEqual(await readWorkbook(original), { active: workbookFixture.workbookId, workbook: workbookFixture });
-      assert.equal(await original.evaluate(() => JSON.parse(localStorage.getItem('sbd.domainMove.avbydave.v1')).revision), 2);
+      assert.equal(await original.evaluate(() => JSON.parse(localStorage.getItem('sbd.domainMove.avbydave.v1')).revision), 3);
     });
   }
 
@@ -411,6 +411,9 @@ try {
     const site = sites.find(entry => entry.id === 'avbydave');
     const expected = Object.fromEntries(avStorageKeys.map((key, index) => [key, JSON.stringify({ fixture: 'stage0', index })]));
     expected['sbd.handoff.stage0-fixture'] = JSON.stringify({ fixture: 'prefix', status: 'draft' });
+    // Kept copies of unreadable saves travel and restore with their keys.
+    expected['signal-flow.v1.unreadable'] = '{"routes":[{"route":"SF 001"';
+    expected['av-suite-dashboard.v1.unreadable'] = '{"showName":"Unreadable show"';
     await page.goto(source + '/index.html');
     await page.evaluate(values => Object.entries(values).forEach(([key, value]) => localStorage.setItem(key, value)), expected);
     await page.goto(source + site.route + '?cutover=registry-keys');
