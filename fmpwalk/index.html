@@ -519,6 +519,7 @@ img,[role="img"]{filter:none!important}
 dialog{max-width:min(90vw,720px);max-height:85dvh;overflow:auto;background:var(--surface);color:var(--text);border:1px solid var(--line);border-radius:12px;padding:24px}dialog::backdrop{background:rgba(20,17,15,.8)}dialog img{max-width:100%;max-height:60dvh;object-fit:contain;filter:none}.known-fault{padding:12px 0;border-bottom:1px solid var(--line)}.known-fault label{display:block}.known-fault select{max-width:100%;min-height:44px}
 @media(max-height:500px){body{height:auto;min-height:100dvh;overflow:auto}main{overflow:visible}nav{position:sticky;bottom:0}.panel{max-height:none}.sheet.on{max-height:90dvh;overflow:auto}}
 </style>
+<link rel="stylesheet" href="./walk-pages.css?v=ad2f56bff67570bd">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23f4eee2'/%3E%3Ccircle cx='16' cy='16' r='9' fill='none' stroke='%239a4525' stroke-width='3'/%3E%3Ccircle cx='16' cy='16' r='3.2' fill='%239a4525'/%3E%3C/svg%3E" type="image/svg+xml">
 </head>
 <body>
@@ -1011,8 +1012,8 @@ function renderHeader(){
 
   var rail = $("rail"); rail.innerHTML = "";
   for(var j=0;j<st.length;j++){
-    var seg = document.createElement("button");
-    seg.type = "button";
+    var seg = document.createElement("span");
+    seg.setAttribute("aria-hidden","true");
     seg.className = "rail-seg" + (j === S.idx && S.tab === "walk" ? " here" : "");
     var r = S.res[st[j].id];
     if(r && r.status) seg.setAttribute("data-s", r.status);
@@ -1936,7 +1937,7 @@ document.addEventListener("keydown", function(e){
   if(e.key === "ArrowRight"){ if(window.__grab) window.__grab(); S.idx = Math.min(S.idx + 1, st.length); save(); renderAll(); e.preventDefault(); return; }
   if(e.key === "ArrowLeft"){ if(window.__grab) window.__grab(); S.idx = Math.max(S.idx - 1, 0); save(); renderAll(); e.preventDefault(); return; }
   if(S.idx >= st.length) return;
-  if(k === "n" && $("rN")){ $("rN").focus(); e.preventDefault(); return; }
+  if(k === "n" && $("rN")){ if(window.FMPWalkPages) FMPWalkPages.reveal($("rN")); ($("rNEditor") || $("rN")).focus(); e.preventDefault(); return; }
   if(k === "p" && $("bP")){ $("bP").click(); e.preventDefault(); }
   if(k === "f" && $("bF")){ $("bF").click(); e.preventDefault(); }
   if(k === "s" && $("bS")){ $("bS").click(); e.preventDefault(); }
@@ -2034,6 +2035,7 @@ syncRoute(true);
   }
 })();
 </script>
+<script src="./walk-pages.js?v=99919936e2945da5"></script>
 <script type="module" src="./email.js?v=6743ac2f30366875"></script>
 <script type="module" src="./notion.js?v=760791e5db5cab8b"></script>
 </body>
