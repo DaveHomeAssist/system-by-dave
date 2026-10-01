@@ -195,14 +195,14 @@ export default function App() {
   }, []);
 
   // Every save goes through here, so a read-only workbook is never written from any path.
-  async function persist(next: AvWorkbook): Promise<AvWorkbook | null> {
+  // newRecord: only for an id minted for this save (a JSON import copy or a new blank), which cannot already exist.
+  async function persist(next: AvWorkbook, options: { newRecord?: boolean } = {}): Promise<AvWorkbook | null> {
     if (readOnlyRef.current) {
       setMessage("This workbook is open read-only. Nothing was saved.");
       return null;
     }
     try {
-      // An id this tab did not load (an imported copy, a sample or a new blank) is a new record.
-      return await saveEditedWorkbook(next, undefined, { newRecord: next.workbookId !== workbook?.workbookId });
+      return await saveEditedWorkbook(next, undefined, { newRecord: options.newRecord === true });
     } catch (error: unknown) {
       if (error instanceof WorkbookUncheckedError) {
         setMessage(error.message);
@@ -342,7 +342,7 @@ export default function App() {
       const next = pendingImport.kind === "json"
         ? { ...pendingImport.proposed, workbookId: `wb-import-${crypto.randomUUID()}` }
         : pendingImport.proposed;
-      const saved = await persist(next);
+      const saved = await persist(next, { newRecord: pendingImport.kind === "json" });
       if (!saved) return;
       setWorkbook(saved);
       setPendingImport(null);
@@ -355,9 +355,10 @@ export default function App() {
     }
   }
 
-  async function replaceWorkbook(next: AvWorkbook, label: string) {
+  // The sample keeps a fixed id that may already be stored, so only a new blank counts as a new record.
+  async function replaceWorkbook(next: AvWorkbook, label: string, newRecord: boolean) {
     if (!window.confirm(`Replace the current workbook with ${label}? Export first if you need a backup.`)) return;
-    const saved = await persist(next);
+    const saved = await persist(next, { newRecord });
     if (!saved) return;
     setWorkbook(saved);
     setActiveTab("overview");
@@ -428,8 +429,8 @@ export default function App() {
         </div>
         <nav aria-label="Workbook actions">
           <a className="console-action" href="../av-suite.html">Suite Console</a>
-          <button type="button" onClick={() => void replaceWorkbook(createBlankWorkbook(), "a blank workbook")}>New Blank</button>
-          <button type="button" onClick={() => void replaceWorkbook(createSampleWorkbook(), "the sample workbook")}>Load Sample</button>
+          <button type="button" onClick={() => void replaceWorkbook(createBlankWorkbook(), "a blank workbook", true)}>New Blank</button>
+          <button type="button" onClick={() => void replaceWorkbook(createSampleWorkbook(), "the sample workbook", false)}>Load Sample</button>
           <button type="button" onClick={handleExport}>Export JSON</button>
           <button type="button" onClick={() => void handleLegacyAudioImport()}>Import Legacy Audio</button>
           <label className="file-button primary primary-action">

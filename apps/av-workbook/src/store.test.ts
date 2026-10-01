@@ -258,6 +258,20 @@ describe("saveEditedWorkbook", () => {
     expect(memory.values.get(FALLBACK_KEY)).toBe(other);
   });
 
+  it("does not let a failed IndexedDB write replace an incompatible fallback copy of the same workbook", async () => {
+    const newer = JSON.stringify({ ...storedWorkbook("wb-demo-corporate-keynote"), schema: "system-by-dave.av-workbook.v2" });
+    const memory = memoryBackend({ failWrites: true, storage: { [FALLBACK_KEY]: newer } });
+    await expect(saveWorkbook(storedWorkbook("wb-demo-corporate-keynote"), memory.backend)).rejects.toBeInstanceOf(WorkbookUncheckedError);
+    expect(memory.values.get(FALLBACK_KEY)).toBe(newer);
+  });
+
+  it("checks a fixed-id sample against its stored copy unless the caller proves the id is new", async () => {
+    const newer = { ...storedWorkbook("wb-demo-corporate-keynote"), schema: "system-by-dave.av-workbook.v2" };
+    const memory = memoryBackend({ records: { "wb-demo-corporate-keynote": newer } });
+    await expect(saveEditedWorkbook(storedWorkbook("wb-demo-corporate-keynote"), memory.backend)).rejects.toBeInstanceOf(WorkbookChangedElsewhereError);
+    expect(memory.records.get("wb-demo-corporate-keynote")).toBe(newer);
+  });
+
   it("replaces another workbook's fallback copy only for a confirmed new blank workbook", async () => {
     const other = JSON.stringify(storedWorkbook("wb-only-copy"));
     const memory = memoryBackend({ failWrites: true, storage: { [FALLBACK_KEY]: other } });

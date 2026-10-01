@@ -246,8 +246,13 @@ export async function startBlankWorkbook(
 function writeFallback(next: AvWorkbook, storage: WorkbookKeyValueStore | null, replaceOtherFallback = false): void {
   if (!storage) throw new WorkbookUncheckedError();
   const existing = storage.getItem(FALLBACK_KEY);
-  if (existing !== null && storedWorkbookId(existing) !== next.workbookId && !replaceOtherFallback) {
-    throw new WorkbookUncheckedError("This browser's workbook storage is unavailable, and its one fallback slot holds a different workbook, which may be that workbook's only copy. Nothing was saved. Export or reload, then try again.");
+  if (existing !== null && !replaceOtherFallback) {
+    if (storedWorkbookId(existing) !== next.workbookId) {
+      throw new WorkbookUncheckedError("This browser's workbook storage is unavailable, and its one fallback slot holds a different workbook, which may be that workbook's only copy. Nothing was saved. Export or reload, then try again.");
+    }
+    if (assessStoredWorkbook(existing).status === "read-only") {
+      throw new WorkbookUncheckedError("This browser's workbook storage is unavailable, and its fallback copy of this workbook was saved by a version this one cannot read. Nothing was saved. Reload to fetch the latest version.");
+    }
   }
   storage.setItem(FALLBACK_KEY, JSON.stringify(next));
   storage.setItem(ACTIVE_KEY, next.workbookId);
