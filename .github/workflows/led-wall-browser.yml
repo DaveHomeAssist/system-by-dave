@@ -1,0 +1,38 @@
+name: LED wall browser
+
+on:
+  pull_request:
+    paths:
+      - 'led-wall-calculator.html'
+      - 'js/av-calculator.js'
+      - 'js/led-wall-viewer.js'
+      - 'js/sbd-registry.js'
+      - 'scripts/probe_led_wall_configurator.js'
+      - '.github/workflows/led-wall-browser.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+      - name: Probe LED calculator and no-WebGL fallback
+        run: |
+          export CHROME_BIN="$(command -v google-chrome)"
+          test -n "$CHROME_BIN"
+          python3 -m http.server 8000 --bind 127.0.0.1 >/tmp/led-wall-probe-server.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid"' EXIT
+          for attempt in 1 2 3 4 5 6 7 8 9 10; do
+            if curl --silent --fail http://127.0.0.1:8000/led-wall-calculator.html >/dev/null; then break; fi
+            sleep 1
+          done
+          curl --silent --fail http://127.0.0.1:8000/led-wall-calculator.html >/dev/null
+          npm run probe:led-configurator -- --base=http://127.0.0.1:8000/
+          npm run probe:led-configurator -- --base=http://127.0.0.1:8000/ --no-webgl
