@@ -1,0 +1,482 @@
+{
+  "schema": "system-by-dave.gear-reference-entry.v1",
+  "id": "birddog-p240",
+  "displayName": "BirdDog P240",
+  "aka": [
+    "P240",
+    "BirdDog P240 PTZ"
+  ],
+  "brand": "BirdDog",
+  "category": "Video",
+  "subcategory": "PTZ cameras",
+  "status": "catalog-derived",
+  "updated": "2026-10-01",
+  "generated": {
+    "by": "scripts/build_gear_from_fmp.js",
+    "catalog": "fmp-p240",
+    "revision": "1.0.1",
+    "note": "Generated file. Change the fmp-suite catalog or scripts/gear_equipment_adapter.js, then run npm run build:gear-from-fmp."
+  },
+  "summary": "Equipment reference generated from the FMP BirdDog P240 catalog. FMP wiring and installed facts stay with the FMP explorer.",
+  "tags": [
+    "PTZ",
+    "NDI",
+    "SDI",
+    "FMP"
+  ],
+  "sources": [
+    {
+      "id": "birddog-techspec",
+      "label": "BirdDog P240 official tech specs",
+      "kind": "manufacturer",
+      "url": "https://birddog.tv/p240-techspecs/",
+      "scope": "Published mechanical, I/O, control, power and video specifications."
+    },
+    {
+      "id": "birddog-guide",
+      "label": "BirdDog P240 user guide",
+      "kind": "manufacturer",
+      "url": "https://birddog.tv/wp-content/uploads/2022/11/BirdDog_P240_User-Guide_230307.pdf",
+      "scope": "Control surface, rear/base connections, OLED, tally, format and ID controls."
+    },
+    {
+      "id": "birddog-overview",
+      "label": "BirdDog P240 product overview",
+      "kind": "manufacturer",
+      "url": "https://birddog.tv/p240-overview/",
+      "scope": "External product form, OLED, mohawk tally, numbering system and output families."
+    },
+    {
+      "id": "fmp-gear",
+      "label": "DB | FMP | AV Gear · BirdDog P240",
+      "kind": "house-record",
+      "reference": "FMP equipment record, 20 September 2026",
+      "scope": "FMP identity, location, Input 4 endpoint, service/fault record and open cable traces."
+    },
+    {
+      "id": "fmp-signal",
+      "label": "REF | FMP | Signal Flow",
+      "kind": "house-record",
+      "reference": "FMP equipment record, 20 September 2026",
+      "scope": "VISCA/IP control reaches the camera separately from the SDI run to ATEM Input 4."
+    },
+    {
+      "id": "dave-sdi-2026-09-23",
+      "label": "Dave's direct Camera 4 transport correction",
+      "kind": "user-report",
+      "reference": "Operator correction, 23 September 2026",
+      "scope": "Camera 4 video reaches ATEM Input 4 by SDI; intermediate cable landings and final patch were not supplied."
+    }
+  ],
+  "accuracy": [
+    {
+      "item": "Model identity",
+      "status": "confirmed",
+      "detail": "The catalog names the model BirdDog P240, and a manufacturer source names the product.",
+      "sourceRefs": [
+        "birddog-techspec"
+      ]
+    },
+    {
+      "item": "Parts with a manufacturer source",
+      "status": "confirmed",
+      "detail": "21 of 21 listed parts cite a manufacturer source.",
+      "sourceRefs": [
+        "birddog-techspec",
+        "birddog-guide",
+        "birddog-overview"
+      ]
+    }
+  ],
+  "sections": [
+    {
+      "id": "id",
+      "title": "Identification",
+      "type": "specTable",
+      "rows": [
+        [
+          "Manufacturer",
+          "BirdDog"
+        ],
+        [
+          "Model (catalog)",
+          "BirdDog P240"
+        ],
+        [
+          "Catalog",
+          "fmp-p240 · revision 1.0.1 · schema 1.1"
+        ],
+        [
+          "Parts on this sheet",
+          "21 of 24 catalog components; 3 kept with FMP"
+        ],
+        [
+          "Interactive model",
+          "housevideo.app/fmp/models/p240.html"
+        ]
+      ],
+      "sourceRefs": [
+        "birddog-techspec",
+        "birddog-guide",
+        "birddog-overview"
+      ]
+    },
+    {
+      "id": "parts",
+      "title": "Parts",
+      "type": "parts",
+      "lede": "Generated from the FMP equipment catalog. Each part keeps the catalog’s own evidence level, and Inspect opens it in the interactive model.",
+      "parts": {
+        "interactive": {
+          "url": "https://housevideo.app/fmp/models/p240.html",
+          "label": "BirdDog P240 interactive model"
+        },
+        "total": 24,
+        "groups": [
+          {
+            "category": "Enclosure",
+            "parts": [
+              {
+                "id": "p240.chassis",
+                "label": "Base / pan chassis",
+                "kind": "chassis",
+                "description": "Fixed lower body and connector platform, and the base the pan axis turns on. Everything that plugs into the camera lands here, so it is the part that never moves while the head above it does.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "birddog-techspec",
+                  "birddog-overview"
+                ]
+              }
+            ]
+          },
+          {
+            "category": "Motion",
+            "parts": [
+              {
+                "id": "p240.pan-axis",
+                "label": "Pan axis",
+                "kind": "axis",
+                "description": "Rotates the upper assembly horizontally, ±350 degrees of continuous travel at up to 150 degrees per second. Never turn the head by hand while the camera is powered — the guide warns this can damage the drive.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "birddog-techspec"
+                ]
+              },
+              {
+                "id": "p240.tilt-axis",
+                "label": "Tilt axis / camera head",
+                "kind": "axis",
+                "description": "Tilts the lens head through ±120 degrees, independently of the pan base. On a ceiling or rail mount, E-Flip inverts the image so the picture stays the right way up and the controls still push the way you expect.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "birddog-techspec"
+                ]
+              }
+            ]
+          },
+          {
+            "category": "Imaging",
+            "parts": [
+              {
+                "id": "p240.lens",
+                "label": "20× optical lens",
+                "kind": "lens",
+                "description": "4.4-88.4 mm zoom. Field of view runs 70.2 degrees wide to 4.1 degrees tight, at f/2.0 wide and f/3.8 tight, so long shots lose almost two stops. Tele Convert changes what \"40x\" means: off gives 20x true optical zoom, on crops the sensor to reach 40x in HD. The crop is not extra lens.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "birddog-techspec",
+                  "birddog-guide"
+                ]
+              }
+            ]
+          },
+          {
+            "category": "Tally",
+            "parts": [
+              {
+                "id": "p240.tally.mohawk",
+                "label": "360° mohawk tally",
+                "kind": "light",
+                "description": "Bi-colour mohawk tally, readable overhead and from behind, so talent and floor crew can see the state of the camera from any angle. Tally has to be enabled on the camera before it lights at all.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "birddog-overview",
+                  "birddog-techspec"
+                ]
+              },
+              {
+                "id": "p240.camera-id",
+                "label": "Rear illuminated camera ID",
+                "kind": "display",
+                "description": "Illuminated rear number built from the supplied 0-9 silicone plugs. It is changed by hand, which means it can disagree with the input the camera is patched to — worth checking whenever cameras are re-patched.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "birddog-overview",
+                  "birddog-guide"
+                ]
+              }
+            ]
+          },
+          {
+            "category": "System",
+            "parts": [
+              {
+                "id": "p240.oled",
+                "label": "5-line RGB OLED",
+                "kind": "display",
+                "description": "Five-line colour OLED on the base showing device, network and video state. It is how you read the camera’s IP address without a computer, which is the quickest way to find a camera that has moved to a different address.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "birddog-techspec",
+                  "birddog-overview"
+                ]
+              }
+            ]
+          },
+          {
+            "category": "Front controls",
+            "parts": [
+              {
+                "id": "p240.ir",
+                "label": "IR sensor",
+                "kind": "sensor",
+                "description": "Infrared sensor for the handheld remote. It answers to whichever ID the rear selector is set to, so two cameras sharing an ID will both respond to the same handset.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "birddog-guide"
+                ]
+              }
+            ]
+          },
+          {
+            "category": "Connections",
+            "parts": [
+              {
+                "id": "p240.io.usb",
+                "label": "USB 2.0 service",
+                "kind": "connector",
+                "description": "USB 2.0, used for firmware upgrade only. It carries no video and no control, so nothing here will help during a show.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "birddog-guide",
+                  "birddog-techspec"
+                ]
+              },
+              {
+                "id": "p240.io.format",
+                "label": "Video format selector",
+                "kind": "connector",
+                "description": "Rotary switch setting the SDI and HDMI video format. The guide warns that this switch and the on-screen menu override each other: whichever was changed last is what the camera uses at boot. Set it to the format you normally run, then make changes in the BirdUI rather than here.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "birddog-guide",
+                  "birddog-techspec"
+                ]
+              },
+              {
+                "id": "p240.io.remote-id",
+                "label": "IR remote ID selector",
+                "kind": "connector",
+                "description": "Sets which ID this camera answers to on the infrared remote. Give each camera in a room its own ID or one handset will drive several heads at once.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "birddog-guide",
+                  "birddog-techspec"
+                ]
+              },
+              {
+                "id": "p240.io.audio-in",
+                "label": "3.5 mm audio input",
+                "kind": "connector",
+                "description": "3.5 mm analogue input, stereo and unbalanced, at line level unless the adjacent selector is switched to microphone. Unbalanced means it will pick up hum over a long cable run.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "birddog-guide",
+                  "birddog-techspec"
+                ]
+              },
+              {
+                "id": "p240.io.audio-out",
+                "label": "3.5 mm audio output",
+                "kind": "connector",
+                "description": "3.5 mm analogue output, stereo and unbalanced. Useful for a local monitor feed; for anything travelling a distance use the balanced breakout instead.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "birddog-guide",
+                  "birddog-techspec"
+                ]
+              },
+              {
+                "id": "p240.io.audio-mode",
+                "label": "Line / mic selector",
+                "kind": "connector",
+                "description": "Switches the 3.5 mm input between line level and microphone with 48 V phantom power. Get this wrong in the phantom direction and you can damage a source that is not expecting voltage on its pins, so set it before plugging anything in.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "birddog-guide",
+                  "birddog-techspec"
+                ]
+              },
+              {
+                "id": "p240.io.balanced-audio",
+                "label": "Balanced audio breakout",
+                "kind": "connector",
+                "description": "LEMO connector carrying balanced XLR audio in and out through a breakout cable, which BirdDog does not supply. The guide names two compatible Atomos cables: ATOMCAM016 for input and output, ATOMCAM017 for input only.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "birddog-guide",
+                  "birddog-techspec"
+                ]
+              },
+              {
+                "id": "p240.io.dc",
+                "label": "12 V DC",
+                "kind": "connector",
+                "description": "12 V DC input. The guide specifies the supplied JEITA type 4 adaptor and no other. It also notes that DC runs cooler than PoE, which is the reason to choose it for a camera in a hot position.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "birddog-guide",
+                  "birddog-techspec"
+                ]
+              },
+              {
+                "id": "p240.io.rs232",
+                "label": "RS-232 RJ45",
+                "kind": "connector",
+                "description": "RJ45 carrying RS-232 serial control, VISCA or Pelco D. The base DIP switch chooses RS-232 over RS-422 and sets the baud rate and address, and the camera has to be power cycled before a change takes effect. RS-232 daisy-chains up to seven cameras.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "birddog-guide",
+                  "birddog-techspec"
+                ]
+              },
+              {
+                "id": "p240.io.rs422",
+                "label": "RS-422/485 RJ45",
+                "kind": "connector",
+                "description": "RJ45 carrying RS-422 / RS-485 serial control. Same DIP switch, baud rate and address rules as RS-232, and the same reboot after changing them. RS-422 is the one to use over long cable runs, where RS-232 becomes unreliable.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "birddog-guide",
+                  "birddog-techspec"
+                ]
+              },
+              {
+                "id": "p240.io.ethernet",
+                "label": "Ethernet / PoE+",
+                "kind": "connector",
+                "description": "Network port for NDI video and VISCA over IP control, and the camera’s power inlet when running PoE+ (802.3at). One Cat5e or Cat6 run therefore carries picture, control and power. PoE runs warmer than DC.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "birddog-guide",
+                  "birddog-techspec"
+                ]
+              },
+              {
+                "id": "p240.io.hdmi",
+                "label": "HDMI output",
+                "kind": "connector",
+                "description": "HDMI output, 4:2:2 12-bit, running at the same time as SDI and NDI rather than instead of them. If it feeds a DVI converter, DIP switch B4 has to be set accordingly.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "birddog-guide",
+                  "birddog-techspec"
+                ]
+              },
+              {
+                "id": "p240.io.sdi",
+                "label": "3G-SDI output",
+                "kind": "connector",
+                "description": "3G-SDI output, 4:2:2 10-bit, available simultaneously with HDMI and NDI. Dave confirms SDI video to ATEM Input 4; intermediate cable landings and the final patch remain untraced.",
+                "evidence": "Documented",
+                "sourceRefs": [
+                  "birddog-guide",
+                  "birddog-techspec",
+                  "dave-sdi-2026-09-23"
+                ],
+                "fmpEvidence": true
+              }
+            ]
+          }
+        ]
+      },
+      "sourceRefs": [
+        "birddog-techspec",
+        "birddog-overview",
+        "birddog-guide"
+      ]
+    },
+    {
+      "id": "kept-with-fmp",
+      "title": "Kept with FMP",
+      "type": "cards",
+      "cards": [
+        {
+          "label": "Installed mount interface",
+          "value": "Installed FMP fact with no equipment source",
+          "text": "Catalog id p240.mount. Open it in the FMP interactive model."
+        },
+        {
+          "label": "FMP VISCA/IP control path",
+          "value": "Signal route between FMP devices",
+          "text": "Catalog id p240.path.control. Open it in the FMP interactive model."
+        },
+        {
+          "label": "FMP Camera 4 SDI path · patches Unknown",
+          "value": "Signal route between FMP devices",
+          "text": "Catalog id p240.path.video. Open it in the FMP interactive model."
+        },
+        {
+          "label": "FMP assignments",
+          "value": "Kept in FMP records",
+          "text": "Addresses, firmware, camera assignments and installed routes for the FMP unit are recorded with the FMP explorer and house records, not on this equipment sheet."
+        }
+      ],
+      "paragraphs": [
+        "This sheet lists equipment facts. Catalog items that describe FMP wiring or installed facts, and the catalog’s venue fields, stay with the FMP explorer."
+      ],
+      "sourceRefs": [
+        "fmp-gear",
+        "fmp-signal",
+        "dave-sdi-2026-09-23"
+      ]
+    },
+    {
+      "id": "open-facts",
+      "title": "Open facts",
+      "type": "table",
+      "columns": [
+        "Item",
+        "Gap",
+        "Detail"
+      ],
+      "rows": [
+        [
+          "Parts citing FMP evidence",
+          "1 part",
+          "These parts cite an FMP record or operator report as well as equipment sources. Their descriptions may include behaviour observed on the FMP unit or an FMP-specific note, and each is flagged. Separating the two needs a distinct field in the fmp-suite catalog."
+        ],
+        [
+          "Connector specifications",
+          "Descriptive text only",
+          "The catalog records connectors as parts with descriptions. It has no structured connector fields (signal standard, format, pinout), so this sheet does not tabulate them."
+        ]
+      ],
+      "sourceRefs": [
+        "birddog-guide",
+        "birddog-techspec",
+        "dave-sdi-2026-09-23"
+      ]
+    },
+    {
+      "id": "accuracy",
+      "title": "Accuracy log",
+      "type": "accuracyLog",
+      "sourceRefs": [
+        "birddog-techspec",
+        "birddog-guide",
+        "birddog-overview"
+      ]
+    }
+  ]
+}

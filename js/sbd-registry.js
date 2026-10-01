@@ -150,6 +150,10 @@
     './data/gear/fujinon-4k-broadcast-zoom.json',
     './data/gear/blackmagic-camera-fiber-converter.json',
     './data/gear/blackmagic-studio-fiber-converter.json',
+    './data/gear/blackmagic-atem-television-studio-hd8-iso.json',
+    './data/gear/blackmagic-atem-camera-control-panel.json',
+    './data/gear/birddog-p240.json',
+    './data/gear/ptzoptics-superjoy-g1.json',
     './data/gear/figures/x39-chassis.svg',
     './data/gear/figures/x39-io.svg',
     './av-workbook.html',
@@ -234,7 +238,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool asset change — rolls the service-worker cache. */
-    version:'v20261001-video-notes',
+    version:'v20261001-gear-shared-equipment',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,
