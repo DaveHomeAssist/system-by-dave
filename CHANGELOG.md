@@ -1,5 +1,11 @@
 # Changelog
 
+## FMP Preshow Walk reliability release preparation — 2026-10-01
+
+- Receive the managed canonical export with stable walk/report IDs, explicit New/Resume, complete session Undo, legacy-draft recovery, validated backup restore previews, and Gmail compose handoff.
+- Preserve dated photo colors and historical/current evidence boundaries. Update the authored FMP release verifier for the local recovery module/reference manifest and reviewed JPEG allowlist.
+- Publication and merge remain pending explicit release authorization for this task. No generated asset or provenance was hand-edited.
+
 ## 2026-10-01 — AV Suite 2.0b follow-up: Video notes kept as typed
 
 - Video Patch, Projection Plan and Stream Plan keep notes exactly as typed. Before, a reload or an import turned line breaks and repeated spaces into single spaces and cut notes at 260 characters, and editing a note in its row flattened it the same way; the next save kept the damage. Notes on the other five Video pages were already kept as typed. Notes already flattened by an earlier reload cannot be recovered.

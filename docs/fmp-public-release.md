@@ -18,8 +18,8 @@ access control.
 - `/fmp/camera/...`: owner-bound drafts and explicit authenticated operational
   actions. SETUP TEST remains mandatory until live acceptance is complete.
 - `https://walk.housevideo.app/fmpwalk/`: venue route, readings, faults, photos, and report preparation.
-  Browser storage is local-first; download, Gmail, and Notion actions each require
-  a separate explicit confirmation.
+  Browser storage is local-first; downloads, Gmail compose handoff, and Notion
+  saves remain separate. Gmail draft opening does not send or confirm email.
 - `/fmp/guide/`: training only. Tonight's director, stage plot, restrictions, and
   verified assignments control.
 - `/fmp/rig/`: read-only 3D/photo equipment reference. It does not report live
@@ -66,7 +66,8 @@ node scripts/export-public-camera.mjs /absolute/path/to/system-by-dave
 The exporter checks destination identity and writes one exact allowlist.
 `fmp/source_provenance.json` pins the canonical source commit, individual
 SHA-256 values, release mode, and a combined artifact digest, and
-`fmpwalk/source_provenance.json` does the same for the preshow walk, which the
+`fmpwalk/source_provenance.json` does the same for the preshow walk, including its
+local reliability module, dated reference JSON and unchanged reviewed JPEGs. The
 same export writes (release mode `local-first`) and walk.housevideo.app
 serves. Both must pin one source commit. The walk was dropped from the export in
 fmp-suite `0946989` while an overwritten landing page was repaired, which froze

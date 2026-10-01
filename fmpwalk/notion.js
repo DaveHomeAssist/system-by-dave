@@ -1,5 +1,5 @@
-import { CLIENT_ID, snapshot } from './mail.js?v=66bf931f21c0eae1';
-import { ensurePhotosReady, photoFiles } from './photos.js?v=b212ddfae13e1efe';
+import { CLIENT_ID, snapshot } from './mail.js?v=fe07a45a7b6d1153';
+import { ensurePhotosReady, photoFiles } from './photos.js?v=56a96b43f5b35693';
 import { NOTION_API_URL } from './notion-config.js?v=b675c734abe301f4';
 
 const $ = id => document.getElementById(id);
@@ -30,7 +30,10 @@ async function api(path, options = {}) {
 }
 function initialize() {
   if (!base) { message('Notion setup is not complete. Download or copy your report for now.'); return; }
-  if (initialized || loading || !navigator.onLine) return;
+  if (initialized || loading) return;
+  // Retry is offered only after sign-in could not start: offline, or Google's script failed to load.
+  if (!navigator.onLine) { $('notionRetry').hidden = false; message('Offline. Use Retry Notion sign-in when your connection is ready.'); return; }
+  $('notionRetry').hidden = true;
   if (!window.google?.accounts?.id) {
     loading = true;
     const script = document.createElement('script');
@@ -41,7 +44,7 @@ function initialize() {
       if (settled) return; settled = true; clearTimeout(timeout); loading = false;
       script.onload = script.onerror = null;
       if (ok) initialize();
-      else { script.remove(); message('Google sign-in could not load. Use Retry Notion sign-in when your connection is ready.'); }
+      else { script.remove(); $('notionRetry').hidden = false; message('Google sign-in could not load. Use Retry Notion sign-in when your connection is ready.'); }
     }
     script.onload = () => finish(Boolean(window.google?.accounts?.id));
     script.onerror = () => finish(false);
