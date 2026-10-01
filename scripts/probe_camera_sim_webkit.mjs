@@ -2,7 +2,7 @@
 // WebKit smoke for the FMP Camera Simulator. Field devices are iPads and iPhones, while the full
 // acceptance probe (scripts/probe_camera_sim.mjs) runs in Chromium only (camera-sim audit Q1).
 // This checks the published camera-sim/ in Playwright's WebKit with phone and tablet emulation:
-// it starts, reports a render status, raises no page errors, fits the screen, and a held arrow
+// it starts and renders the 3D views, raises no page errors, fits the screen, and a held arrow
 // key moves the camera. It is a smoke check, not a second acceptance suite, and emulated WebKit
 // is not physical Safari.
 //
@@ -43,12 +43,14 @@ for (const name of ['iPhone 13', 'iPad Pro 11 landscape']) {
     try { const detail = await fn(); results.push({ ok: true, label: `${name}: ${label}`, detail }); }
     catch (error) { results.push({ ok: false, label: `${name}: ${label}`, detail: error.message }); }
   };
-  await check('starts and reports a render status', async () => {
+  await check('starts and renders the 3D views', async () => {
     await page.goto(PAGE);
     await page.waitForFunction(() => window.__fmpCameraSim && window.__fmpCameraSim.state().renderStatus !== 'starting', null, { timeout: 30000 });
     const status = await page.evaluate(() => window.__fmpCameraSim.state().renderStatus);
-    // Without WebGL the simulator must say so rather than fail; either outcome is a working page.
-    if (!['ok', 'unavailable'].includes(status)) throw new Error(`render status ${status}`);
+    // WebKit renders with WebGL in CI (first run, 2026-10-01), so anything but ok is the WebKit
+    // rendering regression this job exists to catch. The forced no-WebGL fallback is covered by
+    // the Chromium acceptance probe.
+    if (status !== 'ok') throw new Error(`render status ${status}`);
     return `render ${status}; ${await page.evaluate(() => window.__fmpCameraSim.release().version)}`;
   });
   await check('fits the screen without horizontal scrolling', async () => {
