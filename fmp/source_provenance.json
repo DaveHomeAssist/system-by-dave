@@ -1,10 +1,10 @@
 {
   "schema": "fmp.public.release.v2",
   "sourceRepository": "DaveHomeAssist/fmp-suite",
-  "sourceCommit": "fb56cb7a59e95c59dcff7a3cddf867fea17ec2bd",
+  "sourceCommit": "3c5819c9b920a471e1fb9142fc9089da41b9f246",
   "mode": "commissioning",
   "files": {
-    "build/index.html": "86a7b9a77e82f0a8d7b15283e897d101849a8de15c841938296e2cc39c596951",
+    "build/index.html": "30c0bc602f56781c419917528171a624d5d63a9e5f8af2e07eb4f7eafbd1476d",
     "camera-core.js": "07debf3663cc8963443cc29a55582fe59e60cb91b936bdaf8e5a42ccd739cfdc",
     "camera-view.js": "794e85363e56d12aaad203d016e968dc0b7896ae5d6f22cea72b29590b89c4c7",
     "camera.css": "16d13c9cc14dfc61965b614eac072e0c10e45266a41557bdfb76acd0203d77ff",
@@ -17,14 +17,14 @@
     "chrome.css": "a75daa612884c0543ab48697c9dc5b4f48cba65a7d2f392850c6cd18aa31198d",
     "chrome.js": "2a2dec4eaaef1ce17b46c25fdd3e206f9669b9d4bb28173e325edaaf36e4c989",
     "fmp-social-card.png": "651832f5377dc395b846be4da71d6211f227024ce51520b4e84fdaaebcf8a890",
-    "gear/index.html": "486deeeb4b408cfbb05248dc3e2504408ad9891a8d194486eb8c5a39f0130c46",
+    "gear/index.html": "7179ffd0ba7bd90e2200a6a14319b892c17b2de31876160c32161eb3c4fec021",
     "guide/index.html": "c179cdc8a04c50a3c8824d70c25eda857156b128fc18f25b10bf980b04f76daa",
     "house/display-estate.csv": "e8217a9d329cb67a8678d2475952628d27830442b341bfd699a8fd548643d4fa",
     "house/house-data.js": "c7d13e26c2b674d57dbc332f1ee530ca8b479e0ae6266447ecadc02202b4511f",
     "house/house-tokens.css": "2a09b50d41cb919ec6557fb20243374977395ec0b5acc36080f1d3556cec06e0",
     "house/house.css": "f429823db69552aeacd7942e92bd8b34fb34d06ac31842b4820544e1bf5ee9ad",
     "house/house.js": "8f2e076733f4e3e26da7d63d39d377076dd88b0af9e8ab308a397992e337e0dd",
-    "house/index.html": "1313a14ae235d4d9b1728678005354b4bf9f58720f01578de05b5038b5c9da56",
+    "house/index.html": "074f219b621048453da1c9d3d04dd02257a4527bbffa9e91d9172f55a89c7d78",
     "house/site-plan.png": "655d27449a2f686ad17b74bed39b11edc69af9d342d46d079b98c042e4876f2e",
     "index.html": "869d1d8445e7b41b6188198cfe562617309c713dbdb0736a9c1f194abb995243",
     "mail.js": "66bf931f21c0eae17fa411c80760030ee036b2dc1bdde875b8baf624bba3f216",
@@ -53,7 +53,7 @@
     "notion-config.js": "b675c734abe301f46f50f05a65ae58b9d25bd07c57fa8b01ef07e456e32271fc",
     "photos.js": "b212ddfae13e1efe140272a8776d9524c272a226423063133a1e30c030a47038",
     "ptz/SuperJoy-G1-Interactive-Guide.html": "fc0b8616b276d1bdb24bd142e08987183db3c20cbf2bbf309385c553cbaa8cc9",
-    "ptz/index.html": "8ac3428bbd650abbc226b9f78d2a20990f9be2d108c689da50c6293176e34308",
+    "ptz/index.html": "53aab86fb1dde6bb2b05b074d6e5f59b8669486459de316c27d8177298ca6bc0",
     "public.css": "aca2a0cc10a822a1d3ea54427595fb99964671be9e8fb4b1b01fc9a2ea06514c",
     "public.js": "b20019e13c274f2f81052690df1aaf0f7cd94aa0d7f7a5c45a04d9a1ee70b2c1",
     "ref.css": "06116202f4e535153c538bf4c8495fc404f13df39f32c0c41f1b8db6574562a6",
@@ -84,5 +84,5 @@
     "rig/vendor/three/three.module.js": "a476b88d0df406dca0e30c65b4cdf0180c7337110accec828c103655b56a361c",
     "theme.js": "34276e275d44d4380407b996455291bfcca9cc4a9a4ef81b632534b00fc1747a"
   },
-  "artifactSha256": "f8a5d7096ef76651e28493b77f8f597e4d33ceeac3374fc275718d9ab5c46514"
+  "artifactSha256": "a9db1194d00a47b53806ae95862dbb2bfc1f102c9885b87fb32f9c5cbf12fff0"
 }

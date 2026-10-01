@@ -130,12 +130,10 @@ saving and opening without a connection; the guide links it as "Download for
 offline use". Re-run the build after every FMP export: `npm run verify:fmp`
 fails when the guide is out of date with the exported model page.
 
-The preshow walk is configured to publish at **walk.housevideo.app**. The release
-requires configured infrastructure and auth, then verifies the live destination
-before publishing old-origin redirects. After cutover,
-`housevideo.app/fmpwalk/` and `/fmp-walk/` offer saved-data migration before
-redirecting there. Links crossing the two origins are absolute and the exporter
-enforces it. The operator/reference hub no longer launches the walk.
+The preshow walk has published at **walk.housevideo.app** since its 2026-09-20
+cutover. `housevideo.app/fmpwalk/` and `/fmp-walk/` offer saved-data migration
+before redirecting there. Links crossing the two origins are absolute and the
+exporter enforces it. The hub's Operators view links the walk at its own origin.
 
 The Google client and the `fmp-walk-notion` backend (`FMP_ALLOWED_ORIGINS`) allow
 `https://housevideo.app`; keep `https://systembydave.com` in both while old drafts
