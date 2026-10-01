@@ -2,6 +2,17 @@
 
 **State:** In progress, 2026-09-23. The release sequence and acceptance criteria remain in the [consolidation specification](av-suite-consolidation-spec.md). No legacy route or saved record has been retired.
 
+## October 1 product direction
+
+The [maintained plan](av-suite-consolidation-spec.md) now makes Toolbox the default
+entry to focused applications with optional modules. Unified Video is independent
+of Workbook. Public Workbook withdrawal is settled; its former-URL recovery
+behavior is a consequential implementation choice. Retain the historical
+Workbook transfer/import/load-guard evidence below and preserve existing data.
+These safeguards do not require a Workbook host or a Workbook schema upgrade for
+new applications. Withdrawal must retain backup/transfer coverage even after a
+public registry entry is removed. This documentation revision retires no route.
+
 ## Source snapshot as of 2026-09-23
 
 The canonical `js/sbd-registry.js` had 45 tools and 60 declared local-storage keys at this snapshot. The proposal's 44-tool/59-key table describes its earlier baseline. `led-wall-calculator` is the added tool; it remains directly reachable at `led-wall-calculator.html` while its eventual Video or contextual-specialist home is evaluated. The registry and [generated inventory](av-suite-consolidation-inventory.md) remain the current-count sources; this document records audit exceptions and proof rather than copying their full tool list.

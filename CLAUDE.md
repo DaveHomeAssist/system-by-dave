@@ -93,6 +93,14 @@ Toolbox-only pins, recents, search, and filter preferences live in
 and persistence contract. `js/av-theme-mode.js` and `js/av-theme.js` apply the
 operator's Warm Paper, Stage Slate, or System choice.
 
+The [maintained consolidation plan](docs/av-suite-consolidation-spec.md) sets the
+next product direction: Toolbox as default, focused applications with optional
+modules, independently launchable Unified Video, and public Workbook withdrawal
+while retaining its concept for possible redesign. These are settled target
+decisions, not the shipped doorway behavior described above. Workbook is not a
+required host or database for new applications. Read the plan's consequential
+choice gates before implementation; decide routine engineering details autonomously.
+
 ### Cross-tool state
 
 `js/av-suite-context.js` carries the show profile and readiness context.

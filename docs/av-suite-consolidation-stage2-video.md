@@ -1,29 +1,31 @@
 # AV Suite consolidation: Stage 2 (Video) phase plan
 
-**State:** Prepared 2026-09-29. Increments 2.0a (shared safety) and 2.0b (Video page safety) done 2026-10-01; increments 2.1 to 2.5 not started. Source snapshot `DaveHomeAssist/system-by-dave` `origin/main` at `c21ce22`, registry `v20260925-landing-retire`. This plan turns Stage 2 of the [consolidation specification](av-suite-consolidation-spec.md) into ordered increments with entry and exit gates. It does not claim that any Video workspace behavior is live. Line citations refer to the snapshot commit.
+**Decision revision:** 2026-10-01. Unified Video is a focused application launched directly from Toolbox, independent of AV Workbook. The [maintained specification](av-suite-consolidation-spec.md) carries Dave's settled Toolbox, application, module and Workbook-withdrawal decisions. The former D2 recommendation and Workbook v2 execution brief are superseded; do not ask for their approval or implement them as the next phase.
+
+**Evidence boundary:** The September 29 source audit below used `c21ce22`; its line citations and defects are historical evidence with subsequent fixes noted. Increments 2.0a and 2.0b and bounded 2.0c slices are in current source at `238f2ed`. Remaining suite safety work is open. Increments 2.1–2.5 are unimplemented target work, not a live Unified Video application.
 
 ## Where the program stands
 
-- **Stage 1 (equipment pilot)** shipped as an interim bridge: four Gear Reference sheets show the focused FMP model.
-- **Stage 0 (inventory)** remains open across all 45 tools. The [Stage 0 record](av-suite-consolidation-stage0.md) lists its gates. This plan closes the Stage 0 gates for the Video slice only.
+- **Equipment pilot history:** the focused FMP model bridge shipped and was subsequently withdrawn from public Gear Reference. Public reference is equipment-only; venue content needs an explicit workspace binding, without a Workbook prerequisite.
+- **Stage 0 (inventory)** remains open across all 45 tools. The [Stage 0 record](av-suite-consolidation-stage0.md) lists its gates. This plan scopes future migration gates to the Video slice; the shipped legacy-page checks do not close offline, import field-parity or operator-acceptance gates.
 - **Stage 2 (Video)** started in code with increments 2.0a and 2.0b (2026-10-01), which fixed the shared show-context, card-view, navigation and Workbook load defects and the eight Video pages' data-safety defects. A follow-up to 2.0a (PR #188) made the Workbook fail closed when browser storage fails. Increment 2.0c extends the page fixes to the rest of the suite. No Video workspace exists yet. Commit `77ae0eb` had changed only the specification, doorway contract, and changelog.
 
-The Video slice is the eight tools the specification assigns to Video (`signal-flow`, `video-patch`, `display-plan`, `projection-plan`, `stream-plan`, `record-log`, `camera-shot-list`, `playback-check`) plus `led-wall-calculator`, whose home was undecided.
+The Video slice is the eight tools the specification assigns to Video (`signal-flow`, `video-patch`, `display-plan`, `projection-plan`, `stream-plan`, `record-log`, `camera-shot-list`, `playback-check`) plus the independently launchable `led-wall-calculator`, linked contextually from Displays & Projection.
 
 ## Decisions for this phase
 
-These are recommendations made on 2026-09-29 while preparing the phase, from the source audit below. They are not recorded decisions by Dave, and he may override any row. Each is reversible at the listed cost.
+The product direction below carries the October 1 request forward. Routine engineering defaults are explicitly distinguished from product choices still open in the [maintained plan](av-suite-consolidation-spec.md#consequential-choices-before-affected-implementation). Do not reopen settled decisions from the September recommendations.
 
-| # | Decision | Reason | Reversal cost |
-| --- | --- | --- | --- |
-| D1 | **Close Stage 0 for the Video slice, not all 45 tools, before building Video.** Shared-code defects are fixed suite-wide because the fix lives in one file. | The migration contract applies tool by tool. Waiting for every tool would stall Stage 2, while the defects below corrupt the exact data a Video import would read. | Low |
-| D2 | **Build the Video workspace inside the AV Workbook app** (`apps/av-workbook/`) on its typed IndexedDB store, reached by its own URL. | The Workbook already has Zod validation, a blank first run, the reviewable URL-context offer, and the preview, backup, and stale-rejection import pattern. The eight legacy pages share no engine (they are inline copies of a template used by 33 root pages), so a new static page would add a ninth schema. The specification already recommends the Workbook for show-attached entities. | Medium |
-| D3 | **Use a chain-centric typed model with lossless import.** Records keep each legacy status verbatim and store a derived readiness class. Free text stays text, and structured hints are stored beside the original text, never in place of it. Every imported record carries provenance. | Legacy vocabularies conflict: "backup" is a status, a type, and a free-text path in different tools. Formats and durations are free text that cannot be parsed without loss. | Medium |
-| D4 | **Legacy pages remain independent editors of their own keys.** The Video workspace never writes a legacy key. Import copies data after a preview. A repeat import replaces only records that a previous import created. | This avoids two silent writers for one record and keeps the old route as the rollback path. | Low |
-| D5 | **Ship a Workbook load guard before any model extension.** A workbook that the running app cannot fully represent opens read-only. The app never saves over it and never repoints the active workbook to a blank one. | `validateWorkbook` requires the literal `v1` schema (`workbookSchema.ts:14`). On any load failure, `loadActiveWorkbook` saves a new blank workbook and repoints the active ID (`store.ts:38-54`). An older cached app would therefore strip new Video arrays on its next save or abandon a newer workbook. | Low |
-| D6 | **LED Wall Calculator is a contextual specialist.** It is launched from Video › Displays & Projection and remains in Calculators. It is not a Video record type. | It holds one scenario, reads and writes no show data, and persists only its working state (`avCalculator.v1`) and a profile library. Its only integration is the Power Load handoff to AV Calculator. | Low |
-| D7 | **Video becomes a primary destination button** in the `av-suite.html` header and Toolbox that opens the Video workspace. `av-suite.html` keeps its two modes, and the rule that an `sbd*` parameter forces Show Console stays for that page. Show context reaches Video as the Workbook's reviewable offer. | This follows the Front Office precedent without breaking the doorway rule, which `verify_av_suite.js:155` and `probe_av_suite_responsive.js:303` assert. | Low |
-| D8 | **Video does not write `av-suite-dashboard.v1` readiness.** It shows derived issues only. Console readiness authority stays open until Stage 7, as the specification records. | This keeps a single writer. | None |
+| ID | Current direction | Authority or treatment |
+| --- | --- | --- |
+| D1 | Close migration gates for the Video slice before cutting over its workflows; shared-code safety fixes apply wherever needed. | Engineering sequencing; other applications do not block independent Video work. |
+| D2 | **Unified Video is a focused application, independent of Workbook.** It has its own direct launch from Toolbox and does not require Workbook's UI, runtime or database. | Settled product boundary, Dave 2026-10-01. Replaces the recommendation to build inside `apps/av-workbook/`. Reuse code only where it preserves independence. |
+| D3 | Use a chain-oriented typed model with lossless import. Keep original text/statuses, derived readiness and source provenance separately. | Engineering default justified by the field matrix. No separate approval of a validation library or schema implementation is needed. Cross-app document identity remains a consequential gate. |
+| D4 | Legacy pages remain independent writers of their existing keys. New imports are previewed copies; repeat import never silently overwrites newer app edits. | Data-preservation contract. |
+| D5 | Preserve the delivered Workbook load/save safeguards and apply equivalent fail-closed behavior to any new app store. | Completed safety work remains valuable; a Workbook schema extension is no longer a Video prerequisite. |
+| D6 | LED Wall Calculator stays a focused specialist launched directly and from Displays & Projection. | Engineering navigation default; preserve its own state and documented Power Load handoff. |
+| D7 | Toolbox is the default entrance and Video is directly visible. Video opens without show setup, with optional validated show context and optional modules. | Settled product boundary. The current doorway's explicit show-context compatibility remains documented; an old saved preference does not defeat the new neutral Toolbox default. |
+| D8 | Video derives scoped issues locally and does not write `av-suite-dashboard.v1` readiness. | Preserve one writer until the consequential readiness-authority choice is resolved. |
 
 ## Stage 0 Video-slice source audit
 
@@ -60,7 +62,7 @@ This matrix is the acceptance list for increment 2.2. Every field listed must ha
 | Playback Check | `playback-check.v1`; 200 cues; `cue-` | cue, file, type, duration, aspect, audio, destination, status, backup, notes. type: video, audio, slide, image, walk in, sting, other. aspect: 16:9, 9:16, 4:3, 1:1, 21:9, audio only, mixed. audio: embedded, separate, none, voiceover, house music, click | ready, pending, issue, played | showName, venue, showDate, playbackOp, tdName, audioLead |
 | LED Wall Calculator | Working state in `avCalculator.v1`, shared with AV Calculator; `avCalculator.ledProfiles.v1` holds up to 20 profiles of 13 values | No rows (single scenario) | — | None |
 
-**What the Workbook holds today:**
+**Workbook at the September 29 audit (reference only, not the Video host):**
 - `VideoRoute` has `id`, `source`, `processor`, `destination`, `resolution`, `frameRate`, optional `converter` and `backup`, and a `WorkbookStatus` (`types.ts:129-139`). There is no editor.
 - `validateVideo` checks only for a missing backup and for 4K without a converter (`validators.ts:164-189`).
 - There are no Display, Projector, Encoder, Recording, Shot, or Playback entities.
@@ -73,7 +75,7 @@ This matrix is the acceptance list for increment 2.2. Every field listed must ha
 ## Draft Video model (finalized in 2.1)
 
 - **Endpoints** are the devices and points in the chain: camera, playback, graphics, switcher, router, processor, converter, encoder, recorder, display, projector, LED wall, confidence, monitor, platform, and other. Each can reference a room, a hardware record, and a Gear Reference sheet.
-- **Routes** connect a source endpoint to a destination endpoint through ordered hops, with format, connector, port/input text, backup text or backup route, and status. The existing `videoRoutes` records need an explicit migration; they must not be revalidated into a new shape silently.
+- **Routes** connect a source endpoint to a destination endpoint through ordered hops, with format, connector, port/input text, backup text or backup route, and status. Existing Workbook `videoRoutes` remain untouched. Any future supported import from them is a separately previewed copy with field coverage, not an automatic Workbook schema migration.
 - **Task records** are per family: display surfaces (Display and Projection together), stream outputs, recordings, camera shots, and playback cues. Each keeps its legacy fields and its verbatim status set.
 - **Derived readiness** is computed by one pure function that maps each family's statuses to open, ready, issue, spare, or done. It drives counts and the Issues view and is never stored as a second status.
 - **Provenance** on imported records records the tool, storage key, source row ID, source hash, import time, importer version, and every unmapped field verbatim. The inspector shows it, and nothing is folded silently into notes.
@@ -82,20 +84,22 @@ This matrix is the acceptance list for increment 2.2. Every field listed must ha
 
 ## Increments
 
-Each increment is a separate pull request that merges only when every check is green. No increment retires a route, renames a storage key or export schema, or writes a legacy key from the Workbook.
+Each increment is a separate pull request that merges only when every check is green. Video increments do not retire legacy routes, rename existing keys/export schemas, or let the new app write legacy or Workbook records. The separate public Workbook withdrawal follows its own recovery gate in the maintained specification.
 
 | Increment | Deliverable | Exit gate |
 | --- | --- | --- |
 | **2.0a Shared safety** | **Done 2026-10-01.** Fixes V0-1, V0-8, V0-9 and V0-12 (the Workbook load guard, D5). Adds a context-fill browser probe to CI. | Repeating the same context three times changes only one field per page. A newer, unknown-key, or invalid workbook opens read-only, with no IndexedDB write and the active ID unchanged. Registry version, Stage 3D pin, and inventory agree. |
 | **2.0b Video page safety and proof** | **Done 2026-10-01.** Fixes V0-2 through V0-7 on the eight Video pages, plus V0-2 on the four non-Video pages that the widened seed check will catch. Adds a Video legacy behavior probe to CI. | For each of the eight pages: a synthetic fixture with every field survives reload unchanged; JSON export round-trips; CSV headers match the matrix; print hides the page chrome; Cmd/Ctrl+P is not intercepted; first launch writes nothing; unreadable data is preserved; a foreign file is rejected; replacing existing rows needs confirmation. Stage 0 gates for the Video slice are then closed in the Stage 0 record. |
 | **2.0c Suite-wide legacy safety** | In progress 2026-10-01: navigation and three browser probes delivered in a bounded first slice; the remaining safety work is open; Workbook theme follows the Suite and the fourth browser probe joins CI in a second slice; lossless Video load lands in a third slice. Independent of 2.1. Extends the 2.0b fixes to the rest of the suite and closes what 2.0b left open: the modifier guard on 23 tool pages (V0-5), unreadable-data preservation on the remaining pages and a way out when a second unreadable value arrives (V0-3), seeding on Input List and StagePlotter (V0-2), lossless load on the Video pages (V0-4), Display Plan and Projection Plan navigation (V0-9), the four probes outside CI (V0-11), and the Workbook's dark-only theme (workspace rule WEB-1; resolved in the second 2.0c slice). The remaining work is split into reviewable pull requests. | Cmd/Ctrl+P is not intercepted on any tool page. No tool page saves over a value it could not parse, and a second unreadable value has a way out. Input List and StagePlotter start empty. Reloading a Video page keeps every stored character and row. Display Plan and Projection Plan step through Video. The four probes run in the Pages workflow. The Workbook follows the suite theme, light by default. |
-| **2.1 Video model** | Typed Video entities, Zod schema, validators, and migration of existing `videoRoutes`, following the draft above. Schema bump only after 2.0a has deployed. | Every matrix field has a typed home or a provenance entry. Migration tests cover the existing workbook shapes. An older cached app, or a tab left open on 2.0a, meets the 2.0a guard rather than stripping data. |
-| **2.2 Legacy Video import** | One reviewable import covering all eight keys: preview with counts, unmapped fields, and suggested endpoint matches; backup download; explicit confirmation; stale-preview rejection; idempotent repeat import. | Unit tests per tool with the 2.0b fixtures. A browser test clicks through preview, cancel, apply, repeat import, and restore from backup. Legacy keys are byte-identical afterwards. |
-| **2.3 Video views** | Editable Switching & Routes first (the chain backbone), then Displays & Projection, Stream & Record, Cameras, Playback, and Issues. Each view has a shareable URL, and Back/Forward restore it. The run-mode rules of Play Next and Take Next are reproduced or explicitly replaced with operator-visible behavior. | Camera-to-screen, camera-to-stream/record, and playback-to-display paths keep status, backup, and export details. Gear Reference opens from an endpoint. Throwline and LED Wall Calculator launch from Displays & Projection with only the fields they document. |
-| **2.4 Doorway entry** | Video button in the `av-suite.html` header and Toolbox (D7), behind one reversible switch. Doorway contract and registry updated. | Video is visible without search at 390px, 680px, 1280px, and 32:9. The `sbd*` rule for `av-suite.html` still passes. Removing the switch restores the previous doorway. |
-| **2.5 Stage 2 acceptance** | Release readback on `avbydave.com`, an operator trial, and a specification status update. | The specification's Stage 2 exit gate. All eight legacy routes remain directly reachable. Operator acceptance is recorded separately from technical proof. |
+| **2.1 Independent Video foundation** | Resolve the cross-app document-identity gate, then implement app-owned typed entities, validation, fail-closed persistence and the draft chain model. Select source structure and reusable code autonomously. | Every matrix field has a typed or verbatim provenance home. Save/reload, schema compatibility, backup and stale-tab behavior pass. Launch, edit and export work without Workbook installed or opened; its data stays byte-identical. |
+| **2.2 Legacy Video import** | Reviewable imports for all eight keys with counts, unmapped fields, suggested endpoint matches, backup, confirmation, stale-preview rejection and repeat-import conflict handling. | Unit fixtures and a real browser preview/cancel/apply/repeat/restore journey preserve every legacy key and newer destination edit. |
+| **2.3 Focused views and optional modules** | Resolve the initial module preset/preference scope, then build Switching & Routes and the Cameras, Playback, Displays & Projection, Stream & Record and scoped Issues views. Use the shared experience and independent app boundary. | Representative video chains retain status, backup and export details. Disable/reload/deep-link/export/re-enable preserves data and reduces clutter; active operations remain reachable. Specialist launches pass only supported fields. |
+| **2.4 Toolbox launch and compatibility** | Integrate the independent Video route into default Toolbox discovery and app return navigation. Coordinate with the specification's earlier Toolbox-default release; do not recreate a chooser or Workbook launch dependency. | Video is visible without search at phone, 680px, desktop and 32:9. Neutral entry opens Toolbox, explicit Show Console/legacy show-context links still work, Back/Forward restore app/task, and rollback retains saved work. |
+| **2.5 Stage 2 acceptance** | Verify remote, CI, destination deployment and rendered journeys; record a separate operator trial and update the plan. | All eight legacy capabilities and compatible routes remain available. App independence, module behavior, data/field parity and recovery gates pass. Human acceptance is recorded separately from technical proof. |
 
-Increments 2.2 through 2.5 get their own execution briefs once the previous increment has merged. Model and view work benefits from review of the shipped guard and probe.
+Increments 2.1–2.5 follow these revised gates. The former Workbook v2 implementation brief is withdrawn. Select route names, packages, source layout and storage mechanics during implementation without asking again about the settled application boundary. Resolve only the dependent product choices recorded in the maintained specification.
+
+The following 2.0 briefs retain the safety-work history. Check current source and the increment table before using them; completed slices are not new work orders and their old references to future Workbook work are superseded.
 
 ## Execution brief: 2.0a
 
@@ -297,104 +301,21 @@ check count, and the limits note once item 10 lands). Read the Codex review befo
 read back two changed pages on avbydave.com.
 ```
 
-## Execution brief: 2.1
+## Increment 2.1 entry gate and engineering contract
 
-```text
-EXECUTE — AV Suite Stage 2.1: Video model in the AV Workbook
+Before implementing persistence, surface the consequential choice of independent app documents versus a shared project identity. The recommended first release uses app-owned Video documents and explicit handoffs. This choice cannot reintroduce Workbook as a required host. The module preset/preference-scope choice gates 2.3, not the field audit or independent safety work.
 
-GATE (blocking): start only when D2 and D3 each carry Dave's ruling on the AV Suite Roadmap page or
-a "(Dave, date)" note in this plan. If either is overridden, stop and revise this brief. PR #188
-(the fail-closed save guard) must also be live, so every installed copy that meets a v2 workbook
-opens it read-only.
+After the dependent product choice is recorded, implement the independent application foundation using current source and repository conventions. Reuse validation, preview, backup and recovery code where appropriate; select libraries and paths autonomously. Keep all legacy fields/statuses and provenance, compute scoped readiness rather than storing a competing status, and require explicit user confirmation before imports or destructive replacement.
 
-SOURCE: origin/main. Read this plan (D2 to D5, the field matrix, the draft model and the risks)
-and apps/av-workbook/src (types.ts, workbookSchema.ts, store.ts, validators.ts). Use an isolated
-worktree, branch <agent>/av-video-2-1-model, and the .agent-claim protocol.
+Persistence must preserve newer/unknown records, refuse stale saves, keep recoverable backups, report storage failures honestly and leave unsaved edits exportable. Choose concurrency and fallback mechanisms after inspecting the selected store, then test deterministic competing writes and recovery. Do not mandate Workbook schema `v2`, its active ID, or its database as part of this contract.
 
-CHANGE
-1. Schema system-by-dave.av-workbook.v2 adds a video section following the draft model:
-   endpoints, routes (ordered hops), display surfaces (Display and Projection together), stream
-   outputs, recordings, camera shots and playback cues. Each record keeps its legacy fields and
-   its verbatim status, and may carry provenance (tool, storage key, source row id, source hash,
-   import time, importer version, unmapped fields verbatim). Every v1 field keeps its meaning.
-2. Migration: one pure function takes any valid v1 workbook to v2, on load and on JSON import, so
-   v1 backup files exported before this release still import. Each videoRoutes record becomes
-   a route whose source, processor and destination become endpoints; converter and backup are kept
-   as text; nothing is dropped or guessed. Loading a v1 workbook writes nothing. The first save
-   that upgrades a stored v1 record first offers a download of that record and keeps it in
-   IndexedDB, under a key the v2 save cannot overwrite (the workbooks store is keyed by
-   workbookId), until the operator removes it. The active workbook moves to v2 only after both
-   records are stored; a first-save test reads both back. See 2.1 open question 2.
-3. Readiness: one pure function maps each family's verbatim statuses to open, ready, issue, spare
-   or done. It is never stored. Unit tests cover every status value in the field matrix.
-4. Validators: validateVideo keeps its two current checks against migrated routes and runs on the
-   new families without inventing statuses.
-5. Revision: v2 workbooks carry a revision number that every save increments. Loading prefers the
-   copy with the higher revision (IndexedDB or the fallback), and savedAt is display-only. v1 orders
-   the two copies by wall-clock savedAt, which ties or runs backwards under clock changes (#188).
-6. Serialized saves. Rule: no save, on either path, commits unless both stores (IndexedDB and the
-   fallback) are still as this tab last observed them. Checking only the destination store is not
-   enough: a tab that saved to IndexedDB and released the lock leaves the fallback unchanged, so a
-   stale tab could still write a tied revision there. Today the check and the write are separate steps on
-   both paths: IndexedDB get() and put() are separate transactions, and the fallback is read and
-   later written through localStorage, so two tabs can both start from revision N and both
-   commit N+1. (Harmless while only v1 exists.)
-   - One lock: every save, IndexedDB or fallback, runs inside the same cross-tab workbook lock
-     (navigator.locks.request), so a tab saving to IndexedDB and a tab falling back cannot overlap.
-     The IndexedDB read, check and write also stay in one Dexie read-write transaction inside it.
-   - Fallback comparison: inside the lock, a fallback save compares the slot with the value this
-     tab last read or wrote there (its exact text, or "absent"), not with the revision it loaded,
-     because the slot is normally stale or empty. If it changed, raise
-     WorkbookChangedElsewhereError; otherwise write and record the new value as observed.
-   - No Web Locks: fallback saves fail closed with WorkbookUncheckedError and the edit stays on
-     screen for Export. IndexedDB saves still use their transaction.
-   Deterministic unit tests, with a fake lock, interleave two tabs for IndexedDB/IndexedDB,
-   fallback/fallback and IndexedDB/fallback, and expect the second save to be refused with the
-   first tab's write intact. They also cover a stale or absent slot (the save succeeds) and a
-   backend without Web Locks (the fallback save is refused).
-   Open design questions found in review are listed under "2.1 open questions" below and settled
-   in the 2.1 pull request, not in this brief.
-7. Guard: the 2.0a and #188 load and save guards treat v2 as the current schema and anything newer
-   as read-only. A browser test loads a v2 workbook into the previous build (av-workbook/ from
-   origin/main before this change) and proves it opens read-only and writes nothing.
+Historical review of [PR #193](https://github.com/DaveHomeAssist/system-by-dave/pull/193) identified cross-store fallback concurrency and retained-version backup questions for the former Workbook proposal. Keep those findings as reusable engineering risks. They are not questions Dave must answer before designing an independent Video application, and they do not authorize a Workbook migration.
 
-MUST NOT (blocking)
-- Write a legacy storage key, import legacy data (2.2) or add Video editors (2.3).
-- Drop, rename or reinterpret any v1 field, or derive readiness into a stored status.
-- Merge endpoints across tools automatically.
-
-VALIDATION (all must pass before merge)
-- git diff --check; npm run test:av-workbook; npm run typecheck:av-workbook;
-  npm run build:av-workbook (commit the build); npm run verify:av
-- A field-matrix test that fails if any matrix field lacks a typed home or a provenance path
-- Migration tests for blank, sample and real-shaped v1 workbooks, with converter and backup
-  present and absent; a v1 backup file imports; a v2 export imports back unchanged
-- Registry version bumped; Stage 3D pin and the inventory (--check) agree
-
-DELIVERY: CHANGELOG entry. Update this plan's 2.1 row and the draft model section (now final).
-Read the Codex review before merging; merge when green; confirm the Pages run; read back the
-Workbook on avbydave.com.
-```
-
-### 2.1 open questions
-
-A design question raised in review of this brief is added here with its source and settled by the
-2.1 pull request.
-
-1. How does a fallback save check IndexedDB's state when IndexedDB is the store that is failing?
-   (Codex review of #193, 2026-10-01.) Recommended: one generation counter that every save, on
-   either path, increments under the workbook lock and records in localStorage, which stays
-   readable when IndexedDB fails. A save proceeds only if the counter still equals the value this
-   tab last observed. A new localStorage key needs the domain transfer policy and its revision
-   updated (scripts/domain-sites.json).
-2. Where is the retained v1 record kept? (Codex review of #193, 2026-10-01.) Saving v2 under the
-   same workbookId overwrites it. Recommended: a separate IndexedDB table keyed by workbookId and
-   schema, added in the same Dexie version bump, rather than minting a new workbookId, which would
-   break the active id and show-context links.
+Validation covers field-matrix completeness, save/reload, exports, schema compatibility, stale-tab refusal, cancelled/repeated import, storage failure and no writes to legacy/Workbook stores. Run the relevant repository checks and full current-head CI before merge; then verify destination source revision and real browser behavior. Product and operator acceptance remain separate.
 
 ## Risks carried into the phase
 
 - **Operator data already written.** Earlier visits may already have put operator names into `audioLead`, `tdName`, or `producer`. Import 2.2 must surface these in the preview; it must not assume they are correct.
 - **Stored samples.** Sample rows may already be saved under real show names. The import preview labels rows that match the built-in samples exactly, and the operator decides whether to import them.
-- **Offline cache.** Workbook bundles have fixed file names. Every Workbook change needs the registry version bump so that `av-suite-worker.js` replaces the cache (`av-suite-worker.js:8-10`).
+- **Offline cache.** A new app or public withdrawal must update registry assets, version consumers, staged artifacts and caches together. Existing cached Workbook copies must retain recovery paths; successful Pages deployment alone does not prove their behavior.
 - **Different running meaning.** Play Next takes only `ready` cues, while Take Next also takes `hold` and `problem` shots. The P key means Play Next in one tool and "mark problem" in the other. Increment 2.3 must choose one explicit behavior per view and show it to the operator.
