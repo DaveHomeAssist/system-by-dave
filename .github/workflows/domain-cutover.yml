@@ -4,6 +4,18 @@ on:
   workflow_call:
   pull_request:
     paths:
+      # Pages published on housevideo.app and walk.housevideo.app
+      # (scripts/domain-sites.json), which the cutover scenarios load.
+      - 'fmp/**'
+      - 'fmp-index/**'
+      - 'switcher/**'
+      - 'shader/**'
+      - 'ursa-broadcast-g2/**'
+      - 'backfocus/**'
+      - 'camera-sim/**'
+      - 'fmpwalk/**'
+      - 'fmp-walk/**'
+      - 'transfer.html'
       - 'js/domain-*.js'
       - 'scripts/*domain*'
       - 'js/sbd-registry.js'
