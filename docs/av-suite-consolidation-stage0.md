@@ -35,9 +35,26 @@ LED Wall Calculator's working state in `avCalculator.v1` is now listed as a know
 
 ## Open Stage 0 gates
 
-- Inspect route source signals and undeclared keys, prefixes, and databases for all 45 tools; prove exports, print, keyboard, and offline behavior in browsers. The generated matrix does not establish parity. Source inspection is done for the nine Video-slice routes; their browser proof is Stage 2 increment 2.0b.
+- Inspect route source signals and undeclared keys, prefixes, and databases for all 45 tools; prove exports, print, keyboard, and offline behavior in browsers. The generated matrix does not establish parity. Source inspection is done for the nine Video-slice routes, and browser proof of export, print, keyboard and storage behavior is done for the eight Video tools (see [Video-slice browser proof](#video-slice-browser-proof-2026-10-01)). Browser proof remains open for LED Wall Calculator and the other 36 tools, and offline proof remains open for every tool.
 - Audit every saved store's backup and recovery path, including cases where a destination already has a blank or edited Workbook. A record copied into IndexedDB is not proof that the active Workbook will switch to it.
 - Complete a field-by-field legacy Audio mapping and conflict review. The current preview reports known unmapped structured fields, but arbitrary unknown source fields and record-level conflicts need a complete audit before the old pages can be retired. Test repeat import and rollback through the UI.
 - Keep every old route and specialist state contract available until field and export parity, browser proof, and operator acceptance are recorded for its replacement.
 
 These gates are pending. The Stage 0 exit criterion and the later workspace stages are not yet complete.
+
+## Video-slice browser proof (2026-10-01)
+
+Stage 2 increment 2.0b closes the first gate above for the eight Video tools (Signal Flow, Video Patch, Display Plan, Projection Plan, Stream Plan, Record Log, Camera Shot List and Playback Check), except offline behavior. The other three gates are unchanged.
+
+`scripts/probe_av_video_legacy.mjs` (`npm run test:av-video-legacy-browser`, run by the Pages workflow) opens each page in Chromium with a synthetic fixture that fills every field in the [field matrix](av-suite-consolidation-stage2-video.md#field-matrix-for-the-video-import), including blank fields and the durations `2m30s`, `01:02:03:04`, `TBD` and `45 min`. For each page it proves that:
+
+- load, save and reload leave every stored field unchanged;
+- JSON export carries the page's schema string and imports back into an empty page unchanged;
+- the CSV header equals the matrix column order (Camera Shot List exports its labels);
+- print hides the toolbar, side panel and card view and keeps the table;
+- Cmd, Ctrl and Alt key combinations are not default-prevented and change no row, while the plain shortcut still works;
+- first launch writes nothing to the tool's key, and the first edit saves an empty list;
+- unreadable saved data is copied to `<key>.unreadable` and reported, an earlier copy is never replaced, and the page does not save over unreadable data that has no copy;
+- a file whose schema names another tool is rejected, a file without a schema is still accepted, and replacing existing rows asks with both counts, where Cancel leaves storage unchanged.
+
+It also checks the unrecognized-duration marker and runtime total on Playback Check and Record Log, and the raw-key warning on Stream Plan. Against the previous pages, 40 of its 112 checks passed. The fixtures are synthetic: field-by-field import mapping, real saved shows and operator acceptance remain Stage 2 increments 2.2 and 2.5.

@@ -1,5 +1,17 @@
 # Changelog
 
+## 2026-10-01 — AV Suite 2.0b: Video page data safety
+
+- Signal Flow, Record Log and Camera Shot List open empty on a new device instead of filling in sample rows, so a show name from the console is no longer saved over samples. Breakout Room Matrix, Network Plan, Power Plan, RF Coordination and Comms Check get the same fix. Samples load only from Load Sample, which now also asks before replacing rows on Camera Shot List and Comms Check. Camera Shot List keeps an empty list empty, and its Load Sample keeps the show details.
+- On the eight Video pages (Signal Flow, Video Patch, Display Plan, Projection Plan, Stream Plan, Record Log, Camera Shot List and Playback Check), saved data that cannot be read is copied to `<key>.unreadable` before anything is saved, the status line says where, and the page starts empty. If an earlier unreadable copy is already there, the page does not save over the data and says so; Export JSON still works.
+- Blank fields stay blank after a reload: Video Patch source and format, Projection Plan screen and aspect, Stream Plan encoder, Playback Check destination, and Camera Shot List camera, type, subject and shot number. New rows still start with the usual placeholders.
+- Playback Check and Record Log keep durations they cannot read, such as `2m30s`, `TBD` or `45 min`, exactly as typed and mark the row "Unrecognized duration". Those rows are left out of the runtime total, and Copy Summary says how many. Timecode with frames (`01:02:03:04`) keeps its frames. Whole seconds, MM:SS and HH:MM:SS read as before.
+- Cmd, Ctrl and Alt key combinations go to the browser again, so Cmd/Ctrl+P prints instead of playing the next cue or marking a row.
+- Import JSON refuses a file exported by another tool and asks before replacing existing rows, with both counts ("Replace 12 routes with 8 from the file?"). Cancel changes nothing. A file without a schema is still accepted.
+- Stream Plan warns in the row and in Copy Summary when a key label looks like a raw stream key. It does not block or change the label.
+- Status-line errors use the theme's danger color, so they are readable in Warm Paper. Signal Flow and Camera Shot List no longer print the card view beside the table.
+- `scripts/probe_av_video_legacy.mjs` (`npm run test:av-video-legacy-browser`, in the Pages workflow) checks reload, JSON round trip, CSV header, print, Cmd/Ctrl keys, first launch, unreadable data, foreign files and the replace confirmation on all eight pages with a fixture that fills every field-matrix field; 40 of its 112 checks passed against the previous pages. `scripts/verify_av_suite.js` now catches the other ways pages seeded samples and checks the eight pages' shortcut guard, and `scripts/probe_av_domain_views.js` loads samples with Load Sample.
+
 ## 2026-10-01 — Gear Reference keeps the embedded rig in its full layout
 
 - On a 900px-tall laptop screen the four FMP camera-chain sheets sized the rig frame at 612px, below the 640px where the rig switches to its short-screen layout. The model shrank to a 236px strip and the frame scrolled on its own, so the mouse wheel over the model scrolled the frame instead of the sheet. Above 680px wide the frame now stays 660–740px tall: the model and part panel sit side by side (canvas 527×431 at 1440×900) and the wheel scrolls the sheet.

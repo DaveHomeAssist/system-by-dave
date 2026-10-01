@@ -677,7 +677,7 @@
               <button id="deleteBtn" class="danger" type="button">Delete</button>
             </div>
           </div>
-          <p id="hint" class="hint" role="status">Loaded sample power plan.</p>
+          <p id="hint" class="hint" role="status">Add a circuit, or load the sample power plan.</p>
         </section>
         <section class="panel side-section" aria-label="Load by power source">
           <h2>Load by source</h2>
@@ -797,7 +797,7 @@
         utilityContact:String(meta.utilityContact || '').slice(0, 80),
         handoffTo:String(meta.handoffTo || '').slice(0, 80)
       },
-      circuits:Array.isArray(next.circuits) ? next.circuits.map(clonePower).slice(0, 250) : sampleCircuits.map(clonePower),
+      circuits:Array.isArray(next.circuits) ? next.circuits.map(clonePower).slice(0, 250) : [],
       selectedId:typeof next.selectedId === 'string' ? next.selectedId : '',
       filters:{
         search:String(next.filters && next.filters.search || ''),

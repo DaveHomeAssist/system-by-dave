@@ -47,6 +47,7 @@
     "test:shader-practice-browser": "node scripts/probe_shader_practice.js --no-sandbox",
     "test:camera-training-links": "node --test scripts/camera_training_links.test.mjs",
     "test:switcher-guide-browser": "node scripts/probe_switcher_guide.mjs --no-sandbox",
+    "test:av-video-legacy-browser": "node scripts/probe_av_video_legacy.mjs --no-sandbox",
     "test:av-save-safety-browser": "node scripts/probe_av_save_safety.mjs --no-sandbox",
     "test:av-nav-browser": "node scripts/probe_av_nav_dock.mjs --no-sandbox",
     "test:av-suite-import-browser": "node scripts/probe_av_suite_import.mjs --no-sandbox"

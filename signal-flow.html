@@ -471,7 +471,7 @@
     line-height:1.45;
   }
   .hint.success{color:var(--green)}
-  .hint.error{color:#ffd5d5}
+  .hint.error{color:var(--red)}
   .shortcut-list{
     display:grid;
     grid-template-columns:auto 1fr;
@@ -547,6 +547,7 @@
     .topbar,
     .toolbar,
     .side,
+    .av-domain-view,
     .skip-link{display:none !important}
     main{padding:0;width:100%}
     .hero{display:block}
@@ -712,7 +713,7 @@
               <button id="deleteBtn" class="danger wide" type="button">Delete</button>
             </div>
           </div>
-          <p id="hint" class="hint" role="status">Loaded sample signal flow.</p>
+          <p id="hint" class="hint" role="status">Add a route, or load the sample signal flow.</p>
         </section>
         <section class="panel side-section" aria-label="Keyboard shortcuts">
           <h2>Fast actions</h2>
@@ -742,6 +743,8 @@
   var FORMATS = ['SDI','HDMI','Dante','Analog audio','AES','NDI','IP','DMX','GPIO','AC','Other'];
   var CONNECTORS = ['BNC','HDMI','XLR','TRS','RJ45','Fiber LC','Edison','PowerCON','USB C','Phoenix','Other'];
   var $ = function(id){ return document.getElementById(id); };
+  var loadProblem = '';
+  var saveBlocked = false;
 
   var state = {
     meta:{
@@ -827,7 +830,7 @@
         networkLead:String(meta.networkLead || '').slice(0, 80),
         tdName:String(meta.tdName || '').slice(0, 80)
       },
-      routes:Array.isArray(next.routes) ? next.routes.map(cloneRoute).slice(0, 250) : sampleRoutes.map(cloneRoute),
+      routes:Array.isArray(next.routes) ? next.routes.map(cloneRoute).slice(0, 250) : [],
       selectedId:typeof next.selectedId === 'string' ? next.selectedId : '',
       filters:{
         search:String(next.filters && next.filters.search || ''),
@@ -838,20 +841,51 @@
   }
 
   function loadState(){
+    var raw;
     if(!storageAvailable()){
       state = normalizeState({});
       return;
     }
-    try{
-      var raw = localStorage.getItem(STORAGE_KEY);
-      state = raw ? normalizeState(JSON.parse(raw)) : normalizeState({});
-    }catch(e){
-      state = normalizeState({});
+    raw = localStorage.getItem(STORAGE_KEY);
+    state = normalizeState({});
+    if(raw){
+      try{
+        var parsed = JSON.parse(raw);
+        if(!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) throw new Error('Invalid payload');
+        state = normalizeState(parsed);
+      }catch(e){
+        state = normalizeState({});
+        keepUnreadable(raw);
+      }
     }
     if(!state.selectedId && state.routes[0]) state.selectedId = state.routes[0].id;
   }
 
+  /* Unreadable saved data is copied to "<key>.unreadable" before anything can save over it.
+     An earlier copy is never replaced; if no copy can be kept, the page does not save. */
+  function keepUnreadable(raw){
+    var key = STORAGE_KEY + '.unreadable';
+    var kept = null;
+    try{
+      kept = localStorage.getItem(key);
+      if(kept === null || kept === ''){
+        localStorage.setItem(key, raw);
+        kept = localStorage.getItem(key);
+      }
+    }catch(e){}
+    if(kept === raw){
+      loadProblem = 'Saved Signal Flow data could not be read, so the page started empty. A copy of the unreadable data is kept in this browser under ' + key + '.';
+      return;
+    }
+    saveBlocked = true;
+    loadProblem = 'Saved Signal Flow data could not be read, and no copy could be kept because ' + key + ' already holds an earlier copy or storage is full. This page is not saving, so the original stays in place. Export JSON to keep new work.';
+  }
+
   function saveState(){
+    if(saveBlocked){
+      showHint(loadProblem, 'error');
+      return false;
+    }
     if(!storageAvailable()) return false;
     try{
       localStorage.setItem(STORAGE_KEY, JSON.stringify({
@@ -1178,13 +1212,25 @@
     reader.onload = function(){
       try{
         var parsed = JSON.parse(String(reader.result || ''));
-        if(!parsed || typeof parsed !== 'object' || !Array.isArray(parsed.routes)) throw new Error('Invalid payload');
-        state = normalizeState({
+        var next;
+        if(!parsed || typeof parsed !== 'object') throw new Error('Invalid payload');
+        if(isForeignSchema(parsed.schema)){
+          showHint('That file is from another tool (' + parsed.schema.slice(0, 80) + '). Nothing was imported.', 'error');
+          signal($('importJsonBtn'), 'error');
+          return;
+        }
+        if(!Array.isArray(parsed.routes)) throw new Error('Invalid payload');
+        next = normalizeState({
           meta:parsed.meta || state.meta,
           routes:parsed.routes,
           selectedId:'',
           filters:{search:'',system:'all',status:'all'}
         });
+        if(state.routes.length && !window.confirm('Replace ' + countLabel(state.routes.length) + ' with ' + next.routes.length + ' from the file?')){
+          showHint('Import cancelled. Nothing changed.');
+          return;
+        }
+        state = next;
         if(state.routes[0]) state.selectedId = state.routes[0].id;
         saveState();
         render();
@@ -1200,6 +1246,15 @@
       signal($('importJsonBtn'), 'error');
     };
     reader.readAsText(file);
+  }
+
+  /* A file whose schema names another System by Dave tool is never imported here. */
+  function isForeignSchema(schema){
+    return typeof schema === 'string' && schema.replace(/\.v\d+$/, '') !== SCHEMA.replace(/\.v\d+$/, '');
+  }
+
+  function countLabel(count){
+    return count + (count === 1 ? ' route' : ' routes');
   }
 
   function syncMeta(){
@@ -1282,6 +1337,7 @@
       $('importInput').value = '';
     });
     document.addEventListener('keydown', function(event){
+      if(event.metaKey || event.ctrlKey || event.altKey) return;
       if(isTyping()) return;
       if(event.key === 'n' || event.key === 'N'){ event.preventDefault(); addRoute(state.selectedId); }
       if(event.key === 'v' || event.key === 'V'){ event.preventDefault(); setSelectedStatus('verified'); }
@@ -1313,6 +1369,10 @@
 
   function showHint(message, kind){
     var hint = $('hint');
+    if(saveBlocked && message !== loadProblem){
+      message += ' Not saved; export JSON to keep it.';
+      kind = 'error';
+    }
     hint.textContent = message;
     hint.classList.remove('success','error');
     if(kind) hint.classList.add(kind);
@@ -1415,6 +1475,7 @@
   loadState();
   render();
   bindEvents();
+  if(loadProblem) showHint(loadProblem, 'error');
 })();
 </script>
 <script src="js/sbd-registry.js"></script>

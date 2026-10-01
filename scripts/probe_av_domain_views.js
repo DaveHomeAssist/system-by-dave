@@ -327,17 +327,22 @@ async function main() {
         deviceScaleFactor: 1,
         mobile: false
       });
+      // Start from cleared storage and load the sample through the page's own Load Sample button.
+      // Pages start empty (scripts/verify_av_suite.js), so the probe never relies on seeded rows.
+      await cdp('Page.navigate', { url: new URL(target.page, baseUrl).href });
+      await delay(1200);
+      await evaluate('localStorage.clear(); sessionStorage.clear(); true');
       await cdp('Page.navigate', { url: new URL(target.page, baseUrl).href });
       await delay(2200);
 
-      await evaluate(`(() => {
-        const hasRows = Boolean(document.querySelector(${JSON.stringify(`${target.body} tr[data-id]`)}));
-        if (!hasRows) {
-          const sampleButton = document.getElementById('loadSampleBtn') || document.getElementById('sampleBtn');
-          if (sampleButton) sampleButton.click();
-          else if (typeof loadSample === 'function') loadSample();
-        }
+      const loadedSample = await evaluate(`(() => {
+        const sampleButton = document.getElementById('loadSampleBtn') || document.getElementById('sampleBtn');
+        if (!sampleButton) return false;
+        window.confirm = () => true;
+        sampleButton.click();
+        return true;
       })()`);
+      assert(loadedSample, `${target.name} has no Load Sample button.`);
       await delay(350);
 
       let state = await snapshot(target);

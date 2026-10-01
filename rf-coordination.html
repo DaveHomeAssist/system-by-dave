@@ -682,7 +682,7 @@
               <button id="deleteBtn" class="danger" type="button">Delete</button>
             </div>
           </div>
-          <p id="hint" class="hint" role="status">Loaded sample RF plan.</p>
+          <p id="hint" class="hint" role="status">Add a unit, or load the sample RF plan.</p>
         </section>
         <section class="panel side-section" aria-label="Keyboard shortcuts">
           <h2>Fast actions</h2>
@@ -798,7 +798,7 @@
         scanWindow:String(meta.scanWindow || '').slice(0, 100),
         handoffTo:String(meta.handoffTo || '').slice(0, 80)
       },
-      units:Array.isArray(next.units) ? next.units.map(cloneUnit).slice(0, 300) : sampleUnits.map(cloneUnit),
+      units:Array.isArray(next.units) ? next.units.map(cloneUnit).slice(0, 300) : [],
       selectedId:typeof next.selectedId === 'string' ? next.selectedId : '',
       filters:{
         search:String(next.filters && next.filters.search || ''),
