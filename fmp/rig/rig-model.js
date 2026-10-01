@@ -1128,7 +1128,12 @@ canvas.addEventListener('pointerleave',()=>{if(!touches.size)clearHover();});
 // Scrolling or pinching over the model zooms it, like the other equipment viewers (Dave, October 1);
 // the rest of the page scrolls normally. macOS turns Shift+wheel into horizontal scrolling, so Shift
 // reads the horizontal axis. A plain horizontal swipe stays with the browser (back/forward gestures).
+// Embedded in a Gear Reference sheet, the model is one part of a longer document, so a plain scroll
+// keeps scrolling the sheet and Shift+scroll or a pinch zooms.
+const embeddedInSheet=()=>document.documentElement.dataset.embed==='gear-reference';
+if(embeddedInSheet())$('[data-wheel-help]').textContent='Shift + scroll or pinch over the model to zoom';
 canvas.addEventListener('wheel',event=>{
+  if(embeddedInSheet()&&!event.shiftKey&&!event.ctrlKey)return;
   const delta=event.shiftKey&&!event.deltaY?event.deltaX:event.deltaY;
   if(!delta)return;
   event.preventDefault();

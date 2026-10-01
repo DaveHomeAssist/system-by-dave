@@ -1,10 +1,12 @@
 # Changelog
 
-## 2026-10-01 — FMP rig zooms on scroll and trackpad pinch again
+## 2026-10-01 — FMP rig scroll and pinch zoom; walk keeps its place; /fmp/walk/
 
-- Scrolling over the 3D rig explorer's model (`/fmp/rig/`) zooms it again, as in the ATEM, P240, CCU4 and SuperJoy viewers (Dave, 2026-10-01). The rest of the page scrolls normally. A trackpad pinch over the model zooms the model rather than the page (Ctrl+wheel in Chrome and Firefox, gesture events in Safari).
-- The September 16 accessibility release had required Shift+scroll. macOS reports that as a horizontal scroll, so on a Mac it zoomed by nothing while still blocking the event. Shift+scroll now reads that axis. A plain horizontal swipe stays with the browser's back/forward gesture, and one flick zooms at most about 35%.
-- Re-exported from fmp-suite `3812e05` (DaveHomeAssist/fmp-suite#37). fmp-suite's unit test covers scroll, line-mode wheels, pinch, the Mac Shift case and Safari gestures; its browser suite drives a real mouse wheel and Ctrl+wheel at 1440×900. Not tested with a physical Mac mouse, trackpad or Safari.
+- Scrolling over the 3D rig explorer's model (`/fmp/rig/`) zooms it again, as in the ATEM, P240, CCU4 and SuperJoy viewers (Dave, 2026-10-01). The rest of the page scrolls normally. A trackpad pinch over the model zooms the model rather than the page (Ctrl+wheel in Chrome and Firefox, gesture events in Safari). The September 16 accessibility release had required Shift+scroll, which macOS reports as a horizontal scroll, so on a Mac it zoomed by nothing while still blocking the event; Shift+scroll now reads that axis. A plain horizontal swipe stays with the browser's back/forward gesture, and one flick zooms at most about 35%.
+- Embedded in a Gear Reference sheet, a plain scroll over the rig keeps scrolling the sheet (as the frame sizing above intends); Shift+scroll and pinch zoom, and the rig's Help text says so.
+- The preshow walk keeps its place when Setup or zones change mid-walk: it stays on the current stop by id, falls back to the first unwalked stop if that stop left the route, and a finished walk stays finished. Before, any Setup edit, such as fixing a typo in the show name, sent the walker back to stop 1.
+- A typed `/fmp/walk/` (a hygiene-probe 404) is now a noindex redirect to `https://walk.housevideo.app/fmpwalk/` that keeps query and hash. `verify_fmp_release.js` expects and checks it, the navigation verifier lists it as an FMP shell, and the indexing count is 148.
+- Re-exported from fmp-suite `5684a13`, the merge of DaveHomeAssist/fmp-suite#39, which includes #37 and #38. That release also removes `https://davehomeassist.github.io` from the camera backend's default origins (its deployments return 404); it takes effect on the next backend deploy. fmp-suite's unit, backend, walk and public browser suites pass; the rig zoom was not tested with a physical Mac mouse, trackpad or Safari.
 
 ## 2026-10-01 — Gear Reference keeps the embedded rig in its full layout
 
