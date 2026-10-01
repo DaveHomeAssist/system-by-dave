@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
 import { createBlankWorkbook } from "./sampleWorkbook";
 import {
-  ACTIVE_KEY, FALLBACK_KEY, assessStoredWorkbook, importWorkbook, loadActiveWorkbook, startBlankWorkbook,
-  type WorkbookBackend
+  ACTIVE_KEY, FALLBACK_KEY, WorkbookChangedElsewhereError, assessStoredWorkbook, importWorkbook, loadActiveWorkbook, saveEditedWorkbook,
+  startBlankWorkbook, type WorkbookBackend
 } from "./store";
 import type { AvWorkbook } from "./types";
 
@@ -183,5 +183,44 @@ describe("loadActiveWorkbook", () => {
     expect(blank.workbookId).not.toBe("wb-active");
     expect(memory.values.get(ACTIVE_KEY)).toBe(blank.workbookId);
     expect(memory.records.get("wb-active")).toBe(record);
+  });
+});
+
+describe("saveEditedWorkbook", () => {
+  it("saves an edit when the stored copy is still one this version reads", async () => {
+    const record = storedWorkbook("wb-active");
+    const memory = memoryBackend({ records: { "wb-active": record }, storage: { [ACTIVE_KEY]: "wb-active" } });
+    const saved = await saveEditedWorkbook({ ...record, show: { ...record.show, venue: "Hall B" } }, memory.backend);
+    expect(saved.show.venue).toBe("Hall B");
+    expect(memory.table.put).toHaveBeenCalledTimes(1);
+  });
+
+  it("refuses to save over a copy a newer version wrote after this tab loaded", async () => {
+    const loaded = storedWorkbook("wb-active");
+    const newer = { ...loaded, schema: "system-by-dave.av-workbook.v2", videoEndpoints: [{ id: "ep-1" }] };
+    const memory = memoryBackend({ records: { "wb-active": newer }, storage: { [ACTIVE_KEY]: "wb-active" } });
+    const attempt = saveEditedWorkbook({ ...loaded, show: { ...loaded.show, venue: "Hall B" } }, memory.backend);
+    await expect(attempt).rejects.toBeInstanceOf(WorkbookChangedElsewhereError);
+    await attempt.catch((error: WorkbookChangedElsewhereError) => {
+      expect(error.readOnly.reason.code).toBe("newer-schema");
+      expect(error.readOnly.raw).toBe(newer);
+    });
+    expect(memory.table.put).not.toHaveBeenCalled();
+    expect(memory.storage.setItem).not.toHaveBeenCalled();
+    expect(memory.records.get("wb-active")).toBe(newer);
+  });
+
+  it("checks the fallback copy of the same workbook when IndexedDB cannot be read", async () => {
+    const loaded = storedWorkbook("wb-active");
+    const fallback = JSON.stringify({ ...loaded, videoEndpoints: [] });
+    const memory = memoryBackend({ failReads: true, failWrites: true, storage: { [ACTIVE_KEY]: "wb-active", [FALLBACK_KEY]: fallback } });
+    await expect(saveEditedWorkbook(loaded, memory.backend)).rejects.toBeInstanceOf(WorkbookChangedElsewhereError);
+    expect(memory.values.get(FALLBACK_KEY)).toBe(fallback);
+  });
+
+  it("saves a new workbook id that has no stored copy yet", async () => {
+    const memory = memoryBackend({ storage: { [ACTIVE_KEY]: "wb-old" } });
+    const saved = await saveEditedWorkbook(storedWorkbook("wb-import-1"), memory.backend);
+    expect(memory.values.get(ACTIVE_KEY)).toBe(saved.workbookId);
   });
 });

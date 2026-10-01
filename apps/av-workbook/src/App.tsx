@@ -5,8 +5,8 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { DataGrid } from "./DataGrid";
 import { EngineDashboard } from "./EngineDashboard";
 import {
-  downloadText, exportWorkbook, importWorkbook, loadActiveWorkbook, readActiveWorkbook, saveWorkbook, startBlankWorkbook,
-  storedWorkbookText, type WorkbookReadOnly
+  WorkbookChangedElsewhereError, downloadText, exportWorkbook, importWorkbook, loadActiveWorkbook, readActiveWorkbook, saveEditedWorkbook,
+  startBlankWorkbook, storedWorkbookText, type WorkbookReadOnly
 } from "./store";
 import { mergeLegacyAudioIntoWorkbook, readLegacyAudioBundle } from "./legacyAudioImport";
 import { launchContextChanges, readLaunchContext, withLaunchContext } from "./launchContext";
@@ -200,7 +200,15 @@ export default function App() {
       setMessage("This workbook is open read-only. Nothing was saved.");
       return null;
     }
-    return saveWorkbook(next);
+    try {
+      return await saveEditedWorkbook(next);
+    } catch (error: unknown) {
+      if (!(error instanceof WorkbookChangedElsewhereError)) throw error;
+      // A newer version rewrote this workbook after this tab loaded it: stop rather than strip its fields.
+      setReadOnly(error.readOnly);
+      setMessage("This workbook was changed by a newer version in another tab or window. Nothing was saved.");
+      return null;
+    }
   }
 
   async function updateShow<K extends keyof AvWorkbook["show"]>(key: K, value: AvWorkbook["show"][K]) {

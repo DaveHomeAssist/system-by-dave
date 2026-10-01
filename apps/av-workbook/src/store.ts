@@ -230,6 +230,46 @@ export async function saveWorkbook(workbook: AvWorkbook, backend: WorkbookBacken
   return next;
 }
 
+/** A save refused because another tab or window running a newer or incompatible version rewrote the stored workbook. */
+export class WorkbookChangedElsewhereError extends Error {
+  readonly readOnly: WorkbookReadOnly;
+
+  constructor(readOnly: WorkbookReadOnly) {
+    super(readOnly.reason.summary);
+    this.name = "WorkbookChangedElsewhereError";
+    this.readOnly = readOnly;
+  }
+}
+
+/**
+ * Saves an edit to the open workbook, unless its stored copy is no longer one this version can
+ * fully represent. A tab left open on an older release then stops instead of stripping fields
+ * that a newer release wrote after this tab loaded.
+ */
+export async function saveEditedWorkbook(workbook: AvWorkbook, backend: WorkbookBackend = browserBackend()): Promise<AvWorkbook> {
+  let stored: unknown;
+  let source: WorkbookSource = "indexeddb";
+  try {
+    stored = await backend.table.get(workbook.workbookId);
+  } catch {
+    stored = undefined;
+  }
+  if (stored === undefined || stored === null) {
+    const fallback = backend.storage?.getItem(FALLBACK_KEY) ?? null;
+    if (fallback !== null && storedWorkbookId(fallback) === workbook.workbookId) {
+      stored = fallback;
+      source = "fallback";
+    }
+  }
+  if (stored !== undefined && stored !== null) {
+    const assessment = assessStoredWorkbook(stored);
+    if (assessment.status === "read-only") {
+      throw new WorkbookChangedElsewhereError({ status: "read-only", activeId: workbook.workbookId, source, reason: assessment.reason, raw: assessment.raw });
+    }
+  }
+  return saveWorkbook(workbook, backend);
+}
+
 export function exportWorkbook(workbook: AvWorkbook): string {
   return JSON.stringify(validateWorkbook(workbook), null, 2);
 }
