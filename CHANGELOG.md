@@ -5,6 +5,11 @@
 - Publish the FMP walk from canonical source `20d23c6c88c28d67c4a6381f688dbfe50728c727` with focused task selection and Back/Next instead of document or panel scrolling. Paginate long notes, reports, fault forms and dialogs while preserving saved observations and complete backup data.
 - Put dated photos and known faults in Reference and replace narrow route-strip buttons with a 44px station selector. Verify all contract viewport sizes, short/zoom-equivalent layouts, visual-viewport keyboard insets and existing walk workflows; extend the managed-release allowlist for the local paging assets.
 
+## 2026-10-01 — Cheesesteak Heatmap photos and play
+
+- Sync `/cheesesteaks/` from philly-cheesesteak-heatmap `bf4d578`: a Pick for me button spins through the visible shops, lands on one (hotter shops are likelier) and flies the map there; an Order like a local builder shows and can speak the window order (for example "One Whiz wit"). Reduced motion skips the spin.
+- Photos from `9353e76`: shop cards show a thumbnail and the detail panel shows photos for Jim's, Dalessandro's, Pat's, Geno's, John's Roast Pork, Sonny's and Steve's; the map page opens with a strip of three cheesesteak photos. All twelve are Wikimedia Commons photos stored in the export, credited in each caption and on the About page.
+
 ## 2026-10-01 — AV Suite Toolbox and focused application plan
 
 - Revise the consolidation plan around default Toolbox entry, separate focused applications with a shared experience, and reversible optional modules that preserve saved data.
