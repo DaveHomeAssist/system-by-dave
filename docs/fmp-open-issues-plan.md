@@ -20,8 +20,13 @@ agent cannot do.
 | A6 | Done in system-by-dave #181 |
 | A7 | Done in system-by-dave #185: L3 reports a 403 or 429 from a browser-checked host as unverified (grey), never as a pass, and the overall light can then be Grey but not Green. A 404 or 5xx still warns. Unit-tested |
 | A8 | Done: system-by-dave #185 resolved camera-sim audit rows D10 and W2; fmp-suite #41 records an outcome for every walk UX audit recommendation (`docs/walk-ux-audit-outcomes.md`) and for the operator reference review |
-| B2 | In review: fmp-suite #40, hash routes for the walk (`#/walk/<stop>`, `#/faults`, `#/report`) with Back, reload and deep links; the first Back closes an open fault sheet |
+| B2 | Fixed in source: fmp-suite #40 (merged), shipped by the system-by-dave #179 release export. Hash routes for the walk (`#/walk/<stop>`, `#/faults`, `#/report`) with Back, reload and deep links; the first Back closes an open fault sheet |
 | B3 | Done: system-by-dave #187, a weekly WebKit smoke for the Camera Simulator. Its first CI run rendered with WebGL on iPhone 13 and iPad Pro 11 emulation (8/8) |
+| B4 | In review: fmp-suite #43, a sticky Pass/Flag/Skip bar above the nav |
+| B6 | Partly in review: fmp-suite #43 ties every reading label to its field. Segmented controls for yes/no and level readings remain |
+| B7 | In review: fmp-suite #44, Display mode after the zones, a sticky Start walk (it sat at y=1435 on a 390x844 phone) and a distinct Required style |
+| B8 | In review: fmp-suite #43, `--dim` at 4.5:1 on all card surfaces in both modes (Night measured 2.84:1), 44px targets, heading levels, status emoji hidden from screen readers |
+| B9 | In review: fmp-suite #45, preview first, Send as the one primary action, a global disabled style, Retry Notion only after a failure. Moving Clear and start over to Setup follows #44 |
 
 ## Phase A: small fixes, no hardware
 
