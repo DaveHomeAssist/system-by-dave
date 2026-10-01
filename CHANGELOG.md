@@ -10,6 +10,7 @@
 - Import JSON refuses a file exported by another tool and asks before replacing existing rows, with both counts ("Replace 12 routes with 8 from the file?"). Cancel changes nothing. A file without a schema is still accepted.
 - Stream Plan warns in the row and in Copy Summary when a key label looks like a raw stream key. It does not block or change the label.
 - Status-line errors use the theme's danger color, so they are readable in Warm Paper. Signal Flow and Camera Shot List no longer print the card view beside the table.
+- Offline cache version `v20261001-video-pages`, so installed copies pick up the changed tool pages; Throwline Stage 3D's offline check follows it.
 - `scripts/probe_av_video_legacy.mjs` (`npm run test:av-video-legacy-browser`, in the Pages workflow) checks reload, JSON round trip, CSV header, print, Cmd/Ctrl keys, first launch, unreadable data, foreign files and the replace confirmation on all eight pages with a fixture that fills every field-matrix field; 40 of its 112 checks passed against the previous pages. `scripts/verify_av_suite.js` now catches the other ways pages seeded samples and checks the eight pages' shortcut guard, and `scripts/probe_av_domain_views.js` loads samples with Load Sample.
 
 ## 2026-10-01 — AV Suite 2.0a: show-context and Workbook load safety
