@@ -195,16 +195,33 @@ function assertPageContracts(registry) {
     fail('AV Calculator does not migrate saved watt inputs without assuming a power factor.');
   }
 
+  // Samples load only through Load Sample. These catch a load-time fallback to samples:
+  // "list: Array.isArray(x) ? … : sampleRows.map(cloneRow)", "if(!x.length) x = sample…",
+  // and a default state built with "rows: sampleRows()".
   const autoSeedPatterns = [
-    /:\s*sampleCues\.map\(cloneCue\)/,
-    /:\s*sampleItems\.map\(cloneItem\)/,
-    /if\(!next\.items\.length\)\s*next\.items\s*=\s*sampleItems\.map\(cloneItem\)/
+    /:\s*sample[A-Z]\w*\.map\(\s*clone[A-Z]\w*\s*\)/,
+    /if\s*\(\s*!\s*[\w.]+\.length\s*\)\s*\{?\s*[\w.]+\s*=\s*sample[A-Z]\w*/,
+    /:\s*sample[A-Z]\w*\(\s*\)/
   ];
   registry.tools.forEach((tool) => {
     const source = read(pageFile(tool.href));
     if (autoSeedPatterns.some((pattern) => pattern.test(source))) {
       fail(`${tool.href} automatically seeds sample operations instead of starting empty.`);
     }
+  });
+
+  // Video legacy pages (docs/av-suite-consolidation-stage2-video.md, increment 2.0b): single-key
+  // shortcuts must leave Cmd/Ctrl/Alt combinations (print, reload, bookmark) to the browser.
+  ['signal-flow.html', 'video-patch.html', 'display-plan.html', 'projection-plan.html', 'stream-plan.html',
+    'record-log.html', 'camera-shot-list.html', 'playback-check.html'].forEach((rel) => {
+    const source = read(rel);
+    const handlers = source.match(/document\.addEventListener\(\s*(['"])keydown\1\s*,\s*function\s*\(\s*\w+\s*\)\s*\{[\s\S]{0,160}/g) || [];
+    if (!handlers.length) fail(`${rel} has no document keydown handler to check.`);
+    handlers.forEach((handler) => {
+      const name = handler.match(/function\s*\(\s*(\w+)\s*\)/)[1];
+      const guard = new RegExp(`\\{\\s*if\\s*\\(\\s*${name}\\.metaKey\\s*\\|\\|\\s*${name}\\.ctrlKey\\s*\\|\\|\\s*${name}\\.altKey\\s*\\)\\s*return;`);
+      if (!guard.test(handler)) fail(`${rel} single-key shortcuts do not return early for Cmd, Ctrl or Alt.`);
+    });
   });
   const workbookStore = read('apps/av-workbook/src/store.ts');
   if (/createSampleWorkbook/.test(workbookStore)) {

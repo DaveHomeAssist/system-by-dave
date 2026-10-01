@@ -142,6 +142,9 @@ function storagePolicy(site, registry) {
   if (site.storage.registryKeys) {
     for (const tool of registry.tools) for (const item of tool.storageKeys || []) keys.add(item.key);
   }
+  // A page that cannot parse its saved value keeps the original under "<key>.unreadable"
+  // (docs/av-suite-consolidation-stage0.md); that copy travels and is backed up with its key.
+  for (const key of [...keys]) keys.add(`${key}.unreadable`);
   return {
     keys: [...keys].sort(),
     prefixes: [...(site.storage.prefixes || [])].sort(),

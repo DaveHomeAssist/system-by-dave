@@ -678,7 +678,7 @@
               <button id="deleteBtn" class="danger" type="button">Delete</button>
             </div>
           </div>
-          <p id="hint" class="hint" role="status">Loaded sample network plan.</p>
+          <p id="hint" class="hint" role="status">Add a device, or load the sample network plan.</p>
         </section>
         <section class="panel side-section" aria-label="Keyboard shortcuts">
           <h2>Fast actions</h2>
@@ -795,7 +795,7 @@
         internetProvider:String(meta.internetProvider || '').slice(0, 100),
         handoffTo:String(meta.handoffTo || '').slice(0, 80)
       },
-      devices:Array.isArray(next.devices) ? next.devices.map(cloneDevice).slice(0, 300) : sampleDevices.map(cloneDevice),
+      devices:Array.isArray(next.devices) ? next.devices.map(cloneDevice).slice(0, 300) : [],
       selectedId:typeof next.selectedId === 'string' ? next.selectedId : '',
       filters:{
         search:String(next.filters && next.filters.search || ''),

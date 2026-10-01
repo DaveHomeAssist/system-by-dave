@@ -255,7 +255,9 @@ try {
       assert.equal(await original.evaluate(id => JSON.parse(localStorage.getItem('sbd.domainMove.' + id + '.v1')).state, site.id), 'moved');
       await page.bringToFront();
       await page.goto(source + (site.fromRoute || site.route));
-      await page.waitForURL(site.origin + site.route);
+      // The walk writes its own hash route on load (fmp-suite #40), so match the
+      // destination origin and path rather than the exact URL.
+      await page.waitForURL(url => url.origin + url.pathname === site.origin + site.route);
       assert.equal(await page.evaluate(key => localStorage.getItem(key), site.key), 'new destination edit');
       if (site.id === 'avbydave') {
         await page.waitForFunction(() => navigator.serviceWorker.controller, null, { timeout: 30000, polling: 100 });
@@ -375,7 +377,7 @@ try {
       const original = await context.newPage();
       await original.goto(source + '/index.html');
       assert.deepEqual(await readWorkbook(original), { active: workbookFixture.workbookId, workbook: workbookFixture });
-      assert.equal(await original.evaluate(() => JSON.parse(localStorage.getItem('sbd.domainMove.avbydave.v1')).revision), 2);
+      assert.equal(await original.evaluate(() => JSON.parse(localStorage.getItem('sbd.domainMove.avbydave.v1')).revision), 3);
     });
   }
 
@@ -409,6 +411,9 @@ try {
     const site = sites.find(entry => entry.id === 'avbydave');
     const expected = Object.fromEntries(avStorageKeys.map((key, index) => [key, JSON.stringify({ fixture: 'stage0', index })]));
     expected['sbd.handoff.stage0-fixture'] = JSON.stringify({ fixture: 'prefix', status: 'draft' });
+    // Kept copies of unreadable saves travel and restore with their keys.
+    expected['signal-flow.v1.unreadable'] = '{"routes":[{"route":"SF 001"';
+    expected['av-suite-dashboard.v1.unreadable'] = '{"showName":"Unreadable show"';
     await page.goto(source + '/index.html');
     await page.evaluate(values => Object.entries(values).forEach(([key, value]) => localStorage.setItem(key, value)), expected);
     await page.goto(source + site.route + '?cutover=registry-keys');

@@ -434,7 +434,22 @@
     line-height:1.45;
   }
   .hint.success{color:var(--green)}
-  .hint.error{color:#ffd5d5}
+  .hint.error{color:var(--red)}
+  .row-input.is-unrecognized{border-color:var(--amber)}
+  .duration-flag{
+    display:block;
+    max-width:100%;
+    margin-top:4px;
+    padding:2px 6px;
+    border:1px solid var(--av-warning-line, rgba(255,209,102,.44));
+    border-radius:6px;
+    background:var(--av-warning-soft, rgba(255,209,102,.12));
+    color:var(--amber);
+    font-size:11px;
+    font-weight:700;
+    line-height:1.3;
+    white-space:normal;
+  }
   .shortcut-list{
     display:grid;
     grid-template-columns:auto 1fr;
@@ -676,7 +691,7 @@
               <button id="deleteBtn" class="danger" type="button">Delete</button>
             </div>
           </div>
-          <p id="hint" class="hint" role="status">Loaded sample record log.</p>
+          <p id="hint" class="hint" role="status">Add a record, or load the sample record log.</p>
         </section>
         <section class="panel side-section" aria-label="Keyboard shortcuts">
           <h2>Fast actions</h2>
@@ -708,6 +723,8 @@
   var RESOLUTIONS = ['1080p','4K','720p','audio only','mixed','other'];
   var AUDIO = ['embedded','separate','program','matrix','multitrack','none'];
   var $ = function(id){ return document.getElementById(id); };
+  var loadProblem = '';
+  var saveBlocked = false;
 
   var state = {
     meta:{
@@ -794,7 +811,7 @@
         audioLead:String(meta.audioLead || '').slice(0, 80),
         handoffTo:String(meta.handoffTo || '').slice(0, 80)
       },
-      records:Array.isArray(next.records) ? next.records.map(cloneRecord).slice(0, 250) : sampleRecords.map(cloneRecord),
+      records:Array.isArray(next.records) ? next.records.map(cloneRecord).slice(0, 250) : [],
       selectedId:typeof next.selectedId === 'string' ? next.selectedId : '',
       filters:{
         search:String(next.filters && next.filters.search || ''),
@@ -805,20 +822,51 @@
   }
 
   function loadState(){
+    var raw;
     if(!storageAvailable()){
       state = normalizeState({});
       return;
     }
-    try{
-      var raw = localStorage.getItem(STORAGE_KEY);
-      state = raw ? normalizeState(JSON.parse(raw)) : normalizeState({});
-    }catch(e){
-      state = normalizeState({});
+    raw = localStorage.getItem(STORAGE_KEY);
+    state = normalizeState({});
+    if(raw){
+      try{
+        var parsed = JSON.parse(raw);
+        if(!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) throw new Error('Invalid payload');
+        state = normalizeState(parsed);
+      }catch(e){
+        state = normalizeState({});
+        keepUnreadable(raw);
+      }
     }
     if(!state.selectedId && state.records[0]) state.selectedId = state.records[0].id;
   }
 
+  /* Unreadable saved data is copied to "<key>.unreadable" before anything can save over it.
+     An earlier copy is never replaced; if no copy can be kept, the page does not save. */
+  function keepUnreadable(raw){
+    var key = STORAGE_KEY + '.unreadable';
+    var kept = null;
+    try{
+      kept = localStorage.getItem(key);
+      if(kept === null || kept === ''){
+        localStorage.setItem(key, raw);
+        kept = localStorage.getItem(key);
+      }
+    }catch(e){}
+    if(kept === raw){
+      loadProblem = 'Saved Record Log data could not be read, so the page started empty. A copy of the unreadable data is kept in this browser under ' + key + '.';
+      return;
+    }
+    saveBlocked = true;
+    loadProblem = 'Saved Record Log data could not be read, and no copy could be kept because ' + key + ' already holds an earlier copy or storage is full. This page is not saving, so the original stays in place. Export JSON to keep new work.';
+  }
+
   function saveState(){
+    if(saveBlocked){
+      showHint(loadProblem, 'error');
+      return false;
+    }
     if(!storageAvailable()) return false;
     try{
       localStorage.setItem(STORAGE_KEY, JSON.stringify({
@@ -903,7 +951,7 @@
         cell('<select class="row-select field-medium" data-field="audio" aria-label="Audio">' + selectOptions(AUDIO, record.audio, '') + '</select>') +
         cell('<input class="row-input field-large" data-field="media" value="' + escapeAttr(record.media) + '" aria-label="Media">') +
         cell('<select class="row-select field-small" data-field="status" aria-label="Status">' + selectOptions(STATUS, record.status, '') + '</select>') +
-        cell('<input class="row-input mono field-small" data-field="duration" value="' + escapeAttr(record.duration) + '" aria-label="Duration">') +
+        durationCell(record) +
         cell('<input class="row-input field-medium" data-field="backup" value="' + escapeAttr(record.backup) + '" aria-label="Backup">') +
         cell('<textarea class="row-textarea field-notes" data-field="notes" aria-label="Notes">' + escapeHtml(record.notes) + '</textarea>') +
         '</tr>';
@@ -1094,7 +1142,7 @@
     lines.push('Audio: ' + state.meta.audioLead);
     lines.push('Handoff: ' + state.meta.handoffTo);
     lines.push('');
-    lines.push('Summary: ' + state.records.length + ' records, ' + state.records.filter(function(record){ return record.status === 'rolling'; }).length + ' rolling, ' + issues.length + ' issues, ' + state.records.filter(function(record){ return record.status === 'delivered'; }).length + ' delivered, runtime ' + formatDuration(totalSeconds(state.records)));
+    lines.push('Summary: ' + state.records.length + ' records, ' + state.records.filter(function(record){ return record.status === 'rolling'; }).length + ' rolling, ' + issues.length + ' issues, ' + state.records.filter(function(record){ return record.status === 'delivered'; }).length + ' delivered, runtime ' + formatDuration(totalSeconds(state.records)) + unrecognizedNote(state.records));
     if(issues.length){
       lines.push('');
       lines.push('Issues:');
@@ -1145,13 +1193,25 @@
     reader.onload = function(){
       try{
         var parsed = JSON.parse(String(reader.result || ''));
-        if(!parsed || typeof parsed !== 'object' || !Array.isArray(parsed.records)) throw new Error('Invalid payload');
-        state = normalizeState({
+        var next;
+        if(!parsed || typeof parsed !== 'object') throw new Error('Invalid payload');
+        if(isForeignSchema(parsed.schema)){
+          showHint('That file is from another tool (' + parsed.schema.slice(0, 80) + '). Nothing was imported.', 'error');
+          signal($('importJsonBtn'), 'error');
+          return;
+        }
+        if(!Array.isArray(parsed.records)) throw new Error('Invalid payload');
+        next = normalizeState({
           meta:parsed.meta || state.meta,
           records:parsed.records,
           selectedId:'',
           filters:{search:'',type:'all',status:'all'}
         });
+        if(state.records.length && !window.confirm('Replace ' + countLabel(state.records.length) + ' with ' + next.records.length + ' from the file?')){
+          showHint('Import cancelled. Nothing changed.');
+          return;
+        }
+        state = next;
         if(state.records[0]) state.selectedId = state.records[0].id;
         saveState();
         render();
@@ -1167,6 +1227,15 @@
       signal($('importJsonBtn'), 'error');
     };
     reader.readAsText(file);
+  }
+
+  /* A file whose schema names another System by Dave tool is never imported here. */
+  function isForeignSchema(schema){
+    return typeof schema === 'string' && schema.replace(/\.v\d+$/, '') !== SCHEMA.replace(/\.v\d+$/, '');
+  }
+
+  function countLabel(count){
+    return count + (count === 1 ? ' record' : ' records');
   }
 
   function syncMeta(){
@@ -1250,6 +1319,7 @@
       $('importInput').value = '';
     });
     document.addEventListener('keydown', function(event){
+      if(event.metaKey || event.ctrlKey || event.altKey) return;
       if(isTyping()) return;
       if(event.key === 'n' || event.key === 'N'){ event.preventDefault(); addRecord(state.selectedId); }
       if(event.key === 'a' || event.key === 'A'){ event.preventDefault(); setSelectedStatus('armed'); }
@@ -1282,6 +1352,10 @@
 
   function showHint(message, kind){
     var hint = $('hint');
+    if(saveBlocked && message !== loadProblem){
+      message += ' Not saved; export JSON to keep it.';
+      kind = 'error';
+    }
     hint.textContent = message;
     hint.classList.remove('success','error');
     if(kind) hint.classList.add(kind);
@@ -1311,18 +1385,50 @@
     return records.reduce(function(sum, record){ return sum + parseDuration(record.duration); }, 0);
   }
 
+  /* Durations: whole seconds, MM:SS and HH:MM:SS parse cleanly and are tidied to MM:SS or
+     HH:MM:SS as before. HH:MM:SS:FF timecode keeps its frames as typed and counts as HH:MM:SS.
+     Anything else stays exactly as typed, is flagged in the row and is left out of the runtime. */
+  function readDuration(value){
+    var text = String(value == null ? '' : value).trim();
+    var match;
+    if(text === '') return {kind:'blank', seconds:0};
+    if(/^\d+$/.test(text)) return {kind:'clean', seconds:Number(text)};
+    match = text.match(/^(\d+)\s*:\s*(\d+)$/);
+    if(match) return {kind:'clean', seconds:Number(match[1]) * 60 + Number(match[2])};
+    match = text.match(/^(\d+)\s*:\s*(\d+)\s*:\s*(\d+)$/);
+    if(match) return {kind:'clean', seconds:Number(match[1]) * 3600 + Number(match[2]) * 60 + Number(match[3])};
+    match = text.match(/^(\d+):(\d{1,2}):(\d{1,2})[:;](\d{1,3})$/);
+    if(match) return {kind:'timecode', seconds:Number(match[1]) * 3600 + Number(match[2]) * 60 + Number(match[3])};
+    return {kind:'unrecognized', seconds:0};
+  }
+
   function parseDuration(value){
-    var parts = String(value || '').trim().split(':').map(function(part){ return parseInt(part, 10); });
-    if(parts.some(function(part){ return !Number.isFinite(part); })) return 0;
-    if(parts.length === 1) return Math.max(0, parts[0]);
-    if(parts.length === 2) return Math.max(0, parts[0] * 60 + parts[1]);
-    return Math.max(0, parts[0] * 3600 + parts[1] * 60 + parts[2]);
+    return readDuration(value).seconds;
+  }
+
+  function durationUnrecognized(value){
+    return readDuration(value).kind === 'unrecognized';
   }
 
   function normalizeDurationInput(value){
-    var seconds = parseDuration(value);
-    if(!seconds && String(value || '').trim() === '') return '';
-    return formatDuration(seconds);
+    var reading = readDuration(value);
+    if(reading.kind === 'blank') return '';
+    if(reading.kind === 'clean') return formatDuration(reading.seconds);
+    return String(value);
+  }
+
+  function durationCell(item){
+    var id = 'duration-flag-' + item.id;
+    if(!durationUnrecognized(item.duration)){
+      return cell('<input class="row-input mono field-small" data-field="duration" value="' + escapeAttr(item.duration) + '" aria-label="Duration">');
+    }
+    return cell('<input class="row-input mono field-small is-unrecognized" data-field="duration" value="' + escapeAttr(item.duration) + '" aria-label="Duration, unrecognized duration" aria-describedby="' + escapeAttr(id) + '" title="Unrecognized duration: kept as typed and left out of the runtime total">' +
+      '<span class="duration-flag" id="' + escapeAttr(id) + '">Unrecognized duration</span>');
+  }
+
+  function unrecognizedNote(rows){
+    var count = rows.filter(function(row){ return durationUnrecognized(row.duration); }).length;
+    return count ? ' (' + count + ' unrecognized ' + (count === 1 ? 'duration' : 'durations') + ' not counted)' : '';
   }
 
   function formatDuration(seconds){
@@ -1411,6 +1517,7 @@
   loadState();
   render();
   bindEvents();
+  if(loadProblem) showHint(loadProblem, 'error');
 })();
 </script>
 <script src="js/sbd-registry.js"></script>
