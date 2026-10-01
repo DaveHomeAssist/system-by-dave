@@ -50,7 +50,9 @@ Stage 2 increment 2.0b closes the first gate above for the eight Video tools (Si
 
 `scripts/probe_av_video_legacy.mjs` (`npm run test:av-video-legacy-browser`, run by the Pages workflow) opens each page in Chromium with a synthetic fixture that fills every field in the [field matrix](av-suite-consolidation-stage2-video.md#field-matrix-for-the-video-import), including blank fields and the durations `2m30s`, `01:02:03:04`, `TBD` and `45 min`. For each page it proves that:
 
-- load, save and reload leave every stored field unchanged;
+- load, save and reload leave every stored field unchanged, for values within each page's limits
+  (loading still trims whitespace, cuts fields other than notes at 120 characters and drops rows
+  past each page's cap; Stage 2 increment 2.0c removes those limits and extends this probe);
 - JSON export carries the page's schema string and imports back into an empty page unchanged;
 - the CSV header equals the matrix column order (Camera Shot List exports its labels);
 - print hides the toolbar, side panel and card view and keeps the table;

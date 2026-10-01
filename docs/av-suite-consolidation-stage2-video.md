@@ -274,6 +274,9 @@ PR B — navigation, CI, Workbook theme and Video load
     typing and when adding rows; a page holding more rows than its cap says so and blocks adding.
     Add an over-cap fixture to test:av-video-legacy-browser, with a multi-line note longer than
     260 characters on all eight pages.
+11. Rendered checks (PR A): the recovery controls from item 4 are checked at desktop width, 680px
+    and a narrow phone (390px) in both themes: they stay inside the status area, follow the
+    keyboard order, show visible focus and keep 44px touch targets.
 
 MUST NOT (blocking)
 - Rename keys, export schema strings, CSV column names or order, routes or registry ids.
@@ -288,8 +291,9 @@ VALIDATION (all must pass before merge)
   npm run test:av-save-safety-browser; npm run test:av-nav-browser; the four probes in item 8
 - Registry version bumped; Stage 3D pin and the inventory (--check) agree
 
-DELIVERY: CHANGELOG entry per pull request. Update the V0-2 to V0-5, V0-9 and V0-11 rows and this
-plan's 2.0c row. Read the Codex review before merging; merge when green; confirm the Pages run;
+DELIVERY: CHANGELOG entry per pull request. Update the V0-2 to V0-5, V0-9 and V0-11 rows, this
+plan's 2.0c row, and the Video-slice browser proof in docs/av-suite-consolidation-stage0.md (its
+check count, and the limits note once item 10 lands). Read the Codex review before merging; merge when green; confirm the Pages run;
 read back two changed pages on avbydave.com.
 ```
 
@@ -313,7 +317,8 @@ CHANGE
    outputs, recordings, camera shots and playback cues. Each record keeps its legacy fields and
    its verbatim status, and may carry provenance (tool, storage key, source row id, source hash,
    import time, importer version, unmapped fields verbatim). Every v1 field keeps its meaning.
-2. Migration: one pure function takes any valid v1 workbook to v2. Each videoRoutes record becomes
+2. Migration: one pure function takes any valid v1 workbook to v2, on load and on JSON import, so
+   v1 backup files exported before this release still import. Each videoRoutes record becomes
    a route whose source, processor and destination become endpoints; converter and backup are kept
    as text; nothing is dropped or guessed. Loading a v1 workbook writes nothing. The first save
    that upgrades a stored v1 record first offers a download of that record and keeps it in
@@ -361,7 +366,7 @@ VALIDATION (all must pass before merge)
   npm run build:av-workbook (commit the build); npm run verify:av
 - A field-matrix test that fails if any matrix field lacks a typed home or a provenance path
 - Migration tests for blank, sample and real-shaped v1 workbooks, with converter and backup
-  present and absent
+  present and absent; a v1 backup file imports; a v2 export imports back unchanged
 - Registry version bumped; Stage 3D pin and the inventory (--check) agree
 
 DELIVERY: CHANGELOG entry. Update this plan's 2.1 row and the draft model section (now final).
