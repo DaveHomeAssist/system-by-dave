@@ -124,15 +124,19 @@ async function main() {
     await cdp('Runtime.enable');
     await cdp('Emulation.setDeviceMetricsOverride', { width: 1280, height: 900, deviceScaleFactor: 1, mobile: false });
     await cdp('Page.navigate', { url: new URL('led-wall-calculator.html', baseUrl).href });
-    await delay(1000);
-
-    const initialViewer = await evaluate(`(() => {
-      const preview = document.getElementById('ledWallPreview');
-      const canvas = preview.querySelector('canvas');
-      return { state: preview.dataset.viewerState, columns: preview.dataset.viewerColumns,
-        rows: preview.dataset.viewerRows, width: canvas?.width || 0, height: canvas?.height || 0,
-        hint: document.getElementById('ledViewerHint').textContent };
-    })()`);
+    let initialViewer;
+    for (let attempt = 0; attempt < 60; attempt += 1) {
+      initialViewer = await evaluate(`(() => {
+        const preview = document.getElementById('ledWallPreview');
+        if (!preview) return { state: 'loading' };
+        const canvas = preview.querySelector('canvas');
+        return { state: preview.dataset.viewerState || 'loading', columns: preview.dataset.viewerColumns,
+          rows: preview.dataset.viewerRows, width: canvas?.width || 0, height: canvas?.height || 0,
+          hint: document.getElementById('ledViewerHint').textContent };
+      })()`);
+      if (initialViewer.state === 'ready' || initialViewer.state === 'fallback') break;
+      await delay(250);
+    }
     if (noWebgl) {
       if (initialViewer.state !== 'fallback' || !initialViewer.hint.includes('unavailable')) {
         throw new Error(`No-WebGL viewer fallback failed: ${JSON.stringify(initialViewer)}.`);
