@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-02 — Anchored video menus
+
+- Render format and connector menus inside AV Video so embedded browsers cannot place their native popup on another monitor. Keep options within the page viewport with keyboard selection, cancellation and typeahead.
+- Verify menu containment and selected-option visibility at phone, tablet, desktop and ultrawide sizes in both themes, alongside preset edits and Undo/Redo.
+
 ## 2026-10-02 — Video presets and undo
 
 - Add format/EDID timing and connector menus, custom LED rasters, and an explicit read-only link to the saved LED Wall Calculator dimensions. Preserve imported values outside the preset menus.
