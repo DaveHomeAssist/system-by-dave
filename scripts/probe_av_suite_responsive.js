@@ -212,7 +212,7 @@ async function main() {
       mobile: false
     });
 
-    /* Toolbox contract: cold entry, complete registry, plain links, isolated
+    /* Toolbox contract: cold entry, consolidated applications, plain links, isolated
        UI state, persistence, and a byte-for-byte untouched show dashboard. */
     await navigate('av-suite.html?entry=toolbox');
     await evaluateValue(`(() => {
@@ -229,8 +229,8 @@ async function main() {
         chooserHidden: document.getElementById('entryChooser').hidden,
         onboardingHidden: document.getElementById('onboardOverlay').hidden,
         noShow: document.body.innerText.includes('No show attached'),
-        cards: document.querySelectorAll('.toolbox-card').length,
-        registry: window.SBD_REGISTRY.tools.length,
+        tools: links.map((link) => link.getAttribute('data-tool')).sort(),
+        expectedTools: window.SBD_REGISTRY.tools.filter((tool) => !tool.consolidatedInto).map((tool) => tool.id).sort(),
         plainLinks: links.length && links.every((link) => {
           const url = new URL(link.href);
           return showParams.every((name) => !url.searchParams.has(name));
@@ -243,7 +243,7 @@ async function main() {
     if (toolboxInitial.mode !== 'toolbox') failures.push('entry=toolbox did not resolve to Toolbox.');
     if (!toolboxInitial.chooserHidden || !toolboxInitial.onboardingHidden) failures.push('Explicit Toolbox entry did not bypass doorway/show onboarding.');
     if (!toolboxInitial.noShow) failures.push('Toolbox does not clearly display No show attached.');
-    if (toolboxInitial.cards !== toolboxInitial.registry) failures.push(`Toolbox rendered ${toolboxInitial.cards}/${toolboxInitial.registry} registry tools.`);
+    if (JSON.stringify(toolboxInitial.tools) !== JSON.stringify(toolboxInitial.expectedTools)) failures.push(`Toolbox application cards differ from the consolidated registry: ${JSON.stringify(toolboxInitial)}.`);
     if (!toolboxInitial.plainLinks) failures.push('At least one Toolbox tool link carries an sbd* show parameter.');
     if (!toolboxInitial.phaseHidden || !toolboxInitial.setupHidden || !toolboxInitial.showFileHidden) failures.push('Toolbox still exposes show-only phase, setup, or show-file controls.');
 
@@ -321,9 +321,17 @@ async function main() {
     })()`, true);
     if (historyModes.afterClick !== 'toolbox' || historyModes.afterBack !== 'show' || historyModes.afterForward !== 'toolbox') failures.push(`Back/forward entry restoration failed: ${JSON.stringify(historyModes)}.`);
 
-    /* A truly neutral first visit presents two native keyboard doors. */
+    /* A neutral first visit opens Toolbox; the optional chooser keeps native keyboard doors. */
     await evaluateValue(`localStorage.removeItem('av-suite-ui.v1')`);
     await navigate('av-suite.html?neutral-probe=1');
+    const neutral = await evaluateValue(`(() => ({
+      mode: document.getElementById('avApp').getAttribute('data-entry'),
+      chooserHidden: document.getElementById('entryChooser').hidden,
+      onboardingHidden: document.getElementById('onboardOverlay').hidden
+    }))()`);
+    if (neutral.mode !== 'toolbox' || !neutral.chooserHidden || !neutral.onboardingHidden) failures.push(`Neutral entry did not open Toolbox directly: ${JSON.stringify(neutral)}.`);
+    await evaluateValue(`document.getElementById('doorwayBtn').click()`);
+    await delay(120);
     const chooser = await evaluateValue(`(() => {
       const dialog = document.querySelector('.entry-dialog');
       const dialogRect = dialog.getBoundingClientRect();
@@ -337,7 +345,7 @@ async function main() {
         horizontalOverflow: dialog.scrollWidth - dialog.clientWidth
       };
     })()`);
-    if (!chooser.visible || chooser.choices.length !== 2 || chooser.choices.some((choice) => choice.tag !== 'BUTTON' || !choice.contained) || chooser.activeChoice !== 'show' || chooser.horizontalOverflow > 1) failures.push(`Neutral doorway chooser is not keyboard-ready and contained: ${JSON.stringify(chooser)}.`);
+    if (!chooser.visible || chooser.choices.length !== 2 || chooser.choices.some((choice) => choice.tag !== 'BUTTON' || !choice.contained) || chooser.activeChoice !== 'show' || chooser.horizontalOverflow > 1) failures.push(`Optional doorway chooser is not keyboard-ready and contained: ${JSON.stringify(chooser)}.`);
     if (screenshotsDir) {
       fs.mkdirSync(screenshotsDir, { recursive: true });
       const captured = await cdp('Page.captureScreenshot', { format: 'png', captureBeyondViewport: false });
