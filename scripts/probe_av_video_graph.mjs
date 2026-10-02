@@ -186,6 +186,8 @@ try {
         const field = page.getByRole('combobox', { name: label, exact: true });
         await field.click();
         const menu = page.getByRole('listbox', { name: label, exact: true });
+        await field.evaluate(el => el.closest('.editor-scroll').dispatchEvent(new Event('scroll')));
+        assert.equal(await menu.isVisible(), true, 'a queued inspector scroll must not dismiss the menu');
         const bounds = await menu.boundingBox();
         assert.ok(bounds.x >= 0 && bounds.y >= 0 && bounds.x + bounds.width <= width && bounds.y + bounds.height <= height,
           `${label} popup must remain inside ${width}x${height}: ${JSON.stringify(bounds)}`);

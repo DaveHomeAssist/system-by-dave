@@ -23,6 +23,7 @@ export function PresetSelect({ label, value, options, onChange }: Props) {
     if (!open) return;
     function place() {
       const anchor = trigger.current!.getBoundingClientRect();
+      if (anchor.bottom < 0 || anchor.top > window.innerHeight) { setOpen(false); return; }
       const width = Math.min(Math.max(anchor.width, 280), window.innerWidth - 16);
       const below = window.innerHeight - anchor.bottom - 12;
       const above = anchor.top - 12;
@@ -36,7 +37,9 @@ export function PresetSelect({ label, value, options, onChange }: Props) {
     function outside(event: Event) {
       if (!trigger.current?.contains(event.target as Node) && !popup.current?.contains(event.target as Node)) setOpen(false);
     }
-    function scroll(event: Event) { if (!popup.current?.contains(event.target as Node)) setOpen(false); }
+    // Scroll events queued by focus/scrollIntoView may arrive after opening.
+    // Follow the field instead of dismissing a menu the user just opened.
+    function scroll(event: Event) { if (!popup.current?.contains(event.target as Node)) place(); }
     place();
     window.addEventListener("resize", place);
     document.addEventListener("pointerdown", outside);
