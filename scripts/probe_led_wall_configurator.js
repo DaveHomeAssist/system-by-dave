@@ -413,6 +413,18 @@ async function main() {
     }
     console.log('PASS profile provenance reload, legacy profile, and unsafe URL rejection');
 
+    let viewerRestored = false;
+    for (let attempt = 0; attempt < 120; attempt += 1) {
+      viewerRestored = await evaluate(`(() => {
+        const preview = document.getElementById('ledWallPreview');
+        return preview?.dataset.viewerState === '${noWebgl ? 'fallback' : 'ready'}'
+          && ${noWebgl ? 'true' : 'Boolean(preview.querySelector("canvas"))'};
+      })()`);
+      if (viewerRestored) break;
+      await delay(250);
+    }
+    if (!viewerRestored) throw new Error('LED viewer did not finish restoring after profile reload.');
+
     const previewResult = await evaluate(`(() => {
       document.getElementById('ledPreviewFrontBtn').click();
       const stage = document.getElementById('ledWallPreview').parentElement;
