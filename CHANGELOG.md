@@ -1,8 +1,9 @@
 # Changelog
 
-## 2026-10-01 — Cheesesteak Heatmap animated graphics
+## 2026-10-01 — Cheesesteak Heatmap animated graphics and Philly touches
 
-- Sync `/cheesesteaks/` from philly-cheesesteak-heatmap `9cc6258`: hand-drawn SVG graphics animated with GSAP, all skipped under reduced motion. Steam rises off the headline, a cheese drip band pours into Order like a local and wobbles on Whiz, the Pick for me die tumbles and lands, cards show heat-level roll icons, order buttons get ingredient icons, a rowhouse skyline with chimney steam sits at the page bottom, and the no-results state shows an empty wrapper. Adds a 1200x630 share card with Open Graph and Twitter metadata.
+- Sync `/cheesesteaks/` from philly-cheesesteak-heatmap `a896603`: a Pat's or Geno's showdown under the map (the pick stays in the browser), an azure and gold stripe in the Philadelphia flag colors, City Hall with William Penn in the skyline, and a little local voice ("No jawns match these filters", "Made wit love for the 215.").
+- Graphics from `9cc6258`: hand-drawn SVG graphics animated with GSAP, all skipped under reduced motion. Steam rises off the headline, a cheese drip band pours into Order like a local and wobbles on Whiz, the Pick for me die tumbles and lands, cards show heat-level roll icons, order buttons get ingredient icons, a rowhouse skyline with chimney steam sits at the page bottom, and the no-results state shows an empty wrapper. Adds a 1200x630 share card with Open Graph and Twitter metadata.
 
 ## 2026-10-01 — Paged preshow walk workspace
 
