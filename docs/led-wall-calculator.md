@@ -15,14 +15,28 @@
 
 ## Workspace and saved data
 
-At desktop widths the settings and details scroll inside their panels. At 900px and below the workspace scrolls internally; the preview precedes the primary results, then section-jump controls lead to Profile, Layout, Video / Data, Power / Viewer, and Results. The browser document remains viewport-sized. Reduced-motion users receive immediate section jumps.
+At desktop widths the settings and details scroll inside their panels. Product, Layout, Video / Data, and Power / Viewing Distance settings have keyboard-operable disclosure headers. Product starts open; the other groups start closed and can be opened independently without clearing values. At 900px and below the workspace scrolls internally and a sticky section rail sits above the preview. Its five buttons open the requested group or jump to Results. The browser document remains viewport-sized. Reduced-motion users receive immediate section jumps.
 
-The preview renders a 3D wall with schematic cabinet depth using the same pinned three.js release as Throwline. Drag or touch to orbit, pinch or scroll to zoom, and use arrow keys after focusing the model. Tap a cabinet face or enter its row and column to inspect its planned port and native pixel area. Front and Isometric restore known views; reduced-motion settings make those changes immediate. The renderer draws only when geometry, plan, selection, view, or size changes. If WebGL is unavailable or its context is lost, the cabinet grid and row/column inspector remain available. Cabinet depth is illustrative and is not a rigging dimension.
+The preview renders a 3D wall with schematic cabinet depth using the same pinned three.js release as Throwline. Drag or touch to orbit, pinch or scroll to zoom, and use arrow keys after focusing the model. Expand Inspect cabinet to enter a row and column; tapping a cabinet face opens the inspector and shows its planned port and native pixel area. Front and Isometric restore known views; reduced-motion settings make those changes immediate. The renderer draws only when geometry, plan, selection, view, or size changes. If WebGL is unavailable or its context is lost, the cabinet grid and row/column inspector remain available. Cabinet depth is illustrative and is not a rigging dimension.
 
 Calculator values share the `avCalculator.v1` key with the six quick calculators. Product profiles use `avCalculator.ledProfiles.v1`; profiles can retain an operator-supplied manufacturer specification URL, cabinet weight, and explicitly entered power factor. Legacy saved profiles without PF evidence clear that value on load. A supplied URL is provenance, not automatic verification. The selected manufacturer catalog ID persists in calculator state and is cleared when a cabinet-specific value is edited. The LED-to-Power-Load action sends watts into the quick calculator and leaves its manufacturer PF unset. Browser storage failure leaves calculation available but disables persistence and the cross-page handoff.
 
+## Five representative operator walkthroughs
+
+These are simulated task walkthroughs against the rendered application, not five recruited user interviews. They were checked at phone and tablet widths during the October 2, 2026 polish pass.
+
+| Task | Observed friction | Response and check |
+| --- | --- | --- |
+| Choose a sourced cabinet | The profile selector was buried below the preview on narrow screens. | Profile is the first visible section shortcut and opens by default. Selecting a ROE profile updated pitch and source notes. |
+| Size a cabinet array | Layout controls were deep in one long settings panel. | Layout is a separate disclosure; its shortcut opens and focuses it. Editing width and height updated the wall and raster. |
+| Plan video and data | Processor assumptions competed with every other field. | Data is its own disclosure. Editing utilization updated the planned chain count while retaining the generic estimate label. |
+| Review power | Power factor and circuit caveats were far below the fold. | Power is directly reachable from the section rail. Current and circuit counts stayed pending until a manufacturer PF was entered. |
+| Hand off a plan | Phone actions wrapped unevenly, and the download control consumed a full row. | Four actions use a two-column phone layout with 44px targets. Copy Summary produced the expected plan text and success status. |
+
+The remaining acceptance gap is observation with actual operators on their devices; these walkthroughs establish interaction and layout behavior, not human preference or field suitability.
+
 ## Verification
 
-Run `npm run probe:led-configurator -- --base=http://127.0.0.1:8000/` against a local static server, then repeat with `--no-webgl` to verify the fallback. The probe covers the 3D model, cabinet selection, whole-cabinet chain limits, pointer and keyboard orbit, reduced-motion presets, geometry, mode changes, profile round trips, input commit behavior, PF gating and migration, mobile containment at 375×812, accessibility smoke checks, and Power Load handoff. The release also requires `npm run verify:av`, `npm run verify:domain-sites`, the Pages workflow, and a live browser check on avbydave.com.
+Run `npm run probe:led-configurator -- --base=http://127.0.0.1:8000/` against a local static server, then repeat with `--no-webgl` to verify the fallback. The probe covers the 3D model, cabinet selection, whole-cabinet chain limits, pointer and keyboard orbit, reduced-motion presets, geometry, mode changes, profile round trips, input commit behavior, PF gating and migration, section disclosures, accessibility smoke checks, and Power Load handoff. Its viewport matrix checks page containment, stage width, and control sizes at phone, portrait and landscape tablet, desktop, and ultrawide sizes. Visually inspect those proportions as well. The release also requires `npm run verify:av`, `npm run verify:domain-sites`, the Pages workflow, and a live browser check on avbydave.com.
 The `LED wall browser` pull-request workflow runs both probe modes before merge, so the production Pages workflow does not first discover a browser regression after merging.
 The probe waits for the 3D module to report ready or fallback, so the same command can verify the public URL despite normal network loading time.

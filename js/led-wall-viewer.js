@@ -248,7 +248,7 @@ if (!context) {
   preview.append(canvas);
   preview.classList.add('has-3d');
   preview.dataset.viewerState = 'ready';
-  hint.textContent = 'Drag to orbit · pinch or scroll to zoom · arrows to rotate. Depth is schematic.';
+  hint.textContent = 'Drag to orbit · scroll or pinch to zoom · arrow keys rotate.';
   updateGeometry();
   resize();
   const observer = new ResizeObserver(resize);
@@ -344,7 +344,7 @@ if (!context) {
     preview.classList.add('has-3d');
     preview.setAttribute('role', 'group');
     preview.dataset.viewerState = 'ready';
-    hint.textContent = 'Drag to orbit · pinch or scroll to zoom · arrows to rotate. Depth is schematic.';
+    hint.textContent = 'Drag to orbit · scroll or pinch to zoom · arrow keys rotate.';
     resize();
     requestRender();
   });

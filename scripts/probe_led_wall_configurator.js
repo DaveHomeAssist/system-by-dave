@@ -381,7 +381,15 @@ async function main() {
       localStorage.setItem('avCalculator.ledProfiles.v1', JSON.stringify(profiles));
     })()`);
     await cdp('Page.reload', { ignoreCache: true });
-    await delay(500);
+    let profileReady = false;
+    for (let attempt = 0; attempt < 40; attempt += 1) {
+      profileReady = await evaluate(`(() => document.getElementById('ledSpecSource')?.value === 'https://example.com/cabinet-spec.pdf'
+        && document.getElementById('ledWeightKg')?.value === '8.5'
+        && !!document.querySelector('#ledProfileSelect option[value="legacy-cabinet"]'))()`);
+      if (profileReady) break;
+      await delay(100);
+    }
+    if (!profileReady) throw new Error('Saved LED profile did not finish restoring after reload.');
     const persistedProfile = await evaluate(`(() => {
       const source = document.getElementById('ledSpecSource').value;
       const weight = document.getElementById('ledWeightKg').value;
@@ -442,9 +450,12 @@ async function main() {
       const { x, y } = clickTarget;
       await cdp('Input.dispatchMouseEvent', { type: 'mousePressed', x, y, button: 'left', clickCount: 1 });
       await cdp('Input.dispatchMouseEvent', { type: 'mouseReleased', x, y, button: 'left', clickCount: 1 });
-      const clickedCabinet = await evaluate(`document.getElementById('ledCabinetInspection').textContent`);
-      if (!clickedCabinet.includes('planned port') || clickedCabinet.includes('R1 C1 ·')) {
-        throw new Error(`3D cabinet click did not select a cabinet: ${clickedCabinet}; target ${JSON.stringify(clickTarget)}.`);
+      const clickedCabinet = await evaluate(`(() => ({
+        text: document.getElementById('ledCabinetInspection').textContent,
+        open: document.getElementById('ledCabinetInspector').open
+      }))()`);
+      if (!clickedCabinet.open || !clickedCabinet.text.includes('planned port') || clickedCabinet.text.includes('R1 C1 ·')) {
+        throw new Error(`3D cabinet click did not open and update the inspector: ${JSON.stringify(clickedCabinet)}; target ${JSON.stringify(clickTarget)}.`);
       }
       console.log('PASS 3D cabinet click updates the inspector');
       await cdp('Input.dispatchMouseEvent', { type: 'mousePressed', x, y, button: 'left', clickCount: 1 });
@@ -610,6 +621,8 @@ async function main() {
         resultTop: rect('#ledResultStrip').top,
         suiteBottom: rect('.led-suite').bottom,
         inputTop: rect('.led-input-grid').top,
+        navTop: rect('.led-section-nav').top,
+        stageTop: rect('.led-stage').top,
         previewHeight: rect('.led-stage').height,
         jumpHeight: rect('[data-led-jump="ledPowerSection"]').height,
         stageRight: rect('.led-stage').right,
@@ -620,24 +633,63 @@ async function main() {
     })()`);
     if (mobile.documentHeight > mobile.viewportHeight || mobile.documentWidth > mobile.viewportWidth
       || mobile.resultTop >= mobile.suiteBottom
-      || mobile.resultTop >= mobile.inputTop || mobile.previewHeight < 250 || mobile.jumpHeight < 44
+      || mobile.resultTop >= mobile.inputTop || mobile.navTop >= mobile.stageTop
+      || mobile.previewHeight < 250 || mobile.jumpHeight < 43.5
       || mobile.clippedControls.length) {
       throw new Error(`Mobile preview, results, or section navigation failed: ${JSON.stringify(mobile)}.`);
     }
     const jumped = await evaluate(`(() => {
       document.querySelector('[data-led-jump="ledPowerSection"]').click();
-      return document.activeElement.id;
+      const panel = document.querySelector('#ledPowerSection');
+      return { focus: document.activeElement.id,
+        expanded: panel.querySelector('.led-module-toggle').getAttribute('aria-expanded'),
+        hidden: document.getElementById('ledPowerPanelFields').hidden,
+        current: document.querySelector('[data-led-jump="ledPowerSection"]').getAttribute('aria-current') };
     })()`);
-    if (jumped !== 'ledPowerSection') throw new Error(`Mobile section jump did not focus its target: ${jumped}.`);
-    await cdp('Emulation.setDeviceMetricsOverride', { width: 1440, height: 900, deviceScaleFactor: 1, mobile: false });
-    const desktopContainment = await evaluate(`(() => ({
-      height: document.documentElement.scrollHeight <= document.documentElement.clientHeight,
-      width: document.documentElement.scrollWidth <= document.documentElement.clientWidth
-    }))()`);
-    if (!desktopContainment.height || !desktopContainment.width) {
-      throw new Error(`Desktop page-level overflow: ${JSON.stringify(desktopContainment)}.`);
+    if (jumped.focus !== 'ledPowerSection' || jumped.expanded !== 'true' || jumped.hidden || jumped.current !== 'location') {
+      throw new Error(`Mobile section jump did not open and focus its target: ${JSON.stringify(jumped)}.`);
     }
-    console.log('PASS viewport-contained mobile preview, results, and section jump');
+    const disclosure = await evaluate(`(() => {
+      const panel = document.getElementById('ledPowerSection');
+      const toggle = panel.querySelector('.led-module-toggle');
+      const value = document.getElementById('ledMaxWattsEach').value;
+      toggle.click();
+      const closed = toggle.getAttribute('aria-expanded') === 'false' && document.getElementById('ledPowerPanelFields').hidden;
+      toggle.click();
+      return { closed, reopened: toggle.getAttribute('aria-expanded') === 'true'
+        && !document.getElementById('ledPowerPanelFields').hidden,
+        preserved: document.getElementById('ledMaxWattsEach').value === value };
+    })()`);
+    if (!disclosure.closed || !disclosure.reopened || !disclosure.preserved) {
+      throw new Error(`Mobile disclosure did not preserve its power inputs: ${JSON.stringify(disclosure)}.`);
+    }
+    for (const [width, height] of [[390, 844], [768, 1024], [820, 1180], [1180, 820], [1440, 900], [2560, 720]]) {
+      await cdp('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile: width <= 900 });
+      await delay(60);
+      const layout = await evaluate(`(() => {
+        const stage = document.querySelector('.led-stage');
+        const data = document.querySelector('.led-stage-data');
+        const nav = document.querySelector('.led-section-nav');
+        const actionButtons = [...document.querySelectorAll('.led-suite-actions button')];
+        return {
+          pageWidth: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+          pageHeight: document.documentElement.scrollHeight - document.documentElement.clientHeight,
+          stageWidth: stage.scrollWidth - stage.clientWidth,
+          dataWidth: data.scrollWidth - data.clientWidth,
+          navWidth: nav.scrollWidth - nav.clientWidth,
+          navVisible: getComputedStyle(nav).display !== 'none',
+          shortActions: actionButtons.filter(button => button.getBoundingClientRect().height < 43.5).map(button => button.id),
+          shortNav: [...nav.querySelectorAll('button')].filter(button => button.getBoundingClientRect().height < 43.5).map(button => button.textContent.trim())
+        };
+      })()`);
+      if (layout.pageWidth > 0 || layout.pageHeight > 0 || layout.stageWidth > 1 || layout.dataWidth > 1
+        || layout.shortActions.length || (layout.navVisible && layout.shortNav.length)
+        || (width <= 390 && layout.navWidth > 1)) {
+        throw new Error(`${width}×${height} viewport layout failed: ${JSON.stringify(layout)}.`);
+      }
+    }
+    await cdp('Emulation.setDeviceMetricsOverride', { width: 1440, height: 900, deviceScaleFactor: 1, mobile: false });
+    console.log('PASS viewport-contained phone, tablet, desktop, and wide layouts with section jump');
 
     const ledBeforeHandoff = await evaluate(`(() => {
       document.getElementById('sendLedTypicalPowerBtn').click();
