@@ -50,6 +50,10 @@ const button = name => page.getByRole('button', { name, exact: true });
 const node = label => page.locator('.react-flow__node').filter({ has: page.locator('.device-title strong', { hasText: label }) });
 const save = () => page.getByRole('button', { name: /^Save/ }).click();
 const saved = () => page.evaluate(() => JSON.parse(localStorage.getItem('sbd.avVideo.v1')));
+async function choosePreset(label, value) {
+  await page.getByRole('combobox', { name: label, exact: true }).click();
+  await page.getByRole('listbox', { name: label, exact: true }).locator(`[role="option"][data-value="${value}"]`).click();
+}
 async function add(label, role) {
   await button('Add device').click();
   const dialog = page.getByRole('dialog', { name: 'Add device' });
@@ -97,8 +101,8 @@ try {
   assert.equal(await page.getByLabel('Source', { exact: true }).inputValue(), 'Camera 2');
   assert.equal(await page.getByLabel('Destination', { exact: true }).inputValue(), 'Main switcher');
   await page.getByLabel('Switcher / device input').fill('Switcher input 2');
-  await page.getByLabel('Format', { exact: true }).selectOption('1080p59.94');
-  await page.getByLabel('Connector', { exact: true }).selectOption('3G SDI');
+  await choosePreset('Format', '1080p59.94');
+  await choosePreset('Connector', '3G SDI');
   await button('Patch').click();
   assert.equal(await page.locator('.route-card').count(), 5);
   assert.equal(await page.getByLabel('Switcher / device input').inputValue(), 'Switcher input 2');
@@ -128,16 +132,27 @@ try {
   await button('↶ Undo').click(); assert.equal(await source.inputValue(), beforeTyping);
   await button('↷ Redo').click(); assert.equal(await source.inputValue(), `${beforeTyping} renamed`);
   await button('↶ Undo').click();
-  const format = page.getByLabel('Format', { exact: true });
-  const connector = page.getByLabel('Connector', { exact: true });
-  assert.equal(await format.evaluate(el => el.tagName), 'SELECT');
-  assert.equal(await connector.evaluate(el => el.tagName), 'SELECT');
-  await format.selectOption('1080p60');
-  await button('↶ Undo').click(); assert.equal(await format.inputValue(), '1080p59.94');
-  await button('↷ Redo').click(); assert.equal(await format.inputValue(), '1080p60');
-  await connector.selectOption('HDMI');
-  await button('↶ Undo').click(); assert.equal(await connector.inputValue(), '3G SDI');
-  await format.selectOption('custom');
+  const format = page.getByRole('combobox', { name: 'Format', exact: true });
+  const connector = page.getByRole('combobox', { name: 'Connector', exact: true });
+  assert.equal(await format.evaluate(el => el.tagName), 'BUTTON');
+  assert.equal(await connector.evaluate(el => el.tagName), 'BUTTON');
+  await choosePreset('Format', '1080p60');
+  await button('↶ Undo').click(); assert.equal(await format.getAttribute('data-value'), '1080p59.94');
+  await button('↷ Redo').click(); assert.equal(await format.getAttribute('data-value'), '1080p60');
+  await choosePreset('Connector', 'HDMI');
+  await button('↶ Undo').click(); assert.equal(await connector.getAttribute('data-value'), '3G SDI');
+  // Keyboard navigation changes the model only when confirmed, and Escape cancels.
+  await format.focus(); await format.press('ArrowDown'); await format.press('Home');
+  await format.press('ArrowDown'); await format.press('Escape');
+  assert.equal(await format.getAttribute('data-value'), '1080p60');
+  assert.equal(await page.getByRole('listbox').count(), 0);
+  await format.press('Enter'); await format.press('Home'); await format.press('ArrowDown'); await format.press('Enter');
+  assert.equal(await format.getAttribute('data-value'), '720p50');
+  await button('↶ Undo').click();
+  await connector.focus(); await connector.press('h'); await connector.press('d'); await connector.press('m'); await connector.press('Enter');
+  assert.equal(await connector.getAttribute('data-value'), 'HDMI');
+  await button('↶ Undo').click();
+  await choosePreset('Format', 'custom');
   await page.getByLabel('Custom width', { exact: true }).fill('3840');
   await page.getByLabel('Custom height', { exact: true }).fill('1080');
   await page.getByLabel('Custom frame rate', { exact: true }).fill('59.94');
@@ -166,6 +181,24 @@ try {
       await button('Fit View').click();
       assert.ok(await page.evaluate(() => document.documentElement.scrollHeight <= document.documentElement.clientHeight && document.documentElement.scrollWidth <= document.documentElement.clientWidth));
       if (width === 1440 || width === 375) await page.screenshot({ path: `${shots}/${width}-${theme}.png` });
+      await button('Edit route').click();
+      for (const label of ['Format', 'Connector']) {
+        const field = page.getByRole('combobox', { name: label, exact: true });
+        await field.click();
+        const menu = page.getByRole('listbox', { name: label, exact: true });
+        const bounds = await menu.boundingBox();
+        assert.ok(bounds.x >= 0 && bounds.y >= 0 && bounds.x + bounds.width <= width && bounds.y + bounds.height <= height,
+          `${label} popup must remain inside ${width}x${height}: ${JSON.stringify(bounds)}`);
+        assert.equal(await menu.evaluate(el => el.parentElement === document.body), true, 'menu is drawn inside the page');
+        const selected = menu.locator('[aria-selected="true"]');
+        const selectedBox = await selected.boundingBox();
+        assert.ok(selectedBox.y >= bounds.y && selectedBox.y + selectedBox.height <= bounds.y + bounds.height, 'selected option starts visible');
+        if (width === 375 && theme === 'light' && label === 'Format') await page.screenshot({ path: `${shots}/anchored-format-phone.png` });
+        await field.press('Escape');
+        assert.equal(await menu.count(), 0);
+        assert.equal(await field.evaluate(el => el === document.activeElement), true);
+      }
+      await button('Back to diagram').click();
     }
   }
   await page.setViewportSize({ width: 1440, height: 900 }); await button('Fit View').click();
