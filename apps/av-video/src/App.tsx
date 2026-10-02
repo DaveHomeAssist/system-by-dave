@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import { applyImport, emptyDocument, LEGACY, loadDocument, Module, newRoute, Preview, previewImport, Route, routeChain, routeGaps, sampleDocument, saveDocument, STORE, uid, VideoDocument } from "./model";
+import { FlowCanvas } from "./FlowCanvas";
+import { applyImport, emptyDocument, LEGACY, loadDocument, Module, newRoute, Preview, previewImport, Route, routeGaps, sampleDocument, saveDocument, STORE, uid, VideoDocument } from "./model";
 
 type View = "flow" | "patch" | "checks" | "project";
 const statuses = ["planned", "pending", "patched", "routed", "tested", "ready", "verified", "issue", "spare", "backup"];
-const labels: Partial<Record<keyof Route, string>> = { route: "Route name", source: "Source", destination: "Destination", system: "System", type: "Source type", format: "Format", connector: "Connector", processor: "Processor", input: "Switcher / device input", converter: "Converter", backup: "Backup route", status: "Status", notes: "Operator notes" };
+const labels: Partial<Record<keyof Route, string>> = { route: "Route name", source: "Source", destination: "Destination", system: "System", type: "Source type", format: "Format", connector: "Connector", processor: "Processor", input: "Switcher / device input", output: "Source output", converter: "Converter", backup: "Backup route", status: "Status", notes: "Operator notes" };
 function download(name: string, raw: string) {
   const url = URL.createObjectURL(new Blob([raw], { type: "application/json" }));
   const link = document.createElement("a"); link.href = url; link.download = name; link.click();
@@ -32,6 +33,7 @@ export function App() {
   const dialog = useRef<HTMLDialogElement>(null);
   const importTrigger = useRef<HTMLElement | null>(null);
   const [mobileDetail, setMobileDetail] = useState(false);
+  const [inspectorOpen, setInspectorOpen] = useState(false);
   const update = (next: VideoDocument) => { setDoc(next); setDirty(true); };
   const notify = (text: string, error = false) => { setMessage(text); setProblem(error); };
   const route = doc.routes.find(r => r.id === selected);
@@ -57,9 +59,9 @@ export function App() {
     catch (error) { notify(errorText(error), true); }
   }
   function changeRoute(field: keyof Route, value: string) { update({ ...doc, routes: doc.routes.map(r => r.id === selected ? { ...r, [field]: value } : r) }); }
-  function add() { const next = newRoute(); update({ ...doc, routes: [...doc.routes, next] }); setSelected(next.id); setSearch(""); setStatus("all"); setMobileDetail(true); if (view !== "flow" && view !== "patch") setView("flow"); }
+  function add() { const next = newRoute(); update({ ...doc, routes: [...doc.routes, next] }); setSelected(next.id); setSearch(""); setStatus("all"); setMobileDetail(true); setInspectorOpen(true); if (view !== "flow" && view !== "patch") setView("flow"); }
   function choose(id: string) { setSelected(id); setMobileDetail(true); }
-  function switchView(next: View) { setView(next); setMobileDetail(false); }
+  function switchView(next: View) { setView(next); setMobileDetail(false); setInspectorOpen(false); }
   function toggleModule(module: Module) {
     update({ ...doc, modules: { ...doc.modules, [module]: !doc.modules[module] } });
     if (view === module) setView("project");
@@ -86,8 +88,8 @@ export function App() {
   }
   function exportDoc() { download("av-video.json", JSON.stringify(doc, null, 2)); notify("Full plan exported, including hidden module data and original imports."); }
   function replace(next: VideoDocument) {
-    if ((doc.routes.length || dirty || Object.keys(doc.meta).length) && !window.confirm("Replace the current plan? Export first if you need to keep it.")) return;
-    update(next); setSelected(next.routes[0]?.id || ""); setView("flow"); setSearch(""); setStatus("all"); setMobileDetail(false);
+    if ((doc.routes.length || doc.graphDevices.length || dirty || Object.keys(doc.meta).length) && !window.confirm("Replace the current plan? Export first if you need to keep it.")) return;
+    update(next); setSelected(next.routes[0]?.id || ""); setView("flow"); setSearch(""); setStatus("all"); setMobileDetail(false); setInspectorOpen(false); notify(next.routes.length ? "Plan ready. Select a cable to trace its path, or drag devices to arrange." : "New plan. Add devices or routes to begin.");
   }
   function changeTheme(value: string) {
     document.documentElement.dataset.avTheme = value; setTheme(value);
@@ -105,32 +107,32 @@ export function App() {
     </header>
     <div className="plan-bar"><strong title={doc.title}>{doc.title}</strong><span>{doc.routes.length} routes · {dirty ? "Unsaved changes" : baseline.current ? "Saved in this browser" : "New plan"}</span></div>
     {nav}
-    <main id="workspace" tabIndex={-1} className={`workspace view-${view} ${mobileDetail ? "detail-open" : ""}`}>
+    <main id="workspace" tabIndex={-1} className={`workspace view-${view} ${inspectorOpen ? "inspector-open" : ""} ${mobileDetail ? "detail-open" : ""}`}>
       {(view === "flow" || view === "patch") && <>
-        <section className="route-browser" aria-label={view === "flow" ? "Signal routes" : "Patch routes"}>
-          <div className="panel-heading"><div><h2>{view === "flow" ? "Signal flow" : "Video patch"}</h2><p>One route list. Every view stays in sync.</p></div><button type="button" className="primary" onClick={add}>Add route</button></div>
+        {view === "flow" ? <FlowCanvas doc={doc} selected={selected} onChange={update} onSelect={setSelected} onEdit={() => { setInspectorOpen(true); setMobileDetail(true); }} onAddRoute={add} onSample={() => replace(sampleDocument())} onImport={() => switchView("project")} notify={notify} /> :         <section className="route-browser" aria-label="Patch routes">
+          <div className="panel-heading"><div><h2>Video patch</h2><p>One route list. Every view stays in sync.</p></div><button type="button" className="primary" onClick={add}>Add route</button></div>
           <div className="filters"><input aria-label="Search routes" type="search" placeholder="Search routes…" value={search} onChange={e => setSearch(e.target.value)} /><select aria-label="Filter status" value={status} onChange={e => setStatus(e.target.value)}><option value="all">All statuses</option>{Array.from(new Set([...statuses, ...doc.routes.map(r => r.status)])).map(s => <option key={s} value={s}>{s || "Unspecified"}</option>)}</select></div>
           <div className="route-list">
             {!doc.routes.length ? <div className="empty"><span className="empty-symbol" aria-hidden="true">↗</span><h3>Build your video path</h3><p>Connect sources to destinations, assign inputs, and track checks in one plan.</p><button type="button" className="primary" onClick={add}>Create first route</button><button type="button" onClick={() => replace(sampleDocument())}>Try a sample plan</button><button type="button" onClick={() => switchView("project")}>Import existing sheets</button></div> : !visible.length ? <div className="empty"><h3>No matching routes</h3><button type="button" onClick={() => { setSearch(""); setStatus("all"); }}>Clear filters</button></div> : visible.map((r, index) => <button type="button" className={`route-card ${selected === r.id ? "selected" : ""}`} key={r.id} onClick={() => choose(r.id)} aria-pressed={selected === r.id}>
               <span className="route-card-title"><span className="route-number">{String(index + 1).padStart(2, "0")}</span><strong>{r.route || r.source || "Untitled route"}</strong><span className={`status status-${r.status === "issue" ? "issue" : "normal"}`}>{r.status || "Unspecified"}</span></span>
-              {view === "flow" ? <span className="signal-chain">{routeChain(r, doc.modules.patch).map((hop, n) => <span className="hop" key={n}><small>{hop.label}</small><span>{hop.value}</span></span>)}</span> : <span className="patch-summary"><span><small>Source</small>{r.source || "—"}</span><span><small>Input</small>{r.input || "—"}</span><span><small>Destination</small>{r.destination || "—"}</span></span>}
+              <span className="patch-summary"><span><small>Source</small>{r.source || "—"}</span><span><small>Input</small>{r.input || "—"}</span><span><small>Destination</small>{r.destination || "—"}</span></span>
               <span className="route-card-footer"><span>{[r.format, r.connector].filter(Boolean).join(" · ") || "Format and connector needed"}</span>{doc.modules.checks && routeGaps(r, doc.modules).length > 0 && <span className="gap-count">{routeGaps(r, doc.modules).length} {routeGaps(r, doc.modules).length === 1 ? "check" : "checks"}</span>}</span>
             </button>)}
           </div>
-        </section>
-        <section className="inspector" aria-label="Route editor"><div className="panel-heading"><div><h2>Route details</h2><p>{route ? "Edits appear in both views" : "Select a route to edit"}</p></div><button type="button" className="mobile-back" onClick={() => setMobileDetail(false)}>Back to routes</button></div>
+        </section>}
+        {(view === "patch" || inspectorOpen) && <section className="inspector" aria-label="Route editor"><div className="panel-heading"><div><h2>Route details</h2><p>{route ? "Edits appear in both views" : "Select a route to edit"}</p></div><button type="button" className="mobile-back" onClick={() => { setMobileDetail(false); setInspectorOpen(false); }}>{view === "flow" ? "Back to diagram" : "Back to routes"}</button></div>
           {route ? <div className="editor-scroll"><div className="field-grid">{field("route")}{field("type")}{field("source")}{field("destination")}{field("format")}{field("connector")}{field("processor")}{field("system")}
             <label>Status<select value={route.status} onChange={e => changeRoute("status", e.target.value)}>{Array.from(new Set([...statuses, route.status])).map(s => <option key={s} value={s}>{s || "Unspecified"}</option>)}</select></label>
-            {doc.modules.patch && <fieldset className="wide"><legend>Patch details</legend><div className="field-grid">{field("input")}{field("converter")}</div></fieldset>}
+            {doc.modules.patch && <fieldset className="wide"><legend>Patch details</legend><div className="field-grid">{field("input")}{field("output")}{field("converter")}</div></fieldset>}
             {doc.modules.backups && field("backup")}{field("notes", true)}
           </div>
           {doc.modules.checks && <div className="route-checks"><h3>Route checks</h3>{routeGaps(route, doc.modules).length ? <ul>{routeGaps(route, doc.modules).map(g => <li key={g}>{g}</li>)}</ul> : <p>Required fields filled. Confirm the physical route before marking it ready.</p>}</div>}
           {route.origin && <p className="provenance">Imported from {doc.imports.find(i => i.id === route.origin)?.name || "an original sheet"}. Original data is included in exports.</p>}
           <div className="row-actions"><button type="button" onClick={() => { const copy = { ...route, id: uid(), route: `${route.route || route.source} copy` }; update({ ...doc, routes: [...doc.routes, copy] }); setSelected(copy.id); }}>Duplicate route</button><button type="button" className="danger" onClick={() => { if (!confirm("Remove this route from the current plan?")) return; const rows = doc.routes.filter(r => r.id !== route.id); update({ ...doc, routes: rows }); setSelected(rows[0]?.id || ""); setMobileDetail(false); }}>Remove route</button></div>
           </div> : <div className="empty"><p>Choose a route from the list, or create one.</p></div>}
-        </section>
+        </section>}
       </>}
-      {view === "checks" && <section className="single-panel"><div className="panel-heading"><div><h2>Route checks</h2><p>Checks cover {doc.modules.patch ? "signal and patch fields" : "signal fields only; patch module is off"}. These are planning checks, not a live signal test.</p></div><strong>{issues.length} need attention</strong></div><div className="check-list">{issues.length ? issues.map(r => <button type="button" key={r.id} onClick={() => { setView("flow"); choose(r.id); }}><strong>{r.route || r.source || "Untitled route"}</strong><span>{routeGaps(r, doc.modules).join(" · ")}</span><span>Edit route →</span></button>) : <div className="empty"><h3>{doc.routes.length ? "No field gaps in enabled modules" : "No routes to check yet"}</h3><p>Operator statuses are preserved separately from these checks.</p></div>}</div></section>}
+      {view === "checks" && <section className="single-panel"><div className="panel-heading"><div><h2>Route checks</h2><p>Checks cover {doc.modules.patch ? "signal and patch fields" : "signal fields only; patch module is off"}. These are planning checks, not a live signal test.</p></div><strong>{issues.length} need attention</strong></div><div className="check-list">{issues.length ? issues.map(r => <button type="button" key={r.id} onClick={() => { setView("flow"); setInspectorOpen(true); choose(r.id); }}><strong>{r.route || r.source || "Untitled route"}</strong><span>{routeGaps(r, doc.modules).join(" · ")}</span><span>Edit route →</span></button>) : <div className="empty"><h3>{doc.routes.length ? "No field gaps in enabled modules" : "No routes to check yet"}</h3><p>Operator statuses are preserved separately from these checks.</p></div>}</div></section>}
       {view === "project" && <section className="single-panel project-panel"><div className="panel-heading"><div><h2>Project & modules</h2><p>Use Video on its own. Add show details only when useful.</p></div></div><div className="project-scroll">
         <section><h3>Video plan</h3><div className="field-grid"><label>Plan name<input value={doc.title} onChange={e => update({ ...doc, title: e.target.value })} /></label><label>Venue<input value={doc.meta.venue || ""} onChange={e => update({ ...doc, meta: { ...doc.meta, venue: e.target.value } })} /></label><label>Video lead<input value={doc.meta.videoLead || ""} onChange={e => update({ ...doc, meta: { ...doc.meta, videoLead: e.target.value } })} /></label></div><div className="row-actions"><button type="button" onClick={() => replace(emptyDocument())}>New plan</button><button type="button" onClick={() => replace(sampleDocument())}>Load sample</button></div></section>
         <section><h3>Optional modules</h3><p>Turn off what you do not need. Its fields stay in the plan and full export.</p>{([ ["patch", "Patch view", "Input assignments and converters"], ["checks", "Route checks", "Field gaps and reported issues"], ["backups", "Backup details", "Alternate routes and equipment"] ] as [Module, string, string][]).map(([id, name, description]) => <label className="module-toggle" key={id}><input type="checkbox" checked={doc.modules[id]} onChange={() => toggleModule(id)} /><span><strong>{name}</strong><small>{description}</small></span></label>)}</section>

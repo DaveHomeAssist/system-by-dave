@@ -74,24 +74,24 @@ try {
   await page.keyboard.press('Tab');
   assert.equal(await page.locator(':focus').textContent(), 'Skip to video workspace');
   await button('Try a sample plan').click();
+  await button('Edit route').click();
   await page.getByLabel('Source', { exact: true }).fill('Camera edited in flow');
   await button('Patch').click();
   assert.ok((await page.locator('.route-card').first().textContent()).includes('Camera edited in flow'));
   await page.getByLabel('Switcher / device input').fill('Input 9');
   await button('Signal flow').click();
-  assert.ok((await page.locator('.route-card').first().textContent()).includes('Input 9'));
-  await save(); await page.reload();
+  await page.locator('.device-port-labels').filter({ hasText: 'Input 9' }).first().waitFor();
+  assert.equal(await page.locator('.react-flow__node').filter({hasText:'Production switcher'}).count(), 1);
+  await save(); await page.reload(); await button('Edit route').click();
   assert.equal(await page.getByLabel('Source', { exact: true }).inputValue(), 'Camera edited in flow');
   assert.equal(await page.getByLabel('Switcher / device input').inputValue(), 'Input 9');
   await goProject(); await page.getByRole('checkbox', { name: /Patch view/ }).uncheck();
   assert.equal(await button('Patch').count(), 0);
   await page.getByRole('checkbox', { name: /Backup details/ }).uncheck();
-  await button('Signal flow').click();
+  await button('Signal flow').click(); await button('Edit route').click();
   assert.equal(await page.getByLabel('Switcher / device input').count(), 0);
   assert.equal(await page.getByLabel('Backup route', { exact: true }).count(), 0);
-  await page.getByLabel('Search routes').fill('Input 9');
-  assert.equal(await page.locator('.route-card').count(), 0, 'disabled patch data must not remain searchable');
-  await page.getByLabel('Search routes').fill('');
+  assert.equal(await page.locator('.react-flow__node').filter({hasText:'HDMI to SDI'}).count(), 0);
   const hidden = await exportPlan(); assert.equal(hidden.routes[0].input, 'Input 9'); assert.equal(hidden.routes[0].backup, 'Camera 2 wide');
   await save(); await page.reload(); await goProject();
   assert.equal(await page.getByRole('checkbox', { name: /Patch view/ }).isChecked(), false);
@@ -99,24 +99,24 @@ try {
   await save();
   await page.evaluate(({ original, patchOriginal }) => { localStorage.setItem('signal-flow.v1', original); localStorage.setItem('sbd.videoPatch.v1', patchOriginal); }, { original, patchOriginal });
   await button('Import saved Signal Flow').click(); await page.getByRole('dialog').waitFor();
-  await button('Cancel').click(); assert.equal((await readSaved()).routes.length, 3);
+  await button('Cancel').click(); assert.equal((await readSaved()).routes.length, 4);
   await button('Import saved Signal Flow').click(); await button('Add routes to plan').click();
   await goProject(); await button('Import saved Video Patch').click(); await button('Add routes to plan').click();
   await save();
-  const combined = await readSaved(); assert.equal(combined.routes.length, 5); assert.equal(combined.imports.length, 2);
-  assert.equal(combined.routes[3].notes, '\n  Original notes  \n');
-  assert.equal(combined.routes[4].input, 'SDI 1');
+  const combined = await readSaved(); assert.equal(combined.routes.length, 6); assert.equal(combined.imports.length, 2);
+  assert.equal(combined.routes[4].notes, '\n  Original notes  \n');
+  assert.equal(combined.routes[5].input, 'SDI 1');
   assert.equal(await page.evaluate(() => localStorage.getItem('signal-flow.v1')), original);
   assert.equal(await page.evaluate(() => localStorage.getItem('sbd.videoPatch.v1')), patchOriginal);
   await goProject(); await button('Import saved Signal Flow').click(); await button('Add routes to plan').click();
   assert.match(await page.getByRole('status').textContent(), /already imported/);
-  assert.equal((await readSaved()).routes.length, 5);
+  assert.equal((await readSaved()).routes.length, 6);
   // A source changed after preview must not be applied.
   await button('Import saved Signal Flow').click();
   await page.evaluate(() => localStorage.setItem('signal-flow.v1', '{}'));
   await button('Add routes to plan').click();
   assert.match(await page.getByRole('status').textContent(), /changed after preview/);
-  assert.equal((await readSaved()).routes.length, 5);
+  assert.equal((await readSaved()).routes.length, 6);
   // Full JSON round trip, including imported originals and all optional data.
   const exported = await exportPlan();
   await page.locator('input[type=file]').setInputFiles({ name: 'backup.json', mimeType: 'application/json', buffer: Buffer.from(JSON.stringify(exported)) });
@@ -128,9 +128,9 @@ try {
   await page.getByRole('status').filter({ hasText: 'Choose an AV Video' }).waitFor();
   assert.deepEqual(await readSaved(), exported);
   // Stale-tab writer cannot overwrite a later save.
-  const second = await context.newPage(); await second.goto(url); await second.getByLabel('Source', { exact: true }).fill('Later tab source');
+  const second = await context.newPage(); await second.goto(url); await second.getByRole('button', { name: 'Edit route', exact: true }).click(); await second.getByLabel('Source', { exact: true }).fill('Later tab source');
   await second.getByRole('button', { name: /^Save/ }).click();
-  await button('Signal flow').click(); await page.getByLabel('Source', { exact: true }).fill('Stale tab source'); await save();
+  await button('Signal flow').click(); await button('Edit route').click(); await page.getByLabel('Source', { exact: true }).fill('Stale tab source'); await save();
   assert.match(await page.getByRole('status').textContent(), /another tab/);
   assert.equal((await readSaved()).routes[0].source, 'Later tab source');
   await second.close();
@@ -142,9 +142,9 @@ try {
       await page.getByLabel('Theme', { exact: true }).selectOption(theme);
       await button('Signal flow').click(); await assertContained(width, height);
       if (width === 1440 || width === 375) await page.screenshot({ path: `${shots}/${width}-${theme}.png` });
-      await page.locator('.route-card').first().click(); await assertContained(width, height);
+      await button('Edit route').click(); await assertContained(width, height);
       assert.ok(await page.getByLabel('Source', { exact: true }).isVisible());
-      if (width <= 680) await button('Back to routes').click();
+      await button('Back to diagram').click();
       await button('Patch').click(); await assertContained(width, height);
       await page.getByRole('button', { name: /^Checks/ }).click(); await assertContained(width, height);
       await goProject(); await assertContained(width, height);
@@ -153,7 +153,7 @@ try {
   // Broken saved data fails closed, and opening the default Toolbox leaves Show Console alone.
   const broken = await browser.newContext(); const bad = await broken.newPage();
   await bad.goto(url); await bad.evaluate(key => localStorage.setItem(key, 'broken saved source'), key); await bad.reload();
-  await bad.getByRole('button', { name: 'Create first route' }).click(); await bad.getByRole('button', { name: /^Save/ }).click();
+  await bad.getByRole('button', { name: 'Add route', exact: true }).click(); await bad.getByRole('button', { name: /^Save/ }).click();
   assert.match(await bad.getByRole('status').textContent(), /blocked/);
   assert.equal(await bad.evaluate(key => localStorage.getItem(key), key), 'broken saved source');
   await broken.close();
@@ -168,10 +168,10 @@ try {
   await hub.locator('#toolboxGroups a[data-tool=av-video]').click(); await hub.getByRole('heading', { name: 'AV Video', exact: true }).waitFor();
   await toolbox.setOffline(true); await hub.reload();
   await hub.getByRole('heading', { name: 'AV Video', exact: true }).waitFor();
-  await hub.getByRole('button', { name: 'Create first route', exact: true }).click();
+  await hub.getByRole('button', { name: 'Add route', exact: true }).click();
   await hub.getByLabel('Source', { exact: true }).fill('Offline camera');
   await hub.getByRole('button', { name: /^Save/ }).click();
-  await hub.reload(); assert.equal(await hub.getByLabel('Source', { exact: true }).inputValue(), 'Offline camera');
+  await hub.reload(); await hub.getByRole('button', { name: 'Edit route', exact: true }).click(); assert.equal(await hub.getByLabel('Source', { exact: true }).inputValue(), 'Offline camera');
   await toolbox.setOffline(false);
   await toolbox.close();
   assert.deepEqual(errors, []);

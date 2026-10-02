@@ -16,7 +16,7 @@ documenting the Notion skills, agents, widgets, and templates I build and use.
 
 ## AV Video
 
-[AV Video](https://avbydave.com/av-video/) combines Signal Flow and Video Patch in one independent application. Source lives in `apps/av-video/`; `npm run build:av-video` regenerates the committed `av-video/` artifact. Use `npm run typecheck:av-video`, `npm run test:av-video` and `npm run test:av-video-browser` to verify it. See [the workflow and data contract](docs/av-video.md).
+[AV Video](https://avbydave.com/av-video/) combines an interactive Signal Flow canvas and Video Patch in one independent application. Source lives in `apps/av-video/`; `npm run build:av-video` regenerates the committed `av-video/` artifact. Use `npm run typecheck:av-video`, `npm run test:av-video` and `npm run test:av-video-browser` to verify it. See [the workflow and data contract](docs/av-video.md).
 
 ## Local development
 

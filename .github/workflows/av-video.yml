@@ -6,7 +6,7 @@ on:
       - 'apps/av-video/**'
       - 'av-video/**'
       - 'package*.json'
-      - 'scripts/probe_av_video.mjs'
+      - 'scripts/probe_av_video*.mjs'
       - 'js/sbd-registry.js'
       - 'js/av-suite/**'
       - '.github/workflows/av-video.yml'

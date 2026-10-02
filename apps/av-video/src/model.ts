@@ -4,15 +4,20 @@ export const STORE = "sbd.avVideo.v1";
 export const SCHEMA = "system-by-dave.av-video.v1";
 export const LEGACY = { "Signal Flow": "signal-flow.v1", "Video Patch": "sbd.videoPatch.v1" } as const;
 const text = z.string();
+export const deviceKind = z.enum(["source", "converter", "processor", "destination"]);
+export type DeviceKind = z.infer<typeof deviceKind>;
 const routeSchema = z.object({
   id: text, route: text, source: text, destination: text, system: text, type: text,
   format: text, connector: text, processor: text, input: text, converter: text,
   backup: text, status: text, notes: text, origin: text,
+  output: text.default(""),
 }).strict();
 const documentSchema = z.object({
   schema: z.literal(SCHEMA), id: text, title: text, meta: z.record(text),
   routes: z.array(routeSchema), modules: z.object({ patch: z.boolean(), checks: z.boolean(), backups: z.boolean() }).strict(),
   imports: z.array(z.object({ id: text, name: text, raw: text }).strict()),
+  graphDevices: z.array(z.object({ id: text, label: text, kind: deviceKind }).strict()).default([]),
+  graphPositions: z.record(z.object({ x: z.number().finite(), y: z.number().finite() }).strict()).default({}),
 }).strict().superRefine((doc, ctx) => {
   if (new Set(doc.routes.map(r => r.id)).size !== doc.routes.length) ctx.addIssue({ code: "custom", message: "Duplicate route IDs" });
 });
@@ -22,10 +27,10 @@ export type Module = keyof VideoDocument["modules"];
 export type Preview = { name: string; raw: string; fingerprint: string; routes: Route[]; meta: Record<string, string>; restore?: VideoDocument; browserKey?: string };
 export const uid = () => crypto.randomUUID();
 export function newRoute(): Route {
-  return { id: uid(), route: "", source: "", destination: "", system: "video", type: "camera", format: "", connector: "", processor: "", input: "", converter: "", backup: "", status: "planned", notes: "", origin: "" };
+  return { id: uid(), route: "", source: "", destination: "", system: "video", type: "camera", format: "", connector: "", processor: "", input: "", output: "", converter: "", backup: "", status: "planned", notes: "", origin: "" };
 }
 export function emptyDocument(): VideoDocument {
-  return { schema: SCHEMA, id: uid(), title: "Untitled video plan", meta: {}, routes: [], modules: { patch: true, checks: true, backups: true }, imports: [] };
+  return { schema: SCHEMA, id: uid(), title: "Untitled video plan", meta: {}, routes: [], modules: { patch: true, checks: true, backups: true }, imports: [], graphDevices: [], graphPositions: {} };
 }
 export function parseDocument(raw: string): VideoDocument { return documentSchema.parse(JSON.parse(raw)); }
 export function loadDocument(storage: Pick<Storage, "getItem">): { doc: VideoDocument; baseline: string | null; error: string } {
@@ -97,6 +102,7 @@ export function sampleDocument(): VideoDocument {
   return { ...doc, title: "General session · Video", meta: { venue: "Main ballroom", videoLead: "" }, routes: [
     { ...newRoute(), route: "CAM 1 → IMAG", source: "Camera 1", format: "1080p59.94", connector: "3G SDI", input: "Switcher input 1", processor: "Production switcher", destination: "IMAG screens", backup: "Camera 2 wide", status: "tested", notes: "Confirm shading at rehearsal." },
     { ...newRoute(), route: "SLIDES → Screen", source: "Slides laptop", type: "slides", format: "1080p59.94", connector: "HDMI", converter: "HDMI to SDI", input: "Switcher input 3", processor: "Production switcher", destination: "Center screen", backup: "Backup laptop · input 4", status: "issue", notes: "Lock output resolution before doors." },
-    { ...newRoute(), route: "PGM → Record", source: "Program out", type: "record", format: "1080p59.94", connector: "3G SDI", input: "Recorder SDI 1", destination: "Program recorder", status: "planned" },
+    { ...newRoute(), route: "PGM → Record", source: "Production switcher", type: "record", format: "1080p59.94", connector: "3G SDI", output: "Program out 2", input: "Recorder SDI 1", destination: "Program recorder", status: "planned" },
+    { ...newRoute(), route: "PGM → Stream", source: "Production switcher", type: "stream", format: "1080p59.94", connector: "3G SDI", output: "Program out 3", input: "Encoder SDI", destination: "Stream encoder", status: "patched" },
   ] };
 }

@@ -1,0 +1,92 @@
+.workspace.view-flow { grid-template-columns: minmax(0, 1fr); padding: 12px; }
+.workspace.view-flow.inspector-open { grid-template-columns: minmax(0, 1fr) 340px; }
+.flow-workspace { display: flex; flex-direction: column; min-height: 0; min-width: 0; overflow: hidden; border: 1px solid var(--av-line); border-radius: 8px; background: var(--av-surface); }
+.flow-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 16px; border-bottom: 1px solid var(--av-line); }
+.flow-heading { display: flex; align-items: baseline; gap: 18px; }
+.flow-heading h2 { font-size: 18px; white-space: nowrap; }
+.flow-heading span { color: var(--av-muted); font: 11px ui-monospace, monospace; white-space: nowrap; }
+.flow-heading i { font-style: normal; padding: 0 5px; }
+.flow-actions { display: flex; gap: 6px; }
+.flow-actions button { font-size: 12px; }
+.flow-route-bar { display: flex; align-items: center; gap: 8px; padding: 8px 16px; border-bottom: 1px solid var(--av-line); background: var(--av-surface-2); }
+.flow-route-bar label { display: flex; align-items: center; gap: 10px; font-size: 11px; font-weight: 600; }
+.flow-route-bar select { width: 240px; font-size: 12px; }
+.flow-route-bar button { font-size: 12px; white-space: nowrap; }
+.flow-route-bar button[aria-pressed=true] { color: var(--av-primary-ink); background: var(--av-accent)!important; border-color: var(--av-accent); }
+.flow-route-format { margin-left: auto; font: 11px ui-monospace, monospace; color: var(--av-muted); }
+.flow-canvas { position: relative; flex: 1; min-height: 0; min-width: 0; background: var(--av-bg); }
+.flow-canvas .react-flow { --xy-background-color: var(--av-bg); --xy-edge-stroke: var(--av-line-strong); --xy-edge-stroke-selected: var(--av-accent); --xy-edge-label-color: var(--av-text-2); --xy-edge-label-background-color: var(--av-surface); --xy-controls-button-background-color: var(--av-surface); --xy-controls-button-color: var(--av-text); --xy-controls-button-background-color-hover: var(--av-raised); --xy-controls-button-border-color: var(--av-line); --xy-minimap-background-color: var(--av-surface); --xy-attribution-background-color: var(--av-surface); }
+.flow-canvas .react-flow__controls { display: flex; margin: 16px; border: 1px solid var(--av-line); border-radius: 6px; box-shadow: var(--av-shadow); overflow: hidden; }
+.flow-canvas .react-flow__controls button { width: 44px; height: 44px; min-height: 44px; border-radius: 0; padding: 12px; }
+.flow-canvas .react-flow__controls button svg { width: 16px; height: 16px; max-width: none; max-height: none; }
+.flow-canvas .react-flow__minimap { margin: 16px 16px 32px; border: 1px solid var(--av-line); border-radius: 6px; overflow: hidden; }
+.flow-canvas .react-flow__attribution { font-size: 9px; }
+.flow-canvas .react-flow__attribution a { color: var(--av-muted); }
+.diagram-device { position: relative; width: 240px; background: var(--av-surface); border: 1px solid var(--av-line-strong); border-radius: 8px; box-shadow: 0 5px 15px -10px var(--av-text-2); color: var(--av-text); --device-color: var(--av-info); border-top: 3px solid var(--device-color); }
+.diagram-device.kind-processor { --device-color: var(--av-accent); }
+.diagram-device.kind-converter { --device-color: var(--av-purple); }
+.diagram-device.kind-destination { --device-color: var(--av-success); }
+.react-flow__node.selected .diagram-device, .diagram-device.is-traced { outline: 2px solid var(--device-color); outline-offset: 3px; }
+.diagram-device.is-dimmed { opacity: .34; }
+.device-title { display: flex; align-items: center; gap: 10px; padding: 12px 13px 8px; height: 50px; }
+.device-title>div { min-width: 0; }
+.device-title small { display: block; color: var(--device-color); font-size: 10px; text-transform: uppercase; letter-spacing: .09em; margin-bottom: 5px; }
+.device-title strong { font-size: 15px; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 172px; }
+.device-icon { font-size: 24px; line-height: 1; color: var(--device-color); }
+.device-issue { margin-left: auto; flex-shrink: 0; width: 16px; height: 16px; display: grid; place-items: center; font-size: 11px; border-radius: 50%; background: var(--av-danger); color: var(--av-primary-ink); }
+.device-port-labels { display: grid; grid-template-columns: 1fr 1fr; padding: 0 13px; gap: 14px; }
+.device-port-labels>div { min-width: 0; }
+.device-port-labels>div>div { height: 26px; display: flex; align-items: center; color: var(--av-muted); font: 11px ui-monospace, monospace; }
+.device-port-labels>div:last-child>div { justify-content: flex-end; text-align: right; }
+.device-port-labels span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.flow-canvas .react-flow__handle { width: 9px; height: 9px; border: 2px solid var(--av-surface); background: var(--device-color); box-shadow: 0 0 0 1px var(--device-color); }
+.flow-canvas .react-flow__handle::before { content: ''; position: absolute; inset: -14px; }
+.flow-canvas .react-flow__handle:hover { background: var(--av-text); outline: 3px solid var(--av-focus); }
+.device-new-ports { position: absolute; bottom: 0; left: 0; right: 0; height: 26px; display: flex; justify-content: space-between; align-items: center; padding: 0 13px; border-top: 1px solid var(--av-line); font: 11px ui-monospace, monospace; color: var(--av-muted); }
+.diagram-wire .react-flow__edge-path { stroke: var(--av-text-2); }
+.diagram-wire .react-flow__edge-text { font: 11px ui-monospace, monospace; fill: var(--av-text-2); }
+.diagram-wire .react-flow__edge-textbg { fill: var(--av-bg); }
+.diagram-wire.wire-issue .react-flow__edge-path { stroke: var(--av-danger); stroke-dasharray: 5 4; }
+.diagram-wire.wire-traced .react-flow__edge-path { stroke: var(--av-accent); }
+.diagram-wire.wire-dimmed { opacity: .17; }
+.flow-empty { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); display: flex; flex-direction: column; align-items: center; gap: 12px; max-width: 430px; width: calc(100% - 50px); padding: 24px; text-align: center; background: var(--av-surface); border: 1px solid var(--av-line); border-radius: 10px; box-shadow: var(--av-shadow); }
+.flow-empty h3 { font-size: 24px; letter-spacing: -.5px; }
+.flow-empty p { font-size: 13px; }
+.flow-empty-symbol { font-size: 29px; color: var(--av-accent); letter-spacing: 10px; }
+.diagram-hint { position: absolute; top: 12px; left: 16px; pointer-events: none; font: 10px ui-monospace, monospace; color: var(--av-muted); background: var(--av-bg); padding: 4px 6px; border-radius: 3px; }
+.device-selection { position: absolute; top: 40px; left: 16px; z-index: 5; width: 260px; max-height: calc(100% - 100px); overflow: auto; background: var(--av-surface); border: 1px solid var(--av-line-strong); border-radius: 8px; padding: 16px; box-shadow: var(--av-shadow); }
+.device-selection>div>strong, .device-selection>div>span { display: block; margin: 6px 0; overflow-wrap: anywhere; }
+.device-selection>div>span { font-size: 11px; color: var(--av-muted); }
+.device-selection>button:not(.device-close) { width: 100%; margin-top: 8px; }
+.device-selection form { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; }
+.device-selection label { font-size: 11px; font-weight: 600; }
+.device-selection select { margin-top: 6px; font-size: 12px; }
+.device-selection .device-close { position: absolute; right: 2px; top: 2px; border: 0; background: transparent!important; width: 44px; font-size: 22px; }
+.flow-workspace dialog label { display: flex; flex-direction: column; font-size: 12px; font-weight: 600; gap: 7px; margin-top: 16px; }
+.view-flow .inspector .mobile-back { display: block; font-size: 11px; }
+@media(min-width:2000px) { .workspace.view-flow.inspector-open { grid-template-columns: minmax(0,1fr) 440px; } .flow-canvas .react-flow__minimap { width: 240px; height: 150px; } }
+@media(max-width:1100px) { .flow-heading { display: block; } .flow-heading span { display: block; margin-top: 5px; } .flow-route-format { display: none; } }
+@media(max-width:680px) {
+  .workspace.view-flow { display: block; padding: 6px; }
+  .flow-workspace { height: 100%; }
+  .view-flow.detail-open .flow-workspace { display: none; }
+  .view-flow.detail-open .inspector { display: flex; }
+  .flow-toolbar { padding: 10px; display: block; }
+  .flow-heading { display: flex; justify-content: space-between; margin-bottom: 8px; }
+  .flow-heading h2 { font-size: 16px; }
+  .flow-heading span { font-size: 10px; margin: 0; }
+  .flow-actions { display: grid; grid-template-columns: repeat(4,1fr); gap: 4px; }
+  .flow-actions button { padding: 7px 5px; font-size: 10px; }
+  .flow-route-bar { padding: 7px; gap: 5px; }
+  .flow-route-bar label { font-size: 0; flex: 1; min-width: 0; gap: 0; }
+  .flow-route-bar select { width: 100%; font-size: 11px; }
+  .flow-route-bar button { padding: 8px; font-size: 10px; }
+  .flow-canvas .react-flow__minimap { display: none; }
+  .flow-canvas .react-flow__controls { margin: 8px 8px 18px; }
+  .diagram-hint { font-size: 8px; left: 7px; top: 7px; max-width: calc(100% - 14px); }
+  .flow-empty { padding: 16px; gap: 9px; width: calc(100% - 28px); }
+  .flow-empty h3 { font-size: 20px; }
+  .flow-empty-symbol { display: none; }
+  .flow-empty p { font-size: 11px; }
+  .device-selection { top: 30px; left: 8px; width: calc(100% - 16px); max-height: calc(100% - 96px); }
+}
