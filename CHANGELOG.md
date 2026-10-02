@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-02 — Remove Workbook recovery from consolidation scope
+
+- Record Dave's clarification that assumed Workbook users and recovery needs must not drive its public withdrawal. Remove the recovery notice, dedicated export/transfer flow, transition period and migration gate from the maintained plan and its dependent documents.
+- Retain the Workbook concept/source for possible redesign. Former entry URLs can return to Toolbox using routine routing; leave browser storage untouched. This clarification changes planning documents, not the live application.
+
 ## 2026-10-02 — LED Wall Calculator responsive polish
 
 - Make the four settings groups collapsible without clearing inputs, and let the mobile section rail reopen and focus each group. Keep all five section buttons visible at phone width.

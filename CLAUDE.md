@@ -98,8 +98,11 @@ next product direction: Toolbox as default, focused applications with optional
 modules, independently launchable Unified Video, and public Workbook withdrawal
 while retaining its concept for possible redesign. These are settled target
 decisions, not the shipped doorway behavior described above. Workbook is not a
-required host or database for new applications. Read the plan's consequential
-choice gates before implementation; decide routine engineering details autonomously.
+required host or database for new applications. Dave clarified on 2026-10-02
+that its withdrawal needs no recovery notice, dedicated export flow, transition
+period or migration project; do not factor assumed Workbook adoption into scope.
+Read the remaining consequential choice gates before implementation; decide
+routine engineering details autonomously.
 
 ### Cross-tool state
 

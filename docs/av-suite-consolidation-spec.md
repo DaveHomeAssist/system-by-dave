@@ -1,6 +1,6 @@
 # AV Suite consolidation: Toolbox and focused applications
 
-**Decision revision:** 2026-10-01, requested by Dave. This is the maintained product and migration plan. It supersedes the September 23 seven-workspace proposal and the September 29 recommendation to build Video inside Workbook. The [dated specification](av-suite-consolidation-spec-2026-09-23.md) remains historical evidence.
+**Decision revision:** 2026-10-02, requested by Dave. The October 2 clarification removes assumed Workbook adoption, recovery and migration requirements from public withdrawal. This is the maintained product and migration plan. It supersedes the September 23 seven-workspace proposal and the September 29 recommendation to build Video inside Workbook. The [dated specification](av-suite-consolidation-spec-2026-09-23.md) remains historical evidence.
 
 **Delivery boundary:** This revision changes the plan. Toolbox as the default, optional modules, focused consolidated applications, and removal of Workbook from the public website are target behavior, not a claim of implementation. Current source at `238f2ed` still publishes Workbook and retains the doorway chooser. Use the [doorway contract](av-suite-doorway.md) for shipped behavior and the [development assets index](av-suite-development-assets-index.md) for evidence and source ownership.
 
@@ -10,7 +10,7 @@
 2. **Organize the suite as focused applications with a shared experience.** Adobe Suite is the product reference: recognizable applications for different jobs, with common conventions and useful handoffs. It is not a requirement to copy Adobe branding, licensing, cloud services, or its exact interface. Consolidation joins related workflows where that completes a job; it does not turn every application into a tab in one mandatory container.
 3. **Users can turn optional modules off.** This reduces navigation, panels, commands, and routine prompts for work they do not do. Preferences must be reversible and must not delete saved work or conceal active operations.
 4. **Video remains directly visible.** Unified Video covers cameras, playback, switching and signal flow, displays and projection, streaming, and recording. It launches as a focused application from Toolbox and works without Workbook. Its implementation does not inherit Workbook as its host or required data store.
-5. **Remove AV Workbook from the public website.** The public product and discovery surfaces must stop promoting or launching Workbook. Retain its concept, source history, and migration knowledge for a possible future redesign. A future return needs a new product brief; it is not a dependency of this consolidation program.
+5. **Remove AV Workbook from the public website.** The public product and discovery surfaces must stop promoting or launching Workbook. Retain its concept, source history, and migration knowledge for a possible future redesign. A future return needs a new product brief; it is not a dependency of this consolidation program. Per Dave on October 2, do not factor assumed Workbook users or recovery needs into withdrawal: no recovery notice, dedicated export flow, transition period or migration project is required.
 6. **Carry these decisions forward.** Do not ask again whether Toolbox is the default, whether modules can be disabled, whether Video should be visible, or whether Workbook is required or should be withdrawn. Surface only consequential unresolved choices before the affected implementation; choose routine engineering details autonomously within these boundaries.
 
 ## Application model
@@ -96,7 +96,7 @@ The withdrawal implementation must cover the AV home and Toolbox, Show Console r
 
 Retain the Workbook concept and source in the repository for possible redesign. Keep its useful schema/import/load-guard history as engineering evidence, not a mandate to reuse its store. Retained source and generated editor assets must not leak into the public artifact through the current whole-repository Pages staging. Audit app source, generated bundle paths, aliases and caches explicitly.
 
-Preserve existing Workbook IndexedDB, active-ID/fallback keys, backups and domain-transfer coverage even when its public registry entry is hidden or retired. Storage coverage may need an explicit retained-data entry once it is no longer derived from a public tool. Do not clear browser databases, silently migrate them into Video, or redirect a saved document into an incompatible app. The remaining consequential choice is the user-facing recovery treatment of former URLs, not whether to remove Workbook. The recommended recovery notice offers export/transfer without exposing the full editor or advertising Workbook as an available product; verify this before retiring the public runtime.
+Dave resolved the withdrawal scope on 2026-10-02: do not plan around assumed Workbook users or their recovery needs. Remove it without a Workbook recovery page, dedicated export/transfer flow, legacy access period or migration project. Old public entry URLs can use the existing noindex redirect pattern to Toolbox; that is a routine routing decision, not another product approval gate. Leave browser storage untouched rather than adding deletion or migration code. Existing transfer and load-guard work remains historical engineering evidence; extending or proving a retired Workbook recovery path is not a withdrawal prerequisite.
 
 ## Data, interfaces and failure behavior
 
@@ -121,14 +121,14 @@ Completed safety work in [Stage 0](av-suite-consolidation-stage0.md) and the [Vi
 | Stage | Deliverable | Exit gate |
 | --- | --- | --- |
 | 0. Retain evidence and close slice safety | Current registry/route/store inventory; preserve completed 2.0a/2.0b and delivered 2.0c fixes | Enumerate undeclared stores, meaningful fields, exports, offline and recovery behavior for the affected slice |
-| 1. Toolbox default and Workbook withdrawal | Default Toolbox, explicit Show Console, public Workbook removal with agreed recovery behavior | Fresh/returning/deep-link routing passes; no Workbook promotion/editor in staged public artifacts; existing data remains recoverable |
+| 1. Toolbox default and Workbook withdrawal | Default Toolbox, explicit Show Console, public Workbook removal without a recovery or migration project | Fresh/returning/deep-link routing passes; no Workbook promotion/editor in staged public artifacts; former entry URLs return to Toolbox |
 | 2. Unified Video | Independent application and selected module preset; routes first, then the remaining Video workflows | Eight legacy capabilities preserve fields/statuses; camera→screen, camera→stream/record and playback→display journeys pass without Workbook |
 | 3. Audio | Coherent Inputs→Patch→Line Check app, with optional specialist modules | Import, edit, export, repeat import and rollback preserve identity and meaningful fields |
 | 4. Logistics | Coherent prep→pack→load→strike flow, with optional Cable | Counts, partial packs, missing items and destination status reconcile |
 | 5. Remaining application families | Infrastructure, Show Operations and live applications follow resolved boundaries | Specialist controls, timelines, timing, keyboard, remote/display, client output and failure behavior meet parity |
 | 6. Complete discovery and migration | Task search, optional-module management, direct launch and compatibility coverage | Every supported capability has a reachable home; disabled and withdrawn states are explicit; operator trial and deployment readback pass |
 
-For each migrated capability, inventory first; preview source/target, unmapped fields and conflicts; offer backup; apply only on confirmation; verify counts and meaningful values; retain original data and provenance; reject stale/repeated imports that would overwrite newer edits. Keep compatibility and rollback until operator acceptance justifies route retirement. The specific Workbook withdrawal has its own recovery gate above and does not wait for a replacement product.
+For each migrated capability, inventory first; preview source/target, unmapped fields and conflicts; offer backup; apply only on confirmation; verify counts and meaningful values; retain original data and provenance; reject stale/repeated imports that would overwrite newer edits. Keep compatibility and rollback until operator acceptance justifies route retirement. Workbook withdrawal is the explicit exception: no dedicated recovery or migration gate and no replacement-product dependency.
 
 ## Consequential choices before affected implementation
 
@@ -136,7 +136,6 @@ These are open product choices, not a request to reapprove settled direction. Re
 
 | Choice | Recommended path | Consequence and decision gate |
 | --- | --- | --- |
-| **Workbook former URLs and recovery** | Recovery-only notice/export path with no public editor or product launch | Determine whether recovery needs a time-limited legacy access path and where it lives before withdrawing runtime assets. Public withdrawal itself is settled. |
 | **Document identity across applications** | Each app owns documents; share only explicit supported context/imports at first | A shared project container changes identity, conflict handling and migration scope. Resolve before the Video persistence contract; Workbook is not the assumed answer. |
 | **First module presets and preference scope** | A compact Video core around Switching & Routes; optional task modules chosen by the user; preferences local to that user/device | Confirm which task views appear initially and whether presets travel with projects before the module UI/import behavior ships. The ability to turn modules off is settled. |
 | **Remaining application boundaries** | Keep existing live apps separate; evaluate Infrastructure as a family before combining it | Resolve Power/Network/Lighting and live-app mergers before implementing those mergers. It does not block independent Video or Toolbox work. |
@@ -148,7 +147,7 @@ Routine choices such as component boundaries, route spelling within compatibilit
 
 - A neutral visitor lands in Toolbox; Video and other focused apps launch directly without show or Workbook setup. Explicit Show Console and supported legacy links still work.
 - Disable a module, reload, follow a deep link, export/import, and re-enable it: clutter is reduced and original data survives. Disabled dependencies, active operations, unknown preferences, storage failure and scoped readiness are handled explicitly.
-- Workbook is absent from public discovery and the public editor artifact; former URLs follow the agreed recovery treatment. Existing browser work and backups remain recoverable. Retained source/concept does not become a hidden runtime requirement.
+- Workbook is absent from public discovery and the public editor artifact; former entry URLs return to Toolbox without a dedicated recovery notice or export flow. No migration work or browser-data deletion is introduced. Retained source/concept does not become a hidden runtime requirement.
 - Each app completes its representative job with coherent identity, explicit status and usable export; links to specialists return to the original task. No replacement is accepted merely because it groups old forms.
 - At 1440×900 and 375×812, verify `document.documentElement.scrollHeight <= document.documentElement.clientHeight` and the matching width check. Also cover 680px and representative 32:9, keyboard, visible focus, light/dark, reduced motion and offline/recovery behavior.
 - Validate canonical sources, registry/inventory, sitemap, cache consumers, domain staging and generated artifacts together when changed. Run the repository's relevant checks, review the complete diff, commit/push, merge only a green current PR head, then verify the remote and complete Pages workflow.

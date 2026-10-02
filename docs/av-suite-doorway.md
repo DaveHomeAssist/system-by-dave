@@ -123,8 +123,9 @@ chooser and saved-entry fallback for neutral visits when implemented; explicit
 Show Console and supported legacy show-context routes retain compatibility.
 
 Video must be directly launchable without Workbook. Workbook is to be removed
-from public promotion, launch surfaces and the public editor artifact, with an
-agreed recovery treatment for existing saved work; its concept/source remains for
-a possible future redesign. These are settled target decisions. This document
-still describes the live chooser and Workbook grouping above so a plan revision
+from public promotion, launch surfaces and the public editor artifact. Dave
+clarified on 2026-10-02 that no Workbook recovery notice, dedicated export flow,
+transition period or migration project is required; former entry URLs can return
+to Toolbox. Its concept/source remains for a possible future redesign. These are
+settled target decisions. This document still describes the live chooser and Workbook grouping above so a plan revision
 is not mistaken for a shipped interface change.

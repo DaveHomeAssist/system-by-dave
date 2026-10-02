@@ -84,7 +84,7 @@ This matrix is the acceptance list for increment 2.2. Every field listed must ha
 
 ## Increments
 
-Each increment is a separate pull request that merges only when every check is green. Video increments do not retire legacy routes, rename existing keys/export schemas, or let the new app write legacy or Workbook records. The separate public Workbook withdrawal follows its own recovery gate in the maintained specification.
+Each increment is a separate pull request that merges only when every check is green. Video increments do not retire legacy routes, rename existing keys/export schemas, or let the new app write legacy or Workbook records. Per Dave on October 2, the separate public Workbook withdrawal has no dedicated recovery or migration gate; retain its concept/source without planning around assumed users.
 
 | Increment | Deliverable | Exit gate |
 | --- | --- | --- |
@@ -317,5 +317,5 @@ Validation covers field-matrix completeness, save/reload, exports, schema compat
 
 - **Operator data already written.** Earlier visits may already have put operator names into `audioLead`, `tdName`, or `producer`. Import 2.2 must surface these in the preview; it must not assume they are correct.
 - **Stored samples.** Sample rows may already be saved under real show names. The import preview labels rows that match the built-in samples exactly, and the operator decides whether to import them.
-- **Offline cache.** A new app or public withdrawal must update registry assets, version consumers, staged artifacts and caches together. Existing cached Workbook copies must retain recovery paths; successful Pages deployment alone does not prove their behavior.
+- **Offline cache.** A new app or public withdrawal must update registry assets, version consumers, staged artifacts and caches together. Retire Workbook editor assets from current caches without adding a dedicated recovery path or deleting browser data. Successful Pages deployment alone does not prove updated cache behavior.
 - **Different running meaning.** Play Next takes only `ready` cues, while Take Next also takes `hold` and `problem` shots. The P key means Play Next in one tool and "mark problem" in the other. Increment 2.3 must choose one explicit behavior per view and show it to the operator.
