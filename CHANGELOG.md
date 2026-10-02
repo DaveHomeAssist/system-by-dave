@@ -5,6 +5,7 @@
 - Make the four settings groups collapsible without clearing inputs, and let the mobile section rail reopen and focus each group. Keep all five section buttons visible at phone width.
 - Move the section rail ahead of the 3D preview, tighten phone actions and tablet proportions, and make cabinet inspection an on-demand disclosure that opens when a cabinet is selected.
 - Keep the page viewport-locked while checking phone, portrait and landscape tablet, desktop, and ultrawide layouts. Stabilize the saved-profile browser probe by waiting for restored state after reload.
+- Advance the AV offline cache version and Stage 3D readiness pin so returning visitors receive the matching calculator HTML, CSS, and JavaScript after the responsive update.
 
 ## 2026-10-02 — Sourced LED cabinet planning profiles
 

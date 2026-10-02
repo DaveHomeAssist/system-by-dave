@@ -240,7 +240,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool asset change — rolls the service-worker cache. */
-    version:'v20261001-led-cabinet-library',
+    version:'v20261002-led-wall-responsive-polish',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,
