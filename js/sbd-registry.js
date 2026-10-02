@@ -128,6 +128,7 @@
     './js/av-domain-views.js',
     './js/av-calculator.js',
     './js/led-wall-viewer.js',
+    './data/led-cabinet-catalog.v1.json',
     './js/vendor/gsap.min.js',
     './css/av-calculator.css',
     './ProjectorThrow/index.html',
@@ -239,7 +240,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool asset change — rolls the service-worker cache. */
-    version:'v20261001-led-chain-map',
+    version:'v20261001-led-cabinet-library',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,

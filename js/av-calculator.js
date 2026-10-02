@@ -38,6 +38,7 @@
     ledCabinetPixelsHigh: 172,
     ledSpecSource: '',
     ledWeightKg: null,
+    ledCatalogId: null,
     ledCabinetRotation: '0',
     ledCabinetsWide: 8,
     ledCabinetsHigh: 5,
@@ -71,7 +72,10 @@
   const fields = Array.from(document.querySelectorAll('[data-key]'));
   const isLedPage = document.documentElement.dataset.avTool === 'led-wall-calculator';
   const activeKeys = new Set(fields.map(field => field.dataset.key));
-  if (isLedPage) activeKeys.add('ledPowerFactorEntered');
+  if (isLedPage) {
+    activeKeys.add('ledPowerFactorEntered');
+    activeKeys.add('ledCatalogId');
+  }
   const els = {
     delayMs: document.getElementById('delayMs'),
     delayFrames: document.getElementById('delayFrames'),
@@ -110,6 +114,8 @@
     splHint: document.getElementById('splHint'),
     ledProfileSelect: document.getElementById('ledProfileSelect'),
     ledProfileEvidence: document.getElementById('ledProfileEvidence'),
+    ledCabinetMass: document.getElementById('ledCabinetMass'),
+    ledSupportNote: document.getElementById('ledSupportNote'),
     ledLayoutFields: document.getElementById('ledLayoutFields'),
     ledTargetSizeFields: document.getElementById('ledTargetSizeFields'),
     ledTargetRasterFields: document.getElementById('ledTargetRasterFields'),
@@ -203,8 +209,14 @@
     'ledCabinetPixelsWide', 'ledCabinetPixelsHigh', 'ledMaxWattsEach',
     'ledTypicalWattsEach', 'ledVoltage', 'ledPortBasePixels',
     'ledReceiverPixelsWide', 'ledReceiverPixelsHigh', 'ledCabinetsPerHomeRun',
-    'ledSpecSource', 'ledWeightKg'
+    'ledSpecSource', 'ledWeightKg', 'ledPowerFactor', 'ledPowerFactorEntered'
   ];
+  const LED_CATALOG_OVERRIDE_KEYS = new Set([
+    'ledProductName', 'ledPitchMm', 'ledCabinetWidthMm', 'ledCabinetHeightMm',
+    'ledCabinetPixelsWide', 'ledCabinetPixelsHigh', 'ledMaxWattsEach',
+    'ledTypicalWattsEach', 'ledSpecSource', 'ledWeightKg', 'ledPowerFactor',
+    'ledReceiverPixelsWide', 'ledReceiverPixelsHigh', 'ledCabinetsPerHomeRun'
+  ]);
 
   const storage = (() => {
     try {
@@ -269,6 +281,8 @@
 
   let state = loadState();
   let ledProfiles = loadLedProfiles();
+  let ledCatalog = [];
+  let ledCatalogUnavailable = false;
 
   function loadState() {
     const saved = storage.get(STORE);
@@ -312,22 +326,87 @@
     }
   }
 
-  function refreshLedProfileOptions(selectedId = '') {
+  function validCatalogRecord(record) {
+    if (!record || typeof record !== 'object' || !/^[a-z0-9-]+$/.test(record.id || '')
+      || typeof record.manufacturer !== 'string' || typeof record.name !== 'string'
+      || typeof record.sourceRevision !== 'string' || typeof record.powerEvidence !== 'string') return false;
+    try {
+      if (new URL(record.sourceUrl).protocol !== 'https:') return false;
+    } catch (error) {
+      return false;
+    }
+    const cabinet = record.cabinet;
+    if (!cabinet || !['pitchMm', 'widthMm', 'heightMm', 'pixelsWide', 'pixelsHigh',
+      'weightKg', 'maxWatts', 'typicalWatts'].every(key => Number.isFinite(cabinet[key]) && cabinet[key] > 0)) return false;
+    if (cabinet.typicalWatts > cabinet.maxWatts) return false;
+    return Math.abs(cabinet.widthMm / cabinet.pixelsWide - cabinet.pitchMm) / cabinet.pitchMm < 0.005
+      && Math.abs(cabinet.heightMm / cabinet.pixelsHigh - cabinet.pitchMm) / cabinet.pitchMm < 0.005;
+  }
+
+  async function loadLedCatalog() {
+    try {
+      const response = await fetch('data/led-cabinet-catalog.v1.json');
+      if (!response.ok) throw new Error(`Catalog request failed: ${response.status}`);
+      const catalog = await response.json();
+      if (catalog.schemaVersion !== 1 || !Array.isArray(catalog.records)
+        || !catalog.records.length || !catalog.records.every(validCatalogRecord)) {
+        throw new Error('Cabinet catalog failed validation.');
+      }
+      ledCatalog = catalog.records;
+      refreshLedProfileOptions();
+      calculate();
+    } catch (error) {
+      ledCatalogUnavailable = true;
+      refreshLedProfileOptions();
+      calculate();
+    }
+  }
+
+  function catalogRecordForState() {
+    const record = ledCatalog.find(item => item.id === state.ledCatalogId);
+    if (!record) return null;
+    const values = {
+      ledProductName: `${record.manufacturer} ${record.name}`,
+      ledPitchMm: record.cabinet.pitchMm,
+      ledCabinetWidthMm: record.cabinet.widthMm,
+      ledCabinetHeightMm: record.cabinet.heightMm,
+      ledCabinetPixelsWide: record.cabinet.pixelsWide,
+      ledCabinetPixelsHigh: record.cabinet.pixelsHigh,
+      ledWeightKg: record.cabinet.weightKg,
+      ledMaxWattsEach: record.cabinet.maxWatts,
+      ledTypicalWattsEach: record.cabinet.typicalWatts,
+      ledSpecSource: record.sourceUrl
+    };
+    return Object.entries(values).every(([key, value]) => state[key] === value) ? record : null;
+  }
+
+  function refreshLedProfileOptions(selectedId = state.ledCatalogId ? `catalog:${state.ledCatalogId}` : '') {
     const defaultOption = document.createElement('option');
     defaultOption.value = '';
     defaultOption.textContent = 'Current custom profile';
-    const options = ledProfiles.map(profile => {
+    const catalogGroup = document.createElement('optgroup');
+    catalogGroup.label = 'Manufacturer planning profiles';
+    ledCatalog.forEach(record => {
+      const option = document.createElement('option');
+      option.value = `catalog:${record.id}`;
+      option.textContent = `${record.manufacturer} · ${record.name} · ${record.environment}`;
+      catalogGroup.append(option);
+    });
+    const savedGroup = document.createElement('optgroup');
+    savedGroup.label = 'Your saved profiles';
+    ledProfiles.forEach(profile => {
       const option = document.createElement('option');
       option.value = profile.id;
       option.textContent = profile.name;
-      return option;
+      savedGroup.append(option);
     });
-    els.ledProfileSelect.replaceChildren(defaultOption, ...options);
+    els.ledProfileSelect.replaceChildren(defaultOption, catalogGroup, savedGroup);
     els.ledProfileSelect.value = selectedId;
   }
 
   function saveLedPreset() {
     const normalizationMessages = normalizeFields();
+    state.ledCatalogId = null;
     const name = String(state.ledProductName || DEFAULTS.ledProductName).trim();
     const id = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 56) || `led-profile-${Date.now()}`;
     const values = Object.fromEntries(LED_PROFILE_KEYS.map(key => [key, state[key]]));
@@ -337,6 +416,8 @@
     else ledProfiles.unshift(profile);
     ledProfiles = ledProfiles.slice(0, 20);
     const saved = storage.set(LED_PROFILE_STORE, JSON.stringify(ledProfiles));
+    saveState();
+    calculate();
     refreshLedProfileOptions(saved ? id : '');
     const normalization = normalizationMessages.length ? ` ${normalizationMessages.join(' ')}` : '';
     announceAction(saved ? `LED profile “${name}” saved.${normalization}` : 'LED profile could not be saved because browser storage is unavailable.', saved ? 'success' : 'error');
@@ -344,12 +425,46 @@
   }
 
   function applyLedPreset() {
+    const catalog = ledCatalog.find(item => `catalog:${item.id}` === els.ledProfileSelect.value);
+    if (catalog) {
+      const cabinet = catalog.cabinet;
+      Object.assign(state, {
+        ledCatalogId: catalog.id,
+        ledProductName: `${catalog.manufacturer} ${catalog.name}`,
+        ledPitchMm: cabinet.pitchMm,
+        ledCabinetWidthMm: cabinet.widthMm,
+        ledCabinetHeightMm: cabinet.heightMm,
+        ledCabinetPixelsWide: cabinet.pixelsWide,
+        ledCabinetPixelsHigh: cabinet.pixelsHigh,
+        ledWeightKg: cabinet.weightKg,
+        ledMaxWattsEach: cabinet.maxWatts,
+        ledTypicalWattsEach: cabinet.typicalWatts,
+        ledSpecSource: catalog.sourceUrl,
+        ledPowerFactor: null,
+        ledPowerFactorEntered: false,
+        ledReceiverPixelsWide: null,
+        ledReceiverPixelsHigh: null,
+        ledCabinetsPerHomeRun: null
+      });
+      setFieldValues();
+      const normalizationMessages = normalizeFields();
+      const saved = saveState();
+      calculate();
+      announceAction(`${catalog.manufacturer} ${catalog.name} planning profile loaded.${normalizationMessages.length ? ` ${normalizationMessages.join(' ')}` : ''}${saved ? '' : ' Browser storage is unavailable.'}`, saved ? 'success' : 'error');
+      return;
+    }
     const profile = ledProfiles.find(item => item.id === els.ledProfileSelect.value);
     if (!profile || !profile.values || typeof profile.values !== 'object') return;
+    state.ledCatalogId = null;
     LED_PROFILE_KEYS.forEach(key => {
       if (Object.prototype.hasOwnProperty.call(profile.values, key)) state[key] = profile.values[key];
-      else if (key === 'ledSpecSource' || key === 'ledWeightKg') state[key] = DEFAULTS[key];
+      else if (['ledSpecSource', 'ledWeightKg', 'ledPowerFactor', 'ledPowerFactorEntered'].includes(key)) state[key] = DEFAULTS[key];
     });
+    if (profile.values.ledPowerFactorEntered !== true || !Number.isFinite(Number(state.ledPowerFactor))
+      || Number(state.ledPowerFactor) < 0.1 || Number(state.ledPowerFactor) > 1) {
+      state.ledPowerFactor = null;
+      state.ledPowerFactorEntered = false;
+    }
     setFieldValues();
     syncLedModeUI();
     const normalizationMessages = normalizeFields();
@@ -594,6 +709,16 @@
   }
 
   function readFields(event) {
+    if (isLedPage && LED_PROFILE_KEYS.includes(event.target.dataset.key)) {
+      if (state.ledCatalogId) {
+        if (LED_CATALOG_OVERRIDE_KEYS.has(event.target.dataset.key)) {
+          state.ledCatalogId = null;
+          els.ledProfileSelect.value = '';
+        }
+      } else {
+        els.ledProfileSelect.value = '';
+      }
+    }
     if (event.type === 'input') {
       if (isLedPage && event.target === els.ledPowerFactor) {
         state.ledPowerFactorEntered = event.target.value !== '' && event.target.validity.valid;
@@ -1049,6 +1174,7 @@
 
   function renderLedWall(led) {
     latestLedWall = led;
+    const catalog = catalogRecordForState();
     const viewerFill = Math.max(4, Math.min(100, led.viewing.closestM / led.viewing.optimalM * 100));
     els.ledWallPreview.style.setProperty('--wall-cols', led.cabinetsWide);
     els.ledWallPreview.style.setProperty('--wall-rows', led.cabinetsHigh);
@@ -1084,6 +1210,7 @@
     els.ledPowerMeta.textContent = led.power.powerFactor === null
       ? `${format(led.power.typicalWatts / 1000, 2)} kW typical · PF needed for current`
       : `${format(led.power.typicalWatts / 1000, 2)} kW typical · ~${format(led.power.typicalAmps, 1)} A est.`;
+    if (catalog?.manufacturer === 'Absen') els.ledPowerMeta.textContent += ' · ±15% spec tolerance';
 
     els.ledBuildArray.textContent = `${led.cabinetsWide} × ${led.cabinetsHigh} cabinets${led.rotated ? ' · rotated' : ''}`;
     els.ledCabinetCount.textContent = format(led.cabinetsTotal, 0);
@@ -1116,15 +1243,27 @@
       ? 'Cabinet exceeds limit' : `${format(led.processing.heaviestChainPixels, 0)} px · ${format(led.processing.heaviestChainUtilization, 1)}% nominal`;
     renderLedChainList(led);
     els.ledProcessorGuidance.textContent = `${led.processing.portsRequired} even-pixel lower-bound port(s) at ${format(led.processing.refreshHz, 2)} Hz / ${format(led.processing.bitDepth, 0)} bit. The color map assigns whole cabinets in an automatic row-serpentine order at ${format(led.processing.safePixelsPerPort, 0)} planning pixels per port. It is a planning sequence, not a verified cable route; confirm chain direction, receiver limits, and the heaviest output in manufacturer software.`;
-    els.ledProfileEvidence.replaceChildren(document.createTextNode('Operator-supplied values; a source link does not verify them automatically.'));
+    const evidenceText = catalog
+      ? `${catalog.manufacturer} ${catalog.name} · ${catalog.sourceRevision}. ${catalog.powerEvidence}. ${catalog.evidenceNote}`
+      : ledCatalogUnavailable
+        ? 'Manufacturer catalog is unavailable; custom and saved profiles still work. Operator-supplied values require confirmation.'
+        : 'Operator-supplied values; a source link does not verify them automatically.';
+    els.ledProfileEvidence.replaceChildren(document.createTextNode(evidenceText));
     if (state.ledSpecSource && validSpecSource(state.ledSpecSource)) {
       const link = document.createElement('a');
       link.href = state.ledSpecSource;
       link.target = '_blank';
       link.rel = 'noopener noreferrer';
-      link.textContent = ' Open supplied specification';
+      link.textContent = catalog ? ' Open manufacturer specification' : ' Open supplied specification';
       els.ledProfileEvidence.append(link);
     }
+    const cabinetWeight = optionalNumberValue('ledWeightKg');
+    els.ledCabinetMass.textContent = cabinetWeight === null
+      ? 'Cabinet weight needed'
+      : `${format(cabinetWeight * led.cabinetsTotal, 2)} kg cabinets only`;
+    els.ledSupportNote.textContent = catalog
+      ? `${catalog.evidenceNote} ${catalog.supportNote} Hardware, cables, ballast, wind, and structure are excluded from the cabinet-only mass.`
+      : 'Cabinet-only mass excludes hardware, cables, ballast, wind, and supporting structure. Confirm installation conditions with a qualified person.';
 
     const phaseLabel = led.power.phaseMode === 'threePhase'
       ? `balanced 3-phase line-to-line voltage${led.power.powerFactor === null ? '' : `, PF ${format(led.power.powerFactor, 2)}`}`
@@ -1256,6 +1395,7 @@
   }
 
   function buildLedSummary(led) {
+    const catalog = catalogRecordForState();
     const phaseLabel = led.power.phaseMode === 'threePhase'
       ? 'balanced three-phase at line-to-line voltage'
       : 'single-phase at supply voltage';
@@ -1264,10 +1404,10 @@
       : `PF ${format(led.power.powerFactor, 2)}; ${format(led.power.maxAmps, 1)} A maximum and ${format(led.power.typicalAmps, 1)} A typical estimate; ${led.power.maxCircuits} maximum-load and ${led.power.typicalCircuits} typical-load ${format(led.power.breakerAmps, 0)} A circuit(s) at a ${format(led.power.continuousFactor * 100, 0)} percent planning target`;
     return [
       `LED profile: ${led.productName}; P${format(led.pitchMm, 2)}, ${format(led.cabinetWidthMm, 0)} × ${format(led.cabinetHeightMm, 0)} mm effective cabinet, ${format(led.cabinetPixelsWide, 0)} × ${format(led.cabinetPixelsHigh, 0)} px${led.rotated ? ', rotated 90 degrees' : ''}.`,
-      `Product evidence: ${state.ledSpecSource || 'manufacturer specification URL not supplied'}; ${state.ledWeightKg ? `${format(state.ledWeightKg, 2)} kg per cabinet, ${format(state.ledWeightKg * led.cabinetsTotal, 2)} kg cabinets only` : 'cabinet weight not supplied'}. All values are operator supplied and require confirmation.`,
+      `Product evidence: ${state.ledSpecSource || 'manufacturer specification URL not supplied'}; ${state.ledWeightKg ? `${format(state.ledWeightKg, 2)} kg per cabinet, ${format(state.ledWeightKg * led.cabinetsTotal, 2)} kg cabinets only` : 'cabinet weight not supplied'}. ${catalog ? `${catalog.sourceRevision}; ${catalog.powerEvidence}. ${catalog.evidenceNote} ${catalog.supportNote}` : 'All values are operator supplied and require confirmation.'} Hardware, cables, ballast, wind, and structure are excluded.`,
       `LED wall: ${led.cabinetsWide} × ${led.cabinetsHigh} cabinets (${led.cabinetsTotal} total), ${format(led.wallWidthM, 2)} × ${format(led.wallHeightM, 2)} m / ${format(led.wallWidthFt, 2)} × ${format(led.wallHeightFt, 2)} ft, ${format(led.wallWidthPx, 0)} × ${format(led.wallHeightPx, 0)} px native raster (${format(led.totalPixels / 1e6, 2)} MP).`,
       `LED content: ${format(led.content.sourceWidthPx, 0)} × ${format(led.content.sourceHeightPx, 0)} source to ${format(led.wallWidthPx, 0)} × ${format(led.wallHeightPx, 0)} native is ${led.content.fitLabel.toLowerCase()}; ${format(led.content.aspectMismatchPercent, 2)} percent aspect difference.`,
-      `NovaStar planning estimate: ${led.processing.portsRequired} generic minimum 1 GbE data port(s) at ${format(led.processing.safePixelsPerPort, 0)} planning pixels per port; average adjusted-capacity loading ${format(led.processing.portUtilization, 1)} percent. Verify complete-cabinet chains.`,
+      `Generic data-port planning estimate: ${led.processing.portsRequired} minimum 1 GbE data port(s) at ${format(led.processing.safePixelsPerPort, 0)} planning pixels per port; average adjusted-capacity loading ${format(led.processing.portUtilization, 1)} percent. Verify complete-cabinet chains and actual processor compatibility.`,
       `Whole-cabinet data plan: ${led.processing.chainPortsRequired === null ? 'no valid chain because one cabinet exceeds the planning capacity' : `${led.processing.chainPortsRequired} automatic row-serpentine chain(s), up to ${led.processing.cabinetsPerChain} complete cabinet(s) each; heaviest chain ${format(led.processing.heaviestChainPixels, 0)} px`}. Confirm the actual cable order and processor output allocation.`,
       `LED power planning estimate: ${format(led.power.maxWatts / 1000, 2)} kW maximum and ${format(led.power.typicalWatts / 1000, 2)} kW typical at ${format(led.power.voltage, 0)} V ${phaseLabel}; ${currentPlan}.`,
       `LED viewing estimate: P${format(led.pitchMm, 2)} gives ${format(led.viewing.minimumFt, 1)} ft minimum and ${format(led.viewing.optimalFt, 1)} ft optimal rule-of-thumb distances; closest audience is ${format(led.viewing.closestDistance, 1)} ${led.viewing.closestUnit} (${led.viewing.label.toLowerCase()}).`,
@@ -1492,6 +1632,7 @@
   const initialNormalizations = normalizeFields();
   const initialSaved = saveState();
   calculate();
+  if (isLedPage) loadLedCatalog();
   if (!storage.available) {
     updateStatus('Calculators work, but browser storage is unavailable. Values will not persist.', 'error');
   } else if (storageLoadState === 'invalid') {

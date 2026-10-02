@@ -175,7 +175,7 @@ html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-wall-preview.h
         <div class="led-suite-title">
           <p class="led-suite-kicker">Advanced planning suite · cabinet aware</p>
           <h1 id="ledWallTitle">LED Wall Configurator</h1>
-          <p>Turn an LED cabinet profile and deployment goal into buildable geometry, native raster, content-fit guidance, NovaStar port estimates, viewing distance, and separated typical and maximum power plans.</p>
+          <p>Turn an LED cabinet profile and deployment goal into buildable geometry, native raster, content-fit guidance, generic data-port estimates, viewing distance, and separated typical and maximum power plans.</p>
         </div>
         <div class="led-suite-actions" aria-label="LED wall configuration actions">
           <button type="button" id="resetBtn">Reset LED plan</button>
@@ -233,7 +233,7 @@ html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-wall-preview.h
           <small id="ledContentMeta">1920 × 1080 source</small>
         </div>
         <div class="led-result" id="ledProcessingResult">
-          <span>NovaStar Planning</span>
+          <span>Data Port Planning</span>
           <strong id="ledProcessing">0 estimated ports</strong>
           <small id="ledProcessingMeta">Planning estimate</small>
         </div>
@@ -257,7 +257,7 @@ html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-wall-preview.h
           <legend>Product / Cabinet Profile</legend>
           <div class="led-module-fields">
             <div class="field full">
-              <label for="ledProfileSelect">Saved Profile</label>
+              <label for="ledProfileSelect">Cabinet Profile</label>
               <select id="ledProfileSelect">
                 <option value="">Current custom profile</option>
               </select>
@@ -268,7 +268,7 @@ html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-wall-preview.h
             </div>
             <div class="field">
               <label for="ledPitchMm">Pixel Pitch Mm</label>
-              <input id="ledPitchMm" data-key="ledPitchMm" type="number" min="0.1" max="50" step="0.01" value="2.9" inputmode="decimal" aria-describedby="ledAssumption">
+              <input id="ledPitchMm" data-key="ledPitchMm" type="number" min="0.1" max="50" step="0.001" value="2.9" inputmode="decimal" aria-describedby="ledAssumption">
             </div>
             <div class="field">
               <label for="ledCabinetRotation">Cabinet Rotation</label>
@@ -301,7 +301,7 @@ html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-wall-preview.h
               <label for="ledWeightKg">Cabinet Weight Kg (optional)</label>
               <input id="ledWeightKg" data-key="ledWeightKg" data-optional="true" type="number" min="0.01" max="1000" step="0.01" value="" inputmode="decimal">
             </div>
-            <p class="field-note full" id="ledProfileEvidence">Product values are operator supplied until checked against a manufacturer specification. A source link does not verify them automatically.</p>
+            <p class="field-note full" id="ledProfileEvidence">Manufacturer planning profiles are loading. Custom values remain available.</p>
             <p class="field-note full">When both raster fields are entered, they are authoritative and pitch is a validation check. Leave both blank to derive cabinet pixels from dimensions ÷ pitch.</p>
           </div>
         </fieldset>
@@ -353,7 +353,7 @@ html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-wall-preview.h
         </fieldset>
 
         <fieldset class="led-module" id="ledProcessingSection" data-led-section tabindex="-1">
-          <legend>Video / NovaStar Port Planner</legend>
+          <legend>Video / Data Port Planner</legend>
           <div class="led-module-fields">
             <div class="field">
               <label for="ledContentWidthPx">Content Width Px</label>
@@ -421,11 +421,11 @@ html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-wall-preview.h
           <div class="led-module-fields">
             <div class="field">
               <label for="ledMaxWattsEach">Maximum Watts / Cabinet</label>
-              <input id="ledMaxWattsEach" data-key="ledMaxWattsEach" type="number" min="0" max="100000" step="1" value="180" inputmode="decimal" aria-describedby="ledAssumption">
+              <input id="ledMaxWattsEach" data-key="ledMaxWattsEach" type="number" min="0" max="100000" step="0.01" value="180" inputmode="decimal" aria-describedby="ledAssumption">
             </div>
             <div class="field">
               <label for="ledTypicalWattsEach">Typical Watts / Cabinet</label>
-              <input id="ledTypicalWattsEach" data-key="ledTypicalWattsEach" type="number" min="0" max="100000" step="1" value="65" inputmode="decimal" aria-describedby="ledAssumption">
+              <input id="ledTypicalWattsEach" data-key="ledTypicalWattsEach" type="number" min="0" max="100000" step="0.01" value="65" inputmode="decimal" aria-describedby="ledAssumption">
             </div>
             <p class="field-note full">The default 180 W maximum and 65 W typical are sample cabinet values. Replace them with the actual product specifications.</p>
             <div class="field">
@@ -531,8 +531,10 @@ html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-wall-preview.h
             <div class="led-detail-stat"><span>Typical Load</span><strong id="ledTypicalLoad">0 kW · 0 A</strong></div>
             <div class="led-detail-stat"><span>Planning Circuits</span><strong id="ledCircuitPlan">0 max · 0 typical</strong></div>
             <div class="led-detail-stat"><span>Product Home Runs</span><strong id="ledHomeRuns">Not specified</strong></div>
+            <div class="led-detail-stat"><span>Cabinet-only Mass</span><strong id="ledCabinetMass">Cabinet weight needed</strong></div>
             <div class="led-detail-stat"><span>Viewing Range</span><strong id="ledViewingRange">0–0 ft</strong></div>
             <div class="led-detail-stat"><span>Audience Check</span><strong id="ledAudienceCheck">Review</strong></div>
+            <p class="led-detail-copy" id="ledSupportNote">Cabinet-only mass excludes hardware, cables, ballast, wind, and supporting structure.</p>
             <div class="led-inline-actions">
               <button type="button" id="sendLedTypicalPowerBtn">Send Typical Watts to Power Load</button>
               <button type="button" id="sendLedMaxPowerBtn">Send Maximum Watts to Power Load</button>
@@ -544,7 +546,7 @@ html[data-av-tool="led-wall-calculator"].led-workspace-ready .led-wall-preview.h
         </details>
       </div>
 
-      <p class="led-disclaimer" id="ledAssumption"><strong>Planning estimates only:</strong> Verify final cabinet, receiver-card, processor, signal, and power specifications against the actual product documentation. Confirm electrical distribution with the venue and a qualified person; the calculator does not establish code compliance or a verified safe load.</p>
+      <p class="led-disclaimer" id="ledAssumption"><strong>Planning estimates only:</strong> Verify the exact cabinet revision, receiver, processor, and electrical distribution against actual product documentation. Cabinet-only mass excludes support hardware and environmental loads. The calculator does not establish code compliance or a safe hanging or ground-stack design.</p>
     </section>
 
   </main>
