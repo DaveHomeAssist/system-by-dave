@@ -2,7 +2,8 @@
 
 /* Offline cache worker for the AV Suite. The asset manifest and cache version
    come from js/sbd-registry.js — the single source of truth for tools. Bump
-   SBD_REGISTRY.version whenever a tool or shared asset changes. */
+   SBD_REGISTRY.version and update this worker when a cached asset changes so
+   installed clients discover a new cache generation. */
 importScripts('./js/sbd-registry.js');
 
 var CACHE_PREFIX='sbd-av-suite-';
