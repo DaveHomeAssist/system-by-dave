@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-10-02 — Combined AV Video application
+
+- Combine Signal Flow and Video Patch into `/av-video/`: one editable route list drives signal chains, patch assignments and scoped route checks. Add optional patch, checks and backup modules, shared light/dark themes and a contained desktop/mobile workspace.
+- Import either existing sheet after preview, preserve full original sources and statuses, prevent duplicate imports, and provide complete JSON backup/restore. Explicit saves fail closed for unreadable storage and stale tabs. Existing sheet keys are read-only to the new application.
+- Launch Video prominently from Toolbox and fold its two predecessor cards into that application. New visits enter Toolbox by default; explicit Show Console routes and stored choices remain supported.
+- Add typed source, reproducible builds, unit and browser gates. This is the route-and-patch slice; display, projection, cameras, playback, streaming and recording consolidation remains open.
+
+
 ## 2026-10-02 — Remove Workbook recovery from consolidation scope
 
 - Record Dave's clarification that assumed Workbook users and recovery needs must not drive its public withdrawal. Remove the recovery notice, dedicated export/transfer flow, transition period and migration gate from the maintained plan and its dependent documents.

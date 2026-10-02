@@ -97,3 +97,5 @@ The LED Wall Calculator split from AV Calculator after this historical 44-tool b
 | Surface | Canonical route | Current color scheme | Planning surface | Treatment |
 |---|---|---|---|---|
 | LED Wall Calculator | `/led-wall-calculator.html` | Warm Paper / Stage Slate with dark planning stage | Cabinet inputs, live build map, estimates, and saved profiles | Specialist Translation |
+
+| AV Video | `/av-video/` | Shared Warm Paper / Stage Slate; visible theme selector; defaults to light. |

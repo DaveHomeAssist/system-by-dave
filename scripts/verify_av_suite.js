@@ -81,7 +81,7 @@ function assertSourceChecks(registry) {
   }
 
   const toolboxFeatured = registry.tools.filter((tool) => tool.toolboxFeatured === true).map((tool) => tool.id).sort();
-  const expectedFeatured = ['av-calculator', 'gear-reference', 'pixelforge', 'throwline'];
+  const expectedFeatured = ['av-calculator', 'av-video', 'gear-reference', 'pixelforge', 'throwline'];
   if (JSON.stringify(toolboxFeatured) !== JSON.stringify(expectedFeatured)) {
     fail(`Toolbox Use anytime registry set is wrong: ${toolboxFeatured.join(', ')}.`);
   }

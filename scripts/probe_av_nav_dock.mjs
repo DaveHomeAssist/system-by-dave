@@ -246,7 +246,7 @@ try {
   }
 
   for (const [route, previous, next] of [
-    ['display-plan.html', 'Video Patch', 'Projection Plan'],
+    ['display-plan.html', 'AV Video', 'Projection Plan'],
     ['projection-plan.html', 'Display Plan', 'Throwline'],
   ]) {
     const page = await browser.newPage({ viewport: { width: 390, height: 844 } });

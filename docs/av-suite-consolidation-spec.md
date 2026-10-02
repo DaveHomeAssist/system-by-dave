@@ -1,5 +1,7 @@
 # AV Suite consolidation: Toolbox and focused applications
 
+**Implementation update 2026-10-02:** [AV Video](../av-video/) combines Signal Flow and Video Patch as one standalone application launched from Toolbox, with optional modules and its own versioned document. See [the implemented workflow](av-video.md). Cross-application document linking remains deferred; it is not a prerequisite for this independently saved route-and-patch slice. The remaining six Video workflows and other focused applications remain planned.
+
 **Decision revision:** 2026-10-02, requested by Dave. The October 2 clarification removes assumed Workbook adoption, recovery and migration requirements from public withdrawal. This is the maintained product and migration plan. It supersedes the September 23 seven-workspace proposal and the September 29 recommendation to build Video inside Workbook. The [dated specification](av-suite-consolidation-spec-2026-09-23.md) remains historical evidence.
 
 **Delivery boundary:** This revision changes the plan. Toolbox as the default, optional modules, focused consolidated applications, and removal of Workbook from the public website are target behavior, not a claim of implementation. Current source at `238f2ed` still publishes Workbook and retains the doorway chooser. Use the [doorway contract](av-suite-doorway.md) for shipped behavior and the [development assets index](av-suite-development-assets-index.md) for evidence and source ownership.

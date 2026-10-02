@@ -23,6 +23,7 @@
   /* dept = console grouping (fine-grained). storageKeys = localStorage keys the
      tool writes (used by saved-data scan + show-package export/import). */
   var TOOLS=[
+    {id:'av-video',name:'AV Video',href:'av-video/',dept:'Video',phases:['advance','prep','loadin','show'],tag:'Application',desc:'Signal Flow and Video Patch combined: one route list, signal chains, input assignments, checks, and optional modules.',storageKeys:[{key:'sbd.avVideo.v1',label:'AV Video plan'}],toolboxFeatured:true},
     {id:'av-workbook',name:'AV Workbook',href:'av-workbook/',dept:'Workbook',phases:['advance','prep','loadin','show','strike','closeout'],tag:'Show File',desc:'Shared show workbook for rooms, crew, gear, signal sources, patching, validation, and handoff state.',storageKeys:[{key:'system-by-dave.av-workbook.active.v1',label:'AV Workbook active workbook'},{key:'system-by-dave.av-workbook.fallback.v1',label:'AV Workbook fallback'}]},
     {id:'teleprompter',name:'Teleprompter',href:'teleprompter.html',dept:'Show Flow',phases:['prep','show'],tag:'Script',desc:'Script reader with formatting, saved scripts, cues, remote mode, rundown, and a compact read view.',storageKeys:[{key:'teleprompter.v1',label:'Teleprompter state'},{key:'teleprompter.script.v1',label:'Teleprompter script'},{key:'teleprompter.preferences.v1',label:'Teleprompter preferences'},{key:'teleprompter.savedScripts.v1',label:'Teleprompter saved scripts'},{key:'teleprompter.savedFormats.v1',label:'Teleprompter saved looks'},{key:'teleprompter.pacePresets.v1',label:'Teleprompter saved paces'},{key:'teleprompter.bookmarks.v1',label:'Teleprompter bookmarks'},{key:'teleprompter.customColors.v1',label:'Teleprompter custom colors'}]},
     {id:'show-timer',name:'Show Timer',href:'show-timer.html',dept:'Show Flow',phases:['prep','show'],tag:'Clock',desc:'Countdown, count up, clock mode, stage view, warning states, and keyboard control.',storageKeys:[{key:'showTimer.preferences.v1',label:'Show Timer preferences'}]},
@@ -49,8 +50,8 @@
     {id:'speaker-plan',name:'Speaker Plan',href:'speaker-plan.html',dept:'Audio',phases:['advance','prep','loadin'],tag:'PA',desc:'Zones, loudspeakers, processor outputs, amps, cable paths, trim, delay, coverage, and backup routes.',storageKeys:[{key:'sbd.speakerPlan.v1',label:'Speaker Plan'}]},
     {id:'power-plan',name:'Power Plan',href:'power-plan.html',dept:'Power',phases:['advance','prep','loadin'],tag:'Power',desc:'Circuits, sources, room locations, load estimates, capacity, draw, headroom, backups, and issues.',storageKeys:[{key:'power-plan.v1',label:'Power Plan'}]},
     {id:'network-plan',name:'Network Plan',href:'network-plan.html',dept:'Network',phases:['advance','prep','loadin','show'],tag:'Network',desc:'Show control, audio, video, comms, internet, IPs, VLANs, switch ports, backups, and issues.',storageKeys:[{key:'network-plan.v1',label:'Network Plan'}]},
-    {id:'signal-flow',name:'Signal Flow',href:'signal-flow.html',dept:'Video',phases:['advance','prep','loadin'],tag:'Routes',desc:'Sources, processors, destinations, formats, connectors, backups, route status, and issues.',storageKeys:[{key:'signal-flow.v1',label:'Signal Flow'}]},
-    {id:'video-patch',name:'Video Patch',href:'video-patch.html',dept:'Video',phases:['prep','loadin','show'],tag:'Video',desc:'Sources, formats, connectors, switcher inputs, converters, destinations, routes, backups, and tests.',storageKeys:[{key:'sbd.videoPatch.v1',label:'Video Patch'}]},
+    {id:'signal-flow',consolidatedInto:'av-video',name:'Signal Flow',href:'signal-flow.html',dept:'Video',phases:['advance','prep','loadin'],tag:'Routes',desc:'Sources, processors, destinations, formats, connectors, backups, route status, and issues.',storageKeys:[{key:'signal-flow.v1',label:'Signal Flow'}]},
+    {id:'video-patch',consolidatedInto:'av-video',name:'Video Patch',href:'video-patch.html',dept:'Video',phases:['prep','loadin','show'],tag:'Video',desc:'Sources, formats, connectors, switcher inputs, converters, destinations, routes, backups, and tests.',storageKeys:[{key:'sbd.videoPatch.v1',label:'Video Patch'}]},
     {id:'display-plan',name:'Display Plan',href:'display-plan.html',dept:'Video',phases:['advance','prep','loadin'],tag:'Displays',desc:'Displays, inputs, processors, resolutions, aspect ratios, refresh rates, routes, backups, and status.',storageKeys:[{key:'display-plan.v1',label:'Display Plan'}]},
     {id:'projection-plan',name:'Projection Plan',href:'projection-plan.html',dept:'Video',phases:['advance','prep','loadin'],tag:'Projection',desc:'Screens, surfaces, projectors, lenses, throw, positions, routes, blends, backup paths, and alignment.',storageKeys:[{key:'sbd.projectionPlan.v1',label:'Projection Plan'}]},
     {id:'throwline',name:'Throwline',href:'ProjectorThrow/',dept:'Video',phases:['advance','prep','loadin','show'],tag:'Projection',desc:'Offline projector throw, fit, field commissioning, spatial room planning, calculated multi-projector layouts, dimensioned views, and show handoff.',storageKeys:[{key:'throwline:lenses:v2',label:'Throwline custom lenses'},{key:'throwline:jobs:v2',label:'Throwline saved jobs'},{key:'throwline:shift-profiles:v1',label:'Throwline shift profiles'},{key:'throwline:inventory:v1',label:'Throwline crew inventory'},{key:'throwline:show:v1',label:'Throwline current show'},{key:'throwline:stage-scene:v1',label:'Throwline Stage scenes'},{key:'throwline:stage-onboarding:v1',label:'Throwline Stage onboarding'},{key:'throwline:stage-units:v1',label:'Throwline Stage measurement units'},{key:'throwline:theme:v1',label:'Throwline theme'}],toolboxFeatured:true},
@@ -87,7 +88,7 @@
     {label:'Run of show',toolIds:['teleprompter','show-timer','cue-sheet','playback-check','comms-check']},
     {label:'Graphics',toolIds:['pixelforge','playback-check','display-plan','projection-plan']},
     {label:'Audio',toolIds:['audio-patch','line-check','input-list','speaker-plan','rf-coordination']},
-    {label:'Video',toolIds:['signal-flow','video-patch','display-plan','projection-plan','throwline','stream-plan','record-log','camera-shot-list']},
+    {label:'Video',toolIds:['av-video','display-plan','projection-plan','throwline','stream-plan','record-log','camera-shot-list']},
     {label:'Lighting',toolIds:['lighting-patch']},
     {label:'Power & data',toolIds:['power-plan','network-plan','cable-plan']},
     {label:'Spaces & staging',toolIds:['show-board','stageplotter','room-check','breakout-room-matrix','site-survey']},
@@ -158,6 +159,9 @@
     './data/gear/ptzoptics-superjoy-g1.json',
     './data/gear/figures/x39-chassis.svg',
     './data/gear/figures/x39-io.svg',
+    './av-video/index.html',
+    './av-video/assets/av-video.js',
+    './av-video/assets/av-video.css',
     './av-workbook.html',
     './av-workbook/index.html',
     './av-workbook/assets/av-workbook.js',
@@ -201,7 +205,7 @@
     {id:'planning',label:'Planning',depts:'Planning',icon:['M9 2h6v4H9z','M9 4H6a1 1 0 0 0-1 1v15a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V5a1 1 0 0 0-1-1h-3','m9 13 2 2 4-4'],toolIds:['show-advance','site-survey','stageplotter','breakout-room-matrix']},
     {id:'runofshow',label:'Run of show',depts:'Show Flow',icon:['M8 5.14v14l11-7z'],toolIds:['cue-sheet','teleprompter','show-timer'],subs:{teleprompter:[{label:'Read view',kind:'Mode',source:'Saved looks, this browser'},{label:'Remote',kind:'Mode',source:'Second-screen driver'},{label:'Rundown',kind:'Mode',source:'WPM pace presets'},{label:'Bookmarks',kind:'Mode',source:'Marker set, per script'}]}},
     {id:'audio',label:'Audio',depts:'Audio',icon:['M2 12h1','M6 8v8','M10 4v16','M14 7v10','M18 10v4','M21 12h1'],toolIds:['input-list','audio-patch','line-check','speaker-plan']},
-    {id:'video',label:'Video',depts:'Video · Streaming · Playback',icon:['m16 9 5-3v12l-5-3z','M3 6h13v12H3z'],toolIds:['signal-flow','video-patch','display-plan','projection-plan','throwline','stream-plan','record-log','playback-check','camera-shot-list'],subs:{throwline:[{label:'Throw & fit',kind:'Calc',source:'Manufacturer lens spec sheets'},{label:'Brightness',kind:'Calc',source:'ANSI/INFOCOMM 3M-2011 contrast'},{label:'Field verify',kind:'Check',source:'Measured on-site reading'},{label:'Drawings',kind:'Output',source:'ANSI D print validation'}]}},
+    {id:'video',label:'Video',depts:'Video · Streaming · Playback',icon:['m16 9 5-3v12l-5-3z','M3 6h13v12H3z'],toolIds:['av-video','display-plan','projection-plan','throwline','stream-plan','record-log','playback-check','camera-shot-list'],subs:{throwline:[{label:'Throw & fit',kind:'Calc',source:'Manufacturer lens spec sheets'},{label:'Brightness',kind:'Calc',source:'ANSI/INFOCOMM 3M-2011 contrast'},{label:'Field verify',kind:'Check',source:'Measured on-site reading'},{label:'Drawings',kind:'Output',source:'ANSI D print validation'}]}},
     {id:'lighting',label:'Lighting',depts:'Lighting',icon:['M9 18h6','M10 22h4','M12 2a7 7 0 0 0-4 12.7c.6.6 1 1.4 1 2.3h6c0-.9.4-1.7 1-2.3A7 7 0 0 0 12 2z'],toolIds:['lighting-patch']},
     {id:'power',label:'Power & data',depts:'Power · Network · Build',icon:['M13 2 4 14h7l-1 8 9-12h-7z'],toolIds:['power-plan','network-plan','cable-plan']},
     {id:'comms',label:'Comms & RF',depts:'Comms',icon:['M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z','M19 10v2a7 7 0 0 1-14 0v-2','M12 19v3'],toolIds:['rf-coordination','comms-check']},
@@ -240,7 +244,7 @@
 
   root.SBD_REGISTRY={
     /* Bump on any registry/tool asset change — rolls the service-worker cache. */
-    version:'v20261002-led-wall-responsive-polish',
+    version:'v20261002-unified-video',
     phases:PHASES,
     tools:TOOLS,
     recommended:RECOMMENDED,

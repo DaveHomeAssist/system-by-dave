@@ -68,10 +68,12 @@ const robots = read('robots.txt');
 // the noindex offline copy of the ATEM HD8 ISO interactive guide from 2026-09-25, and the noindex
 // /fmp/walk/ redirect to the walk's own origin from 2026-10-01, and the five noindex pages of the
 // managed /cheesesteaks/ static export (map, rankings, neighborhoods, methodology, about) from 2026-10-01.
-if (unlisted.length !== 153) fail(`Expected 153 tracked routes outside the sitemap; found ${unlisted.length}.`);
+// AV Video adds its source page and AV-origin generated application on 2026-10-02.
+if (unlisted.length !== 155) fail(`Expected 155 tracked routes outside the sitemap; found ${unlisted.length}.`);
 
 [
   '/apps/av-workbook/',
+  '/apps/av-video/',
   '/apps/fmp-camera-sim/',
   '/camera-sim/',
   '/cross-project-actions.html',
