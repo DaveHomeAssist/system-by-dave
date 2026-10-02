@@ -103,6 +103,9 @@ try {
   await button('Import saved Signal Flow').click(); await button('Add routes to plan').click();
   await goProject(); await button('Import saved Video Patch').click(); await button('Add routes to plan').click();
   await save();
+  await button('↶ Undo').click();
+  const undoneImport = await exportPlan(); assert.equal(undoneImport.routes.length, 5); assert.equal(undoneImport.imports.length, 1);
+  await button('↷ Redo').click(); await save();
   const combined = await readSaved(); assert.equal(combined.routes.length, 6); assert.equal(combined.imports.length, 2);
   assert.equal(combined.routes[4].notes, '\n  Original notes  \n');
   assert.equal(combined.routes[5].input, 'SDI 1');
