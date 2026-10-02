@@ -2,16 +2,17 @@
 
 **State:** In progress, 2026-09-23. The release sequence and acceptance criteria remain in the [consolidation specification](av-suite-consolidation-spec.md). No legacy route or saved record has been retired.
 
-## October 1 product direction
+## Product direction, clarified October 2
 
 The [maintained plan](av-suite-consolidation-spec.md) now makes Toolbox the default
 entry to focused applications with optional modules. Unified Video is independent
-of Workbook. Public Workbook withdrawal is settled; its former-URL recovery
-behavior is a consequential implementation choice. Retain the historical
-Workbook transfer/import/load-guard evidence below and preserve existing data.
-These safeguards do not require a Workbook host or a Workbook schema upgrade for
-new applications. Withdrawal must retain backup/transfer coverage even after a
-public registry entry is removed. This documentation revision retires no route.
+of Workbook. Public Workbook withdrawal is settled. Dave clarified on October 2
+that assumed users and recovery needs must not factor into its removal: no
+recovery notice, dedicated export/transfer flow, transition period or migration
+project is required. Retain the historical Workbook transfer/import/load-guard
+evidence below; it creates no withdrawal gate or Workbook dependency for new
+applications. Leave browser storage untouched. This documentation revision
+retires no route.
 
 ## Source snapshot as of 2026-09-23
 
