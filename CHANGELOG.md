@@ -7,6 +7,11 @@
 - Label the existing port calculation as a generic data-port plan so choosing a cabinet with another processing platform does not imply NovaStar compatibility.
 - Keep Stage 3D's offline readiness pin aligned with the AV cache version after adding the catalog asset.
 
+## 2026-10-01 — Cheesesteak Heatmap animated graphics and Philly touches
+
+- Sync `/cheesesteaks/` from philly-cheesesteak-heatmap `a896603`: a Pat's or Geno's showdown under the map (the pick stays in the browser), an azure and gold stripe in the Philadelphia flag colors, City Hall with William Penn in the skyline, and a little local voice ("No jawns match these filters", "Made wit love for the 215.").
+- Graphics from `9cc6258`: hand-drawn SVG graphics animated with GSAP, all skipped under reduced motion. Steam rises off the headline, a cheese drip band pours into Order like a local and wobbles on Whiz, the Pick for me die tumbles and lands, cards show heat-level roll icons, order buttons get ingredient icons, a rowhouse skyline with chimney steam sits at the page bottom, and the no-results state shows an empty wrapper. Adds a 1200x630 share card with Open Graph and Twitter metadata.
+
 ## 2026-10-01 — Paged preshow walk workspace
 
 - Publish the FMP walk from canonical source `20d23c6c88c28d67c4a6381f688dbfe50728c727` with focused task selection and Back/Next instead of document or panel scrolling. Paginate long notes, reports, fault forms and dialogs while preserving saved observations and complete backup data.
