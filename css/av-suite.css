@@ -424,7 +424,7 @@ img,svg{display:block}
 /* ---- live Toolbox workspace ---- */
 #avApp[data-entry="toolbox"] #showFileRailBlock,#avApp[data-entry="toolbox"] [data-show-only]{display:none!important}
 #avApp .toolbox-hero{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px;align-items:center}
-#avApp .toolbox-status{display:inline-flex;align-items:center;gap:8px;font-family:var(--f-label);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--st-ready);margin-bottom:8px}
+#avApp .toolbox-status{display:inline-flex;align-items:center;gap:8px;font-family:var(--f-label);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--av-text-2);margin-bottom:8px}
 #avApp .toolbox-status::before{content:'';width:8px;height:8px;background:var(--st-ready)}
 #avApp .toolbox-hero-actions{display:grid;gap:8px;min-width:154px}
 #avApp .toolbox-toolbar{display:grid;grid-template-columns:minmax(220px,1fr) minmax(150px,.45fr);gap:10px;margin:0 0 12px}

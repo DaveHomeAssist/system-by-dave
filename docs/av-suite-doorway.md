@@ -1,5 +1,7 @@
 # AV Suite Doorway Contract
 
+**Implemented 2026-10-02:** neutral first visits now open Toolbox automatically; explicit routes, show context and a deliberately saved entry preference still take precedence. Toolbox features [AV Video](../av-video/), which combines Signal Flow and Video Patch. Their individual registry records and legacy URLs remain compatible, while their Toolbox cards resolve to the combined application. The [Video workflow contract](av-video.md) describes the shipped slice. This implementation supersedes older chooser-first behavior described in the historical sections below.
+
 `av-suite.html` is the stable AV by Dave route. It exposes two distinct,
 addressable workspaces without duplicating the route or the canonical tool
 registry. The AV domain root `/` is a landing page with direct links to both.

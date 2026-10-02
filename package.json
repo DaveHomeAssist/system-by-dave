@@ -54,7 +54,12 @@
     "test:av-save-safety-browser": "node scripts/probe_av_save_safety.mjs --no-sandbox",
     "test:av-nav-browser": "node scripts/probe_av_nav_dock.mjs --no-sandbox",
     "test:av-suite-import-browser": "node scripts/probe_av_suite_import.mjs --no-sandbox",
-    "test:av-context-fill-browser": "node scripts/probe_av_context_fill.mjs --no-sandbox"
+    "test:av-context-fill-browser": "node scripts/probe_av_context_fill.mjs --no-sandbox",
+    "build:av-video": "vite build --config apps/av-video/vite.config.ts",
+    "dev:av-video": "vite --config apps/av-video/vite.config.ts",
+    "test:av-video": "vitest run --config apps/av-video/vitest.config.ts",
+    "typecheck:av-video": "tsc -p apps/av-video/tsconfig.json --noEmit",
+    "test:av-video-browser": "node scripts/probe_av_video.mjs --no-sandbox && node scripts/probe_av_video_graph.mjs --no-sandbox"
   },
   "devDependencies": {
     "@types/react": "^19.2.17",
@@ -73,6 +78,7 @@
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
+    "@xyflow/react": "^12.12.0",
     "gsap": "^3.15.0"
   }
 }

@@ -84,7 +84,7 @@ metadata, and title families are release-gated by the public content contract.
 
 `av-suite.html` is one doorway with two addressable workspaces: Show Console at
 `?entry=show` and the show-independent AV Toolbox at `?entry=toolbox`. A neutral
-first visit asks the operator to choose; any explicit `sbd*` show parameter
+first visit opens Toolbox; an explicitly saved entry preference is honored; any explicit `sbd*` show parameter
 forces Show Console. The registry drives both workspaces' tool inventory,
 storage metadata, navigation, offline assets, and generated sitemap entries.
 Toolbox-only pins, recents, search, and filter preferences live in
@@ -96,8 +96,7 @@ operator's Warm Paper, Stage Slate, or System choice.
 The [maintained consolidation plan](docs/av-suite-consolidation-spec.md) sets the
 next product direction: Toolbox as default, focused applications with optional
 modules, independently launchable Unified Video, and public Workbook withdrawal
-while retaining its concept for possible redesign. These are settled target
-decisions, not the shipped doorway behavior described above. Workbook is not a
+while retaining its concept for possible redesign. AV Video now combines Signal Flow and Video Patch at `/av-video/`, with app-owned data and optional patch, checks and backup modules. The remaining application consolidation is target work. See `docs/av-video.md`. Workbook is not a
 required host or database for new applications. Dave clarified on 2026-10-02
 that its withdrawal needs no recovery notice, dedicated export flow, transition
 period or migration project; do not factor assumed Workbook adoption into scope.
