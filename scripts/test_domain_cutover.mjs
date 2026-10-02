@@ -429,7 +429,8 @@ try {
     await page.locator('#backupFile').setInputFiles(backup);
     await page.getByRole('heading', { name: 'Transfer complete', exact: true }).waitFor();
     assert.deepEqual(await readValues(page), expected);
-    assert.equal(avStorageKeys.length, 60);
+    assert.equal(avStorageKeys.length, 61);
+    assert.ok(avStorageKeys.includes('sbd.avVideo.v1'), 'AV Video must participate in cross-domain backup and restore');
   });
 
   await test('AV Workbook link offers show context without saving it', async page => {
