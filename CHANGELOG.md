@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-02 — LED Wall Calculator responsive polish
+
+- Make the four settings groups collapsible without clearing inputs, and let the mobile section rail reopen and focus each group. Keep all five section buttons visible at phone width.
+- Move the section rail ahead of the 3D preview, tighten phone actions and tablet proportions, and make cabinet inspection an on-demand disclosure that opens when a cabinet is selected.
+- Keep the page viewport-locked while checking phone, portrait and landscape tablet, desktop, and ultrawide layouts. Stabilize the saved-profile browser probe by waiting for restored state after reload.
+
 ## 2026-10-02 — Sourced LED cabinet planning profiles
 
 - Add six ROE Visual and Absen cabinet variants to the LED Wall Calculator as an offline-ready manufacturer planning catalog. Selection fills exact cabinet geometry, raster, weight, and manufacturer or explicitly derived wattage while leaving deployment-specific processor, receiver, power factor, and power-link inputs unknown.

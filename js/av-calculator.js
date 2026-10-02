@@ -1600,16 +1600,34 @@
     els.ledInspectColumn.addEventListener('change', inspectCabinet);
     els.ledWallPreview.addEventListener('led-wall:select', event => {
       selectedCabinet = event.detail;
+      document.getElementById('ledCabinetInspector').open = true;
       updateLedCabinetInspector();
     });
-    document.querySelectorAll('[data-led-jump]').forEach(button => {
+    const setLedPanelExpanded = (panel, expanded) => {
+      const toggle = panel.querySelector('.led-module-toggle');
+      const fields = document.getElementById(toggle.getAttribute('aria-controls'));
+      toggle.setAttribute('aria-expanded', String(expanded));
+      fields.hidden = !expanded;
+    };
+    document.querySelectorAll('.led-module-toggle').forEach(toggle => {
+      toggle.addEventListener('click', () => {
+        setLedPanelExpanded(toggle.closest('.led-module'), toggle.getAttribute('aria-expanded') !== 'true');
+      });
+    });
+    const jumpButtons = document.querySelectorAll('[data-led-jump]');
+    jumpButtons.forEach(button => {
       button.addEventListener('click', () => {
         const target = document.getElementById(button.dataset.ledJump);
+        if (target.classList.contains('led-module')) setLedPanelExpanded(target, true);
         const suite = els.ledWallPreview.closest('.led-suite');
+        const sectionNav = suite.querySelector('.led-section-nav');
         const header = suite.querySelector('.led-suite-head');
-        const top = target.getBoundingClientRect().top - suite.getBoundingClientRect().top + suite.scrollTop - header.offsetHeight - 8;
+        const clearance = getComputedStyle(sectionNav).display === 'none' ? header.offsetHeight : sectionNav.offsetHeight;
+        const top = target.getBoundingClientRect().top - suite.getBoundingClientRect().top + suite.scrollTop - clearance - 8;
         suite.scrollTo({ top, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
         target.focus({ preventScroll: true });
+        jumpButtons.forEach(item => item.removeAttribute('aria-current'));
+        button.setAttribute('aria-current', 'location');
       });
     });
     window.addEventListener('pagehide', () => { if (previewMotion) previewMotion.kill(); }, { once: true });
