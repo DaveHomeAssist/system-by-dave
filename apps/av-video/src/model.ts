@@ -72,6 +72,7 @@ export async function previewImport(raw: string, name: string, browserKey?: stri
   if (rows.some(row => !fields.some(field => typeof row[field] === "string"))) throw new Error("The file contains unrecognized rows; nothing was imported.");
   const routes = rows.map((row, index) => {
     const result = newRoute();
+    if (signal) result.type = "";
     fields.forEach(field => {
       const v = row[field];
       if (v !== undefined && typeof v !== "string") throw new Error(`Row ${index + 1}: ${field} is not text. Nothing was imported.`);

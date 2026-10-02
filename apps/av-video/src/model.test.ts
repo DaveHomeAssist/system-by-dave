@@ -11,7 +11,7 @@ describe("AV Video shared plan", () => {
   it("retains original Signal Flow fields and raw source without truncation or invented status", async () => {
     const preview = await previewImport(source, "signal.json");
     const doc = applyImport(emptyDocument(), preview);
-    expect(doc.routes[0]).toMatchObject({ system: "control", format: "Custom format", connector: "", status: "custom status", notes: JSON.parse(source).routes[0].notes });
+    expect(doc.routes[0]).toMatchObject({ system: "control", type: "", format: "Custom format", connector: "", status: "custom status", notes: JSON.parse(source).routes[0].notes });
     expect(doc.meta.audioLead).toBe("Mira");
     expect(doc.imports[0].raw).toBe(source);
     expect(parseDocument(JSON.stringify(doc))).toEqual(doc);
