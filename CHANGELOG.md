@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-10-02 — Sourced LED cabinet planning profiles
+
+- Add six ROE Visual and Absen cabinet variants to the LED Wall Calculator as an offline-ready manufacturer planning catalog. Selection fills exact cabinet geometry, raster, weight, and manufacturer or explicitly derived wattage while leaving deployment-specific processor, receiver, power factor, and power-link inputs unknown.
+- Show the selected source revision, power basis, tolerance or conflicting-source note, cabinet-only mass, and conditional support guidance. Preserve existing custom profiles and save explicitly entered power factor with user profiles; older profiles cannot import an unverified PF.
+- Label the existing port calculation as a generic data-port plan so choosing a cabinet with another processing platform does not imply NovaStar compatibility.
+- Keep Stage 3D's offline readiness pin aligned with the AV cache version after adding the catalog asset.
+
 ## 2026-10-01 — Cheesesteak Heatmap animated graphics and Philly touches
 
 - Sync `/cheesesteaks/` from philly-cheesesteak-heatmap `a896603`: a Pat's or Geno's showdown under the map (the pick stays in the browser), an azure and gold stripe in the Philadelphia flag colors, City Hall with William Penn in the skyline, and a little local voice ("No jawns match these filters", "Made wit love for the 215.").

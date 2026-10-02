@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "planningOnly": true,
+  "records": [
+    {
+      "id": "roe-bp2v2-500x500",
+      "manufacturer": "ROE Visual",
+      "name": "Black Pearl BP2V2 · 500 × 500 mm",
+      "environment": "Indoor",
+      "sourceRevision": "February 3, 2024 brochure",
+      "sourceUrl": "https://www.roevisual.com/uploads/files/Product%20File/Black%20Pearl/bp2v2-brochure-en-feb.-3-2024.pdf",
+      "powerEvidence": "Manufacturer watts per cabinet",
+      "evidenceNote": "Earlier ROE brochures publish different power figures. Confirm the installed cabinet revision before using the 190/95 W values.",
+      "supportNote": "ROE's published hanging and stacking counts require its specified hardware; stacking also requires sufficient ballast. Obtain the installation manual and project structural review.",
+      "cabinet": { "pitchMm": 2.84, "widthMm": 500, "heightMm": 500, "pixelsWide": 176, "pixelsHigh": 176, "weightKg": 9.35, "maxWatts": 190, "typicalWatts": 95 }
+    },
+    {
+      "id": "roe-graphite-gp2-6-500x1000",
+      "manufacturer": "ROE Visual",
+      "name": "Graphite GP2.6 SMD · 500 × 1000 mm",
+      "environment": "Indoor",
+      "sourceRevision": "March 28, 2025 brochure",
+      "sourceUrl": "https://www.roevisual.com/uploads/files/Product%20File/Graphite/graphite-brochure-mar-28_-2025.pdf",
+      "powerEvidence": "Manufacturer watts per cabinet",
+      "evidenceNote": "The selected brochure lists 9.0 kg; an older ROE sheet lists 8.5 kg. Confirm the installed cabinet revision before using its weight.",
+      "supportNote": "Published hanging and stacking counts depend on ROE hardware and installation conditions. Obtain the installation manual and project structural review.",
+      "cabinet": { "pitchMm": 2.604, "widthMm": 500, "heightMm": 1000, "pixelsWide": 192, "pixelsHigh": 384, "weightKg": 9, "maxWatts": 320, "typicalWatts": 160 }
+    },
+    {
+      "id": "roe-carbon-cb5-mkii-600x1200",
+      "manufacturer": "ROE Visual",
+      "name": "Carbon CB5 MKII · 600 × 1200 mm",
+      "environment": "Outdoor IP65",
+      "sourceRevision": "Product page checked October 1, 2026",
+      "sourceUrl": "https://www.roevisual.com/en/products/cb-mark2",
+      "powerEvidence": "Manufacturer watts per cabinet",
+      "evidenceNote": "The current ROE page lists 13.6 kg; its February 2024 brochure lists 12.2 kg. Confirm the installed cabinet revision before using its weight.",
+      "supportNote": "ROE's published hanging and stacking counts require official hardware; stacking also requires the ballast and conditions in its manual or structural report.",
+      "cabinet": { "pitchMm": 5.77, "widthMm": 600, "heightMm": 1200, "pixelsWide": 104, "pixelsHigh": 208, "weightKg": 13.6, "maxWatts": 480, "typicalWatts": 240 }
+    },
+    {
+      "id": "absen-pl1-9-plus-v2-500x500",
+      "manufacturer": "Absen",
+      "name": "PL1.9 Plus V2 · 500 × 500 mm",
+      "environment": "Indoor IP40/IP21",
+      "sourceRevision": "Specification V20240914",
+      "sourceUrl": "https://www.usabsen.com/wp-content/uploads/2025/02/PL-V2-Spec-NA1-PL-V2-Spec-NA1.pdf#page=1",
+      "powerEvidence": "Derived from manufacturer 700/235 W/m² × 0.25 m²",
+      "evidenceNote": "Absen states ±15% power-consumption tolerance. Cabinet watts are calculated from the stated W/m² and cabinet area.",
+      "supportNote": "The specification lists a maximum rigging quantity, but hardware and project conditions are not established here. No stack limit is supplied.",
+      "cabinet": { "pitchMm": 1.953, "widthMm": 500, "heightMm": 500, "pixelsWide": 256, "pixelsHigh": 256, "weightKg": 7.8, "maxWatts": 175, "typicalWatts": 58.75 }
+    },
+    {
+      "id": "absen-pl2-9-pro-v2-500x500",
+      "manufacturer": "Absen",
+      "name": "PL2.9 Pro V2 · 500 × 500 mm",
+      "environment": "Outdoor IP65/IP54",
+      "sourceRevision": "Specification V20240914",
+      "sourceUrl": "https://www.usabsen.com/wp-content/uploads/2025/02/PL-V2-Spec-NA1-PL-V2-Spec-NA1.pdf#page=9",
+      "powerEvidence": "Derived from manufacturer 610/204 W/m² × 0.25 m²",
+      "evidenceNote": "Absen states ±15% power-consumption tolerance. Cabinet watts are calculated from the stated W/m² and cabinet area; an older manual has conflicting values.",
+      "supportNote": "The specification lists a maximum rigging quantity, but hardware and project conditions are not established here. No stack limit is supplied.",
+      "cabinet": { "pitchMm": 2.97, "widthMm": 500, "heightMm": 500, "pixelsWide": 168, "pixelsHigh": 168, "weightKg": 8, "maxWatts": 152.5, "typicalWatts": 51 }
+    },
+    {
+      "id": "absen-pl3-9-pro-v2-500x1000",
+      "manufacturer": "Absen",
+      "name": "PL3.9 Pro V2 · 500 × 1000 mm",
+      "environment": "Outdoor IP65/IP54",
+      "sourceRevision": "Specification V20240517",
+      "sourceUrl": "https://www.usabsen.com/wp-content/uploads/2025/02/PL-V2-Spec-NA1-PL-V2-Spec-NA1.pdf#page=15",
+      "powerEvidence": "Derived from manufacturer 800/267 W/m² × 0.5 m²",
+      "evidenceNote": "Absen states ±15% power-consumption tolerance. Cabinet watts are calculated from the stated W/m² and cabinet area; an older manual has conflicting values.",
+      "supportNote": "The specification lists a maximum rigging quantity, but hardware and project conditions are not established here. No stack limit is supplied.",
+      "cabinet": { "pitchMm": 3.9, "widthMm": 500, "heightMm": 1000, "pixelsWide": 128, "pixelsHigh": 256, "weightKg": 13, "maxWatts": 400, "typicalWatts": 133.5 }
+    }
+  ]
+}

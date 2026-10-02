@@ -192,6 +192,91 @@ async function main() {
       throw new Error(`Unverified LED power factor produced current or circuits: ${JSON.stringify(defaultPower)}.`);
     }
     console.log('PASS watts remain visible while current and circuits await manufacturer PF');
+    let catalogCount = 0;
+    for (let attempt = 0; attempt < 40; attempt += 1) {
+      catalogCount = await evaluate(`document.querySelectorAll('#ledProfileSelect option[value^="catalog:"]').length`);
+      if (catalogCount) break;
+      await delay(100);
+    }
+    if (catalogCount !== 6) throw new Error(`Expected six sourced cabinet profiles, found ${catalogCount}.`);
+    const catalogVariants = await evaluate(`(() => {
+      const select = document.getElementById('ledProfileSelect');
+      return Array.from(select.querySelectorAll('option[value^="catalog:"]'), option => {
+        const factor = document.getElementById('ledPowerFactor');
+        factor.value = '0.8';
+        factor.dispatchEvent(new Event('change', { bubbles: true }));
+        select.value = option.value;
+        select.dispatchEvent(new Event('change', { bubbles: true }));
+        const saved = JSON.parse(localStorage.getItem('avCalculator.v1'));
+        return { id: option.value, stored: saved.ledCatalogId,
+          source: document.querySelector('#ledProfileEvidence a')?.href,
+          weight: document.getElementById('ledCabinetMass').textContent,
+          factor: document.getElementById('ledPowerFactor').value,
+          correction: document.querySelector('#ledProfileSection [aria-invalid="true"]')?.id };
+      });
+    })()`);
+    if (catalogVariants.some(item => item.stored !== item.id.slice(8) || !item.source?.startsWith('https://')
+      || !item.weight.includes('kg cabinets only') || item.factor !== '' || item.correction)) {
+      throw new Error(`A sourced catalog variant failed to apply cleanly: ${JSON.stringify(catalogVariants)}.`);
+    }
+    const sourcedProfile = await evaluate(`(() => {
+      const select = document.getElementById('ledProfileSelect');
+      select.value = 'catalog:absen-pl1-9-plus-v2-500x500';
+      select.dispatchEvent(new Event('change', { bubbles: true }));
+      const saved = JSON.parse(localStorage.getItem('avCalculator.v1'));
+      return { selected: select.value, pitch: document.getElementById('ledPitchMm').value,
+        watts: document.getElementById('ledMaxWattsEach').value,
+        typical: document.getElementById('ledTypicalWattsEach').value,
+        powerFactor: document.getElementById('ledPowerFactor').value,
+        raster: document.getElementById('ledNativeRaster').textContent,
+        mass: document.getElementById('ledCabinetMass').textContent,
+        note: document.getElementById('ledProfileEvidence').textContent,
+        source: document.querySelector('#ledProfileEvidence a')?.href,
+        catalogId: saved.ledCatalogId, homeRun: saved.ledCabinetsPerHomeRun };
+    })()`);
+    if (sourcedProfile.pitch !== '1.953' || sourcedProfile.watts !== '175'
+      || sourcedProfile.typical !== '58.75' || sourcedProfile.powerFactor !== ''
+      || !sourcedProfile.raster.includes('2,048 × 1,280') || !sourcedProfile.mass.includes('312.00 kg')
+      || !sourcedProfile.note.includes('±15%') || !sourcedProfile.source.includes('usabsen.com')
+      || sourcedProfile.catalogId !== 'absen-pl1-9-plus-v2-500x500' || sourcedProfile.homeRun !== null) {
+      throw new Error(`Sourced profile did not load with evidence and unknown electrical inputs: ${JSON.stringify(sourcedProfile)}.`);
+    }
+    const deploymentChoice = await evaluate(`(() => {
+      const voltage = document.getElementById('ledVoltage');
+      voltage.value = '208';
+      voltage.dispatchEvent(new Event('change', { bubbles: true }));
+      return { selected: document.getElementById('ledProfileSelect').value,
+        catalogId: JSON.parse(localStorage.getItem('avCalculator.v1')).ledCatalogId };
+    })()`);
+    if (deploymentChoice.selected !== 'catalog:absen-pl1-9-plus-v2-500x500'
+      || deploymentChoice.catalogId !== 'absen-pl1-9-plus-v2-500x500') {
+      throw new Error(`Supply-voltage choice incorrectly invalidated cabinet provenance: ${JSON.stringify(deploymentChoice)}.`);
+    }
+    await cdp('Page.reload');
+    let restoredCatalog;
+    for (let attempt = 0; attempt < 40; attempt += 1) {
+      restoredCatalog = await evaluate(`(() => ({ selected: document.getElementById('ledProfileSelect')?.value,
+        count: document.querySelectorAll('#ledProfileSelect option[value^="catalog:"]').length,
+        note: document.getElementById('ledProfileEvidence')?.textContent }))()`);
+      if (restoredCatalog.count === 6 && restoredCatalog.selected === 'catalog:absen-pl1-9-plus-v2-500x500') break;
+      await delay(100);
+    }
+    if (!restoredCatalog.note.includes('Specification V20240914')) {
+      throw new Error(`Sourced profile and provenance did not survive reload: ${JSON.stringify(restoredCatalog)}.`);
+    }
+    const editedCatalog = await evaluate(`(() => {
+      const field = document.getElementById('ledMaxWattsEach');
+      field.value = '180';
+      field.dispatchEvent(new Event('change', { bubbles: true }));
+      return { selected: document.getElementById('ledProfileSelect').value,
+        catalogId: JSON.parse(localStorage.getItem('avCalculator.v1')).ledCatalogId,
+        note: document.getElementById('ledProfileEvidence').textContent };
+    })()`);
+    if (editedCatalog.selected !== '' || editedCatalog.catalogId !== null || !editedCatalog.note.includes('Operator-supplied')) {
+      throw new Error(`Edited catalog values retained manufacturer provenance: ${JSON.stringify(editedCatalog)}.`);
+    }
+    await evaluate(`document.getElementById('resetBtn').click()`);
+    console.log('PASS sourced cabinet profile, derived watts, provenance, persistence, and edit invalidation');
     await scenario('target physical size uses independent ceilings', [
       ['ledMode', 'targetSize'], ['ledTargetWidthFt', '16'], ['ledTargetHeightFt', '9']
     ], {
@@ -290,6 +375,8 @@ async function main() {
       const legacyValues = { ...profiles[0].values };
       delete legacyValues.ledSpecSource;
       delete legacyValues.ledWeightKg;
+      delete legacyValues.ledPowerFactor;
+      delete legacyValues.ledPowerFactorEntered;
       profiles.push({ id: 'legacy-cabinet', name: 'Legacy Cabinet', values: legacyValues });
       localStorage.setItem('avCalculator.ledProfiles.v1', JSON.stringify(profiles));
     })()`);
@@ -301,7 +388,8 @@ async function main() {
       const profiles = document.getElementById('ledProfileSelect');
       profiles.value = 'legacy-cabinet';
       profiles.dispatchEvent(new Event('change', { bubbles: true }));
-      const legacy = [document.getElementById('ledSpecSource').value, document.getElementById('ledWeightKg').value];
+      const legacy = [document.getElementById('ledSpecSource').value, document.getElementById('ledWeightKg').value,
+        document.getElementById('ledPowerFactor').value];
       profiles.value = 'probe-profile-500';
       profiles.dispatchEvent(new Event('change', { bubbles: true }));
       const invalid = document.getElementById('ledSpecSource');
@@ -311,7 +399,7 @@ async function main() {
         link: document.querySelector('#ledProfileEvidence a')?.href || '' };
     })()`);
     if (persistedProfile.source !== 'https://example.com/cabinet-spec.pdf' || persistedProfile.weight !== '8.5'
-      || JSON.stringify(persistedProfile.legacy) !== '["",""]'
+      || JSON.stringify(persistedProfile.legacy) !== '["","",""]'
       || persistedProfile.invalid !== '' || persistedProfile.link !== '') {
       throw new Error(`Profile reload, legacy migration, or source URL validation failed: ${JSON.stringify(persistedProfile)}.`);
     }
@@ -417,6 +505,28 @@ async function main() {
     if (!powerFactorResult.current.includes('~75.0 A') || !powerFactorResult.circuits.includes('5 max') || powerFactorResult.entered !== true) {
       throw new Error(`Single-phase PF calculation failed: ${JSON.stringify(powerFactorResult)}.`);
     }
+    const savedPowerFactor = await evaluate(`(() => {
+      const name = document.getElementById('ledProductName');
+      name.value = 'PF persistence probe';
+      name.dispatchEvent(new Event('change', { bubbles: true }));
+      document.getElementById('saveLedPresetBtn').click();
+      const profile = JSON.parse(localStorage.getItem('avCalculator.ledProfiles.v1'))
+        .find(item => item.id === 'pf-persistence-probe');
+      const factor = document.getElementById('ledPowerFactor');
+      factor.value = '';
+      factor.dispatchEvent(new Event('change', { bubbles: true }));
+      const select = document.getElementById('ledProfileSelect');
+      select.value = 'pf-persistence-probe';
+      select.dispatchEvent(new Event('change', { bubbles: true }));
+      return { saved: profile?.values.ledPowerFactor,
+        entered: profile?.values.ledPowerFactorEntered,
+        restored: factor.value, current: document.getElementById('ledMaxLoad').textContent };
+    })()`);
+    if (savedPowerFactor.saved !== 0.8 || savedPowerFactor.entered !== true
+      || savedPowerFactor.restored !== '0.8' || !savedPowerFactor.current.includes('~75.0 A')) {
+      throw new Error(`Explicitly entered saved-profile PF was not restored: ${JSON.stringify(savedPowerFactor)}.`);
+    }
+    console.log('PASS saved profile retains only explicitly entered power factor');
     await cdp('Page.reload');
     await delay(500);
     const restoredPower = await evaluate(`(() => ({
