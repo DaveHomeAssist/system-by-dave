@@ -7,6 +7,7 @@ on:
       - 'av-video/**'
       - 'package*.json'
       - 'scripts/probe_av_video*.mjs'
+      - 'scripts/probe_av_suite_responsive.js'
       - 'js/sbd-registry.js'
       - 'js/av-suite/**'
       - '.github/workflows/av-video.yml'
@@ -39,3 +40,15 @@ jobs:
       - run: npm run test:av-video-browser
       - name: AV source checks
         run: npm run verify:av
+      - name: Toolbox entry and consolidation contract
+        run: |
+          export CHROME_BIN="$(command -v google-chrome)"
+          test -n "$CHROME_BIN"
+          python3 -m http.server 8000 --bind 127.0.0.1 >/tmp/av-toolbox-server.log 2>&1 &
+          server_pid=$!
+          trap 'kill "$server_pid"' EXIT
+          for attempt in 1 2 3 4 5 6 7 8 9 10; do
+            if curl --silent --fail http://127.0.0.1:8000/av-suite.html >/dev/null; then break; fi
+            sleep 1
+          done
+          node scripts/probe_av_suite_responsive.js --target=hub-toolbox
