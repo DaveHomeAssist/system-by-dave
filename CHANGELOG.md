@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-02 — Video presets and undo
+
+- Add format/EDID timing and connector menus, custom LED rasters, and an explicit read-only link to the saved LED Wall Calculator dimensions. Preserve imported values outside the preset menus.
+- Add session Undo/Redo for route edits, device moves, connections, deletion, imports and module changes, with grouped typing and keyboard shortcuts. Keep save/stale-tab protection intact.
+
 ## 2026-10-02 — Combined AV Video application
 
 - Combine Signal Flow and Video Patch into `/av-video/`: a shared device-and-connection canvas supports equipment dragging, port connections, branching outputs and route tracing, with patch assignments and scoped route checks using the same data. Save diagram layouts and export standalone SVG drawings. Add optional patch, checks and backup modules, shared light/dark themes and a contained desktop/mobile workspace.
