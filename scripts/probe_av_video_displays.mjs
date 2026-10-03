@@ -102,6 +102,7 @@ try {
   assert.equal(await button('Displays').count(), 0);
   const hidden = await exportPlan(); assert.deepEqual(hidden.displays, combined.displays);
   await page.goto(`${url}?view=displays`); assert.equal(await button('Project').getAttribute('aria-current'), 'page');
+  assert.match(await page.getByRole('status').textContent(), /disabled.*Enable it in Project/);
   await page.getByLabel('Displays & Projection', { exact: false }).check(); await save();
   await button('Displays').click();
   await page.getByRole('button', { name: /Main screen.*lined/ }).click();

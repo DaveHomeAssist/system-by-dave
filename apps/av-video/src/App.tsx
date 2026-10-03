@@ -23,7 +23,7 @@ export function App() {
   const [savedSnapshot, setSavedSnapshot] = useState(() => JSON.stringify(initial.doc));
   const baseline = useRef(initial.baseline);
   const dirty = JSON.stringify(doc) !== savedSnapshot;
-  const [message, setMessage] = useState(initial.error || ((initial.doc.routes.length || initial.doc.displays.length) ? "Plan loaded from this browser." : "Ready. Create a route or import an existing sheet."));
+  const [message, setMessage] = useState(initial.error || (new URLSearchParams(location.search).get("view") === "displays" && !initial.doc.modules.displays ? "Displays & Projection is disabled. Enable it in Project to open this view; its data is retained." : (initial.doc.routes.length || initial.doc.displays.length) ? "Plan loaded from this browser." : "Ready. Create a route or import an existing sheet."));
   const [problem, setProblem] = useState(Boolean(initial.error));
   const [view, setView] = useState<View>(() => {
     const requested = new URLSearchParams(location.search).get("view");
