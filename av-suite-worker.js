@@ -133,6 +133,7 @@ self.addEventListener('fetch',function(event){
     if(request.mode==='navigate'||request.destination==='script'||request.destination==='style'){
       var networkRequest=request.mode==='navigate'?fetch(request):fetch(request,{cache:'no-cache'});
       return networkRequest.then(function(response){
+        if(request.mode!=='navigate'&&!response.ok) throw new Error('Asset request failed');
         return putClean(cache,request,response);
       }).catch(function(){
         return cachedResponse(cache,request).then(function(found){
